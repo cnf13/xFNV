@@ -103,10 +103,10 @@ bool ImageSpaceEffectMotionBlur::UpdateParams(ImageSpaceEffectParam* apParam) {
          BSShaderProperty::PreviousTransform::vecPrevCameraDir.y *
              BSShaderManager::spCamera->m_kWorld.m_Rotate.m_pEntry[1][2]);
     m_pObject->SetPixelConstant(1, v11, v10, 0.0, 0.0);
-    return 1;
+    return true;
 }
 
 void ImageSpaceEffectMotionBlur::SetFullScreenBlurConst(float afBlur) {
-    bParamsChanged = (bool)1;
+    bParamsChanged = true;
     Params.r = afBlur;
 }

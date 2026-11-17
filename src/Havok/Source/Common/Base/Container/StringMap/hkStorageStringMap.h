@@ -16,7 +16,7 @@ public:
 // Frees every key's copy on the thread's heap, then empties the map.
 template <typename V, typename Allocator>
 void hkStorageStringMap<V, Allocator>::clear() {
-    typedef typename hkCachedHashMap<hkStringMapOperations, Allocator>::Iterator Iterator;
+    using Iterator = typename hkCachedHashMap<hkStringMapOperations, Allocator>::Iterator;
     hkBool valid;
     for (Iterator it = this->m_map.getIterator(); this->m_map.isValid(&valid, it)->m_bool;
          it = this->m_map.getNext(it)) {

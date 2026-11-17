@@ -352,7 +352,7 @@ NiObject* NiPSysBoundUpdateModifier::CreateObject() {
     NiPSysBoundUpdateModifier* pkObject =
         static_cast<NiPSysBoundUpdateModifier*>(NiMemObject::operator new(sizeof(NiPSysBoundUpdateModifier)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysBoundUpdateModifier;
 }

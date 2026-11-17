@@ -148,7 +148,7 @@ void NiDX9LightManager::SetState(
     m_eApply = v5;
     NiTexturingProperty::Map* v6 = *pkTex->m_kMaps.m_pBase;
     if (v6 && (v6->m_spTexture.m_pObject && v5 == NiTexturingProperty::APPLY_REPLACE)) {
-        m_pkRenderState->SetRenderState(D3DRS_LIGHTING, 0, 0, 0);
+        m_pkRenderState->SetRenderState(D3DRS_LIGHTING, 0, 0, false);
         return;
     }
     NiVertexColorProperty::SourceVertexMode v7 = NiVertexColorProperty::SOURCE_IGNORE;
@@ -157,44 +157,44 @@ void NiDX9LightManager::SetState(
          (v7 = static_cast<NiVertexColorProperty::SourceVertexMode>(m_uFlags >> 4 & 3), (m_uFlags >> 3 & 1) != 0))) {
         if (v7 == m_eSourceMode) {
         LABEL_20:;
-            this->m_bAmbientDiffuse = 1;
+            this->m_bAmbientDiffuse = true;
             goto LABEL_21;
         }
         // The material source values: 0 is D3DMCS_MATERIAL, 1 D3DMCS_COLOR1.
         if (v7) {
             if (v7 != NiVertexColorProperty::SOURCE_EMISSIVE) {
                 if (v7 == NiVertexColorProperty::SOURCE_AMB_DIFF) {
-                    m_pkRenderState->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, 0, 0, 0);
-                    m_pkRenderState->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, 1u, 0, 0);
-                    m_pkRenderState->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, 1u, 0, 0);
+                    m_pkRenderState->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, 0, 0, false);
+                    m_pkRenderState->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, 1u, 0, false);
+                    m_pkRenderState->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, 1u, 0, false);
                 }
                 goto LABEL_19;
             }
-            m_pkRenderState->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, 1u, 0, 0);
+            m_pkRenderState->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, 1u, 0, false);
         }
         else {
-            m_pkRenderState->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, 0, 0, 0);
+            m_pkRenderState->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, 0, 0, false);
         }
-        m_pkRenderState->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, 0, 0, 0);
-        m_pkRenderState->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, 0, 0, 0);
+        m_pkRenderState->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, 0, 0, false);
+        m_pkRenderState->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, 0, 0, false);
     LABEL_19:;
         m_eSourceMode = v7;
         goto LABEL_20;
     }
     if (v7 && v7 != NiVertexColorProperty::SOURCE_AMB_DIFF) {
-        m_pkRenderState->SetRenderState(D3DRS_LIGHTING, 0, 0, 0);
+        m_pkRenderState->SetRenderState(D3DRS_LIGHTING, 0, 0, false);
         return;
     }
     v9 = m_eSourceMode == NiVertexColorProperty::SOURCE_EMISSIVE;
-    this->m_bAmbientDiffuse = 0;
+    this->m_bAmbientDiffuse = false;
     if (v9) {
-        m_pkRenderState->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, 0, 0, 0);
-        m_pkRenderState->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, 0, 0, 0);
-        m_pkRenderState->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, 0, 0, 0);
+        m_pkRenderState->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, 0, 0, false);
+        m_pkRenderState->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, 0, 0, false);
+        m_pkRenderState->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, 0, 0, false);
         m_eSourceMode = NiVertexColorProperty::SOURCE_IGNORE;
     }
 LABEL_21:;
-    m_pkRenderState->SetRenderState(D3DRS_LIGHTING, 1u, 0, 0);
+    m_pkRenderState->SetRenderState(D3DRS_LIGHTING, 1u, 0, false);
     const NiDynamicEffectState* m_pkLastState = this->m_pkLastState;
     if (m_pkLastState == m_pkInvalidState ||
         (pkState != m_pkLastState || this->m_bAmbientDiffuse != m_bLastAmbientDiffuse)) {
@@ -332,17 +332,17 @@ void NiDX9LightManager::ReleaseLights() {
 }
 
 void NiDX9LightManager::InitRenderModes() {
-    this->m_pkRenderState->SetRenderState(139u, 0, 0, 0);
-    this->m_pkRenderState->SetRenderState(137u, 0, 0, 0);
+    this->m_pkRenderState->SetRenderState(139u, 0, 0, false);
+    this->m_pkRenderState->SetRenderState(137u, 0, 0, false);
     NiDX9RenderState* m_pkRenderState = this->m_pkRenderState;
     m_eApply = NiTexturingProperty::APPLY_REPLACE;
-    m_bAmbientDiffuse = 0;
+    m_bAmbientDiffuse = false;
     m_eSourceMode = NiVertexColorProperty::SOURCE_IGNORE;
-    m_pkRenderState->SetRenderState(148u, 0, 0, 0);
-    this->m_pkRenderState->SetRenderState(147u, 0, 0, 0);
-    this->m_pkRenderState->SetRenderState(145u, 0, 0, 0);
+    m_pkRenderState->SetRenderState(148u, 0, 0, false);
+    this->m_pkRenderState->SetRenderState(147u, 0, 0, false);
+    this->m_pkRenderState->SetRenderState(145u, 0, 0, false);
     const NiDynamicEffectState* m_pkInvalidState = this->m_pkInvalidState;
-    m_bLastAmbientDiffuse = 0;
+    m_bLastAmbientDiffuse = false;
     m_pkLastState = m_pkInvalidState;
 }
 

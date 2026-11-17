@@ -137,14 +137,14 @@ PathBuilder::UpdateDetailedPath(uint32_t aiCurrentVirtualNodeIndex, const NiPoin
             uint32_t aiIndex = pSolution.m_pObject->GetNodeCount() - 1;
             pSolution.m_pObject->RemoveLastNode();
             pSolution.m_pObject->iLastLoadedVirtualNodeIndex = arLastLoadedNodeIndex;
-            bPathUpdate = 1;
-            if (!BuildDetailedPathForLoadedVirtualNodes(0) || pSolution.m_pObject->IsIncomplete()) {
+            bPathUpdate = true;
+            if (!BuildDetailedPathForLoadedVirtualNodes(nullptr) || pSolution.m_pObject->IsIncomplete()) {
                 return Pathing::FAILED;
             }
             pSolution.m_pObject->RemoveNode(aiIndex);
         }
         else {
-            if (!BuildDetailedPath(0, aiCurrentVirtualNodeIndex)) {
+            if (!BuildDetailedPath(nullptr, aiCurrentVirtualNodeIndex)) {
                 return Pathing::FAILED;
             }
         }
@@ -182,7 +182,7 @@ Pathing::UPDATE_DETAILED_PATH_RESULT PathBuilder::UpdatePathMoveToHigh(uint32_t 
         VirtualPathingNode* v4 = pSolution.m_pObject->GetVirtualNode(i_2);
         v4->UpdateNode();
     }
-    if (BuildDetailedPath(0, aiCurrentVirtualNodeIndex)) {
+    if (BuildDetailedPath(nullptr, aiCurrentVirtualNodeIndex)) {
         return Pathing::CREATED_DETAILED_PATH;
     }
     else {
@@ -249,7 +249,7 @@ RAYCASTPATH_RESULT PathBuilder::BuildPathFromNavMeshSearchGoal(
         return RCP_FAILED;
     }
     PathingLocation* pLastNodeLoc = &pLastNode->Location;
-    if (!pLastNodeLoc->ResolveNavMeshInfo(0)) {
+    if (!pLastNodeLoc->ResolveNavMeshInfo(nullptr)) {
         return RCP_FAILED;
     }
     if (pLastNodeLoc->HasNavMeshData()) {
@@ -279,7 +279,7 @@ RAYCASTPATH_RESULT PathBuilder::BuildPathFromNavMeshSearchGoal(
             return RCP_SUCCESS;
         }
     }
-    return BuildPathToValidNavMeshTriangle(*pLastNodeLoc, aRetPath, 0, aRetEdges);
+    return BuildPathToValidNavMeshTriangle(*pLastNodeLoc, aRetPath, false, aRetEdges);
 }
 
 RAYCASTPATH_RESULT PathBuilder::BuildStraightPathUsingRayCasts(
@@ -376,7 +376,7 @@ bool PathBuilder::BuildNavMeshPathForVirtualNodes(uint32_t aiFirstVirtualNodeInd
                                 &pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex + 1)->Location;
                             pSolution.m_pObject->AddPathingNode(*pNextLoc, NiPoint3_ZERO);
                             PathingNode* pLastPathNode = pSolution.m_pObject->GetLastNode();
-                            pLastPathNode->SetTransitionFlag(1);
+                            pLastPathNode->SetTransitionFlag(true);
                         }
                     }
                 }
@@ -393,7 +393,7 @@ bool PathBuilder::BuildNavMeshPathForVirtualNodes(uint32_t aiFirstVirtualNodeInd
             goto LABEL_62;
         }
         if (!CheckClosestEdgeToGoal(aiLastVirtualNodeIndex, endEdges, endNodes)) {
-            pSolution.m_pObject->SetIncomplete(1);
+            pSolution.m_pObject->SetIncomplete(true);
         }
         PathingLocation endLoc(
             endEdges.GetFirst().Location, endEdges.GetFirst().pNavMeshInfo, endEdges.GetFirst().usTriangle
@@ -409,7 +409,7 @@ bool PathBuilder::BuildNavMeshPathForVirtualNodes(uint32_t aiFirstVirtualNodeInd
         AddNodesFromNavMesh(*pStartTail, *pGoalTail, aiFirstVirtualNodeIndex, aiLastVirtualNodeIndex);
     if (res_2) {
         if (res_2 == PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_INCOMPLETE) {
-            pSolution.m_pObject->SetIncomplete(1);
+            pSolution.m_pObject->SetIncomplete(true);
             return false;
         }
         if (res_2 != PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_FAILED) {
@@ -424,7 +424,7 @@ bool PathBuilder::BuildNavMeshPathForVirtualNodes(uint32_t aiFirstVirtualNodeInd
         }
         PathingLocation* pGoalLoc = &pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex)->Location;
         VirtualPathingNode* pStartNode = pSolution.m_pObject->GetVirtualNode(aiFirstVirtualNodeIndex);
-        if (Pathing::CheckLineOfSight(pStartNode->Location, *pGoalLoc, 0, 0)) {
+        if (Pathing::CheckLineOfSight(pStartNode->Location, *pGoalLoc, nullptr, nullptr)) {
             goto LABEL_62;
         }
         LocationArray rayCastPath_2;
@@ -432,7 +432,7 @@ bool PathBuilder::BuildNavMeshPathForVirtualNodes(uint32_t aiFirstVirtualNodeInd
         VirtualPathingNode* pStartNode_2 = pSolution.m_pObject->GetVirtualNode(aiFirstVirtualNodeIndex);
         RAYCASTPATH_RESULT res_3 = BuildStraightPathUsingRayCasts(pStartNode_2->Location, *pGoalLoc_2, rayCastPath_2);
         if (res_3 == RCP_SUCCESS) {
-            pSolution.m_pObject->SetIncomplete(0);
+            pSolution.m_pObject->SetIncomplete(false);
             for (uint32_t i_3 = 0; i_3 < rayCastPath_2.iSize; ++i_3) {
                 pSolution.m_pObject->AddPathingNode(rayCastPath_2.GetAt(static_cast<int32_t>(i_3)), NiPoint3_ZERO);
             }
@@ -462,7 +462,7 @@ bool PathBuilder::BuildNavMeshPathForVirtualNodes(uint32_t aiFirstVirtualNodeInd
                         &pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex + 1)->Location;
                     pSolution.m_pObject->AddPathingNode(*pNextLoc, NiPoint3_ZERO);
                     PathingNode* pLastPathNode = pSolution.m_pObject->GetLastNode();
-                    pLastPathNode->SetTransitionFlag(1);
+                    pLastPathNode->SetTransitionFlag(true);
                 }
             }
         }
@@ -501,11 +501,11 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
         return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_OK;
     }
     BadNodes_t BadNodes(32u, 0);
-    bool bAddNodesFromNavMeshIncomplete = 0;
+    bool bAddNodesFromNavMeshIncomplete = false;
     int32_t imaxPassCount = pRequest.m_pObject->iRetryCount;
     BSClamp<int32_t>(imaxPassCount, 1, 10);
-    DetailedPathInfos.Clear(0);
-    DetailedPathMeshes.Clear(0);
+    DetailedPathInfos.Clear(false);
+    DetailedPathMeshes.Clear(false);
     for (uint32_t i = 0;; ++i) {
         uint32_t VirtualNodeCount = pSolution.m_pObject->GetVirtualNodeCount();
         if (i >= VirtualNodeCount) {
@@ -593,15 +593,15 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
                 return v28;
             }
             if (!plastVirtualNode->IsTransitionNode()) {
-                bAddNodesFromNavMeshIncomplete = 1;
-                pSolution.m_pObject->SetIncomplete(1);
+                bAddNodesFromNavMeshIncomplete = true;
+                pSolution.m_pObject->SetIncomplete(true);
             }
             goto LABEL_42;
         }
         if (pass) {
         LABEL_41:;
-            bAddNodesFromNavMeshIncomplete = 1;
-            pSolution.m_pObject->SetIncomplete(1);
+            bAddNodesFromNavMeshIncomplete = true;
+            pSolution.m_pObject->SetIncomplete(true);
         LABEL_42:;
             if (!pRequest.m_pObject->bAllowIncompletePath) {
                 PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT v27 = PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_FAILED;
@@ -622,8 +622,8 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
         goto LABEL_72;
     }
     if (pass == imaxPassCount - 1 && pRequest.m_pObject->GetIgnoreSmoothingIfFails()) {
-        bAddNodesFromNavMeshIncomplete = 1;
-        pSolution.m_pObject->SetIncomplete(1);
+        bAddNodesFromNavMeshIncomplete = true;
+        pSolution.m_pObject->SetIncomplete(true);
         for (uint32_t i_3 = 0;; ++i_3) {
             uint32_t v13 = nodes.iSize;
             if (i_3 >= v13) {
@@ -665,7 +665,7 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
     }
     if (!BadNodes.IsEmpty() && pass != imaxPassCount - 1) {
         if (pass < imaxPassCount - 1) {
-            while (1) {
+            while (true) {
                 uint32_t NodeCount = pSolution.m_pObject->GetNodeCount();
                 if (NodeCount == icurrentNodeCount) {
                     break;
@@ -679,14 +679,14 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
         goto LABEL_13;
     }
     if (plastNode) {
-        bAddNodesFromNavMeshIncomplete = 1;
-        pSolution.m_pObject->SetIncomplete(1);
+        bAddNodesFromNavMeshIncomplete = true;
+        pSolution.m_pObject->SetIncomplete(true);
         if (pRequest.m_pObject->bAllowIncompletePath) {
             links.~BSSimpleArray<NavMeshSearchLink, 1024>();
             nodes.~BSSimpleArray<NavMeshSearchNode, 1024>();
             return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_INCOMPLETE;
         }
-        while (1) {
+        while (true) {
             uint32_t v17 = pSolution.m_pObject->GetNodeCount();
             if (v17 == icurrentNodeCount) {
                 break;
@@ -744,7 +744,7 @@ bool PathBuilder::BuildNavMeshInfoPath(const NavMeshInfo* apStartMesh, const Nav
     NavMeshInfoSearch highSearch;
     infos_t infos(20u, 0, pScrapHeap);
     portals_t portals(20u, 0, pScrapHeap);
-    ActorLockData* plockData = 0;
+    ActorLockData* plockData = nullptr;
     if (!pRequest.m_pObject->bCantOpenDoors) {
         plockData = &pRequest.m_pObject->LockData;
     }
@@ -799,7 +799,7 @@ bool PathBuilder::BuildTeleportDoorPath() {
     TeleportPath doorPath;
     doorPath.Spaces.SetReservedSize(10u);
     doorPath.Doors.SetReservedSize(10u);
-    ActorLockData* plockData = 0;
+    ActorLockData* plockData = nullptr;
     if (!pRequest.m_pObject->bCantOpenDoors) {
         plockData = &pRequest.m_pObject->LockData;
     }
@@ -814,7 +814,7 @@ bool PathBuilder::BuildTeleportDoorPath() {
         TESObjectREFR* pDoor = (&doorPath.Doors.GetFirst())->pDoor;
         ParentSpaceNode* v4 = &doorPath.Spaces.GetFirst();
         if (!BuildNavMeshInfoPathInSpace(startLocation, goalLocation, v4, pDoor)) {
-            return 0;
+            return false;
         }
         for (uint32_t i = 0;; ++i) {
             uint32_t FormFlags = doorPath.Doors.iSize;
@@ -828,24 +828,24 @@ bool PathBuilder::BuildTeleportDoorPath() {
             if (!BuildNavMeshInfoPathInSpace(
                     startLocation_2, goalLocation_2, &doorPath.Spaces.GetAt(static_cast<int32_t>(i + 1)), v10
                 )) {
-                pSolution.m_pObject->SetIncomplete(1);
-                return 0;
+                pSolution.m_pObject->SetIncomplete(true);
+                return false;
             }
         }
         startLocation = (&doorPath.Doors.GetLast())->DoorTeleportLocation;
         goalLocation = (&pRequest.m_pObject->Destination)->GetLocation();
         ParentSpaceNode* Last = &doorPath.Spaces.GetLast();
-        if (!BuildNavMeshInfoPathInSpace(startLocation, goalLocation, Last, 0)) {
-            pSolution.m_pObject->SetIncomplete(1);
-            return 0;
+        if (!BuildNavMeshInfoPathInSpace(startLocation, goalLocation, Last, nullptr)) {
+            pSolution.m_pObject->SetIncomplete(true);
+            return false;
         }
     }
     else {
         if (bteleportSearchSucceeded) {
             ParentSpaceNode* v8 = &doorPath.Spaces.GetAt(0);
             NiPoint3* afMaxDist = ::new (&result) NiPoint3((&pRequest.m_pObject->Destination)->GetLocation());
-            if (!BuildNavMeshInfoPathInSpace((&pRequest.m_pObject->Origin)->GetLocation(), *afMaxDist, v8, 0)) {
-                return 0;
+            if (!BuildNavMeshInfoPathInSpace((&pRequest.m_pObject->Origin)->GetLocation(), *afMaxDist, v8, nullptr)) {
+                return false;
             }
         }
     }
@@ -863,13 +863,13 @@ bool PathBuilder::BuildDetailedPath(Actor* pActor, uint32_t aiFirstHighLevelNode
     ifirstLoadedNode = -1;
     ilastLoadedNode = -1;
     if (!FindLoadedNodeIndices(aiFirstHighLevelNode, &ifirstLoadedNode, &ilastLoadedNode)) {
-        return 1;
+        return true;
     }
     pSolution.m_pObject->iFirstLoadedVirtualNodeIndex = ifirstLoadedNode;
     pSolution.m_pObject->iLastLoadedVirtualNodeIndex = ilastLoadedNode;
     bool bbuildDetailedPathRes = BuildDetailedPathForLoadedVirtualNodes(pActor);
     if (!bbuildDetailedPathRes && !pSolution.m_pObject->GetNodeCount()) {
-        return 0;
+        return false;
     }
     if (pRequest.m_pObject->GetFirstTangentUsesHeading() && !pSolution.m_pObject->iFirstLoadedVirtualNodeIndex &&
         pSolution.m_pObject->GetNodeCount() >= 2) {
@@ -1026,13 +1026,13 @@ bool PathBuilder::FindClosestOpenEdge(PathingLocation aStartLocation, PathingLoc
         }
     }
     if (v36 == -1) {
-        return 0;
+        return false;
     }
     else {
         PathingLocation* aLoc =
             FNVD_RECONSTRUCT(PathingLocation)(&v15, arLocation, v32.GetAt(static_cast<int32_t>(v36)), v35);
         aRetLocation.operator=(*aLoc);
-        return 1;
+        return true;
     }
 }
 
@@ -1160,7 +1160,7 @@ bool PathBuilder::FindEntryPoint(
     NavMeshPtr pcurrentMesh;
     const NavMeshInfo* BestNavMeshInfo = (&apCurrentNode->Location)->GetBestNavMeshInfo();
     if (!BestNavMeshInfo->GetNavMesh(pcurrentMesh)) {
-        return 0;
+        return false;
     }
     if (apCurrentNode->HasActualLocation()) {
         uint16_t usTriIndex[2];
@@ -1170,7 +1170,7 @@ bool PathBuilder::FindEntryPoint(
         iedge = -1;
         float afRadius = fdist + fdist;
         if (pcurrentMesh.m_pObject->FindClosestOpenEdgeForLocation(
-                (&apPrevNode->Location)->GetLocation(), afRadius, usTriIndex, &iedge, 1
+                (&apPrevNode->Location)->GetLocation(), afRadius, usTriIndex, &iedge, true
             )) {
             pcurrentMesh.m_pObject->GetEdgeVertices(usTriIndex[0], iedge, &point1, &point2);
             NiPoint3 center = pcurrentMesh.m_pObject->GetCenter(usTriIndex[0]);
@@ -1181,7 +1181,7 @@ bool PathBuilder::FindEntryPoint(
             PathingLocation apLocation(*v11, NavMeshInfo_, v21);
             PathingLocation* aLoc = &apLocation;
             aRetLocation.operator=(*aLoc);
-            return 1;
+            return true;
         }
     }
     else {
@@ -1216,10 +1216,10 @@ bool PathBuilder::FindEntryPoint(
             PathingLocation v28(*v16, v19, v22);
             PathingLocation* v23 = &v28;
             aRetLocation.operator=(*v23);
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 // KEEP: the exe builds FindClosestOpenEdge's by-value PathingLocation argument in the outgoing argument slot with
@@ -1330,7 +1330,7 @@ bool PathBuilder::FindLoadedNodeIndices(
     VirtualPathingNode* VirtualNode = pSolution.m_pObject->GetVirtualNode(aiFirstHighLevelNode);
     TESObjectCELL* pcell = (&VirtualNode->Location)->GetCell();
     if (!pcell || !pcell->GetAttached()) {
-        return 0;
+        return false;
     }
     *apFirstLoadedNodeIndex = aiFirstHighLevelNode;
     // The index is compared with the node count signed.
@@ -1349,13 +1349,13 @@ bool PathBuilder::FindLoadedNodeIndices(
         }
     }
     --*apLastLoadedNodeIndex;
-    return 1;
+    return true;
 }
 
 bool PathBuilder::FindVirtualNodeSegments(BSSimpleArray<PathBuilder::VirtualNodeSegment, 1024>& aRetSegmentArray) {
     NavMeshInfo* pnextInfo;
     using NodesHaveNavMeshInfo_t = BSScrapArray<bool, 1024>;
-    aRetSegmentArray.Clear(0);
+    aRetSegmentArray.Clear(false);
     int32_t ifirstLoadedVirtualNode = pSolution.m_pObject->iFirstLoadedVirtualNodeIndex;
     int32_t ilastLoadedVirtualNode = pSolution.m_pObject->iLastLoadedVirtualNodeIndex;
     NodesHaveNavMeshInfo_t NodesHaveNavMeshInfo(ilastLoadedVirtualNode - ifirstLoadedVirtualNode + 1, 0, pScrapHeap);
@@ -1366,7 +1366,7 @@ bool PathBuilder::FindVirtualNodeSegments(BSSimpleArray<PathBuilder::VirtualNode
     }
     int32_t nodeIndex = ifirstLoadedVirtualNode;
     while (nodeIndex <= ilastLoadedVirtualNode) {
-        bool aValue = 1;
+        bool aValue = true;
         int32_t firstNodeWithInfoIndex = NodesHaveNavMeshInfo.BSSimpleArray<bool, 1024>::Find(
             aValue, nodeIndex - ifirstLoadedVirtualNode, &BSSimpleArray<bool, 1024>::DefaultEqualFunctionByAddress
         );
@@ -1374,13 +1374,13 @@ bool PathBuilder::FindVirtualNodeSegments(BSSimpleArray<PathBuilder::VirtualNode
             PathBuilder::VirtualNodeSegment v8;
             v8.iFirstVirtualNode = nodeIndex;
             v8.iLastVirtualNode = ilastLoadedVirtualNode;
-            v8.bHasNavMeshes = 0;
+            v8.bHasNavMeshes = false;
             aRetSegmentArray.Add(v8);
             nodeIndex = ilastLoadedVirtualNode + 1;
         }
         else {
             PathBuilder::VirtualNodeSegment v17;
-            bool v5 = 0;
+            bool v5 = false;
             int32_t v2 = NodesHaveNavMeshInfo.BSSimpleArray<bool, 1024>::Find(
                 v5, firstNodeWithInfoIndex, &BSSimpleArray<bool, 1024>::DefaultEqualFunctionByAddress
             );
@@ -1394,7 +1394,7 @@ bool PathBuilder::FindVirtualNodeSegments(BSSimpleArray<PathBuilder::VirtualNode
                 PathBuilder::VirtualNodeSegment a2;
                 a2.iFirstVirtualNode = nodeIndex;
                 a2.iLastVirtualNode = firstNodeWithInfoIndex - 1;
-                a2.bHasNavMeshes = 0;
+                a2.bHasNavMeshes = false;
                 aRetSegmentArray.Add(a2);
             }
             int32_t icurrentsubSegmentFirstNode = firstNodeWithInfoIndex;
@@ -1409,7 +1409,7 @@ bool PathBuilder::FindVirtualNodeSegments(BSSimpleArray<PathBuilder::VirtualNode
                 // The adjacency arrays hold non-const infos, so this local's address is passed to their Find.
                 pnextInfo = const_cast<NavMeshInfo*>((&pnextNode->Location)->GetBestNavMeshInfo());
                 if (!pthisInfo || !pnextInfo) {
-                    return 0;
+                    return false;
                 }
                 if (pthisInfo != pnextInfo &&
                     pthisInfo->AdjacentNavMeshes.Find(
@@ -1421,19 +1421,19 @@ bool PathBuilder::FindVirtualNodeSegments(BSSimpleArray<PathBuilder::VirtualNode
                     PathBuilder::VirtualNodeSegment v9;
                     v9.iFirstVirtualNode = icurrentsubSegmentFirstNode;
                     v9.iLastVirtualNode = icurrentNode;
-                    v9.bHasNavMeshes = 1;
+                    v9.bHasNavMeshes = true;
                     aRetSegmentArray.Add(v9);
                     icurrentsubSegmentFirstNode = icurrentNode + 1;
                 }
             }
             v17.iFirstVirtualNode = icurrentsubSegmentFirstNode;
             v17.iLastVirtualNode = lastNodeWithInfoIndex;
-            v17.bHasNavMeshes = 1;
+            v17.bHasNavMeshes = true;
             aRetSegmentArray.Add(v17);
             nodeIndex = lastNodeWithInfoIndex + 1;
         }
     }
-    return 1;
+    return true;
 }
 
 bool PathBuilder::BuildDetailedPathForLoadedVirtualNodes(Actor* pActor) {
@@ -1448,7 +1448,7 @@ bool PathBuilder::BuildDetailedPathForLoadedVirtualNodes(Actor* pActor) {
         PathBuilder::VirtualNodeSegment* pSegment = &segments.GetAt(static_cast<int32_t>(i));
         if (pSegment->bHasNavMeshes) {
             if (i && segments.GetAt(static_cast<int32_t>(i - 1)).bHasNavMeshes && !bGoDirectIfPathFails) {
-                pSolution.m_pObject->SetIncomplete(1);
+                pSolution.m_pObject->SetIncomplete(true);
                 return false;
             }
             bSegmentBuilt = BuildNavMeshPathForVirtualNodes(
@@ -1499,24 +1499,24 @@ bool PathBuilder::RunNavMeshSearch_006CD670(
                 apThis.~NavMeshSearch();
                 v11.~NiPointer<NavMesh>();
                 apMemory.~NiPointer<NavMesh>();
-                return 1;
+                return true;
             }
             else {
                 apThis.~NavMeshSearch();
                 v11.~NiPointer<NavMesh>();
                 apMemory.~NiPointer<NavMesh>();
-                return 0;
+                return false;
             }
         }
         else {
             v11.~NiPointer<NavMesh>();
             apMemory.~NiPointer<NavMesh>();
-            return 0;
+            return false;
         }
     }
     else {
         apMemory.~NiPointer<NavMesh>();
-        return 0;
+        return false;
     }
 }
 
@@ -1557,7 +1557,8 @@ bool PathBuilder::RunPathSmoother(
             PathingSolution* m_pObject = pSolution.m_pObject;
             NiPoint3* Location_ = ::new (&result) NiPoint3(aGoalLocation.GetLocation());
             bool v24 = pathSmoother.SmoothPath(
-                pRequest.m_pObject, aNodes, aLinks, aStartLocation.GetLocation(), *Location_, m_pObject, &aBadNodes, 1
+                pRequest.m_pObject, aNodes, aLinks, aStartLocation.GetLocation(), *Location_, m_pObject, &aBadNodes,
+                true
             );
             return v24;
         }
@@ -1591,7 +1592,7 @@ bool PathBuilder::FindExitPoint(
     NavMeshPtr pcurrentMesh;
     const NavMeshInfo* BestNavMeshInfo = (&apCurrentNode->Location)->GetBestNavMeshInfo();
     if (!BestNavMeshInfo->GetNavMesh(pcurrentMesh)) {
-        return 0;
+        return false;
     }
     if (apCurrentNode->HasActualLocation()) {
         uint16_t usTriIndex[2];
@@ -1601,7 +1602,7 @@ bool PathBuilder::FindExitPoint(
         iedge = -1;
         float afRadius = fdist + fdist;
         if (pcurrentMesh.m_pObject->FindClosestOpenEdgeForLocation(
-                (&apNextNode->Location)->GetLocation(), afRadius, usTriIndex, &iedge, 0
+                (&apNextNode->Location)->GetLocation(), afRadius, usTriIndex, &iedge, false
             )) {
             pcurrentMesh.m_pObject->GetEdgeVertices(usTriIndex[0], iedge, &point1, &point2);
             NiPoint3 center = pcurrentMesh.m_pObject->GetCenter(usTriIndex[0]);
@@ -1617,9 +1618,9 @@ bool PathBuilder::FindExitPoint(
             PathingLocation apLocation(loc, NavMeshInfo_, fScalarb);
             PathingLocation* aLoc = &apLocation;
             aRetLocation.operator=(*aLoc);
-            return 1;
+            return true;
         }
-        return 0;
+        return false;
     }
     portalTriangles_t portalTriangles(0, 0, pScrapHeap);
     const NavMeshInfo* v13 = (&apNextNode->Location)->GetBestNavMeshInfo();
@@ -1645,7 +1646,7 @@ bool PathBuilder::FindExitPoint(
         }
     }
     if (ibestTri == 0xFFFF) {
-        return 0;
+        return false;
     }
     ::new (&loc_2) NiPoint3(pcurrentMesh.m_pObject->GetCenter(static_cast<uint16_t>(ibestTri)));
     TESObjectCELL* v17 = pcurrentMesh.m_pObject->GetParentCell();
@@ -1658,7 +1659,7 @@ bool PathBuilder::FindExitPoint(
     PathingLocation v27(loc_2, v18, fScalarc);
     PathingLocation* v23 = &v27;
     aRetLocation.operator=(*v23);
-    return 1;
+    return true;
 }
 
 bool PathBuilder::BuildNavMeshInfoPathInSpace(
@@ -1670,14 +1671,14 @@ bool PathBuilder::BuildNavMeshInfoPathInSpace(
     PathingLocation startLoc(&aStartLocation, pSpace->pInteriorCell, pSpace->pWorldSpace);
     PathingLocation goalLoc(&aGoalLocation, pSpace->pInteriorCell, pSpace->pWorldSpace);
     if (!startLoc.ResolveNavMeshInfoOnly() || !goalLoc.ResolveNavMeshInfoOnly()) {
-        return 0;
+        return false;
     }
     using NavMeshInfoArray = BSScrapArray<const NavMeshInfo*, 1024>;
     using PortalArray = BSScrapArray<TESObjectREFR*, 1024>;
     NavMeshInfoSearch infoSearch;
     NavMeshInfoArray returnNodes(20u, 0u, pScrapHeap);
     PortalArray portals(20u, 0u, pScrapHeap);
-    ActorLockData* plockData = 0;
+    ActorLockData* plockData = nullptr;
     // Pathfind's arguments are evaluated right to left, as the game does: the goal's before the start's.
     const NavMeshInfo* pgoalMesh = goalLoc.GetBestNavMeshInfo();
     NiPoint3 goalPoint = goalLoc.GetLocation();
@@ -1689,9 +1690,9 @@ bool PathBuilder::BuildNavMeshInfoPathInSpace(
     );
     if (!binfosearchRes) {
         if (returnNodes.IsEmpty() || !pRequest.m_pObject->bAllowIncompletePath) {
-            return 0;
+            return false;
         }
-        pSolution.m_pObject->SetIncomplete(1);
+        pSolution.m_pObject->SetIncomplete(true);
     }
     pSolution.m_pObject->AddVirtualPathingNode(startLoc);
     for (uint32_t i = 1; i < returnNodes.iSize - 1; ++i) {
@@ -1731,7 +1732,7 @@ bool PathBuilder::BuildStraightPathForVirtualNodes(uint32_t aiFirstVirtualNodeIn
         PathingNode* LastNode = pSolution.m_pObject->GetLastNode();
         LastNode->SetTeleportDoor(Location_);
     }
-    return 1;
+    return true;
 }
 
 RayCastPath::RayCastPath() {}
@@ -1789,7 +1790,7 @@ uint32_t PathingSolution::AddVirtualPathingNode(const PathingLocation& aLocation
         v4 = ::new (apMemory) VirtualPathingNode(&aLocation, apDoor);
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     if (apDoor) {
         uint32_t a2 = apDoor->iFormID;
@@ -1831,8 +1832,8 @@ uint32_t PathingSolution::AddVirtualPathingNode_006D1520(
     TESObjectCELL* apCell,
     TESWorldSpace* apWorldSpace
 ) {
-    PathingLocation loc(static_cast<const NiPoint3*>(&aLocation), apCell, apWorldSpace);
-    loc.ResolveNavMeshInfo(0);
+    PathingLocation loc((&aLocation), apCell, apWorldSpace);
+    loc.ResolveNavMeshInfo(nullptr);
     uint32_t inewNodeIndex = VirtualPathingNodes.AddUninitialized();
     VirtualPathingNode* pnode = &VirtualPathingNodes.GetAt(inewNodeIndex);
     VirtualPathingNode* apMemory = static_cast<VirtualPathingNode*>(::operator new(48u, pnode));

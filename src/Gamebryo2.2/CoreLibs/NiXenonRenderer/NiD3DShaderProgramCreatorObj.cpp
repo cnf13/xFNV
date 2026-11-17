@@ -26,21 +26,21 @@ bool NiD3DShaderProgramCreatorObj::LoadShaderCodeFromFile(
     uint32_t& uiConstantSize,
     int32_t bRecoverable
 ) {
-    pvCode = 0;
+    pvCode = nullptr;
     uiCodeSize = 0;
-    pvConstantData = 0;
+    pvConstantData = nullptr;
     uiConstantSize = 0;
     if (pcFileName && *pcFileName) {
         char FileName[260];
         if (!NiD3DShaderProgramFactory::ResolveShaderFileName(pcFileName, FileName, 260u)) {
             NiShaderFactory::ReportError(1u, bRecoverable, "Failed to find shader program file %s\n", pcFileName);
-            return 0;
+            return false;
         }
         const std::filesystem::path kPath = platform::NativePath(FileName);
         std::FILE* pFile = std::fopen(kPath.string().c_str(), "rb");
         if (!pFile) {
             NiShaderFactory::ReportError(1u, bRecoverable, "Invalid shader file %s\n", FileName);
-            return 0;
+            return false;
         }
         // GetFileSize's INVALID_FILE_SIZE (0xFFFFFFFF) when the size cannot be read.
         std::error_code kError;
@@ -50,22 +50,22 @@ bool NiD3DShaderProgramCreatorObj::LoadShaderCodeFromFile(
         }
         uint8_t* pbyData = static_cast<uint8_t*>(_NiMalloc(dwSize + 4));
         if (!pbyData) {
-            return 0;
+            return false;
         }
         std::memset(pbyData, 0, dwSize + 4);
         const uint32_t dwBytesRead = static_cast<uint32_t>(std::fread(pbyData, 1, dwSize, pFile));
         std::fclose(pFile);
         if (dwBytesRead != dwSize) {
             _NiFree(pbyData);
-            return 0;
+            return false;
         }
         uiCodeSize = dwSize;
         pvCode = pbyData;
-        return 1;
+        return true;
     }
     else {
         NiShaderFactory::ReportError(1u, bRecoverable, "Invalid shader file name\n");
-        return 0;
+        return false;
     }
 }
 
@@ -78,20 +78,20 @@ bool NiD3DShaderProgramCreatorObj::LoadShaderCodeFromBuffer(
     uint32_t& uiConstantSize,
     int32_t bRecoverable
 ) {
-    pvCode = 0;
+    pvCode = nullptr;
     uiCodeSize = 0;
-    pvConstantData = 0;
+    pvConstantData = nullptr;
     uiConstantSize = 0;
     if (pvBuffer && uiBufferSize) {
         void* v8 = _NiMalloc(uiBufferSize);
         pvCode = v8;
         rt::memcpy(v8, pvBuffer, uiBufferSize);
         uiCodeSize = uiBufferSize;
-        return 1;
+        return true;
     }
     else {
         NiShaderFactory::ReportError(1u, bRecoverable, "Invalid shader buffer\n");
-        return 0;
+        return false;
     }
 }
 

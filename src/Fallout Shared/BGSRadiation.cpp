@@ -13,7 +13,7 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // Reads the DATA chunk (the stage's rads and the form ID of its sickness spell) and the editor ID. GetTESForm's result
 // is stored as a byte and compared zero-extended, hence the uint8_t. When the chunk is empty (malformed data) the EDID
@@ -102,7 +102,7 @@ void BGSRadiationStage::Save() {
         pSicknessID = reinterpret_cast<SpellItem*>(static_cast<uintptr_t>(GetSickness()->GetFormID()));
     }
     else {
-        pSicknessID = 0;
+        pSicknessID = nullptr;
     }
     data.pSickness = pSicknessID;
     if (TESForm::QEndianSwapOnSave()) {
@@ -126,7 +126,7 @@ void BGSRadiationStage::InitItem() {
             TESForm* pForm = TESForm::GetFormByNumericID(uiFormID);
             data.pSickness = dynamic_cast<SpellItem*>(pForm);
         }
-        SetInitialized(1);
+        SetInitialized(true);
         AddStage(this);
     }
 }
@@ -146,10 +146,10 @@ void BGSRadiationStage::Copy(TESForm* apCopy) {
 bool BGSRadiationStage::Compare(TESForm* apCompare) {
     BGSRadiationStage* v6 = dynamic_cast<BGSRadiationStage*>(apCompare);
     if (!v6) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v6)) {
-        return (bool)1;
+        return true;
     }
     char* formList = static_cast<char*>(static_cast<void*>(v6->GetData()));
     char* v3 = static_cast<char*>(static_cast<void*>(GetData()));
@@ -169,11 +169,11 @@ void BGSRadiationStage::AddStage(BGSRadiationStage* apNewStage) {
     uint8_t v3 = BGSRadiationStage::iNumStages + 1;
     BGSRadiationStage** Stages = BGSRadiationStage::AllocateStages(v3);
     int32_t v4 = 0;
-    bool v5 = 0;
+    bool v5 = false;
     for (uint32_t i = 0; i < BGSRadiationStage::iNumStages; ++i) {
         if (apNewStage->data.iRads > BGSRadiationStage::pStagesArray[i]->data.iRads && !v5) {
             Stages[v4++] = apNewStage;
-            v5 = 1;
+            v5 = true;
         }
         Stages[v4++] = BGSRadiationStage::pStagesArray[i];
     }
@@ -187,7 +187,7 @@ void BGSRadiationStage::AddStage(BGSRadiationStage* apNewStage) {
 
 void BGSRadiationStage::RemoveStage(BGSRadiationStage* apStage) {
     if (BGSRadiationStage::iNumStages) {
-        bool v4 = 0;
+        bool v4 = false;
         for (uint32_t i = 0; !v4 && i < BGSRadiationStage::iNumStages; ++i) {
             v4 = BGSRadiationStage::pStagesArray[i] == apStage;
         }
@@ -220,20 +220,20 @@ BGSRadiationStage* BGSRadiationStage::GetStage(uint32_t aiIndex) {
 
 BGSRadiationStage** BGSRadiationStage::AllocateStages(uint32_t aiStagesCount) {
     if (!aiStagesCount) {
-        return 0;
+        return nullptr;
     }
     // new BGSRadiationStage*[n]: requests SIZE_MAX when the size overflows.
     BGSRadiationStage** v3 = static_cast<BGSRadiationStage**>(ourMalloc(
         aiStagesCount <= SIZE_MAX / sizeof(BGSRadiationStage*) ? sizeof(BGSRadiationStage*) * aiStagesCount : SIZE_MAX
     ));
     for (uint32_t i = 0; i < aiStagesCount; ++i) {
-        v3[i] = 0;
+        v3[i] = nullptr;
     }
     return v3;
 }
 
 BGSRadiationStage* BGSRadiationStage::FindStageForRadLevel(float afRads) {
-    BGSRadiationStage* pstage = 0;
+    BGSRadiationStage* pstage = nullptr;
     for (uint32_t i = 0; i < BGSRadiationStage::iNumStages && !pstage; ++i) {
         BGSRadiationStage* pcurrentStage = GetStage(i);
         if (pcurrentStage) {

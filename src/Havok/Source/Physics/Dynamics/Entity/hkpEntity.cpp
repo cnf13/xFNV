@@ -279,16 +279,16 @@ void hkpEntity::addEntityListener(hkpEntityListener* el) {
             Instance->m_heap->blockAlloc(sizeof(hkpEntity::ExtendedListeners))
         );
         if (v4) {
-            v4->m_activationListeners.m_data = 0;
+            v4->m_activationListeners.m_data = nullptr;
             v4->m_activationListeners.m_size = 0;
             v4->m_activationListeners.m_capacityAndFlags =
                 hkSmallArray<hkpEntityActivationListener*>::DONT_DEALLOCATE_FLAG;
-            v4->m_entityListeners.m_data = 0;
+            v4->m_entityListeners.m_data = nullptr;
             v4->m_entityListeners.m_size = 0;
             v4->m_entityListeners.m_capacityAndFlags = hkSmallArray<hkpEntityListener*>::DONT_DEALLOCATE_FLAG;
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         this->m_extendedListeners = v4;
     }
@@ -337,8 +337,8 @@ void hkpEntity::activate() {
             m_motion.m_deactivationNumInactiveFrames[1] = (uint16_t)0;
             hkpWorldOperationUtil::markIslandActive(m_world, m_simulationIsland);
             (&m_motion)->setWorldSelectFlagsNeg(
-                (uint8_t)this->m_world->m_dynamicsStepInfo.m_solverInfo.m_deactivationNumInactiveFramesSelectFlag[0],
-                (uint8_t)this->m_world->m_dynamicsStepInfo.m_solverInfo.m_deactivationNumInactiveFramesSelectFlag[1],
+                this->m_world->m_dynamicsStepInfo.m_solverInfo.m_deactivationNumInactiveFramesSelectFlag[0],
+                this->m_world->m_dynamicsStepInfo.m_solverInfo.m_deactivationNumInactiveFramesSelectFlag[1],
                 this->m_world->m_dynamicsStepInfo.m_solverInfo.m_deactivationIntegrateCounter
             );
         }
@@ -353,16 +353,16 @@ void hkpEntity::addEntityActivationListener(hkpEntityActivationListener* el) {
             Instance->m_heap->blockAlloc(sizeof(hkpEntity::ExtendedListeners))
         );
         if (v4) {
-            v4->m_activationListeners.m_data = 0;
+            v4->m_activationListeners.m_data = nullptr;
             v4->m_activationListeners.m_size = 0;
             v4->m_activationListeners.m_capacityAndFlags =
                 hkSmallArray<hkpEntityActivationListener*>::DONT_DEALLOCATE_FLAG;
-            v4->m_entityListeners.m_data = 0;
+            v4->m_entityListeners.m_data = nullptr;
             v4->m_entityListeners.m_size = 0;
             v4->m_entityListeners.m_capacityAndFlags = hkSmallArray<hkpEntityListener*>::DONT_DEALLOCATE_FLAG;
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         this->m_extendedListeners = v4;
     }
@@ -436,16 +436,16 @@ void hkpEntity::removeEntityListener(hkpEntityListener* el) {
             Instance->m_heap->blockAlloc(sizeof(hkpEntity::ExtendedListeners))
         );
         if (v4) {
-            v4->m_activationListeners.m_data = 0;
+            v4->m_activationListeners.m_data = nullptr;
             v4->m_activationListeners.m_size = 0;
             v4->m_activationListeners.m_capacityAndFlags =
                 hkSmallArray<hkpEntityActivationListener*>::DONT_DEALLOCATE_FLAG;
-            v4->m_entityListeners.m_data = 0;
+            v4->m_entityListeners.m_data = nullptr;
             v4->m_entityListeners.m_size = 0;
             v4->m_entityListeners.m_capacityAndFlags = hkSmallArray<hkpEntityListener*>::DONT_DEALLOCATE_FLAG;
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         this->m_extendedListeners = v4;
     }
@@ -462,11 +462,11 @@ void hkpEntity::removeEntityListener(hkpEntityListener* el) {
                 goto LABEL_10;
             }
         }
-        (*p_m_data)[v8] = 0;
+        (*p_m_data)[v8] = nullptr;
     }
     else {
     LABEL_10:;
-        *(*p_m_data - 1) = 0;
+        *(*p_m_data - 1) = nullptr;
     }
 }
 
@@ -651,11 +651,11 @@ hkpDynamicsContactMgr* hkpEntity::findContactMgrTo(const hkpEntity* entity) cons
     int32_t m_size = m_collidable.m_collisionEntries.m_size;
     int32_t v3 = 0;
     if (m_size <= 0) {
-        return 0;
+        return nullptr;
     }
     for (i = m_collidable.m_collisionEntries.m_data; i->m_partner != &entity->m_collidable; ++i) {
         if (++v3 >= m_size) {
-            return 0;
+            return nullptr;
         }
     }
     return static_cast<hkpDynamicsContactMgr*>(i->m_agentEntry->m_contactMgr);

@@ -88,7 +88,7 @@ uint32_t NiVBBlock::FreeChip(uint32_t uiChipIndex) {
         m_uiFreeBytes = v11;
         pkNullChip = nullptr;
         m_apkChips.SetAt(v3, pkNullChip);
-        pkVBChip->m_pkPrevChip = 0;
+        pkVBChip->m_pkPrevChip = nullptr;
         pkVBChip->m_pkNextChip = NiVBBlock::ms_pkChipDump;
         if (NiVBBlock::ms_pkChipDump) {
             NiVBBlock::ms_pkChipDump->m_pkPrevChip = pkVBChip;
@@ -121,16 +121,16 @@ void NiVBBlock::AllocateChips() {
         v1 = static_cast<NiVBChip*>(NiMemObject::operator new(sizeof(NiVBChip)));
         if (v1) {
             v1->m_uiIndex = 0;
-            v1->m_pkBlock = 0;
-            v1->m_pkVB = 0;
+            v1->m_pkBlock = nullptr;
+            v1->m_pkVB = nullptr;
             v1->m_uiOffset = 0;
             v1->m_uiSize = 0;
             v1->m_uiLockFlags = 0;
-            v1->m_pkNextChip = 0;
-            v1->m_pkPrevChip = 0;
+            v1->m_pkNextChip = nullptr;
+            v1->m_pkPrevChip = nullptr;
         }
         else {
-            v1 = 0;
+            v1 = nullptr;
         }
         NiVBChip* v2 = NiVBBlock::ms_pkChipDump;
         if (NiVBBlock::ms_pkChipDump) {
@@ -138,7 +138,7 @@ void NiVBBlock::AllocateChips() {
             v2 = NiVBBlock::ms_pkChipDump;
         }
         v1->m_pkNextChip = v2;
-        v1->m_pkPrevChip = 0;
+        v1->m_pkPrevChip = nullptr;
         ++i;
     }
 }

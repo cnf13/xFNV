@@ -116,24 +116,24 @@ float NiAbs(float fValue) {
 }
 
 void EffectSetting::EffectSettingData::Endian() {
-    ENDIAN<uint32_t>(iFlags, 0);
-    ENDIAN<float>(fBaseCost, 0);
-    ENDIAN<ActorValue::Index>(eAssociatedActorValue, 0);
-    ENDIAN<TESForm*>(pAssociatedItem, 0);
-    ENDIAN<ActorValue::Index>(iAssociatedSkill, 0);
-    ENDIAN<ActorValue::Index>(iResistVariable, 0);
-    ENDIAN<int16_t>(iNumCounterEffects, 0);
-    ENDIAN<TESObjectLIGH*>(pLight, 0);
-    ENDIAN<float>(fSpeed, 0);
-    ENDIAN<TESEffectShader*>(pEffectShader, 0);
-    ENDIAN<TESEffectShader*>(pEnchantEffect, 0);
-    ENDIAN<TESSound*>(pCastSound, 0);
-    ENDIAN<TESSound*>(pBoltSound, 0);
-    ENDIAN<TESSound*>(pHitSound, 0);
-    ENDIAN<TESSound*>(pAreaSound, 0);
-    ENDIAN<float>(fCEEnchantFactor, 0);
-    ENDIAN<float>(fCEBarterFactor, 0);
-    ENDIAN<EffectArchetypes::ArchetypeID>(eArchetype, 0);
+    ENDIAN<uint32_t>(iFlags, false);
+    ENDIAN<float>(fBaseCost, false);
+    ENDIAN<ActorValue::Index>(eAssociatedActorValue, false);
+    ENDIAN<TESForm*>(pAssociatedItem, false);
+    ENDIAN<ActorValue::Index>(iAssociatedSkill, false);
+    ENDIAN<ActorValue::Index>(iResistVariable, false);
+    ENDIAN<int16_t>(iNumCounterEffects, false);
+    ENDIAN<TESObjectLIGH*>(pLight, false);
+    ENDIAN<float>(fSpeed, false);
+    ENDIAN<TESEffectShader*>(pEffectShader, false);
+    ENDIAN<TESEffectShader*>(pEnchantEffect, false);
+    ENDIAN<TESSound*>(pCastSound, false);
+    ENDIAN<TESSound*>(pBoltSound, false);
+    ENDIAN<TESSound*>(pHitSound, false);
+    ENDIAN<TESSound*>(pAreaSound, false);
+    ENDIAN<float>(fCEEnchantFactor, false);
+    ENDIAN<float>(fCEBarterFactor, false);
+    ENDIAN<EffectArchetypes::ArchetypeID>(eArchetype, false);
 }
 
 EffectSetting::EffectSetting()
@@ -219,7 +219,7 @@ void EffectSetting::Save() {
 void EffectSetting::InitItem() {
     if (!GetInitialized()) {
         if (!getArchType() || GetFlag(USE_ASSOCIATED_SKILL | USE_ASSOCIATED_ATTR)) {
-            data.pAssociatedItem = 0;
+            data.pAssociatedItem = nullptr;
         }
         else {
             uint32_t itempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(data.pAssociatedItem));
@@ -324,7 +324,7 @@ void EffectSetting::InitItem() {
                 );
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -357,7 +357,7 @@ void EffectSetting::Copy(TESForm* apCopy) {
         SetCounterEffects(RecipeList);
         if (!GetTemporary() && !iFormID) {
             uint32_t NextID = pDataHandler->GetNextID();
-            SetFormID(NextID, 1);
+            SetFormID(NextID, true);
         }
     }
 }
@@ -365,84 +365,84 @@ void EffectSetting::Copy(TESForm* apCopy) {
 bool EffectSetting::Compare(TESForm* apCompare) {
     EffectSetting* psetting = dynamic_cast<EffectSetting*>(apCompare);
     if (!psetting) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(apCompare)) {
-        return 1;
+        return true;
     }
     int32_t NumberOfItemsActivated = data.iFlags;
     if (NumberOfItemsActivated != psetting->data.iFlags) {
-        return 1;
+        return true;
     }
     double ColorRange = data.fBaseCost;
     if (ColorRange != psetting->data.fBaseCost) {
-        return 1;
+        return true;
     }
     ActorValue::Index AssociatedActorValue = GetAssociatedActorValue();
     if (AssociatedActorValue != psetting->GetAssociatedActorValue()) {
-        return 1;
+        return true;
     }
     TESForm* AssociatedItem = GetAssociatedItem();
     if (AssociatedItem != psetting->GetAssociatedItem()) {
-        return 1;
+        return true;
     }
     ActorValue::Index WaterSystem = data.iAssociatedSkill;
     if (WaterSystem != psetting->data.iAssociatedSkill) {
-        return 1;
+        return true;
     }
     ActorValue::Index ResistanceVariable = GetResistanceVariable();
     if (ResistanceVariable != psetting->GetResistanceVariable()) {
-        return 1;
+        return true;
     }
     TESObjectLIGH* v9 = data.pLight;
     if (v9 != psetting->data.pLight) {
-        return 1;
+        return true;
     }
     TESForm* FormTwo = data.pEffectShader;
     if (FormTwo != psetting->data.pEffectShader) {
-        return 1;
+        return true;
     }
     TESEffectShader* RefCount = data.pEnchantEffect;
     if (RefCount != psetting->data.pEnchantEffect) {
-        return 1;
+        return true;
     }
     double MaximumLeafAngle = data.fSpeed;
     if (MaximumLeafAngle != psetting->data.fSpeed) {
-        return 1;
+        return true;
     }
     TESSound* WaterType = data.pCastSound;
     if (WaterType != psetting->data.pCastSound) {
-        return 1;
+        return true;
     }
     TESSound* BoltSound = GetBoltSound();
     if (BoltSound != psetting->GetBoltSound()) {
-        return 1;
+        return true;
     }
     TESSound* WorldSpace = data.pHitSound;
     if (WorldSpace != psetting->data.pHitSound) {
-        return 1;
+        return true;
     }
     TESSound* OpenSound = data.pAreaSound;
     if (OpenSound != psetting->data.pAreaSound) {
-        return 1;
+        return true;
     }
     int32_t NumCounterEffects = GetNumCounterEffects();
     if (NumCounterEffects != psetting->GetNumCounterEffects()) {
-        return 1;
+        return true;
     }
     int32_t EffectArchetype = GetEffectArchetype();
     if (EffectArchetype != psetting->GetEffectArchetype()) {
-        return 1;
+        return true;
     }
     BSSimpleList<EffectSetting*>* ptmp1 = &counterEffects;
     for (BSSimpleList<EffectSetting*>* ptmp2 = &psetting->counterEffects; ptmp1 && ptmp2; ptmp2 = ptmp2->m_pkNext) {
         EffectSetting* m_item = ptmp1->m_item;
         if (m_item != ptmp2->m_item) {
-            return 1;
+            return true;
         }
         ptmp1 = ptmp1->m_pkNext;
     }
-    return 0;
+    return false;
 }
 
 const char* EffectSetting::GetObjectTypeName() {
@@ -451,7 +451,7 @@ const char* EffectSetting::GetObjectTypeName() {
 }
 
 bool EffectSetting::IsAssociatedActorValueFixed() {
-    return (bool)((uint8_t)(GetAssociatedActorValue() != ((-1))));
+    return (bool)((uint8_t)(GetAssociatedActorValue() != (-1)));
 }
 
 bool EffectSetting::CheckEffectFlag(uint32_t aeFlags) {
@@ -639,7 +639,7 @@ void EffectSetting::SetEffectArchetype(int32_t a2) {
 void EffectSetting::SetEffectName(const char* apEffectName) {
     FNVD_INLINED_LOCAL(BSStringT<char>, apResult, std::nullopt, std::nullopt);
     BSStringT<char>* EffectName = GetEffectName(&apResult);
-    int32_t v5 = EffectName->StrCmp(apEffectName, 1);
+    int32_t v5 = EffectName->StrCmp(apEffectName, true);
     apResult.~BSStringT<char>();
     if (v5) {
         SetFullName(apEffectName);

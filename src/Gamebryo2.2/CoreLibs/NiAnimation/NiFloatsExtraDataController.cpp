@@ -34,7 +34,7 @@ const NiRTTI* NiFloatsExtraDataController::GetRTTI() const {
 
 NiObject* NiFloatsExtraDataController::CreateClone(NiCloningProcess& kCloning) {
     void* pkObject = NiMemObject::operator new(sizeof(NiFloatsExtraDataController));
-    NiFloatsExtraDataController* pkObject_2 = 0;
+    NiFloatsExtraDataController* pkObject_2 = nullptr;
     if (pkObject) {
         pkObject_2 = ::new (pkObject) NiFloatsExtraDataController;
     }
@@ -160,7 +160,7 @@ bool NiFloatsExtraDataController::InterpolatorIsCorrectType(NiInterpolator* pkIn
 NiObject* NiFloatsExtraDataController::CreateObject() {
     void* pkObject = NiMemObject::operator new(sizeof(NiFloatsExtraDataController));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiFloatsExtraDataController;
 }

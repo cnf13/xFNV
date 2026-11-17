@@ -87,7 +87,7 @@ void NiScreenElements::Draw(NiRenderer* pkRenderer) {
 NiObject* NiScreenElements::CreateObject() {
     void* v0 = NiMemObject::operator new(sizeof(NiScreenElements));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiScreenElements;
 }

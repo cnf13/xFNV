@@ -22,8 +22,8 @@ int32_t ActorValueOwner::GetClampedActorValue(ActorValue::Index aiWhich) {
 }
 
 float ActorValueOwner::GetClampedActorFloatValue(ActorValue::Index aiWhich) {
-    float v3 = (float)GetActorFloatValue(aiWhich);
-    return (float)ActorValue::ClampActorValue(static_cast<ActorValue::Index>(aiWhich), v3);
+    float v3 = GetActorFloatValue(aiWhich);
+    return ActorValue::ClampActorValue(aiWhich, v3);
 }
 
 float ActorValueOwner::CalculateFlySpeed(ActorValueOwner* apOwner, float afFlyInventoryWeight) {

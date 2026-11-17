@@ -242,7 +242,7 @@ hkpPhysicsData* hkpHavokSnapshot::load(hkStreamReader* reader, hkResource** allo
     if (!reader || !allocatedData) {
         return nullptr;
     }
-    hkResource* pResource = hkSerializeUtil::load(reader, 0, 0);
+    hkResource* pResource = hkSerializeUtil::load(reader, nullptr, nullptr);
     if (!pResource) {
         return nullptr;
     }
@@ -251,13 +251,13 @@ hkpPhysicsData* hkpHavokSnapshot::load(hkStreamReader* reader, hkResource** allo
         return nullptr;
     }
     hkpPhysicsData* pData =
-        static_cast<hkpPhysicsData*>(pContainer->findObjectByType(hkpPhysicsDataClass.getName(), 0));
+        static_cast<hkpPhysicsData*>(pContainer->findObjectByType(hkpPhysicsDataClass.getName(), nullptr));
     if (!pData) {
         const char* apcNames[] = {"SnapshotSave", "hkpPhysicsData", nullptr};
         int32_t i = 0;
         const char* pcName = apcNames[0];
         do {
-            pData = static_cast<hkpPhysicsData*>(pContainer->findObjectByName(pcName, 0));
+            pData = static_cast<hkpPhysicsData*>(pContainer->findObjectByName(pcName, nullptr));
             if (pData) {
                 break;
             }

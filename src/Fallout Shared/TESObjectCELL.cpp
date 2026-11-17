@@ -291,7 +291,7 @@
 
 #include <bit>
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 namespace HavokWorldProps {} // namespace HavokWorldProps
 
@@ -400,7 +400,7 @@ TESObjectCELL::TESObjectCELL()
     bFadingToLowDetail(false), bDisplayHighDetail(false), bCellDetached(false), bUpdateTerrain(false),
     spPortalGraph(nullptr), pLightingTemplate(nullptr), iLightingTemplateInheritanceFlags(159) {
     cFormType = 57;
-    SetInitialized(1);
+    SetInitialized(true);
     WaterNoiseTexture.InitializeDataComponent();
 }
 
@@ -438,7 +438,7 @@ void TESObjectCELL::ClearData() {
     GetInterior();
     ourFree(pCellData);
     pCellData = nullptr;
-    SetLightingTemplate(0);
+    SetLightingTemplate(nullptr);
     iLightingTemplateInheritanceFlags = (uint32_t)0;
 }
 
@@ -636,12 +636,12 @@ bool TESObjectCELL::Load(TESFile* apFile) {
 bool TESObjectCELL::Save(TESFile* apFile) {
     FORM apGroupData;
     if (GetDelete()) {
-        return 0;
+        return false;
     }
-    bool bChanged = 0;
+    bool bChanged = false;
     CellRefLockEnter();
     if (apFile->GetMaster() || GetAltered()) {
-        bChanged = 1;
+        bChanged = true;
     }
     else {
         BSSimpleList<TESObjectREFR*>* ecx0a = GetRefList();
@@ -650,14 +650,14 @@ bool TESObjectCELL::Save(TESFile* apFile) {
             ecx0a = ecx0a->m_pkNext;
             TESFile* File = v7->GetFile(-1);
             if (File == apFile || (!File || v7->GetAltered())) {
-                bChanged = 1;
+                bChanged = true;
                 break;
             }
         }
     }
     CellRefLockLeave();
     if (!bChanged) {
-        return 0;
+        return false;
     }
     Save();
     apFile->AddTESForm(this);
@@ -670,7 +670,7 @@ bool TESObjectCELL::Save(TESFile* apFile) {
     if (!apFile->GetMaster() || GetFile(0) == apFile) {
         SaveReferences(apFile);
     }
-    return 1;
+    return true;
 }
 
 void TESObjectCELL::Save() {
@@ -728,11 +728,11 @@ bool TESObjectCELL::SaveEdit(TESFile* apFile) {
     apGroupData.iVersionControl = 0;
     apFile->StartGroup(&apGroupData);
     SaveReferences(apFile);
-    return 1;
+    return true;
 }
 
 bool TESObjectCELL::SavesBefore(TESForm* apForm) {
-    bool bretval = 0;
+    bool bretval = false;
     switch (apForm->GetFormType()) {
         case CELL_ID: {
             TESObjectCELL* pothercell = dynamic_cast<TESObjectCELL*>(apForm);
@@ -740,7 +740,7 @@ bool TESObjectCELL::SavesBefore(TESForm* apForm) {
                 if (!GetInterior() || pothercell->GetInterior()) {
                     int32_t Interior = GetInterior();
                     if (Interior == pothercell->GetInterior()) {
-                        bool bcheckblocks = 1;
+                        bool bcheckblocks = true;
                         if (!GetInterior()) {
                             TESWorldSpace* pworld_2 = GetWorldSpace();
                             TESWorldSpace* potherworld = pothercell->GetWorldSpace();
@@ -748,12 +748,12 @@ bool TESObjectCELL::SavesBefore(TESForm* apForm) {
                                 int32_t PersistentCell = GetPersistentCell();
                                 if (PersistentCell != pothercell->GetPersistentCell()) {
                                     bretval = GetPersistentCell();
-                                    bcheckblocks = 0;
+                                    bcheckblocks = false;
                                 }
                             }
                             else {
                                 bretval = pworld_2->SavesBefore(potherworld);
-                                bcheckblocks = 0;
+                                bcheckblocks = false;
                             }
                         }
                         if (bcheckblocks) {
@@ -767,23 +767,23 @@ bool TESObjectCELL::SavesBefore(TESForm* apForm) {
                                         if (v8 == pothercell->GetGroupSubBlockKey()) {
                                             uint32_t CastingType = iFormID;
                                             if (CastingType < pothercell->iFormID) {
-                                                bretval = 1;
+                                                bretval = true;
                                             }
                                         }
                                     }
                                     else {
-                                        bretval = 1;
+                                        bretval = true;
                                     }
                                 }
                             }
                             else {
-                                bretval = 1;
+                                bretval = true;
                             }
                         }
                     }
                 }
                 else {
-                    bretval = 1;
+                    bretval = true;
                 }
             }
             break;
@@ -800,7 +800,7 @@ bool TESObjectCELL::SavesBefore(TESForm* apForm) {
         case PCBE_ID: {
             TESChildCell* pcellchild = dynamic_cast<TESChildCell*>(apForm);
             if (pcellchild->GetSaveParentCell() == this) {
-                bretval = 1;
+                bretval = true;
             }
             else {
                 TESObjectCELL* v2 = pcellchild->GetSaveParentCell();
@@ -810,7 +810,7 @@ bool TESObjectCELL::SavesBefore(TESForm* apForm) {
         }
         case WRLD_ID: {
             if (GetInterior()) {
-                bretval = 1;
+                bretval = true;
             }
             else {
                 TESWorldSpace* pworld = GetWorldSpace();
@@ -827,7 +827,7 @@ bool TESObjectCELL::SavesBefore(TESForm* apForm) {
 }
 
 bool TESObjectCELL::SavesBefore(FORM* apGroupFORM) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apGroupFORM) {
         if (apGroupFORM->form == formEnumString[2].uiFormString) {
             uint32_t form = apGroupFORM->form;
@@ -838,7 +838,7 @@ bool TESObjectCELL::SavesBefore(FORM* apGroupFORM) {
                 }
                 case 1u: {
                     if (GetInterior()) {
-                        bretval = 1;
+                        bretval = true;
                     }
                     else {
                         TESForm* FormByNumericID = TESForm::GetFormByNumericID(apGroupFORM->flags);
@@ -880,7 +880,7 @@ bool TESObjectCELL::SavesBefore(FORM* apGroupFORM) {
                     break;
                 }
                 case 7u: {
-                    bretval = 1;
+                    bretval = true;
                     break;
                 }
                 default: {
@@ -981,7 +981,7 @@ uint16_t TESObjectCELL::GetSaveSize(uint32_t aiFlags) {
     }
     if ((aiFlags & CHANGE_CELL_SEENDATA) != 0) {
         SeenData* SeenData_ = GetSeenData();
-        isize += SeenData_->GetSaveSize(0);
+        isize += SeenData_->GetSaveSize(false);
     }
     if ((aiFlags & 4) != 0) {
         isize += BSstrlen(GetFullName()) + 1;
@@ -1024,7 +1024,7 @@ void TESObjectCELL::SaveGame(uint32_t aiFlags) {
     }
     TESForm::SaveGame(aiFlags);
     iblockSize = 0;
-    uint16_t* pblockSize = 0;
+    uint16_t* pblockSize = nullptr;
     uint8_t* itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -1268,7 +1268,7 @@ void TESObjectCELL::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                     pseen_2 = (SeenData*)::new (apMemory) IntSeenData(0, 0);
                 }
                 else {
-                    pseen_2 = 0;
+                    pseen_2 = nullptr;
                 }
                 pseen_3 = pseen_2;
             }
@@ -1279,7 +1279,7 @@ void TESObjectCELL::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                     pseen_4 = ::new (v8) SeenData;
                 }
                 else {
-                    pseen_4 = 0;
+                    pseen_4 = nullptr;
                 }
                 pseen_3 = pseen_4;
             }
@@ -1557,7 +1557,7 @@ void TESObjectCELL::Copy(TESForm* apCopy) {
         GetExtra()->CopyList(pCopy->GetExtra());
         GetInterior();
         ourFree(pCellData);
-        pCellData = 0;
+        pCellData = nullptr;
         cCellFlags = pCopy->cCellFlags;
         fWaterHeight = pCopy->fWaterHeight;
         CreateCellData();
@@ -1589,37 +1589,37 @@ void TESObjectCELL::Copy(TESForm* apCopy) {
 bool TESObjectCELL::Compare(TESForm* apCompare) {
     TESObjectCELL* pComp = dynamic_cast<TESObjectCELL*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
     int32_t v3 = cCellFlags;
     if (v3 != pComp->cCellFlags) {
-        return 1;
+        return true;
     }
-    if (static_cast<uint32_t>(iLightingTemplateInheritanceFlags) != pComp->iLightingTemplateInheritanceFlags) {
-        return 1;
+    if (iLightingTemplateInheritanceFlags != pComp->iLightingTemplateInheritanceFlags) {
+        return true;
     }
     BGSLightingTemplate* LightingTemplate = GetLightingTemplate();
     if (LightingTemplate != pComp->GetLightingTemplate()) {
-        return 1;
+        return true;
     }
     if (pComp->fWaterHeight != fWaterHeight) {
-        return 1;
+        return true;
     }
     if (GetInterior()) {
         INTERIOR_DATA* pdata = GetInteriorData();
         INTERIOR_DATA* pcompdata = pComp->GetInteriorData();
         if (pdata && (pcompdata && std::memcmp(pdata, pcompdata, sizeof(INTERIOR_DATA)))) {
-            return 1;
+            return true;
         }
     }
     else {
         EXTERIOR_DATA* pdata_2 = GetExteriorData();
         EXTERIOR_DATA* pcompdata_2 = pComp->GetExteriorData();
         if (pdata_2 && (pcompdata_2 && std::memcmp(pdata_2, pcompdata_2, sizeof(EXTERIOR_DATA)))) {
-            return 1;
+            return true;
         }
     }
     // The texture's CompareComponent is called virtually; a call on the member itself would be devirtualised, so it
@@ -1630,7 +1630,7 @@ bool TESObjectCELL::Compare(TESForm* apCompare) {
 }
 
 bool TESObjectCELL::BelongsInGroup(FORM* apGroupFORM, bool abAllowParentGroups, bool abCurrentOnly) {
-    bool v7 = 0;
+    bool v7 = false;
     if (apGroupFORM) {
         if (apGroupFORM->form == formEnumString[2].uiFormString) {
             TESWorldSpace* WorldSpace = GetWorldSpace();
@@ -1649,7 +1649,7 @@ bool TESObjectCELL::BelongsInGroup(FORM* apGroupFORM, bool abAllowParentGroups, 
                 case 1u: {
                     if (!GetInterior() && WorldSpace->FormIDMatchesWithoutIndex(apGroupFORM->flags) &&
                         (abAllowParentGroups || GetPersistentCell())) {
-                        v7 = 1;
+                        v7 = true;
                     }
                     break;
                 }
@@ -1771,11 +1771,11 @@ bool TESObjectCELL::SetFormEditorID(const char* apEditorID) {
 }
 
 bool TESObjectCELL::IsActorCellOwner(Actor* apActor) {
-    bool bflag = 0;
+    bool bflag = false;
     TESForm* powner = GetOwner();
     if (powner) {
         if (!apActor->IsNpc()) {
-            return 0;
+            return false;
         }
         TESNPC* pnpc = dynamic_cast<TESNPC*>(powner);
         if (pnpc) {
@@ -1857,7 +1857,7 @@ void TESObjectCELL::AddMapMarkersToList(BSSimpleList<TESObjectREFR*>* apList) {
 
 void TESObjectCELL::UpdateManagedNodeTransforms() {
     NiTMapItem<TESObjectREFR*, NiNode*>* a2;
-    NiUpdateData apMemory(0.0f, 0, 0);
+    NiUpdateData apMemory(0.0f, false, false);
     NiNode* DynamicNode = static_cast<NiNode*>(GetDynamicNode());
     if (DynamicNode) {
         DynamicNode->UpdateTransformAndBounds(apMemory);
@@ -1865,8 +1865,8 @@ void TESObjectCELL::UpdateManagedNodeTransforms() {
     if (pLoadedData) {
         a2 = pLoadedData->AnimatedRefMap.GetFirstPos();
         while (a2) {
-            TESObjectREFR* a3 = 0;
-            NiNode* a4 = 0;
+            TESObjectREFR* a3 = nullptr;
+            NiNode* a4 = nullptr;
             pLoadedData->AnimatedRefMap.GetNext(a2, a3, a4);
             if (a4) {
                 NiNode* Parent = a4->m_pkParent;
@@ -1894,7 +1894,7 @@ int32_t TESObjectCELL::SetCellOwnership(TESForm* apOwner) {
 }
 
 bool TESObjectCELL::PickWaterDistance(NiPick* apPick, const NiPoint3& aOrigin, const NiPoint3& aDir, float afDistance) {
-    bool bhitsomething = 0;
+    bool bhitsomething = false;
     if (apPick) {
         for (BSSimpleList<TESObjectREFR*>* plist = GetWaterRefList(); plist && !plist->IsEmpty();
              plist = plist->m_pkNext) {
@@ -1904,7 +1904,7 @@ bool TESObjectCELL::PickWaterDistance(NiPick* apPick, const NiPoint3& aOrigin, c
                 if (PickDistanceRecursive(apPick, aOrigin, aDir, afDistance, v7)) {
                     NiPoint3 waterhit = *&(&apPick->m_pickResults)->GetAt(0)->m_intersect;
                     if (static_cast<double>(afDistance) > (waterhit - aOrigin).Length()) {
-                        return 1;
+                        return true;
                     }
                 }
             }
@@ -1921,8 +1921,8 @@ void TESObjectCELL::FreeLoadedData() {
         pLoadedData->ActivatingRefs.RemoveAll();
         iter = pLoadedData->MultiboundRefMap.GetFirstPos();
         while (iter) {
-            ::new (&spnode) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(0));
-            TESObjectREFR* pref = 0;
+            ::new (&spnode) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
+            TESObjectREFR* pref = nullptr;
             pLoadedData->MultiboundRefMap.GetNext(iter, pref, spnode);
             if (pref) {
                 if (spnode.m_pObject) {
@@ -1943,7 +1943,7 @@ void TESObjectCELL::FreeLoadedData() {
         if (pLoadedData) {
             delete pLoadedData;
         }
-        pLoadedData = 0;
+        pLoadedData = nullptr;
     }
 }
 
@@ -1973,10 +1973,10 @@ void TESObjectCELL::SkipVisibleDistantFade() {
         }
     }
     fLodFadeInPercent = TESObjectCELL::fLodFadeTime;
-    bDisplayHighDetail = (bool)1;
-    bFadingToHighDetail = (bool)0;
-    bFadingToLowDetail = (bool)0;
-    bUpdateTerrain = (bool)1;
+    bDisplayHighDetail = true;
+    bFadingToHighDetail = false;
+    bFadingToLowDetail = false;
+    bUpdateTerrain = true;
     CellRefLockLeave();
 }
 
@@ -2040,7 +2040,7 @@ void TESObjectCELL::AddReferences(TESWorldSpace* apWorld) {
                     int32_t aiY = FloatToInt(v3->y) >> 12;
                     TESObjectCELL* CellFromCellCoord = apWorld->GetCellFromCellCoord(aiX, aiY);
                     if (CellFromCellCoord) {
-                        CellFromCellCoord->AddReference(v12, 0);
+                        CellFromCellCoord->AddReference(v12, false);
                     }
                     else {
                         int32_t someFloat = v12->GetFormID();
@@ -2080,7 +2080,7 @@ bool TESObjectCELL::GetCantWaitHere() {
     TESWorldSpace* worldSpace;
     if (GetInterior()) {
         if ((((int32_t)TESForm::GetFormFlags()) & 524288) != 0) {
-            return (bool)1;
+            return true;
         }
     }
     else {
@@ -2089,7 +2089,7 @@ bool TESObjectCELL::GetCantWaitHere() {
             return (bool)((uint8_t)worldSpace->GetCantWaitHere());
         }
     }
-    return (bool)0;
+    return false;
 }
 
 void TESObjectCELL::SetLowestProcessToMiddleLow(bool abFlag) {
@@ -2101,7 +2101,7 @@ void TESObjectCELL::SetLowestProcessToMiddleLow(bool abFlag) {
             pExtra_2 = ::new (apMemory) ExtraProcessMiddleLow;
         }
         else {
-            pExtra_2 = 0;
+            pExtra_2 = nullptr;
         }
         pExtra = pExtra_2;
         ExtraData.AddExtra(pExtra_2);
@@ -2132,7 +2132,7 @@ void TESObjectCELL::SetLowestProcessToMiddleLow(bool abFlag) {
         }
         pExtra->iRefCount = v2;
         if (!pExtra->iRefCount) {
-            ExtraData.RemoveExtra(pExtra, 1);
+            ExtraData.RemoveExtra(pExtra, true);
         }
     }
 }
@@ -2208,14 +2208,14 @@ void TESObjectCELL::UpdateRefSounds() {
         for (TESObjectREFR* pobj : GetRefList()->ItemsUntilNull()) {
             if (pobj) {
                 if (!pobj->GetDisabled() && !pobj->GetDestroyed() && pobj->HasRandomSound() &&
-                    (!pobj->IsCreature() || !pobj->IsDead(0))) {
+                    (!pobj->IsCreature() || !pobj->IsDead(false))) {
                     TESSound* pSound = pobj->pRandomSound;
                     if (pSound) {
                         float v5 = static_cast<double>(pSound->GetRandomPercentChance()) / 200.0;
                         if (RandomBool(v5)) {
                             if (*pSound->GetFilename()) {
                                 uint32_t iMax = 100 * pSound->GetMaxDistance();
-                                float fdist = pPlayer->GetDistanceFromReference(pobj, 0, 0);
+                                float fdist = pPlayer->GetDistanceFromReference(pobj, false, false);
                                 if (iMax > static_cast<uint32_t>(static_cast<int64_t>(fdist))) {
                                     uint32_t a3 = pSound->iFormID;
                                     BSAudio* v1 = &BSAudio::QInstance();
@@ -2231,7 +2231,7 @@ void TESObjectCELL::UpdateRefSounds() {
                                     const NiPoint3* v3 = &pobj->GetLocationOnReference();
                                     SoundHandle.SetPosition(v3->x, v3->y, v3->z);
                                     SoundHandle.SetPriority(192u);
-                                    SoundHandle.Play(0);
+                                    SoundHandle.Play(false);
                                 }
                             }
                         }
@@ -2286,13 +2286,13 @@ void TESObjectCELL::QueueReferences(bool abHighPriorityOnly) {
                  static_cast<const void*>(pBoundMarker))) {
                 if (pRefr->Get3D() && (!pRefr->HasTemp3D())) {
                     if (pRefr->GetDisabled() || pRefr->GetDelete()) {
-                        pRefr->Set3D(nullptr, (bool)1);
+                        pRefr->Set3D(nullptr, true);
                     }
                 }
                 else {
                     if (((!pRefr->GetDisabled()) && (!pRefr->GetDelete())) &&
                         ((!abHighPriorityOnly) || pRefr->Is3DHighPriority())) {
-                        pModelLoader->QueueReference(pRefr, static_cast<IO_TASK_PRIORITY>(eCellPriority), 1);
+                        pModelLoader->QueueReference(pRefr, static_cast<IO_TASK_PRIORITY>(eCellPriority), true);
                     }
                 }
             }
@@ -2307,13 +2307,13 @@ void TESObjectCELL::QueueReferences(bool abHighPriorityOnly) {
                  static_cast<const void*>(pBoundMarker))) {
                 if (pRefr->Get3D() && (!pRefr->HasTemp3D())) {
                     if (pRefr->GetDisabled() || pRefr->GetDelete()) {
-                        pRefr->Set3D(nullptr, (bool)0);
+                        pRefr->Set3D(nullptr, false);
                     }
                 }
                 else {
                     if (((!pRefr->GetDisabled()) && (!pRefr->GetDelete())) &&
                         ((!abHighPriorityOnly) || pRefr->Is3DHighPriority())) {
-                        pModelLoader->QueueReference(pRefr, static_cast<IO_TASK_PRIORITY>(eCellPriority), 1);
+                        pModelLoader->QueueReference(pRefr, static_cast<IO_TASK_PRIORITY>(eCellPriority), true);
                     }
                 }
             }
@@ -2607,7 +2607,7 @@ void TESObjectCELL::AddReferenceSimple(TESObjectREFR* apRef) {
                 ExtraDataList* Extra = apRef->GetExtra();
                 Extra->SetPersistentCell(this);
                 if (!pDataHandler->GetSaveLoad()) {
-                    SetAltered(1);
+                    SetAltered(true);
                 }
             }
             else {
@@ -2621,9 +2621,9 @@ void TESObjectCELL::AddReferenceSimple(TESObjectREFR* apRef) {
                 apRef->SetParentCell(this);
                 CellRefLockLeave();
                 if (!apRef->GetTemporary() && !apRef->GetRefPersists() && !pDataHandler->GetSaveLoad()) {
-                    SetAltered(1);
+                    SetAltered(true);
                 }
-                apRef->AddLight(0);
+                apRef->AddLight(false);
             }
         }
     }
@@ -3262,7 +3262,7 @@ void TESObjectCELL::PlaceCanopyShadow(NiPoint3 aLocation, uint32_t aiRadius, flo
         TESObjectCELL::CreateCanopyShadowMaskForCell(this, pTex, pPixData);
     }
     COORD_DATA kCData;
-    if (!GetLand() || !GetLand()->GetCoordData(&kCData, aLocation, 0)) {
+    if (!GetLand() || !GetLand()->GetCoordData(&kCData, aLocation, false)) {
         return;
     }
     float fTreeX = kCData.Cellpoint.x / 64.0;
@@ -3276,7 +3276,7 @@ void TESObjectCELL::PlaceCanopyShadow(NiPoint3 aLocation, uint32_t aiRadius, flo
         NiDX9DynamicTextureData* pTexData = static_cast<NiDX9DynamicTextureData*>(pTex->m_pkRendererData);
         if (pTexData) {
             IDirect3DTexture9* pD3DTexture = static_cast<IDirect3DTexture9*>(pTexData->GetD3DTexture());
-            pD3DTexture->LockRect(0, pPixData, 0, 0);
+            pD3DTexture->LockRect(0, pPixData, nullptr, 0);
         }
     }
     uint8_t* pData = static_cast<uint8_t*>(pPixData->pBits);
@@ -3614,8 +3614,8 @@ bool TESObjectCELL::ShouldDisplayHighDetail() {
 
 void TESObjectCELL::FadeToHighDetail() {
     if (!bFadingToHighDetail) {
-        bFadingToHighDetail = (bool)1;
-        bFadingToLowDetail = (bool)0;
+        bFadingToHighDetail = true;
+        bFadingToLowDetail = false;
         fLodFadeInPercent = (float)0.0;
     }
 }
@@ -4032,10 +4032,10 @@ bool TESObjectCELL::TestObjectAgainstRoom(
     bool abMultipleRoomTest
 ) {
     NiPoint3 kBoundCenter = (&apRef3D->GetWorldBound())->m_kCenter;
-    bool bOcclusionPlane = 0;
+    bool bOcclusionPlane = false;
     if ((&apRef->m_Extra)->GetOcclusionPlane()) {
         kBoundCenter = (&apRef->m_Extra)->GetOcclusionPlane()->kCenter;
-        bOcclusionPlane = 1;
+        bOcclusionPlane = true;
     }
     NiPointer<BSMultiBoundNode> spNode(static_cast<BSMultiBoundNode*>(nullptr));
     pLoadedData->MultiboundRefMap.GetAt(apBoundRef, spNode);
@@ -4056,7 +4056,7 @@ bool TESObjectCELL::TestObjectAgainstRoom(
                (pWorldBound = &apRef3D->GetWorldBound(),
                 pNodeB->CheckBound(*pWorldBound) == BSMultiBoundShape::BS_INTERSECT_NONE))))) {
         LABEL_76:;
-            return 0;
+            return false;
         }
         apRef->SetMultiBoundRef(apBoundRef);
         if (abMultipleRoomTest && abFoundRoom) {
@@ -4075,7 +4075,7 @@ bool TESObjectCELL::TestObjectAgainstRoom(
                 pPortalGraph->AttachAlwaysRenderChild(apRef3D);
                 if (apRef3D->m_pkParent) {
                     if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                        TESObjectCELL::QueueAttachChild(apRef, 0);
+                        TESObjectCELL::QueueAttachChild(apRef, nullptr);
                     }
                     else {
                         NiNode* pParent = apRef3D->m_pkParent;
@@ -4083,7 +4083,7 @@ bool TESObjectCELL::TestObjectAgainstRoom(
                     }
                 }
             }
-            return 1;
+            return true;
         }
         else {
             BSMultiBoundNode* pNode = spNode.m_pObject;
@@ -4091,23 +4091,23 @@ bool TESObjectCELL::TestObjectAgainstRoom(
             if (bOcclusionPlane) {
                 BSOcclusionPlane* pOcclusionPlane = (&apRef->m_Extra)->GetOcclusionPlane();
                 pRoom->AddOccluder(pOcclusionPlane);
-                return 1;
+                return true;
             }
             else {
-                bool bMultiplePortals = 0;
-                bool bPortalShared = 0;
+                bool bMultiplePortals = false;
+                bool bPortalShared = false;
                 BSPortal* pSharedPortal = nullptr;
                 if ((&pRoom->QPortalList())->m_uiCount) {
                     NiFrustumPlanes kBoxPlanes;
                     [[maybe_unused]] NiTransform kWorldTransform = apRef3D->GetWorldTransform();
-                    bool bUseFrustum = 0;
+                    bool bUseFrustum = false;
                     NiTListItem<BSPortal*>* pPos = (&pRoom->QPortalList())->m_pkHead;
                     while (pPos) {
                         BSPortal* pPortal = (&pRoom->QPortalList())->GetNext(pPos);
                         if (pPortal) {
-                            bool bAdd = 0;
+                            bool bAdd = false;
                             if (bUseFrustum) {
-                                bAdd = pPortal->WithinFrustum(kBoxPlanes, 0, NiPoint3_ZERO);
+                                bAdd = pPortal->WithinFrustum(kBoxPlanes, false, NiPoint3_ZERO);
                             }
                             else {
                                 const NiBound* pBound = &apRef3D->GetWorldBound();
@@ -4115,7 +4115,7 @@ bool TESObjectCELL::TestObjectAgainstRoom(
                             }
                             if (bAdd) {
                                 if (bPortalShared) {
-                                    bMultiplePortals = 1;
+                                    bMultiplePortals = true;
                                     NiNode* pParent = apRef3D->m_pkParent;
                                     if (pParent != GetDynamicNode() && !apRef->IsActor()) {
                                         if (apRef->IsActor()) {
@@ -4133,7 +4133,7 @@ bool TESObjectCELL::TestObjectAgainstRoom(
                                             pPortalGraph->AttachAlwaysRenderChild(apRef3D);
                                             if (apRef3D->m_pkParent) {
                                                 if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                                                    TESObjectCELL::QueueAttachChild(apRef, 0);
+                                                    TESObjectCELL::QueueAttachChild(apRef, nullptr);
                                                 }
                                                 else {
                                                     NiNode* pOldParent = apRef3D->m_pkParent;
@@ -4145,7 +4145,7 @@ bool TESObjectCELL::TestObjectAgainstRoom(
                                     break;
                                 }
                                 pSharedPortal = pPortal;
-                                bPortalShared = 1;
+                                bPortalShared = true;
                             }
                         }
                     }
@@ -4181,12 +4181,12 @@ bool TESObjectCELL::TestObjectAgainstRoom(
                         }
                     }
                 }
-                abFoundRoom = 1;
+                abFoundRoom = true;
                 if (abMultipleRoomTest && !bMultiplePortals) {
-                    return 0;
+                    return false;
                 }
                 else {
-                    return 1;
+                    return true;
                 }
             }
         }
@@ -4207,7 +4207,7 @@ bool TESObjectCELL::TestObjectAgainstRoom(
             pPortalGraph->AttachAlwaysRenderChild(apRef3D);
             if (apRef3D->m_pkParent) {
                 if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                    TESObjectCELL::QueueAttachChild(apRef, 0);
+                    TESObjectCELL::QueueAttachChild(apRef, nullptr);
                 }
                 else {
                     NiNode* pParent = apRef3D->m_pkParent;
@@ -4215,8 +4215,8 @@ bool TESObjectCELL::TestObjectAgainstRoom(
                 }
             }
         }
-        abFoundRoom = 1;
-        return 1;
+        abFoundRoom = true;
+        return true;
     }
 }
 
@@ -4360,7 +4360,7 @@ void TESObjectCELL::AttachModels(bool abSetupMopp) {
 }
 
 void TESObjectCELL::UpdateReferences3DandProcess() {
-    ChangeProcessLevel(0);
+    ChangeProcessLevel(false);
     CellRefLockEnter();
     for (TESObjectREFR* pRef : *GetRefList()) {
         if (pRef) {
@@ -4370,10 +4370,10 @@ void TESObjectCELL::UpdateReferences3DandProcess() {
                     if (GetWorldSpace()) {
                         TESWorldSpace* WorldSpace = GetWorldSpace();
                         BGSTerrainManager* TerrainManager = WorldSpace->GetTerrainManager();
-                        TerrainManager->HideTree(pRef, 1);
+                        TerrainManager->HideTree(pRef, true);
                         TESWorldSpace* v3 = GetWorldSpace();
                         BGSTerrainManager* v4 = v3->GetTerrainManager();
-                        v4->SetNeedsImmediateUpdate(1);
+                        v4->SetNeedsImmediateUpdate(true);
                     }
                 }
             }
@@ -5000,7 +5000,7 @@ void TESObjectCELL::UpdateManagedNodes(float afTime, bool abLargeOnly) {
     NiNode* pdynamic = static_cast<NiNode*>(GetDynamicNode());
     if (pdynamic) {
         if (!abLargeOnly) {
-            NiUpdateData UpdateData(afTime, 0, bparallel);
+            NiUpdateData UpdateData(afTime, false, bparallel);
             pdynamic->UpdateSelectedDownwardPass(UpdateData, 0);
             if (iNumHWThreads.Int() > 1) {
                 TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
@@ -5021,14 +5021,14 @@ void TESObjectCELL::UpdateManagedNodes(float afTime, bool abLargeOnly) {
     if (bUpdateTerrain) {
         if (GetWorldSpace()) {
             if (GetState() == TESObjectCELL::CS_ATTACHED) {
-                bDisplayHighDetail = 1;
-                bFadingToHighDetail = 0;
-                bFadingToLowDetail = 0;
+                bDisplayHighDetail = true;
+                bFadingToHighDetail = false;
+                bFadingToLowDetail = false;
                 if (GetWorldSpace()) {
                     TESWorldSpace* WorldSpace = GetWorldSpace();
-                    WorldSpace->GetTerrainManager()->SetNeedsImmediateUpdate(1);
+                    WorldSpace->GetTerrainManager()->SetNeedsImmediateUpdate(true);
                 }
-                bUpdateTerrain = 0;
+                bUpdateTerrain = false;
             }
         }
     }
@@ -5037,12 +5037,12 @@ void TESObjectCELL::UpdateManagedNodes(float afTime, bool abLargeOnly) {
             if (GetWorldSpace()) {
                 if (!bDisplayHighDetail) {
                     TESWorldSpace* v6 = GetWorldSpace();
-                    v6->GetTerrainManager()->SetNeedsImmediateUpdate(1);
+                    v6->GetTerrainManager()->SetNeedsImmediateUpdate(true);
                 }
             }
-            bDisplayHighDetail = 1;
-            bFadingToHighDetail = 0;
-            bFadingToLowDetail = 0;
+            bDisplayHighDetail = true;
+            bFadingToHighDetail = false;
+            bFadingToLowDetail = false;
         }
         fLodFadeInPercent = appTimer.fDelta + fLodFadeInPercent;
     }
@@ -5054,12 +5054,12 @@ void TESObjectCELL::UpdateManagedNodes(float afTime, bool abLargeOnly) {
                 NiNode* pnode = pref->Get3D();
                 plist = plist->m_pkNext;
                 if (pnode) {
-                    NiUpdateData UpdateData_2(afTime, 0, bparallel);
+                    NiUpdateData UpdateData_2(afTime, false, bparallel);
                     pnode->UpdateSelectedDownwardPass(UpdateData_2, 0);
                     if (UpdateData_2.bSceneGraphChange) {
                         NiNode* v17 = pnode;
                         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
-                        ShadowSceneNode_->UpdateObjectLighting(v17, 1);
+                        ShadowSceneNode_->UpdateObjectLighting(v17, true);
                     }
                     if (iNumHWThreads.Int() > 1) {
                         NiNode* addFlash_1b = pnode;
@@ -5080,8 +5080,8 @@ void TESObjectCELL::UpdateManagedNodes(float afTime, bool abLargeOnly) {
         else {
             NiTMapItem<TESObjectREFR*, NiNode*>* pAnimatedPos = pLoadedData->AnimatedRefMap.GetFirstPos();
             while (pAnimatedPos) {
-                TESObjectREFR* pref_2 = 0;
-                NiNode* pnode_2 = 0;
+                TESObjectREFR* pref_2 = nullptr;
+                NiNode* pnode_2 = nullptr;
                 pLoadedData->AnimatedRefMap.GetNext(pAnimatedPos, pref_2, pnode_2);
                 if (pnode_2) {
                     NiNode* Parent = pnode_2->m_pkParent;
@@ -5089,12 +5089,12 @@ void TESObjectCELL::UpdateManagedNodes(float afTime, bool abLargeOnly) {
                         NiCamera* Camera;
                         if (pref_2->GetObjectReference()->GetFormType() != TREE_ID ||
                             (Camera = BSTreeManager::GetCamera(), NodeInFrustum(pnode_2, Camera))) {
-                            NiUpdateData UpdateData_3(afTime, 0, bparallel);
+                            NiUpdateData UpdateData_3(afTime, false, bparallel);
                             pnode_2->UpdateSelectedDownwardPass(UpdateData_3, 0);
                             if (UpdateData_3.bSceneGraphChange) {
                                 NiNode* v18 = pnode_2;
                                 ShadowSceneNode* v12 = BSShaderManager::GetShadowSceneNode(0);
-                                v12->UpdateObjectLighting(v18, 1);
+                                v12->UpdateObjectLighting(v18, true);
                             }
                             if (iNumHWThreads.Int() > 1) {
                                 NiNode* addFlash_1d = pnode_2;
@@ -5115,8 +5115,8 @@ void TESObjectCELL::UpdateManagedNodes(float afTime, bool abLargeOnly) {
             }
             NiTMapItem<TESForm*, TESObjectREFR*>* pSourcePos = pLoadedData->EmittanceSourceRefMap.GetFirstPos();
             while (pSourcePos) {
-                TESForm* psource = 0;
-                TESObjectREFR* pref_3 = 0;
+                TESForm* psource = nullptr;
+                TESObjectREFR* pref_3 = nullptr;
                 pLoadedData->EmittanceSourceRefMap.GetNext(pSourcePos, psource, pref_3);
                 if (psource) {
                     NiColor* emitcolor = psource->GetEmittanceColor();
@@ -5141,7 +5141,7 @@ void TESObjectCELL::UpdateManagedNodes(float afTime, bool abLargeOnly) {
                                 Sky* psky = Sky::GetInstance();
                                 psky->FillColorBlend(colorblend, pweather, 1.0f, aeTime1, aeTime2);
                                 psky->FillColorBlendColors(
-                                    colorblend, pweather, 0, TESWeather::SUNLIGHT, aeTime1, aeTime2
+                                    colorblend, pweather, nullptr, TESWeather::SUNLIGHT, aeTime1, aeTime2
                                 );
                                 double v27 = psky->GetFlash();
                                 float fflash = fWeatherFlashDirectional.Float() * v27;
@@ -5153,8 +5153,8 @@ void TESObjectCELL::UpdateManagedNodes(float afTime, bool abLargeOnly) {
             }
             NiTMapItem<TESObjectREFR*, NiNode*>* pLightPos = pLoadedData->EmittanceLightRefMap.GetFirstPos();
             while (pLightPos) {
-                TESObjectREFR* pref_4 = 0;
-                NiNode* pnode_3 = 0;
+                TESObjectREFR* pref_4 = nullptr;
+                NiNode* pnode_3 = nullptr;
                 pLoadedData->EmittanceLightRefMap.GetNext(pLightPos, pref_4, pnode_3);
                 if (pnode_3) {
                     NiColor emitcolor_2 = NiColor_WHITE;
@@ -5184,7 +5184,7 @@ void TESObjectCELL::UpdateManagedNodes(float afTime, bool abLargeOnly) {
                                     Sky* psky_2 = Sky::GetInstance();
                                     psky_2->FillColorBlend(colorblend_2, pweather_2, 1.0f, aeTime1_2, aeTime2_2);
                                     psky_2->FillColorBlendColors(
-                                        colorblend_2, pweather_2, 0, TESWeather::SUNLIGHT, aeTime1_2, aeTime2_2
+                                        colorblend_2, pweather_2, nullptr, TESWeather::SUNLIGHT, aeTime1_2, aeTime2_2
                                     );
                                     double flash = psky_2->GetFlash();
                                     float fflash_2 = fWeatherFlashDirectional.Float() * flash;
@@ -5222,7 +5222,7 @@ BGSAcousticSpace* TESObjectCELL::GetAcousticSpace() {
 
 bool TESObjectCELL::IsPointInCellExterior(const NiPoint3& aPt) {
     if (GetInterior()) {
-        return (bool)0;
+        return false;
     }
     int32_t v4 = FloatToInt(aPt.x);
     int32_t v5 = FloatToInt(aPt.y);
@@ -5291,7 +5291,7 @@ void TESObjectCELL::InitHavok() {
         TESTrapListener* v26;
         bhkWorld* pw_2;
         AutoMemContext tempMemContext(
-            MEM_CONTEXT_HAVOK, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp", 14911
+            MEM_CONTEXT_HAVOK, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp", 14911
         );
         bhkWorldCinfo hkwInfo;
         hkwInfo.m_gravity = hkVector4(0.0f, 0.0f, HavokWorldProps::fGravitySC, 0.0f);
@@ -5302,7 +5302,7 @@ void TESObjectCELL::InitHavok() {
             pw_2 = ::new (v30) bhkWorld(hkwInfo);
         }
         else {
-            pw_2 = 0;
+            pw_2 = nullptr;
         }
         pw = pw_2;
         pw_2->MarkForWrite();
@@ -5311,7 +5311,7 @@ void TESObjectCELL::InitHavok() {
             v26 = ::new (v27) TESTrapListener;
         }
         else {
-            v26 = 0;
+            v26 = nullptr;
         }
         pw->AddTrapListener(v26);
         BGSAcousticSpaceListener* v23 =
@@ -5320,7 +5320,7 @@ void TESObjectCELL::InitHavok() {
             v22 = ::new (v23) BGSAcousticSpaceListener;
         }
         else {
-            v22 = 0;
+            v22 = nullptr;
         }
         pw->AddAcousticSpaceListener(v22);
         if (this->HasWater()) {
@@ -5331,7 +5331,7 @@ void TESObjectCELL::InitHavok() {
                 v19 = ::new (v20) TESWaterListener(a5);
             }
             else {
-                v19 = 0;
+                v19 = nullptr;
             }
             pw->AddWaterListener(v19);
         }
@@ -5341,7 +5341,7 @@ void TESObjectCELL::InitHavok() {
             v16 = ::new (v17) TESArrowTargetListener;
         }
         else {
-            v16 = 0;
+            v16 = nullptr;
         }
         pw->AddEntityListener(v16);
         if (!TESObjectCELL::pIslandListener) {
@@ -5352,7 +5352,7 @@ void TESObjectCELL::InitHavok() {
                 v13 = ::new (v14) FOIslandActivationListener;
             }
             else {
-                v13 = 0;
+                v13 = nullptr;
             }
             TESObjectCELL::pIslandListener = v13;
         }
@@ -5372,14 +5372,14 @@ void TESObjectCELL::InitHavok() {
     if (!pcm) {
         CellMopp* pcm_2;
         AutoMemContext tempMemContext_2(
-            MEM_CONTEXT_HAVOK, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp", 14993
+            MEM_CONTEXT_HAVOK, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp", 14993
         );
         CellMopp* v8 = static_cast<CellMopp*>(NiMemObject::operator new(sizeof(CellMopp)));
         if (v8) {
             pcm_2 = ::new (v8) CellMopp;
         }
         else {
-            pcm_2 = 0;
+            pcm_2 = nullptr;
         }
         pcm = pcm_2;
         this->ExtraData.SetCellMopp(pcm_2);
@@ -5553,7 +5553,7 @@ void TESObjectCELL::AddScriptedRef(TESObjectREFR* apRef) {
 void TESObjectCELL::AddActivatingRef(TESObjectREFR* apRef) {
     if (pLoadedData) {
         BSSimpleList<TESObjectREFR*>* plist = &pLoadedData->ActivatingRefs;
-        BSSimpleList<TESObjectREFR*>* plastlist = 0;
+        BSSimpleList<TESObjectREFR*>* plastlist = nullptr;
         while (plist && !plist->IsEmpty()) {
             TESObjectREFR** v2 = &plist->m_item;
             if (*v2 == apRef) {
@@ -5648,7 +5648,7 @@ NiAVObject* TESObjectCELL::Pick(bhkPickData& arResult) {
     CFilter a2;
     bhkWorld* pw = GetbhkWorld();
     if (!pw || !pw->PickObject(arResult)) {
-        return 0;
+        return nullptr;
     }
     hkpRigidBody* pbody = arResult.GethkRigidBody();
     bhkRigidBody* pbhkBody = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(pbody));
@@ -5922,19 +5922,19 @@ NavMeshArray* TESObjectCELL::GetNavMeshArray() {
 
 TESObjectLAND* TESObjectCELL::GetLand() {
     if (GetInterior() || GetPersistentCell()) {
-        return 0;
+        return nullptr;
     }
     if (!pCellLand) {
         TESObjectLAND* v2;
         AutoMemContext apMemory(
-            MEM_CONTEXT_LAND, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp", 4022
+            MEM_CONTEXT_LAND, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp", 4022
         );
         TESObjectLAND* v4 = static_cast<TESObjectLAND*>(ourMalloc(sizeof(TESObjectLAND)));
         if (v4) {
             v2 = ::new (v4) TESObjectLAND;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         pCellLand = v2;
         pCellLand->SetCell(this);
@@ -5948,12 +5948,12 @@ float TESObjectCELL::GetScaleBasedOnLocation(
     TESRegionObjectBase* apObjectBase
 ) {
     BSSimpleList<TESRegion*>* pcurrent;
-    TESRegionList* RegionList = GetRegionList(1);
+    TESRegionList* RegionList = GetRegionList(true);
     if (RegionList) {
         pcurrent = static_cast<BSSimpleList<TESRegion*>*>(RegionList);
     }
     else {
-        pcurrent = 0;
+        pcurrent = nullptr;
     }
     BSSimpleList<TESRegion*>* pcurrent_2 = pcurrent;
     if (GetInterior() || !pcurrent) {
@@ -5965,7 +5965,8 @@ float TESObjectCELL::GetScaleBasedOnLocation(
         float fscaleRegion;
         TESRegionData* pdata;
         if (!pcurrent_2->m_item->GetDelete() &&
-            ((fscaleRegion = 0.0f, (pdata = pcurrent_2->m_item->pDataList->Find(aID)) != 0) && pdata->Validate())) {
+            ((fscaleRegion = 0.0f, (pdata = pcurrent_2->m_item->pDataList->Find(aID)) != nullptr) &&
+             pdata->Validate())) {
             BSSimpleList<TESRegionPointList*>* pcurrentRPL;
             if (pdata->bOverride) {
                 if (pdata->cPriority <= icurrentOverride) {
@@ -6001,7 +6002,7 @@ float TESObjectCELL::GetScaleBasedOnLocation(
                     TESRegionDataObjects* pdataObjects = RegionDataManager->IsRegionDataObjects(pdata);
                     TESRegionObjectList* v5 = pdataObjects->GetObjectList();
                     // An objects entry (GetID 0) is a TESRegionObject.
-                    if (v5->IsInListTOL(static_cast<TESRegionObject*>(apObjectBase), 1, 0)) {
+                    if (v5->IsInListTOL(static_cast<TESRegionObject*>(apObjectBase), true, false)) {
                         goto LABEL_45;
                     }
                     goto LABEL_44;
@@ -6077,7 +6078,7 @@ void TESObjectCELL::Detach(bool abDetachHavok) {
         FadeToLowDetail();
         pModelLoader->CancelReferencesForCell(this);
         TES::pInstance->SetUpdateGridString();
-        AttachLights(0);
+        AttachLights(false);
         if (GetInterior()) {
             TES::pInstance->AddToInteriorBuffer(this);
         }
@@ -6087,19 +6088,19 @@ void TESObjectCELL::Detach(bool abDetachHavok) {
         if (abDetachHavok) {
             DetachHavok();
         }
-        ProcessAddonNodesForRefs(0);
+        ProcessAddonNodesForRefs(false);
         NiNode* proot = Load3D();
         NiNode* Root = TES::pInstance->pObjRoot;
         Root->DetachChild(proot);
         RemoveReferencesFromLoadedReferenceCollection();
         RemoveNavmeshObstacles();
         SetState(TESObjectCELL::CS_LOADED);
-        bCellDetached = 1;
+        bCellDetached = true;
         if (!pSaveLoadManager->IsLoadingGame()) {
-            ChangeProcessLevel(1);
+            ChangeProcessLevel(true);
         }
         SetDetachTime();
-        AttachSounds(0);
+        AttachSounds(false);
         NavMeshRender* Instance = NavMeshRender::GetInstance();
         Instance->RemoveCell(this);
         uint32_t CastingType = iFormID;
@@ -6114,7 +6115,7 @@ void TESObjectCELL::Detach(bool abDetachHavok) {
         pportalgraph->RemoveUnboundNode(ActorNode);
         NiNode* ChildNode = GetChildNode(TESObjectCELL::CN_LAND);
         pportalgraph->RemoveUnboundNode(ChildNode);
-        NiNode* MarkerNode = static_cast<NiNode*>(GetMarkerNode());
+        NiNode* MarkerNode = GetMarkerNode();
         pportalgraph->RemoveUnboundNode(MarkerNode);
     }
     CellRefLockLeave();
@@ -6144,7 +6145,7 @@ uint32_t TESObjectCELL::GetGroupBlockKey() {
     }
     int32_t dataY = GetDataY();
     int32_t dataX = GetDataX();
-    return (uint32_t)TESObjectCELL::CalcExtGroupBlockKey(dataX, dataY);
+    return TESObjectCELL::CalcExtGroupBlockKey(dataX, dataY);
 }
 
 uint32_t TESObjectCELL::GetGroupSubBlockKey() {
@@ -6153,7 +6154,7 @@ uint32_t TESObjectCELL::GetGroupSubBlockKey() {
     }
     int32_t dataY = GetDataY();
     int32_t dataX = GetDataX();
-    return (uint32_t)TESObjectCELL::CalcExtGroupSubBlockKey(dataX, dataY);
+    return TESObjectCELL::CalcExtGroupSubBlockKey(dataX, dataY);
 }
 
 void TESObjectCELL::SetInterior(bool abVal) {
@@ -6171,7 +6172,7 @@ bool TESObjectCELL::CantTravelFrom() {
         v3 = (uint8_t)(!v3);
     }
     if (v3) {
-        return (bool)1;
+        return true;
     }
     TESWorldSpace* worldSpace = GetWorldSpace();
     return (bool)((uint8_t)(worldSpace && worldSpace->CantTravelFrom()));
@@ -6198,7 +6199,7 @@ BSSimpleList<TESObjectREFR*>* TESObjectCELL::GetWaterRefList() {
         return &pLoadedData->WaterRefs;
     }
     else {
-        return (BSSimpleList<TESObjectREFR*>*)0;
+        return (BSSimpleList<TESObjectREFR*>*)nullptr;
     }
 }
 
@@ -6226,7 +6227,7 @@ float TESObjectCELL::GetDistanceFromPoint(const NiPoint3& aPos) {
         }
         else {
             if (!(v8 > ((double)(&aPos)->y))) {
-                return (float)(v11 - (&aPos)->x);
+                return (v11 - (&aPos)->x);
             }
             else {
                 return GetDistanceBetweenPoints((&aPos)->x, (&aPos)->y, v11, v8);
@@ -6236,21 +6237,21 @@ float TESObjectCELL::GetDistanceFromPoint(const NiPoint3& aPos) {
     else {
         if (!(v10 < ((double)(&aPos)->x))) {
             if (v9 < ((double)(&aPos)->y)) {
-                return (float)((&aPos)->y - v9);
+                return ((&aPos)->y - v9);
             }
             else {
                 if (!(v8 > ((double)(&aPos)->y))) {
                     return 0.0;
                 }
                 else {
-                    return (float)(v8 - (&aPos)->y);
+                    return (v8 - (&aPos)->y);
                 }
             }
         }
         else {
             if (!(v9 < ((double)(&aPos)->y))) {
                 if (!(v8 > ((double)(&aPos)->y))) {
-                    return (float)(v11 - (&aPos)->x);
+                    return (v11 - (&aPos)->x);
                 }
                 else {
                     return GetDistanceBetweenPoints((&aPos)->x, (&aPos)->y, v10, v8);
@@ -6303,7 +6304,7 @@ void TESObjectCELL::Clear3D() {
     ClearQueuedRefCount();
     ClearCriticalQueuedRefCount();
     SetState(TESObjectCELL::CS_NOTLOADED);
-    bCellDetached = (bool)0;
+    bCellDetached = false;
 }
 
 bool TESObjectCELL::PickWorldDistance(
@@ -6323,37 +6324,37 @@ bool TESObjectCELL::PickWorldDistance(
     if (apPick) {
         if (acNodeFlags) {
             if ((acNodeFlags & 1) != 0) {
-                childNode = static_cast<NiNode*>(GetChildNode(TESObjectCELL::CN_ACTOR));
-                v14 = (uint8_t)(((int8_t)PickDistance(apPick, aOrigin, aDir, afDistance, childNode, 0)) != 0);
+                childNode = GetChildNode(TESObjectCELL::CN_ACTOR);
+                v14 = (uint8_t)(((int8_t)PickDistance(apPick, aOrigin, aDir, afDistance, childNode, false)) != 0);
             }
             if ((acNodeFlags & 2) != 0) {
-                v8 = static_cast<NiNode*>(GetChildNode(TESObjectCELL::CN_MARKER));
-                if (PickDistance(apPick, aOrigin, aDir, afDistance, v8, 0)) {
+                v8 = GetChildNode(TESObjectCELL::CN_MARKER);
+                if (PickDistance(apPick, aOrigin, aDir, afDistance, v8, false)) {
                     v14 = 1;
                 }
             }
             if ((acNodeFlags & 4) != 0) {
-                v9 = static_cast<NiNode*>(GetChildNode(TESObjectCELL::CN_LAND));
-                if (PickDistance(apPick, aOrigin, aDir, afDistance, v9, 0)) {
+                v9 = GetChildNode(TESObjectCELL::CN_LAND);
+                if (PickDistance(apPick, aOrigin, aDir, afDistance, v9, false)) {
                     v14 = 1;
                 }
             }
             if ((acNodeFlags & 8) != 0) {
-                v10 = static_cast<NiNode*>(GetChildNode(TESObjectCELL::CN_STATIC));
-                if (PickDistance(apPick, aOrigin, aDir, afDistance, v10, 0)) {
+                v10 = GetChildNode(TESObjectCELL::CN_STATIC);
+                if (PickDistance(apPick, aOrigin, aDir, afDistance, v10, false)) {
                     v14 = 1;
                 }
             }
             if ((acNodeFlags & 16) != 0) {
-                v11 = static_cast<NiNode*>(GetChildNode(TESObjectCELL::CN_DYNAMIC));
-                if (PickDistance(apPick, aOrigin, aDir, afDistance, v11, 0)) {
+                v11 = GetChildNode(TESObjectCELL::CN_DYNAMIC);
+                if (PickDistance(apPick, aOrigin, aDir, afDistance, v11, false)) {
                     v14 = 1;
                 }
             }
             if (((acNodeFlags & 8) != 0) || ((acNodeFlags & 16) != 0)) {
-                v12 = static_cast<NiNode*>(GetChildNode(TESObjectCELL::CN_MULTIBOUND));
-                if (PickDistance(apPick, aOrigin, aDir, afDistance, v12, 0)) {
-                    return (bool)1;
+                v12 = GetChildNode(TESObjectCELL::CN_MULTIBOUND);
+                if (PickDistance(apPick, aOrigin, aDir, afDistance, v12, false)) {
+                    return true;
                 }
             }
         }
@@ -6387,7 +6388,7 @@ void TESObjectCELL::ClearReference3D() {
                         v2->TurnFadeNodeOff();
                     }
                 }
-                v4->Set3D(nullptr, (bool)0);
+                v4->Set3D(nullptr, false);
             }
         }
     }
@@ -6401,7 +6402,7 @@ void TESObjectCELL::UnLoadAllTempData() {
     CellRefLockEnter();
     this->sNumRefsWithVisibleDistant = 0;
     this->sNumLoadedRefsWithVisibleDistant = 0;
-    bool bAllowChanges = pSaveLoadGame->SetThreadAllowChanges(0);
+    bool bAllowChanges = pSaveLoadGame->SetThreadAllowChanges(false);
     this->RemoveNavmeshObstacles();
     BSSimpleList<TESObjectREFR*>* pcurrent = this->GetRefList();
     BSSimpleList<TESObjectREFR*>* pprevious = nullptr;
@@ -6428,7 +6429,7 @@ void TESObjectCELL::UnLoadAllTempData() {
                 }
             }
             pSaveLoadGameOLD->UnloadForm(pref);
-            pSaveLoadGame->UnloadForm(pref, 0);
+            pSaveLoadGame->UnloadForm(pref, false);
             char v18 = 1;
             if (pSaveLoadGame->GetSaveGameLoading()) {
                 BGSChangeFlags changeFlags(8);
@@ -6457,14 +6458,15 @@ void TESObjectCELL::UnLoadAllTempData() {
     if (Land) {
         TESFile* v15 = Land->GetFile(-1);
         if (!v15 || v15->GetMaster()) {
-            this->SetLand(0);
-            Land = 0;
+            this->SetLand(nullptr);
+            Land = nullptr;
         }
     }
     NavMeshArray* pNavMeshes = this->GetNavMeshArray();
     if (pNavMeshes) {
         AutoMemContext apMemory(
-            MEM_CONTEXT_NAVMESH, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp", 0x2769
+            MEM_CONTEXT_NAVMESH, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp",
+            0x2769
         );
         for (uint32_t aiNavMeshIndex = 0;; ++aiNavMeshIndex) {
             uint32_t NavMeshCount = pNavMeshes->GetNavMeshCount();
@@ -6483,7 +6485,7 @@ void TESObjectCELL::UnLoadAllTempData() {
             }
         }
     }
-    this->SetHasTempData(0);
+    this->SetHasTempData(false);
 }
 
 void TESObjectCELL::ClearPortalGraph() {
@@ -6493,10 +6495,10 @@ void TESObjectCELL::ClearPortalGraph() {
             BSPortalGraph* PortalGraph = ShadowSceneNode_->GetPortalGraph();
             if (PortalGraph == spPortalGraph.m_pObject) {
                 ShadowSceneNode* v3 = BSShaderManager::GetShadowSceneNode(0);
-                v3->SetPortalGraph(0);
+                v3->SetPortalGraph(nullptr);
             }
         }
-        spPortalGraph.operator=(static_cast<BSPortalGraph*>(0));
+        spPortalGraph.operator=(static_cast<BSPortalGraph*>(nullptr));
         if (GetWorldSpace()) {
             TESWorldSpace* WorldSpace = GetWorldSpace();
             WorldSpace->ClearPortalGraph();
@@ -6562,7 +6564,7 @@ TESObjectREFR* TESObjectCELL::CreateLootBagAtRef(TESObjectREFR* apRef) {
     TESBoundObject* objectReference = pPlayer->TESObjectREFR::GetObjectReference();
     apRef_2->SetOwner(objectReference);
     FillLootBag(apRef_2);
-    AddReference(apRef_2, 0);
+    AddReference(apRef_2, false);
     return apRef_2;
 }
 
@@ -6642,7 +6644,7 @@ bool TESObjectCELL::IsActorBaseCellOwner(TESActorBase* apActorBase) {
                 extraRank = GetOwnershipRank();
                 v4 = dynamic_cast<TESNPC*>(apActorBase);
                 if (v4) {
-                    return (bool)((uint8_t)(static_cast<TESActorBaseData*>(v4)->GetFactionRank(apFaction, 0) >=
+                    return (bool)((uint8_t)(static_cast<TESActorBaseData*>(v4)->GetFactionRank(apFaction, false) >=
                                             extraRank));
                 }
             }
@@ -6678,14 +6680,14 @@ void TESObjectCELL::RemoveReferencesFromLoadedReferenceCollection() {
                         if (worldSpace) {
                             if (apRef->GetDisabled()) {
                                 terrainManager = worldSpace->GetTerrainManager();
-                                terrainManager->HideTree(apRef, 1);
+                                terrainManager->HideTree(apRef, true);
                             }
                             else {
                                 v2 = worldSpace->GetTerrainManager();
                                 v2->ShowTree(apRef);
                             }
                             v4 = worldSpace->GetTerrainManager();
-                            v4->SetNeedsImmediateUpdate(1);
+                            v4->SetNeedsImmediateUpdate(true);
                         }
                     }
                 }
@@ -6717,10 +6719,10 @@ void TESObjectCELL::BuildLocalMapDoorList(BSSimpleList<TESObjectREFR*>* apOutLis
 
 void TESObjectCELL::GetExteriorLocalMapTexture(NiPointer<NiTexture>& aspTexture) {
     FNVD_INLINED_LOCAL(NiPointer<BSRenderedTexture>, sprt, std::nullopt, std::nullopt);
-    NiPointer<NiTexture> sprettex(static_cast<NiTexture*>(0));
+    NiPointer<NiTexture> sprettex(static_cast<NiTexture*>(nullptr));
     const char* v5 = "GetExteriorLocalMapTexture";
     if (!GetInterior()) {
-        ::new (&sprt) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(0));
+        ::new (&sprt) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
         TakeExteriorLocalMapPicture(sprt);
         sprettex.operator=(static_cast<NiTexture*>(sprt.m_pObject->GetTexture(0)));
         sprt.m_pObject->ClearRenderedTextures();
@@ -6734,10 +6736,10 @@ void TESObjectCELL::GetInteriorLocalMapTexture(
     int32_t aiSectionY,
     NiPointer<NiTexture>& aspTexture
 ) {
-    NiPointer<NiTexture> sprettex(static_cast<NiTexture*>(0));
+    NiPointer<NiTexture> sprettex(static_cast<NiTexture*>(nullptr));
     const char* v7 = "GetInteriorLocalMapTexture";
     if (GetInterior()) {
-        NiPointer<BSRenderedTexture> sprt(static_cast<BSRenderedTexture*>(0));
+        NiPointer<BSRenderedTexture> sprt(static_cast<BSRenderedTexture*>(nullptr));
         TakeInteriorLocalMapPicture(aiSectionX, aiSectionY, sprt);
         sprettex.operator=(static_cast<NiTexture*>(sprt.m_pObject->GetTexture(0)));
         sprt.m_pObject->ClearRenderedTextures();
@@ -6760,15 +6762,15 @@ void TESObjectCELL::SaveReferences(TESFile* apFile) {
             TESFile* pfile = pref->GetFile(0);
             if (pfile) {
                 if (!pfile->GetMaster()) {
-                    bsaveref = 0;
+                    bsaveref = false;
                 }
             }
         }
         if (apFile != pref->GetFile(-1) && !pref->GetAltered()) {
-            bsaveref = 0;
+            bsaveref = false;
         }
         if (!GetInterior() && pref->GetRefPersists() && !GetPersistentCell()) {
-            bsaveref = 0;
+            bsaveref = false;
         }
         if (bsaveref) {
             saverefs.AddFirstEmpty(pref);
@@ -6808,7 +6810,7 @@ void TESObjectCELL::PlaceCanopyShadowInAdjacentCell(
     NiRenderedTexture* pTex = nullptr;
     if (!apRect) {
         TESWorldSpace* pWorldSpace = GetWorldSpace();
-        TESObjectCELL* pTmpCell = pDataHandler->GetCellFromCellCoord(aiX, aiY, pWorldSpace, 0);
+        TESObjectCELL* pTmpCell = pDataHandler->GetCellFromCellCoord(aiX, aiY, pWorldSpace, false);
         if (!pTmpCell) {
             return;
         }
@@ -6821,7 +6823,7 @@ void TESObjectCELL::PlaceCanopyShadowInAdjacentCell(
         if (!apRect->pBits) {
             NiDX9DynamicTextureData* pTexData = static_cast<NiDX9DynamicTextureData*>(pTex->m_pkRendererData);
             IDirect3DTexture9* pD3DTexture = static_cast<IDirect3DTexture9*>(pTexData->GetD3DTexture());
-            pD3DTexture->LockRect(0, apRect, 0, 0);
+            pD3DTexture->LockRect(0, apRect, nullptr, 0);
         }
         uint8_t* pTmpData = static_cast<uint8_t*>(apRect->pBits);
         if (pTmpData[aiIndex]) {
@@ -6846,12 +6848,12 @@ void TESObjectCELL::FillBarterContainer(TESObjectREFR* apActor, InventoryChanges
             TESObjectREFR* pmerchant = (&apActor->m_Extra)->GetMerchantContainer();
             CellRefLockEnter();
             for (TESObjectREFR*& rpItem : GetRefList()->ItemsUntilNull()) {
-                InventoryChanges* pActorlist = 0;
+                InventoryChanges* pActorlist = nullptr;
                 TESObjectREFR* pref = rpItem;
-                ExtraDataList* pExtra = 0;
+                ExtraDataList* pExtra = nullptr;
                 if (!pref->GetDisabled() && !pref->GetDelete()) {
                     if (pref->GetOwner()) {
-                        if (pref->IsAnOwner(static_cast<Actor*>(apActor), 0) && pref != pmerchant) {
+                        if (pref->IsAnOwner(static_cast<Actor*>(apActor), false) && pref != pmerchant) {
                             switch (pref->GetObjectReference()->GetFormType()) {
                                 case ARMO_ID:
                                 case BOOK_ID:
@@ -6872,7 +6874,7 @@ void TESObjectCELL::FillBarterContainer(TESObjectREFR* apActor, InventoryChanges
                                 case CONT_ID: {
                                     pActorlist = (&pref->m_Extra)->GetContainerChanges();
                                     if (pActorlist) {
-                                        pActorlist->CreateCopyofList(apBarterContainer, pref, 0);
+                                        pActorlist->CreateCopyofList(apBarterContainer, pref, false);
                                     }
                                     break;
                                 }
@@ -6888,7 +6890,7 @@ void TESObjectCELL::FillBarterContainer(TESObjectREFR* apActor, InventoryChanges
                                         pitem = ::new (apMemory) ItemChange(pref->GetObjectReference(), 0);
                                     }
                                     else {
-                                        pitem = 0;
+                                        pitem = nullptr;
                                     }
                                     if (!pitem->pExtraObjectList) {
                                         BSSimpleList<ExtraDataList*>* v5;
@@ -6899,7 +6901,7 @@ void TESObjectCELL::FillBarterContainer(TESObjectREFR* apActor, InventoryChanges
                                             v5 = ::new (v9) BSSimpleList<ExtraDataList*>;
                                         }
                                         else {
-                                            v5 = 0;
+                                            v5 = nullptr;
                                         }
                                         pitem->pExtraObjectList = v5;
                                     }
@@ -6908,7 +6910,7 @@ void TESObjectCELL::FillBarterContainer(TESObjectREFR* apActor, InventoryChanges
                                         pExtra_2 = ::new (v8) ExtraDataList;
                                     }
                                     else {
-                                        pExtra_2 = 0;
+                                        pExtra_2 = nullptr;
                                     }
                                     pExtra = pExtra_2;
                                     ExtraDataList* Extra = &pref->m_Extra;
@@ -6917,7 +6919,7 @@ void TESObjectCELL::FillBarterContainer(TESObjectREFR* apActor, InventoryChanges
                                     pExtra->RemoveOwnership();
                                     pitem->pExtraObjectList->AddHead(pExtra);
                                     pitem->iNumber = (&pref->m_Extra)->GetCount();
-                                    apBarterContainer->AddChangeItem(pitem, 1);
+                                    apBarterContainer->AddChangeItem(pitem, true);
                                     break;
                                 }
                                 default: {
@@ -6941,7 +6943,7 @@ void TESObjectCELL::SaveGameTest() {
                 Actor* pactor = dynamic_cast<Actor*>(pref);
                 InventoryChanges* pinventory = (&pref->m_Extra)->GetContainerChanges();
                 if (pinventory) {
-                    pinventory->RemoveAllItems(pref, pPlayer, 0, 0, 1, 0, -1, 0);
+                    pinventory->RemoveAllItems(pref, pPlayer, false, false, true, false, -1, nullptr);
                 }
                 if (pactor) {
                     if (!pactor->GetDisabled() && !pactor->GetDelete()) {
@@ -6950,9 +6952,9 @@ void TESObjectCELL::SaveGameTest() {
                 }
                 if (pactor) {
                     if (!pactor->GetEssential() && !pactor->GetDisabled() && !pactor->GetDelete() &&
-                        !pactor->IsDead(0)) {
-                        pactor->StartCombat(pPlayer, 0, 0, 0, 0, 0, 1, 0);
-                        pactor->Kill(0, 0.0f);
+                        !pactor->IsDead(false)) {
+                        pactor->StartCombat(pPlayer, nullptr, false, false, false, 0, true, nullptr);
+                        pactor->Kill(nullptr, 0.0f);
                     }
                 }
                 if (pref->GetLock()) {
@@ -6978,7 +6980,7 @@ void TESObjectCELL::UpdateLights() {
                 LightRefData* a2 = Extra->GetLight();
                 if (a2) {
                     TESObjectLIGH* v3 = static_cast<TESObjectLIGH*>(v6->GetObjectReference());
-                    v3->Update(a2, 0);
+                    v3->Update(a2, nullptr);
                 }
             }
         }
@@ -6994,10 +6996,10 @@ void TESObjectCELL::Destroy() {
         PlayerCharacter* a2 = static_cast<PlayerCharacter*>(ecx0->m_item);
         if (a2 == pPlayer) {
             GetRefList()->RemoveHead();
-            a2->SetParentCell(0);
+            a2->SetParentCell(nullptr);
         }
         else {
-            bool v2 = 0;
+            bool v2 = false;
             if (GetPersistentCell()) {
                 if (pDataHandler) {
                     v2 = !pDataHandler->GetClearingData();
@@ -7020,7 +7022,7 @@ void TESObjectCELL::Destroy() {
                     }
                 }
                 else {
-                    a2->SetParentCell(0);
+                    a2->SetParentCell(nullptr);
                 }
             }
             GetRefList()->RemoveHead();
@@ -7031,7 +7033,7 @@ void TESObjectCELL::Destroy() {
 
 TESObjectREFR* TESObjectCELL::SearchForm(TESBoundObject* a1, char a2) {
     if (!a1) {
-        return 0;
+        return nullptr;
     }
     CellRefLockEnter();
     BSSimpleList<TESObjectREFR*>* ecx0 = GetRefList();
@@ -7045,7 +7047,7 @@ TESObjectREFR* TESObjectCELL::SearchForm(TESBoundObject* a1, char a2) {
         }
     }
     CellRefLockLeave();
-    return 0;
+    return nullptr;
 }
 
 uint32_t TESObjectCELL::FindTeleportDoorsForLocation(
@@ -7083,21 +7085,21 @@ uint32_t TESObjectCELL::FindTeleportDoorsForLocation(
 void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRenderedTexture>& aspRenderedTexture) {
     FNVD_INLINED_LOCAL(NiColorA, blackAlpha, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LOCALMAP, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp", 0x2251
+        MEM_CONTEXT_LOCALMAP, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp", 0x2251
     );
     NiPointer<BSShaderAccumulator> spoldAccum(BSShaderManager::GetAccumulator());
     BSCullingProcess culler(nullptr);
-    NiPointer<BSRenderedTexture> sprendTextColor(static_cast<BSRenderedTexture*>(0));
-    NiPointer<BSRenderedTexture> sprendTextShader(static_cast<BSRenderedTexture*>(0));
-    NiPointer<BSRenderedTexture> sprendTextNormals(static_cast<BSRenderedTexture*>(0));
+    NiPointer<BSRenderedTexture> sprendTextColor(static_cast<BSRenderedTexture*>(nullptr));
+    NiPointer<BSRenderedTexture> sprendTextShader(static_cast<BSRenderedTexture*>(nullptr));
+    NiPointer<BSRenderedTexture> sprendTextNormals(static_cast<BSRenderedTexture*>(nullptr));
     NiDX9Renderer* Renderer_ = BSShaderManager::GetRenderer();
     BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
     sprendTextNormals.operator=(
-        TextureManager->BorrowRenderedTexture(Renderer_, BSTextureManager::TEX_LOCALMAP_NORMALS, 0, 0, 0)
+        TextureManager->BorrowRenderedTexture(Renderer_, BSTextureManager::TEX_LOCALMAP_NORMALS, 0, nullptr, 0)
     );
     NiDX9Renderer* fR = BSShaderManager::GetRenderer();
     BSTextureManager* v4 = BSShaderManager::TextureManagerPtr();
-    sprendTextShader.operator=(v4->CreateRenderedTexture(fR, BSTextureManager::TEX_LOCALMAP_FINAL, 0, 0));
+    sprendTextShader.operator=(v4->CreateRenderedTexture(fR, BSTextureManager::TEX_LOCALMAP_FINAL, nullptr, 0));
     if (sprendTextShader.m_pObject) {
         if (sprendTextNormals.m_pObject) {
             void* pCustomAccumulator;
@@ -7108,17 +7110,17 @@ void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRendered
             v5->SetBackgroundColorAlpha(*::new (&blackAlpha) NiColorA(0.0f, 0.0f, 0.0f, 1.0f));
             ShadowSceneNode* pscene = BSShaderManager::GetShadowSceneNode(0);
             bool bwasLightUpdateDisabled = pscene->bDisableLightUpdate;
-            pscene->bDisableLightUpdate = 1;
+            pscene->bDisableLightUpdate = true;
             bool boutsideFrame = BSRenderedTexture::QOutsideFrame();
             NiNode* pwaternode = TESWaterSystem::GetWaterRoot();
-            bool bwaterculled = 0;
-            bool btreesenabled = 1;
+            bool bwaterculled = false;
+            bool btreesenabled = true;
             if (pwaternode) {
                 bwaterculled = pwaternode->GetAppCulled();
-                pwaternode->SetAppCulled(1);
+                pwaternode->SetAppCulled(true);
             }
             btreesenabled = BSTreeManager::GetTreesEnabled();
-            BSTreeManager::SetTreesEnabled(0);
+            BSTreeManager::SetTreesEnabled(false);
             if (boutsideFrame) {
                 NiRenderTargetGroup* Group = sprendTextNormals.m_pObject->GetGroup();
                 BSRenderedTexture::StartOffscreen(7u, Group);
@@ -7132,7 +7134,7 @@ void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRendered
                 pCustomAccumulator = ::new (v24) BSShaderAccumulator(99, 1u, 759u);
             }
             else {
-                pCustomAccumulator = 0;
+                pCustomAccumulator = nullptr;
             }
             NiPointer<BSShaderAccumulator> spaccum(static_cast<BSShaderAccumulator*>(pCustomAccumulator));
             spaccum.m_pObject->SetShadowSceneNode(pscene);
@@ -7147,9 +7149,9 @@ void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRendered
                 BSShaderUtil::AccumulateScene(apCamera, pscene_3, culler);
                 culler.PopCullMode();
             }
-            BSShaderUtil::RenderScene(apCamera, spaccum.m_pObject, 0);
-            culler.SetAccumulator(0);
-            spaccum.operator=(static_cast<BSShaderAccumulator*>(0));
+            BSShaderUtil::RenderScene(apCamera, spaccum.m_pObject, false);
+            culler.SetAccumulator(nullptr);
+            spaccum.operator=(static_cast<BSShaderAccumulator*>(nullptr));
             if (boutsideFrame) {
                 BSRenderedTexture::StopOffscreen();
             }
@@ -7173,7 +7175,7 @@ void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRendered
             BSRenderedTexture* fRa = sprendTextNormals.m_pObject;
             NiDX9Renderer* v14 = BSShaderManager::GetRenderer();
             ImageSpaceManager* v9 = BSShaderManager::GetImageSpaceManager();
-            v9->RenderEffect(peffect, v14, fRa, v17, 0, 0);
+            v9->RenderEffect(peffect, v14, fRa, v17, nullptr, 0);
             if (boutsideFrame) {
                 BSRenderedTexture::StopOffscreen();
             }
@@ -7182,7 +7184,7 @@ void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRendered
             }
             pscene->bDisableLightUpdate = bwasLightUpdateDisabled;
             BSShaderAccumulator* Accumulator = BSShaderManager::GetAccumulator();
-            Accumulator->bRenderNoShader = 1;
+            Accumulator->bRenderNoShader = true;
             NiDX9Renderer* v20 = BSShaderManager::GetRenderer();
             v20->SetBackgroundColorAlpha(oldColor);
         }
@@ -7197,7 +7199,7 @@ void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRendered
 void TESObjectCELL::TakeExteriorLocalMapPicture(NiPointer<BSRenderedTexture>& aspRenderedTexture) {
     NiPoint2 result;
     if (GetInterior()) {
-        aspRenderedTexture.operator=(static_cast<BSRenderedTexture*>(0));
+        aspRenderedTexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
     }
     else {
         NiNode* v10;
@@ -7207,9 +7209,9 @@ void TESObjectCELL::TakeExteriorLocalMapPicture(NiPointer<BSRenderedTexture>& as
         NiNode* pscene = BSShaderManager::GetShadowSceneNode(0);
         NiPoint3 campos = NiPoint3_ZERO;
         camrot.FromEulerAnglesXYZ(-1.5707964f, -1.5707964f, 1.5707964f);
-        NiFrustum frustum(0);
+        NiFrustum frustum(false);
         frustum.m_fNear = 100.0f;
-        frustum.m_bOrtho = 1;
+        frustum.m_bOrtho = true;
         TESObjectLAND* Land = GetLand();
         NiPoint2* MinMaxLandHeight = ::new (&result) NiPoint2(Land->GetMinMaxLandHeight());
         float x = MinMaxLandHeight->x;
@@ -7230,7 +7232,7 @@ void TESObjectCELL::TakeExteriorLocalMapPicture(NiPointer<BSRenderedTexture>& as
             pCellCamera = ::new (apMemory) NiCamera;
         }
         else {
-            pCellCamera = 0;
+            pCellCamera = nullptr;
         }
         NiPointer<NiCamera> spcamera(pCellCamera);
         NiNode* v13 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
@@ -7238,7 +7240,7 @@ void TESObjectCELL::TakeExteriorLocalMapPicture(NiPointer<BSRenderedTexture>& as
             v10 = ::new (v13) NiNode(0);
         }
         else {
-            v10 = 0;
+            v10 = nullptr;
         }
         NiPointer<NiNode> spcameraNode(v10);
         NiNode* pscene_2 = spcameraNode.m_pObject;
@@ -7248,52 +7250,52 @@ void TESObjectCELL::TakeExteriorLocalMapPicture(NiPointer<BSRenderedTexture>& as
         pscene->AttachChild(fYAngle, 1);
         spcamera.m_pObject->SetRotate(camrot);
         spcamera.m_pObject->SetViewFrustum(frustum);
-        NiUpdateData UpdateData1(0.0f, 0, 0);
+        NiUpdateData UpdateData1(0.0f, false, false);
         spcameraNode.m_pObject->Update(UpdateData1);
-        NiUpdateData UpdateData2(0.0f, 0, 0);
+        NiUpdateData UpdateData2(0.0f, false, false);
         spcamera.m_pObject->Update(UpdateData2);
-        BSTreeManager::SetForceFullLOD(1);
-        BSTreeManager::Update(spcamera.m_pObject, 1);
+        BSTreeManager::SetForceFullLOD(true);
+        BSTreeManager::Update(spcamera.m_pObject, true);
         UpdateTrees();
-        bool bactorculled = 0;
-        bool bmarkerculled = 0;
-        bool blandculled = 0;
+        bool bactorculled = false;
+        bool bmarkerculled = false;
+        bool blandculled = false;
         NiNode* pactornode = GetChildNode(TESObjectCELL::CN_ACTOR);
         if (pactornode) {
             bactorculled = pactornode->GetAppCulled();
-            pactornode->SetAppCulled(1);
+            pactornode->SetAppCulled(true);
         }
         NiNode* pmarkernode = GetChildNode(TESObjectCELL::CN_MARKER);
         if (pmarkernode) {
             bmarkerculled = pmarkernode->GetAppCulled();
-            pmarkernode->SetAppCulled(1);
+            pmarkernode->SetAppCulled(true);
         }
         NiNode* plandnode = GetChildNode(TESObjectCELL::CN_LAND);
         if (plandnode) {
             blandculled = plandnode->GetAppCulled();
-            plandnode->SetAppCulled(1);
+            plandnode->SetAppCulled(true);
         }
         NiNode* pskynode = Sky::GetInstance()->GetRoot();
-        bool bskyculled = 0;
+        bool bskyculled = false;
         if (pskynode) {
             bskyculled = pskynode->GetAppCulled();
-            pskynode->SetAppCulled(1);
+            pskynode->SetAppCulled(true);
         }
         NiNode* pweathernode = Main::WeatherRootNode();
-        bool bweatherculled = 0;
+        bool bweatherculled = false;
         if (pskynode) {
             bweatherculled = pweathernode->GetAppCulled();
-            pweathernode->SetAppCulled(1);
+            pweathernode->SetAppCulled(true);
         }
-        bool bgrassculled = 0;
+        bool bgrassculled = false;
         NiAVObject* pgnode = TESTerrainLODManager::GetGrassNode();
         if (pgnode) {
             bgrassculled = pgnode->GetAppCulled();
-            pgnode->SetAppCulled(1);
+            pgnode->SetAppCulled(true);
         }
         bool bfadeenabled = BSFadeNode::IsFadeEnabled();
-        BSFadeNode::SetFadeEnabled(0);
-        NiPointer<BSRenderedTexture> sptexture(static_cast<BSRenderedTexture*>(0));
+        BSFadeNode::SetFadeEnabled(false);
+        NiPointer<BSRenderedTexture> sptexture(static_cast<BSRenderedTexture*>(nullptr));
         TakeLocalMapPicture(spcamera.m_pObject, sptexture);
         BSFadeNode::SetFadeEnabled(bfadeenabled);
         if (pgnode) {
@@ -7315,13 +7317,13 @@ void TESObjectCELL::TakeExteriorLocalMapPicture(NiPointer<BSRenderedTexture>& as
             plandnode->SetAppCulled(blandculled);
         }
         NiCamera* v6 = Main::WorldRootCamera();
-        BSTreeManager::Update(v6, 1);
-        BSTreeManager::SetForceFullLOD(0);
+        BSTreeManager::Update(v6, true);
+        BSTreeManager::SetForceFullLOD(false);
         UpdateTrees();
         NiNode* fZAngle = spcameraNode.m_pObject;
         pscene->DetachChild(fZAngle);
-        spcameraNode.operator=(static_cast<NiNode*>(0));
-        spcamera.operator=(static_cast<NiCamera*>(0));
+        spcameraNode.operator=(static_cast<NiNode*>(nullptr));
+        spcamera.operator=(static_cast<NiCamera*>(nullptr));
         aspRenderedTexture.operator=(sptexture);
     }
 }
@@ -7343,9 +7345,9 @@ void TESObjectCELL::TakeInteriorLocalMapPicture(
         float v12 = 3.1415927f / 2.0;
         float fXAngle = -3.1415927f / 2.0;
         camrot.FromEulerAnglesXYZ(fXAngle, fXAngle, v12);
-        NiFrustum frustum(0);
+        NiFrustum frustum(false);
         frustum.m_fNear = 100.0f;
-        frustum.m_bOrtho = 1;
+        frustum.m_bOrtho = true;
         NiNode* v4 = Get3D();
         cellbound = v4->GetWorldBound();
         NiPoint3* Center = &(&cellbound)->m_kCenter;
@@ -7356,7 +7358,7 @@ void TESObjectCELL::TakeInteriorLocalMapPicture(
         campos.x = static_cast<float>((aiSectionX << 12) + 0x1080);
         campos.y = static_cast<float>((aiSectionY << 12) + 0x1080);
         campos.z = v37 + 40000.0;
-        AdjustCoordForNorthRotation(campos, campos, 0);
+        AdjustCoordForNorthRotation(campos, campos, false);
         frustum.m_fLeft = -2176.0f;
         frustum.m_fRight = 2176.0f;
         frustum.m_fTop = 2176.0f;
@@ -7367,7 +7369,7 @@ void TESObjectCELL::TakeInteriorLocalMapPicture(
             v10 = (void*)::new (apMemory) NiCamera;
         }
         else {
-            v10 = 0;
+            v10 = nullptr;
         }
         NiRefObject* v18 = static_cast<NiRefObject*>(v10);
         NiPointer<NiCamera> spcamera(static_cast<NiCamera*>(v10));
@@ -7376,7 +7378,7 @@ void TESObjectCELL::TakeInteriorLocalMapPicture(
             v9 = ::new (v15) NiNode(0);
         }
         else {
-            v9 = 0;
+            v9 = nullptr;
         }
         NiRefObject* v16 = (NiRefObject*)v9;
         NiPointer<NiNode> spcameraNode(v9);
@@ -7396,32 +7398,32 @@ void TESObjectCELL::TakeInteriorLocalMapPicture(
         }
         spcamera.m_pObject->SetRotate(camrot);
         spcamera.m_pObject->SetViewFrustum(frustum);
-        NiUpdateData UpdateData1(0.0f, 0, 0);
+        NiUpdateData UpdateData1(0.0f, false, false);
         spcameraNode.m_pObject->Update(UpdateData1);
-        NiUpdateData UpdateData2(0.0f, 0, 0);
+        NiUpdateData UpdateData2(0.0f, false, false);
         spcamera.m_pObject->Update(UpdateData2);
-        bool bactorculled = 0;
-        bool bmarkerculled = 0;
+        bool bactorculled = false;
+        bool bmarkerculled = false;
         NiNode* pactornode = GetChildNode(TESObjectCELL::CN_ACTOR);
         if (pactornode) {
             bactorculled = pactornode->GetAppCulled();
-            pactornode->SetAppCulled(1);
+            pactornode->SetAppCulled(true);
         }
         NiNode* pmarkernode = GetChildNode(TESObjectCELL::CN_MARKER);
         if (pmarkernode) {
             bmarkerculled = pmarkernode->GetAppCulled();
-            pmarkernode->SetAppCulled(1);
+            pmarkernode->SetAppCulled(true);
         }
         NiNode* pportalnode = GetChildNode(TESObjectCELL::CN_PORTAL);
         NiNode* pwaternode = TESWaterSystem::GetWaterRoot();
-        bool bwaterculled = 0;
+        bool bwaterculled = false;
         if (pwaternode) {
             bwaterculled = pwaternode->GetAppCulled();
-            pwaternode->SetAppCulled(1);
+            pwaternode->SetAppCulled(true);
         }
         bool bfadeenabled = BSFadeNode::IsFadeEnabled();
-        BSFadeNode::SetFadeEnabled(0);
-        NiPointer<BSRenderedTexture> sptexture(static_cast<BSRenderedTexture*>(0));
+        BSFadeNode::SetFadeEnabled(false);
+        NiPointer<BSRenderedTexture> sptexture(static_cast<BSRenderedTexture*>(nullptr));
         TakeLocalMapPicture(spcamera.m_pObject, sptexture);
         BSFadeNode::SetFadeEnabled(bfadeenabled);
         if (pwaternode) {
@@ -7435,12 +7437,12 @@ void TESObjectCELL::TakeInteriorLocalMapPicture(
         }
         NiNode* angle = spcameraNode.m_pObject;
         pscene->DetachChild(angle);
-        spcameraNode.operator=(static_cast<NiNode*>(0));
-        spcamera.operator=(static_cast<NiCamera*>(0));
+        spcameraNode.operator=(static_cast<NiNode*>(nullptr));
+        spcamera.operator=(static_cast<NiCamera*>(nullptr));
         aspRenderedTexture.operator=(sptexture);
     }
     else {
-        aspRenderedTexture.operator=(static_cast<BSRenderedTexture*>(0));
+        aspRenderedTexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
     }
 }
 
@@ -7448,12 +7450,12 @@ void TESObjectCELL::DetachHavok() {
     if (GetInterior()) {
         bhkWorld* pw = GetbhkWorld();
         if (pw) {
-            pw->SetEnabled(0);
-            pw->SetVisualDebugger(0);
+            pw->SetEnabled(false);
+            pw->SetVisualDebugger(false);
             if (pw->pAcousticSpaceListener) {
                 BGSAcousticSpaceListener* pasl = pw->pAcousticSpaceListener;
-                pasl->DequeueAllRemovals(1);
-                pasl->bBufferRemovalOperations = 0;
+                pasl->DequeueAllRemovals(true);
+                pasl->bBufferRemovalOperations = false;
             }
         }
     }
@@ -7473,10 +7475,10 @@ void TESObjectCELL::DetachHavok() {
         }
         bhkWorld* pw_2 = GetbhkWorld();
         if (pw_2) {
-            pw_2->pAcousticSpaceListener->bBufferRemovalOperations = 0;
+            pw_2->pAcousticSpaceListener->bBufferRemovalOperations = false;
         }
         if (pSaveLoadManager->IsLoadingGame()) {
-            pw_2->ProcessBatchRemovals(0);
+            pw_2->ProcessBatchRemovals(false);
         }
         CellRefLockLeave();
     }
@@ -7498,7 +7500,7 @@ void TESObjectCELL::UpdateSeenData(const NiPoint3& aCoord) {
             ourMemset(pstart_2, 0, sizeof(pstart_2));
             int32_t isectionx_2 = (FloatToInt(shiftcoord.x) - 2048) >> 12;
             int32_t isectiony_2 = (FloatToInt(shiftcoord.y) - 2048) >> 12;
-            pdata_2[0] = GetIntSeenSection(isectionx_2, isectiony_2, 1);
+            pdata_2[0] = GetIntSeenSection(isectionx_2, isectiony_2, true);
             pstart_2[0] = *::new (&v37) NiPoint3(
                 static_cast<float>((isectionx_2 << 12) + 2048), static_cast<float>((isectiony_2 << 12) + 2048),
                 shiftcoord.z
@@ -7539,7 +7541,7 @@ void TESObjectCELL::UpdateSeenData(const NiPoint3& aCoord) {
                     static_cast<float>((isectiony_2 << 12) + 2048), shiftcoord.z
                 );
                 pstart_2[iindex_2] = *v8;
-                IntSeenData* IntSeenSection = GetIntSeenSection(ixshift + isectionx_2, isectiony_2, 1);
+                IntSeenData* IntSeenSection = GetIntSeenSection(ixshift + isectionx_2, isectiony_2, true);
                 pdata_2[iindex_2++] = IntSeenSection;
             }
             if (iyshift) {
@@ -7548,7 +7550,7 @@ void TESObjectCELL::UpdateSeenData(const NiPoint3& aCoord) {
                     static_cast<float>(((iyshift + isectiony_2) << 12) + 2048), shiftcoord.z
                 );
                 pstart_2[iindex_2] = *v10;
-                IntSeenData* v11 = GetIntSeenSection(isectionx_2, iyshift + isectiony_2, 1);
+                IntSeenData* v11 = GetIntSeenSection(isectionx_2, iyshift + isectiony_2, true);
                 pdata_2[iindex_2++] = v11;
             }
             if (ixshift) {
@@ -7558,7 +7560,7 @@ void TESObjectCELL::UpdateSeenData(const NiPoint3& aCoord) {
                         static_cast<float>(((iyshift + isectiony_2) << 12) + 2048), shiftcoord.z
                     );
                     pstart_2[iindex_2] = *v12;
-                    IntSeenData* v13 = GetIntSeenSection(ixshift + isectionx_2, iyshift + isectiony_2, 1);
+                    IntSeenData* v13 = GetIntSeenSection(ixshift + isectionx_2, iyshift + isectiony_2, true);
                     pdata_2[iindex_2++] = v13;
                 }
             }
@@ -7569,7 +7571,7 @@ void TESObjectCELL::UpdateSeenData(const NiPoint3& aCoord) {
         else {
             IntSeenData* pdata[9];
             NiPoint3 pstart[9];
-            AdjustCoordForNorthRotation(aCoord, shiftcoord, 1);
+            AdjustCoordForNorthRotation(aCoord, shiftcoord, true);
             rt::eh_vector_constructor_iterator(pstart, sizeof(NiPoint3), 9, &emptyPointConstructor);
             ourMemset(pdata, 0, sizeof(pdata));
             ourMemset(pstart, 0, sizeof(pstart));
@@ -7578,7 +7580,7 @@ void TESObjectCELL::UpdateSeenData(const NiPoint3& aCoord) {
             int32_t iindex = 0;
             for (int32_t idx = -1; idx <= 1; ++idx) {
                 for (int32_t idy = -1; idy <= 1; ++idy) {
-                    IntSeenData* v2 = GetIntSeenSection(idx + isectionx, idy + isectiony, 1);
+                    IntSeenData* v2 = GetIntSeenSection(idx + isectionx, idy + isectiony, true);
                     pdata[iindex] = v2;
                     NiPoint3* v3 = ::new (&dst) NiPoint3(
                         static_cast<float>(((idx + isectionx) << 12) + 2048),
@@ -7602,7 +7604,7 @@ void TESObjectCELL::UpdateSeenData(const NiPoint3& aCoord) {
                     pdata_4 = ::new (apMemory) SeenData;
                 }
                 else {
-                    pdata_4 = 0;
+                    pdata_4 = nullptr;
                 }
                 pdata_3 = pdata_4;
                 GetExtra()->SetSeenData(pdata_4);
@@ -7614,7 +7616,7 @@ void TESObjectCELL::UpdateSeenData(const NiPoint3& aCoord) {
             NiPoint3 cellstart(xe, yg, zb);
             if (pdata_3->UpdateSeenData(aCoord, cellstart)) {
                 ClearSeenData();
-                SetFullySeen(1);
+                SetFullySeen(true);
             }
         }
     }
@@ -7659,11 +7661,11 @@ void TESObjectCELL::RemoveNavmeshObstacles() {
 
 void TESObjectCELL::FadeToLowDetail() {
     if (bFadingToLowDetail) {
-        bFadingToLowDetail = 1;
+        bFadingToLowDetail = true;
     }
-    bFadingToHighDetail = 0;
+    bFadingToHighDetail = false;
     fLodFadeInPercent = TESObjectCELL::fLodFadeTime;
-    bDisplayHighDetail = 0;
+    bDisplayHighDetail = false;
     CellRefLockEnter();
     BSSimpleList<TESObjectREFR*>* pList = GetRefList();
     while (pList) {
@@ -7732,49 +7734,49 @@ TESObjectCELL* TESObjectCELL::GetLastWaterCell() {
 
 bool TESObjectCELL::FindLandDataInFile(TESFile* apFile) {
     if (!apFile) {
-        return 0;
+        return false;
     }
     if (apFile->GetFormData()->form != formEnumString[57].uiFormString) {
-        return 0;
+        return false;
     }
-    if (!apFile->NextForm(1)) {
-        return 0;
+    if (!apFile->NextForm(true)) {
+        return false;
     }
     FORM* apFORMa = apFile->GetFormData();
     if (!TESObjectCELL::IsFormCellChild(apFORMa)) {
-        return 0;
+        return false;
     }
-    if (!apFile->NextForm(1)) {
-        return 0;
+    if (!apFile->NextForm(true)) {
+        return false;
     }
     FORM* apFORM = apFile->GetFormData();
     if (!TESObjectCELL::IsFormCellChild(apFORM)) {
-        return 0;
+        return false;
     }
     if (apFORM->form != formEnumString[2].uiFormString) {
-        return 0;
+        return false;
     }
     if (apFORM->iFormID == 8) {
         apFile->NextGroup();
         apFORM = apFile->GetFormData();
         if (!TESObjectCELL::IsFormCellChild(apFORM)) {
-            return 0;
+            return false;
         }
     }
     if (apFORM->iFormID != 9) {
-        return 0;
+        return false;
     }
-    apFile->NextForm(1);
-    bool v5 = 0;
-    while (1) {
+    apFile->NextForm(true);
+    bool v5 = false;
+    while (true) {
         uint8_t TESForm_ = apFile->GetTESForm();
         if (!TESObjectCELL::IsFormTypeCellChild(TESForm_)) {
             break;
         }
         if (apFile->GetTESForm() == LAND_ID) {
-            return 1;
+            return true;
         }
-        apFile->NextForm(1);
+        apFile->NextForm(true);
     }
     return v5;
 }
@@ -7817,26 +7819,26 @@ void TESObjectCELL::SaveRenderFailureData(TESObjectCELL::RENDER_FAILURE_DATA* ap
             BSFile* poutfile_3;
             BSFile* v10 = static_cast<BSFile*>(ourMalloc(sizeof(BSFile)));
             if (v10) {
-                poutfile_3 = ::new (v10) BSFile(FileName, NiFile::APPEND_ONLY, 0x4000u, 0);
+                poutfile_3 = ::new (v10) BSFile(FileName, NiFile::APPEND_ONLY, 0x4000u, false);
             }
             else {
-                poutfile_3 = 0;
+                poutfile_3 = nullptr;
             }
             poutfile_2 = poutfile_3;
-            poutfile_3->Open(0, 0);
+            poutfile_3->Open(false, false);
         }
         else {
             BSFile* poutfile;
             BSSystemFile::DeleteFileA(FileName);
             BSFile* apMemory = static_cast<BSFile*>(ourMalloc(sizeof(BSFile)));
             if (apMemory) {
-                poutfile = ::new (apMemory) BSFile(FileName, NiFile::WRITE_ONLY, 0x4000u, 0);
+                poutfile = ::new (apMemory) BSFile(FileName, NiFile::WRITE_ONLY, 0x4000u, false);
             }
             else {
-                poutfile = 0;
+                poutfile = nullptr;
             }
             poutfile_2 = poutfile;
-            poutfile->Open(0, 0);
+            poutfile->Open(false, false);
             poutfile_2->Seek(0, NiFile::ms_iSeekSet);
             BSsprintf(
                 apDest, 260, "cell ID\tcamera pos\tcamera rot\tgeom count\ttri count\tnew pass count\tactive lights\r\n"
@@ -7861,7 +7863,7 @@ void TESObjectCELL::SaveRenderFailureData(TESObjectCELL::RENDER_FAILURE_DATA* ap
         }
     }
     else {
-        pLastFailedCell = 0;
+        pLastFailedCell = nullptr;
     }
 }
 
@@ -8101,7 +8103,7 @@ void TESObjectCELL::UpdateParticlesOnly(NiAVObject* ap3D) {
         else {
             NiParticles* ppart = ap3D->IsParticlesGeom();
             if (ppart) {
-                NiUpdateData UpdateData(fCellAppTime, 1, 0);
+                NiUpdateData UpdateData(fCellAppTime, true, false);
                 ppart->Update(UpdateData);
             }
         }
@@ -8143,25 +8145,25 @@ bool TESObjectCELL::GetLoadingTempData() {
 
 bool TESObjectCELL::FindReferenceInFile(TESFile* apFile, uint32_t aiRefID) {
     if (!apFile) {
-        return 0;
+        return false;
     }
     if (apFile->GetFormData()->form != formEnumString[57].uiFormString) {
-        return 0;
+        return false;
     }
-    if (!apFile->NextForm(1)) {
-        return 0;
+    if (!apFile->NextForm(true)) {
+        return false;
     }
     FORM* pFORM = apFile->GetFormData();
     if (pFORM->form != formEnumString[2].uiFormString) {
-        return 0;
+        return false;
     }
     uint32_t imaxsize = pFORM->length - 24;
-    if (!apFile->NextForm(1)) {
-        return 0;
+    if (!apFile->NextForm(true)) {
+        return false;
     }
     FORM* pFORM_2 = apFile->GetFormData();
     uint32_t auiFormID = aiRefID & 0xFFFFFF;
-    bool bfound = 0;
+    bool bfound = false;
     uint32_t icheckedsize = 0;
     while (!bfound && icheckedsize < imaxsize) {
         if (pFORM_2->form == formEnumString[2].uiFormString) {
@@ -8169,15 +8171,15 @@ bool TESObjectCELL::FindReferenceInFile(TESFile* apFile, uint32_t aiRefID) {
         }
         else {
             if ((apFile->GetID() & 0xFFFFFF) == auiFormID) {
-                bfound = 1;
+                bfound = true;
             }
             else {
                 icheckedsize += pFORM_2->length + 24;
             }
         }
         if (!bfound) {
-            if (!apFile->NextForm(1)) {
-                return 0;
+            if (!apFile->NextForm(true)) {
+                return false;
             }
             pFORM_2 = apFile->GetFormData();
         }
@@ -8197,7 +8199,7 @@ void TESObjectCELL::UpdateMorphControllersOnly(NiAVObject* ap3D) {
             static_cast<NiGeomMorpherController*>(ap3D->GetController(&NiGeomMorpherController::ms_RTTI));
         if (pGeoMorphController) {
             apMemory.~NiUpdateData();
-            ::new (&apMemory) NiUpdateData(fCellAppTime, 1, 0);
+            ::new (&apMemory) NiUpdateData(fCellAppTime, true, false);
             pGeoMorphController->Update(apMemory);
         }
         v6 = ap3D->IsNode();
@@ -8220,18 +8222,18 @@ int32_t TESObjectCELL::GetSeenValue(const NiPoint3& aCoord) {
             int32_t isecty = (FloatToInt(aCoord.y) - 2048) >> 12;
             int32_t iposx = 0;
             int32_t iposy = 0;
-            SeenData::GetPosForCoord(aCoord, 1, iposx, iposy);
-            SeenData* pseen = pcell->GetIntSeenSection(isectx, isecty, 0);
+            SeenData::GetPosForCoord(aCoord, true, iposx, iposy);
+            SeenData* pseen = pcell->GetIntSeenSection(isectx, isecty, false);
             if (pseen) {
                 if (pseen->IsSeenBitTrue(static_cast<uint32_t>(iposx), static_cast<uint32_t>(iposy))) {
                     ++iretval;
                 }
             }
-            SeenData* pnorthseen = 0;
-            bool bnorth = 0;
+            SeenData* pnorthseen = nullptr;
+            bool bnorth = false;
             if (iposy == 15) {
-                bnorth = 1;
-                pnorthseen = pcell->GetIntSeenSection(isectx, isecty + 1, 0);
+                bnorth = true;
+                pnorthseen = pcell->GetIntSeenSection(isectx, isecty + 1, false);
                 if (pnorthseen) {
                     if (pnorthseen->IsSeenBitTrue(static_cast<uint32_t>(iposx), 0)) {
                         ++iretval;
@@ -8245,11 +8247,11 @@ int32_t TESObjectCELL::GetSeenValue(const NiPoint3& aCoord) {
                     }
                 }
             }
-            SeenData* peastseen = 0;
-            bool beast = 0;
+            SeenData* peastseen = nullptr;
+            bool beast = false;
             if (iposx == 15) {
-                beast = 1;
-                peastseen = pcell->GetIntSeenSection(isectx + 1, isecty, 0);
+                beast = true;
+                peastseen = pcell->GetIntSeenSection(isectx + 1, isecty, false);
                 if (peastseen) {
                     if (peastseen->IsSeenBitTrue(0, static_cast<uint32_t>(iposy))) {
                         ++iretval;
@@ -8264,7 +8266,7 @@ int32_t TESObjectCELL::GetSeenValue(const NiPoint3& aCoord) {
                 }
             }
             if (bnorth && beast) {
-                SeenData* pnortheastseen = pcell->GetIntSeenSection(isectx + 1, isecty + 1, 0);
+                SeenData* pnortheastseen = pcell->GetIntSeenSection(isectx + 1, isecty + 1, false);
                 if (pnortheastseen) {
                     if (pnortheastseen->IsSeenBitTrue(0, 0)) {
                         ++iretval;
@@ -8305,31 +8307,31 @@ int32_t TESObjectCELL::GetSeenValue(const NiPoint3& aCoord) {
                 int32_t isecty_2 = FloatToInt(aCoord.y) >> 12;
                 int32_t iposx_2 = 0;
                 int32_t iposy_2 = 0;
-                SeenData::GetPosForCoord(aCoord, 0, iposx_2, iposy_2);
+                SeenData::GetPosForCoord(aCoord, false, iposx_2, iposy_2);
                 TESObjectCELL* pcenterCell = pworld->GetCellFromCellCoord(isectx_2, isecty_2);
                 if (pcenterCell) {
                     pseen_2 = pcenterCell->GetSeenData();
                 }
                 else {
-                    pseen_2 = 0;
+                    pseen_2 = nullptr;
                 }
                 if ((pseen_2 &&
                      pseen_2->IsSeenBitTrue(static_cast<uint32_t>(iposx_2), static_cast<uint32_t>(iposy_2))) ||
                     (pcenterCell && pcenterCell->GetFullySeen())) {
                     ++iretval;
                 }
-                SeenData* pnorthseen_2 = 0;
-                TESObjectCELL* pnorthCell = 0;
-                bool bnorth_2 = 0;
+                SeenData* pnorthseen_2 = nullptr;
+                TESObjectCELL* pnorthCell = nullptr;
+                bool bnorth_2 = false;
                 if (iposy_2 == 15) {
                     SeenData* pnorthseen_3;
-                    bnorth_2 = 1;
+                    bnorth_2 = true;
                     pnorthCell = pworld->GetCellFromCellCoord(isectx_2, isecty_2 + 1);
                     if (pnorthCell) {
                         pnorthseen_3 = pnorthCell->GetSeenData();
                     }
                     else {
-                        pnorthseen_3 = 0;
+                        pnorthseen_3 = nullptr;
                     }
                     pnorthseen_2 = pnorthseen_3;
                     if ((pnorthseen_3 && pnorthseen_2->IsSeenBitTrue(static_cast<uint32_t>(iposx_2), 0)) ||
@@ -8343,18 +8345,18 @@ int32_t TESObjectCELL::GetSeenValue(const NiPoint3& aCoord) {
                         ++iretval;
                     }
                 }
-                SeenData* peastseen_2 = 0;
-                TESObjectCELL* peastCell = 0;
-                bool beast_2 = 0;
+                SeenData* peastseen_2 = nullptr;
+                TESObjectCELL* peastCell = nullptr;
+                bool beast_2 = false;
                 if (iposx_2 == 15) {
                     SeenData* peastseen_3;
-                    beast_2 = 1;
+                    beast_2 = true;
                     peastCell = pworld->GetCellFromCellCoord(isectx_2 + 1, isecty_2);
                     if (peastCell) {
                         peastseen_3 = peastCell->GetSeenData();
                     }
                     else {
-                        peastseen_3 = 0;
+                        peastseen_3 = nullptr;
                     }
                     peastseen_2 = peastseen_3;
                     if ((peastseen_3 && peastseen_2->IsSeenBitTrue(0, static_cast<uint32_t>(iposy_2))) ||
@@ -8375,7 +8377,7 @@ int32_t TESObjectCELL::GetSeenValue(const NiPoint3& aCoord) {
                         pnortheastseen_2 = pcell->GetSeenData();
                     }
                     else {
-                        pnortheastseen_2 = 0;
+                        pnortheastseen_2 = nullptr;
                     }
                     if ((pnortheastseen_2 && pnortheastseen_2->IsSeenBitTrue(0, 0)) ||
                         (pcell && pcell->GetFullySeen())) {
@@ -8416,25 +8418,25 @@ int32_t TESObjectCELL::CreateCanopyShadowMaskForCell(
     _D3DLOCKED_RECT*& apOutRect
 ) {
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    apOutTex = 0;
+    apOutTex = nullptr;
     if (!apCell || (apCell->GetInterior() || !Renderer::GetNIRenderer())) {
         return 0;
     }
-    NiRenderedTexture::bStaticForceD3DFormat = 1;
+    NiRenderedTexture::bStaticForceD3DFormat = true;
     NiRenderedTexture::iStaticForcedD3DFormat = D3DFMT_L8;
-    NiRenderedTexture::bStaticRenderedTexture = 0;
+    NiRenderedTexture::bStaticRenderedTexture = false;
     NiRenderer* Renderer_ = NiRenderer::GetRenderer();
     NiFixedString* name = ::new (static_cast<void*>(&apString)) NiFixedString("Canopy Shadow Mask");
     apOutTex = NiRenderedTexture::Create(
-        *name, 64u, 64u, Renderer_, NiRenderedTexture::ms_kDefaultPrefs, Ni2DBuffer::MULTISAMPLE_NONE, 0, 0
+        *name, 64u, 64u, Renderer_, NiRenderedTexture::ms_kDefaultPrefs, Ni2DBuffer::MULTISAMPLE_NONE, nullptr, 0
     );
     apString.~NiFixedString();
-    NiRenderedTexture::bStaticForceD3DFormat = 0;
-    NiRenderedTexture::bStaticRenderedTexture = 1;
+    NiRenderedTexture::bStaticForceD3DFormat = false;
+    NiRenderedTexture::bStaticRenderedTexture = true;
     apCell->GetExtra()->SetCanopyShadowMask(1, apOutTex, apOutRect);
     NiDX9DynamicTextureData* ptexdata = static_cast<NiDX9DynamicTextureData*>(apOutTex->m_pkRendererData);
     IDirect3DTexture9* pd3dtexture = static_cast<IDirect3DTexture9*>(ptexdata->GetD3DTexture());
-    pd3dtexture->LockRect(0, apOutRect, 0, 0);
+    pd3dtexture->LockRect(0, apOutRect, nullptr, 0);
     _D3DLOCKED_RECT* v4 = apOutRect;
     int32_t icount = v4->Pitch * apOutTex->GetHeight();
     uint8_t* pbits = static_cast<uint8_t*>(apOutRect->pBits);
@@ -8449,14 +8451,14 @@ TESObjectREFR* TESObjectCELL::PickRandomTeleportDoorInSpace(
     TESForm* apTargetSpace,
     TESObjectREFR** appOutBackUp
 ) {
-    TESObjectREFR* pretdoor = 0;
+    TESObjectREFR* pretdoor = nullptr;
     if (apDoorSpace && (apTargetSpace && (appOutBackUp && apDoorSpace != apTargetSpace))) {
         uint32_t idoorcount = 0;
         BSSimpleList<TESObjectREFR*> doorlist;
-        BSSimpleList<TESObjectREFR*>* preflist = 0;
-        void* v11 = 0;
+        BSSimpleList<TESObjectREFR*>* preflist = nullptr;
+        void* v11 = nullptr;
         TESObjectCELL* pdoorcell = dynamic_cast<TESObjectCELL*>(apDoorSpace);
-        TESObjectCELL* plockcell = 0;
+        TESObjectCELL* plockcell = nullptr;
         if (pdoorcell) {
             preflist = pdoorcell->GetRefList();
             plockcell = pdoorcell;
@@ -8584,7 +8586,7 @@ void TESObjectCELL::RenderTestCell(
     TESObjectCELL::RENDER_TEST_DATA defaultdata;
     if (apCell) {
         if (apCell->Get3D()) {
-            bool bsuccess = 1;
+            bool bsuccess = true;
             defaultdata.~RENDER_TEST_DATA();
             ::new (&defaultdata) TESObjectCELL::RENDER_TEST_DATA;
             if (!apTestData) {
@@ -8620,7 +8622,7 @@ void TESObjectCELL::RenderTestCell(
                                 NiPoint3 testpos = spnavmesh_2.m_pObject->GetCenter(j);
                                 testpos.z = testpos.z + 118.0;
                                 if (!TESObjectCELL::RenderTestPos(apCell, testpos, apTestData)) {
-                                    bsuccess = 0;
+                                    bsuccess = false;
                                 }
                             }
                         }
@@ -8639,7 +8641,7 @@ void TESObjectCELL::RenderTestCell(
                             testpos_2 = (&v6->GetWorldBound())->m_kCenter;
                         }
                         if (!TESObjectCELL::RenderTestPos(apCell, testpos_2, apTestData)) {
-                            bsuccess = 0;
+                            bsuccess = false;
                         }
                     }
                 }
@@ -8647,14 +8649,14 @@ void TESObjectCELL::RenderTestCell(
             else {
                 NiNode* v7 = pPlayer->Get3D();
                 if (!TESObjectCELL::RenderTestPos(apCell, v7->GetWorldTranslate(), apTestData)) {
-                    bsuccess = 0;
+                    bsuccess = false;
                 }
             }
             NiNode* CameraRoot = pworldroot->GetCameraRoot();
             CameraRoot->SetTranslate(oldpos);
             NiNode* v9 = pworldroot->GetCameraRoot();
             v9->SetRotate(oldrot);
-            NiUpdateData UpdateData(0.0f, 0, 0);
+            NiUpdateData UpdateData(0.0f, false, false);
             NiNode* v10 = pworldroot->GetCameraRoot();
             v10->Update(UpdateData);
             if (!bsuccess) {
@@ -8671,7 +8673,7 @@ bool TESObjectCELL::RenderTestPos(
     const NiPoint3& aTestPos,
     TESObjectCELL::RENDER_TEST_DATA* apTestData
 ) {
-    bool bsuccess = 1;
+    bool bsuccess = true;
     int32_t ixangle = 45;
     for (int32_t i = 0; i < 3; ++i) {
         NiMatrix3 xrot;
@@ -8686,7 +8688,7 @@ bool TESObjectCELL::RenderTestPos(
             izangle += 45;
             NiMatrix3 kTestRot = zrot * xrot;
             if (!TESObjectCELL::RenderTestPosRot(apCell, aTestPos, kTestRot, apTestData)) {
-                bsuccess = 0;
+                bsuccess = false;
             }
         }
     }
@@ -8705,7 +8707,7 @@ bool TESObjectCELL::RenderTestPosRot(
     CameraRoot->SetTranslate(aTestPos);
     NiNode* v5 = pworldroot->GetCameraRoot();
     v5->SetRotate(aTestRot);
-    NiUpdateData UpdateData(0.0f, 0, 0);
+    NiUpdateData UpdateData(0.0f, false, false);
     NiNode* v6 = pworldroot->GetCameraRoot();
     v6->Update(UpdateData);
     uint32_t istarttime = BSGetTickCount();
@@ -8722,7 +8724,7 @@ bool TESObjectCELL::RenderTestPosRot(
         );
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
     faildata.RenderData.iActiveLights = ShadowSceneNode_->GetActiveLightCount();
-    bool bfailed = 0;
+    bool bfailed = false;
     if (faildata.RenderData.iGeometryCount <= apTestData->Thresholds.iGeometryCount) {
         if (faildata.RenderData.iTriangleCount <= apTestData->Thresholds.iTriangleCount) {
             if (faildata.RenderData.iNewRenderPassCount <= apTestData->Thresholds.iNewRenderPassCount) {
@@ -8731,15 +8733,15 @@ bool TESObjectCELL::RenderTestPosRot(
                      faildata.RenderData.iTotalTime > apTestData->Thresholds.iTotalTime);
             }
             else {
-                bfailed = 1;
+                bfailed = true;
             }
         }
         else {
-            bfailed = 1;
+            bfailed = true;
         }
     }
     else {
-        bfailed = 1;
+        bfailed = true;
     }
     if (bfailed) {
         if (apTestData->pFailureCallbackFunc) {
@@ -8772,7 +8774,7 @@ bool TESObjectCELL::EnumReferencesCloseToPointFromInterior(
     bool bdone = false;
     if (!icallsdeep) {
         extcoord = NiPoint3_ZERO;
-        pextworld = 0;
+        pextworld = nullptr;
         fextdoordist = 3.4028235e+38f;
     }
     if (apStartInt) {
@@ -8815,7 +8817,7 @@ bool TESObjectCELL::EnumReferencesCloseToPointFromInterior(
                                         ptelint = ptel->GetTeleportCell();
                                         if (ptelint) {
                                             if (!ptelint->GetInterior()) {
-                                                ptelint = 0;
+                                                ptelint = nullptr;
                                             }
                                         }
                                         if (ptelworld) {

@@ -275,7 +275,7 @@ void bhkShape::BuildDisplayFromhkGeometry(
 
 void bhkShape::CopyCinfo(hkShapeCinfo& arInfo) {
     hkpShape* phkObject;
-    if (this && (phkObject = static_cast<hkpShape*>(this->phkObject)) != 0) {
+    if (this && (phkObject = static_cast<hkpShape*>(this->phkObject)) != nullptr) {
         // hkShapeCinfo::m_userData is an int; the shape's user data is its bhkShape.
         arInfo.m_userData = static_cast<int32_t>(reinterpret_cast<uintptr_t>(phkObject->m_userData));
     }
@@ -295,7 +295,7 @@ hkpShape* bhkShape::operator*() const {
 }
 
 HavokMaterialType bhkShape::GetSubshapeMaterial(uint32_t aiKey) {
-    if (aiKey == ((-1))) {
+    if (aiKey == (-1)) {
         return static_cast<HavokMaterialType>(((int32_t)eMaterial) & 31);
     }
     bhkShapeCollection* v3 = FindShapeCollection();
@@ -334,7 +334,7 @@ bhkShape* bhkShape::Getbhk(const hkpShape* apShape) {
         return apShape->m_userData;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

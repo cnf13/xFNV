@@ -200,7 +200,7 @@ void hkpSaveContactPointsEndianUtil::swapEndianTypeInEntry(
     bool& trackUsedOut
 ) {
     hkpAgentEntry* v6;
-    trackUsedOut = 0;
+    trackUsedOut = false;
     switch (entry->m_streamCommand) {
         case 0:
         case 1: {
@@ -268,7 +268,7 @@ void hkpSaveContactPointsEndianUtil::swapEndianTypeInEntry(
                 case hkpSerializedAgentNnEntry::COLLECTION_AGENT3: {
                 LABEL_13:;
                     hkpSaveContactPointsEndianUtil::swapEndianTypeIn1nTrack(input, serializedTrack);
-                    trackUsedOut = 1;
+                    trackUsedOut = true;
                     break;
                 }
                 default: {

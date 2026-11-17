@@ -33,8 +33,8 @@ NiObject* NiAlphaController::CreateClone(NiCloningProcess& kCloning) {
         return v3;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -126,7 +126,7 @@ void NiAlphaController::GetTargetFloatValue(float& fValue) {
 NiObject* NiAlphaController::CreateObject() {
     NiAlphaController* v0 = static_cast<NiAlphaController*>(NiMemObject::operator new(sizeof(NiAlphaController)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiAlphaController;
 }

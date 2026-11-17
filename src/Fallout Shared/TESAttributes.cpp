@@ -36,16 +36,16 @@ void TESAttributes::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESAttributes::CompareComponent(BaseFormComponent* apCompareFC) {
     TESAttributes* v7 = dynamic_cast<TESAttributes*>(apCompareFC);
     if (!v7) {
-        return 1;
+        return true;
     }
     for (int32_t i = 0; i < 7; ++i) {
         int32_t v3 = cAttribute[i];
         ActorValue::Index v4 = ActorValue::ToActorValue(ActorValue::ATTRIBUTE, i);
         if (v3 != v7->GetAttributeValue(v4)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void TESAttributes::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {

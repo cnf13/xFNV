@@ -32,7 +32,7 @@ void BGSBipedModelList::CopyComponent(BaseFormComponent* apCopyFC) {
 bool BGSBipedModelList::CompareComponent(BaseFormComponent* apCompareFC) {
     BGSBipedModelList* pcomp = dynamic_cast<BGSBipedModelList*>(apCompareFC);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     BGSListForm* BipedModelList = pcomp->pListForm;
     return BipedModelList != pListForm;
@@ -62,7 +62,7 @@ void BGSBipedModelList::InitItem(TESForm* apOwner) {
             pownerFile = apOwner->GetFile(-1);
         }
         else {
-            pownerFile = 0;
+            pownerFile = nullptr;
         }
         TESForm::AddCompileIndex(itempint, pownerFile);
         TESForm* FormByNumericID = TESForm::GetFormByNumericID(itempint);
@@ -83,10 +83,10 @@ void BGSBipedModelList::InitItem(TESForm* apOwner) {
                         "BipedModelList on '%s' (%08X) will be cleared.",
                         pform->GetFormEditorID(), v3, v4, v5, v6, CastingType
                     );
-                    pListForm = 0;
+                    pListForm = nullptr;
                     return;
                 }
-                pbip->SetAddOnModel(1);
+                pbip->SetAddOnModel(true);
             }
         }
         else {
@@ -113,7 +113,7 @@ void BGSBipedModelList::InitItem(TESForm* apOwner) {
 
 // The form's biped model list component: armor and weapons have one, other forms none.
 BGSBipedModelList* BGSBipedModelList::GetFormAsBipedModelList(TESForm* apForm) {
-    BGSBipedModelList* pretval = 0;
+    BGSBipedModelList* pretval = nullptr;
     if (apForm) {
         switch (apForm->GetFormType()) {
             case ARMO_ID: pretval = static_cast<TESObjectARMO*>(apForm); break;

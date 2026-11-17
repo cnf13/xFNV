@@ -31,9 +31,9 @@ const hkClass* hkStaticClassNameRegistry::getClassByName(const char* className) 
     const hkClass* const* classes = m_classes;
     int32_t i = 0;
     if (!*classes) {
-        return 0;
+        return nullptr;
     }
-    while (1) {
+    while (true) {
         const char* name = classes[i]->getName();
         bool found = hkString::strCmp(className, name) == 0;
         classes = m_classes;
@@ -42,7 +42,7 @@ const hkClass* hkStaticClassNameRegistry::getClassByName(const char* className) 
         }
         ++i;
         if (!classes[i]) {
-            return 0;
+            return nullptr;
         }
     }
     return classes[i];

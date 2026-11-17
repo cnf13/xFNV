@@ -7,9 +7,9 @@
 
 void* ZeroOverheadHeap::Allocate(uint32_t aiSize, uint32_t aiAlignment) {
     if (!pHeap) {
-        return 0;
+        return nullptr;
     }
-    void* pmem = 0;
+    void* pmem = nullptr;
 #if FNVD_64BIT
     // The 64-bit program aligns each block to 16 bytes, as the platform's allocators do (a departure: the exe's
     // blocks follow each other with only the size word between them); the size word stays right before the block.
@@ -95,7 +95,7 @@ int32_t ZeroOverheadHeap::OutputBlockInfo(IMemoryManagerFile* apFile, bool abFul
         return 0;
     }
     int32_t v4 = 0;
-    return (int32_t)apFile->Write(&v4, 4u);
+    return apFile->Write(&v4, 4u);
 }
 
 uint32_t ZeroOverheadHeap::Size(const void* apMem, uint32_t aiUnused) {

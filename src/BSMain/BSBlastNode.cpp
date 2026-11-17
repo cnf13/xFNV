@@ -59,7 +59,7 @@ void BSBlastNode::CopyMembers(BSBlastNode* pDest, NiCloningProcess& arCloneData)
 NiObject* BSBlastNode::CreateObject() {
     BSBlastNode* pObject = static_cast<BSBlastNode*>(NiMemObject::operator new(sizeof(BSBlastNode)));
     if (!pObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pObject) BSBlastNode;
 }

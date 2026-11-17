@@ -200,7 +200,7 @@ NiFloatKey* NiUVController::GetUOffsetData(uint32_t& uiNumKeys, NiAnimationKey::
         uiNumKeys = 0;
         eType = NiAnimationKey::NOINTERP;
         ucSize = 0;
-        return 0;
+        return nullptr;
     }
 }
 
@@ -216,7 +216,7 @@ NiFloatKey* NiUVController::GetVOffsetData(uint32_t& uiNumKeys, NiAnimationKey::
         uiNumKeys = 0;
         eType = NiAnimationKey::NOINTERP;
         ucSize = 0;
-        return 0;
+        return nullptr;
     }
 }
 
@@ -232,7 +232,7 @@ NiFloatKey* NiUVController::GetUTilingData(uint32_t& uiNumKeys, NiAnimationKey::
         uiNumKeys = 0;
         eType = NiAnimationKey::NOINTERP;
         ucSize = 0;
-        return 0;
+        return nullptr;
     }
 }
 
@@ -248,7 +248,7 @@ NiFloatKey* NiUVController::GetVTilingData(uint32_t& uiNumKeys, NiAnimationKey::
         uiNumKeys = 0;
         eType = NiAnimationKey::NOINTERP;
         ucSize = 0;
-        return 0;
+        return nullptr;
     }
 }
 

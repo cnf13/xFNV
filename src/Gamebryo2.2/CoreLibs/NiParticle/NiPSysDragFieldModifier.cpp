@@ -32,7 +32,7 @@ NiObject* NiPSysDragFieldModifier::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject) NiPSysDragFieldModifier;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_bUseDirection = m_bUseDirection;
@@ -222,7 +222,7 @@ NiObject* NiPSysDragFieldModifier::CreateObject() {
     NiPSysDragFieldModifier* pkObject =
         static_cast<NiPSysDragFieldModifier*>(NiMemObject::operator new(sizeof(NiPSysDragFieldModifier)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysDragFieldModifier;
 }

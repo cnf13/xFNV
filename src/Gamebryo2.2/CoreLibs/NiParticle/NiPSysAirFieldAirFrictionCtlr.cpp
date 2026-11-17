@@ -88,7 +88,7 @@ NiObject* NiPSysAirFieldAirFrictionCtlr::CreateObject() {
     NiPSysAirFieldAirFrictionCtlr* v0 =
         static_cast<NiPSysAirFieldAirFrictionCtlr*>(NiMemObject::operator new(sizeof(NiPSysAirFieldAirFrictionCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysAirFieldAirFrictionCtlr;
 }

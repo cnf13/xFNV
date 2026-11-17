@@ -341,8 +341,8 @@ BSShaderProperty::RenderPassArray* BSShaderPPLightingProperty::GetRenderPasses(
     bool bNoWaterShader;
     NiBound kbound;
     NiPropertyState* pkState = &apGeom->m_PropertyState;
-    if (apAccumulator->bWaterRefraction || (bNoWaterShader = 0, apAccumulator->bWaterReflection)) {
-        bNoWaterShader = 1;
+    if (apAccumulator->bWaterRefraction || (bNoWaterShader = false, apAccumulator->bWaterReflection)) {
+        bNoWaterShader = true;
     }
     int32_t idebugPasses = aiEnabledPasses | auiRenderMode << 8;
     if (auiRenderMode != 7) {
@@ -378,7 +378,7 @@ BSShaderProperty::RenderPassArray* BSShaderPPLightingProperty::GetRenderPasses(
                                         static_cast<NiAlphaProperty*>(pkState->m_aspProps[NiProperty::ALPHA].m_pObject);
                                 }
                                 const bool abAddPass = pAlpha && (pAlpha->m_uFlags & NiAlphaProperty::TEST_ENABLE_MASK);
-                                AddConstAlphaPass(apGeom, apGeom->m_spSkinInstance.m_pObject != 0, abAddPass);
+                                AddConstAlphaPass(apGeom, apGeom->m_spSkinInstance.m_pObject != nullptr, abAddPass);
                             }
                         }
                     }
@@ -394,7 +394,7 @@ BSShaderProperty::RenderPassArray* BSShaderPPLightingProperty::GetRenderPasses(
             case 15u: {
                 CheckSilhouetteRenderPassArray(1);
                 if (!pSilhouettePassList->iSize) {
-                    AddSilhouettePass_2x(apGeom, apGeom->m_spSkinInstance.m_pObject != 0);
+                    AddSilhouettePass_2x(apGeom, apGeom->m_spSkinInstance.m_pObject != nullptr);
                 }
                 return pSilhouettePassList;
             }
@@ -421,7 +421,7 @@ BSShaderProperty::RenderPassArray* BSShaderPPLightingProperty::GetRenderPasses(
         }
         if (!(v20 < BSShaderManager::fDecalLODEnd)) {
         LABEL_57:;
-            v58 = 0;
+            v58 = false;
             v21 = 0;
         LABEL_58:;
             BSNiBound* m_kWorldBound = apGeom->m_kWorldBound;
@@ -444,7 +444,7 @@ BSShaderProperty::RenderPassArray* BSShaderPPLightingProperty::GetRenderPasses(
                     }
                     double v42 = BSShaderManager::fDecalLODEnd;
                     if (BSShaderManager::fDecalLODEnd != v20 && this->fCameraDistance >= v42) {
-                        v60 = 0;
+                        v60 = false;
                         goto LABEL_107;
                     }
                     if (BSShaderManager::fDecalLODStartFade == v20 ||
@@ -466,7 +466,7 @@ BSShaderProperty::RenderPassArray* BSShaderPPLightingProperty::GetRenderPasses(
                 char v43 = abUpdateList;
                 if (iLastRenderPassState != idebugPasses ||
                     (!static_cast<uint8_t>(abUpdateList) || bLightListChanged)) {
-                    bLightListChanged = 0;
+                    bLightListChanged = false;
                     // The last test reads the alpha property of the geometry's property state (its blend bit).
                     if ((((ulFlags[0] & BSS1_Decal_Single_Pass) != 0 || GetFlag(5u)) &&
                          (GetFlag(11u) || GetFlag(28u))) ||
@@ -536,7 +536,7 @@ BSShaderProperty::RenderPassArray* BSShaderPPLightingProperty::GetRenderPasses(
                                 NiSkinInstance* v46 = apGeom->m_spSkinInstance.m_pObject;
                                 InitRenderPassArray_depthMap(1u);
                                 this->pDepthMapRenderPassList->iSize = 0;
-                                AddDepthPass(apGeom, v46 != 0, balphatest_2, apAccumulator);
+                                AddDepthPass(apGeom, v46 != nullptr, balphatest_2, apAccumulator);
                             }
                         }
                         if (v43) {
@@ -544,7 +544,7 @@ BSShaderProperty::RenderPassArray* BSShaderPPLightingProperty::GetRenderPasses(
                             if (v47->iSize) {
                                 BSShaderProperty::RenderPass* ppass = v47->pPassA.m_pBase[v47->iSize - 1];
                                 if (ppass) {
-                                    ppass->bLastPass = 1;
+                                    ppass->bLastPass = true;
                                 }
                             }
                         }
@@ -636,7 +636,7 @@ BSShaderProperty::RenderPassArray* BSShaderPPLightingProperty::GetRenderPasses(
         if (!GetFlag(35u)) {
             v20 = 0.0;
             v21 = 1;
-            v58 = 1;
+            v58 = true;
             goto LABEL_58;
         }
     LABEL_56:;
@@ -645,7 +645,7 @@ BSShaderProperty::RenderPassArray* BSShaderPPLightingProperty::GetRenderPasses(
     }
     uint32_t v10 = ulFlags[0];
     if ((v10 & BSS1_Refraction) != 0 || (v10 & BSS1_Fire_Refraction) != 0) {
-        return 0;
+        return nullptr;
     }
     InitRenderPassArray_depthMap(1u);
     BSShaderProperty::RenderPassArray* pDepthMapRenderPassArray = this->pDepthMapRenderPassList;
@@ -666,7 +666,7 @@ BSShaderProperty::RenderPassArray* BSShaderPPLightingProperty::GetRenderPasses(
                     pAlpha = static_cast<NiAlphaProperty*>(pkState->m_aspProps[NiProperty::ALPHA].m_pObject);
                 }
                 const bool balphatest = pAlpha && (pAlpha->m_uFlags & NiAlphaProperty::TEST_ENABLE_MASK);
-                AddDepthPass(apGeom, apGeom->m_spSkinInstance.m_pObject != 0, balphatest, apAccumulator);
+                AddDepthPass(apGeom, apGeom->m_spSkinInstance.m_pObject != nullptr, balphatest, apAccumulator);
             }
         }
     }
@@ -1252,7 +1252,7 @@ void BSShaderPPLightingProperty::SetLandscapeTextureSet(uint32_t aiIndex, BSText
         FillTextureArray();
     }
     uint32_t v4 = aiIndex;
-    pbGlossMap[aiIndex] = 0;
+    pbGlossMap[aiIndex] = false;
     pSpecularExponent[aiIndex] = 0;
     for (BSShaderProperty::TextureTypeEnum etype = BSShaderProperty::TEXTYPE_DIFFUSE;
          etype < BSShaderProperty::TEXTYPE_SPECULAR;
@@ -1367,7 +1367,7 @@ NiObject* BSShaderPPLightingProperty::CreateObject() {
         return ::new (v0) BSShaderPPLightingProperty;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

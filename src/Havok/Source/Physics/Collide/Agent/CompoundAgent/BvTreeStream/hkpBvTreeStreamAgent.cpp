@@ -429,7 +429,7 @@ hkpCollisionAgent* hkpBvTreeStreamAgent::dispatchConvexListBvTree(
                 return ::new (v8) hkpShapeCollectionAgent(bodyA, bodyB, input, mgr);
             }
             if (v5 != 1) {
-                return 0;
+                return nullptr;
             }
         }
         hkMemoryRouter* v9 = &hkMemoryRouter::getInstance();
@@ -483,7 +483,7 @@ hkpCollisionAgent* hkpBvTreeStreamAgent::dispatchBvTreeConvexList(
                 return ::new (v8) hkpSymmetricAgent<hkpShapeCollectionAgent>(bodyA, bodyB, input, mgr);
             }
             if (v5 != 1) {
-                return 0;
+                return nullptr;
             }
         }
         hkMemoryRouter* v9 = &hkMemoryRouter::getInstance();

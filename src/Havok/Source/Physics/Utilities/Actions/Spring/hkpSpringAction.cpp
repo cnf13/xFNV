@@ -290,7 +290,7 @@ hkpAction* hkpSpringAction::clone(
     const hkArray<hkpPhantom*, hkContainerHeapAllocator>& newPhantoms
 ) const {
     if (newEntities.m_size != 2 || newPhantoms.m_size) {
-        return 0;
+        return nullptr;
     }
     hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
     hkpSpringAction* v6 = static_cast<hkpSpringAction*>(Instance->m_heap->blockAlloc(sizeof(hkpSpringAction)));
@@ -314,9 +314,9 @@ void hkpSpringAction::setPositionsInWorldSpace(const hkVector4& pivotA, const hk
     m_positionBinB.setTransformedInversePos(m_entityB->m_motion.m_motionState.m_transform, pivotB);
     __m128 v5 = _mm_sub_ps(pivotA.m_quad, pivotB.m_quad);
     __m128 v6 = _mm_mul_ps(v5, v5);
-    m_restLength = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
-        static_cast<float>((_mm_shuffle_ps(v6, v6, 170)[0] + static_cast<float>(_mm_shuffle_ps(v6, v6, 85)[0] + v6[0])))
-    )));
+    m_restLength = _mm_cvtss_f32(
+        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]))))
+    );
 }
 
 void hkpSpringAction::setPositionsInBodySpace(const hkVector4& pivotA, const hkVector4& pivotB) {
@@ -330,9 +330,9 @@ void hkpSpringAction::setPositionsInBodySpace(const hkVector4& pivotA, const hkV
     v9.setTransformedPos(m_entityB->m_motion.m_motionState.m_transform, pivotB);
     __m128 v6 = _mm_sub_ps(v8.m_quad, v9.m_quad);
     __m128 v7 = _mm_mul_ps(v6, v6);
-    m_restLength = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
-        static_cast<float>((_mm_shuffle_ps(v7, v7, 170)[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])))
-    )));
+    m_restLength = _mm_cvtss_f32(
+        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]))))
+    );
 }
 
 const hkClass& hkpSpringAction::staticClass() {

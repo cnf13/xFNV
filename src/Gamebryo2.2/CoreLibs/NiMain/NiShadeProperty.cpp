@@ -23,7 +23,7 @@ NiObject* NiShadeProperty::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject_2) NiShadeProperty;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     NiProperty::CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_uFlags = m_uFlags;
@@ -102,7 +102,7 @@ void NiShadeProperty::_SDMShutdown() {
 NiObject* NiShadeProperty::CreateObject() {
     void* pkObject = NiMemObject::operator new(sizeof(NiShadeProperty));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiShadeProperty;
 }

@@ -45,7 +45,7 @@ void hkpAabbTreeCollidableRaycaster::testCollidable(const hkpCollidable* col) {
             __m128* p_m_quad = &col->m_motion.pState->m_transform.m_rotation.m_col0.m_quad;
             const hkpWorldRayCastInput* m_input = this->m_input;
             input_.m_filterInfo = 0;
-            input_.m_rayShapeCollectionFilter = 0;
+            input_.m_rayShapeCollectionFilter = nullptr;
             __m128 v6 = p_m_quad[1];
             __m128 v7 = p_m_quad[2];
             __m128 v8 = _mm_sub_ps(m_input->m_from.m_quad, p_m_quad[3]);

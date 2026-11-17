@@ -31,18 +31,18 @@ uint32_t Archive::InvalidateOlderFilesByPath(const char* apBasePath, const char*
 		pcDest[clength - 1] = 0;
 	}
 	BSHash directoryHash(pcDest, BSHash::HASH_NORMAL);
-	bool Directory = FindDirectory(directoryHash, idirectoryIndex, 0);
-	for (const platform::FileEntry& rEntry : kFound) {
+    bool Directory = FindDirectory(directoryHash, idirectoryIndex, nullptr);
+    for (const platform::FileEntry& rEntry : kFound) {
 		if ((rEntry.attributes & 16) == 0 || rEntry.name[0] == 46) {
 			// CompareFileTime(entry, apArchiveTime) > 0: the entry is newer.
 			if (Directory &&
 				rEntry.writeTime >
 					((static_cast<uint64_t>(apArchiveTime->dwHighDateTime) << 32) | apArchiveTime->dwLowDateTime)) {
 				BSHash filenameHash(rEntry.name.c_str(), BSHash::HASH_FILENAME);
-				if (InvalidateFile(idirectoryIndex, filenameHash, 0)) {
-					++inumInvalidated;
-				}
-			}
+                if (InvalidateFile(idirectoryIndex, filenameHash, nullptr)) {
+                    ++inumInvalidated;
+                }
+            }
 		} else {
 			strcpy_s(FileName, 260, apPath);
 			strcat_s(FileName, 260, rEntry.name.c_str());

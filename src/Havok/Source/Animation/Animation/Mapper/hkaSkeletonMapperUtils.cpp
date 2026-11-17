@@ -131,7 +131,7 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
         v6.m_vec.m_quad = a.m_rotation.m_vec.m_quad;
         __m128 v7 = _mm_mul_ps(a.m_translation.m_quad, v6.m_vec.m_quad);
         __m128 v8 = _mm_shuffle_ps(v7, v7, 170);
-        v8[0] = v8[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+        v8[0] = v8[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
         __m128 v9 = _mm_shuffle_ps(v6.m_vec.m_quad, v6.m_vec.m_quad, 255);
         __m128 v10 = _mm_add_ps(
             _mm_mul_ps(
@@ -160,7 +160,7 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
         v16.m_quad = b.m_translation.m_quad;
         __m128 v17 = _mm_mul_ps(v16.m_quad, m_quad);
         __m128 v18 = _mm_shuffle_ps(v17, v17, 170);
-        v18[0] = v18[0] + static_cast<float>(_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]);
+        v18[0] = v18[0] + (_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]);
         __m128 v19 = _mm_shuffle_ps(m_quad, m_quad, 255);
         q0_.m_vec.m_quad = m_quad;
         __m128 v20 = _mm_add_ps(
@@ -1256,11 +1256,11 @@ hkaSkeletonMapperUtils::findSimpleMapping(int16_t boneA, const hkaSkeletonMapper
     int32_t m_size = mapperdata.m_simpleMappings.m_size;
     int32_t v3 = 0;
     if (m_size <= 0) {
-        return 0;
+        return nullptr;
     }
     for (hkaSkeletonMapperData::SimpleMapping* i = mapperdata.m_simpleMappings.m_data; i->m_boneA != boneA; ++i) {
         if (++v3 >= m_size) {
-            return 0;
+            return nullptr;
         }
     }
     return &mapperdata.m_simpleMappings.m_data[v3];
@@ -1274,10 +1274,10 @@ bool hkaSkeletonMapperUtils::checkRotation(
     const hkQsTransform& bToATransform
 ) {
     if (params.m_mappingType.m_storage != 1) {
-        return 1;
+        return true;
     }
-    float a1a = std::fabs((double)aToBTransform.m_rotation.getAngle());
-    float a1 = std::fabs((double)bToATransform.m_rotation.getAngle());
+    float a1a = std::fabs(aToBTransform.m_rotation.getAngle());
+    float a1 = std::fabs(bToATransform.m_rotation.getAngle());
     double v7 = a1a;
     if (!(a1 < static_cast<double>(a1a))) {
         v7 = a1;

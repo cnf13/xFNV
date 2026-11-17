@@ -56,15 +56,15 @@ void TESModelTextureSwap::CopyComponent(BaseFormComponent* apCopyFC) {
 
 bool TESModelTextureSwap::CompareComponent(BaseFormComponent* apCompareFC) {
     if (TESModel::CompareComponent(apCompareFC)) {
-        return 1;
+        return true;
     }
     TESModelTextureSwap* pcomp = dynamic_cast<TESModelTextureSwap*>(apCompareFC);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     int32_t v3 = (&pcomp->TextureSwapList)->ItemsInList();
     if (v3 != (&TextureSwapList)->ItemsInList()) {
-        return 1;
+        return true;
     }
     for (BSSimpleList<TEX_SWAP*>* plist = &pcomp->TextureSwapList; plist && !plist->IsEmpty();
          plist = plist->m_pkNext) {
@@ -72,23 +72,23 @@ bool TESModelTextureSwap::CompareComponent(BaseFormComponent* apCompareFC) {
         TEX_SWAP* pcompswap = *v4;
         TEX_SWAP* pswap = GetTexSwap((*v4)->iGeomIndex);
         if (!pswap) {
-            return 1;
+            return true;
         }
         if (pswap->pNewTexture != pcompswap->pNewTexture) {
-            return 1;
+            return true;
         }
         if (pswap->pGeomName[0u] && (pcompswap->pGeomName[0u] && BSstricmp(pswap->pGeomName, pcompswap->pGeomName))) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 // The chunk is a packed byte stream: the count, then per swap the name's length, the name, the texture set's form ID
 // and the geometry index, each 32-bit value stored unaligned. The second endian swap deliberately swaps the count's
 // local, not the name's length it stores, as the game does.
 bool TESModelTextureSwap::BuildTextureSwapChunkData(void*& apOutData, uint32_t& aiOutDataSize) {
-    apOutData = 0;
+    apOutData = nullptr;
     aiOutDataSize = 0;
     BSSimpleList<TEX_SWAP*>* plist = &TextureSwapList;
     if (!plist->IsEmpty()) {
@@ -107,7 +107,7 @@ bool TESModelTextureSwap::BuildTextureSwapChunkData(void*& apOutData, uint32_t& 
         uint8_t* pdata = static_cast<uint8_t*>(apOutData);
         uint32_t itempint = icount;
         if (TESForm::QEndianSwapOnSave()) {
-            ENDIAN<uint32_t>(itempint, 0);
+            ENDIAN<uint32_t>(itempint, false);
         }
         *reinterpret_cast<uint32_t*>(pdata) = itempint;
         pdata += 4;
@@ -115,7 +115,7 @@ bool TESModelTextureSwap::BuildTextureSwapChunkData(void*& apOutData, uint32_t& 
             TEX_SWAP* pswap_2 = plist->m_item;
             uint32_t isize = BSstrlen(pswap_2->pGeomName);
             if (TESForm::QEndianSwapOnSave()) {
-                ENDIAN<uint32_t>(itempint, 0);
+                ENDIAN<uint32_t>(itempint, false);
             }
             *reinterpret_cast<uint32_t*>(pdata) = isize;
             pdata += 4;
@@ -131,12 +131,12 @@ bool TESModelTextureSwap::BuildTextureSwapChunkData(void*& apOutData, uint32_t& 
             pdata += 4;
         }
     }
-    return apOutData != 0;
+    return apOutData != nullptr;
 }
 
 void TESModelTextureSwap::Save(CHUNK_ID aeModelID, CHUNK_ID aeTextureID, CHUNK_ID aeSwapID) {
     TESModel::Save(aeModelID, aeTextureID);
-    void* Block = 0;
+    void* Block = nullptr;
     uint32_t aiOutDataSize = 0;
     if (BuildTextureSwapChunkData(Block, aiOutDataSize)) {
         TESForm::__AddChunkData(aeSwapID, Block, aiOutDataSize);
@@ -146,7 +146,7 @@ void TESModelTextureSwap::Save(CHUNK_ID aeModelID, CHUNK_ID aeTextureID, CHUNK_I
 
 void TESModelTextureSwap::InitItem(TESForm* apOwner) {
     BSSimpleList<TEX_SWAP*>* plist = &TextureSwapList;
-    BSSimpleList<TEX_SWAP*>* plastlist = 0;
+    BSSimpleList<TEX_SWAP*>* plastlist = nullptr;
     while (plist && !plist->IsEmpty()) {
         TEX_SWAP* pswap = plist->m_item;
         uint32_t iid = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pswap->pNewTexture));
@@ -189,19 +189,19 @@ bool TESModelTextureSwap::UnpackTextureSwapChunkData(void* apData, uint32_t aiDa
         while (icount) {
             char apDest[268];
             --icount;
-            BGSTextureSet* pnewtexture = 0;
+            BGSTextureSet* pnewtexture = nullptr;
             int32_t igeomindex = -1;
             apDest[0] = 0;
             ireadsize = 4;
             if (ireadsize > auiSize) {
-                return 0;
+                return false;
             }
             uint32_t isize = *reinterpret_cast<uint32_t*>(pdata);
             pdata += ireadsize;
             auiSize -= ireadsize;
             ireadsize = isize;
             if (ireadsize > auiSize || ireadsize >= 260) {
-                return 0;
+                return false;
             }
             ourMemcpy(apDest, pdata, isize);
             apDest[isize] = 0;
@@ -209,7 +209,7 @@ bool TESModelTextureSwap::UnpackTextureSwapChunkData(void* apData, uint32_t aiDa
             auiSize -= ireadsize;
             ireadsize = 4;
             if (ireadsize > auiSize) {
-                return 0;
+                return false;
             }
             // The stream holds the texture set's form ID, kept in the pointer until InitItem resolves it.
             BGSTextureSet* v6 =
@@ -220,7 +220,7 @@ bool TESModelTextureSwap::UnpackTextureSwapChunkData(void* apData, uint32_t aiDa
             if (aiVersion >= 15) {
                 ireadsize = 4;
                 if (ireadsize > auiSize) {
-                    return 0;
+                    return false;
                 }
                 igeomindex = *reinterpret_cast<int32_t*>(pdata);
                 pdata += ireadsize;
@@ -233,7 +233,7 @@ bool TESModelTextureSwap::UnpackTextureSwapChunkData(void* apData, uint32_t aiDa
             }
         }
     }
-    return 1;
+    return true;
 }
 
 void TESModelTextureSwap::ClearTexSwapList() {
@@ -247,7 +247,7 @@ void TESModelTextureSwap::ClearTexSwapList() {
 void TESModelTextureSwap::SwapTextures(NiAVObject* ap3D) {
     if (ap3D) {
         int32_t iwarncount = MessageHandler::QWarningCount();
-        MessageHandler::IncDisableWarningCount(1);
+        MessageHandler::IncDisableWarningCount(true);
         using swapmap_t = BSMap<int32_t, TEX_SWAP*>;
         swapmap_t swapmap(37u);
         BSSimpleList<TEX_SWAP*>* plist = &TextureSwapList;
@@ -268,7 +268,7 @@ void TESModelTextureSwap::SwapTextures(NiAVObject* ap3D) {
                 Warning("Not all texture swaps were performed.");
             }
         }
-        MessageHandler::IncDisableWarningCount(0);
+        MessageHandler::IncDisableWarningCount(false);
         if (iwarncount != MessageHandler::QWarningCount()) {
             Warning(
                 "Warnings were encountered during texture swap for model '%s'. Check warnings file for more "
@@ -280,7 +280,7 @@ void TESModelTextureSwap::SwapTextures(NiAVObject* ap3D) {
 }
 
 TEX_SWAP* TESModelTextureSwap::GetTexSwap(int32_t aiIndex) {
-    TEX_SWAP* pretswap = 0;
+    TEX_SWAP* pretswap = nullptr;
     if (aiIndex != -1) {
         for (BSSimpleList<TEX_SWAP*>* plist = &TextureSwapList; plist && !plist->IsEmpty(); plist = plist->m_pkNext) {
             if (aiIndex == plist->m_item->iGeomIndex) {
@@ -302,7 +302,7 @@ void TESModelTextureSwap::AddTexSwap(const char* apObjName, int32_t aiIndex, BGS
                     v4 = ::new (apMemory) TEX_SWAP;
                 }
                 else {
-                    v4 = 0;
+                    v4 = nullptr;
                 }
                 a2 = v4;
                 BSstrcpy(v4->pGeomName, 128, apObjName);
@@ -368,17 +368,17 @@ bool TESModelTextureSwap::SwapTexturesRecurse(
             for (uint32_t i = 0; i < icount; ++i) {
                 NiAVObject* pchild = pnode->GetAt(i);
                 if (pchild && TESModelTextureSwap::SwapTexturesRecurse(pchild, apSwapMap, aiGeomIndex)) {
-                    return 1;
+                    return true;
                 }
             }
         }
         else {
             if (ap3D->IsGeometry()) {
-                TEX_SWAP* pswap = 0;
+                TEX_SWAP* pswap = nullptr;
                 if (apSwapMap->GetAt(aiGeomIndex, pswap)) {
                     if (pswap) {
                         if (pswap->pNewTexture == BGSTextureSet::GetNullTextureSet()) {
-                            ap3D->SetAppCulled(1);
+                            ap3D->SetAppCulled(true);
                         }
                         else {
                             int32_t v5;
@@ -392,17 +392,17 @@ bool TESModelTextureSwap::SwapTexturesRecurse(
                                 v5 = 0;
                             }
                             BSShaderPPLightingProperty* pbssprop =
-                                v5 ? static_cast<BSShaderPPLightingProperty*>(pprop) : 0;
+                                v5 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
                             if (pbssprop) {
                                 BSShaderTextureSet* pnewset = pswap->pNewTexture->CreateShaderTextureSet();
                                 pbssprop->SetTextureSet(pnewset);
-                                pbssprop->LoadTextureSet(0, 0);
+                                pbssprop->LoadTextureSet(nullptr, nullptr);
                                 pbssprop->SetFlagsFromTextures();
                             }
                         }
                         apSwapMap->RemoveAt(aiGeomIndex);
                         if (!apSwapMap->m_uiCount) {
-                            return 1;
+                            return true;
                         }
                     }
                 }
@@ -410,15 +410,15 @@ bool TESModelTextureSwap::SwapTexturesRecurse(
             }
         }
     }
-    return 0;
+    return false;
 }
 
 bool NiFixedString::EqualsNoCase(const char* pcStr) {
     if (this->GetHandle() == pcStr) {
-        return 1;
+        return true;
     }
     if (pcStr && this->GetHandle()) {
         return NiStricmp(this->GetHandle(), pcStr) == 0;
     }
-    return 0;
+    return false;
 }

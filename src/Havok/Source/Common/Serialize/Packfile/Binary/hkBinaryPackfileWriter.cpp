@@ -62,15 +62,15 @@ void writePackfileHeader(
     v8.m_global.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Global>::DONT_DEALLOCATE_FLAG;
     v8.m_finish.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Finish>::DONT_DEALLOCATE_FLAG;
     v8.m_imports.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Import>::DONT_DEALLOCATE_FLAG;
-    v8.m_local.m_data = 0;
+    v8.m_local.m_data = nullptr;
     v8.m_local.m_size = 0;
-    v8.m_global.m_data = 0;
+    v8.m_global.m_data = nullptr;
     v8.m_global.m_size = 0;
-    v8.m_finish.m_data = 0;
+    v8.m_finish.m_data = nullptr;
     v8.m_finish.m_size = 0;
-    v8.m_imports.m_data = 0;
+    v8.m_imports.m_data = nullptr;
     v8.m_imports.m_size = 0;
-    v8.m_pool = 0;
+    v8.m_pool = nullptr;
     apWriter->writeObject(apStream, v9, hkPackfileHeaderClass, v8);
 }
 

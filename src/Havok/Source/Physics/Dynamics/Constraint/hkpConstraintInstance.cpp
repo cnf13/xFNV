@@ -397,7 +397,7 @@ void hkpConstraintInstance::setFixedRigidBodyPointersToZero(hkpWorld* world) {
     do {
         if (*m_entities == world->m_fixedRigidBody) {
             (*m_entities)->removeReference();
-            *m_entities = 0;
+            *m_entities = nullptr;
         }
         ++m_entities;
         --v3;
@@ -406,7 +406,7 @@ void hkpConstraintInstance::setFixedRigidBodyPointersToZero(hkpWorld* world) {
 }
 
 bool* hkpConstraintInstance::isEnabled(bool* a1) {
-    bool v2 = hkpWorldConstraintUtil::findModifier(this, hkpConstraintAtom::TYPE_MODIFIER_IGNORE_CONSTRAINT) == 0;
+    bool v2 = hkpWorldConstraintUtil::findModifier(this, hkpConstraintAtom::TYPE_MODIFIER_IGNORE_CONSTRAINT) == nullptr;
     *a1 = v2;
     return a1;
 }

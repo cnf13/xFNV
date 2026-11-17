@@ -25,7 +25,7 @@
 TESObjectMISC::TESObjectMISC() {
     SetFormType(MISC_ID);
     TESObjectMISC::InitializeData();
-    SetInitialized(1);
+    SetInitialized(true);
 }
 
 TESObjectMISC::~TESObjectMISC() {}
@@ -180,7 +180,7 @@ void TESObjectMISC::InitItem() {
                 );
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -197,7 +197,7 @@ void TESObjectMISC::Copy(TESForm* apCopy) {
 bool TESObjectMISC::Compare(TESForm* apCompare) {
     TESObjectMISC* v5 = dynamic_cast<TESObjectMISC*>(apCompare);
     if (!v5) {
-        return (bool)1;
+        return true;
     }
     TESSound* allCollector = GetLoopingSound();
     return ((allCollector != v5->GetLoopingSound()) || (((int8_t)TESForm::CompareAllComponents(v5)) != 0));

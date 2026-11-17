@@ -46,7 +46,7 @@ NiObject* BSPSysSimpleColorModifier::CreateClone(NiCloningProcess& kCloning) {
         pkObject = ::new (apMemory) BSPSysSimpleColorModifier;
     }
     else {
-        pkObject = 0;
+        pkObject = nullptr;
     }
     CopyMembers(pkObject, kCloning);
     return pkObject;

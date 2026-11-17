@@ -38,7 +38,5 @@ float hkpSimpleContactConstraintUtil::calculateSeparatingVelocity(
         ),
         cp->m_separatingNormal.m_quad
     );
-    return static_cast<float>(
-        _mm_shuffle_ps(v7, v7, 170)[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])
-    );
+    return (_mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]));
 }

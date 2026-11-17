@@ -135,7 +135,7 @@
 
 #include <bit>
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 namespace bhkConvert {} // namespace bhkConvert
@@ -949,7 +949,7 @@ void bhkRigidBody::ApplyKeyframe(
     hkVector4* v7 = &GetCenterOfMassLocal(c);
     __m128 v8 = _mm_mul_ps(v7->m_quad, arNewRot.m_vec.m_quad);
     __m128 v9 = _mm_shuffle_ps(v8, v8, 170);
-    v9[0] = v9[0] + static_cast<float>(_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
+    v9[0] = v9[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
     __m128 v10 = _mm_shuffle_ps(arNewRot.m_vec.m_quad, arNewRot.m_vec.m_quad, 255);
     __m128 v11 = _mm_add_ps(
         _mm_mul_ps(
@@ -975,11 +975,9 @@ void bhkRigidBody::ApplyKeyframe(
         _mm_sub_ps(_mm_add_ps(_mm_add_ps(v11, v11), arNewPos.m_quad), (&GetCenterOfMassInWorld(c))->m_quad)
     );
     __m128 v12 = _mm_mul_ps(v31.m_vec.m_quad, v31.m_vec.m_quad);
-    float axis_12 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
-        static_cast<float>(
-            (_mm_shuffle_ps(v12, v12, 170)[0] + static_cast<float>(_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]))
-        )
-    )));
+    float axis_12 = _mm_cvtss_f32(
+        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v12, v12, 170)[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]))))
+    );
     float flinCap = GethkMaxLinearVelocity();
     if (flinCap < static_cast<double>(axis_12)) {
         *reinterpret_cast<float*>(&axis_8a) = flinCap / axis_12;
@@ -1006,11 +1004,9 @@ void bhkRigidBody::ApplyKeyframe(
         inverseOldRotation__nav.m_vec.m_quad = m_quad;
     }
     __m128 v14 = _mm_mul_ps(m_quad, m_quad);
-    float axis_8 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
-        static_cast<float>(
-            (_mm_shuffle_ps(v14, v14, 170)[0] + static_cast<float>(_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]))
-        )
-    )));
+    float axis_8 = _mm_cvtss_f32(
+        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v14, v14, 170)[0] + (_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]))))
+    );
     float fangCap = GetMaxAngularVelocity();
     if (fangCap < static_cast<double>(axis_8)) {
         *reinterpret_cast<float*>(&axis_8c) = fangCap / axis_8;
@@ -1321,7 +1317,7 @@ void bhkRigidBody::RemoveActionConstraints() {
 
 const float bhkRigidBody::GetMaxAngularVelocity() {
     hkReferencedObject* phkObject;
-    if (this && (phkObject = this->phkObject) != 0) {
+    if (this && (phkObject = this->phkObject) != nullptr) {
         hkpMotion* pdm = static_cast<hkpRigidBody*>(this->phkObject)->hkpRigidBody::getStoredDynamicMotion();
         if (pdm) {
             return hkUFloat8_intToReal[pdm->m_motionState.m_maxAngularVelocity.m_value];
@@ -1811,7 +1807,7 @@ void bhkRigidBody::CalculateCOMAndMassRecursive(NiAVObject* a1, __m128* arMassCe
             LABEL_9:;
                 v8 = 0;
             }
-            bhkNiCollisionObject* v9 = v8 != 0 ? m_pObject : 0;
+            bhkNiCollisionObject* v9 = v8 != 0 ? m_pObject : nullptr;
             if (v9) {
                 bhkRigidBody* pbody = v9->spWorldObject;
                 if (pbody) {
@@ -1937,7 +1933,7 @@ const char* bhkRigidBodyCinfo::GetQualityTypeString() {
 // Converts a 5.5.1 rigid body cinfo; the motion and quality types are renumbered.
 void bhkRigidBodyCinfo::ConvertFromOld(bhkRigidBody551Cinfo* apOldCInfo) {
     hk.m_gravityFactor = 1.0f;
-    hk.m_localFrame = 0;
+    hk.m_localFrame = nullptr;
     uint32_t m_collisionFilterInfo = apOldCInfo->hkWorldObjectCinfo::m_collisionFilterInfo;
     this->m_collisionFilterInfo = apOldCInfo->hkWorldObjectCinfo::m_collisionFilterInfo;
     hk.m_collisionFilterInfo = m_collisionFilterInfo;

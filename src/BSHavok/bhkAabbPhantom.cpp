@@ -95,7 +95,7 @@ void bhkAabbPhantom::KillCinfo(bool abCreated) {
         if (pInfo) {
             delete static_cast<hkWorldObjectCinfo*>(pInfo);
         }
-        this->pInfo = 0;
+        this->pInfo = nullptr;
     }
     v3->eMemContext = eMemContext;
 }

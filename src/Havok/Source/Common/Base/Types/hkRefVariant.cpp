@@ -17,7 +17,7 @@ const hkClass* hkRefVariant::getClass() const {
         return hkVtableClassRegistry::s_instance->getClassFromVirtualInstance(m_pntr);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

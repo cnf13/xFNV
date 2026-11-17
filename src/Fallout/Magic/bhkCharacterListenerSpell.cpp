@@ -86,7 +86,7 @@ void bhkCharacterListenerSpell::contactPointAddedCallback(const hkpRootCdPoint& 
     Actor* pactor = (ptarget && ptarget->IsActor()) ? static_cast<Actor*>(ptarget) : nullptr;
     hkpPhantom* pph = hkpGetPhantom(point.m_rootCollidableB);
     if (pph) {
-        if (!pactor || pactor->IsDead(0)) {
+        if (!pactor || pactor->IsDead(false)) {
             return;
         }
         if (pactor->pCurrentProcess) {

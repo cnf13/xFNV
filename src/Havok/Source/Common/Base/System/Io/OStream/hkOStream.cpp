@@ -197,14 +197,14 @@ hkOstream& hkOstream::operator<<(float afValue) {
 
 hkOstream& hkOstream::operator<<(int64_t aiValue) {
     char a1[10024];
-    hkString::snprintf(a1, 0x2728, "%lli", static_cast<int64_t>(aiValue));
+    hkString::snprintf(a1, 0x2728, "%lli", aiValue);
     writeString(this->getStreamWriter(), a1);
     return *this;
 }
 
 hkOstream& hkOstream::operator<<(uint64_t auiValue) {
     char a1[10024];
-    hkString::snprintf(a1, 0x2728, "%llu", static_cast<uint64_t>(auiValue));
+    hkString::snprintf(a1, 0x2728, "%llu", auiValue);
     writeString(this->getStreamWriter(), a1);
     return *this;
 }

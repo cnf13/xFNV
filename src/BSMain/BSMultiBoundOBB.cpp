@@ -337,6 +337,6 @@ NiObject* BSMultiBoundOBB::CreateObject() {
         return ::new (apMemory) BSMultiBoundOBB;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

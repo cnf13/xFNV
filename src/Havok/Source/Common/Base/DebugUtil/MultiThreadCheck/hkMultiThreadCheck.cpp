@@ -127,17 +127,17 @@ void hkMultiThreadCheck::markForWriteImpl() {
 
 bool hkMultiThreadCheck::isMarkedForWriteImpl() {
     if ((m_markCount & 0x8000) != 0) {
-        return 1;
+        return true;
     }
     _RTL_CRITICAL_SECTION* v3 = s_criticalSection;
     EnterCriticalSection(s_criticalSection);
     if (m_threadId == static_cast<uint32_t>(getMyThreadId())) {
         LeaveCriticalSection(v3);
-        return 1;
+        return true;
     }
     else {
         LeaveCriticalSection(v3);
-        return 0;
+        return false;
     }
 }
 
@@ -201,7 +201,7 @@ void hkMultiThreadCheck::staticQuit() {
         DeleteCriticalSection(s_criticalSection);
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
         Instance->m_heap->blockFree(v0, sizeof(_RTL_CRITICAL_SECTION));
-        s_criticalSection = 0;
+        s_criticalSection = nullptr;
     }
 }
 

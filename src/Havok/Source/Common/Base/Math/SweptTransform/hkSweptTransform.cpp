@@ -109,9 +109,9 @@ void hkSweptTransform::approxTransformAt(float time, hkTransform& transformOut) 
     float v11 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v10[0])));
     v12[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v13 = _mm_cmpeq_ss(v10, v12);
-    v12[0] = 3.0f - static_cast<float>(static_cast<float>(v10[0] * v11) * v11);
+    v12[0] = 3.0f - ((v10[0] * v11) * v11);
     __m128 v14 = _mm_setzero_ps();
-    v14[0] = static_cast<float>(0.5f * v11) * v12[0];
+    v14[0] = (0.5f * v11) * v12[0];
     __m128 v15 = _mm_andnot_ps(v13, v14);
     arQuaternion.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(v15, v15, 0), v7);
     transformOut.m_rotation.set(arQuaternion);

@@ -27,7 +27,7 @@ NiObject* NiPSysEmitterPlanarAngleCtlr::CreateClone(NiCloningProcess& kCloning) 
     }
     else {
         NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-        return 0;
+        return nullptr;
     }
 }
 
@@ -78,7 +78,7 @@ NiObject* NiPSysEmitterPlanarAngleCtlr::CreateObject() {
     NiPSysEmitterPlanarAngleCtlr* v0 =
         static_cast<NiPSysEmitterPlanarAngleCtlr*>(NiMemObject::operator new(sizeof(NiPSysEmitterPlanarAngleCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysEmitterPlanarAngleCtlr;
 }

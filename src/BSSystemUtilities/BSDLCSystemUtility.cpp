@@ -23,10 +23,10 @@ uint32_t BSDLCSystemUtility::MountDLC(uint32_t anPlayerIndex, BSDLCSystemUtility
             if (!p_m_validDLC->GetNext() && !p_m_validDLC->m_item) {
                 break;
             }
-            cb(v11++, v8 - 1, 1, p_m_validDLC->m_item);
+            cb(v11++, v8 - 1, true, p_m_validDLC->m_item);
             p_m_validDLC = p_m_validDLC->GetNext();
         }
-        cb(-1, -1, 0, 0);
+        cb(-1, -1, false, nullptr);
         return 0;
     }
     else {

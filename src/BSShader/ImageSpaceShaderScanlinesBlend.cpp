@@ -37,14 +37,14 @@ void ImageSpaceShaderScanlinesBlend::ReloadShaders() {
     if (!m_pObject->m_pkRenderStateGroup) {
         m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+    m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
     NiD3DPass* v3 = spPass.m_pObject;
     if (!v3->m_pkRenderStateGroup) {
         v3->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v3->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+    v3->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
     if (!v3->m_pkRenderStateGroup) {
         v3->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v3->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+    v3->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
 }

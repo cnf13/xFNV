@@ -58,19 +58,19 @@ void NavMeshInfo::CreateFromNavMesh(NavMesh* apNavMesh) {
     pParentSpace = apNavMesh->GetParentSpace();
     TESForm* ParentSpace = apNavMesh->GetParentSpace();
     ParentSpaceID = ParentSpace->iFormID;
-    AdjacentNavMeshes.Clear(1);
-    PreferredAdjacentNavMeshes.Clear(1);
-    ConnectedDoors.Clear(1);
+    AdjacentNavMeshes.Clear(true);
+    PreferredAdjacentNavMeshes.Clear(true);
+    ConnectedDoors.Clear(true);
     uiFlags = 0;
     if (pBounds) {
         NavMeshBounds* apThis = pBounds;
         if (apThis) {
             delete apThis;
         }
-        pBounds = 0;
+        pBounds = nullptr;
     }
     if (apNavMesh->GetDisabled()) {
-        SetDisabled(1);
+        SetDisabled(true);
     }
     uint32_t isize = apNavMesh->GetTriangleCount();
     for (uint32_t i = 0; i < isize; ++i) {
@@ -82,11 +82,11 @@ void NavMeshInfo::CreateFromNavMesh(NavMesh* apNavMesh) {
                     uint16_t TriOrExtraInfo = ptri->GetTriOrExtraInfo(e);
                     EdgeExtraInfo* pextraInfo = apNavMesh->GetExtraEdgeInfo(TriOrExtraInfo);
                     if (pextraInfo->Portal.IsValid()) {
-                        bool baddPortal = 1;
+                        bool baddPortal = true;
                         NavMeshPtr spotherMesh;
                         if (pextraInfo->Portal.pOtherMesh->GetNavMeshEvenDisabled(spotherMesh)) {
                             if (spotherMesh.m_pObject->GetDelete()) {
-                                baddPortal = 0;
+                                baddPortal = false;
                             }
                             else {
                                 if (btriPreferred) {
@@ -102,7 +102,7 @@ void NavMeshInfo::CreateFromNavMesh(NavMesh* apNavMesh) {
                                     for (uint32_t k_2 = 0; k_2 < iotherSize; ++k_2) {
                                         NavMeshInfo** v5 = &PreferredAdjacentNavMeshes.GetAt(k_2);
                                         if (*v5 == pextraInfo->Portal.pOtherMesh) {
-                                            baddPortal = 0;
+                                            baddPortal = false;
                                             break;
                                         }
                                     }
@@ -112,7 +112,7 @@ void NavMeshInfo::CreateFromNavMesh(NavMesh* apNavMesh) {
                                     for (uint32_t k_3 = 0; k_3 < iotherSize_2; ++k_3) {
                                         NavMeshInfo** v6 = &AdjacentNavMeshes.GetAt(k_3);
                                         if (*v6 == pextraInfo->Portal.pOtherMesh) {
-                                            baddPortal = 0;
+                                            baddPortal = false;
                                             break;
                                         }
                                     }
@@ -120,7 +120,7 @@ void NavMeshInfo::CreateFromNavMesh(NavMesh* apNavMesh) {
                             }
                         }
                         else {
-                            baddPortal = 0;
+                            baddPortal = false;
                         }
                         if (baddPortal) {
                             if (btriPreferred) {
@@ -174,7 +174,7 @@ void NavMeshInfo::CreateFromNavMesh(NavMesh* apNavMesh) {
         float v11 = static_cast<double>(ipreferredTris) / static_cast<double>(itrisize);
         SetPreferredPercent(v11);
     }
-    SetAltered(1);
+    SetAltered(true);
 }
 
 void NavMeshInfo::SetPreferredPercent(float afPercent) {
@@ -411,15 +411,15 @@ void NavMeshInfo::SetFromPortalChunk(char* apChunkBuffer, TESFile* apFile, int32
     icount = 0;
     ourMemcpy(&icount, apChunkBuffer, sizeof(icount));
     if (apFile->QEndian()) {
-        ENDIAN<uint32_t>(icount, 0);
+        ENDIAN<uint32_t>(icount, false);
     }
-    AdjacentNavMeshes.SetSize(icount, 1);
+    AdjacentNavMeshes.SetSize(icount, true);
     // The chunk is untyped bytes: a run of 4-byte counts and form IDs after the first count.
     uint32_t* uiCount = reinterpret_cast<uint32_t*>(apChunkBuffer + 4);
     for (uint32_t i = 0; i < icount; ++i) {
         uint32_t infoID = *uiCount;
         if (apFile->QEndian()) {
-            ENDIAN<uint32_t>(infoID, 0);
+            ENDIAN<uint32_t>(infoID, false);
         }
         TESForm::AddCompileIndex(infoID, apFile);
         if (infoID) {
@@ -437,14 +437,14 @@ void NavMeshInfo::SetFromPortalChunk(char* apChunkBuffer, TESFile* apFile, int32
         icount = 0;
         ourMemcpy(&icount, uiCount, sizeof(icount));
         if (apFile->QEndian()) {
-            ENDIAN<uint32_t>(icount, 0);
+            ENDIAN<uint32_t>(icount, false);
         }
-        PreferredAdjacentNavMeshes.SetSize(icount, 1);
+        PreferredAdjacentNavMeshes.SetSize(icount, true);
         ++uiCount;
         for (uint32_t i_2 = 0; i_2 < icount; ++i_2) {
             uint32_t infoID_2 = *uiCount;
             if (apFile->QEndian()) {
-                ENDIAN<uint32_t>(infoID_2, 0);
+                ENDIAN<uint32_t>(infoID_2, false);
             }
             TESForm::AddCompileIndex(infoID_2, apFile);
             if (infoID_2) {
@@ -461,14 +461,14 @@ void NavMeshInfo::SetFromPortalChunk(char* apChunkBuffer, TESFile* apFile, int32
     }
     ourMemcpy(&icount, uiCount, sizeof(icount));
     if (apFile->QEndian()) {
-        ENDIAN<uint32_t>(icount, 0);
+        ENDIAN<uint32_t>(icount, false);
     }
-    ConnectedDoors.SetSize(icount, 1);
+    ConnectedDoors.SetSize(icount, true);
     uint32_t* uiCounta = uiCount + 1;
     for (uint32_t i_3 = 0; i_3 < icount; ++i_3) {
         uint32_t infoID_3 = *uiCounta;
         if (apFile->QEndian()) {
-            ENDIAN<uint32_t>(infoID_3, 0);
+            ENDIAN<uint32_t>(infoID_3, false);
         }
         TESForm::AddCompileIndex(infoID_3, apFile);
         TESObjectREFR** v8 = &ConnectedDoors.GetAt(static_cast<int32_t>(i_3));
@@ -497,7 +497,7 @@ void NavMeshInfo::CopyTo(NavMeshInfo* apDestInfo) {
                 v2 = ::new (apMemory) NavMeshBounds;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             apDestInfo->pBounds = v2;
         }
@@ -507,7 +507,7 @@ void NavMeshInfo::CopyTo(NavMeshInfo* apDestInfo) {
         if (apDestInfo->pBounds) {
             delete apDestInfo->pBounds;
         }
-        apDestInfo->pBounds = 0;
+        apDestInfo->pBounds = nullptr;
     }
 }
 

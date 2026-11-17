@@ -305,5 +305,5 @@ void BSSceneGraph::UpdateCameraFOV() {
     m_pObject->m_kPort.m_right = (float)1.0;
     m_pObject->m_kPort.m_top = (float)1.0;
     m_pObject->m_kPort.m_bottom = (float)0.0;
-    SetCameraFOV(fCurrentFOV, 1, 0, 0);
+    SetCameraFOV(fCurrentFOV, true, nullptr, false);
 }

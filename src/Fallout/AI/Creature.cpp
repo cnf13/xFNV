@@ -61,11 +61,11 @@ void Creature::Set3D(NiAVObject* apObject, bool abTestProcessLevel) {
 }
 
 int32_t Creature::GetActorValue(ActorValue::Index aiWhich) {
-    return Actor::GetActorValue(static_cast<ActorValue::Index>(MapActorValue(aiWhich)));
+    return Actor::GetActorValue(MapActorValue(aiWhich));
 }
 
 float Creature::GetActorFloatValue(ActorValue::Index aiWhich) {
-    return Actor::GetActorFloatValue(static_cast<ActorValue::Index>(MapActorValue(aiWhich)));
+    return Actor::GetActorFloatValue(MapActorValue(aiWhich));
 }
 
 float Creature::GetTurningSpeed() {
@@ -157,7 +157,7 @@ float Creature::GetArmorRating() {
         ActorValue::Index edamageResist = ActorValue::DAMAGE_RESISTANCE;
         // Calls Actor::GetEquippedWeight directly rather than through virtual dispatch.
         float fInternalValue = Actor::GetEquippedWeight();
-        bool bFound = 0;
+        bool bFound = false;
         float v7 = GetBaseValueOverride(ActorValue::DAMAGE_RESISTANCE, bFound);
         if (bFound) {
             fInternalValue = v7;
@@ -178,7 +178,7 @@ float Creature::GetArmorThreshold() {
         ActorValue::Index edamageThreshold = ActorValue::DAMAGE_THRESHOLD;
         // Calls Actor::GetEquippedWeight directly rather than through virtual dispatch.
         float fBaseValue = Actor::GetEquippedWeight();
-        bool bExists = 0;
+        bool bExists = false;
         float fInternalValue = GetBaseValueOverride(edamageThreshold, bExists);
         if (bExists) {
             fBaseValue = fInternalValue;
@@ -230,7 +230,7 @@ float Creature::GetWeaponSkill() {
 }
 
 ActorValue::Index Creature::MapActorValue(ActorValue::Index aiWhich) {
-    if (ActorValue::IsFlagSet(static_cast<ActorValue::Index>(aiWhich), ActorValue::COMBAT_SKILL)) {
+    if (ActorValue::IsFlagSet(aiWhich, ActorValue::COMBAT_SKILL)) {
         return ActorValue::UNARMED;
     }
     return aiWhich;
@@ -289,7 +289,7 @@ float Creature::GetMovementAnimationSpeed(ANIM_GROUP_ENUM aeMoveMode) {
         return 0x1p+5f;
     }
     ItemChange* pWeapon = pCurrentProcess->GetCurrentWeapon();
-    uint16_t animGroup = Actor::GetAnimGroup(aeMoveMode, pWeapon, 1, nullptr);
+    uint16_t animGroup = Actor::GetAnimGroup(aeMoveMode, pWeapon, true, nullptr);
     Animation* pAnimation = GetAnimation();
-    return (double)((int16_t)pAnimation->GetGroupSpeed(animGroup));
+    return (double)pAnimation->GetGroupSpeed(animGroup);
 }

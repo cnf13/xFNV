@@ -1470,7 +1470,7 @@ void hkp3AxisSweep::queryBatchAabbSub(
     openOtherNodes.m_capacityAndFlags = 256 | hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG;
 
     const hkpBpEndPoint* ep = m_axis[0].m_endPoints.m_data + 1;
-    const hkpBpEndPoint* epEnd = m_axis[0].m_endPoints.m_data + static_cast<int32_t>(m_axis[0].m_endPoints.m_size) - 1;
+    const hkpBpEndPoint* epEnd = m_axis[0].m_endPoints.m_data + m_axis[0].m_endPoints.m_size - 1;
     for (; ep < epEnd; ++ep) {
         const int32_t nodeIndex = ep->m_nodeIndex;
         const uint32_t isQuery = bitFieldOfQueryNodes[nodeIndex >> 5] & (1u << (nodeIndex & 0x1F));
@@ -2915,13 +2915,13 @@ void hkp3AxisSweep::shiftAllObjects(
         int32_t end;
         int32_t step;
         if (sh >= 0) {
-            start = static_cast<int32_t>(axis.m_endPoints.m_size) - 2;
+            start = axis.m_endPoints.m_size - 2;
             end = 0;
             step = -1;
         }
         else {
             start = 1;
-            end = static_cast<int32_t>(axis.m_endPoints.m_size) - 1;
+            end = axis.m_endPoints.m_size - 1;
             step = 1;
         }
         for (int32_t epIndex = start; epIndex != end; epIndex += step) {
@@ -3890,7 +3890,7 @@ int32_t getMinComponent(float* a1, float* a2) {
     }
     else {
         if (a1[2] > ((double)(*a1))) {
-            *a2 = (float)(*a1);
+            *a2 = (*a1);
             return 0;
         }
     }

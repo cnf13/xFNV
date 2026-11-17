@@ -62,12 +62,12 @@ void BGSVoiceType::Copy(TESForm* apCopy) {
 bool BGSVoiceType::Compare(TESForm* apCompare) {
     BGSVoiceType* v4 = dynamic_cast<BGSVoiceType*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (((int8_t)Data.cFlags) == ((int8_t)v4->Data.cFlags)) {
         return (((int8_t)TESForm::CompareAllComponents(v4)) != 0);
     }
-    return (bool)1;
+    return true;
 }
 
 const char* BGSVoiceType::GetFormEditorID() {
@@ -81,5 +81,5 @@ const char* BGSVoiceType::GetFormEditorID() {
 
 bool BGSVoiceType::SetFormEditorID(const char* apEditorID) {
     strEditorID.Set(apEditorID, 0u);
-    return 1;
+    return true;
 }

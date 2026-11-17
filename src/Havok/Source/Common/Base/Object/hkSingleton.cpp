@@ -10,7 +10,7 @@
 
 hkSingletonInitNode* hkSingletonInitNode::findByName(const char* name) {
     hkSingletonInitNode* pThis = this;
-    while (1) {
+    while (true) {
         if (pThis->m_name && !hkString::strCmp(name, pThis->m_name)) {
             return pThis;
         }
@@ -19,7 +19,7 @@ hkSingletonInitNode* hkSingletonInitNode::findByName(const char* name) {
         }
         pThis = pThis->m_next;
     }
-    return 0;
+    return nullptr;
 }
 
 // Maps every source node by name, then gives each destination node the instance of the source node of the same name,

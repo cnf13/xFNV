@@ -68,10 +68,8 @@ void hkpMotorAction::applyAction(const hkStepInfo& stepInfo) {
         currentAngVel.setRotatedInverseDir(pMotion->m_motionState.m_transform.m_rotation, pMotion->m_angularVelocity);
         // EXE-INLINED 0x62B0A0
         __m128 product = _mm_mul_ps(m_axis.m_quad, currentAngVel.m_quad);
-        float fCurrentRate = static_cast<float>(
-            _mm_shuffle_ps(product, product, 170)[0] +
-            static_cast<float>(_mm_shuffle_ps(product, product, 85)[0] + product[0])
-        );
+        float fCurrentRate =
+            (_mm_shuffle_ps(product, product, 170)[0] + (_mm_shuffle_ps(product, product, 85)[0] + product[0]));
         float fTorque = m_spinRate - fCurrentRate;
         fTorque = fTorque * m_gain;
         hkVector4 torque;
@@ -92,7 +90,7 @@ hkpAction* hkpMotorAction::clone(
     const hkArray<hkpPhantom*, hkContainerHeapAllocator>& newPhantoms
 ) const {
     if (newEntities.m_size != 1 || newPhantoms.m_size) {
-        return 0;
+        return nullptr;
     }
     hkpMotorAction* pAction =
         static_cast<hkpMotorAction*>(hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(hkpMotorAction)));

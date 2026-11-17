@@ -13,7 +13,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 
 #include <bit>
-#include <stdint.h>
+#include <cstdint>
 
 NiProcessorSpecificCode::VectorTransformFunc NiProcessorSpecificCode::ms_pVectorsTransform{&TransformVectorsBasic};
 NiProcessorSpecificCode::PointTransformFunc NiProcessorSpecificCode::ms_pPointsTransform{&TransformPointsBasic};
@@ -76,7 +76,7 @@ void NiTransformVectorsPentium(uint16_t uiVerts, const float* pModel, float* pWo
 
 void NiTransformPointsPentium(uint16_t uiVerts, const float* pModel, float* pWorld, const NiTransform* pXform) {
     float v14[10];
-    v14[9] = std::bit_cast<float>(static_cast<uint32_t>(static_cast<uint32_t>(uiVerts)));
+    v14[9] = std::bit_cast<float>(static_cast<uint32_t>(uiVerts));
     double x = pXform->m_Translate.x;
     float* v15 = v14;
     float v16 = x;

@@ -140,7 +140,7 @@ void TESLoadScreenType::Copy(TESForm* apCopy) {
 bool TESLoadScreenType::Compare(TESForm* apCompare) {
     TESLoadScreenType* v5 = dynamic_cast<TESLoadScreenType*>(apCompare);
     if (!v5) {
-        return (bool)1;
+        return true;
     }
     return (std::memcmp(&data, &v5->data, sizeof(data)) || (((int8_t)TESForm::CompareAllComponents(v5)) != 0));
 }

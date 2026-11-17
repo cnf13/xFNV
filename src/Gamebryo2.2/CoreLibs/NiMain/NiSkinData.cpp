@@ -213,7 +213,7 @@ void NiSkinData::ComputeBoneBounds(const NiPoint3* pkVerts) {
     using NiPoint3Set_t = NiTSet<NiPoint3, NiTNewInterface<NiPoint3>>;
     FNVD_INLINED_LOCAL(NiPoint3Set_t, v13, std::nullopt, std::nullopt);
     uint32_t m_uiUsed = 0;
-    NiPoint3* m_pBase = 0;
+    NiPoint3* m_pBase = nullptr;
     std::memset(&v13, 0, sizeof(v13));
     uint32_t v12 = 0;
     if (m_uiBones) {

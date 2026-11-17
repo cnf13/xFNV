@@ -79,18 +79,18 @@ void TESEyes::Copy(TESForm* apCopy) {
 bool TESEyes::Compare(TESForm* apCompare) {
     TESEyes* v7 = dynamic_cast<TESEyes*>(apCompare);
     if (!v7) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v7)) {
-        return (bool)1;
+        return true;
     }
     int32_t isPlayable = (int32_t)v7->IsPlayable();
     if (((uint32_t)isPlayable) != ((uint32_t)((uint8_t)IsPlayable()))) {
-        return (bool)1;
+        return true;
     }
     int32_t canBeMale = (int32_t)v7->CanBeMale();
     if (((uint32_t)canBeMale) != ((uint32_t)((uint8_t)CanBeMale()))) {
-        return (bool)1;
+        return true;
     }
     int32_t canBeFemale = (int32_t)v7->CanBeFemale();
     return (bool)((uint8_t)(((uint32_t)canBeFemale) != ((uint32_t)((uint8_t)CanBeFemale()))));
@@ -101,7 +101,7 @@ bool TESEyes::IsPlayable() {
 }
 
 bool TESEyes::CanBeEyesForNPC(TESNPC* apNPC) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apNPC) {
         if (apNPC->GetRace()) {
             TESEyes* item = this;
@@ -109,12 +109,12 @@ bool TESEyes::CanBeEyesForNPC(TESNPC* apNPC) {
                 TESActorBase::SEX Sex = apNPC->GetSex();
                 if (Sex) {
                     if (Sex == TESActorBase::SEX_FEMALE && CanBeFemale()) {
-                        return 1;
+                        return true;
                     }
                 }
                 else {
                     if (CanBeMale()) {
-                        return 1;
+                        return true;
                     }
                 }
             }

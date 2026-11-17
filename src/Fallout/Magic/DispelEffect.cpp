@@ -46,7 +46,7 @@ void DispelEffect::CopyData(ActiveEffect* apDestination) {
 }
 
 bool DispelEffect::CheckTarget(MagicTarget* apTarget) {
-    return (dynamic_cast<Character*>(apTarget) != 0);
+    return (dynamic_cast<Character*>(apTarget) != nullptr);
 }
 
 void DispelEffect::Start() {
@@ -58,7 +58,7 @@ void DispelEffect::Start() {
         pcasterActor = pCaster->GetCasterAsActor();
     }
     else {
-        pcasterActor = 0;
+        pcasterActor = nullptr;
     }
     while (plist && !plist->IsEmpty()) {
         ActiveEffect* peffect = plist->m_item;
@@ -67,10 +67,10 @@ void DispelEffect::Start() {
             if (peffect != this) {
                 MagicItem* pspell = peffect->pSpell;
                 if (pspell->GetSpellType() == MagicSystem::SPELL) {
-                    double v2 = pspell->GetCost(bselfCast ? pcasterActor : 0);
+                    double v2 = pspell->GetCost(bselfCast ? pcasterActor : nullptr);
                     double SequenceWeight = fMagnitude;
                     if (fMagicDispelMagnitudeMult.Float() * SequenceWeight >= v2) {
-                        peffect->Dispel(0);
+                        peffect->Dispel(false);
                     }
                 }
             }

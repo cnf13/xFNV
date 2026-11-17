@@ -18,7 +18,7 @@ bool ParallaxShader::LoadStagesAndPasses() {
     }
     while (v3);
     PresetPasses();
-    return 1;
+    return true;
 }
 
 void ParallaxShader::PresetPasses() {
@@ -31,8 +31,8 @@ void ParallaxShader::PresetPasses() {
 }
 
 void ParallaxShader::PresetADPasses_2x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v38 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v38 = nullptr;
     {
         NiPointer<NiD3DTextureStage> spstage;
         if (ParallaxShader::spPass[0].m_pObject) {
@@ -42,27 +42,27 @@ void ParallaxShader::PresetADPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 7) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, true);
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
         }
         NiD3DVertexShader* v2 = this->pVertexShader[8];
@@ -72,19 +72,19 @@ void ParallaxShader::PresetADPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[217] = 1920;
         ShadowLightShader::ulPixelConstantFlags[217] = 44;
         if (m_pObject != ParallaxShader::spPass[1].m_pObject) {
@@ -97,27 +97,27 @@ void ParallaxShader::PresetADPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 7) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, true);
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
         }
         NiD3DVertexShader* v7 = this->pVertexShader[8];
@@ -127,19 +127,19 @@ void ParallaxShader::PresetADPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[218] = 1920;
         ShadowLightShader::ulPixelConstantFlags[218] = 60;
         if (m_pObject != ParallaxShader::spPass[2].m_pObject) {
@@ -152,27 +152,27 @@ void ParallaxShader::PresetADPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 7) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, true);
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
         }
         NiD3DVertexShader* v11 = this->pVertexShader[9];
@@ -182,19 +182,19 @@ void ParallaxShader::PresetADPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[226] = 2032;
         ShadowLightShader::ulPixelConstantFlags[226] = 44;
         if (m_pObject != ParallaxShader::spPass[3].m_pObject) {
@@ -207,27 +207,27 @@ void ParallaxShader::PresetADPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 7) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, true);
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
         }
         NiD3DVertexShader* v15 = this->pVertexShader[9];
@@ -237,19 +237,19 @@ void ParallaxShader::PresetADPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[227] = 2032;
         ShadowLightShader::ulPixelConstantFlags[227] = 60;
         if (m_pObject != ParallaxShader::spPass[4].m_pObject) {
@@ -262,27 +262,27 @@ void ParallaxShader::PresetADPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 7) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, true);
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
         }
         NiD3DVertexShader* v19 = this->pVertexShader[10];
@@ -292,23 +292,23 @@ void ParallaxShader::PresetADPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[235] = 1920;
         ShadowLightShader::ulPixelConstantFlags[235] = 44;
         if (m_pObject != ParallaxShader::spPass[5].m_pObject) {
@@ -321,27 +321,27 @@ void ParallaxShader::PresetADPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 7) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, true);
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
         }
         NiD3DVertexShader* v23 = this->pVertexShader[10];
@@ -351,23 +351,23 @@ void ParallaxShader::PresetADPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[236] = 1920;
         ShadowLightShader::ulPixelConstantFlags[236] = 60;
         if (m_pObject != ParallaxShader::spPass[6].m_pObject) {
@@ -380,27 +380,27 @@ void ParallaxShader::PresetADPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 7) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, true);
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
         }
         NiD3DVertexShader* v27 = this->pVertexShader[11];
@@ -410,23 +410,23 @@ void ParallaxShader::PresetADPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[244] = 2032;
         ShadowLightShader::ulPixelConstantFlags[244] = 44;
         if (m_pObject != ParallaxShader::spPass[7].m_pObject) {
@@ -439,27 +439,27 @@ void ParallaxShader::PresetADPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 7) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 1u, 2u, true);
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 3u, 0, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
         }
         NiD3DVertexShader* v31 = this->pVertexShader[11];
@@ -469,23 +469,23 @@ void ParallaxShader::PresetADPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[245] = 2032;
         ShadowLightShader::ulPixelConstantFlags[245] = 60;
     }
@@ -493,8 +493,8 @@ void ParallaxShader::PresetADPasses_2x() {
 }
 
 void ParallaxShader::PresetADTPasses_2x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v42 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v42 = nullptr;
     {
         NiPointer<NiD3DTextureStage> spstage;
         if (ParallaxShader::spPass[8].m_pObject) {
@@ -504,30 +504,30 @@ void ParallaxShader::PresetADTPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v2 = this->pVertexShader[0];
@@ -546,30 +546,30 @@ void ParallaxShader::PresetADTPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v7 = this->pVertexShader[0];
@@ -588,30 +588,30 @@ void ParallaxShader::PresetADTPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v11 = this->pVertexShader[0];
@@ -621,23 +621,23 @@ void ParallaxShader::PresetADTPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[259] = 1920;
         ShadowLightShader::ulPixelConstantFlags[259] = 60;
         if (m_pObject != ParallaxShader::spPass[11].m_pObject) {
@@ -650,30 +650,30 @@ void ParallaxShader::PresetADTPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v15 = this->pVertexShader[1];
@@ -683,23 +683,23 @@ void ParallaxShader::PresetADTPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[270] = 2032;
         ShadowLightShader::ulPixelConstantFlags[270] = 44;
         if (m_pObject != ParallaxShader::spPass[12].m_pObject) {
@@ -712,30 +712,30 @@ void ParallaxShader::PresetADTPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v19 = this->pVertexShader[1];
@@ -745,23 +745,23 @@ void ParallaxShader::PresetADTPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[271] = 2032;
         ShadowLightShader::ulPixelConstantFlags[271] = 60;
         if (m_pObject != ParallaxShader::spPass[13].m_pObject) {
@@ -774,30 +774,30 @@ void ParallaxShader::PresetADTPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v23 = this->pVertexShader[2];
@@ -807,23 +807,23 @@ void ParallaxShader::PresetADTPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[281] = 1920;
         ShadowLightShader::ulPixelConstantFlags[281] = 44;
         if (m_pObject != ParallaxShader::spPass[14].m_pObject) {
@@ -836,30 +836,30 @@ void ParallaxShader::PresetADTPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v27 = this->pVertexShader[2];
@@ -869,23 +869,23 @@ void ParallaxShader::PresetADTPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[282] = 1920;
         ShadowLightShader::ulPixelConstantFlags[282] = 60;
         if (m_pObject != ParallaxShader::spPass[15].m_pObject) {
@@ -898,30 +898,30 @@ void ParallaxShader::PresetADTPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v31 = this->pVertexShader[3];
@@ -931,23 +931,23 @@ void ParallaxShader::PresetADTPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[292] = 2032;
         ShadowLightShader::ulPixelConstantFlags[292] = 44;
         if (m_pObject != ParallaxShader::spPass[16].m_pObject) {
@@ -960,30 +960,30 @@ void ParallaxShader::PresetADTPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v35 = this->pVertexShader[3];
@@ -993,23 +993,23 @@ void ParallaxShader::PresetADTPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[293] = 2032;
         ShadowLightShader::ulPixelConstantFlags[293] = 60;
     }
@@ -1017,8 +1017,8 @@ void ParallaxShader::PresetADTPasses_2x() {
 }
 
 void ParallaxShader::PresetADTSPasses_2x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v38 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v38 = nullptr;
     {
         NiPointer<NiD3DTextureStage> spstage;
         if (ParallaxShader::spPass[17].m_pObject) {
@@ -1028,30 +1028,30 @@ void ParallaxShader::PresetADTSPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v2 = this->pVertexShader[4];
@@ -1061,23 +1061,23 @@ void ParallaxShader::PresetADTSPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[153] = 1920;
         ShadowLightShader::ulPixelConstantFlags[153] = 44;
         if (m_pObject != ParallaxShader::spPass[18].m_pObject) {
@@ -1090,30 +1090,30 @@ void ParallaxShader::PresetADTSPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v7 = this->pVertexShader[4];
@@ -1123,23 +1123,23 @@ void ParallaxShader::PresetADTSPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[154] = 1920;
         ShadowLightShader::ulPixelConstantFlags[154] = 60;
         if (m_pObject != ParallaxShader::spPass[19].m_pObject) {
@@ -1152,30 +1152,30 @@ void ParallaxShader::PresetADTSPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v11 = this->pVertexShader[5];
@@ -1185,23 +1185,23 @@ void ParallaxShader::PresetADTSPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[164] = 2032;
         ShadowLightShader::ulPixelConstantFlags[164] = 44;
         if (m_pObject != ParallaxShader::spPass[20].m_pObject) {
@@ -1214,30 +1214,30 @@ void ParallaxShader::PresetADTSPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v15 = this->pVertexShader[5];
@@ -1247,23 +1247,23 @@ void ParallaxShader::PresetADTSPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[165] = 2032;
         ShadowLightShader::ulPixelConstantFlags[165] = 60;
         if (m_pObject != ParallaxShader::spPass[21].m_pObject) {
@@ -1276,30 +1276,30 @@ void ParallaxShader::PresetADTSPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v19 = this->pVertexShader[6];
@@ -1309,23 +1309,23 @@ void ParallaxShader::PresetADTSPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[175] = 1920;
         ShadowLightShader::ulPixelConstantFlags[175] = 44;
         if (m_pObject != ParallaxShader::spPass[22].m_pObject) {
@@ -1338,30 +1338,30 @@ void ParallaxShader::PresetADTSPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v23 = this->pVertexShader[6];
@@ -1371,23 +1371,23 @@ void ParallaxShader::PresetADTSPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[176] = 1920;
         ShadowLightShader::ulPixelConstantFlags[176] = 60;
         if (m_pObject != ParallaxShader::spPass[23].m_pObject) {
@@ -1400,30 +1400,30 @@ void ParallaxShader::PresetADTSPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v27 = this->pVertexShader[7];
@@ -1433,23 +1433,23 @@ void ParallaxShader::PresetADTSPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[186] = 2032;
         ShadowLightShader::ulPixelConstantFlags[186] = 44;
         if (m_pObject != ParallaxShader::spPass[24].m_pObject) {
@@ -1462,30 +1462,30 @@ void ParallaxShader::PresetADTSPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 8) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(4u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 5u, 3u, 0, true);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
             m_pObject->SetStage(5u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 6u, 1u, 2u, true);
             m_pObject->SetStage(6u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 7u, 3u, 0, true);
             m_pObject->SetStage(7u, spstage.m_pObject);
         }
         NiD3DVertexShader* v31 = this->pVertexShader[7];
@@ -1495,23 +1495,23 @@ void ParallaxShader::PresetADTSPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[187] = 2032;
         ShadowLightShader::ulPixelConstantFlags[187] = 60;
     }
@@ -1519,8 +1519,8 @@ void ParallaxShader::PresetADTSPasses_2x() {
 }
 
 void ParallaxShader::PresetDiffusePtPasses_2x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v14 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v14 = nullptr;
     {
         NiPointer<NiD3DTextureStage> spstage;
         if (ParallaxShader::spPass[25].m_pObject) {
@@ -1530,18 +1530,18 @@ void ParallaxShader::PresetDiffusePtPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 3u, 0, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
         }
         NiD3DVertexShader* v3 = pVertexShader[12];
@@ -1551,11 +1551,11 @@ void ParallaxShader::PresetDiffusePtPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[308] = 1152;
         ShadowLightShader::ulPixelConstantFlags[308] = 8;
         if (m_pObject != ParallaxShader::spPass[26].m_pObject) {
@@ -1568,18 +1568,18 @@ void ParallaxShader::PresetDiffusePtPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(0, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(1u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(2u, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
             spstage.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             spstage.m_pObject->m_uiTextureFlags = 1;
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 3u, 0, true);
             m_pObject->SetStage(3u, spstage.m_pObject);
         }
         NiD3DVertexShader* v8 = pVertexShader[13];
@@ -1589,11 +1589,11 @@ void ParallaxShader::PresetDiffusePtPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[320] = 1152;
         ShadowLightShader::ulPixelConstantFlags[320] = 8;
     }
@@ -1601,8 +1601,8 @@ void ParallaxShader::PresetDiffusePtPasses_2x() {
 }
 
 void ParallaxShader::PresetTexturePasses_2x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v10 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v10 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         if (ParallaxShader::spPass[27].m_pObject) {
@@ -1612,13 +1612,13 @@ void ParallaxShader::PresetTexturePasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v3 = pVertexShader[14];
@@ -1628,11 +1628,11 @@ void ParallaxShader::PresetTexturePasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[339] = 1024;
         ShadowLightShader::ulPixelConstantFlags[339] = 32;
     }
@@ -1640,8 +1640,8 @@ void ParallaxShader::PresetTexturePasses_2x() {
 }
 
 void ParallaxShader::PresetSpecularPasses_2x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v29 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v29 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         if (ParallaxShader::spPass[28].m_pObject) {
@@ -1651,24 +1651,24 @@ void ParallaxShader::PresetSpecularPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 6) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
             a1.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             a1.m_pObject->m_uiTextureFlags = 1;
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 3u, 0, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 5u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 5u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v3 = pVertexShader[15];
@@ -1678,11 +1678,11 @@ void ParallaxShader::PresetSpecularPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[348] = 1152;
         ShadowLightShader::ulPixelConstantFlags[348] = 40;
         if (m_pObject != ParallaxShader::spPass[29].m_pObject) {
@@ -1695,24 +1695,24 @@ void ParallaxShader::PresetSpecularPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 6) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
             a1.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             a1.m_pObject->m_uiTextureFlags = 1;
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 3u, 0, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 5u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 5u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v8 = this->pVertexShader[16];
@@ -1722,11 +1722,11 @@ void ParallaxShader::PresetSpecularPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[354] = 1264;
         ShadowLightShader::ulPixelConstantFlags[354] = 40;
         if (m_pObject != ParallaxShader::spPass[30].m_pObject) {
@@ -1739,24 +1739,24 @@ void ParallaxShader::PresetSpecularPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 6) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
             a1.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             a1.m_pObject->m_uiTextureFlags = 1;
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 3u, 0, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 5u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 5u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v13 = this->pVertexShader[17];
@@ -1766,11 +1766,11 @@ void ParallaxShader::PresetSpecularPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[360] = 1152;
         ShadowLightShader::ulPixelConstantFlags[360] = ShadowLightShader::ulPixelConstantFlags[358];
         if (m_pObject != ParallaxShader::spPass[31].m_pObject) {
@@ -1783,24 +1783,24 @@ void ParallaxShader::PresetSpecularPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 6) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
             a1.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             a1.m_pObject->m_uiTextureFlags = 1;
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 3u, 0, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 5u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 5u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v17 = this->pVertexShader[18];
@@ -1810,11 +1810,11 @@ void ParallaxShader::PresetSpecularPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[366] = 1152;
         ShadowLightShader::ulPixelConstantFlags[366] = ShadowLightShader::ulPixelConstantFlags[364];
         if (m_pObject != ParallaxShader::spPass[32].m_pObject) {
@@ -1827,24 +1827,24 @@ void ParallaxShader::PresetSpecularPasses_2x() {
         }
         if (m_pObject->m_uiStageCount < 6) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
             a1.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             a1.m_pObject->m_uiTextureFlags = 1;
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 3u, 0, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 3u, 0, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 4u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 4u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 5u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 5u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v22 = this->pVertexShader[19];
@@ -1854,11 +1854,11 @@ void ParallaxShader::PresetSpecularPasses_2x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[372] = 1152;
         ShadowLightShader::ulPixelConstantFlags[372] = ShadowLightShader::ulPixelConstantFlags[370];
     }

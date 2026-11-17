@@ -26,7 +26,7 @@ int32_t BSFileCache::GetCachedFileIndex(char* apFileName) {
 }
 
 bool BSFileCache::CacheFile(CachedFile* apCachedFile) {
-    return (bool)0;
+    return false;
 }
 
 void BSFileCache::WaitForFileCachingToFinish(
@@ -77,15 +77,15 @@ void BSFileCache::CalculateCurrentLayer() {
 }
 
 void BSFileCache::WaitForEssentialFileCachingToFinish() {
-    WaitForFileCachingToFinish((uint32_t)0, iEssentialPriority, (bool)1, (uint8_t)0);
+    WaitForFileCachingToFinish((uint32_t)0, iEssentialPriority, true, (uint8_t)0);
 }
 
 void BSFileCache::WaitIfPaused() {
     while (eFileCacheState == 2 || eFileCacheState == 3) {
-        bInPauseLoop = 1;
+        bInPauseLoop = true;
         Sleep(50u);
     }
-    bInPauseLoop = 0;
+    bInPauseLoop = false;
 }
 
 void BSFileCache::PauseAndWaitForIdle() {

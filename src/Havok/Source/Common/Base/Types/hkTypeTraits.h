@@ -4,20 +4,20 @@
 
 // The two tags hkArrayUtil's element operations dispatch on: plain data (no construction or destruction to run) and
 // classes.
-typedef hkTraitBool<true> hkTypeIsPod;
+using hkTypeIsPod = hkTraitBool<true>;
 
 // The fallback comparison of hkIsPodType's test: a type that does not declare itself POD compares through this one
 // and gets the false type. Only named inside sizeof, never defined.
 template <typename T>
 hkBool::CompileTimeFalseType operator==(const T&, const hkTypeIsPod&);
 
-typedef hkTraitBool<false> hkTypeIsClass;
+using hkTypeIsClass = hkTraitBool<false>;
 
 // hkTypeIsPod for the scalars, pointers and classes that declare HK_DECLARE_POD_TYPE, else hkTypeIsClass.
 template <typename T>
-struct hkIsPodType
-  : public hkTraitBool<
-        (sizeof(*static_cast<T*>(0) == *static_cast<const hkTypeIsPod*>(0)) == sizeof(hkBool::CompileTimeTrueType))> {};
+struct hkIsPodType : public hkTraitBool<
+                         (sizeof(*static_cast<T*>(nullptr) == *static_cast<const hkTypeIsPod*>(nullptr)) ==
+                          sizeof(hkBool::CompileTimeTrueType))> {};
 
 // Declared inside a class: its arrays treat it as plain data.
 #define HK_DECLARE_POD_TYPE() hkBool::CompileTimeTrueType operator==(const hkTypeIsPod&) const;

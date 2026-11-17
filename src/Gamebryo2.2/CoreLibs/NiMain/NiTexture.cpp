@@ -51,7 +51,7 @@ void NiTexture::RendererData::SetTextureReplacementFormat(const NiPixelFormat& k
 NiPixelData* NiTexture::RendererData::GetReplacementData(NiTexture* pkTexture, CreationFailure eFailure) {
     // Tests the sign: every failure value is negative.
     if (eFailure >= NONE) {
-        return 0;
+        return nullptr;
     }
     TEXTUREFAILUREFUNC pfnCallback = ms_pfnTextureFailureCallback;
     if (!pfnCallback) {
@@ -77,7 +77,7 @@ NiPixelData* NiTexture::RendererData::MakeDataFromColors(
         pkData = ::new (v4) NiPixelData(32u, 32u, kDesc, 1u, uiNumFaces);
     }
     else {
-        pkData = 0;
+        pkData = nullptr;
     }
     uint8_t Shift = kDesc.GetShift(NiPixelFormat::COMP_RED);
     uint32_t uiRed = static_cast<uint32_t>(static_cast<int64_t>(kTopLeftColor.r * 255.0));
@@ -112,7 +112,7 @@ NiPixelData* NiTexture::RendererData::MakeDataFromColors(
         do {
             uint32_t v21 = kTopLeftColora >> 4;
             uint32_t v22 = 0;
-            while (1) {
+            while (true) {
                 rt::memcpy(v19, &auiColors[v21 != v22++ >> 4], v20);
                 v19 += v20;
                 if (v22 >= 32) {
@@ -136,7 +136,7 @@ NiPixelData* NiTexture::RendererData::DefaultTextureFailureCallback(
     // A failure value is its index with the top bit set; the top bit is taken off before indexing the table.
     const uint32_t uiIndex = eFailure & 0x7FFFFFFFu;
     if (uiIndex >= 10) {
-        return 0;
+        return nullptr;
     }
     NiPointer<NiPixelData>* v3 = &NiTexture::RendererData::ms_aspReplacementData[uiIndex];
     uint32_t uiNumFaces = 1;

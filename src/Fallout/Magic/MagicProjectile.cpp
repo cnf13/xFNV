@@ -56,7 +56,7 @@
 MagicProjectile::MagicProjectile()
   : MobileObject(), fSpeed(0.0f), fDistanceMoved(0.0f), fAge(0.0f), pCaster(nullptr), pSpell(nullptr),
     pDominantEffect(nullptr), pAVEffect(nullptr) {
-    SetStillLoading(1);
+    SetStillLoading(true);
     pCurrentProcess = new HighProcess();
     SetObjectReference(GetObjectReference());
 }
@@ -87,11 +87,11 @@ MagicProjectile::~MagicProjectile() {
     }
     if (pAVEffect) {
         if (pAVEffect->GetModelLength()) {
-            pModelLoader->ReleaseModel(pAVEffect->GetModel(), 0, 1u);
+            pModelLoader->ReleaseModel(pAVEffect->GetModel(), false, 1u);
         }
     }
     if (!pDataHandler->GetClearingData()) {
-        CleanUpOtherMobileObjects(0);
+        CleanUpOtherMobileObjects(false);
     }
 }
 
@@ -154,16 +154,16 @@ void MagicProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
     pThis->Load3D(false);
     MobileObject::InitLoadGame(aiFlags, aiOldFlags);
     ReferenceProcessLists.RemoveReference(this, GetCurrentProcessType());
-    ReferenceProcessLists.AddReference(this, GetCurrentProcessType(), 0, false, nullptr);
+    ReferenceProcessLists.AddReference(this, GetCurrentProcessType(), false, false, nullptr);
     if (!pCaster || !pSpell) {
         pSaveLoadGameOLD->AddFormToDeferredDeletionsList(this);
     }
 }
 
 NiAVObject* MagicProjectile::Load3D(bool abBackgroundLoading) {
-    NiNode* apObject = 0;
+    NiNode* apObject = nullptr;
     if (GetDelete() || GetDisabled()) {
-        return 0;
+        return nullptr;
     }
     if (!Get3D()) {
         EffectSetting* CriticalQueuedRefCount = GetAVEffect();
@@ -171,13 +171,13 @@ NiAVObject* MagicProjectile::Load3D(bool abBackgroundLoading) {
         if (apObject) {
             TESForm* ObjectReference = GetObjectReference();
             if (ObjectReference->GetNoCollision()) {
-                SetNoCollision(1);
+                SetNoCollision(true);
             }
             Set3DSimple(apObject);
             const NiPoint3* v5 = &GetLocationOnReference();
             apObject->SetTranslate(*v5);
             apObject->SetRotate(GetOrientation());
-            bhkNiCollisionObject::ResetSim(apObject, 1);
+            bhkNiCollisionObject::ResetSim(apObject, true);
             const NiFixedString* v7 = &BSXFlags::Tag();
             BSXFlags* ExtraData = static_cast<BSXFlags*>(apObject->GetExtraData(*v7));
             if (ExtraData) {
@@ -199,7 +199,7 @@ bool MagicProjectile::IsProjectile() {
 }
 
 void MagicProjectile::Process(float afDelta) {
-    float systemTimeClock = (float)(&ReferenceProcessLists)->GetSystemTimeClock();
+    float systemTimeClock = (&ReferenceProcessLists)->GetSystemTimeClock();
     float v4 = systemTimeClock - fLastUpdate;
     if ((systemTimeClock < ((double)fLastUpdate)) || (fLastUpdate < 0.0)) {
         v4 = (float)0.0;
@@ -209,19 +209,19 @@ void MagicProjectile::Process(float afDelta) {
     }
     fLastUpdate = systemTimeClock;
     if (!(pFaderManager->GetFaderAlpha(FADER_TO_BLACK) > 0.0)) {
-        fAge = (float)(fAge + v4);
+        fAge = (fAge + v4);
         Update(v4);
     }
 }
 
 bool MagicProjectile::ChangeProcessLevel() {
-    bool v4 = 1;
+    bool v4 = true;
     TESObjectCELL* ParentCell = GetParentCell();
-    if (!TES::pInstance->IsCellLoaded(ParentCell, 1)) {
+    if (!TES::pInstance->IsCellLoaded(ParentCell, true)) {
         if (this) {
             delete this;
         }
-        return 0;
+        return false;
     }
     return v4;
 }
@@ -234,7 +234,7 @@ void MagicProjectile::SetDisplayGeometry(bool abTF) {
     bhkCharacterController* CharController = GetCharController();
     if (CharController) {
         if (abTF) {
-            CharController->BuildDisplayGeometry(0);
+            CharController->BuildDisplayGeometry(nullptr);
             NiAVObject* NiObject_ = CharController->GetNiObject();
             BSShaderUtil::RecursiveSetPropertyWireframe(NiObject_, 1);
             BuildAreaEffectGeometry();
@@ -255,7 +255,7 @@ bool MagicProjectile::CheckDeletedCaster(MagicCaster* apCaster) {
     if (apCaster == pCaster) {
         pCaster = nullptr;
         v3 = 1;
-        SetDelete((bool)1);
+        SetDelete(true);
     }
     return (bool)v3;
 }
@@ -406,7 +406,7 @@ NiAVObject* MagicProjectile::Clone3D(const char* apModelPath) {
     NiNode* file = nullptr;
     if (apModelPath) {
         if (*apModelPath) {
-            file = pModelLoader->LoadFile(apModelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+            file = pModelLoader->LoadFile(apModelPath, LOD_MULT_NONE, true, false, false, false);
         }
     }
     if (!file) {
@@ -419,7 +419,7 @@ NiAVObject* MagicProjectile::Clone3D(const char* apModelPath) {
     v5 = static_cast<NiNode*>(file->Clone(a2));
     if (v5) {
         v5->SetScale(1.0);
-        v5->SetAppCulled(0);
+        v5->SetAppCulled(false);
         v5->SetRotate(NiMatrix3_IDENTITY);
         v5->SetTranslate(NiPoint3_ZERO);
         if (v5->NiAVObject::GetParent()) {
@@ -440,7 +440,7 @@ TESBoundObject* MagicProjectile::GetDummyObjectReference() {
             pammoObject = ::new (apMemory) TESAmmo;
         }
         else {
-            pammoObject = 0;
+            pammoObject = nullptr;
         }
         pammoObject->SetModel("marker_error.nif");
         MagicProjectile::pDummyObjectRef = pammoObject;
@@ -460,7 +460,7 @@ void MagicProjectile::Launch(
     NiPoint3 aRotation
 ) {
     EffectSetting* pavEffect;
-    MagicProjectile* pprojectile_2 = 0;
+    MagicProjectile* pprojectile_2 = nullptr;
     if (apAVEffect) {
         pavEffect = apAVEffect;
     }
@@ -477,7 +477,7 @@ void MagicProjectile::Launch(
                 );
             }
             else {
-                pprojectile = 0;
+                pprojectile = nullptr;
             }
             pprojectile_2 = pprojectile;
             break;
@@ -490,7 +490,7 @@ void MagicProjectile::Launch(
                     MagicBoltProjectile(apCaster, apSpell, apDominantEffect, pavEffect, aOrigin, aRotation);
             }
             else {
-                pprojectile_3 = 0;
+                pprojectile_3 = nullptr;
             }
             pprojectile_2 = pprojectile_3;
             break;
@@ -503,7 +503,7 @@ void MagicProjectile::Launch(
                     MagicSprayProjectile(apCaster, apSpell, apDominantEffect, pavEffect, aOrigin, aRotation);
             }
             else {
-                pprojectile_5 = 0;
+                pprojectile_5 = nullptr;
             }
             pprojectile_2 = pprojectile_5;
             break;
@@ -517,7 +517,7 @@ void MagicProjectile::Launch(
                 );
             }
             else {
-                pprojectile_4 = 0;
+                pprojectile_4 = nullptr;
             }
             pprojectile_2 = pprojectile_4;
             break;
@@ -527,7 +527,7 @@ void MagicProjectile::Launch(
         }
     }
     if (pprojectile_2) {
-        ReferenceProcessLists.AddReference(pprojectile_2, PROCESS_TYPE_HIGH, 0, 0, 0);
+        ReferenceProcessLists.AddReference(pprojectile_2, PROCESS_TYPE_HIGH, false, false, nullptr);
     }
 }
 

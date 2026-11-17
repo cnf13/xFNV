@@ -22,8 +22,8 @@ bool BSTaskletManager::CreateTaskGroup(BSTaskletGroup& aResult) {
         aResult.pData = pData;
     }
     else {
-        bResult = 0;
-        aResult.pData = 0;
+        bResult = false;
+        aResult.pData = nullptr;
     }
     return bResult;
 }
@@ -35,7 +35,7 @@ void BSTaskletManager::DestroyTaskGroup(BSTaskletGroup& aGroup) {
             aGroup.pData->WaitForCompletion(false);
         }
         DestroyTaskGroupData(aGroup.pData);
-        aGroup.pData = 0;
+        aGroup.pData = nullptr;
     }
 }
 
@@ -79,7 +79,7 @@ void BSTaskletManager::SignalInstanceAvailable() {
     int32_t* lpAddend = &InstanceSema.iCount;
     InstanceSema.hSemaphore->Release();
     InterlockedIncrementInt32(lpAddend);
-    bSignaled = 1;
+    bSignaled = true;
     InstanceAvailable();
 }
 
@@ -90,18 +90,18 @@ BSTaskletManager& BSTaskletManager::QInstance() {
 
 bool BSTaskletManager::RegisterOnExitCallback(BSTaskletManagerCallback* apCallback) {
     if (BSTaskletManager::QInstance().InstanceSema.iCount || (BSTaskletManager::siNumExit >= 16)) {
-        return (bool)0;
+        return false;
     }
     BSTaskletManager::spOnExit[BSTaskletManager::siNumExit++] = apCallback;
-    return (bool)1;
+    return true;
 }
 
 bool BSTaskletManager::RegisterOnStartupCallback(BSTaskletManagerCallback* apCallback) {
     if (BSTaskletManager::QInstance().InstanceSema.iCount || (BSTaskletManager::siNumStartup >= 16)) {
-        return (bool)0;
+        return false;
     }
     BSTaskletManager::spOnStartup[BSTaskletManager::siNumStartup++] = apCallback;
-    return (bool)1;
+    return true;
 }
 
 void BSTaskletManager::operator delete(void* apMemory) {

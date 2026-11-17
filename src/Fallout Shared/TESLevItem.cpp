@@ -123,7 +123,7 @@ void TESLevItem::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
 void TESLevItem::InitItem() {
     if (!TESForm::GetInitialized()) {
         static_cast<TESLeveledList*>(this)->InitItem(this);
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 

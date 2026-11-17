@@ -287,7 +287,7 @@ void hkpMouseSpringAction::applyAction(const hkStepInfo& stepInfo) {
     float maxImpulse = pMotion->getMass();
     maxImpulse = stepInfo.m_deltaTime * maxImpulse * m_maxRelativeForce;
     if (impulseLen2 > maxImpulse * maxImpulse) {
-        float len = static_cast<float>(std::sqrt(impulseLen2));
+        float len = std::sqrt(impulseLen2);
         float factor = 1.0f / len;
         factor = factor * maxImpulse;
         impulse.m_quad[0] = factor * impulse.m_quad[0];

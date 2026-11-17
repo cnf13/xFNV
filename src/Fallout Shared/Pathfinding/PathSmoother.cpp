@@ -80,20 +80,20 @@ PathSmoother::~PathSmoother() {
         RightVerts.GetAt(static_cast<int32_t>(i))->~UniqueVert();
         TheScrapHeap.Deallocate(RightVerts.GetAt(static_cast<int32_t>(i)));
     }
-    LeftVerts.Clear(1);
-    RightVerts.Clear(1);
+    LeftVerts.Clear(true);
+    RightVerts.Clear(true);
     for (uint32_t j = 0; j < LeftEdges.iSize; ++j) {
         TheScrapHeap.Deallocate(LeftEdges.GetAt(static_cast<int32_t>(j)));
     }
     for (uint32_t k = 0; k < RightEdges.iSize; ++k) {
         TheScrapHeap.Deallocate(RightEdges.GetAt(static_cast<int32_t>(k)));
     }
-    LeftEdges.Clear(1);
-    RightEdges.Clear(1);
+    LeftEdges.Clear(true);
+    RightEdges.Clear(true);
     for (uint32_t m = 0; m < PathEdges.iSize; ++m) {
         TheScrapHeap.Deallocate(PathEdges.GetAt(static_cast<int32_t>(m)));
     }
-    PathEdges.Clear(1);
+    PathEdges.Clear(true);
 }
 
 void PathSmoother::AddPathingNode(const PathingLocation& aLocation) {
@@ -405,11 +405,11 @@ bool PathSmoother::SmoothPath(
     LeftEdges.SetReservedSize(2 * aLinks.iSize);
     RightEdges.SetReservedSize(2 * aLinks.iSize);
     PathEdges.SetReservedSize(2 * aLinks.iSize);
-    LeftVerts.Clear(0);
-    RightVerts.Clear(0);
-    LeftEdges.Clear(0);
-    RightEdges.Clear(0);
-    PathEdges.Clear(0);
+    LeftVerts.Clear(false);
+    RightVerts.Clear(false);
+    LeftEdges.Clear(false);
+    RightEdges.Clear(false);
+    PathEdges.Clear(false);
     BuildInternalArrays();
     BuildShrunkEdgeLeftRightArrays();
     bool bCanFit = CheckBoundsEdges();
@@ -420,14 +420,14 @@ bool PathSmoother::SmoothPath(
     BuildStraightenedPath();
     HandleAvoidNodes();
     if (abAddNodesIfFail || apBadNodeArray->IsEmpty()) {
-        BuildFinalPath(1, 1);
+        BuildFinalPath(true, true);
         ComputeTangents();
     }
     return bCanFit;
 }
 
 void PathSmoother::AddPathingNode_006ED730(const NiPoint3& aLocation, NavMeshInfo* apInfo) {
-    PathingLocation apLocation(static_cast<const NiPoint3*>(&aLocation), apInfo);
+    PathingLocation apLocation((&aLocation), apInfo);
     AddPathingNode(apLocation);
 }
 
@@ -442,11 +442,11 @@ bool PathSmoother::CheckLineOfSight(
                 PathEdges.GetAt(aiFirstEdgeIndex)->LeftShrunkLocation,
                 PathEdges.GetAt(aiFirstEdgeIndex)->RightShrunkLocation, aLineStart, aLineEnd
             )) {
-            return 0;
+            return false;
         }
         ++aiFirstEdgeIndex;
     }
-    return 1;
+    return true;
 }
 
 void PathSmoother::BuildShrunkEdgeLeftRightArrays() {
@@ -455,8 +455,8 @@ void PathSmoother::BuildShrunkEdgeLeftRightArrays() {
     LeftVerts.GetFirst()->ShrunkLocation = pVert->Location;
     pVert = RightVerts.GetFirst();
     RightVerts.GetFirst()->ShrunkLocation = pVert->Location;
-    for (uint32_t i = 1; i < LeftVerts.iSize - 1; i = ComputeShrunkPoint(i, fSmoothingRadius, 1)) {}
-    for (uint32_t i = 1; i < RightVerts.iSize - 1; i = ComputeShrunkPoint(i, fSmoothingRadius, 0)) {}
+    for (uint32_t i = 1; i < LeftVerts.iSize - 1; i = ComputeShrunkPoint(i, fSmoothingRadius, true)) {}
+    for (uint32_t i = 1; i < RightVerts.iSize - 1; i = ComputeShrunkPoint(i, fSmoothingRadius, false)) {}
     pVert = *static_cast<PathSmoother::UniqueVert**>(LeftVerts.GetTail());
     (*static_cast<PathSmoother::UniqueVert**>(LeftVerts.GetTail()))->ShrunkLocation = pVert->Location;
     pVert = *static_cast<PathSmoother::UniqueVert**>(RightVerts.GetTail());
@@ -736,13 +736,13 @@ bool PathSmoother::TestBoundsEdgeAgainstOtherBound(BoundsEdge* apEdge1, BoundsEd
     }
     NiPoint3 kPush = pVert->ShrunkLocation - pVert->Location;
     PathingLocation kVertLocation(&pVert->ShrunkLocation, pVert->hNavMeshTri.pNavMeshInfo);
-    if (Pathing::CheckLineOfSight(kVertLocation, pVert->ShrunkLocation + kPush, 0, 0)) {
+    if (Pathing::CheckLineOfSight(kVertLocation, pVert->ShrunkLocation + kPush, nullptr, nullptr)) {
         NiPoint3 kPushed1 = pVert->ShrunkLocation + kPush;
         PathingLocation kStartLocation(&kPushed1, pVert->hNavMeshTri.pNavMeshInfo);
         NiPoint3 kPushed2 = pVert->ShrunkLocation + kPush;
         PathingLocation kEndLocation(&kPushed2, pVert->hNavMeshTri.pNavMeshInfo);
-        if (Pathing::CheckLineOfSight(kStartLocation, kStart, 0, 0) &&
-            Pathing::CheckLineOfSight(kEndLocation, kEnd, 0, 0)) {
+        if (Pathing::CheckLineOfSight(kStartLocation, kStart, nullptr, nullptr) &&
+            Pathing::CheckLineOfSight(kEndLocation, kEnd, nullptr, nullptr)) {
             PathSmoother::UniqueVert* pNewVert = SplitBoundsEdge(apEdge1->iEdgeIndex, abLeft);
             pNewVert->Location = pVert->ShrunkLocation;
             pNewVert->ShrunkLocation = pVert->ShrunkLocation + kPush * 0.1f;
@@ -941,14 +941,14 @@ void PathSmoother::HandleWaterTriangles() {
         }
         PathEdges.GetAt(static_cast<int32_t>(i))->eEnterLeaveWater = PathSmoother::ELW_NONE;
     }
-    bool aValue = 1;
+    bool aValue = true;
     uint32_t ifirstWaterTri = waterTris.Find(aValue, 0, &BSSimpleArray<bool, 1024>::DefaultEqualFunctionByAddress);
     while (ifirstWaterTri != -1) {
         NiPoint3* p_GoalLocation;
         NiPoint3* p_BestPointOnEdge;
         PathSmoother::PathEdge* plastEdge;
         PathSmoother::PathEdge* pfirstEdge;
-        bool v18 = 0;
+        bool v18 = false;
         uint32_t ilastWaterTri =
             waterTris.Find(v18, ifirstWaterTri + 1, &BSSimpleArray<bool, 1024>::DefaultEqualFunctionByAddress);
         if (ilastWaterTri == -1) {
@@ -961,12 +961,12 @@ void PathSmoother::HandleWaterTriangles() {
             pfirstEdge = PathEdges.GetAt(static_cast<int32_t>(ifirstWaterTri - 1));
         }
         else {
-            pfirstEdge = 0;
+            pfirstEdge = nullptr;
         }
         PathSmoother::PathEdge* pfirstEdge_2 = pfirstEdge;
         uint32_t v5 = waterTris.iSize;
         if (ilastWaterTri == v5 - 1) {
-            plastEdge = 0;
+            plastEdge = nullptr;
         }
         else {
             plastEdge = PathEdges.GetAt(static_cast<int32_t>(ilastWaterTri + 1));
@@ -1007,7 +1007,7 @@ void PathSmoother::HandleWaterTriangles() {
             ifirstWaterTri = -1;
         }
         else {
-            bool v13 = 1;
+            bool v13 = true;
             ifirstWaterTri =
                 waterTris.Find(v13, ilastWaterTri + 1, &BSSimpleArray<bool, 1024>::DefaultEqualFunctionByAddress);
         }
@@ -1023,7 +1023,7 @@ void PathSmoother::BuildStraightenedPath() {
     int32_t icurrentEdge = -1;
     int32_t inextEdge = 1;
     float ftotalNormalDelta = 0.0f;
-    while (1) {
+    while (true) {
         uint32_t FormFlags = PathEdges.iSize;
         if (inextEdge >= static_cast<int32_t>(FormFlags + 1)) {
             break;
@@ -1033,19 +1033,19 @@ void PathSmoother::BuildStraightenedPath() {
             PathSmoother::PathEdge** v4 = &PathEdges.GetAt(inextEdge - 1);
             ftotalNormalDelta = 1.0 - (*v4)->fTriangleNormalDelta + ftotalNormalDelta;
         }
-        bool bAddNode = 0;
+        bool bAddNode = false;
         if (!(ftotalNormalDelta > 0.20000000298023224)) {
             PathSmoother::PathEdge* v11;
             uint32_t v5 = PathEdges.iSize;
             if (inextEdge == v5) {
-                v11 = 0;
+                v11 = nullptr;
             }
             else {
                 v11 = PathEdges.GetAt(inextEdge);
             }
             PathSmoother::PathEdge* pnextEdge = v11;
             if (v11 && pnextEdge->eEnterLeaveWater) {
-                bAddNode = 1;
+                bAddNode = true;
             }
             else {
                 NiPoint3* p_GoalLocation;
@@ -1066,12 +1066,12 @@ void PathSmoother::BuildStraightenedPath() {
                 }
                 NiPoint3 testEndPoint = *p_GoalLocation;
                 if (!CheckLineOfSight(icurrentEdge + 1, inextEdge - 1, testStartPoint, testEndPoint)) {
-                    bAddNode = 1;
+                    bAddNode = true;
                 }
             }
         }
         else {
-            bAddNode = 1;
+            bAddNode = true;
         }
         if (bAddNode) {
             NavMeshInfo* pNavMeshInfo = PathEdges.GetAt(inextEdge - 1)->hNavMeshEdge.pNavMeshInfo;
@@ -1222,7 +1222,7 @@ void PathSmoother::HandleAvoidNodes() {
                             if (v50) {
                                 if (ii > i_2 + 1) {
                                     int32_t howMany = ii - i_2 - 1;
-                                    StraightenedPath.RemoveRange(i_2 + 1, static_cast<uint32_t>(howMany), 0);
+                                    StraightenedPath.RemoveRange(i_2 + 1, static_cast<uint32_t>(howMany), false);
                                 }
                                 {
                                     PathingLocation* afCircleRadiusb =
@@ -1317,13 +1317,13 @@ char PathSmoother::SegmentClearOfEdges(NiPoint3* a1, NiPoint3* a2) {
 bool PathSmoother::PointInShrunkPath(NiPoint3* aLocation) {
     float afZDiff;
     if (PathEdges.IsEmpty()) {
-        return 1;
+        return true;
     }
     if (NavMeshMath::IsPointInsideTriangle(
             StartLocation, PathEdges.GetAt(0)->pRightVert->ShrunkLocation,
             PathEdges.GetAt(0)->pLeftVert->ShrunkLocation, *aLocation, afZDiff, 180.0f, 180.0f
         )) {
-        return 1;
+        return true;
     }
     for (uint32_t uiIndex = 0; uiIndex < PathEdges.iSize - 1; ++uiIndex) {
         PathSmoother::UniqueVert** v3 = &PathEdges.GetAt(static_cast<int32_t>(uiIndex))->pLeftVert;
@@ -1334,7 +1334,7 @@ bool PathSmoother::PointInShrunkPath(NiPoint3* aLocation) {
                     PathEdges.GetAt(static_cast<int32_t>(uiIndex + 1))->pRightVert->ShrunkLocation, *aLocation, afZDiff,
                     180.0f, 180.0f
                 )) {
-                return 1;
+                return true;
             }
         }
         else {
@@ -1346,7 +1346,7 @@ bool PathSmoother::PointInShrunkPath(NiPoint3* aLocation) {
                     PathEdges.GetAt(static_cast<int32_t>(uiIndex + 1))->pLeftVert->ShrunkLocation, *aLocation, afZDiff,
                     180.0f, 180.0f
                 )) {
-                return 1;
+                return true;
             }
         }
     }
@@ -1395,7 +1395,7 @@ PathSmoother::UniqueVert* PathSmoother::DuplicateVert(
             }
             pNewVert->EdgeList.Add(pOriginalVert->EdgeList.GetAt(static_cast<int32_t>(i)));
         }
-        pOriginalVert->EdgeList.SetSize(iHalfEdgeCount, 1);
+        pOriginalVert->EdgeList.SetSize(iHalfEdgeCount, true);
     }
     if (abLeft) {
         LeftVerts.Insert(aiVertIndex + 1, pNewVert);

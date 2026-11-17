@@ -131,10 +131,11 @@ void hkHingeConstraintCinfo::LoadBinary(NiStream& arStream) {
     hkpHingeConstraintData* pd = static_cast<hkpHingeConstraintData*>(pData);
     NiBinaryStream* m_pkIstr = (&arStream)->Istr();
     hkTransform* p_m_transformA = &pd->m_atoms.m_transforms.m_transformA;
-    m_pkIstr->m_uiAbsoluteCurrentPos += m_pkIstr->m_pfnRead(m_pkIstr, &pd->m_atoms.m_transforms.m_transformA, 64, 0, 0);
+    m_pkIstr->m_uiAbsoluteCurrentPos +=
+        m_pkIstr->m_pfnRead(m_pkIstr, &pd->m_atoms.m_transforms.m_transformA, 64, nullptr, 0);
     NiBinaryStream* v6 = (&arStream)->Istr();
     hkTransform* p_m_transformB = &pd->m_atoms.m_transforms.m_transformB;
-    v6->m_uiAbsoluteCurrentPos += v6->m_pfnRead(v6, p_m_transformB, 64, 0, 0);
+    v6->m_uiAbsoluteCurrentPos += v6->m_pfnRead(v6, p_m_transformB, 64, nullptr, 0);
     if (!arStream.m_bSourceIsLittleEndian) {
         p_m_transformA->m_translation.m_quad[0] = std::bit_cast<float>(
             static_cast<int32_t>(__builtin_bswap32(std::bit_cast<uint32_t>(p_m_transformA->m_translation.m_quad[0])))

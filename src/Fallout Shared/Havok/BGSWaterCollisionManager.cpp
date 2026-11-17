@@ -48,7 +48,7 @@ void BGSWaterCollisionManager::PlaySplashEffects(float afSplashingBodySize, NiPo
     }
     if (kSound.IsValid()) {
         kSound.SetPosition(arSplashLocation.x, arSplashLocation.y, arSplashLocation.z);
-        kSound.Play(0);
+        kSound.Play(false);
         if (fScale > 0.0 && pPlayer->GetParentCell() && pPlayer->GetParentCell()->GetWaterType() &&
             !pPlayer->GetParentCell()->GetWaterType()->IsDangerous()) {
             NiMatrix3 kRotation;

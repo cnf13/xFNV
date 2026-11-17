@@ -30,7 +30,7 @@ void TESRegionDataGrass::Save() {
             pList = static_cast<BSSimpleList<TESRegionGrassObject*>*>(v6);
         }
         else {
-            pList = 0;
+            pList = nullptr;
         }
         BSSimpleList<TESRegionGrassObject*>* pList_2 = pList;
         uint32_t i = 0;
@@ -154,13 +154,13 @@ bool TESRegionDataGrass::Validate() {
 
 bool TESRegionDataGrass::LoadRegionDataGrass(TESFile* apFile) {
     if (!apFile || apFile->GetTESChunk() != RDGS_ID) {
-        return 0;
+        return false;
     }
     uint32_t isize = apFile->GetChunkSize();
     uint32_t icount = isize >> 3;
     if (isize % 8) {
         Warning("MODELS: Invalid Region Grass Object Data in file \"%s\".", &apFile->m_Filename);
-        return 0;
+        return false;
     }
     else {
         if (icount) {
@@ -181,7 +181,7 @@ bool TESRegionDataGrass::LoadRegionDataGrass(TESFile* apFile) {
                     pobj = ::new (v6) TESRegionGrassObject(&pdataArray[i]);
                 }
                 else {
-                    pobj = 0;
+                    pobj = nullptr;
                 }
                 if (pobj) {
                     if (pobj->GetObject()) {
@@ -195,6 +195,6 @@ bool TESRegionDataGrass::LoadRegionDataGrass(TESFile* apFile) {
             }
             ourFree(pdataArray);
         }
-        return 1;
+        return true;
     }
 }

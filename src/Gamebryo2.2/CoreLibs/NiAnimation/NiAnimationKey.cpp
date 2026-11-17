@@ -15,7 +15,7 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 
 #include <bit>
-#include <stdint.h>
+#include <cstdint>
 
 void NiAnimationKey::LoadBinary(NiStream& stream) {
     uint32_t v4;
@@ -129,9 +129,9 @@ void NiAnimationKey::CopySequence(
             pkNewEulerKey->m_uiNumKeys[0] = 0;
             pkNewEulerKey->m_uiNumKeys[1] = 0;
             pkNewEulerKey->m_uiNumKeys[2] = 0;
-            pkNewEulerKey->m_apkKeys[0] = 0;
-            pkNewEulerKey->m_apkKeys[1] = 0;
-            pkNewEulerKey->m_apkKeys[2] = 0;
+            pkNewEulerKey->m_apkKeys[0] = nullptr;
+            pkNewEulerKey->m_apkKeys[1] = nullptr;
+            pkNewEulerKey->m_apkKeys[2] = nullptr;
             pkNewEulerKey->m_eType[0] = NOINTERP;
             pkNewEulerKey->m_eType[1] = NOINTERP;
             pkNewEulerKey->m_eType[2] = NOINTERP;
@@ -143,7 +143,7 @@ void NiAnimationKey::CopySequence(
             pkNewEulerKey->m_ucSizes[2] = 0;
         }
         else {
-            pkNewEulerKey = 0;
+            pkNewEulerKey = nullptr;
         }
         pkNewKeys = pkNewEulerKey;
         uiNewNumKeys = 1;
@@ -187,7 +187,7 @@ void NiAnimationKey::CopySequence(
             }
         }
         else {
-            pkNewKeys = 0;
+            pkNewKeys = nullptr;
         }
     }
 }
@@ -197,8 +197,7 @@ NiAnimationKey* NiAnimationKey::CreateFunction_00A2A5A0(NiStream& arStream, uint
     uint32_t v2 = auiCount;
     size_t v3 = auiCount <= SIZE_MAX / sizeof(NiFloatKey) ? sizeof(NiFloatKey) * auiCount : SIZE_MAX;
     size_t* v4 = static_cast<size_t*>(MemoryManager_Singleton.Allocate(
-        (static_cast<uint32_t>(static_cast<uint32_t>(v3) + static_cast<uint32_t>(sizeof(size_t))) <
-         static_cast<uint32_t>(v3))
+        ((static_cast<uint32_t>(v3) + static_cast<uint32_t>(sizeof(size_t))) < static_cast<uint32_t>(v3))
             ? -1
             : v3 + sizeof(size_t)
     ));
@@ -208,7 +207,7 @@ NiAnimationKey* NiAnimationKey::CreateFunction_00A2A5A0(NiStream& arStream, uint
         v5 = reinterpret_cast<NiAnimationKey*>(v4 + 1);
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     if (auiCount) {
         NiFloatKey* v6 = static_cast<NiFloatKey*>(v5);

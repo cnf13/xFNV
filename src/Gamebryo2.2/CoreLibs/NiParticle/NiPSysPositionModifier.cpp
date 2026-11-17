@@ -79,7 +79,7 @@ NiObject* NiPSysPositionModifier::CreateObject() {
     NiPSysPositionModifier* v0 =
         static_cast<NiPSysPositionModifier*>(NiMemObject::operator new(sizeof(NiPSysPositionModifier)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysPositionModifier;
 }

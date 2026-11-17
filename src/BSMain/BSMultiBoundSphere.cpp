@@ -30,7 +30,7 @@ NiObject* BSMultiBoundSphere::CreateClone(NiCloningProcess& arCloneData) {
         v3 = ::new (apMemory) BSMultiBoundSphere;
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     CopyMembers(v3, arCloneData);
     return v3;

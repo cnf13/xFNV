@@ -32,7 +32,7 @@ void TESWeightForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESWeightForm::CompareComponent(BaseFormComponent* apCompareFC) {
     TESWeightForm* v5 = dynamic_cast<TESWeightForm*>(apCompareFC);
     if (!v5) {
-        return (bool)1;
+        return true;
     }
     double flt004 = (double)GetWeight();
     return (bool)((uint8_t)(flt004 != v5->GetWeight()));

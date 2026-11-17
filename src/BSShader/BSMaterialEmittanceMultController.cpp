@@ -56,7 +56,7 @@ void BSMaterialEmittanceMultController::LinkObject(NiStream& kStream) {
             v5 = ::new (v4) NiFloatInterpolator(ObjectFromLinkID);
         }
         else {
-            v5 = 0;
+            v5 = nullptr;
         }
         m_spInterpolator = v5;
         m_spInterpolator.m_pObject->Collapse();

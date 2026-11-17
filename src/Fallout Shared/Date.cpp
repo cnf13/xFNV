@@ -62,7 +62,7 @@ uint64_t Date::CalculateFullDateRaw(uint16_t asDate) {
 
 uint16_t Date::GetDaysInMonth(CALENDAR_MONTH aIndex) {
     if (((int32_t)aIndex) < 12) {
-        return (uint16_t)Date::DaysInMonth[(int32_t)aIndex];
+        return Date::DaysInMonth[(int32_t)aIndex];
     }
     else {
         return (uint16_t)0;
@@ -74,7 +74,7 @@ uint16_t Date::CalculateDate(uint16_t asDay, uint16_t asMonth) {
     if (((uint32_t)((int32_t)asMonth)) > 0xCu) {
         asMonth = (uint16_t)11;
     }
-    if (((int32_t)asDay) >= ((int32_t)((uint16_t)Date::DaysInMonth[asMonth]))) {
+    if (((int32_t)asDay) >= ((int32_t)Date::DaysInMonth[asMonth])) {
         asDay = (uint16_t)(Date::DaysInMonth[asMonth] - 1);
     }
     uint16_t v5 = asDay;

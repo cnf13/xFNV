@@ -259,7 +259,7 @@ void hkpFirstPersonGun::calcVelocityToTarget(
         velocity = kDir;
         return;
     }
-    float fTime = static_cast<float>(fLength / speed);
+    float fTime = (fLength / speed);
     float fScale = static_cast<float>(fTime * -0.5);
     hkVector4 kExtra;
     kExtra.m_quad[0] = fScale * gravity.m_quad[0];
@@ -273,13 +273,13 @@ void hkpFirstPersonGun::calcVelocityToTarget(
     fSum = fZZ + fSum;
     float fExtraLength = __builtin_elementwise_sqrt(fSum);
     if (fExtraLength > speed) {
-        float fShrink = static_cast<float>(speed / fExtraLength);
+        float fShrink = (speed / fExtraLength);
         kExtra.m_quad[0] = fShrink * kExtra.m_quad[0];
         kExtra.m_quad[1] = fShrink * kExtra.m_quad[1];
         kExtra.m_quad[2] = fShrink * kExtra.m_quad[2];
         kExtra.m_quad[3] = fShrink * kExtra.m_quad[3];
     }
-    float fDirScale = static_cast<float>(speed / fLength);
+    float fDirScale = (speed / fLength);
     float fX = fDirScale * kDir.m_quad[0];
     float fY = fDirScale * kDir.m_quad[1];
     float fZ = fDirScale * kDir.m_quad[2];

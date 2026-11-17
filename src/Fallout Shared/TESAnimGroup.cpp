@@ -24,7 +24,7 @@
 #include "Reconstruction.hpp"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 AnimGroupInfoArray animGroupInfo{
     {"Idle", false, AGS_IDLE, AGAT_LOOP, {AGA_START, AGA_STOP, AGA_NONE}},
@@ -839,7 +839,7 @@ char* GetNextLineInString(char* Str) {
         return Stra;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -850,14 +850,14 @@ void GetMoveHandAndPowerArmorTypeFromAnimName(
     bool* abIsPowerArmor
 ) {
     const char* plastSlash = std::strrchr(apPath, '\\');
-    *abIsPowerArmor = 0;
+    *abIsPowerArmor = false;
     *a2 = AGM_NONE;
     *a3 = AGW_NONE;
     if (plastSlash) {
         const char* String1 = plastSlash + 1;
         uint32_t v4 = BSstrlen("PA");
         if (!_strnicmp(String1, "PA", v4)) {
-            *abIsPowerArmor = 1;
+            *abIsPowerArmor = true;
             String1 += BSstrlen("PA");
         }
         for (uint32_t n = 1; n < 4; ++n) {
@@ -944,13 +944,13 @@ bool TESAnimGroup::IsJumpingLoopAnim() {
 
 bool TESAnimGroup::SetTime(uint32_t aiIndex, float afValue) {
     if (!times) {
-        return (bool)0;
+        return false;
     }
     if (aiIndex >= ((uint32_t)((int32_t)frameCount))) {
-        return (bool)0;
+        return false;
     }
     times[aiIndex] = afValue;
-    return (bool)1;
+    return true;
 }
 
 void TESAnimGroup::SetSpeed(NiPoint3* apSpeed) {
@@ -1155,7 +1155,7 @@ void TESAnimGroup::PlaySounds(
                                             soundHand_2.SetVolume(0.98f);
                                             float v41 = v86 * 1.0;
                                             soundHand_2.SetModFrequency(v41);
-                                            soundHand_2.Play(0);
+                                            soundHand_2.Play(false);
                                         }
                                     }
                                 }
@@ -1228,7 +1228,7 @@ void TESAnimGroup::PlaySounds(
                                     soundHand_4.SetVolume(0.98f);
                                     float v37 = v86 * 1.0;
                                     soundHand_4.SetModFrequency(v37);
-                                    soundHand_4.Play(0);
+                                    soundHand_4.Play(false);
                                 }
                             }
                         }
@@ -1278,7 +1278,7 @@ void TESAnimGroup::PlaySounds(
                                         soundHand_3.SetVolume(0.98f);
                                         float v38 = v86 * 1.0;
                                         soundHand_3.SetModFrequency(v38);
-                                        soundHand_3.Play(0);
+                                        soundHand_3.Play(false);
                                     }
                                 }
                                 if (pItem) {
@@ -1300,7 +1300,7 @@ void TESAnimGroup::PlaySounds(
 void TESAnimGroup::SetType_(ANIM_GROUP_ENUM a2) {
     int32_t i;
     sType = a2;
-    for (i = 0; i < 5 && *animGroupActionNames[i][animGroupInfo[(TESAnimGroup::GetType(a2))].eAction]; ++i) {
+    for (i = 0; i < 5 && *animGroupActionNames[i][animGroupInfo[TESAnimGroup::GetType(a2)].eAction]; ++i) {
         ;
     }
     frameCount = i;
@@ -1314,7 +1314,7 @@ void TESAnimGroup::SetType_(ANIM_GROUP_ENUM a2) {
         ourMemset(times, 0, sizeof(float) * frameCount);
     }
     else {
-        times = 0;
+        times = nullptr;
     }
 }
 
@@ -1333,7 +1333,7 @@ void TESAnimGroup::SetSoundCount(uint32_t aiCount) {
             ourMemcpy(sounds, Block, sizeof(GROUP_SOUND) * v5);
             ourFree(Block);
             for (uint32_t i = soundCount; i < this->soundCount; ++i) {
-                sounds[i].pSound = 0;
+                sounds[i].pSound = nullptr;
                 sounds[i].fTime = 0.0;
                 sounds[i].eType = -6;
                 sounds[i].fPitch = 1.0;
@@ -1342,7 +1342,7 @@ void TESAnimGroup::SetSoundCount(uint32_t aiCount) {
         else {
             sounds = static_cast<GROUP_SOUND*>(ourMalloc(sizeof(GROUP_SOUND) * this->soundCount));
             for (uint32_t j = 0; j < this->soundCount; ++j) {
-                sounds[j].pSound = 0;
+                sounds[j].pSound = nullptr;
                 sounds[j].fTime = 0.0;
                 sounds[j].eType = -6;
                 sounds[j].fPitch = 1.0;
@@ -1351,7 +1351,7 @@ void TESAnimGroup::SetSoundCount(uint32_t aiCount) {
     }
     else {
         ourFree(sounds);
-        sounds = 0;
+        sounds = nullptr;
     }
 }
 
@@ -1362,7 +1362,7 @@ void TESAnimGroup::SetParentRootNode(const char* a2) {
 void TESAnimGroup::SetupPriorities(BSAnimGroupSequence* apSequence) {
     for (int32_t i = 0; i < 8; ++i) {
         if (pSoundPriorityBoneName[i]) {
-            cSectionPriority[i] = apSequence->GetPriority(pSoundPriorityBoneName[i], 0);
+            cSectionPriority[i] = apSequence->GetPriority(pSoundPriorityBoneName[i], nullptr);
         }
     }
 }
@@ -1381,12 +1381,12 @@ bool TESAnimGroup::IsAttackAction(uint16_t asGroup) {
     // The game tests only 255; there, types 245 to 254 read the string pointers after animGroupInfo
     // (animGroupActionNames), which match no action type. Here, every type past the table returns false.
     if (type >= ANIM_GROUP_COUNT) {
-        return (bool)0;
+        return false;
     }
     if ((type < 74) || (type > 79)) {
         return (bool)((uint8_t)TESAnimGroup::IsAttackAction(animGroupInfo[type].eAction));
     }
-    return (bool)1;
+    return true;
 }
 
 bool TESAnimGroup::IsAttackAction(ANIM_GROUP_ACTION_TYPE aeType) {
@@ -1536,7 +1536,7 @@ bool TESAnimGroup::IsIronSightsAction(ANIM_GROUP_ENUM aeGroup) {
 
 bool TESAnimGroup::IsIronSightsAction(uint16_t asGroup) {
     if (asGroup == 255) {
-        return (bool)0;
+        return false;
     }
     int32_t type = TESAnimGroup::GetType(asGroup);
     return (bool)((int8_t)TESAnimGroup::IsIronSightsAction(static_cast<ANIM_GROUP_ENUM>(type)));

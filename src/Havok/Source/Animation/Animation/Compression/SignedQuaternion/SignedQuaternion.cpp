@@ -62,9 +62,9 @@ void packSignedQuaternion32(const hkQuaternion* in, uint8_t* out8) {
         float v9 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v8[0])));
         __m128 v10 = _mm_setzero_ps();
         __m128 v11 = _mm_cmpeq_ss(v8, v10);
-        v10[0] = 3.0f - static_cast<float>(static_cast<float>(v8[0] * v9) * v9);
+        v10[0] = 3.0f - ((v8[0] * v9) * v9);
         __m128 v12 = _mm_setzero_ps();
-        v12[0] = static_cast<float>(0.5f * v9) * v10[0];
+        v12[0] = (0.5f * v9) * v10[0];
         __m128 v13 = _mm_andnot_ps(v11, v12);
         __m128 afY = _mm_mul_ps(_mm_shuffle_ps(v13, v13, 0), v5);
         double X = afY[2];
@@ -188,7 +188,7 @@ void unpackSignedQuaternion32(const uint8_t* in8, hkQuaternion* out) {
     double v5;
     int32_t v3 = *a1 & 0x3FFFF;
     float v11 = 1.0 - static_cast<double>(*a1 >> 18 & 1023) / 1023.0 * (static_cast<double>(*a1 >> 18 & 1023) / 1023.0);
-    float a1c = std::sqrt((double)static_cast<double>(v3));
+    float a1c = std::sqrt(static_cast<double>(v3));
     int32_t v4 = static_cast<int32_t>(a1c);
     float a1d = static_cast<float>(v4);
     float v9 = a1d / 511.0 * 0.5 * 3.1415927410125732;
@@ -272,7 +272,7 @@ void unpackSignedQuaternion48(const uint8_t* in8, hkQuaternion* out) {
     out->m_vec.m_quad[v8 + 1 + (v8 + 1 == v3)] = v13;
     __m128 v9 = _mm_mul_ps(out->m_vec.m_quad, out->m_vec.m_quad);
     __m128 v10 = _mm_add_ps(_mm_shuffle_ps(v9, v9, 78), v9);
-    float v14 = 1.0 - static_cast<float>(_mm_shuffle_ps(v10, v10, 177)[0] + v10[0]);
+    float v14 = 1.0 - (_mm_shuffle_ps(v10, v10, 177)[0] + v10[0]);
     float v15 = std::sqrt((double)v14);
     out->m_vec.m_quad[v3] = v15;
     if ((in16[2] & 0x8000) != 0) {
@@ -315,7 +315,7 @@ const uint8_t* computePackedNurbsOffsets(
         return &base[(maskAndQuantizationSize & 0x7FFFFFFF) + m_blockOffsets[block]];
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

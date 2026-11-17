@@ -60,8 +60,7 @@ void hkpSphereSphereAgent::getClosestPoints(
     __m128 vec = _mm_sub_ps(bodyA.m_motion.pState->m_transform.m_translation.m_quad, pPosB->m_quad);
     __m128 vecSq = _mm_mul_ps(vec, vec);
     float radiusSum = sphereA->m_radius + sphereB->m_radius + input.m_tolerance;
-    float distSquared =
-        _mm_shuffle_ps(vecSq, vecSq, 170)[0] + static_cast<float>(_mm_shuffle_ps(vecSq, vecSq, 85)[0] + vecSq[0]);
+    float distSquared = _mm_shuffle_ps(vecSq, vecSq, 170)[0] + (_mm_shuffle_ps(vecSq, vecSq, 85)[0] + vecSq[0]);
     double distSquaredD = distSquared;
     if (distSquared < radiusSum * radiusSum) {
         double dist;
@@ -112,8 +111,7 @@ void hkpSphereSphereAgent::processCollision(
     __m128 vec = _mm_sub_ps(bodyA.m_motion.pState->m_transform.m_translation.m_quad, pPosB->m_quad);
     __m128 vecSq = _mm_mul_ps(vec, vec);
     float radiusSum = sphereA->m_radius + sphereB->m_radius + input.m_tolerance;
-    float distSquared =
-        _mm_shuffle_ps(vecSq, vecSq, 170)[0] + static_cast<float>(_mm_shuffle_ps(vecSq, vecSq, 85)[0] + vecSq[0]);
+    float distSquared = _mm_shuffle_ps(vecSq, vecSq, 170)[0] + (_mm_shuffle_ps(vecSq, vecSq, 85)[0] + vecSq[0]);
     double distSquaredD = distSquared;
     if (distSquared < radiusSum * radiusSum) {
         hkpProcessCdPoint* point = result.m_firstFreeContactPoint.m_storage;
@@ -185,8 +183,7 @@ void hkpSphereSphereAgent::staticGetClosestPoints(
     __m128 vec = _mm_sub_ps(bodyA.m_motion.pState->m_transform.m_translation.m_quad, pPosB->m_quad);
     __m128 vecSq = _mm_mul_ps(vec, vec);
     float radiusSum = sphereA->m_radius + sphereB->m_radius + input.m_tolerance;
-    float distSquared =
-        _mm_shuffle_ps(vecSq, vecSq, 170)[0] + static_cast<float>(_mm_shuffle_ps(vecSq, vecSq, 85)[0] + vecSq[0]);
+    float distSquared = _mm_shuffle_ps(vecSq, vecSq, 170)[0] + (_mm_shuffle_ps(vecSq, vecSq, 85)[0] + vecSq[0]);
     double distSquaredD = distSquared;
     if (distSquared < radiusSum * radiusSum) {
         double dist;
@@ -226,8 +223,7 @@ void hkpSphereSphereAgent::staticGetPenetrations(
     );
     __m128 vecSq = _mm_mul_ps(vec, vec);
     float radiusSum = sphereA->m_radius + sphereB->m_radius;
-    float distSquared =
-        _mm_shuffle_ps(vecSq, vecSq, 170)[0] + static_cast<float>(_mm_shuffle_ps(vecSq, vecSq, 85)[0] + vecSq[0]);
+    float distSquared = _mm_shuffle_ps(vecSq, vecSq, 170)[0] + (_mm_shuffle_ps(vecSq, vecSq, 85)[0] + vecSq[0]);
     if (distSquared < radiusSum * radiusSum) {
         collector.addCdBodyPair(bodyA, bodyB);
     }

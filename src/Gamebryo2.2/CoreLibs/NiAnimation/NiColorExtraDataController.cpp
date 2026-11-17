@@ -59,7 +59,7 @@ void NiColorExtraDataController::LinkObject(NiStream& kStream) {
             v5 = ::new (v4) NiColorInterpolator(pkColorData);
         }
         else {
-            v5 = 0;
+            v5 = nullptr;
         }
         m_spInterpolator = v5;
         m_spInterpolator.m_pObject->Collapse();

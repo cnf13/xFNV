@@ -52,11 +52,11 @@ void TESAIForm::InitializeDataComponent() {
     AIData.bAggroRadius = (uint8_t)0;
     AIData.uiAggroRadius = (uint32_t)0;
     if (!confidenceSet) {
-        fConfidences[0] = (float)((&gs_fConfidenceCowardly)->Float());
-        fConfidences[1] = (float)((&gs_fConfidenceCautious)->Float());
-        fConfidences[2] = (float)((&gs_fConfidenceAverage)->Float());
-        fConfidences[3] = (float)((&gs_fConfidenceBrave)->Float());
-        fConfidences[4] = (float)((&gs_fConfidenceFoolhardy)->Float());
+        fConfidences[0] = (&gs_fConfidenceCowardly)->Float();
+        fConfidences[1] = (&gs_fConfidenceCautious)->Float();
+        fConfidences[2] = (&gs_fConfidenceAverage)->Float();
+        fConfidences[3] = (&gs_fConfidenceBrave)->Float();
+        fConfidences[4] = (&gs_fConfidenceFoolhardy)->Float();
         confidenceSet = (uint8_t)1;
     }
 }
@@ -76,47 +76,47 @@ void TESAIForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESAIForm::CompareComponent(BaseFormComponent* apCompareFC) {
     TESAIForm* pCompare = dynamic_cast<TESAIForm*>(apCompareFC);
     if (!pCompare) {
-        return 1;
+        return true;
     }
     int32_t ExtraType = AIData.cAggression;
     if (ExtraType != pCompare->AIData.cAggression) {
-        return 1;
+        return true;
     }
     int32_t Assistance = GetAssistance();
     if (Assistance != pCompare->GetAssistance()) {
-        return 1;
+        return true;
     }
     int32_t Priority = AIData.cConfidence;
     if (Priority != pCompare->AIData.cConfidence) {
-        return 1;
+        return true;
     }
     int32_t FlyCamera = AIData.cEnergy;
     if (FlyCamera != pCompare->AIData.cEnergy) {
-        return 1;
+        return true;
     }
     int32_t Responsibility = GetResponsibility();
     if (Responsibility != pCompare->GetResponsibility()) {
-        return 1;
+        return true;
     }
     int32_t EntryPoint = AIData.cMood;
     if (EntryPoint != pCompare->AIData.cMood) {
-        return 1;
+        return true;
     }
     uint32_t Time = AIData.uiAggroRadius;
     if (Time != pCompare->AIData.uiAggroRadius) {
-        return 1;
+        return true;
     }
     int32_t HasAggroRadius = GetHasAggroRadius();
     if (HasAggroRadius != pCompare->GetHasAggroRadius()) {
-        return 1;
+        return true;
     }
     int32_t CastingType = AIData.iServiceFlags;
     if (CastingType != pCompare->AIData.iServiceFlags) {
-        return 1;
+        return true;
     }
     ActorValue::Index TrainingSkill = GetTrainingSkill();
     if (TrainingSkill != pCompare->GetTrainingSkill()) {
-        return 1;
+        return true;
     }
     int32_t RepeatFire = AIData.cTrainingLevel;
     return RepeatFire != pCompare->AIData.cTrainingLevel || AIPackList.Compare(&pCompare->AIPackList);
@@ -272,12 +272,12 @@ uint8_t TESAIForm::GetResponsibility() {
 
 void TESAIForm::SetAIData(AIDATA* pAIData) {
     if (pAIData) {
-        SetAggression(pAIData->cAggression, 1);
+        SetAggression(pAIData->cAggression, true);
         SetAssistance(pAIData->cAssistance);
-        SetConfidence(pAIData->cConfidence, 1);
-        SetEnergy(pAIData->cEnergy, 1);
-        SetResponsibility(pAIData->cResponsibility, 1);
-        SetServiceFlags(pAIData->iServiceFlags, 1);
+        SetConfidence(pAIData->cConfidence, true);
+        SetEnergy(pAIData->cEnergy, true);
+        SetResponsibility(pAIData->cResponsibility, true);
+        SetServiceFlags(pAIData->iServiceFlags, true);
         SetMood(pAIData->cMood);
         SetHasAggroRadius(pAIData->bAggroRadius);
         SetAggroRadius(pAIData->uiAggroRadius);
@@ -359,7 +359,7 @@ bool TESAIForm::SellBuysItem(TESObject* apObject) {
 }
 
 TESPackage* TESAIForm::GetCurrentPackage(Actor* apActor) {
-    TESPackage* ppack = 0;
+    TESPackage* ppack = nullptr;
     if (apActor) {
         TESAIForm* pAIForm;
         TESActorBase* pactorbase = apActor->GetActorBase();
@@ -367,7 +367,7 @@ TESPackage* TESAIForm::GetCurrentPackage(Actor* apActor) {
             pAIForm = static_cast<TESAIForm*>(pactorbase);
         }
         else {
-            pAIForm = 0;
+            pAIForm = nullptr;
         }
         if (pAIForm) {
             return pAIForm->AIPackList.FindCurrentPackage(apActor);
@@ -392,7 +392,7 @@ void TESAIForm::GetMissedPackages(Actor* apActor, BSSimpleList<TESPackage*>* apP
             paiform = static_cast<TESAIForm*>(pactorbase);
         }
         else {
-            paiform = 0;
+            paiform = nullptr;
         }
         if (paiform) {
             paiform->AIPackList.FindMissedPackages(apActor, apPacks, afStartdate, afhour);

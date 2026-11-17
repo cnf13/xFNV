@@ -61,13 +61,13 @@ void TESRegionDataWeather::BlendInto(const TESRegionData* a1, uint32_t a2) {
                         SetOverride(a1->bOverride);
                         uint8_t v5 = a1->cPriority;
                         SetPriority(v5);
-                        weatherList.CopyComponent(&pWeather->weatherList, 0);
+                        weatherList.CopyComponent(&pWeather->weatherList, false);
                     }
                 }
                 return;
             }
             if (!a1->bOverride) {
-                weatherList.CopyComponent(&pWeather->weatherList, 1);
+                weatherList.CopyComponent(&pWeather->weatherList, true);
                 int32_t v6 = cPriority;
                 int32_t v7 = cPriority * v6;
                 int32_t v8 = 100 - cPriority;
@@ -85,7 +85,7 @@ void TESRegionDataWeather::BlendInto(const TESRegionData* a1, uint32_t a2) {
         SetOverride(a1->bOverride);
         uint8_t v3 = a1->cPriority;
         SetPriority(v3);
-        weatherList.CopyComponent(&pWeather->weatherList, 0);
+        weatherList.CopyComponent(&pWeather->weatherList, false);
     }
 }
 
@@ -96,11 +96,11 @@ bool TESRegionDataWeather::Validate() {
 // Loads the weather list chunk with warnings suppressed, then warns once if any were raised.
 void TESRegionDataWeather::LoadRegionDataWeather(TESFile* apFile, TESRegion* apRegion) {
     // The counts are compared signed.
-    int32_t iWarnings = static_cast<int32_t>(MessageHandler::QWarningCount());
+    int32_t iWarnings = MessageHandler::QWarningCount();
     MessageHandler::IncDisableWarningCount(true);
     TESWeatherList::LoadWeatherListChunk(&weatherList, apFile, apRegion);
     MessageHandler::IncDisableWarningCount(false);
-    if (static_cast<int32_t>(MessageHandler::QWarningCount()) > iWarnings && apRegion) {
+    if (MessageHandler::QWarningCount() > iWarnings && apRegion) {
         Warning(
             "Warnings were encountered while loading weather list chunk from region %s", apRegion->GetFormEditorID()
         );

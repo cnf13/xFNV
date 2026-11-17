@@ -47,7 +47,7 @@ bool BSAnimNoteReceiver::Register(
     BSAnimNote::AnimNoteType aeType,
     void (*apCallbackFunc)(TESObjectREFR*, BSAnimNote*)
 ) {
-    bool bret = 0;
+    bool bret = false;
     if (Registered(aeType, apCallbackFunc) == -1) {
         BSAnimNoteReceiver::BSAnimNoteReceiverType* pReceiverType;
         void* pMemory = ourMalloc(sizeof(BSAnimNoteReceiver::BSAnimNoteReceiverType));
@@ -55,7 +55,7 @@ bool BSAnimNoteReceiver::Register(
             pReceiverType = ::new (pMemory) BSAnimNoteReceiver::BSAnimNoteReceiverType(aeType, apCallbackFunc);
         }
         else {
-            pReceiverType = 0;
+            pReceiverType = nullptr;
         }
         BSAnimNoteReceiver::BSAnimNoteReceiverType* pReceiverType_2 = pReceiverType;
         CallTypeA.Add(pReceiverType_2);

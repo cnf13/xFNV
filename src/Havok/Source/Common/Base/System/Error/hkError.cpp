@@ -51,4 +51,4 @@ void hkError::hkReferenceCountError(const hkReferencedObject* a1, const char* a2
 
 hkErrStream::hkErrStream(void* buf, int32_t bufSize)
   : hkOstream(new (static_cast<char*>(buf) + (bufSize - kErrStreamWriterSize))
-                  hkBufferedStreamWriter(buf, bufSize - kErrStreamWriterSize, static_cast<hkBool>(1))) {}
+                  hkBufferedStreamWriter(buf, bufSize - kErrStreamWriterSize, static_cast<hkBool>(true))) {}

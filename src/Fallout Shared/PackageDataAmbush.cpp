@@ -26,7 +26,7 @@ void TESAmbushPackageData::Copy(TESPackageData* apCopy) {
     if (pcopy) {
         if (pAmbushLocation) {
             delete pAmbushLocation;
-            pAmbushLocation = 0;
+            pAmbushLocation = nullptr;
         }
         if (pcopy->pAmbushLocation) {
             PackageLocation* v2;
@@ -35,10 +35,10 @@ void TESAmbushPackageData::Copy(TESPackageData* apCopy) {
                 v2 = ::new (v4) PackageLocation;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pAmbushLocation = v2;
-            pAmbushLocation->Copy(pcopy->pAmbushLocation, 0);
+            pAmbushLocation->Copy(pcopy->pAmbushLocation, false);
         }
     }
 }
@@ -46,19 +46,19 @@ void TESAmbushPackageData::Copy(TESPackageData* apCopy) {
 bool TESAmbushPackageData::Compare(TESPackageData* apCompare) {
     TESAmbushPackageData* v4 = dynamic_cast<TESAmbushPackageData*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (pAmbushLocation) {
         if (pAmbushLocation->Compare(v4->pAmbushLocation)) {
-            return (bool)1;
+            return true;
         }
     }
     else {
         if (v4->pAmbushLocation) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 void TESAmbushPackageData::Save() {

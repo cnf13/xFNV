@@ -11,7 +11,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 void NiLinPosKey::Copy(NiAnimationKey* pkNewKey, const NiAnimationKey* pkOrigKey) {
     NiLinPosKey* pkNewPos = static_cast<NiLinPosKey*>(pkNewKey);

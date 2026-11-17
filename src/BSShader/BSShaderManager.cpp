@@ -201,7 +201,7 @@ BSShaderManager::BSShaderManager() {
     auto Release = [](auto& rspObject) { rspObject = nullptr; };
     pShaderPath[0] = 0;
     pShaderCachePath[0] = 0;
-    bShaderSupport = 1;
+    bShaderSupport = true;
     eCurrentPass = BSSM_EMPTY;
     pCurrentRenderPass = nullptr;
     bSeparateAmbientLight = 1;
@@ -210,13 +210,13 @@ BSShaderManager::BSShaderManager() {
     pFileCreateCallback = &BSShaderManager::DefaultFileCreateFunc;
     pTimerFunction = nullptr;
     pObjectTypeCallback = nullptr;
-    bShaderRendering = 1;
-    bInitialized = 0;
-    bFirstPass = 0;
+    bShaderRendering = true;
+    bInitialized = false;
+    bFirstPass = false;
     bLiteBrite = 0;
     eShaderLevel = 0;
     e2xShaderLevel = 0;
-    bRenderSpecular = 1;
+    bRenderSpecular = true;
     for (NiPointer<BSShader>& spShader : pspShader) {
         spShader = nullptr;
     }
@@ -238,22 +238,22 @@ BSShaderManager::BSShaderManager() {
     Release(spArmorReflectionCubeMap);
     cSceneGraph = 0;
     bUseNoiseMap = 1;
-    bVisibleShadowVolumes = 0;
-    bImageSpaceEffects = 1;
+    bVisibleShadowVolumes = false;
+    bImageSpaceEffects = true;
     iSelfIllumCount = 0;
     Release(spShaderAccumulator);
-    bOcclusionQuery = 0;
+    bOcclusionQuery = false;
     SetFOV(75.0f);
     fSunlightDimmer = 1.0f;
     fTreeDimmer = 1.0f;
     fGrassDimmer = 1.0f;
     fSkinDimmer = 1.0f;
-    bAllow20ShaderHair = 0;
-    bReportBadTangentSpace = 0;
-    bUseRefractionShader = 0;
+    bAllow20ShaderHair = false;
+    bReportBadTangentSpace = false;
+    bUseRefractionShader = false;
     spCamera = nullptr;
-    b30Shaders = 0;
-    bUse30Lighting = 0;
+    b30Shaders = false;
+    bUse30Lighting = false;
     pImageSpaceManager = nullptr;
 }
 
@@ -683,7 +683,7 @@ BSShader* BSShaderManager::GetShader(int32_t aiShaderIndex) {
     if (!BSShaderManager::pRenderer.m_pObject ||
         static_cast<uint32_t>(aiShaderIndex) >=
             sizeof(BSShaderManager::pspShader) / sizeof(BSShaderManager::pspShader[0])) {
-        return 0;
+        return nullptr;
     }
     NiPointer<BSShader>* v1 = &BSShaderManager::pspShader[aiShaderIndex];
     if (v1->m_pObject) {
@@ -781,7 +781,7 @@ BSShader* BSShaderManager::GetShader(int32_t aiShaderIndex) {
                 return v1->m_pObject;
             }
             NiDecRefCount(m_pObject);
-            v1->m_pObject = 0;
+            v1->m_pObject = nullptr;
             result = v1->m_pObject;
             v2->eMemContext = eMemContext;
             break;
@@ -922,13 +922,13 @@ void BSShaderManager::SetShaderVersion(
         if (static_cast<uint8_t>(aiPixel >> 8) && static_cast<uint8_t>(aiVertex >> 8)) {
             v6 = 1;
             BSShaderManager::eShaderLevel = 1;
-            BSShaderManager::bHDR = 0;
+            BSShaderManager::bHDR = false;
             BSShaderManager::iEnabledPasses = BSSM_ENABLED_LIGHTING_PASSES;
         }
         else {
             v6 = 0;
             BSShaderManager::eShaderLevel = 0;
-            BSShaderManager::bHDR = 0;
+            BSShaderManager::bHDR = false;
         }
     LABEL_44:;
         BSShaderManager::iEnabledPasses &= ~BSSM_ENABLED_SHADOWS;
@@ -938,7 +938,7 @@ void BSShaderManager::SetShaderVersion(
     BSShaderManager::eShaderLevel = 2;
     BSShaderManager::iEnabledPasses = BSSM_ENABLED_LIGHTING_PASSES | BSSM_ENABLED_PROJECTED_SHADOW;
     if (static_cast<uint8_t>(aiPixel >> 8) >= 3u && static_cast<uint8_t>(aiVertex >> 8) >= 3u) {
-        BSShaderManager::b30Shaders = 1;
+        BSShaderManager::b30Shaders = true;
     }
     if (apDeviceDesc && apDriver) {
         if (!_strnicmp(apDriver, "ati", 3u)) {
@@ -957,7 +957,7 @@ void BSShaderManager::SetShaderVersion(
                 }
                 BSShaderManager::e2xShaderLevel = 6;
                 if (aiPSInstructions > 255) {
-                    BSShaderManager::bUse30Lighting = 1;
+                    BSShaderManager::bUse30Lighting = true;
                 }
             }
             BSShaderManager::eShadowFormat = 21;
@@ -980,7 +980,7 @@ void BSShaderManager::SetShaderVersion(
                     }
                     BSShaderManager::e2xShaderLevel = 5;
                     if (aiPSInstructions > 255) {
-                        BSShaderManager::bUse30Lighting = 1;
+                        BSShaderManager::bUse30Lighting = true;
                         BSRenderState::eGPUVendor = 1;
                         goto LABEL_43;
                     }
@@ -1004,7 +1004,7 @@ void BSShaderManager::SetShaderVersion(
                         }
                         BSShaderManager::e2xShaderLevel = 5;
                         if (aiPSInstructions > 255) {
-                            BSShaderManager::bUse30Lighting = 1;
+                            BSShaderManager::bUse30Lighting = true;
                             BSRenderState::eGPUVendor = 3;
                             goto LABEL_43;
                         }
@@ -1032,11 +1032,11 @@ LABEL_45:;
         }
     }
     if (BSShaderManager::b30VFog && (BSShaderManager::b30Shaders && bDo30VFog.uValue.b)) {
-        BSShaderManager::b30VFog = 1;
+        BSShaderManager::b30VFog = true;
         BSShaderManager::bImageSpaceEffects = gs_bImageSpaceEffects_Display.uValue.b;
     }
     else {
-        BSShaderManager::b30VFog = 0;
+        BSShaderManager::b30VFog = false;
         BSShaderManager::bImageSpaceEffects = gs_bImageSpaceEffects_Display.uValue.b;
     }
 }
@@ -1048,7 +1048,7 @@ void BSShaderManager::RenderImageSpaceEffects(
 ) {
     BSShaderManager::pImageSpaceManager->RenderEndOfFrameEffects(apRenderer, apScreenBuffer, apDestinationBuffer);
     for (int32_t i = 0; i < 8; ++i) {
-        BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetTexture(i, 0);
+        BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetTexture(i, nullptr);
     }
 }
 
@@ -1098,8 +1098,9 @@ void BSShaderManager::PrepareGeometry(
 ) {
     BSShaderProperty* pbssprop;
     NiShadeProperty* pprop = static_cast<NiShadeProperty*>(apGeometry->GetProperty(3));
-    if (pprop && (pbssprop = pprop->iShaderPropertyType != -1 ? static_cast<BSShaderProperty*>(pprop) : 0) != 0) {
-        BSShaderProperty* pnewbssprop = pbssprop->ClarifyShader(apGeometry, 0, 1);
+    if (pprop &&
+        (pbssprop = pprop->iShaderPropertyType != -1 ? static_cast<BSShaderProperty*>(pprop) : nullptr) != nullptr) {
+        BSShaderProperty* pnewbssprop = pbssprop->ClarifyShader(apGeometry, false, true);
         if (pnewbssprop) {
             apGeometry->RemoveProperty(3);
             pbssprop = pnewbssprop;
@@ -1472,7 +1473,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
             float fBlue = static_cast<float>(64.0 - fX);
             float fLengthSqr =
                 static_cast<float>(static_cast<double>(fGreen) * fGreen + 4096.0 + static_cast<double>(fBlue) * fBlue);
-            float fLength = static_cast<float>(std::sqrt(fLengthSqr));
+            float fLength = std::sqrt(fLengthSqr);
             float fInvLength = static_cast<float>(1.0 / fLength);
             float fRed = static_cast<float>(fInvLength * 64.0);
             fGreen = static_cast<float>(static_cast<double>(fInvLength) * fGreen);
@@ -1498,7 +1499,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
             float fBlue = static_cast<float>(fX - 64.0);
             float fLengthSqr =
                 static_cast<float>(static_cast<double>(fGreen) * fGreen + 4096.0 + static_cast<double>(fBlue) * fBlue);
-            float fLength = static_cast<float>(std::sqrt(fLengthSqr));
+            float fLength = std::sqrt(fLengthSqr);
             float fInvLength = static_cast<float>(1.0 / fLength);
             float fRed = static_cast<float>(-64.0 * fInvLength);
             fGreen = static_cast<float>(static_cast<double>(fInvLength) * fGreen);
@@ -1524,7 +1525,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
             float fBlue = fRow;
             float fLengthSqr =
                 static_cast<float>(static_cast<double>(fRed) * fRed + 4096.0 + static_cast<double>(fBlue) * fBlue);
-            float fLength = static_cast<float>(std::sqrt(fLengthSqr));
+            float fLength = std::sqrt(fLengthSqr);
             float fInvLength = static_cast<float>(1.0 / fLength);
             fRed = static_cast<float>(static_cast<double>(fInvLength) * fRed);
             float fGreen = static_cast<float>(fInvLength * 64.0);
@@ -1550,7 +1551,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
             float fBlue = fRow;
             float fLengthSqr =
                 static_cast<float>(static_cast<double>(fRed) * fRed + 4096.0 + static_cast<double>(fBlue) * fBlue);
-            float fLength = static_cast<float>(std::sqrt(fLengthSqr));
+            float fLength = std::sqrt(fLengthSqr);
             float fInvLength = static_cast<float>(1.0 / fLength);
             fRed = static_cast<float>(static_cast<double>(fInvLength) * fRed);
             float fGreen = static_cast<float>(-64.0 * fInvLength);
@@ -1576,7 +1577,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
             float fGreen = fRow;
             float fLengthSqr =
                 static_cast<float>(static_cast<double>(fRed) * fRed + static_cast<double>(fGreen) * fGreen + 4096.0);
-            float fLength = static_cast<float>(std::sqrt(fLengthSqr));
+            float fLength = std::sqrt(fLengthSqr);
             float fInvLength = static_cast<float>(1.0 / fLength);
             fRed = static_cast<float>(static_cast<double>(fInvLength) * fRed);
             fGreen = static_cast<float>(static_cast<double>(fInvLength) * fGreen);
@@ -1602,7 +1603,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
             float fGreen = fRow;
             float fLengthSqr =
                 static_cast<float>(static_cast<double>(fRed) * fRed + static_cast<double>(fGreen) * fGreen + 4096.0);
-            float fLength = static_cast<float>(std::sqrt(fLengthSqr));
+            float fLength = std::sqrt(fLengthSqr);
             float fInvLength = static_cast<float>(1.0 / fLength);
             fRed = static_cast<float>(static_cast<double>(fInvLength) * fRed);
             fGreen = static_cast<float>(static_cast<double>(fInvLength) * fGreen);
@@ -1964,7 +1965,7 @@ void BSShaderManager::GetModifiedTextureFilename(
     if (pfilenameStart) {
         if (postfix) {
             if (postfix < pfilenameStart) {
-                postfix_2 = 0;
+                postfix_2 = nullptr;
             }
         }
     }
@@ -5031,13 +5032,13 @@ BSRenderedTexture* BSShaderManager::GetSceneDepthRenderedTexture() {
 
 void BSShaderManager::EnableFullScreenScissor(uint32_t uiX0, uint32_t uiY0, uint32_t uiX1, uint32_t uiY1) {
     BSRenderState::SetScissorRect(uiX0, uiY0, uiX1, uiY1, BSRS_LOCK);
-    BSRenderState::SetScissorEnable(1, BSRS_LOCK);
+    BSRenderState::SetScissorEnable(true, BSRS_LOCK);
 }
 
 void BSShaderManager::DisableFullScreenScissor() {
     --BSRenderState::iLock[14];
     --BSRenderState::iLock[13];
-    BSRenderState::SetScissorEnable(0, BSRS_NOLOCK);
+    BSRenderState::SetScissorEnable(false, BSRS_NOLOCK);
 }
 
 void BSShaderManager::SetIsLiteBrite(bool a1) {
@@ -5236,7 +5237,7 @@ void BSShaderManager::Shutdown(eBool a1) {
             }
         }
     }
-    Renderer::spRenderer.operator=(static_cast<NiDX9Renderer*>(0));
+    Renderer::spRenderer.operator=(static_cast<NiDX9Renderer*>(nullptr));
 }
 
 // Loads the shader package apFileName: a 12-byte header (version 100, the shader count, the size of the rest), then
@@ -5253,7 +5254,7 @@ bool ShaderBuffer::Run(const char* apFileName) {
     if (!pFile) {
         return bResult;
     }
-    pFile->Open(0, false);
+    pFile->Open(false, false);
     uint32_t uiComponentSize = 1;
     if (pFile->BinaryRead(auiHeader, sizeof(auiHeader), &uiComponentSize, 1) == sizeof(auiHeader) &&
         auiHeader[0] == 100) {

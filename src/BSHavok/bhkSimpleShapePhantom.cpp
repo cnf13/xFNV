@@ -153,7 +153,7 @@ void bhkSimpleShapePhantom::GetFixedClosestPoints(hkpFixedBufferCdPointCollector
     hkpProcessCollisionInput* m_collisionInput = GethkWorld()->m_collisionInput;
     hkpSimpleShapePhantom* phkObject = static_cast<hkpSimpleShapePhantom*>(this->phkObject);
     hkpCollisionDispatcher* m_dispatcher = m_collisionInput->m_dispatcher;
-    hkpLinkedCollidable* p_m_collidable = 0;
+    hkpLinkedCollidable* p_m_collidable = nullptr;
     if (phkObject) {
         p_m_collidable = &phkObject->m_collidable;
     }

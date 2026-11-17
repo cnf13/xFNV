@@ -43,7 +43,7 @@ hkSingleton<T>& hkSingleton<T>::operator=([[maybe_unused]] const hkSingleton& ot
 // One singleton, in a static list linked through m_next: its name, the function creating it and where the instance is
 // stored. findByName walks m_next comparing m_name.
 struct hkSingletonInitNode {
-    typedef hkReferencedObject* (*SingletonCreationFunction)();
+    using SingletonCreationFunction = hkReferencedObject* (*)();
 
     // The constructor (inline, defined below the list head) links the node in at the list's head.
     hkSingletonInitNode(const char* name, SingletonCreationFunction func, void** ptr);

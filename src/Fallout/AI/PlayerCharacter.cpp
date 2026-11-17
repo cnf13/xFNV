@@ -341,7 +341,7 @@
 #include "SDK/MSVC/string.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 // The names of the causes of death (CAUSE_OF_DEATH).
@@ -449,11 +449,11 @@ void MarkPlayerBones(NiAVObject* apObject) {
     uint32_t a1;
     NiNode* v4;
     if (apObject) {
-        apObject->SetPlayerBone(1);
+        apObject->SetPlayerBone(true);
         if (apObject->IsNode()) {
             v4 = apObject->IsNode();
             a1 = 0;
-            for (i = (uint32_t)v4->GetArrayCount(); a1 < i; i = (uint32_t)v4->GetArrayCount()) {
+            for (i = v4->GetArrayCount(); a1 < i; i = v4->GetArrayCount()) {
                 v2 = v4->GetAt(a1);
                 if (v2) {
                     MarkPlayerBones(v2);
@@ -477,7 +477,7 @@ bool Cmd_DisableHardcoreTracking(
     if (pPlayer) {
         pPlayer->ClearsHardcoreFlag();
     }
-    return 1;
+    return true;
 }
 
 bool au_re_Cmd_IsAlwaysHardcore(
@@ -490,7 +490,7 @@ bool au_re_Cmd_IsAlwaysHardcore(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::IsAlwaysHardcoreConditionalFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::IsAlwaysHardcoreConditionalFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 void SettingsMenu_ToggleHardcore(StartMenu::UserOption* a1) {
@@ -529,7 +529,7 @@ bool Cmd_GetOwnerLastTarget_Execute(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 // Opens the recipe menu for the calling reference's vendor: the actor itself, or the speaker of a talking activator
@@ -544,19 +544,19 @@ bool Cmd_ShowRecipeMenu(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    TESForm* pCategory = 0;
+    TESForm* pCategory = nullptr;
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pCategory
     );
     if (apRefObject) {
-        MobileObject* pMobile = 0;
-        TESObjectREFR* pVendor = 0;
+        MobileObject* pMobile = nullptr;
+        TESObjectREFR* pVendor = nullptr;
         if (apRefObject->IsMobileObject()) {
             pMobile = static_cast<MobileObject*>(apRefObject);
         }
         else {
             BGSTalkingActivator* pActivator = dynamic_cast<BGSTalkingActivator*>(apRefObject->GetObjectReference());
-            pVendor = pActivator ? pActivator->GetTempRef() : 0;
+            pVendor = pActivator ? pActivator->GetTempRef() : nullptr;
         }
         if (pMobile) {
             if (pMobile->IsActor()) {
@@ -572,7 +572,7 @@ bool Cmd_ShowRecipeMenu(
             Interface::CreateRecipeMenu(pVendor, pCategory);
         }
     }
-    return 1;
+    return true;
 }
 
 // The winnings level (0-4, quarters of the casino's maximum winnings) the player has reached at a casino.
@@ -591,13 +591,13 @@ bool Cmd_GetCasinoWinningsLevel(
 ) {
     // The casino's slot and the zeroed slot after it, which ParseParameters is passed with it (call 1's frame bytes).
     TESCasino* apCasino[2];
-    apCasino[1] = 0;
+    apCasino[1] = nullptr;
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &apCasino[0]
     );
     TESCasino* pCasino = apCasino[0];
     if (!pCasino) {
-        return 0;
+        return false;
     }
     for (BSSimpleList<CasinoData*>* pNode = pPlayer->GetCasinoDataList(); pNode && pNode->m_item;
          pNode = pNode->m_pkNext) {
@@ -613,7 +613,7 @@ bool Cmd_GetCasinoWinningsLevel(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 // Sets the player's winnings level (0-4) at a casino and its winnings to that many quarters of the casino's maximum.
@@ -633,7 +633,7 @@ bool Cmd_SetCasinoWinningsLevel(
     // The casino's slot and the zeroed slot after it, which ParseParameters is passed with it (call 1's frame bytes).
     TESCasino* apCasino[2];
     int32_t iLevel;
-    apCasino[1] = 0;
+    apCasino[1] = nullptr;
     iLevel = 0;
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &apCasino[0],
@@ -641,7 +641,7 @@ bool Cmd_SetCasinoWinningsLevel(
     );
     TESCasino* pCasino = apCasino[0];
     if (!pCasino) {
-        return 0;
+        return false;
     }
     for (BSSimpleList<CasinoData*>* pNode = pPlayer->GetCasinoDataList(); pNode && pNode->m_item;
          pNode = pNode->m_pkNext) {
@@ -653,7 +653,7 @@ bool Cmd_SetCasinoWinningsLevel(
             pNode->m_item->iTotalWinnings = iTotalWinnings;
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_UnlockChallenge(
@@ -667,15 +667,15 @@ bool Cmd_UnlockChallenge(
     uint32_t& auiOffset
 ) {
     TESChallenge* a8;
-    a8 = 0;
+    a8 = nullptr;
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
     );
     if (!a8) {
-        return 0;
+        return false;
     }
     TESChallengeManager::UnlockChallenge(a8);
-    return 1;
+    return true;
 }
 
 bool Cmd_RemoveRecurringFromChallenge(
@@ -689,15 +689,15 @@ bool Cmd_RemoveRecurringFromChallenge(
     uint32_t& auiOffset
 ) {
     TESChallenge* a8;
-    a8 = 0;
+    a8 = nullptr;
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
     );
     if (!a8) {
-        return 0;
+        return false;
     }
     a8->RemoveRecurringFromChallenge(1);
-    return 1;
+    return true;
 }
 
 // An IterateInventory callback: appends the item's worn mark, count, name and form ID to the string apData.
@@ -706,7 +706,7 @@ uint8_t apCallback(ItemChange* apItem, BSStringT<char>* apData) {
         if (apItem) {
             const char* pWorn;
             char acBuffer[264];
-            if (apItem->GetWorn(0)) {
+            if (apItem->GetWorn(false)) {
                 pWorn = "[E]";
             }
             else {
@@ -728,10 +728,10 @@ bool TESAnimGroupIsJumpingLandAnim(TESAnimGroup* apThis, [[maybe_unused]] void* 
 
 void ShakeData() {
     char modelPath[268];
-    ShakeData_pModel = 0;
+    ShakeData_pModel = nullptr;
     BSsprintf(modelPath, 260u, "%s\\Characters\\CameraShake.nif", "Meshes");
-    if (FileFinder::Locate(modelPath, 0, 0, 0xFFFFFFFFu)) {
-        ShakeData_pModel = pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+    if (FileFinder::Locate(modelPath, nullptr, 0, 0xFFFFFFFFu)) {
+        ShakeData_pModel = pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
         NiFixedString apString(modelPath);
         NiFixedString* a2 = &apString;
         ShakeData_pModel->SetName(*a2);
@@ -742,7 +742,7 @@ void FreeCameraShake() {
     if (ShakeData_pModel) {
         const char* HandleString = (&ShakeData_pModel->m_kName)->GetHandleString();
         pModelLoader->ReleaseFile(HandleString);
-        ShakeData_pModel = 0;
+        ShakeData_pModel = nullptr;
     }
 }
 
@@ -762,7 +762,7 @@ void SetLastAntiCheatTime() {
 NonLinearInterpolator::NonLinearInterpolator() : fRemainingTime(0.0f) {}
 
 bool NonLinearInterpolator::Interpolate(float afDeltaTime) {
-    fRemainingTime = (float)(fRemainingTime - afDeltaTime);
+    fRemainingTime = (fRemainingTime - afDeltaTime);
     return (bool)((uint8_t)(fRemainingTime <= 0.0));
 }
 
@@ -783,13 +783,13 @@ bool NonLinearInterpolator::Setup(float afStart, float afEnd, float afTime) {
         fPercentages[j] = FLerp(afStart, afEnd, 0.0f, 1.0f, fPercentages[j]);
     }
     if (!std_time_original) {
-        return 0;
+        return false;
     }
     fCurrent = afStart;
     fEnd = afEnd;
     fTotalTime = afTime;
     fRemainingTime = afTime;
-    return 1;
+    return true;
 }
 
 float NonLinearInterpolator::GetCurrent() {
@@ -850,18 +850,18 @@ PLAYER_TARGET_LOC::PLAYER_TARGET_LOC()
 // character progression; the occupied region list with its flag 1). The field stores stay in the body, in the game's
 // order, because they interleave with calls that read and change the same fields (SetCanFastTravel, the process swap,
 // InitHavok, SetFOV, SetHardcore, CreateActorMover).
-PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(1) {
+PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(true) {
     RandomDoorSpaceMap.Init(37u);
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_PLAYER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\PlayerCharacter.cpp", 711
+        MEM_CONTEXT_PLAYER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\PlayerCharacter.cpp", 711
     );
-    SetInitialized(0);
+    SetInitialized(false);
     Cached1stPersonCameraPos = NiPoint3_ZERO;
     CachedWorldCameraPos = NiPoint3_ZERO;
     InitGunWobble();
     ShakeData();
     kVanityModePos.y = fVanityModeWheelDefault.Float();
-    bAiControlledActivate = 0;
+    bAiControlledActivate = false;
     for (int32_t i = 0; i < 77; ++i) {
         TemporaryActorValueModifiers[i] = 0.0f;
         ScriptActorValueModifiers[i] = 0.0f;
@@ -876,24 +876,24 @@ PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(1) {
     fsecondSneaking = 0.0f;
     iAmountStolenSold = 0;
     iNumAdvance = 0;
-    btransporting = 0;
+    btransporting = false;
     bCanFastTravel = 0;
-    SetCanFastTravel(1);
-    bCanWait = 1;
-    bChargen = 0;
-    bAllowEGMCacheClear = 1;
+    SetCanFastTravel(true);
+    bCanWait = true;
+    bChargen = false;
+    bAllowEGMCacheClear = true;
     eskilladvance = ActorValue::ACTOR_VALUE_COUNT;
     pDefaultClass = nullptr;
     pListofActions = nullptr;
     pAutoAimActor = nullptr;
     BulletAutoAim = NiPoint3_ZERO;
     pPlayersTargetActor = nullptr;
-    bAiControlledPackage = 0;
+    bAiControlledPackage = false;
     pClassBasedOn = nullptr;
-    bTravelUseDoor = 0;
+    bTravelUseDoor = false;
     sp1stPersonLight = nullptr;
     sp3rdPersonLight = nullptr;
-    bOnElevator = 1;
+    bOnElevator = true;
     // The player runs in the high process from the start: Character's process is replaced by a new HighProcess.
     HighProcess* pHighProcess = ::new (ourMalloc(sizeof(HighProcess))) HighProcess();
     pHighProcess->Copy(pCurrentProcess);
@@ -918,17 +918,17 @@ PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(1) {
     else {
         pCameraCaster = nullptr;
     }
-    b3rdPersonSaved = 0;
-    bsave3rdPerson = 0;
-    b3rdPerson = 0;
-    bActually3rdPerson = 0;
-    bWant3rdPerson = 0;
-    bTemp3rdPerson = 0;
-    bTemp3rdPersonSwitchBack = 0;
-    bTemp1stPerson = 0;
-    bTemp1stPersonSwitchBack = 0;
+    b3rdPersonSaved = false;
+    bsave3rdPerson = false;
+    b3rdPerson = false;
+    bActually3rdPerson = false;
+    bWant3rdPerson = false;
+    bTemp3rdPerson = false;
+    bTemp3rdPersonSwitchBack = false;
+    bTemp1stPerson = false;
+    bTemp1stPersonSwitchBack = false;
     bAlwaysRun = bAlwaysRunByDefault.Bool();
-    bAutoMove = 0;
+    bAutoMove = false;
     SetFOV(BSSceneGraph::fDefaultFOV.Float());
     p1stPersonBipedAnim = nullptr;
     p1stPersonAnimation = nullptr;
@@ -938,11 +938,11 @@ PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(1) {
     pInventoryAnimation = nullptr;
     chaseCameraPos = NiPoint3_ZERO;
     fChaseDistance = 0.0f;
-    bSnapChaseCamera = 0;
-    bGreetingPlayer = 0;
+    bSnapChaseCamera = false;
+    bGreetingPlayer = false;
     ucControlsDisabled = 0;
     pClosestConversation = nullptr;
-    bBlockActivate = 0;
+    bBlockActivate = false;
     fBlockActivateTimer = 5.0f;
     ihourstosleep = 0;
     fSitHeadingDelta = 0.0f;
@@ -956,9 +956,9 @@ PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(1) {
     QueuedWornEnchantments = nullptr;
     iNumberTraining = 0;
     SetForceActivateRef(nullptr);
-    bIsSleeping = 0;
+    bIsSleeping = false;
     pPendingPoison = nullptr;
-    bTelekinesisSelected = 0;
+    bTelekinesisSelected = false;
     pOccupiedRegion = nullptr;
     spGrabSpring = nullptr;
     pGrabbedObject = nullptr;
@@ -971,11 +971,11 @@ PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(1) {
     for (int32_t j = 0; j < 5; ++j) {
         pCrimeCounts[j] = 0;
     }
-    iCharacterSeed = std::time(0);
-    SetAIControlledToPosition(0);
-    SetAIControlledFromPosition(0);
-    bInBorderContainedCell = 0;
-    bReturnToLastKnownGoodPosition = 0;
+    iCharacterSeed = std::time(nullptr);
+    SetAIControlledToPosition(false);
+    SetAIControlledFromPosition(false);
+    bInBorderContainedCell = false;
+    bReturnToLastKnownGoodPosition = false;
     LastKnownGoodPosition = NiPoint3_ZERO;
     pLastKnownGoodLocation = nullptr;
     pLastKnownMusicType = nullptr;
@@ -991,21 +991,21 @@ PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(1) {
     iCaravanLosses = 0;
     iCaravanLargestWinning = 0;
     iCasinoCheatLevel = 0;
-    SetHardcore(GamePlayFormulas::HARDCORE_OFF, 0);
-    bAlwaysHardcore = 1;
+    SetHardcore(GamePlayFormulas::HARDCORE_OFF, false);
+    bAlwaysHardcore = true;
     eDifficultyLevel = static_cast<GamePlayFormulas::DifficultyLevel>(gs_iDifficulty_GamePlay.Int());
     eKillCameraSetting = static_cast<KILL_CAM_TYPE>(gs_iKillCamera_GamePlay.Int());
     pInventoryWeaponEffect = nullptr;
-    bBeingChased = 0;
-    bIsYoung = 0;
-    bIsToddler = 0;
-    bCanUsePowerArmor = 0;
+    bBeingChased = false;
+    bIsYoung = false;
+    bIsToddler = false;
+    bCanUsePowerArmor = false;
     iCombatPersue = 0;
     pMapWorld = nullptr;
     fUFOCameraHeading = 0.0f;
     fUFOCameraPitch = 0.0f;
     UFOCameraPos = NiPoint3_ZERO;
-    bShowQuestItemsInInventory = 1;
+    bShowQuestItemsInInventory = true;
     iSelectedSpellCastSoundID = 0;
     SelectedSpellCastSound = BSSoundHandle();
     for (int32_t k = 0; k < 6; ++k) {
@@ -1021,7 +1021,7 @@ PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(1) {
     fWorldFOV = BSSceneGraph::fDefaultWorldFOV.Float();
     f3rdPersonFOV = fOverShoulderFOV.Float();
     f1stPersonFOV = BSSceneGraph::fDefault1stPersonFOV.Float();
-    pCurrentProcess->SetSustainedFire(0);
+    pCurrentProcess->SetSustainedFire(false);
     PlayerCharacter::CreateActorMover();
     fProjectileReleaseTimer = 0.0f;
     iNumberofStealWarnings = 0;
@@ -1029,54 +1029,54 @@ PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(1) {
     iNumberofPickpocketWarnings = 0;
     fPickPocketWarningTimer = -1.0f;
     pListofPercievedActors = nullptr;
-    bMenuModeButtonClicked = 0;
+    bMenuModeButtonClicked = false;
     fMenuModeButtonTimer = 0.0f;
     fAmmoSwapButtonTimer = 0.0f;
     pIronsightsDOFInstance = nullptr;
     pVatsDOFInstance = nullptr;
     pVatsDRBInstance = nullptr;
     kCamera3rdPersonShoulderOffset = NiPoint3_ZERO;
-    bSpeaking = 0;
+    bSpeaking = false;
     pQueuedTargetLoc = nullptr;
     pQueuedWeaponAttach = nullptr;
     pCombatGroup = nullptr;
     iTeammateCount = 0;
-    bPlayerInCombat = 0;
-    bAllCombatTargetsSearching = 0;
+    bPlayerInCombat = false;
+    bAllCombatTargetsSearching = false;
     fCombatTimer = 0.0f;
     fYieldTimer = 0.0f;
     spCameraRigidBody = nullptr;
     SetEncounterZone(BGSEncounterZone::GetNoZone());
-    SetMegatonDestroyed(0);
+    SetMegatonDestroyed(false);
     pHeadingInterpolator = ::new (ourMalloc(sizeof(NonLinearInterpolator))) NonLinearInterpolator();
     pLookingInterpolator = ::new (ourMalloc(sizeof(NonLinearInterpolator))) NonLinearInterpolator();
     ourMemset(pWobbleNodes, 0, sizeof(pWobbleNodes));
-    ResetRockItAmmoWeight(0);
+    ResetRockItAmmoWeight(false);
     pAIConversationRunning = nullptr;
-    bHostileDetection = 0;
+    bHostileDetection = false;
     iSandmanDetection = 0;
     spTargeted3D = nullptr;
-    bTarget3DDistant = 0;
-    bNightVisionOn = 0;
-    bTurboISM = 0;
+    bTarget3DDistant = false;
+    bNightVisionOn = false;
+    bTurboISM = false;
     pReputationUpdate = nullptr;
     fTimeInSlowMoCam = 0.0f;
     fKillCamCooldown = 0.0f;
-    bIgnoresGTM = 0;
+    bIgnoresGTM = false;
     pContinuousBeamPersistant = nullptr;
-    bIsAcousticSpaceTransition = 0;
+    bIsAcousticSpaceTransition = false;
     fLastHelloTime = -1.0f;
     for (int32_t m = 0; m < 3; ++m) {
-        PlayerAchievements[m].bUnlocked = 0;
+        PlayerAchievements[m].bUnlocked = false;
         PlayerAchievements[m].iCurrentValue = 0;
         // The stored value is ~(cFlags & 2) != 0, which is always true, so bTracking is set to true as the game does.
         PlayerAchievements[m].bTracking = true;
     }
     pClosestAudioMarkerInfo = nullptr;
     fCounterAttackTimer = 0.0f;
-    bCounterAttackCamera = 0;
-    bHasCateyeActive = 0;
-    bHasSpotterActive = 0;
+    bCounterAttackCamera = false;
+    bHasCateyeActive = false;
+    bHasSpotterActive = false;
     fCheckForItems = 0.0f;
     SetWeaponSightingNode(nullptr);
     for (int32_t n = 0; n < 8; ++n) {
@@ -1093,7 +1093,7 @@ PlayerCharacter::~PlayerCharacter() {
     m_AllOccupiedRegions.RemoveAll();
     FreeGunWobble();
     FreeCameraShake();
-    CloneInventory3D(0);
+    CloneInventory3D(false);
     if (pCurrentProcess) {
         delete pCurrentProcess;
     }
@@ -1111,7 +1111,7 @@ PlayerCharacter::~PlayerCharacter() {
     }
     spGrabSpring = nullptr;
     if (pSelectedSpell) {
-        pSelectedSpell->Unload(1);
+        pSelectedSpell->Unload(true);
     }
     if (pActiveEffectList) {
         while (pActiveEffectList && !pActiveEffectList->IsEmpty()) {
@@ -1160,7 +1160,7 @@ PlayerCharacter::~PlayerCharacter() {
     if (pInventoryWeaponEffect) {
         delete pInventoryWeaponEffect;
     }
-    PlayerCharacter::Set3D(nullptr, 1);
+    PlayerCharacter::Set3D(nullptr, true);
     if (pInitialStateBuffer) {
         pSaveLoadGameOLD->DestroyBuffer(pInitialStateBuffer);
     }
@@ -1177,10 +1177,10 @@ PlayerCharacter::~PlayerCharacter() {
         }
     }
     DroppedRefList.RemoveAll();
-    SetLightPointer(nullptr, 1);
-    SetLightPointer(nullptr, 0);
+    SetLightPointer(nullptr, true);
+    SetLightPointer(nullptr, false);
     kConflictingPick.SetTarget(nullptr);
-    kConflictingPick.PickObjects(NiPoint3_ZERO, NiPoint3_ZERO, 0);
+    kConflictingPick.PickObjects(NiPoint3_ZERO, NiPoint3_ZERO, false);
     for (BSSimpleList<PerkRankData*>* pperkRankList = &Perks; pperkRankList; pperkRankList = pperkRankList->m_pkNext) {
         ourFree(pperkRankList->m_item);
     }
@@ -1879,7 +1879,7 @@ void PlayerCharacter::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
         apSaveGameBuffer->SaveDataEndian(&pCrimeCounts[i_4], 4u, 0);
     }
     CharacterProgressionInfo.SaveGame(apSaveGameBuffer);
-    TESForm* pplayerMarkerSpace = 0;
+    TESForm* pplayerMarkerSpace = nullptr;
     if (pPlayerMapMarker) {
         pplayerMarkerSpace = (TESForm*)pPlayerMapMarker->GetWorldSpace();
         if (!pplayerMarkerSpace) {
@@ -1894,7 +1894,7 @@ void PlayerCharacter::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
         apSaveGameBuffer->SaveFormID(pOccupiedRegion->pCurrentWeather, 0);
     }
     else {
-        apSaveGameBuffer->SaveFormID(static_cast<TESForm*>(0), 0);
+        apSaveGameBuffer->SaveFormID(static_cast<TESForm*>(nullptr), 0);
     }
     apSaveGameBuffer->SaveFormID(pClosestConversation, 0);
     apSaveGameBuffer->SaveFormID(pAIConversationRunning, 0);
@@ -2329,7 +2329,7 @@ void PlayerCharacter::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     uint32_t iprisonMarkerID;
     LoadNumericID(&iprisonMarkerID, 4);
     pPrisonMarker = reinterpret_cast<TESObjectREFR*>(static_cast<uintptr_t>(iprisonMarkerID));
-    SetSelectedSpell(0);
+    SetSelectedSpell(nullptr);
     uint32_t iselectedSpellID;
     LoadNumericID(&iselectedSpellID, 4);
     pSelectedSpell = reinterpret_cast<MagicItem*>(static_cast<uintptr_t>(iselectedSpellID));
@@ -2455,7 +2455,7 @@ void PlayerCharacter::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
             listTopics.AddHead(ptopic);
         }
     }
-    TESTopic::SortTopics(1, GetTopicList());
+    TESTopic::SortTopics(true, GetTopicList());
     listQuestLog.RemoveAll();
     uint16_t ilogCount;
     LoadGameDataOLD(&ilogCount, 2);
@@ -3043,7 +3043,7 @@ void PlayerCharacter::InitLoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
         pPrisonMarker = dynamic_cast<TESObjectREFR*>(v4);
     }
     uint32_t pSelectedSpell = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this->pSelectedSpell));
-    this->pSelectedSpell = 0;
+    this->pSelectedSpell = nullptr;
     if (pSelectedSpell) {
         TESForm* pform = TESForm::GetFormByNumericID(pSelectedSpell);
         MagicItemForm* pmagicItemForm = dynamic_cast<MagicItemForm*>(pform);
@@ -3100,11 +3100,11 @@ void PlayerCharacter::InitLoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     pSaveLoadGameOLD->GetCurrentVersion();
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 115u) {
         BSSimpleList<TESObjectREFR*>* plist = &ConflictingObjects;
-        BSSimpleList<TESObjectREFR*>* plastList = 0;
+        BSSimpleList<TESObjectREFR*>* plastList = nullptr;
         while (plist && !plist->IsEmpty()) {
             pconflictID = plist->m_item;
             uint32_t m_item = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pconflictID));
-            TESObjectREFR* pref = 0;
+            TESObjectREFR* pref = nullptr;
             if (m_item) {
                 TESForm* v11 = TESForm::GetFormByNumericID(m_item);
                 pref = dynamic_cast<TESObjectREFR*>(v11);
@@ -3129,8 +3129,8 @@ void PlayerCharacter::InitLoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     pCurrentProcess->ClearFaceAnimationData();
     TESNPC* pnpc = static_cast<TESNPC*>(GetObjectReference());
     pnpc->InitLoadFaceGen(this);
-    SetAIControlledToPosition(0);
-    SetAIControlledFromPosition(0);
+    SetAIControlledToPosition(false);
+    SetAIControlledFromPosition(false);
     SetControlsDisabled(ucControlsDisabled);
 }
 
@@ -3150,7 +3150,7 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v23 = dynamic_cast<DialoguePackage*>(FormByNumericID);
     }
     else {
-        v23 = 0;
+        v23 = nullptr;
     }
     pClosestConversation = v23;
     if (apLoadGameBuffer->GetVersion() >= 18u) {
@@ -3162,7 +3162,7 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v22 = dynamic_cast<DialoguePackage*>(v3);
         }
         else {
-            v22 = 0;
+            v22 = nullptr;
         }
         pAIConversationRunning = v22;
     }
@@ -3171,7 +3171,7 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v21 = dynamic_cast<TESObjectREFR*>(v4);
     }
     else {
-        v21 = 0;
+        v21 = nullptr;
     }
     pGrabbedObject = v21;
     if (pLastExtDoorActivated) {
@@ -3180,7 +3180,7 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v20 = dynamic_cast<TESObjectREFR*>(v5);
     }
     else {
-        v20 = 0;
+        v20 = nullptr;
     }
     pLastExtDoorActivated = v20;
     if (this->GetAutoAimActorSimple()) {
@@ -3190,7 +3190,7 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v19 = dynamic_cast<Actor*>(v6);
     }
     else {
-        v19 = 0;
+        v19 = nullptr;
     }
     pAutoAimActor = v19;
     if (pPlayersTargetActor) {
@@ -3199,14 +3199,14 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v18 = dynamic_cast<Actor*>(v7);
     }
     else {
-        v18 = 0;
+        v18 = nullptr;
     }
     pPlayersTargetActor = v18;
     BSSimpleList<CompassTarget*>* plist = pListofPercievedActors;
-    BSSimpleList<CompassTarget*>* plastList = 0;
+    BSSimpleList<CompassTarget*>* plastList = nullptr;
     while (plist && !plist->IsEmpty()) {
         CompassTarget* pactorsNearPlayerData = plist->m_item;
-        bool bremove = 0;
+        bool bremove = false;
         if (pactorsNearPlayerData) {
             Actor* pactor;
             if (pactorsNearPlayerData->pTarget) {
@@ -3216,16 +3216,16 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 pactor = dynamic_cast<Actor*>(v8);
             }
             else {
-                pactor = 0;
+                pactor = nullptr;
             }
             pactorsNearPlayerData->pTarget = pactor;
             if (!pactorsNearPlayerData->pTarget || !pactorsNearPlayerData->pTarget->GetObjectReference()) {
                 ourFree(pactorsNearPlayerData);
-                bremove = 1;
+                bremove = true;
             }
         }
         else {
-            bremove = 1;
+            bremove = true;
         }
         if (bremove) {
             if (plastList) {
@@ -3251,11 +3251,11 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 v16 = dynamic_cast<TESObjectREFR*>(v9);
             }
             else {
-                v16 = 0;
+                v16 = nullptr;
             }
             pplayerAction->prefObj = v16;
             if (pplayerAction->prefObj) {
-                pplayerAction->prefObj->SetTargeted(1);
+                pplayerAction->prefObj->SetTargeted(true);
             }
         }
     }
@@ -3264,7 +3264,7 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     for (PerkRankData* pperkRank : Perks) {
         if (pperkRank) {
             if (pperkRank->pPerk) {
-                pperkRank->pPerk->AddPerkEntryPoints(this, pperkRank->cCurrentRank, 0);
+                pperkRank->pPerk->AddPerkEntryPoints(this, pperkRank->cCurrentRank, false);
             }
         }
     }
@@ -3279,14 +3279,14 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             BSAudio* v11 = &BSAudio::QInstance();
             BSSoundHandle* SoundHandleByName = v11->GetSoundHandleByName(&arHandle, "UIHealthHeartbeatBLP", 49u);
             StatusSoundHandle.operator=(*SoundHandleByName);
-            StatusSoundHandle.Play(1);
+            StatusSoundHandle.Play(true);
         }
     }
     else {
         BSAudio* v10 = &BSAudio::QInstance();
         BSSoundHandle* v14 = v10->GetSoundHandleByName(&a1, "UIHealthHeartbeatALP", 49u);
         StatusSoundHandle.operator=(*v14);
-        StatusSoundHandle.Play(1);
+        StatusSoundHandle.Play(true);
     }
     if (Get3D()) {
         if (!apLoadGameBuffer->GetChangeFlags().CheckFlags(CHANGE_REFR_LEVELED_INVENTORY | CHANGE_REFR_INVENTORY)) {
@@ -3294,7 +3294,7 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                     CHANGE_REFR_LEVELED_INVENTORY | CHANGE_REFR_INVENTORY
                 )) {
                 TESNPC* pnpc = static_cast<TESNPC*>(GetActorBase());
-                pnpc->InitDefaultWorn(this, 1, 1, 0, 1);
+                pnpc->InitDefaultWorn(this, true, true, false, true);
                 if (pCurrentProcess) {
                     if (pCurrentProcess->GetAll3DUpdateFlags()) {
                         pCurrentProcess->Update3dModel(this);
@@ -3307,10 +3307,10 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 
 void PlayerCharacter::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
     Actor::FinishInitLoadGame(aiFlags, aiOldFlags);
-    if (Get3D(1)) {
+    if (Get3D(true)) {
         SetFirstPerson(!b3rdPerson);
         if (bTemp3rdPerson) {
-            ForceTemp3rdPerson(1);
+            ForceTemp3rdPerson(true);
         }
     }
     ActiveEffect::FinishInitLoadGameActiveEffectList(pActiveEffectList, this);
@@ -3328,16 +3328,16 @@ void PlayerCharacter::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) 
 
 void PlayerCharacter::Revert(uint32_t aiFlags) {
     Character::Revert(aiFlags);
-    SetNeedResetHardcoreTimer(1);
+    SetNeedResetHardcoreTimer(true);
     fCheckMyDeadBodyTimer = 0.0f;
     bCanFastTravel = 0;
-    SetCanFastTravel(1);
+    SetCanFastTravel(true);
     fCheckMyDeadBodyTimer = 0.0f;
     if (pSaveLoadGameOLD->IsUnk048Zero()) {
-        pPrisonMarker = 0;
-        PlayerCharacter::pPrisonContainer = 0;
+        pPrisonMarker = nullptr;
+        PlayerCharacter::pPrisonContainer = nullptr;
         StopVanityMode();
-        SetInCharGen(0);
+        SetInCharGen(false);
         ConflictingObjects.RemoveAll();
         ActiveEffect::RevertActiveEffectList(pActiveEffectList, this);
         if ((aiFlags & CHANGE_REFR_ANIMATION) != 0) {
@@ -3349,7 +3349,7 @@ void PlayerCharacter::Revert(uint32_t aiFlags) {
         DestroyMouseSpring();
         DroppedRefList.RemoveAll();
     }
-    bAllowEGMCacheClear = 1;
+    bAllowEGMCacheClear = true;
 }
 
 void PlayerCharacter::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
@@ -3361,55 +3361,55 @@ void PlayerCharacter::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
             p1stPersonAnimation->Revert(apLoadGameBuffer);
         }
     }
-    NiAVObject* v3 = Get3D(0);
-    SetStoredWorldRecurse(v3, 0);
+    NiAVObject* v3 = Get3D(false);
+    SetStoredWorldRecurse(v3, nullptr);
     if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_REFR_SCALE)) {
         SetScale(1.0f);
     }
-    pPrisonMarker = 0;
-    PlayerCharacter::pPrisonContainer = 0;
+    pPrisonMarker = nullptr;
+    PlayerCharacter::pPrisonContainer = nullptr;
     StopVanityMode();
-    bSpeaking = 0;
+    bSpeaking = false;
     fZoomDelta = 0.0f;
     fChaseDistance = 0.0f;
     fPlayerDeathReloadTime_0 = -1.0f;
-    bDelayVATSMenu = 0;
-    pCurrentWater = 0;
-    bCanWait = 1;
-    b3rdPerson = 0;
-    bWant3rdPerson = 0;
-    pCombatGroup = 0;
+    bDelayVATSMenu = false;
+    pCurrentWater = nullptr;
+    bCanWait = true;
+    b3rdPerson = false;
+    bWant3rdPerson = false;
+    pCombatGroup = nullptr;
     iTeammateCount = 0;
     fCombatTimer = 0.0f;
     fYieldTimer = 0.0f;
-    bAiControlledToPos = 0;
-    bAiControlledFromPos = 0;
-    bAiControlledActivate = 0;
-    bAiControlledPackage = 0;
-    bBlockActivate = 0;
-    bAllowEGMCacheClear = 1;
+    bAiControlledToPos = false;
+    bAiControlledFromPos = false;
+    bAiControlledActivate = false;
+    bAiControlledPackage = false;
+    bBlockActivate = false;
+    bAllowEGMCacheClear = true;
     fBlockActivateTimer = 5.0f;
     if (apLoadGameBuffer->GetRevertOnly()) {
-        bIsYoung = 0;
+        bIsYoung = false;
     }
-    bIsToddler = 0;
-    bCanUsePowerArmor = 0;
-    bHostileDetection = 0;
+    bIsToddler = false;
+    bCanUsePowerArmor = false;
+    bHostileDetection = false;
     ucControlsDisabled = 0;
-    bTemp3rdPerson = 0;
-    bTemp3rdPersonSwitchBack = 0;
-    bTemp1stPerson = 0;
-    bTemp1stPersonSwitchBack = 0;
-    bVATSForce1stPerson = 0;
-    bCanUsePowerArmor = 0;
+    bTemp3rdPerson = false;
+    bTemp3rdPersonSwitchBack = false;
+    bTemp1stPerson = false;
+    bTemp1stPersonSwitchBack = false;
+    bVATSForce1stPerson = false;
+    bCanUsePowerArmor = false;
     fWorldFOV = BSSceneGraph::fDefaultWorldFOV.Float();
     f1stPersonFOV = BSSceneGraph::fDefault1stPersonFOV.Float();
     iNumberofStealWarnings = 0;
     fStealWarningTimer = 0.0f;
     iNumberofPickpocketWarnings = 0;
     fPickPocketWarningTimer = 0.0f;
-    bSpeaking = 0;
-    bMegatonDestroyed = 0;
+    bSpeaking = false;
+    bMegatonDestroyed = false;
     iSleepTime = 0;
     fSitHeadingDelta = 0.0f;
     for (int32_t i = 0; i < 5; ++i) {
@@ -3445,12 +3445,12 @@ void PlayerCharacter::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     ClearRockItAmmo();
     FreeCompassTargets();
     CharacterProgressionInfo.Revert(apLoadGameBuffer);
-    pClosestConversation = 0;
-    pAIConversationRunning = 0;
-    pQueuedWeaponAttach = 0;
+    pClosestConversation = nullptr;
+    pAIConversationRunning = nullptr;
+    pQueuedWeaponAttach = nullptr;
     RemovePlayerMapMarker();
-    pLastExtDoorActivated = 0;
-    SetInCharGen(0);
+    pLastExtDoorActivated = nullptr;
+    SetInCharGen(false);
     while (this->pListofActions && this->pListofActions->m_item) {
         ourFree(this->pListofActions->m_item);
         this->pListofActions->RemoveHead();
@@ -3459,7 +3459,7 @@ void PlayerCharacter::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (pListofActions) {
         delete static_cast<BSSimpleList<ActiveEffect*>*>(pListofActions);
     }
-    this->pListofActions = 0;
+    this->pListofActions = nullptr;
     for (pperkRankList = &Perks; pperkRankList; pperkRankList = pperkRankList->m_pkNext) {
         ourFree(pperkRankList->m_item);
     }
@@ -3475,10 +3475,10 @@ void PlayerCharacter::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
         CompanionPerkEntryLists[i_4].RemoveAll();
     }
     ourFree(pQueuedTargetLoc);
-    pQueuedTargetLoc = 0;
-    bAlwaysHardcore = 1;
-    pReputationUpdate = 0;
-    SetWeaponSightingNode(0);
+    pQueuedTargetLoc = nullptr;
+    bAlwaysHardcore = true;
+    pReputationUpdate = nullptr;
+    SetWeaponSightingNode(nullptr);
     ActiveEffect::RevertActiveEffectList(apLoadGameBuffer, pActiveEffectList);
     for (BSSimpleList<TESTopic*>* plist = pDataHandler->GetTopicList(); plist; plist = plist->m_pkNext) {
         ptopic = plist->m_item;
@@ -3489,7 +3489,7 @@ void PlayerCharacter::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
         }
     }
     BSSimpleList<TESTopic*>* TopicList = GetTopicList();
-    TESTopic::SortTopics(1, TopicList);
+    TESTopic::SortTopics(true, TopicList);
     ClearAudioMarkerList();
     ClearMapMarkerStructList();
     ClearAutoAim();
@@ -3504,9 +3504,9 @@ void PlayerCharacter::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         SetScale(distance);
     }
     bWant3rdPerson = b3rdPerson;
-    if (Get3D(1)) {
+    if (Get3D(true)) {
         if (bTemp3rdPerson) {
-            ForceTemp3rdPerson(1);
+            ForceTemp3rdPerson(true);
         }
         Show1stPerson(!b3rdPerson);
     }
@@ -3515,11 +3515,11 @@ void PlayerCharacter::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         UpdateAlpha();
     }
     UpdateArmRotation();
-    Animation* Animation_0 = GetAnimation(1);
+    Animation* Animation_0 = GetAnimation(true);
     Animation_0->UpdateSceneGraphNoController();
-    UpdateCamera(1, 0);
+    UpdateCamera(true, false);
     if (appMain->bFlyCamera) {
-        UpdateFlyCamera(0.0f, 1);
+        UpdateFlyCamera(0.0f, true);
     }
     if (pGrabbedObject) {
         if (eGrabType != PlayerCharacter::GRAB_TELEKINESIS) {
@@ -3539,21 +3539,21 @@ void PlayerCharacter::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     UpdatePlayerCombat(0.0f);
     if (GetIronSights()) {
         BaseProcess* CurrentAIProcess = pCurrentProcess;
-        CurrentAIProcess->SetIronSights(0);
-        SetIronSights(1, 0, 0);
+        CurrentAIProcess->SetIronSights(false);
+        SetIronSights(true, false, false);
     }
     SpellItem* PipBoyLightSpell = MagicSystem::GetPipBoyLightSpell();
     if (PipBoyLightSpell) {
-        IsSpellTarget = this->IsSpellTarget(PipBoyLightSpell, 1);
+        IsSpellTarget = this->IsSpellTarget(PipBoyLightSpell, true);
     }
     else {
-        IsSpellTarget = this->IsSpellTarget(0, 1);
+        IsSpellTarget = this->IsSpellTarget(nullptr, true);
     }
     if (IsSpellTarget) {
         FOPipboyManager* Pipboy = Interface::GetPipboy();
-        Pipboy->ShowPipboyLightEffect(1, 1, 1);
+        Pipboy->ShowPipboyLightEffect(true, true, true);
         FOPipboyManager* v5 = Interface::GetPipboy();
-        v5->ShowPipboyLightEffect(0, 1, 1);
+        v5->ShowPipboyLightEffect(false, true, true);
     }
     CheckTempModifiers();
 }
@@ -3562,12 +3562,12 @@ void PlayerCharacter::UpdateRefLight() {
     LightRefData* plightData = (&m_Extra)->GetLight();
     if (plightData) {
         NiAVObject* v1;
-        if (plightData->spLight == sp1stPersonLight && (v1 = Get3D(1), v1->GetAppCulled())) {
+        if (plightData->spLight == sp1stPersonLight && (v1 = Get3D(true), v1->GetAppCulled())) {
             plightData->spLight.operator=(sp3rdPersonLight);
         }
         else {
             if (plightData->spLight == sp3rdPersonLight) {
-                NiAVObject* v2 = Get3D(0);
+                NiAVObject* v2 = Get3D(false);
                 if (v2->GetAppCulled()) {
                     plightData->spLight.operator=(sp1stPersonLight);
                 }
@@ -3745,7 +3745,7 @@ void PlayerCharacter::UpdateAnimation() {
     ++cSkipThreadQueue;
     double Seconds = appTimer.fDelta;
     float fsecondsPassed = pVATS.GetPlayerUpdateMult() * Seconds;
-    Animation* panim = GetAnimation(0);
+    Animation* panim = GetAnimation(false);
     if (panim) {
         panim->Update(this, fsecondsPassed, -1.0f);
     }
@@ -3801,7 +3801,7 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
         }
         TESWaterSystem::SetCameraRelevantWaterHeight(fWaterHeight);
     }
-    m_Extra.SetMultiBoundRef(0);
+    m_Extra.SetMultiBoundRef(nullptr);
     MobileObject::SetParentCell(apCell);
     if (!apCell) {
         CurrentRegionSoundList.RemoveAll();
@@ -3809,28 +3809,28 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
         return;
     }
     if (!apCell->GetInterior()) {
-        SetOccupiedRegion(0);
+        SetOccupiedRegion(nullptr);
     }
     FalloutRadio::NewCellEntered();
-    pLastKnownMusicType = apCell->GetMusicType(0);
+    pLastKnownMusicType = apCell->GetMusicType(nullptr);
     bhkWorld* pCellWorld = apCell->GetbhkWorld();
     if (pCellWorld) {
-        pCellWorld->pAcousticSpaceListener->bBufferRemovalOperations = 1;
+        pCellWorld->pAcousticSpaceListener->bBufferRemovalOperations = true;
     }
-    MoveHavok(0);
+    MoveHavok(false);
     if (GetParentCell() && GetParentCell()->GetbhkWorld()) {
-        if (DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthLarge(), 0)) {
+        if (DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthLarge(), false)) {
             bhkWorld* pWorld = GetParentCell()->GetbhkWorld();
-            DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthLarge(), 1)->Add(pWorld);
+            DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthLarge(), true)->Add(pWorld);
         }
     }
     if (GetParentCell() && GetParentCell()->GetbhkWorld()) {
-        if (DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthSmall(), 0)) {
+        if (DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthSmall(), false)) {
             bhkWorld* pWorld = GetParentCell()->GetbhkWorld();
-            DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthSmall(), 1)->Add(pWorld);
+            DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthSmall(), true)->Add(pWorld);
         }
     }
-    if (spCameraRigidBody.operator==(static_cast<bhkRigidBody*>(0))) {
+    if (spCameraRigidBody.operator==(static_cast<bhkRigidBody*>(nullptr))) {
         hkVector4 hkv;
         bhkSphereShape* pSphereMemory = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
         bhkSphereShape* pSphere = pSphereMemory ? ::new (pSphereMemory) bhkSphereShape : nullptr;
@@ -3841,7 +3841,7 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
         bhkRigidBody* pBodyMemory = static_cast<bhkRigidBody*>(NiMemObject::operator new(sizeof(bhkRigidBody)));
         bhkRigidBody* pBody = pBodyMemory ? ::new (pBodyMemory) bhkRigidBody(kInfo) : nullptr;
         spCameraRigidBody.operator=(pBody);
-        spCameraRigidBody.m_pObject->SetActive(1);
+        spCameraRigidBody.m_pObject->SetActive(true);
         bhkRigidBody* pCameraBody = spCameraRigidBody.m_pObject;
         pCameraBody->SetMotionType(hkpMotion::MOTION_KEYFRAMED);
         spCameraRigidBody.m_pObject->GetCollidableRw()->m_broadPhaseHandle.m_objectQualityType = 9;
@@ -3851,25 +3851,25 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
     }
     bhkRigidBody* pCameraBody = spCameraRigidBody.m_pObject;
     pCameraBody->Add(GetParentCell()->GetbhkWorld());
-    bool bIncapacitated = IsUnConscious() || IsDead(0) || IsDying() || IsKnockedOut();
+    bool bIncapacitated = IsUnConscious() || IsDead(false) || IsDying() || IsKnockedOut();
     bool bAddWobble = !bIncapacitated && !IsSleeping();
     if (bAddWobble) {
         AddGunWobble();
     }
-    pModelLoader->UpdateQueuedReferencePriorities(0);
+    pModelLoader->UpdateQueuedReferencePriorities(nullptr);
     TESClimate* pClimate = apCell->GetClimate();
-    Sky::GetInstance()->SetCurrentClimate(pClimate, 0);
+    Sky::GetInstance()->SetCurrentClimate(pClimate, false);
     BSShaderManager::SetImageSpaceParameters(&apCell->GetUsableImageSpace()->Data);
     TESWorldSpace* pWorldSpace = apCell->GetWorldSpace();
     bool bInBorderRegion = false;
-    bInBorderContainedCell = 0;
+    bInBorderContainedCell = false;
     if (pBorderRegions) {
         pBorderRegions->RemoveAll();
         NiTPrimitiveArray<TESRegion*>* pOldBorderRegions = pBorderRegions;
         if (pOldBorderRegions) {
             delete pOldBorderRegions;
         }
-        pBorderRegions = 0;
+        pBorderRegions = nullptr;
     }
     int32_t iX = apCell->GetDataX();
     int32_t iY = apCell->GetDataY();
@@ -3882,7 +3882,7 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
     TESRegionPoint se(fHighX, fLowY);
     TESRegionPoint ne(fHighX, fHighY);
     CurrentRegionSoundList.RemoveAll();
-    FalloutAudioMedia::pCurrentRegionSoundData = 0;
+    FalloutAudioMedia::pCurrentRegionSoundData = nullptr;
     BSSimpleList<TESRegion*> OldRegionList;
     BSSimpleList<TESRegion*>* pOccupied = nullptr;
     // The loop tests the address &m_AllOccupiedRegions, which is never null, as the game does.
@@ -3894,8 +3894,8 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
         }
     }
     m_AllOccupiedRegions.RemoveAll();
-    TESRegionDataSound* pSoundOverrideRegion = 0;
-    TESRegionList* pCellRegions = apCell->GetRegionList(1);
+    TESRegionDataSound* pSoundOverrideRegion = nullptr;
+    TESRegionList* pCellRegions = apCell->GetRegionList(true);
     for (BSSimpleList<TESRegion*>* pIter = static_cast<BSSimpleList<TESRegion*>*>(pCellRegions); pIter;
          pIter = pIter->m_pkNext) {
         TESRegion* pCurrentRegion = pIter->m_item;
@@ -3904,7 +3904,7 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
         }
         // The constructor from a world position on the reference's location.
         TESRegionPoint testPoint(data.kPosition);
-        BSSimpleList<TESRegionSound*>* pRegSounds = 0;
+        BSSimpleList<TESRegionSound*>* pRegSounds = nullptr;
         if (pCurrentRegion->GetDelete()) {
             continue;
         }
@@ -3957,7 +3957,7 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
                 bInBorderRegion = true;
                 if (pRPL->IsInsideRegion(&sw) && pRPL->IsInsideRegion(&nw) && pRPL->IsInsideRegion(&se) &&
                     pRPL->IsInsideRegion(&ne)) {
-                    bInBorderContainedCell = 1;
+                    bInBorderContainedCell = true;
                 }
             }
             if (pOccupiedRegion) {
@@ -3988,8 +3988,8 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
     }
     if (gs_bBorderRegionsEnabled_General.Bool() && pWorldSpace && pWorldSpace->GetHasBorderRegion() &&
         !TES::pInstance->CellTestRunning() && !bInBorderRegion) {
-        TESObjectCELL* pGoodCell = 0;
-        TESWorldSpace* pGoodWorldSpace = 0;
+        TESObjectCELL* pGoodCell = nullptr;
+        TESWorldSpace* pGoodWorldSpace = nullptr;
         if (pLastKnownGoodLocation) {
             int32_t iFormType = pLastKnownGoodLocation->GetFormType();
             if (iFormType == CELL_ID) {
@@ -4000,16 +4000,16 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
             }
         }
         if (pGoodCell && pGoodCell != apCell) {
-            bReturnToLastKnownGoodPosition = 1;
+            bReturnToLastKnownGoodPosition = true;
         }
         else if (pGoodWorldSpace && pGoodWorldSpace != apCell->GetWorldSpace()) {
-            bReturnToLastKnownGoodPosition = 1;
+            bReturnToLastKnownGoodPosition = true;
         }
         else {
             NiPoint3 kOffset = GetLocationOnReference();
             kOffset.operator-=(LastKnownGoodPosition);
             if (kOffset.Length() > 2048.0) {
-                bReturnToLastKnownGoodPosition = 1;
+                bReturnToLastKnownGoodPosition = true;
             }
         }
     }
@@ -4032,7 +4032,7 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
             TESRegionDataImposter* pImposterData =
                 static_cast<TESRegionDataImposter*>(pRegion->pDataList->Find(REGION_DATA_IMPOSTER_ID));
             if (pImposterData) {
-                pImposterData->SetImpostersVisible(0, 0);
+                pImposterData->SetImpostersVisible(false, false);
             }
         }
     }
@@ -4098,12 +4098,12 @@ void PlayerCharacter::Update(float afDelta) {
     time_followerStealthing = time_followerStealthing - afDelta;
     if (bVATSForce1stPerson) {
         if (bVATSReturnPlayerTo1stPerson) {
-            pPlayer->SetFirstPerson(1);
+            pPlayer->SetFirstPerson(true);
         }
         else {
-            pPlayer->SetFirstPerson(0);
+            pPlayer->SetFirstPerson(false);
         }
-        bVATSForce1stPerson = 0;
+        bVATSForce1stPerson = false;
     }
     if (pVATS.eMode) {
         BSAudio* v4 = &BSAudio::QInstance();
@@ -4117,7 +4117,7 @@ void PlayerCharacter::Update(float afDelta) {
                 BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&v317, "UIVATSLOOP", 49u);
                 BSAudio::kVatsLoopHandle.operator=(*SoundHandleByName);
             }
-            BSAudio::kVatsLoopHandle.Play(0);
+            BSAudio::kVatsLoopHandle.Play(false);
         }
     }
     else {
@@ -4149,7 +4149,7 @@ void PlayerCharacter::Update(float afDelta) {
             this->fTimeInSlowMoCam = 0.0f;
         }
         this->fTimeInSlowMoCam = this->fTimeInSlowMoCam - afDelta;
-        appTimer.SetGlobalTimeMultiplier(0.3f, 0);
+        appTimer.SetGlobalTimeMultiplier(0.3f, false);
         if (this->bIgnoresGTM) {
             bool v7 = this->Is3rdPerson();
             Animation* v8 = this->GetAnimation(!v7);
@@ -4162,7 +4162,7 @@ void PlayerCharacter::Update(float afDelta) {
             v314 = 1;
         }
         else {
-            this->ResetKillCam(this->eKillCameraSetting, 0);
+            this->ResetKillCam(this->eKillCameraSetting, false);
         }
     }
     if (this->GetBlockCounterTimer() > 0.0) {
@@ -4177,7 +4177,7 @@ void PlayerCharacter::Update(float afDelta) {
             if (this->bTurboISM) {
                 appTimer.RestoreGlobalTimeMultiplierCache();
             }
-            this->bTurboISM = 0;
+            this->bTurboISM = false;
         }
     }
     else {
@@ -4185,11 +4185,11 @@ void PlayerCharacter::Update(float afDelta) {
             BSTimer::SaveGlobalTimeMultiplier();
             TESImageSpaceModifier* apMod =
                 static_cast<TESImageSpaceModifier*>(TESForm::GetFormByEditorID("TurboDOF50"));
-            ImageSpaceModifierInstanceForm::Trigger(apMod, 1.0f, 0);
-            this->bTurboISM = 1;
+            ImageSpaceModifierInstanceForm::Trigger(apMod, 1.0f, nullptr);
+            this->bTurboISM = true;
         }
         float* v15 = &fTurboTimeMultiplier.Float();
-        appTimer.SetGlobalTimeMultiplier(*v15, 0);
+        appTimer.SetGlobalTimeMultiplier(*v15, false);
         float fPersonalMultiplier = 1.0 / BSTimer::QGlobalTimeMultiplier();
         bool v16 = this->Is3rdPerson();
         Animation* v17 = this->GetAnimation(!v16);
@@ -4201,34 +4201,34 @@ void PlayerCharacter::Update(float afDelta) {
     if (this->pQueuedWeaponAttach) {
         if (!this->pCurrentProcess->Get3DUpdateFlag(RESET_MODEL)) {
             this->AttachWeapon(this->pQueuedWeaponAttach);
-            this->pQueuedWeaponAttach = 0;
+            this->pQueuedWeaponAttach = nullptr;
         }
     }
     if (this->bBlockActivate && !appMain->IsInMenuMode()) {
         this->fBlockActivateTimer = this->fBlockActivateTimer - afDelta;
         if (this->fBlockActivateTimer < 0.0) {
             this->fBlockActivateTimer = 0.0f;
-            this->bBlockActivate = 0;
+            this->bBlockActivate = false;
         }
     }
     iActorsDismemberedThisFrame = 0;
     TESObjectREFR* phitRef = TESObjectREFR::FindReferenceFor3D(this->spTargeted3D.m_pObject);
     HUDMainMenu::HandleHealthbarForCrosshairActor(phitRef, this->bTarget3DDistant);
-    this->spTargeted3D.operator=(static_cast<NiAVObject*>(0));
+    this->spTargeted3D.operator=(static_cast<NiAVObject*>(nullptr));
     this->ResetCachedGunSkill();
     alignas(16) AutoMemContext tempMemContext(
-        MEM_CONTEXT_PLAYER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\PlayerCharacter.cpp", 3137
+        MEM_CONTEXT_PLAYER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\PlayerCharacter.cpp", 3137
     );
     SceneGraph* pWorldRoot = Main::GetWorldSceneGraph();
     if (this->pCurrentProcess->GetCurrentWeapon()) {
         pweapon = static_cast<TESObjectWEAP*>(this->pCurrentProcess->GetCurrentWeapon()->pContainerObj);
     }
     else {
-        pweapon = 0;
+        pweapon = nullptr;
     }
-    Animation* panim = this->GetAnimation(0);
-    Animation* panim1st = this->GetAnimation(1);
-    bool v302 = 0;
+    Animation* panim = this->GetAnimation(false);
+    Animation* panim1st = this->GetAnimation(true);
+    bool v302 = false;
     smoveMode = static_cast<int32_t>(
         (static_cast<uint32_t>(smoveMode) & 0xFFFF0000u) | (static_cast<uint32_t>(static_cast<uint16_t>(0)))
     );
@@ -4257,9 +4257,9 @@ void PlayerCharacter::Update(float afDelta) {
     bool IronSights = this->GetIronSights();
     if (IronSights && this->pCurrentProcess->GetWeaponDrawn()) {
         TESObjectWEAP* pcurrentWeapon;
-        bool v298 = 0;
+        bool v298 = false;
         if (this->GetParentCell()->GetInterior()) {
-            v298 = 1;
+            v298 = true;
         }
         else {
             Sky* psky = TES::pInstance->pSky;
@@ -4267,71 +4267,71 @@ void PlayerCharacter::Update(float afDelta) {
             float fsunriseTime = psky->GetSunriseEnd();
             float fsunsetTime = psky->GetSunsetBegin();
             if (fsunsetTime <= static_cast<double>(ftimeOfDay) || fsunriseTime >= static_cast<double>(ftimeOfDay)) {
-                v298 = 1;
+                v298 = true;
             }
         }
         if (pVATS.eMode || this->fTimeInSlowMoCam > 0.0) {
-            v298 = 0;
+            v298 = false;
         }
         ItemChange* pcurrentWeaponItem = this->pCurrentProcess->GetCurrentWeapon();
         if (pcurrentWeaponItem) {
             pcurrentWeapon = static_cast<TESObjectWEAP*>(pcurrentWeaponItem->pContainerObj);
         }
         else {
-            pcurrentWeapon = 0;
+            pcurrentWeapon = nullptr;
         }
         if (pcurrentWeapon &&
             (pcurrentWeapon->HasNightScope() &&
              (!this->bNightVisionOn &&
               (v298 && (!pcurrentWeapon->HasModScope() || pcurrentWeaponItem->HasModEffectActive(14)))))) {
-            this->bNightVisionOn = 1;
+            this->bNightVisionOn = true;
             TESImageSpaceModifier* apMod_3 = static_cast<TESImageSpaceModifier*>(TESForm::GetFormByNumericID(0x8CD8Cu));
-            ImageSpaceModifierInstanceForm::Trigger(apMod_3, 1.0f, 0);
+            ImageSpaceModifierInstanceForm::Trigger(apMod_3, 1.0f, nullptr);
         }
         else {
             if (!v298) {
                 TESImageSpaceModifier* FormByNumericID =
                     static_cast<TESImageSpaceModifier*>(TESForm::GetFormByNumericID(0x8CD8Cu));
                 ImageSpaceModifierInstanceForm::Stop(FormByNumericID);
-                this->RemovePlayerAction(PLAYER_ACTION_IRON_SITES, 0);
-                this->bNightVisionOn = 0;
+                this->RemovePlayerAction(PLAYER_ACTION_IRON_SITES, nullptr);
+                this->bNightVisionOn = false;
             }
         }
         if (!this->GetPlayerAction(PLAYER_ACTION_IRON_SITES)) {
-            this->AddPlayerAction(PLAYER_ACTION_IRON_SITES, 20.0f, 0);
+            this->AddPlayerAction(PLAYER_ACTION_IRON_SITES, 20.0f, nullptr);
         }
     }
     else {
         if (this->bNightVisionOn) {
             TESImageSpaceModifier* v288 = static_cast<TESImageSpaceModifier*>(TESForm::GetFormByNumericID(0x8CD8Cu));
             ImageSpaceModifierInstanceForm::Stop(v288);
-            this->bNightVisionOn = 0;
+            this->bNightVisionOn = false;
         }
-        this->RemovePlayerAction(PLAYER_ACTION_IRON_SITES, 0);
+        this->RemovePlayerAction(PLAYER_ACTION_IRON_SITES, nullptr);
     }
     if (!IronSights || (this->bHasSpotterActive || pVATS.eMode == VATS::VATS_PLAYBACK)) {
         if (this->bHasSpotterActive && !IronSights) {
             TESEffectShader* v22 = pDataHandler->SpotterEffectItem();
             ReferenceProcessLists.FinishMagicShaderHitEffectAll(v22);
-            this->bHasSpotterActive = 0;
+            this->bHasSpotterActive = false;
         }
     }
     else {
         v287 = 0.0;
         BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::HAS_IMPROVED_SPOTTING, pPlayer, &v287);
         if (v287 > 0.0) {
-            this->bHasSpotterActive = 1;
+            this->bHasSpotterActive = true;
             this->SpotterEffectNearbyEnemies();
         }
     }
     if (this->GetActorValue(ActorValue::NIGHT_EYE_BONUS) <= 0) {
         if (this->bHasCateyeActive && this->GetActorValue(ActorValue::NIGHT_EYE_BONUS) <= 0) {
             ReferenceProcessLists.FinishMagicShaderHitEffectAll(pDataHandler->pCateyeMobileShader);
-            this->bHasCateyeActive = 0;
+            this->bHasCateyeActive = false;
         }
     }
     else {
-        this->bHasCateyeActive = 1;
+        this->bHasCateyeActive = true;
     }
     v286 = 0.0;
     BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::HAS_ITEM_DETECTION, pPlayer, &v286);
@@ -4346,24 +4346,24 @@ void PlayerCharacter::Update(float afDelta) {
         this->UpdateHardcoreMode();
     }
     BaseProcess* CurrentAIProcess = this->pCurrentProcess;
-    CurrentAIProcess->CalculateLightValue(this, 0);
+    CurrentAIProcess->CalculateLightValue(this, false);
     if (!this->IsStandingOnFurniture() || this->GetSitSleepState()) {
-        this->RemovePlayerAction(PLAYER_ACTION_STAND_ON_TABLE_CHAIR, 0);
+        this->RemovePlayerAction(PLAYER_ACTION_STAND_ON_TABLE_CHAIR, nullptr);
     }
     else {
         if (!this->GetPlayerAction(PLAYER_ACTION_STAND_ON_TABLE_CHAIR)) {
-            this->AddPlayerAction(PLAYER_ACTION_STAND_ON_TABLE_CHAIR, 20.0f, 0);
+            this->AddPlayerAction(PLAYER_ACTION_STAND_ON_TABLE_CHAIR, 20.0f, nullptr);
         }
     }
     bhkCharacterController* CharController = this->GetCharController();
     if (CharController && static_cast<uint8_t>(CharController->IsOnElevator())) {
         if (!this->bOnElevator) {
             ReferenceProcessLists.MoveFollowersOnToPlayer();
-            this->bOnElevator = 1;
+            this->bOnElevator = true;
         }
     }
     else {
-        this->bOnElevator = 0;
+        this->bOnElevator = false;
     }
     BaseProcess* v283 = this->pCurrentProcess;
     if (!(v283->GetDetectionModifierTimer() > 0.0)) {
@@ -4406,13 +4406,13 @@ void PlayerCharacter::Update(float afDelta) {
         this->fSortActorDistanceTimer = *v26;
     }
     if (this->bReturnToLastKnownGoodPosition) {
-        this->bReturnToLastKnownGoodPosition = 0;
-        this->ReturnToLastKnownGoodPosition(1);
+        this->bReturnToLastKnownGoodPosition = false;
+        this->ReturnToLastKnownGoodPosition(true);
     }
     if (this->GetForceActivateRef()) {
         TESObjectREFR* ForceActivateRef = this->GetForceActivateRef();
-        ForceActivateRef->Activate(this, 0, 0, 1);
-        this->SetForceActivateRef(0);
+        ForceActivateRef->Activate(this, false, nullptr, 1);
+        this->SetForceActivateRef(nullptr);
     }
     else {
         BaseProcess* v279 = this->pCurrentProcess;
@@ -4464,8 +4464,8 @@ void PlayerCharacter::Update(float afDelta) {
             (ActorMover::MF_SNEAKING | ActorMover::MF_SWIMMING | ActorMover::MF_FALL | ActorMover::MF_SLIDE)
         );
         this->pPenetrationDetection->Update();
-        if (this->UpdateHeadingAndLooking(afDelta, 0, &smoveMode, 0)) {
-            v302 = 1;
+        if (this->UpdateHeadingAndLooking(afDelta, false, &smoveMode, false)) {
+            v302 = true;
         }
         if (((PlayerCharacter::bVanityMode || PlayerCharacter::bZoom3rdPersonCamera) &&
              this->pCurrentProcess->GetFadeState() == BaseProcess::FADE_NORMAL) ||
@@ -4481,7 +4481,7 @@ void PlayerCharacter::Update(float afDelta) {
                         TESObjectWEAP* pweapon_3 =
                             static_cast<TESObjectWEAP*>(this->pCurrentProcess->GetCurrentWeapon()->pContainerObj);
                         if (pweapon_3) {
-                            bool bhasAmmo = 1;
+                            bool bhasAmmo = true;
                             if (pweapon_3->GetCurrentAmmo(pPlayer)) {
                                 ItemChange* pammo = this->pCurrentProcess->GetCurrentAmmo();
                                 if (pammo) {
@@ -4489,7 +4489,7 @@ void PlayerCharacter::Update(float afDelta) {
                                     bhasAmmo = FormHealth_0 >= pweapon_3->GetAmmoPerShot();
                                 }
                                 else {
-                                    bhasAmmo = 0;
+                                    bhasAmmo = false;
                                 }
                             }
                         }
@@ -4497,19 +4497,19 @@ void PlayerCharacter::Update(float afDelta) {
                 }
             }
             if (this->pCurrentProcess->GetKnockState() || this->IsParalyzed()) {
-                pVATS.QuitVATSPlayback(0, 0);
-                this->bAiControlledActivate = 0;
-                pCurrentWater = 0;
+                pVATS.QuitVATSPlayback(false, false);
+                this->bAiControlledActivate = false;
+                pCurrentWater = nullptr;
                 if (!this->b3rdPerson) {
-                    this->ForceTemp3rdPerson(1);
+                    this->ForceTemp3rdPerson(true);
                 }
             }
-            if (this->GetUnderAIControl() || this->IsDead(0)) {
+            if (this->GetUnderAIControl() || this->IsDead(false)) {
                 if (this->bActually3rdPerson &&
                     (!this->b3rdPerson && this->GetControlsDisabled(PlayerCharacter::DPC_POV_SWITCH))) {
-                    this->Show1stPerson(1);
+                    this->Show1stPerson(true);
                 }
-                this->pActorMover->ForceMoveMode(static_cast<uint16_t>(smoveMode));
+                this->pActorMover->ForceMoveMode(smoveMode);
                 if (!(fAiControlTimer > 15.0) ||
                     (this->GetSitSleepState() && this->GetSitSleepState() != SIT_SLEEP_IS_SITTING)) {
                     if (this->GetInSleepPackage()) {
@@ -4518,7 +4518,7 @@ void PlayerCharacter::Update(float afDelta) {
                             (this->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
                              (this->pCurrentProcess->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING ||
                               !this->pCurrentProcess->GetPackageThatIsRunning()))) {
-                            this->SetAIControlledToPosition(0);
+                            this->SetAIControlledToPosition(false);
                             this->pCurrentProcess->ClearRunOncePackage();
                             fAiControlTimer = 0.0f;
                         }
@@ -4527,7 +4527,7 @@ void PlayerCharacter::Update(float afDelta) {
                         if (this->GetAIControlledFromPosition()) {
                             fAiControlTimer = fAiControlTimer + afDelta;
                             if (this->GetSitSleepState() == SIT_SLEEP_NORMAL) {
-                                this->SetAIControlledFromPosition(0);
+                                this->SetAIControlledFromPosition(false);
                                 this->pCurrentProcess->ClearRunOncePackage();
                                 fAiControlTimer = 0.0f;
                             }
@@ -4542,27 +4542,27 @@ void PlayerCharacter::Update(float afDelta) {
                     if (!(fPlayerDeathReloadTime.Float() > 0.0)) {
                         if (this->GetLifeState() == ACTOR_LIFE_STATE_DEAD && !PlayerCharacter::bShowDeathMessage) {
                             this->DetachCharController();
-                            Interface::SetGunScopeVisible(0);
+                            Interface::SetGunScopeVisible(false);
                             if (pSaveLoadManager->HasMostRecentSaveGame()) {
                                 const char* afMult = sMiscPlayerDeadMenuOption.String();
                                 const char* v109 = sMiscPlayerDeadLoadOption.String();
                                 Interface::CreateMessageMenu(
-                                    sMiscPlayerDeadMessage.String(), static_cast<const char*>(0),
-                                    static_cast<const char*>(0), &PlayerCharacter::DeathMenu, 1, 23, 0.0f, 0.0f, v109,
-                                    afMult, nullptr
+                                    sMiscPlayerDeadMessage.String(), static_cast<const char*>(nullptr),
+                                    static_cast<const char*>(nullptr), &PlayerCharacter::DeathMenu, 1, 23, 0.0f, 0.0f,
+                                    v109, afMult, nullptr
                                 );
                             }
                             else {
                                 StartMenu::ChooseMainMenu();
                             }
-                            PlayerCharacter::bShowDeathMessage = 1;
+                            PlayerCharacter::bShowDeathMessage = true;
                         }
                     }
                     else {
                         if (this->GetLifeState() == ACTOR_LIFE_STATE_DEAD ||
                             this->GetLifeState() == ACTOR_LIFE_STATE_DYING) {
                             if (fPlayerDeathReloadTime_0 < 0.0) {
-                                Interface::SetGunScopeVisible(0);
+                                Interface::SetGunScopeVisible(false);
                                 fPlayerDeathReloadTime_0 = fPlayerDeathReloadTime.Float();
                             }
                             fPlayerDeathReloadTime_0 = fPlayerDeathReloadTime_0 - afDelta;
@@ -4592,12 +4592,12 @@ void PlayerCharacter::Update(float afDelta) {
                     this->Character::Update(afDelta);
                     Animation* v32 = this->GetAnimation(!this->b3rdPerson);
                     this->UpdateAnimationMovement(v32, afDelta);
-                    this->UpdateCamera(0, 0);
-                    this->GetParentCell()->TestObjectAgainstMultibounds(this, 1, 0);
+                    this->UpdateCamera(false, false);
+                    this->GetParentCell()->TestObjectAgainstMultibounds(this, true, false);
                     NiNode* afMulta = this->Get3D();
                     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
-                    ShadowSceneNode_->UpdateObjectLighting(afMulta, 1);
-                    BGSMusicType* MusicType = this->GetParentCell()->GetMusicType(0);
+                    ShadowSceneNode_->UpdateObjectLighting(afMulta, true);
+                    BGSMusicType* MusicType = this->GetParentCell()->GetMusicType(nullptr);
                     this->pLastKnownMusicType = MusicType;
                     if (this->bAiControlledActivate) {
                         if (pCurrentWater) {
@@ -4615,7 +4615,7 @@ void PlayerCharacter::Update(float afDelta) {
                                     PlayerCharacter::fDrinkDelay =
                                         PlayerCharacter::fDrinkDelay + fDrinkRepeatRate.Float();
                                     if (pCurrentWater) {
-                                        pCurrentWater->Activate(0, this, 0, 0, 0);
+                                        pCurrentWater->Activate(nullptr, this, false, nullptr, 0);
                                     }
                                 }
                             }
@@ -4626,15 +4626,15 @@ void PlayerCharacter::Update(float afDelta) {
                                 Animation* v36 = this->GetAnimation();
                                 v36->SetLoopCount(AGS_SPECIAL_IDLE, 0);
                                 PlayerCharacter::fDrinkDelay = fDrinkRepeatRate.Float();
-                                pCurrentWater = 0;
+                                pCurrentWater = nullptr;
                             }
                         }
                         Animation* v37 = this->GetAnimation();
                         if (v37->SpecialIdleDonePlaying() &&
                             this->pCurrentProcess->GetAnimAction() == ANIM_ACTION_NONE &&
                             this->pCurrentProcess->GetKnockState() == KNOCK_STATE_NORMAL) {
-                            this->bAiControlledActivate = 0;
-                            pCurrentWater = 0;
+                            this->bAiControlledActivate = false;
+                            pCurrentWater = nullptr;
                         }
                     }
                     if (pcontrols->GetUserAction(Controls::UACTN_QUICKLOAD, 1)) {
@@ -4642,28 +4642,28 @@ void PlayerCharacter::Update(float afDelta) {
                             fPlayerDeathReloadTime_0 = -1.0f;
                         }
                     }
-                    if (!this->IsDead(0) && !this->IsDying()) {
-                        this->UpdateMagic(0, 0);
+                    if (!this->IsDead(false) && !this->IsDying()) {
+                        this->UpdateMagic(false, false);
                         if (pcontrols->GetUserAction(Controls::UACTN_ACTIVATE, 1)) {
                             if (!this->IsPipboyActive() && !Interface::IsInMenuMode() && !this->IsParalyzed() &&
                                 !this->GetTempPerson()) {
                                 Actor* pactor_2 = static_cast<Actor*>(Interface::GetActivateREFR());
                                 char v269 = 1;
-                                bool v268 = 0;
+                                bool v268 = false;
                                 if (pactor_2) {
                                     if (pactor_2->IsFurniture()) {
                                         v268 = IronSights;
                                     }
                                 }
                                 if (this->GetControlsDisabled(PlayerCharacter::DPC_MOVEMENT)) {
-                                    v268 = 1;
+                                    v268 = true;
                                 }
                                 if (pactor_2) {
                                     if (pactor_2->IsProjectile()) {
                                         ArrowProjectile* parrow = dynamic_cast<ArrowProjectile*>(pactor_2);
                                         if (parrow) {
                                             if (parrow->eState == ArrowProjectile::STATE_FLYING) {
-                                                v268 = 1;
+                                                v268 = true;
                                             }
                                         }
                                     }
@@ -4673,7 +4673,7 @@ void PlayerCharacter::Update(float afDelta) {
                                         BaseProcess* pprocess = pactor_2->pCurrentProcess;
                                         if (pprocess->GetFadeState() == BaseProcess::FADE_OUT_DISABLE ||
                                             pprocess->GetFadeState() == BaseProcess::FADE_OUT_DELETE) {
-                                            v268 = 1;
+                                            v268 = true;
                                         }
                                     }
                                 }
@@ -4687,7 +4687,7 @@ void PlayerCharacter::Update(float afDelta) {
                                     case 6:
                                     case 7:
                                     case 9: {
-                                        v268 = 1;
+                                        v268 = true;
                                         break;
                                     }
                                     default: {
@@ -4696,17 +4696,17 @@ void PlayerCharacter::Update(float afDelta) {
                                 }
                                 ANIMATION_ACTION AnimAction = this->GetAnimAction();
                                 if (AnimAction != ANIM_ACTION_NONE) {
-                                    v268 = 1;
+                                    v268 = true;
                                 }
                                 if (this->bWant3rdPerson != this->b3rdPerson) {
-                                    v268 = 1;
+                                    v268 = true;
                                 }
                                 if (this->GetBlockActivate()) {
-                                    v268 = 1;
+                                    v268 = true;
                                 }
-                                bool v262 = 0;
+                                bool v262 = false;
                                 if (!v268) {
-                                    Interface::SetInfoForRef(0, 0, 0);
+                                    Interface::SetInfoForRef(nullptr, false, false);
                                     if (pactor_2) {
                                         BSSimpleList<BGSEntryPointFunctionDataActivateChoice*> ChoiceList;
                                         BGSEntryPoint::HandleEntryPoint(
@@ -4714,29 +4714,29 @@ void PlayerCharacter::Update(float afDelta) {
                                         );
                                         if (ChoiceList.IsEmpty()) {
                                             int32_t icount_2 = pactor_2->GetCount();
-                                            if (pactor_2->Activate(this, 0, 0, icount_2)) {
+                                            if (pactor_2->Activate(this, false, nullptr, icount_2)) {
                                                 v269 = 0;
                                             }
                                         }
                                         else {
                                             if (!MessageMenu::AddMessageToQueue(&ChoiceList, pactor_2)) {
                                                 int32_t icount = pactor_2->GetCount();
-                                                if (pactor_2->Activate(this, 0, 0, icount)) {
+                                                if (pactor_2->Activate(this, false, nullptr, icount)) {
                                                     v269 = 0;
                                                 }
                                             }
                                         }
                                     }
                                     else {
-                                        v262 = 1;
+                                        v262 = true;
                                     }
                                     if (v269 && this->pCurrentProcess->GetCurrentFurniture()) {
                                         TESObjectREFR* v38 = this->pCurrentProcess->GetCurrentFurniture();
-                                        v262 = !v38->Activate(this, 0, 0, 1);
+                                        v262 = !v38->Activate(this, false, nullptr, 1);
                                     }
                                     else {
                                         if (v269) {
-                                            v262 = 1;
+                                            v262 = true;
                                         }
                                     }
                                 }
@@ -4757,24 +4757,24 @@ void PlayerCharacter::Update(float afDelta) {
                                         }
                                     }
                                     if (!hndl.IsPlaying()) {
-                                        hndl.Play(0);
+                                        hndl.Play(false);
                                     }
                                     (&this->m_Extra)->SetCreatureAwakeSound(hndl);
                                 }
-                                v302 = 1;
+                                v302 = true;
                             }
                         }
                     }
                 }
                 else {
                     if (this->GetAIControlledFromPosition() && this->GetSitSleepState() == SIT_SLEEP_IS_SITTING) {
-                        this->SetAIControlledFromPosition(0);
+                        this->SetAIControlledFromPosition(false);
                         this->pCurrentProcess->ClearRunOncePackage();
                     }
                     else {
-                        if (this->IsDead(0) || this->GetSitSleepState() == SIT_SLEEP_NORMAL) {
+                        if (this->IsDead(false) || this->GetSitSleepState() == SIT_SLEEP_NORMAL) {
                             this->pCurrentProcess->ClearRunOncePackage();
-                            this->SetAIControlledToPosition(0);
+                            this->SetAIControlledToPosition(false);
                             fAiControlTimer = 0.0f;
                         }
                     }
@@ -4794,14 +4794,14 @@ void PlayerCharacter::Update(float afDelta) {
                 }
                 this->ModPlayerGreetTimer();
                 this->CheckPlayerGreetFlag();
-                bool v255 = 0;
+                bool v255 = false;
                 this->fAmmoSwapButtonTimer = this->fAmmoSwapButtonTimer + afDelta;
                 if (pcontrols->GetUserAction(Controls::UACTN_HOTKEY2, 1)) {
                     if (this->pCurrentProcess->GetCurrentWeapon()) {
                         if (this->IsWeaponDrawn()) {
-                            int32_t iupState = InterfaceManager::CheckMenuButton(Interface::eButtonDPadUp, 0);
-                            int32_t ileftState = InterfaceManager::CheckMenuButton(Interface::eButtonDPadLeft, 0);
-                            int32_t irightState = InterfaceManager::CheckMenuButton(Interface::eButtonDPadRight, 0);
+                            int32_t iupState = InterfaceManager::CheckMenuButton(Interface::eButtonDPadUp, false);
+                            int32_t ileftState = InterfaceManager::CheckMenuButton(Interface::eButtonDPadLeft, false);
+                            int32_t irightState = InterfaceManager::CheckMenuButton(Interface::eButtonDPadRight, false);
                             int32_t v251 = iupState == 2 || !iupState;
                             bool v250 = v251;
                             int32_t v249 = ileftState == 2 || !ileftState;
@@ -4811,7 +4811,7 @@ void PlayerCharacter::Update(float afDelta) {
                             if (!v250 || (!v248 && !v246)) {
                                 float* v40 = &fPlayerAmmoSwapTimer.Float();
                                 bool bStartReload = *v40 < static_cast<double>(this->fAmmoSwapButtonTimer);
-                                this->AmmoSwapHelper(bStartReload, 0);
+                                this->AmmoSwapHelper(bStartReload, false);
                                 if (bStartReload) {
                                     this->fAmmoSwapButtonTimer = 0.0f;
                                 }
@@ -4830,15 +4830,15 @@ void PlayerCharacter::Update(float afDelta) {
                                  !this->GetWantWeaponDrawn())) {
                                 if (!g_bWasReadyItemHeldLastFrame && !this->GetWantWeaponDrawn()) {
                                     if ((this->GetMoveMode() & 2048) == 0) {
-                                        this->SetWantWeaponDrawn(1);
+                                        this->SetWantWeaponDrawn(true);
                                     }
-                                    g_bWasReadyItemHeldLastFrame = 1;
+                                    g_bWasReadyItemHeldLastFrame = true;
                                 }
                             }
                             else {
-                                v255 = 1;
-                                this->SetWantWeaponDrawn(0);
-                                g_bWasReadyItemHeldLastFrame = 1;
+                                v255 = true;
+                                this->SetWantWeaponDrawn(false);
+                                g_bWasReadyItemHeldLastFrame = true;
                             }
                         }
                     }
@@ -4846,7 +4846,7 @@ void PlayerCharacter::Update(float afDelta) {
                 else {
                     if (!pcontrols->GetUserAction(Controls::UACTN_READY_RELOAD_WEAPON, 2)) {
                         fReloadTimer = 0.0f;
-                        g_bWasReadyItemHeldLastFrame = 0;
+                        g_bWasReadyItemHeldLastFrame = false;
                     }
                 }
                 this->UpdateMenuModeButton(afDelta);
@@ -4861,16 +4861,17 @@ void PlayerCharacter::Update(float afDelta) {
                         (pcontrols->GetUserAction(Controls::UACTN_BACK, 0) ||
                          (pcontrols->GetUserAction(Controls::UACTN_SLDRIGHT, 0) ||
                           pcontrols->GetUserAction(Controls::UACTN_SLDLEFT, 0)))) {
-                        this->bAutoMove = 0;
+                        this->bAutoMove = false;
                     }
                     else {
                         pcontrols->ForceUserAction(Controls::UACTN_FORWARD);
                     }
                 }
-                bool v243 = 0;
+                bool v243 = false;
                 if (pcontrols->GetUserAction(Controls::UACTN_CROUCH, 1)) {
-                    if (!this->IsParalyzed() && !this->IsDead(0) && !this->IsKnockedOut() && !this->IsRestrained() &&
-                        !this->IsUnConscious() && !this->GetControlsDisabled(PlayerCharacter::DPC_SNEAKING) &&
+                    if (!this->IsParalyzed() && !this->IsDead(false) && !this->IsKnockedOut() &&
+                        !this->IsRestrained() && !this->IsUnConscious() &&
+                        !this->GetControlsDisabled(PlayerCharacter::DPC_SNEAKING) &&
                         this->GetSitSleepState() == SIT_SLEEP_NORMAL) {
                         int32_t v242 = this->GetAnimAction() + 1;
                         switch (v242) {
@@ -4897,7 +4898,7 @@ void PlayerCharacter::Update(float afDelta) {
                                     hndl.operator=(*v240);
                                     const NiPoint3* v42 = &this->GetLocationOnReference();
                                     hndl.SetPosition(*v42);
-                                    hndl.Play(0);
+                                    hndl.Play(false);
                                     this->UseActionPoints(ActionPoints::ACTION_STAND);
                                 }
                                 else {
@@ -4914,12 +4915,12 @@ void PlayerCharacter::Update(float afDelta) {
                                     hndl.operator=(*v237);
                                     const NiPoint3* v44 = &this->GetLocationOnReference();
                                     hndl.SetPosition(*v44);
-                                    hndl.Play(0);
+                                    hndl.Play(false);
                                     this->UseActionPoints(ActionPoints::ACTION_CROUCH);
                                 }
                                 if (!this->bTemp1stPerson) {
-                                    this->SetIronSights(0, 0, 0);
-                                    this->SetBlock(0);
+                                    this->SetIronSights(false, false, false);
+                                    this->SetBlock(false);
                                 }
                                 break;
                             }
@@ -4928,7 +4929,7 @@ void PlayerCharacter::Update(float afDelta) {
                             }
                         }
                     }
-                    v243 = 1;
+                    v243 = true;
                 }
                 currentMatrix = (*&pWorldRoot->GetCameraRoot()->m_kLocal).m_Rotate;
                 NiPoint3 currentPos = *this->QLocationOnReference();
@@ -4942,7 +4943,7 @@ void PlayerCharacter::Update(float afDelta) {
                     forwardVec__motionVec.z = 0.0f;
                     forwardVec__motionVec.Unitize();
                 }
-                bool bdropping = 0;
+                bool bdropping = false;
                 if (this->eGrabType == PlayerCharacter::GRAB_INVENTORY_DROP) {
                     bdropping = this->UpdateDropSpring(afDelta);
                 }
@@ -5017,7 +5018,7 @@ void PlayerCharacter::Update(float afDelta) {
                     FormFlags = pcurrentWeaponItem_2->pContainerObj;
                 }
                 else {
-                    FormFlags = 0;
+                    FormFlags = nullptr;
                 }
                 if (PlayerCharacter::fWalkSpeedMult > 1.0) {
                     PlayerCharacter::fWalkSpeedMult = 1.0f;
@@ -5275,7 +5276,7 @@ void PlayerCharacter::Update(float afDelta) {
                         (static_cast<uint32_t>(static_cast<uint16_t>((smoveMode & 0xFFC0))))
                     );
                 }
-                this->pActorMover->ForceMoveMode(static_cast<uint16_t>(smoveMode));
+                this->pActorMover->ForceMoveMode(smoveMode);
                 if (v243) {
                     this->SetWalkRunFlagDirty();
                 }
@@ -5283,15 +5284,15 @@ void PlayerCharacter::Update(float afDelta) {
                 this->UpdateTemp3rdPerson();
                 this->UpdateTemp1stPerson();
                 this->bsave3rdPerson = this->b3rdPerson;
-                this->b3rdPersonSaved = 1;
-                this->b3rdPerson = 1;
+                this->b3rdPersonSaved = true;
+                this->b3rdPerson = true;
                 if ((!pcontrols->GetUserAction(Controls::UACTN_USE, 0) ||
                      (!bUserDebounceBow ||
                       (!this->pCurrentProcess->GetCurrentAmmo() || !this->GetWantWeaponDrawn()))) &&
                     this->pCurrentProcess->GetAutomaticShotDelay() != 0.0 &&
                     (pVATS.eMode != VATS::VATS_PLAYBACK ||
                      (!pVATS.GetCurrentAction() || !pVATS.GetCurrentAction()->cFireShots))) {
-                    this->pCurrentProcess->ClearAutomaticShotsToFire(0);
+                    this->pCurrentProcess->ClearAutomaticShotsToFire(false);
                 }
                 char v198 = 0;
                 if (this->IsKnockedOut() ||
@@ -5301,7 +5302,7 @@ void PlayerCharacter::Update(float afDelta) {
                     v198 = 1;
                 }
                 if (v198 || this->GetControlsDisabled(PlayerCharacter::DPC_MOVEMENT)) {
-                    static_cast<PlayerMover*>(this->pActorMover)->PlayerMover::SetMoveMode(831u, 0);
+                    static_cast<PlayerMover*>(this->pActorMover)->PlayerMover::SetMoveMode(831u, false);
                 }
                 if (!v198 && !this->GetControlsDisabled(PlayerCharacter::DPC_FIGHTING)) {
                     if (this->eGrabType == PlayerCharacter::GRAB_INVENTORY_DROP ||
@@ -5317,13 +5318,13 @@ void PlayerCharacter::Update(float afDelta) {
                                 this->pCurrentProcess->CanAttack()) {
                                 if ((!pweapon || (pweapon->IsMeleeWeapon() && this->IsWeaponDrawn())) &&
                                     (pweapon || this->IsWeaponDrawn())) {
-                                    this->SetBlock(1);
+                                    this->SetBlock(true);
                                 }
                                 else {
-                                    this->SetIronSights(1, 0, 0);
+                                    this->SetIronSights(true, false, false);
                                 }
                                 if (!PlayerCharacter::bVanityMode || PlayerCharacter::bIsAutoVanityMode) {
-                                    v302 = 1;
+                                    v302 = true;
                                 }
                             }
                         }
@@ -5332,9 +5333,9 @@ void PlayerCharacter::Update(float afDelta) {
                                  (!pcontrols->GetUserAction(Controls::UACTN_BLOCK, 0) || this->IsPipboyActive())) &&
                                 (this->GetIronSights() ||
                                  this->pCurrentProcess->GetAnimAction() == ANIM_ACTION_BLOCK)) {
-                                this->SetIronSights(0, 0, 0);
-                                this->SetBlock(0);
-                                v302 = 1;
+                                this->SetIronSights(false, false, false);
+                                this->SetBlock(false);
+                                v302 = true;
                             }
                         }
                         if (!this->pCurrentProcess->CanAttack() || (smoveMode & 2048) != 0) {
@@ -5343,7 +5344,7 @@ void PlayerCharacter::Update(float afDelta) {
                         }
                         else {
                             if (this->CheckUserInputAttacks()) {
-                                v302 = 1;
+                                v302 = true;
                             }
                         }
                     }
@@ -5361,7 +5362,7 @@ void PlayerCharacter::Update(float afDelta) {
                                         BSAnimGroupSequence* CurrentSequence = v197->GetCurrentSequence(AGS_MOVEMENT);
                                         TESAnimGroup* AnimGroup = CurrentSequence->GetAnimGroup();
                                         if (TESAnimGroupIsJumpingLandAnim(AnimGroup, nullptr)) {
-                                            this->SetAnimAction(ANIM_ACTION_NONE, 0);
+                                            this->SetAnimAction(ANIM_ACTION_NONE, nullptr);
                                         }
                                     }
                                 }
@@ -5392,7 +5393,7 @@ void PlayerCharacter::Update(float afDelta) {
                                         }
                                     }
                                     this->ForcePhysicsGrabDrop();
-                                    v302 = 1;
+                                    v302 = true;
                                 }
                             }
                         }
@@ -5403,20 +5404,22 @@ void PlayerCharacter::Update(float afDelta) {
                         (&this->m_Extra)->RemoveTrespassPackage();
                     }
                 }
-                bsearch = 0;
+                bsearch = false;
                 if (pcontrols->GetUserAction(Controls::UACTN_RESTMENU, 1)) {
                     if (!this->GetPCControlFlags()) {
                         if (this->IsTresPassing()) {
                             const char* v56 = sNoWaitTrespass.String();
                             Interface::ShowMessage(
-                                v56, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                                v56, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f,
+                                false
                             );
                         }
                         else {
                             if (this->IsAlarmForPlayerCharactaer()) {
                                 const char* v57 = sNoWaitWhileAlarmSounding.String();
                                 Interface::ShowMessage(
-                                    v57, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                                    v57, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr,
+                                    2.0f, false
                                 );
                             }
                             else {
@@ -5425,8 +5428,8 @@ void PlayerCharacter::Update(float afDelta) {
                                 if (this->IsPointDeepUnderWater(*v58, afMultb, 0.875f)) {
                                     const char* v59 = sNoWaitUnderWater.String();
                                     Interface::ShowMessage(
-                                        v59, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0,
-                                        2.0f, 0
+                                        v59, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
+                                        nullptr, 2.0f, false
                                     );
                                 }
                                 else {
@@ -5434,8 +5437,8 @@ void PlayerCharacter::Update(float afDelta) {
                                     if (ReferenceProcessLists.AreHostilActorsNear(Interior)) {
                                         const char* v61 = sNoWaitHostilActorsNear.String();
                                         Interface::ShowMessage(
-                                            v61, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0,
-                                            2.0f, 0
+                                            v61, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
+                                            nullptr, 2.0f, false
                                         );
                                     }
                                     else {
@@ -5447,8 +5450,8 @@ void PlayerCharacter::Update(float afDelta) {
                                             const char* v64 = sNoWaitInAir.String();
                                             Interface::ShowMessage(
                                                 v64, 0,
-                                                "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0,
-                                                2.0f, 0
+                                                "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
+                                                nullptr, 2.0f, false
                                             );
                                         }
                                         else {
@@ -5463,7 +5466,7 @@ void PlayerCharacter::Update(float afDelta) {
                                                         v66, 0,
                                                         "Interface\\Icons\\Message "
                                                         "Icons\\glow_message_vaultboy_sad.dds",
-                                                        0, 2.0f, 0
+                                                        nullptr, 2.0f, false
                                                     );
                                                 }
                                                 else {
@@ -5473,11 +5476,11 @@ void PlayerCharacter::Update(float afDelta) {
                                                             v67, 0,
                                                             "Interface\\Icons\\Message "
                                                             "Icons\\glow_message_vaultboy_sad.dds",
-                                                            0, 2.0f, 0
+                                                            nullptr, 2.0f, false
                                                         );
                                                     }
                                                     else {
-                                                        Interface::CreateSleepMenu(0);
+                                                        Interface::CreateSleepMenu(false);
                                                     }
                                                 }
                                             }
@@ -5485,8 +5488,8 @@ void PlayerCharacter::Update(float afDelta) {
                                                 const char* v65 = sNoWaitInCell.String();
                                                 Interface::ShowMessage(
                                                     v65, 0,
-                                                    "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0,
-                                                    2.0f, 0
+                                                    "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
+                                                    nullptr, 2.0f, false
                                                 );
                                             }
                                         }
@@ -5496,12 +5499,12 @@ void PlayerCharacter::Update(float afDelta) {
                         }
                     }
                 }
-                this->b3rdPerson = 1;
+                this->b3rdPerson = true;
                 this->UpdateAnimation();
                 this->PickAnimations(PlayerCharacter::fWalkSpeedMult, PlayerCharacter::fPCTurnScale);
                 this->pCurrentProcess->UpdateKnockState(this);
                 this->b3rdPerson = this->bsave3rdPerson;
-                this->b3rdPersonSaved = 0;
+                this->b3rdPersonSaved = false;
                 if (this->IsSleeping()) {
                     this->PlayerSleep();
                 }
@@ -5513,7 +5516,7 @@ void PlayerCharacter::Update(float afDelta) {
                             const hkVector4* Zero = &hkVector4::getZero();
                             pcon->SetLinearVelocity(*Zero);
                         }
-                        this->SetNoCollision(1);
+                        this->SetNoCollision(true);
                     }
                     alignas(16) NiPoint3 delta = currentPos - oldPos;
                     delta.operator*=(afDelta);
@@ -5521,13 +5524,13 @@ void PlayerCharacter::Update(float afDelta) {
                     this->SetPosition(oldPos + *v69);
                 }
                 else {
-                    this->SetNoCollision(0);
+                    this->SetNoCollision(false);
                 }
                 static_cast<PlayerMover*>(this->pActorMover)->PlayerMover::SetSideVector(sideVec);
                 this->pActorMover->Update(afDelta);
                 this->CheckBorderRegion();
                 if ((smoveMode & 15) != 0) {
-                    v302 = 1;
+                    v302 = true;
                 }
                 if (pcontrols->GetUserAction(Controls::UACTN_QUICKSAVE, 1)) {
                     pSaveLoadManager->Quicksave();
@@ -5559,7 +5562,7 @@ void PlayerCharacter::Update(float afDelta) {
                                 v180 = v182->GetAnimGroup();
                             }
                             else {
-                                v180 = 0;
+                                v180 = nullptr;
                             }
                             if (v180) {
                                 Type = v180->GetType();
@@ -5571,10 +5574,10 @@ void PlayerCharacter::Update(float afDelta) {
                             if (Type >= ANIM_GROUP_RELOAD_W && v177 < 199) {
                                 if (v182) {
                                     panim->SkipNextBlend();
-                                    panim->BlendOut(AGS_WEAPON, 0);
+                                    panim->BlendOut(AGS_WEAPON, false);
                                     if (v181) {
                                         panim1st->SkipNextBlend();
-                                        panim1st->BlendOut(AGS_WEAPON, 0);
+                                        panim1st->BlendOut(AGS_WEAPON, false);
                                     }
                                 }
                             }
@@ -5590,30 +5593,30 @@ void PlayerCharacter::Update(float afDelta) {
                                (!this->IsWeaponDrawn() ||
                                 (this->IsVanityMode() ||
                                  (this->b3rdPerson || this->bWant3rdPerson != this->b3rdPerson))))))) {
-                            bDelayVATSMenu = 1;
-                            this->SetWantWeaponDrawn(1);
+                            bDelayVATSMenu = true;
+                            this->SetWantWeaponDrawn(true);
                             if (this->IsVanityMode() || this->b3rdPerson) {
                                 this->StopVanityMode();
-                                this->Show1stPerson(1);
-                                this->bWant3rdPerson = 0;
-                                this->b3rdPerson = 0;
+                                this->Show1stPerson(true);
+                                this->bWant3rdPerson = false;
+                                this->b3rdPerson = false;
                             }
                         }
                         else {
                             TESImageSpaceModifier* Hit = TESImageSpaceModifier::GetGetHit();
                             ImageSpaceModifierInstanceForm::Stop(Hit);
-                            appMain->OnIdle_UpdateImageSpace(1);
+                            appMain->OnIdle_UpdateImageSpace(true);
                             Interface::CreateVATSMenu();
-                            bDelayVATSMenu = 0;
+                            bDelayVATSMenu = false;
                         }
                     }
                     else {
                         BSAudio* v72 = &BSAudio::QInstance();
                         BSSoundHandle* v174 = v72->GetSoundHandleByName(&v175, "UIVATSEnterFail", 289u);
-                        v174->Play(0);
-                        bDelayVATSMenu = 0;
+                        v174->Play(false);
+                        bDelayVATSMenu = false;
                     }
-                    v302 = 1;
+                    v302 = true;
                 }
                 if (!this->IsPipboyActive() && !pCurrentWater && !this->bTemp1stPerson &&
                     (!this->bTemp3rdPerson || PlayerCharacter::bVanityMode) && !bDelayVATSMenu) {
@@ -5621,14 +5624,14 @@ void PlayerCharacter::Update(float afDelta) {
                          pcontrols->GetUserAction(Controls::UACTN_TOGGLEPOV, 0)) &&
                         !this->GetControlsDisabled(PlayerCharacter::DPC_POV_SWITCH)) {
                         if (!Interface::IsInMenuMode() && bFOVTargetReached) {
-                            v302 = 1;
-                            PlayerCharacter::bZoom3rdPersonCamera = 1;
+                            v302 = true;
+                            PlayerCharacter::bZoom3rdPersonCamera = true;
                             if (!PlayerCharacter::bVanityMode) {
                                 bWas3rdPersonBeforeVanityMode = this->bActually3rdPerson;
-                                this->SetFirstPerson(0);
+                                this->SetFirstPerson(false);
                                 PlayerCharacter::fAutoVanityDelay = 0.0f;
-                                PlayerCharacter::bIsAutoVanityMode = 0;
-                                PlayerCharacter::bVanityMode = 1;
+                                PlayerCharacter::bIsAutoVanityMode = false;
+                                PlayerCharacter::bVanityMode = true;
                                 HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_VANITY);
                                 PlayerCharacter::kVanityModePos.z = 0.0f;
                                 PlayerCharacter::fStartingCameraY = PlayerCharacter::kVanityModePos.y;
@@ -5640,8 +5643,8 @@ void PlayerCharacter::Update(float afDelta) {
                         if (pcontrols->GetUserAction(Controls::UACTN_TOGGLEPOV, 2) ||
                             (PlayerCharacter::bVanityMode && !PlayerCharacter::bIsAutoVanityMode)) {
                             PlayerCharacter::fAutoVanityDelay = 0.0f;
-                            PlayerCharacter::bIsAutoVanityMode = 0;
-                            PlayerCharacter::bVanityMode = 0;
+                            PlayerCharacter::bIsAutoVanityMode = false;
+                            PlayerCharacter::bVanityMode = false;
                             HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_CHANGED);
                             if (fVanityModeDelay.Float() > static_cast<double>(PlayerCharacter::fVanityDelay) &&
                                 (InterfaceManager::Has360Controller() ||
@@ -5650,18 +5653,18 @@ void PlayerCharacter::Update(float afDelta) {
                                 if (bWas3rdPersonBeforeVanityMode) {
                                     this->SetFirstPerson(!this->bTemp3rdPersonSwitchBack);
                                 }
-                                this->bTemp3rdPerson = 0;
-                                this->bTemp3rdPersonSwitchBack = 0;
+                                this->bTemp3rdPerson = false;
+                                this->bTemp3rdPersonSwitchBack = false;
                             }
                             PlayerCharacter::fVanityDelay = 0.0f;
-                            v302 = 1;
-                            PlayerCharacter::bZoom3rdPersonCamera = 0;
+                            v302 = true;
+                            PlayerCharacter::bZoom3rdPersonCamera = false;
                             PlayerCharacter::kVanityModePos.x = 0.0f;
                             PlayerCharacter::kVanityModePos.z = 0.0f;
                         }
                     }
                 }
-                bool v172 = 0;
+                bool v172 = false;
                 if (this->pCurrentProcess->GetCurrentFurniture()) {
                     v172 = (smoveMode & 15) != 0;
                 }
@@ -5669,22 +5672,22 @@ void PlayerCharacter::Update(float afDelta) {
                     !this->IsPipboyActive() && !Interface::IsInMenuMode() && !this->IsParalyzed() && !bdropping &&
                     !this->GetTempPerson()) {
                     Actor* pactor_3 = static_cast<Actor*>(Interface::GetActivateREFR());
-                    bool v170 = 1;
-                    bool bDontActivate = 0;
+                    bool v170 = true;
+                    bool bDontActivate = false;
                     if (pactor_3) {
                         if (pactor_3->IsFurniture()) {
                             bDontActivate = IronSights;
                         }
                     }
                     if (this->GetControlsDisabled(PlayerCharacter::DPC_MOVEMENT)) {
-                        bDontActivate = 1;
+                        bDontActivate = true;
                     }
                     if (pactor_3) {
                         if (pactor_3->IsProjectile()) {
                             ArrowProjectile* parrow_2 = dynamic_cast<ArrowProjectile*>(pactor_3);
                             if (parrow_2) {
                                 if (parrow_2->eState == ArrowProjectile::STATE_FLYING) {
-                                    bDontActivate = 1;
+                                    bDontActivate = true;
                                 }
                             }
                         }
@@ -5692,7 +5695,7 @@ void PlayerCharacter::Update(float afDelta) {
                     if (pactor_3) {
                         if (pactor_3->IsActor()) {
                             BaseProcess* pprocess_2 = pactor_3->pCurrentProcess;
-                            if (!pactor_3->IsDead(0)) {
+                            if (!pactor_3->IsDead(false)) {
                                 const NiPoint3* v74;
                                 TESObjectCELL* afMultd;
                                 TESObjectCELL* afMultc = pactor_3->GetParentCell();
@@ -5703,7 +5706,7 @@ void PlayerCharacter::Update(float afDelta) {
                                        pPlayer->IsPointDeepUnderWater(*v74, afMultd, 0.875f))) ||
                                      ((pprocess_2 && pprocess_2->GetFadeState() == BaseProcess::FADE_OUT_DISABLE) ||
                                       (pprocess_2 && pprocess_2->GetFadeState() == BaseProcess::FADE_OUT_DELETE)))) {
-                                    bDontActivate = 1;
+                                    bDontActivate = true;
                                 }
                             }
                         }
@@ -5718,7 +5721,7 @@ void PlayerCharacter::Update(float afDelta) {
                         case 6:
                         case 7:
                         case 9: {
-                            bDontActivate = 1;
+                            bDontActivate = true;
                             break;
                         }
                         default: {
@@ -5727,21 +5730,21 @@ void PlayerCharacter::Update(float afDelta) {
                     }
                     ANIMATION_ACTION v164 = this->GetAnimAction();
                     if (v164 != ANIM_ACTION_NONE) {
-                        bDontActivate = 1;
+                        bDontActivate = true;
                     }
                     if (this->bWant3rdPerson != this->b3rdPerson) {
-                        bDontActivate = 1;
+                        bDontActivate = true;
                     }
                     if (this->GetBlockActivate()) {
-                        bDontActivate = 1;
+                        bDontActivate = true;
                     }
-                    bool v163 = 0;
+                    bool v163 = false;
                     if (!bDontActivate) {
                         if (!pactor_3 || !pactor_3->IsActor()) {
-                            Interface::SetInfoForRef(0, 0, 0);
+                            Interface::SetInfoForRef(nullptr, false, false);
                         }
                         if (!pactor_3 || v172) {
-                            v163 = 1;
+                            v163 = true;
                         }
                         else {
                             alignas(16) BSSimpleList<BGSEntryPointFunctionDataActivateChoice*> ChoiceList_2;
@@ -5750,15 +5753,15 @@ void PlayerCharacter::Update(float afDelta) {
                             );
                             if (ChoiceList_2.IsEmpty()) {
                                 int32_t icount_4 = pactor_3->GetCount();
-                                if (pactor_3->Activate(this, 0, 0, icount_4)) {
-                                    v170 = 0;
+                                if (pactor_3->Activate(this, false, nullptr, icount_4)) {
+                                    v170 = false;
                                 }
                                 else {
                                     if (pactor_3->GetLock()) {
                                         TESObjectREFR* pref_2 = (TESObjectREFR*)pactor_3;
                                         LockData* Lock = pactor_3->GetLock();
                                         if (Lock->GetLockLevel(pref_2) != 5 && !pactor_3->GetInaccessible()) {
-                                            v170 = 0;
+                                            v170 = false;
                                         }
                                     }
                                 }
@@ -5766,19 +5769,19 @@ void PlayerCharacter::Update(float afDelta) {
                             else {
                                 if (!MessageMenu::AddMessageToQueue(&ChoiceList_2, pactor_3)) {
                                     int32_t icount_3 = pactor_3->GetCount();
-                                    if (pactor_3->Activate(this, 0, 0, icount_3)) {
-                                        v170 = 0;
+                                    if (pactor_3->Activate(this, false, nullptr, icount_3)) {
+                                        v170 = false;
                                     }
                                 }
                             }
                         }
                         if (v170 && this->pCurrentProcess->GetCurrentFurniture()) {
                             TESObjectREFR* v76 = this->pCurrentProcess->GetCurrentFurniture();
-                            v163 = !v76->Activate(this, 0, 0, 1);
+                            v163 = !v76->Activate(this, false, nullptr, 1);
                         }
                         else {
                             if (v170) {
-                                v163 = 1;
+                                v163 = true;
                             }
                         }
                     }
@@ -5800,11 +5803,11 @@ void PlayerCharacter::Update(float afDelta) {
                             }
                         }
                         if (!hndl_2.IsPlaying()) {
-                            hndl_2.Play(0);
+                            hndl_2.Play(false);
                         }
                         (&this->m_Extra)->SetCreatureAwakeSound(hndl_2);
                     }
-                    v302 = 1;
+                    v302 = true;
                 }
                 if (PlayerCharacter::bIsAutoVanityMode) {
                     if (v302 || this->GetControlsDisabled(PlayerCharacter::DPC_POV_SWITCH)) {
@@ -5841,11 +5844,11 @@ void PlayerCharacter::Update(float afDelta) {
                             else {
                                 PlayerCharacter::kAutoVanityModePos.x = 0.0f;
                             }
-                            this->ForceTemp3rdPerson(1);
-                            PlayerCharacter::bIsAutoVanityMode = 1;
-                            PlayerCharacter::bVanityMode = 1;
+                            this->ForceTemp3rdPerson(true);
+                            PlayerCharacter::bIsAutoVanityMode = true;
+                            PlayerCharacter::bVanityMode = true;
                             HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_VANITY);
-                            PlayerCharacter::bSnapChaseCamera = 1;
+                            PlayerCharacter::bSnapChaseCamera = true;
                         }
                     }
                 }
@@ -5861,8 +5864,8 @@ void PlayerCharacter::Update(float afDelta) {
                         pPlayerSphere->SetLinearVelocity(NiPoint3_ZERO);
                     }
                 }
-                if (!this->IsDead(0) && !this->IsDying()) {
-                    this->UpdateMagic(0, 0);
+                if (!this->IsDead(false) && !this->IsDying()) {
+                    this->UpdateMagic(false, false);
                 }
                 float fValued = panim->GetMoveSpeed();
                 panim1st->SetMoveSpeed(fValued);
@@ -5881,17 +5884,17 @@ void PlayerCharacter::Update(float afDelta) {
                 this->UpdateAnimationMovement(v80, afDelta);
                 this->HandlePostAnimationActions();
                 if (!bVATSForce1stPerson) {
-                    this->UpdateCamera(0, 0);
+                    this->UpdateCamera(false, false);
                 }
-                this->GetParentCell()->TestObjectAgainstMultibounds(this, 1, 0);
+                this->GetParentCell()->TestObjectAgainstMultibounds(this, true, false);
                 NiNode* afMulte = this->Get3D();
                 ShadowSceneNode* v81 = BSShaderManager::GetShadowSceneNode(0);
-                v81->UpdateObjectLighting(afMulte, 1);
+                v81->UpdateObjectLighting(afMulte, true);
                 if (this->pCurrentProcess->GetCurrentMuzzleFlash()) {
                     MuzzleFlash* v82 = this->pCurrentProcess->GetCurrentMuzzleFlash();
                     v82->Update(afDelta, this);
                 }
-                if (this->IsDead(0) &&
+                if (this->IsDead(false) &&
                     (pVATS.eMode != VATS::VATS_PLAYBACK ||
                      (!pVATS.GetCurrentAction() ||
                       pVATS.GetCurrentAction()->eAction != ActionPoints::ACTION_PLAYER_VATS_DEATH))) {
@@ -5907,7 +5910,7 @@ void PlayerCharacter::Update(float afDelta) {
                         pIOManager->LoadQueuedPriority(IO_TASK_PRIORITY_CRITICAL);
                     }
                 }
-                bsearch = 0;
+                bsearch = false;
                 CharacterProgression* CharacterProgressionInfo = this->GetCharacterProgressionInfo();
                 if (CharacterProgressionInfo->GetReadyToLevelUp()) {
                     if (!this->IsPlayerCharacterInCombat(&bsearch) && !pVATS.IsInVats() &&
@@ -5921,7 +5924,7 @@ void PlayerCharacter::Update(float afDelta) {
                     if (!this->IsPlayerCharacterInCombat(&bsearch) && !pVATS.IsInVats() && !Interface::InDialog() &&
                         !StartMenu::PauseMenuIsActive()) {
                         this->pReputationUpdate->DisplayReputationTitleChange();
-                        this->pReputationUpdate = 0;
+                        this->pReputationUpdate = nullptr;
                     }
                 }
                 if (this->pCurrentProcess) {
@@ -5942,7 +5945,7 @@ void PlayerCharacter::Update(float afDelta) {
                         fAngryFace = 0.0f;
                         BSFaceGenAnimationData* pfaceAnim_2 = this->GetFaceAnimationData();
                         if (pfaceAnim_2) {
-                            pfaceAnim_2->ResetCurrentMorphs(0.5f, 1, 0, 0, 0, 0);
+                            pfaceAnim_2->ResetCurrentMorphs(0.5f, true, false, false, false, false);
                         }
                     }
                 }
@@ -5986,10 +5989,10 @@ void PlayerCharacter::Update(float afDelta) {
                             if (this->fTimeSinceLastAmmoRegenTick <= 0.0) {
                                 TESContainer tempcont;
                                 TESAmmo* CurrentAmmo = pweapon->GetCurrentAmmo(pPlayer);
-                                tempcont.AddObject(CurrentAmmo, 1, 0);
-                                tempcont.AddContainerToReference(pPlayer, 1);
+                                tempcont.AddObject(CurrentAmmo, 1, nullptr);
+                                tempcont.AddContainerToReference(pPlayer, true);
                                 TESAmmo* v97 = pweapon->GetCurrentAmmo(pPlayer);
-                                pPlayer->EquipObject(v97, 1, 0, 1, 0, 0);
+                                pPlayer->EquipObject(v97, 1, nullptr, true, false, false);
                             }
                         }
                     }
@@ -6024,7 +6027,7 @@ void PlayerCharacter::Update(float afDelta) {
                                                         BSAudio* v103 = &BSAudio::QInstance();
                                                         BSSoundHandle* SoundHandleByNumericID =
                                                             v103->GetSoundHandleByNumericID(&v135, CastingType, 257u);
-                                                        SoundHandleByNumericID->Play(0);
+                                                        SoundHandleByNumericID->Play(false);
                                                         uint32_t v104 = BSGetTickCount();
                                                         time_11E0BA8 = RandomInt(1500, 2000) + v104;
                                                     }
@@ -6047,7 +6050,7 @@ void PlayerCharacter::Update(float afDelta) {
                         v133 = v105 >= pweapon->GetAmmoPerShot();
                     }
                     else {
-                        v133 = 0;
+                        v133 = false;
                     }
                     if (!v133 ||
                         (pcontrols->GetUserAction(Controls::UACTN_USE, 2) ||
@@ -6077,7 +6080,7 @@ void PlayerCharacter::Update(float afDelta) {
             this->Character::Update(afDelta);
             Animation* v29 = this->GetAnimation(!this->b3rdPerson);
             this->UpdateAnimationMovement(v29, afDelta);
-            this->UpdateCamera(0, 0);
+            this->UpdateCamera(false, false);
         }
     }
 }
@@ -6087,7 +6090,7 @@ void PlayerCharacter::Resurrect(bool abResetInventory, bool abAttach3D, bool abG
     LowProcess* v10;
     fHealthModifier = 0.0f;
     Interface::UpdateActorValue(ActorValue::HEALTH);
-    ReferenceProcessLists.kUpdateLock.Lock(0);
+    ReferenceProcessLists.kUpdateLock.Lock(nullptr);
     BaseProcess* pCurrentProcess = this->pCurrentProcess;
     if (pCurrentProcess) {
         delete pCurrentProcess;
@@ -6097,7 +6100,7 @@ void PlayerCharacter::Resurrect(bool abResetInventory, bool abAttach3D, bool abG
         v10 = ::new (apMemory) LowProcess;
     }
     else {
-        v10 = 0;
+        v10 = nullptr;
     }
     this->pCurrentProcess = v10;
     HighProcess* v14 = static_cast<HighProcess*>(ourMalloc(sizeof(HighProcess)));
@@ -6105,7 +6108,7 @@ void PlayerCharacter::Resurrect(bool abResetInventory, bool abAttach3D, bool abG
         v9 = ::new (v14) HighProcess;
     }
     else {
-        v9 = 0;
+        v9 = nullptr;
     }
     BaseProcess* v19 = v9;
     v9->Copy(this->pCurrentProcess);
@@ -6133,14 +6136,14 @@ void PlayerCharacter::Resurrect(bool abResetInventory, bool abAttach3D, bool abG
             v8 = ::new (v12) CameraCaster(*v6, v7);
         }
         else {
-            v8 = 0;
+            v8 = nullptr;
         }
         pCameraCaster = v8;
     }
     else {
-        pCameraCaster = 0;
+        pCameraCaster = nullptr;
     }
-    Actor::Resurrect(0, 0, 0);
+    Actor::Resurrect(false, false, false);
     InitAnimation();
 }
 
@@ -6176,7 +6179,7 @@ void PlayerCharacter::UseActionPoints(float afAmount) {
 
 bool PlayerCharacter::IsOverEncumbered() {
     if (PlayerCharacter::IsGodMode()) {
-        return (bool)0;
+        return false;
     }
     double v2 = (double)static_cast<ActorValueOwner*>(this)->GetActorValue(ActorValue::INVENTORY_WEIGHT);
     return (bool)((uint8_t)(Actor::GetMaxCarryWeight() < v2));
@@ -6209,7 +6212,7 @@ bool PlayerCharacter::GetSandman() {
         return (bool)result;
     }
     if (((int32_t)v4->GetPackType()) == 37) {
-        return (bool)1;
+        return true;
     }
     return (bool)result;
 }
@@ -6222,20 +6225,20 @@ void PlayerCharacter::InitiateSandmanPackage(
 ) {
     PackageTarget* pnew;
     PackageLocation* ploc;
-    iSandmanDetection = ReferenceProcessLists.GetHighestDetectionLevelForActor(pPlayer, 0);
-    SetAIControlledPackage(1);
-    ForceTemp3rdPerson(1);
-    pCurrentProcess->SetRunOncePackage(0, this);
-    pCurrentProcess->ClearActionHeadTrackTarget(0);
+    iSandmanDetection = ReferenceProcessLists.GetHighestDetectionLevelForActor(pPlayer, false);
+    SetAIControlledPackage(true);
+    ForceTemp3rdPerson(true);
+    pCurrentProcess->SetRunOncePackage(nullptr, this);
+    pCurrentProcess->ClearActionHeadTrackTarget(false);
     TESPackage* ppack = TESPackage::CreatePackage(PACKAGE_TYPE_SANDMAN);
-    ppack->SetMustReachLocation(1);
-    ppack->SetMustComplete(1);
+    ppack->SetMustReachLocation(true);
+    ppack->SetMustComplete(true);
     PackageLocation* v10 = static_cast<PackageLocation*>(ourMalloc(sizeof(PackageLocation)));
     if (v10) {
         ploc = ::new (v10) PackageLocation;
     }
     else {
-        ploc = 0;
+        ploc = nullptr;
     }
     ploc->SetLocType(PLT_REFERENCE);
     ploc->SetLocReference(this);
@@ -6248,7 +6251,7 @@ void PlayerCharacter::InitiateSandmanPackage(
         pnew = ::new (v9) PackageTarget;
     }
     else {
-        pnew = 0;
+        pnew = nullptr;
     }
     ppack->SetPackageTarget(pnew);
     if (pnew) {
@@ -6260,9 +6263,9 @@ void PlayerCharacter::InitiateSandmanPackage(
     ppack->GetPackageTarget()->iValue = 0;
     BaseProcess* CurrentAIProcess = pCurrentProcess;
     CurrentAIProcess->ComputeLastTimeProcessed();
-    SetSandman(1);
+    SetSandman(true);
     pCurrentProcess->SetFurniture(apfurniture, auiIndex, aMarker);
-    PutCreatedPackage(ppack, 0, 1);
+    PutCreatedPackage(ppack, false, true);
     apTarget->InitiateDoNothingPackage();
 }
 
@@ -6270,19 +6273,19 @@ void PlayerCharacter::InitiateCannibalPackage(Actor* apTarget) {
     if (!apTarget->GetHasBeenEaten()) {
         PackageTarget* pnew;
         PackageLocation* ploc;
-        SetAIControlledPackage(1);
-        ForceTemp3rdPerson(1);
-        pCurrentProcess->SetRunOncePackage(0, this);
-        pCurrentProcess->ClearActionHeadTrackTarget(0);
+        SetAIControlledPackage(true);
+        ForceTemp3rdPerson(true);
+        pCurrentProcess->SetRunOncePackage(nullptr, this);
+        pCurrentProcess->ClearActionHeadTrackTarget(false);
         TESPackage* ppack = TESPackage::CreatePackage(PACKAGE_TYPE_CANNIBAL);
-        ppack->SetMustReachLocation(1);
-        ppack->SetMustComplete(1);
+        ppack->SetMustReachLocation(true);
+        ppack->SetMustComplete(true);
         PackageLocation* v7 = static_cast<PackageLocation*>(ourMalloc(sizeof(PackageLocation)));
         if (v7) {
             ploc = ::new (v7) PackageLocation;
         }
         else {
-            ploc = 0;
+            ploc = nullptr;
         }
         ploc->SetLocType(PLT_REFERENCE);
         ploc->SetLocReference(this);
@@ -6295,7 +6298,7 @@ void PlayerCharacter::InitiateCannibalPackage(Actor* apTarget) {
             pnew = ::new (v6) PackageTarget;
         }
         else {
-            pnew = 0;
+            pnew = nullptr;
         }
         ppack->SetPackageTarget(pnew);
         if (pnew) {
@@ -6307,7 +6310,7 @@ void PlayerCharacter::InitiateCannibalPackage(Actor* apTarget) {
         ppack->GetPackageTarget()->iValue = 0;
         BaseProcess* CurrentAIProcess = pCurrentProcess;
         CurrentAIProcess->ComputeLastTimeProcessed();
-        PutCreatedPackage(ppack, 0, 1);
+        PutCreatedPackage(ppack, false, true);
     }
 }
 
@@ -6341,7 +6344,7 @@ void PlayerCharacter::SetRefraction(bool abEnable, float afRefractionPower) {
 void PlayerCharacter::SetActorValue(ActorValue::Index aiWhich, float afValue) {
     Actor::SetActorValue(aiWhich, afValue);
     Interface::UpdateActorValue(aiWhich);
-    Actor::CheckSkillLevelChange(aiWhich, 1);
+    Actor::CheckSkillLevelChange(aiWhich, true);
 }
 
 void PlayerCharacter::TempModActorValue(ActorValue::Index aiWhich, int32_t aiValue, Actor* apAttacker) {
@@ -6361,18 +6364,18 @@ void PlayerCharacter::TempModActorValue(ActorValue::Index aiWhich, int32_t aiVal
         if (aiWhich == ActorValue::HEALTH && aiValuea < 0) {
             HandleHealthDamage(apAttacker, static_cast<float>(aiValuea));
         }
-        CheckSkillLevelChange(aiWhich, 0);
+        CheckSkillLevelChange(aiWhich, false);
         if (apAttacker) {
             a5 = static_cast<ActorValueOwner*>(apAttacker);
         }
         else {
-            a5 = 0;
+            a5 = nullptr;
         }
         if (this) {
             a1 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*this)));
         }
         else {
-            a1 = 0;
+            a1 = nullptr;
         }
         ActorValue::CheckCallModifiedCallback(a1, aiWhich, foldValue, static_cast<float>(aiValuea), a5);
     }
@@ -6395,18 +6398,18 @@ void PlayerCharacter::TempModActorValue(ActorValue::Index aiWhich, float afValue
         if (aiWhich == ActorValue::HEALTH && afValuea < 0.0) {
             HandleHealthDamage(apAttacker, afValuea);
         }
-        CheckSkillLevelChange(aiWhich, 0);
+        CheckSkillLevelChange(aiWhich, false);
         if (apAttacker) {
             a5 = static_cast<ActorValueOwner*>(apAttacker);
         }
         else {
-            a5 = 0;
+            a5 = nullptr;
         }
         if (this) {
             a1 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*this)));
         }
         else {
-            a1 = 0;
+            a1 = nullptr;
         }
         ActorValue::CheckCallModifiedCallback(a1, aiWhich, foldValue, afValuea, a5);
     }
@@ -6430,18 +6433,18 @@ void PlayerCharacter::PermanentModActorValue(ActorValue::Index aiWhich, int32_t 
         if (aiWhich == ActorValue::HEALTH && aiValuea < 0) {
             HandleHealthDamage(apAttacker, static_cast<float>(aiValuea));
         }
-        CheckSkillLevelChange(aiWhich, 0);
+        CheckSkillLevelChange(aiWhich, false);
         if (apAttacker) {
             a5 = static_cast<ActorValueOwner*>(apAttacker);
         }
         else {
-            a5 = 0;
+            a5 = nullptr;
         }
         if (this) {
             a1 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*this)));
         }
         else {
-            a1 = 0;
+            a1 = nullptr;
         }
         ActorValue::CheckCallModifiedCallback(a1, aiWhich, foldValue, static_cast<float>(aiValuea), a5);
     }
@@ -6464,18 +6467,18 @@ void PlayerCharacter::PermanentModActorValue(ActorValue::Index aiWhich, float af
         if (aiWhich == ActorValue::HEALTH && v8 < 0.0) {
             HandleHealthDamage(apAttacker, v8);
         }
-        CheckSkillLevelChange(aiWhich, 0);
+        CheckSkillLevelChange(aiWhich, false);
         if (apAttacker) {
             a5 = static_cast<ActorValueOwner*>(apAttacker);
         }
         else {
-            a5 = 0;
+            a5 = nullptr;
         }
         if (this) {
             a1 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*this)));
         }
         else {
-            a1 = 0;
+            a1 = nullptr;
         }
         ActorValue::CheckCallModifiedCallback(a1, aiWhich, foldValue, v8, a5);
     }
@@ -6528,7 +6531,7 @@ void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, int32_t aiV
                         BSSoundHandle* SoundHandleByName =
                             v5->GetSoundHandleByName(&arHandle, "UIHealthHeartbeatBLP", 49u);
                         StatusSoundHandle.operator=(*SoundHandleByName);
-                        StatusSoundHandle.Play(1);
+                        StatusSoundHandle.Play(true);
                     }
                 }
                 else {
@@ -6537,25 +6540,25 @@ void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, int32_t aiV
                     BSAudio* v4 = &BSAudio::QInstance();
                     BSSoundHandle* v13 = v4->GetSoundHandleByName(&a1, "UIHealthHeartbeatALP", 49u);
                     StatusSoundHandle.operator=(*v13);
-                    StatusSoundHandle.Play(1);
+                    StatusSoundHandle.Play(true);
                 }
             }
             else {
                 StatusSoundHandle.FadeOutAndRelease(1000u);
             }
         }
-        CheckSkillLevelChange(aiWhich, 0);
+        CheckSkillLevelChange(aiWhich, false);
         if (apAttacker) {
             a5 = static_cast<ActorValueOwner*>(apAttacker);
         }
         else {
-            a5 = 0;
+            a5 = nullptr;
         }
         if (this) {
             v10 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*this)));
         }
         else {
-            v10 = 0;
+            v10 = nullptr;
         }
         ActorValue::CheckCallModifiedCallback(v10, aiWhich, foldValue, static_cast<float>(aiValuea), a5);
     }
@@ -6607,7 +6610,7 @@ void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, float afVal
                         BSSoundHandle* SoundHandleByName =
                             v5->GetSoundHandleByName(&arHandle, "UIHealthHeartbeatBLP", 49u);
                         StatusSoundHandle.operator=(*SoundHandleByName);
-                        StatusSoundHandle.Play(1);
+                        StatusSoundHandle.Play(true);
                     }
                 }
                 else {
@@ -6616,25 +6619,25 @@ void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, float afVal
                     BSAudio* v4 = &BSAudio::QInstance();
                     BSSoundHandle* v9 = v4->GetSoundHandleByName(&a1, "UIHealthHeartbeatALP", 49u);
                     StatusSoundHandle.operator=(*v9);
-                    StatusSoundHandle.Play(1);
+                    StatusSoundHandle.Play(true);
                 }
             }
             else {
                 StatusSoundHandle.FadeOutAndRelease(1000u);
             }
         }
-        CheckSkillLevelChange(aiWhich, 0);
+        CheckSkillLevelChange(aiWhich, false);
         if (apAttacker) {
             a5 = static_cast<ActorValueOwner*>(apAttacker);
         }
         else {
-            a5 = 0;
+            a5 = nullptr;
         }
         if (this) {
             apActor = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*this)));
         }
         else {
-            apActor = 0;
+            apActor = nullptr;
         }
         ActorValue::CheckCallModifiedCallback(apActor, aiWhich, foldValue, afValuea, a5);
     }
@@ -6649,7 +6652,7 @@ void PlayerCharacter::ModActorBaseValue(ActorValue::Index aiWhich, int32_t aiVal
     else {
         foldValue = 0.0f;
     }
-    bool v10 = 0;
+    bool v10 = false;
     float v9 = GetBaseValueOverride(aiWhich, v10);
     if (v10) {
         float v6 = static_cast<double>(aiValue) + foldValue;
@@ -6660,14 +6663,14 @@ void PlayerCharacter::ModActorBaseValue(ActorValue::Index aiWhich, int32_t aiVal
         ActorBase->ModActorValue(aiWhich, aiValue);
     }
     Interface::UpdateActorValue(aiWhich);
-    CheckSkillLevelChange(aiWhich, 1);
+    CheckSkillLevelChange(aiWhich, true);
     if (this) {
         a1 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*this)));
     }
     else {
-        a1 = 0;
+        a1 = nullptr;
     }
-    ActorValue::CheckCallModifiedCallback(a1, aiWhich, foldValue, static_cast<float>(aiValue), 0);
+    ActorValue::CheckCallModifiedCallback(a1, aiWhich, foldValue, static_cast<float>(aiValue), nullptr);
 }
 
 void PlayerCharacter::ModActorBaseValue(ActorValue::Index aiWhich, float afValue) {
@@ -6679,7 +6682,7 @@ void PlayerCharacter::ModActorBaseValue(ActorValue::Index aiWhich, float afValue
     else {
         foldValue = 0.0f;
     }
-    bool v9 = 0;
+    bool v9 = false;
     float v8 = GetBaseValueOverride(aiWhich, v9);
     if (v9) {
         float v5 = foldValue + afValue;
@@ -6690,14 +6693,14 @@ void PlayerCharacter::ModActorBaseValue(ActorValue::Index aiWhich, float afValue
         ActorBase->ModActorValue(aiWhich, afValue);
     }
     Interface::UpdateActorValue(aiWhich);
-    CheckSkillLevelChange(aiWhich, 1);
+    CheckSkillLevelChange(aiWhich, true);
     if (this) {
         a1 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*this)));
     }
     else {
-        a1 = 0;
+        a1 = nullptr;
     }
-    ActorValue::CheckCallModifiedCallback(a1, aiWhich, foldValue, afValue, 0);
+    ActorValue::CheckCallModifiedCallback(a1, aiWhich, foldValue, afValue, nullptr);
 }
 
 bool PlayerCharacter::DamageEquipment(ItemChange* apEquipment, float afDamage, bool abIgnoreArmorSkill) {
@@ -6712,7 +6715,7 @@ TESObjectREFR* PlayerCharacter::DropObject(
     const NiPoint3* apPoint,
     const NiPoint3* apRotate
 ) {
-    pVATS.QuitVATSPlayback(0, 0);
+    pVATS.QuitVATSPlayback(false, false);
     TESObjectCELL* pparentcell = GetParentCell();
     if (Interface::PreloadWorldMap() && pparentcell) {
         TESObjectREFR* plootbag = pparentcell->GetLootBag();
@@ -6720,8 +6723,11 @@ TESObjectREFR* PlayerCharacter::DropObject(
             plootbag = pparentcell->CreateLootBagAtRef(this);
         }
         if (plootbag) {
-            RemoveItem(static_cast<TESBoundObject*>(apObject), apExtra, ainumber, 0, 0, plootbag, 0, 0, 1, 0);
-            return 0;
+            RemoveItem(
+                static_cast<TESBoundObject*>(apObject), apExtra, ainumber, false, false, plootbag, nullptr, nullptr,
+                true, false
+            );
+            return nullptr;
         }
     }
     else {
@@ -6731,15 +6737,15 @@ TESObjectREFR* PlayerCharacter::DropObject(
                 TESObjectWEAP* CurrentWeapon = GetCurrentWeapon();
                 if (CurrentWeapon->GetCurrentAmmo(v11) == apObject) {
                     pCurrentProcess->GetCurrentAmmo()->iNumber = 0;
-                    NiAVObject* v8 = Get3D(0);
+                    NiAVObject* v8 = Get3D(false);
                     NiAVObject* pround = BSUtilities::GetObjectByName(v8, "##NifRound");
                     if (pround) {
-                        pround->SetAppCulled(1);
+                        pround->SetAppCulled(true);
                     }
-                    NiAVObject* v9 = Get3D(0);
+                    NiAVObject* v9 = Get3D(false);
                     pround = BSUtilities::GetObjectByName(v9, "##NifRound");
                     if (pround) {
-                        pround->SetAppCulled(1);
+                        pround->SetAppCulled(true);
                     }
                 }
             }
@@ -6748,36 +6754,37 @@ TESObjectREFR* PlayerCharacter::DropObject(
     if (pQueuedWeaponAttach) {
         if (apObject == pQueuedWeaponAttach) {
             if (apExtra) {
-                if (apExtra->GetWorn(0)) {
-                    pQueuedWeaponAttach = 0;
+                if (apExtra->GetWorn(false)) {
+                    pQueuedWeaponAttach = nullptr;
                 }
             }
         }
     }
-    TESBoundObject* pboundobj = apObject->IsBoundObject() ? static_cast<TESBoundObject*>(apObject) : 0;
-    TESObjectREFR* pobjREFR = RemoveItem(pboundobj, apExtra, ainumber, 0, 1, 0, apPoint, apRotate, 1, 0);
+    TESBoundObject* pboundobj = apObject->IsBoundObject() ? static_cast<TESBoundObject*>(apObject) : nullptr;
+    TESObjectREFR* pobjREFR =
+        RemoveItem(pboundobj, apExtra, ainumber, false, true, nullptr, apPoint, apRotate, true, false);
     if (pobjREFR) {
         NiAVObject* pav = pobjREFR->Get3D();
         if (pav) {
-            bhkWorld::Enable(pav, 0, 1, 1);
-            NiUpdateData UpdateData(0.0f, 0, 0);
+            bhkWorld::Enable(pav, false, true, true);
+            NiUpdateData UpdateData(0.0f, false, false);
             pav->Update(UpdateData);
-            bhkWorld::Enable(pav, 1, 1, 1);
+            bhkWorld::Enable(pav, true, true, true);
             NiPoint3 location = pobjREFR->GetLocationOnReference();
             const NiBound* WorldBound = &pav->GetWorldBound();
             NiPoint3 shift = location - WorldBound->m_kCenter;
             location.operator+=(shift);
             pav->SetTranslate(location);
             pobjREFR->SetLocationOnReference(location);
-            bhkNiCollisionObject::ResetSim(pav, 1);
-            bhkWorld::Activate(pav, 1, 1, 0);
+            bhkNiCollisionObject::ResetSim(pav, true);
+            bhkWorld::Activate(pav, true, true, false);
         }
         else {
             DroppedRefList.AddHead(pobjREFR);
-            pobjREFR->SetRecentPCDrop(1);
-            pobjREFR->SetCenterOnCreation(1);
+            pobjREFR->SetRecentPCDrop(true);
+            pobjREFR->SetCenterOnCreation(true);
         }
-        PlayPickUpSound(pboundobj, 0, 0);
+        PlayPickUpSound(pboundobj, false, false);
     }
     return pobjREFR;
 }
@@ -6913,7 +6920,7 @@ void PlayerCharacter::CastScroll(TESObjectBOOK* apScroll, MagicTarget* apTarget)
         SetSelectedScroll(apScroll);
     }
     else {
-        SetSelectedScroll(0);
+        SetSelectedScroll(nullptr);
     }
 }
 
@@ -7097,7 +7104,7 @@ void PlayerCharacter::InitiateGetUpPackage() {
     if (!pPlayer->Actor::IsPathingComplete()) {
         pPlayer->pActorMover->ClearCurrentData();
     }
-    SetAIControlledFromPosition(1);
+    SetAIControlledFromPosition(true);
     Actor::InitiateGetUpPackage();
 }
 
@@ -7431,7 +7438,7 @@ void PlayerCharacter::RemovePerkEntry(BGSPerkEntry* apPerkEntry, bool bAlt) {
 
 BSSimpleList<BGSPerkEntry*>* PlayerCharacter::GetPerkEntryList(uint8_t acEntryPoint, bool bAlt) {
     if (((uint32_t)((int32_t)acEntryPoint)) >= 0x4Au) {
-        return (BSSimpleList<BGSPerkEntry*>*)0;
+        return (BSSimpleList<BGSPerkEntry*>*)nullptr;
     }
     if (bAlt) {
         return &CompanionPerkEntryLists[acEntryPoint];
@@ -7486,7 +7493,7 @@ bool PlayerCharacter::IsImmobile() {
 
 void PlayerCharacter::HandleHealthDamage(Actor* apAttacker, float afDamage) {
     Actor::HandleHealthDamage(apAttacker, afDamage);
-    IsDead(0);
+    IsDead(false);
 }
 
 // Replaces the actor mover with a player mover.
@@ -7524,7 +7531,7 @@ void PlayerCharacter::TransferDisease(SpellItem* apSpell, MagicTarget* apDesired
 }
 
 MagicTarget* PlayerCharacter::GetTouchTarget() {
-    MagicTarget* ptarget = 0;
+    MagicTarget* ptarget = nullptr;
     double v2 = GetReach();
     float freach = GetScale() * v2;
     TESObjectREFR* ptargetRef = CombatUtilities::GetFacingTarget(pPlayer, freach);
@@ -7554,7 +7561,7 @@ bool PlayerCharacter::CheckCast(
         *apReason = ereason;
     }
     if (!bresult && ereason == MagicItem::NOCAST_MULTIPLEBOUNDEFFECTS) {
-        return 0;
+        return false;
     }
     return PlayerCharacter::IsGodMode() || bresult;
 }
@@ -7633,18 +7640,18 @@ int32_t PlayerCharacter::GetPermanentActorValue(ActorValue::Index aiWhich) {
 // permanent modifier is added and the result clamped to the value's range.
 float PlayerCharacter::GetPermanentActorFloatValue(ActorValue::Index aiWhich) {
     float fValue;
-    if (ActorValue::IsSkill(static_cast<ActorValue::Index>(aiWhich))) {
+    if (ActorValue::IsSkill(aiWhich)) {
         double dValue =
-            AiFormulas::AVDeriveSkill(pPlayer ? static_cast<ActorValueOwner*>(pPlayer) : nullptr, aiWhich, 1);
+            AiFormulas::AVDeriveSkill(pPlayer ? static_cast<ActorValueOwner*>(pPlayer) : nullptr, aiWhich, true);
         bool bExists;
-        dValue = GetBaseValueOverride(static_cast<ActorValue::Index>(aiWhich), bExists) + dValue;
+        dValue = GetBaseValueOverride(aiWhich, bExists) + dValue;
         fValue = static_cast<float>(GetPermanentModifier(aiWhich) + dValue);
     }
     else {
         double dValue = GetBaseActorFloatValue(aiWhich);
         fValue = static_cast<float>(GetPermanentModifier(aiWhich) + dValue);
     }
-    return ActorValue::ClampActorValue(static_cast<ActorValue::Index>(aiWhich), fValue);
+    return ActorValue::ClampActorValue(aiWhich, fValue);
 }
 
 BSSimpleList<PerkRankData*>* PlayerCharacter::GetPerkList(bool bAlt) {
@@ -7655,7 +7662,7 @@ BSSimpleList<PerkRankData*>* PlayerCharacter::GetPerkList(bool bAlt) {
 }
 
 PlayerCharacter::TerminalAccessType PlayerCharacter::GetTerminalAccess(TESObjectREFR* apTerminalRef) {
-    BGSTerminal* v7 = 0;
+    BGSTerminal* v7 = nullptr;
     if (apTerminalRef) {
         if (apTerminalRef->GetObjectReference()) {
             TESBoundObject* ObjectReference = apTerminalRef->GetObjectReference();
@@ -7695,7 +7702,7 @@ int32_t PlayerCharacter::GetLastAction() {
 }
 
 bool PlayerCharacter::IsActionInList(PLAYER_ACTION aeAction) {
-    bool bexits = 0;
+    bool bexits = false;
     for (BSSimpleList<PlayerActionObject*>* plist = pListofActions; plist && (plist->m_item && !bexits);
          plist = plist->m_pkNext) {
         PlayerActionObject* pAction = plist->m_item;
@@ -7931,12 +7938,12 @@ void PlayerCharacter::RewardKarma(int32_t aiAmount) {
             v9 = sKarmaMinorGainedImage.String();
             v4 = sKarmaMinorGained.String();
         }
-        Interface::ShowMessage(v4, 0, v9, 0, 2.0f, 0);
+        Interface::ShowMessage(v4, 0, v9, nullptr, 2.0f, false);
         BSSoundHandle psoundHand_2;
         BSAudio* v5 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v5->GetSoundHandleByName(&arHandle, "UIKarmaUp", 289u);
         psoundHand_2.operator=(*SoundHandleByName);
-        psoundHand_2.Play(0);
+        psoundHand_2.Play(false);
     }
     else {
         const char* v2;
@@ -7952,17 +7959,17 @@ void PlayerCharacter::RewardKarma(int32_t aiAmount) {
             v8 = sKarmaMajorLostImage.String();
             v2 = sKarmaMajorLost.String();
         }
-        Interface::ShowMessage(v2, 0, v8, 0, 2.0f, 0);
+        Interface::ShowMessage(v2, 0, v8, nullptr, 2.0f, false);
         BSSoundHandle psoundHand;
         BSAudio* v3 = &BSAudio::QInstance();
         BSSoundHandle* v12 = v3->GetSoundHandleByName(&a1, "UIKarmaDown", 289u);
         psoundHand.operator=(*v12);
-        psoundHand.Play(0);
+        psoundHand.Play(false);
     }
     if (aiAmount <= 0 || (v6 = &iKarmaMax.Int(), icurrent < *v6)) {
         int32_t* v7;
         if (aiAmount >= 0 || (v7 = &iKarmaMin.Int(), icurrent > *v7)) {
-            PermanentModActorValue(ActorValue::KARMA, aiAmount, 0);
+            PermanentModActorValue(ActorValue::KARMA, aiAmount, nullptr);
         }
     }
 }
@@ -8267,7 +8274,7 @@ BGSQuestObjective* PlayerCharacter::GetCurrentQuestObjective() {
             return pObjective;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 AudioMarkerInfo* PlayerCharacter::GetClosestAudioMarkerInfo() {
@@ -8275,12 +8282,12 @@ AudioMarkerInfo* PlayerCharacter::GetClosestAudioMarkerInfo() {
         return pClosestAudioMarkerInfo;
     }
     if (AudioMarkerList.IsEmpty()) {
-        return 0;
+        return nullptr;
     }
-    AudioMarkerInfo* pMarker = 0;
+    AudioMarkerInfo* pMarker = nullptr;
     float dist = 3.4028235e+38f;
-    bool bInside = 0;
-    bool bInsideCurrent = 0;
+    bool bInside = false;
+    bool bInsideCurrent = false;
     BSSimpleList<AudioMarkerInfo*>* pList = &AudioMarkerList;
     while (pList && pList->m_item) {
         AudioMarkerInfo* pAudioMarker = pList->m_item;
@@ -8335,12 +8342,12 @@ void PlayerCharacter::SetControlsDisabled(uint8_t aucDisabled) {
         HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_CHANGED);
     }
     if ((ucControlsDisabled & 8) != 0) {
-        SetWantWeaponDrawn(0);
+        SetWantWeaponDrawn(false);
     }
     if ((ucControlsDisabled & 16) != 0) {
-        bWant3rdPerson = 0;
+        bWant3rdPerson = false;
         if (sp1stPerson3D.m_pObject) {
-            UpdateCamera(0, 0);
+            UpdateCamera(false, false);
         }
         else {
             fChaseDistance = 0.0f;
@@ -8353,7 +8360,7 @@ void PlayerCharacter::SetControlsDisabled(uint8_t aucDisabled) {
 }
 
 PlayerCharacter* PlayerCharacter::SetKillCamMode(KILL_CAM_TYPE eType) {
-    eKillCameraSetting = static_cast<KILL_CAM_TYPE>(eType);
+    eKillCameraSetting = eType;
     return this;
 }
 
@@ -8367,15 +8374,15 @@ void PlayerCharacter::ResetKillCam(KILL_CAM_TYPE eOldType, bool bForceReset) {
     }
     if (eOldType == KILL_CAM_VATS && (bForceReset || !StartMenu::PauseMenuIsActive())) {
         pPlayer->SetControlsDisabled(
-            0,
+            false,
             static_cast<PlayerCharacter::DISABLE_PLAYER_CONTROLS>(
                 PlayerCharacter::DPC_MOVEMENT | PlayerCharacter::DPC_LOOKING
             )
         );
-        pVATS.QuitVATSPlayback(0, 1);
+        pVATS.QuitVATSPlayback(false, true);
         pVATS.ClearData();
-        pVATS.SetMode(VATS::VATS_MODE_NONE, 1);
-        bVATSForce1stPerson = 1;
+        pVATS.SetMode(VATS::VATS_MODE_NONE, true);
+        bVATSForce1stPerson = true;
     }
     fTimeInSlowMoCam = 0.0f;
 }
@@ -8443,18 +8450,18 @@ bool PlayerCharacter::ForceTemp3rdPerson(bool abForceCameraDistance) {
 void PlayerCharacter::SetSelectedSpell(MagicItem* apSelectedSpell) {
     if (pSelectedSpell != apSelectedSpell) {
         if (pSelectedSpell) {
-            pSelectedSpell->Unload(1);
+            pSelectedSpell->Unload(true);
         }
         pSelectedSpell = apSelectedSpell;
         if (pSelectedSpell) {
-            pSelectedSpell->Preload(0);
+            pSelectedSpell->Preload(false);
         }
         ResetMagicCastSound();
     }
 }
 
 void PlayerCharacter::ResetPlayerGreetFlag() {
-    bGreetingPlayer = (bool)0;
+    bGreetingPlayer = false;
     fGreetTimer = (float)0.0;
 }
 
@@ -8468,8 +8475,8 @@ void PlayerCharacter::CheckForClosesConversation(
     PlayerCharacter* v6;
     PlayerCharacter* v7;
     float v8;
-    float fDistToPlayer = (float)apSpeaker->GetDistanceFromReference(pPlayer, 0, 0);
-    float distanceFromReference = (float)apTarget->GetDistanceFromReference(pPlayer, 0, 0);
+    float fDistToPlayer = apSpeaker->GetDistanceFromReference(pPlayer, false, false);
+    float distanceFromReference = apTarget->GetDistanceFromReference(pPlayer, false, false);
     if (fDistToPlayer > ((double)distanceFromReference)) {
         fDistToPlayer = distanceFromReference;
     }
@@ -8478,12 +8485,12 @@ void PlayerCharacter::CheckForClosesConversation(
         if (pPlayer->pClosestConversation->GetActorStartedConversation()) {
             v6 = pPlayer;
             actorStartedConversation = pPlayer->pClosestConversation->GetActorStartedConversation();
-            v10 = (float)actorStartedConversation->GetDistanceFromReference(v6, 0, 0);
+            v10 = actorStartedConversation->GetDistanceFromReference(v6, false, false);
         }
         if (pPlayer->pClosestConversation->DialoguePackage::GetTargetOfConversation()) {
             v7 = pPlayer;
             cullingProcess = pPlayer->pClosestConversation->DialoguePackage::GetTargetOfConversation();
-            v8 = (float)cullingProcess->GetDistanceFromReference(v7, 0, 0);
+            v8 = cullingProcess->GetDistanceFromReference(v7, false, false);
             if (v10 > ((double)v8)) {
                 v10 = v8;
             }
@@ -8506,13 +8513,13 @@ void PlayerCharacter::AddTopics(BSSimpleList<TESTopic*>* apAddTopicList) {
         char v5 = 0;
         for (BSSimpleList<TESTopic*>* pList = apAddTopicList; pList && pList->m_item; pList = pList->m_pkNext) {
             TESTopic** v2 = &pList->m_item;
-            if (AddTopic(*v2, 0, 1)) {
+            if (AddTopic(*v2, false, true)) {
                 v5 = 1;
             }
         }
         if (v5) {
             BSSimpleList<TESTopic*>* TopicList = GetTopicList();
-            TESTopic::SortTopics(1, TopicList);
+            TESTopic::SortTopics(true, TopicList);
         }
     }
 }
@@ -8541,7 +8548,7 @@ void PlayerCharacter::SpellLearned(SpellItem* apSpellIn) {
         for (BSSimpleList<EffectItem*>* plist = apSpellIn; plist && !plist->IsEmpty(); plist = plist->m_pkNext) {
             EffectItem* pitem = plist->m_item;
             if (pitem) {
-                pitem->pEffectSetting->SetFlag(EffectSetting::PLAYER_KNOWS, 1);
+                pitem->pEffectSetting->SetFlag(EffectSetting::PLAYER_KNOWS, true);
             }
         }
     }
@@ -8570,8 +8577,7 @@ void PlayerCharacter::RecursiveReadyInventoryNode(NiNode* apNode) {
     }
     apNode->SetCollisionObject(nullptr);
     auiIndex = 0;
-    for (uint32_t i = static_cast<uint32_t>(apNode->GetArrayCount()); auiIndex < i;
-         i = static_cast<uint32_t>(apNode->GetArrayCount())) {
+    for (uint32_t i = apNode->GetArrayCount(); auiIndex < i; i = apNode->GetArrayCount()) {
         pChild = apNode->GetAt(auiIndex);
         if (pChild) {
             pChild->SetAppCulled(false);
@@ -8728,7 +8734,7 @@ void PlayerCharacter::SetAmmoForHotKey(int32_t aiHotkey, TESAmmo* apAmmo) {
 
 TESAmmo* PlayerCharacter::GetAmmoForHotKey(int32_t aiHotkey) {
     if (aiHotkey < 0 || aiHotkey > 8) {
-        return 0;
+        return nullptr;
     }
     return HotKeyLastAmmo[aiHotkey];
 }
@@ -9045,7 +9051,7 @@ TESObjectREFR* PlayerCharacter::GetRecentAction() {
 
 // Under kPerceivedActorsLock (see PlayerCharacter.h).
 CompassTarget* PlayerCharacter::IsActorPerceived(Actor* apActor) {
-    CompassTarget* pFound = 0;
+    CompassTarget* pFound = nullptr;
     kPerceivedActorsLock.Lock(nullptr);
     for (CompassTarget* v4 : pListofPercievedActors->ItemsUntilNull()) {
         if (v4->pTarget == apActor) {
@@ -9059,7 +9065,7 @@ CompassTarget* PlayerCharacter::IsActorPerceived(Actor* apActor) {
 
 // Under kPerceivedActorsLock (see PlayerCharacter.h).
 bool PlayerCharacter::IsPerceivedActorDetected(Actor* apActor) {
-    bool bDetected = 0;
+    bool bDetected = false;
     kPerceivedActorsLock.Lock(nullptr);
     for (CompassTarget* m_item : pListofPercievedActors->ItemsUntilNull()) {
         if (m_item->pTarget == apActor) {
@@ -9108,11 +9114,11 @@ bool PlayerCharacter::IsPlayerFollower(Actor* apActor) {
     if (FollowerExtra && FollowerExtra->pActorlist) {
         for (Actor*& rpItem : FollowerExtra->pActorlist->ItemsUntilNull()) {
             if (rpItem == apActor) {
-                return 1;
+                return true;
             }
         }
     }
-    return 0;
+    return false;
 }
 
 TESQuest* PlayerCharacter::GetActiveQuest() {
@@ -9156,14 +9162,14 @@ void PlayerCharacter::UpdateAutoAimActor() {
         TESObjectWEAP* FormFlags;
         Actor* phitRef;
         CFilter icolFilter;
-        Actor* pbestActor = 0;
+        Actor* pbestActor = nullptr;
         float v101 = fAutoAimMaxDistance.Float();
         NiCamera* Camera = Main::GetWorldSceneGraph()->GetCamera();
         float v99 = fAutoAimScreenPercentage.Float() * 0.004999999888241291;
         float v98 = -fAutoAimScreenPercentage.Float() * 0.004999999888241291;
         NiPoint2 screenTarget(v98, v99);
-        MobileObject* pmob = 0;
-        this->pPlayersTargetActor = 0;
+        MobileObject* pmob = nullptr;
+        this->pPlayersTargetActor = nullptr;
         for (uint32_t i = 0;; ++i) {
             uint32_t ProcessLevelTail =
                 (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH);
@@ -9172,7 +9178,7 @@ void PlayerCharacter::UpdateAutoAimActor() {
             }
             pmob = (&ReferenceProcessLists.MobProcessArray)->GetItem(i);
             if (pmob) {
-                if (pmob->IsActor() && !pmob->IsDead(0) && pmob->GetCurrentProcessType() == PROCESS_TYPE_HIGH) {
+                if (pmob->IsActor() && !pmob->IsDead(false) && pmob->GetCurrentProcessType() == PROCESS_TYPE_HIGH) {
                     if (pmob->Get3D()) {
                         if (pPlayer->IsActorPerceived(static_cast<Actor*>(pmob))) {
                             Actor* ptestActor = static_cast<Actor*>(pmob);
@@ -9226,7 +9232,7 @@ void PlayerCharacter::UpdateAutoAimActor() {
                                     }
                                 }
                                 if (bShouldBeTargeted) {
-                                    if (pPlayer->LineOfSight(0, ptestActor, 1, 0, 0)) {
+                                    if (pPlayer->LineOfSight(false, ptestActor, true, nullptr, false)) {
                                         this->pPlayersTargetActor = ptestActor;
                                         if (bIsHostileToPlayer) {
                                             pbestActor = ptestActor;
@@ -9253,7 +9259,7 @@ void PlayerCharacter::UpdateAutoAimActor() {
             alignas(16) NiMatrix3 rotMod;
             double EyeHeight = this->GetEyeHeight();
             origPoint.z = EyeHeight + origPoint.z;
-            float za = this->GetHeading(0);
+            float za = this->GetHeading(false);
             playerRot.MakeZRotation(za);
             float zb = this->GetLooking();
             rotMod.MakeXRotation(zb);
@@ -9290,7 +9296,7 @@ void PlayerCharacter::UpdateAutoAimActor() {
             phitRef = static_cast<Actor*>(TESObjectREFR::FindReferenceFor3D(phit));
         }
         else {
-            phitRef = 0;
+            phitRef = nullptr;
         }
         this->spTargeted3D.operator=(phit);
         if (phitRef) {
@@ -9304,7 +9310,7 @@ void PlayerCharacter::UpdateAutoAimActor() {
             FormFlags = static_cast<TESObjectWEAP*>(v59->pContainerObj);
         }
         else {
-            FormFlags = 0;
+            FormFlags = nullptr;
         }
         if (pVATS.eMode != VATS::VATS_MENU_MODE && (phitRef && phitRef == pbestActor)) {
             NiPoint3 v53;
@@ -9316,8 +9322,8 @@ void PlayerCharacter::UpdateAutoAimActor() {
             InterfaceManager* v15 = InterfaceManager::Instance();
             int32_t DataClipDist = static_cast<int32_t>(v15->sRealCursorPos.x);
             SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
-            WorldSceneGraph->GetCamera()->WindowPointToRay(DataClipDist, ScriptProcessingDelay, v54, v53, 0);
-            NiAVObject* v52 = ArrowProjectile::PickSceneGraph(v56, v54, v53, fbestValue, 0);
+            WorldSceneGraph->GetCamera()->WindowPointToRay(DataClipDist, ScriptProcessingDelay, v54, v53, nullptr);
+            NiAVObject* v52 = ArrowProjectile::PickSceneGraph(v56, v54, v53, fbestValue, false);
             if (v52) {
                 TESObjectREFR* ReferenceFor3D = TESObjectREFR::FindReferenceFor3D(v52);
                 if (ReferenceFor3D) {
@@ -9344,8 +9350,8 @@ void PlayerCharacter::UpdateAutoAimActor() {
                             InterfaceManager* v20 = InterfaceManager::Instance();
                             int32_t v27 = static_cast<int32_t>(v20->sRealCursorPos.x);
                             SceneGraph* v21 = Main::GetWorldSceneGraph();
-                            v21->GetCamera()->WindowPointToRay(v27, v29, v47, v46, 0);
-                            NiAVObject* v45 = ArrowProjectile::PickSceneGraph(v50, v47, v46, v48, 0);
+                            v21->GetCamera()->WindowPointToRay(v27, v29, v47, v46, nullptr);
+                            NiAVObject* v45 = ArrowProjectile::PickSceneGraph(v50, v47, v46, v48, false);
                             if (v45) {
                                 Actor* v44 = static_cast<Actor*>(TESObjectREFR::FindReferenceFor3D(v45));
                                 eVATSTargetLimb = ActorValue::VALUE_NONE;
@@ -9379,7 +9385,7 @@ void PlayerCharacter::UpdateAutoAimActor() {
                 if (this->GetCurrentWeapon()) {
                     TESObjectWEAP* CurrentWeapon = this->GetCurrentWeapon();
                     if (!CurrentWeapon->IsMeleeWeapon()) {
-                        pbestActor = 0;
+                        pbestActor = nullptr;
                     }
                 }
             }
@@ -9395,7 +9401,7 @@ void PlayerCharacter::UpdateAutoAimActor() {
             v35 = v36 > static_cast<double>(v25->iPickDistance);
         }
         else {
-            v35 = 0;
+            v35 = false;
         }
         this->bTarget3DDistant = v35;
         this->UpdateImageSpaceIronsights();
@@ -9432,8 +9438,8 @@ void PlayerCharacter::ApplyAutoAimActor(
     NiMatrix3 gunRot;
     NiPoint3 delta = NiPoint3_ZERO;
     VATS_COMMAND* pcurrentVATSAction = pVATS.GetCurrentAction();
-    bool bvatsPlayback = 0;
-    NiAVObject* pvatsTarget3d = 0;
+    bool bvatsPlayback = false;
+    NiAVObject* pvatsTarget3d = nullptr;
     if (apOrigin) {
         v62 = apOrigin;
     }
@@ -9460,7 +9466,7 @@ void PlayerCharacter::ApplyAutoAimActor(
         if (pVATS.eMode == VATS::VATS_PLAYBACK) {
             if (pcurrentVATSAction) {
                 if (pcurrentVATSAction->pTarget) {
-                    bvatsPlayback = 1;
+                    bvatsPlayback = true;
                     pvatsTarget3d = (NiAVObject*)pcurrentVATSAction->pTarget->Get3D();
                 }
             }
@@ -9470,7 +9476,7 @@ void PlayerCharacter::ApplyAutoAimActor(
         if (!apReleaseObj || (!GetCurrentWeapon() || (v12 = GetCurrentWeapon(), v12->IsMeleeWeapon()))) {
             if (GetAutoAimActor()) {
                 Actor* AutoAimActor = GetAutoAimActor();
-                NiAVObject* v13 = Get3D(0);
+                NiAVObject* v13 = Get3D(false);
                 const NiPoint3* x = &v13->GetWorldBound().m_kCenter;
                 NiNode* v14 = AutoAimActor->Get3D();
                 const NiBound* WorldBound = &v14->GetWorldBound();
@@ -9478,7 +9484,7 @@ void PlayerCharacter::ApplyAutoAimActor(
             }
             else {
                 if (BulletAutoAim.operator!=(NiPoint3_ZERO)) {
-                    NiAVObject* v16 = Get3D(0);
+                    NiAVObject* v16 = Get3D(false);
                     const NiBound* v17 = &v16->GetWorldBound();
                     delta = BulletAutoAim - v17->m_kCenter;
                 }
@@ -9499,7 +9505,7 @@ void PlayerCharacter::ApplyAutoAimActor(
                         gunRot = apReleaseObj->GetWorldTransform().m_Rotate;
                     }
                     else {
-                        gunRot = Get3D(0)->GetWorldTransform().m_Rotate;
+                        gunRot = Get3D(false)->GetWorldTransform().m_Rotate;
                     }
                     NiMatrix3* v27 = gunRot.Inverse(&v67);
                     kdirection = *v27 * kdirection;
@@ -9525,21 +9531,22 @@ void PlayerCharacter::ApplyAutoAimActor(
                                      fspeedMult == 0.0 && fhighSpeed >= static_cast<double>(fspeed);
                                      fspeed = (fhighSpeed - flowSpeed) * 0.1 + fspeed) {
                                     float fhitfraction = 0.0f;
-                                    bool bhighArc_2 = 0;
+                                    bool bhighArc_2 = false;
                                     delta.z = delta.z + 10.0;
                                     float a1 = CombatUtilities::GetWorldGravity();
                                     float a6 = fspeed;
                                     NiPoint3 v126 = NiPoint3_ZERO;
                                     NiPoint3 v124 = delta + startPos;
-                                    NiPoint3 arResult =
-                                        CombatUtilities::GetProjectedPointForTarget(startPos, v124, v126, a6, a1, 0);
-                                    phitRef = 0;
+                                    NiPoint3 arResult = CombatUtilities::GetProjectedPointForTarget(
+                                        startPos, v124, v126, a6, a1, false
+                                    );
+                                    phitRef = nullptr;
                                     NiPoint3 v127 = arResult;
                                     NiPoint3 v125 = startPos;
                                     float projectileSpeed = fspeed;
                                     BGSProjectile* ProjectileBase = apProjectile->GetProjectileBase();
                                     bool bresult = CombatUtilities::CalculateProjectileLOS(
-                                        pPlayer, ProjectileBase, projectileSpeed, v125, v127, 0, &phitRef, 0
+                                        pPlayer, ProjectileBase, projectileSpeed, v125, v127, nullptr, &phitRef, nullptr
                                     );
                                     if (!bresult || phitRef == pcurrentVATSAction->pTarget) {
                                         double Speed = apProjectile->GetSpeed();
@@ -9555,13 +9562,13 @@ void PlayerCharacter::ApplyAutoAimActor(
                         }
                         if (v54) {
                             fheading = GetZAngleFromVector(kdirection);
-                            flooking = -CombatUtilities::FindAngleOfProjectile_0(apProjectile, delta, 0.0f, 0);
+                            flooking = -CombatUtilities::FindAngleOfProjectile_0(apProjectile, delta, 0.0f, false);
                         }
                         else {
                             float v50 = kdirection.x / kdirection.y;
                             fheading = std::atanf(v50);
                             flooking =
-                                -CombatUtilities::FindAngleOfProjectile_0(apProjectile, delta, 0.0f, 0) - apLooking;
+                                -CombatUtilities::FindAngleOfProjectile_0(apProjectile, delta, 0.0f, false) - apLooking;
                         }
                     }
                     else {
@@ -9593,7 +9600,7 @@ void PlayerCharacter::ApplyAutoAimActor(
                         flooking = -1.553343f;
                     }
                     if (apProjectile) {
-                        v48 = apProjectile->GetHeading(0);
+                        v48 = apProjectile->GetHeading(false);
                     }
                     else {
                         v48 = afStartHeading;
@@ -9672,14 +9679,14 @@ void PlayerCharacter::ApplyAutoAimActor(
                 }
                 TESObjectWEAP* pweapon = GetCurrentWeapon();
                 if (v54) {
-                    bool bUseSplit = 0;
+                    bool bUseSplit = false;
                     if (pCurrentProcess->GetCurrentWeapon()) {
                         ItemChange* v32 = pCurrentProcess->GetCurrentWeapon();
                         bUseSplit = v32->HasModEffectActive(WEAPON_MOD_SPLIT_BEAM);
                     }
                     if (bvatsPlayback) {
                         if (pweapon) {
-                            if (pweapon->GetNumProjectiles(bUseSplit, 0, pPlayer) > 1u) {
+                            if (pweapon->GetNumProjectiles(bUseSplit, false, pPlayer) > 1u) {
                                 float AttackSkillModBase;
                                 float CurrentGameHour;
                                 if (apProjectile) {
@@ -10165,9 +10172,9 @@ void PlayerCharacter::FastTravel(TESObjectREFR* apRef) {
             pSaveLoadManager->Autosave();
             lastFastTravelSaveTime = appTimer.iLastTime;
         }
-        pPlayer->btransporting = 1;
-        MemoryLevelManager::BeginMemoryFree(&a1, 1, 1, 1);
-        TES::pInstance->ClearAllCells(1, 0);
+        pPlayer->btransporting = true;
+        MemoryLevelManager::BeginMemoryFree(&a1, true, true, true);
+        TES::pInstance->ClearAllCells(true, false);
         MemoryLevelManager::FreeReleasedObjects(a1.bLockedFaceGen);
         MemoryLevelManager::EndMemoryFree(a1);
         static_cast<PlayerMover*>(pActorMover)->PlayerMover::ClearMoveMode(2048u);
@@ -10206,8 +10213,8 @@ void PlayerCharacter::FastTravel(TESObjectREFR* apRef) {
         double v4 = ptimescale->fValue;
         ftime = v4 * ftime;
         this->iSleepTime = static_cast<int32_t>(ftime);
-        bIsSleeping = 0;
-        TES::pInstance->ShowLoadingMenu(1, apRef, 0);
+        bIsSleeping = false;
+        TES::pInstance->ShowLoadingMenu(true, apRef, false);
         if (this->iSleepTime) {
             int32_t iSleepTime = this->iSleepTime;
             while (this->iSleepTime > 0) {
@@ -10216,12 +10223,12 @@ void PlayerCharacter::FastTravel(TESObjectREFR* apRef) {
                 float v13 = SystemTimeClock + ftime;
                 ReferenceProcessLists.SetSystemTimeClock(v13);
                 appCalendar.Update(ftime);
-                ReferenceProcessLists.kUpdateLock.Lock(0);
-                ReferenceProcessLists.UpdateHighListPackages(3600.0f, 1);
-                ReferenceProcessLists.UpdateActorsMovement(3600.0f, 1, PROCESS_TYPE_HIGH);
-                ReferenceProcessLists.UpdateMiddleHighList(3600.0f, 1);
-                ReferenceProcessLists.UpdateMiddleLowList(3600.0f, 1);
-                ReferenceProcessLists.UpdateLowList(3600.0f, 1);
+                ReferenceProcessLists.kUpdateLock.Lock(nullptr);
+                ReferenceProcessLists.UpdateHighListPackages(3600.0f, true);
+                ReferenceProcessLists.UpdateActorsMovement(3600.0f, true, PROCESS_TYPE_HIGH);
+                ReferenceProcessLists.UpdateMiddleHighList(3600.0f, true);
+                ReferenceProcessLists.UpdateMiddleLowList(3600.0f, true);
+                ReferenceProcessLists.UpdateLowList(3600.0f, true);
                 ReferenceProcessLists.ChangeProcessLevelTempList();
                 ReferenceProcessLists.kUpdateLock.Unlock();
                 --this->iSleepTime;
@@ -10238,42 +10245,42 @@ void PlayerCharacter::FastTravel(TESObjectREFR* apRef) {
         }
         ReferenceProcessLists.MoveActorsToReference(apRef);
         if (TES::GetSelectivePurgeUnusedOnFastTravel()) {
-            TES::pInstance->SetAllowUnusedPurge(0);
+            TES::pInstance->SetAllowUnusedPurge(false);
         }
         if (BSFaceGenManager::GetModelCache()) {
             BSFaceGenModelMap* ModelCache = BSFaceGenManager::GetModelCache();
-            ModelCache->UnloadAllEGMAndEGTData(0);
+            ModelCache->UnloadAllEGMAndEGTData(false);
         }
         MemoryPool::FreeUnusedPagesForAllPools();
         Sky* Instance = Sky::GetInstance();
-        Instance->SetFastTravel(1);
-        Interface::bIsFastTraveling = 1;
+        Instance->SetFastTravel(true);
+        Interface::bIsFastTraveling = true;
         TESWorldSpace* WorldSpace = apRef->GetWorldSpace();
         NiPoint3 v34 = apRef->GetAngleOnReference();
         NiPoint3 v33 = apRef->GetLocationOnReference();
-        pPlayer->PositionPlayerExterior(v33, v34, WorldSpace, 1);
-        Interface::bIsFastTraveling = 0;
+        pPlayer->PositionPlayerExterior(v33, v34, WorldSpace, true);
+        Interface::bIsFastTraveling = false;
         this->iSleepTime = 0;
         Sky* v9 = Sky::GetInstance();
-        v9->SetFastTravel(0);
+        v9->SetFastTravel(false);
         if (TES::GetSelectivePurgeUnusedOnFastTravel()) {
-            TES::pInstance->SetAllowUnusedPurge(1);
+            TES::pInstance->SetAllowUnusedPurge(true);
         }
         ReferenceProcessLists.PrintActorsInDialog();
         TES::pInstance->CreateFurnitureList();
         ReferenceProcessLists.PlaceActorsinBedsOrChairs();
         ReferenceProcessLists.ProcessHighActorsForFastTravel();
-        pPlayer->btransporting = 0;
+        pPlayer->btransporting = false;
         ReferenceProcessLists.Update3DAfterResting();
         CheckTempModifiers();
         ResetMagicCastSound();
-        pPlayer->bTravelUseDoor = 0;
+        pPlayer->bTravelUseDoor = false;
     }
 }
 
 void PlayerCharacter::ClearCellsIfTargetNotLoaded(TESObjectCELL* apTarget, TESWorldSpace* apWorldSpace) {
     MemoryLevelManager::MEM_FREE_DATA freedata;
-    if (!apTarget || !TES::pInstance->IsCellLoaded(apTarget, 0)) {
+    if (!apTarget || !TES::pInstance->IsCellLoaded(apTarget, false)) {
         NiNode* pnode;
         TESForm* plocation;
         if (apTarget) {
@@ -10282,16 +10289,16 @@ void PlayerCharacter::ClearCellsIfTargetNotLoaded(TESObjectCELL* apTarget, TESWo
         else {
             plocation = (TESForm*)apWorldSpace;
         }
-        TES::pInstance->ShowLoadingMenu(1, plocation, 0);
+        TES::pInstance->ShowLoadingMenu(true, plocation, false);
         if (pPlayer->GetParentCell()) {
             pPlayer->GetParentCell()->RemoveReference(pPlayer);
         }
-        NiAVObject* p3D = Get3D(1);
+        NiAVObject* p3D = Get3D(true);
         if (p3D) {
             pnode = p3D->IsNode();
         }
         else {
-            pnode = 0;
+            pnode = nullptr;
         }
         if (pnode) {
             if (pnode->m_pkParent) {
@@ -10299,17 +10306,17 @@ void PlayerCharacter::ClearCellsIfTargetNotLoaded(TESObjectCELL* apTarget, TESWo
                 Parent->DetachChild(p3D);
             }
         }
-        MemoryLevelManager::BeginMemoryFree(&freedata, 0, 1, 0);
-        TES::pInstance->ClearAllCells(0, 1);
-        ProcessLists::bIsForciblyUpdated = 1;
+        MemoryLevelManager::BeginMemoryFree(&freedata, false, true, false);
+        TES::pInstance->ClearAllCells(false, true);
+        ProcessLists::bIsForciblyUpdated = true;
         ReferenceProcessLists.UpdateProcessLists();
         ReferenceProcessLists.ChangeProcessLevelTempList();
-        ProcessLists::bIsForciblyUpdated = 0;
+        ProcessLists::bIsForciblyUpdated = false;
         MemoryLevelManager::FreeReleasedObjects(freedata.bLockedFaceGen);
         MemoryLevelManager::EndMemoryFree(freedata);
         if (BSFaceGenManager::GetModelCache()) {
             BSFaceGenModelMap* ModelCache = BSFaceGenManager::GetModelCache();
-            ModelCache->UnloadAllEGMAndEGTData(0);
+            ModelCache->UnloadAllEGMAndEGTData(false);
         }
         MemoryPool::FreeUnusedPagesForAllPools();
     }
@@ -10338,20 +10345,20 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
     NiPoint3 cameraRow;
     NiPoint3 currentPos;
     NiMatrix3 cameraRot;
-    PlayerCharacter::fCameraHeading = GetHeading(0);
+    PlayerCharacter::fCameraHeading = GetHeading(false);
     PlayerCharacter::fCameraLooking = GetLooking();
     SceneGraph* pWorldRoot = Main::GetWorldSceneGraph();
     f1_0_ = 1.0f;
     static NiCamera chaseCamera;
     float fWorldFOV = this->fWorldFOV;
     SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
-    WorldSceneGraph->SetCameraFOV(fWorldFOV, 0, 0, 0);
+    WorldSceneGraph->SetCameraFOV(fWorldFOV, false, nullptr, false);
     BSShaderManager::SetFOV(this->fWorldFOV);
     if (pVATS.eMode == VATS::VATS_PLAYBACK && bWant3rdPerson) {
         NiMatrix3 vatsCameraRot;
         currentPos = chaseCameraPos;
         chaseCamera.SetTranslate(currentPos);
-        NiUpdateData UpdateData(0.0f, 0, 0);
+        NiUpdateData UpdateData(0.0f, false, false);
         chaseCamera.Update(UpdateData);
         NiPoint3* CamshotTargetPos = pVATS.GetCamshotTargetPos(&a2);
         chaseCamera.LookAtWorldPoint(*CamshotTargetPos, NiPoint3_UNIT_Z);
@@ -10368,7 +10375,7 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
     else {
         if (b3rdPerson || (PlayerCharacter::bVanityMode || bWant3rdPerson != b3rdPerson)) {
             NiPoint3 shoulderOffset_2;
-            NiPoint3 targetPos = Get3D(0)->GetWorldTranslate();
+            NiPoint3 targetPos = Get3D(false)->GetWorldTranslate();
             float fYDir = 1000.0f;
             if (PlayerCharacter::bIsAutoVanityMode) {
                 if (!(PlayerCharacter::kAutoVanityModePos.z < 0.0)) {
@@ -10380,7 +10387,7 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
                 else {
                     PlayerCharacter::kAutoVanityModePos.z = PlayerCharacter::kAutoVanityModePos.z + 6.2831854820251465;
                 }
-                float v81 = GetHeading(0) + PlayerCharacter::kAutoVanityModePos.z;
+                float v81 = GetHeading(false) + PlayerCharacter::kAutoVanityModePos.z;
                 cameraRot.MakeZRotation(v81);
                 rotMod.MakeXRotation(PlayerCharacter::kAutoVanityModePos.x);
                 targetPos.z = GetScale() * 100.0 + targetPos.z;
@@ -10388,7 +10395,7 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
             else {
                 float f3rdPersonFOV = this->f3rdPersonFOV;
                 SceneGraph* v10 = Main::GetWorldSceneGraph();
-                v10->SetCameraFOV(f3rdPersonFOV, 0, 0, 0);
+                v10->SetCameraFOV(f3rdPersonFOV, false, nullptr, false);
                 BSShaderManager::SetFOV(this->f3rdPersonFOV);
                 float v80 = PlayerCharacter::fCameraHeading + PlayerCharacter::kVanityModePos.z;
                 cameraRot.MakeZRotation(v80);
@@ -10472,7 +10479,7 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
                 targetPos.operator+=(*::new (&v94) NiPoint3(shoulderOffset * v75));
             }
             chaseCamera.SetTranslate(currentPos);
-            NiUpdateData UpdateData_3(0.0f, 0, 0);
+            NiUpdateData UpdateData_3(0.0f, false, false);
             chaseCamera.Update(UpdateData_3);
             if (PlayerCharacter::bIsAutoVanityMode) {
                 chaseCamera.LookAtWorldPoint(targetPos, NiPoint3_UNIT_Z);
@@ -10502,7 +10509,7 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
                 currentPos = p1stPersonCamera->GetWorldTranslate();
             }
             HighProcess* phighProcess = static_cast<HighProcess*>(pCurrentProcess);
-            BipedAnim* Biped_0 = GetBiped(0);
+            BipedAnim* Biped_0 = GetBiped(false);
             NiNode* ParentBone = Biped_0->GetParentBone(BIPED_BONE_HEAD);
             Animation* v6 = phighProcess->GetAnimation();
             float fblendValue = v6->GetSmallestHavokBlendValue(ParentBone);
@@ -10516,7 +10523,7 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
                     p1stPersonBip->SetTranslate(
                         p1stPersonBip->GetTranslate() + (posDelta * (&sp1stPerson3D.m_pObject->m_kLocal)->m_Rotate)
                     );
-                    NiUpdateData UpdateData_2(0.0f, 0, 0);
+                    NiUpdateData UpdateData_2(0.0f, false, false);
                     p1stPersonBip->Update(UpdateData_2);
                 }
             }
@@ -10550,7 +10557,7 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
         CameraRoot->SetTranslate(currentPos);
         NiNode* v28 = pWorldRoot->GetCameraRoot();
         v28->SetRotate(cameraRot);
-        NiUpdateData UpdateData_4(0.0f, 0, 0);
+        NiUpdateData UpdateData_4(0.0f, false, false);
         NiNode* v29 = pWorldRoot->GetCameraRoot();
         v29->Update(UpdateData_4);
     }
@@ -10621,7 +10628,7 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
     }
     NiQuaternion quatid = NiQuaternion_IDENTITY;
     CachedWorldCameraPos = pWorldRoot->GetCamera()->GetWorldTranslate();
-    spCameraRigidBody.m_pObject->ApplyHardKeyframe(CachedWorldCameraPos, quatid, 0);
+    spCameraRigidBody.m_pObject->ApplyHardKeyframe(CachedWorldCameraPos, quatid, nullptr);
     UpdateFirstPersonZoom();
 }
 
@@ -10757,7 +10764,7 @@ bool PlayerCharacter::UpdateHeadingAndLooking(float afDelta, bool abHorse, uint1
                             PlayerCharacter::kVanityModePos.y =
                                 PlayerCharacter::kVanityModePos.y - fVanityModeWheelInMult.Float() * dzoom;
                         }
-                        if (IsDead(0)) {
+                        if (IsDead(false)) {
                             if (fVanityModeWheelDeadMin.Float() >
                                 static_cast<double>(PlayerCharacter::kVanityModePos.y)) {
                                 PlayerCharacter::kVanityModePos.y = fVanityModeWheelDeadMin.Float();
@@ -10767,7 +10774,7 @@ bool PlayerCharacter::UpdateHeadingAndLooking(float afDelta, bool abHorse, uint1
                             if (fVanityModeWheelMin.Float() > static_cast<double>(PlayerCharacter::kVanityModePos.y)) {
                                 if (!GetUnderAIControl() && !PlayerCharacter::bVanityMode && !bTemp3rdPerson &&
                                     !GetControlsDisabled(PlayerCharacter::DPC_POV_SWITCH)) {
-                                    SetFirstPerson(1);
+                                    SetFirstPerson(true);
                                 }
                                 PlayerCharacter::kVanityModePos.y = fVanityModeWheelMin.Float();
                             }
@@ -10782,7 +10789,7 @@ bool PlayerCharacter::UpdateHeadingAndLooking(float afDelta, bool abHorse, uint1
                     }
                     if (!GetUnderAIControl() && !bTemp1stPerson && !b3rdPerson && imouseZ < 0 &&
                         !GetControlsDisabled(PlayerCharacter::DPC_POV_SWITCH)) {
-                        SetFirstPerson(0);
+                        SetFirstPerson(false);
                     }
                 }
                 float fdefaultFOV = BSSceneGraph::fDefaultWorldFOV.Float();
@@ -10791,7 +10798,7 @@ bool PlayerCharacter::UpdateHeadingAndLooking(float afDelta, bool abHorse, uint1
                 if (fdefaultFOV > static_cast<double>(fcurrentFOV)) {
                     ffovModMult = fcurrentFOV / fdefaultFOV;
                 }
-                PlayerCharacter::fCameraHeading = GetHeading(0);
+                PlayerCharacter::fCameraHeading = GetHeading(false);
                 PlayerCharacter::fCameraLooking = GetLooking();
                 if ((PlayerCharacter::bVanityMode || PlayerCharacter::bZoom3rdPersonCamera) &&
                     pCurrentProcess->GetFadeState() == BaseProcess::FADE_NORMAL) {
@@ -11042,7 +11049,7 @@ bool PlayerCharacter::UpdateHeadingAndLooking(float afDelta, bool abHorse, uint1
                 NiPoint3 rot = CombatUtilities::GetAngleToProjectedPoint(
                     Main::GetWorldSceneGraph()->GetCamera()->GetWorldTranslate(), targetPos
                 );
-                fheadingDelta = rot.z - GetHeading(0);
+                fheadingDelta = rot.z - GetHeading(false);
                 flookingDelta = rot.x - GetLooking();
                 while (fheadingDelta > 3.1415927410125732) {
                     fheadingDelta = fheadingDelta - 6.2831854820251465;
@@ -11056,7 +11063,7 @@ bool PlayerCharacter::UpdateHeadingAndLooking(float afDelta, bool abHorse, uint1
                 while (flookingDelta < -3.1415927410125732) {
                     flookingDelta = flookingDelta + 6.2831854820251465;
                 }
-                rot.z = GetHeading(0) + fheadingDelta;
+                rot.z = GetHeading(false) + fheadingDelta;
                 rot.x = GetLooking() + flookingDelta;
                 if (bresetInterpolators) {
                     float fcamTime = 0.0f;
@@ -11074,7 +11081,7 @@ bool PlayerCharacter::UpdateHeadingAndLooking(float afDelta, bool abHorse, uint1
                     else {
                         fcamTime = 0.75f;
                     }
-                    pHeadingInterpolator->Setup(GetHeading(0), rot.z, fcamTime);
+                    pHeadingInterpolator->Setup(GetHeading(false), rot.z, fcamTime);
                     pLookingInterpolator->Setup(GetLooking(), rot.x, fcamTime);
                 }
                 pHeadingInterpolator->Interpolate(appTimer.GetSeconds());
@@ -11262,11 +11269,11 @@ bool PlayerCharacter::CanPassTime() {
 }
 
 bool PlayerCharacter::IsAlarmForPlayerCharactaer() {
-    void* plist = ReferenceProcessLists.IsActorTargetingREFinPackage(this, PACKAGE_TYPE_ALARM, 0);
+    void* plist = ReferenceProcessLists.IsActorTargetingREFinPackage(this, PACKAGE_TYPE_ALARM, false);
     if (plist) {
         delete static_cast<BSSimpleList<ActiveEffect*>*>(plist);
     }
-    return plist != 0;
+    return plist != nullptr;
 }
 
 bool PlayerCharacter::GetCanWait() {
@@ -11299,7 +11306,7 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
     // Move mode, passed by address to UpdateHeadingAndLooking.
     uint16_t smoveMode;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_PLAYER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\PlayerCharacter.cpp", 0x17A3
+        MEM_CONTEXT_PLAYER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\PlayerCharacter.cpp", 0x17A3
     );
     Controls* pcontrols = appMain->GetControls();
     SceneGraph* pWorldRoot = Main::GetWorldSceneGraph();
@@ -11307,14 +11314,14 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
         pweapon = static_cast<TESObjectWEAP*>(pCurrentProcess->GetCurrentWeapon()->pContainerObj);
     }
     else {
-        pweapon = 0;
+        pweapon = nullptr;
     }
     // A byte of its own that is stored and never read, as the game does.
-    [[maybe_unused]] bool buserInput = 0;
+    [[maybe_unused]] bool buserInput = false;
     smoveMode = 0;
     fDropAngleMod = 0.0f;
     fLastDropAngleMod = 0.0f;
-    bOnElevator = 0;
+    bOnElevator = false;
     HandleFlycamMovement();
     int32_t ijoyX = 0;
     int32_t ijoyY = 0;
@@ -11332,14 +11339,14 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
         uint16_t slastMoveMode = GetMoveMode();
         smoveMode = slastMoveMode & 0xCC00;
         if (pVATS.eMode) {
-            if (UpdateHeadingAndLooking(afDelta, 0, &smoveMode, 0)) {
-                buserInput = 1;
+            if (UpdateHeadingAndLooking(afDelta, false, &smoveMode, false)) {
+                buserInput = true;
             }
         }
         int32_t imouseX = 0;
         int32_t v50 = 0;
         int32_t v54 = 0;
-        PlayerCharacter::fCameraHeading = GetHeading(0);
+        PlayerCharacter::fCameraHeading = GetHeading(false);
         PlayerCharacter::fCameraLooking = GetLooking();
         if (pPlayer->pCurrentProcess->GetCurrentPackage()) {
             pPlayer->pCurrentProcess->ClearCurrentPackage();
@@ -11358,13 +11365,13 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                          !GetWantWeaponDrawn())) {
                         if (!bDebounce && !GetWantWeaponDrawn()) {
                             if ((GetMoveMode() & 2048) == 0) {
-                                SetWantWeaponDrawn(1);
+                                SetWantWeaponDrawn(true);
                             }
                             bDebounce = 1;
                         }
                     }
                     else {
-                        SetWantWeaponDrawn(0);
+                        SetWantWeaponDrawn(false);
                         bDebounce = 1;
                     }
                 }
@@ -11384,7 +11391,7 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                 (pcontrols->GetUserAction(Controls::UACTN_BACK, 0) ||
                  (pcontrols->GetUserAction(Controls::UACTN_SLDRIGHT, 0) ||
                   pcontrols->GetUserAction(Controls::UACTN_SLDLEFT, 0)))) {
-                bAutoMove = 0;
+                bAutoMove = false;
             }
             else {
                 pcontrols->ForceUserAction(Controls::UACTN_FORWARD);
@@ -11392,7 +11399,7 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
         }
         char v53 = 0;
         if (pcontrols->GetUserAction(Controls::UACTN_CROUCH, 1)) {
-            if (!IsParalyzed() && !IsDead(0) && !IsKnockedOut() && !IsRestrained() && !IsUnConscious() &&
+            if (!IsParalyzed() && !IsDead(false) && !IsKnockedOut() && !IsRestrained() && !IsUnConscious() &&
                 GetSitSleepState() == SIT_SLEEP_NORMAL) {
                 ActionPoints::Action eaction = ActionPoints::ACTION_STAND;
                 if ((smoveMode & 1024) != 0) {
@@ -11403,7 +11410,7 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                         BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                             BSGameSound::SOUND_FLAG_FIRST_PERSON
                     );
-                    SoundHandleByName->Play(0);
+                    SoundHandleByName->Play(false);
                 }
                 else {
                     smoveMode = smoveMode | 1024;
@@ -11414,7 +11421,7 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                         BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                             BSGameSound::SOUND_FLAG_FIRST_PERSON
                     );
-                    v23->Play(0);
+                    v23->Play(false);
                 }
                 UseActionPoints(eaction);
             }
@@ -11431,7 +11438,7 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
             forwardVec.z = 0.0f;
             forwardVec.Unitize();
         }
-        bool bdropping = 0;
+        bool bdropping = false;
         if (eGrabType == PlayerCharacter::GRAB_INVENTORY_DROP) {
             bdropping = UpdateDropSpring(afDelta);
         }
@@ -11481,14 +11488,14 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
         if (v53) {
             SetWalkRunFlagDirty();
         }
-        b3rdPerson = 1;
-        bool bdisabled = 0;
+        b3rdPerson = true;
+        bool bdisabled = false;
         if (IsKnockedOut() ||
             (IsParalyzed() || (GetLifeState() || (GetAnimAction() == ANIM_ACTION_STAGGER || GetSitSleepState())))) {
-            bdisabled = 1;
+            bdisabled = true;
         }
         if (bdisabled || GetControlsDisabled(PlayerCharacter::DPC_MOVEMENT)) {
-            static_cast<PlayerMover*>(pActorMover)->PlayerMover::SetMoveMode(831u, 0);
+            static_cast<PlayerMover*>(pActorMover)->PlayerMover::SetMoveMode(831u, false);
         }
         if (!bdisabled && !GetControlsDisabled(PlayerCharacter::DPC_FIGHTING)) {
             if (eGrabType == PlayerCharacter::GRAB_INVENTORY_DROP || eGrabType == PlayerCharacter::GRAB_TELEKINESIS) {
@@ -11498,7 +11505,7 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
             else {
                 if (pCurrentProcess->CanAttack()) {
                     if (CheckUserInputAttacks()) {
-                        buserInput = 1;
+                        buserInput = true;
                     }
                 }
                 else {
@@ -11510,13 +11517,13 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                     (pCurrentProcess->GetAnimAction() != ANIM_ACTION_BLOCK && (!GetIronSights() && IsWeaponDrawn()))) {
                     if (!IsPipboyActive() && pCurrentProcess->CanAttack()) {
                         if (IsWeaponDrawn() && (pweapon && !pweapon->IsMeleeWeapon())) {
-                            SetIronSights(1, 0, 0);
+                            SetIronSights(true, false, false);
                         }
                         else {
-                            SetBlock(1);
+                            SetBlock(true);
                         }
                         if (!PlayerCharacter::bVanityMode || PlayerCharacter::bIsAutoVanityMode) {
-                            buserInput = 1;
+                            buserInput = true;
                         }
                     }
                 }
@@ -11524,9 +11531,9 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                     if ((pcontrols->GetUserAction(Controls::UACTN_BLOCK, 2) ||
                          (!pcontrols->GetUserAction(Controls::UACTN_BLOCK, 0) || IsPipboyActive())) &&
                         (GetIronSights() || pCurrentProcess->GetAnimAction() == ANIM_ACTION_BLOCK)) {
-                        SetIronSights(0, 0, 0);
-                        SetBlock(0);
-                        buserInput = 1;
+                        SetIronSights(false, false, false);
+                        SetBlock(false);
+                        buserInput = true;
                     }
                 }
             }
@@ -11536,7 +11543,7 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                     uint16_t Group = v6->GetGroup(AGS_WEAPON);
                     if (!TESAnimGroup::IsPowerAttackAction(Group) && GetAnimAction() != ANIM_ACTION_DODGE) {
                         bool v19 = !IsJumping() && !IsSwimming();
-                        bool bsuccess = 0;
+                        bool bsuccess = false;
                         bool bpressingBlock = pcontrols->GetUserAction(Controls::UACTN_BLOCK, 0) != 0;
                         bool bblocking = GetBlocked();
                         if (bpressingBlock) {
@@ -11544,7 +11551,7 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                                 if (!bblocking) {
                                     bhkCharacterController* CharController = GetCharController();
                                     if (static_cast<uint8_t>(CharController->CanJump())) {
-                                        bsuccess = Jump() != 0;
+                                        bsuccess = Jump() != nullptr;
                                     }
                                 }
                             }
@@ -11560,7 +11567,7 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                         else {
                             bhkCharacterController* v10 = GetCharController();
                             if (static_cast<uint8_t>(v10->CanJump())) {
-                                bsuccess = Jump() != 0;
+                                bsuccess = Jump() != nullptr;
                             }
                         }
                         ForcePhysicsGrabDrop();
@@ -11568,33 +11575,33 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                             bhkCharacterController* v11 = GetCharController();
                             v11->CanJump();
                         }
-                        buserInput = 1;
+                        buserInput = true;
                     }
                 }
             }
         }
-        b3rdPerson = 1;
+        b3rdPerson = true;
         UpdateAnimation();
         PickAnimations(PlayerCharacter::fWalkSpeedMult, PlayerCharacter::fPCTurnScale);
         b3rdPerson = bActually3rdPerson;
         if (IsSleeping()) {
             PlayerSleep();
         }
-        SetNoCollision(0);
+        SetNoCollision(false);
         static_cast<PlayerMover*>(pActorMover)->PlayerMover::SetSideVector(sideVec);
         pActorMover->Update(afDelta);
         if (imouseX || (v50 || (smoveMode & 15) != 0)) {
-            buserInput = 1;
+            buserInput = true;
         }
         if (pcontrols->GetUserAction(Controls::UACTN_ACTIVATE, 1)) {
             if (!Interface::IsInMenuMode() && !GetControlsDisabled(PlayerCharacter::DPC_MOVEMENT) && !IsParalyzed() &&
                 !bdropping) {
                 Actor* pactor = static_cast<Actor*>(Interface::GetActivateREFR());
-                bool bcheckFurniture = 1;
-                bool bskipActivate = 0;
+                bool bcheckFurniture = true;
+                bool bskipActivate = false;
                 if (pactor) {
                     if (pactor->IsFurniture() && GetIronSights()) {
-                        bskipActivate = 1;
+                        bskipActivate = true;
                     }
                 }
                 if (pactor) {
@@ -11604,7 +11611,7 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                         );
                         if (parrow) {
                             if (!parrow->GetOpenSound()) {
-                                bskipActivate = 1;
+                                bskipActivate = true;
                             }
                         }
                     }
@@ -11615,25 +11622,25 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                         BaseProcess* pprocess = pactor->pCurrentProcess;
                         if (pprocess->GetFadeState() == BaseProcess::FADE_OUT_DISABLE ||
                             pprocess->GetFadeState() == BaseProcess::FADE_OUT_DELETE) {
-                            bskipActivate = 1;
+                            bskipActivate = true;
                         }
                     }
                 }
                 if (!bskipActivate) {
-                    Interface::SetInfoForRef(0, 0, 0);
+                    Interface::SetInfoForRef(nullptr, false, false);
                     if (pactor) {
-                        if (pactor->Activate(this, 0, 0, 1)) {
-                            bcheckFurniture = 0;
+                        if (pactor->Activate(this, false, nullptr, 1)) {
+                            bcheckFurniture = false;
                         }
                     }
                     if (bcheckFurniture) {
                         if (pCurrentProcess->GetCurrentFurniture()) {
                             TESObjectREFR* pref_2 = pCurrentProcess->GetCurrentFurniture();
-                            pref_2->Activate(this, 0, 0, 1);
+                            pref_2->Activate(this, false, nullptr, 1);
                         }
                     }
                 }
-                buserInput = 1;
+                buserInput = true;
             }
         }
         if (pPlayerSphere) {
@@ -11647,11 +11654,11 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                 pPlayerSphere->SetLinearVelocity(NiPoint3_ZERO);
             }
         }
-        if (!IsDead(0) && !IsDying()) {
-            UpdateMagic(0, 0);
+        if (!IsDead(false) && !IsDying()) {
+            UpdateMagic(false, false);
         }
-        Animation* panim = GetAnimation(0);
-        Animation* panim1st = GetAnimation(1);
+        Animation* panim = GetAnimation(false);
+        Animation* panim1st = GetAnimation(true);
         float a2 = panim->GetMoveSpeed();
         panim1st->SetMoveSpeed(a2);
         float a2a = panim->m_fAttackSpeed;
@@ -12153,7 +12160,7 @@ bool PlayerCharacter::CheckUserInputAttacks() {
                     );
                 }
             }
-            pCurrentProcess->SetSustainedFire(0);
+            pCurrentProcess->SetSustainedFire(false);
             bSustainedFire = false;
         }
     }
@@ -12163,7 +12170,7 @@ bool PlayerCharacter::CheckUserInputAttacks() {
          !pControls->GetUserAction(Controls::UACTN_USE, Controls::isHeld))
     ) {
         // The attack control was let go during an attack.
-        pCurrentProcess->SetSustainedFire(0);
+        pCurrentProcess->SetSustainedFire(false);
         bSustainedFire = false;
         if (TESAnimGroup::IsAttackSpinAction(pAnimation->GetGroup(AGS_WEAPON))) {
             bSpinAttackReleasedEarly = pAnimation->GetGroupAction(AGS_WEAPON) < 1;
@@ -12275,7 +12282,7 @@ bool PlayerCharacter::CheckUserInputAttacks() {
         }
         bool bStarted = StartAttack(eAttackAnim);
         if (bStarted && pWeapon && (pWeapon->IsAutomaticWeapon() || pContinuousBeamPersistant) && bSustainedFire) {
-            pCurrentProcess->SetSustainedFire(1);
+            pCurrentProcess->SetSustainedFire(true);
         }
         if (bStarted && bSpeak) {
             // Combat topic 1, the power attack taunt.
@@ -12568,11 +12575,11 @@ uint32_t PlayerCharacter::GetCaravanWinnings() {
 
 bool PlayerCharacter::CasinoAntiCheatCheck() {
     if (bAntiCheatActive && GetCasinoCheatTimeRemaining() > 0) {
-        return 1;
+        return true;
     }
     resetAntiCheatTimer();
     unset_11E07AB();
-    return 0;
+    return false;
 }
 
 int32_t PlayerCharacter::GetCasinoCheatTimeRemaining() {
@@ -12705,27 +12712,27 @@ void PlayerCharacter::UpdateFirstPersonZoom() {
 
 void PlayerCharacter::Show1stPerson(bool abFirstPerson) {
     float fVal;
-    if (Get3D(1) && (Get3D(0) && (!abFirstPerson || (!IsDead(0) && !bTemp3rdPerson)))) {
+    if (Get3D(true) && (Get3D(false) && (!abFirstPerson || (!IsDead(false) && !bTemp3rdPerson)))) {
         ItemChange* v8;
-        NiAVObject* v2 = Get3D(0);
+        NiAVObject* v2 = Get3D(false);
         int32_t AppCulled = v2->GetAppCulled();
-        NiAVObject* v4 = Get3D(1);
+        NiAVObject* v4 = Get3D(true);
         if (AppCulled != v4->GetAppCulled()) {
             if (!abFirstPerson) {
-                NiAVObject* v5 = Get3D(0);
+                NiAVObject* v5 = Get3D(false);
                 if (!v5->GetAppCulled()) {
                     return;
                 }
             }
             if (abFirstPerson) {
-                NiAVObject* v6 = Get3D(1);
+                NiAVObject* v6 = Get3D(true);
                 if (!v6->GetAppCulled()) {
-                    bActually3rdPerson = 0;
+                    bActually3rdPerson = false;
                     return;
                 }
             }
         }
-        NiAVObject* v7 = Get3D(0);
+        NiAVObject* v7 = Get3D(false);
         v7->SetAppCulled(abFirstPerson);
         if (abFirstPerson &&
             (bTemp1stPerson &&
@@ -12738,60 +12745,60 @@ void PlayerCharacter::Show1stPerson(bool abFirstPerson) {
             fVal = 0.0f;
             if (!pweap->HasModScope() ||
                 (v10 = pCurrentProcess->GetCurrentWeapon(), v10->HasModEffectActive(WEAPON_MOD_IRON_SITES, fVal))) {
-                Interface::SetGunScopeVisible(1);
+                Interface::SetGunScopeVisible(true);
             }
         }
         else {
-            NiAVObject* v11 = Get3D(1);
+            NiAVObject* v11 = Get3D(true);
             v11->SetAppCulled(!abFirstPerson);
         }
         bActually3rdPerson = !abFirstPerson;
         if (abFirstPerson) {
             NiMatrix3 rot;
-            NiAVObject* p3dObj = Get3D(0);
+            NiAVObject* p3dObj = Get3D(false);
             const NiPoint3* v12 = &GetLocationOnReference();
             p3dObj->SetTranslate(*v12);
-            float a2 = GetHeading(0);
+            float a2 = GetHeading(false);
             rot.MakeZRotation(a2);
             p3dObj->SetRotate(MultipleMatrixByRace(rot));
             fPlayerCameraAlpha = 1.0f;
             UpdateAlpha();
-            Animation* panim = GetAnimation(0);
+            Animation* panim = GetAnimation(false);
             if (panim) {
                 panim->UpdateMovement(this);
             }
             else {
-                NiUpdateData UpdateData(0.0f, 0, 0);
+                NiUpdateData UpdateData(0.0f, false, false);
                 p3dObj->Update(UpdateData);
             }
             BSSoundHandle weaponSoundHandle;
             (&m_Extra)->GetWeaponIdleSound(weaponSoundHandle);
             if (weaponSoundHandle.IsValid()) {
-                weaponSoundHandle.SetFollowsListener(1);
+                weaponSoundHandle.SetFollowsListener(true);
             }
             (&m_Extra)->GetWeaponAttackSound(weaponSoundHandle);
             if (weaponSoundHandle.IsValid()) {
-                weaponSoundHandle.SetFollowsListener(1);
+                weaponSoundHandle.SetFollowsListener(true);
             }
         }
         else {
             BSSoundHandle weaponSoundHandle_2;
             (&m_Extra)->GetWeaponIdleSound(weaponSoundHandle_2);
             if (weaponSoundHandle_2.IsValid()) {
-                weaponSoundHandle_2.SetFollowsListener(0);
+                weaponSoundHandle_2.SetFollowsListener(false);
             }
             (&m_Extra)->GetWeaponAttackSound(weaponSoundHandle_2);
             if (weaponSoundHandle_2.IsValid()) {
-                weaponSoundHandle_2.SetFollowsListener(0);
+                weaponSoundHandle_2.SetFollowsListener(false);
             }
         }
-        SetFireNode(0);
+        SetFireNode(nullptr);
         if (GetShouldCheckMagicNode()) {
             NiNode* pnodeTo;
             NiNode* pnodeFrom;
-            Animation* panimFrom = 0;
-            Animation* v36 = 0;
-            NiNode* v33 = 0;
+            Animation* panimFrom = nullptr;
+            Animation* v36 = nullptr;
+            NiNode* v33 = nullptr;
             panimFrom = GetAnimation(!abFirstPerson);
             Animation* panimTo = GetAnimation(abFirstPerson);
             NiControllerManager* ControllerManager = panimFrom->GetControllerManager();
@@ -12802,7 +12809,7 @@ void PlayerCharacter::Show1stPerson(bool abFirstPerson) {
                 pnodeFrom = pobj->IsNode();
             }
             else {
-                pnodeFrom = 0;
+                pnodeFrom = nullptr;
             }
             NiControllerManager* v16 = panimTo->GetControllerManager();
             NiDefaultAVObjectPalette* v23 = static_cast<NiDefaultAVObjectPalette*>(v16->GetObjectPalette());
@@ -12812,7 +12819,7 @@ void PlayerCharacter::Show1stPerson(bool abFirstPerson) {
                 pnodeTo = pobj_2->IsNode();
             }
             else {
-                pnodeTo = 0;
+                pnodeTo = nullptr;
             }
             if (pnodeFrom) {
                 if (pnodeTo) {
@@ -12821,9 +12828,9 @@ void PlayerCharacter::Show1stPerson(bool abFirstPerson) {
                         if (I >= ArrayCount) {
                             break;
                         }
-                        NiPointer<NiAVObject> pchild(static_cast<NiAVObject*>(0));
+                        NiPointer<NiAVObject> pchild(static_cast<NiAVObject*>(nullptr));
                         pnodeFrom->DetachChildAt(I, pchild);
-                        if (pchild.operator!=(static_cast<NiAVObject*>(0))) {
+                        if (pchild.operator!=(static_cast<NiAVObject*>(nullptr))) {
                             NiAVObject* v19 = pchild.m_pObject;
                             pnodeTo->AttachChild(v19, 1);
                         }
@@ -12839,7 +12846,7 @@ void PlayerCharacter::Show1stPerson(bool abFirstPerson) {
         }
         InitLightingPropertyPtr(pnode);
         BaseProcess* CurrentAIProcess = pCurrentProcess;
-        CurrentAIProcess->SetShouldRefreshMagicShadersEffects(1, 1, 0);
+        CurrentAIProcess->SetShouldRefreshMagicShadersEffects(true, true, false);
     }
 }
 
@@ -12928,9 +12935,9 @@ void PlayerCharacter::RemovePlayerAction(PLAYER_ACTION aeAction, TESObjectREFR* 
 
 void PlayerCharacter::AddPlayerAction(PLAYER_ACTION aeAction, float afTime, TESObjectREFR* apActObject) {
     bool bsearch;
-    bsearch = 0;
+    bsearch = false;
     if (!IsPlayerCharacterInCombat(&bsearch)) {
-        PlayerActionObject* pobject = 0;
+        PlayerActionObject* pobject = nullptr;
         if (!pListofActions) {
             BSSimpleList<PlayerActionObject*>* v5;
             BSSimpleList<PlayerActionObject*>* v8 =
@@ -12939,12 +12946,12 @@ void PlayerCharacter::AddPlayerAction(PLAYER_ACTION aeAction, float afTime, TESO
                 v5 = ::new (v8) BSSimpleList<PlayerActionObject*>;
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             pListofActions = v5;
         }
         BSSimpleList<PlayerActionObject*>* plist = pListofActions;
-        PlayerActionObject* v12 = 0;
+        PlayerActionObject* v12 = nullptr;
         while (plist && (plist->m_item && !pobject)) {
             PlayerActionObject* pAction = plist->m_item;
             if (pAction) {
@@ -12964,14 +12971,14 @@ void PlayerCharacter::AddPlayerAction(PLAYER_ACTION aeAction, float afTime, TESO
                 pobject_2 = ::new (apMemory) PlayerActionObject;
             }
             else {
-                pobject_2 = 0;
+                pobject_2 = nullptr;
             }
             pobject = pobject_2;
         }
         pobject->eAction = aeAction;
         pobject->ftimer = afTime;
         if (apActObject) {
-            apActObject->SetTargeted(1);
+            apActObject->SetTargeted(true);
         }
         pobject->prefObj = apActObject;
         pListofActions->AddHead(pobject);
@@ -13291,7 +13298,7 @@ void PlayerCharacter::FreeCompassTargets() {
         if (pListofPercievedActors) {
             delete pListofPercievedActors;
         }
-        this->pListofPercievedActors = 0;
+        this->pListofPercievedActors = nullptr;
     }
     kPerceivedActorsLock.Unlock();
 }
@@ -13322,10 +13329,10 @@ void PlayerCharacter::CastQueuedEnchantments() {
                     FormEnchanting = penchantable->pFormEnchanting;
                 }
                 else {
-                    FormEnchanting = 0;
+                    FormEnchanting = nullptr;
                 }
                 if (FormEnchanting) {
-                    CastWornEnchantment(FormEnchanting, plist->m_item, 0);
+                    CastWornEnchantment(FormEnchanting, plist->m_item, false);
                 }
             }
         }
@@ -13333,7 +13340,7 @@ void PlayerCharacter::CastQueuedEnchantments() {
         if (QueuedWornEnchantments) {
             delete QueuedWornEnchantments;
         }
-        QueuedWornEnchantments = 0;
+        QueuedWornEnchantments = nullptr;
     }
 }
 
@@ -13574,7 +13581,7 @@ void PlayerCharacter::DestroyMouseSpring() {
             pw = pcell->GetbhkWorld();
         }
         else {
-            pw = 0;
+            pw = nullptr;
         }
         bhkMouseSpringAction* v1 = spGrabSpring.m_pObject;
         v1->Remove();
@@ -13589,16 +13596,16 @@ void PlayerCharacter::DestroyMouseSpring() {
             pw->MarkForWrite();
         }
     }
-    RemovePlayerAction(PLAYER_ACTION_Z_KEY_OBJECT, 0);
-    spGrabSpring.operator=(static_cast<bhkMouseSpringAction*>(0));
+    RemovePlayerAction(PLAYER_ACTION_Z_KEY_OBJECT, nullptr);
+    spGrabSpring.operator=(static_cast<bhkMouseSpringAction*>(nullptr));
     eGrabType = PlayerCharacter::GRAB_NONE;
     fGrabObjectWeight = 0.0f;
     if (pGrabbedObject) {
         if (pGrabbedObject->IsReference()) {
-            Script::SetActionFlag(0, &pGrabbedObject->m_Extra, SCRIPT_ACTION_ONRELEASE);
+            Script::SetActionFlag(nullptr, &pGrabbedObject->m_Extra, SCRIPT_ACTION_ONRELEASE);
         }
     }
-    pGrabbedObject = 0;
+    pGrabbedObject = nullptr;
 }
 
 // Moves the grab spring's target to the point fGrabDistance ahead of the eyes (shortened to the first hit of a ray cast
@@ -13824,7 +13831,7 @@ float PlayerCharacter::GetRockItLauncherWeight() const {
 }
 
 ItemChange* PlayerCharacter::GetRandomRockItAmmoItem() {
-    ItemChange* preturnAmmo = 0;
+    ItemChange* preturnAmmo = nullptr;
     if (!RockItLauncherAmmoList.IsEmpty()) {
         ExtraDataList* apExtra;
         uint32_t v1 = Random();
@@ -13833,9 +13840,9 @@ ItemChange* PlayerCharacter::GetRandomRockItAmmoItem() {
             apExtra = prandomItem->pExtraObjectList->m_item;
         }
         else {
-            apExtra = 0;
+            apExtra = nullptr;
         }
-        return RemoveRockItAmmo(prandomItem->pContainerObj, apExtra, 1, 1);
+        return RemoveRockItAmmo(prandomItem->pContainerObj, apExtra, 1, true);
     }
     return preturnAmmo;
 }
@@ -14050,19 +14057,19 @@ MagicItem* PlayerCharacter::GetSelectedSpell() {
 
 bool PlayerCharacter::CheckInvulnerable(ActorValue::Index aiWhich, float afValue) {
     if (!static_cast<MagicTarget*>(this)->IsInvulnerable()) {
-        return (bool)1;
+        return true;
     }
     if (!(afValue < 0.0)) {
         if ((afValue > 0.0) && (((int32_t)aiWhich) == 54)) {
-            return (bool)0;
+            return false;
         }
     }
     else {
         if ((((int32_t)aiWhich) == 16) || ((((int32_t)aiWhich) > 24) && (((int32_t)aiWhich) <= 31))) {
-            return (bool)0;
+            return false;
         }
     }
-    return (bool)1;
+    return true;
 }
 
 int32_t PlayerCharacter::GetNumberActorsInCombat() {
@@ -14120,7 +14127,7 @@ void PlayerCharacter::ToggleKillCamMode(KILL_CAM_TYPE arg0) {
     KILL_CAM_TYPE a2 = GetKillCamMode();
     SetKillCamMode(arg0);
     if (a2 != GetKillCamMode() && IsInSlowMo()) {
-        ResetKillCam(a2, 1);
+        ResetKillCam(a2, true);
     }
 }
 
@@ -14137,7 +14144,7 @@ void PlayerCharacter::StopHeartbeatSound() {
 }
 
 void PlayerCharacter::SetLastGreetingTime() {
-    fLastHelloTime = (float)((float)BSGetTickCount());
+    fLastHelloTime = ((float)BSGetTickCount());
 }
 
 void PlayerCharacter::SetLastKnownGoodPosition() {
@@ -14155,7 +14162,7 @@ void PlayerCharacter::SetLastKnownGoodPosition() {
 
 void PlayerCharacter::ModPlayerGreetTimer() {
     if (bGreetingPlayer) {
-        fGreetTimer = (float)((&appTimer)->GetSeconds() + fGreetTimer);
+        fGreetTimer = ((&appTimer)->GetSeconds() + fGreetTimer);
     }
 }
 
@@ -14171,14 +14178,14 @@ void PlayerCharacter::SetIsAMurderer() {
 void PlayerCharacter::IssueStealWarning() {
     ++iNumberofStealWarnings;
     if (fStealWarningTimer == (-1.0)) {
-        fStealWarningTimer = (float)((&::fWarningTimer)->Float());
+        fStealWarningTimer = (&::fWarningTimer)->Float();
     }
 }
 
 void PlayerCharacter::IssuePickPocketWarning() {
     ++iNumberofPickpocketWarnings;
     if (fPickPocketWarningTimer == (-1.0)) {
-        fPickPocketWarningTimer = (float)((&::fWarningTimer)->Float());
+        fPickPocketWarningTimer = (&::fWarningTimer)->Float();
     }
 }
 
@@ -14188,14 +14195,14 @@ char PlayerCharacter::IsPlayingCombatAttackSound() {
 
 void PlayerCharacter::UpdateTemp3rdPerson() {
     if (bTemp3rdPerson &&
-        ((((pCurrentProcess->GetAnimAction() == ((-1))) && (!pCurrentProcess->GetKnockState())) &&
+        ((((pCurrentProcess->GetAnimAction() == (-1)) && (!pCurrentProcess->GetKnockState())) &&
           (!PlayerCharacter::bVanityMode)) &&
          (!PlayerCharacter::bIsAutoVanityMode))) {
-        bTemp3rdPerson = (bool)0;
+        bTemp3rdPerson = false;
         if (bTemp3rdPersonSwitchBack) {
-            SetFirstPerson(1);
+            SetFirstPerson(true);
         }
-        bTemp3rdPersonSwitchBack = (bool)0;
+        bTemp3rdPersonSwitchBack = false;
     }
 }
 
@@ -14221,10 +14228,10 @@ bool PlayerCharacter::ToggleFlyCam(bool abFreezeTime) {
     uint8_t v6 = (uint8_t)(!appMain->GetFlyCamera());
     appMain->SetFlyCamera(v6);
     if (v6 && abFreezeTime) {
-        appMain->SetFreezeTime(1);
+        appMain->SetFreezeTime(true);
     }
     else {
-        appMain->SetFreezeTime(0);
+        appMain->SetFreezeTime(false);
     }
     FOHUDEffectManager* unk0178 = Interface::GetHUDEffects();
     unk0178->bHideHUD = v6;
@@ -14235,7 +14242,7 @@ bool PlayerCharacter::ToggleFlyCam(bool abFreezeTime) {
     UFOCameraPos.x = v3->x;
     UFOCameraPos.y = v3->y;
     UFOCameraPos.z = v3->z;
-    UFOCameraPos.z = (float)((TESObjectREFR::GetScale() * fEyeHeight) + UFOCameraPos.z);
+    UFOCameraPos.z = ((TESObjectREFR::GetScale() * fEyeHeight) + UFOCameraPos.z);
     fUFOCameraHeading = TESObjectREFR::GetAngleOnReference().z;
     fUFOCameraPitch = TESObjectREFR::GetAngleOnReference().x;
     return (bool)v6;
@@ -14299,10 +14306,10 @@ void PlayerCharacter::ReturnRockItAmmo() {
          (i < ((uint32_t)((int32_t)(&RockItLauncherAmmoList)->BSSimpleArray<ItemChange*>::GetSize())));
          ++i) {
         v1 = &(&RockItLauncherAmmoList)->GetAt(i);
-        inventoryChanges->AddChangeItem(*v1, 1);
+        inventoryChanges->AddChangeItem(*v1, true);
     }
-    (&RockItLauncherAmmoList)->Clear(1);
-    ResetRockItAmmoWeight(0);
+    (&RockItLauncherAmmoList)->Clear(true);
+    ResetRockItAmmoWeight(false);
 }
 
 uint32_t PlayerCharacter::GetCaravanCapLosses() {
@@ -14379,15 +14386,15 @@ bool PlayerCharacter::GetTemp1stPersonSwitchBack() {
 
 bool PlayerCharacter::AddCaravanCard(TESCaravanCard* apCard) {
     if (pInactiveListofCaravanCards->IsInList(apCard) || pActiveListofCaravanCards->IsInList(apCard)) {
-        return 1;
+        return true;
     }
-    apCard->bIsActive = 0;
+    apCard->bIsActive = false;
     pInactiveListofCaravanCards->AddHead(apCard);
-    return 1;
+    return true;
 }
 
 void PlayerCharacter::SetActorBaseValue(ActorValue::Index a1, int32_t a2) {
-    bool v7 = 0;
+    bool v7 = false;
     float v6 = GetBaseValueOverride(a1, v7);
     if (v7) {
         SetBaseValueOverride(a1, static_cast<float>(a2));
@@ -14397,7 +14404,7 @@ void PlayerCharacter::SetActorBaseValue(ActorValue::Index a1, int32_t a2) {
         ActorBase->SetActorValue(a1, a2);
     }
     Interface::UpdateActorValue(a1);
-    CheckSkillLevelChange(a1, 1);
+    CheckSkillLevelChange(a1, true);
 }
 
 void PlayerCharacter::StartKillcamForActor(TESObjectREFR* a1, float a2, bool a3, int32_t a4) {
@@ -14407,7 +14414,7 @@ void PlayerCharacter::StartKillcamForActor(TESObjectREFR* a1, float a2, bool a3,
         BSAudio* v5 = &BSAudio::QInstance();
         BSSoundHandle* arHandle = v5->GetSoundHandleByName(&a1a, "UIPopUpQuestNew", 289u);
         th_s.operator=(*arHandle);
-        th_s.Play(0);
+        th_s.Play(false);
         if (!a1 || pVATS.eMode) {
             goto LABEL_21;
         }
@@ -14430,7 +14437,7 @@ void PlayerCharacter::StartKillcamForActor(TESObjectREFR* a1, float a2, bool a3,
             }
             pVATS.AppendCamTarget(a1, a4);
             if (GetIronSights()) {
-                Interface::SetGunScopeVisible(0);
+                Interface::SetGunScopeVisible(false);
             }
         }
         else {
@@ -14447,16 +14454,16 @@ bool PlayerCharacter::AddEatDrinkItem(MagicItem* apItem) {
     if (apItem->GetSpellType() == MagicSystem::POTION) {
         if (GetCurrentPotionCount() < 100) {
             EatDrinkItems->AddHead(apItem);
-            CastAlchemy(apItem, 1);
+            CastAlchemy(apItem, true);
         }
     }
     else {
-        CastAlchemy(apItem, 1);
+        CastAlchemy(apItem, true);
     }
     ProcessEffectsFromItem(apItem);
     EvaluateSpellConditions();
     UpdateTarget(0.01f);
-    return 1;
+    return true;
 }
 
 void PlayerCharacter::DoIronSightsZoom(float afDelta) {
@@ -14467,7 +14474,7 @@ void PlayerCharacter::DoIronSightsZoom(float afDelta) {
             pweapon = static_cast<TESObjectWEAP*>(pCurrentProcess->GetCurrentWeapon()->pContainerObj);
         }
         else {
-            pweapon = 0;
+            pweapon = nullptr;
         }
         float fdefault = BSSceneGraph::fDefaultWorldFOV.Float();
         float f1stdefault = BSSceneGraph::fDefault1stPersonFOV.Float();
@@ -14490,7 +14497,7 @@ void PlayerCharacter::DoIronSightsZoom(float afDelta) {
         }
         if (IsPipboyActive()) {
             if (GetIronSights()) {
-                SetIronSights(0, 0, 0);
+                SetIronSights(false, false, false);
             }
             f1stPersonFOV = fpipboy;
             fWorldFOV = fdefault;
@@ -14516,7 +14523,7 @@ void PlayerCharacter::DoIronSightsZoom(float afDelta) {
                 if ((pVATS.eMode == VATS::VATS_MENU_MODE || pVATS.eMode == VATS::VATS_SCAN_MODE) &&
                     (pVATSTarget && bWant3rdPerson == b3rdPerson)) {
                     NiAVObject* pobj = (NiAVObject*)pVATSTarget->Get3D();
-                    const NiBound* rbound = (const NiBound*)&pobj->GetWorldBound();
+                    const NiBound* rbound = (&pobj->GetWorldBound());
                     NiPoint3 src = p1stPersonCamera->GetWorldTranslate() - rbound->GetCenter();
                     float fdist = src.Length();
                     double fTargetRadius = rbound->m_fRadius;
@@ -14549,7 +14556,7 @@ void PlayerCharacter::DoIronSightsZoom(float afDelta) {
                             v16 = ::new (apMemory) NonLinearInterpolator;
                         }
                         else {
-                            v16 = 0;
+                            v16 = nullptr;
                         }
                         return v16;
                     }();
@@ -14561,7 +14568,7 @@ void PlayerCharacter::DoIronSightsZoom(float afDelta) {
                             v15 = ::new (v20) NonLinearInterpolator;
                         }
                         else {
-                            v15 = 0;
+                            v15 = nullptr;
                         }
                         return v15;
                     }();
@@ -14587,23 +14594,23 @@ void PlayerCharacter::DoIronSightsZoom(float afDelta) {
                     fWorldFOV = pVATSWorldZoomInterpolator->GetCurrent();
                     f1stPersonFOV = pVATSViewmodelZoomInterpolator->GetCurrent();
                     if (pVATSViewmodelZoomInterpolator->GetFinished()) {
-                        VATSMenu::SetHeadingReached(1);
-                        bFOVTargetReached = 1;
+                        VATSMenu::SetHeadingReached(true);
+                        bFOVTargetReached = true;
                     }
                     else {
-                        VATSMenu::SetHeadingReached(0);
-                        bFOVTargetReached = 0;
+                        VATSMenu::SetHeadingReached(false);
+                        bFOVTargetReached = false;
                     }
                 }
                 else {
                     if (pVATS.eMode == VATS::VATS_PLAYBACK) {
-                        poldVATSTarget = 0;
+                        poldVATSTarget = nullptr;
                         fWorldFOV = ftarget;
                         f1stPersonFOV = f1target;
-                        bFOVTargetReached = 1;
+                        bFOVTargetReached = true;
                     }
                     else {
-                        poldVATSTarget = 0;
+                        poldVATSTarget = nullptr;
                         if (!(ftarget < static_cast<double>(fWorldFOV))) {
                             if (ftarget > static_cast<double>(fWorldFOV)) {
                                 fWorldFOV = fWorldFOV + fdelta;
@@ -14620,27 +14627,27 @@ void PlayerCharacter::DoIronSightsZoom(float afDelta) {
                         }
                         if (!(f1target < static_cast<double>(f1stPersonFOV))) {
                             if (!(f1target > static_cast<double>(f1stPersonFOV))) {
-                                bFOVTargetReached = 1;
+                                bFOVTargetReached = true;
                             }
                             else {
                                 f1stPersonFOV = f1stPersonFOV + fdelta;
                                 if (!(f1target < static_cast<double>(f1stPersonFOV))) {
-                                    bFOVTargetReached = 0;
+                                    bFOVTargetReached = false;
                                 }
                                 else {
                                     f1stPersonFOV = f1target;
-                                    bFOVTargetReached = 1;
+                                    bFOVTargetReached = true;
                                 }
                             }
                         }
                         else {
                             f1stPersonFOV = f1stPersonFOV - fdelta;
                             if (!(f1target > static_cast<double>(f1stPersonFOV))) {
-                                bFOVTargetReached = 0;
+                                bFOVTargetReached = false;
                             }
                             else {
                                 f1stPersonFOV = f1target;
-                                bFOVTargetReached = 1;
+                                bFOVTargetReached = true;
                             }
                         }
                     }
@@ -14664,7 +14671,7 @@ void PlayerCharacter::CreateMouseSpring(
     CFilter fltr;
     hkVector4 hkvCenterOfMass;
     float fmassTotal;
-    if (bAllowHavokGrabTheLiving.Bool() || (!apObject->IsActor() || apObject->IsDead(0))) {
+    if (bAllowHavokGrabTheLiving.Bool() || (!apObject->IsActor() || apObject->IsDead(false))) {
         Projectile* pprojectile;
         // A grenade projectile that is a live mine is never grabbed.
         if (!apObject ||
@@ -14683,7 +14690,7 @@ void PlayerCharacter::CreateMouseSpring(
                         bool v75 = bnormalGrabSuccess;
                         this->pGrabbedObject = apObject;
                         // The script action bit 0x80000 has no name in OBJECT_ACTION.
-                        Script::SetActionFlag(0, &this->pGrabbedObject->m_Extra, SCRIPT_ACTION_ONGRAB);
+                        Script::SetActionFlag(nullptr, &this->pGrabbedObject->m_Extra, SCRIPT_ACTION_ONGRAB);
                         this->eGrabType = aeGrabType;
                         this->fGrabDistance = afDistance;
                         hkMouseSpringActionCinfo v74;
@@ -14694,7 +14701,7 @@ void PlayerCharacter::CreateMouseSpring(
                         else {
                             pbody->GetCenterOfMassInWorld(hkvCenterOfMass);
                         }
-                        this->GetEyeVector(point, dir, 1);
+                        this->GetEyeVector(point, dir, true);
                         char v69 = 0;
                         bhkWorld* pw = apObject->GetParentCell()->GetbhkWorld();
                         if (this->eGrabType == PlayerCharacter::GRAB_NORMAL) {
@@ -14730,7 +14737,7 @@ void PlayerCharacter::CreateMouseSpring(
                                                 ppickedAV = pcol->m_pkSceneObject;
                                             }
                                             else {
-                                                ppickedAV = 0;
+                                                ppickedAV = nullptr;
                                             }
                                             TESObjectREFR* ppickedRef = TESObjectREFR::FindReferenceFor3D(ppickedAV);
                                             if (prb) {
@@ -14819,7 +14826,7 @@ void PlayerCharacter::CreateMouseSpring(
                                     float ftotalWeight = BSMIN(fmaxWeight, a2b);
                                     fscaleForce = FLerp(fscaleLow, fscaleHigh, fmaxWeight, fminWeight, ftotalWeight) *
                                         fscaleForce;
-                                    bool bonlyContactConstraints = 1;
+                                    bool bonlyContactConstraints = true;
                                     for (int32_t i = 0;; ++i) {
                                         if (i >= phkbody->m_constraintsMaster.getSize() || !bonlyContactConstraints) {
                                             break;
@@ -14863,7 +14870,7 @@ void PlayerCharacter::CreateMouseSpring(
                                 v29 = ::new (v30) bhkMouseSpringAction(v74);
                             }
                             else {
-                                v29 = 0;
+                                v29 = nullptr;
                             }
                             this->spGrabSpring.operator=(v29);
                             bhkMouseSpringAction* v28 = this->spGrabSpring.m_pObject;
@@ -14879,7 +14886,7 @@ void PlayerCharacter::CreateMouseSpring(
                         if (aeGrabType == PlayerCharacter::GRAB_INVENTORY_DROP) {
                             this->pGrabbedObject = apObject;
                             // The script action bit 0x80000 has no name in OBJECT_ACTION.
-                            Script::SetActionFlag(0, &this->pGrabbedObject->m_Extra, SCRIPT_ACTION_ONGRAB);
+                            Script::SetActionFlag(nullptr, &this->pGrabbedObject->m_Extra, SCRIPT_ACTION_ONGRAB);
                             this->eGrabType = PlayerCharacter::GRAB_INVENTORY_DROP;
                             this->fGrabDistance = afDistance;
                         }
@@ -14898,13 +14905,13 @@ void PlayerCharacter::PlayMagicFailureSound(MagicSystem::School aeSchool) {
         MagicFailureSounds[aeSchool].SetPosition(v8.x, v8.y, v8.z);
         NiNode* v2 = Get3D();
         MagicFailureSounds[aeSchool].SetObjectToFollow(v2);
-        MagicFailureSounds[aeSchool].Play(0);
+        MagicFailureSounds[aeSchool].Play(false);
     }
     else {
         TESSound* psound = MagicSystem::GetMagicFailureSound(aeSchool);
         if (psound) {
             uint32_t CastingType = psound->iFormID;
-            BSSoundHandle* arHandle = PlaySound(&a2, CastingType, 0, 2u, 1);
+            BSSoundHandle* arHandle = PlaySound(&a2, CastingType, false, 2u, true);
             MagicFailureSounds[aeSchool].operator=(*arHandle);
         }
     }
@@ -14922,7 +14929,7 @@ void PlayerCharacter::HaveFollowersRecheckPackages() {
             Actor* pactor = pActorlist->m_item;
             if (pactor && pactor->GetCurrentAIProcess()) {
                 BaseProcess* pprocess = pactor->GetCurrentAIProcess();
-                pprocess->CheckforNewPackage(pactor, 1);
+                pprocess->CheckforNewPackage(pactor, true);
                 if (pnext != pActorlist->m_pkNext) {
                     pActorlist = FollowerExtra->pActorlist;
                 }
@@ -14941,7 +14948,7 @@ void PlayerCharacter::HaveFollowersRecheckPackages() {
 // PlayerCharacter.h).
 void PlayerCharacter::InsertPerceivedActor(Actor* apActor, bool abAttack, bool abHasLineSightNotDetection) {
     TESActorBaseData* pBaseData = static_cast<TESActorBaseData*>(apActor->GetActorBase());
-    if (!pBaseData->GetIsGhost() && !apActor->IsDead(0)) {
+    if (!pBaseData->GetIsGhost() && !apActor->IsDead(false)) {
         kPerceivedActorsLock.Lock(nullptr);
         CompassTarget* pdata = IsActorPerceived(apActor);
         if (pdata) {
@@ -14958,7 +14965,7 @@ void PlayerCharacter::InsertPerceivedActor(Actor* apActor, bool abAttack, bool a
                     v5 = ::new (v9) BSSimpleList<CompassTarget*>;
                 }
                 else {
-                    v5 = 0;
+                    v5 = nullptr;
                 }
                 pListofPercievedActors = v5;
             }
@@ -14967,7 +14974,7 @@ void PlayerCharacter::InsertPerceivedActor(Actor* apActor, bool abAttack, bool a
                 pData = ::new (apMemory) CompassTarget;
             }
             else {
-                pData = 0;
+                pData = nullptr;
             }
             CompassTarget* pData_2 = pData;
             pData->pTarget = apActor;
@@ -14981,14 +14988,15 @@ void PlayerCharacter::InsertPerceivedActor(Actor* apActor, bool abAttack, bool a
 
 // Under kPerceivedActorsLock (see PlayerCharacter.h).
 bool PlayerCharacter::IsDetectedByCompassTargetExceptActor(Actor* apActor) {
-    bool bDetected = 0;
+    bool bDetected = false;
     kPerceivedActorsLock.Lock(nullptr);
     for (CompassTarget* pCompassTarget : pListofPercievedActors->ItemsUntilNull()) {
         Actor* pTarget = pCompassTarget->pTarget;
         if (pTarget && !pTarget->IsPlayerTeammate() && pTarget != apActor) {
-            bool bLineOfSight = pTarget->LineOfSight(0, pPlayer, 1, 0, 0);
-            if (pTarget->GetDetectionLevelAgainstActor(0, pPlayer, bLineOfSight, 0, 0, 0, 0) > 0) {
-                bDetected = 1;
+            bool bLineOfSight = pTarget->LineOfSight(false, pPlayer, true, nullptr, false);
+            if (pTarget->GetDetectionLevelAgainstActor(false, pPlayer, bLineOfSight, false, false, false, nullptr) >
+                0) {
+                bDetected = true;
                 break;
             }
         }
@@ -15006,7 +15014,7 @@ void PlayerCharacter::SetDifficultyLevel(GamePlayFormulas::DifficultyLevel aeDif
 }
 
 void PlayerCharacter::SetActorBaseValueF(ActorValue::Index a1, float a3) {
-    bool v6 = 0;
+    bool v6 = false;
     float v5 = GetBaseValueOverride(a1, v6);
     if (v6) {
         SetBaseValueOverride(a1, a3);
@@ -15016,7 +15024,7 @@ void PlayerCharacter::SetActorBaseValueF(ActorValue::Index a1, float a3) {
         ActorBase->SetActorValue(a1, a3);
     }
     Interface::UpdateActorValue(a1);
-    CheckSkillLevelChange(a1, 1);
+    CheckSkillLevelChange(a1, true);
 }
 
 TESObjectCELL* PlayerCharacter::GetWaterCell(float afCheckRadius) {
@@ -15074,7 +15082,7 @@ TESObjectCELL* PlayerCharacter::GetWaterCell(float afCheckRadius) {
     }
     if (cell) {
         if (!cell->HasWater()) {
-            return 0;
+            return nullptr;
         }
     }
     return cell;
@@ -15083,17 +15091,19 @@ TESObjectCELL* PlayerCharacter::GetWaterCell(float afCheckRadius) {
 bool PlayerCharacter::CanFastTravel() {
     float fCheckPerk;
     char msg[504];
-    bool bretval = 0;
-    bool bsearch = 0;
+    bool bretval = false;
+    bool bsearch = false;
     bool Interior = pPlayer->GetInterior();
     if (ReferenceProcessLists.AreHostilActorsNear(Interior)) {
         BSsprintf(msg, 500, sNoFastTravelHostileActorsNear.String());
-        Interface::ShowMessage(msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0);
-        return 0;
+        Interface::ShowMessage(
+            msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+        );
+        return false;
     }
     else {
         BSSimpleList<TESObjectREFR*>* preflist =
-            ReferenceProcessLists.IsActorTargetingREFinPackage(pPlayer, PACKAGE_TYPE_ALARM, 0);
+            ReferenceProcessLists.IsActorTargetingREFinPackage(pPlayer, PACKAGE_TYPE_ALARM, false);
         if (!preflist || preflist->IsEmpty()) {
             BSSimpleList<ActiveEffect*>* plist = GetActiveEffectList();
             if (pCurrentProcess) {
@@ -15103,9 +15113,10 @@ bool PlayerCharacter::CanFastTravel() {
                     if (peffect && peffect->IsCausingDamage()) {
                         BSsprintf(msg, 500, sFastTravelNoTravelHealthDamage.String());
                         Interface::ShowMessage(
-                            msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                            msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f,
+                            false
                         );
-                        return 0;
+                        return false;
                     }
                     plist = pnext;
                 }
@@ -15116,8 +15127,8 @@ bool PlayerCharacter::CanFastTravel() {
                      (BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::HAS_ALWAYS_FAST_TRAVEL, this, &fCheckPerk),
                       fCheckPerk < 1.0))) {
                     BSsprintf(msg, 500, sNoFastTravelOverencumbered.String());
-                    Interface::ShowMessage(msg, 0, 0, 0, 2.0f, 0);
-                    return 0;
+                    Interface::ShowMessage(msg, 0, nullptr, nullptr, 2.0f, false);
+                    return false;
                 }
                 else {
                     if (pPlayer->GetActorValue(ActorValue::FATIGUE) >= 1 &&
@@ -15125,9 +15136,10 @@ bool PlayerCharacter::CanFastTravel() {
                         if (pPlayer->IsJumping()) {
                             BSsprintf(msg, 500, sNoFastTravelInAir.String());
                             Interface::ShowMessage(
-                                msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                                msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f,
+                                false
                             );
-                            return 0;
+                            return false;
                         }
                         else {
                             if (GetParentCell()) {
@@ -15142,7 +15154,8 @@ bool PlayerCharacter::CanFastTravel() {
                             if (!bretval) {
                                 BSsprintf(msg, 500, sNoFastTravelCell.String());
                                 Interface::ShowMessage(
-                                    msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                                    msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr,
+                                    2.0f, false
                                 );
                             }
                             return bretval;
@@ -15151,30 +15164,31 @@ bool PlayerCharacter::CanFastTravel() {
                     else {
                         BSsprintf(msg, 500, sFastTravelNoTravelHealthDamage.String());
                         Interface::ShowMessage(
-                            msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                            msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f,
+                            false
                         );
-                        return 0;
+                        return false;
                     }
                 }
             }
             else {
                 BSsprintf(msg, 500, sNoFastTravelScriptBlock.String());
                 Interface::ShowMessage(
-                    msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                    msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
                 );
-                return 0;
+                return false;
             }
         }
         else {
             BSsprintf(msg, 500, sNoFastTravelAlarm.String());
             Interface::ShowMessage(
-                msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
             );
             preflist->RemoveAllPointerList();
             if (preflist) {
                 delete preflist;
             }
-            return 0;
+            return false;
         }
     }
 }
@@ -15204,7 +15218,7 @@ void PlayerCharacter::SpotterEffectNearbyEnemies() {
                     peffect = ::new (apMemory) MagicShaderHitEffect(pact->pTarget, pEffectData, -1.0f);
                 }
                 else {
-                    peffect = 0;
+                    peffect = nullptr;
                 }
                 if (peffect->Init()) {
                     ReferenceProcessLists.AddTempEffect(peffect);
@@ -15227,8 +15241,8 @@ void PlayerCharacter::ShaderNearbyItems() {
     FindObjectIterator v17(ALCH_ID, this);
     FindObjectIterator apThis(KEYM_ID, this);
     float a3 = fItemDetectionTimer.Float();
-    TESObjectREFR* arpRef = 0;
-    ItemChange* arpItemChange = 0;
+    TESObjectREFR* arpRef = nullptr;
+    ItemChange* arpItemChange = nullptr;
     TESEffectShader* a2 = static_cast<TESEffectShader*>(pDataHandler->GetItemDetectedShader());
     if (a2) {
         while (pLoadedReferenceCollection->GetNextObject(arIterator, arpRef, arpItemChange, 3u)) {
@@ -15239,7 +15253,7 @@ void PlayerCharacter::ShaderNearbyItems() {
                 v4 = ::new (v9) MagicShaderHitEffect(arpRef, a2, a3);
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             if (v4->Init()) {
                 ReferenceProcessLists.AddTempEffect(v4);
@@ -15258,7 +15272,7 @@ void PlayerCharacter::ShaderNearbyItems() {
                 v3 = ::new (v8) MagicShaderHitEffect(arpRef, a2, a3);
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             if (v3->Init()) {
                 ReferenceProcessLists.AddTempEffect(v3);
@@ -15277,7 +15291,7 @@ void PlayerCharacter::ShaderNearbyItems() {
                 v2 = ::new (v7) MagicShaderHitEffect(arpRef, a2, a3);
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             if (v2->Init()) {
                 ReferenceProcessLists.AddTempEffect(v2);
@@ -15296,7 +15310,7 @@ void PlayerCharacter::ShaderNearbyItems() {
                 v1 = ::new (v6) MagicShaderHitEffect(arpRef, a2, a3);
             }
             else {
-                v1 = 0;
+                v1 = nullptr;
             }
             if (v1->Init()) {
                 ReferenceProcessLists.AddTempEffect(v1);
@@ -15315,7 +15329,7 @@ void PlayerCharacter::UpdatePlayerCombat(float afDelta) {
     if (pCombatGroup) {
         if (!pCombatGroup->GetTargetCount()) {
             pCombatGroup->RemoveMember(this);
-            pCombatGroup = 0;
+            pCombatGroup = nullptr;
         }
     }
     if (pCombatGroup) {
@@ -15327,20 +15341,20 @@ void PlayerCharacter::UpdatePlayerCombat(float afDelta) {
     apNumLost = 0;
     uint32_t CombatantCount = pCombatManager->GetCombatantCount(pPlayer, &apNumLost);
     if (CombatantCount) {
-        bPlayerInCombat = 1;
+        bPlayerInCombat = true;
         bAllCombatTargetsSearching = CombatantCount == apNumLost;
     }
     else {
-        bPlayerInCombat = 0;
-        bAllCombatTargetsSearching = 0;
+        bPlayerInCombat = false;
+        bAllCombatTargetsSearching = false;
     }
 }
 
 void PlayerCharacter::CheckBorderRegion() {
     if (gs_bBorderRegionsEnabled_General.Bool() && !TES::pInstance->CellTestRunning()) {
-        bool binBorderRegion = 0;
+        bool binBorderRegion = false;
         if (bInBorderContainedCell) {
-            binBorderRegion = 1;
+            binBorderRegion = true;
         }
         else {
             if (pBorderRegions) {
@@ -15353,7 +15367,7 @@ void PlayerCharacter::CheckBorderRegion() {
                         for (BSSimpleList<TESRegionPointList*>* plist = pregion->pPointLists;
                              !binBorderRegion && (plist && !plist->IsEmpty()); plist = plist->m_pkNext) {
                             if (plist->m_item->IsInsideRegion(&testPoint)) {
-                                binBorderRegion = 1;
+                                binBorderRegion = true;
                             }
                         }
                     }
@@ -15365,7 +15379,7 @@ void PlayerCharacter::CheckBorderRegion() {
             else {
                 TESWorldSpace* pworld = GetWorldSpace();
                 if (!pworld || !pworld->GetHasBorderRegion()) {
-                    binBorderRegion = 1;
+                    binBorderRegion = true;
                 }
             }
         }
@@ -15373,7 +15387,7 @@ void PlayerCharacter::CheckBorderRegion() {
             SetLastKnownGoodPosition();
         }
         else {
-            ReturnToLastKnownGoodPosition(0);
+            ReturnToLastKnownGoodPosition(false);
         }
     }
 }
@@ -15471,7 +15485,7 @@ void PlayerCharacter::HandleFlycamMovement() {
     CameraRoot->SetTranslate(UFOCameraPos);
     NiNode* v2 = WorldSceneGraph->GetCameraRoot();
     v2->SetRotate(result);
-    NiUpdateData a2(0.0f, 0, 0);
+    NiUpdateData a2(0.0f, false, false);
     NiNode* v3 = WorldSceneGraph->GetCameraRoot();
     v3->Update(a2);
     if (GetWorldSpace()) {
@@ -15491,9 +15505,11 @@ void PlayerCharacter::ReturnToLastKnownGoodPosition(bool abPositionPlayer) {
     if (pLastKnownGoodLocation) {
         if (abPositionPlayer) {
             const char* v2 = sPlayerLeavingBorderRegion.String();
-            Interface::ShowMessage(v2, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0);
-            TESObjectCELL* pcell = 0;
-            TESWorldSpace* pworld = 0;
+            Interface::ShowMessage(
+                v2, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+            );
+            TESObjectCELL* pcell = nullptr;
+            TESWorldSpace* pworld = nullptr;
             if (pLastKnownGoodLocation) {
                 int32_t FormType = pLastKnownGoodLocation->GetFormType();
                 if (FormType == 57) {
@@ -15508,20 +15524,22 @@ void PlayerCharacter::ReturnToLastKnownGoodPosition(bool abPositionPlayer) {
             if (pworld) {
                 NiPoint3 v25 = GetAngleOnReference();
                 NiPoint3 v23 = GetLastKnownGoodPosition();
-                PositionPlayerExterior(v23, v25, pworld, 0);
+                PositionPlayerExterior(v23, v25, pworld, false);
             }
             else {
                 if (pcell) {
                     NiPoint3 v26 = GetAngleOnReference();
                     NiPoint3 v24 = GetLastKnownGoodPosition();
-                    PositionPlayer(v24, v26, pcell, 0);
+                    PositionPlayer(v24, v26, pcell, false);
                 }
             }
         }
         else {
             Actor* pactor = this;
             const char* v3 = sPlayerLeavingBorderRegion.String();
-            Interface::ShowMessage(v3, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0);
+            Interface::ShowMessage(
+                v3, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+            );
             bhkCharacterController* pcon = GetCharController();
             if (pcon) {
                 if (!pcon->QSupported()) {
@@ -15532,8 +15550,8 @@ void PlayerCharacter::ReturnToLastKnownGoodPosition(bool abPositionPlayer) {
             if (pcon) {
                 pcon->SetPosition(LastKnownGoodPosition);
             }
-            TESObjectCELL* pcell_2 = 0;
-            TESWorldSpace* pworld_2 = 0;
+            TESObjectCELL* pcell_2 = nullptr;
+            TESWorldSpace* pworld_2 = nullptr;
             if (pLastKnownGoodLocation) {
                 int32_t v6 = pLastKnownGoodLocation->GetFormType();
                 if (v6 == 57) {
@@ -15548,21 +15566,21 @@ void PlayerCharacter::ReturnToLastKnownGoodPosition(bool abPositionPlayer) {
             if (pworld_2) {
                 int32_t icellx = FloatToInt(LastKnownGoodPosition.x) >> 12;
                 int32_t icelly = FloatToInt(LastKnownGoodPosition.y) >> 12;
-                pcell_2 = pDataHandler->GetCellFromCellCoord(icellx, icelly, pworld_2, 0);
+                pcell_2 = pDataHandler->GetCellFromCellCoord(icellx, icelly, pworld_2, false);
             }
             if (pcell_2) {
                 pactor->SetParentCell(pcell_2);
                 SetParentCell(pcell_2);
             }
-            NiAVObject* pobj3D = Get3D(0);
-            NiAVObject* pobj1st3D = Get3D(1);
+            NiAVObject* pobj3D = Get3D(false);
+            NiAVObject* pobj1st3D = Get3D(true);
             pobj3D->SetTranslate(LastKnownGoodPosition);
             pobj1st3D->SetTranslate(LastKnownGoodPosition);
-            bhkNiCollisionObject::ResetSim(pobj3D, 1);
-            bhkNiCollisionObject::ResetSim(pobj1st3D, 1);
-            NiUpdateData UpdateData1(0.0f, 0, 0);
+            bhkNiCollisionObject::ResetSim(pobj3D, true);
+            bhkNiCollisionObject::ResetSim(pobj1st3D, true);
+            NiUpdateData UpdateData1(0.0f, false, false);
             pobj3D->Update(UpdateData1);
-            NiUpdateData UpdateData2(0.0f, 0, 0);
+            NiUpdateData UpdateData2(0.0f, false, false);
             pobj1st3D->Update(UpdateData2);
         }
     }
@@ -15582,11 +15600,11 @@ void PlayerCharacter::PlayerSleep() {
         }
         else {
             if (ReferenceProcessLists.bRunScheduals) {
-                ReferenceProcessLists.kUpdateLock.Lock(0);
-                ReferenceProcessLists.UpdateHighListPackages(3600.0f, 1);
-                ReferenceProcessLists.UpdateMiddleHighList(3600.0f, 1);
-                ReferenceProcessLists.UpdateMiddleLowList(3600.0f, 1);
-                ReferenceProcessLists.UpdateLowList(3600.0f, 1);
+                ReferenceProcessLists.kUpdateLock.Lock(nullptr);
+                ReferenceProcessLists.UpdateHighListPackages(3600.0f, true);
+                ReferenceProcessLists.UpdateMiddleHighList(3600.0f, true);
+                ReferenceProcessLists.UpdateMiddleLowList(3600.0f, true);
+                ReferenceProcessLists.UpdateLowList(3600.0f, true);
                 ReferenceProcessLists.kUpdateLock.Unlock();
             }
         }
@@ -15601,21 +15619,19 @@ void PlayerCharacter::PlayerSleep() {
             else {
                 fSleepRestored_2 = fCurrentSLP;
             }
-            PermanentModActorValue(
-                ActorValue::SLEEPDEPREVATION, static_cast<float>(-fSleepRestored_2), static_cast<Actor*>(0)
-            );
+            PermanentModActorValue(ActorValue::SLEEPDEPREVATION, (-fSleepRestored_2), static_cast<Actor*>(nullptr));
         }
     }
     float fDelta = appTimer.fDelta;
     TES::pInstance->pSky->Update(fDelta);
     ReferenceProcessLists.UpdateTheCrimeList();
-    UpdateMagic(1, 0);
+    UpdateMagic(true, false);
     if (--iSleepTime <= 0) {
-        PlayerCharacter::bSleepRunUpdates = 1;
+        PlayerCharacter::bSleepRunUpdates = true;
         if (bIsSleeping && !IsHardcore()) {
             RestoreFullHealthAndConditions();
         }
-        bIsSleeping = 0;
+        bIsSleeping = false;
     }
 }
 
@@ -15627,12 +15643,12 @@ void PlayerCharacter::UpdateTemp1stPerson() {
              (!pCurrentProcess->GetCurrentWeapon() ||
               (v1 = pCurrentProcess->GetCurrentWeapon(),
                !static_cast<TESObjectWEAP*>(v1->pContainerObj)->GetScopeModel()->GetModelLength())))) {
-            bTemp1stPerson = 0;
-            bSkipAlphaFadeOut = 1;
+            bTemp1stPerson = false;
+            bSkipAlphaFadeOut = true;
             if (bTemp1stPersonSwitchBack) {
-                SetFirstPerson(0);
+                SetFirstPerson(false);
             }
-            bTemp1stPersonSwitchBack = 0;
+            bTemp1stPersonSwitchBack = false;
         }
     }
 }
@@ -15647,14 +15663,14 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
                 if (apThis) {
                     delete apThis;
                 }
-                pInventoryAnimation = 0;
+                pInventoryAnimation = nullptr;
                 NiNode* v27 = spInventoryPC.m_pObject;
                 NiFixedString* v19 = &FixedStrings::QRaceHeadBiped();
                 NiAVObject* pav_3 = v27->GetObjectByName(*v19);
                 BSFaceGenNiNode* pfacenode_3 =
                     static_cast<BSFaceGenNiNode*>(NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, pav_3));
                 if (pfacenode_3) {
-                    pfacenode_3->UpdateAllChildrenMorphData(1);
+                    pfacenode_3->UpdateAllChildrenMorphData(true);
                 }
                 NiNode* v26 = spInventoryPC.m_pObject;
                 NiFixedString* v20 = &FixedStrings::QRaceHeadSkinned();
@@ -15662,13 +15678,13 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
                 BSFaceGenNiNode* pfacenode_4 =
                     static_cast<BSFaceGenNiNode*>(NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, pav_4));
                 if (pfacenode_4) {
-                    pfacenode_4->UpdateAllChildrenMorphData(1);
+                    pfacenode_4->UpdateAllChildrenMorphData(true);
                 }
-                spInventoryPC.operator=(static_cast<NiNode*>(0));
+                spInventoryPC.operator=(static_cast<NiNode*>(nullptr));
                 MagicShaderHitEffect* peffect = GetMagicShaderHitEffect();
                 if (peffect) {
                     delete peffect;
-                    SetInventoryWeaponEffect(0);
+                    SetInventoryWeaponEffect(nullptr);
                 }
             }
         }
@@ -15683,14 +15699,14 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
         char apDest[268];
         char Str1[264];
         bool boldForce = BSShaderPPLightingProperty::GetForceNoProjectedShadowTexture();
-        BSShaderPPLightingProperty::SetForceNoProjectedShadowTexture(1);
+        BSShaderPPLightingProperty::SetForceNoProjectedShadowTexture(true);
         ReferenceProcessLists.FinishGeometryDecalEffects();
         ReferenceProcessLists.UpdateTempEffects(0.0f);
         NiNode* v2 = Get3D();
         bhkForceController::RemoveForce(v2);
-        NiAVObject* proot = Get3D(0);
+        NiAVObject* proot = Get3D(false);
         bhkForceController::RemoveForce(proot);
-        NiAVObject* proot_2 = Get3D(0);
+        NiAVObject* proot_2 = Get3D(false);
         NiPointer<NiTimeController> spmanager(proot_2->GetControllers());
         proot_2->RemoveAllControllers();
         cloneData.~BSCloningProcess();
@@ -15700,7 +15716,7 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
             pclonednode_2 = pobj->IsNode();
         }
         else {
-            pclonednode_2 = 0;
+            pclonednode_2 = nullptr;
         }
         if (pclonednode_2) {
             ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
@@ -15712,7 +15728,7 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
             v39 = pobj->IsNode();
         }
         else {
-            v39 = 0;
+            v39 = nullptr;
         }
         spInventoryPC.operator=(v39);
         spInventoryPC.m_pObject->RemoveAllControllers();
@@ -15731,7 +15747,7 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
             v38 = ::new (v44) BSFaceGenAnimationData;
         }
         else {
-            v38 = 0;
+            v38 = nullptr;
         }
         NiPointer<BSFaceGenAnimationData> spanimdata(v38);
         NiNode* v37 = spInventoryPC.m_pObject;
@@ -15751,9 +15767,9 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
         if (pfacenode_2) {
             BSFaceGenAnimationData* a2b = spanimdata.m_pObject;
             pfacenode_2->SetAnimationData(a2b);
-            pfacenode_2->UpdateAllChildrenMorphData(1);
+            pfacenode_2->UpdateAllChildrenMorphData(true);
         }
-        spanimdata.operator=(static_cast<BSFaceGenAnimationData*>(0));
+        spanimdata.operator=(static_cast<BSFaceGenAnimationData*>(nullptr));
         NiNode* v35 = spInventoryPC.m_pObject;
         NiFixedString* v8 = &FixedStrings::QArrowBone();
         NiAVObject* parrowObj = v35->GetObjectByName(*v8);
@@ -15761,7 +15777,7 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
             parrowBone = parrowObj->IsNode();
         }
         else {
-            parrowBone = 0;
+            parrowBone = nullptr;
         }
         if (parrowBone) {
             for (int32_t n = 0;; ++n) {
@@ -15779,7 +15795,7 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
             pmagicBone = pmagicObj->IsNode();
         }
         else {
-            pmagicBone = 0;
+            pmagicBone = nullptr;
         }
         if (pmagicBone) {
             for (int32_t n_2 = 0;; ++n_2) {
@@ -15796,19 +15812,19 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
             v31 = ::new (v43) Animation;
         }
         else {
-            v31 = 0;
+            v31 = nullptr;
         }
         pInventoryAnimation = v31;
         TESBoundObject* pref_2 = GetObjectReference();
         BSsprintf(apDest, 260, "%s", GetModel());
         char* pslash = std::strrchr(apDest, 92);
         if (!pslash) {
-            return 0;
+            return nullptr;
         }
         BSstrcpy(pslash, 260 - (pslash - apDest), "\\MTIdle.KF");
         BSsprintf(Str1, 260, "Data\\%s\\%s", "Meshes", apDest);
         const char* Model_ = GetModel();
-        BSSimpleList<const char*>* pkfFiles = pModelLoader->BuildFileList(Str1, Model_, 0);
+        BSSimpleList<const char*>* pkfFiles = pModelLoader->BuildFileList(Str1, Model_, nullptr);
         *pslash = 0;
         // Each weapon kind's idle and torch idle file, when it exists, goes into the list as a 260-byte path the list
         // owns.
@@ -15817,7 +15833,7 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
             char* pTorchIdleFile;
             BSsprintf(Str1, 260, "Data\\%s\\%s\\%sIdle.KF", "Meshes", apDest, animWeaponInfo[n_3]);
             FileFinder* Singleton = FileFinder::GetSingleton();
-            if (Singleton->Exist(Str1, 0, 0, FileFinder::ARCHIVE_TYPE_ANY)) {
+            if (Singleton->Exist(Str1, nullptr, 0, FileFinder::ARCHIVE_TYPE_ANY)) {
                 pIdleFile = static_cast<char*>(ourMalloc(260u));
                 const char* v15 = GetModel();
                 BSstrcpy(pIdleFile, 260, v15);
@@ -15830,7 +15846,7 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
             }
             BSsprintf(Str1, 260, "Data\\%s\\%s\\%sTorchIdle.KF", "Meshes", apDest, animWeaponInfo[n_3]);
             FileFinder* v16 = FileFinder::GetSingleton();
-            if (v16->Exist(Str1, 0, 0, FileFinder::ARCHIVE_TYPE_ANY)) {
+            if (v16->Exist(Str1, nullptr, 0, FileFinder::ARCHIVE_TYPE_ANY)) {
                 pTorchIdleFile = static_cast<char*>(ourMalloc(260u));
                 const char* v17 = GetModel();
                 BSstrcpy(pTorchIdleFile, 260, v17);
@@ -15843,20 +15859,20 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
             }
         }
         NiNode* v21 = spInventoryPC.m_pObject;
-        this->GetInventoryAnimation()->Init(pkfFiles, v21, this, 1);
+        this->GetInventoryAnimation()->Init(pkfFiles, v21, this, true);
         LightRefData* lightPtr = (&m_Extra)->GetLight();
         NiNode* v30 = spInventoryPC.m_pObject;
         v30->UpdateWorldBound();
         if (pCurrentProcess) {
             BaseProcess* CurrentAIProcess = pCurrentProcess;
-            CurrentAIProcess->SetShouldRefreshMagicShadersEffects(1, 0, 0);
+            CurrentAIProcess->SetShouldRefreshMagicShadersEffects(true, false, false);
         }
         BSShaderPPLightingProperty::SetForceNoProjectedShadowTexture(boldForce);
         NiNode* v28 = spInventoryPC.m_pObject;
         NiFixedString* v18 = &FixedStrings::QHeadMeshExp();
         NiAVObject* pspecialFace = v28->GetObjectByName(*v18);
         if (pspecialFace) {
-            pspecialFace->SetAppCulled(1);
+            pspecialFace->SetAppCulled(true);
         }
     }
     return spInventoryPC.m_pObject;
@@ -15864,7 +15880,7 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
 
 bool PlayerCharacter::AddQuestStageItem(TESQuestStageItem* apNewItem) {
     if (!apNewItem) {
-        return 0;
+        return false;
     }
     BSSimpleList<TESQuestStageItem*>* ecx0a = GetQuestLog();
     while (ecx0a && ecx0a->m_item) {
@@ -15873,13 +15889,13 @@ bool PlayerCharacter::AddQuestStageItem(TESQuestStageItem* apNewItem) {
         if (v7 == apNewItem) {
             TESQuest* TalkingActivator = v7->GetOwner();
             if (!TalkingActivator->GetAllowRepeatStages()) {
-                return 0;
+                return false;
             }
         }
     }
     listQuestLog.AddHead(apNewItem);
     if (!Script::GetProcessScripts()) {
-        return 1;
+        return true;
     }
     if (apNewItem->GetEndQuest()) {
         Interface::PlayMenuSound(9);
@@ -15891,14 +15907,14 @@ bool PlayerCharacter::AddQuestStageItem(TESQuestStageItem* apNewItem) {
             }
         }
     }
-    return 1;
+    return true;
 }
 
 void PlayerCharacter::RemovePlayerMapMarker() {
     if (pPlayerMapMarker) {
         delete pPlayerMapMarker;
     }
-    pPlayerMapMarker = 0;
+    pPlayerMapMarker = nullptr;
     PlayerMarkerPath.Clear();
 }
 
@@ -15937,8 +15953,8 @@ void PlayerCharacter::FocusOnActor(MobileObject* apActor, float afZoomPercent, b
         }
         NiPoint3 src = p1stPersonCamera->GetWorldTranslate();
         NiPoint3 target;
-        bool bcalculated = 0;
-        NiAVObject* pav = 0;
+        bool bcalculated = false;
+        NiAVObject* pav = nullptr;
         if (apActor->IsTalkingActivator()) {
             TESObjectREFR* pref = apActor->GetTalkingActivator();
             pav = pref->Get3D();
@@ -15946,10 +15962,10 @@ void PlayerCharacter::FocusOnActor(MobileObject* apActor, float afZoomPercent, b
         else {
             pav = apActor->Get3D();
         }
-        bool bvalidTarget = 1;
+        bool bvalidTarget = true;
         if (pav) {
-            BSFaceGenNiNode* pfaceGenHead = apActor->GetFaceNodeSkinned(0);
-            NiNode* phead = 0;
+            BSFaceGenNiNode* pfaceGenHead = apActor->GetFaceNodeSkinned(nullptr);
+            NiNode* phead = nullptr;
             if (!pfaceGenHead) {
                 NiAVObject* pheadObject = BSUtilities::GetObjectByName(pav, *FixedStrings::GetBip01_Head());
                 phead = static_cast<NiNode*>(NiObject::DynamicCastStatic(&NiNode::ms_RTTI, pheadObject));
@@ -15960,7 +15976,7 @@ void PlayerCharacter::FocusOnActor(MobileObject* apActor, float afZoomPercent, b
                 pSpeaker = ::new (static_cast<void*>(pSpeakerMemory)) NiFixedString("Bip01 Speaker");
             }
             else {
-                pSpeaker = 0;
+                pSpeaker = nullptr;
             }
             if (!phead) {
                 NiAVObject* pspeakerObject = BSUtilities::GetObjectByName(pav, *pSpeaker);
@@ -15969,11 +15985,11 @@ void PlayerCharacter::FocusOnActor(MobileObject* apActor, float afZoomPercent, b
             if (pfaceGenHead || phead) {
                 if (pfaceGenHead) {
                     if (pfaceGenHead->GetAppCulled()) {
-                        pfaceGenHead->SetAppCulled(0);
-                        NiUpdateData UpdateData(0.0f, 0, 0);
+                        pfaceGenHead->SetAppCulled(false);
+                        NiUpdateData UpdateData(0.0f, false, false);
                         pfaceGenHead->Update(UpdateData);
                         pfaceGenHead->UpdateWorldBound();
-                        pfaceGenHead->SetAppCulled(1);
+                        pfaceGenHead->SetAppCulled(true);
                     }
                 }
                 NiBound headBound;
@@ -15989,7 +16005,7 @@ void PlayerCharacter::FocusOnActor(MobileObject* apActor, float afZoomPercent, b
                 src -= target;
                 NiCamera* pcam = Main::GetWorldSceneGraph()->GetCamera();
                 if (pcam) {
-                    bcalculated = 1;
+                    bcalculated = true;
                     float fworldFOVDelta = 0.0f;
                     float f1stPersonFOVDelta = 0.0f;
                     if (PlayerCharacter::fDialogZoomPercent == 0.0) {
@@ -16021,7 +16037,7 @@ void PlayerCharacter::FocusOnActor(MobileObject* apActor, float afZoomPercent, b
                     );
                 }
                 plastWarningActor = apActor;
-                bvalidTarget = 0;
+                bvalidTarget = false;
             }
             if (!abOnlyZoom && bvalidTarget) {
                 float fangleDelta;
@@ -16032,10 +16048,10 @@ void PlayerCharacter::FocusOnActor(MobileObject* apActor, float afZoomPercent, b
                 fangleDelta = ftargetAngle - GetLooking();
                 double fabsLook = std::fabs(fangleDelta);
                 if (fDlgLookDegStart.Float() * 0.01745329238474369 * ffovMult < fabsLook) {
-                    badjustLooking = 1;
+                    badjustLooking = true;
                 }
                 if (PlayerCharacter::fDialogZoomPercent < 1.0) {
-                    badjustLooking = 1;
+                    badjustLooking = true;
                 }
                 if (badjustLooking) {
                     if (!(PlayerCharacter::fDialogZoomPercent < 1.0)) {
@@ -16052,11 +16068,11 @@ void PlayerCharacter::FocusOnActor(MobileObject* apActor, float afZoomPercent, b
                     }
                     double fabsLookAfter = std::fabs(fangleDelta);
                     if (fDlgLookDegStop.Float() * 0.01745329238474369 * ffovMult > fabsLookAfter) {
-                        badjustLooking = 0;
+                        badjustLooking = false;
                     }
                 }
                 double fzAngle = GetZAngleFromVector(-src);
-                for (fangleDelta = fzAngle - GetHeading(0); fangleDelta > 3.1415927410125732;
+                for (fangleDelta = fzAngle - GetHeading(false); fangleDelta > 3.1415927410125732;
                      fangleDelta = fangleDelta - 6.2831854820251465) {
                     ;
                 }
@@ -16065,15 +16081,15 @@ void PlayerCharacter::FocusOnActor(MobileObject* apActor, float afZoomPercent, b
                 }
                 double fabsHeading = std::fabs(fangleDelta);
                 if (fDlgHeadingDegStart.Float() * 0.01745329238474369 * ffovMult < fabsHeading) {
-                    badjustHeading = 1;
+                    badjustHeading = true;
                 }
                 if (PlayerCharacter::fDialogZoomPercent < 1.0) {
-                    badjustHeading = 1;
+                    badjustHeading = true;
                 }
                 if (badjustHeading) {
                     if (GetSitSleepState()) {
                         double fsitAngle = GetZAngleFromVector(-src);
-                        for (fangleDelta = fsitAngle - Actor::GetHeading(0) - fSitHeadingDelta;
+                        for (fangleDelta = fsitAngle - Actor::GetHeading(false) - fSitHeadingDelta;
                              fangleDelta > 3.1415927410125732; fangleDelta = fangleDelta - 6.2831854820251465) {
                             ;
                         }
@@ -16109,22 +16125,22 @@ void PlayerCharacter::FocusOnActor(MobileObject* apActor, float afZoomPercent, b
                     }
                     double fabsHeadingAfter = std::fabs(fangleDelta);
                     if (fDlgHeadingDegStop.Float() * 0.01745329238474369 * ffovMult > fabsHeadingAfter) {
-                        badjustHeading = 0;
+                        badjustHeading = false;
                     }
                 }
-                PlayerCharacter::fCameraHeading = GetHeading(0);
+                PlayerCharacter::fCameraHeading = GetHeading(false);
                 PlayerCharacter::fCameraLooking = GetLooking();
-                SetFirstPerson(1);
+                SetFirstPerson(true);
                 UpdateFirstPersonZoom();
                 UpdateTemp3rdPerson();
                 static_cast<PlayerMover*>(pActorMover)->PlayerMover::ClearMoveMode(63u);
                 bhkWorld::ClearPickData();
-                b3rdPerson = 1;
+                b3rdPerson = true;
                 UpdateAnimation();
                 PickAnimations(1.0f, 1.0f);
-                Animation* pAnim3rd = GetAnimation(0);
+                Animation* pAnim3rd = GetAnimation(false);
                 UpdateAnimationMovement(pAnim3rd, 0.0f);
-                b3rdPerson = 0;
+                b3rdPerson = false;
                 float fupdateDelta = appTimer.fDelta;
                 Character::Update(fupdateDelta);
                 float fmoveDelta = appTimer.fDelta;
@@ -16146,20 +16162,20 @@ void PlayerCharacter::InitiateSitSleepPackage(TESObjectREFR* apCurrentFurniture)
     if (!pPlayer->IsPathingComplete()) {
         pPlayer->pActorMover->ClearCurrentData();
     }
-    SetAIControlledToPosition(1);
+    SetAIControlledToPosition(true);
     if (pCurrentProcess->GetAnimAction() == ANIM_ACTION_BLOCK) {
-        SetBlock(0);
+        SetBlock(false);
     }
     TESPackage* Package = TESPackage::CreatePackage(PACKAGE_TYPE_TRAVEL);
     Package->SetPackType(PACKAGE_TYPE_TRAVEL);
-    Package->SetMustReachLocation(0);
-    Package->SetMustComplete(1);
+    Package->SetMustReachLocation(false);
+    Package->SetMustComplete(true);
     PackageLocation* v2 = static_cast<PackageLocation*>(ourMalloc(sizeof(PackageLocation)));
     if (v2) {
         v2 = ::new (v2) PackageLocation;
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     v2->SetLocReference(apCurrentFurniture);
     Package->SetPackageLocation(v2);
@@ -16167,15 +16183,15 @@ void PlayerCharacter::InitiateSitSleepPackage(TESObjectREFR* apCurrentFurniture)
         delete v2;
     }
     Package->SetProcedureType(PACKAGE_PROCEDURE_EXPLORE_TRAVEL);
-    PutCreatedPackage(Package, 0, 1);
+    PutCreatedPackage(Package, false, true);
 }
 
 bool PlayerCharacter::IsActorFollowingEscortingPlayer(Actor* apActor, bool bAll) {
-    if (apActor->IsDead(0) || (apActor->GetDisabled() || (apActor->IsParalyzed() || apActor->IsRestrained()))) {
-        return 0;
+    if (apActor->IsDead(false) || (apActor->GetDisabled() || (apActor->IsParalyzed() || apActor->IsRestrained()))) {
+        return false;
     }
     BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
-    CurrentAIProcess->CheckforNewPackage(apActor, 1);
+    CurrentAIProcess->CheckforNewPackage(apActor, true);
     TESPackage* pPack = apActor->GetPackageSetAsPcurrent();
     ActorPackage* pCurrentPackage = &apActor->pCurrentProcess->CurrentPackage;
     if (!bAll) {
@@ -16198,9 +16214,9 @@ bool PlayerCharacter::IsActorFollowingEscortingPlayer(Actor* apActor, bool bAll)
                 }
             }
         }
-        return 0;
+        return false;
     }
-    TESObjectREFR* pref = 0;
+    TESObjectREFR* pref = nullptr;
     if (pCurrentPackage) {
         if (pCurrentPackage->pTarget) {
             pref = pCurrentPackage->pTarget;
@@ -16218,11 +16234,11 @@ bool PlayerCharacter::IsActorFollowingEscortingPlayer(Actor* apActor, bool bAll)
         if (pref != pPlayer) {
             BaseProcess* v4 = apActor->pCurrentProcess;
             if (v4->GetTarget() != pPlayer) {
-                return 0;
+                return false;
             }
         }
         if (pPack->GetPackType() == PACKAGE_TYPE_AMBUSH) {
-            return 0;
+            return false;
         }
     }
     return pref != pPlayer || !apActor->IsWaiting();
@@ -16241,7 +16257,7 @@ bool PlayerCharacter::ReloadLoop(
     pinventory->GetObjectCount(pammo);
     ItemChange* pweaponItem = pCurrentProcess->GetCurrentWeapon();
     ItemChange* pAmmoItem = pCurrentProcess->GetCurrentAmmo();
-    GetAnimation(0);
+    GetAnimation(false);
     if (apWeapon) {
         if (pammo) {
             if (apWeapon != pammo) {
@@ -16267,7 +16283,7 @@ bool PlayerCharacter::ReloadLoop(
             parrows = ::new (apMemory) ItemChange(pammo, icount);
         }
         else {
-            parrows = 0;
+            parrows = nullptr;
         }
         pCurrentProcess->SetCurrentAmmo(parrows);
         pCurrentProcess->GetCurrentAmmo()->iNumber = 0;
@@ -16279,10 +16295,10 @@ bool PlayerCharacter::ReloadLoop(
     FormHealth_0 = pAmmoItem->iNumber;
     HasModEffectActive_0 = pweaponItem->HasModEffectActive(2);
     if (FormHealth_0 == apWeapon->GetFormClipRounds(HasModEffectActive_0)) {
-        return 0;
+        return false;
     }
     if (icount == pAmmoItem->iNumber) {
-        return 0;
+        return false;
     }
 LABEL_21:;
     if (apWeapon) {
@@ -16293,29 +16309,29 @@ LABEL_21:;
     }
     if (aiReloadAnim) {
         if (aiReloadAnim == 1) {
-            Animation* panim = GetAnimation(0);
+            Animation* panim = GetAnimation(false);
             ANIM_GROUP_ENUM eanimGroup = static_cast<ANIM_GROUP_ENUM>(apWeapon->GetReloadAnim(bUseModValue) - 23);
-            uint16_t sanimGroup = GetAnimGroup(eanimGroup, 0, 0, panim);
+            uint16_t sanimGroup = GetAnimGroup(eanimGroup, nullptr, false, panim);
             if (TESAnimGroup::GetType(sanimGroup) == eanimGroup) {
                 panim->QueueReloadAnim(sanimGroup);
             }
-            return 1;
+            return true;
         }
         else {
             if (aiReloadAnim == 2) {
                 ANIM_GROUP_ENUM eanimGroup_2 = static_cast<ANIM_GROUP_ENUM>(apWeapon->GetReloadAnim(bUseModValue) - 23);
-                uint16_t sanimGroup_2 = GetAnimGroup(eanimGroup_2, 0, 0, 0);
+                uint16_t sanimGroup_2 = GetAnimGroup(eanimGroup_2, nullptr, false, nullptr);
                 if (TESAnimGroup::GetType(sanimGroup_2) == eanimGroup_2) {
-                    Animation* panim_2 = GetAnimation(0);
+                    Animation* panim_2 = GetAnimation(false);
                     panim_2->PlayGroup(sanimGroup_2, ACTION_START, -1, AGS_NONE);
                     StartAnimOn1stPerson(sanimGroup_2, ACTION_START);
                     BSAnimGroupSequence* CurrentSequence = panim_2->GetCurrentSequence(AGS_WEAPON);
                     SetAnimAction(ANIM_ACTION_RELOAD_LOOP, CurrentSequence);
                 }
-                return 1;
+                return true;
             }
             else {
-                return 0;
+                return false;
             }
         }
     }
@@ -16328,8 +16344,8 @@ LABEL_21:;
         if (bFromInventory) {
             iCurrentCount = icount;
         }
-        QueueEquipObject(pammo, iCurrentCount, 0, 1, 0, 0);
-        return 1;
+        QueueEquipObject(pammo, iCurrentCount, nullptr, true, false, false);
+        return true;
     }
 }
 
@@ -16342,7 +16358,7 @@ void PlayerCharacter::CheckPoisonWeapon(AlchemyItem* apPoison) {
             pweapon = dynamic_cast<TESObjectWEAP*>(pweaponItem->pContainerObj);
         }
         else {
-            pweapon = 0;
+            pweapon = nullptr;
         }
         if (pweapon &&
             (pweapon->GetWeaponSkill() == ActorValue::UNARMED ||
@@ -16350,8 +16366,8 @@ void PlayerCharacter::CheckPoisonWeapon(AlchemyItem* apPoison) {
             if (pweaponItem->GetPoison()) {
                 const char* v3 = sOk.String();
                 Interface::CreateMessageMenu(
-                    sPoisonAlreadyPoisonedMessage.String(), static_cast<const char*>(0), static_cast<const char*>(0),
-                    &PlayerCharacter::PoisonWeapon, 1, 23, 0.0f, 0.0f, v3, nullptr
+                    sPoisonAlreadyPoisonedMessage.String(), static_cast<const char*>(nullptr),
+                    static_cast<const char*>(nullptr), &PlayerCharacter::PoisonWeapon, 1, 23, 0.0f, 0.0f, v3, nullptr
                 );
             }
             else {
@@ -16360,15 +16376,15 @@ void PlayerCharacter::CheckPoisonWeapon(AlchemyItem* apPoison) {
                 std::sprintf(apText, "%s%s?", sPoisonConfirmMessage.String(), pweapon->GetFullName());
                 const char* v4 = sNo.String();
                 Interface::CreateMessageMenu(
-                    apText, static_cast<const char*>(0), static_cast<const char*>(0), &PlayerCharacter::PoisonWeapon, 2,
-                    23, 0.0f, 0.0f, sYes.String(), v4, nullptr
+                    apText, static_cast<const char*>(nullptr), static_cast<const char*>(nullptr),
+                    &PlayerCharacter::PoisonWeapon, 2, 23, 0.0f, 0.0f, sYes.String(), v4, nullptr
                 );
             }
         }
         else {
             const char* v2 = sOk.String();
             Interface::CreateMessageMenu(
-                sPoisonNoWeaponMessage.String(), static_cast<const char*>(0), static_cast<const char*>(0),
+                sPoisonNoWeaponMessage.String(), static_cast<const char*>(nullptr), static_cast<const char*>(nullptr),
                 &PlayerCharacter::PoisonWeapon, 1, 23, 0.0f, 0.0f, v2, nullptr
             );
         }
@@ -16383,10 +16399,10 @@ void PlayerCharacter::AddQueuedEnchantment(TESBoundObject* apObject, ExtraDataLi
             FormEnchanting = penchantable->pFormEnchanting;
         }
         else {
-            FormEnchanting = 0;
+            FormEnchanting = nullptr;
         }
         if (FormEnchanting) {
-            CastWornEnchantment(FormEnchanting, apObject, 0);
+            CastWornEnchantment(FormEnchanting, apObject, false);
             ProcessEffectsFromItem(FormEnchanting);
         }
     }
@@ -16401,18 +16417,18 @@ void PlayerCharacter::RemoveQueuedEnchantment(TESBoundObject* apObject, ExtraDat
                 FormEnchanting = penchantable->pFormEnchanting;
             }
             else {
-                FormEnchanting = 0;
+                FormEnchanting = nullptr;
             }
             if (FormEnchanting) {
-                if (IsSpellTarget(FormEnchanting, 1)) {
-                    Dispel(apObject, 0);
+                if (IsSpellTarget(FormEnchanting, true)) {
+                    Dispel(apObject, false);
                 }
                 QueuedWornEnchantments->Remove(apObject);
                 if (QueuedWornEnchantments->IsEmpty()) {
                     if (QueuedWornEnchantments) {
                         delete QueuedWornEnchantments;
                     }
-                    QueuedWornEnchantments = 0;
+                    QueuedWornEnchantments = nullptr;
                 }
             }
         }
@@ -16438,7 +16454,7 @@ void PlayerCharacter::HandlePhysicsGrab(float afTimeDelta) {
                 }
                 else {
                     DestroyMouseSpring();
-                    bIsGrabbing = 0;
+                    bIsGrabbing = false;
                 }
             }
         }
@@ -16457,13 +16473,13 @@ void PlayerCharacter::HandlePhysicsGrab(float afTimeDelta) {
                                 pcol = FindFirstCollisionObject(pav);
                             }
                             else {
-                                pcol = 0;
+                                pcol = nullptr;
                             }
                             if (pcol) {
                                 pbody = pcol->GetRigidBody();
                             }
                             else {
-                                pbody = 0;
+                                pbody = nullptr;
                             }
                             if (pbody) {
                                 if (pbody->GethkWorld()) {
@@ -16473,7 +16489,7 @@ void PlayerCharacter::HandlePhysicsGrab(float afTimeDelta) {
                                         if (spGrabSpring.m_pObject) {
                                             pObject->AddChange(4);
                                         }
-                                        bIsGrabbing = 1;
+                                        bIsGrabbing = true;
                                         (&pObject->m_Extra)->NotifyGuardsAboutActivation(pObject, this);
                                         (&pObject->m_Extra)->RemoveExtra(124);
                                     }
@@ -16513,11 +16529,11 @@ bool PlayerCharacter::UpdateDropSpring(float afTimeDelta) {
 // IsActorTargetingREFinPackage made.
 void PlayerCharacter::CheckGetAwayFromGuards() {
     BSSimpleList<TESObjectREFR*>* preflist =
-        ReferenceProcessLists.IsActorTargetingREFinPackage(pPlayer, PACKAGE_TYPE_COMBAT, 0);
+        ReferenceProcessLists.IsActorTargetingREFinPackage(pPlayer, PACKAGE_TYPE_COMBAT, false);
     BSSimpleList<TESObjectREFR*>* plist = preflist;
-    pPlayer->bBeingChased = 0;
+    pPlayer->bBeingChased = false;
     while (plist) {
-        Actor* pactor = 0;
+        Actor* pactor = nullptr;
         if (plist->m_item) {
             TESObjectREFR* m_item = plist->m_item;
             if (m_item->IsActor()) {
@@ -16525,7 +16541,7 @@ void PlayerCharacter::CheckGetAwayFromGuards() {
             }
         }
         if (pactor && pactor->IsActoraGuard()) {
-            pPlayer->bBeingChased = 1;
+            pPlayer->bBeingChased = true;
             break;
         }
         plist = plist->m_pkNext;
@@ -16564,11 +16580,11 @@ void PlayerCharacter::HavokActivateDroppedReference() {
             TESObjectREFR* pref = pcurrent->m_item;
             if (pref && pref->Get3D()) {
                 NiNode* v1 = pref->Get3D();
-                bhkWorld::SetMotion(v1, hkpMotion::MOTION_DYNAMIC, 1, 1, 1);
+                bhkWorld::SetMotion(v1, hkpMotion::MOTION_DYNAMIC, true, true, true);
                 NiNode* v2 = pref->Get3D();
-                bhkWorld::Activate(v2, 1, 1, 0);
+                bhkWorld::Activate(v2, true, true, false);
                 DroppedRefList.Remove(pref);
-                pref->SetRecentPCDrop(0);
+                pref->SetRecentPCDrop(false);
                 pcurrent = plast->m_pkNext;
             }
             else {
@@ -16583,53 +16599,53 @@ bool PlayerCharacter::IsConflictingObject(NiAVObject* apObj) {
     NiPoint3 v9;
     NiPoint3 v11;
     if (!apObj) {
-        return 0;
+        return false;
     }
     if (!pConflictingPick) {
         pConflictingPick = &kConflictingPick;
-        kConflictingPick.SetFrontOnly(0);
-        pConflictingPick->SetReturnNormal(1);
-        pConflictingPick->SetObserveAppCullFlag(1);
+        kConflictingPick.SetFrontOnly(false);
+        pConflictingPick->SetReturnNormal(true);
+        pConflictingPick->SetObserveAppCullFlag(true);
     }
     NiPoint3 pos = GetLocationOnReference();
     NiPoint3 dir(0.0f, 24.0f, 0.0f);
-    bool bresult = 0;
+    bool bresult = false;
     pos.z = pPlayer->GetHeight() * 0.25 + pos.z;
     pConflictingPick->SetTarget(apObj);
-    if (pConflictingPick->PickObjects(pos + dir, dir, 0)) {
+    if (pConflictingPick->PickObjects(pos + dir, dir, false)) {
         NiPick::Record* ppickRecord = (&pConflictingPick->m_pickResults)->GetAt(0);
         NiPoint3 normal = *&ppickRecord->m_normal;
         if (dir.Dot(normal) > 0.0 &&
             !NiObject::IsExactKindOf(&NiBillboardNode::ms_RTTI, ppickRecord->GetAVObject()->m_pkParent)) {
-            bresult = 1;
+            bresult = true;
         }
     }
     if (!bresult) {
         dir = *::new (&v11) NiPoint3(24.0f, -24.0f, 0.0f);
-        if (pConflictingPick->PickObjects(pos + dir, dir, 0)) {
+        if (pConflictingPick->PickObjects(pos + dir, dir, false)) {
             NiPick::Record* ppickRecord_2 = (&pConflictingPick->m_pickResults)->GetAt(0);
             NiPoint3 normal_2 = *&ppickRecord_2->m_normal;
             if (dir.Dot(normal_2) > 0.0 &&
                 !NiObject::IsExactKindOf(&NiBillboardNode::ms_RTTI, ppickRecord_2->GetAVObject()->m_pkParent)) {
-                bresult = 1;
+                bresult = true;
             }
         }
         if (!bresult) {
             dir = *::new (&v9) NiPoint3(-24.0f, -24.0f, 0.0f);
-            if (pConflictingPick->PickObjects(pos + dir, dir, 0)) {
+            if (pConflictingPick->PickObjects(pos + dir, dir, false)) {
                 NiPick::Record* ppickRecord_3 = (&pConflictingPick->m_pickResults)->GetAt(0);
                 NiPoint3 normal_3 = *&ppickRecord_3->m_normal;
                 if (dir.Dot(normal_3) > 0.0 &&
                     !NiObject::IsExactKindOf(&NiBillboardNode::ms_RTTI, ppickRecord_3->GetAVObject()->m_pkParent)) {
-                    bresult = 1;
+                    bresult = true;
                 }
             }
         }
     }
-    pConflictingPick->SetTarget(0);
+    pConflictingPick->SetTarget(nullptr);
     pConflictingPick->ClearResultsArray(0);
     if (bresult) {
-        return 1;
+        return true;
     }
     bhkCharacterController* CharController = GetCharController();
     return CharController->CheckInsideOfObject();
@@ -16639,18 +16655,18 @@ void PlayerCharacter::UpdateConflictingObjects() {
     if (!ConflictingObjects.IsEmpty()) {
         BSSimpleList<TESObjectREFR*>* plist = &ConflictingObjects;
         while (plist) {
-            bool bremoveFromList = 0;
+            bool bremoveFromList = false;
             TESObjectREFR* pref = plist->m_item;
             NiAVObject* pobj = pref->Get3D();
             if (pobj) {
                 if (!IsConflictingObject(pobj)) {
-                    bremoveFromList = 1;
-                    pobj->SetAppCulled(0);
-                    bhkWorld::EnableCollision(pobj, 1, 1, 0);
+                    bremoveFromList = true;
+                    pobj->SetAppCulled(false);
+                    bhkWorld::EnableCollision(pobj, true, true, false);
                 }
             }
             else {
-                bremoveFromList = 1;
+                bremoveFromList = true;
             }
             if (bremoveFromList) {
                 ConflictingObjects.Remove(pref);
@@ -16669,7 +16685,7 @@ void PlayerCharacter::UpdateConflictingObjects() {
 void PlayerCharacter::UpdatePlayerActions() {
     PlayerActionObject* pAction;
     BSSimpleList<PlayerActionObject*>* plist = pListofActions;
-    ListBoxBase* item = 0;
+    ListBoxBase* item = nullptr;
     while (plist && plist->m_item) {
         pAction = plist->m_item;
         if (!(pAction->ftimer <= 0.0) ||
@@ -16695,7 +16711,7 @@ void PlayerCharacter::RemoveAllActionsForObject(TESObjectREFR* apActObject) {
     if (pListofActions) {
         if (apActObject) {
             BSSimpleList<PlayerActionObject*>* plist = pListofActions;
-            ListBoxBase* item = 0;
+            ListBoxBase* item = nullptr;
             while (plist && plist->m_item) {
                 PlayerActionObject* pAction = plist->m_item;
                 if (pAction && apActObject == pAction->prefObj) {
@@ -16721,7 +16737,7 @@ BGSNote* PlayerCharacter::GetNotebyIndex(int32_t aiIndex) {
         ecx0 = ecx0->m_pkNext;
         ++v4;
     }
-    return 0;
+    return nullptr;
 }
 
 void PlayerCharacter::UpdateMenuModeButton(float afTimeDelta) {
@@ -16743,37 +16759,37 @@ void PlayerCharacter::UpdateMenuModeButton(float afTimeDelta) {
                             a2 = &static_cast<MagicItem&>(static_cast<MagicItemForm&>(*PipBoyLightSpell));
                         }
                         else {
-                            a2 = 0;
+                            a2 = nullptr;
                         }
-                        if (IsSpellTarget(a2, 1)) {
+                        if (IsSpellTarget(a2, true)) {
                             MagicItem* apSpell;
                             FOPipboyManager* Pipboy = Interface::GetPipboy();
-                            Pipboy->ShowPipboyLightEffect(1, 0, 1);
+                            Pipboy->ShowPipboyLightEffect(true, false, true);
                             FOPipboyManager* v3 = Interface::GetPipboy();
-                            v3->ShowPipboyLightEffect(0, 0, 1);
+                            v3->ShowPipboyLightEffect(false, false, true);
                             BSAudio* v4 = &BSAudio::QInstance();
                             BSSoundHandle* SoundHandleByName = v4->GetSoundHandleByName(&a1, "UIPipBoyLightOff", 289u);
-                            SoundHandleByName->Play(0);
+                            SoundHandleByName->Play(false);
                             SpellItem* v15 = MagicSystem::GetPipBoyLightSpell();
                             if (v15) {
                                 apSpell = &static_cast<MagicItem&>(static_cast<MagicItemForm&>(*v15));
                             }
                             else {
-                                apSpell = 0;
+                                apSpell = nullptr;
                             }
-                            Dispel(apSpell, static_cast<MagicCaster*>(0), static_cast<ActiveEffect*>(0));
+                            Dispel(apSpell, static_cast<MagicCaster*>(nullptr), static_cast<ActiveEffect*>(nullptr));
                         }
                         else {
                             if (!pPlayer->GetControlsDisabled(PlayerCharacter::DPC_PIPBOY)) {
                                 FOPipboyManager* v5 = Interface::GetPipboy();
-                                v5->ShowPipboyLightEffect(1, 1, 1);
+                                v5->ShowPipboyLightEffect(true, true, true);
                                 FOPipboyManager* v6 = Interface::GetPipboy();
-                                v6->ShowPipboyLightEffect(0, 1, 1);
+                                v6->ShowPipboyLightEffect(false, true, true);
                                 BSAudio* v7 = &BSAudio::QInstance();
                                 BSSoundHandle* v13 = v7->GetSoundHandleByName(&arHandle, "UIPipBoyLightOn", 289u);
-                                v13->Play(0);
+                                v13->Play(false);
                                 SpellItem* v8 = MagicSystem::GetPipBoyLightSpell();
-                                CastAbility(v8, 0);
+                                CastAbility(v8, false);
                             }
                         }
                         bPipboyLightDebounce = 1;
@@ -16782,26 +16798,29 @@ void PlayerCharacter::UpdateMenuModeButton(float afTimeDelta) {
             }
         }
         else {
-            bMenuModeButtonClicked = 0;
+            bMenuModeButtonClicked = false;
             fMenuModeButtonTimer = 0.0f;
             bPipboyLightDebounce = 0;
         }
     }
     else {
-        bMenuModeButtonClicked = 1;
+        bMenuModeButtonClicked = true;
     }
     FOPipboyManager* v9 = Interface::GetPipboy();
     if (v9->QPipboyLightOn() && !Interface::GetPipboy()->Get3rdPersonPipboyRoot()) {
         FOPipboyManager* v10 = Interface::GetPipboy();
-        v10->ShowPipboyLightEffect(1, 0, 1);
+        v10->ShowPipboyLightEffect(true, false, true);
         FOPipboyManager* v11 = Interface::GetPipboy();
-        v11->ShowPipboyLightEffect(0, 0, 1);
+        v11->ShowPipboyLightEffect(false, false, true);
         SpellItem* v12 = MagicSystem::GetPipBoyLightSpell();
         if (v12) {
-            Dispel(v12, static_cast<MagicCaster*>(0), static_cast<ActiveEffect*>(0));
+            Dispel(v12, static_cast<MagicCaster*>(nullptr), static_cast<ActiveEffect*>(nullptr));
         }
         else {
-            Dispel(static_cast<MagicItem*>(0), static_cast<MagicCaster*>(0), static_cast<ActiveEffect*>(0));
+            Dispel(
+                static_cast<MagicItem*>(nullptr), static_cast<MagicCaster*>(nullptr),
+                static_cast<ActiveEffect*>(nullptr)
+            );
         }
     }
 }
@@ -16809,25 +16828,25 @@ void PlayerCharacter::UpdateMenuModeButton(float afTimeDelta) {
 bool PlayerCharacter::CanEquipOrUseObject(ItemChange* apItem) {
     ExtraDataList* pextra;
     float fhealth;
-    bool bcanEquip = 1;
+    bool bcanEquip = true;
     TESBoundObject* pobj = apItem->pContainerObj;
     if (apItem->pExtraObjectList && apItem->pExtraObjectList->m_item) {
         pextra = apItem->pExtraObjectList->m_item;
     }
     else {
-        pextra = 0;
+        pextra = nullptr;
     }
     if (pobj->GetQuestObject() &&
         ((pobj->GetFormType() != WEAP_ID && pobj->GetFormType() != ARMO_ID) ||
          !static_cast<TESObjectWEAP*>(pobj)->TESObjectWEAP::GetIsPlayable())) {
-        bcanEquip = 0;
+        bcanEquip = false;
     }
     if (pextra) {
         if (pextra->GetCanNotWear()) {
-            bcanEquip = 0;
+            bcanEquip = false;
         }
     }
-    ExtraHealth* pHealth = 0;
+    ExtraHealth* pHealth = nullptr;
     if (pextra) {
         pHealth = static_cast<ExtraHealth*>(pextra->GetExtraData(EXTRA_HEALTH));
     }
@@ -16841,7 +16860,7 @@ bool PlayerCharacter::CanEquipOrUseObject(ItemChange* apItem) {
         case ARMO_ID:
         case WEAP_ID: {
             if (fhealth <= 0.0) {
-                bcanEquip = 0;
+                bcanEquip = false;
             }
             break;
         }
@@ -16853,28 +16872,28 @@ bool PlayerCharacter::CanEquipOrUseObject(ItemChange* apItem) {
         }
         case CLOT_ID: {
             if (!CanCastWornEnchantment(pobj, pextra)) {
-                bcanEquip = 0;
+                bcanEquip = false;
             }
             break;
         }
         case AMMO_ID: {
-            bcanEquip = 1;
+            bcanEquip = true;
             TESAmmo* pObj = static_cast<TESAmmo*>(apItem->pContainerObj);
             TESObjectWEAP* pCurrWeapon = GetCurrentWeapon();
             if (pCurrWeapon && pObj) {
                 TESAmmo* pAmmo = pCurrWeapon->GetAmmoForm();
                 BGSListForm* pAmmoList = pCurrWeapon->GetAmmoFormList();
                 if (pAmmo != pObj && (!pAmmoList || pAmmoList->GetItemIndex(pObj) == -1)) {
-                    bcanEquip = 0;
+                    bcanEquip = false;
                 }
             }
             else {
-                bcanEquip = 0;
+                bcanEquip = false;
             }
             break;
         }
         default: {
-            bcanEquip = 0;
+            bcanEquip = false;
             break;
         }
     }
@@ -16890,7 +16909,7 @@ uint32_t PlayerCharacter::AttemptYield() {
         return 0;
     }
     CombatGroup* pplayerGroup = pCombatGroup;
-    CombatGroup* psplitGroup = 0;
+    CombatGroup* psplitGroup = nullptr;
     if (pplayerGroup) {
         iplayerGroupMemberCount = pplayerGroup->GetMemberCount();
     }
@@ -16919,14 +16938,14 @@ uint32_t PlayerCharacter::AttemptYield() {
         CombatGroup* phostileGroup = pCombatManager->GetCombatGroupByIndex(i_2);
         if (phostileGroup &&
             (phostileGroup != pplayerGroup && (phostileGroup != psplitGroup && phostileGroup->IsTarget(this)))) {
-            bool bacceptYield = 1;
-            bool bacceptNonTeammateYield = 1;
+            bool bacceptYield = true;
+            bool bacceptNonTeammateYield = true;
             uint32_t imemberCount = phostileGroup->GetMemberCount();
             for (uint32_t j = 0; j < imemberCount; ++j) {
                 Actor* pmember_2 = phostileGroup->GetMember(j);
                 FIGHT_REACTION efightReaction = FIGHT_REACTION_NEUTRAL;
-                if (pmember_2->GetShouldAttackActor(this, 0, efightReaction, 1)) {
-                    bacceptYield = 0;
+                if (pmember_2->GetShouldAttackActor(this, false, efightReaction, true)) {
+                    bacceptYield = false;
                     break;
                 }
                 if (bacceptNonTeammateYield && inonTeamMateCount) {
@@ -16934,16 +16953,16 @@ uint32_t PlayerCharacter::AttemptYield() {
                         Actor* pplayerMember = pplayerGroup->GetMember(k);
                         if (pplayerMember != pPlayer &&
                             (!pplayerMember->bPlayerTeammate &&
-                             (pmember_2->GetShouldAttackActor(pplayerMember, 0, efightReaction, 1) ||
-                              pplayerMember->GetShouldAttackActor(pmember_2, 0, efightReaction, 1)))) {
-                            bacceptNonTeammateYield = 0;
+                             (pmember_2->GetShouldAttackActor(pplayerMember, false, efightReaction, true) ||
+                              pplayerMember->GetShouldAttackActor(pmember_2, false, efightReaction, true)))) {
+                            bacceptNonTeammateYield = false;
                             break;
                         }
                     }
                 }
             }
             if (bacceptYield) {
-                Actor* pclosestMember = 0;
+                Actor* pclosestMember = nullptr;
                 float fclosestMemberDistanceSquared = 3.4028235e+38f;
                 NiPoint3 myLoc = GetLocationOnReference();
                 if (pplayerGroup) {
@@ -16975,7 +16994,7 @@ uint32_t PlayerCharacter::AttemptYield() {
                         if (ptarget->bPlayerTeammate && !ptarget->IsAngryWithPlayer()) {
                             phostileGroup->RemoveTarget(ptarget);
                             --j_3;
-                            ptarget->StopCombat(0);
+                            ptarget->StopCombat(nullptr);
                         }
                     }
                 }
@@ -16998,18 +17017,18 @@ uint32_t PlayerCharacter::AttemptYield() {
                         fclosestMemberDistanceSquared = fdistanceSquared_2;
                     }
                     BSSimpleList<Crime*>* plist = pcrimeList;
-                    BSSimpleList<Crime*>* plastList = 0;
+                    BSSimpleList<Crime*>* plastList = nullptr;
                     while (plist && !plist->IsEmpty()) {
                         Crime* pcrime = plist->m_item;
-                        bool bremove = 0;
+                        bool bremove = false;
                         if (pcrime) {
                             if (pcrime->pcrimetarget == pmember_3) {
                                 delete pcrime;
-                                bremove = 1;
+                                bremove = true;
                             }
                         }
                         else {
-                            bremove = 1;
+                            bremove = true;
                         }
                         if (bremove) {
                             if (plastList) {
@@ -17027,7 +17046,7 @@ uint32_t PlayerCharacter::AttemptYield() {
                     }
                 }
                 if (pclosestMember) {
-                    pCombatDialogueManager->StartDialogue(pclosestMember, this, DT_COMBAT, 11, 1, 0);
+                    pCombatDialogueManager->StartDialogue(pclosestMember, this, DT_COMBAT, 11, true, nullptr);
                 }
             }
         }
@@ -17058,23 +17077,23 @@ uint32_t PlayerCharacter::AttemptYield() {
                     case PACKAGE_TYPE_SPECTATOR: {
                         static_cast<SpectatorPackage*>(pspec__pflee)
                             ->SpectatorPackage::RemoveActorAsThreatSourceOrTarget(*pPlayer);
-                        pmember_4->EvaluatePackage(0, 0);
+                        pmember_4->EvaluatePackage(false, false);
                         break;
                     }
                     case PACKAGE_TYPE_FLEE: {
                         static_cast<FleePackage*>(pspec__pflee)->FleePackage::RemoveAvoidedRef(pPlayer);
-                        pmember_4->EvaluatePackage(0, 0);
+                        pmember_4->EvaluatePackage(false, false);
                         break;
                     }
                     case PACKAGE_TYPE_FLEE_NON_COMBAT: {
-                        pmember_4->EvaluatePackage(0, 0);
+                        pmember_4->EvaluatePackage(false, false);
                         break;
                     }
                 }
             }
         }
     }
-    bPlayerInCombat = 0;
+    bPlayerInCombat = false;
     for (Crime* pcrime_2 : *pcrimeList) {
         if (pcrime_2) {
             Actor* pactor = static_cast<Actor*>(pcrime_2->pcrimetarget);
@@ -17095,7 +17114,7 @@ uint32_t PlayerCharacter::AttemptYield() {
 }
 
 void PlayerCharacter::AddRockItAmmo(TESBoundObject* apObj, ExtraDataList* apExtra, int32_t aiNumAdded) {
-    bool bfoundMatch = 0;
+    bool bfoundMatch = false;
     for (int32_t iitemCt = 0; !bfoundMatch; ++iitemCt) {
         uint32_t FormFlags = RockItLauncherAmmoList.iSize;
         if (iitemCt >= FormFlags) {
@@ -17104,28 +17123,29 @@ void PlayerCharacter::AddRockItAmmo(TESBoundObject* apObj, ExtraDataList* apExtr
         ItemChange* pitem = RockItLauncherAmmoList.GetAt(iitemCt);
         if (RockItLauncherAmmoList.GetAt(iitemCt)->pContainerObj == apObj) {
             bool v14 = !pitem->pExtraObjectList ||
-                (!pitem->pExtraObjectList->m_item || pitem->pExtraObjectList->m_item->IsExtraDefaultforContainer(0));
+                (!pitem->pExtraObjectList->m_item ||
+                 pitem->pExtraObjectList->m_item->IsExtraDefaultforContainer(false));
             bool bisDefaultStack = v14;
             if (apExtra) {
                 for (BSSimpleList<ExtraDataList*>* pextraObj = pitem->pExtraObjectList;
                      !bfoundMatch && (pextraObj && pextraObj->m_item); pextraObj = pextraObj->m_pkNext) {
-                    if (!pextraObj->m_item->CompareListForContainer(apExtra, 1, 0) &&
-                        !apExtra->CompareListForContainer(pextraObj->m_item, 1, 0)) {
+                    if (!pextraObj->m_item->CompareListForContainer(apExtra, true, false) &&
+                        !apExtra->CompareListForContainer(pextraObj->m_item, true, false)) {
                         uint32_t FormHealth_0 = RockItLauncherAmmoList.GetAt(iitemCt)->iNumber;
                         pitem->iNumber = aiNumAdded + FormHealth_0;
                         int16_t Count = pextraObj->m_item->GetCount();
                         pextraObj->m_item->SetCount(aiNumAdded + Count);
-                        bfoundMatch = 1;
+                        bfoundMatch = true;
                     }
                 }
-                if (!bfoundMatch && apExtra->IsExtraDefaultforContainer(0) && bisDefaultStack) {
+                if (!bfoundMatch && apExtra->IsExtraDefaultforContainer(false) && bisDefaultStack) {
                     ExtraDataList* paddedExtra;
                     ExtraDataList* apMemory = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
                     if (apMemory) {
                         paddedExtra = ::new (apMemory) ExtraDataList;
                     }
                     else {
-                        paddedExtra = 0;
+                        paddedExtra = nullptr;
                     }
                     ExtraDataList* paddedExtra_2 = paddedExtra;
                     paddedExtra->DuplicateExtraListForContainer(apExtra);
@@ -17138,21 +17158,21 @@ void PlayerCharacter::AddRockItAmmo(TESBoundObject* apObj, ExtraDataList* apExtr
                             v12 = ::new (v18) BSSimpleList<ExtraDataList*>;
                         }
                         else {
-                            v12 = 0;
+                            v12 = nullptr;
                         }
                         pitem->pExtraObjectList = v12;
                     }
                     pitem->pExtraObjectList->AddHead(paddedExtra_2);
                     int32_t v9 = aiNumAdded + RockItLauncherAmmoList.GetAt(iitemCt)->iNumber;
                     pitem->iNumber = v9;
-                    bfoundMatch = 1;
+                    bfoundMatch = true;
                 }
             }
             else {
                 if (bisDefaultStack) {
                     int32_t v8 = aiNumAdded + RockItLauncherAmmoList.GetAt(iitemCt)->iNumber;
                     pitem->iNumber = v8;
-                    bfoundMatch = 1;
+                    bfoundMatch = true;
                 }
             }
         }
@@ -17164,7 +17184,7 @@ void PlayerCharacter::AddRockItAmmo(TESBoundObject* apObj, ExtraDataList* apExtr
             pnewItem = ::new (v17) ItemChange(apObj, aiNumAdded);
         }
         else {
-            pnewItem = 0;
+            pnewItem = nullptr;
         }
         ItemChange* pnewItem_2 = pnewItem;
         if (apExtra) {
@@ -17174,7 +17194,7 @@ void PlayerCharacter::AddRockItAmmo(TESBoundObject* apObj, ExtraDataList* apExtr
                 paddedExtra_3 = ::new (v16) ExtraDataList;
             }
             else {
-                paddedExtra_3 = 0;
+                paddedExtra_3 = nullptr;
             }
             ExtraDataList* paddedExtra_4 = paddedExtra_3;
             paddedExtra_3->DuplicateExtraListForContainer(apExtra);
@@ -17194,8 +17214,8 @@ ItemChange* PlayerCharacter::RemoveRockItAmmo(
     int32_t aiNumRemoved,
     bool abReturnRemovedItem
 ) {
-    bool bfoundMatch = 0;
-    ItemChange* preturnedItem = 0;
+    bool bfoundMatch = false;
+    ItemChange* preturnedItem = nullptr;
     int32_t iamountToRemove = aiNumRemoved;
     for (int32_t iitemCt = 0; !bfoundMatch; ++iitemCt) {
         uint32_t FormFlags = RockItLauncherAmmoList.iSize;
@@ -17222,7 +17242,7 @@ ItemChange* PlayerCharacter::RemoveRockItAmmo(
                                 preturnedItem_3 = ::new (v21) ItemChange(apObj, iamountToRemove);
                             }
                             else {
-                                preturnedItem_3 = 0;
+                                preturnedItem_3 = nullptr;
                             }
                             preturnedItem = preturnedItem_3;
                             if (!bremoveExtra) {
@@ -17232,7 +17252,7 @@ ItemChange* PlayerCharacter::RemoveRockItAmmo(
                                     preturnedExtra_2 = ::new (v20) ExtraDataList;
                                 }
                                 else {
-                                    preturnedExtra_2 = 0;
+                                    preturnedExtra_2 = nullptr;
                                 }
                                 preturnedExtra = preturnedExtra_2;
                                 preturnedExtra_2->DuplicateExtraListForContainer(apExtra);
@@ -17248,7 +17268,7 @@ ItemChange* PlayerCharacter::RemoveRockItAmmo(
                                 if (apExtra) {
                                     delete apExtra;
                                 }
-                                apExtra = 0;
+                                apExtra = nullptr;
                             }
                         }
                         else {
@@ -17261,9 +17281,9 @@ ItemChange* PlayerCharacter::RemoveRockItAmmo(
                             pitem->iNumber = v12 - iamountToRemove;
                         }
                         else {
-                            RockItLauncherAmmoList.Remove(iitemCt, 1);
+                            RockItLauncherAmmoList.Remove(iitemCt, true);
                         }
-                        bfoundMatch = 1;
+                        bfoundMatch = true;
                     }
                 }
             }
@@ -17276,7 +17296,7 @@ ItemChange* PlayerCharacter::RemoveRockItAmmo(
                             preturnedItem_2 = ::new (apMemory) ItemChange(apObj, iamountToRemove);
                         }
                         else {
-                            preturnedItem_2 = 0;
+                            preturnedItem_2 = nullptr;
                         }
                         preturnedItem = preturnedItem_2;
                     }
@@ -17286,9 +17306,9 @@ ItemChange* PlayerCharacter::RemoveRockItAmmo(
                         pitem->iNumber = v7 - iamountToRemove;
                     }
                     else {
-                        RockItLauncherAmmoList.Remove(iitemCt, 1);
+                        RockItLauncherAmmoList.Remove(iitemCt, true);
                     }
-                    bfoundMatch = 1;
+                    bfoundMatch = true;
                 }
             }
         }
@@ -17320,27 +17340,27 @@ void PlayerCharacter::UpdateHardcoreMode() {
             fPrevHardcoreTickH20 = fHardcoreTimerH20;
             fPrevHardcoreTickFOD = fHardcoreTimerFOD;
             fPrevHardcoreTickSLP = fHardcoreTimerSLP;
-            SetNeedResetHardcoreTimer(0);
+            SetNeedResetHardcoreTimer(false);
         }
         float v2 = fHardcoreTimerH20 - fPrevHardcoreTickH20;
         float v7 = fHardcoreTimerFOD - fPrevHardcoreTickFOD;
         float v6 = fHardcoreTimerSLP - fPrevHardcoreTickSLP;
         if (v8 <= static_cast<double>(v2)) {
-            DamageModActorValue(ActorValue::DEHYDRATION, static_cast<int32_t>(v2 / v8), static_cast<Actor*>(0));
+            DamageModActorValue(ActorValue::DEHYDRATION, static_cast<int32_t>(v2 / v8), static_cast<Actor*>(nullptr));
             fHardcoreTimerH20 = appCalendar.GetMinutesPassed();
             fPrevHardcoreTickH20 = fHardcoreTimerH20;
         }
         if (v3 <= static_cast<double>(v6)) {
             if (!pPlayer->IsSleeping()) {
                 DamageModActorValue(
-                    ActorValue::SLEEPDEPREVATION, static_cast<int32_t>(v6 / v3), static_cast<Actor*>(0)
+                    ActorValue::SLEEPDEPREVATION, static_cast<int32_t>(v6 / v3), static_cast<Actor*>(nullptr)
                 );
             }
             fHardcoreTimerSLP = appCalendar.GetMinutesPassed();
             fPrevHardcoreTickSLP = fHardcoreTimerSLP;
         }
         if (v4 <= static_cast<double>(v7)) {
-            DamageModActorValue(ActorValue::HUNGER, static_cast<int32_t>(v7 / v4), static_cast<Actor*>(0));
+            DamageModActorValue(ActorValue::HUNGER, static_cast<int32_t>(v7 / v4), static_cast<Actor*>(nullptr));
             fHardcoreTimerFOD = appCalendar.GetMinutesPassed();
             fPrevHardcoreTickFOD = fHardcoreTimerFOD;
         }
@@ -17357,9 +17377,9 @@ double PlayerCharacter::GetTimeGrenadeHeld() {
 }
 
 PlayerActionObject* PlayerCharacter::GetPlayerAction(PLAYER_ACTION aeAction) {
-    PlayerActionObject* v4 = 0;
+    PlayerActionObject* v4 = nullptr;
     if (!pListofActions) {
-        return 0;
+        return nullptr;
     }
     for (BSSimpleList<PlayerActionObject*>* ecx0a = pListofActions; ecx0a && (ecx0a->m_item && !v4);
          ecx0a = ecx0a->m_pkNext) {
@@ -17384,7 +17404,7 @@ void PlayerCharacter::DebugResetAllTerminals() {
     NiTMapItem<uint32_t, TESForm*>* iter;
     iter = TESForm::pAllForms->GetFirstPos();
     while (iter) {
-        pform = 0;
+        pform = nullptr;
         iid = 0;
         TESForm::pAllForms->GetNext(iter, iid, pform);
         if (pform) {
@@ -17410,12 +17430,12 @@ void PlayerCharacter::DeathMenu() {
 }
 
 bool PlayerCharacter::IsGodMode() {
-    return (bool)((uint8_t)(((&::bSetDemigodMode)->Bool()) || PlayerCharacter::bGodMode));
+    return (bool)((uint8_t)((&::bSetDemigodMode)->Bool() || PlayerCharacter::bGodMode));
 }
 
 bool PlayerCharacter::IsDemigodMode() {
     if ((&::bSetDemigodMode)->Bool()) {
-        return (bool)1;
+        return true;
     }
     else {
         return (bool)((int8_t)PlayerCharacter::bDemigodMode);
@@ -17464,19 +17484,23 @@ void PlayerCharacter::PoisonWeapon() {
                 );
             }
             else {
-                v0 = 0;
+                v0 = nullptr;
             }
             if (v0) {
-                TESChallengeManager::UpdateChallenge(CHALLENGE_TYPE_USE_ITEM, 1, pPlayer->pPendingPoison, 0, 0, 0, 0);
                 TESChallengeManager::UpdateChallenge(
-                    CHALLENGE_TYPE_USE_ITEM_LIST, 1, pPlayer->pPendingPoison, 0, 0, 0, 0
+                    CHALLENGE_TYPE_USE_ITEM, 1, pPlayer->pPendingPoison, nullptr, 0, 0, 0
+                );
+                TESChallengeManager::UpdateChallenge(
+                    CHALLENGE_TYPE_USE_ITEM_LIST, 1, pPlayer->pPendingPoison, nullptr, 0, 0, 0
                 );
                 v2->SetPoison(pPlayer->pPendingPoison);
-                pPlayer->RemoveItem(pPlayer->pPendingPoison, 0, 1, 0, 0, 0, 0, 0, 1, 0);
+                pPlayer->RemoveItem(
+                    pPlayer->pPendingPoison, nullptr, 1, false, false, nullptr, nullptr, nullptr, true, false
+                );
                 Interface::UpdateInventory();
             }
         }
-        pPlayer->pPendingPoison = 0;
+        pPlayer->pPendingPoison = nullptr;
     }
 }
 

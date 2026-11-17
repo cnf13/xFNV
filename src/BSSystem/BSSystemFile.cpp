@@ -7,9 +7,9 @@
 #include "platform/Paths.h"
 
 #include <cerrno>
+#include <cstdint>
 #include <cstdio>
 #include <filesystem>
-#include <stdint.h>
 #include <system_error>
 
 BSSystemFile::BSSystemFile(const char* apName, uint32_t aeAccessMode, uint32_t aeOpenMode, bool abAllowAsync)

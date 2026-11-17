@@ -62,7 +62,7 @@
 #include "SDK/MSVC/tchar.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 // ListBox<TESRecipe*>::NumUnfiltered's guarded static and its guard word.
 static int32_t iUT_num_filtered;
@@ -74,18 +74,18 @@ BSSimpleArray<TESRecipeCategory*, 1024>* get_g_RecipeMenuCategories() {
     return &RecipeMenu::filterlist;
 }
 
-RecipeMenu::RecipeMenu() : eFilterSound(MENU_SOUND_NEXT_PREVIOUS), plbCurrListbox(&lbRecipeList), bTutorial(0) {
+RecipeMenu::RecipeMenu() : eFilterSound(MENU_SOUND_NEXT_PREVIOUS), plbCurrListbox(&lbRecipeList), bTutorial(false) {
     g_recipeMenuTrait_Title = Tile::TextToTrait("_Title");
     g_recipeMenuTrait_Value = Tile::TextToTrait("_Value");
     g_recipeMenuTrait_IsRecipeSelected = Tile::TextToTrait("_IsRecipeSelected");
-    RecipeMenu::pCurrItem = 0;
+    RecipeMenu::pCurrItem = nullptr;
     RecipeMenu::iNumCanMake = 0;
-    get_g_RecipeMenuCategories()->Clear(1);
+    get_g_RecipeMenuCategories()->Clear(true);
 }
 
 RecipeMenu::~RecipeMenu() {
     pDataHandler->ClearRecipeContainer();
-    RecipeMenu::pMe = 0;
+    RecipeMenu::pMe = nullptr;
 }
 
 void RecipeMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
@@ -120,19 +120,19 @@ void RecipeMenu::DoClick(int32_t a1, Tile* a2) {
                 }
                 if (g_currentRecipeMenuCategory == -1) {
                     const char* v6 = sRecipes.String();
-                    pTiles[1]->Set(4036, v6, 1);
+                    pTiles[1]->Set(4036, v6, true);
                 }
                 else {
                     uint32_t v8 = g_currentRecipeMenuCategory;
                     BSSimpleArray<TESRecipeCategory*, 1024>* v5 = get_g_RecipeMenuCategories();
-                    pTiles[1]->Set(4036, v5->operator[](v8)->GetFullName(), 1);
+                    pTiles[1]->Set(4036, v5->operator[](v8)->GetFullName(), true);
                 }
                 Tile* v7 = pRecipeBase->GetTileAt(0, false);
                 pRecipeBase->Highlight(v7);
                 pRecipeBase->ScrollToHighlight();
                 lbRecipeList.SaveListState();
                 lbRecipeList.Filter(&TESRecipe::ShouldHideItem);
-                lbRecipeList.RestoreListState(1);
+                lbRecipeList.RestoreListState(true);
             }
             break;
         }
@@ -141,7 +141,7 @@ void RecipeMenu::DoClick(int32_t a1, Tile* a2) {
             break;
         }
         case 8: {
-            RecipeMenu::bControlIngredientList = 0;
+            RecipeMenu::bControlIngredientList = false;
             RecipeMenu::Close();
             break;
         }
@@ -266,8 +266,7 @@ void RecipeMenu::DoEnter(int32_t aiID, Tile* apTarget) {
                 if (pCurrItem->GetRequiredSkill() > -1) {
                     int32_t iLevel = pCurrItem->GetRequiredSkillLevel();
                     int32_t iValue = rOwner.GetClampedActorValue(pCurrItem->GetRequiredSkill());
-                    const char* pSkillName =
-                        ActorValue::GetActorValueName(static_cast<ActorValue::Index>(pCurrItem->GetRequiredSkill()));
+                    const char* pSkillName = ActorValue::GetActorValueName(pCurrItem->GetRequiredSkill());
                     BSsprintf(acSkill, 0x100, "%s (%d/%d)", pSkillName, iValue, iLevel);
                 }
                 pMe->pTiles[5]->Set(Tile::kTileValue_String, acSkill, true);
@@ -325,7 +324,7 @@ void RecipeMenu::DoIdle() {
     float v7;
     uint32_t time;
     if (g_bShouldRefreshRecipeMenu) {
-        RecipeMenu::ForceRecipeUpdate(1);
+        RecipeMenu::ForceRecipeUpdate(true);
     }
     if (bPulseSelection) {
         v7 = 485.0f;
@@ -337,8 +336,8 @@ void RecipeMenu::DoIdle() {
         BSClamp(aVal, (float)0.0, 255.0f);
         if (pCrossFadeTile2) {
             if (pCrossFadeTile1) {
-                pCrossFadeTile2->Set(4009, aVal, (bool)1);
-                pCrossFadeTile1->Set(4009, afValue, (bool)1);
+                pCrossFadeTile2->Set(4009, aVal, true);
+                pCrossFadeTile1->Set(4009, afValue, true);
             }
         }
         time = (&appTimer)->BSTimer::GetTime();
@@ -353,10 +352,10 @@ void RecipeMenu::DoIdle() {
         RecipeMenu_afValue = (float)v1;
         BSClamp(RecipeMenu_afValue, v2, v7);
         if (v7 <= ((double)RecipeMenu_afValue)) {
-            bCrossFade = (bool)1;
+            bCrossFade = true;
         }
         if (v2 >= ((double)RecipeMenu_afValue)) {
-            bCrossFade = (bool)0;
+            bCrossFade = false;
         }
     }
 }
@@ -377,13 +376,13 @@ bool RecipeMenu::DoGamepad(int32_t a2, float a3) {
             }
             case 13: {
                 DoEnter(3, nullptr);
-                RecipeMenu::bControlIngredientList = (bool)0;
+                RecipeMenu::bControlIngredientList = false;
                 v5 = 1;
                 break;
             }
             case 14: {
                 DoEnter(6, nullptr);
-                RecipeMenu::bControlIngredientList = (bool)1;
+                RecipeMenu::bControlIngredientList = true;
                 v5 = 1;
                 break;
             }
@@ -405,7 +404,7 @@ void RecipeMenu::UpdateLists(TESBoundObject* apUpdateObj, TESForm* apCategory) {
         pRecipeList = pRecipeList->m_pkNext;
         TESRecipeCategory* pThisCategory = pThisRecipe->pRecipeCat;
         if ((!pCompCategory || pCompCategory == pThisCategory) &&
-            (&pThisRecipe->RecipeConditions)->IsTrue(RecipeMenu::pMe->pCrafterRef, 0)) {
+            (&pThisRecipe->RecipeConditions)->IsTrue(RecipeMenu::pMe->pCrafterRef, nullptr)) {
             char apDest[256];
             pThisSubCategory = pThisRecipe->GetSubCategory();
             if (pThisSubCategory) {
@@ -427,7 +426,7 @@ void RecipeMenu::UpdateLists(TESBoundObject* apUpdateObj, TESForm* apCategory) {
             else {
                 BSsprintf(apDest, 256, "%s", pThisRecipe->GetFullName());
             }
-            Tile* pselectedTile = lbRecipeList.AddItem(pThisRecipe, apDest, 0, 0);
+            Tile* pselectedTile = lbRecipeList.AddItem(pThisRecipe, apDest, nullptr, nullptr);
             if (RecipeMenu::CanMakeRecipe(pThisRecipe)) {
                 pselectedTile->xChildren.GetTail()->Set(4009, 255);
             }
@@ -643,10 +642,10 @@ void RecipeMenu::PopulateItemStatsDisplay(TESForm* apCurrItem, Tile* apDisplayTi
 bool RecipeMenu::IsWellFormedMenu() {
     for (int32_t i = 0; i < 14; ++i) {
         if (!pTiles[i]) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 Tile* RecipeMenu::Create(TESObjectREFR* apVendor, TESForm* apCategory) {
@@ -664,40 +663,40 @@ Tile* RecipeMenu::Create(TESObjectREFR* apVendor, TESForm* apCategory) {
             Menu_ = static_cast<RecipeMenu*>(ptile->GetMenu());
         }
         else {
-            Menu_ = 0;
+            Menu_ = nullptr;
         }
         RecipeMenu::pMe = Menu_;
-        pCrossFadeTile1 = 0;
-        pCrossFadeTile2 = 0;
-        pAmmoTile = 0;
+        pCrossFadeTile1 = nullptr;
+        pCrossFadeTile2 = nullptr;
+        pAmmoTile = nullptr;
         if (Menu_ && (v4 = RecipeMenu::pMe->GetClass(), v4 == RecipeMenu::GetClassStatic())) {
-            RecipeMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), 0);
+            RecipeMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
             if (!RecipeMenu::pMe->IsWellFormedMenu()) {
                 Warning("MENUS: Recipe Menu Creation Failed... Are your menu and art resources up to date?");
             }
             if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
                 float afValue = Tile::GetMaximumDepth();
-                ptile->Set(4013, afValue, 1);
+                ptile->Set(4013, afValue, true);
             }
             DialogMenu::ServiceStart();
             RecipeMenu::pMe->lbRecipeList.Initialize(RecipeMenu::pMe->pTiles[3], "CM_list_template");
             RecipeMenu::pMe->lbIngredientList.Initialize(RecipeMenu::pMe->pTiles[6], "CM_list_template");
             const char* v5 = sRecipes.String();
-            RecipeMenu::pMe->pTiles[1]->Set(4036, v5, 1);
+            RecipeMenu::pMe->pTiles[1]->Set(4036, v5, true);
             const char* v6 = sSkillRequirement.String();
-            RecipeMenu::pMe->pTiles[13]->Set(4036, v6, 1);
+            RecipeMenu::pMe->pTiles[13]->Set(4036, v6, true);
             const char* v7 = sIngredients.String();
-            RecipeMenu::pMe->pTiles[11]->Set(4036, v7, 1);
+            RecipeMenu::pMe->pTiles[11]->Set(4036, v7, true);
             const char* v8 = sMadeAt.String();
-            RecipeMenu::pMe->pTiles[12]->Set(4036, v8, 1);
+            RecipeMenu::pMe->pTiles[12]->Set(4036, v8, true);
             const char* v9 = sAccept.String();
-            RecipeMenu::pMe->pTiles[7]->Set(4036, v9, 1);
+            RecipeMenu::pMe->pTiles[7]->Set(4036, v9, true);
             const char* v10 = sExit.String();
-            RecipeMenu::pMe->pTiles[8]->Set(4036, v10, 1);
+            RecipeMenu::pMe->pTiles[8]->Set(4036, v10, true);
             float v16 = RecipeMenu::pMe->pTiles[7]->GetFloat(4001) - 20.0;
-            RecipeMenu::pMe->pTiles[7]->Set(4001, v16, 1);
+            RecipeMenu::pMe->pTiles[7]->Set(4001, v16, true);
             float v15 = RecipeMenu::pMe->pTiles[8]->GetFloat(4001) - 20.0;
-            RecipeMenu::pMe->pTiles[8]->Set(4001, v15, 1);
+            RecipeMenu::pMe->pTiles[8]->Set(4001, v15, true);
             RecipeMenu::pMe->pCrafterRef = apVendor;
             RecipeMenu::pMe->pCategory = apCategory;
             InterfaceManager::PlayMenuSound(MENU_SOUND_MODE);
@@ -706,13 +705,13 @@ Tile* RecipeMenu::Create(TESObjectREFR* apVendor, TESForm* apCategory) {
                 TESForm* FormByEditorID = TESForm::GetFormByEditorID("HelpCrafting");
                 BGSMessage* helpForm = dynamic_cast<BGSMessage*>(FormByEditorID);
                 if (helpForm) {
-                    RecipeMenu::pMe->bTutorial = TutorialMenu::Create(helpForm, 0);
+                    RecipeMenu::pMe->bTutorial = TutorialMenu::Create(helpForm, false);
                     InterfaceManager* v13 = InterfaceManager::Instance();
                     v13->xTutorialManager.FlagAsShown(Interface::TUT_RECIPE);
                 }
             }
-            RecipeMenu::pMe->PrepForVisibility(0);
-            RecipeMenu::pMe->UpdateLists(0, apCategory);
+            RecipeMenu::pMe->PrepForVisibility(false);
+            RecipeMenu::pMe->UpdateLists(nullptr, apCategory);
             return ptile;
         }
         else {
@@ -723,24 +722,24 @@ Tile* RecipeMenu::Create(TESObjectREFR* apVendor, TESForm* apCategory) {
                     }
                 }
             }
-            return 0;
+            return nullptr;
         }
     }
     else {
         Warning(WARN_MENUS, "Recipe menu called with NULL vendor!  Oh, noes!");
-        return 0;
+        return nullptr;
     }
 }
 
 void RecipeMenu::ForceRecipeUpdate(bool abUpdateNow) {
     if (abUpdateNow) {
         if (RecipeMenu::pMe) {
-            RecipeMenu::pMe->UpdateLists(0, 0);
+            RecipeMenu::pMe->UpdateLists(nullptr, nullptr);
         }
-        g_bShouldRefreshRecipeMenu = (bool)0;
+        g_bShouldRefreshRecipeMenu = false;
     }
     else {
-        g_bShouldRefreshRecipeMenu = (bool)1;
+        g_bShouldRefreshRecipeMenu = true;
     }
 }
 
@@ -754,7 +753,7 @@ int32_t RecipeMenu::CanMakeRecipe(TESRecipe* apRecipe) {
         pactor = static_cast<Actor*>(RecipeMenu::pMe->pCrafterRef);
     }
     else {
-        pactor = 0;
+        pactor = nullptr;
     }
     RecipeMenu::iNumCanMake = 100;
     if (!apRecipe->pRecipeCat || !apRecipe->GetSubCategory()) {
@@ -806,7 +805,7 @@ void RecipeMenu::Close() {
         if (CurrentAIProcess->Get3DUpdateFlag(RESET_MODEL)) {
             pPlayer->UpdatePlayer3d();
         }
-        DialogMenu::ServiceEnd(0);
+        DialogMenu::ServiceEnd(nullptr);
         RecipeMenu::pMe->pMenu->Set(Tile::kTileValue_DeleteOnFade, 1);
         RecipeMenu::pMe->StartFadeOut();
     }
@@ -825,8 +824,8 @@ void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
     FNVD_INLINED_LOCAL(BSStringT<char>, pstring, std::nullopt, std::nullopt);
     Tile* pcurrTiple = RecipeMenu::pMe->plbCurrListbox->GetTileFor(RecipeMenu::pCurrItem);
     BSSimpleList<TESRecipeComponent*>* pCompList = &RecipeMenu::pCurrItem->ingredientlist;
-    TESForm* apObj = 0;
-    TESForm* pForm = 0;
+    TESForm* apObj = nullptr;
+    TESForm* pForm = nullptr;
     int32_t iQuantity = 0;
     if (aiAmountSelected) {
         char v23 = 0;
@@ -834,7 +833,7 @@ void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
         while (pCompList && !pCompList->IsEmpty()) {
             pForm = pCompList->m_item->pInternalItem;
             if (!v23) {
-                TESChallengeManager::UpdateChallenge(CHALLENGE_TYPE_CRAFT, 1, pForm, 0, 0, 0, 0);
+                TESChallengeManager::UpdateChallenge(CHALLENGE_TYPE_CRAFT, 1, pForm, nullptr, 0, 0, 0);
                 if (pForm->GetFormType() == CHIP_ID) {
                     v24 = 1;
                 }
@@ -848,12 +847,12 @@ void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
             }
             if (apObj) {
                 Actor* pactor;
-                bool bAmmo = 0;
+                bool bAmmo = false;
                 if (RecipeMenu::pMe->pCrafterRef && RecipeMenu::pMe->pCrafterRef->IsActor()) {
                     pactor = static_cast<Actor*>(RecipeMenu::pMe->pCrafterRef);
                 }
                 else {
-                    pactor = 0;
+                    pactor = nullptr;
                 }
                 Actor* pactor_2 = pactor;
                 if (pactor) {
@@ -867,10 +866,11 @@ void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
                 if (apObj->GetFormType() == WEAP_ID &&
                     pactor_2->GetInventoryObjectCount(static_cast<TESBoundObject*>(apObj)) == 1 &&
                     apObj == pactor_2->GetCurrentWeapon()) {
-                    pactor_2->UnEquipObject(static_cast<TESBoundObject*>(apObj), 1, 0, 0, 0, 1);
+                    pactor_2->UnEquipObject(static_cast<TESBoundObject*>(apObj), 1, nullptr, false, false, true);
                 }
                 RecipeMenu::pMe->pCrafterRef->RemoveItem(
-                    static_cast<TESBoundObject*>(apObj), 0, aiAmountSelected * iQuantity, 0, 0, 0, 0, 0, 1, 0
+                    static_cast<TESBoundObject*>(apObj), nullptr, aiAmountSelected * iQuantity, false, false, nullptr,
+                    nullptr, nullptr, true, false
                 );
                 if (bAmmo) {
                     BaseProcess* CurrentAIProcess = pactor_2->pCurrentProcess;
@@ -883,10 +883,10 @@ void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
             MiscStatManager::ModVal(MiscStatManager::MS_ITEMS_CRAFTED, aiAmountSelected);
         }
         pCompList = &RecipeMenu::pCurrItem->outputlist;
-        TESBoundObject* pobject = 0;
-        pForm = 0;
+        TESBoundObject* pobject = nullptr;
+        pForm = nullptr;
         iQuantity = 0;
-        while (1) {
+        while (true) {
             if (!pCompList || pCompList->IsEmpty()) {
                 RecipeMenu::Close();
                 return;
@@ -909,10 +909,10 @@ void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
             if (!static_cast<TESObjectWEAP*>(pobject)->TESObjectWEAP::IsThrownWeapon()) {
                 TESContainer apMemory;
                 if (pobject) {
-                    apMemory.AddObject(pobject, aiAmountSelected * iQuantity, 0);
+                    apMemory.AddObject(pobject, aiAmountSelected * iQuantity, nullptr);
                 }
                 apMemory.ApplyHealthPercentToContainer(0.8f);
-                apMemory.AddContainerToReference(RecipeMenu::pMe->pCrafterRef, 0);
+                apMemory.AddContainerToReference(RecipeMenu::pMe->pCrafterRef, false);
                 goto LABEL_46;
             }
         }
@@ -920,14 +920,14 @@ void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
             if (pobject->GetFormType() == ARMO_ID || pobject->GetFormType() == CLOT_ID) {
                 TESContainer apContainer;
                 if (pobject) {
-                    apContainer.AddObject(pobject, aiAmountSelected * iQuantity, 0);
+                    apContainer.AddObject(pobject, aiAmountSelected * iQuantity, nullptr);
                 }
                 apContainer.ApplyHealthPercentToContainer(0.8f);
-                apContainer.AddContainerToReference(RecipeMenu::pMe->pCrafterRef, 0);
+                apContainer.AddContainerToReference(RecipeMenu::pMe->pCrafterRef, false);
                 goto LABEL_46;
             }
         }
-        RecipeMenu::pMe->pCrafterRef->AddBoundObjectItem(pobject, 0, aiAmountSelected * iQuantity);
+        RecipeMenu::pMe->pCrafterRef->AddBoundObjectItem(pobject, nullptr, aiAmountSelected * iQuantity);
     LABEL_46:;
         ::new (&pstring) BSStringT<char>;
         if (aiAmountSelected * iQuantity <= 1) {
@@ -940,9 +940,10 @@ void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
             const char* FullName = TESFullName::GetFullName(pobject);
             pstring.SPrintF("%i %s%s %s", aiAmountSelected * iQuantity, FullName, time, a2a);
         }
-        const char* PickUpSoundName = pPlayer->GetPickUpSoundName(pobject, 1, 0);
+        const char* PickUpSoundName = pPlayer->GetPickUpSoundName(pobject, true, false);
         Interface::ShowMessage(
-            pstring.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_giftbox.dds", PickUpSoundName, 2.0f, 0
+            pstring.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_giftbox.dds", PickUpSoundName, 2.0f,
+            false
         );
         pstring.~BSStringT<char>();
         goto LABEL_50;

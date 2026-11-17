@@ -38,7 +38,7 @@ void ActorValueCache::SetRelatedActorValuesOutOfDate(ActorValue::Index aiParent)
         if (iCount) {
             for (int32_t i = 0; i < iCount; ++i) {
                 if (pDependentActorValues[i] >= 0 && pDependentActorValues[i] < ActorValue::ACTOR_VALUE_COUNT) {
-                    Cache[pDependentActorValues[i]].bOutOfDate = 1;
+                    Cache[pDependentActorValues[i]].bOutOfDate = true;
                 }
             }
         }

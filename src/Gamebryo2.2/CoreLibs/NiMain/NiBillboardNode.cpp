@@ -37,7 +37,7 @@ NiObject* NiBillboardNode::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject) NiBillboardNode;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->NiBillboardNode::m_uFlags = NiBillboardNode::m_uFlags;
@@ -131,7 +131,7 @@ void NiBillboardNode::UpdateWorldBound() {
     pkBound->m_kCenter = m_kWorld.m_Translate;
     float fSum =
         static_cast<float>(static_cast<double>(fX) * fX + static_cast<double>(fY) * fY + static_cast<double>(fZ) * fZ);
-    float fRoot = static_cast<float>(std::sqrt(fSum));
+    float fRoot = std::sqrt(fSum);
     pkBound->m_fRadius = static_cast<float>(static_cast<double>(fRoot) + fRadius);
 }
 
@@ -390,10 +390,10 @@ void NiBillboardNode::RotateToCamera(const NiCamera* pkCamera) {
     v54.fTime = m_fSavedTime;
     uint32_t v43 = 0;
     v54.bUpdateControllers = (this->NiBillboardNode::m_uFlags & 8) != 0;
-    v54.bParallelUpdate = 0;
-    v54.bFoundParticles = 0;
-    v54.bFoundMorphController = 0;
-    for (v54.bSceneGraphChange = 0; v43 < m_kChildren.m_usSize; ++v43) {
+    v54.bParallelUpdate = false;
+    v54.bFoundParticles = false;
+    v54.bFoundMorphController = false;
+    for (v54.bSceneGraphChange = false; v43 < m_kChildren.m_usSize; ++v43) {
         NiAVObject* pkChild = m_kChildren.m_pBase[v43].m_pObject;
         if (pkChild) {
             pkChild->UpdateDownwardPass(v54, 0);
@@ -419,7 +419,7 @@ bool NiBillboardNode::RotateToCenter(
     v21.z = pkCamera->m_kWorld.m_Translate.z - kWorldTranslate.z;
     float pkCamerab = v21.x * v21.x + v21.y * v21.y + v21.z * v21.z;
     if (pkCamerab < 0.001f) {
-        return 0;
+        return false;
     }
     v21.Unitize();
     float v22 = pkCamera->m_kWorld.m_Rotate.m_pEntry[0][0];
@@ -467,7 +467,7 @@ bool NiBillboardNode::RotateToCenter(
         kCamU = (result = v26 * kCamU);
         kCamR = (result = v26 * kCamR);
     }
-    return 1;
+    return true;
 }
 
 void NiBillboardNode::SetField(uint16_t uVal, uint16_t uMask, uint16_t uPos) {
@@ -509,7 +509,7 @@ char* NiBillboardNode::GetViewerString(const char* pcPrefix, FaceMode eMode) {
 NiObject* NiBillboardNode::CreateObject() {
     NiBillboardNode* pkObject = static_cast<NiBillboardNode*>(NiMemObject::operator new(sizeof(NiBillboardNode)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiBillboardNode;
 }

@@ -147,7 +147,7 @@ void BSShaderLightingProperty::GetViewerStrings(NiTPrimitiveArray<char*>* apStri
     BSShaderProperty::GetViewerStrings(apStrings);
     apStrings->Add(NiGetViewerString(BSShaderLightingProperty::ms_RTTI.GetName()));
     apStrings->Add(NiGetViewerString("number of lights", static_cast<uint16_t>(lLightList.m_uiCount)));
-    apStrings->Add(NiGetViewerString("active lights", static_cast<uint16_t>(GetNumberofActiveLights())));
+    apStrings->Add(NiGetViewerString("active lights", GetNumberofActiveLights()));
     apStrings->Add(NiGetViewerString("Reference ID", uiReferenceID));
 }
 
@@ -372,7 +372,7 @@ void BSShaderLightingProperty::ResortLights(NiBound* apObjBound) {
     ShadowSceneLightItem* kIter = lLightList.m_pkHead;
     char bChanged = 0;
     if (kIter) {
-        while (1) {
+        while (true) {
             ShadowSceneLightItem* kDest = lLightList.m_pkHead;
             ShadowSceneLightItem* kNext = kIter->m_pkNext;
             float fLuminance = kIter->m_element->GetLuminanceToBound(apObjBound);
@@ -409,7 +409,7 @@ void BSShaderLightingProperty::ResortLights(NiBound* apObjBound) {
                         }
                         v5->m_pkPrev = kIter;
                     }
-                    kDest = 0;
+                    kDest = nullptr;
                     bChanged = 1;
                 }
             }
@@ -442,7 +442,7 @@ void BSShaderLightingProperty::SetDirectionalLight3x(
         if (!m_pObject ||
             ((iShaderPropertyType = m_pObject->iShaderPropertyType, iShaderPropertyType < 8) ||
              iShaderPropertyType > 12)) {
-            m_pObject = 0;
+            m_pObject = nullptr;
         }
         float y = v5->m_kWorldDir.y;
         float z = v5->m_kWorldDir.z;
@@ -461,7 +461,7 @@ void BSShaderLightingProperty::SetDirectionalLight3x(
         kdata.a = v9;
         pambientColor = NiColorA_BLACK;
         float pkLight = v5->m_fDimmer;
-        bool bmodambient = 0;
+        bool bmodambient = false;
         double v10 = pkLight;
         if (!BSShaderManager::bHDR && v10 > 1.0) {
             pkLight = 1.0f;
@@ -499,7 +499,7 @@ void BSShaderLightingProperty::SetDirectionalLight3x(
         float v20 = v19 * afForcedDarkness;
         float v23 = v22 * afForcedDarkness;
         if (afForcedDarkness < 1.0) {
-            bmodambient = 1;
+            bmodambient = true;
         }
         pambientColor.r = v18;
         pambientColor.g = v20;

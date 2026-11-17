@@ -51,7 +51,7 @@ static void* copyObjectsToChunk(
 
 static void updateMetadataInplace(hkClass** a1, int32_t a2) {
     hkUlongMapBase ErrorMessage;
-    ErrorMessage.m_elem = 0;
+    ErrorMessage.m_elem = nullptr;
     ErrorMessage.m_numElems = 0;
     ErrorMessage.m_hashMod = -1;
     hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
@@ -101,7 +101,7 @@ static void* copyObjectsToChunk(
     using offsets_t = hkPointerMap<void*, int32_t, hkContainerHeapAllocator>;
     FNVD_INLINED_LOCAL(offsets_t, offsets, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkPointerMap<void*, int32_t>::hkPointerMap
-    offsets.m_map.m_elem = 0;
+    offsets.m_map.m_elem = nullptr;
     offsets.m_map.m_numElems = 0;
     offsets.m_map.m_hashMod = -1;
     hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
@@ -414,7 +414,7 @@ void hkVersionUtil::recomputeClassMemberOffsets(hkClass* const* classes, int32_t
     hkStructureLayout layout;
     using classesDone_t = hkPointerMap<const hkClass*, int32_t, hkContainerHeapAllocator>;
     FNVD_INLINED_LOCAL(classesDone_t, classesDone, std::nullopt, std::nullopt);
-    classesDone.m_map.m_elem = 0;
+    classesDone.m_map.m_elem = nullptr;
     classesDone.m_map.m_numElems = 0;
     classesDone.m_map.m_hashMod = -1;
     hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();

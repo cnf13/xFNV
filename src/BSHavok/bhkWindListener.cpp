@@ -68,6 +68,6 @@ float bhkWindListener::GetRandom(float) {
 }
 
 void bhkWindListener::SetWind(float afSpeed, float afAngle) {
-    bhkWindListener::fWindSpeed = (float)(bhkWindListener::fMaxWind * afSpeed);
+    bhkWindListener::fWindSpeed = (bhkWindListener::fMaxWind * afSpeed);
     bhkWindListener::fWindDir = afAngle;
 }

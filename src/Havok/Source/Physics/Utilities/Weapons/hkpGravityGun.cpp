@@ -285,7 +285,7 @@ void hkpGravityGun::stepGun(
         if (!v9) {
             do {
                 hkpFirstPersonGunBulletListener* v10 = m_listeners.m_data[v8];
-                v10->gunFiredCallback(&v15, 0);
+                v10->gunFiredCallback(&v15, nullptr);
                 ++v8;
             }
             while (v8 < m_listeners.m_size);
@@ -301,7 +301,7 @@ void hkpGravityGun::stepGun(
                 if (!v9) {
                     do {
                         hkpFirstPersonGunBulletListener* v14 = m_listeners.m_data[v13];
-                        v14->gunFiredCallback(&v16, 0);
+                        v14->gunFiredCallback(&v16, nullptr);
                         ++v13;
                     }
                     while (v13 < m_listeners.m_size);
@@ -329,14 +329,14 @@ void hkpGravityGun::stepGun(
 
 void hkpGravityGun::reset(hkpWorld* world) {
     int32_t v3 = 0;
-    if (((int32_t)m_grabbedBodies.m_size) <= 0) {
+    if (m_grabbedBodies.m_size <= 0) {
         m_grabbedBodies.m_size = (uint32_t)0;
     }
     else {
         do {
             m_grabbedBodies.m_data[v3++]->removeReference();
         }
-        while (v3 < ((int32_t)m_grabbedBodies.m_size));
+        while (v3 < m_grabbedBodies.m_size);
         m_grabbedBodies.m_size = (uint32_t)0;
     }
 }
@@ -346,18 +346,18 @@ hkpGravityGun::pickBody(const hkTransform& viewTransform, const hkpRigidBody* ch
     float v26 = 0.35f;
     const hkArray<hkpSimulationIsland*, hkContainerHeapAllocator>* p_m_activeSimulationIslands =
         &world->m_activeSimulationIslands;
-    hkpRigidBody* v24 = 0;
+    hkpRigidBody* v24 = nullptr;
     const hkArray<hkpSimulationIsland*, hkContainerHeapAllocator>* p_m_inactiveSimulationIslands =
         &world->m_activeSimulationIslands;
     int32_t v25 = 2;
-    while (1) {
+    while (true) {
         int32_t v5 = 0;
         for (int32_t i = 0; v5 < p_m_activeSimulationIslands->m_size; i = v5) {
             hkpSimulationIsland* v6 = p_m_activeSimulationIslands->m_data[v5];
             hkpSimulationIsland* v27 = v6;
             int32_t v21 = 0;
             if (v6->m_entities.m_size > 0) {
-                while (1) {
+                while (true) {
                     hkVector4 v29;
                     hkpRigidBody* v7 = static_cast<hkpRigidBody*>(v6->m_entities.m_data[v21]);
                     v29.setTransformedInversePos(
@@ -403,7 +403,7 @@ hkpGravityGun::pickBody(const hkTransform& viewTransform, const hkpRigidBody* ch
                                 v13.m_quad = v7->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1.m_quad;
                                 // MAYBE-INLINED 0xE45BFB: after the vptr store of hkpClosestRayHitCollector's inlined
                                 // constructor
-                                collector.m_rayHit.m_rootCollidable = 0;
+                                collector.m_rayHit.m_rootCollidable = nullptr;
                                 // MAYBE-INLINED 0xE45C02: after the vptr store of hkpClosestRayHitCollector's inlined
                                 // constructor
                                 collector.m_rayHit.m_shapeKeyIndex = 0;

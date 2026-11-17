@@ -3,7 +3,7 @@
 #include "BSSystem/BSFile.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 void BSFile::Seek(int32_t aiOffset, int32_t aiWhence) {
     uint32_t uiPos;
@@ -39,7 +39,7 @@ uint32_t BSFile::GetSize() {
     if (((int32_t)m_eMode) == 1) {
         NiFile::Flush();
     }
-    Open(0, (bool)0);
+    Open(false, false);
     if (m_pFile) {
         uiOffset = std::ftell(m_pFile);
         std::fseek(m_pFile, 0, 2);
@@ -52,7 +52,7 @@ uint32_t BSFile::GetSize() {
 // Opens the file through the vtable when it is not open yet, then reads through NiFile and advances the position.
 uint32_t BSFile::ReadF(void* apBuffer, uint32_t aiBytes) {
     if (!m_pFile) {
-        Open(0, false);
+        Open(false, false);
     }
     size_t uiRead = FileRead(apBuffer, aiBytes);
     iTrueFilePos += uiRead;

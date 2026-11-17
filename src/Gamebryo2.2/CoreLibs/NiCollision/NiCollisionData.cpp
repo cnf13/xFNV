@@ -45,7 +45,7 @@ NiRTTI NiCollisionData::ms_RTTI("NiCollisionData", &NiCollisionObject::ms_RTTI);
 NiAVObject* FindCollisionAncestor(NiAVObject* a1) {
     NiAVObject* result = a1;
     if (a1) {
-        while (1) {
+        while (true) {
             result = result->m_pkParent;
             if (!result) {
                 break;
@@ -55,7 +55,7 @@ NiAVObject* FindCollisionAncestor(NiAVObject* a1) {
             }
         }
     }
-    return 0;
+    return nullptr;
 }
 
 NiCollisionData::NiCollisionData()
@@ -86,8 +86,8 @@ NiObject* NiCollisionData::CreateClone(NiCloningProcess& kCloning) {
         return v4;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -290,7 +290,7 @@ void NiCollisionData::CreateWorldVertices() {
                     m_pkWorldVertex = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(
                         m_usVertices <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * m_usVertices : SIZE_MAX
                     ));
-                    m_bWorldVerticesNeedUpdate = 1;
+                    m_bWorldVerticesNeedUpdate = true;
                     // The source's pkGeom->GetTriangleCount(): a tri-based geometry's model data is NiTriBasedGeomData.
                     m_usNumTriangles = static_cast<NiTriBasedGeomData*>(pkGeom->m_spModelData.m_pObject)->m_usTriangles;
                 }
@@ -313,7 +313,7 @@ void NiCollisionData::UpdateWorldVertices() {
                     NiProcessorSpecificCode::ms_pPointsTransform(
                         usVertices, &pkVertex->x, &m_pkWorldVertex->x, &pkGeom->m_kWorld
                     );
-                    m_bWorldVerticesNeedUpdate = 0;
+                    m_bWorldVerticesNeedUpdate = false;
                 }
             }
         }
@@ -324,7 +324,7 @@ void NiCollisionData::UpdateWorldVertices() {
 void NiCollisionData::CreateOBB(int32_t iBinSize) {
     const NiRTTI* pkRTTI;
     NiAVObject* pkSceneObject = m_pkSceneObject;
-    if (pkSceneObject && (pkRTTI = pkSceneObject->GetRTTI()) != 0) {
+    if (pkSceneObject && (pkRTTI = pkSceneObject->GetRTTI()) != nullptr) {
         while (pkRTTI != &NiTriShape::ms_RTTI) {
             pkRTTI = pkRTTI->GetBaseRTTI();
             if (!pkRTTI) {
@@ -348,7 +348,7 @@ void NiCollisionData::CreateOBB(int32_t iBinSize) {
                 );
             }
             else {
-                m_pkOBBRoot = 0;
+                m_pkOBBRoot = nullptr;
             }
         }
     }
@@ -395,7 +395,7 @@ void NiCollisionData::CreateOBB(int32_t iBinSize) {
                         );
                     }
                     else {
-                        pkRoot = 0;
+                        pkRoot = nullptr;
                     }
                     m_pkOBBRoot = pkRoot;
                     MemoryManager_Singleton.Deallocate(pusTriList);

@@ -250,7 +250,7 @@ hkpSimulationIsland* findSmallSparseActiveIsland(
     hkpSimulationIsland* result;
     int32_t m_minDesiredIslandSize = world->m_minDesiredIslandSize;
     if (islandSizeAddon >= m_minDesiredIslandSize || !world->m_wantSimulationIslands) {
-        return 0;
+        return nullptr;
     }
     int32_t m_size = islands.m_size;
     int32_t v8 = m_size - 20;
@@ -258,7 +258,7 @@ hkpSimulationIsland* findSmallSparseActiveIsland(
     int32_t v10 = m_size - 1;
     int32_t v11 = v9 ? 0 : v8;
     if (v10 < v11) {
-        return 0;
+        return nullptr;
     }
     for (hkpSimulationIsland** i = &islands.m_data[v10];; --i) {
         result = *i;
@@ -272,7 +272,7 @@ hkpSimulationIsland* findSmallSparseActiveIsland(
             }
         }
         if (--v10 < v11) {
-            return 0;
+            return nullptr;
         }
     }
     result->m_sparseEnabled = 1;
@@ -551,7 +551,7 @@ void hkpWorldOperationUtil::removeIslandFromDirtyList(hkpWorld* world, hkpSimula
     m_dirtyListIndex = island->m_dirtyListIndex;
     if (m_dirtyListIndex != 0xffff) {
         world->m_dirtySimulationIslands.m_data[m_dirtyListIndex] = nullptr;
-        island->m_dirtyListIndex = (uint16_t)((-1));
+        island->m_dirtyListIndex = (uint16_t)(-1);
     }
 }
 
@@ -627,7 +627,7 @@ void hkpWorldOperationUtil::removeEntityBP(hkpWorld* world, hkpEntity* entity) {
 
 void hkpWorldOperationUtil::removeEntitySI(hkpWorld* world, hkpEntity* entity) {
     hkpSimulationIsland* m_simulationIsland = entity->getSimulationIsland();
-    entity->m_world = 0;
+    entity->m_world = nullptr;
     m_simulationIsland->internalRemoveEntity(entity);
     if (m_simulationIsland->m_storageIndex != 0xFFFF && !m_simulationIsland->m_entities.m_size &&
         world->m_wantSimulationIslands) {
@@ -1463,7 +1463,7 @@ void hkpWorldOperationUtil::removeAttachedConstraints(
     }
     int32_t v7 = v2->m_constraintsSlave.m_size - 1;
     if (v7 >= 0) {
-        while (1) {
+        while (true) {
             hkpConstraintInstance* v8 = v2->m_constraintsSlave.m_data[v7];
             v8->addReference();
             hkpWorldOperationUtil::removeConstraintImmediately(

@@ -73,12 +73,12 @@ void hkDisplayBox::getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryA
 void hkDisplayBox::buildGeometry() {
     hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
     hkGeometry* v3 = static_cast<hkGeometry*>(Instance->m_heap->blockAlloc(sizeof(hkGeometry)));
-    hkGeometry* v4 = 0;
+    hkGeometry* v4 = nullptr;
     if (v3) {
-        v3->m_vertices.m_data = 0;
+        v3->m_vertices.m_data = nullptr;
         v3->m_vertices.m_size = 0;
         v3->m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-        v3->m_triangles.m_data = 0;
+        v3->m_triangles.m_data = nullptr;
         v3->m_triangles.m_size = 0;
         v3->m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;
         v4 = v3;

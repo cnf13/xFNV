@@ -28,7 +28,7 @@ NiObject* NiCullingProperty::CreateClone(NiCloningProcess& kCloning) {
         pkObject_2 = ::new (pkObject) NiCullingProperty;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_uFlags = m_uFlags;
@@ -76,7 +76,7 @@ void NiCullingProperty::_SDMInit() {
         v1 = ::new (v1) NiCullingProperty;
     }
     else {
-        v1 = 0;
+        v1 = nullptr;
     }
     NiCullingProperty::ms_spDefault = v1;
 }
@@ -90,7 +90,7 @@ void NiCullingProperty::_SDMShutdown() {
 NiObject* NiCullingProperty::CreateObject() {
     NiCullingProperty* pkObject = static_cast<NiCullingProperty*>(NiMemObject::operator new(sizeof(NiCullingProperty)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiCullingProperty;
 }

@@ -61,7 +61,7 @@ uint32_t hkSystemMemoryBlockServer::getTotalAvailableMemory() {
         return (uint32_t)((int32_t)(v1 - m_allocated));
     }
     else {
-        return (uint32_t)((-1));
+        return (uint32_t)(-1);
     }
 }
 

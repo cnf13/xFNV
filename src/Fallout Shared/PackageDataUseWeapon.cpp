@@ -50,7 +50,7 @@ void TESUseWeaponPackageData::Copy(TESPackageData* apCopy) {
         if (pAttackTarget) {
             delete pAttackTarget;
         }
-        pAttackTarget = 0;
+        pAttackTarget = nullptr;
         if (pcopy->pAttackTarget) {
             PackageTarget* v3;
             PackageTarget* v6 = static_cast<PackageTarget*>(ourMalloc(sizeof(PackageTarget)));
@@ -58,7 +58,7 @@ void TESUseWeaponPackageData::Copy(TESPackageData* apCopy) {
                 v3 = ::new (v6) PackageTarget;
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             pAttackTarget = v3;
             pAttackTarget->Copy(pcopy->pAttackTarget);
@@ -67,7 +67,7 @@ void TESUseWeaponPackageData::Copy(TESPackageData* apCopy) {
         if (pTargetLocation) {
             delete pTargetLocation;
         }
-        pTargetLocation = 0;
+        pTargetLocation = nullptr;
         if (pcopy->pTargetLocation) {
             PackageLocation* v2;
             PackageLocation* v5 = static_cast<PackageLocation*>(ourMalloc(sizeof(PackageLocation)));
@@ -75,10 +75,10 @@ void TESUseWeaponPackageData::Copy(TESPackageData* apCopy) {
                 v2 = ::new (v5) PackageLocation;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pTargetLocation = v2;
-            pTargetLocation->Copy(pcopy->pTargetLocation, 0);
+            pTargetLocation->Copy(pcopy->pTargetLocation, false);
         }
         bAlwaysHit = pcopy->bAlwaysHit;
         bDoNoDamage = pcopy->bDoNoDamage;
@@ -97,61 +97,61 @@ void TESUseWeaponPackageData::Copy(TESPackageData* apCopy) {
 bool TESUseWeaponPackageData::Compare(TESPackageData* apCompare) {
     TESUseWeaponPackageData* pcomp = dynamic_cast<TESUseWeaponPackageData*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (pWeapon != pcomp->pWeapon) {
-        return 1;
+        return true;
     }
     if (pAttackTarget) {
         if (pAttackTarget->Compare(pcomp->pAttackTarget)) {
-            return 1;
+            return true;
         }
     }
     else {
         if (pcomp->pAttackTarget) {
-            return 1;
+            return true;
         }
     }
     if (pTargetLocation) {
         if (pTargetLocation->Compare(pcomp->pTargetLocation)) {
-            return 1;
+            return true;
         }
     }
     else {
         if (pcomp->pTargetLocation) {
-            return 1;
+            return true;
         }
     }
     if (bAlwaysHit != pcomp->bAlwaysHit) {
-        return 1;
+        return true;
     }
     if (bDoNoDamage != pcomp->bDoNoDamage) {
-        return 1;
+        return true;
     }
     if (bCrouch != pcomp->bCrouch) {
-        return 1;
+        return true;
     }
     if (bHoldFire != pcomp->bHoldFire) {
-        return 1;
+        return true;
     }
     if (bVolleyFire != pcomp->bVolleyFire) {
-        return 1;
+        return true;
     }
     if (bRepeatFire != pcomp->bRepeatFire) {
-        return 1;
+        return true;
     }
     if (sBurstCount != pcomp->sBurstCount) {
-        return 1;
+        return true;
     }
     if (sVolleyShotsMin != pcomp->sVolleyShotsMin) {
-        return 1;
+        return true;
     }
     if (sVolleyShotsMax != pcomp->sVolleyShotsMax) {
-        return 1;
+        return true;
     }
     float v4 = fVolleyWaitMin - pcomp->fVolleyWaitMin;
     if (std::fabsf(v4) > 0.01) {
-        return 1;
+        return true;
     }
     float v3 = fVolleyWaitMax - pcomp->fVolleyWaitMax;
     return std::fabsf(v3) > 0.01;
@@ -215,7 +215,7 @@ void TESUseWeaponPackageData::InitItem(TESForm* apOwner) {
                                     v3 = ::new (v5) PackageTarget;
                                 }
                                 else {
-                                    v3 = 0;
+                                    v3 = nullptr;
                                 }
                                 pAttackTarget = v3;
                                 pAttackTarget->SetTargType(PTT_REFERENCE);
@@ -252,12 +252,12 @@ void TESUseWeaponPackageData::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     apSaveGameBuffer->SaveDataEndian(reinterpret_cast<char*>(&fVolleyWaitMin), 4u, 0);
     apSaveGameBuffer->SaveDataEndian(reinterpret_cast<char*>(&fVolleyWaitMax), 4u, 0);
     apSaveGameBuffer->SaveFormID(pWeapon, static_cast<uint32_t>(0));
-    apData = pAttackTarget != 0;
+    apData = pAttackTarget != nullptr;
     apSaveGameBuffer->SaveDataEndian(&apData, 1u, 0);
     if (apData) {
         pAttackTarget->SaveGame(apSaveGameBuffer);
     }
-    v3 = pTargetLocation != 0;
+    v3 = pTargetLocation != nullptr;
     apSaveGameBuffer->SaveDataEndian(&v3, 1u, 0);
     if (v3) {
         pTargetLocation->SaveGame(apSaveGameBuffer);
@@ -313,7 +313,7 @@ void TESUseWeaponPackageData::SetAttackTarget(PackageTarget* apTarg) {
                 v2 = ::new (v5) PackageTarget;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             this->pAttackTarget = v2;
         }
@@ -324,7 +324,7 @@ void TESUseWeaponPackageData::SetAttackTarget(PackageTarget* apTarg) {
         if (pAttackTarget) {
             delete pAttackTarget;
         }
-        this->pAttackTarget = 0;
+        this->pAttackTarget = nullptr;
     }
 }
 

@@ -121,12 +121,12 @@ void hkpBroadPhaseBorder::deactivate() {
         do {
             (*m_phantoms)->removePhantomOverlapListener(this);
             (*m_phantoms)->removeReference();
-            *m_phantoms++ = 0;
+            *m_phantoms++ = nullptr;
             --v4;
         }
         while (v4);
         worldDeletedCallback(this->m_world);
-        this->m_world = 0;
+        this->m_world = nullptr;
     }
 }
 
@@ -176,9 +176,9 @@ void hkpBroadPhaseBorder::postSimulationCallback(hkpWorld* world) {
 
 void hkpBroadPhaseBorder::worldDeletedCallback(hkpWorld* world) {
     hkpWorldPostSimulationListener* v3;
-    m_world->removeWorldDeletionListener(this != nullptr ? static_cast<hkpWorldDeletionListener*>(this) : 0);
+    m_world->removeWorldDeletionListener(this != nullptr ? static_cast<hkpWorldDeletionListener*>(this) : nullptr);
     if (this == nullptr) {
-        v3 = 0;
+        v3 = nullptr;
     }
     else {
         v3 = static_cast<hkpWorldPostSimulationListener*>(this);

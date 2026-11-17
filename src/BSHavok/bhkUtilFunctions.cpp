@@ -88,7 +88,7 @@
 #include "Havok/Source/Physics/Utilities/Serialize/hkpDisplayBindingData.h"
 #include "Reconstruction.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 namespace bhkConvert {} // namespace bhkConvert
@@ -151,15 +151,15 @@ NiAVObject* bhkUtilFunctions::GetNiAVObject(const hkpCollidable* apCollidable) {
 }
 
 bhkBlendCollisionObject* bhkUtilFunctions::FindbhkBlendCollisionObject(NiNode* apNode) {
-    bhkBlendCollisionObject* v1 = 0;
+    bhkBlendCollisionObject* v1 = nullptr;
     if (apNode) {
         bhkNiCollisionObject* m_pObject = apNode->m_spCollisionObject.m_pObject;
-        NiObject* v3 = m_pObject ? m_pObject->DynamicCastMember(&bhkBlendCollisionObject::ms_RTTI) : 0;
+        NiObject* v3 = m_pObject ? m_pObject->DynamicCastMember(&bhkBlendCollisionObject::ms_RTTI) : nullptr;
         v1 = static_cast<bhkBlendCollisionObject*>(v3);
         if (!v3) {
             NiAVObject* v4;
             NiNode* v5;
-            if (apNode->m_kChildren.m_usSize && (v4 = apNode->m_kChildren.m_pBase->m_pObject) != 0) {
+            if (apNode->m_kChildren.m_usSize && (v4 = apNode->m_kChildren.m_pBase->m_pObject) != nullptr) {
                 NiNode* v6 = static_cast<NiNode*>(v4->DynamicCastMember(&NiNode::ms_RTTI));
                 v5 = v6;
                 if (v6) {
@@ -169,21 +169,21 @@ bhkBlendCollisionObject* bhkUtilFunctions::FindbhkBlendCollisionObject(NiNode* a
                         v8 = v7->DynamicCastMember(&bhkBlendCollisionObject::ms_RTTI);
                     }
                     else {
-                        v8 = 0;
+                        v8 = nullptr;
                     }
                     v1 = static_cast<bhkBlendCollisionObject*>(v8);
                 }
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             if (!v1) {
                 NiAVObject* v9;
                 NiNode* v10;
                 NiObject* v12;
                 if (!apNode->m_kChildren.m_usSize ||
-                    ((v9 = apNode->m_kChildren.m_pBase->m_pObject) == 0 ||
-                     (v10 = static_cast<NiNode*>(v9->DynamicCastMember(&NiNode::ms_RTTI)), (v5 = v10) == 0))) {
+                    ((v9 = apNode->m_kChildren.m_pBase->m_pObject) == nullptr ||
+                     (v10 = static_cast<NiNode*>(v9->DynamicCastMember(&NiNode::ms_RTTI)), (v5 = v10) == nullptr))) {
                 LABEL_23:;
                     v5 = apNode;
                 LABEL_24:;
@@ -198,7 +198,7 @@ bhkBlendCollisionObject* bhkUtilFunctions::FindbhkBlendCollisionObject(NiNode* a
                                     v16 = v15->DynamicCastMember(&bhkBlendCollisionObject::ms_RTTI);
                                 }
                                 else {
-                                    v16 = 0;
+                                    v16 = nullptr;
                                 }
                                 v1 = static_cast<bhkBlendCollisionObject*>(v16);
                                 if (!v16) {
@@ -214,7 +214,7 @@ bhkBlendCollisionObject* bhkUtilFunctions::FindbhkBlendCollisionObject(NiNode* a
                                                     v21 = v20->DynamicCastMember(&bhkBlendCollisionObject::ms_RTTI);
                                                 }
                                                 else {
-                                                    v21 = 0;
+                                                    v21 = nullptr;
                                                 }
                                                 v1 = static_cast<bhkBlendCollisionObject*>(v21);
                                                 if (v21) {
@@ -236,7 +236,7 @@ bhkBlendCollisionObject* bhkUtilFunctions::FindbhkBlendCollisionObject(NiNode* a
                     v12 = v11->DynamicCastMember(&bhkBlendCollisionObject::ms_RTTI);
                 }
                 else {
-                    v12 = 0;
+                    v12 = nullptr;
                 }
                 v1 = static_cast<bhkBlendCollisionObject*>(v12);
             }
@@ -277,22 +277,22 @@ bool bhkUtilFunctions::IsRigidBodyActive(NiAVObject* apObject) {
     bhkNiCollisionObject* v3;
     BSFadeNode* v1 = static_cast<BSFadeNode*>(apObject);
     bhkNiCollisionObject* m_pObject = apObject->m_spCollisionObject.m_pObject;
-    if (!m_pObject || (v3 = m_pObject->IsBhkNiCollisionObject()) == 0) {
+    if (!m_pObject || (v3 = m_pObject->IsBhkNiCollisionObject()) == nullptr) {
         BSXFlags* v4 = BSXFlags::Find(v1);
         if (!v4) {
-            return 0;
+            return false;
         }
         if ((v4->m_iValue & 2) == 0) {
-            return 0;
+            return false;
         }
-        NiAVObject* v5 = v1->m_kChildren.m_usSize ? v1->m_kChildren.m_pBase->m_pObject : 0;
+        NiAVObject* v5 = v1->m_kChildren.m_usSize ? v1->m_kChildren.m_pBase->m_pObject : nullptr;
         bhkNiCollisionObject* v6 = v5->m_spCollisionObject.m_pObject;
         if (!v6) {
-            return 0;
+            return false;
         }
         v3 = v6->IsBhkNiCollisionObject();
         if (!v3) {
-            return 0;
+            return false;
         }
     }
     NiObject* spWorldObject = (NiObject*)v3->spWorldObject;
@@ -878,7 +878,7 @@ const hkpRigidBody* bhkUtilFunctions::FindConstrainedSystemRoot(const hkpRigidBo
     if (apBody) {
     LABEL_2:;
         int32_t v2 = 0;
-        bool v3 = 1;
+        bool v3 = true;
         if (v1->m_constraintsMaster.m_size) {
             int32_t v4 = 0;
             while (v3) {

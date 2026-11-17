@@ -30,7 +30,7 @@ uint32_t BSSaveDataSystemUtility::GetSaveDataEntries(
 }
 
 bool BSSaveDataSystemUtility::GetMostRecentSaveDataEntry(const char* apcDirectoryName, SaveDataEntry& aEntry) {
-    return (bool)0;
+    return false;
 }
 
 void BSSaveDataSystemUtility::SaveData(BSSaveDataSystemUtilityFile* apSaveDataFile) {
@@ -39,10 +39,10 @@ void BSSaveDataSystemUtility::SaveData(BSSaveDataSystemUtilityFile* apSaveDataFi
 
 bool BSSaveDataSystemUtility::GetMostRecentlyAccessedSaveDataEntry(BSSaveDataSystemUtility::SaveDataEntry& aEntry) {
     if (!std::strlen(MostRecentEntry.cName)) {
-        return 0;
+        return false;
     }
     strcpy_s(aEntry.cName, 32, MostRecentEntry.cName);
-    return 1;
+    return true;
 }
 
 BSSaveDataSystemUtility* BSSaveDataSystemUtility::GetSingleton() {

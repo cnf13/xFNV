@@ -159,7 +159,7 @@ int32_t hkServerProcessHandler::findProcessByTag(int32_t tag) {
     if (m_size <= 0) {
         return -1;
     }
-    while (1) {
+    while (true) {
         hkProcess* v5 = m_processList.m_data[v4];
         if (v5->getProcessTag() == tag) {
             break;
@@ -185,7 +185,7 @@ hkResult hkServerProcessHandler::registerAllAvailableProcesss() {
 hkCommandRouter::~hkCommandRouter() {}
 
 void hkProcess::getConsumableCommands(uint8_t*& commands, int32_t& numCommands) {
-    commands = 0;
+    commands = nullptr;
     numCommands = 0;
 }
 

@@ -287,8 +287,7 @@ void NiPSysEmitterCtlr::Update(NiUpdateData& UpdateData) {
         }
         pkBirthRate->Update(static_cast<float>(fLastTime + (fTime - fLastTime) * 0.5), m_pkTarget, fBirthRate);
         EmitParticles(
-            static_cast<float>(fSystemTime + (fTime - fLastTime) + fWrapDelta), fTime, fLastTime, fFirstKeyTime, fTime,
-            fBirthRate
+            (fSystemTime + (fTime - fLastTime) + fWrapDelta), fTime, fLastTime, fFirstKeyTime, fTime, fBirthRate
         );
         return;
     }
@@ -395,10 +394,7 @@ void NiPSysEmitterCtlr::Update(NiUpdateData& UpdateData) {
         if (bWrapped) {
             fSystemTime = m_fHiKeyTime - m_fLoKeyTime + fSystemTime;
         }
-        EmitParticles(
-            static_cast<float>(fSystemTime + fTime - fLastTime), fCurTime, fRunLastTime, fEmitStart, fEmitStop,
-            fBirthRate
-        );
+        EmitParticles((fSystemTime + fTime - fLastTime), fCurTime, fRunLastTime, fEmitStart, fEmitStop, fBirthRate);
 
         if (!(fTime > pkEndKey->m_fTime)) {
             return;

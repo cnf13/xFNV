@@ -39,8 +39,8 @@ void FNVD_TRIANGULATOR_TYP::setDomain(const hkVector4& dmin, const hkVector4& dm
     const int32_t iMargin = margin ? 1 : 0;
     m_margin = iMargin;
     const float fExt = static_cast<float>(32767.0 - (static_cast<double>(iMargin) + iMargin));
-    const float fS = static_cast<float>(std::sin(angle));
-    const float fC = static_cast<float>(std::cos(angle));
+    const float fS = std::sin(angle);
+    const float fC = std::cos(angle);
     const float fSclX = static_cast<float>((static_cast<double>(dmax.m_quad[0]) - dmin.m_quad[0]) / fExt);
     const float fSclY = static_cast<float>((static_cast<double>(dmax.m_quad[1]) - dmin.m_quad[1]) / fExt);
     m_localToWorld = hkMatrix4Identity;

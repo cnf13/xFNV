@@ -49,7 +49,7 @@ NiObject* bhkCylinderShape::CreateClone(NiCloningProcess& arCloneData) {
     TLSData* v3 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v3->eMemContext;
     v3->eMemContext = MEM_CONTEXT_HAVOK;
-    bhkCylinderShape* pobj = 0;
+    bhkCylinderShape* pobj = nullptr;
     bhkSerializable::CloneCritLock();
     bhkCylinderShape* v6 = static_cast<bhkCylinderShape*>(NiMemObject::operator new(sizeof(bhkCylinderShape)));
     if (v6) {
@@ -199,7 +199,7 @@ hkSerializableCinfo& bhkCylinderShape::CreateCinfo(bool& arCreated) {
     TLSData* v3 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v3->eMemContext;
     v3->eMemContext = MEM_CONTEXT_HAVOK;
-    bool v5 = pInfo == 0;
+    bool v5 = pInfo == nullptr;
     arCreated = v5;
     if (v5) {
         // The allocation is treated as untyped memory: the pointer is aligned here and the padding length is written
@@ -225,7 +225,7 @@ hkSerializableCinfo& bhkCylinderShape::CreateCinfo(bool& arCreated) {
         pCinfo->m_vertexB.fY = 0.0f;
         pCinfo->m_vertexB.fZ = 0.0f;
         pCinfo->m_vertexB.fW = 0.0f;
-        bool v9 = phkObject == 0;
+        bool v9 = phkObject == nullptr;
         pInfo = pCinfo;
         if (!v9) {
             CopyCinfo(*pCinfo);

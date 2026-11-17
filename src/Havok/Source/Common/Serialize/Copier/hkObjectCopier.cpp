@@ -934,7 +934,7 @@ void hkObjectCopier::writePodArray(int32_t nelem, uint32_t msize, hkOArchive* oa
 
 // The class registry's finish-loaded-object callback: the null check, then the class's finish constructor.
 void finishLoadedObjecthkAlignSceneToNodeOptions(void* p, int32_t finishing) {
-    void* apMemory = static_cast<void*>(p);
+    void* apMemory = p;
     hkFinishLoadedObjectFlag aFlag;
     aFlag.m_finishing = finishing;
     if (!apMemory) {

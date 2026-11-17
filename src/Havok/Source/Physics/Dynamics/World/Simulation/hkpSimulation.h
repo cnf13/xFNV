@@ -43,7 +43,7 @@ public:
     };
 
     // What processAgentsOfEntities runs on each agent: a hkpSimulation member function, called with the simulation.
-    typedef void (*AgentEntityCallback)(
+    using AgentEntityCallback = void (*)(
         hkpSimulation* simulation,
         hkpAgentNnEntry* entry,
         const hkpProcessCollisionInput& input,

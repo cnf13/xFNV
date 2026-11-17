@@ -122,7 +122,7 @@ void NiExtraData::ClearName() {
 NiObject* NiExtraData::CreateObject() {
     NiExtraData* pkObject = static_cast<NiExtraData*>(NiMemObject::operator new(sizeof(NiExtraData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiExtraData;
 }

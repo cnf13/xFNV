@@ -167,13 +167,13 @@ NiAVObject* BSUtilities::GetObjectByName(NiAVObject* apScene, const char* apName
     NiAVObject* pres;
     FNVD_INLINED_LOCAL(NiFixedString, name, std::nullopt, std::nullopt);
     if (!apScene || !apName) {
-        return 0;
+        return nullptr;
     }
     NiControllerManager* pcontrollerManager =
         static_cast<NiControllerManager*>(apScene->GetController(&NiControllerManager::ms_RTTI));
     // MAYBE-INLINED 0xC4B374: a write opening NiFixedString's uses: may be its inlined constructor
     name.m_kHandle = NiGlobalStringTable::AddString(apName);
-    if (pcontrollerManager && (pres = pcontrollerManager->m_spObjectPalette.m_pObject->GetAVObject(name)) != 0) {
+    if (pcontrollerManager && (pres = pcontrollerManager->m_spObjectPalette.m_pObject->GetAVObject(name)) != nullptr) {
         // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(name.GetHandle());
         return pres;
@@ -188,18 +188,18 @@ NiAVObject* BSUtilities::GetObjectByName(NiAVObject* apScene, const char* apName
         else {
             // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
             NiGlobalStringTable::ReleaseHandle(name.GetHandle());
-            return 0;
+            return nullptr;
         }
     }
 }
 
 NiAVObject* BSUtilities::GetObjectByName(NiAVObject* apScene, const char* apName) {
-    return BSUtilities::GetObjectByName(apScene, apName, (bool)1);
+    return BSUtilities::GetObjectByName(apScene, apName, true);
 }
 
 NiAVObject* BSUtilities::GetObjectByName(NiAVObject* apScene, const NiFixedString& apName, bool bTestScenegraph) {
     if (!apScene || !(&apName)->GetHandle()) {
-        return 0;
+        return nullptr;
     }
     NiControllerManager* Controller =
         static_cast<NiControllerManager*>(apScene->GetController(&NiControllerManager::ms_RTTI));
@@ -212,11 +212,11 @@ NiAVObject* BSUtilities::GetObjectByName(NiAVObject* apScene, const NiFixedStrin
     if (bTestScenegraph) {
         return apScene->GetObjectByName(apName);
     }
-    return 0;
+    return nullptr;
 }
 
 NiAVObject* BSUtilities::GetObjectByName(NiAVObject* apScene, const NiFixedString& apName) {
-    return BSUtilities::GetObjectByName(apScene, apName, (bool)1);
+    return BSUtilities::GetObjectByName(apScene, apName, true);
 }
 
 bool BSUtilities::GetExternalEmittanceRecurse(NiAVObject* apObj) {
@@ -231,16 +231,16 @@ bool BSUtilities::GetExternalEmittanceRecurse(NiAVObject* apObj) {
         type = NiShadeProperty::GetType();
         property = static_cast<NoFaderShaderProperty*>(apObj->GetProperty(type));
         if (property && property->BSShaderProperty::GetFlag(BSShaderProperty::BSSP_FLAG_EXTERNAL_EMITTANCE)) {
-            return (bool)1;
+            return true;
         }
         else {
             v6 = apObj->IsNode();
             if (v6) {
-                arrayCount = (uint32_t)v6->GetArrayCount();
+                arrayCount = v6->GetArrayCount();
                 for (a1 = 0; a1 < arrayCount; ++a1) {
                     v2 = v6->GetAt(a1);
                     if (BSUtilities::GetExternalEmittanceRecurse(v2)) {
-                        return (bool)1;
+                        return true;
                     }
                 }
             }
@@ -326,15 +326,18 @@ void BSUtilities::ApplyTransformToVerticesAndNormals(
             apOutVerts[i].z = v6;
         }
         if (apOutNorms) {
-            apOutNorms[i].x = (float)((((&aTrans)->m_Rotate.m_pEntry[0][0] * apInNorms[i].x) +
-                                       ((&aTrans)->m_Rotate.m_pEntry[0][1] * apInNorms[i].y)) +
-                                      ((&aTrans)->m_Rotate.m_pEntry[0][2] * apInNorms[i].z));
-            apOutNorms[i].y = (float)((((&aTrans)->m_Rotate.m_pEntry[1][0] * apInNorms[i].x) +
-                                       ((&aTrans)->m_Rotate.m_pEntry[1][1] * apInNorms[i].y)) +
-                                      ((&aTrans)->m_Rotate.m_pEntry[1][2] * apInNorms[i].z));
-            apOutNorms[i].z = (float)((((&aTrans)->m_Rotate.m_pEntry[2][0] * apInNorms[i].x) +
-                                       ((&aTrans)->m_Rotate.m_pEntry[2][1] * apInNorms[i].y)) +
-                                      ((&aTrans)->m_Rotate.m_pEntry[2][2] * apInNorms[i].z));
+            apOutNorms[i].x =
+                ((((&aTrans)->m_Rotate.m_pEntry[0][0] * apInNorms[i].x) +
+                  ((&aTrans)->m_Rotate.m_pEntry[0][1] * apInNorms[i].y)) +
+                 ((&aTrans)->m_Rotate.m_pEntry[0][2] * apInNorms[i].z));
+            apOutNorms[i].y =
+                ((((&aTrans)->m_Rotate.m_pEntry[1][0] * apInNorms[i].x) +
+                  ((&aTrans)->m_Rotate.m_pEntry[1][1] * apInNorms[i].y)) +
+                 ((&aTrans)->m_Rotate.m_pEntry[1][2] * apInNorms[i].z));
+            apOutNorms[i].z =
+                ((((&aTrans)->m_Rotate.m_pEntry[2][0] * apInNorms[i].x) +
+                  ((&aTrans)->m_Rotate.m_pEntry[2][1] * apInNorms[i].y)) +
+                 ((&aTrans)->m_Rotate.m_pEntry[2][2] * apInNorms[i].z));
         }
     }
 }
@@ -343,7 +346,7 @@ const char* BSUtilities::GetSequenceFileName(NiControllerSequence* apSequence) {
     if (apSequence->m_kName.GetHandle()) {
         std::strstr(apSequence->m_kName.GetHandle(), rdata_10C21E0);
     }
-    return 0;
+    return nullptr;
 }
 
 void BSUtilities::ProcessSelectiveUpdate(NiAVObject* apObject) {
@@ -398,10 +401,10 @@ void BSUtilities::FindAnimatedTextures(NiAVObject* apObject, NiTPrimitiveArray<N
                 }
                 v5 = 0;
             LABEL_13:;
-                ptexProp = v5 != 0 ? Property : 0;
+                ptexProp = v5 != 0 ? Property : nullptr;
             }
             else {
-                ptexProp = 0;
+                ptexProp = nullptr;
             }
             if (ptexProp) {
                 pflip = static_cast<NiFlipController*>(ptexProp->GetController(&NiFlipController::ms_RTTI));
@@ -424,7 +427,7 @@ void BSUtilities::FindAnimatedTextures(NiAVObject* apObject, NiTPrimitiveArray<N
         }
         v2 = 0;
     LABEL_28:;
-        NiNode* pnode = v2 != 0 ? static_cast<NiNode*>(apObject) : 0;
+        NiNode* pnode = v2 != 0 ? static_cast<NiNode*>(apObject) : nullptr;
         if (pnode) {
             for (uint32_t k = 0; k < pnode->m_kChildren.m_usSize; ++k) {
                 BSUtilities::FindAnimatedTextures(pnode->m_kChildren.m_pBase[k].m_pObject, arTextureArray);
@@ -488,7 +491,7 @@ void BSUtilities::ReflectCameraAboutArbitraryPlane(NiCamera* apCamera, NiPlane* 
     float v7 = std::fabs(static_cast<double>(apCamera->m_kWorld.m_fScale));
     apReflectedCamera->m_kLocal.m_fScale = v7;
     apReflectedCamera->SetViewFrustum(apCamera->m_kViewFrustum);
-    NiUpdateData UpdateData1(0.0f, 0, 0);
+    NiUpdateData UpdateData1(0.0f, false, false);
     apReflectedCamera->Update(UpdateData1);
 }
 
@@ -513,7 +516,7 @@ void BSUtilities::GetInverseWorldMatrix(const NiTransform& aWorld, const NiSkinI
         kSkinMatrix._41 = NiRenderer::PosAdjust.x;
         kSkinMatrix._42 = NiRenderer::PosAdjust.y;
         kSkinMatrix._43 = NiRenderer::PosAdjust.z;
-        D3DXMatrixInverse_Thunk(&aOut, 0, &kSkinMatrix);
+        D3DXMatrixInverse_Thunk(&aOut, nullptr, &kSkinMatrix);
     }
     else {
         NiTransform kInvertedTransform;

@@ -161,7 +161,7 @@ void LoadedAreaBound::WarpActor(Actor* apActor) {
     apActor->SetPosition(ecx0);
     if (apActor->GetCharController()) {
         bhkCharacterController* CharController = apActor->GetCharController();
-        CharController->SetStuckQuadruped(0);
+        CharController->SetStuckQuadruped(false);
     }
 }
 
@@ -192,7 +192,7 @@ void LoadedAreaBound::FindWarpLocation(TESObjectREFR* apRef, const NiPoint3& arC
         arWarpLoc = pact->GetEditorLocationCoord();
         blocFound = true;
     }
-    else if (!pact && apRef && apRef->GetEditorLocation(tmpLoc, rot, plocForm, 0)) {
+    else if (!pact && apRef && apRef->GetEditorLocation(tmpLoc, rot, plocForm, nullptr)) {
         TESObjectCELL* pcellLoc = TES::pInstance->GetCellForPoint(tmpLoc);
         if (pcellLoc && pcellLoc->GetState() == TESObjectCELL::CS_ATTACHED) {
             arWarpLoc = tmpLoc;
@@ -344,7 +344,7 @@ void LoadedAreaBound::Create(TESObjectCELL* apCell, const hkAabb& arboundAABB) {
         float fheightOffset;
         alignas(16) hkVector4 minExtent;
         alignas(16) hkVector4 maxExtent;
-        this->spPhantomA[ui].operator=(static_cast<bhkAabbPhantom*>(0));
+        this->spPhantomA[ui].operator=(static_cast<bhkAabbPhantom*>(nullptr));
         hkAabbPhantomCinfo ci;
         hkAabb bound;
         if (apCell->GetInterior()) {

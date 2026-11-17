@@ -288,14 +288,14 @@ void hkpPhantomDisplayViewer::addWorld(hkpWorld* world) {
         v3 = static_cast<hkpPhantomListener*>(this);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     world->addPhantomListener(v3);
     if (this) {
         v4 = static_cast<hkpWorldPostSimulationListener*>(this);
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     world->addWorldPostSimulationListener(v4);
     int32_t v5 = 0;
@@ -316,14 +316,14 @@ void hkpPhantomDisplayViewer::removeWorld(hkpWorld* world) {
         v3 = static_cast<hkpPhantomListener*>(this);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     world->removePhantomListener(v3);
     if (this) {
         v4 = static_cast<hkpWorldPostSimulationListener*>(this);
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     world->removeWorldPostSimulationListener(v4);
     int32_t v5 = 0;
@@ -346,7 +346,7 @@ hkProcess* hkpPhantomDisplayViewer::create(const hkArray<hkProcessContext*, hkCo
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

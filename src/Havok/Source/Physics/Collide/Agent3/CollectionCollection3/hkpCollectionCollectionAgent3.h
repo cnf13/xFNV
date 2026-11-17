@@ -19,7 +19,7 @@ class hkpShapeContainer;
 class hkStatisticsCollector;
 
 // The SDK's hkpAgentData is void: the bytes of an agent's data, in front of its entry.
-typedef void hkpAgentData;
+using hkpAgentData = void;
 
 // The stream agent between two shape collections or bounding volume trees: its registration, its process and the
 // AABB helpers the process uses.

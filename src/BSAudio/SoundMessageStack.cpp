@@ -11,11 +11,11 @@ SoundMessageStack::~SoundMessageStack() {
 }
 
 BSSoundMessage* SoundMessageStack::Pop() {
-    BSSoundMessage* presult = 0;
+    BSSoundMessage* presult = nullptr;
     if (pTop) {
         presult = pTop;
         pTop = static_cast<BSSoundMessage*>(presult->pData);
-        presult->pData = 0;
+        presult->pData = nullptr;
         --uiCount;
     }
     else {
@@ -27,10 +27,10 @@ BSSoundMessage* SoundMessageStack::Pop() {
                 presult_2 = ::new (pMessage) BSSoundMessage;
             }
             else {
-                presult_2 = 0;
+                presult_2 = nullptr;
             }
             presult = presult_2;
-            presult_2->pData = 0;
+            presult_2->pData = nullptr;
             uiTimeLastAllocated = GetTickCount();
         }
     }
@@ -42,7 +42,7 @@ void SoundMessageStack::Clear() {
         BSSoundMessage* pTop = this->pTop;
         this->pTop = static_cast<BSSoundMessage*>(pTop->pData);
         --uiCount;
-        pTop->pData = 0;
+        pTop->pData = nullptr;
         if (pTop) {
             pTop->~BSSoundMessage();
             MemoryManager_Singleton.Deallocate(pTop);

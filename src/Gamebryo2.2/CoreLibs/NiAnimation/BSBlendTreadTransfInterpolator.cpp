@@ -39,7 +39,7 @@ NiObject* BSBlendTreadTransfInterpolator::CreateClone(NiCloningProcess& kCloning
         ::new (pkObject) BSBlendTreadTransfInterpolator;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->fCurrLerp = fCurrLerp;
@@ -135,7 +135,7 @@ NiObject* BSBlendTreadTransfInterpolator::CreateObject() {
     BSBlendTreadTransfInterpolator* pkObject =
         static_cast<BSBlendTreadTransfInterpolator*>(NiMemObject::operator new(sizeof(BSBlendTreadTransfInterpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) BSBlendTreadTransfInterpolator;
 }

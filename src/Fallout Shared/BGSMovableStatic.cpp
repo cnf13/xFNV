@@ -30,7 +30,7 @@ BGSMovableStatic::BGSMovableStatic() {
 BGSMovableStatic::~BGSMovableStatic() {}
 
 void BGSMovableStatic::InitializeData() {
-    pSoundLoop = 0;
+    pSoundLoop = nullptr;
 }
 
 // Reads the movable static's chunks. Reads the record's form type first and discards it.
@@ -121,7 +121,7 @@ void BGSMovableStatic::InitItem() {
                 );
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -137,13 +137,13 @@ void BGSMovableStatic::Copy(TESForm* apCopy) {
 bool BGSMovableStatic::Compare(TESForm* apCompare) {
     BGSMovableStatic* pcomp = dynamic_cast<BGSMovableStatic*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (static_cast<TESObjectSTAT*>(this)->CompareAllComponents(static_cast<TESObjectSTAT*>(pcomp))) {
-        return 1;
+        return true;
     }
     if (data.Compare(pcomp->data)) {
-        return 1;
+        return true;
     }
     TESSound* LoopingSound = GetLoopingSound();
     return LoopingSound != pcomp->GetLoopingSound();

@@ -88,18 +88,19 @@ FOVATSEffectManager::VATS_TARGET::VATS_TARGET() : spObj(nullptr) {}
 
 FOVATSEffectManager::FOVATSEffectManager()
   : EffectMode(FOVATSEffectManager::SINGLE_TARGET), SingleTarget(), iNumMultiTargets(0), iSelectedMultiTarget(-1),
-    pMultiTargets(), spStencilProp(nullptr), bOcclusionEnabled(0), bEffectEnabled(1), iNumAdditionalLimbs(0),
-    bDistortActive(0), fDistortPosition(0.0f), fDistortDuration(gs_fDistortDuration_VATS.Float()), bBurstActive(0),
-    fPulseCurrentIntensity(0.0f), fPulseCurrentRadius(0.0f), bScanning(0), bExitScanMode(0), fPulseIntensity(0.0f),
-    spScanlinesTexture(nullptr), uiPartialResultMult(1), spAccumulator(nullptr) {
+    pMultiTargets(), spStencilProp(nullptr), bOcclusionEnabled(false), bEffectEnabled(true), iNumAdditionalLimbs(0),
+    bDistortActive(false), fDistortPosition(0.0f), fDistortDuration(gs_fDistortDuration_VATS.Float()),
+    bBurstActive(false), fPulseCurrentIntensity(0.0f), fPulseCurrentRadius(0.0f), bScanning(false),
+    bExitScanMode(false), fPulseIntensity(0.0f), spScanlinesTexture(nullptr), uiPartialResultMult(1),
+    spAccumulator(nullptr) {
     double fTime = static_cast<double>(appTimer.iLastTime);
     fNextDistortTime = static_cast<double>(rt::rand() % gs_iDistortMaxInterval_VATS.Int()) + fTime;
     SingleTarget.pRef = nullptr;
-    BSShaderManager::GetTexture(gs_sScanlineTexture_VATS.String(), 1, spScanlinesTexture, 0, 0);
+    BSShaderManager::GetTexture(gs_sScanlineTexture_VATS.String(), true, spScanlinesTexture, false, false);
     spAccumulator = new BSShaderAccumulator(101, 1u, 759u);
-    spAccumulator->SetRenderDecals(0);
+    spAccumulator->SetRenderDecals(false);
     for (int32_t i = 0; i < 16; ++i) {
-        bWaitingForOcclusionQuery[i] = 0;
+        bWaitingForOcclusionQuery[i] = false;
         pEntireLimbQuery[i] = nullptr;
         pPartialLimbQuery[i] = nullptr;
         bValidOcclusionResult[i] = 0;
@@ -145,8 +146,8 @@ void FOVATSEffectManager::OnIdle() {
             UpdateBurst(fappTime);
         }
         if (SingleTarget.pRef) {
-            if (SingleTarget.pRef->IsDead(0)) {
-                SetTarget(0, BGSBodyPart::LIMB_NONE, 0);
+            if (SingleTarget.pRef->IsDead(false)) {
+                SetTarget(nullptr, BGSBodyPart::LIMB_NONE, false);
             }
         }
         InitializationFlow("====== VATSEffectOnIdle ======");
@@ -156,20 +157,20 @@ void FOVATSEffectManager::OnIdle() {
                     if (pPartialLimbQuery[i]) {
                         NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
                         Renderer_->LockRenderer();
-                        if (pEntireLimbQuery[i]->GetResult(&itempResultEntire, 1) &&
-                            pPartialLimbQuery[i]->GetResult(&itempResultPartial, 1) && !bValidOcclusionResult[i]) {
+                        if (pEntireLimbQuery[i]->GetResult(&itempResultEntire, true) &&
+                            pPartialLimbQuery[i]->GetResult(&itempResultPartial, true) && !bValidOcclusionResult[i]) {
                             BSOcclusionQuery* v5 = pEntireLimbQuery[i];
                             if (v5) {
                                 delete v5;
                             }
-                            pEntireLimbQuery[i] = 0;
+                            pEntireLimbQuery[i] = nullptr;
                             BSOcclusionQuery* v4 = pPartialLimbQuery[i];
                             if (v4) {
                                 delete v4;
                             }
-                            pPartialLimbQuery[i] = 0;
+                            pPartialLimbQuery[i] = nullptr;
                             bValidOcclusionResult[i] = 1;
-                            bWaitingForOcclusionQuery[i] = 0;
+                            bWaitingForOcclusionQuery[i] = false;
                             uiTotalArea[i] = itempResultEntire;
                             uiVisibleArea[i] = uiPartialResultMult * itempResultPartial;
                         }
@@ -181,8 +182,8 @@ void FOVATSEffectManager::OnIdle() {
         }
     }
     else {
-        bScanning = 0;
-        bExitScanMode = 0;
+        bScanning = false;
+        bExitScanMode = false;
     }
 }
 
@@ -200,12 +201,12 @@ void FOVATSEffectManager::SetTarget(TESObjectREFR* apTarget, BGSBodyPart::LIMB_E
         pNode = apTarget->Get3D();
     }
     else {
-        pNode = 0;
+        pNode = nullptr;
     }
     iNumAdditionalLimbs = 0;
     if (pNode != SingleTarget.spObj.m_pObject && bScanning) {
-        bScanning = 0;
-        bExitScanMode = 0;
+        bScanning = false;
+        bExitScanMode = false;
     }
     if (bEffectEnabled && !bScanning) {
         if (apTarget) {
@@ -213,13 +214,13 @@ void FOVATSEffectManager::SetTarget(TESObjectREFR* apTarget, BGSBodyPart::LIMB_E
             if (v4 == SingleTarget.spObj.m_pObject) {
                 float a3 = gs_fBurstIntensity_VATS.Float();
                 float* v5 = &gs_fBurstDuration_VATS.Float();
-                TriggerBurst(*v5, a3, 1);
+                TriggerBurst(*v5, a3, true);
             }
         }
     }
     bOcclusionEnabled = abDoOcclusion;
     if (bOcclusionEnabled) {
-        bWaitingForOcclusionQuery[aeLimb] = 1;
+        bWaitingForOcclusionQuery[aeLimb] = true;
     }
     eLimb = aeLimb;
     SingleTarget.pRef = apTarget;
@@ -228,10 +229,10 @@ void FOVATSEffectManager::SetTarget(TESObjectREFR* apTarget, BGSBodyPart::LIMB_E
         pTarget3D = apTarget->Get3D();
     }
     else {
-        pTarget3D = 0;
+        pTarget3D = nullptr;
     }
     SingleTarget.spObj.operator=(pTarget3D);
-    bWaitingForOcclusionQuery[aeLimb] = 0;
+    bWaitingForOcclusionQuery[aeLimb] = false;
     bValidOcclusionResult[aeLimb] = 0;
     if (aeLimb != BGSBodyPart::LIMB_NONE) {
         if (pEntireLimbQuery[aeLimb]) {
@@ -239,14 +240,14 @@ void FOVATSEffectManager::SetTarget(TESObjectREFR* apTarget, BGSBodyPart::LIMB_E
             if (v12) {
                 delete v12;
             }
-            pEntireLimbQuery[aeLimb] = 0;
+            pEntireLimbQuery[aeLimb] = nullptr;
         }
         if (pPartialLimbQuery[aeLimb]) {
             BSOcclusionQuery* v11 = pPartialLimbQuery[aeLimb];
             if (v11) {
                 delete v11;
             }
-            pPartialLimbQuery[aeLimb] = 0;
+            pPartialLimbQuery[aeLimb] = nullptr;
         }
     }
 }
@@ -276,8 +277,8 @@ void FOVATSEffectManager::DrawSingleTarget(bool abQueryMode, FOVATSEffectManager
         pculler->SetAccumulator(spAccumulator.m_pObject);
         pculler->SetCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
         NiCamera* pcam = psg->GetCamera();
-        BaseProcess* pprocess = 0;
-        NiNode* pweapon = 0;
+        BaseProcess* pprocess = nullptr;
+        NiNode* pweapon = nullptr;
         if (SingleTarget.pRef->IsActor()) {
             pprocess = pactor->pCurrentProcess;
         }
@@ -294,10 +295,10 @@ void FOVATSEffectManager::DrawSingleTarget(bool abQueryMode, FOVATSEffectManager
             }
         }
         if (eLimb != BGSBodyPart::LIMB_WEAPON || aeDrawMode == FOVATSEffectManager::VATS_DRAW_ENTIRE_TARGET) {
-            bool bhidWeapon = 0;
+            bool bhidWeapon = false;
             if (pweapon) {
                 bhidWeapon = !pweapon->GetAppCulled();
-                pweapon->SetAppCulled(1);
+                pweapon->SetAppCulled(true);
             }
             BSShaderUtil::AccumulateScene(pcam, SingleTarget.spObj.m_pObject, *pculler);
             if (SingleTarget.pRef->IsActor()) {
@@ -334,13 +335,13 @@ void FOVATSEffectManager::DrawSingleTarget(bool abQueryMode, FOVATSEffectManager
             }
             if (pweapon) {
                 if (bhidWeapon) {
-                    pweapon->SetAppCulled(0);
+                    pweapon->SetAppCulled(false);
                 }
             }
         }
         BSShaderAccumulator* v4 = spAccumulator.m_pObject;
-        BSShaderUtil::RenderScene(pcam, v4, 0);
-        pculler->SetAccumulator(0);
+        BSShaderUtil::RenderScene(pcam, v4, false);
+        pculler->SetAccumulator(nullptr);
         pculler->SetCullMode(BSCullingProcess::BSCP_CULL_NORMAL);
         if (((bEffectEnabled && !bScanning) || abQueryMode) &&
             aeDrawMode != FOVATSEffectManager::VATS_DRAW_ENTIRE_TARGET) {
@@ -363,20 +364,20 @@ void FOVATSEffectManager::DrawMultipleTargets() {
         pCuller->SetCamera(pCamera);
         const NiFrustum* ViewFrustum = &pCamera->GetViewFrustum();
         pCuller->SetFrustum(*ViewFrustum);
-        bool bFlagsSet = 0;
-        NiAVObject* pRootObject = 0;
+        bool bFlagsSet = false;
+        NiAVObject* pRootObject = nullptr;
         for (int32_t i = 0; i < iNumMultiTargets; ++i) {
             ShadowSceneNode* shadowSceneNode = static_cast<ShadowSceneNode*>(pMultiTargets[i].spObj.m_pObject);
             if (i == iSelectedMultiTarget) {
                 BSShaderProperty::SetFlagRecurse(shadowSceneNode, BSShaderProperty::BSSP_FLAG_VATS_SELECTION, 1);
                 pRootObject = shadowSceneNode;
-                bFlagsSet = 1;
+                bFlagsSet = true;
             }
             BSShaderUtil::AccumulateScene(pCamera, shadowSceneNode, *pCuller);
         }
         BSShaderAccumulator* v4 = spAccumulator.m_pObject;
-        BSShaderUtil::RenderScene(pCamera, v4, 0);
-        pCuller->SetAccumulator(0);
+        BSShaderUtil::RenderScene(pCamera, v4, false);
+        pCuller->SetAccumulator(nullptr);
         if (bFlagsSet) {
             BSShaderProperty::SetFlagRecurse(pRootObject, BSShaderProperty::BSSP_FLAG_VATS_SELECTION, 0);
         }
@@ -401,7 +402,7 @@ void FOVATSEffectManager::UpdatePulse(float afTime) {
 }
 
 void FOVATSEffectManager::SetMultiTarget(TESObjectREFR* apTarget) {
-    bScanning = 0;
+    bScanning = false;
     for (int32_t i = 0; i < iNumMultiTargets; ++i) {
         if (pMultiTargets[i].pRef == apTarget) {
             return;
@@ -426,11 +427,11 @@ void FOVATSEffectManager::SetMultiTarget(TESObjectREFR* apTarget) {
 }
 
 void FOVATSEffectManager::TriggerBurst(float afBurstDuration, float afBurstIntensity, bool abPlaySound) {
-    bBurstActive = (bool)1;
+    bBurstActive = true;
     fBurstDuration = afBurstDuration;
     fBurstCurrentIntensity = afBurstIntensity;
     fBurstMaximumIntensity = afBurstIntensity;
-    fBurstStartTime = (float)((float)(&appTimer)->BSTimer::GetTime());
+    fBurstStartTime = ((float)(&appTimer)->BSTimer::GetTime());
 }
 
 void FOVATSEffectManager::SetEffectMode(const VATS_EFFECT_MODE& aMode) {
@@ -452,13 +453,13 @@ void FOVATSEffectManager::PrepareHighlightEffect(
     Instance->GetColor(1, newcolor);
     ImageSpaceEffectInterface::eMode = 1;
     ImageSpaceManager* ImageSpaceManager_ = BSShaderManager::GetImageSpaceManager();
-    ImageSpaceManager_->GetEffect(ImageSpaceManager::EFFECT_INTERFACE)->bIsActive = 1;
+    ImageSpaceManager_->GetEffect(ImageSpaceManager::EFFECT_INTERFACE)->bIsActive = true;
     ImageSpaceEffectInterface::spMaskTexture.operator=(static_cast<NiTexture*>(apSourceMask->GetTexture(0)));
     if (bDistortActive) {
         ImageSpaceEffectInterface::fDistortVerticalScale = gs_fDistortVerticalScale_VATS.Float();
         ImageSpaceEffectInterface::fDistortHorizontalScale = gs_fDistortHorizontalScale_VATS.Float();
         ImageSpaceEffectInterface::fDistortVerticalPosition = fDistortPosition;
-        ImageSpaceEffectInterface::bDistortEverywhere = 0;
+        ImageSpaceEffectInterface::bDistortEverywhere = false;
     }
     else {
         ImageSpaceEffectInterface::fDistortVerticalScale = 0.0f;
@@ -500,7 +501,7 @@ void FOVATSEffectManager::PrepareScanEffect(
     ImageSpaceEffectVATSScan::spScanlinesTexture.operator=(spScanlinesTexture);
     ImageSpaceEffectVATSScan::spMaskTexture.operator=(static_cast<NiTexture*>(apSourceMask->GetTexture(0)));
     ImageSpaceManager* ImageSpaceManager_ = BSShaderManager::GetImageSpaceManager();
-    ImageSpaceManager_->GetEffect(ImageSpaceManager::EFFECT_VATS_SCAN)->bIsActive = 1;
+    ImageSpaceManager_->GetEffect(ImageSpaceManager::EFFECT_VATS_SCAN)->bIsActive = true;
 }
 
 bool FOVATSEffectManager::OcclusionEnabled() {
@@ -516,7 +517,7 @@ void FOVATSEffectManager::DrawTargetToTexture(
     bool abStopRenderTarget
 ) {
     float args;
-    if (!SingleTarget.pRef->IsDead(0)) {
+    if (!SingleTarget.pRef->IsDead(false)) {
         float fTargetAlpha;
         Actor* pactor;
         NiDX9Renderer* pr = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
@@ -529,15 +530,15 @@ void FOVATSEffectManager::DrawTargetToTexture(
             NiRenderTargetGroup* Group = apTarget->GetGroup();
             BSRenderedTexture::StartOffscreen(aeClearMode, Group);
         }
-        Lighting30Shader::bAlwaysWriteAlpha = 1;
-        ShadowLightShader::bAlwaysWriteAlpha = 1;
+        Lighting30Shader::bAlwaysWriteAlpha = true;
+        ShadowLightShader::bAlwaysWriteAlpha = true;
         bool bIsOcclusionOn = bOcclusionEnabled;
-        bool bEndQuery = 0;
+        bool bEndQuery = false;
         if (SingleTarget.pRef->IsActor()) {
             pactor = static_cast<Actor*>(SingleTarget.pRef);
         }
         else {
-            pactor = 0;
+            pactor = nullptr;
         }
         if (pactor) {
             fTargetAlpha = pactor->GetAlpha();
@@ -545,7 +546,7 @@ void FOVATSEffectManager::DrawTargetToTexture(
         else {
             fTargetAlpha = 1.0f;
         }
-        ExtraRefractionProperty* pRPE = 0;
+        ExtraRefractionProperty* pRPE = nullptr;
         args = 0.0f;
         BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::HAS_IMPROVED_DETECTION, pPlayer, &args);
         if (pactor) {
@@ -553,13 +554,13 @@ void FOVATSEffectManager::DrawTargetToTexture(
                 pRPE = (&pactor->m_Extra)->GetRefractionPropertyExtra();
             }
         }
-        bool bHasRefraction = 0;
+        bool bHasRefraction = false;
         float fRefractPower = 0.0f;
         if (pRPE) {
             if (pactor) {
                 fRefractPower = pRPE->fRefractionPower;
-                bHasRefraction = 1;
-                pactor->SetRefraction(0, 0.0f);
+                bHasRefraction = true;
+                pactor->SetRefraction(false, 0.0f);
             }
         }
         if (bIsOcclusionOn) {
@@ -576,10 +577,10 @@ void FOVATSEffectManager::DrawTargetToTexture(
                     v10 = ::new (v16) BSOcclusionQuery;
                 }
                 else {
-                    v10 = 0;
+                    v10 = nullptr;
                 }
                 pPartialLimbQuery[eLimb] = v10;
-                bEndQuery = 1;
+                bEndQuery = true;
                 pPartialLimbQuery[eLimb]->Begin();
             }
             else {
@@ -596,10 +597,10 @@ void FOVATSEffectManager::DrawTargetToTexture(
                         pOcclusionQuery = ::new (v14) BSOcclusionQuery;
                     }
                     else {
-                        pOcclusionQuery = 0;
+                        pOcclusionQuery = nullptr;
                     }
                     pEntireLimbQuery[eLimb] = pOcclusionQuery;
-                    bEndQuery = 1;
+                    bEndQuery = true;
                     pEntireLimbQuery[eLimb]->Begin();
                 }
             }
@@ -613,7 +614,7 @@ void FOVATSEffectManager::DrawTargetToTexture(
             if (aQueryType == FOVATSEffectManager::VATS_OCCLUSION_QUERY_PARTIAL) {
                 if (pPartialLimbQuery[eLimb]) {
                     pPartialLimbQuery[eLimb]->End();
-                    bWaitingForOcclusionQuery[eLimb] = 1;
+                    bWaitingForOcclusionQuery[eLimb] = true;
                 }
                 else {
                     Warning("pPartialLimbQuery is NULL even though we just issued one.  This should be impossible.");
@@ -635,11 +636,11 @@ void FOVATSEffectManager::DrawTargetToTexture(
         }
         if (bHasRefraction) {
             if (pactor) {
-                pactor->SetRefraction(1, fRefractPower);
+                pactor->SetRefraction(true, fRefractPower);
             }
         }
-        Lighting30Shader::bAlwaysWriteAlpha = 0;
-        ShadowLightShader::bAlwaysWriteAlpha = 0;
+        Lighting30Shader::bAlwaysWriteAlpha = false;
+        ShadowLightShader::bAlwaysWriteAlpha = false;
         pr->SetBackgroundColorAlpha(prevcolor);
     }
 }
@@ -696,26 +697,26 @@ bool FOVATSEffectManager::IsScanning() {
 
 void FOVATSEffectManager::DisableScan() {
     if (bScanning) {
-        bExitScanMode = (bool)1;
+        bExitScanMode = true;
     }
 }
 
 void FOVATSEffectManager::TriggerDistort() {
-    bDistortActive = (bool)1;
-    fDistortStartTime = (float)((float)(&appTimer)->BSTimer::GetTime());
+    bDistortActive = true;
+    fDistortStartTime = ((float)(&appTimer)->BSTimer::GetTime());
     fDistortPosition = (float)0.0;
 }
 
 void FOVATSEffectManager::TriggerScan() {
     if (!bScanning) {
-        bScanning = (bool)1;
+        bScanning = true;
         fScanStartTime = (-0x1p+0f);
         fScanPosition = (float)0.0;
     }
 }
 
 void FOVATSEffectManager::UpdateTargetPulse(float afTime) {
-    float x = afTime * ((&::fVATSTargetPulseRate)->Float());
+    float x = afTime * (&::fVATSTargetPulseRate)->Float();
     float v4 = (float)((std::sinf(x) + 1.0) * 0.5);
     fPulseIntensity = v4;
 }
@@ -728,7 +729,7 @@ void FOVATSEffectManager::SetSelectedMultiTarget(TESObjectREFR* apTarget) {
             iIndex = i;
         }
     }
-    if (iIndex == ((-1))) {
+    if (iIndex == (-1)) {
         if (iNumMultiTargets < 32) {
             iSelectedMultiTarget = iNumMultiTargets;
             SetMultiTarget(apTarget);
@@ -744,27 +745,27 @@ void FOVATSEffectManager::UpdateBurst(float afTime) {
     float v3 = afTime - fBurstStartTime;
     if (!(fBurstDuration < ((double)v3))) {
         v2 = (float)(1.0 - (v3 / fBurstDuration));
-        fBurstCurrentIntensity = (float)(fBurstMaximumIntensity * v2);
+        fBurstCurrentIntensity = (fBurstMaximumIntensity * v2);
     }
     else {
-        bBurstActive = (bool)0;
+        bBurstActive = false;
     }
 }
 
 void FOVATSEffectManager::UpdateDistort(float afTime) {
     int32_t v2;
     float v4 = afTime - fDistortStartTime;
-    fDistortPosition = (float)(v4 / fDistortDuration);
-    if (fDistortPosition > (((&gs_fDistortVerticalScale_VATS)->Float()) + 1.0)) {
-        bDistortActive = (bool)0;
+    fDistortPosition = (v4 / fDistortDuration);
+    if (fDistortPosition > ((&gs_fDistortVerticalScale_VATS)->Float() + 1.0)) {
+        bDistortActive = false;
         v2 = rt::rand();
-        fNextDistortTime = (float)(((double)(v2 % ((int32_t)((&gs_iDistortMaxInterval_VATS)->UInt())))) + afTime);
+        fNextDistortTime = (float)(((double)(v2 % ((int32_t)(&gs_iDistortMaxInterval_VATS)->UInt()))) + afTime);
     }
 }
 
 void FOVATSEffectManager::DisableOcclusion() {
     InitializationFlow("--==OCCLUSION DISABLED==--\n");
-    bOcclusionEnabled = (bool)0;
+    bOcclusionEnabled = false;
 }
 
 void FOVATSEffectManager::UpdateScan(float afTime) {
@@ -774,13 +775,13 @@ void FOVATSEffectManager::UpdateScan(float afTime) {
         fScanStartTime = afTime;
     }
     float v5 = afTime - fScanStartTime;
-    fScanPosition = (float)(v5 / ((&gs_fScanModeDuration_VATS)->Float()));
-    if (bExitScanMode && (fScanPosition > (((&gs_fScanModeVerticalScale_VATS)->Float()) + 1.0))) {
-        bScanning = (bool)0;
-        bExitScanMode = (bool)0;
+    fScanPosition = (v5 / (&gs_fScanModeDuration_VATS)->Float());
+    if (bExitScanMode && (fScanPosition > ((&gs_fScanModeVerticalScale_VATS)->Float() + 1.0))) {
+        bScanning = false;
+        bExitScanMode = false;
         a3 = (&gs_fBurstIntensity_VATS)->Float();
         v2 = &gs_fBurstDuration_VATS.Float();
-        TriggerBurst(*v2, a3, 1);
+        TriggerBurst(*v2, a3, true);
     }
 }
 
@@ -807,7 +808,7 @@ void* FOVATSEffectManager::ClearsData_() {
 
 FOVATSEffectManager* FOVATSEffectManager::Clears() {
     ClearsData();
-    SingleTarget.pRef = 0;
+    SingleTarget.pRef = nullptr;
     return this;
 }
 
@@ -839,7 +840,7 @@ void FOVATSEffectManager::IsolateBodyPart() {
                                 ptri_2 = pobj_2->IsGeometry();
                             }
                             else {
-                                ptri_2 = 0;
+                                ptri_2 = nullptr;
                             }
                             v17 = ptri_2;
                             ++n_2;
@@ -848,7 +849,7 @@ void FOVATSEffectManager::IsolateBodyPart() {
                             pskin = v17->GetSkinInstance();
                         }
                         else {
-                            pskin = 0;
+                            pskin = nullptr;
                         }
                         NiObject* pkObject = pskin;
                         BSDismemberSkinInstance* pdSkinInstance = static_cast<BSDismemberSkinInstance*>(
@@ -861,16 +862,16 @@ void FOVATSEffectManager::IsolateBodyPart() {
                                 EnableBodyPartOnSkinInstance(pdSkinInstance, eindex, eindex == eLimb);
                                 for (int32_t i = 0; i < iNumAdditionalLimbs; ++i) {
                                     if (eindex == pAdditionalLimbs[i]) {
-                                        EnableBodyPartOnSkinInstance(pdSkinInstance, eindex, 1);
+                                        EnableBodyPartOnSkinInstance(pdSkinInstance, eindex, true);
                                     }
                                 }
                             }
                         }
-                        v17 = 0;
+                        v17 = nullptr;
                     }
                 }
                 else {
-                    pobj->SetAppCulled(1);
+                    pobj->SetAppCulled(true);
                 }
             }
         }
@@ -887,11 +888,11 @@ void FOVATSEffectManager::IsolateBodyPart() {
                         NiAVObject* plimbNode = v2->GetObjectByName(*v1);
                         apString.~NiFixedString();
                         if (plimbNode && eindex_2 == eLimb) {
-                            plimbNode->SetAppCulled(0);
+                            plimbNode->SetAppCulled(false);
                         }
                         else {
                             if (plimbNode) {
-                                plimbNode->SetAppCulled(1);
+                                plimbNode->SetAppCulled(true);
                             }
                         }
                     }
@@ -899,22 +900,22 @@ void FOVATSEffectManager::IsolateBodyPart() {
             }
         }
         if (eLimb != BGSBodyPart::LIMB_LEFT_ARM_1 && eLimb != BGSBodyPart::LIMB_LEFT_ARM_2) {
-            ShowBipedObjectOnActor(pactor, BO_LEFT_HAND, 0);
+            ShowBipedObjectOnActor(pactor, BO_LEFT_HAND, false);
         }
         if (eLimb != BGSBodyPart::LIMB_RIGHT_ARM_1 && eLimb != BGSBodyPart::LIMB_RIGHT_ARM_2) {
-            ShowBipedObjectOnActor(pactor, BO_RIGHT_HAND, 0);
+            ShowBipedObjectOnActor(pactor, BO_RIGHT_HAND, false);
         }
         if (eLimb != BGSBodyPart::LIMB_HEAD_1 && eLimb != BGSBodyPart::LIMB_HEAD_2) {
-            ShowBipedObjectOnActor(pactor, BO_HAT, 0);
-            ShowBipedObjectOnActor(pactor, BO_EYE_GLASSES, 0);
-            ShowBipedObjectOnActor(pactor, BO_NOSE_RING, 0);
-            ShowBipedObjectOnActor(pactor, BO_EARRINGS, 0);
-            ShowBipedObjectOnActor(pactor, BO_HEADBAND, 0);
-            ShowBipedObjectOnActor(pactor, BO_MASK, 0);
-            ShowBipedObjectOnActor(pactor, BO_CHOKER, 0);
-            ShowBipedObjectOnActor(pactor, BO_MOUTH_OBJECT, 0);
-            ShowBipedObjectOnActor(pactor, BO_HAIR, 0);
-            ShowBipedObjectOnActor(pactor, BO_HEAD, 0);
+            ShowBipedObjectOnActor(pactor, BO_HAT, false);
+            ShowBipedObjectOnActor(pactor, BO_EYE_GLASSES, false);
+            ShowBipedObjectOnActor(pactor, BO_NOSE_RING, false);
+            ShowBipedObjectOnActor(pactor, BO_EARRINGS, false);
+            ShowBipedObjectOnActor(pactor, BO_HEADBAND, false);
+            ShowBipedObjectOnActor(pactor, BO_MASK, false);
+            ShowBipedObjectOnActor(pactor, BO_CHOKER, false);
+            ShowBipedObjectOnActor(pactor, BO_MOUTH_OBJECT, false);
+            ShowBipedObjectOnActor(pactor, BO_HAIR, false);
+            ShowBipedObjectOnActor(pactor, BO_HEAD, false);
         }
     }
 }
@@ -932,18 +933,18 @@ void FOVATSEffectManager::RestoreBodyParts() {
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (SingleTarget.pRef->IsActor() && eLimb != BGSBodyPart::LIMB_WEAPON && eLimb != BGSBodyPart::LIMB_COUNT) {
         Actor* pactor = static_cast<Actor*>(SingleTarget.pRef);
-        ShowBipedObjectOnActor(pactor, BO_LEFT_HAND, 1);
-        ShowBipedObjectOnActor(pactor, BO_RIGHT_HAND, 1);
-        ShowBipedObjectOnActor(pactor, BO_HAT, 1);
-        ShowBipedObjectOnActor(pactor, BO_EYE_GLASSES, 1);
-        ShowBipedObjectOnActor(pactor, BO_NOSE_RING, 1);
-        ShowBipedObjectOnActor(pactor, BO_EARRINGS, 1);
-        ShowBipedObjectOnActor(pactor, BO_HEADBAND, 1);
-        ShowBipedObjectOnActor(pactor, BO_MASK, 1);
-        ShowBipedObjectOnActor(pactor, BO_CHOKER, 1);
-        ShowBipedObjectOnActor(pactor, BO_MOUTH_OBJECT, 1);
-        ShowBipedObjectOnActor(pactor, BO_HAIR, 1);
-        ShowBipedObjectOnActor(pactor, BO_HEAD, 1);
+        ShowBipedObjectOnActor(pactor, BO_LEFT_HAND, true);
+        ShowBipedObjectOnActor(pactor, BO_RIGHT_HAND, true);
+        ShowBipedObjectOnActor(pactor, BO_HAT, true);
+        ShowBipedObjectOnActor(pactor, BO_EYE_GLASSES, true);
+        ShowBipedObjectOnActor(pactor, BO_NOSE_RING, true);
+        ShowBipedObjectOnActor(pactor, BO_EARRINGS, true);
+        ShowBipedObjectOnActor(pactor, BO_HEADBAND, true);
+        ShowBipedObjectOnActor(pactor, BO_MASK, true);
+        ShowBipedObjectOnActor(pactor, BO_CHOKER, true);
+        ShowBipedObjectOnActor(pactor, BO_MOUTH_OBJECT, true);
+        ShowBipedObjectOnActor(pactor, BO_HAIR, true);
+        ShowBipedObjectOnActor(pactor, BO_HEAD, true);
         int32_t ilimb = eLimb;
         NiNode* pactorRoot = SingleTarget.pRef->Get3D();
         for (uint32_t n = 0; n < pactorRoot->GetArrayCount(); ++n) {
@@ -962,7 +963,7 @@ void FOVATSEffectManager::RestoreBodyParts() {
                                 ptri_2 = pobj_2->IsGeometry();
                             }
                             else {
-                                ptri_2 = 0;
+                                ptri_2 = nullptr;
                             }
                             v16 = ptri_2;
                             ++n_2;
@@ -971,7 +972,7 @@ void FOVATSEffectManager::RestoreBodyParts() {
                             pskin = v16->GetSkinInstance();
                         }
                         else {
-                            pskin = 0;
+                            pskin = nullptr;
                         }
                         NiObject* pkObject = pskin;
                         BSDismemberSkinInstance* pdSkinInstance = static_cast<BSDismemberSkinInstance*>(
@@ -981,17 +982,17 @@ void FOVATSEffectManager::RestoreBodyParts() {
                             for (BGSBodyPart::LIMB_ENUM eindex = BGSBodyPart::LIMB_TORSO;
                                  eindex < BGSBodyPart::LIMB_COUNT;
                                  eindex = static_cast<BGSBodyPart::LIMB_ENUM>(eindex + 1)) {
-                                pdSkinInstance->SetBodyPartEnabled(eindex, 1);
-                                pdSkinInstance->SetBodyPartEnabled(1000 * eindex, 1);
-                                pdSkinInstance->SetBodyPartEnabled(eindex + 100, 0);
-                                pdSkinInstance->SetBodyPartEnabled(eindex + 200, 0);
+                                pdSkinInstance->SetBodyPartEnabled(eindex, true);
+                                pdSkinInstance->SetBodyPartEnabled(1000 * eindex, true);
+                                pdSkinInstance->SetBodyPartEnabled(eindex + 100, false);
+                                pdSkinInstance->SetBodyPartEnabled(eindex + 200, false);
                             }
                         }
-                        v16 = 0;
+                        v16 = nullptr;
                     }
                 }
                 else {
-                    pobj->SetAppCulled(0);
+                    pobj->SetAppCulled(false);
                 }
             }
         }
@@ -1008,7 +1009,7 @@ void FOVATSEffectManager::RestoreBodyParts() {
                         NiAVObject* plimbNode = v2->GetObjectByName(*v1);
                         apString.~NiFixedString();
                         if (plimbNode) {
-                            plimbNode->SetAppCulled(0);
+                            plimbNode->SetAppCulled(false);
                         }
                     }
                 }
@@ -1020,21 +1021,21 @@ void FOVATSEffectManager::RestoreBodyParts() {
 void FOVATSEffectManager::FreeOcclusionQueries() {
     uint32_t a2;
     for (uint32_t i = 0; i < 15; ++i) {
-        bWaitingForOcclusionQuery[i] = 0;
+        bWaitingForOcclusionQuery[i] = false;
         a2 = 0;
         if (pPartialLimbQuery[i]) {
-            pPartialLimbQuery[i]->GetResult(&a2, 1u);
+            pPartialLimbQuery[i]->GetResult(&a2, true);
             if (pPartialLimbQuery[i]) {
                 delete pPartialLimbQuery[i];
             }
-            pPartialLimbQuery[i] = 0;
+            pPartialLimbQuery[i] = nullptr;
         }
         if (pEntireLimbQuery[i]) {
-            pEntireLimbQuery[i]->GetResult(&a2, 1u);
+            pEntireLimbQuery[i]->GetResult(&a2, true);
             if (pEntireLimbQuery[i]) {
                 delete pEntireLimbQuery[i];
             }
-            pEntireLimbQuery[i] = 0;
+            pEntireLimbQuery[i] = nullptr;
         }
     }
 }

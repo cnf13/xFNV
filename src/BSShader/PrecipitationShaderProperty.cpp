@@ -107,7 +107,7 @@ void PrecipitationShaderProperty::GetViewerStrings(NiTPrimitiveArray<char*>* apS
         apStrings->SetAt(v13, v20);
     }
     if (GetClampNI() == NiTexturingProperty::CLAMP_S_CLAMP_T) {
-        char* ViewerString_0 = NiGetViewerString("clamp", static_cast<bool>(1));
+        char* ViewerString_0 = NiGetViewerString("clamp", true);
         uint32_t v15 = apStrings->m_usSize;
         uint32_t v16 = apStrings->m_usMaxSize;
         v20 = ViewerString_0;
@@ -137,14 +137,14 @@ bool PrecipitationShaderProperty::SetupGeometry(NiGeometry* apGeometry) {
     }
     NiTexturingProperty* ptexprop = static_cast<NiTexturingProperty*>(pkState->m_aspProps[5].m_pObject);
     if (!ptexprop) {
-        return 0;
+        return false;
     }
     NiTexturingProperty::Map* v4 = *ptexprop->m_kMaps.m_pBase;
     if (v4) {
         m_pObject = v4->m_spTexture.m_pObject;
     }
     else {
-        m_pObject = 0;
+        m_pObject = nullptr;
     }
     spBaseTexture = m_pObject;
     NiTexturingProperty::Map** m_pBase = ptexprop->m_kMaps.m_pBase;
@@ -156,7 +156,7 @@ bool PrecipitationShaderProperty::SetupGeometry(NiGeometry* apGeometry) {
     }
     SetClampNI(v8);
     apGeometry->DetachProperty(ptexprop);
-    return 1;
+    return true;
 }
 
 BSShaderProperty::RenderPassArray* PrecipitationShaderProperty::GetRenderPasses(
@@ -173,7 +173,7 @@ BSShaderProperty::RenderPassArray* PrecipitationShaderProperty::GetRenderPasses(
     if (iLastRenderPassState != aiEnabledPasses) {
         CheckCreateRenderPassArray(1);
         pRenderPassList->iSize = 0;
-        pRenderPassList->Add(apGeom, 719u, 1, 0, 0, 0, 0, 0);
+        pRenderPassList->Add(apGeom, 719u, 1, 0, nullptr, nullptr, nullptr, nullptr);
         iLastRenderPassState = aiEnabledPasses | auiRenderMode << 8;
     }
     BSShaderProperty::RenderPassArray* result = pRenderPassList;

@@ -57,19 +57,19 @@ NiRenderedTexture* NiRenderedTexture::Create(
 ) {
     NiRenderedTexture* pkThis;
     if (!apkRenderer) {
-        return 0;
+        return nullptr;
     }
     if ((!uiWidth || (uiWidth - 1 & uiWidth) != 0 || !uiHeight || (uiHeight - 1 & uiHeight) != 0) &&
         (apkRenderer->GetFlags() & NiRenderer::CAPS_NONPOW2_TEXT) == 0 &&
         (apkRenderer->GetFlags() & NiRenderer::CAPS_NONPOW2_CONDITIONAL_TEXT) == 0) {
-        return 0;
+        return nullptr;
     }
     NiRenderedTexture* v9 = static_cast<NiRenderedTexture*>(NiMemObject::operator new(sizeof(NiRenderedTexture)));
     if (v9) {
         pkThis = ::new (v9) NiRenderedTexture;
     }
     else {
-        pkThis = 0;
+        pkThis = nullptr;
     }
     pkThis->m_kFormatPrefs = kPrefs;
     pkThis->pAliasTexture = apAliasTex;
@@ -81,11 +81,11 @@ NiRenderedTexture* NiRenderedTexture::Create(
     pkThis->bRenderedTexture = NiRenderedTexture::bStaticRenderedTexture;
     if (apkRenderer->CreateRenderedTextureRendererData(pkThis, eMSAAPref)) {
         pkThis->eMSAA = eMSAAPref;
-        pkThis->pAliasTexture = 0;
+        pkThis->pAliasTexture = nullptr;
         return pkThis;
     }
     else {
         delete pkThis;
-        return 0;
+        return nullptr;
     }
 }

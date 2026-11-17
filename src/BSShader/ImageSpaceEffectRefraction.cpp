@@ -46,9 +46,9 @@ void ImageSpaceEffectRefraction::Render(
     ImageSpaceTexture* p_spRefractionNormalBuffer = &spRefractionNormalBuffer;
     pShader->SetTexture(2, p_spRefractionNormalBuffer, NiTexturingProperty::FILTER_NEAREST);
     pShader->Render(apGeometry, apRenderer, v8, 1);
-    pShader->SetTexture(0, 0, NiTexturingProperty::FILTER_NEAREST);
-    pShader->SetTexture(1, 0, NiTexturingProperty::FILTER_NEAREST);
-    pShader->SetTexture(2, 0, NiTexturingProperty::FILTER_NEAREST);
+    pShader->SetTexture(0, nullptr, NiTexturingProperty::FILTER_NEAREST);
+    pShader->SetTexture(1, nullptr, NiTexturingProperty::FILTER_NEAREST);
+    pShader->SetTexture(2, nullptr, NiTexturingProperty::FILTER_NEAREST);
     BSTextureManager* v11 = BSShaderManager::pTextureManager;
     BSRenderedTexture* RenderedTexture = p_spRefractionNormalBuffer->GetRenderedTexture();
     v11->ReturnRenderedTexture(RenderedTexture);
@@ -67,7 +67,7 @@ void ImageSpaceEffectRefraction::Setup(ImageSpaceManager* apManager, ImageSpaceE
         pparam = ::new (pMemory) ImageSpaceShaderParam;
     }
     else {
-        pparam = 0;
+        pparam = nullptr;
     }
     pparam->InitConstantMap(0, 1);
     NiPoint4 kTint = BSShaderLightingProperty::pShaderLightConstants[0];
@@ -79,7 +79,7 @@ void ImageSpaceEffectRefraction::Setup(ImageSpaceManager* apManager, ImageSpaceE
 }
 
 bool ImageSpaceEffectRefraction::IsActive() {
-    return ((&spRefractionNormalBuffer)->GetTexture() != 0);
+    return ((&spRefractionNormalBuffer)->GetTexture() != nullptr);
 }
 
 bool ImageSpaceEffectRefraction::UpdateParams(ImageSpaceEffectParam* apParam) {
@@ -88,7 +88,7 @@ bool ImageSpaceEffectRefraction::UpdateParams(ImageSpaceEffectParam* apParam) {
         BSShaderManager::pImageSpaceManager->kRefractionTint.g, BSShaderManager::pImageSpaceManager->kRefractionTint.b,
         BSShaderManager::pImageSpaceManager->kRefractionTint.a
     );
-    return (bool)1;
+    return true;
 }
 
 BSRenderedTexture* ImageSpaceEffectRefraction::GetRefractionNormalsTexture(bool abCreate) {

@@ -139,8 +139,8 @@ void Character::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     fArmorRating = (-0x1p+0f);
     fArmorThreshold = (-0x1p+0f);
     fequippedweight = (-0x1p+0f);
-    bTrespassing = (bool)0;
-    bGuard = (bool)0;
+    bTrespassing = false;
+    bGuard = false;
 }
 
 void Character::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
@@ -246,7 +246,7 @@ void Character::Update(float afDelta) {
                                     for (uint32_t n = 0; n < icount; ++n) {
                                         NiMorphData::MorphTarget* ptarget = panimMorph->GetTarget(n);
                                         NiInterpolator* pinterp = panimMorph->GetInterpolator(n);
-                                        NiBlendFloatInterpolator* pfloatInterp = 0;
+                                        NiBlendFloatInterpolator* pfloatInterp = nullptr;
                                         if (NiObject::IsExactKindOf(&NiBlendFloatInterpolator::ms_RTTI, pinterp)) {
                                             pfloatInterp = static_cast<NiBlendFloatInterpolator*>(pinterp);
                                         }
@@ -574,9 +574,9 @@ void Character::InitiateSandmanPackage(
     if (!IsInCombat()) {
         PackageTarget* pnew;
         PackageLocation* ploc;
-        pCurrentProcess->SetRunOncePackage(0, this);
+        pCurrentProcess->SetRunOncePackage(nullptr, this);
         BaseProcess* CurrentAIProcess = pCurrentProcess;
-        CurrentAIProcess->ClearActionHeadTrackTarget(0);
+        CurrentAIProcess->ClearActionHeadTrackTarget(false);
         BaseProcess* v15 = pCurrentProcess;
         v15->GetCurrentPackage();
         if (GetCurrentPackage()) {
@@ -586,14 +586,14 @@ void Character::InitiateSandmanPackage(
             }
         }
         TESPackage* ppack = TESPackage::CreatePackage(PACKAGE_TYPE_SANDMAN);
-        ppack->SetMustReachLocation(1);
-        ppack->SetMustComplete(1);
+        ppack->SetMustReachLocation(true);
+        ppack->SetMustComplete(true);
         PackageLocation* v19 = static_cast<PackageLocation*>(ourMalloc(sizeof(PackageLocation)));
         if (v19) {
             ploc = ::new (v19) PackageLocation;
         }
         else {
-            ploc = 0;
+            ploc = nullptr;
         }
         ploc->SetLocType(PLT_REFERENCE);
         ploc->SetLocReference(this);
@@ -606,7 +606,7 @@ void Character::InitiateSandmanPackage(
             pnew = ::new (v18) PackageTarget;
         }
         else {
-            pnew = 0;
+            pnew = nullptr;
         }
         ppack->SetPackageTarget(pnew);
         if (pnew) {
@@ -628,7 +628,7 @@ void Character::InitiateSandmanPackage(
             (&m_Extra)->SetPackageExtra(v6, v7, v8, v9, v10, v11);
         }
         pCurrentProcess->SetFurniture(apfurniture, auiIndex, aMarker);
-        PutCreatedPackage(ppack, 0, 1);
+        PutCreatedPackage(ppack, false, true);
         apTarget->InitiateDoNothingPackage();
     }
 }
@@ -646,34 +646,34 @@ void Character::ResetArmorRating() {
 bool Character::InitiateTresPassPackage(TrespassPackage* apPack) {
     TESPackage* currentPackage;
     if (Actor::IsInCombat() ||
-        (IsDead((bool)0) ||
+        (IsDead(false) ||
          (Actor::IsAlarmed() ||
-          (Actor::IsFleeing(0) || (IsTresPassing() || (apPack && (((int32_t)apPack->GetNumberActors()) > 1))))))) {
-        return (bool)0;
+          (Actor::IsFleeing(false) || (IsTresPassing() || (apPack && (((int32_t)apPack->GetNumberActors()) > 1))))))) {
+        return false;
     }
     if (GetSitSleepState() && ((((int32_t)GetSitSleepState()) != 4) && (((int32_t)GetSitSleepState()) != 9))) {
-        return (bool)0;
+        return false;
     }
     if (!apPack) {
-        return (bool)0;
+        return false;
     }
     pCurrentProcess->ClearRunOncePackage();
     BaseProcess* currentAIProcess = MobileObject::GetCurrentAIProcess();
-    currentAIProcess->ClearActionHeadTrackTarget((bool)1);
+    currentAIProcess->ClearActionHeadTrackTarget(true);
     if (MobileObject::GetCurrentPackage()) {
         currentPackage = MobileObject::GetCurrentPackage();
         if (currentPackage->IsInterruptPackage()) {
-            Actor::EndInterruptPackage(0);
+            Actor::EndInterruptPackage(false);
         }
     }
     BaseProcess* v5 = MobileObject::GetCurrentAIProcess();
     v5->ComputeLastTimeProcessed();
     BaseProcess* v4 = MobileObject::GetCurrentAIProcess();
     v4->SavePackageToExtraData(this);
-    PutCreatedPackage(apPack, (bool)0, (bool)0);
+    PutCreatedPackage(apPack, false, false);
     apPack->ModNumberActors(1);
     pCurrentProcess->SetProcedureIndexRunning((uint32_t)0);
-    return (bool)1;
+    return true;
 }
 
 void Character::InitiateSpectator() {
@@ -698,7 +698,7 @@ void Character::InitiateSpectator() {
                         SpectatorPackage* pspecPack;
                         pCurrentProcess->ClearRunOncePackage();
                         BaseProcess* CurrentAIProcess = pCurrentProcess;
-                        CurrentAIProcess->ClearActionHeadTrackTarget(1);
+                        CurrentAIProcess->ClearActionHeadTrackTarget(true);
                         if (pCurrentProcess->GetSitSleepState() == SIT_SLEEP_IS_SITTING || IsSleeping()) {
                             InitiateGetUpPackage();
                         }
@@ -708,7 +708,7 @@ void Character::InitiateSpectator() {
                             pspecPack = ::new (apMemory) SpectatorPackage;
                         }
                         else {
-                            pspecPack = 0;
+                            pspecPack = nullptr;
                         }
                         BaseProcess* v7 = pCurrentProcess;
                         v7->ComputeLastTimeProcessed();
@@ -722,13 +722,13 @@ void Character::InitiateSpectator() {
                                 BaseProcess* v5 = pCurrentProcess;
                                 TESPackage* v3 = v5->GetPackageThatIsRunning();
                                 if (v3->IsInterruptPackage()) {
-                                    EndInterruptPackage(0);
+                                    EndInterruptPackage(false);
                                 }
                             }
                         }
                         BaseProcess* v4 = pCurrentProcess;
                         v4->SavePackageToExtraData(this);
-                        PutCreatedPackage(pspecPack, 0, 1);
+                        PutCreatedPackage(pspecPack, false, true);
                     }
                 }
             }
@@ -739,17 +739,17 @@ void Character::InitiateSpectator() {
 float Character::GetArmorRating() {
     TESObjectARMO* parmorFound[20];
     int32_t iarmorFoundCount = 0;
-    parmorFound[0] = 0;
+    parmorFound[0] = nullptr;
     if (fArmorRating < 0.0) {
         fArmorRating = 0.0f;
         InventoryChanges* pinventory = (&m_Extra)->GetContainerChanges();
         if (pinventory) {
             for (BIPED_OBJECT i = BO_HEAD; i < BIPED_OBJECT_COUNT; i = static_cast<BIPED_OBJECT>(i + 1)) {
-                ItemChange* pchange = pinventory->GetWornItem(i, 0);
+                ItemChange* pchange = pinventory->GetWornItem(i, false);
                 if (pchange) {
                     TESObjectARMO* parmo = dynamic_cast<TESObjectARMO*>(pchange->pContainerObj);
                     if (parmo) {
-                        bool balreadyCounted = 0;
+                        bool balreadyCounted = false;
                         if (iarmorFoundCount) {
                             for (int32_t j = 0; j < iarmorFoundCount && !balreadyCounted; ++j) {
                                 balreadyCounted = parmorFound[j] == parmo;
@@ -761,7 +761,7 @@ float Character::GetArmorRating() {
                                 a2 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(*this));
                             }
                             else {
-                                a2 = 0;
+                                a2 = nullptr;
                             }
                             fArmorRating = pchange->GetConditionScaledDR(a2) + fArmorRating;
                             parmorFound[iarmorFoundCount++] = parmo;
@@ -784,17 +784,17 @@ float Character::GetArmorRating() {
 float Character::GetArmorThreshold() {
     TESObjectARMO* parmorFound[20];
     int32_t iarmorFoundCount = 0;
-    parmorFound[0] = 0;
+    parmorFound[0] = nullptr;
     if (fArmorThreshold < 0.0) {
         fArmorThreshold = 0.0f;
         InventoryChanges* pinventory = (&m_Extra)->GetContainerChanges();
         if (pinventory) {
             for (int32_t i = 0; i < 20; ++i) {
-                ItemChange* pchange = pinventory->GetWornItem(static_cast<BIPED_OBJECT>(i), 0);
+                ItemChange* pchange = pinventory->GetWornItem(static_cast<BIPED_OBJECT>(i), false);
                 if (pchange) {
                     TESObjectARMO* parmo = dynamic_cast<TESObjectARMO*>(pchange->pContainerObj);
                     if (parmo) {
-                        bool balreadyCounted = 0;
+                        bool balreadyCounted = false;
                         if (iarmorFoundCount) {
                             for (int32_t j = 0; j < iarmorFoundCount && !balreadyCounted; ++j) {
                                 balreadyCounted = parmorFound[j] == parmo;
@@ -806,7 +806,7 @@ float Character::GetArmorThreshold() {
                                 a2 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(*this));
                             }
                             else {
-                                a2 = 0;
+                                a2 = nullptr;
                             }
                             fArmorThreshold = pchange->GetModifiedDamageThreshold(a2) + fArmorThreshold;
                             parmorFound[iarmorFoundCount++] = parmo;
@@ -824,10 +824,10 @@ int32_t Character::GetAttackDamage() {
     float v3 = (float)0.0;
     float v2 = (float)0.0;
     if (this) {
-        CombatFormulas::CalcHandToHandDamage(static_cast<ActorValueOwner*>(this), 0, v3, v2);
+        CombatFormulas::CalcHandToHandDamage(static_cast<ActorValueOwner*>(this), false, v3, v2);
     }
     else {
-        CombatFormulas::CalcHandToHandDamage(nullptr, 0, v3, v2);
+        CombatFormulas::CalcHandToHandDamage(nullptr, false, v3, v2);
     }
     return (int32_t)v3;
 }
@@ -875,9 +875,9 @@ void Character::InitiateCannibal(Actor* apTarget) {
     if (!IsInCombat()) {
         PackageTarget* pnew;
         PackageLocation* ploc;
-        pCurrentProcess->SetRunOncePackage(0, this);
+        pCurrentProcess->SetRunOncePackage(nullptr, this);
         BaseProcess* CurrentAIProcess = pCurrentProcess;
-        CurrentAIProcess->ClearActionHeadTrackTarget(0);
+        CurrentAIProcess->ClearActionHeadTrackTarget(false);
         BaseProcess* v12 = pCurrentProcess;
         v12->GetCurrentPackage();
         if (GetCurrentPackage()) {
@@ -887,14 +887,14 @@ void Character::InitiateCannibal(Actor* apTarget) {
             }
         }
         TESPackage* ppack = TESPackage::CreatePackage(PACKAGE_TYPE_CANNIBAL);
-        ppack->SetMustReachLocation(1);
-        ppack->SetMustComplete(1);
+        ppack->SetMustReachLocation(true);
+        ppack->SetMustComplete(true);
         PackageLocation* v16 = static_cast<PackageLocation*>(ourMalloc(sizeof(PackageLocation)));
         if (v16) {
             ploc = ::new (v16) PackageLocation;
         }
         else {
-            ploc = 0;
+            ploc = nullptr;
         }
         ploc->SetLocType(PLT_REFERENCE);
         ploc->SetLocReference(this);
@@ -907,7 +907,7 @@ void Character::InitiateCannibal(Actor* apTarget) {
             pnew = ::new (v15) PackageTarget;
         }
         else {
-            pnew = 0;
+            pnew = nullptr;
         }
         ppack->SetPackageTarget(pnew);
         if (pnew) {
@@ -928,7 +928,7 @@ void Character::InitiateCannibal(Actor* apTarget) {
             TESPackage* v3 = pCurrentProcess->GetCurrentPackage();
             (&m_Extra)->SetPackageExtra(v3, v4, v5, v6, v7, v8);
         }
-        PutCreatedPackage(ppack, 0, 1);
+        PutCreatedPackage(ppack, false, true);
         apTarget->InitiateDoNothingPackage();
     }
 }
@@ -978,7 +978,7 @@ float Character::GetClothingValue() {
     InventoryChanges* ContainerChanges = (&m_Extra)->GetContainerChanges();
     if (ContainerChanges) {
         for (BIPED_OBJECT part = BO_HEAD; part < BIPED_OBJECT_COUNT; part = static_cast<BIPED_OBJECT>(part + 1)) {
-            ItemChange* WornItem = ContainerChanges->GetWornItem(part, 0);
+            ItemChange* WornItem = ContainerChanges->GetWornItem(part, false);
             if (WornItem) {
                 char* v8 = static_cast<char*>(FNVD_DYNAMIC_CAST_VOID(TESObjectARMO)(
                     WornItem->pContainerObj, RTTI_TESBoundObject, RTTI_TESObjectARMO

@@ -158,7 +158,7 @@ int32_t hkCollideCapsuleUtilManifoldCapsVsCaps(
     __m128 v9 = _mm_sub_ps(capsBPoints[1].m_quad, capsBPoints->m_quad);
     __m128 v10 = _mm_sub_ps(m_quad, capsAPointsIn->m_quad);
     __m128 v11 = _mm_mul_ps(v9, v10);
-    float v124 = _mm_shuffle_ps(v11, v11, 170)[0] + static_cast<float>(_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
+    float v124 = _mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
     float v123 = v124;
     __m128 v129 = v10;
     __m128 v133 = v9;
@@ -176,12 +176,12 @@ int32_t hkCollideCapsuleUtilManifoldCapsVsCaps(
     __m128 v13 = _mm_sub_ps(m_quad_2, m_quad_3);
     __m128 v14 = _mm_mul_ps(v13, v10);
     __m128 v15 = _mm_mul_ps(v13, v9);
-    float v16 = _mm_shuffle_ps(v14, v14, 170)[0] + static_cast<float>(_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]);
-    float v120 = _mm_shuffle_ps(v15, v15, 170)[0] + static_cast<float>(_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]);
+    float v16 = _mm_shuffle_ps(v14, v14, 170)[0] + (_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]);
+    float v120 = _mm_shuffle_ps(v15, v15, 170)[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]);
     __m128 v17 = _mm_mul_ps(v10, v10);
-    float v126 = _mm_shuffle_ps(v17, v17, 170)[0] + static_cast<float>(_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]);
+    float v126 = _mm_shuffle_ps(v17, v17, 170)[0] + (_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]);
     __m128 v18 = _mm_mul_ps(v9, v9);
-    float v125 = _mm_shuffle_ps(v18, v18, 170)[0] + static_cast<float>(_mm_shuffle_ps(v18, v18, 85)[0] + v18[0]);
+    float v125 = _mm_shuffle_ps(v18, v18, 170)[0] + (_mm_shuffle_ps(v18, v18, 85)[0] + v18[0]);
     double v19 = v125;
     float v122 = v16;
     double v20 = v125 * v126;
@@ -263,11 +263,9 @@ LABEL_22:;
     }
     float v110 = v32;
     __m128 v34 = _mm_mul_ps(m_quad_6, m_quad_6);
-    float v35 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
-        static_cast<float>(
-            (_mm_shuffle_ps(v34, v34, 170)[0] + static_cast<float>(_mm_shuffle_ps(v34, v34, 85)[0] + v34[0]))
-        )
-    )));
+    float v35 = _mm_cvtss_f32(
+        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v34, v34, 170)[0] + (_mm_shuffle_ps(v34, v34, 85)[0] + v34[0]))))
+    );
     double v36 = v35;
     float v106 = v35;
     points->m_separatingNormal.m_quad = m_quad_6;
@@ -322,9 +320,9 @@ LABEL_22:;
             float v47 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v46[0])));
             v48[0] = zero;
             __m128 v49 = _mm_cmpeq_ss(v46, v48);
-            v48[0] = 3.0f - static_cast<float>(static_cast<float>(v46[0] * v47) * v47);
+            v48[0] = 3.0f - ((v46[0] * v47) * v47);
             __m128 v50 = _mm_setzero_ps();
-            v50[0] = static_cast<float>(0.5f * v47) * v48[0];
+            v50[0] = (0.5f * v47) * v48[0];
             __m128 v51 = _mm_andnot_ps(v49, v50);
             points->m_separatingNormal.m_quad = _mm_mul_ps(_mm_shuffle_ps(v51, v51, 0), v43.m_quad);
         }
@@ -357,7 +355,7 @@ LABEL_22:;
         float v121 = -v120;
         double v63 = v107;
         double v64 = 0.0;
-        while (1) {
+        while (true) {
             double v65;
             float v74;
             double v85;
@@ -402,7 +400,7 @@ LABEL_22:;
             m_quad_9 = _mm_sub_ps(m_quad_8, m_quad_14);
             v73 = _mm_mul_ps(m_quad_9, m_quad_9);
             v114 = v59->m_separatingNormal.m_quad[3] + v127;
-            v74 = _mm_shuffle_ps(v73, v73, 170)[0] + static_cast<float>(_mm_shuffle_ps(v73, v73, 85)[0] + v73[0]);
+            v74 = _mm_shuffle_ps(v73, v73, 170)[0] + (_mm_shuffle_ps(v73, v73, 85)[0] + v73[0]);
             v115 = v114 * v114;
             if (!(v115 > static_cast<double>(v74))) {
                 double v88;
@@ -432,9 +430,9 @@ LABEL_22:;
                 float v79 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v78[0])));
                 v80[0] = zero;
                 __m128 v81 = _mm_cmpeq_ss(v78, v80);
-                v80[0] = 3.0f - static_cast<float>(static_cast<float>(v78[0] * v79) * v79);
+                v80[0] = 3.0f - ((v78[0] * v79) * v79);
                 __m128 v82 = _mm_setzero_ps();
-                v82[0] = static_cast<float>(0.5f * v79) * v80[0];
+                v82[0] = (0.5f * v79) * v80[0];
                 __m128 v83 = _mm_andnot_ps(v81, v82);
                 m_quad_10 = _mm_mul_ps(_mm_shuffle_ps(v83, v83, 0), m_quad_11);
             }
@@ -752,7 +750,7 @@ void hkCollideCapsuleUtilCapsVsTri(
                 const __m128 kSeparatingNormal = _mm_mul_ps(_mm_shuffle_ps(kScale, kScale, 0), kSeparating);
                 _mm_store_ps(&reinterpret_cast<float*>(&cp.m_separatingNormal.m_quad)[0], kSeparatingNormal);
                 const __m128 kProject = _mm_set1_ps(project);
-                const float fDistance = static_cast<float>(std::sqrt(fDistanceSquared));
+                const float fDistance = std::sqrt(fDistanceSquared);
                 const float fNegDistance = -fDistance;
                 const __m128 kOnCapsule = _mm_add_ps(
                     _mm_mul_ps(

@@ -20,7 +20,7 @@ NiDepthStencilBuffer* NiDepthStencilBuffer::Create(
     Ni2DBuffer::MultiSamplePreference eMSAAPref
 ) {
     if (kFormat.m_eFormat != NiPixelFormat::FORMAT_DEPTH_STENCIL) {
-        return 0;
+        return nullptr;
     }
     NiDepthStencilBuffer* pkBuffer =
         static_cast<NiDepthStencilBuffer*>(NiMemObject::operator new(sizeof(NiDepthStencilBuffer)));
@@ -31,7 +31,7 @@ NiDepthStencilBuffer* NiDepthStencilBuffer::Create(
         return pkBuffer_2;
     }
     delete pkBuffer_2;
-    return 0;
+    return nullptr;
 }
 
 NiDepthStencilBuffer* NiDepthStencilBuffer::CreateCompatible(Ni2DBuffer* pkBuffer, NiRenderer* apkRenderer) {

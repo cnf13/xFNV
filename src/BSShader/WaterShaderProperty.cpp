@@ -109,9 +109,9 @@ BSShaderProperty::RenderPassArray* WaterShaderProperty::GetRenderPasses(
     v8->eMemContext = MEM_CONTEXT_WATER;
     if (!WaterShaderProperty::bEnabled) {
         v8->eMemContext = eMemContext;
-        return 0;
+        return nullptr;
     }
-    bool bHasVertexColors = apGeom->m_spModelData.m_pObject->m_pkColor != 0;
+    bool bHasVertexColors = apGeom->m_spModelData.m_pObject->m_pkColor != nullptr;
     if (WaterShader::bUnderWater != bUnderWater) {
         BSShaderProperty::RenderPassArray* pRenderPassArray = this->pRenderPassList;
         if (pRenderPassArray) {
@@ -362,28 +362,30 @@ BSShaderProperty::RenderPassArray* WaterShaderProperty::GetRenderPasses(
             ambPass = !bReflections + BSShaderManager::BSSM_WATER_LOD;
         }
     LABEL_76:;
-        v12->Add(apGeom, ambPass, 1, 0, 0, 0, 0, 0);
+        v12->Add(apGeom, ambPass, 1, 0, nullptr, nullptr, nullptr, nullptr);
         if (!bDisplacement && !bLOD) {
             BSShaderProperty::RenderPass* pwaterPass = GetWaterPass(apGeom);
-            this->pRenderPassList->Add(pwaterPass->pGeometry, pwaterPass->usPassEnum, 1, 0, 0, 0, 0, 0);
+            this->pRenderPassList->Add(
+                pwaterPass->pGeometry, pwaterPass->usPassEnum, 1, 0, nullptr, nullptr, nullptr, nullptr
+            );
         }
         if (bSpecularLighting) {
             if (LightList.m_uiCount) {
                 BSShaderProperty::RenderPassArray* v23 = this->pRenderPassList;
                 if (bDisplacement) {
                     if (bHasVertexColors) {
-                        v23->Add(apGeom, 683, 1, 0, 0, 0, 0, 0);
+                        v23->Add(apGeom, 683, 1, 0, nullptr, nullptr, nullptr, nullptr);
                     }
                     else {
-                        v23->Add(apGeom, 666, 1, 0, 0, 0, 0, 0);
+                        v23->Add(apGeom, 666, 1, 0, nullptr, nullptr, nullptr, nullptr);
                     }
                 }
                 else {
                     if (bHasVertexColors) {
-                        v23->Add(apGeom, 718, 1, 0, 0, 0, 0, 0);
+                        v23->Add(apGeom, 718, 1, 0, nullptr, nullptr, nullptr, nullptr);
                     }
                     else {
-                        v23->Add(apGeom, 700, 1, 0, 0, 0, 0, 0);
+                        v23->Add(apGeom, 700, 1, 0, nullptr, nullptr, nullptr, nullptr);
                     }
                 }
             }

@@ -104,7 +104,7 @@ void TESClimate::Copy(TESForm* apCopy) {
     TESClimate* pcopy = dynamic_cast<TESClimate*>(apCopy);
     if (pcopy) {
         CopyAllComponents(pcopy);
-        weatherList.CopyComponent(&pcopy->weatherList, 0);
+        weatherList.CopyComponent(&pcopy->weatherList, false);
         for (int32_t i = 0; i < 2; ++i) {
             txSkyObjects[i].CopyComponent(&pcopy->txSkyObjects[i]);
         }
@@ -116,14 +116,14 @@ void TESClimate::Copy(TESForm* apCopy) {
 bool TESClimate::Compare(TESForm* apCompare) {
     TESClimate* pcomp = dynamic_cast<TESClimate*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     for (int32_t i = 0; i < 2; ++i) {
         if (txSkyObjects[i].CompareComponent(&pcomp->txSkyObjects[i])) {
-            return 1;
+            return true;
         }
     }
     return mNightSky.CompareComponent(&pcomp->mNightSky) ||
@@ -147,8 +147,8 @@ void TESClimate::MakeDefault() {
     ucData[TESClimate::SUNSET_BEGIN] = 108;
     ucData[TESClimate::SUNSET_END] = 114;
     ucData[TESClimate::VOLATILITY] = 0;
-    SetUsesMasser(1);
-    SetUsesSecunda(1);
+    SetUsesMasser(true);
+    SetUsesSecunda(true);
     SetMoonPhaseDays(3u);
     weatherList.RemoveAll();
     WeatherEntry* apMemory = static_cast<WeatherEntry*>(ourMalloc(sizeof(WeatherEntry)));
@@ -156,7 +156,7 @@ void TESClimate::MakeDefault() {
         pEntry = ::new (apMemory) WeatherEntry;
     }
     else {
-        pEntry = 0;
+        pEntry = nullptr;
     }
     WeatherEntry* pEntry_2 = pEntry;
     TESForm* FormByNumericID = TESForm::GetFormByNumericID(350u);

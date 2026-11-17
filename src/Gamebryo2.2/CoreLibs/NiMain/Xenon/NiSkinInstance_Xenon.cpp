@@ -24,7 +24,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // The first bone's bound is moved into world space; each further bone's is merged in. A bone whose world scale is
 // exactly 1 (an ordered compare: NaN takes the full update) only has its bound translated, its rotation ignored, with

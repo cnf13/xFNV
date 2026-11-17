@@ -107,7 +107,7 @@ void bhkSerializable::KillCinfo(bool abCreated) {
     v3->eMemContext = MEM_CONTEXT_HAVOK;
     if (abCreated) {
         MemoryManager_Singleton.Deallocate(pInfo);
-        pInfo = 0;
+        pInfo = nullptr;
     }
     v3->eMemContext = eMemContext;
 }
@@ -117,7 +117,7 @@ int32_t bhkSerializable::LoadCInfo(NiStream& arStream) {
     hkSerializableCinfo* v3 = &CreateCinfo(v7);
     int32_t isize = QCinfoSize();
     NiBinaryStream* m_pkIstr = (&arStream)->Istr();
-    m_pkIstr->m_uiAbsoluteCurrentPos += m_pkIstr->m_pfnRead(m_pkIstr, v3, isize, 0, 0);
+    m_pkIstr->m_uiAbsoluteCurrentPos += m_pkIstr->m_pfnRead(m_pkIstr, v3, isize, nullptr, 0);
     return isize;
 }
 
@@ -137,7 +137,7 @@ void bhkSerializable::CopyMembers(bhkSerializable* pDest, NiCloningProcess& arCl
     NiObject::CopyMembers(pDest, arCloneData);
     hkSerializableCinfo* cinfo = &CreateCinfo(bCreated);
     pDest->Init(*cinfo);
-    KillCinfo(1);
+    KillCinfo(true);
 }
 
 void bhkSerializable::CloneCritLock() {

@@ -6,7 +6,7 @@
 
 void NiSystemSDM::Init() {
     if (!NiSystemSDM::ms_bInitialized) {
-        NiSystemSDM::ms_bInitialized = 1;
+        NiSystemSDM::ms_bInitialized = true;
         NiMemManager::_SDMInit();
         NiSystemDesc::InitSystemDesc();
         OEI::IO::initialize();
@@ -15,7 +15,7 @@ void NiSystemSDM::Init() {
 
 void NiSystemSDM::Shutdown() {
     if (NiSystemSDM::ms_bInitialized) {
-        NiSystemSDM::ms_bInitialized = 0;
+        NiSystemSDM::ms_bInitialized = false;
         OEI::IO::terminate();
         NiSystemDesc::ShutdownSystemDesc();
     }

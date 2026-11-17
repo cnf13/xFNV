@@ -56,7 +56,7 @@ void GuardActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     }
     pGuardWarnedActor = pActor;
     if (pGuardWarnedActor) {
-        pGuardWarnedActor->TESObjectREFR::SetTargeted(1);
+        pGuardWarnedActor->TESObjectREFR::SetTargeted(true);
     }
 }
 
@@ -69,12 +69,12 @@ void GuardActorPackageData::ClearWarningCount() {
 }
 
 void GuardActorPackageData::UpdateWarningTimer(float a2) {
-    fGuardTimer = (float)(fGuardTimer + a2);
+    fGuardTimer = (fGuardTimer + a2);
 }
 
 void GuardActorPackageData::SetTarget(Actor* a2) {
     pGuardWarnedActor = a2;
-    pGuardWarnedActor->TESObjectREFR::SetTargeted(1);
+    pGuardWarnedActor->TESObjectREFR::SetTargeted(true);
 }
 
 void GuardActorPackageData::ClearWarningTimer() {

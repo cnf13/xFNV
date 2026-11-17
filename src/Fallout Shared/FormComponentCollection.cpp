@@ -132,21 +132,21 @@ void FormComponentCollection::ClearDataAllComponents() {
 bool FormComponentCollection::CompareAllComponents(FormComponentCollection* apFCC) {
     int32_t i;
     if (!apFCC) {
-        return (bool)1;
+        return true;
     }
     for (i = 0; i < 38; ++i) {
         if (pFCArray[i]) {
             if (pFCArray[i]->CompareComponent(apFCC->pFCArray[i])) {
-                return (bool)1;
+                return true;
             }
         }
         else {
             if (apFCC->pFCArray[i]) {
-                return (bool)1;
+                return true;
             }
         }
     }
-    return (bool)0;
+    return false;
 }
 
 void FormComponentCollection::ClearFormComponentArray() {

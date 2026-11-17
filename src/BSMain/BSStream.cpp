@@ -56,7 +56,7 @@ BSStream::~BSStream() {
 
 bool BSStream::Save(const char* apFileName) {
     NiFile* pfile = NiFile::GetFile(apFileName, NiFile::WRITE_ONLY, 0x2800u);
-    bool bres = 0;
+    bool bres = false;
     if (pfile) {
         bres = NiStream::Save(pfile);
         delete pfile;
@@ -71,17 +71,17 @@ bool BSStream::RegisterSaveObject(NiObject* apObject) {
     NiObject* pkObject = apObject;
     uint32_t uiLinkID;
     if (m_kRegisterMap.GetAt(apObject, uiLinkID)) {
-        return 0;
+        return false;
     }
     NiPointer<BSReference> spRef(nullptr);
     NiObjectNET* pNET;
     if (apObject) {
-        pNET = apObject->IsKindOfMember(&NiObjectNET::ms_RTTI) ? static_cast<NiObjectNET*>(apObject) : 0;
+        pNET = apObject->IsKindOfMember(&NiObjectNET::ms_RTTI) ? static_cast<NiObjectNET*>(apObject) : nullptr;
     }
     else {
-        pNET = 0;
+        pNET = nullptr;
     }
-    NiObjectNET* pFound = 0;
+    NiObjectNET* pFound = nullptr;
     if (pNET) {
         const char* pName = pNET->m_kName.GetHandle();
         if (pObjectRefMap && pName) {
@@ -110,7 +110,7 @@ bool BSStream::RegisterSaveObject(NiObject* apObject) {
         }
         m_kObjects.SetAt(uiIndex, spObject);
     }
-    return 1;
+    return true;
 }
 
 bool BSStream::LoadStream() {
@@ -119,7 +119,7 @@ bool BSStream::LoadStream() {
         return NiStream::LoadStream();
     }
     if (!LoadHeader()) {
-        return 0;
+        return false;
     }
     m_uiPostLink = 0;
     m_uiLink = 0;
@@ -128,7 +128,7 @@ bool BSStream::LoadStream() {
     uint32_t uiNifFileVersion = this->GetFileVersion();
     bool bNew = uiNifFileVersion >= NiStream::GetVersionFromString("5.0.0.1");
     if (bNew && !LoadRTTI()) {
-        return 0;
+        return false;
     }
     uint32_t uiVersion = this->GetFileVersion();
     if (uiVersion >= NiStream::GetVersionFromString("5.0.0.6")) {
@@ -137,7 +137,7 @@ bool BSStream::LoadStream() {
     uint32_t uiObjects = m_kObjects.m_uiMaxSize;
     while (m_uiLoad < uiObjects) {
         if (m_eBackgroundLoadStatus == NiStream::CANCELLING) {
-            return 0;
+            return false;
         }
         if (bNew) {
             pObject = m_kObjects.m_pBase[m_uiLoad].m_pObject;
@@ -145,7 +145,7 @@ bool BSStream::LoadStream() {
         }
         else {
             if (!LoadObject()) {
-                return 0;
+                return false;
             }
         }
         ++m_uiLoad;
@@ -153,7 +153,7 @@ bool BSStream::LoadStream() {
     LoadTopLevelObjects();
     while (m_uiLink < uiObjects) {
         if (m_eBackgroundLoadStatus == NiStream::CANCELLING) {
-            return 0;
+            return false;
         }
         pObject = m_kObjects.m_pBase[m_uiLink].m_pObject;
         NiObjectNET* pNET;
@@ -165,12 +165,12 @@ bool BSStream::LoadStream() {
                     break;
                 }
             }
-            pNET = bIsKind ? static_cast<NiObjectNET*>(pObject) : 0;
+            pNET = bIsKind ? static_cast<NiObjectNET*>(pObject) : nullptr;
         }
         else {
-            pNET = 0;
+            pNET = nullptr;
         }
-        NiObjectNET* pFound = 0;
+        NiObjectNET* pFound = nullptr;
         if (pNET) {
             const char* pName = pNET->m_kName.GetHandle();
             if (pObjectRefMap && pName) {
@@ -184,7 +184,7 @@ bool BSStream::LoadStream() {
     }
     while (m_uiPostLink < uiObjects) {
         if (m_eBackgroundLoadStatus == NiStream::CANCELLING) {
-            return 0;
+            return false;
         }
         pObject = m_kObjects.m_pBase[m_uiPostLink].m_pObject;
         NiObjectNET* pNET;
@@ -196,12 +196,12 @@ bool BSStream::LoadStream() {
                     break;
                 }
             }
-            pNET = bIsKind ? static_cast<NiObjectNET*>(pObject) : 0;
+            pNET = bIsKind ? static_cast<NiObjectNET*>(pObject) : nullptr;
         }
         else {
-            pNET = 0;
+            pNET = nullptr;
         }
-        NiObjectNET* pFound = 0;
+        NiObjectNET* pFound = nullptr;
         if (pNET) {
             const char* pName = pNET->m_kName.GetHandle();
             if (pObjectRefMap && pName) {
@@ -215,7 +215,7 @@ bool BSStream::LoadStream() {
     }
     SetSelectiveUpdateFlagsForOldVersions();
     FreeLoadData();
-    return 1;
+    return true;
 }
 
 bool BSStream::SaveStream() {
@@ -236,7 +236,7 @@ bool BSStream::Load(const char* apFileName, NiFile* apFile) {
     if (!apFile) {
         apFile = NiFile::GetFile(apFileName, NiFile::READ_ONLY, 0x2800u);
     }
-    bool bres = 0;
+    bool bres = false;
     if (apFile) {
         strcpy_s(m_acFileName, 260, apFileName);
         NiPath::StandardizeNoResult(m_acFileName);
@@ -259,7 +259,7 @@ void BSStream::KillObjectRefMap() {
     if (pObjectRefMap) {
         delete pObjectRefMap;
     }
-    pObjectRefMap = 0;
+    pObjectRefMap = nullptr;
 }
 
 void BSStream::LoadShaderTextures(char* apcName) {
@@ -272,14 +272,14 @@ void BSStream::LoadShaderTextures(char* apcName) {
             FNVD_INLINED_LOCAL(NiFixedString, kFileName, std::nullopt, std::nullopt);
             // The array's address (cPath) is never null.
             kFileName.m_kHandle = NiGlobalStringTable::AddString(cPath);
-            sptexture.operator=(
-                static_cast<NiTexture*>(NiSourceTexture::Create(kFileName, NiSourceTexture::ms_kDefaultPrefs, 1, 0))
-            );
+            sptexture.operator=(static_cast<NiTexture*>(
+                NiSourceTexture::Create(kFileName, NiSourceTexture::ms_kDefaultPrefs, true, false)
+            ));
             // Destructor of kFileName.
             // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
             NiGlobalStringTable::ReleaseHandle(kFileName.GetHandle());
             if (sptexture.m_pObject) {
-                BSTexturePalette::SetTexture(sptexture.m_pObject, 0);
+                BSTexturePalette::SetTexture(sptexture.m_pObject, nullptr);
             }
         }
     }
@@ -302,10 +302,11 @@ void BSStream::ObjectRefRec(NiObjectNET* apObject, uint32_t aiLevels) {
         if ((aiLevels & 31) != 0) {
             NiAVObject* pAVObject;
             if (apObject) {
-                pAVObject = apObject->IsKindOfMember(&NiAVObject::ms_RTTI) ? static_cast<NiAVObject*>(apObject) : 0;
+                pAVObject =
+                    apObject->IsKindOfMember(&NiAVObject::ms_RTTI) ? static_cast<NiAVObject*>(apObject) : nullptr;
             }
             else {
-                pAVObject = 0;
+                pAVObject = nullptr;
             }
             if (pAVObject) {
                 if ((aiLevels & 4) != 0) {
@@ -344,10 +345,10 @@ void BSStream::ObjectRefRec(NiObjectNET* apObject, uint32_t aiLevels) {
                                 break;
                             }
                         }
-                        pTexProp = bIsKind ? static_cast<NiTexturingProperty*>(apObject) : 0;
+                        pTexProp = bIsKind ? static_cast<NiTexturingProperty*>(apObject) : nullptr;
                     }
                     else {
-                        pTexProp = 0;
+                        pTexProp = nullptr;
                     }
                     if (pTexProp) {
                         // EXE-INLINED 0x4BC240
@@ -357,7 +358,7 @@ void BSStream::ObjectRefRec(NiObjectNET* apObject, uint32_t aiLevels) {
                             pTexture = pBaseMap->m_spTexture.m_pObject;
                         }
                         else {
-                            pTexture = 0;
+                            pTexture = nullptr;
                         }
                         if (pTexture) {
                             ObjectRefRec(pTexture, aiLevels);
@@ -391,7 +392,7 @@ void BSStream::GetModifiedTextureFilename(char* apDstFileName, const char* apSrc
     if (pcSlash) {
         if (pcUnderscore) {
             if (pcUnderscore < pcSlash) {
-                pcUnderscore = 0;
+                pcUnderscore = nullptr;
             }
         }
     }
@@ -456,7 +457,7 @@ void BSStream::RegisterLoadersINI(const char* apINIFilePath) {
         strcat_s(FileName, 260, "Loaders.ini");
     }
     uiLength = platform::IniGetKeys(FileName, "Loaders", " ", std::span<char>(ReturnedString, 1024));
-    char* pcName = 0;
+    char* pcName = nullptr;
     if (uiLength) {
         for (const char* lpKeyName = ReturnedString; *lpKeyName; lpKeyName += std::strlen(lpKeyName) + 1) {
             char apObjectName[128];

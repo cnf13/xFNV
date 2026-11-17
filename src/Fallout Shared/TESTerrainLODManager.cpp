@@ -80,7 +80,7 @@ TESTerrainLODManager::~TESTerrainLODManager() {
 
 void TESTerrainLODManager::UpdateGrass(NiPoint3 apCameraPosition, NiPoint3 apCameraDirection, float afUpdateAngle) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_GRASS, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESTerrainLODManager.cpp", 177
+        MEM_CONTEXT_GRASS, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESTerrainLODManager.cpp", 177
     );
     if (!TES::pInstance->pInteriorCell && (gs_bDrawShaderGrass_Grass.Bool() && bIsToggleGrassUpdate)) {
         if (!TESTerrainLODManager::bGrassInitialized) {
@@ -104,7 +104,7 @@ void TESTerrainLODManager::UpdateGrass(NiPoint3 apCameraPosition, NiPoint3 apCam
                         v11 = ::new (apMemory) NiNode(0);
                     }
                     else {
-                        v11 = 0;
+                        v11 = nullptr;
                     }
                     TESTerrainLODManager::pGrassNode = v11;
                     v11->SetName(FixedStrings::QGrass());
@@ -128,7 +128,7 @@ void TESTerrainLODManager::UpdateGrass(NiPoint3 apCameraPosition, NiPoint3 apCam
                 for (int32_t icity = 0; icity < 5; ++icity) {
                     pcell = TES::pInstance->GetGridCellCell(icellx + icitx - 2, icelly + icity - 2);
                     if (pcell) {
-                        bool bremove = 1;
+                        bool bremove = true;
                         if (icitx) {
                             if (icitx != 4) {
                                 if (icity) {
@@ -139,7 +139,7 @@ void TESTerrainLODManager::UpdateGrass(NiPoint3 apCameraPosition, NiPoint3 apCam
                                                 pcell, TESTerrainLODManager::pGrassNode, apCameraPosition,
                                                 apCameraDirection, ffaderange, fmaxrange, afUpdateAngle
                                             );
-                                            bremove = 0;
+                                            bremove = false;
                                         }
                                     }
                                 }
@@ -156,10 +156,10 @@ void TESTerrainLODManager::UpdateGrass(NiPoint3 apCameraPosition, NiPoint3 apCam
             if (gs_bGrassPointLighting_Grass.operator bool()) {
                 NiNode* iDataY = TESTerrainLODManager::pGrassNode;
                 NiNode* pbasenode_2 = BSShaderManager::GetShadowSceneNode(0);
-                static_cast<ShadowSceneNode*>(pbasenode_2)->ShadowSceneNode::UpdateObjectLighting(iDataY, 0);
+                static_cast<ShadowSceneNode*>(pbasenode_2)->ShadowSceneNode::UpdateObjectLighting(iDataY, false);
             }
             if (TESTerrainLODManager::pGrassNode) {
-                NiUpdateData UpdateData(0.0f, 0, 0);
+                NiUpdateData UpdateData(0.0f, false, false);
                 TESTerrainLODManager::pGrassNode->Update(UpdateData);
                 TESTerrainLODManager::pGrassNode->UpdateProperties();
             }
@@ -174,7 +174,7 @@ void TESTerrainLODManager::UpdateGrass(NiPoint3 apCameraPosition, NiPoint3 apCam
 void TESTerrainLODManager::InitGrass() {
     NiNode* v2;
     AutoMemContext apMemory(
-        MEM_CONTEXT_GRASS, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESTerrainLODManager.cpp", 144
+        MEM_CONTEXT_GRASS, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESTerrainLODManager.cpp", 144
     );
     float fRadius = 0.0f;
     float* v0 = &fGrassStartFadeDistance.Float();
@@ -192,13 +192,13 @@ void TESTerrainLODManager::InitGrass() {
         v2 = ::new (v3) NiNode(0);
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     TESTerrainLODManager::pGrassNode = v2;
     v2->SetName(FixedStrings::QGrass());
     ShadowSceneNode_->SetAt(6u, TESTerrainLODManager::pGrassNode);
     TESTerrainLODManager::pGrassNode->UpdateProperties();
-    TESTerrainLODManager::bGrassInitialized = 1;
+    TESTerrainLODManager::bGrassInitialized = true;
 }
 
 NiNode* TESTerrainLODManager::GetGrassNode() {
@@ -219,7 +219,7 @@ void TESTerrainLODManager::UpdateGrassForCell(
     if (!bTempTest) {
         int32_t v44 = 0;
         BSSimpleList<TESLandTexture*> plandTextures;
-        TESGrass* pGrassForm = 0;
+        TESGrass* pGrassForm = nullptr;
         COORD_DATA coordData;
         uint16_t usHeightLimit = 0;
         uint8_t ucMaxSlope = 0;
@@ -237,7 +237,7 @@ void TESTerrainLODManager::UpdateGrassForCell(
             apCameraDirection.z = 0.0f;
             apCameraDirection.Unitize();
             afUpdateAngle = afUpdateAngle + afUpdateAngle;
-            NiFrustum kfrustum(0);
+            NiFrustum kfrustum(false);
             NiRenderer* Renderer_ = NiRenderer::GetRenderer();
             float fheight = static_cast<float>(Renderer_->GetScreenHeight());
             NiRenderer* v8 = NiRenderer::GetRenderer();
@@ -266,7 +266,7 @@ void TESTerrainLODManager::UpdateGrassForCell(
                 NiNode* plandquad = apCell->GetLandNode(iQuad);
                 if (plandquad) {
                     int32_t vertIndex;
-                    NiPoint3 blockstart = pland->GetVertexLocation(0, 0, 0, 0);
+                    NiPoint3 blockstart = pland->GetVertexLocation(0, 0, nullptr, nullptr);
                     int32_t lseed = 0;
                     NiBound kbound = plandquad->GetWorldBound();
                     NiPoint3 asdf = NiPoint3_ZERO;
@@ -284,9 +284,9 @@ void TESTerrainLODManager::UpdateGrassForCell(
                         for (int32_t ixvert = igrassEvalSize; ixvert < 16; ixvert += igrassEvalSquared) {
                             for (int32_t iyvert = igrassEvalSize; iyvert < 16; iyvert += igrassEvalSquared) {
                                 vertIndex = ixvert + 17 * iyvert;
-                                NiPoint3* VertexLocation = ::new (&v25) NiPoint3(
-                                    pland->GetVertexLocation(static_cast<uint8_t>(iQuad), ixvert + 17 * iyvert, 0, 0)
-                                );
+                                NiPoint3* VertexLocation = ::new (&v25) NiPoint3(pland->GetVertexLocation(
+                                    static_cast<uint8_t>(iQuad), ixvert + 17 * iyvert, nullptr, nullptr
+                                ));
                                 kVertexPos.m_kNormal.x = VertexLocation->x;
                                 kVertexPos.m_kNormal.y = VertexLocation->y;
                                 float z = VertexLocation->z;
@@ -327,7 +327,7 @@ void TESTerrainLODManager::UpdateGrassForCell(
                             for (int32_t iyvert_2 = igrassEvalSize; iyvert_2 < 16; iyvert_2 += igrassEvalSquared) {
                                 vertIndex = ixvert_2 + 17 * iyvert_2;
                                 kVertexPos.m_kNormal = pland->GetVertexLocation(
-                                    static_cast<uint8_t>(iQuad), ixvert_2 + 17 * iyvert_2, 0, 0
+                                    static_cast<uint8_t>(iQuad), ixvert_2 + 17 * iyvert_2, nullptr, nullptr
                                 );
                                 kVertexPos.m_kNormal.x = kVertexPos.m_kNormal.x - 256.0;
                                 kVertexPos.m_kNormal.y = kVertexPos.m_kNormal.y - 256.0;
@@ -365,9 +365,9 @@ void TESTerrainLODManager::CreateGrass(
 ) {
     NiPoint3 dst;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_GRASS, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESTerrainLODManager.cpp", 522
+        MEM_CONTEXT_GRASS, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESTerrainLODManager.cpp", 522
     );
-    NiPointer<NiGeometry> block(static_cast<NiGeometry*>(0));
+    NiPointer<NiGeometry> block(static_cast<NiGeometry*>(nullptr));
     float v24 = static_cast<double>(aiMinSlope) * 0.01745329238474369;
     float fminSlope = NiCosQ(v24);
     float v23 = static_cast<double>(aiMaxSlope) * 0.01745329238474369;
@@ -453,7 +453,7 @@ void TESTerrainLODManager::CreateGrass(
                         pnewpos.x = FloatFloor(pnewpos.x);
                         pnewpos.y = FloatFloor(pnewpos.y);
                         pnewpos.z = 0.0f;
-                        bool bthisCell = apLand->GetCoordData(&aCoordData, pnewpos, 0);
+                        bool bthisCell = apLand->GetCoordData(&aCoordData, pnewpos, false);
                         TES::pInstance->GetLandHeight(pnewpos, fheight);
                         switch (iWaterState) {
                             case TESGrass::GWS_ABOVE_ONLY_ATLEAST: {

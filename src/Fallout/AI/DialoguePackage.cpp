@@ -51,7 +51,7 @@ void DialoguePackage::LoadGame() {
     uint32_t italkingActorID;
     TESPackage::LoadGame();
     iblockSize = 0;
-    uint8_t* istartBufferPosition = 0;
+    uint8_t* istartBufferPosition = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockHeader, 4u);
         if (iblockHeader != 0x424C4F4B) {
@@ -99,13 +99,13 @@ void DialoguePackage::LoadGame() {
                 v10 = ::new (apMemory) Conversation;
             }
             else {
-                v10 = 0;
+                v10 = nullptr;
             }
             pConversation = v10;
             pConversation->LoadGameTES();
             LoadGameDataOLD(&v19, 2);
             if (v19 == -1) {
-                pCurrentItem = 0;
+                pCurrentItem = nullptr;
             }
             else {
                 pCurrentItem = pConversation->GetDialogueItemByIndex(v19);
@@ -114,7 +114,7 @@ void DialoguePackage::LoadGame() {
             // Stores the sign-extended response index in the field before it resolves it.
             pCurrentResponse = reinterpret_cast<DialogueResponse*>(static_cast<intptr_t>(apBuffer));
             if (!pCurrentItem || apBuffer == -1) {
-                pCurrentResponse = 0;
+                pCurrentResponse = nullptr;
             }
             else {
                 pCurrentResponse = pCurrentItem->GetDialogueResponseByIndex(apBuffer);
@@ -137,8 +137,8 @@ void DialoguePackage::LoadGame() {
             pCurrentResponse = reinterpret_cast<DialogueResponse*>(static_cast<intptr_t>(v17));
         }
         else {
-            pCurrentItem = 0;
-            pCurrentResponse = 0;
+            pCurrentItem = nullptr;
+            pCurrentResponse = nullptr;
         }
     }
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
@@ -222,7 +222,7 @@ DialoguePackage::DialoguePackage(
     if (pConversation) {
         pConversation->FirstItem();
     }
-    pActor->SetActionComplete(0);
+    pActor->SetActionComplete(false);
     pPlayer->CheckForClosesConversation(apAct, apTarg, this);
 }
 
@@ -260,7 +260,7 @@ void DialoguePackage::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     apSaveGameBuffer->SaveDataEndian(&bUseIdleManager, 1u, 0);
     apSaveGameBuffer->SaveDataEndian(&bSoundFile, 1u, 0);
     apSaveGameBuffer->SaveDataEndian(&bReachedAmbushLocation, 1u, 0);
-    apData = pConversation != 0;
+    apData = pConversation != nullptr;
     apSaveGameBuffer->SaveDataEndian(&apData, 1u, 0);
     if (apData) {
         pConversation->SaveGameBGS(apSaveGameBuffer);
@@ -310,7 +310,7 @@ void DialoguePackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (apLoadGameBuffer->GetVersion() >= 3u) {
         apLoadGameBuffer->LoadData(&bReachedAmbushLocation, 1u);
     }
-    bhasConversation = 0;
+    bhasConversation = false;
     apLoadGameBuffer->LoadData(&bhasConversation, 1u);
     if (bhasConversation) {
         Conversation* v4;
@@ -320,7 +320,7 @@ void DialoguePackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v4 = ::new (apMemory) Conversation;
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         pConversation = v4;
         pConversation->LoadGameBGS(apLoadGameBuffer);
@@ -352,7 +352,7 @@ void DialoguePackage::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v11 = dynamic_cast<MobileObject*>(FormByNumericID);
     }
     else {
-        v11 = 0;
+        v11 = nullptr;
     }
     pTalkingActor = v11;
     if (pActor) {
@@ -360,7 +360,7 @@ void DialoguePackage::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v10 = dynamic_cast<MobileObject*>(v3);
     }
     else {
-        v10 = 0;
+        v10 = nullptr;
     }
     pActor = v10;
     if (pTargetActor) {
@@ -368,7 +368,7 @@ void DialoguePackage::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v9 = dynamic_cast<MobileObject*>(v4);
     }
     else {
-        v9 = 0;
+        v9 = nullptr;
     }
     pTargetActor = v9;
     if (pTalkingActivator) {
@@ -377,7 +377,7 @@ void DialoguePackage::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v8 = dynamic_cast<MobileObject*>(v5);
     }
     else {
-        v8 = 0;
+        v8 = nullptr;
     }
     pTalkingActivator = v8;
     if (pTargetLocation) {
@@ -385,7 +385,7 @@ void DialoguePackage::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v7 = dynamic_cast<TESObjectREFR*>(v6);
     }
     else {
-        v7 = 0;
+        v7 = nullptr;
     }
     pTargetLocation = v7;
     if (pConversation) {
@@ -561,17 +561,17 @@ void DialoguePackage::InitLoadGame() {
                 v4 = ::new (apMemory) Conversation(pActor, pTargetActor, ptopic);
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             pConversation = v4;
             if (icurrentItemIndex == -1) {
-                pCurrentItem = 0;
+                pCurrentItem = nullptr;
             }
             else {
                 pCurrentItem = pConversation->GetDialogueItemByIndex(icurrentItemIndex);
             }
             if (!pCurrentItem || icurrentResponseIndex == -1) {
-                pCurrentResponse = 0;
+                pCurrentResponse = nullptr;
             }
             else {
                 pCurrentResponse = pCurrentItem->GetDialogueResponseByIndex(icurrentResponseIndex);
@@ -869,7 +869,7 @@ void DialoguePackage::Speak(bool abUseSound) {
                 uint32_t audioFlags =
                     BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_VOICE | BSGameSound::SOUND_FLAG_IS_3D;
                 FNVD_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
-                handle = *BSAudio::QInstance().GetSoundHandleByFilename(&soundHandle, acAudioFile, audioFlags, 0);
+                handle = *BSAudio::QInstance().GetSoundHandleByFilename(&soundHandle, acAudioFile, audioFlags, nullptr);
                 NiPoint3 kSpeakerLoc = pspeaker->GetLocationOnReference();
                 // Reads the maximum distance first.
                 float fMaxDist = BSAudio::GetMaxDialogDist();

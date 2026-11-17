@@ -12,7 +12,7 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "Reconstruction.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 
 // Reads one 4-byte value as one component. The size is written before the read, so nothing is read uninitialised.
 void NiStreamLoadBinary(NiFile* a1, void* a2) {
@@ -171,7 +171,7 @@ NiPixelData* NiDDSReader::ReadFile(NiFile& a1, NiPixelData* a2) {
     EnterCriticalSection(&v3->m_kReadCriticalSection.m_kCriticalSection);
     if (!v3->ReadHeader(a1, v32, v31, kFmt, bMipmap, uiNumFaces)) {
         LeaveCriticalSection(&v3->m_kReadCriticalSection.m_kCriticalSection);
-        return 0;
+        return nullptr;
     }
     NiPixelData* pkDest = a2;
     if (!a2 ||
@@ -184,7 +184,7 @@ NiPixelData* NiDDSReader::ReadFile(NiFile& a1, NiPixelData* a2) {
             pkDest = ::new (v7) NiPixelData(v3->m_uiWidth, v3->m_uiHeight, kFmt, v3->m_uiMipmapLevels, uiNumFaces);
         }
         else {
-            pkDest = 0;
+            pkDest = nullptr;
         }
     }
     uint32_t m_uiMipmapLevels = pkDest->m_uiMipmapLevels;
@@ -249,7 +249,7 @@ NiPixelData* NiDDSReader::ReadFile(NiFile& a1, NiPixelData* a2) {
         int32_t v37;
         int32_t v17 = -1;
         int32_t v29 = -1;
-        while (1) {
+        while (true) {
             switch (v17) {
                 case 0: {
                     kIsta = 1;
@@ -287,7 +287,7 @@ NiPixelData* NiDDSReader::ReadFile(NiFile& a1, NiPixelData* a2) {
                 goto LABEL_47;
             }
         }
-        while (1) {
+        while (true) {
             uint8_t m_ucBitsPerPixel;
             m_ucBitsPerPixel = v3->m_kOriginalFormat.m_ucBitsPerPixel;
             if (m_ucBitsPerPixel == 16) {

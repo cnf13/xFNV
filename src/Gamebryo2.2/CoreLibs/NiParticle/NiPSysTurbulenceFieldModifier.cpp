@@ -31,7 +31,7 @@ NiObject* NiPSysTurbulenceFieldModifier::CreateClone(NiCloningProcess& kCloning)
         ::new (pkObject) NiPSysTurbulenceFieldModifier;
     }
     else {
-        pkObject = 0;
+        pkObject = nullptr;
     }
     CopyMembers(pkObject, kCloning);
     float fFrequency = m_fFrequency;
@@ -202,7 +202,7 @@ NiObject* NiPSysTurbulenceFieldModifier::CreateObject() {
     NiPSysTurbulenceFieldModifier* pkObject =
         static_cast<NiPSysTurbulenceFieldModifier*>(NiMemObject::operator new(sizeof(NiPSysTurbulenceFieldModifier)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysTurbulenceFieldModifier;
 }

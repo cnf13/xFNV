@@ -79,7 +79,7 @@ NiObject* NiPSysFieldMaxDistanceCtlr::CreateObject() {
     NiPSysFieldMaxDistanceCtlr* v0 =
         static_cast<NiPSysFieldMaxDistanceCtlr*>(NiMemObject::operator new(sizeof(NiPSysFieldMaxDistanceCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysFieldMaxDistanceCtlr;
 }

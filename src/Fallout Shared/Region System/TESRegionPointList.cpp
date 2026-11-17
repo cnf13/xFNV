@@ -37,13 +37,13 @@ TESRegionPointList::~TESRegionPointList() {
 
 bool TESRegionPointList::Load(TESFile* apFile) {
     if (!apFile || apFile->GetTESChunk() != RPLD_ID) {
-        return 0;
+        return false;
     }
     uint32_t auiMaxSize = apFile->GetChunkSize();
     uint32_t uiPoints = auiMaxSize >> 3;
     if (auiMaxSize % 8) {
         Warning("Invalid Region Point List data in file \"%s\".", &apFile->m_Filename);
-        return 0;
+        return false;
     }
     else {
         if (auiMaxSize && uiPoints) {
@@ -54,22 +54,22 @@ bool TESRegionPointList::Load(TESFile* apFile) {
                 pPoints = static_cast<NiPoint2*>(ptr);
             }
             else {
-                pPoints = 0;
+                pPoints = nullptr;
             }
             apFile->GetChunkData(pPoints, auiMaxSize);
             iCount = 0;
             for (uint32_t i = 0; i < uiPoints; ++i) {
                 TESRegionPoint* pPoint;
                 if (apFile->QEndian()) {
-                    ENDIAN<float>(pPoints[i].x, 0);
-                    ENDIAN<float>(pPoints[i].y, 0);
+                    ENDIAN<float>(pPoints[i].x, false);
+                    ENDIAN<float>(pPoints[i].y, false);
                 }
                 void* pMemory = ourMalloc(sizeof(TESRegionPoint));
                 if (pMemory) {
                     pPoint = ::new (pMemory) TESRegionPoint(pPoints[i]);
                 }
                 else {
-                    pPoint = 0;
+                    pPoint = nullptr;
                 }
                 if (static_cast<double>(Minimums.x) > pPoint->Point.x) {
                     Minimums.x = pPoint->Point.x;
@@ -87,16 +87,16 @@ bool TESRegionPointList::Load(TESFile* apFile) {
                 ++iCount;
             }
             ourFree(pPoints);
-            return 1;
+            return true;
         }
         else {
-            return 0;
+            return false;
         }
     }
 }
 
 bool TESRegionPointList::Validate(bool abMinPointsTest) {
-    return (!abMinPointsTest || iCount >= 3) && !SelfIntersects(1);
+    return (!abMinPointsTest || iCount >= 3) && !SelfIntersects(true);
 }
 
 void TESRegionPointList::SetDistanceInsideAtMax(uint32_t aiDistance) {
@@ -150,20 +150,20 @@ bool TESRegionPointList::Add(TESRegionPoint* apPoint, float afMaxDelta) {
     double distanceSquared;
     TESRegionPoint* v6;
     if (!apPoint) {
-        return (bool)0;
+        return false;
     }
     if (m_item) {
         v6 = apPoint;
         v4 = this;
         distanceSquared = (double)v4->m_item->GetDistanceSquared(v6);
         if ((afMaxDelta * afMaxDelta) > distanceSquared) {
-            return (bool)0;
+            return false;
         }
     }
     BSSimpleList<TESRegionPoint*>::AddHead(apPoint);
-    if (SelfIntersects(0)) {
+    if (SelfIntersects(false)) {
         BSSimpleList<TESRegionPoint*>::RemoveHead();
-        return (bool)0;
+        return false;
     }
     else {
         ++iCount;
@@ -179,7 +179,7 @@ bool TESRegionPointList::Add(TESRegionPoint* apPoint, float afMaxDelta) {
         if (((double)Maximums.y) < apPoint->GetY()) {
             Maximums.y = apPoint->GetY();
         }
-        return (bool)1;
+        return true;
     }
 }
 
@@ -187,14 +187,14 @@ bool TESRegionPointList::IsInsideRegion(TESRegionPoint* apTest) {
     BSSimpleList<TESRegionPoint*>* pnext;
     int32_t icrossings = 0;
     if (!apTest || iCount < 3) {
-        return 0;
+        return false;
     }
     float fxtest = apTest->Point.x;
     float fytest = apTest->Point.y;
     if (static_cast<double>(fxtest) < GetMinX() ||
         (static_cast<double>(fxtest) > GetMaxX() ||
          (static_cast<double>(fytest) < GetMinY() || static_cast<double>(fytest) > GetMaxY()))) {
-        return 0;
+        return false;
     }
     BSSimpleList<TESRegionPoint*>* pcurrent = this;
     do {
@@ -236,7 +236,7 @@ void TESRegionPointList::Save() {
             pPoints = ptr;
         }
         else {
-            pPoints = 0;
+            pPoints = nullptr;
         }
         void* pPoints_3 = pPoints;
         while (pList && !pList->IsEmpty()) {
@@ -259,7 +259,7 @@ void TESRegionPointList::Save() {
                     pPoints_4 = pPoints_2;
                 }
                 else {
-                    pPoints_4 = 0;
+                    pPoints_4 = nullptr;
                 }
                 pPoints_3 = pPoints_4;
                 ourMemcpy(pPoints_4, pTemp, sizeof(NiPoint2) * iCount);
@@ -374,14 +374,14 @@ TESRegionPointList* TESRegionPointList::Copy(TESRegionPointList* apCopyInto) {
             pcopy_2 = ::new (apMemory) TESRegionPointList(bOwnsPointMemory);
         }
         else {
-            pcopy_2 = 0;
+            pcopy_2 = nullptr;
         }
         pcopy = pcopy_2;
     }
     while (pcurrent) {
         if (pcopy->bOwnsPointMemory) {
             TESRegionPoint** v2 = &pcurrent->m_item;
-            TESRegionPoint* ppointCopy = (*v2)->Copy(0);
+            TESRegionPoint* ppointCopy = (*v2)->Copy(nullptr);
             if (!pcopy->Add(ppointCopy, 0.0f)) {
                 ourFree(ppointCopy);
             }
@@ -396,7 +396,7 @@ TESRegionPointList* TESRegionPointList::Copy(TESRegionPointList* apCopyInto) {
 }
 
 float TESRegionPointList::GetScaleBasedOnLocation(TESRegionPoint* apTest, float afDistInsideAtMax) {
-    bool bQuit = 0;
+    bool bQuit = false;
     if (pLastScaleResult && pLastScaleResult->Matches(apTest, afDistInsideAtMax)) {
         return pLastScaleResult->fscale;
     }
@@ -413,7 +413,7 @@ float TESRegionPointList::GetScaleBasedOnLocation(TESRegionPoint* apTest, float 
                     BSSimpleList<TESRegionPoint*>* pnext = pcurrent->m_pkNext;
                     if (!pnext) {
                         pnext = this;
-                        bQuit = 1;
+                        bQuit = true;
                     }
                     float fdistsqPV1 = apTest->GetDistanceSquared(pcurrent->m_item);
                     float fdistsqPV2 = apTest->GetDistanceSquared(pnext->m_item);
@@ -453,7 +453,7 @@ float TESRegionPointList::GetScaleBasedOnLocation(TESRegionPoint* apTest, float 
                     v5 = ::new (pMemory) TESRegionPointList::ScaleResult;
                 }
                 else {
-                    v5 = 0;
+                    v5 = nullptr;
                 }
                 pLastScaleResult = v5;
                 apTest->Copy(&pLastScaleResult->point);

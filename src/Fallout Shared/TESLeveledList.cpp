@@ -74,7 +74,7 @@ void TESLeveledList::CopyComponent(BaseFormComponent* apCopyFC) {
                 pdata = ::new (apMemory) LEVELED_OBJECT;
             }
             else {
-                pdata = 0;
+                pdata = nullptr;
             }
             LEVELED_OBJECT* pdata_2 = pdata;
             pdata->pForm = pcopydata->pForm;
@@ -88,7 +88,7 @@ void TESLeveledList::CopyComponent(BaseFormComponent* apCopyFC) {
                         v6 = ::new (v9) ContainerItemExtra;
                     }
                     else {
-                        v6 = 0;
+                        v6 = nullptr;
                     }
                     pdata_2->pItemExtra = v6;
                     pdata_2->pItemExtra->Copy(pcopydata->pItemExtra);
@@ -118,36 +118,36 @@ void TESLeveledList::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESLeveledList::CompareComponent(BaseFormComponent* apCompareFC) {
     TESLeveledList* pCompare = dynamic_cast<TESLeveledList*>(apCompareFC);
     if (!pCompare) {
-        return 1;
+        return true;
     }
     int32_t CalcAllBelow = GetCalcAllBelow();
     if (CalcAllBelow != pCompare->GetCalcAllBelow()) {
-        return 1;
+        return true;
     }
     int32_t v4 = GetMultCalc();
     if (v4 != pCompare->GetMultCalc()) {
-        return 1;
+        return true;
     }
     int32_t v5 = GetChanceNone();
     if (v5 != pCompare->GetChanceNone()) {
-        return 1;
+        return true;
     }
     int32_t UseAll = GetUseAll();
     if (UseAll != pCompare->GetUseAll()) {
-        return 1;
+        return true;
     }
     if (pChanceGlobal != pCompare->pChanceGlobal) {
-        return 1;
+        return true;
     }
     BSSimpleList<LEVELED_OBJECT*>* pList = &leveledList;
     BSSimpleList<LEVELED_OBJECT*>* pCompareList = &pCompare->leveledList;
     int32_t IsEmpty = pList->IsEmpty();
     if (IsEmpty != pCompareList->IsEmpty()) {
-        return 1;
+        return true;
     }
     if (pList->IsEmpty()) {
         if (!pCompareList->IsEmpty()) {
-            return 1;
+            return true;
         }
     }
     else {
@@ -156,33 +156,33 @@ bool TESLeveledList::CompareComponent(BaseFormComponent* apCompareFC) {
             LEVELED_OBJECT* pCompareLevO = pCompareList->m_item;
             if (pLevO && pCompareLevO) {
                 if (pLevO->pForm != pCompareLevO->pForm) {
-                    return 1;
+                    return true;
                 }
                 if (pLevO->sLevel != pCompareLevO->sLevel) {
-                    return 1;
+                    return true;
                 }
                 if (pLevO->sCount != pCompareLevO->sCount) {
-                    return 1;
+                    return true;
                 }
                 if (pLevO->pItemExtra && (!pCompareLevO->pItemExtra && !pLevO->pItemExtra->IsDefault())) {
-                    return 1;
+                    return true;
                 }
                 if (!pLevO->pItemExtra && (pCompareLevO->pItemExtra && !pCompareLevO->pItemExtra->IsDefault())) {
-                    return 1;
+                    return true;
                 }
                 if (pLevO->pItemExtra &&
                     (pCompareLevO->pItemExtra && pLevO->pItemExtra->Compare(pCompareLevO->pItemExtra))) {
-                    return 1;
+                    return true;
                 }
             }
             pList = pList->m_pkNext;
             pCompareList = pCompareList->m_pkNext;
         }
         if (pList || pCompareList) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 uint8_t TESLeveledList::GetChanceNone() {
@@ -509,14 +509,14 @@ void TESLeveledList::CalculateCurrentFormListForRef(TESObjectREFR* apRef, TESCon
 
 void TESLeveledList::InitItem(TESForm* apOwner) {
     TESFile* pownerFile;
-    BSSimpleList<LEVELED_OBJECT*>* pLastList = 0;
+    BSSimpleList<LEVELED_OBJECT*>* pLastList = nullptr;
     BSSimpleList<LEVELED_OBJECT*>* pList = &leveledList;
-    LEVELED_OBJECT* pdata = 0;
+    LEVELED_OBJECT* pdata = nullptr;
     if (apOwner) {
         pownerFile = apOwner->GetFile(-1);
     }
     else {
-        pownerFile = 0;
+        pownerFile = nullptr;
     }
     while (pList) {
         pdata = pList->m_item;
@@ -536,7 +536,7 @@ void TESLeveledList::InitItem(TESForm* apOwner) {
             if (pdata) {
                 delete pdata;
             }
-            pdata = 0;
+            pdata = nullptr;
             if (apOwner) {
                 if (apOwner->GetFormEditorIDLength()) {
                     const char* v4 = apOwner->GetFormEditorID();

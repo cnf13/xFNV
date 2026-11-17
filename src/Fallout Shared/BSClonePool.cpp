@@ -43,7 +43,7 @@ BSClonePools::BSClonePools() {
 
 void BSClonePools::KillClones(NiAVObject* apLoadedObject, uint32_t aiCloneCount) {
     if (apLoadedObject) {
-        BSClonePools::ClonePool* ppool = 0;
+        BSClonePools::ClonePool* ppool = nullptr;
         for (BSSimpleList<BSClonePools::ClonePool*>* plist = &ClonePools; plist && (!ppool && !plist->IsEmpty());
              plist = plist->m_pkNext) {
             BSClonePools::ClonePool* pitem = plist->m_item;
@@ -70,9 +70,10 @@ void BSClonePools::KillClones(NiAVObject* apLoadedObject, uint32_t aiCloneCount)
 void BSClonePools::MakeClones(NiAVObject* apLoadedObject, uint32_t aiCloneCount) {
     if (apLoadedObject) {
         AutoMemContext tempMemContext(
-            MEM_CONTEXT_TES_REFERENCES, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BSClonePool.cpp", 56
+            MEM_CONTEXT_TES_REFERENCES, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BSClonePool.cpp",
+            56
         );
-        BSClonePools::ClonePool* ppool = 0;
+        BSClonePools::ClonePool* ppool = nullptr;
         for (BSSimpleList<BSClonePools::ClonePool*>* plist = &ClonePools; plist && (!ppool && !plist->IsEmpty());
              plist = plist->m_pkNext) {
             BSClonePools::ClonePool* pitem = plist->m_item;
@@ -90,7 +91,7 @@ void BSClonePools::MakeClones(NiAVObject* apLoadedObject, uint32_t aiCloneCount)
                 ppool_2 = ::new (v6) BSClonePools::ClonePool;
             }
             else {
-                ppool_2 = 0;
+                ppool_2 = nullptr;
             }
             ppool = ppool_2;
             ppool_2->pObject = (NiObject*)apLoadedObject;
@@ -106,7 +107,7 @@ void BSClonePools::MakeClones(NiAVObject* apLoadedObject, uint32_t aiCloneCount)
 }
 
 NiAVObject* BSClonePools::RequestClone(NiAVObject* apLoadedObject) {
-    BSClonePools::ClonePool* ppool = 0;
+    BSClonePools::ClonePool* ppool = nullptr;
     for (BSSimpleList<BSClonePools::ClonePool*>* plist = &ClonePools; plist && (!ppool && !plist->IsEmpty());
          plist = plist->m_pkNext) {
         BSClonePools::ClonePool* pitem = plist->m_item;
@@ -116,7 +117,7 @@ NiAVObject* BSClonePools::RequestClone(NiAVObject* apLoadedObject) {
             }
         }
     }
-    NiAVObject* presult = 0;
+    NiAVObject* presult = nullptr;
     if (ppool) {
         for (BSSimpleList<NiPointer<NiRefObject>>* pclones = &ppool->kAvailableClones;
              !presult && (pclones && !pclones->IsEmpty()); pclones = pclones->m_pkNext) {
@@ -155,7 +156,7 @@ BSCloneReserver::BSCloneReserver(NiAVObject* apModel, uint32_t aiCloneCount)
 
 BSCloneReserver::~BSCloneReserver() {
     if (pModel && iCloneCount) {
-        BSClonePools::GetInstance(1)->KillClones(pModel, iCloneCount);
+        BSClonePools::GetInstance(true)->KillClones(pModel, iCloneCount);
     }
 }
 
@@ -179,7 +180,7 @@ void BSCloneReserver::Init() {
         if (iCloneCount) {
             uiCloneCount = (int32_t)iCloneCount;
             pModel = this->pModel;
-            singleton = BSClonePools::GetInstance(1);
+            singleton = BSClonePools::GetInstance(true);
             singleton->MakeClones(pModel, uiCloneCount);
         }
     }

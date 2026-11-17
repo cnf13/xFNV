@@ -145,7 +145,7 @@ bool ImageSpaceModifierInstanceForm::StartTransition(
     NiAVObject* apTarget
 ) {
     if ((pImageSpaceMod && pImageSpaceMod->Data.bAnimatable) || (apMod && apMod->Data.bAnimatable)) {
-        return 0;
+        return false;
     }
     pLastImageSpaceMod = pImageSpaceMod;
     fLastStrength = fStrength;
@@ -155,7 +155,7 @@ bool ImageSpaceModifierInstanceForm::StartTransition(
     pImageSpaceMod = apMod;
     fStrength = afStrength;
     spTarget.operator=(apTarget);
-    return 1;
+    return true;
 }
 
 // Removes every active instance of apMod (the list's Remove copies the next node into a removed head, so the scan stays
@@ -164,7 +164,7 @@ void ImageSpaceModifierInstanceForm::Stop(TESImageSpaceModifier* apMod) {
     FNVD_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spInstance, std::nullopt, std::nullopt);
     if (apMod) {
-        bool bHasPlayed = 0;
+        bool bHasPlayed = false;
         BSSimpleList<NiPointer<ImageSpaceModifierInstance>>* pkList = &TES::pInstance->listActiveImageSpaceModifiers;
         while (pkList) {
             ImageSpaceModifierInstance* pInstance = pkList->m_item.m_pObject;
@@ -174,11 +174,11 @@ void ImageSpaceModifierInstanceForm::Stop(TESImageSpaceModifier* apMod) {
                 spInstance.~NiPointer<ImageSpaceModifierInstance>();
                 if (apMod->pOutroSound) {
                     if (!bHasPlayed) {
-                        bHasPlayed = 1;
+                        bHasPlayed = true;
                         uint32_t uiSoundID = apMod->pOutroSound->iFormID;
                         BSAudio* pAudio = &BSAudio::QInstance();
                         BSSoundHandle* pSound = pAudio->GetSoundHandleByNumericID(&kSound, uiSoundID, 0x200000u);
-                        pSound->Play(0);
+                        pSound->Play(false);
                     }
                 }
             }
@@ -193,7 +193,7 @@ ImageSpaceModifierInstanceForm*
 ImageSpaceModifierInstanceForm::Trigger(TESImageSpaceModifier* apMod, float afStrength, NiAVObject* apTarget) {
     FNVD_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spForm, std::nullopt, std::nullopt);
-    ImageSpaceModifierInstanceForm* pMod = 0;
+    ImageSpaceModifierInstanceForm* pMod = nullptr;
     if (apMod) {
         ImageSpaceModifierInstanceForm* pNew;
         void* pMemory = NiMemObject::operator new(sizeof(ImageSpaceModifierInstanceForm));
@@ -201,7 +201,7 @@ ImageSpaceModifierInstanceForm::Trigger(TESImageSpaceModifier* apMod, float afSt
             pNew = ::new (pMemory) ImageSpaceModifierInstanceForm(apMod, -10001.0f, afStrength, apTarget);
         }
         else {
-            pNew = 0;
+            pNew = nullptr;
         }
         pMod = pNew;
         ::new (&spForm) NiPointer<ImageSpaceModifierInstance>(static_cast<ImageSpaceModifierInstance*>(pNew));
@@ -211,7 +211,7 @@ ImageSpaceModifierInstanceForm::Trigger(TESImageSpaceModifier* apMod, float afSt
             uint32_t uiSoundID = apMod->pIntroSound->iFormID;
             BSAudio* pAudio = &BSAudio::QInstance();
             BSSoundHandle* pSound = pAudio->GetSoundHandleByNumericID(&kSound, uiSoundID, 0x200000u);
-            pSound->Play(0);
+            pSound->Play(false);
         }
     }
     return pMod;
@@ -224,15 +224,15 @@ ImageSpaceModifierInstanceForm* ImageSpaceModifierInstanceForm::TriggerIfNotActi
 ) {
     FNVD_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spForm, std::nullopt, std::nullopt);
-    bool bFound = 0;
-    ImageSpaceModifierInstanceForm* pMod = 0;
+    bool bFound = false;
+    ImageSpaceModifierInstanceForm* pMod = nullptr;
     if (apMod) {
         for (BSSimpleList<NiPointer<ImageSpaceModifierInstance>>* pkList =
                  &TES::pInstance->listActiveImageSpaceModifiers;
              pkList; pkList = pkList->m_pkNext) {
             ImageSpaceModifierInstance* pInstance = pkList->m_item.m_pObject;
             if (pInstance && (pInstance->IsForm() && pInstance->IsForm()->pImageSpaceMod == apMod)) {
-                bFound = 1;
+                bFound = true;
                 break;
             }
         }
@@ -243,7 +243,7 @@ ImageSpaceModifierInstanceForm* ImageSpaceModifierInstanceForm::TriggerIfNotActi
                 pNew = ::new (pMemory) ImageSpaceModifierInstanceForm(apMod, -10001.0f, afStrength, apTarget);
             }
             else {
-                pNew = 0;
+                pNew = nullptr;
             }
             pMod = pNew;
             ::new (&spForm) NiPointer<ImageSpaceModifierInstance>(static_cast<ImageSpaceModifierInstance*>(pNew));
@@ -253,7 +253,7 @@ ImageSpaceModifierInstanceForm* ImageSpaceModifierInstanceForm::TriggerIfNotActi
                 uint32_t uiSoundID = apMod->pIntroSound->iFormID;
                 BSAudio* pAudio = &BSAudio::QInstance();
                 BSSoundHandle* pSound = pAudio->GetSoundHandleByNumericID(&kSound, uiSoundID, 0x200000u);
-                pSound->Play(0);
+                pSound->Play(false);
             }
         }
     }
@@ -320,7 +320,7 @@ ImageSpaceModifierInstanceDOF* ImageSpaceModifierInstanceDOF::Trigger(
         );
     }
     else {
-        pInstance = 0;
+        pInstance = nullptr;
     }
     NiPointer<ImageSpaceModifierInstance> spInstance(static_cast<ImageSpaceModifierInstance*>(pInstance));
     TES::pInstance->listActiveImageSpaceModifiers.AddTail(spInstance);
@@ -392,7 +392,7 @@ ImageSpaceModifierInstanceDRB* ImageSpaceModifierInstanceDRB::Trigger(
         );
     }
     else {
-        pInstance = 0;
+        pInstance = nullptr;
     }
     NiPointer<ImageSpaceModifierInstance> spInstance(static_cast<ImageSpaceModifierInstance*>(pInstance));
     TES::pInstance->listActiveImageSpaceModifiers.AddTail(spInstance);
@@ -460,7 +460,7 @@ ImageSpaceModifierInstanceRB* ImageSpaceModifierInstanceRB::Trigger_0052A440(
         );
     }
     else {
-        pInstance = 0;
+        pInstance = nullptr;
     }
     NiPointer<ImageSpaceModifierInstance> spInstance(static_cast<ImageSpaceModifierInstance*>(pInstance));
     TES::pInstance->listActiveImageSpaceModifiers.AddTail(spInstance);

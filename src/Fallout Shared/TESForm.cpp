@@ -42,7 +42,7 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "SDK/MSVC/rtti.h"
 
-#include <stdint.h>
+#include <cstdint>
 #include <zlib.h>
 
 struct z_stream_s;
@@ -83,7 +83,7 @@ TESForm::TESForm() : BaseFormComponent(), cFormType(0), iFormFlags(8), iFormID(0
     // Checks the form type table once: every entry in its slot, no two with the same record code.
     if (!bEnumStringsChecked) {
         bool bFailed = false;
-        MessageHandler::IncDisableWarningCount(1);
+        MessageHandler::IncDisableWarningCount(true);
         for (uint32_t i = 0; i < 121; ++i) {
             const char* pString = formEnumString[i].pFormString;
             formEnumString[i].uiFormString = pString[3] << 24 | (pString[2] << 16 | (pString[1] << 8 | *pString));
@@ -102,11 +102,11 @@ TESForm::TESForm() : BaseFormComponent(), cFormType(0), iFormFlags(8), iFormID(0
                 }
             }
         }
-        MessageHandler::IncDisableWarningCount(0);
+        MessageHandler::IncDisableWarningCount(false);
         if (bFailed) {
             InitializationFlow("You must fix the problems in TESForm.cpp to run this game.");
         }
-        bEnumStringsChecked = 1;
+        bEnumStringsChecked = true;
     }
     // A form created at run time (not while the files load) takes the next form ID and the active file.
     if (pDataHandler && !pDataHandler->GetLoadingFiles()) {
@@ -115,7 +115,7 @@ TESForm::TESForm() : BaseFormComponent(), cFormType(0), iFormFlags(8), iFormID(0
             SetFile(pDataHandler->GetActiveFile());
         }
         if (iFormID <= 2047) {
-            TESForm::SetFormID(2048u, 1);
+            TESForm::SetFormID(2048u, true);
         }
     }
     if (iFormID) {
@@ -127,7 +127,7 @@ TESForm::~TESForm() {
     RemoveFromDataStructures();
     pSourceFiles.RemoveAll();
     if (!GetTemporary() && pSaveLoadGameOLD) {
-        pSaveLoadGameOLD->RemoveChanges(this, 0);
+        pSaveLoadGameOLD->RemoveChanges(this, false);
         pSaveLoadGameOLD->RemoveFormFromDeferredDeletionList(this);
     }
     if (!GetTemporary() && pSaveLoadGame) {
@@ -161,23 +161,23 @@ bool TESForm::CompareComponent(BaseFormComponent* apCompareFC) {
     const char* v6;
     TESForm* pCompare = dynamic_cast<TESForm*>(apCompareFC);
     if (!pCompare) {
-        return 1;
+        return true;
     }
     int32_t cFormType = this->cFormType;
     if (cFormType != pCompare->GetFormType()) {
-        return 1;
+        return true;
     }
     if (!GetFormEditorIDLength() && !pCompare->GetFormEditorIDLength()) {
         goto LABEL_11;
     }
     FormEditorIDLength = GetFormEditorIDLength();
     if (FormEditorIDLength != pCompare->GetFormEditorIDLength()) {
-        return 1;
+        return true;
     }
     v6 = pCompare->GetFormEditorID();
     v5 = GetFormEditorID();
     if (BSstricmp(v5, v6)) {
-        return 1;
+        return true;
     }
 LABEL_11:;
     uint32_t iTempFlags = iFormFlags;
@@ -186,7 +186,7 @@ LABEL_11:;
 
 bool TESForm::Save(TESFile* apFile) {
     if (GetTemporary()) {
-        return (bool)0;
+        return false;
     }
     Save();
     return (apFile->AddTESForm(this) == 0);
@@ -198,14 +198,14 @@ bool TESForm::LoadEdit(TESFile* apFile) {
 
 bool TESForm::SaveEdit(TESFile* apFile) {
     if (GetTemporary()) {
-        return 0;
+        return false;
     }
     if (!GetDelete()) {
         return Save(apFile);
     }
     apFile->StartForm(this);
     apFile->CloseForm();
-    return 1;
+    return true;
 }
 
 bool TESForm::SavesBefore(TESForm* apForm) {
@@ -261,7 +261,7 @@ bool TESForm::SavesBefore(TESForm* apForm) {
 }
 
 bool TESForm::SavesBefore(FORM* apGroupFORM) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apGroupFORM) {
         if (apGroupFORM->form == formEnumString[2].uiFormString) {
             uint32_t form = apGroupFORM->form;
@@ -316,7 +316,7 @@ bool TESForm::SavesBefore(FORM* apGroupFORM) {
                         }
                     }
                     if (v14 < v12) {
-                        bretval = 1;
+                        bretval = true;
                     }
                     break;
                 }
@@ -348,7 +348,7 @@ bool TESForm::SavesBefore(FORM* apGroupFORM) {
                         }
                     }
                     if (v8 < 650) {
-                        bretval = 1;
+                        bretval = true;
                     }
                     break;
                 }
@@ -380,7 +380,7 @@ bool TESForm::SavesBefore(FORM* apGroupFORM) {
                         }
                     }
                     if (v10 < 570) {
-                        bretval = 1;
+                        bretval = true;
                     }
                     break;
                 }
@@ -410,7 +410,7 @@ bool TESForm::SavesBefore(FORM* apGroupFORM) {
                         }
                     }
                     if (v6 < 690) {
-                        bretval = 1;
+                        bretval = true;
                     }
                     break;
                 }
@@ -663,7 +663,7 @@ bool TESForm::Compare(TESForm* apCopy) {
     const char* pFormString = apCopy->GetFormTypeString();
     const char* v2 = apCopy->GetFormEditorID();
     Warning("FORMS: Trying to compare form \"%s\".\r\nNo compare function for %s form types.\r\n", v2, pFormString);
-    return (bool)0;
+    return false;
 }
 
 // Whether apGroupFORM is the top-level group of this form's type: a 'GRUP' header of type FGT_TYPE whose label is the
@@ -1335,7 +1335,7 @@ void TESForm::__SaveData(void* apData, uint32_t aiSize) {
                 if (pWeight) {
                     ftemp_2 = pWeight->GetWeight();
                     if (TESForm::QEndianSwapOnSave()) {
-                        ENDIAN<float>(ftemp_2, 0);
+                        ENDIAN<float>(ftemp_2, false);
                     }
                     ourMemcpy(pData, &ftemp_2, 4u);
                     pData += 4;
@@ -1343,7 +1343,7 @@ void TESForm::__SaveData(void* apData, uint32_t aiSize) {
                 if (pQuality) {
                     ftemp_3 = static_cast<float>(pQuality->cQuality);
                     if (TESForm::QEndianSwapOnSave()) {
-                        ENDIAN<float>(ftemp_3, 0);
+                        ENDIAN<float>(ftemp_3, false);
                     }
                     ourMemcpy(pData, &ftemp_3, 4u);
                     pData += 4;
@@ -1510,13 +1510,13 @@ bool TESForm::ExpandChunk(CHUNK* apChunk, uint16_t asExpandSize) {
         }
         TESForm::iBufferSize += asExpandSize;
         TESForm::pFormBuffer = static_cast<FORM*>(ourRealloc(TESForm::pFormBuffer, TESForm::iBufferSize));
-        return (bool)1;
+        return true;
     }
     else {
         if (endianSwapOnSave) {
             apChunk->Endian();
         }
-        return (bool)0;
+        return false;
     }
 }
 
@@ -1673,7 +1673,7 @@ void TESForm::AddChunk(CHUNK_ID aeChunkID) {
 }
 
 bool TESForm::IsInteriorCellOrWorldspace(TESForm* apForm) {
-    bool v4 = 0;
+    bool v4 = false;
     if (apForm) {
         int32_t FormType = apForm->GetFormType();
         if (FormType == 57) {
@@ -1684,7 +1684,7 @@ bool TESForm::IsInteriorCellOrWorldspace(TESForm* apForm) {
         }
         else {
             if (FormType == 65) {
-                return 1;
+                return true;
             }
         }
     }
@@ -1768,7 +1768,7 @@ void TESForm::CompressSaveBuffer() {
                         ourMemcpy(pbuffer, pFORM, sizeof(FORM));
                         itempsize = ioriginalsize;
                         if (TESForm::QEndianSwapOnSave()) {
-                            ENDIAN<uint32_t>(itempsize, 0);
+                            ENDIAN<uint32_t>(itempsize, false);
                         }
                         ourMemcpy(&pbuffer[1], &itempsize, 4u);
                         ourMemcpy(&pbuffer[1].length, pcompressionbuffer, icompressedsize);
@@ -1843,20 +1843,20 @@ void TESForm::ReleaseFormDataStructures() {
         if (TESForm::pAllForms) {
             delete TESForm::pAllForms;
         }
-        TESForm::pAllForms = 0;
+        TESForm::pAllForms = nullptr;
     }
     if (TESForm::pAllFormsByEditorID) {
         TESForm::pAllFormsByEditorID->RemoveAll();
         if (TESForm::pAllFormsByEditorID) {
             delete TESForm::pAllFormsByEditorID;
         }
-        TESForm::pAllFormsByEditorID = 0;
+        TESForm::pAllFormsByEditorID = nullptr;
     }
     if (TESForm::pAlteredForms) {
         TESForm::pAlteredForms->RemoveAll();
         if (TESForm::pAlteredForms) {
             delete TESForm::pAlteredForms;
         }
-        TESForm::pAlteredForms = 0;
+        TESForm::pAlteredForms = nullptr;
     }
 }

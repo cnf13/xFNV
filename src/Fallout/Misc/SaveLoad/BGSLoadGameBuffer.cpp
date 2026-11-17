@@ -16,7 +16,7 @@ uint32_t BGSLoadGameBuffer::Load(BGSSaveLoadFile* apFile) {
         return v4;
     }
     else {
-        return (uint32_t)((-1));
+        return (uint32_t)(-1);
     }
 }
 

@@ -198,7 +198,7 @@ hkConstraintCinfo* bhkConstraintManager::GetInfo(uint32_t aiType) {
         }
         default: {
         LABEL_24:;
-            result = 0;
+            result = nullptr;
             break;
         }
     }

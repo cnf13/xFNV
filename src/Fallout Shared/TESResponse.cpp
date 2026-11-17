@@ -172,7 +172,7 @@ void TESResponse::InitItem(TESForm* apOwner) {
             Data.pConversationTopic = static_cast<TESTopic*>(pfileform);
         }
         else {
-            Data.pConversationTopic = 0;
+            Data.pConversationTopic = nullptr;
         }
         if (!Data.pConversationTopic) {
             const char* v20;
@@ -182,12 +182,12 @@ void TESResponse::InitItem(TESForm* apOwner) {
             char v46[264];
             TESTopicInfo* pinfo = dynamic_cast<TESTopicInfo*>(apOwner);
             TESTopic* ptopic = TESTopic::GetOwnerTopic(pinfo);
-            TESQuest* pquest = 0;
+            TESQuest* pquest = nullptr;
             if (ptopic) {
                 pquest = ptopic->GetOwnerQuest(pinfo);
             }
             BSStringT<char> infotext;
-            pinfo->GetInfoDisplayText(infotext, 1);
+            pinfo->GetInfoDisplayText(infotext, true);
             if (ptopic) {
                 CastingType = ptopic->iFormID;
             }
@@ -229,7 +229,7 @@ void TESResponse::InitItem(TESForm* apOwner) {
             Data.pVoiceSound = static_cast<TESSound*>(pfileform_2);
         }
         else {
-            Data.pVoiceSound = 0;
+            Data.pVoiceSound = nullptr;
         }
         if (!Data.pVoiceSound) {
             const char* v16;
@@ -239,12 +239,12 @@ void TESResponse::InitItem(TESForm* apOwner) {
             char v39[268];
             TESTopicInfo* pinfo_2 = dynamic_cast<TESTopicInfo*>(apOwner);
             TESTopic* ptopic_2 = TESTopic::GetOwnerTopic(pinfo_2);
-            TESQuest* pquest_2 = 0;
+            TESQuest* pquest_2 = nullptr;
             if (ptopic_2) {
                 pquest_2 = ptopic_2->GetOwnerQuest(pinfo_2);
             }
             BSStringT<char> infotext_2;
-            pinfo_2->GetInfoDisplayText(infotext_2, 1);
+            pinfo_2->GetInfoDisplayText(infotext_2, true);
             if (ptopic_2) {
                 v19 = ptopic_2->iFormID;
             }
@@ -284,7 +284,7 @@ void TESResponse::InitItem(TESForm* apOwner) {
             pSpeakerIdle = static_cast<TESIdleForm*>(pfileform_3);
         }
         else {
-            pSpeakerIdle = 0;
+            pSpeakerIdle = nullptr;
         }
         if (!pSpeakerIdle) {
             const char* v12;
@@ -294,12 +294,12 @@ void TESResponse::InitItem(TESForm* apOwner) {
             char v32[268];
             TESTopicInfo* pinfo_3 = dynamic_cast<TESTopicInfo*>(apOwner);
             TESTopic* ptopic_3 = TESTopic::GetOwnerTopic(pinfo_3);
-            TESQuest* pquest_3 = 0;
+            TESQuest* pquest_3 = nullptr;
             if (ptopic_3) {
                 pquest_3 = ptopic_3->GetOwnerQuest(pinfo_3);
             }
             BSStringT<char> infotext_3;
-            pinfo_3->GetInfoDisplayText(infotext_3, 1);
+            pinfo_3->GetInfoDisplayText(infotext_3, true);
             if (ptopic_3) {
                 v15 = ptopic_3->iFormID;
             }
@@ -339,18 +339,18 @@ void TESResponse::InitItem(TESForm* apOwner) {
             pListenerIdle = static_cast<TESIdleForm*>(pfileform_4);
         }
         else {
-            pListenerIdle = 0;
+            pListenerIdle = nullptr;
         }
         if (!pListenerIdle) {
             char v25[268];
             TESTopicInfo* pinfo_4 = dynamic_cast<TESTopicInfo*>(apOwner);
             TESTopic* ptopic_4 = TESTopic::GetOwnerTopic(pinfo_4);
-            TESQuest* pquest_4 = 0;
+            TESQuest* pquest_4 = nullptr;
             if (ptopic_4) {
                 pquest_4 = ptopic_4->GetOwnerQuest(pinfo_4);
             }
             BSStringT<char> infotext_4;
-            pinfo_4->GetInfoDisplayText(infotext_4, 1);
+            pinfo_4->GetInfoDisplayText(infotext_4, true);
             Warning("MASTERFILE: Could not find listener idle (%08X) in TESResponse init for %s.", itempint_2, v25);
         }
     }
@@ -388,7 +388,7 @@ bool TESResponse::TestAudioFullPath(
     BSstrcat(pout, 260, ".");
     BSstrcat(pout, 260, apFileExt);
     aFullPath.operator=(&result[1]);
-    return 1;
+    return true;
 }
 
 void TESResponse::GetAudioFilename(
@@ -434,12 +434,12 @@ bool TESResponse::GetAudioFullPath(
     BSStringT<char>& aFullPath
 ) {
     if (!apSpeaker) {
-        return 0;
+        return false;
     }
     TESBoundObject* ObjectReference = apSpeaker->GetObjectReference();
     int32_t FormType = ObjectReference->GetFormType();
     if (FormType != 22 && (FormType <= 41 || FormType > 43)) {
-        return 0;
+        return false;
     }
     TESBoundObject* pSpeakerBase = apSpeaker->GetObjectReference();
     return GetAudioFullPath(pSpeakerBase, apQuest, apOwnerTopic, apOwnerInfo, aFullPath);

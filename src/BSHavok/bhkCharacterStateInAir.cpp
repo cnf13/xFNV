@@ -29,7 +29,7 @@ void bhkCharacterStateInAir::Update(bhkCharacterController& arInput) {
     if (arInput.eWantState == HK_CHARACTER_MAX_STATE_ID && arInput.fFallTime > 1.0f &&
         arInput.GetFallDistance() < 0.10000000149011612) {
         arInput.eWantState = HK_CHARACTER_ON_GROUND;
-        arInput.bFakeSupport = 1;
+        arInput.bFakeSupport = true;
         arInput.GetPosition_hk(startFakePos);
         arInput.FakeSupportStart.m_quad = startFakePos.m_quad;
     }
@@ -79,7 +79,7 @@ void bhkCharacterStateInAir::Update(bhkCharacterController& arInput) {
         float v11 = _mm_shuffle_ps(v10, v10, 85)[0] + v10[0];
         float v12 = _mm_shuffle_ps(v10, v10, 170)[0];
         __m128 m_quad = hkQuadReal0000;
-        m_quad[0] = 0.0f - static_cast<float>(v12 + v11);
+        m_quad[0] = 0.0f - (v12 + v11);
         arInput.OutVelocity.m_quad =
             _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(m_quad, m_quad, 0), arInput.UpVec.m_quad), arInput.OutVelocity.m_quad);
         __m128 v14 = _mm_mul_ps(arInput.UpVec.m_quad, muInput.m_currentVelocity.m_quad);

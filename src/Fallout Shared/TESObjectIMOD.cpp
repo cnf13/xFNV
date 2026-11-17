@@ -21,7 +21,7 @@
 
 TESObjectIMOD::TESObjectIMOD() {
     cFormType = IMOD_ID;
-    SetInitialized(1);
+    SetInitialized(true);
 }
 
 TESObjectIMOD::~TESObjectIMOD() {}
@@ -148,7 +148,7 @@ void TESObjectIMOD::InitItem() {
         static_cast<BGSDestructibleObjectForm*>(this)->InitItem(this);
         static_cast<TESModelTextureSwap*>(this)->InitItem(this);
         static_cast<BGSPickupPutdownSounds*>(this)->InitItem(this);
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 

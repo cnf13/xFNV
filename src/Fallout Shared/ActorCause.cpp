@@ -77,7 +77,7 @@ void ActorCause::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
                 v3 = ::new (v6) BSSimpleList<DetectionState*>;
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             pWitnesses = v3;
         }
@@ -88,7 +88,7 @@ void ActorCause::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
                 pdetectionState = ::new (apMemory) DetectionState;
             }
             else {
-                pdetectionState = 0;
+                pdetectionState = nullptr;
             }
             DetectionState* pdetectionState_2 = pdetectionState;
             pdetectionState->LoadGame(apLoadGameBuffer);
@@ -116,7 +116,7 @@ void ActorCause::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
 }
 
 NiPoint3* ActorCause::FreeDetectionList() {
-    pActor = 0;
+    pActor = nullptr;
     while (this->pWitnesses && !this->pWitnesses->IsEmpty()) {
         ourFree(this->pWitnesses->m_item);
         this->pWitnesses->RemoveHead();
@@ -125,7 +125,7 @@ NiPoint3* ActorCause::FreeDetectionList() {
     if (pWitnesses) {
         delete static_cast<BSSimpleList<ActiveEffect*>*>(pWitnesses);
     }
-    this->pWitnesses = 0;
+    this->pWitnesses = nullptr;
     kOrigin = NiPoint3_ZERO;
     return &kOrigin;
 }
@@ -138,7 +138,7 @@ void ActorCause::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
         v3 = dynamic_cast<Actor*>(FormByNumericID);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     pActor = v3;
     for (DetectionState* pdetectionState : *pWitnesses) {
@@ -150,10 +150,10 @@ void ActorCause::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
 
 void ActorCause::InitLoadActorCausesList(BGSLoadGameBuffer* apLoadGameBuffer) {
     BSSimpleList<ActorCause*>* plist = &ActorCause::kCauseList;
-    BSSimpleList<ActorCause*>* plastList = 0;
+    BSSimpleList<ActorCause*>* plastList = nullptr;
     while (plist && !plist->IsEmpty()) {
         ActorCause* pactorCause = plist->m_item;
-        bool bremove = 0;
+        bool bremove = false;
         if (pactorCause) {
             // Tests only the low 16 bits of the count.
             if (static_cast<uint16_t>(pactorCause->iRefCount)) {
@@ -162,11 +162,11 @@ void ActorCause::InitLoadActorCausesList(BGSLoadGameBuffer* apLoadGameBuffer) {
             else {
                 pactorCause->iActorCauseID = -1;
                 delete pactorCause;
-                bremove = 1;
+                bremove = true;
             }
         }
         else {
-            bremove = 1;
+            bremove = true;
         }
         if (bremove) {
             if (plastList) {
@@ -217,14 +217,14 @@ void ActorCause::ClearActor(Actor* apActor) {
                     pcause->FreeDetectionList();
                 }
                 BSSimpleList<DetectionState*>* pdetection = pcause->pWitnesses;
-                bool bfound = 0;
+                bool bfound = false;
                 while (!bfound && (pdetection && pdetection->m_item)) {
                     DetectionState* pstate = pdetection->m_item;
                     pdetection = pdetection->m_pkNext;
                     if (pstate->pActor == apActor) {
                         pcause->pWitnesses->Remove(pstate);
                         ourFree(pstate);
-                        bfound = 1;
+                        bfound = true;
                     }
                 }
             }
@@ -234,14 +234,14 @@ void ActorCause::ClearActor(Actor* apActor) {
 
 ActorCause* ActorCause::GetActorCauseByID(int32_t aiActorCauseID) {
     if (aiActorCauseID < 0) {
-        return 0;
+        return nullptr;
     }
     for (ActorCause* v2 : ActorCause::kCauseList) {
         if (v2 && v2->iActorCauseID == aiActorCauseID) {
             return v2;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 void ActorCause::SaveActorCausesList(BGSSaveGameBuffer* apSaveGameBuffer) {

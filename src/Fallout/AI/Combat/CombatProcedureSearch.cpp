@@ -70,11 +70,11 @@ void CombatProcedureSearch::Update() {
                 LookingTimer.Reset(2.0f);
                 return;
             }
-            pSearchDoor = 0;
+            pSearchDoor = nullptr;
             if (!pcombatGroup->IsSearching()) {
                 return;
             }
-            CombatSearchLocation* psearchLocation = pcombatGroup->FindSearchLocation(pattacker, 0, 0);
+            CombatSearchLocation* psearchLocation = pcombatGroup->FindSearchLocation(pattacker, 0, nullptr);
             if (psearchLocation && psearchLocation->GetScore() > 30.0) {
                 float* v1;
                 NiPoint3* Point;
@@ -82,8 +82,8 @@ void CombatProcedureSearch::Update() {
                 ::new (&request) PathingRequest;
                 Space = psearchLocation->WorldLoc.pSpace;
                 Point = &(&psearchLocation->WorldLoc)->Point;
-                pattacker->BuildRequest_0(&request, *Point, Space, 128.0f, 0);
-                request.SetSoftGoalRadius(0);
+                pattacker->BuildRequest_0(&request, *Point, Space, 128.0f, nullptr);
+                request.SetSoftGoalRadius(false);
                 if (!pattacker->SetPathfindingGoal(&request)) {
                     SetFailed("Cannot setup path to investigate point");
                     request.~PathingRequest();
@@ -104,12 +104,12 @@ void CombatProcedureSearch::Update() {
             else {
                 v41 = fCombatSearchCheckDoorDistance.Float();
             }
-            TESObjectREFR* pdoor = pcombatGroup->FindSearchDoor(pattacker, v41, 1);
+            TESObjectREFR* pdoor = pcombatGroup->FindSearchDoor(pattacker, v41, true);
             if (pdoor) {
                 PathingRequest request_2;
                 TESForm* v28 = pdoor->GetSpace();
                 const NiPoint3* LinkedDoorTeleportPosition = &pdoor->GetLinkedDoorTeleportPosition();
-                pattacker->BuildRequest_0(&request_2, *LinkedDoorTeleportPosition, v28, 0.0f, 0);
+                pattacker->BuildRequest_0(&request_2, *LinkedDoorTeleportPosition, v28, 0.0f, nullptr);
                 NiPoint3 teleportRotation = pdoor->GetLinkedDoorTeleportRotation();
                 float v40 = teleportRotation.z - 3.1415927410125732;
                 float a2 = ClampAngle(v40);
@@ -132,10 +132,10 @@ void CombatProcedureSearch::Update() {
                 }
                 else {
                     PathingRequest request_3;
-                    if (pcombatState->CheckMovement(searchCenter, 1, 0)) {
+                    if (pcombatState->CheckMovement(searchCenter, true, false)) {
                         TESForm* v29 = searchCenter.pSpace;
                         NiPoint3* v25 = &(&searchCenter)->Point;
-                        pattacker->BuildRequest_0(&request_3, *v25, v29, 128.0f, 0);
+                        pattacker->BuildRequest_0(&request_3, *v25, v29, 128.0f, nullptr);
                         if (!pattacker->SetPathfindingGoal(&request_3)) {
                             SetFailed("Cannot setup path to search center");
                             return;
@@ -173,7 +173,7 @@ void CombatProcedureSearch::Update() {
                     }
                 }
                 losRequest.SetIgnoreLocationRadius(512.0f);
-                losRequest.SetAllowIncompletePath(0);
+                losRequest.SetAllowIncompletePath(false);
                 ignoreLocations_t ignoreLocations;
                 if (pcombatGroup->CalculateSearchIgnoreLocations(pattacker, &ignoreLocations)) {
                     losRequest.SetIgnoreLocations(ignoreLocations);
@@ -206,15 +206,17 @@ void CombatProcedureSearch::Update() {
                 }
             }
             else {
-                bool bforceComplete = 0;
+                bool bforceComplete = false;
                 if (eState == CombatProcedureSearch::SEARCH_STATE_INVESTIGATING && CheckDestinationTimer.Check()) {
                     pattacker->GetWorldLocation(&attackerWorldLoc_2);
                     double DistanceSquared = attackerWorldLoc_2.GetDistanceSquared(InvestigateLocation);
                     float* v7 = &fCombatSearchCheckInvestigateMaxDistance.Float();
                     if (*v7 * fCombatSearchCheckInvestigateMaxDistance.Float() > DistanceSquared) {
                         PathingLocation investigatePathingLocation(&InvestigateLocation);
-                        if (Pathing::CheckLineOfSight(investigatePathingLocation, attackerWorldLoc_2.Point, 0, 0)) {
-                            bforceComplete = 1;
+                        if (Pathing::CheckLineOfSight(
+                                investigatePathingLocation, attackerWorldLoc_2.Point, nullptr, nullptr
+                            )) {
+                            bforceComplete = true;
                         }
                     }
                     float* v8 = &fCombatSearchCheckInvestigateTime.Float();
@@ -259,7 +261,7 @@ void CombatProcedureSearch::Update() {
                             }
                             TESForm* TeleportSpace = pteleportData->GetTeleportSpace();
                             NiPoint3* TeleportPosition = &pteleportData->position;
-                            pattacker->BuildRequest_0(&request_4, *TeleportPosition, TeleportSpace, 0.0f, 0);
+                            pattacker->BuildRequest_0(&request_4, *TeleportPosition, TeleportSpace, 0.0f, nullptr);
                             if (!pattacker->SetPathfindingGoal(&request_4)) {
                                 SetFailed("Cannot setup path through search door");
                                 return;
@@ -271,7 +273,7 @@ void CombatProcedureSearch::Update() {
                             eState = CombatProcedureSearch::SEARCH_STATE_LOOKING_DOOR_FADE;
                             LookingTimer.Reset(3.0f);
                         }
-                        pSearchDoor = 0;
+                        pSearchDoor = nullptr;
                     }
                     else {
                         eState = CombatProcedureSearch::SEARCH_STATE_LOOKING;
@@ -287,9 +289,9 @@ void CombatProcedureSearch::Update() {
                     PathingLocation* pfailedPathDestination = pattacker->GetFailedPathDestination();
                     if (pfailedPathDestination) {
                         if (psearchLOSGridMap) {
-                            pfailedPathDestination->ResolveNavMeshInfo(0);
-                            psearchLOSGridMap->SetLocationSeen(*pfailedPathDestination, 1);
-                            pcombatGroup->bUpdateSearchDebugGeometry = 1;
+                            pfailedPathDestination->ResolveNavMeshInfo(nullptr);
+                            psearchLOSGridMap->SetLocationSeen(*pfailedPathDestination, true);
+                            pcombatGroup->bUpdateSearchDebugGeometry = true;
                         }
                     }
                 }
@@ -305,12 +307,12 @@ void CombatProcedureSearch::Update() {
                     float* v10 = &fCombatSearchCheckDoorMovingTime.Float();
                     CheckSearchDoorTimer.Reset(*v10);
                     float* v11 = &fCombatSearchCheckDoorMovingDistance.Float();
-                    TESObjectREFR* pdoor_2 = pcombatGroup->FindSearchDoor(pattacker, *v11, 1);
+                    TESObjectREFR* pdoor_2 = pcombatGroup->FindSearchDoor(pattacker, *v11, true);
                     if (pdoor_2) {
                         PathingRequest request_5;
                         TESForm* v31 = pdoor_2->GetSpace();
                         const NiPoint3* v12 = &pdoor_2->GetLinkedDoorTeleportPosition();
-                        pattacker->BuildRequest_0(&request_5, *v12, v31, 0.0f, 0);
+                        pattacker->BuildRequest_0(&request_5, *v12, v31, 0.0f, nullptr);
                         if (pattacker->SetPathfindingGoal(&request_5)) {
                             eState = CombatProcedureSearch::SEARCH_STATE_SEARCHING_DOOR;
                             pSearchDoor = pdoor_2;
@@ -319,7 +321,7 @@ void CombatProcedureSearch::Update() {
                         }
                     }
                 }
-                bool bforceComplete_2 = 0;
+                bool bforceComplete_2 = false;
                 if (psearchLOSGridMap) {
                     if (CheckDestinationTimer.Check()) {
                         PathingLocation searchDestination;
@@ -331,10 +333,10 @@ void CombatProcedureSearch::Update() {
                             float* v14 = &fCombatSearchCheckDestinationMaxDistance.Float();
                             float* v15 = &fCombatSearchCheckDestinationMaxDistance.Float();
                             if (fsquaredDistance < *v14 * *v15) {
-                                searchDestination.ResolveNavMeshInfo(0);
+                                searchDestination.ResolveNavMeshInfo(nullptr);
                                 if (searchDestination.HasNavMeshData() &&
                                     psearchLOSGridMap->IsLocationSeen(searchDestination)) {
-                                    bforceComplete_2 = 1;
+                                    bforceComplete_2 = true;
                                     NavMeshPtr spmesh;
                                     if (searchDestination.GetNavMesh(spmesh)) {
                                         float* v17;
@@ -351,7 +353,7 @@ void CombatProcedureSearch::Update() {
                                              (v19 = &fCombatSearchCheckDestinationMidDistance.Float(),
                                               (v20 = &fCombatSearchCheckDestinationMidDistance.Float(),
                                                fsquaredDistance > *v19 * *v20)))) {
-                                            bforceComplete_2 = 0;
+                                            bforceComplete_2 = false;
                                         }
                                     }
                                     if (bforceComplete_2) {
@@ -563,7 +565,7 @@ void CombatProcedureSearch::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     apSaveGameBuffer->SaveDataEndian(reinterpret_cast<char*>(&eState), 4, 0);
     // The same buffer pointer is passed to every member; the cast is there because BGSWorldLocation::SaveGame is typed
     // on the form buffer.
-    InvestigateLocation.SaveGame(static_cast<BGSSaveFormBuffer*>(apSaveGameBuffer));
+    InvestigateLocation.SaveGame(apSaveGameBuffer);
     LookingTimer.SaveGame(apSaveGameBuffer);
     CheckDestinationTimer.SaveGame(apSaveGameBuffer);
     CheckSearchDoorTimer.SaveGame(apSaveGameBuffer);
@@ -589,7 +591,7 @@ void CombatProcedureSearch::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v3 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     pSearchDoor = v3;
 }

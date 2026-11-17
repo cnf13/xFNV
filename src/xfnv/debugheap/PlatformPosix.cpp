@@ -5,14 +5,14 @@
 
 #include "Platform.h"
 
+#include <climits>
+#include <csignal>
+#include <cstdlib>
+#include <cstring>
 #include <fcntl.h>
-#include <limits.h>
 #include <link.h>
 #include <malloc.h>
 #include <pthread.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/mman.h>
 #include <sys/syscall.h>
 #include <ucontext.h>

@@ -28,7 +28,7 @@ FileFinder::~FileFinder() {
         MemoryManager_Singleton.Deallocate(const_cast<char*>(kPaths.pBuffer[auiIndex]));
     }
     if (FileFinder::pFinder == this) {
-        FileFinder::pFinder = 0;
+        FileFinder::pFinder = nullptr;
     }
 }
 
@@ -170,7 +170,7 @@ NiFile* FileFinder::GetFile(const char* apName, NiFile::OpenMode aeMode, uint32_
                 pNew = nullptr;
             }
             pFile = pNew;
-            pFile->Open(0, false);
+            pFile->Open(false, false);
         }
     }
     return pFile;
@@ -235,7 +235,7 @@ BSSimpleList<const char*>* FileFinder::BuildFileList(
     BSSimpleList<const char*>* apFileList
 ) {
     if (!apSearchName || !apBaseFilename) {
-        return 0;
+        return nullptr;
     }
     if (!std::strstr(apSearchName, "*") && !std::strstr(apSearchName, "?")) {
         return FileFinder::BuildSingleFileList(apSearchName, apBaseFilename, aiArchiveType, apFileList);
@@ -248,11 +248,11 @@ BSSimpleList<const char*>* FileFinder::BuildFileList(
         );
         if (v7) {
             v7->m_item = 0;
-            v7->m_pkNext = 0;
+            v7->m_pkNext = nullptr;
             v6 = v7;
         }
         else {
-            v6 = 0;
+            v6 = nullptr;
         }
         plist = v6;
     }
@@ -266,7 +266,7 @@ BSSimpleList<const char*>* FileFinder::BuildFileList(
             plist->RemoveAll();
             MemoryManager_Singleton.Deallocate(plist);
         }
-        return 0;
+        return nullptr;
     }
     return plist;
 }
@@ -288,7 +288,7 @@ bool FileFinder::AccessFile(const char* apName, NiFile::OpenMode aeMode) {
     else {
         int32_t v3;
         if (FileFinder::pFinder) {
-            v3 = FileFinder::pFinder->Exist(apName, 0, 0, 0xFFFFFFFFu);
+            v3 = FileFinder::pFinder->Exist(apName, nullptr, 0, 0xFFFFFFFFu);
         }
         else {
             v3 = 0;
@@ -298,7 +298,7 @@ bool FileFinder::AccessFile(const char* apName, NiFile::OpenMode aeMode) {
 }
 
 BSSimpleList<const char*>* FileFinder::BuildFileList_(const char* apSearchName, const char* apBaseFilename) {
-    return FileFinder::BuildFileList(apSearchName, apBaseFilename, 0xFFFFu, 0);
+    return FileFinder::BuildFileList(apSearchName, apBaseFilename, 0xFFFFu, nullptr);
 }
 
 BSSimpleList<const char*>* FileFinder::BuildSingleFileList(
@@ -325,15 +325,15 @@ BSSimpleList<const char*>* FileFinder::BuildSingleFileList(
         );
         if (v8) {
             v8->m_item = 0;
-            v8->m_pkNext = 0;
+            v8->m_pkNext = nullptr;
             v6 = v8;
         }
         else {
-            v6 = 0;
+            v6 = nullptr;
         }
         plist = v6;
     }
-    bool bfound = 0;
+    bool bfound = false;
     if (!ArchiveManager::bUseArchives || ArchiveManager::bInvalidateOlderFiles) {
         bfound = FileFinder::PlatformFindSingleFile(apSearchName);
     }
@@ -361,7 +361,7 @@ BSSimpleList<const char*>* FileFinder::BuildSingleFileList(
             plist->RemoveAll();
             MemoryManager_Singleton.Deallocate(plist);
         }
-        return 0;
+        return nullptr;
     }
     return plist;
 }

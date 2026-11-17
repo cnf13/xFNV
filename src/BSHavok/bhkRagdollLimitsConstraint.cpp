@@ -58,9 +58,10 @@ void hkRagdollLimitsConstraintCinfo::LoadBinary(NiStream& arStream) {
     hkConstraintCinfo::LoadBinary(arStream);
     hkpRagdollLimitsData* pd = static_cast<hkpRagdollLimitsData*>(pData);
     NiBinaryStream* m_pkIstr = v2->Istr();
-    m_pkIstr->m_uiAbsoluteCurrentPos += m_pkIstr->m_pfnRead(m_pkIstr, &pd->m_atoms.m_rotations.m_rotationA, 48, 0, 0);
+    m_pkIstr->m_uiAbsoluteCurrentPos +=
+        m_pkIstr->m_pfnRead(m_pkIstr, &pd->m_atoms.m_rotations.m_rotationA, 48, nullptr, 0);
     NiBinaryStream* v6 = v2->Istr();
-    v6->m_uiAbsoluteCurrentPos += v6->m_pfnRead(v6, &pd->m_atoms.m_rotations.m_rotationB, 48, 0, 0);
+    v6->m_uiAbsoluteCurrentPos += v6->m_pfnRead(v6, &pd->m_atoms.m_rotations.m_rotationB, 48, nullptr, 0);
     if (!v2->m_bSourceIsLittleEndian) {
         bhkRigidBodyCinfo::EndianMatrix(pd->m_atoms.m_rotations.m_rotationA);
         bhkRigidBodyCinfo::EndianMatrix(pd->m_atoms.m_rotations.m_rotationB);

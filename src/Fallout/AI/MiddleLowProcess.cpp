@@ -47,13 +47,13 @@ void MiddleLowProcess::Update(MobileObject* apRef, float fTimeDelta) {
 void MiddleLowProcess::Update(MobileObject* apRef) {
     AIProcessing_MiddleLowUpdate.Start();
     if (apRef) {
-        Actor* apActor__pact = apRef->IsActor() ? static_cast<Actor*>(apRef) : 0;
+        Actor* apActor__pact = apRef->IsActor() ? static_cast<Actor*>(apRef) : nullptr;
         float fHour = appCalendar.GetHour();
         if (apActor__pact) {
-            if (CheckforNewPackage(apActor__pact, 0)) {
+            if (CheckforNewPackage(apActor__pact, false)) {
                 ClearCurrentDataforProcess(apActor__pact);
                 apActor__pact->AlertAccompanyToPackageChange();
-                SetLocationForPackage(apActor__pact, 0);
+                SetLocationForPackage(apActor__pact, false);
             }
             TESPackage* ppack = GetCurrentPackage();
             if (GetCurrentPackage()) {
@@ -62,7 +62,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                     char Format[304];
                     UpdateTarget();
                     PackageLocation* ploc = GetCurrentPackage()->pPackLoc;
-                    TESObjectREFR* pRef_2 = 0;
+                    TESObjectREFR* pRef_2 = nullptr;
                     TESPackage* v3 = GetCurrentPackage();
                     uint32_t Count = v3->ePROCEDURE_TYPE;
                     switch (Procedure_Action[Count][GetProcedureIndexRunning()]) {
@@ -77,12 +77,12 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                                     pRef = pproc->GetGenericLocation();
                                 }
                                 else {
-                                    pRef = 0;
+                                    pRef = nullptr;
                                 }
                                 pRef_2 = pRef;
                             }
                             TESPackage* v57 = GetCurrentPackage();
-                            if (!v57->IsActorAtLocation(apActor__pact, 0, -1.0f, 0) &&
+                            if (!v57->IsActorAtLocation(apActor__pact, false, -1.0f, false) &&
                                 apActor__pact->IsPathingComplete()) {
                                 TESGlobal* ptimescale = static_cast<TESGlobal*>(TESForm::GetFormByNumericID(58u));
                                 float fhour = appCalendar.GetHour();
@@ -92,7 +92,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                                 float ftimedelta = fhour - fHourLastProcessed;
                                 ftimedelta = 3600.0 / ptimescale->fValue * ftimedelta;
                                 TESPackage* v5 = GetCurrentPackage();
-                                float fradius = v5->GetPackageRadiusActorToLocation(apActor__pact, 0);
+                                float fradius = v5->GetPackageRadiusActorToLocation(apActor__pact, false);
                                 TESPackage* v6 = GetCurrentPackage();
                                 if (v6->GetPackType() == PACKAGE_TYPE_WANDER) {
                                     fradius = 0.0f;
@@ -103,12 +103,12 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                                 TESObjectCELL* LocationCell = v8->GetLocationCell(apActor__pact);
                                 TESPackage* v9 = GetCurrentPackage();
                                 apActor__pact->SetPathfindingGoal(
-                                    v9->GetLocationCoord(apActor__pact), LocationCell, afRadius2, fradius, 0
+                                    v9->GetLocationCoord(apActor__pact), LocationCell, afRadius2, fradius, nullptr
                                 );
                             }
                             if (apActor__pact->pCurrentProcess->eLevel == PROCESS_TYPE_MIDDLE_LOW) {
                                 TESPackage* v56 = GetCurrentPackage();
-                                if (v56->IsActorAtLocation(apActor__pact, 0, -1.0f, 0)) {
+                                if (v56->IsActorAtLocation(apActor__pact, false, -1.0f, false)) {
                                     TESBoundObject* ObjectReference;
                                     TESPackage* v14;
                                     if (!GetLockedLocation()) {
@@ -122,7 +122,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                                                 &LowProcess::LockDoorsatLocation, apActor__pact
                                             );
                                         }
-                                        SetLockedLocation(1);
+                                        SetLockedLocation(true);
                                     }
                                     TESPackage* v12 = GetCurrentPackage();
                                     if (v12->GetUnlockDoorsAtLocation()) {
@@ -161,7 +161,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                             break;
                         }
                         case PROCEDURE_ACTIVATE: {
-                            ProcessActivate(apActor__pact, 1);
+                            ProcessActivate(apActor__pact, true);
                             break;
                         }
                         case PROCEDURE_ACQUIRE: {
@@ -191,7 +191,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                             break;
                         }
                         case PROCEDURE_FOLLOW: {
-                            ProcessFollow(apActor__pact, 1, 257, 0);
+                            ProcessFollow(apActor__pact, true, 257, false);
                             break;
                         }
                         case PROCEDURE_ESCORT: {
@@ -207,7 +207,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                             break;
                         }
                         case PROCEDURE_DIALOGUE: {
-                            apActor__pact->EndInterruptPackage(0);
+                            apActor__pact->EndInterruptPackage(false);
                             break;
                         }
                         case PROCEDURE_WAIT: {
@@ -221,7 +221,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                                 if (!pPlayer->IsPlayerFollower(apActor__pact)) {
                                     int32_t NumberOfFollowers = pPlayer->GetNumberOfFollowers();
                                     if (NumberOfFollowers < iNumberActorsAllowedToFollowPlayer.Int()) {
-                                        ppack->SetWaiting(0);
+                                        ppack->SetWaiting(false);
                                     }
                                 }
                             }
@@ -232,7 +232,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                                 if (ppack->GetPackType() == PACKAGE_TYPE_FOLLOW) {
                                     float fwaitdistance = static_cast<float>(ppack->GetPackageTarget()->iValue);
                                     if (static_cast<double>(fwaitdistance) >=
-                                        apActor__pact->GetDistanceFromReference(pTarget, 0, 0)) {
+                                        apActor__pact->GetDistanceFromReference(pTarget, false, false)) {
                                         AddToProcedureIndexRunning(apActor__pact, 1);
                                     }
                                 }
@@ -254,7 +254,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                                         }
                                     }
                                     if (fwaitdistance_2 / 2.0 >=
-                                        apActor__pact->GetDistanceFromReference(pTarget, 0, 0)) {
+                                        apActor__pact->GetDistanceFromReference(pTarget, false, false)) {
                                         AddToProcedureIndexRunning(apActor__pact, 1);
                                     }
                                 }
@@ -262,11 +262,11 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                             break;
                         }
                         case PROCEDURE_TRAVEL_TARGET: {
-                            ProcessActivate(apActor__pact, 0);
+                            ProcessActivate(apActor__pact, false);
                             break;
                         }
                         case PROCEDURE_PURSUE: {
-                            ProcessPursue(apActor__pact, 0, 1, 257);
+                            ProcessPursue(apActor__pact, false, true, 257);
                             break;
                         }
                         case PROCEDURE_CREATE_FOLLOW: {
@@ -275,7 +275,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                             }
                             if (pTarget) {
                                 if (pTarget != pPlayer) {
-                                    CreateFollowforEscort(apActor__pact, ppack, 1);
+                                    CreateFollowforEscort(apActor__pact, ppack, true);
                                 }
                             }
                         LABEL_88:;
@@ -331,7 +331,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                             break;
                         }
                         case PROCEDURE_DIALOGUE_ACTIVATE: {
-                            Actor* pact = 0;
+                            Actor* pact = nullptr;
                             if (pTarget) {
                                 if (pTarget->IsActor()) {
                                     pact = static_cast<Actor*>(pTarget);
@@ -342,8 +342,8 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                                 TESPackage* v15 = GetCurrentPackage();
                                 if (!v15->GetPackageSecondLocation() ||
                                     (v55 = GetCurrentPackage(),
-                                     v55->IsActorAtSecondLocation(pact, apActor__pact, 0, -1.0f, 1))) {
-                                    ProcessActivate(apActor__pact, 1);
+                                     v55->IsActorAtSecondLocation(pact, apActor__pact, false, -1.0f, true))) {
+                                    ProcessActivate(apActor__pact, true);
                                 }
                             }
                             break;
@@ -371,14 +371,14 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                                     Script::SetActionFlag(v25, a5, SCRIPT_ACTION_ONPACKAGEEND);
                                     TESPackage* v26 = GetCurrentPackage();
                                     PackageDone(apActor__pact, v26);
-                                    SetPackageDoneOnce(1);
+                                    SetPackageDoneOnce(true);
                                 }
-                                SetIsAggressor(0);
+                                SetIsAggressor(false);
                                 if (GetCurrentPackage()) {
                                     TESPackage* v27 = GetCurrentPackage();
                                     if (!v27->ePROCEDURE_TYPE) {
                                         TESPackage* v54 = GetCurrentPackage();
-                                        if (!v54->IsActorAtLocation(apActor__pact, 0, -1.0f, 0)) {
+                                        if (!v54->IsActorAtLocation(apActor__pact, false, -1.0f, false)) {
                                             AddToProcedureIndexRunning(apActor__pact, -1);
                                             return;
                                         }
@@ -396,7 +396,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                                 if (GetCurrentPackage()) {
                                     TESPackage* v30 = GetCurrentPackage();
                                     if (v30->GetIsCreated()) {
-                                        apActor__pact->EndInterruptPackage(0);
+                                        apActor__pact->EndInterruptPackage(false);
                                     }
                                 }
                                 if (Interface::GetConsoleSelection() == apActor__pact) {
@@ -410,7 +410,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                                 if (apThis) {
                                     apThis->Delete(1u);
                                 }
-                                pAcquireObject = 0;
+                                pAcquireObject = nullptr;
                                 while (!ObjectList.IsEmpty()) {
                                     ObjectstoAcquire* pobj = (&ObjectList)->m_item;
                                     if (pobj) {
@@ -422,7 +422,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                                     TESPackage* v33 = GetCurrentPackage();
                                     if (!v33->GetPackageSchedule()->PSData.iDuration) {
                                         TESPackage* ptemp = GetCurrentPackage();
-                                        CheckforNewPackage(apActor__pact, 1);
+                                        CheckforNewPackage(apActor__pact, true);
                                         ppack = GetCurrentPackage();
                                         TESPackage* v34 = GetCurrentPackage();
                                         if (ptemp != v34) {
@@ -448,7 +448,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
 }
 
 bool MiddleLowProcess::CheckforNewPackage(Actor* apActor, bool abFlag) {
-    float hour = (float)(&appCalendar)->GetHour();
+    float hour = (&appCalendar)->GetHour();
     uint8_t v6 = 0;
     if (abFlag || ((!GetCurrentPackage()) || (iHourPackageEvaluated != ((uint32_t)((int32_t)hour))))) {
         v6 = (uint8_t)LowProcess::CheckforNewPackage(apActor, abFlag);
@@ -466,7 +466,7 @@ int32_t MiddleLowProcess::GetPackageEvaluateHour() {
 }
 
 int32_t MiddleLowProcess::GetActorValue(TESActorBase* apActorBase, ActorValue::Index aiWhich, Actor* apActor) {
-    if ((uint8_t)ActorValue::IsFlagSet(static_cast<ActorValue::Index>(aiWhich), ActorValue::ENUMERATION)) {
+    if ((uint8_t)ActorValue::IsFlagSet(aiWhich, ActorValue::ENUMERATION)) {
         return LowProcess::GetActorValue(apActorBase, aiWhich, apActor);
     }
     int32_t actorValue = LowProcess::GetActorValue(apActorBase, aiWhich, apActor);
@@ -475,7 +475,7 @@ int32_t MiddleLowProcess::GetActorValue(TESActorBase* apActorBase, ActorValue::I
 
 float MiddleLowProcess::GetActorFloatValue(TESActorBase* apActorBase, ActorValue::Index aiWhich, Actor* apActor) {
     // enumerated actor values bypass the modifiers
-    if (ActorValue::IsFlagSet(static_cast<ActorValue::Index>(aiWhich), ActorValue::ENUMERATION)) {
+    if (ActorValue::IsFlagSet(aiWhich, ActorValue::ENUMERATION)) {
         return this->LowProcess::GetActorFloatValue(apActorBase, aiWhich, apActor);
     }
 
@@ -486,13 +486,13 @@ float MiddleLowProcess::GetActorFloatValue(TESActorBase* apActorBase, ActorValue
 }
 
 void MiddleLowProcess::TempModActorValue(Actor* apActor, ActorValue::Index aiWhich, float afValue) {
-    if (!((uint8_t)ActorValue::IsFlagSet(static_cast<ActorValue::Index>(aiWhich), ActorValue::ENUMERATION))) {
+    if (!((uint8_t)ActorValue::IsFlagSet(aiWhich, ActorValue::ENUMERATION))) {
         (&pTemporaryModifiers)->AdjustModifier((int32_t)((uint8_t)aiWhich), afValue, ModifierList::NO_CLAMP);
     }
 }
 
 void MiddleLowProcess::TempModActorValue(Actor* apActor, ActorValue::Index aiWhich, int32_t aiValue) {
-    if (!((uint8_t)ActorValue::IsFlagSet(static_cast<ActorValue::Index>(aiWhich), ActorValue::ENUMERATION))) {
+    if (!((uint8_t)ActorValue::IsFlagSet(aiWhich, ActorValue::ENUMERATION))) {
         float fValue = static_cast<float>(aiValue);
         (&pTemporaryModifiers)->AdjustModifier((int32_t)((uint8_t)aiWhich), fValue, ModifierList::NO_CLAMP);
     }
@@ -502,7 +502,7 @@ void MiddleLowProcess::DamageModActorValue(Actor* apActor, ActorValue::Index aiW
     double v4;
     ModifierList::ClampStyle a4;
     float afValue_2;
-    if (!((uint8_t)ActorValue::IsFlagSet(static_cast<ActorValue::Index>(aiWhich), ActorValue::ENUMERATION))) {
+    if (!((uint8_t)ActorValue::IsFlagSet(aiWhich, ActorValue::ENUMERATION))) {
         if (apActor) {
             v4 = (double)Actor::CheckClampDamageModifier(static_cast<ActorValueOwner*>(apActor), aiWhich, afValue);
         }
@@ -511,8 +511,7 @@ void MiddleLowProcess::DamageModActorValue(Actor* apActor, ActorValue::Index aiW
         }
         afValue_2 = (float)v4;
         a4 = static_cast<ModifierList::ClampStyle>(
-            ((uint8_t)ActorValue::IsFlagSet(static_cast<ActorValue::Index>(aiWhich), ActorValue::DAMAGE_IS_POSITIVE)) !=
-            0
+            ((uint8_t)ActorValue::IsFlagSet(aiWhich, ActorValue::DAMAGE_IS_POSITIVE)) != 0
         );
         (&pDamageModifiers)->AdjustModifier((int32_t)((uint8_t)aiWhich), afValue_2, a4);
     }
@@ -731,25 +730,25 @@ void MiddleLowProcess::ProcessCombat(Actor* apActor) {
     float* pCombatRound = &fCombatRoundAmount.Float();
     int32_t iCombatRound2 = static_cast<int32_t>(*pCombatRound + *pCombatRound);
     Actor* pTarget = dynamic_cast<Actor*>(this->pTarget);
-    bool bRoundDone = 0;
-    if (!this->pTarget || (pTarget->GetDisabled() || (pTarget->GetDelete() || pTarget->IsDead(0)))) {
-        apActor->StopCombat(0);
-        apActor->EndInterruptPackage(0);
+    bool bRoundDone = false;
+    if (!this->pTarget || (pTarget->GetDisabled() || (pTarget->GetDelete() || pTarget->IsDead(false)))) {
+        apActor->StopCombat(nullptr);
+        apActor->EndInterruptPackage(false);
     }
     else {
         BaseProcess* v3;
         if (pTarget &&
             (pTarget->GetCurrentAIProcess() &&
              (v3 = pTarget->GetCurrentAIProcess(), v3->GetProcessLevel() == PROCESS_TYPE_MIDDLE_LOW))) {
-            while (iCombatRound2 && !apActor->IsDead(0)) {
+            while (iCombatRound2 && !apActor->IsDead(false)) {
                 apActor->PerformOneRoundofCombat();
                 pTarget = dynamic_cast<Actor*>(this->pTarget);
                 if (pTarget) {
-                    if (!pTarget->IsDead(0)) {
+                    if (!pTarget->IsDead(false)) {
                         BaseProcess* CurrentAIProcess = pTarget->GetCurrentAIProcess();
                         if (CurrentAIProcess->GetProcessLevel() == PROCESS_TYPE_MIDDLE_LOW) {
                             pTarget->PerformOneRoundofCombat();
-                            bRoundDone = 1;
+                            bRoundDone = true;
                         }
                     }
                 }
@@ -763,31 +762,31 @@ void MiddleLowProcess::ProcessCombat(Actor* apActor) {
             }
         }
         else {
-            ProcessFollow(apActor, 1, 257, 0);
+            ProcessFollow(apActor, true, 257, false);
         }
     }
 }
 
 bool MiddleLowProcess::ProcessCombatOneHour(Actor* apActor, float afTimeDelta) {
     int32_t v6 = static_cast<int32_t>(fCombatRoundAmount.Float() * 4.0);
-    Actor* pTarget = 0;
-    while (v6 && !apActor->IsDead(0)) {
+    Actor* pTarget = nullptr;
+    while (v6 && !apActor->IsDead(false)) {
         apActor->PerformOneRoundofCombat();
         pTarget = dynamic_cast<Actor*>(this->pTarget);
         if (pTarget) {
-            if (!pTarget->IsDead(0)) {
+            if (!pTarget->IsDead(false)) {
                 pTarget->PerformOneRoundofCombat();
             }
         }
         --v6;
     }
     if (pTarget) {
-        if (!pTarget->IsDead(0)) {
+        if (!pTarget->IsDead(false)) {
             BaseProcess* CurrentAIProcess = pTarget->GetCurrentAIProcess();
             CurrentAIProcess->ComputeLastTimeProcessed();
         }
     }
-    return 0;
+    return false;
 }
 
 void MiddleLowProcess::MiddleLowCopy(MiddleLowProcess* apProcess) {

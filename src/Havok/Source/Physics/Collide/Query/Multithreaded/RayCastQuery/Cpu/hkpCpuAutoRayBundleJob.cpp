@@ -92,7 +92,7 @@ void hkpAutoRayBundleJob_bundleIndexedRays(
     hkpWorldRayCastBundleCommand* bundleCommandsOut,
     int32_t* numBundleCommandsOut
 ) {
-    const float fCos = static_cast<float>(std::cos(maxAngle));
+    const float fCos = std::cos(maxAngle);
     // EXE-INLINED none: fabs
     const float fMinCos = __builtin_fabsf(fCos);
     alignas(16) hkLocalArray<hkpAutoRayBundle> bundles;
@@ -213,7 +213,7 @@ void hkpAutoRayBundleJob_bundleOctantRays(
     hkpWorldRayCastBundleCommand* bundleCommandsOut,
     int32_t* numBundleCommandsOut
 ) {
-    const float fCos = static_cast<float>(std::cos(maxAngle));
+    const float fCos = std::cos(maxAngle);
     // EXE-INLINED none: fabs
     const float fMinCos = __builtin_fabsf(fCos);
     alignas(16) hkLocalArray<hkpAutoRayBundle> bundles;
@@ -332,21 +332,16 @@ bool hkpAutoRayBundleJob_canBundleRays(
 ) {
     __m128 v8 = _mm_mul_ps(direction0.m_quad, direction1.m_quad);
     bool result = false;
-    if (!(minCos > static_cast<double>(static_cast<float>(
-                       _mm_shuffle_ps(v8, v8, 170)[0] + static_cast<float>(_mm_shuffle_ps(v8, v8, 85)[0] + v8[0])
-                   )))) {
+    if (!(minCos > static_cast<double>((_mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]))))) {
         __m128 v10 = _mm_sub_ps(from1.m_quad, from0.m_quad);
         __m128 v11 = _mm_mul_ps(v10, v10);
         __m128 v12 = _mm_sub_ps(to1.m_quad, to0.m_quad);
         if (!(maxDistanceSquared <
-              static_cast<double>(static_cast<float>(
-                  _mm_shuffle_ps(v11, v11, 170)[0] + static_cast<float>(_mm_shuffle_ps(v11, v11, 85)[0] + v11[0])
-              )))) {
+              static_cast<double>((_mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]))))) {
             __m128 v13 = _mm_mul_ps(v12, v12);
-            if (!(maxDistanceSquared <
-                  static_cast<double>(static_cast<float>(
-                      _mm_shuffle_ps(v13, v13, 170)[0] + static_cast<float>(_mm_shuffle_ps(v13, v13, 85)[0] + v13[0])
-                  )))) {
+            if (!(maxDistanceSquared < static_cast<double>((
+                                           _mm_shuffle_ps(v13, v13, 170)[0] + (_mm_shuffle_ps(v13, v13, 85)[0] + v13[0])
+                                       )))) {
                 return true;
             }
         }

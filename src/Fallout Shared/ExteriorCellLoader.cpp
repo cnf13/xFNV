@@ -40,12 +40,12 @@ void ExteriorCellLoader::LoadCellData(CELL_LOAD_DATA* apCellData) {
             apCellData->pCell = apCellData->pWorld->LoadCell(apCellData->iX, apCellData->iY);
         }
         if (!apCellData->pCell) {
-            apCellData->pCell = pDataHandler->NewCell(0, apCellData->iX, apCellData->iY, apCellData->pWorld);
+            apCellData->pCell = pDataHandler->NewCell(nullptr, apCellData->iX, apCellData->iY, apCellData->pWorld);
         }
         apCellData->pCell->Load3D();
         TESObjectLAND* pland = apCellData->pCell->GetLand();
         if (pland) {
-            pland->LoadVertices(1);
+            pland->LoadVertices(true);
             bool ShowLandBorders = TES::pInstance->GetShowLandBorders();
             pland->DrawLandBorder(ShowLandBorders);
         }
@@ -59,9 +59,9 @@ void ExteriorCellLoader::LoadCellData(CELL_LOAD_DATA* apCellData) {
                 !apCellData->pCell->bAutoWaterLoaded) {
                 BGSAutoWater::GeneratePlaceableWaterForCell(apCellData->pCell);
             }
-            apCellData->pCell->SetAutoWaterLoaded(1);
+            apCellData->pCell->SetAutoWaterLoaded(true);
         }
-        apCellData->bLoaded = 1;
+        apCellData->bLoaded = true;
     }
 }
 
@@ -92,10 +92,10 @@ void ExteriorCellLoader::ClearData() {
     iterator_t iterator;
     while (!iterator.GetFinished()) {
         ikey = 0;
-        ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
+        ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
         if (QueuedCellMap.GetNext(iterator, ikey, sptask, true)) {
             ExteriorCellLoaderTask* v1 = sptask.m_pObject;
-            pIOManager->CancelTask(v1, 0);
+            pIOManager->CancelTask(v1, nullptr);
         }
         sptask.~NiPointer<ExteriorCellLoaderTask>();
     }
@@ -104,7 +104,7 @@ void ExteriorCellLoader::ClearData() {
 bool ExteriorCellLoader::CellIsQueued(int32_t aiCellX, int32_t aiCellY) {
     FNVD_INLINED_LOCAL(NiPointer<ExteriorCellLoaderTask>, sptask, std::nullopt, std::nullopt);
     uint32_t ikey = TESObjectCELL::GetCoord(static_cast<uint16_t>(aiCellX), static_cast<uint16_t>(aiCellY));
-    ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
+    ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
     bool v5 = QueuedCellMap.GetAt(ikey, sptask);
     // This destructor releases through BSTask's DecRefCount.
     sptask.~NiPointer<ExteriorCellLoaderTask>();
@@ -118,7 +118,7 @@ void ExteriorCellLoader::PostProcessCompletedTasks() {
     iterator_t iterator;
     while (!iterator.GetFinished()) {
         ikey = 0;
-        ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
+        ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
         if (QueuedCellMap.GetNext(iterator, ikey, sptask, true) && sptask.m_pObject->IsCompleted()) {
             ExteriorCellLoaderTask* pTask = sptask.m_pObject;
             pTask->PostProcess();
@@ -135,10 +135,10 @@ uint32_t ExteriorCellLoader::TryCancelTasks() {
     iterator_t iterator;
     while (!iterator.GetFinished()) {
         ikey = 0;
-        ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
+        ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
         if (QueuedCellMap.GetNext(iterator, ikey, sptask, true)) {
             ExteriorCellLoaderTask* v2 = sptask.m_pObject;
-            if (!pIOManager->TryCancelTask(v2, 0)) {
+            if (!pIOManager->TryCancelTask(v2, nullptr)) {
                 ++iuncanceledTasks;
             }
         }
@@ -154,7 +154,7 @@ void ExteriorCellLoader::WaitForTasks() {
     iterator_t iterator;
     while (!iterator.GetFinished()) {
         ikey = 0;
-        ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
+        ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
         if (QueuedCellMap.GetNext(iterator, ikey, sptask, true)) {
             ExteriorCellLoaderTask* v1 = sptask.m_pObject;
             pIOManager->WaitForTask(v1);
@@ -185,12 +185,12 @@ void ExteriorCellLoader::QueueCellLoad(TESWorldSpace* apWorld, int32_t aiCellX, 
                         v5 = ::new (v7) ExteriorCellLoaderTask(this, pcelldata);
                     }
                     else {
-                        v5 = 0;
+                        v5 = nullptr;
                     }
                     ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(v5));
                     uint32_t ikey =
                         TESObjectCELL::GetCoord(static_cast<uint16_t>(aiCellX), static_cast<uint16_t>(aiCellY));
-                    QueuedCellMap.SetAt(ikey, sptask, 1);
+                    QueuedCellMap.SetAt(ikey, sptask, true);
                     ExteriorCellLoaderTask* v4 = sptask.m_pObject;
                     pIOManager->AddTask(v4);
                     sptask.~NiPointer<ExteriorCellLoaderTask>();
@@ -201,14 +201,14 @@ void ExteriorCellLoader::QueueCellLoad(TESWorldSpace* apWorld, int32_t aiCellX, 
 }
 
 CELL_LOAD_DATA* ExteriorCellLoader::PreLoadCellData(TESWorldSpace* apWorld, int32_t aiCellX, int32_t aiCellY) {
-    CELL_LOAD_DATA* pcell = 0;
+    CELL_LOAD_DATA* pcell = nullptr;
     if (apWorld) {
         pcell = static_cast<CELL_LOAD_DATA*>(ourMalloc(sizeof(CELL_LOAD_DATA)));
         pcell->pWorld = apWorld;
         pcell->iX = aiCellX;
         pcell->iY = aiCellY;
-        pcell->bLoaded = 0;
-        pcell->pCell = 0;
+        pcell->bLoaded = false;
+        pcell->pCell = nullptr;
     }
     return pcell;
 }
@@ -253,7 +253,7 @@ ExteriorCellLoaderTask::~ExteriorCellLoaderTask() {
 
 void ExteriorCellLoaderTask::Run() {
     pLoader->LoadCellData(pCellData);
-    pCellData->pCell->QueueReferences(1);
+    pCellData->pCell->QueueReferences(true);
 }
 
 void ExteriorCellLoaderTask::Finish() {
@@ -268,13 +268,13 @@ void ExteriorCellLoaderTask::PostProcess() {
             }
         }
     }
-    pCellData->bLoaded = 0;
+    pCellData->bLoaded = false;
     pLoader->RemoveCell(pCellData->iX, pCellData->iY);
 }
 
 void ExteriorCellLoaderTask::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
     if (pCellData->pCell) {
-        if (TES::pInstance->IsCellLoaded(pCellData->pCell, 0)) {
+        if (TES::pInstance->IsCellLoaded(pCellData->pCell, false)) {
             pDataHandler->UnloadCell(pCellData->pCell);
         }
     }

@@ -27,7 +27,7 @@ public:
         MAX_UNIQUE_FREELISTS = 0x29,
     };
 
-    typedef void (*MemoryWalkCallback)(void*, uint32_t, hkBool, int32_t, void*);
+    using MemoryWalkCallback = void (*)(void*, uint32_t, hkBool, int32_t, void*);
 
     hkFreeListAllocator(hkMemoryBlockServer* server);
     ~hkFreeListAllocator() override;

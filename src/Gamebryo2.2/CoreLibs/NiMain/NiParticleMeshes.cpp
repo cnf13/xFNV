@@ -110,7 +110,7 @@ void NiParticleMeshes::UpdateWorldData(NiUpdateData& UpdateData) {
     m_pObject->UpdateDownwardPass(UpdateData, 0);
     if (pkData->m_bNeedsPropertyEffectUpdate) {
         UpdateProperties();
-        pkData->m_bNeedsPropertyEffectUpdate = 0;
+        pkData->m_bNeedsPropertyEffectUpdate = false;
     }
 }
 
@@ -133,7 +133,7 @@ void NiParticleMeshes::CopyMembers(NiParticleMeshes* pkDest, NiCloningProcess& k
 NiObject* NiParticleMeshes::CreateObject() {
     NiParticleMeshes* pkObject = static_cast<NiParticleMeshes*>(NiMemObject::operator new(sizeof(NiParticleMeshes)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiParticleMeshes;
 }

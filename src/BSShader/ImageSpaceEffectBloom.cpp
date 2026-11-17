@@ -99,10 +99,10 @@ bool ImageSpaceEffectBloom::UpdateParams(ImageSpaceEffectParam* pParam) {
     }
     pparam->SetPixelConstant(0, 0.0f, y, a5, 0.0f);
     ImageSpaceEffectBlur::fBlurRadius = 4.0f;
-    return 1;
+    return true;
 }
 
 void ImageSpaceEffectBloom::SetParams(float* apfData) {
-    bParamsChanged = (bool)1;
+    bParamsChanged = true;
     pfData = apfData;
 }

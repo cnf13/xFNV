@@ -21,7 +21,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
 #include "Reconstruction.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiRTTI BSFaceGenAnimationData::ms_RTTI("BSFaceGenAnimationData", &NiExtraData::ms_RTTI);
 SettingT<GameSettingCollection> BSFaceGenAnimationData::fExpressionChangePerSec("fExpressionChangePerSec", 2.0f);
@@ -90,10 +90,10 @@ BSFaceGenAnimationData::~BSFaceGenAnimationData() {
 
 float BSFaceGenAnimationData::GetExpressionValue(BS_FACEGEN_EXPRESSION aeExpression) {
     if (((int32_t)aeExpression) >= 15) {
-        return (float)(0.0);
+        return (float)0.0;
     }
     else {
-        return (float)((float)(&CurrentExpressionData)->GetQuantity(aeExpression));
+        return (&CurrentExpressionData)->GetQuantity(aeExpression);
     }
 }
 
@@ -110,9 +110,9 @@ bool BSFaceGenAnimationData::GetModifierValuesAsRotation(NiQuaternion& arQuat) {
     double v5;
     double v6;
     double v7;
-    float quantity = (float)(&CurrentModifierData)->GetQuantity(BS_FG_MODIFIER_HEAD_YAW);
-    float v9 = (float)(&CurrentModifierData)->GetQuantity(BS_FG_MODIFIER_HEAD_ROLL);
-    float v11 = (float)(&CurrentModifierData)->GetQuantity(BS_FG_MODIFIER_HEAD_PITCH);
+    float quantity = (&CurrentModifierData)->GetQuantity(BS_FG_MODIFIER_HEAD_YAW);
+    float v9 = (&CurrentModifierData)->GetQuantity(BS_FG_MODIFIER_HEAD_ROLL);
+    float v11 = (&CurrentModifierData)->GetQuantity(BS_FG_MODIFIER_HEAD_PITCH);
     if (quantity == 0x1.fffffe0000000p+127) {
         quantity = (float)0.0;
     }
@@ -173,10 +173,10 @@ void BSFaceGenAnimationData::SetModifierValue(BS_FACEGEN_MODIFIER aeModifier, fl
 
 float BSFaceGenAnimationData::GetPhonemeValue(BS_FACEGEN_PHONEME aePhoneme) {
     if (((int32_t)aePhoneme) >= 16) {
-        return (float)(0.0);
+        return (float)0.0;
     }
     else {
-        return (float)((float)(&CurrentPhonemeData)->GetQuantity(aePhoneme));
+        return (&CurrentPhonemeData)->GetQuantity(aePhoneme);
     }
 }
 
@@ -188,10 +188,10 @@ void BSFaceGenAnimationData::SetPhonemeValue(BS_FACEGEN_PHONEME aePhoneme, float
 
 float BSFaceGenAnimationData::GetCustomMorphValue(BS_FACEGEN_CUSTOM_MORPH aeCustomMorph) {
     if (((int32_t)aeCustomMorph) >= 1) {
-        return (float)(0.0);
+        return (float)0.0;
     }
     else {
-        return (float)((float)(&CurrentCustomMorphData)->GetQuantity(aeCustomMorph));
+        return (&CurrentCustomMorphData)->GetQuantity(aeCustomMorph);
     }
 }
 
@@ -217,11 +217,11 @@ void BSFaceGenAnimationData::ResetCurrentMorphs(
     if (afTime == 0.0) {
         if (abResetExpression) {
             (&CurrentExpressionData)->SetTime((float)0.0);
-            (&CurrentExpressionData)->ClearData((bool)1);
+            (&CurrentExpressionData)->ClearData(true);
         }
         if (abResetModifier) {
             (&CurrentModifierData)->SetTime((float)0.0);
-            (&CurrentModifierData)->ClearData((bool)1);
+            (&CurrentModifierData)->ClearData(true);
             if (abForDeath) {
                 (&CurrentModifierData)->SetQuantity(0, 1.0);
                 (&CurrentModifierData)->SetQuantity(1u, 1.0);
@@ -229,11 +229,11 @@ void BSFaceGenAnimationData::ResetCurrentMorphs(
         }
         if (abResetPhoneme) {
             (&CurrentPhonemeData)->SetTime((float)0.0);
-            (&CurrentPhonemeData)->ClearData((bool)1);
+            (&CurrentPhonemeData)->ClearData(true);
         }
         if (abResetCustomMorph) {
             (&CurrentCustomMorphData)->SetTime((float)0.0);
-            (&CurrentCustomMorphData)->ClearData((bool)1);
+            (&CurrentCustomMorphData)->ClearData(true);
         }
     }
     (&AnimLock)->Unlock();
@@ -251,7 +251,7 @@ void BSFaceGenAnimationData::ResetSpeechCurrentMorphs(
     if (abResetExpression) {
         CurrentTargetExpressionData.SetTime(0.0);
         if (!(afTime > 0.0)) {
-            CurrentTargetExpressionData.ClearData(1);
+            CurrentTargetExpressionData.ClearData(true);
         }
         else {
             SetExpressionTarget(BS_FG_EXPRESSION_NONE, 1.0f);
@@ -260,7 +260,7 @@ void BSFaceGenAnimationData::ResetSpeechCurrentMorphs(
     if (abResetModifier) {
         CurrentSpeechModifierData.SetTime(0.0);
         if (!(afTime > 0.0)) {
-            CurrentSpeechModifierData.ClearData(1);
+            CurrentSpeechModifierData.ClearData(true);
             if (abForDeath) {
                 SetModifierValue(BS_FG_MODIFIER_BLINK_LEFT, 1.0f);
                 SetModifierValue(BS_FG_MODIFIER_BLINK_RIGHT, 1.0f);
@@ -269,32 +269,32 @@ void BSFaceGenAnimationData::ResetSpeechCurrentMorphs(
         else {
             if (abForDeath) {
                 float apQuantities[18];
-                BSFaceGenManager::ResetQuantityArray(apQuantities, 17u, 1);
+                BSFaceGenManager::ResetQuantityArray(apQuantities, 17u, true);
                 apQuantities[0] = 1.0f;
                 apQuantities[1] = 1.0f;
                 AddModifiersKeyframe(apQuantities, afTime);
             }
             else {
-                AddSpeechEmptyKeyframe(BS_FG_MORPH_MODIFIER, afTime, 1);
+                AddSpeechEmptyKeyframe(BS_FG_MORPH_MODIFIER, afTime, true);
             }
         }
     }
     if (abResetPhoneme) {
         CurrentSpeechPhonemeData.SetTime(0.0);
         if (!(afTime > 0.0)) {
-            CurrentSpeechPhonemeData.ClearData(1);
+            CurrentSpeechPhonemeData.ClearData(true);
         }
         else {
-            AddSpeechEmptyKeyframe(BS_FG_MORPH_PHONEME, afTime, 1);
+            AddSpeechEmptyKeyframe(BS_FG_MORPH_PHONEME, afTime, true);
         }
     }
     if (abResetCustomMorph) {
         CurrentSpeechCustomMorphData.SetTime(0.0);
         if (!(afTime > 0.0)) {
-            CurrentSpeechCustomMorphData.ClearData(1);
+            CurrentSpeechCustomMorphData.ClearData(true);
         }
         else {
-            AddSpeechEmptyKeyframe(BS_FG_MORPH_CUSTOM, afTime, 1);
+            AddSpeechEmptyKeyframe(BS_FG_MORPH_CUSTOM, afTime, true);
         }
     }
 }
@@ -310,37 +310,37 @@ void BSFaceGenAnimationData::ResetAnimCurrentMorphs(
     if (abResetExpression) {
         CurrentAnimExpressionData.SetTime(0.0);
         if (!(afTime > 0.0)) {
-            CurrentAnimExpressionData.ClearData(1);
+            CurrentAnimExpressionData.ClearData(true);
         }
         else {
-            AddAnimEmptyKeyframe(BS_FG_MORPH_EXPRESSION, afTime, 1);
+            AddAnimEmptyKeyframe(BS_FG_MORPH_EXPRESSION, afTime, true);
         }
     }
     if (abResetModifier) {
         CurrentAnimModifierData.SetTime(0.0);
         if (!(afTime > 0.0)) {
-            CurrentAnimModifierData.ClearData(1);
+            CurrentAnimModifierData.ClearData(true);
         }
         else {
-            AddAnimEmptyKeyframe(BS_FG_MORPH_MODIFIER, afTime, 1);
+            AddAnimEmptyKeyframe(BS_FG_MORPH_MODIFIER, afTime, true);
         }
     }
     if (abResetPhoneme) {
         CurrentAnimPhonemeData.SetTime(0.0);
         if (!(afTime > 0.0)) {
-            CurrentAnimPhonemeData.ClearData(1);
+            CurrentAnimPhonemeData.ClearData(true);
         }
         else {
-            AddAnimEmptyKeyframe(BS_FG_MORPH_PHONEME, afTime, 1);
+            AddAnimEmptyKeyframe(BS_FG_MORPH_PHONEME, afTime, true);
         }
     }
     if (abResetCustomMorph) {
         CurrentAnimCustomMorphData.SetTime(0.0);
         if (!(afTime > 0.0)) {
-            CurrentAnimCustomMorphData.ClearData(1);
+            CurrentAnimCustomMorphData.ClearData(true);
         }
         else {
-            AddAnimEmptyKeyframe(BS_FG_MORPH_CUSTOM, afTime, 1);
+            AddAnimEmptyKeyframe(BS_FG_MORPH_CUSTOM, afTime, true);
         }
     }
 }
@@ -354,7 +354,7 @@ void BSFaceGenAnimationData::SetHeadTrackVector(NiPoint3 aPoint, bool abInstant)
         TrackingState = ETrackingState_None;
     }
     HeadTrackVector = aPoint;
-    bShouldHeadTrack = (bool)1;
+    bShouldHeadTrack = true;
 }
 
 void BSFaceGenAnimationData::ClearHeadTracking(bool abInstant) {
@@ -381,26 +381,26 @@ bool BSFaceGenAnimationData::GetDead() {
 void BSFaceGenAnimationData::SetDead(bool abDead, bool abInstant) {
     if (!abDead || bDead) {
         if (!abDead && bDead) {
-            bDead = 0;
+            bDead = false;
             if (abInstant) {
-                ResetCurrentMorphs(0.0, 1, 1, 1, 1, 0);
+                ResetCurrentMorphs(0.0, true, true, true, true, false);
             }
             else {
-                ResetCurrentMorphs(1.0, 1, 1, 1, 1, 0);
+                ResetCurrentMorphs(1.0, true, true, true, true, false);
             }
-            bChangedLastUpdate = 1;
-            bShouldHeadTrack = 1;
+            bChangedLastUpdate = true;
+            bShouldHeadTrack = true;
         }
     }
     else {
         if (abInstant) {
-            ResetCurrentMorphs(0.0, 1, 1, 1, 1, 1);
+            ResetCurrentMorphs(0.0, true, true, true, true, true);
         }
         else {
-            ResetCurrentMorphs(1.0, 1, 1, 1, 1, 1);
+            ResetCurrentMorphs(1.0, true, true, true, true, true);
         }
         bDead = abDead;
-        bChangedLastUpdate = 1;
+        bChangedLastUpdate = true;
     }
 }
 
@@ -515,7 +515,7 @@ void BSFaceGenAnimationData::ClearSpeechKeyframeLists(
                     pdelete_2 = SpeechModifierKeyframeList.GetHead();
                 }
                 else {
-                    pdelete_2 = 0;
+                    pdelete_2 = nullptr;
                 }
             }
         }
@@ -530,7 +530,7 @@ void BSFaceGenAnimationData::ClearSpeechKeyframeLists(
                     pdelete_4 = SpeechPhonemeKeyframeList.GetHead();
                 }
                 else {
-                    pdelete_4 = 0;
+                    pdelete_4 = nullptr;
                 }
             }
         }
@@ -546,7 +546,7 @@ void BSFaceGenAnimationData::ClearSpeechKeyframeLists(
                     pdelete_6 = SpeechCustomMorphKeyframeList.GetHead();
                 }
                 else {
-                    pdelete_6 = 0;
+                    pdelete_6 = nullptr;
                 }
             }
         }
@@ -572,7 +572,7 @@ bool BSFaceGenAnimationData::IsSpeechKeyframeListEmpty(BS_FACEGEN_MORPH_TYPE aeT
             return ((&SpeechCustomMorphKeyframeList)->m_uiCount == 0);
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool BSFaceGenAnimationData::IsAnimKeyframeListEmpty(BS_FACEGEN_MORPH_TYPE aeType) {
@@ -610,7 +610,7 @@ void BSFaceGenAnimationData::SetExpressionTarget(float* apQuantities) {
         delete pTargetExpressionData;
     }
     apMemory = static_cast<BSFaceGenKeyframeMultiple*>(ourMalloc(sizeof(BSFaceGenKeyframeMultiple)));
-    v2 = apMemory ? ::new (apMemory) BSFaceGenKeyframeMultiple(BS_FG_MORPH_EXPRESSION, 15u) : 0;
+    v2 = apMemory ? ::new (apMemory) BSFaceGenKeyframeMultiple(BS_FG_MORPH_EXPRESSION, 15u) : nullptr;
     pTargetExpressionData = v2;
     for (uint32_t iexp = 0; iexp < 15; ++iexp) {
         pTargetExpressionData->SetQuantity(iexp, apQuantities[iexp]);
@@ -625,7 +625,7 @@ void BSFaceGenAnimationData::SetExpressionTarget(BS_FACEGEN_EXPRESSION aeExpress
     if (aeExpression >= BS_FG_EXPRESSION_NONE && aeExpression <= BS_FG_EXPRESSION_COUNT && !(afValue < 0.0) &&
         !(afValue > 1.0)) {
         if (pTargetExpressionData) {
-            pTargetExpressionData->ClearData(1);
+            pTargetExpressionData->ClearData(true);
         }
         else {
             BSFaceGenKeyframeMultiple* v3;
@@ -635,7 +635,7 @@ void BSFaceGenAnimationData::SetExpressionTarget(BS_FACEGEN_EXPRESSION aeExpress
                 v3 = ::new (apMemory) BSFaceGenKeyframeMultiple(BS_FG_MORPH_EXPRESSION, 15u);
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             pTargetExpressionData = v3;
             pTargetExpressionData->SetToZero();
@@ -651,7 +651,7 @@ void BSFaceGenAnimationData::SetExpressionTarget(BS_FACEGEN_EXPRESSION aeExpress
 
 void BSFaceGenAnimationData::SetExpressionTargetFromMood(int32_t aiMoodindex, bool abTalking) {
     if (pTargetExpressionData) {
-        pTargetExpressionData->ClearData(1);
+        pTargetExpressionData->ClearData(true);
     }
     else {
         BSFaceGenKeyframeMultiple* v3;
@@ -661,7 +661,7 @@ void BSFaceGenAnimationData::SetExpressionTargetFromMood(int32_t aiMoodindex, bo
             v3 = ::new (apMemory) BSFaceGenKeyframeMultiple(BS_FG_MORPH_EXPRESSION, 15u);
         }
         else {
-            v3 = 0;
+            v3 = nullptr;
         }
         pTargetExpressionData = v3;
         pTargetExpressionData->SetToZero();
@@ -714,13 +714,13 @@ void BSFaceGenAnimationData::ClearExpressionTarget() {
     if (pTargetExpressionData) {
         delete pTargetExpressionData;
     }
-    pTargetExpressionData = 0;
+    pTargetExpressionData = nullptr;
 }
 
 void BSFaceGenAnimationData::AddAnimationDataFromNote(const char* apNote) {}
 
 bool BSFaceGenAnimationData::Update(float afTime) {
-    AnimLock.Lock(0);
+    AnimLock.Lock(nullptr);
     float flookdown = CurrentModifierData.GetQuantity(BS_FG_MODIFIER_LOOK_DOWN);
     if (BSFaceGenManager::GetUseProceduralEyeBlinking() && !bDead && SpeechModifierKeyframeList.IsEmpty() &&
         gs_fBlinkDownTime.Float() > 0.0 && gs_fBlinkUpTime.Float() > 0.0 && gs_fBlinkDelayMin.Float() > 0.0) {
@@ -732,18 +732,18 @@ bool BSFaceGenAnimationData::Update(float afTime) {
                 float apQuantities[BS_FG_MODIFIER_COUNT];
                 float* v4 = &gs_fBlinkDelayMax.Float();
                 float v16 = *v4 - gs_fBlinkDelayMin.Float();
-                BSFaceGenManager::ResetQuantityArray(apQuantities, 17u, 0);
+                BSFaceGenManager::ResetQuantityArray(apQuantities, 17u, false);
                 apQuantities[0] = 0.0f;
                 apQuantities[1] = 0.0f;
                 float* v5 = &gs_fBlinkDelayMin.Float();
                 float v14 = RandomFloat0To1() * v16 + *v5;
                 AddModifiersKeyframe(apQuantities, v14);
-                BSFaceGenManager::ResetQuantityArray(apQuantities, 17u, 0);
+                BSFaceGenManager::ResetQuantityArray(apQuantities, 17u, false);
                 apQuantities[0] = 1.0f;
                 apQuantities[1] = 1.0f;
                 float* v6 = &gs_fBlinkDownTime.Float();
                 AddModifiersKeyframe(apQuantities, *v6);
-                BSFaceGenManager::ResetQuantityArray(apQuantities, 17u, 0);
+                BSFaceGenManager::ResetQuantityArray(apQuantities, 17u, false);
                 apQuantities[0] = 0.0f;
                 apQuantities[1] = 0.0f;
                 float* v7 = &gs_fBlinkUpTime.Float();
@@ -764,7 +764,7 @@ bool BSFaceGenAnimationData::Update(float afTime) {
         BSFaceGenKeyframe* pPhoneme = &CurrentPhonemeData;
         BSFaceGenKeyframe* pAnimCustomMorph = &CurrentAnimCustomMorphData;
         BSFaceGenKeyframe* pCustomMorph = &CurrentCustomMorphData;
-        bChangedLastUpdate = 0;
+        bChangedLastUpdate = false;
         bool bchangedSpeech = pTargetExpression->UpdateToTarget(afTime, pTargetExpressionData);
         bool bchangedAnim = (!bAnimHeadCulledLastFrame && bAnimHeadCulled) || pAnimExpression->IsTargetAvailable();
         if (!bchangedAnim && !bchangedSpeech) {
@@ -773,7 +773,7 @@ bool BSFaceGenAnimationData::Update(float afTime) {
         if (bchangedSpeech) {
             pExpression->CopyFrom(&CurrentTargetExpressionData);
             if (bchangedAnim) {
-                pExpression->MergeMorphDataFrom(&CurrentAnimExpressionData, 1.0f, 0, 0);
+                pExpression->MergeMorphDataFrom(&CurrentAnimExpressionData, 1.0f, false, false);
             }
         }
         else {
@@ -783,13 +783,13 @@ bool BSFaceGenAnimationData::Update(float afTime) {
         }
         bool v13 = bchangedSpeech || bchangedAnim;
         bchangedSpeech = BSFaceGenAnimationData::UpdateKeyframeList(
-            afTime, &SpeechModifierKeyframeList, &CurrentSpeechModifierData, 0
+            afTime, &SpeechModifierKeyframeList, &CurrentSpeechModifierData, false
         );
         bchangedAnim = (!bAnimHeadCulledLastFrame && bAnimHeadCulled) || pAnimModifier->IsTargetAvailable();
         if (bchangedSpeech) {
             pModifier->CopyFrom(&CurrentSpeechModifierData);
             if (bchangedAnim) {
-                pModifier->MergeMorphDataFrom(&CurrentAnimModifierData, 1.0f, 0, 0);
+                pModifier->MergeMorphDataFrom(&CurrentAnimModifierData, 1.0f, false, false);
             }
         }
         else {
@@ -799,13 +799,13 @@ bool BSFaceGenAnimationData::Update(float afTime) {
         }
         bool v12 = bchangedSpeech || bchangedAnim;
         bchangedSpeech = BSFaceGenAnimationData::UpdateKeyframeList(
-            afTime, &SpeechPhonemeKeyframeList, &CurrentSpeechPhonemeData, 0
+            afTime, &SpeechPhonemeKeyframeList, &CurrentSpeechPhonemeData, false
         );
         bchangedAnim = (!bAnimHeadCulledLastFrame && bAnimHeadCulled) || pAnimPhoneme->IsTargetAvailable();
         if (bchangedSpeech) {
             pPhoneme->CopyFrom(&CurrentSpeechPhonemeData);
             if (bchangedAnim) {
-                pPhoneme->MergeMorphDataFrom(&CurrentAnimPhonemeData, 1.0f, 0, 0);
+                pPhoneme->MergeMorphDataFrom(&CurrentAnimPhonemeData, 1.0f, false, false);
             }
         }
         else {
@@ -815,13 +815,13 @@ bool BSFaceGenAnimationData::Update(float afTime) {
         }
         bool v11 = bchangedSpeech || bchangedAnim;
         bchangedSpeech = BSFaceGenAnimationData::UpdateKeyframeList(
-            afTime, &SpeechCustomMorphKeyframeList, &CurrentSpeechCustomMorphData, 0
+            afTime, &SpeechCustomMorphKeyframeList, &CurrentSpeechCustomMorphData, false
         );
         bchangedAnim = (!bAnimHeadCulledLastFrame && bAnimHeadCulled) || pAnimCustomMorph->IsTargetAvailable();
         if (bchangedSpeech) {
             pCustomMorph->CopyFrom(&CurrentSpeechCustomMorphData);
             if (bchangedAnim) {
-                pCustomMorph->MergeMorphDataFrom(&CurrentAnimCustomMorphData, 1.0f, 0, 0);
+                pCustomMorph->MergeMorphDataFrom(&CurrentAnimCustomMorphData, 1.0f, false, false);
             }
         }
         else {
@@ -840,20 +840,20 @@ bool BSFaceGenAnimationData::Update(float afTime) {
 
 float BSFaceGenAnimationData::GetModifierValue(BS_FACEGEN_MODIFIER aeModifier) {
     if (((int32_t)aeModifier) >= 17) {
-        return (float)(0.0);
+        return (float)0.0;
     }
     else {
-        return (float)((float)(&CurrentModifierData)->GetQuantity(aeModifier));
+        return (&CurrentModifierData)->GetQuantity(aeModifier);
     }
 }
 
 bool BSFaceGenAnimationData::UpdateEyeTracking(float afTime, NiNode* apHeadNode) {
     float feyeHeadingDelta;
     float feyePitchDelta;
-    AnimLock.Lock(0);
+    AnimLock.Lock(nullptr);
     bool bres = !bDead;
     if (bres) {
-        bres = 1;
+        bres = true;
         BS_FACEGEN_EXPRESSION mostSignificantExpression = GetCurrentExpression();
         float fexpModDesiredHeading = fDesiredEyeHeading;
         float fexpModDesiredPitch = fDesiredEyePitch;
@@ -945,7 +945,7 @@ BSFaceGenAnimationData* BSFaceGenAnimationData::CreateCopyBS() {
         pretval = ::new (apMemory) BSFaceGenAnimationData;
     }
     else {
-        pretval = 0;
+        pretval = nullptr;
     }
     pretval->CurrentTargetExpressionData.operator=(&CurrentTargetExpressionData);
     pretval->CurrentAnimExpressionData.operator=(&CurrentAnimExpressionData);
@@ -975,18 +975,18 @@ BSFaceGenAnimationData* BSFaceGenAnimationData::CreateCopyBS() {
             v8 = ::new (v20) BSFaceGenKeyframeMultiple(pTargetExpressionData);
         }
         else {
-            v8 = 0;
+            v8 = nullptr;
         }
         pretval->pTargetExpressionData = v8;
     }
     else {
-        pretval->pTargetExpressionData = 0;
+        pretval->pTargetExpressionData = nullptr;
     }
     for (iter = SpeechModifierKeyframeList.m_pkHead; iter;
          iter = SpeechModifierKeyframeList.GetNextPos(static_cast<NiTListItem<BSFaceGenKeyframe*>*>(iter))) {
         BSFaceGenKeyframe* ptemp = SpeechModifierKeyframeList.Get(static_cast<NiTListItem<BSFaceGenKeyframe*>*>(iter));
         bool v1 = ptemp->IsMultiple();
-        BSFaceGenKeyframeMultiple* pcurrent = v1 ? static_cast<BSFaceGenKeyframeMultiple*>(ptemp) : 0;
+        BSFaceGenKeyframeMultiple* pcurrent = v1 ? static_cast<BSFaceGenKeyframeMultiple*>(ptemp) : nullptr;
         if (pcurrent) {
             BSFaceGenKeyframeMultiple* pcopy;
             BSFaceGenKeyframeMultiple* v18 =
@@ -995,13 +995,13 @@ BSFaceGenAnimationData* BSFaceGenAnimationData::CreateCopyBS() {
                 pcopy = ::new (v18) BSFaceGenKeyframeMultiple(pcurrent);
             }
             else {
-                pcopy = 0;
+                pcopy = nullptr;
             }
             BSFaceGenKeyframeMultiple* v19 = pcopy;
             v31 = pcopy;
         }
         else {
-            v31 = 0;
+            v31 = nullptr;
         }
         BSFaceGenKeyframe* arg0 = v31;
         pretval->SpeechModifierKeyframeList.AddTail(arg0);
@@ -1010,7 +1010,7 @@ BSFaceGenAnimationData* BSFaceGenAnimationData::CreateCopyBS() {
          iter = SpeechPhonemeKeyframeList.GetNextPos(static_cast<NiTListItem<BSFaceGenKeyframe*>*>(iter))) {
         BSFaceGenKeyframe* ptemp_2 = SpeechPhonemeKeyframeList.Get(static_cast<NiTListItem<BSFaceGenKeyframe*>*>(iter));
         bool v2 = ptemp_2->IsMultiple();
-        BSFaceGenKeyframeMultiple* pcurrent_2 = v2 ? static_cast<BSFaceGenKeyframeMultiple*>(ptemp_2) : 0;
+        BSFaceGenKeyframeMultiple* pcurrent_2 = v2 ? static_cast<BSFaceGenKeyframeMultiple*>(ptemp_2) : nullptr;
         if (pcurrent_2) {
             BSFaceGenKeyframeMultiple* pcopy_2;
             BSFaceGenKeyframeMultiple* v15 =
@@ -1019,13 +1019,13 @@ BSFaceGenAnimationData* BSFaceGenAnimationData::CreateCopyBS() {
                 pcopy_2 = ::new (v15) BSFaceGenKeyframeMultiple(pcurrent_2);
             }
             else {
-                pcopy_2 = 0;
+                pcopy_2 = nullptr;
             }
             BSFaceGenKeyframeMultiple* v16 = pcopy_2;
             v31 = pcopy_2;
         }
         else {
-            v31 = 0;
+            v31 = nullptr;
         }
         BSFaceGenKeyframe* element = v31;
         pretval->SpeechPhonemeKeyframeList.AddTail(element);
@@ -1035,7 +1035,7 @@ BSFaceGenAnimationData* BSFaceGenAnimationData::CreateCopyBS() {
         BSFaceGenKeyframe* ptemp_3 =
             SpeechCustomMorphKeyframeList.Get(static_cast<NiTListItem<BSFaceGenKeyframe*>*>(iter));
         bool v3 = ptemp_3->IsMultiple();
-        BSFaceGenKeyframeMultiple* pcurrent_3 = v3 ? static_cast<BSFaceGenKeyframeMultiple*>(ptemp_3) : 0;
+        BSFaceGenKeyframeMultiple* pcurrent_3 = v3 ? static_cast<BSFaceGenKeyframeMultiple*>(ptemp_3) : nullptr;
         if (pcurrent_3) {
             BSFaceGenKeyframeMultiple* pcopy_3;
             BSFaceGenKeyframeMultiple* v12 =
@@ -1044,13 +1044,13 @@ BSFaceGenAnimationData* BSFaceGenAnimationData::CreateCopyBS() {
                 pcopy_3 = ::new (v12) BSFaceGenKeyframeMultiple(pcurrent_3);
             }
             else {
-                pcopy_3 = 0;
+                pcopy_3 = nullptr;
             }
             BSFaceGenKeyframeMultiple* v13 = pcopy_3;
             v31 = pcopy_3;
         }
         else {
-            v31 = 0;
+            v31 = nullptr;
         }
         BSFaceGenKeyframe* v11 = v31;
         pretval->SpeechCustomMorphKeyframeList.AddTail(v11);
@@ -1175,25 +1175,25 @@ void BSFaceGenAnimationData::ModifyEyeHeadingAndPitchBasedOnExpression(
 }
 
 void BSFaceGenAnimationData::GetTrackEyeXYMinMax(float& afMinOut, float& afMaxOut) {
-    afMaxOut = (float)(((&BSFaceGenAnimationData::fTrackEyeXY)->Float()) * 0.01745329238474369);
-    if ((afMaxOut) < 0.0) {
+    afMaxOut = (float)((&BSFaceGenAnimationData::fTrackEyeXY)->Float() * 0.01745329238474369);
+    if (afMaxOut < 0.0) {
         afMaxOut = (float)0.0;
     }
-    if ((afMaxOut) > 1.5707963267948966) {
+    if (afMaxOut > 1.5707963267948966) {
         afMaxOut = 1.5707963705062866f;
     }
-    afMinOut = (float)((afMaxOut) * (-1.0));
+    afMinOut = (float)(afMaxOut * (-1.0));
 }
 
 void BSFaceGenAnimationData::GetTrackEyeZMinMax(float& afMinOut, float& afMaxOut) {
-    afMaxOut = (float)(((&BSFaceGenAnimationData::fTrackEyeZ)->Float()) * 0.01745329238474369);
-    if ((afMaxOut) < 0.0) {
+    afMaxOut = (float)((&BSFaceGenAnimationData::fTrackEyeZ)->Float() * 0.01745329238474369);
+    if (afMaxOut < 0.0) {
         afMaxOut = (float)0.0;
     }
-    if ((afMaxOut) > 1.5707963267948966) {
+    if (afMaxOut > 1.5707963267948966) {
         afMaxOut = 1.5707963705062866f;
     }
-    afMinOut = (float)((afMaxOut) * (-1.0));
+    afMinOut = (float)(afMaxOut * (-1.0));
 }
 
 // Each sum, difference and quotient is rounded to float before it is passed.
@@ -1257,7 +1257,7 @@ void BSFaceGenAnimationData::InitTag() {
     NiFixedString* v0;
     void* v1 = ourMalloc(sizeof(NiFixedString));
     if (v1) {
-        v0 = ::new (static_cast<void*>(v1)) NiFixedString(const_cast<char*>("FAD"));
+        v0 = ::new (v1) NiFixedString(const_cast<char*>("FAD"));
     }
     else {
         v0 = nullptr;
@@ -1269,11 +1269,11 @@ void BSFaceGenAnimationData::KillSDM() {
     if (BSFaceGenAnimationData::pTag) {
         delete BSFaceGenAnimationData::pTag;
     }
-    BSFaceGenAnimationData::pTag = 0;
+    BSFaceGenAnimationData::pTag = nullptr;
 }
 
 float BSFaceGenAnimationData::GetExpressionTargetChangePerSec() {
-    if (!(((&BSFaceGenAnimationData::fExpressionChangePerSec)->Float()) > 0.0)) {
+    if (!((&BSFaceGenAnimationData::fExpressionChangePerSec)->Float() > 0.0)) {
         return (float)0.0;
     }
     else {
@@ -1282,7 +1282,7 @@ float BSFaceGenAnimationData::GetExpressionTargetChangePerSec() {
 }
 
 float BSFaceGenAnimationData::GetExpressionStrengthAddPerSec() {
-    if (!(((&BSFaceGenAnimationData::fExpressionStrengthAdd)->Float()) > 0.0)) {
+    if (!((&BSFaceGenAnimationData::fExpressionStrengthAdd)->Float() > 0.0)) {
         return (float)0.0;
     }
     else {
@@ -1297,7 +1297,7 @@ float BSFaceGenAnimationData::GetSpeechDelay() {
 void BSFaceGenAnimationData::GetTrackDeadZoneXYMinMax(float& afMinOut, float& afMaxOut) {
     float a1;
     float a2;
-    afMaxOut = (float)(((&BSFaceGenAnimationData::fTrackDeadZoneXY)->Float()) * 0.01745329238474369);
+    afMaxOut = (float)((&BSFaceGenAnimationData::fTrackDeadZoneXY)->Float() * 0.01745329238474369);
     if (afMaxOut < 0.0) {
         afMaxOut = (float)0.0;
     }
@@ -1314,7 +1314,7 @@ void BSFaceGenAnimationData::GetTrackDeadZoneXYMinMax(float& afMinOut, float& af
 void BSFaceGenAnimationData::GetTrackDeadZoneZMinMax(float& afMinOut, float& afMaxOut) {
     float a1;
     float a2;
-    afMaxOut = (float)(((&BSFaceGenAnimationData::fTrackDeadZoneZ)->Float()) * 0.01745329238474369);
+    afMaxOut = (float)((&BSFaceGenAnimationData::fTrackDeadZoneZ)->Float() * 0.01745329238474369);
     if (afMaxOut < 0.0) {
         afMaxOut = (float)0.0;
     }

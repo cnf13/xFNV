@@ -205,7 +205,7 @@ void NiGeometry::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
 
 void NiGeometry::ProcessClone(NiCloningProcess& kCloning) {
     NiAVObject::ProcessClone(kCloning);
-    NiObject* pkObject = 0;
+    NiObject* pkObject = nullptr;
     kCloning.m_pkCloneMap->GetAt(this, pkObject);
     NiSkinInstance* pkSkin = m_spSkinInstance.m_pObject;
     NiGeometry* pkGeom = static_cast<NiGeometry*>(pkObject);
@@ -224,7 +224,7 @@ void NiGeometry::ProcessClone(NiCloningProcess& kCloning) {
         if (GetShader()->GetRTTI() == &NiShader::ms_RTTI) {
             // A plain NiShader is copied: a new one with its name and implementation id. It is stored in the clone's
             // m_spShader as it is.
-            NiShader* pkShader = 0;
+            NiShader* pkShader = nullptr;
             NiShader* pkMemory = static_cast<NiShader*>(NiMemObject::operator new(sizeof(NiShader)));
             if (pkMemory) {
                 pkShader = ::new (pkMemory) NiShader;
@@ -236,7 +236,7 @@ void NiGeometry::ProcessClone(NiCloningProcess& kCloning) {
         else {
             pkGeom->m_spShader = GetShader();
             GetShader()->SetupGeometry(pkGeom);
-            NiAVObject::kPropertyStateLock.Lock(0);
+            NiAVObject::kPropertyStateLock.Lock(nullptr);
             pkGeom->UpdatePropertiesDownward(&m_PropertyState);
             if (!--NiAVObject::kPropertyStateLock.uiLockCount) {
                 NiAVObject::kPropertyStateLock.uiOwningThread = 0;
@@ -418,7 +418,7 @@ void NiGeometry::UpdatePropertiesDownward(NiPropertyState* pkParentState) {
     while (pkPos) {
         NiProperty* pkProperty = pkPos->m_element.m_pObject;
         pkPos = pkPos->m_pkNext;
-        if (pkProperty && static_cast<int32_t>(pkProperty->Type()) <= 7) {
+        if (pkProperty && pkProperty->Type() <= 7) {
             NiPointer<NiProperty>* pspSlot = m_PropertyState.m_aspProps + pkProperty->Type();
             NiProperty* pkOld = pspSlot->m_pObject;
             // EXE-INLINED 0x66B0D0

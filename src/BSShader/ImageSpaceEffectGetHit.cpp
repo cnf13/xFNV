@@ -38,19 +38,19 @@ void ImageSpaceEffectGetHit::Setup(ImageSpaceManager* apManager, ImageSpaceEffec
     FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(4);
     pTextures.SetSize(4u);
-    ImageSpaceShaderParam* pparam = 0;
+    ImageSpaceShaderParam* pparam = nullptr;
     spParam.m_pObject = nullptr;
     pEffectParamList.SetAt(0, spParam);
     SetEffectInputs(0, 1, NiTexturingProperty::FILTER_NEAREST);
-    SetEffect(0, apManager->pEffectList.m_pBase[34], 0, 2);
+    SetEffect(0, apManager->pEffectList.m_pBase[34], nullptr, 2);
     spParam.m_pObject = nullptr;
     pEffectParamList.SetAt(1u, spParam);
     SetEffectInputs(1, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
-    SetEffect(1, apManager->pEffectList.m_pBase[17], 0, 2);
+    SetEffect(1, apManager->pEffectList.m_pBase[17], nullptr, 2);
     spParam.m_pObject = nullptr;
     pEffectParamList.SetAt(2u, spParam);
     SetEffectInputs(2, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
-    SetEffect(2, apManager->pEffectList.m_pBase[17], 0, 2);
+    SetEffect(2, apManager->pEffectList.m_pBase[17], nullptr, 2);
     ImageSpaceShaderParam* v6 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
     spParam.m_pObject = v6;
@@ -58,7 +58,7 @@ void ImageSpaceEffectGetHit::Setup(ImageSpaceManager* apManager, ImageSpaceEffec
         pparam = ::new (v6) ImageSpaceShaderParam;
     }
     pparam->InitConstantMap(0, 2);
-    pparam->bUseTexOffset[2] = 0;
+    pparam->bUseTexOffset[2] = false;
     spParam.m_pObject = pparam;
     pEffectParamList.SetAt(3u, spParam);
     SetEffectInputs(3, 1, 2, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
@@ -94,9 +94,9 @@ bool ImageSpaceEffectGetHit::UpdateParams(ImageSpaceEffectParam* pParam) {
     float fTrigger = fTriggerValue;
     float fBlur = fTrigger * fBlurAmount;
     pShaderParam->SetPixelConstant(0, 0.0f, 0.0f, fBlur, fTrigger);
-    float fCos = (float)std::cos(fAngle);
+    float fCos = std::cos(fAngle);
     float fOffsetY = fCos * fAmplitude;
-    float fSin = (float)std::sin(fAngle);
+    float fSin = std::sin(fAngle);
     float fOffsetX = fSin * fAmplitude;
     pShaderParam->SetPixelConstant(1, fOffsetX, fOffsetY, 1.0f, 1.0f);
     ImageSpaceEffectBlur::fBlurRadius = 2.0f;

@@ -196,7 +196,7 @@ void DistantLODShader::LoadShaders() {
     kPixelMacros[1].kMacros[1].Name = nullptr;
     kPixelMacros[1].kMacros[1].Definition = nullptr;
     std::memset(&kPixelMacros[1].kMacros[2], 0, sizeof(kPixelMacros[1].kMacros) - 2 * sizeof(D3DXMACRO));
-    const char* ptarget = BSShaderManager::GetPSTarget(1);
+    const char* ptarget = BSShaderManager::GetPSTarget(true);
     if (BSShaderManager::eShaderLevel == 1) {
         for (int32_t i = 0; i < 2; ++i) {
             BSShader::MakePath(kVertexMacros[i].strPath, Str1);
@@ -228,7 +228,7 @@ bool DistantLODShader::LoadStagesAndPasses() {
 void DistantLODShader::PresetStages() {
     NiPointer<NiD3DTextureStage> a1;
     NiD3DTextureStage::CreateNewStage(a1);
-    BSShader::SetupDefaultStage(a1.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(a1.m_pObject, 0, 3u, 2u, true);
     this->DistantLODShader::spPass.m_pObject->SetStage(
         this->DistantLODShader::spPass.m_pObject->m_uiCurrentStage, a1.m_pObject
     );
@@ -243,37 +243,37 @@ void DistantLODShader::PresetStages() {
         if (!v8->m_pkRenderStateGroup) {
             v8->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v8->m_pkRenderStateGroup->SetRenderState(24u, 10u, 1);
+        v8->m_pkRenderStateGroup->SetRenderState(24u, 10u, true);
     }
     NiD3DPass* v9 = this->DistantLODShader::spPass.m_pObject;
     if (!v9->m_pkRenderStateGroup) {
         v9->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v9->m_pkRenderStateGroup->SetRenderState(168u, 7u, 1);
+    v9->m_pkRenderStateGroup->SetRenderState(168u, 7u, true);
     NiD3DPass* v10 = this->DistantLODShader::spPass.m_pObject;
     if (!v10->m_pkRenderStateGroup) {
         v10->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v10->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+    v10->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
     NiD3DPass* v11 = this->DistantLODShader::spPass.m_pObject;
     if (!v11->m_pkRenderStateGroup) {
         v11->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v11->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+    v11->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
     NiD3DPass* v12 = this->DistantLODShader::spPass.m_pObject;
     if (!v12->m_pkRenderStateGroup) {
         v12->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v12->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+    v12->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
     NiD3DPass* v13 = this->DistantLODShader::spPass.m_pObject;
     if (!v13->m_pkRenderStateGroup) {
         v13->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v13->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+    v13->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
 }
 
 BSShader* DistantLODShader::CreateShader() {
-    DistantLODShader* pshader = 0;
+    DistantLODShader* pshader = nullptr;
     NiDX9ShaderDeclaration* spShaderDecl = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 4u, 1u);
     spShaderDecl->SetEntry(0, 0, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
     spShaderDecl->SetEntry(1u, 5u, NiShaderDeclaration::SHADERPARAM_NI_COLOR, NiShaderDeclaration::SPTYPE_FLOAT4, 0);

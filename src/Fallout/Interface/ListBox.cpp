@@ -40,7 +40,7 @@
 #include "SDK/MSVC/tchar.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 using ItemChangeListBox = ListBox<ItemChange*>;
 

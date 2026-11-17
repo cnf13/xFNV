@@ -53,7 +53,7 @@ public:
     };
 
     // A position in an object's member list: an index.
-    typedef int32_t Iterator;
+    using Iterator = int32_t;
 
     // The identity of an object: its implementation and a second word (the native objects' class, 0 for the dictionary
     // ones).

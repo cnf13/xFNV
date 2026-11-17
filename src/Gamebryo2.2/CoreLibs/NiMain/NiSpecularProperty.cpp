@@ -25,7 +25,7 @@ NiObject* NiSpecularProperty::CreateClone(NiCloningProcess& kCloning) {
         pkObject_2 = ::new (pkObject) NiSpecularProperty;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_uFlags = m_uFlags;
@@ -73,7 +73,7 @@ NiObject* NiSpecularProperty::CreateObject() {
     NiSpecularProperty* pkObject =
         static_cast<NiSpecularProperty*>(NiMemObject::operator new(sizeof(NiSpecularProperty)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiSpecularProperty;
 }

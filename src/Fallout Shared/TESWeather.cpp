@@ -347,27 +347,27 @@ void TESWeather::Copy(TESForm* apCopy) {
 bool TESWeather::Compare(TESForm* apCompare) {
     TESWeather* pcomp = dynamic_cast<TESWeather*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     BSSimpleList<TESWeather::WeatherSound*>* pCompSL = &pcomp->soundList;
     BSSimpleList<TESWeather::WeatherSound*>* pThisSL = &soundList;
     int32_t v3 = pcomp->soundList.ItemsInList();
     if (v3 != soundList.ItemsInList()) {
-        return 1;
+        return true;
     }
     while (pCompSL && (pThisSL && (pCompSL->m_item && pThisSL->m_item))) {
         if (std::memcmp(pCompSL->m_item, pThisSL->m_item, sizeof(TESWeather::WeatherSound))) {
-            return 1;
+            return true;
         }
         pCompSL = pCompSL->m_pkNext;
         pThisSL = pThisSL->m_pkNext;
     }
     if (iNumCloudLayers != pcomp->iNumCloudLayers) {
-        return 1;
+        return true;
     }
     for (int32_t i = 0; i < iNumCloudLayers; ++i) {
         if (cloudTexture[i].CompareComponent(&pcomp->cloudTexture[i])) {
-            return 1;
+            return true;
         }
     }
     return CompareAllComponents(pcomp) ||

@@ -98,6 +98,6 @@ NiDX9ShaderConstantManager* NiDX9ShaderConstantManager::Create(NiDX9Renderer* pk
         return ::new (v2) NiDX9ShaderConstantManager(pkRenderer, kD3DCaps9);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

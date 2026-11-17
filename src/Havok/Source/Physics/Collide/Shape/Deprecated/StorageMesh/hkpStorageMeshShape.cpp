@@ -129,7 +129,7 @@ void finishLoadedObjecthkpStorageMeshShapeSubpartStorage(void* p, int32_t a1) {
 
 // Factory for a storage mesh: constructs one on apMemory when apMemory is set.
 void finishLoadedObjecthkpStorageMeshShape(void* p, int32_t finishing) {
-    void* apMemory = static_cast<void*>(p);
+    void* apMemory = p;
     hkpShapeType aType = static_cast<hkpShapeType>(finishing);
     if (apMemory != nullptr) {
         ::new (apMemory) hkpStorageMeshShape(aType);

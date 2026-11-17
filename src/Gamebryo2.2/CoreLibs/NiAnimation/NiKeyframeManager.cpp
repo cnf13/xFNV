@@ -41,10 +41,10 @@ void NiKeyframeManager::LoadBinary(NiStream& kStream) {
             --uiNumSequences;
             uint32_t uiFlagSize = 1;
             pkFlagIstr->m_uiAbsoluteCurrentPos += pkFlagIstr->m_pfnRead(pkFlagIstr, &uiSizeOrFlag, 1, &uiFlagSize, 1);
-            char* pcSequenceName = 0;
+            char* pcSequenceName = nullptr;
             kStream.LoadCString(pcSequenceName);
             if (static_cast<uint8_t>(uiSizeOrFlag)) {
-                char* pcFileName = 0;
+                char* pcFileName = nullptr;
                 kStream.LoadCString(pcFileName);
                 NiBinaryStream* pkIndexIstr = kStream.Istr();
                 uint32_t uiSize = 4;
@@ -78,7 +78,7 @@ void NiKeyframeManager::LoadBinary(NiStream& kStream) {
                 kNumSequenceKeys.Add(uiNumKeys);
                 while (uiNumKeys) {
                     --uiNumKeys;
-                    char* pcObjectName = 0;
+                    char* pcObjectName = nullptr;
                     kStream.LoadCString(pcObjectName);
                     NiTPrimitiveArray<char*>& kObjectName = ms_pkLinkRecord->m_kObjectName;
                     uint32_t uiObjectAt = kObjectName.m_usSize;
@@ -118,9 +118,9 @@ void NiKeyframeManager::LoadBinary(NiStream& kStream) {
             uint32_t uiSize = 1;
             pkFlagIstr->m_uiAbsoluteCurrentPos += pkFlagIstr->m_pfnRead(pkFlagIstr, &uiSizeOrFlag, 1, &uiSize, 1);
             if (static_cast<uint8_t>(uiSizeOrFlag)) {
-                char* pcSequenceName = 0;
+                char* pcSequenceName = nullptr;
                 kStream.LoadCString(pcSequenceName);
-                char* pcFileName = 0;
+                char* pcFileName = nullptr;
                 kStream.LoadCString(pcFileName);
                 NiBinaryStream* pkIndexIstr = kStream.Istr();
                 uiSize = 4;
@@ -226,7 +226,7 @@ bool NiKeyframeManager::Add(const char* pcSequenceFile, const char* pcSequenceNa
 NiObject* NiKeyframeManager::CreateObject() {
     NiKeyframeManager* pkObject = static_cast<NiKeyframeManager*>(NiMemObject::operator new(sizeof(NiKeyframeManager)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiKeyframeManager;
 }

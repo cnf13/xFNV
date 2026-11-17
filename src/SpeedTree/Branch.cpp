@@ -16,9 +16,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <map>
 #include <memory>
-#include <stdint.h>
 #include <vector>
 
 CIdvRandom CIdvBranch::m_cRandom;
@@ -54,8 +54,8 @@ void CIdvBranch::ComputeVolume() {
             m_fVolume = (float)0.0;
             for (i = 0; i < (m_nVertexCount - 1); ++i) {
                 v2 = &m_pVertices[i];
-                v3 = (float)(&v2->m_cPos)->Distance(v2[1].m_cPos);
-                m_fVolume = (float)(((v2->m_fRadius + v2[1].m_fRadius) * v3) + m_fVolume);
+                v3 = (&v2->m_cPos)->Distance(v2[1].m_cPos);
+                m_fVolume = (((v2->m_fRadius + v2[1].m_fRadius) * v3) + m_fVolume);
             }
         }
     }
@@ -85,7 +85,7 @@ void CIdvBranch::Compute(
     float fParentRadius
 ) {
     // GetLevel's unsigned level is compared signed.
-    bool bFrond = m_pFrondEngine->Enabled() && nLevel >= static_cast<int32_t>(m_pFrondEngine->GetLevel());
+    bool bFrond = m_pFrondEngine->Enabled() && nLevel >= m_pFrondEngine->GetLevel();
     if (nLevel == m_nWeightLevel) {
         nWindGroup = m_nRoundRobinWindLevel++;
     }
@@ -426,7 +426,7 @@ void CIdvBranch::Compute(
                         nWindGroup, fRadiusOfParentAtBranch
                     );
 
-                    if (!m_pFrondEngine->Enabled() || nLevel < static_cast<int32_t>(m_pFrondEngine->GetLevel())) {
+                    if (!m_pFrondEngine->Enabled() || nLevel < m_pFrondEngine->GetLevel()) {
                         m_vChildren.push_back(sBranch);
                     }
                     else {
@@ -523,9 +523,9 @@ void CIdvBranch::FillBranch(SIdvBranch& sBranch, float fChildGrowthPos) const {
             }
         }
         (&sBranch)->m_fPercent =
-            (float)((fChildGrowthPos - m_pVertices[(&sBranch)->m_nPreVertexIndex].m_fRunningLength) /
-                    (m_pVertices[(&sBranch)->m_nPreVertexIndex + 1].m_fRunningLength -
-                     m_pVertices[(&sBranch)->m_nPreVertexIndex].m_fRunningLength));
+            ((fChildGrowthPos - m_pVertices[(&sBranch)->m_nPreVertexIndex].m_fRunningLength) /
+             (m_pVertices[(&sBranch)->m_nPreVertexIndex + 1].m_fRunningLength -
+              m_pVertices[(&sBranch)->m_nPreVertexIndex].m_fRunningLength));
     }
 }
 
@@ -1086,7 +1086,7 @@ void CRotTransform::RotateX(float fAngle) {
     apMemory.m_afData[1][1] = v8;
     apMemory.m_afData[1][2] = v2;
     apMemory.m_afData[2][0] = (float)0.0;
-    apMemory.m_afData[2][1] = (float)(-v2);
+    apMemory.m_afData[2][1] = (-v2);
     apMemory.m_afData[2][2] = v8;
     __builtin_memcpy(this, &(result = (&apMemory)->operator*(*this)), sizeof(CRotTransform));
 }
@@ -1194,7 +1194,7 @@ void CRotTransform::RotateZ(float fAngle) {
     cRotMatrix.m_afData[0][0] = fCosine;
     cRotMatrix.m_afData[0][1] = fSine;
     cRotMatrix.m_afData[0][2] = (float)0.0;
-    cRotMatrix.m_afData[1][0] = (float)(-fSine);
+    cRotMatrix.m_afData[1][0] = (-fSine);
     cRotMatrix.m_afData[1][1] = fCosine;
     cRotMatrix.m_afData[1][2] = (float)0.0;
     cRotMatrix.m_afData[2][0] = (float)0.0;

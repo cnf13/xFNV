@@ -64,8 +64,8 @@ void CoverReservationInfo::Clear() {
     cSegment = (uint8_t)0;
     cSegmentLength = (uint8_t)0;
     cSegmentCount = (uint8_t)0;
-    bHideCover = (bool)0;
-    bLeftEdge = (bool)0;
+    bHideCover = false;
+    bLeftEdge = false;
 }
 
 void CoverReservationInfo::CalculateSegmentInfo(PathingCoverLocation* apCoverLocation) {
@@ -74,14 +74,14 @@ void CoverReservationInfo::CalculateSegmentInfo(PathingCoverLocation* apCoverLoc
     float v5;
     NiPoint3 result;
     (result = (&apCoverLocation->LeftVertex)->operator-(apCoverLocation->RightVertex));
-    float fWidth = (float)(&result)->Length();
+    float fWidth = (&result)->Length();
     if (!(fWidth <= 256.0)) {
         v5 = (float)(fWidth / 32.0);
         if (!(v5 > 255.0)) {
             cSegmentLength = (uint8_t)((int32_t)FloatFloor(v5));
         }
         else {
-            cSegmentLength = (uint8_t)((-1));
+            cSegmentLength = (uint8_t)(-1);
         }
         cSegmentCount = (uint8_t)32;
     }
@@ -111,20 +111,20 @@ bool CoverReservationInfo::FindCoverReservation(
         CalculateSegmentInfo(apCoverLocation);
     }
     if (!cSegmentLength || !cSegmentCount) {
-        return 0;
+        return false;
     }
     if (!cActorWidth) {
         cActorWidth = CalculateActorWidth(afActorRadius);
     }
     if (static_cast<uint8_t>(static_cast<int32_t>(static_cast<double>(cActorWidth) / 1.5)) >
         static_cast<int32_t>(cSegmentCount)) {
-        return 0;
+        return false;
     }
     cActorWidth = BSMIN(cActorWidth, cSegmentCount);
     if (cSegment) {
         bHideCover = abHideCover;
         if ((ireservations & GetCoverMask()) == 0 && bLeftEdge == abLeftEdge) {
-            return 1;
+            return true;
         }
     }
     bHideCover = abHideCover;
@@ -137,7 +137,7 @@ bool CoverReservationInfo::FindCoverReservation(
                 for (int32_t i = cSegmentCount - cActorWidth; i >= 0; --i) {
                     if ((icoverMask << i & ireservations) == 0) {
                         cSegment = i;
-                        return 1;
+                        return true;
                     }
                 }
             }
@@ -145,7 +145,7 @@ bool CoverReservationInfo::FindCoverReservation(
                 for (int32_t j = 0; j <= cSegmentCount - cActorWidth; ++j) {
                     if ((icoverMask << j & ireservations) == 0) {
                         cSegment = j;
-                        return 1;
+                        return true;
                     }
                 }
             }
@@ -169,7 +169,7 @@ bool CoverReservationInfo::FindCoverReservation(
                     else {
                         if ((icoverMask << v8 & ireservations) == 0) {
                             cSegment = v8;
-                            return 1;
+                            return true;
                         }
                     }
                 }
@@ -187,11 +187,11 @@ bool CoverReservationInfo::FindCoverReservation(
         }
         if ((icoverMask << cshift & ireservations) == 0) {
             cSegment = cshift;
-            return 1;
+            return true;
         }
     }
     Clear();
-    return 0;
+    return false;
 }
 
 void CoverReservationInfo::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
@@ -263,7 +263,7 @@ bool ReservedCoverLocation::TryReserveCoverLocation(
     for (uint32_t i = Reservations.iSize; i_2 < i; i = Reservations.iSize) {
         CoverReservation* coverReservation = &Reservations.operator[](i_2);
         if (coverReservation->pCombatController == apCombatController) {
-            return 0;
+            return false;
         }
         ++i_2;
     }
@@ -272,12 +272,12 @@ bool ReservedCoverLocation::TryReserveCoverLocation(
     }
     uint32_t icoverSegmentMask = apCombatCoverLocation->ReservationInfo.GetCoverMask();
     if ((icoverSegmentMask & iReservations) != 0) {
-        return 0;
+        return false;
     }
     iReservations |= icoverSegmentMask;
     CoverReservation kReservation(apCombatController, apCombatCoverLocation);
     Reservations.Add(kReservation);
-    return 1;
+    return true;
 }
 
 bool ReservedCoverLocation::CanReserveCoverLocation(CombatController* apCombatController) {
@@ -289,16 +289,16 @@ bool ReservedCoverLocation::CanReserveCoverLocation(CombatController* apCombatCo
         for (i = 0; i < Reservations.iSize; ++i) {
             pReservation = &(&Reservations)->operator[](i);
             if (pReservation->pCombatController == apCombatController) {
-                return (bool)0;
+                return false;
             }
             pActor = pReservation->pCombatController->GetAttacker();
             pGroup = apCombatController->CombatController::GetCombatGroup();
             if (pGroup->IsTarget(pActor)) {
-                return (bool)0;
+                return false;
             }
         }
     }
-    return (bool)1;
+    return true;
 }
 
 void ReservedCoverLocation::SetCoverHeight(uint8_t acCoverHeight) {
@@ -313,18 +313,18 @@ bool ReservedCoverLocation::UnreserveCoverLocation(
     uint32_t isize = Reservations.iSize;
     for (i = 0;; ++i) {
         if (i >= isize) {
-            return 0;
+            return false;
         }
         if ((&Reservations.operator[](i))->pCombatController == apCombatController) {
             break;
         }
     }
     if (isize == 1) {
-        return 1;
+        return true;
     }
     iReservations &= ~apCombatCoverLocation->ReservationInfo.GetCoverMask();
     Reservations.RemoveFast(i, 1u);
-    return 0;
+    return false;
 }
 
 CombatCoverMap::CombatCoverMap() : NiTMap<uint32_t, ReservedCoverLocation*>(37u), spCoverSearchDebugGeometry(nullptr) {}
@@ -360,7 +360,7 @@ void CombatCoverMap::ReserveCoverLocation(
     CombatCoverLocation* apCombatCoverLocation
 ) {
     Lock.LockForWrite();
-    ReservedCoverLocation* preservedLocation = 0;
+    ReservedCoverLocation* preservedLocation = nullptr;
     if (!GetAt(apCombatCoverLocation->iCoverLocationKey, preservedLocation)) {
         ReservedCoverLocation* preservedLocation_2;
         ReservedCoverLocation* apMemory = static_cast<ReservedCoverLocation*>(ourMalloc(sizeof(ReservedCoverLocation)));
@@ -368,7 +368,7 @@ void CombatCoverMap::ReserveCoverLocation(
             preservedLocation_2 = ::new (apMemory) ReservedCoverLocation;
         }
         else {
-            preservedLocation_2 = 0;
+            preservedLocation_2 = nullptr;
         }
         preservedLocation = preservedLocation_2;
         uint8_t v3 = apCombatCoverLocation->cCoverHeight;
@@ -376,7 +376,7 @@ void CombatCoverMap::ReserveCoverLocation(
         SetAt(apCombatCoverLocation->iCoverLocationKey, preservedLocation);
     }
     preservedLocation->ReserveCoverLocation(apCombatController, apCombatCoverLocation);
-    apCombatCoverLocation->bReserved = 1;
+    apCombatCoverLocation->bReserved = true;
     Lock.UnlockWrite();
 }
 
@@ -385,7 +385,7 @@ bool CombatCoverMap::TryReserveCoverLocation(
     CombatCoverLocation* apCombatCoverLocation
 ) {
     Lock.LockForWrite();
-    ReservedCoverLocation* preservedLocation = 0;
+    ReservedCoverLocation* preservedLocation = nullptr;
     if (!GetAt(apCombatCoverLocation->iCoverLocationKey, preservedLocation)) {
         ReservedCoverLocation* preservedLocation_2;
         ReservedCoverLocation* apMemory = static_cast<ReservedCoverLocation*>(ourMalloc(sizeof(ReservedCoverLocation)));
@@ -393,7 +393,7 @@ bool CombatCoverMap::TryReserveCoverLocation(
             preservedLocation_2 = ::new (apMemory) ReservedCoverLocation;
         }
         else {
-            preservedLocation_2 = 0;
+            preservedLocation_2 = nullptr;
         }
         preservedLocation = preservedLocation_2;
         uint8_t v3 = apCombatCoverLocation->cCoverHeight;
@@ -457,7 +457,7 @@ void CombatCoverMap::UnreserveCoverLocation(
                 NiTMapBase<DFALL<NiTMapItem<uint32_t, ReservedCoverLocation*>>, uint32_t, ReservedCoverLocation*>::
                     RemoveAt(apCombatCoverLocation->iCoverLocationKey);
             }
-            apCombatCoverLocation->SetReserved(0);
+            apCombatCoverLocation->SetReserved(false);
         }
         (&Lock)->UnlockWrite();
     }

@@ -152,7 +152,7 @@ void NiFloatData::SetAnim(NiFloatKey* pkKeys, uint32_t uiNumKeys, NiAnimationKey
 NiObject* NiFloatData::CreateObject() {
     void* pkObject = NiMemObject::operator new(sizeof(NiFloatData));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiFloatData;
 }

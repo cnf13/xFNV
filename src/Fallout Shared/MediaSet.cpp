@@ -41,11 +41,11 @@ void MediaSet::MediaLayer::Copy(MediaSet::MediaLayer l) {
 }
 
 bool MediaSet::MediaLayer::Compare(MediaSet::MediaLayer l) {
-    if (l.Attenuation == Attenuation && (l.Percent == Percent && Name.StrCmp(l.Name.pString, static_cast<bool>(0)))) {
-        return 0;
+    if (l.Attenuation == Attenuation && (l.Percent == Percent && Name.StrCmp(l.Name.pString, false))) {
+        return false;
     }
     else {
-        return 1;
+        return true;
     }
 }
 
@@ -306,7 +306,7 @@ void MediaSet::InitItem() {
                 Warning("MASTERFILE: Could not find open sound (%08X) for MediaSet '%s' (%08X).", itempInt, v6, v8);
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -386,11 +386,11 @@ bool MediaSet::Compare(TESForm* apCompare) {
 }
 
 void MediaSet::Reset() {
-    bStarted = (bool)0;
+    bStarted = false;
     uiSeekTime = (uint32_t)0;
-    bInCombat = (bool)0;
-    bInTension = (bool)0;
-    bIsDay = (bool)0;
+    bInCombat = false;
+    bInTension = false;
+    bIsDay = false;
     cCurrentLayer = 0;
 }
 
@@ -408,11 +408,11 @@ bool MediaSet::UpdateLocation(uint32_t ticks, bool abInCombat, MediaLocationCont
     float percent;
     uint32_t auiSynchTime;
     MediaSet::MediaLayer* p_pMLOne;
-    uint8_t isPlaying = (uint8_t)FalloutAudioMedia::MediaIsPlaying(MEDIA_LOCATION, 0);
+    uint8_t isPlaying = (uint8_t)FalloutAudioMedia::MediaIsPlaying(MEDIA_LOCATION, false);
     uint8_t v25 = 1;
     int8_t v23 = 0;
     if (abInCombat) {
-        return (bool)0;
+        return false;
     }
     uint32_t subDuration = FalloutAudioMedia::MediaGetSubDuration(MEDIA_LOCATION);
     int8_t v21 = 0;
@@ -421,7 +421,7 @@ bool MediaSet::UpdateLocation(uint32_t ticks, bool abInCombat, MediaLocationCont
         FalloutAudioMedia::MediaFadeOut((int32_t)(fThree * 1000.0), MEDIA_LOCATION);
         uiLoopUpdate = ticks;
         if (pController->GetLoop()) {
-            return (bool)0;
+            return false;
         }
         v21 = 1;
     }
@@ -487,7 +487,7 @@ bool MediaSet::UpdateLocation(uint32_t ticks, bool abInCombat, MediaLocationCont
           (bInCombat ||
            (((bIsDay = (int32_t)this->bIsDay), (((uint32_t)bIsDay) != ((uint32_t)((uint8_t)pController->GetDay())))) ||
             (cCurrentLayer != v23)))) &&
-         (((uint32_t)FalloutAudioMedia::uiMediaLocationControllerDelay) < ticks)) ||
+         (FalloutAudioMedia::uiMediaLocationControllerDelay < ticks)) ||
         v21) {
         p_pMLOne = nullptr;
         if (pController->GetDay()) {
@@ -536,7 +536,7 @@ bool MediaSet::UpdateLocation(uint32_t ticks, bool abInCombat, MediaLocationCont
             v7 = (uint32_t)((int64_t)(fThree * 1000.0));
             v6 = p_pMLOne->Name.pString;
             FalloutAudioMedia::MediaOpen(
-                MEDIA_LOCATION, static_cast<const char*>(v6), v7, (bool)v8, (bool)1, afAttenuation, auiSynchTime
+                MEDIA_LOCATION, static_cast<const char*>(v6), v7, (bool)v8, true, afAttenuation, auiSynchTime
             );
             FalloutAudioMedia::MediaPlay();
             uiLoopUpdate = ticks;
@@ -547,7 +547,7 @@ bool MediaSet::UpdateLocation(uint32_t ticks, bool abInCombat, MediaLocationCont
             }
             v25 = 0;
         }
-        bInCombat = (bool)0;
+        bInCombat = false;
         this->bIsDay = (bool)((uint8_t)pController->GetDay());
         cCurrentLayer = v23;
     }
@@ -564,21 +564,21 @@ bool MediaSet::Update(uint32_t ticks, bool abInCombat, MediaLocationController* 
             if (Type == MediaSet::LAYER_DUNGEON) {
                 return UpdateDungeon(ticks, abInCombat, pController);
             }
-            return 0;
+            return false;
         }
         return UpdateBattle(abInCombat, ticks, MEDIA_BATTLE);
     }
     if (this->Type == MediaSet::INCIDENTAL) {
         if (MediaSet::uiLastUpdate > ticks) {
-            return 1;
+            return true;
         }
         UpdateIncidentals(ticks);
-        return 0;
+        return false;
     }
     if (this->Type == MediaSet::BATTLE) {
         return UpdateBattle(abInCombat, ticks, MEDIA_BATTLE);
     }
-    return 0;
+    return false;
 }
 
 bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationController* pController) {
@@ -586,22 +586,22 @@ bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationContr
     FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
-    bool bMusicPlaying = FalloutAudioMedia::MediaIsPlaying(MEDIA_DUNGEON, 1);
-    bool bReturn = 1;
+    bool bMusicPlaying = FalloutAudioMedia::MediaIsPlaying(MEDIA_DUNGEON, true);
+    bool bReturn = true;
     char cLayer = pController->fCurrentPlayerRadius < 100.0;
     if (!bInCombat && abInCombat) {
         FalloutAudioMedia::uiMediaLocationControllerDelay = 0;
     }
     uint32_t dur = FalloutAudioMedia::MediaGetDuration(MEDIA_LOCATION);
-    bool bLoop = 0;
+    bool bLoop = false;
     if (uiLoopUpdate &&
         (dur && static_cast<double>(dur + uiLoopUpdate) - fThree * 1000.0 < static_cast<double>(ticks))) {
         FalloutAudioMedia::MediaFadeOut(static_cast<int32_t>(fThree * 1000.0), MEDIA_LOCATION);
         uiLoopUpdate = ticks;
         if (pController->GetLoop()) {
-            return 0;
+            return false;
         }
-        bLoop = 1;
+        bLoop = true;
     }
     if (((bMusicPlaying &&
           (bInCombat == abInCombat &&
@@ -613,22 +613,22 @@ bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationContr
             if (bMusicPlaying) {
                 FalloutAudioMedia::MediaFadeOut(static_cast<int32_t>(fThree * 1000.0), MEDIA_DUNGEON);
             }
-            return 0;
+            return false;
         }
     }
     else {
-        MediaSet::MediaLayer* newLayer = 0;
+        MediaSet::MediaLayer* newLayer = nullptr;
         if (abInCombat) {
             if (pSoundOne) {
                 if (!bStarted) {
                     uint32_t CastingType = pSoundOne->iFormID;
                     BSAudio* v6 = &BSAudio::QInstance();
                     BSSoundHandle* SoundHandleByNumericID = v6->GetSoundHandleByNumericID(&a1, CastingType, 2305u);
-                    SoundHandleByNumericID->Play(0);
+                    SoundHandleByNumericID->Play(false);
                 }
             }
             newLayer = &pMLOne;
-            bStarted = 1;
+            bStarted = true;
         }
         else {
             if (pController->bInTension) {
@@ -637,11 +637,11 @@ bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationContr
                         uint32_t v10 = pSoundTwo->iFormID;
                         BSAudio* v7 = &BSAudio::QInstance();
                         BSSoundHandle* v13 = v7->GetSoundHandleByNumericID(&apHandle, v10, 2305u);
-                        v13->Play(0);
+                        v13->Play(false);
                     }
                 }
                 newLayer = &pMLThree;
-                bStarted = 0;
+                bStarted = false;
             }
             else {
                 if (bStarted) {
@@ -649,11 +649,11 @@ bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationContr
                         uint32_t v11 = pSoundTwo->iFormID;
                         BSAudio* v8 = &BSAudio::QInstance();
                         BSSoundHandle* v12 = v8->GetSoundHandleByNumericID(&th_s, v11, 2305u);
-                        v12->Play(0);
+                        v12->Play(false);
                     }
                 }
                 newLayer = &pMLTwo;
-                bStarted = 0;
+                bStarted = false;
             }
         }
         if (newLayer) {
@@ -671,12 +671,12 @@ bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationContr
             }
             if (newLayer == &pMLOne) {
                 FalloutAudioMedia::MediaOpen(
-                    MEDIA_DUNGEON, newLayer->Name.pString, 1000u, 1, 1, newLayer->Attenuation, uiSeekTime
+                    MEDIA_DUNGEON, newLayer->Name.pString, 1000u, true, true, newLayer->Attenuation, uiSeekTime
                 );
             }
             else {
                 FalloutAudioMedia::MediaOpen(
-                    MEDIA_DUNGEON, newLayer->Name.pString, static_cast<int64_t>(fThree * 1000.0), 1, 1,
+                    MEDIA_DUNGEON, newLayer->Name.pString, static_cast<int64_t>(fThree * 1000.0), true, true,
                     newLayer->Attenuation, uiSeekTime
                 );
             }
@@ -684,7 +684,7 @@ bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationContr
         }
         else {
             FalloutAudioMedia::MediaFadeOut(static_cast<int32_t>(fThree * 1000.0), MEDIA_DUNGEON);
-            bReturn = 0;
+            bReturn = false;
         }
         bInCombat = abInCombat;
         this->bInTension = pController->bInTension;
@@ -697,8 +697,8 @@ bool MediaSet::UpdateBattle(bool bInCombat, uint32_t ticks, MEDIATYPE mType) {
     FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     if (bInCombat) {
-        bool bShouldPlayIntro = 0;
-        bool bIsLoaded = FalloutAudioMedia::MediaIsPlaying(mType, 0);
+        bool bShouldPlayIntro = false;
+        bool bIsLoaded = FalloutAudioMedia::MediaIsPlaying(mType, false);
         if (!bIsLoaded && !bStarted) {
             if (pSoundOne) {
                 if (!bStarted) {
@@ -706,26 +706,26 @@ bool MediaSet::UpdateBattle(bool bInCombat, uint32_t ticks, MEDIATYPE mType) {
                     BSAudio* v4 = &BSAudio::QInstance();
                     BSSoundHandle* SoundHandleByNumericID =
                         v4->GetSoundHandleByNumericID(&apHandle, CastingType, 2305u);
-                    SoundHandleByNumericID->Play(0);
+                    SoundHandleByNumericID->Play(false);
                 }
             }
             MediaSet::uiLastUpdate = ticks - 1;
-            bStarted = 1;
+            bStarted = true;
             FalloutAudioMedia::MediaOpen(
-                mType, pMLOne.Name.pString, static_cast<int64_t>(fTwo * 1000.0), 1, 1, pMLOne.Attenuation, 0
+                mType, pMLOne.Name.pString, static_cast<int64_t>(fTwo * 1000.0), true, true, pMLOne.Attenuation, 0
             );
             FalloutAudioMedia::MediaPlay();
             FalloutAudioMedia::MediaPause();
         }
         if (static_cast<double>(MediaSet::uiLastUpdate) + fOne < static_cast<double>(ticks)) {
             FalloutAudioMedia::MediaUnPause();
-            bStarted = 1;
+            bStarted = true;
         }
         uint32_t dur = FalloutAudioMedia::MediaGetDuration(mType);
         if (dur) {
             if (ticks > MediaSet::uiLastUpdate + dur - 1000) {
                 FalloutAudioMedia::MediaOpen(
-                    mType, pMLOne.Name.pString, static_cast<int64_t>(fTwo * 1000.0), 1, 1, pMLOne.Attenuation, 0
+                    mType, pMLOne.Name.pString, static_cast<int64_t>(fTwo * 1000.0), true, true, pMLOne.Attenuation, 0
                 );
                 FalloutAudioMedia::MediaPlay();
                 MediaSet::uiLastUpdate = ticks;
@@ -733,9 +733,9 @@ bool MediaSet::UpdateBattle(bool bInCombat, uint32_t ticks, MEDIATYPE mType) {
         }
     }
     else {
-        bool bShouldPlayOutro = 0;
-        if (FalloutAudioMedia::MediaIsPlaying(mType, 0) && bStarted) {
-            bShouldPlayOutro = 1;
+        bool bShouldPlayOutro = false;
+        if (FalloutAudioMedia::MediaIsPlaying(mType, false) && bStarted) {
+            bShouldPlayOutro = true;
             FalloutAudioMedia::MediaFadeOut(static_cast<int32_t>(fTwo * 1000.0), mType);
         }
         if (bShouldPlayOutro) {
@@ -743,13 +743,13 @@ bool MediaSet::UpdateBattle(bool bInCombat, uint32_t ticks, MEDIATYPE mType) {
                 uint32_t v8 = pSoundTwo->iFormID;
                 BSAudio* v5 = &BSAudio::QInstance();
                 BSSoundHandle* v9 = v5->GetSoundHandleByNumericID(&th_s, v8, 2305u);
-                v9->Play(0);
+                v9->Play(false);
             }
             MediaSet::uiLastUpdate = static_cast<int64_t>(static_cast<double>(ticks) + fThree * 1000.0);
             if (FalloutAudioMedia::pCurrentMediaController) {
                 FalloutAudioMedia::pCurrentMediaController->uiLocationDelay = MediaSet::uiLastUpdate;
             }
-            bStarted = 0;
+            bStarted = false;
         }
     }
     return bInCombat;
@@ -760,7 +760,7 @@ bool MediaSet::UpdateIncidentals(uint32_t ticks) {
     FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (ticks <= MediaSet::uiLastUpdate) {
-        return 1;
+        return true;
     }
     Sky* psky = TES::pInstance->pSky;
     if (psky) {
@@ -781,7 +781,7 @@ bool MediaSet::UpdateIncidentals(uint32_t ticks) {
         uint32_t CastingType = pSoundOne->iFormID;
         BSAudio* v3 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByNumericID = v3->GetSoundHandleByNumericID(&a1, CastingType, 2305u);
-        SoundHandleByNumericID->Play(0);
+        SoundHandleByNumericID->Play(false);
         MediaSet::uiLastUpdate =
             ticks + RandomInt(static_cast<int32_t>(fOne * 1000.0), static_cast<int32_t>(fThree * 1000.0));
     }
@@ -789,9 +789,9 @@ bool MediaSet::UpdateIncidentals(uint32_t ticks) {
         uint32_t v6 = pSoundTwo->iFormID;
         BSAudio* v4 = &BSAudio::QInstance();
         BSSoundHandle* v7 = v4->GetSoundHandleByNumericID(&apHandle, v6, 2305u);
-        v7->Play(0);
+        v7->Play(false);
         MediaSet::uiLastUpdate =
             ticks + RandomInt(static_cast<int32_t>(fTwo * 1000.0), static_cast<int32_t>(fFour * 1000.0));
     }
-    return 1;
+    return true;
 }

@@ -30,7 +30,7 @@ BeamShader::BeamShader(NiDX9ShaderDeclaration* apShaderDecl)
   : ePass(BSShaderManager::BSSM_BEAM), fTimer(0.0f), fVars{}, spBeamPass(nullptr), spBeamVertexShader(nullptr),
     spBeamPixelShader(nullptr) {
     iShaderType = 16;
-    m_bUsesNiRenderState = 1;
+    m_bUsesNiRenderState = true;
     m_spShaderDecl = apShaderDecl;
 }
 
@@ -112,7 +112,7 @@ void BeamShader::LoadShaders() {
     NiD3DVertexShader* pVertexShader =
         CompileVertexShaderHLSL(Str1, kVertexMacros.kMacros, ShaderTarget_vs_1_1, PSOFile);
     spBeamVertexShader = pVertexShader;
-    const char* ptarget = BSShaderManager::GetPSTarget(1);
+    const char* ptarget = BSShaderManager::GetPSTarget(true);
     kPixelMacros.strPath = "beam\\p\\beam.p.hlsl";
     kPixelMacros.kMacros[0].Name = nullptr;
     kPixelMacros.kMacros[0].Definition = nullptr;
@@ -133,8 +133,8 @@ bool BeamShader::LoadStagesAndPasses() {
 }
 
 void BeamShader::PresetStages() {
-    NiD3DPass* v2 = 0;
-    NiD3DPass* v11 = 0;
+    NiD3DPass* v2 = nullptr;
+    NiD3DPass* v11 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         NiD3DPass* m_pObject = spBeamPass.m_pObject;
@@ -145,8 +145,8 @@ void BeamShader::PresetStages() {
         }
         if (!v2->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
-            a1.m_pObject->m_pkTextureStageGroup->SetSamplerState(7u, 0, 0, 0);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
+            a1.m_pObject->m_pkTextureStageGroup->SetSamplerState(7u, 0, false, false);
             v2->SetStage(v2->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v4 = spBeamVertexShader.m_pObject;
@@ -156,43 +156,43 @@ void BeamShader::PresetStages() {
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(22u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(22u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(168u, 15u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(168u, 15u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(52u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(52u, 0, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
     }
     v2->DecRefCount();
 }
@@ -209,7 +209,7 @@ void BeamShader::Free() {
 }
 
 BSShader* BeamShader::CreateShader() {
-    BeamShader* pshader = 0;
+    BeamShader* pshader = nullptr;
     NiDX9ShaderDeclaration* spShaderDecl = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 5u, 1u);
     spShaderDecl->SetEntry(0, 0, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
     spShaderDecl->SetEntry(1u, 3u, NiShaderDeclaration::SHADERPARAM_NI_NORMAL, NiShaderDeclaration::SPTYPE_FLOAT3, 0);

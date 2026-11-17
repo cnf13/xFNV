@@ -53,7 +53,7 @@ void NiScreenPolygonArray_SetAt(
     const NiPointer<NiScreenPolygon>& akElement
 ) {
     // `tcmp` is NiTArray::SetAt's guarded null element, released by its static destructor at exit.
-    static NiPointer<NiScreenPolygon> tcmp = static_cast<NiScreenPolygon*>(0);
+    static NiPointer<NiScreenPolygon> tcmp = static_cast<NiScreenPolygon*>(nullptr);
     if (auiIndex < apArray->m_usSize) {
         NiPointer<NiScreenPolygon>* m_pBase = apArray->m_pBase;
         if (akElement.m_pObject == tcmp.m_pObject) {
@@ -93,7 +93,7 @@ void NiScreenTextureArray_SetAt(
     uint32_t auiIndex,
     const NiPointer<NiScreenTexture>& akElement
 ) {
-    static NiPointer<NiScreenTexture> tcmp = static_cast<NiScreenTexture*>(0);
+    static NiPointer<NiScreenTexture> tcmp = static_cast<NiScreenTexture*>(nullptr);
     if (auiIndex < apArray->m_usSize) {
         NiPointer<NiScreenTexture>* m_pBase = apArray->m_pBase;
         if (akElement.m_pObject == tcmp.m_pObject) {
@@ -599,7 +599,7 @@ void NiScreenPolygon::LinkObject(NiStream& stream) {
     while (uiCount) {
         uiCount--;
         NiProperty* pkProperty = static_cast<NiProperty*>(stream.GetObjectFromLinkID());
-        if (pkProperty && int32_t(pkProperty->Type()) <= 7) {
+        if (pkProperty && pkProperty->Type() <= 7) {
             m_spPropertyState->m_aspProps[pkProperty->Type()] = pkProperty;
         }
     }
@@ -731,14 +731,14 @@ NiObject* NiScreenPolygon::CreateObject() {
 // Both screen arrays hold 5 slots and grow by 5; the camera is orthographic and its world data and bound are
 // updated through NiCamera's own bodies.
 NiScreenSpaceCamera::NiScreenSpaceCamera() : m_kScreenPolygons(5, 5), m_kScreenTextures(5, 5) {
-    m_kViewFrustum.m_bOrtho = 1;
+    m_kViewFrustum.m_bOrtho = true;
     NiUpdateData kUpdateData;
     kUpdateData.fTime = 0.0f;
-    kUpdateData.bUpdateControllers = 0;
-    kUpdateData.bParallelUpdate = 0;
-    kUpdateData.bFoundParticles = 0;
-    kUpdateData.bFoundMorphController = 0;
-    kUpdateData.bSceneGraphChange = 0;
+    kUpdateData.bUpdateControllers = false;
+    kUpdateData.bParallelUpdate = false;
+    kUpdateData.bFoundParticles = false;
+    kUpdateData.bFoundMorphController = false;
+    kUpdateData.bSceneGraphChange = false;
     NiCamera::UpdateWorldData(kUpdateData);
     NiCamera::UpdateWorldBound();
 }
@@ -759,8 +759,8 @@ NiObject* NiScreenSpaceCamera::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -870,6 +870,6 @@ NiObject* NiScreenSpaceCamera::CreateObject() {
         return ::new (v0) NiScreenSpaceCamera;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

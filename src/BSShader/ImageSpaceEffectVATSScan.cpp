@@ -146,7 +146,7 @@ void ImageSpaceEffectVATSScan::ReturnTextures() {
     for (int32_t i = 0; i < 5; ++i) {
         ImageSpaceTexture* ptex = pTextures.m_pBase[i];
         if (ptex) {
-            ptex->SetTexture(static_cast<NiTexture*>(0));
+            ptex->SetTexture(static_cast<NiTexture*>(nullptr));
         }
     }
 }
@@ -164,5 +164,5 @@ bool ImageSpaceEffectVATSScan::UpdateParams(ImageSpaceEffectParam* pParam) {
         2, ImageSpaceEffectVATSScan::kTint.r, ImageSpaceEffectVATSScan::kTint.g, ImageSpaceEffectVATSScan::kTint.b,
         ImageSpaceEffectVATSScan::kTint.a
     );
-    return 0;
+    return false;
 }

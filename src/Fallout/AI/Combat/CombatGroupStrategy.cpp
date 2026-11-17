@@ -72,7 +72,7 @@ CombatGroupStrategy* CombatGroupStrategy::LookupByName(char* a1) {
             return CombatGroupStrategy::GetCombatGroupStrategy(aiIndex);
         }
     }
-    return 0;
+    return nullptr;
 }
 
 CombatGroupStrategy* InitNthCombatGroupStrategy(CombatGroupStrategy::COMBAT_GROUP_STRATEGY aeType) {
@@ -86,7 +86,7 @@ CombatGroupStrategy* InitNthCombatGroupStrategy(CombatGroupStrategy::COMBAT_GROU
                 v5 = ::new (apMemory) CombatGroupStrategyFallBack(aeType);
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             result = v5;
             break;
@@ -99,7 +99,7 @@ CombatGroupStrategy* InitNthCombatGroupStrategy(CombatGroupStrategy::COMBAT_GROU
                 v2 = ::new (v6) CombatGroupStrategyAdvance(aeType);
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             result = v2;
             break;
@@ -112,7 +112,7 @@ CombatGroupStrategy* InitNthCombatGroupStrategy(CombatGroupStrategy::COMBAT_GROU
                 v4 = ::new (v8) CombatGroupStrategyFlank(aeType);
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             result = v4;
             break;
@@ -125,14 +125,14 @@ CombatGroupStrategy* InitNthCombatGroupStrategy(CombatGroupStrategy::COMBAT_GROU
                 v3 = ::new (v7) CombatGroupStrategyAmbush(aeType);
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             result = v3;
             break;
         }
         default: {
             Warning("COMBAT: Could not create combat group strategy of type %i", aeType);
-            result = 0;
+            result = nullptr;
             break;
         }
     }
@@ -150,12 +150,12 @@ CombatGroupStrategyFallBack::CombatGroupStrategyFallBack(CombatGroupStrategy::CO
 
 bool CombatGroupStrategyFallBack::CanExecute(CombatGroup* apGroup, CombatGroupData* apGroupData) {
     if (static_cast<int32_t>(apGroupData->iMemberCount) < 2) {
-        return 0;
+        return false;
     }
     if (apGroup->CheckGroupStrategyChosenTimeStamp(0, 30.0f)) {
         return !(apGroupData->GetAverageGroupHealth() > 0.33000001311302185);
     }
-    return 0;
+    return false;
 }
 
 // Every member falls back. The member count is read again on every pass.
@@ -175,18 +175,18 @@ CombatGroupStrategyFlank::CombatGroupStrategyFlank(CombatGroupStrategy::COMBAT_G
 
 bool CombatGroupStrategyFlank::CanExecute(CombatGroup* apGroup, CombatGroupData* apGroupData) {
     if (static_cast<int32_t>(apGroupData->iMemberCount) < 3) {
-        return 0;
+        return false;
     }
     if (apGroupData->GetRangedMemberCount() < 1) {
-        return 0;
+        return false;
     }
     if (!apGroup->CheckGroupStrategyChosenTimeStamp(2u, 30.0f)) {
-        return 0;
+        return false;
     }
     if (apGroupData->GetMemberMaximumTargetDetection() > 0) {
         return !apGroupData->GetMembersTargetsIntersecting();
     }
-    return 0;
+    return false;
 }
 
 void CombatGroupStrategyFlank::Execute(CombatGroup* apGroup, CombatGroupData* apGroupData) {
@@ -235,15 +235,15 @@ CombatGroupStrategyAmbush::CombatGroupStrategyAmbush(CombatGroupStrategy::COMBAT
 
 bool CombatGroupStrategyAmbush::CanExecute(CombatGroup* apGroup, CombatGroupData* apGroupData) {
     if (static_cast<int32_t>(apGroupData->iMemberCount) < 2) {
-        return 0;
+        return false;
     }
     if (!apGroup->CheckGroupStrategyChosenTimeStamp(3u, 60.0f)) {
-        return 0;
+        return false;
     }
     if (apGroupData->GetMemberMaximumTargetDetection() > 0) {
         return !apGroupData->GetMembersTargetsIntersecting();
     }
-    return 0;
+    return false;
 }
 
 // The first half of the members fall back; the rest ambush. The member count is read again on every pass of the second
@@ -268,13 +268,13 @@ CombatGroupStrategyAdvance::CombatGroupStrategyAdvance(CombatGroupStrategy::COMB
 
 bool CombatGroupStrategyAdvance::CanExecute(CombatGroup* apGroup, CombatGroupData* apGroupData) {
     if (apGroupData->GetRangedMemberCount() < 2) {
-        return 0;
+        return false;
     }
     if (!apGroup->CheckGroupStrategyChosenTimeStamp(1u, 60.0f)) {
-        return 0;
+        return false;
     }
     if (apGroupData->GetMemberMinimumTargetDetection() <= 0) {
-        return 0;
+        return false;
     }
     uint32_t irangedMemberCount = apGroupData->GetRangedMemberCount();
     for (uint32_t i = 0; i < irangedMemberCount; ++i) {
@@ -286,16 +286,16 @@ bool CombatGroupStrategyAdvance::CanExecute(CombatGroup* apGroup, CombatGroupDat
             const NiPoint3* v4 = &prangedMember->pActor->GetLocationOnReference();
             NiPoint3 targetVector = *v4 - *kTargetPos;
             if (targetVector.SqrLength() < 1048576.0) {
-                return 0;
+                return false;
             }
         }
     }
-    return 1;
+    return true;
 }
 
 // Every ranged member advances. The ranged member count is read again on every pass.
 void CombatGroupStrategyAdvance::Execute(CombatGroup* apGroup, CombatGroupData* apGroupData) {
-    for (int32_t i = 0; i < static_cast<int32_t>(apGroupData->GetRangedMemberCount()); ++i) {
+    for (int32_t i = 0; i < apGroupData->GetRangedMemberCount(); ++i) {
         GroupMemberData* pMember = apGroupData->GetRangedMember(i);
         apGroup->SetGroupStrategyAssignment(pMember->iIndex, STRATEGY_ASSIGNMENT_ADVANCING);
     }

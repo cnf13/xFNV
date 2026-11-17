@@ -323,21 +323,21 @@ bool NiScreenElementsData::SetRectangle(int32_t iPolygon, float fLeft, float fTo
     NiScreenElementsData::Polygon* m_akPolygon;
     int32_t m_usVOffset;
     if (iPolygon < 0) {
-        return (bool)0;
+        return false;
     }
     if (iPolygon >= ((int32_t)m_usMaxPQuantity)) {
-        return (bool)0;
+        return false;
     }
     uint16_t v7 = m_ausPIndexer[iPolygon];
     if (v7 == 0xffff) {
-        return (bool)0;
+        return false;
     }
     int32_t v8 = (int32_t)v7;
     m_akPolygon = this->m_akPolygon;
     uint8_t v10 = (uint8_t)(m_akPolygon[v8].m_usNumVertices == 4);
     NiScreenElementsData::Polygon* v11 = &m_akPolygon[v8];
     if (!v10) {
-        return (bool)0;
+        return false;
     }
     m_usVOffset = (int32_t)v11->m_usVOffset;
     double v13 = (double)fLeft;
@@ -362,8 +362,8 @@ bool NiScreenElementsData::SetRectangle(int32_t iPolygon, float fLeft, float fTo
     m_pkVertex[v17].y = fTop;
     m_pkVertex[v17].z = (float)0.0;
     NiGeometryData::MarkAsChanged(1u);
-    m_bBoundNeedsUpdate = (bool)1;
-    return (bool)1;
+    m_bBoundNeedsUpdate = true;
+    return true;
 }
 
 // The PC texture-set check uses only bit zero.
@@ -415,7 +415,7 @@ void NiScreenElementsData::UpdateBound() {
 NiObject* NiScreenElementsData::CreateObject() {
     void* pkObject = NiMemObject::operator new(sizeof(NiScreenElementsData));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiScreenElementsData;
 }

@@ -247,7 +247,7 @@ void MagicBoltProjectile::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
         psavedData = ::new (pmemory) BoltSavedData;
     }
     else {
-        psavedData = 0;
+        psavedData = nullptr;
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 48u) {
         LoadGameDataOLD(&psavedData->StartingLocation, 12);
@@ -293,7 +293,7 @@ void MagicBoltProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
     }
     Init3D();
     Set3DSimple(spBoltNode.m_pObject);
-    GetParentCell()->AddReference(this, 0);
+    GetParentCell()->AddReference(this, false);
     if (pAVEffect->GetBoltSound()) {
         uint32_t isoundFileID = pAVEffect->GetBoltSound()->iFormID;
         if (Sound.IsValid()) {
@@ -306,7 +306,7 @@ void MagicBoltProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
             NiPoint3 v11 = GetLocationOnReference();
             Sound.SetPosition(v11.x, v11.y, v11.z);
             Sound.SetObjectToFollow(spSoundNode.m_pObject);
-            Sound.Play(1);
+            Sound.Play(true);
         }
     }
 }
@@ -329,7 +329,7 @@ void MagicBoltProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFla
         if (GetCaster() && (v27 = GetCaster(), v27->GetCasterStatsObject())) {
             MagicCaster* Caster = GetCaster();
             TESObjectREFR* pref = Caster->GetCasterStatsObject();
-            Actor* pactor = pref->IsActor() ? static_cast<Actor*>(pref) : 0;
+            Actor* pactor = pref->IsActor() ? static_cast<Actor*>(pref) : nullptr;
             if (pactor) {
                 CFilter v32;
                 pactor->GetCollisionFilter(&v32.iFilter);
@@ -344,7 +344,7 @@ void MagicBoltProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFla
                     prb = pcol->GetRigidBody();
                 }
                 else {
-                    prb = 0;
+                    prb = nullptr;
                 }
                 if (prb) {
                     CFilter* v5 = prb->GetCollisionFilter(&apResult);
@@ -365,7 +365,7 @@ void MagicBoltProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFla
                 prb_2 = pcol_2->GetRigidBody();
             }
             else {
-                prb_2 = 0;
+                prb_2 = nullptr;
             }
             if (prb_2) {
                 CFilter* v7 = prb_2->GetCollisionFilter(&v30);
@@ -386,7 +386,7 @@ void MagicBoltProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFla
         pcaster = v21->GetCasterStatsObject();
     }
     else {
-        pcaster = 0;
+        pcaster = nullptr;
     }
     if (pcaster != pPlayer) {
         MagicProjectile::AddTrackedProjectile(fMagicTrackingMultBolt.Float());
@@ -421,7 +421,7 @@ void MagicBoltProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFla
                 }
             }
         }
-        pAreaBolts = 0;
+        pAreaBolts = nullptr;
         if (ptempData->pAreaBoltData) {
             // Only the count's low 16 bits are read.
             uint16_t icount = static_cast<uint16_t>(ptempData->pAreaBoltData[0]);
@@ -429,7 +429,7 @@ void MagicBoltProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFla
                 uint32_t imagicTargetID = ptempData->pAreaBoltData[i + 1];
                 MagicTarget* pmagicTarget = MagicTarget::GetMagicTargetByNumericID(imagicTargetID);
                 if (pmagicTarget) {
-                    AddAreaTarget(pmagicTarget, 0);
+                    AddAreaTarget(pmagicTarget, nullptr);
                 }
             }
         }
@@ -609,8 +609,8 @@ void MagicBoltProjectile::Update(float afDelta) {
         if (!spBoltProperty.m_pObject || eState) {
             if (eState == MagicBoltProjectile::BRANCH) {
                 MagicBoltProjectile::AreaBolt* pbranch = pAreaBolts;
-                MagicBoltProjectile::AreaBolt* pprevious = 0;
-                MagicBoltProjectile::AreaBolt* v43 = 0;
+                MagicBoltProjectile::AreaBolt* pprevious = nullptr;
+                MagicBoltProjectile::AreaBolt* v43 = nullptr;
                 while (pbranch) {
                     UpdateBranch(afDelta, pbranch);
                     MagicBoltProjectile::AreaBolt* pnext = pbranch->pNext;
@@ -625,10 +625,10 @@ void MagicBoltProjectile::Update(float afDelta) {
                         else {
                             pAreaBolts = pbranch->pNext;
                         }
-                        pbranch->spBoltNode.operator=(static_cast<NiNode*>(0));
-                        pbranch->spBoltProperty.operator=(static_cast<BoltShaderProperty*>(0));
-                        pbranch->spSource.operator=(static_cast<NiAVObject*>(0));
-                        pbranch->spTarget.operator=(static_cast<NiAVObject*>(0));
+                        pbranch->spBoltNode.operator=(static_cast<NiNode*>(nullptr));
+                        pbranch->spBoltProperty.operator=(static_cast<BoltShaderProperty*>(nullptr));
+                        pbranch->spSource.operator=(static_cast<NiAVObject*>(nullptr));
+                        pbranch->spTarget.operator=(static_cast<NiAVObject*>(nullptr));
                         MagicBoltProjectile::AreaBolt* v30 = pbranch;
                         MagicBoltProjectile::AreaBolt* pbranch_2 = pbranch;
                         if (pbranch) {
@@ -664,7 +664,7 @@ void MagicBoltProjectile::Update(float afDelta) {
         }
         fDistanceMoved = (dst - v47).Length() + fDistanceMoved;
         if (fMagicProjectileMaxDistance.Float() < static_cast<double>(fDistanceMoved)) {
-            SetDelete(1);
+            SetDelete(true);
         }
         if (IsActive()) {
         LABEL_29:;
@@ -729,7 +729,7 @@ void MagicBoltProjectile::Update(float afDelta) {
                     Sound.Release();
                 }
                 if (!pAreaBolts) {
-                    SetDelete(1);
+                    SetDelete(true);
                 }
             }
         }
@@ -750,7 +750,7 @@ void MagicBoltProjectile::Collide(
         v23 = static_cast<Actor*>(apCollidee);
     }
     else {
-        v23 = 0;
+        v23 = nullptr;
     }
     if (!v23 || !v23->GetGhost()) {
         fCollideTime = fLastUpdate;
@@ -786,12 +786,12 @@ void MagicBoltProjectile::Collide(
         }
         NiPoint3 startingLocation = Get3D()->GetTranslate();
         float fBoltLength = (startingLocation - aContactPoint).Length();
-        spBoltProperty.m_pObject->UpdateBolt(0.01f, fBoltLength, fSpeed, 0);
+        spBoltProperty.m_pObject->UpdateBolt(0.01f, fBoltLength, fSpeed, false);
         if (!abFizzle) {
             NiPoint3 v44 = GetLocationOnReference();
-            GetCaster()->FindTargets_0(pSpell, GetParentCell(), v44, this, apCollidee, 0, 1.0f, 1.0f);
+            GetCaster()->FindTargets_0(pSpell, GetParentCell(), v44, this, apCollidee, false, 1.0f, 1.0f);
         }
-        pTarget = 0;
+        pTarget = nullptr;
         if (pAVEffect->GetModel()) {
             NiPoint3* v18;
             double Area = static_cast<double>(GetDominantEffect()->GetArea());
@@ -816,7 +816,7 @@ void MagicBoltProjectile::Collide(
             }
             NiPoint3 orient = *v18;
             BSTempEffectParticle* pareaEffect =
-                BSTempEffectParticle::Spawn(GetParentCell(), 5.0f, pfilename, orient, aContactPoint, 1.0f, 7u, 0);
+                BSTempEffectParticle::Spawn(GetParentCell(), 5.0f, pfilename, orient, aContactPoint, 1.0f, 7u, nullptr);
             pareaEffect->PlaySequence("SpecialIdle_AreaEffect");
         }
         if (pAVEffect->data.pAreaSound) {
@@ -827,7 +827,7 @@ void MagicBoltProjectile::Collide(
                 v13->GetSoundHandleByNumericID(&soundHand, isoundFileID, 258u);
                 NiPoint3 v32 = GetLocationOnReference();
                 soundHand.SetPosition(v32.x, v32.y, v32.z);
-                soundHand.Play(0);
+                soundHand.Play(false);
             }
         }
     }
@@ -847,11 +847,11 @@ void MagicBoltProjectile::AddAreaTarget(MagicTarget* apTarget, ActiveEffect* apA
             pnode = ::new (apMemory) NiNode(0);
         }
         else {
-            pnode = 0;
+            pnode = nullptr;
         }
         NiNode* pparentNode = static_cast<NiNode*>(GetParentCell()->GetDynamicNode());
         pparentNode->AttachChild(pnode, 1);
-        BoltShaderProperty* pprop = BoltShader::Start(pnode, 0);
+        BoltShaderProperty* pprop = BoltShader::Start(pnode, false);
         if (pprop) {
             pprop->SetAbsorbNumBolts(iShockBranchNumBolts.Int());
             float* v4 = &fShockBranchBoltsRadius.Float();
@@ -882,17 +882,17 @@ void MagicBoltProjectile::AddAreaTarget(MagicTarget* apTarget, ActiveEffect* apA
             pprop->SetSegmentVariance(*v13);
             float* v14 = &gs_fSubSegmentVariance.Float();
             pprop->SetAbsorbTortuosityVariance(*v14);
-            pprop->SetStartFromPoint(0);
+            pprop->SetStartFromPoint(false);
             pprop->InitSegmentData();
         }
         bhkCharacterController* CharController = GetCharController();
         CharController->GetPosition(location);
-        NiAVObject* psource = 0;
+        NiAVObject* psource = nullptr;
         if (pTarget) {
             pav = pTarget->Get3D();
         }
         else {
-            pav = 0;
+            pav = nullptr;
         }
         NiAVObject* pav_2 = (NiAVObject*)pav;
         if (pav) {
@@ -900,7 +900,7 @@ void MagicBoltProjectile::AddAreaTarget(MagicTarget* apTarget, ActiveEffect* apA
             NiFixedString* v25 = &apString;
             psource = pav_2->GetObjectByName(*v25);
         }
-        NiRefObject* v36 = 0;
+        NiRefObject* v36 = nullptr;
         TESObjectREFR* v24 = apTarget->GetTargetStatsObject();
         pav_2 = (NiAVObject*)v24->Get3D();
         if (pav_2) {
@@ -917,7 +917,7 @@ void MagicBoltProjectile::AddAreaTarget(MagicTarget* apTarget, ActiveEffect* apA
                 pnewBolt = ::new (v16) MagicBoltProjectile::AreaBolt;
             }
             else {
-                pnewBolt = 0;
+                pnewBolt = nullptr;
             }
             pnewBolt->spBoltProperty.operator=(pprop);
             pnewBolt->spBoltNode.operator=(pnode);
@@ -940,24 +940,24 @@ bool MagicBoltProjectile::PostProcess() {
         pcasterRef = pcaster->GetCasterStatsObject();
     }
     else {
-        pcasterRef = 0;
+        pcasterRef = nullptr;
     }
     if (pcasterRef && pcasterRef->IsActor()) {
         v5 = pcasterRef;
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     PlayerCharacter* pcasterActor = static_cast<PlayerCharacter*>(v5);
     if (v5) {
         pmagicNode = pcasterActor->GetMagicNode();
     }
     else {
-        pmagicNode = 0;
+        pmagicNode = nullptr;
     }
     bhkCharacterController* pchar = GetCharController();
     if (!pmagicNode || (!pchar || !spBoltNode.m_pObject)) {
-        return 1;
+        return true;
     }
     if (fAge < 0.5 && pcasterActor == pPlayer && !pPlayer->Is3rdPerson()) {
         NiPoint3 startLocation = pmagicNode->GetWorldTranslate();
@@ -977,9 +977,9 @@ bool MagicBoltProjectile::PostProcess() {
         rot.FromEulerAnglesZYX(fZAngle, 0.0f, Y);
         spBoltNode.m_pObject->SetRotate(rot);
     }
-    NiUpdateData UpdateData(0.0f, 0, 0);
+    NiUpdateData UpdateData(0.0f, false, false);
     spBoltNode.m_pObject->Update(UpdateData);
-    return 0;
+    return false;
 }
 
 void MagicBoltProjectile::SetState(State aeNewState) {
@@ -1019,7 +1019,7 @@ void MagicBoltProjectile::Init3D() {
         v22 = ::new (apMemory) NiNode(0);
     }
     else {
-        v22 = 0;
+        v22 = nullptr;
     }
     NiRefObject* v31 = (NiRefObject*)v22;
     spSoundNode.operator=(v22);
@@ -1030,7 +1030,7 @@ void MagicBoltProjectile::Init3D() {
         v21 = ::new (v28) NiNode(0);
     }
     else {
-        v21 = 0;
+        v21 = nullptr;
     }
     NiRefObject* v29 = (NiRefObject*)v21;
     spBoltNode.operator=(v21);
@@ -1045,18 +1045,18 @@ void MagicBoltProjectile::Init3D() {
             pextra_2 = ::new (v26) BSXFlags;
         }
         else {
-            pextra_2 = 0;
+            pextra_2 = nullptr;
         }
         pextra = pextra_2;
         const NiFixedString* v4 = &BSXFlags::Tag();
         spBoltNode.m_pObject->AddExtraData(*v4, pextra_2);
     }
-    pextra->SetFlags(1u, 1);
-    spBoltProperty.operator=(static_cast<BoltShaderProperty*>(0));
+    pextra->SetFlags(1u, true);
+    spBoltProperty.operator=(static_cast<BoltShaderProperty*>(nullptr));
     NiPoint3 v33 = GetAngleOnReference();
     rot.FromEulerAnglesZXY(v33.z, v33.x, v33.y);
     spBoltNode.m_pObject->SetRotate(rot);
-    spBoltProperty.operator=(BoltShader::Start(spBoltNode.m_pObject, 1));
+    spBoltProperty.operator=(BoltShader::Start(spBoltNode.m_pObject, true));
     if (spBoltProperty.m_pObject) {
         spBoltProperty.m_pObject->SetAbsorbNumBolts(iShockNumBolts.Int());
         float* v5 = &fShockBoltsRadius.Float();
@@ -1086,7 +1086,7 @@ void MagicBoltProjectile::Init3D() {
         spBoltProperty.m_pObject->SetSegmentVariance(*v14);
         float* v15 = &fShockSubSegmentVariance.Float();
         spBoltProperty.m_pObject->SetAbsorbTortuosityVariance(*v15);
-        spBoltProperty.m_pObject->SetStartFromPoint(1);
+        spBoltProperty.m_pObject->SetStartFromPoint(true);
         spBoltProperty.m_pObject->InitSegmentData();
     }
 }

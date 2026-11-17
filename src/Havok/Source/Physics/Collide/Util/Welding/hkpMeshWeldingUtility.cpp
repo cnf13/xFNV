@@ -179,16 +179,13 @@ void hkBuildClipPlanesForTriangle(hkVector4* out, const hkpTriangleShape* triang
     __m128 v7 = _mm_sub_ps(v4.m_quad, v3.m_quad);
     __m128 v8 = _mm_mul_ps(triangle->m_vertexA.m_quad, m_quad);
     __m128 v9 = _mm_setzero_ps();
-    out->m_quad[3] = v36 -
-        static_cast<float>(_mm_shuffle_ps(v8, v8, 170)[0] + static_cast<float>(_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]));
+    out->m_quad[3] = v36 - (_mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]));
     __m128 v10 = _mm_xor_ps(rdata_10C4C00, m_quad);
     out[1].m_quad = v10;
     __m128 v11 = _mm_mul_ps(v10, triangle->m_vertexA.m_quad);
     __m128 v12 = _mm_shuffle_ps(m_quad, m_quad, 210);
     __m128 v38 = _mm_shuffle_ps(m_quad, m_quad, 201);
-    out[1].m_quad[3] = v36 -
-        static_cast<float>(_mm_shuffle_ps(v11, v11, 170)[0] +
-                           static_cast<float>(_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]));
+    out[1].m_quad[3] = v36 - (_mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]));
     out[2].m_quad =
         _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(v5, v5, 201), v12), _mm_mul_ps(_mm_shuffle_ps(v5, v5, 210), v38));
     __m128 v13 = _mm_mul_ps(out[2].m_quad, out[2].m_quad);
@@ -201,14 +198,12 @@ void hkBuildClipPlanesForTriangle(hkVector4* out, const hkpTriangleShape* triang
     __m128 v16 = _mm_setzero_ps();
     v16[0] = 0.5f;
     __m128 v17 = _mm_cmpeq_ss(v14, v9);
-    v9[0] = 3.0f - static_cast<float>(static_cast<float>(v14[0] * v15) * v15);
-    v16[0] = static_cast<float>(0.5f * v15) * v9[0];
+    v9[0] = 3.0f - ((v14[0] * v15) * v15);
+    v16[0] = (0.5f * v15) * v9[0];
     __m128 v19 = _mm_andnot_ps(v17, v16);
     out[2].m_quad = _mm_mul_ps(_mm_shuffle_ps(v19, v19, 0), out[2].m_quad);
     __m128 v20 = _mm_mul_ps(out[2].m_quad, triangle->m_vertexA.m_quad);
-    out[2].m_quad[3] = v36 -
-        static_cast<float>(_mm_shuffle_ps(v20, v20, 170)[0] +
-                           static_cast<float>(_mm_shuffle_ps(v20, v20, 85)[0] + v20[0]));
+    out[2].m_quad[3] = v36 - (_mm_shuffle_ps(v20, v20, 170)[0] + (_mm_shuffle_ps(v20, v20, 85)[0] + v20[0]));
     out[3].m_quad =
         _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(v7, v7, 201), v12), _mm_mul_ps(_mm_shuffle_ps(v7, v7, 210), v38));
     __m128 v21 = out[3].m_quad;
@@ -218,12 +213,12 @@ void hkBuildClipPlanesForTriangle(hkVector4* out, const hkpTriangleShape* triang
     v23[0] = v23[0] + v7[0];
     float v24 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v23[0])));
     __m128 v25 = _mm_cmpeq_ss(v23, normal.m_quad);
-    v9[0] = 3.0f - static_cast<float>(static_cast<float>(v23[0] * v24) * v24);
-    v16[0] = static_cast<float>(0.5f * v24) * v9[0];
+    v9[0] = 3.0f - ((v23[0] * v24) * v24);
+    v16[0] = (0.5f * v24) * v9[0];
     __m128 v27 = _mm_andnot_ps(v25, v16);
     out[3].m_quad = _mm_mul_ps(_mm_shuffle_ps(v27, v27, 0), v21);
     __m128 v28 = _mm_mul_ps(out[3].m_quad, triangle->m_vertexB.m_quad);
-    float v37 = _mm_shuffle_ps(v28, v28, 170)[0] + static_cast<float>(_mm_shuffle_ps(v28, v28, 85)[0] + v28[0]);
+    float v37 = _mm_shuffle_ps(v28, v28, 170)[0] + (_mm_shuffle_ps(v28, v28, 85)[0] + v28[0]);
     __m128 v30 = _mm_mul_ps(_mm_shuffle_ps(v40, v40, 210), v38);
     out[3].m_quad[3] = v36 - v37;
     out[4].m_quad = _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(v40, v40, 201), v12), v30);
@@ -233,14 +228,11 @@ void hkBuildClipPlanesForTriangle(hkVector4* out, const hkpTriangleShape* triang
     __m128 v33 = _mm_shuffle_ps(v32, v32, 170);
     v33[0] = v33[0] + v30[0];
     v30[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v33[0])));
-    v16[0] = static_cast<float>(0.5f * v30[0]) *
-        static_cast<float>(3.0f - static_cast<float>(static_cast<float>(v33[0] * v30[0]) * v30[0]));
+    v16[0] = (0.5f * v30[0]) * (3.0f - ((v33[0] * v30[0]) * v30[0]));
     __m128 v34 = _mm_andnot_ps(_mm_cmpeq_ss(v33, normal.m_quad), v16);
     out[4].m_quad = _mm_mul_ps(_mm_shuffle_ps(v34, v34, 0), v31);
     __m128 v35 = _mm_mul_ps(out[4].m_quad, triangle->m_vertexC.m_quad);
-    out[4].m_quad[3] = v36 -
-        static_cast<float>(_mm_shuffle_ps(v35, v35, 170)[0] +
-                           static_cast<float>(_mm_shuffle_ps(v35, v35, 85)[0] + v35[0]));
+    out[4].m_quad[3] = v36 - (_mm_shuffle_ps(v35, v35, 170)[0] + (_mm_shuffle_ps(v35, v35, 85)[0] + v35[0]));
 }
 
 // Whether two triangles have the same three vertices, each within 0.001 in x, y and z.
@@ -309,9 +301,7 @@ uint8_t* triangleHasVertices(uint8_t* a1, const hkVector4* a2, const hkVector4* 
 // Whether two directions are almost perpendicular: |dot3| below 0.05.
 bool* isPerpendicular(bool* a1, const hkVector4* a2, const hkVector4* a3) {
     __m128 v3 = _mm_mul_ps(a2->m_quad, a3->m_quad);
-    float v5 = std::fabs((double)static_cast<float>(
-        _mm_shuffle_ps(v3, v3, 170)[0] + static_cast<float>(_mm_shuffle_ps(v3, v3, 85)[0] + v3[0])
-    ));
+    float v5 = std::fabs((double)(_mm_shuffle_ps(v3, v3, 170)[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0])));
     *a1 = v5 < 0.05000000074505806;
     return a1;
 }
@@ -443,7 +433,7 @@ int32_t hkpMeshWeldingUtility::calcEdgeAngleBitcode(float cosAngle) {
     double v1 = (double)cosAngle;
     int32_t v2 = 0;
     int32_t v4 = 0;
-    while (1) {
+    while (true) {
         v5 = (float)((((double)v4) * 0.20943951606750488) - 3.1415927410125732);
         if (v5 >= v1) {
             break;
@@ -552,7 +542,7 @@ float hkpMeshWeldingUtility::calcAngleForEdge(
     float v5 = _mm_shuffle_ps(v3, v3, 170)[0];
     __m128 v6 = _mm_mul_ps(edgeNormal.m_quad, triangleNormal.m_quad);
     return hkMath_atan2fApproximation(
-        v5 + v4, _mm_shuffle_ps(v6, v6, 170)[0] + static_cast<float>(_mm_shuffle_ps(v6, v6, 85)[0] + v6[0])
+        v5 + v4, _mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0])
     );
 }
 
@@ -576,9 +566,9 @@ void hkpMeshWeldingUtility::calcAntiClockwiseTriangleNormal(
     float v9 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v8[0])));
     v10[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v11 = _mm_cmpeq_ss(v8, v10);
-    v10[0] = 3.0f - static_cast<float>(static_cast<float>(v8[0] * v9) * v9);
+    v10[0] = 3.0f - ((v8[0] * v9) * v9);
     __m128 v12 = _mm_setzero_ps();
-    v12[0] = static_cast<float>(0.5f * v9) * v10[0];
+    v12[0] = (0.5f * v9) * v10[0];
     __m128 v13 = _mm_andnot_ps(v11, v12);
     normal.m_quad = _mm_mul_ps(_mm_shuffle_ps(v13, v13, 0), v6);
 }
@@ -898,9 +888,9 @@ float hkpMeshWeldingUtility::calcAngleFromVertices(const hkVector4* vertices, fl
     float v7 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v6[0])));
     v8[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v9 = _mm_cmpeq_ss(v6, v8);
-    v8[0] = 3.0f - static_cast<float>(static_cast<float>(v6[0] * v7) * v7);
+    v8[0] = 3.0f - ((v6[0] * v7) * v7);
     __m128 v10 = _mm_setzero_ps();
-    v10[0] = static_cast<float>(0.5f * v7) * v8[0];
+    v10[0] = (0.5f * v7) * v8[0];
     __m128 v11 = _mm_andnot_ps(v9, v10);
     __m128 v12 = _mm_mul_ps(_mm_shuffle_ps(v11, v11, 0), afX);
     __m128 v13 = _mm_mul_ps(
@@ -914,7 +904,7 @@ float hkpMeshWeldingUtility::calcAngleFromVertices(const hkVector4* vertices, fl
     v8[0] = _mm_shuffle_ps(v13, v13, 170)[0];
     __m128 v15 = _mm_mul_ps(v19.m_quad, normal.m_quad);
     sinAngleOut = v8[0] + v14;
-    afX[0] = _mm_shuffle_ps(v15, v15, 170)[0] + static_cast<float>(_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]);
+    afX[0] = _mm_shuffle_ps(v15, v15, 170)[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]);
     cosAngleOut = afX[0];
     return hkMath_atan2fApproximation(sinAngleOut, afX[0]);
 }
@@ -992,7 +982,7 @@ int32_t hkpMeshWeldingUtility::calcEdgeAngleBitcode(hkVector4* a1) {
     double v1 = a3;
     int32_t v2 = 0;
     a2 = 0;
-    while (1) {
+    while (true) {
         a3 = static_cast<double>(a2) * 0.20943951606750488 - 3.1415927410125732;
         if (a3 >= v1) {
             break;

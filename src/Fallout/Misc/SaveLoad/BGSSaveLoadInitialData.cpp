@@ -55,7 +55,7 @@ BGSSaveLoadInitialData::GetInitialDataType(uint32_t aiFormID, int32_t aeFormType
 }
 
 INITIAL_DATA_TYPE BGSSaveLoadInitialData::GetInitialDataType(TESForm* apForm, BGSChangeFlags aiChangeFlags) {
-    const ENUM_FORM_ID eFormType = static_cast<ENUM_FORM_ID>(apForm->GetFormType());
+    const ENUM_FORM_ID eFormType = apForm->GetFormType();
     uint32_t iFormID = apForm->GetFormID();
     return BGSSaveLoadInitialData::GetInitialDataType(iFormID, eFormType, aiChangeFlags);
 }
@@ -69,7 +69,7 @@ bool BGSSaveLoadInitialData::IsInitialDataRefType(INITIAL_DATA_TYPE aeType) {
 }
 
 uint32_t BGSSaveLoadInitialData::GetInitialDataTypeDataSize(INITIAL_DATA_TYPE aeType) {
-    return ((uint32_t)BGSSaveLoadInitialData::GetInitialDataTypeSize(aeType)) + 1;
+    return BGSSaveLoadInitialData::GetInitialDataTypeSize(aeType) + 1;
 }
 
 bool BGSSaveLoadInitialData::IsInitialDataCellType(INITIAL_DATA_TYPE aeType) {
@@ -121,7 +121,7 @@ INITIAL_DATA_TYPE BGSSaveLoadInitialData::SaveInitialData(
             }
             NiPoint3 kLocation = *pRef->QLocationOnReference();
             NiPoint3 kAngle = pRef->GetAngleOnReference();
-            if (!pLocation && !pRef->GetEditorLocation(kLocation, kAngle, pLocation, 0)) {
+            if (!pLocation && !pRef->GetEditorLocation(kLocation, kAngle, pLocation, nullptr)) {
                 pLocation = pPlayer->GetWorldSpace();
                 if (!pLocation) {
                     pLocation = pPlayer->GetParentCell();
@@ -179,7 +179,7 @@ INITIAL_DATA_TYPE BGSSaveLoadInitialData::SaveInitialData(
             }
             NiPoint3 kLocation = *pRef->QLocationOnReference();
             NiPoint3 kAngle = pRef->GetAngleOnReference();
-            if (!pLocation && !pRef->GetEditorLocation(kLocation, kAngle, pLocation, 0)) {
+            if (!pLocation && !pRef->GetEditorLocation(kLocation, kAngle, pLocation, nullptr)) {
                 pLocation = pPlayer->GetWorldSpace();
                 if (!pLocation) {
                     pLocation = pPlayer->GetParentCell();
@@ -196,7 +196,7 @@ INITIAL_DATA_TYPE BGSSaveLoadInitialData::SaveInitialData(
             NiPoint3 kEditorLocation;
             NiPoint3 kEditorAngle;
             TESForm* pEditorLocationForm = nullptr;
-            if (pRef->GetEditorLocation(kEditorLocation, kEditorAngle, pEditorLocationForm, 0)) {
+            if (pRef->GetEditorLocation(kEditorLocation, kEditorAngle, pEditorLocationForm, nullptr)) {
                 kMovedRefData.OriginalLocationIDIndex.SetNumericID(pEditorLocationForm->iFormID);
                 kMovedRefData.sOriginalCellX = FloatToInt(kEditorLocation.x) >> 12;
                 kMovedRefData.sOriginalCellY = FloatToInt(kEditorLocation.y) >> 12;

@@ -33,13 +33,13 @@ void TESPatrolPackageData::Copy(TESPackageData* apCopy) {
 bool TESPatrolPackageData::Compare(TESPackageData* apCompare) {
     TESPatrolPackageData* v4 = dynamic_cast<TESPatrolPackageData*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (((uint32_t)((uint8_t)bRepeatable)) == ((uint32_t)((int8_t)v4->bRepeatable))) {
         return (bool)((uint8_t)(((uint32_t)((uint8_t)bStartingLocationAtLinkedRef)) !=
                                 ((uint32_t)((int8_t)v4->bStartingLocationAtLinkedRef))));
     }
-    return (bool)1;
+    return true;
 }
 
 void TESPatrolPackageData::Save() {

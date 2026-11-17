@@ -103,7 +103,7 @@ void NiBinaryExtraData::SetValue(uint32_t uiSize, char* pcBinaryData) {
 NiObject* NiBinaryExtraData::CreateObject() {
     NiBinaryExtraData* pkObject = static_cast<NiBinaryExtraData*>(NiMemObject::operator new(sizeof(NiBinaryExtraData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiBinaryExtraData;
 }

@@ -81,7 +81,7 @@ MagicModelHitEffect::~MagicModelHitEffect() {
     }
     if (pFilename) {
         if (*pFilename) {
-            pModelLoader->ReleaseModel(pFilename, 0, 1u);
+            pModelLoader->ReleaseModel(pFilename, false, 1u);
             if (bOwnPath) {
                 // An owned path is the block this effect allocated.
                 ourFree(const_cast<char*>(pFilename));
@@ -98,7 +98,7 @@ const NiRTTI* MagicModelHitEffect::GetRTTI() const {
 bool MagicModelHitEffect::Update(float a1) {
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (!pTarget || (!pTarget->Get3D() || !MagicHitEffect::Update(a1))) {
-        return 0;
+        return false;
     }
     if (spObject.m_pObject) {
         UpdatePosition();
@@ -114,8 +114,8 @@ bool MagicModelHitEffect::Update(float a1) {
                 if (pseq->m_fEndKeyTime < v3) {
                     if (pseq->GetState()) {
                         if (pseq->m_eCycleType == NiControllerSequence::CYCLE_CLAMP || bFinished) {
-                            bFinished = 1;
-                            pseq->Deactivate(0.0f, 0);
+                            bFinished = true;
+                            pseq->Deactivate(0.0f, false);
                             fLifetime = this->MagicHitEffect::fAge;
                         }
                     }
@@ -132,7 +132,7 @@ TEMP_EFFECT_TYPE MagicModelHitEffect::GetType() {
 
 bool MagicModelHitEffect::CheckShouldSave() {
     if (pEffect) {
-        return (bool)0;
+        return false;
     }
     return (bool)((uint8_t)(pTarget && pFilename));
 }
@@ -197,7 +197,7 @@ void MagicModelHitEffect::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
 void MagicModelHitEffect::SaveGame(ActiveEffect* a1, TESObjectREFR* a2) {
     uint16_t isize;
     MagicHitEffect::SaveGame(a1, a2);
-    NiControllerManager* pmanager = 0;
+    NiControllerManager* pmanager = nullptr;
     if (spObject.m_pObject) {
         pmanager = static_cast<NiControllerManager*>(
             NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, spObject.m_pObject->GetControllers())
@@ -215,7 +215,7 @@ void MagicModelHitEffect::SaveGame(ActiveEffect* a1, TESObjectREFR* a2) {
             pactor = static_cast<Actor*>(a2);
         }
         else {
-            pactor = 0;
+            pactor = nullptr;
         }
         if (pactor) {
             if (a1) {
@@ -259,13 +259,13 @@ bool MagicModelHitEffect::LoadGame() {
 
 void MagicModelHitEffect::LoadGame(BGSLoadGameBuffer* a1) {
     MagicHitEffect::LoadGame(a1);
-    pFilename = a1->LoadString(0);
-    bOwnPath = 1;
+    pFilename = a1->LoadString(nullptr);
+    bOwnPath = true;
     LoadedDataSubBuffer.LoadGame(a1);
     if (pEffect) {
         if (pEffect->pEffect->pEffectSetting->GetModel()) {
             const char* v2 = pEffect->pEffect->pEffectSetting->GetModel();
-            pModelLoader->QueueModel(v2, IO_TASK_PRIORITY_VERY_LOW, 0, LOD_MULT_NONE, 1, 0, 0);
+            pModelLoader->QueueModel(v2, IO_TASK_PRIORITY_VERY_LOW, nullptr, LOD_MULT_NONE, true, false, false);
         }
     }
 }
@@ -278,7 +278,7 @@ void MagicModelHitEffect::LoadGame(ActiveEffect* a1, TESObjectREFR* a2) {
     if (a1) {
         if (a1->pEffect->pEffectSetting->GetModel()) {
             const char* v3 = a1->pEffect->pEffectSetting->GetModel();
-            pModelLoader->QueueModel(v3, IO_TASK_PRIORITY_VERY_LOW, 0, LOD_MULT_NONE, 1, 0, 0);
+            pModelLoader->QueueModel(v3, IO_TASK_PRIORITY_VERY_LOW, nullptr, LOD_MULT_NONE, true, false, false);
         }
     }
     pSaveLoadGameOLD->LoadGameDataOLD(&isize, sizeof(isize));
@@ -330,7 +330,7 @@ void MagicModelHitEffect::FinishInitLoadGame(ActiveEffect* a1, TESObjectREFR* a2
                 pactor = static_cast<Actor*>(a2);
             }
             else {
-                pactor = 0;
+                pactor = nullptr;
             }
             if (pactor) {
                 if (a1) {
@@ -359,7 +359,7 @@ void MagicModelHitEffect::FinishLoadGame(BGSLoadGameBuffer* a1) {
     this->MagicHitEffect::fAge = ftempAge;
     bFinished = btempFinished;
     if (LoadedDataSubBuffer.pBuffer) {
-        NiControllerManager* pmanager = 0;
+        NiControllerManager* pmanager = nullptr;
         if (spObject.m_pObject) {
             pmanager = static_cast<NiControllerManager*>(
                 NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, spObject.m_pObject->GetControllers())
@@ -373,7 +373,7 @@ void MagicModelHitEffect::FinishLoadGame(BGSLoadGameBuffer* a1) {
                 panim = pactor->GetAnimation();
             }
             else {
-                panim = 0;
+                panim = nullptr;
             }
             if (panim) {
                 ftime = panim->GetTime();
@@ -381,7 +381,7 @@ void MagicModelHitEffect::FinishLoadGame(BGSLoadGameBuffer* a1) {
             else {
                 ftime = -1.0f;
             }
-            BGSLoadFormBuffer* ptempLoadFormBuffer = LoadedDataSubBuffer.Create(0);
+            BGSLoadFormBuffer* ptempLoadFormBuffer = LoadedDataSubBuffer.Create(nullptr);
             TESObjectREFR::LoadControllerManagerBGS(pmanager, ptempLoadFormBuffer, ftime);
             if (ptempLoadFormBuffer) {
                 delete ptempLoadFormBuffer;
@@ -400,18 +400,18 @@ bool MagicModelHitEffect::Init() {
         bFinished = !EffectSetting_->IsFlagSet(EffectSetting::PERSIST);
     }
     if (!pTarget) {
-        return 0;
+        return false;
     }
     if (!pTarget->Get3D()) {
-        return 0;
+        return false;
     }
     if (pTarget == pPlayer) {
         b3rdPerson = pPlayer->Is3rdPerson();
     }
     if (!pFilename || !*pFilename) {
-        return 0;
+        return false;
     }
-    NiAVObject* ptest3D = pModelLoader->LoadFile(pFilename, LOD_MULT_NONE, 1, 0, 0, 0);
+    NiAVObject* ptest3D = pModelLoader->LoadFile(pFilename, LOD_MULT_NONE, true, false, false, false);
     if (ptest3D) {
         NiControllerManager* pmanager = static_cast<NiControllerManager*>(
             NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, ptest3D->GetControllers())
@@ -421,49 +421,49 @@ bool MagicModelHitEffect::Init() {
             NiFixedString* kName = &apString;
             NiControllerSequence* pseq = pmanager->GetSequenceByName(*kName);
             if (!pseq) {
-                return 0;
+                return false;
             }
         }
     }
     spObject.operator=(static_cast<NiNode*>(MagicProjectile::Clone3D(pFilename)));
-    pModelLoader->ReleaseModel(pFilename, 0, 1u);
+    pModelLoader->ReleaseModel(pFilename, false, 1u);
     if (!spObject.m_pObject) {
-        return 0;
+        return false;
     }
     if (!pTarget->Get3D()) {
-        return 0;
+        return false;
     }
     UpdatePosition();
     BSUtilities::ProcessSelectiveUpdate(spObject.m_pObject);
     float v4 = static_cast<double>(appTimer.iLastTime) / 1000.0;
-    NiUpdateData UpdateData(v4, 1, 0);
+    NiUpdateData UpdateData(v4, true, false);
     spObject.m_pObject->Update(UpdateData);
     NiControllerManager* pmanager_2 = static_cast<NiControllerManager*>(
         NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, spObject.m_pObject->GetControllers())
     );
     if (!pmanager_2) {
-        return 0;
+        return false;
     }
     NiFixedString* v3 = ::new (static_cast<void*>(&v7)) NiFixedString("SpecialIdle_HitEffect");
     NiControllerSequence* pseq_2 = pmanager_2->GetSequenceByName(*v3);
     v7.~NiFixedString();
     if (!pseq_2) {
-        return 0;
+        return false;
     }
     pmanager_2->DeactivateAll(0.0);
-    pmanager_2->ActivateSequence(pseq_2, 0, 0, 1.0f, 0.0, 0);
-    pmanager_2->SetActive(1);
+    pmanager_2->ActivateSequence(pseq_2, 0, false, 1.0f, 0.0, nullptr);
+    pmanager_2->SetActive(true);
     if (this->MagicHitEffect::fAge > 0.0) {
-        pseq_2->SetPhase(this->MagicHitEffect::fAge, 0);
+        pseq_2->SetPhase(this->MagicHitEffect::fAge, false);
     }
-    return 1;
+    return true;
 }
 
 void MagicModelHitEffect::UpdatePosition() {
-    NiAVObject* ptarget = 0;
+    NiAVObject* ptarget = nullptr;
     if (pTarget == pPlayer) {
         b3rdPerson = pPlayer->Is3rdPerson();
-        ptarget = pPlayer->Get3D(0);
+        ptarget = pPlayer->Get3D(false);
     }
     else {
         ptarget = pTarget->Get3D();
@@ -471,8 +471,8 @@ void MagicModelHitEffect::UpdatePosition() {
     UpdateParentCell(spObject.m_pObject);
     if (ptarget) {
         NiPoint3 position;
-        if ((pTarget->IsActor() && pTarget->IsDead(0)) || pTarget->IsKnockedOut()) {
-            bool buseShift = 1;
+        if ((pTarget->IsActor() && pTarget->IsDead(false)) || pTarget->IsKnockedOut()) {
+            bool buseShift = true;
             NiNode* pnode = ptarget->IsNode();
             if (pnode) {
                 if (pnode->GetArrayCount()) {
@@ -482,7 +482,7 @@ void MagicModelHitEffect::UpdatePosition() {
                         pbip = pchild->IsNode();
                     }
                     else {
-                        pbip = 0;
+                        pbip = nullptr;
                     }
                     if (pbip) {
                         if (pbip->GetArrayCount()) {
@@ -492,11 +492,11 @@ void MagicModelHitEffect::UpdatePosition() {
                                 paccum = pchild_2->IsNode();
                             }
                             else {
-                                paccum = 0;
+                                paccum = nullptr;
                             }
                             if (paccum) {
                                 if ((&paccum->GetTranslate())->operator!=(NiPoint3_ZERO)) {
-                                    buseShift = 0;
+                                    buseShift = false;
                                 }
                             }
                         }

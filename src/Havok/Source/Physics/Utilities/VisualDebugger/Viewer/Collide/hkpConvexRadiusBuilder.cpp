@@ -66,7 +66,7 @@ double _getPlaneToSurfaceDistance(const hkpShape* r_eax) {
     // getPlaneEquations, a trivial accessor: the shape's plane equations.
     hkArray<hkVector4, hkContainerHeapAllocator>* v2 =
         &static_cast<const hkpConvexVerticesShape*>(r_eax)->m_planeEquations;
-    apVertices.m_data = 0;
+    apVertices.m_data = nullptr;
     apVertices.m_size = 0;
     apVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
     static_cast<const hkpConvexVerticesShape*>(r_eax)->getOriginalVertices(apVertices);
@@ -81,10 +81,7 @@ double _getPlaneToSurfaceDistance(const hkpShape* r_eax) {
                 do {
                     __m128 v6 = _mm_mul_ps(*p_m_quad, m_data->m_quad);
                     float v11 =
-                        (*p_m_quad)[3] +
-                        static_cast<float>(
-                            _mm_shuffle_ps(v6, v6, 170)[0] + static_cast<float>(_mm_shuffle_ps(v6, v6, 85)[0] + v6[0])
-                        );
+                        (*p_m_quad)[3] + (_mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]));
                     if (v9 < static_cast<double>(v11)) {
                         v9 = v11;
                     }
@@ -521,21 +518,21 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
 }
 
 void hkpConvexRadiusBuilder::resetCurrentRawGeometry() {
-    m_currentGeometry = 0;
+    m_currentGeometry = nullptr;
 }
 
 hkDisplayGeometry* hkpConvexRadiusBuilder::getCurrentRawGeometry(
     hkArray<hkDisplayGeometry*, hkContainerHeapAllocator>& displayGeometries
 ) {
-    hkGeometry* v3 = 0;
+    hkGeometry* v3 = nullptr;
     if (!m_currentGeometry) {
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
         hkGeometry* v5 = static_cast<hkGeometry*>(Instance->m_heap->blockAlloc(sizeof(hkGeometry)));
         if (v5) {
-            v5->m_vertices.m_data = 0;
+            v5->m_vertices.m_data = nullptr;
             v5->m_vertices.m_size = 0;
             v5->m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-            v5->m_triangles.m_data = 0;
+            v5->m_triangles.m_data = nullptr;
             v5->m_triangles.m_size = 0;
             v5->m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;
             v3 = v5;

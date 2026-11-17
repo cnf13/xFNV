@@ -65,11 +65,11 @@ bool NavMesh::GetMatchingEdge(
     int32_t* arOtherEdgeIndex
 ) {
     if (ausTriangleIndex >= GetTriangleCount()) {
-        return 0;
+        return false;
     }
     NavMeshTriangle* pthisTri = GetTriangle(ausTriangleIndex);
     if (!pthisTri->IsEdgeConnected(aiEdgeIndex)) {
-        return 0;
+        return false;
     }
     if (pthisTri->EdgeHasExtraInfo(aiEdgeIndex)) {
         EdgeExtraInfo* pinfo = GetEdgeExtraInfo(ausTriangleIndex, aiEdgeIndex);
@@ -93,25 +93,25 @@ bool NavMesh::GetMatchingEdge(
                         }
                     }
                     if (otherEdgeIndex == 3) {
-                        return 0;
+                        return false;
                     }
                     else {
                         *arpReturnNavMesh = potherMesh;
                         *arOtherTriangleIndex = otherTriangleIndex;
                         *arOtherEdgeIndex = otherEdgeIndex;
-                        return 1;
+                        return true;
                     }
                 }
                 else {
-                    return 0;
+                    return false;
                 }
             }
             else {
-                return 0;
+                return false;
             }
         }
         else {
-            return 0;
+            return false;
         }
     }
     else {
@@ -127,10 +127,10 @@ bool NavMesh::GetMatchingEdge(
         }
         if (otherEdgeIndex_2 < 3) {
             *arOtherEdgeIndex = otherEdgeIndex_2;
-            return 1;
+            return true;
         }
         else {
-            return 0;
+            return false;
         }
     }
 }
@@ -148,13 +148,13 @@ NavMeshInfo* NavMesh::GetNavMeshInfo() {
 }
 
 void NavMesh::ClearNavMesh(bool abCheckout) {
-    Vertices.Clear(1);
-    Triangles.Clear(1);
-    ExtraEdgeInfo.Clear(1);
+    Vertices.Clear(true);
+    Triangles.Clear(true);
+    ExtraEdgeInfo.Clear(true);
     MeshGrid.Clear();
-    CoverArray.Clear(1);
-    Obstacles.Clear(1);
-    DoorPortals.Clear(1);
+    CoverArray.Clear(true);
+    Obstacles.Clear(true);
+    DoorPortals.Clear(true);
     if (pNavMeshInfo) {
         uint32_t CastingType = iFormID;
         NavMeshInfoMap* NavMeshInfoMap_ = TES::pInstance->GetNavMeshInfoMap();
@@ -174,7 +174,7 @@ TESForm* NavMesh::GetParentSpace() {
 
 bool NavMesh::CheckNavMesh(bool abFix) {
     NiPoint3 normal;
-    bool bFoundProblem = 0;
+    bool bFoundProblem = false;
     BSStringT<char> cellName;
     TESObjectCELL* pCell = pParentCell;
     pCell->GetFormDetailedString(cellName);
@@ -185,7 +185,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                 "PATHFINDING: Navmesh %08x Cell %s, has bad vertex X coordinate, Please regenerate", iFormID,
                 cellName.String()
             );
-            bFoundProblem = 1;
+            bFoundProblem = true;
             break;
         }
         if (!std::isfinite((&Vertices.GetAt(static_cast<int32_t>(i)))->Location.y) ||
@@ -194,7 +194,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                 "PATHFINDING: Navmesh %08x Cell %s, has bad vertex Y coordinate, Please regenerate", iFormID,
                 cellName.String()
             );
-            bFoundProblem = 1;
+            bFoundProblem = true;
             break;
         }
         if (!std::isfinite((&Vertices.GetAt(static_cast<int32_t>(i)))->Location.z) ||
@@ -203,7 +203,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                 "PATHFINDING: Navmesh %08x Cell %s, has bad vertex Z coordinate, Please regenerate", iFormID,
                 cellName.String()
             );
-            bFoundProblem = 1;
+            bFoundProblem = true;
             break;
         }
     }
@@ -230,7 +230,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                         iFormID, cellName.String(), i_2, e
                     );
                     ptri->SetTri(static_cast<uint32_t>(e), 0xFFFF);
-                    bFoundProblem = 1;
+                    bFoundProblem = true;
                 }
             }
         }
@@ -241,7 +241,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                 iFormID, cellName.String(), i_2
             );
             FlipTriangle(i_2);
-            bFoundProblem = 1;
+            bFoundProblem = true;
         }
     }
     for (uint32_t i_3 = 0;; ++i_3) {
@@ -258,7 +258,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                     if (!pinfo->Portal.pOtherMesh || pinfo->Portal.sTriangle == 0xFFFF) {
                         uint16_t v6 = ptri_2->GetTriOrExtraInfo(e_2);
                         DeleteExtraEdgeInfo(v6);
-                        bFoundProblem = 1;
+                        bFoundProblem = true;
                     }
                     else {
                         uint32_t sTriangle;
@@ -275,7 +275,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                             );
                             uint16_t v8 = ptri_2->GetTriOrExtraInfo(e_2);
                             DeleteExtraEdgeInfo(v8);
-                            bFoundProblem = 1;
+                            bFoundProblem = true;
                         }
                         else {
                             TESWorldSpace* WorldSpace = pParentCell->GetWorldSpace();
@@ -289,7 +289,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                                 );
                                 uint16_t v10 = ptri_2->GetTriOrExtraInfo(e_2);
                                 DeleteExtraEdgeInfo(v10);
-                                bFoundProblem = 1;
+                                bFoundProblem = true;
                             }
                         }
                     }
@@ -301,7 +301,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                         iFormID, cellName.String(), i_3, e_2
                     );
                     ptri_2->ClearEdgeExtraInfo(e_2);
-                    bFoundProblem = 1;
+                    bFoundProblem = true;
                 }
             }
         }
@@ -316,7 +316,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                 "index %d",
                 iFormID, cellName.String(), i_4, a1c
             );
-            bFoundProblem = 1;
+            bFoundProblem = true;
         }
         int32_t v12 = ptri_3->GetVert(0);
         if (v12 == ptri_3->GetVert(2u)) {
@@ -326,7 +326,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                 "index %d",
                 iFormID, cellName.String(), i_4, a1d
             );
-            bFoundProblem = 1;
+            bFoundProblem = true;
         }
         int32_t v13 = ptri_3->GetVert(1u);
         if (v13 == ptri_3->GetVert(2u)) {
@@ -336,7 +336,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                 "index %d",
                 iFormID, cellName.String(), i_4, a1e
             );
-            bFoundProblem = 1;
+            bFoundProblem = true;
         }
     }
     for (uint32_t i_5 = 0; i_5 < Triangles.iSize; ++i_5) {
@@ -351,7 +351,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                     "%d",
                     iFormID, cellName.String(), i_5, a1f
                 );
-                bFoundProblem = 1;
+                bFoundProblem = true;
             }
         }
         int32_t v16 = ptri_4->GetTriOrExtraInfo(0);
@@ -364,7 +364,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                     "%d",
                     iFormID, cellName.String(), i_5, a1g
                 );
-                bFoundProblem = 1;
+                bFoundProblem = true;
             }
         }
         int32_t v18 = ptri_4->GetTriOrExtraInfo(1);
@@ -377,7 +377,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                     "%d",
                     iFormID, cellName.String(), i_5, a1h
                 );
-                bFoundProblem = 1;
+                bFoundProblem = true;
             }
         }
     }
@@ -407,7 +407,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                                             "normals but are linked",
                                             iFormID, cellName.String(), i_6, j
                                         );
-                                        bFoundProblem = 1;
+                                        bFoundProblem = true;
                                     }
                                     if (ptri_5->EdgeHasExtraInfo(edge1index)) {
                                         if (!ppotentialTri->EdgeHasExtraInfo(f)) {
@@ -416,7 +416,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                                                 "have Portal information, but doesn't",
                                                 iFormID, cellName.String(), j, f
                                             );
-                                            bFoundProblem = 1;
+                                            bFoundProblem = true;
                                         }
                                     }
                                     else {
@@ -428,7 +428,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                                                     "Portal info for its matching edge %d",
                                                     iFormID, cellName.String(), i_6, edge1index, j, j, f
                                                 );
-                                                bFoundProblem = 1;
+                                                bFoundProblem = true;
                                             }
                                             if (ptri_5->GetTriOrExtraInfo(edge1index) != j) {
                                                 Warning(
@@ -436,7 +436,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                                                     "have a link to Triangle %d, but doesn't",
                                                     iFormID, cellName.String(), i_6, edge1index, j
                                                 );
-                                                bFoundProblem = 1;
+                                                bFoundProblem = true;
                                             }
                                             if (ppotentialTri->GetTriOrExtraInfo(f) != i_6) {
                                                 Warning(
@@ -444,7 +444,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                                                     "have a link to Triangle %d, but doesn't",
                                                     iFormID, cellName.String(), j, f, i_6
                                                 );
-                                                bFoundProblem = 1;
+                                                bFoundProblem = true;
                                             }
                                         }
                                     }
@@ -480,7 +480,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                         "doesn't have the matching link",
                         iFormID, cellName.String(), i_7, X_4a, a1i
                     );
-                    bFoundProblem = 1;
+                    bFoundProblem = true;
                 }
                 if (othertriedgevert1 < 3) {
                     int32_t v22;
@@ -502,7 +502,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                             "do not match",
                             iFormID, cellName.String(), i_7, a1j
                         );
-                        bFoundProblem = 1;
+                        bFoundProblem = true;
                     }
                 }
             }
@@ -518,7 +518,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                     "not have cover.",
                     iFormID, cellName.String(), i_8, icoverTri
                 );
-                bFoundProblem = 1;
+                bFoundProblem = true;
             }
         }
         else {
@@ -527,7 +527,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                 "exist.",
                 iFormID, cellName.String(), i_8, icoverTri
             );
-            bFoundProblem = 1;
+            bFoundProblem = true;
         }
     }
     CheckNavMeshAgainstNeighbors();
@@ -577,17 +577,17 @@ bool NavMesh::GetMatchingEdge(const NavMeshEdgeHandle& aThisEdge, NavMeshEdgeHan
     NavMesh* arpReturnNavMesh;
     int32_t arOtherEdgeIndex;
     uint16_t arOtherTriangleIndex;
-    arpReturnNavMesh = 0;
+    arpReturnNavMesh = nullptr;
     arOtherEdgeIndex = -1;
     if (!GetMatchingEdge(
             aThisEdge.usTriangle, aThisEdge.iEdgeIndex, &arpReturnNavMesh, &arOtherTriangleIndex, &arOtherEdgeIndex
         )) {
-        return 0;
+        return false;
     }
     apRetOtherEdge->pNavMeshInfo = arpReturnNavMesh->GetNavMeshInfo();
     apRetOtherEdge->usTriangle = arOtherTriangleIndex;
     apRetOtherEdge->iEdgeIndex = arOtherEdgeIndex;
-    return 1;
+    return true;
 }
 
 EdgeExtraInfo* NavMesh::GetEdgeExtraInfo(uint16_t ausTriangleIndex, int32_t aiEdgeIndex) {
@@ -782,14 +782,14 @@ bool NavMesh::GetMatchingEdge_0(
 ) {
     FNVD_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
     NavMesh* pOtherNavMesh;
-    pOtherNavMesh = 0;
+    pOtherNavMesh = nullptr;
     if (!GetMatchingEdge(ausTriangleIndex, aiEdgeIndex, &pOtherNavMesh, apOtherTriangleIndex, apOtherEdgeIndex)) {
-        return 0;
+        return false;
     }
     NavMeshPtr* ptr = NavMeshPtr::MakeNavMeshPtr(&apResult, pOtherNavMesh);
     apReturnNavMesh->operator=(*ptr);
     FNVD_DESTRUCT(NiPointer<NavMesh>)(&apResult);
-    return 1;
+    return true;
 }
 
 const BSSimpleArray<uint16_t, 1024>* NavMesh::GetTrianglesForGridCell(uint32_t aiGridCellIndex) {
@@ -800,7 +800,7 @@ uint32_t NavMesh::GetGridIndicesForTriangle(uint16_t ausTriangleIndex, BSSimpleA
     uint32_t icol;
     uint32_t irow;
     const NavMeshTriangle* ptri = &Triangles.GetAt(static_cast<int32_t>(ausTriangleIndex));
-    apGridCells->Clear(0);
+    apGridCells->Clear(false);
     uint32_t imaxRow = 0;
     uint32_t iminRow = -1;
     uint32_t imaxCol = 0;
@@ -854,7 +854,7 @@ bool NavMesh::CheckUnconnectedBorderEdges(
     float afEdgeX,
     float afEdgeY
 ) {
-    return 1;
+    return true;
 }
 
 bool NavMesh::SetDisableNavMesh(uint32_t aiID, bool abDisable) {
@@ -875,21 +875,21 @@ bool NavMesh::SetDisableNavMesh(uint32_t aiID, bool abDisable) {
                 }
             }
             apMemory.~NiPointer<NavMesh>();
-            return 1;
+            return true;
         }
         else {
             Warning(
                 "DisableNavMesh Script Function: Did not find matching NavMesh for NavMesh ID parameter %08X", aiID
             );
             apMemory.~NiPointer<NavMesh>();
-            return 0;
+            return false;
         }
     }
     else {
         Warning(
             "DisableNavMesh Script Function: Did not find matching NavMeshInfo for NavMesh ID parameter %08X", aiID
         );
-        return 0;
+        return false;
     }
 }
 

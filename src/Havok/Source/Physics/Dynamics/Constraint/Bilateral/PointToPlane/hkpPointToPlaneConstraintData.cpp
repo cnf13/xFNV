@@ -238,9 +238,9 @@ void hkpPointToPlaneConstraintData::setInBodySpace(
     float v12 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v11[0])));
     v13[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v14 = _mm_cmpeq_ss(v11, v13);
-    v13[0] = 3.0f - static_cast<float>(static_cast<float>(v11[0] * v12) * v12);
+    v13[0] = 3.0f - ((v11[0] * v12) * v12);
     __m128 v15 = _mm_setzero_ps();
-    v15[0] = static_cast<float>(0.5f * v12) * v13[0];
+    v15[0] = (0.5f * v12) * v13[0];
     __m128 v16 = _mm_andnot_ps(v14, v15);
     *v7 = _mm_mul_ps(_mm_shuffle_ps(v16, v16, 0), *v7);
     *(&m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad + (m_axisIndex + 2) % 3) = _mm_sub_ps(
@@ -292,9 +292,9 @@ void hkpPointToPlaneConstraintData::setInWorldSpace(
     float v14 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v13[0])));
     v15[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v16 = _mm_cmpeq_ss(v13, v15);
-    v15[0] = 3.0f - static_cast<float>(static_cast<float>(v13[0] * v14) * v14);
+    v15[0] = 3.0f - ((v13[0] * v14) * v14);
     __m128 v17 = _mm_setzero_ps();
-    v17[0] = static_cast<float>(0.5f * v14) * v15[0];
+    v17[0] = (0.5f * v14) * v15[0];
     __m128 v18 = _mm_andnot_ps(v16, v17);
     *v8 = _mm_mul_ps(_mm_shuffle_ps(v18, v18, 0), *v8);
     *(&m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad + (m_axisIndex + 2) % 3) = _mm_sub_ps(

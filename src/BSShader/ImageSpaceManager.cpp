@@ -148,9 +148,9 @@
 
 void ImageSpaceParameterData::Endian() {
     for (int32_t j = 0; j < 15; ++j) {
-        pfHDRData[j] = std::bit_cast<float>(static_cast<uint32_t>(
+        pfHDRData[j] = std::bit_cast<float>(
             static_cast<uint32_t>(__builtin_bswap32((uint32_t)std::bit_cast<uint32_t>(pfHDRData[j])))
-        ));
+        );
     }
     uint32_t* pfBloomData = reinterpret_cast<uint32_t*>(this->pfBloomData);
     int32_t v3 = 3;
@@ -176,7 +176,7 @@ void ImageSpaceParameterData::Endian() {
         --v7;
     }
     while (v7);
-    uiCinematicsEnabled = __builtin_bswap32((uint32_t)uiCinematicsEnabled);
+    uiCinematicsEnabled = __builtin_bswap32(uiCinematicsEnabled);
 }
 
 ImageSpaceManager::ImageSpaceManager()
@@ -1031,15 +1031,15 @@ void ImageSpaceManager::RenderEffect(
     TLSData* v8 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v8->eMemContext;
     v8->eMemContext = MEM_CONTEXT_IMAGE_SPACE;
-    src.bForceAniso = 0;
-    src.bIsRenderedTexture = 0;
-    src.bIsTextureBorrowed = 0;
+    src.bForceAniso = false;
+    src.bIsRenderedTexture = false;
+    src.bIsTextureBorrowed = false;
     src.spTexture = nullptr;
     src.eFilterMode = 0;
     src.eClampMode = 0;
-    dest.bForceAniso = 0;
-    dest.bIsRenderedTexture = 0;
-    dest.bIsTextureBorrowed = 0;
+    dest.bForceAniso = false;
+    dest.bIsRenderedTexture = false;
+    dest.bIsTextureBorrowed = false;
     dest.spTexture = nullptr;
     dest.eFilterMode = 0;
     dest.eClampMode = 0;
@@ -1053,8 +1053,8 @@ void ImageSpaceManager::RenderEffect(
             p_spPartialScreenTriShape = &spScreenTriShape;
         }
         apEffect->Render(p_spPartialScreenTriShape->m_pObject, apRenderer, apParam, abEndFrame);
-        apEffect->SetTexture(0, 0, NiTexturingProperty::FILTER_NEAREST);
-        apEffect->SetTexture(1, 0, NiTexturingProperty::FILTER_NEAREST);
+        apEffect->SetTexture(0, nullptr, NiTexturingProperty::FILTER_NEAREST);
+        apEffect->SetTexture(1, nullptr, NiTexturingProperty::FILTER_NEAREST);
     }
     v8->eMemContext = eMemContext;
 }
@@ -1072,15 +1072,15 @@ void ImageSpaceManager::RenderEffect(
     TLSData* v8 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v8->eMemContext;
     v8->eMemContext = MEM_CONTEXT_IMAGE_SPACE;
-    src.bForceAniso = 0;
-    src.bIsRenderedTexture = 0;
-    src.bIsTextureBorrowed = 0;
+    src.bForceAniso = false;
+    src.bIsRenderedTexture = false;
+    src.bIsTextureBorrowed = false;
     src.spTexture = nullptr;
     src.eFilterMode = 0;
     src.eClampMode = 0;
-    dest.bForceAniso = 0;
-    dest.bIsRenderedTexture = 0;
-    dest.bIsTextureBorrowed = 0;
+    dest.bForceAniso = false;
+    dest.bIsRenderedTexture = false;
+    dest.bIsTextureBorrowed = false;
     dest.spTexture = nullptr;
     dest.eFilterMode = 0;
     dest.eClampMode = 0;
@@ -1094,8 +1094,8 @@ void ImageSpaceManager::RenderEffect(
             p_spPartialScreenTriShape = &spScreenTriShape;
         }
         apEffect->Render(p_spPartialScreenTriShape->m_pObject, apRenderer, apParam, abEndFrame);
-        apEffect->SetTexture(0, 0, NiTexturingProperty::FILTER_NEAREST);
-        apEffect->SetTexture(1, 0, NiTexturingProperty::FILTER_NEAREST);
+        apEffect->SetTexture(0, nullptr, NiTexturingProperty::FILTER_NEAREST);
+        apEffect->SetTexture(1, nullptr, NiTexturingProperty::FILTER_NEAREST);
     }
     v8->eMemContext = eMemContext;
 }
@@ -1489,7 +1489,7 @@ void ImageSpaceManager::ShutdownEffects() {
         if (peffect) {
             peffect->Shutdown();
             delete peffect;
-            ImageSpaceEffect* a3 = 0;
+            ImageSpaceEffect* a3 = nullptr;
             pEffectList.SetAt(i, a3);
         }
     }
@@ -1552,18 +1552,18 @@ void ImageSpaceManager::EndParamModifiers() {
     ImageSpaceEffectDepthOfField* pdofeffect =
         static_cast<ImageSpaceEffectDepthOfField*>(pEffectList.m_pBase[EFFECT_DEPTH_OF_FIELD]);
     pdofeffect->fStrength = fHighestDOFStrengthValue;
-    pdofeffect->bParamsChanged = 1;
+    pdofeffect->bParamsChanged = true;
     double fCurrentDOFDistanceValue = this->fCurrentDOFDistanceValue;
-    pdofeffect->bParamsChanged = 1;
+    pdofeffect->bParamsChanged = true;
     float v24 = fCurrentDOFDistanceValue;
     pdofeffect->fDepth = v24;
     double fCurrentDOFRangeValue = this->fCurrentDOFRangeValue;
-    pdofeffect->bParamsChanged = 1;
+    pdofeffect->bParamsChanged = true;
     pdofeffect->fRange = fCurrentDOFRangeValue;
     pdofeffect->fMaskConst = fCurrentDOFMaskConst;
     ImageSpaceEffectDepthOfField::DepthOfFieldMode fCurrentDOFMode = this->fCurrentDOFMode;
     if (fCurrentDOFMode != pdofeffect->Mode) {
-        pdofeffect->bParamsChanged = 1;
+        pdofeffect->bParamsChanged = true;
         pdofeffect->Mode = fCurrentDOFMode;
     }
     if (bCurrentDOFUseMask) {
@@ -1575,7 +1575,7 @@ void ImageSpaceManager::EndParamModifiers() {
     ImageSpaceEffectDepthRadialBlur* pdrbeffect =
         static_cast<ImageSpaceEffectDepthRadialBlur*>(pEffectList.m_pBase[EFFECT_DEPTH_RADIAL_BLUR]);
     double fHighestDepthRadialBlurStrengthValue = this->fHighestDepthRadialBlurStrengthValue;
-    pdrbeffect->bParamsChanged = 1;
+    pdrbeffect->bParamsChanged = true;
     pdrbeffect->Params2.r = fHighestDepthRadialBlurStrengthValue;
     float fCurrentDepthRadialBlurDistance = this->fCurrentDepthRadialBlurDistance;
     float fRange = pdrbeffect->fRange;
@@ -1584,11 +1584,11 @@ void ImageSpaceManager::EndParamModifiers() {
         fRange = fCurrentDepthRadialBlurDistance;
     }
     pdrbeffect->Params.b = fCurrentDepthRadialBlurDistance;
-    pdrbeffect->bParamsChanged = 1;
+    pdrbeffect->bParamsChanged = true;
     pdrbeffect->Params.r = v11 - fRange;
     pdrbeffect->Params.g = fRange + v11;
     double fCurrentDepthRadialBlurRange = this->fCurrentDepthRadialBlurRange;
-    pdrbeffect->bParamsChanged = 1;
+    pdrbeffect->bParamsChanged = true;
     float v26 = fCurrentDepthRadialBlurRange;
     pdrbeffect->fRange = v26;
     pdrbeffect->Params.r = v11 - v26;
@@ -1602,7 +1602,7 @@ void ImageSpaceManager::EndParamModifiers() {
     ImageSpaceEffectMotionBlur* pMotionBlur =
         static_cast<ImageSpaceEffectMotionBlur*>(pEffectList.m_pBase[EFFECT_MOTION_BLUR]);
     double fHighestMotionBlurStrengthValue = this->fHighestMotionBlurStrengthValue;
-    pMotionBlur->bParamsChanged = 1;
+    pMotionBlur->bParamsChanged = true;
     pMotionBlur->Params.r = fHighestMotionBlurStrengthValue;
 }
 
@@ -1914,7 +1914,7 @@ void ImageSpaceShaderCopy::ReloadShaders() {
     std::memset(v4.kMacros, 0, sizeof(v4.kMacros));
     v3.strPath = "imagespace\\1x\\p\\copy.p.hlsl";
     std::memset(v3.kMacros, 0, sizeof(v3.kMacros));
-    const char* pcptarget = BSShaderManager::GetPSTarget(1);
+    const char* pcptarget = BSShaderManager::GetPSTarget(true);
     LoadShaders(v4, v3, "COPY", ShaderTarget_vs_1_1, pcptarget);
     LoadStagesAndPasses();
 }
@@ -1944,12 +1944,12 @@ void ImageSpaceShaderCopyRenderTarget1::SetState() {
     if (!m_pObject->m_pkRenderStateGroup) {
         m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    m_pObject->m_pkRenderStateGroup->SetRenderState(168, 0, 1);
+    m_pObject->m_pkRenderStateGroup->SetRenderState(168, 0, true);
     NiD3DPass* v3 = spPass.m_pObject;
     if (!v3->m_pkRenderStateGroup) {
         v3->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v3->m_pkRenderStateGroup->SetRenderState(190, 0xFu, 1);
+    v3->m_pkRenderStateGroup->SetRenderState(190, 0xFu, true);
 }
 
 void ImageSpaceShaderDepthOfField::ReloadShaders() {
@@ -2007,7 +2007,7 @@ void ImageSpaceShaderFFTDisplayWaterHeight::ReloadShaders() {
     v3.strPath = "water\\2_ab\\p\\waterhmap.p.hlsl";
     v3.kMacros[0].Name = "DISPLAY_WATER_HEIGHT";
     std::memset(&v3.kMacros[0].Definition, 0, sizeof(v3) - offsetof(BSShaderMacro, kMacros[0].Definition));
-    const char* PSTarget = BSShaderManager::GetPSTarget(1);
+    const char* PSTarget = BSShaderManager::GetPSTarget(true);
     LoadShaders(v4, v3, "FFTDISPLAYWATERHEIGHT", ShaderTarget_vs_1_1, PSTarget);
     LoadStagesAndPasses();
 }
@@ -2112,7 +2112,7 @@ void ImageSpaceShaderMenuUnpack::ReloadShaders() {
     std::memset(v4.kMacros, 0, sizeof(v4.kMacros));
     v3.strPath = "imagespace\\1x\\p\\copy.p.hlsl";
     std::memset(v3.kMacros, 0, sizeof(v3.kMacros));
-    const char* pcptarget = BSShaderManager::GetPSTarget(1);
+    const char* pcptarget = BSShaderManager::GetPSTarget(true);
     LoadShaders(v4, v3, "COPYUNPACK", ShaderTarget_vs_1_1, pcptarget);
     LoadStagesAndPasses();
 }
@@ -2142,7 +2142,7 @@ void ImageSpaceShaderNULL::ReloadShaders() {
     vshader.kMacros[0].Definition = "";
     std::memset(&vshader.kMacros[1], 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1]));
     std::memset(&v3, 0, sizeof(v3));
-    LoadShaders(vshader, v3, "NULL", ShaderTarget_vs_1_1, 0);
+    LoadShaders(vshader, v3, "NULL", ShaderTarget_vs_1_1, nullptr);
     LoadStagesAndPasses();
 }
 
@@ -2160,7 +2160,7 @@ void ImageSpaceShaderNoiseNormalmap::ReloadShaders() {
     v3.strPath = "imagespace\\2x\\p\\noise_P20.p.hlsl";
     v3.kMacros[0].Name = "NORMALMAP";
     std::memset(&v3.kMacros[0].Definition, 0, sizeof(v3) - offsetof(BSShaderMacro, kMacros[0].Definition));
-    const char* pcptarget = BSShaderManager::GetPSTarget(1);
+    const char* pcptarget = BSShaderManager::GetPSTarget(true);
     LoadShaders(v4, v3, "NOISENORMALMAP", ShaderTarget_vs_1_1, pcptarget);
     LoadStagesAndPasses();
 }
@@ -2171,39 +2171,39 @@ bool ImageSpaceShaderNoiseNormalmap::LoadStagesAndPasses() {
     NiD3DPass::CreateNewPass(spPass);
     for (uint32_t i = 0; i < pTextures.m_usMaxSize; ++i) {
         NiD3DTextureStage::CreateNewStage(a1);
-        BSShader::SetupDefaultStage(a1.m_pObject, i, 1u, 2u, 1);
+        BSShader::SetupDefaultStage(a1.m_pObject, i, 1u, 2u, true);
         p_spPass->m_pObject->SetStage(p_spPass->m_pObject->m_uiCurrentStage, a1.m_pObject);
     }
     NiD3DPass* m_pObject = p_spPass->m_pObject;
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 0, 1);
+    m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 0, true);
     NiD3DPass* v5 = p_spPass->m_pObject;
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         v5->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v5->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+    v5->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
     NiD3DPass* v6 = p_spPass->m_pObject;
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         v6->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v6->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+    v6->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
     NiD3DPass* v7 = p_spPass->m_pObject;
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         v7->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v7->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+    v7->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
     NiD3DPass* v8 = p_spPass->m_pObject;
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         v8->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v8->m_pkRenderStateGroup->SetRenderState(168u, 15u, 1);
+    v8->m_pkRenderStateGroup->SetRenderState(168u, 15u, true);
     SetState();
     p_spPass->m_pObject->m_spVertexShader = spVertexShader.m_pObject;
     p_spPass->m_pObject->m_spPixelShader = spPixelShader.m_pObject;
     NiD3DShader::m_spCurrentPass = p_spPass->m_pObject;
-    return 1;
+    return true;
 }
 
 void ImageSpaceShaderNoiseScrollAndBlend::ReloadShaders() {
@@ -2214,7 +2214,7 @@ void ImageSpaceShaderNoiseScrollAndBlend::ReloadShaders() {
     v3.strPath = "imagespace\\2x\\p\\noise_P20.p.hlsl";
     v3.kMacros[0].Name = "SCROLL_AND_BLEND";
     std::memset(&v3.kMacros[0].Definition, 0, sizeof(v3) - offsetof(BSShaderMacro, kMacros[0].Definition));
-    const char* pcptarget = BSShaderManager::GetPSTarget(1);
+    const char* pcptarget = BSShaderManager::GetPSTarget(true);
     LoadShaders(v4, v3, "NOISESCROLLANDBLEND", ShaderTarget_vs_1_1, pcptarget);
     LoadStagesAndPasses();
 }
@@ -2286,7 +2286,7 @@ void ImageSpaceShaderStencilCopy::ReloadShaders() {
     std::memset(v4.kMacros, 0, sizeof(v4.kMacros));
     v3.strPath = "imagespace\\1x\\p\\copy.p.hlsl";
     std::memset(v3.kMacros, 0, sizeof(v3.kMacros));
-    const char* pcptarget = BSShaderManager::GetPSTarget(1);
+    const char* pcptarget = BSShaderManager::GetPSTarget(true);
     LoadShaders(v4, v3, "STENCILCOPY", ShaderTarget_vs_1_1, pcptarget);
     LoadStagesAndPasses();
 }
@@ -2297,18 +2297,18 @@ void ImageSpaceShaderStencilCopy::SetState() {
     if (!pPass->m_pkRenderStateGroup) {
         pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILENABLE, 1u, 1);
+    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILENABLE, 1u, true);
     pPass = spPass.m_pObject;
     if (!pPass->m_pkRenderStateGroup) {
         pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILFUNC, 4u, 1);
+    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILFUNC, 4u, true);
     pPass = spPass.m_pObject;
     uint32_t uiRef = uiStencilRef;
     if (!pPass->m_pkRenderStateGroup) {
         pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILREF, uiRef, 1);
+    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILREF, uiRef, true);
 }
 
 ImageSpaceShaderStencilCopyNoTextureNoDepth::ImageSpaceShaderStencilCopyNoTextureNoDepth() {
@@ -2324,7 +2324,7 @@ void ImageSpaceShaderStencilCopyNoTextureNoDepth::ReloadShaders() {
     v3.kMacros[0].Name = "NOTEX";
     v3.kMacros[0].Definition = "";
     std::memset(&v3.kMacros[1], 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1]));
-    const char* pcptarget = BSShaderManager::GetPSTarget(1);
+    const char* pcptarget = BSShaderManager::GetPSTarget(true);
     LoadShaders(v4, v3, "STENCILCOPYNOTEXNODEPTH", ShaderTarget_vs_1_1, pcptarget);
     LoadStagesAndPasses();
 }
@@ -2335,17 +2335,17 @@ void ImageSpaceShaderStencilCopyNoTextureNoDepth::SetState() {
     if (!m_pObject->m_pkRenderStateGroup) {
         m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    m_pObject->m_pkRenderStateGroup->SetRenderState(0xEu, 0, 1);
+    m_pObject->m_pkRenderStateGroup->SetRenderState(0xEu, 0, true);
     NiD3DPass* v3 = spPass.m_pObject;
     if (!v3->m_pkRenderStateGroup) {
         v3->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v3->m_pkRenderStateGroup->SetRenderState(0x34u, 1u, 1);
+    v3->m_pkRenderStateGroup->SetRenderState(0x34u, 1u, true);
     NiD3DPass* v4 = spPass.m_pObject;
     if (!v4->m_pkRenderStateGroup) {
         v4->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v4->m_pkRenderStateGroup->SetRenderState(0x38u, 3u, 1);
+    v4->m_pkRenderStateGroup->SetRenderState(0x38u, 3u, true);
 }
 
 ImageSpaceShaderSunbeams::ImageSpaceShaderSunbeams() {
@@ -2370,22 +2370,22 @@ void ImageSpaceShaderSunbeams::SetState() {
     if (!pPass->m_pkRenderStateGroup) {
         pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILENABLE, 1u, 1);
+    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILENABLE, 1u, true);
     pPass = spPass.m_pObject;
     if (!pPass->m_pkRenderStateGroup) {
         pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILFUNC, 7u, 1);
+    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILFUNC, 7u, true);
     pPass = spPass.m_pObject;
     if (!pPass->m_pkRenderStateGroup) {
         pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILREF, 0x80u, 1);
+    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILREF, 0x80u, true);
     pPass = spPass.m_pObject;
     if (!pPass->m_pkRenderStateGroup) {
         pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILPASS, 1u, 1);
+    pPass->m_pkRenderStateGroup->SetRenderState(D3DRS_STENCILPASS, 1u, true);
 }
 
 ImageSpaceShaderTV::ImageSpaceShaderTV() {
@@ -2414,7 +2414,7 @@ void ImageSpaceShaderTextureMask::ReloadShaders() {
     v3.kMacros[0].Name = "MASK";
     v3.kMacros[0].Definition = "";
     std::memset(&v3.kMacros[1], 0, sizeof(v3.kMacros) - sizeof(v3.kMacros[0]));
-    const char* pcptarget = BSShaderManager::GetPSTarget(1);
+    const char* pcptarget = BSShaderManager::GetPSTarget(true);
     LoadShaders(v4, v3, "TEXMASK", ShaderTarget_vs_1_1, pcptarget);
     LoadStagesAndPasses();
 }
@@ -2432,16 +2432,16 @@ void ImageSpaceShaderVATSScan::ReloadShaders() {
     if (!m_pObject->m_pkRenderStateGroup) {
         m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+    m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
     NiD3DPass* v3 = spPass.m_pObject;
     if (!v3->m_pkRenderStateGroup) {
         v3->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v3->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+    v3->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
     if (!v3->m_pkRenderStateGroup) {
         v3->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v3->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+    v3->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
 }
 
 ImageSpaceShaderVolumetricFog::ImageSpaceShaderVolumetricFog() {
@@ -2475,17 +2475,17 @@ void ImageSpaceShaderVolumetricFog::SetState() {
     if (!m_pObject->m_pkRenderStateGroup) {
         m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    m_pObject->m_pkRenderStateGroup->SetRenderState(52, 1u, 1);
+    m_pObject->m_pkRenderStateGroup->SetRenderState(52, 1u, true);
     NiD3DPass* v3 = spPass.m_pObject;
     if (!v3->m_pkRenderStateGroup) {
         v3->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v3->m_pkRenderStateGroup->SetRenderState(56, 3u, 1);
+    v3->m_pkRenderStateGroup->SetRenderState(56, 3u, true);
     NiD3DPass* v4 = spPass.m_pObject;
     if (!v4->m_pkRenderStateGroup) {
         v4->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v4->m_pkRenderStateGroup->SetRenderState(57, 1u, 1);
+    v4->m_pkRenderStateGroup->SetRenderState(57, 1u, true);
 }
 
 // Active while texture slot 2 holds a texture.
@@ -2499,15 +2499,15 @@ BSRenderedTexture* ImageSpaceShaderVolumetricFog::GetTexture() {
         ImageSpaceTexture* v2 =
             static_cast<ImageSpaceTexture*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceTexture)));
         if (v2) {
-            v2->bForceAniso = 0;
-            v2->bIsRenderedTexture = 0;
-            v2->bIsTextureBorrowed = 0;
-            v2->spTexture = 0;
+            v2->bForceAniso = false;
+            v2->bIsRenderedTexture = false;
+            v2->bIsTextureBorrowed = false;
+            v2->spTexture = nullptr;
             v2->eFilterMode = 0;
             v2->eClampMode = 0;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         ImageSpaceTexture* a3 = v2;
         pTextures.SetAt(2u, a3);
@@ -2515,7 +2515,7 @@ BSRenderedTexture* ImageSpaceShaderVolumetricFog::GetTexture() {
     if (!pTextures.m_pBase[2]->GetRenderedTexture()) {
         ImageSpaceTexture** v3 = pTextures.m_pBase + 2;
         BSRenderedTexture* v4 = BSShaderManager::pTextureManager->BorrowRenderedTexture(
-            static_cast<NiDX9Renderer*>(NiRenderer::ms_pkRenderer), BSTextureManager::TEX_VFOG, 0, 0, 0
+            static_cast<NiDX9Renderer*>(NiRenderer::ms_pkRenderer), BSTextureManager::TEX_VFOG, 0, nullptr, 0
         );
         (*v3)->SetTexture(v4);
     }
@@ -2536,12 +2536,12 @@ ImageSpaceTexture::~ImageSpaceTexture() {
 void ImageSpaceTexture::ReturnRenderedTexture() {
     if (bIsTextureBorrowed) {
         BSRenderedTexture* spTexture;
-        bIsTextureBorrowed = 0;
+        bIsTextureBorrowed = false;
         if (bIsRenderedTexture) {
             spTexture = static_cast<BSRenderedTexture*>(this->spTexture);
         }
         else {
-            spTexture = 0;
+            spTexture = nullptr;
         }
         BSShaderManager::pTextureManager->ReturnRenderedTexture(spTexture);
         NiRefObject* pTexture = static_cast<NiRefObject*>(this->spTexture);
@@ -2549,7 +2549,7 @@ void ImageSpaceTexture::ReturnRenderedTexture() {
             pTexture->DecRefCount();
             this->spTexture = nullptr;
         }
-        bIsRenderedTexture = 0;
+        bIsRenderedTexture = false;
         eFilterMode = 0;
         eClampMode = 0;
     }
@@ -2569,8 +2569,9 @@ void ImageSpaceTexture::ClearTexture() {
 
 // Borrows a rendered texture of the type and holds it.
 void ImageSpaceTexture::BorrowRenderedTexture(BSTextureManager::eTextureType aeType) {
-    BSRenderedTexture* ptex =
-        BSShaderManager::pTextureManager->BorrowRenderedTexture(BSShaderManager::pRenderer.m_pObject, aeType, 0, 0, 0);
+    BSRenderedTexture* ptex = BSShaderManager::pTextureManager->BorrowRenderedTexture(
+        BSShaderManager::pRenderer.m_pObject, aeType, 0, nullptr, 0
+    );
     NiRefObject* pOld = static_cast<NiRefObject*>(this->spTexture);
     NiRefObject* pNew = ptex;
     if (pOld != pNew) {
@@ -2582,8 +2583,8 @@ void ImageSpaceTexture::BorrowRenderedTexture(BSTextureManager::eTextureType aeT
             NiIncRefCount(ptex);
         }
     }
-    bIsRenderedTexture = 1;
-    bIsTextureBorrowed = 1;
+    bIsRenderedTexture = true;
+    bIsTextureBorrowed = true;
 }
 
 // Holds apRendTex in the slot and marks it as not a rendered texture.
@@ -2613,7 +2614,7 @@ void ImageSpaceTexture::SetTexture(BSRenderedTexture* apRendTex) {
             NiIncRefCount(apRendTex);
         }
     }
-    bIsRenderedTexture = 1;
+    bIsRenderedTexture = true;
 }
 
 BSRenderedTexture* ImageSpaceTexture::GetRenderedTexture() {

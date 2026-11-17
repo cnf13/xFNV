@@ -159,14 +159,14 @@ uint32_t NiDX9FragmentShader::SetupTransformations(
 ) {
     if (!pkPartition) {
         return NiD3DShader::SetupTransformations(
-            pkGeometry, pkSkin, 0, pkRendererData, pkState, pkEffects, kWorld, kWorldBound
+            pkGeometry, pkSkin, nullptr, pkRendererData, pkState, pkEffects, kWorld, kWorldBound
         );
     }
     if (!m_uiCurrentPass) {
-        m_pkD3DRenderer->CalculateBoneMatrices(pkSkin, kWorld, 1, 3u, 1);
+        m_pkD3DRenderer->CalculateBoneMatrices(pkSkin, kWorld, true, 3u, true);
     }
     m_pkD3DRenderState->SetBoneCount(pkPartition->m_usBonesPerVertex);
-    m_pkD3DRenderer->SetModelTransform(kWorld, 0);
+    m_pkD3DRenderer->SetModelTransform(kWorld, false);
     return 0;
 }
 
@@ -199,17 +199,17 @@ bool NiDX9FragmentShader::SetAlphaOverride(
     NiAlphaProperty::AlphaFunction eDestBlendMode
 ) {
     if (uiPassId) {
-        return 0;
+        return false;
     }
     NiD3DPass* v8 = NiD3DShader::m_spCurrentPass;
     if (!NiD3DShader::m_spCurrentPass) {
-        return 0;
+        return false;
     }
     if (bAlphaBlend) {
         if (!NiD3DShader::m_spCurrentPass->m_pkRenderStateGroup) {
             v8->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v8->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v8->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         NiDX9RenderState* D3DRenderState = v8->GetD3DRenderState();
         if (bUsePreviousSrcBlendMode) {
             NiD3DRenderStateGroup* m_pkRenderStateGroup = v8->m_pkRenderStateGroup;
@@ -218,25 +218,25 @@ bool NiDX9FragmentShader::SetAlphaOverride(
             }
         }
         else {
-            v8->SetRenderState(19u, D3DRenderState->m_auiAlphaMapping[eSrcBlendMode], 0);
+            v8->SetRenderState(19u, D3DRenderState->m_auiAlphaMapping[eSrcBlendMode], false);
         }
         if (!bUsePreviousDestBlendMode) {
-            v8->SetRenderState(20u, D3DRenderState->m_auiAlphaMapping[eDestBlendMode], 0);
-            return 1;
+            v8->SetRenderState(20u, D3DRenderState->m_auiAlphaMapping[eDestBlendMode], false);
+            return true;
         }
         NiD3DRenderStateGroup* v11 = v8->m_pkRenderStateGroup;
         if (v11) {
             v11->RemoveRenderState(20u);
-            return 1;
+            return true;
         }
     }
     else {
         if (!NiD3DShader::m_spCurrentPass->m_pkRenderStateGroup) {
             v8->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v8->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        v8->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
     }
-    return 1;
+    return true;
 }
 
 // uiProgramId is not written.

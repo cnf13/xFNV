@@ -95,12 +95,12 @@ void PathingRequestCoveredMove::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     apLoadGameBuffer->LoadData(&TargetLocation, 12u);
     apLoadGameBuffer->LoadData(&bHasTargetLocation, 1u);
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
-    UnreachableCoverLocations.SetSize(isaveGameCount, 1);
+    UnreachableCoverLocations.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         apLoadGameBuffer->LoadData(&UnreachableCoverLocations.operator[](i), 4u);
     }
     uint32_t isaveGameCount_2 = apLoadGameBuffer->LoadVariableSizedValue();
-    TargetLocations.SetSize(isaveGameCount_2, 1);
+    TargetLocations.SetSize(isaveGameCount_2, true);
     for (uint32_t i_2 = 0; i_2 < isaveGameCount_2; ++i_2) {
         apLoadGameBuffer->LoadData(&TargetLocations.operator[](i_2), 12u);
     }

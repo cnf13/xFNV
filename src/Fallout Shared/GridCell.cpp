@@ -46,7 +46,7 @@ static uint8_t bSwitch;
 // The game settings this file defines, with their IDs and default values, in initialization order.
 SettingT<INISettingCollection> uGridsToLoad("uGridsToLoad:General", 5u);
 
-GridCellArray::GridCellArray() : WorldCenter(0.0f, 0.0f, 0.0f), bLandAttached(0), spTexRendered(nullptr) {
+GridCellArray::GridCellArray() : WorldCenter(0.0f, 0.0f, 0.0f), bLandAttached(false), spTexRendered(nullptr) {
     FixGridsToLoadINISetting();
     iDimension = uGridsToLoad.Int();
     uint32_t uiCells = iDimension * iDimension;
@@ -55,7 +55,7 @@ GridCellArray::GridCellArray() : WorldCenter(0.0f, 0.0f, 0.0f), bLandAttached(0)
         uiCells > UINT32_MAX / sizeof(GridCell) ? UINT32_MAX : static_cast<uint32_t>(uiCells * sizeof(GridCell))
     ));
     ourMemset(pGridCellA, 0, static_cast<uint32_t>(sizeof(GridCell) * iDimension * iDimension));
-    bRecreateCanopyShadowMaskTexture = 1;
+    bRecreateCanopyShadowMaskTexture = true;
 }
 
 GridCellArray::~GridCellArray() {
@@ -102,7 +102,7 @@ void GridCellArray::Detach(uint32_t aiX, uint32_t aiY) {
 
 void GridCellArray::ClearItem(uint32_t aiX, uint32_t aiY) {
     Get(aiX, aiY)->pCell = nullptr;
-    bLandAttached = (bool)0;
+    bLandAttached = false;
 }
 
 void GridCellArray::MoveItem(uint32_t aiX1, uint32_t aiY1, uint32_t aiX2, uint32_t aiY2) {
@@ -126,10 +126,10 @@ void GridCellArray::UpdateManagedNodeTransforms() {
     bswitch = !bswitch;
     for (uint32_t x = 0; x < CastingType; ++x) {
         for (uint32_t y = 0; y < CastingType; ++y) {
-            bool v3 = 1;
+            bool v3 = true;
             if (!x || (!y || (x == v7 || y == v7))) {
                 if (((static_cast<uint8_t>(y) ^ static_cast<uint8_t>(x)) & 1) != 0) {
-                    v3 = 0;
+                    v3 = false;
                 }
                 if (bswitch) {
                     v3 = !v3;
@@ -605,7 +605,7 @@ void GridCellArray::Set(uint32_t aiX, uint32_t aiY, TESObjectCELL* apCell) {
 void GridCellArray::AttachAllLand3D() {
     if (!bLandAttached) {
         AutoMemContext apMemory(
-            MEM_CONTEXT_LAND, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\GridCell.cpp", 269
+            MEM_CONTEXT_LAND, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\GridCell.cpp", 269
         );
         uint32_t CastingType = GetDimension();
         for (uint32_t x = 0; x < CastingType; ++x) {
@@ -620,7 +620,7 @@ void GridCellArray::AttachAllLand3D() {
                 }
             }
         }
-        bLandAttached = 1;
+        bLandAttached = true;
     }
 }
 

@@ -17,7 +17,7 @@ void TESFollowPackageData::Copy(TESPackageData* apCopy) {
         fTriggerRadius = pcopy->fTriggerRadius;
         if (pStartLocation) {
             delete pStartLocation;
-            pStartLocation = 0;
+            pStartLocation = nullptr;
         }
         if (pcopy->pStartLocation) {
             PackageLocation* v2;
@@ -26,10 +26,10 @@ void TESFollowPackageData::Copy(TESPackageData* apCopy) {
                 v2 = ::new (v4) PackageLocation;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pStartLocation = v2;
-            pStartLocation->Copy(pcopy->pStartLocation, 0);
+            pStartLocation->Copy(pcopy->pStartLocation, false);
         }
     }
 }
@@ -37,22 +37,22 @@ void TESFollowPackageData::Copy(TESPackageData* apCopy) {
 bool TESFollowPackageData::Compare(TESPackageData* apCompare) {
     TESFollowPackageData* v4 = dynamic_cast<TESFollowPackageData*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (v4->fTriggerRadius != fTriggerRadius) {
-        return (bool)1;
+        return true;
     }
     if (pStartLocation) {
         if (pStartLocation->Compare(v4->pStartLocation)) {
-            return (bool)1;
+            return true;
         }
     }
     else {
         if (v4->pStartLocation) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 void TESFollowPackageData::Save() {

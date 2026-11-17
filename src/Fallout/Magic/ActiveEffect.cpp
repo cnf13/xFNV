@@ -65,8 +65,8 @@ ActiveEffect::ActiveEffect(MagicCaster* a1, MagicItem* a2, EffectItem* a3)
 ActiveEffect::~ActiveEffect() {
     for (BSSimpleList<MagicHitEffect*>* plist = pHitEffects; plist && !plist->IsEmpty(); plist = plist->m_pkNext) {
         MagicHitEffect* peffect = plist->m_item;
-        peffect->bFinished = 1;
-        peffect->pEffect = 0;
+        peffect->bFinished = true;
+        peffect->pEffect = nullptr;
     }
     if (pHitEffects) {
         pHitEffects->RemoveAll();
@@ -95,7 +95,7 @@ void ActiveEffect::Finalize() {
     bool vCondition1;
     vCondition1 = HasConditions() || ActiveEffect::GetDisplacementSpell();
     if (vCondition1) {
-        EvaluateConditions(0.0, 1);
+        EvaluateConditions(0.0, true);
     }
 }
 
@@ -249,7 +249,7 @@ void ActiveEffect::LoadGame(Actor* apActor) {
         pSaveLoadGameOLD->LoadGameDataOLD(&ccount, 1u);
         for (uint32_t i = 0; i < ccount; ++i) {
             pSaveLoadGameOLD->LoadGameDataOLD(&chitEffectType, 1u);
-            phitEffect = 0;
+            phitEffect = nullptr;
             if (chitEffectType == 5) {
                 MagicHitEffect* phitEffect_2;
                 MagicModelHitEffect* apMemory =
@@ -258,7 +258,7 @@ void ActiveEffect::LoadGame(Actor* apActor) {
                     phitEffect_2 = ::new (apMemory) MagicModelHitEffect;
                 }
                 else {
-                    phitEffect_2 = 0;
+                    phitEffect_2 = nullptr;
                 }
                 phitEffect = phitEffect_2;
             }
@@ -271,7 +271,7 @@ void ActiveEffect::LoadGame(Actor* apActor) {
                         phitEffect_3 = ::new (v8) MagicShaderHitEffect;
                     }
                     else {
-                        phitEffect_3 = 0;
+                        phitEffect_3 = nullptr;
                     }
                     phitEffect = phitEffect_3;
                 }
@@ -290,7 +290,7 @@ void ActiveEffect::LoadGame(Actor* apActor) {
                     v3 = ::new (v7) BSSimpleList<MagicHitEffect*>(phitEffect);
                 }
                 else {
-                    v3 = 0;
+                    v3 = nullptr;
                 }
                 pHitEffects = v3;
             }
@@ -331,7 +331,7 @@ void ActiveEffect::LoadGame(BGSLoadFormBuffer* apBuffer) {
     for (uint32_t iloop = 0; iloop < isaveGameCount; ++iloop) {
         chitEffectType = 0;
         apBuffer->LoadData(&chitEffectType, 1u);
-        phitEffect = 0;
+        phitEffect = nullptr;
         if (chitEffectType == 5) {
             MagicHitEffect* phitEffect_2;
             MagicModelHitEffect* apMemory =
@@ -340,7 +340,7 @@ void ActiveEffect::LoadGame(BGSLoadFormBuffer* apBuffer) {
                 phitEffect_2 = (MagicHitEffect*)::new (apMemory) MagicModelHitEffect;
             }
             else {
-                phitEffect_2 = 0;
+                phitEffect_2 = nullptr;
             }
             phitEffect = phitEffect_2;
         }
@@ -353,7 +353,7 @@ void ActiveEffect::LoadGame(BGSLoadFormBuffer* apBuffer) {
                     phitEffect_3 = (MagicHitEffect*)::new (v10) MagicShaderHitEffect;
                 }
                 else {
-                    phitEffect_3 = 0;
+                    phitEffect_3 = nullptr;
                 }
                 phitEffect = phitEffect_3;
             }
@@ -373,7 +373,7 @@ void ActiveEffect::LoadGame(BGSLoadFormBuffer* apBuffer) {
                 plist = ::new (pMemory) BSSimpleList<MagicHitEffect*>(phitEffect);
             }
             else {
-                plist = 0;
+                plist = nullptr;
             }
             pHitEffects = plist;
         }
@@ -409,7 +409,7 @@ void ActiveEffect::InitLoadGame(BGSLoadGameBuffer* a1) {
             MagicCaster::GetMagicCasterByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pCaster)));
     }
     else {
-        MagicCasterByNumericID = 0;
+        MagicCasterByNumericID = nullptr;
     }
     pCaster = MagicCasterByNumericID;
     if (pTarget) {
@@ -417,7 +417,7 @@ void ActiveEffect::InitLoadGame(BGSLoadGameBuffer* a1) {
             MagicTarget::GetMagicTargetByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pTarget)));
     }
     else {
-        MagicTargetByNumericID = 0;
+        MagicTargetByNumericID = nullptr;
     }
     pTarget = MagicTargetByNumericID;
     if (pDisplacementSpell) {
@@ -425,7 +425,7 @@ void ActiveEffect::InitLoadGame(BGSLoadGameBuffer* a1) {
             MagicItem::GetMagicItemByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pDisplacementSpell)));
     }
     else {
-        MagicItemByNumericID = 0;
+        MagicItemByNumericID = nullptr;
     }
     pDisplacementSpell = MagicItemByNumericID;
     for (MagicHitEffect* phitEffect : *pHitEffects) {
@@ -440,7 +440,7 @@ void ActiveEffect::FinishInitLoadGame(Actor* apActor) {
         for (BSSimpleList<MagicHitEffect*>* plist = pHitEffects; plist && !plist->IsEmpty(); plist = plist->m_pkNext) {
             MagicHitEffect** v2 = &plist->m_item;
             MagicHitEffect* phitEffect = *v2;
-            (*v2)->FinishInitLoadGame(this, apActor, 0);
+            (*v2)->FinishInitLoadGame(this, apActor, nullptr);
             ReferenceProcessLists.AddTempEffect(phitEffect);
         }
     }
@@ -459,7 +459,7 @@ bool ActiveEffect::CheckDeletedCaster(MagicCaster* apCaster) {
         return (bool)bResult;
     }
     pCaster = nullptr;
-    return (bool)1;
+    return true;
 }
 
 bool ActiveEffect::IsCausingDamage() {
@@ -567,7 +567,7 @@ void ActiveEffect::SetQueuedForRemoval(uint8_t abQueued) {
 
 void ActiveEffect::UpdateEffect(float afSecondsElapsed) {
     if (HasConditions() || GetDisplacementSpell()) {
-        EvaluateConditions(afSecondsElapsed, 0);
+        EvaluateConditions(afSecondsElapsed, false);
     }
     if (afSecondsElapsed > 0.0 && !bDone) {
         MagicItem* pspell = pSpell;
@@ -622,7 +622,7 @@ void ActiveEffect::UpdateEffect(float afSecondsElapsed) {
                                         if (pHitEffects) {
                                             delete pHitEffects;
                                         }
-                                        this->pHitEffects = 0;
+                                        this->pHitEffects = nullptr;
                                     }
                                     if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
                                         TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
@@ -636,7 +636,7 @@ void ActiveEffect::UpdateEffect(float afSecondsElapsed) {
                         }
                     }
                 }
-                bStarted = 1;
+                bStarted = true;
             }
         }
         if (!bDone) {
@@ -662,7 +662,7 @@ void ActiveEffect::UpdateEffect(float afSecondsElapsed) {
                             if (v16) {
                                 delete v16;
                             }
-                            this->pHitEffects = 0;
+                            this->pHitEffects = nullptr;
                         }
                         this->pHitEffects = MagicHitEffect::InstantiateHitEffects(this);
                         ClearFlag(ActiveEffect::DEFERRED_HITEFFECT);
@@ -676,21 +676,21 @@ void ActiveEffect::UpdateEffect(float afSecondsElapsed) {
             }
             if (!bpermanent && !FromWornEnchantment()) {
                 if (pEffect->pEffectSetting->IsFlagSet(EffectSetting::NO_DURATION)) {
-                    bDone = 1;
+                    bDone = true;
                 }
                 else {
                     if (static_cast<double>(fElapsedSeconds) >= fDuration) {
-                        bDone = 1;
+                        bDone = true;
                     }
                 }
             }
             if (pTarget->MagicTargetIsActor()) {
                 Actor* pActor = static_cast<Actor*>(pTarget);
                 if (pActor) {
-                    if (pActor->IsDead(1)) {
+                    if (pActor->IsDead(true)) {
                         EffectSetting* v4 = GetEffectSetting();
                         if (!v4->IsFlagSet(EffectSetting::NO_DEATH_DISPEL)) {
-                            bDone = 1;
+                            bDone = true;
                         }
                     }
                 }
@@ -699,7 +699,7 @@ void ActiveEffect::UpdateEffect(float afSecondsElapsed) {
     }
     if (bStarted && ((bDone || !bActive) && !bFinished)) {
         Finish();
-        bFinished = 1;
+        bFinished = true;
         if (PersistentSound.IsValid()) {
             PersistentSound.Stop();
         }
@@ -723,11 +723,11 @@ void ActiveEffect::EvaluateConditions(float afTimeDelta, bool abForceUpdate) {
                     TESObjectREFR* pTargetActor = pTarget->GetTargetStatsObject();
                     EffectItem* CastingType = GetEffectItem();
                     TESCondition* Data = &CastingType->Conditions;
-                    bool bIsTrue = Data->IsTrue(pTargetActor, 0);
+                    bool bIsTrue = Data->IsTrue(pTargetActor, nullptr);
                     bool v12 = !CheckDisplacementSpellOnTarget() && bIsTrue;
                     if (v12 && !bActive && bFinished && !bDone) {
-                        bStarted = 0;
-                        bFinished = 0;
+                        bStarted = false;
+                        bFinished = false;
                     }
                     bActive = v12;
                 }
@@ -747,7 +747,7 @@ void ActiveEffect::SetEnchantmentSource(TESBoundObject* apSource) {
 }
 
 void ActiveEffect::Dispel(bool abNow) {
-    bDone = (bool)1;
+    bDone = true;
     SetFlag(WAS_DISPELED);
     if (abNow) {
         UpdateEffect(0.0);
@@ -804,13 +804,13 @@ float ActiveEffect::GetMagnitude() {
 }
 
 bool ActiveEffect::CheckDisplacementSpellOnTarget() {
-    bool bresult = 0;
-    bool bignoreAddiction = 0;
+    bool bresult = false;
+    bool bignoreAddiction = false;
     if (this->pTarget->MagicTargetIsActor()) {
         Actor* pactor = static_cast<Actor*>(this->pTarget);
         if (pactor) {
             if (pactor->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS) > 0) {
-                bignoreAddiction = 1;
+                bignoreAddiction = true;
             }
         }
     }
@@ -824,7 +824,7 @@ bool ActiveEffect::CheckDisplacementSpellOnTarget() {
                 if (pitem) {
                     if (pitem->bActive) {
                         if (pitem->pSpell == pDisplacementSpell) {
-                            bresult = 1;
+                            bresult = true;
                         }
                         else {
                             if (pitem->pSpell->GetSpellType() == MagicSystem::POTION) {
@@ -840,7 +840,7 @@ bool ActiveEffect::CheckDisplacementSpellOnTarget() {
         }
     }
     if (bresult && bignoreAddiction) {
-        return 0;
+        return false;
     }
     return bresult;
 }
@@ -867,7 +867,7 @@ void ActiveEffect::StartSound() {
                     ptargetActor = pTarget->GetTargetAsActor();
                 }
                 else {
-                    ptargetActor = 0;
+                    ptargetActor = nullptr;
                 }
                 EffectSetting* v4 = GetEffectSetting();
                 bool bpersistent = v4->IsFlagSet(EffectSetting::PERSIST);
@@ -879,7 +879,7 @@ void ActiveEffect::StartSound() {
                 }
                 if (ptargetActor) {
                     uint32_t uiflags = bpersistent ? 274 : 258;
-                    BSSoundHandle* arHandle = ptargetActor->PlaySound(&a2, isoundFileID, bpersistent, uiflags, 0);
+                    BSSoundHandle* arHandle = ptargetActor->PlaySound(&a2, isoundFileID, bpersistent, uiflags, false);
                     soundHandle.operator=(*arHandle);
                 }
                 else {
@@ -912,12 +912,12 @@ ActiveEffect* ActiveEffect::Activate(
     TESBoundObject* apObject
 ) {
     EffectSetting* psetting;
-    ActiveEffect* presult = 0;
+    ActiveEffect* presult = nullptr;
     if (apEffectItem) {
         psetting = apEffectItem->pEffectSetting;
     }
     else {
-        psetting = 0;
+        psetting = nullptr;
     }
     EffectArchetypes::InstantiateFunction pInstantiate =
         EffectArchetypes::Archetypes[psetting->GetEffectArchetype()].pInstantiateFunction;
@@ -942,16 +942,16 @@ ActiveEffect* ActiveEffect::LoadActiveEffect(BGSLoadFormBuffer* apLoadGameBuffer
         pspell = MagicItem::GetMagicItemByNumericID(ispellID);
     }
     else {
-        pspell = 0;
+        pspell = nullptr;
     }
     ceffectIndex = 0;
     apLoadGameBuffer->LoadData(&ceffectIndex, 1u);
     uint32_t ieffectArchetypeID = apLoadGameBuffer->LoadVariableSizedValue();
     if (pspell &&
-        ((peffect = pspell->GetEffectItemByIndex(ceffectIndex)) != 0 &&
+        ((peffect = pspell->GetEffectItemByIndex(ceffectIndex)) != nullptr &&
          (EffectArchetype = peffect->pEffectSetting->GetEffectArchetype(), EffectArchetype == ieffectArchetypeID))) {
         apLoadGameBuffer->LoadVariableSizedValue();
-        ActiveEffect* pactiveEffect = ActiveEffect::Activate(0, pspell, peffect, 0);
+        ActiveEffect* pactiveEffect = ActiveEffect::Activate(nullptr, pspell, peffect, nullptr);
         pactiveEffect->LoadGame(apLoadGameBuffer);
         return pactiveEffect;
     }
@@ -962,7 +962,7 @@ ActiveEffect* ActiveEffect::LoadActiveEffect(BGSLoadFormBuffer* apLoadGameBuffer
             "%i",
             isavedSpellID, ceffectIndex, ieffectArchetypeID
         );
-        return 0;
+        return nullptr;
     }
 }
 
@@ -984,7 +984,7 @@ void ActiveEffect::LoadActiveEffectListTES(BSSimpleList<ActiveEffect*>* apActive
     uint32_t iblockHeader;
     uint16_t icount;
     uint16_t iblockSize = 0;
-    uint8_t* istartBufferPosition = 0;
+    uint8_t* istartBufferPosition = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockHeader, 4u);
         if (iblockHeader != 0x424C4F4B) {
@@ -1119,7 +1119,7 @@ void ActiveEffect::FinishInitLoadGameActiveEffectList(BSSimpleList<ActiveEffect*
     if (apActor) {
         if (apActor->pCurrentProcess) {
             BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
-            CurrentAIProcess->SetShouldRefreshMagicShadersEffects(1, 1, 1);
+            CurrentAIProcess->SetShouldRefreshMagicShadersEffects(true, true, true);
         }
     }
 }
@@ -1167,7 +1167,7 @@ void ActiveEffect::SaveActiveEffectList(BSSimpleList<ActiveEffect*>* apActiveEff
     uint16_t icount;
     uint16_t iblockSize;
     iblockSize = 0;
-    uint16_t* pblockSize = 0;
+    uint16_t* pblockSize = nullptr;
     uint8_t* itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -1291,7 +1291,8 @@ ActiveEffect* ActiveEffect::LoadActiveEffectTES(Actor* a1) {
     pSaveLoadGameOLD->LoadGameDataOLD(&v4, 1u);
     MagicItem* magicItemByNumericID = MagicItem::GetMagicItemByNumericID(apFormID);
     if (magicItemByNumericID &&
-        ((effectItemByIndex = static_cast<EffectItemList*>(magicItemByNumericID)->GetEffectItemByIndex(v4)) != 0)) {
+        ((effectItemByIndex = static_cast<EffectItemList*>(magicItemByNumericID)->GetEffectItemByIndex(v4)) !=
+         nullptr)) {
         v2 = ActiveEffect::Activate(nullptr, magicItemByNumericID, effectItemByIndex, nullptr);
         v2->LoadGame(a1);
         return v2;

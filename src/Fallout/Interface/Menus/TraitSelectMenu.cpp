@@ -90,22 +90,22 @@ void TraitSelectMenu::DoIdle() {
             uint32_t nCheckMarkTimer = BSGetTickCount() - m_nCheckmarkAnimStartTime;
             if (nCheckMarkTimer >= 50) {
                 if (nCheckMarkTimer >= 100) {
-                    pTiles[17]->Set(4032, 64.0f, 1);
+                    pTiles[17]->Set(4032, 64.0f, true);
                     if (nCheckMarkTimer >= 150) {
-                        pTiles[17]->Set(4031, 32.0f, 1);
+                        pTiles[17]->Set(4031, 32.0f, true);
                     }
                     else {
-                        pTiles[17]->Set(4031, 0.0f, 1);
+                        pTiles[17]->Set(4031, 0.0f, true);
                     }
                 }
                 else {
-                    pTiles[17]->Set(4032, 0.0f, 1);
-                    pTiles[17]->Set(4031, 32.0f, 1);
+                    pTiles[17]->Set(4032, 0.0f, true);
+                    pTiles[17]->Set(4031, 32.0f, true);
                 }
             }
             else {
-                pTiles[17]->Set(4032, 0.0f, 1);
-                pTiles[17]->Set(4031, 0.0f, 1);
+                pTiles[17]->Set(4032, 0.0f, true);
+                pTiles[17]->Set(4031, 0.0f, true);
             }
         }
     }
@@ -170,16 +170,16 @@ void TraitSelectMenu::SetBoxAsChecked(int32_t aiID, bool bForceRefresh) {
                 pTiles[17]->Set(4003, 0);
                 BSAudio* v3 = &BSAudio::QInstance();
                 BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "UITraitSelectErase", 289u);
-                SoundHandleByName->Play(0);
+                SoundHandleByName->Play(false);
             }
             else {
                 if (pTiles[aiID]) {
                     pTiles[17]->Set(4003, 1);
                     float afValue = pTiles[aiID]->GetFloat(4002) - 8.0;
-                    pTiles[17]->Set(4002, afValue, static_cast<bool>(1));
+                    pTiles[17]->Set(4002, afValue, true);
                     BSAudio* v4 = &BSAudio::QInstance();
                     BSSoundHandle* v5 = v4->GetSoundHandleByName(&arHandle, "UITraitSelectCheckmark", 289u);
-                    v5->Play(0);
+                    v5->Play(false);
                 }
             }
         }
@@ -192,7 +192,7 @@ void TraitSelectMenu::ToggleCheckBox(int32_t aiID) {
         ClearCheckBox();
     }
     else {
-        SetBoxAsChecked(aiID, 0);
+        SetBoxAsChecked(aiID, false);
     }
 }
 
@@ -213,13 +213,13 @@ void TraitSelectMenu::ScrollForm(float afDeltaY) {
         float fScrollPaperDist = ptile->GetFloat(Tile::kTileValue_User4);
         if (pTiles[15]) {
             float fMainRectYAdjust = fMenuTop - mfCurrentYScroll * fScrollPaperDist;
-            pTiles[15]->Set(4002, fMainRectYAdjust, 1);
+            pTiles[15]->Set(4002, fMainRectYAdjust, true);
         }
         Interface::PlayMenuSound(4);
         if (pTiles[13]) {
             int32_t iUT_CurrentValue = Tile::TextToTrait("_current_value");
             float fYInScrollBarSpace = mfCurrentYScroll * 10.0;
-            pTiles[13]->Set(iUT_CurrentValue, fYInScrollBarSpace, 0);
+            pTiles[13]->Set(iUT_CurrentValue, fYInScrollBarSpace, false);
             int32_t v2 = Tile::TextToTrait("_SetInCode");
             pTiles[13]->Poke(v2, 1.0f);
         }
@@ -233,10 +233,10 @@ void TraitSelectMenu::ClearCheckBox() {
 bool TraitSelectMenu::IsWellFormedMenu() {
     for (int32_t i = 0; i < 18; ++i) {
         if (!pTiles[i]) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 void TraitSelectMenu::SetButtonAsHighlighted(int32_t a1, char a2) {
@@ -351,7 +351,7 @@ Tile* TraitSelectMenu::Create() {
     if (pMe) {
         int32_t iClass = pMe->GetClass();
         if (iClass == TraitSelectMenu::GetClassStatic()) {
-            pMe->Menu::SetMenuTile(static_cast<TileMenu*>(pTile), 0);
+            pMe->Menu::SetMenuTile(static_cast<TileMenu*>(pTile), false);
             if (!pMe->IsWellFormedMenu()) {
                 Warning("MENUS: Companion Wheel Menu Creation Failed... Are your menu and art resources up to date?");
                 return nullptr;
@@ -361,12 +361,12 @@ Tile* TraitSelectMenu::Create() {
             pMe->SetButtonAsHighlighted(0, 0);
             pMe->m_nLastMenuUpdateTime = BSGetTickCount();
             BSSoundHandle* pSound = BSAudio::QInstance().GetSoundHandleByName(&kSound, "UIPopUpMessageGeneral", 289u);
-            pSound->Play(0);
+            pSound->Play(false);
             if (pTile->GetFloat(4007) == 6006.0 || pTile->GetFloat(4007) == 102.0) {
                 float afValue = Tile::GetMaximumDepth();
-                pTile->Set(4013, afValue, 1);
+                pTile->Set(4013, afValue, true);
             }
-            pMe->Menu::PrepForVisibility(0);
+            pMe->Menu::PrepForVisibility(false);
             return pTile;
         }
     }

@@ -4,7 +4,7 @@
 #include "BSShader/BSShaderUtil.h"
 #include "Fallout/Misc/Main.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 void BSShaderSDM::InitSDM() {
     if (!bShaderInitialized) {

@@ -34,7 +34,7 @@ NiObject* NiBlendPoint3Interpolator::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject) NiBlendPoint3Interpolator;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_kPoint3Value = m_kPoint3Value;
@@ -159,7 +159,7 @@ NiObject* NiBlendPoint3Interpolator::CreateObject() {
     NiBlendPoint3Interpolator* pkObject =
         static_cast<NiBlendPoint3Interpolator*>(NiMemObject::operator new(sizeof(NiBlendPoint3Interpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     ::new (pkObject) NiBlendPoint3Interpolator;
     return pkObject;

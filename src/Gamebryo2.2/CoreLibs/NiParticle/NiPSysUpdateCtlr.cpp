@@ -33,8 +33,8 @@ NiObject* NiPSysUpdateCtlr::CreateClone(NiCloningProcess& kCloning) {
         return v3;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -123,7 +123,7 @@ bool NiPSysUpdateCtlr::TargetIsRequiredType() const {
 NiObject* NiPSysUpdateCtlr::CreateObject() {
     NiPSysUpdateCtlr* v0 = static_cast<NiPSysUpdateCtlr*>(NiMemObject::operator new(sizeof(NiPSysUpdateCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysUpdateCtlr;
 }

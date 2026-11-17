@@ -57,8 +57,8 @@ void CalmEffect::Update(float afSecondsElapsed) {
         else {
             v3 = 1;
         }
-        if (targetAsActor->IsDead((bool)0) || (targetAsActor->IsDying() || (!v3))) {
-            ActiveEffect::Dispel(0);
+        if (targetAsActor->IsDead(false) || (targetAsActor->IsDying() || (!v3))) {
+            ActiveEffect::Dispel(false);
         }
     }
 }
@@ -83,11 +83,11 @@ bool CalmEffect::CheckTarget(MagicTarget* apTarget) {
     }
     uint8_t result = 0;
     if (actor) {
-        if (((!actor->IsDead((bool)0)) && (!actor->IsDying())) && actor->IsInCombat()) {
+        if (((!actor->IsDead(false)) && (!actor->IsDying())) && actor->IsInCombat()) {
             afMagnitude = fMagnitude;
             level = actor->GetLevel();
             if (MagicFormulas::CheckTargetLevelMagnitude(level, afMagnitude)) {
-                return (bool)1;
+                return true;
             }
         }
     }

@@ -113,14 +113,10 @@ public:
 
     // Callbacks of a job type: a process function runs a job, the pop callback says whether the job taken leaves its
     // queue, the finish callback may create a follow-up job.
-    typedef JobStatus (*ProcessJobFunc)(hkJobQueue& queue, JobQueueEntry& jobInOut);
-    typedef JobPopFuncResult (*PopJobFunc)(
-        hkJobQueue& queue,
-        DynamicData* data,
-        JobQueueEntry& jobIn,
-        JobQueueEntry& jobOut
-    );
-    typedef JobCreationStatus (*FinishJobFunc)(
+    using ProcessJobFunc = JobStatus (*)(hkJobQueue& queue, JobQueueEntry& jobInOut);
+    using PopJobFunc =
+        JobPopFuncResult (*)(hkJobQueue& queue, DynamicData* data, JobQueueEntry& jobIn, JobQueueEntry& jobOut);
+    using FinishJobFunc = JobCreationStatus (*)(
         hkJobQueue& queue,
         DynamicData* data,
         const JobQueueEntry& jobIn,

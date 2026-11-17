@@ -76,7 +76,7 @@ NiObject* NiPSysEmitterInitialRadiusCtlr::CreateObject() {
     NiPSysEmitterInitialRadiusCtlr* v0 =
         static_cast<NiPSysEmitterInitialRadiusCtlr*>(NiMemObject::operator new(sizeof(NiPSysEmitterInitialRadiusCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysEmitterInitialRadiusCtlr;
 }

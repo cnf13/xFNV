@@ -87,34 +87,34 @@ void TESBipedModelForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESBipedModelForm::CompareComponent(BaseFormComponent* apCompareFC) {
     TESBipedModelForm* pCompare = dynamic_cast<TESBipedModelForm*>(apCompareFC);
     if (!pCompare) {
-        return 1;
+        return true;
     }
     if (std::memcmp(&bipedModelData, &pCompare->bipedModelData, sizeof(bipedModelData))) {
-        return 1;
+        return true;
     }
     if (bipedModel->CompareComponent(&pCompare->bipedModel[0])) {
-        return 1;
+        return true;
     }
     if (worldModel->CompareComponent(&pCompare->worldModel[0])) {
-        return 1;
+        return true;
     }
     if (inventoryIcon[0].CompareComponent(&pCompare->inventoryIcon[0])) {
-        return 1;
+        return true;
     }
     if (messageIcon->CompareComponent(&pCompare->messageIcon[0])) {
-        return 1;
+        return true;
     }
     if (bipedModel[1].CompareComponent(&pCompare->bipedModel[1])) {
-        return 1;
+        return true;
     }
     if (worldModel[1].CompareComponent(&pCompare->worldModel[1])) {
-        return 1;
+        return true;
     }
     if (inventoryIcon[1].CompareComponent(&pCompare->inventoryIcon[1])) {
-        return 1;
+        return true;
     }
     if (messageIcon[1].CompareComponent(&pCompare->messageIcon[1])) {
-        return 1;
+        return true;
     }
     return ConstraintTemplate.CompareComponent(&pCompare->ConstraintTemplate);
 }
@@ -308,7 +308,7 @@ TESModelTextureSwap* TESBipedModelForm::GetWorldTESModel(TESForm* apObj, TESObje
         TESActorBase* actorBase = static_cast<TESActorBase*>(owner);
         sex = actorBase->GetSex();
     }
-    return static_cast<TESModelTextureSwap*>(bipedModelForm->GetWorldTESModel(sex));
+    return bipedModelForm->GetWorldTESModel(sex);
 }
 
 TESModelTextureSwap* TESBipedModelForm::GetBipedTESModel(TESForm* apObj, TESObjectREFR* apRef) {
@@ -331,7 +331,7 @@ TESModelTextureSwap* TESBipedModelForm::GetBipedTESModel(TESForm* apObj, TESObje
 const char* TESBipedModelForm::GetMessageIcon(TESForm* apObj, TESObjectREFR* apRef) {
     TESBipedModelForm* v4 = dynamic_cast<TESBipedModelForm*>(apObj);
     if (!v4) {
-        return 0;
+        return nullptr;
     }
     if (!apRef) {
         return v4->messageIcon->GetMessageIconTextureName();
@@ -349,7 +349,7 @@ const char* TESBipedModelForm::GetMessageIcon(TESForm* apObj, TESObjectREFR* apR
 const char* TESBipedModelForm::GetWorldModel(TESForm* apObj, TESObjectREFR* apRef) {
     TESBipedModelForm* pbipedModel = dynamic_cast<TESBipedModelForm*>(apObj);
     if (!pbipedModel) {
-        return 0;
+        return nullptr;
     }
     if (!apRef) {
         return pbipedModel->worldModel[0].GetModel();
@@ -367,7 +367,7 @@ const char* TESBipedModelForm::GetWorldModel(TESForm* apObj, TESObjectREFR* apRe
 const char* TESBipedModelForm::GetIcon_0(TESForm* apObj, TESObjectREFR* apRef) {
     TESBipedModelForm* pbipedModel = dynamic_cast<TESBipedModelForm*>(apObj);
     if (!pbipedModel) {
-        return 0;
+        return nullptr;
     }
     if (!apRef) {
         return pbipedModel->inventoryIcon[0].GetTextureName();

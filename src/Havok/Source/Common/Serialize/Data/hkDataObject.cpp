@@ -165,8 +165,8 @@ hkDataObject::Handle* hkDataObject::getHandle(hkDataObject::Handle* apResult) co
     hkDataObject::Handle v6;
     hkDataObject::Handle v7;
     hkDataObjectImpl* m_impl = this->m_impl;
-    v6.p0 = 0;
-    v6.p1 = 0;
+    v6.p0 = nullptr;
+    v6.p1 = nullptr;
     if (m_impl) {
         v3 = ::new (&v7) hkDataObject::Handle(m_impl->getHandle());
     }
@@ -275,7 +275,7 @@ hkDataClass& hkDataClass::getParent(hkDataClass& arResult) const {
 }
 
 int32_t hkDataClass::isNull() const {
-    return m_impl == 0;
+    return m_impl == nullptr;
 }
 
 hkBool* hkDataClass::isSuperClass(hkBool* apResult, const hkDataClass& k) {

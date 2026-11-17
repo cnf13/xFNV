@@ -59,7 +59,7 @@ hkBool hkpCollisionFilterList::isCollisionEnabled(const hkpCollidable& a, const 
     }
     else {
         const hkpCollidable* v6 = &b;
-        while (1) {
+        while (true) {
             const hkpCollisionFilter* v7 = m_collisionFilters.m_data[v5];
             if (!v7->isCollisionEnabled(a, *v6).m_bool) {
                 break;
@@ -88,7 +88,7 @@ hkBool hkpCollisionFilterList::isCollisionEnabled(
         return result;
     }
     else {
-        while (1) {
+        while (true) {
             const hkpCollisionFilter* v10 = m_collisionFilters.m_data[v8];
             if (!v10->isCollisionEnabled(input, a, b, bContainer, bKey).m_bool) {
                 break;
@@ -119,7 +119,7 @@ hkBool hkpCollisionFilterList::isCollisionEnabled(
         return result;
     }
     else {
-        while (1) {
+        while (true) {
             hkBool v14;
             const hkpCollisionFilter* v12 = m_collisionFilters.m_data[v10];
             if (!(::new (&v14) hkBool(v12->isCollisionEnabled(
@@ -151,7 +151,7 @@ hkBool hkpCollisionFilterList::isCollisionEnabled(
         return result;
     }
     else {
-        while (1) {
+        while (true) {
             hkBool v11;
             const hkpCollisionFilter* v9 = m_collisionFilters.m_data[v7];
             if (!(::new (&v11) hkBool(v9->isCollisionEnabled(aInput, bShape, bContainer, bKey)))->m_bool) {
@@ -177,7 +177,7 @@ hkpCollisionFilterList::isCollisionEnabled(const hkpWorldRayCastInput& a, const 
     }
     else {
         const hkpCollidable* v6 = &collidableB;
-        while (1) {
+        while (true) {
             const hkpCollisionFilter* v7 = m_collisionFilters.m_data[v5];
             if (!v7->isCollisionEnabled(a, *v6).m_bool) {
                 break;

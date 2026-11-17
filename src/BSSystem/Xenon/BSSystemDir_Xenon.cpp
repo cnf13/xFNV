@@ -73,8 +73,7 @@ BSSystemFile::ErrorCode BSSystemDir::DoClose() {
 
 BSSystemDir* BSSystemDir::ClearFindAttributeByte() {
     FindData_.dwFileAttributes = static_cast<uint32_t>(
-        (static_cast<uint32_t>(FindData_.dwFileAttributes) & 0xFFFFFF00u) |
-        (static_cast<uint32_t>(static_cast<uint8_t>(0)))
+        (FindData_.dwFileAttributes & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(0)))
     );
     return this;
 }

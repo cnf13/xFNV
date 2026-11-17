@@ -117,21 +117,21 @@ void TESSkill::Copy(TESForm* apCopy) {
 bool TESSkill::Compare(TESForm* apCompare) {
     TESSkill* pComp = dynamic_cast<TESSkill*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
     void* FrustumPlanes = &pComp->kData;
     if (std::memcmp(&kData, FrustumPlanes, sizeof(kData))) {
-        return 1;
+        return true;
     }
     for (int32_t i = 0; i < 4; ++i) {
         if (kDescriptions[i].CompareComponent(&pComp->kDescriptions[i])) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void TESSkill::ResetData() {
@@ -146,6 +146,6 @@ void TESSkill::ResetData() {
     for (j = 0; j < 4; ++j) {
         (&kDescriptions[j])->InitializeDataComponent();
     }
-    SetAltered((bool)0);
+    SetAltered(false);
     TESForm::ClearFiles();
 }

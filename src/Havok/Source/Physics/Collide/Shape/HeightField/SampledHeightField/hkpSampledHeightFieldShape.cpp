@@ -321,7 +321,7 @@ void hkpSampledHeightFieldShape::castSphere(
     }
     v6.m_from.m_quad[1] = v6.m_from.m_quad[1] + m_radius;
     v6.m_to.m_quad[1] = m_radius + v6.m_to.m_quad[1];
-    castRayInternal(v6, cdBody, static_cast<hkBool>(1), input.m_maxExtraPenetration, collector);
+    castRayInternal(v6, cdBody, static_cast<hkBool>(true), input.m_maxExtraPenetration, collector);
 }
 
 // The cell's two triangles are split along the diagonal the triangle flip picks. Reads the four corner heights it needs

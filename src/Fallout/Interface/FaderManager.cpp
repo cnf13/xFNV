@@ -36,7 +36,7 @@ FaderDataArray FaderData = {
 
 FaderManager::FaderManager() : pRootBelowMenus(nullptr), pRootAboveMenus(nullptr) {
     for (int32_t n = 0; n < 3; ++n) {
-        FaderData[n].bFadingIn = 0;
+        FaderData[n].bFadingIn = false;
         FaderData[n].pRoot = nullptr;
         FaderData[n].fAlpha = 0.0f;
         FaderData[n].spTileShaderProp = nullptr;
@@ -45,7 +45,7 @@ FaderManager::FaderManager() : pRootBelowMenus(nullptr), pRootAboveMenus(nullptr
 
 FaderManager::~FaderManager() {
     for (int32_t n = 0; n < 3; ++n) {
-        FaderData[n].bFadingIn = 0;
+        FaderData[n].bFadingIn = false;
         FaderData[n].pRoot = nullptr;
         FaderData[n].fAlpha = 0.0f;
         FaderData[n].spTileShaderProp = nullptr;
@@ -113,13 +113,13 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
     NiPoint3 v57;
     NiPoint3 dst;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_INTERFACE, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Interface\\FaderManager.cpp", 135
+        MEM_CONTEXT_INTERFACE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Interface\\FaderManager.cpp", 135
     );
     if (FaderData[aeFader].pRoot) {
         if (FaderData[aeFader].bFadingIn) {
             return;
         }
-        RemoveFader(aeFader, 1);
+        RemoveFader(aeFader, true);
     }
     void* ptr = ourMalloc(4 * sizeof(NiPoint3));
     if (ptr) {
@@ -127,7 +127,7 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
         pvertices = static_cast<NiPoint3*>(ptr);
     }
     else {
-        pvertices = 0;
+        pvertices = nullptr;
     }
     void* v59 = ourMalloc(4 * sizeof(NiPoint2));
     if (v59) {
@@ -135,7 +135,7 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
         ptextures = static_cast<NiPoint2*>(v59);
     }
     else {
-        ptextures = 0;
+        ptextures = nullptr;
     }
     uint16_t* pvertOrder = static_cast<uint16_t*>(_NiMalloc(6 * sizeof(uint16_t)));
     float fhalfScreenWidth = static_cast<double>(Renderer::GetScreenWidth()) * 0.5;
@@ -179,7 +179,7 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
         faderNode = ::new (v49) NiNode(0);
     }
     else {
-        faderNode = 0;
+        faderNode = nullptr;
     }
     FaderData[aeFader].pRoot = faderNode;
     NiFixedString* kName = ::new (static_cast<void*>(&apString))
@@ -191,9 +191,9 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
         palphaProp = ::new (v46) NiAlphaProperty;
     }
     else {
-        palphaProp = 0;
+        palphaProp = nullptr;
     }
-    palphaProp->SetAlphaBlending(1);
+    palphaProp->SetAlphaBlending(true);
     FaderData[aeFader].pRoot->AttachProperty(palphaProp);
     NiTriShape* v44 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
     if (v44) {
@@ -201,7 +201,7 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
             NiTriShape(4, pvertices, nullptr, nullptr, ptextures, 1, NiGeometryData::NBT_METHOD_NONE, 2, pvertOrder);
     }
     else {
-        ptri = 0;
+        ptri = nullptr;
     }
     FaderData[aeFader].pRoot->AttachChild(ptri, 1);
     BSStringT<char> textureFilename;
@@ -212,7 +212,9 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
     v43.~NiFixedString();
     NiFixedString* kFilename =
         ::new (static_cast<void*>(&v42)) NiFixedString(static_cast<const char*>(textureFilename.pString));
-    NiPointer<NiSourceTexture> ptexture(NiSourceTexture::Create(*kFilename, NiSourceTexture::ms_kDefaultPrefs, 1, 0));
+    NiPointer<NiSourceTexture> ptexture(
+        NiSourceTexture::Create(*kFilename, NiSourceTexture::ms_kDefaultPrefs, true, false)
+    );
     v42.~NiFixedString();
     float falpha = 0.0f;
     if (abBeginBlack || afFadeSpeed == 0.0) {
@@ -221,10 +223,10 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
     }
     TileShaderProperty* v41 = static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
     if (v41) {
-        ptsp = ::new (v41) TileShaderProperty(0);
+        ptsp = ::new (v41) TileShaderProperty(false);
     }
     else {
-        ptsp = 0;
+        ptsp = nullptr;
     }
     NiSourceTexture* negativeHeightb = ptexture.m_pObject;
     ptsp->SetTileTexture(negativeHeightb);
@@ -241,7 +243,7 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
     }
     pparent->AttachChild(FaderData[aeFader].pRoot, 1);
     pparent->UpdateProperties();
-    NiUpdateData UpdateData(0.0f, 0, 0);
+    NiUpdateData UpdateData(0.0f, false, false);
     pparent->Update(UpdateData);
     FaderData[aeFader].fFadeSpeed = afFadeSpeed;
     FaderData[aeFader].bFadingIn = !abBeginBlack;
@@ -318,13 +320,13 @@ void FaderManager::RemoveFader(FADER_ENUM aeFader, bool abForce) {
         if (abForce || bClosingAllSupportMenus) {
             NiNode* Parent = FaderData[aeFader].pRoot->m_pkParent;
             Parent->DetachChild(FaderData[aeFader].pRoot);
-            FaderData[aeFader].pRoot = 0;
+            FaderData[aeFader].pRoot = nullptr;
             FaderData[aeFader].fAlpha = 0.0f;
-            FaderData[aeFader].spTileShaderProp.operator=(static_cast<TileShaderProperty*>(0));
-            TES::pInstance->ShowLoadingMenu(0, 0, 0);
+            FaderData[aeFader].spTileShaderProp.operator=(static_cast<TileShaderProperty*>(nullptr));
+            TES::pInstance->ShowLoadingMenu(false, nullptr, false);
         }
         else {
-            FaderData[aeFader].bFadingIn = 0;
+            FaderData[aeFader].bFadingIn = false;
             if (FaderData[aeFader].fAlpha == 1.0) {
                 FaderData[aeFader].fAlpha = 0.9999f;
             }

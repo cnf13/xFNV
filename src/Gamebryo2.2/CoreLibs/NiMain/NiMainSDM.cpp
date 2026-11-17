@@ -100,7 +100,7 @@ void FreeMemoryBlocks() {
         while (v1);
     }
     uiMemBlockCount = 0;
-    apMem = 0;
+    apMem = nullptr;
 }
 
 // The first instance registers the library's Init and Shutdown with the static data manager.
@@ -112,7 +112,7 @@ NiMainSDM::NiMainSDM() {
 
 void NiMainSDM::Init() {
     if (!NiMainSDM::ms_bInitialized) {
-        NiMainSDM::ms_bInitialized = 1;
+        NiMainSDM::ms_bInitialized = true;
         NiGlobalStringTable::_SDMInit();
         CreateSinTable();
         NiShaderConstantMap::_SDMInit();
@@ -218,7 +218,7 @@ void NiMainSDM::Init() {
 
 void NiMainSDM::Shutdown() {
     if (NiMainSDM::ms_bInitialized) {
-        NiMainSDM::ms_bInitialized = 0;
+        NiMainSDM::ms_bInitialized = false;
         NiStream::UnregisterLoader("BSPackedAdditionalGeometryData");
         NiStream::UnregisterLoader("NiAdditionalGeometryData");
         NiStream::UnregisterLoader("NiAlphaAccumulator");
@@ -328,6 +328,6 @@ void NiTAbstractPoolAllocator<uint32_t>::_SDMShutdown() {
         }
         while (m_pkNext);
     }
-    NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem = 0;
-    NiTAbstractPoolAllocator<uint32_t>::ms_pkBlockHeader = 0;
+    NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem = nullptr;
+    NiTAbstractPoolAllocator<uint32_t>::ms_pkBlockHeader = nullptr;
 }

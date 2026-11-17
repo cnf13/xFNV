@@ -33,7 +33,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Reconstruction.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 NiPoint3* NiGeometry::GetVertices() {
@@ -127,7 +127,7 @@ void BGSAutoWater::GatherLineSegments(TESObjectCELL* apCell) {
     if (pland) {
         bool bloaded = pland->HasVertices();
         if (!bloaded) {
-            pland->LoadVertices(0);
+            pland->LoadVertices(false);
         }
         using edgeIntersect_t = BSSimpleArray<BSSimpleArray<NiPoint3, 1024>, 1024>;
         edgeIntersect_t edgeIntersect;
@@ -136,13 +136,13 @@ void BGSAutoWater::GatherLineSegments(TESObjectCELL* apCell) {
             tmp_t tmp;
             edgeIntersect.Insert(static_cast<uint32_t>(i), tmp);
         }
-        bool badjustlandheight = 0;
+        bool badjustlandheight = false;
         float fbaseheight = 0.0f;
         if (apCell->GetWorldSpace()) {
             TESWorldSpace* WorldSpace = apCell->GetWorldSpace();
             if (WorldSpace->GetNeedsWaterAdjustment()) {
                 fbaseheight = pland->GetBaseHeight();
-                badjustlandheight = 1;
+                badjustlandheight = true;
             }
         }
         NiPoint3** pverts = pland->GetVertexArray();
@@ -164,15 +164,15 @@ void BGSAutoWater::GatherLineSegments(TESObjectCELL* apCell) {
                     NiPoint3 n(0.0f, 0.0f, 1.0f);
                     NiPlane waterplane(n, p);
                     uint16_t ucount = 0;
-                    bool bvertIntersect = 0;
-                    bool bcoPlanar = 0;
+                    bool bvertIntersect = false;
+                    bool bcoPlanar = false;
                     int32_t v1flags = BGSAutoWater::WhichCellEdge(apCell, v1);
                     int32_t v2flags = BGSAutoWater::WhichCellEdge(apCell, v2_2);
                     int32_t v3flags = BGSAutoWater::WhichCellEdge(apCell, v3_2);
                     int32_t isect = NavMeshMath::SegmentPlaneIntersection(v1, v2_2, p, n, &intpt);
                     if (isect == 1) {
                         if (v1 == intpt || v2_2 == intpt) {
-                            bvertIntersect = 1;
+                            bvertIntersect = true;
                         }
                         BGSAutoWater::pLineSegmentArray->Add(intpt);
                         ++ucount;
@@ -197,7 +197,7 @@ void BGSAutoWater::GatherLineSegments(TESObjectCELL* apCell) {
                     }
                     else {
                         if (isect == -1) {
-                            bcoPlanar = 1;
+                            bcoPlanar = true;
                             BGSAutoWater::pLineSegmentArray->Add(v1);
                             BGSAutoWater::pLineSegmentArray->Add(v2_2);
                             ucount += 2;
@@ -205,13 +205,13 @@ void BGSAutoWater::GatherLineSegments(TESObjectCELL* apCell) {
                     }
                     isect = NavMeshMath::SegmentPlaneIntersection(v1, v3_2, p, n, &intpt);
                     if (isect == 1) {
-                        bool baddpoint = 1;
+                        bool baddpoint = true;
                         if (v1 == intpt || v3_2 == intpt) {
                             if (bvertIntersect || bcoPlanar) {
-                                baddpoint = 0;
+                                baddpoint = false;
                             }
                             else {
-                                bvertIntersect = 1;
+                                bvertIntersect = true;
                             }
                         }
                         if (baddpoint) {
@@ -239,7 +239,7 @@ void BGSAutoWater::GatherLineSegments(TESObjectCELL* apCell) {
                     }
                     else {
                         if (isect == -1) {
-                            bcoPlanar = 1;
+                            bcoPlanar = true;
                             for (int32_t i_2 = 0; i_2 < ucount; ++i_2) {
                                 BGSAutoWater::pLineSegmentArray->RemoveLast();
                             }
@@ -250,9 +250,9 @@ void BGSAutoWater::GatherLineSegments(TESObjectCELL* apCell) {
                     }
                     isect = NavMeshMath::SegmentPlaneIntersection(v2_2, v3_2, p, n, &intpt);
                     if (isect == 1) {
-                        bool baddpoint_2 = 1;
+                        bool baddpoint_2 = true;
                         if (v2_2 == intpt || (v3_2 == intpt && (bvertIntersect || bcoPlanar))) {
-                            baddpoint_2 = 0;
+                            baddpoint_2 = false;
                         }
                         if (baddpoint_2) {
                             BGSAutoWater::pLineSegmentArray->Add(intpt);
@@ -473,7 +473,7 @@ void BGSAutoWater::GeneratePolygons(TESObjectCELL* apCell) {
     NiPoint3 v0;
     NiPoint3 v1;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_WATER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BGSAutoWater.cpp", 522
+        MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BGSAutoWater.cpp", 522
     );
     while (BGSAutoWater::pLineSegmentArray->iSize) {
         BSSimpleArray<NiPoint3>* pverts;
@@ -613,7 +613,7 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
     FNVD_INLINED_LOCAL(NiFixedString, kWaterName, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiFixedString, kNodeName, std::nullopt, std::nullopt);
     AutoMemContext kMemContext(
-        MEM_CONTEXT_WATER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BGSAutoWater.cpp", 717
+        MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BGSAutoWater.cpp", 717
     );
     if (BGSAutoWater::pPolygonList) {
         float z = apCell->GetWaterHeight();
@@ -621,7 +621,7 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
         float a1 = Land->GetWorldOffsetForBlock(0).y;
         TESObjectLAND* v2 = apCell->GetLand();
         NiPoint3 worldtranslate(v2->GetWorldOffsetForBlock(0).x, a1, z);
-        bool bcreatedHavok = 0;
+        bool bcreatedHavok = false;
         NiTListItem<BSPolygon2D*>* pos = BGSAutoWater::pPolygonList->GetHeadPos();
         while (pos) {
             NiTListItem<BSPolygon2D*>* next = BGSAutoWater::pPolygonList->GetNextPos(pos);
@@ -647,7 +647,7 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
                             pwaterRef = ::new (v41) TESObjectREFR;
                         }
                         else {
-                            pwaterRef = 0;
+                            pwaterRef = nullptr;
                         }
                         WaterShaderProperty* v40 =
                             static_cast<WaterShaderProperty*>(NiMemObject::operator new(sizeof(WaterShaderProperty)));
@@ -655,7 +655,7 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
                             pwatershadprop = ::new (v40) WaterShaderProperty;
                         }
                         else {
-                            pwatershadprop = 0;
+                            pwatershadprop = nullptr;
                         }
                         ppoly->Get3D()->AttachProperty(pwatershadprop);
                         BSShaderManager::PrepareObject(ppoly->GetRootNode(), 0, 0);
@@ -665,7 +665,7 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
                             pstencilprop = ::new (v39) NiStencilProperty;
                         }
                         else {
-                            pstencilprop = 0;
+                            pstencilprop = nullptr;
                         }
                         pstencilprop->SetDrawMode(NiStencilProperty::DRAW_BOTH);
                         ppoly->Get3D()->AttachProperty(pstencilprop);
@@ -677,10 +677,10 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
                             pfadenode = ::new (v38) BSFadeNode;
                         }
                         else {
-                            pfadenode = 0;
+                            pfadenode = nullptr;
                         }
-                        pfadenode->SetIgnoreFade(1);
-                        pwaterRef->Set3D(pfadenode, 1);
+                        pfadenode->SetIgnoreFade(true);
+                        pwaterRef->Set3D(pfadenode, true);
                         pfadenode->SetTranslate(worldtranslate);
                         pwaterRef->SetLocationOnReferenceSimple(worldtranslate);
                         BSMultiBoundAABB* v37 =
@@ -689,7 +689,7 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
                             pmbshape = ::new (v37) BSMultiBoundAABB;
                         }
                         else {
-                            pmbshape = 0;
+                            pmbshape = nullptr;
                         }
                         float minx = 0.0f;
                         float miny = 0.0f;
@@ -744,7 +744,7 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
                             pmb = ::new (v36) BSMultiBound;
                         }
                         else {
-                            pmb = 0;
+                            pmb = nullptr;
                         }
                         pmb->SetShape(pmbshape);
                         BSMultiBoundNode* v35 =
@@ -753,23 +753,23 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
                             pmbnode = ::new (v35) BSMultiBoundNode;
                         }
                         else {
-                            pmbnode = 0;
+                            pmbnode = nullptr;
                         }
                         pmbnode->SetMultiBound(pmb);
                         pfadenode->AttachChild(pmbnode, 1);
                         pmbnode->AttachChild(ppoly->GetRootNode(), 1);
-                        NiUpdateData tmp(0.0f, 0, 0);
+                        NiUpdateData tmp(0.0f, false, false);
                         pfadenode->Update(tmp);
-                        apCell->AddReference(pwaterRef, 0);
+                        apCell->AddReference(pwaterRef, false);
                         pwaterRef->SetTemporary();
                         if (bAutoWaterUsesHavokShapes.Bool() && !bcreatedHavok) {
                             pwaterRef->InitHavokForPlaceableWater();
-                            bcreatedHavok = 1;
+                            bcreatedHavok = true;
                         }
                         if (ppoly) {
                             delete ppoly;
                         }
-                        ppoly = 0;
+                        ppoly = nullptr;
                         BGSAutoWater::pPolygonList->RemovePos(pos);
                     }
                 }
@@ -789,10 +789,10 @@ bool BGSAutoWater::IsPolyonInsidePolygon(BSPolygon2D* apPoly1, BSPolygon2D* apPo
         float z = v3->z;
         NiPoint2 vec2(v3->x, v3->y);
         if (apPoly2->IsPointInsidePoly(vec2)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 int32_t BGSAutoWater::WhichCellEdge(TESObjectCELL* apCell, NiPoint3 arVert) {
@@ -857,7 +857,7 @@ NiPoint3** TESObjectLAND::GetVertexArray() {
         return pLoadedData->ppVertices;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

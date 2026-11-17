@@ -39,8 +39,8 @@ NiObject* NiBoolInterpolator::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -259,7 +259,7 @@ NiBoolKey* NiBoolInterpolator::GetKeys(uint32_t& uiNumKeys, NiAnimationKey::KeyT
         uiNumKeys = 0;
         eType = NiAnimationKey::NOINTERP;
         ucSize = 0;
-        return 0;
+        return nullptr;
     }
 }
 
@@ -287,7 +287,7 @@ NiObject* NiBoolInterpolator::CreateObject() {
     NiBoolInterpolator* pkObject =
         static_cast<NiBoolInterpolator*>(NiMemObject::operator new(sizeof(NiBoolInterpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiBoolInterpolator(static_cast<NiBoolData*>(nullptr));
 }

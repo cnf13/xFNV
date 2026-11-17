@@ -47,7 +47,7 @@ struct hkgpAbstractMeshDefinitions {
     struct Vertex
       : List<VERTEX, BASE, hkGeometryProcessing::PoolAllocator<VERTEX, 32, hkContainerHeapAllocator>>::Item {
         // The base the mesh's vertex list is instantiated with.
-        typedef BASE tItemBase;
+        using tItemBase = BASE;
 
         // The SDK's isOrdered: a orders before b (its compare below 0) or equals it (0), that is b does not order
         // before a by VERTEX's operator<.
@@ -61,7 +61,7 @@ struct hkgpAbstractMeshDefinitions {
     struct Triangle
       : List<TRIANGLE, BASE, hkGeometryProcessing::PoolAllocator<TRIANGLE, 32, hkContainerHeapAllocator>>::Item {
         // The base the mesh's triangle list is instantiated with.
-        typedef BASE tItemBase;
+        using tItemBase = BASE;
 
         VERTEX m_vertices[3];
         uintptr_t m_links[3];
@@ -111,11 +111,11 @@ struct hkgpTopology {
 template <typename EDGE, typename VERTEX, typename TRIANGLE, typename ALLOCATOR>
 class hkgpAbstractMesh : public hkReferencedObject {
 public:
-    typedef hkGeometryProcessing::PoolAllocator<VERTEX, 32, ALLOCATOR> VertexPoolAllocator;
-    typedef hkGeometryProcessing::PoolAllocator<TRIANGLE, 32, ALLOCATOR> TrianglePoolAllocator;
-    typedef hkgpAbstractMeshDefinitions::List<VERTEX, typename VERTEX::tItemBase, VertexPoolAllocator> VertexList;
-    typedef hkgpAbstractMeshDefinitions::List<TRIANGLE, typename TRIANGLE::tItemBase, TrianglePoolAllocator>
-        TriangleList;
+    using VertexPoolAllocator = hkGeometryProcessing::PoolAllocator<VERTEX, 32, ALLOCATOR>;
+    using TrianglePoolAllocator = hkGeometryProcessing::PoolAllocator<TRIANGLE, 32, ALLOCATOR>;
+    using VertexList = hkgpAbstractMeshDefinitions::List<VERTEX, typename VERTEX::tItemBase, VertexPoolAllocator>;
+    using TriangleList =
+        hkgpAbstractMeshDefinitions::List<TRIANGLE, typename TRIANGLE::tItemBase, TrianglePoolAllocator>;
 
     // Walks the mesh's edges, each one once; only m_edge is declared.
     struct EdgeIterator {
@@ -325,7 +325,7 @@ public:
 
     // A directed edge of a triangle.
     struct Edge : hkgpTopology::Edge<Edge, Vertex, Triangle, Vertex*> {
-        typedef hkgpTopology::Edge<Edge, Vertex, Triangle, Vertex*> tBase;
+        using tBase = hkgpTopology::Edge<Edge, Vertex, Triangle, Vertex*>;
     };
 
     // The hash table's box of an edge's data: the edge's two vertices (its key) and the data.

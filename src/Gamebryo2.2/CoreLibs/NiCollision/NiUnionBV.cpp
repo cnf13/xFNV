@@ -70,8 +70,8 @@ NiBoundingVolume* NiUnionBV::Create() const {
         v8 = pUnion;
     }
     else {
-        v8 = 0;
-        pUnion = 0;
+        v8 = nullptr;
+        pUnion = nullptr;
     }
     pUnion->m_kBoundingVolume.SetSize(m_kBoundingVolume.m_usSize);
     if (!m_kBoundingVolume.m_usSize) {
@@ -110,7 +110,7 @@ NiBoundingVolume* NiUnionBV::Clone() const {
         return ::new (v2) NiUnionBV(*this);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -188,7 +188,7 @@ void NiUnionBV::RemoveAllBoundingVolumes() {
 // game does.
 NiBoundingVolume* NiUnionBV::CreateFromStream(NiStream& stream) {
     NiUnionBV* pkMemory = static_cast<NiUnionBV*>(MemoryManager_Singleton.Allocate(sizeof(NiUnionBV)));
-    NiUnionBV* pkABV = 0;
+    NiUnionBV* pkABV = nullptr;
     if (pkMemory) {
         pkABV = ::new (pkMemory) NiUnionBV;
     }

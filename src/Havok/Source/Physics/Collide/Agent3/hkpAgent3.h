@@ -15,7 +15,7 @@ class hkStatisticsCollector;
 class hkVector4;
 
 // The SDK's hkpAgentData is void: the bytes of an agent's data, in front of its entry.
-typedef void hkpAgentData;
+using hkpAgentData = void;
 
 // The function types of a stream (agent3) collision agent: the dispatcher keeps one table of them per agent type.
 // The constraint owners are hkCollisionConstraintOwner, Havok's name for hkpConstraintOwner here; the times are
@@ -46,25 +46,25 @@ namespace hkAgent3 {
         STREAM_CALL_AGENT_WITH_TRANSFORM = STREAM_CALL_AGENT | TRANSFORM_FLAG,
     };
 
-    typedef hkpAgentData* (*CreateFunc)(const hkpAgent3Input& input, hkpAgentEntry* entry, hkpAgentData* freeMemory);
-    typedef void (*DestroyFunc)(
+    using CreateFunc = hkpAgentData* (*)(const hkpAgent3Input& input, hkpAgentEntry* entry, hkpAgentData* freeMemory);
+    using DestroyFunc = void (*)(
         hkpAgentEntry* entry,
         hkpAgentData* agentData,
         hkpContactMgr* mgr,
         hkpConstraintOwner& constraintOwner,
         hkpCollisionDispatcher* dispatcher
     );
-    typedef hkpAgentData* (*CleanupFunc)(
+    using CleanupFunc = hkpAgentData* (*)(
         hkpAgentEntry* entry,
         hkpAgentData* agentData,
         hkpContactMgr* mgr,
         hkpConstraintOwner& constraintOwner
     );
-    typedef void (*RemovePointFunc)(hkpAgentEntry* entry, hkpAgentData* agentData, uint16_t idToRemove);
-    typedef void (*CommitPotentialFunc)(hkpAgentEntry* entry, hkpAgentData* agentData, uint16_t newId);
-    typedef void (*CreateZombieFunc)(hkpAgentEntry* entry, hkpAgentData* agentData, uint16_t idToBecomeZombie);
+    using RemovePointFunc = void (*)(hkpAgentEntry* entry, hkpAgentData* agentData, uint16_t idToRemove);
+    using CommitPotentialFunc = void (*)(hkpAgentEntry* entry, hkpAgentData* agentData, uint16_t newId);
+    using CreateZombieFunc = void (*)(hkpAgentEntry* entry, hkpAgentData* agentData, uint16_t idToBecomeZombie);
     // Callers (hkpWorldAgentUtil) pass the pair's contact manager before the constraint owner.
-    typedef void (*UpdateFilterFunc)(
+    using UpdateFilterFunc = void (*)(
         hkpAgentEntry* entry,
         hkpAgentData* agentData,
         const hkpCdBody& bodyA,
@@ -75,27 +75,27 @@ namespace hkAgent3 {
     );
     // The agent3 bridge's calcStatisticsFunc reports the child agent stored at agentData to the collector, its fourth
     // argument.
-    typedef void (*CalcStatisticsFunc)(
+    using CalcStatisticsFunc = void (*)(
         hkpAgentEntry* entry,
         hkpAgentData* agentData,
         const hkpCollisionInput& input,
         hkStatisticsCollector* collector
     );
-    typedef void (*InvalidateTimFunc)(hkpAgentEntry* entry, hkpAgentData* agentData, const hkpCollisionInput& input);
-    typedef void (*WarpTimeFunc)(
+    using InvalidateTimFunc = void (*)(hkpAgentEntry* entry, hkpAgentData* agentData, const hkpCollisionInput& input);
+    using WarpTimeFunc = void (*)(
         hkpAgentEntry* entry,
         hkpAgentData* agentData,
         float oldTime,
         float newTime,
         const hkpCollisionInput& input
     );
-    typedef void (*SepNormalFunc)(
+    using SepNormalFunc = void (*)(
         const hkpAgent3Input& input,
         hkpAgentEntry* entry,
         hkpAgentData* agentData,
         hkVector4& separatingNormalOut
     );
-    typedef hkpAgentData* (*ProcessFunc)(
+    using ProcessFunc = hkpAgentData* (*)(
         const hkpAgent3ProcessInput& input,
         hkpAgentEntry* entry,
         hkpAgentData* agentData,

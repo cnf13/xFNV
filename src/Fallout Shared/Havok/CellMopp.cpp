@@ -34,7 +34,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Reconstruction.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 // The game settings this file defines, with their IDs and values, in initialization order.
@@ -85,7 +85,7 @@ bhkWorldM* CellMopp::GetParent() {
 }
 
 bool CellMopp::Make(bhkWorld* apWorld, const NiPoint3& arPosition, const NiQuaternion& arRotation) {
-    bool bres = 0;
+    bool bres = false;
     if (apWorld) {
         if (QCreated()) {
             NiQuaternion rot;

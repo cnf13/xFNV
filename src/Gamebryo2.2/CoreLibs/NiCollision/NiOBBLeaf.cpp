@@ -95,17 +95,17 @@ bool NiOBBLeaf::TestCollision(
         pTestNode->m_uiChangeStamp = uiChangeStamp1;
     }
     if (!m_box.TestIntersection(pTestNode->m_box)) {
-        return 0;
+        return false;
     }
     if (pTestNode->IsLeaf()) {
-        return 1;
+        return true;
     }
     if (!iTestMaxDepth) {
-        return 1;
+        return true;
     }
     NiOBBNode* m_pLeft = pTestNode->m_pLeft;
     if (!m_pLeft && !pTestNode->m_pRight) {
-        return 1;
+        return true;
     }
     return TestCollision(m_pLeft, pkObj0, pkObj1, iMaxDepth, iTestMaxDepth - 1, uiChangeStamp0, uiChangeStamp1) ||
         TestCollision(

@@ -52,80 +52,80 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "SDK/MSVC/rtti.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 bool BGSSaveLoadGlobalData::LoadGlobalData(uint32_t auiGlobalDataType, BGSLoadGameBuffer* apLoadGameBuffer) {
     bool result;
     if (auiGlobalDataType > 1000) {
     LABEL_18:;
         SaveGameWarning("SAVELOAD: Unknown global data type %i in LoadGlobalData()", auiGlobalDataType);
-        return 0;
+        return false;
     }
     else {
         if (auiGlobalDataType == 1000) {
-            return 1;
+            return true;
         }
         else {
             switch (auiGlobalDataType) {
                 case 0u: {
                     MiscStatManager::LoadGame(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 1u: {
                     BGSSaveLoadGlobalData::LoadLocationData(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 2u: {
                     TES::pInstance->LoadGame(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 3u: {
                     BGSSaveLoadGlobalData::LoadGlobals(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 4u: {
                     ReferenceProcessLists.LoadGame(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 5u: {
                     pCombatManager->LoadGame(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 6u: {
                     Interface::LoadGame(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 7u: {
                     BGSSaveLoadGlobalData::LoadEffects(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 8u: {
                     Sky* Instance = Sky::GetInstance();
                     Instance->LoadGame(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 9u: {
                     ActorCause::LoadActorCausesList(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 10u: {
                     FalloutRadio::LoadGame(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 11u: {
                     FalloutAudio::LoadGame(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 default: {
@@ -159,64 +159,64 @@ bool BGSSaveLoadGlobalData::InitGlobalData(uint32_t aiGlobalDataType, BGSLoadGam
     if (aiGlobalDataType > 1000) {
     LABEL_18:;
         SaveGameWarning("DEFAULT: Unknown global data type %i in InitGlobalData()", aiGlobalDataType);
-        return 0;
+        return false;
     }
     else {
         if (aiGlobalDataType == 1000) {
-            return 0;
+            return false;
         }
         else {
             switch (aiGlobalDataType) {
                 case 0u: {
-                    result = 0;
+                    result = false;
                     break;
                 }
                 case 1u: {
-                    result = 0;
+                    result = false;
                     break;
                 }
                 case 2u: {
-                    result = 0;
+                    result = false;
                     break;
                 }
                 case 3u: {
-                    result = 0;
+                    result = false;
                     break;
                 }
                 case 4u: {
                     ReferenceProcessLists.InitLoadGame(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 5u: {
                     pCombatManager->InitLoadGame(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 6u: {
-                    result = 0;
+                    result = false;
                     break;
                 }
                 case 7u: {
-                    result = 0;
+                    result = false;
                     break;
                 }
                 case 8u: {
-                    result = 0;
+                    result = false;
                     break;
                 }
                 case 9u: {
                     ActorCause::InitLoadActorCausesList(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 10u: {
                     FalloutRadio::InitLoadGame(apLoadGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 11u: {
-                    result = 0;
+                    result = false;
                     break;
                 }
                 default: {
@@ -343,73 +343,73 @@ bool BGSSaveLoadGlobalData::SaveGlobalData(uint32_t aiGlobalDataType, BGSSaveGam
     if (aiGlobalDataType > 1000) {
     LABEL_18:;
         SaveGameWarning("SAVELOAD: Unknown global data type %i in SaveGlobalData()", aiGlobalDataType);
-        return 0;
+        return false;
     }
     else {
         if (aiGlobalDataType == 1000) {
-            return 1;
+            return true;
         }
         else {
             switch (aiGlobalDataType) {
                 case 0u: {
                     MiscStatManager::SaveGame(apSaveGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 1u: {
                     BGSSaveLoadGlobalData::SaveLocationData(apSaveGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 2u: {
                     TES::pInstance->SaveGameBGS(apSaveGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 3u: {
                     BGSSaveLoadGlobalData::SaveGlobals(apSaveGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 4u: {
                     ReferenceProcessLists.SaveGame(apSaveGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 5u: {
                     pCombatManager->SaveGame(apSaveGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 6u: {
                     Interface::SaveGame(apSaveGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 7u: {
                     BGSSaveLoadGlobalData::SaveEffects(apSaveGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 8u: {
                     Sky* Instance = Sky::GetInstance();
                     Instance->SaveGame(apSaveGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 9u: {
                     ActorCause::SaveActorCausesList(apSaveGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 10u: {
                     FalloutRadio::SaveGame(apSaveGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 case 11u: {
                     FalloutAudio::SaveGame(apSaveGameBuffer);
-                    result = 1;
+                    result = true;
                     break;
                 }
                 default: {
@@ -459,12 +459,12 @@ void BGSSaveLoadGlobalData::LoadLocationData(BGSLoadGameBuffer* apLoadGameBuffer
     TESForm* pworld = TESForm::GetFormByNumericID(v3);
     apLoadGameBuffer->LoadData(&playerLocation, 12u);
     LoadingMenu::LoadGame(apLoadGameBuffer);
-    bool bvalidPlayerLocation = 1;
+    bool bvalidPlayerLocation = true;
     if (pworld) {
         if (pworld->GetFormType() == CELL_ID) {
             if (pPlayer->GetParentCell() != pworld) {
                 NiPoint3 v32 = pPlayer->GetAngleOnReference();
-                pPlayer->PositionPlayer(playerLocation, v32, static_cast<TESObjectCELL*>(pworld), 0);
+                pPlayer->PositionPlayer(playerLocation, v32, static_cast<TESObjectCELL*>(pworld), false);
             }
             if (ptesWorldSpace) {
                 TES::pInstance->SetWorldSpace(ptesWorldSpace);
@@ -480,45 +480,45 @@ void BGSSaveLoadGlobalData::LoadLocationData(BGSLoadGameBuffer* apLoadGameBuffer
                 TESWorldSpace* pworld_2 = static_cast<TESWorldSpace*>(pworld);
                 if (static_cast<TESWorldSpace*>(pworld)->TESWorldSpace::GetHasBorderRegion() &&
                     gs_bBorderRegionsEnabled_General.Bool() && !pworld_2->IsPointInBorderRegion(playerLocation)) {
-                    bvalidPlayerLocation = 0;
+                    bvalidPlayerLocation = false;
                 }
                 if (bvalidPlayerLocation) {
                     centerGridLocation.x = static_cast<float>(icurrentGridX << 12);
                     centerGridLocation.y = static_cast<float>(icurrentGridY << 12);
                     centerGridLocation.z = 0.0f;
-                    TES::pInstance->UpdateCurrentGridCell(&centerGridLocation, 0);
-                    TES::pInstance->ShowLoadingMenu(1, pworld, 0);
+                    TES::pInstance->UpdateCurrentGridCell(&centerGridLocation, false);
+                    TES::pInstance->ShowLoadingMenu(true, pworld, false);
                     int32_t icellX = FloatToInt(playerLocation.x) >> 12;
                     int32_t icellY = FloatToInt(playerLocation.y) >> 12;
-                    TESObjectCELL* pcell = pDataHandler->GetCellFromCellCoord(icellX, icellY, pworld_2, 0);
+                    TESObjectCELL* pcell = pDataHandler->GetCellFromCellCoord(icellX, icellY, pworld_2, false);
                     if (!pcell || !pcell->Get3D()) {
                         if (pPlayer->GetParentCell()) {
                             pPlayer->GetParentCell()->RemoveReference(pPlayer);
                         }
                         TES::pInstance->LeaveInterior(&centerGridLocation);
-                        pcell = pDataHandler->GetCellFromCellCoord(icellX, icellY, pworld_2, 1);
+                        pcell = pDataHandler->GetCellFromCellCoord(icellX, icellY, pworld_2, true);
                     }
                     if (pcell) {
                         pSaveLoadGame->TogglePositioningPlayer(1);
                         NiPoint3 v33 = pPlayer->GetAngleOnReference();
-                        pPlayer->PositionPlayer(playerLocation, v33, pcell, 0);
+                        pPlayer->PositionPlayer(playerLocation, v33, pcell, false);
                         pSaveLoadGame->TogglePositioningPlayer(0);
                     }
                     else {
-                        bvalidPlayerLocation = 0;
+                        bvalidPlayerLocation = false;
                     }
                 }
             }
             else {
-                bvalidPlayerLocation = 0;
+                bvalidPlayerLocation = false;
             }
         }
     }
     else {
-        bvalidPlayerLocation = 0;
+        bvalidPlayerLocation = false;
     }
     if (!bvalidPlayerLocation) {
-        pSaveLoadGame->SetPlayerLocationInvalid(1);
+        pSaveLoadGame->SetPlayerLocationInvalid(true);
         for (BSSimpleList<TESQuest*>* ecx0 = pDataHandler->GetQuestList(); ecx0 && ecx0->m_item;
              ecx0 = ecx0->m_pkNext) {
             int32_t CastingType = ecx0->m_item->iFormID;
@@ -529,9 +529,9 @@ void BGSSaveLoadGlobalData::LoadLocationData(BGSLoadGameBuffer* apLoadGameBuffer
                 break;
             }
         }
-        pPlayer->SetControlsDisabled(0, PlayerCharacter::DPC_ALL);
+        pPlayer->SetControlsDisabled(false, PlayerCharacter::DPC_ALL);
         const char* v6 = sSaveGameSafeMarkerID.String();
-        uint32_t isafeMarkerID = std::strtol(v6, 0, 16);
+        uint32_t isafeMarkerID = std::strtol(v6, nullptr, 16);
         TESForm* v7 = TESForm::GetFormByNumericID(isafeMarkerID);
         TESObjectREFR* pref = dynamic_cast<TESObjectREFR*>(v7);
         if (pref) {
@@ -539,16 +539,16 @@ void BGSSaveLoadGlobalData::LoadLocationData(BGSLoadGameBuffer* apLoadGameBuffer
             NiPoint3 angle = pref->GetAngleOnReference();
             TESObjectCELL* pcell_2 = pref->GetParentCell();
             TESWorldSpace* pworld_3 = pref->GetWorldSpace();
-            bvalidPlayerLocation = 1;
+            bvalidPlayerLocation = true;
             if (pworld_3) {
-                pPlayer->PositionPlayerExterior(loc, angle, pworld_3, 1);
+                pPlayer->PositionPlayerExterior(loc, angle, pworld_3, true);
             }
             else {
                 if (pcell_2) {
-                    pPlayer->PositionPlayer(loc, angle, pcell_2, 1);
+                    pPlayer->PositionPlayer(loc, angle, pcell_2, true);
                 }
                 else {
-                    bvalidPlayerLocation = 0;
+                    bvalidPlayerLocation = false;
                 }
             }
         }
@@ -567,17 +567,17 @@ void BGSSaveLoadGlobalData::LoadLocationData(BGSLoadGameBuffer* apLoadGameBuffer
                     pcell_3 = pworld_4->LoadCell(0, 0);
                 }
                 if (!pcell_3) {
-                    pcell_3 = pDataHandler->NewCell(0, 0, 0, pworld_4);
+                    pcell_3 = pDataHandler->NewCell(nullptr, 0, 0, pworld_4);
                 }
                 if (pcell_3) {
-                    pPlayer->CenterOnCell(0, pcell_3);
+                    pPlayer->CenterOnCell(nullptr, pcell_3);
                 }
             }
         }
     }
-    TES::pInstance->ClearAllCells(1, 0);
-    GarbageCollector::ClearAll(0);
-    NiObjectGarbage::ClearAll(0);
+    TES::pInstance->ClearAllCells(true, false);
+    GarbageCollector::ClearAll(false);
+    NiObjectGarbage::ClearAll(false);
 }
 
 void BGSSaveLoadGlobalData::SaveGlobals(BGSSaveGameBuffer* apSaveGameBuffer) {
@@ -605,7 +605,7 @@ void BGSSaveLoadGlobalData::LoadGlobals(BGSLoadGameBuffer* apLoadGameBuffer) {
     GlobalsMap_t GlobalsMap(37u);
     for (TESGlobal* pglobal : *pDataHandler->GetGlobalList()) {
         if (pglobal) {
-            GlobalsMap.SetAt(pglobal, 1);
+            GlobalsMap.SetAt(pglobal, true);
         }
     }
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
@@ -624,8 +624,8 @@ void BGSSaveLoadGlobalData::LoadGlobals(BGSLoadGameBuffer* apLoadGameBuffer) {
     }
     NiTMapItem<TESGlobal*, bool>* pos = GlobalsMap.GetFirstPos();
     while (pos) {
-        TESGlobal* pglobal_2 = 0;
-        bool bvalue = 0;
+        TESGlobal* pglobal_2 = nullptr;
+        bool bvalue = false;
         GlobalsMap.GetNext(pos, pglobal_2, bvalue);
         if (!pglobal_2->TESForm::GetHasSpokenFlag()) {
             preconstructForms->AddForm(pglobal_2, 0);
@@ -670,12 +670,13 @@ void BGSSaveLoadGlobalData::LoadEffects(BGSLoadGameBuffer* apLoadGameBuffer) {
         if (apLoadGameBuffer->GetVersion() >= 14u) {
             apLoadGameBuffer->LoadData(&v5, 4u);
         }
-        TESImageSpaceModifier* apMod = 0;
+        TESImageSpaceModifier* apMod = nullptr;
         uint32_t FormID_0 = apLoadGameBuffer->LoadFormID();
         TESForm* FormByNumericID = TESForm::GetFormByNumericID(FormID_0);
         TESImageSpaceModifier* pmod = dynamic_cast<TESImageSpaceModifier*>(FormByNumericID);
         if (pmod) {
-            ImageSpaceModifierInstanceForm* pinstance = ImageSpaceModifierInstanceForm::Trigger(pmod, fstrength, 0);
+            ImageSpaceModifierInstanceForm* pinstance =
+                ImageSpaceModifierInstanceForm::Trigger(pmod, fstrength, nullptr);
             if (pinstance) {
                 float a2 = fCellAppTime - v5;
                 pinstance->SetAge(a2);
@@ -685,12 +686,12 @@ void BGSSaveLoadGlobalData::LoadEffects(BGSLoadGameBuffer* apLoadGameBuffer) {
 }
 
 void RevertGlobalData::InterfaceManagerAndMenus(BGSLoadGameBuffer* apLoadGameBuffer) {
-    bIsReverting = 1;
+    bIsReverting = true;
     Interface::ClearAllSubtitlesAndMessages();
     HUDMainMenu::Revert();
     if (Interface::InDialog()) {
         MobileObject* DialogMenuParterRef = static_cast<MobileObject*>(GetDialogMenuParterRef());
-        pPlayer->FocusOnActor(DialogMenuParterRef, 0.0f, 1);
+        pPlayer->FocusOnActor(DialogMenuParterRef, 0.0f, true);
         MenuTopicManager::Destroy();
     }
     Interface::CloseVATSMenu();
@@ -700,9 +701,9 @@ void RevertGlobalData::InterfaceManagerAndMenus(BGSLoadGameBuffer* apLoadGameBuf
     StatsMenu::ClearPerks();
     MapMenu::ClearSelectedNote();
     MapMenu::ClearAudioLogSubtites();
-    Interface::PopFromEnterStack(1, 1);
+    Interface::PopFromEnterStack(1, true);
     InterfaceManager* v2 = InterfaceManager::Instance();
-    v2->EnterRenderedMenu(0);
+    v2->EnterRenderedMenu(nullptr);
     InterfaceManager::Instance()->ePipboyState = InterfaceManager::PS_CLOSED;
     InterfaceManager* v3 = InterfaceManager::Instance();
     v3->xTutorialManager.Reset();

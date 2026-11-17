@@ -50,7 +50,7 @@ ActiveEffect* SunDamageEffect::Copy() {
 
 void SunDamageEffect::Update(float afSecondsElapsed) {
     if (bDoNotTakeDamageNextUpdate) {
-        bDoNotTakeDamageNextUpdate = 0;
+        bDoNotTakeDamageNextUpdate = false;
     }
     else {
         if (GetTarget()) {
@@ -65,14 +65,14 @@ void SunDamageEffect::Update(float afSecondsElapsed) {
                     if (pActor == pPlayer) {
                         if (fDamage > 0.009999999776482582) {
                             float v4 = fDamage * afSecondsElapsed;
-                            pPlayer->DoDamage(v4, 0.0, 0);
+                            pPlayer->DoDamage(v4, 0.0, nullptr);
                             if (!(SunDamageEffect::fPlayerPainCountdown < 0.0)) {
                                 if (SunDamageEffect::fPlayerPainCountdown == 3.4028234663852886e+38) {
                                     SunDamageEffect::fPlayerPainCountdown = fMagicSunDamagePainInitialDelay.Float();
                                 }
                             }
                             else {
-                                pPlayer->TriggerPain(1, 1);
+                                pPlayer->TriggerPain(true, true);
                                 SunDamageEffect::fPlayerPainCountdown = fMagicSunDamagePainTimer.Float();
                             }
                             SunDamageEffect::fPlayerPainCountdown =
@@ -91,7 +91,7 @@ void SunDamageEffect::Update(float afSecondsElapsed) {
                     }
                 }
                 else {
-                    UpdateHitEffect(0);
+                    UpdateHitEffect(false);
                     if (pActor == pPlayer) {
                         SunDamageEffect::fPlayerPainCountdown = fMagicSunDamagePainInitialDelay.Float();
                     }
@@ -171,9 +171,9 @@ float SunDamageEffect::GetDamageAmount() {
         return 0.0;
     }
     Sky* currentProcess = TES::pInstance->TES::GetSky();
-    float a2 = (float)currentProcess->GetCurrentGameHour();
-    float a3 = (float)currentProcess->GetSunriseBegin();
-    float a4 = (float)currentProcess->GetSunsetEnd();
+    float a2 = currentProcess->GetCurrentGameHour();
+    float a3 = currentProcess->GetSunriseBegin();
+    float a4 = currentProcess->GetSunsetEnd();
     if (currentProcess->GetCurrentWeather()) {
         mainThreadID = currentProcess->GetCurrentWeather();
         weatherData = static_cast<TESWeather*>(mainThreadID)->GetWeatherData(TESWeather::WD_SUN_DAMAGE, 1.0, 0.0);
@@ -183,7 +183,7 @@ float SunDamageEffect::GetDamageAmount() {
     }
     float v13 = weatherData;
     if (currentProcess->GetLastWeather()) {
-        weatherPercent = (float)currentProcess->GetWeatherPercent();
+        weatherPercent = currentProcess->GetWeatherPercent();
         v14 = weatherData * weatherPercent;
         v2 = currentProcess->GetLastWeather();
         v13 = (float)((static_cast<TESWeather*>(v2)->GetWeatherData(TESWeather::WD_SUN_DAMAGE, 1.0, 0.0) *
@@ -197,7 +197,7 @@ float SunDamageEffect::GetDamageAmount() {
         v18 = (uint8_t)(pActor->GetLocationOnReference().z <= waterLevel);
     }
     float fMagnitude = this->fMagnitude;
-    return MagicFormulas::CalcSunDamage(fMagnitude, a2, a3, a4, 1, v13, v18);
+    return MagicFormulas::CalcSunDamage(fMagnitude, a2, a3, a4, true, v13, v18);
 }
 
 void SunDamageEffect::UpdateHitEffect(bool abDamaging) {
@@ -215,7 +215,7 @@ void SunDamageEffect::UpdateHitEffect(bool abDamaging) {
                             if (pHitEffects) {
                                 delete pHitEffects;
                             }
-                            this->pHitEffects = 0;
+                            this->pHitEffects = nullptr;
                         }
                         void* apMemory = NiMemObject::operator new(sizeof(MagicShaderHitEffect));
                         if (apMemory) {
@@ -224,7 +224,7 @@ void SunDamageEffect::UpdateHitEffect(bool abDamaging) {
                             peffect = ::new (apMemory) MagicShaderHitEffect(v3, pEffectData, -1.0f);
                         }
                         else {
-                            peffect = 0;
+                            peffect = nullptr;
                         }
                         MagicShaderHitEffect* peffect_2 = peffect;
                         if (peffect->Init()) {
@@ -236,7 +236,7 @@ void SunDamageEffect::UpdateHitEffect(bool abDamaging) {
                                 v7 = ::new (v12) BSSimpleList<MagicHitEffect*>(item);
                             }
                             else {
-                                v7 = 0;
+                                v7 = nullptr;
                             }
                             this->pHitEffects = v7;
                             peffect_2->pEffect = this;
@@ -245,7 +245,7 @@ void SunDamageEffect::UpdateHitEffect(bool abDamaging) {
                             if (peffect_2) {
                                 delete peffect_2;
                             }
-                            peffect_2 = 0;
+                            peffect_2 = nullptr;
                         }
                     }
                 }
@@ -254,14 +254,14 @@ void SunDamageEffect::UpdateHitEffect(bool abDamaging) {
                         for (BSSimpleList<MagicHitEffect*>* plist = this->pHitEffects; plist && !plist->IsEmpty();
                              plist = plist->m_pkNext) {
                             MagicHitEffect* peffect_3 = plist->m_item;
-                            peffect_3->bFinished = 1;
-                            peffect_3->pEffect = 0;
+                            peffect_3->bFinished = true;
+                            peffect_3->pEffect = nullptr;
                         }
                         this->pHitEffects->RemoveAll();
                         if (this->pHitEffects) {
                             delete this->pHitEffects;
                         }
-                        this->pHitEffects = 0;
+                        this->pHitEffects = nullptr;
                         MagicTarget* v6 = pTarget;
                         TESObjectREFR* v5 = v6->GetTargetStatsObject();
                         ReferenceProcessLists.FinishMagicShaderHitEffect(v5, pEffectData);

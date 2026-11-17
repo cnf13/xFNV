@@ -37,8 +37,8 @@ NiObject* NiScreenTexture::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -162,7 +162,7 @@ void NiScreenTexture::CopyMembers(NiScreenTexture* pkDest, NiCloningProcess& kCl
 NiObject* NiScreenTexture::CreateObject() {
     void* pkObject = NiMemObject::operator new(sizeof(NiScreenTexture));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiScreenTexture;
 }

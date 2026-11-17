@@ -55,7 +55,7 @@ void bhkCharacterStateProjectile::Update(bhkCharacterController& arInput) {
             float v8 = _mm_shuffle_ps(v7, v7, 85)[0] + v7[0];
             float v9 = _mm_shuffle_ps(v7, v7, 170)[0];
             __m128 m_quad = hkQuadReal0000;
-            m_quad[0] = 0.0f - static_cast<float>(v9 + v8);
+            m_quad[0] = 0.0f - (v9 + v8);
             p_kOutVelocity->m_quad =
                 _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(m_quad, m_quad, 0), arInput.UpVec.m_quad), p_kOutVelocity->m_quad);
             __m128 v11 = _mm_mul_ps(arInput.UpVec.m_quad, muInput.m_currentVelocity.m_quad);

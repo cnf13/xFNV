@@ -163,9 +163,7 @@ uint8_t* calcEigenVectors(uint8_t* a1, __m128* a2, __m128* a3, __m128* a4, __m12
             ),
             v14
         );
-        if (static_cast<float>(
-                _mm_shuffle_ps(v15, v15, 170)[0] + static_cast<float>(_mm_shuffle_ps(v15, v15, 85)[0] + v15[0])
-            ) < 0.0f) {
+        if ((_mm_shuffle_ps(v15, v15, 170)[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0])) < 0.0f) {
             *a5 = _mm_xor_ps(v14, hkQuadRealNegateMask);
         }
         return a1;
@@ -858,7 +856,7 @@ void calcCovarianceOfTriangles(
     {
         // EXE-INLINED none: hkArray<hkVector4>::~hkArray
         hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t capacityAndFlags = static_cast<int32_t>(centroids.m_capacityAndFlags);
+        const int32_t capacityAndFlags = centroids.m_capacityAndFlags;
         centroids.m_size = 0;
         if (capacityAndFlags >= 0) {
             pHeap->bufFree(
@@ -1061,7 +1059,7 @@ done:
     {
         // EXE-INLINED none: hkArray<hkVector4>::~hkArray
         hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t capacityAndFlags = static_cast<int32_t>(onSphere.m_capacityAndFlags);
+        const int32_t capacityAndFlags = onSphere.m_capacityAndFlags;
         onSphere.m_size = 0;
         if (capacityAndFlags >= 0) {
             pHeap->bufFree(
@@ -1211,7 +1209,7 @@ void hkGeometryUtility::createConvexGeometry(
     arg4.m_allowLowerDimensions.m_bool = 1;
     if (apMemory.build(stridedVertsIn, arg4) != -1) {
         apMemory.generateGeometry(hkgpConvexHull::SOURCE_VERTICES, geometryOut);
-        apMemory.buildIndices(0.9999f, 0);
+        apMemory.buildIndices(0.9999f, false);
         apMemory.appendVertices(planeEquationsOut);
     }
 }

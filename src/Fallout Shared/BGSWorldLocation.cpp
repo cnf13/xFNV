@@ -40,7 +40,7 @@ void BGSWorldLocation::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     uint32_t FormID_0 = apLoadGameBuffer->LoadFormID();
     pSpace = TESForm::GetFormByNumericID(FormID_0);
     if (!BGSWorldLocation::CheckSpace(static_cast<TESObjectCELL*>(pSpace))) {
-        pSpace = 0;
+        pSpace = nullptr;
     }
 }
 
@@ -55,7 +55,7 @@ float BGSWorldLocation::GetDistanceSquared(const BGSWorldLocation& arWorldLocati
 
 bool BGSWorldLocation::IsLocationLoaded() const {
     TESObjectCELL* a1 = GetCell();
-    return (bool)((uint8_t)(a1 && TES::pInstance->IsCellLoaded(a1, 0)));
+    return (bool)((uint8_t)(a1 && TES::pInstance->IsCellLoaded(a1, false)));
 }
 
 BGSWorldLocation* BGSWorldLocation::Clear() {
@@ -94,30 +94,30 @@ float BGSWorldLocation::GetModifiedDistanceSquared(
         return 0x1.fffffe0000000p+127f;
     }
     (v4 = (&(&arWorldLocation)->Point)->operator-(Point));
-    v4.x = (float)(v4.x * (&arCoordMult)->x);
-    v4.y = (float)(v4.y * (&arCoordMult)->y);
-    v4.z = (float)(v4.z * (&arCoordMult)->z);
+    v4.x = (v4.x * (&arCoordMult)->x);
+    v4.y = (v4.y * (&arCoordMult)->y);
+    v4.z = (v4.z * (&arCoordMult)->z);
     return (&v4)->SqrLength();
 }
 
 bool BGSWorldLocation::GetCellOrWorld(TESObjectCELL*& arpCell, TESWorldSpace*& arpWorld) {
     if (!pSpace) {
-        return 0;
+        return false;
     }
     int32_t FormType = pSpace->GetFormType();
     if (FormType == 65) {
         arpWorld = static_cast<TESWorldSpace*>(pSpace);
-        arpCell = 0;
-        return 1;
+        arpCell = nullptr;
+        return true;
     }
     else {
         if (FormType == 57) {
             arpCell = static_cast<TESObjectCELL*>(pSpace);
-            arpWorld = 0;
-            return 1;
+            arpWorld = nullptr;
+            return true;
         }
         else {
-            return 0;
+            return false;
         }
     }
 }

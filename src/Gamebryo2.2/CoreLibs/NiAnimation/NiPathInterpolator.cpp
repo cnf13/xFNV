@@ -54,8 +54,8 @@ NiObject* NiPathInterpolator::CreateClone(NiCloningProcess& kCloning) {
         return v4;
     }
     else {
-        CopyMembers(0, &kCloning);
-        return 0;
+        CopyMembers(nullptr, &kCloning);
+        return nullptr;
     }
 }
 
@@ -827,6 +827,6 @@ NiObject* NiPathInterpolator::CreateObject() {
         return ::new (v0) NiPathInterpolator(nullptr, nullptr);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

@@ -131,7 +131,7 @@
 #include "SDK/MSVC/rtti.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 namespace hkAlgorithm {} // namespace hkAlgorithm
 
@@ -203,7 +203,7 @@ Explosion::~Explosion() {
         TESObjectREFR::RemoveMasterParticleAddonNodes(p3D->IsNode());
     }
     if (GetParentCell() && GetParentCell()->GetbhkWorld()) {
-        bhkWorld::RemoveObjects(TESObjectREFR::Get3D(), 1, 0);
+        bhkWorld::RemoveObjects(TESObjectREFR::Get3D(), true, false);
     }
     DetachLight();
     if (spPhantom.m_pObject) {
@@ -215,7 +215,7 @@ Explosion::~Explosion() {
         TargetList.RemoveHead();
     }
     if (!pDataHandler->GetClearingData()) {
-        CleanUpOtherMobileObjects(0);
+        CleanUpOtherMobileObjects(false);
     }
     StopSounds();
     spActorCause = nullptr;
@@ -269,7 +269,7 @@ void Explosion::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
         iActorCauseID = -1;
     }
     apSaveGameBuffer->SaveDataEndian(&iActorCauseID, 4u, 0);
-    bHasCaster = pCaster != 0;
+    bHasCaster = pCaster != nullptr;
     apSaveGameBuffer->SaveDataEndian(&bHasCaster, 1u, 0);
     if (bHasCaster) {
         uint32_t MagicTargetFormID;
@@ -322,7 +322,7 @@ void Explosion::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     apLoadGameBuffer->LoadData(&iactorCauseID, 4u);
     ActorCause* ActorCauseByID = ActorCause::GetActorCauseByID(iactorCauseID);
     spActorCause.operator=(ActorCauseByID);
-    bhasCaster = 1;
+    bhasCaster = true;
     if (apLoadGameBuffer->GetVersion() >= 7u) {
         apLoadGameBuffer->LoadData(&bhasCaster, 1u);
     }
@@ -334,7 +334,7 @@ void Explosion::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 v5 = ::new (apMemory) NonActorMagicCaster(this);
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             pCaster = v5;
         }
@@ -343,9 +343,9 @@ void Explosion::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         apLoadGameBuffer->LoadFormID(pCaster->pCasterObject);
     }
     if (iFrameCount > 0) {
-        bTargetsFound = 1;
-        bTargetsProcessed = 1;
-        bForcesApplied = 1;
+        bTargetsFound = true;
+        bTargetsProcessed = true;
+        bForcesApplied = true;
     }
 }
 
@@ -359,7 +359,7 @@ void Explosion::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v9 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v9 = 0;
+        v9 = nullptr;
     }
     pOwner = v9;
     if (pExplodedRef) {
@@ -367,7 +367,7 @@ void Explosion::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v8 = dynamic_cast<TESObjectREFR*>(v3);
     }
     else {
-        v8 = 0;
+        v8 = nullptr;
     }
     pExplodedRef = v8;
     if (pCaster) {
@@ -380,7 +380,7 @@ void Explosion::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             );
         }
         else {
-            MagicItemByNumericID = 0;
+            MagicItemByNumericID = nullptr;
         }
         pCaster->pCurrentSpell = MagicItemByNumericID;
         if (pCaster->pDesiredTarget) {
@@ -389,7 +389,7 @@ void Explosion::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             );
         }
         else {
-            MagicTargetByNumericID = 0;
+            MagicTargetByNumericID = nullptr;
         }
         pCaster->pDesiredTarget = MagicTargetByNumericID;
         if (pCaster->pCasterObject) {
@@ -398,7 +398,7 @@ void Explosion::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v5 = dynamic_cast<TESObjectREFR*>(v4);
         }
         else {
-            v5 = 0;
+            v5 = nullptr;
         }
         pCaster->pCasterObject = v5;
     }
@@ -409,14 +409,14 @@ void Explosion::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 
 void Explosion::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     MobileObject::Revert(apLoadGameBuffer);
-    bDecalsPlaced = 0;
-    bTargetsFound = 0;
-    bTargetsProcessed = 0;
-    bForcesApplied = 0;
-    spActorCause.operator=(static_cast<ActorCause*>(0));
+    bDecalsPlaced = false;
+    bTargetsFound = false;
+    bTargetsProcessed = false;
+    bForcesApplied = false;
+    spActorCause.operator=(static_cast<ActorCause*>(nullptr));
     fWeaponCondition = 1.0f;
-    bIgnoreImageSpaceSwap = 0;
-    bUnderWater = 0;
+    bIgnoreImageSpaceSwap = false;
+    bUnderWater = false;
     ClosestPoint = NiPoint3_ZERO;
     ClosestPointNormal = NiPoint3_ZERO;
     while (!TargetList.IsEmpty()) {
@@ -451,7 +451,7 @@ MagicCaster* Explosion::GetMagicCaster() {
 }
 
 void Explosion::InitHavok() {
-    if (spPhantom.operator==(static_cast<bhkSimpleShapePhantom*>(0))) {
+    if (spPhantom.operator==(static_cast<bhkSimpleShapePhantom*>(nullptr))) {
         if (this->GetParentCell()) {
             if (this->GetParentCell()->GetbhkWorld()) {
                 bhkSimpleShapePhantom* v6;
@@ -460,10 +460,10 @@ void Explosion::InitHavok() {
                 bhkSphereShape* v12 = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
                 if (v12) {
                     float afRadius = this->fRadius;
-                    pshape = ::new (v12) bhkSphereShape(afRadius, 1);
+                    pshape = ::new (v12) bhkSphereShape(afRadius, true);
                 }
                 else {
-                    pshape = 0;
+                    pshape = nullptr;
                 }
                 info.m_shape = pshape->operator*();
                 uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
@@ -483,7 +483,7 @@ void Explosion::InitHavok() {
                     v6 = ::new (v7) bhkSimpleShapePhantom(info);
                 }
                 else {
-                    v6 = 0;
+                    v6 = nullptr;
                 }
                 this->spPhantom.operator=(v6);
                 bhkSimpleShapePhantom* v5 = this->spPhantom.m_pObject;
@@ -499,11 +499,11 @@ bool Explosion::IsExplosion() {
 }
 
 bool Explosion::ChangeProcessLevel() {
-    bool bchange = 1;
+    bool bchange = true;
     PROCESS_TYPE eoldLevel = pCurrentProcess->eLevel;
     PROCESS_TYPE enewLevel = PROCESS_TYPE_LOW;
     TESObjectCELL* pcell = GetParentCell();
-    if ((Get3D() || pModelLoader->IsReferenceQueued(this)) && TES::pInstance->IsCellLoaded(pcell, 1)) {
+    if ((Get3D() || pModelLoader->IsReferenceQueued(this)) && TES::pInstance->IsCellLoaded(pcell, true)) {
         enewLevel = PROCESS_TYPE_HIGH;
     }
     if (eoldLevel != enewLevel) {
@@ -511,7 +511,7 @@ bool Explosion::ChangeProcessLevel() {
             if (this) {
                 delete this;
             }
-            return 0;
+            return false;
         }
     }
     return bchange;
@@ -523,7 +523,7 @@ bool Explosion::IsTransient() {
 
 void Explosion::Update(float afDelta) {
     if (!iFrameCount) {
-        TESObjectREFR* pObjectHit = 0;
+        TESObjectREFR* pObjectHit = nullptr;
         if (!TargetList.IsEmpty()) {
             pObjectHit = TargetList.m_item->pRef;
         }
@@ -547,7 +547,8 @@ void Explosion::Update(float afDelta) {
 
 void Explosion::Initialize() {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_TES_REFERENCES, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\Explosion.cpp", 376
+        MEM_CONTEXT_TES_REFERENCES, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\Explosion.cpp",
+        376
     );
     bool bLoadingSaveGame = pSaveLoadGame->GetSaveGameLoading();
     bool bCreateProcess = pCurrentProcess == nullptr;
@@ -701,7 +702,7 @@ void Explosion::ApplyImpactDecals() {
             NiPoint3 contactPoint;
             NiAVObject* pav;
             int32_t j;
-            this->bDecalsPlaced = 1;
+            this->bDecalsPlaced = true;
             hkLocalArray<hkpRootCdPoint> cdPointA(iNumExplosionDecalCDPoint.Int());
             alignas(16) hkpFixedBufferCdPointCollector fixedCollector(cdPointA.m_data, iNumExplosionDecalCDPoint.Int());
             hkpFixedBufferCdPointCollector::registerDefaultAddCdPointFunction();
@@ -723,12 +724,12 @@ void Explosion::ApplyImpactDecals() {
                     HK2NI(location, point.m_contact.getPosition());
                     HK2NINS(normal, point.m_contact.getNormal());
                     NiColorA red(1.0f, 0.0f, 0.0f, 0.65f);
-                    NiAVObject* pdebug = (NiAVObject*)MakeTriPoint(1.5f, red, 1);
+                    NiAVObject* pdebug = (NiAVObject*)MakeTriPoint(1.5f, red, true);
                     pdebug->UpdateProperties();
                     pdebug->SetTranslate(location);
                     TES::pInstance->AddTempDebugObject(pdebug, 10.0f);
                     NiPoint3* v6 = ::new (&v122) NiPoint3(location + normal * 10.0f);
-                    pdebug = (NiAVObject*)MakeLine(location, red, *v6, red, 1);
+                    pdebug = (NiAVObject*)MakeLine(location, red, *v6, red, true);
                     TES::pInstance->AddTempDebugObject(pdebug, 10.0f);
                 }
             }
@@ -829,12 +830,12 @@ void Explosion::ApplyImpactDecals() {
             }
             if (iExplosionDebug.Int() > 1) {
                 NiColorA green(0.0f, 1.0f, 0.0f, 0.65f);
-                NiAVObject* pdebug_2 = (NiAVObject*)MakeTriPoint(5.0f, green, 1);
+                NiAVObject* pdebug_2 = (NiAVObject*)MakeTriPoint(5.0f, green, true);
                 pdebug_2->UpdateProperties();
                 pdebug_2->SetTranslate(this->ClosestPoint);
                 TES::pInstance->AddTempDebugObject(pdebug_2, 10.0f);
                 NiPoint3* v17 = ::new (&v90) NiPoint3(this->ClosestPoint + this->ClosestPointNormal * 20.0f);
-                pdebug_2 = (NiAVObject*)MakeLine(this->ClosestPoint, green, *v17, green, 1);
+                pdebug_2 = (NiAVObject*)MakeLine(this->ClosestPoint, green, *v17, green, true);
                 TES::pInstance->AddTempDebugObject(pdebug_2, 10.0f);
             }
             v121 = 1;
@@ -857,12 +858,12 @@ void Explosion::ApplyImpactDecals() {
                 float iNumExplosionDecalCDPoint_a = pimpactData->GetDecalMaxWidth();
                 float x_4 = pimpactData->GetMinWidth();
                 float fDecalSize = RandomFloat(x_4, iNumExplosionDecalCDPoint_a);
-                DecalCaster* pcaster = DecalCaster::GetInstance(fDecalSize, 1);
+                DecalCaster* pcaster = DecalCaster::GetInstance(fDecalSize, true);
                 pcaster->SetCustomPickCollisions(DecalCaster::CUSTOM_PICK_ACTORS);
-                pcaster->SetCollision(L_BIPED, 0);
-                pcaster->SetCollision(L_DEADBIP, 0);
+                pcaster->SetCollision(L_BIPED, false);
+                pcaster->SetCollision(L_DEADBIP, false);
                 TESObjectCELL* pcell = this->GetParentCell();
-                bhkWorld* pw = pcell ? pcell->GetbhkWorld() : 0;
+                bhkWorld* pw = pcell ? pcell->GetbhkWorld() : nullptr;
                 if (pw) {
                     pcaster->Add(pw);
                     bhkFilteredCdBodyCollector v79;
@@ -873,7 +874,7 @@ void Explosion::ApplyImpactDecals() {
                     char v76 = static_cast<int32_t>(std::floor(iNumExplosionDecalCDPoint_b));
                     for (int32_t m = 0;; ++m) {
                         if (m >= v78) {
-                            pcaster = 0;
+                            pcaster = nullptr;
                             break;
                         }
                         const hkpCollidable* m_rootCollidableB =
@@ -902,7 +903,7 @@ void Explosion::ApplyImpactDecals() {
                                 uint32_t iNumExplosionDecalCDPoint_c = m_rootCollidableB->getCollisionFilterInfo();
                                 uint32_t v21 = FNVD_RECONSTRUCT(CFilter)(&v68, iNumExplosionDecalCDPoint_c)->GetGroup();
                                 bool v67 = v21 == 1;
-                                NiAVObject* Count = 0;
+                                NiAVObject* Count = nullptr;
                                 if (v21 == 1) {
                                     hkpRigidBody* RigidBody = hkpGetRigidBody(m_rootCollidableB);
                                     if (RigidBody) {
@@ -958,14 +959,14 @@ void Explosion::ApplyImpactDecals() {
                                     data.fVertexColor = *FNVD_RECONSTRUCT(NiColor)(
                                         &kVertexColor, v55, x_4a, iNumExplosionDecalCDPoint_d
                                     );
-                                    pcell_2->AddDecal(data, BGSDecalManager::DECAL_TYPE_SIMPLE, 0);
+                                    pcell_2->AddDecal(data, BGSDecalManager::DECAL_TYPE_SIMPLE, false);
                                 }
                             }
                         }
                     }
                 }
             }
-            if (!v88 || (this->bUnderWater || ((v53 = pimpactData->GetModel()) == 0 || !*v53))) {
+            if (!v88 || (this->bUnderWater || ((v53 = pimpactData->GetModel()) == nullptr || !*v53))) {
             LABEL_96:;
                 TESSound* pimpactSound1 = pimpactData->pSound1;
                 if (pimpactSound1) {
@@ -978,7 +979,7 @@ void Explosion::ApplyImpactDecals() {
                         pimpactSound1
                     );
                     soundHandle.SetPosition(contactPoint.x, contactPoint.y, contactPoint.z);
-                    soundHandle.Play(0);
+                    soundHandle.Play(false);
                 }
                 TESSound* pimpactSound2 = pimpactData->pSound2;
                 if (pimpactSound2) {
@@ -991,7 +992,7 @@ void Explosion::ApplyImpactDecals() {
                         pimpactSound2
                     );
                     soundHandle_2.SetPosition(contactPoint.x, contactPoint.y, contactPoint.z);
-                    soundHandle_2.Play(0);
+                    soundHandle_2.Play(false);
                 }
                 goto LABEL_100;
             }
@@ -1020,7 +1021,7 @@ void Explosion::ApplyImpactDecals() {
             NiPoint3 v142 = contactPoint;
             NiPoint3 v141 = impactEffectVector;
             float afLifetime = pimpactData->Data.fEffectDuration;
-            BSTempEffectParticle::Spawn(this->GetParentCell(), afLifetime, v53, v141, v142, 1.0f, 7u, 0);
+            BSTempEffectParticle::Spawn(this->GetParentCell(), afLifetime, v53, v141, v142, 1.0f, 7u, nullptr);
             goto LABEL_96;
         }
     }
@@ -1029,7 +1030,7 @@ void Explosion::ApplyImpactDecals() {
 void Explosion::UpdateNonRenderSafeMovement(float afDelta) {
     if (IsDistant()) {
         if (Get3D()) {
-            NiUpdateData a2(fCellAppTime, 1, 0);
+            NiUpdateData a2(fCellAppTime, true, false);
             NiNode* v2 = Get3D();
             v2->Update(a2);
         }
@@ -1058,7 +1059,7 @@ float Explosion::GetRadius() {
 }
 
 bool Explosion::IsDistant() {
-    return (TESObjectREFR::GetParentCell() == 0);
+    return (TESObjectREFR::GetParentCell() == nullptr);
 }
 
 TESObjectREFR* Explosion::GetOwner() {
@@ -1131,17 +1132,17 @@ void Explosion::SetLifetime(float afValue) {
 }
 
 void Explosion::ProcessMovement(float a2) {
-    float seconds = (float)(&appTimer)->GetSeconds();
+    float seconds = (&appTimer)->GetSeconds();
     Update(seconds);
-    fAge = (float)(fAge + seconds);
+    fAge = (fAge + seconds);
 }
 
 void Explosion::Kill() {
-    SetDelete((bool)1);
+    SetDelete(true);
 }
 
 BSSimpleList<Explosion::ExplodedLimb*>* Explosion::GetAffectedLimbList(TESObjectREFR* apTarget) {
-    BSSimpleList<Explosion::ExplodedLimb*>* presult = 0;
+    BSSimpleList<Explosion::ExplodedLimb*>* presult = nullptr;
     for (BSSimpleList<Explosion::ExplosionTarget*>* ptargets = &TargetList;
          !presult && (ptargets && !ptargets->IsEmpty()); ptargets = ptargets->m_pkNext) {
         Explosion::ExplosionTarget* ptarget = ptargets->m_item;
@@ -1175,7 +1176,7 @@ void Explosion::AttachDistant() {
 void Explosion::Init3D() {
     CFilter v39;
     bhkRigidBodyCinfo cinfo;
-    Load3D(0);
+    Load3D(false);
     NiNode* pav = this->Get3D();
     if (pav) {
         NiFixedString* v12;
@@ -1189,7 +1190,7 @@ void Explosion::Init3D() {
                 pfade = pnode->IsFadeNode();
             }
             else {
-                pfade = 0;
+                pfade = nullptr;
             }
             if (pfade) {
                 pfade->SetRange(3.4028235e+38f, 3.4028235e+38f);
@@ -1231,7 +1232,7 @@ void Explosion::Init3D() {
             BSXFlags* pbsx = static_cast<BSXFlags*>(pav->GetExtraData(*v2));
             if (pbsx) {
                 NiExtraData* pextraData = (NiExtraData*)pbsx;
-                pbsx->SetFlags(16u, 1);
+                pbsx->SetFlags(16u, true);
             }
             for (int32_t i = 0;; ++i) {
                 bhkLiquidAction* pliquid;
@@ -1250,7 +1251,7 @@ void Explosion::Init3D() {
                     pthing = ::new (v55) NiNode(0);
                 }
                 else {
-                    pthing = 0;
+                    pthing = nullptr;
                 }
                 NiNode* v53 = pthing;
                 NiNode* pthing_2 = pthing;
@@ -1269,16 +1270,16 @@ void Explosion::Init3D() {
                     pobj = ::new (v48) bhkCollisionObject(pthing_2);
                 }
                 else {
-                    pobj = 0;
+                    pobj = nullptr;
                 }
                 bhkCollisionObject* v46 = pobj;
                 bhkCollisionObject* pobj_2 = pobj;
                 bhkSphereShape* v44 = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
                 if (v44) {
-                    pshape = ::new (v44) bhkSphereShape(8.0f, 1);
+                    pshape = ::new (v44) bhkSphereShape(8.0f, true);
                 }
                 else {
-                    pshape = 0;
+                    pshape = nullptr;
                 }
                 bhkSphereShape* v42 = pshape;
                 bhkSphereShape* pshape_2 = pshape;
@@ -1297,7 +1298,7 @@ void Explosion::Init3D() {
                     pbody = ::new (v38) bhkRigidBody(cinfo);
                 }
                 else {
-                    pbody = 0;
+                    pbody = nullptr;
                 }
                 bhkRigidBody* v36 = pbody;
                 bhkRigidBody* pbody_2 = pbody;
@@ -1308,7 +1309,7 @@ void Explosion::Init3D() {
                     paddon = ::new (v34) BSValueNode;
                 }
                 else {
-                    paddon = 0;
+                    paddon = nullptr;
                 }
                 BSValueNode* v32 = paddon;
                 BSValueNode* paddon_2 = paddon;
@@ -1326,7 +1327,7 @@ void Explosion::Init3D() {
                     pliquid = ::new (v29) bhkLiquidAction(info);
                 }
                 else {
-                    pliquid = 0;
+                    pliquid = nullptr;
                 }
                 bhkLiquidAction* v27 = pliquid;
                 bhkLiquidAction* v26 = pliquid;
@@ -1335,22 +1336,22 @@ void Explosion::Init3D() {
             if (this->GetParentCell()) {
                 if (this->GetParentCell()->GetbhkWorld()) {
                     this->GetParentCell()->GetbhkWorld();
-                    bhkWorld::UpdatePosition(pav, 1, 1);
-                    NiUpdateData update(0.0f, 0, 0);
+                    bhkWorld::UpdatePosition(pav, true, true);
+                    NiUpdateData update(0.0f, false, false);
                     pav->Update(update);
                     bhkWorld* v24 = this->GetParentCell()->GetbhkWorld();
-                    v24->AddObjects(pav, 1, 1, 0, 1);
+                    v24->AddObjects(pav, true, true, 0, true);
                 }
             }
         }
         if (this->GetParentCell()) {
             if (this->GetParentCell()->GetbhkWorld()) {
                 this->GetParentCell()->GetbhkWorld();
-                bhkWorld::UpdatePosition(pav, 1, 1);
-                NiUpdateData update_2(0.0f, 0, 0);
+                bhkWorld::UpdatePosition(pav, true, true);
+                NiUpdateData update_2(0.0f, false, false);
                 pav->Update(update_2);
                 bhkWorld* v22 = this->GetParentCell()->GetbhkWorld();
-                v22->AddObjects(pav, 1, 1, 0, 1);
+                v22->AddObjects(pav, true, true, 0, true);
             }
         }
         if (pav->IsNode()) {
@@ -1365,7 +1366,7 @@ void Explosion::Init3D() {
                 bhkWorld* v11 = this->GetParentCell()->GetbhkWorld();
                 if (v11->QDebugDisplay()) {
                     bhkWorld* v21 = this->GetParentCell()->GetbhkWorld();
-                    v21->SetDebugDisplay(pav, 1);
+                    v21->SetDebugDisplay(pav, true);
                     PrepareObjectWithNoLightingRecurse(pav);
                 }
             }
@@ -1379,7 +1380,7 @@ void Explosion::Init3D() {
                 }
             }
         }
-        NiControllerManager* pmanager = 0;
+        NiControllerManager* pmanager = nullptr;
         while (po) {
             if (NiObject::IsKindOf_0(&NiControllerManager::ms_RTTI, po)) {
                 pmanager = static_cast<NiControllerManager*>(po);
@@ -1388,10 +1389,11 @@ void Explosion::Init3D() {
             po = po->GetNext();
         }
         if (pmanager &&
-            (v12 = &FixedStrings::QSpecialIdle_AreaEffect(), (pseqArea = pmanager->GetSequenceByName(*v12)) != 0)) {
+            (v12 = &FixedStrings::QSpecialIdle_AreaEffect(),
+             (pseqArea = pmanager->GetSequenceByName(*v12)) != nullptr)) {
             pmanager->DeactivateAll(0.0f);
-            pmanager->ActivateSequence(pseqArea, 0, 0, 1.0f, 0.0f, 0);
-            pmanager->SetActive(1);
+            pmanager->ActivateSequence(pseqArea, 0, false, 1.0f, 0.0f, nullptr);
+            pmanager->SetActive(true);
             pseqArea->ResetSequence();
             double Lifetime = this->fLifetime;
             if (pseqArea->m_fEndKeyTime > Lifetime) {
@@ -1429,7 +1431,7 @@ void Explosion::ApplyForces() {
             COL_LAYER v16 = elayer;
             if (bonlyAffectExploded || v16 == L_DEADBIP) {
                 bhkCollisionObject* pcol = bhkCollisionObject::Getbhk(phk);
-                NiAVObject* pav = pcol ? pcol->m_pkSceneObject : 0;
+                NiAVObject* pav = pcol ? pcol->m_pkSceneObject : nullptr;
                 TESObjectREFR* pref = TESObjectREFR::FindReferenceFor3D(pav);
                 if (bonlyAffectExploded && pref != pExplodedRef) {
                     continue;
@@ -1449,13 +1451,13 @@ void Explosion::ApplyForces() {
             }
         }
     }
-    bForcesApplied = 1;
+    bForcesApplied = true;
 }
 
 void Explosion::ProcessTargets() {
     NiPoint2 v33;
     NiPoint2 apResult;
-    bTargetsProcessed = 1;
+    bTargetsProcessed = true;
     BSSimpleList<Explosion::ExplosionTarget*>* plist = &TargetList;
     while (plist && !plist->IsEmpty()) {
         Explosion::ExplosionTarget* ptarget = plist->m_item;
@@ -1484,7 +1486,7 @@ void Explosion::ProcessTargets() {
                             BGSExplosion* pbase = GetExplosionBase();
                             TESImageSpaceModifier* pmodifier = pbase->pFormImageSpaceModifying;
                             if (pmodifier) {
-                                ImageSpaceModifierInstanceForm::Trigger(pmodifier, fimagespacepower_2, 0);
+                                ImageSpaceModifierInstanceForm::Trigger(pmodifier, fimagespacepower_2, nullptr);
                             }
                         }
                     }
@@ -1499,7 +1501,7 @@ void Explosion::ProcessTargets() {
                             pactor = static_cast<Actor*>(ptarget->pRef);
                         }
                         else {
-                            pactor = 0;
+                            pactor = nullptr;
                         }
                         Actor* pactor_3 = pactor;
                         if (pactor) {
@@ -1509,7 +1511,7 @@ void Explosion::ProcessTargets() {
                             a1 = GetActorCause()->pActor;
                         }
                         else {
-                            a1 = 0;
+                            a1 = nullptr;
                         }
                         Script::SetActionFlag(a1, &ptarget->pRef->m_Extra, SCRIPT_ACTION_ONHIT);
                         if (GetSourceWeapon()) {
@@ -1525,7 +1527,7 @@ void Explosion::ProcessTargets() {
                         if (ptarget->pRef->GetDestroyed()) {
                             PlayerCharacter* Owner = static_cast<PlayerCharacter*>(GetOwner());
                             if (Owner == pPlayer) {
-                                pPlayer->AddPlayerAction(PLAYER_ACTION_DESTROY_OBJECT, 8.0f, 0);
+                                pPlayer->AddPlayerAction(PLAYER_ACTION_DESTROY_OBJECT, 8.0f, nullptr);
                             }
                         }
                         if (pactor_3) {
@@ -1539,7 +1541,7 @@ void Explosion::ProcessTargets() {
                                     );
                                 }
                                 else {
-                                    HitData::InitializeExplosionData(&data, 0, pactor_3, this, fdamage);
+                                    HitData::InitializeExplosionData(&data, nullptr, pactor_3, this, fdamage);
                                 }
                                 pactor_3->HitMe(&data, 0);
                                 if (pactor_3 == pPlayer) {
@@ -1571,7 +1573,7 @@ void Explosion::ProcessTargets() {
                                                 v27 = static_cast<MagicTarget*>(pactor_3);
                                             }
                                             else {
-                                                v27 = 0;
+                                                v27 = nullptr;
                                             }
                                             if (FormEnchanting) {
                                                 v26 = &static_cast<MagicItem&>(
@@ -1579,9 +1581,9 @@ void Explosion::ProcessTargets() {
                                                 );
                                             }
                                             else {
-                                                v26 = 0;
+                                                v26 = nullptr;
                                             }
-                                            pCaster->CastSpellImmediate(v26, 0, v27, 1.0f, 0);
+                                            pCaster->CastSpellImmediate(v26, false, v27, 1.0f, false);
                                         }
                                         else {
                                             MagicItem* v24;
@@ -1590,7 +1592,7 @@ void Explosion::ProcessTargets() {
                                                 v25 = static_cast<MagicTarget*>(pactor_3);
                                             }
                                             else {
-                                                v25 = 0;
+                                                v25 = nullptr;
                                             }
                                             if (FormEnchanting) {
                                                 v24 = &static_cast<MagicItem&>(
@@ -1598,21 +1600,22 @@ void Explosion::ProcessTargets() {
                                                 );
                                             }
                                             else {
-                                                v24 = 0;
+                                                v24 = nullptr;
                                             }
                                             // The owner is an actor here (tested above); the call goes through its
                                             // MagicCaster with no null test.
-                                            static_cast<Actor*>(GetOwner())->CastSpellImmediate(v24, 0, v25, 1.0f, 0);
+                                            static_cast<Actor*>(GetOwner())
+                                                ->CastSpellImmediate(v24, false, v25, 1.0f, false);
                                         }
                                     }
                                 }
-                                if (!pactor_3->IsDead(0)) {
+                                if (!pactor_3->IsDead(false)) {
                                     char ShouldDamageKnockdownTarget;
                                     if (GetExplosionBase()->GetFlag(4) ||
                                         (GetExplosionBase()->GetFlag(8) &&
                                          (!pactor_3 ? ShouldDamageKnockdownTarget =
                                                           ActorValueOwner::ShouldDamageKnockdownTarget(
-                                                              0, static_cast<int32_t>(data.fHealthDamage)
+                                                              nullptr, static_cast<int32_t>(data.fHealthDamage)
                                                           )
                                                     : ShouldDamageKnockdownTarget =
                                                           ActorValueOwner::ShouldDamageKnockdownTarget(
@@ -1622,22 +1625,22 @@ void Explosion::ProcessTargets() {
                                         PushActor(pactor_3, fpower);
                                     }
                                 }
-                                if (pactor_3->IsDead(0)) {
+                                if (pactor_3->IsDead(false)) {
                                     NiAVObject* apObject;
                                     if (pactor_3 == pPlayer) {
-                                        apObject = pPlayer->Get3D(0);
+                                        apObject = pPlayer->Get3D(false);
                                     }
                                     else {
                                         apObject = (NiAVObject*)pactor_3->Get3D();
                                     }
-                                    bhkWorld::SetMotion(apObject, hkpMotion::MOTION_DYNAMIC, 1, 0, 1);
-                                    NiUpdateData UpdateData(0.0f, 0, 0);
+                                    bhkWorld::SetMotion(apObject, hkpMotion::MOTION_DYNAMIC, true, false, true);
+                                    NiUpdateData UpdateData(0.0f, false, false);
                                     apObject->Update(UpdateData);
                                 }
                             }
                         }
                         else {
-                            ptarget->pRef->DamageObject(fdamage, 0);
+                            ptarget->pRef->DamageObject(fdamage, false);
                         }
                     }
                 }
@@ -1667,20 +1670,20 @@ void Explosion::StartSounds() {
     if (GetExplosionBase()->Data.pSound1) {
         int32_t refID = GetExplosionBase()->Data.pSound1->iFormID;
         BSSoundHandle* arHandle = PlaySound(
-            &a2, refID, 0,
+            &a2, refID, false,
             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_BATTLE_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT |
                 BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
-            1
+            true
         );
         Sound1.operator=(*arHandle);
     }
     if (GetExplosionBase()->Data.pSound2) {
         int32_t uiFormID = GetExplosionBase()->Data.pSound2->iFormID;
         BSSoundHandle* v1 = PlaySound(
-            &arHandleOut, uiFormID, 0,
+            &arHandleOut, uiFormID, false,
             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_BATTLE_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT |
                 BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
-            1
+            true
         );
         Sound2.operator=(*v1);
     }
@@ -1691,7 +1694,7 @@ void Explosion::AttachLight() {
         if (GetExplosionBase()->Data.pLight) {
             NiNode* v2 = Get3D();
             TESObjectLIGH* WaterType = GetExplosionBase()->Data.pLight;
-            spLight.operator=(static_cast<NiPointLight*>(WaterType->GenDynamic(this, v2, 0)));
+            spLight.operator=(static_cast<NiPointLight*>(WaterType->GenDynamic(this, v2, false)));
         }
     }
 }
@@ -1722,29 +1725,29 @@ bool Explosion::RunLOSPick(NiPoint3 aLocation, TESObjectREFR* apTarget) {
     int32_t* v61 = &v66;
     BGSExplosion* pExplode = GetExplosionBase();
     if (pExplode->GetFlag(16)) {
-        return 1;
+        return true;
     }
     if (apTarget) {
         ptarget3D = apTarget->Get3D();
     }
     else {
-        ptarget3D = 0;
+        ptarget3D = nullptr;
     }
     NiNode* ptarget3D_2 = ptarget3D;
     if (apTarget == pPlayer) {
-        ptarget3D_2 = static_cast<NiNode*>(pPlayer->Get3D(0));
+        ptarget3D_2 = static_cast<NiNode*>(pPlayer->Get3D(false));
     }
     if (!ptarget3D_2 || !ptarget3D_2->IsVisualObject()) {
-        return 0;
+        return false;
     }
     if (apTarget->GetParentCell()) {
         pw = apTarget->GetParentCell()->GetbhkWorld();
     }
     else {
-        pw = 0;
+        pw = nullptr;
     }
     if (!pw) {
-        return 0;
+        return false;
     }
     int32_t v54 = 0x26206;
     bhkCollisionFilter::SetMultiLayerCollision(L_CUSTOMPICK1, 0x26206u);
@@ -1784,7 +1787,7 @@ bool Explosion::RunLOSPick(NiPoint3 aLocation, TESObjectREFR* apTarget) {
     fltr.iFilter = 0;
     fltr.SetLayer(L_CUSTOMPICK1);
     bool v16 = apTarget->IsActor();
-    Actor* pactorTarget = v16 ? static_cast<Actor*>(apTarget) : 0;
+    Actor* pactorTarget = v16 ? static_cast<Actor*>(apTarget) : nullptr;
     if (pactorTarget && pactorTarget->GetCharController()) {
         bhkCharacterController* CharController = pactorTarget->GetCharController();
         uint32_t FilterGroup = CharController->GetFilterGroup();
@@ -1834,7 +1837,7 @@ bool Explosion::RunLOSPick(NiPoint3 aLocation, TESObjectREFR* apTarget) {
             v23 = ::new (&v37) NiColorA(0.0f, 1.0f, 0.0f, 1.0f);
         }
         v35 = *v23;
-        NiAVObject* pdebug = (NiAVObject*)MakeLine(aLocation, v35, *targetLocation, v35, 1);
+        NiAVObject* pdebug = (NiAVObject*)MakeLine(aLocation, v35, *targetLocation, v35, true);
         TES::pInstance->AddTempDebugObject(pdebug, 25.0f);
     }
     if (bInFurniture) {
@@ -1876,7 +1879,7 @@ bool Explosion::TestExplosionUnderWater() {
     int32_t v37;
     void* retaddr;
     int32_t* v32 = &v37;
-    bool binWater = 0;
+    bool binWater = false;
     float fExplosionRadiusRatio = fExplosionWaterRadiusRatio.Float();
     TESObjectCELL* pcell = this->GetParentCell();
     if (!this->IsDistant()) {
@@ -1891,13 +1894,13 @@ bool Explosion::TestExplosionUnderWater() {
                     phkworld = pworld->operator*();
                 }
                 else {
-                    phkworld = 0;
+                    phkworld = nullptr;
                 }
                 if (phkworld) {
                     pbroadphase = phkworld->m_broadPhase;
                 }
                 else {
-                    pbroadphase = 0;
+                    pbroadphase = nullptr;
                 }
                 if (pbroadphase) {
                     NiPoint3* v7 = &(v20 = 1.0f * NiPoint3_UNIT_ALL);
@@ -1925,7 +1928,7 @@ bool Explosion::TestExplosionUnderWater() {
                                 double Radius = this->fRadius;
                                 double v9 = Radius * fExplosionRadiusRatio + v4->z;
                                 if ((&pwaterRef->GetLocationOnReference())->z > v9) {
-                                    binWater = 1;
+                                    binWater = true;
                                 }
                             }
                         }
@@ -1933,7 +1936,7 @@ bool Explosion::TestExplosionUnderWater() {
                 }
             }
             else {
-                binWater = 1;
+                binWater = true;
             }
         }
     }
@@ -1943,7 +1946,7 @@ bool Explosion::TestExplosionUnderWater() {
 
 void Explosion::FindTargets() {
     using Detail = hkpSimpleShapePhantom::CollisionDetail;
-    Explosion::ExplosionTarget* pplayerTargetEntry = AddTarget(pPlayer, 0, 1);
+    Explosion::ExplosionTarget* pplayerTargetEntry = AddTarget(pPlayer, false, true);
     if (spPhantom.m_pObject) {
         for (int32_t uiIndex = 0;; ++uiIndex) {
             hkArray<Detail, hkContainerHeapAllocator>* pDetails = &spPhantom.m_pObject->GetCollisionDetails();
@@ -1962,16 +1965,16 @@ void Explosion::FindTargets() {
                         bdynamic = pbody->getMotionType() < hkpMotion::MOTION_KEYFRAMED;
                     }
                     else {
-                        bdynamic = 0;
+                        bdynamic = false;
                     }
-                    Explosion::ExplosionTarget* ptargetEntry = 0;
+                    Explosion::ExplosionTarget* ptargetEntry = nullptr;
                     if (pactor == pPlayer || pactor == pOwner) {
                         if (pactor == pPlayer) {
                             ptargetEntry = pplayerTargetEntry;
                         }
                     }
                     else {
-                        ptargetEntry = AddTarget(pactor, 0, bdynamic);
+                        ptargetEntry = AddTarget(pactor, false, bdynamic);
                     }
                     if (ptargetEntry) {
                         if (pactor->IsActor() && GetDamage() > 0.0) {
@@ -1984,7 +1987,7 @@ void Explosion::FindTargets() {
             }
         }
     }
-    bTargetsFound = 1;
+    bTargetsFound = true;
 }
 
 void Explosion::PushRigidBody(bhkRigidBody* apRigidBody) {
@@ -2009,7 +2012,7 @@ void Explosion::PushRigidBody(bhkRigidBody* apRigidBody) {
                     pav = pcol->m_pkSceneObject;
                 }
                 else {
-                    pav = 0;
+                    pav = nullptr;
                 }
                 TESObjectREFR* pref = TESObjectREFR::FindReferenceFor3D(pav);
                 if (pref) {
@@ -2023,7 +2026,7 @@ void Explosion::PushRigidBody(bhkRigidBody* apRigidBody) {
                     }
                 }
             }
-            fforce = TESHavokUtilities::ScaleGameplayImpulseForce(fforce, apRigidBody, 1);
+            fforce = TESHavokUtilities::ScaleGameplayImpulseForce(fforce, apRigidBody, true);
             if (!bSourceRef) {
                 fforce = BSMIN(fforce, fExplosionMaxImpulse.Float());
             }
@@ -2069,7 +2072,7 @@ void Explosion::DetachLight() {
         NiLight* v2 = spLight.m_pObject;
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
         ShadowSceneNode_->RemoveLight(v2);
-        spLight.operator=(static_cast<NiPointLight*>(0));
+        spLight.operator=(static_cast<NiPointLight*>(nullptr));
     }
 }
 
@@ -2079,7 +2082,7 @@ void Explosion::CheckLimbTarget(Explosion::ExplosionTarget* apTarget, NiAVObject
             if (apTarget->pRef->IsActor()) {
                 Actor* ptargetActor = static_cast<Actor*>(apTarget->pRef);
                 int32_t icount = 0;
-                Explosion::ExplodedLimb* pfarthestLimb = 0;
+                Explosion::ExplodedLimb* pfarthestLimb = nullptr;
                 BSSimpleList<Explosion::ExplodedLimb*>* plist = &apTarget->limbList;
                 while (plist && !plist->IsEmpty()) {
                     ++icount;
@@ -2103,7 +2106,7 @@ void Explosion::CheckLimbTarget(Explosion::ExplosionTarget* apTarget, NiAVObject
 
 void Explosion::AddLimbTarget(Explosion::ExplosionTarget* apTarget, BGSBodyPart::LIMB_ENUM aeLimb, float afDistance) {
     int32_t v5 = 0;
-    Explosion::ExplodedLimb* a2 = 0;
+    Explosion::ExplodedLimb* a2 = nullptr;
     BSSimpleList<Explosion::ExplodedLimb*>* ecx0 = &apTarget->limbList;
     while (ecx0 && (!ecx0->IsEmpty() && (!a2 || a2->eLimb != aeLimb))) {
         ++v5;
@@ -2128,18 +2131,18 @@ void Explosion::AddLimbTarget(Explosion::ExplosionTarget* apTarget, BGSBodyPart:
 void Explosion::CheckRefDeleted(TESObjectREFR* apDeletedRef) {
     BSSimpleList<Explosion::ExplosionTarget*>* pnext;
     if (GetOwner() == apDeletedRef) {
-        pOwner = 0;
+        pOwner = nullptr;
     }
     if (pExplodedRef == apDeletedRef) {
-        pExplodedRef = 0;
+        pExplodedRef = nullptr;
     }
     for (BSSimpleList<Explosion::ExplosionTarget*>* plist = &TargetList; plist && !plist->IsEmpty(); plist = pnext) {
         pnext = plist->m_pkNext;
         Explosion::ExplosionTarget* ptarget = plist->m_item;
         if (ptarget) {
             if (ptarget->pRef == apDeletedRef) {
-                ptarget->bProcessed = 1;
-                ptarget->pRef = 0;
+                ptarget->bProcessed = true;
+                ptarget->pRef = nullptr;
             }
         }
     }

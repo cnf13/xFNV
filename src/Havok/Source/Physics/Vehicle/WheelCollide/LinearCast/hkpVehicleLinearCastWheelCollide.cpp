@@ -301,7 +301,7 @@ void hkpVehicleLinearCastWheelCollide::getPhantoms(hkArray<hkpPhantom*, hkContai
     if (pThis->m_wheelStates.m_size > 0) {
         int32_t v2 = 0;
         int32_t m_size = pThis->m_wheelStates.m_size;
-        while (1) {
+        while (true) {
             hkpAabbPhantom* m_phantom = pThis->m_wheelStates.m_data[v2].m_phantom;
             hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
             if (phantomsOut.m_size == (phantomsOut.m_capacityAndFlags & hkArrayBase<hkpPhantom*>::CAPACITY_MASK)) {
@@ -427,7 +427,7 @@ int32_t hkpVehicleLinearCastWheelCollide::getNumCommands(uint8_t numWheel) const
     hkpAabbPhantom* m_phantom;
     m_phantom = m_wheelStates.m_data[numWheel].m_phantom;
     m_phantom->ensureDeterministicOrder();
-    return (int32_t)m_phantom->m_overlappingCollidables.m_size;
+    return m_phantom->m_overlappingCollidables.m_size;
 }
 
 // One collidable per wheel, built in collidableStorage over the wheel's shape and transform (when there is storage),
@@ -535,8 +535,8 @@ hkBool* hkpVehicleLinearCastWheelCollide::castSingleWheel(
     // MAYBE-INLINED 0xE36A4F: before the vptr store of hkpClosestCdPointCollector's inlined constructor
     a3.m_earlyOutDistance = 3.40282e+38f;
     // MAYBE-INLINED 0xE36A5B: after the vptr store of hkpClosestCdPointCollector's inlined constructor
-    a3.m_hitPoint.m_rootCollidableA = 0;
-    v5->m_phantom->linearCast(&v10, v8, a3, 0);
+    a3.m_hitPoint.m_rootCollidableA = nullptr;
+    v5->m_phantom->linearCast(&v10, v8, a3, nullptr);
     if (a3.m_hitPoint.m_rootCollidableA) {
         linearCastOutput.Assign(a3.m_hitPoint);
         arResult->m_bool = 1;
@@ -609,7 +609,7 @@ void hkpVehicleLinearCastWheelCollide::getCollisionOutputWithoutHit(
 ) const {
     hkpVehicleInstance::WheelInfo* v4 = &vehicle->m_wheelsInfo.m_data[wheelNum];
     double m_length = vehicle->m_suspension->m_wheelParams.m_data[wheelNum].m_length;
-    cdInfo.m_contactBody = 0;
+    cdInfo.m_contactBody = nullptr;
     cdInfo.m_currentSuspensionLength = m_length;
     cdInfo.m_suspensionClosingSpeed = 0.0f;
     cdInfo.m_contactPoint.m_position = v4->m_rayEndPointWs;

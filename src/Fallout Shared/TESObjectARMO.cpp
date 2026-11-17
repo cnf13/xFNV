@@ -360,8 +360,8 @@ TESObjectARMO::~TESObjectARMO() {}
 
 void TESObjectARMO::InitializeData() {
     ourMemset(&data.sRating, 0, sizeof(OBJ_ARMO) - offsetof(OBJ_ARMO, sRating));
-    bIsFoleyBase = (bool)0;
-    pFoleySoundList = (BSSimpleList<FOLEY_SOUND*>*)0;
+    bIsFoleyBase = false;
+    pFoleySoundList = (BSSimpleList<FOLEY_SOUND*>*)nullptr;
     static_cast<TESEnchantableForm*>(this)->TESEnchantableForm::SetCastingType(MagicSystem::CONSTANT_EFFECT);
 }
 
@@ -481,7 +481,7 @@ void TESObjectARMO::InitItem() {
                 TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pFoleyTemplate)))
             );
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -511,7 +511,7 @@ void TESObjectARMO::Copy(TESForm* apCopy) {
                 v3 = ::new (v6) BSSimpleList<FOLEY_SOUND*>;
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             this->pFoleySoundList = v3;
             if (parmo->pFoleySoundList) {
@@ -527,7 +527,7 @@ void TESObjectARMO::Copy(TESForm* apCopy) {
                                 tsnd = ::new (apMemory) FOLEY_SOUND;
                             }
                             else {
-                                tsnd = 0;
+                                tsnd = nullptr;
                             }
                             FOLEY_SOUND* tsnd_2 = tsnd;
                             *tsnd = *fsnd;
@@ -546,30 +546,30 @@ void TESObjectARMO::Copy(TESForm* apCopy) {
 bool TESObjectARMO::Compare(TESForm* apCompare) {
     TESObjectARMO* pcomp = dynamic_cast<TESObjectARMO*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     if (std::memcmp(&data, &pcomp->data, sizeof(data))) {
-        return 1;
+        return true;
     }
     if (bIsFoleyBase != pcomp->bIsFoleyBase) {
-        return 1;
+        return true;
     }
     if (bIsFoleyBase) {
         if (!pcomp->pFoleySoundList) {
-            return 1;
+            return true;
         }
         if (!this->pFoleySoundList) {
-            return 1;
+            return true;
         }
         BSSimpleList<FOLEY_SOUND*>* v3 = pcomp->pFoleySoundList;
         if (v3->m_item != this->pFoleySoundList->m_item) {
-            return 1;
+            return true;
         }
         for (FOLEY_SOUND*& rpItem : this->pFoleySoundList->ItemsUntilNull()) {
-            bool bFound = 0;
+            bool bFound = false;
             for (FOLEY_SOUND*& rpItem_2 : pcomp->pFoleySoundList->ItemsUntilNull()) {
                 FOLEY_SOUND* m_item = rpItem;
                 if (m_item->pSound == rpItem_2->pSound) {
@@ -577,23 +577,23 @@ bool TESObjectARMO::Compare(TESForm* apCompare) {
                     if (iChance == rpItem_2->iChance) {
                         FOLEY_SOUND* v6 = rpItem;
                         if (v6->eType == rpItem_2->eType) {
-                            bFound = 1;
+                            bFound = true;
                             break;
                         }
                     }
                 }
             }
             if (!bFound) {
-                return 1;
+                return true;
             }
         }
     }
     else {
         if (this->pFoleySoundList != pcomp->pFoleySoundList) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 bool TESObjectARMO::ModulatesVoice() {
@@ -616,7 +616,7 @@ uint8_t TESObjectARMO::GetArmorWeight() {
 
 TESSound* TESObjectARMO::GetFoleySound(ENUM_FOLEY_SOUND aeType) {
     BSSimpleList<FOLEY_SOUND*>* pList;
-    TESSound* pSound = 0;
+    TESSound* pSound = nullptr;
     if (bIsFoleyBase) {
         pList = this->pFoleySoundList;
     }
@@ -625,7 +625,7 @@ TESSound* TESObjectARMO::GetFoleySound(ENUM_FOLEY_SOUND aeType) {
         pList = this->pFoleyTemplate->pFoleySoundList;
     }
     else {
-        pList = 0;
+        pList = nullptr;
     }
     while (pList && (!pList->IsEmpty() && !pSound)) {
         FOLEY_SOUND* pData = pList->m_item;

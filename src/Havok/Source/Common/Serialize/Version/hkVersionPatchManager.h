@@ -84,7 +84,7 @@ public:
     };
 
     // A function patch's function: rewrites one object of the patched class.
-    typedef void (*Function)(hkDataObject& o);
+    using Function = void (*)(hkDataObject& o);
 
     // The patch kinds' own structs, which a PatchInfo::Component's patch points to by its type (members from the
     // SDK; layouts from Havok's release hkserialize.pdb).

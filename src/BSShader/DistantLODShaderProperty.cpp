@@ -63,7 +63,6 @@
 #include "SDK/MSVC/string.h"
 
 #include <cstdint>
-#include <stdint.h>
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 NiRTTI DistantLODShaderProperty::ms_RTTI("DistantLODShaderProperty", &BSShaderLightingProperty::ms_RTTI);
@@ -92,10 +91,10 @@ void ClearDistantLODMap() {
     }
     else {
     LABEL_5:;
-        pos_1 = 0;
+        pos_1 = nullptr;
     }
     pos = pos_1;
-    DistantLODShaderProperty::CachedDistantLOD* val_ = 0;
+    DistantLODShaderProperty::CachedDistantLOD* val_ = nullptr;
     if (DistantLODShaderProperty::GetDistantLODMap()->m_kAllocator.m_uiCount) {
         if (pos_1) {
             do {
@@ -639,7 +638,7 @@ void DistantLODShaderProperty::ClearStaticMaps() {
                 if (pCachedGeom) {
                     pCachedGeom->spTriGeomData = nullptr;
                     MemoryManager_Singleton.Deallocate(pCachedGeom->pInstanceIndex);
-                    pCachedGeom->pInstanceIndex = 0;
+                    pCachedGeom->pInstanceIndex = nullptr;
                     pCachedGeom->spBaseTexture = nullptr;
                     pCachedGeom->spAlphaNoBlend = nullptr;
                     pCachedGeom->spAlphaBlend = nullptr;
@@ -671,7 +670,7 @@ void DistantLODShaderProperty::AddDistantLOD(
     int32_t i = 0;
     int32_t v9 = 0;
     if (aiNumPositions) {
-        while (1) {
+        while (true) {
             pGroup = nullptr;
             uint16_t ilen =
                 DistantLODShaderProperty::GetDistantLODGroup(apDistantLODParam, aiCellChunk, &pGroup, apDistantLODNode);

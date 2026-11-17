@@ -18,7 +18,7 @@ class hkRotation;
 class hkTransform;
 
 // The four floats a Havok vector or simd real is stored in.
-typedef __m128 hkQuadReal;
+using hkQuadReal = __m128;
 
 // The four floats of an hkQuadReal as an array (hkSseMathTypes.inl:25).
 union hkQuadRealUnion {

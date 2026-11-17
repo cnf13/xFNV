@@ -91,13 +91,13 @@ void SpectatorThreatInfo::Update() {
         v3 = pSource->GetCombatController();
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     if (v3) {
         pweapon = v3->GetCurrentWeapon();
     }
     else {
-        pweapon = 0;
+        pweapon = nullptr;
     }
     THREAT_LEVEL enewThreatLevel = THREAT_LEVEL_NONE;
     if (pweapon) {
@@ -163,10 +163,10 @@ void SpectatorThreatInfo::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     }
     pTarget = pActor;
     if (pSource) {
-        pSource->TESObjectREFR::SetTargeted(1);
+        pSource->TESObjectREFR::SetTargeted(true);
     }
     if (pTarget) {
-        pTarget->TESObjectREFR::SetTargeted(1);
+        pTarget->TESObjectREFR::SetTargeted(true);
     }
 }
 
@@ -327,7 +327,7 @@ void SpectatorPackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     apLoadGameBuffer->LoadData(&bFlagCompleted, 1u);
     apLoadGameBuffer->LoadData(&kEventCenter, 12u);
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
-    kThreatInfos.SetSize(isaveGameCount, 1);
+    kThreatInfos.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         SpectatorThreatInfo* threatInfo = &kThreatInfos.operator[](i);
         threatInfo->LoadGame(apLoadGameBuffer);
@@ -358,7 +358,7 @@ void SpectatorPackage::Copy(TESForm* apCopy) {
         kEventCenter.z = pcopy->kEventCenter.z;
         bFlagCompleted = pcopy->bFlagCompleted;
         int32_t isize = pcopy->kThreatInfos.iSize;
-        kThreatInfos.SetSize(static_cast<uint32_t>(isize), 1);
+        kThreatInfos.SetSize(static_cast<uint32_t>(isize), true);
         for (int32_t i = 0; i < isize; ++i) {
             SpectatorThreatInfo* v3 = &pcopy->kThreatInfos.operator[](i);
             SpectatorThreatInfo* v2 = &kThreatInfos.operator[](i);
@@ -390,7 +390,7 @@ void SpectatorPackage::InitLoadGame() {
 void SpectatorPackage::AddThreatFromActorToCombatTarget(Actor& aSourceActor) {
     Actor* ptargetActor = aSourceActor.GetCombatTarget();
     int32_t isize = kThreatInfos.iSize;
-    SpectatorThreatInfo* pstoredInfo = 0;
+    SpectatorThreatInfo* pstoredInfo = nullptr;
     for (int32_t i = 0; i < isize; ++i) {
         SpectatorThreatInfo* scanInfo = &kThreatInfos.operator[](i);
         if (scanInfo->pSource == &aSourceActor && scanInfo->pTarget == ptargetActor) {
@@ -400,7 +400,7 @@ void SpectatorPackage::AddThreatFromActorToCombatTarget(Actor& aSourceActor) {
     }
     if (!pstoredInfo) {
         int32_t index = kThreatInfos.iSize;
-        kThreatInfos.SetSize(index + 1, 1);
+        kThreatInfos.SetSize(index + 1, true);
         pstoredInfo = &kThreatInfos.operator[](index);
     }
     pstoredInfo->SetupThreatFromActorToCombatTarget(aSourceActor);
@@ -435,7 +435,7 @@ void SpectatorPackage::ComputeCenterPoint() {
         int32_t icount = 0;
         NiPoint3 maxPoint = NiPoint3_ZERO;
         NiPoint3 minPoint = NiPoint3_ZERO;
-        bool bInitialized = 0;
+        bool bInitialized = false;
         for (i = 0; i < isize; ++i) {
             SpectatorThreatInfo* info = &kThreatInfos.operator[](i);
             if (info->bHasSource && info->bHasTarget) {
@@ -532,7 +532,7 @@ void SpectatorPackage::MakeCombatComment(Actor* apActor, bool bflag) {
                 v5 = FormHealth_0;
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             if (v5) {
                 if (apActor->pCurrentProcess) {
@@ -544,7 +544,7 @@ void SpectatorPackage::MakeCombatComment(Actor* apActor, bool bflag) {
                         if (Topic) {
                             apActor->SetDialogueItemTarget(v5);
                             BaseProcess* v3 = apActor->pCurrentProcess;
-                            v3->ProcessGreet(apActor, Topic, 0, 0, 1, 0);
+                            v3->ProcessGreet(apActor, Topic, false, false, true, false);
                             fConversationTimer = fAISpectatorCommentTimer.Float();
                         }
                     }
@@ -555,7 +555,7 @@ void SpectatorPackage::MakeCombatComment(Actor* apActor, bool bflag) {
     }
     else {
         BaseProcess* v6 = apActor->pCurrentProcess;
-        v6->SetGreetingFlag(0);
+        v6->SetGreetingFlag(false);
         apActor->StopMoving();
     }
 }
@@ -565,15 +565,16 @@ void SpectatorPackage::LookAtCombatants(Actor* apActor, bool bflag) {
     Actor* FormHealth_0;
     if (bflag &&
         (kThreatInfos.iSize &&
-         ((FormHealth_0 = (&kThreatInfos.GetFirst())->pTarget) == 0 || !FormHealth_0->IsActor() ? v5 = 0
-                                                                                                : v5 = FormHealth_0,
+         ((FormHealth_0 = (&kThreatInfos.GetFirst())->pTarget) == nullptr || !FormHealth_0->IsActor()
+              ? v5 = nullptr
+              : v5 = FormHealth_0,
           v5))) {
         BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
         CurrentAIProcess->SetActionHeadTrackTarget(v5);
     }
     else {
         BaseProcess* v3 = apActor->pCurrentProcess;
-        v3->ClearActionHeadTrackTarget(1);
+        v3->ClearActionHeadTrackTarget(true);
     }
 }
 
@@ -606,9 +607,9 @@ void SpectatorPackage::Update(Actor* pOwner) {
             double CastingType = static_cast<double>(info_2->iLastPerceivedTime);
             if (!(fAISpectatorRememberThreatTimer.Float() * 1000.0 + CastingType < v6)) {
                 if (ptarget &&
-                    (ptarget->IsDead(0) ||
+                    (ptarget->IsDead(false) ||
                      (ptarget->GetDelete() || (ptarget->IsParalyzed() || ptarget->IsKnockedOut())))) {
-                    info_2->pTarget = 0;
+                    info_2->pTarget = nullptr;
                     v18 = 1;
                 }
                 else {
@@ -617,7 +618,7 @@ void SpectatorPackage::Update(Actor* pOwner) {
                     if (!psource ||
                         (!psource->IsNpc() ||
                          (!pOwner->pCurrentProcess ||
-                          (!pOwner->pCurrentProcess ? v3 = 0
+                          (!pOwner->pCurrentProcess ? v3 = nullptr
                                                     : (CurrentAIProcess = pOwner->pCurrentProcess,
                                                        v3 = CurrentAIProcess->GetDetectionState(psource, 0)),
                            v3 && v3->iLevel > 0)))) {
@@ -652,8 +653,8 @@ void SpectatorPackage::HandleDeletedActor(void* a2) {
         }
         else {
             if (scanInfo->pTarget == a2) {
-                scanInfo->pTarget = 0;
-                scanInfo->bHasTarget = 0;
+                scanInfo->pTarget = nullptr;
+                scanInfo->bHasTarget = false;
             }
         }
     }
@@ -679,13 +680,13 @@ PathingAvoidNodeArray* SpectatorPackage::CreateAvoidNodeArray() {
         pavoidNodeArray = ::new (apMemory) PathingAvoidNodeArray;
     }
     else {
-        pavoidNodeArray = 0;
+        pavoidNodeArray = nullptr;
     }
     int32_t isize = kThreatInfos.iSize;
     for (int32_t i = 0; i < isize; ++i) {
         const SpectatorThreatInfo& scanInfo = kThreatInfos.operator[](i);
         int32_t nodeArrayIndex = pavoidNodeArray->iSize;
-        pavoidNodeArray->SetSize(nodeArrayIndex + 1, 1);
+        pavoidNodeArray->SetSize(nodeArrayIndex + 1, true);
         PathingAvoidNode* v1 = &pavoidNodeArray->GetAt(nodeArrayIndex);
         scanInfo.GetAvoidNode(v1);
     }

@@ -290,7 +290,7 @@ static void weldVertexArray(
     }
     hk1AxisSweep::sortAabbs(pAabbs, numVertices);
 
-    const float thresholdSq = static_cast<float>(threshold * threshold);
+    const float thresholdSq = (threshold * threshold);
     for (int32_t i = 0; i < numVertices; ++i) {
         const uint32_t key = pAabbs[i].getKey();
         if (key == 0xFFFFFFFFu) {
@@ -417,7 +417,7 @@ void hkGeometryUtils::createCapsuleGeometry(
         const hkQuadReal zSq = _mm_mul_ps(canonicalZ, axis.m_quad);
         const float zDot =
             _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(zSq, zSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(zSq, zSq, 0x55), zSq)));
-        const float zDotAbs = static_cast<float>(std::fabs(zDot));
+        const float zDotAbs = std::fabs(zDot);
         if (zDotAbs < 0.9999899864196777) {
             // col1 = axis x canonicalZ, normalised; col0 = col1 x axis; col2 = axis.
             const hkQuadReal axisYZX = _mm_shuffle_ps(axis.m_quad, axis.m_quad, 0xC9);

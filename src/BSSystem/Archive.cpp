@@ -294,7 +294,7 @@ char* Archive::GetDirectoryString(uint32_t aiDirectoryIndex) {
         return &this->pDirectoryStringArray[pDirectoryStringOffsets[aiDirectoryIndex]];
     }
     if ((oFlags.iFlag & 1) == 0) {
-        return 0;
+        return nullptr;
     }
     uint32_t iDirectories = this->iDirectories;
     Seek(16 * iDirectories + 36, NiFile::ms_iSeekSet);
@@ -311,7 +311,7 @@ char* Archive::GetDirectoryString(uint32_t aiDirectoryIndex) {
     if (this->pDirectoryStringArray) {
         void* Block = (void*)this->pDirectoryStringArray;
         MemoryManager_Singleton.Deallocate(Block);
-        this->pDirectoryStringArray = 0;
+        this->pDirectoryStringArray = nullptr;
     }
     char* v14 = static_cast<char*>(MemoryManager_Singleton.Allocate(v17));
     this->pDirectoryStringArray = v14;
@@ -568,22 +568,22 @@ bool Archive::FindFileInDirectory(
 bool Archive::InvalidateFile(BSHash& arDirectoryHash, BSHash& arFileNameHash, const char* apFileName) {
     uint32_t ifileIndex;
     uint32_t idirectoryIndex;
-    if (!FindFile(arDirectoryHash, arFileNameHash, idirectoryIndex, ifileIndex, 0)) {
-        return 0;
+    if (!FindFile(arDirectoryHash, arFileNameHash, idirectoryIndex, ifileIndex, nullptr)) {
+        return false;
     }
     BSFileEntry* pFileEntry = &pDirectories[idirectoryIndex].pFiles[ifileIndex];
     pFileEntry->iOffset &= 0x80000000u;
-    return 1;
+    return true;
 }
 
 bool Archive::InvalidateFile(uint32_t aiDirectoryIndex, BSHash& arFileNameHash, const char* apFileName) {
     uint32_t ifileIndex;
-    if (!FindFileInDirectory(aiDirectoryIndex, arFileNameHash, ifileIndex, 0, 0)) {
-        return 0;
+    if (!FindFileInDirectory(aiDirectoryIndex, arFileNameHash, ifileIndex, nullptr, false)) {
+        return false;
     }
     BSFileEntry* v6 = &pDirectories[aiDirectoryIndex].pFiles[ifileIndex];
     v6->iOffset &= 0x80000000u;
-    return 1;
+    return true;
 }
 
 // The entry's offset keeps its secondary-archive bit out; its size keeps the compression-toggle and checked bits
@@ -759,7 +759,7 @@ uint32_t Archive::GetDirectoryIndexForFileEntry(BSFileEntry* apFileEntry) {
             return i;
         }
     }
-    return (uint32_t)((-1));
+    return (uint32_t)(-1);
 }
 
 // The address distance is divided unsigned, not as a signed pointer difference.
@@ -773,7 +773,7 @@ uint32_t Archive::GetFileIndexForFileEntryFromDirectory(uint32_t aiDirectoryInde
 
 char* Archive::GetFileNameForFileEntry(BSFileEntry* apFileEntry) {
     uint32_t aiDirectoryIndex = GetDirectoryIndexForFileEntry(apFileEntry);
-    if (aiDirectoryIndex == ((-1))) {
+    if (aiDirectoryIndex == (-1)) {
         return nullptr;
     }
     uint32_t aiFileIndex = GetFileIndexForFileEntryFromDirectory(aiDirectoryIndex, apFileEntry);
@@ -802,7 +802,7 @@ void Archive::DeleteDirectoryStringArray() {
             (&MemoryManager_Singleton)->Deallocate(pDirectoryStringOffsets);
         }
         pDirectoryStringArray = nullptr;
-        pDirectoryStringOffsets = (uint32_t*)0;
+        pDirectoryStringOffsets = (uint32_t*)nullptr;
     }
     cArchiveFlags &= (~0x10u);
 }
@@ -813,17 +813,17 @@ const char* Archive::DoesFileCollide(BSHash& arDirectoryHash, BSHash& arFileName
     uint32_t ifileIndex;
     uint32_t idirectoryIndex;
     if (!ArchiveManager::bCheckRuntimeCollisions) {
-        return 0;
+        return nullptr;
     }
     if ((oFlags.iFlag & 1) == 0) {
-        return 0;
+        return nullptr;
     }
     if ((oFlags.iFlag & 2) == 0) {
-        return 0;
+        return nullptr;
     }
-    _splitpath_s(apFileName, 0, 0, String2, 260u, Str, 260u, 0, 0);
-    if (!FindFile(arDirectoryHash, arFileNameHash, idirectoryIndex, ifileIndex, 0)) {
-        return 0;
+    _splitpath_s(apFileName, nullptr, 0, String2, 260u, Str, 260u, nullptr, 0);
+    if (!FindFile(arDirectoryHash, arFileNameHash, idirectoryIndex, ifileIndex, nullptr)) {
+        return nullptr;
     }
     const char* pdirectoryString = GetDirectoryString(idirectoryIndex);
     const char* pfileString = GetFileString(idirectoryIndex, ifileIndex);
@@ -849,7 +849,7 @@ const char* Archive::DoesFileCollide(BSHash& arDirectoryHash, BSHash& arFileName
         return pdirectoryString;
     }
     if (!_stricmp(comp2, Str)) {
-        return 0;
+        return nullptr;
     }
     MemoryManager_Singleton.Deallocate(comp1);
     MemoryManager_Singleton.Deallocate(comp2);
@@ -869,11 +869,11 @@ uint32_t Archive::FindNewerAndInvalidate() {
             if (!ArchiveManager::pInvalidateDirectoryHashes) {
                 goto LABEL_20;
             }
-            v14 = 0;
+            v14 = false;
             for (uint32_t i = 0; i < ArchiveManager::pInvalidateDirectoryHashes->iSize; ++i) {
                 BSHash* phash = ArchiveManager::pInvalidateDirectoryHashes->pBuffer[i];
                 if (!phash->Compare(*pdirectory)) {
-                    v14 = 1;
+                    v14 = true;
                     break;
                 }
             }
@@ -944,14 +944,14 @@ void Archive::DeleteFilenameStringArray(bool abPreserveOffsets) {
         if (pFileNameStringArray) {
             MemoryManager_Singleton.Deallocate(pFileNameStringArray);
         }
-        pFileNameStringArray = 0;
+        pFileNameStringArray = nullptr;
         if (pFileNameStringOffsets) {
             if (!abPreserveOffsets) {
                 for (uint32_t i = 0; i < iDirectories; ++i) {
                     MemoryManager_Singleton.Deallocate(pFileNameStringOffsets[i]);
                 }
                 MemoryManager_Singleton.Deallocate(pFileNameStringOffsets);
-                pFileNameStringOffsets = 0;
+                pFileNameStringOffsets = nullptr;
             }
         }
     }
@@ -1014,17 +1014,17 @@ void ArchiveFile::SetEndianSwap(bool bDoSwap) {
 
 bool ArchiveFile::Open(bool abWaitForOpen, bool abTextMode) {
     if (m_pBuffer) {
-        return 1;
+        return true;
     }
     m_uiPos = 0;
     m_uiBufferReadSize = 0;
-    m_pBuffer = 0;
+    m_pBuffer = nullptr;
     if (m_uiBufferAllocSize) {
         if (!m_pBuffer) {
             m_pBuffer = static_cast<char*>(MemoryManager_Singleton.Allocate(m_uiBufferAllocSize));
         }
     }
-    m_bGood = 1;
+    m_bGood = true;
     return m_bGood;
 }
 
@@ -1308,7 +1308,7 @@ bool CompressedArchiveFile::Exist() {
 }
 
 void CompressedArchiveFile::Seek(int32_t aiByteCount, int32_t aiSeekFlags) {
-    ReadF(0, aiByteCount);
+    ReadF(nullptr, aiByteCount);
 }
 
 uint32_t CompressedArchiveFile::ReadF(void* apReadBuffer, uint32_t aiByteCount) {
@@ -1579,14 +1579,14 @@ ArchiveManager::OpenArchive(const char* apArchiveName, uint16_t aiForceArchiveTy
 Archive* ArchiveManager::GetArchive(const char* apArchiveName) {
     Archive* m_pObject;
     if (!ArchiveManager::pArchiveList) {
-        return 0;
+        return nullptr;
     }
     EnterCriticalSection(&ArchiveManager::s_ArchiveListLock.CriticalSection);
     BSSimpleList<NiPointer<Archive>>* v4 = ArchiveManager::pArchiveList;
-    while (1) {
+    while (true) {
         if (!v4) {
             LeaveCriticalSection(&ArchiveManager::s_ArchiveListLock.CriticalSection);
-            return 0;
+            return nullptr;
         }
         m_pObject = v4->m_item.m_pObject;
         if (v4->m_item.m_pObject) {
@@ -1711,14 +1711,14 @@ bool ArchiveManager::InvalidateFile(const char* apFileName) {
     BSHash directoryHash;
     BSHash filenameHash;
     if (!ArchiveManager::pArchiveList) {
-        return 0;
+        return false;
     }
     const char* Str1 = ArchiveManager::TrimFileName(apFileName);
     BSHash::MakeDirAndFile(Str1, directoryHash, filenameHash);
     BSSimpleList<NiPointer<Archive>>* plist = ArchiveManager::pArchiveList;
-    while (1) {
+    while (true) {
         if (!plist) {
-            return 0;
+            return false;
         }
         sparchive = plist->m_item.m_pObject;
         if (plist->m_item.m_pObject) {
@@ -1735,7 +1735,7 @@ bool ArchiveManager::InvalidateFile(const char* apFileName) {
         }
     }
     sparchive->DecRefCount();
-    return 1;
+    return true;
 }
 
 // Opens the entry's file from the archive that holds the entry; aeArchiveTypeIndex is unused.
@@ -2153,7 +2153,7 @@ bool ArchiveManager::OpenMasterArchives() {
         while (*pFileName == ' ' || *pFileName == '\t' || *pFileName == '\n') {
             ++pFileName;
         }
-        Archive* pArchive = ArchiveManager::OpenArchive(pFileName, 0, 0);
+        Archive* pArchive = ArchiveManager::OpenArchive(pFileName, 0, false);
         if (pArchive) {
             pArchive->IncRefCount();
         }
@@ -2188,7 +2188,7 @@ bool ArchiveManager::CloseArchive(const char* apArchiveName) {
     FileFinder::FILE_LOCATION v2;
     char acPath[268];
     if (!ArchiveManager::pArchiveList) {
-        return 0;
+        return false;
     }
     strcpy_s(acPath, 260, apArchiveName);
     if (FileFinder::pFinder) {
@@ -2198,18 +2198,18 @@ bool ArchiveManager::CloseArchive(const char* apArchiveName) {
         v2 = FileFinder::NOTFOUND;
     }
     if (v2 == FileFinder::NOTFOUND) {
-        return 0;
+        return false;
     }
     for (BSSimpleList<NiPointer<Archive>>* i = ArchiveManager::pArchiveList; i; i = i->GetNext()) {
         Archive* apArchive = i->m_item.m_pObject;
         if (i->m_item.m_pObject) {
             if (!_stricmp(apArchive->GetDevice(), acPath)) {
                 ArchiveManager::RemoveArchive(apArchive);
-                return 1;
+                return true;
             }
         }
     }
-    return 0;
+    return false;
 }
 
 void ArchiveManager::LoadInvalidationFile(const char* apFileName) {
@@ -2262,7 +2262,7 @@ BSFileEntry* ArchiveManager::GetFileEntryForFileOnlyFromMasterArchives(
     const char* apFileName
 ) {
     NiPointer<Archive>* v5;
-    BSFileEntry* pentry = 0;
+    BSFileEntry* pentry = nullptr;
     if (ArchiveManager::spMasterArchives[0][aeArchiveTypeIndex].m_pObject) {
         v5 = &ArchiveManager::spMasterArchives[0][aeArchiveTypeIndex];
     }
@@ -2289,9 +2289,9 @@ BSFileEntry* ArchiveManager::GetFileEntryForFile_1(
     BSFileEntry* FileEntryForFile;
     Archive* m_pObject;
     BSSimpleList<NiPointer<Archive>>* v7 = ArchiveManager::pArchiveList;
-    while (1) {
+    while (true) {
         if (!v7) {
-            return 0;
+            return nullptr;
         }
         m_pObject = v7->m_item.m_pObject;
         if (v7->m_item.m_pObject) {
@@ -2319,7 +2319,7 @@ bool ArchiveManager::GetFileNameForFileEntry(
     BSFileEntry* apFileEntry,
     char* apFileName
 ) {
-    bool bResult = 0;
+    bool bResult = false;
     Archive* spArchive =
         ArchiveManager::spMasterArchives[(apFileEntry->iOffset & 0x80000000u) != 0][aeArchiveTypeIndex].m_pObject;
     if (spArchive) {
@@ -2328,7 +2328,7 @@ bool ArchiveManager::GetFileNameForFileEntry(
         const char* pcSrc = spArchive->GetFileNameForFileEntry(apFileEntry);
         if (pcSrc) {
             strcpy_s(apFileName, 260, pcSrc);
-            bResult = 1;
+            bResult = true;
         }
         LeaveCriticalSection(&spArchive->ArchiveCriticalSection.CriticalSection);
     }
@@ -2356,7 +2356,7 @@ bool ArchiveManager::GetRandomFileNameForDirectory(
     while (pList) {
         NiPointer<Archive> spArchive = pList->m_item;
         if (spArchive && (aeArchiveType & spArchive->iArchiveType) != 0 &&
-            spArchive->FindDirectory(directoryHash, iDirectoryIndex, 0)) {
+            spArchive->FindDirectory(directoryHash, iDirectoryIndex, nullptr)) {
             spFoundArchive.SetPointer_(&spArchive);
             pDirectory = &spFoundArchive->pDirectories[iDirectoryIndex];
             break;
@@ -2412,7 +2412,7 @@ bool ArchiveManager::GetFileNameForSmallestFileInDirectory(
             NiPointer<Archive> sparchive = plist->m_item;
             if (sparchive.m_pObject &&
                 (static_cast<uint16_t>(aeArchiveType) & sparchive.m_pObject->iArchiveType) != 0 &&
-                sparchive.m_pObject->FindDirectory(directoryHash, idirectoryIndex, 0)) {
+                sparchive.m_pObject->FindDirectory(directoryHash, idirectoryIndex, nullptr)) {
                 spLastArchive.SetPointer_(&sparchive);
                 sptempLastArchive = &spLastArchive.m_pObject->pDirectories[idirectoryIndex];
                 break;
@@ -2467,7 +2467,7 @@ void ArchiveManager::InvalidateFileInArchives(BSHash& arDirectoryHash, BSHash& a
             InterlockedIncrementInt32(reinterpret_cast<int32_t*>(&pArchive->m_uiRefCount));
         }
         if ((static_cast<uint16_t>(aiArchiveTypes) & pArchive->iArchiveType) != 0) {
-            pArchive->InvalidateFile(arDirectoryHash, arFileHash, 0);
+            pArchive->InvalidateFile(arDirectoryHash, arFileHash, nullptr);
         }
         kIter = kIter->GetNext();
         if (pArchive) {

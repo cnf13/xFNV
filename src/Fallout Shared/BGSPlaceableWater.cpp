@@ -115,10 +115,8 @@ void BGSPlaceableWaterData::Endian() {
 }
 
 void BGSPlaceableWaterData::Initialize() {
-    ulFlags = static_cast<uint32_t>(
-        (static_cast<uint32_t>(ulFlags) & 0xFFFF0000u) | (static_cast<uint32_t>(static_cast<uint16_t>(0)))
-    );
-    pWaterType = 0;
+    ulFlags = static_cast<uint32_t>((ulFlags & 0xFFFF0000u) | (static_cast<uint32_t>(static_cast<uint16_t>(0))));
+    pWaterType = nullptr;
 }
 
 void BGSPlaceableWaterData::EndianFromFile() {
@@ -136,16 +134,16 @@ BGSPlaceableWater::~BGSPlaceableWater() {}
 
 void BGSPlaceableWater::InitializeData() {
     Data.Clear();
-    SetReflectionEnabled(1);
-    SetReflectsLand(1);
-    SetReflectsLODLand(1);
-    SetReflectsSky(1);
-    SetRefractionEnabled(1);
-    SetRefractsLand(1);
-    SetAutomaticWater(0);
-    SetObjectTexCoordsEnabled(0);
-    SetDepthEnabled(1);
-    EnableUnderwaterFoggingPass(1);
+    SetReflectionEnabled(true);
+    SetReflectsLand(true);
+    SetReflectsLODLand(true);
+    SetReflectsSky(true);
+    SetRefractionEnabled(true);
+    SetRefractsLand(true);
+    SetAutomaticWater(false);
+    SetObjectTexCoordsEnabled(false);
+    SetDepthEnabled(true);
+    EnableUnderwaterFoggingPass(true);
 }
 
 // Writes the model chunks, then DATA with the water type replaced by its form ID (0 for none).
@@ -186,7 +184,7 @@ void BGSPlaceableWater::InitItem() {
         if (!Data.pWaterType) {
             Data.pWaterType = pDefaultWater;
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -201,10 +199,10 @@ void BGSPlaceableWater::Copy(TESForm* apCopy) {
 bool BGSPlaceableWater::Compare(TESForm* apCompare) {
     BGSPlaceableWater* v5 = dynamic_cast<BGSPlaceableWater*>(apCompare);
     if (!v5) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v5)) {
-        return (bool)1;
+        return true;
     }
     return (std::memcmp(&Data, &v5->Data, sizeof(Data)) != 0);
 }
@@ -218,12 +216,12 @@ bool BGSPlaceableWater::Activate(
 ) {
     TESWaterForm* pwaterForm = GetWaterType();
     if (!pwaterForm) {
-        return 0;
+        return false;
     }
     if (apActionRef && apActionRef->IsActor()) {
         Actor* pActor = static_cast<Actor*>(apActionRef);
         TESIdleManager::SetUsedItem(this);
-        TESIdleManager::SetUsedItemActivate(1);
+        TESIdleManager::SetUsedItemActivate(true);
         double EyeLevel = pActor->Actor::GetEyeLevel();
         double v10 = (&pActor->GetLocationOnReference())->z + EyeLevel;
         float v15 = v10 - pActor->GetReach();
@@ -232,18 +230,18 @@ bool BGSPlaceableWater::Activate(
         TESIdleManager::SetUsedItemLevel(ilevel);
         BaseProcess* pProcess = pActor->GetCurrentAIProcess();
         char banim = pProcess->SetupSpecialIdle(pActor, nullptr, AnimIdle::PLAY_TYPE_AUTO_EXCLUSIVE, true, false, true);
-        TESIdleManager::SetUsedItem(0);
-        TESIdleManager::SetUsedItemActivate(0);
+        TESIdleManager::SetUsedItem(nullptr);
+        TESIdleManager::SetUsedItemActivate(false);
         TESIdleManager::SetUsedItemLevel(-1);
         if (!banim) {
-            return 0;
+            return false;
         }
         if (apActionRef == pPlayer) {
             pCurrentWater = pwaterForm;
-            pPlayer->SetIsDrinkingPlacedWater(1);
-            Animation* Animation_0 = pPlayer->GetAnimation(1);
+            pPlayer->SetIsDrinkingPlacedWater(true);
+            Animation* Animation_0 = pPlayer->GetAnimation(true);
             Animation_0->ClearGroup(AGS_MOVEMENT, 0.0f);
-            Animation* v8 = pPlayer->GetAnimation(0);
+            Animation* v8 = pPlayer->GetAnimation(false);
             v8->ClearGroup(AGS_MOVEMENT, 0.0f);
         }
     }

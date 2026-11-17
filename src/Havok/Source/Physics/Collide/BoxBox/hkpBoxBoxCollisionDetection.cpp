@@ -448,7 +448,7 @@ hkBool hkpBoxBoxCollisionDetection::isValidEdgeEdge(hkpFeaturePointCache& fpp) c
     __m128 v17 = _mm_mul_ps(v15, v11);
     double v18 = v37;
     float v38 = v42 * v42;
-    float v43 = _mm_shuffle_ps(v17, v17, 170)[0] + static_cast<float>(_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]);
+    float v43 = _mm_shuffle_ps(v17, v17, 170)[0] + (_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]);
     double v19 = v38 * v44 - v18 * v18;
     double v20 = v44;
     float v45 = v19;
@@ -487,34 +487,27 @@ hkBool hkpBoxBoxCollisionDetection::isValidEdgeEdge(hkpFeaturePointCache& fpp) c
     );
     __m128 v24 = _mm_mul_ps(v23, v23);
     __m128 v25 = _mm_shuffle_ps(v24, v24, 170);
-    v25[0] = v25[0] + static_cast<float>(_mm_shuffle_ps(v24, v24, 85)[0] + v24[0]);
+    v25[0] = v25[0] + (_mm_shuffle_ps(v24, v24, 85)[0] + v24[0]);
     float v26 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v25[0])));
     __m128 v28 = _mm_cmpeq_ss(v25, _mm_set_ss(zero));
     __m128 v29 = _mm_setzero_ps();
-    v29[0] = static_cast<float>(0.5f * v26) * (3.0f - static_cast<float>(static_cast<float>(v25[0] * v26) * v26));
+    v29[0] = (0.5f * v26) * (3.0f - ((v25[0] * v26) * v26));
     __m128 v30 = _mm_andnot_ps(v28, v29);
     __m128 v31 = _mm_shuffle_ps(v30, v30, 0);
     __m128 v32 = _mm_mul_ps(v31, v23);
     if (m_boundaryTolerance >
-        static_cast<double>(static_cast<float>(
-            static_cast<float>(
-                _mm_shuffle_ps(v24, v24, 170)[0] + static_cast<float>(_mm_shuffle_ps(v24, v24, 85)[0] + v24[0])
-            ) *
-            v31[0]
-        ))) {
+        static_cast<double>(
+            ((_mm_shuffle_ps(v24, v24, 170)[0] + (_mm_shuffle_ps(v24, v24, 85)[0] + v24[0])) * v31[0])
+        )) {
         result.m_bool = 0;
         return result;
     }
     __m128 v33 = _mm_mul_ps(signA, v32);
-    if (static_cast<float>(
-            _mm_shuffle_ps(v33, v33, 170)[0] + static_cast<float>(_mm_shuffle_ps(v33, v33, 85)[0] + v33[0])
-        ) < 0.0f) {
+    if ((_mm_shuffle_ps(v33, v33, 170)[0] + (_mm_shuffle_ps(v33, v33, 85)[0] + v33[0])) < 0.0f) {
         v32 = _mm_xor_ps(v32, hkQuadRealNegateMask);
     }
     __m128 v34 = _mm_mul_ps(v32, v15);
-    float distance = static_cast<float>(
-        _mm_shuffle_ps(v34, v34, 170)[0] + static_cast<float>(_mm_shuffle_ps(v34, v34, 85)[0] + v34[0])
-    );
+    float distance = (_mm_shuffle_ps(v34, v34, 170)[0] + (_mm_shuffle_ps(v34, v34, 85)[0] + v34[0]));
     // An unordered (NaN) distance is also taken as within the tolerance.
     if (m_tolerance < distance) {
         result.m_bool = 0;
@@ -1600,7 +1593,7 @@ void hkpBoxBoxCollisionDetection::checkCompleteness(
         int32_t v5 = 0;
         int32_t v6 = 0;
         int32_t a2a = 0;
-        while (1) {
+        while (true) {
             uint8_t v7;
             int32_t v14;
             bool v15;

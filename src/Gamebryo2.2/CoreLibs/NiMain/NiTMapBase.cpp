@@ -213,7 +213,7 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 using NiTMapBaseUInt32Bool = NiTMapBase<DFALL<NiTMapItem<uint32_t, bool>>, uint32_t, bool>;
 

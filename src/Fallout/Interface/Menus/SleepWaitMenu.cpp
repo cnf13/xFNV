@@ -54,9 +54,9 @@ void SleepWaitMenu::DoClick(int32_t a1, Tile* a2) {
         }
         if (this->bSleepingInBed) {
             float* v3 = &fFadeToBlackFadeSeconds.Float();
-            pFaderManager->CreateFader(FADER_BLACK_UNDER_MENUS, *v3, 0);
+            pFaderManager->CreateFader(FADER_BLACK_UNDER_MENUS, *v3, false);
         }
-        bRestingActive = 1;
+        bRestingActive = true;
         pTiles[4]->Set(4015, 0);
         pTiles[1]->Set(4015, 0);
         bool bSleepingInBed = this->bSleepingInBed;
@@ -73,7 +73,7 @@ void SleepWaitMenu::DoClick(int32_t a1, Tile* a2) {
     else {
         if (a1 == 5) {
             InterfaceManager::PlayMenuSound(MENU_SOUND_CANCEL);
-            pPlayer->SetSleeping(0, 0);
+            pPlayer->SetSleeping(0, false);
             SleepWaitMenu::Close();
         }
     }
@@ -95,7 +95,7 @@ void SleepWaitMenu::DoIdle() {
         }
         float someFloat = fPrevQuantity + 1.0;
         BSsprintf(Src, 260u, "%d %s", FloatToInt(someFloat), v2);
-        pTiles[2]->Set(4036, Src, static_cast<bool>(1));
+        pTiles[2]->Set(4036, Src, true);
     }
 }
 
@@ -116,10 +116,10 @@ bool SleepWaitMenu::DoGamepad(int32_t a2, float a3) {
             v6 = 0x1p+1f;
         }
         v5 = pTiles[1]->GetFloat(SleepWaitMenu::iUT_CurrentValue) + v6;
-        pTiles[1]->Set(SleepWaitMenu::iUT_CurrentValue, v5, (bool)0);
+        pTiles[1]->Set(SleepWaitMenu::iUT_CurrentValue, v5, false);
         v3 = Tile::TextToTrait("_SetInCode");
         pTiles[1]->Poke(v3, 1.0);
-        return (bool)1;
+        return true;
     }
     return (bool)v8;
 }
@@ -128,19 +128,19 @@ bool SleepWaitMenu::UpdateSleep() {
     Controls* v2;
     Controls* Controls_ = appMain->GetControls();
     if (Controls_->GetUserAction(Controls::UACTN_RESTMENU, 2)) {
-        bButtonReleased = 1;
+        bButtonReleased = true;
     }
     if (((bButtonReleased && (v2 = appMain->GetControls(), v2->GetUserAction(Controls::UACTN_RESTMENU, 1))) ||
          (bRestingActive && !pPlayer->IsSleepingorResting())) &&
         !Interface::IsConsoleVisible()) {
-        DoClick(5, 0);
-        return 0;
+        DoClick(5, nullptr);
+        return false;
     }
     else {
         if (bRestingActive) {
             fElapsedSecs = appTimer.fDelta + fElapsedSecs;
             if (!(fElapsedSecs >= 1.0)) {
-                return 0;
+                return false;
             }
             else {
                 fElapsedSecs = 0.0f;
@@ -155,11 +155,11 @@ bool SleepWaitMenu::UpdateSleep() {
                 int32_t v5 = Tile::TextToTrait("_SetInCode");
                 pTiles[1]->Poke(v5, 1.0f);
                 SetCurrentTime();
-                return 1;
+                return true;
             }
         }
         else {
-            return 0;
+            return false;
         }
     }
 }
@@ -183,7 +183,7 @@ bool SleepWaitMenu::UpdateSleeping() {
         return (bool)v3;
     }
     if (menu && menu->UpdateSleep()) {
-        return (bool)1;
+        return true;
     }
     return (bool)v3;
 }
@@ -214,7 +214,7 @@ void SleepWaitMenu::SetCurrentTime() {
         Src, 260, "%s, %s, %d:%02d %s", appCalendar.GetDayOfWeekString(), DateString->String(), v9, iMinutes, pAMPM
     );
     apResult.~BSStringT<char>();
-    pTiles[3]->Set(4036, Src, 1);
+    pTiles[3]->Set(4036, Src, true);
 }
 
 bool SleepWaitMenu::IsWellFormedMenu() {
@@ -255,17 +255,17 @@ Tile* SleepWaitMenu::Create(bool abSleep) {
     Tile* ptile = pin->GetMenusRoot()->ReadFile("Data\\Menus\\sleep_wait_menu.xml");
     SleepWaitMenu::pMe = static_cast<SleepWaitMenu*>(ptile->GetMenu());
     if (SleepWaitMenu::pMe && (v2 = SleepWaitMenu::pMe->GetClass(), v2 == SleepWaitMenu::GetClassStatic())) {
-        SleepWaitMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), 0);
+        SleepWaitMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
         if (SleepWaitMenu::pMe->IsWellFormedMenu()) {
             const char* v5;
             char Dst[264];
             char Src[264];
             BSAudio* v4 = &BSAudio::QInstance();
             BSSoundHandle* SoundHandleByName = v4->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-            SoundHandleByName->Play(0);
+            SoundHandleByName->Play(false);
             if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
                 float afValue = Tile::GetMaximumDepth();
-                ptile->Set(4013, afValue, 1);
+                ptile->Set(4013, afValue, true);
             }
             SleepWaitMenu::pMe->bSleepingInBed = abSleep;
             if (abSleep) {
@@ -276,23 +276,23 @@ Tile* SleepWaitMenu::Create(bool abSleep) {
             }
             BSstrcpy(Dst, 260, v5);
             BSsprintf(Src, 260, "%s %s?", sHowManyWait.String(), Dst);
-            SleepWaitMenu::pMe->pTiles[0]->Set(4036, Src, 1);
+            SleepWaitMenu::pMe->pTiles[0]->Set(4036, Src, true);
             Dst[0] = std::toupper(Dst[0]);
-            SleepWaitMenu::pMe->pTiles[4]->Set(4036, Dst, 1);
+            SleepWaitMenu::pMe->pTiles[4]->Set(4036, Dst, true);
             BSsprintf(Src, 260, "1 %s", sHour.String());
-            SleepWaitMenu::pMe->pTiles[2]->Set(4036, Src, 1);
+            SleepWaitMenu::pMe->pTiles[2]->Set(4036, Src, true);
             SleepWaitMenu::pMe->SetCurrentTime();
             const char* v6 = sCancel.String();
-            SleepWaitMenu::pMe->pTiles[5]->Set(4036, v6, 1);
+            SleepWaitMenu::pMe->pTiles[5]->Set(4036, v6, true);
             float v9 = fMenuBackgroundOpacity.Float() * 255.0;
             Tile* ChildByName = SleepWaitMenu::pMe->pMenu->GetChildByName("SWM_Background");
-            ChildByName->Set(4009, v9, 1);
-            SleepWaitMenu::pMe->PrepForVisibility(0);
+            ChildByName->Set(4009, v9, true);
+            SleepWaitMenu::pMe->PrepForVisibility(false);
             return ptile;
         }
         else {
             Warning("MENUS: Sleep Wait Menu Creation Failed... Are your menu and art resources up to date?");
-            return 0;
+            return nullptr;
         }
     }
     else {
@@ -303,6 +303,6 @@ Tile* SleepWaitMenu::Create(bool abSleep) {
                 }
             }
         }
-        return 0;
+        return nullptr;
     }
 }

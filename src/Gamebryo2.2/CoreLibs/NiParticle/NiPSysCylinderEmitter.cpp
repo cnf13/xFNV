@@ -31,7 +31,7 @@ NiObject* NiPSysCylinderEmitter::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject) NiPSysCylinderEmitter;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fEmitterRadius = m_fEmitterRadius;
@@ -120,7 +120,7 @@ NiObject* NiPSysCylinderEmitter::CreateObject() {
     NiPSysCylinderEmitter* pkObject =
         static_cast<NiPSysCylinderEmitter*>(NiMemObject::operator new(sizeof(NiPSysCylinderEmitter)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysCylinderEmitter;
 }

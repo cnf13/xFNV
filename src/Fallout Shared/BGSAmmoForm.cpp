@@ -32,7 +32,7 @@ bool BGSAmmoForm::CompareComponent(BaseFormComponent* apCompareFC) {
 }
 
 TESAmmo* BGSAmmoForm::GetAmmoHelper() {
-    TESAmmo* pAmmoReturn = 0;
+    TESAmmo* pAmmoReturn = nullptr;
     if (GetAmmoForm()) {
         return GetAmmoForm();
     }
@@ -100,7 +100,7 @@ void BGSAmmoForm::InitItem(TESForm* apOwner) {
         pFormAmmo = TESForm::GetFormByNumericID(itempint);
         if (pFormAmmo) {
             if (pFormAmmo->GetFormType() != AMMO_ID && pFormAmmo->GetFormType() != FLST_ID) {
-                pFormAmmo = 0;
+                pFormAmmo = nullptr;
             }
         }
         if (!pFormAmmo) {

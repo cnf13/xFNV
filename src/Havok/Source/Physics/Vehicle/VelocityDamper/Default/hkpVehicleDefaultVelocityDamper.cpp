@@ -107,9 +107,7 @@ void hkpVehicleDefaultVelocityDamper::applyVelocityDamping(float deltaTime, hkpV
     arVelocity.m_quad = m_entity->m_motion.m_angularVelocity.m_quad;
     __m128 v6 = _mm_mul_ps(arVelocity.m_quad, arVelocity.m_quad);
     float v9 = m_collisionThreshold * m_collisionThreshold;
-    if (!(v9 < static_cast<double>(static_cast<float>(
-                   _mm_shuffle_ps(v6, v6, 170)[0] + static_cast<float>(_mm_shuffle_ps(v6, v6, 85)[0] + v6[0])
-               )))) {
+    if (!(v9 < static_cast<double>((_mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]))))) {
         m_normalSpinDamping = this->m_normalSpinDamping;
     }
     else {

@@ -26,7 +26,7 @@ void InitXGamerProfile() {
             v1 = ::new (apMemory) XGamerProfile;
         }
         else {
-            v1 = 0;
+            v1 = nullptr;
         }
         XGamerProfile::pInstance = v1;
     }
@@ -87,12 +87,12 @@ char return_1_3() {
 }
 
 XGamerProfile::XGamerProfile()
-  : unk4(0), m_bProcessing(0), unk50(0), unk64(0), m_PlayerIndex(0), m_pSaveData(0), m_iNumCorruptContent(0),
+  : unk4(0), m_bProcessing(false), unk50(0), unk64(0), m_PlayerIndex(0), m_pSaveData(nullptr), m_iNumCorruptContent(0),
     iCurrentPlayerLevel(1), iCurrentPlayerAlignment(1), iDifficultyDefault(-1), iControllerSensitivityDefault(-1),
-    bUsesDifficultyDefault(1), bRumbleDefault(1), bInvertYDefault(0), bForcePresenceUpdate(1), bIsPlayingGame(0),
+    bUsesDifficultyDefault(true), bRumbleDefault(1), bInvertYDefault(false), bForcePresenceUpdate(1), bIsPlayingGame(0),
     m_DownloadedContent(), unk3B4(0), unk14278(0) {
     for (int32_t igamePad = 0; igamePad < 4; ++igamePad) {
-        m_bSignedIn[igamePad] = 0;
+        m_bSignedIn[igamePad] = false;
     }
     std::memset(&m_EventData, 0, sizeof(m_EventData));
     std::memset(unk3B8, 0, sizeof(unk3B8));
@@ -124,11 +124,11 @@ void XGamerProfile::SetPlayingFlag(bool abPlaying) {
 bool XGamerProfile::IsCodeRedeemed(const char* cCode) {
     SettingT<INIPrefSettingCollection>::InitCollection();
     INIPrefSettingCollection* pCollection = SettingT_INIPrefSettingCollection_pCollection;
-    Setting* pSetting = 0;
+    Setting* pSetting = nullptr;
     pCollection->Get("uiRedeemedContent:GamePlay", pSetting);
     Setting* pRedeemed = pSetting;
     if (!pRedeemed) {
-        return 0;
+        return false;
     }
     uint32_t uiContentBit = GetContentBit(cCode);
     return (uiContentBit & pRedeemed->uValue.uint) != 0;
@@ -138,7 +138,7 @@ bool XGamerProfile::RedeemCode(const char* cCode) {
     Setting::Info* p_uValue;
     SettingT<INIPrefSettingCollection>::InitCollection();
     INIPrefSettingCollection* pCollection = SettingT_INIPrefSettingCollection_pCollection;
-    Setting* pSetting = 0;
+    Setting* pSetting = nullptr;
     pCollection->Get("uiRedeemedContent:GamePlay", pSetting);
     Setting* v8 = pSetting;
     uint32_t bit = GetContentBit(cCode);
@@ -157,7 +157,7 @@ void XGamerProfile::RevokeCode(const char* cCode) {
     Setting::Info* p_uValue;
     SettingT<INIPrefSettingCollection>::InitCollection();
     INIPrefSettingCollection* pCollection = SettingT_INIPrefSettingCollection_pCollection;
-    Setting* pSetting = 0;
+    Setting* pSetting = nullptr;
     pCollection->Get("uiRedeemedContent:GamePlay", pSetting);
     Setting* v5 = pSetting;
     if (v5) {
@@ -246,7 +246,7 @@ uint32_t XGamerProfile::sub_A25D50() {
 
 bool XGamerProfile::sub_A25FD0() {
     for (FileData* m_item : m_DownloadedContent.ItemsUntilNull()) {}
-    return 1;
+    return true;
 }
 
 XGamerProfile* XGamerProfile::Instance() {

@@ -54,7 +54,7 @@ void CombatWorldStateArray::Update(CombatController* apCombatController) {
                 }
             }
             else {
-                CombatUtilities::CalculateCoverPositions(apCombatController, pcoverLocation, &coverLocation, 0);
+                CombatUtilities::CalculateCoverPositions(apCombatController, pcoverLocation, &coverLocation, nullptr);
                 NiPoint3 vec = coverLocation - attackerWorldLoc.Point;
                 vec.z = vec.z * 0.10000000149011612;
                 if (vec.SqrLength() < 1024.0) {
@@ -82,7 +82,7 @@ void CombatWorldStateArray::Update(CombatController* apCombatController) {
     }
     if (ptarget) {
         if (targetWorldLoc.GetDistanceSquared(attackerWorldLoc) < 589824.0 && !pcombatState->GetTargetUnreachable() &&
-            pcombatState->CheckMovement(targetWorldLoc, 1, 0)) {
+            pcombatState->CheckMovement(targetWorldLoc, true, false)) {
             iatlocationValue |= 2u;
         }
     }
@@ -131,7 +131,7 @@ void CombatWorldStateArray::Update(CombatController* apCombatController) {
     double AltTimer = pcombatState->fThreatScore;
     SetValue(COMBAT_WORLD_STATE_THREATENED, fCombatThreatSignificantScore.Float() < AltTimer);
     TESForm* FormTwo = pcombatState->pExplosiveProjectileBlocked;
-    SetValue(COMBAT_WORLD_STATE_EXPLOSIVE_PROJECTILE_BLOCKED, FormTwo != 0);
+    SetValue(COMBAT_WORLD_STATE_EXPLOSIVE_PROJECTILE_BLOCKED, FormTwo != nullptr);
     if (ptarget) {
         bool HasBufferedDetection = pcombatState->GetHasBufferedDetection();
         SetValue(COMBAT_WORLD_STATE_TARGET_DETECTED, HasBufferedDetection);
@@ -190,16 +190,16 @@ void CombatWorldStateArray::Update(CombatController* apCombatController) {
         if (pcombatState->GetUsableCombatItem(static_cast<int32_t>(i_3))) {
             CombatTimer* UsableCombatItemTimer = pcombatState->GetUsableCombatItemTimer(static_cast<int32_t>(i_3));
             if (UsableCombatItemTimer->Check()) {
-                bool buseItem = 0;
+                bool buseItem = false;
                 if (i_3) {
                     if (i_3 == 1) {
-                        buseItem = 1;
+                        buseItem = true;
                     }
                 }
                 else {
                     double HealthPercentage = pattacker->GetHealthPercentage();
                     if (static_cast<double>(iAICombatRestoreHealthPercentage.Int()) > HealthPercentage * 100.0) {
-                        buseItem = 1;
+                        buseItem = true;
                     }
                 }
                 if (buseItem) {
@@ -279,7 +279,7 @@ int32_t CombatWorldStateArray::GetSpecifiedVariable(int32_t aiSpecifiedVariable)
 void CombatWorldStateArray::GetDebugText(char* apDebugText, uint32_t aiMaxLength, COMBAT_WORLD_STATE aeState) {
     int32_t ivalue = GetValue(aeState);
     if (kCombatWorldStateData[aeState].bBitfield) {
-        bool bstarted = 0;
+        bool bstarted = false;
         for (uint32_t i = 0; i < 32; ++i) {
             if ((ivalue & 1 << i) != 0) {
                 if (bstarted) {
@@ -294,7 +294,7 @@ void CombatWorldStateArray::GetDebugText(char* apDebugText, uint32_t aiMaxLength
                         apDebugText, aiMaxLength, "%s: %s", CombatWorldState::GetStateName(aeState), StateValueText
                     );
                 }
-                bstarted = 1;
+                bstarted = true;
             }
         }
         if (!bstarted) {
@@ -315,8 +315,7 @@ CombatWorldStateArray* CombatWorldStateArray::CombatWorldStateArray_0(CombatWorl
 CombatWorldState::CombatWorldState(COMBAT_WORLD_STATE aeState, int32_t aiValue) : eState(aeState), iValue(aiValue) {}
 
 bool CombatWorldState::ValueMatches(int32_t aiValue) {
-    return (bool)((uint8_t)((((uint32_t)aiValue) == iValue) ||
-                            ((((uint32_t)aiValue) == ((-1))) || (iValue == ((-1))))));
+    return (bool)((uint8_t)((((uint32_t)aiValue) == iValue) || ((((uint32_t)aiValue) == (-1)) || (iValue == (-1)))));
 }
 
 bool CombatWorldState::Matches(COMBAT_WORLD_STATE aeState, int32_t aiValue) {
@@ -402,11 +401,11 @@ bool CombatWorldStateList::GetWorldStateActionValue(COMBAT_WORLD_STATE aeState, 
         CombatWorldState* pstate = pThis->m_item;
         if (pstate && pstate->eState == aeState) {
             ariActionValue = pstate->iValue;
-            return 1;
+            return true;
         }
         pThis = pThis->GetNext();
     }
-    return 0;
+    return false;
 }
 
 bool CombatWorldStateList::HasMatchingWorldState(COMBAT_WORLD_STATE aeState, int32_t aiValue) {
@@ -414,11 +413,11 @@ bool CombatWorldStateList::HasMatchingWorldState(COMBAT_WORLD_STATE aeState, int
     while (pThis) {
         CombatWorldState* pstate = pThis->m_item;
         if (pstate && pstate->Matches(aeState, aiValue)) {
-            return 1;
+            return true;
         }
         pThis = pThis->GetNext();
     }
-    return 0;
+    return false;
 }
 
 CombatWorldStateList* CombatWorldStateList::GetNext() {

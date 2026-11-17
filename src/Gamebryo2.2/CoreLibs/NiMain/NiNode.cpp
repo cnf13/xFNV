@@ -62,7 +62,7 @@ void NiAVObjectArray_InsertAt(
 void NiAVObjectArray_UpdateSize(NiTObjectArray<NiPointer<NiAVObject>>* apArray) {
     FNVD_INLINED_LOCAL(NiPointer<NiAVObject>, spNull, std::nullopt, std::nullopt);
     while (apArray->m_usSize) {
-        NiPointer<NiAVObject>* pNull = ::new (&spNull) NiPointer<NiAVObject>(static_cast<NiAVObject*>(0));
+        NiPointer<NiAVObject>* pNull = ::new (&spNull) NiPointer<NiAVObject>(static_cast<NiAVObject*>(nullptr));
         bool v3 = apArray->m_pBase[apArray->m_usSize - 1].operator!=(*pNull);
         spNull.~NiPointer<NiAVObject>();
         if (v3) {
@@ -175,27 +175,27 @@ bool NiNode::IsEqual(NiObject* pkObject) {
         NiNode* pkNode = static_cast<NiNode*>(pkObject);
         uint32_t m_usSize = m_kChildren.m_usSize;
         if (m_usSize != pkNode->m_kChildren.m_usSize) {
-            return 0;
+            return false;
         }
         uint32_t i = 0;
         if (!m_kChildren.m_usSize) {
-            return 1;
+            return true;
         }
-        while (1) {
+        while (true) {
             NiAVObject* pkChild0 = m_kChildren.m_pBase[i].m_pObject;
             NiAVObject* pkChild1 = pkNode->m_kChildren.m_pBase[i].m_pObject;
             if (pkChild0) {
                 if (!pkChild1 || !pkChild0->IsEqual(pkChild1)) {
-                    return 0;
+                    return false;
                 }
             }
             else {
                 if (pkChild1) {
-                    return 0;
+                    return false;
                 }
             }
             if (++i >= m_usSize) {
-                return 1;
+                return true;
             }
         }
     }
@@ -300,12 +300,12 @@ void NiNode::ApplyTransform(const NiMatrix3& kMat, const NiPoint3& kTrn, bool bO
         v22 = (v16 * m_kLocal.m_Rotate.m_pEntry[2][2]) +
             ((v14 * m_kLocal.m_Rotate.m_pEntry[1][2]) + (v12 * m_kLocal.m_Rotate.m_pEntry[0][2]));
         bOnLefta = (float)(1.0 / m_kLocal.m_fScale);
-        v23.x = (float)(bOnLefta * v18);
-        v23.y = (float)(v20 * bOnLefta);
-        for (v23.z = (float)(bOnLefta * v22); v7 < ((uint32_t)((int32_t)m_kChildren.m_usSize)); ++v7) {
+        v23.x = (bOnLefta * v18);
+        v23.y = (v20 * bOnLefta);
+        for (v23.z = (bOnLefta * v22); v7 < ((uint32_t)((int32_t)m_kChildren.m_usSize)); ++v7) {
             m_pObject = m_kChildren.m_pBase[v7].m_pObject;
             if (m_pObject) {
-                m_pObject->ApplyTransform(v24, v23, (bool)1);
+                m_pObject->ApplyTransform(v24, v23, true);
             }
         }
     }
@@ -313,7 +313,7 @@ void NiNode::ApplyTransform(const NiMatrix3& kMat, const NiPoint3& kTrn, bool bO
         for (i = 0; i < ((uint32_t)((int32_t)m_kChildren.m_usSize)); ++i) {
             v10 = m_kChildren.m_pBase[i].m_pObject;
             if (v10) {
-                v10->ApplyTransform(kMat, kTrn, (bool)1);
+                v10->ApplyTransform(kMat, kTrn, true);
             }
         }
     }
@@ -403,7 +403,7 @@ void NiNode::SetSelectiveUpdateFlags(bool& bSelectiveUpdate, int32_t bSelectiveU
 
 void NiNode::UpdateDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) {
     if (UpdateData.bUpdateControllers) {
-        UpdateObjectControllers(UpdateData, 1);
+        UpdateObjectControllers(UpdateData, true);
     }
     UpdateWorldData(UpdateData);
     if ((this->m_uFlags & 1) != 0) {
@@ -446,7 +446,7 @@ void NiNode::UpdateDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) {
     }
     if (m_usSize) {
         NiAVObject* pkChild;
-        while (1) {
+        while (true) {
             pkChild = m_kChildren.m_pBase[i].m_pObject;
             if (pkChild) {
                 pkChild->UpdateDownwardPass(UpdateData, uFlags);
@@ -482,7 +482,7 @@ void NiNode::UpdateDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) {
 void NiNode::UpdateSelectedDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) {
     bool bUpdateControllers = UpdateData.bUpdateControllers;
     UpdateData.bUpdateControllers = (this->m_uFlags & NiAVObject::SELECTIVE_UPDATE_CONTROLLER) != 0;
-    UpdateObjectControllers(UpdateData, 1);
+    UpdateObjectControllers(UpdateData, true);
     bool v6 = !UpdateData.bParallelUpdate;
     UpdateData.bUpdateControllers = bUpdateControllers;
     if ((this->m_uFlags & NiAVObject::SELECTIVE_UPDATE_TRANSFORMS) != 0 && v6) {
@@ -537,7 +537,7 @@ void NiNode::UpdateSelectedDownwardPass(NiUpdateData& UpdateData, uint32_t uFlag
     }
     if (m_usSize) {
         NiAVObject* v11;
-        while (1) {
+        while (true) {
             v11 = m_kChildren.m_pBase[v9].m_pObject;
             if (v11) {
                 if ((v11->m_uFlags & NiAVObject::SELECTIVE_UPDATE) != 0) {
@@ -584,7 +584,7 @@ void NiNode::UpdateRigidDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) 
     NiAVObject* m_pObject;
     bUpdateControllers = (uint8_t)(&UpdateData)->bUpdateControllers;
     (&UpdateData)->bUpdateControllers = ((((int32_t)m_uFlags) & 8) != 0);
-    NiAVObject::UpdateObjectControllers(UpdateData, 1);
+    NiAVObject::UpdateObjectControllers(UpdateData, true);
     (&UpdateData)->bUpdateControllers = (bool)bUpdateControllers;
     if ((((int32_t)m_uFlags) & 4) != 0) {
         UpdateWorldData(UpdateData);
@@ -691,7 +691,7 @@ void NiNode::UpdateTransformAndBounds(NiUpdateData& UpdateData) {
     }
     if (m_usSize) {
         NiAVObject* v6;
-        while (1) {
+        while (true) {
             v6 = m_kChildren.m_pBase[v4].m_pObject;
             if (v6) {
                 v6->UpdateTransformAndBounds(UpdateData);
@@ -798,11 +798,11 @@ void NiNode::DetachChild(NiAVObject* apChild, NiPointer<NiAVObject>& arspAVObjec
         NiAVObject* m_pObject = arspAVObject.m_pObject;
         if (arspAVObject.m_pObject) {
             NiDecRefCount(m_pObject);
-            v6->m_pObject = 0;
+            v6->m_pObject = nullptr;
         }
         return;
     }
-    while (1) {
+    while (true) {
         v5 = m_kChildren.m_pBase[i].m_pObject;
         if (v5) {
             break;
@@ -817,7 +817,7 @@ void NiNode::DetachChild(NiAVObject* apChild, NiPointer<NiAVObject>& arspAVObjec
         NiDecRefCount(v5);
         goto LABEL_6;
     }
-    v5->m_pkParent = 0;
+    v5->m_pkParent = nullptr;
     { NiPointer<NiAVObject> v11 = (m_kChildren.RemoveAt(i)); }
     NiPointer<NiAVObject>* v9 = &arspAVObject;
     NiAVObject* v10 = arspAVObject.m_pObject;
@@ -842,14 +842,14 @@ void NiNode::DetachChildAt(uint32_t auiIndex, NiPointer<NiAVObject>& arspAVObjec
         NiAVObject* m_pObject = arspAVObject.m_pObject;
         if (arspAVObject.m_pObject) {
             NiDecRefCount(m_pObject);
-            v9->m_pObject = 0;
+            v9->m_pObject = nullptr;
         }
     }
     else {
         NiAVObject* v5 = m_kChildren.m_pBase[auiIndex].m_pObject;
         if (v5) {
             NiIncRefCount(v5);
-            v5->m_pkParent = 0;
+            v5->m_pkParent = nullptr;
             NiPointer<NiAVObject> v11 = (m_kChildren.RemoveAt(auiIndex));
         }
         NiPointer<NiAVObject>* v7 = &arspAVObject;
@@ -893,14 +893,14 @@ void NiNode::SetAt(uint32_t auiIndex, NiAVObject* apChild, NiPointer<NiAVObject>
         NiAVObject* m_pObject = arspAVObject.m_pObject;
         if (arspAVObject.m_pObject) {
             NiDecRefCount(m_pObject);
-            v6->m_pObject = 0;
+            v6->m_pObject = nullptr;
         }
         return;
     }
     NiAVObject* v8 = m_kChildren.m_pBase[auiIndex].m_pObject;
     if (v8) {
         NiIncRefCount(v8);
-        v8->m_pkParent = 0;
+        v8->m_pkParent = nullptr;
     }
     if (apChild) {
         apChild->AttachParent(this);
@@ -1059,7 +1059,7 @@ void NiAVObjectArray_SetAt(
     const NiPointer<NiAVObject>* apElement
 ) {
     // `tcmp` is NiTArray::SetAt's guarded null element.
-    static NiPointer<NiAVObject> tcmp = static_cast<NiAVObject*>(0);
+    static NiPointer<NiAVObject> tcmp = static_cast<NiAVObject*>(nullptr);
     if (auiIndex < apArray->m_usSize) {
         if (apElement->operator!=(tcmp)) {
             if (apArray->m_pBase[auiIndex].operator==(tcmp)) {
@@ -1134,7 +1134,7 @@ void NiAVObjectArray_Compact(NiTObjectArray<NiPointer<NiAVObject>>* apArray) {
             uint16_t v6 = 0;
             uint16_t v5 = 0;
             while (v6 < static_cast<int32_t>(apArray->m_usSize)) {
-                NiPointer<NiAVObject>* pNull = ::new (&spNull) NiPointer<NiAVObject>(static_cast<NiAVObject*>(0));
+                NiPointer<NiAVObject>* pNull = ::new (&spNull) NiPointer<NiAVObject>(static_cast<NiAVObject*>(nullptr));
                 bool v3 = apArray->m_pBase[v6].operator!=(*pNull);
                 spNull.~NiPointer<NiAVObject>();
                 if (v3) {
@@ -1156,7 +1156,7 @@ void NiAVObjectArray_Compact(NiTObjectArray<NiPointer<NiAVObject>>* apArray) {
             }
         }
         else {
-            apArray->m_pBase = 0;
+            apArray->m_pBase = nullptr;
         }
         NiAVObjectArray_Deallocate(pSaveBase);
     }

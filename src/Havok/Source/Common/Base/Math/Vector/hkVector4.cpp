@@ -125,7 +125,7 @@ void hkVector4::setTransformedPos(const hkQsTransform& t, const hkVector4& v) {
     __m128 v4 = _mm_mul_ps(t.m_scale.m_quad, v.m_quad);
     __m128 v5 = _mm_mul_ps(v3.m_vec.m_quad, v4);
     __m128 v6 = _mm_shuffle_ps(v5, v5, 170);
-    v6[0] = v6[0] + static_cast<float>(_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
+    v6[0] = v6[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
     __m128 v7 = _mm_shuffle_ps(v3.m_vec.m_quad, v3.m_vec.m_quad, 255);
     __m128 v8 = _mm_add_ps(
         _mm_mul_ps(
@@ -217,7 +217,7 @@ void hkVector4::setTransformedInversePos(const hkQsTransform& a, const hkVector4
     __m128 v4 = _mm_sub_ps(b.m_quad, a.m_translation.m_quad);
     __m128 v5 = _mm_mul_ps(v3.m_vec.m_quad, v4);
     __m128 v6 = _mm_shuffle_ps(v5, v5, 170);
-    v6[0] = v6[0] + static_cast<float>(_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
+    v6[0] = v6[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
     __m128 v7 = _mm_shuffle_ps(v3.m_vec.m_quad, v3.m_vec.m_quad, 255);
     __m128 v8 = _mm_add_ps(
         _mm_mul_ps(
@@ -314,9 +314,9 @@ void hkVector4::sub_D53060(hkRotation* a1, hkRotation* arg4, hkVector4* a3) {
     float v12 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v11[0])));
     v13[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v14 = _mm_cmpeq_ss(v11, v13);
-    v13[0] = 3.0f - static_cast<float>(static_cast<float>(v11[0] * v12) * v12);
+    v13[0] = 3.0f - ((v11[0] * v12) * v12);
     __m128 v15 = _mm_setzero_ps();
-    v15[0] = static_cast<float>(0.5f * v12) * v13[0];
+    v15[0] = (0.5f * v12) * v13[0];
     __m128 v16 = _mm_andnot_ps(v14, v15);
     __m128 v17 = _mm_shuffle_ps(v16, v16, 0);
     __m128 m_quad = a3->m_quad;
@@ -335,11 +335,9 @@ void hkVector4::sub_D53060(hkRotation* a1, hkRotation* arg4, hkVector4* a3) {
 
 bool* hkVector4::hasValidAxis(bool* a1) {
     __m128 v2 = _mm_mul_ps(m_quad, m_quad);
-    *a1 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
-              static_cast<float>(
-                  (_mm_shuffle_ps(v2, v2, 170)[0] + static_cast<float>(_mm_shuffle_ps(v2, v2, 85)[0] + v2[0]))
-              )
-          ))) > 1.1920929e-07f;
+    *a1 = _mm_cvtss_f32(
+              _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v2, v2, 170)[0] + (_mm_shuffle_ps(v2, v2, 85)[0] + v2[0]))))
+          ) > 1.1920929e-07f;
     return a1;
 }
 
@@ -682,7 +680,7 @@ calcTriangleBarycentricPlanes(const hkVector4* vertices, const float* params, hk
 float calcSignedSquaredDistance(const hkVector4* a1, const hkVector4* a2, const hkVector4* r_eax) {
     const __m128 v = _mm_mul_ps(_mm_sub_ps(r_eax->m_quad, a1->m_quad), a2->m_quad);
     const float d = _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(v, v, 0xAA), _mm_add_ss(_mm_shuffle_ps(v, v, 0x55), v)));
-    const float absD = static_cast<float>(std::fabs(d));
+    const float absD = std::fabs(d);
     const float result = d * absD;
     return result;
 }

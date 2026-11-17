@@ -20,7 +20,7 @@ void WaterBlendHeightmaps::ReloadShaders() {
     v3.strPath = "water\\2_ab\\p\\displace.p.hlsl";
     v3.kMacros[0].Name = "BLEND_HEIGHTMAPS";
     std::memset(&v3.kMacros[0].Definition, 0, sizeof(v3.kMacros) - sizeof(v3.kMacros[0].Name));
-    const char* PSTarget = BSShaderManager::GetPSTarget(1);
+    const char* PSTarget = BSShaderManager::GetPSTarget(true);
     LoadShaders(v4, v3, "WATERDISPLACEMENTBLENDHEIGHTMAPS", ShaderTarget_vs_1_1, PSTarget);
     LoadStagesAndPasses();
 }

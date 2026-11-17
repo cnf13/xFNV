@@ -3,7 +3,7 @@
 // Steam (FNVD_NO_STEAM), so these do what the DLL does without SteamAPI_Init. Steam is not running, the interface
 // getters return null, and callbacks are neither registered nor run.
 
-#include <stdint.h>
+#include <cstdint>
 
 extern "C" {
 

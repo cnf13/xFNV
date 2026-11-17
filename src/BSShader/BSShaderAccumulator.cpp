@@ -161,11 +161,11 @@ bool BSShaderAccumulator::RegisterObject(NiGeometry* apGeometry) {
         (static_cast<BSDismemberSkinInstance*>(apGeometry->m_spSkinInstance.m_pObject)->GetRTTI() ==
              &BSDismemberSkinInstance::ms_RTTI &&
          !m_pObject->bVisiblePartitions)) {
-        return 1;
+        return true;
     }
     BSShaderProperty* pshp = static_cast<BSShaderProperty*>(apGeometry->m_PropertyState.m_aspProps[3].m_pObject);
     if (!apGeometry->GetShader() || !pshp) {
-        return 1;
+        return true;
     }
     BSShaderAccumulatorRegisterObjectFunc v5 = BSShaderAccumulator::pRegisterObjectFunc[eRenderMode];
     BSShader* m_spShader = apGeometry->GetShader();
@@ -239,7 +239,7 @@ void BSShaderAccumulator::DoSunOcclusionQuery(NiTriShape* apSunGeometry, uint32_
             }
             if (bHasQuery) {
                 BSShader* Shader = BSShaderManager::GetShader(1);
-                ShadowLightShader::EnableConstantsForPass(9u, 0);
+                ShadowLightShader::EnableConstantsForPass(9u, false);
                 Shader->m_spVertexConstantMap.m_pObject->SortByEnabled();
                 Shader->m_spPixelConstantMap.m_pObject->SortByEnabled();
                 pTest->pOcclusionQuery->Begin();
@@ -275,7 +275,7 @@ bool BSShaderAccumulator::RenderVolumetricFog(NiCamera* apCamera, BSRenderedText
             BSShaderManager::pImageSpaceManager->pEffectList.m_pBase[ImageSpaceManager::EFFECT_SHADER_VOLUMETRIC_FOG]
         );
         BSRenderedTexture* pvolumetricFogBuffer = pFogShader->GetTexture();
-        BSShaderProperty::RenderPass renderpass(0, 0, 1, 0, 0);
+        BSShaderProperty::RenderPass renderpass(nullptr, 0, 1, 0, 0);
         bool busesinglepass = BSShaderManager::b30VFog;
         NiCamera* pOldCamera = this->m_pkCamera;
         this->m_pkCamera = apCamera;
@@ -291,7 +291,7 @@ bool BSShaderAccumulator::RenderVolumetricFog(NiCamera* apCamera, BSRenderedText
         renderpass.usPassEnum = BSShaderManager::BSSM_VFOG_3;
         NiTListItem<NiGeometry*>* m_pkHead = pVolumetricFogGeometry.m_pkHead;
         if (m_pkHead) {
-            while (1) {
+            while (true) {
                 NiTListItem<NiGeometry*>* pNextItem = m_pkHead->m_pkNext;
                 NiGeometry* pkItem = m_pkHead->m_element;
                 NiShadeProperty* pShadeProp =
@@ -356,7 +356,8 @@ bool BSShaderAccumulator::RenderVolumetricFog(NiCamera* apCamera, BSRenderedText
                     pFogEffect->bParamsChanged = true;
                     pFogEffect->FogColor.a = v31;
                     BSShaderManager::pImageSpaceManager->RenderEffect(
-                        ImageSpaceManager::EFFECT_VOLUMETRIC_FOG, pRenderer, apCurRenderTarget, apCurRenderTarget, 0, 1
+                        ImageSpaceManager::EFFECT_VOLUMETRIC_FOG, pRenderer, apCurRenderTarget, apCurRenderTarget,
+                        nullptr, 1
                     );
                 }
                 if (!pNextItem) {
@@ -388,7 +389,7 @@ void BSShaderAccumulator::ResetSunOcclusion() {
             v1 = 0.0;
             if (sunTest.bWaiting) {
                 ++sunTest.uiFrameCount;
-                bWaitingForSunQueury = 1;
+                bWaitingForSunQueury = true;
                 v6 = 0;
             }
         }
@@ -403,7 +404,7 @@ void BSShaderAccumulator::ResetSunOcclusion() {
         }
     }
     if (v6) {
-        bWaitingForSunQueury = 0;
+        bWaitingForSunQueury = false;
         fPercentSunOccludedStored = fpercentSunOccluded_2;
         if (uipixelCounter < 10) {
             fPercentSunOccludedStored = 1.0f;
@@ -619,7 +620,7 @@ void BSShaderAccumulator::SetShadowSceneNode(ShadowSceneNode* apShadowSceneNode)
 }
 
 void BSShaderAccumulator::SetRenderMode(BSShaderManager::etRenderMode aeRenderMode) {
-    eRenderMode = static_cast<BSShaderManager::etRenderMode>(aeRenderMode);
+    eRenderMode = aeRenderMode;
 }
 
 void BSShaderAccumulator::SetUnderWater(bool abUnderWater) {
@@ -632,7 +633,7 @@ void BSShaderAccumulator::ClearRenderPasses() {
 
 void BSShaderAccumulator::ClearBloodSplatter() {
     for (uint32_t i = 0; i < uiBatchRendererCount; ++i) {
-        pBatchRenderer[i]->ClearRenderPasses(0);
+        pBatchRenderer[i]->ClearRenderPasses(false);
     }
 }
 
@@ -696,25 +697,25 @@ void BSShaderAccumulator::ClearAllBoundVolumes() {
             if (pOcclusionQuery) {
                 m_element->pOcclusionQuery->~BSOcclusionQuery();
                 MemoryManager_Singleton.Deallocate(pOcclusionQuery);
-                m_element->pOcclusionQuery = 0;
+                m_element->pOcclusionQuery = nullptr;
             }
             MemoryManager_Singleton.Deallocate(m_element);
         }
         NiTListItem<ReferenceVolume*>* pNode = ReferenceVolumeList.m_pkHead;
         ReferenceVolumeList.m_pkHead = pNode->m_pkNext;
         if (ReferenceVolumeList.m_pkHead) {
-            ReferenceVolumeList.m_pkHead->m_pkPrev = 0;
+            ReferenceVolumeList.m_pkHead->m_pkPrev = nullptr;
         }
         else {
-            ReferenceVolumeList.m_pkTail = 0;
+            ReferenceVolumeList.m_pkTail = nullptr;
         }
         // EXE-INLINED 0x45CEE0
         // DeleteItem and the pool's Deallocate, inlined as the engine does: the node's memory is the allocator's node.
         pNode->m_element = 0;
         NiTAbstractPoolAllocator<uint32_t>::AllocNode* pAllocNode =
             static_cast<NiTAbstractPoolAllocator<uint32_t>::AllocNode*>(static_cast<void*>(pNode));
-        NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.Lock(0);
-        pAllocNode->m_pkData = 0;
+        NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.Lock(nullptr);
+        pAllocNode->m_pkData = nullptr;
         pAllocNode->m_pkNext = NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
         bool v6 = NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.uiLockCount-- == 1;
         NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem = pAllocNode;
@@ -730,7 +731,7 @@ void BSShaderAccumulator::RemoveBoundVolume(uint32_t auiReferenceID) {
     if (m_pkHead) {
         ReferenceVolume* pvolume;
         ReferenceVolume* v7;
-        while (1) {
+        while (true) {
             pvolume = m_pkHead->m_element;
             m_pkHead = m_pkHead->m_pkNext;
             v7 = pvolume;
@@ -749,7 +750,7 @@ void BSShaderAccumulator::RemoveBoundVolume(uint32_t auiReferenceID) {
                 pvolume->pOcclusionQuery->~BSOcclusionQuery();
                 MemoryManager_Singleton.Deallocate(pOcclusionQuery);
             }
-            pvolume->pOcclusionQuery = 0;
+            pvolume->pOcclusionQuery = nullptr;
         }
         MemoryManager_Singleton.Deallocate(pvolume);
         p_ReferenceVolumeList->Remove(v7);
@@ -764,9 +765,9 @@ bool BSShaderAccumulator::IsBoundVolumeOccluded(uint32_t auiReferenceID, bool ab
     }
     NiTListItem<ReferenceVolume*>* m_pkHead = ReferenceVolumeList.m_pkHead;
     if (!m_pkHead) {
-        return 0;
+        return false;
     }
-    while (1) {
+    while (true) {
         pvolume = m_pkHead->m_element;
         m_pkHead = m_pkHead->m_pkNext;
         if (pvolume) {
@@ -775,7 +776,7 @@ bool BSShaderAccumulator::IsBoundVolumeOccluded(uint32_t auiReferenceID, bool ab
             }
         }
         if (!m_pkHead) {
-            return 0;
+            return false;
         }
     }
     if (!pvolume->bWaiting) {
@@ -786,14 +787,14 @@ bool BSShaderAccumulator::IsBoundVolumeOccluded(uint32_t auiReferenceID, bool ab
             bool v8;
             uint32_t ddata;
             do {
-                v8 = pvolume->pOcclusionQuery->GetResult(&ddata, 1);
+                v8 = pvolume->pOcclusionQuery->GetResult(&ddata, true);
             }
             while (v8);
             if (!v8) {
                 pvolume->bOccluded = (ddata == 0);
                 pvolume->uiPixelCount = ddata;
             LABEL_20:;
-                pvolume->bWaiting = 0;
+                pvolume->bWaiting = false;
                 goto LABEL_21;
             }
             BSOcclusionQuery* pOcclusionQuery = pvolume->pOcclusionQuery;
@@ -802,7 +803,7 @@ bool BSShaderAccumulator::IsBoundVolumeOccluded(uint32_t auiReferenceID, bool ab
                 MemoryManager_Singleton.Deallocate(pOcclusionQuery);
             }
             v3 = auiReferenceID;
-            pvolume->pOcclusionQuery = 0;
+            pvolume->pOcclusionQuery = nullptr;
         }
         else {
             if (!BSShaderAccumulator::bResetBoundingSphereOcclusion) {
@@ -810,7 +811,7 @@ bool BSShaderAccumulator::IsBoundVolumeOccluded(uint32_t auiReferenceID, bool ab
             }
         }
         pvolume->uiPixelCount = 0xF423F;
-        pvolume->bOccluded = 0;
+        pvolume->bOccluded = false;
         goto LABEL_20;
     }
 LABEL_21:;
@@ -1104,17 +1105,17 @@ void BSShaderAccumulator::RenderTiles() {
                 NiTListItem<NiGeometry*>* pNext = pNode->m_pkNext;
                 pList->m_pkHead = pNext;
                 if (pNext) {
-                    pNext->m_pkPrev = 0;
+                    pNext->m_pkPrev = nullptr;
                 }
                 else {
-                    pList->m_pkTail = 0;
+                    pList->m_pkTail = nullptr;
                 }
                 pNode->m_element = 0;
                 // EXE-INLINED 0x45CEE0
                 NiTAbstractPoolAllocator<uint32_t>::AllocNode* pAllocNode =
                     static_cast<NiTAbstractPoolAllocator<uint32_t>::AllocNode*>(static_cast<void*>(pNode));
-                NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.Lock(0);
-                pAllocNode->m_pkData = 0;
+                NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.Lock(nullptr);
+                pAllocNode->m_pkData = nullptr;
                 pAllocNode->m_pkNext = NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
                 v13 = NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.uiLockCount-- == 1;
                 NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem = pAllocNode;
@@ -1132,17 +1133,17 @@ void BSShaderAccumulator::RenderTiles() {
             NiTListItem<NiGeometry*>* v15 = m_pkHead->m_pkNext;
             m_kItems.m_pkHead = m_pkHead->m_pkNext;
             if (v15) {
-                v15->m_pkPrev = 0;
+                v15->m_pkPrev = nullptr;
             }
             else {
-                m_kItems.m_pkTail = 0;
+                m_kItems.m_pkTail = nullptr;
             }
             m_pkHead->m_element = 0;
             // EXE-INLINED 0x45CEE0
             NiTAbstractPoolAllocator<uint32_t>::AllocNode* pAllocNode =
                 static_cast<NiTAbstractPoolAllocator<uint32_t>::AllocNode*>(static_cast<void*>(m_pkHead));
-            NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.Lock(0);
-            pAllocNode->m_pkData = 0;
+            NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.Lock(nullptr);
+            pAllocNode->m_pkData = nullptr;
             pAllocNode->m_pkNext = NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
             v13 = NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.uiLockCount-- == 1;
             NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem = pAllocNode;
@@ -1217,14 +1218,14 @@ void BSShaderAccumulator::ClearAllQueries() {
         do {
             BSOcclusionQuery** v3 = &this->ppOcclusionQuery[i];
             if (*v3) {
-                (*v3)->GetResult(&ddata, 1);
+                (*v3)->GetResult(&ddata, true);
                 BSOcclusionQuery** ppOcclusionQuery = this->ppOcclusionQuery;
                 BSOcclusionQuery* v5 = ppOcclusionQuery[i];
                 if (v5) {
                     ppOcclusionQuery[i]->~BSOcclusionQuery();
                     MemoryManager_Singleton.Deallocate(v5);
                 }
-                this->ppOcclusionQuery[i] = 0;
+                this->ppOcclusionQuery[i] = nullptr;
             }
             ++i;
         }
@@ -1234,21 +1235,21 @@ void BSShaderAccumulator::ClearAllQueries() {
     int32_t v7 = 3;
     do {
         if (pSunTests->pOcclusionQuery) {
-            pSunTests->pOcclusionQuery->GetResult(&ddata, 1);
+            pSunTests->pOcclusionQuery->GetResult(&ddata, true);
             BSOcclusionQuery* pOcclusionQuery = pSunTests->pOcclusionQuery;
             if (pSunTests->pOcclusionQuery) {
                 pSunTests->pOcclusionQuery->~BSOcclusionQuery();
                 MemoryManager_Singleton.Deallocate(pOcclusionQuery);
             }
-            pSunTests->pOcclusionQuery = 0;
-            pSunTests->bWaiting = 0;
+            pSunTests->pOcclusionQuery = nullptr;
+            pSunTests->bWaiting = false;
         }
         ++pSunTests;
         --v7;
     }
     while (v7);
     bool v9 = ReferenceVolumeList.m_uiCount == 0;
-    bWaitingForSunQueury = 0;
+    bWaitingForSunQueury = false;
     NiTListItem<ReferenceVolume*>* m_pkHead = ReferenceVolumeList.m_pkHead;
     if (!v9) {
         do {
@@ -1257,13 +1258,13 @@ void BSShaderAccumulator::ClearAllQueries() {
             if (pvolume) {
                 BSOcclusionQuery* v12 = pvolume->pOcclusionQuery;
                 if (v12) {
-                    v12->GetResult(&ddata, 1);
+                    v12->GetResult(&ddata, true);
                     BSOcclusionQuery* v13 = pvolume->pOcclusionQuery;
                     if (v13) {
                         pvolume->pOcclusionQuery->~BSOcclusionQuery();
                         MemoryManager_Singleton.Deallocate(v13);
                     }
-                    pvolume->pOcclusionQuery = 0;
+                    pvolume->pOcclusionQuery = nullptr;
                 }
             }
         }
@@ -1273,14 +1274,14 @@ void BSShaderAccumulator::ClearAllQueries() {
     usQuerySize = 0;
     usQueryCount = 0;
     MemoryManager_Singleton.Deallocate(v14);
-    this->ppOcclusionQuery = 0;
+    this->ppOcclusionQuery = nullptr;
 }
 
 void BSShaderAccumulator::AddAndUpdateBoundVolume(uint32_t auiReferenceID, const NiBound& aBound, bool abRunTest) {
     NiTListItem<ReferenceVolume*>* m_pkHead = ReferenceVolumeList.m_pkHead;
     if (m_pkHead) {
         ReferenceVolume* pvolume;
-        while (1) {
+        while (true) {
             pvolume = m_pkHead->m_element;
             m_pkHead = m_pkHead->m_pkNext;
             if (pvolume) {
@@ -1311,20 +1312,20 @@ void BSShaderAccumulator::AddAndUpdateBoundVolume(uint32_t auiReferenceID, const
             v7->fRadius = abEnable;
             v7->Center.z = z;
             v7->uiReferenceID = auiReferenceID;
-            v7->pOcclusionQuery = 0;
-            v7->bOccluded = 0;
-            v7->bWaiting = 0;
-            v7->bPerformTest = 1;
+            v7->pOcclusionQuery = nullptr;
+            v7->bOccluded = false;
+            v7->bWaiting = false;
+            v7->bPerformTest = true;
             v7->uiPixelCount = 0;
             v10 = v7;
         }
         else {
-            v10 = 0;
+            v10 = nullptr;
         }
         uint32_t* p_m_uiCount = &ReferenceVolumeList.m_uiCount;
         NiTListItem<ReferenceVolume*>* v12 = ReferenceVolumeList.NewItem();
         v12->m_element = v10;
-        v12->m_pkPrev = 0;
+        v12->m_pkPrev = nullptr;
         v12->m_pkNext = ReferenceVolumeList.m_pkHead;
         NiTListItem<ReferenceVolume*>* v13 = ReferenceVolumeList.m_pkHead;
         if (v13) {
@@ -1379,7 +1380,7 @@ void BSShaderAccumulator::EvaluateSunOcclusionResults(uint32_t aiTestNumber) {
             if (pQuery) {
                 // The pixel count is read into aiTestNumber, overwriting it, as the game does; kTest keeps the index.
                 uint32_t& uiPixelCount = aiTestNumber;
-                bool bResult = pQuery->GetResultNoWait(&uiPixelCount, 1);
+                bool bResult = pQuery->GetResultNoWait(&uiPixelCount, true);
                 if (bResult == true) {
                     if (uiPixelCount) {
                         uint32_t uiClamped = 1500;
@@ -1387,13 +1388,13 @@ void BSShaderAccumulator::EvaluateSunOcclusionResults(uint32_t aiTestNumber) {
                             uiClamped = uiPixelCount;
                         }
                         kTest.uiPixelCount = uiPixelCount;
-                        kTest.bWaiting = 0;
+                        kTest.bWaiting = false;
                         float fPercentOccluded = 1.0 - static_cast<double>(uiClamped) / 1500.0;
                         kTest.fPercentOccluded = fPercentOccluded;
                     }
                     else {
                         kTest.uiPixelCount = 0;
-                        kTest.bWaiting = 0;
+                        kTest.bWaiting = false;
                         kTest.fPercentOccluded = 1.0f;
                     }
                 }
@@ -1403,8 +1404,8 @@ void BSShaderAccumulator::EvaluateSunOcclusionResults(uint32_t aiTestNumber) {
                         pOldQuery->~BSOcclusionQuery();
                         MemoryManager_Singleton.Deallocate(pOldQuery);
                     }
-                    kTest.pOcclusionQuery = 0;
-                    kTest.bWaiting = 0;
+                    kTest.pOcclusionQuery = nullptr;
+                    kTest.bWaiting = false;
                 }
             }
         }
@@ -1419,33 +1420,33 @@ void BSShaderAccumulator::ClearSunQueries() {
         BSOcclusionQuery* pOcclusionQuery = pSunTests->pOcclusionQuery;
         a2 = 0;
         if (pOcclusionQuery) {
-            pOcclusionQuery->GetResult(&a2, 1u);
+            pOcclusionQuery->GetResult(&a2, true);
             BSOcclusionQuery* v4 = pSunTests->pOcclusionQuery;
             if (pSunTests->pOcclusionQuery) {
                 pSunTests->pOcclusionQuery->~BSOcclusionQuery();
                 MemoryManager_Singleton.Deallocate(v4);
             }
-            pSunTests->pOcclusionQuery = 0;
-            pSunTests->bWaiting = 0;
+            pSunTests->pOcclusionQuery = nullptr;
+            pSunTests->bWaiting = false;
         }
         ++pSunTests;
         --v2;
     }
     while (v2);
-    bWaitingForSunQueury = 0;
+    bWaitingForSunQueury = false;
 }
 
 void BSShaderAccumulator::ClearRenderedGeometryCache() {
     for (int32_t i = 0; i < 4; ++i) {
         pRenderedGeometryCache[i].CleanUnusedNodes();
         pRenderedGeometryCache[i].pNextFreeItem = pRenderedGeometryCache[i].m_pkHead;
-        pRenderedGeometryCache[i].m_pkHead = 0;
-        pRenderedGeometryCache[i].m_pkTail = 0;
+        pRenderedGeometryCache[i].m_pkHead = nullptr;
+        pRenderedGeometryCache[i].m_pkTail = nullptr;
         pRenderedGeometryCache[i].Allocator.uiCount = 0;
         pRendered1stPersonGeometryCache[i].CleanUnusedNodes();
         pRendered1stPersonGeometryCache[i].pNextFreeItem = pRendered1stPersonGeometryCache[i].m_pkHead;
-        pRendered1stPersonGeometryCache[i].m_pkHead = 0;
-        pRendered1stPersonGeometryCache[i].m_pkTail = 0;
+        pRendered1stPersonGeometryCache[i].m_pkHead = nullptr;
+        pRendered1stPersonGeometryCache[i].m_pkTail = nullptr;
         pRendered1stPersonGeometryCache[i].Allocator.uiCount = 0;
     }
 }
@@ -1460,13 +1461,13 @@ void BSShaderAccumulator::FinishAccumulating_Standard_PostResolveDepth(BSShaderA
             BSRenderedTexture* v1 = BSShaderManager::pWaterRefractionTexture;
             if (!BSShaderManager::pWaterRefractionTexture) {
                 v1 = BSShaderManager::pTextureManager->BorrowRenderedTexture(
-                    BSShaderManager::pRenderer.m_pObject, BSTextureManager::TEX_MAIN_FIRSTPERSON, 0, 0, 0
+                    BSShaderManager::pRenderer.m_pObject, BSTextureManager::TEX_MAIN_FIRSTPERSON, 0, nullptr, 0
                 );
                 BSShaderManager::pWaterRefractionTexture = v1;
             }
             BSShaderManager::pImageSpaceManager->RenderEffect(
                 ImageSpaceManager::EFFECT_SHADER_COPY, BSShaderManager::pRenderer.m_pObject,
-                BSShaderManager::pCurrentRenderTarget, v1, 0, 1
+                BSShaderManager::pCurrentRenderTarget, v1, nullptr, 1
             );
             NiRenderTargetGroup* Group = BSShaderManager::pCurrentRenderTarget->GetGroup();
             BSRenderedTexture::StartOffscreen(0, Group);
@@ -1480,12 +1481,12 @@ void BSShaderAccumulator::FinishAccumulating_Standard_PostResolveDepth(BSShaderA
     apAccumulator->RenderBatches(BSShaderManager::BSSM_WATER, BSShaderManager::BSSM_WATER_SPECULAR_LIGHTING_Vc, 0, -1);
     if (apAccumulator->bWorldGeometry) {
         BSShaderManager::pTextureManager->ReturnRenderedTexture(BSShaderManager::pWaterRefractionTexture);
-        BSShaderManager::pWaterRefractionTexture = 0;
+        BSShaderManager::pWaterRefractionTexture = nullptr;
     }
     apAccumulator->RenderGeometryGroup(9u, 1);
     apAccumulator->RenderAlphaGeometry(static_cast<BSShaderAccumulator::WATER_SIDE>(apAccumulator->bUnderWater));
-    BSRenderState::SetAlphaBlendEnable(0, BSRS_NOLOCK);
-    BSRenderState::SetAlphaBlendEnable(0, BSRS_NOLOCK);
+    BSRenderState::SetAlphaBlendEnable(false, BSRS_NOLOCK);
+    BSRenderState::SetAlphaBlendEnable(false, BSRS_NOLOCK);
     apAccumulator->RenderBatches(
         BSShaderManager::BSSM_PRECIPITATION_RAIN, BSShaderManager::BSSM_SELFILLUMALPHA_S, 0, -1
     );
@@ -1514,15 +1515,15 @@ void BSShaderAccumulator::FinishAccumulating_Standard_PreResolveDepth(BSShaderAc
                 apAccumulator->RenderGeometryGroup(10u, 0);
                 if (BSShaderAccumulator::bShowRenderPassesScenegraph && apAccumulator->eRenderMode != 7) {
                     BSShaderAccumulator::spRenderPassesScenegraph.operator=(apAccumulator->CreateRenderPassTree());
-                    BSShaderAccumulator::bShowRenderPassesScenegraph = 0;
+                    BSShaderAccumulator::bShowRenderPassesScenegraph = false;
                 }
                 if (apAccumulator->bWaterReflection) {
                     apAccumulator->RenderBatches(
                         BSShaderManager::BSSM_ZONLY, BSShaderManager::BSSM_DISTANT_TREE_SILHOUETTE, 0, -1
                     );
-                    BSRenderState::SetUserClipPlaneEnables(0, 0, 0, 0, 0, 0, BSRS_NOLOCK);
+                    BSRenderState::SetUserClipPlaneEnables(false, false, false, false, false, false, BSRS_NOLOCK);
                     apAccumulator->RenderBatches(BSShaderManager::BSSM_SKYBASEPRE, BSShaderManager::BSSM_VFOG_3, 0, -1);
-                    BSRenderState::SetUserClipPlaneEnables(1, 0, 0, 0, 0, 0, BSRS_NOLOCK);
+                    BSRenderState::SetUserClipPlaneEnables(true, false, false, false, false, false, BSRS_NOLOCK);
                 }
                 else {
                     apAccumulator->RenderBatches(BSShaderManager::BSSM_ZONLY, BSShaderManager::BSSM_VFOG_3, 0, -1);
@@ -1718,7 +1719,7 @@ bool BSShaderAccumulator::RegisterObject_Standard(
                         }
                         else {
                             BSShader* pShader = BSShaderManager::GetShader(1);
-                            ShadowLightShader::EnableConstantsForPass(pPass->usPassEnum, 0);
+                            ShadowLightShader::EnableConstantsForPass(pPass->usPassEnum, false);
                             if (pShader) {
                                 pShader->m_spVertexConstantMap.m_pObject->SortByEnabled();
                                 pShader->m_spPixelConstantMap.m_pObject->SortByEnabled();
@@ -1730,7 +1731,7 @@ bool BSShaderAccumulator::RegisterObject_Standard(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 // Returns true without registering geometry whose bound radius is under 50, unlit geometry, and geometry not flagged to
@@ -1824,12 +1825,12 @@ void BSShaderAccumulator::FinishAccumulating_Standard(BSShaderAccumulator* apAcc
 
 void BSShaderAccumulator::FinishAccumulating_WaterDepth(BSShaderAccumulator* apAccumulator) {
     if (apAccumulator->m_pkCamera) {
-        BSRenderState::SetAlphaBlendEnable(0, BSRS_LOCK);
+        BSRenderState::SetAlphaBlendEnable(false, BSRS_LOCK);
         apAccumulator->RenderBatches(
             static_cast<BSShaderManager::eBSSMPassEnum>(728), static_cast<BSShaderManager::eBSSMPassEnum>(751), 0, (-1)
         );
         --BSRenderState::iLock[6];
-        BSRenderState::SetAlphaBlendEnable(0, BSRS_NOLOCK);
+        BSRenderState::SetAlphaBlendEnable(false, BSRS_NOLOCK);
     }
 }
 
@@ -1838,7 +1839,7 @@ void BSShaderAccumulator::FinishAccumulating_Interface(BSShaderAccumulator* apAc
         apAccumulator->m_kItemsToSortAndRender = nullptr;
         apAccumulator->Sort();
         apAccumulator->RenderTiles();
-        BSRenderState::SetAlphaBlendEnable(0, BSRS_NOLOCK);
+        BSRenderState::SetAlphaBlendEnable(false, BSRS_NOLOCK);
     }
 }
 
@@ -1881,15 +1882,15 @@ bool BSShaderAccumulator::RegisterObject_WaterDepth(
     BSShader* apShader
 ) {
     if (!apAccumulator->bWaterRefraction) {
-        return 1;
+        return true;
     }
     BSShaderProperty::RenderPassArray* v5 = apShaderProp->GetWaterFogPassList(apGeometry);
     if (!v5) {
-        return 1;
+        return true;
     }
     uint32_t v7 = 0;
     if (!v5->iSize) {
-        return 1;
+        return true;
     }
     TLSData* v8 = GetThreadTLSData();
     do {
@@ -1898,7 +1899,7 @@ bool BSShaderAccumulator::RegisterObject_WaterDepth(
         ++v7;
     }
     while (v7 < v5->iSize);
-    return 1;
+    return true;
 }
 
 bool BSShaderAccumulator::RegisterObject_Interface(
@@ -1912,36 +1913,36 @@ bool BSShaderAccumulator::RegisterObject_Interface(
         uint32_t* p_m_uiCount = &apAccumulator->m_kItems.m_uiCount;
         NiTListItem<NiGeometry*>* v6 = apAccumulator->m_kItems.NewItem();
         v6->m_element = apGeometry;
-        v6->m_pkNext = 0;
+        v6->m_pkNext = nullptr;
         v6->m_pkPrev = apAccumulator->m_kItems.m_pkTail;
         NiTListItem<NiGeometry*>* m_pkTail = apAccumulator->m_kItems.m_pkTail;
         if (m_pkTail) {
             m_pkTail->m_pkNext = v6;
             ++*p_m_uiCount;
             apAccumulator->m_kItems.m_pkTail = v6;
-            return 1;
+            return true;
         }
         ++*p_m_uiCount;
         apAccumulator->m_kItems.m_pkHead = v6;
         apAccumulator->m_kItems.m_pkTail = v6;
     }
-    return 1;
+    return true;
 }
 
 void BSShaderAccumulator::FinishAccumulating_FirstPerson(BSShaderAccumulator* apAccumulator) {
     if (apAccumulator->m_pkCamera) {
         if (BSShaderAccumulator::bShowRenderPassesScenegraph) {
             BSShaderAccumulator::spRenderPassesScenegraph.operator=(apAccumulator->CreateRenderPassTree());
-            BSShaderAccumulator::bShowRenderPassesScenegraph = 0;
+            BSShaderAccumulator::bShowRenderPassesScenegraph = false;
         }
-        apAccumulator->m_kItemsToSortAndRender = 0;
+        apAccumulator->m_kItemsToSortAndRender = nullptr;
         apAccumulator->Sort();
         apAccumulator->RenderBatches(BSShaderManager::BSSM_ZONLY, BSShaderManager::BSSM_GRASS_SHADOW_LSB, 0, -1);
         apAccumulator->RenderDecals();
         apAccumulator->SortAlphaPasses();
         apAccumulator->RenderAlphaGeometry(static_cast<BSShaderAccumulator::WATER_SIDE>(!apAccumulator->bUnderWater));
         apAccumulator->RenderAlphaGeometry(static_cast<BSShaderAccumulator::WATER_SIDE>(apAccumulator->bUnderWater));
-        BSRenderState::SetAlphaBlendEnable(0, BSRS_NOLOCK);
+        BSRenderState::SetAlphaBlendEnable(false, BSRS_NOLOCK);
         apAccumulator->RenderBatches(
             BSShaderManager::BSSM_PRECIPITATION_RAIN, BSShaderManager::BSSM_SELFILLUMALPHA_S, 0, -1
         );
@@ -1962,7 +1963,7 @@ void BSBatchRenderer::ClearAlphaLists(int32_t aiSide) {
         }
     }
     rList.NiTListBase<GeometryGroup*>::RemoveAll();
-    pCurrentAlphaGroup[aiSide] = 0;
+    pCurrentAlphaGroup[aiSide] = nullptr;
 }
 
 void ImageSpaceShaderVolumetricFog::ReturnVolumetricFogTexture() {

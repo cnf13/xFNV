@@ -32,7 +32,7 @@ bool NavMeshMath::IsPointInsideTriangle(
     float v13 = (((&aTriVert2Loc)->x - (&aTriVert1Loc)->x) * ((&aTriVert3Loc)->y - (&aTriVert1Loc)->y)) -
         (((&aTriVert3Loc)->x - (&aTriVert1Loc)->x) * ((&aTriVert2Loc)->y - (&aTriVert1Loc)->y));
     if (v13 == 0.0) {
-        return (bool)0;
+        return false;
     }
     float v9 = (&aTriVert2Loc)->x - (&aLocation)->x;
     float v10 = (&aTriVert3Loc)->x - (&aLocation)->x;
@@ -41,28 +41,28 @@ bool NavMeshMath::IsPointInsideTriangle(
     float v17 = (float)(1.0 / v13);
     float v18 = ((v9 * v19) - (v10 * v8)) * v17;
     if (v18 < 0.0) {
-        return (bool)0;
+        return false;
     }
     float v11 = (&aTriVert1Loc)->x - (&aLocation)->x;
     float v20 = (&aTriVert1Loc)->y - (&aLocation)->y;
     float v16 = ((v10 * v20) - (v11 * v19)) * v17;
     if (v16 < 0.0) {
-        return (bool)0;
+        return false;
     }
     float v14 = ((v11 * v8) - (v9 * v20)) * v17;
     if (v14 < 0.0) {
-        return (bool)0;
+        return false;
     }
     float v12 = ((v18 * (&aTriVert1Loc)->z) + (v16 * (&aTriVert2Loc)->z)) + (v14 * (&aTriVert3Loc)->z);
     float v15 = v12 - (&aLocation)->z;
     if (afMaxZdistAbove < ((double)v15)) {
-        return (bool)0;
+        return false;
     }
     if (v15 < (-afMaxZdistBelow)) {
-        return (bool)0;
+        return false;
     }
     afZDiff = v15;
-    return (bool)1;
+    return true;
 }
 
 bool NavMeshMath::Find2DIntersectionStable(
@@ -84,19 +84,19 @@ bool NavMeshMath::Find2DIntersectionStable(
     float v14 = (aSegment2Start.x - aSegment1End.x) * (aSegment2End.y - aSegment1End.y) -
         (aSegment2Start.y - aSegment1End.y) * (aSegment2End.x - aSegment1End.x);
     if (!(v15 * v12 <= 0.0) || !(v13 * v14 <= 0.0)) {
-        return 0;
+        return false;
     }
     if (v15 == 0.0) {
-        return 0;
+        return false;
     }
     if (v14 == 0.0) {
-        return 0;
+        return false;
     }
     float v11 = v13 / (v13 - v14);
     NiPoint3* v6 = &(result = aSegment1End - aSegment1Start);
     NiPoint3* v7 = &(dst = v11 * *v6);
     *apReturnIntersection = (v8 = aSegment1Start + *v7);
-    return 1;
+    return true;
 }
 
 int8_t NavMeshMath::Get2DBaryCentricCoord_0(float* apA, float* apB, float* apC, float* apD, float* apReturn) {
@@ -121,7 +121,7 @@ bool NavMeshMath::Find2DIntersection(const NiPoint2& a1, const NiPoint2& a2, con
     float v5 = (((&a3)->x - (&a1)->x) * ((&a4)->y - (&a1)->y)) - (((&a3)->y - (&a1)->y) * ((&a4)->x - (&a1)->x));
     float v6 = (v5 + v7) - v8;
     if ((v5 * v6) < 0.0) {
-        return (bool)1;
+        return true;
     }
     return (bool)result;
 }
@@ -158,19 +158,19 @@ bool NavMeshMath::Find2DIntersectionPoint(
     float v14 = (aSegment1Start.x - aSegment2Start.x) * (aSegment1End.y - aSegment2Start.y) -
         (aSegment1Start.y - aSegment2Start.y) * (aSegment1End.x - aSegment2Start.x);
     if (!(v15 * v14 <= 0.0)) {
-        return 0;
+        return false;
     }
     float v12 = (aSegment2Start.x - aSegment1Start.x) * (aSegment2End.y - aSegment1Start.y) -
         (aSegment2Start.y - aSegment1Start.y) * (aSegment2End.x - aSegment1Start.x);
     float v13 = v12 + v14 - v15;
     if (!(v12 * v13 < 0.0)) {
-        return 0;
+        return false;
     }
     float v11 = v12 / (v12 - v13);
     NiPoint3* v5 = &(result = aSegment1End - aSegment1Start);
     NiPoint3* v6 = &(dst = v11 * *v5);
     *apReturnIntersection = (v8 = aSegment1Start + *v6);
-    return 1;
+    return true;
 }
 
 NiPoint3
@@ -312,14 +312,14 @@ float NavMeshMath::DistanceFromSegment(
             NiPoint3* v7 = &(dst = v10 * result);
             v15 = aLineStart + *v7;
             if (apRetInSegment) {
-                *apRetInSegment = 1;
+                *apRetInSegment = true;
             }
             NiPoint3* v8 = &(v11 = aPoint - v15);
             return v8->Length();
         }
         else {
             if (apRetInSegment) {
-                *apRetInSegment = 0;
+                *apRetInSegment = false;
             }
             NiPoint3* v6 = &(v13 = aPoint - aLineEnd);
             return v6->Length();
@@ -327,7 +327,7 @@ float NavMeshMath::DistanceFromSegment(
     }
     else {
         if (apRetInSegment) {
-            *apRetInSegment = 0;
+            *apRetInSegment = false;
         }
         NiPoint3* v4 = &(v14 = aPoint - aLineStart);
         return v4->Length();
@@ -380,7 +380,7 @@ bool NavMeshMath::CircleSegmentIntersection(
     NiPoint3 delta;
     float fEpsilon = 0.001f;
     if (aCircle.fRadius <= 0.0) {
-        return 0;
+        return false;
     }
     NavMeshMath::CSIResult* result0 = aResults.Results;
     NavMeshMath::CSIResult* result1 = &aResults.Results[1];
@@ -397,11 +397,11 @@ bool NavMeshMath::CircleSegmentIntersection(
             bdox = std::fabs(delta.y) < v9;
         }
         else {
-            bdox = 0;
+            bdox = false;
         }
     }
     else {
-        bdox = 1;
+        bdox = true;
     }
     if (bdox) {
         float finvDeltaX = 1.0 / delta.x;
@@ -413,7 +413,7 @@ bool NavMeshMath::CircleSegmentIntersection(
         float fdeltaCos = (fr2 * fb - fp2) * fr2;
         if (fdeltaCos < -fEpsilon) {
             aResults.eType = NavMeshMath::CSI_NONE;
-            return 0;
+            return false;
         }
         if (!(fEpsilon > static_cast<double>(fdeltaCos))) {
             AngleSinCos v27;
@@ -458,7 +458,7 @@ bool NavMeshMath::CircleSegmentIntersection(
         float fdeltaSin = (fr2 * v24 - v25) * fr2;
         if (fdeltaSin < -fEpsilon) {
             aResults.eType = NavMeshMath::CSI_NONE;
-            return 0;
+            return false;
         }
         if (!(fEpsilon > static_cast<double>(fdeltaSin))) {
             AngleSinCos v14;
@@ -502,11 +502,11 @@ bool NavMeshMath::CircleSegmentIntersection(
             else {
                 aResults.Results[0u].eType = NavMeshMath::CSIT_ENDPOINT;
             }
-            return 1;
+            return true;
         }
         else {
             aResults.eType = NavMeshMath::CSI_NONE;
-            return 0;
+            return false;
         }
     }
     else {
@@ -528,7 +528,7 @@ bool NavMeshMath::CircleSegmentIntersection(
             else {
                 aResults.Results[1].eType = NavMeshMath::CSIT_ENDPOINT;
             }
-            return 1;
+            return true;
         }
         else {
             if (!v7 || v6) {
@@ -539,7 +539,7 @@ bool NavMeshMath::CircleSegmentIntersection(
                     else {
                         aResults.eType = NavMeshMath::CSI_CONTAINED;
                     }
-                    return 0;
+                    return false;
                 }
                 else {
                     aResults.eType = NavMeshMath::CSI_ONEPOINT_LOWER;
@@ -552,7 +552,7 @@ bool NavMeshMath::CircleSegmentIntersection(
                     else {
                         aResults.Results[0u].eType = NavMeshMath::CSIT_ENDPOINT;
                     }
-                    return 1;
+                    return true;
                 }
             }
             else {
@@ -564,7 +564,7 @@ bool NavMeshMath::CircleSegmentIntersection(
                 else {
                     aResults.Results[0u].eType = NavMeshMath::CSIT_ENDPOINT;
                 }
-                return 1;
+                return true;
             }
         }
     }
@@ -739,30 +739,30 @@ bool NavMeshMath::CheckArcAgainstCircle(const Sphere& aCircle1, const AngleSinCo
     AngleSinCos angle1;
     AngleSinCos angle2;
     if (aCircle1.fRadius == 0.0) {
-        return 1;
+        return true;
     }
     if (aCircle2.fRadius == 0.0) {
-        return 1;
+        return true;
     }
     NiPoint3 delta = aCircle2.Center - aCircle1.Center;
     float fd3 = delta.SqrLength();
     float fd2 = delta.SqrXYLength();
     if (fd2 == 0.0) {
-        return 0;
+        return false;
     }
     float fsum = aCircle1.fRadius + aCircle2.fRadius;
     if (fd2 > fsum * fsum) {
-        return 1;
+        return true;
     }
     if (fd3 > fsum * fsum) {
-        return 1;
+        return true;
     }
     float fdiff = aCircle1.fRadius - aCircle2.fRadius;
     if (fd2 < fdiff * fdiff) {
-        return 1;
+        return true;
     }
     if (fd3 < fdiff * fdiff) {
-        return 1;
+        return true;
     }
     float fr12 = aCircle1.fRadius * aCircle1.fRadius;
     float fr22 = aCircle2.fRadius * aCircle2.fRadius;
@@ -814,7 +814,7 @@ bool NavMeshMath::Find2DIntersection_006B9E90(
     float v16 = (aSegment1Start.x - aSegment2Start.x) * (aSegment1End.y - aSegment2Start.y) -
         (aSegment1Start.y - aSegment2Start.y) * (aSegment1End.x - aSegment2Start.x);
     if (!(v17 * v16 < 0.0)) {
-        return 0;
+        return false;
     }
     float v14 = (aSegment2Start.x - aSegment1Start.x) * (aSegment2End.y - aSegment1Start.y) -
         (aSegment2Start.y - aSegment1Start.y) * (aSegment2End.x - aSegment1Start.x);
@@ -824,7 +824,7 @@ bool NavMeshMath::Find2DIntersection_006B9E90(
             (aSegment2Start.y - aSegment1End.y) * (aSegment2End.x - aSegment1End.x);
     }
     if (!(v14 * v15 < 0.0)) {
-        return 0;
+        return false;
     }
     float afScale = v14 / (v14 - v15);
     NiPoint2* v5 = &(result = aSegment1End - aSegment1Start);
@@ -833,7 +833,7 @@ bool NavMeshMath::Find2DIntersection_006B9E90(
     float y = v7->y;
     apReturnIntersection->x = v7->x;
     apReturnIntersection->y = y;
-    return 1;
+    return true;
 }
 
 bool NavMeshMath::LineToLineSegment2DIntersection(
@@ -851,13 +851,13 @@ bool NavMeshMath::LineToLineSegment2DIntersection(
     v13 = *apCoverPoint - *apTargetLocation;
     float v14 = result.x * v13.y - result.y * v13.x;
     if (v14 == 0.0) {
-        return 0;
+        return false;
     }
     v10 = *apTargetLocation - *apLeftVertex;
     float v9 = v10.x * result.y - v10.y * result.x;
     float v15 = v9 / v14;
     if (v15 < 0.0 || v15 > 1.0) {
-        return 0;
+        return false;
     }
     float v12 = v10.x * v13.y - v10.y * v13.x;
     v15 = v12 / v14;
@@ -866,7 +866,7 @@ bool NavMeshMath::LineToLineSegment2DIntersection(
         NiPoint3* v6 = &(dst = v15 * result);
         *apIntersection = (v7 = *apLeftVertex + *v6);
     }
-    return 1;
+    return true;
 }
 
 char NavMeshMath::LineSegmentToLine2DIntersection(
@@ -903,24 +903,24 @@ char NavMeshMath::LineSegmentToLine2DIntersection(
 char NavMeshMath::ComputeTangentPointsToCircleFromPoint(NiPoint3* pt, float a2, NiPoint3* a3, float* a4, float* a5) {
     NiPoint3 result;
     (result = a3->operator-(*pt));
-    float v9 = (float)(&result)->SqrXYLength();
+    float v9 = (&result)->SqrXYLength();
     float v10 = a2 * a2;
     if (!(v10 <= ((double)v9))) {
         return 0;
     }
     float v8 = (float)(1.0 / v9);
     float afX = v9 - v10;
-    float v7 = (float)std::sqrt(afX);
+    float v7 = std::sqrt(afX);
     *a4 = pt->x;
     a4[1] = pt->y;
     a4[2] = pt->z;
     *a5 = pt->x;
     a5[1] = pt->y;
     a5[2] = pt->z;
-    *a4 = (float)(((((a2 * result.x) - (result.y * v7)) * a2) * v8) + (*a4));
-    a4[1] = (float)(((((a2 * result.y) + (result.x * v7)) * a2) * v8) + a4[1]);
-    *a5 = (float)(((((a2 * result.x) + (result.y * v7)) * a2) * v8) + (*a5));
-    a5[1] = (float)(((((a2 * result.y) - (result.x * v7)) * a2) * v8) + a5[1]);
+    *a4 = (((((a2 * result.x) - (result.y * v7)) * a2) * v8) + (*a4));
+    a4[1] = (((((a2 * result.y) + (result.x * v7)) * a2) * v8) + a4[1]);
+    *a5 = (((((a2 * result.x) + (result.y * v7)) * a2) * v8) + (*a5));
+    a5[1] = (((((a2 * result.y) - (result.x * v7)) * a2) * v8) + a5[1]);
     return 1;
 }
 

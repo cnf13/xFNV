@@ -16,14 +16,14 @@ TESDescription::TESDescription() : BaseFormComponent() {
 
 void TESDescription::InitializeDataComponent() {
     (&TESDescription::strCurrentDescription)->Set(nullptr, (uint32_t)0);
-    TESDescription::pCurrentDescription = 0;
+    TESDescription::pCurrentDescription = nullptr;
     lFileOffset = (uint32_t)0;
 }
 
 void TESDescription::CopyComponent(BaseFormComponent* apCopyFC) {
     TESDescription* pCopy = dynamic_cast<TESDescription*>(apCopyFC);
     if (pCopy) {
-        TESDescription::strCurrentDescription.Set(pCopy->GetDescription(0, DESC_ID), 0u);
+        TESDescription::strCurrentDescription.Set(pCopy->GetDescription(nullptr, DESC_ID), 0u);
         lFileOffset = pCopy->lFileOffset;
     }
 }
@@ -31,17 +31,17 @@ void TESDescription::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESDescription::CompareComponent(BaseFormComponent* apCompareFC) {
     TESDescription* v6 = dynamic_cast<TESDescription*>(apCompareFC);
     if (!v6) {
-        return (bool)1;
+        return true;
     }
     if ((!GetDescriptionLength()) && (!v6->GetDescriptionLength())) {
-        return (bool)0;
+        return false;
     }
     uint32_t v3 = GetDescriptionLength();
     if (v3 != v6->GetDescriptionLength()) {
-        return (bool)1;
+        return true;
     }
     const char* v4 = v6->GetDescription(nullptr, static_cast<CHUNK_ID>(0x43534544u));
-    return ((&TESDescription::strCurrentDescription)->StrCmp(v4, 0) != 0);
+    return ((&TESDescription::strCurrentDescription)->StrCmp(v4, false) != 0);
 }
 
 const char* TESDescription::GetDescription(TESForm* apForm, CHUNK_ID aeChunk) {

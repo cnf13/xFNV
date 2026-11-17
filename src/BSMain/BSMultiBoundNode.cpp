@@ -39,7 +39,7 @@ NiObject* BSMultiBoundNode::CreateClone(NiCloningProcess& arCloneData) {
         pobj = ::new (apMemory) BSMultiBoundNode;
     }
     else {
-        pobj = 0;
+        pobj = nullptr;
     }
     CopyMembers(pobj, arCloneData);
     return pobj;
@@ -237,19 +237,19 @@ bool BSMultiBoundNode::VisibleAgainstActiveOccluders(
         BSCullingProcess* pbsculler = static_cast<BSCullingProcess*>(&akCuller);
         if (pbsculler->kCullMode == BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS ||
             pbsculler->kCullMode == BSCullingProcess::BSCP_CULL_ALLPASS) {
-            return 1;
+            return true;
         }
     }
     if (!apOccluder) {
-        return 1;
+        return true;
     }
     NiFrustumPlanes kPlanes;
     apOccluder->GetFrustumPlanes(akViewPoint, kPlanes);
     if (!spMultiBound.m_pObject->spShape.m_pObject->CompletelyWithinFrustum(kPlanes)) {
-        return 1;
+        return true;
     }
     spMultiBound.m_pObject->spShape.m_pObject->kCullResult = BSMultiBoundShape::BS_CULL_CULLED;
-    return 0;
+    return false;
 }
 
 NiObject* BSMultiBoundNode::CreateObject() {
@@ -271,12 +271,12 @@ BSMultiBoundNode* BSMultiBoundNode::FindMultiboundNode(NiAVObject* apObject) {
         pMultiBoundNode = apObject->GetRTTI() == &BSMultiBoundNode::ms_RTTI;
     }
     else {
-        pMultiBoundNode = 0;
+        pMultiBoundNode = false;
     }
     if (pMultiBoundNode) {
         return static_cast<BSMultiBoundNode*>(apObject);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

@@ -51,10 +51,10 @@ void hkpAgentRegisterUtil::_registerBvTreeAgents(hkpCollisionDispatcher* dis) {
 // follows; the convex list and height field agents register with them on again.
 void hkpAgentRegisterUtil::_registerListAgents(hkpCollisionDispatcher* a1) {
     hkpListAgent::registerAgent(a1);
-    a1->setEnableChecks(static_cast<hkBool>(0));
+    a1->setEnableChecks(static_cast<hkBool>(false));
     hkpCollectionAgent3::registerAgent3(a1);
     hkpCollectionCollectionAgent3::registerAgent3(a1);
-    a1->setEnableChecks(static_cast<hkBool>(1));
+    a1->setEnableChecks(static_cast<hkBool>(true));
     hkpConvexListAgent::registerAgent(a1);
     hkConvexListAgent3::registerAgent3(a1);
     hkpHeightFieldAgent::registerAgent(a1);

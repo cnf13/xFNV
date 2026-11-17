@@ -76,7 +76,7 @@ NiObject* NiPSysInitialRotSpeedCtlr::CreateObject() {
     NiPSysInitialRotSpeedCtlr* v0 =
         static_cast<NiPSysInitialRotSpeedCtlr*>(NiMemObject::operator new(sizeof(NiPSysInitialRotSpeedCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysInitialRotSpeedCtlr;
 }

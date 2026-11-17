@@ -43,7 +43,7 @@ hkpBreakableConstraintData::hkpBreakableConstraintData(hkpConstraintData* constr
     if (m_constraintData) {
         hkpConstraintData::RuntimeInfo kInfo;
         m_constraintData->addReference();
-        m_constraintData->getRuntimeInfo(static_cast<hkBool>(1), kInfo);
+        m_constraintData->getRuntimeInfo(static_cast<hkBool>(true), kInfo);
         m_childRuntimeSize = kInfo.m_sizeOfExternalRuntime;
         m_childNumSolverResults = kInfo.m_numSolverResults;
     }
@@ -102,7 +102,7 @@ void hkpBreakableConstraintData::buildJacobian(const hkpConstraintQueryIn& in, h
     hkpConstraintData::ConstraintInfo kInfo;
     m_constraintData->getConstraintInfo(kInfo);
     if (kInfo.m_atoms->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {
-        hkBool bContact = {1};
+        hkBool bContact = {true};
         hkSimpleContactConstraintDataBuildJacobian(
             static_cast<hkpSimpleContactConstraintAtom*>(kInfo.m_atoms), in, bContact, out
         );
@@ -137,7 +137,7 @@ void hkpBreakableConstraintData::buildJacobianCallback(const hkpConstraintQueryI
         }
         if (sumImpulseSq > m_solverResultLimit * m_solverResultLimit) {
             float currentForce = std::sqrt(sumImpulseSq);
-            setBroken(in.m_constraintInstance, static_cast<hkBool>(1), currentForce);
+            setBroken(in.m_constraintInstance, static_cast<hkBool>(true), currentForce);
             if (m_revertBackVelocityOnBreak.m_bool) {
                 float invForce = 1.0f / currentForce;
                 float factor = invForce * m_solverResultLimit;
@@ -254,7 +254,7 @@ void hkpBreakableConstraintData::SetWrappedConstraintData(hkpConstraintData* apD
     }
     m_constraintData = apData;
     hkpConstraintData::RuntimeInfo kInfo;
-    hkBool bWantRuntime = {1};
+    hkBool bWantRuntime = {true};
     m_constraintData->getRuntimeInfo(bWantRuntime, kInfo);
     m_childNumSolverResults = static_cast<uint16_t>(kInfo.m_numSolverResults);
     m_childRuntimeSize = static_cast<uint16_t>(kInfo.m_sizeOfExternalRuntime);
@@ -272,7 +272,7 @@ void hkpBreakableConstraintData::SetWrappedConstraintData_0(hkpConstraintData* a
     this->m_constraintData = apData;
     if (apData) {
         hkpConstraintData::RuntimeInfo v5;
-        this->m_constraintData->getRuntimeInfo(static_cast<hkBool>(1), v5);
+        this->m_constraintData->getRuntimeInfo(static_cast<hkBool>(true), v5);
         uint16_t m_numSolverResults = v5.m_numSolverResults;
         m_childRuntimeSize = v5.m_sizeOfExternalRuntime;
         m_childNumSolverResults = m_numSolverResults;
@@ -281,5 +281,5 @@ void hkpBreakableConstraintData::SetWrappedConstraintData_0(hkpConstraintData* a
 
 // The SDK's hkBeginConstraints with no solver results (stride 8).
 void hkpBreakableConstraintData::buildNopJacobian(const hkpConstraintQueryIn& in, hkpConstraintQueryOut& out) {
-    hkBeginConstraints(&in, &out, 0, 8);
+    hkBeginConstraints(&in, &out, nullptr, 8);
 }

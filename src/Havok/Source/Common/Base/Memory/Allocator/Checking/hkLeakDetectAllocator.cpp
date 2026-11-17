@@ -280,7 +280,7 @@ void hkLeakDetectAllocator::init(
     hkLeakDetectAllocator::Dynamic* v8 =
         static_cast<hkLeakDetectAllocator::Dynamic*>(debug->blockAlloc(sizeof(hkLeakDetectAllocator::Dynamic)));
     if (v8) {
-        v8->m_activePointers.m_elem = 0;
+        v8->m_activePointers.m_elem = nullptr;
         v8->m_activePointers.m_numElems = 0;
         v8->m_activePointers.m_hashMod = -1;
         m_callTree.m_allocator = debug;
@@ -288,7 +288,7 @@ void hkLeakDetectAllocator::init(
     }
     else {
         m_callTree.m_allocator = debug;
-        m_dynamic = 0;
+        m_dynamic = nullptr;
     }
 }
 

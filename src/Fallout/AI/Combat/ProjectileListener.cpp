@@ -42,7 +42,7 @@ void ProjectileListener::contactPointAddedCallback(const hkpCharacterProxy* apPr
             pbp = bhkPhantom::Getbhk(pphantom);
         }
         else {
-            pbp = 0;
+            pbp = nullptr;
         }
         if (ptarget &&
             (pbp &&
@@ -68,14 +68,14 @@ void ProjectileListener::contactPointAddedCallback(const hkpCharacterProxy* apPr
                         pav = (NiAVObject*)ptarget->Get3D();
                     }
                     else {
-                        pav = 0;
+                        pav = nullptr;
                     }
                     bhkCollisionObject* pcol = FindFirstCollisionObject(pav);
                     if (pcol) {
                         pfirstbody = pcol->GetRigidBody();
                     }
                     else {
-                        pfirstbody = 0;
+                        pfirstbody = nullptr;
                     }
                     if (pfirstbody) {
                         CFilter* CollisionFilter = pfirstbody->GetCollisionFilter(&v27);
@@ -84,7 +84,7 @@ void ProjectileListener::contactPointAddedCallback(const hkpCharacterProxy* apPr
                             NiPoint3 direction;
                             bhkPickData pd;
                             NiPoint3 origin = pprojectile->GetLocationOnReference();
-                            float a2 = pprojectile->GetHeading(0);
+                            float a2 = pprojectile->GetHeading(false);
                             rot.MakeZRotation(a2);
                             float a2a = pprojectile->GetLooking();
                             rot2.MakeXRotation(a2a);
@@ -96,7 +96,7 @@ void ProjectileListener::contactPointAddedCallback(const hkpCharacterProxy* apPr
                             pd.NiSetLength(length);
                             hkpAllRayHitCollector collector;
                             pd.SetAllCollector(&collector);
-                            if (Projectile::PickSceneGraph(&pd, pav, 0, 1) &&
+                            if (Projectile::PickSceneGraph(&pd, pav, false, true) &&
                                 (&pd.pAllCollector->getHits())->m_size > 0) {
                                 v34 = 0;
                                 const hkpWorldRayCastOutput* v7 =

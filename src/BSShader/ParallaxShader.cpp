@@ -31,7 +31,7 @@ NiRTTI ParallaxShader::ms_RTTI("ParallaxShader", &ShadowLightShader::ms_RTTI);
 ParallaxShader::ParallaxShader(NiDX9ShaderDeclaration* apShaderDecl)
   : ShadowLightShader(apShaderDecl, nullptr, nullptr, nullptr), pVertexShader{}, pPixelShader{} {
     iShaderType = 3;
-    bFirstPass = 0;
+    bFirstPass = false;
     spShaderDecl = apShaderDecl;
     spSkinnedShaderDecl = nullptr;
     ePass = BSShaderManager::BSSM_EMPTY;
@@ -119,7 +119,7 @@ void ParallaxShader::SetupGeometryTextures(const NiPropertyState* apState) {
                 case BSShaderManager::BSSM_ADTS_GPxShp:
                 case BSShaderManager::BSSM_ADTS2_GPx:
                 case BSShaderManager::BSSM_ADTS2_GPxShp: {
-                    SetGlowMap(pprop, 4u, 0, 1);
+                    SetGlowMap(pprop, 4u, 0, true);
                 LABEL_10:;
                     SetDiffuseMap(pprop, 0, 0);
                     SetNormalMap(pprop, 1u, 0);
@@ -137,7 +137,7 @@ void ParallaxShader::SetupGeometryTextures(const NiPropertyState* apState) {
                 case BSShaderManager::BSSM_AD2_GPxShp:
                 case BSShaderManager::BSSM_AD3_GPx:
                 case BSShaderManager::BSSM_AD3_GPxShp: {
-                    SetGlowMap(pprop, 3u, 0, 1);
+                    SetGlowMap(pprop, 3u, 0, true);
                 LABEL_5:;
                     SetDiffuseMap(pprop, 0, 0);
                     SetNormalMap(pprop, 1u, 0);
@@ -153,7 +153,7 @@ void ParallaxShader::SetupGeometryTextures(const NiPropertyState* apState) {
                 case BSShaderManager::BSSM_ADT_GPxShp:
                 case BSShaderManager::BSSM_ADT2_GPx:
                 case BSShaderManager::BSSM_ADT2_GPxShp: {
-                    SetGlowMap(pprop, 4u, 0, 1);
+                    SetGlowMap(pprop, 4u, 0, true);
                 LABEL_8:;
                     SetDiffuseMap(pprop, 0, 0);
                     SetNormalMap(pprop, 1u, 0);
@@ -724,7 +724,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[0].strPath = "lighting\\2x\\p\\ADTS.p.hlsl";
     kMacroArray[0].kMacros[0].Name = "PARALLAX";
     kMacroArray[0].kMacros[0].Definition = "";
-    kMacroArray[0].kMacros[1].Name = 0;
+    kMacroArray[0].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[0].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -733,7 +733,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[1].kMacros[0].Definition = "";
     kMacroArray[1].kMacros[1].Name = "OPT";
     kMacroArray[1].kMacros[1].Definition = "";
-    kMacroArray[1].kMacros[2].Name = 0;
+    kMacroArray[1].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[1].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -742,7 +742,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[2].kMacros[0].Definition = "";
     kMacroArray[2].kMacros[1].Name = "SI";
     kMacroArray[2].kMacros[1].Definition = "";
-    kMacroArray[2].kMacros[2].Name = 0;
+    kMacroArray[2].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[2].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -751,7 +751,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[3].kMacros[0].Definition = "";
     kMacroArray[3].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray[3].kMacros[1].Definition = "";
-    kMacroArray[3].kMacros[2].Name = 0;
+    kMacroArray[3].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[3].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -762,7 +762,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[4].kMacros[1].Definition = "";
     kMacroArray[4].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray[4].kMacros[2].Definition = "";
-    kMacroArray[4].kMacros[3].Name = 0;
+    kMacroArray[4].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[4].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -771,7 +771,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[5].kMacros[0].Definition = "2";
     kMacroArray[5].kMacros[1].Name = "PARALLAX";
     kMacroArray[5].kMacros[1].Definition = "";
-    kMacroArray[5].kMacros[2].Name = 0;
+    kMacroArray[5].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[5].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -782,7 +782,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[6].kMacros[1].Definition = "";
     kMacroArray[6].kMacros[2].Name = "SI";
     kMacroArray[6].kMacros[2].Definition = "";
-    kMacroArray[6].kMacros[3].Name = 0;
+    kMacroArray[6].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[6].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -793,7 +793,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[7].kMacros[1].Definition = "";
     kMacroArray[7].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray[7].kMacros[2].Definition = "";
-    kMacroArray[7].kMacros[3].Name = 0;
+    kMacroArray[7].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[7].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -806,22 +806,22 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[8].kMacros[2].Definition = "";
     kMacroArray[8].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray[8].kMacros[3].Definition = "";
-    kMacroArray[8].kMacros[4].Name = 0;
-    kMacroArray[8].kMacros[4].Definition = 0;
-    kMacroArray[8].kMacros[5].Name = 0;
-    kMacroArray[8].kMacros[5].Definition = 0;
-    kMacroArray[8].kMacros[6].Name = 0;
-    kMacroArray[8].kMacros[6].Definition = 0;
-    kMacroArray[8].kMacros[7].Name = 0;
-    kMacroArray[8].kMacros[7].Definition = 0;
-    kMacroArray[8].kMacros[8].Name = 0;
-    kMacroArray[8].kMacros[8].Definition = 0;
+    kMacroArray[8].kMacros[4].Name = nullptr;
+    kMacroArray[8].kMacros[4].Definition = nullptr;
+    kMacroArray[8].kMacros[5].Name = nullptr;
+    kMacroArray[8].kMacros[5].Definition = nullptr;
+    kMacroArray[8].kMacros[6].Name = nullptr;
+    kMacroArray[8].kMacros[6].Definition = nullptr;
+    kMacroArray[8].kMacros[7].Name = nullptr;
+    kMacroArray[8].kMacros[7].Definition = nullptr;
+    kMacroArray[8].kMacros[8].Name = nullptr;
+    kMacroArray[8].kMacros[8].Definition = nullptr;
     kMacroArray[9].strPath = "lighting\\2x\\p\\ADTS.p.hlsl";
     kMacroArray[9].kMacros[0].Name = "SPECULAR";
     kMacroArray[9].kMacros[0].Definition = "";
     kMacroArray[9].kMacros[1].Name = "PARALLAX";
     kMacroArray[9].kMacros[1].Definition = "";
-    kMacroArray[9].kMacros[2].Name = 0;
+    kMacroArray[9].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[9].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -832,7 +832,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[10].kMacros[1].Definition = "";
     kMacroArray[10].kMacros[2].Name = "SI";
     kMacroArray[10].kMacros[2].Definition = "";
-    kMacroArray[10].kMacros[3].Name = 0;
+    kMacroArray[10].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[10].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -844,7 +844,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[11].kMacros[1].Definition = "";
     kMacroArray[11].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray[11].kMacros[2].Definition = "";
-    kMacroArray[11].kMacros[3].Name = 0;
+    kMacroArray[11].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[11].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -858,22 +858,22 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[12].kMacros[2].Definition = "";
     kMacroArray[12].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray[12].kMacros[3].Definition = "";
-    kMacroArray[12].kMacros[4].Name = 0;
-    kMacroArray[12].kMacros[4].Definition = 0;
-    kMacroArray[12].kMacros[5].Name = 0;
-    kMacroArray[12].kMacros[5].Definition = 0;
-    kMacroArray[12].kMacros[6].Name = 0;
-    kMacroArray[12].kMacros[6].Definition = 0;
-    kMacroArray[12].kMacros[7].Name = 0;
-    kMacroArray[12].kMacros[7].Definition = 0;
-    kMacroArray[12].kMacros[8].Name = 0;
-    kMacroArray[12].kMacros[8].Definition = 0;
+    kMacroArray[12].kMacros[4].Name = nullptr;
+    kMacroArray[12].kMacros[4].Definition = nullptr;
+    kMacroArray[12].kMacros[5].Name = nullptr;
+    kMacroArray[12].kMacros[5].Definition = nullptr;
+    kMacroArray[12].kMacros[6].Name = nullptr;
+    kMacroArray[12].kMacros[6].Definition = nullptr;
+    kMacroArray[12].kMacros[7].Name = nullptr;
+    kMacroArray[12].kMacros[7].Definition = nullptr;
+    kMacroArray[12].kMacros[8].Name = nullptr;
+    kMacroArray[12].kMacros[8].Definition = nullptr;
     kMacroArray[13].strPath = "lighting\\2x\\p\\AD.p.hlsl";
     kMacroArray[13].kMacros[0].Name = "LIGHTS";
     kMacroArray[13].kMacros[0].Definition = "2";
     kMacroArray[13].kMacros[1].Name = "PARALLAX";
     kMacroArray[13].kMacros[1].Definition = "";
-    kMacroArray[13].kMacros[2].Name = 0;
+    kMacroArray[13].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[13].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -885,7 +885,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[14].kMacros[1].Definition = "";
     kMacroArray[14].kMacros[2].Name = "SI";
     kMacroArray[14].kMacros[2].Definition = "";
-    kMacroArray[14].kMacros[3].Name = 0;
+    kMacroArray[14].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[14].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -897,7 +897,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[15].kMacros[1].Definition = "";
     kMacroArray[15].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray[15].kMacros[2].Definition = "";
-    kMacroArray[15].kMacros[3].Name = 0;
+    kMacroArray[15].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[15].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -911,22 +911,22 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[16].kMacros[2].Definition = "";
     kMacroArray[16].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray[16].kMacros[3].Definition = "";
-    kMacroArray[16].kMacros[4].Name = 0;
-    kMacroArray[16].kMacros[4].Definition = 0;
-    kMacroArray[16].kMacros[5].Name = 0;
-    kMacroArray[16].kMacros[5].Definition = 0;
-    kMacroArray[16].kMacros[6].Name = 0;
-    kMacroArray[16].kMacros[6].Definition = 0;
-    kMacroArray[16].kMacros[7].Name = 0;
-    kMacroArray[16].kMacros[7].Definition = 0;
-    kMacroArray[16].kMacros[8].Name = 0;
-    kMacroArray[16].kMacros[8].Definition = 0;
+    kMacroArray[16].kMacros[4].Name = nullptr;
+    kMacroArray[16].kMacros[4].Definition = nullptr;
+    kMacroArray[16].kMacros[5].Name = nullptr;
+    kMacroArray[16].kMacros[5].Definition = nullptr;
+    kMacroArray[16].kMacros[6].Name = nullptr;
+    kMacroArray[16].kMacros[6].Definition = nullptr;
+    kMacroArray[16].kMacros[7].Name = nullptr;
+    kMacroArray[16].kMacros[7].Definition = nullptr;
+    kMacroArray[16].kMacros[8].Name = nullptr;
+    kMacroArray[16].kMacros[8].Definition = nullptr;
     kMacroArray[17].strPath = "lighting\\2x\\p\\AD.p.hlsl";
     kMacroArray[17].kMacros[0].Name = "LIGHTS";
     kMacroArray[17].kMacros[0].Definition = "3";
     kMacroArray[17].kMacros[1].Name = "PARALLAX";
     kMacroArray[17].kMacros[1].Definition = "";
-    kMacroArray[17].kMacros[2].Name = 0;
+    kMacroArray[17].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[17].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -938,7 +938,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[18].kMacros[1].Definition = "";
     kMacroArray[18].kMacros[2].Name = "SI";
     kMacroArray[18].kMacros[2].Definition = "";
-    kMacroArray[18].kMacros[3].Name = 0;
+    kMacroArray[18].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[18].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -950,7 +950,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[19].kMacros[1].Definition = "";
     kMacroArray[19].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray[19].kMacros[2].Definition = "";
-    kMacroArray[19].kMacros[3].Name = 0;
+    kMacroArray[19].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[19].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -964,22 +964,22 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[20].kMacros[2].Definition = "";
     kMacroArray[20].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray[20].kMacros[3].Definition = "";
-    kMacroArray[20].kMacros[4].Name = 0;
-    kMacroArray[20].kMacros[4].Definition = 0;
-    kMacroArray[20].kMacros[5].Name = 0;
-    kMacroArray[20].kMacros[5].Definition = 0;
-    kMacroArray[20].kMacros[6].Name = 0;
-    kMacroArray[20].kMacros[6].Definition = 0;
-    kMacroArray[20].kMacros[7].Name = 0;
-    kMacroArray[20].kMacros[7].Definition = 0;
-    kMacroArray[20].kMacros[8].Name = 0;
-    kMacroArray[20].kMacros[8].Definition = 0;
+    kMacroArray[20].kMacros[4].Name = nullptr;
+    kMacroArray[20].kMacros[4].Definition = nullptr;
+    kMacroArray[20].kMacros[5].Name = nullptr;
+    kMacroArray[20].kMacros[5].Definition = nullptr;
+    kMacroArray[20].kMacros[6].Name = nullptr;
+    kMacroArray[20].kMacros[6].Definition = nullptr;
+    kMacroArray[20].kMacros[7].Name = nullptr;
+    kMacroArray[20].kMacros[7].Definition = nullptr;
+    kMacroArray[20].kMacros[8].Name = nullptr;
+    kMacroArray[20].kMacros[8].Definition = nullptr;
     kMacroArray[21].strPath = "lighting\\2x\\p\\DiffusePt.p.hlsl";
     kMacroArray[21].kMacros[0].Name = "LIGHTS";
     kMacroArray[21].kMacros[0].Definition = "2";
     kMacroArray[21].kMacros[1].Name = "PARALLAX";
     kMacroArray[21].kMacros[1].Definition = "";
-    kMacroArray[21].kMacros[2].Name = 0;
+    kMacroArray[21].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[21].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -989,7 +989,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[22].kMacros[0].Definition = "3";
     kMacroArray[22].kMacros[1].Name = "PARALLAX";
     kMacroArray[22].kMacros[1].Definition = "";
-    kMacroArray[22].kMacros[2].Name = 0;
+    kMacroArray[22].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[22].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -997,7 +997,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[23].strPath = "lighting\\2x\\p\\Texture.p.hlsl";
     kMacroArray[23].kMacros[0].Name = "PARALLAX";
     kMacroArray[23].kMacros[0].Definition = "";
-    kMacroArray[23].kMacros[1].Name = 0;
+    kMacroArray[23].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[23].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -1005,7 +1005,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[24].strPath = "lighting\\2x\\p\\Specular.p.hlsl";
     kMacroArray[24].kMacros[0].Name = "PARALLAX";
     kMacroArray[24].kMacros[0].Definition = "";
-    kMacroArray[24].kMacros[1].Name = 0;
+    kMacroArray[24].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[24].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -1015,7 +1015,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[25].kMacros[0].Definition = "";
     kMacroArray[25].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray[25].kMacros[1].Definition = "";
-    kMacroArray[25].kMacros[2].Name = 0;
+    kMacroArray[25].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[25].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -1025,7 +1025,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[26].kMacros[0].Definition = "";
     kMacroArray[26].kMacros[1].Name = "PARALLAX";
     kMacroArray[26].kMacros[1].Definition = "";
-    kMacroArray[26].kMacros[2].Name = 0;
+    kMacroArray[26].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[26].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -1037,7 +1037,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[27].kMacros[1].Definition = "";
     kMacroArray[27].kMacros[2].Name = "PARALLAX";
     kMacroArray[27].kMacros[2].Definition = "";
-    kMacroArray[27].kMacros[3].Name = 0;
+    kMacroArray[27].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[27].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -1049,7 +1049,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[28].kMacros[1].Definition = "";
     kMacroArray[28].kMacros[2].Name = "PARALLAX";
     kMacroArray[28].kMacros[2].Definition = "";
-    kMacroArray[28].kMacros[3].Name = 0;
+    kMacroArray[28].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[28].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -1061,7 +1061,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[29].kMacros[1].Definition = "2";
     kMacroArray[29].kMacros[2].Name = "PARALLAX";
     kMacroArray[29].kMacros[2].Definition = "";
-    kMacroArray[29].kMacros[3].Name = 0;
+    kMacroArray[29].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[29].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -1069,31 +1069,31 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[30].strPath = "lighting\\2x\\p\\ADTS.p.hlsl";
     kMacroArray[30].kMacros[0].Name = "SPECULAR";
     kMacroArray[30].kMacros[0].Definition = "";
-    kMacroArray[30].kMacros[4].Definition = 0;
-    kMacroArray[30].kMacros[5].Name = 0;
-    kMacroArray[30].kMacros[5].Definition = 0;
-    kMacroArray[30].kMacros[6].Name = 0;
-    kMacroArray[30].kMacros[6].Definition = 0;
-    kMacroArray[30].kMacros[7].Name = 0;
-    kMacroArray[30].kMacros[7].Definition = 0;
-    kMacroArray[30].kMacros[8].Name = 0;
-    kMacroArray[30].kMacros[8].Definition = 0;
-    kMacroArray[31].kMacros[4].Definition = 0;
-    kMacroArray[31].kMacros[5].Name = 0;
-    kMacroArray[31].kMacros[5].Definition = 0;
-    kMacroArray[31].kMacros[6].Name = 0;
-    kMacroArray[31].kMacros[6].Definition = 0;
-    kMacroArray[31].kMacros[7].Name = 0;
-    kMacroArray[31].kMacros[7].Definition = 0;
-    kMacroArray[31].kMacros[8].Name = 0;
-    kMacroArray[31].kMacros[8].Definition = 0;
+    kMacroArray[30].kMacros[4].Definition = nullptr;
+    kMacroArray[30].kMacros[5].Name = nullptr;
+    kMacroArray[30].kMacros[5].Definition = nullptr;
+    kMacroArray[30].kMacros[6].Name = nullptr;
+    kMacroArray[30].kMacros[6].Definition = nullptr;
+    kMacroArray[30].kMacros[7].Name = nullptr;
+    kMacroArray[30].kMacros[7].Definition = nullptr;
+    kMacroArray[30].kMacros[8].Name = nullptr;
+    kMacroArray[30].kMacros[8].Definition = nullptr;
+    kMacroArray[31].kMacros[4].Definition = nullptr;
+    kMacroArray[31].kMacros[5].Name = nullptr;
+    kMacroArray[31].kMacros[5].Definition = nullptr;
+    kMacroArray[31].kMacros[6].Name = nullptr;
+    kMacroArray[31].kMacros[6].Definition = nullptr;
+    kMacroArray[31].kMacros[7].Name = nullptr;
+    kMacroArray[31].kMacros[7].Definition = nullptr;
+    kMacroArray[31].kMacros[8].Name = nullptr;
+    kMacroArray[31].kMacros[8].Definition = nullptr;
     kMacroArray[30].kMacros[1].Name = "LIGHTS";
     kMacroArray[30].kMacros[1].Definition = "2";
     kMacroArray[30].kMacros[2].Name = "PARALLAX";
     kMacroArray[30].kMacros[2].Definition = "";
     kMacroArray[30].kMacros[3].Name = "SI";
     kMacroArray[30].kMacros[3].Definition = "";
-    kMacroArray[30].kMacros[4].Name = 0;
+    kMacroArray[30].kMacros[4].Name = nullptr;
     kMacroArray[31].strPath = "lighting\\2x\\p\\ADTS.p.hlsl";
     kMacroArray[31].kMacros[0].Name = "SPECULAR";
     kMacroArray[31].kMacros[0].Definition = "";
@@ -1103,7 +1103,7 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[31].kMacros[2].Definition = "";
     kMacroArray[31].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray[31].kMacros[3].Definition = "";
-    kMacroArray[31].kMacros[4].Name = 0;
+    kMacroArray[31].kMacros[4].Name = nullptr;
     kMacroArray[32].strPath = "lighting\\2x\\p\\ADTS.p.hlsl";
     kMacroArray[32].kMacros[0].Name = "SPECULAR";
     kMacroArray[32].kMacros[0].Definition = "";
@@ -1115,14 +1115,14 @@ void ParallaxShader::LoadPixelShaders() {
     kMacroArray[32].kMacros[3].Definition = "";
     kMacroArray[32].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray[32].kMacros[4].Definition = "";
-    kMacroArray[32].kMacros[5].Name = 0;
-    kMacroArray[32].kMacros[5].Definition = 0;
-    kMacroArray[32].kMacros[6].Name = 0;
-    kMacroArray[32].kMacros[6].Definition = 0;
-    kMacroArray[32].kMacros[7].Name = 0;
-    kMacroArray[32].kMacros[7].Definition = 0;
-    kMacroArray[32].kMacros[8].Name = 0;
-    kMacroArray[32].kMacros[8].Definition = 0;
+    kMacroArray[32].kMacros[5].Name = nullptr;
+    kMacroArray[32].kMacros[5].Definition = nullptr;
+    kMacroArray[32].kMacros[6].Name = nullptr;
+    kMacroArray[32].kMacros[6].Definition = nullptr;
+    kMacroArray[32].kMacros[7].Name = nullptr;
+    kMacroArray[32].kMacros[7].Definition = nullptr;
+    kMacroArray[32].kMacros[8].Name = nullptr;
+    kMacroArray[32].kMacros[8].Definition = nullptr;
     // The shader level is read once: sets 29 to 32 need level 5 or higher.
     int32_t iShaderLevel = BSShaderManager::eShaderLevel;
     if (iShaderLevel >= 2) {
@@ -1165,7 +1165,7 @@ void ParallaxShader::LoadPixelShaders() {
 }
 
 BSShader* ParallaxShader::CreateShader() {
-    ParallaxShader* pshader = 0;
+    ParallaxShader* pshader = nullptr;
     NiDX9ShaderDeclaration* spShaderDecl = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 6u, 1u);
     spShaderDecl->SetEntry(0, 0, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
     spShaderDecl->SetEntry(1u, 3u, NiShaderDeclaration::SHADERPARAM_NI_NORMAL, NiShaderDeclaration::SPTYPE_FLOAT3, 0);

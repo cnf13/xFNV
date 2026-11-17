@@ -125,14 +125,14 @@ bool CombatPlanner::GetNodeConnections(
     CombatPlanLinkData linkData;
     float fparentCost = apNode->fCost;
     AStarNode<CombatPlanNode*, CombatPlanLink*>* v3 = apNode->pParentAStarNode;
-    bool bfirstLink = v3 == 0;
+    bool bfirstLink = v3 == nullptr;
     if (!v3) {
         apRetNodes->SetReservedSize(16u);
     }
     for (uint32_t i = 0; i < apNode->tNodeData->iUnsatisfiedStateCount; ++i) {
         CombatWorldState* punsatisfiedState = apNode->tNodeData->UnsatisfiedStates[i].pUnsatisfiedState;
         BSSimpleList<CombatAction*>* pactionList = CombatAction::GetActionsForTargetState(punsatisfiedState->eState);
-        bool bactionFound = 0;
+        bool bactionFound = false;
         while (pactionList && pactionList->m_item) {
             CombatAction* paction = pactionList->m_item;
             if (!paction->GetFlag(CombatAction::INFINITE_ACTION) || bfirstLink) {
@@ -157,7 +157,7 @@ bool CombatPlanner::GetNodeConnections(
                             pnewNode = ::new (apMemory) CombatPlanNode(&InitialWorldState);
                         }
                         else {
-                            pnewNode = 0;
+                            pnewNode = nullptr;
                         }
                         CombatPlanNode* pnewNode_2 = pnewNode;
                         for (CombatWorldStateList* peffectsList = &paction->Effects;
@@ -194,7 +194,7 @@ bool CombatPlanner::GetNodeConnections(
                                     v22 = ::new (v30) CombatWorldState(pstate_3->eState, ivalue_3);
                                 }
                                 else {
-                                    v22 = 0;
+                                    v22 = nullptr;
                                 }
                                 pnewNode_2->AddUnsatisfiedState(
                                     v22, apNode->tNodeData->UnsatisfiedStates[j].pUnsatisfiedStateParent
@@ -218,13 +218,13 @@ bool CombatPlanner::GetNodeConnections(
                                     v21 = ::new (v28) CombatWorldState(pstate_4->eState, ivalue_4);
                                 }
                                 else {
-                                    v21 = 0;
+                                    v21 = nullptr;
                                 }
                                 pnewNode_2->AddUnsatisfiedState(v21, pnewNode_2);
                             }
                         }
                         fcost = fcost + fparentCost;
-                        bactionFound = 1;
+                        bactionFound = true;
                         uint32_t ikey = GetKeyForNode(pnewNode_2);
                         int32_t uiResult = GetOrCreateAStarNode(ikey, fcost, &pnode);
                         if (uiResult) {
@@ -245,7 +245,7 @@ bool CombatPlanner::GetNodeConnections(
                             );
                         }
                         else {
-                            plink = 0;
+                            plink = nullptr;
                         }
                         plink->LinkData = linkData;
                         pnode->ParentLink = plink;
@@ -257,11 +257,11 @@ bool CombatPlanner::GetNodeConnections(
             pactionList = pactionList->m_pkNext;
         }
         if (!bactionFound) {
-            apRetNodes->Clear(0);
-            return 0;
+            apRetNodes->Clear(false);
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 bool CombatPlanner::IsGoalNode(const AStarNode<CombatPlanNode*, CombatPlanLink*>* apNode) {
@@ -310,7 +310,7 @@ CombatPlan* CombatPlanner::CreatePlan_0(CombatController* apCombatController, bo
                         pGroupMember = ::new (v7) CombatWorldState(pgoalState->eState, ivalue);
                     }
                     else {
-                        pGroupMember = 0;
+                        pGroupMember = nullptr;
                     }
                     startNode.AddUnsatisfiedState(pGroupMember, &startNode);
                 }
@@ -322,7 +322,7 @@ CombatPlan* CombatPlanner::CreatePlan_0(CombatController* apCombatController, bo
             pgoal->CombatPlannerFailed(apCombatController, &InitialWorldState);
         }
     }
-    return 0;
+    return nullptr;
 }
 
 CombatPlan* CombatPlanner::CreatePlan(
@@ -334,15 +334,15 @@ CombatPlan* CombatPlanner::CreatePlan(
     using NodeArray_t = BSScrapArray<CombatPlanNode*, 1024>;
     using LinkArray_t = BSScrapArray<CombatPlanLink*, 1024>;
     if (!apStartNode->iUnsatisfiedStateCount) {
-        return 0;
+        return nullptr;
     }
     ClearSearchData();
     uint32_t KeyForNode = GetKeyForNode(apStartNode);
     AddStartNode(KeyForNode, apStartNode, 0.0f);
     NodeArray_t NodeArray;
     LinkArray_t LinkArray;
-    Search(&NodeArray, &LinkArray, 0);
-    CombatPlan* pplan = 0;
+    Search(&NodeArray, &LinkArray, false);
+    CombatPlan* pplan = nullptr;
     if (LinkArray.iSize) {
         CombatPlan* pplan_2;
         CombatPlan* pPlan = static_cast<CombatPlan*>(ourMalloc(sizeof(CombatPlan)));
@@ -350,11 +350,11 @@ CombatPlan* CombatPlanner::CreatePlan(
             pplan_2 = ::new (pPlan) CombatPlan(apCombatController, apGoal, &NodeArray, &LinkArray, &InitialWorldState);
         }
         else {
-            pplan_2 = 0;
+            pplan_2 = nullptr;
         }
         pplan = pplan_2;
     }
-    CombatPlannerWindow* pWindow = 0;
+    CombatPlannerWindow* pWindow = nullptr;
     if (abDebugPlan) {
         CombatPlannerWindow* v7;
         CombatPlannerWindow* apMemory = static_cast<CombatPlannerWindow*>(ourMalloc(sizeof(CombatPlannerWindow)));
@@ -362,7 +362,7 @@ CombatPlan* CombatPlanner::CreatePlan(
             v7 = ::new (apMemory) CombatPlannerWindow(this, pplan, &NodeArray);
         }
         else {
-            v7 = 0;
+            v7 = nullptr;
         }
         pWindow = v7;
     }

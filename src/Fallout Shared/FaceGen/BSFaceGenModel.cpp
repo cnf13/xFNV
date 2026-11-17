@@ -56,10 +56,10 @@
 #include "SDK/MSVC/iosfwd.h"
 #include "SDK/MSVC/string.h"
 
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <new>
-#include <stdint.h>
 #include <string>
 #include <vector>
 
@@ -426,14 +426,14 @@ bool BSFaceGenModel::LoadModelTexture(const char* apEGTFilename) {
 }
 
 bool BSFaceGenModel::CreateNewMesh(NiPointer<NiTriBasedGeom>& aspReturnMesh) {
-    NiPointer<NiGeometryData> spdata(static_cast<NiGeometryData*>(0));
-    NiPointer<NiSkinPartition> spskinPartition(static_cast<NiSkinPartition*>(0));
-    aspReturnMesh.operator=(static_cast<NiTriBasedGeom*>(0));
+    NiPointer<NiGeometryData> spdata(static_cast<NiGeometryData*>(nullptr));
+    NiPointer<NiSkinPartition> spskinPartition(static_cast<NiSkinPartition*>(nullptr));
+    aspReturnMesh.operator=(static_cast<NiTriBasedGeom*>(nullptr));
     if (pMeshData && (pMeshData->spModel.m_pObject && pMeshData->spModel.m_pObject->GetModelData())) {
         BSFaceGenModelExtraData* pmorphBase_2;
         BSFaceGenBaseMorphExtraData* pmorphBase;
         aspReturnMesh.operator=(static_cast<NiTriBasedGeom*>(pMeshData->spModel.m_pObject->Clone()));
-        NiPointer<NiObject> spTempObject(static_cast<NiObject*>(0));
+        NiPointer<NiObject> spTempObject(static_cast<NiObject*>(nullptr));
         pMeshData->spModel.m_pObject->GetModelData()->CreateDeepCopy(spTempObject);
         spdata.operator=(static_cast<NiGeometryData*>(spTempObject.m_pObject));
         NiTriBasedGeom* v6 = aspReturnMesh.m_pObject;
@@ -441,7 +441,7 @@ bool BSFaceGenModel::CreateNewMesh(NiPointer<NiTriBasedGeom>& aspReturnMesh) {
         NiSkinInstance* pskin = aspReturnMesh.m_pObject->GetSkinInstance();
         if (pskin) {
             if (pskin->GetSkinPartition()) {
-                NiPointer<NiObject> spTempSkinObject(static_cast<NiObject*>(0));
+                NiPointer<NiObject> spTempSkinObject(static_cast<NiObject*>(nullptr));
                 pskin->GetSkinPartition()->CreateDeepCopy(spTempSkinObject);
                 spskinPartition.operator=(static_cast<NiSkinPartition*>(spTempSkinObject.m_pObject));
                 NiSkinPartition* v3 = spskinPartition.m_pObject;
@@ -456,7 +456,7 @@ bool BSFaceGenModel::CreateNewMesh(NiPointer<NiTriBasedGeom>& aspReturnMesh) {
             );
         }
         else {
-            pmorphBase = 0;
+            pmorphBase = nullptr;
         }
         NiExtraData* pkExtra = pmorphBase;
         if (pmorphBase) {
@@ -468,13 +468,13 @@ bool BSFaceGenModel::CreateNewMesh(NiPointer<NiTriBasedGeom>& aspReturnMesh) {
             pmorphBase_2 = ::new (v8) BSFaceGenModelExtraData(this);
         }
         else {
-            pmorphBase_2 = 0;
+            pmorphBase_2 = nullptr;
         }
         aspReturnMesh.m_pObject->AddExtraData(pmorphBase_2);
-        return 1;
+        return true;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -736,14 +736,14 @@ uint32_t BSFaceGenModel::GetEGTDataSize() {
 bool BSFaceGenModel::UnloadEGMData() {
     if (pMeshData && pMeshData->pEGMData) {
         if (pMeshData->iRefCount) {
-            return 0;
+            return false;
         }
         if (pMeshData->pEGMData) {
             delete pMeshData->pEGMData;
         }
-        pMeshData->pEGMData = 0;
+        pMeshData->pEGMData = nullptr;
     }
-    return 1;
+    return true;
 }
 
 bool BSFaceGenModel::HasEGTData() const {
@@ -788,7 +788,7 @@ bool BSFaceGenModel::ApplyCoordinateTexturingToMesh(
     BSFaceGenImage* pImage;
     BSFaceGenRGBA emtpyRGBA;
     uint32_t ibasisSize;
-    NiPointer<BSFaceGenImage> spimageOut(static_cast<BSFaceGenImage*>(0));
+    NiPointer<BSFaceGenImage> spimageOut(static_cast<BSFaceGenImage*>(nullptr));
     BSFaceGenRGBAVector::iterator kPixelIter;
     aspReturnBaseMod.operator=(static_cast<NiTexture*>(BSFaceGenManager::GetBaseTexture()));
     if (!pTextureData) {
@@ -846,7 +846,7 @@ bool BSFaceGenModel::ApplyCoordinateTexturingToMesh(
         pImage = ::new (pMemory) BSFaceGenImage(static_cast<NiSourceTexture*>(nullptr));
     }
     else {
-        pImage = 0;
+        pImage = nullptr;
     }
     spimageOut.operator=(pImage);
     spimageOut.m_pObject->iWidth = ibasisHeight;
@@ -915,7 +915,7 @@ bool BSFaceGenModel::ApplyCoordinateTexturingToMesh(
 
 bool BSFaceGenModel::LoadEGMData() {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_FACEGEN_EGM, 1,
+        MEM_CONTEXT_FACEGEN_EGM, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\FaceGen\\BSFaceGenModel.cpp", 1264
     );
     if (!pMeshData) {
@@ -925,18 +925,18 @@ bool BSFaceGenModel::LoadEGMData() {
         EGMData* v2;
         if (!pMeshData->EGMFilename.GetLength()) {
         LABEL_2:;
-            return 0;
+            return false;
         }
         EGMData* v4 = static_cast<EGMData*>(ourMalloc(sizeof(EGMData)));
         if (v4) {
             v2 = ::new (v4) EGMData(pMeshData->EGMFilename.pString);
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         pMeshData->pEGMData = v2;
     }
-    return 1;
+    return true;
 }
 
 void BSFaceGenModel::KillTextureData() {
@@ -944,11 +944,11 @@ void BSFaceGenModel::KillTextureData() {
         if (pTextureData->pEGTData) {
             delete pTextureData->pEGTData;
         }
-        pTextureData->pEGTData = 0;
+        pTextureData->pEGTData = nullptr;
         if (pTextureData) {
             delete pTextureData;
         }
-        pTextureData = 0;
+        pTextureData = nullptr;
     }
 }
 
@@ -1143,7 +1143,7 @@ BSSystemFile::ErrorCode BSSystemFile::QLastError() const {
 BSSystemFile::ErrorCode BSSystemFile::GetSizeOfFile(const char* apcPath, uint64_t& auiSize) {
     BSSystemFile apMemory;
     apMemory.~BSSystemFile();
-    ::new (&apMemory) BSSystemFile(apcPath, 0, 0, 0);
+    ::new (&apMemory) BSSystemFile(apcPath, 0, 0, false);
     BSSystemFile::ErrorCode Size = apMemory.QLastError();
     if (Size) {
         auiSize = 0;
@@ -1173,7 +1173,7 @@ void BSFaceGenModelExtraData::InitTag() {
         v0 = ::new (static_cast<void*>(v1)) NiFixedString("FMD");
     }
     else {
-        v0 = 0;
+        v0 = nullptr;
     }
     BSFaceGenModelExtraData::pTag = v0;
 }

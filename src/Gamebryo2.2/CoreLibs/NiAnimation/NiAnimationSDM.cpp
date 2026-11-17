@@ -20,7 +20,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTAbstractPoolAllocator.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiStaticDataManager.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // Bytes no code reads or writes, between NiTAbstractPoolAllocator<NiActorManager::TimelineData>::ms_pkFreeMem and the
 // 32-byte-aligned ms_kSpinLock of the same pool; likely the lock's alignment padding.
@@ -55,7 +55,7 @@ NiAnimationSDM::NiAnimationSDM() {
 
 void NiAnimationSDM::Init() {
     if (!NiAnimationSDM::ms_bInitialized) {
-        NiAnimationSDM::ms_bInitialized = 1;
+        NiAnimationSDM::ms_bInitialized = true;
         NiStream::RegisterLoader("NiAlphaController", &NiAlphaController::CreateObject);
         NiStream::RegisterLoader("NiBlendAccumTransformInterpolator", &NiBlendAccumTransformInterpolator::CreateObject);
         NiStream::RegisterLoader("NiBlendBoolInterpolator", &NiBlendBoolInterpolator::CreateObject);
@@ -138,7 +138,7 @@ void NiAnimationSDM::Init() {
 
 void NiAnimationSDM::Shutdown() {
     if (NiAnimationSDM::ms_bInitialized) {
-        NiAnimationSDM::ms_bInitialized = 0;
+        NiAnimationSDM::ms_bInitialized = false;
         NiStream::UnregisterLoader("NiAlphaController");
         NiStream::UnregisterLoader("NiBlendAccumTransformInterpolator");
         NiStream::UnregisterLoader("NiBlendBoolInterpolator");

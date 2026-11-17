@@ -254,10 +254,10 @@ void PathingRequest::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v2 = ::new (apMemory) PathingAvoidNodeArray;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         spAvoidNodeArray.operator=(v2);
-        spAvoidNodeArray.m_pObject->SetSize(isaveGameCount, 1);
+        spAvoidNodeArray.m_pObject->SetSize(isaveGameCount, true);
         for (uint32_t i = 0; i < isaveGameCount; ++i) {
             PathingAvoidNode* avoidNode = &spAvoidNodeArray.m_pObject->GetAt(i);
             avoidNode->LoadGame(apLoadGameBuffer);
@@ -267,14 +267,14 @@ void PathingRequest::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 
 void PathingRequest::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (apLoadGameBuffer->GetVersion() < 14u) {
-        bWaitIfPlayerWaits = 0;
+        bWaitIfPlayerWaits = false;
         Actor* pactor = apLoadGameBuffer->GetActor();
         if (pactor) {
             TESPackage* ppack = pactor->GetCurrentPackage();
             if (ppack) {
                 if (ppack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_ESCORT_ACTOR &&
-                    ppack->GetEscortTargetForPackage(pactor, 0) == pPlayer) {
-                    bWaitIfPlayerWaits = 1;
+                    ppack->GetEscortTargetForPackage(pactor, false) == pPlayer) {
+                    bWaitIfPlayerWaits = true;
                 }
             }
         }
@@ -309,7 +309,7 @@ void PathingRequest::Initialize(Actor* apActor) {
         TESActorBaseData* v5 = static_cast<TESActorBaseData*>(apActor->GetActorBase());
         SetCantOpenDoors(v5->GetCantOpenDoors());
     }
-    float a2 = apActor->GetHeading(0);
+    float a2 = apActor->GetHeading(false);
     SetInitialPathHeading(a2);
 }
 
@@ -331,7 +331,7 @@ void PathingRequest::SetSmoothingRandomness(float afRandomness) {
 
 void PathingRequest::SetGoalAngleToFace(float aTargetAngle) {
     fGoalAngle = aTargetAngle;
-    bFaceTargetAtGoal = (bool)1;
+    bFaceTargetAtGoal = true;
 }
 
 void PathingRequest::SetCantOpenDoors(bool abCantOpenDoors) {
@@ -386,7 +386,7 @@ void PathingRequest::SetCanFly(bool abCanFly) {
 
 void PathingRequest::SetInitialPathHeading(float afInitialPathHeading) {
     fInitialPathHeading = afInitialPathHeading;
-    bFirstTangentUsesHeading = (bool)1;
+    bFirstTangentUsesHeading = true;
 }
 
 void PathingRequest::SetGoDirectIfPathingFails(bool abGoDirect) {
@@ -410,7 +410,7 @@ bool PathingRequest::GetIgnoreSmoothingIfFails() const {
 }
 
 void PathingRequest::ClearInitialPathHeading() {
-    bFirstTangentUsesHeading = (bool)0;
+    bFirstTangentUsesHeading = false;
 }
 
 bool PathingRequest::GetWaitIfPlayerWaits() const {
@@ -440,7 +440,7 @@ PathingRequest* PathingRequest::CreatePathingRequest(PATHING_REQUEST_TYPE aeType
                 v9 = ::new (v17) PathingRequest;
             }
             else {
-                v9 = 0;
+                v9 = nullptr;
             }
             result = v9;
             break;
@@ -453,7 +453,7 @@ PathingRequest* PathingRequest::CreatePathingRequest(PATHING_REQUEST_TYPE aeType
                 v8 = ::new (v16) PathingRequestCover;
             }
             else {
-                v8 = 0;
+                v8 = nullptr;
             }
             result = v8;
             break;
@@ -466,7 +466,7 @@ PathingRequest* PathingRequest::CreatePathingRequest(PATHING_REQUEST_TYPE aeType
                 v7 = ::new (apMemory) PathingRequestClosePoint;
             }
             else {
-                v7 = 0;
+                v7 = nullptr;
             }
             result = v7;
             break;
@@ -479,7 +479,7 @@ PathingRequest* PathingRequest::CreatePathingRequest(PATHING_REQUEST_TYPE aeType
                 v6 = ::new (v14) PathingRequestFlee;
             }
             else {
-                v6 = 0;
+                v6 = nullptr;
             }
             result = v6;
             break;
@@ -492,7 +492,7 @@ PathingRequest* PathingRequest::CreatePathingRequest(PATHING_REQUEST_TYPE aeType
                 v5 = ::new (v13) PathingRequestHide;
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             result = v5;
             break;
@@ -505,7 +505,7 @@ PathingRequest* PathingRequest::CreatePathingRequest(PATHING_REQUEST_TYPE aeType
                 v4 = ::new (v12) PathingRequestLOS;
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             result = v4;
             break;
@@ -519,7 +519,7 @@ PathingRequest* PathingRequest::CreatePathingRequest(PATHING_REQUEST_TYPE aeType
                 v3 = ::new (v11) PathingRequestOptimalLocation;
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             result = v3;
             break;
@@ -532,14 +532,14 @@ PathingRequest* PathingRequest::CreatePathingRequest(PATHING_REQUEST_TYPE aeType
                 v2 = ::new (v10) PathingRequestCoveredMove;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             result = v2;
             break;
         }
         default: {
             Warning("PATHFINDING: Unknown pathing request type %i", aeType);
-            result = 0;
+            result = nullptr;
             break;
         }
     }

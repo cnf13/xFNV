@@ -139,7 +139,7 @@ BSShaderProperty::RenderPassArray* HairShaderProperty::GetRenderPasses(
                 ShadowSceneLight* pSunLight = BSShaderManager::GetAccumulator()->pActiveShadowSceneNode->pSunLight;
                 if (!GetNumberofActiveNonShadowLights()) {
                     if (static_cast<uint8_t>(abUpdateList) == 1) {
-                        pRenderPassList->Add(apGeom, 0xC1, 1, 1, pSunLight, nullptr, nullptr, 0);
+                        pRenderPassList->Add(apGeom, 0xC1, 1, 1, pSunLight, nullptr, nullptr, nullptr);
                         if ((ulFlags[1] & BSS2_1st_Light_is_Point_Light) != 0) {
                             iLastRenderPassState = 0;
                         }
@@ -269,7 +269,7 @@ BSShaderProperty::RenderPassArray* HairShaderProperty::GetRenderPasses(
                         }
                     }
                     if (static_cast<uint8_t>(abUpdateList) == 1) {
-                        pRenderPassList->Add(apGeom, 0xC2, 1, 3, pLight0, pLight1, pLight2, 0);
+                        pRenderPassList->Add(apGeom, 0xC2, 1, 3, pLight0, pLight1, pLight2, nullptr);
                     }
                     else {
                         ++asCount;

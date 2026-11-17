@@ -121,7 +121,7 @@ float AlchemyItem::GetCost(Actor* apActor) {
         return static_cast<float>(GetCostOverride());
     }
     else {
-        return static_cast<EffectItemList*>(this)->EffectItemList::GetCost(0);
+        return static_cast<EffectItemList*>(this)->EffectItemList::GetCost(nullptr);
     }
 }
 
@@ -140,7 +140,7 @@ uint32_t AlchemyItem::GetDataSize() {
 bool AlchemyItem::CompareMagicItemData(MagicItem* apCompare) {
     AlchemyItem* palchemy = dynamic_cast<AlchemyItem*>(apCompare);
     if (!palchemy) {
-        return 1;
+        return true;
     }
     const void* v3 = palchemy->GetData();
     return std::memcmp(&data, v3, sizeof(data)) != 0;

@@ -73,15 +73,15 @@ void hkDisplayCone::buildGeometry() {
     hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
     hkGeometry* m_geometry_1 = static_cast<hkGeometry*>(Instance->m_heap->blockAlloc(sizeof(hkGeometry)));
     if (m_geometry_1) {
-        m_geometry_1->m_vertices.m_data = 0;
+        m_geometry_1->m_vertices.m_data = nullptr;
         m_geometry_1->m_vertices.m_size = 0;
         m_geometry_1->m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-        m_geometry_1->m_triangles.m_data = 0;
+        m_geometry_1->m_triangles.m_data = nullptr;
         m_geometry_1->m_triangles.m_size = 0;
         m_geometry_1->m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;
     }
     else {
-        m_geometry_1 = 0;
+        m_geometry_1 = nullptr;
     }
     this->m_geometry = m_geometry_1;
     generateConeVertices(m_geometry_1->m_vertices);
@@ -216,9 +216,9 @@ void hkDisplayCone::generateConeVertices(hkArrayBase<hkVector4>& vertices) {
     float v14 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v13[0])));
     v15[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v16 = _mm_cmpeq_ss(v13, v15);
-    v15[0] = 3.0f - static_cast<float>(static_cast<float>(v13[0] * v14) * v14);
+    v15[0] = 3.0f - ((v13[0] * v14) * v14);
     __m128 v17 = _mm_setzero_ps();
-    v17[0] = static_cast<float>(0.5f * v14) * v15[0];
+    v17[0] = (0.5f * v14) * v15[0];
     __m128 v18 = _mm_andnot_ps(v16, v17);
     float afAngle = m_coneAngle;
     arAxis.m_quad = _mm_mul_ps(_mm_shuffle_ps(v18, v18, 0), arAxis.m_quad);
@@ -227,7 +227,7 @@ void hkDisplayCone::generateConeVertices(hkArrayBase<hkVector4>& vertices) {
     v39.setAxisAngle(m_coneAxis, afAngle_1);
     __m128 v19 = _mm_mul_ps(p_m_coneAxis->m_quad, v38.m_vec.m_quad);
     __m128 v20 = _mm_shuffle_ps(v19, v19, 170);
-    v20[0] = v20[0] + static_cast<float>(_mm_shuffle_ps(v19, v19, 85)[0] + v19[0]);
+    v20[0] = v20[0] + (_mm_shuffle_ps(v19, v19, 85)[0] + v19[0]);
     __m128 v21 = _mm_shuffle_ps(v38.m_vec.m_quad, v38.m_vec.m_quad, 255);
     int32_t m_numSegments_3 = 0;
     __m128 v23 = _mm_add_ps(
@@ -260,7 +260,7 @@ void hkDisplayCone::generateConeVertices(hkArrayBase<hkVector4>& vertices) {
             );
             __m128 v26 = _mm_mul_ps(v39.m_vec.m_quad, v24);
             __m128 v27 = _mm_shuffle_ps(v26, v26, 170);
-            v27[0] = v27[0] + static_cast<float>(_mm_shuffle_ps(v26, v26, 85)[0] + v26[0]);
+            v27[0] = v27[0] + (_mm_shuffle_ps(v26, v26, 85)[0] + v26[0]);
             __m128 v28 = _mm_shuffle_ps(v39.m_vec.m_quad, v39.m_vec.m_quad, 255);
             ++m_numSegments_3;
             __m128 v29 = _mm_add_ps(

@@ -104,7 +104,7 @@ CBillboardLeaf* CBillboardLeaf::Clone() const {
         pClone = ::new (apMemory) CBillboardLeaf;
     }
     else {
-        pClone = 0;
+        pClone = nullptr;
     }
     pClone->operator=(*this);
     return pClone;

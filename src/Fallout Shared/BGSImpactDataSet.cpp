@@ -155,10 +155,10 @@ bool BGSImpactDataSet::Compare(TESForm* apCompare) {
     TESForm* v4 =
         static_cast<TESForm*>(FNVD_DYNAMIC_CAST_VOID(BGSImpactDataSet)(apCompare, RTTI_TESForm, RTTI_BGSImpactDataSet));
     if (!v4) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(v4)) {
-        return 1;
+        return true;
     }
     return std::memcmp(ppImpactData, &v4[1].cFormType, sizeof(ppImpactData)) != 0;
 }
@@ -174,13 +174,13 @@ void BGSImpactDataSet::QueueFiles(IO_TASK_PRIORITY aePriority, QueuedFile* apPar
                     apModel = static_cast<TESModel*>(pimpactData);
                 }
                 else {
-                    apModel = 0;
+                    apModel = nullptr;
                 }
-                pModelLoader->QueueModel(apModel, aePriority, apParent, LOD_MULT_OBJECTS, 1, 0, 0);
+                pModelLoader->QueueModel(apModel, aePriority, apParent, LOD_MULT_OBJECTS, true, false, false);
             }
             BGSTextureSet* ptexset = pimpactData->pDecalTextureSet;
             if (ptexset) {
-                ptexset->QueueTextureSet(aePriority, apParent, 0);
+                ptexset->QueueTextureSet(aePriority, apParent, false);
             }
         }
     }
@@ -209,7 +209,7 @@ void BGSImpactDataSet::ApplyImpactSwap(ImpactSwap* apSwap) {
             ImpactMixer::SetAltMaterialSoundName(a1, AltFootstepMaterialName);
         }
         else {
-            ImpactMixer::SetAltMaterialSoundName(a1, 0);
+            ImpactMixer::SetAltMaterialSoundName(a1, nullptr);
         }
     }
     ImpactMixer::ReInitFootsteps();
@@ -229,7 +229,7 @@ void BGSImpactDataSet::CreateDefaultImpactDataSet() {
             v1 = nullptr;
         }
         BGSImpactDataSet::pDefaultImpactDataSet = v1;
-        v1->SetFormID(0x276u, (bool)1);
+        v1->SetFormID(0x276u, true);
         BGSImpactDataSet::pDefaultImpactDataSet->SetFormEditorID("DefaultImpactDataSet");
         pDataHandler->AddFormToDataHandler(BGSImpactDataSet::pDefaultImpactDataSet);
     }
@@ -328,13 +328,13 @@ ImpactSwap::~ImpactSwap() {
         if (pRemappedData[i]) {
             delete pRemappedData[i];
         }
-        pRemappedData[i] = 0;
+        pRemappedData[i] = nullptr;
     }
 }
 
 BGSImpactData*
 ImpactSwap::GetSwappedImpactData(BGSImpactDataSet::IMPACT_MATERIAL_TYPE aeType, BGSImpactData* apOrigImpactData) {
-    BGSImpactData* a2 = 0;
+    BGSImpactData* a2 = nullptr;
     if (!pRemappedData[aeType]) {
         return apOrigImpactData;
     }
@@ -368,7 +368,7 @@ void ImpactSwap::InitItem(TESForm* apOwner) {
             }
             pRemappedData[i]->RemoveAll_1();
             for (iindex = 0; iindex < icount; ++iindex) {
-                BGSImpactData* polddata = 0;
+                BGSImpactData* polddata = nullptr;
                 if (pdataarray[iindex].pOldData) {
                     uint32_t itempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pdataarray[iindex].pOldData));
                     TESFile* File = apOwner->GetFile(-1);
@@ -384,7 +384,7 @@ void ImpactSwap::InitItem(TESForm* apOwner) {
                         );
                     }
                 }
-                BGSImpactData* pnewdata = 0;
+                BGSImpactData* pnewdata = nullptr;
                 if (pdataarray[iindex].pNewData) {
                     uint32_t itempint_2 =
                         static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pdataarray[iindex].pNewData));
@@ -410,7 +410,7 @@ void ImpactSwap::InitItem(TESForm* apOwner) {
                 if (v11) {
                     delete v11;
                 }
-                pRemappedData[i] = 0;
+                pRemappedData[i] = nullptr;
             }
         }
     }
@@ -425,15 +425,15 @@ void ImpactSwap::Copy(ImpactSwap* apSwap) {
         if (v3) {
             delete v3;
         }
-        pRemappedData[i] = 0;
+        pRemappedData[i] = nullptr;
     }
     for (BGSImpactDataSet::IMPACT_MATERIAL_TYPE i_2 = BGSImpactDataSet::IMP_MAT_STONE;
          i_2 < BGSImpactDataSet::IMP_MAT_COUNT; i_2 = static_cast<BGSImpactDataSet::IMPACT_MATERIAL_TYPE>(i_2 + 1)) {
         if (apSwap->pRemappedData[i_2]) {
             iter = apSwap->pRemappedData[i_2]->GetFirstPos();
             while (iter) {
-                polddata = 0;
-                pnewdata = 0;
+                polddata = nullptr;
+                pnewdata = nullptr;
                 apSwap->pRemappedData[i_2]->GetNext(iter, polddata, pnewdata);
                 AddSwappedImpactData(i_2, polddata, pnewdata);
             }
@@ -478,29 +478,29 @@ bool ImpactSwap::Compare(ImpactSwap* apSwap) {
     BGSImpactData* polddata;
     BSMapItem<BGSImpactData*, BGSImpactData*>* iter;
     if (!apSwap) {
-        return 1;
+        return true;
     }
     for (BGSImpactDataSet::IMPACT_MATERIAL_TYPE i = BGSImpactDataSet::IMP_MAT_STONE;
          i < BGSImpactDataSet::IMP_MAT_COUNT; i = static_cast<BGSImpactDataSet::IMPACT_MATERIAL_TYPE>(i + 1)) {
         if (pRemappedData[i] && apSwap->pRemappedData[i]) {
             int32_t icount = pRemappedData[i]->m_uiCount;
             if (icount != apSwap->pRemappedData[i]->m_uiCount) {
-                return 1;
+                return true;
             }
             iter = pRemappedData[i]->GetFirstPos();
             while (iter) {
-                polddata = 0;
-                pnewdata = 0;
+                polddata = nullptr;
+                pnewdata = nullptr;
                 pRemappedData[i]->GetNext(iter, polddata, pnewdata);
                 BGSImpactData* pswapped = apSwap->GetSwappedImpactData(i, polddata);
                 if (pswapped != pnewdata) {
-                    return 1;
+                    return true;
                 }
             }
         }
         else {
             if (pRemappedData[i] || apSwap->pRemappedData[i]) {
-                return 1;
+                return true;
             }
         }
     }
@@ -524,7 +524,7 @@ void ImpactSwap::AddSwappedImpactData(
                 pmap = ::new (apMemory) BSMap<BGSImpactData*, BGSImpactData*>(37u);
             }
             else {
-                pmap = 0;
+                pmap = nullptr;
             }
             pRemappedData[aeType] = pmap;
         }

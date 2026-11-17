@@ -79,7 +79,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 using ActorValueListBox = ListBox<ActorValue::Index>;
 
@@ -94,12 +94,12 @@ MenuManager::~MenuManager() {
 }
 
 Menu* MenuManager::GetFrontmostMenu() {
-    Menu* ptop = 0;
+    Menu* ptop = nullptr;
     float depth = -1e+08f;
     for (NiTListItem<Tile*>* elem = InterfaceManager::Instance()->GetMenusRoot()->xChildren.m_pkHead; elem;
          elem = InterfaceManager::Instance()->GetMenusRoot()->xChildren.GetNextPos(elem)) {
         Tile* pmenutile = InterfaceManager::Instance()->GetMenusRoot()->xChildren.Get(elem);
-        Menu* pmenu = 0;
+        Menu* pmenu = nullptr;
         if (pmenutile) {
             pmenu = pmenutile->GetMenu();
         }
@@ -122,10 +122,10 @@ bool MenuManager::IsMenuOpen(int32_t aiClass) {
     NiTListItem<Tile*>* elem = InterfaceManager::Instance()->GetMenusRoot()->xChildren.m_pkHead;
     do {
         if (!elem) {
-            return 0;
+            return false;
         }
         Tile* pmenutile = InterfaceManager::Instance()->GetMenusRoot()->xChildren.GetNext(elem);
-        pmenu = 0;
+        pmenu = nullptr;
         if (pmenutile) {
             pmenu = pmenutile->GetMenu();
         }
@@ -144,7 +144,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v38 = ::new (v75) MessageMenu;
             }
             else {
-                v38 = 0;
+                v38 = nullptr;
             }
             result = v38;
             break;
@@ -156,7 +156,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v35 = ::new (v72) InventoryMenu;
             }
             else {
-                v35 = 0;
+                v35 = nullptr;
             }
             result = v35;
             break;
@@ -168,7 +168,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v34 = ::new (v71) StatsMenu;
             }
             else {
-                v34 = 0;
+                v34 = nullptr;
             }
             result = v34;
             break;
@@ -180,7 +180,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v33 = ::new (v70) HUDMainMenu;
             }
             else {
-                v33 = 0;
+                v33 = nullptr;
             }
             result = v33;
             break;
@@ -192,7 +192,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v32 = ::new (v69) LoadingMenu;
             }
             else {
-                v32 = 0;
+                v32 = nullptr;
             }
             result = v32;
             break;
@@ -204,7 +204,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v31 = ::new (v68) ContainerMenu;
             }
             else {
-                v31 = 0;
+                v31 = nullptr;
             }
             result = v31;
             break;
@@ -216,7 +216,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v29 = ::new (v66) DialogMenu;
             }
             else {
-                v29 = 0;
+                v29 = nullptr;
             }
             result = v29;
             break;
@@ -228,7 +228,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v28 = ::new (v65) SleepWaitMenu;
             }
             else {
-                v28 = 0;
+                v28 = nullptr;
             }
             result = v28;
             break;
@@ -240,7 +240,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 started = ::new (v64) StartMenu;
             }
             else {
-                started = 0;
+                started = nullptr;
             }
             result = started;
             break;
@@ -252,7 +252,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v26 = ::new (v63) LockPickMenu;
             }
             else {
-                v26 = 0;
+                v26 = nullptr;
             }
             result = v26;
             break;
@@ -264,7 +264,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v25 = ::new (apMemory) QuantityMenu;
             }
             else {
-                v25 = 0;
+                v25 = nullptr;
             }
             result = v25;
             break;
@@ -276,7 +276,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v36 = ::new (v73) MapMenu;
             }
             else {
-                v36 = 0;
+                v36 = nullptr;
             }
             result = v36;
             break;
@@ -288,7 +288,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v24 = ::new (v61) BookMenu;
             }
             else {
-                v24 = 0;
+                v24 = nullptr;
             }
             result = v24;
             break;
@@ -300,7 +300,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v23 = ::new (v60) LevelUpMenu;
             }
             else {
-                v23 = 0;
+                v23 = nullptr;
             }
             result = v23;
             break;
@@ -312,7 +312,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v21 = ::new (v58) RepairMenu;
             }
             else {
-                v21 = 0;
+                v21 = nullptr;
             }
             result = v21;
             break;
@@ -324,7 +324,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v22 = ::new (v59) RaceSexMenu;
             }
             else {
-                v22 = 0;
+                v22 = nullptr;
             }
             result = v22;
             break;
@@ -336,7 +336,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v39 = ::new (v76) CreditsMenu;
             }
             else {
-                v39 = 0;
+                v39 = nullptr;
             }
             result = v39;
             break;
@@ -348,7 +348,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v14 = ::new (v51) CharGenMenu;
             }
             else {
-                v14 = 0;
+                v14 = nullptr;
             }
             result = v14;
             break;
@@ -360,7 +360,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v3 = ::new (v40) TextEditMenu;
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             result = v3;
             break;
@@ -372,7 +372,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v30 = ::new (v67) BarterMenu;
             }
             else {
-                v30 = 0;
+                v30 = nullptr;
             }
             result = v30;
             break;
@@ -384,7 +384,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v16 = ::new (v53) SurgeryMenu;
             }
             else {
-                v16 = 0;
+                v16 = nullptr;
             }
             result = v16;
             break;
@@ -396,7 +396,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v18 = ::new (v55) HackingMenu;
             }
             else {
-                v18 = 0;
+                v18 = nullptr;
             }
             result = v18;
             break;
@@ -408,7 +408,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v15 = ::new (v52) VATSMenu;
             }
             else {
-                v15 = 0;
+                v15 = nullptr;
             }
             result = v15;
             break;
@@ -420,7 +420,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v17 = ::new (v54) ComputersMenu;
             }
             else {
-                v17 = 0;
+                v17 = nullptr;
             }
             result = v17;
             break;
@@ -432,7 +432,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v19 = ::new (v56) RepairServicesMenu;
             }
             else {
-                v19 = 0;
+                v19 = nullptr;
             }
             result = v19;
             break;
@@ -444,7 +444,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v37 = ::new (v74) TutorialMenu;
             }
             else {
-                v37 = 0;
+                v37 = nullptr;
             }
             result = v37;
             break;
@@ -456,7 +456,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v13 = ::new (v50) SPECIALBookMenu;
             }
             else {
-                v13 = 0;
+                v13 = nullptr;
             }
             result = v13;
             break;
@@ -468,7 +468,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v20 = ::new (v57) ItemModMenu;
             }
             else {
-                v20 = 0;
+                v20 = nullptr;
             }
             result = v20;
             break;
@@ -480,7 +480,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v11 = ::new (v48) LoveTesterMenu;
             }
             else {
-                v11 = 0;
+                v11 = nullptr;
             }
             result = v11;
             break;
@@ -492,7 +492,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v12 = ::new (v49) CompanionWheelMenu;
             }
             else {
-                v12 = 0;
+                v12 = nullptr;
             }
             result = v12;
             break;
@@ -504,7 +504,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v10 = ::new (v47) TraitSelectMenu;
             }
             else {
-                v10 = 0;
+                v10 = nullptr;
             }
             result = v10;
             break;
@@ -516,7 +516,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v4 = ::new (v41) RecipeMenu;
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             result = v4;
             break;
@@ -528,7 +528,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v9 = ::new (v46) SlotMachineMenu;
             }
             else {
-                v9 = 0;
+                v9 = nullptr;
             }
             result = v9;
             break;
@@ -540,7 +540,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v8 = ::new (v45) BlackJackMenu;
             }
             else {
-                v8 = 0;
+                v8 = nullptr;
             }
             result = v8;
             break;
@@ -552,7 +552,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v6 = ::new (v43) RouletteMenu;
             }
             else {
-                v6 = 0;
+                v6 = nullptr;
             }
             result = v6;
             break;
@@ -564,7 +564,7 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v5 = ::new (v42) CaravanMenu;
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             result = v5;
             break;
@@ -576,14 +576,14 @@ Menu* MenuManager::CreateMenuByClass(int32_t aiMenuID) {
                 v7 = ::new (v44) TraitMenu;
             }
             else {
-                v7 = 0;
+                v7 = nullptr;
             }
             result = v7;
             break;
         }
         default: {
             Warning("MENUS: Unknown menu class!");
-            result = 0;
+            result = nullptr;
             break;
         }
     }
@@ -596,7 +596,7 @@ Tile* MenuManager::ReloadMenu(int32_t aiMenuClass) {
     if (pmenu) {
         delete pmenu;
     }
-    Tile* pmenu_2 = 0;
+    Tile* pmenu_2 = nullptr;
     if (MapMenu::GetClassStatic() == aiMenuClass) {
         pmenu_2 = Interface::CreateMapMenu();
         float afSecs = pmenu_2->GetFloat(4033);
@@ -647,13 +647,13 @@ Tile* MenuManager::ReloadMenu(int32_t aiMenuClass) {
                 return HUDMainMenu::Create();
             }
             default: {
-                if (StartMenu::GetClassStatic() == aiMenuClass && StartMenu::Create(bpausemenu, 0)) {
+                if (StartMenu::GetClassStatic() == aiMenuClass && StartMenu::Create(bpausemenu, false)) {
                     return Menu::GetMenuByClass(aiMenuClass);
                 }
                 else {
                     switch (aiMenuClass) {
                         case 1007: {
-                            return LoadingMenu::Create(0, 1, 0);
+                            return LoadingMenu::Create(nullptr, true, false);
                         }
                         case 1027: {
                             return LevelUpMenu::CreateMenu();
@@ -689,10 +689,10 @@ Tile* MenuManager::ReloadMenu(int32_t aiMenuClass) {
 bool MenuManager::DeleteMenu(int32_t aiMenuClass) {
     Tile* MenuByClass = Menu::GetMenuByClass(aiMenuClass);
     if (!MenuByClass) {
-        return 0;
+        return false;
     }
     delete MenuByClass;
-    return 1;
+    return true;
 }
 
 void MenuManager::Init() {
@@ -746,7 +746,7 @@ void ListBoxBase::Remove(ListBoxBase* apListBox) {
 
 LoveTesterMenu::LoveTesterMenu()
   : pTiles{}, eState(LoveTesterMenu::LTMS_START), eXBoxIndexState(LoveTesterMenu::LTMS_STRENGTH), fFrameAnimTimer(0.0f),
-    bAnimFinished(1), iAvailablePoints(0), pDynamicGeometry(0), pCabinetGeometry(0) {}
+    bAnimFinished(true), iAvailablePoints(0), pDynamicGeometry(nullptr), pCabinetGeometry(nullptr) {}
 
 QuantityMenu::QuantityMenu() {}
 
@@ -793,7 +793,7 @@ void* StatsMenu::BodyPartController::DeleteInstance() {
     if (StatsMenu::BodyPartController::pInstance) {
         delete StatsMenu::BodyPartController::pInstance;
     }
-    StatsMenu::BodyPartController::pInstance = 0;
+    StatsMenu::BodyPartController::pInstance = nullptr;
     return result;
 }
 

@@ -232,7 +232,7 @@ NiFloatKey* NiFloatInterpolator::GetKeys(uint32_t& uiNumKeys, NiAnimationKey::Ke
         uiNumKeys = 0;
         eType = NiAnimationKey::NOINTERP;
         ucSize = 0;
-        return 0;
+        return nullptr;
     }
 }
 
@@ -247,7 +247,7 @@ void NiFloatInterpolator::CopyMembers(NiFloatInterpolator* pkDest, NiCloningProc
 NiObject* NiFloatInterpolator::CreateObject() {
     void* pkObject = NiMemObject::operator new(sizeof(NiFloatInterpolator));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiFloatInterpolator(static_cast<NiFloatData*>(nullptr));
 }

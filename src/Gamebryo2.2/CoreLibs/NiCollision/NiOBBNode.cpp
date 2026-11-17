@@ -75,7 +75,7 @@ bool NiOBBNode::TestCollision(
     uint32_t uiChangeStamp1
 ) {
     if (!pTestNode) {
-        return 0;
+        return false;
     }
     if (uiChangeStamp0 != m_uiChangeStamp) {
         m_box.Transform(pkObj0->m_kWorld);
@@ -86,7 +86,7 @@ bool NiOBBNode::TestCollision(
         pTestNode->m_uiChangeStamp = uiChangeStamp1;
     }
     if (!m_box.TestIntersection(pTestNode->m_box)) {
-        return 0;
+        return false;
     }
     if (iMaxDepth && iTestMaxDepth) {
         bool v11 = !this->IsLeaf();
@@ -136,7 +136,7 @@ bool NiOBBNode::TestCollision(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 int32_t NiOBBNode::FindCollisions(

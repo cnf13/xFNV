@@ -27,7 +27,7 @@
 #include "Fallout/Misc/SaveLoad/BGSLoadGameBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // The statistics manager constructed at start-up.
 static MiscStatManager msm;

@@ -45,8 +45,8 @@ FleePackage::FleePackage(TESObjectREFR* apActor, TESObjectCELL* pcell, TESObject
   : bCombatMode(true), kFleePoint(NiPoint3_ZERO), fFleeTimer(-1.0f), bFleeSucceeded(0), pTeleportDoor(nullptr),
     pRefFleeTo(nullptr), bknowstarget(false), busehorse(false) {
     SetPackType(PACKAGE_TYPE_FLEE);
-    SetMustReachLocation(1);
-    SetMustComplete(1);
+    SetMustReachLocation(true);
+    SetMustComplete(true);
     bEvaluatePoint = true;
     if (apActor) {
         PackageLocation* pLocation = new PackageLocation();
@@ -72,7 +72,7 @@ FleePackage::FleePackage(TESObjectREFR* apActor, TESObjectCELL* pcell, TESObject
         GetPackageTarget()->SetTargType(PTT_REFERENCE);
         GetPackageTarget()->SetTargReference(apActor);
     }
-    SetIsCreated(1);
+    SetIsCreated(true);
 }
 
 FleePackage::~FleePackage() {
@@ -115,7 +115,7 @@ void FleePackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     apLoadGameBuffer->LoadFormID(pRefFleeTo);
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     for (uint32_t iloop = 0; iloop < isaveGameCount; ++iloop) {
-        pForm = 0;
+        pForm = nullptr;
         apLoadGameBuffer->LoadFormID(pForm);
         kAvoidRefs.AddHead(pForm);
     }
@@ -131,7 +131,7 @@ void FleePackage::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v7 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v7 = 0;
+        v7 = nullptr;
     }
     pTeleportDoor = v7;
     if (pRefFleeTo) {
@@ -139,14 +139,14 @@ void FleePackage::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v6 = dynamic_cast<TESObjectREFR*>(v3);
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     pRefFleeTo = v6;
     BSSimpleList<TESObjectREFR*>* plist = &kAvoidRefs;
-    BSSimpleList<TESObjectREFR*>* plastList = 0;
+    BSSimpleList<TESObjectREFR*>* plastList = nullptr;
     while (plist && !plist->IsEmpty()) {
         TESObjectREFR* pForm = plist->m_item;
-        bool bremove = 0;
+        bool bremove = false;
         if (pForm) {
             TESForm* v4 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pForm)));
             pForm = dynamic_cast<TESObjectREFR*>(v4);
@@ -154,11 +154,11 @@ void FleePackage::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 plist->SetItem(pForm);
             }
             else {
-                bremove = 1;
+                bremove = true;
             }
         }
         else {
-            bremove = 1;
+            bremove = true;
         }
         if (bremove) {
             if (plastList) {
@@ -213,7 +213,7 @@ void FleePackage::SaveGame() {
     uint16_t iblockSize;
     TESPackage::SaveGame();
     iblockSize = 0;
-    uint16_t* pblockSize = 0;
+    uint16_t* pblockSize = nullptr;
     uint8_t* itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -398,7 +398,7 @@ void FleePackage::LoadGame() {
 void FleePackage::InitLoadGame() {
     TESPackage::InitLoadGame();
     BSSimpleList<TESObjectREFR*>* plist = &kAvoidRefs;
-    BSSimpleList<TESObjectREFR*>* plastList = 0;
+    BSSimpleList<TESObjectREFR*>* plastList = nullptr;
     while (plist && !plist->IsEmpty()) {
         // The TESObjectREFR* entry holds a form ID (uint32_t) stored by LoadGame, not a pointer.
         TESObjectREFR* psavedID = plist->m_item;
@@ -436,7 +436,7 @@ void FleePackage::InitLoadGame() {
 }
 
 void FleePackage::ModFleeTimer(float aftime) {
-    fFleeTimer = (float)(fFleeTimer + aftime);
+    fFleeTimer = (fFleeTimer + aftime);
 }
 
 void FleePackage::SetKnowsTarget(bool abflag) {
@@ -448,8 +448,8 @@ void FleePackage::UpdateAvoidedRefList(BaseProcess* apProcess) {
     float fforgetTime = fFleeIsSafeTimer.Float();
     while (plist && plist->m_item) {
         TESObjectREFR* pref = plist->m_item;
-        Actor* pact = pref->IsActor() ? static_cast<Actor*>(pref) : 0;
-        bool v4 = pref->IsDead(0) || pref->GetDelete();
+        Actor* pact = pref->IsActor() ? static_cast<Actor*>(pref) : nullptr;
+        bool v4 = pref->IsDead(false) || pref->GetDelete();
         bool bdelete = v4;
         if (!v4) {
             if (pact) {
@@ -489,8 +489,8 @@ TESObjectREFR* FleePackage::GetClosestAvoidedRef(TESObjectREFR* apFromRef) {
     while (ecx0 && ecx0->m_item) {
         a2 = static_cast<Actor*>(ecx0->m_item);
         ecx0 = ecx0->m_pkNext;
-        distanceFromReference = (float)a2->GetDistanceFromReference(apFromRef, 0, 0);
-        if (a2->GetDisabled() || a2->IsDead((bool)0)) {
+        distanceFromReference = a2->GetDistanceFromReference(apFromRef, false, false);
+        if (a2->GetDisabled() || a2->IsDead(false)) {
             RemoveAvoidedRef(a2);
             ecx0 = &kAvoidRefs;
         }
@@ -506,10 +506,10 @@ TESObjectREFR* FleePackage::GetClosestAvoidedRef(TESObjectREFR* apFromRef) {
 
 bool FleePackage::FindTeleportDoor(Actor* apActor, TESObjectREFR* apThreat) {
     if (!bEvaluatePoint) {
-        return 0;
+        return false;
     }
     if (!apThreat) {
-        return 0;
+        return false;
     }
     pcombatActor = apThreat;
     if (apActor->GetRefPersists()) {
@@ -521,9 +521,9 @@ bool FleePackage::FindTeleportDoor(Actor* apActor, TESObjectREFR* apThreat) {
         );
     }
     pTeleportDoor = pstaticTeleportDoor;
-    pcombatActor = 0;
-    pstaticTeleportDoor = 0;
-    return pTeleportDoor != 0;
+    pcombatActor = nullptr;
+    pstaticTeleportDoor = nullptr;
+    return pTeleportDoor != nullptr;
 }
 
 PathingAvoidNodeArray* FleePackage::CreateAvoidNodeArray() {
@@ -535,7 +535,7 @@ PathingAvoidNodeArray* FleePackage::CreateAvoidNodeArray() {
         pavoidNodeArray = ::new (apMemory) PathingAvoidNodeArray;
     }
     else {
-        pavoidNodeArray = 0;
+        pavoidNodeArray = nullptr;
     }
     if (GetPackageTarget()) {
         favoidNodeRadius = static_cast<float>(GetPackageTarget()->iValue);
@@ -546,9 +546,9 @@ PathingAvoidNodeArray* FleePackage::CreateAvoidNodeArray() {
     float favoidNodeRadius_2 = BSMAX(favoidNodeRadius, 256.0f);
     for (TESObjectREFR* pref : kAvoidRefs) {
         if (pref) {
-            if (!pref->GetDisabled() && !pref->IsDead(0)) {
+            if (!pref->GetDisabled() && !pref->IsDead(false)) {
                 int32_t nodeArrayIndex = pavoidNodeArray->iSize;
-                pavoidNodeArray->SetSize(nodeArrayIndex + 1, 1);
+                pavoidNodeArray->SetSize(nodeArrayIndex + 1, true);
                 float v6 = favoidNodeRadius_2 * favoidNodeRadius_2;
                 float favoidNodeCost = BSMAX(v6, 100.0f);
                 float a2 = favoidNodeCost;
@@ -617,7 +617,7 @@ bool FleePackage::ShouldShutDown() {
         abAreAllCombatTargetsSearching = 0;
         if ((static_cast<const void*>((&kAvoidRefs)->m_item) == static_cast<const void*>(pPlayer)) &&
             (!pPlayer->IsPlayerCharacterInCombat((bool*)(&abAreAllCombatTargetsSearching)))) {
-            return (bool)1;
+            return true;
         }
     }
     return (bool)result;
@@ -636,19 +636,19 @@ void FleePackage::AddAvoidedRef(TESObjectREFR* apRef) {
 bool FleePackage::EvaluateReferenceforTeleportDoor(TESObjectREFR* apRef, void* aiFilterData) {
     float fdistance;
     if (!apRef || (apRef->GetDelete() || (apRef->GetTemporary() || apRef->GetDisabled()))) {
-        return 0;
+        return false;
     }
     PACKAGE_OBJECT_TYPE eUseItem = POTYPE_NONE;
     Actor* pactor = static_cast<Actor*>(aiFilterData);
     if (!aiFilterData) {
-        return 0;
+        return false;
     }
     TESObjectDOOR* ObjectReference = static_cast<TESObjectDOOR*>(apRef->GetObjectReference());
     if (ObjectReference == pJailMarker) {
-        return 0;
+        return false;
     }
     if (!apRef->GetTeleport()) {
-        return 0;
+        return false;
     }
     if (pcombatActor && pcombatActor->GetInterior()) {
         fdistance = 128.0f;
@@ -656,25 +656,25 @@ bool FleePackage::EvaluateReferenceforTeleportDoor(TESObjectREFR* apRef, void* a
     else {
         fdistance = 800.0f;
     }
-    float fourDistFromDoor = apRef->GetDistanceFromReference(pactor, 0, 0);
-    float fcombatActorDistFromDoor = apRef->GetDistanceFromReference(pcombatActor, 0, 0);
+    float fourDistFromDoor = apRef->GetDistanceFromReference(pactor, false, false);
+    float fcombatActorDistFromDoor = apRef->GetDistanceFromReference(pcombatActor, false, false);
     if (!(fdistance < static_cast<double>(fcombatActorDistFromDoor)) &&
         !(fourDistFromDoor < static_cast<double>(fcombatActorDistFromDoor))) {
-        return 0;
+        return false;
     }
     LockData* pLock = apRef->GetLock();
     if (pLock &&
         (pLock->IsLocked() &&
-         (!apRef->IsAnOwner(pactor, 1) &&
+         (!apRef->IsAnOwner(pactor, true) &&
           (!pLock->pKey || !pactor->HasObjects(pLock->pKey, POTYPE_NONE, 1, 0, eUseItem))))) {
-        return 0;
+        return false;
     }
     PathingLocation actorLoc(pactor);
     const NiPoint3* LinkedDoorTeleportPosition = &apRef->GetLinkedDoorTeleportPosition();
     PathingLocation doorLoc(*LinkedDoorTeleportPosition, apRef);
-    if (Pathing::CanCreatePath(actorLoc, doorLoc, 0)) {
+    if (Pathing::CanCreatePath(actorLoc, doorLoc, nullptr)) {
         pstaticTeleportDoor = apRef;
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }

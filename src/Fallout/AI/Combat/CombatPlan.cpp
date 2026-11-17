@@ -113,44 +113,44 @@ bool CombatPlan::ValidatePlanStep(
     for (j = aiStep + 1;; ++j) {
         bool ballEffectsContained;
         if (j >= iLength) {
-            return 1;
+            return true;
         }
         peffectedAction = pPlanSteps[j]->pAction;
         ieffectedActionValue = pPlanSteps[j]->iActionValue;
-        ballEffectsContained = 1;
+        ballEffectsContained = true;
         if (peffectedAction != apAction) {
             for (CombatWorldStateList* peffects = &apAction->Effects; peffects && peffects->m_item;
                  peffects = peffects->GetNext()) {
-                bool beffectContained = 0;
+                bool beffectContained = false;
                 CombatWorldState* peffectState = peffects->m_item;
                 for (CombatWorldStateList* peffects2 = &peffectedAction->Effects; peffects2 && peffects2->m_item;
                      peffects2 = peffects2->GetNext()) {
                     CombatWorldState* peffectState2 = peffects2->m_item;
                     if (peffectState->eState == peffectState2->eState) {
-                        beffectContained = 1;
+                        beffectContained = true;
                         break;
                     }
                 }
                 if (!beffectContained) {
-                    ballEffectsContained = 0;
+                    ballEffectsContained = false;
                     break;
                 }
             }
         }
         if (ballEffectsContained) {
             if (!pPlanSteps[aiStep]->pParentStep) {
-                return 1;
+                return true;
             }
             uint32_t iparentIndex = GetIndexForStep(pPlanSteps[aiStep]->pParentStep);
             if (iparentIndex < j) {
-                return 1;
+                return true;
             }
             CombatPlan::Step* ptemp = pPlanSteps[aiStep];
             ourMemcpy(
                 &pPlanSteps[aiStep], &pPlanSteps[aiStep + 1], sizeof(CombatPlan::Step*) * (iparentIndex - 1 - aiStep)
             );
             pPlanSteps[iparentIndex - 1] = ptemp;
-            return 0;
+            return false;
         }
         peffects_2 = &apAction->Effects;
     LABEL_23:;
@@ -177,14 +177,14 @@ bool CombatPlan::ValidatePlanStep(
             }
         }
     }
-    bool bsameBranch = 0;
+    bool bsameBranch = false;
     if (peffectedAction->GetFlag(CombatAction::INFINITE_ACTION)) {
-        bsameBranch = 1;
+        bsameBranch = true;
     }
     else {
         for (CombatPlan::Step* pparent = pPlanSteps[aiStep]->pParentStep; pparent; pparent = pparent->pParentStep) {
             if (pparent == pPlanSteps[j]) {
-                bsameBranch = 1;
+                bsameBranch = true;
                 break;
             }
         }
@@ -196,7 +196,7 @@ bool CombatPlan::ValidatePlanStep(
             ishiftIndex = GetIndexForStep(pPlanSteps[aiStep]->pParentStep) - 1;
         }
         if (ishiftIndex <= aiStep) {
-            bsameBranch = 1;
+            bsameBranch = true;
         }
         else {
             ourMemcpy(&pPlanSteps[aiStep], &pPlanSteps[aiStep + 1], sizeof(CombatPlan::Step*) * (ishiftIndex - aiStep));
@@ -219,7 +219,7 @@ bool CombatPlan::ValidatePlanStep(
         pPlanSteps[j]->pParentStep = pPlanSteps[j + 1];
         ourFree(pcurrentSteps);
     }
-    return 0;
+    return false;
 }
 
 void CombatPlan::ValidatePlan(CombatWorldStateArray* apWorldStateArray) {
@@ -260,7 +260,7 @@ bool CombatPlan::ExecuteNextAction(CombatController* apCombatController) {
         ++iCurrentAction;
     }
     if (!IsFinished()) {
-        bool bIsEmpty = 1;
+        bool bIsEmpty = true;
         CombatPlan::Step* v2 = pPlanSteps[iCurrentAction];
         if (v2->pAction == apCombatController->pCurrentAction) {
             CombatPlan::Step* v3 = pPlanSteps[iCurrentAction];

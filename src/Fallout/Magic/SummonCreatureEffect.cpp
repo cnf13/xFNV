@@ -66,7 +66,7 @@ SummonCreatureEffect::SummonCreatureEffect(MagicCaster* apCaster, MagicItem* apS
 
 SummonCreatureEffect::~SummonCreatureEffect() {
     if (bcached && pSpell) {
-        pSpell->Unload(1);
+        pSpell->Unload(true);
     }
 }
 
@@ -77,7 +77,7 @@ ActiveEffect* SummonCreatureEffect::Copy() {
         v3 = ::new (apMemory) SummonCreatureEffect(pCaster, pSpell, pEffect);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     AssociatedItemEffect::CopyData(v3);
     v3->pSummonedCreature = pSummonedCreature;
@@ -89,7 +89,7 @@ ActiveEffect* SummonCreatureEffect::Copy() {
     if (bcached && !v3->bcached) {
         if (GetSpell()) {
             MagicItem* FormFlags = GetSpell();
-            FormFlags->Preload(0);
+            FormFlags->Preload(false);
         }
     }
     v3->bcached = bcached;
@@ -106,22 +106,22 @@ void SummonCreatureEffect::Update(float afSecondsElapsed) {
     else {
         targetAsActor = nullptr;
     }
-    if (targetAsActor && ((!bPlacement) || (pSummonedCreature && (!pSummonedCreature->IsDead((bool)0))))) {
+    if (targetAsActor && ((!bPlacement) || (pSummonedCreature && (!pSummonedCreature->IsDead(false))))) {
         if ((fAppearTime <= ((double)fElapsedSeconds)) && (!bPlacement)) {
             DoSummon(targetAsActor);
             if (targetAsActor == pPlayer) {
                 LimitPlayerSummonedCreatures();
             }
-            bPlacement = (bool)1;
+            bPlacement = true;
         }
         if (pSummonedCreature) {
-            if (!pSummonedCreature->IsDead((bool)0)) {
+            if (!pSummonedCreature->IsDead(false)) {
                 CommandEffect::UpdateCommandedActor(pSummonedCreature, targetAsActor);
             }
         }
     }
     else {
-        ActiveEffect::Dispel(0);
+        ActiveEffect::Dispel(false);
     }
 }
 
@@ -175,7 +175,7 @@ void SummonCreatureEffect::InitLoadGame(Actor* a1) {
         TESForm* FormByNumericID = TESForm::GetFormByNumericID(iformID);
         pSummonedCreature = dynamic_cast<Actor*>(FormByNumericID);
         if (!pSummonedCreature) {
-            Dispel(1);
+            Dispel(true);
         }
     }
 }
@@ -183,7 +183,7 @@ void SummonCreatureEffect::InitLoadGame(Actor* a1) {
 bool SummonCreatureEffect::CheckDeletedCaster(MagicCaster* a2) {
     int8_t v4 = (int8_t)ActiveEffect::CheckDeletedCaster(a2);
     if (v4) {
-        ActiveEffect::Dispel(1);
+        ActiveEffect::Dispel(true);
     }
     return (bool)v4;
 }
@@ -196,7 +196,7 @@ bool SummonCreatureEffect::CheckTarget(MagicTarget* a2) {
     else {
         targetAsActor = nullptr;
     }
-    return (targetAsActor != 0);
+    return (targetAsActor != nullptr);
 }
 
 void SummonCreatureEffect::Start() {
@@ -207,7 +207,7 @@ void SummonCreatureEffect::Start() {
         pownerActor = pTarget->GetTargetAsActor();
     }
     else {
-        pownerActor = 0;
+        pownerActor = nullptr;
     }
     if (pownerActor) {
         AppearRotation = pownerActor->GetAngleOnReference();
@@ -224,14 +224,14 @@ void SummonCreatureEffect::Start() {
         NiPoint3 v17 = move;
         const char* v2 = pEffect->pEffectSetting->GetModel();
         BSTempEffectParticle* peffect =
-            BSTempEffectParticle::Spawn(pownerActor->GetParentCell(), 1.0f, v2, v17, AppearLocation, 1.0f, 7u, 0);
+            BSTempEffectParticle::Spawn(pownerActor->GetParentCell(), 1.0f, v2, v17, AppearLocation, 1.0f, 7u, nullptr);
         peffect->PlaySequence(psequenceName);
         NiAVObject* psummonObject = peffect->GetParticleObject();
         fAppearTime = FindTimeForNoteKey(psummonObject, psequenceName, "Hit");
         if (!bcached) {
             if (pSpell) {
-                pSpell->Preload(0);
-                bcached = 1;
+                pSpell->Preload(false);
+                bcached = true;
             }
         }
     }
@@ -244,33 +244,33 @@ void SummonCreatureEffect::Finish() {
         TargetAsActor = Unk24->GetTargetAsActor();
     }
     else {
-        TargetAsActor = 0;
+        TargetAsActor = nullptr;
     }
     if (pSummonedCreature) {
         if (TargetAsActor) {
             BaseProcess* v2;
             if (!pSummonedCreature->GetCurrentAIProcess() ||
                 (v2 = pSummonedCreature->GetCurrentAIProcess(), v2->GetProcessLevel())) {
-                CommandEffect::CleanupCommandedActor(pSummonedCreature, TargetAsActor, 1);
-                pSummonedCreature->SetDelete(1);
+                CommandEffect::CleanupCommandedActor(pSummonedCreature, TargetAsActor, true);
+                pSummonedCreature->SetDelete(true);
             }
             else {
-                if (!pSummonedCreature->IsDead(0)) {
-                    pSummonedCreature->Kill(0, 0.0);
+                if (!pSummonedCreature->IsDead(false)) {
+                    pSummonedCreature->Kill(nullptr, 0.0);
                 }
                 Actor* zero = pSummonedCreature;
                 HighProcess* CurrentAIProcess = static_cast<HighProcess*>(zero->GetCurrentAIProcess());
                 CurrentAIProcess->FadeAndDelete(zero);
-                CommandEffect::CleanupCommandedActor(pSummonedCreature, TargetAsActor, 1);
+                CommandEffect::CleanupCommandedActor(pSummonedCreature, TargetAsActor, true);
             }
-            pSummonedCreature = 0;
+            pSummonedCreature = nullptr;
         }
     }
     if (bcached) {
         if (GetSpell()) {
             MagicItem* FormFlags = GetSpell();
-            FormFlags->Unload(0);
-            bcached = 0;
+            FormFlags->Unload(false);
+            bcached = false;
         }
     }
 }
@@ -323,7 +323,7 @@ void SummonCreatureEffect::DoSummon(Actor* pOwner) {
 
 void SummonCreatureEffect::LimitPlayerSummonedCreatures() {
     BSSimpleList<ActiveEffect*>* plist = pPlayer->GetActiveEffectList();
-    ActiveEffect* poldest = 0;
+    ActiveEffect* poldest = nullptr;
     float fage = -3.4028235e+38f;
     int32_t icount = 0;
     while (plist && !plist->IsEmpty()) {
@@ -340,7 +340,7 @@ void SummonCreatureEffect::LimitPlayerSummonedCreatures() {
     }
     if (poldest) {
         if (icount > iMaxPlayerSummonedCreatures.Int()) {
-            poldest->Dispel(0);
+            poldest->Dispel(false);
         }
     }
 }
@@ -429,10 +429,10 @@ bool SummonCreatureEffect::GetBestSummonLocation(
 ) {
     NiPoint3* pointlist;
     int32_t index;
-    pointlist = 0;
+    pointlist = nullptr;
     int32_t ipointListSize = GeneratePointCloud(&pointlist, apOwnerActor, apSummonedActor);
     if (ipointListSize <= 0 || !pointlist) {
-        return 0;
+        return false;
     }
     int32_t v7 = 0;
     summoner = apOwnerActor;
@@ -442,12 +442,12 @@ bool SummonCreatureEffect::GetBestSummonLocation(
     }
     if (index >= ipointListSize) {
         ourFree(pointlist);
-        return 0;
+        return false;
     }
     else {
         *returnLocation = pointlist[index];
         ourFree(pointlist);
-        return 1;
+        return true;
     }
 }
 

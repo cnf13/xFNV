@@ -54,11 +54,11 @@ DoorLock::~DoorLock() {
 }
 
 bool DoorLock::CanActorIgnoreDoorLock(Actor* apActor, bool abActivate, bool abMovement) {
-    bool bZero = 0;
+    bool bZero = false;
     if (apActor) {
         if (pLockData || !abMovement) {
             if (pLockData && (!pLockData->IsLocked() && abMovement)) {
-                return 1;
+                return true;
             }
             else {
                 TESObjectCELL* ParentCell;
@@ -69,13 +69,13 @@ bool DoorLock::CanActorIgnoreDoorLock(Actor* apActor, bool abActivate, bool abMo
                       (v5 = apActor->GetParentCell(), v5->IsActorCellOwner(apActor))))) {
                     if (!pTeleportDoorCell ||
                         (!pTeleportDoorCell->GetOwner() || pTeleportDoorCell->IsActorCellOwner(apActor))) {
-                        return 1;
+                        return true;
                     }
                 }
                 else {
-                    if (apActor == pPlayer || !IsActorAnOwner(apActor, 1)) {
+                    if (apActor == pPlayer || !IsActorAnOwner(apActor, true)) {
                         if (apActor->IsActoraGuard() && apActor->IsAlarmed()) {
-                            return 1;
+                            return true;
                         }
                         else {
                             if (apActor == pPlayer && pPlayer->IsTresPassing()) {
@@ -83,7 +83,7 @@ bool DoorLock::CanActorIgnoreDoorLock(Actor* apActor, bool abActivate, bool abMo
                                     if (pLockData) {
                                         if (pLockData->cLockLevel != 100 &&
                                             (!pTeleportDoorCell->GetInterior() || pTeleportDoorCell->GetPublic())) {
-                                            return 1;
+                                            return true;
                                         }
                                     }
                                 }
@@ -91,20 +91,20 @@ bool DoorLock::CanActorIgnoreDoorLock(Actor* apActor, bool abActivate, bool abMo
                         }
                     }
                     else {
-                        return 1;
+                        return true;
                     }
                 }
             }
         }
         else {
-            return 1;
+            return true;
         }
     }
     return bZero;
 }
 
 bool DoorLock::CanActorIgnoreDoorLock(const ActorLockData* apActorData, bool abNeedsKey) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apActorData) {
         if (pLockData) {
             if (pLockData->pKey || !abNeedsKey) {
@@ -112,15 +112,15 @@ bool DoorLock::CanActorIgnoreDoorLock(const ActorLockData* apActorData, bool abN
                     if (!pTeleportDoorCell ||
                         (!pTeleportDoorCell->GetOwner() ||
                          pTeleportDoorCell->IsActorBaseCellOwner(apActorData->pActorBase))) {
-                        return 1;
+                        return true;
                     }
                 }
                 else {
-                    if (IsAnOwner(apActorData, 1)) {
-                        return 1;
+                    if (IsAnOwner(apActorData, true)) {
+                        return true;
                     }
                     else {
-                        TESClass* pclass = 0;
+                        TESClass* pclass = nullptr;
                         if (apActorData->pActorBase) {
                             if (apActorData->pActorBase->GetFormType() == NPC__ID) {
                                 if (apActorData->pActorBase) {
@@ -128,7 +128,7 @@ bool DoorLock::CanActorIgnoreDoorLock(const ActorLockData* apActorData, bool abN
                                 }
                                 if (pclass) {
                                     if (pclass->IsGuard() && apActorData->bIsAlarmed) {
-                                        return 1;
+                                        return true;
                                     }
                                 }
                             }
@@ -137,11 +137,11 @@ bool DoorLock::CanActorIgnoreDoorLock(const ActorLockData* apActorData, bool abN
                 }
             }
             else {
-                return 1;
+                return true;
             }
         }
         else {
-            return 1;
+            return true;
         }
     }
     return bretval;
@@ -153,37 +153,37 @@ bool DoorLock::CanActorUnlockDoorLock(
     bool& abOutMustPick
 ) {
     PACKAGE_OBJECT_TYPE aeMatchId;
-    bool v7 = 0;
+    bool v7 = false;
     aeMatchId = POTYPE_NONE;
-    abOutMustPick = 0;
+    abOutMustPick = false;
     if (apActorLockData) {
-        if (CanActorIgnoreDoorLock(apActorLockData, static_cast<bool>(0))) {
-            return 1;
+        if (CanActorIgnoreDoorLock(apActorLockData, false)) {
+            return true;
         }
         else {
             if (pLockData->IsLocked()) {
                 if (pLockData->pKey &&
                     (apActorLockData->pInventory &&
                      apActorLockData->pInventory->ContainerHasObjects(
-                         pLockData->pKey, POTYPE_NONE, 1, aeMatchId, 0, 0
+                         pLockData->pKey, POTYPE_NONE, 1, aeMatchId, 0, nullptr
                      ))) {
-                    return 1;
+                    return true;
                 }
                 else {
                     if (pLockData->GetLockLevel(apDoorRef) != 5) {
                         if (apActorLockData->pInventory) {
                             if (apActorLockData->pInventory->ContainerHasObjects(
-                                    pLockpick, POTYPE_NONE, 1, aeMatchId, 0, 0
+                                    pLockpick, POTYPE_NONE, 1, aeMatchId, 0, nullptr
                                 )) {
-                                v7 = 1;
-                                abOutMustPick = 1;
+                                v7 = true;
+                                abOutMustPick = true;
                             }
                         }
                     }
                 }
             }
             else {
-                return 1;
+                return true;
             }
         }
     }
@@ -191,24 +191,24 @@ bool DoorLock::CanActorUnlockDoorLock(
 }
 
 bool DoorLock::IsAnOwner(const ActorLockData* apActorData, bool abUseFaction) {
-    bool v6 = 0;
+    bool v6 = false;
     if (pOwnershipForm) {
         if (apActorData) {
-            v6 = 1;
+            v6 = true;
             if (pOwnershipForm != apActorData->pActorBase) {
-                TESFaction* apFaction = 0;
+                TESFaction* apFaction = nullptr;
                 if (pOwnershipForm) {
                     if (pOwnershipForm->GetFormType() == 8) {
                         apFaction = static_cast<TESFaction*>(pOwnershipForm);
                     }
                 }
                 if ((!apFaction || !abUseFaction) && (!pOwnershipGlobal || pOwnershipGlobal->GetValue() == 0.0)) {
-                    v6 = 0;
+                    v6 = false;
                 }
                 if (apFaction) {
                     if (apActorData->pActorBase) {
-                        if (apActorData->pActorBase->GetFactionRank(apFaction, 0) < iOwnershipRank) {
-                            return 0;
+                        if (apActorData->pActorBase->GetFactionRank(apFaction, false) < iOwnershipRank) {
+                            return false;
                         }
                     }
                 }
@@ -225,7 +225,7 @@ void DoorLock::SetFromDoorRef(TESObjectREFR* apDoorRef) {
         pTeleportDoorCell = Teleport->GetTeleportCell();
     }
     else {
-        pTeleportDoorCell = 0;
+        pTeleportDoorCell = nullptr;
     }
     LockData* Lock = apDoorRef->GetLock();
     if (Lock) {
@@ -236,7 +236,7 @@ void DoorLock::SetFromDoorRef(TESObjectREFR* apDoorRef) {
                 v2 = ::new (apMemory) LockData;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pLockData = v2;
         }
@@ -247,7 +247,7 @@ void DoorLock::SetFromDoorRef(TESObjectREFR* apDoorRef) {
     else {
         if (pLockData) {
             ourFree(pLockData);
-            pLockData = 0;
+            pLockData = nullptr;
         }
     }
     pOwnershipForm = apDoorRef->GetOwner();
@@ -256,33 +256,33 @@ void DoorLock::SetFromDoorRef(TESObjectREFR* apDoorRef) {
 }
 
 bool DoorLock::IsActorAnOwner(Actor* apActor, bool abUseFaction) {
-    bool v9 = 0;
+    bool v9 = false;
     if (pOwnershipForm) {
         if (apActor) {
-            v9 = 1;
+            v9 = true;
             TESBoundObject* ObjectReference = apActor->GetTemplateActorBase();
             if (!ObjectReference) {
                 ObjectReference = apActor->GetObjectReference();
             }
-            TESActorBase* v8 = 0;
+            TESActorBase* v8 = nullptr;
             int32_t FormType = ObjectReference->GetFormType();
             if (FormType >= 42 && FormType <= 43) {
                 v8 = dynamic_cast<TESActorBase*>(ObjectReference);
             }
             if (pOwnershipForm != ObjectReference) {
-                TESFaction* apFaction = 0;
+                TESFaction* apFaction = nullptr;
                 if (pOwnershipForm) {
                     if (pOwnershipForm->GetFormType() == 8) {
                         apFaction = static_cast<TESFaction*>(pOwnershipForm);
                     }
                 }
                 if ((!apFaction || !abUseFaction) && (!pOwnershipGlobal || pOwnershipGlobal->GetValue() == 0.0)) {
-                    v9 = 0;
+                    v9 = false;
                 }
                 if (apFaction) {
                     if (v8) {
                         if (v8->GetFactionRank(apFaction, apActor == pPlayer) < iOwnershipRank) {
-                            return 0;
+                            return false;
                         }
                     }
                 }

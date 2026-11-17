@@ -98,7 +98,7 @@ NiObject* NiObject::Clone() {
 void NiObject::CreateDeepCopy(NiPointer<NiObject>& aspObject) {
     NiStream stream;
     stream.InsertObject(this);
-    char* pBuffer = 0;
+    char* pBuffer = nullptr;
     int32_t iBufferSize = 0;
     stream.NiStream::Save(pBuffer, iBufferSize);
     stream.NiStream::Load(pBuffer, iBufferSize);
@@ -133,10 +133,10 @@ NiObject* NiObject::Clone(NiCloningProcess& arCloning) {
 bool NiObject::IsKindOfMember(const NiRTTI* pkRTTI) const {
     for (const NiRTTI* i = GetRTTI(); i; i = i->m_pkBaseRTTI) {
         if (i == pkRTTI) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 bool NiObject::IsExactKindOf(const NiRTTI* pkRTTI, const NiObject* pkObject) {

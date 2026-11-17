@@ -44,7 +44,7 @@ TESForm* TESRecipeComponent::GetComponentPointer() {
 bool TESRecipeComponent::Compare(TESRecipeComponent* apCompare) {
     uint32_t Quantity = this->Quantity;
     if (Quantity != apCompare->Quantity) {
-        return 1;
+        return true;
     }
     TESForm* ComponentPointer = pInternalItem;
     return ComponentPointer != apCompare->pInternalItem;
@@ -65,8 +65,8 @@ void TESRecipe::ClearData() {
     (&garbageCollection)->RemoveAll();
     data.ReqSkillId = -1;
     data.ReqSkillLevel = 0;
-    pRecipeCat = 0;
-    pRecipeSubCat = 0;
+    pRecipeCat = nullptr;
+    pRecipeSubCat = nullptr;
 }
 
 // When the EDID chunk is empty (malformed data), its buffer is initialised to "" (one zeroed byte, allocated only for
@@ -254,14 +254,14 @@ void TESRecipe::InitItem() {
                 static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pComponent_2->GetComponentPointer()))
             );
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
 void TESRecipe::Copy(TESForm* apCopy) {
     TESRecipe* pmisc = dynamic_cast<TESRecipe*>(apCopy);
     if (pmisc) {
-        (&RecipeConditions)->Copy(&pmisc->RecipeConditions, 0);
+        (&RecipeConditions)->Copy(&pmisc->RecipeConditions, nullptr);
         ourMemcpy(&data, &pmisc->data, sizeof(data));
         CopyAllComponents(apCopy);
         while (!(&ingredientlist)->IsEmpty()) {
@@ -276,7 +276,7 @@ void TESRecipe::Copy(TESForm* apCopy) {
                 pNew = ::new (pMemory) TESRecipeComponent;
             }
             else {
-                pNew = 0;
+                pNew = nullptr;
             }
             pNew->Quantity = pComp->Quantity;
             pNew->pInternalItem = pComp->pInternalItem;
@@ -294,7 +294,7 @@ void TESRecipe::Copy(TESForm* apCopy) {
                 pNew_2 = ::new (pMemory_2) TESRecipeComponent;
             }
             else {
-                pNew_2 = 0;
+                pNew_2 = nullptr;
             }
             pNew_2->Quantity = pComp_2->Quantity;
             pNew_2->pInternalItem = pComp_2->pInternalItem;
@@ -310,48 +310,48 @@ void TESRecipe::Copy(TESForm* apCopy) {
 bool TESRecipe::Compare(TESForm* apCompare) {
     TESRecipe* pcomp = dynamic_cast<TESRecipe*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     TESRecipeCategory* Category = pRecipeCat;
     if (Category != pcomp->pRecipeCat) {
-        return 1;
+        return true;
     }
     TESRecipeCategory* SubCategory = GetSubCategory();
     if (SubCategory != pcomp->GetSubCategory()) {
-        return 1;
+        return true;
     }
     ActorValue::Index RequiredSkill = GetRequiredSkill();
     if (RequiredSkill != pcomp->GetRequiredSkill()) {
-        return 1;
+        return true;
     }
     int32_t ProcessLevel = data.ReqSkillLevel;
     if (ProcessLevel != pcomp->data.ReqSkillLevel) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     if ((&RecipeConditions)->Compare(&pcomp->RecipeConditions)) {
-        return 1;
+        return true;
     }
     int32_t v7 = (&ingredientlist)->ItemsInList();
     if (v7 != (&pcomp->ingredientlist)->ItemsInList()) {
-        return 1;
+        return true;
     }
     int32_t v8 = (&outputlist)->ItemsInList();
     if (v8 != (&pcomp->outputlist)->ItemsInList()) {
-        return 1;
+        return true;
     }
     BSSimpleList<TESRecipeComponent*>* ingredients = &ingredientlist;
     BSSimpleList<TESRecipeComponent*>* copyingredients = &pcomp->ingredientlist;
     while (copyingredients && !copyingredients->IsEmpty()) {
         if (!ingredients || ingredients->IsEmpty()) {
-            return 1;
+            return true;
         }
         TESRecipeComponent* pRecipeComponent = ingredients->m_item;
         TESRecipeComponent* pRecipeComponentCopy = copyingredients->m_item;
         if (pRecipeComponent->Compare(pRecipeComponentCopy)) {
-            return 1;
+            return true;
         }
         copyingredients = copyingredients->m_pkNext;
         ingredients = ingredients->m_pkNext;
@@ -360,17 +360,17 @@ bool TESRecipe::Compare(TESForm* apCompare) {
     BSSimpleList<TESRecipeComponent*>* copyoutput = &pcomp->outputlist;
     while (copyoutput && !copyoutput->IsEmpty()) {
         if (!output || output->IsEmpty()) {
-            return 1;
+            return true;
         }
         TESRecipeComponent* pRecipeComponent_2 = output->m_item;
         TESRecipeComponent* pRecipeComponentCopy_2 = copyoutput->m_item;
         if (pRecipeComponent_2->Compare(pRecipeComponentCopy_2)) {
-            return 1;
+            return true;
         }
         copyoutput = copyoutput->m_pkNext;
         output = output->m_pkNext;
     }
-    return 0;
+    return false;
 }
 
 TESCondition* TESRecipe::GetConditions() {
@@ -420,7 +420,7 @@ int32_t TESRecipe::CompareForSorting(ListBoxItem<TESRecipe*>* a1, ListBoxItem<TE
 
 bool TESRecipe::ShouldHideItem(TESRecipe* a1) {
     if (g_currentRecipeMenuCategory == -1) {
-        return 0;
+        return false;
     }
     TESRecipeCategory* SubCategory = a1->GetSubCategory();
     return SubCategory != get_g_RecipeMenuCategories()->operator[](static_cast<uint32_t>(g_currentRecipeMenuCategory));
@@ -499,7 +499,7 @@ void TESRecipeCategory::Copy(TESForm* apCopy) {
 bool TESRecipeCategory::Compare(TESForm* apCompare) {
     TESRecipeCategory* v5 = dynamic_cast<TESRecipeCategory*>(apCompare);
     if (!v5) {
-        return (bool)1;
+        return true;
     }
     return (std::memcmp(&data.flags, &v5->data, 1u) || (((int8_t)TESForm::CompareAllComponents(v5)) != 0));
 }

@@ -129,7 +129,7 @@ public:
     };
 
 protected:
-    typedef NiTPrimitiveSet<BoneSet*> NiBoneSetCollection;
+    using NiBoneSetCollection = NiTPrimitiveSet<BoneSet*>;
 
 public:
     // No partitions; the count is left as allocated.

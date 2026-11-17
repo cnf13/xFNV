@@ -139,7 +139,7 @@ void BSAttachPoints::AddPair(const NiFixedString& arParent, const NiFixedString&
         ppair = ::new (apMemory) BSAttachPointPair(arParent, arChild);
     }
     else {
-        ppair = 0;
+        ppair = nullptr;
     }
     appkElement = ppair;
     pAttachPointsA.Add(appkElement);
@@ -174,5 +174,5 @@ void BSAttachPoints::KillSDM() {
         NiGlobalStringTable::ReleaseHandle(BSAttachPoints::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }
-    BSAttachPoints::pTag = 0;
+    BSAttachPoints::pTag = nullptr;
 }

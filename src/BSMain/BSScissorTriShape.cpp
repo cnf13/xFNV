@@ -66,7 +66,7 @@ NiObject* BSScissorTriShape::CreateClone(NiCloningProcess& arCloneData) {
         pNode = ::new (v5) BSScissorTriShape;
     }
     else {
-        pNode = 0;
+        pNode = nullptr;
     }
     CopyMembers(pNode, arCloneData);
     return pNode;
@@ -76,14 +76,14 @@ NiObject* BSScissorTriShape::CreateClone(NiCloningProcess& arCloneData) {
 // interface, reloading m_pkD3DDevice9 at each call.
 void BSScissorTriShape::RenderImmediate(NiRenderer* pkRenderer) {
     NiDX9Renderer* pkDX9Renderer = static_cast<NiDX9Renderer*>(pkRenderer);
-    bool bScissorTestSet = 0;
+    bool bScissorTestSet = false;
     if ((kRect.bottom || (kRect.top || (kRect.left || kRect.right))) &&
         ((kRect.left < 0 && kRect.right < 0) ||
          ((kRect.left > 1 && kRect.right > 1) ||
           ((kRect.top < 0 && kRect.bottom < 0) || (kRect.top > 1 && kRect.bottom > 1))))) {
         pkDX9Renderer->m_pkD3DDevice9->SetRenderState(D3DRS_SCISSORTESTENABLE, 1);
         pkDX9Renderer->m_pkD3DDevice9->SetScissorRect(&kRect);
-        bScissorTestSet = 1;
+        bScissorTestSet = true;
     }
     NiTriShape::RenderImmediate(pkRenderer);
     if (bScissorTestSet) {

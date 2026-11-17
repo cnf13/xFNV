@@ -53,18 +53,18 @@ int32_t TutorialMenu::GetClass() {
 }
 
 bool TutorialMenu::DoGamepad(int32_t a1, float a2) {
-    return (bool)0;
+    return false;
 }
 
 bool TutorialMenu::DoGamepadUpEvent(int32_t a1, float a2) {
     Interface::enumMenus v3 = static_cast<Interface::enumMenus>(GetClass());
     if (!Interface::IsTopMenuID(v3) || a1 != 10) {
-        return 0;
+        return false;
     }
     InterfaceManager::Instance();
     InterfaceManager::ClearMenuButton(Interface::eButtonB);
     TutorialMenu::Close();
-    return 1;
+    return true;
 }
 
 void TutorialMenu::NextPage() {
@@ -81,7 +81,7 @@ void TutorialMenu::SetPage(uint32_t a1) {
         BSStringT<char> v5;
         iCurrentPage = a1;
         v5.SPrintF("%d/%d", a1 + 1, iNumPages);
-        pTiles[5]->Set(4036, v5.pString, 1);
+        pTiles[5]->Set(4036, v5.pString, true);
         for (pformlist = pHelpManual; pformlist; pformlist = pformlist->m_pkNext) {
             if (!a1--) {
                 break;
@@ -105,18 +105,18 @@ void TutorialMenu::SetTitleAndText(BGSMessage* apMessage) {
         return;
     }
     if (pTiles[4]) {
-        pTiles[4]->Set(4036, static_cast<TESFullName*>(apMessage)->GetFullName(), 1);
+        pTiles[4]->Set(4036, static_cast<TESFullName*>(apMessage)->GetFullName(), true);
     }
     if (pTiles[0]) {
         const char* pText = static_cast<TESDescription*>(apMessage)->GetDescription(nullptr, DESC_ID);
         if (pText) {
             pTiles[0]->Set(4030, static_cast<int32_t>(*pText == '<'));
-            pTiles[0]->Set(4036, pText, 1);
+            pTiles[0]->Set(4036, pText, true);
         }
     }
     if (pTiles[6]) {
         int32_t iCurrentValue = Tile::AddUserTrait("_current_value", -1);
-        pTiles[6]->Set(iCurrentValue, 0.0f, 0);
+        pTiles[6]->Set(iCurrentValue, 0.0f, false);
     }
 }
 
@@ -152,18 +152,18 @@ bool TutorialMenu::Create(BGSMessage* apMessage, bool abHelpManual) {
         Menu_ = static_cast<TutorialMenu*>(ptile->GetMenu());
     }
     else {
-        Menu_ = 0;
+        Menu_ = nullptr;
     }
     TutorialMenu::pMe = Menu_;
     if (Menu_ && (v4 = TutorialMenu::pMe->GetClass(), v4 == TutorialMenu::GetClassStatic())) {
         TileMenu* v5 = dynamic_cast<TileMenu*>(ptile);
-        TutorialMenu::pMe->SetMenuTile(v5, 0);
+        TutorialMenu::pMe->SetMenuTile(v5, false);
         if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
             float afValue = Tile::GetMaximumDepth();
-            ptile->Set(4013, afValue, 1);
+            ptile->Set(4013, afValue, true);
         }
         const char* v6 = sVDSGManual.String();
-        TutorialMenu::pMe->pTiles[7]->Set(4036, v6, 1);
+        TutorialMenu::pMe->pTiles[7]->Set(4036, v6, true);
         if (abHelpManual) {
             TESForm* FormByNumericID;
             if (InterfaceManager::Has360Controller()) {
@@ -180,27 +180,27 @@ bool TutorialMenu::Create(BGSMessage* apMessage, bool abHelpManual) {
                 }
             }
             const char* v10 = sNext.String();
-            TutorialMenu::pMe->pTiles[1]->Set(4036, v10, 1);
+            TutorialMenu::pMe->pTiles[1]->Set(4036, v10, true);
             const char* v11 = sPrevious.String();
-            TutorialMenu::pMe->pTiles[2]->Set(4036, v11, 1);
+            TutorialMenu::pMe->pTiles[2]->Set(4036, v11, true);
         }
         else {
             TutorialMenu::pMe->pTiles[1]->Set(4003, 0);
             TutorialMenu::pMe->pTiles[2]->Set(4003, 0);
         }
         const char* v12 = sCloseButton.String();
-        TutorialMenu::pMe->pTiles[3]->Set(4036, v12, 1);
+        TutorialMenu::pMe->pTiles[3]->Set(4036, v12, true);
         if (!apMessage) {
             Warning(WARN_MENUS, "Warning:  Unable to find valid starting message for Tutorial Menu.");
         }
         TutorialMenu::pMe->iNumPages = 0;
         TutorialMenu::pMe->iCurrentPage = 0;
-        bool bfound = 0;
+        bool bfound = false;
         for (BSSimpleList<TESForm*>* pformlist = TutorialMenu::pMe->pHelpManual; pformlist && pformlist->m_item;
              pformlist = pformlist->m_pkNext) {
             if (!bfound && pformlist->m_item == apMessage) {
                 TutorialMenu::pMe->iCurrentPage = TutorialMenu::pMe->iNumPages;
-                bfound = 1;
+                bfound = true;
             }
             ++TutorialMenu::pMe->iNumPages;
         }
@@ -208,7 +208,7 @@ bool TutorialMenu::Create(BGSMessage* apMessage, bool abHelpManual) {
             BSStringT<char> strtmp;
             strtmp.SPrintF("%d/%d", TutorialMenu::pMe->iCurrentPage + 1, TutorialMenu::pMe->iNumPages);
             char* afValuea = strtmp.pString;
-            TutorialMenu::pMe->pTiles[5]->Set(4036, afValuea, 1);
+            TutorialMenu::pMe->pTiles[5]->Set(4036, afValuea, true);
         }
         else {
             TutorialMenu::pMe->pTiles[5]->Set(4003, 0);
@@ -218,15 +218,15 @@ bool TutorialMenu::Create(BGSMessage* apMessage, bool abHelpManual) {
             TutorialMenu::pMe->SetTitleAndText(apMessage);
             TutorialMenu::pMe->UpdatePrevNext();
             InterfaceManager* v13 = InterfaceManager::Instance();
-            v13->pCursor->Set(4009, 255.0f, 1);
-            TutorialMenu::pMe->PrepForVisibility(0);
-            return 1;
+            v13->pCursor->Set(4009, 255.0f, true);
+            TutorialMenu::pMe->PrepForVisibility(false);
+            return true;
         }
         else {
             if (TutorialMenu::pMe) {
                 delete TutorialMenu::pMe;
             }
-            return 0;
+            return false;
         }
     }
     else {
@@ -237,7 +237,7 @@ bool TutorialMenu::Create(BGSMessage* apMessage, bool abHelpManual) {
                 }
             }
         }
-        return 0;
+        return false;
     }
 }
 

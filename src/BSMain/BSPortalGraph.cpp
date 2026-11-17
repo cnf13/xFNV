@@ -214,9 +214,9 @@ void BSPortalGraph::AddRoom(BSMultiBoundRoom* apRoom) {
                 goto LABEL_8;
             }
         }
-        v4 = 0;
+        v4 = nullptr;
     LABEL_8:;
-        bool v10 = v4 == 0;
+        bool v10 = v4 == nullptr;
         NiDecRefCount(apRoom);
         if (v10) {
             NiPointer<BSMultiBoundRoom> spRoom = apRoom;

@@ -46,12 +46,12 @@ NiObject* NiBSplineCompTransformInterpolator::CreateClone(NiCloningProcess& kClo
     NiBSplineCompTransformInterpolator* pkObject_2 = pkObject;
     if (pkObject) {
         ::new (pkObject) NiBSplineCompTransformInterpolator(
-            static_cast<NiBSplineData*>(0), NiBSplineData::INVALID_HANDLE, NiBSplineData::INVALID_HANDLE,
-            NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(0)
+            static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, NiBSplineData::INVALID_HANDLE,
+            NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
         );
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_afCompScalars[0] = m_afCompScalars[0];
@@ -156,11 +156,11 @@ NiObject* NiBSplineCompTransformInterpolator::CreateObject() {
         NiMemObject::operator new(sizeof(NiBSplineCompTransformInterpolator))
     );
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     ::new (pkObject) NiBSplineCompTransformInterpolator(
-        static_cast<NiBSplineData*>(0), NiBSplineData::INVALID_HANDLE, NiBSplineData::INVALID_HANDLE,
-        NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(0)
+        static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, NiBSplineData::INVALID_HANDLE,
+        NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
     );
     return pkObject;
 }

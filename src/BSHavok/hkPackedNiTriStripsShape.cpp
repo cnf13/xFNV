@@ -283,14 +283,14 @@ const hkpShape* hkPackedNiTriStripsShape::getChildShape(uint32_t aKey, char (&ar
     hkVector4 v17;
     hkPackedNiTriStripsData* m_pObject = spTriStripsData.m_pObject;
     if ((aKey & 0xFFFFFF) >= m_pObject->uiKeyCount) {
-        return 0;
+        return nullptr;
     }
     TriangleData* v6 = &m_pObject->paTriData[aKey & 0xFFFFFF];
     if (&arBuffer) {
         ptriangleShape = ::new (&arBuffer) hkNormalTriangleShape(fRadius);
     }
     else {
-        ptriangleShape = 0;
+        ptriangleShape = nullptr;
     }
     NiPoint3* v8 = &spTriStripsData.m_pObject->paVertData[v6->us1];
     float x = v8->x;

@@ -261,7 +261,7 @@ NiObject* NiQuaternionInterpolator::CreateObject() {
     NiQuaternionInterpolator* pkObject =
         static_cast<NiQuaternionInterpolator*>(NiMemObject::operator new(sizeof(NiQuaternionInterpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiQuaternionInterpolator;
 }

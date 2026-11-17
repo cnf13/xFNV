@@ -124,7 +124,7 @@ void hkZeroSmallWaveletCoefficients(
         }
         sortedCoefs.setSize(static_cast<int32_t>(nValues));
         for (uint32_t i = 0; i < nValues; i++) {
-            sortedCoefs.m_data[i] = static_cast<float>(std::fabs(waveletData[i]));
+            sortedCoefs.m_data[i] = std::fabs(waveletData[i]);
         }
         int32_t index = static_cast<int32_t>(fN * tolerance - 1.1920928955078125e-07) - 1;
         if (index >= static_cast<int32_t>(nValues)) {
@@ -140,7 +140,7 @@ void hkZeroSmallWaveletCoefficients(
         }
         const float fLimit = sortedCoefs.m_data[index];
         for (uint32_t i = 0; i < nValues; i++) {
-            const float fMagnitude = static_cast<float>(std::fabs(waveletData[i]));
+            const float fMagnitude = std::fabs(waveletData[i]);
             if (fMagnitude <= fLimit) {
                 waveletData[i] = 0.0f;
             }
@@ -153,7 +153,7 @@ void hkZeroSmallWaveletCoefficients(
         uint32_t uiLevel = nValues >> 1;
         for (uint32_t i = nValues; i != 0;) {
             i--;
-            const float fMagnitude = static_cast<float>(std::fabs(waveletData[i]));
+            const float fMagnitude = std::fabs(waveletData[i]);
             if (fMagnitude < fThreshold) {
                 waveletData[i] = 0.0f;
                 if (fMaxZeroed < fMagnitude) {

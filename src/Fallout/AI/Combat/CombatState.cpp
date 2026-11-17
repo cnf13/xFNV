@@ -171,8 +171,8 @@ CombatState::CombatState(CombatController* apCombatController, float afTimerDela
 
 CombatState::~CombatState() {
     DeleteInventoryData();
-    ClearCoverLocation(0);
-    ClearSecondaryCoverLocation(0);
+    ClearCoverLocation(false);
+    ClearSecondaryCoverLocation(false);
     ClearCombatLocation();
     ClearLocationTarget();
     for (uint32_t i = 0; i < 5; ++i) {
@@ -189,29 +189,29 @@ bool CombatState::FindCombatLocation(int32_t aiLocation) {
     CombatPlannerData* pplannerData = pCombatController->pCombatPlannerData;
     if (pplannerData->GetLocation(aiLocation)) {
         pplannerData->SetUnk4Ptr(aiLocation);
-        return 1;
+        return true;
     }
     else {
         if (3.4028235e+38f == pplannerData->GetCost(aiLocation)) {
-            return 0;
+            return false;
         }
         else {
             CombatCoverLocation* pfoundCoverLocation;
             CombatLocation* pfoundCombatLocation;
-            bool bfound = 0;
+            bool bfound = false;
             CombatLocation* v16 = static_cast<CombatLocation*>(ourMalloc(sizeof(CombatLocation)));
             if (v16) {
                 pfoundCombatLocation = ::new (v16) CombatLocation;
             }
             else {
-                pfoundCombatLocation = 0;
+                pfoundCombatLocation = nullptr;
             }
             CombatCoverLocation* v15 = static_cast<CombatCoverLocation*>(ourMalloc(sizeof(CombatCoverLocation)));
             if (v15) {
                 pfoundCoverLocation = ::new (v15) CombatCoverLocation;
             }
             else {
-                pfoundCoverLocation = 0;
+                pfoundCoverLocation = nullptr;
             }
             pfoundCombatLocation->iLocation = aiLocation;
             pfoundCombatLocation->SetRadius(kCombatLocationTypeData[aiLocation].fRadius);
@@ -225,13 +225,13 @@ bool CombatState::FindCombatLocation(int32_t aiLocation) {
                     }
                     if (!kCombatLocationTypeData[aiLocation].bRecheckLocation) {
                         pfoundCombatLocation->UpdateRefLocation();
-                        bfound = 1;
+                        bfound = true;
                     }
                 }
             }
-            bool bignoreCombatRadius = 0;
+            bool bignoreCombatRadius = false;
             if (aiLocation == HIDE_LOCATION || (aiLocation == FLEE_LOCATION || aiLocation == INVESTIGATE_LOCATION)) {
-                bignoreCombatRadius = 1;
+                bignoreCombatRadius = true;
             }
             if (!bfound) {
                 switch (aiLocation) {
@@ -241,14 +241,14 @@ bool CombatState::FindCombatLocation(int32_t aiLocation) {
                             if (GetHasBufferedDetection()) {
                                 if (!GetTargetUnreachable()) {
                                     pfoundCombatLocation->SetRef(ptarget);
-                                    bfound = 1;
+                                    bfound = true;
                                 }
                             }
                             else {
                                 BGSWorldLocation lastDetectedLocation;
                                 if (pgroup->GetTargetLastDetectedLocation(ptarget, lastDetectedLocation)) {
                                     pfoundCombatLocation->SetLocation(lastDetectedLocation);
-                                    bfound = 1;
+                                    bfound = true;
                                 }
                             }
                         }
@@ -274,14 +274,14 @@ bool CombatState::FindCombatLocation(int32_t aiLocation) {
                                 NiPoint3 advanceLocation = Target->GetLocationOnReference();
                                 bfound = FindBestAdvanceLocation(
                                     &CoverSearchInfo, pfoundCoverLocation, pfoundCombatLocation, aiLocation,
-                                    advanceLocation, 0.0f, 0
+                                    advanceLocation, 0.0f, nullptr
                                 );
                             }
                         }
                         else {
                             bfound = FindBestAdvanceLocation(
                                 &CoverSearchInfo, pfoundCoverLocation, pfoundCombatLocation, aiLocation,
-                                pLocationTarget->WorldLoc.Point, 0.0f, 0
+                                pLocationTarget->WorldLoc.Point, 0.0f, nullptr
                             );
                         }
                         break;
@@ -305,7 +305,7 @@ bool CombatState::FindCombatLocation(int32_t aiLocation) {
                                     pfoundCombatLocation->SetLocation(pLocationTarget->WorldLoc);
                                 }
                                 pfoundCombatLocation->SetRadius(pLocationTarget->fMinDistance);
-                                bfound = 1;
+                                bfound = true;
                             }
                         }
                         break;
@@ -325,8 +325,8 @@ bool CombatState::FindCombatLocation(int32_t aiLocation) {
                         break;
                     }
                     case 14: {
-                        pfoundCombatLocation->SetFlag(1u, 1);
-                        bfound = 1;
+                        pfoundCombatLocation->SetFlag(1u, true);
+                        bfound = true;
                         break;
                     }
                     case 15: {
@@ -335,13 +335,13 @@ bool CombatState::FindCombatLocation(int32_t aiLocation) {
                         );
                         if (psearchLocation) {
                             pfoundCombatLocation->SetLocation(psearchLocation->WorldLoc);
-                            bfound = 1;
+                            bfound = true;
                         }
                         else if (pfoundCombatLocation->GetPoint() != NiPoint3_ZERO) {
-                            bfound = 1;
+                            bfound = true;
                         }
                         if (bfound) {
-                            pfoundCombatLocation->SetFlag(2u, 1);
+                            pfoundCombatLocation->SetFlag(2u, true);
                         }
                         break;
                     }
@@ -360,8 +360,8 @@ bool CombatState::FindCombatLocation(int32_t aiLocation) {
                                 double v7 = pattacker->GetForwardLength() + ModelBoundSize;
                                 float v6 = fPickupItemDistanceFudge.Float() + v7;
                                 pfoundCombatLocation->SetRadius(v6);
-                                pfoundCombatLocation->SetFlag(2u, 1);
-                                bfound = 1;
+                                pfoundCombatLocation->SetFlag(2u, true);
+                                bfound = true;
                             }
                         }
                         break;
@@ -383,7 +383,7 @@ bool CombatState::FindCombatLocation(int32_t aiLocation) {
                 pfoundCombatLocation->SetSpace(Space);
             }
             worldLoc = pfoundCombatLocation->WorldLoc;
-            if ((worldLoc.Point == NiPoint3_ZERO) || CheckMovement(worldLoc, 1, bignoreCombatRadius)) {
+            if ((worldLoc.Point == NiPoint3_ZERO) || CheckMovement(worldLoc, true, bignoreCombatRadius)) {
                 float fcost = 0.0f;
                 if (kCombatLocationTypeData[aiLocation].bUsesMovementCost) {
                     pattacker->GetWorldLocation(&attackerLoc);
@@ -398,7 +398,7 @@ bool CombatState::FindCombatLocation(int32_t aiLocation) {
                         delete pfoundCoverLocation;
                     }
                 }
-                return 1;
+                return true;
             }
             else {
             LABEL_77:;
@@ -406,8 +406,8 @@ bool CombatState::FindCombatLocation(int32_t aiLocation) {
                 if (pfoundCoverLocation) {
                     delete pfoundCoverLocation;
                 }
-                pplannerData->SetCombatLocation(aiLocation, 0, 3.4028235e+38f);
-                return 0;
+                pplannerData->SetCombatLocation(aiLocation, nullptr, 3.4028235e+38f);
+                return false;
             }
         }
     }
@@ -558,8 +558,8 @@ void CombatState::UpdateThreatRatio() {
             if (cFleeState == 2 && cCurrentConfidence < 4u) {
                 float afRadius = fCombatFleeBoostConfidenceTargetRadius.Float();
                 BGSWorldLocation* WorldLocation = pattacker->GetWorldLocation(&apLocation);
-                if (pgroup->FindTargetNearLocation(*WorldLocation, afRadius, 1)) {
-                    BoostConfidence(1);
+                if (pgroup->FindTargetNearLocation(*WorldLocation, afRadius, true)) {
+                    BoostConfidence(true);
                 }
             }
         }
@@ -595,14 +595,14 @@ bool CombatState::IsCoverLocationUnreachable(uint32_t aiCoverKey) {
             &UnreachableCoverLocations.operator[](static_cast<uint32_t>(i));
         if (!(unreachableCoverLocation->fTimeStamp.ElapsedTime() > 10.0)) {
             if (unreachableCoverLocation->iCoverKey == aiCoverKey) {
-                return 1;
+                return true;
             }
         }
         else {
             UnreachableCoverLocations.RemoveFast(i--, 1u);
         }
     }
-    return 0;
+    return false;
 }
 
 // areCoverState gets COVER_STATE_NO_EDGES_OPEN (closed stand cover), COVER_STATE_COVER_LOS (not between the target and
@@ -808,7 +808,7 @@ bool CombatState::CheckCoverLocation(
 
 bool CombatState::GetHasBuffered360LineOfSight() {
     double elapsedTime = (double)(&fLastTarget360LineOfSightTimeStamp)->ElapsedTime();
-    return (bool)((uint8_t)(((&fCombatLOSBufferTime)->Float()) > elapsedTime));
+    return (bool)((uint8_t)((&fCombatLOSBufferTime)->Float() > elapsedTime));
 }
 
 CombatCoverLocation* CombatState::GetSecondaryCoverLocation() {
@@ -817,12 +817,12 @@ CombatCoverLocation* CombatState::GetSecondaryCoverLocation() {
 
 void CombatState::DoInitialUpdate() {
     Actor* pattacker = pCombatController->pAttacker;
-    bHasHandToHandEquip = CombatController::CheckHasEquip(pattacker, 0);
+    bHasHandToHandEquip = CombatController::CheckHasEquip(pattacker, nullptr);
     UpdateInventoryData();
     Update();
     cStartingConfidence = static_cast<uint8_t>(pattacker->GetActorValue(ActorValue::CONFIDENCE));
     cCurrentConfidence = cStartingConfidence;
-    bInitializing = 0;
+    bInitializing = false;
 }
 
 void CombatState::TargetChanged() {
@@ -877,20 +877,20 @@ void CombatState::ClearCoverLocation(bool abInvalidateCover) {
         if (pCoverLocation) {
             delete pCoverLocation;
         }
-        pCoverLocation = 0;
+        pCoverLocation = nullptr;
     }
 }
 
 void CombatState::DamagedByAttacker(Actor* apAttacker, float afDamage) {
     CombatTimer var4;
     if ((&fLastDamagedByAttackerTimeStamp)->ElapsedTime() > 1.0) {
-        UpdateCombatArea(1);
+        UpdateCombatArea(true);
     }
     float a2 = CombatTimer::GetTimer();
     ::new (&var4) CombatTimeStamp(a2);
     fLastDamagedByAttackerTimeStamp.fTimeStamp = var4.fStartTime;
     if (cFleeState == 2) {
-        BoostConfidence(1);
+        BoostConfidence(true);
     }
 }
 
@@ -1200,7 +1200,7 @@ void CombatState::UpdatePeriodicData() {
             bool bforceSwitch = EmbeddedWeaponUpdateTimer.IsForced();
             float* v2 = &fEmbeddedWeaponSwitchChance.Float();
             if (RandomBool(*v2) || (bInitializing || bforceSwitch)) {
-                TESObjectWEAP* v20 = 0;
+                TESObjectWEAP* v20 = nullptr;
                 if (bforceSwitch && pCurrentEmbeddedWeapon) {
                     int32_t iembeddedWeaponIndex = RandomInt(0, inumEmbeddedWeapons - 1);
                     for (uint32_t apThis_16 = 0; apThis_16 < EmbeddedWeaponsArray.iSize; ++apThis_16) {
@@ -1241,7 +1241,7 @@ void CombatState::UpdatePeriodicData() {
                 ExplosiveProjectileBlockedTimer.Reset(*v5);
             }
             else {
-                pExplosiveProjectileBlocked = 0;
+                pExplosiveProjectileBlocked = nullptr;
             }
         }
     }
@@ -1289,7 +1289,7 @@ void CombatState::UpdatePeriodicData() {
                 iQueuedPathCheck = -1;
             }
             if (iQueuedPathCheck == -1) {
-                spPathCheckQueue.operator=(static_cast<ActorPathingMessageQueue*>(0));
+                spPathCheckQueue.operator=(static_cast<ActorPathingMessageQueue*>(nullptr));
             }
         }
     }
@@ -1299,7 +1299,7 @@ void CombatState::UpdatePeriodicData() {
                 TargetUnreachableTimer.Reset(5.0f);
             }
             if (TargetUnreachableTimer.Check()) {
-                bool v14 = 0;
+                bool v14 = false;
                 if (GetLocationUnreachable(2)) {
                     v14 = QueuePathCheck(1);
                 }
@@ -1317,12 +1317,12 @@ void CombatState::UpdatePeriodicData() {
     if (pCombatController->IsFleeing()) {
         if (!pCombatController->IsPlanUpdateForced() && !cFleeState) {
             cFleeState = 1;
-            pattacker->SetWantWeaponDrawn(0);
-            pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, 3, 1);
+            pattacker->SetWantWeaponDrawn(false);
+            pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, 3, true);
         }
     }
     else {
-        bool v13 = 1;
+        bool v13 = true;
         if (pCombatController->pCurrentGoal) {
             if (pCombatController->pCurrentGoal->eType == CombatGoal::COMBAT_GOAL_GUARD) {
                 v13 = !CheckShouldFlee();
@@ -1344,14 +1344,14 @@ void CombatState::UpdateImmediateData() {
     Actor* ptarget = pCombatController->GetTarget();
     TESForm* pattackerSpace = pattacker->GetSpace();
     if (!ptarget || pattackerSpace == ptarget->GetSpace()) {
-        bTargetSpaceDifferent = 0;
+        bTargetSpaceDifferent = false;
     }
     else {
         if (!bTargetSpaceDifferent) {
             if (bTargetLineOfSight) {
                 pCombatController->ForcePlanUpdate();
             }
-            bTargetSpaceDifferent = 1;
+            bTargetSpaceDifferent = true;
         }
     }
     if (ptarget) {
@@ -1362,7 +1362,7 @@ void CombatState::UpdateImmediateData() {
                 bTarget360LineOfSight
             );
             iTargetDetectionLevel = inewDetectionLevel;
-            pCombatController->SetUpdatedDetection(0);
+            pCombatController->SetUpdatedDetection(false);
         }
         if (bTarget360LineOfSight) {
             float za = CombatTimer::GetTimer();
@@ -1372,7 +1372,7 @@ void CombatState::UpdateImmediateData() {
             CombatGoal* pCombatGoal = pCombatController->pCurrentGoal;
             if (!pCombatGoal || pCombatGoal->eType != CombatGoal::COMBAT_GOAL_FLUSH_TARGET) {
                 cTargetFlushed = -1;
-                bGrenadeThrowHighArc = 0;
+                bGrenadeThrowHighArc = false;
             }
         }
         if (bTarget360LineOfSight && (!bTargetBlocked && pCombatController->CombatPlanContainsAction(24))) {
@@ -1384,7 +1384,7 @@ void CombatState::UpdateImmediateData() {
     }
     else {
         iTargetDetectionLevel = -1;
-        bTarget360LineOfSight = 0;
+        bTarget360LineOfSight = false;
         CombatTimeStamp detectedTimeStamp(-3.4028235e+38f);
         fLastTargetDetectedTimeStamp = detectedTimeStamp;
         CombatTimeStamp lineOfSightTimeStamp(-3.4028235e+38f);
@@ -1394,7 +1394,7 @@ void CombatState::UpdateImmediateData() {
     CheckReferences();
     if (DynamicCoverLostTimer.IsSet()) {
         if (DynamicCoverLostTimer.Check()) {
-            ClearCoverLocation(0);
+            ClearCoverLocation(false);
             DynamicCoverLostTimer.Clear();
         }
     }
@@ -1421,7 +1421,7 @@ void CombatState::UpdateImmediateData() {
                 fgatherDistance = fmaxDistance + 256.0;
             }
             if (CombatGroup::bUseSimpleCombatGroupClustering) {
-                Actor* pcurrentPartner = 0;
+                Actor* pcurrentPartner = nullptr;
                 if (pLocationTarget) {
                     if (pLocationTarget->pRef) {
                         if (pLocationTarget->pRef->IsActor()) {
@@ -1457,7 +1457,7 @@ LABEL_56:;
         if (pLocationTarget->cType == 3) {
             TESForm* Space = pLocationTarget->WorldLoc.pSpace;
             if (Space != pattackerSpace) {
-                UpdateCombatArea(1);
+                UpdateCombatArea(true);
             }
         }
         if (pLocationTarget->pRef) {
@@ -1466,16 +1466,16 @@ LABEL_56:;
         NiPoint3 coordMult(1.0f, 1.0f, 0.25f);
         BGSWorldLocation* WorldLocation = pattacker->GetWorldLocation(&kAttackerLocation);
         float fsquaredDistance = pLocationTarget->WorldLoc.GetModifiedDistanceSquared(*WorldLocation, coordMult);
-        bool bignoreLocationTarget = 0;
+        bool bignoreLocationTarget = false;
         if (!pLocationTarget->cType || pLocationTarget->cType == 1) {
             if (ptarget) {
                 if (pCombatController->GetPretendInCombat() && !pCombatController->GetContinueDuringCombat()) {
-                    bignoreLocationTarget = 1;
+                    bignoreLocationTarget = true;
                 }
             }
         }
         if (bignoreLocationTarget) {
-            pLocationTarget->bNearTarget = 1;
+            pLocationTarget->bNearTarget = true;
         }
         else {
             if (pLocationTarget->fMinDistance < static_cast<double>(pLocationTarget->fMaxDistance) &&
@@ -1483,19 +1483,19 @@ LABEL_56:;
                 float fnearTargetDistance = GetLocationTargetNearTargetDistance();
                 if (pLocationTarget->bNearTarget) {
                     if (fsquaredDistance > fnearTargetDistance * fnearTargetDistance) {
-                        pLocationTarget->bNearTarget = 0;
+                        pLocationTarget->bNearTarget = false;
                     }
                 }
                 else {
                     if (fsquaredDistance < fnearTargetDistance * fnearTargetDistance) {
-                        pLocationTarget->bNearTarget = 1;
+                        pLocationTarget->bNearTarget = true;
                     }
                 }
             }
             else {
-                pLocationTarget->bNearTarget = 0;
+                pLocationTarget->bNearTarget = false;
                 if (fsquaredDistance < pLocationTarget->fMinDistance * pLocationTarget->fMinDistance) {
-                    pLocationTarget->bNearTarget = 1;
+                    pLocationTarget->bNearTarget = true;
                 }
             }
         }
@@ -1508,7 +1508,7 @@ LABEL_56:;
                         float* v4 = &fCombatFollowSneakFollowRadius.Float();
                         if (!(fsquaredDistance < *v3 * *v4)) {
                             if (pCombatController->GetForceSneak()) {
-                                pCombatController->SetForceSneak(0);
+                                pCombatController->SetForceSneak(false);
                             }
                         }
                         else {
@@ -1586,7 +1586,7 @@ LABEL_56:;
     if (bInventoryDirty || (UpdateInventoryTimer.IsSet() && UpdateInventoryTimer.Check())) {
         UpdateInventoryData();
     }
-    UpdateCombatArea(0);
+    UpdateCombatArea(false);
     if (iLastFleeDoor) {
         DecalMinWidth = fLastFleeDoorTimeStamp.ElapsedTime();
         if (fCombatFleeLastDoorRestrictTime.Float() < DecalMinWidth) {
@@ -1646,7 +1646,7 @@ void CombatState::ReloadingWeapon(TESObjectWEAP* apWeapon, bool abForced) {
 }
 
 void CombatState::SetCoverLocation(CombatCoverLocation* apCombatCoverLocation) {
-    ClearCoverLocation(0);
+    ClearCoverLocation(false);
     pCoverLocation = apCombatCoverLocation;
 }
 
@@ -1710,7 +1710,7 @@ void CombatState::FiredProjectile(Projectile* apProjectile) {
 
 bool CombatState::GetHasBufferedDetection() {
     double elapsedTime = (double)(&fLastTargetDetectedTimeStamp)->ElapsedTime();
-    return (bool)((uint8_t)(((&fCombatDetectionBufferTime)->Float()) > elapsedTime));
+    return (bool)((uint8_t)((&fCombatDetectionBufferTime)->Float() > elapsedTime));
 }
 
 void CombatState::ClearSecondaryCoverSearchInfo() {
@@ -1741,7 +1741,7 @@ void CombatState::ClearSecondaryCoverLocation(bool abClearLocation) {
         if (pSecondaryCoverLocation) {
             delete pSecondaryCoverLocation;
         }
-        pSecondaryCoverLocation = 0;
+        pSecondaryCoverLocation = nullptr;
     }
 }
 
@@ -1766,7 +1766,7 @@ void CombatState::UpdateCombatArea(bool abForceUpdate) {
 void CombatState::BoostConfidence(bool abChangeFleeStatus) {
     BGSWorldLocation* worldLocation;
     BGSWorldLocation v4;
-    if (((uint32_t)((int32_t)((uint8_t)cCurrentConfidence))) < 4u) {
+    if (((uint32_t)((int32_t)cCurrentConfidence)) < 4u) {
         if (TESAIForm::GetConfidenceLevel(cCurrentConfidence) < 100.0) {
             ++cCurrentConfidence;
         }
@@ -1776,7 +1776,7 @@ void CombatState::BoostConfidence(bool abChangeFleeStatus) {
                 if (pLocationTarget->cType == 1) {
                     worldLocation = pCombatController->pAttacker->TESObjectREFR::GetWorldLocation(&v4);
                     if ((&pLocationTarget->WorldLoc)->GetDistanceSquared(*worldLocation) < 4096.0) {
-                        abChangeFleeStatus = (bool)0;
+                        abChangeFleeStatus = false;
                     }
                 }
             }
@@ -1786,7 +1786,7 @@ void CombatState::BoostConfidence(bool abChangeFleeStatus) {
         }
         if (pCoverLocation) {
             if (((uint32_t)pCoverLocation->iLocation) == 12) {
-                ClearCoverLocation(0);
+                ClearCoverLocation(false);
             }
         }
     }
@@ -1799,7 +1799,7 @@ bool CombatState::CheckMovement(const BGSWorldLocation& apWorldLocation, bool ab
              (pLocationTarget->cType == LOCATION_TARGET_COMBAT_AREA && !abPassive))) {
             float fmaxDistance = GetLocationTargetCheckMovementDistance();
             if (fmaxDistance * fmaxDistance < apWorldLocation.GetDistanceSquared(pLocationTarget->WorldLoc)) {
-                return 0;
+                return false;
             }
         }
     }
@@ -1975,9 +1975,9 @@ double CombatState::GetMaxDPSForWeaponType(COMBAT_WEAPON_TYPE aeType) {
 void CombatState::ChangeProcessLevel(PROCESS_TYPE aeOldLevel, PROCESS_TYPE aeNewLevel) {
     if (((int32_t)aeOldLevel) == 0) {
         if (aeNewLevel) {
-            ClearCoverLocation(0);
+            ClearCoverLocation(false);
             ClearCoverSearchInfo();
-            ClearSecondaryCoverLocation(0);
+            ClearSecondaryCoverLocation(false);
             ClearSecondaryCoverSearchInfo();
             ClearCombatLocation();
         }
@@ -2023,32 +2023,32 @@ void CombatState::CheckReferences() {
 void CombatState::ClearCovers() {
     if (pCoverLocation) {
         if (!pCoverLocation->bReserved) {
-            ClearCoverLocation(0);
+            ClearCoverLocation(false);
         }
     }
     if (pSecondaryCoverLocation) {
         if (!pSecondaryCoverLocation->bReserved) {
-            ClearSecondaryCoverLocation(0);
+            ClearSecondaryCoverLocation(false);
         }
     }
 }
 
 bool CombatState::GetLastSeenTargetFiringLocation(NiPoint3& arLastSeenFiringLocation) {
     if (!GetLastSeenTargetLocation(arLastSeenFiringLocation)) {
-        return (bool)0;
+        return false;
     }
     Actor* apRef = pCombatController->GetTarget();
     (&arLastSeenFiringLocation)->z =
-        (float)(CombatUtilities::GetTargetFiringZOffset(apRef, ACTOR_SEGMENT_INVIEW_TOP, 1) +
-                (&arLastSeenFiringLocation)->z);
-    return (bool)1;
+        (CombatUtilities::GetTargetFiringZOffset(apRef, ACTOR_SEGMENT_INVIEW_TOP, true) +
+         (&arLastSeenFiringLocation)->z);
+    return true;
 }
 
 float CombatState::GetLocationTargetNearTargetDistance() {
     CombatLocationTarget* pCombatLocationTarget;
     if (pLocationTarget->bNearTarget) {
         pCombatLocationTarget = pLocationTarget;
-        return (float)(pCombatLocationTarget->fMaxDistance + ((&fCombatGuardFollowBufferDistance)->Float()));
+        return (pCombatLocationTarget->fMaxDistance + (&fCombatGuardFollowBufferDistance)->Float());
     }
     else {
         return (float)(((pLocationTarget->fMaxDistance - pLocationTarget->fMinDistance) * 0.75) +
@@ -2078,7 +2078,7 @@ bool CombatState::CheckShouldFlee() {
 bool CombatState::TryReserveCoverLocation(CombatCoverLocation* apCoverLocation) {
     CombatController* pCombatController;
     if ((!apCoverLocation) || apCoverLocation->IsReserved()) {
-        return (bool)1;
+        return true;
     }
     pCombatController = this->pCombatController;
     CombatCoverMap* parent = pCombatManager->CombatManager::GetCoverMap();
@@ -2131,7 +2131,7 @@ TESObjectWEAP* CombatState::GetBestCombatWeapon() {
 
 bool CombatState::IsDetectionLost() {
     double elapsedTime = (double)(&fLastTargetDetectedTimeStamp)->ElapsedTime();
-    return (bool)((uint8_t)(((&fCombatDetectionLostTime)->Float()) <= elapsedTime));
+    return (bool)((uint8_t)((&fCombatDetectionLostTime)->Float() <= elapsedTime));
 }
 
 void CombatState::SetLocationTargetLocation(BGSWorldLocation* a1, uint8_t a2, float a3, float a4) {
@@ -2142,11 +2142,11 @@ void CombatState::SetLocationTargetLocation(BGSWorldLocation* a1, uint8_t a2, fl
         v7 = ::new (apMemory) CombatLocationTarget;
     }
     else {
-        v7 = 0;
+        v7 = nullptr;
     }
     pLocationTarget = v7;
     pLocationTarget->cType = a2;
-    pLocationTarget->pRef = 0;
+    pLocationTarget->pRef = nullptr;
     pLocationTarget->WorldLoc = *a1;
     float* v5 = &fCombatLocationTargetRadiusMin.Float();
     pLocationTarget->fMinDistance = BSMAX(a3, *v5);
@@ -2180,9 +2180,9 @@ void CombatState::UpdateCombatPermissions() {
 
 bool CombatState::CheckShouldUpdateDetection(Actor* apAttacker, Actor* apTarget) {
     if (apTarget != pLastTarget) {
-        return 1;
+        return true;
     }
-    bool v5 = 1;
+    bool v5 = true;
     if (iTargetDetectionLevel > 0) {
         CombatProcedureBeInCover* pProcedure =
             static_cast<CombatProcedureBeInCover*>(pCombatController->pMovementProcedure);
@@ -2262,7 +2262,7 @@ bool CombatState::FindGrenadeThrowLocation(CombatLocation* apRetLocation, bool& 
             kTargetLocation = kTargetWorldLocation.Point;
         }
         kTargetLocation.z =
-            CombatUtilities::GetTargetFiringZOffset(pTarget, ACTOR_SEGMENT_INVIEW_TOP, 0) + kTargetLocation.z;
+            CombatUtilities::GetTargetFiringZOffset(pTarget, ACTOR_SEGMENT_INVIEW_TOP, false) + kTargetLocation.z;
         NiPoint3 kTargetVector = kTargetLocation - kAttackerLocation;
         float fDistanceSquared = kTargetVector.SqrXYLength();
         // The compare is against the unrounded square, and an unordered (NaN) distance is not skipped and goes on.
@@ -2292,7 +2292,7 @@ bool CombatState::FindGrenadeThrowLocation(CombatLocation* apRetLocation, bool& 
                 continue;
             }
         }
-        apRetLocation->SetPoint(kTargetLocation, 0);
+        apRetLocation->SetPoint(kTargetLocation, nullptr);
         return true;
     }
     return false;
@@ -2313,7 +2313,7 @@ bool CombatState::FindBestCoverLocation(
     Actor* pattacker = pCombatController->pAttacker;
     Actor* pTarget = pCombatController->GetTarget();
     if (!pTarget) {
-        return 0;
+        return false;
     }
     float arfMinRange = 0.0f;
     float fMinDistToShootFrom = 512.0f;
@@ -2325,10 +2325,10 @@ bool CombatState::FindBestCoverLocation(
     float* v7 = &fCombatCoverMaxRangeMult.Float();
     arfMaxRange = arfMaxRange * *v7;
     arfMaxRange = BSMIN(arfMaxRange, arfAbsoluteMaxRange);
-    bool v33 = 0;
-    bool v40 = 0;
-    bool v42 = 0;
-    bool v43 = 0;
+    bool v33 = false;
+    bool v40 = false;
+    bool v42 = false;
+    bool v43 = false;
     switch (aiLocation) {
         case 2: {
             TESCombatStyle* CurrentCombatStyle = pCombatController->GetCurrentCombatStyle();
@@ -2336,30 +2336,30 @@ bool CombatState::FindBestCoverLocation(
             break;
         }
         case 4: {
-            v43 = 1;
-            v33 = 1;
+            v43 = true;
+            v33 = true;
             break;
         }
         case 5: {
             fMaxDist = 4096.0f;
             arfMaxRange = 10000.0f;
-            v43 = 1;
-            v40 = 1;
-            v42 = 1;
+            v43 = true;
+            v40 = true;
+            v42 = true;
             break;
         }
         case 10: {
             arfMaxRange = 10000.0f;
-            v43 = 1;
+            v43 = true;
             break;
         }
         case 12: {
             fMinDistToShootFrom = fCombatFleeMinCoverDistance.Float();
             fMaxDist = fCombatFleeMaxCoverDistance.Float();
             arfMaxRange = 10000.0f;
-            v40 = 1;
-            v42 = 1;
-            v43 = 1;
+            v40 = true;
+            v42 = true;
+            v43 = true;
             break;
         }
         default: {
@@ -2383,7 +2383,7 @@ bool CombatState::FindBestCoverLocation(
                 )) {
                 apCombatCoverLocation->bDirtyFlag = false;
                 CombatAI_CoverSearch.Stop();
-                return 1;
+                return true;
             }
             apCoverSearchInfo->uiPreviousState = ecurrentCoverState;
         }
@@ -2444,7 +2444,7 @@ bool CombatState::FindBestCoverLocation(
     apCoverSearchInfo->kLastSearch = v17;
     apCoverSearchInfo->nipoint3C = center;
     apCoverSearchInfo->float18 = fMaxDist;
-    apCoverSearchInfo->kCoverLocations.Clear(0);
+    apCoverSearchInfo->kCoverLocations.Clear(false);
     if (Pathing::GetCoverPoints(&v32, apCoverSearchInfo->kCoverLocations)) {
         pCombatManager->pCoverMap->LockForWrite();
         for (uint32_t i = 0;; ++i) {
@@ -2482,7 +2482,7 @@ bool CombatState::FindBestCoverLocation(
                         apCombatCoverLocation->bDirtyFlag = false;
                         DynamicCoverLostTimer.Clear();
                         CombatAI_CoverSearch.Stop();
-                        return 1;
+                        return true;
                     }
                     coverLoc->cState = estate;
                 }
@@ -2491,7 +2491,7 @@ bool CombatState::FindBestCoverLocation(
         pCombatManager->pCoverMap->UnlockForWrite();
     }
     CombatAI_CoverSearch.Stop();
-    return 0;
+    return false;
 }
 
 // Fills apLocationsArray with each target's last seen location (seen within 3 seconds), else its current location.
@@ -2551,9 +2551,9 @@ bool CombatState::FindBestAdvanceLocation(
             float fRadius = pattacker->GetRadius();
             if (pCombatManager->pCoverMap->CanReserveCoverLocation(
                     apCombatCoverLocation->iCoverLocationKey, &apCombatCoverLocation->CoverLocation, pCombatController,
-                    fRadius, &apCombatCoverLocation->ReservationInfo, 1, bLeftEdge
+                    fRadius, &apCombatCoverLocation->ReservationInfo, true, bLeftEdge
                 )) {
-                return 1;
+                return true;
             }
         }
     }
@@ -2567,10 +2567,10 @@ bool CombatState::FindBestAdvanceLocation(
     coveredMoveRequest.pCombatCoverLocation = apCombatCoverLocation;
     coveredMoveRequest.SetAvoidNodeArray(apPathingAvoidNodeArray);
     coveredMoveRequest.iLocationIndex = aiLocation;
-    bool bresult = CombatState::FindBestAdvanceLocation(&coveredMoveRequest, fminAdvanceDistance_2, 0);
+    bool bresult = CombatState::FindBestAdvanceLocation(&coveredMoveRequest, fminAdvanceDistance_2, false);
     if (bresult) {
         NiPoint3* ScriptList = &coveredMoveRequest.CoverLocation;
-        apRetLocation->SetPoint(*ScriptList, 0);
+        apRetLocation->SetPoint(*ScriptList, nullptr);
     }
     coveredMoveRequest.ClearCombatCoverData();
     return bresult;
@@ -2611,13 +2611,13 @@ bool CombatState::FindCoveredMoveLocation(
     PathingAvoidNodeArray* apPathingAvoidNodeArray
 ) {
     CombatCoverLocation* v7;
-    ClearSecondaryCoverLocation(0);
+    ClearSecondaryCoverLocation(false);
     CombatCoverLocation* apMemory = static_cast<CombatCoverLocation*>(ourMalloc(sizeof(CombatCoverLocation)));
     if (apMemory) {
         v7 = ::new (apMemory) CombatCoverLocation;
     }
     else {
-        v7 = 0;
+        v7 = nullptr;
     }
     pSecondaryCoverLocation = v7;
     CombatLocation coverLocation;
@@ -2629,11 +2629,11 @@ bool CombatState::FindCoveredMoveLocation(
         pSecondaryCoverLocation->iCoverLocationLastMovedTimeStamp =
             pSecondaryCoverLocation->CoverLocation.GetDynamicCoverObstacleTimeStamp();
         apCoverLocation->operator=(pSecondaryCoverLocation->CoverLocation);
-        return 1;
+        return true;
     }
     else {
-        ClearSecondaryCoverLocation(0);
-        return 0;
+        ClearSecondaryCoverLocation(false);
+        return false;
     }
 }
 
@@ -2677,18 +2677,18 @@ bool CombatState::FindOptimalLocation(
         float v27 = result.SqrLength();
         if (!(v27 < afAbsoluteMinRange * afAbsoluteMinRange) &&
             (!(v27 > afAbsoluteMaxRange * afAbsoluteMaxRange) &&
-             (!abCheckTargetLOS || CombatUtilities::CalculateLOS(apActor, apTarget, a2, arTargetPos, 0, -1)))) {
-            apRetLocation->SetPoint(a2, 0);
+             (!abCheckTargetLOS || CombatUtilities::CalculateLOS(apActor, apTarget, a2, arTargetPos, false, -1)))) {
+            apRetLocation->SetPoint(a2, nullptr);
             apLocation.~PathingLocation();
-            return 1;
+            return true;
         }
         else {
             apLocation.~PathingLocation();
-            return 0;
+            return false;
         }
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -2703,16 +2703,16 @@ bool CombatState::FindBestFleeLocation(CombatCoverLocation* arg0, CombatLocation
     pattacker->GetWorldLocation(&attackerWorldLoc);
     if (ptarget) {
         ptarget->GetWorldLocation(&targetWorldLoc);
-        Actor* pclosestHelper = 0;
+        Actor* pclosestHelper = nullptr;
         float* v5 = &fCombatFleeMaxAllyDistance.Float();
         float fclosestHelperDistanceSquared = *v5 * fCombatFleeMaxAllyDistance.Float();
         LoadedReferenceMap* pactorMap = &pLoadedReferenceCollection->ActorsMap;
         NiTMapItem<uint32_t, TESObjectREFR*>* it = pactorMap->GetFirstPos();
         while (it) {
             uint32_t iformID = 0;
-            TESObjectREFR* pref = 0;
+            TESObjectREFR* pref = nullptr;
             pactorMap->GetNext(it, iformID, pref);
-            if (!pref->GetDisabledOrDeleted() && pref->IsActor() && !static_cast<Actor*>(pref)->IsDead(0) &&
+            if (!pref->GetDisabledOrDeleted() && pref->IsActor() && !static_cast<Actor*>(pref)->IsDead(false) &&
                 pref != pattacker && pref != ptarget) {
                 Actor* phelper = static_cast<Actor*>(pref);
                 phelper->GetWorldLocation(&helperWorldLoc);
@@ -2724,10 +2724,10 @@ bool CombatState::FindBestFleeLocation(CombatCoverLocation* arg0, CombatLocation
                         float ftargetHelperDistanceSquared = targetWorldLoc.GetDistanceSquared(helperWorldLoc);
                         float ftargetAttackerDistanceSquared = targetWorldLoc.GetDistanceSquared(attackerWorldLoc);
                         if (!(ftargetHelperDistanceSquared < static_cast<double>(ftargetAttackerDistanceSquared)) &&
-                            CheckMovement(helperWorldLoc, 1, 0) && !phelper->IsFleeing(0) &&
-                            (phelper->GetShouldAttackActor(ptarget, 0, ereaction, 0) ||
+                            CheckMovement(helperWorldLoc, true, false) && !phelper->IsFleeing(false) &&
+                            (phelper->GetShouldAttackActor(ptarget, false, ereaction, false) ||
                              pCombatManager->GetWanttoHelpGroup(phelper, pattacker)) &&
-                            !phelper->GetShouldAttackActor(pattacker, 0, ereaction, 0)) {
+                            !phelper->GetShouldAttackActor(pattacker, false, ereaction, false)) {
                             pclosestHelper = phelper;
                             fclosestHelperDistanceSquared = fsquaredDistance;
                         }
@@ -2741,7 +2741,7 @@ bool CombatState::FindBestFleeLocation(CombatCoverLocation* arg0, CombatLocation
             double v19 = pattacker->GetRadius() + Radius;
             float v18 = fCombatMoveToActorBufferDistance.Float() + v19;
             arg4->SetRadius(v18);
-            return 1;
+            return true;
         }
     }
     TESActorBase* pactorBase = pattacker->GetActorBase();
@@ -2756,7 +2756,7 @@ bool CombatState::FindBestFleeLocation(CombatCoverLocation* arg0, CombatLocation
             // ElapsedTime is called before the setting's Float, and its result is kept as a double.
             double fElapsedTime = fLastFleeDoorTimeStamp.ElapsedTime();
             if (fCombatFleeUseDoorRestrictTime.Float() < fElapsedTime) {
-                TESObjectREFR* pclosestDoor = 0;
+                TESObjectREFR* pclosestDoor = nullptr;
                 NiPoint3 apArray_20 = pattacker->GetLocationOnReference();
                 float apArray_16 = fCombatFleeMaxDoorDistance.Float();
                 float fclosestDoorDistanceSquared = apArray_16 * apArray_16;
@@ -2790,13 +2790,13 @@ bool CombatState::FindBestFleeLocation(CombatCoverLocation* arg0, CombatLocation
                                 if (pdoorZone == pactorZone) {
                                 LABEL_44:;
                                     pdoor->GetWorldLocation(&doorWorldLocation);
-                                    if (CheckMovement(doorWorldLocation, 1, 0)) {
+                                    if (CheckMovement(doorWorldLocation, true, false)) {
                                         BGSWorldLocation* TeleportWorldLocation =
                                             pteleportData->GetTeleportWorldLocation(&apResult);
-                                        if (CheckMovement(*TeleportWorldLocation, 1, 1)) {
+                                        if (CheckMovement(*TeleportWorldLocation, true, true)) {
                                             float* v12 = &fCombatFleeDoorTargetCheckDistance.Float();
                                             if (!pCombatController->pCombatGroup->FindTargetNearLocation(
-                                                    doorWorldLocation, *v12, 0
+                                                    doorWorldLocation, *v12, false
                                                 )) {
                                                 NiPoint3 doorLoc = pdoor->GetLocationOnReference();
                                                 NiPoint3 doorVec = doorLoc - apArray_20;
@@ -2821,13 +2821,13 @@ bool CombatState::FindBestFleeLocation(CombatCoverLocation* arg0, CombatLocation
                         pspace = (TESForm*)pteleportData_2->GetTeleportCell();
                     }
                     arg4->SetPoint(*&pteleportData_2->position, pspace);
-                    return 1;
+                    return true;
                 }
             }
         }
     }
-    if (arg0 && FindBestCoverLocation(0, &CoverSearchInfo, arg0, arg4, arg8)) {
-        return 1;
+    if (arg0 && FindBestCoverLocation(nullptr, &CoverSearchInfo, arg0, arg4, arg8)) {
+        return true;
     }
     if (pLocationTarget && pLocationTarget->cType == 1) {
         if (pLocationTarget->pRef) {
@@ -2842,11 +2842,11 @@ bool CombatState::FindBestFleeLocation(CombatCoverLocation* arg0, CombatLocation
         else {
             arg4->SetLocation(pLocationTarget->WorldLoc);
         }
-        return 1;
+        return true;
     }
     else {
-        arg4->SetFlag(1u, 1);
-        return 1;
+        arg4->SetFlag(1u, true);
+        return true;
     }
 }
 
@@ -2868,34 +2868,35 @@ bool CombatState::FindLOSLocation(CombatLocation* apRetLocation, int32_t a3) {
     }
     pcombatController = pactor->GetCombatController();
     if (pcombatController && pcombatController->pCombatState->GetHasBuffered360LineOfSight()) {
-        return 1;
+        return true;
     }
     if (pactor->Has360LOS(pCombatController->GetTarget())) {
-        return 1;
+        return true;
     }
 LABEL_9:;
     Actor* pattacker = pCombatController->pAttacker;
     pattacker->GetWorldLocation(&attackerWorldLoc);
-    Actor* plosMember = 0;
+    Actor* plosMember = nullptr;
     float fmaxDistanceSquared = 67108864.0f;
     uint32_t imemberCount = pgroup->GetMemberCount();
     for (uint32_t i = 0; i < imemberCount; ++i) {
         Actor* pmember = pgroup->GetMember(i);
         if (pmember != pattacker) {
-            bool bhasLOS = 0;
+            bool bhasLOS = false;
             CombatController* pcombatController_2 = pmember->GetCombatController();
             if (pcombatController_2 && pcombatController_2->pCombatState->GetHasBuffered360LineOfSight()) {
-                bhasLOS = 1;
+                bhasLOS = true;
             }
             else {
                 if (pmember->Has360LOS(pCombatController->GetTarget())) {
-                    bhasLOS = 1;
+                    bhasLOS = true;
                 }
             }
             if (bhasLOS) {
                 pmember->GetWorldLocation(&memberWorldLoc);
                 float fsqrLength = memberWorldLoc.GetDistanceSquared(attackerWorldLoc);
-                if (!(fmaxDistanceSquared <= static_cast<double>(fsqrLength)) && CheckMovement(memberWorldLoc, 1, 0)) {
+                if (!(fmaxDistanceSquared <= static_cast<double>(fsqrLength)) &&
+                    CheckMovement(memberWorldLoc, true, false)) {
                     plosMember = pmember;
                     fmaxDistanceSquared = fsqrLength;
                 }
@@ -2903,14 +2904,14 @@ LABEL_9:;
         }
     }
     if (!plosMember) {
-        return 0;
+        return false;
     }
     apRetLocation->SetRef(plosMember);
     double Radius = plosMember->GetRadius();
     double v5 = pattacker->GetRadius() + Radius;
     float v4 = fCombatMoveToActorBufferDistance.Float() + v5;
     apRetLocation->SetRadius(v4);
-    return 1;
+    return true;
 }
 
 bool CombatState::FindBetterWeapon() {
@@ -2922,15 +2923,15 @@ bool CombatState::FindBetterWeapon() {
     Actor* pattacker = pCombatController->pAttacker;
     Actor* ptarget = pCombatController->GetTarget();
     if (!pCombatController->bAttackerCanMove) {
-        return 0;
+        return false;
     }
     if (pCurrentEmbeddedWeapon || EmbeddedWeaponsArray.iSize) {
-        return 0;
+        return false;
     }
     if (pattacker->IsCreature()) {
         TESCreature* pcreature = static_cast<TESCreature*>(pattacker->GetActorBase());
         if (!pcreature->GetWeaponList()) {
-            return 0;
+            return false;
         }
     }
     BaseProcess* CurrentAIProcess = pattacker->pCurrentProcess;
@@ -2940,17 +2941,17 @@ bool CombatState::FindBetterWeapon() {
             if (pcurrentWeaponItem->pExtraObjectList->m_item) {
                 ExtraDataList** v2 = &pcurrentWeaponItem->pExtraObjectList->m_item;
                 if ((*v2)->GetCanNotWear()) {
-                    return 0;
+                    return false;
                 }
             }
         }
     }
     CombatAI_CombatItemSearch.Start();
     pattacker->GetWorldLocation(&attackerWorldLoc);
-    TESObjectREFR* pnewWeapon = 0;
-    TESBoundObject* pnewWeaponObject = 0;
-    TESObjectREFR* pnewAmmo = 0;
-    TESBoundObject* pnewAmmoObject = 0;
+    TESObjectREFR* pnewWeapon = nullptr;
+    TESBoundObject* pnewWeaponObject = nullptr;
+    TESObjectREFR* pnewAmmo = nullptr;
+    TESBoundObject* pnewAmmoObject = nullptr;
     TESObjectWEAP* pcurrentWeapon = pCombatController->GetCurrentWeapon();
     bool btargetUnreachable = GetTargetUnreachable();
     if (btargetUnreachable) {
@@ -2984,11 +2985,11 @@ bool CombatState::FindBetterWeapon() {
             fpickupWeaponDistanceMin = fPickupWeaponUnarmedDistanceMin.Float();
             fpickupWeaponDistanceMax = fPickupWeaponUnarmedDistanceMax.Float();
         }
-        bool bcloseToTarget = 0;
+        bool bcloseToTarget = false;
         if (ptarget) {
             ptarget->GetWorldLocation(&targetWorldLoc);
             if (attackerWorldLoc.GetDistanceSquared(targetWorldLoc) < 589824.0) {
-                bcloseToTarget = 1;
+                bcloseToTarget = true;
             }
         }
         if (!bcloseToTarget && fMaxRangedWeaponDPS > 0.0 && fMaxCombatWeaponDPS > 0.0) {
@@ -3008,12 +3009,12 @@ bool CombatState::FindBetterWeapon() {
     float ffoundWeaponDPS = 0.0f;
     float ffoundWeaponTotalDistanceSquared = 3.4028235e+38f;
     FindObjectIterator weaponIterator(WEAP_ID, pattacker);
-    TESObjectREFR* pweaponRef = 0;
-    ItemChange* pweaponItemChange = 0;
+    TESObjectREFR* pweaponRef = nullptr;
+    ItemChange* pweaponItemChange = nullptr;
     while (pLoadedReferenceCollection->GetNextObject(weaponIterator, pweaponRef, pweaponItemChange, 3u)) {
         float fhealth;
         if (pweaponItemChange) {
-            fhealth = pweaponItemChange->GetItemHealth(0);
+            fhealth = pweaponItemChange->GetItemHealth(false);
         }
         else {
             fhealth = (&pweaponRef->m_Extra)->GetHealth();
@@ -3034,14 +3035,15 @@ bool CombatState::FindBetterWeapon() {
                 fcondition = v33 / static_cast<double>(fTotalHealth);
             }
             TESCombatStyle* CurrentCombatStyle = pCombatController->GetCurrentCombatStyle();
-            float fnewWeaponDPS =
-                CombatFormulas::CalcCombatWeaponDPS(pattacker, pweapon_2, fcondition, CurrentCombatStyle, 0, 0);
+            float fnewWeaponDPS = CombatFormulas::CalcCombatWeaponDPS(
+                pattacker, pweapon_2, fcondition, CurrentCombatStyle, nullptr, nullptr
+            );
             if (pweapon_2->IsMeleeWeapon()) {
                 float* v8 = &fPickupWeaponMeleeWeaponDPSMult.Float();
                 fnewWeaponDPS = fnewWeaponDPS * *v8;
             }
             if (!(fweaponDPS >= static_cast<double>(fnewWeaponDPS)) &&
-                (!btargetUnreachable || pweapon_2->IsRangedWeapon()) && pattacker->CanUseWeapon(pweapon_2, 0)) {
+                (!btargetUnreachable || pweapon_2->IsRangedWeapon()) && pattacker->CanUseWeapon(pweapon_2, false)) {
                 float fsquaredMaxDistance = 0.0;
                 if (!(fweaponDPS <= 0.0)) {
                     float fnewWeaponDPSRatio = fnewWeaponDPS / fweaponDPS;
@@ -3058,21 +3060,21 @@ bool CombatState::FindBetterWeapon() {
                 pweaponRef->GetWorldLocation(&weaponWorldLoc);
                 float ftotalDistanceSquared = weaponWorldLoc.GetDistanceSquared(attackerWorldLoc);
                 if (!(fsquaredMaxDistance <= static_cast<double>(ftotalDistanceSquared)) &&
-                    CheckMovement(weaponWorldLoc, 1, 0)) {
+                    CheckMovement(weaponWorldLoc, true, false)) {
                     LockData* Lock;
                     TESObjectWEAP* pweapon_4;
                     if (!pweaponRef->GetObjectReference() ||
                         (pweaponRef->GetObjectReference()->GetFormType() != CONT_ID ||
-                         ((pweapon_4 = static_cast<TESObjectWEAP*>(pweaponRef->GetObjectReference())) == 0 ||
+                         ((pweapon_4 = static_cast<TESObjectWEAP*>(pweaponRef->GetObjectReference())) == nullptr ||
                           ((!pweaponRef->GetLock() || (Lock = pweaponRef->GetLock(), !Lock->IsLocked())) &&
-                           (!pweaponRef->GetOwner() || pweaponRef->IsAnOwner(pattacker, 1)))))) {
-                        TESObjectREFR* ptempNewAmmo = 0;
-                        bool bhasAmmo = 1;
+                           (!pweaponRef->GetOwner() || pweaponRef->IsAnOwner(pattacker, true)))))) {
+                        TESObjectREFR* ptempNewAmmo = nullptr;
+                        bool bhasAmmo = true;
                         TESAmmo* pammo = pweapon_2->GetCurrentAmmo(pattacker);
                         if (pammo) {
-                            bhasAmmo = 0;
+                            bhasAmmo = false;
                             if (!pweaponItemChange) {
-                                bhasAmmo = (&pweaponRef->m_Extra)->GetAmmoExtra() != 0;
+                                bhasAmmo = (&pweaponRef->m_Extra)->GetAmmoExtra() != nullptr;
                             }
                             if (!bhasAmmo) {
                                 bhasAmmo = pattacker->GetInventoryObjectCount(pammo) != 0;
@@ -3080,7 +3082,7 @@ bool CombatState::FindBetterWeapon() {
                             if (!bhasAmmo) {
                                 if (pweaponItemChange) {
                                     if (pweaponRef->GetInventoryObjectCount(pammo)) {
-                                        bhasAmmo = 1;
+                                        bhasAmmo = true;
                                         ptempNewAmmo = pweaponRef;
                                     }
                                 }
@@ -3089,8 +3091,8 @@ bool CombatState::FindBetterWeapon() {
                                 float fsquaredTotalDistance = 3.4028235e+38f;
                                 NiPoint3 weaponLoc = pweaponRef->GetLocationOnReference();
                                 FindObjectIterator ammoIterator(pammo, pattacker);
-                                TESObjectREFR* pammoRef = 0;
-                                ItemChange* pammoItemChange = 0;
+                                TESObjectREFR* pammoRef = nullptr;
+                                ItemChange* pammoItemChange = nullptr;
                                 while (pLoadedReferenceCollection->GetNextObject(
                                     ammoIterator, pammoRef, pammoItemChange, 3u
                                 )) {
@@ -3100,11 +3102,11 @@ bool CombatState::FindBetterWeapon() {
                                         ammoWorldLoc.GetDistanceSquared(weaponWorldLoc) + fAmmoDistance;
                                     if (!(fsquaredMaxDistance < static_cast<double>(fnewSquaredTotalDistance)) &&
                                         !(fsquaredTotalDistance < static_cast<double>(fnewSquaredTotalDistance)) &&
-                                        CheckMovement(ammoWorldLoc, 1, 0)) {
+                                        CheckMovement(ammoWorldLoc, true, false)) {
                                         ptempNewAmmo = pammoRef;
                                         fsquaredTotalDistance = fnewSquaredTotalDistance;
                                         ftotalDistanceSquared = fnewSquaredTotalDistance;
-                                        bhasAmmo = 1;
+                                        bhasAmmo = true;
                                     }
                                 }
                             }
@@ -3113,7 +3115,7 @@ bool CombatState::FindBetterWeapon() {
                             float fItemDistance = NiSqrt(ftotalDistanceSquared);
                             float ftotalDistance = BSMAX(fItemDistance, 64.0f);
                             float fmodifiedNewWeaponDPS = fnewWeaponDPS * 10000.0 / ftotalDistance;
-                            bool buseWeapon = 0;
+                            bool buseWeapon = false;
                             if (!(ffoundWeaponDPS < static_cast<double>(fmodifiedNewWeaponDPS))) {
                                 if (ffoundWeaponDPS == fmodifiedNewWeaponDPS) {
                                     buseWeapon =
@@ -3121,15 +3123,15 @@ bool CombatState::FindBetterWeapon() {
                                 }
                             }
                             else {
-                                buseWeapon = 1;
+                                buseWeapon = true;
                             }
                             if (buseWeapon) {
                                 ffoundWeaponDPS = fnewWeaponDPS * 10000.0 / ftotalDistance;
                                 ffoundWeaponTotalDistanceSquared = ftotalDistanceSquared;
                                 pnewWeapon = pweaponRef;
-                                pnewWeaponObject = pweaponRef != 0 ? pweapon_2 : 0;
+                                pnewWeaponObject = pweaponRef != nullptr ? pweapon_2 : nullptr;
                                 pnewAmmo = ptempNewAmmo;
-                                pnewAmmoObject = ptempNewAmmo != 0 ? pammo : 0;
+                                pnewAmmoObject = ptempNewAmmo != nullptr ? pammo : nullptr;
                             }
                         }
                     }
@@ -3141,16 +3143,16 @@ bool CombatState::FindBetterWeapon() {
     if (pnewWeapon) {
         AddObjectToTarget(3u, pnewAmmo, pnewAmmoObject);
         AddObjectToTarget(4u, pnewWeapon, pnewWeaponObject);
-        return 1;
+        return true;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
 bool CombatState::IsCoverLocationValid(CombatCoverLocation* apCoverLocation) {
     if (!apCoverLocation) {
-        return 0;
+        return false;
     }
     return apCoverLocation == pCoverLocation || apCoverLocation == pSecondaryCoverLocation;
 }
@@ -3164,12 +3166,12 @@ void CombatState::AddObjectToTarget(uint32_t auiIndex, TESObjectREFR* apReferenc
             pItem = ::new (pMemory) CombatState::TargetedObject;
         }
         else {
-            pItem = 0;
+            pItem = nullptr;
         }
         pCombatItems[auiIndex] = pItem;
         pCombatItems[auiIndex]->pRef = (TESForm*)apReference;
         pCombatItems[auiIndex]->pObject = apObject;
-        apReference->SetTargeted(1);
+        apReference->SetTargeted(true);
     }
 }
 
@@ -3235,14 +3237,14 @@ bool CombatState::IsLocationUnreachable(const BGSWorldLocation& arWorldLocation,
         UnreachableLocation* unreachableLocation = &UnreachableLocations.operator[](i);
         if (!(unreachableLocation->fTimeStamp.ElapsedTime() > 10.0)) {
             if (fradiusSquared > unreachableLocation->Location.GetDistanceSquared(arWorldLocation)) {
-                return 1;
+                return true;
             }
         }
         else {
             UnreachableLocations.RemoveFast(i--, 1u);
         }
     }
-    return 0;
+    return false;
 }
 
 // KEEP: src cannot express it exactly. The exe builds BuildPath's two smart pointer arguments (0x6EBF30, 0x633C90)
@@ -3252,7 +3254,7 @@ bool CombatState::QueuePathCheck(int32_t aiLocation) {
     Actor* pattacker = pCombatController->pAttacker;
     Actor* ptarget = pCombatController->GetTarget();
     if (!ptarget) {
-        return 0;
+        return false;
     }
     if (!this->spPathCheckQueue.m_pObject) {
         ActorPathingMessageQueue* pQueue;
@@ -3261,7 +3263,7 @@ bool CombatState::QueuePathCheck(int32_t aiLocation) {
             pQueue = ::new (apMemory) ActorPathingMessageQueue;
         }
         else {
-            pQueue = 0;
+            pQueue = nullptr;
         }
         this->spPathCheckQueue.operator=(pQueue);
     }
@@ -3272,7 +3274,7 @@ bool CombatState::QueuePathCheck(int32_t aiLocation) {
                 CombatUtilities::ComputeFaceTargetLocation(pattacker, ptarget, *pTargetLocation, -1.0f);
             PathingLocation pathingLocationTarget(faceTargetLocation, pattacker);
             if (!pathingLocationTarget.IsValidLocation(pattacker->GetRadius())) {
-                return 0;
+                return false;
             }
             PathingRequest* prequest;
             void* pRequestMemory = NiMemObject::operator new(sizeof(PathingRequest));
@@ -3280,11 +3282,11 @@ bool CombatState::QueuePathCheck(int32_t aiLocation) {
                 prequest = ::new (pRequestMemory) PathingRequest;
             }
             else {
-                prequest = 0;
+                prequest = nullptr;
             }
             pattacker->BuildRequest(
                 prequest, pathingLocationTarget.GetLocation(), pathingLocationTarget.pCell,
-                pathingLocationTarget.pWorldSpace, -1.0f, 0
+                pathingLocationTarget.pWorldSpace, -1.0f, nullptr
             );
             // BuildPath takes both smart pointers by value: the queue is copied into its argument, then the request's
             // is built from the raw pointer, and the callee releases them.
@@ -3298,16 +3300,16 @@ bool CombatState::QueuePathCheck(int32_t aiLocation) {
             prequest = ::new (pRequestMemory) PathingRequest;
         }
         else {
-            prequest = 0;
+            prequest = nullptr;
         }
         BGSWorldLocation targetWorldLoc;
         ptarget->GetWorldLocation(&targetWorldLoc);
-        pattacker->BuildRequest_0(prequest, targetWorldLoc.Point, targetWorldLoc.pSpace, -1.0f, 0);
+        pattacker->BuildRequest_0(prequest, targetWorldLoc.Point, targetWorldLoc.pSpace, -1.0f, nullptr);
         // As above: the queue's slot first, then the request's; the callee releases both.
         PathManager::QInstance()->BuildPath(NiPointer<PathingRequest>(prequest), spPathCheckQueue, true);
     }
     this->iQueuedPathCheck = aiLocation;
-    return 1;
+    return true;
 }
 
 void CombatState::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
@@ -3467,7 +3469,7 @@ void CombatState::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         pCombatWeapons[i] = dynamic_cast<TESObjectWEAP*>(FormByNumericID);
     }
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
-    EmbeddedWeaponsArray.SetSize(isaveGameCount, 1);
+    EmbeddedWeaponsArray.SetSize(isaveGameCount, true);
     for (uint32_t i_2 = 0; i_2 < isaveGameCount; ++i_2) {
         TESObjectWEAP** pembeddedWeapon = &EmbeddedWeaponsArray.operator[](i_2);
         uint32_t v4 = apLoadGameBuffer->LoadFormID();
@@ -3530,12 +3532,12 @@ void CombatState::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v18 = ::new (apMemory) CombatCoverLocation;
         }
         else {
-            v18 = 0;
+            v18 = nullptr;
         }
         pCoverLocation = v18;
         pCoverLocation->LoadGame(apLoadGameBuffer);
         if (pCoverLocation->bReserved) {
-            pCoverLocation->SetReserved(0);
+            pCoverLocation->SetReserved(false);
             ReserveCoverLocation(pCoverLocation);
         }
     }
@@ -3546,12 +3548,12 @@ void CombatState::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v17 = ::new (v23) CombatCoverLocation;
         }
         else {
-            v17 = 0;
+            v17 = nullptr;
         }
         pSecondaryCoverLocation = v17;
         pSecondaryCoverLocation->LoadGame(apLoadGameBuffer);
         if (pSecondaryCoverLocation->bReserved) {
-            pSecondaryCoverLocation->SetReserved(0);
+            pSecondaryCoverLocation->SetReserved(false);
             ReserveCoverLocation(pSecondaryCoverLocation);
         }
     }
@@ -3562,7 +3564,7 @@ void CombatState::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v16 = ::new (v22) CombatLocation;
         }
         else {
-            v16 = 0;
+            v16 = nullptr;
         }
         pCombatLocation = v16;
         pCombatLocation->LoadGame(apLoadGameBuffer);
@@ -3574,7 +3576,7 @@ void CombatState::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v15 = ::new (v21) CombatLocationTarget;
         }
         else {
-            v15 = 0;
+            v15 = nullptr;
         }
         pLocationTarget = v15;
         pLocationTarget->LoadGame(apLoadGameBuffer);
@@ -3586,12 +3588,12 @@ void CombatState::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         SecondaryCoverSearchInfo.LoadGameBGS(apLoadGameBuffer);
     }
     uint32_t isaveGameCount_2 = apLoadGameBuffer->LoadVariableSizedValue();
-    UnreachableCoverLocations.SetSize(isaveGameCount_2, 1);
+    UnreachableCoverLocations.SetSize(isaveGameCount_2, true);
     for (uint32_t i_4 = 0; i_4 < isaveGameCount_2; ++i_4) {
         (&UnreachableCoverLocations.operator[](i_4))->LoadGame(apLoadGameBuffer);
     }
     uint32_t isaveGameCount_3 = apLoadGameBuffer->LoadVariableSizedValue();
-    UnreachableLocations.SetSize(isaveGameCount_3, 1);
+    UnreachableLocations.SetSize(isaveGameCount_3, true);
     for (uint32_t i_5 = 0; i_5 < isaveGameCount_3; ++i_5) {
         (&UnreachableLocations.operator[](i_5))->LoadGame(apLoadGameBuffer);
     }
@@ -3607,7 +3609,7 @@ void CombatState::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 v14 = ::new (v20) CombatState::TargetedObject;
             }
             else {
-                v14 = 0;
+                v14 = nullptr;
             }
             pCombatItems[i_6] = v14;
             // Loads the raw form ID into the reference field, as untyped storage; InitLoadGame resolves it.
@@ -3659,11 +3661,11 @@ void CombatState::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 );
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             pCombatItems[i]->pRef = v5;
             if (pCombatItems[i]->pRef) {
-                static_cast<TESObjectREFR*>(pCombatItems[i]->pRef)->TESObjectREFR::SetTargeted(1);
+                static_cast<TESObjectREFR*>(pCombatItems[i]->pRef)->TESObjectREFR::SetTargeted(true);
             }
         }
     }
@@ -3675,7 +3677,7 @@ void CombatState::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v4 = dynamic_cast<Actor*>(v3);
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     pLastTarget = v4;
     if (iQueuedPathCheck != -1) {
@@ -3704,7 +3706,7 @@ void CombatState::SetLocationTargetRef(TESObjectREFR* apRef, LOCATION_TARGET_TYP
             v7 = ::new (apMemory) CombatLocationTarget;
         }
         else {
-            v7 = 0;
+            v7 = nullptr;
         }
         pLocationTarget = v7;
         pLocationTarget->cType = aeType;
@@ -3729,8 +3731,8 @@ bool CombatState::CheckCoverLOS(
                (Location_ = &(result = arCoverPathingLocation.GetLocation()),
                 (v6 = arTargetLocation - *Location_, !(v6.SqrLength() > 4194304.0)))) &&
         Pathing::CheckLineOfSight(
-                  arCoverPathingLocation, arTargetLocation, static_cast<PathingLocation*>(0),
-                  static_cast<Pathing::CheckLineOfSightFilter*>(0)
+                  arCoverPathingLocation, arTargetLocation, static_cast<PathingLocation*>(nullptr),
+                  static_cast<Pathing::CheckLineOfSightFilter*>(nullptr)
         );
     return v4;
 }
@@ -3746,11 +3748,11 @@ bool CombatState::CheckTargetsCoverLOS_0(
             break;
         }
         arTargetLocation = *static_cast<NiPoint3*>(&apLocationsArray->operator[](auiIndex));
-        if (CombatState::CheckCoverLOS(arCoverPathingLocation, arTargetLocation, 0)) {
-            return 1;
+        if (CombatState::CheckCoverLOS(arCoverPathingLocation, arTargetLocation, false)) {
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 // Searches cover points around a spot part of the way from the origin to the destination and takes the first one that
@@ -3826,7 +3828,7 @@ bool CombatState::FindBestAdvanceLocation(
     pcombatCoverSearchInfo->nipoint3C = center;
     pcombatCoverSearchInfo->float18 = fMaxDist;
     pcombatCoverSearchInfo->kSearchLocation = pcombatCoverLocation->CoverSearchTargetLocation;
-    pcombatCoverSearchInfo->kCoverLocations.Clear(0);
+    pcombatCoverSearchInfo->kCoverLocations.Clear(false);
     if (Pathing::GetCoverPoints(&coverRequest, pcombatCoverSearchInfo->kCoverLocations)) {
         if (!abBackgroundThread) {
             pCombatManager->pCoverMap->LockForWrite();
@@ -3936,7 +3938,7 @@ bool CombatState::FindBestAdvanceLocation(
                     nodeCenter = *kTargetNodes[1].GetCenter(&kSecondNodeCenter);
                 }
                 if (pcombatCoverLocation->CoverLocation.IsLeftSideClosest(nodeCenter)) {
-                    pcombatCoverLocation->ReservationInfo.bLeftEdge = 1;
+                    pcombatCoverLocation->ReservationInfo.bLeftEdge = true;
                 }
             }
             else if (coverDestinationNodes.iSize > 1) {
@@ -3944,7 +3946,7 @@ bool CombatState::FindBestAdvanceLocation(
                 NiPoint3 nodeCenter;
                 kDestinationNodes[1].GetCenter(&nodeCenter);
                 if (pcombatCoverLocation->CoverLocation.IsLeftSideClosest(nodeCenter)) {
-                    pcombatCoverLocation->ReservationInfo.bLeftEdge = 1;
+                    pcombatCoverLocation->ReservationInfo.bLeftEdge = true;
                 }
             }
             apCoveredMoveRequest->SetCoverLocation(coverLocation);
@@ -4048,7 +4050,7 @@ void CombatCoverSearchInfo::LoadGameBGS(BGSLoadGameBuffer* a2) {
     a2->LoadData(&uiPreviousState, 4u);
     kLastSearch.LoadGame(a2);
     uint32_t aiNewSize = a2->LoadVariableSizedValue();
-    kCoverLocations.SetSize(aiNewSize, 1);
+    kCoverLocations.SetSize(aiNewSize, true);
     for (uint32_t aiIndex = 0; aiIndex < aiNewSize; ++aiIndex) {
         PathingCoverLocation* v3 = &kCoverLocations.operator[](aiIndex);
         v3->LoadGame(a2);

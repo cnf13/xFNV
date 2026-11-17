@@ -815,7 +815,7 @@ void castRayBroadPhase(
     apCollector->m_nextFreeResult = apCommand->m_results;
     apCollector->m_command = apCommand;
     v9.m_toStriding = 16;
-    v9.m_aabbCacheInfo = 0;
+    v9.m_aabbCacheInfo = nullptr;
     v9.m_numCasts = 1;
     v9.m_from.m_quad = v4.m_quad;
     if (apCommand->m_rayInput.m_enableShapeCollectionFilter.m_bool) {
@@ -825,11 +825,11 @@ void castRayBroadPhase(
                 static_cast<const hkpRayShapeCollectionFilter*>(m_filter);
         }
         else {
-            apCollector->m_workInput.m_rayShapeCollectionFilter = 0;
+            apCollector->m_workInput.m_rayShapeCollectionFilter = nullptr;
         }
     }
     else {
-        apCollector->m_workInput.m_rayShapeCollectionFilter = 0;
+        apCollector->m_workInput.m_rayShapeCollectionFilter = nullptr;
     }
     if (apCommand->m_useCollector.m_bool) {
         if (apFixedBufferCollector) {
@@ -839,18 +839,18 @@ void castRayBroadPhase(
             apCollector->m_fixedBufferRayHitCollector = apFixedBufferCollector;
         }
         else {
-            apCollector->m_fixedBufferRayHitCollector = 0;
+            apCollector->m_fixedBufferRayHitCollector = nullptr;
         }
         g_FixedBufferRayHitCollectorAddRayHitCallbackFunc = &hkpFixedBufferRayHitCollector::addRayHitImplementation;
     }
     else {
-        apCollector->m_fixedBufferRayHitCollector = 0;
+        apCollector->m_fixedBufferRayHitCollector = nullptr;
     }
     hkpWorldRayCastOutput* v8 = apCommand->m_results;
     v8->m_hitFraction = 1.0f;
     v8->m_extraInfo = -1;
     v8->m_shapeKeys[0] = -1;
-    v8->m_rootCollidable = 0;
+    v8->m_rootCollidable = nullptr;
     v8->m_shapeKeyIndex = 0;
     apBroadPhase->castRay(v9, apCollector, 0);
 }

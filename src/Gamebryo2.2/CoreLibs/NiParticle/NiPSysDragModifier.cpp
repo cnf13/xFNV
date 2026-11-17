@@ -162,7 +162,7 @@ void NiPSysDragModifier::Update(float fTime, NiPSysData* pkData) {
         NiParticleInfo* pkInfo = &pkData->m_pkParticleInfo[i];
         // EXE-INLINED 0x4A7290
         float fSqrDist = fDiffX * fDiffX + fDiffY * fDiffY + fDiffZ * fDiffZ;
-        float fDist = static_cast<float>(std::sqrt(fSqrDist));
+        float fDist = std::sqrt(fSqrDist);
         float fPercentage = m_fPercentage;
         float fSteps = (fTime - pkInfo->m_fLastUpdate) / 0.03333330154418945;
 

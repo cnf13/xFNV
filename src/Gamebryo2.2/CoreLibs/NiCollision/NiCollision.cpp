@@ -24,7 +24,7 @@ NiBoundingVolume* NiCollisionConvert::ConvertToSphereBV_Safe(float fRadius, cons
         pkSphereBV = ::new (v2) NiSphereBV(1.0f, NiPoint3_ZERO);
     }
     else {
-        pkSphereBV = 0;
+        pkSphereBV = nullptr;
     }
     pkSphereBV->m_kSphere.m_fRadius = fRadius;
     pkSphereBV->m_kSphere.m_kCenter = kCenter;
@@ -35,7 +35,7 @@ NiBoundingVolume* NiCollisionConvert::ConvertToBoxBV(int32_t usQuantity, const N
     NiBoxBV* pkBoxBV;
     NiBox v4;
     if (!static_cast<uint16_t>(usQuantity) || !pkVertex) {
-        return 0;
+        return nullptr;
     }
     v4.CreateFromData(usQuantity, pkVertex);
     NiBoxBV* v2 = static_cast<NiBoxBV*>(MemoryManager_Singleton.Allocate(sizeof(NiBoxBV)));
@@ -44,7 +44,7 @@ NiBoundingVolume* NiCollisionConvert::ConvertToBoxBV(int32_t usQuantity, const N
             ::new (v2) NiBoxBV(NiPoint3_UNIT_ALL, NiPoint3_ZERO, NiPoint3_UNIT_X, NiPoint3_UNIT_Y, NiPoint3_UNIT_Z);
     }
     else {
-        pkBoxBV = 0;
+        pkBoxBV = nullptr;
     }
     pkBoxBV->m_kBox = v4;
     return pkBoxBV;

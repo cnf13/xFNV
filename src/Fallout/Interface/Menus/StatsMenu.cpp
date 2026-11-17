@@ -59,7 +59,7 @@
 #include "SDK/MSVC/rtti.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 // Whether the player was in hardcore mode at the last DoIdle; it starts out set.
 static bool bWasHardcore = true;
@@ -90,7 +90,7 @@ StatsMenu::HealingOption::~HealingOption() {
 }
 
 bool StatsMenu::HealingOption::DefaultTargetConditionCallback(StatsMenu::HealingOption& aHO) {
-    return aHO.pInventoryItem != 0;
+    return aHO.pInventoryItem != nullptr;
 }
 
 StatsMenu::StatusDataList::~StatusDataList() {
@@ -112,7 +112,7 @@ void StatsMenu::StatusDataList::Register(ActiveEffect* apActiveEffect) {
                 v5 = ::new (apMemory) EffectItemData;
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             a2 = v5;
             EffectItem* v4 = apActiveEffect->pEffect;
@@ -137,7 +137,7 @@ EffectItemData* StatsMenu::StatusDataList::GetEntryByAVCode(int32_t aiActorValue
 
 int32_t StatsMenu::StatusDataList::Flush() {
     int32_t result;
-    while (1) {
+    while (true) {
         result = IsEmpty();
         if (static_cast<uint8_t>(result)) {
             break;
@@ -163,7 +163,7 @@ void StatsMenu::StatusDataList::Register(EffectItem* arg0) {
                 v5 = ::new (apMemory) EffectItemData;
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             a2 = v5;
             v5->iActorValue = arg0->GetActorValueIndex();
@@ -207,7 +207,7 @@ void StatsMenu::StatusEffectList::Register(ActiveEffect* apActiveEffect) {
             peffect_2 = ::new (apMemory) StatsMenu::StatusEffect(pform);
         }
         else {
-            peffect_2 = 0;
+            peffect_2 = nullptr;
         }
         peffect = peffect_2;
         Insert(peffect_2, &StatsMenu::StatusEffectSortFn);
@@ -223,12 +223,12 @@ void StatsMenu::StatusEffectList::Register(ActiveEffect* apActiveEffect) {
 
 StatsMenu::StatusEffect* StatsMenu::StatusEffectList::Find(uint32_t aiID) {
     BSSimpleList<StatsMenu::StatusEffect*>* pnode;
-    StatsMenu::StatusEffect* peffect = 0;
+    StatsMenu::StatusEffect* peffect = nullptr;
     if (this) {
         pnode = static_cast<BSSimpleList<StatsMenu::StatusEffect*>*>(this);
     }
     else {
-        pnode = 0;
+        pnode = nullptr;
     }
     for (BSSimpleList<StatsMenu::StatusEffect*>* pnode_2 = pnode; !peffect && (pnode_2 && pnode_2->m_item);
          pnode_2 = pnode_2->m_pkNext) {
@@ -311,7 +311,7 @@ StatsMenu::BodyPartController* StatsMenu::BodyPartController::GetInstance() {
             v1 = ::new (apMemory) StatsMenu::BodyPartController;
         }
         else {
-            v1 = 0;
+            v1 = nullptr;
         }
         StatsMenu::BodyPartController::pInstance = v1;
     }
@@ -412,11 +412,11 @@ void StatsMenu::DoClick(int32_t aiID, Tile* apTarget) {
                                         extraData = pHealingOptionsA[i].pInventoryItem->pExtraObjectList->m_item;
                                     }
                                     else {
-                                        extraData = 0;
+                                        extraData = nullptr;
                                     }
                                     uint32_t FormHealth_0 = pHealingOptionsA[i].pInventoryItem->iNumber;
                                     TESBoundObject* FormFlags = pHealingOptionsA[i].pInventoryItem->pContainerObj;
-                                    pPlayer->QueueEquipObject(FormFlags, FormHealth_0, extraData, 0, 0, 1);
+                                    pPlayer->QueueEquipObject(FormFlags, FormHealth_0, extraData, false, false, true);
                                     for (BSSimpleList<EffectItem*>* pnode = dynamic_cast<BSSimpleList<EffectItem*>*>(
                                              pHealingOptionsA[i].pInventoryItem->pContainerObj
                                          );
@@ -425,7 +425,7 @@ void StatsMenu::DoClick(int32_t aiID, Tile* apTarget) {
                                         UpdateActorValue(ActorValueIndex);
                                     }
                                     UpdateHealingOptions(i);
-                                    bActiveEffectsUpdatedThisFrame = 0;
+                                    bActiveEffectsUpdatedThisFrame = false;
                                     UpdateActiveEffects();
                                     i = StatsMenu::SM_HO_COUNT;
                                 }
@@ -435,10 +435,10 @@ void StatsMenu::DoClick(int32_t aiID, Tile* apTarget) {
                             StatsMenu::BodyPartController* Instance = StatsMenu::BodyPartController::GetInstance();
                             if (Instance->Find(apTarget) != StatsMenu::BodyPartController::SM_BODYPART_COUNT) {
                                 if (pPlayer->IsHardcore()) {
-                                    DoClick(59, 0);
+                                    DoClick(59, nullptr);
                                 }
                                 else {
-                                    DoClick(10, 0);
+                                    DoClick(10, nullptr);
                                 }
                             }
                         }
@@ -585,14 +585,14 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
     StatsMenu::Page epage_2;
     StatsMenu::Page epage;
     if (!Interface::IsTopMenuID(Interface::eStatsMenu)) {
-        return 0;
+        return false;
     }
     FOPipboyManager* Pipboy = Interface::GetPipboy();
     if (!Pipboy->GetInitialized()) {
-        return 0;
+        return false;
     }
     if (!Interface::IsTopMenuID(Interface::eStatsMenu)) {
-        return 0;
+        return false;
     }
     if (this->bLimbMode && (aiButton == 1 || (aiButton == 2 || (aiButton == 4 || aiButton == 3)))) {
         StatsMenu::BodyPartController::Direction edir;
@@ -621,26 +621,26 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
         StatsMenu::BodyPartController::BodyPartIndex enewBodyPart = Instance->GetLink(afRate, edir);
         if (enewBodyPart < StatsMenu::BodyPartController::SM_BODYPART_COUNT) {
             StatsMenu::BodyPartController* v7 = StatsMenu::BodyPartController::GetInstance();
-            v7->SetCurrentBodyPart(enewBodyPart, 1);
+            v7->SetCurrentBodyPart(enewBodyPart, true);
             bool v8 = StatsMenu::StimpakTargetConditionCallback(*pHealingOptionsA);
             pHealingOptionsA[0].pTile->Set(4015, static_cast<int32_t>(v8));
             bool v9 = DrBagTargetConditionCallback(pHealingOptionsA[3]);
             pHealingOptionsA[3].pTile->Set(4015, static_cast<int32_t>(v9));
             BSAudio* v10 = &BSAudio::QInstance();
             BSSoundHandle* SoundHandleByName = v10->GetSoundHandleByName(&a1, "UIPipBoyHighlight", 289u);
-            SoundHandleByName->Play(0);
+            SoundHandleByName->Play(false);
         }
-        return 1;
+        return true;
     }
     if ((aiButton == 13 || aiButton == 14) && afValue >= 1.0) {
         InterfaceManager::PlayMenuSound(MENU_SOUND_MODE);
         if (aiButton == 13) {
-            Interface::SetMapMenuVisible(1, 0);
+            Interface::SetMapMenuVisible(true, false);
         }
         else {
-            Interface::SetInventoryMenuVisible(1, 0, 1);
+            Interface::SetInventoryMenuVisible(true, false, true);
         }
-        return 1;
+        return true;
     }
     if (aiButton == 4) {
         epage = GetCurrentPage();
@@ -652,7 +652,7 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
             SetCurrentPage(StatsMenu::SM_GENERAL);
         }
         pTiles[0]->PlayTileSound(4043);
-        return 1;
+        return true;
     }
     if (aiButton == 3) {
         epage_2 = GetCurrentPage();
@@ -664,12 +664,12 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
             SetCurrentPage(v30);
         }
         pTiles[0]->PlayTileSound(4043);
-        return 1;
+        return true;
     }
     if (GetCurrentPage() == StatsMenu::SM_GENERAL) {
         if (aiButton == 11) {
-            DoClick(49, 0);
-            return 1;
+            DoClick(49, nullptr);
+            return true;
         }
         goto LABEL_86;
     }
@@ -719,8 +719,8 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
                 float afAmount = static_cast<double>(idelta) * *v11;
                 InterfaceManager* v12 = InterfaceManager::Instance();
                 FOPipboyManager* v13 = v12->GetPipboy();
-                v13->MoveKnob(FOPipboyManager::KNOB_SCROLL, afAmount, afRatea, 1);
-                return 1;
+                v13->MoveKnob(FOPipboyManager::KNOB_SCROLL, afAmount, afRatea, true);
+                return true;
             }
         LABEL_86:;
             if (Interface::Has360Controller() &&
@@ -745,7 +745,7 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
                     }
                     int32_t iUT_CurrentValue = Tile::TextToTrait("_current_value");
                     int32_t icurrScrollbarValue = static_cast<int32_t>(Time->GetFloat(iUT_CurrentValue));
-                    Time->Set(iUT_CurrentValue, static_cast<float>(iscrollDelta + icurrScrollbarValue), 0);
+                    Time->Set(iUT_CurrentValue, static_cast<float>(iscrollDelta + icurrScrollbarValue), false);
                     if (static_cast<double>(icurrScrollbarValue) != Time->GetFloat(iUT_CurrentValue)) {
                         int32_t v18 = Tile::TextToTrait("_SetInCode");
                         Time->Poke(v18, 1.0f);
@@ -764,41 +764,41 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
                     }
                 }
             }
-            return 0;
+            return false;
         }
         case 9: {
             StatsMenu::StatusPage StatusPage = GetStatusPage();
             if (StatusPage) {
                 if (StatusPage == StatsMenu::SM_STATUS_RADS) {
-                    DoClick(11, 0);
-                    return 1;
+                    DoClick(11, nullptr);
+                    return true;
                 }
                 else {
-                    return 0;
+                    return false;
                 }
             }
             else {
-                DoClick(10, 0);
-                return 1;
+                DoClick(10, nullptr);
+                return true;
             }
         }
         case 11: {
             StatsMenu::StatusPage v27 = GetStatusPage();
             if (v27) {
                 if (v27 != StatsMenu::SM_STATUS_RADS) {
-                    return 0;
+                    return false;
                 }
                 goto LABEL_77;
             }
             if (this->bLimbMode || !pTiles[9]->IsTrue(4015)) {
-                return 0;
+                return false;
             }
             else {
-                DoClick(9, 0);
+                DoClick(9, nullptr);
                 BSAudio* v14 = &BSAudio::QInstance();
                 BSSoundHandle* v26 = v14->GetSoundHandleByName(&arHandle, "UIMenuOK", 289u);
-                v26->Play(0);
-                return 1;
+                v26->Play(false);
+                return true;
             }
         }
         case 12: {
@@ -806,21 +806,21 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
             v25 = GetStatusPage();
             if (v25) {
                 if (v25 != StatsMenu::SM_STATUS_RADS) {
-                    return 0;
+                    return false;
                 }
             LABEL_77:;
-                DoClick(31, 0);
-                return 1;
+                DoClick(31, nullptr);
+                return true;
             }
             if (pTiles[9]->IsTrue(4015)) {
-                DoClick(59, 0);
+                DoClick(59, nullptr);
                 BSAudio* v15 = &BSAudio::QInstance();
                 BSSoundHandle* v24 = v15->GetSoundHandleByName(&th_s, "UIMenuOK", 289u);
-                v24->Play(0);
-                return 1;
+                v24->Play(false);
+                return true;
             }
             else {
-                return 0;
+                return false;
             }
         }
         default: {
@@ -832,13 +832,13 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
 bool StatsMenu::DoGamepadUpEvent(int32_t aiButton, float afValue) {
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (!bLimbMode || (aiButton != 10 || !pTiles[9]->IsTrue(4015))) {
-        return 0;
+        return false;
     }
-    DoClick(9, 0);
+    DoClick(9, nullptr);
     BSAudio* v3 = &BSAudio::QInstance();
     BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "UIMenuOK", 289u);
-    SoundHandleByName->Play(0);
-    return 1;
+    SoundHandleByName->Play(false);
+    return true;
 }
 
 void StatsMenu::DoControllerSwitch(bool abHas360Controller) {
@@ -1176,9 +1176,7 @@ void StatsMenu::UpdateActiveEffects() {
         // Timed effects, diseases, enchantments, addictions and conditional abilities that change a named actor
         // value are listed; other effects only when they show their name.
         if (activeEffect->pEffect->IsActorValueUsed() &&
-            ActorValue::GetActorValueAbbreviation(
-                static_cast<ActorValue::Index>(activeEffect->pEffect->GetActorValueIndex())
-            ) &&
+            ActorValue::GetActorValueAbbreviation(activeEffect->pEffect->GetActorValueIndex()) &&
             (activeEffect->fDuration != 0.0 || activeEffect->eSpellType == MagicSystem::DISEASE ||
              activeEffect->eSpellType == MagicSystem::ENCHANTMENT ||
              activeEffect->eSpellType == MagicSystem::ADDICTION ||
@@ -1200,14 +1198,12 @@ void StatsMenu::UpdateActiveEffects() {
             tile->Set(Tile::kTileValue_ListIndex, index);
             ++index;
             text = "stats_rad_effect_";
-            text += ActorValue::GetActorValueAbbreviation(static_cast<ActorValue::Index>(node->GetItem()->iActorValue));
+            text += ActorValue::GetActorValueAbbreviation(node->GetItem()->iActorValue);
             tile->SetName(text);
             text.SPrintF("%+d", node->GetItem()->iMagnitude);
             tile->Set(Tile::kTileValue_String, text.pString, true);
             tile->Set(
-                Tile::kTileValue_User1,
-                ActorValue::GetActorValueAbbreviation(static_cast<ActorValue::Index>(node->GetItem()->iActorValue)),
-                true
+                Tile::kTileValue_User1, ActorValue::GetActorValueAbbreviation(node->GetItem()->iActorValue), true
             );
         }
         this->pTiles[eRadEffects]->Set(Tile::kTileValue_Visible, 1);
@@ -1224,14 +1220,12 @@ void StatsMenu::UpdateActiveEffects() {
             tile->Set(Tile::kTileValue_ListIndex, index);
             ++index;
             text = "stats_h20_effect_";
-            text += ActorValue::GetActorValueAbbreviation(static_cast<ActorValue::Index>(node->GetItem()->iActorValue));
+            text += ActorValue::GetActorValueAbbreviation(node->GetItem()->iActorValue);
             tile->SetName(text);
             text.SPrintF("%+d", node->GetItem()->iMagnitude);
             tile->Set(Tile::kTileValue_String, text.pString, true);
             tile->Set(
-                Tile::kTileValue_User1,
-                ActorValue::GetActorValueAbbreviation(static_cast<ActorValue::Index>(node->GetItem()->iActorValue)),
-                true
+                Tile::kTileValue_User1, ActorValue::GetActorValueAbbreviation(node->GetItem()->iActorValue), true
             );
         }
         this->pTiles[eH20Effects]->Set(Tile::kTileValue_Visible, 1);
@@ -1248,14 +1242,12 @@ void StatsMenu::UpdateActiveEffects() {
             tile->Set(Tile::kTileValue_ListIndex, index);
             ++index;
             text = "stats_hunger_effect_";
-            text += ActorValue::GetActorValueAbbreviation(static_cast<ActorValue::Index>(node->GetItem()->iActorValue));
+            text += ActorValue::GetActorValueAbbreviation(node->GetItem()->iActorValue);
             tile->SetName(text);
             text.SPrintF("%+d", node->GetItem()->iMagnitude);
             tile->Set(Tile::kTileValue_String, text.pString, true);
             tile->Set(
-                Tile::kTileValue_User1,
-                ActorValue::GetActorValueAbbreviation(static_cast<ActorValue::Index>(node->GetItem()->iActorValue)),
-                true
+                Tile::kTileValue_User1, ActorValue::GetActorValueAbbreviation(node->GetItem()->iActorValue), true
             );
         }
         this->pTiles[eFODEffects]->Set(Tile::kTileValue_Visible, 1);
@@ -1272,14 +1264,12 @@ void StatsMenu::UpdateActiveEffects() {
             tile->Set(Tile::kTileValue_ListIndex, index);
             ++index;
             text = "stats_sleep_effect_";
-            text += ActorValue::GetActorValueAbbreviation(static_cast<ActorValue::Index>(node->GetItem()->iActorValue));
+            text += ActorValue::GetActorValueAbbreviation(node->GetItem()->iActorValue);
             tile->SetName(text);
             text.SPrintF("%+d", node->GetItem()->iMagnitude);
             tile->Set(Tile::kTileValue_String, text.pString, true);
             tile->Set(
-                Tile::kTileValue_User1,
-                ActorValue::GetActorValueAbbreviation(static_cast<ActorValue::Index>(node->GetItem()->iActorValue)),
-                true
+                Tile::kTileValue_User1, ActorValue::GetActorValueAbbreviation(node->GetItem()->iActorValue), true
             );
         }
         this->pTiles[eSLPEffects]->Set(Tile::kTileValue_Visible, 1);
@@ -1330,11 +1320,7 @@ void StatsMenu::UpdateActiveEffects() {
              data = data->GetNext()) {
             if (data->GetItem()->iMagnitude) {
                 int32_t magnitude = data->GetItem()->iMagnitude;
-                text.SPrintF(
-                    "%s %+d",
-                    ActorValue::GetActorValueAbbreviation(static_cast<ActorValue::Index>(data->GetItem()->iActorValue)),
-                    magnitude
-                );
+                text.SPrintF("%s %+d", ActorValue::GetActorValueAbbreviation(data->GetItem()->iActorValue), magnitude);
                 effects += text;
                 if (data->GetNext()) {
                     effects += ", ";
@@ -1475,10 +1461,10 @@ void StatsMenu::UpdateH20Level() {
     float fh20 = BSMAX(static_cast<float>(0.0), a2);
     if (!(fh20 > 0.0) || !(fh20 < 1.0)) {
         float fh20_2 = BSRoundToNearest(fh20, 1.0f);
-        pMenu->Set(Tile::kTileValue_User11, fh20_2, static_cast<bool>(1));
+        pMenu->Set(Tile::kTileValue_User11, fh20_2, true);
     }
     else {
-        pMenu->Set(Tile::kTileValue_User11, static_cast<float>(1.0), static_cast<bool>(1));
+        pMenu->Set(Tile::kTileValue_User11, static_cast<float>(1.0), true);
     }
 }
 
@@ -1489,10 +1475,10 @@ void StatsMenu::UpdateFODLevel() {
     float fh20 = BSMAX(static_cast<float>(0.0), a2);
     if (!(fh20 > 0.0) || !(fh20 < 1.0)) {
         float fh20_2 = BSRoundToNearest(fh20, 1.0f);
-        pMenu->Set(Tile::kTileValue_User12, fh20_2, static_cast<bool>(1));
+        pMenu->Set(Tile::kTileValue_User12, fh20_2, true);
     }
     else {
-        pMenu->Set(Tile::kTileValue_User12, static_cast<float>(1.0), static_cast<bool>(1));
+        pMenu->Set(Tile::kTileValue_User12, static_cast<float>(1.0), true);
     }
 }
 
@@ -1503,10 +1489,10 @@ void StatsMenu::UpdateSLPLevel() {
     float fh20 = BSMAX(static_cast<float>(0.0), a2);
     if (!(fh20 > 0.0) || !(fh20 < 1.0)) {
         float fh20_2 = BSRoundToNearest(fh20, 1.0f);
-        pMenu->Set(Tile::kTileValue_User13, fh20_2, static_cast<bool>(1));
+        pMenu->Set(Tile::kTileValue_User13, fh20_2, true);
     }
     else {
-        pMenu->Set(Tile::kTileValue_User13, static_cast<float>(1.0), static_cast<bool>(1));
+        pMenu->Set(Tile::kTileValue_User13, static_cast<float>(1.0), true);
     }
 }
 
@@ -1563,19 +1549,19 @@ void StatsMenu::SetIconAndDescription(PerkRankData* apPerkRankData) {
     int32_t v2 = Tile::TextToTrait("_ScrollDelta");
     float fscrollDelta = pscrollbar->GetFloat(v2);
     pTiles[25]->Set(4003, 1);
-    pTiles[25]->Set(4044, apPerkRankData->pPerk->GetTextureName(), 1);
-    const char* v3 = apPerkRankData->pPerk->GetDescription(0, DESC_ID);
-    pdescText->Set(4036, v3, 1);
-    pdescText->UpdateTile(0);
+    pTiles[25]->Set(4044, apPerkRankData->pPerk->GetTextureName(), true);
+    const char* v3 = apPerkRankData->pPerk->GetDescription(nullptr, DESC_ID);
+    pdescText->Set(4036, v3, true);
+    pdescText->UpdateTile(false);
     double Float = pdescText->GetFloat(4016);
     float fheightDifference = Float - pdescText->pParent->GetFloat(4016);
     float fheightDifference_2 = BSMAX(0.0f, fheightDifference);
     float v8 = fheightDifference_2 / fscrollDelta;
     float v7 = std::ceil(v8) + 1.0;
     int32_t v4 = Tile::TextToTrait("_number_of_items");
-    pscrollbar->Set(v4, v7, 1);
+    pscrollbar->Set(v4, v7, true);
     int32_t v5 = Tile::TextToTrait("_current_value");
-    pscrollbar->Set(v5, 0.0f, 0);
+    pscrollbar->Set(v5, 0.0f, false);
     int32_t v6 = Tile::TextToTrait("_SetInCode");
     pscrollbar->Poke(v6, 1.0);
 }
@@ -1583,13 +1569,13 @@ void StatsMenu::SetIconAndDescription(PerkRankData* apPerkRankData) {
 void StatsMenu::SetReputation(TESReputation* pRep) {
     if (pRep) {
         const char* ReputationMainIcon = pRep->GetReputationMainIcon();
-        pTiles[47]->Set(4044, ReputationMainIcon, 1);
+        pTiles[47]->Set(4044, ReputationMainIcon, true);
         pTiles[47]->Set(4003, 1);
         pTiles[48]->Set(4003, 1);
         pTiles[51]->Set(4003, 1);
-        pTiles[51]->Set(4036, pRep->GetFullName(), 1);
+        pTiles[51]->Set(4036, pRep->GetFullName(), true);
         const char* ReputationTitle = pRep->GetReputationTitle();
-        pTiles[48]->Set(4036, ReputationTitle, 1);
+        pTiles[48]->Set(4036, ReputationTitle, true);
     }
 }
 
@@ -1601,7 +1587,7 @@ uint32_t StatsMenu::MoveKnob(Tile* apTarget, uint32_t& aiLastIndex) {
             float afAmounta = -fScrollKnobIncrement.Float();
             InterfaceManager* v5 = InterfaceManager::Instance();
             FOPipboyManager* Pipboy = v5->GetPipboy();
-            Pipboy->MoveKnob(FOPipboyManager::KNOB_SCROLL, afAmounta, afRatea, 1);
+            Pipboy->MoveKnob(FOPipboyManager::KNOB_SCROLL, afAmounta, afRatea, true);
         }
     }
     else {
@@ -1609,7 +1595,7 @@ uint32_t StatsMenu::MoveKnob(Tile* apTarget, uint32_t& aiLastIndex) {
         float afAmount = fScrollKnobIncrement.Float();
         InterfaceManager* v3 = InterfaceManager::Instance();
         FOPipboyManager* v4 = v3->GetPipboy();
-        v4->MoveKnob(FOPipboyManager::KNOB_SCROLL, afAmount, afRate, 1);
+        v4->MoveKnob(FOPipboyManager::KNOB_SCROLL, afAmount, afRate, true);
     }
     aiLastIndex = Float;
     return Float;
@@ -1628,54 +1614,54 @@ void StatsMenu::UpdateAll() {
     const char* v1 = sLanguage.String();
     if (BSstrcmp(v1, "ENGLISH")) {
         const char* v2 = sStatsStatus.String();
-        pTiles[0]->Set(4036, v2, static_cast<bool>(1));
+        pTiles[0]->Set(4036, v2, true);
         const char* v3 = sStatsSpecial.String();
-        pTiles[1]->Set(4036, v3, static_cast<bool>(1));
+        pTiles[1]->Set(4036, v3, true);
         const char* v4 = sStatsSkills.String();
-        pTiles[2]->Set(4036, v4, static_cast<bool>(1));
+        pTiles[2]->Set(4036, v4, true);
         const char* v5 = sStatsPerks.String();
-        pTiles[3]->Set(4036, v5, static_cast<bool>(1));
+        pTiles[3]->Set(4036, v5, true);
         const char* v6 = sStatsGeneral.String();
-        pTiles[4]->Set(4036, v6, static_cast<bool>(1));
+        pTiles[4]->Set(4036, v6, true);
         const char* v7 = sStatsCNDAbbrev.String();
-        pTiles[28]->Set(4036, v7, static_cast<bool>(1));
+        pTiles[28]->Set(4036, v7, true);
         const char* v8 = sStatsRADAbbrev.String();
-        pTiles[29]->Set(4036, v8, static_cast<bool>(1));
+        pTiles[29]->Set(4036, v8, true);
         const char* v9 = sStatsH20Abbrev.String();
-        pTiles[53]->Set(4036, v9, static_cast<bool>(1));
+        pTiles[53]->Set(4036, v9, true);
         const char* v10 = sStatsSLPAbbrev.String();
-        pTiles[57]->Set(4036, v10, static_cast<bool>(1));
+        pTiles[57]->Set(4036, v10, true);
         const char* v11 = sStatsFODAbbrev.String();
-        pTiles[55]->Set(4036, v11, static_cast<bool>(1));
+        pTiles[55]->Set(4036, v11, true);
         const char* v12 = sStatsCrippled.String();
-        pMenu->Set(Tile::kTileValue_User9, v12, static_cast<bool>(1));
+        pMenu->Set(Tile::kTileValue_User9, v12, true);
         const char* v13 = sStatsEFFAbbrev.String();
-        pMenu->Set(Tile::kTileValue_User10, v13, static_cast<bool>(1));
+        pMenu->Set(Tile::kTileValue_User10, v13, true);
         const char* v25 = sStats.String();
         Tile* ChildByName = pMenu->GetChildByName("stats_title");
-        ChildByName->Set(4036, v25, static_cast<bool>(1));
+        ChildByName->Set(4036, v25, true);
         const char* v26 = sStatsLVLAbbrev.String();
         int32_t v21 = Tile::TextToTrait("_Title");
         Tile* v15 = pMenu->GetChildByName("stats_lvl_info");
-        v15->Set(v21, v26, static_cast<bool>(1));
+        v15->Set(v21, v26, true);
         const char* v27 = sStatsHP.String();
         int32_t v22 = Tile::TextToTrait("_Title");
         Tile* v16 = pMenu->GetChildByName("stats_hp_info");
-        v16->Set(v22, v27, static_cast<bool>(1));
+        v16->Set(v22, v27, true);
         const char* v28 = sStatsAP.String();
         int32_t v23 = Tile::TextToTrait("_Title");
         Tile* v17 = pMenu->GetChildByName("stats_ap_info");
-        v17->Set(v23, v28, static_cast<bool>(1));
+        v17->Set(v23, v28, true);
         const char* v29 = sStatsXP.String();
         int32_t v24 = Tile::TextToTrait("_Title");
         Tile* v18 = pMenu->GetChildByName("stats_xp_info");
-        v18->Set(v24, v29, static_cast<bool>(1));
+        v18->Set(v24, v29, true);
         const char* v30 = sStatsRadResist.String();
         Tile* v19 = pMenu->GetChildByName("stats_rad_resist_label");
-        v19->Set(4036, v30, static_cast<bool>(1));
+        v19->Set(4036, v30, true);
         const char* v31 = sStatsNoEffects.String();
         Tile* v20 = pMenu->GetChildByName("stats_no_effects");
-        v20->Set(4036, v31, static_cast<bool>(1));
+        v20->Set(4036, v31, true);
     }
 }
 
@@ -1693,7 +1679,7 @@ void StatsMenu::UpdateReputations() {
                         BSStringT<char> strtmp;
                         strtmp.SPrintF("%s", pRepItem->GetFullName());
                         char* v1 = strtmp.pString;
-                        StatsMenu::pMe->lbReputation.AddItem(pRepItem, v1, &StatsMenu::ReputationListSortFn, 0);
+                        StatsMenu::pMe->lbReputation.AddItem(pRepItem, v1, &StatsMenu::ReputationListSortFn, nullptr);
                     }
                 }
             }
@@ -1724,31 +1710,31 @@ bool StatsMenu::GetPageFor(StatsMenu::TileIndex aeIndex, StatsMenu::Page& aePage
     switch (aeIndex) {
         case StatsMenu::eStatusButton: {
             aePage = StatsMenu::SM_STATUS;
-            result = 1;
+            result = true;
             break;
         }
         case StatsMenu::eSpecialButton: {
             aePage = StatsMenu::SM_SPECIAL;
-            result = 1;
+            result = true;
             break;
         }
         case StatsMenu::eSkillsButton: {
             aePage = StatsMenu::SM_SKILLS;
-            result = 1;
+            result = true;
             break;
         }
         case StatsMenu::ePerksButton: {
             aePage = StatsMenu::SM_PERKS;
-            result = 1;
+            result = true;
             break;
         }
         case StatsMenu::eGeneralButton: {
             aePage = StatsMenu::SM_GENERAL;
-            result = 1;
+            result = true;
             break;
         }
         default: {
-            result = 0;
+            result = false;
             break;
         }
     }
@@ -1760,36 +1746,36 @@ bool StatsMenu::GetStatusPageFor(StatsMenu::TileIndex aeIndex, StatsMenu::Status
     switch (aeIndex) {
         case StatsMenu::eConditionButton: {
             aePage = StatsMenu::SM_STATUS_CONDITION;
-            result = 1;
+            result = true;
             break;
         }
         case StatsMenu::eRadsButton: {
             aePage = StatsMenu::SM_STATUS_RADS;
-            result = 1;
+            result = true;
             break;
         }
         case StatsMenu::eEffectsButton: {
             aePage = StatsMenu::SM_STATUS_EFFECTS;
-            result = 1;
+            result = true;
             break;
         }
         case StatsMenu::eH20Button: {
             aePage = StatsMenu::SM_STATUS_H20;
-            result = 1;
+            result = true;
             break;
         }
         case StatsMenu::eFODButton: {
             aePage = StatsMenu::SM_STATUS_FOD;
-            result = 1;
+            result = true;
             break;
         }
         case StatsMenu::eSLPButton: {
             aePage = StatsMenu::SM_STATUS_SLP;
-            result = 1;
+            result = true;
             break;
         }
         default: {
-            result = 0;
+            result = false;
             break;
         }
     }
@@ -1806,12 +1792,12 @@ void StatsMenu::ToggleGenRepMode() {
     StatsMenu::pMe->pTiles[8]->Set(4003, static_cast<int32_t>(g_StatsMenuIsShowGeneralNotReputation == 0));
     if (g_StatsMenuIsShowGeneralNotReputation) {
         const char* v1 = sStatsGeneral.String();
-        StatsMenu::pMe->pTiles[49]->Set(4036, v1, 1);
+        StatsMenu::pMe->pTiles[49]->Set(4036, v1, true);
         StatsMenu::pMe->pTiles[50]->Set(Tile::kTileValue_User0, 1);
     }
     else {
         const char* v2 = sReputationButton.String();
-        StatsMenu::pMe->pTiles[49]->Set(4036, v2, 1);
+        StatsMenu::pMe->pTiles[49]->Set(4036, v2, true);
         StatsMenu::pMe->pTiles[50]->Set(Tile::kTileValue_User0, 0);
     }
 }
@@ -2048,7 +2034,7 @@ void StatsMenu::UpdatePerks() {
     if (StatsMenu::pMe) {
         if (StatsMenu::pMe->pTiles[34]) {
             static_cast<ListBox<PerkRankData*>*>(&StatsMenu::pMe->lbPerks)->RemoveAll();
-            for (PerkRankData*& rpItem : pPlayer->GetPerkList(0)->ItemsUntilNull()) {
+            for (PerkRankData*& rpItem : pPlayer->GetPerkList(false)->ItemsUntilNull()) {
                 if (!rpItem->pPerk->IsPerkHidden()) {
                     BSStringT<char> strtmp;
                     if (rpItem->cCurrentRank <= 1u) {
@@ -2060,7 +2046,7 @@ void StatsMenu::UpdatePerks() {
                     }
                     char* v1 = strtmp.pString;
                     PerkRankData* m_item = rpItem;
-                    StatsMenu::pMe->lbPerks.AddItem(m_item, v1, &StatsMenu::PerkListSortFn, 0);
+                    StatsMenu::pMe->lbPerks.AddItem(m_item, v1, &StatsMenu::PerkListSortFn, nullptr);
                 }
             }
         }
@@ -2104,8 +2090,8 @@ void StatsMenu::SkillsUpdateFn(Tile* apTile, ActorValue::Index aeIndex) {
     }
     int32_t current = static_cast<ActorValueOwner&>(*pPlayer).GetClampedActorValue(aeIndex);
     int32_t base = static_cast<ActorValueOwner&>(*pPlayer).GetPermanentActorValue(aeIndex);
-    float derivedCurrent = AiFormulas::AVDeriveSkill(pPlayer, aeIndex, 0);
-    float derivedBase = AiFormulas::AVDeriveSkill(pPlayer, aeIndex, 1);
+    float derivedCurrent = AiFormulas::AVDeriveSkill(pPlayer, aeIndex, false);
+    float derivedBase = AiFormulas::AVDeriveSkill(pPlayer, aeIndex, true);
     float derivedChange = derivedCurrent - derivedBase;
     int32_t change = current - base + FloatToInt(derivedChange);
     apTile->Set(Tile::kTileValue_User1, current);
@@ -2272,17 +2258,17 @@ bool DrBagTargetConditionCallback(StatsMenu::HealingOption& aHO) {
     if (aHO.pInventoryItem) {
         ActorValue::Index etargetAV = StatsMenu::GetTargetedBodyPart();
         if (!bIsHardcore && etargetAV != ActorValue::VALUE_NONE) {
-            return 0;
+            return false;
         }
         for (ActorValue::Index eav = ActorValue::PERCEPTION_CONDITION; eav < ActorValue::BRAIN_CONDITION;
              eav = static_cast<ActorValue::Index>(eav + 1)) {
             int32_t v2 = pPlayer->GetActorValue(eav);
             if (v2 < pPlayer->GetPermanentActorValue(eav)) {
-                return 1;
+                return true;
             }
         }
     }
-    return 0;
+    return false;
 }
 
 EffectSetting* ActiveEffect::GetEffectSetting() {

@@ -307,6 +307,6 @@ NiObject* NiUVData::CreateObject() {
         return ::new (pkObject) NiUVData;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

@@ -98,7 +98,7 @@ ActorPathHandler::PATH_HANDLER_RESULT VirtualActorPathHandler::Update(float afDe
                 if (iDoorResult == 1) {
                     TESWorldSpace* pWorldSpace = pActor->GetWorldSpace();
                     TESObjectCELL* pParentCell = pActor->GetParentCell();
-                    pActor->MoveActorAndFollowers(currentLoc, fangle, pParentCell, pWorldSpace, 1, 0);
+                    pActor->MoveActorAndFollowers(currentLoc, fangle, pParentCell, pWorldSpace, true, false);
                     return ActorPathHandler::PATH_HANDLER_RESULT_OK;
                 }
             }
@@ -106,7 +106,7 @@ ActorPathHandler::PATH_HANDLER_RESULT VirtualActorPathHandler::Update(float afDe
         else {
             TESWorldSpace* pWorldSpace = pActor->GetWorldSpace();
             TESObjectCELL* pParentCell = pActor->GetParentCell();
-            pActor->MoveActorAndFollowers(currentLoc, fangle, pParentCell, pWorldSpace, 1, 0);
+            pActor->MoveActorAndFollowers(currentLoc, fangle, pParentCell, pWorldSpace, true, false);
             if (pActor->GetDesiredProcessLevel() == PROCESS_TYPE_HIGH && !pPlayer->IsSleepingorResting()) {
                 return ActorPathHandler::PATH_HANDLER_RESULT_OK;
             }
@@ -130,7 +130,7 @@ ActorPathHandler::PATH_HANDLER_RESULT VirtualActorPathHandler::Update(float afDe
     pActor->SetHeading(fangle_2);
     TESWorldSpace* pWorldSpace = pActor->GetWorldSpace();
     TESObjectCELL* pParentCell = pActor->GetParentCell();
-    pActor->MoveActorAndFollowers(currentLoc, fangle_2, pParentCell, pWorldSpace, 1, 0);
+    pActor->MoveActorAndFollowers(currentLoc, fangle_2, pParentCell, pWorldSpace, true, false);
     if (pActor->GetDesiredProcessLevel() == PROCESS_TYPE_HIGH && !pPlayer->IsSleepingorResting()) {
         return ActorPathHandler::PATH_HANDLER_RESULT_OK;
     }
@@ -158,10 +158,10 @@ float VirtualActorPathHandler::GetPercentTraveled() {
         return 0.0;
     }
     PathingSolution* v2 = (&spPath)->operator->();
-    if ((((uint32_t)iCurrentNodeIndex) >= v2->GetVirtualNodeCount()) || (fPathLength <= 0.0)) {
+    if ((iCurrentNodeIndex >= v2->GetVirtualNodeCount()) || (fPathLength <= 0.0)) {
         return 1.0;
     }
-    return (float)(fDistanceTraveled / fPathLength);
+    return (fDistanceTraveled / fPathLength);
 }
 
 NiPoint3 VirtualActorPathHandler::GetNextNodeLocation() {
@@ -184,17 +184,17 @@ NiPoint3 VirtualActorPathHandler::GetNextNodeLocation() {
 bool VirtualActorPathHandler::GetNodeLocation(uint32_t aiIndex, NiPoint3& arLocation) {
     NiPoint3 result;
     if (!spPath.operator->()) {
-        return 0;
+        return false;
     }
     PathingSolution* v3 = spPath.operator->();
     if (aiIndex >= v3->GetVirtualNodeCount()) {
-        return 0;
+        return false;
     }
     PathingSolution* v4 = spPath.operator->();
     VirtualPathingNode* VirtualNode = v4->GetVirtualNode(aiIndex);
     PathingLocation* ActorPackageThatIsRunning = static_cast<PathingLocation*>(&VirtualNode->GetLocation());
     arLocation = (result = ActorPackageThatIsRunning->GetLocation());
-    return 1;
+    return true;
 }
 
 // The path length not yet travelled, at least 0.
@@ -220,7 +220,7 @@ uint32_t VirtualActorPathHandler::GetMoveMode() {
 
 bool VirtualActorPathHandler::GetMoveDelta(NiPoint3& aDelta) {
     aDelta = NiPoint3_ZERO;
-    return (bool)0;
+    return false;
 }
 
 void VirtualActorPathHandler::PrintCurrentStatus(
@@ -272,7 +272,7 @@ int32_t VirtualActorPathHandler::UseDoorAtNode(NiPoint3& aNewLoc) {
     }
     TESObjectREFR* pdoor = spPath.m_pObject->GetVirtualNode(iCurrentNodeIndex)->pDoorRef;
     ++iCurrentNodeIndex;
-    if (pdoor && !pdoor->Activate(this->pActor, 0, 0, 1)) {
+    if (pdoor && !pdoor->Activate(this->pActor, false, nullptr, 1)) {
         return -1;
     }
     if (spPath.m_pObject && iCurrentNodeIndex < spPath.m_pObject->GetVirtualNodeCount()) {

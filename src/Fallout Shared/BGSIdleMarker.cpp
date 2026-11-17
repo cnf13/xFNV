@@ -108,7 +108,7 @@ void BGSIdleMarker::Save() {
 void BGSIdleMarker::InitItem() {
     if (!TESForm::GetInitialized()) {
         static_cast<BGSIdleCollection*>(this)->InitItem(this);
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 

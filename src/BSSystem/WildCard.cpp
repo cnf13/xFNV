@@ -107,7 +107,7 @@ int32_t WildCard::RecMatch(const char* apString, const char* apPattern) {
                                         ++v18;
                                     }
                                 }
-                                v15 = 0;
+                                v15 = false;
                                 v18 = 0;
                             }
                             else {
@@ -115,7 +115,7 @@ int32_t WildCard::RecMatch(const char* apString, const char* apPattern) {
                             }
                         }
                         else {
-                            v15 = 1;
+                            v15 = true;
                         }
                         ++apPatterna;
                     }
@@ -199,10 +199,10 @@ bool WildCard::IsWild(const char* apPattern) {
         else {
             v3 = *apPattern;
             if (((*apPattern) == 63) || ((v3 == 91) || ((v3 == 93) || ((v3 == 42) || (v3 == 94))))) {
-                return (bool)1;
+                return true;
             }
         }
         ++apPattern;
     }
-    return (bool)0;
+    return false;
 }

@@ -89,32 +89,32 @@ void hkpWeldingUtility::initWeldingTable(float edgeNormalSnapDeltaAngle, float t
             kEntry.m_cosAccept0 = 1.0f;
             kEntry.m_sinAccept0 = 0.0f;
             if (fSnap > triangleNormalSnapDeltaAngle) {
-                kEntry.m_cosSnap0 = static_cast<float>(std::cos(triangleNormalSnapDeltaAngle));
+                kEntry.m_cosSnap0 = std::cos(triangleNormalSnapDeltaAngle);
             }
             else {
                 float fClamped = (0.0f < fSnap) ? fSnap : 0.0f;
-                kEntry.m_cosSnap0 = static_cast<float>(std::cos(fClamped));
+                kEntry.m_cosSnap0 = std::cos(fClamped);
             }
             float fClamped = (fSnap > 0.0f) ? fSnap : 0.0f;
-            kEntry.m_cosSnap1 = static_cast<float>(std::cos(fClamped));
-            kEntry.m_cosAccept1 = static_cast<float>(std::cos(fBound));
-            kEntry.m_sinAccept1 = static_cast<float>(std::sin(fBound));
+            kEntry.m_cosSnap1 = std::cos(fClamped);
+            kEntry.m_cosAccept1 = std::cos(fBound);
+            kEntry.m_sinAccept1 = std::sin(fBound);
         }
         else {
-            kEntry.m_cosAccept0 = static_cast<float>(std::cos(fAngle));
-            kEntry.m_sinAccept0 = static_cast<float>(std::sin(fAngle));
+            kEntry.m_cosAccept0 = std::cos(fAngle);
+            kEntry.m_sinAccept0 = std::sin(fAngle);
             double dSum = static_cast<double>(fAngle) + static_cast<double>(edgeNormalSnapDeltaAngle);
             float fSum = static_cast<float>(dSum);
             float fSnap0 = (fSum < 3.1415927410125732) ? fSum : 3.1415927f;
-            kEntry.m_cosSnap0 = static_cast<float>(std::cos(fSnap0));
+            kEntry.m_cosSnap0 = std::cos(fSnap0);
             float fSumRounded = static_cast<float>(dSum);
             float fUpper = static_cast<float>(3.1415927410125732 - static_cast<double>(triangleNormalSnapDeltaAngle));
             if (fUpper > fSumRounded) {
-                kEntry.m_cosSnap1 = static_cast<float>(std::cos(fUpper));
+                kEntry.m_cosSnap1 = std::cos(fUpper);
             }
             else {
                 float fSnap1 = (fSumRounded < 3.1415927410125732) ? fSumRounded : 3.1415927f;
-                kEntry.m_cosSnap1 = static_cast<float>(std::cos(fSnap1));
+                kEntry.m_cosSnap1 = std::cos(fSnap1);
             }
             kEntry.m_cosAccept1 = -1.0f;
             kEntry.m_sinAccept1 = 0.0f;

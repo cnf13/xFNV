@@ -50,55 +50,56 @@ void ImageSpaceEffectTV::Setup(ImageSpaceManager* apManager, ImageSpaceEffectPar
     NiTPrimitiveArray<ImageSpaceTexture*>* pTextureList = &pTextures;
     pTextures.SetSize(4u);
     BSShaderManager::GetTexture(
-        "Data\\Textures\\Pipboy3000\\PipboyDistortEffectMap.dds", 1, ImageSpaceEffectTV::spDistortTexture, 0, 0
+        "Data\\Textures\\Pipboy3000\\PipboyDistortEffectMap.dds", true, ImageSpaceEffectTV::spDistortTexture, false,
+        false
     );
     BSShaderManager::GetTexture(
-        "Data\\Textures\\Pipboy3000\\PipboyScanlines.dds", 1, ImageSpaceEffectTV::spScanlinesTexture, 0, 0
+        "Data\\Textures\\Pipboy3000\\PipboyScanlines.dds", true, ImageSpaceEffectTV::spScanlinesTexture, false, false
     );
     NiTexture* pDistortTexture = ImageSpaceEffectTV::spDistortTexture.m_pObject;
     NiTexture* pScanlineTexture = ImageSpaceEffectTV::spScanlinesTexture.m_pObject;
     ImageSpaceTexture* pTexture =
         static_cast<ImageSpaceTexture*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceTexture)));
     if (pTexture) {
-        pTexture->bForceAniso = 0;
-        pTexture->bIsRenderedTexture = 0;
-        pTexture->bIsTextureBorrowed = 0;
-        pTexture->spTexture = 0;
+        pTexture->bForceAniso = false;
+        pTexture->bIsRenderedTexture = false;
+        pTexture->bIsTextureBorrowed = false;
+        pTexture->spTexture = nullptr;
         pTexture->eFilterMode = 0;
         pTexture->eClampMode = 0;
     }
     else {
-        pTexture = 0;
+        pTexture = nullptr;
     }
     pTextureList->SetAt(1u, pTexture);
     pTextures.m_pBase[1]->SetClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
-    pTextures.m_pBase[1]->SetTexture(static_cast<NiTexture*>(0));
+    pTextures.m_pBase[1]->SetTexture(static_cast<NiTexture*>(nullptr));
     pTexture = static_cast<ImageSpaceTexture*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceTexture)));
     if (pTexture) {
-        pTexture->bForceAniso = 0;
-        pTexture->bIsRenderedTexture = 0;
-        pTexture->bIsTextureBorrowed = 0;
-        pTexture->spTexture = 0;
+        pTexture->bForceAniso = false;
+        pTexture->bIsRenderedTexture = false;
+        pTexture->bIsTextureBorrowed = false;
+        pTexture->spTexture = nullptr;
         pTexture->eFilterMode = 0;
         pTexture->eClampMode = 0;
     }
     else {
-        pTexture = 0;
+        pTexture = nullptr;
     }
     pTextureList->SetAt(2u, pTexture);
     pTextures.m_pBase[2]->SetClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
     pTextures.m_pBase[2]->SetTexture(pDistortTexture);
     pTexture = static_cast<ImageSpaceTexture*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceTexture)));
     if (pTexture) {
-        pTexture->bForceAniso = 0;
-        pTexture->bIsRenderedTexture = 0;
-        pTexture->bIsTextureBorrowed = 0;
-        pTexture->spTexture = 0;
+        pTexture->bForceAniso = false;
+        pTexture->bIsRenderedTexture = false;
+        pTexture->bIsTextureBorrowed = false;
+        pTexture->spTexture = nullptr;
         pTexture->eFilterMode = 0;
         pTexture->eClampMode = 0;
     }
     else {
-        pTexture = 0;
+        pTexture = nullptr;
     }
     pTextureList->SetAt(3u, pTexture);
     pTextures.m_pBase[3]->SetClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
@@ -130,11 +131,11 @@ void ImageSpaceEffectTV::Setup(ImageSpaceManager* apManager, ImageSpaceEffectPar
         pparam = ::new (pMemory) ImageSpaceShaderParam;
     }
     else {
-        pparam = 0;
+        pparam = nullptr;
     }
     pparam->InitConstantMap(0, 5);
-    pparam->bUseTexOffset[1] = 0;
-    pparam->bUseTexOffset[2] = 0;
+    pparam->bUseTexOffset[1] = false;
+    pparam->bUseTexOffset[2] = false;
     pparam->SetPixelConstant(0, foffsetx, foffsety, 0.0f, 0.0f);
     pparam->SetPixelConstant(1, ImageSpaceEffectTV::fPulse, 0.0f, 0.0f, 0.0f);
     pparam->SetPixelConstant(
@@ -200,5 +201,5 @@ bool ImageSpaceEffectTV::UpdateParams(ImageSpaceEffectParam* pParam) {
     m_pObject->SetPixelConstant(
         4, ImageSpaceEffectTV::Tint.r, ImageSpaceEffectTV::Tint.g, ImageSpaceEffectTV::Tint.b, 1.0
     );
-    return 0;
+    return false;
 }

@@ -417,7 +417,7 @@ void CIndexedGeometry::DeleteIndexData() {
                 break;
             }
             ourFree(m_vStrips[i][j]);
-            m_vStrips[i][j] = 0;
+            m_vStrips[i][j] = nullptr;
         }
         m_vStrips[i].clear();
     }

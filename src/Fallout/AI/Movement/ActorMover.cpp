@@ -217,7 +217,7 @@ void ActorMover::ClearMoveModePreference(uint32_t auiPreferredMoveMode) {
 }
 
 void ActorMover::ForceMoveMode(uint32_t aiMoveMode) {
-    bForceMoveMode = (bool)1;
+    bForceMoveMode = true;
     uiForcedMoveMode = aiMoveMode;
 }
 
@@ -229,11 +229,11 @@ void ActorMover::ClearForcedMoveMode() {
 void ActorMover::Update(float fdeltaT) {
     BaseProcess* pprocess;
     if (bStopMovementNextUpdate) {
-        bStopCurrentMoveAnim = 1;
-        FinishMoving(1);
-        bStopMovementNextUpdate = 0;
+        bStopCurrentMoveAnim = true;
+        FinishMoving(true);
+        bStopMovementNextUpdate = false;
     }
-    if (pActor->IsDead(0)) {
+    if (pActor->IsDead(false)) {
         if (pCurrentPathHandler) {
             pCurrentPathHandler->ClearMovement();
         }
@@ -248,7 +248,7 @@ void ActorMover::Update(float fdeltaT) {
                  (!pActor->IsKnockedOut() &&
                   (pprocess->GetKnockState() == KNOCK_STATE_NORMAL && !pprocess->GetCurrentlyReanimating())))) {
                 if (bActorChangedProcessLevel) {
-                    bActorChangedProcessLevel = 0;
+                    bActorChangedProcessLevel = false;
                     HandleProcessLevelChange();
                 }
                 if (!bPathingFailed) {
@@ -275,7 +275,7 @@ void ActorMover::Update(float fdeltaT) {
                                 }
                                 else {
                                     eState = ACTOR_MOVER_STATE_FAILED;
-                                    SetPathingFailed(1);
+                                    SetPathingFailed(true);
                                     if (spCurrentPath.m_pObject) {
                                         uint32_t ilastLoadedVirtualNodeIndex =
                                             spCurrentPath.m_pObject->iLastLoadedVirtualNodeIndex;
@@ -453,7 +453,7 @@ void ActorMover::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v10 = ::new (v15) PathingSolution;
         }
         else {
-            v10 = 0;
+            v10 = nullptr;
         }
         spCurrentPath.operator=(v10);
         spCurrentPath.m_pObject->LoadGame(apLoadGameBuffer);
@@ -483,7 +483,7 @@ void ActorMover::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v9 = ::new (apMemory) VirtualActorPathHandler(pActor, this, spCurrentPath, spCurrentRequest.m_pObject);
         }
         else {
-            v9 = 0;
+            v9 = nullptr;
         }
         pCurrentPathHandler = (ActorPathHandler*)v9;
     }
@@ -496,7 +496,7 @@ void ActorMover::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 v8 = ::new (v13) DetailedActorPathHandler(pActor, this, spCurrentPath, spCurrentRequest.m_pObject);
             }
             else {
-                v8 = 0;
+                v8 = nullptr;
             }
             pCurrentPathHandler = (ActorPathHandler*)v8;
         }
@@ -507,7 +507,7 @@ void ActorMover::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (v20) {
         ClearCurrentData();
         eState = ACTOR_MOVER_STATE_FAILED;
-        SetPathingFailed(1);
+        SetPathingFailed(true);
     }
 }
 
@@ -582,30 +582,30 @@ void ActorMover::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
             v2 = ::new (apMemory) ActorPathingMessageQueue;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         spMessageQueue.operator=(v2);
     }
     eState = ACTOR_MOVER_STATE_INVALID;
-    spCurrentRequest.operator=(static_cast<PathingRequest*>(0));
-    spCurrentPath.operator=(static_cast<PathingSolution*>(0));
+    spCurrentRequest.operator=(static_cast<PathingRequest*>(nullptr));
+    spCurrentPath.operator=(static_cast<PathingSolution*>(nullptr));
     if (pCurrentPathHandler) {
         delete pCurrentPathHandler;
     }
-    pCurrentPathHandler = 0;
+    pCurrentPathHandler = nullptr;
     uiPreferredMoveMode = 257;
-    SetPathingFailed(0);
+    SetPathingFailed(false);
     iPreviousNode = -1;
     iNextNode = -1;
-    bActorChangedProcessLevel = 0;
-    bStopMovementNextUpdate = 0;
+    bActorChangedProcessLevel = false;
+    bStopMovementNextUpdate = false;
     bWaitingForPath = 0;
-    bInDialog = 0;
+    bInDialog = false;
     LookAtPoint = NiPoint3_ZERO;
     CachedMoveDelta = NiPoint3_ZERO;
-    bFaceTargetPoint = 0;
+    bFaceTargetPoint = false;
     bForceMoveMode = 0;
-    bStopCurrentMoveAnim = 0;
+    bStopCurrentMoveAnim = false;
     bHaveValidDeltaThisFrame = 0;
     uiForcedMoveMode = 0;
     iCachedLastValidMoveMode = 0;
@@ -633,17 +633,17 @@ void ActorMover::RemoveReference(TESObjectREFR* apReference) {
 
 bool ActorMover::GetCurrentGoal(PathingLocation* apRetLocation) {
     if (!spCurrentPath.m_pObject) {
-        return 0;
+        return false;
     }
     if (!spCurrentPath.m_pObject->IsValid()) {
-        return 0;
+        return false;
     }
     VirtualPathingNode* pnode = spCurrentPath.m_pObject->GetLastVirtualNode();
     if (!pnode) {
-        return 0;
+        return false;
     }
     apRetLocation->operator=(*&pnode->Location);
-    return 1;
+    return true;
 }
 
 uint32_t ActorMover::GetCurrentNodeIndex() {
@@ -660,7 +660,7 @@ bool ActorMover::GetLocationAt(uint32_t auiNodeIndex, NiPoint3* apLocation) {
 
 void ActorMover::SetLookAtTarget(NiPoint3 aPoint) {
     LookAtPoint = aPoint;
-    bFaceTargetPoint = 1;
+    bFaceTargetPoint = true;
     if (pActor->GetCurrentProcessType() == PROCESS_TYPE_HIGH) {
         if (!pCurrentPathHandler) {
             DetailedActorPathHandler* v2;
@@ -670,7 +670,7 @@ void ActorMover::SetLookAtTarget(NiPoint3 aPoint) {
                 v2 = ::new (apMemory) DetailedActorPathHandler(pActor, this);
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pCurrentPathHandler = v2;
         }
@@ -747,7 +747,7 @@ bool ActorMover::IsPathValid() {
     }
     PathingSolution* v1 = (&spCurrentPath)->operator->();
     if (v1->IsValid()) {
-        return (bool)1;
+        return true;
     }
     return (bool)result;
 }
@@ -768,8 +768,8 @@ void ActorMover::FinishMoving(bool abClearHandler) {
     if (eState < ACTOR_MOVER_STATE_FAILED || eState > ACTOR_MOVER_STATE_FAILED_PROCESS_UPDATE) {
         this->eState = ACTOR_MOVER_STATE_FINISHED;
     }
-    spCurrentRequest.operator=(static_cast<PathingRequest*>(0));
-    spCurrentPath.operator=(static_cast<PathingSolution*>(0));
+    spCurrentRequest.operator=(static_cast<PathingRequest*>(nullptr));
+    spCurrentPath.operator=(static_cast<PathingSolution*>(nullptr));
     if (pCurrentPathHandler) {
         if (abClearHandler) {
             pCurrentPathHandler->ClearMovement();
@@ -783,12 +783,12 @@ void ActorMover::FinishMoving(bool abClearHandler) {
             v2 = ::new (apMemory) ActorPathingMessageQueue;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         spMessageQueue.operator=(v2);
         bWaitingForPath = 0;
     }
-    SetPathingFailed(0);
+    SetPathingFailed(false);
     DebugOnEvent();
 }
 
@@ -844,7 +844,7 @@ bool ActorMover::BackGroundBuildPath(const PathingRequest* apRequest) {
     bool bResult = false;
     apRequest->CheckValid();
     eState = ACTOR_MOVER_STATE_INIT;
-    ClearDataForNewPathingRequest(0);
+    ClearDataForNewPathingRequest(false);
     if (!apRequest->Destination.QUnused()) {
         const PathingLocation* pOrigin = &apRequest->Origin;
         const PathingLocation* pDestination = &apRequest->Destination;
@@ -870,10 +870,10 @@ bool ActorMover::BackGroundBuildPath(const PathingRequest* apRequest) {
             // Already at the goal: within the target radius and the goal's height range.
             if (apRequest->fTargetRadius * apRequest->fTargetRadius >= dSqrDistance &&
                 apRequest->fGoalZDelta >= std::fabs(kGoalDelta.z)) {
-                FinishMoving(1);
+                FinishMoving(true);
                 bool bRotated = true;
                 if (apRequest->bFaceTargetAtGoal) {
-                    bRotated = RequestRotateActor(apRequest->fGoalAngle, 1);
+                    bRotated = RequestRotateActor(apRequest->fGoalAngle, true);
                 }
                 return bRotated;
             }
@@ -968,13 +968,13 @@ bool ActorMover::BackGroundBuildPath(const PathingRequest* apRequest) {
     else {
         ClearCurrentData();
         eState = ACTOR_MOVER_STATE_FAILED;
-        SetPathingFailed(1);
+        SetPathingFailed(true);
     }
     return bResult;
 }
 
 void ActorMover::ResumeMoving() {
-    bStopMovementNextUpdate = (bool)0;
+    bStopMovementNextUpdate = false;
 }
 
 // Checks whether the mover is in the rotating state.
@@ -1019,7 +1019,7 @@ void ActorMover::SetPathingFailed(bool abValue) {
                     TESWorldSpace* a3 = (&spCurrentRequest.m_pObject->Destination)->pWorldSpace;
                     TESObjectCELL* Count = (&spCurrentRequest.m_pObject->Destination)->pCell;
                     pActor->MoveActorAndFollowers(
-                        (&spCurrentRequest.m_pObject->Destination)->GetLocation(), 0.0f, Count, a3, 0, 1
+                        (&spCurrentRequest.m_pObject->Destination)->GetLocation(), 0.0f, Count, a3, false, true
                     );
                 }
             }
@@ -1100,11 +1100,11 @@ void ActorMover::ClearDataForNewPathingRequest(bool abClearWaitingFlag) {
 void ActorMover::OnMoveToLow() {
     if (pCurrentPathHandler) {
         if (bActorChangedProcessLevel && (!pCurrentPathHandler->IsDetailedPathHandler())) {
-            bActorChangedProcessLevel = (bool)0;
+            bActorChangedProcessLevel = false;
         }
         else {
             if (pCurrentPathHandler->IsDetailedPathHandler()) {
-                bActorChangedProcessLevel = (bool)1;
+                bActorChangedProcessLevel = true;
             }
         }
     }
@@ -1126,21 +1126,21 @@ void ActorMover::OnMoveToHigh() {
                             uint32_t iPreviousNode;
                             PathingSolution* v2;
                             if (this->iPreviousNode != iNextNode ||
-                                (iPreviousNode = static_cast<uint16_t>(this->iPreviousNode),
+                                (iPreviousNode = this->iPreviousNode,
                                  (v2 = spCurrentPath.operator->(), iPreviousNode >= v2->GetVirtualNodeCount() - 1))) {
-                                bActorChangedProcessLevel = 0;
+                                bActorChangedProcessLevel = false;
                             }
                         }
                     }
                     else {
                         if (!pCurrentPathHandler->IsDetailedPathHandler()) {
-                            bActorChangedProcessLevel = 1;
+                            bActorChangedProcessLevel = true;
                         }
                     }
                 }
                 else {
                     if (!pSaveLoadGame->GetSaveGameLoading()) {
-                        pActor->MoveToSafePoint(0);
+                        pActor->MoveToSafePoint(false);
                     }
                 }
             }
@@ -1205,24 +1205,24 @@ void ActorMover::ClearLookAtTarget() {
 }
 
 bool ActorMover::RequestRotateActor(float afTargetAngle, bool abForceTurn) {
-    bool v8 = 0;
-    ClearDataForNewPathingRequest(1);
+    bool v8 = false;
+    ClearDataForNewPathingRequest(true);
     if (pActor->GetAnimation()) {
         Animation* v3 = pActor->GetAnimation();
         if (v3->ShouldBeMoving()) {
-            bStopCurrentMoveAnim = 1;
+            bStopCurrentMoveAnim = true;
         }
     }
     if (pActor->CanMove() && pActor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
         if (!IsActorInLoadedArea()) {
             eState = ACTOR_MOVER_STATE_FINISHED;
             pActor->SetHeading(afTargetAngle);
-            v8 = 1;
+            v8 = true;
         }
     }
     else {
         eState = ACTOR_MOVER_STATE_FINISHED;
-        v8 = 1;
+        v8 = true;
     }
     if (!v8) {
         if (pCurrentPathHandler) {
@@ -1230,7 +1230,7 @@ bool ActorMover::RequestRotateActor(float afTargetAngle, bool abForceTurn) {
                 if (pCurrentPathHandler) {
                     delete pCurrentPathHandler;
                 }
-                pCurrentPathHandler = 0;
+                pCurrentPathHandler = nullptr;
             }
         }
         if (!pCurrentPathHandler) {
@@ -1241,17 +1241,17 @@ bool ActorMover::RequestRotateActor(float afTargetAngle, bool abForceTurn) {
                 v5 = ::new (apMemory) DetailedActorPathHandler(pActor, this);
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             pCurrentPathHandler = v5;
         }
         if (pCurrentPathHandler->InitRotationOnly(afTargetAngle, abForceTurn)) {
             eState = ACTOR_MOVER_STATE_ROTATING;
-            v8 = 1;
+            v8 = true;
         }
         else {
             eState = ACTOR_MOVER_STATE_FINISHED;
-            v8 = 0;
+            v8 = false;
         }
     }
     DebugOnEvent();
@@ -1263,7 +1263,7 @@ bool ActorMover::RequestRotateActor(NiPoint3 akTargetPos, bool abForceTurn) {
     NiPoint3 a1;
     const NiPoint3* v3 = &pActor->GetLocationOnReference();
     (a1 = (&akTargetPos)->operator-(*v3));
-    float afRotation = (float)GetZAngleFromVector(a1);
+    float afRotation = GetZAngleFromVector(a1);
     return (bool)((uint8_t)RequestRotateActor(afRotation, abForceTurn));
 }
 
@@ -1358,7 +1358,7 @@ bool ActorMover::MoveActorToLocation(const NiPoint3& aNewLoc) {
     this->pActor->SetLocationOnReference(aNewLoc);
     TESWorldSpace* apWorld = this->pActor->GetWorldSpace();
     if (!apWorld) {
-        return (bool)1;
+        return true;
     }
     TESObjectCELL* parentCell = this->pActor->TESObjectREFR::GetParentCell();
     if (parentCell != apWorld->GetCellFromWorldCoord(aNewLoc)) {
@@ -1388,13 +1388,13 @@ ActorMover::END_OF_PATH_CHECK_RESULT ActorMover::EndOfCurrentPathCheck() {
             }
             else {
                 eState = ACTOR_MOVER_STATE_FAILED;
-                SetPathingFailed(1);
+                SetPathingFailed(true);
                 DoStopMoving();
                 return ActorMover::END_OF_PATH_FAILED;
             }
         }
         else {
-            iPreviousNode = (uint32_t)((uint16_t)this->iPreviousNode);
+            iPreviousNode = (uint32_t)this->iPreviousNode;
             v7 = (&pCurrentPathHandler->spPath)->operator->();
             if (iPreviousNode >= ((uint32_t)(((int32_t)v7->GetVirtualNodeCount()) - 1))) {
                 DoStopMoving();
@@ -1404,7 +1404,7 @@ ActorMover::END_OF_PATH_CHECK_RESULT ActorMover::EndOfCurrentPathCheck() {
     }
     else {
         eState = ACTOR_MOVER_STATE_FAILED;
-        SetPathingFailed(1);
+        SetPathingFailed(true);
         StopMoving();
         return ActorMover::END_OF_PATH_FAILED;
     }
@@ -1430,33 +1430,33 @@ void ActorMover::DoStartMoving(float afDelta) {
     DebugOnEvent();
     if (spCurrentPath.m_pObject->GetNodeCount()) {
         if (pActor->GetCurrentProcessType()) {
-            bdetailed = 0;
+            bdetailed = false;
             spCurrentRequest.m_pObject->SetActorLockData(pActor);
             Pathing::UPDATE_DETAILED_PATH_RESULT updated =
                 Pathing::UpdateSolutionMoveToLow(spCurrentRequest.m_pObject, spCurrentPath.m_pObject);
             if (updated >= Pathing::FAILED && updated <= Pathing::NO_CHANGE) {
                 eState = ACTOR_MOVER_STATE_FAILED;
-                SetPathingFailed(1);
+                SetPathingFailed(true);
                 return;
             }
         }
         else {
-            bdetailed = 1;
+            bdetailed = true;
         }
     }
     else {
         if (pActor->GetCurrentProcessType()) {
-            bdetailed = 0;
+            bdetailed = false;
         }
         else {
-            bdetailed = 1;
+            bdetailed = true;
             spCurrentRequest.m_pObject->SetActorLockData(pActor);
             Pathing::UPDATE_DETAILED_PATH_RESULT v4 =
                 Pathing::UpdateSolutionMoveToHigh(spCurrentRequest.m_pObject, spCurrentPath.m_pObject, 0);
             if (v4 >= Pathing::FAILED && v4 <= Pathing::NO_CHANGE) {
-                pActor->MoveToSafePoint(1);
+                pActor->MoveToSafePoint(true);
                 eState = ACTOR_MOVER_STATE_FAILED;
-                SetPathingFailed(1);
+                SetPathingFailed(true);
                 return;
             }
         }
@@ -1472,7 +1472,7 @@ void ActorMover::DoStartMoving(float afDelta) {
             v3 = ::new (v8) DetailedActorPathHandler(pActor, this, spCurrentPath, spCurrentRequest.m_pObject);
         }
         else {
-            v3 = 0;
+            v3 = nullptr;
         }
         pCurrentPathHandler = (ActorPathHandler*)v3;
         pCurrentPathHandler->HandlePreviousPathTransition(poldPathHandler);
@@ -1493,7 +1493,7 @@ void ActorMover::DoStartMoving(float afDelta) {
             v2 = ::new (apMemory) VirtualActorPathHandler(pActor, this, spCurrentPath, spCurrentRequest.m_pObject);
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         pCurrentPathHandler = (ActorPathHandler*)v2;
     }
@@ -1517,9 +1517,9 @@ void ActorMover::HandleProcessLevelChange() {
         if (pCurrentPathHandler) {
             delete pCurrentPathHandler;
         }
-        this->pCurrentPathHandler = 0;
+        this->pCurrentPathHandler = nullptr;
         eState = ACTOR_MOVER_STATE_FINISHED;
-        SetPathingFailed(0);
+        SetPathingFailed(false);
         return;
     }
     if (this->pActor->GetCurrentProcessType() == PROCESS_TYPE_HIGH) {
@@ -1549,7 +1549,7 @@ void ActorMover::HandleProcessLevelChange() {
                 VirtualPathingNode* v3 = spCurrentPath.m_pObject->GetLastVirtualNode();
                 this->pActor->SetPosition((&v3->Location)->GetLocation());
             }
-            FinishMoving(1);
+            FinishMoving(true);
             return;
         }
         spCurrentRequest.m_pObject->SetActorLockData(this->pActor);
@@ -1561,9 +1561,9 @@ void ActorMover::HandleProcessLevelChange() {
         if (updated <= Pathing::NO_CHANGE) {
             if (!spCurrentPath.m_pObject->IsIncomplete() ||
                 (!spCurrentRequest.m_pObject->bAllowIncompletePath || !spCurrentPath.m_pObject->GetNodeCount())) {
-                this->pActor->MoveToSafePoint(1);
+                this->pActor->MoveToSafePoint(true);
                 eState = ACTOR_MOVER_STATE_FAILED_PROCESS_UPDATE;
-                SetPathingFailed(1);
+                SetPathingFailed(true);
                 return;
             }
         }
@@ -1576,7 +1576,7 @@ void ActorMover::HandleProcessLevelChange() {
         iNextNode = spCurrentPath.m_pObject->iLastLoadedVirtualNodeIndex;
     LABEL_43:;
         if (this->iPreviousNode == iNextNode) {
-            FinishMoving(1);
+            FinishMoving(true);
         }
         else {
             DetailedActorPathHandler* v14;
@@ -1603,14 +1603,14 @@ void ActorMover::HandleProcessLevelChange() {
                     ::new (v21) DetailedActorPathHandler(this->pActor, this, spCurrentPath, spCurrentRequest.m_pObject);
             }
             else {
-                v14 = 0;
+                v14 = nullptr;
             }
             this->pCurrentPathHandler = (ActorPathHandler*)v14;
             ActorPathHandler::PATH_HANDLER_RESULT res = this->pCurrentPathHandler->Init(fpercentTraveled, 0.0f);
             if (res == ActorPathHandler::PATH_HANDLER_RESULT_DONE ||
                 res == ActorPathHandler::PATH_HANDLER_RESULT_DONE_SLEEP_SPECIAL) {
                 HandleMovementResult(res);
-                FinishMoving(1);
+                FinishMoving(true);
             }
         }
         return;
@@ -1635,7 +1635,7 @@ void ActorMover::HandleProcessLevelChange() {
     if (v18 >= Pathing::FAILED) {
         if (v18 <= Pathing::NO_CHANGE) {
             eState = ACTOR_MOVER_STATE_FAILED;
-            SetPathingFailed(1);
+            SetPathingFailed(true);
             return;
         }
         if (v18 == Pathing::CLEARED_DETAILED_PATH) {
@@ -1652,7 +1652,7 @@ void ActorMover::HandleProcessLevelChange() {
         v17 = ::new (apMemory) VirtualActorPathHandler(this->pActor, this, spCurrentPath, spCurrentRequest.m_pObject);
     }
     else {
-        v17 = 0;
+        v17 = nullptr;
     }
     this->pCurrentPathHandler = (ActorPathHandler*)v17;
     this->pCurrentPathHandler->Init(static_cast<float>(this->iPreviousNode), 0.0f);
@@ -1661,7 +1661,7 @@ void ActorMover::HandleProcessLevelChange() {
 void ActorMover::SetCurrentFrameMoveModeAndDelta() {
     NiPoint3 dst;
     NiPoint3 movedelta;
-    bool bvalid = 0;
+    bool bvalid = false;
     uint32_t imovemode = 0;
     movedelta = NiPoint3_ZERO;
     if (bForceMoveMode) {
@@ -1669,10 +1669,10 @@ void ActorMover::SetCurrentFrameMoveModeAndDelta() {
         Animation* panim = pActor->GetAnimation();
         if (panim) {
             if (pActor->GetNoCollision()) {
-                panim->GetDelta(&movedelta, pActor, 1, 0);
+                panim->GetDelta(&movedelta, pActor, true, false);
             }
             else {
-                panim->GetDelta(&movedelta, pActor, 0, 1);
+                panim->GetDelta(&movedelta, pActor, false, true);
             }
         }
         else {
@@ -1682,7 +1682,7 @@ void ActorMover::SetCurrentFrameMoveModeAndDelta() {
                 movedelta = *::new (&dst) NiPoint3(0.0f, v5, 0.0f);
             }
         }
-        bvalid = 1;
+        bvalid = true;
     }
     else {
         if (pCurrentPathHandler) {
@@ -1693,17 +1693,17 @@ void ActorMover::SetCurrentFrameMoveModeAndDelta() {
                     ActorMover::MF_FORWARD | ActorMover::MF_BACKWARD | ActorMover::MF_LEFT | ActorMover::MF_RIGHT
                 );
                 movedelta = NiPoint3_ZERO;
-                bvalid = 1;
+                bvalid = true;
                 ANIMATION_ACTION AnimAction = pActor->GetAnimAction();
                 if (AnimAction < ANIM_ACTION_WAIT_FOR_LOWER_BODY_ANIM || AnimAction > ANIM_ACTION_FORCE_SCRIPT_ANIM) {
                     Animation* panim_2 = pActor->GetAnimation();
                     if (!panim_2 || !panim_2->ShouldBeMoving()) {
-                        bStopCurrentMoveAnim = 0;
+                        bStopCurrentMoveAnim = false;
                     }
                 }
                 else {
-                    bStopCurrentMoveAnim = 0;
-                    bvalid = 0;
+                    bStopCurrentMoveAnim = false;
+                    bvalid = false;
                 }
             }
         }
@@ -1752,17 +1752,17 @@ NiPoint3* ActorMover::GetNextNodeLocation(NiPoint3* apResult) {
 
 bool ActorMover::GetCurrentGoal_009DE2B0(NiPoint3* apRetLocation) {
     if (!spCurrentPath.m_pObject) {
-        return 0;
+        return false;
     }
     if (!spCurrentPath.m_pObject->IsValid()) {
-        return 0;
+        return false;
     }
     VirtualPathingNode* LastVirtualNode = spCurrentPath.m_pObject->GetLastVirtualNode();
     if (!LastVirtualNode) {
-        return 0;
+        return false;
     }
     *apRetLocation = (&LastVirtualNode->Location)->PathingLocation::GetLocation();
-    return 1;
+    return true;
 }
 
 void ActorMover::WarpToNextNode() {
@@ -1828,7 +1828,7 @@ void ActorMover::WarpToNextNode() {
                 }
             }
             PathingLocation apLocation(pActor);
-            apLocation.ResolveNavMeshInfo(0);
+            apLocation.ResolveNavMeshInfo(nullptr);
             if (!apLocation.HasNavMeshData()) {
                 v59 = 1;
             }
@@ -1848,16 +1848,16 @@ void ActorMover::WarpToNextNode() {
             float v36 = pActor->GetWidth() * 0.6000000238418579;
             apRequest.SetActorRadius(v36);
             apRequest.SetActorLockData(pActor);
-            apRequest.SetAllowIncompletePath(1);
-            apRequest.SetIgnoreSmoothingIfFails(1);
-            apRequest.SetCantOpenDoors(0);
+            apRequest.SetAllowIncompletePath(true);
+            apRequest.SetIgnoreSmoothingIfFails(true);
+            apRequest.SetCantOpenDoors(false);
             TESActorBase* ActorBase = pActor->GetActorBase();
             bool DoesSwim = ActorBase->DoesSwim();
             apRequest.SetCanSwim(DoesSwim);
             TESCreature* v26 = static_cast<TESCreature*>(pActor->GetActorBase());
             bool DoesFly = v26->DoesFly();
             apRequest.SetCanFly(DoesFly);
-            apRequest.SetGoDirectIfPathingFails(1);
+            apRequest.SetGoDirectIfPathingFails(true);
             TESObjectCELL* ParentCell = pPlayer->GetParentCell();
             PathingSolution apSolution;
             if (Pathing::BuildPath(&apRequest, &apSolution)) {
@@ -1911,7 +1911,7 @@ void ActorMover::HandleMovementResult(ActorPathHandler::PATH_HANDLER_RESULT aeRe
         case ActorPathHandler::PATH_HANDLER_RESULT_FELL_OFF_PATH: {
             eState = ACTOR_MOVER_STATE_FAILED;
             DoStopMoving();
-            SetPathingFailed(1);
+            SetPathingFailed(true);
             break;
         }
         case ActorPathHandler::PATH_HANDLER_RESULT_DONE:
@@ -1935,7 +1935,7 @@ void ActorMover::HandleMovementResult(ActorPathHandler::PATH_HANDLER_RESULT aeRe
                     }
                     if (bFailed) {
                         eState = ACTOR_MOVER_STATE_FAILED;
-                        SetPathingFailed(1);
+                        SetPathingFailed(true);
                         ClearCurrentData();
                         DoStopMoving();
                     }
@@ -1965,7 +1965,7 @@ void ActorMover::BuildRequest(
     float afTargetRadius,
     PathingAvoidNodeArray* apAvoidNodes
 ) {
-    PathingLocation dest(static_cast<const NiPoint3*>(&aGoalLocation), apCell, apWorldSpace);
+    PathingLocation dest((&aGoalLocation), apCell, apWorldSpace);
     apRequest->Initialize(apActor);
     apRequest->SetDestination(dest);
     if (!(afTargetRadius <= 0.0)) {

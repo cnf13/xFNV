@@ -80,7 +80,7 @@ ArrowProjectile::CollisionData::CollisionData() {}
 ArrowProjectile::ArrowProjectile()
   : psCollisionData(nullptr), bNeedsFinishInitLoadGame(false), bAddedToInventory(false), bPostForce(false),
     iLoadGameFlags(0) {
-    SetStillLoading(1);
+    SetStillLoading(true);
     pCurrentProcess = new HighProcess();
     ++iArrowCount;
 }
@@ -108,7 +108,7 @@ ArrowProjectile::~ArrowProjectile() {
     ourFree(psCollisionData);
     TESObjectREFR::Set3D(nullptr, true);
     if (!pDataHandler->GetClearingData()) {
-        CleanUpOtherMobileObjects(0);
+        CleanUpOtherMobileObjects(false);
     }
 }
 
@@ -192,7 +192,7 @@ void ArrowProjectile::SaveGame(uint32_t aiFlags) {
     bool bsaveCollisionData;
     MobileObject::SaveGame(aiFlags);
     iblockSize = 0;
-    uint16_t* pblockSize = 0;
+    uint16_t* pblockSize = nullptr;
     uint8_t* itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -225,7 +225,7 @@ void ArrowProjectile::SaveGame(uint32_t aiFlags) {
         ipoisonID = pPoison->iFormID;
     }
     SaveNumericID(&ipoisonID, 4);
-    bsaveCollisionData = psCollisionData != 0;
+    bsaveCollisionData = psCollisionData != nullptr;
     SaveGameDataOLD(&bsaveCollisionData, 1);
     if (bsaveCollisionData) {
         pSaveLoadGameOLD->SaveGameDataOLD(psCollisionData, 4u);
@@ -258,13 +258,13 @@ void ArrowProjectile::SaveGame(uint32_t aiFlags) {
                         bool bignoreWeaponBoneAndFadeNodes = psCollisionData->eCollisionType == 0;
                         NiNode* v2 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
                         icollisionObjectCount = GetCollisionObjectCountInSceneGraph(
-                            v2, bignoreWeaponBoneAndFadeNodes, bignoreWeaponBoneAndFadeNodes, 1
+                            v2, bignoreWeaponBoneAndFadeNodes, bignoreWeaponBoneAndFadeNodes, true
                         );
                         bhkNiCollisionObject* pcol =
                             bhkNiCollisionObject::GetbhkNiCollisionObject(psCollisionData->pClosestObject);
                         NiNode* v3 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
                         icollisionObjectIndex = GetCollisionObjectIndexInSceneGraph(
-                            v3, pcol, bignoreWeaponBoneAndFadeNodes, bignoreWeaponBoneAndFadeNodes, 1
+                            v3, pcol, bignoreWeaponBoneAndFadeNodes, bignoreWeaponBoneAndFadeNodes, true
                         );
                     }
                 }
@@ -329,7 +329,7 @@ void ArrowProjectile::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     char bhasCollisionData;
     MobileObject::LoadGame(aiFlags, aiCurrentFlags);
     iblockSize = 0;
-    uint8_t* istartBufferPosition = 0;
+    uint8_t* istartBufferPosition = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockHeader, 4u);
         if (iblockHeader != 0x424C4F4B) {
@@ -387,11 +387,11 @@ void ArrowProjectile::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
             v11 = ::new (apMemory) ArrowProjectile::CollisionData;
         }
         else {
-            v11 = 0;
+            v11 = nullptr;
         }
         psCollisionData = v11;
-        psCollisionData->pClosestObject = 0;
-        psCollisionData->pCollidee = 0;
+        psCollisionData->pClosestObject = nullptr;
+        psCollisionData->pCollidee = nullptr;
         psCollisionData->kRotation = NiMatrix3_IDENTITY;
         pSaveLoadGameOLD->LoadGameDataOLD(psCollisionData, 4u);
         LoadGameDataOLD(&psCollisionData->kPoint, 12);
@@ -513,13 +513,13 @@ void ArrowProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
     PROCESS_TYPE CurrentProcessType = GetCurrentProcessType();
     ReferenceProcessLists.RemoveReference(this, CurrentProcessType);
     PROCESS_TYPE v8 = GetCurrentProcessType();
-    ReferenceProcessLists.AddReference(this, v8, 0, 0, 0);
+    ReferenceProcessLists.AddReference(this, v8, false, false, nullptr);
 }
 
 // pClosestObject holds what LoadGame read: the packed collision object count (high word) and index, or before
 // version 32 the object's name, which is freed here.
 void ArrowProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
-    SetStillLoading(0);
+    SetStillLoading(false);
     TESObjectREFR::Get3D();
     if (TESObjectREFR::Get3D()) {
         InitHavok(pShooter, 1.0f);
@@ -530,18 +530,18 @@ void ArrowProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) 
                     bool bignoreWeaponBoneAndFadeNodes = psCollisionData->eCollisionType == 0;
                     int32_t icollisionObjectIndex =
                         static_cast<int32_t>(reinterpret_cast<uintptr_t>(psCollisionData->pClosestObject));
-                    psCollisionData->pClosestObject = 0;
+                    psCollisionData->pClosestObject = nullptr;
                     if (psCollisionData->pCollidee) {
                         NiNode* v3 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
                         if (static_cast<uint16_t>(icollisionObjectIndex >> 16) ==
                             static_cast<uint16_t>(GetCollisionObjectCountInSceneGraph(
-                                v3, bignoreWeaponBoneAndFadeNodes, bignoreWeaponBoneAndFadeNodes, 1
+                                v3, bignoreWeaponBoneAndFadeNodes, bignoreWeaponBoneAndFadeNodes, true
                             ))) {
                             if (icollisionObjectIndex != -1) {
                                 NiNode* v4 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
                                 bhkNiCollisionObject* pcol = GetCollisionObjectByIndexInSceneGraph(
                                     v4, icollisionObjectIndex, bignoreWeaponBoneAndFadeNodes,
-                                    bignoreWeaponBoneAndFadeNodes, 1
+                                    bignoreWeaponBoneAndFadeNodes, true
                                 );
                                 if (pcol) {
                                     psCollisionData->pClosestObject = pcol->m_pkSceneObject;
@@ -565,7 +565,7 @@ void ArrowProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) 
                             BSUtilities::GetObjectByName(static_cast<NiAVObject*>(v5), pstring);
                     }
                     else {
-                        psCollisionData->pClosestObject = 0;
+                        psCollisionData->pClosestObject = nullptr;
                     }
                     ourFree(pstring);
                 }
@@ -580,11 +580,11 @@ void ArrowProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) 
         if (psCollisionData &&
             (psCollisionData->pCollidee &&
              (psCollisionData->pCollidee->GetDisabled() && psCollisionData->pCollidee->GetDelete()))) {
-            SetDelete(1);
-            psCollisionData->pClosestObject = 0;
+            SetDelete(true);
+            psCollisionData->pClosestObject = nullptr;
         }
         else {
-            bNeedsFinishInitLoadGame = 1;
+            bNeedsFinishInitLoadGame = true;
             iLoadGameFlags = aiFlags;
         }
     }
@@ -597,7 +597,7 @@ bool ArrowProjectile::IsProjectile() {
 bool ArrowProjectile::MovetoHigh() {
     HighProcess* v2;
     if (pCurrentProcess && !pCurrentProcess->eLevel) {
-        return 1;
+        return true;
     }
     PROCESS_TYPE aWhichList = pCurrentProcess->eLevel;
     ReferenceProcessLists.RemoveReference(this, aWhichList);
@@ -606,23 +606,23 @@ bool ArrowProjectile::MovetoHigh() {
         v2 = ::new (apMemory) HighProcess;
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     v2->Copy(pCurrentProcess);
     if (pCurrentProcess) {
         delete pCurrentProcess;
     }
     pCurrentProcess = v2;
-    ReferenceProcessLists.AddReference(this, PROCESS_TYPE_HIGH, 0, 0, 0);
-    MoveHavok(0);
+    ReferenceProcessLists.AddReference(this, PROCESS_TYPE_HIGH, false, false, nullptr);
+    MoveHavok(false);
     pCurrentProcess->SetLastSeenLocation();
-    return 1;
+    return true;
 }
 
 bool ArrowProjectile::MovetoMiddleHigh() {
     MiddleHighProcess* v2;
     if (pCurrentProcess && pCurrentProcess->eLevel == PROCESS_TYPE_MIDDLE_HIGH) {
-        return 1;
+        return true;
     }
     PROCESS_TYPE aWhichList = pCurrentProcess->eLevel;
     ReferenceProcessLists.RemoveReference(this, aWhichList);
@@ -631,17 +631,17 @@ bool ArrowProjectile::MovetoMiddleHigh() {
         v2 = ::new (apMemory) MiddleHighProcess;
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     v2->Copy(pCurrentProcess);
     if (pCurrentProcess) {
         delete pCurrentProcess;
     }
     pCurrentProcess = v2;
-    ReferenceProcessLists.AddReference(this, PROCESS_TYPE_MIDDLE_HIGH, 0, 0, 0);
-    MoveHavok(0);
+    ReferenceProcessLists.AddReference(this, PROCESS_TYPE_MIDDLE_HIGH, false, false, nullptr);
+    MoveHavok(false);
     pCurrentProcess->SetLastSeenLocation();
-    return 1;
+    return true;
 }
 
 void ArrowProjectile::Process(float afDelta) {
@@ -650,8 +650,8 @@ void ArrowProjectile::Process(float afDelta) {
 }
 
 bool ArrowProjectile::ChangeProcessLevel() {
-    bool bchange = 1;
-    bool bhighProcessOnly = 0;
+    bool bchange = true;
+    bool bhighProcessOnly = false;
     PROCESS_TYPE eoldLevel = pCurrentProcess->eLevel;
     PROCESS_TYPE enewLevel = PROCESS_TYPE_LOW;
     TESObjectCELL* pcell = GetParentCell();
@@ -660,32 +660,32 @@ bool ArrowProjectile::ChangeProcessLevel() {
             if (eoldLevel) {
                 MovetoHigh();
             }
-            return 1;
+            return true;
         }
         pcell = psCollisionData->pCollidee->GetParentCell();
     }
     if (Get3D() || pModelLoader->IsReferenceQueued(this)) {
-        if (TES::pInstance->IsCellLoaded(pcell, 1)) {
+        if (TES::pInstance->IsCellLoaded(pcell, true)) {
             enewLevel = PROCESS_TYPE_HIGH;
         }
         else {
-            if (TES::pInstance->IsCellLoaded(pcell, 0)) {
+            if (TES::pInstance->IsCellLoaded(pcell, false)) {
                 enewLevel = PROCESS_TYPE_MIDDLE_HIGH;
             }
         }
     }
     if (eState == ArrowProjectile::STATE_FLYING) {
-        bhighProcessOnly = 1;
+        bhighProcessOnly = true;
     }
     if (eoldLevel == enewLevel) {
-        return 1;
+        return true;
     }
     if (enewLevel) {
         if (enewLevel != PROCESS_TYPE_MIDDLE_HIGH || bhighProcessOnly) {
             if (this) {
                 delete this;
             }
-            return 0;
+            return false;
         }
         else {
             MovetoMiddleHigh();
@@ -704,16 +704,16 @@ bool ArrowProjectile::IsTransient() {
 void ArrowProjectile::Update(float afDelta) {
     NiMatrix3 rot;
     if (bNeedsFinishInitLoadGame) {
-        bool bready = 1;
+        bool bready = true;
         if (psCollisionData) {
             if (psCollisionData->eCollisionType <= 1) {
                 if (psCollisionData->pCollidee) {
-                    bready = psCollisionData->pCollidee->TESObjectREFR::Get3D() != 0;
+                    bready = psCollisionData->pCollidee->TESObjectREFR::Get3D() != nullptr;
                 }
             }
         }
         if (bready) {
-            bNeedsFinishInitLoadGame = 0;
+            bNeedsFinishInitLoadGame = false;
             FinishInitLoadGame(iLoadGameFlags, 0);
             pSaveLoadGameOLD->FinalizeQueuedForms();
         }
@@ -722,7 +722,7 @@ void ArrowProjectile::Update(float afDelta) {
     if (!(afDelta >= 0.0)) {
     LABEL_47:;
         if (p3d) {
-            NiUpdateData UpdateData(afDelta, 1, 0);
+            NiUpdateData UpdateData(afDelta, true, false);
             p3d->Update(UpdateData);
         }
         return;
@@ -738,7 +738,7 @@ void ArrowProjectile::Update(float afDelta) {
                 if (p3d) {
                     if (!ecolType) {
                         SetLocationOnReference(p3d->GetWorldTranslate());
-                        TESObjectCELL* pcell = 0;
+                        TESObjectCELL* pcell = nullptr;
                         if (psCollisionData->pCollidee) {
                             pcell = psCollisionData->pCollidee->GetParentCell();
                         }
@@ -747,7 +747,7 @@ void ArrowProjectile::Update(float afDelta) {
                                 ReferenceProcessLists.AddActorToTempChangeList(this);
                             }
                             else {
-                                SetDelete(1);
+                                SetDelete(true);
                             }
                         }
                     }
@@ -756,7 +756,7 @@ void ArrowProjectile::Update(float afDelta) {
                     if (ecolType == 1 &&
                         (!psCollisionData ||
                          (!psCollisionData->pCollidee || !psCollisionData->pCollidee->TESObjectREFR::Get3D()))) {
-                        SetDelete(1);
+                        SetDelete(true);
                     }
                 }
             }
@@ -765,7 +765,7 @@ void ArrowProjectile::Update(float afDelta) {
                     fFadeAlpha = fFadeAlpha - afDelta / 3.0;
                     if (fFadeAlpha <= 0.0) {
                         fFadeAlpha = 0.0f;
-                        SetDelete(1);
+                        SetDelete(true);
                     }
                     if (p3d) {
                         BSShaderUtil::RecursiveSetPropertyFadeAlpha(static_cast<NiNode*>(p3d), fFadeAlpha);
@@ -788,7 +788,7 @@ void ArrowProjectile::Update(float afDelta) {
                 v3->SetFallTime(ratio);
                 fWaterSpeed = fWaterSpeed - afDelta * 1.0;
                 if (fWaterSpeed < 0.5) {
-                    Simulate(0);
+                    Simulate(nullptr);
                     ProcessCollision();
                 }
             }
@@ -915,7 +915,7 @@ void ArrowProjectile::InitHavok(Actor* apShooter, float afPower) {
     if (pOldObject != p3D) {
         pController->SetNiObject(p3D);
         if (pWorld && pWorld->QDebugDisplay()) {
-            pController->BuildDisplayGeometry(0);
+            pController->BuildDisplayGeometry(nullptr);
             BSShaderUtil::RecursiveSetPropertyWireframe(pController->GetNiObject(), 1);
         }
         bhkWorld::SetMotion(p3D, hkpMotion::MOTION_KEYFRAMED, true, false, true);
@@ -1050,7 +1050,7 @@ bool ArrowProjectile::ProcessCollisionActor(bhkRigidBody* apArrowRB) {
     if (psCollisionData->pCollidee && psCollisionData->pCollidee->IsActor()) {
         pClosestObject = static_cast<NiNode*>(psCollisionData->pClosestObject);
         if (pClosestObject) {
-            bhkWorld::RemoveObjects(apNode, 1, 0);
+            bhkWorld::RemoveObjects(apNode, true, false);
             TESHavokUtilities::RemoveHavokFromSceneGraph(apNode);
             apNode->SetTranslate(psCollisionData->kPoint);
             apNode->SetRotate(psCollisionData->kRotation);
@@ -1059,7 +1059,7 @@ bool ArrowProjectile::ProcessCollisionActor(bhkRigidBody* apArrowRB) {
             apNode->SetScale(v4);
             shadowSceneNode = BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD);
             shadowSceneNode->RemoveObject(apNode);
-            pClosestObject->AttachChild(apNode, (bool)1);
+            pClosestObject->AttachChild(apNode, true);
             shadowSceneNode->AddObject(apNode);
             pCollidee = static_cast<Actor*>(psCollisionData->pCollidee);
             if (pCollidee) {
@@ -1068,15 +1068,15 @@ bool ArrowProjectile::ProcessCollisionActor(bhkRigidBody* apArrowRB) {
                     currentAIProcess->AddAttachedArrow(this);
                 }
             }
-            return (bool)1;
+            return true;
         }
         else {
-            return (bool)0;
+            return false;
         }
     }
     else {
         Warning("AI: An arrow thinks it is colliding with an Actor, but there is no Actor in the collision data!");
-        return (bool)0;
+        return false;
     }
 }
 
@@ -1090,7 +1090,7 @@ bool ArrowProjectile::ProcessSimulate(bhkRigidBody* apArrowRB) {
     CFilter v12;
     DetachCharController();
     NiNode* v2 = Get3D();
-    bhkWorld::SetMotion(v2, hkpMotion::MOTION_DYNAMIC, 1, 0, 1);
+    bhkWorld::SetMotion(v2, hkpMotion::MOTION_DYNAMIC, true, false, true);
     Actor* v14 = dynamic_cast<Actor*>(psCollisionData->pCollidee);
     if (v14 && v14->GetCharController()) {
         charController = v14->GetCharController();
@@ -1107,9 +1107,9 @@ bool ArrowProjectile::ProcessSimulate(bhkRigidBody* apArrowRB) {
     hkpRigidBody* v8 = apArrowRB->Gethk();
     bhkCollisionObject* v13 = bhkCollisionObject::Getbhk(v8);
     if (v13) {
-        v13->SetNotify(1);
+        v13->SetNotify(true);
     }
-    return (bool)1;
+    return true;
 }
 
 void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3& aContactNormal, Actor* apCollidee) {
@@ -1130,12 +1130,12 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
         v83 = ::new (v84) ArrowProjectile::CollisionData;
     }
     else {
-        v83 = 0;
+        v83 = nullptr;
     }
     this->psCollisionData = v83;
     this->psCollisionData->eCollisionType = 0;
-    this->psCollisionData->pClosestObject = 0;
-    this->psCollisionData->pCollidee = 0;
+    this->psCollisionData->pClosestObject = nullptr;
+    this->psCollisionData->pCollidee = nullptr;
     float* p_x = &this->psCollisionData->kNormal.x;
     *p_x = aContactNormal.x;
     p_x[1] = aContactNormal.y;
@@ -1178,16 +1178,16 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
         Script::SetActionFlag(this->GetObjectReference(), fAnglea, SCRIPT_ACTION_ONHITWITH);
         if (this->pShooter) {
             if (this->pShooter == pPlayer || this->pShooter->IsInCombat()) {
-                bool v76 = apCollidee->IsDead(0);
-                if (!v76 && apCollidee->IsDead(0) && (!apCollidee->IsCreature() || apCollidee->HasRagDoll())) {
+                bool v76 = apCollidee->IsDead(false);
+                if (!v76 && apCollidee->IsDead(false) && (!apCollidee->IsCreature() || apCollidee->HasRagDoll())) {
                     NiAVObject* p3d = (NiAVObject*)apCollidee->TESObjectREFR::Get3D();
                     if (p3d) {
                         hkVector4 loc;
                         float* v10 = &fDeathForceRangedDamageMax.Float();
-                        float fmagnitude = CombatFormulas::GetDeathForce(*v10, 1);
+                        float fmagnitude = CombatFormulas::GetDeathForce(*v10, true);
                         bhkForceController::RemoveForce(p3d);
-                        bhkWorld::SetMotion(p3d, hkpMotion::MOTION_DYNAMIC, 1, 0, 1);
-                        NiUpdateData UpdateData(0.0f, 0, 0);
+                        bhkWorld::SetMotion(p3d, hkpMotion::MOTION_DYNAMIC, true, false, true);
+                        NiUpdateData UpdateData(0.0f, false, false);
                         p3d->Update(UpdateData);
                         alignas(16) NiPoint3 moveBack = (&v77->GetWorldTransform())->m_Rotate * NiPoint3_UNIT_Y;
                         moveBack.Unitize();
@@ -1195,20 +1195,20 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
                         const NiPoint3* v11 = &this->GetLocationOnReference();
                         moveBack = *v11 + *v31;
                         NI2HK(loc, moveBack);
-                        TESHavokUtilities::AddExplosionImpulse(p3d, loc, fmagnitude, 0);
+                        TESHavokUtilities::AddExplosionImpulse(p3d, loc, fmagnitude, nullptr);
                     }
                 }
             }
         }
-        bhkRigidBody* RigidBody = 0;
+        bhkRigidBody* RigidBody = nullptr;
         if (apCollidee == pPlayer) {
-            proot = static_cast<NiNode*>(pPlayer->Get3D(0));
+            proot = static_cast<NiNode*>(pPlayer->Get3D(false));
         }
         else {
             proot = apCollidee->TESObjectREFR::Get3D();
         }
         fpickLength = 512.0f;
-        float fAngleb = this->GetHeading(0);
+        float fAngleb = this->GetHeading(false);
         rotation.MakeZRotation(fAngleb);
         float fAnglec = this->GetLooking();
         tmpRot.MakeXRotation(fAnglec);
@@ -1219,7 +1219,7 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
         const NiPoint3* v13 = &this->GetLocationOnReference();
         NiPoint3 origin = *v13 - *fAngled;
         char v58 = 0;
-        bool fScalara = !apCollidee->IsDead(1);
+        bool fScalara = !apCollidee->IsDead(true);
         NiPoint3 v95 = dir;
         NiPoint3 v94 = origin;
         NiNode* v14 = apCollidee->Get3D();
@@ -1241,10 +1241,10 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
             }
             v58 = 1;
         }
-        bool v48 = 0;
+        bool v48 = false;
         if (apCollidee->GetBlocked()) {
             if (apCollidee->pCurrentProcess) {
-                if (CombatUtilities::IsTargetWithinStrikeAngle(apCollidee, this, 0)) {
+                if (CombatUtilities::IsTargetWithinStrikeAngle(apCollidee, this, nullptr)) {
                     NiPoint3 v47 = *apCollidee->QLocationOnReference();
                     float v46 = apCollidee->GetHeight() / 2.0 + v47.z;
                     v48 = aContactPoint.z >= static_cast<double>(v46);
@@ -1258,12 +1258,12 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
         NI2HK(pos, aContactPoint);
         hitSphere.setPosition(pos);
         hitSphere.setRadius(200.0f);
-        ptmpBody = 0;
+        ptmpBody = nullptr;
         if (v48) {
             ptmpBody = static_cast<bhkRigidBody*>(bhkUtilFunctions::FindBipedPart(proot, 7));
         }
         else {
-            bool v18 = apCollidee->IsDead(1);
+            bool v18 = apCollidee->IsDead(true);
             ptmpBody = bhkUtilFunctions::GetClosestBody(proot, hitSphere, !v18);
         }
         if (ptmpBody) {
@@ -1292,10 +1292,10 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
                 this->ApplyCollisionForce(aContactPoint, v96, RigidBody);
             }
             if (this->psCollisionData->pClosestObject &&
-                ((pcol_3 = bhkCollisionObject::GetbhkCollisionObject(this->psCollisionData->pClosestObject)) == 0
-                     ? pbody = 0
+                ((pcol_3 = bhkCollisionObject::GetbhkCollisionObject(this->psCollisionData->pClosestObject)) == nullptr
+                     ? pbody = nullptr
                      : pbody = pcol_3->GetRigidBody(),
-                 (!pbody ? pshape = 0 : pshape = pbody->GetShape(), pshape))) {
+                 (!pbody ? pshape = nullptr : pshape = pbody->GetShape(), pshape))) {
                 switch (pshape->GetMaterial()) {
                     case BHK_MATERIAL_STONE:
                     case BHK_MATERIAL_GLASS:
@@ -1318,8 +1318,8 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
                     if (!this->pEnchantment) {
                         uint32_t v22 = Random();
                         if (v22 % 100 < iArrowInventoryChance.Int()) {
-                            apCollidee->AddObjecttoContainer(this->GetObjectReference(), 0, 1);
-                            this->bAddedToInventory = 1;
+                            apCollidee->AddObjecttoContainer(this->GetObjectReference(), nullptr, 1);
+                            this->bAddedToInventory = true;
                         }
                     }
                 }
@@ -1345,15 +1345,15 @@ void ArrowProjectile::CollideTerrain(const NiPoint3& aContactPoint, const NiPoin
         v24 = ::new (v25) ArrowProjectile::CollisionData;
     }
     else {
-        v24 = 0;
+        v24 = nullptr;
     }
     this->psCollisionData = v24;
     alignas(16) NiPoint3 move = this->DeltaS;
     NiPoint3::UnitizeVector(move);
     move.operator*=(24.0f);
     this->psCollisionData->eCollisionType = 2;
-    this->psCollisionData->pClosestObject = 0;
-    this->psCollisionData->pCollidee = 0;
+    this->psCollisionData->pClosestObject = nullptr;
+    this->psCollisionData->pCollidee = nullptr;
     this->psCollisionData->kNormal = aContactNormal;
     this->psCollisionData->kPoint = aContactPoint + move;
     this->psCollisionData->kRotation = NiMatrix3_IDENTITY;
@@ -1391,7 +1391,7 @@ void ArrowProjectile::CollideTerrain(const NiPoint3& aContactPoint, const NiPoin
     this->eState = ArrowProjectile::STATE_COLLISION;
     NiPoint3 v34 = aContactPoint;
     float afVelocity = this->psCollisionData->kVelocity.Length();
-    this->PlayArrowCollisionSound(afVelocity, v34, 0, emat);
+    this->PlayArrowCollisionSound(afVelocity, v34, nullptr, emat);
     if (this->pShooter) {
         if (this->pShooter->GetCombatController()) {
             this->pShooter->GetCombatController()->ProjectileHitObstruction(aContactPoint, false);
@@ -1404,9 +1404,9 @@ void ArrowProjectile::CollideTerrain(const NiPoint3& aContactPoint, const NiPoin
                 this->pShooter->SetCurrentSpell(LoopingSound);
             }
             else {
-                this->pShooter->SetCurrentSpell(0);
+                this->pShooter->SetCurrentSpell(nullptr);
             }
-            this->pShooter->SetDesiredTarget(0);
+            this->pShooter->SetDesiredTarget(nullptr);
             TESBoundObject* a2a = this->GetObjectReference();
             this->pShooter->ReleaseCast(a2a);
         }
@@ -1416,9 +1416,9 @@ void ArrowProjectile::CollideTerrain(const NiPoint3& aContactPoint, const NiPoin
                 this->pShooter->SetCurrentSpell(v14);
             }
             else {
-                this->pShooter->SetCurrentSpell(0);
+                this->pShooter->SetCurrentSpell(nullptr);
             }
-            this->pShooter->SetDesiredTarget(0);
+            this->pShooter->SetDesiredTarget(nullptr);
             TESBoundObject* a2b = this->GetObjectReference();
             this->pShooter->ReleaseCast(a2b);
         }
@@ -1428,9 +1428,9 @@ void ArrowProjectile::CollideTerrain(const NiPoint3& aContactPoint, const NiPoin
                 this->pShooter->SetCurrentSpell(pBowEnchant);
             }
             else {
-                this->pShooter->SetCurrentSpell(0);
+                this->pShooter->SetCurrentSpell(nullptr);
             }
-            this->pShooter->SetDesiredTarget(0);
+            this->pShooter->SetDesiredTarget(nullptr);
             TESBoundObject* a2c = this->GetObjectReference();
             this->pShooter->ReleaseCast(a2c);
         }
@@ -1454,7 +1454,7 @@ void ArrowProjectile::Bounce(const NiPoint3& aContactPoint, const NiPoint3& aCon
             this->psCollisionData->kPoint = aContactPoint;
         }
         this->psCollisionData->eCollisionType = 3;
-        this->psCollisionData->pCollidee = 0;
+        this->psCollisionData->pCollidee = nullptr;
     }
     else {
         ArrowProjectile::CollisionData* v15;
@@ -1464,12 +1464,12 @@ void ArrowProjectile::Bounce(const NiPoint3& aContactPoint, const NiPoint3& aCon
             v15 = ::new (v16) ArrowProjectile::CollisionData;
         }
         else {
-            v15 = 0;
+            v15 = nullptr;
         }
         this->psCollisionData = v15;
         this->psCollisionData->eCollisionType = 3;
-        this->psCollisionData->pClosestObject = 0;
-        this->psCollisionData->pCollidee = 0;
+        this->psCollisionData->pClosestObject = nullptr;
+        this->psCollisionData->pCollidee = nullptr;
         float* v4 = &this->psCollisionData->kNormal.x;
         *v4 = aContactNormal.x;
         v4[1] = aContactNormal.y;
@@ -1509,11 +1509,11 @@ void ArrowProjectile::Simulate(Actor* apCollidee) {
             v13 = ::new (v14) ArrowProjectile::CollisionData;
         }
         else {
-            v13 = 0;
+            v13 = nullptr;
         }
         this->psCollisionData = v13;
         this->psCollisionData->eCollisionType = 4;
-        this->psCollisionData->pClosestObject = 0;
+        this->psCollisionData->pClosestObject = nullptr;
         this->psCollisionData->pCollidee = apCollidee;
         float* p_x = &this->psCollisionData->kNormal.x;
         *p_x = NiPoint3_ZERO.x;
@@ -1544,14 +1544,14 @@ bool ArrowProjectile::ProcessCollision() {
     bhkCollisionObject* FirstCollisionObject;
     char v6 = 0;
     if (!psCollisionData) {
-        return 0;
+        return false;
     }
     if (Get3D()) {
         NiNode* v2 = Get3D();
         FirstCollisionObject = FindFirstCollisionObject(v2);
     }
     else {
-        FirstCollisionObject = 0;
+        FirstCollisionObject = nullptr;
     }
     if (FirstCollisionObject) {
         bhkRigidBody* pBody = FirstCollisionObject->GetRigidBody();
@@ -1583,7 +1583,7 @@ bool ArrowProjectile::ProcessCollision() {
         if (!v6) {
             if (psCollisionData) {
                 ourFree(psCollisionData);
-                psCollisionData = 0;
+                psCollisionData = nullptr;
             }
             eState = STATE_FLYING;
         }
@@ -1592,8 +1592,8 @@ bool ArrowProjectile::ProcessCollision() {
     else {
         Warning("AI: No collision data was found on this arrow");
         ourFree(psCollisionData);
-        psCollisionData = 0;
-        return 0;
+        psCollisionData = nullptr;
+        return false;
     }
 }
 
@@ -1607,7 +1607,7 @@ bool ArrowProjectile::ProcessCollisionReference(bhkRigidBody* apArrowRB) {
         if (pcol) {
             bhkRigidBody* ptargetRB = pcol->GetRigidBody();
             NiNode* v4 = this->Get3D();
-            bhkWorld::SetMotion(v4, hkpMotion::MOTION_KEYFRAMED, 1, 0, 1);
+            bhkWorld::SetMotion(v4, hkpMotion::MOTION_KEYFRAMED, true, false, true);
             CFilter* CollisionFilter = ptargetRB->GetCollisionFilter(&apResult);
             uint32_t Group = CollisionFilter->GetGroup();
             CFilter filter(L_PROJECTILE, Group, P_OTHER);
@@ -1626,10 +1626,10 @@ bool ArrowProjectile::ProcessCollisionReference(bhkRigidBody* apArrowRB) {
                     TESArrowTargetListener::AddArrowTarget(centerOfMass, this->psCollisionData->pClosestObject);
                 }
             }
-            return 1;
+            return true;
         }
         else {
-            return 0;
+            return false;
         }
     }
     else {
@@ -1637,7 +1637,7 @@ bool ArrowProjectile::ProcessCollisionReference(bhkRigidBody* apArrowRB) {
             "AI: An arrow thinks it is colliding with an Reference, but there is no Reference in the collision "
             "data!"
         );
-        return 0;
+        return false;
     }
 }
 
@@ -1649,12 +1649,12 @@ bool ArrowProjectile::ProcessBounce(bhkRigidBody* apArrowRB) {
         NiPoint3* X = &psCollisionData->kPoint;
         NiNode* v2 = Get3D();
         v2->SetTranslate(*X);
-        NiUpdateData UpdateData(0.0f, 0, 0);
+        NiUpdateData UpdateData(0.0f, false, false);
         NiNode* v3 = Get3D();
         v3->Update(UpdateData);
     }
     NiNode* v4 = Get3D();
-    bhkWorld::SetMotion(v4, hkpMotion::MOTION_DYNAMIC, 1, 0, 1);
+    bhkWorld::SetMotion(v4, hkpMotion::MOTION_DYNAMIC, true, false, true);
     uint32_t ArrowGroup = ArrowProjectile::GetArrowGroup();
     CFilter* v6 = FNVD_RECONSTRUCT(CFilter)(&apMemory, L_CLUTTER, ArrowGroup, P_OTHER);
     apArrowRB->SetCollisionFilter(*v6);
@@ -1689,9 +1689,9 @@ bool ArrowProjectile::ProcessBounce(bhkRigidBody* apArrowRB) {
     NiNode* v15 = Get3D();
     bhkCollisionObject* pcol = FindFirstCollisionObject(v15);
     if (pcol) {
-        pcol->SetNotify(1);
+        pcol->SetNotify(true);
     }
-    return 1;
+    return true;
 }
 
 // Plays the collision sound of a stuck arrow's body against a4 at a3. The sound's location and velocity are constructed
@@ -1708,7 +1708,7 @@ void ArrowProjectile::PlayArrowCollisionSound(float afVelocity, NiPoint3 a3, bhk
                     Base = FirstCollisionObject->GetRigidBody();
                 }
                 else {
-                    Base = 0;
+                    Base = nullptr;
                 }
                 if (Base) {
                     ::new (&apMemory) NiBound;
@@ -1744,8 +1744,8 @@ int32_t ArrowProjectile::GetArrowCount() {
 void ArrowProjectile::DeleteAttachedArrows(TESObjectREFR* apRef, bool abInstant) {
     if (apRef) {
         if (!apRef->IsProjectile()) {
-            bool v12 = 1;
-            bool v11 = 1;
+            bool v12 = true;
+            bool v11 = true;
             if (apRef->IsActor()) {
                 BaseProcess* pprocess = static_cast<Actor*>(apRef)->GetCurrentAIProcess();
                 if (pprocess) {
@@ -1758,7 +1758,7 @@ void ArrowProjectile::DeleteAttachedArrows(TESObjectREFR* apRef, bool abInstant)
                                     parrow->ClearAttachedRef();
                                     if (!parrow->GetDelete()) {
                                         if (abInstant) {
-                                            parrow->SetDelete(1);
+                                            parrow->SetDelete(true);
                                         }
                                         else {
                                             parrow->SetState(ArrowProjectile::STATE_DELETING);
@@ -1766,7 +1766,7 @@ void ArrowProjectile::DeleteAttachedArrows(TESObjectREFR* apRef, bool abInstant)
                                     }
                                 }
                                 if (parrow->GetDelete()) {
-                                    parrow->Set3D(0, 1);
+                                    parrow->Set3D(nullptr, true);
                                 }
                             }
                         }
@@ -1774,13 +1774,13 @@ void ArrowProjectile::DeleteAttachedArrows(TESObjectREFR* apRef, bool abInstant)
                     }
                     if (pprocess->eLevel) {
                         if (pprocess->eLevel == PROCESS_TYPE_MIDDLE_HIGH) {
-                            v12 = 0;
-                            v11 = 1;
+                            v12 = false;
+                            v11 = true;
                         }
                     }
                     else {
-                        v12 = 1;
-                        v11 = 0;
+                        v12 = true;
+                        v11 = false;
                     }
                 }
             }
@@ -1795,7 +1795,7 @@ void ArrowProjectile::DeleteAttachedArrows(TESObjectREFR* apRef, bool abInstant)
                                 parrow_2->ClearAttachedRef();
                                 if (!pmob->GetDelete()) {
                                     if (abInstant) {
-                                        parrow_2->SetDelete(1);
+                                        parrow_2->SetDelete(true);
                                     }
                                     else {
                                         parrow_2->SetState(ArrowProjectile::STATE_DELETING);
@@ -1803,7 +1803,7 @@ void ArrowProjectile::DeleteAttachedArrows(TESObjectREFR* apRef, bool abInstant)
                                 }
                             }
                             if (parrow_2->GetDelete()) {
-                                parrow_2->Set3D(0, 1);
+                                parrow_2->Set3D(nullptr, true);
                             }
                         }
                     }
@@ -1821,11 +1821,11 @@ void ArrowProjectile::DeleteAttachedArrows(TESObjectREFR* apRef, bool abInstant)
                             if (parrow_3->GetAttachedRef() == apRef) {
                                 parrow_3->ClearAttachedRef();
                                 if (!pmob_2->GetDelete()) {
-                                    parrow_3->SetDelete(1);
+                                    parrow_3->SetDelete(true);
                                 }
                             }
                             if (parrow_3->GetDelete()) {
-                                parrow_3->Set3D(0, 1);
+                                parrow_3->Set3D(nullptr, true);
                             }
                         }
                     }
@@ -1916,7 +1916,7 @@ NiAVObject* ArrowProjectile::PickSceneGraph(
         }
         NiNode* pNode = apObject->IsNode();
         if (pNode) {
-            for (uint32_t i = 0; i < static_cast<uint32_t>(pNode->GetArrayCount()); ++i) {
+            for (uint32_t i = 0; i < pNode->GetArrayCount(); ++i) {
                 NiAVObject* pChild = pNode->GetAt(i);
                 NiAVObject* pHit =
                     PickSceneGraph(static_cast<NiNode*>(pChild), aPickFrom, aDirection, afPickLength, abIgnoreHead);

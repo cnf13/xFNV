@@ -307,7 +307,7 @@ void TESReputation::Copy(TESForm* apCopy) {
 bool TESReputation::Compare(TESForm* apCompare) {
     TESReputation* preputation = dynamic_cast<TESReputation*>(apCompare);
     if (!preputation) {
-        return 1;
+        return true;
     }
     return std::memcmp(&data, preputation->GetData(), sizeof(data)) || CompareAllComponents(preputation);
 }
@@ -340,11 +340,11 @@ REPUTATION_DATA* TESReputation::GetData() {
 }
 
 const float TESReputation::GetPositiveRatio() {
-    return (float)(fPositiveValue / data.fMaximumValue);
+    return (fPositiveValue / data.fMaximumValue);
 }
 
 const float TESReputation::GetNegativeRatio() {
-    return (float)(fNegativeValue / data.fMaximumValue);
+    return (fNegativeValue / data.fMaximumValue);
 }
 
 const float TESReputation::GetReputationPct(ReputationType RepType) {
@@ -386,7 +386,7 @@ void TESReputation::AddReputationExact(ReputationType aeType, float afAmount) {
             v12 = 1;
         }
         const char* v4 = sRepPositiveGainIcon.String();
-        Interface::ShowMessage(msg, 0, v4, 0, 2.0f, 0);
+        Interface::ShowMessage(msg, 0, v4, nullptr, 2.0f, false);
     }
     else {
         float fNegativeValue;
@@ -405,9 +405,9 @@ void TESReputation::AddReputationExact(ReputationType aeType, float afAmount) {
             rSound = REPUTATION_NEGATIVE;
         }
         const char* v6 = sRepNegativeGainIcon.String();
-        Interface::ShowMessage(msg, 0, v6, 0, 2.0f, 0);
+        Interface::ShowMessage(msg, 0, v6, nullptr, 2.0f, false);
     }
-    if (!v12 || (pPlayer->IsPlayerCharacterInCombat(0) || Interface::InDialog())) {
+    if (!v12 || (pPlayer->IsPlayerCharacterInCombat(nullptr) || Interface::InDialog())) {
         if (v12) {
             pPlayer->SetLastModifiedFactionReputation(this);
         }
@@ -427,15 +427,15 @@ const char TESReputation::GetReputationLevel(ReputationType RepType) {
     else {
         positiveRepRatio = GetNegativeRatio();
     }
-    if ((((&::fReputationThresholdOne)->Float()) <= ((double)positiveRepRatio)) &&
-        (((&::fReputationThresholdTwo)->Float()) > ((double)positiveRepRatio))) {
+    if (((&::fReputationThresholdOne)->Float() <= ((double)positiveRepRatio)) &&
+        ((&::fReputationThresholdTwo)->Float() > ((double)positiveRepRatio))) {
         return 1;
     }
-    if ((((&::fReputationThresholdTwo)->Float()) <= ((double)positiveRepRatio)) &&
-        (((&::fReputationThresholdThree)->Float()) > ((double)positiveRepRatio))) {
+    if (((&::fReputationThresholdTwo)->Float() <= ((double)positiveRepRatio)) &&
+        ((&::fReputationThresholdThree)->Float() > ((double)positiveRepRatio))) {
         return 2;
     }
-    if (((&::fReputationThresholdThree)->Float()) <= ((double)positiveRepRatio)) {
+    if ((&::fReputationThresholdThree)->Float() <= ((double)positiveRepRatio)) {
         return 3;
     }
     return v3;
@@ -591,7 +591,7 @@ void TESReputation::RemoveReputation(ReputationType a1, int32_t a2) {
                 v19 = 1;
             }
             const char* v4 = sRepPositiveLossIcon.String();
-            Interface::ShowMessage(msg, 0, v4, 0, 2.0f, 0);
+            Interface::ShowMessage(msg, 0, v4, nullptr, 2.0f, false);
         }
         else {
             float fNegativeValue;
@@ -612,9 +612,9 @@ void TESReputation::RemoveReputation(ReputationType a1, int32_t a2) {
             }
             // Shows the gain icon here (sRepNegativeGainIcon), not the loss icon, deliberately, as the game does.
             const char* v6 = sRepNegativeGainIcon.String();
-            Interface::ShowMessage(msg, 0, v6, 0, 2.0f, 0);
+            Interface::ShowMessage(msg, 0, v6, nullptr, 2.0f, false);
         }
-        if (!v19 || (pPlayer->IsPlayerCharacterInCombat(0) || Interface::InDialog())) {
+        if (!v19 || (pPlayer->IsPlayerCharacterInCombat(nullptr) || Interface::InDialog())) {
             if (v19) {
                 pPlayer->SetLastModifiedFactionReputation(this);
             }
@@ -647,7 +647,7 @@ void TESReputation::RemoveReputationExact(ReputationType aeType, float afAmount)
             v12 = 1;
         }
         const char* v4 = sRepPositiveLossIcon.String();
-        Interface::ShowMessage(msg, 0, v4, 0, 2.0f, 0);
+        Interface::ShowMessage(msg, 0, v4, nullptr, 2.0f, false);
     }
     else {
         float fNegativeValue;
@@ -666,9 +666,9 @@ void TESReputation::RemoveReputationExact(ReputationType aeType, float afAmount)
             v12 = 1;
         }
         const char* v6 = sRepNegativeLossIcon.String();
-        Interface::ShowMessage(msg, 0, v6, 0, 2.0f, 0);
+        Interface::ShowMessage(msg, 0, v6, nullptr, 2.0f, false);
     }
-    if (!v12 || (pPlayer->IsPlayerCharacterInCombat(0) || Interface::InDialog())) {
+    if (!v12 || (pPlayer->IsPlayerCharacterInCombat(nullptr) || Interface::InDialog())) {
         if (v12) {
             pPlayer->SetLastModifiedFactionReputation(this);
         }
@@ -710,7 +710,7 @@ void TESReputation::AddReputation(ReputationType a1, int32_t a2) {
                 v19 = 1;
             }
             const char* v4 = sRepPositiveGainIcon.String();
-            Interface::ShowMessage(msg, 0, v4, 0, 2.0f, 0);
+            Interface::ShowMessage(msg, 0, v4, nullptr, 2.0f, false);
         }
         else {
             float fNegativeValue;
@@ -730,9 +730,9 @@ void TESReputation::AddReputation(ReputationType a1, int32_t a2) {
                 v19 = 1;
             }
             const char* v6 = sRepNegativeGainIcon.String();
-            Interface::ShowMessage(msg, 0, v6, 0, 2.0f, 0);
+            Interface::ShowMessage(msg, 0, v6, nullptr, 2.0f, false);
         }
-        if (!v19 || (pPlayer->IsPlayerCharacterInCombat(0) || Interface::InDialog())) {
+        if (!v19 || (pPlayer->IsPlayerCharacterInCombat(nullptr) || Interface::InDialog())) {
             if (v19) {
                 pPlayer->SetLastModifiedFactionReputation(this);
             }

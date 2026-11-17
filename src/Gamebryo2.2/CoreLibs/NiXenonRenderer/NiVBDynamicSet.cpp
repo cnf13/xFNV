@@ -17,7 +17,7 @@ IDirect3DVertexBuffer9* NiVBDynamicSet::AllocateBufferSpace(
         if (m_pkVB) {
             this->m_pkVB->Release();
         }
-        this->m_pkVB = 0;
+        this->m_pkVB = nullptr;
         uint32_t v8 = uiSize;
         if ((uiSize & 15) != 0) {
             v8 = (uiSize & 0xFFFFFFF0u) + 32;
@@ -29,7 +29,8 @@ IDirect3DVertexBuffer9* NiVBDynamicSet::AllocateBufferSpace(
         if (bSoftwareVP) {
             v9 = 536;
         }
-        if (m_pkD3DDevice->CreateVertexBuffer(this->GetBlockSize(), v9, this->GetFVF(), 0, &this->m_pkVB, 0) >= 0) {
+        if (m_pkD3DDevice->CreateVertexBuffer(this->GetBlockSize(), v9, this->GetFVF(), 0, &this->m_pkVB, nullptr) >=
+            0) {
             this->m_uiCurrOffset = 0;
         }
     }

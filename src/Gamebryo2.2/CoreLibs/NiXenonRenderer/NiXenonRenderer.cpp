@@ -49,7 +49,7 @@ bool NiPixelFormat::operator!=(const NiPixelFormat& kOther) const {
 // Stores pkProp in the slot of its type. The type is compared signed and 7 is accepted, one past the PC's seven slots,
 // as the game does.
 void NiPropertyState::SetProperty(NiProperty* pkProp) {
-    if (pkProp && static_cast<int32_t>(pkProp->Type()) <= 7) {
+    if (pkProp && pkProp->Type() <= 7) {
         m_aspProps[pkProp->Type()] = pkProp;
     }
 }

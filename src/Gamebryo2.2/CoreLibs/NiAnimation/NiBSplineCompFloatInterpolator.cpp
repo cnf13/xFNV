@@ -36,11 +36,12 @@ NiObject* NiBSplineCompFloatInterpolator::CreateClone(NiCloningProcess& kCloning
     NiBSplineCompFloatInterpolator* pkObject_2 = pkObject;
     if (pkObject) {
         ::new (pkObject) NiBSplineCompFloatInterpolator(
-            static_cast<NiBSplineData*>(0), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(0)
+            static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE,
+            static_cast<NiBSplineBasisData*>(nullptr)
         );
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     std::memcpy(pkObject_2->m_afCompScalars, m_afCompScalars, sizeof(pkObject_2->m_afCompScalars));
@@ -108,10 +109,10 @@ NiObject* NiBSplineCompFloatInterpolator::CreateObject() {
     NiBSplineCompFloatInterpolator* pkObject =
         static_cast<NiBSplineCompFloatInterpolator*>(NiMemObject::operator new(sizeof(NiBSplineCompFloatInterpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     ::new (pkObject) NiBSplineCompFloatInterpolator(
-        static_cast<NiBSplineData*>(0), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(0)
+        static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
     );
     return pkObject;
 }

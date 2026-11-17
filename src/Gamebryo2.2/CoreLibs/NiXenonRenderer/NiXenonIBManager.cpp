@@ -60,9 +60,9 @@ NiDX9IndexBufferManager::~NiDX9IndexBufferManager() {
 IDirect3DIndexBuffer9*
 NiDX9IndexBufferManager::GetIndexBuffer(uint32_t auiLength, uint32_t auiUsage, D3DFORMAT aeFormat, D3DPOOL aePool) {
     if (!m_pkD3DDevice9) {
-        return 0;
+        return nullptr;
     }
-    IDirect3DIndexBuffer9* pkD3DIB9 = 0;
+    IDirect3DIndexBuffer9* pkD3DIB9 = nullptr;
     NiDX9IndexBufferManager::NiDX9IBInfo* IBInfo = GetIBInfo(auiUsage, aeFormat, aePool);
     if (IBInfo) {
         uint32_t v10;
@@ -72,7 +72,7 @@ NiDX9IndexBufferManager::GetIndexBuffer(uint32_t auiLength, uint32_t auiUsage, D
             v10 = auiLength;
             if (v9->m_uiLength > auiLength) {
                 v9->m_pkIB->Release();
-                v9->m_pkIB = 0;
+                v9->m_pkIB = nullptr;
             }
             else {
                 pkD3DIB9 = v9->m_pkIB;
@@ -88,7 +88,7 @@ NiDX9IndexBufferManager::GetIndexBuffer(uint32_t auiLength, uint32_t auiUsage, D
                 ::new (v11) NiDX9IndexBufferManager::NiDX9IBResource;
             }
             else {
-                v9 = 0;
+                v9 = nullptr;
             }
             v9->m_ePool = aePool;
             v10 = auiLength;
@@ -97,7 +97,7 @@ NiDX9IndexBufferManager::GetIndexBuffer(uint32_t auiLength, uint32_t auiUsage, D
             v9->m_uiLength = auiLength;
             v9->m_eFormat = aeFormat;
             v9->m_uiRevID = 0;
-            v9->m_pkIB = 0;
+            v9->m_pkIB = nullptr;
         }
         if (!v9->m_pkIB) {
             IDirect3DIndexBuffer9* IndexBuffer = CreateIndexBuffer(v10, auiUsage, aeFormat, aePool, &v9->m_kIBDesc);

@@ -71,7 +71,7 @@ double GetObjectImpactDamage(float a1, float a2) {
         v5 = a2 * fPhysicsDamageSpeedMult.Float() + *v2;
     }
     float v8 = v5;
-    return static_cast<float>(v7 * v8);
+    return (v7 * v8);
 }
 
 TESObjectREFR* TESHavokUtilities::FindCollidableRef(const hkpCollidable* apCol) {
@@ -121,7 +121,7 @@ void TESHavokUtilities::AddVelocity(NiAVObject* apObject, const hkVector4& aVelo
     }
     NiNode* pNode = apObject->IsNode();
     if (pNode) {
-        for (uint32_t i = 0; i < static_cast<uint32_t>(pNode->GetArrayCount()); ++i) {
+        for (uint32_t i = 0; i < pNode->GetArrayCount(); ++i) {
             AddVelocity(pNode->GetAt(i), aVelocity, abReset);
         }
     }
@@ -156,7 +156,7 @@ void TESHavokUtilities::AddAngularVelocity(NiAVObject* apObject, const hkVector4
     }
     NiNode* pNode = apObject->IsNode();
     if (pNode) {
-        for (uint32_t i = 0; i < static_cast<uint32_t>(pNode->GetArrayCount()); ++i) {
+        for (uint32_t i = 0; i < pNode->GetArrayCount(); ++i) {
             AddAngularVelocity(pNode->GetAt(i), aVelocity, abReset);
         }
     }
@@ -237,14 +237,14 @@ float TESHavokUtilities::ScaleGameplayImpulseForce(float afBaseForce, bhkRigidBo
     }
     if (abUseMinMass) {
         mass = apPushedBody->GetMass();
-        if (((&fGameplayImpulseMinMass)->Float()) > ((double)mass)) {
+        if ((&fGameplayImpulseMinMass)->Float() > ((double)mass)) {
             v9 = &(&fGameplayImpulseMinMass)->Float();
             v14 = (mass / (*v9)) * v14;
         }
     }
     float* v10 = &(&fGameplayImpulseScale)->Float();
     v14 = v14 * (*v10);
-    return (float)(v14 * afBaseForce);
+    return (v14 * afBaseForce);
 }
 
 void TESHavokUtilities::RemoveHavokFromSceneGraph(NiAVObject* apObject) {
@@ -256,7 +256,7 @@ void TESHavokUtilities::RemoveHavokFromSceneGraph(NiAVObject* apObject) {
     }
     if (apObject->IsNode()) {
         NiNode* pNode = static_cast<NiNode*>(apObject);
-        for (uint32_t i = 0; i < static_cast<uint32_t>(pNode->GetArrayCount()); ++i) {
+        for (uint32_t i = 0; i < pNode->GetArrayCount(); ++i) {
             RemoveHavokFromSceneGraph(pNode->GetAt(i));
         }
     }
@@ -411,14 +411,14 @@ void TESHavokUtilities::AddExplosionImpulse(
     }
     NiNode* pNode = apObject->IsNode();
     if (pNode) {
-        for (uint32_t i = 0; i < static_cast<uint32_t>(pNode->GetArrayCount()); ++i) {
+        for (uint32_t i = 0; i < pNode->GetArrayCount(); ++i) {
             AddExplosionImpulse(pNode->GetAt(i), aLocation, afMagnitude, apHitData);
         }
     }
 }
 
 bool TESHavokUtilities::Should3DRagDoll(TESObjectREFR* apRef, NiAVObject* ap3D) {
-    return (bool)((uint8_t)((apRef && (apRef->IsActor() && (apRef->IsDead((bool)0) || apRef->IsKnockedOut()))) ||
+    return (bool)((uint8_t)((apRef && (apRef->IsActor() && (apRef->IsDead(false) || apRef->IsKnockedOut()))) ||
                             (BSXFlags::FindFlag(ap3D, static_cast<BSXFlags::FLAGS>(72)) == 72)));
 }
 
@@ -440,7 +440,7 @@ void TESHavokUtilities::InspectHavokObjects(
                     phkShape = pshape->Gethk();
                 }
                 else {
-                    phkShape = 0;
+                    phkShape = nullptr;
                 }
                 if (phkShape) {
                     if (phkShape->getType() == HK_SHAPE_TRIANGLE_COLLECTION) {
@@ -520,7 +520,7 @@ NiPoint3* TESHavokUtilities::GetLocalPointWithinCollision(NiPoint3* apResult, Ni
 }
 
 TESObjectREFR* TESHavokUtilities::FindCollidableRef_009C69E0(const hkpCollidable* apCol) {
-    TESObjectREFR* pref = 0;
+    TESObjectREFR* pref = nullptr;
     NiAVObject* pav = bhkUtilFunctions::GetNiAVObject(apCol);
     if (pav) {
         return TESObjectREFR::FindReferenceFor3D(pav);

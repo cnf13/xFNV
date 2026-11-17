@@ -139,7 +139,7 @@ RAYCASTPATH_RESULT PathingSearchRayCast::BuildPath(RayCastPathRequest& aRequest,
     }
     iRayCastCount = 0;
     while (iRayCastCount < 10 && !aRequest.Edges.IsEmpty()) {
-        bool braycastPassed = 0;
+        bool braycastPassed = false;
         if (this->eType) {
             NiPoint3* v18 = &(v37 = GoalLocation.GetLocation());
             braycastPassed = RayCastRecurse((&aRequest.Edges.GetFirst())->Location, *v18);
@@ -160,16 +160,16 @@ RAYCASTPATH_RESULT PathingSearchRayCast::BuildPath(RayCastPathRequest& aRequest,
                 aRetPath.Nodes.Add(GoalLocation);
                 aRetPath.Nodes.Add(startLoc);
                 PathingLocation* Tail = static_cast<PathingLocation*>(aRetPath.Nodes.GetTail());
-                Tail->ResolveNavMeshInfo(0);
+                Tail->ResolveNavMeshInfo(nullptr);
                 aRetPath.eResult = RCP_SUCCESS;
             }
             else {
-                aRequest.Edges.Clear(1);
+                aRequest.Edges.Clear(true);
                 aRetPath.eResult = RCP_FAILED;
             }
             break;
         }
-        aRequest.Edges.Remove(0, 1);
+        aRequest.Edges.Remove(0, true);
         if (aRequest.Edges.IsEmpty()) {
             aRetPath.eResult = RCP_FAILED;
             break;
@@ -207,11 +207,11 @@ bool PathingSearchRayCast::InitRayCasts() {
     CFilter kFilter;
     TESObjectCELL* pcell = (&pRequest->Origin)->GetCell();
     if (!pcell) {
-        return 0;
+        return false;
     }
     pHavokWorld = pcell->GetbhkWorld();
     if (!pHavokWorld) {
-        return 0;
+        return false;
     }
     kFilter.~CFilter();
     ::new (&kFilter) CFilter(0);
@@ -224,7 +224,7 @@ bool PathingSearchRayCast::InitRayCasts() {
         pNewPickData = ::new (apMemory) bhkPickData;
     }
     else {
-        pNewPickData = 0;
+        pNewPickData = nullptr;
     }
     pPickData = pNewPickData;
     pPickData->SetFilter(kFilter);
@@ -236,11 +236,11 @@ bool PathingSearchRayCast::InitRayCasts() {
         pNewCollector = ::new (v6) hkpClosestRayHitCollector;
     }
     else {
-        pNewCollector = 0;
+        pNewCollector = nullptr;
     }
     pCollector = pNewCollector;
     pPickData->SetClosestCollector(pCollector);
-    return 1;
+    return true;
 }
 
 void PathingSearchRayCast::CleanUpRayCasts() {
@@ -248,11 +248,11 @@ void PathingSearchRayCast::CleanUpRayCasts() {
     if (pCollector) {
         pCollector->~hkpClosestRayHitCollector();
         ourMemalignFree(pCollector);
-        pCollector = 0;
+        pCollector = nullptr;
     }
     if (pPickData) {
         ourMemalignFree(pPickData);
-        pPickData = 0;
+        pPickData = nullptr;
     }
 }
 
@@ -272,7 +272,7 @@ bool PathingSearchRayCast::RayCastRecurse(const NiPoint3& aStart, const NiPoint3
         v9 = v16 + *v3;
         v9.z = v16.z;
         if (!RayCast(v16, v9, ecx0)) {
-            return 0;
+            return false;
         }
         v16 = ecx0;
     }
@@ -281,7 +281,7 @@ bool PathingSearchRayCast::RayCastRecurse(const NiPoint3& aStart, const NiPoint3
     float z = aGoal.z;
     v14.z = v16.z;
     if (!RayCast(v16, v14, v15)) {
-        return 0;
+        return false;
     }
     float _Xx = v15.z - aGoal.z;
     return std::fabs(_Xx) < 64.0;
@@ -297,7 +297,7 @@ bool PathingSearchRayCast::RayCast(const NiPoint3& aStart, const NiPoint3& aGoal
     pPickData->NiSetFrom(horizontalPickStart);
     pPickData->NiSetTo(horizontalPickEnd);
     if (pHavokWorld->PickObject(*pPickData)) {
-        return 0;
+        return false;
     }
     ++iRayCastCount;
     float v11 = fMaxDrop + fMaxStep;
@@ -307,12 +307,12 @@ bool PathingSearchRayCast::RayCast(const NiPoint3& aStart, const NiPoint3& aGoal
     pPickData->NiSetFrom(horizontalPickEnd);
     pPickData->NiSetTo(verticalPickEnd);
     if (!pHavokWorld->PickObject(*pPickData)) {
-        return 0;
+        return false;
     }
     float fScalar = (&pCollector->m_rayHit)->m_hitFraction;
     NiPoint3 pickEnd = horizontalPickEnd + (verticalPickEnd - horizontalPickEnd) * fScalar;
     aRetLoc = pickEnd;
-    return 1;
+    return true;
 }
 
 bool PathingSearchRayCast::UnderWaterRayCast(const NiPoint3& aStart, const NiPoint3& aGoal) {

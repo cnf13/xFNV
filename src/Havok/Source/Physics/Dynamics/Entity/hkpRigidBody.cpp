@@ -576,7 +576,7 @@ hkpMotion* hkpRigidBody::getStoredDynamicMotion_0() {
         return m_motion.m_savedMotion;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -715,7 +715,7 @@ void hkpRigidBody::updateBroadphaseAndResetCollisionInformationOfWarpedBody(hkpE
     }
     hkpTreeWorldManager* pKdTreeManager = pWorld->m_kdTreeManager;
     if (pKdTreeManager) {
-        pKdTreeManager->setUpToDate(0);
+        pKdTreeManager->setUpToDate(false);
     }
     // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
     if (pWorld->m_criticalOperationsLockCount-- == 1 && !pWorld->m_blockExecutingPendingOperations.m_bool) {

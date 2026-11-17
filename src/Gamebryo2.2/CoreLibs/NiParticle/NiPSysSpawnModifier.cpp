@@ -48,7 +48,7 @@ NiObject* NiPSysSpawnModifier::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject) NiPSysSpawnModifier;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_usNumSpawnGenerations = m_usNumSpawnGenerations;
@@ -318,7 +318,7 @@ NiObject* NiPSysSpawnModifier::CreateObject() {
     NiPSysSpawnModifier* pkObject =
         static_cast<NiPSysSpawnModifier*>(NiMemObject::operator new(sizeof(NiPSysSpawnModifier)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysSpawnModifier;
 }

@@ -77,8 +77,7 @@ hkpPlaneShape::hkpPlaneShape(const hkVector4& plane, const hkAabb& aabb)
 hkpPlaneShape::hkpPlaneShape(const hkVector4& direction, const hkVector4& center, const hkVector4& halfExtents)
   : hkpHeightFieldShape(HK_SHAPE_PLANE), m_plane(direction), m_aabbCenter(center), m_aabbHalfExtents(halfExtents) {
     __m128 v5 = _mm_mul_ps(direction.m_quad, center.m_quad);
-    m_plane.m_quad[3] =
-        -static_cast<float>(_mm_shuffle_ps(v5, v5, 170)[0] + static_cast<float>(_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]));
+    m_plane.m_quad[3] = -(_mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]));
 }
 
 hkpPlaneShape::~hkpPlaneShape() {}
@@ -184,10 +183,8 @@ void hkpPlaneShape::collideSpheres(
         *outputArray = m_plane;
         v6.m_quad = m_plane.m_quad;
         __m128 v7 = _mm_mul_ps(m_spheres->m_pos.m_quad, v6.m_quad);
-        v8 = static_cast<float>(
-                 static_cast<float>(_mm_shuffle_ps(v7, v7, 170)[0] + _mm_shuffle_ps(v6.m_quad, v6.m_quad, 255)[0]) +
-                 static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])
-             ) -
+        v8 = ((_mm_shuffle_ps(v7, v7, 170)[0] + _mm_shuffle_ps(v6.m_quad, v6.m_quad, 255)[0]) +
+              (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])) -
             m_spheres->m_pos.m_quad[3];
         ++outputArray;
         ++m_spheres;
@@ -205,18 +202,15 @@ void hkpPlaneShape::castSphere(
     uint32_t v17;
     v4.m_quad = m_plane.m_quad;
     __m128 v5 = _mm_mul_ps(v4.m_quad, inputLocal.m_from.m_quad);
-    double v6 = static_cast<float>(
-        static_cast<float>(_mm_shuffle_ps(v5, v5, 170)[0] + _mm_shuffle_ps(v4.m_quad, v4.m_quad, 255)[0]) +
-        static_cast<float>(_mm_shuffle_ps(v5, v5, 85)[0] + v5[0])
-    );
+    double v6 =
+        ((_mm_shuffle_ps(v5, v5, 170)[0] + _mm_shuffle_ps(v4.m_quad, v4.m_quad, 255)[0]) +
+         (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]));
     v7.m_quad = inputLocal.m_to.m_quad;
     double m_radius = inputLocal.m_radius;
     __m128 v9 = _mm_mul_ps(v4.m_quad, v7.m_quad);
     float v16 = v6 - m_radius;
-    float v18 = static_cast<float>(
-                    static_cast<float>(_mm_shuffle_ps(v9, v9, 170)[0] + _mm_shuffle_ps(v4.m_quad, v4.m_quad, 255)[0]) +
-                    static_cast<float>(_mm_shuffle_ps(v9, v9, 85)[0] + v9[0])
-                ) -
+    float v18 = ((_mm_shuffle_ps(v9, v9, 170)[0] + _mm_shuffle_ps(v4.m_quad, v4.m_quad, 255)[0]) +
+                 (_mm_shuffle_ps(v9, v9, 85)[0] + v9[0])) -
         m_radius;
     if (!(v18 >= 0.0f)) {
         double v10 = v16;

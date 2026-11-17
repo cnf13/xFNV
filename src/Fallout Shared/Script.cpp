@@ -78,8 +78,8 @@
 #include "SDK/MSVC/rtti.h"
 
 #include <cmath>
+#include <cstdint>
 #include <cstring>
-#include <stdint.h>
 
 class TESQuest;
 
@@ -98,7 +98,7 @@ bool Cmd_GetIsCurrentWeather(TESObjectREFR* apRefObject, void* apParam1, void* a
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetIsCurrentWeather >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IsWeaponSkillType(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
@@ -110,7 +110,7 @@ bool Cmd_IsWeaponSkillType(TESObjectREFR* apRefObject, void* apParam1, void* apP
     }
     if (v6 || (reinterpret_cast<intptr_t>(apParam1) != 45)) {
         if (!v6) {
-            return 0;
+            return false;
         }
     }
     else {
@@ -124,11 +124,11 @@ bool Cmd_IsWeaponSkillType(TESObjectREFR* apRefObject, void* apParam1, void* apP
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is Weapon Skill Type >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SameFactionAsPC(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
-    return Cmd_SameFaction(apRefObject, pPlayer, 0, afReturnValue);
+    return Cmd_SameFaction(apRefObject, pPlayer, nullptr, afReturnValue);
 }
 
 bool Cmd_SameFaction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
@@ -141,7 +141,7 @@ bool Cmd_SameFaction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2,
     }
     Actor* pOther = static_cast<Actor*>(apParam1);
     if (!pActor || !pOther) {
-        return 1;
+        return true;
     }
     TESActorBase* pActorBase = pActor->GetActorBase();
     TESActorBase* pOtherBase = pOther->GetActorBase();
@@ -161,12 +161,12 @@ bool Cmd_SameFaction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2,
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("SameFaction >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetArgTo0AndReturnTrue(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
-    return 1;
+    return true;
 }
 
 bool Cmd_SameRaceAsPC(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
@@ -179,14 +179,14 @@ bool Cmd_SameSexAsPC(TESObjectREFR* apRefObject, void* apParam1, void* apParam2,
 
 bool Cmd_SameRace(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
-    TESNPC* v8 = 0;
+    TESNPC* v8 = nullptr;
     if (apRefObject) {
         TESBoundObject* ObjectReference = apRefObject->GetObjectReference();
         if (ObjectReference->GetFormType() == 42) {
             v8 = static_cast<TESNPC*>(apRefObject->GetObjectReference());
         }
     }
-    TESNPC* v9 = 0;
+    TESNPC* v9 = nullptr;
     if (apParam1) {
         TESBoundObject* v5 = static_cast<TESObjectREFR*>(apParam1)->GetObjectReference();
         if (v5->GetFormType() == 42) {
@@ -204,19 +204,19 @@ bool Cmd_SameRace(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, do
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("SameRace >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SameSex(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
-    TESActorBase* v8 = 0;
+    TESActorBase* v8 = nullptr;
     if (apRefObject) {
         TESBoundObject* ObjectReference = apRefObject->GetObjectReference();
         if (ObjectReference->GetFormType() == 42) {
             v8 = static_cast<TESActorBase*>(apRefObject->GetObjectReference());
         }
     }
-    TESActorBase* v9 = 0;
+    TESActorBase* v9 = nullptr;
     if (apParam1) {
         TESBoundObject* v5 = static_cast<TESObjectREFR*>(apParam1)->GetObjectReference();
         if (v5->GetFormType() == 42) {
@@ -234,7 +234,7 @@ bool Cmd_SameSex(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, dou
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("SameSex >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 // The process, item and list getters are trivial accessors.
@@ -275,18 +275,18 @@ bool Cmd_IsWeaponInList(TESObjectREFR* apRefObject, void* apParam1, void* apPara
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("IsWeaponInList >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetDefaultOpen(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     if (!apRefObject) {
-        return 0;
+        return false;
     }
     afReturnValue = 0.0;
     if (apRefObject->GetAction(OBJECT_ACTION_OPEN_BY_DEFAULT)) {
         afReturnValue = 1.0;
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetFactionRelation(TESObjectREFR* apRefObject, Actor* apParam1, void* apParam2, double& afReturnValue) {
@@ -305,7 +305,7 @@ bool Cmd_GetFactionRelation(TESObjectREFR* apRefObject, Actor* apParam1, void* a
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IsLastIdlePlayed(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
@@ -321,11 +321,11 @@ bool Cmd_IsLastIdlePlayed(TESObjectREFR* apRefObject, void* apParam1, void* apPa
             }
         }
     }
-    return 1;
+    return true;
 }
 
 void ClearPendingReferenceLists() {
-    Script::ScriptRefListCrit.Enter(0);
+    Script::ScriptRefListCrit.Enter(nullptr);
     Script::ReferencesToEnable.RemoveAll();
     Script::ReferencesToDisable.RemoveAll();
     Script::ReferencesToDelete.RemoveAll();
@@ -445,7 +445,7 @@ void Script::SetIsCompiled(bool abCompiled) {
 }
 
 void Script::AddProfilerTime(float afTime) {
-    fProfilerTimer = (float)(fProfilerTimer + afTime);
+    fProfilerTimer = (fProfilerTimer + afTime);
 }
 
 void Script::SetOwnerQuest(TESQuest* apQuest) {
@@ -487,7 +487,7 @@ bool Script::GetInZoneConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetInZone >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetAlarmedConditionFunction(
@@ -515,7 +515,7 @@ bool Script::GetAlarmedConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetAlarmed >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsWeaponOutConditionFunction(
@@ -539,7 +539,7 @@ bool Script::IsWeaponOutConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is Weapon Out >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetOpenStateConditionFunction(
@@ -555,7 +555,7 @@ bool Script::GetOpenStateConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetOpenState >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetRadiationLevel(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
@@ -566,10 +566,10 @@ bool Script::GetRadiationLevel(TESObjectREFR* apRefObject, void* apParam1, void*
     BaseProcess* currentProcess;
     afReturnValue = 0.0;
     if (!apRefObject) {
-        return 1;
+        return true;
     }
     if (!apRefObject->IsActor()) {
-        return 1;
+        return true;
     }
     afReturnValue = 0.0;
     if (static_cast<Actor*>(apRefObject)->MobileObject::GetCurrentAIProcess()) {
@@ -581,12 +581,12 @@ bool Script::GetRadiationLevel(TESObjectREFR* apRefObject, void* apParam1, void*
         afReturnValue = (currentProcess->GetRadiationDelta() + v7) + v8;
     }
     if (!Script::GetThreadSystemOutput()) {
-        return 1;
+        return true;
     }
     double v6 = afReturnValue;
     const char* baseFullName = apRefObject->TESObjectREFR::GetFullName();
     Interface::PrintLine("%s radiation level is %.2f", baseFullName, v6);
-    return 1;
+    return true;
 }
 
 bool Script::IsCombatTargetConditionFunction(
@@ -605,7 +605,7 @@ bool Script::IsCombatTargetConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsCombatTarget >> %.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetActorsInHighConditionFunction(
@@ -619,7 +619,7 @@ bool Script::GetActorsInHighConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetActorsInHigh >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::HasLoaded3DConditionFunction(
@@ -630,12 +630,12 @@ bool Script::HasLoaded3DConditionFunction(
 ) {
     afReturnValue = 0.0;
     if (!apRefObject) {
-        return 1;
+        return true;
     }
     if (apRefObject->Get3D()) {
         afReturnValue = 1.0;
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetFatiguePercentageConditionFunction(
@@ -651,13 +651,13 @@ bool Script::GetFatiguePercentageConditionFunction(
         }
     }
     if (!v5) {
-        return 1;
+        return true;
     }
     afReturnValue = (double)v5->GetFatiguePercentage();
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetFatiguePercentage >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetHealthPercentageConditionFunction(
@@ -673,13 +673,13 @@ bool Script::GetHealthPercentageConditionFunction(
         }
     }
     if (!v5) {
-        return 1;
+        return true;
     }
     afReturnValue = (double)v5->GetHealthPercentage();
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetHealthPercentage >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetScaleConditionFunction(
@@ -696,7 +696,7 @@ bool Script::GetScaleConditionFunction(
             Interface::PrintLine("GetScale >> %0.2f (with base %0.2f)", afReturnValue, scale);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetIsLockBrokenConditionFunction(
@@ -716,7 +716,7 @@ bool Script::GetIsLockBrokenConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetIsLockBroken >> %0.f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetDiseaseConditionFunction(
@@ -729,7 +729,7 @@ bool Script::GetDiseaseConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("UNIMPLEMENTED: GetDisease >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetGoldConditionFunction(
@@ -754,7 +754,7 @@ bool Script::GetGoldConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetGold >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetFurnitureMarkerIDConditionFunction(
@@ -778,7 +778,7 @@ bool Script::GetFurnitureMarkerIDConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetFurnitureMarkerID >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetIsPleasantConditionFunction(
@@ -800,18 +800,17 @@ bool Script::GetIsPleasantConditionFunction(
         weatherPercent = 0.0;
     }
     afReturnValue = weatherPercent;
-    if (instance->Sky::GetLastWeather() &&
-        ((time = static_cast<TESWeather*>(instance->Sky::GetLastWeather())), time->IsPleasant())) {
+    if (instance->Sky::GetLastWeather() && ((time = instance->Sky::GetLastWeather()), time->IsPleasant())) {
         v7 = 1.0 - instance->GetWeatherPercent();
     }
     else {
         v7 = 0.0;
     }
-    afReturnValue = (afReturnValue) + v7;
+    afReturnValue = afReturnValue + v7;
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetIsPleasant >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetIsCloudyConditionFunction(
@@ -833,18 +832,17 @@ bool Script::GetIsCloudyConditionFunction(
         weatherPercent = 0.0;
     }
     afReturnValue = weatherPercent;
-    if (instance->Sky::GetLastWeather() &&
-        ((time = static_cast<TESWeather*>(instance->Sky::GetLastWeather())), time->IsCloudy())) {
+    if (instance->Sky::GetLastWeather() && ((time = instance->Sky::GetLastWeather()), time->IsCloudy())) {
         v7 = 1.0 - instance->GetWeatherPercent();
     }
     else {
         v7 = 0.0;
     }
-    afReturnValue = (afReturnValue) + v7;
+    afReturnValue = afReturnValue + v7;
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetIsCloudy >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetIsRainingConditionFunction(
@@ -865,7 +863,7 @@ bool Script::GetIsRainingConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetIsRaining >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetIsSnowingConditionFunction(
@@ -886,7 +884,7 @@ bool Script::GetIsSnowingConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetIsSnowing >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetWeatherPercentConditionFunction(
@@ -900,7 +898,7 @@ bool Script::GetWeatherPercentConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetCurrentWeatherPercent >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetAttackedConditionFunction(
@@ -921,7 +919,7 @@ bool Script::GetAttackedConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetAttacked >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetIsChildConditionFunction(
@@ -932,14 +930,14 @@ bool Script::GetIsChildConditionFunction(
 ) {
     afReturnValue = 0.0;
     if (apRefObject) {
-        if (apRefObject->IsChild((bool)0)) {
+        if (apRefObject->IsChild(false)) {
             afReturnValue = 1.0;
         }
     }
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsChild >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetUsedItemLevelConditionFunction(
@@ -952,7 +950,7 @@ bool Script::GetUsedItemLevelConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetIsUsedItemLevel >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetUsedItemActivateConditionFunction(
@@ -968,7 +966,7 @@ bool Script::GetUsedItemActivateConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetIsUsedItemActivate >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetRestrainedConditionFunction(
@@ -991,7 +989,7 @@ bool Script::GetRestrainedConditionFunction(
             afReturnValue = 1.0;
         }
         if (Script::GetThreadSystemOutput()) {
-            if (0.0 == (afReturnValue)) {
+            if (0.0 == afReturnValue) {
                 fullName = v7->TESObjectREFR::GetFullName();
                 Interface::PrintLine("%s is not restrained", fullName);
             }
@@ -1001,7 +999,7 @@ bool Script::GetRestrainedConditionFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetLevelConditionFunction(
@@ -1023,7 +1021,7 @@ bool Script::GetLevelConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetLevel >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetAlertConditionFunction(
@@ -1045,7 +1043,7 @@ bool Script::GetAlertConditionFunction(
             Interface::PrintLine("GetIsAlerted: %0.2f", afReturnValue);
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::IsFacingUpConditionFunction(
@@ -1078,7 +1076,7 @@ bool Script::IsFacingUpConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is Facing Up >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsLeftUpConditionFunction(
@@ -1108,7 +1106,7 @@ bool Script::IsLeftUpConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is Left Up >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetCurrentAIPackageConditionFunction(
@@ -1265,7 +1263,7 @@ bool Script::GetCurrentAIPackageConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Current Process >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsWaitingConditionFunction(
@@ -1289,7 +1287,7 @@ bool Script::IsWaitingConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is Waiting >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsIdlePlayingConditionFunction(
@@ -1311,7 +1309,7 @@ bool Script::IsIdlePlayingConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is Idle Playing >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetAmountStolenSoldConditionFunction(
@@ -1325,7 +1323,7 @@ bool Script::GetAmountStolenSoldConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Amount stolen the player sold >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetWindSpeedConditionFunction(
@@ -1336,14 +1334,14 @@ bool Script::GetWindSpeedConditionFunction(
 ) {
     afReturnValue = 0.0;
     if ((!TES::pInstance) || (!TES::pInstance->TES::GetSky())) {
-        return 0;
+        return false;
     }
     Sky* currentAIProcess = TES::pInstance->TES::GetSky();
     afReturnValue = (double)currentAIProcess->GetWindSpeed();
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetWindSpeed >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsInMyOwnedCellConditionFunction(
@@ -1371,7 +1369,7 @@ bool Script::IsInMyOwnedCellConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is in owned cell value %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsContinuingPackagePCNearConditionFunction(
@@ -1393,7 +1391,7 @@ bool Script::IsContinuingPackagePCNearConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("is continuing package near PC value %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::HasFlamesConditionFunction(
@@ -1424,7 +1422,7 @@ bool Script::HasFlamesConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("HasFlames >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsPCSleepingConditionFunction(
@@ -1445,7 +1443,7 @@ bool Script::IsPCSleepingConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsPlayerSleeping >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsPCAMurdererConditionFunction(
@@ -1466,7 +1464,7 @@ bool Script::IsPCAMurdererConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsPlayerAMurderer >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsSwimmingConditionFunction(
@@ -1490,7 +1488,7 @@ bool Script::IsSwimmingConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is Swimming >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetDestroyedConditionFunction(
@@ -1508,7 +1506,7 @@ bool Script::GetDestroyedConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetDestroyed >> %.0f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::HasMagicEffectConditionFunction(
@@ -1536,7 +1534,7 @@ bool Script::HasMagicEffectConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Has Magic Effect >> %0.2f", afReturnValue);
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetVATSModeConditionFunction(
@@ -1550,7 +1548,7 @@ bool Script::GetVATSModeConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("VATS Mode >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetSandmanConditionFunction(
@@ -1566,7 +1564,7 @@ bool Script::GetSandmanConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Player is in Sandman action >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::HasBeenEatenConditionFunction(
@@ -1584,7 +1582,7 @@ bool Script::HasBeenEatenConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Actor has been eaten >> %0.2f", afReturnValue);
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetGhostConditionFunction(
@@ -1608,7 +1606,7 @@ bool Script::GetGhostConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetGhost >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetOffersServiceConditionFunction(
@@ -1632,9 +1630,9 @@ bool Script::GetOffersServiceConditionFunction(
         }
     }
     if (!Script::GetThreadSystemOutput()) {
-        return 1;
+        return true;
     }
-    if (0.0 == (afReturnValue)) {
+    if (0.0 == afReturnValue) {
         baseFormFullName = pActor->TESObjectREFR::GetFullName();
         Interface::PrintLine("%s is not offering services", baseFormFullName);
     }
@@ -1642,7 +1640,7 @@ bool Script::GetOffersServiceConditionFunction(
         v4 = pActor->TESObjectREFR::GetFullName();
         Interface::PrintLine("%s  is offering services", v4);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetBarterGoldConditionFunction(
@@ -1665,7 +1663,7 @@ bool Script::GetBarterGoldConditionFunction(
             Interface::PrintLine("%s  has %d barter gold currently", v6, barterGold);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsActorUsingATorchConditionFunction(
@@ -1678,7 +1676,7 @@ bool Script::IsActorUsingATorchConditionFunction(
         apRefObject->IsActor();
     }
     afReturnValue = 0.0;
-    return 1;
+    return true;
 }
 
 bool Script::IsSneakingConditionFunction(
@@ -1700,9 +1698,9 @@ bool Script::IsSneakingConditionFunction(
         afReturnValue = 1.0;
     }
     if (!Script::GetThreadSystemOutput()) {
-        return 1;
+        return true;
     }
-    if (0.0 == (afReturnValue)) {
+    if (0.0 == afReturnValue) {
         fullName = TESFullName::GetFullName(v7);
         Interface::PrintLine("%s is not sneaking", fullName);
     }
@@ -1710,7 +1708,7 @@ bool Script::IsSneakingConditionFunction(
         v4 = TESFullName::GetFullName(v7);
         Interface::PrintLine("%s is sneaking", v4);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsRunningConditionFunction(
@@ -1732,9 +1730,9 @@ bool Script::IsRunningConditionFunction(
         afReturnValue = 1.0;
     }
     if (!Script::GetThreadSystemOutput()) {
-        return 1;
+        return true;
     }
-    if (0.0 == (afReturnValue)) {
+    if (0.0 == afReturnValue) {
         fullName = TESFullName::GetFullName(v7);
         Interface::PrintLine("%s is not running", fullName);
     }
@@ -1742,7 +1740,7 @@ bool Script::IsRunningConditionFunction(
         v4 = TESFullName::GetFullName(v7);
         Interface::PrintLine("%s is running", v4);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetFriendHitConditionFunction(
@@ -1762,7 +1760,7 @@ bool Script::GetFriendHitConditionFunction(
         }
     }
     if (!apObj) {
-        return (bool)1;
+        return true;
     }
     ExtraDataList* extra = apObj->TESObjectREFR::GetExtra();
     afReturnValue = (double)extra->GetFriendHitCount();
@@ -1772,7 +1770,7 @@ bool Script::GetFriendHitConditionFunction(
         v6 = TESFullName::GetFullName(pPlayer);
         Interface::PrintLine("%s has hit %s %0.2f times", v6, fullName, v8);
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::IsInInteriorConditionFunction(
@@ -1794,9 +1792,9 @@ bool Script::IsInInteriorConditionFunction(
         }
     }
     if (!Script::GetThreadSystemOutput()) {
-        return 1;
+        return true;
     }
-    if (0.0 == (afReturnValue)) {
+    if (0.0 == afReturnValue) {
         fullName = TESFullName::GetFullName(apRefObject);
         Interface::PrintLine("%s is not an Interior", fullName);
     }
@@ -1804,7 +1802,7 @@ bool Script::IsInInteriorConditionFunction(
         v5 = TESFullName::GetFullName(apRefObject);
         Interface::PrintLine("%s is in an Interior", v5);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetWhichServiceConditionFunction(
@@ -1815,7 +1813,7 @@ bool Script::GetWhichServiceConditionFunction(
 ) {
     afReturnValue = (-1.0);
     afReturnValue = (double)Interface::iServiceFlag;
-    return 1;
+    return true;
 }
 
 bool Script::IsActorRidingHorseConditionFunction(
@@ -1828,7 +1826,7 @@ bool Script::IsActorRidingHorseConditionFunction(
     if (apRefObject) {
         apRefObject->IsActor();
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsXboxConditionFunction(
@@ -1849,7 +1847,7 @@ bool Script::IsXboxConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsXBox >> %1.0f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsPS3ConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
@@ -1857,7 +1855,7 @@ bool Script::IsPS3ConditionFunction(TESObjectREFR* apRefObject, void* apParam1, 
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsPS3 >> %1.0f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsPCConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
@@ -1873,7 +1871,7 @@ bool Script::IsPCConditionFunction(TESObjectREFR* apRefObject, void* apParam1, v
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsPC >> %1.0f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsEssentialConditionFunction(
@@ -1886,7 +1884,7 @@ bool Script::IsEssentialConditionFunction(
     if (apRefObject->IsActor() && static_cast<Actor*>(apRefObject)->GetEssential()) {
         afReturnValue = 1.0;
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::IsActorConditionFunction(
@@ -1899,7 +1897,7 @@ bool Script::IsActorConditionFunction(
     if (apRefObject->IsActor()) {
         afReturnValue = 1.0;
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsPlayerMovingIntoNewSpaceConditionFunction(
@@ -1912,7 +1910,7 @@ bool Script::IsPlayerMovingIntoNewSpaceConditionFunction(
     if (pPlayer->btransporting) {
         afReturnValue = 1.0;
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetLastPlayerActionConditionFunction(
@@ -1923,7 +1921,7 @@ bool Script::GetLastPlayerActionConditionFunction(
 ) {
     afReturnValue = 0.0;
     afReturnValue = (double)pPlayer->GetLastAction();
-    return 1;
+    return true;
 }
 
 bool Script::GetLastHitCriticalConditionFunction(
@@ -1949,7 +1947,7 @@ bool Script::GetLastHitCriticalConditionFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetIsMovingConditionFunction(
@@ -1960,10 +1958,10 @@ bool Script::GetIsMovingConditionFunction(
 ) {
     afReturnValue = 0.0;
     if (!apRefObject) {
-        return 1;
+        return true;
     }
     if (!apRefObject->IsActor()) {
-        return 1;
+        return true;
     }
     int8_t movementFlags = (int8_t)static_cast<Actor*>(apRefObject)->GetMoveMode();
     if ((movementFlags & 1) != 0) {
@@ -1984,7 +1982,7 @@ bool Script::GetIsMovingConditionFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetAnimActionConditionFunction(
@@ -1999,7 +1997,7 @@ bool Script::GetAnimActionConditionFunction(
             afReturnValue = (double)static_cast<Actor*>(apRefObject)->GetAnimAction();
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetPlantedExplosiveConditionFunction(
@@ -2018,7 +2016,7 @@ bool Script::GetPlantedExplosiveConditionFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsActorTalkingThroughActivatorConditionFunction(
@@ -2034,7 +2032,7 @@ bool Script::IsActorTalkingThroughActivatorConditionFunction(
                 (double)(&ReferenceProcessLists)->IsActorTalkingThroughActivator(static_cast<Actor*>(apRefObject));
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetDialogueEmotionConditionFunction(
@@ -2053,7 +2051,7 @@ bool Script::GetDialogueEmotionConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetEmotion >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetDialogueEmotionValueConditionFunction(
@@ -2069,7 +2067,7 @@ bool Script::GetDialogueEmotionValueConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetEmotionValue >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsWaterObjectConditionFunction(
@@ -2088,7 +2086,7 @@ bool Script::IsWaterObjectConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsWaterActivator >> %0.2f", afReturnValue);
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetPlayerTeammateConditionFunction(
@@ -2104,11 +2102,11 @@ bool Script::GetPlayerTeammateConditionFunction(
                 afReturnValue = 1.0;
             }
             if (Script::GetThreadSystemOutput()) {
-                Interface::PrintLine("Player teammate  >> %d", (int32_t)(afReturnValue));
+                Interface::PrintLine("Player teammate  >> %d", (int32_t)afReturnValue);
             }
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetMinorCrimeCountConditionFunction(
@@ -2131,7 +2129,7 @@ bool Script::GetMinorCrimeCountConditionFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetMajorCrimeCountConditionFunction(
@@ -2142,10 +2140,10 @@ bool Script::GetMajorCrimeCountConditionFunction(
 ) {
     afReturnValue = 0.0;
     if (!apRefObject) {
-        return 1;
+        return true;
     }
     if (!apRefObject->IsActor()) {
-        return 1;
+        return true;
     }
     if (static_cast<const void*>(apRefObject) == static_cast<const void*>(pPlayer)) {
         afReturnValue = (double)static_cast<Actor*>(apRefObject)->GetMajorCrimesNumber();
@@ -2156,7 +2154,7 @@ bool Script::GetMajorCrimeCountConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("The number of major crimes is %.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetDestructionStageConditionFunction(
@@ -2172,7 +2170,7 @@ bool Script::GetDestructionStageConditionFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetDestructionStage >> %.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsHardcoreConditionalFunction(
@@ -2187,7 +2185,7 @@ bool Script::IsHardcoreConditionalFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsHardcore? >> %f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsAlwaysHardcoreConditionalFunction(
@@ -2202,7 +2200,7 @@ bool Script::IsAlwaysHardcoreConditionalFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetAlwaysHardcore? >> %f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetIsTurningConditionFunction(
@@ -2226,7 +2224,7 @@ bool Script::GetIsTurningConditionFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ShowMessage(
@@ -2384,7 +2382,7 @@ bool Script::GetPosConditionFunction(
             );
         }
     }
-    return 1;
+    return true;
 }
 
 void Script::LoadPendingReferenceLists(BGSLoadGameBuffer* apLoadGameBuffer) {
@@ -2562,12 +2560,12 @@ bool Script::GetNoRumors(TESObjectREFR* apRefObject, void* apParam1, void* apPar
         }
     }
     if (!v5) {
-        return 1;
+        return true;
     }
     if (v5->HasNoRumors()) {
         afReturnValue = 1.0;
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleMaterialGeometryFunction(
@@ -2580,10 +2578,10 @@ bool Script::ToggleMaterialGeometryFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    bhkShape::bMaterialColor = (bool)1;
+    bhkShape::bMaterialColor = true;
     TES::pInstance->ToggleCollisionGeometry();
-    bhkShape::bMaterialColor = (bool)0;
-    return 1;
+    bhkShape::bMaterialColor = false;
+    return true;
 }
 
 bool Script::TriggerHUDShudder(
@@ -2601,17 +2599,17 @@ bool Script::TriggerHUDShudder(
     float v14 = 0.10000000149011612f;
     float v13 = 0.05000000074505806f;
     if (!Script::ParseParameters(
-            apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript,
-            static_cast<ScriptLocals*>(apScriptLocals), &a8, &v14, &v13, &v15
+            apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v14,
+            &v13, &v15
         )) {
-        return 0;
+        return false;
     }
     float a4 = v13;
     float a3 = v14;
     float a2 = a8;
     FOHUDEffectManager* screenShaderThingy = Interface::GetHUDEffects();
     screenShaderThingy->TriggerShudder(a2, a3, a4);
-    return 1;
+    return true;
 }
 
 bool Script::GetWeaponAnimType(
@@ -2625,10 +2623,10 @@ bool Script::GetWeaponAnimType(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return Script::GetWeaponAnimTypeConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::GetWeaponAnimTypeConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return 1;
+        return true;
     }
 }
 
@@ -2649,7 +2647,7 @@ bool Script::DebugCombatPlan(
             v4->DebugCombatPlan();
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::DumpNiUpdates(
@@ -2664,7 +2662,7 @@ bool Script::DumpNiUpdates(
 ) {
     Set(1);
     Interface::CloseConsole();
-    return 1;
+    return true;
 }
 
 bool Script::RefreshINI(
@@ -2708,7 +2706,7 @@ bool Script::RefreshINI(
         v5->ReadSettingsFromFile(static_cast<const char*>(static_cast<const void*>(apDest)));
     }
     Interface::PrintLine("The in-game settings have been refreshed from the Fallout.ini file.");
-    return 1;
+    return true;
 }
 
 bool Script::SetOpenState(
@@ -2726,25 +2724,25 @@ bool Script::SetOpenState(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (a8) {
             if (((int32_t)BGSOpenCloseForm::GetOpenState(apRefObject)) > 2) {
-                apRefObject->Activate(nullptr, 0, nullptr, 1);
+                apRefObject->Activate(nullptr, false, nullptr, 1);
             }
             apRefObject->SetLastFinishedSequence("Open");
         }
         else {
             if (((int32_t)BGSOpenCloseForm::GetOpenState(apRefObject)) < 3) {
-                apRefObject->Activate(nullptr, 0, nullptr, 1);
+                apRefObject->Activate(nullptr, false, nullptr, 1);
             }
             apRefObject->SetLastFinishedSequence("Close");
         }
         extra = apRefObject->TESObjectREFR::GetExtra();
         extra->RemoveSavedAnimation();
     }
-    return 1;
+    return true;
 }
 
 bool Script::DamageActorValueFunction(
@@ -2765,7 +2763,7 @@ bool Script::DamageActorValueFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v14
         )) {
-        return 0;
+        return false;
     }
     Actor* v12 = dynamic_cast<Actor*>(apRefObject);
     if (v12) {
@@ -2778,10 +2776,10 @@ bool Script::DamageActorValueFunction(
             }
         }
         else {
-            if ((a8 == 16) && v12->IsChild((bool)0)) {
+            if ((a8 == 16) && v12->IsChild(false)) {
                 a1 = -v14;
                 v12->HandleHealthDamage(nullptr, a1);
-                return 1;
+                return true;
             }
             v11 = v14;
             if (!((uint8_t)ActorValue::IsFlagSet(static_cast<ActorValue::Index>(a8), ActorValue::DAMAGE_IS_POSITIVE))) {
@@ -2790,7 +2788,7 @@ bool Script::DamageActorValueFunction(
             v12->DamageModActorValue(static_cast<ActorValue::Index>(a8), v11, nullptr);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::RefreshShaders(
@@ -2807,7 +2805,7 @@ bool Script::RefreshShaders(
     BSShaderManager::SetShaderErrorCallback(&ConsoleShaderError);
     BSShaderManager::ReloadShaders();
     BSShaderManager::SetShaderErrorCallback(pOldCallback);
-    return 1;
+    return true;
 }
 
 bool Script::ToggleBorders(
@@ -2832,5 +2830,5 @@ bool Script::ToggleBorders(
             Interface::PrintLine("Borders -> %s", "Off");
         }
     }
-    return 1;
+    return true;
 }

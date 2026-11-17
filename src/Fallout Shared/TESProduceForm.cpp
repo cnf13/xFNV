@@ -30,7 +30,7 @@ void TESProduceForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESProduceForm::CompareComponent(BaseFormComponent* apCompareFC) {
     TESProduceForm* pcompare = dynamic_cast<TESProduceForm*>(apCompareFC);
     if (!pcompare) {
-        return 1;
+        return true;
     }
     IngredientItem* FormHealth_0 = pFormIngredient;
     return FormHealth_0 != pcompare->pFormIngredient || std::memcmp(iProduceChance, pcompare->iProduceChance, 4u) != 0;

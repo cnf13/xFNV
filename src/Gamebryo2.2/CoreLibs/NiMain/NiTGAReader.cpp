@@ -41,7 +41,7 @@ NiPixelData* NiTGAReader::ReadFile(NiFile& kIst, NiPixelData* pkOptDest) {
     EnterCriticalSection(&m_kReadCriticalSection.m_kCriticalSection);
     if (!ReadHeader(kIst, v25, v24, apMemory, v19, v23)) {
         LeaveCriticalSection(&m_kReadCriticalSection.m_kCriticalSection);
-        return 0;
+        return nullptr;
     }
     uint8_t m_uiBytesPerPixel = this->m_uiBytesPerPixel;
     uint32_t m_usWidth = this->m_usWidth;
@@ -61,7 +61,7 @@ NiPixelData* NiTGAReader::ReadFile(NiFile& kIst, NiPixelData* pkOptDest) {
         }
     LABEL_15:;
         LeaveCriticalSection(&m_kReadCriticalSection.m_kCriticalSection);
-        return 0;
+        return nullptr;
     }
     if (m_bColormapped) {
         goto LABEL_15;
@@ -79,7 +79,7 @@ LABEL_9:;
             kIsta = ::new (v10) NiPixelData(this->m_usWidth, m_usHeight, m_kFormat, 1u, 1u);
         }
         else {
-            kIsta = 0;
+            kIsta = nullptr;
         }
         v9 = kIsta;
     }
@@ -90,7 +90,7 @@ LABEL_9:;
             v12 = ::new (v11) NiPalette(m_bAlpha, m_usPalLength, m_pkColorMap);
         }
         else {
-            v12 = 0;
+            v12 = nullptr;
         }
         v9->SetPalette(v12);
     }
@@ -150,7 +150,7 @@ bool NiTGAReader::ReadHeader(
 ) {
     bool result;
     uint32_t v26;
-    kIst.SetEndianSwap(0);
+    kIst.SetEndianSwap(false);
     NiCriticalSection* lpCriticalSection = &m_kReadCriticalSection;
     EnterCriticalSection(&m_kReadCriticalSection.m_kCriticalSection);
     uiFaces = 1;
@@ -195,27 +195,27 @@ bool NiTGAReader::ReadHeader(
     m_bFlipVert = (m_ucAttBits & 32) == 0;
     switch (m_ucImgType) {
         case TGA_Map: {
-            this->m_bColormapped = 1;
-            m_bRLE = 0;
+            this->m_bColormapped = true;
+            m_bRLE = false;
             goto LABEL_9;
         }
         case TGA_RGB:
         case TGA_Mono: {
-            m_bRLE = 0;
+            m_bRLE = false;
             goto LABEL_8;
         }
         case TGA_RLEMap: {
-            this->m_bColormapped = 1;
-            m_bRLE = 1;
+            this->m_bColormapped = true;
+            m_bRLE = true;
             goto LABEL_9;
         }
         case TGA_RLERGB:
         case TGA_RLEMono: {
             uint8_t m_ucCoSize;
             NiPixelFormat* v22;
-            m_bRLE = 1;
+            m_bRLE = true;
         LABEL_8:;
-            this->m_bColormapped = 0;
+            this->m_bColormapped = false;
         LABEL_9:;
             bool m_bColormapped = this->m_bColormapped;
             if (m_bColormapped) {
@@ -296,20 +296,20 @@ bool NiTGAReader::ReadHeader(
                 }
             }
             uint32_t m_usWidth = this->m_usWidth;
-            m_bRLEncodedRun = 0;
+            m_bRLEncodedRun = false;
             m_uiRLECount = 0;
             uiWidth = m_usWidth;
             uiHeight = m_usHeight;
             kFormat = m_kFormat;
-            bMipmap = 0;
+            bMipmap = false;
             LeaveCriticalSection(&lpCriticalSection->m_kCriticalSection);
-            result = 1;
+            result = true;
             break;
         }
         default: {
         LABEL_34:;
             LeaveCriticalSection(&lpCriticalSection->m_kCriticalSection);
-            result = 0;
+            result = false;
             break;
         }
     }

@@ -9,7 +9,7 @@
 bool NiDX9MaterialManager::MaterialEntry::Update(const NiMaterialProperty* apMaterial) {
     uint32_t m_uiRevID = apMaterial->m_uiRevID;
     if (this->m_uiRevID == m_uiRevID) {
-        return 0;
+        return false;
     }
     this->m_uiRevID = m_uiRevID;
     const NiColor* m_external_emit = apMaterial->m_external_emit;
@@ -35,7 +35,7 @@ bool NiDX9MaterialManager::MaterialEntry::Update(const NiMaterialProperty* apMat
     m_kD3DMat.Specular.a = apMateriala;
     double m_fShine = apMaterial->m_fShine;
     m_kD3DMat.Power = m_fShine;
-    return 1;
+    return true;
 }
 
 // Frees the default material's entry, which the manager made.
@@ -89,7 +89,7 @@ void NiDX9MaterialManager::SetCurrentMaterial(const NiMaterialProperty* apMateri
 
 void NiDX9MaterialManager::UpdateToDevice(IDirect3DDevice9* apDevice) {
     if (m_bChanged) {
-        m_bChanged = 0;
+        m_bChanged = false;
         apDevice->SetMaterial(&m_pkCurrentMaterial->m_kD3DMat);
     }
 }

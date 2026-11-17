@@ -49,7 +49,7 @@ void TESRegionDataImposter::Save() {
 }
 
 void TESRegionDataImposter::InitItem(TESForm* apOwner) {
-    TESObjectREFR* pImposter = 0;
+    TESObjectREFR* pImposter = nullptr;
     BSSimpleList<TESObjectREFR*>* pList = &m_Imposters;
     while (pList) {
         if (pList->m_item) {
@@ -59,7 +59,7 @@ void TESRegionDataImposter::InitItem(TESForm* apOwner) {
                 pownerFile = apOwner->GetFile(-1);
             }
             else {
-                pownerFile = 0;
+                pownerFile = nullptr;
             }
             TESForm::AddCompileIndex(nID, pownerFile);
             TESForm* FormByNumericID = TESForm::GetFormByNumericID(nID);
@@ -135,15 +135,15 @@ bool TESRegionDataImposter::LoadRegionDataImposter(TESFile* apFile) {
 bool TESRegionDataImposter::AddToImposterList(TESObjectREFR* apNewImposter) {
     BSSimpleList<TESObjectREFR*>* Name = GetImposterList();
     if (Name->IsInList(apNewImposter)) {
-        return 0;
+        return false;
     }
     m_Imposters.AddTail(apNewImposter);
-    return 1;
+    return true;
 }
 
 bool TESRegionDataImposter::ClearImposterList() {
     (&m_Imposters)->RemoveAll();
-    return 1;
+    return true;
 }
 
 void TESRegionDataImposter::SetImpostersVisible(bool abVisible, bool abInstantly) {
@@ -157,20 +157,20 @@ void TESRegionDataImposter::SetImpostersVisible(bool abVisible, bool abInstantly
 void TESRegionDataImposter::SetImposterVisible(TESObjectREFR* apImposter, bool abVisible, bool abInstantly) {
     if (apImposter) {
         if (!apImposter->GetIsImposter()) {
-            apImposter->SetIsImposter(1);
+            apImposter->SetIsImposter(true);
             int32_t CastingType = apImposter->iFormID;
             Warning(
                 WARN_FORMS, "SetImposterVisible: ObjectREFR is not flagged as an imposter (%s:%X)",
                 apImposter->GetFormEditorID(), CastingType
             );
         }
-        BSFadeNode* pFadeNode = 0;
+        BSFadeNode* pFadeNode = nullptr;
         if (apImposter->Get3D()) {
             NiNode* pNode = apImposter->Get3D();
             pFadeNode = pNode->IsFadeNode();
         }
         if (!pFadeNode) {
-            abInstantly = 1;
+            abInstantly = true;
         }
         if (abInstantly) {
             if (apImposter->Get3D()) {
@@ -183,11 +183,11 @@ void TESRegionDataImposter::SetImposterVisible(TESObjectREFR* apImposter, bool a
         else {
             if (abVisible) {
                 NiNode* v5 = apImposter->Get3D();
-                v5->SetAppCulled(0);
-                pFadeNode->SetRelevantImposter(1);
+                v5->SetAppCulled(false);
+                pFadeNode->SetRelevantImposter(true);
             }
             else {
-                pFadeNode->SetRelevantImposter(0);
+                pFadeNode->SetRelevantImposter(false);
             }
         }
     }

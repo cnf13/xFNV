@@ -350,7 +350,7 @@ void BSFadeNode::OnVisible(NiCullingProcess& arCuller) {
         if (!m_kWorldBound) {
             m_kWorldBound = static_cast<BSNiBound*>(&NiAVObject::NullBoundS);
         }
-        pbsAccum->StartGroupingAlphas(*m_kWorldBound, 1);
+        pbsAccum->StartGroupingAlphas(*m_kWorldBound, true);
         v11 = 1;
         BSShaderUtil::RecursiveSetPropertyFadeAlpha(this, fmaxA);
         fCurrentFade = fmaxA;
@@ -411,7 +411,7 @@ bool BSFadeNode::CheckFadeRadius(NiCamera* apCamera, bool abNoFade) {
             goto LABEL_10;
         }
         if (eMultType == LOD_MULT_DIST_OVERRIDE) {
-            return 1;
+            return true;
         }
         if (fFarDistSqr > 2600.0f) {
             fFarDistSqr = 2600.0f;
@@ -430,7 +430,7 @@ bool BSFadeNode::CheckFadeRadius(NiCamera* apCamera, bool abNoFade) {
         if (eMultType == LOD_MULT_OBJECTS ||
             (eMultType == LOD_MULT_LANDSCAPE || (eMultType == LOD_MULT_TREES || eMultType == LOD_MULT_DISTANTLOD))) {
             iFrameCounter = BSFadeNode::iFadeCounter;
-            return 0;
+            return false;
         }
         if (apCameraa > 0.0f) {
             float fLODAdjusta = fLODAdjust / apCameraa;
@@ -443,14 +443,14 @@ bool BSFadeNode::CheckFadeRadius(NiCamera* apCamera, bool abNoFade) {
             float fLODAdjustb = BSFadeNode::fDistanceMultiplier * fFarDistSqr;
             double v8 = apCamerab;
             if (fLODAdjustb < static_cast<double>(apCamerab)) {
-                return 0;
+                return false;
             }
             double v9 = v14;
             if (v14 < v8) {
                 float apCamerac = fLODAdjustb - v9;
                 float apCamerad = 1.0 - (v8 - v9) / apCamerac;
                 if (BSFadeNode::fFadeOutAlphaThreshold > static_cast<double>(apCamerad)) {
-                    return 0;
+                    return false;
                 }
             }
             v3 = 1.0;
@@ -460,7 +460,7 @@ bool BSFadeNode::CheckFadeRadius(NiCamera* apCamera, bool abNoFade) {
     fCurrentFade = v3;
     fLastFade = v3;
     BSShaderUtil::RecursiveSetPropertyFadeAlpha(this, v3);
-    return 1;
+    return true;
 }
 
 void BSFadeNode::SetLODMultType(ENUM_LOD_MULT aeMultType) {
@@ -502,14 +502,14 @@ uint32_t BSFadeNode::QHasMovingSound() {
 void BSFadeNode::TurnFadeNodeOff() {
     fCurrentFade = (float)0.0;
     fLastFade = (float)0.0;
-    SetFadingFlag(0);
+    SetFadingFlag(false);
 }
 
 bool BSFadeNode::ShouldUpdate(NiCamera* apCamera, float afDistMult) {
     ENUM_LOD_MULT eMultType = this->eMultType;
     float lodAdjust = apCamera->m_fLODAdjust;
     if (eMultType == LOD_MULT_INVISIBLE) {
-        return 0;
+        return false;
     }
     if (static_cast<uint32_t>(eMultType) <= LOD_MULT_DIST_OVERRIDE) {
         float apCameraa = BSFadeNode::pfFadeOutMultiplierA[eMultType];
@@ -649,5 +649,5 @@ void BSFadeNode::KillSDM() {
         NiGlobalStringTable::ReleaseHandle(BSFadeNode::pFadeNodeAnimName->GetHandle());
         MemoryManager_Singleton.Deallocate(v1);
     }
-    BSFadeNode::pFadeNodeAnimName = 0;
+    BSFadeNode::pFadeNodeAnimName = nullptr;
 }

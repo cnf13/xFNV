@@ -157,7 +157,7 @@ void BGSConstructibleObject::InitItem() {
                 );
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -173,13 +173,13 @@ void BGSConstructibleObject::Copy(TESForm* apCopy) {
 bool BGSConstructibleObject::Compare(TESForm* apCompare) {
     BGSConstructibleObject* v4 = dynamic_cast<BGSConstructibleObject*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (TESObjectMISC::Compare(v4)) {
-        return (bool)1;
+        return true;
     }
     if (pRequiredItems == v4->pRequiredItems) {
         return (bool)((uint8_t)(pCreatedItem != v4->pCreatedItem));
     }
-    return (bool)1;
+    return true;
 }

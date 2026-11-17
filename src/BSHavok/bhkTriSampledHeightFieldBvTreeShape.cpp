@@ -155,7 +155,7 @@ void bhkTriSampledHeightFieldBvTreeShape::KillCinfo(bool abCreated) {
             // class allocator delete the cinfo inherits; the size mismatch is deliberate, as the game does.
             Instance->m_heap->blockFree(pInfo, sizeof(hkpSampledHeightFieldBaseCinfo));
         }
-        this->pInfo = 0;
+        this->pInfo = nullptr;
     }
     v3->eMemContext = eMemContext;
 }

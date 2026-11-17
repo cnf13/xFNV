@@ -160,5 +160,5 @@ void BSXFlags::KillSDM() {
         NiGlobalStringTable::ReleaseHandle(BSXFlags::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }
-    BSXFlags::pTag = 0;
+    BSXFlags::pTag = nullptr;
 }

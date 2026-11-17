@@ -23,11 +23,11 @@ bool BSOcclusionQuery::GetResult(uint32_t* pResult, bool bFlush) {
 
 bool BSOcclusionQuery::Begin() {
     if (BSOcclusionQuery::bQueryInProgress) {
-        return 0;
+        return false;
     }
     BSOcclusionQuery::bQueryInProgress = 1;
     pQuery->Issue(2);
-    return 1;
+    return true;
 }
 
 void BSOcclusionQuery::End() {

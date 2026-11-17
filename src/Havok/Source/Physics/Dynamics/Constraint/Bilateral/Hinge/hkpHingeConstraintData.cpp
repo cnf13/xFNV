@@ -272,9 +272,9 @@ void hkpHingeConstraintData::setInWorldSpace(
     float v13 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v12[0])));
     v14[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v15 = _mm_cmpeq_ss(v12, v14);
-    v14[0] = 3.0f - static_cast<float>(static_cast<float>(v12[0] * v13) * v13);
+    v14[0] = 3.0f - ((v12[0] * v13) * v13);
     __m128 v16 = _mm_setzero_ps();
-    v16[0] = static_cast<float>(0.5f * v13) * v14[0];
+    v16[0] = (0.5f * v13) * v14[0];
     __m128 v17 = _mm_andnot_ps(v15, v16);
     __m128 v18 = _mm_shuffle_ps(v17, v17, 0);
     __m128 m_quad = axis.m_quad;

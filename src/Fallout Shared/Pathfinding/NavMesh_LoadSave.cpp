@@ -488,10 +488,10 @@ void NavMesh::GetFormDetailedString(BSStringT<char>& aString) {
 
 void NavMesh::SetDelete(bool abDeleted) {
     if (abDeleted != GetDelete()) {
-        bool bModified = 1;
+        bool bModified = true;
         TESFile* pFile = GetFile(0);
         if (abDeleted && (!pFile || !pFile->GetMaster())) {
-            bModified = 0;
+            bModified = false;
         }
         TESForm::SetDelete(abDeleted);
         SetAltered(bModified);
@@ -514,13 +514,13 @@ void NavMesh::SetDelete(bool abDeleted) {
 }
 
 bool NavMesh::BelongsInGroup(FORM* apGroupFORM, bool abAllowParentGroups, bool abCurrentOnly) {
-    bool v7 = 0;
+    bool v7 = false;
     if (apGroupFORM && apGroupFORM->form == formEnumString[2].uiFormString) {
         TESForm* Unk24 = GetParentCell();
         uint32_t iFormID = apGroupFORM->iFormID;
         if (iFormID == 6) {
             if (!abAllowParentGroups) {
-                return 0;
+                return false;
             }
         }
         else {
@@ -587,7 +587,7 @@ void NavMesh::MakeCopyForObstacle(NavMeshPtr& spDestNavMesh) const {
     NiTMapItem<uint16_t, NiPointer<ObstacleData>>* pObstaclePos = pTriangleToObstacleMap->GetFirstPos();
     while (pObstaclePos) {
         uint16_t key;
-        NiPointer<ObstacleData> spObstacle(static_cast<ObstacleData*>(0));
+        NiPointer<ObstacleData> spObstacle(static_cast<ObstacleData*>(nullptr));
         pTriangleToObstacleMap->GetNext(pObstaclePos, key, spObstacle);
         spDestNavMesh->pTriangleToObstacleMap->SetAt(key, spObstacle);
     }
@@ -600,7 +600,7 @@ void NavMesh::MakeCopyForObstacle(NavMeshPtr& spDestNavMesh) const {
     }
     ClosestPOVs.CopyTo(&spDestNavMesh->ClosestPOVs);
     ObstaclePOVs.CopyTo(&spDestNavMesh->ObstaclePOVs);
-    spDestNavMesh->pNavMeshInfo = 0;
+    spDestNavMesh->pNavMeshInfo = nullptr;
 }
 
 // The object count sits in bits 13 to 15 of the triangle flags. The parameter's low word is clamped in place and read

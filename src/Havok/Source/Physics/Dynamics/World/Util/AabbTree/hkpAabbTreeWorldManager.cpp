@@ -104,10 +104,10 @@ hkpAabbTreeWorldManager::~hkpAabbTreeWorldManager() {
 
 void hkpAabbTreeWorldManager::updateFromWorld(hkJobQueue* jobQueue, hkJobThreadPool* jobThreadPool) {
     HK_TIMER_BEGIN("TreeBuild", nullptr);
-    m_treeIsClean = 1;
+    m_treeIsClean = true;
     if (!m_doneFirstBuild) {
         fullBuild(jobQueue, jobThreadPool);
-        m_doneFirstBuild = 1;
+        m_doneFirstBuild = true;
     }
     else {
         incrementalBuild(jobQueue, jobThreadPool);
@@ -244,8 +244,8 @@ void hkpAabbTreeWorldManager::setWorkingBuffer(void* ptr) {
 }
 
 void hkpAabbTreeWorldManager::entityAddedCallback(hkpEntity* entity) {
-    m_mustUpdateActiveList = 1;
-    m_treeIsClean = 0;
+    m_mustUpdateActiveList = true;
+    m_treeIsClean = false;
     pushBackToActiveList(&entity->m_collidable);
 }
 
@@ -262,8 +262,8 @@ void hkpAabbTreeWorldManager::entityDeletedCallback(hkpEntity* entity) {
 }
 
 void hkpAabbTreeWorldManager::phantomAddedCallback(hkpPhantom* phantom) {
-    m_mustUpdateActiveList = 1;
-    m_treeIsClean = 0;
+    m_mustUpdateActiveList = true;
+    m_treeIsClean = false;
     pushBackToActiveList(&phantom->m_collidable);
 }
 
@@ -485,7 +485,7 @@ void hkpAabbTreeWorldManager::buildInactiveTree(
 }
 
 void hkpAabbTreeWorldManager::clearTransitionQueue() {
-    m_mustUpdateActiveList = 0;
+    m_mustUpdateActiveList = false;
     m_transitionQueue.m_map.clear();
 }
 
@@ -843,7 +843,7 @@ void hkpAabbTreeWorldManager::gatherActiveCollidablesFromWorld(
     if (!v4) {
         do {
             v5 = world->m_activeSimulationIslands.m_data[v3];
-            for (i = 0; i < ((int32_t)v5->m_entities.m_size); ++i) {
+            for (i = 0; i < v5->m_entities.m_size; ++i) {
                 p_m_collidable = &v5->m_entities.m_data[i]->m_collidable;
                 instance = &hkMemoryRouter::getInstance();
                 if ((&collidables)->m_size == ((&collidables)->m_capacityAndFlags & 1073741823)) {
@@ -927,8 +927,8 @@ void sub_D083D0() {
 
 int32_t reset(hkpAabbTreeWorldManager* apThis, [[maybe_unused]] void* apEdx) {
     apThis->m_activeList.m_size = (uint32_t)0;
-    apThis->m_doneFirstBuild = (bool)0;
-    apThis->m_mustUpdateActiveList = (bool)0;
+    apThis->m_doneFirstBuild = false;
+    apThis->m_mustUpdateActiveList = false;
     return 0;
 }
 

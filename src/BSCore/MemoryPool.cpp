@@ -46,15 +46,15 @@ void* MemoryPool::Allocate(uint32_t requested) {
             if (!--CriticalSectionO.uiLockCount) {
                 CriticalSectionO.uiOwningThread = 0;
             }
-            return 0;
+            return nullptr;
         }
-        char* pfirstFreePage = 0;
+        char* pfirstFreePage = nullptr;
         uint32_t ientriesPerPage = 0x1000 / iAlignedBlockSize;
         if (!PlatformCommitPage(inewPageIndex, pfirstFreePage)) {
             if (!--CriticalSectionO.uiLockCount) {
                 CriticalSectionO.uiOwningThread = 0;
             }
-            return 0;
+            return nullptr;
         }
         pPageRefCount[inewPageIndex] = 0;
         for (uint32_t i = 0; i < ientriesPerPage; ++i) {
@@ -64,7 +64,7 @@ void* MemoryPool::Allocate(uint32_t requested) {
             iHighCommitedPages = iNumCommittedPages;
         }
     }
-    void* pmem = 0;
+    void* pmem = nullptr;
     if (pFreeHead) {
         pmem = (void*)pFreeHead;
         MemoryPool::FreePoolBlock* ptemp = pFreeHead;
@@ -114,7 +114,7 @@ void MemoryPool::PlatformReserveHeap() {
 
 bool MemoryPool::PlatformCommitPage(uint32_t auiPageIndex, char*& apPageAddress) {
     // The reserved heap is raw storage; committing a page exposes its first free block.
-    apPageAddress = pHeap + (static_cast<uint32_t>(auiPageIndex) << 12);
+    apPageAddress = pHeap + (auiPageIndex << 12);
     return platform::Commit(apPageAddress, 0x1000);
 }
 
@@ -168,7 +168,7 @@ uint32_t MemoryPool::GetFreePageIndex() {
             return i;
         }
     }
-    return (uint32_t)((-1));
+    return (uint32_t)(-1);
 }
 
 void MemoryPool::AddFreeBlock(void* apPointer) {
@@ -307,7 +307,7 @@ void MemoryPool::SortFreeBlockList() {
 }
 
 void MemoryPool::RemoveFromLookupArrays() {
-    MemoryPool::pMemoryPoolsBySize[iAlignedBlockSize >> 2] = 0;
+    MemoryPool::pMemoryPoolsBySize[iAlignedBlockSize >> 2] = nullptr;
     uint32_t iPoolSize_high = static_cast<uint8_t>(iPoolSize >> 24);
     if (iPoolSize % 0x1000000) {
         ++iPoolSize_high;
@@ -315,7 +315,7 @@ void MemoryPool::RemoveFromLookupArrays() {
     // The by-address table is indexed by the top byte of the pool's heap address: the address as a number.
     uintptr_t v2 = reinterpret_cast<uintptr_t>(pHeap) >> 24;
     for (uint32_t i = 0; i < iPoolSize_high; ++i) {
-        *(&MemoryPool::pMemoryPoolsByAddress[i] + v2) = 0;
+        *(&MemoryPool::pMemoryPoolsByAddress[i] + v2) = nullptr;
     }
 }
 
@@ -379,7 +379,7 @@ void MemoryPool::DeletePools() {
             Block->~MemoryPool();
             MemoryManager_Singleton.Deallocate(Block);
         }
-        MemoryPool::pMemoryPoolsBySize[i] = 0;
+        MemoryPool::pMemoryPoolsBySize[i] = nullptr;
     }
 }
 

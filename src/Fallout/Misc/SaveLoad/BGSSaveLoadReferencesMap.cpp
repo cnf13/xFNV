@@ -26,7 +26,7 @@ BGSCellNumericIDArrayMap::~BGSCellNumericIDArrayMap() {
 }
 
 void BGSCellNumericIDArrayMap::AddReference(uint32_t aiCellID, uint32_t aiReferenceID) {
-    BSSimpleArray<uint32_t, 1024>* pnumericIDArray = 0;
+    BSSimpleArray<uint32_t, 1024>* pnumericIDArray = nullptr;
     if (!GetAt(aiCellID, pnumericIDArray)) {
         BSSimpleArray<uint32_t, 1024>* pnumericIDArray_2;
         BSSimpleArray<uint32_t, 1024>* apMemory =
@@ -35,7 +35,7 @@ void BGSCellNumericIDArrayMap::AddReference(uint32_t aiCellID, uint32_t aiRefere
             pnumericIDArray_2 = ::new (apMemory) BSSimpleArray<uint32_t, 1024>;
         }
         else {
-            pnumericIDArray_2 = 0;
+            pnumericIDArray_2 = nullptr;
         }
         pnumericIDArray = pnumericIDArray_2;
         SetAt(aiCellID, pnumericIDArray_2);
@@ -47,7 +47,7 @@ void BGSCellNumericIDArrayMap::Clear() {
     NiTMapItem<uint32_t, BSSimpleArray<uint32_t>*>* pPos = GetFirstPos();
     while (pPos) {
         uint32_t icellID = 0;
-        BSSimpleArray<uint32_t>* pnumericIDArray = 0;
+        BSSimpleArray<uint32_t>* pnumericIDArray = nullptr;
         GetNext(pPos, icellID, pnumericIDArray);
         if (pnumericIDArray) {
             delete pnumericIDArray;
@@ -57,7 +57,7 @@ void BGSCellNumericIDArrayMap::Clear() {
 }
 
 void BGSCellNumericIDArrayMap::RemoveReference(uint32_t aiCellID, uint32_t aiReferenceID) {
-    BSSimpleArray<uint32_t, 1024>* pnumericIDArray = 0;
+    BSSimpleArray<uint32_t, 1024>* pnumericIDArray = nullptr;
     if (GetAt(aiCellID, pnumericIDArray)) {
         uint32_t iindex =
             pnumericIDArray->Find(aiReferenceID, 0, &BSSimpleArray<uint32_t>::DefaultEqualFunctionByAddress);
@@ -79,7 +79,7 @@ void BGSSaveLoadReferencesMap::LoadReferencesForCell(
     BGSReconstructFormsInAllFilesMap* apReconstructForms
 ) {
     BSSimpleArray<uint32_t>* pnumericIDArray;
-    BGSCellNumericIDArrayMap* pcellNumericIDArrayMap = 0;
+    BGSCellNumericIDArrayMap* pcellNumericIDArrayMap = nullptr;
     uint32_t icellID = 0;
     if (apCell->GetInterior()) {
         icellID = apCell->iFormID;
@@ -93,7 +93,7 @@ void BGSSaveLoadReferencesMap::LoadReferencesForCell(
         WorldspaceReferencesMap.GetAt(WorldSpace->iFormID, pcellNumericIDArrayMap);
     }
     if (pcellNumericIDArrayMap) {
-        pnumericIDArray = 0;
+        pnumericIDArray = nullptr;
         if (pcellNumericIDArrayMap->GetAt(icellID, pnumericIDArray)) {
             for (uint32_t i = 0; i < pnumericIDArray->iSize; ++i) {
                 LoadChangedReference(pnumericIDArray->operator[](i), apReconstructForms);
@@ -111,7 +111,7 @@ void BGSSaveLoadReferencesMap::AddReference(
     uint32_t aiReferenceID,
     const NiPoint3& arReferenceLocation
 ) {
-    BGSCellNumericIDArrayMap* a2 = 0;
+    BGSCellNumericIDArrayMap* a2 = nullptr;
     if (!WorldspaceReferencesMap.GetAt(aiWorldSpaceID, a2)) {
         BGSCellNumericIDArrayMap* v4;
         BGSCellNumericIDArrayMap* apMemory =
@@ -120,7 +120,7 @@ void BGSSaveLoadReferencesMap::AddReference(
             v4 = ::new (apMemory) BGSCellNumericIDArrayMap;
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         a2 = v4;
         WorldspaceReferencesMap.SetAt(aiWorldSpaceID, v4);
@@ -139,7 +139,7 @@ void BGSSaveLoadReferencesMap::Clear() {
     NiTMapItem<uint32_t, BGSCellNumericIDArrayMap*>* pPos = WorldspaceReferencesMap.GetFirstPos();
     while (pPos) {
         uint32_t iworldSpaceID = 0;
-        BGSCellNumericIDArrayMap* pcellNumericIDArrayMap = 0;
+        BGSCellNumericIDArrayMap* pcellNumericIDArrayMap = nullptr;
         WorldspaceReferencesMap.GetNext(pPos, iworldSpaceID, pcellNumericIDArrayMap);
         if (pcellNumericIDArrayMap) {
             delete pcellNumericIDArrayMap;
@@ -153,7 +153,7 @@ void BGSSaveLoadReferencesMap::RemoveReference(
     uint32_t aiReferenceID,
     const NiPoint3& arReferenceLocation
 ) {
-    BGSCellNumericIDArrayMap* a2 = 0;
+    BGSCellNumericIDArrayMap* a2 = nullptr;
     if (WorldspaceReferencesMap.GetAt(aiWorldSpaceID, a2)) {
         uint32_t aiCellID = TESWorldSpace::GetKeyForWorldCoord(arReferenceLocation);
         a2->RemoveReference(aiCellID, aiReferenceID);
@@ -176,14 +176,14 @@ void BGSSaveLoadReferencesMap::LoadChangedReference(
                 char* Data = pchanges->UnloadedFormBuffer.GetAdvancedBuffer();
                 BGSSaveLoadInitialData::LoadInitialDataStruct(Data, einitialDataType, &refData);
                 if (einitialDataType == INITIAL_DATA_CREATED_REFERENCE) {
-                    TESForm* pform = BGSSaveLoadInitialData::CreateReference(aiRefID, &refData, 0);
+                    TESForm* pform = BGSSaveLoadInitialData::CreateReference(aiRefID, &refData, nullptr);
                     if (pform) {
                         pSaveLoadGame->LoadForm(pform);
                     }
                 }
                 else {
-                    pcell = 0;
-                    pworld = 0;
+                    pcell = nullptr;
+                    pworld = nullptr;
                     if (refData.GetOriginalLocationCellAndWorld(pcell, pworld)) {
                         if (pcell) {
                             apReconstructForms->AddReference(pcell, aiRefID, 0);

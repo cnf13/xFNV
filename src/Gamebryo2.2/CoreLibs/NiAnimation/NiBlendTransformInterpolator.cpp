@@ -217,7 +217,7 @@ bool NiBlendTransformInterpolator::BlendValues(float fTime, NiObjectNET* pkInter
         if (bRotChanged) {
             float fLengthSquared = kFinalRotate.m_fX * kFinalRotate.m_fX + kFinalRotate.m_fW * kFinalRotate.m_fW +
                 kFinalRotate.m_fY * kFinalRotate.m_fY + kFinalRotate.m_fZ * kFinalRotate.m_fZ;
-            float fLength = static_cast<float>(std::sqrt(fLengthSquared));
+            float fLength = std::sqrt(fLengthSquared);
             float fInvLength = 1.0f / fLength;
             kFinalRotate.m_fW = fInvLength * kFinalRotate.m_fW;
             kValue.m_kRotate.m_fW = kFinalRotate.m_fW;
@@ -242,7 +242,7 @@ void NiBlendTransformInterpolator::SetAlwaysBlend(bool abTF) {
 NiObject* NiBlendTransformInterpolator::CreateObject() {
     void* v0 = NiMemObject::operator new(sizeof(NiBlendTransformInterpolator));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiBlendTransformInterpolator;
 }

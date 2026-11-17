@@ -99,21 +99,21 @@ void BSTempEffectGeometryDecal::Initialize() {
             }
         }
         BSTempEffect::Initialize();
-        spTargetGeom.operator=(static_cast<NiTriBasedGeom*>(0));
-        spParent.operator=(static_cast<NiNode*>(0));
+        spTargetGeom.operator=(static_cast<NiTriBasedGeom*>(nullptr));
+        spParent.operator=(static_cast<NiNode*>(nullptr));
     }
 }
 
 bool BSTempEffectGeometryDecal::Update(float afTimeDelta) {
     if (bFinished) {
-        return 0;
+        return false;
     }
     bool ret = BSTempEffect::Update(afTimeDelta);
     NiAVObject* pobj = Get3D();
     // The shade property of the decal geometry is its GeometryDecalShaderProperty.
     static_cast<GeometryDecalShaderProperty*>(pobj->GetProperty(NiProperty::SHADE))->fTimer = fAge / fLifetime;
     if (fLifetime < static_cast<double>(fAge)) {
-        BGSDecalNode* pdecalnode = 0;
+        BGSDecalNode* pdecalnode = nullptr;
         if (spDecalParent.m_pObject) {
             NiNode* v4 = spDecalParent.m_pObject;
             v4->DetachChild(spDecalGeometry.m_pObject);
@@ -129,7 +129,7 @@ bool BSTempEffectGeometryDecal::Update(float afTimeDelta) {
                 --BGSDecalManager::iSkinnedDecalCount;
             }
         }
-        bFinished = 1;
+        bFinished = true;
     }
     return ret;
 }
@@ -167,7 +167,7 @@ void BSTempEffectGeometryDecal::SaveGame() {
     uint32_t iblockHeader;
     uint16_t iblockSize;
     iblockSize = 0;
-    void* pblockSize = 0;
+    void* pblockSize = nullptr;
     uint8_t* itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -217,9 +217,9 @@ void BSTempEffectGeometryDecal::SaveGame() {
 bool BSTempEffectGeometryDecal::LoadGame() {
     uint32_t iblockHeader;
     uint16_t v17[3];
-    bool bvalid = 1;
+    bool bvalid = true;
     v17[0] = 0;
-    uint8_t* istartBufferPosition = 0;
+    uint8_t* istartBufferPosition = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockHeader, 4u);
         if (iblockHeader != 0x424C4F4B) {
@@ -363,11 +363,11 @@ bool BSTempEffectGeometryDecal::ShouldAddTriangle(
             ++v10;
         }
         if (v10 == 3) {
-            return (bool)1;
+            return true;
         }
     }
     if ((((v13 & 3) == 3) || ((v13 & 12) == 12)) && ((v13 & 16) != 0)) {
-        return (bool)1;
+        return true;
     }
     return (bool)v12;
 }
@@ -1328,7 +1328,7 @@ void BSTempEffectGeometryDecal::CreateGeometry(
         );
     }
     else {
-        pnewDecal = 0;
+        pnewDecal = nullptr;
     }
     pnewDecal->SetName(*FixedStrings::GetDecal());
     GeometryDecalShaderProperty* apMemory =
@@ -1337,11 +1337,11 @@ void BSTempEffectGeometryDecal::CreateGeometry(
         pshaderprop = ::new (apMemory) GeometryDecalShaderProperty;
     }
     else {
-        pshaderprop = 0;
+        pshaderprop = nullptr;
     }
     pnewDecal->AttachProperty(pshaderprop);
     pshaderprop->SetDepthBias(1.0f);
-    NiPointer<NiTexture> sptexture(static_cast<NiTexture*>(0));
+    NiPointer<NiTexture> sptexture(static_cast<NiTexture*>(nullptr));
     pTextureSet->GetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, sptexture);
     NiTexture* ptexture = sptexture.m_pObject;
     if (NiObject::IsKindOf_0(&NiSourceTexture::ms_RTTI, ptexture)) {
@@ -1355,7 +1355,7 @@ void BSTempEffectGeometryDecal::CreateGeometry(
         pnewSkinData = ::new (v29) NiSkinData(iboneCount, apGeomBoneData, *v13, apGeomVertex);
     }
     else {
-        pnewSkinData = 0;
+        pnewSkinData = nullptr;
     }
     NiAVObject** ppbones = pskin->m_ppkBones;
     // Checked array allocation: the count is taken unsigned.
@@ -1388,8 +1388,8 @@ void BSTempEffectGeometryDecal::CreateGeometry(
         ));
     for (int32_t i = 0; i < icount; ++i) {
         uint16_t v10;
-        ppartitionExtraDataArray[i].bEnabled = 1;
-        ppartitionExtraDataArray[i].bStateChange = 1;
+        ppartitionExtraDataArray[i].bEnabled = true;
+        ppartitionExtraDataArray[i].bStateChange = true;
         if (apBodyPartIndex) {
             v10 = apBodyPartIndex[i];
         }
@@ -1406,7 +1406,7 @@ void BSTempEffectGeometryDecal::CreateGeometry(
             ::new (v28) BSDismemberSkinInstance(pnewSkinData, v11, ppnewBones, ppartitionExtraDataArray, icount);
     }
     else {
-        pnewSkinInstance = 0;
+        pnewSkinInstance = nullptr;
     }
     if (apPartition) {
         pnewSkinInstance->SetSkinPartition(apPartition);
@@ -1419,10 +1419,11 @@ void BSTempEffectGeometryDecal::CreateGeometry(
             ppartition = ::new (v27) NiSkinPartition;
         }
         else {
-            ppartition = 0;
+            ppartition = nullptr;
         }
         if (ppartition->MakePartitions(
-                static_cast<NiTriBasedGeomData*>(pnewDecal->GetModelData()), pnewSkinData, 18, 4, 1, 0, 0, 0
+                static_cast<NiTriBasedGeomData*>(pnewDecal->GetModelData()), pnewSkinData, 18, 4, 1, nullptr, nullptr,
+                nullptr
             )) {
             pnewSkinInstance->SetSkinPartition(ppartition);
             pnewDecal->SetSkinInstance(pnewSkinInstance);

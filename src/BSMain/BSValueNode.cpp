@@ -12,9 +12,9 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <stdint.h>
 
 NiRTTI BSValueNode::ms_RTTI("BSValueNode", &BSNiNode::ms_RTTI);
 

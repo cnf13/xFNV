@@ -31,7 +31,7 @@ static void validateJumpCommands();
 // Shifts by the exponent use its low five bits.
 static float hkFloor(float a1) {
     float fArgument = a1;
-    int32_t iBits = std::bit_cast<int32_t>(static_cast<float>(fArgument));
+    int32_t iBits = std::bit_cast<int32_t>(fArgument);
     int32_t iExponent = static_cast<int32_t>((static_cast<uint32_t>(iBits) >> 23) & 0xFF) - 127;
     // Zero for +-0, so that -0 floors to +0.
     int32_t iNonZero = ~(((iBits & 0x7FFFFFFF) - 1) >> 31);
@@ -53,7 +53,7 @@ static float hkFloor(float a1) {
 // Floors to an integer with integer bit operations. Every shift uses its count's low five bits.
 static int32_t hkFloorToInt(float a1) {
     float fArgument = a1;
-    int32_t iBits = std::bit_cast<int32_t>(static_cast<float>(fArgument));
+    int32_t iBits = std::bit_cast<int32_t>(fArgument);
     int32_t iExponent = static_cast<int32_t>((static_cast<uint32_t>(iBits) >> 23) & 0xFF) - 127;
     // All ones while the exponent leaves fraction bits in the mantissa (at most 23).
     int32_t iHasFractionBits = (iExponent - 24) >> 31;
@@ -884,7 +884,7 @@ void hkpMoppDefaultAssembler::addCut(const hkpMoppTreeNode* a1, const hkpMoppAss
     int32_t n3_1 = 0;
     const int32_t* v6 = &a2.m_extents[0][1];
     const int32_t* m_accumOffset = a2.m_accumOffset;
-    while (1) {
+    while (true) {
         if (a1->m_assemblerData.m_cutCommandType[n3].m_storage == hkpMoppAssemblerData::HK_MOPP_CUT8) {
             int32_t m_currentBitsResolution = v3->m_currentBitsResolution;
             hkpMoppCodeGenerator* m_code = this->m_code;

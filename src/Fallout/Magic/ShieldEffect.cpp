@@ -20,7 +20,7 @@ static char bRegistered = EffectArchetypes::RegisterActiveEffect(EffectArchetype
 
 ShieldEffect::ShieldEffect(MagicCaster* apCaster, MagicItem* apItem, EffectItem* apEffect)
   : ValueModifierEffect(apCaster, apItem, apEffect) {
-    eWhichActorValue = static_cast<ActorValue::Index>(apEffect->GetActorValueIndex());
+    eWhichActorValue = apEffect->GetActorValueIndex();
 }
 
 ShieldEffect::~ShieldEffect() {}
@@ -129,11 +129,11 @@ void ShieldEffect::ModifyAdditionalActorValue(Actor* apActor, float afModifier) 
                 EffectSetting* Time = pEffect->GetEffectSetting();
                 if (Time->IsFlagSet(EffectSetting::RECOVER)) {
                     ActorValue::Index v5 = eAdditionalActorValue;
-                    apActor->TempModActorValue(v5, afModifier, static_cast<Actor*>(0));
+                    apActor->TempModActorValue(v5, afModifier, static_cast<Actor*>(nullptr));
                 }
                 else {
                     ActorValue::Index v6 = eAdditionalActorValue;
-                    apActor->DamageModActorValue(v6, afModifier, static_cast<Actor*>(0));
+                    apActor->DamageModActorValue(v6, afModifier, static_cast<Actor*>(nullptr));
                 }
             }
         }

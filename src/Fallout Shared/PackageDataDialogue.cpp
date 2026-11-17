@@ -17,7 +17,7 @@ void TESDialoguePackageData::Copy(TESPackageData* apCopy) {
         bNOHeadtracking = pcopy->bNOHeadtracking;
         if (pTargetLocation) {
             delete pTargetLocation;
-            pTargetLocation = 0;
+            pTargetLocation = nullptr;
         }
         if (pcopy->pTargetLocation) {
             PackageLocation* v2;
@@ -26,10 +26,10 @@ void TESDialoguePackageData::Copy(TESPackageData* apCopy) {
                 v2 = ::new (v4) PackageLocation;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pTargetLocation = v2;
-            pTargetLocation->Copy(pcopy->pTargetLocation, 0);
+            pTargetLocation->Copy(pcopy->pTargetLocation, false);
         }
         ptopic = pcopy->ptopic;
         bDoNotControlTarget = pcopy->bDoNotControlTarget;
@@ -41,28 +41,28 @@ void TESDialoguePackageData::Copy(TESPackageData* apCopy) {
 bool TESDialoguePackageData::Compare(TESPackageData* apCompare) {
     TESDialoguePackageData* v4 = dynamic_cast<TESDialoguePackageData*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (v4->fFov != fFov) {
-        return (bool)1;
+        return true;
     }
     if (v4->fDistanceStartTalking != fDistanceStartTalking) {
-        return (bool)1;
+        return true;
     }
     if (((uint32_t)((uint8_t)bNOHeadtracking)) != ((uint32_t)((int8_t)v4->bNOHeadtracking))) {
-        return (bool)1;
+        return true;
     }
     if (ptopic != v4->ptopic) {
-        return (bool)1;
+        return true;
     }
     if (pTargetLocation) {
         if (pTargetLocation->Compare(v4->pTargetLocation)) {
-            return (bool)1;
+            return true;
         }
     }
     else {
         if (v4->pTargetLocation) {
-            return (bool)1;
+            return true;
         }
     }
     return (bool)((uint8_t)((((uint32_t)((uint8_t)bDoNotControlTarget)) !=

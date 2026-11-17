@@ -850,12 +850,12 @@ void _SharedShapeData::recursivelyParseShapeReferences(const hkpShape* shape) {
         _SharedShapeData::SharedShape* v7 = &m_sharedShapes.m_data[m_sharedShapes.m_size];
         if (v7) {
             v7->m_originalShape = shape;
-            v7->m_replacementShape = 0;
+            v7->m_replacementShape = nullptr;
             v7->m_numReferences = 1;
         }
         ++m_sharedShapes.m_size;
         shape->addReference();
-        r_esi.m_data = 0;
+        r_esi.m_data = nullptr;
         r_esi.m_size = 0;
         r_esi.m_capacityAndFlags = hkArrayBase<const hkpShape*>::DONT_DEALLOCATE_FLAG;
         collectChildShapes(shape, &r_esi);
@@ -908,7 +908,7 @@ hkResult _SharedShapeData::setReplacement(const hkpShape* shape, const hkpShape*
 // The SDK's removeSingleReferencedShapeData: from the last record down, each record of a shape referenced fewer than
 // twice gives up its shapes' references and is removed, the last record moved into its slot.
 void _SharedShapeData::removeSingleReferencedShapeData() {
-    for (int32_t i = static_cast<int32_t>(m_sharedShapes.m_size) - 1; i >= 0; --i) {
+    for (int32_t i = m_sharedShapes.m_size - 1; i >= 0; --i) {
         if (m_sharedShapes.m_data[i].m_numReferences < 2) {
             const hkpShape* pOriginal = m_sharedShapes.m_data[i].m_originalShape;
             if (pOriginal) {
@@ -919,7 +919,7 @@ void _SharedShapeData::removeSingleReferencedShapeData() {
                 pReplacement->removeReference();
             }
             // EXE-INLINED none: hkArray<_SharedShapeData::SharedShape>::removeAt
-            const int32_t iLast = static_cast<int32_t>(--m_sharedShapes.m_size);
+            const int32_t iLast = (--m_sharedShapes.m_size);
             if (iLast != i) {
                 m_sharedShapes.m_data[i] = m_sharedShapes.m_data[iLast];
             }

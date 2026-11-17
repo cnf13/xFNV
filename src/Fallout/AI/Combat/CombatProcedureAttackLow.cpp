@@ -53,10 +53,10 @@ void CombatProcedureAttackLow::Update() {
         if (pWeapon) {
             ItemChange* pweaponItem = pattacker->GetInventoryItem(pWeapon, 0);
             if (!pweaponItem) {
-                pcombatState->SetInventoryDirty(1);
+                pcombatState->SetInventoryDirty(true);
                 return;
             }
-            fWeaponCondition = pweaponItem->GetItemHealth(1);
+            fWeaponCondition = pweaponItem->GetItemHealth(true);
             if (pweaponItem) {
                 delete pweaponItem;
             }
@@ -72,7 +72,7 @@ void CombatProcedureAttackLow::Update() {
     int32_t aeType = eweaponType_2;
     if (!pWeapon || pWeapon == pcombatState->GetWeaponByCombatType(static_cast<COMBAT_WEAPON_TYPE>(aeType))) {
         float fhitPercent;
-        if (ptarget->IsFleeing(0)) {
+        if (ptarget->IsFleeing(false)) {
             fhitPercent = fCombatLowFleeingTargetHitPercent.Float();
         }
         else {
@@ -85,7 +85,7 @@ void CombatProcedureAttackLow::Update() {
                 v5 = ::new (apMemory) HitData;
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             NiPointer<HitData> spdata(v5);
             HitData::InitializeHitData(spdata.m_pObject, pattacker, ptarget, fWeaponDPS);
@@ -99,16 +99,18 @@ void CombatProcedureAttackLow::Update() {
                     TESAmmo* pammo = pWeapon->GetCurrentAmmo(pattacker);
                     int32_t iammoCount = pattacker->GetInventoryObjectCount(pammo);
                     if (pattacker) {
-                        WeaponRateOfFire = CombatFormulas::GetWeaponRateOfFire(pattacker, pWeapon, 0);
+                        WeaponRateOfFire = CombatFormulas::GetWeaponRateOfFire(pattacker, pWeapon, nullptr);
                     }
                     else {
-                        WeaponRateOfFire = CombatFormulas::GetWeaponRateOfFire(0, pWeapon, 0);
+                        WeaponRateOfFire = CombatFormulas::GetWeaponRateOfFire(nullptr, pWeapon, nullptr);
                     }
                     int32_t iammoUsed = BSMAX(static_cast<int32_t>(WeaponRateOfFire), 1);
                     int32_t iammoUsed_2 = BSMIN(iammoUsed, iammoCount);
-                    pattacker->RemoveItem(pammo, 0, iammoUsed_2, 0, 0, 0, 0, 0, 1, 0);
+                    pattacker->RemoveItem(
+                        pammo, nullptr, iammoUsed_2, false, false, nullptr, nullptr, nullptr, true, false
+                    );
                     if (iammoUsed_2 == iammoCount) {
-                        pcombatState->SetInventoryDirty(1);
+                        pcombatState->SetInventoryDirty(true);
                         eState = CombatProcedureAttackLow::ATTACK_STATE_INITIALIZING;
                     }
                 }
@@ -116,7 +118,7 @@ void CombatProcedureAttackLow::Update() {
         }
     }
     else {
-        pcombatState->SetInventoryDirty(1);
+        pcombatState->SetInventoryDirty(true);
         eState = CombatProcedureAttackLow::ATTACK_STATE_INITIALIZING;
     }
 }

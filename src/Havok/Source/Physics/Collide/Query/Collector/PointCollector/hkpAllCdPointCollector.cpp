@@ -76,7 +76,7 @@ void hkpAllCdPointCollector::addRootCdPoint(const hkpRootCdPoint& a1) {
 }
 
 hkBool* hkpAllCdPointCollector::hasHit(hkBool* apResult) {
-    int32_t v2 = (int32_t)(&m_hits)->m_size;
+    int32_t v2 = (&m_hits)->m_size;
     ::new (apResult) hkBool(v2 > 0);
     return apResult;
 }

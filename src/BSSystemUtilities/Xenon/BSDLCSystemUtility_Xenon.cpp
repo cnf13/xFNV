@@ -10,7 +10,7 @@
 #include "SDK/Steam/isteamfriends.h"
 #include "SDK/Steam/isteamutils.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 void nullsub(BSDLCSystemUtility* apThis, [[maybe_unused]] void* apEdx) {
     ;
@@ -94,7 +94,7 @@ bool BSDLCSystemUtility::GetOfferCounts(
     void* param
 ) {
     callback(0, 0, param);
-    return 1;
+    return true;
 }
 
 void BSDLCSystemUtility::CheckForCorruptContentAndDisplayMessage() {}
@@ -116,7 +116,7 @@ BSDLCSystemUtility* BSDLCSystemUtility::GetSingleton() {
             v1 = ::new (apMemory) BSDLCSystemUtility;
         }
         else {
-            v1 = 0;
+            v1 = nullptr;
         }
         BSDLCSystemUtility::pSingleton = v1;
     }

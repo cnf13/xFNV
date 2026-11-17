@@ -196,7 +196,7 @@ NiObject* NiPSysEmitterCtlrData::CreateObject() {
     NiPSysEmitterCtlrData* pkObject =
         static_cast<NiPSysEmitterCtlrData*>(NiMemObject::operator new(sizeof(NiPSysEmitterCtlrData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysEmitterCtlrData;
 }

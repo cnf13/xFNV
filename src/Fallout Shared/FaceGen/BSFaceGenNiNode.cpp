@@ -237,7 +237,7 @@ void BSFaceGenNiNode::OnVisible(NiCullingProcess& arCuller) {
     uint32_t kmode = static_cast<BSCullingProcess&>(arCuller).GetAccumulator()->eRenderMode;
     if (!kmode) {
         const NiBound* WorldBound = &GetWorldBound();
-        paccum->StartGroupingAlphas(*WorldBound, 0);
+        paccum->StartGroupingAlphas(*WorldBound, false);
     }
     NiNode::OnVisible(arCuller);
     if (!kmode) {
@@ -270,7 +270,7 @@ NiMatrix3 BSFaceGenNiNode::GetBaseRotation() {
 
 void BSFaceGenNiNode::SetBaseRotation(const NiMatrix3& aRot) {
     BaseRotation = aRot;
-    bRotatedLastUpdate = 1;
+    bRotatedLastUpdate = true;
     SetRotate(GetBaseRotation());
 }
 
@@ -352,7 +352,7 @@ void BSFaceGenNiNode::UpdateAllChildrenMorphData(bool abChanged) {
     ::new (&objdata) FaceGenUpdateData;
     uint32_t iobjCount = GetArrayCount();
     for (uint32_t i = 0; i < iobjCount; ++i) {
-        objdata.bbaseApplied = 0;
+        objdata.bbaseApplied = false;
         NiAVObject* pobj = GetAt(i);
         if (pobj) {
             objdata.ptri = pobj->IsTriBasedGeom();
@@ -364,16 +364,16 @@ void BSFaceGenNiNode::UpdateAllChildrenMorphData(bool abChanged) {
                             BSFaceGenUtils::GetFaceGenExtraData<BSFaceGenBaseMorphExtraData>(objdata.ptri)
                         );
                         if (objdata.pmorphBase) {
-                            if (objdata.ptri->GetModelData()->LockPackedVertexData(1)) {
+                            if (objdata.ptri->GetModelData()->LockPackedVertexData(true)) {
                                 objdata.ptri->GetModelData()->GetVerticesIterator(objdata.iter);
                                 objdata.ivertCount = objdata.ptri->GetVertexCount();
                                 if (abChanged || bForceBaseMorph) {
                                     BSFaceGenManager::RefreshMeshFromBaseMorphExtraData(objdata.ptri, objdata.iter);
-                                    objdata.bbaseApplied = 1;
-                                    bForceBaseMorph = 0;
+                                    objdata.bbaseApplied = true;
+                                    bForceBaseMorph = false;
                                 }
-                                bool bmodAdded = 0;
-                                bool bphoAdded = 0;
+                                bool bmodAdded = false;
+                                bool bphoAdded = false;
                                 NiPoint3 cameraloc = BSFaceGenManager::GetCameraPosition();
                                 float buffer = 10.0f;
                                 float dist = (cameraloc - GetWorldTranslate()).Length();
@@ -383,26 +383,26 @@ void BSFaceGenNiNode::UpdateAllChildrenMorphData(bool abChanged) {
                                     morphdist = morphdist * 0.25;
                                     talkdist = talkdist * 0.25;
                                 }
-                                bool bdophonemes = 0;
-                                bool bdomodifiers = 0;
+                                bool bdophonemes = false;
+                                bool bdomodifiers = false;
                                 if (dist <= talkdist + buffer || (bIAmInDialogue || Interface::IsInMenuMode())) {
-                                    bdophonemes = 1;
+                                    bdophonemes = true;
                                     if (dist <= morphdist + buffer || (bIAmInDialogue || Interface::IsInMenuMode())) {
-                                        bdomodifiers = 1;
+                                        bdomodifiers = true;
                                     }
                                 }
                                 if (bForceMorphUpdates && !objdata.bbaseApplied) {
                                     BSFaceGenManager::RefreshMeshFromBaseMorphExtraData(objdata.ptri, objdata.iter);
-                                    objdata.bbaseApplied = 1;
+                                    objdata.bbaseApplied = true;
                                 }
                                 if (bdophonemes && !bDisableMorphUpdates) {
                                     ApplyFacialPhonemes(objdata);
-                                    bphoAdded = 1;
+                                    bphoAdded = true;
                                     if (bdomodifiers) {
                                         ApplyFacialExpressions(objdata);
                                         ApplyFacialModifiers(objdata);
                                         ApplyFacialCustomMorphs(objdata);
-                                        bmodAdded = 1;
+                                        bmodAdded = true;
                                     }
                                 }
                                 BSFaceGenAnimationData* v6 = GetAnimationData();
@@ -413,7 +413,7 @@ void BSFaceGenNiNode::UpdateAllChildrenMorphData(bool abChanged) {
                                             NiNode* Parent = m_pkParent;
                                             if (Parent->IsFadeNode()) {
                                                 ApplyFacialModifiers(objdata);
-                                                bmodAdded = 1;
+                                                bmodAdded = true;
                                             }
                                         }
                                     }
@@ -421,7 +421,7 @@ void BSFaceGenNiNode::UpdateAllChildrenMorphData(bool abChanged) {
                                 else {
                                     if (!bphoAdded && dist > BSFaceGenManager::GetLodDistance() - buffer) {
                                         BSFaceGenAnimationData* pAnimData = GetAnimationData();
-                                        pAnimData->ResetCurrentMorphs(0.0f, 1, 1, 1, 1, 0);
+                                        pAnimData->ResetCurrentMorphs(0.0f, true, true, true, true, false);
                                     }
                                 }
                                 objdata.ptri->GetModelData()->UnlockPackedVertexData();
@@ -432,7 +432,7 @@ void BSFaceGenNiNode::UpdateAllChildrenMorphData(bool abChanged) {
             }
         }
     }
-    bForceMorphUpdates = 0;
+    bForceMorphUpdates = false;
 }
 
 // Each value is tested against 0.0 twice (> then >=) before <= 1.0, all as doubles, as the game does.
@@ -520,7 +520,7 @@ void BSFaceGenNiNode::CheckLOD(BS_FACEGEN_LOD aiForceLOD) {
     float offset = 10.0f;
     const NiPoint3* worldTranslate = &NiAVObject::GetWorldTranslate();
     NiPoint3* v3 = &(v5 = (&cameraPosition)->operator-(*worldTranslate));
-    float distance = (float)v3->Length();
+    float distance = v3->Length();
     if (((!(distance > (BSFaceGenManager::GetLodDistance() + offset))) || GetUsingLoResHead()) && aiForceLOD) {
         if (((distance < (BSFaceGenManager::GetLodDistance() - offset)) && GetUsingLoResHead()) || (aiForceLOD == 1)) {
             BSFaceGenManager::ReplaceFaceMeshLOD(this, 1);

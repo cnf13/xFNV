@@ -8,7 +8,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiColorA NiColorKey::ms_kDefault(NiColorA_BLACK);
 

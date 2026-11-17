@@ -59,11 +59,11 @@ void hkStatisticsProcess::step(float frameTimeInMs) {
     globalFixups.m_capacityAndFlags = hkArrayBase<hkObjectSerialize::GlobalFixup>::DONT_DEALLOCATE_FLAG;
     startPtrs.m_capacityAndFlags = hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG;
     endPtrs.m_capacityAndFlags = hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG;
-    globalFixups.m_data = 0;
+    globalFixups.m_data = nullptr;
     globalFixups.m_size = 0;
-    startPtrs.m_data = 0;
+    startPtrs.m_data = nullptr;
     startPtrs.m_size = 0;
-    endPtrs.m_data = 0;
+    endPtrs.m_data = nullptr;
     endPtrs.m_size = 0;
     const int32_t numContexts = m_contexts.getSize();
     for (int32_t c = 0; c < numContexts; ++c) {
@@ -104,7 +104,7 @@ void hkStatisticsProcess::step(float frameTimeInMs) {
     {
         using map_t = hkPointerMap<const void*, const char*, hkContainerHeapAllocator>;
         FNVD_INLINED_LOCAL(map_t, map, std::nullopt, std::nullopt);
-        map.m_map.m_elem = 0;
+        map.m_map.m_elem = nullptr;
         map.m_map.m_numElems = 0;
         map.m_map.m_hashMod = -1;
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
@@ -175,7 +175,7 @@ void hkStatisticsProcess::step(float frameTimeInMs) {
             endPtrs.m_data, endPtrs.m_capacityAndFlags & hkArrayBase<const char*>::CAPACITY_MASK
         );
     }
-    endPtrs.m_data = 0;
+    endPtrs.m_data = nullptr;
     endPtrs.m_capacityAndFlags = hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG;
     hkMemoryAllocator* startHeap = (&hkMemoryRouter::getInstance())->m_heap;
     startPtrs.m_size = 0;
@@ -184,7 +184,7 @@ void hkStatisticsProcess::step(float frameTimeInMs) {
             startPtrs.m_data, startPtrs.m_capacityAndFlags & hkArrayBase<const char*>::CAPACITY_MASK
         );
     }
-    startPtrs.m_data = 0;
+    startPtrs.m_data = nullptr;
     startPtrs.m_capacityAndFlags = hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG;
     hkMemoryAllocator* fixupHeap = (&hkMemoryRouter::getInstance())->m_heap;
     globalFixups.m_size = 0;
@@ -210,6 +210,6 @@ hkProcess* hkStatisticsProcess::create(const hkArray<hkProcessContext*, hkContai
         return static_cast<hkProcess*>(v3);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

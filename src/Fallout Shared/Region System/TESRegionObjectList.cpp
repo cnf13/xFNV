@@ -9,19 +9,19 @@ bool TESRegionObjectList::IsInListTOL(
 ) const {
     const BSSimpleList<TESRegionObject*>* pList;
     if (!apObject) {
-        return 0;
+        return false;
     }
     if (IsInList(apObject)) {
-        return 1;
+        return true;
     }
     if (!abIncludeChildren && !abIncludeChildrenOfTextures) {
-        return 0;
+        return false;
     }
     if (this) {
         pList = static_cast<const BSSimpleList<TESRegionObject*>*>(this);
     }
     else {
-        pList = 0;
+        pList = nullptr;
     }
     for (TESRegionObject* const& rpItem : pList->ItemsUntilNull()) {
         if (!abIncludeChildren) {
@@ -33,8 +33,8 @@ bool TESRegionObjectList::IsInListTOL(
             }
         }
         if (rpItem->pChildren->IsInListTOL(apObject, abIncludeChildren, abIncludeChildrenOfTextures)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }

@@ -124,7 +124,7 @@ int32_t EffectItem::GetArea() {
         return (int32_t)0;
     }
     else {
-        return (int32_t)data.iArea;
+        return data.iArea;
     }
 }
 
@@ -182,7 +182,7 @@ bool EffectItem::IsActorValueUsed() {
 
 ActorValue::Index EffectItem::GetActorValueIndex() {
     if (IsActorValueUsed()) {
-        return static_cast<ActorValue::Index>(data.iActorValue);
+        return data.iActorValue;
     }
     else {
         return static_cast<ActorValue::Index>(-1);
@@ -217,11 +217,11 @@ ActorValue::Index EffectItem::GetMagicSchool() {
 
 // The luck is deliberately read before the school, as the game does.
 float EffectItem::GetCost(Actor* apActor) {
-    float fCost = static_cast<float>(GetRawCost());
+    float fCost = GetRawCost();
     if (apActor) {
         int32_t iLuck = static_cast<ActorValueOwner*>(apActor)->GetClampedActorValue(ActorValue::LUCK);
         int32_t iSkill = static_cast<ActorValueOwner*>(apActor)->GetClampedActorValue(GetMagicSchool());
-        fCost = static_cast<float>(MagicFormulas::AdjustMagicSpellCost(fCost, iSkill, iLuck));
+        fCost = MagicFormulas::AdjustMagicSpellCost(fCost, iSkill, iLuck);
     }
     fCost = FloatFloor(fCost);
     return BSMAX(fCost, 1.0f);
@@ -294,7 +294,7 @@ bool EffectItem::Load(TESFile* apFile, const char* apSpellName) {
     }
     else {
         if (TESChunk != EFIT_ID) {
-            return 0;
+            return false;
         }
         ourMemset(this, 0, 20u);
         apFile->GetChunkData(this, 20u);
@@ -317,7 +317,7 @@ bool EffectItem::Load(TESFile* apFile, const char* apSpellName) {
             Warning("GAME EFFECTS: Unknown EffectSetting encountered when loading EffectItem in actor effect '%s'", v4);
         }
     }
-    return 1;
+    return true;
 }
 
 void EffectItem::Copy(EffectItem* apCopy) {
@@ -358,24 +358,24 @@ bool EffectItem::MatchesEffect(EffectItem* apCompare) {
     }
     // Tests the address of Conditions, which is never null, as the game does.
     if (Conditions.Compare(&apCompare->Conditions)) {
-        return 1;
+        return true;
     }
     return bresult;
 }
 
 void EffectItem::SetConditions(TESCondition* apCondition) {
     if (apCondition) {
-        Conditions.Copy(apCondition, 0);
+        Conditions.Copy(apCondition, nullptr);
     }
     else {
         TESCondition v3;
-        Conditions.Copy(&v3, 0);
+        Conditions.Copy(&v3, nullptr);
     }
 }
 
 bool EffectItem::SharesAssociatedItem(EffectItem* apEffect1, EffectItem* apEffect2) {
     if (!apEffect1 || !apEffect2) {
-        return 0;
+        return false;
     }
     if (apEffect1->pEffectSetting->IsFlagSet(EffectSetting::USE_ASSOCIATED_ARMOR) &&
         apEffect2->pEffectSetting->IsFlagSet(EffectSetting::USE_ASSOCIATED_ARMOR)) {
@@ -418,12 +418,12 @@ bool SettingCollection::WriteSettings() {
 }
 
 bool SettingCollection::ReadSettings() {
-    return pHandle != 0;
+    return pHandle != nullptr;
 }
 
 // The settings' viewer strings, one per setting in the collection's map; returns how many were added.
 uint32_t SettingCollectionMap::GetViewerStrings(NiTPrimitiveArray<char*>* apStringsA) {
-    AutoMemContext kContext(MEM_CONTEXT_GAMESETTING, 1, "..\\BSMain\\Setting.h", 569);
+    AutoMemContext kContext(MEM_CONTEXT_GAMESETTING, true, "..\\BSMain\\Setting.h", 569);
     uint32_t uiCount = 0;
     const char* pKey;
     Setting* pSetting;
@@ -439,7 +439,7 @@ uint32_t SettingCollectionMap::GetViewerStrings(NiTPrimitiveArray<char*>* apStri
 }
 
 void SettingCollectionMap::Add(Setting* apSetting) {
-    AutoMemContext kContext(MEM_CONTEXT_GAMESETTING, 1, "..\\BSMain\\Setting.h", 539);
+    AutoMemContext kContext(MEM_CONTEXT_GAMESETTING, true, "..\\BSMain\\Setting.h", 539);
     if (apSetting) {
         if (apSetting->pKey) {
             Setting* pExisting;
@@ -484,7 +484,7 @@ bool SettingCollectionMap::WriteSettings() {
 // Reads every setting of the map through the virtual ReadSetting, under the game setting memory context; true when the
 // store is open and every read succeeded.
 bool SettingCollectionMap::ReadSettings() {
-    AutoMemContext kContext(MEM_CONTEXT_GAMESETTING, 1, "..\\BSMain\\Setting.h", 632);
+    AutoMemContext kContext(MEM_CONTEXT_GAMESETTING, true, "..\\BSMain\\Setting.h", 632);
     bool bResult = SettingCollection::ReadSettings();
     if (bResult) {
         const char* pKey;

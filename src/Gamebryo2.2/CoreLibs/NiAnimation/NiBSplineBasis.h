@@ -33,7 +33,7 @@ public:
     mutable int32_t m_iMax;
 };
 
-typedef NiBSplineBasis<float, 3> NiBSplineBasisFloat3;
+using NiBSplineBasisFloat3 = NiBSplineBasis<float, 3>;
 
 // General evaluation (Cox-de Boor on the clamped uniform knots). A time whose bits equal the last one's reuses the
 // cached values; the test compares bits, not floating-point values.

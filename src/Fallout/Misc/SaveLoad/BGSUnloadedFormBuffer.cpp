@@ -12,9 +12,9 @@
 #include "SDK/FaceGen/StrContainers.h"
 #include "SDK/FaceGen/algs.h"
 
+#include <cstdint>
 #include <map>
 #include <memory>
-#include <stdint.h>
 #include <string>
 #include <vector>
 
@@ -34,7 +34,7 @@ ENUM_FORM_ID BGSUnloadedFormBuffer::GetFormType() {
 
 char* BGSUnloadedFormBuffer::GetAdvancedBuffer() {
     if (!pBuffer) {
-        return 0;
+        return nullptr;
     }
     // The buffer's first byte is read as a BGSSaveLoadFormInfo.
     SIZE_TYPE esizeType = reinterpret_cast<BGSSaveLoadFormInfo*>(pBuffer)->GetSizeType();
@@ -104,7 +104,7 @@ BGSLoadFormBuffer* BGSUnloadedFormBuffer::FillLoadFormBuffer() {
         v4 = ::new (apMemory) BGSLoadFormBuffer;
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     uint8_t Version = GetVersion();
     v4->Header.cVersion = Version;

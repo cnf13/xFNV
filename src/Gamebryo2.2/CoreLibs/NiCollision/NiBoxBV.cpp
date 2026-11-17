@@ -95,7 +95,7 @@ NiBoundingVolume* NiBoxBV::Create() const {
 NiBoundingVolume* NiBoxBV::Clone() const {
     NiBoxBV* pkClone = static_cast<NiBoxBV*>(MemoryManager_Singleton.Allocate(sizeof(NiBoxBV)));
     if (!pkClone) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkClone) NiBoxBV(*this);
 }
@@ -218,7 +218,7 @@ NiBoundingVolume* NiBoxBV::CreateFromStream(NiStream& kStream) {
     NiBoxBV* v1 = static_cast<NiBoxBV*>(MemoryManager_Singleton.Allocate(sizeof(NiBoxBV)));
     // LoadBinary is called on the new NiBoxBV without a null test, as the game does: on a failed allocation it is
     // called through a null object.
-    NiBoxBV* v2 = 0;
+    NiBoxBV* v2 = nullptr;
     if (v1) {
         v2 = ::new (v1) NiBoxBV(NiPoint3_UNIT_ALL, NiPoint3_ZERO, NiPoint3_UNIT_X, NiPoint3_UNIT_Y, NiPoint3_UNIT_Z);
     }
@@ -428,9 +428,9 @@ bool NiBoxBV::BoxBoxTestIntersect(
     // EXE-INLINED 0x4A3760
     // EXE-INLINED 0x439E90
     NiPoint3 D1;
-    D1.x = D0.x + static_cast<float>(fTime * W.x);
-    D1.y = D0.y + static_cast<float>(fTime * W.y);
-    D1.z = D0.z + static_cast<float>(fTime * W.z);
+    D1.x = D0.x + (fTime * W.x);
+    D1.y = D0.y + (fTime * W.y);
+    D1.z = D0.z + (fTime * W.z);
 
     // The axes A[0], A[1], A[2].
     for (int32_t i = 0; i < 3; i++) {
@@ -1411,9 +1411,9 @@ bool NiBoxBV::BoxBoxFindIntersect(
     // EXE-INLINED 0x4A3760
     // EXE-INLINED 0x439E90
     NiPoint3 D1;
-    D1.x = D0.x + static_cast<float>(fTime * W.x);
-    D1.y = D0.y + static_cast<float>(fTime * W.y);
-    D1.z = D0.z + static_cast<float>(fTime * W.z);
+    D1.x = D0.x + (fTime * W.x);
+    D1.y = D0.y + (fTime * W.y);
+    D1.z = D0.z + (fTime * W.z);
 
     uint32_t uiType = 0;
     int32_t iSide = 0;

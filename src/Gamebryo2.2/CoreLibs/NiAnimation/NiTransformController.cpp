@@ -66,7 +66,7 @@ void NiTransformController::LinkObject(NiStream& kStream) {
             v5 = ::new (v4) NiTransformInterpolator(pkKeyframeData);
         }
         else {
-            v5 = 0;
+            v5 = nullptr;
         }
         m_spInterpolator = v5;
         m_spInterpolator.m_pObject->Collapse();
@@ -179,7 +179,7 @@ NiBlendInterpolator* NiTransformController::CreateBlendInterpolator(
             return ::new (v8) NiBlendTransformInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
         }
     }
-    return 0;
+    return nullptr;
 }
 
 bool NiTransformController::InterpolatorIsCorrectType(NiInterpolator* pkInterpolator, uint16_t) const {
@@ -194,7 +194,7 @@ NiObject* NiTransformController::CreateObject() {
     NiTransformController* v0 =
         static_cast<NiTransformController*>(NiMemObject::operator new(sizeof(NiTransformController)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiTransformController;
 }

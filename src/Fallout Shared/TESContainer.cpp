@@ -100,19 +100,19 @@ void ContainerObject::Copy(ContainerObject* apCopy) {
 
 bool ContainerObject::Compare(ContainerObject* apCompare) {
     if (!apCompare) {
-        return (bool)1;
+        return true;
     }
     if (((uint32_t)i_count) != ((uint32_t)apCompare->i_count)) {
-        return (bool)1;
+        return true;
     }
     if (pObj != apCompare->pObj) {
-        return (bool)1;
+        return true;
     }
     if (pItemExtra && ((!pItemExtra->IsDefault()) && (!apCompare->pItemExtra))) {
-        return (bool)1;
+        return true;
     }
     if ((!pItemExtra) && (apCompare->pItemExtra && (!apCompare->pItemExtra->IsDefault()))) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(pItemExtra && (apCompare->pItemExtra && pItemExtra->Compare(apCompare->pItemExtra))));
 }
@@ -157,23 +157,23 @@ void TESContainer::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESContainer::CompareComponent(BaseFormComponent* apCompareFC) {
     TESContainer* pCompare = dynamic_cast<TESContainer*>(apCompareFC);
     if (!pCompare) {
-        return 1;
+        return true;
     }
     uint32_t iCount = 0;
     for (ContainerObject* pobj : *&objectList) {
         if (pobj) {
             BSSimpleList<ContainerObject*>* pCompList = &pCompare->objectList;
-            bool bFound = 0;
+            bool bFound = false;
             while (pCompList) {
                 ContainerObject* pcomp = pCompList->m_item;
                 if (pcomp && !pcomp->Compare(pobj)) {
-                    bFound = 1;
+                    bFound = true;
                     break;
                 }
                 pCompList = pCompList->m_pkNext;
             }
             if (!bFound) {
-                return 1;
+                return true;
             }
             ++iCount;
         }
@@ -184,7 +184,7 @@ bool TESContainer::CompareComponent(BaseFormComponent* apCompareFC) {
 void TESContainer::Save() {
     BSSimpleList<ContainerObject*>* pkList = &objectList;
     if (!pkList->m_item) {
-        pkList = 0;
+        pkList = nullptr;
     }
     while (pkList) {
         ContainerObject** v1 = &pkList->m_item;
@@ -200,7 +200,7 @@ float TESContainer::GetContainerWeight(bool abIsHardcore) {
     float weight = 0.0f;
     BSSimpleList<ContainerObject*>* pkList = &objectList;
     if (!pkList->m_item) {
-        pkList = 0;
+        pkList = nullptr;
     }
     while (pkList) {
         ContainerObject* obj = pkList->m_item;
@@ -215,7 +215,7 @@ float TESContainer::GetContainerWeight(bool abIsHardcore) {
 
 void TESContainer::InitItem(TESForm* apOwner) {
     BSSimpleList<ContainerObject*>* plist = &objectList;
-    BSSimpleList<ContainerObject*>* plastlist = 0;
+    BSSimpleList<ContainerObject*>* plastlist = nullptr;
     while (plist && !plist->IsEmpty()) {
         ContainerObject* pobj = plist->m_item;
         pobj->InitItem(apOwner);
@@ -234,7 +234,7 @@ void TESContainer::InitItem(TESForm* apOwner) {
             if (pobj) {
                 delete pobj;
             }
-            pobj = 0;
+            pobj = nullptr;
         }
     }
 }
@@ -283,32 +283,32 @@ void TESContainer::ApplyHealthPercentToContainer(float afHealthPerc) {
                 v3 = ::new (apMemory) ContainerItemExtra;
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             pcont->pItemExtra = v3;
         }
         pcont->pItemExtra->AdjustHealthPercent(afHealthPerc);
         if (pcont->pItemExtra->IsDefault()) {
             ourFree(pcont->pItemExtra);
-            pcont->pItemExtra = 0;
+            pcont->pItemExtra = nullptr;
         }
     }
 }
 
 void TESContainer::AddLevItemContainerToChanges(int32_t aiLevItemIndex, InventoryChanges* apChanges) {
-    bool bhadChanges = 0;
+    bool bhadChanges = false;
     if (apChanges) {
         for (BSSimpleList<ContainerObject*>* plist = &objectList; plist && !plist->IsEmpty(); plist = plist->m_pkNext) {
             ContainerObject* pcont = plist->m_item;
             if (pcont) {
                 ExtraDataList* pextra;
-                bhadChanges = 1;
+                bhadChanges = true;
                 ExtraDataList* apMemory = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
                 if (apMemory) {
                     pextra = ::new (apMemory) ExtraDataList;
                 }
                 else {
-                    pextra = 0;
+                    pextra = nullptr;
                 }
                 pextra->SetLevelItemExtra(aiLevItemIndex);
                 pextra->SetCount(pcont->i_count);
@@ -347,9 +347,9 @@ ContainerObject* TESContainer::AddObject(CONTAINER_OBJECT_FILE* apCOFile) {
 
 ContainerObject* TESContainer::AddObject(TESObject* apObj, int32_t aiCount, ContainerItemExtra* apExtra) {
     if (!apObj || !aiCount) {
-        return 0;
+        return nullptr;
     }
-    ContainerObject* a2 = 0;
+    ContainerObject* a2 = nullptr;
     for (BSSimpleList<ContainerObject*>* ecx0 = GetObjectList(); ecx0 && !ecx0->IsEmpty(); ecx0 = ecx0->m_pkNext) {
         a2 = ecx0->m_item;
         if (a2->pObj == apObj) {
@@ -364,7 +364,7 @@ ContainerObject* TESContainer::AddObject(TESObject* apObj, int32_t aiCount, Cont
                 }
             }
         }
-        a2 = 0;
+        a2 = nullptr;
     }
     if (a2) {
         a2->i_count += aiCount;
@@ -376,7 +376,7 @@ ContainerObject* TESContainer::AddObject(TESObject* apObj, int32_t aiCount, Cont
             pContainerObj = ::new (apMemory) ContainerObject;
         }
         else {
-            pContainerObj = 0;
+            pContainerObj = nullptr;
         }
         a2 = pContainerObj;
         pContainerObj->i_count = aiCount;
@@ -388,7 +388,7 @@ ContainerObject* TESContainer::AddObject(TESObject* apObj, int32_t aiCount, Cont
                 v6 = ::new (v9) ContainerItemExtra;
             }
             else {
-                v6 = 0;
+                v6 = nullptr;
             }
             a2->pItemExtra = v6;
             a2->pItemExtra->Copy(apExtra);
@@ -402,7 +402,7 @@ ContainerObject* TESContainer::AddObject(TESObject* apObj, int32_t aiCount, Cont
 void TESContainer::AddContainerToReference(TESObjectREFR* apRef, bool abSilent) {
     if (apRef) {
         Actor* pactor = dynamic_cast<Actor*>(apRef);
-        ContainerObject* plast = 0;
+        ContainerObject* plast = nullptr;
         for (ContainerObject* pcont : *&objectList) {
             if (pcont) {
                 Script* pscript = TESScriptableForm::GetFormScript(pcont->pObj);
@@ -411,13 +411,13 @@ void TESContainer::AddContainerToReference(TESObjectREFR* apRef, bool abSilent) 
                 if (pscript) {
                     for (int32_t i = 0; i < inum; ++i) {
                         ExtraDataList* pextra_2;
-                        ExtraDataList* pextra = 0;
+                        ExtraDataList* pextra = nullptr;
                         ExtraDataList* apMemory = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
                         if (apMemory) {
                             pextra_2 = ::new (apMemory) ExtraDataList;
                         }
                         else {
-                            pextra_2 = 0;
+                            pextra_2 = nullptr;
                         }
                         pextra = pextra_2;
                         pextra_2->SetCount(1);
@@ -433,11 +433,11 @@ void TESContainer::AddContainerToReference(TESObjectREFR* apRef, bool abSilent) 
                                     pref = ::new (pRefMemory) TESObjectREFR;
                                 }
                                 else {
-                                    pref = 0;
+                                    pref = nullptr;
                                 }
                                 pref->SetTemporary();
                                 ScriptLocals* pExtraLocals = pextra->GetScriptLocals();
-                                pscript->Run(pref, pExtraLocals, 0, 0);
+                                pscript->Run(pref, pExtraLocals, nullptr, false);
                                 if (pref) {
                                     delete pref;
                                 }
@@ -456,7 +456,7 @@ void TESContainer::AddContainerToReference(TESObjectREFR* apRef, bool abSilent) 
                     }
                 }
                 else {
-                    ExtraDataList* pextra_3 = 0;
+                    ExtraDataList* pextra_3 = nullptr;
                     if (pcont->pItemExtra) {
                         ExtraDataList* pextra_4;
                         ExtraDataList* pExtraMemory = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
@@ -464,7 +464,7 @@ void TESContainer::AddContainerToReference(TESObjectREFR* apRef, bool abSilent) 
                             pextra_4 = ::new (pExtraMemory) ExtraDataList;
                         }
                         else {
-                            pextra_4 = 0;
+                            pextra_4 = nullptr;
                         }
                         pextra_3 = pextra_4;
                         pextra_4->SetCount(pcont->i_count);
@@ -509,10 +509,10 @@ void TESContainer::AddContainerToReference(TESObjectREFR* apRef, bool abSilent) 
                         case CHIP_ID:
                         case CCRD_ID:
                         case CMNY_ID: {
-                            const char* pSoundName = pPlayer->GetPickUpSoundName(plast->pObj, 1, 0);
+                            const char* pSoundName = pPlayer->GetPickUpSoundName(plast->pObj, true, false);
                             Interface::ShowMessage(
                                 pstring.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_giftbox.dds",
-                                pSoundName, 2.0f, 0
+                                pSoundName, 2.0f, false
                             );
                             break;
                         }
@@ -562,7 +562,7 @@ void TESContainer::AddDuplicateObject(ContainerObject* pCObj) {
             v3 = ::new (apMemory) ContainerObject;
         }
         else {
-            v3 = 0;
+            v3 = nullptr;
         }
         ContainerObject* a2 = v3;
         v3->Copy(pCObj);
@@ -574,7 +574,7 @@ void TESContainer::AddDuplicateObject(ContainerObject* pCObj) {
 TESObjectWEAP* TESContainer::GetBestWeapon(TESActorBase* apActorBase) {
     BSSimpleList<ContainerObject*>* pList = &objectList;
     float fHighDesire = -3.4028235e+38f;
-    TESObjectWEAP* pBest = 0;
+    TESObjectWEAP* pBest = nullptr;
     while (pList) {
         ContainerObject* pcont = pList->m_item;
         if (pcont) {
@@ -595,13 +595,13 @@ TESObjectWEAP* TESContainer::GetBestWeapon(TESActorBase* apActorBase) {
 TESObjectARMO* TESContainer::GetBestArmor(TESActorBase* apActorBase, BIPED_OBJECT aeBodySlot) {
     BSSimpleList<ContainerObject*>* pList = &objectList;
     float fHighDesire = -3.4028235e+38f;
-    TESObjectARMO* pBest = 0;
+    TESObjectARMO* pBest = nullptr;
     while (pList) {
         ContainerObject* pcont = pList->m_item;
         if (pcont) {
             TESObjectARMO* pObj = dynamic_cast<TESObjectARMO*>(pcont->pObj);
             if (pObj) {
-                if (aeBodySlot != BO_NONE && pObj->FillsBipedSlot(aeBodySlot, 0, 0)) {
+                if (aeBodySlot != BO_NONE && pObj->FillsBipedSlot(aeBodySlot, false, nullptr)) {
                     float fDesire = apActorBase->GetDesirability(pObj);
                     if (fHighDesire < static_cast<double>(fDesire)) {
                         fHighDesire = fDesire;
@@ -623,7 +623,7 @@ BSSimpleList<ContainerObject*>* TESContainer::GetFilteredList() {
         pnewlist = ::new (v5) BSSimpleList<ContainerObject*>;
     }
     else {
-        pnewlist = 0;
+        pnewlist = nullptr;
     }
     for (ContainerObject*& rpItem : objectList.ItemsUntilNull()) {
         pnewlist->AddHead(rpItem);

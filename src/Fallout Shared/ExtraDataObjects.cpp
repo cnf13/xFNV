@@ -150,10 +150,10 @@ ExtraAction::ExtraAction() : BSExtraData(EXTRA_ACTION), eAction((uint8_t)1), pAc
 bool ExtraAction::Compare(BSExtraData* apCompare) {
     ExtraAction* v4 = dynamic_cast<ExtraAction*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(eAction != v4->eAction));
 }
@@ -165,28 +165,28 @@ ExtraActivateRef::ExtraActivateRef() : BSExtraData(83), cActivateFlags(0) {
 bool ExtraActivateRef::Compare(BSExtraData* apCompare) {
     ExtraActivateRef* pcomp = dynamic_cast<ExtraActivateRef*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     int32_t v3 = ParentList.ItemsInList();
     if (v3 != pcomp->ParentList.ItemsInList()) {
-        return 1;
+        return true;
     }
     for (BSSimpleList<REF_ACTIVATE_DATA*>* plist = &ParentList; plist && !plist->IsEmpty(); plist = plist->m_pkNext) {
         REF_ACTIVATE_DATA** v4 = &plist->m_item;
         REF_ACTIVATE_DATA* pdata = *v4;
         REF_ACTIVATE_DATA* pcompdata = pcomp->GetData((*v4)->pActivateRef);
         if (!pcompdata || std::memcmp(pcompdata, pdata, sizeof(REF_ACTIVATE_DATA))) {
-            return 1;
+            return true;
         }
     }
     if (cActivateFlags != pcomp->cActivateFlags) {
-        return 1;
+        return true;
     }
     if (!ActivateTextOverride.GetLength() && !pcomp->ActivateTextOverride.GetLength()) {
-        return 0;
+        return false;
     }
     if (!ActivateTextOverride.GetLength() || !pcomp->ActivateTextOverride.GetLength()) {
-        return 1;
+        return true;
     }
     return BSstrcmp(ActivateTextOverride.pString, pcomp->ActivateTextOverride.pString) != 0;
 }
@@ -213,7 +213,7 @@ void ExtraActivateRef::Copy(BSExtraData* apCopy) {
                 pcopydata = ::new (apMemory) REF_ACTIVATE_DATA;
             }
             else {
-                pcopydata = 0;
+                pcopydata = nullptr;
             }
             REF_ACTIVATE_DATA* pcopydata_2 = pcopydata;
             ourMemcpy(pcopydata, pdata, sizeof(REF_ACTIVATE_DATA));
@@ -224,7 +224,7 @@ void ExtraActivateRef::Copy(BSExtraData* apCopy) {
     }
 }
 
-REF_ACTIVATE_DATA::REF_ACTIVATE_DATA() : pActivateRef(0), fActivateDelay(0.0) {}
+REF_ACTIVATE_DATA::REF_ACTIVATE_DATA() : pActivateRef(nullptr), fActivateDelay(0.0) {}
 
 void REF_ACTIVATE_DATA::Endian() {
     ENDIAN(pActivateRef, false);
@@ -232,7 +232,7 @@ void REF_ACTIVATE_DATA::Endian() {
 }
 
 REF_ACTIVATE_DATA* GetActivateDataFromList(TESObjectREFR* apRef, BSSimpleList<REF_ACTIVATE_DATA*>* apList) {
-    REF_ACTIVATE_DATA* v5 = 0;
+    REF_ACTIVATE_DATA* v5 = nullptr;
     while (apList && !apList->IsEmpty()) {
         REF_ACTIVATE_DATA* v3 = apList->m_item;
         if (v3->pActivateRef == apRef) {
@@ -311,21 +311,20 @@ ExtraActivateRefChildren::~ExtraActivateRefChildren() {
     FreeActivateList(&ChildList);
 }
 
-ExtraAmmo::ExtraAmmo(TESAmmo* apAmmo, int32_t aiCount)
-  : BSExtraData(EXTRA_AMMO), pAmmo(apAmmo), iCount((int32_t)aiCount) {}
+ExtraAmmo::ExtraAmmo(TESAmmo* apAmmo, int32_t aiCount) : BSExtraData(EXTRA_AMMO), pAmmo(apAmmo), iCount(aiCount) {}
 
 bool ExtraAmmo::Compare(BSExtraData* apCompare) {
     ExtraAmmo* v4 = dynamic_cast<ExtraAmmo*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     if (((uint32_t)iCount) == ((uint32_t)v4->iCount)) {
         return (bool)((uint8_t)(pAmmo != v4->pAmmo));
     }
-    return (bool)1;
+    return true;
 }
 
 ExtraAnim::ExtraAnim(Animation* apAnim) : BSExtraData(EXTRA_ANIM), pAnimation(apAnim) {}
@@ -343,10 +342,10 @@ ExtraAudioMarker::ExtraAudioMarker(AudioMarker* apAudioData)
 bool ExtraAudioMarker::Compare(BSExtraData* apCompare) {
     ExtraAudioMarker* pComp = dynamic_cast<ExtraAudioMarker*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return 1;
+        return true;
     }
     return pAudioData->Compare(pComp->pAudioData);
 }
@@ -378,10 +377,10 @@ ExtraCombatStyle::ExtraCombatStyle(TESCombatStyle* apCombatStyle)
 bool ExtraCombatStyle::Compare(BSExtraData* apCompare) {
     ExtraCombatStyle* v4 = dynamic_cast<ExtraCombatStyle*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(pCombatStyle != v4->pCombatStyle));
 }
@@ -395,15 +394,15 @@ ExtraContainerChanges::~ExtraContainerChanges() {
 
 ExtraCount::ExtraCount() : BSExtraData(36), iCount(0) {}
 
-ExtraCount::ExtraCount(int16_t aiCount) : BSExtraData(EXTRA_COUNT), iCount((int16_t)aiCount) {}
+ExtraCount::ExtraCount(int16_t aiCount) : BSExtraData(EXTRA_COUNT), iCount(aiCount) {}
 
 bool ExtraCount::Compare(BSExtraData* apCompare) {
     ExtraCount* v4 = dynamic_cast<ExtraCount*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(iCount != v4->iCount));
 }
@@ -413,31 +412,31 @@ ExtraDecalRefs::ExtraDecalRefs() : BSExtraData(87u) {}
 bool ExtraDecalRefs::Compare(BSExtraData* apCompare) {
     ExtraDecalRefs* pcomp = dynamic_cast<ExtraDecalRefs*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     int32_t v3 = DecalRefList.ItemsInList();
     if (v3 != pcomp->DecalRefList.ItemsInList()) {
-        return 1;
+        return true;
     }
     for (BSSimpleList<REF_DECAL_DATA*>* plist = &pcomp->DecalRefList; plist && !plist->IsEmpty();
          plist = plist->m_pkNext) {
         REF_DECAL_DATA* pcompdata = plist->m_item;
         REF_DECAL_DATA* pdata = GetRefDecalData(pcompdata->pDecalRef);
         if (!pdata) {
-            return 1;
+            return true;
         }
         if (std::memcmp(pdata, pcompdata, sizeof(REF_DECAL_DATA))) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void ExtraDecalRefs::InitItem(TESForm* apOwner) {
     BSSimpleList<REF_DECAL_DATA*>* preflist = &DecalRefList;
-    BSSimpleList<REF_DECAL_DATA*>* plastlist = 0;
+    BSSimpleList<REF_DECAL_DATA*>* plastlist = nullptr;
     while (preflist && !preflist->IsEmpty()) {
-        bool badvanced = 0;
+        bool badvanced = false;
         REF_DECAL_DATA* pdata = preflist->m_item;
         uint32_t tempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pdata->pDecalRef));
         TESFile* File = apOwner->GetFile(-1);
@@ -457,8 +456,8 @@ void ExtraDecalRefs::InitItem(TESForm* apOwner) {
                 preflist->RemoveHead();
             }
             ourFree(pdata);
-            pdata = 0;
-            badvanced = 1;
+            pdata = nullptr;
+            badvanced = true;
         }
         if (!badvanced) {
             plastlist = preflist;
@@ -468,7 +467,7 @@ void ExtraDecalRefs::InitItem(TESForm* apOwner) {
 }
 
 REF_DECAL_DATA* ExtraDecalRefs::GetRefDecalData(TESObjectREFR* apRef) {
-    REF_DECAL_DATA* v5 = 0;
+    REF_DECAL_DATA* v5 = nullptr;
     BSSimpleList<REF_DECAL_DATA*>* ecx0 = &DecalRefList;
     while (ecx0 && !ecx0->IsEmpty()) {
         REF_DECAL_DATA* v3 = static_cast<REF_DECAL_DATA*>(ecx0->m_item);
@@ -502,7 +501,7 @@ void ExtraDecalRefs::SetRefDecalData(TESObjectREFR* apRef, const NiPoint3& aInte
 int32_t ExtraDecalRefs::ClearDecalData() {
     int32_t result;
     void* v3;
-    while (1) {
+    while (true) {
         result = (int32_t)(&DecalRefList)->IsEmpty();
         if ((uint8_t)result) {
             break;
@@ -528,7 +527,7 @@ void ExtraDecalRefs::Copy(BSExtraData* apCopy) {
                 pdata = ::new (apMemory) REF_DECAL_DATA;
             }
             else {
-                pdata = 0;
+                pdata = nullptr;
             }
             pdata_2 = pdata;
             ourMemcpy(pdata, pcopydata, sizeof(REF_DECAL_DATA));
@@ -564,12 +563,12 @@ ExtraEnableStateParent::ExtraEnableStateParent()
 bool ExtraEnableStateParent::Compare(BSExtraData* apCompare) {
     ExtraEnableStateParent* pcomp = dynamic_cast<ExtraEnableStateParent*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (pcomp->pParent == pParent) {
         return pcomp->cFlags != cFlags;
     }
-    return 1;
+    return true;
 }
 
 bool ExtraEnableStateParent::ShouldPopIn() {
@@ -589,10 +588,10 @@ ExtraEncounterZone::ExtraEncounterZone() : BSExtraData(EXTRA_ENCOUNTERZONE), pZo
 bool ExtraEncounterZone::Compare(BSExtraData* apCompare) {
     ExtraEncounterZone* v4 = dynamic_cast<ExtraEncounterZone*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(pZone != v4->pZone));
 }
@@ -609,10 +608,10 @@ ExtraGlobal::ExtraGlobal(TESGlobal* apGlobal) : BSExtraData(EXTRA_GLOBAL), pGlob
 bool ExtraGlobal::Compare(BSExtraData* apCompare) {
     ExtraGlobal* v4 = dynamic_cast<ExtraGlobal*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(pGlobal != v4->pGlobal));
 }
@@ -624,10 +623,10 @@ ExtraHealth::ExtraHealth(float afHealth) : BSExtraData(EXTRA_HEALTH), fHealth(af
 bool ExtraHealth::Compare(BSExtraData* apCompare) {
     ExtraHealth* v4 = dynamic_cast<ExtraHealth*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(v4->fHealth != fHealth));
 }
@@ -637,10 +636,10 @@ ExtraHealthPerc::ExtraHealthPerc() : BSExtraData(EXTRA_HEALTH_PERC), fHealthPerc
 bool ExtraHealthPerc::Compare(BSExtraData* apCompare) {
     ExtraHealthPerc* v4 = dynamic_cast<ExtraHealthPerc*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(v4->fHealthPerc != fHealthPerc));
 }
@@ -698,18 +697,18 @@ ExtraLitWaterRefs::ExtraLitWaterRefs() : BSExtraData(133u) {}
 bool ExtraLitWaterRefs::Compare(BSExtraData* apCompare) {
     ExtraLitWaterRefs* pcomp = dynamic_cast<ExtraLitWaterRefs*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     int32_t v3 = RefList.ItemsInList();
     if (v3 != pcomp->RefList.ItemsInList()) {
-        return 1;
+        return true;
     }
     for (BSSimpleList<TESObjectREFR*>* plist = &pcomp->RefList; plist && !plist->IsEmpty(); plist = plist->m_pkNext) {
         if (!RefList.IsInList(plist->m_item)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void ExtraLitWaterRefs::InitItem(TESForm* apOwner) {
@@ -722,7 +721,7 @@ void ExtraLitWaterRefs::InitItem(TESForm* apOwner) {
         TESForm* FormByNumericID = TESForm::GetFormByNumericID(tempint);
         TESObjectREFR* pref = dynamic_cast<TESObjectREFR*>(FormByNumericID);
         if (pref && pref->GetRefPersists()) {
-            (&pref->m_Extra)->SetWaterLightRef(static_cast<TESObjectREFR*>(apOwner), 1);
+            (&pref->m_Extra)->SetWaterLightRef(static_cast<TESObjectREFR*>(apOwner), true);
             newlist.AddHead(pref);
         }
         else {
@@ -831,25 +830,25 @@ ExtraLock::ExtraLock(LockData* apLock) : BSExtraData(EXTRA_LOCK), pLock(apLock) 
 bool ExtraLock::Compare(BSExtraData* apCompare) {
     ExtraLock* pComp = dynamic_cast<ExtraLock*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return 1;
+        return true;
     }
     if (pLock->cFlags != pComp->pLock->cFlags) {
-        return 1;
+        return true;
     }
     if (pLock->pKey != pComp->pLock->pKey) {
-        return 1;
+        return true;
     }
     int32_t LockPickLevel = GetLockPickLevel(pLock->cLockLevel);
     if (LockPickLevel != GetLockPickLevel(pComp->pLock->cLockLevel)) {
-        return 1;
+        return true;
     }
     if (pLock->iNumTries == pComp->pLock->iNumTries) {
         return pLock->iTimesUnlocked != pComp->pLock->iTimesUnlocked;
     }
-    return 1;
+    return true;
 }
 
 ExtraLock::~ExtraLock() {
@@ -869,10 +868,10 @@ ExtraMapMarker::ExtraMapMarker(MapMarkerData* apMapData) : BSExtraData(EXTRA_MAP
 bool ExtraMapMarker::Compare(BSExtraData* apCompare) {
     ExtraMapMarker* pComp = dynamic_cast<ExtraMapMarker*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return 1;
+        return true;
     }
     return pMapData->Compare(pComp->pMapData);
 }
@@ -888,7 +887,7 @@ bool ExtraMerchantContainer::Compare(BSExtraData* apCompare) {
     return (bool)((uint8_t)((!v4) || (v4->pContainer != pContainer)));
 }
 
-ExtraModelSwap::ExtraModelSwap() : BSExtraData(91), pModelSwap(0), pModelSwapForm(0) {}
+ExtraModelSwap::ExtraModelSwap() : BSExtraData(91), pModelSwap(nullptr), pModelSwapForm(nullptr) {}
 
 ExtraModelSwap::ExtraModelSwap(TESModel* apModelSwap, TESForm* apModelSwapForm)
   : BSExtraData(EXTRA_MODEL_SWAP), pModelSwap(apModelSwap), pModelSwapForm(apModelSwapForm) {}
@@ -918,17 +917,17 @@ ExtraOwnership::ExtraOwnership(TESForm* apOwner) : BSExtraData(EXTRA_OWNERSHIP),
 bool ExtraOwnership::Compare(BSExtraData* apCompare) {
     ExtraOwnership* v4 = dynamic_cast<ExtraOwnership*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(pOwner != v4->pOwner));
 }
 
 ExtraPackage::ExtraPackage()
-  : BSExtraData(EXTRA_PACKAGE), pPack(nullptr), iindex((-1)), pTarg(nullptr), bActionComplete((bool)0),
-    bActivated((bool)0), bDoneOnce((bool)0) {}
+  : BSExtraData(EXTRA_PACKAGE), pPack(nullptr), iindex((-1)), pTarg(nullptr), bActionComplete(false), bActivated(false),
+    bDoneOnce(false) {}
 
 ExtraPackage::ExtraPackage(
     TESPackage* apPack,
@@ -938,7 +937,7 @@ ExtraPackage::ExtraPackage(
     bool abactivated,
     bool abDoneOnce
 )
-  : BSExtraData(EXTRA_PACKAGE), pPack(apPack), iindex((int32_t)aiIndex), pTarg(apRef),
+  : BSExtraData(EXTRA_PACKAGE), pPack(apPack), iindex(aiIndex), pTarg(apRef),
     bActionComplete((bool)((uint8_t)abcomplete)), bActivated((bool)((uint8_t)abactivated)),
     bDoneOnce((bool)((uint8_t)abDoneOnce)) {}
 
@@ -947,22 +946,22 @@ ExtraRagDollData::ExtraRagDollData() : BSExtraData(EXTRA_RAGDOLLDATA), pRagDollD
 bool ExtraRagDollData::Compare(BSExtraData* apCompare) {
     ExtraRagDollData* pcomp = dynamic_cast<ExtraRagDollData*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return 1;
+        return true;
     }
     if (pRagDollData) {
         if (pRagDollData->Compare(pcomp->pRagDollData)) {
-            return 1;
+            return true;
         }
     }
     else {
         if (pcomp->pRagDollData) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 ExtraRagDollData::~ExtraRagDollData() {
@@ -993,10 +992,10 @@ bool ExtraPackageStartLocation::Compare(BSExtraData* apCompare) {
         FNVD_DYNAMIC_CAST_VOID(ExtraPackageStartLocation)(apCompare, RTTI_BSExtraData, RTTI_ExtraPackageStartLocation)
     );
     if (!v4) {
-        return 1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return 1;
+        return true;
     }
     return std::memcmp(&worldLoc, v4 + 12, sizeof(worldLoc)) != 0;
 }
@@ -1038,10 +1037,10 @@ ExtraRadiation::ExtraRadiation(float afRadiation) : BSExtraData(EXTRA_RADIATION)
 bool ExtraRadiation::Compare(BSExtraData* apCompare) {
     ExtraRadiation* v4 = dynamic_cast<ExtraRadiation*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(v4->fRadiation != fRadiation));
 }
@@ -1057,10 +1056,10 @@ bool ExtraRadioData::Compare(BSExtraData* apCompare) {
     char* v4 =
         static_cast<char*>(FNVD_DYNAMIC_CAST_VOID(ExtraRadioData)(apCompare, RTTI_BSExtraData, RTTI_ExtraRadioData));
     if (!v4) {
-        return 1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return 1;
+        return true;
     }
     return std::memcmp(&Data, v4 + 12, sizeof(Data)) != 0;
 }
@@ -1072,10 +1071,10 @@ ExtraRadius::ExtraRadius(float afRadius) : BSExtraData(EXTRA_RADIUS), fRadius(af
 bool ExtraRadius::Compare(BSExtraData* apCompare) {
     ExtraRadius* v4 = dynamic_cast<ExtraRadius*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(v4->fRadius != fRadius));
 }
@@ -1085,10 +1084,10 @@ ExtraRank::ExtraRank(int32_t aiRank) : BSExtraData(EXTRA_RANK), iRank(aiRank) {}
 bool ExtraRank::Compare(BSExtraData* apCompare) {
     ExtraRank* v4 = dynamic_cast<ExtraRank*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(((uint32_t)iRank) != ((uint32_t)v4->iRank)));
 }
@@ -1107,11 +1106,11 @@ ExtraReflectedRefs::ExtraReflectedRefs() : BSExtraData(0x65u) {}
 bool ExtraReflectedRefs::Compare(BSExtraData* apCompare) {
     ExtraReflectedRefs* pcomp = dynamic_cast<ExtraReflectedRefs*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     int32_t v3 = RefList.ItemsInList();
     if (v3 != pcomp->RefList.ItemsInList()) {
-        return 1;
+        return true;
     }
     for (BSSimpleList<REF_REFLECTED_DATA*>* plist = &pcomp->RefList; plist && !plist->IsEmpty();
          plist = plist->m_pkNext) {
@@ -1119,13 +1118,13 @@ bool ExtraReflectedRefs::Compare(BSExtraData* apCompare) {
         REF_REFLECTED_DATA* pcompdata = *v4;
         REF_REFLECTED_DATA* pdata = GetRefData((*v4)->pRef);
         if (!pdata) {
-            return 1;
+            return true;
         }
         if (std::memcmp(pdata, pcompdata, sizeof(REF_REFLECTED_DATA))) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 ExtraReflectedRefs::~ExtraReflectedRefs() {
@@ -1148,7 +1147,7 @@ void ExtraReflectedRefs::Copy(BSExtraData* apCopy) {
                 pdata = ::new (v4) REF_REFLECTED_DATA;
             }
             else {
-                pdata = 0;
+                pdata = nullptr;
             }
             REF_REFLECTED_DATA* pdata_2 = pdata;
             ourMemcpy(pdata, pcopydata, sizeof(REF_REFLECTED_DATA));
@@ -1159,7 +1158,7 @@ void ExtraReflectedRefs::Copy(BSExtraData* apCopy) {
 
 void ExtraReflectedRefs::RemoveReference(TESObjectREFR* apRef) {
     BSSimpleList<REF_REFLECTED_DATA*>* plist = &RefList;
-    BSSimpleList<REF_REFLECTED_DATA*>* plastlist = 0;
+    BSSimpleList<REF_REFLECTED_DATA*>* plastlist = nullptr;
     while (plist && !plist->IsEmpty()) {
         REF_REFLECTED_DATA* pdata = plist->m_item;
         if (pdata->pRef == apRef) {
@@ -1170,7 +1169,7 @@ void ExtraReflectedRefs::RemoveReference(TESObjectREFR* apRef) {
                 plist->RemoveHead();
             }
             ourFree(pdata);
-            pdata = 0;
+            pdata = nullptr;
             return;
         }
         plastlist = plist;
@@ -1187,7 +1186,7 @@ void ExtraReflectedRefs::SetReference(TESObjectREFR* apRef, uint32_t aiEffectFla
             pdata_2 = ::new (v5) REF_REFLECTED_DATA;
         }
         else {
-            pdata_2 = 0;
+            pdata_2 = nullptr;
         }
         pdata = pdata_2;
         pdata_2->pRef = apRef;
@@ -1219,24 +1218,24 @@ ExtraReflectorRefs::ExtraReflectorRefs() : BSExtraData(102u) {}
 bool ExtraReflectorRefs::Compare(BSExtraData* apCompare) {
     ExtraReflectorRefs* pcomp = dynamic_cast<ExtraReflectorRefs*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     int32_t v3 = RefList.ItemsInList();
     if (v3 != pcomp->RefList.ItemsInList()) {
-        return 1;
+        return true;
     }
     for (BSSimpleList<REF_REFLECTOR_DATA*>* plist = &pcomp->RefList; plist && !plist->IsEmpty();
          plist = plist->m_pkNext) {
         REF_REFLECTOR_DATA* pcompdata = plist->m_item;
         REF_REFLECTOR_DATA* pdata = GetRefData(pcompdata->pRef);
         if (!pdata) {
-            return 1;
+            return true;
         }
         if (std::memcmp(pdata, pcompdata, sizeof(REF_REFLECTOR_DATA))) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 ExtraReflectorRefs::~ExtraReflectorRefs() {
@@ -1259,7 +1258,7 @@ void ExtraReflectorRefs::Copy(BSExtraData* apCopy) {
                 pdata = ::new (v4) REF_REFLECTOR_DATA;
             }
             else {
-                pdata = 0;
+                pdata = nullptr;
             }
             REF_REFLECTOR_DATA* pdata_2 = pdata;
             ourMemcpy(pdata, pcopydata, sizeof(REF_REFLECTOR_DATA));
@@ -1301,9 +1300,9 @@ void ExtraReflectorRefs::SetReference(TESObjectREFR* apRef, uint32_t aiEffectFla
 
 void ExtraReflectorRefs::InitItem(TESForm* apOwner) {
     BSSimpleList<REF_REFLECTOR_DATA*>* preflist = &RefList;
-    BSSimpleList<REF_REFLECTOR_DATA*>* plastlist = 0;
+    BSSimpleList<REF_REFLECTOR_DATA*>* plastlist = nullptr;
     while (preflist && !preflist->IsEmpty()) {
-        bool badvanced = 0;
+        bool badvanced = false;
         REF_REFLECTOR_DATA* pdata = preflist->m_item;
         uint32_t tempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pdata->pRef));
         TESFile* File = apOwner->GetFile(-1);
@@ -1312,10 +1311,10 @@ void ExtraReflectorRefs::InitItem(TESForm* apOwner) {
         TESObjectREFR* pref = dynamic_cast<TESObjectREFR*>(FormByNumericID);
         if (pref && pref->GetRefPersists()) {
             if ((pdata->iEffectFlags & 1) != 0) {
-                (&pref->m_Extra)->SetReflectsRef(static_cast<TESObjectREFR*>(apOwner), 1);
+                (&pref->m_Extra)->SetReflectsRef(static_cast<TESObjectREFR*>(apOwner), true);
             }
             if ((pdata->iEffectFlags & 2) != 0) {
-                (&pref->m_Extra)->SetRefractsRef(static_cast<TESObjectREFR*>(apOwner), 1);
+                (&pref->m_Extra)->SetRefractsRef(static_cast<TESObjectREFR*>(apOwner), true);
             }
             pdata->pRef = pref;
         }
@@ -1337,8 +1336,8 @@ void ExtraReflectorRefs::InitItem(TESForm* apOwner) {
                 preflist->RemoveHead();
             }
             ourFree(pdata);
-            pdata = 0;
-            badvanced = 1;
+            pdata = nullptr;
+            badvanced = true;
         }
         if (!badvanced) {
             plastlist = preflist;
@@ -1376,8 +1375,8 @@ ExtraRunOncePacks::~ExtraRunOncePacks() {
 }
 
 void ExtraRunOncePacks::AddRunOncePack(TESPackage* apPack, char acDay) {
-    RunOncePackage* pMatch = 0;
-    RunOncePackage* pItem = 0;
+    RunOncePackage* pMatch = nullptr;
+    RunOncePackage* pItem = nullptr;
     BSSimpleList<RunOncePackage*>* pIter = pPackageList;
     while (pIter) {
         pItem = pIter->m_item;
@@ -1389,7 +1388,7 @@ void ExtraRunOncePacks::AddRunOncePack(TESPackage* apPack, char acDay) {
             pIter = pIter->m_pkNext;
         }
         else {
-            pIter = 0;
+            pIter = nullptr;
         }
     }
     if (!pMatch) {
@@ -1400,17 +1399,17 @@ void ExtraRunOncePacks::AddRunOncePack(TESPackage* apPack, char acDay) {
     pMatch->cday = acDay;
 }
 
-ExtraScript::ExtraScript() : BSExtraData(13u), pScript(0), pScriptVars(0) {}
+ExtraScript::ExtraScript() : BSExtraData(13u), pScript(nullptr), pScriptVars(nullptr) {}
 
 ExtraScript::ExtraScript(Script* apScript) : BSExtraData(EXTRA_SCRIPT), pScript(apScript), pScriptVars(nullptr) {}
 
 bool ExtraScript::Compare(BSExtraData* apCompare) {
     ExtraScript* v4 = dynamic_cast<ExtraScript*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(pScript != v4->pScript));
 }
@@ -1429,10 +1428,10 @@ ExtraTeleport::ExtraTeleport(DoorTeleportData* apTeleport) : BSExtraData(EXTRA_T
 bool ExtraTeleport::Compare(BSExtraData* apCompare) {
     ExtraTeleport* pComp = dynamic_cast<ExtraTeleport*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return 1;
+        return true;
     }
     return pTeleportData->Compare(pComp->pTeleportData);
 }
@@ -1455,10 +1454,10 @@ ExtraWeaponModFlags::ExtraWeaponModFlags(uint8_t acSlot)
 bool ExtraWeaponModFlags::Compare(BSExtraData* apCompare) {
     ExtraWeaponModFlags* v4 = dynamic_cast<ExtraWeaponModFlags*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(cWeaponModsActive != v4->cWeaponModsActive));
 }
@@ -1514,10 +1513,10 @@ ExtraSpecialRenderFlags::ExtraSpecialRenderFlags() : BSExtraData(EXTRA_SPECIAL_R
 bool ExtraSpecialRenderFlags::Compare(BSExtraData* apCompare) {
     ExtraSpecialRenderFlags* v5 = dynamic_cast<ExtraSpecialRenderFlags*>(apCompare);
     if (!v5) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     uint32_t v3 = ExtraSpecialRenderFlags::GetFlags();
     return (bool)((uint8_t)((v3 != v5->ExtraSpecialRenderFlags::GetFlags()) ||
@@ -1542,10 +1541,10 @@ bool ExtraStartingPosition::Compare(BSExtraData* apCompare) {
         FNVD_DYNAMIC_CAST_VOID(ExtraStartingPosition)(apCompare, RTTI_BSExtraData, RTTI_ExtraStartingPosition)
     );
     if (!v4) {
-        return 1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return 1;
+        return true;
     }
     return std::memcmp(
                &startPosition, v4 + 12, sizeof(ExtraStartingPosition) - offsetof(ExtraStartingPosition, startPosition)
@@ -1563,9 +1562,9 @@ bool ExtraLevCreaModifier::Compare(BSExtraData* apCompare) {
 float ExtraLevCreaModifier::GetMultiplier() {
     float v3 = (float)1.0;
     if (eModifier != 4) {
-        return (float)(pLevCreaModMult[eModifier]->Float());
+        return pLevCreaModMult[eModifier]->Float();
     }
-    return (float)(v3);
+    return v3;
 }
 
 int32_t ExtraLevCreaModifier::GetAllBelowForce() {
@@ -1592,12 +1591,12 @@ void ExtraRoomRefData::Clear() {
 }
 
 ExtraSayToTopicInfo::ExtraSayToTopicInfo()
-  : BSExtraData(EXTRA_SAY_TO_TOPIC_INFO), pInfo(nullptr), pTopic(nullptr), nResponseID((uint32_t)0),
-    bVoiceDone((bool)0) {}
+  : BSExtraData(EXTRA_SAY_TO_TOPIC_INFO), pInfo(nullptr), pTopic(nullptr), nResponseID((uint32_t)0), bVoiceDone(false) {
+}
 
 ExtraSayToTopicInfo::ExtraSayToTopicInfo(TESTopicInfo* apTopicInfo)
   : BSExtraData(EXTRA_SAY_TO_TOPIC_INFO), pInfo(apTopicInfo), pTopic(nullptr), nResponseID((uint32_t)0),
-    bVoiceDone((bool)0) {}
+    bVoiceDone(false) {}
 
 void ExtraSayToTopicInfo::SetTopic(TESTopic* apTopic) {
     pTopic = apTopic;
@@ -1638,7 +1637,7 @@ ExtraCellAcousticSpace::ExtraCellAcousticSpace(BGSAcousticSpace* apSpace)
 
 ExtraCellClimate::ExtraCellClimate(TESClimate* apClimate) : BSExtraData(EXTRA_CLIMATE), pClimate(apClimate) {}
 
-ExtraPoison::ExtraPoison() : BSExtraData(63u), pPoison(0) {}
+ExtraPoison::ExtraPoison() : BSExtraData(63u), pPoison(nullptr) {}
 
 ExtraPoison::ExtraPoison(AlchemyItem* apPoison) : BSExtraData(EXTRA_POISON), pPoison(apPoison) {}
 
@@ -1647,7 +1646,7 @@ bool ExtraPoison::Compare(BSExtraData* apCompare) {
     return (bool)((uint8_t)((!v4) || (v4->pPoison != pPoison)));
 }
 
-ExtraRandomTeleportMarker::ExtraRandomTeleportMarker() : BSExtraData(59u), pMarker(0) {}
+ExtraRandomTeleportMarker::ExtraRandomTeleportMarker() : BSExtraData(59u), pMarker(nullptr) {}
 
 bool ExtraRandomTeleportMarker::Compare(BSExtraData* apCompare) {
     ExtraRandomTeleportMarker* v4 = dynamic_cast<ExtraRandomTeleportMarker*>(apCompare);
@@ -1860,66 +1859,66 @@ void AudioMarker::Copy(AudioMarker* apCopy) {
 
 bool AudioMarker::Load(TESFile* apFile) {
     if (!apFile) {
-        return 0;
+        return false;
     }
     if (apFile->GetTESChunk() != MMRK_ID) {
-        return 0;
+        return false;
     }
     uint32_t arData = 0;
     if (!apFile->NextChunk()) {
-        return 0;
+        return false;
     }
     if (apFile->GetTESChunk() != FULL_ID) {
-        return 0;
+        return false;
     }
     TESFullName::LoadFullNameChunk(&kName, apFile);
     if (!apFile->NextChunk()) {
-        return 0;
+        return false;
     }
     if (apFile->GetTESChunk() != CNAM_ID) {
-        return 0;
+        return false;
     }
     apFile->GetChunkData<uint32_t>(arData);
     pMediaLocationController = reinterpret_cast<MediaLocationController*>(static_cast<uintptr_t>(arData));
     if (!apFile->NextChunk()) {
-        return 0;
+        return false;
     }
     if (apFile->GetTESChunk() != BNAM_ID) {
-        return 0;
+        return false;
     }
     apFile->GetChunkData<uint32_t>(arData);
     bUseControllerValues = arData == 1;
     if (!apFile->NextChunk()) {
-        return 0;
+        return false;
     }
     if (apFile->GetTESChunk() != MNAM_ID) {
-        return 0;
+        return false;
     }
     apFile->GetChunkData<uint32_t>(*reinterpret_cast<uint32_t*>(&fLayer2TriggerPerc));
     if (!apFile->NextChunk()) {
-        return 0;
+        return false;
     }
     if (apFile->GetTESChunk() != NNAM_ID) {
-        return 0;
+        return false;
     }
     apFile->GetChunkData<uint32_t>(*reinterpret_cast<uint32_t*>(&fLayer3TriggerPerc));
-    return 1;
+    return true;
 }
 
 bool AudioMarker::Compare(AudioMarker* apCompare) {
     if (kName.CompareComponent(&apCompare->kName)) {
-        return 1;
+        return true;
     }
     if (pMediaLocationController != apCompare->pMediaLocationController) {
-        return 1;
+        return true;
     }
     if (bUseControllerValues != apCompare->bUseControllerValues) {
-        return 1;
+        return true;
     }
     if (apCompare->fLayer2TriggerPerc == fLayer2TriggerPerc) {
         return apCompare->fLayer3TriggerPerc != fLayer3TriggerPerc;
     }
-    return 1;
+    return true;
 }
 
 RagDollData::RagDollData() : iBoneCount(0), pBoneArray(nullptr), Bip01Rot(NiPoint3_ZERO) {}
@@ -1952,7 +1951,7 @@ void RagDollData::CreateRotation(TESObjectREFR* apRef) {
 
 ExtraDismemberedLimbs::ExtraDismemberedLimbs()
   : BSExtraData(95), sLimbs(0), eCauseofDeath(CAUSE_OF_DEATH_NONE), pDeathObject(nullptr),
-    eLastHitLimb(BGSBodyPart::LIMB_NONE), bEaten(0) {}
+    eLastHitLimb(BGSBodyPart::LIMB_NONE), bEaten(false) {}
 
 ExtraDismemberedLimbs::~ExtraDismemberedLimbs() {
     for (uint32_t uiIndex = 0; uiIndex < DismemberedLimbs.iSize; ++uiIndex) {
@@ -1992,15 +1991,15 @@ void ExtraDismemberedLimbs::Dismember(TESObjectREFR* a1, BGSBodyPart::LIMB_ENUM 
             pdismemberedLimb = ::new (apMemory) DismemberedLimb;
         }
         else {
-            pdismemberedLimb = 0;
+            pdismemberedLimb = nullptr;
         }
         DismemberedLimb* pdismemberedLimb_2 = pdismemberedLimb;
         uint32_t iindex = DismemberedLimbs.Add(pdismemberedLimb_2);
         pdismemberedLimb_2->cLimb = static_cast<uint8_t>(a2);
         pdismemberedLimb_2->bLimbExploded = a3;
-        pdismemberedLimb_2->bObjectArrayIdentical = 0;
+        pdismemberedLimb_2->bObjectArrayIdentical = false;
         if (a3) {
-            pdismemberedLimb_2->bObjectArrayIdentical = 1;
+            pdismemberedLimb_2->bObjectArrayIdentical = true;
         }
         else {
             if (a1->IsActor() && a1 != pPlayer && a1->IsNpc()) {
@@ -2013,8 +2012,8 @@ void ExtraDismemberedLimbs::Dismember(TESObjectREFR* a1, BGSBodyPart::LIMB_ENUM 
                         DismemberedLimb* pprevDismemberedLimb = DismemberedLimbs.operator[](i);
                         if (!pprevDismemberedLimb->bObjectArrayIdentical) {
                             if (pprevDismemberedLimb->ObjectArray.CompareArrays(pdismemberedLimb_2->ObjectArray)) {
-                                pdismemberedLimb_2->bObjectArrayIdentical = 1;
-                                pdismemberedLimb_2->ObjectArray.Clear(1);
+                                pdismemberedLimb_2->bObjectArrayIdentical = true;
+                                pdismemberedLimb_2->ObjectArray.Clear(true);
                             }
                             return;
                         }
@@ -2027,32 +2026,32 @@ void ExtraDismemberedLimbs::Dismember(TESObjectREFR* a1, BGSBodyPart::LIMB_ENUM 
 
 bool ExtraDismemberedLimbs::CheckDismemberedLimbsIdentical(ExtraDismemberedLimbs* apDismemberedLimbs) {
     if (apDismemberedLimbs->sLimbs != sLimbs) {
-        return 0;
+        return false;
     }
     uint32_t FormFlags = apDismemberedLimbs->DismemberedLimbs.iSize;
     if (FormFlags != DismemberedLimbs.iSize) {
-        return 0;
+        return false;
     }
     for (uint32_t i = 0; i < DismemberedLimbs.iSize; ++i) {
         DismemberedLimb* pdismemberedLimb1 = DismemberedLimbs.operator[](i);
         DismemberedLimb* pdismemberedLimb2 = apDismemberedLimbs->DismemberedLimbs.operator[](i);
         if (pdismemberedLimb1->cLimb != pdismemberedLimb2->cLimb) {
-            return 0;
+            return false;
         }
         if (pdismemberedLimb1->bLimbExploded != pdismemberedLimb2->bLimbExploded) {
-            return 0;
+            return false;
         }
         if (pdismemberedLimb1->bObjectArrayIdentical != pdismemberedLimb2->bObjectArrayIdentical) {
-            return 0;
+            return false;
         }
         if (pdismemberedLimb1->bLimbRemoved != pdismemberedLimb2->bLimbRemoved) {
-            return 0;
+            return false;
         }
         if (!pdismemberedLimb1->ObjectArray.CompareArrays(pdismemberedLimb2->ObjectArray)) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 ExtraFactionChanges::ExtraFactionChanges() : BSExtraData(94), pFactionChanges(new BSSimpleList<FACTION_RANK*>) {}
@@ -2077,7 +2076,7 @@ void ExtraFactionChanges::ExpelFromFaction(TESFaction* apFaction) {
             v2 = ::new (v4) BSSimpleList<FACTION_RANK*>;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         pFactionChanges = v2;
     }
@@ -2131,14 +2130,14 @@ void ExtraFactionChanges::ExpelFromAllFactions(TESActorBase* apActorBase) {
         FACTION_RANK* prankdata = plist->m_item;
         plist = plist->m_pkNext;
         prankdata->cRank = -1;
-        expelledmap.SetAt(prankdata->pFaction, 1);
+        expelledmap.SetAt(prankdata->pFaction, true);
     }
     if (apActorBase) {
         plist = &apActorBase->listFactions;
         while (plist && plist->m_item) {
             FACTION_RANK* prankdata_2 = plist->m_item;
             plist = plist->m_pkNext;
-            bexpel = 0;
+            bexpel = false;
             if (!expelledmap.GetAt(prankdata_2->pFaction, bexpel) || !bexpel) {
                 FACTION_RANK* prank = static_cast<FACTION_RANK*>(ourMalloc(sizeof(FACTION_RANK)));
                 prank->pFaction = prankdata_2->pFaction;
@@ -2193,10 +2192,10 @@ ExtraCharge::ExtraCharge(float afCharge) : BSExtraData(EXTRA_CHARGE), fCharge(af
 bool ExtraCharge::Compare(BSExtraData* apCompare) {
     ExtraCharge* v4 = dynamic_cast<ExtraCharge*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(v4->fCharge != fCharge));
 }
@@ -2222,7 +2221,7 @@ void ExtraFollowerSwimBreadcrumbs::RemoveFirstCrumb() {
     if (pCrumb) {
         delete pCrumb;
     }
-    ExtraFollowerSwimBreadcrumb* a2 = 0;
+    ExtraFollowerSwimBreadcrumb* a2 = nullptr;
     CrumbList.SetItem(a2);
     CrumbList.RemoveHead();
 }
@@ -2233,9 +2232,9 @@ bool ExtraFollowerSwimBreadcrumbs::UpdateLeaderInfo(
     uint32_t aLeaderNavMeshID
 ) {
     if (aeLeaderState == BREADCRUMB_STATE_INVALID) {
-        return 0;
+        return false;
     }
-    bool baddedCrumb = 0;
+    bool baddedCrumb = false;
     if (aeLeaderState != eLeaderState) {
         if (eLeaderState) {
             ExtraFollowerSwimBreadcrumb* pcrumb;
@@ -2244,7 +2243,7 @@ bool ExtraFollowerSwimBreadcrumbs::UpdateLeaderInfo(
                 pcrumb = ::new (apMemory) ExtraFollowerSwimBreadcrumb;
             }
             else {
-                pcrumb = 0;
+                pcrumb = nullptr;
             }
             ExtraFollowerSwimBreadcrumb* pcrumb_2 = pcrumb;
             pcrumb->StartLocation.x = LeaderLocation.x;
@@ -2255,7 +2254,7 @@ bool ExtraFollowerSwimBreadcrumbs::UpdateLeaderInfo(
             pcrumb_2->EndNavMeshID = aLeaderNavMeshID;
             pcrumb_2->bEnteringWater = aeLeaderState == BREADCRUMB_STATE_IN_WATER;
             CrumbList.AddTail(pcrumb_2);
-            baddedCrumb = 1;
+            baddedCrumb = true;
         }
     }
     LeaderLocation = aLeaderLocation;
@@ -2308,7 +2307,7 @@ void ExtraFriendHits::RemoveOldHits() {
     }
 }
 
-ExtraHasNoRumors::ExtraHasNoRumors() : BSExtraData(78), bNoRumors(0) {}
+ExtraHasNoRumors::ExtraHasNoRumors() : BSExtraData(78), bNoRumors(false) {}
 
 ExtraHasNoRumors::ExtraHasNoRumors(bool abNoRumors)
   : BSExtraData(EXTRA_NO_RUMORS), bNoRumors((bool)((int8_t)abNoRumors)) {}
@@ -2320,10 +2319,10 @@ ExtraHotKey::ExtraHotKey(char acHotKey) : BSExtraData(EXTRA_HOT_KEY), chotkey((i
 bool ExtraHotKey::Compare(BSExtraData* apCompare) {
     ExtraHotKey* v4 = dynamic_cast<ExtraHotKey*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(chotkey != v4->chotkey));
 }
@@ -2336,10 +2335,10 @@ bool ExtraModdingItem::Compare(BSExtraData* apCompare) {
         FNVD_DYNAMIC_CAST_VOID(ExtraModdingItem)(apCompare, RTTI_BSExtraData, RTTI_ExtraModdingItem)
     );
     if (!v4) {
-        return 1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return 1;
+        return true;
     }
     return bIsModding != v4[12];
 }
@@ -2354,15 +2353,15 @@ ExtraOriginalReference::ExtraOriginalReference(TESObjectREFR* apReference)
 bool ExtraOriginalReference::Compare(BSExtraData* apCompare) {
     ExtraOriginalReference* v4 = dynamic_cast<ExtraOriginalReference*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(pReference != v4->pReference));
 }
 
-ExtraPackageData::ExtraPackageData() : BSExtraData(112u), pActorPackageData(0) {}
+ExtraPackageData::ExtraPackageData() : BSExtraData(112u), pActorPackageData(nullptr) {}
 
 ExtraPackageData::ExtraPackageData(ActorPackageData* apActorPackageData)
   : BSExtraData(EXTRA_PACKAGE_DATA), pActorPackageData(apActorPackageData) {}
@@ -2378,12 +2377,12 @@ bool ExtraPatrolRefInUseData::Compare(BSExtraData* apCompare) {
 
 bool ExtraPatrolRefInUseData::GetCanBeUsedBy(const TESObjectREFR* apPotentialUser) {
     if (apPotentialUser && (apPotentialUser->TESForm::GetFormID() == User)) {
-        return (bool)1;
+        return true;
     }
     Actor* formByNumericID = static_cast<Actor*>(TESForm::GetFormByNumericID(User));
-    if ((!formByNumericID) || (formByNumericID->IsDead((bool)0) || formByNumericID->GetDisabledOrDeleted())) {
+    if ((!formByNumericID) || (formByNumericID->IsDead(false) || formByNumericID->GetDisabledOrDeleted())) {
         User = (uint32_t)0;
-        return (bool)1;
+        return true;
     }
     else {
         if (formByNumericID->IsActor() &&
@@ -2391,10 +2390,10 @@ bool ExtraPatrolRefInUseData::GetCanBeUsedBy(const TESObjectREFR* apPotentialUse
              (formByNumericID->IsUnConscious() ||
               (formByNumericID->GetCurrentProcessType() && (!formByNumericID->GetRunsInLow()))))) {
             User = (uint32_t)0;
-            return (bool)1;
+            return true;
         }
         else {
-            return (bool)0;
+            return false;
         }
     }
 }
@@ -2404,10 +2403,10 @@ ExtraScale::ExtraScale(float afScale) : BSExtraData(EXTRA_SCALE), fScale(afScale
 bool ExtraScale::Compare(BSExtraData* apCompare) {
     ExtraScale* v4 = dynamic_cast<ExtraScale*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(v4->fScale != fScale));
 }
@@ -2429,7 +2428,7 @@ void ExtraSecuritronFace::ApplyFace(NiAVObject* apMesh) {
         NiAVObject* pFace = apMesh->GetObjectByName(*v4);
         apString.~NiFixedString();
         if (pFace) {
-            NiPointer<NiSourceTexture> TexPtr(static_cast<NiSourceTexture*>(0));
+            NiPointer<NiSourceTexture> TexPtr(static_cast<NiSourceTexture*>(nullptr));
             GetPersonality(&Personality);
             GetMood(&Mood);
             if (Personality.GetLength()) {
@@ -2440,7 +2439,7 @@ void ExtraSecuritronFace::ApplyFace(NiAVObject* apMesh) {
                         apDest, 260, "Textures\\creatures\\Securitron\\%s_%s.dds", Personality.String(), Mood.String()
                     );
                     SwapPlatformLanguageTexturePath(apDest, path, 260u);
-                    TES::pInstance->CreateTextureImage(path, TexPtr, 0, 0);
+                    TES::pInstance->CreateTextureImage(path, TexPtr, false, false);
                 }
             }
             int32_t Type = NiShadeProperty::GetType();
@@ -2479,7 +2478,7 @@ ExtraTalkingActor::ExtraTalkingActor(BGSTalkingActivator* apBaseForm, TESObjectR
 }
 
 MobileObject* ExtraTalkingActor::CreateLocalMobileObjectCopy(BGSTalkingActivator* apTalkact, TESObjectREFR* apRef) {
-    MobileObject* pnewactor = 0;
+    MobileObject* pnewactor = nullptr;
     if (apRef) {
         MobileObject* pnewactor_2;
         TESObjectCELL* psavecell;
@@ -2488,7 +2487,7 @@ MobileObject* ExtraTalkingActor::CreateLocalMobileObjectCopy(BGSTalkingActivator
             pnewactor_2 = ::new (apMemory) MobileObject;
         }
         else {
-            pnewactor_2 = 0;
+            pnewactor_2 = nullptr;
         }
         pnewactor = pnewactor_2;
         pnewactor_2->SetObjectReference(apTalkact);
@@ -2497,10 +2496,10 @@ MobileObject* ExtraTalkingActor::CreateLocalMobileObjectCopy(BGSTalkingActivator
         pnewactor_2->SetLocationOnReference(*apRef->QLocationOnReference());
         pnewactor_2->SetAngleOnReference(apRef->GetAngleOnReference());
         pnewactor_2->SetTalkingActivatorRef(apRef);
-        pnewactor_2->SetTalkingActivator(1);
+        pnewactor_2->SetTalkingActivator(true);
         pnewactor_2->UpdateTopicInfoSayOnce();
         if ((apRef->GetParentCell() && apRef->GetParentCell()->GetInterior()) ||
-            (psavecell = apRef->GetSaveParentCell()) == 0) {
+            (psavecell = apRef->GetSaveParentCell()) == nullptr) {
             pnewactor_2->SetParentCell(apRef->GetParentCell());
         }
         else {
@@ -2509,7 +2508,7 @@ MobileObject* ExtraTalkingActor::CreateLocalMobileObjectCopy(BGSTalkingActivator
         BaseProcess* pproc = pPlayer->pCurrentProcess;
         if (pproc) {
             // A new process of the player's process level.
-            BaseProcess* pcopyproc = 0;
+            BaseProcess* pcopyproc = nullptr;
             switch (pproc->eLevel) {
                 case PROCESS_TYPE_HIGH: {
                     HighProcess* pMemory = static_cast<HighProcess*>(ourMalloc(sizeof(HighProcess)));
@@ -2537,19 +2536,19 @@ MobileObject* ExtraTalkingActor::CreateLocalMobileObjectCopy(BGSTalkingActivator
             }
             pnewactor_2->SetCurrentAIProcess(pcopyproc);
             PROCESS_TYPE ProcessLevel = pcopyproc->eLevel;
-            ReferenceProcessLists.AddReference(pnewactor_2, ProcessLevel, 0, 0, 0);
+            ReferenceProcessLists.AddReference(pnewactor_2, ProcessLevel, false, false, nullptr);
         }
     }
     return pnewactor;
 }
 
 ExtraTerminalState::ExtraTerminalState()
-  : BSExtraData(EXTRA_TERMINALSTATE), cState((uint8_t)0), cLockOverride((uint8_t)((-1))) {}
+  : BSExtraData(EXTRA_TERMINALSTATE), cState((uint8_t)0), cLockOverride((uint8_t)(-1)) {}
 
 ExtraTerminalState::~ExtraTerminalState() {}
 
 bool ExtraTerminalState::IsLockedState() {
-    return (bool)((uint8_t)((!cState) && (((int8_t)cLockOverride) == ((-1)))));
+    return (bool)((uint8_t)((!cState) && (((int8_t)cLockOverride) == (-1))));
 }
 
 ExtraTimeLeft::ExtraTimeLeft(float afTime) : BSExtraData(EXTRA_TIMELEFT), fTime(afTime) {}
@@ -2557,10 +2556,10 @@ ExtraTimeLeft::ExtraTimeLeft(float afTime) : BSExtraData(EXTRA_TIMELEFT), fTime(
 bool ExtraTimeLeft::Compare(BSExtraData* apCompare) {
     ExtraTimeLeft* v4 = dynamic_cast<ExtraTimeLeft*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(v4->fTime != fTime));
 }
@@ -2570,7 +2569,7 @@ ExtraTresPassPackage::ExtraTresPassPackage(TrespassPackage* apPack)
 
 ExtraTresPassPackage::~ExtraTresPassPackage() {
     if (pPack) {
-        pPack->SetIsCreated(1);
+        pPack->SetIsCreated(true);
         delete pPack;
     }
 }
@@ -2584,10 +2583,10 @@ ExtraUses::~ExtraUses() {}
 bool ExtraUses::Compare(BSExtraData* apCompare) {
     ExtraUses* v4 = dynamic_cast<ExtraUses*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(cUses != v4->cUses));
 }
@@ -2608,10 +2607,10 @@ ExtraSeed::~ExtraSeed() {}
 bool ExtraSeed::Compare(BSExtraData* apCompare) {
     ExtraSeed* v4 = dynamic_cast<ExtraSeed*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(iSeed != v4->iSeed));
 }
@@ -2621,7 +2620,7 @@ ExtraInfoGeneralTopic::ExtraInfoGeneralTopic() : BSExtraData(EXTRA_INFO_GENERAL_
 ExtraInfoGeneralTopic::ExtraInfoGeneralTopic(MenuTopic* apItem) : BSExtraData(77u), pInfoGen(apItem) {}
 
 ExtraInfoGeneralTopic::~ExtraInfoGeneralTopic() {
-    pInfoGen->bGeneralTopic = 0;
+    pInfoGen->bGeneralTopic = false;
     delete pInfoGen;
 }
 
@@ -2634,18 +2633,18 @@ ExtraWaterLightRefs::ExtraWaterLightRefs() : BSExtraData(132u) {}
 bool ExtraWaterLightRefs::Compare(BSExtraData* apCompare) {
     ExtraWaterLightRefs* pcomp = dynamic_cast<ExtraWaterLightRefs*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     int32_t v3 = RefList.ItemsInList();
     if (v3 != pcomp->RefList.ItemsInList()) {
-        return 1;
+        return true;
     }
     for (BSSimpleList<TESObjectREFR*>* plist = &pcomp->RefList; plist && !plist->IsEmpty(); plist = plist->m_pkNext) {
         if (!RefList.IsInList(plist->m_item)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 ExtraWaterLightRefs::~ExtraWaterLightRefs() {
@@ -2767,20 +2766,20 @@ ExtraGuardedRefData::~ExtraGuardedRefData() {}
 
 bool ExtraGuardedRefData::Compare(BSExtraData* apCompare) {
     if (!BSExtraData::Compare(apCompare)) {
-        return 1;
+        return true;
     }
     // The cast is static because BSExtraData::Compare has already checked that both extras are of one type.
     ExtraGuardedRefData* pcomp = static_cast<ExtraGuardedRefData*>(apCompare);
     if (pcomp->Guards.iSize != Guards.iSize) {
-        return 1;
+        return true;
     }
     for (uint32_t i = 0; i < Guards.iSize; ++i) {
         if (pcomp->Guards.Find(Guards.operator[](i), 0, &BSSimpleArray<uint32_t>::DefaultEqualFunctionByAddress) ==
             -1) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void ExtraGuardedRefData::AddGuard(Actor* apActor) {
@@ -2834,7 +2833,7 @@ bool DoorTeleportData::InitItem(TESForm* apOwner) {
                 Warning("MASTERFILE: Corrupt angle found in teleport data, setting to (0, 0, 0).");
                 rotation = NiPoint3_ZERO;
             }
-            return 1;
+            return true;
         }
         else {
             TESBoundObject* ObjectReference = pLinkedDoor->GetObjectReference();
@@ -2845,13 +2844,13 @@ bool DoorTeleportData::InitItem(TESForm* apOwner) {
                 "MASTERFILE: Linked door (%08X) in teleport data points to invalid object (%s %s(%08X)).", tempID,
                 formEnumString[FormType].pFormString, X, X_4
             );
-            pLinkedDoor = 0;
-            return 0;
+            pLinkedDoor = nullptr;
+            return false;
         }
     }
     else {
         Warning("MASTERFILE: Could not find linked door (%08X) in teleport data init.", tempID);
-        return 0;
+        return false;
     }
 }
 

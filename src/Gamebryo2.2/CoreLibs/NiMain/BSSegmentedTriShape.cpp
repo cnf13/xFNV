@@ -38,8 +38,8 @@ NiObject* BSSegmentedTriShape::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -182,33 +182,33 @@ bool BSSegmentedTriShape::GetSegmentEmpty(uint32_t aiSegment) {
 
 void BSSegmentedTriShape::EnableSegment(uint32_t aiSegment) {
     pSegments[aiSegment].bEnabled = (pSegments[aiSegment].iNumPrimitives != 0);
-    bSegmentsChanged = (bool)1;
+    bSegmentsChanged = true;
 }
 
 void BSSegmentedTriShape::DisableSegment(uint32_t aiSegment) {
-    pSegments[aiSegment].bEnabled = (bool)0;
-    bSegmentsChanged = (bool)1;
+    pSegments[aiSegment].bEnabled = false;
+    bSegmentsChanged = true;
 }
 
 // The model data is a NiTriBasedGeomData (NiTriBasedGeom casts it so); its triangle count is read directly.
 void BSSegmentedTriShape::EnableAllSegments() {
-    pSegments->bEnabledPostMerge = 1;
+    pSegments->bEnabledPostMerge = true;
     pSegments->iNumPrimitivesMerged = static_cast<NiTriBasedGeomData*>(m_spModelData.m_pObject)->m_usTriangles;
     uint32_t v1 = 1;
     if (iNumSegments > 1) {
         int32_t v2 = 1;
         do {
-            pSegments[v2].bEnabledPostMerge = 0;
+            pSegments[v2].bEnabledPostMerge = false;
             BSSegmentedTriShape::Segment* v3 = &pSegments[v2];
             if (v3->iNumPrimitives) {
-                v3->bEnabled = 1;
+                v3->bEnabled = true;
             }
             ++v1;
             ++v2;
         }
         while (v1 < iNumSegments);
     }
-    bSegmentsChanged = 0;
+    bSegmentsChanged = false;
 }
 
 void BSSegmentedTriShape::CopyMembers(BSSegmentedTriShape* pkDest, NiCloningProcess& kCloning) {
@@ -242,7 +242,7 @@ void BSSegmentedTriShape::SetSystemDisabled(bool abDisable) {
 NiObject* BSSegmentedTriShape::CreateObject() {
     void* pkMemory = NiMemObject::operator new(sizeof(BSSegmentedTriShape));
     if (!pkMemory) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkMemory) BSSegmentedTriShape;
 }

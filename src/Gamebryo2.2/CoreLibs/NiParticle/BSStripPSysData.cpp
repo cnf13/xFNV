@@ -41,8 +41,8 @@ NiObject* BSStripPSysData::CreateClone(NiCloningProcess& kCloning) {
         return pkObject_2;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -281,7 +281,7 @@ void BSStripPSysData::CopyMembers(BSStripPSysData* pkDest, NiCloningProcess& kCl
 NiObject* BSStripPSysData::CreateObject() {
     BSStripPSysData* pkObject = static_cast<BSStripPSysData*>(NiMemObject::operator new(sizeof(BSStripPSysData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) BSStripPSysData;
 }

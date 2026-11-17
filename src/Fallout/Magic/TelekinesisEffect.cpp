@@ -72,11 +72,11 @@ void TelekinesisEffect::Update(float a1) {
     bhkMouseSpringAction* BhkMouseSpringAction = static_cast<bhkMouseSpringAction*>(pPlayer->GetBhkMouseSpringAction());
     if (BhkMouseSpringAction->GetWorldObject() &&
         (!pCaster || !pPlayer->GetGrabObject()->GetParentCell()
-             ? pcasterWorld = 0
+             ? pcasterWorld = nullptr
              : (grabSpring = pCaster,
                 (v2 = grabSpring->GetCasterStatsObject(), pcasterWorld = v2->GetParentCell()->GetbhkWorld())),
          (!pPlayer->GetGrabObject() || !pPlayer->GetGrabObject()->GetParentCell()
-              ? pobjectWorld = 0
+              ? pobjectWorld = nullptr
               : (GrabObject = pPlayer->GetGrabObject(), pobjectWorld = GrabObject->GetParentCell()->GetbhkWorld()),
           BhkMouseSpringAction &&
               (pRef == pPlayer->GetGrabObject() &&
@@ -87,9 +87,9 @@ void TelekinesisEffect::Update(float a1) {
             (v5 = appMain->GetControls(), v5->GetUserAction(Controls::UACTN_USE, 0))) {
             float* v6 = &fMagicTelekinesisMoveBase.Float();
             if (fMoveVelocity > fMagicTelekinesisMoveAccelerate.Float() * 0.10000000149011612 + *v6) {
-                bThrow = 1;
+                bThrow = true;
             }
-            Dispel(0);
+            Dispel(false);
         }
         else {
             Controls* v7 = appMain->GetControls();
@@ -134,10 +134,10 @@ void TelekinesisEffect::Update(float a1) {
         if (!bFirstUpdate) {
             pPlayer->UpdateMouseSpring(a1);
         }
-        bFirstUpdate = 0;
+        bFirstUpdate = false;
     }
     else {
-        Dispel(0);
+        Dispel(false);
     }
 }
 
@@ -190,7 +190,7 @@ void TelekinesisEffect::FinishInitLoadGame(Actor* apActor) {
     if (this->pRef) {
         CreateSpring();
     }
-    bFirstUpdate = (bool)1;
+    bFirstUpdate = true;
 }
 
 void TelekinesisEffect::Revert(Actor* apActor) {
@@ -214,7 +214,7 @@ void TelekinesisEffect::Start() {
     ValueModifierEffect::Start();
     pRef = InterfaceManager::GetTelekinesisTarget();
     CreateSpring();
-    bFirstUpdate = (bool)0;
+    bFirstUpdate = false;
 }
 
 void TelekinesisEffect::Finish() {
@@ -269,13 +269,13 @@ void TelekinesisEffect::CreateSpring() {
             pcol = FindFirstCollisionObject(pav);
         }
         else {
-            pcol = 0;
+            pcol = nullptr;
         }
         if (pcol) {
             pbody = pcol->GetRigidBody();
         }
         else {
-            pbody = 0;
+            pbody = nullptr;
         }
         if (pbody) {
             bhkTelekinesisListener::AllowToFinish(pbody);
@@ -293,7 +293,7 @@ void TelekinesisEffect::CreateSpring() {
                 v9 = ::new (apMemory) bhkTelekinesisListener(pRef, pbody, CollisionFilter->iFilter);
             }
             else {
-                v9 = 0;
+                v9 = nullptr;
             }
             BSFadeNode* pavlod = static_cast<BSFadeNode*>(NiObject::DynamicCastStatic(&BSFadeNode::ms_RTTI, pav));
             if (pavlod) {
@@ -306,7 +306,7 @@ void TelekinesisEffect::CreateSpring() {
                 fHoldDistance = 10000.0f;
             }
             pPlayer->CreateMouseSpring(pRef, PlayerCharacter::GRAB_TELEKINESIS, fHoldDistance);
-            pPlayer->GetEyeVector(origin, dir, 1);
+            pPlayer->GetEyeVector(origin, dir, true);
             if (!pSaveLoadGameOLD->GetLoading()) {
                 bhkMouseSpringAction* BhkMouseSpringAction =
                     static_cast<bhkMouseSpringAction*>(pPlayer->GetBhkMouseSpringAction());
@@ -327,7 +327,7 @@ void TelekinesisEffect::CreateSpring() {
                     peffect = ::new (v13) MagicShaderHitEffect(pRef, FormTwo, -1.0f);
                 }
                 else {
-                    peffect = 0;
+                    peffect = nullptr;
                 }
                 if (peffect->Init()) {
                     ReferenceProcessLists.AddTempEffect(peffect);
@@ -340,11 +340,11 @@ void TelekinesisEffect::CreateSpring() {
             }
         }
         else {
-            Dispel(0);
+            Dispel(false);
         }
     }
     else {
-        Dispel(0);
+        Dispel(false);
     }
 }
 

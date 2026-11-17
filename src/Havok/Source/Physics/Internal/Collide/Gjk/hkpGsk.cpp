@@ -812,7 +812,7 @@ testSupport:
             goto penetrating;
         }
         const double dLimit = static_cast<double>(fLenSq) * fEpsilon;
-        const float fAbsDist = static_cast<float>(std::fabs(fDist));
+        const float fAbsDist = std::fabs(fDist);
         if (static_cast<double>(fDist) * fAbsDist <= dLimit || fEpsilon > fLenSq) {
             goto penetrating;
         }
@@ -829,13 +829,13 @@ testSupport:
         hkVector4 diff;
         diff.setSub4(m_verticesA[iDim], m_verticesA[0]);
         const float fDot0 = _mm_cvtss_f32(diff.dot3(direction).getQuad());
-        const float fProd0 = fDot0 * static_cast<float>(std::fabs(fDot0));
+        const float fProd0 = fDot0 * std::fabs(fDot0);
         if (fLimit < fProd0) {
             bool bGrow = true;
             if (iDim == 3) {
                 diff.setSub4(m_verticesA[iDim], m_verticesA[2]);
                 const float fDot2 = _mm_cvtss_f32(diff.dot3(direction).getQuad());
-                const float fProd2 = fDot2 * static_cast<float>(std::fabs(fDot2));
+                const float fProd2 = fDot2 * std::fabs(fDot2);
                 if (fProd2 < fLimit) {
                     bGrow = false;
                 }
@@ -843,7 +843,7 @@ testSupport:
             if (bGrow && (iDim == 2 || iDim == 3)) {
                 diff.setSub4(m_verticesA[iDim], m_verticesA[1]);
                 const float fDot1 = _mm_cvtss_f32(diff.dot3(direction).getQuad());
-                const float fProd1 = fDot1 * static_cast<float>(std::fabs(fDot1));
+                const float fProd1 = fDot1 * std::fabs(fDot1);
                 if (fProd1 < fLimit) {
                     bGrow = false;
                 }
@@ -878,13 +878,13 @@ testSupport:
         hkVector4 diff;
         diff.setSub4(m_verticesBinB[iDim], m_verticesBinB[0]);
         const float fDot0 = _mm_cvtss_f32(diff.dot3(direction).getQuad());
-        const float fProd0 = fDot0 * static_cast<float>(std::fabs(fDot0));
+        const float fProd0 = fDot0 * std::fabs(fDot0);
         if (fLimit < fProd0) {
             bool bGrow = true;
             if (iDim == 3) {
                 diff.setSub4(m_verticesBinB[iDim], m_verticesBinB[2]);
                 const float fDot2 = _mm_cvtss_f32(diff.dot3(direction).getQuad());
-                const float fProd2 = fDot2 * static_cast<float>(std::fabs(fDot2));
+                const float fProd2 = fDot2 * std::fabs(fDot2);
                 if (fProd2 < fLimit) {
                     bGrow = false;
                 }
@@ -892,7 +892,7 @@ testSupport:
             if (bGrow && (iDim == 2 || iDim == 3)) {
                 diff.setSub4(m_verticesBinB[iDim], m_verticesBinB[1]);
                 const float fDot1 = _mm_cvtss_f32(diff.dot3(direction).getQuad());
-                const float fProd1 = fDot1 * static_cast<float>(std::fabs(fDot1));
+                const float fProd1 = fDot1 * std::fabs(fDot1);
                 if (fProd1 < fLimit) {
                     bGrow = false;
                 }
@@ -926,13 +926,13 @@ testSupport:
         hkVector4 diff;
         diff.setSub4(m_verticesA[iDim], m_verticesA[0]);
         const float fDot0 = _mm_cvtss_f32(diff.dot3(direction).getQuad());
-        const float fProd0 = fDot0 * static_cast<float>(std::fabs(fDot0));
+        const float fProd0 = fDot0 * std::fabs(fDot0);
         if (fLimit < fProd0) {
             bool bGrow = true;
             if (iDim == 3) {
                 diff.setSub4(m_verticesA[iDim], m_verticesA[2]);
                 const float fDot2 = _mm_cvtss_f32(diff.dot3(direction).getQuad());
-                const float fProd2 = fDot2 * static_cast<float>(std::fabs(fDot2));
+                const float fProd2 = fDot2 * std::fabs(fDot2);
                 if (fProd2 < fLimit) {
                     bGrow = false;
                 }
@@ -940,7 +940,7 @@ testSupport:
             if (bGrow && (iDim == 2 || iDim == 3)) {
                 diff.setSub4(m_verticesA[iDim], m_verticesA[1]);
                 const float fDot1 = _mm_cvtss_f32(diff.dot3(direction).getQuad());
-                const float fProd1 = fDot1 * static_cast<float>(std::fabs(fDot1));
+                const float fProd1 = fDot1 * std::fabs(fDot1);
                 if (fProd1 < fLimit) {
                     bGrow = false;
                 }
@@ -1427,7 +1427,7 @@ keepSupport:
             ab.setSub4(m_verticesBinA[0], m_verticesA[0]);
             const float fDist = _mm_cvtss_f32(ab.dot3(dir).getQuad());
             for (int32_t i = m_dimA.m_storage; i != 0; i--) {
-                const float fAbsDist = static_cast<float>(std::fabs(fDist));
+                const float fAbsDist = std::fabs(fDist);
                 if (fMinDistance > fAbsDist) {
                     fMinDistance = fAbsDist;
                 }

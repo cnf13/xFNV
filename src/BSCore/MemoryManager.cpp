@@ -405,7 +405,7 @@ void* MemoryManager::Allocate(size_t aSize, const char* apFile, const int32_t ai
 ScrapHeap* MemoryManager::GetThreadScrapHeap() {
     ScrapHeap* pscrapHeap;
     uint32_t threadid = GetCurrentThreadId();
-    pscrapHeap = 0;
+    pscrapHeap = nullptr;
     kThreadScrapHeapMap.GetAt(threadid, pscrapHeap);
     if (!pscrapHeap) {
         ScrapHeap* pscrapHeap_2;
@@ -414,7 +414,7 @@ ScrapHeap* MemoryManager::GetThreadScrapHeap() {
             pscrapHeap_2 = ::new (apMemory) ScrapHeap;
         }
         else {
-            pscrapHeap_2 = 0;
+            pscrapHeap_2 = nullptr;
         }
         pscrapHeap = pscrapHeap_2;
         kThreadScrapHeapMap.SetAt(threadid, pscrapHeap_2);
@@ -437,7 +437,7 @@ IMemoryHeap* MemoryManager::GetHeapForPointer(const void* apMem) {
 }
 
 IMemoryHeap* MemoryManager::GetHeapForPhysicalPointer(const void* apMem) {
-    IMemoryHeap* v5 = 0;
+    IMemoryHeap* v5 = nullptr;
     for (uint16_t i = 0; i < static_cast<int32_t>(iNumPhysicalHeaps) && !v5; ++i) {
         if (ppPhysicalHeaps[i]->PointerInHeap(apMem)) {
             v5 = ppPhysicalHeaps[i];
@@ -498,14 +498,14 @@ void MemoryManager::SpecifyPools() {
 void MemoryManager::InitializeStackTrace() {}
 
 uint32_t MemoryManager::ProcessMemoryProblem(IMemoryHeap* apHeap, int32_t aiMemoryPass, bool* apbAllowSystemAllocs) {
-    *apbAllowSystemAllocs = 1;
+    *apbAllowSystemAllocs = true;
     uint32_t v4 = BSGetCurrentThreadID();
     uint32_t v5 = appMain->uiThreadID;
     switch (aiMemoryPass) {
         case 0: {
             uiReallocOnCrossPageBoundaryPaddingST = 0;
             if (v4 == v5) {
-                TES::pInstance->CleanUpUnusedTextures(0);
+                TES::pInstance->CleanUpUnusedTextures(false);
             }
             return aiMemoryPass + 1;
         }
@@ -521,7 +521,7 @@ uint32_t MemoryManager::ProcessMemoryProblem(IMemoryHeap* apHeap, int32_t aiMemo
                     if (BSFaceGenManager::TryLockFaceGenAccess()) {
                         if (BSFaceGenModelMap::GetCSEnterCounter() == 1) {
                             BSFaceGenModelMap* v8 = BSFaceGenManager::GetModelCache();
-                            v8->UnloadAllEGMAndEGTData(0);
+                            v8->UnloadAllEGMAndEGTData(false);
                         }
                         BSFaceGenManager::UnlockFaceGenAccess();
                     }
@@ -539,23 +539,23 @@ uint32_t MemoryManager::ProcessMemoryProblem(IMemoryHeap* apHeap, int32_t aiMemo
             if (v4 != v5) {
                 return aiMemoryPass + 1;
             }
-            GarbageCollector::CanRunGarbageCollector(0);
+            GarbageCollector::CanRunGarbageCollector(false);
             if (TES::pInstance->ClearOldestBufferedCell()) {
                 --aiMemoryPass;
             }
             else {
-                TES::pInstance->ClearAllCells(1, 0);
+                TES::pInstance->ClearAllCells(true, false);
             }
-            TES::pInstance->CleanUpUnusedTextures(0);
-            GarbageCollector::CanRunGarbageCollector(1);
-            GarbageCollector::ClearAll(1);
+            TES::pInstance->CleanUpUnusedTextures(false);
+            GarbageCollector::CanRunGarbageCollector(true);
+            GarbageCollector::ClearAll(true);
         LABEL_19:;
             if (ReferenceProcessLists.kUpdateLock.TryLock()) {
-                GarbageCollector::ClearAll(1);
+                GarbageCollector::ClearAll(true);
                 ReferenceProcessLists.kUpdateLock.Unlock();
             }
         LABEL_21:;
-            NiObjectGarbage::ClearAll(1);
+            NiObjectGarbage::ClearAll(true);
             break;
         }
         case 6: {
@@ -568,7 +568,7 @@ uint32_t MemoryManager::ProcessMemoryProblem(IMemoryHeap* apHeap, int32_t aiMemo
             if (*apbAllowSystemAllocs || v4 != v5) {
                 goto LABEL_28;
             }
-            *apbAllowSystemAllocs = 1;
+            *apbAllowSystemAllocs = true;
             break;
         }
         case 8: {
@@ -577,7 +577,7 @@ uint32_t MemoryManager::ProcessMemoryProblem(IMemoryHeap* apHeap, int32_t aiMemo
                 uiEmergencyCleanupPassCount = 6;
                 if (uiReallocOnCrossPageBoundaryPaddingST >= 0x3A98u) {
                     if (!*apbAllowSystemAllocs) {
-                        *apbAllowSystemAllocs = 1;
+                        *apbAllowSystemAllocs = true;
                     }
                 }
                 else {
@@ -653,7 +653,7 @@ void* MemoryManager::ClearMainThreadMemoryProblemPassSignal() {
 
 void MemoryManager::InitializeStandard() {
     GetThreadMemContext() = 0;
-    bInitialized = (bool)1;
+    bInitialized = true;
 }
 
 void MemoryManager::RegisterMemoryManager() {
@@ -666,17 +666,17 @@ void MemoryManager::RegisterMemoryManager() {
             v3 = ::new (apMemory) BSNiAllocator;
         }
         else {
-            v3 = 0;
+            v3 = nullptr;
         }
         inited = ::new (v5) NiInitOptions(v3);
     }
     else {
-        inited = 0;
+        inited = nullptr;
     }
     NiStaticDataManager::ms_pkInitOptions = inited;
     NiMemManager::_SDMInit();
     BSSystemUtility* v1 = &BSSystemUtility::QInstance();
-    v1->Initialize(0, 0, 0);
+    v1->Initialize(nullptr, nullptr, 0);
 }
 
 MemoryManager& MemoryManager::Instance() {
@@ -707,7 +707,7 @@ void MemoryManager::DisableDelayedFree() {
 }
 
 char MemoryManager::SetCheckMemOnFree(char abVal) {
-    bCheckFreeBlocksOnFree = (char)abVal;
+    bCheckFreeBlocksOnFree = abVal;
     return abVal;
 }
 

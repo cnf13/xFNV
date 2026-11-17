@@ -90,7 +90,7 @@ NiObject* BSWArray::CreateObject() {
 }
 
 BSWArray* BSWArray::Find(NiObjectNET* apObject) {
-    BSWArray* v5 = 0;
+    BSWArray* v5 = nullptr;
     if (apObject) {
         NiExtraData* ExtraData = apObject->GetExtraData(*BSWArray::pTag);
         if (ExtraData) {
@@ -98,14 +98,14 @@ BSWArray* BSWArray::Find(NiObjectNET* apObject) {
             for (const NiRTTI* i = ExtraData->GetRTTI(); i; i = i->GetBaseRTTI()) {
                 if (i == &BSWArray::ms_RTTI) {
                     v2 = 1;
-                    return v2 != 0 ? static_cast<BSWArray*>(ExtraData) : 0;
+                    return v2 != 0 ? static_cast<BSWArray*>(ExtraData) : nullptr;
                 }
             }
             v2 = 0;
-            return v2 != 0 ? static_cast<BSWArray*>(ExtraData) : 0;
+            return v2 != 0 ? static_cast<BSWArray*>(ExtraData) : nullptr;
         }
         else {
-            return 0;
+            return nullptr;
         }
     }
     return v5;
@@ -118,5 +118,5 @@ void BSWArray::KillSDM() {
         NiGlobalStringTable::ReleaseHandle(BSWArray::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }
-    BSWArray::pTag = 0;
+    BSWArray::pTag = nullptr;
 }

@@ -127,7 +127,7 @@ NiObject* NiPSysColorModifier::CreateObject() {
     NiPSysColorModifier* pkObject =
         static_cast<NiPSysColorModifier*>(NiMemObject::operator new(sizeof(NiPSysColorModifier)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysColorModifier;
 }

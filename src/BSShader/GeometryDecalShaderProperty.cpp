@@ -69,7 +69,7 @@ BSShaderProperty::RenderPassArray* GeometryDecalShaderProperty::GetRenderPasses(
 ) {
     double v17;
     if (auiRenderMode == 7) {
-        return 0;
+        return nullptr;
     }
     float foldCameraDistance = fCameraDistance;
     BSNiBound* m_kWorldBound = apGeom->m_kWorldBound;
@@ -133,14 +133,14 @@ LABEL_25:;
         CheckCreateRenderPassArray(1);
         this->pRenderPassList->iSize = 0;
         if (!v11) {
-            return 0;
+            return nullptr;
         }
         BSShaderProperty::RenderPassArray* pRenderPassArray = this->pRenderPassList;
         if (apGeom->m_spSkinInstance.m_pObject) {
-            pRenderPassArray->Add(apGeom, 589, 1, 0, 0, 0, 0, 0);
+            pRenderPassArray->Add(apGeom, 589, 1, 0, nullptr, nullptr, nullptr, nullptr);
         }
         else {
-            pRenderPassArray->Add(apGeom, 588, 1, 0, 0, 0, 0, 0);
+            pRenderPassArray->Add(apGeom, 588, 1, 0, nullptr, nullptr, nullptr, nullptr);
         }
         iLastRenderPassState = aiEnabledPasses | auiRenderMode << 8;
     }

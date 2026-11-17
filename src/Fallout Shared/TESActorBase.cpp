@@ -45,7 +45,7 @@ TESActorBase::~TESActorBase() {}
 void TESActorBase::AddChange(int32_t aiChangeFlags) {
     uint32_t v2 = TESForm::GetFormID();
     if (pDataHandler->IsFormIDCreated(v2)) {
-        if (pSaveLoadGame->ShouldAddChanges(this, 0)) {
+        if (pSaveLoadGame->ShouldAddChanges(this, false)) {
             static_cast<TESActorBaseData*>(this)->AddChangeFlags(aiChangeFlags);
         }
     }
@@ -418,19 +418,19 @@ void TESActorBase::SetActorValue(ActorValue::Index aiWhich, int32_t aiValue) {
     float afKarma;
     switch (aiWhich) {
         case 0: {
-            static_cast<TESAIForm*>(this)->SetAggression(aiValue, 1);
+            static_cast<TESAIForm*>(this)->SetAggression(aiValue, true);
             break;
         }
         case 1: {
-            static_cast<TESAIForm*>(this)->SetConfidence(aiValue, 1);
+            static_cast<TESAIForm*>(this)->SetConfidence(aiValue, true);
             break;
         }
         case 2: {
-            static_cast<TESAIForm*>(this)->SetEnergy(aiValue, 1);
+            static_cast<TESAIForm*>(this)->SetEnergy(aiValue, true);
             break;
         }
         case 3: {
-            static_cast<TESAIForm*>(this)->SetResponsibility(aiValue, 1);
+            static_cast<TESAIForm*>(this)->SetResponsibility(aiValue, true);
             break;
         }
         case 4: {
@@ -490,7 +490,7 @@ void TESActorBase::SetActorValue(ActorValue::Index aiWhich, float afValue) {
 
 bool TESActorBase::FightsInWater() {
     if (!DoesSwim()) {
-        return (bool)0;
+        return false;
     }
     return (bool)((uint8_t)((((int32_t)TESForm::GetFormType()) != 43) ||
                             (!static_cast<TESActorBaseData*>(this)->GetFlag(262144))));
@@ -531,7 +531,7 @@ bool TESActorBase::IsImmobile() const {
 
 bool TESActorBase::DoesSwim() {
     if (((int32_t)TESForm::GetFormType()) != 43) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(static_cast<TESActorBaseData*>(this)->GetFlag(16) ||
                             static_cast<TESActorBaseData*>(this)->GetFlag(1)));
@@ -583,10 +583,14 @@ float TESActorBase::GetDesirability(TESForm* apForm) {
                         double fRetVal_2;
                         float condition = 1.0f;
                         if (this) {
-                            fRetVal_2 = CombatFormulas::CalcWeaponDamage(this, pWeap, condition, 1.0f, 0, 0, 0, 0);
+                            fRetVal_2 = CombatFormulas::CalcWeaponDamage(
+                                this, pWeap, condition, 1.0f, false, false, nullptr, false
+                            );
                         }
                         else {
-                            fRetVal_2 = CombatFormulas::CalcWeaponDamage(0, pWeap, condition, 1.0f, 0, 0, 0, 0);
+                            fRetVal_2 = CombatFormulas::CalcWeaponDamage(
+                                nullptr, pWeap, condition, 1.0f, false, false, nullptr, false
+                            );
                         }
                         fRetVal = fRetVal_2;
                     }

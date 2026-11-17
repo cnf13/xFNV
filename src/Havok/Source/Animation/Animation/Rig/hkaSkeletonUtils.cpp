@@ -151,7 +151,7 @@ void hkaSkeletonUtils::markDescendants(const hkaSkeleton* skeleton, int32_t star
         std::memset(out, 0, static_cast<size_t>(startBone));
     }
     int32_t v4 = startBone + 1;
-    out[startBone] = 1;
+    out[startBone] = true;
     if (startBone + 1 >= skeleton->m_bones.m_size) {
         out[startBone] = includeStart;
     }
@@ -378,7 +378,7 @@ void hkaSkeletonUtils::enforceSkeletonConstraintsModelSpace(
                     v7.m_vec.m_quad = poseModelInOut[v6].m_rotation.m_vec.m_quad;
                     __m128 v8 = _mm_mul_ps(v5->m_translation.m_quad, v7.m_vec.m_quad);
                     __m128 v9 = _mm_shuffle_ps(v8, v8, 170);
-                    v9[0] = v9[0] + static_cast<float>(_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
+                    v9[0] = v9[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
                     __m128 v10 = _mm_shuffle_ps(v7.m_vec.m_quad, v7.m_vec.m_quad, 255);
                     __m128 v11 = _mm_add_ps(
                         _mm_mul_ps(
@@ -503,7 +503,7 @@ void hkaSkeletonUtils::transformLocalBoneToModelBone(
         __m128 m_quad = v5->m_rotation.m_vec.m_quad;
         __m128 v7 = _mm_mul_ps(boneModelOut.m_translation.m_quad, m_quad);
         __m128 v8 = _mm_shuffle_ps(v7, v7, 170);
-        v8[0] = v8[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+        v8[0] = v8[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
         __m128 v9 = _mm_shuffle_ps(m_quad, m_quad, 255);
         __m128 v10 = _mm_add_ps(
             _mm_mul_ps(

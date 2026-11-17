@@ -236,7 +236,7 @@ FurnitureMarkerDeltaSettings pFurnitureMarkerDelta{
 TESFurniture::TESFurniture() : TESObjectACTI() {
     SetFormType(FURN_ID);
     TESFurniture::InitializeData();
-    SetInitialized(1);
+    SetInitialized(true);
 }
 
 TESFurniture::~TESFurniture() {}
@@ -312,7 +312,7 @@ void TESFurniture::InitItem() {
     if (!TESForm::GetInitialized()) {
         static_cast<BGSDestructibleObjectForm*>(this)->InitItem(this);
         VerifyMarkers();
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 
@@ -328,10 +328,10 @@ void TESFurniture::Copy(TESForm* apCopy) {
 bool TESFurniture::Compare(TESForm* apCompare) {
     TESFurniture* v4 = dynamic_cast<TESFurniture*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v4)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(iFurnFlags != v4->iFurnFlags));
 }
@@ -345,10 +345,10 @@ bool TESFurniture::Activate(
 ) {
     PlayerCharacter* pactor = dynamic_cast<PlayerCharacter*>(apActionRef);
     if (!pactor) {
-        return 0;
+        return false;
     }
     if (pactor->GetSitSleepState()) {
-        pactor->ForceTemp3rdPerson(1);
+        pactor->ForceTemp3rdPerson(true);
         pactor->ClearSitHeadingDelta();
         pactor->InitiateGetUpPackage();
     }
@@ -356,23 +356,23 @@ bool TESFurniture::Activate(
         uint32_t iunusedMarker = 0;
         FurnitureMark marker(255u);
         const NiPoint3* v7 = &apActionRef->GetLocationOnReference();
-        if (!apItemActivated->GetClosestFreeMarker(*v7, 1, 1, marker, iunusedMarker, 1)) {
-            return 0;
+        if (!apItemActivated->GetClosestFreeMarker(*v7, true, true, marker, iunusedMarker, true)) {
+            return false;
         }
         uint32_t Type = marker.GetType();
         if (TESFurniture::IsSleepMarker(Type)) {
-            if (!apItemActivated->GetOwner() || apItemActivated->IsAnOwner(pactor, 1)) {
+            if (!apItemActivated->GetOwner() || apItemActivated->IsAnOwner(pactor, true)) {
                 if (pactor == pPlayer && pPlayer->GetParentCell()->GetCantWaitHere()) {
                     const char* v10 = sNoWaitInCell.String();
                     Interface::ShowMessage(
-                        v10, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                        v10, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
                     );
-                    return 0;
+                    return false;
                 }
                 if (pPlayer->IsTresPassing()) {
                     const char* v11 = sNoSleepTrespass.String();
                     Interface::ShowMessage(
-                        v11, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                        v11, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
                     );
                 }
                 else {
@@ -380,25 +380,28 @@ bool TESFurniture::Activate(
                     if (ReferenceProcessLists.AreHostilActorsNear(Interior)) {
                         const char* v13 = sNoSleepHostileActorsNear.String();
                         Interface::ShowMessage(
-                            v13, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                            v13, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f,
+                            false
                         );
                     }
                     else {
                         if (ReferenceProcessLists.IsPlayerInRadiationArea()) {
                             const char* v14 = sNoSleepInRadiation.String();
                             Interface::ShowMessage(
-                                v14, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                                v14, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f,
+                                false
                             );
                         }
                         else {
                             if (pPlayer->HasDamageHealthEffect()) {
                                 const char* v15 = sNoSleepTakingHealthDamage.String();
                                 Interface::ShowMessage(
-                                    v15, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                                    v15, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr,
+                                    2.0f, false
                                 );
                             }
                             else {
-                                Interface::CreateSleepMenu(1);
+                                Interface::CreateSleepMenu(true);
                             }
                         }
                     }
@@ -408,19 +411,19 @@ bool TESFurniture::Activate(
                 if (pactor == pPlayer) {
                     const char* v9 = sNoSleepInOwnedBed.String();
                     Interface::ShowMessage(
-                        v9, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                        v9, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
                     );
-                    return 0;
+                    return false;
                 }
             }
         }
         else {
-            pactor->ForceTemp3rdPerson(1);
+            pactor->ForceTemp3rdPerson(true);
             pactor->ClearSitHeadingDelta();
             pactor->InitiateSitSleepPackage(apItemActivated);
         }
     }
-    return 1;
+    return true;
 }
 
 bool TESFurniture::CanSleepOn() {
@@ -433,14 +436,14 @@ bool TESFurniture::CanSitOn() {
 
 void TESFurniture::VerifyMarkers() {
     if (!GetTemporary() && !iFurnFlags) {
-        NiAVObject* v1 = Clone3D(static_cast<TESObjectREFR*>(0));
+        NiAVObject* v1 = Clone3D(static_cast<TESObjectREFR*>(nullptr));
         if (BSFurnitureMarker::Find(v1)) {
             Warning("MODELS: You have not selected any FurnitureMarkers for '%s'.", GetFormEditorID());
         }
         else {
             Warning("MODELS: No FurnitureMarkers found in '%s'.", GetModel());
         }
-        UnClone3D(0);
+        UnClone3D(nullptr);
     }
 }
 
@@ -483,7 +486,7 @@ bool TESFurniture::IsSleepMarker(uint32_t aiNumber) {
 bool TESFurniture::IsSitMarker(uint32_t aiNumber) {
     uint8_t v2 = 0;
     if (((aiNumber >= 10) && (aiNumber <= 20)) || (aiNumber == 26)) {
-        return (bool)1;
+        return true;
     }
     return (bool)v2;
 }

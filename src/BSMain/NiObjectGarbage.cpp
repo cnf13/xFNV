@@ -19,12 +19,12 @@ void SetGarbageGrowBy(uint16_t a1) {
 }
 
 void NiObjectGarbage::ClearAll(bool abTryLock) {
-    bool bLocked = 1;
+    bool bLocked = true;
     if (abTryLock) {
         bLocked = NiObjectGarbage::kCritSec.TryLock();
     }
     else {
-        NiObjectGarbage::kCritSec.Lock(0);
+        NiObjectGarbage::kCritSec.Lock(nullptr);
     }
     if (!bLocked || TryEnterCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection)) {
         if (bLocked) {
@@ -44,7 +44,7 @@ void NiObjectGarbage::ClearAll(bool abTryLock) {
 }
 
 void NiObjectGarbage::Add(NiRefObject* apObject) {
-    NiObjectGarbage::kCritSec.Lock(0);
+    NiObjectGarbage::kCritSec.Lock(nullptr);
     {
         NiPointer<NiRefObject> a2 = apObject;
         NiObjectGarbage::ObjectGarbageA.Add(a2);
@@ -75,7 +75,7 @@ uint32_t NiObjectGarbage::GetCount() {
 }
 
 void NiObjectGarbage::Update() {
-    NiObjectGarbage::kCritSec.Lock(0);
+    NiObjectGarbage::kCritSec.Lock(nullptr);
     uint32_t inextTime = NiObjectGarbage::iMaxTime + GetTickCount();
     uint32_t itime = 0;
     uint32_t inumObjects = NiObjectGarbage::ObjectGarbageA.m_usESize;

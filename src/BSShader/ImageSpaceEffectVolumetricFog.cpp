@@ -34,7 +34,7 @@ void ImageSpaceEffectVolumetricFog::Setup(ImageSpaceManager* apManager, ImageSpa
         pparam = ::new (v4) ImageSpaceShaderParam;
     }
     else {
-        pparam = 0;
+        pparam = nullptr;
     }
     pparam->InitConstantMap(0, 1);
     pparam->SetPixelConstant(0, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -50,5 +50,5 @@ bool ImageSpaceEffectVolumetricFog::IsActive() {
 
 bool ImageSpaceEffectVolumetricFog::UpdateParams(ImageSpaceEffectParam* apParam) {
     pEffectParamList.m_pBase->m_pObject->SetPixelConstant(0, FogColor.r, FogColor.g, FogColor.b, 1.0);
-    return 0;
+    return false;
 }

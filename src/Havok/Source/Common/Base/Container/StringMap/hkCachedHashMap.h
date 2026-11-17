@@ -33,7 +33,7 @@ class hkCachedHashMap {
 public:
     // A slot index, opaque to the map's users. As in the SDK, the elaborated name declares the global class Dummy
     // (the libraries' mangled names carry PAVDummy@@).
-    typedef class Dummy* Iterator;
+    using Iterator = class Dummy*;
 
     // The empty map's constructor: allocates 16 empty slots. The parameter stands in for the empty Operations object
     // passed by value and is unused. With the default argument, an hkStringMap member or local is the empty map.

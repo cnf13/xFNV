@@ -71,7 +71,7 @@ struct hkp1dMotorSolverInfo {
 // The three angular motors of a ragdoll joint: two bits of state per motor in m_broken, and each motor's solver
 // info (SDK hkpSolverInfo.h:116; hkaragdoll.pdb sizeof 64).
 struct hkp3dAngularMotorSolverInfo {
-    typedef uint8_t Status;
+    using Status = uint8_t;
 
     // The two bits of m_broken that hold each motor's state.
     enum Mask : int32_t {

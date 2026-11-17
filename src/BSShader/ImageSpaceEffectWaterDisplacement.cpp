@@ -40,7 +40,7 @@ ImageSpaceEffectWaterDisplacement::ImageSpaceEffectWaterDisplacement()
     fTimeFromLastRipple(0.1f), fTimeBetweenSimulations(1.0f), fTimeFromLastSimulation(0.0f) {
     pTextures.SetSize(2u);
     pInstance = this;
-    NiRenderedTexture::bStaticForceD3DFormat = 0;
+    NiRenderedTexture::bStaticForceD3DFormat = false;
     fBlendAmount = 0.0f;
     RainVariables.r = 0.1f;
     RainVariables.g = 0.6f;
@@ -77,9 +77,9 @@ void ImageSpaceEffectWaterDisplacement::Render(
     FNVD_INLINED_LOCAL(ImageSpaceTexture, apThis, std::nullopt, std::nullopt);
     fTimeBetweenSimulations = 0.025f;
     // EXE-INLINED 0x4EBB70
-    aTex.bForceAniso = 0;
-    aTex.bIsRenderedTexture = 0;
-    aTex.bIsTextureBorrowed = 0;
+    aTex.bForceAniso = false;
+    aTex.bIsRenderedTexture = false;
+    aTex.bIsTextureBorrowed = false;
     aTex.spTexture = nullptr;
     aTex.eFilterMode = 0;
     aTex.eClampMode = 0;
@@ -87,16 +87,16 @@ void ImageSpaceEffectWaterDisplacement::Render(
     this->fTime = fNewTime;
     fTimeFromLastRipple = fNewTime + fTimeFromLastRipple;
     // EXE-INLINED 0x4EBB70
-    kGreyTex.bForceAniso = 0;
-    kGreyTex.bIsRenderedTexture = 0;
-    kGreyTex.bIsTextureBorrowed = 0;
+    kGreyTex.bForceAniso = false;
+    kGreyTex.bIsRenderedTexture = false;
+    kGreyTex.bIsTextureBorrowed = false;
     kGreyTex.spTexture = nullptr;
     kGreyTex.eFilterMode = 0;
     kGreyTex.eClampMode = 0;
     // EXE-INLINED 0x4EBB70
-    apTex.bForceAniso = 0;
-    apTex.bIsRenderedTexture = 0;
-    apTex.bIsTextureBorrowed = 0;
+    apTex.bForceAniso = false;
+    apTex.bIsRenderedTexture = false;
+    apTex.bIsTextureBorrowed = false;
     apTex.spTexture = nullptr;
     apTex.eFilterMode = 0;
     apTex.eClampMode = 0;
@@ -112,13 +112,13 @@ void ImageSpaceEffectWaterDisplacement::Render(
         pRendered = ::new (pMemory) BSRenderedTexture(pTexture, 1, pDepth);
     }
     else {
-        pRendered = 0;
+        pRendered = nullptr;
     }
     apTex.SetTexture(pRendered);
     // EXE-INLINED 0x4EBB70
-    apThis.bForceAniso = 0;
-    apThis.bIsRenderedTexture = 0;
-    apThis.bIsTextureBorrowed = 0;
+    apThis.bForceAniso = false;
+    apThis.bIsRenderedTexture = false;
+    apThis.bIsTextureBorrowed = false;
     apThis.spTexture = nullptr;
     apThis.eFilterMode = 0;
     apThis.eClampMode = 0;
@@ -132,7 +132,7 @@ void ImageSpaceEffectWaterDisplacement::Render(
         apThis = *pTextures.m_pBase[1];
         aTex = apTex;
         apTex = apThis;
-        ImageSpaceEffectWaterDisplacement::bClearSimulation = 0;
+        ImageSpaceEffectWaterDisplacement::bClearSimulation = false;
     }
     if (ImageSpaceEffectWaterDisplacement::bWadingWater) {
         ImageSpaceShader* pShader2 = static_cast<ImageSpaceShader*>(pEffectList.m_pBase[1].m_pObject);
@@ -170,10 +170,10 @@ void ImageSpaceEffectWaterDisplacement::Render(
                         static_cast<NiScreenElementsData*>(NiMemObject::operator new(sizeof(NiScreenElementsData)));
                     NiScreenElementsData* pData;
                     if (pDataMemory) {
-                        pData = ::new (pDataMemory) NiScreenElementsData(0, 0, 1, 1, 1, 4, 1, 2, 1);
+                        pData = ::new (pDataMemory) NiScreenElementsData(false, false, 1, 1, 1, 4, 1, 2, 1);
                     }
                     else {
-                        pData = 0;
+                        pData = nullptr;
                     }
                     if (pData) {
                         NiIncRefCount(pData);
@@ -185,11 +185,11 @@ void ImageSpaceEffectWaterDisplacement::Render(
                         pElements = ::new (pElementsMemory) NiScreenElements(pData);
                     }
                     else {
-                        pElements = 0;
+                        pElements = nullptr;
                     }
                     spPartialScreenTriShape = pElements;
                     static_cast<NiScreenElementsData*>(spPartialScreenTriShape.m_pObject->m_spModelData.m_pObject)
-                        ->Insert(4, 0, 0);
+                        ->Insert(4, 0, nullptr);
                     static_cast<NiScreenElementsData*>(spPartialScreenTriShape.m_pObject->m_spModelData.m_pObject)
                         ->SetRectangle(0, 0.0f, 0.01f, 1.0f, -0.01f);
                     static_cast<NiScreenElementsData*>(spPartialScreenTriShape.m_pObject->m_spModelData.m_pObject)
@@ -199,11 +199,11 @@ void ImageSpaceEffectWaterDisplacement::Render(
                     spPartialScreenTriShape.m_pObject->UpdateProperties();
                     NiAVObject* pObject = spPartialScreenTriShape.m_pObject;
                     UpdateData.fTime = 0.0f;
-                    UpdateData.bUpdateControllers = 0;
-                    UpdateData.bParallelUpdate = 0;
-                    UpdateData.bFoundParticles = 0;
-                    UpdateData.bFoundMorphController = 0;
-                    UpdateData.bSceneGraphChange = 0;
+                    UpdateData.bUpdateControllers = false;
+                    UpdateData.bParallelUpdate = false;
+                    UpdateData.bFoundParticles = false;
+                    UpdateData.bFoundMorphController = false;
+                    UpdateData.bSceneGraphChange = false;
                     pObject->Update(UpdateData);
                     // EXE-INLINED none: NiFixedString(const char*) and ~NiFixedString
                     FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
@@ -249,7 +249,7 @@ void ImageSpaceEffectWaterDisplacement::Render(
                     ImageSpaceEffectWaterDisplacement::fDisplaceOffset._Deallocate(
                         ImageSpaceEffectWaterDisplacement::fDisplaceOffset.pBuffer
                     );
-                    ImageSpaceEffectWaterDisplacement::fDisplaceOffset.pBuffer = 0;
+                    ImageSpaceEffectWaterDisplacement::fDisplaceOffset.pBuffer = nullptr;
                     ImageSpaceEffectWaterDisplacement::fDisplaceOffset.iReservedSize = 0;
                     ImageSpaceEffectWaterDisplacement::fDisplaceOffset.iSize = 0;
                 }
@@ -257,14 +257,14 @@ void ImageSpaceEffectWaterDisplacement::Render(
                     ImageSpaceEffectWaterDisplacement::fLastDisplaceOffset._Deallocate(
                         ImageSpaceEffectWaterDisplacement::fLastDisplaceOffset.pBuffer
                     );
-                    ImageSpaceEffectWaterDisplacement::fLastDisplaceOffset.pBuffer = 0;
+                    ImageSpaceEffectWaterDisplacement::fLastDisplaceOffset.pBuffer = nullptr;
                     ImageSpaceEffectWaterDisplacement::fLastDisplaceOffset.iReservedSize = 0;
                     ImageSpaceEffectWaterDisplacement::fLastDisplaceOffset.iSize = 0;
                 }
             }
         }
     }
-    ImageSpaceEffectWaterDisplacement::bRanSimulationThisFrame = 0;
+    ImageSpaceEffectWaterDisplacement::bRanSimulationThisFrame = false;
     apThis = *pTextures.m_pBase[1];
     aTex = apTex;
     apTex = apThis;
@@ -296,7 +296,7 @@ void ImageSpaceEffectWaterDisplacement::Render(
             peffect_4->SetTexture(0, &apTex, NiTexturingProperty::FILTER_NEAREST);
             peffect_4->SetTexture(1, &aTex, NiTexturingProperty::FILTER_BILERP);
             peffect_4->Render(apGeometry, apRenderer, pparam_3, 1);
-            ImageSpaceEffectWaterDisplacement::bRanSimulationThisFrame = 1;
+            ImageSpaceEffectWaterDisplacement::bRanSimulationThisFrame = true;
             apThis = aTex;
             aTex = apTex;
             apTex = apThis;
@@ -307,7 +307,7 @@ void ImageSpaceEffectWaterDisplacement::Render(
         ImageSpaceManager* pManager = BSShaderManager::pImageSpaceManager;
         BSRenderedTexture* pDestination = apTex.GetRenderedTexture();
         BSRenderedTexture* pSource = aTex.GetRenderedTexture();
-        pManager->RenderEffect(ImageSpaceManager::EFFECT_TOP_LEVEL_END, pRenderer, pSource, pDestination, 0, 1);
+        pManager->RenderEffect(ImageSpaceManager::EFFECT_TOP_LEVEL_END, pRenderer, pSource, pDestination, nullptr, 1);
     }
     if (kGreyTex.GetTexture()) {
         kGreyTex.ReturnRenderedTexture();

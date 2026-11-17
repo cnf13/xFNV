@@ -102,36 +102,36 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdio.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 bool TestHour(int32_t aitime, int32_t aiduration, float afhour) {
     int32_t iCurrentHour = static_cast<int32_t>(afhour);
     int32_t iEndHour = aiduration + aitime;
     if (iCurrentHour == aitime) {
-        return 1;
+        return true;
     }
     if (iEndHour <= 23) {
         if (iCurrentHour > aitime && iCurrentHour < iEndHour) {
-            return 1;
+            return true;
         }
     }
     else {
         if ((iCurrentHour > aitime || iCurrentHour < iEndHour - 24) && iCurrentHour < iEndHour) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void PackageList::InitItem(TESForm* apOwner) {
     TESFile* pownerFile;
     BSSimpleList<TESPackage*>* plist = &this->listPackages;
-    BSSimpleList<TESPackage*>* plastlist = 0;
+    BSSimpleList<TESPackage*>* plastlist = nullptr;
     if (apOwner) {
         pownerFile = apOwner->GetFile(-1);
     }
     else {
-        pownerFile = 0;
+        pownerFile = nullptr;
     }
     while (plist && !plist->IsEmpty()) {
         uint32_t tempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(plist->m_item));
@@ -193,7 +193,7 @@ bool PackageList::Compare(PackageList* apCompare) {
 
 TESPackage* PackageList::FindCurrentPackage(Actor* apActor) {
     BSSimpleList<TESPackage*>* pList = &this->listPackages;
-    TESPackage* apCurrentPack = 0;
+    TESPackage* apCurrentPack = nullptr;
     if (apActor) {
         apCurrentPack = apActor->GetCurrentPackage();
     }
@@ -207,25 +207,25 @@ TESPackage* PackageList::FindCurrentPackage(Actor* apActor) {
                 (pPack->GetOncePerDay() && !(&apActor->m_Extra)->IsInRunOnceDayPackageList(pPack))) {
                 PackageSchedule* pSchedule_2 = pPack->GetPackageSchedule();
                 if (pSchedule_2) {
-                    bool bOverlapdayof = 0;
-                    bool bOverlapday = 0;
-                    bool bOverlapmonth = 0;
+                    bool bOverlapdayof = false;
+                    bool bOverlapday = false;
+                    bool bOverlapmonth = false;
                     int32_t StartTime = pSchedule_2->GetStartTime();
                     if (StartTime + pSchedule_2->PSData.iDuration > 24) {
-                        bOverlapdayof = pPack->IsitDayofTheWeek(1);
+                        bOverlapdayof = pPack->IsitDayofTheWeek(true);
                         int32_t day = appCalendar.GetDay() - 1;
                         if (day < 0) {
                             day = 30;
                         }
                         if (pSchedule_2->PSData.cDate == day) {
-                            bOverlapday = 1;
+                            bOverlapday = true;
                         }
                         int32_t imonth = appCalendar.GetMonth() - 1;
                         if (imonth < 0) {
                             imonth = 12;
                         }
                         if (pSchedule_2->PSData.eMonth == imonth) {
-                            bOverlapmonth = 1;
+                            bOverlapmonth = true;
                         }
                     }
                     if (pSchedule_2->PSData.eMonth == PSM_NONE ||
@@ -233,7 +233,7 @@ TESPackage* PackageList::FindCurrentPackage(Actor* apActor) {
                         if (!pSchedule_2->PSData.cDate || pSchedule_2->PSData.cDate == appCalendar.GetDay() ||
                             bOverlapday) {
                             if (pSchedule_2->GetStartDayOfWeek() == PSD_NONE ||
-                                (pPack->IsitDayofTheWeek(0) || bOverlapdayof)) {
+                                (pPack->IsitDayofTheWeek(false) || bOverlapdayof)) {
                                 char v5;
                                 int32_t iDuration;
                                 float fCurrentHour;
@@ -241,7 +241,7 @@ TESPackage* PackageList::FindCurrentPackage(Actor* apActor) {
                                     (fCurrentHour = appCalendar.GetHour(),
                                      (iDuration = pSchedule_2->PSData.iDuration,
                                       (v5 = pSchedule_2->GetStartTime(), TestHour(v5, iDuration, fCurrentHour))))) {
-                                    TESObjectREFR* pTargetRef = 0;
+                                    TESObjectREFR* pTargetRef = nullptr;
                                     PackageTarget* pTarget = pPack->GetPackageTarget();
                                     if (pTarget) {
                                         pTargetRef = pTarget->GetTargReference();
@@ -283,7 +283,7 @@ TESPackage* PackageList::FindCurrentPackage(Actor* apActor) {
                                                 BaseProcess* v18 = apActor->pCurrentProcess;
                                                 v18->ChangePackage(apActor, apCurrentPack);
                                                 BaseProcess* v17 = apActor->pCurrentProcess;
-                                                v17->SetPackageDoneOnce(0);
+                                                v17->SetPackageDoneOnce(false);
                                             }
                                         }
                                         if (pPack) {
@@ -313,7 +313,7 @@ void PackageList::FindMissedPackages(
     float afStartdate,
     float afhour
 ) {
-    TESPackage* apCurrentPack = 0;
+    TESPackage* apCurrentPack = nullptr;
     BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
     int32_t iday = CurrentAIProcess->GetProcessedDay();
     BaseProcess* v13 = apActor->pCurrentProcess;
@@ -332,8 +332,8 @@ void PackageList::FindMissedPackages(
             iday = 0;
         }
         else {
-            TESPackage* pPack = 0;
-            PackageSchedule* pSchedule = 0;
+            TESPackage* pPack = nullptr;
+            PackageSchedule* pSchedule = nullptr;
             while (pList) {
                 pPack = pList->m_item;
                 if (!pPack) {
@@ -391,9 +391,9 @@ void PackageList::FindMissedPackages(
     BSSimpleList<TESPackage*>* pFirst = apPacks;
     if (apPacks) {
         int32_t iCount = pFirst->ItemsInList();
-        bool bSwappedItems = 1;
+        bool bSwappedItems = true;
         while (iCount && bSwappedItems) {
-            bSwappedItems = 0;
+            bSwappedItems = false;
             for (BSSimpleList<TESPackage*>* pSecond = pFirst; pSecond; pSecond = pSecond->m_pkNext) {
                 TESPackage* pFirstData = pFirst->m_item;
                 TESPackage* pSecondData = pSecond->m_item;
@@ -401,7 +401,7 @@ void PackageList::FindMissedPackages(
                 if (pFirstData->ComparePackageSchedule(PackageSchedule_) == 1) {
                     pFirst->SetItem(pSecondData);
                     pSecond->SetItem(pFirstData);
-                    bSwappedItems = 1;
+                    bSwappedItems = true;
                 }
             }
             pFirst = pFirst->m_pkNext;

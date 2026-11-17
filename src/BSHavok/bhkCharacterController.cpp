@@ -132,7 +132,7 @@
 
 #include <bit>
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 #include <x86intrin.h>
 #include <xmmintrin.h>
 
@@ -178,7 +178,7 @@ bhkShape* MakeConvex(const NiPoint3& arTop, const NiPoint3& arBottom, float afRa
     TLSData* v4 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v4->eMemContext;
     v4->eMemContext = MEM_CONTEXT_HAVOK;
-    a2.m_data = 0;
+    a2.m_data = nullptr;
     float v24 = fBS2HkScaleSC * afRadius;
     a2.m_size = 0;
     a2.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -224,7 +224,7 @@ bhkShape* MakeConvex(const NiPoint3& arTop, const NiPoint3& arBottom, float afRa
     double v14 = v24;
     double v26 = 0.5 * v24;
     v27[2] = v26 + v27[2];
-    while (1) {
+    while (true) {
         double v15 = fCircleX[v13] * v14;
         v28.m_quad = v27;
         v28.m_quad[0] = v15;
@@ -1579,9 +1579,9 @@ void bhkCharacterController::objectInteractionCallback(
     float v25;
     float Mass = arInput.m_body->m_motion.getMass();
     __m128 v5 = _mm_mul_ps(arOutput.m_objectImpulse.m_quad, arOutput.m_objectImpulse.m_quad);
-    float v6 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
-        static_cast<float>((_mm_shuffle_ps(v5, v5, 170)[0] + static_cast<float>(_mm_shuffle_ps(v5, v5, 85)[0] + v5[0])))
-    )));
+    float v6 = _mm_cvtss_f32(
+        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]))))
+    );
     float v23 = v6;
     if (!(Mass > 0.0f) || !(bhkCharacterListener::fMoveLimitMass > static_cast<double>(Mass))) {
         arOutput.m_objectImpulse.m_quad = _mm_setzero_ps();
@@ -1630,9 +1630,9 @@ LABEL_11:;
             float v14 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v13[0])));
             v15[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
             __m128 v16 = _mm_cmpeq_ss(v13, v15);
-            v15[0] = 3.0f - static_cast<float>(static_cast<float>(v13[0] * v14) * v14);
+            v15[0] = 3.0f - ((v13[0] * v14) * v14);
             __m128 v17 = _mm_setzero_ps();
-            v17[0] = static_cast<float>(0.5f * v14) * v15[0];
+            v17[0] = (0.5f * v14) * v15[0];
             __m128 v18 = _mm_andnot_ps(v16, v17);
             arOutput.m_objectImpulse.m_quad = _mm_mul_ps(
                 _mm_mul_ps(_mm_shuffle_ps(v18, v18, 0), v10.m_quad), _mm_shuffle_ps(_mm_set_ss(v23), _mm_set_ss(v23), 0)
@@ -1708,7 +1708,7 @@ bhkCharacterController* bhkCharacterController::GetBumpedCharacterController() {
         );
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -1718,7 +1718,7 @@ bhkRigidBody* bhkCharacterController::GetBumpedBody() {
         return static_cast<bhkRigidBody*>(m_pntr->m_userData);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -1734,7 +1734,7 @@ void bhkCharacterController::SetShapeType(bhkCharacterController::SHAPE_TYPES ae
             bhkShape* Shape = GetShape();
             SetShape(Shape, *v5);
             if (v3) {
-                BuildDisplayGeometry(0);
+                BuildDisplayGeometry(nullptr);
             }
         }
     }
@@ -1764,17 +1764,17 @@ float bhkCharacterController::GetRadius() {
     bhkCapsuleShape* v3;
     hkpCapsuleShape* phkObject;
     NiObject* v2 = spShapes[0];
-    if (v2 && ((v3 = static_cast<bhkCapsuleShape*>(v2->DynamicCastMember(&bhkCapsuleShape::ms_RTTI))) != 0)) {
+    if (v2 && ((v3 = static_cast<bhkCapsuleShape*>(v2->DynamicCastMember(&bhkCapsuleShape::ms_RTTI))) != nullptr)) {
         phkObject = static_cast<hkpCapsuleShape*>(v3->phkObject);
         if (phkObject) {
-            return (float)(phkObject->m_radius);
+            return phkObject->m_radius;
         }
         else {
-            return (float)(0.10000000149011612f);
+            return 0.10000000149011612f;
         }
     }
     else {
-        return (float)(fRadius);
+        return fRadius;
     }
 }
 
@@ -2093,8 +2093,7 @@ void bhkCharacterController::SetVelocityModifier(const NiPoint3& arVelocity, flo
     float v5 = _mm_shuffle_ps(v4, v4, 85)[0] + v4[0];
     float v6 = _mm_shuffle_ps(v4, v4, 170)[0];
     __m128 v7 = _mm_mul_ps(VelocityMod.m_quad, VelocityMod.m_quad);
-    if (static_cast<float>(_mm_shuffle_ps(v7, v7, 170)[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])) <
-        static_cast<double>(static_cast<float>(v6 + v5))) {
+    if ((_mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])) < static_cast<double>((v6 + v5))) {
         fVelocityTime = afTime;
         VelocityMod.m_quad = v3;
     }
@@ -2270,7 +2269,7 @@ void bhkCharacterController::ResetCalculatePitchTimer() {
 }
 
 void bhkCharacterController::UpdateFalling() {
-    fFallTime = (float)(StepInfo.m_deltaTime + fFallTime);
+    fFallTime = (StepInfo.m_deltaTime + fFallTime);
 }
 
 // The cosine and sine results are each rounded to float. The negated sine is -0.0f minus the sine. Without a shape
@@ -2283,21 +2282,21 @@ void bhkCharacterController::ApplyPitchAndRoll(const hkQuaternion& arRot) {
     alignas(16) hkTransform kTransform = phkPhantom->m_motionState.m_transform;
     kTransform.m_rotation.set(kRotation);
     if (0.0f != fPitchAngle && (bhkCharacterListener::iFlags >> 25) & 1) {
-        float fCos = static_cast<float>(std::cos(fPitchAngle));
-        float fSin = static_cast<float>(std::sin(fPitchAngle));
+        float fCos = std::cos(fPitchAngle);
+        float fSin = std::sin(fPitchAngle);
         alignas(16) hkMatrix3 kPitch;
         kPitch.m_col0.m_quad = {1.0f, 0.0f, 0.0f, 0.0f};
-        kPitch.m_col1.m_quad = {0.0f, fCos, static_cast<float>(-0.0f - fSin), 0.0f};
+        kPitch.m_col1.m_quad = {0.0f, fCos, (-0.0f - fSin), 0.0f};
         kPitch.m_col2.m_quad = {0.0f, fSin, fCos, 0.0f};
         kTransform.m_rotation.mul(kPitch);
     }
     if (0.0f != fRollAngle && (bhkCharacterListener::iFlags >> 26) & 1) {
-        float fCos = static_cast<float>(std::cos(fRollAngle));
-        float fSin = static_cast<float>(std::sin(fRollAngle));
+        float fCos = std::cos(fRollAngle);
+        float fSin = std::sin(fRollAngle);
         alignas(16) hkMatrix3 kRoll;
         kRoll.m_col0.m_quad = {fCos, 0.0f, fSin, 0.0f};
         kRoll.m_col1.m_quad = {0.0f, 1.0f, 0.0f, 0.0f};
-        kRoll.m_col2.m_quad = {static_cast<float>(-0.0f - fSin), 0.0f, fCos, 0.0f};
+        kRoll.m_col2.m_quad = {(-0.0f - fSin), 0.0f, fCos, 0.0f};
         kTransform.m_rotation.mul(kRoll);
     }
     if (pPhantom) {
@@ -2340,7 +2339,7 @@ float bhkCharacterController::ApplyRotationModifier(float afOldRotation, float a
             fRotModTime = afDeltaTime;
         }
         v6 = (float)(v3 + (fRotMod * fRotModTime));
-        this->fRotModTime = (float)(this->fRotModTime - afDeltaTime);
+        this->fRotModTime = (this->fRotModTime - afDeltaTime);
         fRotMod = (float)(fRotMod - 0.05000000074505806);
         return v6;
     }
@@ -2408,7 +2407,7 @@ void bhkCharacterController::CalculatePitchAndRoll() {
             }
             else {
                 float fSlope = fDelta / fHeight;
-                fAngle = (float)std::atan(fSlope);
+                fAngle = std::atan(fSlope);
                 if (fAngle > 0.0f) {
                     double dLimit = fMaxSlopeDefault * 0.01745329238474369;
                     if (dLimit < fAngle) {
@@ -2452,7 +2451,7 @@ void bhkCharacterController::CalculatePitchAndRoll() {
         }
         else {
             float fSlope = fDelta / fHeight;
-            fAngle = (float)std::atan(fSlope);
+            fAngle = std::atan(fSlope);
             if (fAngle > 0.0f) {
                 double dLimit = fMaxSlopeDefault * 0.01745329238474369;
                 if (dLimit < fAngle) {
@@ -2527,11 +2526,11 @@ void bhkCharacterController::FindSupportPoint(uint32_t aiFrontBack, hkVector4& a
     pickRes.m_extraInfo = -1;
     pickRes.m_shapeKeyIndex = 0;
     pickRes.m_shapeKeys[0] = -1;
-    pickRes.m_rootCollidable = 0;
-    pickRes.pCache = 0;
-    pickRes.bPickFailed = 0;
+    pickRes.m_rootCollidable = nullptr;
+    pickRes.pCache = nullptr;
+    pickRes.bPickFailed = false;
     // MAYBE-INLINED 0xC6E715: after the vptr store of hkpClosestRayHitCollector's inlined constructor
-    v13.m_rayHit.m_rootCollidable = 0;
+    v13.m_rayHit.m_rootCollidable = nullptr;
     // MAYBE-INLINED 0xC6E71C: after the vptr store of hkpClosestRayHitCollector's inlined constructor
     v13.m_rayHit.m_extraInfo = -1;
     // MAYBE-INLINED 0xC6E723: after the vptr store of hkpClosestRayHitCollector's inlined constructor
@@ -2546,7 +2545,7 @@ void bhkCharacterController::FindSupportPoint(uint32_t aiFrontBack, hkVector4& a
     pickRes.hkLength.m_quad = hkVector4Zero.m_quad;
     v6.m_quad = arPos.m_quad;
     pickRes.pCloseCollector = static_cast<SpecificItemCollector*>(&v13);
-    pickRes.pAllCollector = 0;
+    pickRes.pAllCollector = nullptr;
     pickRes.m_to.m_quad = v6.m_quad;
     GetCollisionFilter(&iflt);
     ahkpCharacterProxy* phkObject = static_cast<ahkpCharacterProxy*>(this->phkObject);
@@ -2555,14 +2554,14 @@ void bhkCharacterController::FindSupportPoint(uint32_t aiFrontBack, hkVector4& a
         ShapePhantom = static_cast<hkpCachingShapePhantom*>(phkObject->GetShapePhantom());
     }
     else {
-        ShapePhantom = 0;
+        ShapePhantom = nullptr;
     }
     ahkpWorld* m_world = static_cast<ahkpWorld*>(ShapePhantom->m_world);
     if (m_world) {
         pw = static_cast<bhkWorld*>(m_world->m_userData);
     }
     else {
-        pw = 0;
+        pw = nullptr;
     }
     if (pw->PickObject(pickRes)) {
         *reinterpret_cast<float*>(&iflt.iFilter) = 1.0 - v13.m_rayHit.m_hitFraction;
@@ -2771,9 +2770,9 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                                         Convex = ::new (v74) bhkCapsuleShape(top, bottom, frad);
                                     }
                                     else {
-                                        Convex = 0;
+                                        Convex = nullptr;
                                     }
-                                    v63 = v8->spShape.m_pObject == 0;
+                                    v63 = v8->spShape.m_pObject == nullptr;
                                     if (v63) {
                                         v76 = &v2->spShapes[v8->eShapeType];
                                     }
@@ -2791,7 +2790,7 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                                         v78 = ::new (v77) bhkCapsuleShape(top, bottom, frad);
                                     }
                                     else {
-                                        v78 = 0;
+                                        v78 = nullptr;
                                     }
                                     *spShapes = v78;
                                     if (v8->bUseDefaultShape) {
@@ -2836,7 +2835,7 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                         lsi.m_childShapes.m_data = nullptr;
                         lsi.m_childShapes.m_size = 0;
                         lsi.m_childShapes.m_capacityAndFlags = hkArrayBase<const hkpShape*>::DONT_DEALLOCATE_FLAG;
-                        lsi.m_childShapeFilterInfo.m_data = 0;
+                        lsi.m_childShapeFilterInfo.m_data = nullptr;
                         lsi.m_childShapeFilterInfo.m_size = 0;
                         lsi.m_childShapeFilterInfo.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
                         bhkCapsuleShape* v45 =
@@ -2845,7 +2844,7 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                             pcs0 = (bhkShape*)::new (v45) bhkCapsuleShape(top, bottom, frad);
                         }
                         else {
-                            pcs0 = 0;
+                            pcs0 = nullptr;
                         }
                         top2.x = top.x;
                         top.y = top.y - 8.0;
@@ -2861,7 +2860,7 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                             pcs1 = (bhkShape*)::new (v47) bhkCapsuleShape(top, top2, v104);
                         }
                         else {
-                            pcs1 = 0;
+                            pcs1 = nullptr;
                         }
                         bottom2.x = bottom.x;
                         bottom.y = bottom.y + 8.0;
@@ -2876,13 +2875,13 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                             pcs2 = (bhkShape*)::new (v49) bhkCapsuleShape(bottom, bottom2, v105);
                         }
                         else {
-                            pcs2 = 0;
+                            pcs2 = nullptr;
                         }
                         if (pcs0) {
                             phkObject = static_cast<hkpShape*>(pcs0->phkObject);
                         }
                         else {
-                            phkObject = 0;
+                            phkObject = nullptr;
                         }
                         hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
                         if (lsi.m_childShapes.m_size ==
@@ -2894,7 +2893,7 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                             v53 = static_cast<hkpShape*>(pcs1->phkObject);
                         }
                         else {
-                            v53 = 0;
+                            v53 = nullptr;
                         }
                         hkMemoryAllocator* v54 = (&hkMemoryRouter::getInstance())->m_heap;
                         if (lsi.m_childShapes.m_size ==
@@ -2906,7 +2905,7 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                             v55 = static_cast<hkpShape*>(pcs2->phkObject);
                         }
                         else {
-                            v55 = 0;
+                            v55 = nullptr;
                         }
                         hkMemoryAllocator* v56 = (&hkMemoryRouter::getInstance())->m_heap;
                         if (lsi.m_childShapes.m_size ==
@@ -2939,9 +2938,9 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                             v62 = ::new (v61) bhkListShape(lsi);
                         }
                         else {
-                            v62 = 0;
+                            v62 = nullptr;
                         }
-                        v63 = stSizeInBytes->spShape.m_pObject == 0;
+                        v63 = stSizeInBytes->spShape.m_pObject == nullptr;
                         if (v63) {
                             eShapeType = stSizeInBytes->eShapeType;
                         }
@@ -3024,7 +3023,7 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
         NiIncRefCount(m_pObject);
     }
     pcs = static_cast<bhkConvexShape*>(v2->GetShape());
-    if (pcs && (v6 = static_cast<hkpConvexShape*>(pcs->phkObject)) != 0) {
+    if (pcs && (v6 = static_cast<hkpConvexShape*>(pcs->phkObject)) != nullptr) {
         v7 = v6->m_radius;
     }
     else {
@@ -3061,7 +3060,7 @@ LABEL_108:;
         uint32_t iFilter = v8->iColFilter.iFilter;
         NiAVObject* pObject = v8->pObject;
         sspci.m_collisionFilterInfo = (iFilter & 0xFFFFFF80u) | 32;
-        sspci.m_shape = 0;
+        sspci.m_shape = nullptr;
         if (pObject) {
             NiBound* v84 = (NiBound*)pObject->m_kWorldBound;
             if (!v84) {
@@ -3101,7 +3100,7 @@ LABEL_108:;
         pMemory += ucPadding;
         pMemory[-1] = ucPadding;
         void* v91 = pMemory;
-        v125 = (void*)v91;
+        v125 = v91;
         bhkWorldObject* v92 = (bhkWorldObject*)::new (v91) bhkCollisionBox(&sspci, v2);
         bhkWorldObject* spCollisionBox = v2->spCollisionBox;
         if (spCollisionBox != v92) {
@@ -3145,7 +3144,7 @@ void bhkCharacterController::InitFrontBack() {
             ShapePhantom = phkObject->GetShapePhantom();
         }
         else {
-            ShapePhantom = 0;
+            ShapePhantom = nullptr;
         }
         float frad = fRadius;
         // Computed on the x87 stack and stored as floats.
@@ -3179,7 +3178,7 @@ void bhkCharacterController::ChangeSize(float afTime) {
         float fcurRad_2;
         hkVector4 v21;
         bhkShape* v3 = spShapes[0];
-        if (!v3 || (pcs = static_cast<bhkCapsuleShape*>(v3->DynamicCastMember(&bhkCapsuleShape::ms_RTTI))) == 0) {
+        if (!v3 || (pcs = static_cast<bhkCapsuleShape*>(v3->DynamicCastMember(&bhkCapsuleShape::ms_RTTI))) == nullptr) {
             fcurRad_2 = fDestRadius;
         LABEL_26:;
             if (fDestRadius == fcurRad_2) {
@@ -3274,7 +3273,7 @@ void bhkCharacterController::ClearHurtfulHits() {
         if (m_pkNext) {
             DamageImpacts.m_pkNext = m_pkNext->GetNext();
             DamageImpacts.m_item = m_pkNext->m_item;
-            m_pkNext->m_pkNext = 0;
+            m_pkNext->m_pkNext = nullptr;
             m_pkNext->RemoveAll();
             MemoryManager_Singleton.Deallocate(m_pkNext);
         }
@@ -3332,10 +3331,10 @@ void bhkCharacterController::MoveAsProjectile(float afTimeDelta) {
 bhkShape* bhkCharacterController::GetShape() {
     bhkShape* const* v2;
     bhkShape* v4;
-    v4 = 0;
+    v4 = nullptr;
     bhkCharacterController::SHAPE_TYPES eShapeType = this->eShapeType;
     if (eShapeType >= bhkCharacterController::ST_NUMTYPES) {
-        v4 = 0;
+        v4 = nullptr;
         v2 = &v4;
     }
     else {
@@ -3619,17 +3618,17 @@ bool bhkCharacterController::SetShape(bhkShape* apShape, const hkVector4& a2) {
     hkpShape* v11;
     ahkpCharacterProxy* phkObject = static_cast<ahkpCharacterProxy*>(this->phkObject);
     if (!phkObject) {
-        return 0;
+        return false;
     }
     hkpCachingShapePhantom* ShapePhantom = static_cast<hkpCachingShapePhantom*>(phkObject->GetShapePhantom());
     hkpPhantom* v6 = ShapePhantom;
     if (!ShapePhantom) {
-        return 0;
+        return false;
     }
     const hkpShape* m_shape = ShapePhantom->m_collidable.m_shape;
-    hkReferencedObject* v8 = apShape ? apShape->phkObject : 0;
+    hkReferencedObject* v8 = apShape ? apShape->phkObject : nullptr;
     if (m_shape == v8) {
-        return 0;
+        return false;
     }
     hkpCharacterProxy* v9 = static_cast<hkpCharacterProxy*>(this->phkObject);
     hkpWorld* m_world = v6->m_world;
@@ -3647,13 +3646,13 @@ bool bhkCharacterController::SetShape(bhkShape* apShape, const hkVector4& a2) {
         v11 = static_cast<hkpShape*>(apShape->phkObject);
     }
     else {
-        v11 = 0;
+        v11 = nullptr;
     }
     v6->setShape(v11);
     if (v13) {
         v13->addPhantom(v6);
     }
-    return 1;
+    return true;
 }
 
 // The controller that owns a character proxy's phantom: the proxy (the phantom's PROPERTY_KEY_CHARACTER_PROXY property)
@@ -3733,7 +3732,7 @@ void bhkCharacterController::SetSupportMaterial(const hkpRootCdPoint& arManifold
             }
             if (eSupportMaterial == BHK_MATERIAL_MAX || econtactMaterial == BHK_MATERIAL_ELEVATOR) {
                 eSupportMaterial = econtactMaterial;
-                bool MaterialStairCallback = 0;
+                bool MaterialStairCallback = false;
                 if (bhkCharacterController::pfGetMaterialStairCallback) {
                     MaterialStairCallback = bhkCharacterController::pfGetMaterialStairCallback(econtactMaterial);
                 }
@@ -3880,7 +3879,7 @@ void bhkCharacterController::ReleaseDefaultShape() {
 }
 
 void* bhkCharacterController::FindBSReference(uint32_t aiKey, hkpPhantom* apPhantom) {
-    void* result = 0;
+    void* result = nullptr;
     if (apPhantom) {
         hkpPropertyValue a2 = apPhantom->getProperty(aiKey, hkpWorldObject::MULTI_THREADING_CHECKS_ENABLE);
         return a2.getPtr();

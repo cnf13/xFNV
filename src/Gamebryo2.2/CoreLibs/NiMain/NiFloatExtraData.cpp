@@ -26,7 +26,7 @@ NiObject* NiFloatExtraData::CreateClone(NiCloningProcess& kCloning) {
         pkObject_2 = ::new (pkObject) NiFloatExtraData;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fValue = m_fValue;
@@ -69,7 +69,7 @@ void NiFloatExtraData::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
 NiObject* NiFloatExtraData::CreateObject() {
     NiFloatExtraData* pkObject = static_cast<NiFloatExtraData*>(NiMemObject::operator new(sizeof(NiFloatExtraData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiFloatExtraData;
 }

@@ -36,7 +36,7 @@ NiObject* NiAlphaAccumulator::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject_2) NiAlphaAccumulator;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_bObserveNoSortHint = m_bObserveNoSortHint;
@@ -182,7 +182,7 @@ NiObject* NiAlphaAccumulator::CreateObject() {
     NiAlphaAccumulator* pkObject =
         static_cast<NiAlphaAccumulator*>(NiMemObject::operator new(sizeof(NiAlphaAccumulator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiAlphaAccumulator;
 }

@@ -69,7 +69,7 @@ bool PathingLOSMap::GetNavMeshAndTriangleForIndex(uint32_t aiIndex, NavMeshPtr& 
     bool vCondition1;
     vCondition1 = (&NavMeshes)->IsEmpty();
     if (vCondition1) {
-        return (bool)0;
+        return false;
     }
     uint32_t v13 = 0;
     for (i = 0;; ++i) {
@@ -83,7 +83,7 @@ bool PathingLOSMap::GetNavMeshAndTriangleForIndex(uint32_t aiIndex, NavMeshPtr& 
         bool vCondition2;
         vCondition2 = !(&NavMeshToOffsetMap)->GetAt(a1, a2);
         if (vCondition2) {
-            return (bool)0;
+            return false;
         }
         if (a2 > aiIndex) {
             break;
@@ -93,7 +93,7 @@ bool PathingLOSMap::GetNavMeshAndTriangleForIndex(uint32_t aiIndex, NavMeshPtr& 
     aRetTriangle = (uint16_t)(aiIndex - v13);
     NavMeshPtr* v8 = &(&NavMeshes)->GetAt(i - 1);
     aRetNavMesh = *v8;
-    return (bool)1;
+    return true;
 }
 
 bool PathingLOSMap::GetOffsetForNavMesh(uint32_t aNavMeshID, uint32_t& aRetOffset) {
@@ -137,19 +137,19 @@ bool PathingLOSMap::Setup(const BSSimpleArray<NavMeshPtr, 1024>& aNavMeshes) {
     for (uint32_t i = 0; i < iTotalTriangleCount; ++i) {
         pTriangleScores[i] = 127;
     }
-    return 1;
+    return true;
 }
 
 bool PathingLOSMap::GetUnseenNavMeshAndTriangle(NavMeshPtr& aRetNavMesh, uint16_t& aRetTriangle) {
     if (NavMeshes.IsEmpty()) {
-        return 0;
+        return false;
     }
     for (uint32_t i = 0; i < iTotalTriangleCount; ++i) {
         if (GetTriangleScore(i) <= 0 && GetNavMeshAndTriangleForIndex(i, aRetNavMesh, aRetTriangle)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 NiNode* PathingLOSMap::CreateDebugGeometry() {
@@ -162,24 +162,24 @@ NiNode* PathingLOSMap::CreateDebugGeometry() {
         pLOSGeometry = ::new (apMemory) NiNode(0);
     }
     else {
-        pLOSGeometry = 0;
+        pLOSGeometry = nullptr;
     }
     NiAlphaProperty* v24 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
     if (v24) {
         v16 = (void*)::new (v24) NiAlphaProperty;
     }
     else {
-        v16 = 0;
+        v16 = nullptr;
     }
     NiRefObject* v25 = static_cast<NiRefObject*>(v16);
     NiPointer<NiAlphaProperty> spAlphaProp(static_cast<NiAlphaProperty*>(v16));
-    spAlphaProp.m_pObject->SetAlphaBlending(1);
+    spAlphaProp.m_pObject->SetAlphaBlending(true);
     NiMaterialProperty* v22 = static_cast<NiMaterialProperty*>(NiMemObject::operator new(sizeof(NiMaterialProperty)));
     if (v22) {
         v15 = (void*)::new (v22) NiMaterialProperty;
     }
     else {
-        v15 = 0;
+        v15 = nullptr;
     }
     NiRefObject* v23 = static_cast<NiRefObject*>(v15);
     NiPointer<NiMaterialProperty> spmat(static_cast<NiMaterialProperty*>(v15));
@@ -242,7 +242,7 @@ NiNode* PathingLOSMap::CreateDebugGeometry() {
                         verts[v] = Vertex->Location;
                         verts[v].z = verts[v].z + 5.0;
                     }
-                    NiPointer<NiTriShape> spTri(MakeTriangle(verts[0], verts[1], verts[2], colora, 1));
+                    NiPointer<NiTriShape> spTri(MakeTriangle(verts[0], verts[1], verts[2], colora, true));
                     NiTriShape* a3 = spTri.m_pObject;
                     pLOSGeometry->AttachChild(a3, 1);
                 }
@@ -256,7 +256,7 @@ NiNode* PathingLOSMap::CreateDebugGeometry() {
             pradiusDebugGeometry = ::new (v20) NiNode(0);
         }
         else {
-            pradiusDebugGeometry = 0;
+            pradiusDebugGeometry = nullptr;
         }
         NiColorA color(1.0f, 1.0f, 0.0f, 0.5f);
         for (uint32_t i_3 = 0; i_3 < 5; ++i_3) {
@@ -273,7 +273,7 @@ NiNode* PathingLOSMap::CreateDebugGeometry() {
         pLOSGeometry->AttachChild(pradiusDebugGeometry, 1);
     }
     pLOSGeometry->UpdateProperties();
-    NiUpdateData UpdateData(0.0f, 0, 0);
+    NiUpdateData UpdateData(0.0f, false, false);
     pLOSGeometry->Update(UpdateData);
     return pLOSGeometry;
 }
@@ -324,7 +324,7 @@ void NiAVObjectArray_SetSize(NiTObjectArray<NiPointer<NiAVObject>>* apArray, uin
             }
         }
         else {
-            apArray->m_pBase = 0;
+            apArray->m_pBase = nullptr;
         }
         NiAVObjectArray_Deallocate(pSaveBase);
     }

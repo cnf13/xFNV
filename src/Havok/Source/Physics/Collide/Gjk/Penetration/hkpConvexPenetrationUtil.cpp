@@ -69,7 +69,7 @@ static void findNearestTrianglePair(
         int32_t v10;
         double v7 = 1.0;
         hkpWingedEdge::Triangle* triA = &a1->m_triangles[v6];
-        while (1) {
+        while (true) {
             if (!(v47 < triA->m_distanceToOrigin * triA->m_distanceToOrigin)) {
                 v10 = a2->m_numTriangles - 1;
                 if (v10 >= 1) {
@@ -85,7 +85,7 @@ static void findNearestTrianglePair(
         }
         hkpWingedEdge::Triangle* triB = &a2->m_triangles[v10];
         int32_t v12 = a2->m_numTriangles - 1;
-        while (1) {
+        while (true) {
             __m128 v13;
             float v14;
             double v15;
@@ -106,7 +106,7 @@ static void findNearestTrianglePair(
                 goto LABEL_23;
             }
             v13 = _mm_mul_ps(triB->m_normal.m_quad, triA->m_normal.m_quad);
-            v14 = _mm_shuffle_ps(v13, v13, 170)[0] + static_cast<float>(_mm_shuffle_ps(v13, v13, 85)[0] + v13[0]);
+            v14 = _mm_shuffle_ps(v13, v13, 170)[0] + (_mm_shuffle_ps(v13, v13, 85)[0] + v13[0]);
             v15 = v14;
             if (v14 < -0.5f) {
                 goto LABEL_23;
@@ -206,9 +206,9 @@ LABEL_25:;
     float v36 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v35[0])));
     __m128 v37 = _mm_setzero_ps();
     __m128 v38 = _mm_cmpeq_ss(v35, v37);
-    v37[0] = 3.0f - static_cast<float>(static_cast<float>(v35[0] * v36) * v36);
+    v37[0] = 3.0f - ((v35[0] * v36) * v36);
     __m128 v39 = _mm_setzero_ps();
-    v39[0] = static_cast<float>(0.5f * v36) * v37[0];
+    v39[0] = (0.5f * v36) * v37[0];
     __m128 v40 = _mm_andnot_ps(v38, v39);
     a3->m_quad = _mm_mul_ps(_mm_shuffle_ps(v40, v40, 0), v32);
     if (!(v47 < 0.0f)) {
@@ -304,7 +304,7 @@ static hkpGskOut* sampleSupportPenetration(
     __m128 half = _mm_setzero_ps();
     half[0] = 0.5f;
     float scale = 1.0f;
-    while (1) {
+    while (true) {
         float step = scale * 0.9900000095367432;
         float absX = std::fabs(best.m_direction.m_quad[0]);
         float absY = std::fabs(best.m_direction.m_quad[1]);
@@ -810,9 +810,9 @@ simplex3:
             alignas(16) hkVector4 edge;
             edge.m_quad = _mm_sub_ps(m_simplex.m_storage[0].m_quad, m_simplex.m_storage[1].m_quad);
             // Lane choice: i0 and i1 swap where |x| > |y|; i2 becomes i1 where min(|x|, |y|) > |z|.
-            float minAbs = static_cast<float>(std::fabs(edge(0)));
-            const float abs1 = static_cast<float>(std::fabs(edge(1)));
-            const float abs2 = static_cast<float>(std::fabs(edge(2)));
+            float minAbs = std::fabs(edge(0));
+            const float abs1 = std::fabs(edge(1));
+            const float abs2 = std::fabs(edge(2));
             int32_t i0 = 1;
             int32_t i1 = 0;
             int32_t i2 = 2;
@@ -878,9 +878,9 @@ simplex2:
         alignas(16) hkVector4 edge;
         edge.m_quad = _mm_sub_ps(m_simplex.m_storage[0].m_quad, m_simplex.m_storage[1].m_quad);
         // Lane choice: i0 and i1 swap where |x| > |y|; i2 becomes i1 where min(|x|, |y|) > |z|.
-        float minAbs = static_cast<float>(std::fabs(edge(0)));
-        const float abs1 = static_cast<float>(std::fabs(edge(1)));
-        const float abs2 = static_cast<float>(std::fabs(edge(2)));
+        float minAbs = std::fabs(edge(0));
+        const float abs1 = std::fabs(edge(1));
+        const float abs2 = std::fabs(edge(2));
         int32_t i0 = 1;
         int32_t i1 = 0;
         int32_t i2 = 2;
@@ -1155,7 +1155,7 @@ hkpWingedEdge::Triangle::TriangleState hkpWingedEdge::Triangle::calcStateAndUpda
     float* apPreviousMinimumDistance
 ) {
     __m128 v4 = _mm_mul_ps(_mm_sub_ps(arPoint.m_quad, m_edge[0].m_vertex->m_position.m_quad), m_normal.m_quad);
-    float v9 = _mm_shuffle_ps(v4, v4, 170)[0] + static_cast<float>(_mm_shuffle_ps(v4, v4, 85)[0] + v4[0]);
+    float v9 = _mm_shuffle_ps(v4, v4, 170)[0] + (_mm_shuffle_ps(v4, v4, 85)[0] + v4[0]);
     double v5 = v9;
     hkpWingedEdge::Triangle::TriangleState v6 = hkpWingedEdge::Triangle::HK_VISIBLE;
     if (!(*apToleranceBorder < static_cast<double>(v9))) {

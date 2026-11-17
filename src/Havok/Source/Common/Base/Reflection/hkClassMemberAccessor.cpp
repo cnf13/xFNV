@@ -85,7 +85,7 @@ void hkClassMemberAccessor::connect(void* object, const hkClassMember* member) {
 }
 
 hkBool* hkClassMemberAccessor::isOk(hkBool* apResult) const {
-    apResult->m_bool = m_address != 0;
+    apResult->m_bool = m_address != nullptr;
     return apResult;
 }
 

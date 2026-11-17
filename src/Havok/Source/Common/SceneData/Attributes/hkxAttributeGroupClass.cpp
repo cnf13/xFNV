@@ -289,7 +289,7 @@ void cleanupLoadedObjecthkxMaterialTextureStage(void* p) {
     if (*a1) {
         (*a1)->removeReference();
     }
-    *a1 = 0;
+    *a1 = nullptr;
 }
 
 // The type info's finish-loaded-object callback for hkxEnvironment::Variable: its finish constructor finishes the name,

@@ -81,7 +81,7 @@ void MagicLight::Update(float afDelta) {
             color *= v6;
             LightData.spLight.m_pObject->SetDiffuseColor(color);
         }
-        pLightObject->Update(&LightData, 0);
+        pLightObject->Update(&LightData, nullptr);
     }
 }
 
@@ -95,7 +95,7 @@ void MagicLight::Init(uint32_t aiLightID, NiAVObject* apObj) {
             v8 = ::new (apMemory) NiPointLight;
         }
         else {
-            v8 = 0;
+            v8 = nullptr;
         }
         LightData.spLight.operator=(static_cast<NiLight*>(v8));
         LightData.fWantDimmer = 1.0f;
@@ -111,7 +111,7 @@ void MagicLight::Init(uint32_t aiLightID, NiAVObject* apObj) {
         LightData.spLight.m_pObject->SetDimmer(za);
         ShadowSceneNode* pnode = BSShaderManager::GetShadowSceneNode(0);
         if (pnode) {
-            pnode->AddLight(LightData.spLight.m_pObject, 1);
+            pnode->AddLight(LightData.spLight.m_pObject, true);
         }
         pParent.operator=(static_cast<NiNode*>(apObj));
         NiNode* v7 = pParent.m_pObject;

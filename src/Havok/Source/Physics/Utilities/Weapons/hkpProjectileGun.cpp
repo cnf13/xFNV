@@ -174,7 +174,7 @@ void hkpGunProjectile::_destroyBody() {
             removeFromWorld(this, nullptr);
         }
         this->m_body->removeReference();
-        this->m_body = 0;
+        this->m_body = nullptr;
     }
 }
 
@@ -231,11 +231,9 @@ void hkpGunProjectile::flyTrue(hkpRigidBody* body, float minVelocity, float time
     arB.m_translation = body->m_motion.m_motionState.m_transform.m_translation;
     __m128 v5 = _mm_mul_ps(v3.m_quad, v3.m_quad);
     arB.m_rotation.m_col0.m_quad = m_quad;
-    if (minVelocity < static_cast<double>(_mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
-                          static_cast<float>((
-                              _mm_shuffle_ps(v5, v5, 170)[0] + static_cast<float>(_mm_shuffle_ps(v5, v5, 85)[0] + v5[0])
-                          ))
-                      ))))) {
+    if (minVelocity < static_cast<double>(_mm_cvtss_f32(_mm_sqrt_ss(
+                          _mm_set_ss((_mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0])))
+                      )))) {
         hkVector4 q;
         __m128 v6 = _mm_mul_ps(v3.m_quad, v3.m_quad);
         float v7 = _mm_shuffle_ps(v6, v6, 85)[0] + v6[0];
@@ -248,8 +246,8 @@ void hkpGunProjectile::flyTrue(hkpRigidBody* body, float minVelocity, float time
         v11[0] = 0.5f;
         __m128 v12 = _mm_cmpeq_ss(v8, v10);
         q.m_quad = v10;
-        v10[0] = 3.0f - static_cast<float>(static_cast<float>(v8[0] * v9) * v9);
-        v11[0] = static_cast<float>(0.5f * v9) * v10[0];
+        v10[0] = 3.0f - ((v8[0] * v9) * v9);
+        v11[0] = (0.5f * v9) * v10[0];
         __m128 v14 = _mm_andnot_ps(v12, v11);
         __m128 v15 = _mm_mul_ps(_mm_shuffle_ps(v14, v14, 0), v3.m_quad);
         __m128 v16 = _mm_sub_ps(
@@ -257,11 +255,9 @@ void hkpGunProjectile::flyTrue(hkpRigidBody* body, float minVelocity, float time
             _mm_mul_ps(_mm_shuffle_ps(m_quad, m_quad, 201), _mm_shuffle_ps(v15, v15, 210))
         );
         __m128 v17 = _mm_mul_ps(v16, v16);
-        float v18 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
-            static_cast<float>(
-                (_mm_shuffle_ps(v17, v17, 170)[0] + static_cast<float>(_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]))
-            )
-        )));
+        float v18 = _mm_cvtss_f32(
+            _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v17, v17, 170)[0] + (_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]))))
+        );
         if (v18 > 1e-05f) {
             hkRotation v26;
             hkRotation arA;
@@ -270,8 +266,7 @@ void hkpGunProjectile::flyTrue(hkpRigidBody* body, float minVelocity, float time
             v20[0] = v20[0] + v19;
             float v21 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v20[0])));
             float afAngle = v18 * timeStep * -5.0;
-            v11[0] = static_cast<float>(0.5f * v21) *
-                static_cast<float>(3.0f - static_cast<float>(static_cast<float>(v20[0] * v21) * v21));
+            v11[0] = (0.5f * v21) * (3.0f - ((v20[0] * v21) * v21));
             __m128 v22 = _mm_andnot_ps(_mm_cmpeq_ss(v20, q.m_quad), v11);
             q.m_quad = _mm_mul_ps(_mm_shuffle_ps(v22, v22, 0), v16);
             arA.setAxisAngle(q, afAngle);
@@ -334,7 +329,7 @@ void hkpProjectileGun::onUpdate(
 void hkpProjectileGun::clearProjectiles() {
     int32_t m_size;
     hkpGunProjectile* v4;
-    m_size = (int32_t)m_projectiles.m_size;
+    m_size = m_projectiles.m_size;
     int32_t v3 = 0;
     if (m_size <= 0) {
         m_projectiles.m_size = (uint32_t)0;
@@ -397,7 +392,7 @@ hkpGunProjectile* hkpProjectileGun::getFirstActiveProjectile() {
     int32_t m_size = m_projectiles.m_size;
     int32_t v2 = 0;
     if (m_size <= 0) {
-        return 0;
+        return nullptr;
     }
     for (hkpGunProjectile** i = static_cast<hkArrayBase<hkpGunProjectile*>&>(m_projectiles).begin();; ++i) {
         result = *i;
@@ -405,7 +400,7 @@ hkpGunProjectile* hkpProjectileGun::getFirstActiveProjectile() {
             break;
         }
         if (++v2 >= m_size) {
-            return 0;
+            return nullptr;
         }
     }
     return result;

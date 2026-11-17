@@ -89,7 +89,7 @@ NavMeshRender::NavMeshRender()
         spTriangleMaterialArray[i] = new NiMaterialProperty;
         spTriangleMaterialArray[i]->SetEmittance(NiColor_WHITE);
         spTriangleMaterialArray[i]->SetAlpha(afTriangleAlpha[i]);
-        spVertPoints[i] = MakeTriPoint(fPointSize, ColorValues[i], 1);
+        spVertPoints[i] = MakeTriPoint(fPointSize, ColorValues[i], true);
         spVertPoints[i]->AttachProperty(spEdgeAndVertexMaterialArray[i].m_pObject);
         NiPointer<BSShaderNoLightingProperty> spShaderProp = new BSShaderNoLightingProperty;
         spShaderProp->SetFlag(32u, 0);
@@ -540,25 +540,25 @@ void NavMeshRender::UpdateRenderOnlyNavMeshes() {
     int32_t j;
     int32_t i;
     int32_t v7;
-    SetDraw(0);
+    SetDraw(false);
     TESObjectCELL* currentCell = TES::pInstance->GetCurrentCell();
     if (currentCell) {
         if (currentCell->GetInterior()) {
             singleton = NavMeshRender::GetInstance();
-            singleton->AddDrawOnlyNavMeshes(currentCell, 0);
+            singleton->AddDrawOnlyNavMeshes(currentCell, false);
         }
         else {
-            v7 = ((int32_t)(((&uGridsToLoad)->UInt()) - 1)) / 2;
+            v7 = ((int32_t)((&uGridsToLoad)->UInt() - 1)) / 2;
             for (i = currentCell->GetDataX() - v7; i <= (v7 + currentCell->GetDataX()); ++i) {
                 for (j = currentCell->GetDataY() - v7; j <= (v7 + currentCell->GetDataY()); ++j) {
                     worldSpace = currentCell->GetWorldSpace();
                     cellFromCellCoord = worldSpace->GetCellFromCellCoord(i, j);
-                    AddDrawOnlyNavMeshes(cellFromCellCoord, 0);
+                    AddDrawOnlyNavMeshes(cellFromCellCoord, false);
                 }
             }
         }
     }
-    SetDraw(1);
+    SetDraw(true);
 }
 
 void NavMeshRender::Update() {
@@ -687,11 +687,11 @@ void NavMeshRender::SetTransparentOverLayMode(bool abTransparent) {
 }
 
 void NavMeshRender::RemoveCell(TESObjectCELL* apCell) {
-    NiPointer<NiNode> spNode(static_cast<NiNode*>(0));
+    NiPointer<NiNode> spNode(static_cast<NiNode*>(nullptr));
     if (NavMeshCellMap.GetAt(apCell, spNode)) {
         NiNode* pRoot = NavMeshRender::spRootDrawNode.m_pObject;
         pRoot->DetachChild(spNode.m_pObject);
-        NiUpdateData kUpdateData(0.0f, 0, 0);
+        NiUpdateData kUpdateData(0.0f, false, false);
         NavMeshRender::spRootDrawNode.m_pObject->Update(kUpdateData);
         NavMeshRender::spRootDrawNode.m_pObject->UpdateProperties();
         NavMeshCellMap.RemoveAt(apCell);

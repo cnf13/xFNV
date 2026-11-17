@@ -24,7 +24,7 @@ void BGSAcousticSpace::InitializeData() {
     pNightSound = nullptr;
     pWallaSound = nullptr;
     iWallaPop = (uint32_t)0;
-    bIsInterior = (bool)1;
+    bIsInterior = true;
     pSoundRegion = nullptr;
     eEnvType = CET_DEFAULT;
 }
@@ -212,7 +212,7 @@ void BGSAcousticSpace::InitItem() {
                 Warning("MASTERFILE: Could not find pWallaSound (%08X) for activator '%s' (%08X).", itempint, v18, v24);
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -237,42 +237,42 @@ void BGSAcousticSpace::Copy(TESForm* apCopy) {
 bool BGSAcousticSpace::Compare(TESForm* apCompare) {
     BGSAcousticSpace* pcomp = dynamic_cast<BGSAcousticSpace*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     int32_t IsInterior = this->IsInterior();
     if (IsInterior != pcomp->IsInterior()) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     TESSound* Interior = pDawnSound;
     if (Interior != pcomp->pDawnSound) {
-        return 1;
+        return true;
     }
     TESSound* ConversationData = pNoonSound;
     if (ConversationData != pcomp->pNoonSound) {
-        return 1;
+        return true;
     }
     TESSound* EnchantmentSource = pDuskSound;
     if (EnchantmentSource != pcomp->pDuskSound) {
-        return 1;
+        return true;
     }
     TESSound* ParentCell = pNightSound;
     if (ParentCell != pcomp->pNightSound) {
-        return 1;
+        return true;
     }
     TESSound* State = pWallaSound;
     if (State != pcomp->pWallaSound) {
-        return 1;
+        return true;
     }
     int32_t UnderwaterState = iWallaPop;
     if (UnderwaterState != pcomp->iWallaPop) {
-        return 1;
+        return true;
     }
     TESRegion* CombatStyle = pSoundRegion;
     if (CombatStyle != pcomp->pSoundRegion) {
-        return 1;
+        return true;
     }
     int32_t v11 = eEnvType;
     return v11 != pcomp->eEnvType;

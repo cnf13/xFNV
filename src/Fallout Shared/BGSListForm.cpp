@@ -34,7 +34,7 @@ bool BGSListForm::Load(TESFile* apFile) {
     LoadForm(apFile);
     SetInitialized(false);
     for (;;) {
-        CHUNK_ID eChunk = static_cast<CHUNK_ID>(apFile->GetTESChunk());
+        CHUNK_ID eChunk = apFile->GetTESChunk();
         if (eChunk == NO_CHUNK) {
             break;
         }
@@ -159,11 +159,11 @@ void BGSListForm::Copy(TESForm* apCopy) {
 bool BGSListForm::Compare(TESForm* apCompare) {
     BGSListForm* pcompare = dynamic_cast<BGSListForm*>(apCompare);
     if (!pcompare) {
-        return 1;
+        return true;
     }
     int32_t v3 = (&ListOfForms)->ItemsInList();
     if (v3 != (&pcompare->ListOfForms)->ItemsInList()) {
-        return 1;
+        return true;
     }
     BSSimpleList<TESForm*>* plist_2 = &ListOfForms;
     for (BSSimpleList<TESForm*>* pcomplist_2 = &pcompare->ListOfForms;
@@ -171,7 +171,7 @@ bool BGSListForm::Compare(TESForm* apCompare) {
          pcomplist_2 = pcomplist_2->m_pkNext) {
         BSSimpleList<TESForm*>* v4 = plist_2;
         if (v4->m_item != pcomplist_2->m_item) {
-            return 1;
+            return true;
         }
         plist_2 = plist_2->m_pkNext;
     }
@@ -181,7 +181,7 @@ bool BGSListForm::Compare(TESForm* apCompare) {
 BGSListForm* BGSListForm::EmptyList() {
     BGSListForm* result;
     BSSimpleList<TESForm*>* list;
-    while (1) {
+    while (true) {
         result = this;
         if (!iScriptAddedFormCount) {
             break;

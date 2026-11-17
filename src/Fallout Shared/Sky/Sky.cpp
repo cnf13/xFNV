@@ -75,7 +75,7 @@
 #include "SDK/MSVC/rtti.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<GameSettingCollection> fMasserAngleFadeStart("fMasserAngleFadeStart", 55.0f);
@@ -130,10 +130,10 @@ bool SkySound::HandleCheckTime(int32_t aiInterval) {
     uint32_t uiNow = BSGetTickCount();
     uint32_t uiWhen = GetNextCheck();
     if (uiNow <= BSMIN(0x80000000u, uiWhen)) {
-        return 0;
+        return false;
     }
     SetNextCheck(aiInterval + uiNow);
-    return 1;
+    return true;
 }
 
 void* SkySound::DeletingDestructor(uint32_t auiFlags) {
@@ -165,12 +165,12 @@ void SkySound::Play(float afVol) {
         }
         if (eSoundType == TESWeather::WST_THUNDER) {
             if (!SndHandle.IsPlaying()) {
-                SndHandle.Play(0);
+                SndHandle.Play(false);
             }
         }
         else {
             if (HandleCheckTime(1000) && !SndHandle.IsPlaying()) {
-                SndHandle.Play(1);
+                SndHandle.Play(true);
             }
         }
         float v4 = SndHandle.GetVolume() - afVol;
@@ -242,7 +242,7 @@ void Sky::ForceWeather(TESWeather* apWeather, bool abOverride) {
         pOverrideWeather = nullptr;
     }
     pLastWeather = nullptr;
-    SetAcceleration(0);
+    SetAcceleration(false);
     fCurrentWeatherPct = (float)1.0;
     fLastWeatherUpdate = fCurrentGameHour;
     pPlayer->SetOccupiedRegion(nullptr);
@@ -362,7 +362,7 @@ void Sky::Update(float afSecondsPassed) {
         pSun->Update(this, afSecondsPassed);
     }
     // The days passed compare is unsigned.
-    if (((uiFlags & 0x20) && uiLastMoonPhaseUpdate < static_cast<uint32_t>(appCalendar.GetDaysPassed())) ||
+    if (((uiFlags & 0x20) && uiLastMoonPhaseUpdate < appCalendar.GetDaysPassed()) ||
         pSaveLoadGame->GetSaveGameLoading()) {
         bool bPhaseChange = Moon::UpdatePhase(this);
         if (pMasser && bPhaseChange && pMasser->eUpdateMoonTexture == Moon::US_NOT_REQUIRED) {
@@ -611,7 +611,7 @@ void Sky::UpdateWind() {
         if ((((int32_t)eMode) == 3) || (((int32_t)eMode) == 2)) {
             fWindSpeed = pCurrentWeather->GetWeatherData(TESWeather::WD_WIND_SPEED, 1.0, 0.0);
             if (pLastWeather) {
-                fWindSpeed = (float)(fWindSpeed * fCurrentWeatherPct);
+                fWindSpeed = (fWindSpeed * fCurrentWeatherPct);
                 v4 = 1.0 - fCurrentWeatherPct;
                 fWindSpeed =
                     (float)((pLastWeather->GetWeatherData(TESWeather::WD_WIND_SPEED, 1.0, 0.0) * v4) + fWindSpeed);
@@ -621,7 +621,7 @@ void Sky::UpdateWind() {
             ecx0;
             v9 = 15.0f;
             v8 = 15.0f;
-            v7 = (float)(((BSShaderManager::GetTimer(false) / 3600.0) * 6.283180236816406) * ((float)15.0f));
+            v7 = (float)(((BSShaderManager::GetTimer(false) / 3600.0) * 6.283180236816406) * 15.0f);
             v1 = NiSinQ(v7);
             ecx0.x = (float)(v1 * v8);
             v3 = (float)(v7 * 0.699999988079071);
@@ -644,23 +644,23 @@ void Sky::HandleClimateChange() {
             if (eMode == Sky::SM_FULL || eMode == Sky::SM_FAKEEXTERIOR) {
                 BSStringT<char> strfilename;
                 SkyShaderProperty* pprop = static_cast<SkyShaderProperty*>(pSun->GetBase()->GetProperty(3));
-                NiTexture* ptex = 0;
+                NiTexture* ptex = nullptr;
                 const TESTexture* ptestexture = pCurrentClimate->GetTexture(TESClimate::TX_SUN);
                 if (ptestexture) {
                     if (ptestexture->GetTextureNameLength()) {
-                        NiPointer<NiTexture> spTex(static_cast<NiTexture*>(0));
+                        NiPointer<NiTexture> spTex(static_cast<NiTexture*>(nullptr));
                         const char* v1 = ptestexture->GetDefaultPath();
                         strfilename.operator=(v1);
                         const char* pTextureName = ptestexture->GetTextureName();
                         strfilename.operator+=(pTextureName);
-                        BSShaderManager::GetTexture(strfilename.pString, 1, spTex, 1, 0);
+                        BSShaderManager::GetTexture(strfilename.pString, true, spTex, true, false);
                         ptex = spTex.m_pObject;
                         if (ptex) {
                             pprop->SetTexture(static_cast<NiSourceTexture*>(ptex));
                         }
                     }
                 }
-                pSun->GetSunBaseNode()->SetDisplayObject(ptex != 0);
+                pSun->GetSunBaseNode()->SetDisplayObject(ptex != nullptr);
                 NiAVObject* pSunGlare = pSun->GetSunGlareGeo();
                 pprop = static_cast<SkyShaderProperty*>(pSunGlare->GetProperty(3));
                 ptestexture = pCurrentClimate->GetTexture(TESClimate::TX_GLARE);
@@ -675,15 +675,15 @@ void Sky::HandleClimateChange() {
                         else {
                             strfilename.operator=("Textures\\Sky\\SunGlareNonHDR.dds");
                         }
-                        NiPointer<NiTexture> spTex_2(static_cast<NiTexture*>(0));
-                        BSShaderManager::GetTexture(strfilename.pString, 1, spTex_2, 1, 0);
+                        NiPointer<NiTexture> spTex_2(static_cast<NiTexture*>(nullptr));
+                        BSShaderManager::GetTexture(strfilename.pString, true, spTex_2, true, false);
                         ptex = spTex_2.m_pObject;
                         if (ptex) {
                             pprop->SetTexture(static_cast<NiSourceTexture*>(ptex));
                         }
                     }
                 }
-                pSun->GetSunGlareNode()->SetDisplayObject(ptex != 0);
+                pSun->GetSunGlareNode()->SetDisplayObject(ptex != nullptr);
             }
         }
         if (!pCurrentClimate->UsesMasser() || pMasser) {
@@ -691,7 +691,7 @@ void Sky::HandleClimateChange() {
                 if (pMasser) {
                     delete pMasser;
                 }
-                pMasser = 0;
+                pMasser = nullptr;
             }
         }
         else {
@@ -709,7 +709,7 @@ void Sky::HandleClimateChange() {
                 );
             }
             else {
-                Masser = 0;
+                Masser = nullptr;
             }
             pMasser = Masser;
             pMasser->Initialize(spMoonsRoot.m_pObject, "Masser");
@@ -719,7 +719,7 @@ void Sky::HandleClimateChange() {
                 if (pSecunda) {
                     delete pSecunda;
                 }
-                pSecunda = 0;
+                pSecunda = nullptr;
             }
         }
         else {
@@ -737,13 +737,13 @@ void Sky::HandleClimateChange() {
                 );
             }
             else {
-                Secunda = 0;
+                Secunda = nullptr;
             }
             pSecunda = Secunda;
             pSecunda->Initialize(spMoonsRoot.m_pObject, "Secunda");
         }
         spRoot.m_pObject->UpdateProperties();
-        NiUpdateData UpdateData(0.0f, 0, 0);
+        NiUpdateData UpdateData(0.0f, false, false);
         spRoot.m_pObject->Update(UpdateData);
         uiFlags &= ~64u;
     }
@@ -772,7 +772,7 @@ void Sky::UpdateWeather() {
                 pRegionList = static_cast<BSSimpleList<TESRegion*>*>(RegionList);
             }
             else {
-                pRegionList = 0;
+                pRegionList = nullptr;
             }
             for (BSSimpleList<TESRegion*>* pRegionList_2 = pRegionList; pRegionList_2 && pRegionList_2->m_item;
                  pRegionList_2 = pRegionList_2->m_pkNext) {
@@ -780,10 +780,10 @@ void Sky::UpdateWeather() {
                 (*v2)->UpdateWeather();
             }
         }
-        bool bloadNewWeather = pOverrideWeather == 0;
+        bool bloadNewWeather = pOverrideWeather == nullptr;
         if (pCurrentWeather) {
             if (pSaveLoadGame->GetSaveGameLoading()) {
-                bloadNewWeather = 0;
+                bloadNewWeather = false;
             }
         }
         if (bloadNewWeather) {
@@ -805,7 +805,7 @@ void Sky::UpdateWeather() {
         }
         else {
             if ((uiFlags & 16) != 0 || eMode == Sky::SM_INTERIOR) {
-                pLastWeather = 0;
+                pLastWeather = nullptr;
                 if (pPrecip) {
                     pPrecip->FlushAll();
                 }
@@ -846,9 +846,9 @@ void Sky::UpdateWeather() {
             fCurrentWeatherPct = (fWeatherTransAccel.Float() + 1.0) * v5 + fAccelBeginPct;
         }
         if (fCurrentWeatherPct > 1.0) {
-            pLastWeather = 0;
+            pLastWeather = nullptr;
             fCurrentWeatherPct = 1.0f;
-            SetAcceleration(0);
+            SetAcceleration(false);
         }
         UpdateHDRValues();
     }
@@ -865,7 +865,7 @@ void Sky::UpdateSound() {
             pSaveList = ::new (v13) BSSimpleList<SkySound*>;
         }
         else {
-            pSaveList = 0;
+            pSaveList = nullptr;
         }
         BSSimpleList<SkySound*> oldHandleList;
         while (pCurrentNode) {
@@ -888,9 +888,9 @@ void Sky::UpdateSound() {
             pCurrentNode = pCurrentNode->m_pkNext;
         }
         BSSimpleList<SkySound*>* poldHandleNode = &oldHandleList;
-        while (1) {
+        while (true) {
             SkySound* oldHandle;
-            if (!poldHandleNode || (oldHandle = poldHandleNode->m_item) == 0) {
+            if (!poldHandleNode || (oldHandle = poldHandleNode->m_item) == nullptr) {
                 oldHandleList.RemoveAll();
                 pSkySoundList->RemoveAll();
                 if (pSkySoundList) {
@@ -898,12 +898,12 @@ void Sky::UpdateSound() {
                 }
                 pSkySoundList = pSaveList;
                 pCurrentNode = pSaveList;
-                Sky::bCleanList = 0;
+                Sky::bCleanList = false;
                 break;
             }
             poldHandleNode = poldHandleNode->m_pkNext;
             if (oldHandle->SndHandle.IsValid()) {
-                bool v20 = 0;
+                bool v20 = false;
                 for (pCurrentNode = pSaveList; !v20; pCurrentNode = pCurrentNode->m_pkNext) {
                     if (!pCurrentNode) {
                         break;
@@ -1064,7 +1064,7 @@ void Sky::UpdateSound() {
                     }
                 }
                 pCurrentSound->FlagToKill();
-                Sky::bCleanList = 1;
+                Sky::bCleanList = true;
             }
         }
         pCurrentNode = pCurrentNode->m_pkNext;
@@ -1692,7 +1692,7 @@ void Sky::SetColor(NiColor& aColor, COLOR_BLEND* apColorBlend, float afAddFlash)
 
 void Sky::ReloadAllTextures() {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_SKY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Sky.cpp", 2268
+        MEM_CONTEXT_SKY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Sky.cpp", 2268
     );
     if (pClouds) {
         if (pCurrentWeather) {
@@ -1708,11 +1708,11 @@ void Sky::ReloadAllTextures() {
                             const TESTexture* CloudTexture = pCurrentWeather->GetCloudTexture(i);
                             const char* TextureName = pCurrentWeather->GetCloudTexture(i)->GetTextureName();
                             strFile.SPrintF("%s%s", CloudTexture->GetDefaultPath(), TextureName);
-                            if (FileFinder::Locate(strFile.pString, 0, 0, 0xFFFFFFFFu)) {
+                            if (FileFinder::Locate(strFile.pString, nullptr, 0, 0xFFFFFFFFu)) {
                                 NiGeometry* CloudsGeo = pClouds->GetCloudsGeo(i);
                                 if (CloudsGeo->GetProperty(5)) {
-                                    NiPointer<NiTexture> spTexture(static_cast<NiTexture*>(0));
-                                    BSShaderManager::GetTexture(strFile.pString, 1, spTexture, 1, 0);
+                                    NiPointer<NiTexture> spTexture(static_cast<NiTexture*>(nullptr));
+                                    BSShaderManager::GetTexture(strFile.pString, true, spTexture, true, false);
                                     NiSourceTexture* v13 = static_cast<NiSourceTexture*>(spTexture.m_pObject);
                                     NiGeometry* v3 = pClouds->GetCloudsGeo(i);
                                     SkyShaderProperty* Property = static_cast<SkyShaderProperty*>(v3->GetProperty(3));
@@ -1727,32 +1727,32 @@ void Sky::ReloadAllTextures() {
     }
     if (pMasser) {
         SkyShaderProperty* pprop = static_cast<SkyShaderProperty*>(pMasser->spShadowMesh.m_pObject->GetProperty(3));
-        NiPointer<NiTexture> spTex(static_cast<NiTexture*>(0));
-        BSShaderManager::GetTexture("Textures\\Sky\\MoonShadow.dds", 1, spTex, 1, 0);
+        NiPointer<NiTexture> spTex(static_cast<NiTexture*>(nullptr));
+        BSShaderManager::GetTexture("Textures\\Sky\\MoonShadow.dds", true, spTex, true, false);
         NiTexture* ptex = spTex.m_pObject;
         if (ptex) {
             pprop->SetTexture(static_cast<NiSourceTexture*>(ptex));
         }
-        pMasser->spShadowMesh.m_pObject->SetDisplayObject(ptex != 0);
+        pMasser->spShadowMesh.m_pObject->SetDisplayObject(ptex != nullptr);
         pMasser->eUpdateMoonTexture = Moon::US_INITIALIZE;
     }
     if (pSecunda) {
         SkyShaderProperty* pprop_2 = static_cast<SkyShaderProperty*>(pSecunda->spShadowMesh.m_pObject->GetProperty(3));
-        NiPointer<NiTexture> spTex_2(static_cast<NiTexture*>(0));
-        BSShaderManager::GetTexture("Textures\\Sky\\MoonShadow.dds", 1, spTex_2, 1, 0);
+        NiPointer<NiTexture> spTex_2(static_cast<NiTexture*>(nullptr));
+        BSShaderManager::GetTexture("Textures\\Sky\\MoonShadow.dds", true, spTex_2, true, false);
         NiTexture* ptex_2 = spTex_2.m_pObject;
         if (ptex_2) {
             pprop_2->SetTexture(static_cast<NiSourceTexture*>(ptex_2));
         }
-        pSecunda->spShadowMesh.m_pObject->SetDisplayObject(ptex_2 != 0);
+        pSecunda->spShadowMesh.m_pObject->SetDisplayObject(ptex_2 != nullptr);
         pSecunda->eUpdateMoonTexture = Moon::US_INITIALIZE;
     }
     if (pSun) {
         if (pCurrentClimate) {
             BSStringT<char> strfilename;
             SkyShaderProperty* pprop_3 = static_cast<SkyShaderProperty*>(pSun->GetBase()->GetProperty(3));
-            NiTexture* ptex_3 = 0;
-            NiPointer<NiTexture> spTex_3(static_cast<NiTexture*>(0));
+            NiTexture* ptex_3 = nullptr;
+            NiPointer<NiTexture> spTex_3(static_cast<NiTexture*>(nullptr));
             const TESTexture* ptestexture = pCurrentClimate->GetTexture(TESClimate::TX_SUN);
             if (ptestexture) {
                 if (ptestexture->GetTextureNameLength()) {
@@ -1760,14 +1760,14 @@ void Sky::ReloadAllTextures() {
                     strfilename.operator=(v5);
                     const char* pTextureName = ptestexture->GetTextureName();
                     strfilename.operator+=(pTextureName);
-                    BSShaderManager::GetTexture(strfilename.pString, 1, spTex_3, 1, 0);
+                    BSShaderManager::GetTexture(strfilename.pString, true, spTex_3, true, false);
                     ptex_3 = spTex_3.m_pObject;
                     if (ptex_3) {
                         pprop_3->SetTexture(static_cast<NiSourceTexture*>(ptex_3));
                     }
                 }
             }
-            pSun->GetSunBaseNode()->SetDisplayObject(ptex_3 != 0);
+            pSun->GetSunBaseNode()->SetDisplayObject(ptex_3 != nullptr);
             NiAVObject* pSunGlare = pSun->GetSunGlareGeo();
             SkyShaderProperty* pprop_4 = static_cast<SkyShaderProperty*>(pSunGlare->GetProperty(3));
             ptestexture = pCurrentClimate->GetTexture(TESClimate::TX_SUN);
@@ -1782,15 +1782,15 @@ void Sky::ReloadAllTextures() {
                     else {
                         strfilename.operator=("Textures\\Sky\\SunGlareNonHDR.dds");
                     }
-                    NiPointer<NiTexture> spTex_4(static_cast<NiTexture*>(0));
-                    BSShaderManager::GetTexture(strfilename.pString, 1, spTex_4, 1, 0);
+                    NiPointer<NiTexture> spTex_4(static_cast<NiTexture*>(nullptr));
+                    BSShaderManager::GetTexture(strfilename.pString, true, spTex_4, true, false);
                     ptex_3 = spTex_4.m_pObject;
                     if (ptex_3) {
                         pprop_4->SetTexture(static_cast<NiSourceTexture*>(ptex_3));
                     }
                 }
             }
-            pSun->GetSunGlareNode()->SetDisplayObject(ptex_3 != 0);
+            pSun->GetSunGlareNode()->SetDisplayObject(ptex_3 != nullptr);
         }
     }
     if (pStars) {
@@ -1979,7 +1979,7 @@ void Sky::ActivateWeatherSounds(const TESWeather* apWeather) {
                     ::new (pMemory) SkySound(kHandleArg, apWeather, pSoundData->eType, pSoundData->uiSoundFormID);
             }
             else {
-                pNewSound = 0;
+                pNewSound = nullptr;
             }
             this->pSkySoundList->AddHead(pNewSound);
             if (pSoundData->eType == TESWeather::WST_THUNDER) {
@@ -1993,7 +1993,7 @@ void Sky::Destroy() {
     if (Sky::pInstance) {
         delete Sky::pInstance;
     }
-    Sky::pInstance = 0;
+    Sky::pInstance = nullptr;
 }
 
 // Whether the sound list, up to its first empty item, holds a sound of form aiFormID for apWeather.

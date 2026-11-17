@@ -50,8 +50,8 @@ NiObject* NiPathController::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -688,7 +688,7 @@ void NiPathController::GetPathData(
 NiObject* NiPathController::CreateObject() {
     NiPathController* pkObject = static_cast<NiPathController*>(NiMemObject::operator new(sizeof(NiPathController)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPathController;
 }

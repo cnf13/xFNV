@@ -24,7 +24,7 @@ void BSWin32TaskletGroupData::WaitForCompletion(bool a1) {
         kCompletionSemaphore.hSemaphore->Wait();
         InterlockedDecrementInt32(&kCompletionSemaphore.iCount);
     }
-    bComplete = 1;
+    bComplete = true;
     padding2C = 0;
 }
 

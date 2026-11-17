@@ -101,7 +101,7 @@ void Atmosphere::Initialize(NiNode* apSkyRoot, BSFogProperty* apFog) {
     if (!BSShaderManager::bHDR) {
         NiNode* v8;
         SkyShader::CreateSkyQuad(spSkyQuad);
-        spSkyQuad.m_pObject->SetSelectiveUpdate(1);
+        spSkyQuad.m_pObject->SetSelectiveUpdate(true);
         SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
         NiNode* CameraRoot = WorldSceneGraph->GetCameraRoot();
         spSkyQuad.m_pObject->SetTranslate(CameraRoot->GetTranslate());
@@ -110,20 +110,20 @@ void Atmosphere::Initialize(NiNode* apSkyRoot, BSFogProperty* apFog) {
             v8 = ::new (apMemory) NiNode(0);
         }
         else {
-            v8 = 0;
+            v8 = nullptr;
         }
         spSkyQuadNode.operator=(v8);
-        spSkyQuadNode.m_pObject->SetSelectiveUpdate(1);
+        spSkyQuadNode.m_pObject->SetSelectiveUpdate(true);
         NiNode* v7 = spSkyQuadNode.m_pObject;
         v7->AttachChild(spSkyQuad.m_pObject, 1);
         NiNode* v6 = spRoot.m_pObject;
         v6->AttachChild(spSkyQuadNode.m_pObject, 1);
     }
     BSStream stream;
-    if (stream.BSStream::Load("Meshes\\Sky\\Atmosphere.nif", 0)) {
-        Model model("Meshes\\Sky\\Atmosphere.nif", &stream, 0, 0);
+    if (stream.BSStream::Load("Meshes\\Sky\\Atmosphere.nif", nullptr)) {
+        Model model("Meshes\\Sky\\Atmosphere.nif", &stream, false, false);
         NiNode* pnode = model.GetModel();
-        NiTriShape* ptrishape = 0;
+        NiTriShape* ptrishape = nullptr;
         NiObject* pobj = model.GetModel();
         if (pobj) {
             if (pobj->IsNode()) {
@@ -140,7 +140,7 @@ void Atmosphere::Initialize(NiNode* apSkyRoot, BSFogProperty* apFog) {
             return;
         }
         spAtmosphere.operator=(ptrishape);
-        spAtmosphere.m_pObject->SetSelectiveUpdate(1);
+        spAtmosphere.m_pObject->SetSelectiveUpdate(true);
         NiNode* v5 = spRoot.m_pObject;
         v5->AttachChild(spAtmosphere.m_pObject, 1);
     }

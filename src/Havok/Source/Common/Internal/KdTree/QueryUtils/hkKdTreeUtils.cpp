@@ -80,19 +80,16 @@ hkBool* hkKdTreeUtils::castRayIterative(
     __m128 dir = _mm_sub_ps(to.m_quad, from.m_quad);
     __m128 dirSq = _mm_mul_ps(dir, dir);
     __m128 lengthSq = _mm_shuffle_ps(dirSq, dirSq, 170);
-    lengthSq[0] = lengthSq[0] + static_cast<float>(_mm_shuffle_ps(dirSq, dirSq, 85)[0] + dirSq[0]);
+    lengthSq[0] = lengthSq[0] + (_mm_shuffle_ps(dirSq, dirSq, 85)[0] + dirSq[0]);
     float rsqrt = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(lengthSq[0])));
     __m128 lengthSqIsZero = _mm_cmpeq_ss(lengthSq, _mm_setzero_ps());
-    float newtonStep = 3.0f - static_cast<float>(static_cast<float>(lengthSq[0] * rsqrt) * rsqrt);
+    float newtonStep = 3.0f - ((lengthSq[0] * rsqrt) * rsqrt);
     __m128 invLength = _mm_setzero_ps();
-    invLength[0] = static_cast<float>(0.5f * rsqrt) * newtonStep;
+    invLength[0] = (0.5f * rsqrt) * newtonStep;
     invLength = _mm_andnot_ps(lengthSqIsZero, invLength);
     invLength = _mm_shuffle_ps(invLength, invLength, 0);
     float rayLength =
-        static_cast<float>(
-            _mm_shuffle_ps(dirSq, dirSq, 170)[0] + static_cast<float>(_mm_shuffle_ps(dirSq, dirSq, 85)[0] + dirSq[0])
-        ) *
-        invLength[0];
+        (_mm_shuffle_ps(dirSq, dirSq, 170)[0] + (_mm_shuffle_ps(dirSq, dirSq, 85)[0] + dirSq[0])) * invLength[0];
     float nodeTFar = rayLength;
     __m128 origin = from.m_quad;
     __m128 unitDir = _mm_mul_ps(invLength, dir);

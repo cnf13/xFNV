@@ -48,7 +48,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Reconstruction.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 
 // Reads the part's names, models and data. The chunks come in a fixed order and a missing one fails the load; NAM2 and
 // NAM3 are read and dropped, as the game does.
@@ -209,19 +209,19 @@ void PART_DATA::Initialize() {
     cToHitChance = 100;
     cExplosionChance = 0;
     cExplosionGenericDebrisCount = 0;
-    pExplosionGenericDebris = 0;
-    pExplosion = 0;
+    pExplosionGenericDebris = nullptr;
+    pExplosion = nullptr;
     fTrackingMaxAngle = 0.0f;
     fExplosionGenericDebrisScale = 1.0f;
     fExplosionSpecialDebrisScale = 1.0f;
     cDismemberGenericDebrisCount = 0;
-    pDismemberGenericDebris = 0;
-    pDismemberExplosion = 0;
+    pDismemberGenericDebris = nullptr;
+    pDismemberExplosion = nullptr;
     fDismemberGenericDebrisScale = 1.0f;
     kGoreTranslate = NiPoint3_ZERO;
     kGoreRotate = NiPoint3_ZERO;
-    pDismemberImpactDataSet = 0;
-    pExplosionImpactDataSet = 0;
+    pDismemberImpactDataSet = nullptr;
+    pExplosionImpactDataSet = nullptr;
     cDismemberDecalCount = 0;
     cExplosionDecalCount = 0;
 }
@@ -238,10 +238,7 @@ BGSBodyPart::~BGSBodyPart() {
 
 void BGSBodyPart::QueueFiles(IO_TASK_PRIORITY aePriority, QueuedFile* apParent) {
     if (ExplosionSpecialDebris.GetModelLength()) {
-        pModelLoader->QueueModel(
-            &ExplosionSpecialDebris, aePriority, apParent, LOD_MULT_OBJECTS, static_cast<bool>(1), static_cast<bool>(0),
-            static_cast<bool>(0)
-        );
+        pModelLoader->QueueModel(&ExplosionSpecialDebris, aePriority, apParent, LOD_MULT_OBJECTS, true, false, false);
     }
     if (Data.pExplosionGenericDebris) {
         Data.pExplosionGenericDebris->QueueFiles(aePriority, apParent);
@@ -412,8 +409,8 @@ void BGSBodyPart::UnhideLimb(BGSBodyPart::LIMB_ENUM aeLimb, NiAVObject* apObj) {
                     NiObject::DynamicCastStatic(&BSDismemberSkinInstance::ms_RTTI, pkObject)
                 );
                 if (v4) {
-                    v4->SetBodyPartEnabled(aeLimb, 1);
-                    v4->SetBodyPartEnabled(aeLimb + 200, 0);
+                    v4->SetBodyPartEnabled(aeLimb, true);
+                    v4->SetBodyPartEnabled(aeLimb + 200, false);
                 }
             }
         }
@@ -439,8 +436,8 @@ void BGSBodyPart::HideLimb(BGSBodyPart::LIMB_ENUM aeLimb, NiAVObject* apObj) {
                     NiObject::DynamicCastStatic(&BSDismemberSkinInstance::ms_RTTI, pkObject)
                 );
                 if (v4) {
-                    v4->SetBodyPartEnabled(aeLimb, 0);
-                    v4->SetBodyPartEnabled(aeLimb + 200, 1);
+                    v4->SetBodyPartEnabled(aeLimb, false);
+                    v4->SetBodyPartEnabled(aeLimb + 200, true);
                 }
             }
         }
@@ -465,7 +462,7 @@ void BGSBodyPart::ShowLimb(BGSBodyPart::LIMB_ENUM usBodyPart, NiObject* a2) {
             pskin = ptri->GetSkinInstance();
         }
         else {
-            pskin = 0;
+            pskin = nullptr;
         }
         BSDismemberSkinInstance* pdSkinInstance = static_cast<BSDismemberSkinInstance*>(
             NiObject::DynamicCastStatic(&BSDismemberSkinInstance::ms_RTTI, pskin)
@@ -474,13 +471,13 @@ void BGSBodyPart::ShowLimb(BGSBodyPart::LIMB_ENUM usBodyPart, NiObject* a2) {
             for (BGSBodyPart::LIMB_ENUM eindex = BGSBodyPart::LIMB_TORSO; eindex < BGSBodyPart::LIMB_COUNT;
                  eindex = static_cast<BGSBodyPart::LIMB_ENUM>(eindex + 1)) {
                 if (eindex == usBodyPart) {
-                    pdSkinInstance->SetBodyPartEnabled(usBodyPart + 100, 1);
+                    pdSkinInstance->SetBodyPartEnabled(usBodyPart + 100, true);
                 }
                 else {
-                    pdSkinInstance->SetBodyPartEnabled(eindex, 0);
-                    pdSkinInstance->SetBodyPartEnabled(eindex + 200, 0);
+                    pdSkinInstance->SetBodyPartEnabled(eindex, false);
+                    pdSkinInstance->SetBodyPartEnabled(eindex + 200, false);
                 }
-                pdSkinInstance->SetBodyPartEnabled(1000 * eindex, 0);
+                pdSkinInstance->SetBodyPartEnabled(1000 * eindex, false);
             }
         }
     }

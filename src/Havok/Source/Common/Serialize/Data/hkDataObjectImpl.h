@@ -26,7 +26,7 @@ public:
 // A serialized class: its name, version, parent and members.
 class hkDataClassImpl : public hkDataRefCounted {
 public:
-    typedef hkDataClass::MemberInfo MemberInfo;
+    using MemberInfo = hkDataClass::MemberInfo;
 
     ~hkDataClassImpl() override;
 

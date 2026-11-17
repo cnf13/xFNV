@@ -112,7 +112,7 @@ hkBool* hkpConvexVerticesConnectivity::isClosed(hkBool* apResult) {
     hkUlongMapBase ErrorMessage;
     hkpConvexVerticesConnectivity* v2 = this;
     int32_t v3 = 0;
-    ErrorMessage.m_elem = 0;
+    ErrorMessage.m_elem = nullptr;
     ErrorMessage.m_numElems = 0;
     ErrorMessage.m_hashMod = -1;
     hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
@@ -130,7 +130,7 @@ hkBool* hkpConvexVerticesConnectivity::isClosed(hkBool* apResult) {
             int32_t v23 = v6;
             uint16_t* v25 = v7;
             if (v2->m_numVerticesPerFace.m_data[v3]) {
-                while (1) {
+                while (true) {
                     int32_t v10 = v7[v9];
                     int32_t v11 = v8 >= v10 ? v8 | v10 << 16 : v10 | v8 << 16;
                     uint32_t v12 = v11 + 1;

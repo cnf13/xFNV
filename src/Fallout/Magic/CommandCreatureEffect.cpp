@@ -50,7 +50,7 @@ bool CommandCreatureEffect::CheckTarget(MagicTarget* apTarget) {
         v5 = nullptr;
     }
     if (!v5) {
-        return (bool)0;
+        return false;
     }
     float flt1C = fMagnitude;
     uint16_t level = v5->GetLevel();
@@ -63,6 +63,6 @@ ActiveEffect* CommandCreatureEffect::Instantiate(MagicCaster* apCaster, MagicIte
         return ::new (apMemory) CommandCreatureEffect(apCaster, apSpell, apEffect);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

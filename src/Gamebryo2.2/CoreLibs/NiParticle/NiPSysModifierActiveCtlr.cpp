@@ -27,7 +27,7 @@ NiObject* NiPSysModifierActiveCtlr::CreateClone(NiCloningProcess& kCloning) {
     }
     else {
         NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-        return 0;
+        return nullptr;
     }
 }
 
@@ -80,7 +80,7 @@ NiObject* NiPSysModifierActiveCtlr::CreateObject() {
     NiPSysModifierActiveCtlr* v0 =
         static_cast<NiPSysModifierActiveCtlr*>(NiMemObject::operator new(sizeof(NiPSysModifierActiveCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysModifierActiveCtlr;
 }

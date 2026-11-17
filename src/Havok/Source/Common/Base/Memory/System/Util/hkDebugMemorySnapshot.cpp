@@ -18,7 +18,7 @@ void hkDebugMemorySnapshot::subtract(hkDebugMemorySnapshot& rhs) {
                 return;
             }
             if (*m_pointers == *v5) {
-                *m_pointers++ = 0;
+                *m_pointers++ = nullptr;
             }
             else {
                 if (*m_pointers < *v5) {
@@ -43,8 +43,8 @@ void hkDebugMemorySnapshot::reset() {
         hkMemoryRouter* v7 = &hkMemoryRouter::getInstance();
         v7->m_debug->blockFree(m_info, sizeof(hkMemoryPointerInfo) * v5);
     }
-    this->m_pointers = 0;
-    this->m_info = 0;
+    this->m_pointers = nullptr;
+    this->m_info = nullptr;
     this->m_numPointers = 0;
 }
 

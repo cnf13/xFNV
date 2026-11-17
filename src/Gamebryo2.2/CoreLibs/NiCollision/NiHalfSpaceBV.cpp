@@ -68,7 +68,7 @@ NiBoundingVolume* NiHalfSpaceBV::Create() const {
 NiBoundingVolume* NiHalfSpaceBV::Clone() const {
     NiHalfSpaceBV* v2 = static_cast<NiHalfSpaceBV*>(MemoryManager_Singleton.Allocate(sizeof(NiHalfSpaceBV)));
     if (!v2) {
-        return 0;
+        return nullptr;
     }
     return ::new (v2) NiHalfSpaceBV(*this);
 }
@@ -137,7 +137,7 @@ bool NiHalfSpaceBV::HalfSpaceSphereFindIntersect(
         float kABV0a = kHalfABV.m_kPlane.m_kNormal.x * v21 + kHalfABV.m_kPlane.m_kNormal.y * v23 +
             kHalfABV.m_kPlane.m_kNormal.z * v25;
         if (kABV0a <= 0.0f || !(kABV0a * fTime + v12 >= kABV1a)) {
-            return 0;
+            return false;
         }
         else {
             NiPoint3 v38;
@@ -165,7 +165,7 @@ bool NiHalfSpaceBV::HalfSpaceSphereFindIntersect(
             v38.y = v18 + v28;
             v38.z = v20 + v29;
             kIntrPt = v38;
-            return 1;
+            return true;
         }
     }
     else {
@@ -185,7 +185,7 @@ bool NiHalfSpaceBV::HalfSpaceSphereFindIntersect(
             v36.z = -kNormal1.z;
             kNormal0 = v36;
         }
-        return 1;
+        return true;
     }
 }
 
@@ -440,7 +440,7 @@ bool NiHalfSpaceBV::HalfSpaceSphereTestIntersect(
     float kABV1a = -kSphABV.m_kSphere.m_fRadius;
     double v6 = kABV0c;
     if (kABV1a <= static_cast<double>(kABV0c)) {
-        return 1;
+        return true;
     }
     float v8 = kV1.x - kV0.x;
     float v9 = kV1.y - kV0.y;
@@ -482,7 +482,7 @@ bool NiHalfSpaceBV::HalfSpaceBoxTestIntersect(
     float kABV1a = -kABV1b;
     double v9 = kABV0i;
     if (kABV1a <= static_cast<double>(kABV0i)) {
-        return 1;
+        return true;
     }
     float v12 = kV1.x - kV0.x;
     float v14 = kV1.y - kV0.y;
@@ -508,7 +508,7 @@ bool NiHalfSpaceBV::HalfSpaceCapsuleTestIntersect(
     float kABV1a = -kCapABV.m_kCapsule.m_fRadius;
     double v7 = kABV0d;
     if (kABV1a <= static_cast<double>(kABV0d)) {
-        return 1;
+        return true;
     }
     float kABV0e = kCapABV.m_kCapsule.m_kSegment.m_kDirection.y * kHalfABV.m_kPlane.m_kNormal.y +
         kCapABV.m_kCapsule.m_kSegment.m_kDirection.x * kHalfABV.m_kPlane.m_kNormal.x +
@@ -516,7 +516,7 @@ bool NiHalfSpaceBV::HalfSpaceCapsuleTestIntersect(
     float kABV0f = kABV0e + v7;
     double v9 = kABV0f;
     if (kABV0f >= static_cast<double>(kABV1a)) {
-        return 1;
+        return true;
     }
     float v10 = kV1.x - kV0.x;
     float v11 = kV1.y - kV0.y;
@@ -524,7 +524,7 @@ bool NiHalfSpaceBV::HalfSpaceCapsuleTestIntersect(
     float kABV0a =
         kHalfABV.m_kPlane.m_kNormal.y * v11 + v10 * kHalfABV.m_kPlane.m_kNormal.x + kHalfABV.m_kPlane.m_kNormal.z * v12;
     if (kABV0a <= 0.0f) {
-        return 0;
+        return false;
     }
     float kABV0b = -(kABV0a * fTime + kCapABV.m_kCapsule.m_fRadius);
     return kABV0b <= v7 || v9 >= kABV0b;
@@ -543,7 +543,7 @@ bool NiHalfSpaceBV::HalfSpaceHalfSpaceTestIntersect(
         kHalfABV0.m_kPlane.m_kNormal.x * kHalfABV1.m_kPlane.m_kNormal.x +
         kHalfABV1.m_kPlane.m_kNormal.z * kHalfABV0.m_kPlane.m_kNormal.z;
     if (kABV0b > -0.9999989867210388 || -kHalfABV1.m_kPlane.m_fConstant >= kHalfABV0.m_kPlane.m_fConstant) {
-        return 1;
+        return true;
     }
     float v7 = kV1.x - kV0.x;
     float v8 = kV1.y - kV0.y;
@@ -568,21 +568,21 @@ bool NiHalfSpaceBV::HalfSpaceTriTestIntersect(
     float kABV0c = kABV0b - kHalfABV.m_kPlane.m_fConstant;
     double v8 = kABV0c;
     if (kABV0c >= 0.0f) {
-        return 1;
+        return true;
     }
     float kABV0d = kVert1.y * kHalfABV.m_kPlane.m_kNormal.y + kVert1.x * kHalfABV.m_kPlane.m_kNormal.x +
         kVert1.z * kHalfABV.m_kPlane.m_kNormal.z;
     float kABV0e = kABV0d - kHalfABV.m_kPlane.m_fConstant;
     double v9 = kABV0e;
     if (kABV0e >= 0.0f) {
-        return 1;
+        return true;
     }
     float kABV0f = kVert2.y * kHalfABV.m_kPlane.m_kNormal.y + kVert2.x * kHalfABV.m_kPlane.m_kNormal.x +
         kVert2.z * kHalfABV.m_kPlane.m_kNormal.z;
     float kABV0g = kABV0f - kHalfABV.m_kPlane.m_fConstant;
     double v11 = kABV0g;
     if (kABV0g >= 0.0f) {
-        return 1;
+        return true;
     }
     float v15 = kV1.x - kV0.x;
     float v16 = kV1.y - kV0.y;
@@ -590,7 +590,7 @@ bool NiHalfSpaceBV::HalfSpaceTriTestIntersect(
     float kABV0a =
         kHalfABV.m_kPlane.m_kNormal.y * v16 + kHalfABV.m_kPlane.m_kNormal.x * v15 + kHalfABV.m_kPlane.m_kNormal.z * v17;
     if (kABV0a <= 0.0f) {
-        return 0;
+        return false;
     }
     float kABV0h = kABV0a * -fTime;
     bool v12 = !(kABV0h >= v8);
@@ -755,7 +755,7 @@ bool NiHalfSpaceBV::HalfSpaceTriFindIntersect(
             kNormal0.y = y;
             kNormal0.z = z;
         }
-        return 1;
+        return true;
     }
     float kABV0c = kVert1.y * kHalfABV.m_kPlane.m_kNormal.y + kHalfABV.m_kPlane.m_kNormal.x * kVert1.x +
         kVert1.z * kHalfABV.m_kPlane.m_kNormal.z;
@@ -782,9 +782,9 @@ bool NiHalfSpaceBV::HalfSpaceTriFindIntersect(
                 float v25 = dst.z;
                 kNormal0.y = v23;
                 kNormal0.z = v25;
-                return 1;
+                return true;
             }
-            return 1;
+            return true;
         }
         dst.x = kV1.x - kV0.x;
         dst.y = kV1.y - kV0.y;
@@ -793,12 +793,12 @@ bool NiHalfSpaceBV::HalfSpaceTriFindIntersect(
             kHalfABV.m_kPlane.m_kNormal.z * dst.z;
         double v26 = kABV0g;
         if (kABV0g <= 0.0f) {
-            return 0;
+            return false;
         }
         float kABV0h = -fTime * v26;
         double v27 = kABV0h;
         if (!(kABV0h <= v13) && (!(v27 <= v18) && !(v27 <= v22))) {
-            return 0;
+            return false;
         }
         if (!(v13 >= v18)) {
             if (v22 <= v18) {
@@ -833,7 +833,7 @@ bool NiHalfSpaceBV::HalfSpaceTriFindIntersect(
             kNormal0.y = v29;
             kNormal0.z = v31;
         }
-        return 1;
+        return true;
     }
     fIntrTime = 0.0f;
     kIntrPt = kVert1;
@@ -849,5 +849,5 @@ bool NiHalfSpaceBV::HalfSpaceTriFindIntersect(
         kNormal0.y = v19;
         kNormal0.z = v21;
     }
-    return 1;
+    return true;
 }

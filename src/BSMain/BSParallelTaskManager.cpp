@@ -17,7 +17,7 @@ BSParallelTaskManager::BSParallelTaskManager()
         void* pMemory = MemoryManager_Singleton.Allocate(sizeof(BSParallelTaskThread));
         pThreads[i] = pMemory ? new (pMemory) BSParallelTaskThread(this) : nullptr;
         BSsprintf(acName, 260, "Parallel Task Thread %i", aiThread[i]);
-        pThreads[i]->Initialize(BSThread::MEDIUM_STACK_SIZE, acName, 0);
+        pThreads[i]->Initialize(BSThread::MEDIUM_STACK_SIZE, acName, false);
         pThreads[i]->SetName(acName);
         pThreads[i]->SetThreadProcessor(aiThread[i]);
         pThreads[i]->SetThreadPriority(15);

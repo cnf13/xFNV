@@ -91,7 +91,7 @@ float NiSign(float fValue) {
             return (float)0.0;
         }
         else {
-            return (float)(-0x1p+0f);
+            return (-0x1p+0f);
         }
     }
 }
@@ -163,7 +163,7 @@ WaterTargetEntry* WaterTargetEntry::GetNextEntry() {
         return static_cast<WaterTargetEntry*>(pnext);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -294,8 +294,8 @@ bool TESWaterListener::contactPointAddedCallback(hkpRootCdPoint& CPoint) {
                     TESWaterForm* v8 = v15->GetWaterType();
                     TESWaterSystem::SetCurrentWaterType(v8);
                 }
-                WaterZone* apZone = static_cast<WaterZone*>(AddZoneTargetPair(CPoint, arg0a, apActor, 0, 0));
-                apActor->SetInZone(apZone, 1);
+                WaterZone* apZone = static_cast<WaterZone*>(AddZoneTargetPair(CPoint, arg0a, apActor, 0, false));
+                apActor->SetInZone(apZone, true);
                 if (AILinearTaskThreadManager::ShouldQueue3DTask() && TaskQueueInterface::GetInstance()) {
                     TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
                     Instance->QueueWaterObjectForAdd(arg0a, apActor, 0.0);
@@ -304,15 +304,15 @@ bool TESWaterListener::contactPointAddedCallback(hkpRootCdPoint& CPoint) {
                     TESWaterSystem* WaterSystem = TES::pInstance->GetWaterSystem();
                     WaterSystem->AddTESObjectToWaterGroup(arg0a, apActor, 0.0);
                 }
-                HandleQueuedRemovals(apActor, 0, 1);
-                return 1;
+                HandleQueuedRemovals(apActor, false, true);
+                return true;
             }
             else {
-                return 0;
+                return false;
             }
         }
         else {
-            return 0;
+            return false;
         }
     }
     else {
@@ -325,22 +325,22 @@ bool TESWaterListener::contactPointAddedCallback(hkpRootCdPoint& CPoint) {
                 if (bAutoWaterUsesHavokShapes.Bool() || !pPlaceableWater->IsAutomaticWater()) {
                     const NiPoint3* v5 = &CollidableRef_0->GetLocationOnReference();
                     TESWaterSystem::SetCameraRelevantWaterHeight(v5->z);
-                    TESWaterSystem::SetPlayerForceUnderwater(1);
-                    TESWaterSystem::SetCameraInPlaceableWater(1);
+                    TESWaterSystem::SetPlayerForceUnderwater(true);
+                    TESWaterSystem::SetCameraInPlaceableWater(true);
                     TESWaterForm* v6 = pPlaceableWater->GetWaterType();
                     TESWaterSystem::SetCurrentWaterType(v6);
-                    return 1;
+                    return true;
                 }
                 else {
-                    return 0;
+                    return false;
                 }
             }
             else {
-                return 0;
+                return false;
             }
         }
         else {
-            return 0;
+            return false;
         }
     }
 }
@@ -444,10 +444,10 @@ bhkRigidBody* TESWaterListener::GetRB(hkpEntity* apEntity) {
     bhkEntity* pe = bhkEntity::Getbhk(apEntity);
     bhkRigidBody* pb = static_cast<bhkRigidBody*>(NiObject::DynamicCastStatic(&bhkRigidBody::ms_RTTI, pe));
     if (pb->GetMotionType() == 5) {
-        return 0;
+        return nullptr;
     }
     if (!pb) {
-        return 0;
+        return nullptr;
     }
     CFilter* CollisionFilter = pb->GetCollisionFilter(&a2);
     switch (CollisionFilter->GetLayer()) {
@@ -463,7 +463,7 @@ bhkRigidBody* TESWaterListener::GetRB(hkpEntity* apEntity) {
             break;
         }
         default: {
-            return 0;
+            return nullptr;
         }
     }
     return pb;
@@ -498,10 +498,10 @@ ZoneEntry* TESWaterListener::CreateZoneEntry(TESObjectREFR* apRef, const hkpColl
         v5 = ::new (apMemory) WaterZone(apRef, apCol);
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     TESWaterSystem* WaterSystem = TES::pInstance->GetWaterSystem();
-    v5->pGroup = WaterSystem->FindWaterGroup(apRef, 0, 0.0);
+    v5->pGroup = WaterSystem->FindWaterGroup(apRef, nullptr, 0.0);
     return v5;
 }
 
@@ -604,7 +604,7 @@ double TESWaterListener::GetWaterHeightForCoord(int32_t aiX, int32_t aiY) {
     int32_t v3;
     uint32_t v7 = (uint32_t)(aiX + (((int32_t)uiCellArrayWidth) * aiY));
     if (v7 >= ((uint32_t)(((int32_t)uiCellArrayWidth) * ((int32_t)uiCellArrayWidth)))) {
-        return (float)(-0x1.fffffe0000000p+127f);
+        return (-0x1.fffffe0000000p+127f);
     }
     else {
         v3 = aiX + (((int32_t)uiCellArrayWidth) * aiY);
@@ -895,7 +895,7 @@ void TESWaterListener::RemoveWaterZoneForReference(TESObjectREFR* apWaterRef) {
             TESObjectREFR* pref = pentry->pRef;
             if (pref) {
                 while ((&pref->m_Extra)->GetInWaterZone(pzone)) {
-                    (&pref->m_Extra)->SetInWaterZone(pzone, 0);
+                    (&pref->m_Extra)->SetInWaterZone(pzone, false);
                 }
             }
         }

@@ -242,7 +242,7 @@ void NiStencilProperty::_SDMShutdown() {
 NiObject* NiStencilProperty::CreateObject() {
     NiStencilProperty* pkObject = static_cast<NiStencilProperty*>(NiMemObject::operator new(sizeof(NiStencilProperty)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiStencilProperty;
 }

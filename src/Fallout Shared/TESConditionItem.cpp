@@ -208,7 +208,7 @@ float TESConditionItem::GetComparisonValue() {
     float v3 = (float)0.0;
     if (GetValueIsGlobal()) {
         if (Data.uComparisonValue.pGlobal) {
-            return (float)Data.uComparisonValue.pGlobal->TESGlobal::GetValue();
+            return Data.uComparisonValue.pGlobal->TESGlobal::GetValue();
         }
     }
     else {

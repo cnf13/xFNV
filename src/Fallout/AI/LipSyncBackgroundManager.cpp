@@ -22,14 +22,15 @@ LipTask::~LipTask() {}
 
 void LipTask::Run() {
     AutoMemContext apMemory(
-        MEM_CONTEXT_DIALOGUE, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Ai\\LipSyncBackgroundManager.cpp", 21
+        MEM_CONTEXT_DIALOGUE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Ai\\LipSyncBackgroundManager.cpp",
+        21
     );
     BSFile* apFile = GetFile(ARCHIVE_TYPE_INDEX_VOICES, ARCHIVE_TYPE_VOICES);
     if (!apFile) {
         BaseProcess* CurrentAIProcess = pActor->pCurrentProcess;
-        CurrentAIProcess->SetWaitingforLipFile(0);
+        CurrentAIProcess->SetWaitingforLipFile(false);
         BaseProcess* v1 = pActor->pCurrentProcess;
-        v1->SetLipFileFailed(1);
+        v1->SetLipFileFailed(true);
     }
     pLipSynicAnim = LipSynchAnim::LoadFromFile(apFile);
 }
@@ -42,10 +43,10 @@ void LipTask::Finish() {
         currentAIProcess = pActor->MobileObject::GetCurrentAIProcess();
         currentAIProcess->SetLipAnim(pLipSynicAnim);
         v2 = pActor->MobileObject::GetCurrentAIProcess();
-        v2->SetWaitingforLipFile((bool)0);
+        v2->SetWaitingforLipFile(false);
         if (!pLipSynicAnim) {
             v1 = pActor->MobileObject::GetCurrentAIProcess();
-            v1->SetLipFileFailed((bool)1);
+            v1->SetLipFileFailed(true);
         }
     }
     pOwner->RemoveTask(pActor);
@@ -76,7 +77,7 @@ LipSyncBackgroundManager::~LipSyncBackgroundManager() {
         NiPointer<LipTask> sptask(nullptr);
         if (LipMap.GetNext(iterator, pactor, sptask, true)) {
             RemoveTask(pactor);
-            pIOManager->CancelTask(sptask.m_pObject, 0);
+            pIOManager->CancelTask(sptask.m_pObject, nullptr);
         }
     }
 }
@@ -87,11 +88,11 @@ void LipSyncBackgroundManager::RemoveTask(MobileObject* apActor) {
 
 void LipSyncBackgroundManager::CancelLipFile(MobileObject* apActor) {
     FNVD_INLINED_LOCAL(NiPointer<LipTask>, sptask, std::nullopt, std::nullopt);
-    ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
+    ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
     if (LipMap.GetAt(apActor, sptask)) {
         RemoveTask(apActor);
         LipTask* v2 = sptask.m_pObject;
-        pIOManager->CancelTask(v2, 0);
+        pIOManager->CancelTask(v2, nullptr);
     }
     sptask.~NiPointer<LipTask>();
 }
@@ -100,7 +101,8 @@ void LipSyncBackgroundManager::BuildLipSynicFile(MobileObject* apActor, const ch
     LipTask* pnewtask;
     FNVD_INLINED_LOCAL(NiPointer<LipTask>, v6, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_DIALOGUE, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Ai\\LipSyncBackgroundManager.cpp", 97
+        MEM_CONTEXT_DIALOGUE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Ai\\LipSyncBackgroundManager.cpp",
+        97
     );
     CancelLipFile(apActor);
     LipTask* v7 = static_cast<LipTask*>(ourMalloc(sizeof(LipTask)));
@@ -108,12 +110,12 @@ void LipSyncBackgroundManager::BuildLipSynicFile(MobileObject* apActor, const ch
         pnewtask = ::new (v7) LipTask(this, apActor, apFilename);
     }
     else {
-        pnewtask = 0;
+        pnewtask = nullptr;
     }
     ::new (static_cast<void*>(&v6)) NiPointer<QueuedFile>(static_cast<QueuedFile*>(pnewtask));
-    bool bresult = LipMap.SetAt(apActor, v6, 0);
+    bool bresult = LipMap.SetAt(apActor, v6, false);
     v6.~NiPointer<LipTask>();
     BaseProcess* pProcess = apActor->pCurrentProcess;
-    pProcess->SetLipFileFailed(0);
+    pProcess->SetLipFileFailed(false);
     pIOManager->AddTask(pnewtask);
 }

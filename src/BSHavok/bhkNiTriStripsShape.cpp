@@ -658,10 +658,10 @@ bool bhkNiTriStripsShape::GetSubMaterialVarType(uint32_t aiKey, MATERIAL_VARIANT
     hkNiTriStripsShape* phkObject;
     hkNiTriStripsData* v5;
     NiGeometryData* m_pObject;
-    if (aiKey == ((-1))) {
+    if (aiKey == (-1)) {
         return ((((int32_t)aeType) & ((int32_t)eMaterial)) != 0);
     }
-    if (this && ((phkObject = static_cast<hkNiTriStripsShape*>(this->phkObject)) != 0)) {
+    if (this && ((phkObject = static_cast<hkNiTriStripsShape*>(this->phkObject)) != nullptr)) {
         v5 = &phkObject->pShapesA.m_pBase[aiKey >> 20];
     }
     else {

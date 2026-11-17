@@ -127,7 +127,7 @@ void NiGeometryData::LoadBinary(NiStream& kStream) {
     else {
         uiID = 4;
         v13->m_uiAbsoluteCurrentPos += v14(v13, &this->m_pkVertex, 4, &uiID, 1);
-        bHasVertex = this->m_pkVertex != 0;
+        bHasVertex = this->m_pkVertex != nullptr;
     }
     if (bHasVertex) {
         NiObjectGroup* v15 = GetGroup();
@@ -179,7 +179,7 @@ void NiGeometryData::LoadBinary(NiStream& kStream) {
         uiID = 4;
         v25->m_uiAbsoluteCurrentPos += v26(v25, &this->m_pkNormal, 4, &uiID, 1);
         v22 = v69;
-        bHasNormal = this->m_pkNormal != 0;
+        bHasNormal = this->m_pkNormal != nullptr;
     }
     if (bHasNormal) {
         if (GetGroup()) {
@@ -214,7 +214,7 @@ void NiGeometryData::LoadBinary(NiStream& kStream) {
         NiBinaryStream::NIBINARYSTREAMREADFN v32 = v31->m_pfnRead;
         uiID = 4;
         v31->m_uiAbsoluteCurrentPos += v32(v31, &this->m_pkColor, 4, &uiID, 1);
-        bHasColor = this->m_pkColor != 0;
+        bHasColor = this->m_pkColor != nullptr;
     }
     if (bHasColor) {
         if (GetGroup()) {
@@ -237,7 +237,7 @@ void NiGeometryData::LoadBinary(NiStream& kStream) {
                 );
             }
             else {
-                v40 = 0;
+                v40 = nullptr;
             }
             this->m_pkColor = v40;
         }
@@ -374,7 +374,7 @@ void NiGeometryData::SaveBinary(NiStream& kStream) {
     v12->m_uiAbsoluteCurrentPos += v13(v12, &m_ucCompressFlags, 1, &uiValue, 1);
     NiBinaryStream* v14 = v2->Ostr();
     // Only the low byte of bHasVertex is written out.
-    bHasVertex = this->m_pkVertex != 0;
+    bHasVertex = this->m_pkVertex != nullptr;
     NiBinaryStream::NIBINARYSTREAMWRITEFN v15 = v14->m_pfnWrite;
     uiValue = 1;
     v14->m_uiAbsoluteCurrentPos += v15(v14, &bHasVertex, 1, &uiValue, 1);
@@ -401,7 +401,7 @@ void NiGeometryData::SaveBinary(NiStream& kStream) {
         uiValue = 3 * v20;
     }
     NiBinaryStream* v21 = v2->Ostr();
-    bHasNormals = this->m_pkNormal != 0;
+    bHasNormals = this->m_pkNormal != nullptr;
     NiBinaryStream::NIBINARYSTREAMWRITEFN v22 = v21->m_pfnWrite;
     uiSize = 1;
     v21->m_uiAbsoluteCurrentPos += v22(v21, &bHasNormals, 1, &uiSize, 1);
@@ -414,7 +414,7 @@ void NiGeometryData::SaveBinary(NiStream& kStream) {
     }
     m_kBound.SaveBinary(*v2);
     NiBinaryStream* v25 = v2->Ostr();
-    bHasColor = this->m_pkColor != 0;
+    bHasColor = this->m_pkColor != nullptr;
     NiBinaryStream::NIBINARYSTREAMWRITEFN v26 = v25->m_pfnWrite;
     uiSize = 1;
     v25->m_uiAbsoluteCurrentPos += v26(v25, &bHasColor, 1, &uiSize, 1);
@@ -687,9 +687,9 @@ bool NiGeometryData::ContainsVertexData(NiShaderDeclaration::ShaderParameter ePa
         return true;
     }
     switch (eParameter) {
-        case NiShaderDeclaration::SHADERPARAM_NI_POSITION: return m_pkVertex != 0;
-        case NiShaderDeclaration::SHADERPARAM_NI_NORMAL: return m_pkNormal != 0;
-        case NiShaderDeclaration::SHADERPARAM_NI_COLOR: return m_pkColor != 0;
+        case NiShaderDeclaration::SHADERPARAM_NI_POSITION: return m_pkVertex != nullptr;
+        case NiShaderDeclaration::SHADERPARAM_NI_NORMAL: return m_pkNormal != nullptr;
+        case NiShaderDeclaration::SHADERPARAM_NI_COLOR: return m_pkColor != nullptr;
         case NiShaderDeclaration::SHADERPARAM_NI_TEXCOORD0:
             return m_pkTexture && static_cast<uint8_t>(m_usDataFlags & NiGeometryData::VERTEX_MASK) >= 1;
         case NiShaderDeclaration::SHADERPARAM_NI_TEXCOORD1:
@@ -735,7 +735,7 @@ void NiGeometryData::GetVerticesIterator(NiGeometryDataIteratorNiPoint3& arItera
         uint32_t uiStride = 0;
         ausCount[0] = 0;
         ausCount[1] = 0;
-        uint8_t* pucData = 0;
+        uint8_t* pucData = nullptr;
         if (!pkAGD) {
             goto LABEL_6;
         }
@@ -749,12 +749,12 @@ void NiGeometryData::GetVerticesIterator(NiGeometryDataIteratorNiPoint3& arItera
             uint32_t v5 = uiStride;
             arIterator.m_pvCurrentPosition = (void*)pucData;
             arIterator.m_iStride = v5;
-            arIterator.m_bCompressed = 0;
+            arIterator.m_bCompressed = false;
         }
         else {
         LABEL_6:;
             NiPoint3* m_pkVertex = this->m_pkVertex;
-            arIterator.m_bCompressed = 0;
+            arIterator.m_bCompressed = false;
             arIterator.m_pvCurrentPosition = (void*)m_pkVertex;
             arIterator.m_iStride = 12;
         }
@@ -769,7 +769,7 @@ void NiGeometryData::GetNormalsIterator(NiGeometryDataIteratorNiPoint3& arIterat
         uint32_t uiStride = 0;
         ausCount[0] = 0;
         ausCount[1] = 0;
-        uint8_t* pucData = 0;
+        uint8_t* pucData = nullptr;
         if (!pkAGD) {
             goto LABEL_6;
         }
@@ -788,12 +788,12 @@ void NiGeometryData::GetNormalsIterator(NiGeometryDataIteratorNiPoint3& arIterat
             uint32_t v5 = uiStride;
             arIterator.m_pvCurrentPosition = (void*)pucData;
             arIterator.m_iStride = v5;
-            arIterator.m_bCompressed = 0;
+            arIterator.m_bCompressed = false;
         }
         else {
         LABEL_6:;
             NiPoint3* m_pkNormal = this->m_pkNormal;
-            arIterator.m_bCompressed = 0;
+            arIterator.m_bCompressed = false;
             arIterator.m_pvCurrentPosition = (void*)m_pkNormal;
             arIterator.m_iStride = 12;
         }
@@ -809,7 +809,7 @@ void NiGeometryData::GetTextureSetIterator(uint16_t usSet, NiGeometryDataIterato
         uint32_t uiStride = 0;
         ausCount[0] = 0;
         ausCount[1] = 0;
-        uint8_t* pucData = 0;
+        uint8_t* pucData = nullptr;
         if (!pkAGD) {
             goto LABEL_6;
         }
@@ -829,12 +829,12 @@ void NiGeometryData::GetTextureSetIterator(uint16_t usSet, NiGeometryDataIterato
             uint32_t v7 = uiStride;
             arIterator.m_pvCurrentPosition = (void*)pucData;
             arIterator.m_iStride = v7;
-            arIterator.m_bCompressed = 0;
+            arIterator.m_bCompressed = false;
         }
         else {
         LABEL_6:;
             NiPoint2* m_pkTexture = this->m_pkTexture;
-            arIterator.m_bCompressed = 0;
+            arIterator.m_bCompressed = false;
             arIterator.m_pvCurrentPosition = (void*)m_pkTexture;
             arIterator.m_iStride = 8;
         }
@@ -849,7 +849,7 @@ void NiGeometryData::GetBlendWeightsIterator(NiGeometryDataIteratorNiBlendWeight
         uint32_t uiStride = 0;
         ausCount[0] = 0;
         ausCount[1] = 0;
-        uint8_t* pucData = 0;
+        uint8_t* pucData = nullptr;
         // Tests BSPackedAdditionalGeometryData's flags on any additional data whose VB is ready: only the packed class
         // reports a ready VB.
         if (pkAGD && pkAGD->GetVBReady() &&
@@ -862,7 +862,7 @@ void NiGeometryData::GetBlendWeightsIterator(NiGeometryDataIteratorNiBlendWeight
         }
         arIterator.m_pvCurrentPosition = (void*)pucData;
         arIterator.m_iStride = uiStride;
-        arIterator.m_bCompressed = 0;
+        arIterator.m_bCompressed = false;
     }
 }
 
@@ -874,7 +874,7 @@ void NiGeometryData::GetBlendIndicesIterator(NiGeometryDataIteratorNiBlendIndice
         uint32_t uiStride = 0;
         ausCount[0] = 0;
         ausCount[1] = 0;
-        uint8_t* pucData = 0;
+        uint8_t* pucData = nullptr;
         // Only the packed data answers GetVBReady with true; only skinned packed data has blend indices.
         if (pkAGD && pkAGD->GetVBReady() &&
             (static_cast<BSPackedAdditionalGeometryData*>(pkAGD)->m_uiShaderDeclarationIndex &
@@ -887,7 +887,7 @@ void NiGeometryData::GetBlendIndicesIterator(NiGeometryDataIteratorNiBlendIndice
         uint32_t v3 = uiStride;
         arIterator.m_pvCurrentPosition = (void*)pucData;
         arIterator.m_iStride = v3;
-        arIterator.m_bCompressed = 0;
+        arIterator.m_bCompressed = false;
     }
 }
 
@@ -1025,7 +1025,7 @@ void NiGeometryData::CreateNormals(bool bInitialize) {
         m_pkNormal = static_cast<NiPoint3*>((&MemoryManager_Singleton)
                                                 ->Allocate(
                                                     (((12 * ((uint64_t)(v3 * ((uint32_t)m_usVertices)))) >> 32) != 0)
-                                                        ? ((-1))
+                                                        ? (-1)
                                                         : (12 * (v3 * m_usVertices))
                                                 ));
     }
@@ -1052,7 +1052,7 @@ void NiGeometryData::StoreNormalBinormalTangent(DataFlags eNBTMethod) {
         static_cast<NiPoint3*>((&MemoryManager_Singleton)
                                    ->Allocate(
                                        (((12 * ((uint64_t)(uiFactor * ((uint32_t)m_usVertices)))) >> 32) != 0)
-                                           ? ((-1))
+                                           ? (-1)
                                            : (12 * (uiFactor * m_usVertices))
                                    ));
     for (uint32_t uiIndex = 0; uiIndex < m_usVertices; ++uiIndex) {
@@ -1179,11 +1179,11 @@ void NiGeometryData::IndexQSort(uint16_t* pusIndex, int32_t mask, int32_t l, int
     int32_t v5 = l;
     int32_t v7 = r;
     if (r > l) {
-        while (1) {
+        while (true) {
             int32_t v9 = v5 - 1;
             int32_t v10 = v7 + 1;
             uint16_t pusIndexa = ChoosePivot(pusIndex, mask, v5, v7);
-            while (1) {
+            while (true) {
                 uint16_t v11;
                 uint16_t v12;
                 do {
@@ -1241,7 +1241,7 @@ void NiGeometryData::GetColorsIterator(NiGeometryDataIteratorNiColorA& arIterato
         uint32_t uiStride = 0;
         ausCount[0] = 0;
         ausCount[1] = 0;
-        uint8_t* pucData = 0;
+        uint8_t* pucData = nullptr;
         if (!pkAGD) {
             goto LABEL_7;
         }
@@ -1278,7 +1278,7 @@ void NiGeometryData::GetColorsIterator(NiGeometryDataIteratorNiColorA& arIterato
 void NiGeometryData::ClearNormals() {
     if (m_pkNormal) {
         MemoryManager_Singleton.Deallocate(m_pkNormal);
-        m_pkNormal = 0;
+        m_pkNormal = nullptr;
     }
 }
 

@@ -27,7 +27,7 @@ ImageSpaceTexture& ImageSpaceTexture::operator=(ImageSpaceTexture& aTex) {
         }
     }
     eFilterMode = aTex.eFilterMode;
-    aTex.bIsTextureBorrowed = 0;
+    aTex.bIsTextureBorrowed = false;
     return *this;
 }
 

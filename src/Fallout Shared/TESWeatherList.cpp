@@ -60,12 +60,12 @@ TESWeather* TESWeatherList::GetRandomWeather() {
         }
     }
     if (!uiSum) {
-        return 0;
+        return nullptr;
     }
     uint32_t uiRand = Random() % uiSum;
     uint32_t uiLow = 0;
     uint32_t uiHigh = -1;
-    WeatherEntry* pEntry = 0;
+    WeatherEntry* pEntry = nullptr;
     for (BSSimpleList<WeatherEntry*>* pCurrentNode_2 = this; pCurrentNode_2;
          pCurrentNode_2 = pCurrentNode_2->m_pkNext) {
         pEntry = pCurrentNode_2->m_item;
@@ -84,7 +84,7 @@ TESWeather* TESWeatherList::GetRandomWeather() {
         return pEntry->pWeather;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -145,26 +145,26 @@ void TESWeatherList::FlushList() {
 
 bool TESWeatherList::CompareComponent(TESWeatherList* apCompareWL) {
     if (!apCompareWL) {
-        return 1;
+        return true;
     }
     if (IsEmpty() && apCompareWL->IsEmpty()) {
-        return 0;
+        return false;
     }
     int32_t v3 = ItemsInList();
     if (v3 != apCompareWL->ItemsInList()) {
-        return 1;
+        return true;
     }
     for (BSSimpleList<WeatherEntry*>* pThisNode = this; pThisNode; pThisNode = pThisNode->m_pkNext) {
-        bool bFound = 0;
+        bool bFound = false;
         for (BSSimpleList<WeatherEntry*>* pCompNode = apCompareWL; !bFound && pCompNode;
              pCompNode = pCompNode->m_pkNext) {
             bFound = std::memcmp(pThisNode->m_item, pCompNode->m_item, sizeof(WeatherEntry)) == 0;
         }
         if (!bFound) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 int32_t TESWeatherList::SortCompare(WeatherEntry* p1, WeatherEntry* p2) {

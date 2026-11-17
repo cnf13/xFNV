@@ -27,7 +27,7 @@ NiObject* NiPSysEmitterSpeedCtlr::CreateClone(NiCloningProcess& kCloning) {
     }
     else {
         NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-        return 0;
+        return nullptr;
     }
 }
 
@@ -79,7 +79,7 @@ NiObject* NiPSysEmitterSpeedCtlr::CreateObject() {
     NiPSysEmitterSpeedCtlr* v0 =
         static_cast<NiPSysEmitterSpeedCtlr*>(NiMemObject::operator new(sizeof(NiPSysEmitterSpeedCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysEmitterSpeedCtlr;
 }

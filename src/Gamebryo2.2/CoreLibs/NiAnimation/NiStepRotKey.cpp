@@ -17,7 +17,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 bool NiStepRotKey::Insert(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNumKeys) {
     NiAnimationKey* pkOldKeys = pkKeys;

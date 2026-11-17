@@ -4,7 +4,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 PathingSpline::PathingSpline() : Key1(), Key2() {}
 
@@ -123,7 +123,7 @@ bool PathingSpline::FindPointOnSpline(
         if (v20) {
             *apfReturnParameter = v22;
             *apReturnPoint = pt;
-            return 1;
+            return true;
         }
         else {
             if (abForward) {
@@ -134,13 +134,13 @@ bool PathingSpline::FindPointOnSpline(
                 *apfReturnParameter = 0.0;
                 *apReturnPoint = Key1.Location;
             }
-            return 0;
+            return false;
         }
     }
     else {
         NiPoint3* v7 = &(v15 = Interpolate(afStartParameter));
         *apReturnPoint = *v7;
         *apfReturnParameter = afStartParameter;
-        return 1;
+        return true;
     }
 }

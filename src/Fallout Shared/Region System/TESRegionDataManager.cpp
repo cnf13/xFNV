@@ -17,7 +17,7 @@
 TESRegionDataManager::TESRegionDataManager() : pLastLoadedRegion(nullptr) {}
 
 TESRegionData* TESRegionDataManager::ConstructRegionData(REGION_DATA_ID aType) {
-    TESRegionData* v15 = 0;
+    TESRegionData* v15 = nullptr;
     switch (aType) {
         case REGION_DATA_WEATHER_ID: {
             TESRegionDataWeather* v8;
@@ -27,7 +27,7 @@ TESRegionData* TESRegionDataManager::ConstructRegionData(REGION_DATA_ID aType) {
                 v8 = ::new (apMemory) TESRegionDataWeather;
             }
             else {
-                v8 = 0;
+                v8 = nullptr;
             }
             v15 = v8;
             break;
@@ -39,7 +39,7 @@ TESRegionData* TESRegionDataManager::ConstructRegionData(REGION_DATA_ID aType) {
                 TESRegionDataMap_ = ::new (v13) TESRegionDataMap;
             }
             else {
-                TESRegionDataMap_ = 0;
+                TESRegionDataMap_ = nullptr;
             }
             v15 = TESRegionDataMap_;
             break;
@@ -52,7 +52,7 @@ TESRegionData* TESRegionDataManager::ConstructRegionData(REGION_DATA_ID aType) {
                 TESRegionDataLandscape_ = ::new (v12) TESRegionDataLandscape;
             }
             else {
-                TESRegionDataLandscape_ = 0;
+                TESRegionDataLandscape_ = nullptr;
             }
             v15 = TESRegionDataLandscape_;
             break;
@@ -64,7 +64,7 @@ TESRegionData* TESRegionDataManager::ConstructRegionData(REGION_DATA_ID aType) {
                 TESRegionDataGrass_ = ::new (v11) TESRegionDataGrass;
             }
             else {
-                TESRegionDataGrass_ = 0;
+                TESRegionDataGrass_ = nullptr;
             }
             v15 = TESRegionDataGrass_;
             break;
@@ -76,7 +76,7 @@ TESRegionData* TESRegionDataManager::ConstructRegionData(REGION_DATA_ID aType) {
                 TESRegionDataSound_ = ::new (v10) TESRegionDataSound;
             }
             else {
-                TESRegionDataSound_ = 0;
+                TESRegionDataSound_ = nullptr;
             }
             v15 = TESRegionDataSound_;
             break;
@@ -88,7 +88,7 @@ TESRegionData* TESRegionDataManager::ConstructRegionData(REGION_DATA_ID aType) {
                 TESRegionDataImposter_ = ::new (v9) TESRegionDataImposter;
             }
             else {
-                TESRegionDataImposter_ = 0;
+                TESRegionDataImposter_ = nullptr;
             }
             v15 = TESRegionDataImposter_;
             break;
@@ -152,7 +152,7 @@ TESRegionDataImposter* TESRegionDataManager::IsRegionDataImposter(TESRegionData*
 bool TESRegionDataManager::LoadRegionData(TESFile* apFile, TESRegion* apRegion) {
     REGION_DATA_BASE data;
     if (!apFile || !apRegion) {
-        return 0;
+        return false;
     }
     pLastLoadedRegion = apRegion;
     CHUNK_ID TESChunk = apFile->GetTESChunk();
@@ -178,14 +178,14 @@ bool TESRegionDataManager::LoadRegionData(TESFile* apFile, TESRegion* apRegion) 
                     }
                 }
             }
-            return 1;
+            return true;
         }
         if (TESChunk == RDGS_ID) {
             TESRegionDataGrass* pRegDataGrass = IsRegionDataGrass(pRegData);
             if (pRegDataGrass) {
                 pRegDataGrass->LoadRegionDataGrass(apFile);
             }
-            return 1;
+            return true;
         }
         if (TESChunk != ICON_ID) {
             if (TESChunk == RDMP_ID) {
@@ -194,7 +194,7 @@ bool TESRegionDataManager::LoadRegionData(TESFile* apFile, TESRegion* apRegion) 
                     pRegDataMap->LoadRegionDataMap(apFile);
                 }
             }
-            return 1;
+            return true;
         }
         goto LABEL_39;
     }
@@ -204,11 +204,11 @@ bool TESRegionDataManager::LoadRegionData(TESFile* apFile, TESRegion* apRegion) 
         if (pRegDataLandscape) {
             pRegDataLandscape->LoadRegionDataLandscape(apFile);
         }
-        return 1;
+        return true;
     }
     if (TESChunk > RDMD_ID) {
         if (TESChunk != RDSD_ID && TESChunk != RDSI_ID) {
-            return 1;
+            return true;
         }
         goto LABEL_36;
     }
@@ -218,7 +218,7 @@ bool TESRegionDataManager::LoadRegionData(TESFile* apFile, TESRegion* apRegion) 
         if (pRegDataSound) {
             pRegDataSound->LoadRegionDataSound(apFile);
         }
-        return 1;
+        return true;
     }
     if (TESChunk == RDID_ID) {
         TESRegionDataImposter* pRegDataImposter = IsRegionDataImposter(pRegData);
@@ -226,5 +226,5 @@ bool TESRegionDataManager::LoadRegionData(TESFile* apFile, TESRegion* apRegion) 
             pRegDataImposter->LoadRegionDataImposter(apFile);
         }
     }
-    return 1;
+    return true;
 }

@@ -28,7 +28,7 @@
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DVertexShader.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 using NiTStringTemplateMapBuildStorage =
     NiTStringTemplateMap<NiTPointerMap<const char*, Tile::BuildStorage*>, Tile::BuildStorage*>;

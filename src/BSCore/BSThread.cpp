@@ -57,7 +57,7 @@ bool BSThread::QIsThreadActive() {
 
 void BSThread::Close() {
     if (m_ThreadHandle) {
-        bThreadIsActive = 0;
+        bThreadIsActive = false;
         EnterCriticalSection(&CriticalSection.CriticalSection);
         delete m_ThreadHandle;
         m_ThreadHandle = nullptr;

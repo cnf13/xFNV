@@ -36,11 +36,12 @@ NiObject* NiBSplineColorInterpolator::CreateClone(NiCloningProcess& kCloning) {
     NiBSplineColorInterpolator* pkObject_2 = pkObject;
     if (pkObject) {
         ::new (pkObject) NiBSplineColorInterpolator(
-            static_cast<NiBSplineData*>(0), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(0)
+            static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE,
+            static_cast<NiBSplineBasisData*>(nullptr)
         );
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     NiBSplineInterpolator::CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_kColorAValue = m_kColorAValue;
@@ -134,9 +135,9 @@ NiObject* NiBSplineColorInterpolator::CreateObject() {
     NiBSplineColorInterpolator* pkObject =
         static_cast<NiBSplineColorInterpolator*>(NiMemObject::operator new(sizeof(NiBSplineColorInterpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiBSplineColorInterpolator(
-        static_cast<NiBSplineData*>(0), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(0)
+        static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
     );
 }

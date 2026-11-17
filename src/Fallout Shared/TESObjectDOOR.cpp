@@ -193,7 +193,7 @@ void TESObjectDOOR::InitItem() {
         BGSDestructibleObjectForm::InitItem(this);
         TESModelTextureSwap::InitItem(this);
         BSSimpleList<TESForm*>* plist = &RandomTeleports;
-        BSSimpleList<TESForm*>* plastlist = 0;
+        BSSimpleList<TESForm*>* plastlist = nullptr;
         while (plist && !plist->IsEmpty()) {
             uint32_t tempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(plist->m_item));
             TESFile* File = GetFile(-1);
@@ -221,7 +221,7 @@ void TESObjectDOOR::InitItem() {
                 }
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -249,35 +249,35 @@ void TESObjectDOOR::Copy(TESForm* apCopy) {
 bool TESObjectDOOR::Compare(TESForm* apCompare) {
     TESObjectDOOR* pcomp = dynamic_cast<TESObjectDOOR*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     if (pOpenSound != pcomp->pOpenSound) {
-        return 1;
+        return true;
     }
     if (pCloseSound != pcomp->pCloseSound) {
-        return 1;
+        return true;
     }
     if (pLoopSound != pcomp->pLoopSound) {
-        return 1;
+        return true;
     }
     if (this->TESObjectDOOR::cFlags != pcomp->TESObjectDOOR::cFlags) {
-        return 1;
+        return true;
     }
     BSSimpleList<TESForm*>* pcomplist = &pcomp->RandomTeleports;
     int32_t v3 = RandomTeleports.ItemsInList();
     if (v3 != pcomplist->ItemsInList()) {
-        return 1;
+        return true;
     }
     while (pcomplist && !pcomplist->IsEmpty()) {
         if (!RandomTeleports.IsInList(pcomplist->m_item)) {
-            return 1;
+            return true;
         }
         pcomplist = pcomplist->m_pkNext;
     }
-    return 0;
+    return false;
 }
 
 bool TESObjectDOOR::Activate(
@@ -298,7 +298,7 @@ bool TESObjectDOOR::Activate(
     bool bignorelock;
     PACKAGE_OBJECT_TYPE eUseItem;
     if (!apItemActivated || apItemActivated->GetDestroyed()) {
-        return 0;
+        return false;
     }
     DoorTeleportData* pTel = apItemActivated->GetTeleport();
     LockData* pLock = apItemActivated->GetLock();
@@ -306,13 +306,15 @@ bool TESObjectDOOR::Activate(
         TESObjectREFR* pteldoor = FindRandomTeleportTarget(apItemActivated, apActionRef);
         if (!pteldoor) {
             const char* v7 = gs_sRandomDoorTeleportFailureMessage.String();
-            Interface::ShowMessage(v7, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0);
-            return 0;
+            Interface::ShowMessage(
+                v7, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+            );
+            return false;
         }
         TESObjectDOOR::LinkRandomTeleportDoors(apItemActivated, pteldoor);
         pTel = apItemActivated->GetTeleport();
         if (!pTel) {
-            return 0;
+            return false;
         }
     }
     Actor* pActionActor = dynamic_cast<Actor*>(apActionRef);
@@ -320,23 +322,23 @@ bool TESObjectDOOR::Activate(
         pprocess = pActionActor->pCurrentProcess;
     }
     else {
-        pprocess = 0;
+        pprocess = nullptr;
     }
     if (!pActionActor) {
         goto LABEL_60;
     }
     pprocess_3 = pActionActor->pCurrentProcess;
     if (pprocess_3->GetCurrentFurniture() && pActionActor->GetSitSleepState()) {
-        return 0;
+        return false;
     }
     if (pActionActor == pPlayer) {
         pPlayer->iCombatPersue = 0;
     }
-    bignorelock = TESObjectDOOR::CanActorIgnoreLock(apItemActivated, pActionActor, 1, 1);
+    bignorelock = TESObjectDOOR::CanActorIgnoreLock(apItemActivated, pActionActor, true, true);
     if (!pLock || (!pLock->IsLocked() || bignorelock)) {
         goto LABEL_60;
     }
-    blockpick = 0;
+    blockpick = false;
     if (pActionActor->IsNpc()) {
         blockpick = pActionActor->HasObjects(pLockpick, POTYPE_NONE, 1, 0, eUseItem);
     }
@@ -353,28 +355,28 @@ bool TESObjectDOOR::Activate(
                     (pextralock->pLock->GetLockLevel(apItemActivated) == 5 || pextralock->pLock->IsBroken())) {
                     const char* v8 = sImpossibleLock.String();
                     Interface::ShowMessage(
-                        v8, 0, "Interface\\Icons\\Message Icons\\glow_message_padlock.dds", 0, 2.0f, 0
+                        v8, 0, "Interface\\Icons\\Message Icons\\glow_message_padlock.dds", nullptr, 2.0f, false
                     );
                     Interface::PlayMenuSound(18);
                 }
                 else {
-                    _ShowLockPickMenu(apItemActivated, 0, 0);
+                    _ShowLockPickMenu(apItemActivated, 0, false);
                 }
-                return 0;
+                return false;
             }
             if (!blockpick) {
-                return 0;
+                return false;
             }
             panim = pActionActor->GetAnimation();
             if (panim) {
-                panim->SpecialIdleFree(1, 0);
+                panim->SpecialIdleFree(true, false);
             }
             TESIdleManager::SetUsedItem(pLockpick);
-            TESIdleManager::SetUsedItemActivate(1);
+            TESIdleManager::SetUsedItemActivate(true);
             TESIdleManager::SetUsedItemLevel(1);
-            pprocess->SetupSpecialIdle(pActionActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
-            TESIdleManager::SetUsedItem(0);
-            TESIdleManager::SetUsedItemActivate(0);
+            pprocess->SetupSpecialIdle(pActionActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
+            TESIdleManager::SetUsedItem(nullptr);
+            TESIdleManager::SetUsedItemActivate(false);
             TESIdleManager::SetUsedItemLevel(-1);
             pextralock_2 = apItemActivated->GetExtraLock();
             if (pextralock_2) {
@@ -411,19 +413,19 @@ bool TESObjectDOOR::Activate(
                                 NiPoint3 v33 = apItemActivated->GetLocationOnReference();
                                 SoundHandle.SetPosition(v33.x, v33.y, v33.z);
                             }
-                            SoundHandle.Play(0);
+                            SoundHandle.Play(false);
                             if (pActionActor == pPlayer) {
                                 BSAudio* v15 = &BSAudio::QInstance();
                                 if (!v15->bMultiThread) {
                                     for (int32_t i = 0; i < 4; ++i) {
                                         BSAudio* v16 = &BSAudio::QInstance();
-                                        v16->Update(0);
+                                        v16->Update(false);
                                     }
                                 }
                             }
                         }
                     }
-                    static_cast<HighProcess*>(pprocess)->HighProcess::FadeOut(pActionActor, apItemActivated, 1);
+                    static_cast<HighProcess*>(pprocess)->HighProcess::FadeOut(pActionActor, apItemActivated, true);
                     return pActionActor == pPlayer;
                 }
                 TESObjectCELL* ptelcell = pTel->GetTeleportCell();
@@ -434,14 +436,14 @@ bool TESObjectDOOR::Activate(
                     if (!pPlayer->GetInterior()) {
                         pPlayer->pLastExtDoorActivated = apItemActivated;
                     }
-                    pPlayer->btransporting = 1;
+                    pPlayer->btransporting = true;
                     pPlayer->HaveFollowersRecheckPackages();
                     HandlePlayerTeleport(apItemActivated);
-                    pPlayer->btransporting = 0;
+                    pPlayer->btransporting = false;
                 }
                 else {
                     apActionRef->SetLocationOnReference(*&pTel->position);
-                    if (ptelcell && TES::pInstance->IsCellLoaded(ptelcell, 0)) {
+                    if (ptelcell && TES::pInstance->IsCellLoaded(ptelcell, false)) {
                         float* FollowUpInfoList = &(&pTel->rotation)->x;
                         apActionRef->SetAngleOnReferenceZ(FollowUpInfoList[2]);
                         apActionRef->SetAngleOnReferenceX(0.0f);
@@ -451,7 +453,7 @@ bool TESObjectDOOR::Activate(
                     }
                     Actor* pac = dynamic_cast<Actor*>(apActionRef);
                     if (pac) {
-                        pac->SetForceUpdateQuest(0);
+                        pac->SetForceUpdateQuest(false);
                     }
                     TESObjectREFR::MoveRefToNewSpace(apActionRef, ptelcell, ptelworld);
                 }
@@ -466,10 +468,10 @@ bool TESObjectDOOR::Activate(
                     BGSOpenCloseForm::HandleActivate(apItemActivated, apActionRef, this);
                 }
                 else {
-                    BGSOpenCloseForm::HandleActivate(apItemActivated, apActionRef, 0);
+                    BGSOpenCloseForm::HandleActivate(apItemActivated, apActionRef, nullptr);
                 }
             }
-            return 1;
+            return true;
         }
         if (pActionActor != pPlayer || pstaticdoor) {
             goto LABEL_60;
@@ -482,28 +484,28 @@ bool TESObjectDOOR::Activate(
         }
         BSAudio* v9 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v9->GetSoundHandleByName(&a1, "UILockpickingUnlock", 289u);
-        SoundHandleByName->Play(0);
+        SoundHandleByName->Play(false);
         BSsprintf(msg, 255, sOpenWithKey.String(), pLock->pKey->GetFullName());
-        Interface::ShowMessage(msg, 0, "Interface\\Icons\\Message Icons\\glow_message_key.dds", 0, 2.0f, 0);
-        pstaticdoor->Activate(pPlayer, 0, 0, 1);
-        pstaticdoor = 0;
-        return 1;
+        Interface::ShowMessage(msg, 0, "Interface\\Icons\\Message Icons\\glow_message_key.dds", nullptr, 2.0f, false);
+        pstaticdoor->Activate(pPlayer, false, nullptr, 1);
+        pstaticdoor = nullptr;
+        return true;
     }
     else {
         if (pActionActor != pPlayer) {
             if (!blockpick) {
-                return 0;
+                return false;
             }
             Animation* panim_2 = pActionActor->GetAnimation();
             if (panim_2) {
-                panim_2->SpecialIdleFree(1, 0);
+                panim_2->SpecialIdleFree(true, false);
             }
             TESIdleManager::SetUsedItem(pLockpick);
-            TESIdleManager::SetUsedItemActivate(1);
+            TESIdleManager::SetUsedItemActivate(true);
             TESIdleManager::SetUsedItemLevel(1);
-            pprocess->SetupSpecialIdle(pActionActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
-            TESIdleManager::SetUsedItem(0);
-            TESIdleManager::SetUsedItemActivate(0);
+            pprocess->SetupSpecialIdle(pActionActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
+            TESIdleManager::SetUsedItem(nullptr);
+            TESIdleManager::SetUsedItemActivate(false);
             TESIdleManager::SetUsedItemLevel(-1);
             ExtraLock* pextralock_5 = apItemActivated->GetExtraLock();
             if (pextralock_5) {
@@ -518,13 +520,15 @@ bool TESObjectDOOR::Activate(
         if (pextralock_4 &&
             (pextralock_4->pLock->GetLockLevel(apItemActivated) == 5 || pextralock_4->pLock->IsBroken())) {
             const char* v10 = sImpossibleLock.String();
-            Interface::ShowMessage(v10, 0, "Interface\\Icons\\Message Icons\\glow_message_padlock.dds", 0, 2.0f, 0);
+            Interface::ShowMessage(
+                v10, 0, "Interface\\Icons\\Message Icons\\glow_message_padlock.dds", nullptr, 2.0f, false
+            );
             Interface::PlayMenuSound(18);
         }
         else {
-            _ShowLockPickMenu(apItemActivated, 0, 0);
+            _ShowLockPickMenu(apItemActivated, 0, false);
         }
-        return 0;
+        return false;
     }
 }
 
@@ -557,7 +561,7 @@ NiAVObject* TESObjectDOOR::Clone3D(TESObjectREFR* apRequester) {
                     pcontrol = ::new (v14) BSPlayerDistanceCheckController;
                 }
                 else {
-                    pcontrol = 0;
+                    pcontrol = nullptr;
                 }
                 pcontrol->SetCheckDistance(gs_fAutoDoorActivateDistance.Float());
                 pcontrol->SetCallback(&TESObjectDOOR::AutoDoorCallback);
@@ -572,13 +576,13 @@ NiAVObject* TESObjectDOOR::Clone3D(TESObjectREFR* apRequester) {
                     pextra_2 = ::new (apMemory) BSXFlags;
                 }
                 else {
-                    pextra_2 = 0;
+                    pextra_2 = nullptr;
                 }
                 pextra = pextra_2;
                 const NiFixedString* v6 = &BSXFlags::Tag();
                 p3D->AddExtraData(*v6, pextra_2);
             }
-            pextra->SetFlags(1u, 1);
+            pextra->SetFlags(1u, true);
         }
     }
     return p3D;
@@ -635,11 +639,11 @@ void TESObjectDOOR::HandlePlayerTeleport(TESObjectREFR* apActivatedDoor) {
                     ploc = ::new (apMemory) PLAYER_TARGET_LOC;
                 }
                 else {
-                    ploc = 0;
+                    ploc = nullptr;
                 }
                 ploc->Location = *&pTel->position;
                 ploc->Angle = *&pTel->rotation;
-                ploc->bResetWeather = 0;
+                ploc->bResetWeather = false;
                 ploc->pfnArrivalFunc = &TESObjectDOOR::DoorTeleportPlayerArrivalCallback;
                 // The arrival data is an integer field; the callback takes the door reference back out of it.
                 ploc->iArrivalFuncData = reinterpret_cast<uintptr_t>(apActivatedDoor);
@@ -655,7 +659,7 @@ void TESObjectDOOR::HandlePlayerTeleport(TESObjectREFR* apActivatedDoor) {
                     Interior = poriginalParentCell->GetInterior();
                 }
                 else {
-                    Interior = 0;
+                    Interior = false;
                 }
                 bStaticWasInInterior = Interior;
             }
@@ -675,8 +679,8 @@ bool TESObjectDOOR::RandomlyTeleportsTo(TESForm* apSpace) {
 
 TESObjectREFR* TESObjectDOOR::FindRandomTeleportTarget(TESObjectREFR* apStartDoor, TESObjectREFR* apActionRef) {
     TESObjectREFR* pbackup;
-    TESObjectREFR* pretdoor = 0;
-    pbackup = 0;
+    TESObjectREFR* pretdoor = nullptr;
+    pbackup = nullptr;
     if (apStartDoor) {
         TESForm* pstartspace = (TESForm*)apStartDoor->GetWorldSpace();
         if (!pstartspace) {
@@ -697,10 +701,10 @@ TESObjectREFR* TESObjectDOOR::FindRandomTeleportTarget(TESObjectREFR* apStartDoo
             while (ifailures < icount && !pretdoor) {
                 ++ifailures;
                 itry = Random() % icount;
-                for (bool bchecked = 0; checked.GetAt(itry, bchecked) && bchecked; bchecked = 0) {
+                for (bool bchecked = false; checked.GetAt(itry, bchecked) && bchecked; bchecked = false) {
                     itry = Random() % icount;
                 }
-                TESForm* ptryspace = 0;
+                TESForm* ptryspace = nullptr;
                 uint32_t iindex = 0;
                 for (BSSimpleList<TESForm*>* plist = &RandomTeleports; plist && !plist->IsEmpty();
                      plist = plist->m_pkNext) {
@@ -720,10 +724,10 @@ TESObjectREFR* TESObjectDOOR::FindRandomTeleportTarget(TESObjectREFR* apStartDoo
                     if (itry == ilasttry) {
                         pbackup = pretdoor;
                         ibackuptry = itry;
-                        pretdoor = 0;
+                        pretdoor = nullptr;
                     }
                 }
-                checked.SetAt(iindex, 1);
+                checked.SetAt(iindex, true);
             }
             if (itry != -1) {
                 pPlayer->SetLastSpaceForDoor(this, itry);
@@ -800,7 +804,7 @@ void TESObjectDOOR::DoorTeleportPlayerArrivalCallback(uintptr_t aiArrivalData) {
                     uint32_t CastingType = pdoor->pCloseSound->iFormID;
                     BSAudio* v1 = &BSAudio::QInstance();
                     v1->GetSoundHandleByNumericID(&SoundHandle, CastingType, 289u);
-                    SoundHandle.Play(0);
+                    SoundHandle.Play(false);
                 }
             }
         }
@@ -829,7 +833,7 @@ void TESObjectDOOR::PlayerPullFollower() {
             pTempList = ::new (v4) BSSimpleList<Actor*>;
         }
         else {
-            pTempList = 0;
+            pTempList = nullptr;
         }
         BSSimpleList<Actor*>* plist = pTempList;
         BSSimpleList<Actor*>* v3 = static_cast<BSSimpleList<Actor*>*>(ourMalloc(sizeof(BSSimpleList<Actor*>)));
@@ -837,7 +841,7 @@ void TESObjectDOOR::PlayerPullFollower() {
             v1 = ::new (v3) BSSimpleList<Actor*>;
         }
         else {
-            v1 = 0;
+            v1 = nullptr;
         }
         BSSimpleList<Actor*>* plist_2 = v1;
         for (Actor*& rpItem : pfollow->pActorlist->ItemsUntilNull()) {

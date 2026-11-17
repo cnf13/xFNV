@@ -39,7 +39,7 @@ NiObject* NiMaterialColorController::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject_2) NiMaterialColorController;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_uFlags = m_uFlags;
@@ -73,7 +73,7 @@ void NiMaterialColorController::LinkObject(NiStream& kStream) {
             v5 = ::new (v4) NiPoint3Interpolator(pkPosData);
         }
         else {
-            v5 = 0;
+            v5 = nullptr;
         }
         m_spInterpolator = v5;
         m_spInterpolator.m_pObject->Collapse();
@@ -198,7 +198,7 @@ NiObject* NiMaterialColorController::CreateObject() {
     NiMaterialColorController* pkObject =
         static_cast<NiMaterialColorController*>(NiMemObject::operator new(sizeof(NiMaterialColorController)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiMaterialColorController;
 }

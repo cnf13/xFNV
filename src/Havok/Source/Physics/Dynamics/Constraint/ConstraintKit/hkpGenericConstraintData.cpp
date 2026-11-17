@@ -93,9 +93,9 @@ hkInternalConstraintUtils_calcRelativeAngle(__m128* a1, __m128* a2, __m128* a3, 
     __m128 v6 = *a2;
     __m128 v7 = _mm_add_ps(*a1, *a2);
     __m128 v8 = _mm_mul_ps(v7, v7);
-    float v9 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
-        static_cast<float>((_mm_shuffle_ps(v8, v8, 170)[0] + static_cast<float>(_mm_shuffle_ps(v8, v8, 85)[0] + v8[0])))
-    )));
+    float v9 = _mm_cvtss_f32(
+        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]))))
+    );
     if (v9 > 1.0000000168623835e-16) {
         *reinterpret_cast<float*>(&v16) = 1.0 / v9;
         v6 = _mm_mul_ps(
@@ -111,8 +111,8 @@ hkInternalConstraintUtils_calcRelativeAngle(__m128* a1, __m128* a2, __m128* a3, 
     __m128 v14 = _mm_mul_ps(*a3, v12);
     __m128 v15 = _mm_mul_ps(*a3, v13);
     *a6 = hkMath_atan2fApproximation(
-        _mm_shuffle_ps(v14, v14, 170)[0] + static_cast<float>(_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]),
-        _mm_shuffle_ps(v15, v15, 170)[0] + static_cast<float>(_mm_shuffle_ps(v15, v15, 85)[0] + v15[0])
+        _mm_shuffle_ps(v14, v14, 170)[0] + (_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]),
+        _mm_shuffle_ps(v15, v15, 170)[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0])
     );
     *a5 = v6;
 }
@@ -124,9 +124,9 @@ double calcAngleAboutAxis(const hkpGenericConstraintDataParameters* apVars, int3
     __m128 kAxisA = (&apVars->m_angularBasisAw.m_col0)[iNext].m_quad;
     __m128 kY =
         _mm_mul_ps((&apVars->m_angularBasisBw.m_col0)[hkGenericConstraintDataAxisOrder[aiAxis + 1]].m_quad, kAxisA);
-    float fY = _mm_shuffle_ps(kY, kY, 170)[0] + static_cast<float>(_mm_shuffle_ps(kY, kY, 85)[0] + kY[0]);
+    float fY = _mm_shuffle_ps(kY, kY, 170)[0] + (_mm_shuffle_ps(kY, kY, 85)[0] + kY[0]);
     __m128 kX = _mm_mul_ps((&apVars->m_angularBasisBw.m_col0)[iNext].m_quad, kAxisA);
-    float fX = _mm_shuffle_ps(kX, kX, 170)[0] + static_cast<float>(_mm_shuffle_ps(kX, kX, 85)[0] + kX[0]);
+    float fX = _mm_shuffle_ps(kX, kX, 170)[0] + (_mm_shuffle_ps(kX, kX, 85)[0] + kX[0]);
     return hkMath_atan2fApproximation(fY, fX);
 }
 
@@ -145,7 +145,7 @@ hkpGenericConstraintData::hkpGenericConstraintData(int32_t a1)
 
 // Releases the motors' references; the scheme is destroyed by the compiler.
 hkpGenericConstraintData::~hkpGenericConstraintData() {
-    for (int32_t i = 0; i < static_cast<int32_t>(m_scheme.m_motors.m_size); ++i) {
+    for (int32_t i = 0; i < m_scheme.m_motors.m_size; ++i) {
         m_scheme.m_motors.m_data[i]->removeReference();
     }
 }
@@ -208,7 +208,7 @@ void hkpGenericConstraintData::hatchScheme(
     alignas(16) hkVector4* currentData = scheme->m_data.begin();
     hkpConstraintModifier** currentModifier = scheme->m_modifiers.begin();
 
-    while (1) {
+    while (true) {
         switch (*currentCommand) {
             case hkpGenericConstraintDataScheme::e_endScheme: return;
             case hkpGenericConstraintDataScheme::e_setPivotA:
@@ -514,7 +514,7 @@ void hkpGenericConstraintData::setConeLimitW(
         return;
     }
     info.m_computedAngle.m_storage =
-        static_cast<float>((a.m_quad[1] * b.m_quad[1] + a.m_quad[0] * b.m_quad[0]) + a.m_quad[2] * b.m_quad[2]);
+        ((a.m_quad[1] * b.m_quad[1] + a.m_quad[0] * b.m_quad[0]) + a.m_quad[2] * b.m_quad[2]);
     // EXE-INLINED 0x62AEA0
     {
         const __m128 len2v = _mm_add_ps(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ps(_mm_shuffle_ps(sq, sq, 0x55), sq));

@@ -24,9 +24,7 @@ void hkpCharacterMovementUtil::calculateMovement(
         )
     );
     __m128 v3 = _mm_mul_ps(v2, v2);
-    if (!(static_cast<float>(
-              _mm_shuffle_ps(v3, v3, 170)[0] + static_cast<float>(_mm_shuffle_ps(v3, v3, 85)[0] + v3[0])
-          ) < 1.1920929e-07f)) {
+    if (!((_mm_shuffle_ps(v3, v3, 170)[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0])) < 1.1920929e-07f)) {
         __m128 v7 = _mm_undefined_ps();
         hkVector4 v22;
         hkVector4 v29;
@@ -41,8 +39,8 @@ void hkpCharacterMovementUtil::calculateMovement(
         __m128 v8 = _mm_setzero_ps();
         v8[0] = 0.5f;
         __m128 v9 = _mm_cmpeq_ss(v5, v7);
-        float v10 = 3.0f - static_cast<float>(static_cast<float>(v5[0] * v6) * v6);
-        v8[0] = static_cast<float>(0.5f * v6) * v10;
+        float v10 = 3.0f - ((v5[0] * v6) * v6);
+        v8[0] = (0.5f * v6) * v10;
         __m128 v12 = _mm_andnot_ps(v9, v8);
         __m128 v13 = _mm_mul_ps(_mm_shuffle_ps(v12, v12, 0), v2);
         __m128 v14 = _mm_sub_ps(
@@ -60,9 +58,9 @@ void hkpCharacterMovementUtil::calculateMovement(
         __m128 v16 = _mm_shuffle_ps(v15, v15, 170);
         v16[0] = v16[0] + v12[0];
         float v17 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v16[0])));
-        float v18 = 3.0f - static_cast<float>(static_cast<float>(v16[0] * v17) * v17);
+        float v18 = 3.0f - ((v16[0] * v17) * v17);
         __m128 v19 = _mm_cmpeq_ss(v16, v7);
-        v8[0] = static_cast<float>(0.5f * v17) * v18;
+        v8[0] = (0.5f * v17) * v18;
         __m128 v21 = _mm_andnot_ps(v19, v8);
         v22.m_quad = _mm_mul_ps(_mm_shuffle_ps(v21, v21, 0), v14);
         __m128 v23 = _mm_sub_ps(
@@ -80,8 +78,7 @@ void hkpCharacterMovementUtil::calculateMovement(
         __m128 v26 = _mm_shuffle_ps(v24, v24, 170);
         v26[0] = v26[0] + v25;
         float v27 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v26[0])));
-        v8[0] = static_cast<float>(0.5f * v27) *
-            static_cast<float>(3.0f - static_cast<float>(static_cast<float>(v26[0] * v27) * v27));
+        v8[0] = (0.5f * v27) * (3.0f - ((v26[0] * v27) * v27));
         __m128 v28 = _mm_andnot_ps(_mm_cmpeq_ss(v26, v7), v8);
         a2.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v28, v28, 0), v23);
         a2.m_col2 = input.m_surfaceNormal;
@@ -93,7 +90,7 @@ void hkpCharacterMovementUtil::calculateMovement(
         double m_gain = input.m_gain;
         __m128 v32 = _mm_sub_ps(input.m_desiredVelocity.m_quad, a3.m_quad);
         __m128 v33 = _mm_mul_ps(v32, v32);
-        float v35 = _mm_shuffle_ps(v33, v33, 170)[0] + static_cast<float>(_mm_shuffle_ps(v33, v33, 85)[0] + v33[0]);
+        float v35 = _mm_shuffle_ps(v33, v33, 170)[0] + (_mm_shuffle_ps(v33, v33, 85)[0] + v33[0]);
         if (!(m_gain * v35 * input.m_gain > m_maxVelocityDelta * m_maxVelocityDelta)) {
             v34 = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(input.m_gain), _mm_set_ss(input.m_gain), 0), v32);
         }

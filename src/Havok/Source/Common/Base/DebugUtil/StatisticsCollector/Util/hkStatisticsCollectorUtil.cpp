@@ -21,9 +21,9 @@ const char* _findObjectName(void* object, const hkClass* klass) {
     int32_t NumDeclaredMembers = klass->getNumDeclaredMembers();
     int32_t i = 0;
     if (NumDeclaredMembers <= 0) {
-        return 0;
+        return nullptr;
     }
-    while (1) {
+    while (true) {
         int32_t m_storage;
         const hkClassMember* DeclaredMember = &klass->getDeclaredMember(i);
         if (hkString::strCmp(DeclaredMember->m_name, "name")) {
@@ -44,7 +44,7 @@ const char* _findObjectName(void* object, const hkClass* klass) {
         }
     LABEL_5:;
         if (++i >= NumDeclaredMembers) {
-            return 0;
+            return nullptr;
         }
     }
     result = apMemory.asCstring(0);
@@ -344,13 +344,13 @@ void hkStatisticsCollectorUtil::defaultCalcStatistics(
     const hkClass& cls,
     hkStatisticsCollector* collector
 ) {
-    hkStatisticsCollectorUtil::_addObjectContents(0, obj, cls, collector);
+    hkStatisticsCollectorUtil::_addObjectContents(nullptr, obj, cls, collector);
 }
 
 void hkStatisticsCollectorUtil::defaultCalcStatistics(const hkReferencedObject* obj, hkStatisticsCollector* collector) {
     const hkClass* ClassType = collector->findClassType(obj);
     if (ClassType) {
-        hkStatisticsCollectorUtil::_addObjectContents(0, obj, *ClassType, collector);
+        hkStatisticsCollectorUtil::_addObjectContents(nullptr, obj, *ClassType, collector);
     }
 }
 
@@ -455,7 +455,7 @@ hkBool* hkStatisticsCollectorUtil::_isClassSimple(hkBool* apResult, const hkClas
         return apResult;
     }
     else {
-        while (1) {
+        while (true) {
             const hkClassMember* DeclaredMember = &clsIn.getDeclaredMember(v3);
             if (!hkStatisticsCollectorUtil::isMemberSimple(&v6, *DeclaredMember)->m_bool) {
                 break;

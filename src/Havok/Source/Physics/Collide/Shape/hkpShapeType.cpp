@@ -168,7 +168,7 @@ const char* hkGetShapeTypeName(hkpShapeType type) {
             break;
         }
         default: {
-            result = 0;
+            result = nullptr;
             break;
         }
     }

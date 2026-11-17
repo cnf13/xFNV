@@ -51,7 +51,7 @@ void NiMemStream::SetEndianSwap(bool bDoSwap) {
 
 void* NiMemStream::Str() {
     char* result = m_pBuffer;
-    m_bFreeze = (bool)1;
+    m_bFreeze = true;
     return result;
 }
 

@@ -75,7 +75,7 @@ void NiD3DTextureStage::ApplyTextureTransform() {
     if (m_uiStage < NiD3DPass::ms_uiMaxTextureBlendStages) {
         _D3DMATRIX* p_m_kTextureTransformation;
         if (!m_bTextureTransform) {
-            NiD3DTextureStage::ms_pkD3DRenderState->SetTextureStageState(m_uiStage, 24u, 0, 0);
+            NiD3DTextureStage::ms_pkD3DRenderState->SetTextureStageState(m_uiStage, 24u, 0, false);
             return;
         }
         uint32_t m_uiTextureTransformFlags = this->m_uiTextureTransformFlags;
@@ -117,13 +117,13 @@ void NiD3DTextureStage::ApplyTextureTransform() {
 void NiD3DTextureStage::ModifyClampMode(bool bNonPow2) {
     if (bNonPow2 && (NiD3DTextureStage::ms_pkD3DRenderer->GetFlags() & 8) == 0 &&
         (NiD3DTextureStage::ms_pkD3DRenderer->GetFlags() & 4) != 0) {
-        NiD3DTextureStage::ms_pkD3DRenderState->SetSamplerState(m_uiStage, 1u, 3u, 0);
-        NiD3DTextureStage::ms_pkD3DRenderState->SetSamplerState(m_uiStage, 2u, 3u, 0);
+        NiD3DTextureStage::ms_pkD3DRenderState->SetSamplerState(m_uiStage, 1u, 3u, false);
+        NiD3DTextureStage::ms_pkD3DRenderState->SetSamplerState(m_uiStage, 2u, 3u, false);
         uint32_t v3 = 198;
         int32_t v4 = 8;
         do {
-            NiD3DTextureStage::ms_pkD3DRenderState->SetRenderState(v3 - 70, 0, 0, 0);
-            NiD3DTextureStage::ms_pkD3DRenderState->SetRenderState(v3++, 0, 0, 0);
+            NiD3DTextureStage::ms_pkD3DRenderState->SetRenderState(v3 - 70, 0, 0, false);
+            NiD3DTextureStage::ms_pkD3DRenderState->SetRenderState(v3++, 0, 0, false);
             --v4;
         }
         while (v4);
@@ -176,7 +176,7 @@ uint32_t NiD3DTextureStage::GetTexCoordIndex() {
 bool NiD3DTextureStage::GetSaveTexCoordIndex() {
     NiD3DTextureStageGroup* m_pkTextureStageGroup = this->m_pkTextureStageGroup;
     uint32_t uiValue = 0;
-    bool bSave = 0;
+    bool bSave = false;
     bool StageState = m_pkTextureStageGroup->GetStageState(11u, uiValue, bSave);
     return StageState && bSave;
 }
@@ -228,7 +228,7 @@ void NiD3DTextureStage::CreateNewStage(NiPointer<NiD3DTextureStage>& aspD3DTextu
     if (v5) {
         NiIncRefCount(v5);
     }
-    v5->m_bRendererOwned = 1;
+    v5->m_bRendererOwned = true;
     NiD3DTextureStage* m_pObject = aspD3DTextureStage.m_pObject;
     if (aspD3DTextureStage.m_pObject != v5) {
         if (m_pObject) {
@@ -249,13 +249,13 @@ void NiD3DTextureStage::CreateNewStage(NiPointer<NiD3DTextureStage>& aspD3DTextu
 void NiD3DTextureStage::DisableStage(uint32_t uiStage) {
     uint32_t i;
     for (i = uiStage; i < NiD3DPass::ms_uiMaxTextureBlendStages; ++i) {
-        NiD3DTextureStage::ms_pkD3DRenderState->SetTexture(i, 0);
-        NiD3DTextureStage::ms_pkD3DRenderState->SetTextureStageState(i, 1u, 1u, 0);
-        NiD3DTextureStage::ms_pkD3DRenderState->SetTextureStageState(i, 4u, 1u, 0);
-        NiD3DTextureStage::ms_pkD3DRenderState->SetTextureStageState(i, 24u, 0, 0);
+        NiD3DTextureStage::ms_pkD3DRenderState->SetTexture(i, nullptr);
+        NiD3DTextureStage::ms_pkD3DRenderState->SetTextureStageState(i, 1u, 1u, false);
+        NiD3DTextureStage::ms_pkD3DRenderState->SetTextureStageState(i, 4u, 1u, false);
+        NiD3DTextureStage::ms_pkD3DRenderState->SetTextureStageState(i, 24u, 0, false);
     }
     for (; i < NiD3DPass::ms_uiMaxSamplers; ++i) {
-        NiD3DTextureStage::ms_pkD3DRenderState->SetTexture(i, 0);
+        NiD3DTextureStage::ms_pkD3DRenderState->SetTexture(i, nullptr);
     }
 }
 
@@ -295,7 +295,7 @@ void NiD3DTextureStage::ShutdownPools() {
         _NiFree(v0->m_kFreeObjects.m_pBase);
         MemoryManager_Singleton.Deallocate(v0);
     }
-    NiD3DTextureStage::ms_pkTextureStagePool = 0;
+    NiD3DTextureStage::ms_pkTextureStagePool = nullptr;
 }
 
 // Holds the renderer and a reference on its device, and caches the renderer's render state; null drops both.

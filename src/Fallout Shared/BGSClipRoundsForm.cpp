@@ -26,7 +26,7 @@ void BGSClipRoundsForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool BGSClipRoundsForm::CompareComponent(BaseFormComponent* apCompareFC) {
     BGSClipRoundsForm* pCompare = dynamic_cast<BGSClipRoundsForm*>(apCompareFC);
     if (!pCompare) {
-        return 1;
+        return true;
     }
     int32_t FormType = cClipRounds;
     return FormType != pCompare->cClipRounds;

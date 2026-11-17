@@ -176,7 +176,7 @@ void NiVBSet::E943C0() {
         if (i < m_apkBlocks.m_usSize) {
             NiVBBlock** m_pBase = m_apkBlocks.m_pBase;
             NiVBBlock* v4 = m_pBase[i];
-            m_pBase[i] = 0;
+            m_pBase[i] = nullptr;
             if (v4) {
                 --m_apkBlocks.m_usESize;
             }
@@ -188,7 +188,7 @@ void NiVBSet::E943C0() {
                 IDirect3DVertexBuffer9* m_pkVB = v4->GetVB();
                 if (m_pkVB) {
                     v4->GetVB()->Release();
-                    v4->m_pkVB = 0;
+                    v4->m_pkVB = nullptr;
                 }
                 v4->ClearAllData();
                 NiVBBlock* m_pkNextBlock = v4->m_pkNextBlock;
@@ -205,7 +205,7 @@ void NiVBSet::E943C0() {
                     v9 = NiVBSet::ms_pkBlockDump;
                 }
                 v4->m_pkNextBlock = v9;
-                v4->m_pkPrevBlock = 0;
+                v4->m_pkPrevBlock = nullptr;
                 NiVBSet::ms_pkBlockDump = v4;
             }
         }
@@ -214,7 +214,7 @@ void NiVBSet::E943C0() {
     if (m_pkD3DDevice) {
         this->m_pkD3DDevice->Release();
     }
-    this->m_pkD3DDevice = 0;
+    this->m_pkD3DDevice = nullptr;
     FNVD_DESTRUCT_AS(DestructInlined, NiTArray<NiVBBlock*, NiTMallocInterface<NiVBBlock*>>)(&m_apkBlocks);
 }
 
@@ -267,7 +267,7 @@ void NiVBSet::DeleteBlocks() {
         }
         while (m_pkNextBlock);
     }
-    NiVBSet::ms_pkBlockDump = 0;
+    NiVBSet::ms_pkBlockDump = nullptr;
 }
 
 void NiVBSet::AllocateBlocks() {
@@ -279,7 +279,7 @@ void NiVBSet::AllocateBlocks() {
             v1->ClearAllData();
         }
         else {
-            v1 = 0;
+            v1 = nullptr;
         }
         NiVBBlock* m_pkNextBlock = v1->m_pkNextBlock;
         NiVBBlock* m_pkPrevBlock = v1->m_pkPrevBlock;
@@ -295,7 +295,7 @@ void NiVBSet::AllocateBlocks() {
             v4 = NiVBSet::ms_pkBlockDump;
         }
         v1->m_pkNextBlock = v4;
-        v1->m_pkPrevBlock = 0;
+        v1->m_pkPrevBlock = nullptr;
         ++ui;
     }
 }

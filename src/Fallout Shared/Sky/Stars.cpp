@@ -63,13 +63,13 @@ void Stars::Update(Sky* apSky, float afSecondsPassed) {
                  fAlpha > 0.0)) {
                 uint32_t icount;
                 NiPoint3 pt;
-                spRoot.m_pObject->SetAppCulled(0);
+                spRoot.m_pObject->SetAppCulled(false);
                 // SkyColor[6] is the stars' color; its three channels are copied into pt.
                 const NiColor& kStarsColor = apSky->SkyColor[6];
                 pt.x = kStarsColor.r;
                 pt.y = kStarsColor.g;
                 pt.z = kStarsColor.b;
-                NiNode* v22 = 0;
+                NiNode* v22 = nullptr;
                 int32_t v17 = 0;
                 if (spStars.m_pObject) {
                     icount = static_cast<NiNode*>(spStars.m_pObject)->NiNode::GetChildCount();
@@ -96,7 +96,7 @@ void Stars::Update(Sky* apSky, float afSecondsPassed) {
                                 pStarsProp_2 = static_cast<SkyShaderProperty*>(pstarsgeo->GetProperty(3));
                             }
                             else {
-                                pStarsProp_2 = 0;
+                                pStarsProp_2 = nullptr;
                             }
                             if (pStarsProp_2) {
                                 if (colorLastFrame.operator!=(pt)) {
@@ -125,7 +125,7 @@ void Stars::Update(Sky* apSky, float afSecondsPassed) {
                 }
             }
             else {
-                spRoot.m_pObject->SetAppCulled(1);
+                spRoot.m_pObject->SetAppCulled(true);
             }
         }
     }
@@ -147,25 +147,25 @@ void Stars::LoadGeometry(const char* apFilename) {
         BSStringT<char> v8;
         v8.SPrintF("%s%s%s", "Meshes", "\\", apFilename);
         BSStream apMemory_16;
-        if (apMemory_16.BSStream::Load(static_cast<const char*>(v8.pString), static_cast<NiFile*>(0)) &&
+        if (apMemory_16.BSStream::Load(static_cast<const char*>(v8.pString), static_cast<NiFile*>(nullptr)) &&
             (apMemory_16.GetObjectCount() == 1 &&
              (ObjectAt = apMemory_16.GetObjectAt(0), NiObject::IsKindOf_0(&NiNode::ms_RTTI, ObjectAt)))) {
-            Model v6(v8.pString, &apMemory_16, 1, 0);
-            spRoot.m_pObject->SetDisplayObject(1);
+            Model v6(v8.pString, &apMemory_16, true, false);
+            spRoot.m_pObject->SetDisplayObject(true);
             NiNode* v4 = spRoot.m_pObject;
             v4->DetachChild(spStars.m_pObject);
             spStars.operator=(v6.GetModel());
-            spStars.m_pObject->SetSelectiveUpdate(1);
+            spStars.m_pObject->SetSelectiveUpdate(true);
             NiNode* v3 = spRoot.m_pObject;
             v3->AttachChild(spStars.m_pObject, 1);
             spStars.m_pObject->UpdateProperties();
         }
         else {
             Warning("DEFAULT: Cannot load the stars.");
-            spRoot.m_pObject->SetDisplayObject(0);
+            spRoot.m_pObject->SetDisplayObject(false);
         }
     }
     else {
-        spRoot.m_pObject->SetDisplayObject(0);
+        spRoot.m_pObject->SetDisplayObject(false);
     }
 }

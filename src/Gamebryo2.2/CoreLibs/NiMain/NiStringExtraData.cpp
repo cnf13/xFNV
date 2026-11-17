@@ -76,7 +76,7 @@ void NiStringExtraData::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
 NiObject* NiStringExtraData::CreateObject() {
     NiStringExtraData* pkObject = static_cast<NiStringExtraData*>(NiMemObject::operator new(sizeof(NiStringExtraData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiStringExtraData;
 }

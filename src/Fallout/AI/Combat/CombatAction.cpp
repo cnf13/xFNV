@@ -75,7 +75,7 @@ bool CombatAction::CanExecute(
         if (pworldState) {
             int32_t ivalue = pworldState->iValue == -1 ? aiActionValue : pworldState->iValue;
             if (!apWorldStateArray->IsTrue(pworldState->eState, ivalue)) {
-                return 0;
+                return false;
             }
         }
     }
@@ -83,7 +83,7 @@ bool CombatAction::CanExecute(
     if (GetPreconditionWorldStateActionValue(COMBAT_WORLD_STATE_AT_LOCATION, icombatLocation)) {
         apCombatController->pCombatPlannerData->SetUnk4Ptr(icombatLocation);
     }
-    return 1;
+    return true;
 }
 
 bool CombatAction::CheckIdentical(CombatController* apCombatController, int32_t aiActionValue) {
@@ -125,7 +125,7 @@ void CombatAction::AddWorldStateAction(COMBAT_WORLD_STATE aeCombatState, CombatA
             v2 = ::new (v3) BSSimpleList<CombatAction*>;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         CombatAction::pPerStateLists[aeCombatState] = v2;
     }
@@ -143,7 +143,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v26 = ::new (v53) CombatActionAttackRangedExplosive(aeCombatAction);
             }
             else {
-                v26 = 0;
+                v26 = nullptr;
             }
             result = v26;
             break;
@@ -157,7 +157,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v25 = ::new (v52) CombatActionAttackRangedExplosiveFromCover(aeCombatAction);
             }
             else {
-                v25 = 0;
+                v25 = nullptr;
             }
             result = v25;
             break;
@@ -170,7 +170,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v28 = ::new (apMemory) CombatActionAttackRanged(aeCombatAction);
             }
             else {
-                v28 = 0;
+                v28 = nullptr;
             }
             result = v28;
             break;
@@ -183,7 +183,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v27 = ::new (v54) CombatActionAttackRangedFromCover(aeCombatAction);
             }
             else {
-                v27 = 0;
+                v27 = nullptr;
             }
             result = v27;
             break;
@@ -196,7 +196,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v22 = ::new (v49) CombatActionAttackGrenade(aeCombatAction);
             }
             else {
-                v22 = 0;
+                v22 = nullptr;
             }
             result = v22;
             break;
@@ -210,7 +210,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v21 = ::new (v48) CombatActionAttackGrenadeFlushTarget(aeCombatAction);
             }
             else {
-                v21 = 0;
+                v21 = nullptr;
             }
             result = v21;
             break;
@@ -223,7 +223,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v20 = ::new (v47) CombatActionAttackGrenadeFromCover(aeCombatAction);
             }
             else {
-                v20 = 0;
+                v20 = nullptr;
             }
             result = v20;
             break;
@@ -236,7 +236,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v24 = ::new (v51) CombatActionAttackMelee(aeCombatAction);
             }
             else {
-                v24 = 0;
+                v24 = nullptr;
             }
             result = v24;
             break;
@@ -249,7 +249,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v23 = ::new (v50) CombatActionAttackHandToHand(aeCombatAction);
             }
             else {
-                v23 = 0;
+                v23 = nullptr;
             }
             result = v23;
             break;
@@ -261,7 +261,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v19 = ::new (v46) CombatActionMove(aeCombatAction);
             }
             else {
-                v19 = 0;
+                v19 = nullptr;
             }
             result = v19;
             break;
@@ -274,7 +274,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v18 = ::new (v45) CombatActionMoveAndSwitchToMelee(aeCombatAction);
             }
             else {
-                v18 = 0;
+                v18 = nullptr;
             }
             result = v18;
             break;
@@ -287,7 +287,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v17 = ::new (v44) CombatActionMoveAndAttackRanged(aeCombatAction);
             }
             else {
-                v17 = 0;
+                v17 = nullptr;
             }
             result = v17;
             break;
@@ -301,7 +301,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v16 = ::new (v43) CombatActionMoveAndAttackRangedExplosive(aeCombatAction);
             }
             else {
-                v16 = 0;
+                v16 = nullptr;
             }
             result = v16;
             break;
@@ -314,7 +314,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v15 = ::new (v42) CombatActionMoveAndAttackGrenade(aeCombatAction);
             }
             else {
-                v15 = 0;
+                v15 = nullptr;
             }
             result = v15;
             break;
@@ -327,7 +327,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v14 = ::new (v41) CombatActionDrawWeapon(aeCombatAction);
             }
             else {
-                v14 = 0;
+                v14 = nullptr;
             }
             result = v14;
             break;
@@ -340,7 +340,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v13 = ::new (v40) CombatActionSwitchWeapon(aeCombatAction);
             }
             else {
-                v13 = 0;
+                v13 = nullptr;
             }
             result = v13;
             break;
@@ -353,7 +353,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v12 = ::new (v39) CombatActionAvoidThreat(aeCombatAction);
             }
             else {
-                v12 = 0;
+                v12 = nullptr;
             }
             result = v12;
             break;
@@ -365,7 +365,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v11 = ::new (v38) CombatActionSearch(aeCombatAction);
             }
             else {
-                v11 = 0;
+                v11 = nullptr;
             }
             result = v11;
             break;
@@ -378,7 +378,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v10 = ::new (v37) CombatActionInvestigate(aeCombatAction);
             }
             else {
-                v10 = 0;
+                v10 = nullptr;
             }
             result = v10;
             break;
@@ -390,7 +390,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v9 = ::new (v36) CombatActionDodge(aeCombatAction);
             }
             else {
-                v9 = 0;
+                v9 = nullptr;
             }
             result = v9;
             break;
@@ -403,7 +403,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v8 = ::new (v35) CombatActionIgnoreBlockedTarget(aeCombatAction);
             }
             else {
-                v8 = 0;
+                v8 = nullptr;
             }
             result = v8;
             break;
@@ -415,7 +415,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v7 = ::new (v34) CombatActionFlee(aeCombatAction);
             }
             else {
-                v7 = 0;
+                v7 = nullptr;
             }
             result = v7;
             break;
@@ -428,7 +428,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v6 = ::new (v33) CombatActionActivateCombatItem(aeCombatAction);
             }
             else {
-                v6 = 0;
+                v6 = nullptr;
             }
             result = v6;
             break;
@@ -441,7 +441,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v5 = ::new (v32) CombatActionUseCombatItem(aeCombatAction);
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             result = v5;
             break;
@@ -454,7 +454,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v4 = ::new (v31) CombatActionAcquireLineOfSight(aeCombatAction);
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             result = v4;
             break;
@@ -466,7 +466,7 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v3 = ::new (v30) CombatActionHide(aeCombatAction);
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             result = v3;
             break;
@@ -479,14 +479,14 @@ CombatAction* CombatAction::CreateCombatAction(CombatAction::COMBAT_ACTION aeCom
                 v2 = ::new (v29) CombatActionApproachTarget(aeCombatAction);
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             result = v2;
             break;
         }
         default: {
             Warning("COMBAT: Could not create combat action of type %i", aeCombatAction);
-            result = 0;
+            result = nullptr;
             break;
         }
     }

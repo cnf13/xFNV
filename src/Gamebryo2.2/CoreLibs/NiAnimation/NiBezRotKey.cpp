@@ -102,9 +102,9 @@ int32_t NiBezRotKey::RegisterLoader() {
     static char bRegistered;
     int32_t result = 0;
     if (!bRegistered) {
-        NiAnimationKey::ms_curves[14] = 0;
-        NiAnimationKey::ms_interpd1s[14] = 0;
-        NiAnimationKey::ms_interpd2s[14] = 0;
+        NiAnimationKey::ms_curves[14] = nullptr;
+        NiAnimationKey::ms_interpd1s[14] = nullptr;
+        NiAnimationKey::ms_interpd2s[14] = nullptr;
         bRegistered = 1;
         NiAnimationKey::ms_loaders[14] = &NiBezRotKey::CreateFromStream;
         NiAnimationKey::ms_saves[14] = &NiBezRotKey::SaveToStream;
@@ -142,13 +142,12 @@ bool NiBezRotKey::Equal(const NiAnimationKey& key0, const NiAnimationKey& key1) 
 NiAnimationKey* NiBezRotKey::CreateArray(uint32_t uiNumKeys) {
     size_t v1 = uiNumKeys <= SIZE_MAX / sizeof(NiBezRotKey) ? sizeof(NiBezRotKey) * uiNumKeys : SIZE_MAX;
     size_t* v2 = static_cast<size_t*>(MemoryManager_Singleton.Allocate(
-        (static_cast<uint32_t>(static_cast<uint32_t>(v1) + static_cast<uint32_t>(sizeof(size_t))) <
-         static_cast<uint32_t>(v1))
+        ((static_cast<uint32_t>(v1) + static_cast<uint32_t>(sizeof(size_t))) < static_cast<uint32_t>(v1))
             ? -1
             : v1 + sizeof(size_t)
     ));
     if (!v2) {
-        return 0;
+        return nullptr;
     }
     // new[]'s block, treated as untyped raw memory: the count cookie, then the keys.
     NiAnimationKey* v3 = reinterpret_cast<NiAnimationKey*>(v2 + 1);

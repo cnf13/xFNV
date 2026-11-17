@@ -78,7 +78,7 @@ NiObject* NiPSysFieldMagnitudeCtlr::CreateObject() {
     NiPSysFieldMagnitudeCtlr* v0 =
         static_cast<NiPSysFieldMagnitudeCtlr*>(NiMemObject::operator new(sizeof(NiPSysFieldMagnitudeCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysFieldMagnitudeCtlr;
 }

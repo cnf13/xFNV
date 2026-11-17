@@ -1237,6 +1237,6 @@ uint8_t* hkpBvTreeAgent::getUseAabbCaching(uint8_t* a1) {
 }
 
 char hkpBvTreeAgent::setUseAabbCaching(char a1) {
-    hkpBvTreeAgent::m_useAabbCaching.m_bool = (char)a1;
+    hkpBvTreeAgent::m_useAabbCaching.m_bool = a1;
     return a1;
 }

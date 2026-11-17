@@ -97,7 +97,7 @@ void BGSSleepDeprevationStage::Save() {
         pSicknessID = reinterpret_cast<SpellItem*>(static_cast<uintptr_t>(GetSickness()->GetFormID()));
     }
     else {
-        pSicknessID = 0;
+        pSicknessID = nullptr;
     }
     data.pSickness = pSicknessID;
     if (TESForm::QEndianSwapOnSave()) {
@@ -121,7 +121,7 @@ void BGSSleepDeprevationStage::InitItem() {
             TESForm* pForm = TESForm::GetFormByNumericID(uiFormID);
             data.pSickness = dynamic_cast<SpellItem*>(pForm);
         }
-        SetInitialized(1);
+        SetInitialized(true);
         BGSSleepDeprevationStage::AddStage(this);
     }
 }
@@ -141,10 +141,10 @@ void BGSSleepDeprevationStage::Copy(TESForm* apCopy) {
 bool BGSSleepDeprevationStage::Compare(TESForm* apCompare) {
     BGSSleepDeprevationStage* v6 = dynamic_cast<BGSSleepDeprevationStage*>(apCompare);
     if (!v6) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v6)) {
-        return (bool)1;
+        return true;
     }
     char* formList = static_cast<char*>(static_cast<void*>(v6->GetData()));
     char* v3 = static_cast<char*>(static_cast<void*>(GetData()));
@@ -161,7 +161,7 @@ SpellItem* BGSSleepDeprevationStage::GetSickness() {
 
 void BGSSleepDeprevationStage::RemoveStage(BGSSleepDeprevationStage* apStage) {
     if (BGSSleepDeprevationStage::iNumStages) {
-        bool v4 = 0;
+        bool v4 = false;
         for (uint32_t i = 0; !v4 && i < BGSSleepDeprevationStage::iNumStages; ++i) {
             v4 = BGSSleepDeprevationStage::pStagesArray[i] == apStage;
         }
@@ -208,7 +208,7 @@ void BGSSleepDeprevationStage::AddStage(BGSSleepDeprevationStage* apNewStage) {
 
 BGSSleepDeprevationStage** BGSSleepDeprevationStage::AllocateStages(uint32_t aiStagesCount) {
     if (!aiStagesCount) {
-        return 0;
+        return nullptr;
     }
     // new BGSSleepDeprevationStage*[n]: requests SIZE_MAX when the size overflows.
     BGSSleepDeprevationStage** v3 = static_cast<BGSSleepDeprevationStage**>(ourMalloc(
@@ -217,14 +217,14 @@ BGSSleepDeprevationStage** BGSSleepDeprevationStage::AllocateStages(uint32_t aiS
             : SIZE_MAX
     ));
     for (uint32_t i = 0; i < aiStagesCount; ++i) {
-        v3[i] = 0;
+        v3[i] = nullptr;
     }
     return v3;
 }
 
 BGSSleepDeprevationStage* BGSSleepDeprevationStage::GetStage(uint32_t aiIndex) {
     if (aiIndex >= BGSSleepDeprevationStage::iNumStages) {
-        return 0;
+        return nullptr;
     }
     else {
         return pStagesArray[aiIndex];
@@ -232,7 +232,7 @@ BGSSleepDeprevationStage* BGSSleepDeprevationStage::GetStage(uint32_t aiIndex) {
 }
 
 BGSSleepDeprevationStage* BGSSleepDeprevationStage::FindStageForRadLevel(float afRads) {
-    BGSSleepDeprevationStage* pstage = 0;
+    BGSSleepDeprevationStage* pstage = nullptr;
     for (uint32_t i = 0; i < BGSSleepDeprevationStage::iNumStages && !pstage; ++i) {
         BGSSleepDeprevationStage* pcurrentStage = BGSSleepDeprevationStage::GetStage(i);
         if (pcurrentStage) {

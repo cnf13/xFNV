@@ -188,7 +188,7 @@ void TESChallenge::InitItem() {
                 Warning("MASTERFILE: Could not find Form (%08X) on challenge '%s' (%08X).", itempInt, v4, v6);
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -376,14 +376,14 @@ bool TESChallengeManager::UpdateChallenge(
 ) {
     // The type is tested signed, against the enum's constant, not the class's unsigned CHALLENGE_TYPE_COUNT.
     if (cType >= ::CHALLENGE_TYPE_COUNT || cType < 0) {
-        return 0;
+        return false;
     }
     BSSimpleList<TESChallenge*>* pChallenges = &TESChallengeManager::pInactiveChallengeList[cType];
-    bool bCompletedChallenges = 0;
-    TESChallenge* pItem = 0;
+    bool bCompletedChallenges = false;
+    TESChallenge* pItem = nullptr;
     while (pChallenges) {
         pItem = pChallenges->m_item;
-        bool bFound = 1;
+        bool bFound = true;
         if (!pItem) {
             goto LABEL_11;
         }
@@ -398,7 +398,7 @@ bool TESChallengeManager::UpdateChallenge(
                                 BGSListForm* pformlist = static_cast<BGSListForm*>(pItem->GetFormOne());
                                 if (pformlist) {
                                     if (!(&pformlist->ListOfForms)->IsInList(pFormOne)) {
-                                        bFound = 0;
+                                        bFound = false;
                                     }
                                 }
                                 break;
@@ -412,14 +412,14 @@ bool TESChallengeManager::UpdateChallenge(
                             case CHALLENGE_TYPE_CRAFT: {
                                 BGSListForm* pformlist_2 = static_cast<BGSListForm*>(pItem->GetFormOne());
                                 if (pFormOne != pformlist_2) {
-                                    bFound = 0;
+                                    bFound = false;
                                 }
                                 break;
                             }
                             case CHALLENGE_TYPE_DISCOVER: {
                                 BGSListForm* pformlist_3 = static_cast<BGSListForm*>(pItem->GetFormOne());
                                 if (pFormOne != pformlist_3) {
-                                    bFound = 0;
+                                    bFound = false;
                                 }
                                 break;
                             }
@@ -429,7 +429,7 @@ bool TESChallengeManager::UpdateChallenge(
                         }
                     }
                     else {
-                        bFound = 0;
+                        bFound = false;
                     }
                 }
                 if (!bFound) {
@@ -441,13 +441,13 @@ bool TESChallengeManager::UpdateChallenge(
                             BGSListForm* pformlist_4 = static_cast<BGSListForm*>(pItem->GetFormTwo());
                             if (pformlist_4) {
                                 if (!(&pformlist_4->ListOfForms)->IsInList(pFormTwo)) {
-                                    bFound = 0;
+                                    bFound = false;
                                 }
                             }
                         }
                     }
                     else {
-                        bFound = 0;
+                        bFound = false;
                     }
                 }
                 if (!bFound) {
@@ -455,46 +455,46 @@ bool TESChallengeManager::UpdateChallenge(
                 }
                 if (pItem->GetSpecialOne()) {
                     if (!nSpecialDataOne) {
-                        bFound = 0;
+                        bFound = false;
                     }
                     int32_t iSpecialOne = nSpecialDataOne;
                     if (iSpecialOne != pItem->GetSpecialOne()) {
-                        bFound = 0;
+                        bFound = false;
                     }
                 }
                 else {
                     if (pItem->GetChallengeType() == CHALLENGE_TYPE_MISC_STAT) {
                         int32_t iSpecialOne = nSpecialDataOne;
                         if (iSpecialOne != pItem->GetSpecialOne()) {
-                            bFound = 0;
+                            bFound = false;
                         }
                     }
                 }
                 if (pItem->GetSpecialTwo()) {
                     if (!nSpecialDataTwo) {
-                        bFound = 0;
+                        bFound = false;
                     }
                     int32_t iSpecialTwo = nSpecialDataTwo;
                     if (iSpecialTwo != pItem->GetSpecialTwo()) {
-                        bFound = 0;
+                        bFound = false;
                     }
                 }
                 else {
                     if (pItem->GetChallengeType() == CHALLENGE_TYPE_HIT) {
                         if (nSpecialDataTwo) {
                             if (nSpecialDataTwo != 1) {
-                                bFound = 0;
+                                bFound = false;
                             }
                         }
                     }
                 }
                 if (pItem->GetSpecialThree()) {
                     if (!nSpecialDataThree) {
-                        bFound = 0;
+                        bFound = false;
                     }
                     int32_t iSpecialThree = nSpecialDataThree;
                     if (iSpecialThree != pItem->GetSpecialThree()) {
-                        bFound = 0;
+                        bFound = false;
                     }
                 }
                 if (!bFound) {
@@ -515,18 +515,18 @@ bool TESChallengeManager::UpdateChallenge(
                     for (int32_t i = uiProgress; i >= 0; i -= uiStep) {
                         if (!i) {
                             if (pItem->GetFullName()) {
-                                if (pItem->GetDescription(0, DESC_ID)) {
+                                if (pItem->GetDescription(nullptr, DESC_ID)) {
                                     if (bShowChallengeUpdates.Bool()) {
                                         char apDest[512];
-                                        const char* pDescription = pItem->GetDescription(0, DESC_ID);
+                                        const char* pDescription = pItem->GetDescription(nullptr, DESC_ID);
                                         int32_t iThreshold = pItem->data.iThreshold;
                                         uint32_t uiCurrent = pItem->progress.iProgress;
                                         BSsprintf(
                                             apDest, 512, "%s   %d\\%d\n%s", pItem->GetFullName(), uiCurrent, iThreshold,
                                             pDescription
                                         );
-                                        const char* TextureName = TESTexture::GetTextureName(pItem, 0);
-                                        Interface::ShowMessage(apDest, 0, TextureName, 0, 2.0f, 0);
+                                        const char* TextureName = TESTexture::GetTextureName(pItem, nullptr);
+                                        Interface::ShowMessage(apDest, 0, TextureName, nullptr, 2.0f, false);
                                     }
                                 }
                             }
@@ -535,36 +535,36 @@ bool TESChallengeManager::UpdateChallenge(
                 }
                 else {
                     if (pItem->pFormScript) {
-                        pItem->pFormScript->RunScriptEffectStart(pPlayer, 0);
+                        pItem->pFormScript->RunScriptEffectStart(pPlayer, nullptr);
                     }
                     if (pItem->GetChallengeType() != CHALLENGE_TYPE_MISC_STAT || pItem->GetSpecialOne() != 27) {
                         MiscStatManager::Increment(MiscStatManager::MS_CHALLENGES_COMPLETED);
                     }
                     if (pItem->GetFullName()) {
-                        if (pItem->GetDescription(0, DESC_ID)) {
+                        if (pItem->GetDescription(nullptr, DESC_ID)) {
                             if (bShowChallengeUpdates.Bool()) {
                                 char msg[512];
-                                const char* v22 = pItem->GetDescription(0, DESC_ID);
+                                const char* v22 = pItem->GetDescription(nullptr, DESC_ID);
                                 int32_t time = pItem->data.iThreshold;
                                 int32_t NumberOfItemsActivated = pItem->data.iThreshold;
                                 BSsprintf(
                                     msg, 512, "%s   %d\\%d\n%s", pItem->GetFullName(), NumberOfItemsActivated, time, v22
                                 );
-                                const char* v16 = TESTexture::GetTextureName(pItem, 0);
-                                Interface::ShowMessage(msg, 0, v16, 0, 2.0f, 0);
+                                const char* v16 = TESTexture::GetTextureName(pItem, nullptr);
+                                Interface::ShowMessage(msg, 0, v16, nullptr, 2.0f, false);
                                 Interface::PlayMenuSound(21);
                             }
                         }
                     }
                     if (!pItem->GetRecurring() || pItem->GetRemovedRecurring()) {
-                        pItem->SetCompleted(1);
-                        bCompletedChallenges = 1;
+                        pItem->SetCompleted(true);
+                        bCompletedChallenges = true;
                     }
                     else {
                         uint32_t v17 = pItem->progress.iProgress;
                         int32_t iSpillOver = v17 - pItem->data.iThreshold;
                         pItem->ClearProgress();
-                        pItem->SetCompletedRecurring(1);
+                        pItem->SetCompletedRecurring(true);
                         pItem->IncrementProgress(iSpillOver);
                     }
                 }
@@ -580,7 +580,7 @@ bool TESChallengeManager::UpdateChallenge(
     if (bCompletedChallenges) {
         TESChallengeManager::LoadChallenges();
     }
-    return 1;
+    return true;
 }
 
 // The index is compared signed, against the global enum's count, not the class's unsigned copy.
@@ -613,7 +613,7 @@ void TESChallengeManager::LoadChallenges() {
 bool TESChallengeManager::UnlockChallenge(TESChallenge* pChallenge) {
     if (pChallenge) {
         CHALLENGE_TYPE cType = pChallenge->GetChallengeType();
-        pChallenge->SetUnlocked(1);
+        pChallenge->SetUnlocked(true);
         if (!TESChallengeManager::pInactiveChallengeList[cType].IsInList(pChallenge)) {
             TESChallengeManager::pInactiveChallengeList[cType].AddHead(pChallenge);
         }
@@ -621,7 +621,7 @@ bool TESChallengeManager::UnlockChallenge(TESChallenge* pChallenge) {
             TESChallengeManager::pChallengeList[cType].Remove(pChallenge);
         }
     }
-    return 1;
+    return true;
 }
 
 bool TESChallengeManager::IncrementScriptedChallenge(TESChallenge* apChallenge, int32_t aiCount) {

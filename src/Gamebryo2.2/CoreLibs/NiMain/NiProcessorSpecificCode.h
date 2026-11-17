@@ -9,8 +9,9 @@ class NiTransform;
 // SetVectorTransformFunction fill in. A static class, no instances.
 class NiProcessorSpecificCode {
 public:
-    typedef void (*PointTransformFunc)(uint16_t uiVerts, const float* pModel, float* pWorld, const NiTransform* pXform);
-    typedef void (*VectorTransformFunc)(uint16_t uiVerts, const float* pModel, float* pWorld, NiMatrix3* pMatrix);
+    using PointTransformFunc =
+        void (*)(uint16_t uiVerts, const float* pModel, float* pWorld, const NiTransform* pXform);
+    using VectorTransformFunc = void (*)(uint16_t uiVerts, const float* pModel, float* pWorld, NiMatrix3* pMatrix);
 
     // The values IdentifyProcessor stores in ms_eProcessorID
     // (Gamebryo's reference source names).

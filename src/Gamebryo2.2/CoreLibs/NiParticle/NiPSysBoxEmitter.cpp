@@ -27,7 +27,7 @@ NiObject* NiPSysBoxEmitter::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject) NiPSysBoxEmitter;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fEmitterWidth = m_fEmitterWidth;
@@ -118,7 +118,7 @@ void NiPSysBoxEmitter::ComputeVolumeInitialPositionAndVelocity(
 NiObject* NiPSysBoxEmitter::CreateObject() {
     NiPSysBoxEmitter* pkObject = static_cast<NiPSysBoxEmitter*>(NiMemObject::operator new(sizeof(NiPSysBoxEmitter)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysBoxEmitter;
 }

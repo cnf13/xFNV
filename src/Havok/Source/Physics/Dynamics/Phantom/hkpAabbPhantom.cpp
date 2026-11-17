@@ -138,7 +138,7 @@ void hkpAabbPhantom::addOverlappingCollidable(hkpCollidable* collidable) {
 }
 
 hkBool* hkpAabbPhantom::isOverlappingCollidableAdded(hkBool* arResult, const hkpCollidable* apCollidable) {
-    int32_t iSize = static_cast<int32_t>(m_overlappingCollidables.m_size);
+    int32_t iSize = m_overlappingCollidables.m_size;
     int32_t v4 = 0;
     if (iSize <= 0) {
     LABEL_5:;
@@ -194,7 +194,7 @@ void hkpAabbPhantom::ensureDeterministicOrder() {
     if (!m_orderDirty.m_bool) {
         return;
     }
-    const int32_t iSize = static_cast<int32_t>(m_overlappingCollidables.m_size);
+    const int32_t iSize = m_overlappingCollidables.m_size;
     if (iSize > 1) {
         hkAlgorithm::quickSort(m_overlappingCollidables.m_data, 0, iSize - 1, 0);
     }
@@ -226,7 +226,7 @@ void hkpAabbPhantom::deallocateInternalArrays() {
     int32_t v3;
     if (!m_overlappingCollidables.m_size) {
         m_heap = (&hkMemoryRouter::getInstance())->m_heap;
-        v3 = (int32_t)m_overlappingCollidables.m_capacityAndFlags;
+        v3 = m_overlappingCollidables.m_capacityAndFlags;
         m_overlappingCollidables.m_size = (uint32_t)0;
         if (v3 >= 0) {
             m_heap->bufFree(m_overlappingCollidables.m_data, sizeof(hkpCollidable*) * v3);

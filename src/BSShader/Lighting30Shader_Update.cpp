@@ -154,7 +154,7 @@ void Lighting30Shader::UpdatePassTextureStages(uint32_t a1, Lighting30ShaderProp
             case 434u: {
                 SetProjShadowMaps(NiD3DShader::m_spCurrentPass);
             LABEL_18:;
-                SetupStandardTextures(v3, a2, 1);
+                SetupStandardTextures(v3, a2, true);
                 break;
             }
             case 420u:
@@ -216,7 +216,7 @@ void Lighting30Shader::UpdatePassTextureStages(uint32_t a1, Lighting30ShaderProp
 NiD3DPass*
 Lighting30Shader::UpdatePass(BSShaderManager::eBSSMPassEnum aePassEnum, Lighting30ShaderProperty* apL30Prop) {
     NiD3DPass* result;
-    NiD3DPass* ppass = 0;
+    NiD3DPass* ppass = nullptr;
     if (aePassEnum > BSShaderManager::BSSM_3XOCCLUSION) {
         NiD3DPass* m_pObject;
         NiD3DPass* v10;

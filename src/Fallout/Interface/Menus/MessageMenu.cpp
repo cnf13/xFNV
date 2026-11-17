@@ -39,14 +39,14 @@
 #include "Reconstruction.hpp"
 
 #include <cctype>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 MessageMenu::MessageMenuEntryArray MessageMenu::xEntryList;
 MessageMenu::xPerkActivations_t MessageMenu::xPerkActivations;
 
 MessageMenu::MessageMenuEntry::MessageMenuEntry()
-  : strTitle(0), cFirstButtonResult(0), fpResultCallback(0), iWarningContext(WARN_DEFAULT), bIsModal(1),
+  : strTitle(nullptr), cFirstButtonResult(0), fpResultCallback(nullptr), iWarningContext(WARN_DEFAULT), bIsModal(true),
     iXPosOverride(-1), iYPosOverride(-1), fMillisecondsVisible(0.0f),
     fBackgroundTextureOpacity(
         InterfaceManager::Instance()->pStringRoot->GetFloat(Tile::TextToTrait("_background_fill_alpha"))
@@ -55,7 +55,7 @@ MessageMenu::MessageMenuEntry::MessageMenuEntry()
 
 MessageMenu::MessageMenuEntry::~MessageMenuEntry() {
     ourFree(strTitle);
-    strTitle = 0;
+    strTitle = nullptr;
 }
 
 MessageMenu::MessageMenu() : uiMessageStartTime(0) {
@@ -63,10 +63,10 @@ MessageMenu::MessageMenu() : uiMessageStartTime(0) {
 }
 
 MessageMenu::~MessageMenu() {
-    Interface::bAllowPauseMenu = (bool)1;
+    Interface::bAllowPauseMenu = true;
     MessageMenu::pMe = nullptr;
     if (MessageMenu::bCheckForDeletion) {
-        MessageMenu::bDeletedDuringCheck = (bool)1;
+        MessageMenu::bDeletedDuringCheck = true;
     }
 }
 
@@ -84,16 +84,16 @@ void MessageMenu::DoClick(int32_t aiID, Tile* apTarget) {
         if (apTarget) {
             char DataFor = buttonList.GetDataFor(apTarget);
             InterfaceManager::Instance()->cLastMessageButtonClicked = DataFor;
-            MessageMenu::bCheckForDeletion = 1;
+            MessageMenu::bCheckForDeletion = true;
             if (MessageMenu::GetQueueHead()) {
                 if (MessageMenu::GetQueueHead()->fpResultCallback) {
                     MessageMenu::MessageMenuEntry* QueueHead = MessageMenu::GetQueueHead();
                     QueueHead->fpResultCallback();
                 }
             }
-            MessageMenu::bCheckForDeletion = 0;
+            MessageMenu::bCheckForDeletion = false;
             if (MessageMenu::bDeletedDuringCheck) {
-                MessageMenu::bDeletedDuringCheck = 0;
+                MessageMenu::bDeletedDuringCheck = false;
             }
             else {
                 MessageMenu::ClearMessageQueueHead();
@@ -122,7 +122,7 @@ bool MessageMenu::DoKey(int32_t aiKey) {
                         char* v6 = &strtemp.operator[](hotkeyIndex);
                         int32_t v7 = std::toupper(*v6);
                         if (v7 == std::toupper(aiKey)) {
-                            Tile* v8 = pbuttons->GetTileAt(hotkeyIndex, 0);
+                            Tile* v8 = pbuttons->GetTileAt(hotkeyIndex, false);
                             DoClick(7, v8);
                             bhandled = true;
                             break;
@@ -132,7 +132,7 @@ bool MessageMenu::DoKey(int32_t aiKey) {
             }
         }
         else {
-            Tile* v2 = pbuttons->GetTileAt(buttonList.NumItems() - 1, 0);
+            Tile* v2 = pbuttons->GetTileAt(buttonList.NumItems() - 1, false);
             DoClick(7, v2);
             bhandled = true;
         }
@@ -215,20 +215,20 @@ void MessageMenu::LoadNextMessage() {
             char* v27 = pcurrMessage->strAudioOverride.pString;
             BSAudio* v3 = &BSAudio::QInstance();
             BSSoundHandle* v62 = v3->GetSoundHandleByName(&th_s, v27, 289u);
-            v62->Play(0);
+            v62->Play(false);
         }
         else {
             BSAudio* v4 = &BSAudio::QInstance();
             BSSoundHandle* v61 = v4->GetSoundHandleByName(&apResult, "UIPopUpMessageWindow", 289u);
-            v61->Play(0);
+            v61->Play(false);
         }
         char* a1 = pcurrMessage->strMessageText.pString;
-        MessageMenu::pMe->pTiles[3]->Set(4036, a1, 1);
+        MessageMenu::pMe->pTiles[3]->Set(4036, a1, true);
         if (pcurrMessage->strTitle) {
             float v58;
             float fWrapWidth_4;
             float fWrapWidth_3;
-            MessageMenu::pMe->pTiles[1]->Set(4036, pcurrMessage->strTitle, 1);
+            MessageMenu::pMe->pTiles[1]->Set(4036, pcurrMessage->strTitle, true);
             MessageMenu::pMe->pTiles[1]->Set(4003, 1);
             if (pcurrMessage->uiWidthOverride) {
                 fWrapWidth_3 = static_cast<float>(pcurrMessage->uiWidthOverride);
@@ -275,8 +275,9 @@ void MessageMenu::LoadNextMessage() {
                     _Result = apMemory_28.substr(currStartIndex, v8 - currStartIndex);
                     std::string* v57 = &_Result;
                     const char* v9 = v57->c_str();
-                    Tile* ptemp =
-                        MessageMenu::pMe->buttonList.AddItem(ibuttonCt + pcurrMessage->cFirstButtonResult, v9, 0, 0);
+                    Tile* ptemp = MessageMenu::pMe->buttonList.AddItem(
+                        ibuttonCt + pcurrMessage->cFirstButtonResult, v9, nullptr, nullptr
+                    );
                     Tile* ptextChildTile = ptemp->GetChildByName("ListItemText");
                     ptemp->Set(4010, 7);
                     if (ptextChildTile) {
@@ -313,7 +314,7 @@ void MessageMenu::LoadNextMessage() {
         }
         if (pcurrMessage->strIconFilename.GetLength()) {
             char* a1a = pcurrMessage->strIconFilename.pString;
-            MessageMenu::pMe->pTiles[2]->Set(4044, a1a, 1);
+            MessageMenu::pMe->pTiles[2]->Set(4044, a1a, true);
             MessageMenu::pMe->pTiles[2]->Set(4003, 1);
             if (pcurrMessage->uiWidthOverride) {
                 float a2 = static_cast<float>(pcurrMessage->uiWidthOverride);
@@ -335,8 +336,8 @@ void MessageMenu::LoadNextMessage() {
         else {
             flistWidth = static_cast<double>(imaxButtonWidth) + 80.0;
         }
-        MessageMenu::pMe->pTiles[4]->Set(4016, ftotalButtonHeight, 0);
-        MessageMenu::pMe->pTiles[4]->Set(4017, flistWidth, 0);
+        MessageMenu::pMe->pTiles[4]->Set(4016, ftotalButtonHeight, false);
+        MessageMenu::pMe->pTiles[4]->Set(4017, flistWidth, false);
         MessageMenu::pMe->buttonList.Synchronize();
         if (pcurrMessage->uiWidthOverride) {
             float a2b = static_cast<float>(pcurrMessage->uiWidthOverride);
@@ -360,7 +361,7 @@ void MessageMenu::LoadNextMessage() {
         if (MessageMenu::pMe->pTiles[2]->IsTrue(4003)) {
             fWrapWidth_7 = fWrapWidth_7 - 120.0;
         }
-        MessageMenu::pMe->pTiles[3]->Set(4026, fWrapWidth_7, 1);
+        MessageMenu::pMe->pTiles[3]->Set(4026, fWrapWidth_7, true);
         float a1b = MessageMenu::pMe->pTiles[3]->GetFloat(4026);
         char* v25 = pcurrMessage->strMessageText.pString;
         FontManager* v15 = FontManager::Instance();
@@ -393,26 +394,26 @@ void MessageMenu::LoadNextMessage() {
             float a2d = pMenu->GetFloat(v17);
             fmenuWidth = BSMAX(fmenuWidth, a2d);
         }
-        MessageMenu::pMe->pTiles[0]->Set(4017, fmenuWidth, 1);
+        MessageMenu::pMe->pTiles[0]->Set(4017, fmenuWidth, true);
         Interface::bAllowPauseMenu = pcurrMessage->iWarningContext == WARN_INGAME_MESSAGE;
         pMenu->Set(Tile::kTileValue_DeleteOnFade, 0);
         pMenu->Set(4003, 1);
         if (pcurrMessage->bIsModal) {
-            MessageMenu::pMe->pTiles[0]->Set(4009, 1.0f, 1);
+            MessageMenu::pMe->pTiles[0]->Set(4009, 1.0f, true);
             uint32_t a2h = GetClass();
             InterfaceManager* v21 = InterfaceManager::Instance();
             if (!v21->IsMenuInStack(a2h)) {
                 int32_t v22 = GetClass();
-                Interface::AddToEnterStack(v22, 0);
+                Interface::AddToEnterStack(v22, false);
             }
         }
         else {
-            MessageMenu::pMe->pTiles[0]->Set(4009, 0.0f, 1);
+            MessageMenu::pMe->pTiles[0]->Set(4009, 0.0f, true);
             uint32_t a2e = GetClass();
             InterfaceManager* v19 = InterfaceManager::Instance();
             if (v19->IsMenuInStack(a2e)) {
                 int32_t v20 = GetClass();
-                Interface::PopFromEnterStack(v20, 1);
+                Interface::PopFromEnterStack(v20, true);
             }
             float fScreenWidth = InterfaceManager::GetScreenWidth();
             float fMainWidth = MessageMenu::pMe->pTiles[0]->GetFloat(4017);
@@ -438,10 +439,10 @@ void MessageMenu::LoadNextMessage() {
                 float v40 = v41 - InterfaceManager::GetScreenSafeY();
                 fMenuY = BSMIN(fMenuY, v40);
             }
-            MessageMenu::pMe->pTiles[0]->Set(4001, fMenuX, 1);
-            MessageMenu::pMe->pTiles[0]->Set(4002, fMenuY, 1);
+            MessageMenu::pMe->pTiles[0]->Set(4001, fMenuX, true);
+            MessageMenu::pMe->pTiles[0]->Set(4002, fMenuY, true);
         }
-        MessageMenu::pMe->pTiles[5]->Set(4009, pcurrMessage->fBackgroundTextureOpacity, 1);
+        MessageMenu::pMe->pTiles[5]->Set(4009, pcurrMessage->fBackgroundTextureOpacity, true);
     }
 }
 
@@ -473,14 +474,14 @@ void MessageMenu::ProcessYesToAll() {
     if (MessageMenu::GetQueueHead()) {
         WARNING_TYPES disableContext = MessageMenu::GetQueueHead()->iWarningContext;
         MessageHandler::pHandler->DisableContextMessages(disableContext);
-        MessageHandler::SetYesToAll(1);
+        MessageHandler::SetYesToAll(true);
         for (int32_t imessageCt = MessageMenu::iStartIndex; imessageCt < MessageMenu::xEntryList.iSize; ++imessageCt) {
             if (MessageMenu::xEntryList.GetAt(imessageCt)->iWarningContext == disableContext) {
                 MessageMenu::MessageMenuEntry* v0 = MessageMenu::xEntryList.operator[](imessageCt);
                 if (v0) {
                     delete v0;
                 }
-                MessageMenu::xEntryList.Remove(imessageCt--, 1);
+                MessageMenu::xEntryList.Remove(imessageCt--, true);
             }
         }
     }
@@ -515,7 +516,7 @@ bool MessageMenu::AddMessageToQueue(
         pnewMessage = ::new (apMemory) MessageMenu::MessageMenuEntry;
     }
     else {
-        pnewMessage = 0;
+        pnewMessage = nullptr;
     }
     MessageMenu::MessageMenuEntry* pnewMessage_2 = pnewMessage;
     BSStringT<char> strbuttonName(axFirst);
@@ -541,7 +542,7 @@ bool MessageMenu::AddMessageToQueue(
         ititleLen = 0;
     }
     if (ititleLen <= 0) {
-        pnewMessage_2->strTitle = 0;
+        pnewMessage_2->strTitle = nullptr;
     }
     else {
         char* v26 = static_cast<char*>(ourMalloc(ititleLen + 1));
@@ -588,7 +589,7 @@ bool MessageMenu::AddMessageToQueue(
         MessageMenu::xEntryList.Add(pnewMessage_2);
     }
     if (MessageMenu::pMe || (bMessageMenuDisabled || (Interface::InDialog() && !abModal))) {
-        bDeferredCreation = 1;
+        bDeferredCreation = true;
     }
     else {
         if (iNumHWThreads.Int() <= 1) {
@@ -596,14 +597,16 @@ bool MessageMenu::AddMessageToQueue(
         }
         else {
             bool IsTrait = pnewMessage_2->bIsModal;
-            Interface::QueueMenuCreate(Interface::OPEN_MESSAGE, 0, 0, 0, Interface::CMM_STANDARD, !IsTrait);
+            Interface::QueueMenuCreate(
+                Interface::OPEN_MESSAGE, nullptr, nullptr, nullptr, Interface::CMM_STANDARD, !IsTrait
+            );
         }
     }
-    return 1;
+    return true;
 }
 
 MessageMenu::MessageMenuEntry* MessageMenu::GetQueueHead() {
-    MessageMenu::MessageMenuEntry* preturn = 0;
+    MessageMenu::MessageMenuEntry* preturn = nullptr;
     if (MessageMenu::iStartIndex < MessageMenu::xEntryList.iSize) {
         return MessageMenu::xEntryList.GetAt(MessageMenu::iStartIndex);
     }
@@ -628,23 +631,23 @@ void MessageMenu::SetPauseMenuMode(bool abFlag) {
 bool MessageMenu::Create() {
     int32_t v1;
     InterfaceManager* pim = InterfaceManager::Instance();
-    bool boverMenu = 0;
+    bool boverMenu = false;
     int32_t ClassStatic = MessageMenu::GetClassStatic();
     Tile* pold_menu_tile = Menu::GetMenuByClass(ClassStatic);
     if (pold_menu_tile) {
         delete pold_menu_tile;
     }
     if (Interface::GetTopMenuID()) {
-        boverMenu = 1;
+        boverMenu = true;
     }
     Tile* ptile = pim->GetMenusRoot()->ReadFile("Data\\Menus\\message_menu.xml");
     MessageMenu::pMe = static_cast<MessageMenu*>(ptile->GetMenu());
     if (MessageMenu::pMe && (v1 = MessageMenu::pMe->GetClass(), v1 == MessageMenu::GetClassStatic())) {
-        MessageMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), 0);
+        MessageMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
         if (MessageMenu::pMe->IsWellFormedMenu()) {
             if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
                 float afValue = Tile::GetMaximumDepth();
-                ptile->Set(4013, afValue, 1);
+                ptile->Set(4013, afValue, true);
             }
             MessageMenu::pMe->buttonList.Initialize(MessageMenu::pMe->pTiles[4], "MM_ButtonTemplate");
             if (MessageMenu::GetQueueHead()) {
@@ -653,18 +656,18 @@ bool MessageMenu::Create() {
             if (boverMenu) {
                 float v5 = fPopUpBackgroundOpacity.Float() * 255.0;
                 Tile* ChildByName = MessageMenu::pMe->pMenu->GetChildByName("MM_Background");
-                ChildByName->Set(4009, v5, 1);
+                ChildByName->Set(4009, v5, true);
             }
             if (Interface::InDialog()) {
-                Interface::SetDialogPause(1);
+                Interface::SetDialogPause(true);
             }
-            MessageMenu::pMe->PrepForVisibility(0);
-            Interface::SetGunScopeVisible(0);
-            return 1;
+            MessageMenu::pMe->PrepForVisibility(false);
+            Interface::SetGunScopeVisible(false);
+            return true;
         }
         else {
             InitializationFlow("Message Menu Creation Failed... Are your menu and art resources up to date?");
-            return 0;
+            return false;
         }
     }
     else {
@@ -675,7 +678,7 @@ bool MessageMenu::Create() {
                 }
             }
         }
-        return 0;
+        return false;
     }
 }
 
@@ -685,7 +688,7 @@ void MessageMenu::ClearMessageQueueHead() {
         if (v0) {
             delete v0;
         }
-        MessageMenu::xEntryList.Remove(MessageMenu::iStartIndex, 1);
+        MessageMenu::xEntryList.Remove(MessageMenu::iStartIndex, true);
     }
     if (MessageMenu::GetQueueHead()) {
         if (MessageMenu::pMe) {
@@ -704,7 +707,7 @@ void MessageMenu::ClearMessageQueue() {
             delete v0;
         }
     }
-    MessageMenu::xEntryList.Clear(1);
+    MessageMenu::xEntryList.Clear(true);
     MessageMenu::iStartIndex = 0;
 }
 
@@ -721,13 +724,13 @@ bool MessageMenu::AddMessageToQueue(
         pnewMessage = ::new (apMemory) MessageMenu::MessageMenuEntry;
     }
     else {
-        pnewMessage = 0;
+        pnewMessage = nullptr;
     }
     MessageMenu::MessageMenuEntry* pnewMessage_2 = pnewMessage;
     pnewMessage->fpResultCallback = &MessageMenu::HandlePerkActivationResults;
     pnewMessage_2->cFirstButtonResult = 0;
     pnewMessage_2->iWarningContext = WARN_DEFAULT;
-    pnewMessage_2->strIconFilename.operator=(0);
+    pnewMessage_2->strIconFilename.operator=(nullptr);
     pnewMessage_2->strHotkeys.operator=("");
     const char* v2 = sActivationChoiceMessage.String();
     pnewMessage_2->strMessageText.operator=(v2);
@@ -795,8 +798,8 @@ bool MessageMenu::AddMessageToQueue(
                     BGSOpenCloseForm::GetOpenState(apActivationTarget) == BGSOpenCloseForm::OBJECT_OPENING;
                 if (!pExtraLock ||
                     (!pExtraLock->IsLocked() ||
-                     (apActivationTarget->IsAnOwner(pPlayer, 1) ||
-                      (pdoor_2 && TESObjectDOOR::CanActorIgnoreLock(apActivationTarget, pPlayer, 0, 1))))) {
+                     (apActivationTarget->IsAnOwner(pPlayer, true) ||
+                      (pdoor_2 && TESObjectDOOR::CanActorIgnoreLock(apActivationTarget, pPlayer, false, true))))) {
                     const char* apSource;
                     if (v18) {
                         apSource = sCloseButton.String();
@@ -846,7 +849,7 @@ bool MessageMenu::AddMessageToQueue(
     MessageMenu::PerkActivation* pperk_3 =
         static_cast<MessageMenu::PerkActivation*>(ourMalloc(sizeof(MessageMenu::PerkActivation)));
     pperk_3->DisplayText = Dst;
-    pperk_3->pScript = 0;
+    pperk_3->pScript = nullptr;
     pperk_3->pActivatedObject = apActivationTarget;
     MessageMenu::xPerkActivations.Add(pperk_3);
     MessageMenu::xEntryList.Add(pnewMessage_2);
@@ -855,24 +858,26 @@ bool MessageMenu::AddMessageToQueue(
             MessageMenu::Create();
         }
         else {
-            Interface::QueueMenuCreate(Interface::OPEN_MESSAGE, 0, 0, 0, Interface::CMM_STANDARD, 0);
+            Interface::QueueMenuCreate(
+                Interface::OPEN_MESSAGE, nullptr, nullptr, nullptr, Interface::CMM_STANDARD, false
+            );
         }
     }
-    return 1;
+    return true;
 }
 
 void MessageMenu::HandlePerkActivationResults() {
     uint32_t auiIndex = Interface::GetMessageMenuResult();
     if (auiIndex == MessageMenu::xPerkActivations.iSize - 1) {
         int32_t a5 = MessageMenu::xPerkActivations.operator[](auiIndex)->pActivatedObject->GetCount();
-        MessageMenu::xPerkActivations.operator[](auiIndex)->pActivatedObject->Activate(pPlayer, 0, 0, a5);
+        MessageMenu::xPerkActivations.operator[](auiIndex)->pActivatedObject->Activate(pPlayer, false, nullptr, a5);
     }
     else {
         MessageMenu::xPerkActivations.operator[](auiIndex)->pScript->Run(
-            MessageMenu::xPerkActivations.operator[](auiIndex)->pActivatedObject, 0, 0, 0
+            MessageMenu::xPerkActivations.operator[](auiIndex)->pActivatedObject, nullptr, nullptr, false
         );
     }
-    MessageMenu::xPerkActivations.Clear(1);
+    MessageMenu::xPerkActivations.Clear(true);
 }
 
 void MessageHandler::SetYesToAll(bool abTF) {

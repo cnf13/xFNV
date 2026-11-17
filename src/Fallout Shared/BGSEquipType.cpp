@@ -35,7 +35,7 @@ void BGSEquipType::CopyComponent(BaseFormComponent* apCopyFC) {
 bool BGSEquipType::CompareComponent(BaseFormComponent* apCompareFC) {
     BGSEquipType* pcompare = dynamic_cast<BGSEquipType*>(apCompareFC);
     if (!pcompare) {
-        return 1;
+        return true;
     }
     uint32_t FormHealth_0 = eEquipType;
     return FormHealth_0 != pcompare->eEquipType;
@@ -59,10 +59,10 @@ void BGSEquipType::GenerateDefaultMenuIcons() {
                 picon_2 = ::new (apMemory) BGSMenuIcon;
             }
             else {
-                picon_2 = 0;
+                picon_2 = nullptr;
             }
             picon = picon_2;
-            picon_2->SetFormID(iid, 1);
+            picon_2->SetFormID(iid, true);
             BSstrcpy(Dst, 260, "MenuIconEquipType");
             BSstrcat(Dst, 260, BGSEquipType::pEquipTypeNames[i]);
             picon->SetFormEditorID(Dst);

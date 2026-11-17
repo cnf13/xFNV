@@ -160,7 +160,7 @@ void SetLightAttenuation(NiLight* apLight, uint32_t aiRadius) {
 }
 
 NiLight* FindLight(NiNode* apNode) {
-    NiLight* plight = 0;
+    NiLight* plight = nullptr;
     if (!apNode) {
         return plight;
     }
@@ -220,7 +220,7 @@ bool GetAttenuationSettings() {
     if (gs_fQuadraticRadiusMult_bLightAttenuation.Float() == 0.0) {
         gs_fQuadraticRadiusMult_bLightAttenuation.operator=(1.0f);
     }
-    return 1;
+    return true;
 }
 
 void OBJ_LIGH::Endian() {
@@ -431,17 +431,17 @@ void TESObjectLIGH::Copy(TESForm* apCopy) {
 bool TESObjectLIGH::Compare(TESForm* apCompare) {
     TESObjectLIGH* pComp = dynamic_cast<TESObjectLIGH*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
     if (m_pSound != pComp->m_pSound) {
-        return 1;
+        return true;
     }
     void* Children = &pComp->data;
     if (std::memcmp(&data, Children, sizeof(data))) {
-        return 1;
+        return true;
     }
     double LastFadePercent = fFade;
     return LastFadePercent != pComp->fFade;
@@ -532,7 +532,7 @@ NiAVObject* TESObjectLIGH::Clone3D(TESObjectREFR* pRequester) {
 NiLight* TESObjectLIGH::GenDynamic(TESObjectREFR* pRequester, NiAVObject* pModel, bool abForceDynamic) {
     FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
     if (!pModel) {
-        return 0;
+        return nullptr;
     }
     if (pRequester) {
         const NiPoint3* ppos;
@@ -542,15 +542,15 @@ NiLight* TESObjectLIGH::GenDynamic(TESObjectREFR* pRequester, NiAVObject* pModel
              (ppos = &pRequester->GetLocationOnReference(),
               static_cast<double>(ppos->z) < pRequester->GetRelevantWaterHeight()))) {
             if (pObj->GetFormType() == LIGH_ID && TESObjectREFR::HasAddonNodes(static_cast<NiNode*>(pModel))) {
-                pRequester->SetFireOff(1);
+                pRequester->SetFireOff(true);
                 TESObjectLIGH::StopParticlesRecursive(static_cast<NiNode*>(pModel));
             }
             if (!pRequester->IsActor() && (data.flags & LF_OFF_BY_DEFAULT) != 0) {
-                return 0;
+                return nullptr;
             }
         }
     }
-    NiLight* plight = 0;
+    NiLight* plight = nullptr;
     NiColor kColor(0.0f, 0.0f, 0.0f);
     kColor.r = static_cast<double>(static_cast<uint8_t>(data.color)) / 255.0;
     kColor.g = static_cast<double>(static_cast<uint8_t>(static_cast<uint16_t>(data.color) >> 8)) / 255.0;
@@ -558,7 +558,7 @@ NiLight* TESObjectLIGH::GenDynamic(TESObjectREFR* pRequester, NiAVObject* pModel
     if ((data.flags & LF_NEGATIVE) != 0) {
         kColor = -kColor;
     }
-    NiNode* pattachnode = 0;
+    NiNode* pattachnode = nullptr;
     NiAVObject* pobj = pModel->GetObjectByName(FixedStrings::QAttachLight());
     if (pobj) {
         pattachnode = pobj->IsNode();
@@ -576,7 +576,7 @@ NiLight* TESObjectLIGH::GenDynamic(TESObjectREFR* pRequester, NiAVObject* pModel
             pnewLight = ::new (pMemory) NiPointLight;
         }
         else {
-            pnewLight = 0;
+            pnewLight = nullptr;
         }
         plight = pnewLight;
         NiFixedString* pname = ::new (static_cast<void*>(&kName)) NiFixedString(static_cast<const char*>(acName));
@@ -598,7 +598,7 @@ NiLight* TESObjectLIGH::GenDynamic(TESObjectREFR* pRequester, NiAVObject* pModel
     plight->SetDiffuseColor(kColor);
     for (NiTimeController* pkCtrl = pModel->GetControllers(); pkCtrl; pkCtrl = pkCtrl->GetNext()) {
         if (pkCtrl->IsTransformController()) {
-            SetDynamic(1);
+            SetDynamic(true);
             break;
         }
     }
@@ -664,7 +664,7 @@ bool TESObjectLIGH::Update(LightRefData* apLight, ExtraTimeLeft* apExtra) {
 
 bool TESObjectLIGH::Update(NiPointer<NiLight> aspLight, float* apWantDimmer, ExtraTimeLeft* apExtra) {
     NiPointLight* pLight = static_cast<NiPointLight*>(aspLight.m_pObject);
-    bool bShouldResetFadeValue = 0;
+    bool bShouldResetFadeValue = false;
     if ((data.flags & LF_FLICKER) != 0 || (data.flags & LF_FLICKER_SLOW) != 0) {
         float v20;
         float fTimeDelta = appTimer.fDelta;
@@ -722,7 +722,7 @@ bool TESObjectLIGH::Update(NiPointer<NiLight> aspLight, float* apWantDimmer, Ext
             Instance->QueueObjectUpdate(a2);
         }
         else {
-            NiUpdateData arData(0.0f, 0, 0);
+            NiUpdateData arData(0.0f, false, false);
             aspLight.m_pObject->Update(arData);
         }
         float v16 = (fOffsetZ + 0.30000001192092896) * 3.0;
@@ -758,7 +758,7 @@ bool TESObjectLIGH::Update(NiPointer<NiLight> aspLight, float* apWantDimmer, Ext
             float v11 = v27 - *apWantDimmer;
             if (static_cast<double>(v28) > std::fabs(v11)) {
                 if (apExtra && apExtra->fTime == 0.0) {
-                    bShouldResetFadeValue = 1;
+                    bShouldResetFadeValue = true;
                 }
                 else {
                     if ((data.flags & LF_FLICKER) != 0 || (data.flags & LF_FLICKER_SLOW) != 0) {
@@ -804,7 +804,7 @@ void TESObjectLIGH::StopParticlesRecursive(NiNode* pNode) {
     NiProperty* property;
     NiAVObject* v2;
     uint32_t a1;
-    for (a1 = 0; a1 < ((uint32_t)pNode->GetArrayCount()); ++a1) {
+    for (a1 = 0; a1 < pNode->GetArrayCount(); ++a1) {
         v2 = pNode->GetAt(a1);
         if (v2) {
             if (v2->IsNode()) {

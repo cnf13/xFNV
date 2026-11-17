@@ -195,7 +195,7 @@ void BSDismemberSkinInstance::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrin
 
 void BSDismemberSkinInstance::SetBodyPartEnabled(uint16_t ausBodyPartNum, bool abEnabled) {
     uint32_t i;
-    bVisiblePartitions = (bool)0;
+    bVisiblePartitions = false;
     for (i = 0; i < uiPartitionDataArraySize; ++i) {
         if (pPartitionDataArray[i].usBodyPartNum == ausBodyPartNum) {
             pPartitionDataArray[i].bEnabled = (bool)((uint8_t)abEnabled);
@@ -226,7 +226,7 @@ void BSDismemberSkinInstance::CopyMembers(BSDismemberSkinInstance* pkDest, NiClo
 NiObject* BSDismemberSkinInstance::CreateObject() {
     void* pkMemory = NiMemObject::operator new(sizeof(BSDismemberSkinInstance));
     if (!pkMemory) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkMemory) BSDismemberSkinInstance;
 }

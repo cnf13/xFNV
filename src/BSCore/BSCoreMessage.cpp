@@ -4,7 +4,7 @@
 #include "Fallout Shared/GlobalFunc.h"
 
 bool get_11F6370(WARNING_TYPES a1) {
-    return (bool)BSCoreMessage::bWarningsDisabled[a1];
+    return BSCoreMessage::bWarningsDisabled[a1];
 }
 
 BSCoreMessage::BSCoreMessage() {}
@@ -37,7 +37,7 @@ BSCoreMessage::MsgReturn BSCoreMessage::Message(
 }
 
 void BSCoreMessage::DisableContextMessages(WARNING_TYPES aWarningContext) {
-    BSCoreMessage::SetWarningDisabled(aWarningContext, 1);
+    BSCoreMessage::SetWarningDisabled(aWarningContext, true);
 }
 
 // Passes the call on to the handler by calling this same function on pHandler, so a set handler recurses, as the game
@@ -59,7 +59,7 @@ bool BSCoreMessage::CheckWarningContexts(WARNING_TYPES aWarningContext) {
 }
 
 bool BSCoreMessage::HasHandler() {
-    return BSCoreMessage::pHandler != 0;
+    return BSCoreMessage::pHandler != nullptr;
 }
 
 BSCoreMessage* BSCoreMessage::GetInstance() {

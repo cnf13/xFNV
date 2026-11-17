@@ -307,7 +307,7 @@ void NiBSplineData::GetCompactedValueDegree3(
 NiObject* NiBSplineData::CreateObject() {
     NiBSplineData* pkObject = static_cast<NiBSplineData*>(NiMemObject::operator new(sizeof(NiBSplineData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiBSplineData;
 }

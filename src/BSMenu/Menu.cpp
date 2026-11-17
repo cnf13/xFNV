@@ -32,17 +32,17 @@ Menu::Menu()
 
 Menu::~Menu() {
     if (iClass >= 1001 && iClass <= 1084) {
-        Menu::pMenusVisible[iClass - 1001] = 0;
+        Menu::pMenusVisible[iClass - 1001] = false;
     }
     if (iIsModal) {
-        Interface::PopFromEnterStack(iIsModal, 1);
+        Interface::PopFromEnterStack(iIsModal, true);
     }
-    Menu::SetMenuByClass(iClass, 0);
+    Menu::SetMenuByClass(iClass, nullptr);
     if (pMenu) {
-        pMenu->pMenu = 0;
+        pMenu->pMenu = nullptr;
         delete pMenu;
     }
-    pMenu = 0;
+    pMenu = nullptr;
     if (bDeleteTemplates) {
         for (Tile::TileTemplate* m_item : xTemplates) {
             delete m_item;
@@ -218,7 +218,7 @@ void Menu::StartFadeOut() {
         xFadeState = Interface::FADING_OUT;
         if (iIsModal) {
             if (pMenu->Tile::IsTrue(6002)) {
-                Interface::PopFromEnterStack(static_cast<Interface::enumMenus>(iIsModal), 0);
+                Interface::PopFromEnterStack(static_cast<Interface::enumMenus>(iIsModal), false);
                 Interface::SetCurrentFocusTarget(nullptr);
             }
         }
@@ -228,7 +228,7 @@ void Menu::StartFadeOut() {
 
 void Menu::CancelFadeIn() {
     if (xFadeState == 8) {
-        pMenu->Set(4003, static_cast<float>(0.0), static_cast<bool>(1));
+        pMenu->Set(4003, static_cast<float>(0.0), true);
         Interface::RecursiveFade(pMenu->spModel.m_pObject, 1.0, 0.0);
         xFadeState = Interface::FADE_HIDDEN;
         Interface::ClearTimer(this);
@@ -441,7 +441,7 @@ bool Menu::LoadFinalMasterXML() {
     if (!pFile) {
         return bLoaded;
     }
-    pFile->Open(0, false);
+    pFile->Open(false, false);
     FinalMasterXMLHeader kHeader;
     // Calls ReadF directly.
     if (pFile->BSFile::ReadF(&kHeader, 12) == 12 && kHeader.uiVersion == 100) {
@@ -535,7 +535,7 @@ void Menu::FreeXMLArchive() {
 }
 
 Tile::BuildStorage* Menu::GetParsedXML(const char* apFilename) {
-    Tile::BuildStorage* val = 0;
+    Tile::BuildStorage* val = nullptr;
     Menu::XMLParsedHash.GetAt(apFilename, val);
     return val;
 }
@@ -581,7 +581,7 @@ int32_t Menu::LoadMasterXMLFile() {
         Menu::XMLHash.SetAt(pfname, pnewdata);
         ++icount;
         pstart_2 = pend + 4;
-        pend = 0;
+        pend = nullptr;
         if (pstart_2 - pstart < ilength) {
             pend = const_cast<char*>(std::strstr(pstart_2, "@#$%"));
         }
@@ -616,10 +616,10 @@ bool Menu::CreateFinalMasterXMLFile() {
     BSFile* pfile;
     void* apMemory = MemoryManager_Singleton.Allocate(sizeof(BSFile));
     if (apMemory) {
-        pfile = ::new (apMemory) BSFile("D:\\Data\\final_master_xml.dat", NiFile::WRITE_ONLY, 0x4000u, 0);
+        pfile = ::new (apMemory) BSFile("D:\\Data\\final_master_xml.dat", NiFile::WRITE_ONLY, 0x4000u, false);
     }
     else {
-        pfile = 0;
+        pfile = nullptr;
     }
     uint32_t uiHeaderSizes = 1;
     uint32_t uiWritten = pfile->m_pfnWrite(pfile, auiHeader, sizeof(auiHeader), &uiHeaderSizes, 1);

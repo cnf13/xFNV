@@ -40,7 +40,6 @@
 #include "SDK/MSVC/string.h"
 
 #include <cstdint>
-#include <stdint.h>
 
 NiRTTI NiSkinPartition::ms_RTTI("NiSkinPartition", &NiObject::ms_RTTI);
 
@@ -108,10 +107,10 @@ bool NiSkinPartition::BoneSet::Contains(const NiSkinPartition::BoneSet& kThat) c
     uint32_t v2 = 0;
     uint32_t v3 = 0;
     if (!(&kThat)->m_uiUsed) {
-        return (bool)1;
+        return true;
     }
     m_uiUsed = this->m_uiUsed;
-    while (1) {
+    while (true) {
         v5 = (uint8_t)(v2 == m_uiUsed);
         if (v2 < m_uiUsed) {
             v6 = &m_pBase[v2];
@@ -131,10 +130,10 @@ bool NiSkinPartition::BoneSet::Contains(const NiSkinPartition::BoneSet& kThat) c
         ++v3;
         ++v2;
         if (v3 >= (&kThat)->m_uiUsed) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 uint32_t NiSkinPartition::BoneSet::MergedSize(const NiSkinPartition::BoneSet& kThat) const {
@@ -403,7 +402,7 @@ void NiSkinPartition::Partition::Create(
             uint32_t v33 = 0;
             const NiSkinPartition::VertexInteractions* apTriData = v32;
             if (v9->m_uiUsed) {
-                while (1) {
+                while (true) {
                     float arTriangles;
                     uint32_t v34 = v32->m_uiUsed;
                     uint32_t v35 = 0;
@@ -1374,7 +1373,7 @@ void NiSkinPartition::MakeBoneMap(
         const NiSkinPartition::VertexInteractions* kMapa = v6;
         uint32_t m_uiUsed = v6->m_uiUsed;
         if (m_uiUsed) {
-            while (1) {
+            while (true) {
                 uint32_t uiBone = v6->m_pBase[v7].m_uiBone;
                 NiTMapItem<uint32_t, float>* v9 = kMap.m_ppkHashTable[kMap.KeyToHashIndex(uiBone)];
                 if (!v9) {
@@ -1422,7 +1421,7 @@ void NiSkinPartition::CreateInitialBoneSets(
         if (!pkTriData->m_usTriangles) {
             return;
         }
-        while (1) {
+        while (true) {
             v5->GetTriangleIndices(v63, *ausTriangle, ausTriangle[1], ausTriangle[2]);
             if (ausTriangle[0] != ausTriangle[1] &&
                 (ausTriangle[1] != ausTriangle[2] && ausTriangle[2] != ausTriangle[0])) {
@@ -1431,13 +1430,13 @@ void NiSkinPartition::CreateInitialBoneSets(
                     MemoryManager_Singleton.Allocate(sizeof(NiSkinPartition::BoneSet))
                 );
                 if (v45) {
-                    v45->m_pBase = 0;
+                    v45->m_pBase = nullptr;
                     v45->m_uiAlloced = 0;
                     v45->m_uiUsed = 0;
                     v46 = v45;
                 }
                 else {
-                    v46 = 0;
+                    v46 = nullptr;
                 }
                 for (uint32_t i = 0; i < 3; ++i) {
                     NiSkinPartition::VertexInteractions* v47 = &pkVertexInteraction[ausTriangle[i]];
@@ -1483,7 +1482,7 @@ void NiSkinPartition::CreateInitialBoneSets(
                 std::qsort(v46->m_pBase, v46->m_uiUsed, sizeof(uint16_t), &NiSkinPartition::BoneSet::CompareBones);
                 uint32_t v55 = 0;
                 if (kBoneSets.m_uiUsed) {
-                    while (1) {
+                    while (true) {
                         NiSkinPartition::BoneSet* v56 = kBoneSets.m_pBase[v55];
                         if (v56->Contains(*v46)) {
                             break;
@@ -1532,7 +1531,7 @@ void NiSkinPartition::CreateInitialBoneSets(
     if (!pkTriData->m_usTriangles) {
         return;
     }
-    while (2) {
+    while (true) {
         uint32_t v75[3];
         v5->GetTriangleIndices(v8, *ausTriangle, ausTriangle[1], ausTriangle[2]);
         int32_t v9 = v6[ausTriangle[1]];
@@ -1597,7 +1596,7 @@ void NiSkinPartition::CreateInitialBoneSets(
                                                 }
                                             }
                                             else {
-                                                v23 = 0;
+                                                v23 = nullptr;
                                             }
                                             _NiFree(v13->m_pBase);
                                             v13->m_pBase = v23;
@@ -1631,9 +1630,9 @@ void NiSkinPartition::CreateInitialBoneSets(
                 NiSkinPartition::BoneSet* v26 = static_cast<NiSkinPartition::BoneSet*>(
                     MemoryManager_Singleton.Allocate(sizeof(NiSkinPartition::BoneSet))
                 );
-                NiSkinPartition::BoneSet* v27 = 0;
+                NiSkinPartition::BoneSet* v27 = nullptr;
                 if (v26) {
-                    v26->m_pBase = 0;
+                    v26->m_pBase = nullptr;
                     v26->m_uiAlloced = 0;
                     v26->m_uiUsed = 0;
                     v27 = v26;
@@ -1680,7 +1679,7 @@ void NiSkinPartition::CreateInitialBoneSets(
                                             }
                                         }
                                         else {
-                                            v37 = 0;
+                                            v37 = nullptr;
                                         }
                                         _NiFree(v27->m_pBase);
                                         v27->m_pBase = v37;
@@ -1745,7 +1744,7 @@ void NiSkinPartition::CreateInitialBoneSets(
 NiObject* NiSkinPartition::CreateObject() {
     NiSkinPartition* pkObject = static_cast<NiSkinPartition*>(NiMemObject::operator new(sizeof(NiSkinPartition)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiSkinPartition;
 }

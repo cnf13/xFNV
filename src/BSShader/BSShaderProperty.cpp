@@ -153,7 +153,7 @@ void BSShaderProperty::RenderPass::SetLights(int32_t ausNumLights, ShadowSceneLi
 void BSShaderProperty::RenderPass::ClearSceneLights() {
     if (ppSceneLights) {
         (&MemoryManager_Singleton)->Deallocate(ppSceneLights);
-        ppSceneLights = (ShadowSceneLight**)0;
+        ppSceneLights = (ShadowSceneLight**)nullptr;
     }
 }
 
@@ -228,8 +228,8 @@ void BSShaderProperty::PreviousTransform::SaveCamera(NiCamera* apCamera) {
     if (!BSShaderProperty::PreviousTransform::bFrozen && !BSShaderProperty::PreviousTransform::bConsole) {
         BSShaderProperty::PreviousTransform::matView = BSShaderManager::pRenderer.m_pObject->m_kD3DView;
         BSShaderProperty::PreviousTransform::matProj = BSShaderManager::pRenderer.m_pObject->m_kD3DProj;
-        BSShaderProperty::PreviousTransform::bViewProjReady = 1;
-        BSShaderProperty::PreviousTransform::bDirty = 0;
+        BSShaderProperty::PreviousTransform::bViewProjReady = true;
+        BSShaderProperty::PreviousTransform::bDirty = false;
         float v1 = apCamera->m_kWorld.m_Rotate.m_pEntry[1][0];
         float v2 = apCamera->m_kWorld.m_Rotate.m_pEntry[2][0];
         BSShaderProperty::PreviousTransform::vecPrevCameraDir.x = apCamera->m_kWorld.m_Rotate.m_pEntry[0][0];
@@ -459,7 +459,7 @@ void BSShaderProperty::CheckCreateRenderPassArray(int32_t aiNumPasses) {
     BSShaderProperty::RenderPassArray* v5;
     if (!pRenderPassList) {
         v3 = aiNumPasses;
-        if (aiNumPasses == ((-1))) {
+        if (aiNumPasses == (-1)) {
             v3 = 5;
         }
         v4 = (&MemoryManager_Singleton)->Allocate(sizeof(BSShaderProperty::RenderPassArray));
@@ -642,14 +642,14 @@ void BSShaderProperty::AddLocalMapPass(NiGeometry* apGeometry, bool abSkinned, b
     BSShaderProperty::RenderPassArray* pLocalMapRenderPassArray = this->pLocalMapRenderPassList;
     if (!pLocalMapRenderPassArray->iSize) {
         if (abHidden) {
-            pLocalMapRenderPassArray->Add(apGeometry, 494, 1, 0, 0, 0, 0, 0);
+            pLocalMapRenderPassArray->Add(apGeometry, 494, 1, 0, nullptr, nullptr, nullptr, nullptr);
         }
         else {
             if (abSkinned) {
-                pLocalMapRenderPassArray->Add(apGeometry, 493, 1, 0, 0, 0, 0, 0);
+                pLocalMapRenderPassArray->Add(apGeometry, 493, 1, 0, nullptr, nullptr, nullptr, nullptr);
             }
             else {
-                pLocalMapRenderPassArray->Add(apGeometry, 492, 1, 0, 0, 0, 0, 0);
+                pLocalMapRenderPassArray->Add(apGeometry, 492, 1, 0, nullptr, nullptr, nullptr, nullptr);
             }
         }
     }
@@ -783,10 +783,10 @@ void BSShaderProperty::InitRenderPassArray_constAlpha(uint32_t a2) {
 void BSShaderProperty::AddConstAlphaPass(NiGeometry* a1, bool a2, bool a3) {
     BSShaderProperty::RenderPassArray* pConstAlphaRenderPassArray = this->pConstAlphaRenderPassList;
     if (a2) {
-        pConstAlphaRenderPassArray->Add(a1, 8u, 1, 0, 0, 0, 0, 0);
+        pConstAlphaRenderPassArray->Add(a1, 8u, 1, 0, nullptr, nullptr, nullptr, nullptr);
     }
     else {
-        pConstAlphaRenderPassArray->Add(a1, a3 + 6, 1, 0, 0, 0, 0, 0);
+        pConstAlphaRenderPassArray->Add(a1, a3 + 6, 1, 0, nullptr, nullptr, nullptr, nullptr);
     }
 }
 
@@ -812,7 +812,7 @@ void BSShaderProperty::AddPass_2X_EnvMap(
             else {
                 v14 = a2;
             }
-            pRenderPassArray->Add(a1, 585, *a6, 1, v14, 0, 0, 0);
+            pRenderPassArray->Add(a1, 585, *a6, 1, v14, nullptr, nullptr, nullptr);
             return;
         }
     LABEL_16:;
@@ -827,7 +827,7 @@ void BSShaderProperty::AddPass_2X_EnvMap(
     }
     else {
         if (a9) {
-            this->pRenderPassList->Add(a1, 586, *a6, 0, 0, 0, 0, 0);
+            this->pRenderPassList->Add(a1, 586, *a6, 0, nullptr, nullptr, nullptr, nullptr);
             return;
         }
         usnewPassEnum = 584;
@@ -837,7 +837,7 @@ void BSShaderProperty::AddPass_2X_EnvMap(
     if (!a3) {
         v11 = a2;
     }
-    v12->Add(a1, usnewPassEnum, *a6, 1, v11, 0, 0, 0);
+    v12->Add(a1, usnewPassEnum, *a6, 1, v11, nullptr, nullptr, nullptr);
 }
 
 void BSShaderProperty::SelfIlluminationBlock(NiGeometry* a2, uint16_t* a3, int32_t a4, bool bSkinned) {
@@ -851,7 +851,7 @@ void BSShaderProperty::SelfIlluminationBlock(NiGeometry* a2, uint16_t* a3, int32
             v5 = static_cast<int16_t>(
                 (static_cast<uint32_t>(v5) & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(bSkinned)))
             );
-            pSIBlockRenderPassArray->Add(a2, v5 + 20, 0, 0, 0, 0, 0, 0);
+            pSIBlockRenderPassArray->Add(a2, v5 + 20, 0, 0, nullptr, nullptr, nullptr, nullptr);
         }
     }
 }
@@ -860,22 +860,22 @@ void BSShaderProperty::SelfIlluminationBlock(NiGeometry* a2, uint16_t* a3, int32
 int32_t BSShaderProperty::AddDepthPassOrCount(NiGeometry* a2, uint16_t* a3, int32_t a4, bool* bEnable, bool bSkinned) {
     if (bSkinned) {
         if (static_cast<uint8_t>(a4) == 1) {
-            pRenderPassList->Add(a2, 593, *bEnable, 0, 0, 0, 0, 0);
+            pRenderPassList->Add(a2, 593, *bEnable, 0, nullptr, nullptr, nullptr, nullptr);
         }
         else {
             ++*a3;
         }
-        *bEnable = 0;
+        *bEnable = false;
         return 0;
     }
     else {
         if (static_cast<uint8_t>(a4) == 1) {
-            pRenderPassList->Add(a2, 592, *bEnable, 0, 0, 0, 0, 0);
+            pRenderPassList->Add(a2, 592, *bEnable, 0, nullptr, nullptr, nullptr, nullptr);
         }
         else {
             ++*a3;
         }
-        *bEnable = 0;
+        *bEnable = false;
         return 0;
     }
 }
@@ -900,15 +900,15 @@ int32_t BSShaderProperty::AD2(
             if (!bFaceGen) {
                 if (bShadows) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 230, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 230, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 221, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 221, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -919,15 +919,15 @@ int32_t BSShaderProperty::AD2(
             if (bFaceGen) {
                 if (bShadows) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 231, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 231, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 222, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 222, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -936,15 +936,15 @@ int32_t BSShaderProperty::AD2(
             if (!bParallax) {
                 if (bShadows) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 229, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 229, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 220, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 220, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -957,15 +957,15 @@ int32_t BSShaderProperty::AD2(
             if (bFaceGen) {
                 if (bShadows) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 228, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 228, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 219, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 219, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -974,15 +974,15 @@ int32_t BSShaderProperty::AD2(
                 if (bParallax) {
                     if (bShadows) {
                         if (static_cast<uint8_t>(arg10) == 1) {
-                            pRenderPassList->Add(pShape, 226, 1, 2, pLight, pLight1, 0, 0);
-                            *bEnable = 0;
+                            pRenderPassList->Add(pShape, 226, 1, 2, pLight, pLight1, nullptr, nullptr);
+                            *bEnable = false;
                             return 0;
                         }
                     }
                     else {
                         if (static_cast<uint8_t>(arg10) == 1) {
-                            pRenderPassList->Add(pShape, 217, 1, 2, pLight, pLight1, 0, 0);
-                            *bEnable = 0;
+                            pRenderPassList->Add(pShape, 217, 1, 2, pLight, pLight1, nullptr, nullptr);
+                            *bEnable = false;
                             return 0;
                         }
                     }
@@ -991,15 +991,15 @@ int32_t BSShaderProperty::AD2(
                     if (bShadows) {
                         if (bTreeBranch) {
                             if (static_cast<uint8_t>(arg10) == 1) {
-                                pRenderPassList->Add(pShape, 232, 1, 2, pLight, pLight1, 0, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 232, 1, 2, pLight, pLight1, nullptr, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
                         else {
                             if (static_cast<uint8_t>(arg10) == 1) {
-                                pRenderPassList->Add(pShape, 224, 1, 2, pLight, pLight1, 0, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 224, 1, 2, pLight, pLight1, nullptr, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
@@ -1007,15 +1007,15 @@ int32_t BSShaderProperty::AD2(
                     else {
                         if (bTreeBranch) {
                             if (static_cast<uint8_t>(arg10) == 1) {
-                                pRenderPassList->Add(pShape, 223, 1, 2, pLight, pLight1, 0, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 223, 1, 2, pLight, pLight1, nullptr, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
                         else {
                             if (static_cast<uint8_t>(arg10) == 1) {
-                                pRenderPassList->Add(pShape, 215, 1, 2, pLight, pLight1, 0, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 215, 1, 2, pLight, pLight1, nullptr, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
@@ -1029,15 +1029,15 @@ int32_t BSShaderProperty::AD2(
         if (!bFaceGen) {
             if (bShadows) {
                 if (static_cast<uint8_t>(arg10) == 1) {
-                    pRenderPassList->Add(pShape, 225, 1, 2, pLight, pLight1, 0, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 225, 1, 2, pLight, pLight1, nullptr, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
             else {
                 if (static_cast<uint8_t>(arg10) == 1) {
-                    pRenderPassList->Add(pShape, 216, 1, 2, pLight, pLight1, 0, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 216, 1, 2, pLight, pLight1, nullptr, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
@@ -1045,7 +1045,7 @@ int32_t BSShaderProperty::AD2(
         }
     }
 LABEL_52:;
-    *bEnable = 0;
+    *bEnable = false;
     return 0;
 }
 
@@ -1072,15 +1072,15 @@ int32_t BSShaderProperty::AD3(
             }
             if (bHasShadow) {
                 if (static_cast<uint8_t>(arg14) == 1) {
-                    pRenderPassList->Add(pShape, 248, 1, 3, pLight, pLight1, pLight2, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 248, 1, 3, pLight, pLight1, pLight2, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
             else {
                 if (static_cast<uint8_t>(arg14) == 1) {
-                    pRenderPassList->Add(pShape, 239, 1, 3, pLight, pLight1, pLight2, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 239, 1, 3, pLight, pLight1, pLight2, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
@@ -1089,15 +1089,15 @@ int32_t BSShaderProperty::AD3(
         if (bIsFaceGen) {
             if (bHasShadow) {
                 if (static_cast<uint8_t>(arg14) == 1) {
-                    pRenderPassList->Add(pShape, 249, 1, 3, pLight, pLight1, pLight2, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 249, 1, 3, pLight, pLight1, pLight2, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
             else {
                 if (static_cast<uint8_t>(arg14) == 1) {
-                    pRenderPassList->Add(pShape, 240, 1, 3, pLight, pLight1, pLight2, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 240, 1, 3, pLight, pLight1, pLight2, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
@@ -1106,15 +1106,15 @@ int32_t BSShaderProperty::AD3(
         if (!bHasParallax) {
             if (bHasShadow) {
                 if (static_cast<uint8_t>(arg14) == 1) {
-                    pRenderPassList->Add(pShape, 247, 1, 3, pLight, pLight1, pLight2, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 247, 1, 3, pLight, pLight1, pLight2, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
             else {
                 if (static_cast<uint8_t>(arg14) == 1) {
-                    pRenderPassList->Add(pShape, 238, 1, 3, pLight, pLight1, pLight2, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 238, 1, 3, pLight, pLight1, pLight2, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
@@ -1126,15 +1126,15 @@ int32_t BSShaderProperty::AD3(
             if (bIsFaceGen) {
                 if (bHasShadow) {
                     if (static_cast<uint8_t>(arg14) == 1) {
-                        pRenderPassList->Add(pShape, 246, 1, 3, pLight, pLight1, pLight2, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 246, 1, 3, pLight, pLight1, pLight2, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg14) == 1) {
-                        pRenderPassList->Add(pShape, 237, 1, 3, pLight, pLight1, pLight2, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 237, 1, 3, pLight, pLight1, pLight2, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1143,15 +1143,15 @@ int32_t BSShaderProperty::AD3(
                 if (bHasParallax) {
                     if (bHasShadow) {
                         if (static_cast<uint8_t>(arg14) == 1) {
-                            pRenderPassList->Add(pShape, 244, 1, 3, pLight, pLight1, pLight2, 0);
-                            *bEnable = 0;
+                            pRenderPassList->Add(pShape, 244, 1, 3, pLight, pLight1, pLight2, nullptr);
+                            *bEnable = false;
                             return 0;
                         }
                     }
                     else {
                         if (static_cast<uint8_t>(arg14) == 1) {
-                            pRenderPassList->Add(pShape, 235, 1, 3, pLight, pLight1, pLight2, 0);
-                            *bEnable = 0;
+                            pRenderPassList->Add(pShape, 235, 1, 3, pLight, pLight1, pLight2, nullptr);
+                            *bEnable = false;
                             return 0;
                         }
                     }
@@ -1160,15 +1160,15 @@ int32_t BSShaderProperty::AD3(
                     if (bHasShadow) {
                         if (bIsBranch) {
                             if (static_cast<uint8_t>(arg14) == 1) {
-                                pRenderPassList->Add(pShape, 250, 1, 3, pLight, pLight1, pLight2, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 250, 1, 3, pLight, pLight1, pLight2, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
                         else {
                             if (static_cast<uint8_t>(arg14) == 1) {
-                                pRenderPassList->Add(pShape, 242, 1, 3, pLight, pLight1, pLight2, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 242, 1, 3, pLight, pLight1, pLight2, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
@@ -1176,15 +1176,15 @@ int32_t BSShaderProperty::AD3(
                     else {
                         if (bIsBranch) {
                             if (static_cast<uint8_t>(arg14) == 1) {
-                                pRenderPassList->Add(pShape, 241, 1, 3, pLight, pLight1, pLight2, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 241, 1, 3, pLight, pLight1, pLight2, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
                         else {
                             if (static_cast<uint8_t>(arg14) == 1) {
-                                pRenderPassList->Add(pShape, 233, 1, 3, pLight, pLight1, pLight2, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 233, 1, 3, pLight, pLight1, pLight2, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
@@ -1199,15 +1199,15 @@ int32_t BSShaderProperty::AD3(
             if (bHasParallax) {
                 if (bHasShadow) {
                     if (static_cast<uint8_t>(arg14) == 1) {
-                        pRenderPassList->Add(pShape, 245, 1, 3, pLight, pLight1, pLight2, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 245, 1, 3, pLight, pLight1, pLight2, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg14) == 1) {
-                        pRenderPassList->Add(pShape, 236, 1, 3, pLight, pLight1, pLight2, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 236, 1, 3, pLight, pLight1, pLight2, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1215,15 +1215,15 @@ int32_t BSShaderProperty::AD3(
             else {
                 if (bHasShadow) {
                     if (static_cast<uint8_t>(arg14) == 1) {
-                        pRenderPassList->Add(pShape, 243, 1, 3, pLight, pLight1, pLight2, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 243, 1, 3, pLight, pLight1, pLight2, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg14) == 1) {
-                        pRenderPassList->Add(pShape, 234, 1, 3, pLight, pLight1, pLight2, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 234, 1, 3, pLight, pLight1, pLight2, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1232,7 +1232,7 @@ int32_t BSShaderProperty::AD3(
         }
     }
 LABEL_59:;
-    *bEnable = 0;
+    *bEnable = false;
     return 0;
 }
 
@@ -1259,15 +1259,15 @@ int32_t BSShaderProperty::ADT2(
             }
             if (a11) {
                 if (static_cast<uint8_t>(arg10) == 1) {
-                    pRenderPassList->Add(a1, 296, 1, 2, a2, a3, 0, 0);
-                    *arg14 = 0;
+                    pRenderPassList->Add(a1, 296, 1, 2, a2, a3, nullptr, nullptr);
+                    *arg14 = false;
                     return 0;
                 }
             }
             else {
                 if (static_cast<uint8_t>(arg10) == 1) {
-                    pRenderPassList->Add(a1, 285, 1, 2, a2, a3, 0, 0);
-                    *arg14 = 0;
+                    pRenderPassList->Add(a1, 285, 1, 2, a2, a3, nullptr, nullptr);
+                    *arg14 = false;
                     return 0;
                 }
             }
@@ -1276,15 +1276,15 @@ int32_t BSShaderProperty::ADT2(
         if (a9) {
             if (a11) {
                 if (static_cast<uint8_t>(arg10) == 1) {
-                    pRenderPassList->Add(a1, 297, 1, 2, a2, a3, 0, 0);
-                    *arg14 = 0;
+                    pRenderPassList->Add(a1, 297, 1, 2, a2, a3, nullptr, nullptr);
+                    *arg14 = false;
                     return 0;
                 }
             }
             else {
                 if (static_cast<uint8_t>(arg10) == 1) {
-                    pRenderPassList->Add(a1, 286, 1, 2, a2, a3, 0, 0);
-                    *arg14 = 0;
+                    pRenderPassList->Add(a1, 286, 1, 2, a2, a3, nullptr, nullptr);
+                    *arg14 = false;
                     return 0;
                 }
             }
@@ -1294,15 +1294,15 @@ int32_t BSShaderProperty::ADT2(
             if (a11) {
                 if (a14) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(a1, 299, 1, 2, a2, a3, 0, 0);
-                        *arg14 = 0;
+                        pRenderPassList->Add(a1, 299, 1, 2, a2, a3, nullptr, nullptr);
+                        *arg14 = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(a1, 295, 1, 2, a2, a3, 0, 0);
-                        *arg14 = 0;
+                        pRenderPassList->Add(a1, 295, 1, 2, a2, a3, nullptr, nullptr);
+                        *arg14 = false;
                         return 0;
                     }
                 }
@@ -1310,15 +1310,15 @@ int32_t BSShaderProperty::ADT2(
             else {
                 if (a14) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(a1, 288, 1, 2, a2, a3, 0, 0);
-                        *arg14 = 0;
+                        pRenderPassList->Add(a1, 288, 1, 2, a2, a3, nullptr, nullptr);
+                        *arg14 = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(a1, 284, 1, 2, a2, a3, 0, 0);
-                        *arg14 = 0;
+                        pRenderPassList->Add(a1, 284, 1, 2, a2, a3, nullptr, nullptr);
+                        *arg14 = false;
                         return 0;
                     }
                 }
@@ -1331,15 +1331,15 @@ int32_t BSShaderProperty::ADT2(
             if (a9) {
                 if (a11) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(a1, 291, 1, 2, a2, a3, 0, 0);
-                        *arg14 = 0;
+                        pRenderPassList->Add(a1, 291, 1, 2, a2, a3, nullptr, nullptr);
+                        *arg14 = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(a1, 280, 1, 2, a2, a3, 0, 0);
-                        *arg14 = 0;
+                        pRenderPassList->Add(a1, 280, 1, 2, a2, a3, nullptr, nullptr);
+                        *arg14 = false;
                         return 0;
                     }
                 }
@@ -1348,15 +1348,15 @@ int32_t BSShaderProperty::ADT2(
                 if (a12) {
                     if (a11) {
                         if (static_cast<uint8_t>(arg10) == 1) {
-                            pRenderPassList->Add(a1, 292, 1, 2, a2, a3, 0, 0);
-                            *arg14 = 0;
+                            pRenderPassList->Add(a1, 292, 1, 2, a2, a3, nullptr, nullptr);
+                            *arg14 = false;
                             return 0;
                         }
                     }
                     else {
                         if (static_cast<uint8_t>(arg10) == 1) {
-                            pRenderPassList->Add(a1, 281, 1, 2, a2, a3, 0, 0);
-                            *arg14 = 0;
+                            pRenderPassList->Add(a1, 281, 1, 2, a2, a3, nullptr, nullptr);
+                            *arg14 = false;
                             return 0;
                         }
                     }
@@ -1365,23 +1365,23 @@ int32_t BSShaderProperty::ADT2(
                     if (a11) {
                         if (a13) {
                             if (static_cast<uint8_t>(arg10) == 1) {
-                                pRenderPassList->Add(a1, 298, 1, 2, a2, a3, 0, 0);
-                                *arg14 = 0;
+                                pRenderPassList->Add(a1, 298, 1, 2, a2, a3, nullptr, nullptr);
+                                *arg14 = false;
                                 return 0;
                             }
                         }
                         else {
                             if (a14) {
                                 if (static_cast<uint8_t>(arg10) == 1) {
-                                    pRenderPassList->Add(a1, 294, 1, 2, a2, a3, 0, 0);
-                                    *arg14 = 0;
+                                    pRenderPassList->Add(a1, 294, 1, 2, a2, a3, nullptr, nullptr);
+                                    *arg14 = false;
                                     return 0;
                                 }
                             }
                             else {
                                 if (static_cast<uint8_t>(arg10) == 1) {
-                                    pRenderPassList->Add(a1, 289, 1, 2, a2, a3, 0, 0);
-                                    *arg14 = 0;
+                                    pRenderPassList->Add(a1, 289, 1, 2, a2, a3, nullptr, nullptr);
+                                    *arg14 = false;
                                     return 0;
                                 }
                             }
@@ -1390,23 +1390,23 @@ int32_t BSShaderProperty::ADT2(
                     else {
                         if (a13) {
                             if (static_cast<uint8_t>(arg10) == 1) {
-                                pRenderPassList->Add(a1, 287, 1, 2, a2, a3, 0, 0);
-                                *arg14 = 0;
+                                pRenderPassList->Add(a1, 287, 1, 2, a2, a3, nullptr, nullptr);
+                                *arg14 = false;
                                 return 0;
                             }
                         }
                         else {
                             if (a14) {
                                 if (static_cast<uint8_t>(arg10) == 1) {
-                                    pRenderPassList->Add(a1, 283, 1, 2, a2, a3, 0, 0);
-                                    *arg14 = 0;
+                                    pRenderPassList->Add(a1, 283, 1, 2, a2, a3, nullptr, nullptr);
+                                    *arg14 = false;
                                     return 0;
                                 }
                             }
                             else {
                                 if (static_cast<uint8_t>(arg10) == 1) {
-                                    pRenderPassList->Add(a1, 278, 1, 2, a2, a3, 0, 0);
-                                    *arg14 = 0;
+                                    pRenderPassList->Add(a1, 278, 1, 2, a2, a3, nullptr, nullptr);
+                                    *arg14 = false;
                                     return 0;
                                 }
                             }
@@ -1420,15 +1420,15 @@ int32_t BSShaderProperty::ADT2(
             if (a12) {
                 if (a11) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(a1, 293, 1, 2, a2, a3, 0, 0);
-                        *arg14 = 0;
+                        pRenderPassList->Add(a1, 293, 1, 2, a2, a3, nullptr, nullptr);
+                        *arg14 = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(a1, 282, 1, 2, a2, a3, 0, 0);
-                        *arg14 = 0;
+                        pRenderPassList->Add(a1, 282, 1, 2, a2, a3, nullptr, nullptr);
+                        *arg14 = false;
                         return 0;
                     }
                 }
@@ -1436,15 +1436,15 @@ int32_t BSShaderProperty::ADT2(
             else {
                 if (a11) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(a1, 290, 1, 2, a2, a3, 0, 0);
-                        *arg14 = 0;
+                        pRenderPassList->Add(a1, 290, 1, 2, a2, a3, nullptr, nullptr);
+                        *arg14 = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(a1, 279, 1, 2, a2, a3, 0, 0);
-                        *arg14 = 0;
+                        pRenderPassList->Add(a1, 279, 1, 2, a2, a3, nullptr, nullptr);
+                        *arg14 = false;
                         return 0;
                     }
                 }
@@ -1454,7 +1454,7 @@ int32_t BSShaderProperty::ADT2(
         }
     }
 LABEL_71:;
-    *arg14 = 0;
+    *arg14 = false;
     return 0;
 }
 
@@ -1481,15 +1481,15 @@ int32_t BSShaderProperty::ADTS(
             }
             if (bShadows) {
                 if (static_cast<uint8_t>(abAddPass) == 1) {
-                    pRenderPassList->Add(pShape, 167, 1, 1, pLight, 0, 0, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 167, 1, 1, pLight, nullptr, nullptr, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
             else {
                 if (static_cast<uint8_t>(abAddPass) == 1) {
-                    pRenderPassList->Add(pShape, 156, 1, 1, pLight, 0, 0, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 156, 1, 1, pLight, nullptr, nullptr, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
@@ -1501,15 +1501,15 @@ int32_t BSShaderProperty::ADTS(
             if (bShadows) {
                 if (bHair) {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(pShape, 168, 1, 1, pLight, 0, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 168, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(pShape, 166, 1, 1, pLight, 0, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 166, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1517,15 +1517,15 @@ int32_t BSShaderProperty::ADTS(
             else {
                 if (bHair) {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(pShape, 157, 1, 1, pLight, 0, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 157, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(pShape, 155, 1, 1, pLight, 0, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 155, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1538,15 +1538,15 @@ int32_t BSShaderProperty::ADTS(
             if (bParallax) {
                 if (bShadows) {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(pShape, 165, 1, 1, pLight, 0, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 165, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(pShape, 154, 1, 1, pLight, 0, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 154, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1554,15 +1554,15 @@ int32_t BSShaderProperty::ADTS(
             else {
                 if (bShadows) {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(pShape, 161, 1, 1, pLight, 0, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 161, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(pShape, 150, 1, 1, pLight, 0, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 150, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1576,15 +1576,15 @@ int32_t BSShaderProperty::ADTS(
             if (bParallax) {
                 if (bShadows) {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(pShape, 164, 1, 1, pLight, 0, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 164, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(pShape, 153, 1, 1, pLight, 0, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 153, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1593,23 +1593,23 @@ int32_t BSShaderProperty::ADTS(
                 if (bShadows) {
                     if (bTreeBranch) {
                         if (static_cast<uint8_t>(abAddPass) == 1) {
-                            pRenderPassList->Add(pShape, 170, 1, 1, pLight, 0, 0, 0);
-                            *bEnable = 0;
+                            pRenderPassList->Add(pShape, 170, 1, 1, pLight, nullptr, nullptr, nullptr);
+                            *bEnable = false;
                             return 0;
                         }
                     }
                     else {
                         if (bHair) {
                             if (static_cast<uint8_t>(abAddPass) == 1) {
-                                pRenderPassList->Add(pShape, 162, 1, 1, pLight, 0, 0, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 162, 1, 1, pLight, nullptr, nullptr, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
                         else {
                             if (static_cast<uint8_t>(abAddPass) == 1) {
-                                pRenderPassList->Add(pShape, 160, 1, 1, pLight, 0, 0, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 160, 1, 1, pLight, nullptr, nullptr, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
@@ -1618,23 +1618,23 @@ int32_t BSShaderProperty::ADTS(
                 else {
                     if (bTreeBranch) {
                         if (static_cast<uint8_t>(abAddPass) == 1) {
-                            pRenderPassList->Add(pShape, 159, 1, 1, pLight, 0, 0, 0);
-                            *bEnable = 0;
+                            pRenderPassList->Add(pShape, 159, 1, 1, pLight, nullptr, nullptr, nullptr);
+                            *bEnable = false;
                             return 0;
                         }
                     }
                     else {
                         if (bHair) {
                             if (static_cast<uint8_t>(abAddPass) == 1) {
-                                pRenderPassList->Add(pShape, 151, 1, 1, pLight, 0, 0, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 151, 1, 1, pLight, nullptr, nullptr, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
                         else {
                             if (static_cast<uint8_t>(abAddPass) == 1) {
-                                pRenderPassList->Add(pShape, 149, 1, 1, pLight, 0, 0, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 149, 1, 1, pLight, nullptr, nullptr, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
@@ -1645,7 +1645,7 @@ int32_t BSShaderProperty::ADTS(
         }
     }
 LABEL_61:;
-    *bEnable = 0;
+    *bEnable = false;
     return 0;
 }
 
@@ -1672,15 +1672,15 @@ int32_t BSShaderProperty::ADTS2(
             }
             if (bShadows) {
                 if (static_cast<uint8_t>(arg10) == 1) {
-                    pRenderPassList->Add(pShape, 189, 1, 2, pLight, pLight1, 0, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 189, 1, 2, pLight, pLight1, nullptr, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
             else {
                 if (static_cast<uint8_t>(arg10) == 1) {
-                    pRenderPassList->Add(pShape, 178, 1, 2, pLight, pLight1, 0, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 178, 1, 2, pLight, pLight1, nullptr, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
@@ -1692,15 +1692,15 @@ int32_t BSShaderProperty::ADTS2(
             if (bShadows) {
                 if (bHair) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 190, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 190, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 188, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 188, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1708,15 +1708,15 @@ int32_t BSShaderProperty::ADTS2(
             else {
                 if (bHair) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 179, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 179, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 177, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 177, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1729,15 +1729,15 @@ int32_t BSShaderProperty::ADTS2(
             if (bParallax) {
                 if (bShadows) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 187, 1, 1, pLight, 0, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 187, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 176, 1, 1, pLight, 0, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 176, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1745,15 +1745,15 @@ int32_t BSShaderProperty::ADTS2(
             else {
                 if (bShadows) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 183, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 183, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 172, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 172, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1767,15 +1767,15 @@ int32_t BSShaderProperty::ADTS2(
             if (bParallax) {
                 if (bShadows) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 186, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 186, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 175, 1, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 175, 1, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1784,23 +1784,23 @@ int32_t BSShaderProperty::ADTS2(
                 if (bShadows) {
                     if (bTreeBranch) {
                         if (static_cast<uint8_t>(arg10) == 1) {
-                            pRenderPassList->Add(pShape, 192, 1, 2, pLight, pLight1, 0, 0);
-                            *bEnable = 0;
+                            pRenderPassList->Add(pShape, 192, 1, 2, pLight, pLight1, nullptr, nullptr);
+                            *bEnable = false;
                             return 0;
                         }
                     }
                     else {
                         if (bHair) {
                             if (static_cast<uint8_t>(arg10) == 1) {
-                                pRenderPassList->Add(pShape, 184, 1, 2, pLight, pLight1, 0, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 184, 1, 2, pLight, pLight1, nullptr, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
                         else {
                             if (static_cast<uint8_t>(arg10) == 1) {
-                                pRenderPassList->Add(pShape, 182, 1, 2, pLight, pLight1, 0, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 182, 1, 2, pLight, pLight1, nullptr, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
@@ -1809,23 +1809,23 @@ int32_t BSShaderProperty::ADTS2(
                 else {
                     if (bTreeBranch) {
                         if (static_cast<uint8_t>(arg10) == 1) {
-                            pRenderPassList->Add(pShape, 181, 1, 2, pLight, pLight1, 0, 0);
-                            *bEnable = 0;
+                            pRenderPassList->Add(pShape, 181, 1, 2, pLight, pLight1, nullptr, nullptr);
+                            *bEnable = false;
                             return 0;
                         }
                     }
                     else {
                         if (bHair) {
                             if (static_cast<uint8_t>(arg10) == 1) {
-                                pRenderPassList->Add(pShape, 173, 1, 2, pLight, pLight1, 0, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 173, 1, 2, pLight, pLight1, nullptr, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
                         else {
                             if (static_cast<uint8_t>(arg10) == 1) {
-                                pRenderPassList->Add(pShape, 171, 1, 2, pLight, pLight1, 0, 0);
-                                *bEnable = 0;
+                                pRenderPassList->Add(pShape, 171, 1, 2, pLight, pLight1, nullptr, nullptr);
+                                *bEnable = false;
                                 return 0;
                             }
                         }
@@ -1836,7 +1836,7 @@ int32_t BSShaderProperty::ADTS2(
         }
     }
 LABEL_61:;
-    *bEnable = 0;
+    *bEnable = false;
     return 0;
 }
 
@@ -1856,31 +1856,31 @@ int32_t BSShaderProperty::DiffusePoint2(
     if (!abIsSkinned) {
         if (abIsFaceGen) {
             if (static_cast<uint8_t>(abAddPass) == 1) {
-                pRenderPassList->Add(a2, 307, *abEnablePass, 2, apLight0, apLight1, 0, 0);
-                *abEnablePass = 0;
+                pRenderPassList->Add(a2, 307, *abEnablePass, 2, apLight0, apLight1, nullptr, nullptr);
+                *abEnablePass = false;
                 return 0;
             }
         }
         else {
             if (abHasParallax) {
                 if (static_cast<uint8_t>(abAddPass) == 1) {
-                    pRenderPassList->Add(a2, 308, *abEnablePass, 2, apLight0, apLight1, 0, 0);
-                    *abEnablePass = 0;
+                    pRenderPassList->Add(a2, 308, *abEnablePass, 2, apLight0, apLight1, nullptr, nullptr);
+                    *abEnablePass = false;
                     return 0;
                 }
             }
             else {
                 if (a12) {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(a2, 311, *abEnablePass, 2, apLight0, apLight1, 0, 0);
-                        *abEnablePass = 0;
+                        pRenderPassList->Add(a2, 311, *abEnablePass, 2, apLight0, apLight1, nullptr, nullptr);
+                        *abEnablePass = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(a2, 306, *abEnablePass, 2, apLight0, apLight1, 0, 0);
-                        *abEnablePass = 0;
+                        pRenderPassList->Add(a2, 306, *abEnablePass, 2, apLight0, apLight1, nullptr, nullptr);
+                        *abEnablePass = false;
                         return 0;
                     }
                 }
@@ -1892,22 +1892,22 @@ int32_t BSShaderProperty::DiffusePoint2(
     }
     if (abIsFaceGen) {
         if (static_cast<uint8_t>(abAddPass) == 1) {
-            pRenderPassList->Add(a2, 310, *abEnablePass, 2, apLight0, apLight1, 0, 0);
-            *abEnablePass = 0;
+            pRenderPassList->Add(a2, 310, *abEnablePass, 2, apLight0, apLight1, nullptr, nullptr);
+            *abEnablePass = false;
             return 0;
         }
         goto LABEL_19;
     }
     if (!abHasParallax) {
         if (static_cast<uint8_t>(abAddPass) == 1) {
-            pRenderPassList->Add(a2, 309, *abEnablePass, 2, apLight0, apLight1, 0, 0);
-            *abEnablePass = 0;
+            pRenderPassList->Add(a2, 309, *abEnablePass, 2, apLight0, apLight1, nullptr, nullptr);
+            *abEnablePass = false;
             return 0;
         }
         goto LABEL_19;
     }
 LABEL_20:;
-    *abEnablePass = 0;
+    *abEnablePass = false;
     return 0;
 }
 
@@ -1928,31 +1928,31 @@ int32_t BSShaderProperty::DiffusePoint3(
     if (!bSkinned) {
         if (bFaceGen) {
             if (static_cast<uint8_t>(arg14) == 1) {
-                pRenderPassList->Add(pShape, 319, *bEnable, 3, pLight, pLight1, pLight2, 0);
-                *bEnable = 0;
+                pRenderPassList->Add(pShape, 319, *bEnable, 3, pLight, pLight1, pLight2, nullptr);
+                *bEnable = false;
                 return 0;
             }
         }
         else {
             if (bParallax) {
                 if (static_cast<uint8_t>(arg14) == 1) {
-                    pRenderPassList->Add(pShape, 320, *bEnable, 3, pLight, pLight1, pLight2, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 320, *bEnable, 3, pLight, pLight1, pLight2, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
             else {
                 if (bTreeBranch) {
                     if (static_cast<uint8_t>(arg14) == 1) {
-                        pRenderPassList->Add(pShape, 323, *bEnable, 3, pLight, pLight1, pLight2, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 323, *bEnable, 3, pLight, pLight1, pLight2, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg14) == 1) {
-                        pRenderPassList->Add(pShape, 318, *bEnable, 3, pLight, pLight1, pLight2, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 318, *bEnable, 3, pLight, pLight1, pLight2, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -1964,22 +1964,22 @@ int32_t BSShaderProperty::DiffusePoint3(
     }
     if (bFaceGen) {
         if (static_cast<uint8_t>(arg14) == 1) {
-            pRenderPassList->Add(pShape, 322, *bEnable, 3, pLight, pLight1, pLight2, 0);
-            *bEnable = 0;
+            pRenderPassList->Add(pShape, 322, *bEnable, 3, pLight, pLight1, pLight2, nullptr);
+            *bEnable = false;
             return 0;
         }
         goto LABEL_19;
     }
     if (!bParallax) {
         if (static_cast<uint8_t>(arg14) == 1) {
-            pRenderPassList->Add(pShape, 321, *bEnable, 3, pLight, pLight1, pLight2, 0);
-            *bEnable = 0;
+            pRenderPassList->Add(pShape, 321, *bEnable, 3, pLight, pLight1, pLight2, nullptr);
+            *bEnable = false;
             return 0;
         }
         goto LABEL_19;
     }
 LABEL_20:;
-    *bEnable = 0;
+    *bEnable = false;
     return 0;
 }
 
@@ -2001,7 +2001,7 @@ void BSShaderProperty::Textures(
     if (bParallax) {
         if (!bSkinned) {
             if (static_cast<uint8_t>(abAddPass) == 1) {
-                pRenderPassList->Add(pShape, 339, *bEnable, 0, 0, 0, 0, 0);
+                pRenderPassList->Add(pShape, 339, *bEnable, 0, nullptr, nullptr, nullptr, nullptr);
             }
             else {
                 ++*apusPassCount;
@@ -2031,31 +2031,31 @@ int32_t BSShaderProperty::SpecularPoint2(
     if (!bSkinned) {
         if (bParallax) {
             if (static_cast<uint8_t>(arg10) == 1) {
-                pRenderPassList->Add(pShape, 366, *bEnable, 2, pLight, pLight1, 0, 0);
-                *bEnable = 0;
+                pRenderPassList->Add(pShape, 366, *bEnable, 2, pLight, pLight1, nullptr, nullptr);
+                *bEnable = false;
                 return 0;
             }
         }
         else {
             if (bTreeBranch) {
                 if (static_cast<uint8_t>(arg10) == 1) {
-                    pRenderPassList->Add(pShape, 369, *bEnable, 2, pLight, pLight1, 0, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 369, *bEnable, 2, pLight, pLight1, nullptr, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
             else {
                 if (bHair) {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 365, *bEnable, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 365, *bEnable, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg10) == 1) {
-                        pRenderPassList->Add(pShape, 364, *bEnable, 2, pLight, pLight1, 0, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 364, *bEnable, 2, pLight, pLight1, nullptr, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -2068,22 +2068,22 @@ int32_t BSShaderProperty::SpecularPoint2(
     if (!bParallax) {
         if (bHair) {
             if (static_cast<uint8_t>(arg10) == 1) {
-                pRenderPassList->Add(pShape, 368, *bEnable, 2, pLight, pLight1, 0, 0);
-                *bEnable = 0;
+                pRenderPassList->Add(pShape, 368, *bEnable, 2, pLight, pLight1, nullptr, nullptr);
+                *bEnable = false;
                 return 0;
             }
         }
         else {
             if (static_cast<uint8_t>(arg10) == 1) {
-                pRenderPassList->Add(pShape, 367, *bEnable, 2, pLight, pLight1, 0, 0);
-                *bEnable = 0;
+                pRenderPassList->Add(pShape, 367, *bEnable, 2, pLight, pLight1, nullptr, nullptr);
+                *bEnable = false;
                 return 0;
             }
         }
         goto LABEL_19;
     }
 LABEL_20:;
-    *bEnable = 0;
+    *bEnable = false;
     return 0;
 }
 
@@ -2103,31 +2103,31 @@ int32_t BSShaderProperty::SpecularPoint3(
     if (!bSkinned) {
         if (bParallax) {
             if (static_cast<uint8_t>(arg14) == 1) {
-                pRenderPassList->Add(pShape, 372, *bEnable, 3, pLight, pLight1, pLight2, 0);
-                *bEnable = 0;
+                pRenderPassList->Add(pShape, 372, *bEnable, 3, pLight, pLight1, pLight2, nullptr);
+                *bEnable = false;
                 return 0;
             }
         }
         else {
             if (bTreeBranch) {
                 if (static_cast<uint8_t>(arg14) == 1) {
-                    pRenderPassList->Add(pShape, 375, *bEnable, 3, pLight, pLight1, pLight2, 0);
-                    *bEnable = 0;
+                    pRenderPassList->Add(pShape, 375, *bEnable, 3, pLight, pLight1, pLight2, nullptr);
+                    *bEnable = false;
                     return 0;
                 }
             }
             else {
                 if (bHair) {
                     if (static_cast<uint8_t>(arg14) == 1) {
-                        pRenderPassList->Add(pShape, 371, *bEnable, 3, pLight, pLight1, pLight2, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 371, *bEnable, 3, pLight, pLight1, pLight2, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(arg14) == 1) {
-                        pRenderPassList->Add(pShape, 370, *bEnable, 3, pLight, pLight1, pLight2, 0);
-                        *bEnable = 0;
+                        pRenderPassList->Add(pShape, 370, *bEnable, 3, pLight, pLight1, pLight2, nullptr);
+                        *bEnable = false;
                         return 0;
                     }
                 }
@@ -2140,22 +2140,22 @@ int32_t BSShaderProperty::SpecularPoint3(
     if (!bParallax) {
         if (bHair) {
             if (static_cast<uint8_t>(arg14) == 1) {
-                pRenderPassList->Add(pShape, 374, *bEnable, 3, pLight, pLight1, pLight2, 0);
-                *bEnable = 0;
+                pRenderPassList->Add(pShape, 374, *bEnable, 3, pLight, pLight1, pLight2, nullptr);
+                *bEnable = false;
                 return 0;
             }
         }
         else {
             if (static_cast<uint8_t>(arg14) == 1) {
-                pRenderPassList->Add(pShape, 373, *bEnable, 3, pLight, pLight1, pLight2, 0);
-                *bEnable = 0;
+                pRenderPassList->Add(pShape, 373, *bEnable, 3, pLight, pLight1, pLight2, nullptr);
+                *bEnable = false;
                 return 0;
             }
         }
         goto LABEL_19;
     }
 LABEL_20:;
-    *bEnable = 0;
+    *bEnable = false;
     return 0;
 }
 
@@ -2184,15 +2184,15 @@ int32_t BSShaderProperty::ADT(
             }
             if (bHasShadow) {
                 if (static_cast<uint8_t>(abAddPass) == 1) {
-                    pRenderPassList->Add(apGeometry, 274, 1, 1, pLight, 0, 0, 0);
-                    *abEnable = 0;
+                    pRenderPassList->Add(apGeometry, 274, 1, 1, pLight, nullptr, nullptr, nullptr);
+                    *abEnable = false;
                     return 0;
                 }
             }
             else {
                 if (static_cast<uint8_t>(abAddPass) == 1) {
-                    pRenderPassList->Add(apGeometry, 262, 1, 1, pLight, 0, 0, 0);
-                    *abEnable = 0;
+                    pRenderPassList->Add(apGeometry, 262, 1, 1, pLight, nullptr, nullptr, nullptr);
+                    *abEnable = false;
                     return 0;
                 }
             }
@@ -2201,15 +2201,15 @@ int32_t BSShaderProperty::ADT(
         if (bIsFaceGen) {
             if (bHasShadow) {
                 if (static_cast<uint8_t>(abAddPass) == 1) {
-                    pRenderPassList->Add(apGeometry, 275, 1, 1, pLight, 0, 0, 0);
-                    *abEnable = 0;
+                    pRenderPassList->Add(apGeometry, 275, 1, 1, pLight, nullptr, nullptr, nullptr);
+                    *abEnable = false;
                     return 0;
                 }
             }
             else {
                 if (static_cast<uint8_t>(abAddPass) == 1) {
-                    pRenderPassList->Add(apGeometry, 263, 1, 1, pLight, 0, 0, 0);
-                    *abEnable = 0;
+                    pRenderPassList->Add(apGeometry, 263, 1, 1, pLight, nullptr, nullptr, nullptr);
+                    *abEnable = false;
                     return 0;
                 }
             }
@@ -2219,15 +2219,15 @@ int32_t BSShaderProperty::ADT(
             if (bHasShadow) {
                 if (bIsHair) {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(apGeometry, 277, 1, 1, pLight, 0, 0, 0);
-                        *abEnable = 0;
+                        pRenderPassList->Add(apGeometry, 277, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *abEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(apGeometry, 273, 1, 1, pLight, 0, 0, 0);
-                        *abEnable = 0;
+                        pRenderPassList->Add(apGeometry, 273, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *abEnable = false;
                         return 0;
                     }
                 }
@@ -2235,15 +2235,15 @@ int32_t BSShaderProperty::ADT(
             else {
                 if (bIsHair) {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(apGeometry, 265, 1, 1, pLight, 0, 0, 0);
-                        *abEnable = 0;
+                        pRenderPassList->Add(apGeometry, 265, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *abEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(apGeometry, 261, 1, 1, pLight, 0, 0, 0);
-                        *abEnable = 0;
+                        pRenderPassList->Add(apGeometry, 261, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *abEnable = false;
                         return 0;
                     }
                 }
@@ -2257,15 +2257,15 @@ int32_t BSShaderProperty::ADT(
             if (bHasParallax) {
                 if (bHasShadow) {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(apGeometry, 271, 1, 1, pLight, 0, 0, 0);
-                        *abEnable = 0;
+                        pRenderPassList->Add(apGeometry, 271, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *abEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(apGeometry, 259, 1, 1, pLight, 0, 0, 0);
-                        *abEnable = 0;
+                        pRenderPassList->Add(apGeometry, 259, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *abEnable = false;
                         return 0;
                     }
                 }
@@ -2273,15 +2273,15 @@ int32_t BSShaderProperty::ADT(
             else {
                 if (bHasShadow) {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(apGeometry, 268, 1, 1, pLight, 0, 0, 0);
-                        *abEnable = 0;
+                        pRenderPassList->Add(apGeometry, 268, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *abEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(apGeometry, 255, 1, 1, pLight, 0, 0, 0);
-                        *abEnable = 0;
+                        pRenderPassList->Add(apGeometry, 255, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *abEnable = false;
                         return 0;
                     }
                 }
@@ -2289,21 +2289,21 @@ int32_t BSShaderProperty::ADT(
             goto LABEL_96;
         }
     LABEL_97:;
-        *abEnable = 0;
+        *abEnable = false;
         return 0;
     }
     if (bIsFaceGen) {
         if (bHasShadow) {
             if (static_cast<uint8_t>(abAddPass) == 1) {
-                pRenderPassList->Add(apGeometry, 269, 1, 1, pLight, 0, 0, 0);
-                *abEnable = 0;
+                pRenderPassList->Add(apGeometry, 269, 1, 1, pLight, nullptr, nullptr, nullptr);
+                *abEnable = false;
                 return 0;
             }
         }
         else {
             if (static_cast<uint8_t>(abAddPass) == 1) {
-                pRenderPassList->Add(apGeometry, 256, 1, 1, pLight, 0, 0, 0);
-                *abEnable = 0;
+                pRenderPassList->Add(apGeometry, 256, 1, 1, pLight, nullptr, nullptr, nullptr);
+                *abEnable = false;
                 return 0;
             }
         }
@@ -2313,15 +2313,15 @@ int32_t BSShaderProperty::ADT(
         if (bHasModelSpaceNormals) {
             if (bHasShadow) {
                 if (static_cast<uint8_t>(abAddPass) == 1) {
-                    pRenderPassList->Add(apGeometry, 267, 1, 1, pLight, 0, 0, 0);
-                    *abEnable = 0;
+                    pRenderPassList->Add(apGeometry, 267, 1, 1, pLight, nullptr, nullptr, nullptr);
+                    *abEnable = false;
                     return 0;
                 }
             }
             else {
                 if (static_cast<uint8_t>(abAddPass) == 1) {
-                    pRenderPassList->Add(apGeometry, 254, 1, 1, pLight, 0, 0, 0);
-                    *abEnable = 0;
+                    pRenderPassList->Add(apGeometry, 254, 1, 1, pLight, nullptr, nullptr, nullptr);
+                    *abEnable = false;
                     return 0;
                 }
             }
@@ -2330,23 +2330,23 @@ int32_t BSShaderProperty::ADT(
         if (bHasShadow) {
             if (bIsBranch) {
                 if (static_cast<uint8_t>(abAddPass) == 1) {
-                    pRenderPassList->Add(apGeometry, 276, 1, 1, pLight, 0, 0, 0);
-                    *abEnable = 0;
+                    pRenderPassList->Add(apGeometry, 276, 1, 1, pLight, nullptr, nullptr, nullptr);
+                    *abEnable = false;
                     return 0;
                 }
             }
             else {
                 if (bIsHair) {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(apGeometry, 272, 1, 1, pLight, 0, 0, 0);
-                        *abEnable = 0;
+                        pRenderPassList->Add(apGeometry, 272, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *abEnable = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(apGeometry, 266, 1, 1, pLight, 0, 0, 0);
-                        *abEnable = 0;
+                        pRenderPassList->Add(apGeometry, 266, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *abEnable = false;
                         return 0;
                     }
                 }
@@ -2356,8 +2356,8 @@ int32_t BSShaderProperty::ADT(
         if (bIsBranch) {
             if (!bIsTree) {
                 if (static_cast<uint8_t>(abAddPass) == 1) {
-                    pRenderPassList->Add(apGeometry, 264, 1, 1, pLight, 0, 0, 0);
-                    *abEnable = 0;
+                    pRenderPassList->Add(apGeometry, 264, 1, 1, pLight, nullptr, nullptr, nullptr);
+                    *abEnable = false;
                     return 0;
                 }
                 goto LABEL_96;
@@ -2367,8 +2367,8 @@ int32_t BSShaderProperty::ADT(
             if (!bIsTree) {
                 if (bIsHair) {
                     if (static_cast<uint8_t>(abAddPass) == 1) {
-                        pRenderPassList->Add(apGeometry, 260, 1, 1, pLight, 0, 0, 0);
-                        *abEnable = 0;
+                        pRenderPassList->Add(apGeometry, 260, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *abEnable = false;
                         return 0;
                     }
                     goto LABEL_96;
@@ -2393,14 +2393,16 @@ int32_t BSShaderProperty::ADT(
                     }
                     if (!(v20->fAlpha < 1.0f) && v20->GetFlag(37u)) {
                         bool Flag = v20->GetFlag(34u);
-                        pRenderPassList->Add(apGeometry, Flag + BSShaderManager::BSSM_ADT_Opt, 1, 1, pLight, 0, 0, 0);
-                        *abEnable = 0;
+                        pRenderPassList->Add(
+                            apGeometry, Flag + BSShaderManager::BSSM_ADT_Opt, 1, 1, pLight, nullptr, nullptr, nullptr
+                        );
+                        *abEnable = false;
                         return 0;
                     }
                     else {
                     LABEL_36:;
-                        pRenderPassList->Add(apGeometry, 251, 1, 1, pLight, 0, 0, 0);
-                        *abEnable = 0;
+                        pRenderPassList->Add(apGeometry, 251, 1, 1, pLight, nullptr, nullptr, nullptr);
+                        *abEnable = false;
                         return 0;
                     }
                 }
@@ -2410,16 +2412,16 @@ int32_t BSShaderProperty::ADT(
             }
         }
         if (static_cast<uint8_t>(abAddPass) == 1) {
-            pRenderPassList->Add(apGeometry, 565, 1, 1, pLight, 0, 0, 0);
-            *abEnable = 0;
+            pRenderPassList->Add(apGeometry, 565, 1, 1, pLight, nullptr, nullptr, nullptr);
+            *abEnable = false;
             return 0;
         }
         goto LABEL_96;
     }
     if (bHasShadow) {
         if (static_cast<uint8_t>(abAddPass) == 1) {
-            pRenderPassList->Add(apGeometry, 270, 1, 1, pLight, 0, 0, 0);
-            *abEnable = 0;
+            pRenderPassList->Add(apGeometry, 270, 1, 1, pLight, nullptr, nullptr, nullptr);
+            *abEnable = false;
             return 0;
         }
         goto LABEL_96;
@@ -2443,14 +2445,14 @@ int32_t BSShaderProperty::ADT(
         }
     }
     if (v24->GetFlag(37u) && !(v24->fFadeAlpha < 1.0f)) {
-        pRenderPassList->Add(apGeometry, 258, 1, 1, pLight, 0, 0, 0);
-        *abEnable = 0;
+        pRenderPassList->Add(apGeometry, 258, 1, 1, pLight, nullptr, nullptr, nullptr);
+        *abEnable = false;
         return 0;
     }
     else {
     LABEL_67:;
-        pRenderPassList->Add(apGeometry, 257, 1, 1, pLight, 0, 0, 0);
-        *abEnable = 0;
+        pRenderPassList->Add(apGeometry, 257, 1, 1, pLight, nullptr, nullptr, nullptr);
+        *abEnable = false;
         return 0;
     }
 }
@@ -2479,31 +2481,31 @@ int32_t BSShaderProperty::Specular(
         if (bPointLight) {
             if (bHasParallax) {
                 if (static_cast<uint8_t>(a5) == 1) {
-                    pRenderPassList->Add(a2, 360, *arg10, 1, pLight, 0, 0, 0);
-                    *arg10 = 0;
+                    pRenderPassList->Add(a2, 360, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                    *arg10 = false;
                     return 0;
                 }
             }
             else {
                 if (bIsBranch) {
                     if (static_cast<uint8_t>(a5) == 1) {
-                        pRenderPassList->Add(a2, 363, *arg10, 1, pLight, 0, 0, 0);
-                        *arg10 = 0;
+                        pRenderPassList->Add(a2, 363, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                        *arg10 = false;
                         return 0;
                     }
                 }
                 else {
                     if (bIsHair) {
                         if (static_cast<uint8_t>(a5) == 1) {
-                            pRenderPassList->Add(a2, 359, *arg10, 1, pLight, 0, 0, 0);
-                            *arg10 = 0;
+                            pRenderPassList->Add(a2, 359, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                            *arg10 = false;
                             return 0;
                         }
                     }
                     else {
                         if (static_cast<uint8_t>(a5) == 1) {
-                            pRenderPassList->Add(a2, 358, *arg10, 1, pLight, 0, 0, 0);
-                            *arg10 = 0;
+                            pRenderPassList->Add(a2, 358, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                            *arg10 = false;
                             return 0;
                         }
                     }
@@ -2514,15 +2516,15 @@ int32_t BSShaderProperty::Specular(
             if (bHasParallax) {
                 if (bHasShadow) {
                     if (static_cast<uint8_t>(a5) == 1) {
-                        pRenderPassList->Add(a2, 354, *arg10, 1, pLight, 0, 0, 0);
-                        *arg10 = 0;
+                        pRenderPassList->Add(a2, 354, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                        *arg10 = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(a5) == 1) {
-                        pRenderPassList->Add(a2, 348, *arg10, 1, pLight, 0, 0, 0);
-                        *arg10 = 0;
+                        pRenderPassList->Add(a2, 348, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                        *arg10 = false;
                         return 0;
                     }
                 }
@@ -2531,23 +2533,23 @@ int32_t BSShaderProperty::Specular(
                 if (bHasShadow) {
                     if (bIsBranch) {
                         if (static_cast<uint8_t>(a5) == 1) {
-                            pRenderPassList->Add(a2, 357, *arg10, 1, pLight, 0, 0, 0);
-                            *arg10 = 0;
+                            pRenderPassList->Add(a2, 357, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                            *arg10 = false;
                             return 0;
                         }
                     }
                     else {
                         if (bIsHair) {
                             if (static_cast<uint8_t>(a5) == 1) {
-                                pRenderPassList->Add(a2, 353, *arg10, 1, pLight, 0, 0, 0);
-                                *arg10 = 0;
+                                pRenderPassList->Add(a2, 353, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                                *arg10 = false;
                                 return 0;
                             }
                         }
                         else {
                             if (static_cast<uint8_t>(a5) == 1) {
-                                pRenderPassList->Add(a2, 352, *arg10, 1, pLight, 0, 0, 0);
-                                *arg10 = 0;
+                                pRenderPassList->Add(a2, 352, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                                *arg10 = false;
                                 return 0;
                             }
                         }
@@ -2556,23 +2558,23 @@ int32_t BSShaderProperty::Specular(
                 else {
                     if (bIsBranch) {
                         if (static_cast<uint8_t>(a5) == 1) {
-                            pRenderPassList->Add(a2, 351, *arg10, 1, pLight, 0, 0, 0);
-                            *arg10 = 0;
+                            pRenderPassList->Add(a2, 351, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                            *arg10 = false;
                             return 0;
                         }
                     }
                     else {
                         if (bIsHair) {
                             if (static_cast<uint8_t>(a5) == 1) {
-                                pRenderPassList->Add(a2, 347, *arg10, 1, pLight, 0, 0, 0);
-                                *arg10 = 0;
+                                pRenderPassList->Add(a2, 347, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                                *arg10 = false;
                                 return 0;
                             }
                         }
                         else {
                             if (static_cast<uint8_t>(a5) == 1) {
-                                pRenderPassList->Add(a2, 346, *arg10, 1, pLight, 0, 0, 0);
-                                *arg10 = 0;
+                                pRenderPassList->Add(a2, 346, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                                *arg10 = false;
                                 return 0;
                             }
                         }
@@ -2588,15 +2590,15 @@ int32_t BSShaderProperty::Specular(
         if (!bHasParallax) {
             if (bIsHair) {
                 if (static_cast<uint8_t>(a5) == 1) {
-                    pRenderPassList->Add(a2, 362, *arg10, 1, pLight, 0, 0, 0);
-                    *arg10 = 0;
+                    pRenderPassList->Add(a2, 362, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                    *arg10 = false;
                     return 0;
                 }
             }
             else {
                 if (static_cast<uint8_t>(a5) == 1) {
-                    pRenderPassList->Add(a2, 361, *arg10, 1, pLight, 0, 0, 0);
-                    *arg10 = 0;
+                    pRenderPassList->Add(a2, 361, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                    *arg10 = false;
                     return 0;
                 }
             }
@@ -2608,15 +2610,15 @@ int32_t BSShaderProperty::Specular(
             if (bHasShadow) {
                 if (bIsHair) {
                     if (static_cast<uint8_t>(a5) == 1) {
-                        pRenderPassList->Add(a2, 356, *arg10, 1, pLight, 0, 0, 0);
-                        *arg10 = 0;
+                        pRenderPassList->Add(a2, 356, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                        *arg10 = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(a5) == 1) {
-                        pRenderPassList->Add(a2, 355, *arg10, 1, pLight, 0, 0, 0);
-                        *arg10 = 0;
+                        pRenderPassList->Add(a2, 355, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                        *arg10 = false;
                         return 0;
                     }
                 }
@@ -2624,15 +2626,15 @@ int32_t BSShaderProperty::Specular(
             else {
                 if (bIsHair) {
                     if (static_cast<uint8_t>(a5) == 1) {
-                        pRenderPassList->Add(a2, 350, *arg10, 1, pLight, 0, 0, 0);
-                        *arg10 = 0;
+                        pRenderPassList->Add(a2, 350, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                        *arg10 = false;
                         return 0;
                     }
                 }
                 else {
                     if (static_cast<uint8_t>(a5) == 1) {
-                        pRenderPassList->Add(a2, 349, *arg10, 1, pLight, 0, 0, 0);
-                        *arg10 = 0;
+                        pRenderPassList->Add(a2, 349, *arg10, 1, pLight, nullptr, nullptr, nullptr);
+                        *arg10 = false;
                         return 0;
                     }
                 }
@@ -2641,7 +2643,7 @@ int32_t BSShaderProperty::Specular(
         }
     }
 LABEL_60:;
-    *arg10 = 0;
+    *arg10 = false;
     return 0;
 }
 

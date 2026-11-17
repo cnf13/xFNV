@@ -81,7 +81,7 @@ void BSParticleSystemManager::AttachChild(NiAVObject* apChild, int32_t abFirstAv
         bIsMaster = apChild->GetRTTI() == &BSMasterParticleSystem::ms_RTTI;
     }
     else {
-        bIsMaster = 0;
+        bIsMaster = false;
     }
     if (bIsMaster) {
         uint32_t uiIndex = static_cast<BSMasterParticleSystem*>(apChild)->uiIndex;
@@ -135,7 +135,7 @@ void BSParticleSystemManager::DetachChildAt(uint32_t auiIndex) {
 }
 
 void BSParticleSystemManager::SetAt(uint32_t auiIndex, NiAVObject* apChild, NiPointer<NiAVObject>& arspAVObject) {
-    arspAVObject.operator=(static_cast<NiAVObject*>(0));
+    arspAVObject.operator=(static_cast<NiAVObject*>(nullptr));
 }
 
 void BSParticleSystemManager::SetAt(uint32_t auiIndex, NiAVObject* apChild) {
@@ -148,7 +148,7 @@ BSMasterParticleSystem* BSParticleSystemManager::GetMasterParticleSystem(uint32_
     BSMasterParticleSystem* v4 = nullptr;
     if (auiIndex < uiIndexToChildLookupSize) {
         v3 = aIndexToChildLookup[auiIndex];
-        if (v3 != ((-1))) {
+        if (v3 != (-1)) {
             return static_cast<BSMasterParticleSystem*>(m_kChildren.m_pBase[v3].m_pObject);
         }
     }
@@ -221,7 +221,7 @@ uint32_t BSParticleSystemManager::GetChildIndex(NiAVObject* apChild) {
             return i;
         }
     }
-    return (uint32_t)((-1));
+    return (uint32_t)(-1);
 }
 
 void BSParticleSystemManager::CopyMembers(BSParticleSystemManager* pDest, NiCloningProcess& arCloneData) {
@@ -230,7 +230,7 @@ void BSParticleSystemManager::CopyMembers(BSParticleSystemManager* pDest, NiClon
 
 bool BSParticleSystemManager::CheckEmitterRecurse(NiAVObject* apObject, BSMasterParticleSystem* apMasterSystem) {
     if (!apObject) {
-        return 0;
+        return false;
     }
     if (apObject->IsParticlesGeom()) {
         if (apObject->GetRTTI() == &NiParticleSystem::ms_RTTI) {
@@ -239,7 +239,7 @@ bool BSParticleSystemManager::CheckEmitterRecurse(NiAVObject* apObject, BSMaster
                     "DEFAULT: \"%s\" is a Master Particle System not emitting in world space.",
                     apObject->m_kName.GetHandle()
                 );
-                return 0;
+                return false;
             }
             for (BSPSysMultiTargetEmitterCtlr* i =
                      static_cast<BSPSysMultiTargetEmitterCtlr*>(apObject->m_spControllers);
@@ -270,7 +270,7 @@ bool BSParticleSystemManager::CheckEmitterRecurse(NiAVObject* apObject, BSMaster
                             "DEFAULT: \"%s\" is a Master Particle System not pointing to the proper root.",
                             apObject->m_kName.GetHandle()
                         );
-                        return 0;
+                        return false;
                     }
                 }
             }
@@ -278,7 +278,7 @@ bool BSParticleSystemManager::CheckEmitterRecurse(NiAVObject* apObject, BSMaster
         Warning(
             "DEFAULT: \"%s\" is a Master Particle System without a multi-target emitter.", apObject->m_kName.GetHandle()
         );
-        return 0;
+        return false;
     }
     else {
         NiNode* pnode = apObject->IsNode();
@@ -287,11 +287,11 @@ bool BSParticleSystemManager::CheckEmitterRecurse(NiAVObject* apObject, BSMaster
             for (uint32_t k = 0; k < m_usSize; ++k) {
                 NiAVObject* pchild = pnode->m_kChildren.m_pBase[k].m_pObject;
                 if (pchild && !BSParticleSystemManager::CheckEmitterRecurse(pchild, apMasterSystem)) {
-                    return 0;
+                    return false;
                 }
             }
         }
-        return 1;
+        return true;
     }
 }
 
@@ -315,24 +315,24 @@ bool BSParticleSystemManager::IsValidMasterParticleSystem(NiAVObject* apObject) 
 
 bool BSParticleSystemManager::ReplaceEmitterRecurse(NiAVObject* apObject, BSMasterParticleSystem* apMasterSystem) {
     if (!apObject) {
-        return 0;
+        return false;
     }
     if (apObject->IsParticlesGeom()) {
         if (apObject->GetRTTI() == &NiParticleSystem::ms_RTTI) {
-            static_cast<NiParticleSystem*>(apObject)->m_bWorldSpace = 1;
+            static_cast<NiParticleSystem*>(apObject)->m_bWorldSpace = true;
             for (BSPSysMultiTargetEmitterCtlr* i =
                      static_cast<BSPSysMultiTargetEmitterCtlr*>(apObject->m_spControllers);
                  i; i = static_cast<BSPSysMultiTargetEmitterCtlr*>(i->m_spNext.m_pObject)) {
                 if (i->GetRTTI() == &BSPSysMultiTargetEmitterCtlr::ms_RTTI) {
                     i->pMasterParticleSystem = apMasterSystem;
-                    return 1;
+                    return true;
                 }
             }
         }
         Warning(
             "DEFAULT: \"%s\" is a Master Particle System without a multi-target emitter.", apObject->m_kName.GetHandle()
         );
-        return 0;
+        return false;
     }
     else {
         NiNode* pnode = apObject->IsNode();
@@ -341,17 +341,17 @@ bool BSParticleSystemManager::ReplaceEmitterRecurse(NiAVObject* apObject, BSMast
             for (uint32_t uindex = 0; uindex < ucount; ++uindex) {
                 NiAVObject* pchild = pnode->m_kChildren.m_pBase[uindex].m_pObject;
                 if (pchild && !BSParticleSystemManager::ReplaceEmitterRecurse(pchild, apMasterSystem)) {
-                    return 0;
+                    return false;
                 }
             }
         }
-        return 1;
+        return true;
     }
 }
 
 BSMasterParticleSystem* BSParticleSystemManager::MakeMasterParticleSystem(NiNode* apBaseNode) {
-    BSMasterParticleSystem* apMasterSystem = 0;
-    if (BSParticleSystemManager::CheckEmitterRecurse(apBaseNode, 0)) {
+    BSMasterParticleSystem* apMasterSystem = nullptr;
+    if (BSParticleSystemManager::CheckEmitterRecurse(apBaseNode, nullptr)) {
         BSMasterParticleSystem* v2;
         BSMasterParticleSystem* apMemory =
             static_cast<BSMasterParticleSystem*>(NiMemObject::operator new(sizeof(BSMasterParticleSystem)));
@@ -359,7 +359,7 @@ BSMasterParticleSystem* BSParticleSystemManager::MakeMasterParticleSystem(NiNode
             v2 = ::new (apMemory) BSMasterParticleSystem;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         apMasterSystem = v2;
         BSParticleSystemManager::ReplaceEmitterRecurse(apBaseNode, v2);

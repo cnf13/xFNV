@@ -146,10 +146,10 @@ void hkaPoseMatchingUtility::computeOrientation(const hkQsTransform* poseModelSp
     __m128 v11 = _mm_setzero_ps();
     v11[0] = 0.5f;
     const hkQsTransform* v13 = &poseModelSpace[m_anotherBoneIdx];
-    float v14 = 3.0f - static_cast<float>(static_cast<float>(v6[0] * v7) * v7);
+    float v14 = 3.0f - ((v6[0] * v7) * v7);
     __m128 v15 = _mm_cmpeq_ss(v6, v8);
     __m128 v16 = v11;
-    v16[0] = static_cast<float>(v11[0] * v7) * v14;
+    v16[0] = (v11[0] * v7) * v14;
     __m128 v17 = _mm_andnot_ps(v15, v16);
     __m128 v43 = v13->m_translation.m_quad;
     v18.m_quad = _mm_mul_ps(_mm_shuffle_ps(v17, v17, 0), v3);
@@ -161,9 +161,9 @@ void hkaPoseMatchingUtility::computeOrientation(const hkQsTransform* poseModelSp
     v22[0] = v22[0] + v21;
     float v23 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v22[0])));
     __m128 v24 = _mm_cmpeq_ss(v22, v8);
-    v8[0] = 3.0f - static_cast<float>(static_cast<float>(v22[0] * v23) * v23);
+    v8[0] = 3.0f - ((v22[0] * v23) * v23);
     __m128 v25 = v11;
-    v25[0] = static_cast<float>(v11[0] * v23) * v8[0];
+    v25[0] = (v11[0] * v23) * v8[0];
     __m128 v26 = _mm_andnot_ps(v24, v25);
     __m128 v27 = _mm_mul_ps(_mm_shuffle_ps(v26, v26, 0), v19);
     __m128 v44 = _mm_shuffle_ps(v18.m_quad, v18.m_quad, 201);
@@ -176,9 +176,9 @@ void hkaPoseMatchingUtility::computeOrientation(const hkQsTransform* poseModelSp
     v32[0] = v32[0] + v31;
     v47.m_quad[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v32[0])));
     __m128 v33 = _mm_cmpeq_ss(v32, v42);
-    v8[0] = 3.0f - static_cast<float>(static_cast<float>(v32[0] * v47.m_quad[0]) * v47.m_quad[0]);
+    v8[0] = 3.0f - ((v32[0] * v47.m_quad[0]) * v47.m_quad[0]);
     __m128 v34 = v11;
-    v34[0] = static_cast<float>(v11[0] * v47.m_quad[0]) * v8[0];
+    v34[0] = (v11[0] * v47.m_quad[0]) * v8[0];
     __m128 v35 = _mm_andnot_ps(v33, v34);
     __m128 v36 = _mm_mul_ps(_mm_shuffle_ps(v35, v35, 0), v29);
     __m128 v37 =
@@ -190,8 +190,7 @@ void hkaPoseMatchingUtility::computeOrientation(const hkQsTransform* poseModelSp
     // The rsqrt is kept in v45 until hkQuaternion::set overwrites it.
     v45.m_vec.m_quad = _mm_rsqrt_ss(m_quad_1);
     float v39 = v45.m_vec.m_quad[0];
-    v11[0] = static_cast<float>(v11[0] * v39) *
-        static_cast<float>(3.0f - static_cast<float>(static_cast<float>(m_quad_1[0] * v39) * v39));
+    v11[0] = (v11[0] * v39) * (3.0f - ((m_quad_1[0] * v39) * v39));
     __m128 v41 = _mm_andnot_ps(_mm_cmpeq_ss(m_quad_1, v42), v11);
     r.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(v41, v41, 0), v37);
     r.m_col1.m_quad = _mm_sub_ps(
@@ -215,7 +214,7 @@ int32_t hkaPoseMatchingUtility::findBestCandidatePoseIndex(const hkQsTransform* 
         do {
             __m128 v8 = _mm_mul_ps(m_candidatePoses.m_data[v4].m_reference.m_vec.m_quad, m_quad);
             __m128 v9 = _mm_add_ps(_mm_shuffle_ps(v8, v8, 78), v8);
-            float v11 = std::fabs((double)static_cast<float>(_mm_shuffle_ps(v9, v9, 177)[0] + v9[0]));
+            float v11 = std::fabs((double)(_mm_shuffle_ps(v9, v9, 177)[0] + v9[0]));
             float v12 = 1.0 - v11;
             if (error > static_cast<double>(v12)) {
                 error = v12;

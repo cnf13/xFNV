@@ -122,7 +122,7 @@
 
 #include <cctype>
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 // UpdateWeaponStatus's function-local statics: the last shown loaded and remaining ammo and condition percentage
 // (FLT_MIN at load: nothing shown yet), whether the bar's pulse is fading down, and the weapon last shown. The three
@@ -255,7 +255,7 @@ void HandleQuestObjectiveBlinking(Tile* th_s, float value, float a3) {
             v16 = appTimer.fDelta * v17 + v18;
         }
         float v24 = v16;
-        th_s->Set(4009, v24, 1);
+        th_s->Set(4009, v24, true);
     }
     else {
         if (Float == 1.0) {
@@ -269,13 +269,13 @@ void HandleQuestObjectiveBlinking(Tile* th_s, float value, float a3) {
                 v13 = v15 - appTimer.fDelta * v14;
             }
             float v25 = v13;
-            th_s->Set(4009, v25, 1);
+            th_s->Set(4009, v25, true);
         }
         else {
             if (Float == 3.0) {
                 v23 = fCurrentHUDOpacity;
             }
-            th_s->Set(4009, v23, 1);
+            th_s->Set(4009, v23, true);
         }
     }
     float v27 = th_s->GetFloat(4009);
@@ -304,14 +304,14 @@ void HandleQuestObjectiveBlinking(Tile* th_s, float value, float a3) {
                 x1a = static_cast<float>(iHUDCompassIconBlinkLongestPause.Int());
             }
             float v19 = FLerp(x1a, x2a, y1a, y2a, value);
-            th_s->Set(4009, 0.0f, 1);
+            th_s->Set(4009, 0.0f, true);
             th_s->Set(iUT_AlphaDown, 0);
             float v12 = static_cast<double>(appTimer.iLastTime) + v19;
-            th_s->Set(Tile::kTileValue_User10, v12, 1);
+            th_s->Set(Tile::kTileValue_User10, v12, true);
         }
     }
     else {
-        th_s->Set(4009, a3, 1);
+        th_s->Set(4009, a3, true);
         th_s->Set(iUT_AlphaDown, 3);
     }
 }
@@ -597,8 +597,8 @@ void HUDMainMenu::DoIdle() {
     const uint32_t uiSinceEnemyHealth = this->HudTimer.GetTime() - this->iEnemyHealthTimer;
     const uint32_t uiEnemyHealthLimit =
         static_cast<uint32_t>(static_cast<int64_t>(fEnemyHealthBarTimer.Float() * 1000.0));
-    const bool bFacingEnemy = uiSinceEnemyHealth <= uiEnemyHealthLimit ||
-        std::fabs(static_cast<float>(fPlayerHeading - fEnemyHeading)) < 45.0;
+    const bool bFacingEnemy =
+        uiSinceEnemyHealth <= uiEnemyHealthLimit || std::fabs((fPlayerHeading - fEnemyHeading)) < 45.0;
 
     if (pVATS.GetMode() == VATS::VATS_PLAYBACK) {
         if (pVATSTarget && pVATSTarget->IsActor() && !pVATSTarget->IsDead(false)) {
@@ -743,7 +743,7 @@ bool HUDMainMenu::ShowMessage(
     bool abMoveToHead
 ) {
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
-    bool bresult = 0;
+    bool bresult = false;
     if (apString) {
         HUDMainMenu::MessageData* newMessage_2 =
             static_cast<HUDMainMenu::MessageData*>(ourMalloc(sizeof(HUDMainMenu::MessageData)));
@@ -796,13 +796,13 @@ bool HUDMainMenu::ShowMessage(
         if (xMessages.IsEmpty()) {
             xMessages.AddTail(newMessage);
             HUDMainMenu::MessageData* m_item = (&xMessages)->m_item;
-            HUDMainMenu::pme->pTiles[26]->Set(4036, m_item->strText, 1);
+            HUDMainMenu::pme->pTiles[26]->Set(4036, m_item->strText, true);
             char* IconFilename = (&xMessages)->m_item->IconFilename;
-            HUDMainMenu::pme->pTiles[25]->Set(4044, IconFilename, 1);
+            HUDMainMenu::pme->pTiles[25]->Set(4044, IconFilename, true);
             if (apSoundName) {
                 BSAudio* v7 = &BSAudio::QInstance();
                 BSSoundHandle* SoundHandleByName = v7->GetSoundHandleByName(&a1, apSoundName, 289u);
-                SoundHandleByName->Play(0);
+                SoundHandleByName->Play(false);
             }
         }
         else {
@@ -823,7 +823,7 @@ bool HUDMainMenu::ShowMessage(
                 ourFree(newMessage);
             }
         }
-        return 1;
+        return true;
     }
     return bresult;
 }
@@ -898,12 +898,12 @@ bool HUDMainMenu::ShowSubtitle(
     bool abForceShow
 ) {
     Actor* pActor;
-    bool bresult = 0;
+    bool bresult = false;
     if (apTarget && apTarget->IsActor()) {
         pActor = dynamic_cast<Actor*>(apTarget);
     }
     else {
-        pActor = 0;
+        pActor = nullptr;
     }
     if (apString) {
         if (gs_bGeneralSubtitles_Gameplay.Bool() || (pActor && static_cast<uint8_t>(pActor->GetShowSubtitles()))) {
@@ -914,7 +914,7 @@ bool HUDMainMenu::ShowSubtitle(
                 newSubtitle = ::new (apMemory) HUDMainMenu::SubtitleData;
             }
             else {
-                newSubtitle = 0;
+                newSubtitle = nullptr;
             }
             HUDMainMenu::SubtitleData* newSubtitle_2 = newSubtitle;
             BSstrcpy(newSubtitle->strText, 260, apString);
@@ -942,7 +942,7 @@ bool HUDMainMenu::ShowSubtitle(
             }
             newSubtitle_2->uiSubtitleStartTime = HudTimer.iLastTime;
             xSubtitles.Add(newSubtitle_2);
-            bresult = 1;
+            bresult = true;
         }
     }
     return bresult;
@@ -1300,7 +1300,7 @@ void HUDMainMenu::UpdateExplosiveIndicator() {
                 float fangle2 = GetZAngleFromVector(WorldSceneGraph->GetCamera()->GetWorldDirection());
                 float v15 = fangle2 - fangle;
                 pnew->GetModel()->SetRotate(v15, 0.0f, 1.0f, 0.0f);
-                NiUpdateData update(0.0f, 1, 0);
+                NiUpdateData update(0.0f, true, false);
                 pnew->GetModel()->Update(update);
             }
         }
@@ -1340,13 +1340,13 @@ void HUDMainMenu::UpdateShake() {
 
 void HUDMainMenu::ShiftConditionTileOver(int32_t aishift) {
     float v5 = (float)(HUDMainMenu::pme->pTiles[10]->GetFloat(4001) + ((double)aishift));
-    pTiles[10]->Set(4001, v5, (bool)1);
+    pTiles[10]->Set(4001, v5, true);
     float v4 = (float)(HUDMainMenu::pme->pTiles[11]->GetFloat(4001) + ((double)aishift));
-    pTiles[11]->Set(4001, v4, (bool)1);
+    pTiles[11]->Set(4001, v4, true);
     float v3 = (float)(HUDMainMenu::pme->pTiles[9]->GetFloat(4001) + ((double)aishift));
-    pTiles[9]->Set(4001, v3, (bool)1);
+    pTiles[9]->Set(4001, v3, true);
     float v2 = (float)(HUDMainMenu::pme->pTiles[86]->GetFloat(4001) + ((double)aishift));
-    pTiles[86]->Set(4001, v2, (bool)1);
+    pTiles[86]->Set(4001, v2, true);
 }
 
 void HUDMainMenu::UpdateActorValue(ActorValue::Index aeActorValue) {
@@ -1370,7 +1370,7 @@ void HUDMainMenu::UpdateActorValue(ActorValue::Index aeActorValue) {
             if (fbase > 1.0) {
                 fbase = 1.0f;
             }
-            if (pPlayer->IsDead(0)) {
+            if (pPlayer->IsDead(false)) {
                 HUDMainMenu::UpdateMeter(HUDMainMenu::pme->pTiles[1], fbase, HUDMainMenu::HJ_LEFT, 0, 0);
             }
             else {
@@ -1427,8 +1427,8 @@ void HUDMainMenu::UpdateBreathMeter() {
 
 void HUDMainMenu::UpdateSneak() {
     bool bcombatSearch;
-    bcombatSearch = 0;
-    bool bblink = 0;
+    bcombatSearch = false;
+    bool bblink = false;
     if (pPlayer->IsPlayerCharacterInCombat(&bcombatSearch) || bcombatSearch) {
         const char* v1;
         HUDMainMenu::pme->pTiles[24]->Set(4084, 2);
@@ -1436,29 +1436,29 @@ void HUDMainMenu::UpdateSneak() {
             v1 = sSneakCaution.String();
         }
         else {
-            bblink = 1;
+            bblink = true;
             v1 = sSneakDanger.String();
         }
-        HUDMainMenu::pme->pTiles[24]->Set(4036, v1, 1);
+        HUDMainMenu::pme->pTiles[24]->Set(4036, v1, true);
     }
     else {
         if (pPlayer->GetHostileDetection()) {
             HUDMainMenu::pme->pTiles[24]->Set(4084, 2);
             const char* v2 = sSneakCaution.String();
-            HUDMainMenu::pme->pTiles[24]->Set(4036, v2, 1);
+            HUDMainMenu::pme->pTiles[24]->Set(4036, v2, true);
         }
         else {
-            int32_t ilevel = ReferenceProcessLists.GetHighestDetectionLevelForActor(pPlayer, 0);
+            int32_t ilevel = ReferenceProcessLists.GetHighestDetectionLevelForActor(pPlayer, false);
             HUDMainMenu::pme->pTiles[24]->Set(4084, 1);
-            bblink = 0;
+            bblink = false;
             if (ilevel <= 0) {
                 const char* v4 = sSneakHidden.String();
-                HUDMainMenu::pme->pTiles[24]->Set(4036, v4, 1);
+                HUDMainMenu::pme->pTiles[24]->Set(4036, v4, true);
             }
             else {
                 if (!pPlayer->GetHostileDetection()) {
                     const char* v3 = sSneakDetected.String();
-                    HUDMainMenu::pme->pTiles[24]->Set(4036, v3, 1);
+                    HUDMainMenu::pme->pTiles[24]->Set(4036, v3, true);
                 }
             }
         }
@@ -1499,7 +1499,7 @@ void HUDMainMenu::UpdateQuestText() {
                  (Interface::IsMenuIDVisible(Interface::eDialogMenu, 0) || Interface::IsConsoleVisible())) &&
                 !pVATS.eMode) {
                 char Dst[268];
-                bQuestNameShowing = 1;
+                bQuestNameShowing = true;
                 BSSoundHandle psoundHand;
                 if (HUDMainMenu::pQuestUpdateManager->GetQuestNamesItem()->eUpdateType) {
                     if (HUDMainMenu::pQuestUpdateManager->GetQuestNamesItem()->eUpdateType ==
@@ -1520,7 +1520,7 @@ void HUDMainMenu::UpdateQuestText() {
                     BSSoundHandle* v36 = v2->GetSoundHandleByName(&arHandle, "UIPopUpQuestNew", 289u);
                     psoundHand.operator=(*v36);
                 }
-                psoundHand.Play(0);
+                psoundHand.Play(false);
                 int32_t iWidth = 0;
                 uint32_t uifadeInStart = appTimer.iLastTime;
                 Tile* pquest = HUDMainMenu::pme->pTiles[14]->xChildren.GetHead();
@@ -1528,20 +1528,20 @@ void HUDMainMenu::UpdateQuestText() {
                     if (HUDMainMenu::pQuestUpdateManager->GetQuestNamesItem()->eUpdateType ==
                         QuestUpdateManager::HQUT_FAILED) {
                         const char* v6 = sQuestFailed.String();
-                        pquest->Set(4036, v6, 1);
+                        pquest->Set(4036, v6, true);
                     }
                     else {
                         if (HUDMainMenu::pQuestUpdateManager->GetQuestNamesItem()->eUpdateType ==
                             QuestUpdateManager::HQUT_COMPLETE) {
                             const char* v7 = gs_sQuestCompletedText.String();
-                            pquest->Set(4036, v7, 1);
+                            pquest->Set(4036, v7, true);
                         }
                         else {
                             if (HUDMainMenu::pQuestUpdateManager->GetQuestNamesItem()->eUpdateType ==
                                 QuestUpdateManager::HQUT_CUSTOM) {
                                 QuestUpdateManager::QuestUpdate* QuestNamesItem =
                                     HUDMainMenu::pQuestUpdateManager->GetQuestNamesItem();
-                                pquest->Set(4036, QuestNamesItem->CustomTextTitle, 1);
+                                pquest->Set(4036, QuestNamesItem->CustomTextTitle, true);
                             }
                             else {
                                 Warning(
@@ -1555,7 +1555,7 @@ void HUDMainMenu::UpdateQuestText() {
                 }
                 else {
                     const char* v5 = gs_sQuestAddedText.String();
-                    pquest->Set(4036, v5, 1);
+                    pquest->Set(4036, v5, true);
                 }
                 pquest->Set(4003, 1);
                 pquest->Set(4009, 0);
@@ -1573,7 +1573,7 @@ void HUDMainMenu::UpdateQuestText() {
                 Singleton->CalculateStringDimensions(&pos_4, String, Float, a1a, 0);
                 iWidth = static_cast<int32_t>(pos_4.x);
                 float v33 = -(pos_4.y + 15.0);
-                pquest->Set(4002, v33, 1);
+                pquest->Set(4002, v33, true);
                 int32_t nJustification = 1;
                 float fScreenWidthMultiplier = 0.0f;
                 int32_t nScreenWidth = static_cast<int32_t>(InterfaceManager::GetScreenWidth());
@@ -1610,13 +1610,13 @@ void HUDMainMenu::UpdateQuestText() {
                         fScreenWidthMultiplier = 0.0f;
                     }
                     float v31 = static_cast<double>(nSafeScreenWidth - iWidth / 2) * fScreenWidthMultiplier;
-                    pquest->Set(4001, v31, 1);
+                    pquest->Set(4001, v31, true);
                     pquest->Set(4023, nJustification);
                 }
                 pquest->Set(Tile::kTileValue_User0, uifadeInStart);
                 double v30 = static_cast<double>(uifadeInStart);
                 float v29 = fQuestCinematicCharacterRemain.Float() * 1000.0 + v30;
-                pquest->Set(Tile::kTileValue_User1, v29, 1);
+                pquest->Set(Tile::kTileValue_User1, v29, true);
                 HUDMainMenu::SetBrightness(pquest, HUDMainMenu::HB_HUD_TEXT);
                 if (HUDMainMenu::pQuestUpdateManager->GetQuestNamesItem()->eUpdateType ==
                     QuestUpdateManager::HQUT_COMPLETE) {
@@ -1662,7 +1662,7 @@ void HUDMainMenu::UpdateQuestText() {
                     HUDMainMenu::pme->pTiles[14]->xChildren.GetNext(textDimensions);
                 }
                 for (int32_t i_2 = 0; Dst[i_2]; ++i_2) {
-                    Tile* pquest_2 = 0;
+                    Tile* pquest_2 = nullptr;
                     if (textDimensions) {
                         char Src[4];
                         pquest_2 = HUDMainMenu::pme->pTiles[14]->xChildren.GetNext(textDimensions);
@@ -1676,7 +1676,7 @@ void HUDMainMenu::UpdateQuestText() {
                             );
                         }
                         pquest_2->Set(4025, nFont);
-                        pquest_2->Set(4036, Src, 1);
+                        pquest_2->Set(4036, Src, true);
                         pquest_2->Set(4003, 1);
                         pquest_2->Set(4009, 0);
                         pquest_2->Set(4001, iX);
@@ -1686,7 +1686,7 @@ void HUDMainMenu::UpdateQuestText() {
                         v13->CalculateStringDimensions(&textDimensions_2, Src, v20, a1b, 0);
                         if (i_2 > iSpace) {
                             float v28 = textDimensions_2.y + 5.0;
-                            pquest_2->Set(4002, v28, 1);
+                            pquest_2->Set(4002, v28, true);
                         }
                         else {
                             pquest_2->Set(4002, 0);
@@ -1696,7 +1696,7 @@ void HUDMainMenu::UpdateQuestText() {
                         pquest_2->Set(Tile::kTileValue_User0, uifadeInStart);
                         double v27 = static_cast<double>(uifadeInStart);
                         float v26 = fQuestCinematicCharacterRemain.Float() * 1000.0 + v27;
-                        pquest_2->Set(Tile::kTileValue_User1, v26, 1);
+                        pquest_2->Set(Tile::kTileValue_User1, v26, true);
                         double v25 = static_cast<double>(uifadeInStart);
                         double a1c = fQuestCinematicCharacterRemain.Float() * 1000.0 + v25;
                         InitializationFlow("Set show time %s: %f", pquest_2->GetString(4036), a1c);
@@ -1742,7 +1742,7 @@ void HUDMainMenu::UpdateXPMeter() {
             Interface::GetTopMenuID() == Interface::eDialogMenu)))) &&
         (pVATS.eMode != VATS::VATS_PLAYBACK && !HKWheel.GetVisible())) {
         if (fCurrentHUDOpacity == 0.0) {
-            bXPMeterFinishedMoving = 1;
+            bXPMeterFinishedMoving = true;
         }
         else {
             float falpha = pTiles[44]->GetFloat(4009);
@@ -1775,7 +1775,7 @@ void HUDMainMenu::UpdateXPMeter() {
                         }
                         else {
                             if (static_cast<double>(fxMax) < pTiles[47]->GetFloat(4001)) {
-                                pTiles[47]->Set(4001, fxMax, 1);
+                                pTiles[47]->Set(4001, fxMax, true);
                             }
                             float a1a = pTiles[47]->GetFloat(4001);
                             pTiles[47]->AddFadeControl(4001, a1a, fxMax, 1.0f, Tile::TFCT_STANDARD);
@@ -1803,11 +1803,11 @@ void HUDMainMenu::UpdateXPMeter() {
                                         iprevThreshold_3 = inextThreshold_3;
                                         inextThreshold_3 =
                                             GamePlayFormulas::GetRequiredExperiencePoints(xp_nextActorLevel);
-                                        pTiles[47]->Set(4001, fxMin, 1);
+                                        pTiles[47]->Set(4001, fxMin, true);
                                         BSsprintf(apDest, 3, "%i", xp_currentActorLevel);
-                                        pTiles[48]->Set(4036, apDest, 1);
+                                        pTiles[48]->Set(4036, apDest, true);
                                         BSsprintf(apDest, 3, "%i", xp_nextActorLevel);
-                                        pTiles[49]->Set(4036, apDest, 1);
+                                        pTiles[49]->Set(4036, apDest, true);
                                         if (icurrXP_3 <= inextThreshold_3) {
                                             float a2f = FLerp(
                                                 fxMin, fxMax, static_cast<float>(iprevThreshold_3),
@@ -1851,7 +1851,7 @@ void HUDMainMenu::UpdateXPMeter() {
                             HUDMainMenu::pme->pTiles[48]->Set(4003, 0);
                             HUDMainMenu::pme->pTiles[49]->Set(4003, 0);
                             if ((g_XPBarState & 8) != 0 && !bXPMeterFinishedMoving) {
-                                bXPMeterFinishedMoving = 1;
+                                bXPMeterFinishedMoving = true;
                                 pTiles[50]->Set(Tile::kTileValue_User10, 0);
                             }
                         }
@@ -1877,7 +1877,7 @@ void HUDMainMenu::UpdateXPMeter() {
                         BSSoundHandle* SoundHandleByName =
                             v2->GetSoundHandleByName(&arHandle, "UIPopUpExperienceUp", 289u);
                         psoundHand.operator=(*SoundHandleByName);
-                        psoundHand.Play(0);
+                        psoundHand.Play(false);
                         float fxp = 0.0f;
                         int32_t v60 = 0;
                         int32_t v63 = 0;
@@ -1906,34 +1906,34 @@ void HUDMainMenu::UpdateXPMeter() {
                         float a2a = pTiles[47]->GetFloat(HUDXPMeter_trait_x_min);
                         float a2b = BSMAX(fxp, a2a);
                         float afLengthb = BSMIN(a2b, afLengtha);
-                        pTiles[47]->Set(4001, afLengthb, 1);
+                        pTiles[47]->Set(4001, afLengthb, true);
                         pTiles[44]->Set(4003, 1);
                         pTiles[45]->Set(4003, 1);
                         pTiles[46]->Set(4003, 1);
                         const char* v4 = sStatsXP.String();
-                        pTiles[46]->Set(4036, v4, 1);
+                        pTiles[46]->Set(4036, v4, true);
                         pTiles[47]->Set(4003, 1);
                         pTiles[48]->Set(4003, 1);
                         pTiles[49]->Set(4003, 1);
-                        pTiles[44]->Set(4009, 0.0f, 1);
-                        pTiles[45]->Set(4009, 0.0f, 1);
-                        pTiles[46]->Set(4009, 0.0f, 1);
-                        pTiles[47]->Set(4009, 0.0f, 1);
-                        pTiles[48]->Set(4009, 0.0f, 1);
-                        pTiles[49]->Set(4009, 0.0f, 1);
+                        pTiles[44]->Set(4009, 0.0f, true);
+                        pTiles[45]->Set(4009, 0.0f, true);
+                        pTiles[46]->Set(4009, 0.0f, true);
+                        pTiles[47]->Set(4009, 0.0f, true);
+                        pTiles[48]->Set(4009, 0.0f, true);
+                        pTiles[49]->Set(4009, 0.0f, true);
                         BSsprintf(Src, 16, "+%i", v70);
-                        pTiles[45]->Set(4036, Src, 1);
+                        pTiles[45]->Set(4036, Src, true);
                         BSsprintf(Src, 16, "%i", xp_currentActorLevel);
-                        pTiles[48]->Set(4036, Src, 1);
+                        pTiles[48]->Set(4036, Src, true);
                         BSsprintf(Src, 16, "%i", xp_nextActorLevel);
-                        pTiles[49]->Set(4036, Src, 1);
+                        pTiles[49]->Set(4036, Src, true);
                         pTiles[44]->AddFadeControl(4009, 0.0f, fCurrentHUDOpacity, 2.0f, Tile::TFCT_STANDARD);
                         pTiles[45]->AddFadeControl(4009, 0.0f, fCurrentHUDOpacity, 2.0f, Tile::TFCT_STANDARD);
                         pTiles[46]->AddFadeControl(4009, 0.0f, fCurrentHUDOpacity, 2.0f, Tile::TFCT_STANDARD);
                         pTiles[47]->AddFadeControl(4009, 0.0f, fCurrentHUDOpacity, 2.0f, Tile::TFCT_STANDARD);
                         pTiles[48]->AddFadeControl(4009, 0.0f, fCurrentHUDOpacity, 2.0f, Tile::TFCT_STANDARD);
                         pTiles[49]->AddFadeControl(4009, 0.0f, fCurrentHUDOpacity, 2.0f, Tile::TFCT_STANDARD);
-                        bxpMeterShowing = 1;
+                        bxpMeterShowing = true;
                     }
                 }
                 if (bplayerReadyToLevel) {
@@ -1955,7 +1955,7 @@ void HUDMainMenu::UpdateXPMeter() {
                         bool balphadOut_2 = pTiles[50]->GetFloat(4009) == 0.0;
                         if (balreadyShown) {
                             if (!bXPMeterFinishedMoving && bfadeFinished_2 && balphadOut_2) {
-                                bXPMeterFinishedMoving = 1;
+                                bXPMeterFinishedMoving = true;
                                 g_XPBarState = 8;
                                 pTiles[50]->Set(Tile::kTileValue_User10, 0);
                             }
@@ -1982,7 +1982,7 @@ void HUDMainMenu::UpdateXPMeter() {
                         if (!(Time - pTiles[50]->GetFloat(Tile::kTileValue_User9) > 1500.0) ||
                             (balphadOut || !bfadeFinished)) {
                             if (!bXPMeterFinishedMoving && bfadeFinished && balphadOut) {
-                                bXPMeterFinishedMoving = 1;
+                                bXPMeterFinishedMoving = true;
                                 g_XPBarState = 8;
                                 pTiles[50]->Set(Tile::kTileValue_User10, 0);
                             }
@@ -1996,11 +1996,11 @@ void HUDMainMenu::UpdateXPMeter() {
                     else {
                         BSAudio* v7 = &BSAudio::QInstance();
                         BSSoundHandle* v36 = v7->GetSoundHandleByName(&apResult, "UILevelUpText", 289u);
-                        v36->Play(0);
-                        pTiles[50]->Set(4009, 0.0f, 1);
+                        v36->Play(false);
+                        pTiles[50]->Set(4009, 0.0f, true);
                         pTiles[50]->AddFadeControl(4009, 0.0f, fCurrentHUDOpacity, 0.5f, Tile::TFCT_STANDARD);
                         const char* v8 = sLevelUp.String();
-                        pTiles[50]->Set(4036, v8, 1);
+                        pTiles[50]->Set(4036, v8, true);
                         pTiles[50]->Set(4003, 1);
                         uint32_t v9 = appTimer.iLastTime;
                         pTiles[50]->Set(Tile::kTileValue_User9, v9);
@@ -2017,10 +2017,10 @@ void HUDMainMenu::UpdateXPMeter() {
         HUDMainMenu::pme->pTiles[47]->Set(4003, 0);
         HUDMainMenu::pme->pTiles[48]->Set(4003, 0);
         HUDMainMenu::pme->pTiles[49]->Set(4003, 0);
-        HUDMainMenu::pme->pTiles[44]->Set(4009, 0.0f, 1);
+        HUDMainMenu::pme->pTiles[44]->Set(4009, 0.0f, true);
         HUDMainMenu::pme->pTiles[44]->RemoveFadeControl(4009);
         g_XPBarState |= 1u;
-        bXPMeterFinishedMoving = 0;
+        bXPMeterFinishedMoving = false;
     }
 }
 
@@ -2030,7 +2030,7 @@ void HUDMainMenu::UpdateRadiationMeter() {
     bool bdrankRads = static_cast<double>(appTimer.iLastTime) < Float;
     bool binRadiation = ReferenceProcessLists.IsPlayerInRadiationArea();
     if (binRadiation || (bdrankRads || ivisFlag != 4)) {
-        bool brecalcRadsTarget = 0;
+        bool brecalcRadsTarget = false;
         if (HUDMainMenu::pme->pTiles[17]->GetFadeFinished(4009) &&
             HUDMainMenu::pme->pTiles[17]->GetFloat(4009) == 0.0 &&
             HUDMainMenu::pme->pTiles[18]->GetFadeFinished(4009) &&
@@ -2043,7 +2043,7 @@ void HUDMainMenu::UpdateRadiationMeter() {
         }
         if ((ivisFlag == 4 || ivisFlag == 2) && (binRadiation || bdrankRads)) {
             ivisFlag = 8;
-            brecalcRadsTarget = 1;
+            brecalcRadsTarget = true;
         }
         float fstart = 15.0f;
         float fend = 315.0f;
@@ -2053,9 +2053,9 @@ void HUDMainMenu::UpdateRadiationMeter() {
         bool v24 = HUDMainMenu::pme->pTiles[19]->IsTrue(Tile::kTileValue_User7) || bdrankRads;
         if (binRadiation || (bdrankRads || brecalcRadsTarget)) {
             float fplayerRads = static_cast<float>(pPlayer->GetActorValue(ActorValue::RADIATION_RADS));
-            bool bchangeVal = 0;
+            bool bchangeVal = false;
             if (binRadiation || (brecalcRadsTarget || v24)) {
-                bchangeVal = 1;
+                bchangeVal = true;
                 fradsTotal = HUDMainMenu::pme->pTiles[19]->GetFloat(Tile::kTileValue_User5);
                 float fplayerRads_2 = fplayerRads - fradsTotal;
                 float a1 = BSMIN(fplayerRads_2, 1000.0f);
@@ -2063,14 +2063,14 @@ void HUDMainMenu::UpdateRadiationMeter() {
                 fplayersCurrentRads = FLerp(fstart, fend, 0.0f, 1000.0f, a2);
             }
             if ((bdrankRads && brecalcRadsTarget) || (v24 || binRadiation)) {
-                bchangeVal = 1;
+                bchangeVal = true;
                 float a1a = BSMIN(fplayerRads, 1000.0f);
                 float a2a = BSMAX(a1a, 0.0f);
                 ftargetRads = FLerp(fstart, fend, 0.0f, 1000.0f, a2a);
             }
             if (bchangeVal) {
                 BSsprintf(g_sRadiationTextBuffer, 260u, "+%i", BSMAX(1, static_cast<int32_t>(fradsTotal)));
-                HUDMainMenu::pme->pTiles[19]->Set(4036, g_sRadiationTextBuffer, 1);
+                HUDMainMenu::pme->pTiles[19]->Set(4036, g_sRadiationTextBuffer, true);
             }
         }
         if (brecalcRadsTarget) {
@@ -2083,7 +2083,7 @@ void HUDMainMenu::UpdateRadiationMeter() {
                 ftargetRads_2 = fplayersCurrentRads;
             }
             float a1b = BSMIN(ftargetRads_2, fend);
-            HUDMainMenu::pme->pTiles[18]->Set(4001, a1b, 1);
+            HUDMainMenu::pme->pTiles[18]->Set(4001, a1b, true);
             HUDMainMenu::pme->pTiles[61]->Set(4003, 1);
             float afEnd = fCurrentHUDOpacity;
             float afStart = HUDMainMenu::pme->pTiles[17]->GetFloat(4009);
@@ -2101,13 +2101,13 @@ void HUDMainMenu::UpdateRadiationMeter() {
         else {
             if (binRadiation) {
                 float a1c = BSMIN(ftargetRads, fend);
-                HUDMainMenu::pme->pTiles[18]->Set(4001, a1c, 1);
+                HUDMainMenu::pme->pTiles[18]->Set(4001, a1c, true);
             }
         }
         if (v24) {
             HUDMainMenu::pme->pTiles[19]->Set(Tile::kTileValue_User7, 0);
             float a1d = BSMIN(ftargetRads, fend);
-            HUDMainMenu::pme->pTiles[18]->Set(Tile::kTileValue_User0, a1d, 1);
+            HUDMainMenu::pme->pTiles[18]->Set(Tile::kTileValue_User0, a1d, true);
             float a2b = BSMIN(50.0f, fradsTotal);
             float fpointerMovementTime = FLerp(1.5f, 3.0f, 0.0f, 50.0f, a2b);
             float fcurrentX = HUDMainMenu::pme->pTiles[18]->GetFloat(4001);
@@ -2141,23 +2141,23 @@ void HUDMainMenu::UpdateStatusModeUI(bool abIsHardcore) {
     ActorValueOwner* apActor;
     ActorValueOwner* a1;
     const char* v2 = sStatsLMBAbbrev.String();
-    HUDMainMenu::pme->pTiles[85]->Set(4036, v2, static_cast<bool>(1));
+    HUDMainMenu::pme->pTiles[85]->Set(4036, v2, true);
     const char* v3 = sStatsRADAbbrev.String();
-    HUDMainMenu::pme->pTiles[84]->Set(4036, v3, static_cast<bool>(1));
+    HUDMainMenu::pme->pTiles[84]->Set(4036, v3, true);
     const char* v4 = sStatsH20Abbrev.String();
-    HUDMainMenu::pme->pTiles[79]->Set(4036, v4, static_cast<bool>(1));
+    HUDMainMenu::pme->pTiles[79]->Set(4036, v4, true);
     const char* v5 = sStatsFODAbbrev.String();
-    HUDMainMenu::pme->pTiles[81]->Set(4036, v5, static_cast<bool>(1));
+    HUDMainMenu::pme->pTiles[81]->Set(4036, v5, true);
     const char* v6 = sStatsSLPAbbrev.String();
-    HUDMainMenu::pme->pTiles[80]->Set(4036, v6, static_cast<bool>(1));
+    HUDMainMenu::pme->pTiles[80]->Set(4036, v6, true);
     int32_t iTotalCrippledLimbs = 0;
     if (pPlayer) {
         a1 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer)));
     }
     else {
-        a1 = 0;
+        a1 = nullptr;
     }
-    float factorLeftArmCondition = CombatFormulas::GetBodyPartCondition(a1, ActorValue::LEFT_ATTACK_CONDITION, 0);
+    float factorLeftArmCondition = CombatFormulas::GetBodyPartCondition(a1, ActorValue::LEFT_ATTACK_CONDITION, false);
     if (factorLeftArmCondition == 0.0) {
         iTotalCrippledLimbs = 1;
     }
@@ -2165,10 +2165,10 @@ void HUDMainMenu::UpdateStatusModeUI(bool abIsHardcore) {
         apActor = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer)));
     }
     else {
-        apActor = 0;
+        apActor = nullptr;
     }
     float factorLeftLegCondition =
-        CombatFormulas::GetBodyPartCondition(apActor, ActorValue::LEFT_MOBILITY_CONDITION, 0);
+        CombatFormulas::GetBodyPartCondition(apActor, ActorValue::LEFT_MOBILITY_CONDITION, false);
     if (factorLeftLegCondition == 0.0) {
         ++iTotalCrippledLimbs;
     }
@@ -2176,9 +2176,10 @@ void HUDMainMenu::UpdateStatusModeUI(bool abIsHardcore) {
         v14 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer)));
     }
     else {
-        v14 = 0;
+        v14 = nullptr;
     }
-    float factorRightLegCondition = CombatFormulas::GetBodyPartCondition(v14, ActorValue::RIGHT_MOBILITY_CONDITION, 0);
+    float factorRightLegCondition =
+        CombatFormulas::GetBodyPartCondition(v14, ActorValue::RIGHT_MOBILITY_CONDITION, false);
     if (factorRightLegCondition == 0.0) {
         ++iTotalCrippledLimbs;
     }
@@ -2186,9 +2187,10 @@ void HUDMainMenu::UpdateStatusModeUI(bool abIsHardcore) {
         v13 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer)));
     }
     else {
-        v13 = 0;
+        v13 = nullptr;
     }
-    float factorRightArmCondition = CombatFormulas::GetBodyPartCondition(v13, ActorValue::RIGHT_ATTACK_CONDITION, 0);
+    float factorRightArmCondition =
+        CombatFormulas::GetBodyPartCondition(v13, ActorValue::RIGHT_ATTACK_CONDITION, false);
     if (factorRightArmCondition == 0.0) {
         ++iTotalCrippledLimbs;
     }
@@ -2196,9 +2198,9 @@ void HUDMainMenu::UpdateStatusModeUI(bool abIsHardcore) {
         v12 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer)));
     }
     else {
-        v12 = 0;
+        v12 = nullptr;
     }
-    float factorHeadCondition = CombatFormulas::GetBodyPartCondition(v12, ActorValue::PERCEPTION_CONDITION, 0);
+    float factorHeadCondition = CombatFormulas::GetBodyPartCondition(v12, ActorValue::PERCEPTION_CONDITION, false);
     if (factorHeadCondition == 0.0) {
         ++iTotalCrippledLimbs;
     }
@@ -2206,9 +2208,9 @@ void HUDMainMenu::UpdateStatusModeUI(bool abIsHardcore) {
         v11 = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer)));
     }
     else {
-        v11 = 0;
+        v11 = nullptr;
     }
-    float factorBodyCondition = CombatFormulas::GetBodyPartCondition(v11, ActorValue::ENDURANCE_CONDITION, 0);
+    float factorBodyCondition = CombatFormulas::GetBodyPartCondition(v11, ActorValue::ENDURANCE_CONDITION, false);
     if (factorBodyCondition == 0.0) {
         ++iTotalCrippledLimbs;
     }
@@ -2232,20 +2234,20 @@ void HUDMainMenu::UpdateStatusModeUI(bool abIsHardcore) {
         fTotalLimbCondition = fHCFlashTextThreshold.Float() + 1.0;
     }
     float afCurrValue = static_cast<float>(pPlayer->GetActorValue(ActorValue::RADIATION_RADS));
-    StatusModeTileEffects(HUDMainMenu::pme->pTiles[84], afCurrValue, 0);
+    StatusModeTileEffects(HUDMainMenu::pme->pTiles[84], afCurrValue, false);
     StatusModeTileEffects(HUDMainMenu::pme->pTiles[85], fTotalLimbCondition, !abIsHardcore);
     if (abIsHardcore) {
         float afCurrValuea = static_cast<float>(pPlayer->GetActorValue(ActorValue::DEHYDRATION));
-        StatusModeTileEffects(HUDMainMenu::pme->pTiles[79], afCurrValuea, 0);
+        StatusModeTileEffects(HUDMainMenu::pme->pTiles[79], afCurrValuea, false);
         float afCurrValueb = static_cast<float>(pPlayer->GetActorValue(ActorValue::SLEEPDEPREVATION));
-        StatusModeTileEffects(HUDMainMenu::pme->pTiles[80], afCurrValueb, 0);
+        StatusModeTileEffects(HUDMainMenu::pme->pTiles[80], afCurrValueb, false);
         float afCurrValuec = static_cast<float>(pPlayer->GetActorValue(ActorValue::HUNGER));
-        StatusModeTileEffects(HUDMainMenu::pme->pTiles[81], afCurrValuec, 1);
+        StatusModeTileEffects(HUDMainMenu::pme->pTiles[81], afCurrValuec, true);
     }
     else {
-        HUDMainMenu::pme->pTiles[79]->Set(4009, 0.0f, static_cast<bool>(1));
-        HUDMainMenu::pme->pTiles[80]->Set(4009, 0.0f, static_cast<bool>(1));
-        HUDMainMenu::pme->pTiles[81]->Set(4009, 0.0f, static_cast<bool>(1));
+        HUDMainMenu::pme->pTiles[79]->Set(4009, 0.0f, true);
+        HUDMainMenu::pme->pTiles[80]->Set(4009, 0.0f, true);
+        HUDMainMenu::pme->pTiles[81]->Set(4009, 0.0f, true);
     }
 }
 
@@ -2267,7 +2269,7 @@ void HUDMainMenu::UpdateEnemyHealth(Actor* apActor) {
         HUDMainMenu::UpdateMeter(pTiles[22], 0.0f, HUDMainMenu::HJ_CENTER, 0, 0);
     }
     else {
-        if (apActor->IsDead(0)) {
+        if (apActor->IsDead(false)) {
             HUDMainMenu::UpdateMeter(pTiles[22], fperhealth, HUDMainMenu::HJ_CENTER, 0, 0);
         }
         else {
@@ -2278,7 +2280,7 @@ void HUDMainMenu::UpdateEnemyHealth(Actor* apActor) {
     BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::SEE_ENEMY_HEALTH, pPlayer, &fHasSeeHealthPerk);
     if (!(*reinterpret_cast<float*>(&fHasSeeHealthPerk) > 0.0)) {
         const char* FullName = apActor->GetFullName();
-        HUDMainMenu::pme->pTiles[23]->Set(4036, FullName, 1);
+        HUDMainMenu::pme->pTiles[23]->Set(4036, FullName, true);
     }
     else {
         char Src[260];
@@ -2287,7 +2289,7 @@ void HUDMainMenu::UpdateEnemyHealth(Actor* apActor) {
         int32_t afMeterPercent_4 = static_cast<int32_t>(fcurrent_health);
         const char* afMeterPercent = sStatsHP.String();
         std::sprintf(Src, "%s\n %s:%d %s:%.2f", apActor->GetFullName(), afMeterPercent, afMeterPercent_4, v5, a2);
-        HUDMainMenu::pme->pTiles[23]->Set(4036, Src, 1);
+        HUDMainMenu::pme->pTiles[23]->Set(4036, Src, true);
     }
 }
 
@@ -2311,16 +2313,16 @@ void HUDMainMenu::KillQuestName() {
 
 void HUDMainMenu::KillQuestObjectives() {
     NiTListItem<Tile*>* xchildIter = HUDMainMenu::pme->pTiles[13]->xChildren.m_pkTail;
-    Tile* v5 = 0;
+    Tile* v5 = nullptr;
     while (xchildIter) {
         Tile* ptile = HUDMainMenu::pme->pTiles[13]->xChildren.GetPrev(xchildIter);
         if (ptile) {
             ptile->Set(4003, 0);
-            ptile->Set(4009, 0.0f, 1);
+            ptile->Set(4009, 0.0f, true);
             int32_t v1 = Tile::TextToTrait("_WaitComplete");
-            ptile->Set(v1, 0.0f, 1);
+            ptile->Set(v1, 0.0f, true);
             int32_t v2 = Tile::TextToTrait("_HoldTime");
-            ptile->Set(v2, 0.0f, 1);
+            ptile->Set(v2, 0.0f, true);
         }
     }
     if (HUDMainMenu::pme->eMenuMode != HUDMainMenu::HMM_LOAD) {
@@ -2333,7 +2335,7 @@ void HUDMainMenu::KillQuestObjectives() {
 }
 
 HUDMainMenu::SubtitleData* HUDMainMenu::GetNextSubtitle() {
-    HUDMainMenu::SubtitleData* pResult = 0;
+    HUDMainMenu::SubtitleData* pResult = nullptr;
     float fClosestSqrDist = 3.4028235e+38f;
     NiPoint3 playerLoc = pPlayer->GetLocationOnReference();
     for (int32_t isubtitleCt = 0;; ++isubtitleCt) {
@@ -2385,12 +2387,12 @@ void HUDMainMenu::HideMessage() {
                     else {
                         if ((&xMessages)->m_item->SoundName[0]) {
                             char* afStart = (&xMessages)->m_item->SoundName;
-                            pPlayer->PlaySoundByEditorName(&dst, afStart, 0, 289u, 0);
+                            pPlayer->PlaySoundByEditorName(&dst, afStart, false, 289u, false);
                         }
                         HUDMainMenu::MessageData* afLength = (&xMessages)->m_item;
-                        HUDMainMenu::pme->pTiles[26]->Set(4036, afLength->strText, 1);
+                        HUDMainMenu::pme->pTiles[26]->Set(4036, afLength->strText, true);
                         char* afLengtha = (&xMessages)->m_item->IconFilename;
-                        HUDMainMenu::pme->pTiles[25]->Set(4044, afLengtha, 1);
+                        HUDMainMenu::pme->pTiles[25]->Set(4044, afLengtha, true);
                         uiMessageStartTime = HudTimer.iLastTime;
                     }
                     return;
@@ -2402,7 +2404,7 @@ void HUDMainMenu::HideMessage() {
 
 void HUDMainMenu::KillQuestUpdates() {
     if (HUDMainMenu::pme) {
-        HUDMainMenu::pme->bKillQuestUpdates = (bool)1;
+        HUDMainMenu::pme->bKillQuestUpdates = true;
     }
 }
 
@@ -2426,7 +2428,7 @@ void HUDMainMenu::ShowCrippledGuy() {
         }
     }
     BSsprintf(Src, 260, "Interface\\Stats\\face_%02d.dds", ifaceImage);
-    pTiles[52]->Set(4044, Src, 1);
+    pTiles[52]->Set(4044, Src, true);
     pTiles[52]->AddFadeControl(4009, 0.0f, fCurrentHUDOpacity, 5.0f, Tile::TFCT_FADE_IN_HOLD_FADE_OUT);
     HUDMainMenu::HUD_MAIN_MENU_TILES etile = HUDMainMenu::HMMT_CRIPPLED_HEAD;
     for (ActorValue::Index eindex = ActorValue::PERCEPTION_CONDITION; eindex < ActorValue::BRAIN_CONDITION;
@@ -2440,7 +2442,7 @@ void HUDMainMenu::ShowCrippledGuy() {
             apFormat = "Interface\\Stats\\%s.dds";
         }
         BSsprintf(Src, 260, apFormat, HUDCrippledLimbNames[eindex - ActorValue::PERCEPTION_CONDITION]);
-        pTiles[etile]->Set(4044, Src, 1);
+        pTiles[etile]->Set(4044, Src, true);
         if (fval == 0.0) {
             pTiles[etile]->Set(4084, 2);
             pTiles[etile]->AddFadeControl(4009, 0.0f, fCurrentHUDOpacity, 5.0f, Tile::TFCT_BLINK_FAST_FADE);
@@ -2455,32 +2457,32 @@ void HUDMainMenu::ShowCrippledGuy() {
 
 bool HUDMainMenu::IsQuestNameShowing() {
     if (!bQuestNameShowing) {
-        return 0;
+        return false;
     }
     NiTListItem<Tile*>* pPos = HUDMainMenu::pme->pTiles[14]->xChildren.m_pkHead;
     while (pPos) {
         Tile* pChild = HUDMainMenu::pme->pTiles[14]->xChildren.GetNext(pPos);
         if (pChild->Tile::IsTrue(4003)) {
-            return 1;
+            return true;
         }
     }
-    bQuestNameShowing = 0;
-    return 0;
+    bQuestNameShowing = false;
+    return false;
 }
 
 bool HUDMainMenu::AreObjectivesShowing() {
     if (!bObjectiveNameShowing) {
-        return 0;
+        return false;
     }
     NiTListItem<Tile*>* pPos = HUDMainMenu::pme->pTiles[13]->xChildren.m_pkHead;
     while (pPos) {
         Tile* pChild = HUDMainMenu::pme->pTiles[13]->xChildren.GetNext(pPos);
         if (pChild->Tile::IsTrue(4003)) {
-            return 1;
+            return true;
         }
     }
-    bObjectiveNameShowing = 0;
-    return 0;
+    bObjectiveNameShowing = false;
+    return false;
 }
 
 void HUDMainMenu::UpdateRadiationMeterConditions(float a1, float a2) {
@@ -2489,14 +2491,14 @@ void HUDMainMenu::UpdateRadiationMeterConditions(float a1, float a2) {
         if (a2 > 0.0) {
             double Float = HUDMainMenu::pme->pTiles[19]->GetFloat(Tile::kTileValue_User6);
             if (static_cast<double>(appTimer.iLastTime) >= Float) {
-                HUDMainMenu::pme->pTiles[19]->Set(Tile::kTileValue_User5, ftotalRads, static_cast<bool>(1));
+                HUDMainMenu::pme->pTiles[19]->Set(Tile::kTileValue_User5, ftotalRads, true);
             }
         }
     }
     else {
         float afValue = static_cast<double>(appTimer.iLastTime) + 2000.0;
-        HUDMainMenu::pme->pTiles[19]->Set(Tile::kTileValue_User6, afValue, static_cast<bool>(1));
-        HUDMainMenu::pme->pTiles[19]->Set(Tile::kTileValue_User5, ftotalRads, static_cast<bool>(1));
+        HUDMainMenu::pme->pTiles[19]->Set(Tile::kTileValue_User6, afValue, true);
+        HUDMainMenu::pme->pTiles[19]->Set(Tile::kTileValue_User5, ftotalRads, true);
         HUDMainMenu::pme->pTiles[19]->Set(Tile::kTileValue_User7, 1);
     }
 }
@@ -2527,7 +2529,7 @@ void HUDMainMenu::StatusModeTileEffects(Tile* apTile, float afCurrValue, bool bR
     }
     else {
         apTile->Set(4084, 2);
-        apTile->Set(4009, fCurrAlphaHardcore, static_cast<bool>(1));
+        apTile->Set(4009, fCurrAlphaHardcore, true);
     }
     if (bResetValues) {
         double v4;
@@ -2769,7 +2771,7 @@ void HUDMainMenu::HandleCinematicFade(Tile* th_s) {
         while (pPos) {
             Tile* pChild = HUDMainMenu::pme->pTiles[13]->xChildren.GetNext(pPos);
             if (pChild) {
-                pChild->Tile::Set(4009, 0.0f, 1);
+                pChild->Tile::Set(4009, 0.0f, true);
                 pChild->Tile::Set(Tile::TextToTrait("_WaitComplete"), 0);
             }
         }
@@ -2825,7 +2827,7 @@ void HUDMainMenu::ClearGunScope() {
                 v1 = (&HUDMainMenu::spScopeModel)->m_pObject;
                 v2 = v1->GetAt(0);
                 v3->DetachChild(v2);
-                HUDMainMenu::pme->bScopeVisible = (bool)0;
+                HUDMainMenu::pme->bScopeVisible = false;
             }
         }
     }
@@ -3576,7 +3578,7 @@ bool HUDMainMenu::SetInfoForRef(TESObjectREFR* apObject, bool abTelekinesis, boo
         }
         else {
             bool bHardcore = pPlayer->IsHardcore();
-            fWeight = static_cast<float>(TESWeightForm::GetFormWeight(kItem.GetItemChangeObject(), bHardcore));
+            fWeight = TESWeightForm::GetFormWeight(kItem.GetItemChangeObject(), bHardcore);
         }
         if (fWeight > 0.0) {
             BSsprintf(wg, 8, "%.1f", fWeight);
@@ -3673,9 +3675,9 @@ bool HUDMainMenu::SetInfoForRef(TESObjectREFR* apObject, bool abTelekinesis, boo
 void HUDMainMenu::DisplayWaterHealth(int32_t aiHealth, int32_t aiInfoLabel, int32_t aiInfoValue) {
     char Src[268];
     std::sprintf(Src, "%i", aiHealth);
-    HUDMainMenu::pme->pTiles[aiInfoLabel]->Set(4036, Src, static_cast<bool>(1));
+    HUDMainMenu::pme->pTiles[aiInfoLabel]->Set(4036, Src, true);
     const char* v3 = sHitPointsShort.String();
-    HUDMainMenu::pme->pTiles[aiInfoValue]->Set(4036, v3, static_cast<bool>(1));
+    HUDMainMenu::pme->pTiles[aiInfoValue]->Set(4036, v3, true);
 }
 
 void HUDMainMenu::DisplayWaterRadiation(int32_t aiRadiationAmount, int32_t aiInfoLabel, int32_t aiInfoValue) {
@@ -3694,9 +3696,9 @@ void HUDMainMenu::DisplayWaterRadiation(int32_t aiRadiationAmount, int32_t aiInf
         v4 = 1;
     }
     std::sprintf(Src, "%i", v4);
-    HUDMainMenu::pme->pTiles[aiInfoLabel]->Set(4036, Src, static_cast<bool>(1));
+    HUDMainMenu::pme->pTiles[aiInfoLabel]->Set(4036, Src, true);
     const char* v3 = sHUDRads.String();
-    HUDMainMenu::pme->pTiles[aiInfoValue]->Set(4036, v3, static_cast<bool>(1));
+    HUDMainMenu::pme->pTiles[aiInfoValue]->Set(4036, v3, true);
 }
 
 void HUDMainMenu::SetBrightness(Tile* apTile, HUD_BRIGHTNESS aeBrightness) {
@@ -3730,7 +3732,7 @@ void HUDMainMenu::SetRadiationLevel(float afDrinkinRads, float afStandinRads) {
                 BSAudio* v2 = &BSAudio::QInstance();
                 BSSoundHandle* arHandle = v2->GetSoundHandleByName(&a1, "UIPipBoyRadiationTestLP", 17u);
                 HUDMainMenu::pme->GeigerSound.operator=(*arHandle);
-                HUDMainMenu::pme->GeigerSound.Play(0);
+                HUDMainMenu::pme->GeigerSound.Play(false);
             }
             HUDMainMenu::pme->UpdateRadiationMeterConditions(afDrinkinRads, afStandinRads);
         }
@@ -3751,7 +3753,7 @@ Tile* HUDMainMenu::Create() {
     }
     InterfaceManager* pInterfaceManager = InterfaceManager::Instance();
     const float fMaxDepth = Tile::GetMaximumDepth();
-    Tile::GetTileUpdateAllCriticalSectionLock()->Enter(0);
+    Tile::GetTileUpdateAllCriticalSectionLock()->Enter(nullptr);
     Tile* pFile = pInterfaceManager->GetMenusRoot()->ReadFile("Data\\Menus\\Main\\hud_main_menu.xml");
     Menu* pMenu = pFile->GetMenu();
     if (!pMenu || pMenu->GetClass() != GetMenuID()) {
@@ -4084,7 +4086,7 @@ Tile* HUDMainMenu::Create() {
     pme->pTiles[HMMT_INFO_LABEL_TWO] =
         pMenu->RenderTemplate(pme->pTiles[HMMT_INFO], "template_justify_right_text", nullptr);
     SetBrightness(pme->pTiles[HMMT_INFO_LABEL_TWO], HB_HUD_TEXT);
-    fValue = static_cast<float>(pme->pTiles[HMMT_INFO]->GetFloat(kTileValue_Width) - iLabelTwoOffset);
+    fValue = (pme->pTiles[HMMT_INFO]->GetFloat(kTileValue_Width) - iLabelTwoOffset);
     pme->pTiles[HMMT_INFO_LABEL_TWO]->Set(kTileValue_X, fValue, true);
     pme->pTiles[HMMT_INFO_LABEL_TWO]->Set(kTileValue_Y, iInfoLineY);
     pme->pTiles[HMMT_INFO_LABEL_TWO]->Set(kTileValue_Alpha, fCurrentHUDOpacity, true);
@@ -4793,8 +4795,8 @@ void HUDMainMenu::HandleHealthbarForCrosshairActor(TESObjectREFR* apRef, bool ab
     }
     else {
         apRef->GetRefPromptType();
-        Actor* a1 = apRef->IsActor() ? static_cast<Actor*>(apRef) : 0;
-        bool v5 = a1 && a1->IsDead(0);
+        Actor* a1 = apRef->IsActor() ? static_cast<Actor*>(apRef) : nullptr;
+        bool v5 = a1 && a1->IsDead(false);
         v7 = v5;
         if (a1) {
             if ((pPlayer->IsActorPerceived(a1) && pPlayer->IsActorPerceived(a1)->bIsHostile) ||
@@ -4803,7 +4805,7 @@ void HUDMainMenu::HandleHealthbarForCrosshairActor(TESObjectREFR* apRef, bool ab
             }
         }
         if (a1) {
-            if (!v5 && !a1->IsDead(0)) {
+            if (!v5 && !a1->IsDead(false)) {
                 int32_t v2 = a1->GetActorValue(ActorValue::HEALTH);
                 if (v2 < a1->GetBaseActorValue(ActorValue::HEALTH) && !HUDMainMenu::pme->pTiles[32]->IsTrue(4003)) {
                     HUDMainMenu::SetEnemyActor(a1);
@@ -5381,12 +5383,12 @@ float HUDMainMenu::HeadingBetweenLocations(const NiPoint3& aStart, const NiPoint
     }
     else {
         v5 = result.x / result.y;
-        afAngle = (float)std::atanf(v5);
+        afAngle = std::atanf(v5);
         if (result.y < 0.0) {
             afAngle = (float)(afAngle + 3.1415927410125732);
         }
     }
-    float v7 = (float)ClampAngle(afAngle);
+    float v7 = ClampAngle(afAngle);
     return (float)(v7 * 57.2957763671875);
 }
 
@@ -5402,7 +5404,7 @@ void HUDMainMenu::DisplayQuestReminder(TESQuest* apQuest) {
                         if (!(*v2)->GetStatus(2)) {
                             BGSQuestObjective** v3 = &plist->m_item;
                             const char* DisplayText = (*v3)->GetDisplayText();
-                            HUDMainMenu::ShowQuestObjective(DisplayText, 0, 1);
+                            HUDMainMenu::ShowQuestObjective(DisplayText, false, true);
                         }
                     }
                 }
@@ -5457,13 +5459,13 @@ void HUDMainMenu::ShowEnemyDDTIcon(bool abArmorPiercing) {
 
 void HUDMainMenu::SetHUDShake(float a1) {
     if (HUDMainMenu::pme) {
-        HUDMainMenu::pme->fShake = (float)(a1 * ((&HUDMainMenu::fHUDShakeMult)->Float()));
+        HUDMainMenu::pme->fShake = (a1 * (&HUDMainMenu::fHUDShakeMult)->Float());
     }
 }
 
 void HUDMainMenu::ClearXPMeterFinishedMoving() {
     if (HUDMainMenu::pme) {
-        HUDMainMenu::pme->bXPMeterFinishedMoving = (bool)0;
+        HUDMainMenu::pme->bXPMeterFinishedMoving = false;
     }
     g_XPBarState = 1;
 }
@@ -5480,7 +5482,7 @@ void HUDMainMenu::InitGunScope(TESModel* apModelFilename) {
                         pModelLoader->LoadFile(apModelFilename->GetModel(), LOD_MULT_NONE, true, false, false, false);
                     pScopeModel->AttachChild(pModel, true);
                     HUDMainMenu::spScopeModel.m_pObject->SetAppCulled(true);
-                    NiUpdateData UpdateData1(0.0f, 0, 0);
+                    NiUpdateData UpdateData1(0.0f, false, false);
                     HUDMainMenu::spScopeModel.m_pObject->Update(UpdateData1);
                 }
             }
@@ -5517,7 +5519,7 @@ void HUDMainMenu::SetLocationText(const HUDMainMenu::HUDTravelLocData& aLocation
                 }
             }
             else {
-                pLastLocation = 0;
+                pLastLocation = nullptr;
             }
         }
         else {
@@ -5528,14 +5530,14 @@ void HUDMainMenu::SetLocationText(const HUDMainMenu::HUDTravelLocData& aLocation
                         HUDMainMenu::pme->pTiles[16]->GetFloat(4009) == 0.0) {
                         MapMarkerData* MapMarkerData_ = aLocationData.pMarker->GetMapMarkerData();
                         const char* LocationName = MapMarkerData_->GetLocationName();
-                        HUDMainMenu::pme->pTiles[16]->Set(4036, LocationName, 1);
+                        HUDMainMenu::pme->pTiles[16]->Set(4036, LocationName, true);
                         float afEnd = fHudOpacity.Float() * 255.0;
                         HUDMainMenu::pme->pTiles[16]->AddFadeControl(4009, 0.0f, afEnd, 2.0f, Tile::TFCT_STANDARD);
                         uint32_t Time = appTimer.iLastTime;
                         HUDMainMenu::pme->pTiles[16]->Set(Tile::kTileValue_User0, Time);
                     }
                     HUDMainMenu::pme->pTiles[15]->RemoveFadeControl(4009);
-                    HUDMainMenu::pme->pTiles[15]->Set(4009, 0.0f, 1);
+                    HUDMainMenu::pme->pTiles[15]->Set(4009, 0.0f, true);
                 }
             }
         }
@@ -5575,9 +5577,9 @@ void HUDMainMenu::Revert() {
             pHUD->uiQuestReminderTimer = 0;
             pHUD->uiDDTdisplayTimer = -1;
             pHUD->uiEnemyDDTdisplayTimer = -1;
-            pHUD->bForceObjectiveReminders = 0;
+            pHUD->bForceObjectiveReminders = false;
             pHUD->pTiles[50]->Set(4003, 0);
-            pHUD->bXPMeterFinishedMoving = 0;
+            pHUD->bXPMeterFinishedMoving = false;
             HUDMainMenu::pme->pTiles[44]->Set(4003, 0);
             HUDMainMenu::pme->pTiles[45]->Set(4003, 0);
             HUDMainMenu::pme->pTiles[46]->Set(4003, 0);
@@ -5585,7 +5587,7 @@ void HUDMainMenu::Revert() {
             HUDMainMenu::pme->pTiles[48]->Set(4003, 0);
             HUDMainMenu::pme->pTiles[49]->Set(4003, 0);
             g_XPBarState = 1;
-            HUDMainMenu::pme->bKillQuestUpdates = 1;
+            HUDMainMenu::pme->bKillQuestUpdates = true;
         }
     }
 }
@@ -5595,7 +5597,7 @@ double HUDMainMenu::GetCompassAngle(NiPoint3 a1, NiPoint3 a2) {
     result = a1 - a2;
     float UnclampedZAngleFromVector = GetUnclampedZAngleFromVector(result);
     float v5 = 0.0;
-    v5 = UnclampedZAngleFromVector - pPlayer->GetHeading(0);
+    v5 = UnclampedZAngleFromVector - pPlayer->GetHeading(false);
     if (!(v5 <= -3.1415927410125732)) {
         if (v5 > 3.1415927410125732) {
             v5 = 6.2831854820251465 - v5;

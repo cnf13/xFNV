@@ -11,7 +11,7 @@ class NiRenderer;
 class NiShader;
 
 // The position of a list walk (Gamebryo's NiTListIterator, a void*); the program directories are a list of strings.
-typedef void* NiTListIterator;
+using NiTListIterator = void*;
 
 // The registry of shader libraries, shaders and global shader constants. Only some of its members are declared.
 class NiShaderFactory : public NiRefObject {
@@ -24,18 +24,12 @@ public:
     };
 
     // Gamebryo's callback types (NiShaderFactory.h).
-    typedef bool (*NISHADERFACTORY_CLASSCREATIONCALLBACK)(
-        const char*,
-        NiRenderer*,
-        int32_t,
-        char*[],
-        bool,
-        NiShaderLibrary**
-    );
-    typedef uint32_t (*NISHADERFACTORY_RUNPARSERCALLBACK)(const char*, NiRenderer*, const char*, bool);
+    using NISHADERFACTORY_CLASSCREATIONCALLBACK =
+        bool (*)(const char*, NiRenderer*, int32_t, char*[], bool, NiShaderLibrary**);
+    using NISHADERFACTORY_RUNPARSERCALLBACK = uint32_t (*)(const char*, NiRenderer*, const char*, bool);
     // The int32_t parameter is the recoverable flag. It is an int32_t rather than a bool so the caller's whole value is
     // passed on; a bool would be zero-extended.
-    typedef uint32_t (*NISHADERFACTORY_ERRORCALLBACK)(const char*, NiShaderError, int32_t);
+    using NISHADERFACTORY_ERRORCALLBACK = uint32_t (*)(const char*, NiShaderError, int32_t);
 
     NiShaderFactory();
 

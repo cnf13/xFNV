@@ -72,7 +72,7 @@ int32_t QuantityMenu::GetClass() {
 }
 
 bool QuantityMenu::DoGamepad(int32_t a1, float a2) {
-    bool bhandled = 0;
+    bool bhandled = false;
     switch (a1) {
         case 13:
         case 14: {
@@ -89,9 +89,9 @@ bool QuantityMenu::DoGamepad(int32_t a1, float a2) {
             float v10 = fquantity + fjumpSize_2;
             float a22 = BSMAX(v10, 0.0f);
             float afB = BSMIN(a22, fmaxAmount);
-            pTiles[0]->Set(Tile::kTileValue_User2, afB, static_cast<bool>(1));
-            pTiles[0]->Set(4080, 0.0f, static_cast<bool>(1));
-            bhandled = 1;
+            pTiles[0]->Set(Tile::kTileValue_User2, afB, true);
+            pTiles[0]->Set(4080, 0.0f, true);
+            bhandled = true;
             break;
         }
         case 15:
@@ -109,9 +109,9 @@ bool QuantityMenu::DoGamepad(int32_t a1, float a2) {
             float v8 = fquantity_2 + fstepSize_2;
             float a2a = BSMAX(v8, 0.0f);
             float afBa = BSMIN(a2a, fmaxAmount_2);
-            pTiles[0]->Set(Tile::kTileValue_User2, afBa, static_cast<bool>(1));
-            pTiles[0]->Set(4080, 0.0f, static_cast<bool>(1));
-            bhandled = 1;
+            pTiles[0]->Set(Tile::kTileValue_User2, afBa, true);
+            pTiles[0]->Set(4080, 0.0f, true);
+            bhandled = true;
             break;
         }
         default: {
@@ -125,7 +125,7 @@ bool QuantityMenu::DoGamepadUpEvent(int32_t a2, float a3) {
     int8_t v4 = 0;
     if (a2 == 10) {
         DoClick(5, nullptr);
-        return (bool)1;
+        return true;
     }
     return (bool)v4;
 }
@@ -133,10 +133,10 @@ bool QuantityMenu::DoGamepadUpEvent(int32_t a2, float a3) {
 bool QuantityMenu::IsWellFormedMenu() {
     for (int32_t i = 0; i < 6; ++i) {
         if (!pTiles[i]) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 void QuantityMenu::Close() {
@@ -154,26 +154,26 @@ void QuantityMenu::Close() {
 TileMenu* QuantityMenu::Create(int32_t aiMaxAmount, QuantityMenu::ResultCallback afpCallback, int32_t aiStartAmount) {
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     InterfaceManager* pin = InterfaceManager::Instance();
-    bool boverMenu = 0;
+    bool boverMenu = false;
     int32_t iClass = GetClass_007ABDA0();
     Tile* pold_menu_tile = Menu::GetMenuByClass(iClass);
     if (pold_menu_tile) {
         delete pold_menu_tile;
     }
     if (Interface::GetTopMenuID()) {
-        boverMenu = 1;
+        boverMenu = true;
     }
     Tile* ptile = pin->GetMenusRoot()->ReadFile("Data\\Menus\\quantity_menu.xml");
     QuantityMenu::pMe = static_cast<QuantityMenu*>(ptile->GetMenu());
     if (QuantityMenu::pMe && QuantityMenu::pMe->GetClass() == GetClass_007ABDA0()) {
-        QuantityMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), 0);
+        QuantityMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
         if (QuantityMenu::pMe->IsWellFormedMenu()) {
             BSAudio* v8 = &BSAudio::QInstance();
             BSSoundHandle* SoundHandleByName = v8->GetSoundHandleByName(&a1, "UIPopUpMessageWindow", 289u);
-            SoundHandleByName->Play(0);
+            SoundHandleByName->Play(false);
             if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
                 float afValue = Tile::GetMaximumDepth();
-                ptile->Set(4013, afValue, 1);
+                ptile->Set(4013, afValue, true);
             }
             int32_t istartQuantity = BSMIN(aiStartAmount, aiMaxAmount);
             int32_t istepSize = BSMAX(aiMaxAmount / 20, 1);
@@ -185,26 +185,26 @@ TileMenu* QuantityMenu::Create(int32_t aiMaxAmount, QuantityMenu::ResultCallback
             QuantityMenu::pMe->pTiles[0]->Set(Tile::kTileValue_User2, istartQuantity);
             QuantityMenu::pMe->pTiles[0]->Set(Tile::kTileValue_User3, istepSize);
             QuantityMenu::pMe->pTiles[0]->Set(Tile::kTileValue_User4, ijumpSize);
-            QuantityMenu::pMe->pTiles[0]->Set(4080, 0.0f, 1);
+            QuantityMenu::pMe->pTiles[0]->Set(4080, 0.0f, true);
             QuantityMenu::fpResultCallback = afpCallback;
             const char* afValuea = sHowMany.String();
             Tile* ChildByName = ptile->GetChildByName("QM_HowManyText");
-            ChildByName->Set(4036, afValuea, 1);
+            ChildByName->Set(4036, afValuea, true);
             const char* v10 = sOk.String();
-            QuantityMenu::pMe->pTiles[4]->Set(4036, v10, 1);
+            QuantityMenu::pMe->pTiles[4]->Set(4036, v10, true);
             const char* v11 = sCancel.String();
-            QuantityMenu::pMe->pTiles[5]->Set(4036, v11, 1);
+            QuantityMenu::pMe->pTiles[5]->Set(4036, v11, true);
             if (boverMenu) {
                 float v15 = fPopUpBackgroundOpacity.Float() * 255.0;
                 Tile* v12 = QuantityMenu::pMe->pMenu->GetChildByName("QM_Background");
-                v12->Set(4009, v15, 1);
+                v12->Set(4009, v15, true);
             }
-            QuantityMenu::pMe->PrepForVisibility(0);
+            QuantityMenu::pMe->PrepForVisibility(false);
             return static_cast<TileMenu*>(ptile);
         }
         else {
             Warning("MENUS: Quantity Menu Creation Failed... Are your menu and art resources up to date?");
-            return 0;
+            return nullptr;
         }
     }
     else {
@@ -215,6 +215,6 @@ TileMenu* QuantityMenu::Create(int32_t aiMaxAmount, QuantityMenu::ResultCallback
                 }
             }
         }
-        return 0;
+        return nullptr;
     }
 }

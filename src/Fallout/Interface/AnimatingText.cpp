@@ -6,7 +6,7 @@
 #include "Fallout/Interface/Menus/ComputersMenu.h"
 #include "Fallout/Interface/Menus/HackingText.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 HackingText::HackingText() {
     init();
@@ -42,23 +42,23 @@ void HackingText::ResetBuffer() {
         v2 = static_cast<char*>(ourCalloc(Length + 1, 1u));
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     pCurrentlyDisplayedText = v2;
-    bIsTextRemaining = 0;
+    bIsTextRemaining = false;
     uiNextDisplayTime = 0;
 }
 
 HackingText* HackingText::init() {
-    SetTraits(0, 0);
+    SetTraits(nullptr, nullptr);
     uiDisplayRate = g_iComputersDisplayRateForCurrentMenu;
     uiFlashOnDuration = g_iHackingFlashOnDuration;
     uiFlashOffDuration = g_iHackingFlashOffDuration;
     uiNextBlinkTime = 0;
     uiNextDisplayTime = 0;
-    pCurrentlyDisplayedText = 0;
+    pCurrentlyDisplayedText = nullptr;
     ucFlags = 1;
-    bIsTextRemaining = 0;
+    bIsTextRemaining = false;
     return this;
 }
 
@@ -67,13 +67,13 @@ char HackingText::Update() {
     if (GetDisplayMode() && BSGetTickCount() >= uiNextDisplayTime && !bIsTextRemaining) {
         if (pTileValueVisibility) {
             if (!GetFlashMode()) {
-                pTileValueVisibility->SetFloat(1.0f, 1);
+                pTileValueVisibility->SetFloat(1.0f, true);
             }
         }
         if (pTileValueVisibility) {
             if (pTileText) {
                 if (!strText.pString) {
-                    pTileValueVisibility->SetFloat(0.0f, 1);
+                    pTileValueVisibility->SetFloat(0.0f, true);
                 }
             }
         }
@@ -90,28 +90,26 @@ char HackingText::Update() {
             size_t aCount = v3;
             if (v3 > strText.GetLength() - v6) {
                 aCount = strText.GetLength() - v6;
-                bIsTextRemaining = 1;
+                bIsTextRemaining = true;
             }
             ourMemcpy(&pCurrentlyDisplayedText[v6], &strText.pString[v6], aCount);
-            pTileText->SetString(pCurrentlyDisplayedText, 1);
+            pTileText->SetString(pCurrentlyDisplayedText, true);
         }
         else {
-            bIsTextRemaining = 1;
+            bIsTextRemaining = true;
         }
         uiNextDisplayTime = uiDisplayRate + BSGetTickCount();
     }
-    v1 = static_cast<uint32_t>(
-        (static_cast<uint32_t>(v1) & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(GetFlashMode())))
-    );
+    v1 = static_cast<uint32_t>((v1 & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(GetFlashMode()))));
     if (static_cast<uint8_t>(v1)) {
         v1 = BSGetTickCount();
         if (v1 >= uiNextBlinkTime) {
             if (pTileValueVisibility->fValue == 1.0) {
-                pTileValueVisibility->SetFloat(0.0f, 1);
+                pTileValueVisibility->SetFloat(0.0f, true);
                 v1 = uiFlashOffDuration + BSGetTickCount();
             }
             else {
-                pTileValueVisibility->SetFloat(1.0f, 1);
+                pTileValueVisibility->SetFloat(1.0f, true);
                 v1 = uiFlashOnDuration + BSGetTickCount();
             }
             uiNextBlinkTime = v1;
@@ -124,13 +122,13 @@ void HackingText::ForceFinish() {
     if (GetDisplayMode() && !bIsTextRemaining) {
         if (pTileValueVisibility) {
             if (!GetFlashMode()) {
-                pTileValueVisibility->SetFloat(1.0f, 1);
+                pTileValueVisibility->SetFloat(1.0f, true);
             }
         }
         if (pTileValueVisibility) {
             if (pTileText) {
                 if (!strText.pString) {
-                    pTileValueVisibility->SetFloat(0.0f, 1);
+                    pTileValueVisibility->SetFloat(0.0f, true);
                 }
             }
         }
@@ -138,8 +136,8 @@ void HackingText::ForceFinish() {
             if (pCurrentlyDisplayedText) {
                 uint32_t v1 = BSstrlen(strText.pString);
                 ourMemcpy(pCurrentlyDisplayedText, strText.pString, v1);
-                pTileText->SetString(pCurrentlyDisplayedText, 1);
-                bIsTextRemaining = 1;
+                pTileText->SetString(pCurrentlyDisplayedText, true);
+                bIsTextRemaining = true;
             }
         }
     }
@@ -187,6 +185,6 @@ void HackingText::SetVisibility(bool abOn) {
         else {
             afValue = 0.0;
         }
-        pTileValueVisibility->SetFloat(afValue, 1);
+        pTileValueVisibility->SetFloat(afValue, true);
     }
 }

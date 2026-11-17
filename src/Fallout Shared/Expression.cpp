@@ -8,7 +8,7 @@
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESFile.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 class ScriptLocals;
 
@@ -189,7 +189,7 @@ double CExpression::Eval(
     char* token = v22;
     uint32_t uiSize = GetNextToken(&tokenInPostfix, v22, eOperator, abEndian, &pscriptData);
     if (!uiSize) {
-        token = 0;
+        token = nullptr;
     }
     while (uiSize) {
         ExpressionOperand reo;
@@ -215,7 +215,8 @@ double CExpression::Eval(
                     }
                     else {
                         if (!Script::GetValue(
-                                eo.eoDouble, token, uiTokenOffset, apFunctionOwner, apContainer, script, scriptLocals, 0
+                                eo.eoDouble, token, uiTokenOffset, apFunctionOwner, apContainer, script, scriptLocals,
+                                false
                             )) {
                             goto LABEL_182;
                         }
@@ -570,7 +571,7 @@ double CExpression::Eval(
             pscriptData += uiSize;
             uiSize = GetNextToken(&tokenInPostfix, token, eOperator, abEndian, &pscriptData);
             if (!uiSize) {
-                token = 0;
+                token = nullptr;
             }
         }
     }
@@ -640,7 +641,7 @@ char* CExpression::InfixToPostfix(char* apInfix, uint32_t& auiSize) {
                     SetError(ERROR_EXPRESSION_SYNTAX);
                     return nullptr;
                 }
-                while (1) {
+                while (true) {
                     EXPRESSION_OPERATORS eOperator = m_charStack.pop();
                     if (eOperator == EXP_LEFTPAREN) {
                         break;

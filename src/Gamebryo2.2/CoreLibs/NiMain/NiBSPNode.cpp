@@ -125,7 +125,7 @@ void NiBSPNode::ApplyTransform(const NiMatrix3& mat, const NiPoint3& trn, bool b
         for (m_kModelPlane.m_fConstant = abOnLeftb + m_kModelPlane.m_fConstant; v7 < m_kChildren.m_usSize; ++v7) {
             NiAVObject* m_pObject = m_kChildren.m_pBase[v7].m_pObject;
             if (m_pObject) {
-                m_pObject->ApplyTransform(a1, v17, 1);
+                m_pObject->ApplyTransform(a1, v17, true);
             }
         }
     }
@@ -147,7 +147,7 @@ void NiBSPNode::ApplyTransform(const NiMatrix3& mat, const NiPoint3& trn, bool b
         for (m_kModelPlane.m_fConstant = abOnLeftc + m_kModelPlane.m_fConstant; v12 < m_kChildren.m_usSize; ++v12) {
             NiAVObject* v16 = m_kChildren.m_pBase[v12].m_pObject;
             if (v16) {
-                v16->ApplyTransform(mat, trn, 1);
+                v16->ApplyTransform(mat, trn, true);
             }
         }
     }
@@ -213,7 +213,7 @@ void NiBSPNode::UpdateWorldPlane() {
 NiObject* NiBSPNode::CreateObject() {
     NiBSPNode* pkObject = static_cast<NiBSPNode*>(NiMemObject::operator new(sizeof(NiBSPNode)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiBSPNode;
 }

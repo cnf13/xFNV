@@ -96,12 +96,12 @@ void BSAnimGroupSequence::LoadGame(float afTime) {
     if (((uint32_t)((int32_t)pSaveLoadGameOLD->GetCurrentVersion())) < 0x71u) {
         pSaveLoadGameOLD->LoadGameDataOLD(&apData, 4u);
     }
-    m_fOffset = (float)(apData - afTime);
+    m_fOffset = (apData - afTime);
     pSaveLoadGameOLD->LoadGameDataOLD(&m_fLastTime, 4u);
     pSaveLoadGameOLD->LoadGameDataOLD(&m_fWeightedLastTime, 4u);
     pSaveLoadGameOLD->LoadGameDataOLD(&m_fDestFrame, 4u);
-    m_fStartTime = (float)(-0x1.fffffe0000000p+127f);
-    m_fEndTime = (float)(-0x1.fffffe0000000p+127f);
+    m_fStartTime = (-0x1.fffffe0000000p+127f);
+    m_fEndTime = (-0x1.fffffe0000000p+127f);
     GetScaledTime(afTime);
 }
 
@@ -142,7 +142,7 @@ bool BSAnimGroupSequence::ResolveTransformInterpolators(NiAVObject* apNode, uint
 }
 
 double BSAnimGroupSequence::GetKeyLengthOverFrequency() {
-    return (float)((m_fEndKeyTime - m_fBeginKeyTime) / m_fFrequency);
+    return ((m_fEndKeyTime - m_fBeginKeyTime) / m_fFrequency);
 }
 
 uint8_t BSAnimGroupSequence::GetPriority(const char* apBoneName, uint32_t* apReturnIndex) {
@@ -175,7 +175,7 @@ void BSAnimGroupSequence::SetInterpolatorPriority(uint32_t a2, uint8_t a3) {
 
 uint8_t BSAnimGroupSequence::GetInterpolatorPriority(uint32_t a2) {
     if (a2 >= m_uiArraySize) {
-        return (uint8_t)((-1));
+        return (uint8_t)(-1);
     }
     else {
         return m_pkInterpArray[a2].m_ucPriority;
@@ -189,7 +189,7 @@ void BSAnimGroupSequence::SetAnimGroup(TESAnimGroup* apAnimGroup) {
 void BSAnimGroupSequence::ClearBlendInterp() {
     uint32_t v3 = 0;
     for (uint32_t i = m_uiArraySize; v3 < i; i = m_uiArraySize) {
-        m_pkInterpArray[v3++].m_pkBlendInterp = 0;
+        m_pkInterpArray[v3++].m_pkBlendInterp = nullptr;
     }
 }
 
@@ -199,7 +199,7 @@ float BSAnimGroupSequence::GetScaledTime(float afTime) {
         return 0.0;
     }
     float fTime = afTime + m_fOffset;
-    return NiControllerSequence::ComputeScaledTime(fTime, 1);
+    return NiControllerSequence::ComputeScaledTime(fTime, true);
 }
 
 void BSAnimGroupSequence::ValidateTargets() {
@@ -213,9 +213,9 @@ void BSAnimGroupSequence::ValidateTargets() {
             NiControllerSequence::IDTag* kIDTag = &m_pkIDTagArray[ui];
             NiAVObject* v1 = pdefaultObjectPalette->GetScene();
             if (!v1->GetObjectByName(kIDTag->m_kAVObjectName)) {
-                pdefaultObjectPalette->SetAVObject(kIDTag->m_kAVObjectName, 0);
-                m_pkInterpArray[ui].m_spInterpCtlr.operator=(static_cast<NiInterpController*>(0));
-                m_pkInterpArray[ui].m_pkBlendInterp = 0;
+                pdefaultObjectPalette->SetAVObject(kIDTag->m_kAVObjectName, nullptr);
+                m_pkInterpArray[ui].m_spInterpCtlr.operator=(static_cast<NiInterpController*>(nullptr));
+                m_pkInterpArray[ui].m_pkBlendInterp = nullptr;
                 m_pkInterpArray[ui].m_ucBlendIdx = -1;
             }
         }
@@ -232,8 +232,8 @@ void BSAnimGroupSequence::ValidateTargetsFromPalette() {
         const NiControllerSequence::IDTag* kIDTag = &m_pkIDTagArray[ui];
         if (!kIDTag->m_kAVObjectName.GetHandleString() ||
             !pdefaultObjectPalette->GetAVObject(kIDTag->m_kAVObjectName)) {
-            m_pkInterpArray[ui].m_spInterpCtlr.operator=(static_cast<NiInterpController*>(0));
-            m_pkInterpArray[ui].m_pkBlendInterp = 0;
+            m_pkInterpArray[ui].m_spInterpCtlr.operator=(static_cast<NiInterpController*>(nullptr));
+            m_pkInterpArray[ui].m_pkBlendInterp = nullptr;
             m_pkInterpArray[ui].m_ucBlendIdx = -1;
         }
     }
@@ -296,7 +296,7 @@ bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR*
     FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     uint32_t inumKeys;
-    bool bdone = 0;
+    bool bdone = false;
     if (apSeq) {
         if (apSeq->GetState() == NiControllerSequence::kAnimating) {
             float fstartTime = apSeq->m_fStartTime;
@@ -304,7 +304,7 @@ bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR*
             if (fstartTime != -3.4028235e+38f && fstopTime != -3.4028235e+38f && fstopTime != fstartTime) {
                 bool blooped = fstartTime > static_cast<double>(fstopTime);
                 inumKeys = 0;
-                NiTextKey* ptextKeys = 0;
+                NiTextKey* ptextKeys = nullptr;
                 if (apSeq->GetTextKeys()) {
                     NiTextKeyExtraData* TextKeys = apSeq->GetTextKeys();
                     ptextKeys = TextKeys->GetKeys(inumKeys);
@@ -316,25 +316,25 @@ bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR*
                     if (pnote) {
                         char soundAttachNode_2[32];
                         float ftestTime = ptextKeys[n].m_fTime;
-                        bool bplay = 0;
-                        NiAVObject* pmovingSound = 0;
+                        bool bplay = false;
+                        NiAVObject* pmovingSound = nullptr;
                         if (blooped &&
                             (fstartTime < static_cast<double>(ftestTime) ||
                              fstopTime >= static_cast<double>(ftestTime))) {
-                            bplay = 1;
+                            bplay = true;
                         }
                         else {
                             if (fstartTime <= static_cast<double>(ftestTime) &&
                                 fstopTime > static_cast<double>(ftestTime)) {
-                                bplay = 1;
+                                bplay = true;
                             }
                         }
                         if (bplay) {
                             if (_strnicmp("Sound: ", pnote, 7u)) {
-                                bplay = 0;
+                                bplay = false;
                                 if (!_strnicmp("Enum: StopSounds ", pnote, 17u)) {
                                     char soundAttachNode[32];
-                                    const char* psp = 0;
+                                    const char* psp = nullptr;
                                     soundAttachNode[0] = 0;
                                     char* pcr = std::strchr(pnote, 13);
                                     if (pcr) {
@@ -379,8 +379,8 @@ bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR*
                                 }
                             }
                         }
-                        TESSound* psound = 0;
-                        char* psp_2 = 0;
+                        TESSound* psound = nullptr;
+                        char* psp_2 = nullptr;
                         soundAttachNode_2[0] = 0;
                         if (bplay) {
                             char* pcr_2 = std::strchr(pnote, 13);
@@ -423,10 +423,10 @@ bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR*
                                         pmovingSound = (NiAVObject*)apRef->Get3D();
                                     }
                                     if (pmovingSound) {
-                                        pmovingSound->SetHasMovingSound(1);
+                                        pmovingSound->SetHasMovingSound(true);
                                     }
                                     NiAVObject* pmovingSound_2 = (NiAVObject*)apRef->Get3D();
-                                    pmovingSound_2->SetHasMovingSound(1);
+                                    pmovingSound_2->SetHasMovingSound(true);
                                     if (pmovingSound) {
                                         WorldTranslate = &pmovingSound->GetWorldTranslate();
                                     }
@@ -522,14 +522,14 @@ bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR*
                 }
             }
             if (apSeq->m_eCycleType) {
-                bdone = 1;
+                bdone = true;
                 if (-3.4028235e+38f == apSeq->GetOffset()) {
-                    return 0;
+                    return false;
                 }
                 else {
                     double DataFogPower = apSeq->m_fLastScaledTime;
                     if (apSeq->m_fEndKeyTime > DataFogPower) {
-                        return 0;
+                        return false;
                     }
                 }
             }
@@ -547,15 +547,15 @@ void* BSAnimGroupSequence::InitAnimGroup(BSAnimGroupSequence* apSequence, const 
     int32_t uiIndex;
     char apDest[68];
     char v79 = 0;
-    TESAnimGroup* result = 0;
+    TESAnimGroup* result = nullptr;
     ANIM_GROUP_ENUM v70 = ANIM_GROUP_NONE;
     int32_t v68 = 0;
-    a4 = 0;
+    a4 = false;
     emove = AGM_NONE;
     aeWeapon = AGW_NONE;
     // The result of strrchr is kept in plastSlash, which is never read, as the game does.
-    plastSlash = std::strrchr(static_cast<const char*>(a2), 92);
-    MessageHandler::IncDisableWarningCount(1);
+    plastSlash = std::strrchr(a2, 92);
+    MessageHandler::IncDisableWarningCount(true);
     NiFixedString* RootNodeNamePtr = apSequence->GetRootNodeNamePtr();
     const char* apString1 = RootNodeNamePtr->GetHandleString();
     uint32_t v77 = -1;
@@ -687,8 +687,8 @@ void* BSAnimGroupSequence::InitAnimGroup(BSAnimGroupSequence* apSequence, const 
                                                         pKeyValue = &pTextKey[BSstrlen("Sound: ")];
                                                     }
                                                     BSstrcpy(cKeyValue, 260, pKeyValue);
-                                                    char* String = 0;
-                                                    char* v54 = 0;
+                                                    char* String = nullptr;
+                                                    char* v54 = nullptr;
                                                     char* v56 = std::strchr(cKeyValue, 44);
                                                     if (v56) {
                                                         String = v56 + 1;
@@ -845,7 +845,7 @@ void* BSAnimGroupSequence::InitAnimGroup(BSAnimGroupSequence* apSequence, const 
                                                                             v38 = ::new (apMemory) TESAnimGroup(aeType);
                                                                         }
                                                                         else {
-                                                                            v38 = 0;
+                                                                            v38 = nullptr;
                                                                         }
                                                                         result = v38;
                                                                     }
@@ -863,7 +863,7 @@ void* BSAnimGroupSequence::InitAnimGroup(BSAnimGroupSequence* apSequence, const 
                                                                             v37 = ::new (v42) TESAnimGroup(v23);
                                                                         }
                                                                         else {
-                                                                            v37 = 0;
+                                                                            v37 = nullptr;
                                                                         }
                                                                         result = v37;
                                                                     }
@@ -930,7 +930,7 @@ void* BSAnimGroupSequence::InitAnimGroup(BSAnimGroupSequence* apSequence, const 
                                                         (&apSequence->m_kName)->GetHandleString(), a2
                                                     );
                                                     v79 = 1;
-                                                    pTextKey = 0;
+                                                    pTextKey = nullptr;
                                                     uiIndex = uiNumKeys;
                                                 }
                                             }
@@ -1026,7 +1026,7 @@ void* BSAnimGroupSequence::InitAnimGroup(BSAnimGroupSequence* apSequence, const 
             }
         }
     }
-    MessageHandler::IncDisableWarningCount(0);
+    MessageHandler::IncDisableWarningCount(false);
     if (v79) {
         Warning("ANIMATION: Animation group note problem. See %s file.", MessageHandler::GetWarningFileName());
     }
@@ -1040,7 +1040,7 @@ void BSAnimGroupSequence::CreateSequenceFromFile(
 ) {
     BSAnimGroupSequence* v3;
     FNVD_INLINED_LOCAL(NiPointer<NiControllerSequence>, spSequence, std::nullopt, std::nullopt);
-    ::new (&spSequence) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(0));
+    ::new (&spSequence) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
     NiControllerSequence::CreateSequenceFromFile(kStream, uiIndex, spSequence);
     BSAnimGroupSequence* apMemory =
         static_cast<BSAnimGroupSequence*>(NiMemObject::operator new(sizeof(BSAnimGroupSequence)));
@@ -1048,7 +1048,7 @@ void BSAnimGroupSequence::CreateSequenceFromFile(
         v3 = ::new (apMemory) BSAnimGroupSequence(nullptr, spSequence.m_pObject);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     aspControllerSequence.operator=(static_cast<NiControllerSequence*>(v3));
     spSequence.~NiPointer<NiControllerSequence>();

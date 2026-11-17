@@ -307,8 +307,8 @@ void hkpRagdollLimitsData::setInBodySpace(
     __m128 v10 = _mm_setzero_ps();
     v10[0] = 0.5f;
     __m128 v11 = _mm_cmpeq_ss(v7, v9);
-    float v12 = 3.0f - static_cast<float>(static_cast<float>(v7[0] * v8) * v8);
-    v10[0] = static_cast<float>(0.5f * v8) * v12;
+    float v12 = 3.0f - ((v7[0] * v8) * v8);
+    v10[0] = (0.5f * v8) * v12;
     __m128 v14 = _mm_andnot_ps(v11, v10);
     m_atoms.m_rotations.m_rotationA.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(v14, v14, 0), twistAxisA.m_quad);
     m_atoms.m_rotations.m_rotationA.m_col1.m_quad = planeAxisA.m_quad;
@@ -318,8 +318,8 @@ void hkpRagdollLimitsData::setInBodySpace(
     __m128 v17 = _mm_shuffle_ps(v16, v16, 170);
     v17[0] = v17[0] + v14[0];
     float v18 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v17[0])));
-    float v20 = 3.0f - static_cast<float>(static_cast<float>(v17[0] * v18) * v18);
-    v10[0] = static_cast<float>(0.5f * v18) * v20;
+    float v20 = 3.0f - ((v17[0] * v18) * v18);
+    v10[0] = (0.5f * v18) * v20;
     __m128 v22 = _mm_andnot_ps(_mm_cmpeq_ss(v17, v9), v10);
     m_atoms.m_rotations.m_rotationA.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v22, v22, 0), v15.m_quad);
     m_atoms.m_rotations.m_rotationA.m_col2.m_quad = _mm_sub_ps(
@@ -346,8 +346,8 @@ void hkpRagdollLimitsData::setInBodySpace(
     v24[0] = v24[0] + v22[0];
     float v25 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v24[0])));
     __m128 v26 = _mm_cmpeq_ss(v24, v9);
-    float v27 = 3.0f - static_cast<float>(static_cast<float>(v24[0] * v25) * v25);
-    v10[0] = static_cast<float>(0.5f * v25) * v27;
+    float v27 = 3.0f - ((v24[0] * v25) * v25);
+    v10[0] = (0.5f * v25) * v27;
     __m128 v29 = _mm_andnot_ps(v26, v10);
     m_atoms.m_rotations.m_rotationB.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(v29, v29, 0), twistAxisB.m_quad);
     m_atoms.m_rotations.m_rotationB.m_col1.m_quad = planeAxisB.m_quad;
@@ -357,8 +357,7 @@ void hkpRagdollLimitsData::setInBodySpace(
     __m128 v32 = _mm_shuffle_ps(v31, v31, 170);
     v32[0] = v32[0] + v29[0];
     v29[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v32[0])));
-    v10[0] = static_cast<float>(0.5f * v29[0]) *
-        static_cast<float>(3.0f - static_cast<float>(static_cast<float>(v32[0] * v29[0]) * v29[0]));
+    v10[0] = (0.5f * v29[0]) * (3.0f - ((v32[0] * v29[0]) * v29[0]));
     __m128 v33 = _mm_andnot_ps(_mm_cmpeq_ss(v32, v9), v10);
     m_atoms.m_rotations.m_rotationB.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v33, v33, 0), v30.m_quad);
     m_atoms.m_rotations.m_rotationB.m_col2.m_quad = _mm_sub_ps(

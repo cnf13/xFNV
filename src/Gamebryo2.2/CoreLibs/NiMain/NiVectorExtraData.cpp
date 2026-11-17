@@ -25,7 +25,7 @@ NiObject* NiVectorExtraData::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject) NiVectorExtraData;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_afVector[0] = m_afVector[0];

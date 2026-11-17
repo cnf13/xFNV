@@ -53,7 +53,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderer.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 TESObjectREFR* GetDialogMenuParterRef() {
     InterfaceManager* v0;
@@ -62,14 +62,14 @@ TESObjectREFR* GetDialogMenuParterRef() {
     Tile* MenuByClass;
     if (InterfaceManager::Instance() &&
         ((v0 = InterfaceManager::Instance(), v0->bFirstInit) &&
-         ((MenuByClass = Menu::GetMenuByClass(1009)) == 0
-              ? v3 = 0
+         ((MenuByClass = Menu::GetMenuByClass(1009)) == nullptr
+              ? v3 = nullptr
               : (Menu_ = MenuByClass->GetMenu(), v3 = dynamic_cast<DialogMenu*>(Menu_)),
           v3))) {
         return v3->pSpeaker;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -100,7 +100,7 @@ void DialogMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void DialogMenu::DoClick(int32_t aiID, Tile* apTarget) {
-    bool bspeechChallenge = 0;
+    bool bspeechChallenge = false;
     if (eDialogState && eDialogState != DialogMenu::eCameraZoomOut) {
         double Float;
         if (uiIgnoreInputStartTime) {
@@ -119,15 +119,15 @@ void DialogMenu::DoClick(int32_t aiID, Tile* apTarget) {
         }
         MenuTopic* ptopic = pTopicManager->GetCurrentTopic();
         bool bNewTopic = ptopic->bTopicIsNew;
-        ptopic->bTopicIsNew = 0;
+        ptopic->bTopicIsNew = false;
         if (ptopic->pInfo->IsSpeechChallenge()) {
-            bspeechChallenge = 1;
+            bspeechChallenge = true;
             if (pTopicManager->DoSpeechChallengeCheck(ptopic)) {
                 ptopic = pTopicManager->GetCurrentTopic();
                 SetGoodbyeState(ptopic);
             LABEL_32:;
                 pTopicManager->RunBeginScript();
-                bResponseShown = 0;
+                bResponseShown = false;
                 DialogMenu::pLastClickedInfo = ptopic->pInfo;
                 eDialogState = LoadNextScreen(bspeechChallenge);
                 return;
@@ -166,16 +166,16 @@ void DialogMenu::DoClick(int32_t aiID, Tile* apTarget) {
 
 bool DialogMenu::DoGamepad(int32_t aiButton, float afValue) {
     if (!Interface::IsTopMenuID(Interface::eDialogMenu) || aiButton != 9) {
-        return 0;
+        return false;
     }
     if (pMenu->IsTrue(DialogMenu::iUT_ShowingText)) {
-        DoClick(0, 0);
+        DoClick(0, nullptr);
     }
     else {
         Tile* v3 = static_cast<Tile*>(lbResponseList.GetHighlightedItem());
         DoClick(-1, v3);
     }
-    return 1;
+    return true;
 }
 
 void DialogMenu::DoIdle() {
@@ -210,9 +210,9 @@ void DialogMenu::DoIdle() {
                     bShowingTutorial = v1->xTutorialManager.ShowMessage(Interface::TUT_DIALOGUE, a3, a2);
                     if (!bShowingTutorial) {
                         if (pSpeaker) {
-                            pSpeaker->bSpeakingDone = 1;
+                            pSpeaker->bSpeakingDone = true;
                         }
-                        LoadNextScreen(0);
+                        LoadNextScreen(false);
                     }
                 }
                 else {
@@ -231,9 +231,9 @@ void DialogMenu::DoIdle() {
                             fElapsedSecs = 0.0f;
                             pMenu->Set(DialogMenu::iUT_DialogVisible, 1);
                             if (pSpeaker) {
-                                pSpeaker->bSpeakingDone = 1;
+                                pSpeaker->bSpeakingDone = true;
                             }
-                            LoadNextScreen(0);
+                            LoadNextScreen(false);
                             eDialogState = DialogMenu::ePlaySpeech;
                         }
                     }
@@ -247,7 +247,7 @@ void DialogMenu::DoIdle() {
             case DialogMenu::eLoadSpeech: {
                 if (pSpeaker->bSpeakingDone) {
                     fElapsedSecs = 0.0f;
-                    eDialogState = LoadNextScreen(0);
+                    eDialogState = LoadNextScreen(false);
                     iStopSpeechStartTime = 0;
                 }
                 else {
@@ -258,7 +258,7 @@ void DialogMenu::DoIdle() {
                     if (static_cast<double>(appTimer.iLastTime - iStopSpeechStartTime) >= 500.0) {
                         // The callback's context is the speaker's form ID, as Actor's speech callbacks pass it.
                         void* pContext = reinterpret_cast<void*>(static_cast<uintptr_t>(pSpeaker->GetFormID()));
-                        Actor::ChangeDialogueAnimation(pContext, 1);
+                        Actor::ChangeDialogueAnimation(pContext, true);
                     }
                 }
                 goto LABEL_58;
@@ -291,10 +291,10 @@ void DialogMenu::DoIdle() {
                 if (fPercentZoomed != 0.0) {
                     goto LABEL_58;
                 }
-                bVATSForce1stPerson = 1;
+                bVATSForce1stPerson = true;
                 bVATSReturnPlayerTo1stPerson = !bIsIn3rdPerson;
-                pPlayer->FocusOnActor(pSpeaker, 0.0f, 1);
-                pPlayer->UpdateCamera(0, 0);
+                pPlayer->FocusOnActor(pSpeaker, 0.0f, true);
+                pPlayer->UpdateCamera(false, false);
                 pDepthOfFieldInstance->SetStrength(0.0f);
                 TileMenu* MenuTile = pMenu;
                 if (MenuTile) {
@@ -304,8 +304,8 @@ void DialogMenu::DoIdle() {
             }
             case DialogMenu::eServiceFadeOut: {
                 if (bDoServiceLoad && xFadeState == Interface::FADE_HIDDEN) {
-                    LoadNextScreen(0);
-                    bDoServiceLoad = 0;
+                    LoadNextScreen(false);
+                    bDoServiceLoad = false;
                     eDialogState = DialogMenu::eSpeechIdle;
                 }
                 goto LABEL_58;
@@ -315,7 +315,7 @@ void DialogMenu::DoIdle() {
             LABEL_58:;
                 if (pPlayer->IsInDialoguewithPlayer()) {
                     float Seconds = appTimer.fDelta;
-                    pSpeaker->UpdateInDialogue(Seconds, 0, 0);
+                    pSpeaker->UpdateInDialogue(Seconds, nullptr, false);
                 }
                 if (DialogMenu::fPackagePercentZoom == 0.0) {
                     v9 = 1.0;
@@ -325,7 +325,7 @@ void DialogMenu::DoIdle() {
                 }
                 float v8 = fPercentZoomed * v9;
                 pPlayer->FocusOnActor(pSpeaker, v8, eDialogState == DialogMenu::eCameraZoomOut);
-                pPlayer->UpdateCamera(0, 0);
+                pPlayer->UpdateCamera(false, false);
                 float v7 = fDialogFocalDepthStrength.Float() * fPercentZoomed;
                 pDepthOfFieldInstance->SetStrength(v7);
                 break;
@@ -338,24 +338,24 @@ bool DialogMenu::IsWellFormedMenu() {
     int32_t i;
     for (i = 0; i < 4; ++i) {
         if (!pTiles[i]) {
-            return (bool)0;
+            return false;
         }
     }
-    return (bool)1;
+    return true;
 }
 
 void DialogMenu::SetPause(bool abPause) {
     if (!bPaused || abPause) {
         if (!bPaused && abPause) {
             hSpeechFile.Pause();
-            bPaused = 1;
+            bPaused = true;
             ePausedState = eDialogState;
             eDialogState = eSpeechIdle;
         }
     }
     else {
-        hSpeechFile.Play(0);
-        bPaused = 0;
+        hSpeechFile.Play(false);
+        bPaused = false;
         eDialogState = ePausedState;
     }
 }
@@ -376,13 +376,13 @@ void DialogMenu::LoadTopicsList() {
     pResponseList->RemoveAll();
     int32_t iindex = 0;
     int32_t ilistHeight = 0;
-    bool bmore = pTopicManager->FirstTopic(1);
+    bool bmore = pTopicManager->FirstTopic(true);
     while (bmore) {
         int32_t aiValue;
         TESFullName* ptopicSkill_3;
         char Dst[516];
         MenuTopic* pcurrTopic = pTopicManager->GetCurrentTopic();
-        bool bSpeechFailure = 0;
+        bool bSpeechFailure = false;
         if (pcurrTopic->pInfo->GetActorValue()) {
             TESFullName* ptopicSkill;
             ActorValueInfo* ActorValue_ = pcurrTopic->pInfo->GetActorValue();
@@ -390,7 +390,7 @@ void DialogMenu::LoadTopicsList() {
                 ptopicSkill = static_cast<TESFullName*>(ActorValue_);
             }
             else {
-                ptopicSkill = 0;
+                ptopicSkill = nullptr;
             }
             ptopicSkill_3 = ptopicSkill;
         }
@@ -401,7 +401,7 @@ void DialogMenu::LoadTopicsList() {
                 ptopicSkill_2 = static_cast<TESFullName*>(Perk);
             }
             else {
-                ptopicSkill_2 = 0;
+                ptopicSkill_2 = nullptr;
             }
             ptopicSkill_3 = ptopicSkill_2;
         }
@@ -445,7 +445,7 @@ void DialogMenu::LoadTopicsList() {
                         }
                         else {
                             BSsprintf(Dst, 512, "%s %d/%d", Dst, playerActorValue, reqActorValue);
-                            bSpeechFailure = 1;
+                            bSpeechFailure = true;
                         }
                         break;
                     }
@@ -469,7 +469,7 @@ void DialogMenu::LoadTopicsList() {
                 Warning("ERROR: DialogMenu::LoadTopicsList(): has a topic without topictext OR info prompt: %s", v10);
             }
         }
-        Tile* ptile = lbResponseList.AddItem(iindex, Dst, 0, 0);
+        Tile* ptile = lbResponseList.AddItem(iindex, Dst, nullptr, nullptr);
         BSsprintf(Dst, 512, "topic_%i", iindex);
         ptile->SetName(static_cast<const char*>(Dst));
         ptile->Set(4012, iindex);
@@ -482,7 +482,7 @@ void DialogMenu::LoadTopicsList() {
         int32_t v3 = Tile::TextToTrait("_line_alpha");
         ptile->Set(v3, aiValue);
         if (bSpeechFailure) {
-            ptile->SetSpeechChallengeFailure(1);
+            ptile->SetSpeechChallengeFailure(true);
         }
         if (iindex <= 2) {
             ilistHeight += static_cast<int32_t>(ptile->GetFloat(4016));
@@ -490,12 +490,12 @@ void DialogMenu::LoadTopicsList() {
         bmore = pTopicManager->NextTopic();
         ++iindex;
     }
-    pTiles[3]->Set(4016, static_cast<float>(ilistHeight), 0);
+    pTiles[3]->Set(4016, static_cast<float>(ilistHeight), false);
     int32_t v4 = Tile::TextToTrait("_ScrollbarHeight");
     float afDispositiona = pMenu->GetFloat(v4);
     int32_t v5 = Tile::TextToTrait("_height");
-    lbResponseList.pScrollBar->Set(v5, afDispositiona, 1);
-    lbResponseList.pScrollBar->Set(g_dialogMenu_TraitCurrentValue, 0.0f, 0);
+    lbResponseList.pScrollBar->Set(v5, afDispositiona, true);
+    lbResponseList.pScrollBar->Set(g_dialogMenu_TraitCurrentValue, 0.0f, false);
     lbResponseList.Synchronize();
     uiIgnoreInputStartTime = appTimer.iLastTime;
 }
@@ -510,7 +510,7 @@ DialogMenu::DialogState DialogMenu::LoadNextScreen(bool abShowChallengePrefix) {
         presponse = ptopic->GetCurrentResponse();
     }
     else {
-        presponse = 0;
+        presponse = nullptr;
     }
     DialogMenu::DialogState enextState = DialogMenu::eSpeechIdle;
     if (ptopic) {
@@ -524,10 +524,10 @@ DialogMenu::DialogState DialogMenu::LoadNextScreen(bool abShowChallengePrefix) {
     if (presponse) {
         BaseProcess* CurrentAIProcess;
         bool bdonotchangeanim;
-        bdonotchangeanim = 0;
-        bResponseShown = 1;
+        bdonotchangeanim = false;
+        bResponseShown = true;
         ptopic->NextResponse();
-        this->pSpeaker->UpdateInDialogue(0.0f, presponse, 1);
+        this->pSpeaker->UpdateInDialogue(0.0f, presponse, true);
         CurrentAIProcess = this->pSpeaker->pCurrentProcess;
         hSpeechFile = CurrentAIProcess->GetSoundHandle(ACTOR_SOUND_HANDLE_VOICE);
         if (!bInServiceMenu) {
@@ -558,7 +558,7 @@ DialogMenu::DialogState DialogMenu::LoadNextScreen(bool abShowChallengePrefix) {
                     BSstrcpy(strtemp, 512, " ");
                 }
             }
-            pTiles[2]->Set(4036, strtemp, 1);
+            pTiles[2]->Set(4036, strtemp, true);
             pMenu->Set(DialogMenu::iUT_ShowingText, 1);
             enextState = DialogMenu::ePlaySpeech;
         }
@@ -583,7 +583,7 @@ DialogMenu::DialogState DialogMenu::LoadNextScreen(bool abShowChallengePrefix) {
     LABEL_58:;
         if (!bInServiceMenu || eDialogState == DialogMenu::eServiceFadeOut) {
             pTopicManager->Update();
-            if (!pTopicManager->FirstTopic(1) && eGoodbyeState == DialogMenu::eInDialogue) {
+            if (!pTopicManager->FirstTopic(true) && eGoodbyeState == DialogMenu::eInDialogue) {
                 eGoodbyeState = DialogMenu::eInvalidChoiceList;
             }
             if (eGoodbyeState) {
@@ -604,9 +604,9 @@ DialogMenu::DialogState DialogMenu::LoadNextScreen(bool abShowChallengePrefix) {
     PlayerCharacter* v13 = pPlayer;
     TESObjectREFR* v11 = pTopicManager->pSpeaker;
     TESTopicInfo* pInfo =
-        TESTopic::GetMatchingFollowUpInfo(DialogMenu::pLastClickedInfo, bDispositionFailure, v11, v13, 0, 0);
+        TESTopic::GetMatchingFollowUpInfo(DialogMenu::pLastClickedInfo, bDispositionFailure, v11, v13, false, nullptr);
     if (!pInfo || !ptopic) {
-        DialogMenu::pLastClickedInfo = 0;
+        DialogMenu::pLastClickedInfo = nullptr;
         goto LABEL_58;
     }
     BSSimpleList<MenuTopic*>* v30 = static_cast<BSSimpleList<MenuTopic*>*>(ourMalloc(sizeof(BSSimpleList<MenuTopic*>)));
@@ -614,16 +614,16 @@ DialogMenu::DialogState DialogMenu::LoadNextScreen(bool abShowChallengePrefix) {
         pnewList = ::new (v30) BSSimpleList<MenuTopic*>;
     }
     else {
-        pnewList = 0;
+        pnewList = nullptr;
     }
     MenuTopic* apMemory = static_cast<MenuTopic*>(ourMalloc(sizeof(MenuTopic)));
     if (apMemory) {
         MobileObject* pSpeaker = this->pSpeaker;
         TESTopic* v12 = ptopic->pTopic;
-        pnewTopic = ::new (apMemory) MenuTopic(ptopic->pQuest, v12, pInfo, pSpeaker, 0);
+        pnewTopic = ::new (apMemory) MenuTopic(ptopic->pQuest, v12, pInfo, pSpeaker, false);
     }
     else {
-        pnewTopic = 0;
+        pnewTopic = nullptr;
     }
     MenuTopic* pnewTopic_3 = pnewTopic;
     pnewTopic->FirstResponse();
@@ -631,7 +631,7 @@ DialogMenu::DialogState DialogMenu::LoadNextScreen(bool abShowChallengePrefix) {
     pnewList->AddTail(pnewTopic_2);
     pnewList->AddTail(pnewTopic_3);
     pTopicManager->PushTopicList(pnewList);
-    pTopicManager->FirstTopic(1);
+    pTopicManager->FirstTopic(true);
     if (pnewTopic_3->pInfo->IsSpeechChallenge()) {
         if (pTopicManager->DoSpeechChallengeCheck(pnewTopic_3)) {
             pnewTopic_3 = pTopicManager->GetCurrentTopic();
@@ -666,7 +666,7 @@ DialogMenu::DialogState DialogMenu::LoadNextScreen(bool abShowChallengePrefix) {
     }
     SetGoodbyeState(pnewTopic_3);
     pTopicManager->RunBeginScript();
-    bResponseShown = 0;
+    bResponseShown = false;
     DialogMenu::pLastClickedInfo = pnewTopic_3->pInfo;
     // Passes the parameter's byte on zero-extended.
     return LoadNextScreen(static_cast<uint8_t>(abShowChallengePrefix) != 0);
@@ -677,13 +677,13 @@ void DialogMenu::ServiceStart() {
     DialogueResponse* currentResponse;
     if (DialogMenu::pMe) {
         if (!DialogMenu::pMe->eGoodbyeState) {
-            DialogMenu::pMe->bInServiceMenu = (bool)1;
-            DialogMenu::pMe->bDoServiceLoad = (bool)1;
+            DialogMenu::pMe->bInServiceMenu = true;
+            DialogMenu::pMe->bDoServiceLoad = true;
             if (DialogMenu::pMe->pTopicManager->GetCurrentTopic()) {
                 currentTopic = DialogMenu::pMe->pTopicManager->GetCurrentTopic();
                 currentResponse = currentTopic->GetCurrentResponse();
-                DialogMenu::pMe->pSpeaker->UpdateInDialogue((float)0.0, currentResponse, (bool)0);
-                DialogMenu::pMe->pSpeaker->bSpeakingDone = (bool)1;
+                DialogMenu::pMe->pSpeaker->UpdateInDialogue((float)0.0, currentResponse, false);
+                DialogMenu::pMe->pSpeaker->bSpeakingDone = true;
             }
             DialogMenu::pMe->StartFadeOut();
         }
@@ -712,23 +712,23 @@ Tile* DialogMenu::Create(MobileObject* apSpeaker, TESTopic* apGreetTopic, Mobile
         Tile* ptile = pin->GetMenusRoot()->ReadFile("Data\\Menus\\Dialog\\dialog_menu.xml");
         DialogMenu::pMe = static_cast<DialogMenu*>(ptile->GetMenu());
         if (DialogMenu::pMe && (v4 = DialogMenu::pMe->GetClass(), v4 == DialogMenu::GetClassStatic())) {
-            DialogMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), 0);
+            DialogMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
             if (DialogMenu::pMe->IsWellFormedMenu()) {
                 InterfaceManager* v17;
                 if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
                     float afMotionBlur = Tile::GetMaximumDepth();
-                    ptile->Set(4013, afMotionBlur, 1);
+                    ptile->Set(4013, afMotionBlur, true);
                 }
                 DialogMenu::pMe->pSpeaker = apSpeaker;
                 TESImageSpaceModifier* Hit = TESImageSpaceModifier::GetGetHit();
                 ImageSpaceModifierInstanceForm::Stop(Hit);
-                if (apSpeaker->GetFaceNodeBiped(0)) {
-                    BSFaceGenNiNode* v6 = apSpeaker->GetFaceNodeBiped(0);
-                    v6->SetIAmInDialogue(1);
+                if (apSpeaker->GetFaceNodeBiped(nullptr)) {
+                    BSFaceGenNiNode* v6 = apSpeaker->GetFaceNodeBiped(nullptr);
+                    v6->SetIAmInDialogue(true);
                 }
-                if (apSpeaker->GetFaceNodeSkinned(0)) {
-                    BSFaceGenNiNode* v7 = apSpeaker->GetFaceNodeSkinned(0);
-                    v7->SetIAmInDialogue(1);
+                if (apSpeaker->GetFaceNodeSkinned(nullptr)) {
+                    BSFaceGenNiNode* v7 = apSpeaker->GetFaceNodeSkinned(nullptr);
+                    v7->SetIAmInDialogue(true);
                 }
                 TESPackage* ppack = apSpeaker->GetCurrentPackage();
                 if (apSpeaker->IsActor()) {
@@ -743,13 +743,13 @@ Tile* DialogMenu::Create(MobileObject* apSpeaker, TESTopic* apGreetTopic, Mobile
                 if (!ppack ||
                     (ppack->GetPackType() != PACKAGE_TYPE_IN_GAME_DIALOGUE ||
                      apSpeaker->GetCurrentTarget() != pPlayer)) {
-                    if (apSpeaker->IsActor() && !apSpeaker->IsInCombat(1)) {
-                        static_cast<Actor*>(apSpeaker)->Actor::EndInterruptPackage(0);
+                    if (apSpeaker->IsActor() && !apSpeaker->IsInCombat(true)) {
+                        static_cast<Actor*>(apSpeaker)->Actor::EndInterruptPackage(false);
                     }
-                    if (apSpeaker->IsInCombat(1)) {
+                    if (apSpeaker->IsInCombat(true)) {
                         static_cast<Actor*>(apSpeaker)->Actor::StopMoving();
                     }
-                    apSpeaker->InitiateDialogue(pPlayer, 0, 0, 1, 0, 1, 0, 0, 0);
+                    apSpeaker->InitiateDialogue(pPlayer, nullptr, nullptr, true, false, true, nullptr, false, false);
                 }
                 MobileObject* pspeak = apSpeaker;
                 if (apSpeakas) {
@@ -762,16 +762,16 @@ Tile* DialogMenu::Create(MobileObject* apSpeaker, TESTopic* apGreetTopic, Mobile
                 if (DialogMenu::pMe->pTopicManager->GetGreeting()) {
                     DialogMenu::pLastClickedInfo = DialogMenu::pMe->pTopicManager->GetGreeting()->pInfo;
                 }
-                pPlayer->SetDialoguewithPlayer(1);
+                pPlayer->SetDialoguewithPlayer(true);
                 if (apSpeaker->IsActor()) {
                     BaseProcess* CurrentAIProcess = apSpeaker->pCurrentProcess;
                     CurrentAIProcess->AddToProcedureIndexRunning(apSpeaker, 2);
-                    apSpeaker->SetDialoguewithPlayer(1);
+                    apSpeaker->SetDialoguewithPlayer(true);
                 }
                 DialogMenu::pMe->bIsIn3rdPerson = pPlayer->Is3rdPerson();
                 if (DialogMenu::pMe->eGoodbyeState != DialogMenu::eForceGoodbye) {
-                    pPlayer->Show1stPerson(1);
-                    pPlayer->FocusOnActor(apSpeaker, 0.0f, 1);
+                    pPlayer->Show1stPerson(true);
+                    pPlayer->FocusOnActor(apSpeaker, 0.0f, true);
                 }
                 if (!DialogMenu::pMe->pDepthOfFieldInstance) {
                     const NiPoint3* afDuration = &pPlayer->GetLocationOnReference();
@@ -781,9 +781,9 @@ Tile* DialogMenu::Create(MobileObject* apSpeaker, TESTopic* apGreetTopic, Mobile
                     DialogMenu::pMe->pDepthOfFieldInstance = ImageSpaceModifierInstanceDOF::Trigger(
                         fdistance, *v11, ImageSpaceModifierInstanceDOF::DOF_BACK, 0.0f, 0.0f, 0.0f
                     );
-                    DialogMenu::pMe->pDepthOfFieldInstance->SetPermanent(1);
+                    DialogMenu::pMe->pDepthOfFieldInstance->SetPermanent(true);
                 }
-                pPlayer->SetIronSights(0, 0, 0);
+                pPlayer->SetIronSights(false, false, false);
                 pPlayer->StopIronSightsImageSpace();
                 DialogMenu::pMe->lbResponseList.Initialize(DialogMenu::pMe->pTiles[3], "DM_TopicTemplate");
                 Tile* ChildByName = DialogMenu::pMe->pTiles[3]->GetChildByName("lb_scrollbar");
@@ -801,25 +801,25 @@ Tile* DialogMenu::Create(MobileObject* apSpeaker, TESTopic* apGreetTopic, Mobile
                 int32_t v15 = Tile::TextToTrait("_ShowSubtitles");
                 DialogMenu::pMe->pMenu->Set(v15, static_cast<int32_t>(v23));
                 const char* FullName = apSpeaker->GetFullName();
-                DialogMenu::pMe->pTiles[1]->Set(4036, FullName, 1);
+                DialogMenu::pMe->pTiles[1]->Set(4036, FullName, true);
                 if (!ReturnTrue() ||
                     (v17 = InterfaceManager::Instance(), v17->xTutorialManager.HasBeenShown(Interface::TUT_DIALOGUE))) {
-                    DialogMenu::pMe->LoadNextScreen(0);
+                    DialogMenu::pMe->LoadNextScreen(false);
                 }
                 else {
-                    DialogMenu::pMe->bShowingTutorial = 1;
+                    DialogMenu::pMe->bShowingTutorial = true;
                 }
-                DialogMenu::pMe->PrepForVisibility(0);
+                DialogMenu::pMe->PrepForVisibility(false);
                 FalloutAudio::MuteRadio();
                 BSAudio* v18 = &BSAudio::QInstance();
                 v18->EnterDialogue();
-                apSpeaker->SetHasSpokenFlag(1);
-                Interface::SetGunScopeVisible(0);
+                apSpeaker->SetHasSpokenFlag(true);
+                Interface::SetGunScopeVisible(false);
                 return ptile;
             }
             else {
                 Warning("MENUS: Dialogue Menu Creation Failed... Are your menu and art resources up to date?");
-                return 0;
+                return nullptr;
             }
         }
         else {
@@ -830,7 +830,7 @@ Tile* DialogMenu::Create(MobileObject* apSpeaker, TESTopic* apGreetTopic, Mobile
                     }
                 }
             }
-            return 0;
+            return nullptr;
         }
     }
     else {
@@ -838,7 +838,7 @@ Tile* DialogMenu::Create(MobileObject* apSpeaker, TESTopic* apGreetTopic, Mobile
             "MENUS: DialogMenu::Create() called with a null speaker, which shouldn't happen.  Notify your friendly "
             "Interface programmer!"
         );
-        return 0;
+        return nullptr;
     }
 }
 
@@ -848,7 +848,7 @@ bool DialogMenu::IsDialogActive() {
 
 void DialogMenu::ServiceEnd(TESTopic* apTopic) {
     if (DialogMenu::pMe) {
-        DialogMenu::pMe->bInServiceMenu = 0;
+        DialogMenu::pMe->bInServiceMenu = false;
         if (apTopic) {
             MenuTopic* pnewTopic;
             TESTopicInfo* pnewTopicInfo = apTopic->GetMatchingInfo(DialogMenu::pMe->pSpeaker, pPlayer);
@@ -856,15 +856,15 @@ void DialogMenu::ServiceEnd(TESTopic* apTopic) {
             if (apMemory) {
                 MobileObject* pSpeaker = DialogMenu::pMe->pSpeaker;
                 TESQuest* OwnerQuest = apTopic->GetOwnerQuest(pnewTopicInfo);
-                pnewTopic = ::new (apMemory) MenuTopic(OwnerQuest, apTopic, pnewTopicInfo, pSpeaker, 0);
+                pnewTopic = ::new (apMemory) MenuTopic(OwnerQuest, apTopic, pnewTopicInfo, pSpeaker, false);
             }
             else {
-                pnewTopic = 0;
+                pnewTopic = nullptr;
             }
             pnewTopic->FirstResponse();
             DialogueResponse* CurrentResponse = pnewTopic->GetCurrentResponse();
-            DialogMenu::pMe->pSpeaker->UpdateInDialogue(0.0f, CurrentResponse, 0);
-            DialogMenu::pMe->pSpeaker->bSpeakingDone = 1;
+            DialogMenu::pMe->pSpeaker->UpdateInDialogue(0.0f, CurrentResponse, false);
+            DialogMenu::pMe->pSpeaker->bSpeakingDone = true;
             if (pnewTopic) {
                 delete pnewTopic;
             }
@@ -876,7 +876,7 @@ void DialogMenu::ServiceEnd(TESTopic* apTopic) {
 void DialogMenu::Close() {
     if (DialogMenu::pMe) {
         MobileObject* pSpeaker = DialogMenu::pMe->pSpeaker;
-        Actor* v13 = 0;
+        Actor* v13 = nullptr;
         if (pSpeaker->IsActor()) {
             v13 = static_cast<Actor*>(pSpeaker);
         }
@@ -885,38 +885,38 @@ void DialogMenu::Close() {
         if (DialogMenu::pMe->eGoodbyeState == 3) {
             Warning("MENUS: (Dialog Menu) Invalid choice list encountered.  Closing menu...");
         }
-        if (pSpeaker->GetFaceNodeBiped(0)) {
-            BSFaceGenNiNode* v0 = pSpeaker->GetFaceNodeBiped(0);
-            v0->SetIAmInDialogue(0);
+        if (pSpeaker->GetFaceNodeBiped(nullptr)) {
+            BSFaceGenNiNode* v0 = pSpeaker->GetFaceNodeBiped(nullptr);
+            v0->SetIAmInDialogue(false);
         }
-        if (pSpeaker->GetFaceNodeSkinned(0)) {
-            BSFaceGenNiNode* v1 = pSpeaker->GetFaceNodeSkinned(0);
-            v1->SetIAmInDialogue(0);
+        if (pSpeaker->GetFaceNodeSkinned(nullptr)) {
+            BSFaceGenNiNode* v1 = pSpeaker->GetFaceNodeSkinned(nullptr);
+            v1->SetIAmInDialogue(false);
         }
         pSpeaker->StopCurrentDialogue();
-        pSpeaker->SetDialoguewithPlayer(0);
-        pPlayer->SetDialoguewithPlayer(0);
+        pSpeaker->SetDialoguewithPlayer(false);
+        pPlayer->SetDialoguewithPlayer(false);
         pSpeaker->EndDialogue();
-        DialogMenu::bDialogActive = 0;
+        DialogMenu::bDialogActive = false;
         if (pSpeaker->pCurrentProcess) {
             BaseProcess* CurrentAIProcess = pSpeaker->pCurrentProcess;
             CurrentAIProcess->SetLastSpeakingEmotion(DE_NEUTRAL);
             if (v13) {
                 if (!v13->IsInCombat()) {
                     BaseProcess* v9 = v13->pCurrentProcess;
-                    v9->CheckforNewPackage(v13, 1);
+                    v9->CheckforNewPackage(v13, true);
                 }
             }
         }
         if (v13) {
             if (v13->pCurrentProcess) {
                 BaseProcess* v8 = v13->pCurrentProcess;
-                v8->ClearDialogHeadTrackTarget(1);
+                v8->ClearDialogHeadTrackTarget(true);
             }
         }
         if (pSpeaker->pCurrentProcess) {
             if (v13) {
-                if (!v13->IsDead(0) && !v13->IsDying()) {
+                if (!v13->IsDead(false) && !v13->IsDying()) {
                     BaseProcess* v7 = pSpeaker->pCurrentProcess;
                     float* v2 = &fAIGreetingTimer.Float();
                     v7->SetGreetingTimer(*v2);
@@ -928,7 +928,7 @@ void DialogMenu::Close() {
         }
         pPlayer->ResetPlayerGreetFlag();
         BaseProcess* v6 = pPlayer->pCurrentProcess;
-        v6->ClearDialogHeadTrackTarget(1);
+        v6->ClearDialogHeadTrackTarget(true);
         if (v14) {
             if (v11 && !v14->IsRunImmediately()) {
                 v14->RunResult(TIRS_END, pSpeaker);
@@ -937,7 +937,7 @@ void DialogMenu::Close() {
                     if (!v13->IsInCombat()) {
                         if (v13->pCurrentProcess) {
                             BaseProcess* v5 = v13->pCurrentProcess;
-                            if (v5->CheckforNewPackage(v13, 1)) {
+                            if (v5->CheckforNewPackage(v13, true)) {
                                 BaseProcess* v4 = v13->pCurrentProcess;
                                 v4->ClearCurrentDataforProcess(v13);
                             }
@@ -957,13 +957,13 @@ void DialogMenu::Close() {
 void DialogMenu::DebugResetSaidOnceFlags() {
     if (DialogMenu::pMe) {
         MenuTopicManager* pTopicManager = DialogMenu::pMe->pTopicManager;
-        pTopicManager->FirstTopic(1);
-        while (1) {
+        pTopicManager->FirstTopic(true);
+        while (true) {
             MenuTopic* CurrentTopic = pTopicManager->GetCurrentTopic();
             if (!CurrentTopic) {
                 break;
             }
-            CurrentTopic->bTopicIsNew = 1;
+            CurrentTopic->bTopicIsNew = true;
             pTopicManager->NextTopic();
         }
     }

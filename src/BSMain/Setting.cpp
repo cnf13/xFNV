@@ -192,7 +192,7 @@ void Setting::GetViewerStrings(NiTPrimitiveArray<char*>* apStringsA) {
                 value = &uValue;
             }
             else {
-                Setting::DefaultValue.b = 0;
+                Setting::DefaultValue.b = false;
                 value = &Setting::DefaultValue;
             }
             char* element = NiGetViewerString(name, value->b);
@@ -206,7 +206,7 @@ void Setting::GetViewerStrings(NiTPrimitiveArray<char*>* apStringsA) {
                 p_uValue = &uValue;
             }
             else {
-                Setting::DefaultValue.b = 0;
+                Setting::DefaultValue.b = false;
                 p_uValue = &Setting::DefaultValue;
             }
             char* ViewerString_1 = NiGetViewerString(name, static_cast<char>(p_uValue->b));
@@ -247,7 +247,7 @@ void Setting::GetViewerStrings(NiTPrimitiveArray<char*>* apStringsA) {
                     NiGetViewerString(static_cast<const char*>(name), static_cast<const char*>(uValue.str));
             }
             else {
-                ViewerString_9 = NiGetViewerString(name, static_cast<const char*>(0));
+                ViewerString_9 = NiGetViewerString(name, static_cast<const char*>(nullptr));
             }
             char* v10 = ViewerString_9;
             apStringsA->Add(v10);
@@ -300,7 +300,7 @@ uint32_t Setting::DataSize() {
                         Str = uValue.str;
                     }
                     else {
-                        Str = 0;
+                        Str = nullptr;
                     }
                     v4 = std::strlen(Str) + 1;
                 }

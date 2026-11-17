@@ -13,7 +13,7 @@ void TESEatPackageData::Copy(TESPackageData* apCopy) {
     if (v5) {
         if (pSearchLocation) {
             delete pSearchLocation;
-            pSearchLocation = 0;
+            pSearchLocation = nullptr;
         }
         if (v5->pSearchLocation) {
             PackageLocation* v2;
@@ -22,10 +22,10 @@ void TESEatPackageData::Copy(TESPackageData* apCopy) {
                 v2 = ::new (v4) PackageLocation;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pSearchLocation = v2;
-            pSearchLocation->Copy(v5->pSearchLocation, 0);
+            pSearchLocation->Copy(v5->pSearchLocation, false);
         }
     }
 }
@@ -33,19 +33,19 @@ void TESEatPackageData::Copy(TESPackageData* apCopy) {
 bool TESEatPackageData::Compare(TESPackageData* apCompare) {
     TESEatPackageData* v4 = dynamic_cast<TESEatPackageData*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (pSearchLocation) {
         if (pSearchLocation->Compare(v4->pSearchLocation)) {
-            return (bool)1;
+            return true;
         }
     }
     else {
         if (v4->pSearchLocation) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 void TESEatPackageData::Save() {

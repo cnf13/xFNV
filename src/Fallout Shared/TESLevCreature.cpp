@@ -20,7 +20,7 @@ SettingT<GameSettingCollection> gs_iLevCreaLevelDifferenceMax("iLevCreaLevelDiff
 
 TESLevCreature::TESLevCreature() : TESBoundObject(), TESLeveledList(), TESModelTextureSwap() {
     cFormType = 44;
-    SetInitialized(1);
+    SetInitialized(true);
 }
 
 TESLevCreature::~TESLevCreature() {}
@@ -140,7 +140,7 @@ void TESLevCreature::InitItem() {
     if (!TESForm::GetInitialized()) {
         static_cast<TESLeveledList*>(this)->InitItem(this);
         static_cast<TESModelTextureSwap*>(this)->InitItem(this);
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 

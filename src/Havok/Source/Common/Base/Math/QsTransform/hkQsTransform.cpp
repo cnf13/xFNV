@@ -100,7 +100,7 @@ bool* hkQsTransform::isApproximatelyEqual(bool* a1, __m128* a2, uint32_t a3) {
         __m128 v7 = a2[1];
         __m128 v8 = _mm_mul_ps(v6.m_vec.m_quad, v7);
         __m128 v9 = _mm_add_ps(_mm_shuffle_ps(v8, v8, 78), v8);
-        if (static_cast<float>(_mm_shuffle_ps(v9, v9, 177)[0] + v9[0]) < 0.0f) {
+        if ((_mm_shuffle_ps(v9, v9, 177)[0] + v9[0]) < 0.0f) {
             v6.m_vec.m_quad = _mm_mul_ps(
                 _mm_shuffle_ps(
                     _mm_set_ss(std::bit_cast<float>(0xBF800000u)), _mm_set_ss(std::bit_cast<float>(0xBF800000u)), 0
@@ -114,7 +114,7 @@ bool* hkQsTransform::isApproximatelyEqual(bool* a1, __m128* a2, uint32_t a3) {
         return a1;
     }
     else {
-        *a1 = 0;
+        *a1 = false;
         return a1;
     }
 }

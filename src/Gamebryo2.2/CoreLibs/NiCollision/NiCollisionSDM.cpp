@@ -144,24 +144,24 @@ void NiCollisionSDM::Init() {
 
 void NiCollisionSDM::Shutdown() {
     if (NiCollisionSDM::ms_bInitialized) {
-        NiCollisionSDM::ms_bInitialized = 0;
+        NiCollisionSDM::ms_bInitialized = false;
         NiStream::UnregisterLoader("NiCollisionData");
-        NiBoundingVolume::ms_apfnLoaders[1] = 0;
-        NiBoundingVolume::ms_apfnLoaders[2] = 0;
-        NiBoundingVolume::ms_apfnLoaders[5] = 0;
-        NiBoundingVolume::ms_apfnLoaders[3] = 0;
-        NiBoundingVolume::ms_apfnLoaders[0] = 0;
-        NiBoundingVolume::ms_apfnLoaders[4] = 0;
+        NiBoundingVolume::ms_apfnLoaders[1] = nullptr;
+        NiBoundingVolume::ms_apfnLoaders[2] = nullptr;
+        NiBoundingVolume::ms_apfnLoaders[5] = nullptr;
+        NiBoundingVolume::ms_apfnLoaders[3] = nullptr;
+        NiBoundingVolume::ms_apfnLoaders[0] = nullptr;
+        NiBoundingVolume::ms_apfnLoaders[4] = nullptr;
         _NiFree(NiBoundingVolume::ms_pfnTestFuncTable);
         _NiFree(NiBoundingVolume::ms_pfnFindFuncTable);
         _NiFree(NiBoundingVolume::ms_pfnTriTestFuncTable);
         _NiFree(NiBoundingVolume::ms_pfnTriFindFuncTable);
-        NiBoundingVolume::ms_pfnTestFuncTable = 0;
-        NiBoundingVolume::ms_pfnFindFuncTable = 0;
-        NiBoundingVolume::ms_pfnTriTestFuncTable = 0;
-        NiBoundingVolume::ms_pfnTriFindFuncTable = 0;
-        NiBoundingVolume::ms_pfnConvertToSphereBV_Fast = 0;
-        NiBoundingVolume::ms_pfnConvertToSphereBV_Safe = 0;
-        NiBoundingVolume::ms_pfnConvertToBoxBV = 0;
+        NiBoundingVolume::ms_pfnTestFuncTable = nullptr;
+        NiBoundingVolume::ms_pfnFindFuncTable = nullptr;
+        NiBoundingVolume::ms_pfnTriTestFuncTable = nullptr;
+        NiBoundingVolume::ms_pfnTriFindFuncTable = nullptr;
+        NiBoundingVolume::ms_pfnConvertToSphereBV_Fast = nullptr;
+        NiBoundingVolume::ms_pfnConvertToSphereBV_Safe = nullptr;
+        NiBoundingVolume::ms_pfnConvertToBoxBV = nullptr;
     }
 }

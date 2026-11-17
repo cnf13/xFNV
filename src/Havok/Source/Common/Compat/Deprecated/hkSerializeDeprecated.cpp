@@ -56,7 +56,7 @@ hkResource* hkSerializeDeprecated::loadOldPackfile(
             "Call hkSerializeDeprecated::initDeprecated() to include loading support for this file"
         );
     }
-    return 0;
+    return nullptr;
 }
 
 hkObjectResource* hkSerializeDeprecated::loadOldPackfileOnHeap(
@@ -70,5 +70,5 @@ hkObjectResource* hkSerializeDeprecated::loadOldPackfileOnHeap(
             "Call hkSerializeDeprecated::initDeprecated() to include loading support for this file"
         );
     }
-    return 0;
+    return nullptr;
 }

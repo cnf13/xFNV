@@ -44,7 +44,7 @@ hkCpuBuildJacobiansJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueu
         queryIn.m_constraintRuntime.m_storage = atomInfo.m_runtime;
         queryIn.m_constraintRuntimeInMainMemory.m_storage = atomInfo.m_runtime;
         if (atomInfo.m_atoms->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {
-            hkBool contact = {1};
+            hkBool contact = {true};
             hkSimpleContactConstraintDataBuildJacobian(
                 static_cast<hkpSimpleContactConstraintAtom*>(atomInfo.m_atoms), queryIn, contact, out
             );
@@ -92,7 +92,7 @@ void hkCpuBuildJacobiansFromTask(const hkBuildJacobiansFromTaskInput& input, hkp
         queryIn.m_constraintRuntime.m_storage = atomInfo->m_runtime;
         queryIn.m_constraintRuntimeInMainMemory.m_storage = atomInfo->m_runtime;
         if (atomInfo->m_atoms->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {
-            hkBool contact = {1};
+            hkBool contact = {true};
             hkSimpleContactConstraintDataBuildJacobian(
                 static_cast<hkpSimpleContactConstraintAtom*>(atomInfo->m_atoms), queryIn, contact, out
             );

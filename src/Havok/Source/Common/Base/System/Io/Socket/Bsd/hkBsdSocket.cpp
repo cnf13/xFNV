@@ -54,7 +54,7 @@ hkBsdSocket::~hkBsdSocket() {
 }
 
 hkBool* hkBsdSocket::isOk(hkBool* arResult) const {
-    arResult->m_bool = (int8_t)((uint8_t)(m_socket != ((-1))));
+    arResult->m_bool = (int8_t)((uint8_t)(m_socket != (-1)));
     return arResult;
 }
 

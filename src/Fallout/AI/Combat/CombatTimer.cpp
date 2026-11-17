@@ -44,7 +44,7 @@ bool CombatTimer::IsForced() {
 }
 
 float CombatTimer::ElapsedTime() {
-    return (float)(CombatTimer::GetTimer() - fStartTime);
+    return (CombatTimer::GetTimer() - fStartTime);
 }
 
 void CombatTimer::SetStartTime(float a1) {
@@ -56,7 +56,7 @@ float CombatTimer::GetTimer() {
 }
 
 void CombatTimer::UpdateTimer(float afElapsedTime) {
-    CombatTimer::fTimer = (float)(CombatTimer::fTimer + afElapsedTime);
+    CombatTimer::fTimer = (CombatTimer::fTimer + afElapsedTime);
 }
 
 CombatTimeStamp::CombatTimeStamp() : fTimeStamp(0.0f) {}
@@ -66,7 +66,7 @@ CombatTimeStamp::CombatTimeStamp(float afValue) : fTimeStamp(afValue) {}
 void CombatTimeStamp::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     apLoadGameBuffer->LoadData(static_cast<char*>(static_cast<void*>(this)), 4u);
     if ((fTimeStamp < 0x1.fffffe0000000p+127f) && (fTimeStamp > (-0x1.fffffe0000000p+127f))) {
-        fTimeStamp = (float)(CombatTimer::GetTimer() + fTimeStamp);
+        fTimeStamp = (CombatTimer::GetTimer() + fTimeStamp);
     }
 }
 
@@ -80,12 +80,12 @@ void CombatTimeStamp::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
 }
 
 float CombatTimeStamp::ElapsedTime() {
-    return (float)(CombatTimer::GetTimer() - fTimeStamp);
+    return (CombatTimer::GetTimer() - fTimeStamp);
 }
 
 float CombatTimeStamp::DisplayElapsedTime() {
     if (!((CombatTimer::GetTimer() - fTimeStamp) > 1000.0)) {
-        return (float)(CombatTimer::GetTimer() - fTimeStamp);
+        return (CombatTimer::GetTimer() - fTimeStamp);
     }
     else {
         return (float)1000.0;

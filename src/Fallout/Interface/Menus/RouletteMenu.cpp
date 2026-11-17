@@ -65,7 +65,7 @@
 #include "SDK/MSVC/stdlib.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 static RouletteMenu::RouletteState eprevRouletteState{RouletteMenu::RO_IDLE};
 static bool bInvalidBet;
@@ -83,9 +83,9 @@ RouletteMenu::BetTileInfo::BetTileInfo() {}
 
 RouletteMenu::RouletteMenu()
   : eRouletteState(RouletteMenu::RO_IDLE), uiPrevIdleTick(0), pBetList(new BSSimpleList<RouletteMenu::RouletteBet*>),
-    pCurrentBetFace(0), fRadius(0.0f), fValidRadius(0.0f), fxTranslate(0.0f), fyTranslate(0.0f), fzTranslate(0.0f),
-    iNextModelIndex(0), iNumBetsSet(0), iCurrentBet(0), iTotalBet(0), iChipCount(0), iLuckValue(0), iTotalWinnings(0),
-    iMinBet(0), bLucky(0), iCheatToggle(pPlayer->iCasinoCheatLevel) {
+    pCurrentBetFace(nullptr), fRadius(0.0f), fValidRadius(0.0f), fxTranslate(0.0f), fyTranslate(0.0f),
+    fzTranslate(0.0f), iNextModelIndex(0), iNumBetsSet(0), iCurrentBet(0), iTotalBet(0), iChipCount(0), iLuckValue(0),
+    iTotalWinnings(0), iMinBet(0), bLucky(false), iCheatToggle(pPlayer->iCasinoCheatLevel) {
     RouletteMenu::iUT_Value = Tile::AddUserTrait("_Value", -1);
     RouletteMenu::iUT_X = Tile::AddUserTrait(rdata_1075F74, -1);
 }
@@ -98,7 +98,7 @@ RouletteMenu::~RouletteMenu() {
     pModelLoader->ReleaseFile("Meshes\\terminals\\NV_Roulette\\NV_Roulette-Bet.NIF");
     pModelLoader->ReleaseFile("Meshes\\terminals\\NV_Roulette\\NV_Roulette-Points.NIF");
     pModelLoader->ReleaseFile(RouletteMenu::pCasino->GetModel(6)->GetModel());
-    char* tempstr = 0;
+    char* tempstr = nullptr;
     BSstrcpy(Dst, 260, RouletteMenu::pCasino->GetModel(6)->GetModel());
     for (int32_t j = 0; j < BSstrlen(Dst); ++j) {
         if (Dst[j] == '.') {
@@ -110,17 +110,17 @@ RouletteMenu::~RouletteMenu() {
         BSstrcpy(tempstr, 15, "_Shadow.NIF");
         pModelLoader->ReleaseFile(Dst);
     }
-    RouletteMenu::sp3DCamera = static_cast<NiCamera*>(0);
+    RouletteMenu::sp3DCamera = static_cast<NiCamera*>(nullptr);
     BSShaderManager::GetShadowSceneNode(1)->DetachChild(RouletteMenu::spModel.m_pObject);
     BSShaderManager::GetShadowSceneNode(1)->RemoveAllLights();
     RouletteMenu::spModel.m_pObject->DetachAllChildren();
-    RouletteMenu::spModel = static_cast<NiNode*>(0);
-    pRouletteTableGeometry = 0;
-    pRouletteGridGeometry = 0;
-    pCursorGeometry = 0;
-    pCurrentBetFace = 0;
-    pValidBetFace = 0;
-    pInvalidBetFace = 0;
+    RouletteMenu::spModel = static_cast<NiNode*>(nullptr);
+    pRouletteTableGeometry = nullptr;
+    pRouletteGridGeometry = nullptr;
+    pCursorGeometry = nullptr;
+    pCurrentBetFace = nullptr;
+    pValidBetFace = nullptr;
+    pInvalidBetFace = nullptr;
     // The bet list is the menu's own heap object. It is emptied only once, before it is freed; the game empties it
     // again after freeing it (a read of freed memory), which is deliberately not done here.
     if (pBetList) {
@@ -129,18 +129,18 @@ RouletteMenu::~RouletteMenu() {
         }
         delete pBetList;
     }
-    pBetList = 0;
-    pTableAnimManager = 0;
+    pBetList = nullptr;
+    pTableAnimManager = nullptr;
     for (int32_t i = 0; i < 3; ++i) {
-        pTableAnimations[i] = 0;
+        pTableAnimations[i] = nullptr;
     }
     for (int32_t i = 0; i < 10; ++i) {
-        pBetGeometry[i] = 0;
-        pBetShadowGeometry[i] = 0;
+        pBetGeometry[i] = nullptr;
+        pBetShadowGeometry[i] = nullptr;
     }
-    RouletteMenu::pCasinoData = 0;
-    RouletteMenu::pCasino = 0;
-    RouletteMenu::pMe = 0;
+    RouletteMenu::pCasinoData = nullptr;
+    RouletteMenu::pCasino = nullptr;
+    RouletteMenu::pMe = nullptr;
 }
 
 void RouletteMenu::AttachTileByID(int32_t a1, Tile* a2) {
@@ -190,7 +190,7 @@ void RouletteMenu::DoClick(int32_t a1, Tile* a2) {
                 if (i_2 < 159 && RemoveBet(i_2)) {
                     BSAudio* v3 = &BSAudio::QInstance();
                     BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a12, "GAMERouletteDecreaseBet", 289u);
-                    SoundHandleByName->Play(0);
+                    SoundHandleByName->Play(false);
                     RouletteMenu::pMe->pTiles[10]->Poke(RouletteMenu::iUT_X, 1.0f);
                     RouletteMenu::pMe->pTiles[10]->Set(RouletteMenu::iUT_X, iTotalBet);
                     RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_INCREASEBET_CNTRL, 255.0f);
@@ -266,7 +266,7 @@ void RouletteMenu::DoClick(int32_t a1, Tile* a2) {
                 if (iTempBet != iCurrentBet) {
                     BSAudio* v5 = &BSAudio::QInstance();
                     BSSoundHandle* v12 = v5->GetSoundHandleByName(&arHandle, "GAMERouletteValidBet", 289u);
-                    v12->Play(0);
+                    v12->Play(false);
                 }
                 RouletteMenu::pMe->pTiles[0]->Poke(RouletteMenu::iUT_X, 1.0f);
                 RouletteMenu::pMe->pTiles[0]->Set(RouletteMenu::iUT_X, iCurrentBet);
@@ -338,7 +338,7 @@ void RouletteMenu::DoClick(int32_t a1, Tile* a2) {
                 if (iTempBet_2 != iCurrentBet) {
                     BSAudio* v6 = &BSAudio::QInstance();
                     BSSoundHandle* v7 = v6->GetSoundHandleByName(&th_s, "GAMERouletteValidBet", 289u);
-                    v7->Play(0);
+                    v7->Play(false);
                 }
                 RouletteMenu::pMe->pTiles[0]->Poke(RouletteMenu::iUT_X, 1.0f);
                 RouletteMenu::pMe->pTiles[0]->Set(RouletteMenu::iUT_X, iCurrentBet);
@@ -358,13 +358,13 @@ void RouletteMenu::DoClick(int32_t a1, Tile* a2) {
 void RouletteMenu::DoEnter(int32_t a1, Tile* a2) {
     InterfaceManager* singleton = InterfaceManager::Instance();
     Tile* processLevel = singleton->GetCursorTile();
-    processLevel->Set(4009, (float)0.0, (bool)1);
+    processLevel->Set(4009, (float)0.0, true);
 }
 
 void RouletteMenu::DoLeave(int32_t a1, Tile* a2) {
     InterfaceManager* singleton = InterfaceManager::Instance();
     Tile* processLevel = singleton->GetCursorTile();
-    processLevel->Set(4009, 40.0f, (bool)1);
+    processLevel->Set(4009, 40.0f, true);
 }
 
 // Runs the state machine: the spin animation, paying out the bets, moving the cursor chip over the table while idle,
@@ -482,14 +482,13 @@ void RouletteMenu::DoIdle() {
             RouletteMenu::pMe->SetTileTextAlpha(TI_PLACEBET_CNTRL, 255.0f);
             RouletteMenu::pMe->SetTileTextAlpha(TI_REMOVEBET_CNTRL, 128.0f);
             // The bet is compared signed.
-            if (static_cast<int32_t>(this->iCurrentBet) < this->iMinBet) {
+            if (this->iCurrentBet < this->iMinBet) {
                 RouletteMenu::pMe->SetTileTextAlpha(TI_DECREASEBET_CNTRL, 128.0f);
             }
             else {
                 RouletteMenu::pMe->SetTileTextAlpha(TI_DECREASEBET_CNTRL, 255.0f);
             }
-            if (static_cast<int32_t>(this->iCurrentBet) > this->iMaxBet ||
-                static_cast<int32_t>(this->iCurrentBet) == this->iChipCount) {
+            if (this->iCurrentBet > this->iMaxBet || this->iCurrentBet == this->iChipCount) {
                 RouletteMenu::pMe->SetTileTextAlpha(TI_DECREASEBET_CNTRL, 128.0f);
             }
             else {
@@ -643,8 +642,8 @@ void RouletteMenu::DoIdle() {
             if (!this->iCurrentBet) {
                 this->iCurrentBet = this->iMinBet;
                 // The bet is converted as a signed int.
-                RouletteMenu::pMe->pTiles[0]->Poke(iUT_X, static_cast<float>(static_cast<int32_t>(this->iCurrentBet)));
-                RouletteMenu::pMe->pTiles[0]->Set(iUT_X, static_cast<int32_t>(this->iCurrentBet));
+                RouletteMenu::pMe->pTiles[0]->Poke(iUT_X, static_cast<float>(this->iCurrentBet));
+                RouletteMenu::pMe->pTiles[0]->Set(iUT_X, this->iCurrentBet);
             }
             this->eRouletteState = RO_IDLE;
             int32_t iMax = pCasino->GetData()->iMaxWinnings;
@@ -772,10 +771,10 @@ void RouletteMenu::DoIdle() {
                     }
                 }
             }
-            if (this->iChipCount < static_cast<int32_t>(this->iCurrentBet) + this->iTotalBet) {
+            if (this->iChipCount < this->iCurrentBet + this->iTotalBet) {
                 this->iCurrentBet = this->iChipCount - this->iTotalBet;
                 RouletteMenu::pMe->pTiles[0]->Poke(iUT_Value, 1.0f);
-                RouletteMenu::pMe->pTiles[0]->Set(iUT_Value, static_cast<int32_t>(this->iCurrentBet));
+                RouletteMenu::pMe->pTiles[0]->Set(iUT_Value, this->iCurrentBet);
                 RouletteMenu::pMe->SetTileTextAlpha(TI_INCREASEBET_CNTRL, 128.0f);
             }
             if (this->iChipCount < this->iMinBet) {
@@ -886,7 +885,7 @@ void RouletteMenu::UpdateEarningsString() {
         }
         BSsprintf(Src, 260u, "%s%i", Src, RouletteMenu::pCasinoData->iTotalWinnings);
     }
-    pTiles[2]->Set(RouletteMenu::iUT_Value, Src, 1);
+    pTiles[2]->Set(RouletteMenu::iUT_Value, Src, true);
 }
 
 int32_t RouletteMenu::GetBetIndex() {
@@ -951,7 +950,7 @@ void RouletteMenu::SetTileTextAlpha(RouletteMenu::TileIndex TI, float alpha) {
     for (NiTPointerList<Tile*>* pTileList =
              static_cast<NiTPointerList<Tile*>*>(&RouletteMenu::pMe->pTiles[TI]->xChildren);
          iter && (pTileList && pTileList->GetHead()); iter = pTileList->GetNextPos(iter)) {
-        pTileList->Get(iter)->Set(4009, alpha, static_cast<bool>(1));
+        pTileList->Get(iter)->Set(4009, alpha, true);
     }
 }
 
@@ -960,7 +959,7 @@ void RouletteMenu::ResetBetChips() {
         pBetGeometry[i]->SetTranslate(static_cast<float>(0.0), static_cast<float>(0.0), -5.0f);
         pBetShadowGeometry[i]->SetTranslate(static_cast<float>(0.0), static_cast<float>(0.0), -5.0f);
     }
-    NiUpdateData arData(0.0, 0, 0);
+    NiUpdateData arData(0.0, false, false);
     NiAVObject* v1 = RouletteMenu::spModel.m_pObject;
     v1->Update(arData);
 }
@@ -1019,7 +1018,7 @@ void RouletteMenu::SetBetChip() {
     float v2 = static_cast<double>(level) * 0.18000000000000002;
     pBetGeometry[iNextModelIndex - 3]->SetTranslate(kTranslate.x, kTranslate.y, v2);
     pBetShadowGeometry[iNextModelIndex - 3]->SetTranslate(kTranslate.x, kTranslate.y, 0.0f);
-    NiUpdateData update1(0.0f, 0, 0);
+    NiUpdateData update1(0.0f, false, false);
     RouletteMenu::spModel.m_pObject->Update(update1);
 }
 
@@ -1031,22 +1030,22 @@ void RouletteMenu::Prepare3DElements() {
     char modelPath[252];
     TESModelTextureSwap* Model_ = RouletteMenu::pCasino->GetModel(9);
     const char* v1 = Model_->GetModel();
-    pRouletteTableGeometry = (NiAVObject*)pModelLoader->LoadFile(v1, LOD_MULT_NONE, 1, 0, 0, 0);
+    pRouletteTableGeometry = (NiAVObject*)pModelLoader->LoadFile(v1, LOD_MULT_NONE, true, false, false, false);
     pRouletteGridGeometry = (NiAVObject*)pModelLoader->LoadFile(
-        "Meshes\\terminals\\NV_Roulette\\NV_Roulette-Points.NIF", LOD_MULT_NONE, 1, 0, 0, 0
+        "Meshes\\terminals\\NV_Roulette\\NV_Roulette-Points.NIF", LOD_MULT_NONE, true, false, false, false
     );
     pCursorGeometry = (NiAVObject*)pModelLoader->LoadFile(
-        "Meshes\\terminals\\NV_Roulette\\NV_Roulette-Bet.NIF", LOD_MULT_NONE, 1, 0, 0, 0
+        "Meshes\\terminals\\NV_Roulette\\NV_Roulette-Bet.NIF", LOD_MULT_NONE, true, false, false, false
     );
     TESModelTextureSwap* v19 = RouletteMenu::pCasino->GetModel(6);
     const char* v2 = v19->GetModel();
-    pBetGeometry[0] = (NiAVObject*)pModelLoader->LoadFile(v2, LOD_MULT_NONE, 1, 0, 0, 0);
+    pBetGeometry[0] = (NiAVObject*)pModelLoader->LoadFile(v2, LOD_MULT_NONE, true, false, false, false);
     pRouletteGridGeometry->SetTranslate(0.0f, 0.0f, 0.1f);
     pCursorGeometry->SetTranslate(0.0f, 0.0f, 0.1f);
     pValidBetFace = BSUtilities::GetObjectByName(pCursorGeometry, "Bet_Selector:0");
     pInvalidBetFace = BSUtilities::GetObjectByName(pCursorGeometry, "Bet_Invalid:0");
-    pInvalidBetFace->SetAppCulled(1);
-    char* tempstr = 0;
+    pInvalidBetFace->SetAppCulled(true);
+    char* tempstr = nullptr;
     TESModelTextureSwap* v18 = RouletteMenu::pCasino->GetModel(6);
     const char* v3 = v18->GetModel();
     BSstrcpy(modelPath, 260, v3);
@@ -1058,7 +1057,8 @@ void RouletteMenu::Prepare3DElements() {
     }
     if (tempstr) {
         BSstrcpy(tempstr, 15, "_Shadow.NIF");
-        pBetShadowGeometry[0] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+        pBetShadowGeometry[0] =
+            (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
     }
     for (int32_t i = 1; i < 10; ++i) {
         pBetGeometry[i] = static_cast<NiAVObject*>(pBetGeometry[0]->Clone());
@@ -1071,7 +1071,7 @@ void RouletteMenu::Prepare3DElements() {
         v17 = ::new (apMemory) NiNode(0);
     }
     else {
-        v17 = 0;
+        v17 = nullptr;
     }
     NiRefObject* v26 = (NiRefObject*)v17;
     RouletteMenu::spModel.operator=(v17);
@@ -1092,7 +1092,7 @@ void RouletteMenu::Prepare3DElements() {
     iNextModelIndex = 3;
     ResetBetChips();
     SetBetChip();
-    NiUpdateData UpdateData1(0.0f, 0, 0);
+    NiUpdateData UpdateData1(0.0f, false, false);
     RouletteMenu::spModel.m_pObject->Update(UpdateData1);
     NiTimeController* pTableAnimController = pRouletteTableGeometry->GetController(&NiControllerManager::ms_RTTI);
     if (pTableAnimController) {
@@ -1133,11 +1133,11 @@ NiCamera* RouletteMenu::Create3DCamera() {
         v10 = ::new (apMemory) NiCamera;
     }
     else {
-        v10 = 0;
+        v10 = nullptr;
     }
     ::new (&a2) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     v10->SetViewPort(a2);
-    NiFrustum kFrustum(0);
+    NiFrustum kFrustum(false);
     SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
     kFrustum.m_fFar = WorldSceneGraph->GetFarDistance();
     kFrustum.m_fNear = BSSceneGraph::fNearDistance.Float();
@@ -1157,13 +1157,13 @@ NiCamera* RouletteMenu::Create3DCamera() {
     kFrustum.m_fBottom = -v1 * aspectRatio * 0.75f;
     double v2 = std::tan(v16);
     kFrustum.m_fTop = v2 * aspectRatio * 0.75f;
-    kFrustum.m_bOrtho = 0;
+    kFrustum.m_bOrtho = false;
     v10->SetViewFrustum(kFrustum);
     NiPoint3* z = ::new (&dst) NiPoint3(0.0f, 0.0f, 1.0f);
     NiPoint3* v3 = ::new (&v12) NiPoint3(0.0f, 0.0f, 1.0f);
     v10->LookAtWorldPoint(*v3, *z);
     v10->SetMinNearPlaneDist(1.0f);
-    NiUpdateData arData(0.0f, 0, 0);
+    NiUpdateData arData(0.0f, false, false);
     v10->Update(arData);
     NiFixedString apString("Surgery3DCamera");
     NiFixedString* kName = &apString;
@@ -1205,14 +1205,14 @@ bool RouletteMenu::SetBet(int32_t aiIndex) {
     RouletteMenu::RouletteBet* newBet_2;
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (iNumBetsSet >= 10 || aiIndex >= 159 || aiIndex < 0 || !iCurrentBet) {
-        return 0;
+        return false;
     }
     for (RouletteMenu::RouletteBet*& rpItem : pBetList->ItemsUntilNull()) {
         if (rpItem->betIndex == aiIndex) {
-            return 0;
+            return false;
         }
     }
-    NiUpdateData update1(0.0f, 0, 0);
+    NiUpdateData update1(0.0f, false, false);
     float x = betTileInfoArray[aiIndex].location.x;
     float y = betTileInfoArray[aiIndex].location.y;
     float z = betTileInfoArray[aiIndex].location.z;
@@ -1224,7 +1224,7 @@ bool RouletteMenu::SetBet(int32_t aiIndex) {
         newBet_2 = newBet;
     }
     else {
-        newBet_2 = 0;
+        newBet_2 = nullptr;
     }
     RouletteMenu::RouletteBet* newBet_3 = newBet_2;
     newBet_2->betValue = iCurrentBet;
@@ -1242,7 +1242,7 @@ bool RouletteMenu::SetBet(int32_t aiIndex) {
     iTotalBet += iCurrentBet;
     BSAudio* v3 = &BSAudio::QInstance();
     BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "GAMERouletteIncreaseBet", 289u);
-    SoundHandleByName->Play(0);
+    SoundHandleByName->Play(false);
     if (iNextModelIndex >= 13) {
         iNextModelIndex = 3;
     }
@@ -1269,7 +1269,7 @@ bool RouletteMenu::SetBet(int32_t aiIndex) {
         RouletteMenu::pMe->pTiles[0]->Set(RouletteMenu::iUT_X, iCurrentBet);
         RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_INCREASEBET_CNTRL, 128.0f);
     }
-    return 1;
+    return true;
 }
 
 // The chip's translate is read through the model-index table from pRouletteTableGeometry: model aiIndex is
@@ -1542,7 +1542,7 @@ void RouletteMenu::SetupPossibleBets() {
             NiFixedString* v92 = &apString;
             ObjectByName = pRouletteGridGeometry->GetObjectByName(*v92);
         }
-        ObjectByName->SetAppCulled(1);
+        ObjectByName->SetAppCulled(true);
         const NiPoint3* Center = &ObjectByName->GetWorldBound().GetCenter();
         betTileInfoArray[j].location = *Center;
         BSstrcpy(betTileInfoArray[j].faceName, 8, blockName);
@@ -1793,7 +1793,7 @@ void RouletteMenu::SetupPossibleBets() {
     apSrc[36] = 23;
     apSrc[37] = 35;
     ourMemcpy(iNumberStrip, apSrc, sizeof(iNumberStrip));
-    bRunScriptOnExit = 0;
+    bRunScriptOnExit = false;
 }
 
 bool RouletteMenu::RemoveBet(int32_t aiIndex) {
@@ -1801,11 +1801,11 @@ bool RouletteMenu::RemoveBet(int32_t aiIndex) {
     NiUpdateData apMemory;
     BSSimpleList<RouletteMenu::RouletteBet*>* blist;
     if (aiIndex >= 159 || aiIndex < 0) {
-        return 0;
+        return false;
     }
     for (blist = pBetList;; blist = blist->m_pkNext) {
         if (!blist || !blist->m_item) {
-            return 0;
+            return false;
         }
         int32_t comp = blist->m_item->betIndex;
         if (comp == aiIndex) {
@@ -1837,8 +1837,8 @@ bool RouletteMenu::RemoveBet(int32_t aiIndex) {
     RouletteMenu::RouletteBet* delBet = blist->m_item;
     blist->RemoveHead();
     ourFree(delBet);
-    delBet = 0;
-    return 1;
+    delBet = nullptr;
+    return true;
 }
 
 // Geometry pointers are indexed from pRouletteTableGeometry by model index: model a1 is pBetGeometry[a1 - 3] and its
@@ -1859,23 +1859,23 @@ void RouletteMenu::SetWinningSlotLuckyAndAnimToPlay() {
     iResultValue = RandomInt(0, 38);
     int32_t v3 = iLuckValue - 5;
     if (v3 == 0) {
-        bUnlucky = 0;
-        bLucky = 0;
+        bUnlucky = false;
+        bLucky = false;
     }
     else if (v3 > 0) {
-        bUnlucky = 0;
-        bLucky = 1;
+        bUnlucky = false;
+        bLucky = true;
     }
     else if (v3 < 0) {
-        bUnlucky = 1;
-        bLucky = 0;
+        bUnlucky = true;
+        bLucky = false;
     }
 }
 
 void RouletteMenu::DrawScene() {
     NiCamera* v6;
     NiRenderer* Renderer_ = NiRenderer::GetRenderer();
-    Renderer_->ClearBuffer(0, 4u);
+    Renderer_->ClearBuffer(nullptr, 4u);
     SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
     BSCullingProcess* a1 = WorldSceneGraph->pCuller;
     a1->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
@@ -1894,9 +1894,9 @@ void RouletteMenu::DrawScene() {
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
     BSShaderUtil::AccumulateScene(v6, ShadowSceneNode_, *a1);
     BSShaderAccumulator* v3 = static_cast<BSShaderAccumulator*>(apMemory.m_pObject);
-    BSShaderUtil::RenderScene(v6, v3, 0);
-    a1->SetAccumulator(0);
-    apMemory.operator=(static_cast<NiRefObject*>(0));
+    BSShaderUtil::RenderScene(v6, v3, false);
+    a1->SetAccumulator(nullptr);
+    apMemory.operator=(static_cast<NiRefObject*>(nullptr));
     a1->PopCullMode();
 }
 
@@ -1906,7 +1906,7 @@ void RouletteMenu::Close() {
     if (RouletteMenu::pMe) {
         singleton = InterfaceManager::Instance();
         processLevel = singleton->GetCursorTile();
-        processLevel->Set(4009, 255.0f, (bool)1);
+        processLevel->Set(4009, 255.0f, true);
         RouletteMenu::pMe->eRouletteState = RO_CLOSING_MENU;
     }
 }
@@ -2057,7 +2057,7 @@ Tile* RouletteMenu::Create(
     }
     RouletteMenu::pMe->pTiles[0]->Set(iUT_Value, sCurrentBetText.String(), true);
     RouletteMenu::pMe->pTiles[0]->Poke(iUT_X, 1.0f);
-    RouletteMenu::pMe->pTiles[0]->Set(iUT_X, static_cast<int32_t>(RouletteMenu::pMe->iCurrentBet));
+    RouletteMenu::pMe->pTiles[0]->Set(iUT_X, RouletteMenu::pMe->iCurrentBet);
     RouletteMenu::pMe->pTiles[10]->Set(iUT_Value, sTotalBetText.String(), true);
     RouletteMenu::pMe->pTiles[10]->Poke(iUT_X, 1.0f);
     RouletteMenu::pMe->pTiles[10]->Set(iUT_X, 0);

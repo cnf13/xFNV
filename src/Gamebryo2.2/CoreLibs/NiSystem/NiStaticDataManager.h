@@ -7,8 +7,8 @@ class NiInitOptions;
 // Runs the registered libraries' static data init and shutdown functions. Only some of its members are declared.
 class NiStaticDataManager {
 public:
-    typedef void (*InitFunction)();
-    typedef void (*ShutdownFunction)();
+    using InitFunction = void (*)();
+    using ShutdownFunction = void (*)();
     // The tables hold 16 entries.
     using InitFunctionArray = InitFunction[16];
     using ShutdownFunctionArray = ShutdownFunction[16];

@@ -88,9 +88,9 @@ bool BSTCommonScrapHeapMessageQueue::DoTryPush(const void* aMessage) {
         ppTail = &pHead;
     }
     *ppTail = pElem;
-    pElem->pNext = 0;
+    pElem->pNext = nullptr;
     ppTail = &pElem->pNext;
-    return 1;
+    return true;
 }
 
 bool BSTCommonScrapHeapMessageQueue::DoTryPop(void* aMessage) {

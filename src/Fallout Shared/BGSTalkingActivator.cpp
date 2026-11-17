@@ -186,14 +186,14 @@ void BGSTalkingActivator::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 
 void BGSTalkingActivator::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_TALKING_ACTIVATOR_SPEAKER)) {
-        pTempRef = 0;
+        pTempRef = nullptr;
     }
 }
 
 void BGSTalkingActivator::InitItem() {
     if (!GetInitialized()) {
         TESObjectACTI::InitItem();
-        pTempRef = 0;
+        pTempRef = nullptr;
         uint32_t itempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pVoiceType));
         if (itempint) {
             TESFile* File = GetFile(-1);
@@ -208,7 +208,7 @@ void BGSTalkingActivator::InitItem() {
                 );
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -246,8 +246,8 @@ bool BGSTalkingActivator::Activate(
         if (pextratalk) {
             if (pextratalk->pTalkObject) {
                 const char* v6 = sObjectInUse.String();
-                Interface::ShowMessage(v6, 0, 0, 0, 2.0f, 0);
-                return 0;
+                Interface::ShowMessage(v6, 0, nullptr, nullptr, 2.0f, false);
+                return false;
             }
         }
     }
@@ -267,11 +267,13 @@ bool BGSTalkingActivator::Activate(
     }
     if (pactor) {
         if (apActionRef == pPlayer) {
-            pVATS.QuitVATSPlayback(0, 0);
-            Interface::QueueMenuCreate(Interface::OPEN_DIALOG, pactor, 0, pTempRef, Interface::CMM_STANDARD, 0);
+            pVATS.QuitVATSPlayback(false, false);
+            Interface::QueueMenuCreate(
+                Interface::OPEN_DIALOG, pactor, nullptr, pTempRef, Interface::CMM_STANDARD, false
+            );
         }
         else {
-            DialoguePackage* pdia = 0;
+            DialoguePackage* pdia = nullptr;
             if (pactor->GetCurrentPackage()) {
                 DialoguePackage* pdia_2 = static_cast<DialoguePackage*>(pactor->GetCurrentPackage());
                 if (pdia_2->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE) {
@@ -279,16 +281,15 @@ bool BGSTalkingActivator::Activate(
                 }
             }
             if (pdia && pdia->GetActorStartedConversation() == pactionact) {
-                return 1;
+                return true;
             }
             pactor->InitiateDialogue(
-                pactionact, static_cast<PackageLocation*>(0), static_cast<PackageLocation*>(0), static_cast<bool>(1),
-                static_cast<bool>(0), static_cast<bool>(0), static_cast<TESTopic*>(0), static_cast<bool>(0),
-                static_cast<bool>(0)
+                pactionact, static_cast<PackageLocation*>(nullptr), static_cast<PackageLocation*>(nullptr), true, false,
+                false, static_cast<TESTopic*>(nullptr), false, false
             );
         }
     }
-    return 1;
+    return true;
 }
 
 bool BGSTalkingActivator::IsRadioStation() {
@@ -308,7 +309,7 @@ BGSVoiceType* BGSTalkingActivator::GetVoiceType() {
 }
 
 MobileObject* BGSTalkingActivator::AddMobileObjectExtra(TESObjectREFR* apRef) {
-    MobileObject* pobject = 0;
+    MobileObject* pobject = nullptr;
     (&apRef->m_Extra)->SetTalkingActorExtra(this, apRef);
     apRef->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
     if ((&apRef->m_Extra)->GetTalkingActorExtra()) {

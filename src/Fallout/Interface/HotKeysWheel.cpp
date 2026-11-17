@@ -64,9 +64,9 @@ void HotKeysWheel::Initialize(Tile* apWheel) {
         }
         iUT_HighlightedHotkey = Tile::AddUserTrait("_SelectedHotkey", -1);
         iUT_HighlightedText = Tile::AddUserTrait("_SelectedText", -1);
-        bSelectingHotkey = 0;
+        bSelectingHotkey = false;
         pWheel->Set(iUT_HighlightedHotkey, -1);
-        pWheel->Set(iUT_HighlightedText, "", static_cast<bool>(1));
+        pWheel->Set(iUT_HighlightedText, "", true);
     }
     else {
         Warning("HotKeyWheel: Hot key wheel being initialized with a NULL parent tile.  This...should not...be!");
@@ -102,7 +102,7 @@ void HotKeysWheel::UpdateHotkeyList() {
                     strtemp.operator+=(EquipTypeIconFilename);
                     char* v7 = strtemp.pString;
                     int32_t v3 = Tile::TextToTrait("_HotKeyIcon");
-                    pHotkeyTilesA[ihotkeyCt]->Set(v3, v7, 1);
+                    pHotkeyTilesA[ihotkeyCt]->Set(v3, v7, true);
                     int32_t v4 = Tile::TextToTrait("_HotKeyAssigned");
                     pHotkeyTilesA[ihotkeyCt]->Set(v4, 1);
                     if (pcurrHotkeyedItem_2->iNumber <= 1) {
@@ -113,12 +113,12 @@ void HotKeysWheel::UpdateHotkeyList() {
                         uint32_t FormHealth_0 = pcurrHotkeyedItem_2->iNumber;
                         strtemp.SPrintF("%s (%d)", pcurrHotkeyedItem_2->GetFullName(), FormHealth_0);
                     }
-                    pHotkeyTilesA[ihotkeyCt]->Set(4036, strtemp.pString, 1);
+                    pHotkeyTilesA[ihotkeyCt]->Set(4036, strtemp.pString, true);
                 }
                 else {
                     int32_t v6 = Tile::TextToTrait("_HotKeyAssigned");
                     pHotkeyTilesA[ihotkeyCt]->Set(v6, 0);
-                    pHotkeyTilesA[ihotkeyCt]->Set(4036, "", 1);
+                    pHotkeyTilesA[ihotkeyCt]->Set(4036, "", true);
                 }
             }
         }
@@ -141,10 +141,10 @@ int32_t HotKeysWheel::MoveHighlight(int32_t aiNewIndex) {
     }
     if (InterfaceManager::Has360Controller()) {
         if (aiNewIndex < 0) {
-            int32_t v9 = InterfaceManager::CheckMenuButton(Interface::eButtonDPadDown, 0);
-            int32_t v11 = InterfaceManager::CheckMenuButton(Interface::eButtonDPadUp, 0);
-            int32_t v8 = InterfaceManager::CheckMenuButton(Interface::eButtonDPadLeft, 0);
-            int32_t v10 = InterfaceManager::CheckMenuButton(Interface::eButtonDPadRight, 0);
+            int32_t v9 = InterfaceManager::CheckMenuButton(Interface::eButtonDPadDown, false);
+            int32_t v11 = InterfaceManager::CheckMenuButton(Interface::eButtonDPadUp, false);
+            int32_t v8 = InterfaceManager::CheckMenuButton(Interface::eButtonDPadLeft, false);
+            int32_t v10 = InterfaceManager::CheckMenuButton(Interface::eButtonDPadRight, false);
             bool v6 = v9 == 2 || !v9;
             bool v5 = v11 == 2 || !v11;
             bool v4 = v8 == 2 || !v8;
@@ -214,13 +214,13 @@ void HotKeysWheel::UseHotkeyItem() {
         pitem = pinventory->GetHotKeyItem(iLastHighlightedHotkey);
     }
     else {
-        pitem = 0;
+        pitem = nullptr;
     }
     if (pitem && pitem->pExtraObjectList) {
         pextra = pitem->pExtraObjectList->m_item;
     }
     else {
-        pextra = 0;
+        pextra = nullptr;
     }
     bool v9 = pitem &&
         (pitem->pContainerObj->GetFormType() == WEAP_ID &&
@@ -236,10 +236,10 @@ void HotKeysWheel::UseHotkeyItem() {
                         (v2 = pPlayer->GetActorValue(ActorValue::HEALTH),
                          v2 == pPlayer->GetPermanentActorValue(ActorValue::HEALTH))) {
                         const char* v3 = sFullHealth.operator const char*();
-                        Interface::ShowMessage(v3, 0, 0, 0, 2.0f, 0);
+                        Interface::ShowMessage(v3, 0, nullptr, nullptr, 2.0f, false);
                     }
                     else {
-                        if (pitem->GetWorn(0)) {
+                        if (pitem->GetWorn(false)) {
                             uint32_t aiCount;
                             if (v9) {
                                 aiCount = pitem->iNumber;
@@ -248,7 +248,7 @@ void HotKeysWheel::UseHotkeyItem() {
                                 aiCount = 1;
                             }
                             TESBoundObject* v5 = pitem->pContainerObj;
-                            pPlayer->QueueUnEquipObject(v5, aiCount, pextra, 0, 0, 1);
+                            pPlayer->QueueUnEquipObject(v5, aiCount, pextra, false, false, true);
                         }
                         else {
                             uint32_t count;
@@ -259,11 +259,11 @@ void HotKeysWheel::UseHotkeyItem() {
                                 count = 1;
                             }
                             TESBoundObject* v4 = pitem->pContainerObj;
-                            pPlayer->QueueEquipObject(v4, count, pextra, 0, 0, 1);
+                            pPlayer->QueueEquipObject(v4, count, pextra, false, false, true);
                         }
                         pPlayer->UpdatePlayer3d();
                         BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
-                        CurrentAIProcess->SetShouldRefreshMagicShadersEffects(1, 0, 0);
+                        CurrentAIProcess->SetShouldRefreshMagicShadersEffects(true, false, false);
                         pPlayer->ResetArmorRating();
                         delete pitem;
                     }
@@ -284,7 +284,7 @@ void HotKeysWheel::SetHotkeyItem(ItemChange* apHotkeyItem) {
                     v5 = apHotkeyItem->pExtraObjectList->m_item;
                 }
                 else {
-                    v5 = 0;
+                    v5 = nullptr;
                 }
                 if (HotKeyItem) {
                     InventoryChanges_->RemoveHotKeyItem(HotKeyItem, iLastHighlightedHotkey);
@@ -308,13 +308,13 @@ void HotKeysWheel::SetHotkeyItem(ItemChange* apHotkeyItem) {
                     }
                     if (v7) {
                         const char* v3 = v7->GetModel();
-                        pModelLoader->LoadFile(v3, LOD_MULT_NONE, 1, 0, 0, 0);
+                        pModelLoader->LoadFile(v3, LOD_MULT_NONE, true, false, false, false);
                     }
                 }
                 UpdateHotkeyList();
                 TESBoundObject* FormFlags = apHotkeyItem->pContainerObj;
-                pPlayer->PlayPickUpSound(FormFlags, 1, 0);
-                bSelectingHotkey = 0;
+                pPlayer->PlayPickUpSound(FormFlags, true, false);
+                bSelectingHotkey = false;
                 if (HotKeyItem) {
                     delete HotKeyItem;
                 }
@@ -331,22 +331,22 @@ void HotKeysWheel::HighlightHotkey(int32_t a3) {
     const char* src;
     pWheel->Set(iUT_HighlightedHotkey, a3);
     if ((a3 < 0) || (a3 == 1)) {
-        pWheel->Set(iUT_HighlightedText, "", (bool)1);
+        pWheel->Set(iUT_HighlightedText, "", true);
     }
     else {
         src = pHotkeyTilesA[a3]->GetString(4036);
-        pWheel->Set(iUT_HighlightedText, src, (bool)1);
+        pWheel->Set(iUT_HighlightedText, src, true);
     }
     if (a3 >= 0) {
         iLastHighlightedHotkey = a3;
-        bSelectingHotkey = (bool)1;
+        bSelectingHotkey = true;
     }
 }
 
 bool HotKeysWheel::IsDPadPressed() {
     return (bool)((uint8_t)(Interface::Has360Controller() &&
-                            ((InterfaceManager::CheckMenuButton(Interface::eButtonDPadDown, 0) != ((-1))) ||
-                             ((InterfaceManager::CheckMenuButton(Interface::eButtonDPadUp, 0) != ((-1))) ||
-                              ((InterfaceManager::CheckMenuButton(Interface::eButtonDPadLeft, 0) != ((-1))) ||
-                               (InterfaceManager::CheckMenuButton(Interface::eButtonDPadRight, 0) != ((-1))))))));
+                            ((InterfaceManager::CheckMenuButton(Interface::eButtonDPadDown, false) != (-1)) ||
+                             ((InterfaceManager::CheckMenuButton(Interface::eButtonDPadUp, false) != (-1)) ||
+                              ((InterfaceManager::CheckMenuButton(Interface::eButtonDPadLeft, false) != (-1)) ||
+                               (InterfaceManager::CheckMenuButton(Interface::eButtonDPadRight, false) != (-1)))))));
 }

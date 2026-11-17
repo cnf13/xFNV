@@ -45,7 +45,7 @@ bool BGSDefaultObjectManager::Load(TESFile* apFile) {
 
 BGSDefaultObjectManager::BGSDefaultObjectManager() : TESForm() {
     cFormType = 100;
-    TESForm::SetFormID(49u, 1);
+    TESForm::SetFormID(49u, true);
     TESForm::SetFormEditorID("DefaultObjectManager");
     BGSDefaultObjectManager::InitializeData();
 }
@@ -84,7 +84,7 @@ void BGSDefaultObjectManager::InitItem() {
                 if (pObjectArray[i]) {
                     int32_t FormType = pObjectArray[i]->GetFormType();
                     if (FormType != kDefaultObjectData[i].eType) {
-                        pObjectArray[i] = 0;
+                        pObjectArray[i] = nullptr;
                     }
                 }
                 if (!pObjectArray[i]) {
@@ -94,7 +94,7 @@ void BGSDefaultObjectManager::InitItem() {
                 }
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -127,6 +127,6 @@ TESForm* BGSDefaultObjectManager::GetDefaultObject(DEFAULT_OBJECT aeObject) {
 void BGSDefaultObjectManager::ReleaseInstance() {
     if (BGSDefaultObjectManager::pSingleton) {
         delete BGSDefaultObjectManager::pSingleton;
-        BGSDefaultObjectManager::pSingleton = 0;
+        BGSDefaultObjectManager::pSingleton = nullptr;
     }
 }

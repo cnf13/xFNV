@@ -68,7 +68,7 @@ void CombatProcedureHideFromTarget::Update() {
             if (eState == CombatProcedureHideFromTarget::HIDE_STATE_HIDING) {
                 if (HidingTimer.Check()) {
                     if (bClearCoverWhenFinished) {
-                        pcombatState->ClearCoverLocation(0);
+                        pcombatState->ClearCoverLocation(false);
                     }
                     SetFinished();
                 }
@@ -81,7 +81,7 @@ void CombatProcedureHideFromTarget::Update() {
                             if (plocationTarget->cType == 1) {
                                 BGSWorldLocation* WorldLocation = pattacker__ptarget->GetWorldLocation(&apLocation);
                                 if (plocationTarget->WorldLoc.GetDistanceSquared(*WorldLocation) < 4096.0) {
-                                    bcheckHiding = 0;
+                                    bcheckHiding = false;
                                 }
                             }
                         }
@@ -97,14 +97,14 @@ void CombatProcedureHideFromTarget::Update() {
                                 (DistanceSquared = attackerWorldLoc.GetDistanceSquared(targetWorldLoc),
                                  (v4 = &fCombatHideFailedTargetDistance.Float(),
                                   *v4 * fCombatHideFailedTargetDistance.Float() > DistanceSquared))))))) {
-                            pCombatController->pCombatState->ClearCoverLocation(1);
+                            pCombatController->pCombatState->ClearCoverLocation(true);
                             pcombatState->cFleeState = 0;
                             SetFinished();
                         }
                         else {
                             double DecalMinWidth = pcombatState->GetLastDamagedByAttackerTimeStamp().fTimeStamp;
                             if (fhidingTime < DecalMinWidth) {
-                                pCombatController->pCombatState->ClearCoverLocation(1);
+                                pCombatController->pCombatState->ClearCoverLocation(true);
                                 pcombatState->cFleeState = 0;
                                 SetFinished();
                             }
@@ -119,14 +119,14 @@ void CombatProcedureHideFromTarget::Update() {
         bool bcoverValid = pcombatState->IsCoverLocationValid(pCoverLocation);
         if (bcoverValid) {
             double TargetFiringZOffset;
-            pCoverLocation->ReservationInfo.bHideCover = 1;
+            pCoverLocation->ReservationInfo.bHideCover = true;
             CombatUtilities::CalculateCoverPositions(pCombatController, pCoverLocation, &HidePosition, &LookAtPosition);
             if (ptarget) {
-                TargetFiringZOffset = CombatUtilities::GetTargetFiringZOffset(ptarget, ACTOR_SEGMENT_INVIEW_TOP, 0);
+                TargetFiringZOffset = CombatUtilities::GetTargetFiringZOffset(ptarget, ACTOR_SEGMENT_INVIEW_TOP, false);
             }
             else {
                 TargetFiringZOffset =
-                    CombatUtilities::GetTargetFiringZOffset(pattacker__ptarget, ACTOR_SEGMENT_INVIEW_TOP, 0);
+                    CombatUtilities::GetTargetFiringZOffset(pattacker__ptarget, ACTOR_SEGMENT_INVIEW_TOP, false);
             }
             LookAtPosition.z = TargetFiringZOffset + LookAtPosition.z;
         }
@@ -143,8 +143,8 @@ void CombatProcedureHideFromTarget::Update() {
             PathingRequest request;
             TESWorldSpace* WorldSpace = pattacker__ptarget->GetWorldSpace();
             TESObjectCELL* ParentCell = pattacker__ptarget->GetParentCell();
-            pattacker__ptarget->BuildRequest(&request, HidePosition, ParentCell, WorldSpace, 0.0f, 0);
-            float a2 = pattacker__ptarget->GetHeading(0);
+            pattacker__ptarget->BuildRequest(&request, HidePosition, ParentCell, WorldSpace, 0.0f, nullptr);
+            float a2 = pattacker__ptarget->GetHeading(false);
             request.SetInitialPathHeading(a2);
             if (pattacker__ptarget->SetPathfindingGoal(&request)) {
                 this->eState = CombatProcedureHideFromTarget::HIDE_STATE_MOVING_TO_COVER;

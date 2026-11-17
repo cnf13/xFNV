@@ -33,7 +33,7 @@ void BGSDebrisData::SetFileName(const char* apFileName) {
     if (pFileName) {
         ourFree(pFileName);
     }
-    pFileName = 0;
+    pFileName = nullptr;
     if (apFileName) {
         int32_t iFilenameLen = BSstrlen(apFileName) + 1;
         pFileName = static_cast<char*>(ourMalloc(iFilenameLen));
@@ -170,35 +170,35 @@ void BGSDebris::Copy(TESForm* apCopy) {
 bool BGSDebris::Compare(TESForm* apCompare) {
     BGSDebris* pcomp = dynamic_cast<BGSDebris*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     BSSimpleList<BGSDebrisData*>* pcompareList = pcomp->GetData();
     int32_t v3 = pcompareList->ItemsInList();
     if (v3 != DataList.ItemsInList()) {
-        return 1;
+        return true;
     }
     BSSimpleList<BGSDebrisData*>* plocalList = &DataList;
     while (pcompareList) {
         BGSDebrisData* pcompareData = pcompareList->m_item;
         BGSDebrisData* plocalData = plocalList->m_item;
         if ((!pcompareData && plocalData) || (pcompareData && !plocalData)) {
-            return 1;
+            return true;
         }
         if (pcompareData && plocalData) {
             if (pcompareData->cPercentage != plocalData->cPercentage) {
-                return 1;
+                return true;
             }
             if (BSstrcmp(pcompareData->pFileName, plocalData->pFileName)) {
-                return 1;
+                return true;
             }
             if (pcompareData->cFlags != plocalData->cFlags) {
-                return 1;
+                return true;
             }
         }
         plocalList = plocalList->m_pkNext;
         pcompareList = pcompareList->m_pkNext;
     }
-    return 0;
+    return false;
 }
 
 // Queues each debris model that has a file name, with its texture list.
@@ -216,17 +216,17 @@ void BGSDebris::QueueFiles(IO_TASK_PRIORITY aePriority, QueuedFile* apParent) {
 BGSDebrisData* BGSDebris::AddDebrisData(int8_t acPercentage, const char* apFileName, int8_t acFlags) {
     BGSDebrisData* pdata;
     if (!apFileName || !acPercentage) {
-        return 0;
+        return nullptr;
     }
     if (!BSstrlen(apFileName)) {
-        return 0;
+        return nullptr;
     }
     BGSDebrisData* apMemory = static_cast<BGSDebrisData*>(ourMalloc(sizeof(BGSDebrisData)));
     if (apMemory) {
         pdata = ::new (apMemory) BGSDebrisData;
     }
     else {
-        pdata = 0;
+        pdata = nullptr;
     }
     pdata->cPercentage = acPercentage;
     pdata->SetFileName(apFileName);
@@ -266,18 +266,18 @@ void BGSDebris::SpawnDebris(TESObjectCELL* apCell, const NiPoint3& arLocation, u
                                 if (v7) {
                                     pdebris = ::new (v7) BSTempEffectDebris(
                                         apCell, 90.0f, pdebrisData->pFileName, nullptr, arLocation, debrisVector,
-                                        velocity, velocity, afScale, 0, 0
+                                        velocity, velocity, afScale, false, false
                                     );
                                 }
                                 else {
-                                    pdebris = 0;
+                                    pdebris = nullptr;
                                 }
                                 BSTempEffectDebris* v9 = pdebris;
                             }
                             else {
                                 float v5 = afScale * 10.0;
                                 BSTempEffectParticle::Spawn(
-                                    apCell, 10.0f, pdebrisData->pFileName, debrisVector, arLocation, v5, 7u, 0
+                                    apCell, 10.0f, pdebrisData->pFileName, debrisVector, arLocation, v5, 7u, nullptr
                                 );
                             }
                             ++inumParticlesSpawned;
@@ -292,10 +292,10 @@ void BGSDebris::SpawnDebris(TESObjectCELL* apCell, const NiPoint3& arLocation, u
 bool BGSDebris::AddDebrisData(BGSDebrisData* apDebrisData) {
     if (!apDebrisData ||
         (!apDebrisData->cPercentage || (!apDebrisData->pFileName || !BSstrlen(apDebrisData->pFileName)))) {
-        return 0;
+        return false;
     }
     DataList.Insert(apDebrisData, &DebrisSortFunction);
-    return 1;
+    return true;
 }
 
 BGSPreloadable::BGSPreloadable() {}

@@ -45,7 +45,7 @@
 TESObjectACTI::TESObjectACTI() {
     cFormType = 21;
     TESObjectACTI::InitializeData();
-    SetInitialized(1);
+    SetInitialized(true);
 }
 
 TESObjectACTI::~TESObjectACTI() {}
@@ -295,10 +295,10 @@ void TESObjectACTI::InitItem() {
                 Warning(
                     "MASTERFILE: Could not find radio station (%08X) for activator '%s' (%08X).", itempint, v15, v20
                 );
-                pRadioStation = 0;
+                pRadioStation = nullptr;
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -327,31 +327,31 @@ bool TESObjectACTI::Compare(TESForm* apCompare) {
     FNVD_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
     TESObjectACTI* pComp = dynamic_cast<TESObjectACTI*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     TESSound* LoopingSound = GetLoopingSound();
     if (LoopingSound != pComp->GetLoopingSound()) {
-        return 1;
+        return true;
     }
     TESForm* FormTwo = pSoundActivate;
     if (FormTwo != pComp->pSoundActivate) {
-        return 1;
+        return true;
     }
     TESSound* RefCount = pRadioTemplate;
     if (RefCount != pComp->pRadioTemplate) {
-        return 1;
+        return true;
     }
     TESWaterForm* v6 = GetWaterType();
     if (v6 != pComp->GetWaterType()) {
-        return 1;
+        return true;
     }
     BGSTalkingActivator* RadioStation = pRadioStation;
     if (RadioStation != pComp->pRadioStation) {
-        return 1;
+        return true;
     }
     BSStringT<char>* arString = pComp->GetActivationString(&v11);
     BSStringT<char>* ActivationString = GetActivationString(&apString);
-    int32_t v13 = ActivationString->StrCmp(*arString, 1);
+    int32_t v13 = ActivationString->StrCmp(*arString, true);
     apString.~BSStringT<char>();
     v11.~BSStringT<char>();
     return v13 || CompareAllComponents(pComp);
@@ -365,8 +365,8 @@ bool TESObjectACTI::Activate(
     int32_t aicount
 ) {
     FNVD_INLINED_LOCAL(BSSoundHandle, sndHandle, std::nullopt, std::nullopt);
-    Actor* pActionActor = 0;
-    bool bstoreSoundLoopOnPlayer = 0;
+    Actor* pActionActor = nullptr;
+    bool bstoreSoundLoopOnPlayer = false;
     if (apActionRef) {
         if (apActionRef->IsActor()) {
             pActionActor = static_cast<Actor*>(apActionRef);
@@ -374,7 +374,7 @@ bool TESObjectACTI::Activate(
     }
     if (pActionActor) {
         TESIdleManager::SetUsedItem(this);
-        TESIdleManager::SetUsedItemActivate(1);
+        TESIdleManager::SetUsedItemActivate(true);
         double fEyeLevel = pActionActor->GetEyeLevel();
         double fWorldEyeLevel = pActionActor->GetLocationOnReference().z + fEyeLevel;
         float factz = fWorldEyeLevel - pActionActor->GetReach();
@@ -383,30 +383,32 @@ bool TESObjectACTI::Activate(
         ilevel = apItemActivated->IsNpc() || factz < static_cast<double>(fitemz);
         TESIdleManager::SetUsedItemLevel(ilevel);
         BaseProcess* CurrentAIProcess = pActionActor->pCurrentProcess;
-        bool banim = CurrentAIProcess->SetupSpecialIdle(pActionActor, 0, AnimIdle::PLAY_TYPE_AUTO_EXCLUSIVE, 1, 0, 1);
-        TESIdleManager::SetUsedItem(0);
-        TESIdleManager::SetUsedItemActivate(0);
+        bool banim = CurrentAIProcess->SetupSpecialIdle(
+            pActionActor, nullptr, AnimIdle::PLAY_TYPE_AUTO_EXCLUSIVE, true, false, true
+        );
+        TESIdleManager::SetUsedItem(nullptr);
+        TESIdleManager::SetUsedItemActivate(false);
         TESIdleManager::SetUsedItemLevel(-1);
         if (!banim && pWaterForm) {
-            return 0;
+            return false;
         }
         if (apActionRef == pPlayer && banim) {
             pCurrentWater = pWaterForm;
-            pPlayer->SetIsDrinkingPlacedWater(1);
-            bstoreSoundLoopOnPlayer = 1;
-            Animation* Animation_0 = pPlayer->GetAnimation(static_cast<bool>(1));
+            pPlayer->SetIsDrinkingPlacedWater(true);
+            bstoreSoundLoopOnPlayer = true;
+            Animation* Animation_0 = pPlayer->GetAnimation(true);
             Animation_0->ClearGroup(AGS_MOVEMENT, 0.0f);
-            Animation* v8 = pPlayer->GetAnimation(static_cast<bool>(0));
+            Animation* v8 = pPlayer->GetAnimation(false);
             v8->ClearGroup(AGS_MOVEMENT, 0.0f);
         }
-        if (!apItemActivated->IsAnOwner(pActionActor, 1)) {
+        if (!apItemActivated->IsAnOwner(pActionActor, true)) {
             TESForm* pOwnerFaction = apItemActivated->GetOwner();
             pActionActor->TrespassAlarm(apItemActivated, pOwnerFaction, -1);
         }
     }
     if (pSoundActivate) {
         const NiPoint3* WorldTranslate;
-        NiAVObject* psoundNode = 0;
+        NiAVObject* psoundNode = nullptr;
         if (apItemActivated) {
             if (apItemActivated->Get3D()) {
                 NiNode* v20 = apItemActivated->Get3D();
@@ -442,21 +444,21 @@ bool TESObjectACTI::Activate(
         sndHandle.SetPosition(x, y, z);
         NiNode* v14 = apItemActivated->Get3D();
         sndHandle.SetObjectToFollow(v14);
-        sndHandle.Play(0);
+        sndHandle.Play(false);
     }
     if (pWaterForm) {
         pWaterForm->Activate(apItemActivated, apActionRef, abIdFlag, apObjecttoGet, aicount);
     }
-    BGSOpenCloseForm::HandleActivate(apItemActivated, apActionRef, 0);
+    BGSOpenCloseForm::HandleActivate(apItemActivated, apActionRef, nullptr);
     if (pRadioStation) {
-        bool bturnOn = 0;
+        bool bturnOn = false;
         BGSOpenCloseForm::OPEN_STATE estate = BGSOpenCloseForm::GetOpenState(apItemActivated);
         if (estate == BGSOpenCloseForm::OBJECT_OPEN || estate == BGSOpenCloseForm::OBJECT_OPENING) {
-            bturnOn = 1;
+            bturnOn = true;
         }
         FalloutRadio::ActivateRadio(apItemActivated, bturnOn);
     }
-    return 1;
+    return true;
 }
 
 // Sets pRadioStation, the RNAM subrecord.

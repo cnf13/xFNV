@@ -108,7 +108,7 @@ void AbstractHeap::GetHeapStats(HeapStats* apStats, bool abFullBlockInfo) {
                 apStats->iMemUsedInBlocks += (pcur_2->iMemSize & 0xFFFFFFF) + kHeader;
             }
             if (pcur_2 == pBlockTail) {
-                pcur = 0;
+                pcur = nullptr;
             }
             else {
                 // The heap's memory is raw bytes walked as blocks: the next block starts right after this one's header
@@ -267,7 +267,7 @@ void* AbstractHeap::BaseAllocate(uint32_t aSize) {
                     BSsprintf(acBuffer, 0x100, "Committing Entire Free Block: %08X, %08X\r\n", pIter, uiCommitSize);
                     if (BSCoreMessage::pHandler) {
                         BSCoreMessage* pHandler = BSCoreMessage::pHandler;
-                        pHandler->Message(BSCoreMessage::MS_PROGFLOW, acBuffer, 0, 0, 0);
+                        pHandler->Message(BSCoreMessage::MS_PROGFLOW, acBuffer, nullptr, 0, 0);
                     }
                 }
                 FreeHeapBlock* pNewFree =
@@ -275,7 +275,7 @@ void* AbstractHeap::BaseAllocate(uint32_t aSize) {
                 uint32_t uiMemorySize = uiSize - (aSize + kHeader);
                 pNewFree->pPrevFree = nullptr;
                 pNewFree->pNextFree = nullptr;
-                pNewFree->Init(uiMemorySize, 0);
+                pNewFree->Init(uiMemorySize, nullptr);
                 pNewFree->pPrevious = pIter;
                 if (pIter == pBlockTail) {
                     pBlockTail = pNewFree;
@@ -304,7 +304,7 @@ void* AbstractHeap::BaseAllocate(uint32_t aSize) {
                 );
                 if (BSCoreMessage::pHandler) {
                     BSCoreMessage* pHandler = BSCoreMessage::pHandler;
-                    pHandler->Message(BSCoreMessage::MS_PROGFLOW, acBuffer, 0, 0, 0);
+                    pHandler->Message(BSCoreMessage::MS_PROGFLOW, acBuffer, nullptr, 0, 0);
                 }
             }
             pIter->iMemSize = (pIter->iMemSize & 0xF0000000) | aSize;
@@ -333,10 +333,10 @@ void* AbstractHeap::BaseAllocate(uint32_t aSize) {
                 );
                 if (BSCoreMessage::pHandler) {
                     BSCoreMessage* pHandler = BSCoreMessage::pHandler;
-                    pHandler->Message(BSCoreMessage::MS_PROGFLOW, acBuffer, 0, 0, 0);
+                    pHandler->Message(BSCoreMessage::MS_PROGFLOW, acBuffer, nullptr, 0, 0);
                 }
             }
-            pNewBlock->Init(aSize, 0);
+            pNewBlock->Init(aSize, nullptr);
             AddBlockToList(pNewBlock);
             iMemAllocated += uiBlockSize;
             if (iMemAllocated > iMemAllocatedHigh) {
@@ -502,8 +502,8 @@ void AbstractHeap::CleanEnd() {
         iMemAllocated -= (pcur->iMemSize & 0xFFFFFFF) + kHeader;
         --iNumBlocks;
         if (pBlockHead == pBlockTail) {
-            pBlockTail = 0;
-            pBlockHead = 0;
+            pBlockTail = nullptr;
+            pBlockHead = nullptr;
             break;
         }
         pBlockTail = pcur->pPrevious;
@@ -593,7 +593,7 @@ void AbstractHeap::DeleteHeap() {
         RemoveBlockFromFreeList(&LargeFreeList, LargeFreeList.pTail);
     }
     DoHeapFree(pMemHeap);
-    pMemHeap = 0;
+    pMemHeap = nullptr;
     MemHeapSize = 0;
 }
 
@@ -606,7 +606,7 @@ void AbstractHeap::OutputBlockFailure(uint32_t desired_size, FreeHeapBlockList* 
         uint32_t uiLargestFreeBlock = 0;
         int32_t uiTotalFreeSpace = 0;
         BSsprintf(apDest, 256, "AbstractHeap: Checking list for block size %u\n", desired_size);
-        BSCoreMessage::pHandler->Message(BSCoreMessage::MS_PROGFLOW, apDest, 0, 0, 0);
+        BSCoreMessage::pHandler->Message(BSCoreMessage::MS_PROGFLOW, apDest, nullptr, 0, 0);
         if (list) {
             // Walks the list as raw heap memory: each block's payload starts right after its header.
             for (HeapBlock* block = list->pHead; block;
@@ -630,6 +630,6 @@ void AbstractHeap::OutputBlockFailure(uint32_t desired_size, FreeHeapBlockList* 
             "global memory: %u\n",
             uiFreeBlocks, uiLargestFreeBlock, uiTotalFreeSpace, uiAvailPhys
         );
-        BSCoreMessage::pHandler->Message(BSCoreMessage::MS_PROGFLOW, apDest, 0, 0, 0);
+        BSCoreMessage::pHandler->Message(BSCoreMessage::MS_PROGFLOW, apDest, nullptr, 0, 0);
     }
 }

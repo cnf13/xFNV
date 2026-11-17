@@ -43,7 +43,7 @@ void BSShaderUtil::AccumulateScene(NiCamera* apCamera, NiAVObject* apScene, BSCu
                     v3->SetSorter(aCuller.spAccumulator.m_pObject);
                 }
                 BSShaderManager::SetAccumulator(static_cast<BSShaderAccumulator*>(aCuller.spAccumulator.m_pObject));
-                aCuller.Process(apCamera, apScene, 0);
+                aCuller.Process(apCamera, apScene, nullptr);
             }
         }
     }
@@ -327,8 +327,8 @@ void BSShaderUtil::KillSDM() {
         NiGlobalStringTable::ReleaseHandle(BSShaderUtil::pBGConvertedTextureName->GetHandle());
         MemoryManager_Singleton.Deallocate(v1);
     }
-    BSShaderUtil::pBGConvertedTextureName = 0;
-    BSShaderUtil::pConvertedTextureName = 0;
+    BSShaderUtil::pBGConvertedTextureName = nullptr;
+    BSShaderUtil::pConvertedTextureName = nullptr;
 }
 
 void BSShaderUtil::RenderScenePreResolveDepth(NiCamera* apCamera, BSShaderAccumulator* apAccumulator, bool abUseSPU) {

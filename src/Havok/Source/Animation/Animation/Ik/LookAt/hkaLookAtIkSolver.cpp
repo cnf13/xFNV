@@ -97,7 +97,7 @@ hkBool* hkaLookAtIkSolver::solve(
     hkQuaternion kLimitRotation;
     apResult->m_bool = 1;
     // Outside the cone: turn the limit axis by the half angle towards the target instead.
-    if (static_cast<float>(std::cos(fLimitAngle)) > fCosToLimitAxis) {
+    if (std::cos(fLimitAngle) > fCosToLimitAxis) {
         hkVector4& kLimitAxis = kRotation.m_vec;
         store(kLimitAxis, normalize3(cross(load(setup.m_limitAxisMS), load(kDirection))));
         kLimitRotation.setAxisAngle(kLimitAxis, fLimitAngle);
@@ -152,7 +152,7 @@ hkBool* hkaLookAtIkSolver::solve(
     const float fCos = _mm_cvtss_f32(dot3(load(kFwdMS), load(kDirection)));
     float fAngle;
     if (!(__builtin_fabsf(fCos) >= 1.0f)) {
-        fAngle = static_cast<float>(std::acos(fCos));
+        fAngle = std::acos(fCos);
     }
     else {
         fAngle = fCos > 0.0f ? 0.0f : 3.1415927f;

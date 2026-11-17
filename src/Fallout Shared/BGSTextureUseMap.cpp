@@ -30,9 +30,9 @@ void BGSTextureUseMap::CollectTexUseDataRecursive(NiAVObject* ap3D, bool abCheck
     if (ap3D && !ap3D->GetAppCulled()) {
         NiNode* pnode = ap3D->IsNode();
         if (pnode) {
-            bignore = 0;
-            bool bsetref = 0;
-            NiNode* pnode_2 = 0;
+            bignore = false;
+            bool bsetref = false;
+            NiNode* pnode_2 = nullptr;
             if (pnode->IsFadeNode()) {
                 pnode_2 = pnode;
             }
@@ -42,7 +42,7 @@ void BGSTextureUseMap::CollectTexUseDataRecursive(NiAVObject* ap3D, bool abCheck
                     BGSSceneInfo::pReferenceIgnoreMap->GetAt(pref, bignore);
                 }
                 if (pref && !bignore) {
-                    bool bisactor = 0;
+                    bool bisactor = false;
                     int32_t FormType = pref->GetObjectReference()->GetFormType();
                     if (FormType >= 42) {
                         bisactor = FormType <= 45;
@@ -50,7 +50,7 @@ void BGSTextureUseMap::CollectTexUseDataRecursive(NiAVObject* ap3D, bool abCheck
                     if ((bisactor && !abCheckActors) || pref->IsMarker()) {
                         return;
                     }
-                    bsetref = 1;
+                    bsetref = true;
                     pactiveref = pref;
                 }
             }
@@ -62,7 +62,7 @@ void BGSTextureUseMap::CollectTexUseDataRecursive(NiAVObject* ap3D, bool abCheck
                 }
             }
             if (bsetref) {
-                pactiveref = 0;
+                pactiveref = nullptr;
             }
             return;
         }
@@ -71,10 +71,10 @@ void BGSTextureUseMap::CollectTexUseDataRecursive(NiAVObject* ap3D, bool abCheck
             BSShaderProperty* pbssprop;
             NiShadeProperty* pprop = static_cast<NiShadeProperty*>(pgeom->GetProperty(3));
             if (pprop) {
-                pbssprop = pprop->iShaderPropertyType != -1 ? static_cast<BSShaderProperty*>(pprop) : 0;
+                pbssprop = pprop->iShaderPropertyType != -1 ? static_cast<BSShaderProperty*>(pprop) : nullptr;
             }
             else {
-                pbssprop = 0;
+                pbssprop = nullptr;
             }
             if (pbssprop) {
                 TESObjectREFR* pDefaultUser;
@@ -96,7 +96,7 @@ void BGSTextureUseMap::CollectTexUseDataRecursive(NiAVObject* ap3D, bool abCheck
 void BGSTextureUseMap::AddTexUse(NiTexture* apTex, uint32_t aulMemorySize, TESForm* apForm) {
     if (apTex) {
         if (apForm) {
-            TEX_USER_DATA* pdata = 0;
+            TEX_USER_DATA* pdata = nullptr;
             if (!UserMap.GetAt(apTex, pdata) || !pdata) {
                 TEX_USER_DATA* pdata_2;
                 TEX_USER_DATA* apMemory = static_cast<TEX_USER_DATA*>(ourMalloc(sizeof(TEX_USER_DATA)));
@@ -104,7 +104,7 @@ void BGSTextureUseMap::AddTexUse(NiTexture* apTex, uint32_t aulMemorySize, TESFo
                     pdata_2 = ::new (apMemory) TEX_USER_DATA;
                 }
                 else {
-                    pdata_2 = 0;
+                    pdata_2 = nullptr;
                 }
                 pdata = pdata_2;
                 UserMap.SetAt(apTex, pdata_2);
@@ -139,7 +139,7 @@ void BGSTextureUseMap::CollectSceneTexUseData(bool abCheckActors) {
         CollectTexUseData(v2, interior, abCheckActors);
     }
     else {
-        v10 = ((&uGridsToLoad)->UInt()) >> 1;
+        v10 = (&uGridsToLoad)->UInt() >> 1;
         v11 = v10 + 2;
         for (i = v10 - 2; i <= v11; ++i) {
             for (j = v10 - 2; j <= v11; ++j) {
@@ -159,8 +159,8 @@ uint32_t BGSTextureUseMap::GetTotalTextureSize() {
     uint32_t ulretsize = 0;
     iter = UserMap.GetFirstPos();
     while (iter) {
-        NiTexture* pignore = 0;
-        TEX_USER_DATA* pdata = 0;
+        NiTexture* pignore = nullptr;
+        TEX_USER_DATA* pdata = nullptr;
         UserMap.GetNext(iter, pignore, pdata);
         if (pdata) {
             ulretsize += pdata->ulTextureSize;
@@ -173,8 +173,8 @@ void BGSTextureUseMap::ClearAllTexUseData() {
     NiTMapItem<NiTexture*, TEX_USER_DATA*>* iter;
     iter = UserMap.GetFirstPos();
     while (iter) {
-        NiTexture* pignore = 0;
-        TEX_USER_DATA* pdata = 0;
+        NiTexture* pignore = nullptr;
+        TEX_USER_DATA* pdata = nullptr;
         UserMap.GetNext(iter, pignore, pdata);
         if (pdata) {
             delete pdata;
@@ -185,14 +185,14 @@ void BGSTextureUseMap::ClearAllTexUseData() {
 
 bool BGSTextureUseMap::WriteToFile(const char* apFilename) {
     NiTMapItem<NiTexture*, TEX_USER_DATA*>* iter;
-    bool bretval = 0;
-    BSFile mapfile(apFilename, NiFile::WRITE_ONLY, 1024u, 1);
-    if (mapfile.BSFile::Open(0, 0)) {
-        bretval = 1;
+    bool bretval = false;
+    BSFile mapfile(apFilename, NiFile::WRITE_ONLY, 1024u, true);
+    if (mapfile.BSFile::Open(false, false)) {
+        bretval = true;
         iter = UserMap.GetFirstPos();
         while (iter) {
-            NiTexture* pbasetex = 0;
-            TEX_USER_DATA* pdata = 0;
+            NiTexture* pbasetex = nullptr;
+            TEX_USER_DATA* pdata = nullptr;
             UserMap.GetNext(iter, pbasetex, pdata);
             NiSourceTexture* ptex =
                 static_cast<NiSourceTexture*>(NiObject::DynamicCastStatic(&NiSourceTexture::ms_RTTI, pbasetex));
@@ -203,7 +203,7 @@ bool BGSTextureUseMap::WriteToFile(const char* apFilename) {
                     uint32_t ulTextureSize = pdata->ulTextureSize;
                     const NiFixedString* v2 = &ptex->GetFilename();
                     outstring.SPrintF("%s\t%d bytes\t%i users\r\n", v2->GetHandleString(), ulTextureSize, v6);
-                    mapfile.BSFile::Write(outstring, 1);
+                    mapfile.BSFile::Write(outstring, true);
                     BSSimpleList<TESForm*>* plist = &pdata->UserList;
                     while (plist && !plist->IsEmpty()) {
                         TESForm* puser = plist->m_item;
@@ -211,10 +211,10 @@ bool BGSTextureUseMap::WriteToFile(const char* apFilename) {
                         int32_t CastingType = puser->iFormID;
                         const char* v5 = puser->GetFormEditorID();
                         outstring.SPrintF("%s\t%s\t%08X\r\n", puser->GetFormTypeString(), v5, CastingType);
-                        mapfile.BSFile::Write(outstring, 1);
+                        mapfile.BSFile::Write(outstring, true);
                     }
                     outstring.SPrintF("\r\n");
-                    mapfile.BSFile::Write(outstring, 1);
+                    mapfile.BSFile::Write(outstring, true);
                 }
             }
         }

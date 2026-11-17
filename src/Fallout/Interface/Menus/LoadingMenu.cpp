@@ -94,7 +94,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // Cleared once the player tiles have been laid out for a load screen.
 static bool bUpdatePlayerTilePositions = true;
@@ -117,9 +117,9 @@ SettingT<INISettingCollection> gs_fMainMenuBkgdUpdateInterval_Loading("fMainMenu
 SettingT<INISettingCollection> gs_fLoadingInitUpdateInterval_Loading("fLoadingInitUpdateInterval:Loading", 4.0f);
 SettingT<INISettingCollection> LoadingMenu::iNumLocationSpecificScreens("iNumLocationSpecificScreens:Loading", 1);
 
-LoadingMenuThread::LoadingMenuThread() : bFlagSuspend(0), bFlagSuspended(0), bExit(0) {
+LoadingMenuThread::LoadingMenuThread() : bFlagSuspend(false), bFlagSuspended(false), bExit(false) {
     SetName("LoadingMenu");
-    Initialize(BSThread::SMALL_STACK_SIZE, "LoadingMenu", 0);
+    Initialize(BSThread::SMALL_STACK_SIZE, "LoadingMenu", false);
     SetThreadProcessor(5u);
     SetThreadPriority(-1);
 }
@@ -140,10 +140,10 @@ uint32_t LoadingMenuThread::ThreadProc() {
         }
         else {
             MainThreadSema.Signal();
-            bFlagSuspended = 1;
+            bFlagSuspended = true;
             BackgroundThreadSema.Wait();
             SetThreadPriority(-1);
-            bFlagSuspended = 0;
+            bFlagSuspended = false;
         }
         LoadingMenu::pMe->Update();
         LoadingMenu::ShowChanges();
@@ -157,7 +157,7 @@ bool LoadingMenuThread::QIsSuspended() {
 
 void LoadingMenuThread::Unsuspend() {
     if (bFlagSuspended) {
-        bFlagSuspend = (bool)0;
+        bFlagSuspend = false;
         (&BackgroundThreadSema)->Signal();
     }
 }
@@ -168,8 +168,8 @@ bool LoadingMenuThread::GetByte49() {
 
 LoadingMenu::LoadingMenu()
   : pTiles{}, SaveBackgroundColor(0.0f, 0.0f, 0.0f, 0.0f), pNextLoadScreen(&LoadScreens), uiNextBackgroundSwap(0),
-    uiFadeInComplete(0), pLocation(0), pSlide1TSP(0), pSlide2TSP(0), uiCurrTextureIndex(0), usCurIndex(0), usFlags(0),
-    m_TileCrossFadeStartTime(0), m_SlideCount(0), m_DelayedTipMatteUpdate(0) {
+    uiFadeInComplete(0), pLocation(nullptr), pSlide1TSP(nullptr), pSlide2TSP(nullptr), uiCurrTextureIndex(0),
+    usCurIndex(0), usFlags(0), m_TileCrossFadeStartTime(0), m_SlideCount(0), m_DelayedTipMatteUpdate(0) {
     for (int32_t j = 0; j < 43; ++j) {
         eIDOrder[j] = MiscStatManager::MS_EQUIPMENT_DAMAGE_REPAIRED;
     }
@@ -192,7 +192,7 @@ LoadingMenu::~LoadingMenu() {
             BSTexturePalette::RemoveTexture(spHoldTexture[i].m_pObject);
         }
     }
-    Interface::bIsLoadingNewGame = 0;
+    Interface::bIsLoadingNewGame = false;
     NiRenderer::GetRenderer()->SetBackgroundColor(SaveBackgroundColor);
     if (StartMenu::MainMenuIsActive() || (LoadingMenu::bInitialLoad && *sStartingCell.String())) {
         if (BSAudio::QInstance().bAudioEnabled) {
@@ -200,27 +200,27 @@ LoadingMenu::~LoadingMenu() {
         }
     }
     if (FalloutAudio::GetNewGameMusic()) {
-        FalloutAudio::SetNewGameMusic(0);
-        FalloutAudio::SetMainMenuMusic(0);
+        FalloutAudio::SetNewGameMusic(false);
+        FalloutAudio::SetMainMenuMusic(false);
         FalloutAudioMedia::MediaFadeOut(4000, MEDIA_STANDBY);
     }
     if (GetFlag(LoadingMenu::LM_AUDIO_THREADING)) {
         if (BSAudio::QInstance().bMultiThread) {
-            BSAudio::QInstance().SetMultiThreaded(0);
+            BSAudio::QInstance().SetMultiThreaded(false);
         }
     }
     BSAudio::QInstance().UnMute(1000u);
-    LoadingMenu::bInitialLoad = 0;
+    LoadingMenu::bInitialLoad = false;
     FlushLoadScreenList();
     SlideSound.Stop();
     SlideSound.Release();
     InitialSlideSound.Release();
-    pLocation = 0;
-    LoadingMenu::pMe = 0;
+    pLocation = nullptr;
+    LoadingMenu::pMe = nullptr;
     if (pPlayer) {
         if (pPlayer->patch04DebugQuest) {
             pPlayer->patch04DebugQuest->SetEnabled(1);
-            pPlayer->patch04DebugQuest = 0;
+            pPlayer->patch04DebugQuest = nullptr;
         }
     }
 }
@@ -320,20 +320,20 @@ void LoadingMenu::Update() {
     float fTileAlpha;
     float fSlide02Alpha;
     float fSlide01Alpha;
-    LoadingMenu::bDoTileUpdate = 1;
+    LoadingMenu::bDoTileUpdate = true;
     if ((m_DelayedTipMatteUpdate & 1) != 0) {
         m_DelayedTipMatteUpdate &= ~1u;
         float v12 = pTiles[34]->GetFloat(4002) - 15.0;
-        pTiles[36]->Set(4002, v12, 1);
+        pTiles[36]->Set(4002, v12, true);
         float v11 = pTiles[34]->GetFloat(4016) + 30.0;
-        pTiles[36]->Set(4016, v11, 1);
+        pTiles[36]->Set(4016, v11, true);
     }
     if ((m_DelayedTipMatteUpdate & 2) != 0) {
         m_DelayedTipMatteUpdate &= ~2u;
         float v10 = pTiles[35]->GetFloat(4002) - 15.0;
-        pTiles[37]->Set(4002, v10, 1);
+        pTiles[37]->Set(4002, v10, true);
         float v9 = pTiles[35]->GetFloat(4016) + 30.0;
-        pTiles[37]->Set(4016, v9, 1);
+        pTiles[37]->Set(4016, v9, true);
     }
     uint32_t CurrTime = BSGetTickCount();
     if (!GetFlag(LoadingMenu::LM_FADE_IN)) {
@@ -360,7 +360,7 @@ void LoadingMenu::Update() {
         float fSlide02Alpha_2 = fSlide02Alpha;
         TESLoadScreen** v1 = &pNextLoadScreen->m_item;
         UpdatePlayerTileAlphas(*v1, fSlide02Alpha_2, 2);
-        LoadingMenu::bDoTileUpdate = 1;
+        LoadingMenu::bDoTileUpdate = true;
     }
     if (CurrTime - m_TileCrossFadeStartTime >= 3000) {
         if (uiNextBackgroundSwap) {
@@ -374,10 +374,10 @@ void LoadingMenu::Update() {
                         if (!LoadingMenu::bInitialLoad && pPlayCredits->fValue == 0.0 &&
                             !StartMenu::MainMenuIsActive() &&
                             (!GetFlag(LoadingMenu::LM_RESET_MENU) || pTiles[34]->IsTrue(4003))) {
-                            SetScreenInfo(0);
+                            SetScreenInfo(false);
                         }
                         AdvanceScreen();
-                        SetNextSlide(0);
+                        SetNextSlide(nullptr);
                         p3dtile->pAniManager->DeactivateSequence(p3dtile->pCurrentSequence, 0.0f);
                         NextSwap();
                         if (LoadingMenu::bInitialLoad && pNextLoadScreen == &LoadScreens) {
@@ -403,7 +403,7 @@ void LoadingMenu::Update() {
                                     SetFlag(LoadingMenu::LM_STATIC_MENU, LoadScreens.ItemsInList() == 1);
                                     SetFlag(LoadingMenu::LM_NEW_LOADSCREEN_LIST, 0);
                                 }
-                                NiUpdateData data(0.0f, 1, 0);
+                                NiUpdateData data(0.0f, true, false);
                                 p3dtile->GetModel()->Update(data);
                             }
                             else {
@@ -450,12 +450,12 @@ void LoadingMenu::Update() {
                     char cfilename_2[64];
                     ourMemset(cfilename_2, 0, 64u);
                     BSsprintf(cfilename_2, 64, "Data\\Music\\Special\\%s.mp3", gs_sTitleMusic_Loading.String());
-                    FalloutAudio::SetMainMenuMusic(1);
-                    FalloutAudioMedia::MediaOpen(MEDIA_MAINMENU, cfilename_2, 0, 1, 1, 0.0f, 0);
+                    FalloutAudio::SetMainMenuMusic(true);
+                    FalloutAudioMedia::MediaOpen(MEDIA_MAINMENU, cfilename_2, 0, true, true, 0.0f, 0);
                     FalloutAudioMedia::MediaMenuUnPause();
                     FalloutAudioMedia::fMediaAVolume = 0.6f;
                     FalloutAudioMedia::fMediaBVolume = 0.6f;
-                    bMainMenuMovieIntroStarted = 1;
+                    bMainMenuMovieIntroStarted = true;
                 }
             }
         }
@@ -463,26 +463,26 @@ void LoadingMenu::Update() {
             char cfilename[64];
             ourMemset(cfilename, 0, 64u);
             BSsprintf(cfilename, 64, "Data\\Music\\Special\\%s.mp3", gs_sTitleMusic_Loading.String());
-            FalloutAudio::SetMainMenuMusic(1);
-            FalloutAudioMedia::MediaOpen(MEDIA_MAINMENU, cfilename, 0, 1, 1, 0.0f, 0);
+            FalloutAudio::SetMainMenuMusic(true);
+            FalloutAudioMedia::MediaOpen(MEDIA_MAINMENU, cfilename, 0, true, true, 0.0f, 0);
             FalloutAudioMedia::MediaMenuUnPause();
             FalloutAudioMedia::fMediaAVolume = 0.6f;
             FalloutAudioMedia::fMediaBVolume = 0.6f;
-            pTiles[0]->GetModel()->SetAppCulled(1);
-            pTiles[32]->Set(4009, 0.0f, 1);
-            pTiles[33]->Set(4009, 255.0f, 1);
+            pTiles[0]->GetModel()->SetAppCulled(true);
+            pTiles[32]->Set(4009, 0.0f, true);
+            pTiles[33]->Set(4009, 255.0f, true);
             const char* v3 = BGSMoviePlayer::sMainMenuMovieIntro.String();
-            pMoviePlayer->StartSequence(v3, 0, -1, 0, 0, 0.0f);
-            bMainMenuMovieIntroStarted = 1;
+            pMoviePlayer->StartSequence(v3, false, -1, false, false, 0.0f);
+            bMainMenuMovieIntroStarted = true;
             pTiles[11]->Set(4003, 1);
-            LoadingMenu::bDoTileUpdate = 1;
+            LoadingMenu::bDoTileUpdate = true;
         }
     }
     if (pTiles[11]->IsVisible()) {
         ResetLoadingPinwheelAnimation();
     }
     BSAudio* v6 = &BSAudio::QInstance();
-    v6->Update(1);
+    v6->Update(true);
     FalloutAudioMedia::Update();
 }
 
@@ -624,9 +624,7 @@ bool LoadingMenu::OK2Add(TESLoadScreen* apLoadScreen) {
     bool bOK = apLoadScreen && apLoadScreen->GetFormType() == LSCR_ID;
     for (BSSimpleList<TESLoadScreen*>* pNode = &this->LoadScreens; bOK && pNode && pNode->GetItem();
          pNode = pNode->GetNext()) {
-        bOK =
-            BSstrcmp(static_cast<TESLoadScreen*>(apLoadScreen)->GetTextureName(), pNode->GetItem()->GetTextureName()) !=
-            0;
+        bOK = BSstrcmp(apLoadScreen->GetTextureName(), pNode->GetItem()->GetTextureName()) != 0;
     }
     return bOK;
 }
@@ -647,7 +645,7 @@ void LoadingMenu::FadeIn3D(NiAVObject* apObject, float afPct) {
     }
     NiNode* pNode = apObject->IsNode();
     // The compare is unsigned.
-    for (uint32_t i = 0; pNode && i < static_cast<uint32_t>(pNode->GetArrayCount()); ++i) {
+    for (uint32_t i = 0; pNode && i < pNode->GetArrayCount(); ++i) {
         this->FadeIn3D(pNode->GetAt(i), afPct);
     }
     if (apObject->IsGeometry()) {
@@ -843,10 +841,10 @@ void LoadingMenu::Reset(TESForm* apLocation) {
             }
         }
         if (appMain->GameReset()) {
-            ShowPlayerTiles(0);
+            ShowPlayerTiles(false);
         }
         else {
-            ShowPlayerTiles(1);
+            ShowPlayerTiles(true);
             PrepPlayerTiles();
         }
         pLocation = apLocation;
@@ -854,14 +852,14 @@ void LoadingMenu::Reset(TESForm* apLocation) {
         pLocation = apLocation;
         uiNextBackgroundSwap = BSGetTickCount();
         ++m_SlideCount;
-        SetScreenInfo(0);
+        SetScreenInfo(false);
         AdvanceScreen();
-        SetNextSlide(0);
+        SetNextSlide(nullptr);
         NextSwap();
         ++m_SlideCount;
-        SetScreenInfo(0);
+        SetScreenInfo(false);
         AdvanceScreen();
-        SetNextSlide(0);
+        SetNextSlide(nullptr);
         NextSwap();
         SetFlag(LoadingMenu::LM_RESET_MENU, 0);
         NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
@@ -872,10 +870,10 @@ void LoadingMenu::Reset(TESForm* apLocation) {
         }
         InterfaceManager* v5 = InterfaceManager::Instance();
         v5->pCursor->Set(4003, 0);
-        Tile::UpdateAll(1);
+        Tile::UpdateAll(true);
         NiDX9Renderer* v6 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
         v6->UnlockRenderer();
-        LoadingMenu::bDoTileUpdate = 1;
+        LoadingMenu::bDoTileUpdate = true;
         LoadingMenu::ResumeBackgroundThread();
     }
 }
@@ -889,7 +887,7 @@ void LoadingMenu::PrepPlayerTiles() {
     if (!pSaveLoadGame || !pSaveLoadGame->GetSaveGameLoading()) {
         LoadingMenu::FillDisplayData();
     }
-    pTiles[10]->Set(Tile::kTileValue_User0, LoadingMenu::DisplayData.fLevelProgress, 1);
+    pTiles[10]->Set(Tile::kTileValue_User0, LoadingMenu::DisplayData.fLevelProgress, true);
     // The signed level is passed to the unsigned overload, as the game does.
     pTiles[10]->Set(Tile::kTileValue_User1, static_cast<uint32_t>(LoadingMenu::DisplayData.iLevel));
     if (LoadingMenu::DisplayData.pCurrentObjective) {
@@ -898,11 +896,11 @@ void LoadingMenu::PrepPlayerTiles() {
     else {
         Src = sNone.String();
     }
-    pTiles[3]->Set(4036, Src, 1);
+    pTiles[3]->Set(4036, Src, true);
     const char* afValue = sCurrentObjective.String();
-    pTiles[14]->Set(4036, afValue, 1);
+    pTiles[14]->Set(4036, afValue, true);
     const char* v1 = sLevelProgress.String();
-    pTiles[15]->Set(4036, v1, 1);
+    pTiles[15]->Set(4036, v1, true);
 }
 
 void LoadingMenu::SetScreenInfo(bool abRefreshCurrent) {
@@ -915,18 +913,18 @@ void LoadingMenu::SetScreenInfo(bool abRefreshCurrent) {
     if (m_SlideCount % 2) {
         m_DelayedTipMatteUpdate |= 2;
         TESDescription* v5 = static_cast<TESDescription*>(pNextLoadScreen->m_item);
-        const char* v3 = v5->GetDescription(0, DESC_ID);
-        pTiles[35]->Set(4036, v3, 1);
+        const char* v3 = v5->GetDescription(nullptr, DESC_ID);
+        pTiles[35]->Set(4036, v3, true);
     }
     else {
         m_DelayedTipMatteUpdate |= 1;
         TESDescription* v6 = static_cast<TESDescription*>(pNextLoadScreen->m_item);
-        const char* v2 = v6->GetDescription(0, DESC_ID);
-        pTiles[34]->Set(4036, v2, 1);
+        const char* v2 = v6->GetDescription(nullptr, DESC_ID);
+        pTiles[34]->Set(4036, v2, true);
     }
     const char* v4 = sVDSGPlate.String();
-    pTiles[13]->Set(4036, v4, 1);
-    LoadingMenu::bDoTileUpdate = 1;
+    pTiles[13]->Set(4036, v4, true);
+    LoadingMenu::bDoTileUpdate = true;
 }
 
 void LoadingMenu::AdvanceScreen() {
@@ -980,8 +978,8 @@ void LoadingMenu::FadeIn(Tile* apTile, float afTime) {
                     afAlpha = 1.0 - afAlpha;
                 }
                 float v3 = afAlpha * 255.0;
-                apTile->Set(4009, v3, 1);
-                LoadingMenu::bDoTileUpdate = 1;
+                apTile->Set(4009, v3, true);
+                LoadingMenu::bDoTileUpdate = true;
                 for (NiTListItem<Tile*>* piter = apTile->xChildren.m_pkHead; piter;
                      FadeIn(apTile->xChildren.GetNext(piter), afAlpha)) {
                     ;
@@ -1050,18 +1048,18 @@ void LoadingMenu::CalcLoadScreenTypeTextWindowFaces(const LoadScreenType_Data* a
 }
 
 void LoadingMenu::InitStatsTilesSettings(LoadScreenType_Data* apData) {
-    pTiles[31]->Set(4001, static_cast<float>(iMinX), 1);
-    pTiles[31]->Set(4017, static_cast<float>(iMaxX - iMinX), 1);
-    pTiles[31]->Set(4002, static_cast<float>(iMinY), 1);
-    pTiles[31]->Set(4016, static_cast<float>(iMaxY - iMinY), 1);
+    pTiles[31]->Set(4001, static_cast<float>(iMinX), true);
+    pTiles[31]->Set(4017, static_cast<float>(iMaxX - iMinX), true);
+    pTiles[31]->Set(4002, static_cast<float>(iMinY), true);
+    pTiles[31]->Set(4016, static_cast<float>(iMaxY - iMinY), true);
     pTiles[17]->Set(4025, apData->DisplayData1.eDisplayFont);
-    pTiles[17]->Set(4018, apData->DisplayData1.TextColorR, 1);
-    pTiles[17]->Set(4019, apData->DisplayData1.TextColorG, 1);
-    pTiles[17]->Set(4020, apData->DisplayData1.TextColorB, 1);
+    pTiles[17]->Set(4018, apData->DisplayData1.TextColorR, true);
+    pTiles[17]->Set(4019, apData->DisplayData1.TextColorG, true);
+    pTiles[17]->Set(4020, apData->DisplayData1.TextColorB, true);
     pTiles[18]->Set(4025, apData->DisplayData2.eDisplayFont);
-    pTiles[17]->Set(4018, apData->DisplayData2.TextColorR, 1);
-    pTiles[17]->Set(4019, apData->DisplayData2.TextColorG, 1);
-    pTiles[17]->Set(4020, apData->DisplayData2.TextColorB, 1);
+    pTiles[17]->Set(4018, apData->DisplayData2.TextColorR, true);
+    pTiles[17]->Set(4019, apData->DisplayData2.TextColorG, true);
+    pTiles[17]->Set(4020, apData->DisplayData2.TextColorB, true);
     float fStatRowHeight = pTiles[31]->GetFloat(4016) / static_cast<double>(apData->uNumStatsToDisplay);
     float fYOffset = 0.0f;
     NiTListItem<Tile*>* pLabelIter = pTiles[17]->xChildren.m_pkTail;
@@ -1072,13 +1070,13 @@ void LoadingMenu::InitStatsTilesSettings(LoadScreenType_Data* apData) {
         Tile* pValChild = pTiles[18]->xChildren.GetPrev(pValIter);
         if (pLabelChild) {
             if (pValChild) {
-                bool bIsVisible = 1;
+                bool bIsVisible = true;
                 if (nRowCount > apData->uNumStatsToDisplay) {
-                    bIsVisible = 0;
+                    bIsVisible = false;
                 }
                 else {
-                    pLabelChild->Set(4002, fYOffset, 1);
-                    pValChild->Set(4002, fYOffset, 1);
+                    pLabelChild->Set(4002, fYOffset, true);
+                    pValChild->Set(4002, fYOffset, true);
                     fYOffset = fYOffset + fStatRowHeight;
                     pLabelChild->AddNeedsUpdate(8);
                     pValChild->AddNeedsUpdate(8);
@@ -1089,7 +1087,7 @@ void LoadingMenu::InitStatsTilesSettings(LoadScreenType_Data* apData) {
             }
         }
     }
-    pTiles[31]->Set(4090, apData->DisplayData1.fDisplayRotationRads, 1);
+    pTiles[31]->Set(4090, apData->DisplayData1.fDisplayRotationRads, true);
     pTiles[31]->RecursiveRotationUpdate();
 }
 
@@ -1118,16 +1116,16 @@ void LoadingMenu::InitObjectiveTilesSettings(LoadScreenType_Data* apData) {
                         break;
                     }
                 }
-                pTile->Set(4001, fX, 1);
-                pTile->Set(4017, static_cast<float>(iMaxX - iMinX), 1);
+                pTile->Set(4001, fX, true);
+                pTile->Set(4017, static_cast<float>(iMaxX - iMinX), true);
                 float afWrapwidtha = pTile->GetFloat(4017);
-                pTile->Set(4026, afWrapwidtha, 1);
-                pTile->Set(4002, static_cast<float>(iMinY), 1);
+                pTile->Set(4026, afWrapwidtha, true);
+                pTile->Set(4002, static_cast<float>(iMinY), true);
                 pTile->Set(4025, apData->DisplayData1.eDisplayFont);
                 pTile->Set(4023, apData->DisplayData1.uJustification);
-                pTile->Set(4018, apData->DisplayData1.TextColorR, 1);
-                pTile->Set(4019, apData->DisplayData1.TextColorG, 1);
-                pTile->Set(4020, apData->DisplayData1.TextColorB, 1);
+                pTile->Set(4018, apData->DisplayData1.TextColorR, true);
+                pTile->Set(4019, apData->DisplayData1.TextColorG, true);
+                pTile->Set(4020, apData->DisplayData1.TextColorB, true);
                 pTile->Set(4085, -1);
                 pTile->AddNeedsUpdate(8);
             }
@@ -1138,12 +1136,12 @@ void LoadingMenu::InitObjectiveTilesSettings(LoadScreenType_Data* apData) {
                     const char* v4 = sCurrentObjective.String();
                     FontManager* v3 = FontManager::Instance();
                     v3->CalculateStringDimensions(&nip3Dims, v4, eDisplayFont, fWrapWidth, 0);
-                    pTile->Set(4002, nip3Dims.y, 1);
+                    pTile->Set(4002, nip3Dims.y, true);
                 }
             }
         }
     }
-    pTiles[27]->Set(4090, apData->DisplayData1.fDisplayRotationRads, 1);
+    pTiles[27]->Set(4090, apData->DisplayData1.fDisplayRotationRads, true);
     pTiles[27]->RecursiveRotationUpdate();
 }
 
@@ -1156,16 +1154,16 @@ void LoadingMenu::InitXPProgressTilesSettings(LoadScreenType_Data* apData) {
         Tile* pTile = XPProgressTilesList.GetNext(piter);
         if (pTile) {
             if (pTile == pTiles[16]) {
-                pTile->Set(4001, static_cast<float>(iMinX), 1);
+                pTile->Set(4001, static_cast<float>(iMinX), true);
                 double iMaxX = static_cast<double>(this->iMaxX);
                 float v21 = iMaxX - pTile->GetFloat(4001);
-                pTile->Set(4017, v21, 1);
+                pTile->Set(4017, v21, true);
                 float afWrapwidtha = pTile->GetFloat(4017);
-                pTile->Set(4026, afWrapwidtha, 1);
-                pTile->Set(4002, static_cast<float>(iMinY), 1);
+                pTile->Set(4026, afWrapwidtha, true);
+                pTile->Set(4002, static_cast<float>(iMinY), true);
                 double iMaxY = static_cast<double>(this->iMaxY);
                 float v19 = iMaxY - pTile->GetFloat(4002);
-                pTile->Set(4016, v19, 1);
+                pTile->Set(4016, v19, true);
             }
             else {
                 if (pTile == pTiles[15]) {
@@ -1185,19 +1183,19 @@ void LoadingMenu::InitXPProgressTilesSettings(LoadScreenType_Data* apData) {
                             break;
                         }
                     }
-                    pTile->Set(4001, fX, 1);
+                    pTile->Set(4001, fX, true);
                     pTile->Set(4023, apData->DisplayData1.uJustification);
                     pTile->Set(4025, apData->DisplayData1.eDisplayFont);
-                    pTile->Set(4017, static_cast<float>(this->iMaxX - iMinX), 1);
+                    pTile->Set(4017, static_cast<float>(this->iMaxX - iMinX), true);
                     float afWrapwidthd = pTile->GetFloat(4017);
-                    pTile->Set(4026, afWrapwidthd, 1);
+                    pTile->Set(4026, afWrapwidthd, true);
                     float afWrapwidthe = pTile->GetFloat(4026);
                     int32_t eDisplayFont = apData->DisplayData1.eDisplayFont;
                     const char* v5 = sLevelProgress.String();
                     FontManager* Singleton = FontManager::Instance();
                     Singleton->CalculateStringDimensions(&nip3Dims, v5, eDisplayFont, afWrapwidthe, 0);
                     float fHeight = nip3Dims.y;
-                    pTile->Set(4016, nip3Dims.y, 1);
+                    pTile->Set(4016, nip3Dims.y, true);
                 }
                 else {
                     if (pTile == pTiles[10]) {
@@ -1209,7 +1207,7 @@ void LoadingMenu::InitXPProgressTilesSettings(LoadScreenType_Data* apData) {
                         int32_t v7 = apData->DisplayData1.eDisplayFont;
                         FontManager* v3 = FontManager::Instance();
                         float fCurrLevelWidth = v3->CalculateStringDimensions(&v25, apDest, v7, afWrapwidthf, 0)->x;
-                        pTile->Set(4001, fCurrLevelWidth, 1);
+                        pTile->Set(4001, fCurrLevelWidth, true);
                         // Converts to a 64-bit integer and passes its low 32 bits.
                         BSsprintf(apText, 260, "%i", static_cast<int32_t>(static_cast<int64_t>(pTile->GetFloat(4102))));
                         float v17 = (static_cast<double>(this->iMaxX - iMinX) - fCurrLevelWidth) / 2.0;
@@ -1218,18 +1216,18 @@ void LoadingMenu::InitXPProgressTilesSettings(LoadScreenType_Data* apData) {
                         float fNextLevelWidth = v4->CalculateStringDimensions(&v24, apText, v8, v17, 0)->x;
                         float v16 = static_cast<double>(this->iMaxX - iMinX) - (fCurrLevelWidth + fCurrLevelWidth) -
                             fNextLevelWidth;
-                        pTile->Set(4017, v16, 1);
+                        pTile->Set(4017, v16, true);
                     }
                 }
-                pTile->Set(4018, apData->DisplayData1.TextColorR, 1);
-                pTile->Set(4019, apData->DisplayData1.TextColorG, 1);
-                pTile->Set(4020, apData->DisplayData1.TextColorB, 1);
+                pTile->Set(4018, apData->DisplayData1.TextColorR, true);
+                pTile->Set(4019, apData->DisplayData1.TextColorG, true);
+                pTile->Set(4020, apData->DisplayData1.TextColorB, true);
                 pTile->Set(4085, -1);
                 pTile->AddNeedsUpdate(8);
             }
         }
     }
-    pTiles[16]->Set(4090, apData->DisplayData1.fDisplayRotationRads, 1);
+    pTiles[16]->Set(4090, apData->DisplayData1.fDisplayRotationRads, true);
     pTiles[16]->RecursiveRotationUpdate();
 }
 
@@ -1242,35 +1240,35 @@ void LoadingMenu::InitTipTilesSettings(LoadScreenType_Data* apData) {
             uint32_t uJustification = apData->DisplayData1.uJustification;
             if (uJustification == 1) {
                 float iMinX = static_cast<float>(this->iMinX);
-                pTile->Set(4001, iMinX, 1);
+                pTile->Set(4001, iMinX, true);
             }
             else {
                 if (uJustification == 2) {
                     float v23 = static_cast<double>(this->iMinX) + static_cast<double>(this->iMaxX - this->iMinX) / 2.0;
-                    pTile->Set(4001, v23, 1);
+                    pTile->Set(4001, v23, true);
                 }
                 else {
                     if (uJustification == 4) {
                         iMaxX = static_cast<float>(this->iMaxX);
                     }
-                    pTile->Set(4001, iMaxX, 1);
+                    pTile->Set(4001, iMaxX, true);
                 }
             }
-            pTile->Set(4017, static_cast<float>(this->iMaxX - this->iMinX), 1);
+            pTile->Set(4017, static_cast<float>(this->iMaxX - this->iMinX), true);
             float afValuea = pTile->GetFloat(4017);
-            pTile->Set(4026, afValuea, 1);
-            pTile->Set(4002, static_cast<float>(iMinY), 1);
+            pTile->Set(4026, afValuea, true);
+            pTile->Set(4002, static_cast<float>(iMinY), true);
             double iMaxY = static_cast<double>(this->iMaxY);
             float v13 = iMaxY - pTile->GetFloat(4002);
-            pTile->Set(4016, v13, 1);
+            pTile->Set(4016, v13, true);
             float afValuec = pTile->GetFloat(4016);
-            pTile->Set(4027, afValuec, 1);
-            pTile->Set(4090, apData->DisplayData1.fDisplayRotationRads, 1);
+            pTile->Set(4027, afValuec, true);
+            pTile->Set(4090, apData->DisplayData1.fDisplayRotationRads, true);
             pTile->Set(4025, apData->DisplayData1.eDisplayFont);
             pTile->Set(4023, apData->DisplayData1.uJustification);
-            pTile->Set(4018, apData->DisplayData1.TextColorR, 1);
-            pTile->Set(4019, apData->DisplayData1.TextColorG, 1);
-            pTile->Set(4020, apData->DisplayData1.TextColorB, 1);
+            pTile->Set(4018, apData->DisplayData1.TextColorR, true);
+            pTile->Set(4019, apData->DisplayData1.TextColorG, true);
+            pTile->Set(4020, apData->DisplayData1.TextColorB, true);
             pTile->Set(4085, -1);
             pTile->AddNeedsUpdate(8);
         }
@@ -1283,35 +1281,35 @@ void LoadingMenu::InitTipTilesSettings(LoadScreenType_Data* apData) {
             uint32_t v12 = apData->DisplayData1.uJustification;
             if (v12 == 1) {
                 float v18 = static_cast<float>(this->iMinX);
-                pTile_2->Set(4001, v18, 1);
+                pTile_2->Set(4001, v18, true);
             }
             else {
                 if (v12 == 2) {
                     float v19 = static_cast<double>(this->iMinX) + static_cast<double>(this->iMaxX - this->iMinX) / 2.0;
-                    pTile_2->Set(4001, v19, 1);
+                    pTile_2->Set(4001, v19, true);
                 }
                 else {
                     if (v12 == 4) {
                         v17 = static_cast<float>(this->iMaxX);
                     }
-                    pTile_2->Set(4001, v17, 1);
+                    pTile_2->Set(4001, v17, true);
                 }
             }
-            pTile_2->Set(4017, static_cast<float>(this->iMaxX - this->iMinX), 1);
+            pTile_2->Set(4017, static_cast<float>(this->iMaxX - this->iMinX), true);
             float afValuee = pTile_2->GetFloat(4017);
-            pTile_2->Set(4026, afValuee, 1);
-            pTile_2->Set(4002, static_cast<float>(iMinY), 1);
+            pTile_2->Set(4026, afValuee, true);
+            pTile_2->Set(4002, static_cast<float>(iMinY), true);
             double v11 = static_cast<double>(this->iMaxY);
             float v10 = v11 - pTile_2->GetFloat(4002);
-            pTile_2->Set(4016, v10, 1);
+            pTile_2->Set(4016, v10, true);
             float afValueg = pTile_2->GetFloat(4016);
-            pTile_2->Set(4027, afValueg, 1);
-            pTile_2->Set(4090, apData->DisplayData1.fDisplayRotationRads, 1);
+            pTile_2->Set(4027, afValueg, true);
+            pTile_2->Set(4090, apData->DisplayData1.fDisplayRotationRads, true);
             pTile_2->Set(4025, apData->DisplayData1.eDisplayFont);
             pTile_2->Set(4023, apData->DisplayData1.uJustification);
-            pTile_2->Set(4018, apData->DisplayData1.TextColorR, 1);
-            pTile_2->Set(4019, apData->DisplayData1.TextColorG, 1);
-            pTile_2->Set(4020, apData->DisplayData1.TextColorB, 1);
+            pTile_2->Set(4018, apData->DisplayData1.TextColorR, true);
+            pTile_2->Set(4019, apData->DisplayData1.TextColorG, true);
+            pTile_2->Set(4020, apData->DisplayData1.TextColorB, true);
             pTile_2->Set(4085, -1);
             pTile_2->AddNeedsUpdate(8);
         }
@@ -1319,7 +1317,7 @@ void LoadingMenu::InitTipTilesSettings(LoadScreenType_Data* apData) {
 }
 
 void LoadingMenu::BuildCandidateList(BSSimpleArray<TESLoadScreen*, 1024>& aListOut) {
-    aListOut.Clear(0);
+    aListOut.Clear(false);
     for (BSSimpleList<TESLoadScreen*>* pnode = pDataHandler->GetLoadScreenList(); pnode && pnode->m_item;
          pnode = pnode->m_pkNext) {
         TESLoadScreen** v2;
@@ -1361,7 +1359,7 @@ void LoadingMenu::AddCandidates(BSSimpleArray<TESLoadScreen*, 1024>& aCandidateL
         uiMaxScreens = LoadingMenu::iMaxScreens_MainMenu.UInt();
     }
     else if (this->pLocation && !TESLoadScreen::QUseLocationSpecificScreensOnly()) {
-        uiMaxScreens = BSMIN(uiMaxScreens, static_cast<uint32_t>(LoadingMenu::iNumLocationSpecificScreens.UInt()));
+        uiMaxScreens = BSMIN(uiMaxScreens, LoadingMenu::iNumLocationSpecificScreens.UInt());
     }
     uint32_t uiCount = static_cast<uint32_t>(this->LoadScreens.ItemsInList());
     while (uiCount < uiMaxScreens && aCandidateList.GetSize()) {
@@ -1436,10 +1434,10 @@ void LoadingMenu::UpdatePlayerTileVisibilities(TESLoadScreen* pLoadScreen, bool 
             }
             else {
             LABEL_13:;
-                UpdateObjectiveTilesVisibilities(0);
-                UpdateStatsTilesVisibilities(0);
-                UpdateTipTilesVisibilities(0);
-                UpdateXPProgressTilesVisibilities(0);
+                UpdateObjectiveTilesVisibilities(false);
+                UpdateStatsTilesVisibilities(false);
+                UpdateTipTilesVisibilities(false);
+                UpdateXPProgressTilesVisibilities(false);
             }
         }
     }
@@ -1586,10 +1584,10 @@ Tile* LoadingMenu::Create(TESForm* apLocation, bool abBackgroundUpdate, bool abS
     LoadingMenu::pMe->InitObjectiveTilesList();
     LoadingMenu::pMe->InitTipTilesList();
     LoadingMenu::pMe->InitXPProgressTilesList();
-    LoadingMenu::pMe->UpdateObjectiveTilesVisibilities(0);
-    LoadingMenu::pMe->UpdateTipTilesVisibilities(0);
-    LoadingMenu::pMe->UpdateStatsTilesVisibilities(0);
-    LoadingMenu::pMe->UpdateXPProgressTilesVisibilities(0);
+    LoadingMenu::pMe->UpdateObjectiveTilesVisibilities(false);
+    LoadingMenu::pMe->UpdateTipTilesVisibilities(false);
+    LoadingMenu::pMe->UpdateStatsTilesVisibilities(false);
+    LoadingMenu::pMe->UpdateXPProgressTilesVisibilities(false);
     LoadingMenu::pMe->_Create(apLocation);
     LoadingMenu::pMe->SetFlag(LM_ENABLE_LOADING_MENU_COMMAND, abScripted);
     if (!LoadingMenu::pLoadingThread) {
@@ -1613,7 +1611,7 @@ void LoadingMenu::ShowChanges() {
         if (TryEnter(&NiObjectNET::ExtraDataCrit.m_kCriticalSection, nullptr)) {
             if (!LoadingMenu::bDoTileUpdate || BSTexturePalette::TryLock()) {
                 if (LoadingMenu::bDoTileUpdate) {
-                    Tile::UpdateAll(1);
+                    Tile::UpdateAll(true);
                     BSTexturePalette::Unlock();
                 }
                 MTRenderingSystem::QInstance()->StartThreads();
@@ -1623,7 +1621,7 @@ void LoadingMenu::ShowChanges() {
                 }
                 LoadingMenu::bRendering = 1;
                 InterfaceManager* v4 = InterfaceManager::Instance();
-                v4->Click(0, 0);
+                v4->Click(nullptr, nullptr);
                 LoadingMenu::bRendering = 0;
                 MTRenderingSystem::QInstance()->WaitForThreads();
                 NiDX9Renderer* v5 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
@@ -1706,7 +1704,7 @@ bool LoadingMenu::QResetFlagged() {
 
 void LoadingMenu::SetWorldspaceAndChangedFlag(TESWorldSpace* apWorldSpace) {
     if (LoadingMenu::pMe && apWorldSpace && !LoadingMenu::pMe->pLocation) {
-        FlagReset(1);
+        FlagReset(true);
         LoadingMenu::pMe->Reset(apWorldSpace);
     }
 }
@@ -1723,7 +1721,7 @@ void LoadingMenu::SetupForMainMenu(bool abCreate) {
     }
     else {
         if (abCreate) {
-            LoadingMenu::Create(0, 0, 0);
+            LoadingMenu::Create(nullptr, false, false);
         }
     }
     if (LoadingMenu::pMe) {
@@ -1754,7 +1752,7 @@ void LoadingMenu::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
         pquest = LoadingMenu::DisplayData.pCurrentObjective->pOwnerQuest;
     }
     else {
-        pquest = 0;
+        pquest = nullptr;
     }
     if (LoadingMenu::DisplayData.pCurrentObjective) {
         FormHealth_0 = LoadingMenu::DisplayData.pCurrentObjective->iIndex;
@@ -1784,7 +1782,7 @@ void LoadingMenu::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
         Objective = pquest->GetObjective(iindex);
     }
     else {
-        Objective = 0;
+        Objective = nullptr;
     }
     LoadingMenu::DisplayData.pCurrentObjective = Objective;
     apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&LoadingMenu::DisplayData.fLevelProgress), 4u);
@@ -1792,14 +1790,14 @@ void LoadingMenu::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     if (LoadingMenu::DisplayData.iLevel >= iMaxCharacterLevel.UInt()) {
         LoadingMenu::DisplayData.fLevelProgress = 0.0f;
     }
-    buseLocationSpecificScreensOnly = 0;
+    buseLocationSpecificScreensOnly = false;
     apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&buseLocationSpecificScreensOnly), 1u);
     SetIsLocationSpecificLoadScreensOnly(buseLocationSpecificScreensOnly);
     if (LoadingMenu::pMe) {
         LoadingMenu::pMe->pTiles[11]->Set(4003, 1);
         LoadingMenu::pMe->SetFlag(LoadingMenu::LM_STATIC_MENU, 0);
     }
-    LoadingMenu::FlagReset(1);
+    LoadingMenu::FlagReset(true);
 }
 
 LoadingMenu::WelcomeScreenID operator++(LoadingMenu::WelcomeScreenID& aeID, int32_t) {

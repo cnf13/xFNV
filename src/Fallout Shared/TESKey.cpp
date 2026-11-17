@@ -5,7 +5,7 @@
 
 TESKey::TESKey() : TESObjectMISC() {
     SetFormType(46u);
-    SetInitialized(1);
+    SetInitialized(true);
 }
 
 TESKey::~TESKey() {}

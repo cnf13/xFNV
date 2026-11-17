@@ -159,7 +159,7 @@ TESObjectLAND::~TESObjectLAND() {
         for (int32_t i = 0; i < 4; ++i) {
             ourFree(TESObjectLAND::ppDefVertexBLOCK[i]);
         }
-        TESObjectLAND::bStaticsDefined = 0;
+        TESObjectLAND::bStaticsDefined = false;
         TESObjectLAND::spTexturingProperty = static_cast<NiTexturingProperty*>(nullptr);
         if (TESObjectLAND::pDefText) {
             delete TESObjectLAND::pDefText;
@@ -184,7 +184,7 @@ bool TESObjectLAND::Load(TESFile* pFile) {
     int8_t acNormals[3276] = {};
     uint8_t v48[3272] = {};
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LAND, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESLand.cpp", 706
+        MEM_CONTEXT_LAND, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESLand.cpp", 706
     );
     uint8_t formid = pFile->GetTESForm();
     if (formid == LAND_ID) {
@@ -192,14 +192,14 @@ bool TESObjectLAND::Load(TESFile* pFile) {
         LoadForm(pFile);
         int32_t ilasttexindex = -1;
         int32_t ilastblock = -1;
-        bool bloaddata = 0;
+        bool bloaddata = false;
         if ((pFile->GetActive() || TESObjectCELL::GetLoadingTempData()) && !GetLandRemapped()) {
-            bloaddata = 1;
+            bloaddata = true;
         }
         if (bloaddata) {
-            CreateLandscape(0);
+            CreateLandscape(nullptr);
         }
-        bool badjusttextures = 0;
+        bool badjusttextures = false;
         do {
             CHUNK_ID TESChunk = pFile->GetTESChunk();
             if (TESChunk > VHGT_ID) {
@@ -219,9 +219,9 @@ bool TESObjectLAND::Load(TESFile* pFile) {
                                 fBa, a6b
                             );
                             texdata_2.sIndex = 5;
-                            badjusttextures = 1;
+                            badjusttextures = true;
                         }
-                        TESLandTexture* ptex_2 = 0;
+                        TESLandTexture* ptex_2 = nullptr;
                         if (texdata_2.iTextureID) {
                             TESForm::AddCompileIndex(texdata_2.iTextureID, pFile);
                             TESForm* FormByNumericID = TESForm::GetFormByNumericID(texdata_2.iTextureID);
@@ -235,7 +235,7 @@ bool TESObjectLAND::Load(TESFile* pFile) {
                                     "block %i.",
                                     GetDataX(), fGb, fBb, a6c
                                 );
-                                badjusttextures = 1;
+                                badjusttextures = true;
                             }
                         }
                         else {
@@ -250,7 +250,7 @@ bool TESObjectLAND::Load(TESFile* pFile) {
                                     v25 = ::new (result_1) QueuedFile(IO_TASK_PRIORITY_VERY_LOW);
                                 }
                                 else {
-                                    v25 = 0;
+                                    v25 = nullptr;
                                 }
                                 spQueuedTextures.operator=(v25);
                             }
@@ -281,7 +281,7 @@ bool TESObjectLAND::Load(TESFile* pFile) {
                                         v26 = ::new (v33) QueuedFile(IO_TASK_PRIORITY_VERY_LOW);
                                     }
                                     else {
-                                        v26 = 0;
+                                        v26 = nullptr;
                                     }
                                     spQueuedTextures.operator=(v26);
                                 }
@@ -297,7 +297,7 @@ bool TESObjectLAND::Load(TESFile* pFile) {
                                     "MASTERFILE: Land (%i, %i) unable to find base texture ID (%08X) for block %i.",
                                     GetDataX(), fG, fB, a6
                                 );
-                                badjusttextures = 1;
+                                badjusttextures = true;
                             }
                         }
                     }
@@ -313,7 +313,7 @@ bool TESObjectLAND::Load(TESFile* pFile) {
                                         "%s.",
                                         GetDataX(), fBc, a6e
                                     );
-                                    badjusttextures = 1;
+                                    badjusttextures = true;
                                 }
                                 else {
                                     FILE_TEX_VERT_DATA* pvertdata =
@@ -333,7 +333,7 @@ bool TESObjectLAND::Load(TESFile* pFile) {
                                         );
                                     }
                                     ourFree(pvertdata);
-                                    pvertdata = 0;
+                                    pvertdata = nullptr;
                                 }
                             }
                             ilastblock = -1;
@@ -449,7 +449,7 @@ bool TESObjectLAND::Load(TESFile* pFile) {
                                 if (pFile->QEndian()) {
                                     Data.Endian();
                                 }
-                                MarkLoaded(0);
+                                MarkLoaded(false);
                                 UpdateUseParentWorldspace(bremapped);
                             }
                             else {
@@ -460,7 +460,7 @@ bool TESObjectLAND::Load(TESFile* pFile) {
                                     pFile->GetChunkData(pbuffer, ibuffersize);
                                     if (this->pLoadedData->pMoppCode) {
                                         this->pLoadedData->pMoppCode->removeReference();
-                                        this->pLoadedData->pMoppCode = 0;
+                                        this->pLoadedData->pMoppCode = nullptr;
                                     }
                                     ReadMoppCodeFromBuffer(
                                         pbuffer__pvertdata, ibuffersize, &this->pLoadedData->pMoppCode
@@ -482,10 +482,10 @@ bool TESObjectLAND::Load(TESFile* pFile) {
             AdjustTextureArrays();
         }
         MarkLoaded(bloaddata);
-        return 1;
+        return true;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -677,7 +677,7 @@ void TESObjectLAND::Save() {
 }
 
 bool TESObjectLAND::SavesBefore(TESForm* apForm) {
-    bool bretval = 0;
+    bool bretval = false;
     uint8_t FormType = apForm->GetFormType();
     if (TESObjectCELL::IsFormTypeCellChild(FormType)) {
         TESChildCell* pcellchild = dynamic_cast<TESChildCell*>(apForm);
@@ -697,7 +697,7 @@ bool TESObjectLAND::SavesBefore(TESForm* apForm) {
                     break;
                 }
                 case NAVM_ID: {
-                    bretval = 1;
+                    bretval = true;
                     break;
                 }
                 default: {
@@ -716,7 +716,7 @@ bool TESObjectLAND::SavesBefore(TESForm* apForm) {
 }
 
 bool TESObjectLAND::SavesBefore(FORM* apGroupFORM) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apGroupFORM) {
         if (apGroupFORM->form == formEnumString[2].uiFormString) {
             uint32_t iFormID = apGroupFORM->iFormID;
@@ -729,7 +729,7 @@ bool TESObjectLAND::SavesBefore(FORM* apGroupFORM) {
                 TESObjectCELL* pcell = dynamic_cast<TESObjectCELL*>(FormByNumericID);
                 if (pcell) {
                     if (pParentCell == pcell) {
-                        return 0;
+                        return false;
                     }
                 }
             }
@@ -739,7 +739,7 @@ bool TESObjectLAND::SavesBefore(FORM* apGroupFORM) {
 }
 
 TESForm* TESObjectLAND::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap<TESForm*, TESForm*>* apCopyMap) {
-    TESForm* duplicateForm = TESForm::CreateDuplicateForm(0, apCopyMap);
+    TESForm* duplicateForm = TESForm::CreateDuplicateForm(false, apCopyMap);
     return dynamic_cast<TESObjectLAND*>(duplicateForm);
 }
 
@@ -756,7 +756,7 @@ void TESObjectLAND::Copy(TESForm* apCopy) {
     if (pcopyland) {
         bool bcopyloaded = pcopyland->IsLoaded();
         if (!bcopyloaded) {
-            pcopyland->LoadVertices(0);
+            pcopyland->LoadVertices(false);
         }
         pParentCell = pcopyland->pParentCell;
         CreateLandscape(pcopyland);
@@ -782,18 +782,18 @@ void TESObjectLAND::Copy(TESForm* apCopy) {
         if (!bcopyloaded) {
             pcopyland->UnLoadVertices();
         }
-        MarkLoaded(1);
+        MarkLoaded(true);
     }
 }
 
 bool TESObjectLAND::BelongsInGroup(FORM* apGroupFORM, bool abAllowParentGroups, bool abCurrentOnly) {
-    bool bFalsr = 0;
+    bool bFalsr = false;
     if (apGroupFORM && apGroupFORM->form == formEnumString[2].uiFormString) {
         TESForm* pParentCell = GetParentCell();
         uint32_t iFormID = apGroupFORM->iFormID;
         if (iFormID == 6) {
             if (!abAllowParentGroups) {
-                return 0;
+                return false;
             }
         }
         else {
@@ -863,7 +863,7 @@ void TESObjectLAND::Attach3D() {
                     if (pLoadedData->ppMesh[iblock_2]) {
                         bool AppCulled = pLoadedData->ppMesh[iblock_2]->GetAppCulled();
                         pbculled[iblock_2] = AppCulled;
-                        pLoadedData->ppMesh[iblock_2]->SetAppCulled(1);
+                        pLoadedData->ppMesh[iblock_2]->SetAppCulled(true);
                         NiTexturingProperty* z = TESObjectLAND::spTexturingProperty.m_pObject;
                         pLoadedData->ppMesh[iblock_2]->AttachProperty(z);
                         NiTriStrips* ptrigeom = MakeLandTriStrips(iblock_2);
@@ -919,7 +919,7 @@ void TESObjectLAND::Attach3D() {
                             ShadowLightShader* pshade_2;
                             // Shader types 1 to 5 are the ShadowLightShader family; the type is read as signed.
                             if (pshade->GetShaderType() < 1 || pshade->GetShaderType() > 5) {
-                                pshade_2 = 0;
+                                pshade_2 = nullptr;
                             }
                             else {
                                 pshade_2 = static_cast<ShadowLightShader*>(pshade);
@@ -927,7 +927,7 @@ void TESObjectLAND::Attach3D() {
                             v13 = pshade_2;
                         }
                         else {
-                            v13 = 0;
+                            v13 = nullptr;
                         }
                         ShadowLightShader* pslshader = v13;
                         if (v13) {
@@ -939,7 +939,7 @@ void TESObjectLAND::Attach3D() {
                     }
                     if (pLoadedData->ppMesh[iblock_3]) {
                         pLoadedData->ppMesh[iblock_3]->SetAppCulled(pbculled[iblock_3]);
-                        NiUpdateData UpdateData(0.0f, 0, 0);
+                        NiUpdateData UpdateData(0.0f, false, false);
                         pLoadedData->ppMesh[iblock_3]->Update(UpdateData);
                         pLoadedData->ppMesh[iblock_3]->UpdateProperties();
                     }
@@ -947,15 +947,15 @@ void TESObjectLAND::Attach3D() {
             }
             if (pLoadedData->ppMesh) {
                 if (pParentCell) {
-                    bool bforce = 0;
+                    bool bforce = false;
                     bool bEmpty = GetLandRemapped() && !pParentCell->TESObjectCELL::HasReferences();
                     bforce = bEmpty;
                     for (int32_t iblock = 0; iblock < 4; ++iblock) {
                         if (bforce || pParentCell->TESObjectCELL::GetHideLand(static_cast<uint32_t>(iblock))) {
-                            pLoadedData->ppMesh[iblock]->SetAppCulled(1);
+                            pLoadedData->ppMesh[iblock]->SetAppCulled(true);
                         }
                         else {
-                            pLoadedData->ppMesh[iblock]->SetAppCulled(0);
+                            pLoadedData->ppMesh[iblock]->SetAppCulled(false);
                         }
                     }
                 }
@@ -966,29 +966,29 @@ void TESObjectLAND::Attach3D() {
 
 bool TESObjectLAND::LoadVertices(bool abLoad3D) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LAND, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESLand.cpp", 1109
+        MEM_CONTEXT_LAND, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESLand.cpp", 1109
     );
     if (Interface::GetLoadingMenuVisible()) {
-        abLoad3D = 0;
+        abLoad3D = false;
     }
     if (IsLoaded()) {
         if (!pLoadedData->ppMesh && abLoad3D) {
             Attach3D();
         }
     LABEL_15:;
-        return 1;
+        return true;
     }
     if (!GetLandRemapped() &&
         (((Data.iFlags & 1) == 0 && ((Data.iFlags & 2) == 0 && (Data.iFlags & 4) == 0)) || !GetFile(-1))) {
-        CreateLandscape(0);
+        CreateLandscape(nullptr);
         if (abLoad3D) {
             Attach3D();
         }
         goto LABEL_15;
     }
-    CreateLandscape(0);
+    CreateLandscape(nullptr);
     bool success = LoadVerticesIntoArrays();
-    MarkLoaded(1);
+    MarkLoaded(true);
     if (abLoad3D) {
         Attach3D();
     }
@@ -998,35 +998,35 @@ bool TESObjectLAND::LoadVertices(bool abLoad3D) {
 // Frees the loaded data's per-quadrant arrays and grass maps, then the data itself through its deleting destructor.
 bool TESObjectLAND::UnLoadVertices() {
     NiTMapItem<uint32_t, TESGrassAreaParam**>* pPos;
-    MarkLoaded(0);
+    MarkLoaded(false);
     Detach3D();
     if (pLoadedData) {
-        TESGrassAreaParam** pgrassParam = 0;
+        TESGrassAreaParam** pgrassParam = nullptr;
         for (int32_t i = 0; i < 4; ++i) {
             if (pLoadedData->ppPercentArrays[i]) {
                 ourFree(*pLoadedData->ppPercentArrays[i]);
                 ourFree(pLoadedData->ppPercentArrays[i]);
-                pLoadedData->ppPercentArrays[i] = 0;
+                pLoadedData->ppPercentArrays[i] = nullptr;
             }
             if (pLoadedData->pQuadTextureArray[i]) {
                 ourFree(pLoadedData->pQuadTextureArray[i]);
-                pLoadedData->pQuadTextureArray[i] = 0;
+                pLoadedData->pQuadTextureArray[i] = nullptr;
             }
             if (pLoadedData->ppVertices) {
                 ourFree(pLoadedData->ppVertices[i]);
-                pLoadedData->ppVertices[i] = 0;
+                pLoadedData->ppVertices[i] = nullptr;
             }
             if (pLoadedData->ppNormals) {
                 ourFree(pLoadedData->ppNormals[i]);
-                pLoadedData->ppNormals[i] = 0;
+                pLoadedData->ppNormals[i] = nullptr;
             }
             if (pLoadedData->ppColorsA) {
                 ourFree(pLoadedData->ppColorsA[i]);
-                pLoadedData->ppColorsA[i] = 0;
+                pLoadedData->ppColorsA[i] = nullptr;
             }
             if (pLoadedData->ppNormalsSet) {
                 ourFree(pLoadedData->ppNormalsSet[i]);
-                pLoadedData->ppNormalsSet[i] = 0;
+                pLoadedData->ppNormalsSet[i] = nullptr;
             }
             if (pLoadedData->pmGrassMap[i].m_kAllocator.m_uiCount) {
                 pPos = pLoadedData->pmGrassMap[i].GetFirstPos();
@@ -1036,7 +1036,7 @@ bool TESObjectLAND::UnLoadVertices() {
                     if (pgrassParam) {
                         for (int32_t k = 0; k < 16; ++k) {
                             if (pgrassParam[k]) {
-                                pgrassParam[k]->kGrassParam.pcGeomFilename = 0;
+                                pgrassParam[k]->kGrassParam.pcGeomFilename = nullptr;
                                 ourFree(pgrassParam[k]);
                             }
                         }
@@ -1052,15 +1052,15 @@ bool TESObjectLAND::UnLoadVertices() {
         ourFree(pLoadedData->ppNormals);
         if (pLoadedData->pMoppCode) {
             pLoadedData->pMoppCode->removeReference();
-            pLoadedData->pMoppCode = 0;
+            pLoadedData->pMoppCode = nullptr;
         }
     }
     TESObjectLAND::LoadedLandData* pData = pLoadedData;
     if (pData) {
         delete pData;
     }
-    pLoadedData = 0;
-    return 1;
+    pLoadedData = nullptr;
+    return true;
 }
 
 // Each block holds 17x17 = 289 vertices, 6 quad textures and 8 texture-percent floats per vertex.
@@ -1075,7 +1075,7 @@ int8_t TESObjectLAND::CreateLandscape(TESObjectLAND* apFrom) {
         v6 = ::new (apMemory) TESObjectLAND::LoadedLandData;
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     pLoadedData = v6;
     pLoadedData->iCellX = pParentCell->GetDataX();
@@ -1095,7 +1095,7 @@ int8_t TESObjectLAND::CreateLandscape(TESObjectLAND* apFrom) {
             v5 = static_cast<NiPoint3*>(ptr);
         }
         else {
-            v5 = 0;
+            v5 = nullptr;
         }
         pLoadedData->ppVertices[iblock] = v5;
         void* v9 = ourMalloc(289 * sizeof(NiColorA));
@@ -1104,7 +1104,7 @@ int8_t TESObjectLAND::CreateLandscape(TESObjectLAND* apFrom) {
             v4 = static_cast<NiColorA*>(v9);
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         pLoadedData->ppColorsA[iblock] = v4;
         void* v8 = ourMalloc(289 * sizeof(NiPoint3));
@@ -1113,7 +1113,7 @@ int8_t TESObjectLAND::CreateLandscape(TESObjectLAND* apFrom) {
             v3 = static_cast<NiPoint3*>(v8);
         }
         else {
-            v3 = 0;
+            v3 = nullptr;
         }
         pLoadedData->ppNormals[iblock] = v3;
         pLoadedData->ppNormalsSet[iblock] = static_cast<bool*>(ourMalloc(289 * sizeof(bool)));
@@ -1153,7 +1153,7 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
         if (pNode) {
             if (pLoadedData->spBorder.m_pObject) {
                 pNode->DetachChild(pLoadedData->spBorder.m_pObject);
-                pLoadedData->spBorder.operator=(static_cast<NiLines*>(0));
+                pLoadedData->spBorder.operator=(static_cast<NiLines*>(nullptr));
             }
             if (bShow) {
                 BSShaderNoLightingProperty* pshprop;
@@ -1167,7 +1167,7 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
                     lineverts = static_cast<NiPoint3*>(ptr);
                 }
                 else {
-                    lineverts = 0;
+                    lineverts = nullptr;
                 }
                 void* v31 = ourMalloc(128 * sizeof(NiColorA));
                 if (v31) {
@@ -1175,7 +1175,7 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
                     lineclr = static_cast<NiColorA*>(v31);
                 }
                 else {
-                    lineclr = 0;
+                    lineclr = nullptr;
                 }
                 uint8_t* lineflags = static_cast<uint8_t*>(ourMalloc(128u));
                 float y = GetWorldCellY();
@@ -1238,7 +1238,7 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
                         NiLines(128, lineverts, lineclr, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, lineflags);
                 }
                 else {
-                    pBorder = 0;
+                    pBorder = nullptr;
                 }
                 pLoadedData->spBorder.operator=(pBorder);
                 pLoadedData->spBorder.m_pObject->SetTranslate(worldshift);
@@ -1248,10 +1248,10 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
                     deftext = ::new (v24) NiTexturingProperty;
                 }
                 else {
-                    deftext = 0;
+                    deftext = nullptr;
                 }
-                deftext->SetBaseMap(0);
-                deftext->SetDecalMap(0, 0);
+                deftext->SetBaseMap(nullptr);
+                deftext->SetDecalMap(0, nullptr);
                 pLoadedData->spBorder.m_pObject->AttachProperty(deftext);
                 BSShaderNoLightingProperty* apMemory = static_cast<BSShaderNoLightingProperty*>(
                     NiMemObject::operator new(sizeof(BSShaderNoLightingProperty))
@@ -1260,7 +1260,7 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
                     pshprop = ::new (apMemory) BSShaderNoLightingProperty;
                 }
                 else {
-                    pshprop = 0;
+                    pshprop = nullptr;
                 }
                 pshprop->SetShader(33);
                 pLoadedData->spBorder.m_pObject->AttachProperty(pshprop);
@@ -1268,7 +1268,7 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
                 NiLines* ya = pLoadedData->spBorder.m_pObject;
                 pNode->AttachChild(ya, 1);
                 pLoadedData->spBorder.m_pObject->UpdateProperties();
-                NiUpdateData UpdateData(0.0f, 0, 0);
+                NiUpdateData UpdateData(0.0f, false, false);
                 pLoadedData->spBorder.m_pObject->Update(UpdateData);
             }
         }
@@ -1331,21 +1331,21 @@ bool TESObjectLAND::GetCoordData(COORD_DATA* cdata, const NiPoint3& coord, bool 
     float v28 = static_cast<double>(GetDataX()) * 4096.0;
     float v30 = static_cast<double>(GetDataY()) * 4096.0;
     if (!pLoadedData || (!pLoadedData->ppVertices && !pLoadedData->ppMesh)) {
-        return 0;
+        return false;
     }
     if (v28 > static_cast<double>(coord.x)) {
-        return 0;
+        return false;
     }
     float v11 = v28 + 4096.0;
     if (coord.x > static_cast<double>(v11)) {
-        return 0;
+        return false;
     }
     if (v30 > static_cast<double>(coord.y)) {
-        return 0;
+        return false;
     }
     float v10 = v30 + 4096.0;
     if (coord.y > static_cast<double>(v10)) {
-        return 0;
+        return false;
     }
     cdata->Cellpoint.x = coord.x - v28;
     cdata->Cellpoint.y = coord.y - v30;
@@ -1387,29 +1387,29 @@ bool TESObjectLAND::GetCoordData(COORD_DATA* cdata, const NiPoint3& coord, bool 
     cdata->Tilepoint.y = coord.y - v24;
     cdata->iShape = cdata->iBlock;
     if ((cdata->Tile.y + cdata->Tile.x) % 2) {
-        cdata->bTriright = 1;
+        cdata->bTriright = true;
         cdata->iTrivertidx[1] = 17 * cdata->Tile.y + cdata->Tile.x + 1;
         cdata->iTrivertidx[2] = cdata->Tile.x + 17 * (cdata->Tile.y + 1);
         if (!(cdata->Tilepoint.x + cdata->Tilepoint.y > 128.0)) {
             cdata->iTrivertidx[0u] = cdata->Tile.x + 17 * cdata->Tile.y;
-            cdata->bTriupper = 0;
+            cdata->bTriupper = false;
         }
         else {
             cdata->iTrivertidx[0u] = 17 * (cdata->Tile.y + 1) + cdata->Tile.x + 1;
-            cdata->bTriupper = 1;
+            cdata->bTriupper = true;
         }
     }
     else {
-        cdata->bTriright = 0;
+        cdata->bTriright = false;
         cdata->iTrivertidx[1] = cdata->Tile.x + 17 * cdata->Tile.y;
         cdata->iTrivertidx[2] = 17 * (cdata->Tile.y + 1) + cdata->Tile.x + 1;
         if (!(cdata->Tilepoint.y < static_cast<double>(cdata->Tilepoint.x))) {
             cdata->iTrivertidx[0u] = cdata->Tile.x + 17 * (cdata->Tile.y + 1);
-            cdata->bTriupper = 1;
+            cdata->bTriupper = true;
         }
         else {
             cdata->iTrivertidx[0u] = 17 * cdata->Tile.y + cdata->Tile.x + 1;
-            cdata->bTriupper = 0;
+            cdata->bTriupper = false;
         }
     }
     if (static_cast<int32_t>(coord.x) % 128 || static_cast<int32_t>(coord.y) % 128) {
@@ -1440,7 +1440,7 @@ bool TESObjectLAND::GetCoordData(COORD_DATA* cdata, const NiPoint3& coord, bool 
     }
     GetVertex(cdata->iBlock, cdata->iVertidx, arOut);
     cdata->Vertcoord = ecx0 + arOut;
-    return !forcetovertex || GetCoordData(cdata, cdata->Vertcoord, 0);
+    return !forcetovertex || GetCoordData(cdata, cdata->Vertcoord, false);
 }
 
 bool TESObjectLAND::GetLandHeight(const COORD_DATA& cdata, float& height) {
@@ -1481,7 +1481,7 @@ bool TESObjectLAND::GetLandHeight(const COORD_DATA& cdata, float& height) {
         }
         height = v3;
     }
-    return 1;
+    return true;
 }
 
 NiGeometry* TESObjectLAND::GetGeometry(const NiPoint3& arPoint) {
@@ -1499,7 +1499,7 @@ NiGeometry* TESObjectLAND::GetGeometry(const COORD_DATA& cdata) {
         return static_cast<NiGeometry*>(pLoadedData->ppMesh[cdata.iBlock]->GetAtChecked(0));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -1544,10 +1544,10 @@ bool TESObjectLAND::GetLandHeight(const NiPoint3& coord, float& height) {
 
 TESLandTexture* TESObjectLAND::GetMainTexture(const NiPoint3& aCoord) {
     COORD_DATA cdata;
-    TESLandTexture* v5 = 0;
+    TESLandTexture* v5 = nullptr;
     cdata.~COORD_DATA();
     ::new (&cdata) COORD_DATA;
-    if (GetCoordData(&cdata, aCoord, 1)) {
+    if (GetCoordData(&cdata, aCoord, true)) {
         return GetMainTexture(cdata.iBlock, cdata.iVertidx);
     }
     return v5;
@@ -1557,11 +1557,11 @@ bool TESObjectLAND::GetLandNormal(const NiPoint3& aCoord, NiPoint3& aNormal, NiP
     COORD_DATA coordData;
     coordData.~COORD_DATA();
     ::new (&coordData) COORD_DATA;
-    if (GetCoordData(&coordData, aCoord, 0)) {
+    if (GetCoordData(&coordData, aCoord, false)) {
         return (bool)((int8_t)GetLandNormal(coordData, aNormal, aFaceNormal));
     }
     else {
-        return (bool)0;
+        return false;
     }
 }
 
@@ -1578,7 +1578,7 @@ bool TESObjectLAND::GetLandNormal(const COORD_DATA& cdata, NiPoint3& aNormal, Ni
     NiPoint3 a4;
     NiPoint3 result;
     NiPoint3 v78;
-    result = GetVertexLocation(cdata.iBlock, cdata.iVertidx, 0, 0);
+    result = GetVertexLocation(cdata.iBlock, cdata.iVertidx, nullptr, nullptr);
     GetVertex(cdata.iBlock, cdata.iVertidx, a4);
     float v36 = GetWorldCellY() + 2048.0;
     float x = GetWorldCellX() + 2048.0;
@@ -1646,7 +1646,7 @@ bool TESObjectLAND::GetLandNormal(const COORD_DATA& cdata, NiPoint3& aNormal, Ni
             aFaceNormal = arOut.UnitCross(v68);
         }
     }
-    return 1;
+    return true;
 }
 
 bool TESObjectLAND::GetLandColor(const NiPoint3& aCoord, NiColorA& aColor) {
@@ -1665,8 +1665,8 @@ bool TESObjectLAND::GetLandColor(const NiPoint3& aCoord, NiColorA& aColor) {
     COORD_DATA cdata;
     cdata.~COORD_DATA();
     ::new (&cdata) COORD_DATA;
-    if (!GetCoordData(&cdata, aCoord, 0)) {
-        return 0;
+    if (!GetCoordData(&cdata, aCoord, false)) {
+        return false;
     }
     NiColorA c0(0.0f, 0.0f, 0.0f, 0.0f);
     NiColorA c1(0.0f, 0.0f, 0.0f, 0.0f);
@@ -1708,12 +1708,12 @@ bool TESObjectLAND::GetLandColor(const NiPoint3& aCoord, NiColorA& aColor) {
         NiColorA* v13 = NiColorA::Multiply(&v40, v26, &c2);
         aColor = (*v13 + *v19) * fpy + *Yc;
     }
-    return 1;
+    return true;
 }
 
 bool TESObjectLAND::GetLandColor(const COORD_DATA& cdata, NiColorA& color) {
     GetColorA(cdata.iBlock, cdata.iVertidx, color);
-    return 1;
+    return true;
 }
 
 void TESObjectLAND::InitDistantTextureBlending() {
@@ -1729,7 +1729,7 @@ void TESObjectLAND::InitDistantTextureBlending() {
         pterrainManager = TES::pInstance->pWorldSpace->GetTerrainManager();
     }
     else {
-        pterrainManager = 0;
+        pterrainManager = nullptr;
     }
     kcellcenter = NiPoint3_ZERO;
     kcellcenter.x = (static_cast<double>(pLoadedData->iCellX) + 0.5) * 4096.0;
@@ -1748,7 +1748,7 @@ void TESObjectLAND::InitDistantTextureBlending() {
                 else {
                     v13 = 0;
                 }
-                BSShaderPPLightingProperty* pshprop = v13 ? static_cast<BSShaderPPLightingProperty*>(pprop) : 0;
+                BSShaderPPLightingProperty* pshprop = v13 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
                 if (pshprop) {
                     if (!pshprop->GetDiffuseTextures(9) || !pshprop->GetNormalTexture(9u)) {
                         FNVD_INLINED_LOCAL(NiColorA, kbaseCoord, std::nullopt, std::nullopt);
@@ -2062,14 +2062,14 @@ void TESObjectLAND::RemoveTextureFromArrays(uint8_t acBlock, uint16_t asRemoveIn
 bool TESObjectLAND::VertexInRect(tagRECT* apRect, const NiPoint3& aPoint) {
     NiPoint3 dst;
     if (!apRect) {
-        return (bool)1;
+        return true;
     }
     float y = (float)(GetWorldCellY() + 2048.0);
     float x = (float)(GetWorldCellX() + 2048.0);
     ::new (&dst) NiColor(x, y, 0.0);
     &(&dst)->operator+=(aPoint);
     if ((dst.x > ((double)apRect->right)) || (dst.y > ((double)apRect->top))) {
-        return (bool)0;
+        return false;
     }
     return (bool)((uint8_t)((!(dst.x < ((double)apRect->left))) && (!(dst.y < ((double)apRect->bottom)))));
 }
@@ -2140,7 +2140,7 @@ void TESObjectLAND::GetColorA(int32_t iblock, int32_t index, NiColorA& color) {
                         NiTConvertingStrideIterator<NiColorA> apMemory;
                         NiAdditionalGeometryData* pkAGD = pgeodata->GetAdditionalGeometryData();
                         if (pkAGD) {
-                            if (pkAGD->GetVBReady() && pgeodata->LockPackedVertexData(1)) {
+                            if (pkAGD->GetVBReady() && pgeodata->LockPackedVertexData(true)) {
                                 pgeodata->GetColorsIterator(*static_cast<NiGeometryDataIteratorNiColorA*>(&apMemory));
                                 apMemory.Get(index, color);
                                 pgeodata->UnlockPackedVertexData();
@@ -2161,7 +2161,7 @@ void TESObjectLAND::GetColorA(int32_t iblock, int32_t index, NiColorA& color) {
 }
 
 NiTriStrips* TESObjectLAND::MakeLandTriStrips(uint8_t aiBlock) {
-    NiTriStrips* ptrigeom = 0;
+    NiTriStrips* ptrigeom = nullptr;
     if (aiBlock < 4u) {
         if (pLoadedData) {
             NiTriStrips* ptrigeom_2;
@@ -2174,7 +2174,7 @@ NiTriStrips* TESObjectLAND::MakeLandTriStrips(uint8_t aiBlock) {
                 ptextures_2 = ptextures;
             }
             else {
-                ptextures_2 = 0;
+                ptextures_2 = nullptr;
             }
             ourMemcpy(ptextures_2, TESObjectLAND::pDefTextureBLOCK, sizeof(NiPoint2) * 289);
             uint16_t* pstriplength = static_cast<uint16_t*>(_NiMalloc(sizeof(uint16_t)));
@@ -2187,7 +2187,7 @@ NiTriStrips* TESObjectLAND::MakeLandTriStrips(uint8_t aiBlock) {
                 pnormalcopy_2 = pnormalcopy;
             }
             else {
-                pnormalcopy_2 = 0;
+                pnormalcopy_2 = nullptr;
             }
             ourMemcpy(pnormalcopy_2, pLoadedData->ppNormals[aiBlock], sizeof(NiPoint3) * 289);
             void* apMemory = NiMemObject::operator new(sizeof(NiTriStrips));
@@ -2198,7 +2198,7 @@ NiTriStrips* TESObjectLAND::MakeLandTriStrips(uint8_t aiBlock) {
                 );
             }
             else {
-                ptrigeom_2 = 0;
+                ptrigeom_2 = nullptr;
             }
             ptrigeom = ptrigeom_2;
             NiPoint3 blockcenter = GetWorldOffsetForBlock(aiBlock);
@@ -2214,7 +2214,7 @@ NiTriStrips* TESObjectLAND::MakeLandTriStrips(uint8_t aiBlock) {
 
 bool TESObjectLAND::InitLandscape() {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LAND, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESLand.cpp", 3236
+        MEM_CONTEXT_LAND, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESLand.cpp", 3236
     );
     if (pLoadedData && (pLoadedData->ppMesh && *pLoadedData->ppMesh)) {
         int32_t i;
@@ -2232,7 +2232,7 @@ bool TESObjectLAND::InitLandscape() {
                 }
             }
         }
-        MarkLoaded(1);
+        MarkLoaded(true);
         for (i = 0; i < 4; ++i) {
             BSShaderPPLightingProperty* pshprop;
             // The address &pLoadedData->ppPercentArrays is tested here, and it is never null.
@@ -2246,7 +2246,7 @@ bool TESObjectLAND::InitLandscape() {
                 );
             }
             else {
-                ppercentED = 0;
+                ppercentED = nullptr;
             }
             NiFixedString* TexPercTag = BSShaderManager::TexPercTag();
             pLoadedData->ppMesh[i]->AddExtraData(*TexPercTag, ppercentED);
@@ -2256,7 +2256,7 @@ bool TESObjectLAND::InitLandscape() {
                 pshprop = ::new (v18) BSShaderPPLightingProperty;
             }
             else {
-                pshprop = 0;
+                pshprop = nullptr;
             }
             pshprop->SetShader(1);
             if (pshprop) {
@@ -2283,7 +2283,7 @@ bool TESObjectLAND::InitLandscape() {
                         pshprop->SetLandscapeTextureSet(static_cast<uint32_t>(itex), v7);
                     }
                     else {
-                        pshprop->SetLandscapeTextureSet(static_cast<uint32_t>(itex), 0);
+                        pshprop->SetLandscapeTextureSet(static_cast<uint32_t>(itex), nullptr);
                     }
                 }
                 if (pLoadedData->pQuadTextureArray[i][5]) {
@@ -2339,10 +2339,10 @@ bool TESObjectLAND::InitLandscape() {
                 BSShaderManager::PrepareObject(pLoadedData->ppMesh[i], 0, 0);
             }
         }
-        return 1;
+        return true;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -2355,7 +2355,7 @@ void TESObjectLAND::AdjustTextureArrays() {
                     float fblockuse = GetTextureUsePercent(iblock, itex);
                     float v9 = fblockuse / 289.0;
                     if (v9 < 0.0010000000474974513) {
-                        pLoadedData->pQuadTextureArray[iblock][itex] = 0;
+                        pLoadedData->pQuadTextureArray[iblock][itex] = nullptr;
                     }
                 }
             }
@@ -2420,7 +2420,7 @@ void TESObjectLAND::MergeSameFileTextures() {
                                         pLoadedData->ppPercentArrays[i][m][j] + pLoadedData->ppPercentArrays[i][m][k];
                                     pLoadedData->ppPercentArrays[i][m][k] = 0.0f;
                                 }
-                                SetTexture(i, k, 0);
+                                SetTexture(i, k, nullptr);
                             }
                         }
                     }
@@ -2430,7 +2430,7 @@ void TESObjectLAND::MergeSameFileTextures() {
                         for (int32_t n = 0; n < 289; ++n) {
                             pLoadedData->ppPercentArrays[i][n][j] = 0.0f;
                         }
-                        SetTexture(i, j, 0);
+                        SetTexture(i, j, nullptr);
                     }
                 }
             }
@@ -2522,7 +2522,7 @@ char TESObjectLAND::CalculateGrassParams() {
                                 v21 = ::new (apMemory) TESGrassAreaParam;
                             }
                             else {
-                                v21 = 0;
+                                v21 = nullptr;
                             }
                             apParam[iParam] = v21;
                             ourMemset(apParam[iParam], 0, sizeof(TESGrassAreaParam));
@@ -2650,7 +2650,7 @@ char TESObjectLAND::CalculateGrassParams() {
                                             v11 = ::new (v25) TESGrassAreaParam;
                                         }
                                         else {
-                                            v11 = 0;
+                                            v11 = nullptr;
                                         }
                                         apParam[iParam] = v11;
                                         ++iTypea;
@@ -2782,10 +2782,10 @@ bool TESObjectLAND::ForceGoodNormals() {
     bool pbloaded[8];
     int32_t i;
     if (!IsLoaded() || GetLandRemapped()) {
-        return 0;
+        return false;
     }
     ourMemset(pbloaded, 0, 8u);
-    FillLands8(&L8, 1, pbloaded);
+    FillLands8(&L8, true, pbloaded);
     TESObjectLAND** plandarray = &(&L8)->pNWLand;
     rt::eh_vector_constructor_iterator(ptr, sizeof(NiPoint3), 0x2420, &emptyPointConstructor);
     for (i = 0; i < 8; ++i) {
@@ -2794,11 +2794,11 @@ bool TESObjectLAND::ForceGoodNormals() {
                 NiPoint3** NormalArray = plandarray[i]->GetNormalArray();
                 ourMemcpy(&ptr[0x3630 * i + 3468 * j], NormalArray[j], 3468u);
             }
-            plandarray[i]->InvalidateNormals(0);
+            plandarray[i]->InvalidateNormals(nullptr);
         }
     }
-    InvalidateNormals(0);
-    SetLandNormals(&L8, 0);
+    InvalidateNormals(nullptr);
+    SetLandNormals(&L8, nullptr);
     for (i = 0; i < 4; ++i) {
         for (int32_t k = 0; k < 289; ++k) {
             pLoadedData->ppNormals[i][k].Unitize();
@@ -2824,7 +2824,7 @@ bool TESObjectLAND::ForceGoodNormals() {
             }
         }
     }
-    return 1;
+    return true;
 }
 
 void TESObjectLAND::GetVertex(int32_t iblock, int32_t index, NiPoint3& vert) {
@@ -2857,10 +2857,10 @@ void TESObjectLAND::GetNormal(int32_t iblock, int32_t index, NiPoint3& norm) {
     NiPoint3 v5;
     NiPoint3 dst;
     if (HasVertices()) {
-        bool bset = 0;
+        bool bset = false;
         if (pLoadedData->ppNormals && pLoadedData->ppNormals[iblock]) {
             norm = pLoadedData->ppNormals[iblock][index];
-            bset = 1;
+            bset = true;
         }
         else {
             if (pLoadedData->ppMesh) {
@@ -2868,18 +2868,18 @@ void TESObjectLAND::GetNormal(int32_t iblock, int32_t index, NiPoint3& norm) {
                     NiGeometry* shape = static_cast<NiGeometry*>(pLoadedData->ppMesh[iblock]->GetAt(0));
                     if (shape->GetNormals()) {
                         norm = shape->GetNormals()[index];
-                        bset = 1;
+                        bset = true;
                     }
                     else {
                         NiGeometryData* pgeodata = shape->GetModelData();
                         NiTConvertingStrideIterator<NiPoint3> apMemory;
                         NiAdditionalGeometryData* pkAGD = pgeodata->GetAdditionalGeometryData();
                         if (pkAGD) {
-                            if (pkAGD->GetVBReady() && pgeodata->LockPackedVertexData(1)) {
+                            if (pkAGD->GetVBReady() && pgeodata->LockPackedVertexData(true)) {
                                 pgeodata->GetNormalsIterator(*static_cast<NiGeometryDataIteratorNiPoint3*>(&apMemory));
                                 apMemory.Get(index, norm);
                                 pgeodata->UnlockPackedVertexData();
-                                bset = 1;
+                                bset = true;
                             }
                         }
                     }
@@ -2907,32 +2907,32 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
     int8_t acNormals[3276] = {};
     uint8_t v55[3272] = {};
     if (IsLoaded()) {
-        return 1;
+        return true;
     }
     int32_t ilastblock = -1;
     int32_t ilasttexindex = -1;
-    bool bfailed = 0;
-    TESFile* pFile = 0;
+    bool bfailed = false;
+    TESFile* pFile = nullptr;
     uint32_t ifindoffset = 0;
     if (GetLandRemapped()) {
         TESWorldSpace* pworld = GetWorldSpace();
         if (!pworld) {
-            return 1;
+            return true;
         }
         int32_t iCellY = GetDataY();
         int32_t DataX = GetDataX();
         if (!pworld->FindLandDataInFile(DataX, iCellY, pFile, ifindoffset)) {
-            return 1;
+            return true;
         }
     }
     else {
         if ((Data.iFlags & 1) == 0 && ((Data.iFlags & 2) == 0 && (Data.iFlags & 4) == 0)) {
-            return 1;
+            return true;
         }
         TESFile* File = GetFile(-1);
         pFile = File->GetThreadSafeFile();
         if (!pFile->FindForm(this)) {
-            bfailed = 1;
+            bfailed = true;
         }
         if (!bfailed) {
             uint8_t formid = pFile->GetTESForm();
@@ -2944,7 +2944,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
     }
     if (bfailed) {
         const char* Filename;
-        MessageHandler::IncDisableWarningCount(0);
+        MessageHandler::IncDisableWarningCount(false);
         if (pFile) {
             Filename = pFile->GetFilename();
         }
@@ -2957,15 +2957,15 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
             "CELLS: Failed to load landscape data for LAND (%08X) in Cell (%i, %i) from file '%s'.", iFormID, iCellYa,
             fB, Filename
         );
-        MessageHandler::IncDisableWarningCount(1);
-        return 0;
+        MessageHandler::IncDisableWarningCount(true);
+        return false;
     }
     else {
         TESFile* pFile_2 = pFile;
         if (pFile->SetOffset(ifindoffset)) {
-            bool loadedhgt = 0;
-            bool loadednorms = 0;
-            bool badjusttextures = 0;
+            bool loadedhgt = false;
+            bool loadednorms = false;
+            bool badjusttextures = false;
             do {
                 CHUNK_ID eChunk = pFile_2->GetTESChunk();
                 if (eChunk > VHGT_ID) {
@@ -2985,9 +2985,9 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                     fBb, a6b
                                 );
                                 texdata_2.sIndex = 5;
-                                badjusttextures = 1;
+                                badjusttextures = true;
                             }
-                            TESLandTexture* ptex_2 = 0;
+                            TESLandTexture* ptex_2 = nullptr;
                             if (texdata_2.iTextureID) {
                                 TESForm::AddCompileIndex(texdata_2.iTextureID, pFile_2);
                                 TESForm* FormByNumericID = TESForm::GetFormByNumericID(texdata_2.iTextureID);
@@ -3001,7 +3001,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                         "block %i.",
                                         GetDataX(), iCellYd, fBc, a6c
                                     );
-                                    badjusttextures = 1;
+                                    badjusttextures = true;
                                 }
                             }
                             else {
@@ -3016,7 +3016,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                         v31 = ::new (v39) QueuedFile(IO_TASK_PRIORITY_VERY_LOW);
                                     }
                                     else {
-                                        v31 = 0;
+                                        v31 = nullptr;
                                     }
                                     spQueuedTextures.operator=(v31);
                                 }
@@ -3048,7 +3048,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                             v32 = ::new (v40) QueuedFile(IO_TASK_PRIORITY_VERY_LOW);
                                         }
                                         else {
-                                            v32 = 0;
+                                            v32 = nullptr;
                                         }
                                         spQueuedTextures.operator=(v32);
                                     }
@@ -3064,7 +3064,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                         "%i.",
                                         GetDataX(), iCellYb, fBa, a6
                                     );
-                                    badjusttextures = 1;
+                                    badjusttextures = true;
                                 }
                             }
                         }
@@ -3080,7 +3080,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                             "file %s.",
                                             GetDataX(), fBd, a6e
                                         );
-                                        badjusttextures = 1;
+                                        badjusttextures = true;
                                     }
                                     else {
                                         FILE_TEX_VERT_DATA* pvertdata =
@@ -3097,7 +3097,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                             );
                                         }
                                         ourFree(pvertdata);
-                                        pvertdata = 0;
+                                        pvertdata = nullptr;
                                     }
                                 }
                                 ilastblock = -1;
@@ -3164,7 +3164,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                         this->pLoadedData->ppVertices[i][j].z - this->pLoadedData->fBaseHeight;
                                 }
                             }
-                            loadedhgt = 1;
+                            loadedhgt = true;
                         }
                     }
                     else {
@@ -3206,7 +3206,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                                 this->pLoadedData->ppNormals[i][j].Unitize();
                                             }
                                         }
-                                        loadednorms = 1;
+                                        loadednorms = true;
                                     }
                                     break;
                                 }
@@ -3231,7 +3231,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                     pFile_2->GetChunkData(pbuffer, ibuffersize);
                                     if (this->pLoadedData->pMoppCode) {
                                         this->pLoadedData->pMoppCode->removeReference();
-                                        this->pLoadedData->pMoppCode = 0;
+                                        this->pLoadedData->pMoppCode = nullptr;
                                     }
                                     ReadMoppCodeFromBuffer(
                                         pbuffer__pvertdata, ibuffersize, &this->pLoadedData->pMoppCode
@@ -3259,16 +3259,16 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                     "CELLS: Land for cell (%i, %i) in file '%s' does not contain Normal Data.", GetDataX(), fBe, a6f
                 );
             }
-            return 1;
+            return true;
         }
         else {
-            return 0;
+            return false;
         }
     }
 }
 
 void TESObjectLAND::Detach3D() {
-    spQueuedTextures.operator=(static_cast<QueuedFile*>(0));
+    spQueuedTextures.operator=(static_cast<QueuedFile*>(nullptr));
     if (pLoadedData) {
         if (pLoadedData->ppMesh) {
             bhkWorld* phw;
@@ -3276,42 +3276,42 @@ void TESObjectLAND::Detach3D() {
                 phw = pParentCell->GetbhkWorld();
             }
             else {
-                phw = 0;
+                phw = nullptr;
             }
             if (phw) {
                 if (pLoadedData->spLandRB.operator!=(nullptr)) {
                     phw->RemoveBody(pLoadedData->spLandRB.m_pObject);
                 }
             }
-            pLoadedData->spLandRB.operator=(static_cast<bhkRigidBody*>(0));
+            pLoadedData->spLandRB.operator=(static_cast<bhkRigidBody*>(nullptr));
             for (int32_t iblock = 0; iblock < 4; ++iblock) {
                 if (pLoadedData->ppMesh[iblock]) {
-                    pLoadedData->ppVertices[iblock] = 0;
-                    pLoadedData->ppColorsA[iblock] = 0;
+                    pLoadedData->ppVertices[iblock] = nullptr;
+                    pLoadedData->ppColorsA[iblock] = nullptr;
                     ourFree(pLoadedData->ppNormals[iblock]);
-                    pLoadedData->ppNormals[iblock] = 0;
+                    pLoadedData->ppNormals[iblock] = nullptr;
                     NiNode* v2 = pLoadedData->ppMesh[iblock];
                     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
                     ShadowSceneNode_->RemoveObject(v2);
                     pLoadedData->ppMesh[iblock]->DetachChildAt(0u);
                 }
-                pLoadedData->ppMesh[iblock] = 0;
+                pLoadedData->ppMesh[iblock] = nullptr;
             }
             ourFree(pLoadedData->ppMesh);
-            pLoadedData->ppMesh = 0;
+            pLoadedData->ppMesh = nullptr;
         }
         if (pLoadedData->spBorder.m_pObject) {
             NiNode* pParent = pLoadedData->spBorder.m_pObject->m_pkParent;
             if (pParent) {
                 pParent->DetachChild(pLoadedData->spBorder.m_pObject);
             }
-            pLoadedData->spBorder.operator=(static_cast<NiLines*>(0));
+            pLoadedData->spBorder.operator=(static_cast<NiLines*>(nullptr));
         }
     }
 }
 
 bool TESObjectLAND::ReadMoppCodeFromBuffer(char* apBuffer, uint32_t aiBufferSize, hkpMoppCode** apOutCode) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apBuffer) {
         if (aiBufferSize) {
             if (apOutCode) {
@@ -3321,7 +3321,7 @@ bool TESObjectLAND::ReadMoppCodeFromBuffer(char* apBuffer, uint32_t aiBufferSize
                     pcode = ::new (apMemory) hkpMoppCode;
                 }
                 else {
-                    pcode = 0;
+                    pcode = nullptr;
                 }
                 *apOutCode = pcode;
                 if (aiBufferSize > 16) {
@@ -3329,13 +3329,13 @@ bool TESObjectLAND::ReadMoppCodeFromBuffer(char* apBuffer, uint32_t aiBufferSize
                     // The remaining byte count is passed as is: hkArray::setSize takes Havok's int.
                     pcode->m_data.setSize(static_cast<int32_t>(aiBufferSize - 16));
                     ourMemcpy(pcode->m_data.m_data, apBuffer + 16, aiBufferSize - 16);
-                    bretval = 1;
+                    bretval = true;
                 }
                 if (!bretval) {
                     if (pcode) {
                         delete pcode;
                     }
-                    *apOutCode = 0;
+                    *apOutCode = nullptr;
                 }
             }
         }
@@ -3344,7 +3344,7 @@ bool TESObjectLAND::ReadMoppCodeFromBuffer(char* apBuffer, uint32_t aiBufferSize
 }
 
 TESLandTexture* TESObjectLAND::GetMainTexture(uint8_t acBlock, uint16_t asVertIndex) {
-    TESLandTexture* v9 = 0;
+    TESLandTexture* v9 = nullptr;
     if (acBlock < 4u && asVertIndex < 289u) {
         float v7 = -3.4028235e+38f;
         uint32_t v8 = 0;
@@ -3391,13 +3391,13 @@ void TESObjectLAND::SetNewDefaultTexture(uint8_t acBlock, uint16_t asNewDefaultI
 TESGrassAreaParam** TESObjectLAND::GetGrassParameters(int32_t aiBlock, int32_t aiVert) {
     TESGrassAreaParam** pparam;
     if (!pLoadedData || (aiBlock >= 4 || (aiVert + 18 >= 289 || aiVert - 18 < 0))) {
-        return 0;
+        return nullptr;
     }
     // The grass map is keyed by unsigned int; the vertex index goes in as its key.
     if (pLoadedData->pmGrassMap[aiBlock].GetAt(static_cast<uint32_t>(aiVert), pparam)) {
         return pparam;
     }
-    return 0;
+    return nullptr;
 }
 
 NiPoint3** TESObjectLAND::GetNormalArray() {
@@ -3405,7 +3405,7 @@ NiPoint3** TESObjectLAND::GetNormalArray() {
         return pLoadedData->ppNormals;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -3415,7 +3415,7 @@ void TESObjectLAND::InvalidateNormals(tagRECT* apInvalidateRect) {
             for (int32_t k = 0; k < 289; ++k) {
                 if (!apInvalidateRect || VertexInRect(apInvalidateRect, pLoadedData->ppVertices[i][k])) {
                     pLoadedData->ppNormals[i][k] = NiPoint3_ZERO;
-                    pLoadedData->ppNormalsSet[i][k] = 0;
+                    pLoadedData->ppNormalsSet[i][k] = false;
                 }
             }
             uint16_t* pTriList = TESObjectLAND::pDefTriListBLOCK;
@@ -3458,7 +3458,7 @@ void TESObjectLAND::UpdateMesh(bool updatescene, LANDS8* pL8) {
                         ptrigeom = pobj->IsGeometry();
                     }
                     else {
-                        ptrigeom = 0;
+                        ptrigeom = nullptr;
                     }
                     if (ptrigeom) {
                         int32_t v18;
@@ -3475,7 +3475,8 @@ void TESObjectLAND::UpdateMesh(bool updatescene, LANDS8* pL8) {
                         else {
                             v18 = 0;
                         }
-                        BSShaderPPLightingProperty* pshprop = v18 ? static_cast<BSShaderPPLightingProperty*>(pprop) : 0;
+                        BSShaderPPLightingProperty* pshprop =
+                            v18 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
                         if (pshprop) {
                             uint8_t v11;
                             uint8_t v12;
@@ -3505,7 +3506,7 @@ void TESObjectLAND::UpdateMesh(bool updatescene, LANDS8* pL8) {
                                     pshprop->SetLandscapeTextureSet(static_cast<uint32_t>(itex), v7);
                                 }
                                 else {
-                                    pshprop->SetLandscapeTextureSet(static_cast<uint32_t>(itex), 0);
+                                    pshprop->SetLandscapeTextureSet(static_cast<uint32_t>(itex), nullptr);
                                 }
                             }
                             if (pLoadedData->pQuadTextureArray[iblock][5]) {
@@ -3559,7 +3560,7 @@ void TESObjectLAND::UpdateMesh(bool updatescene, LANDS8* pL8) {
                         }
                     }
                 }
-                NiUpdateData UpdateData(0.0f, 0, 0);
+                NiUpdateData UpdateData(0.0f, false, false);
                 pNode->Update(UpdateData);
                 if (updatescene) {
                     pNode->UpdateProperties();
@@ -3572,7 +3573,7 @@ void TESObjectLAND::UpdateMesh(bool updatescene, LANDS8* pL8) {
         }
     }
     else {
-        CreateLandscape(0);
+        CreateLandscape(nullptr);
         Attach3D();
     }
 }
@@ -3590,7 +3591,7 @@ void TESObjectLAND::FillLands8(LANDS8* pL8, bool abForceLoad, bool* apLoaded) {
         TESWorldSpace* WorldSpace = GetWorldSpace();
         int32_t v28 = GetDataY() + 1;
         int32_t DataX = GetDataX();
-        TESObjectCELL* CellFromCellCoord = pDataHandler->GetCellFromCellCoord(DataX - 1, v28, WorldSpace, 0);
+        TESObjectCELL* CellFromCellCoord = pDataHandler->GetCellFromCellCoord(DataX - 1, v28, WorldSpace, false);
         if (CellFromCellCoord && (v5 = CellFromCellCoord->GetLand(), v5->HasVertices())) {
             pL8->pNWLand = CellFromCellCoord->GetLand();
         }
@@ -3599,17 +3600,17 @@ void TESObjectLAND::FillLands8(LANDS8* pL8, bool abForceLoad, bool* apLoaded) {
             if (CellFromCellCoord &&
                 ((Land = CellFromCellCoord->GetLand(), !Land->HasVertices()) && (abForceLoad && apLoaded))) {
                 pL8->pNWLand = CellFromCellCoord->GetLand();
-                pL8->pNWLand->LoadVertices(0);
-                *apLoaded = 1;
+                pL8->pNWLand->LoadVertices(false);
+                *apLoaded = true;
             }
             else {
-                pL8->pNWLand = 0;
+                pL8->pNWLand = nullptr;
             }
         }
         TESWorldSpace* v37 = GetWorldSpace();
         int32_t v29 = GetDataY() + 1;
         int32_t v7 = GetDataX();
-        TESObjectCELL* v46 = pDataHandler->GetCellFromCellCoord(v7, v29, v37, 0);
+        TESObjectCELL* v46 = pDataHandler->GetCellFromCellCoord(v7, v29, v37, false);
         if (v46 && (v8 = v46->GetLand(), v8->HasVertices())) {
             pL8->pNLand = v46->GetLand();
         }
@@ -3617,17 +3618,17 @@ void TESObjectLAND::FillLands8(LANDS8* pL8, bool abForceLoad, bool* apLoaded) {
             TESObjectLAND* v9;
             if (v46 && ((v9 = v46->GetLand(), !v9->HasVertices()) && (abForceLoad && apLoaded))) {
                 pL8->pNLand = v46->GetLand();
-                pL8->pNLand->LoadVertices(0);
-                apLoaded[1] = 1;
+                pL8->pNLand->LoadVertices(false);
+                apLoaded[1] = true;
             }
             else {
-                pL8->pNLand = 0;
+                pL8->pNLand = nullptr;
             }
         }
         TESWorldSpace* v38 = GetWorldSpace();
         int32_t v30 = GetDataY() + 1;
         int32_t v10 = GetDataX();
-        TESObjectCELL* v47 = pDataHandler->GetCellFromCellCoord(v10 + 1, v30, v38, 0);
+        TESObjectCELL* v47 = pDataHandler->GetCellFromCellCoord(v10 + 1, v30, v38, false);
         if (v47 && (v11 = v47->GetLand(), v11->HasVertices())) {
             pL8->pNELand = v47->GetLand();
         }
@@ -3635,17 +3636,17 @@ void TESObjectLAND::FillLands8(LANDS8* pL8, bool abForceLoad, bool* apLoaded) {
             TESObjectLAND* v12;
             if (v47 && ((v12 = v47->GetLand(), !v12->HasVertices()) && (abForceLoad && apLoaded))) {
                 pL8->pNELand = v47->GetLand();
-                pL8->pNELand->LoadVertices(0);
-                apLoaded[2] = 1;
+                pL8->pNELand->LoadVertices(false);
+                apLoaded[2] = true;
             }
             else {
-                pL8->pNELand = 0;
+                pL8->pNELand = nullptr;
             }
         }
         TESWorldSpace* v39 = GetWorldSpace();
         int32_t DataY = GetDataY();
         int32_t v13 = GetDataX();
-        TESObjectCELL* v48 = pDataHandler->GetCellFromCellCoord(v13 - 1, DataY, v39, 0);
+        TESObjectCELL* v48 = pDataHandler->GetCellFromCellCoord(v13 - 1, DataY, v39, false);
         if (v48 && (v14 = v48->GetLand(), v14->HasVertices())) {
             pL8->pWLand = v48->GetLand();
         }
@@ -3653,17 +3654,17 @@ void TESObjectLAND::FillLands8(LANDS8* pL8, bool abForceLoad, bool* apLoaded) {
             TESObjectLAND* v15;
             if (v48 && ((v15 = v48->GetLand(), !v15->HasVertices()) && (abForceLoad && apLoaded))) {
                 pL8->pWLand = v48->GetLand();
-                pL8->pWLand->LoadVertices(0);
-                apLoaded[3] = 1;
+                pL8->pWLand->LoadVertices(false);
+                apLoaded[3] = true;
             }
             else {
-                pL8->pWLand = 0;
+                pL8->pWLand = nullptr;
             }
         }
         TESWorldSpace* v40 = GetWorldSpace();
         int32_t v32 = GetDataY();
         int32_t v16 = GetDataX();
-        TESObjectCELL* v49 = pDataHandler->GetCellFromCellCoord(v16 + 1, v32, v40, 0);
+        TESObjectCELL* v49 = pDataHandler->GetCellFromCellCoord(v16 + 1, v32, v40, false);
         if (v49 && (v17 = v49->GetLand(), v17->HasVertices())) {
             pL8->pELand = v49->GetLand();
         }
@@ -3671,17 +3672,17 @@ void TESObjectLAND::FillLands8(LANDS8* pL8, bool abForceLoad, bool* apLoaded) {
             TESObjectLAND* v18;
             if (v49 && ((v18 = v49->GetLand(), !v18->HasVertices()) && (abForceLoad && apLoaded))) {
                 pL8->pELand = v49->GetLand();
-                pL8->pELand->LoadVertices(0);
-                apLoaded[4] = 1;
+                pL8->pELand->LoadVertices(false);
+                apLoaded[4] = true;
             }
             else {
-                pL8->pELand = 0;
+                pL8->pELand = nullptr;
             }
         }
         TESWorldSpace* v41 = GetWorldSpace();
         int32_t v33 = GetDataY() - 1;
         int32_t v19 = GetDataX();
-        TESObjectCELL* v50 = pDataHandler->GetCellFromCellCoord(v19 - 1, v33, v41, 0);
+        TESObjectCELL* v50 = pDataHandler->GetCellFromCellCoord(v19 - 1, v33, v41, false);
         if (v50 && (v20 = v50->GetLand(), v20->HasVertices())) {
             pL8->pSWLand = v50->GetLand();
         }
@@ -3689,17 +3690,17 @@ void TESObjectLAND::FillLands8(LANDS8* pL8, bool abForceLoad, bool* apLoaded) {
             TESObjectLAND* v21;
             if (v50 && ((v21 = v50->GetLand(), !v21->HasVertices()) && (abForceLoad && apLoaded))) {
                 pL8->pSWLand = v50->GetLand();
-                pL8->pSWLand->LoadVertices(0);
-                apLoaded[5] = 1;
+                pL8->pSWLand->LoadVertices(false);
+                apLoaded[5] = true;
             }
             else {
-                pL8->pSWLand = 0;
+                pL8->pSWLand = nullptr;
             }
         }
         TESWorldSpace* v42 = GetWorldSpace();
         int32_t v34 = GetDataY() - 1;
         int32_t v22 = GetDataX();
-        TESObjectCELL* v51 = pDataHandler->GetCellFromCellCoord(v22, v34, v42, 0);
+        TESObjectCELL* v51 = pDataHandler->GetCellFromCellCoord(v22, v34, v42, false);
         if (v51 && (v23 = v51->GetLand(), v23->HasVertices())) {
             pL8->pSLand = v51->GetLand();
         }
@@ -3707,17 +3708,17 @@ void TESObjectLAND::FillLands8(LANDS8* pL8, bool abForceLoad, bool* apLoaded) {
             TESObjectLAND* v24;
             if (v51 && ((v24 = v51->GetLand(), !v24->HasVertices()) && (abForceLoad && apLoaded))) {
                 pL8->pSLand = v51->GetLand();
-                pL8->pSLand->LoadVertices(0);
-                apLoaded[6] = 1;
+                pL8->pSLand->LoadVertices(false);
+                apLoaded[6] = true;
             }
             else {
-                pL8->pSLand = 0;
+                pL8->pSLand = nullptr;
             }
         }
         TESWorldSpace* v43 = GetWorldSpace();
         int32_t v35 = GetDataY() - 1;
         int32_t v25 = GetDataX();
-        TESObjectCELL* v52 = pDataHandler->GetCellFromCellCoord(v25 + 1, v35, v43, 0);
+        TESObjectCELL* v52 = pDataHandler->GetCellFromCellCoord(v25 + 1, v35, v43, false);
         if (v52 && (v26 = v52->GetLand(), v26->HasVertices())) {
             pL8->pSELand = v52->GetLand();
         }
@@ -3725,11 +3726,11 @@ void TESObjectLAND::FillLands8(LANDS8* pL8, bool abForceLoad, bool* apLoaded) {
             TESObjectLAND* v27;
             if (v52 && ((v27 = v52->GetLand(), !v27->HasVertices()) && (abForceLoad && apLoaded))) {
                 pL8->pSELand = v52->GetLand();
-                pL8->pSELand->LoadVertices(0);
-                apLoaded[7] = 1;
+                pL8->pSELand->LoadVertices(false);
+                apLoaded[7] = true;
             }
             else {
-                pL8->pSELand = 0;
+                pL8->pSELand = nullptr;
             }
         }
     }
@@ -3740,7 +3741,7 @@ void TESObjectLAND::SetLandNormals(LANDS8* pL8, tagRECT* apCalcRect) {
     if (IsLoaded()) {
         if (!pL8) {
             pL8 = &v6;
-            FillLands8(&v6, 0, 0);
+            FillLands8(&v6, false, nullptr);
         }
         for (int32_t i = 0; i < 4; ++i) {
             for (int32_t j = 0; j < 289; ++j) {
@@ -3758,7 +3759,7 @@ void TESObjectLAND::SetLandNormals(LANDS8* pL8, tagRECT* apCalcRect) {
                             if (pL8->pSWLand) {
                                 if (pL8->pELand) {
                                     if (pL8->pWLand) {
-                                        SetGoodNormals(1);
+                                        SetGoodNormals(true);
                                     }
                                 }
                             }
@@ -3998,14 +3999,14 @@ void TESObjectLAND::InitializeStatics() {
     int32_t y;
     int32_t x;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LAND, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESLand.cpp", 198
+        MEM_CONTEXT_LAND, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESLand.cpp", 198
     );
     BGSTextureSet* v42 = static_cast<BGSTextureSet*>(NiMemObject::operator new(sizeof(BGSTextureSet)));
     if (v42) {
         v21 = ::new (v42) BGSTextureSet;
     }
     else {
-        v21 = 0;
+        v21 = nullptr;
     }
     TESObjectLAND::pDefTextTexSet = v21;
     BSsprintf(apDest, 260, "Landscape\\%s", gs_sDefaultLandDiffuseTexture_Landscape.String());
@@ -4018,18 +4019,18 @@ void TESObjectLAND::InitializeStatics() {
         TESLandTexture_ = ::new (v40) TESLandTexture;
     }
     else {
-        TESLandTexture_ = 0;
+        TESLandTexture_ = nullptr;
     }
     TESObjectLAND::pDefText = TESLandTexture_;
     TESLandTexture_->pTextureSet = TESObjectLAND::pDefTextTexSet;
-    NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(0));
+    NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(nullptr));
     TESObjectLAND::pDefTextTexSet->GetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, spTempTexture);
     NiTexturingProperty::Map* v38 = static_cast<NiTexturingProperty::Map*>(ourMalloc(sizeof(NiTexturingProperty::Map)));
     if (v38) {
         pdefmap = ::new (v38) NiTexturingProperty::Map(spTempTexture.m_pObject, 0, 3, 5, nullptr);
     }
     else {
-        pdefmap = 0;
+        pdefmap = nullptr;
     }
     NiTexturingProperty* v36 =
         static_cast<NiTexturingProperty*>(NiMemObject::operator new(sizeof(NiTexturingProperty)));
@@ -4037,7 +4038,7 @@ void TESObjectLAND::InitializeStatics() {
         NiTexturingProperty_ = ::new (v36) NiTexturingProperty;
     }
     else {
-        NiTexturingProperty_ = 0;
+        NiTexturingProperty_ = nullptr;
     }
     TESObjectLAND::spTexturingProperty.operator=(NiTexturingProperty_);
     TESObjectLAND::spTexturingProperty.m_pObject->SetApplyMode(NiTexturingProperty::APPLY_MODULATE);
@@ -4083,7 +4084,7 @@ void TESObjectLAND::InitializeStatics() {
         pColorBlock = static_cast<NiColorA*>(ptr);
     }
     else {
-        pColorBlock = 0;
+        pColorBlock = nullptr;
     }
     TESObjectLAND::pDefColorBLOCK = pColorBlock;
     void* v31 = ourMalloc(289 * sizeof(NiPoint3));
@@ -4092,7 +4093,7 @@ void TESObjectLAND::InitializeStatics() {
         pNormalBlock = static_cast<NiPoint3*>(v31);
     }
     else {
-        pNormalBlock = 0;
+        pNormalBlock = nullptr;
     }
     TESObjectLAND::pDefNormalBLOCK = pNormalBlock;
     bool* v30 = static_cast<bool*>(ourMalloc(289 * sizeof(bool)));
@@ -4103,7 +4104,7 @@ void TESObjectLAND::InitializeStatics() {
         pTextureBlock = static_cast<NiPoint2*>(v28);
     }
     else {
-        pTextureBlock = 0;
+        pTextureBlock = nullptr;
     }
     TESObjectLAND::pDefTextureBLOCK = pTextureBlock;
     int32_t index = 0;
@@ -4113,7 +4114,7 @@ void TESObjectLAND::InitializeStatics() {
             TESObjectLAND::pDefColorBLOCK[index] = kColor;
             NiPoint3* v3 = ::new (&dst) NiPoint3(0.0f, 0.0f, 1.0f);
             TESObjectLAND::pDefNormalBLOCK[index] = *v3;
-            TESObjectLAND::pDefNormalSetBLOCK[index] = 1;
+            TESObjectLAND::pDefNormalSetBLOCK[index] = true;
             float v14 = static_cast<double>(x) / ftilescalar;
             float v13 = static_cast<double>(y) / ftilescalar;
             NiPoint2* v4 = ::new (&v25) NiPoint2(v13, v14);
@@ -4139,7 +4140,7 @@ void TESObjectLAND::InitializeStatics() {
             v12 = static_cast<NiPoint3*>(v23);
         }
         else {
-            v12 = 0;
+            v12 = nullptr;
         }
         TESObjectLAND::ppDefVertexBLOCK[i] = v12;
         for (x = 0; x < 17; ++x) {
@@ -4151,7 +4152,7 @@ void TESObjectLAND::InitializeStatics() {
             }
         }
     }
-    TESObjectLAND::bStaticsDefined = 1;
+    TESObjectLAND::bStaticsDefined = true;
 }
 
 TESObjectLAND::LoadedLandData::LoadedLandData()
@@ -4207,7 +4208,7 @@ NiVBChip* NiVBChip::Create(
         pkChip = ::new (apMemory) NiVBChip;
     }
     else {
-        pkChip = 0;
+        pkChip = nullptr;
     }
     if (pkChip) {
         pkChip->m_uiIndex = uiIndex;

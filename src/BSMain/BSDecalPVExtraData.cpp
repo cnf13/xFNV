@@ -51,7 +51,7 @@ NiObject* BSDecalPlacementVectorExtraData::CreateClone(NiCloningProcess& arClone
         pobj = ::new (apMemory) BSDecalPlacementVectorExtraData(0);
     }
     else {
-        pobj = 0;
+        pobj = nullptr;
     }
     CopyMembers(pobj, arCloneData);
     return pobj;
@@ -117,7 +117,7 @@ void BSDecalPlacementVectorExtraData::CopyMembers(
             v7 = new (v9) DECAL_PLACEMENT_VECTOR_GROUP_DATA();
         }
         else {
-            v7 = 0;
+            v7 = nullptr;
         }
         pDest->pDecalPlacementGroups[i] = v7;
         pDest->pDecalPlacementGroups[i]->usVectorCount = pDecalPlacementGroups[i]->usVectorCount;
@@ -147,7 +147,7 @@ bool BSDecalPlacementVectorExtraData::FindDecalPlacementVectorGroupRecurse(
     size_t sLen;
     NiMatrix3 rot;
     if (!apObject->IsNode()) {
-        return 0;
+        return false;
     }
     if (!sDVPG) {
         NiFixedString* v9;
@@ -162,7 +162,7 @@ bool BSDecalPlacementVectorExtraData::FindDecalPlacementVectorGroupRecurse(
             v9 = v12;
         }
         else {
-            v9 = 0;
+            v9 = nullptr;
         }
         sDVPG = v9;
     }
@@ -176,7 +176,7 @@ bool BSDecalPlacementVectorExtraData::FindDecalPlacementVectorGroupRecurse(
                 BSDecalPlacementVectorExtraData::FindDecalPlacementVectorGroupRecurse(child, apRootObject);
             }
         }
-        return 0;
+        return false;
     }
     if (!pextra) {
         BSDecalPlacementVectorExtraData* pextra_2;
@@ -187,7 +187,7 @@ bool BSDecalPlacementVectorExtraData::FindDecalPlacementVectorGroupRecurse(
             pextra_2 = ::new (apMemory) BSDecalPlacementVectorExtraData(0);
         }
         else {
-            pextra_2 = 0;
+            pextra_2 = nullptr;
         }
         pextra = pextra_2;
         apRootObject->AddExtraData(*sDVPG, pextra_2);
@@ -211,7 +211,7 @@ bool BSDecalPlacementVectorExtraData::FindDecalPlacementVectorGroupRecurse(
             pnewdata = new (v10) DECAL_PLACEMENT_VECTOR_GROUP_DATA();
         }
         else {
-            pnewdata = 0;
+            pnewdata = nullptr;
         }
         for (int32_t j = 0; j < v24->m_kChildren.m_usESize; ++j) {
             if (j < 8) {
@@ -237,8 +237,8 @@ bool BSDecalPlacementVectorExtraData::FindDecalPlacementVectorGroupRecurse(
         pextra->pDecalPlacementGroups[igroupnum] = pnewdata;
         ++pextra->usGroupCount;
     }
-    strName.Set(0, 0);
-    return 1;
+    strName.Set(nullptr, 0);
+    return true;
 }
 
 void BSDecalPlacementVectorExtraData::CreateDecalPlacementVectorExtraData(NiAVObject* apObject) {

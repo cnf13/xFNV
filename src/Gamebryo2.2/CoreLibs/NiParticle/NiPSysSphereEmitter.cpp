@@ -30,7 +30,7 @@ NiObject* NiPSysSphereEmitter::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject) NiPSysSphereEmitter;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fEmitterRadius = m_fEmitterRadius;
@@ -92,7 +92,7 @@ void NiPSysSphereEmitter::ComputeVolumeInitialPositionAndVelocity(
     float fRandom = NiUnitRandom();
     double dToIndex = 512.0 / s_fTwoPi;
     int32_t iAngle1 = static_cast<int32_t>(fAngle1 * dToIndex) & 0x1FF;
-    float fAngle2 = static_cast<float>(s_fTwoPi * fRandom);
+    float fAngle2 = (s_fTwoPi * fRandom);
     int32_t iAngle2 = static_cast<int32_t>(dToIndex * fAngle2) & 0x1FF;
     kPosition.x = fRadius * s_fSinTableA[iAngle2] * s_fCosTableA[iAngle1];
     kPosition.y = fRadius * s_fSinTableA[iAngle2] * s_fSinTableA[iAngle1];
@@ -112,7 +112,7 @@ NiObject* NiPSysSphereEmitter::CreateObject() {
     NiPSysSphereEmitter* pkObject =
         static_cast<NiPSysSphereEmitter*>(NiMemObject::operator new(sizeof(NiPSysSphereEmitter)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysSphereEmitter;
 }

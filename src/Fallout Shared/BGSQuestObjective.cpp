@@ -127,17 +127,17 @@ void BGSQuestObjective::SetState(QUEST_OBJECTIVE_STATE aeNewState) {
     if (aeNewState == 3 && eState == 1 && !pOwnerQuest->GetCompleted()) {
         HUDMainMenu::ShowQuestObjective(GetDisplayText(), true, false);
     }
-    eState = static_cast<QUEST_OBJECTIVE_STATE>(aeNewState);
+    eState = aeNewState;
 }
 
 bool BGSQuestObjective::GetStatus(int32_t a2) {
-    return (((int32_t)(a2 & eState)) != 0);
+    return ((a2 & eState) != 0);
 }
 
 void BGSQuestObjective::InitializeData() {
     iIndex = (uint32_t)0;
     (&cDisplayText)->operator=("");
-    bInitialized = (bool)0;
+    bInitialized = false;
     eState = QOS_DORMANT;
     pOwnerQuest = nullptr;
 }
@@ -145,15 +145,15 @@ void BGSQuestObjective::InitializeData() {
 void BGSQuestObjective::UpdateCurrentTargetList(BSSimpleList<TESQuestTarget*>* apListToFill) {
     if (eState == QOS_DISPLAYED) {
         BSSimpleList<TESQuestTarget*>* pMasterList = &ListTargets;
-        void* pQuestTarget = 0;
+        void* pQuestTarget = nullptr;
         while (pMasterList && pMasterList->m_item) {
             TESQuestTarget* pTarget = pMasterList->m_item;
             pMasterList = pMasterList->m_pkNext;
-            TESObjectREFR* Reference = pTarget->GetReference(0);
-            if ((&pTarget->objConditions)->IsTrue(Reference, 0)) {
+            TESObjectREFR* Reference = pTarget->GetReference(false);
+            if ((&pTarget->objConditions)->IsTrue(Reference, nullptr)) {
                 bool IgnoreLocks = pTarget->GetIgnoreLocks();
                 TeleportPath* v4 = pTarget->QTargetPath();
-                TESObjectREFR* v3 = pTarget->GetReference(1);
+                TESObjectREFR* v3 = pTarget->GetReference(true);
                 pPlayer->BuildPathToTarget(v3, v4, IgnoreLocks);
                 apListToFill->AddTail(pTarget);
             }
@@ -181,7 +181,7 @@ TeleportPath* TESQuestTarget::QTargetPath() {
 void PlayerCharacter::AddQuestObjective(BGSQuestObjective* apObj) {
     BSSimpleList<BGSQuestObjective*>* plist = GetQuestObjectiveList();
     TESQuest* pquest = apObj->pOwnerQuest;
-    bool v6 = 0;
+    bool v6 = false;
     char v7 = 0;
     while (plist && plist->m_item) {
         BGSQuestObjective* m_item = plist->m_item;
@@ -205,7 +205,7 @@ void PlayerCharacter::AddQuestObjective(BGSQuestObjective* apObj) {
 void HUDMainMenu::ShowQuestObjective(const char* apText, bool abCompleted, bool abFailed) {
     if (HUDMainMenu::pme) {
         if (apText) {
-            HUDMainMenu::HUDShowQuestObjectivsCritSect.Enter(0);
+            HUDMainMenu::HUDShowQuestObjectivsCritSect.Enter(nullptr);
             uiMessageDelayTime = appTimer.iLastTime;
             HUDMainMenu::QueuedQuestText* a2 =
                 static_cast<HUDMainMenu::QueuedQuestText*>(ourMalloc(sizeof(HUDMainMenu::QueuedQuestText)));

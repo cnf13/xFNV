@@ -24,25 +24,25 @@ enum hkpCollisionDispatcherAgentType : int32_t { HK_AGENT_TYPE_NULL = 0, HK_AGEN
 // The table of collision agents per pair of shape types. Only the fields this code touches are declared.
 class hkpCollisionDispatcher : public hkReferencedObject {
 public:
-    typedef hkpCollisionAgent* (*CreateFunc)(
+    using CreateFunc = hkpCollisionAgent* (*)(
         const hkpCdBody& bodyA,
         const hkpCdBody& bodyB,
         const hkpCollisionInput& input,
         hkpContactMgr* mgr
     );
-    typedef void (*GetPenetrationsFunc)(
+    using GetPenetrationsFunc = void (*)(
         const hkpCdBody& bodyA,
         const hkpCdBody& bodyB,
         const hkpCollisionInput& input,
         hkpCdBodyPairCollector& collector
     );
-    typedef void (*GetClosestPointsFunc)(
+    using GetClosestPointsFunc = void (*)(
         const hkpCdBody& bodyA,
         const hkpCdBody& bodyB,
         const hkpCollisionInput& input,
         hkpCdPointCollector& output
     );
-    typedef void (*LinearCastFunc)(
+    using LinearCastFunc = void (*)(
         const hkpCdBody& bodyA,
         const hkpCdBody& bodyB,
         const hkpLinearCastCollisionInput& input,
@@ -162,7 +162,7 @@ public:
     };
 
     // The SDK's hkChar index of m_collisionQualityInfo: callers sign-extend a byte index into it.
-    typedef int8_t CollisionQualityIndex;
+    using CollisionQualityIndex = int8_t;
 
     hkpCollisionDispatcher(CreateFunc defaultCreationFunction, hkpContactMgrFactory* defaultContactMgrFactory);
     ~hkpCollisionDispatcher() override;

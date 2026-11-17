@@ -54,7 +54,7 @@ void BSCompoundFrustum::ShiftOps(int32_t aiShift, bool abFillNoop) {
             else {
                 v3 = aiShift;
             }
-            kFunctionOperators.SetSize(v3 + kFunctionOperators.iReservedSize, 1);
+            kFunctionOperators.SetSize(v3 + kFunctionOperators.iReservedSize, true);
         }
         for (j = iFreeOp + aiShift - 1; j >= aiShift; --j) {
             kFunctionOperators.pBuffer[j].op = kFunctionOperators.pBuffer[j - aiShift].op;
@@ -73,7 +73,7 @@ void BSCompoundFrustum::PrethreadOpList() {
         int32_t ipass = iFreeOp + 1;
         int32_t ifail = iFreeOp + 2;
         if (iFreeOp + 3 >= static_cast<int32_t>(kFunctionOperators.iReservedSize)) {
-            kFunctionOperators.SetSize(kFunctionOperators.iReservedSize + 10, 1);
+            kFunctionOperators.SetSize(kFunctionOperators.iReservedSize + 10, true);
         }
         kFunctionOperators.pBuffer[iFreeOp].op = 1;
         kFunctionOperators.pBuffer[iFreeOp + 1].op = 2;
@@ -126,7 +126,7 @@ void BSCompoundFrustum::PrethreadOpList() {
         *pgroupIndex = 0;
         int32_t v14 = 1;
         int32_t v21 = 1;
-        bool bfoundfirst = 0;
+        bool bfoundfirst = false;
         for (int32_t i_2 = 0; i_2 < iFreeOp + 1; ++i_2) {
             switch (kFunctionOperators.pBuffer[i_2].op) {
                 case 1: {
@@ -166,7 +166,7 @@ void BSCompoundFrustum::PrethreadOpList() {
                 case 8: {
                     if (!bfoundfirst) {
                         iFirstOp = i_2;
-                        bfoundfirst = 1;
+                        bfoundfirst = true;
                     }
                     int32_t v2 = pgroupStack[v14 - 1];
                     if (v2) {
@@ -196,13 +196,13 @@ void BSCompoundFrustum::PrethreadOpList() {
         if (!bfoundfirst) {
             Warning("BSCompoundFrustum : prethreading an effectively empty op list");
             iFirstOp = ipass;
-            bPrethreaded = 1;
+            bPrethreaded = true;
             return;
         }
         for (int32_t i_3 = iFirstOp; i_3 < iFreeOp; ++i_3) {
             int32_t op = kFunctionOperators.pBuffer[i_3].op;
             if (op >= 7 && op <= 8) {
-                while (1) {
+                while (true) {
                     int32_t idestop = kFunctionOperators.pBuffer[kFunctionOperators.pBuffer[i_3].jp].op;
                     if (idestop == 7 || (idestop == 8 || (idestop == 2 || idestop == 3))) {
                         break;
@@ -210,7 +210,7 @@ void BSCompoundFrustum::PrethreadOpList() {
                     kFunctionOperators.pBuffer[i_3].jp =
                         kFunctionOperators.pBuffer[kFunctionOperators.pBuffer[i_3].jp].jp;
                 }
-                while (1) {
+                while (true) {
                     int32_t idestop_2 = kFunctionOperators.pBuffer[kFunctionOperators.pBuffer[i_3].jf].op;
                     if (idestop_2 == 7 || (idestop_2 == 8 || (idestop_2 == 2 || idestop_2 == 3))) {
                         break;
@@ -225,7 +225,7 @@ void BSCompoundFrustum::PrethreadOpList() {
         pScrapHeap->Deallocate(pgroupEnds);
         pScrapHeap->Deallocate(pgroupIndex);
     }
-    bPrethreaded = 1;
+    bPrethreaded = true;
 }
 
 void BSCompoundFrustum::SetCamera(const NiCamera* apCamera) {
@@ -237,32 +237,32 @@ void BSCompoundFrustum::SetCamera(const NiCamera* apCamera) {
     }
     iFreePlane = 0;
     iFreeOp = 0;
-    bPrethreaded = 0;
+    bPrethreaded = false;
     iFirstOp = 0;
-    bSkipViewFrustum = 0;
+    bSkipViewFrustum = false;
 }
 
 void BSCompoundFrustum::StartGroupIntersection() {
     if ((iFreeOp + 1) >= ((int32_t)kFunctionOperators.iReservedSize)) {
-        (&kFunctionOperators)->SetSize(((int32_t)kFunctionOperators.iReservedSize) + 10, 1);
+        (&kFunctionOperators)->SetSize(((int32_t)kFunctionOperators.iReservedSize) + 10, true);
     }
     kFunctionOperators.pBuffer[iFreeOp++].op = 4;
 }
 
 void BSCompoundFrustum::EndGroup() {
     if ((iFreeOp + 1) >= ((int32_t)kFunctionOperators.iReservedSize)) {
-        (&kFunctionOperators)->SetSize(((int32_t)kFunctionOperators.iReservedSize) + 10, 1);
+        (&kFunctionOperators)->SetSize(((int32_t)kFunctionOperators.iReservedSize) + 10, true);
     }
-    bPrethreaded = (bool)0;
+    bPrethreaded = false;
     kFunctionOperators.pBuffer[iFreeOp++].op = 6;
 }
 
 void BSCompoundFrustum::AddPortal(BSPortal* apPortal, bool abFinalRoom) {
     if ((iFreeOp + 2) >= ((int32_t)kFunctionOperators.iReservedSize)) {
-        (&kFunctionOperators)->SetSize(((int32_t)kFunctionOperators.iReservedSize) + 10, 1);
+        (&kFunctionOperators)->SetSize(((int32_t)kFunctionOperators.iReservedSize) + 10, true);
     }
     if ((iFreePlane + 1) >= ((int32_t)kPlanes.iReservedSize)) {
-        (&kPlanes)->SetSize(((int32_t)kPlanes.iReservedSize) + 4, 1);
+        (&kPlanes)->SetSize(((int32_t)kPlanes.iReservedSize) + 4, true);
     }
     NiPoint3 kVertices[4];
     apPortal->GetVertices(kVertices);
@@ -314,10 +314,10 @@ void BSCompoundFrustum::AddOcclusionPlane(BSOcclusionPlane* apPlane) {
     if ((potherplane && potherplane->kCullResult != BSMultiBoundShape::BS_CULL_VISIBLE) || !bsameside ||
         klink == BSOcclusionPlane::BSOP_LINKTYPE_NONE) {
         if (iFreeOp + 2 >= static_cast<int32_t>(kFunctionOperators.iReservedSize)) {
-            kFunctionOperators.SetSize(kFunctionOperators.iReservedSize + 10, 1);
+            kFunctionOperators.SetSize(kFunctionOperators.iReservedSize + 10, true);
         }
         if (iFreePlane + 1 >= static_cast<int32_t>(kPlanes.iReservedSize)) {
-            kPlanes.SetSize(kPlanes.iReservedSize + 4, 1);
+            kPlanes.SetSize(kPlanes.iReservedSize + 4, true);
         }
         kFunctionOperators.pBuffer[iFreeOp].op = 8;
         ++iFreeOp;
@@ -328,10 +328,10 @@ void BSCompoundFrustum::AddOcclusionPlane(BSOcclusionPlane* apPlane) {
     }
     else if (klink == BSOcclusionPlane::BSOP_LINKTYPE_PARENT) {
         if (iFreeOp + 12 >= static_cast<int32_t>(kFunctionOperators.iReservedSize)) {
-            kFunctionOperators.SetSize(kFunctionOperators.iReservedSize + 12, 1);
+            kFunctionOperators.SetSize(kFunctionOperators.iReservedSize + 12, true);
         }
         if (iFreePlane + 4 >= static_cast<int32_t>(kPlanes.iReservedSize)) {
-            kPlanes.SetSize(kPlanes.iReservedSize + 4, 1);
+            kPlanes.SetSize(kPlanes.iReservedSize + 4, true);
         }
         // Each op: the index is taken and iFreeOp stored before the entry is written, as the game orders them.
         int32_t iOp = iFreeOp++;
@@ -396,7 +396,7 @@ void BSCompoundFrustum::AddCompoundFrustum(BSCompoundFrustum* apFrustum) {
         else {
             v5 = apFrustum->iFreeOp + 1;
         }
-        kFunctionOperators.SetSize(v5 + kFunctionOperators.iReservedSize, 1);
+        kFunctionOperators.SetSize(v5 + kFunctionOperators.iReservedSize, true);
     }
     if (apFrustum->iFreePlane + iFreePlane + 1 >= static_cast<int32_t>(kPlanes.iReservedSize)) {
         int32_t v4;
@@ -406,9 +406,9 @@ void BSCompoundFrustum::AddCompoundFrustum(BSCompoundFrustum* apFrustum) {
         else {
             v4 = apFrustum->iFreePlane + 1;
         }
-        kPlanes.SetSize(v4 + kPlanes.iReservedSize, 1);
+        kPlanes.SetSize(v4 + kPlanes.iReservedSize, true);
     }
-    bPrethreaded = 0;
+    bPrethreaded = false;
     for (int32_t i = 0; i < apFrustum->iFreeOp; ++i) {
         kFunctionOperators.pBuffer[i + iFreeOp].op = apFrustum->kFunctionOperators.pBuffer[i].op;
     }
@@ -455,9 +455,9 @@ void BSCompoundFrustum::MakeIntoUnion() {
     }
     if (v5) {
         if ((iFreeOp + 1) >= ((int32_t)kFunctionOperators.iReservedSize)) {
-            (&kFunctionOperators)->SetSize(kFunctionOperators.iReservedSize + 10, 1);
+            (&kFunctionOperators)->SetSize(kFunctionOperators.iReservedSize + 10, true);
         }
-        ShiftOps(1, 0);
+        ShiftOps(1, false);
         kFunctionOperators.pBuffer->op = 5;
     }
     else {
@@ -467,8 +467,8 @@ void BSCompoundFrustum::MakeIntoUnion() {
 
 void BSCompoundFrustum::BuildForPortal(BSCompoundFrustum* apExistingFrustum, BSPortal* apPortal) {
     int32_t iopcount = apExistingFrustum->iFreeOp;
-    kFunctionOperators.SetSize(iopcount, 1);
-    kPlanes.SetSize(apExistingFrustum->iFreePlane, 1);
+    kFunctionOperators.SetSize(iopcount, true);
+    kPlanes.SetSize(apExistingFrustum->iFreePlane, true);
     for (int32_t i = 0; i < iopcount; ++i) {
         int32_t op = apExistingFrustum->kFunctionOperators.pBuffer[i].op;
         if (op < 7 || op > 8) {
@@ -497,7 +497,7 @@ void BSCompoundFrustum::BuildForPortal(BSCompoundFrustum* apExistingFrustum, BSP
 }
 
 bool BSCompoundFrustum::ProcessPlane(BSOcclusionPlane* apPlane) {
-    bool v8 = 1;
+    bool v8 = true;
     if (!bSkipViewFrustum) {
         v8 = apPlane->WithinFrustumDistFirst(kViewFrustum, kViewPosition);
     }
@@ -505,10 +505,11 @@ bool BSCompoundFrustum::ProcessPlane(BSOcclusionPlane* apPlane) {
         int32_t jp;
         int32_t i;
         for (i = iFirstOp; kFunctionOperators.pBuffer[i].op != 2 && kFunctionOperators.pBuffer[i].op != 3; i = jp) {
-            bool v6 = 0;
+            bool v6 = false;
             int32_t op = kFunctionOperators.pBuffer[i].op;
             if (op == 7) {
-                v6 = apPlane->WithinFrustum(kPlanes.pBuffer[kFunctionOperators.pBuffer[i + 1].op], 0, NiPoint3_ZERO);
+                v6 =
+                    apPlane->WithinFrustum(kPlanes.pBuffer[kFunctionOperators.pBuffer[i + 1].op], false, NiPoint3_ZERO);
             }
             else {
                 if (op == 8) {
@@ -551,16 +552,16 @@ void BSCompoundFrustum::SetActivePlaneState(int32_t* apPlaneState) {
 
 void BSCompoundFrustum::StartGroupUnion() {
     if ((iFreeOp + 1) >= ((int32_t)kFunctionOperators.iReservedSize)) {
-        (&kFunctionOperators)->SetSize(((int32_t)kFunctionOperators.iReservedSize) + 10, 1);
+        (&kFunctionOperators)->SetSize(((int32_t)kFunctionOperators.iReservedSize) + 10, true);
     }
-    bPrethreaded = (bool)0;
+    bPrethreaded = false;
     kFunctionOperators.pBuffer[iFreeOp++].op = 5;
 }
 
 bool BSCompoundFrustum::TestNotContained(NiBound* apBound, NiFrustumPlanes& apPlanes) {
     int32_t i;
     if (!(&apPlanes)->m_uiActivePlanes) {
-        return (bool)0;
+        return false;
     }
     for (i = 0; i < 6; ++i) {
         if (((&apPlanes)->m_uiActivePlanes & (1 << i)) != 0) {
@@ -630,13 +631,13 @@ void BSCompoundFrustum::CopyMembers(BSCompoundFrustum* apDest) {
     apDest->kViewPosition = kViewPosition;
     apDest->kViewFrustum = kViewFrustum;
     apDest->bPrethreaded = bPrethreaded;
-    apDest->kFunctionOperators.SetSize(kFunctionOperators.iReservedSize, 1);
+    apDest->kFunctionOperators.SetSize(kFunctionOperators.iReservedSize, true);
     for (uint32_t i = 0; i < kFunctionOperators.iReservedSize; ++i) {
         apDest->kFunctionOperators.pBuffer[i].op = kFunctionOperators.pBuffer[i].op;
         apDest->kFunctionOperators.pBuffer[i].jp = kFunctionOperators.pBuffer[i].jp;
         apDest->kFunctionOperators.pBuffer[i].jf = kFunctionOperators.pBuffer[i].jf;
     }
-    apDest->kPlanes.SetSize(kPlanes.iReservedSize, 1);
+    apDest->kPlanes.SetSize(kPlanes.iReservedSize, true);
     for (uint32_t j = 0; j < kPlanes.iReservedSize; ++j) {
         apDest->kPlanes.pBuffer[j] = kPlanes.pBuffer[j];
     }
@@ -666,9 +667,9 @@ void BSCompoundFrustum::MakeIntoIntersection() {
     }
     if (v5) {
         if (iFreeOp + 1 >= static_cast<int32_t>(kFunctionOperators.iReservedSize)) {
-            kFunctionOperators.SetSize(kFunctionOperators.iReservedSize + 10, 1);
+            kFunctionOperators.SetSize(kFunctionOperators.iReservedSize + 10, true);
         }
-        ShiftOps(1, 0);
+        ShiftOps(1, false);
         kFunctionOperators.pBuffer->op = 4;
     }
     else {
@@ -691,7 +692,7 @@ bool BSCompoundFrustum::Process(NiAVObject* apObject) {
     NiBound* pBound;
     NiBound Bound;
     if (!apObject->m_kWorldBound || apObject->m_kWorldBound->m_fRadius == 0.0) {
-        return 0;
+        return false;
     }
     if (apObject->m_kWorldBound) {
         pBound = apObject->m_kWorldBound;
@@ -700,7 +701,7 @@ bool BSCompoundFrustum::Process(NiAVObject* apObject) {
         pBound = &NiAVObject::NullBoundS;
     }
     Bound = *pBound;
-    bool bResult = 1;
+    bool bResult = true;
     if (!bSkipViewFrustum) {
         bResult = TestIntersection(&Bound, kViewFrustum);
     }
@@ -708,7 +709,7 @@ bool BSCompoundFrustum::Process(NiAVObject* apObject) {
         int32_t jp;
         int32_t i;
         for (i = iFirstOp; kFunctionOperators.pBuffer[i].op != 2 && kFunctionOperators.pBuffer[i].op != 3; i = jp) {
-            bool v8 = 0;
+            bool v8 = false;
             int32_t uiFunction = kFunctionOperators.pBuffer[i].op;
             if (uiFunction == 7) {
                 v8 = TestIntersection(&Bound, kPlanes.pBuffer[kFunctionOperators.pBuffer[i + 1].op]);
@@ -731,7 +732,7 @@ bool BSCompoundFrustum::Process(NiAVObject* apObject) {
 }
 
 bool BSCompoundFrustum::ProcessMultiBound(BSMultiBound* apBound) {
-    bool v8 = 1;
+    bool v8 = true;
     if (!bSkipViewFrustum) {
         v8 = apBound->spShape.m_pObject->WithinFrustum(kViewFrustum);
     }
@@ -739,7 +740,7 @@ bool BSCompoundFrustum::ProcessMultiBound(BSMultiBound* apBound) {
         int32_t jp;
         int32_t i;
         for (i = iFirstOp; kFunctionOperators.pBuffer[i].op != 2 && kFunctionOperators.pBuffer[i].op != 3; i = jp) {
-            bool v6 = 0;
+            bool v6 = false;
             int32_t op = kFunctionOperators.pBuffer[i].op;
             if (op == 7) {
                 v6 = apBound->spShape.m_pObject->WithinFrustum(kPlanes.pBuffer[kFunctionOperators.pBuffer[i + 1].op]);
@@ -766,7 +767,7 @@ bool BSCompoundFrustum::ProcessMultiBound(BSMultiBound* apBound) {
 bool BSCompoundFrustum::TestIntersection(NiBound* apBound, NiFrustumPlanes& apPlanes) {
     int32_t i;
     if (!(&apPlanes)->GetActivePlaneState()) {
-        return 1;
+        return true;
     }
     for (i = 0; i < 6; ++i) {
         if (((&apPlanes)->GetActivePlaneState() & 1 << i) != 0) {

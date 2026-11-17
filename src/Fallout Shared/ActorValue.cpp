@@ -28,7 +28,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
 #include "SDK/MSVC/rtti.h"
 
-#include <stdarg.h>
+#include <cstdarg>
 
 ActorValue ActorValue::Instance;
 
@@ -60,7 +60,7 @@ ActorValue::Index* ActorValue::GetDependentActorValues(Index aiWhich, int32_t& a
     ActorValueInfo* pInfo = GetActorValueInfo(aiWhich);
     if (pInfo) {
         pDependents = reinterpret_cast<Index*>(pInfo->DependentActorValues);
-        aiCount = static_cast<int32_t>(pInfo->iNumDependentActorValues);
+        aiCount = pInfo->iNumDependentActorValues;
     }
     return pDependents;
 }
@@ -195,7 +195,7 @@ uint32_t ActorValue::GetSectionCount(ActorValue::Section aiSection) {
 const char* ActorValue::GetActorValueName(ActorValue::Index aiIndex) {
     ActorValueInfo* pinfo = ActorValue::GetActorValueInfo(aiIndex);
     if (!pinfo) {
-        return 0;
+        return nullptr;
     }
     if (pinfo->GetFullName() && BSstrlen(pinfo->GetFullName())) {
         return pinfo->GetFullName();
@@ -215,10 +215,10 @@ const char* ActorValue::GetActorValueScriptName(ActorValue::Index aiIndex) {
 const char* ActorValue::GetActorValueDesc(ActorValue::Index aiIndex) {
     ActorValueInfo* pinfo = ActorValue::GetActorValueInfo(aiIndex);
     if (pinfo) {
-        return pinfo->GetDescription(0, DESC_ID);
+        return pinfo->GetDescription(nullptr, DESC_ID);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -228,12 +228,12 @@ const char* ActorValue::GetActorValueIcon(ActorValue::Index aiIndex) {
         return ActorValueInfo_->GetTextureName();
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
 const char* ActorValue::GetItemWeaponTypeBadge(ActorValue::Index aiIndex) {
-    const char* v2 = 0;
+    const char* v2 = nullptr;
     switch (aiIndex) {
         case ActorValue::BIG_GUNS: {
             v2 = "Interface\\Icons\\TypeIcons\\weap_skill_icon_big_guns.dds";
@@ -269,7 +269,7 @@ const char* ActorValue::GetItemWeaponTypeBadge(ActorValue::Index aiIndex) {
 void ActorValue::RegisterActorValues() {
     if (!bActorValuesRegistered) {
         ActorValue::RegisterActorValue(
-            ActorValue::AGGRESSION, "Aggression", ActorValue::AI_ATTRIBUTE, 257u, 0, 0,
+            ActorValue::AGGRESSION, "Aggression", ActorValue::AI_ATTRIBUTE, 257u, nullptr, nullptr,
             &Actor::AggressionModifiedCallback, 0
         );
         ActorValueInfo* pinfo = ActorValue::GetActorValueInfo(ActorValue::AGGRESSION);
@@ -277,7 +277,7 @@ void ActorValue::RegisterActorValues() {
             pinfo->SetEnumerated(4, "Unaggressive", "Aggressive", "Very Aggressive", "Frenzied");
         }
         ActorValue::RegisterActorValue(
-            ActorValue::ASSISTANCE, "Assistance", ActorValue::AI_ATTRIBUTE, 257u, 0, 0,
+            ActorValue::ASSISTANCE, "Assistance", ActorValue::AI_ATTRIBUTE, 257u, nullptr, nullptr,
             &Actor::AssistanceModifiedCallback, 0
         );
         ActorValueInfo* pinfo_2 = ActorValue::GetActorValueInfo(ActorValue::ASSISTANCE);
@@ -285,17 +285,21 @@ void ActorValue::RegisterActorValues() {
             pinfo_2->SetEnumerated(3, "Helps Nobody", "Helps Allies", "Helps Friends and Allies");
         }
         ActorValue::RegisterActorValue(
-            ActorValue::CONFIDENCE, "Confidence", ActorValue::AI_ATTRIBUTE, 257u, 0, 0, 0, 0
+            ActorValue::CONFIDENCE, "Confidence", ActorValue::AI_ATTRIBUTE, 257u, nullptr, nullptr, nullptr, 0
         );
         ActorValueInfo* pinfo_3 = ActorValue::GetActorValueInfo(ActorValue::CONFIDENCE);
         if (pinfo_3) {
             pinfo_3->SetEnumerated(5, "Cowardly", "Cautious", "Average", "Brave", "Foolhardy");
         }
-        ActorValue::RegisterActorValue(ActorValue::ENERGY, "Energy", ActorValue::AI_ATTRIBUTE, 1u, 0, 0, 0, 0);
         ActorValue::RegisterActorValue(
-            ActorValue::RESPONSIBILITY, "Responsibility", ActorValue::AI_ATTRIBUTE, 1u, 0, 0, 0, 0
+            ActorValue::ENERGY, "Energy", ActorValue::AI_ATTRIBUTE, 1u, nullptr, nullptr, nullptr, 0
         );
-        ActorValue::RegisterActorValue(ActorValue::MOOD, "Mood", ActorValue::AI_ATTRIBUTE, 257u, 0, 0, 0, 0);
+        ActorValue::RegisterActorValue(
+            ActorValue::RESPONSIBILITY, "Responsibility", ActorValue::AI_ATTRIBUTE, 1u, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::MOOD, "Mood", ActorValue::AI_ATTRIBUTE, 257u, nullptr, nullptr, nullptr, 0
+        );
         ActorValueInfo* pinfo_4 = ActorValue::GetActorValueInfo(ActorValue::MOOD);
         if (pinfo_4) {
             pinfo_4->SetEnumerated(
@@ -304,39 +308,39 @@ void ActorValue::RegisterActorValues() {
         }
         ActorValue::RegisterActorValue(
             ActorValue::STRENGTH, "Strength", ActorValue::ATTRIBUTE,
-            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, 0, 0, 0, 3, ActorValue::CARRY_WEIGHT,
-            ActorValue::MELEE_WEAPONS, ActorValue::MELEE_DAMAGE
+            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, nullptr, nullptr, nullptr, 3,
+            ActorValue::CARRY_WEIGHT, ActorValue::MELEE_WEAPONS, ActorValue::MELEE_DAMAGE
         );
         ActorValue::RegisterActorValue(
             ActorValue::PERCEPTION, "Perception", ActorValue::ATTRIBUTE,
-            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, 0, 0, 0, 3,
+            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, nullptr, nullptr, nullptr, 3,
             ActorValue::ENERGY_WEAPONS, ActorValue::LOCKPICK, ActorValue::EXPLOSIVES
         );
         ActorValue::RegisterActorValue(
             ActorValue::ENDURANCE, "Endurance", ActorValue::ATTRIBUTE,
-            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, 0, 0,
+            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, nullptr, nullptr,
             &Actor::EnduranceModifiedCallback, 7, ActorValue::HEALTH, ActorValue::HEALING_RATE,
             ActorValue::POISON_RESISTANCE, ActorValue::RADIATION_RESISTANCE, ActorValue::BIG_GUNS, ActorValue::UNARMED,
             ActorValue::SURVIVAL
         );
         ActorValue::RegisterActorValue(
             ActorValue::CHARISMA, "Charisma", ActorValue::ATTRIBUTE,
-            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, 0, 0, 0, 2, ActorValue::BARTER,
-            ActorValue::SPEECH
+            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, nullptr, nullptr, nullptr, 2,
+            ActorValue::BARTER, ActorValue::SPEECH
         );
         ActorValue::RegisterActorValue(
             ActorValue::INTELLIGENCE, "Intelligence", ActorValue::ATTRIBUTE,
-            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, 0, 0, 0, 3, ActorValue::SCIENCE,
-            ActorValue::REPAIR, ActorValue::MEDICINE
+            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, nullptr, nullptr, nullptr, 3,
+            ActorValue::SCIENCE, ActorValue::REPAIR, ActorValue::MEDICINE
         );
         ActorValue::RegisterActorValue(
             ActorValue::AGILITY, "Agility", ActorValue::ATTRIBUTE,
-            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, 0, 0, 0, 3,
+            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, nullptr, nullptr, nullptr, 3,
             ActorValue::ACTION_POINTS, ActorValue::SMALL_GUNS, ActorValue::SNEAK
         );
         ActorValue::RegisterActorValue(
             ActorValue::LUCK, "Luck", ActorValue::ATTRIBUTE,
-            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, 0, 0, 0, 15,
+            ActorValue::FAST_MODIFIER | ActorValue::MAX_TEN | ActorValue::MIN_ONE, nullptr, nullptr, nullptr, 15,
             ActorValue::CRITICAL_CHANCE, ActorValue::BARTER, ActorValue::BIG_GUNS, ActorValue::ENERGY_WEAPONS,
             ActorValue::EXPLOSIVES, ActorValue::LOCKPICK, ActorValue::MEDICINE, ActorValue::MELEE_WEAPONS,
             ActorValue::REPAIR, ActorValue::SCIENCE, ActorValue::SMALL_GUNS, ActorValue::SNEAK, ActorValue::SPEECH,
@@ -344,200 +348,238 @@ void ActorValue::RegisterActorValues() {
         );
         ActorValue::RegisterActorValue(
             ActorValue::ACTION_POINTS, "ActionPoints", ActorValue::DERIVED_ATTRIBUTE, 0,
-            &AiFormulas::AVDeriveActionPoints, 0, 0, 0
+            &AiFormulas::AVDeriveActionPoints, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::CARRY_WEIGHT, "CarryWeight", ActorValue::DERIVED_ATTRIBUTE, 2049u,
-            &AiFormulas::AVDeriveCarryWeight, 0, 0, 0
+            &AiFormulas::AVDeriveCarryWeight, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::CRITICAL_CHANCE, "CritChance", ActorValue::DERIVED_ATTRIBUTE, 2048u,
-            &AiFormulas::AVDeriveCriticalChance, 0, 0, 0
+            &AiFormulas::AVDeriveCriticalChance, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::HEALING_RATE, "HealRate", ActorValue::DERIVED_ATTRIBUTE, 2049u,
-            &AiFormulas::AVDeriveHealingRate, 0, &Actor::HealingRateModifiedCallback, 0
+            &AiFormulas::AVDeriveHealingRate, nullptr, &Actor::HealingRateModifiedCallback, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::HEALTH, "Health", ActorValue::DERIVED_ATTRIBUTE,
             ActorValue::FAST_MODIFIER | ActorValue::DERIVED_PLUS_BASE | ActorValue::DERIVED_IF_AUTOCALC |
                 ActorValue::CREATURE_NOT_DERIVED,
-            &AiFormulas::AVDeriveHealth, 0, &Actor::HealthFatigueModifiedCallback, 0
+            &AiFormulas::AVDeriveHealth, nullptr, &Actor::HealthFatigueModifiedCallback, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::MELEE_DAMAGE, "MeleeDamage", ActorValue::DERIVED_ATTRIBUTE, 2048u,
-            &AiFormulas::AVDeriveFromPrimary, 0, 0, 0
+            &AiFormulas::AVDeriveFromPrimary, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::DAMAGE_RESISTANCE, "DamageResist", ActorValue::RESISTANCE, 2048u,
-            &Actor::GetBaseDamageResistance, 0, &Actor::ResetActorDTDR, 0
+            &Actor::GetBaseDamageResistance, nullptr, &Actor::ResetActorDTDR, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::POISON_RESISTANCE, "PoisonResist", ActorValue::RESISTANCE, 2048u,
-            &AiFormulas::AVDeriveResistance, 0, 0, 0
+            &AiFormulas::AVDeriveResistance, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::RADIATION_RESISTANCE, "RadResist", ActorValue::RESISTANCE, 2048u,
-            &AiFormulas::AVDeriveResistance, 0, &Actor::HandleChange_008BA2B0, 0
+            &AiFormulas::AVDeriveResistance, nullptr, &Actor::HandleChange_008BA2B0, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::FIRE_RESISTANCE, "FireResist", ActorValue::RESISTANCE, 0, 0, 0, 0, 0
+            ActorValue::FIRE_RESISTANCE, "FireResist", ActorValue::RESISTANCE, 0, nullptr, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::ELECTRICAL_RESISTANCE, "ElectricResist", ActorValue::RESISTANCE, 0, 0, 0, 0, 0
+            ActorValue::ELECTRICAL_RESISTANCE, "ElectricResist", ActorValue::RESISTANCE, 0, nullptr, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::FROST_RESISTANCE, "FrostResist", ActorValue::RESISTANCE, 0, 0, 0, 0, 0
+            ActorValue::FROST_RESISTANCE, "FrostResist", ActorValue::RESISTANCE, 0, nullptr, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::ENERGY_RESISTANCE, "EnergyResist", ActorValue::RESISTANCE, 0, 0, 0, 0, 0
+            ActorValue::ENERGY_RESISTANCE, "EnergyResist", ActorValue::RESISTANCE, 0, nullptr, nullptr, nullptr, 0
         );
-        ActorValue::RegisterActorValue(ActorValue::EMP_RESISTANCE, "EmpResist", ActorValue::RESISTANCE, 0, 0, 0, 0, 0);
         ActorValue::RegisterActorValue(
-            ActorValue::SPEED_MULT, "SpeedMult", ActorValue::DERIVED_ATTRIBUTE, 2049u, 0, 0, 0, 0
+            ActorValue::EMP_RESISTANCE, "EmpResist", ActorValue::RESISTANCE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::SPEED_MULT, "SpeedMult", ActorValue::DERIVED_ATTRIBUTE, 2049u, nullptr, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::FATIGUE, "Fatigue", ActorValue::DERIVED_ATTRIBUTE,
             ActorValue::FAST_MODIFIER | ActorValue::DERIVED_PLUS_BASE | ActorValue::DERIVED_ALWAYS |
                 ActorValue::CREATURE_NOT_DERIVED,
-            &AiFormulas::AVDeriveFatigue, 0, &Actor::HealthFatigueModifiedCallback, 0
+            &AiFormulas::AVDeriveFatigue, nullptr, &Actor::HealthFatigueModifiedCallback, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::PERCEPTION_CONDITION, "PerceptionCondition", ActorValue::CONDITION, 2081u,
-            &AiFormulas::AVDeriveBodyPartCondition, 0, &Actor::ConditionModifiedCallback, 0
+            &AiFormulas::AVDeriveBodyPartCondition, nullptr, &Actor::ConditionModifiedCallback, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::ENDURANCE_CONDITION, "EnduranceCondition", ActorValue::CONDITION, 2081u,
-            &AiFormulas::AVDeriveBodyPartCondition, 0, &Actor::ConditionModifiedCallback, 0
+            &AiFormulas::AVDeriveBodyPartCondition, nullptr, &Actor::ConditionModifiedCallback, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::LEFT_ATTACK_CONDITION, "LeftAttackCondition", ActorValue::CONDITION, 2081u,
-            &AiFormulas::AVDeriveBodyPartCondition, 0, &Actor::ConditionModifiedCallback, 0
+            &AiFormulas::AVDeriveBodyPartCondition, nullptr, &Actor::ConditionModifiedCallback, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::RIGHT_ATTACK_CONDITION, "RightAttackCondition", ActorValue::CONDITION, 2081u,
-            &AiFormulas::AVDeriveBodyPartCondition, 0, &Actor::ConditionModifiedCallback, 0
+            &AiFormulas::AVDeriveBodyPartCondition, nullptr, &Actor::ConditionModifiedCallback, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::LEFT_MOBILITY_CONDITION, "LeftMobilityCondition", ActorValue::CONDITION, 2081u,
-            &AiFormulas::AVDeriveBodyPartCondition, 0, &Actor::MobilityConditionModifiedCallback, 0
+            &AiFormulas::AVDeriveBodyPartCondition, nullptr, &Actor::MobilityConditionModifiedCallback, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::RIGHT_MOBILITY_CONDITION, "RightMobilityCondition", ActorValue::CONDITION, 2081u,
-            &AiFormulas::AVDeriveBodyPartCondition, 0, &Actor::MobilityConditionModifiedCallback, 0
+            &AiFormulas::AVDeriveBodyPartCondition, nullptr, &Actor::MobilityConditionModifiedCallback, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::BRAIN_CONDITION, "BrainCondition", ActorValue::CONDITION, 2080u,
-            &AiFormulas::AVDeriveBodyPartCondition, 0, &Actor::ConditionModifiedCallback, 0
+            &AiFormulas::AVDeriveBodyPartCondition, nullptr, &Actor::ConditionModifiedCallback, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::KARMA, "Karma", ActorValue::DERIVED_ATTRIBUTE, ActorValue::NO_SCRIPT_MODAV, 0, 0, 0, 0
+            ActorValue::KARMA, "Karma", ActorValue::DERIVED_ATTRIBUTE, ActorValue::NO_SCRIPT_MODAV, nullptr, nullptr,
+            nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::EXPERIENCE_POINTS, "XP", ActorValue::DERIVED_ATTRIBUTE, ActorValue::NO_SCRIPT_MODAV, 0, 0,
-            &ActorValue::HandleXPChange, 0
+            ActorValue::EXPERIENCE_POINTS, "XP", ActorValue::DERIVED_ATTRIBUTE, ActorValue::NO_SCRIPT_MODAV, nullptr,
+            nullptr, &ActorValue::HandleXPChange, 0
         );
         ActorValue::RegisterActorValue(
             ActorValue::UNARMED_DAMAGE, "UnarmedDamage", ActorValue::DERIVED_ATTRIBUTE, 2048u,
-            &AiFormulas::AVDeriveUnarmedDamage, 0, 0, 0
+            &AiFormulas::AVDeriveUnarmedDamage, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::BARTER, "Barter", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, 0, 0, 0
+            ActorValue::BARTER, "Barter", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::BIG_GUNS, "BigGuns", ActorValue::SKILL, ActorValue::DEPRECATED, 0, 0, 0, 0
+            ActorValue::BIG_GUNS, "BigGuns", ActorValue::SKILL, ActorValue::DEPRECATED, nullptr, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::ENERGY_WEAPONS, "EnergyWeapons", ActorValue::SKILL, 1040u, &AiFormulas::AVDeriveSkill_0, 0, 0, 0
+            ActorValue::ENERGY_WEAPONS, "EnergyWeapons", ActorValue::SKILL, 1040u, &AiFormulas::AVDeriveSkill_0,
+            nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::EXPLOSIVES, "Explosives", ActorValue::SKILL, 1040u, &AiFormulas::AVDeriveSkill_0, 0, 0, 0
+            ActorValue::EXPLOSIVES, "Explosives", ActorValue::SKILL, 1040u, &AiFormulas::AVDeriveSkill_0, nullptr,
+            nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::LOCKPICK, "Lockpick", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, 0, 0, 0
+            ActorValue::LOCKPICK, "Lockpick", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::MEDICINE, "Medicine", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, 0,
+            ActorValue::MEDICINE, "Medicine", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, nullptr,
             &Actor::HandleChange_008B9AB0, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::MELEE_WEAPONS, "MeleeWeapons", ActorValue::SKILL, 1040u, &AiFormulas::AVDeriveSkill_0, 0, 0, 0
+            ActorValue::MELEE_WEAPONS, "MeleeWeapons", ActorValue::SKILL, 1040u, &AiFormulas::AVDeriveSkill_0, nullptr,
+            nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::REPAIR, "Repair", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, 0, 0, 0
+            ActorValue::REPAIR, "Repair", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::SCIENCE, "Science", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, 0, 0, 0
+            ActorValue::SCIENCE, "Science", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::SMALL_GUNS, "Guns", ActorValue::SKILL, 1040u, &AiFormulas::AVDeriveSkill_0, 0, 0, 0
+            ActorValue::SMALL_GUNS, "Guns", ActorValue::SKILL, 1040u, &AiFormulas::AVDeriveSkill_0, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::SNEAK, "Sneak", ActorValue::SKILL, 17u, &AiFormulas::AVDeriveSkill_0, 0, 0, 0
+            ActorValue::SNEAK, "Sneak", ActorValue::SKILL, 17u, &AiFormulas::AVDeriveSkill_0, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::SPEECH, "Speech", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, 0, 0, 0
+            ActorValue::SPEECH, "Speech", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, nullptr, nullptr, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::SURVIVAL, "Survival", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, 0,
+            ActorValue::SURVIVAL, "Survival", ActorValue::SKILL, 16u, &AiFormulas::AVDeriveSkill_0, nullptr,
             &Actor::HandleChange_008B9B10, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::UNARMED, "Unarmed", ActorValue::SKILL, 1040u, &AiFormulas::AVDeriveSkill_0, 0, 0, 1,
+            ActorValue::UNARMED, "Unarmed", ActorValue::SKILL, 1040u, &AiFormulas::AVDeriveSkill_0, nullptr, nullptr, 1,
             ActorValue::UNARMED_DAMAGE
         );
         ActorValue::RegisterActorValue(
             ActorValue::INVENTORY_WEIGHT, "InventoryWeight", ActorValue::DERIVED_ATTRIBUTE, 1u,
-            &Actor::GetInventoryWeight, 0, &Actor::HandleChange_008BA2F0, 0
+            &Actor::GetInventoryWeight, nullptr, &Actor::HandleChange_008BA2F0, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::PARALYSIS, "Paralysis", ActorValue::INT_VALUE, 1u, 0, 0, &Actor::ParalysisModifiedCallback, 0
-        );
-        ActorValue::RegisterActorValue(ActorValue::INVISIBILITY, "Invisibility", ActorValue::INT_VALUE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(ActorValue::CHAMELEON, "Chameleon", ActorValue::INT_VALUE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(ActorValue::NIGHT_EYE_BONUS, "NightEye", ActorValue::INT_VALUE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(ActorValue::TURBO, "Turbo", ActorValue::INT_VALUE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(
-            ActorValue::WATER_BREATHING, "WaterBreathing", ActorValue::INT_VALUE, 1u, 0, 0, 0, 0
+            ActorValue::PARALYSIS, "Paralysis", ActorValue::INT_VALUE, 1u, nullptr, nullptr,
+            &Actor::ParalysisModifiedCallback, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::RADIATION_RADS, "RadiationRads", ActorValue::INT_VALUE, 544u, 0, 0,
+            ActorValue::INVISIBILITY, "Invisibility", ActorValue::INT_VALUE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::CHAMELEON, "Chameleon", ActorValue::INT_VALUE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::NIGHT_EYE_BONUS, "NightEye", ActorValue::INT_VALUE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::TURBO, "Turbo", ActorValue::INT_VALUE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::WATER_BREATHING, "WaterBreathing", ActorValue::INT_VALUE, 1u, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::RADIATION_RADS, "RadiationRads", ActorValue::INT_VALUE, 544u, nullptr, nullptr,
             &Actor::CheckRadiationLevelChange, 0
         );
-        ActorValue::RegisterActorValue(ActorValue::BLOODY_MESS, "BloodyMess", ActorValue::INT_VALUE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(ActorValue::VARIABLE_01, "Variable01", ActorValue::VARIABLE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(ActorValue::VARIABLE_02, "Variable02", ActorValue::VARIABLE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(ActorValue::VARIABLE_03, "Variable03", ActorValue::VARIABLE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(ActorValue::VARIABLE_04, "Variable04", ActorValue::VARIABLE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(ActorValue::VARIABLE_05, "Variable05", ActorValue::VARIABLE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(ActorValue::VARIABLE_06, "Variable06", ActorValue::VARIABLE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(ActorValue::VARIABLE_07, "Variable07", ActorValue::VARIABLE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(ActorValue::VARIABLE_08, "Variable08", ActorValue::VARIABLE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(ActorValue::VARIABLE_09, "Variable09", ActorValue::VARIABLE, 0, 0, 0, 0, 0);
-        ActorValue::RegisterActorValue(ActorValue::VARIABLE_10, "Variable10", ActorValue::VARIABLE, 0, 0, 0, 0, 0);
         ActorValue::RegisterActorValue(
-            ActorValue::IGNORE_CRIPPLED_LIMBS, "IgnoreCrippledLimbs", ActorValue::VARIABLE, 1u, 0, 0,
+            ActorValue::BLOODY_MESS, "BloodyMess", ActorValue::INT_VALUE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::VARIABLE_01, "Variable01", ActorValue::VARIABLE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::VARIABLE_02, "Variable02", ActorValue::VARIABLE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::VARIABLE_03, "Variable03", ActorValue::VARIABLE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::VARIABLE_04, "Variable04", ActorValue::VARIABLE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::VARIABLE_05, "Variable05", ActorValue::VARIABLE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::VARIABLE_06, "Variable06", ActorValue::VARIABLE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::VARIABLE_07, "Variable07", ActorValue::VARIABLE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::VARIABLE_08, "Variable08", ActorValue::VARIABLE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::VARIABLE_09, "Variable09", ActorValue::VARIABLE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::VARIABLE_10, "Variable10", ActorValue::VARIABLE, 0, nullptr, nullptr, nullptr, 0
+        );
+        ActorValue::RegisterActorValue(
+            ActorValue::IGNORE_CRIPPLED_LIMBS, "IgnoreCrippledLimbs", ActorValue::VARIABLE, 1u, nullptr, nullptr,
             &Actor::ConditionModifiedCallback, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::DEHYDRATION, "Dehydration", ActorValue::INT_VALUE, 545u, 0, 0,
+            ActorValue::DEHYDRATION, "Dehydration", ActorValue::INT_VALUE, 545u, nullptr, nullptr,
             &Actor::CheckDehydrationLevelChange, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::HUNGER, "Hunger", ActorValue::INT_VALUE, 545u, 0, 0, &Actor::CheckHungerLevelChange, 0
+            ActorValue::HUNGER, "Hunger", ActorValue::INT_VALUE, 545u, nullptr, nullptr, &Actor::CheckHungerLevelChange,
+            0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::SLEEPDEPREVATION, "SleepDeprevation", ActorValue::INT_VALUE, 545u, 0, 0,
+            ActorValue::SLEEPDEPREVATION, "SleepDeprevation", ActorValue::INT_VALUE, 545u, nullptr, nullptr,
             &Actor::CheckSleepDeprevationLevelChange, 0
         );
         ActorValue::RegisterActorValue(
-            ActorValue::DAMAGE_THRESHOLD, "DamageThreshold", ActorValue::RESISTANCE, 2048u, &Actor::GetTotalArmorDT, 0,
-            &Actor::ResetActorDTDR, 0
+            ActorValue::DAMAGE_THRESHOLD, "DamageThreshold", ActorValue::RESISTANCE, 2048u, &Actor::GetTotalArmorDT,
+            nullptr, &Actor::ResetActorDTDR, 0
         );
         for (int32_t i = 0; i < 77; ++i) {
             ;
         }
-        bActorValuesRegistered = 1;
+        bActorValuesRegistered = true;
     }
 }
 
@@ -569,7 +611,7 @@ void ActorValue::RegisterActorValue(
         va_list vList;
         va_start(vList, aiNumDependentActorValues);
         // The count is compared signed.
-        for (int32_t i = 0; i < static_cast<int32_t>(pInfo->iNumDependentActorValues); ++i) {
+        for (int32_t i = 0; i < pInfo->iNumDependentActorValues; ++i) {
             pInfo->DependentActorValues[i] = va_arg(vList, int32_t);
         }
         va_end(vList);
@@ -578,13 +620,13 @@ void ActorValue::RegisterActorValue(
 }
 
 bool ActorValue::GetDerivedActorValue(ActorValueOwner* apActor, ActorValue::Index aiWhich, float& afValue) {
-    bool v5 = 0;
+    bool v5 = false;
     afValue = 0.0f;
     ActorValueInfo* pValueInfo = ActorValue::GetActorValueInfo(aiWhich);
     if (pValueInfo) {
         if (pValueInfo->pDerivationFunction) {
             afValue = pValueInfo->pDerivationFunction(apActor, aiWhich);
-            return 1;
+            return true;
         }
     }
     return v5;
@@ -632,10 +674,10 @@ void ActorValue::FreeActorValues() {
     for (int32_t i = 0; i < 77; ++i) {
         if (ActorValue::Instance.pActorValueInfo[i]) {
             delete ActorValue::Instance.pActorValueInfo[i];
-            ActorValue::Instance.pActorValueInfo[i] = 0;
+            ActorValue::Instance.pActorValueInfo[i] = nullptr;
         }
     }
-    bActorValuesRegistered = 0;
+    bActorValuesRegistered = false;
 }
 
 void ActorValue::HandleXPChange(
@@ -668,7 +710,7 @@ ActorValueInfo::ActorValueInfo(ActorValue::Index aiWhich, char* apScriptName)
     pModifiedCallback(nullptr), iNumDependentActorValues(0), iEnumCount(0), sEnumNames{} {
     cFormType = AVIF_ID;
     if (aiWhich != ActorValue::VALUE_NONE) {
-        TESForm::SetFormID(GetActorValueFormID(aiWhich), 0);
+        TESForm::SetFormID(GetActorValueFormID(aiWhich), false);
     }
     if (apScriptName) {
         char acEditorID[108];
@@ -750,7 +792,7 @@ void ActorValueInfo::Save() {
 
 void ActorValueInfo::InitItem() {
     if (!TESForm::GetInitialized()) {
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 
@@ -779,10 +821,10 @@ void ActorValueInfo::Copy(TESForm* apCopy) {
 bool ActorValueInfo::Compare(TESForm* apCompare) {
     ActorValueInfo* pinfo = dynamic_cast<ActorValueInfo*>(apCompare);
     if (!pinfo) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pinfo)) {
-        return 1;
+        return true;
     }
     return static_cast<uint8_t>(sAbbreviation.IsNotEqual(pinfo->sAbbreviation)) != 0;
 }

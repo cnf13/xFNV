@@ -27,7 +27,7 @@
 #include "Fallout/Misc/TaskQueueInterface.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 ActionPoints::SettingPointerArray ActionPoints::pCosts{
     &fActionPointsAttackUnarmed,
@@ -118,9 +118,9 @@ double get_fActionPointsRestoreRate() {
 float ActionPoints::GetBaseActionPoints(uint32_t auiAction) {
     float v3 = (float)0.0;
     if (auiAction <= 21) {
-        return (float)(ActionPoints::pCosts[auiAction]->Float());
+        return ActionPoints::pCosts[auiAction]->Float();
     }
-    return (float)(v3);
+    return v3;
 }
 
 // The cost and the scaled cost are rounded to float before they are returned.

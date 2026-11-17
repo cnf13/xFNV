@@ -9,7 +9,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolve.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverInfo.h"
 
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 // Walks one constraint's schemas after its header. Each bilateral or contact row's velocity is the dot product of its

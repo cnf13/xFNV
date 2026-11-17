@@ -54,8 +54,8 @@ NiObject* NiPSysMeshUpdateModifier::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -256,7 +256,7 @@ NiObject* NiPSysMeshUpdateModifier::CreateObject() {
     NiPSysMeshUpdateModifier* pkObject =
         static_cast<NiPSysMeshUpdateModifier*>(NiMemObject::operator new(sizeof(NiPSysMeshUpdateModifier)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysMeshUpdateModifier;
 }

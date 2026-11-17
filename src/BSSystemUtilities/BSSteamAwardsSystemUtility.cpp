@@ -6,7 +6,7 @@
 #include "Fallout Shared/GlobalFunc.h"
 #include "SDK/Steam/isteamuserstats.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 char return_0_1() {
     return 0;
@@ -73,7 +73,7 @@ BSSteamAwardsSystemUtility* BSSteamAwardsSystemUtility::QInstance() {
             v1 = ::new (apMemory) BSSteamAwardsSystemUtility;
         }
         else {
-            v1 = 0;
+            v1 = nullptr;
         }
         BSSteamAwardsSystemUtility::m_pInstance = v1;
     }

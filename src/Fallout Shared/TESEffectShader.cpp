@@ -46,7 +46,7 @@
 #include "SDK/MSVC/string.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 // The EDID buffer is initialised to "" (one zeroed byte, allocated even for an empty chunk), so an empty chunk
 // (malformed data) does not leave it uninitialised.
@@ -152,7 +152,7 @@ void TESEffectShader::Save() {
         pSavedAddonModels = reinterpret_cast<BGSDebris*>(static_cast<uintptr_t>(pAddonModels->iFormID));
     }
     else {
-        pSavedAddonModels = 0;
+        pSavedAddonModels = nullptr;
     }
     Data.pAddonModels = pSavedAddonModels;
     if (TESForm::QEndianSwapOnSave()) {
@@ -177,7 +177,7 @@ void TESEffectShader::InitItem() {
             TESForm* FormByNumericID = TESForm::GetFormByNumericID(uiAddonModelsID);
             Data.pAddonModels = dynamic_cast<BGSDebris*>(FormByNumericID);
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -201,20 +201,20 @@ void TESEffectShader::Copy(TESForm* apCopy) {
 bool TESEffectShader::Compare(TESForm* apCompare) {
     TESEffectShader* v7 = dynamic_cast<TESEffectShader*>(apCompare);
     if (!v7) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(v7)) {
-        return 1;
+        return true;
     }
     // Compares each texture through its vtable.
     TESTexture* pTextureShaderTexture = v7->GetTextureShaderTexture();
     BaseFormComponent* pComponent = &TextureShaderTexture;
     if (pComponent->CompareComponent(pTextureShaderTexture)) {
-        return 1;
+        return true;
     }
     pComponent = &ParticleShaderTexture;
     if (pComponent->CompareComponent(&v7->ParticleShaderTexture)) {
-        return 1;
+        return true;
     }
     TESTexture* pBlockOutTexture = v7->GetBlockOutTexture();
     pComponent = &BlockOutTexture;
@@ -294,13 +294,13 @@ void TESEffectShader::StartTextureShader(
             BSShaderPPLightingProperty* pLightingProp =
                 bIsLighting ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
             if (pLightingProp) {
-                bool bapply = 1;
+                bool bapply = true;
                 if (IsFlagSet(TESEffectShader::SKIN_ONLY)) {
                     const char* HandleString;
                     NiMaterialProperty* pmat = static_cast<NiMaterialProperty*>(apObject->GetProperty(2));
                     if (!(&pmat->m_kName)->GetHandleString() ||
                         (HandleString = (&pmat->m_kName)->GetHandleString(), BSstrcmp(HandleString, "skin"))) {
-                        bapply = 0;
+                        bapply = false;
                     }
                 }
                 if (bapply) {
@@ -438,7 +438,7 @@ void TESEffectShader::StopTextureShader(
     else {
         NiNode* pNode = apObject->IsNode();
         if (pNode) {
-            for (uint32_t i = 0; i < (uint32_t)pNode->GetArrayCount(); ++i) {
+            for (uint32_t i = 0; i < pNode->GetArrayCount(); ++i) {
                 StopTextureShader(pNode->GetAt(i), apTexEffectData);
             }
         }
@@ -500,9 +500,9 @@ float TESEffectShader::GetFillAlphaPersistentPercent() {
 
 float TESEffectShader::AnimateFillEffectAlpha(float afCurrentAlpha, float afTimeDelta, float afTime, bool abFade) {
     float fillTexturePersistentAlphaRatio = GetFillAlphaPersistentPercent();
-    float fillTextureFullAlphaRatio = (float)GetFillAlphaFullPercent();
+    float fillTextureFullAlphaRatio = GetFillAlphaFullPercent();
     float fillTextureFullAlphaTime = GetFillAlphaFullTime();
-    float fillTextureAlphaFadeOutTime = (float)GetFillAlphaFadeOutTime();
+    float fillTextureAlphaFadeOutTime = GetFillAlphaFadeOutTime();
     float fillTextureAlphaFadeInTime = GetFillAlphaFadeInTime();
     return AnimateValue(
         afCurrentAlpha, afTimeDelta, afTime, abFade, fillTextureAlphaFadeInTime, fillTextureAlphaFadeOutTime,
@@ -522,11 +522,11 @@ TESEffectShader::CreateTextureShaderData(NiAVObject* apObject, NiSourceTexture* 
         pData = ::new (apMemory) BSShaderPPLightingProperty::TextureEffectData;
     }
     else {
-        pData = 0;
+        pData = nullptr;
     }
     int32_t fillTextureRGB = Data.iFillColor;
     int32_t UnderwaterState = Data.iEdgeColor;
-    pData->spTexture.operator=(static_cast<NiTexture*>(0));
+    pData->spTexture.operator=(static_cast<NiTexture*>(nullptr));
     float fB = static_cast<float>(static_cast<uint8_t>(fillTextureRGB >> 16));
     float fG = static_cast<float>(static_cast<uint8_t>(fillTextureRGB >> 8));
     float fR = static_cast<float>(static_cast<uint8_t>(fillTextureRGB));

@@ -193,7 +193,7 @@ public:
 template <typename T, typename Allocator = hkContainerHeapAllocator>
 class hkArray : public hkArrayBase<T> {
 public:
-    typedef Allocator AllocatorType;
+    using AllocatorType = Allocator;
 
     hkArray() : hkArrayBase<T>(nullptr, 0, 0) {}
     // The array over an external buffer, flagged DONT_DEALLOCATE.

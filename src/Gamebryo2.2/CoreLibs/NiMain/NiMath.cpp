@@ -8,8 +8,8 @@ void CreateSinTable() {
     float fAngle = 0.0f;
     double dStep = NI_TWO_PI * 0.001953125;
     for (uint32_t i = 0; i < 512; i++) {
-        s_fSinTableA[i] = static_cast<float>(std::sin(fAngle));
-        s_fCosTableA[i] = static_cast<float>(std::cos(fAngle));
+        s_fSinTableA[i] = std::sin(fAngle);
+        s_fCosTableA[i] = std::cos(fAngle);
         fAngle = fAngle + dStep;
     }
 }

@@ -17,7 +17,7 @@
 #include "SDK/MSVC/string.h"
 #include "SDK/MSVC/sys/stat.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 IDirect3DTexture9* Create_texture(
     IDirect3DDevice9* pkD3DDevice9,
@@ -187,7 +187,7 @@ void Close_RAD_3D_image_pow2(BINKTEXTURESET* Block) {
                 Block->ppTextures[i]->Release();
             }
         }
-        Block->ppTextures = 0;
+        Block->ppTextures = nullptr;
         MemoryManager_Singleton.Deallocate(Block);
     }
 }
@@ -202,7 +202,7 @@ int32_t Lock_RAD_3D_image_pow2(
     uint32_t* a7
 ) {
     _D3DLOCKED_RECT v13;
-    if (a1->uiLockIndex >= a1->uiTextureCount || a1->ppTextures[a1->uiLockIndex]->LockRect(0, &v13, 0, 0) < 0) {
+    if (a1->uiLockIndex >= a1->uiTextureCount || a1->ppTextures[a1->uiLockIndex]->LockRect(0, &v13, nullptr, 0) < 0) {
         a1->uiLockIndex = 0;
         return 0;
     }
@@ -428,7 +428,7 @@ bool Movie::OpenBink(const char* apFileName, bool abSkipWarning, bool abPreloadB
     struct rt::_stat64i32 Stat;
     char Destination[268];
     if (!std::strlen(apFileName)) {
-        return 0;
+        return false;
     }
     if (!static_cast<BGSMoviePlayer*>(pMoviePlayer)->BGSMoviePlayer::GetMoviePath(apFileName, Destination)) {
         std::strcpy(Destination, "Data\\Video\\");
@@ -451,13 +451,13 @@ bool Movie::OpenBink(const char* apFileName, bool abSkipWarning, bool abPreloadB
     }
     pMoviePlayer->SuspendAudioThread();
     pBink = BinkOpen(Destination, uiFlags);
-    bool bresult = 1;
+    bool bresult = true;
     if (!pBink) {
         if (!abSkipWarning) {
             Warning("Could not open %s for playback.", apFileName);
         }
         ePlayingState = MOVIE_NOT_PLAYING;
-        bresult = 0;
+        bresult = false;
     }
     if (v12) {
         pMoviePlayer->SignalBinkOpen();
@@ -467,8 +467,8 @@ bool Movie::OpenBink(const char* apFileName, bool abSkipWarning, bool abPreloadB
 }
 
 bool Movie::LoadBink(const char* apFileName, bool abSkipWarning, bool abPreloadBink, bool abLetterBoxed) {
-    if (!pBink && !OpenBink(apFileName, abSkipWarning, abPreloadBink, 0)) {
-        return 0;
+    if (!pBink && !OpenBink(apFileName, abSkipWarning, abPreloadBink, false)) {
+        return false;
     }
     dxDevice = pMoviePlayer->GetDevice();
     fScale = pMoviePlayer->CalculateScale(pBink->Width, pBink->Height, abLetterBoxed);
@@ -476,13 +476,13 @@ bool Movie::LoadBink(const char* apFileName, bool abSkipWarning, bool abPreloadB
     fYCoordOffset = pMoviePlayer->CalculateYOffset(fScale, pBink->Height, abLetterBoxed);
     pTextureSet = Open_RAD_3D_image_pow2(dxDevice, pBink->Width, pBink->Height, 4, 256u, D3DFMT_X8R8G8B8);
     if (pTextureSet) {
-        return 1;
+        return true;
     }
     if (!abSkipWarning) {
         Warning("Could not allocate textures for %s playback.", apFileName);
     }
     ePlayingState = MOVIE_NOT_PLAYING;
-    return 0;
+    return false;
 }
 
 void Movie::ClearData() {
@@ -520,10 +520,10 @@ bool Movie::Play(
     float afTimeBeforeMovieSkippable
 ) {
     ePlayingState = MOVIE_PLAYING;
-    bLoading = 1;
+    bLoading = true;
     if (LoadBink(apFileName, abSkipWarning, abPreloadBink, abLetterBoxed)) {
         NiDX92DBufferData* v19;
-        bLoading = 0;
+        bLoading = false;
         if (abMuteGameAudio) {
             pMoviePlayer->MuteAudio();
         }
@@ -542,23 +542,23 @@ bool Movie::Play(
             }
             v14 = 0;
         LABEL_15:;
-            v19 = v14 != 0 ? v13 : 0;
+            v19 = v14 != 0 ? v13 : nullptr;
         }
         else {
-            v19 = 0;
+            v19 = nullptr;
         }
         if (v19) {
             dxDevice->SetRenderTarget(0, v19->m_pkSurface);
         }
         if (afTimeBeforeMovieSkippable != 0.0) {
-            abAllowInterruption = 0;
+            abAllowInterruption = false;
         }
         uint32_t uiStartTime = GetTickCount();
         while (Update(abAllowInterruption, abLoop, abLetterBoxed)) {
             if (afTimeBeforeMovieSkippable != 0.0 &&
                 GetTickCount() - uiStartTime >
                     static_cast<uint32_t>(static_cast<int64_t>(afTimeBeforeMovieSkippable * 1000.0))) {
-                abAllowInterruption = 1;
+                abAllowInterruption = true;
                 afTimeBeforeMovieSkippable = 0.0f;
             }
         }
@@ -573,8 +573,8 @@ bool Movie::Play(
         return bfinishedPlaying;
     }
     else {
-        bLoading = 0;
-        return 0;
+        bLoading = false;
+        return false;
     }
 }
 
@@ -622,7 +622,7 @@ void MoviePlayer::SignalBinkOpen() {
     BSSemaphore* lpAddend = &OpenBinkSema;
     OpenBinkSema.hSemaphore->Release();
     InterlockedIncrementInt32(&lpAddend->iCount);
-    bBinkOpenSignaled = 1;
+    bBinkOpenSignaled = true;
 }
 
 void MoviePlayer::ThreadLoadMovie(const char* apFileName, void (*afpCallback)()) {

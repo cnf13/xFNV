@@ -39,10 +39,10 @@ ActiveEffect* CommandHumanoidEffect::Copy() {
 bool CommandHumanoidEffect::CheckTarget(MagicTarget* apTarget) {
     Character* v6 = dynamic_cast<Character*>(apTarget);
     if (!v6) {
-        return (bool)0;
+        return false;
     }
     if (v6->IsPc()) {
-        return (bool)0;
+        return false;
     }
     float flt1C = fMagnitude;
     uint16_t level = v6->Actor::GetLevel();

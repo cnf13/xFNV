@@ -59,7 +59,7 @@ float TESRegionPoint::GetDistanceSquared(const TESRegionPoint* apOther) const {
     float v7 = (float)(v5 - apOther->GetX());
     double flt004 = (double)GetY();
     float v8 = (float)(flt004 - apOther->GetY());
-    return (float)((v7 * v7) + (v8 * v8));
+    return ((v7 * v7) + (v8 * v8));
 }
 
 float TESRegionPoint::GetDistance(const TESRegionPoint* apOther) const {
@@ -115,28 +115,28 @@ bool TESRegionPoint::LineSegmentsIntersect(
     float v18;
     float v23;
     if ((!apP1) || ((!apP2) || ((!apR1) || (!apR2)))) {
-        return (bool)0;
+        return false;
     }
     double v10 = (double)apP2->GetX();
     float v15 = (float)(v10 - apP1->GetX());
     double v9 = (double)apR1->GetX();
     float v22 = (float)(v9 - apR2->GetX());
     if (!(v15 < 0.0)) {
-        v18 = (float)apP2->GetX();
-        v14 = (float)apP1->GetX();
+        v18 = apP2->GetX();
+        v14 = apP1->GetX();
     }
     else {
-        v18 = (float)apP1->GetX();
-        v14 = (float)apP2->GetX();
+        v18 = apP1->GetX();
+        v14 = apP2->GetX();
     }
     if (!(v22 > 0.0)) {
         if ((((double)v18) < apR1->GetX()) || (((double)v14) > apR2->GetX())) {
-            return (bool)0;
+            return false;
         }
     }
     else {
         if ((((double)v18) < apR2->GetX()) || (((double)v14) > apR1->GetX())) {
-            return (bool)0;
+            return false;
         }
     }
     double flt004 = (double)apP2->GetY();
@@ -144,21 +144,21 @@ bool TESRegionPoint::LineSegmentsIntersect(
     double v7 = (double)apR1->GetY();
     float v20 = (float)(v7 - apR2->GetY());
     if (!(v17 < 0.0)) {
-        v23 = (float)apP2->GetY();
-        v12 = (float)apP1->GetY();
+        v23 = apP2->GetY();
+        v12 = apP1->GetY();
     }
     else {
-        v23 = (float)apP1->GetY();
-        v12 = (float)apP2->GetY();
+        v23 = apP1->GetY();
+        v12 = apP2->GetY();
     }
     if (!(v20 > 0.0)) {
         if ((((double)v23) < apR1->GetY()) || (((double)v12) > apR2->GetY())) {
-            return (bool)0;
+            return false;
         }
     }
     else {
         if ((((double)v23) < apR2->GetY()) || (((double)v12) > apR1->GetY())) {
-            return (bool)0;
+            return false;
         }
     }
     double v6 = (double)apP1->GetX();
@@ -169,23 +169,23 @@ bool TESRegionPoint::LineSegmentsIntersect(
     float v13 = (v15 * v11) - (v17 * v21);
     float v16 = (v20 * v21) - (v22 * v11);
     if (v19 == 0.0) {
-        return (bool)1;
+        return true;
     }
     if (!(v19 > 0.0)) {
         if ((v16 > 0.0) || (v19 > ((double)v16))) {
-            return (bool)0;
+            return false;
         }
         if ((v13 > 0.0) || (v19 > ((double)v13))) {
-            return (bool)0;
+            return false;
         }
     }
     else {
         if ((v16 < 0.0) || (v19 < ((double)v16))) {
-            return (bool)0;
+            return false;
         }
         if ((v13 < 0.0) || (v19 < ((double)v13))) {
-            return (bool)0;
+            return false;
         }
     }
-    return (bool)1;
+    return true;
 }

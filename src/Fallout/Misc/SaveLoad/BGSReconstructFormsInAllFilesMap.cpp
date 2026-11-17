@@ -85,10 +85,10 @@ void BGSReconstructFormsInFileMap::AddReference(
             BGSReconstructCellBlocksMap* apMemory =
                 static_cast<BGSReconstructCellBlocksMap*>(ourMalloc(sizeof(BGSReconstructCellBlocksMap)));
             if (apMemory) {
-                v6 = ::new (apMemory) BGSReconstructCellBlocksMap(0);
+                v6 = ::new (apMemory) BGSReconstructCellBlocksMap(false);
             }
             else {
-                v6 = 0;
+                v6 = nullptr;
             }
             pInteriorCells = v6;
         }
@@ -103,7 +103,7 @@ void BGSReconstructFormsInFileMap::AddReference(
                 v5 = ::new (v8) BGSReconstructWorldSpacesMap;
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             pWorldSpaces = v5;
         }
@@ -187,10 +187,10 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
     if (!iCount) {
         return;
     }
-    apFile->TESRewind(1);
+    apFile->TESRewind(true);
     FORM* pcurrentForm = apFile->GetFormData();
     while (pcurrentForm->form == formEnumString[TES4_ID].uiFormString) {
-        apFile->NextForm(1);
+        apFile->NextForm(true);
     }
     BGSReconstructCellBlocksMap* pcurrentCellBlocksMap = nullptr;
     BGSReconstructCellSubBlocksMap* pcurrentCellSubBlocksMap = nullptr;
@@ -215,7 +215,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                 bool bexteriors = pcurrentForm->flags == formEnumString[WRLD_ID].uiFormString;
                 if (bexteriors) {
                     if (pWorldSpaces) {
-                        apFile->NextForm(1);
+                        apFile->NextForm(true);
                     }
                     else {
                         apFile->NextGroup();
@@ -223,7 +223,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                 }
                 else if (pInteriorCells) {
                     pcurrentCellBlocksMap = pInteriorCells;
-                    apFile->NextForm(1);
+                    apFile->NextForm(true);
                 }
                 else {
                     apFile->NextGroup();
@@ -235,7 +235,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
             else if (!pcurrentForm->iFormID) {
                 // A top group of one form type.
                 if (GetAt(pcurrentForm->flags, pcurrentFormsMap)) {
-                    apFile->NextForm(1);
+                    apFile->NextForm(true);
                 }
                 else {
                     apFile->NextGroup();
@@ -253,7 +253,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                                 pcurrentCellBlocksMap->GetFormMapFlag(RECONSTRUCT_CELL | RECONSTRUCT_TEMP_CHILDREN)) {
                                 offsetArray.AddOffset(pcurrentForm->iVersionControl, nullptr);
                             }
-                            apFile->NextForm(1);
+                            apFile->NextForm(true);
                         }
                         else {
                             apFile->NextGroup();
@@ -267,7 +267,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                     case 4: {
                         // An interior or exterior cell block.
                         if (pcurrentCellBlocksMap->GetAt(pcurrentForm->flags, pcurrentCellSubBlocksMap)) {
-                            apFile->NextForm(1);
+                            apFile->NextForm(true);
                         }
                         else {
                             apFile->NextGroup();
@@ -280,7 +280,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                     case 5: {
                         // An interior or exterior cell sub-block.
                         if (pcurrentCellSubBlocksMap->GetAt(pcurrentForm->flags, pcurrentCellsMap)) {
-                            apFile->NextForm(1);
+                            apFile->NextForm(true);
                         }
                         else {
                             apFile->NextGroup();
@@ -299,7 +299,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                                 breconstructTempChildren = false;
                             }
                             if (breconstructPersistentChildren || breconstructTempChildren) {
-                                apFile->NextForm(1);
+                                apFile->NextForm(true);
                             }
                             else {
                                 apFile->NextGroup();
@@ -313,7 +313,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                     case 8: {
                         // A cell's persistent children.
                         if (pcurrentFormsMap->GetFlag(RECONSTRUCT_PERSISTENT_CHILDREN)) {
-                            apFile->NextForm(1);
+                            apFile->NextForm(true);
                         }
                         else {
                             apFile->NextGroup();
@@ -323,7 +323,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                     case 9: {
                         // A cell's temporary children.
                         if (pcurrentFormsMap->GetFlag(RECONSTRUCT_TEMP_CHILDREN)) {
-                            apFile->NextForm(1);
+                            apFile->NextForm(true);
                         }
                         else {
                             apFile->NextGroup();
@@ -339,7 +339,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
         }
         else if (pcurrentForm->form == formEnumString[WRLD_ID].uiFormString) {
             icurrentWorldSpaceID = pcurrentForm->iFormID;
-            apFile->NextForm(1);
+            apFile->NextForm(true);
         }
         else if (pcurrentForm->form == formEnumString[CELL_ID].uiFormString) {
             if (pcurrentCellsMap) {
@@ -373,8 +373,8 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                 pLastLoadedCell = nullptr;
                 if (pcurrentCellsMap->GetAt(icellKey, pcurrentFormsMap)) {
                     if (pcurrentFormsMap->GetFlag(RECONSTRUCT_CELL)) {
-                        pDataHandler->ConstructObject(apFile, 0, 0, 0);
-                        apFile->NextForm(1);
+                        pDataHandler->ConstructObject(apFile, false, nullptr, false);
+                        apFile->NextForm(true);
                         TESForm* pform = TESForm::GetFormByNumericID(icurrentCellID);
                         if (pform) {
                             ReconstructFormData formData(pform, pcurrentFormsMap->iFlags);
@@ -386,11 +386,11 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                         ++ireconstructedCount;
                     }
                     else {
-                        apFile->NextForm(1);
+                        apFile->NextForm(true);
                     }
                 }
                 else {
-                    apFile->NextForm(1);
+                    apFile->NextForm(true);
                 }
             }
             else {
@@ -398,7 +398,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                 pcurrentFormsMap = pcurrentCellBlocksMap->pPersistentCell;
                 icurrentCellID = pcurrentForm->iFormID;
                 pLastLoadedCell = nullptr;
-                apFile->NextForm(1);
+                apFile->NextForm(true);
             }
         }
         else if (pcurrentForm->form == formEnumString[TOFT_ID].uiFormString) {
@@ -415,7 +415,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                 }
             }
             else {
-                apFile->NextForm(1);
+                apFile->NextForm(true);
             }
         }
         else {
@@ -428,8 +428,8 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                         pLastLoadedCell = static_cast<TESObjectCELL*>(TESForm::GetFormByNumericID(icurrentCellID));
                     }
                 }
-                pDataHandler->ConstructObject(apFile, 0, formData.pForm, 1);
-                apFile->NextForm(1);
+                pDataHandler->ConstructObject(apFile, false, formData.pForm, true);
+                apFile->NextForm(true);
                 if (!formData.pForm) {
                     formData.pForm = TESForm::GetFormByNumericID(iformID);
                 }
@@ -446,7 +446,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
                 ++ireconstructedCount;
             }
             else {
-                apFile->NextForm(1);
+                apFile->NextForm(true);
             }
         }
         // Past the end of the recorded group: on to the next recorded offset, or done.
@@ -468,7 +468,7 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
             if (pcurrentForm->iFormID == 1) {
                 iworldSpaceID = pcurrentForm->flags;
                 ilength = pcurrentForm->length;
-                apFile->NextForm(1);
+                apFile->NextForm(true);
             }
             else {
                 ilength = pcurrentForm->length;
@@ -521,7 +521,7 @@ void BGSReconstructCellSubBlocksMap::AddReference(
     uint32_t aiFlags
 ) {
     uint32_t a1 = arg0->GetGroupSubBlockKey();
-    BGSReconstructCellsMap* a2 = 0;
+    BGSReconstructCellsMap* a2 = nullptr;
     if (!GetAt(a1, a2)) {
         BGSReconstructCellsMap* v5;
         BGSReconstructCellsMap* apMemory =
@@ -530,7 +530,7 @@ void BGSReconstructCellSubBlocksMap::AddReference(
             v5 = ::new (apMemory) BGSReconstructCellsMap;
         }
         else {
-            v5 = 0;
+            v5 = nullptr;
         }
         a2 = v5;
         SetAt(a1, v5);
@@ -547,7 +547,7 @@ void BGSReconstructCellSubBlocksMap::AddCellForm(
     uint32_t aiFlags
 ) {
     uint32_t a1 = TESObjectCELL::CalcExtGroupSubBlockKey(aiCellX, aiCellY);
-    BGSReconstructCellsMap* a2 = 0;
+    BGSReconstructCellsMap* a2 = nullptr;
     if (!GetAt(a1, a2)) {
         BGSReconstructCellsMap* v7;
         BGSReconstructCellsMap* apMemory =
@@ -556,7 +556,7 @@ void BGSReconstructCellSubBlocksMap::AddCellForm(
             v7 = ::new (apMemory) BGSReconstructCellsMap;
         }
         else {
-            v7 = 0;
+            v7 = nullptr;
         }
         a2 = v7;
         SetAt(a1, v7);
@@ -569,13 +569,13 @@ bool BGSReconstructCellSubBlocksMap::GetFormMapFlag(uint32_t aiFlags) {
     a2 = GetFirstPos();
     while (a2) {
         uint32_t a3 = 0;
-        BGSReconstructCellsMap* a4 = 0;
+        BGSReconstructCellsMap* a4 = nullptr;
         GetNext(a2, a3, a4);
         if (a4->GetFormMapFlag(aiFlags)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void BGSReconstructCellSubBlocksMap::operator delete(void* apMemory) {
@@ -662,14 +662,14 @@ BGSReconstructFormsInAllFilesMap::~BGSReconstructFormsInAllFilesMap() {
 }
 
 void BGSReconstructFormsInAllFilesMap::ReconstructForms() {
-    pSaveLoadGame->SetReconstructingForms(1);
+    pSaveLoadGame->SetReconstructingForms(true);
     ReconstructedForms.SetReservedSize(iCount);
     bool SaveLoad = pDataHandler->GetSaveLoad();
-    pDataHandler->SetSaveLoad(1);
+    pDataHandler->SetSaveLoad(true);
     NiTMapItem<TESFile*, BGSReconstructFormsInFileMap*>* kIter = GetFirstPos();
     while (kIter) {
-        TESFile* pFile = 0;
-        BGSReconstructFormsInFileMap* pMap = 0;
+        TESFile* pFile = nullptr;
+        BGSReconstructFormsInFileMap* pMap = nullptr;
         GetNext(kIter, pFile, pMap);
         TESFile* apFile = pFile->GetThreadSafeFile();
         pMap->ReconstructForms(apFile, &ReconstructedForms);
@@ -692,7 +692,7 @@ void BGSReconstructFormsInAllFilesMap::ReconstructForms() {
         ReconstructFormData* v2 = ReconstructedForms.GetFormData(i);
         InitReconstructedForm(v2);
     }
-    pSaveLoadGame->SetReconstructingForms(0);
+    pSaveLoadGame->SetReconstructingForms(false);
 }
 
 uint32_t BGSReconstructFormsInAllFilesMap::GetReconstructedCount() {
@@ -707,7 +707,7 @@ void BGSReconstructFormsInAllFilesMap::AddForm(TESForm* apForm, uint32_t aiFlags
     if (apForm) {
         TESFile* pfile = apForm->GetFile(-1);
         if (pfile) {
-            BGSReconstructFormsInFileMap* pformsInFileMap = 0;
+            BGSReconstructFormsInFileMap* pformsInFileMap = nullptr;
             if (!NiTMapBase<
                     DFALL<NiTMapItem<TESFile*, BGSReconstructFormsInFileMap*>>, TESFile*,
                     BGSReconstructFormsInFileMap*>::GetAt(pfile, pformsInFileMap)) {
@@ -718,7 +718,7 @@ void BGSReconstructFormsInAllFilesMap::AddForm(TESForm* apForm, uint32_t aiFlags
                     pformsInFileMap_2 = ::new (apMemory) BGSReconstructFormsInFileMap;
                 }
                 else {
-                    pformsInFileMap_2 = 0;
+                    pformsInFileMap_2 = nullptr;
                 }
                 pformsInFileMap = pformsInFileMap_2;
                 SetAt(pfile, pformsInFileMap_2);
@@ -740,7 +740,7 @@ void BGSReconstructFormsInAllFilesMap::AddForm(TESForm* apForm, uint32_t aiFlags
 
 void BGSReconstructFormsInAllFilesMap::AddReference(TESObjectCELL* apParentCell, uint32_t aiRefID, uint32_t aiFlags) {
     if (apParentCell) {
-        TESFile* pfile = 0;
+        TESFile* pfile = nullptr;
         if (apParentCell->GetInterior()) {
             pfile = GetFileForFormID(apParentCell->GetFileList(), aiRefID);
         }
@@ -749,7 +749,7 @@ void BGSReconstructFormsInAllFilesMap::AddReference(TESObjectCELL* apParentCell,
             pfile = GetFileForFormID(WorldSpace->GetFileList(), aiRefID);
         }
         if (pfile) {
-            BGSReconstructFormsInFileMap* pformsInFileMap = 0;
+            BGSReconstructFormsInFileMap* pformsInFileMap = nullptr;
             if (!NiTMapBase<
                     DFALL<NiTMapItem<TESFile*, BGSReconstructFormsInFileMap*>>, TESFile*,
                     BGSReconstructFormsInFileMap*>::GetAt(pfile, pformsInFileMap)) {
@@ -760,7 +760,7 @@ void BGSReconstructFormsInAllFilesMap::AddReference(TESObjectCELL* apParentCell,
                     pformsInFileMap_2 = ::new (apMemory) BGSReconstructFormsInFileMap;
                 }
                 else {
-                    pformsInFileMap_2 = 0;
+                    pformsInFileMap_2 = nullptr;
                 }
                 pformsInFileMap = pformsInFileMap_2;
                 SetAt(pfile, pformsInFileMap_2);
@@ -788,7 +788,7 @@ void BGSReconstructFormsInAllFilesMap::AddReference(
     if (apWorldSpace) {
         TESFile* pfile = GetFileForFormID(apWorldSpace->GetFileList(), aiRefID);
         if (pfile) {
-            BGSReconstructFormsInFileMap* pformsInFileMap = 0;
+            BGSReconstructFormsInFileMap* pformsInFileMap = nullptr;
             if (!NiTMapBase<
                     DFALL<NiTMapItem<TESFile*, BGSReconstructFormsInFileMap*>>, TESFile*,
                     BGSReconstructFormsInFileMap*>::GetAt(pfile, pformsInFileMap)) {
@@ -799,12 +799,12 @@ void BGSReconstructFormsInAllFilesMap::AddReference(
                     pformsInFileMap_2 = ::new (apMemory) BGSReconstructFormsInFileMap;
                 }
                 else {
-                    pformsInFileMap_2 = 0;
+                    pformsInFileMap_2 = nullptr;
                 }
                 pformsInFileMap = pformsInFileMap_2;
                 SetAt(pfile, pformsInFileMap_2);
             }
-            pformsInFileMap->AddCellForm(apWorldSpace, aiCellX, aiCellY, 0, aiRefID, aiFlags);
+            pformsInFileMap->AddCellForm(apWorldSpace, aiCellX, aiCellY, nullptr, aiRefID, aiFlags);
             ++iCount;
         }
         else {
@@ -835,8 +835,8 @@ TESFile* BGSReconstructFormsInAllFilesMap::GetFileForFormID(BSSimpleList<TESFile
 void BGSReconstructFormsInAllFilesMap::Clear() {
     NiTMapItem<TESFile*, BGSReconstructFormsInFileMap*>* it = GetFirstPos();
     while (it) {
-        TESFile* pfile = 0;
-        BGSReconstructFormsInFileMap* pformsInFileMap = 0;
+        TESFile* pfile = nullptr;
+        BGSReconstructFormsInFileMap* pformsInFileMap = nullptr;
         GetNext(it, pfile, pformsInFileMap);
         if (pformsInFileMap) {
             delete pformsInFileMap;
@@ -863,7 +863,7 @@ void BGSReconstructFormsInAllFilesMap::InitReconstructedForm(ReconstructFormData
             TESWorldSpace* pworld = pref->GetWorldSpace();
             if (pworld) {
                 BGSTerrainManager* TerrainManager = pworld->GetTerrainManager();
-                TerrainManager->HideTree(pref, 1);
+                TerrainManager->HideTree(pref, true);
             }
         }
         if (pref->IsMobileObject()) {
@@ -877,7 +877,7 @@ void BGSReconstructFormsInAllFilesMap::InitReconstructedForm(ReconstructFormData
                         if (CurrentAIProcess) {
                             delete CurrentAIProcess;
                         }
-                        pmob->SetCurrentAIProcess(0);
+                        pmob->SetCurrentAIProcess(nullptr);
                     }
                 }
             }
@@ -889,7 +889,7 @@ void BGSReconstructFormsInAllFilesMap::InitReconstructedForm(ReconstructFormData
                         v8 = ::new (apMemory) LowProcess;
                     }
                     else {
-                        v8 = 0;
+                        v8 = nullptr;
                     }
                     pmob->SetCurrentAIProcess(v8);
                     pmob->ChangeProcessLevel();
@@ -902,10 +902,11 @@ void BGSReconstructFormsInAllFilesMap::InitReconstructedForm(ReconstructFormData
                     if (pactor->Get3D()) {
                         if (pactor->IsCreature()) {
                             static_cast<TESCreature*>(pactor->GetActorBase())
-                                ->TESCreature::InitDefaultWorn(pactor, 1, 1, 1);
+                                ->TESCreature::InitDefaultWorn(pactor, true, true, true);
                         }
                         else {
-                            static_cast<TESNPC*>(pactor->GetActorBase())->TESNPC::InitDefaultWorn(pactor, 1, 1, 0, 1);
+                            static_cast<TESNPC*>(pactor->GetActorBase())
+                                ->TESNPC::InitDefaultWorn(pactor, true, true, false, true);
                         }
                     }
                 }
@@ -965,7 +966,7 @@ void BGSReconstructCellBlocksMap::AddReference(
                 v6 = ::new (apMemory) BGSReconstructFormsMap;
             }
             else {
-                v6 = 0;
+                v6 = nullptr;
             }
             pPersistentCell = v6;
         }
@@ -973,7 +974,7 @@ void BGSReconstructCellBlocksMap::AddReference(
     }
     else {
         uint32_t iblock = apCell->GetGroupBlockKey();
-        BGSReconstructCellSubBlocksMap* pcellSubBlocksMap = 0;
+        BGSReconstructCellSubBlocksMap* pcellSubBlocksMap = nullptr;
         if (!GetAt(iblock, pcellSubBlocksMap)) {
             BGSReconstructCellSubBlocksMap* pcellSubBlocksMap_2;
             BGSReconstructCellSubBlocksMap* v8 =
@@ -982,7 +983,7 @@ void BGSReconstructCellBlocksMap::AddReference(
                 pcellSubBlocksMap_2 = ::new (v8) BGSReconstructCellSubBlocksMap;
             }
             else {
-                pcellSubBlocksMap_2 = 0;
+                pcellSubBlocksMap_2 = nullptr;
             }
             pcellSubBlocksMap = pcellSubBlocksMap_2;
             SetAt(iblock, pcellSubBlocksMap_2);
@@ -1008,7 +1009,7 @@ void BGSReconstructCellBlocksMap::AddCellForm(
                 v8 = ::new (apMemory) BGSReconstructFormsMap;
             }
             else {
-                v8 = 0;
+                v8 = nullptr;
             }
             pPersistentCell = v8;
         }
@@ -1016,7 +1017,7 @@ void BGSReconstructCellBlocksMap::AddCellForm(
     }
     else {
         uint32_t a1 = TESObjectCELL::CalcExtGroupBlockKey(aiCellX, aiCellY);
-        BGSReconstructCellSubBlocksMap* a2 = 0;
+        BGSReconstructCellSubBlocksMap* a2 = nullptr;
         if (!GetAt(a1, a2)) {
             BGSReconstructCellSubBlocksMap* v7;
             BGSReconstructCellSubBlocksMap* v10 =
@@ -1025,7 +1026,7 @@ void BGSReconstructCellBlocksMap::AddCellForm(
                 v7 = ::new (v10) BGSReconstructCellSubBlocksMap;
             }
             else {
-                v7 = 0;
+                v7 = nullptr;
             }
             a2 = v7;
             SetAt(a1, v7);
@@ -1036,18 +1037,18 @@ void BGSReconstructCellBlocksMap::AddCellForm(
 
 bool BGSReconstructCellBlocksMap::GetFormMapFlag(uint32_t aiFlags) {
     if (pPersistentCell && pPersistentCell->GetFlag(aiFlags)) {
-        return 1;
+        return true;
     }
     NiTMapItem<uint32_t, BGSReconstructCellSubBlocksMap*>* it = GetFirstPos();
     while (it) {
         uint32_t iblock = 0;
-        BGSReconstructCellSubBlocksMap* psubBlocksMap = 0;
+        BGSReconstructCellSubBlocksMap* psubBlocksMap = nullptr;
         GetNext(it, iblock, psubBlocksMap);
         if (psubBlocksMap->GetFormMapFlag(aiFlags)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void BGSReconstructCellBlocksMap::operator delete(void* apMemory) {
@@ -1158,7 +1159,7 @@ void BGSReconstructCellsMap::AddReference(
         int32_t DataX = apCell->GetDataX();
         a1 = TESObjectCELL::GetCoord(DataX, DataY);
     }
-    BGSReconstructFormsMap* a2 = 0;
+    BGSReconstructFormsMap* a2 = nullptr;
     if (!GetAt(a1, a2)) {
         BGSReconstructFormsMap* v7;
         BGSReconstructFormsMap* apMemory =
@@ -1167,7 +1168,7 @@ void BGSReconstructCellsMap::AddReference(
             v7 = ::new (apMemory) BGSReconstructFormsMap;
         }
         else {
-            v7 = 0;
+            v7 = nullptr;
         }
         a2 = v7;
         SetAt(a1, v7);
@@ -1190,7 +1191,7 @@ void BGSReconstructCellsMap::AddCellForm(
     uint32_t aiFlags
 ) {
     int32_t icellKey = TESObjectCELL::GetCoord(static_cast<uint16_t>(aiCellX), static_cast<uint16_t>(aiCellY));
-    BGSReconstructFormsMap* pformsMap = 0;
+    BGSReconstructFormsMap* pformsMap = nullptr;
     if (!GetAt(icellKey, pformsMap)) {
         BGSReconstructFormsMap* pformsMap_2;
         BGSReconstructFormsMap* apMemory =
@@ -1199,7 +1200,7 @@ void BGSReconstructCellsMap::AddCellForm(
             pformsMap_2 = ::new (apMemory) BGSReconstructFormsMap;
         }
         else {
-            pformsMap_2 = 0;
+            pformsMap_2 = nullptr;
         }
         pformsMap = pformsMap_2;
         SetAt(icellKey, pformsMap_2);
@@ -1211,13 +1212,13 @@ bool BGSReconstructCellsMap::GetFormMapFlag(uint32_t aiFlags) {
     NiTMapItem<uint32_t, BGSReconstructFormsMap*>* pos = GetFirstPos();
     while (pos) {
         uint32_t a3 = 0;
-        BGSReconstructFormsMap* a4 = 0;
+        BGSReconstructFormsMap* a4 = nullptr;
         GetNext(pos, a3, a4);
         if (a4->GetFlag(aiFlags)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void BGSReconstructCellsMap::operator delete(void* apMemory) {
@@ -1245,16 +1246,16 @@ void BGSReconstructWorldSpacesMap::AddReference(
 ) {
     TESWorldSpace* pworldSpace = apCell->GetWorldSpace();
     uint32_t iworldSpaceID = pworldSpace->iFormID;
-    BGSReconstructCellBlocksMap* pcellBlocksMap = 0;
+    BGSReconstructCellBlocksMap* pcellBlocksMap = nullptr;
     if (!GetAt(iworldSpaceID, pcellBlocksMap)) {
         BGSReconstructCellBlocksMap* pcellBlocksMap_2;
         BGSReconstructCellBlocksMap* apMemory =
             static_cast<BGSReconstructCellBlocksMap*>(ourMalloc(sizeof(BGSReconstructCellBlocksMap)));
         if (apMemory) {
-            pcellBlocksMap_2 = ::new (apMemory) BGSReconstructCellBlocksMap(1);
+            pcellBlocksMap_2 = ::new (apMemory) BGSReconstructCellBlocksMap(true);
         }
         else {
-            pcellBlocksMap_2 = 0;
+            pcellBlocksMap_2 = nullptr;
         }
         pcellBlocksMap = pcellBlocksMap_2;
         SetAt(iworldSpaceID, pcellBlocksMap_2);
@@ -1271,16 +1272,16 @@ void BGSReconstructWorldSpacesMap::AddCellForm(
     uint32_t aiFlags
 ) {
     uint32_t iworldSpaceID = apWorldSpace->iFormID;
-    BGSReconstructCellBlocksMap* pcellBlocksMap = 0;
+    BGSReconstructCellBlocksMap* pcellBlocksMap = nullptr;
     if (!GetAt(iworldSpaceID, pcellBlocksMap)) {
         BGSReconstructCellBlocksMap* pcellBlocksMap_2;
         BGSReconstructCellBlocksMap* apMemory =
             static_cast<BGSReconstructCellBlocksMap*>(ourMalloc(sizeof(BGSReconstructCellBlocksMap)));
         if (apMemory) {
-            pcellBlocksMap_2 = ::new (apMemory) BGSReconstructCellBlocksMap(1);
+            pcellBlocksMap_2 = ::new (apMemory) BGSReconstructCellBlocksMap(true);
         }
         else {
-            pcellBlocksMap_2 = 0;
+            pcellBlocksMap_2 = nullptr;
         }
         pcellBlocksMap = pcellBlocksMap_2;
         SetAt(iworldSpaceID, pcellBlocksMap_2);

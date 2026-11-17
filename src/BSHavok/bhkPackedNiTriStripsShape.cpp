@@ -99,7 +99,7 @@ bool bhkPackedNiTriStripsShape::RegisterStreamables(NiStream& arStream) {
         phkObject = this->phkObject;
     }
     else {
-        phkObject = 0;
+        phkObject = nullptr;
     }
     hkPackedNiTriStripsData* pData = static_cast<hkPackedNiTriStripsShape*>(phkObject)->spTriStripsData.m_pObject;
     pData->RegisterStreamables(arStream);
@@ -423,7 +423,7 @@ HavokMaterialType bhkPackedNiTriStripsShape::QSubMaterial(uint32_t aiKey) {
         phkObject = nullptr;
     }
     int32_t v3 = (int32_t)((uint8_t)(aiKey >> 24));
-    if (aiKey == ((-1))) {
+    if (aiKey == (-1)) {
         return (HavokMaterialType)(((int32_t)eMaterial) & 31);
     }
     m_pObject = phkObject->spTriStripsData.m_pObject;
@@ -452,7 +452,7 @@ void bhkPackedNiTriStripsShape::CopyCinfo(hkPackedNiTriStripsShapeCinfo& arInfo)
 // The x component of the wrapped shape's scale, 1 without a shape.
 float bhkPackedNiTriStripsShape::GetScale() {
     hkReferencedObject* phkObject;
-    if (this && (phkObject = this->phkObject) != 0) {
+    if (this && (phkObject = this->phkObject) != nullptr) {
         return static_cast<hkPackedNiTriStripsShape*>(phkObject)->vScale(0);
     }
     else {

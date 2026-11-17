@@ -24,14 +24,14 @@ void NiShaderConstantMapEntry::SetData(uint32_t uiDataSize, uint32_t uiDataStrid
     if (bCopyData) {
         m_pvDataSource = this->m_pvDataSource;
         v8 = this->m_pvDataSource;
-        m_bOwnData = (bool)1;
+        m_bOwnData = true;
         _NiFree(v8);
         v7 = _NiMalloc(uiDataSize);
         this->m_pvDataSource = v7;
         rt::memcpy(v7, pvDataSource, uiDataSize);
     }
     else {
-        m_bOwnData = (bool)0;
+        m_bOwnData = false;
         this->m_pvDataSource = pvDataSource;
     }
 }

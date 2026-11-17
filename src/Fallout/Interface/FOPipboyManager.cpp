@@ -67,14 +67,14 @@ SettingT<INISettingCollection> fLightEffectLightFadeDuration("fLightEffectLightF
 
 FOPipboyManager::FOPipboyManager()
   : FORenderedMenu(), spPipboyRoot(nullptr), sp3rdPersonPipboyRoot(nullptr), sp3rdPersonScreen(nullptr),
-    spPartialScreenGeometry(nullptr), spButtons(), spButtonGlow(), spKnobs(), bScaledTexCoords(0), bPipboyUp(0),
-    pBackgroundHum(), b1stPersonLightOn(0), b3rdPersonLightOn(0), bLightEffectFading(0) {
+    spPartialScreenGeometry(nullptr), spButtons(), spButtonGlow(), spKnobs(), bScaledTexCoords(false), bPipboyUp(false),
+    pBackgroundHum(), b1stPersonLightOn(false), b3rdPersonLightOn(false), bLightEffectFading(false) {
     for (int32_t i = 0; i < 3; ++i) {
         fKnobPositions[i] = 0.0f;
         fKnobTargets[i] = 0.0f;
         fKnobRates[i] = 0.0f;
     }
-    bUsePartialScreenGeometry = 1;
+    bUsePartialScreenGeometry = true;
 }
 
 FOPipboyManager::~FOPipboyManager() {
@@ -98,17 +98,17 @@ void FOPipboyManager::Initialize() {
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (bUsePipboyMode.Bool() && !GetInitialized()) {
         if (pPlayer) {
-            if (pPlayer->Get3D(1)) {
-                NiGeometry* p3rdPersonScreenGeom = 0;
-                NiGeometry* pPipboyScreen = 0;
-                NiNode* v23 = 0;
-                NiAVObject* v13 = pPlayer->Get3D(1);
+            if (pPlayer->Get3D(true)) {
+                NiGeometry* p3rdPersonScreenGeom = nullptr;
+                NiGeometry* pPipboyScreen = nullptr;
+                NiNode* v23 = nullptr;
+                NiAVObject* v13 = pPlayer->Get3D(true);
                 NiFixedString* v12 = ::new (static_cast<void*>(&apString)) NiFixedString("pipboyscreen");
                 NiAVObject* v1 = v13->GetObjectByName(*v12);
                 NiNode* pPipboyNode = static_cast<NiNode*>(NiObject::DynamicCastStatic(&NiNode::ms_RTTI, v1));
                 apString.~NiFixedString();
                 if (!pPipboyNode) {
-                    NiAVObject* v11 = pPlayer->Get3D(1);
+                    NiAVObject* v11 = pPlayer->Get3D(true);
                     NiFixedString v16("pipboyscreen:0");
                     NiFixedString* v10 = &v16;
                     NiAVObject* v2 = v11->GetObjectByName(*v10);
@@ -121,7 +121,7 @@ void FOPipboyManager::Initialize() {
                     spPipboyRoot.operator=(pPipboyNode->m_pkParent);
                 }
                 else {
-                    NiAVObject* v9 = pPlayer->Get3D(1);
+                    NiAVObject* v9 = pPlayer->Get3D(true);
                     NiFixedString* v8 = ::new (static_cast<void*>(&v15)) NiFixedString("pipboyscreen:0");
                     NiAVObject* v3 = v9->GetObjectByName(*v8);
                     pPipboyScreen = static_cast<NiGeometry*>(NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, v3));
@@ -130,7 +130,7 @@ void FOPipboyManager::Initialize() {
                         spPipboyRoot.operator=(pPipboyScreen->m_pkParent);
                     }
                 }
-                SetScreenParent(pPlayer->Get3D(1));
+                SetScreenParent(pPlayer->Get3D(true));
                 if (pPipboyNode) {
                     NiGeometry* pPipboyScreen_2 = static_cast<NiGeometry*>(pPipboyNode->GetAtChecked(0));
                     p3rdPersonScreenGeom =
@@ -156,12 +156,12 @@ void FOPipboyManager::Initialize() {
                 InitKnobs();
                 InitLight();
                 if (spPipboyRoot.m_pObject) {
-                    NiUpdateData UpdateData(0.0f, 0, 0);
+                    NiUpdateData UpdateData(0.0f, false, false);
                     spPipboyRoot.m_pObject->Update(UpdateData);
                     spPipboyRoot.m_pObject->UpdateProperties();
                 }
                 if (sp3rdPersonPipboyRoot.m_pObject) {
-                    NiUpdateData UpdateData_2(0.0f, 0, 0);
+                    NiUpdateData UpdateData_2(0.0f, false, false);
                     sp3rdPersonPipboyRoot.m_pObject->Update(UpdateData_2);
                     sp3rdPersonPipboyRoot.m_pObject->UpdateProperties();
                 }
@@ -175,10 +175,10 @@ void FOPipboyManager::Initialize() {
                 SetBlurIntensity(*v6);
                 SetBlurRadius(fBlurRadiusPipboy.Float());
                 float* v7 = &gs_fScanlineFrequencyPipboy_Pipboy.Float();
-                SetDoScanlines(1, *v7);
+                SetDoScanlines(true, *v7);
                 bPulseAffectsLight = 1;
-                ShowPipboyLightEffect(0, 0, 1);
-                ShowPipboyLightEffect(1, 0, 1);
+                ShowPipboyLightEffect(false, false, true);
+                ShowPipboyLightEffect(true, false, true);
             }
         }
     }
@@ -204,24 +204,24 @@ void FOPipboyManager::Shutdown() {
 void FOPipboyManager::OnMenuOpen() {
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (GetInitialized()) {
-        SetRefractive(0);
+        SetRefractive(false);
         ResetColors();
-        Interface::bStartPipboyRenderBackground = 1;
+        Interface::bStartPipboyRenderBackground = true;
         FORenderedMenu::bSoundsActive = 1;
-        Interface::IsolateMenuElements(1, 1);
+        Interface::IsolateMenuElements(true, true);
         pBackgroundHum.Stop();
         pBackgroundHum.Release();
         BSAudio* v1 = &BSAudio::QInstance();
         BSSoundHandle* arHandle = v1->GetSoundHandleByName(&a1, "UIPipBoyHumLP", 49u);
         pBackgroundHum.operator=(*arHandle);
-        pBackgroundHum.Play(0);
+        pBackgroundHum.Play(false);
         float fDefaultBurstIntensity = ::fDefaultBurstIntensity.Float();
         float* v2 = &fDefaultBurstDuration.Float();
         TriggerBurst(*v2, fDefaultBurstIntensity, 0.5f);
         FORenderedMenu::OnMenuOpen();
         TESImageSpaceModifier* Hit = TESImageSpaceModifier::GetGetHit();
         ImageSpaceModifierInstanceForm::Stop(Hit);
-        TESImageSpaceModifier::AllowGetHit(0);
+        TESImageSpaceModifier::AllowGetHit(false);
         BSShaderBloodSplatter::SetGlobalAlpha(0.0f);
     }
 }
@@ -230,15 +230,15 @@ void FOPipboyManager::OnMenuClose() {
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     bool IsRefractive = pPlayer->IsRefractive();
     SetRefractive(IsRefractive);
-    Animation* panim = pPlayer->GetAnimation(static_cast<bool>(1));
+    Animation* panim = pPlayer->GetAnimation(true);
     if (panim) {
         if (!panim->SpecialIdleDonePlaying()) {
             panim->ClearGroup(AGS_SPECIAL_IDLE, 0.0f);
         }
-        uint16_t AnimGroup = pPlayer->GetAnimGroup(ANIM_GROUP_IDLE, 0, 0, 0);
+        uint16_t AnimGroup = pPlayer->GetAnimGroup(ANIM_GROUP_IDLE, nullptr, false, nullptr);
         panim->PlayGroup(AnimGroup, ACTION_START, -1, AGS_NONE);
-        uint16_t v5 = pPlayer->GetAnimGroup(ANIM_GROUP_IDLE, 0, 0, 0);
-        Animation* panim_2 = pPlayer->GetAnimation(static_cast<bool>(0));
+        uint16_t v5 = pPlayer->GetAnimGroup(ANIM_GROUP_IDLE, nullptr, false, nullptr);
+        Animation* panim_2 = pPlayer->GetAnimation(false);
         panim_2->PlayGroup(v5, ACTION_START, -1, AGS_NONE);
         if (pPlayer->GetSitSleepState()) {
             panim->PlayGroup(0, ACTION_START, -1, AGS_IDLE);
@@ -247,37 +247,37 @@ void FOPipboyManager::OnMenuClose() {
     if (GetInitialized()) {
         BSAudio* v4 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v4->GetSoundHandleByName(&a1, "UIPipBoyAccessDown", 289u);
-        SoundHandleByName->Play(0);
+        SoundHandleByName->Play(false);
         pBackgroundHum.Stop();
         pBackgroundHum.Release();
         ActivateButton(0);
         Interface::RestoreMenuElements();
         FORenderedMenu::OnMenuClose();
         FORenderedMenu::bSoundsActive = 0;
-        TESImageSpaceModifier::AllowGetHit(1);
+        TESImageSpaceModifier::AllowGetHit(true);
     }
 }
 
 void FOPipboyManager::UpdateKnobs(float afTime) {
     bool v17[3];
     float v16 = afTime - fLastPipboyKnobUpdateTime;
-    v17[0] = 0;
-    v17[1] = 0;
-    v17[2] = 0;
+    v17[0] = false;
+    v17[1] = false;
+    v17[2] = false;
     for (int32_t i = 0; i < 3; ++i) {
         if (fKnobPositions[i] < static_cast<double>(fKnobTargets[i])) {
             fKnobPositions[i] = fKnobRates[i] * v16 + fKnobPositions[i];
             if (fKnobTargets[i] < static_cast<double>(fKnobPositions[i])) {
                 fKnobPositions[i] = fKnobTargets[i];
             }
-            v17[i] = 1;
+            v17[i] = true;
         }
         if (fKnobPositions[i] > static_cast<double>(fKnobTargets[i])) {
             fKnobPositions[i] = fKnobPositions[i] - fKnobRates[i] * v16;
             if (fKnobTargets[i] > static_cast<double>(fKnobPositions[i])) {
                 fKnobPositions[i] = fKnobTargets[i];
             }
-            v17[i] = 1;
+            v17[i] = true;
         }
     }
     if (spKnobs->m_pObject) {
@@ -285,7 +285,7 @@ void FOPipboyManager::UpdateKnobs(float afTime) {
             float fAngle = fKnobPositions[0];
             NiAVObject* v2 = spKnobs->m_pObject;
             v2->SetRotate(fAngle, static_cast<float>(1.0), static_cast<float>(0.0), static_cast<float>(0.0));
-            NiUpdateData a2(0.0, 0, 0);
+            NiUpdateData a2(0.0, false, false);
             NiAVObject* v3 = spKnobs->m_pObject;
             v3->Update(a2);
         }
@@ -295,7 +295,7 @@ void FOPipboyManager::UpdateKnobs(float afTime) {
             float fAnglea = fKnobPositions[1];
             NiAVObject* v4 = spKnobs[1].m_pObject;
             v4->SetRotate(fAnglea, static_cast<float>(0.0), static_cast<float>(0.0), static_cast<float>(1.0));
-            NiUpdateData arData(0.0, 0, 0);
+            NiUpdateData arData(0.0, false, false);
             NiAVObject* v5 = spKnobs[1].m_pObject;
             v5->Update(arData);
         }
@@ -305,7 +305,7 @@ void FOPipboyManager::UpdateKnobs(float afTime) {
             float fAngleb = fKnobPositions[2];
             NiAVObject* v6 = spKnobs[2].m_pObject;
             v6->SetRotate(fAngleb, static_cast<float>(0.0), static_cast<float>(0.0), static_cast<float>(1.0));
-            NiUpdateData apMemory(0.0, 0, 0);
+            NiUpdateData apMemory(0.0, false, false);
             NiAVObject* v7 = spKnobs[2].m_pObject;
             v7->Update(apMemory);
         }
@@ -317,21 +317,21 @@ void FOPipboyManager::SetRefractive(bool abRefractive) {
     if (GetScreenGeometry()) {
         if (Get3rdPersonScreen()) {
             if (abRefractive) {
-                GetScreenGeometry()->SetAppCulled(1);
+                GetScreenGeometry()->SetAppCulled(true);
                 NiAVObject* v2 = Get3rdPersonScreen();
-                v2->SetAppCulled(1);
+                v2->SetAppCulled(true);
             }
             else {
-                GetScreenGeometry()->SetAppCulled(0);
+                GetScreenGeometry()->SetAppCulled(false);
                 NiAVObject* v3 = Get3rdPersonScreen();
-                v3->SetAppCulled(0);
+                v3->SetAppCulled(false);
             }
         }
     }
 }
 
 void FOPipboyManager::SetVerticalHoldParams(float afParam1, float afParam2) {
-    bVertHoldActive = 1;
+    bVertHoldActive = true;
     fVertHoldDuration = afParam1;
     fVertHoldSpeed = afParam2 * 0.0010000000474974513;
     fVertHoldStartTime = static_cast<float>(appTimer.iLastTime);
@@ -339,12 +339,12 @@ void FOPipboyManager::SetVerticalHoldParams(float afParam1, float afParam2) {
 }
 
 uint32_t FOPipboyManager::SetShudderHoldParams(float afParam1, float afParam2, float afParam3) {
-    bShudderActive = (bool)1;
+    bShudderActive = true;
     fShudderDuration = afParam1;
     fShudderIntensity = afParam2;
     fShudderFrequency = afParam3;
     uint32_t result = (&appTimer)->BSTimer::GetTime();
-    fShudderStartTime = (float)((float)result);
+    fShudderStartTime = ((float)result);
     fShudderCurrentPosition = (float)0.0;
     return result;
 }
@@ -374,8 +374,8 @@ void FOPipboyManager::TriggerRandomEffect() {
 
 void FOPipboyManager::FadeLightEffect(bool abFadeOut) {
     if (b1stPersonLightOn) {
-        fLightEffectFadeStartTime = (float)((float)(&appTimer)->BSTimer::GetTime());
-        bLightEffectFading = (bool)1;
+        fLightEffectFadeStartTime = ((float)(&appTimer)->BSTimer::GetTime());
+        bLightEffectFading = true;
         if (abFadeOut) {
             fLightEffectFadeTarget = (float)0.0;
         }
@@ -467,7 +467,7 @@ void FOPipboyManager::UpdateLightEffect(float afTime) {
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (bLightEffectFading) {
         FadeLight(afTime);
-        ShowPipboyLightEffect(0, 1, 0);
+        ShowPipboyLightEffect(false, true, false);
         NiAVObject* proot = spPipboyRoot.m_pObject;
         float fdelta = afTime - fLightEffectFadeStartTime;
         float v7 = fdelta / fLightEffectFadeDuration.Float();
@@ -484,7 +484,7 @@ void FOPipboyManager::UpdateLightEffect(float afTime) {
             NiFixedString* PipboyLightEffect_0 = &v9;
             pLightEffect = proot->GetObjectByName(*PipboyLightEffect_0);
         }
-        NiNode* plightNode = 0;
+        NiNode* plightNode = nullptr;
         if (pLightEffect) {
             plightNode = pLightEffect->IsNode();
         }
@@ -508,9 +508,9 @@ void FOPipboyManager::UpdateLightEffect(float afTime) {
             }
         }
         if (fLightEffectFadeTarget == ffade) {
-            bLightEffectFading = 0;
+            bLightEffectFading = false;
             if (fLightEffectFadeTarget == 0.0) {
-                ShowPipboyLightEffect(0, 0, 0);
+                ShowPipboyLightEffect(false, false, false);
             }
         }
     }
@@ -524,7 +524,7 @@ void FOPipboyManager::ResetPipBoyManager() {
     CurrentAIProcess->Update3dModel(pPlayer);
     Shutdown();
     Initialize();
-    SetPipBoyManagerReset(0);
+    SetPipBoyManagerReset(false);
 }
 
 void FOPipboyManager::SetTabKnobPosition(uint32_t aiNewPos, bool abPlaySounds) {
@@ -538,7 +538,7 @@ void FOPipboyManager::SetTabKnobPosition(uint32_t aiNewPos, bool abPlaySounds) {
                 BSAudio* v3 = &BSAudio::QInstance();
                 BSSoundHandle* arHandle = v3->GetSoundHandleByName(&a1, "UIPipBoyTab", 289u);
                 psoundHand.operator=(*arHandle);
-                psoundHand.Play(0);
+                psoundHand.Play(false);
             }
         }
     }
@@ -559,7 +559,7 @@ void FOPipboyManager::MoveKnob(FOPipboyManager::Knobs aiKnob, float afAmount, fl
         BSAudio* v5 = &BSAudio::QInstance();
         BSSoundHandle* arHandle = v5->GetSoundHandleByName(&a1, "UIPipBoyScroll", 289u);
         psoundHand.operator=(*arHandle);
-        psoundHand.Play(0);
+        psoundHand.Play(false);
     }
     fKnobTargets[aiKnob] = fKnobTargets[aiKnob] + afAmount;
     fKnobRates[aiKnob] = afRate;
@@ -715,15 +715,15 @@ char FOPipboyManager::CheckOrangeButtonsClicked(char arg0, char a3, float* a4, f
             NiPoint3 a2;
             NiPoint3 a1;
             NiPick apMemory(0, 8u);
-            apMemory.SetObserveAppCullFlag(1);
+            apMemory.SetObserveAppCullFlag(true);
             apMemory.SetTarget(GetScreenGeometry());
             apMemory.m_eSortType = NiPick::SORT;
-            apMemory.SetIsReturnTexture(1);
+            apMemory.SetIsReturnTexture(true);
             NiCamera* Camera = Main::GetWorldSceneGraph()->GetCamera();
             int32_t ScriptProcessingDelay = static_cast<int32_t>(v27->sRealCursorPos.z);
             double DataClipDist = v27->sRealCursorPos.x;
-            Camera->WindowPointToRay(static_cast<int32_t>(DataClipDist), ScriptProcessingDelay, a1, a2, 0);
-            if (apMemory.PickObjects(a1, a2, 0)) {
+            Camera->WindowPointToRay(static_cast<int32_t>(DataClipDist), ScriptProcessingDelay, a1, a2, nullptr);
+            if (apMemory.PickObjects(a1, a2, false)) {
                 NiPick::Record* v21 = (&apMemory.m_pickResults)->GetAt(0);
                 if (v21) {
                     NiGeometry* AVObject = static_cast<NiGeometry*>(v21->GetAVObject());
@@ -742,14 +742,14 @@ char FOPipboyManager::CheckOrangeButtonsClicked(char arg0, char a3, float* a4, f
             if (arg0 || a3) {
                 int32_t v16 = -1;
                 apMemory.m_eSortType = NiPick::SORT;
-                apMemory.SetIsReturnTexture(0);
+                apMemory.SetIsReturnTexture(false);
                 for (int32_t i = 0; i < 3; ++i) {
                     apMemory.SetTarget(spButtons[i].m_pObject);
                     int32_t v13 = static_cast<int32_t>(v27->sRealCursorPos.z);
                     int32_t v11 = static_cast<int32_t>(v27->sRealCursorPos.x);
                     SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
-                    WorldSceneGraph->GetCamera()->WindowPointToRay(v11, v13, a1, a2, 0);
-                    if (apMemory.PickObjects(a1, a2, 0)) {
+                    WorldSceneGraph->GetCamera()->WindowPointToRay(v11, v13, a1, a2, nullptr);
+                    if (apMemory.PickObjects(a1, a2, false)) {
                         if ((&apMemory.m_pickResults)->GetAt(0)) {
                             if (arg0) {
                                 iClickedOrangeButton = i;
@@ -779,12 +779,12 @@ void FOPipboyManager::InitKnobs() {
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiMatrix3 ecx0;
     NiMatrix3 prn;
-    NiAVObject* v16 = pPlayer->Get3D(1);
+    NiAVObject* v16 = pPlayer->Get3D(true);
     NiFixedString* v15 = ::new (static_cast<void*>(&apString)) NiFixedString("ScrollKnob");
     NiAVObject* pGeometry = v16->GetObjectByName(*v15);
     apString.~NiFixedString();
     if (!pGeometry) {
-        NiAVObject* v14 = pPlayer->Get3D(1);
+        NiAVObject* v14 = pPlayer->Get3D(true);
         NiFixedString v23("ScrollKnob:0");
         NiFixedString* v13 = &v23;
         pGeometry = v14->GetObjectByName(*v13);
@@ -795,22 +795,22 @@ void FOPipboyManager::InitKnobs() {
             spKnobs->operator=(static_cast<NiGeometry*>(v1->GetAt(0)));
         }
     }
-    NiAVObject* v12 = pPlayer->Get3D(1);
+    NiAVObject* v12 = pPlayer->Get3D(true);
     NiFixedString* v11 = ::new (static_cast<void*>(&v22)) NiFixedString("RadNeedle");
     spKnobs[1].operator=(static_cast<NiGeometry*>(v12->GetObjectByName(*v11)));
     v22.~NiFixedString();
     if (!spKnobs[1].m_pObject) {
-        NiAVObject* v10 = pPlayer->Get3D(1);
+        NiAVObject* v10 = pPlayer->Get3D(true);
         NiFixedString v21("RadNeedle:0");
         NiFixedString* v9 = &v21;
         spKnobs[1].operator=(static_cast<NiGeometry*>(v10->GetObjectByName(*v9)));
     }
-    NiAVObject* v8 = pPlayer->Get3D(1);
+    NiAVObject* v8 = pPlayer->Get3D(true);
     NiFixedString* v7 = ::new (static_cast<void*>(&v20)) NiFixedString("TabKnob");
     spKnobs[2].operator=(static_cast<NiGeometry*>(v8->GetObjectByName(*v7)));
     v20.~NiFixedString();
     if (!spKnobs[2].m_pObject) {
-        NiAVObject* v6 = pPlayer->Get3D(1);
+        NiAVObject* v6 = pPlayer->Get3D(true);
         NiFixedString v19("TabKnob:0");
         NiFixedString* v5 = &v19;
         spKnobs[2].operator=(static_cast<NiGeometry*>(v6->GetObjectByName(*v5)));
@@ -857,7 +857,7 @@ void FOPipboyManager::UpdateIdleAnims() {
     if ((!Interface::IsConsoleVisible()) && (InterfaceManager::Instance()->ePipboyState == 3)) {
         singleton = InterfaceManager::Instance();
         if (singleton->GetCurrentMode() != 4) {
-            animation = pPlayer->GetAnimation((bool)1);
+            animation = pPlayer->GetAnimation(true);
             currentSequence = animation->GetCurrentSequence(static_cast<ANIM_GROUP_SECTION>(0));
             if (currentSequence) {
                 animGroup = currentSequence->GetAnimGroup();

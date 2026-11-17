@@ -132,7 +132,7 @@ void hkpTriSampledHeightFieldBvTreeShape::queryAabb(
         return;
     }
     const hkpSampledHeightFieldShape* pHeightField = getShapeCollection()->getHeightFieldShape();
-    const int32_t iOriginalSize = static_cast<int32_t>(hits.m_size);
+    const int32_t iOriginalSize = hits.m_size;
     if (m_wantAabbRejectionTest.m_bool) {
         // Every sample so far at or below the box's bottom; every sample so far at or above its top.
         bool bAabbAbove = true;

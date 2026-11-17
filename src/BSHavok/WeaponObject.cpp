@@ -165,7 +165,7 @@ void WeaponObject::Init(
     TLSData* v7 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v7->eMemContext;
     v7->eMemContext = MEM_CONTEXT_HAVOK;
-    if (apOwner3d && (apObject && (v10 = apReplaceObject) != 0)) {
+    if (apOwner3d && (apObject && (v10 = apReplaceObject) != nullptr)) {
         usFlags |= 65u;
         bhkBlendCollisionObject* pblendObject =
             static_cast<bhkBlendCollisionObject*>(v10->DynamicCastMember(&bhkBlendCollisionObject::ms_RTTI));
@@ -185,11 +185,11 @@ void WeaponObject::Init(
         if (spWorldObject) {
             NiIncRefCount(spWorldObject);
         }
-        v10->SetWorldObject(0);
+        v10->SetWorldObject(nullptr);
         NiAVObject* psceneObject = v10->m_pkSceneObject;
         psceneObject->SetCollisionObject(this);
         SetWorldObject(static_cast<bhkWorldObject*>(spWorldObject));
-        UpdateConstraints(1, aOwnerFilter, apOwner3d, abDefaultKeyframed);
+        UpdateConstraints(true, aOwnerFilter, apOwner3d, abDefaultKeyframed);
         bhkRigidBody* v14 = this->spWorldObject;
         if (v14) {
             // Without a Havok body the motion type is 5 (MOTION_FIXED), and its address is passed.
@@ -215,7 +215,7 @@ void WeaponObject::Init(
                 pcon = ::new (v17) bhkBlendController;
             }
             else {
-                pcon = 0;
+                pcon = nullptr;
             }
         }
         pcon->m_usFlags |= 8u;
@@ -239,7 +239,7 @@ void WeaponObject::Kill() {
     v1->eMemContext = MEM_CONTEXT_HAVOK;
     NiAVObject* m_pkSceneObject = this->m_pkSceneObject;
     if (m_pkSceneObject) {
-        bhkWorld::RemoveObjects(m_pkSceneObject, 1, 1);
+        bhkWorld::RemoveObjects(m_pkSceneObject, true, true);
         NiTimeController* Controller = m_pkSceneObject->GetController(&bhkBlendController::ms_RTTI);
         if (Controller) {
             m_pkSceneObject->RemoveController(Controller);
@@ -264,12 +264,12 @@ void WeaponObject::UpdateConstraints(
 ) {
     NiAVObject* pweaponAttach;
     NiAVObject* pbackpackAttach;
-    NiAVObject* pweaponBone = BSUtilities::GetObjectByName(apRoot3d, "Weapon", 0);
+    NiAVObject* pweaponBone = BSUtilities::GetObjectByName(apRoot3d, "Weapon", false);
     if (pweaponBone) {
         pweaponAttach = (NiAVObject*)pweaponBone->m_pkParent;
     }
     else {
-        pweaponAttach = 0;
+        pweaponAttach = nullptr;
     }
     for (; pweaponAttach; pweaponAttach = (NiAVObject*)pweaponAttach->m_pkParent) {
         bhkNiCollisionObject* m_pObject = pweaponAttach->m_spCollisionObject.m_pObject;
@@ -284,7 +284,7 @@ void WeaponObject::UpdateConstraints(
     }
     if (pweaponAttach == apRoot3d) {
     LABEL_11:;
-        pweaponAttach = 0;
+        pweaponAttach = nullptr;
     }
     if (pweaponBone) {
         if (pweaponAttach) {
@@ -292,12 +292,12 @@ void WeaponObject::UpdateConstraints(
         }
     }
     static NiFixedString strBackpack("Backpack");
-    NiAVObject* pbackpack = BSUtilities::GetObjectByName(apRoot3d, strBackpack, 0);
+    NiAVObject* pbackpack = BSUtilities::GetObjectByName(apRoot3d, strBackpack, false);
     if (pbackpack) {
         pbackpackAttach = (NiAVObject*)pbackpack->m_pkParent;
     }
     else {
-        pbackpackAttach = 0;
+        pbackpackAttach = nullptr;
     }
     for (; pbackpackAttach; pbackpackAttach = (NiAVObject*)pbackpackAttach->m_pkParent) {
         bhkNiCollisionObject* v12 = pbackpackAttach->m_spCollisionObject.m_pObject;
@@ -312,7 +312,7 @@ void WeaponObject::UpdateConstraints(
     }
     if (pbackpackAttach == apRoot3d) {
     LABEL_27:;
-        pbackpackAttach = 0;
+        pbackpackAttach = nullptr;
     }
     if (pbackpack) {
         if (pbackpackAttach) {
@@ -414,27 +414,27 @@ void WeaponObject::UpdateRigidBodyTransforms(NiAVObject* apObject, NiAVObject* a
         }
     }
     else {
-        pweapCol = 0;
+        pweapCol = nullptr;
     }
-    pweaponObject = 0;
+    pweaponObject = nullptr;
 LABEL_6:;
     if (pweapCol) {
         pweapRB = pweapCol->spWorldObject;
     }
     else {
-        pweapRB = 0;
+        pweapRB = nullptr;
     }
-    if (apParent && (m_pObject = apParent->m_spCollisionObject.m_pObject) != 0) {
+    if (apParent && (m_pObject = apParent->m_spCollisionObject.m_pObject) != nullptr) {
         pparentCol = static_cast<bhkCollisionObject*>(m_pObject->DynamicCastMember(&bhkCollisionObject::ms_RTTI));
     }
     else {
-        pparentCol = 0;
+        pparentCol = nullptr;
     }
     if (pparentCol) {
         pparentRB = pparentCol->spWorldObject;
     }
     else {
-        pparentRB = 0;
+        pparentRB = nullptr;
     }
     if (pweapRB) {
         if (pparentRB) {
@@ -461,7 +461,7 @@ LABEL_6:;
                         hkr.m_vec.m_quad[2] = niq.m_fZ;
                         hkr.m_vec.m_quad[3] = niq.m_fW;
                         hkr.normalize();
-                        bhkNiCollisionObject::kKeyframeLock.Lock(0);
+                        bhkNiCollisionObject::kKeyframeLock.Lock(nullptr);
                         pweapRB->SetPosRot(hkv, hkr);
                         // EXE-INLINED 0x40FBA0
                         if (!--bhkNiCollisionObject::kKeyframeLock.uiLockCount) {

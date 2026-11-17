@@ -35,13 +35,13 @@ SettingT<INISettingCollection> fBlurIntensityMenus("fBlurIntensityMenus:Interfac
 FOHUDEffectManager::FOHUDEffectManager() : spPartialScreenGeometry(nullptr), Packer() {
     pUnpackShaderParams = new ImageSpaceShaderParam();
     pUnpackShaderParams->InitConstantMap(0, 0);
-    pUnpackShaderParams->bUseTexOffset[1] = 0;
-    pUnpackShaderParams->bUseTexOffset[2] = 0;
+    pUnpackShaderParams->bUseTexOffset[1] = false;
+    pUnpackShaderParams->bUseTexOffset[2] = false;
     pUnpackShaderParams->iFiltermode = NiTexturingProperty::FILTER_BILERP;
     spPartialScreenGeometry = nullptr;
-    bShudderActive = 0;
+    bShudderActive = false;
     ShudderCurrentPosition = NiPoint2::ZERO;
-    bHideHUD = 0;
+    bHideHUD = false;
     fCurrentScanlineFrequencyHUD = fScanlineFrequencyHUD.Float();
     fCurrentBlurIntensityHUD = fBlurIntensityHUD.Float();
     fCurrentBlurRadiusHUD = fBlurRadiusHUD.Float();
@@ -64,12 +64,12 @@ void FOHUDEffectManager::SetBlurIntensityHUD(float abIntensity) {
 }
 
 void FOHUDEffectManager::TriggerShudder(float a2, float a3, float a4) {
-    bShudderActive = (bool)1;
+    bShudderActive = true;
     ShudderDuration.x = a2;
     ShudderDuration.y = a2;
     ShudderIntensity.x = a3;
     ShudderFrequency.x = a4;
-    fShudderStartTime = (float)((float)(&appTimer)->BSTimer::GetTime());
+    fShudderStartTime = ((float)(&appTimer)->BSTimer::GetTime());
     ShudderCurrentPosition.x = (float)0.0;
     ShudderIntensity.y = (float)0.0;
 }
@@ -94,7 +94,7 @@ void FOHUDEffectManager::UpdateShudder(float afTime) {
         ShudderCurrentPosition.y = (float)((v3 * ShudderIntensity.y) * v8);
     }
     else {
-        bShudderActive = (bool)0;
+        bShudderActive = false;
         ImageSpaceShaderMenuUnpack::SetOffset(0.0, 0.0);
     }
 }
@@ -115,7 +115,7 @@ void FOHUDEffectManager::TriggerShudder_007F78F0(
     const NiPoint2& aIntensity,
     const NiPoint2& aFrequency
 ) {
-    bShudderActive = 1;
+    bShudderActive = true;
     float y = aDuration.y;
     ShudderDuration.x = aDuration.x;
     ShudderDuration.y = y;

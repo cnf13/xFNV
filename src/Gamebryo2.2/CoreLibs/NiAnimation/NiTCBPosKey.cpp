@@ -14,7 +14,7 @@
 #include "SDK/MSVC/string.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 void NiTCBPosKey::CalculateDVals(const NiPoint3& ptSub1, const NiPoint3& ptPlus1, float fPreLen, float fNextLen) {
     NiPoint3 v40;
@@ -414,13 +414,12 @@ int32_t NiTCBPosKey::RegisterLoader() {
 NiAnimationKey* NiTCBPosKey::CreateArray(uint32_t uiNumKeys) {
     size_t v1 = uiNumKeys <= SIZE_MAX / sizeof(NiTCBPosKey) ? sizeof(NiTCBPosKey) * uiNumKeys : SIZE_MAX;
     size_t* v2 = static_cast<size_t*>(MemoryManager_Singleton.Allocate(
-        (static_cast<uint32_t>(static_cast<uint32_t>(v1) + static_cast<uint32_t>(sizeof(size_t))) <
-         static_cast<uint32_t>(v1))
+        ((static_cast<uint32_t>(v1) + static_cast<uint32_t>(sizeof(size_t))) < static_cast<uint32_t>(v1))
             ? -1
             : v1 + sizeof(size_t)
     ));
     if (!v2) {
-        return 0;
+        return nullptr;
     }
     *v2 = uiNumKeys;
     return reinterpret_cast<NiAnimationKey*>(v2 + 1);

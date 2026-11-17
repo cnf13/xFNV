@@ -46,7 +46,7 @@ hkpWorldConstraintUtil::findModifier(hkpConstraintInstance* a1, hkpConstraintAto
         if (((uint32_t)result->m_type.m_storage) == ((uint32_t)((int32_t)a2))) {
             return result;
         }
-        while (1) {
+        while (true) {
             result = static_cast<hkpModifierConstraintAtom*>(result->m_child);
             if (((uint32_t)((int32_t)result->m_type.m_storage)) < 0x17u) {
                 break;

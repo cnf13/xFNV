@@ -11,7 +11,7 @@
 #include "SDK/MSVC/ehvec.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 NavMeshGrid::NavMeshGrid() : iGridSize(0), GridData(nullptr) {
     GridBoundsMin.x = 3.4028235e+38f;
@@ -22,7 +22,7 @@ BSSimpleArray<uint16_t, 1024>* NavMeshGrid::GetTrianglesForGridCell(uint32_t aiI
         return &GridData[aiIndex];
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -127,15 +127,15 @@ bool NavMeshGrid::Load(const char* apBuffer, uint32_t aiBufferSize, TESFile* apF
     uint32_t icopy = 36;
     ourMemcpy(this, apBuffer, 36u);
     if (apFile->QEndian()) {
-        ENDIAN<uint32_t>(iGridSize, 0);
-        ENDIAN<float>(fColumnSectionLen, 0);
-        ENDIAN<float>(fRowSectionLen, 0);
-        ENDIAN<float>(GridBoundsMin.x, 0);
-        ENDIAN<float>(GridBoundsMin.y, 0);
-        ENDIAN<float>(GridBoundsMin.z, 0);
-        ENDIAN<float>(GridBoundsMax.x, 0);
-        ENDIAN<float>(GridBoundsMax.y, 0);
-        ENDIAN<float>(GridBoundsMax.z, 0);
+        ENDIAN<uint32_t>(iGridSize, false);
+        ENDIAN<float>(fColumnSectionLen, false);
+        ENDIAN<float>(fRowSectionLen, false);
+        ENDIAN<float>(GridBoundsMin.x, false);
+        ENDIAN<float>(GridBoundsMin.y, false);
+        ENDIAN<float>(GridBoundsMin.z, false);
+        ENDIAN<float>(GridBoundsMax.x, false);
+        ENDIAN<float>(GridBoundsMax.y, false);
+        ENDIAN<float>(GridBoundsMax.z, false);
     }
     if (iGridSize) {
         BSSimpleArray<uint16_t, 1024>* v9;
@@ -150,13 +150,13 @@ bool NavMeshGrid::Load(const char* apBuffer, uint32_t aiBufferSize, TESFile* apF
         for (uint32_t i = 0; i < itotalGridSize; ++i) {
             uint16_t isize = *pbuffer++;
             if (apFile->QEndian()) {
-                ENDIAN<uint16_t>(isize, 0);
+                ENDIAN<uint16_t>(isize, false);
             }
-            GridData[i].SetSize(isize, 1);
+            GridData[i].SetSize(isize, true);
             if (isize) {
                 if (apFile->QEndian()) {
                     for (uint16_t k = 0; k < static_cast<int32_t>(isize); ++k) {
-                        ENDIAN<uint16_t>(pbuffer[k], 0);
+                        ENDIAN<uint16_t>(pbuffer[k], false);
                     }
                 }
                 size_t v8 = sizeof(uint16_t) * isize;
@@ -166,11 +166,11 @@ bool NavMeshGrid::Load(const char* apBuffer, uint32_t aiBufferSize, TESFile* apF
                 pbuffer += isize;
             }
         }
-        return 1;
+        return true;
     }
     else {
-        GridData = 0;
-        return 0;
+        GridData = nullptr;
+        return false;
     }
 }
 
@@ -187,7 +187,7 @@ void NavMeshGrid::Clear() {
                 ourFree(reinterpret_cast<size_t*>(GridData) - 1);
             }
         }
-        this->GridData = 0;
+        this->GridData = nullptr;
     }
     iGridSize = 0;
     GridBoundsMin.x = 3.4028235e+38f;

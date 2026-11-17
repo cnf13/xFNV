@@ -56,7 +56,7 @@ PathingLocation::PathingLocation(const NiPoint3& aLocation, const PathingLocatio
   : Location(aLocation.x, aLocation.y, aLocation.z), usTriangle(0xFFFF), uiFlags(0) {
     NavMeshPtr spMesh;
     if (!aHintLoc.GetNavMesh(spMesh) ||
-        (usTriangle = spMesh.m_pObject->FindTriangleForLocation(aLocation, 0), usTriangle == 0xFFFF)) {
+        (usTriangle = spMesh.m_pObject->FindTriangleForLocation(aLocation, nullptr), usTriangle == 0xFFFF)) {
         TESWorldSpace* pWorld = aHintLoc.pWorldSpace;
         SetupData(aLocation, aHintLoc.GetCell(), pWorld);
     }
@@ -143,7 +143,7 @@ void PathingLocation::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
     apSaveGameBuffer->SaveDataEndian(static_cast<char*>(static_cast<void*>(&iCellKey)), 4u, 0);
     apSaveGameBuffer->SaveDataEndian(static_cast<char*>(static_cast<void*>(&usTriangle)), 2u, 0);
     apSaveGameBuffer->SaveDataEndian(static_cast<char*>(static_cast<void*>(&uiFlags)), 1u, 0);
-    int8_t apData = (int8_t)(pNavMeshes != 0);
+    int8_t apData = (int8_t)(pNavMeshes != nullptr);
     apSaveGameBuffer->SaveDataEndian(static_cast<char*>(static_cast<void*>(&apData)), 1u, 0);
 }
 
@@ -165,7 +165,7 @@ void PathingLocation::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     apLoadGameBuffer->LoadData(&usTriangle, 2u);
     usTriangle = -1;
     apLoadGameBuffer->LoadData(&uiFlags, 1u);
-    bhadNavMeshesArray = 0;
+    bhadNavMeshesArray = false;
     apLoadGameBuffer->LoadData(&bhadNavMeshesArray, 1u);
     if (bhadNavMeshesArray) {
         if (pWorldSpace) {
@@ -187,43 +187,44 @@ bool PathingLocation::IsValidLocation(float afRadius) {
     NiPoint3 v6;
     NiPoint3 v7;
     NiPoint3 result;
-    ResolveNavMeshInfo(0);
+    ResolveNavMeshInfo(nullptr);
     if (!HasNavMeshData()) {
-        return 0;
+        return false;
     }
     if (afRadius <= 0.0) {
-        return 1;
+        return true;
     }
     result = GetLocation();
     aTarget.y = result.y;
     aTarget.z = result.z;
     aTarget.x = result.x - afRadius;
     if (!Pathing::CheckLineOfSight(
-            *this, aTarget, static_cast<PathingLocation*>(0), static_cast<Pathing::CheckLineOfSightFilter*>(0)
+            *this, aTarget, static_cast<PathingLocation*>(nullptr),
+            static_cast<Pathing::CheckLineOfSightFilter*>(nullptr)
         )) {
-        return 0;
+        return false;
     }
     v7.y = result.y;
     v7.z = result.z;
     v7.x = result.x + afRadius;
     if (!Pathing::CheckLineOfSight(
-            *this, v7, static_cast<PathingLocation*>(0), static_cast<Pathing::CheckLineOfSightFilter*>(0)
+            *this, v7, static_cast<PathingLocation*>(nullptr), static_cast<Pathing::CheckLineOfSightFilter*>(nullptr)
         )) {
-        return 0;
+        return false;
     }
     v4.x = result.x;
     v4.z = result.z;
     v4.y = result.y - afRadius;
     if (!Pathing::CheckLineOfSight(
-            *this, v4, static_cast<PathingLocation*>(0), static_cast<Pathing::CheckLineOfSightFilter*>(0)
+            *this, v4, static_cast<PathingLocation*>(nullptr), static_cast<Pathing::CheckLineOfSightFilter*>(nullptr)
         )) {
-        return 0;
+        return false;
     }
     v6.x = result.x;
     v6.z = result.z;
     v6.y = result.y + afRadius;
     return Pathing::CheckLineOfSight(
-        *this, v6, static_cast<PathingLocation*>(0), static_cast<Pathing::CheckLineOfSightFilter*>(0)
+        *this, v6, static_cast<PathingLocation*>(nullptr), static_cast<Pathing::CheckLineOfSightFilter*>(nullptr)
     );
 }
 
@@ -431,7 +432,7 @@ void PathingLocation::SetTriangleIndex(uint16_t aiTriIndex) {
 }
 
 void PathingLocation::ClearTriangleData() {
-    usTriangle = (uint16_t)((-1));
+    usTriangle = (uint16_t)(-1);
 }
 
 uint16_t PathingLocation::GetTriangle() const {
@@ -443,12 +444,12 @@ const NavMeshInfo* PathingLocation::GetBestNavMeshInfo() {
         return pNavMesh;
     }
     if (!pNavMeshes) {
-        return 0;
+        return nullptr;
     }
     if (QAllMeshesReachable()) {
         return pNavMeshes->operator[](0);
     }
-    return 0;
+    return nullptr;
 }
 
 bool PathingLocation::HasNavMesh() {
@@ -462,16 +463,16 @@ bool PathingLocation::GetNavMesh(NavMeshPtr& aRetNavMesh) const {
 bool PathingLocation::IsCloseTo(const PathingLocation& aOtherLoc, float afTolerance) {
     NiPoint3 v5;
     if ((&aOtherLoc)->pWorldSpace != pWorldSpace) {
-        return (bool)0;
+        return false;
     }
     if (pWorldSpace) {
         if ((&aOtherLoc)->iCellKey != iCellKey) {
-            return (bool)0;
+            return false;
         }
     }
     else {
         if ((&aOtherLoc)->pCell != pCell) {
-            return (bool)0;
+            return false;
         }
     }
     NiPoint3* v4 = &(v5 = (&(&aOtherLoc)->Location)->operator-(Location));
@@ -497,10 +498,10 @@ bool PathingLocation::ResolveNavMeshInfoOnly() {
     const NavMeshInfo* pmesh;
     using allMeshes_t = BSSimpleArray<const NavMeshInfo*, 1024>;
     if (QUnused()) {
-        return 0;
+        return false;
     }
     if (!pNavMesh && !pNavMeshes) {
-        return 0;
+        return false;
     }
     if (pNavMesh) {
         return !pNavMesh->GetDisabled();
@@ -517,7 +518,7 @@ bool PathingLocation::ResolveNavMeshInfoOnly() {
         NavMeshBounds* pbounds = pmesh->GetBounds();
         if (pbounds) {
             if (pbounds->IsPointInBounds(Location)) {
-                allMeshes.Clear(0);
+                allMeshes.Clear(false);
                 allMeshes.Add(pmesh);
                 break;
             }
@@ -532,9 +533,9 @@ bool PathingLocation::ResolveNavMeshInfoOnly() {
     }
     if (allMeshes.iSize == 1) {
         pNavMesh = allMeshes.GetFirst();
-        pNavMeshes = 0;
+        pNavMeshes = nullptr;
         SetAllMeshesReachable(1);
-        return 1;
+        return true;
     }
     else {
         bool v3 = AreAllMeshesReachable();
@@ -626,13 +627,13 @@ bool PathingLocation::ResolveToClosestNavmeshAndTriangle() {
     bool bpointInside;
     SetupData(Location, pCell, pWorldSpace);
     if (!pNavMesh && !pNavMeshes) {
-        return 0;
+        return false;
     }
     if (pNavMesh && usTriangle != 0xFFFF) {
-        return 1;
+        return true;
     }
     if (pNavMesh) {
-        bpointInside = 0;
+        bpointInside = false;
         NavMeshPtr spmesh;
         if (pNavMesh->GetNavMesh(spmesh)) {
             if (spmesh.m_pObject->FindClosestTriangleForLocation(Location, &usTriangle, &bpointInside)) {
@@ -644,27 +645,27 @@ bool PathingLocation::ResolveToClosestNavmeshAndTriangle() {
                         Location = res.Intersection * 0.9f + *fScalar;
                     }
                 }
-                return 1;
+                return true;
             }
             else {
-                return 0;
+                return false;
             }
         }
         else {
-            return 0;
+            return false;
         }
     }
     else {
         float fminDistToPointSqr = 3.4028235e+38f;
         uint32_t ibestNavMesh = -1;
         uint16_t usbestTri = -1;
-        bool bbestTriWithinZRange = 0;
+        bool bbestTriWithinZRange = false;
         uint32_t isize = pNavMeshes->iSize;
         bool bunderWater = Location.z < TES::pInstance->GetWaterHeight(Location, pCell) + 25.0;
         for (uint32_t i = 0; i < isize; ++i) {
             uint16_t a3[3];
             a3[0] = -1;
-            bpointInside_2 = 0;
+            bpointInside_2 = false;
             NavMeshPtr spmesh_2;
             const NavMeshInfo* pinfo = pNavMeshes->operator[](i);
             if (pinfo->GetDisabled() ||
@@ -672,18 +673,18 @@ bool PathingLocation::ResolveToClosestNavmeshAndTriangle() {
                  spmesh_2.m_pObject->FindClosestTriangleForLocation(Location, a3, &bpointInside_2))) {
                 if (bpointInside_2) {
                     pNavMesh = pNavMeshes->operator[](i);
-                    pNavMeshes = 0;
+                    pNavMeshes = nullptr;
                     usTriangle = a3[0];
-                    bool v13 = 1;
+                    bool v13 = true;
                     return v13;
                 }
                 if (spmesh_2.operator NavMesh*()) {
                     NiPoint3 delta = Location - spmesh_2.m_pObject->GetCenter(a3[0]);
                     float fdistToPointSqr = delta.SqrXYLength();
                     float fzdist = delta.z;
-                    bool bthisTriInZRange = 0;
+                    bool bthisTriInZRange = false;
                     if ((bunderWater || fzdist < 180.0) && fzdist > -64.0) {
-                        bthisTriInZRange = 1;
+                        bthisTriInZRange = true;
                     }
                     if (bbestTriWithinZRange) {
                         if (bthisTriInZRange) {
@@ -699,7 +700,7 @@ bool PathingLocation::ResolveToClosestNavmeshAndTriangle() {
                             fminDistToPointSqr = fdistToPointSqr;
                             usbestTri = a3[0];
                             ibestNavMesh = i;
-                            bbestTriWithinZRange = 1;
+                            bbestTriWithinZRange = true;
                         }
                         else {
                             if (fminDistToPointSqr > fdistToPointSqr) {
@@ -713,11 +714,11 @@ bool PathingLocation::ResolveToClosestNavmeshAndTriangle() {
             }
         }
         if (ibestNavMesh == -1) {
-            return 0;
+            return false;
         }
         else {
             pNavMesh = pNavMeshes->operator[](ibestNavMesh);
-            pNavMeshes = 0;
+            pNavMeshes = nullptr;
             usTriangle = usbestTri;
             NavMeshPtr spmesh_3;
             if (pNavMesh->GetNavMesh(spmesh_3)) {
@@ -727,10 +728,10 @@ bool PathingLocation::ResolveToClosestNavmeshAndTriangle() {
                     NiPoint3* fScalara = ::new (&v10) NiPoint3(res_2.Intersection * 0.9f);
                     Location = center_2 * 0.1f + *fScalara;
                 }
-                return 1;
+                return true;
             }
             else {
-                return 0;
+                return false;
             }
         }
     }
@@ -777,11 +778,11 @@ void PathingLocation::SetupData(const NiPoint3& aLocation, TESObjectCELL* apCell
 }
 
 void PathingLocation::SetNavMeshInfo(const NavMeshInfo* apNavMeshInfo) {
-    pNavMeshes = 0;
+    pNavMeshes = nullptr;
     pNavMesh = apNavMeshInfo;
     pWorldSpace = apNavMeshInfo->GetWorldSpace();
     if (pWorldSpace) {
-        pCell = 0;
+        pCell = nullptr;
         iCellKey = apNavMeshInfo->iCellKey;
     }
     else {
@@ -795,17 +796,17 @@ void PathingLocation::SetNavMeshInfo(const NavMeshInfo* apNavMeshInfo) {
 bool PathingLocation::GetNavMeshInfos(BSSimpleArray<const NavMeshInfo*, 1024>& apRetInfos) {
     if (pNavMesh) {
         apRetInfos.Add(pNavMesh);
-        return 1;
+        return true;
     }
     else {
         if (pNavMeshes) {
             // CopyTo<1024> takes its own array type, while the caller's array holds const NavMeshInfo pointers, hence
             // the cast.
             pNavMeshes->CopyTo(reinterpret_cast<BSSimpleArray<NavMeshInfo*, 1024>*>(&apRetInfos));
-            return 1;
+            return true;
         }
         else {
-            return 0;
+            return false;
         }
     }
 }

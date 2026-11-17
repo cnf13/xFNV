@@ -43,7 +43,7 @@ NiRTTI TileShader::ms_RTTI("TileShader", &NiD3DDefaultShader::ms_RTTI);
 
 TileShader::TileShader(NiDX9ShaderDeclaration* apShaderDecl, NiDX9ShaderDeclaration* apShaderDeclVC)
   : spShaderDecl(apShaderDecl), spShaderDeclVC(apShaderDeclVC) {
-    bFirstPass = 1;
+    bFirstPass = true;
     iShaderType = 20;
     if (apShaderDecl) {
         NiIncRefCount(apShaderDecl);
@@ -63,7 +63,7 @@ TileShader::TileShader(NiDX9ShaderDeclaration* apShaderDecl, NiDX9ShaderDeclarat
 
 // The declarations are raw pointers the shader holds a reference on: they are released here, the rest by the members.
 TileShader::~TileShader() {
-    bFirstPass = 0;
+    bFirstPass = false;
     if (spShaderDecl) {
         NiDecRefCount(spShaderDecl);
         spShaderDecl = nullptr;
@@ -101,9 +101,9 @@ bool TileShader::Initialize() {
         if (v8->m_uiRefCount-- == 1) {
             v8->ReturnPassToPool();
         }
-        spTileShaderPass.m_pObject = 0;
+        spTileShaderPass.m_pObject = nullptr;
     }
-    return 1;
+    return true;
 }
 
 // Selects the vertex and pixel programs from the tile property's flags, applies them to the current pass and the render
@@ -173,7 +173,7 @@ void TileShader::SetupGeometryConstants(const NiPropertyState* apState) {
         NiGeometryBufferData* pbufferData = pgeometry->m_spModelData.m_pObject->m_pkBuffData;
         TileShaderProperty* pProp = static_cast<TileShaderProperty*>(apState->m_aspProps[3].m_pObject);
         const NiSkinInstance* pskin = pgeometry->m_spSkinInstance.m_pObject;
-        m_pkD3DRenderer->SetModelTransform(pgeometry->m_kWorld, 0);
+        m_pkD3DRenderer->SetModelTransform(pgeometry->m_kWorld, false);
         if (pProp->bUseTexScroll) {
             TileShader::TexScroll.x = pProp->fTexScrollX;
             TileShader::TexScroll.y = pProp->fTexScrollY;
@@ -195,7 +195,8 @@ void TileShader::SetupGeometryConstants(const NiPropertyState* apState) {
             NiD3DPixelShader* v19 = NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject;
             if (v19) {
                 v6->SetShaderConstants(
-                    v19, pgeometry, pskin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *m_kWorldBound, 0, 1
+                    v19, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *m_kWorldBound,
+                    0, true
                 );
             }
         }
@@ -204,7 +205,8 @@ void TileShader::SetupGeometryConstants(const NiPropertyState* apState) {
             NiD3DVertexShader* v21 = NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject;
             if (v21) {
                 v7->SetShaderConstants(
-                    v21, pgeometry, pskin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *m_kWorldBound, 0, 1
+                    v21, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *m_kWorldBound,
+                    0, true
                 );
             }
         }
@@ -231,13 +233,13 @@ void TileShader::SetupGeometryConstants(const NiPropertyState* apState) {
                     );
                 }
             }
-            BSRenderState::SetScissorEnable(1, BSRS_NOLOCK);
+            BSRenderState::SetScissorEnable(true, BSRS_NOLOCK);
             BSRenderState::SetScissorRect(iLeft, iTop, iRight, iBottom, BSRS_NOLOCK);
         }
         NiStencilProperty* pStencil = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
         if (pStencil) {
             if (pStencil->m_uFlags & NiStencilProperty::ENABLE_MASK) {
-                BSRenderState::SetStencilEnable(1, BSRS_NOLOCK);
+                BSRenderState::SetStencilEnable(true, BSRS_NOLOCK);
                 BSRenderState::SetStencilAction(
                     static_cast<NiStencilProperty::Action>(
                         (pStencil->m_uFlags & NiStencilProperty::FAILACTION_MASK) >> NiStencilProperty::FAILACTION_POS
@@ -261,12 +263,12 @@ void TileShader::SetupGeometryConstants(const NiPropertyState* apState) {
 
 void TileShader::PostGeometry(const NiPropertyState* apState) {
     if (static_cast<TileShaderProperty*>(apState->m_aspProps[3].m_pObject)->bUseScissor) {
-        BSRenderState::SetScissorEnable(0, BSRS_NOLOCK);
+        BSRenderState::SetScissorEnable(false, BSRS_NOLOCK);
     }
     NiStencilProperty* pStencil = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
     if (pStencil) {
         if ((pStencil->m_uFlags & 1) != 0) {
-            BSRenderState::SetStencilEnable(0, BSRS_NOLOCK);
+            BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
         }
     }
 }
@@ -344,21 +346,21 @@ void TileShader::LoadVertexShaders() {
     BSShaderMacro v10[3];
     int32_t i = 0;
     v10[0].strPath = "tile\\tile.v.hlsl";
-    v10[0].kMacros[0].Name = 0;
+    v10[0].kMacros[0].Name = nullptr;
     std::memset(
         &v10[0].kMacros[0].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     v10[1].strPath = "tile\\tile.v.hlsl";
     v10[1].kMacros[0].Name = "TEXSCROLL";
     v10[1].kMacros[0].Definition = "";
-    v10[1].kMacros[1].Name = 0;
+    v10[1].kMacros[1].Name = nullptr;
     std::memset(
         &v10[1].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     v10[2].strPath = "tile\\tile.v.hlsl";
     v10[2].kMacros[0].Name = "VC";
     v10[2].kMacros[0].Definition = "";
-    v10[2].kMacros[1].Name = 0;
+    v10[2].kMacros[1].Name = nullptr;
     std::memset(
         &v10[2].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -396,26 +398,26 @@ void TileShader::LoadPixelShaders() {
     BSShaderMacro v11[3];
     int32_t i = 0;
     v11[0].strPath = "tile\\tile.p.hlsl";
-    v11[0].kMacros[0].Name = 0;
+    v11[0].kMacros[0].Name = nullptr;
     std::memset(
         &v11[0].kMacros[0].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     v11[1].strPath = "tile\\tile.p.hlsl";
     v11[1].kMacros[0].Name = "ALPHAMAP";
     v11[1].kMacros[0].Definition = "";
-    v11[1].kMacros[1].Name = 0;
+    v11[1].kMacros[1].Name = nullptr;
     std::memset(
         &v11[1].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     v11[2].strPath = "tile\\tile.p.hlsl";
     v11[2].kMacros[0].Name = "VC";
     v11[2].kMacros[0].Definition = "";
-    v11[2].kMacros[1].Name = 0;
+    v11[2].kMacros[1].Name = nullptr;
     std::memset(
         &v11[2].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     BSShaderMacro* v3 = v11;
-    const char* ptarget = BSShaderManager::GetPSTarget(1);
+    const char* ptarget = BSShaderManager::GetPSTarget(true);
     BSShaderMacro* v8 = v11;
     NiPointer<NiD3DPixelShader>* spTilePixelShader = this->spTilePixelShader;
     do {
@@ -450,13 +452,13 @@ bool TileShader::LoadStagesAndPasses() {
     NiD3DPass::CreateNewPass(spTileShaderPass);
     NiPointer<NiD3DTextureStage> aspD3DTextureStage;
     NiD3DTextureStage::CreateNewStage(aspD3DTextureStage);
-    BSShader::SetupDefaultStage(aspD3DTextureStage.m_pObject, 0, 1u, 2u, 1);
+    BSShader::SetupDefaultStage(aspD3DTextureStage.m_pObject, 0, 1u, 2u, true);
     p_spTileShaderPass->m_pObject->SetStage(
         p_spTileShaderPass->m_pObject->m_uiCurrentStage, aspD3DTextureStage.m_pObject
     );
     aspD3DTextureStage.m_pObject->SetFilterMode(NiTexturingProperty::FILTER_BILERP);
     NiD3DTextureStage::CreateNewStage(aspD3DTextureStage);
-    BSShader::SetupDefaultStage(aspD3DTextureStage.m_pObject, 1u, 1u, 2u, 1);
+    BSShader::SetupDefaultStage(aspD3DTextureStage.m_pObject, 1u, 1u, 2u, true);
     p_spTileShaderPass->m_pObject->SetStage(
         p_spTileShaderPass->m_pObject->m_uiCurrentStage, aspD3DTextureStage.m_pObject
     );
@@ -464,18 +466,18 @@ bool TileShader::LoadStagesAndPasses() {
     if (!p_spTileShaderPass->m_pObject->m_pkRenderStateGroup) {
         m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 0, 1);
+    m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 0, true);
     NiD3DPass* v3 = p_spTileShaderPass->m_pObject;
     if (!p_spTileShaderPass->m_pObject->m_pkRenderStateGroup) {
         v3->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v3->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+    v3->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
     NiD3DPass* v4 = p_spTileShaderPass->m_pObject;
     if (!v4->m_pkRenderStateGroup) {
         v4->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v4->m_pkRenderStateGroup->SetRenderState(168u, 15u, 1);
-    return 1;
+    v4->m_pkRenderStateGroup->SetRenderState(168u, 15u, true);
+    return true;
 }
 
 // The tile shader has no textures of its own to load.
@@ -502,7 +504,7 @@ BSShader* TileShader::CreateShader() {
         pshader = ::new (v2) TileShader(spShaderDecl, spShaderDeclVC);
     }
     else {
-        pshader = 0;
+        pshader = nullptr;
     }
     pshader->Initialize();
     pshader->LoadShaders();

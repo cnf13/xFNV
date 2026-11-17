@@ -306,7 +306,7 @@ hkpAgentData* hkPredGskCylinderAgent3::process(
             _mm_shuffle_ps(products, products, _MM_SHUFFLE(2, 2, 2, 2)),
             _mm_add_ss(_mm_shuffle_ps(products, products, _MM_SHUFFLE(1, 1, 1, 1)), products)
         );
-        const float cosAngle = static_cast<float>(std::fabs(_mm_cvtss_f32(dot)));
+        const float cosAngle = std::fabs(_mm_cvtss_f32(dot));
         if (isReplacedWithCapsule[i]) {
             if (cosAngle > 0.10000000149011612 &&
                 separatingDistanceUsingCapsuleRepresentations(input, entry, agentData) < 0.0f) {

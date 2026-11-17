@@ -183,16 +183,16 @@ LABEL_7:;
         hkpEntity::ExtendedListeners* v11 =
             static_cast<hkpEntity::ExtendedListeners*>(v10->m_heap->blockAlloc(sizeof(hkpEntity::ExtendedListeners)));
         if (v11) {
-            v11->m_activationListeners.m_data = 0;
+            v11->m_activationListeners.m_data = nullptr;
             v11->m_activationListeners.m_size = 0;
             v11->m_activationListeners.m_capacityAndFlags =
                 hkSmallArray<hkpEntityActivationListener*>::DONT_DEALLOCATE_FLAG;
-            v11->m_entityListeners.m_data = 0;
+            v11->m_entityListeners.m_data = nullptr;
             v11->m_entityListeners.m_size = 0;
             v11->m_entityListeners.m_capacityAndFlags = hkSmallArray<hkpEntityListener*>::DONT_DEALLOCATE_FLAG;
         }
         else {
-            v11 = 0;
+            v11 = nullptr;
         }
         new_entity->m_extendedListeners = v11;
     }

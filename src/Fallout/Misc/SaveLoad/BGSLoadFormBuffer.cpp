@@ -104,7 +104,7 @@ void BGSLoadFormBuffer::ClearBuffer() {
 }
 
 ENUM_FORM_ID BGSLoadFormBuffer::GetFormType() {
-    return static_cast<ENUM_FORM_ID>((&Header.FormInfo)->GetFormType());
+    return (&Header.FormInfo)->GetFormType();
 }
 
 uint32_t BGSLoadFormBuffer::LoadDataFromFile(BGSSaveLoadFile* apFile) {
@@ -116,7 +116,7 @@ uint32_t BGSLoadFormBuffer::LoadDataFromFile(BGSSaveLoadFile* apFile) {
 }
 
 void BGSLoadFormBuffer::SkipData(BGSSaveLoadFile* apFile, uint32_t aiAlreadyLoadedAmount) {
-    if (iSize != (uint32_t)aiAlreadyLoadedAmount) {
+    if (iSize != aiAlreadyLoadedAmount) {
         apFile->SeekCurrent(iSize - aiAlreadyLoadedAmount);
     }
 }

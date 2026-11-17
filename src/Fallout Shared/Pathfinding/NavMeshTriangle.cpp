@@ -39,7 +39,7 @@ uint16_t NavMeshTriangle::GetTriOrExtraInfo(int32_t aiEdgeIndex) {
 
 void NavMeshTriangle::ClearEdgeExtraInfo(int32_t aiEdgeIndex) {
     TriangleFlags &= (~(1 << aiEdgeIndex));
-    Triangles[aiEdgeIndex] = (uint16_t)((-1));
+    Triangles[aiEdgeIndex] = (uint16_t)(-1);
 }
 
 bool NavMeshTriangle::IsPreferred() const {
@@ -112,9 +112,9 @@ void NavMeshTriangle::GetVerts(uint16_t& i0, uint16_t& i1, uint16_t& i2) const {
 }
 
 void NavMeshTriangle::GetSides(uint16_t* a2, uint16_t* a3, uint16_t* a4) {
-    *a2 = (uint16_t)Triangles[0];
-    *a3 = (uint16_t)Triangles[1];
-    *a4 = (uint16_t)Triangles[2];
+    *a2 = Triangles[0];
+    *a3 = Triangles[1];
+    *a4 = Triangles[2];
 }
 
 void NavMeshTriangle::GetEdgeCoverData(uint16_t aiTriangleFlags, uint16_t& aiEdge, bool& aiData, bool& abRight) const {

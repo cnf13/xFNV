@@ -35,7 +35,7 @@ void BGSSaveGameBuffer::SaveDataToBuffer(void* apData, size_t aiSize, bool abDir
 }
 
 void BGSSaveGameBuffer::SaveDataEndian(void* apData, uint32_t aiSize, uint32_t aiUnusuedMetaDataArg) {
-    SaveDataToBuffer(apData, aiSize, (bool)0);
+    SaveDataToBuffer(apData, aiSize, false);
 }
 
 void BGSSaveGameBuffer::SaveFormID(TESForm* apForm, uint32_t aiUnusuedMetaDataArg) {
@@ -50,7 +50,7 @@ void BGSSaveGameBuffer::SaveFormID(TESForm* apForm, uint32_t aiUnusuedMetaDataAr
     apMemory.~BGSNumericIDIndex();
     ::new (&apMemory) BGSNumericIDIndex;
     (&apMemory)->SetNumericID(v3);
-    SaveDataToBuffer(static_cast<char*>(static_cast<void*>(&apMemory)), 3u, (bool)0);
+    SaveDataToBuffer(static_cast<char*>(static_cast<void*>(&apMemory)), 3u, false);
 }
 
 // Writes the length's low 16 bits, then the string's bytes when the length is not 0.
@@ -73,7 +73,7 @@ uint32_t BGSSaveGameBuffer::StartVariableSizedValue() {
     uint32_t iBufferPosition;
     iBufferPosition = this->iBufferPosition;
     int8_t a2 = 35;
-    SaveDataToBuffer(static_cast<char*>(static_cast<void*>(&a2)), 1u, (int32_t)this->iBufferPosition, 0);
+    SaveDataToBuffer(static_cast<char*>(static_cast<void*>(&a2)), 1u, (int32_t)this->iBufferPosition, false);
     return iBufferPosition;
 }
 
@@ -88,19 +88,19 @@ void BGSSaveGameBuffer::SaveVariableSizedValue(uint32_t aiVariableValue, uint32_
             else {
                 ShiftBuffer(aiPosition, 3);
                 v4 = 4 * aiVariableValue | 2;
-                SaveDataToBuffer(&v4, 4u, aiPosition, 0);
+                SaveDataToBuffer(&v4, 4u, aiPosition, false);
             }
         }
         else {
             uint16_t svalue;
             ShiftBuffer(aiPosition, 1);
             svalue = 4 * aiVariableValue | 1;
-            SaveDataToBuffer(&svalue, 2u, aiPosition, 0);
+            SaveDataToBuffer(&svalue, 2u, aiPosition, false);
         }
     }
     else {
         cvalue = 4 * aiVariableValue;
-        SaveDataToBuffer(&cvalue, 1u, aiPosition, 0);
+        SaveDataToBuffer(&cvalue, 1u, aiPosition, false);
     }
 }
 
@@ -114,17 +114,17 @@ void BGSSaveGameBuffer::SaveVariableSizedValue(uint32_t auiSize) {
             }
             else {
                 v2 = 4 * auiSize | 2;
-                SaveDataToBuffer(&v2, 4u, 0);
+                SaveDataToBuffer(&v2, 4u, false);
             }
         }
         else {
             uint16_t svalue = 4 * auiSize | 1;
-            SaveDataToBuffer(&svalue, 2u, 0);
+            SaveDataToBuffer(&svalue, 2u, false);
         }
     }
     else {
         cvalue = 4 * auiSize;
-        SaveDataToBuffer(&cvalue, 1u, 0);
+        SaveDataToBuffer(&cvalue, 1u, false);
     }
 }
 
@@ -133,7 +133,7 @@ void BGSSaveGameBuffer::SaveFormID(uint32_t aiFormID, uint32_t aiUnusuedMetaData
     apMemory.~BGSNumericIDIndex();
     ::new (&apMemory) BGSNumericIDIndex;
     (&apMemory)->SetNumericID(aiFormID);
-    SaveDataToBuffer(static_cast<char*>(static_cast<void*>(&apMemory)), 3u, (bool)0);
+    SaveDataToBuffer(static_cast<char*>(static_cast<void*>(&apMemory)), 3u, false);
 }
 
 void BGSSaveGameBuffer::SaveDataToBuffer(void* apData, size_t aiSize, uint32_t aiPosition, bool abDirectSave) {

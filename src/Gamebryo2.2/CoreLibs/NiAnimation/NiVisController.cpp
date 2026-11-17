@@ -57,7 +57,7 @@ void NiVisController::LinkObject(NiStream& kStream) {
             v5 = ::new (v4) NiBoolInterpolator(pkBoolData);
         }
         else {
-            v5 = 0;
+            v5 = nullptr;
         }
         m_spInterpolator = v5;
         m_spInterpolator.m_pObject->Collapse();
@@ -131,7 +131,7 @@ void NiVisController::GetTargetBoolValue(bool& bValue) {
 NiObject* NiVisController::CreateObject() {
     NiVisController* v0 = static_cast<NiVisController*>(NiMemObject::operator new(sizeof(NiVisController)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiVisController;
 }

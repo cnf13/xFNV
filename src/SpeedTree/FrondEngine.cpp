@@ -21,9 +21,9 @@
 #include <bit>
 #include <cmath>
 #include <cstdarg>
+#include <cstdint>
 #include <map>
 #include <memory>
-#include <stdint.h>
 #include <string>
 #include <vector>
 
@@ -585,7 +585,7 @@ void CFrondEngine::BuildProfileVectors(
     std::vector<CVec3, std::allocator<CVec3>>& vProfile,
     std::vector<CVec3, std::allocator<CVec3>>& vNormals
 ) {
-    float fAdjust = static_cast<float>(m_pProfile->Evaluate(0.0f) * sGuide.m_fRadius);
+    float fAdjust = (m_pProfile->Evaluate(0.0f) * sGuide.m_fRadius);
     for (uint32_t i = 0; i < m_nProfileSegments; ++i) {
         float fPercent =
             static_cast<float>(1.0 - static_cast<double>(i) / (static_cast<double>(m_nProfileSegments) - 1.0));
@@ -595,7 +595,7 @@ void CFrondEngine::BuildProfileVectors(
         cVertex.m_afData[0] = 0.0f;
         cVertex.m_afData[0] = 0.0f;
         cVertex.m_afData[1] = -fPercent * sGuide.m_fRadius;
-        cVertex.m_afData[2] = static_cast<float>(m_pProfile->Evaluate(fPercent) * sGuide.m_fRadius - fAdjust);
+        cVertex.m_afData[2] = (m_pProfile->Evaluate(fPercent) * sGuide.m_fRadius - fAdjust);
         vProfile.push_back(cVertex);
     }
 

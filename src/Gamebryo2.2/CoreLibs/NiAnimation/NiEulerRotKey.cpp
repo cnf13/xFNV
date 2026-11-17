@@ -10,16 +10,16 @@
 #include "Reconstruction.hpp"
 #include "SDK/MSVC/ehvec.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiEulerRotKey::NiEulerRotKey() {
     m_quat.SetValues(0.0f, 0.0f, 0.0f, 0.0f);
     m_uiNumKeys[0] = 0;
     m_uiNumKeys[1] = 0;
     m_uiNumKeys[2] = 0;
-    m_apkKeys[0] = 0;
-    m_apkKeys[1] = 0;
-    m_apkKeys[2] = 0;
+    m_apkKeys[0] = nullptr;
+    m_apkKeys[1] = nullptr;
+    m_apkKeys[2] = nullptr;
     m_eType[0] = NiAnimationKey::NOINTERP;
     m_eType[1] = NiAnimationKey::NOINTERP;
     m_eType[2] = NiAnimationKey::NOINTERP;

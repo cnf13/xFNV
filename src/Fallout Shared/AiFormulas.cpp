@@ -459,7 +459,7 @@ float AiFormulas::AVDeriveFatigue(ActorValueOwner* apActor, [[maybe_unused]] Act
 }
 
 float AiFormulas::AVDeriveSkill_0(ActorValueOwner* apOwner, ActorValue::Index aiSkill) {
-    return AVDeriveSkill(apOwner, aiSkill, 0);
+    return AVDeriveSkill(apOwner, aiSkill, false);
 }
 
 float AiFormulas::CalculateDerivedSkillValue(float afSkillBase, float afPrimaryAttribute, float afLuck) {
@@ -491,7 +491,7 @@ float AiFormulas::CalculateDerivedHealth(ActorValueOwner* apActor, float afEndur
         pactor = static_cast<Actor*>(apActor);
     }
     else {
-        pactor = 0;
+        pactor = nullptr;
     }
     bool bnpc = pactor->IsNpc();
     bool bpc = pactor->IsPc();
@@ -546,7 +546,7 @@ float AiFormulas::CalculateDerivedFatigue(ActorValueOwner* apActor, float afEndu
         pactor = static_cast<Actor*>(apActor);
     }
     else {
-        pactor = 0;
+        pactor = nullptr;
     }
     bool bnpc = pactor->IsNpc();
     bool bpc = pactor->IsPc();
@@ -580,7 +580,7 @@ float AiFormulas::CalculateDerivedFatigue(ActorValueOwner* apActor, float afEndu
 // owner is an actor whose class tags the skill.
 float AiFormulas::AVDeriveSkill(ActorValueOwner* apActor, ActorValue::Index aiWhich, bool abBaseDerivation) {
     float fValue = 0.0f;
-    if (!ActorValue::IsSkill(static_cast<ActorValue::Index>(aiWhich))) {
+    if (!ActorValue::IsSkill(aiWhich)) {
         return fValue;
     }
     ActorValue::Index ePrimary = static_cast<ActorValue::Index>(-1);
@@ -605,7 +605,7 @@ float AiFormulas::AVDeriveSkill(ActorValueOwner* apActor, ActorValue::Index aiWh
     if (pForm && pForm->IsReference()) {
         if (pForm->IsActor()) {
             Actor* pActor = static_cast<Actor*>(pForm);
-            if (pActor->GetClass() && pActor->GetClass()->IsTagSkill(static_cast<ActorValue::Index>(aiWhich))) {
+            if (pActor->GetClass() && pActor->GetClass()->IsTagSkill(aiWhich)) {
                 fValue = fValue + fAVDTagSkillBonus.Float();
             }
         }
@@ -615,8 +615,8 @@ float AiFormulas::AVDeriveSkill(ActorValueOwner* apActor, ActorValue::Index aiWh
 
 int32_t AiFormulas::GetActorDetectionSize(float afHeightOrLength) {
     int32_t v2 = 1;
-    if (((&::fDetectionLargeActorThreshold)->Float()) < ((double)afHeightOrLength)) {
-        return (int32_t)(afHeightOrLength / ((&::fDetectionLargeActorThreshold)->Float()));
+    if ((&::fDetectionLargeActorThreshold)->Float() < ((double)afHeightOrLength)) {
+        return (int32_t)(afHeightOrLength / (&::fDetectionLargeActorThreshold)->Float());
     }
     return v2;
 }
@@ -838,8 +838,8 @@ float AiFormulas::GetFollowRadiusSlow(float afbasePackRadius) {
 
 float AiFormulas::AVDeriveCarryWeight(ActorValueOwner* apActor, [[maybe_unused]] ActorValue::Index aiWhich) {
     double clampedActorFloatValue = (double)apActor->GetClampedActorFloatValue(static_cast<ActorValue::Index>(5));
-    double v3 = ((&::fAVDCarryWeightMult)->Float()) * clampedActorFloatValue;
-    return (float)(((&gs_fAVDCarryWeightsBase)->Float()) + v3);
+    double v3 = (&::fAVDCarryWeightMult)->Float() * clampedActorFloatValue;
+    return (float)((&gs_fAVDCarryWeightsBase)->Float() + v3);
 }
 
 float AiFormulas::AVDeriveFromPrimary(ActorValueOwner* apActor, ActorValue::Index aiWhich) {
@@ -850,42 +850,42 @@ float AiFormulas::AVDeriveFromPrimary(ActorValueOwner* apActor, ActorValue::Inde
     float v8 = (float)0.0;
     if (((int32_t)aiWhich) == 17) {
         clampedActorValueF = (double)apActor->GetClampedActorFloatValue(static_cast<ActorValue::Index>(5));
-        v5 = ((&fAVDMeleeDamageStrengthOffset)->Float()) + clampedActorValueF;
-        x_4 = (float)(((&::fAVDMeleeDamageStrengthMult)->Float()) * v5);
-        v7 = (float)std::floorf(x_4);
+        v5 = (&fAVDMeleeDamageStrengthOffset)->Float() + clampedActorValueF;
+        x_4 = (float)((&::fAVDMeleeDamageStrengthMult)->Float() * v5);
+        v7 = std::floorf(x_4);
         if (v7 > 0.0) {
-            return (float)(v8 + v7);
+            return (v8 + v7);
         }
     }
-    return (float)(v8);
+    return v8;
 }
 
 float AiFormulas::GetFollowRadiusWalk(float afbasePackRadius) {
-    return (float)(afbasePackRadius * ((&fFollowWalkZoneMult)->Float()));
+    return (afbasePackRadius * (&fFollowWalkZoneMult)->Float());
 }
 
 float AiFormulas::GetFollowRadiusStartMoving(float afbasePackRadius) {
-    return (float)((((&fFollowMatchSpeedZoneWidth)->Float()) * 0.5) + afbasePackRadius);
+    return (float)(((&fFollowMatchSpeedZoneWidth)->Float() * 0.5) + afbasePackRadius);
 }
 
 float AiFormulas::GetFollowRadiusMatchSpeed(float afbasePackRadius) {
-    return (float)(afbasePackRadius + ((&fFollowMatchSpeedZoneWidth)->Float()));
+    return (afbasePackRadius + (&fFollowMatchSpeedZoneWidth)->Float());
 }
 
 int32_t
 AiFormulas::ComputePickpocketSuccess(int32_t aiSneakSkillModed, int32_t aiTargetSneakModed, float fAmountofItem) {
     float* v3 = &(&fPickPocketActorSkillBase)->Float();
-    float v7 = (float)((((double)aiSneakSkillModed) * ((&::fPickPocketActorSkillMult)->Float())) + (*v3));
+    float v7 = (float)((((double)aiSneakSkillModed) * (&::fPickPocketActorSkillMult)->Float()) + (*v3));
     float* v4 = &(&::fPickPocketTargetSkillBase)->Float();
-    float v9 = (float)((((double)aiTargetSneakModed) * ((&::fPickPocketTargetSkillMult)->Float())) + (*v4));
+    float v9 = (float)((((double)aiTargetSneakModed) * (&::fPickPocketTargetSkillMult)->Float()) + (*v4));
     float* v5 = &(&::fPickPocketAmountBase)->Float();
-    float v10 = (((&::fPickPocketAmountMult)->Float()) * fAmountofItem) + (*v5);
+    float v10 = ((&::fPickPocketAmountMult)->Float() * fAmountofItem) + (*v5);
     int32_t v8 = (int32_t)((v7 + v9) + v10);
-    if (((&::fPickPocketMinChance)->Float()) > ((double)v8)) {
-        return (int32_t)((&::fPickPocketMinChance)->Float());
+    if ((&::fPickPocketMinChance)->Float() > ((double)v8)) {
+        return (int32_t)(&::fPickPocketMinChance)->Float();
     }
-    if (((&::fPickPocketMaxChance)->Float()) < ((double)v8)) {
-        return (int32_t)((&::fPickPocketMaxChance)->Float());
+    if ((&::fPickPocketMaxChance)->Float() < ((double)v8)) {
+        return (int32_t)(&::fPickPocketMaxChance)->Float();
     }
     return v8;
 }
@@ -912,7 +912,7 @@ float AiFormulas::GetFollowRadiusFudgeForMultipleFollowers(Actor* apActor, Actor
         pfollowerExtra = (&apFollowTarget->m_Extra)->GetFollowerExtra();
     }
     else {
-        pfollowerExtra = 0;
+        pfollowerExtra = nullptr;
     }
     if (pfollowerExtra) {
         uint32_t inumActualFollowers = 0;
@@ -943,7 +943,8 @@ float AiFormulas::GetFollowRadiusFudgeForMultipleFollowers(Actor* apActor, Actor
                         followerInfo->fPackDesiredDist = v5;
                         double Radius = pfollower_2->GetRadius();
                         followerInfo->fActorRadius = Radius;
-                        double PackageRadiusActorToRefTarget = ppack_2->GetPackageRadiusActorToRefTarget(apActor, 0);
+                        double PackageRadiusActorToRefTarget =
+                            ppack_2->GetPackageRadiusActorToRefTarget(apActor, false);
                         followerInfo->fPackDesiredDist = PackageRadiusActorToRefTarget;
                         ++i;
                     }

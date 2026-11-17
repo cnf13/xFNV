@@ -35,7 +35,7 @@
 #include "Reconstruction.hpp"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // The game settings this file defines, in their initialization order.
 SettingT<INISettingCollection> iConsoleHistorySize("iConsoleHistorySize:Menu", 50);
@@ -46,8 +46,8 @@ SettingT<INISettingCollection> iConsoleTextYPos("iConsoleTextYPos:Menu", 940);
 SettingT<INISettingCollection> iConsoleLineSpacing("iConsoleLineSpacing:Menu", 35);
 
 MenuConsole::MenuConsole()
-  : pConsoleCompiler(nullptr), xStrings(), xInputs(), iInputsPos(0), iLastString(0), cVisible(0), bIsActive(0),
-    bRecordingBatch(0), iRecordingLineCount(0) {
+  : pConsoleCompiler(nullptr), xStrings(), xInputs(), iInputsPos(0), iLastString(0), cVisible(0), bIsActive(false),
+    bRecordingBatch(false), iRecordingLineCount(0) {
     int32_t iFont = iConsoleFont.Int() - 1;
     FontManager* pFontManager = FontManager::Instance();
     iConsoleLineSpacing = static_cast<int32_t>(pFontManager->GetFont(iFont)->GetBaseLine()) + 3;
@@ -79,8 +79,8 @@ void MenuConsole::ScrollBy(int32_t aiNumLines) {
     if (formFlags > ((int32_t)(&xStrings)->m_uiCount)) {
         formFlags = (int32_t)(&xStrings)->m_uiCount;
     }
-    if (((int32_t)(formFlags - ((&::iConsoleVisibleLines)->UInt()))) <= 0) {
-        formFlags = (int32_t)((&::iConsoleVisibleLines)->UInt());
+    if (((int32_t)(formFlags - (&::iConsoleVisibleLines)->UInt())) <= 0) {
+        formFlags = (int32_t)(&::iConsoleVisibleLines)->UInt();
     }
     if (formFlags > ((int32_t)(&xStrings)->m_uiCount)) {
         formFlags = (int32_t)(&xStrings)->m_uiCount;
@@ -103,12 +103,12 @@ void MenuConsole::RefreshLines() {
     int32_t iLastString;
     int32_t i;
     a1 = (&xStrings)->NiTListBase<BSStringT<char>>::GetHeadPos();
-    int32_t v14 = (int32_t)(iConsoleYPos - (((int32_t)iConsoleLineSpacing) * ((&::iConsoleVisibleLines)->UInt())));
+    int32_t v14 = (int32_t)(iConsoleYPos - (((int32_t)iConsoleLineSpacing) * (&::iConsoleVisibleLines)->UInt()));
     iLastString = (int32_t)this->iLastString;
-    for (i = (int32_t)(iLastString - ((&::iConsoleVisibleLines)->UInt())); i < 0; ++i) {
+    for (i = (int32_t)(iLastString - (&::iConsoleVisibleLines)->UInt()); i < 0; ++i) {
         a4 = (float)(double)v14;
         a3 = (float)(double)iConsoleXPos;
-        v1 = DebugText::Instance(1);
+        v1 = DebugText::Instance(true);
         v1->Print(nullptr, a3, a4, 1, (-1), (-0x1p+0f), 0, nullptr);
         v14 += ((int32_t)iConsoleLineSpacing);
     }
@@ -121,7 +121,7 @@ void MenuConsole::RefreshLines() {
         a3a = (float)(double)iConsoleXPos;
         v2 = &(&xStrings)->NiTPointerListBase<BSStringT<char>>::Get(a1);
         v4 = v2->pString;
-        v3 = DebugText::Instance(1);
+        v3 = DebugText::Instance(true);
         v3->Print(v4, a3a, a4a, 1, (-1), (-0x1p+0f), uint, nullptr);
         a1 = (&xStrings)->NiTListBase<BSStringT<char>>::GetNextPos(a1);
         ++i;
@@ -131,7 +131,7 @@ void MenuConsole::RefreshLines() {
 
 bool MenuConsole::IsVisible() {
     // The state byte is sign-extended: zero or negative reads as closed.
-    return static_cast<int8_t>(this->cVisible) > 0;
+    return this->cVisible > 0;
 }
 
 void MenuConsole::OnEnterMenuMode() {
@@ -139,8 +139,8 @@ void MenuConsole::OnEnterMenuMode() {
         int32_t v5 = iConsoleFont.Int();
         float a4 = static_cast<float>(iConsoleYPos);
         float a3 = static_cast<float>(iConsoleXPos);
-        DebugText* v1 = DebugText::Instance(1);
-        v1->Print("|", a3, a4, 1, -1, -1.0f, v5, 0);
+        DebugText* v1 = DebugText::Instance(true);
+        v1->Print("|", a3, a4, 1, -1, -1.0f, v5, nullptr);
         uint32_t FormFlags = xStrings.m_uiCount;
         ScrollBy(FormFlags);
         RefreshLines();
@@ -152,7 +152,7 @@ bool MenuConsole::ToggleVisible() {
     BSShaderProperty::PreviousTransform::ToggleConsole();
     if (!cVisible) {
         SetVisible(1);
-        return 1;
+        return true;
     }
     // Only state 1 may switch to state 2 (shift held, one menu entered, none on the second stack); every other
     // state closes the console.
@@ -163,7 +163,7 @@ bool MenuConsole::ToggleVisible() {
     else {
         SetVisible(0);
     }
-    return 0;
+    return false;
 }
 
 // KEEP: uninitialised reads. With an empty console line (Source[0] == 0) the exe tests Source[ilen - 1], the byte
@@ -178,11 +178,11 @@ bool MenuConsole::Idle(int32_t aiKey) {
     float frange;
     NiFrustum xfrust;
     if (cVisible <= 0) {
-        return 0;
+        return false;
     }
     InterfaceManager* v2 = InterfaceManager::Instance();
     if (!v2->IsInMenuMode()) {
-        return 0;
+        return false;
     }
     if (aiKey) {
         char apBuf[2052];
@@ -191,7 +191,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
         int32_t ilen;
         float afY = static_cast<float>(iConsoleYPos);
         float a7 = static_cast<float>(iConsoleXPos);
-        DebugText* v4 = DebugText::Instance(1);
+        DebugText* v4 = DebugText::Instance(true);
         v4->GetDebugText_0(apBuf, a7, afY, 1);
         mbsnbcpy_(Source, apBuf, 2046u);
         for (ilen = 0; Source[ilen]; ++ilen) {
@@ -230,7 +230,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                 }
             }
             if (Source[0]) {
-                g_bHasPlayerUsedConsole = 1;
+                g_bHasPlayerUsedConsole = true;
                 InterfaceManager* pim = InterfaceManager::Instance();
                 uint32_t FormFlags = xStrings.m_uiCount;
                 ScrollBy(FormFlags);
@@ -241,8 +241,8 @@ bool MenuConsole::Idle(int32_t aiKey) {
                 int32_t afYa = iConsoleFont.Int();
                 float a4 = static_cast<float>(iConsoleYPos);
                 float a3 = static_cast<float>(iConsoleXPos);
-                DebugText* v6 = DebugText::Instance(1);
-                v6->Print("|", a3, a4, 1, -1, -1.0f, afYa, 0);
+                DebugText* v6 = DebugText::Instance(true);
+                v6->Print("|", a3, a4, 1, -1, -1.0f, afYa, nullptr);
                 if (_tcsnicmp(Source, "dof", 3u)) {
                     if (_tcsnicmp(Source, "usz", 3u)) {
                         if (_tcsicmp(Source, "clr") && _tcscmp(Source, "cls")) {
@@ -408,19 +408,19 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                                                                                                             NiFile::
                                                                                                                                                 WRITE_ONLY,
                                                                                                                                             0x1000u,
-                                                                                                                                            1
+                                                                                                                                            true
                                                                                                                                         );
                                                                                                                                 }
                                                                                                                                 else {
                                                                                                                                     pfile_5 =
-                                                                                                                                        0;
+                                                                                                                                        nullptr;
                                                                                                                                 }
                                                                                                                                 if (
                                                                                                                                     pfile_5 &&
                                                                                                                                     pfile_5
                                                                                                                                         ->Open(
-                                                                                                                                            0,
-                                                                                                                                            0
+                                                                                                                                            false,
+                                                                                                                                            false
                                                                                                                                         )
                                                                                                                                 ) {
                                                                                                                                     for (
@@ -481,7 +481,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                                                                                                 );
                                                                                                                         }
                                                                                                                         bRecordingBatch =
-                                                                                                                            0;
+                                                                                                                            false;
                                                                                                                         iRecordingLineCount =
                                                                                                                             0;
                                                                                                                     }
@@ -495,7 +495,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                                                                                                 "Use rbat {filename} to save batch file or rbat with no filename to cancel."
                                                                                                                             );
                                                                                                                         bRecordingBatch =
-                                                                                                                            1;
+                                                                                                                            true;
                                                                                                                         iRecordingLineCount =
                                                                                                                             0;
                                                                                                                         for (
@@ -570,12 +570,12 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                                                                                                 NiFile::
                                                                                                                                     READ_ONLY,
                                                                                                                                 0x4000u,
-                                                                                                                                0
+                                                                                                                                false
                                                                                                                             );
                                                                                                                     }
                                                                                                                     else {
                                                                                                                         pfile =
-                                                                                                                            0;
+                                                                                                                            nullptr;
                                                                                                                     }
                                                                                                                     BSFile* pfile_2 =
                                                                                                                         pfile;
@@ -587,8 +587,8 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                                                                                         (!pfile_2 ||
                                                                                                                          !pfile_2
                                                                                                                               ->Open(
-                                                                                                                                  0,
-                                                                                                                                  0
+                                                                                                                                  false,
+                                                                                                                                  false
                                                                                                                               )) &&
                                                                                                                         (ilength <=
                                                                                                                              4 ||
@@ -638,12 +638,12 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                                                                                                     NiFile::
                                                                                                                                         READ_ONLY,
                                                                                                                                     0x4000u,
-                                                                                                                                    0
+                                                                                                                                    false
                                                                                                                                 );
                                                                                                                         }
                                                                                                                         else {
                                                                                                                             pfile_4 =
-                                                                                                                                0;
+                                                                                                                                nullptr;
                                                                                                                         }
                                                                                                                         pfile_2 =
                                                                                                                             pfile_4;
@@ -652,8 +652,8 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                                                                                         pfile_2 &&
                                                                                                                         pfile_2
                                                                                                                             ->Open(
-                                                                                                                                0,
-                                                                                                                                0
+                                                                                                                                false,
+                                                                                                                                false
                                                                                                                             )
                                                                                                                     ) {
                                                                                                                         char newText
@@ -814,13 +814,15 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                                                         else {
                                                                                             FontManager* Singleton =
                                                                                                 FontManager::Instance();
-                                                                                            Singleton->SetNewFonts(0);
+                                                                                            Singleton->SetNewFonts(
+                                                                                                false
+                                                                                            );
                                                                                         }
                                                                                     }
                                                                                     else {
                                                                                         FontManager* v15 =
                                                                                             FontManager::Instance();
-                                                                                        v15->SetNewFonts(1);
+                                                                                        v15->SetNewFonts(true);
                                                                                     }
                                                                                 }
                                                                                 else {
@@ -848,13 +850,14 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                                                     Source, "set trait %s %s %f",
                                                                                     ptarget, ptrait, &fval
                                                                                 );
-                                                                                Tile* ptile =
-                                                                                    Tile::GetTileByName(0, ptarget);
+                                                                                Tile* ptile = Tile::GetTileByName(
+                                                                                    nullptr, ptarget
+                                                                                );
                                                                                 int32_t itrait =
                                                                                     Tile::TextToTrait(ptrait);
                                                                                 if (ptile && itrait > 0) {
                                                                                     PrintLine("Trait set.");
-                                                                                    ptile->Set(itrait, fval, 1);
+                                                                                    ptile->Set(itrait, fval, true);
                                                                                 }
                                                                                 else {
                                                                                     if (ptile) {
@@ -884,7 +887,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                                     else {
                                                                         for (int32_t top = pim->GetEnterStackTop(); top;
                                                                              top = pim->GetEnterStackTop()) {
-                                                                            pim->PopFromEnterStack(top, 0);
+                                                                            pim->PopFromEnterStack(top, false);
                                                                         }
                                                                     }
                                                                 }
@@ -893,7 +896,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                                     std::sscanf(Source, "visible %i", &aiClass);
                                                                     PrintLine(
                                                                         "Is Visible: %i",
-                                                                        MenuManager::Instance(1)->IsMenuOpen(aiClass)
+                                                                        MenuManager::Instance(true)->IsMenuOpen(aiClass)
                                                                     );
                                                                 }
                                                             }
@@ -908,7 +911,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                         }
                                                         else {
                                                             Menu* FrontmostMenu =
-                                                                MenuManager::Instance(1)->GetFrontmostMenu();
+                                                                MenuManager::Instance(true)->GetFrontmostMenu();
                                                             PrintLine("Frontmost: %s", FrontmostMenu->pMenu->GetName());
                                                         }
                                                     }
@@ -916,7 +919,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                         char v93[1028];
                                                         std::sscanf(Source, "delete %s", v93);
                                                         int32_t v11 = Tile::TextToTrait(v93);
-                                                        MenuManager::Instance(1)->DeleteMenu(v11);
+                                                        MenuManager::Instance(true)->DeleteMenu(v11);
                                                     }
                                                 }
                                                 else {
@@ -937,7 +940,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                         apText[0] = 38;
                                                     }
                                                     int32_t v10 = Tile::TextToTrait(apText);
-                                                    MenuManager::Instance(1)->ReloadMenu(v10);
+                                                    MenuManager::Instance(true)->ReloadMenu(v10);
                                                 }
                                             }
                                             else {
@@ -947,7 +950,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                 if (v49) {
                                                     delete v49;
                                                 }
-                                                StartMenu::Create(0, 0);
+                                                StartMenu::Create(false, false);
                                             }
                                         }
                                         else {
@@ -964,9 +967,9 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                     if (StringRoot) {
                                         delete StringRoot;
                                     }
-                                    Menu::RemoveFromXMLArchive("Data\\Menus\\globals.xml", 0);
+                                    Menu::RemoveFromXMLArchive("Data\\Menus\\globals.xml", nullptr);
                                     Tile* pstring = pim->GetMenusRoot()->ReadFile("Data\\Menus\\globals.xml");
-                                    pstring->SetParent(0, 0);
+                                    pstring->SetParent(nullptr, nullptr);
                                     pim->pStringRoot = pstring;
                                 }
                             }
@@ -1069,7 +1072,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                         --iInputsPos;
                         iInputsPos = BSMAX(iInputsPos, 0);
                         BSStringT<char> xstr_2;
-                        void* xelem_2 = 0;
+                        void* xelem_2 = nullptr;
                         if (iInputsPos) {
                             xelem_2 = (void*)xInputs.m_pkHead;
                             for (int32_t a_7 = 0; a_7 < iInputsPos; ++a_7) {
@@ -1143,10 +1146,10 @@ bool MenuConsole::Idle(int32_t aiKey) {
                     break;
                 }
             }
-            bool bhas_bar = 0;
+            bool bhas_bar = false;
             for (a_8 = 0; Source[a_8]; ++a_8) {
                 if (Source[a_8] == 124) {
-                    bhas_bar = 1;
+                    bhas_bar = true;
                     break;
                 }
             }
@@ -1165,11 +1168,11 @@ bool MenuConsole::Idle(int32_t aiKey) {
             int32_t afYb = iConsoleFont.Int();
             float a4a = static_cast<float>(iConsoleYPos);
             float a3a = static_cast<float>(iConsoleXPos);
-            DebugText* v22 = DebugText::Instance(1);
-            v22->Print(Source, a3a, a4a, 1, -1, -1.0f, afYb, 0);
+            DebugText* v22 = DebugText::Instance(true);
+            v22->Print(Source, a3a, a4a, 1, -1, -1.0f, afYb, nullptr);
         }
     }
-    return 1;
+    return true;
 }
 
 void MenuConsole::PrintLine(const char* apString, va_list xlist) {
@@ -1181,7 +1184,7 @@ void MenuConsole::PrintLine(const char* apString, va_list xlist) {
         int32_t iheight = 0;
         int32_t v5 = iConsoleFont.Int() - 1;
         FontManager* Singleton = FontManager::Instance();
-        int32_t inum_lines = Singleton->GetFont(v5)->LineBreakText(xstring, iwidth, iheight, 0, 0);
+        int32_t inum_lines = Singleton->GetFont(v5)->LineBreakText(xstring, iwidth, iheight, false, 0);
         if (inum_lines) {
             char v14[2052];
             for (uint32_t b = 0; b <= xstring.GetLength(); ++b) {
@@ -1196,7 +1199,7 @@ void MenuConsole::PrintLine(const char* apString, va_list xlist) {
                 if (bat_end) {
                     iLastString = xStrings.m_uiCount;
                 }
-                while (1) {
+                while (true) {
                     int32_t FormFlags = xStrings.m_uiCount;
                     if (FormFlags <= iConsoleHistorySize.Int()) {
                         break;
@@ -1235,7 +1238,7 @@ void MenuConsole::SetVisible(char acState) {
     if (acState > 0 != cold_state > 0) {
         if (acState <= 0) {
             InitializationFlow();
-            DebugText* v6 = DebugText::Instance(1);
+            DebugText* v6 = DebugText::Instance(true);
             v6->DeleteAllDebugText();
             InterfaceManager* v7 = InterfaceManager::Instance();
             v7->ClearTargetREFR();
@@ -1247,16 +1250,16 @@ void MenuConsole::SetVisible(char acState) {
                 int32_t v12 = iConsoleFont.Int();
                 float a4 = static_cast<float>(iConsoleYPos);
                 float a3 = static_cast<float>(iConsoleXPos);
-                DebugText* v3 = DebugText::Instance(1);
-                v3->Print("|", a3, a4, 1, -1, -1.0f, v12, 0);
+                DebugText* v3 = DebugText::Instance(true);
+                v3->Print("|", a3, a4, 1, -1, -1.0f, v12, nullptr);
                 uint32_t FormFlags = xStrings.m_uiCount;
                 ScrollBy(FormFlags);
             }
             else {
                 float a4a = static_cast<float>(iConsoleYPos);
                 float a3a = static_cast<float>(iConsoleXPos);
-                DebugText* v5 = DebugText::Instance(1);
-                v5->Print("", a3a, a4a, 1, -1, -1.0f, 0, 0);
+                DebugText* v5 = DebugText::Instance(true);
+                v5->Print("", a3a, a4a, 1, -1, -1.0f, 0, nullptr);
             }
             RefreshLines();
         }
@@ -1293,12 +1296,12 @@ void MenuConsole::DumpTextures() {
     }
     BSFile* apMemory = static_cast<BSFile*>(ourMalloc(sizeof(BSFile)));
     if (apMemory) {
-        pfile = ::new (apMemory) BSFile("textures.txt", NiFile::WRITE_ONLY, 0x1000u, 1);
+        pfile = ::new (apMemory) BSFile("textures.txt", NiFile::WRITE_ONLY, 0x1000u, true);
     }
     else {
-        pfile = 0;
+        pfile = nullptr;
     }
-    if (pfile && pfile->Open(0, 0)) {
+    if (pfile && pfile->Open(false, false)) {
         const char* v8;
         const char* v9;
         char apDest[1024];
@@ -1350,15 +1353,15 @@ void MenuConsole::DumpTextures() {
 }
 
 char MenuConsole::IsMenuTexture(NiSourceTexture* apTexture) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apTexture) {
         if (apTexture->GetFilename().GetHandleString()) {
             const char* HandleString = apTexture->GetFilename().GetHandleString();
             const char* Str = std::strchr(HandleString, 92);
             while (Str) {
                 if (!_strnicmp(Str, "\\menus", 6u)) {
-                    bretval = 1;
-                    Str = 0;
+                    bretval = true;
+                    Str = nullptr;
                 }
                 else {
                     Str = std::strchr(Str + 1, 92);
@@ -1388,8 +1391,8 @@ void MenuConsole::WriteToOutputFile(const char* apOutText) {
             ilen = 0;
         }
         if (ilen) {
-            BSFile outfile(pOutputFileName, NiFile::WRITE_ONLY, 0x2800u, 1);
-            if (outfile.BSFile::Open(0, 1)) {
+            BSFile outfile(pOutputFileName, NiFile::WRITE_ONLY, 0x2800u, true);
+            if (outfile.BSFile::Open(false, true)) {
                 outfile.BSFile::Seek(0, NiFile::ms_iSeekEnd);
                 outfile.BSFile::WriteF(apOutText, ilen);
                 outfile.BSFile::WriteF("\r\n", 2u);

@@ -36,7 +36,7 @@ int32_t eatWhiteSpace(hkStreamReader* r_edi) {
     int32_t result = r_edi->read(v4, 64);
     if (result) {
         int32_t v2;
-        while (1) {
+        while (true) {
             v2 = 0;
             if (result > 0) {
                 break;
@@ -48,7 +48,7 @@ int32_t eatWhiteSpace(hkStreamReader* r_edi) {
                 return result;
             }
         }
-        while (1) {
+        while (true) {
             char v3 = v4[v2];
             if (v3 != 32 && (v3 != 9 && (v3 != 13 && v3 != 10))) {
                 break;
@@ -163,7 +163,7 @@ double readFloat(hkStreamReader* r_eax) {
     if (i <= 0) {
         return -1.0f;
     }
-    return static_cast<float>(std::strtod(String, 0));
+    return static_cast<float>(std::strtod(String, nullptr));
 }
 
 hkIstream::hkIstream(hkStreamReader* a1) : m_streamReader(a1) {
@@ -205,7 +205,7 @@ int32_t hkIstream::getline(char* str, int32_t maxlen, char delim) {
     if (maxlen <= 0) {
         return -1;
     }
-    while (1) {
+    while (true) {
         int32_t v6 = readChar(m_streamReader);
         if (v6 == -1 || v6 == delim) {
             break;

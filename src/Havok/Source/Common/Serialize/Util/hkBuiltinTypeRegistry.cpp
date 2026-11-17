@@ -1078,7 +1078,7 @@ static hkSingletonInitNode hkSingletonRegisterhkBuiltinTypeRegistry(
 static hkReferencedObject* hkCreateBuiltInTypeRegistry() {
     if (!hkVtableClassRegistry::s_instance ||
         (!hkDefaultClassNameRegistry::s_instance || !hkTypeInfoRegistry::s_instance)) {
-        return 0;
+        return nullptr;
     }
     hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
     hkDefaultBuiltinTypeRegistry* pRegistry =

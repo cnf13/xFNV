@@ -180,7 +180,7 @@ int32_t hkBufferedStreamWriter::flushBuffer() {
         this->m_bufSize = 0;
     }
     else {
-        while (1) {
+        while (true) {
             int32_t v4 = m_stream->write(&m_buf[v3], m_bufSize - v3);
             v3 += v4;
             if (!v4) {

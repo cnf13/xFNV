@@ -25,8 +25,8 @@ TrespassPackage::TrespassPackage(Actor* apCriminal, TESForm* apOwner, TESObjectC
   : fwarningtimer(0.0f), iwarning(0), pOwner(apOwner), pObjectOwned(OpenSound), iCrimeNumber(static_cast<uint32_t>(-1)),
     iwarninglevel(auiWarningLevel), iNumberActors(0) {
     SetPackType(PACKAGE_TYPE_TRESPASS);
-    SetMustReachLocation(1);
-    SetMustComplete(1);
+    SetMustReachLocation(true);
+    SetMustComplete(true);
     // SetPackageLocation and SetPackageTarget copy the temporaries.
     PackageLocation* ploc = new PackageLocation();
     ploc->SetLocReference(apCriminal);
@@ -77,14 +77,14 @@ void TrespassPackage::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         FormByNumericID = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pOwner)));
     }
     else {
-        FormByNumericID = 0;
+        FormByNumericID = nullptr;
     }
     pOwner = FormByNumericID;
     if (pObjectOwned) {
         v2 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pObjectOwned)));
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     pObjectOwned = v2;
 }
@@ -158,7 +158,7 @@ void TrespassPackage::ModNumberActors(int32_t aiNumber) {
 }
 
 void TrespassPackage::ModWarningTimer(float aftime) {
-    fwarningtimer = (float)(fwarningtimer + aftime);
+    fwarningtimer = (fwarningtimer + aftime);
 }
 
 void TrespassPackage::ModWarning(int32_t ainumb) {

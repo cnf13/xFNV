@@ -168,7 +168,7 @@ void hkpMidphaseViewer::postSimulationCallback(hkpWorld* world) {
 
 void hkpMidphaseViewer::worldAddedCallback(hkpWorld* world) {
     if (this == nullptr) {
-        world->addWorldPostSimulationListener(0);
+        world->addWorldPostSimulationListener(nullptr);
     }
     else {
         world->addWorldPostSimulationListener(this);
@@ -177,7 +177,7 @@ void hkpMidphaseViewer::worldAddedCallback(hkpWorld* world) {
 
 void hkpMidphaseViewer::worldRemovedCallback(hkpWorld* world) {
     if (this == nullptr) {
-        world->removeWorldPostSimulationListener(0);
+        world->removeWorldPostSimulationListener(nullptr);
     }
     else {
         world->removeWorldPostSimulationListener(this);
@@ -193,7 +193,7 @@ hkProcess* hkpMidphaseViewer::create(const hkArray<hkProcessContext*, hkContaine
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

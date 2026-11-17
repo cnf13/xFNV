@@ -255,7 +255,7 @@ void hkpSimulationIslandViewer::postSimulationCallback(hkpWorld* world) {
 
 void hkpSimulationIslandViewer::worldAddedCallback(hkpWorld* world) {
     if (this == nullptr) {
-        world->addWorldPostSimulationListener(0);
+        world->addWorldPostSimulationListener(nullptr);
     }
     else {
         world->addWorldPostSimulationListener(this);
@@ -264,7 +264,7 @@ void hkpSimulationIslandViewer::worldAddedCallback(hkpWorld* world) {
 
 void hkpSimulationIslandViewer::worldRemovedCallback(hkpWorld* world) {
     if (this == nullptr) {
-        world->removeWorldPostSimulationListener(0);
+        world->removeWorldPostSimulationListener(nullptr);
     }
     else {
         world->removeWorldPostSimulationListener(this);
@@ -281,7 +281,7 @@ hkProcess* hkpSimulationIslandViewer::create(const hkArray<hkProcessContext*, hk
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

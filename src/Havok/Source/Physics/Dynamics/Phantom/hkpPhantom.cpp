@@ -114,22 +114,22 @@ void hkpPhantom::deallocateInternalArrays() {
     int32_t v5;
     if (!m_overlapListeners.m_size) {
         m_heap = (&hkMemoryRouter::getInstance())->m_heap;
-        m_capacityAndFlags = (int32_t)m_overlapListeners.m_capacityAndFlags;
+        m_capacityAndFlags = m_overlapListeners.m_capacityAndFlags;
         m_overlapListeners.m_size = (uint32_t)0;
         if (m_capacityAndFlags >= 0) {
             m_heap->bufFree(m_overlapListeners.m_data, sizeof(hkpPhantomOverlapListener*) * m_capacityAndFlags);
         }
-        m_overlapListeners.m_data = (hkpPhantomOverlapListener**)0;
+        m_overlapListeners.m_data = (hkpPhantomOverlapListener**)nullptr;
         m_overlapListeners.m_capacityAndFlags = 0x80000000u;
     }
     if (!m_phantomListeners.m_size) {
         v4 = (&hkMemoryRouter::getInstance())->m_heap;
-        v5 = (int32_t)m_phantomListeners.m_capacityAndFlags;
+        v5 = m_phantomListeners.m_capacityAndFlags;
         m_phantomListeners.m_size = (uint32_t)0;
         if (v5 >= 0) {
             v4->bufFree(m_phantomListeners.m_data, sizeof(hkpPhantomListener*) * v5);
         }
-        m_phantomListeners.m_data = (hkpPhantomListener**)0;
+        m_phantomListeners.m_data = (hkpPhantomListener**)nullptr;
         m_phantomListeners.m_capacityAndFlags = 0x80000000u;
     }
 }
@@ -426,7 +426,7 @@ void hkpPhantom::removePhantomOverlapListener(hkpPhantomOverlapListener* el) {
 void hkpPhantom::firePhantomDeleted() {
     for (int32_t i = m_phantomListeners.m_size - 1; i >= 0; --i) {
         hkpPhantomListener** m_data = m_phantomListeners.begin();
-        bool v4 = m_data[i] == 0;
+        bool v4 = m_data[i] == nullptr;
         hkpPhantomListener** v5 = &m_data[i];
         if (!v4) {
             (*v5)->phantomDeletedCallback(this);

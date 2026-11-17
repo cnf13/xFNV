@@ -70,7 +70,7 @@ void BackUpPackage::SaveGame() {
     TESPackage::SaveGame();
     iblockSize = 0;
     // The reserved size slot in the save buffer (untyped bytes there).
-    void* pblockSize = 0;
+    void* pblockSize = nullptr;
     uint8_t* itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -125,7 +125,7 @@ void BackUpPackage::LoadGame() {
     uint16_t iblockSize;
     TESPackage::LoadGame();
     iblockSize = 0;
-    uint8_t* istartBufferPosition = 0;
+    uint8_t* istartBufferPosition = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockHeader, 4u);
         if (iblockHeader != 0x424C4F4B) {
@@ -216,8 +216,8 @@ void BackUpPackage::InitializeBackUpPackage(Actor* apActor, TESObjectCELL* apcel
     NiPoint3 result;
     NiPoint3 v12;
     SetPackType(PACKAGE_TYPE_BACKUP);
-    SetMustReachLocation(1);
-    SetMustComplete(1);
+    SetMustReachLocation(true);
+    SetMustComplete(true);
     if (apActor) {
         PackageTarget* v7;
         PackageLocation* v8;
@@ -226,7 +226,7 @@ void BackUpPackage::InitializeBackUpPackage(Actor* apActor, TESObjectCELL* apcel
             v8 = ::new (v13) PackageLocation;
         }
         else {
-            v8 = 0;
+            v8 = nullptr;
         }
         if (apcell || apRef) {
             if (apRef) {
@@ -264,7 +264,7 @@ void BackUpPackage::InitializeBackUpPackage(Actor* apActor, TESObjectCELL* apcel
             v7 = ::new (v10) PackageTarget;
         }
         else {
-            v7 = 0;
+            v7 = nullptr;
         }
         SetPackageTarget(v7);
         if (v7) {
@@ -276,7 +276,7 @@ void BackUpPackage::InitializeBackUpPackage(Actor* apActor, TESObjectCELL* apcel
         PackageTarget* v6 = GetPackageTarget();
         v6->SetTargReference(apActor);
     }
-    SetIsCreated(1);
+    SetIsCreated(true);
 }
 
 NiPoint3* BackUpPackage::GetBackUpPoint(NiPoint3* apResult) {

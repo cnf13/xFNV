@@ -130,7 +130,7 @@ void NiTriStrips::CopyMembers(NiTriStrips* pkDest, NiCloningProcess& kCloning) {
 NiObject* NiTriStrips::CreateObject() {
     NiTriStrips* pkObject = static_cast<NiTriStrips*>(NiMemObject::operator new(sizeof(NiTriStrips)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiTriStrips;
 }

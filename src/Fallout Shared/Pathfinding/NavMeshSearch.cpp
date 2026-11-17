@@ -40,7 +40,7 @@
 #include "Reconstruction.hpp"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<GameSettingCollection> fPathingLargeActorRadius("fPathingLargeActorRadius", 80.0f);
@@ -64,7 +64,7 @@ int32_t AStarSearch_GetOrCreateAStarNode_6A7E00(
     AStarNode<NavMeshSearchNode, NavMeshSearchLink>** apRetNode
 ) {
     AStarNode<NavMeshSearchNode, NavMeshSearchLink>** pBuckHead =
-        &apThis->kNodeMap.Buckets[(apThis->kNodeMap.GetBucketFromKey(aiKey))];
+        &apThis->kNodeMap.Buckets[apThis->kNodeMap.GetBucketFromKey(aiKey)];
     if (*pBuckHead) {
         if ((*pBuckHead)->iKey == aiKey) {
             if (!(afCost < (*pBuckHead)->fCost)) {
@@ -275,7 +275,7 @@ bool NavMeshSearch::GetNodeConnections(
         pnode->ParentLink.iEdgeIndex = i;
         apRetNodes->Add(pnode);
     }
-    return 1;
+    return true;
 }
 
 bool NavMeshSearch::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) {
@@ -308,8 +308,8 @@ bool NavMeshSearch::BuildNodePath(
     NiPoint3 kStartCenter;
     using searchNavmeshes_t = BSSimpleArray<NavMeshPtr, 1024>;
     pCurrentRequest = apRequest;
-    apReturnNodeArray->Clear(0);
-    apReturnLinkArray->Clear(0);
+    apReturnNodeArray->Clear(false);
+    apReturnLinkArray->Clear(false);
     ClearSearchData();
     StartNode.pNavMesh = aStartNode.pNavMesh;
     StartNode.sTriangle = aStartNode.sTriangle;
@@ -341,7 +341,7 @@ bool NavMeshSearch::BuildNodePath(
             }
         }
     }
-    return Search(apReturnNodeArray, apReturnLinkArray, 1);
+    return Search(apReturnNodeArray, apReturnLinkArray, true);
 }
 
 uint32_t NavMeshSearch::GetKeyForNode(NavMesh* apNavMesh, uint16_t aiTri) const {

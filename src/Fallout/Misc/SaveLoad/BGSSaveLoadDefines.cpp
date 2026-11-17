@@ -228,19 +228,19 @@ uint32_t LoadGameSizeFromFile(BGSSaveLoadFile* apFile, uint32_t& ariSize, SIZE_T
 
 bool GetLocationCellOrWorld(TESForm* apLocation, TESObjectCELL*& arpCell, TESWorldSpace*& arpWorld) {
     if (!apLocation) {
-        return 0;
+        return false;
     }
     if (apLocation->GetFormType() == 65) {
         arpWorld = static_cast<TESWorldSpace*>(apLocation);
-        return 1;
+        return true;
     }
     else {
         if (apLocation->GetFormType() == 57) {
             arpCell = static_cast<TESObjectCELL*>(apLocation);
-            return 1;
+            return true;
         }
         else {
-            return 0;
+            return false;
         }
     }
 }

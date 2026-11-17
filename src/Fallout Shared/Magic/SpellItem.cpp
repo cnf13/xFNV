@@ -30,7 +30,7 @@ SpellItem::~SpellItem() {
 
 void SpellItem::InitializeData() {
     data.iSpellType = MagicSystem::SPELL;
-    data.iCostOverride = (uint32_t)((-1));
+    data.iCostOverride = (uint32_t)(-1);
     data.eLevelOverride = SkillLevel::NOVICE;
     data.iFlags = (uint8_t)0;
 }
@@ -58,7 +58,7 @@ bool SpellItem::GetNoAbsorbOrReflect() {
 float SpellItem::GetCost(Actor* apActor) {
     float fcost = 0.0f;
     if (GetSpellType() == MagicSystem::POWER || GetSpellType() == MagicSystem::LESSER_POWER) {
-        apActor = 0;
+        apActor = nullptr;
     }
     if (GetFlag(1u)) {
         fcost = static_cast<float>(data.iCostOverride);
@@ -79,7 +79,7 @@ SkillLevel::Value SpellItem::GetLevel() {
     if (GetFlag(1u)) {
         return data.eLevelOverride;
     }
-    float afSpellCost = static_cast<EffectItemList*>(this)->GetCost(0);
+    float afSpellCost = static_cast<EffectItemList*>(this)->GetCost(nullptr);
     return MagicFormulas::GetMagicSpellLevel(afSpellCost);
 }
 
@@ -98,7 +98,7 @@ uint32_t SpellItem::GetDataSize() {
 bool SpellItem::CompareMagicItemData(MagicItem* apCompare) {
     SpellItem* pspell = dynamic_cast<SpellItem*>(apCompare);
     if (!pspell) {
-        return 1;
+        return true;
     }
     MagicSystem::SpellType v3 = pspell->GetSpellType();
     bool result = true;

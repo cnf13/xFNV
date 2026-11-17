@@ -159,10 +159,10 @@ hkaDefaultAnimatedReferenceFrame::hkaDefaultAnimatedReferenceFrame(
     hkaDefaultAnimatedReferenceFrame::project(options, hkQsTransformIdentity, previous, projected);
     previous = projected;
     if (options.m_allowTurning.m_bool) {
-        const float forwardError = static_cast<float>(std::fabs(static_cast<float>(options.m_forward.dot3(projected))));
+        const float forwardError = std::fabs(static_cast<float>(options.m_forward.dot3(projected)));
         hkVector4 right;
         right.setCross(options.m_up, options.m_forward);
-        const float rightError = static_cast<float>(std::fabs(static_cast<float>(right.dot3(projected))));
+        const float rightError = std::fabs(static_cast<float>(right.dot3(projected)));
         if (forwardError > 0.01f || rightError > 0.01f) {
             FNVD_INLINED_LOCAL(hkErrStream, ostr, std::nullopt, std::nullopt);
             char buf[512];
@@ -291,12 +291,12 @@ void hkaDefaultAnimatedReferenceFrame::getDeltaReferenceFrame(
         __m128 v48 = v8;
         __m128 v47 = v9;
         int32_t v11 = v6;
-        while (1) {
+        while (true) {
             __m128 v25;
             if (loops >= 0) {
                 __m128 v26 = _mm_mul_ps(v10.m_quad, v7.m_vec.m_quad);
                 __m128 v27 = _mm_shuffle_ps(v26, v26, 170);
-                v27[0] = v27[0] + static_cast<float>(_mm_shuffle_ps(v26, v26, 85)[0] + v26[0]);
+                v27[0] = v27[0] + (_mm_shuffle_ps(v26, v26, 85)[0] + v26[0]);
                 __m128 v28 = _mm_add_ps(
                     _mm_mul_ps(
                         _mm_sub_ps(
@@ -318,7 +318,7 @@ void hkaDefaultAnimatedReferenceFrame::getDeltaReferenceFrame(
                 hkQuaternion q0_8;
                 __m128 v12 = _mm_mul_ps(v46.m_translation.m_quad, v7.m_vec.m_quad);
                 __m128 v13 = _mm_shuffle_ps(v12, v12, 170);
-                v13[0] = v13[0] + static_cast<float>(_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]);
+                v13[0] = v13[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]);
                 __m128 v14 = _mm_mul_ps(_mm_shuffle_ps(v46.m_translation.m_quad, v46.m_translation.m_quad, 210), v9);
                 __m128 v15 = _mm_add_ps(
                     _mm_mul_ps(_mm_add_ps(_mm_mul_ps(v8, v8), hkQuadRealMinusHalf), v46.m_translation.m_quad),
@@ -343,7 +343,7 @@ void hkaDefaultAnimatedReferenceFrame::getDeltaReferenceFrame(
                 __m128 v20 = _mm_xor_ps(rdata_10C4C00, v7.m_vec.m_quad);
                 __m128 v21 = _mm_mul_ps(v20, v10.m_quad);
                 __m128 v22 = _mm_shuffle_ps(v21, v21, 170);
-                v22[0] = v22[0] + static_cast<float>(_mm_shuffle_ps(v21, v21, 85)[0] + v21[0]);
+                v22[0] = v22[0] + (_mm_shuffle_ps(v21, v21, 85)[0] + v21[0]);
                 __m128 v23 = _mm_shuffle_ps(v20, v20, 255);
                 __m128 v24 = _mm_add_ps(
                     _mm_mul_ps(
@@ -383,7 +383,7 @@ void hkaDefaultAnimatedReferenceFrame::getDeltaReferenceFrame(
     }
     __m128 v29 = _mm_mul_ps(v52.m_rotation.m_vec.m_quad, v52.m_translation.m_quad);
     __m128 v30 = _mm_shuffle_ps(v29, v29, 170);
-    v30[0] = v30[0] + static_cast<float>(_mm_shuffle_ps(v29, v29, 85)[0] + v29[0]);
+    v30[0] = v30[0] + (_mm_shuffle_ps(v29, v29, 85)[0] + v29[0]);
     __m128 v31 = _mm_shuffle_ps(v52.m_rotation.m_vec.m_quad, v52.m_rotation.m_vec.m_quad, 255);
     __m128 v32 = _mm_xor_ps(v52.m_rotation.m_vec.m_quad, rdata_10C4C00);
     __m128 v33 = _mm_add_ps(
@@ -411,7 +411,7 @@ void hkaDefaultAnimatedReferenceFrame::getDeltaReferenceFrame(
     __m128 v44 = _mm_and_ps(_mm_sub_ps(_mm_add_ps(v36, v36), _mm_mul_ps(_mm_mul_ps(v36, v35), v36)), rdata_10C4C10);
     __m128 v37 = _mm_mul_ps(v32, v10.m_quad);
     __m128 v38 = _mm_shuffle_ps(v37, v37, 170);
-    v38[0] = v38[0] + static_cast<float>(_mm_shuffle_ps(v37, v37, 85)[0] + v37[0]);
+    v38[0] = v38[0] + (_mm_shuffle_ps(v37, v37, 85)[0] + v37[0]);
     __m128 v39 = _mm_shuffle_ps(v32, v32, 255);
     v42 = _mm_xor_ps(v34, hkQuadRealNegateMask);
     v43.m_vec.m_quad = v32;

@@ -60,16 +60,16 @@ void BGSSaveLoadHeader::LoadHeaderData(BGSSaveLoadFile* apFile, BGSSaveLoadFileE
         isaveGameNumber = 0;
         apLoadGameBuffer->LoadData(&isaveGameNumber, 4u);
         apFileEntry->iSaveGameNumber = isaveGameNumber;
-        apFileEntry->pPlayerName = apLoadGameBuffer->LoadString(0);
-        apFileEntry->pPlayerTitle = apLoadGameBuffer->LoadString(0);
+        apFileEntry->pPlayerName = apLoadGameBuffer->LoadString(nullptr);
+        apFileEntry->pPlayerTitle = apLoadGameBuffer->LoadString(nullptr);
         if (iversion > 47) {
             iplayerLevel = 0;
             apLoadGameBuffer->LoadData(&iplayerLevel, 4u);
             apFileEntry->iPlayerLevel = iplayerLevel;
         }
-        char* String = apLoadGameBuffer->LoadString(0);
+        char* String = apLoadGameBuffer->LoadString(nullptr);
         apFileEntry->pLocation = String;
-        apFileEntry->pPlayTime = apLoadGameBuffer->LoadString(0);
+        apFileEntry->pPlayTime = apLoadGameBuffer->LoadString(nullptr);
         apFileEntry->iScreenshotWidth = iscreenshotWidth;
         apFileEntry->iScreenshotHeight = iscreenshotHeight;
         uint32_t FilePosition = apFile->GetFilePosition();
@@ -92,7 +92,7 @@ NiTexture* BGSSaveLoadHeader::LoadHeaderScreenshot(
         ppixelData = ::new (apMemory) NiPixelData(aiWidth, aiHeight, pixelFormat, 1u, 1u);
     }
     else {
-        ppixelData = 0;
+        ppixelData = nullptr;
     }
     apFile->Read(ppixelData->GetPixels(0u, 0u), 3 * (aiHeight * aiWidth));
     NiTexture::FormatPrefs prefs;
@@ -137,7 +137,7 @@ void BGSSaveLoadHeader::SaveHeader(BGSSaveLoadFile* apFile) {
         BSstrcat(pfileName, 260, apFile->pSaveFileName);
         BSstrcat(pfileName, 260, ".bmp");
     }
-    NiPixelData* pscreenshot = 0;
+    NiPixelData* pscreenshot = nullptr;
     if (pSaveLoadManager->bSimulatedMode) {
         double v6 = static_cast<double>(Renderer::GetScreenHeight());
         float finverseAspectRatio = v6 / static_cast<double>(Renderer::GetScreenWidth());
@@ -159,11 +159,11 @@ void BGSSaveLoadHeader::SaveHeader(BGSSaveLoadFile* apFile) {
     apSaveGameBuffer->SaveDataEndian(&iplayerLevel, 4u, 0);
     pSaveLoadManager->GetPlayerLocationName(plocation);
     apSaveGameBuffer->SaveString(plocation, 0);
-    pSaveLoadManager->GetPlayTimeString(pplayTime, 1);
+    pSaveLoadManager->GetPlayTimeString(pplayTime, true);
     apSaveGameBuffer->SaveString(pplayTime, 0);
     saveBuffer.Save(apFile);
     if (pSaveLoadManager->bSimulatedMode) {
-        apFile->Write(0, 3 * (iscreenshotHeight * iscreenshotWidth));
+        apFile->Write(nullptr, 3 * (iscreenshotHeight * iscreenshotWidth));
     }
     else {
         apFile->Write(pscreenshot->GetPixels(0u, 0u), 3 * (iscreenshotHeight * iscreenshotWidth));
@@ -214,14 +214,14 @@ int32_t BGSSaveLoadHeader::LoadHeader(BGSSaveLoadFile* apFile) {
 void BGSSaveLoadFileEntry::LoadData() {
     if (!bLoaded && !bCorrupt) {
         BGSSaveLoadFile* pfile =
-            pSaveLoadManager->OpenSaveFile(pFileName, 0, BGSSaveLoadManager::SAVEFILE_LOAD, iDeviceID);
+            pSaveLoadManager->OpenSaveFile(pFileName, false, BGSSaveLoadManager::SAVEFILE_LOAD, iDeviceID);
         if (pfile) {
             BGSSaveLoadHeader::LoadHeaderData(pfile, this);
             if (!iScreenshotWidth && !iScreenshotHeight) {
-                bCorrupt = 1;
+                bCorrupt = true;
             }
             if (!pLocation) {
-                bCorrupt = 1;
+                bCorrupt = true;
             }
             if (pSaveLoadManager->IsSaveFileNameCustom(pFileName)) {
                 ourFree(pLocation);
@@ -229,17 +229,17 @@ void BGSSaveLoadFileEntry::LoadData() {
                 pLocation = static_cast<char*>(ourMalloc(ilength));
                 BSstrcpy(pLocation, static_cast<int32_t>(ilength), pFileName);
             }
-            pSaveLoadManager->CloseSaveFile(pfile, 0);
-            bLoaded = 1;
+            pSaveLoadManager->CloseSaveFile(pfile, false);
+            bLoaded = true;
         }
         else {
-            bCorrupt = 1;
+            bCorrupt = true;
         }
     }
 }
 
 void BGSSaveLoadFileEntry::SetLoaded() {
-    bLoaded = (bool)1;
+    bLoaded = true;
 }
 
 uint32_t BGSSaveLoadFileEntry::GetPlayerLevel() {

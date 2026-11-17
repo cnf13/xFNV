@@ -37,7 +37,7 @@ void BGSMessageIcon::CopyComponent(BaseFormComponent* apCopyFC) {
 bool BGSMessageIcon::CompareComponent(BaseFormComponent* apCompareFC) {
     BGSMessageIcon* v6 = dynamic_cast<BGSMessageIcon*>(apCompareFC);
     if (!v6) {
-        return (bool)1;
+        return true;
     }
     const char* messageIconTextureName = v6->GetMessageIconTextureName();
     const char* v3 = GetMessageIconTextureName();

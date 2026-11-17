@@ -45,26 +45,26 @@ void PlayerMover::ForceMoveMode(uint32_t aiMoveMode) {
     BSAnimGroupSequence* v13;
     uint8_t v14 = (uint8_t)((MoveMode & 1024) != (aiMoveMode & 1024));
     if ((aiMoveMode & 48) != 0) {
-        fMinTurnTime = (float)((&fPCTurnAnimMinTime)->Float());
+        fMinTurnTime = (&fPCTurnAnimMinTime)->Float();
         LastTurnDir = aiMoveMode & 48;
     }
     MoveMode = aiMoveMode;
     if (v14) {
-        animation = pPlayer->GetAnimation((bool)0);
+        animation = pPlayer->GetAnimation(false);
         group = animation->GetGroup(AGS_WEAPON);
         if (TESAnimGroup::IsAimAction(static_cast<ANIM_GROUP_ENUM>((int32_t)group))) {
             v7 = pPlayer->Actor::GetIronSights() ? 20 : 17;
-            v10 = pPlayer->GetAnimation((bool)0);
+            v10 = pPlayer->GetAnimation(false);
             currentSequence = v10->GetCurrentSequence(AGS_WEAPON);
-            animGroup = pPlayer->Actor::GetAnimGroup(static_cast<ANIM_GROUP_ENUM>(v7), nullptr, 0, v10);
+            animGroup = pPlayer->Actor::GetAnimGroup(static_cast<ANIM_GROUP_ENUM>(v7), nullptr, false, v10);
             if ((!currentSequence) || ((v4 = currentSequence->GetAnimGroup()), (animGroup != v4->sType))) {
-                v10->BlendOut(AGS_WEAPON, 0);
+                v10->BlendOut(AGS_WEAPON, false);
             }
-            v11 = pPlayer->GetAnimation((bool)1);
+            v11 = pPlayer->GetAnimation(true);
             v13 = v11->GetCurrentSequence(AGS_WEAPON);
-            v9 = pPlayer->Actor::GetAnimGroup(static_cast<ANIM_GROUP_ENUM>(v7), nullptr, 0, v11);
+            v9 = pPlayer->Actor::GetAnimGroup(static_cast<ANIM_GROUP_ENUM>(v7), nullptr, false, v11);
             if ((!v13) || ((v5 = v13->GetAnimGroup()), (v9 != v5->sType))) {
-                v11->BlendOut(AGS_WEAPON, 0);
+                v11->BlendOut(AGS_WEAPON, false);
             }
         }
     }
@@ -105,10 +105,10 @@ void PlayerMover::UpdateTurnTimer(float fdeltaT) {
 void PlayerMover::Update(float fdeltaT) {
     NiPoint3 movedelta;
     movedelta = NiPoint3_ZERO;
-    Animation* panim = pPlayer->GetAnimation(0);
+    Animation* panim = pPlayer->GetAnimation(false);
     if (!pPlayer->Is3rdPerson()) {
         int32_t Group;
-        Animation* panim1st = pPlayer->GetAnimation(1);
+        Animation* panim1st = pPlayer->GetAnimation(true);
         if (!panim || (Group = panim1st->GetGroup(AGS_MOVEMENT), Group == panim->GetGroup(AGS_MOVEMENT))) {
             panim = panim1st;
         }
@@ -117,10 +117,10 @@ void PlayerMover::Update(float fdeltaT) {
         bhkCharacterListener* pListener;
         if (panim) {
             if (pPlayer->GetNoCollision()) {
-                panim->GetDelta(&movedelta, pPlayer, 1, 0);
+                panim->GetDelta(&movedelta, pPlayer, true, false);
             }
             else {
-                panim->GetDelta(&movedelta, pPlayer, 0, 1);
+                panim->GetDelta(&movedelta, pPlayer, false, true);
             }
         }
         bhkCharacterController* pController = pPlayer->GetCharController();
@@ -128,7 +128,7 @@ void PlayerMover::Update(float fdeltaT) {
             pListener = static_cast<bhkCharacterListener*>(pController);
         }
         else {
-            pListener = 0;
+            pListener = nullptr;
         }
         if (pListener) {
             if (pListener->StuckToSomeone()) {

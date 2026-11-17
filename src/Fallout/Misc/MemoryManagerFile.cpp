@@ -4,7 +4,7 @@
 #include "BSCore/MemoryManager.h"
 #include "BSSystem/BSSystemFile.h"
 
-MemoryManagerFile::MemoryManagerFile(const char* apFileName) : File(apFileName, 1u, 2u, 0) {}
+MemoryManagerFile::MemoryManagerFile(const char* apFileName) : File(apFileName, 1u, 2u, false) {}
 
 MemoryManagerFile::~MemoryManagerFile() {}
 

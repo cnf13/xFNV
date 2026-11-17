@@ -54,12 +54,12 @@ void EscortActorPackageData::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         EscortPackageData = pPackage->GetEscortPackageData();
     }
     else {
-        EscortPackageData = 0;
+        EscortPackageData = nullptr;
     }
     pPackageData = EscortPackageData;
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     for (uint32_t iloop = 0; iloop < isaveGameCount; ++iloop) {
-        pForm = 0;
+        pForm = nullptr;
         apLoadGameBuffer->LoadFormID(pForm);
         EscortedActors.AddHead(pForm);
     }
@@ -67,10 +67,10 @@ void EscortActorPackageData::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 
 void EscortActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     BSSimpleList<Actor*>* plist = &EscortedActors;
-    BSSimpleList<Actor*>* plastList = 0;
+    BSSimpleList<Actor*>* plastList = nullptr;
     while (plist && !plist->IsEmpty()) {
         Actor* pForm = plist->m_item;
-        bool bremove = 0;
+        bool bremove = false;
         if (pForm) {
             // The Actor* holds the form ID that LoadGame stored in the entry, read back as uint32_t.
             TESForm* FormByNumericID =
@@ -80,11 +80,11 @@ void EscortActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 plist->SetItem(pForm);
             }
             else {
-                bremove = 1;
+                bremove = true;
             }
         }
         else {
-            bremove = 1;
+            bremove = true;
         }
         if (bremove) {
             if (plastList) {

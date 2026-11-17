@@ -505,7 +505,7 @@ void bhkRagdollPenetrationUtil::Update() {
         const int32_t iNumFloatSlots = kPose.m_skeleton->m_floatSlots.m_size;
         // EXE-INLINED none: hkArray<float>::setSize(int, const float&)
         kPose.m_floatSlotValues.reserve(iNumFloatSlots);
-        for (int32_t k = static_cast<int32_t>(kPose.m_floatSlotValues.m_size); k < iNumFloatSlots; ++k) {
+        for (int32_t k = kPose.m_floatSlotValues.m_size; k < iNumFloatSlots; ++k) {
             kPose.m_floatSlotValues.m_data[k] = 0.0f;
         }
         kPose.m_floatSlotValues.setSizeUnchecked(iNumFloatSlots);
@@ -692,7 +692,7 @@ void bhkRagdollPenetrationUtil::Clear() {
     }
     if (ActiveSystems.pBuffer) {
         ActiveSystems._Deallocate(ActiveSystems.pBuffer);
-        ActiveSystems.pBuffer = 0;
+        ActiveSystems.pBuffer = nullptr;
         ActiveSystems.iReservedSize = 0;
         ActiveSystems.iSize = 0;
     }

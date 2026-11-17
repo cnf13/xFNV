@@ -129,7 +129,7 @@ uint32_t hkNiTriStripsShape::getFirstKey() const {
 // The key's high 12 bits pick the sub part, its low 20 bits the triangle. Both parts are compared signed; it skips
 // degenerate triangles and returns HK_INVALID_SHAPE_KEY past the last sub part.
 uint32_t hkNiTriStripsShape::getNextKey(uint32_t aOldKey) const {
-    while (1) {
+    while (true) {
         ++aOldKey;
         if (static_cast<int32_t>(aOldKey & 0xFFFFF) >=
             pShapesA.m_pBase[aOldKey >> 20].spGeom.m_pObject->m_usTriangles) {
@@ -175,7 +175,7 @@ const hkpShape* hkNiTriStripsShape::getChildShape(uint32_t aKey, char (&arBuffer
     uint16_t v14 = v13[1];
     uint16_t v15 = v13[2];
     if (v12 == v14 || (v12 == v15 || v14 == v15)) {
-        return 0;
+        return nullptr;
     }
     float* p_x = &m_pkVertex[v12].x;
     float* v17 = &m_pkVertex[v14].x;
@@ -184,7 +184,7 @@ const hkpShape* hkNiTriStripsShape::getChildShape(uint32_t aKey, char (&arBuffer
         ptriangleShape = ::new (arBuffer) hkNormalTriangleShape(m_radius);
     }
     else {
-        ptriangleShape = 0;
+        ptriangleShape = nullptr;
     }
     double v20 = bhkConvert::fBS2HkScaleSC;
     v23[0] = *p_x * bhkConvert::fBS2HkScaleSC;

@@ -371,7 +371,7 @@ int32_t hkpExtendedMeshShape::calcSizeForSpu(const hkpShape::CalcSizeForSpuInput
             return 240;
         }
     }
-    while (1) {
+    while (true) {
         hkpShape* v6 = v4->m_childShapes.m_data[v5];
         int32_t v7 = v6->calcSizeForSpu(a1, 256);
         int32_t v8 = (std::bit_cast<int32_t>(v4->m_translation.m_quad[3]) & 0xC0FFFFFFu) != 0
@@ -399,7 +399,7 @@ void hkpExtendedMeshShape::initWeldingInfo(hkpWeldingUtility::WeldingType weldin
         if (m_capacityAndFlags >= 0) {
             m_heap->bufFree(m_weldingInfo.begin(), sizeof(uint16_t) * (m_capacityAndFlags & 0x3FFFFFFF));
         }
-        m_weldingInfo.m_data = 0;
+        m_weldingInfo.m_data = nullptr;
         m_weldingInfo.m_capacityAndFlags = hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG;
     }
     else {
@@ -778,9 +778,9 @@ hkpExtendedMeshShape::TrianglesSubpart* hkpExtendedMeshShape::expandOneTriangleS
             v7->m_type.m_storage = 0;
             v7->m_materialIndexStridingType.m_storage = 1;
             v7->m_numMaterials = 1;
-            v7->m_materialBase = 0;
-            v7->m_materialIndexBase = 0;
-            v7->m_materialClass = 0;
+            v7->m_materialBase = nullptr;
+            v7->m_materialIndexBase = nullptr;
+            v7->m_materialClass = nullptr;
             v7->m_flipAlternateTriangles = 0;
             v7->m_extrusion.m_quad = _mm_setzero_ps();
             v7->m_userData = 0;
@@ -816,10 +816,10 @@ hkpExtendedMeshShape::ShapesSubpart* hkpExtendedMeshShape::expandOneShapesSubpar
         v6->m_numMaterials = 1;
         v6->m_type.m_storage = 1;
         v6->m_materialIndexStridingType.m_storage = 1;
-        v6->m_materialBase = 0;
-        v6->m_materialIndexBase = 0;
-        v6->m_materialClass = 0;
-        v6->m_childShapes.m_data = 0;
+        v6->m_materialBase = nullptr;
+        v6->m_materialIndexBase = nullptr;
+        v6->m_materialClass = nullptr;
+        v6->m_childShapes.m_data = nullptr;
         v6->m_childShapes.m_size = 0;
         v6->m_childShapes.m_capacityAndFlags = hkArrayBase<hkpConvexShape*>::DONT_DEALLOCATE_FLAG;
     }

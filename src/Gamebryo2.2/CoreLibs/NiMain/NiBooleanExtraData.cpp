@@ -26,7 +26,7 @@ NiObject* NiBooleanExtraData::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject_2) NiBooleanExtraData;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_bValue = m_bValue;
@@ -75,7 +75,7 @@ NiObject* NiBooleanExtraData::CreateObject() {
     NiBooleanExtraData* pkObject =
         static_cast<NiBooleanExtraData*>(NiMemObject::operator new(sizeof(NiBooleanExtraData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiBooleanExtraData;
 }

@@ -483,7 +483,7 @@ bool NavMeshPOVSearch::BuildPOVListForTriangles(
     using VertHandleArrays = BSSimpleArray<BSSimpleArray<FastNavMeshVertHandle, 1024>, 1024>;
     using IndexArray = BSSimpleArray<uint16_t, 1024>;
     using RemoveIndexArray = BSSimpleArray<RemoveIndex, 1024>;
-    POVs.SetSize(apList.iSize + 1, 1);
+    POVs.SetSize(apList.iSize + 1, true);
     VertHandleArrays povs(POVs.iSize);
     VertHandleArrays obstaclePovs(POVs.iSize);
     IndexArray thisTriPOVs;
@@ -632,7 +632,7 @@ bool NavMeshPOVSearch::BuildPOVListForTriangles(
             delete pRemoved;
         }
         uint32_t uiMinorIndex = removeList.GetAt(i).iMinorIndex;
-        POVs.GetAt(removeList.GetAt(i).iMasterIndex).Remove(uiMinorIndex, 1);
+        POVs.GetAt(removeList.GetAt(i).iMasterIndex).Remove(uiMinorIndex, true);
     }
     return true;
 }
@@ -652,16 +652,16 @@ bool NavMeshPOVSearch::BuildPath(
     pSolution = apSolution;
     if (NavMeshPOVSearch::bDrawDebugData) {
         NiNode* v33;
-        if (NavMeshPOVSearch::spRootDrawNode.operator!=(static_cast<NiNode*>(0))) {
+        if (NavMeshPOVSearch::spRootDrawNode.operator!=(static_cast<NiNode*>(nullptr))) {
             PathManager* v6 = PathManager::QInstance();
-            v6->DrawPath(NavMeshPOVSearch::spRootDrawNode, 0);
+            v6->DrawPath(NavMeshPOVSearch::spRootDrawNode, false);
         }
         void* apMemory = NiMemObject::operator new(sizeof(NiNode));
         if (apMemory) {
             v33 = ::new (apMemory) NiNode(0);
         }
         else {
-            v33 = 0;
+            v33 = nullptr;
         }
         NiRefObject* v48 = (NiRefObject*)v33;
         NavMeshPOVSearch::spRootDrawNode.operator=(v33);
@@ -698,16 +698,16 @@ bool NavMeshPOVSearch::BuildPath(
                     palpha = ::new (v45) NiAlphaProperty;
                 }
                 else {
-                    palpha = 0;
+                    palpha = nullptr;
                 }
                 NiAlphaProperty* v46 = palpha;
                 NiAlphaProperty* a1 = palpha;
-                palpha->SetAlphaBlending(1);
+                palpha->SetAlphaBlending(true);
                 spnode.m_pObject->AttachProperty(a1);
                 AddNoLightingPropertyRecurse(spnode.m_pObject);
                 BSShaderManager::PrepareObject(spnode.m_pObject, 0, 0);
                 spnode.m_pObject->UpdateProperties();
-                NiUpdateData UpdateData(0.0f, 0, 0);
+                NiUpdateData UpdateData(0.0f, false, false);
                 spnode.m_pObject->Update(UpdateData);
                 NiNode* v27 = NavMeshPOVSearch::spRootDrawNode.m_pObject;
                 v27->AttachChild(spnode.m_pObject, 1);
@@ -716,16 +716,16 @@ bool NavMeshPOVSearch::BuildPath(
     }
     StartLocation.operator=(aStartLocation);
     GoalLocation.operator=(aGoalLocation);
-    StartLocation.ResolveNavMeshInfo(0);
+    StartLocation.ResolveNavMeshInfo(nullptr);
     if (!StartLocation.HasNavMeshData()) {
-        return 0;
+        return false;
     }
     NavMeshPOV* v43 = static_cast<NavMeshPOV*>(ourMalloc(sizeof(NavMeshPOV)));
     if (v43) {
         v26 = ::new (v43) NavMeshPOV;
     }
     else {
-        v26 = 0;
+        v26 = nullptr;
     }
     pStartPov = v26;
     pStartPov->eType = NavMeshPOV::POV_TYPE_START;
@@ -738,7 +738,7 @@ bool NavMeshPOVSearch::BuildPath(
         v25 = ::new (v40) NavMeshPOV;
     }
     else {
-        v25 = 0;
+        v25 = nullptr;
     }
     pGoalPov = v25;
     pGoalPov->eType = NavMeshPOV::POV_TYPE_GOAL;
@@ -753,7 +753,7 @@ bool NavMeshPOVSearch::BuildPath(
     float v24 = (GoalLocation.GetLocation() - *fA).Length() * 0.75;
     uintptr_t uiKey = GetKeyForNode(pStartPov, AD_CCW);
     AddStartNode(uiKey, startNode, v24);
-    bool bres = Search(&Nodes, &Links, 1);
+    bool bres = Search(&Nodes, &Links, true);
     for (uint32_t i_2 = 0;; ++i_2) {
         uint32_t v14 = Links.iSize;
         if (i_2 >= v14) {
@@ -772,10 +772,10 @@ bool NavMeshPOVSearch::BuildPath(
     }
     if (NavMeshPOVSearch::bDrawDebugData) {
         NavMeshPOVSearch::spRootDrawNode.m_pObject->UpdateProperties();
-        NiUpdateData updateData(0.0f, 0, 0);
+        NiUpdateData updateData(0.0f, false, false);
         NavMeshPOVSearch::spRootDrawNode.m_pObject->Update(updateData);
         PathManager* v19 = PathManager::QInstance();
-        v19->DrawPath(NavMeshPOVSearch::spRootDrawNode, 1);
+        v19->DrawPath(NavMeshPOVSearch::spRootDrawNode, true);
     }
     for (uint32_t i_3 = 0;; ++i_3) {
         uint32_t v20 = allPOVs.iSize;
@@ -795,8 +795,8 @@ void NavMeshPOVSearch::operator delete(void* apMemory) {
 }
 
 void NavMeshPOVSearch::DrawLine(const NiPoint3& aStart, const NiPoint3& aGoal, const NiColorA& aColor) {
-    NiPointer<NiLines> splines(MakeLine(aStart, aColor, aGoal, aColor, 1));
-    NiUpdateData UpdateData(0.0f, 0, 0);
+    NiPointer<NiLines> splines(MakeLine(aStart, aColor, aGoal, aColor, true));
+    NiUpdateData UpdateData(0.0f, false, false);
     splines.m_pObject->UpdateProperties();
     splines.m_pObject->Update(UpdateData);
     NiNode* v3 = NavMeshPOVSearch::spRootDrawNode.m_pObject;
@@ -948,12 +948,12 @@ double AngleSinCosArc::GetLength(float a1) {
             return static_cast<float>((6.2831854820251465 - Angle) * a1);
         }
         else {
-            return static_cast<float>(-Angle * a1);
+            return (-Angle * a1);
         }
     }
     else {
         if (!(Angle < 0.0)) {
-            return static_cast<float>(Angle * a1);
+            return (Angle * a1);
         }
         else {
             return static_cast<float>((Angle + 6.2831854820251465) * a1);

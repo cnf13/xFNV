@@ -43,7 +43,7 @@ void bhkBinaryAction::LinkObject(NiStream& arStream) {
             bhkSerializable::LinkObject(*v2);
             return;
         }
-        cinfo->m_bodyB = 0;
+        cinfo->m_bodyB = nullptr;
     }
     bhkSerializable::LinkObject(*v2);
 }

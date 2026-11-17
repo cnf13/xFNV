@@ -81,7 +81,7 @@ bool NavMeshSearchMaxCost::GetNodeConnections(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool NavMeshSearchMaxCost::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) {
@@ -89,7 +89,7 @@ bool NavMeshSearchMaxCost::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMesh
         return (bool)((int8_t)NavMeshSearch::IsGoalNode(apNode));
     }
     else {
-        return (bool)0;
+        return false;
     }
 }
 
@@ -116,10 +116,10 @@ NiPoint3 NavMeshSearchMaxCost::FindClosestPoint(
     float afHeuristic = (*StartNode.GetCenter(&v14) - *pgoalCenter).Length();
     AddStartNode(GetKeyForNode(StartNode.pNavMesh, StartNode.sTriangle), StartNode, afHeuristic);
     if (!aGoalNode.pNavMesh && aGoalNode.usTriangle == 0xFFFF) {
-        bHasGoalNode = 0;
+        bHasGoalNode = false;
     }
     else {
-        bHasGoalNode = 1;
+        bHasGoalNode = true;
         GoalNode.pNavMesh = aGoalNode.pNavMesh;
         GoalNode.sTriangle = aGoalNode.usTriangle;
         center = GoalNode.pNavMesh->GetCenter(GoalNode.sTriangle);
@@ -131,7 +131,7 @@ NiPoint3 NavMeshSearchMaxCost::FindClosestPoint(
     using nodes_t = BSScrapArray<NavMeshSearchNode, 1024>;
     nodes_t nodes;
     ::new (&links) BSScrapArray<NavMeshSearchLink, 1024>;
-    if (Search(&nodes, &links, 0)) {
+    if (Search(&nodes, &links, false)) {
         result = aGoalLocation;
     }
     else {
@@ -152,10 +152,10 @@ bool NavMeshSearchMaxCost::BuildNodePath(
     NiPoint3 v12;
     StartNode = aStartNode;
     pCurrentRequest = apRequest;
-    apReturnNodeArray->Clear(0);
-    apReturnLinkArray->Clear(0);
+    apReturnNodeArray->Clear(false);
+    apReturnLinkArray->Clear(false);
     ClearSearchData();
-    if (!aOptimalLocation.QUnused() && aOptimalLocation.ResolveNavMeshInfo(0)) {
+    if (!aOptimalLocation.QUnused() && aOptimalLocation.ResolveNavMeshInfo(nullptr)) {
         uint16_t usgoalTri;
         NavMeshPtr spgoalMesh;
         if (aOptimalLocation.GetNavMeshAndTriangle(spgoalMesh, usgoalTri)) {
@@ -165,12 +165,12 @@ bool NavMeshSearchMaxCost::BuildNodePath(
             GoalNode.CenterX = center.x;
             GoalNode.CenterY = center.y;
             GoalNode.CenterZ = center.z;
-            bHasGoalNode = 1;
+            bHasGoalNode = true;
         }
     }
     // The goal's center is built before the start's.
     const NiPoint3* pgoalCenter = GoalNode.GetCenter(&apLocation);
     float afHeuristic = (*StartNode.GetCenter(&v12) - *pgoalCenter).Length();
     AddStartNode(GetKeyForNode(aStartNode.pNavMesh, aStartNode.sTriangle), aStartNode, afHeuristic);
-    return Search(apReturnNodeArray, apReturnLinkArray, 0);
+    return Search(apReturnNodeArray, apReturnLinkArray, false);
 }

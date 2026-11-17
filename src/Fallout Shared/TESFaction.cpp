@@ -138,14 +138,14 @@ bool Cmd_GetPCFactionAttack(TESObjectREFR* apRefObject, void* apParam1, void* ap
         }
     }
     if (Script::GetThreadSystemOutput()) {
-        if (0.0 == (afReturnValue)) {
+        if (0.0 == afReturnValue) {
             Interface::PrintLine("PC did not attack a faction member.");
         }
         else {
             Interface::PrintLine("PC attacked a faction member.");
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetPCEnemyofFaction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
@@ -163,7 +163,7 @@ bool Cmd_GetPCEnemyofFaction(TESObjectREFR* apRefObject, void* apParam1, void* a
             Interface::PrintLine("PC Is an Enemy of the faction.");
         }
     }
-    return 1;
+    return true;
 }
 
 RANK_DATA::RANK_DATA() : cMaleRankTitle(), cFemaleRankTitle(), TextureInsignia() {}
@@ -306,7 +306,7 @@ void TESFaction::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
 void TESFaction::InitItem() {
     if (!GetInitialized()) {
         TESReactionForm::InitItem(this);
-        SetInitialized(1);
+        SetInitialized(true);
         if (pReputation) {
             uint32_t itempint = 0;
             itempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pReputation));
@@ -348,50 +348,46 @@ void TESFaction::Copy(TESForm* apCopy) {
 bool TESFaction::Compare(TESForm* apCompare) {
     TESFaction* pComp = dynamic_cast<TESFaction*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
     void* LocalTransform = &pComp->data;
     if (std::memcmp(&data, LocalTransform, sizeof(data))) {
-        return 1;
+        return true;
     }
     if (pReputation != pComp->pReputation) {
-        return 1;
+        return true;
     }
     BSSimpleList<RANK_DATA*>* pRankList = &m_rankDataList;
     BSSimpleList<RANK_DATA*>* pCompRankList = &pComp->m_rankDataList;
     while (pRankList && !pRankList->IsEmpty()) {
         if (!pCompRankList || !pCompRankList->m_item) {
-            return 1;
+            return true;
         }
         RANK_DATA* pdata = pRankList->m_item;
         RANK_DATA* pcompdata = pCompRankList->m_item;
         if (pdata->cMaleRankTitle.GetLength() || pcompdata->cMaleRankTitle.GetLength()) {
             uint32_t Length = pdata->cMaleRankTitle.GetLength();
             if (Length != pcompdata->cMaleRankTitle.GetLength()) {
-                return 1;
+                return true;
             }
-            if (pdata->cMaleRankTitle.StrCmp(
-                    static_cast<const char*>(pcompdata->cMaleRankTitle.pString), static_cast<bool>(0)
-                )) {
-                return 1;
+            if (pdata->cMaleRankTitle.StrCmp(static_cast<const char*>(pcompdata->cMaleRankTitle.pString), false)) {
+                return true;
             }
         }
         if (pdata->cFemaleRankTitle.GetLength() || pcompdata->cFemaleRankTitle.GetLength()) {
             uint32_t v5 = pdata->cFemaleRankTitle.GetLength();
             if (v5 != pcompdata->cFemaleRankTitle.GetLength()) {
-                return 1;
+                return true;
             }
-            if (pdata->cFemaleRankTitle.StrCmp(
-                    static_cast<const char*>(pcompdata->cFemaleRankTitle.pString), static_cast<bool>(0)
-                )) {
-                return 1;
+            if (pdata->cFemaleRankTitle.StrCmp(static_cast<const char*>(pcompdata->cFemaleRankTitle.pString), false)) {
+                return true;
             }
         }
         if (pdata->TextureInsignia.CompareComponent(&pcompdata->TextureInsignia)) {
-            return 1;
+            return true;
         }
         pRankList = pRankList->m_pkNext;
         pCompRankList = pCompRankList->m_pkNext;

@@ -42,8 +42,8 @@ NiObject* NiPSysRotationModifier::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -177,7 +177,7 @@ void NiPSysRotationModifier::Initialize(NiPSysData* pkData, uint16_t usNewPartic
             fPolar = fPolar * 3.1415927410125732;
             float fCosPolar = s_fCosTableA[static_cast<int32_t>(512.0 / s_fTwoPi * fPolar) & 0x1FF];
             float fSqr = 1.0f - fCosPolar * fCosPolar;
-            float fSinPolar = static_cast<float>(std::sqrt(fSqr));
+            float fSinPolar = std::sqrt(fSqr);
 
             float fAzimuth = NiUnitRandom();
             fAzimuth = s_fTwoPi * fAzimuth;
@@ -221,7 +221,7 @@ NiObject* NiPSysRotationModifier::CreateObject() {
     NiPSysRotationModifier* pkObject =
         static_cast<NiPSysRotationModifier*>(NiMemObject::operator new(sizeof(NiPSysRotationModifier)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysRotationModifier;
 }

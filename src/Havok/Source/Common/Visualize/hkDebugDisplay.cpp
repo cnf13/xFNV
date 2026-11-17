@@ -233,7 +233,7 @@ void hkDebugDisplay::displayRayModelSpace(
     v8.m_vec.m_quad = worldFromModel.m_rotation.m_vec.m_quad;
     __m128 v9 = _mm_mul_ps(direction.m_quad, v8.m_vec.m_quad);
     __m128 v10 = _mm_shuffle_ps(v9, v9, 170);
-    v10[0] = v10[0] + static_cast<float>(_mm_shuffle_ps(v9, v9, 85)[0] + v9[0]);
+    v10[0] = v10[0] + (_mm_shuffle_ps(v9, v9, 85)[0] + v9[0]);
     __m128 v11 = _mm_shuffle_ps(v8.m_vec.m_quad, v8.m_vec.m_quad, 255);
     __m128 v12 = _mm_add_ps(
         _mm_mul_ps(
@@ -414,7 +414,7 @@ void hkDebugDisplay::setGeometryColor(int32_t a1, hkUlong a2, int32_t a3) {
     int32_t i;
     hkDebugDisplayHandler* v6;
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (i = 0; i < ((int32_t)m_debugDisplayHandlers.m_size); ++i) {
+    for (i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
         v6 = m_debugDisplayHandlers.m_data[i];
         v6->setGeometryColor(a1, a2, a3);
     }
@@ -736,17 +736,13 @@ void hkDebugDisplay::displayPlane(__m128* a1, __m128* a2, uint32_t a3, int32_t a
     __m128 v15 = _mm_mul_ps(v14, v14);
     __m128 v16 = _mm_shuffle_ps(v15, v15, 170);
     __m128 v17 = _mm_set_ss(std::bit_cast<float>(a3));
-    v16[0] = _mm_cvtss_f32(_mm_rsqrt_ss(
-        _mm_set_ss(static_cast<float>((v16[0] + static_cast<float>(_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]))))
-    ));
+    v16[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss((v16[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0])))));
     __m128 v18 = _mm_mul_ps(_mm_mul_ps(_mm_shuffle_ps(v16, v16, 0), v14), _mm_shuffle_ps(v17, v17, 0));
     __m128 v19 =
         _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(v18, v18, 201), v12), _mm_mul_ps(_mm_shuffle_ps(v18, v18, 210), v11));
     __m128 v20 = _mm_mul_ps(v19, v19);
     __m128 v21 = _mm_shuffle_ps(v20, v20, 170);
-    v21[0] = _mm_cvtss_f32(_mm_rsqrt_ss(
-        _mm_set_ss(static_cast<float>((v21[0] + static_cast<float>(_mm_shuffle_ps(v20, v20, 85)[0] + v20[0]))))
-    ));
+    v21[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss((v21[0] + (_mm_shuffle_ps(v20, v20, 85)[0] + v20[0])))));
     __m128 m_quad = _mm_mul_ps(_mm_mul_ps(_mm_shuffle_ps(v21, v21, 0), v19), _mm_shuffle_ps(v17, v17, 0));
     v33 = v18;
     for (dir.m_quad = m_quad;; m_quad = dir.m_quad) {

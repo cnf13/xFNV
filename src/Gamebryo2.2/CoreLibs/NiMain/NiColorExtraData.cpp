@@ -28,7 +28,7 @@ NiObject* NiColorExtraData::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject_2) NiColorExtraData;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_kColorA = m_kColorA;
@@ -87,7 +87,7 @@ void NiColorExtraData::SetValue(NiColorA akColorA) {
 NiObject* NiColorExtraData::CreateObject() {
     NiColorExtraData* pkObject = static_cast<NiColorExtraData*>(NiMemObject::operator new(sizeof(NiColorExtraData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiColorExtraData;
 }

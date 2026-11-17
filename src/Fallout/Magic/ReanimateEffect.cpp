@@ -306,14 +306,14 @@ void ReanimateEffect::FinishInitLoadGame(Actor* apActor) {
         BSFaceGenAnimationData* panimData = apActor->GetFaceAnimationData();
         if (panimData) {
             if (iState >= 40) {
-                panimData->SetDead(0, 0);
+                panimData->SetDead(false, false);
             }
             else {
-                panimData->SetDead(1, 1);
+                panimData->SetDead(true, true);
             }
         }
         if (iState < 30) {
-            bhkWorld::SetMotion(pav, hkpMotion::MOTION_DYNAMIC, 1, 0, 1);
+            bhkWorld::SetMotion(pav, hkpMotion::MOTION_DYNAMIC, true, false, true);
         }
         NiFixedString* v2 = ::new (static_cast<void*>(&apString)) NiFixedString("Bip01 Spine2");
         NiAVObject* pmove = pav->GetObjectByName(*v2);
@@ -355,36 +355,36 @@ bool ReanimateEffect::CheckDeletedCaster(MagicCaster* apCaster) {
 bool ReanimateEffect::CheckTarget(MagicTarget* apTarget) {
     TESObjectREFR* v2 = apTarget->GetTargetStatsObject();
     Character* v4 = dynamic_cast<Character*>(v2);
-    return v4 && (v4->IsDead(0) && (!v4->IsReanimated() && v4->GetLifeState() != ACTOR_LIFE_STATE_ESSENTIAL_DOWN));
+    return v4 && (v4->IsDead(false) && (!v4->IsReanimated() && v4->GetLifeState() != ACTOR_LIFE_STATE_ESSENTIAL_DOWN));
 }
 
 void ReanimateEffect::Finish() {
     if (!pDataHandler->GetClearingData()) {
-        Actor* ptarget = pTarget ? pTarget->GetTargetAsActor() : 0;
+        Actor* ptarget = pTarget ? pTarget->GetTargetAsActor() : nullptr;
         if (ptarget) {
             if (iState >= 50) {
-                if (ptarget->IsDead(0)) {
+                if (ptarget->IsDead(false)) {
                     Actor* pcaster;
                 LABEL_12:;
                     if (pCaster) {
                         pcaster = pCaster->GetCasterAsActor();
                     }
                     else {
-                        pcaster = 0;
+                        pcaster = nullptr;
                     }
                     if (pcaster) {
-                        CommandEffect::CleanupCommandedActor(ptarget, pcaster, 0);
+                        CommandEffect::CleanupCommandedActor(ptarget, pcaster, false);
                     }
                     return;
                 }
             }
             else {
-                ptarget->SetGhost(0);
+                ptarget->SetGhost(false);
                 if (pBody) {
                     pBody->SetMotionType(hkpMotion::MOTION_DYNAMIC);
                 }
             }
-            ptarget->Kill(0, 0.0f);
+            ptarget->Kill(nullptr, 0.0f);
             goto LABEL_12;
         }
     }

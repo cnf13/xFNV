@@ -54,7 +54,7 @@ void bhkCollisionBox::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
 }
 
 bool bhkCollisionBox::Add(bhkWorld* apWorld) {
-    bool result = 0;
+    bool result = false;
     if (!bDisabled) {
         bool v4 = bhkWorldObject::Add(apWorld);
         if (v4) {

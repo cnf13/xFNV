@@ -120,7 +120,7 @@ NiObject* NiTriShapeDynamicData::CreateObject() {
     NiTriShapeDynamicData* pkObject =
         static_cast<NiTriShapeDynamicData*>(NiMemObject::operator new(sizeof(NiTriShapeDynamicData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiTriShapeDynamicData;
 }

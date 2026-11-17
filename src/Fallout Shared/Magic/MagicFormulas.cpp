@@ -286,8 +286,8 @@ float MagicFormulas::GetMagicTargetResistance(float afTargetMagicTypeResistance,
 }
 
 bool MagicFormulas::CheckTargetLevelMagnitude(int32_t aiTargetLevel, float afMagnitude) {
-    float v3 = afMagnitude * ((&::fMagicLevelMagnitudeMult)->Float());
-    return (bool)((uint8_t)((v3 >= ((double)((int32_t)((&::iMagnitudeLevelAffectsAll)->UInt())))) ||
+    float v3 = afMagnitude * (&::fMagicLevelMagnitudeMult)->Float();
+    return (bool)((uint8_t)((v3 >= ((double)((int32_t)(&::iMagnitudeLevelAffectsAll)->UInt()))) ||
                             (v3 >= ((double)aiTargetLevel))));
 }
 
@@ -317,13 +317,13 @@ float MagicFormulas::CheckExplosionStrength(
 float MagicFormulas::CalcMedicineEffectivenessMult(ActorValueOwner* apActor) {
     float fMedicinePercent = (float)(apActor->GetClampedActorFloatValue(ActorValue::MEDICINE) / 100.0);
     float* fBase = &(&::fMagicMedicineSkillBase)->Float();
-    return (float)((fMedicinePercent * ((&::fMagicMedicineSkillMult)->Float())) + (*fBase));
+    return ((fMedicinePercent * (&::fMagicMedicineSkillMult)->Float()) + (*fBase));
 }
 
 float MagicFormulas::CalcSurvivalEffectivenessMult(ActorValueOwner* apActor) {
     float v5 = (float)(apActor->GetClampedActorFloatValue(ActorValue::SURVIVAL) / 100.0);
     float* v1 = &(&::fMagicSurvivalSkillBase)->Float();
-    return (float)((v5 * ((&::fMagicSurvivalSkillMult)->Float())) + (*v1));
+    return ((v5 * (&::fMagicSurvivalSkillMult)->Float()) + (*v1));
 }
 
 SkillLevel::Value MagicFormulas::GetMagicSpellLevel(float afSpellCost) {

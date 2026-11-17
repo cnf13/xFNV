@@ -138,11 +138,11 @@ BSMultiBound* MultiBoundMarkerData::CreateMultiBoundForRef(TESObjectREFR* apRef)
 }
 
 BSMultiBoundRoom* MultiBoundMarkerData::CreateRoomForRef(TESObjectREFR* apRef) {
-    BSMultiBoundRoom* pbound = 0;
+    BSMultiBoundRoom* pbound = nullptr;
     if (apRef) {
         BSMultiBound* pmb;
         BSMultiBoundRoom* pbound_2;
-        BSMultiBoundShape* pshape = 0;
+        BSMultiBoundShape* pshape = nullptr;
         if (!(std::fabs((&apRef->GetAngleOnReference())->x) < 0.009999999776482582) ||
             (!(std::fabs((&apRef->GetAngleOnReference())->y) < 0.009999999776482582) ||
              !(std::fabs((&apRef->GetAngleOnReference())->z) < 0.009999999776482582))) {
@@ -152,7 +152,7 @@ BSMultiBoundRoom* MultiBoundMarkerData::CreateRoomForRef(TESObjectREFR* apRef) {
                 pshape_3 = ::new (v13) BSMultiBoundOBB;
             }
             else {
-                pshape_3 = 0;
+                pshape_3 = nullptr;
             }
             pshape = pshape_3;
             static_cast<BSMultiBoundOBB*>(pshape)->BSMultiBoundOBB::SetAxis(apRef->GetOrientation());
@@ -166,7 +166,7 @@ BSMultiBoundRoom* MultiBoundMarkerData::CreateRoomForRef(TESObjectREFR* apRef) {
                 pshape_2 = ::new (apMemory) BSMultiBoundAABB;
             }
             else {
-                pshape_2 = 0;
+                pshape_2 = nullptr;
             }
             pshape = pshape_2;
             const NiPoint3* v1 = &apRef->GetMultiBoundHalfExtent();
@@ -179,7 +179,7 @@ BSMultiBoundRoom* MultiBoundMarkerData::CreateRoomForRef(TESObjectREFR* apRef) {
             pbound_2 = ::new (v11) BSMultiBoundRoom;
         }
         else {
-            pbound_2 = 0;
+            pbound_2 = nullptr;
         }
         pbound = pbound_2;
         BSMultiBound* v10 = static_cast<BSMultiBound*>(NiMemObject::operator new(sizeof(BSMultiBound)));
@@ -187,7 +187,7 @@ BSMultiBoundRoom* MultiBoundMarkerData::CreateRoomForRef(TESObjectREFR* apRef) {
             pmb = ::new (v10) BSMultiBound;
         }
         else {
-            pmb = 0;
+            pmb = nullptr;
         }
         pmb->SetShape(pshape);
         pbound->SetMultiBound(pmb);
@@ -252,12 +252,12 @@ bool MultiBoundMarkerData::MultiBoundIntersectsCell(TESObjectREFR* apRef, int32_
                 NiPoint3 ignore;
                 NiPoint3 endpt = boundverts[edges[4 * i + j]];
                 if (LineVsRect(cellrect, startpt, endpt, ignore)) {
-                    return 1;
+                    return true;
                 }
             }
         }
     }
-    return 0;
+    return false;
 }
 
 void BSMultiBoundOBB::SetAxis(const NiMatrix3& arAxis) {
@@ -265,7 +265,7 @@ void BSMultiBoundOBB::SetAxis(const NiMatrix3& arAxis) {
 }
 
 void NiAVObject::AttachProperty(NiProperty* pkProperty) {
-    if (static_cast<int32_t>(pkProperty->Type()) < static_cast<int32_t>(NiProperty::MAX_TYPES)) {
+    if (pkProperty->Type() < static_cast<int32_t>(NiProperty::MAX_TYPES)) {
         NiPointer<NiProperty> spProperty(pkProperty);
         m_kPropertyList.AddHead(spProperty);
     }
@@ -286,7 +286,7 @@ void NiTAbstractPoolAllocator<uint32_t>::CreateFreeMem() {
                 : SIZE_MAX
         ));
     NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem[NiTAbstractPoolAllocator<uint32_t>::ms_uiBlockSize - 1].m_pkNext =
-        0;
+        nullptr;
     uint32_t i = 1;
     do {
         NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem[i].m_pkNext =
@@ -301,7 +301,7 @@ void NiTAbstractPoolAllocator<uint32_t>::CreateFreeMem() {
     }
     else {
         NiTAbstractPoolAllocator<uint32_t>::ms_pkBlockHeader = NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
-        NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem->m_pkNext = 0;
+        NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem->m_pkNext = nullptr;
     }
     ++NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
 }

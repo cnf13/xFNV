@@ -61,7 +61,7 @@ void DisintegrateArmorEffect::SaveGame(Actor* a1) {
                 if (parmor) {
                     // The slots are counted as an integer and passed as FillsBipedSlot's BIPED_OBJECT.
                     for (uint32_t ibiped = 0; ibiped < 20; ++ibiped) {
-                        if (parmor->FillsBipedSlot(static_cast<BIPED_OBJECT>(ibiped), 0, 0)) {
+                        if (parmor->FillsBipedSlot(static_cast<BIPED_OBJECT>(ibiped), false, nullptr)) {
                             earmorPosition = static_cast<BIPED_OBJECT>(ibiped);
                             break;
                         }
@@ -81,7 +81,7 @@ void DisintegrateArmorEffect::LoadGame(Actor* a1) {
         if (earmorPosition != BO_NONE) {
             InventoryChanges* pinventory = (&a1->m_Extra)->GetContainerChanges();
             if (pinventory) {
-                this->pArmor = pinventory->GetWornItem(earmorPosition, 1);
+                this->pArmor = pinventory->GetWornItem(earmorPosition, true);
             }
             ItemChange* apThis = this->pArmor;
             if (apThis) {
@@ -109,13 +109,13 @@ void DisintegrateArmorEffect::Start() {
         pactor = pTarget->GetTargetAsActor();
     }
     else {
-        pactor = 0;
+        pactor = nullptr;
     }
     if (pactor) {
-        pArmor = pactor->GetRandomWornArmor(0);
+        pArmor = pactor->GetRandomWornArmor(false);
         if (pArmor) {
             float SequenceWeight = fMagnitude;
-            pactor->DamageEquipment(pArmor, SequenceWeight, 1);
+            pactor->DamageEquipment(pArmor, SequenceWeight, true);
             if (CombatController::GetShowVerboseMessages()) {
                 double v3 = fMagnitude;
                 const char* FullName = pArmor->GetFullName();
@@ -138,6 +138,6 @@ ActiveEffect* DisintegrateArmorEffect::Instantiate(MagicCaster* apCaster, MagicI
         return ::new (apMemory) DisintegrateArmorEffect(apCaster, apSpell, apEffect);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

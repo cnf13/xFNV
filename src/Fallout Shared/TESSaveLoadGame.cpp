@@ -181,9 +181,9 @@
 #include "SDK/MSVC/string.h"
 #include "platform/Paths.h"
 
+#include <cstdint>
 #include <cstring>
 #include <filesystem>
-#include <stdint.h>
 #include <system_error>
 #include <vector>
 
@@ -1318,8 +1318,8 @@ TESSaveLoadGame::PrepForLoadSave(BSFile* apFile, const char* asFileName, TESSave
                 if (!i) {
                     BSstrcpy(OldFilename, 260, Dst);
                 }
-                if (FileFinder::Locate(OldFilename, 0, 0, 0xFFFFFFFFu)) {
-                    if (FileFinder::Locate(FileName, 0, 0, 0xFFFFFFFFu)) {
+                if (FileFinder::Locate(OldFilename, nullptr, 0, 0xFFFFFFFFu)) {
+                    if (FileFinder::Locate(FileName, nullptr, 0, 0xFFFFFFFFu)) {
                         std::filesystem::remove(platform::NativePath(FileName), kError);
                     }
                     rt::rename(OldFilename, FileName);
@@ -1337,22 +1337,22 @@ TESSaveLoadGame::PrepForLoadSave(BSFile* apFile, const char* asFileName, TESSave
                 if (v20 > 4 && !_strnicmp(&Str[v20 - 4], ".ess", 4u)) {
                     Str[v20 - 4] = 0;
                 }
-                DeleteSaveGame(apFile, 0);
+                DeleteSaveGame(apFile, nullptr);
                 if (!_strnicmp(Str, "Save ", 5u) || std::strstr(Str, "autosave")) {
-                    pNewFile = PrepForLoadSave(0, 0, TESSaveLoadGame::ACTION_SAVE);
+                    pNewFile = PrepForLoadSave(nullptr, nullptr, TESSaveLoadGame::ACTION_SAVE);
                 }
                 else {
-                    pNewFile = PrepForLoadSave(0, Str, TESSaveLoadGame::ACTION_SAVE);
+                    pNewFile = PrepForLoadSave(nullptr, Str, TESSaveLoadGame::ACTION_SAVE);
                 }
             }
             else {
                 BSFile* pNewFile_2;
                 BSFile* apMemory = static_cast<BSFile*>(ourMalloc(sizeof(BSFile)));
                 if (apMemory) {
-                    pNewFile_2 = ::new (apMemory) BSFile(Dst, NiFile::WRITE_ONLY, 0x20000u, 0);
+                    pNewFile_2 = ::new (apMemory) BSFile(Dst, NiFile::WRITE_ONLY, 0x20000u, false);
                 }
                 else {
-                    pNewFile_2 = 0;
+                    pNewFile_2 = nullptr;
                 }
                 pNewFile = pNewFile_2;
             }
@@ -1362,18 +1362,18 @@ TESSaveLoadGame::PrepForLoadSave(BSFile* apFile, const char* asFileName, TESSave
             BSFile* pNewFile_3;
             BSFile* v16 = static_cast<BSFile*>(ourMalloc(sizeof(BSFile)));
             if (v16) {
-                pNewFile_3 = ::new (v16) BSFile(Dst, NiFile::READ_ONLY, 0x20000u, 0);
+                pNewFile_3 = ::new (v16) BSFile(Dst, NiFile::READ_ONLY, 0x20000u, false);
             }
             else {
-                pNewFile_3 = 0;
+                pNewFile_3 = nullptr;
             }
             pNewFile = pNewFile_3;
-            pNewFile_3->Open(0, 0);
+            pNewFile_3->Open(false, false);
             break;
         }
         case TESSaveLoadGame::ACTION_READ: {
             pNewFile = apFile;
-            apFile->Open(0, 0);
+            apFile->Open(false, false);
             break;
         }
         case TESSaveLoadGame::ACTION_DELETE: {
@@ -1433,19 +1433,19 @@ void* TESSaveLoadGame::CreateBuffer(uint32_t aiSize) {
 
 void TESSaveLoadGame::DestroyBuffer(void* apBuffer) {
     ourFree(apBuffer);
-    m_pBuffer = 0;
+    m_pBuffer = nullptr;
 }
 
 void TESSaveLoadGame::DeleteForm(TESForm* apForm) {
     Warning("FORMS: DeleteForm() was called, but the game is not being loaded.");
-    m_pChanges->RemoveChanges(apForm, static_cast<bool>(1));
+    m_pChanges->RemoveChanges(apForm, true);
     char* v4 = static_cast<char*>(FNVD_DYNAMIC_CAST_VOID(TESObjectCELL)(apForm, RTTI_TESForm, RTTI_TESObjectCELL));
     if (apForm->GetTemporary() || v4) {
         uint32_t NextID = pDataHandler->GetNextID();
-        apForm->SetFormID(NextID, 1);
+        apForm->SetFormID(NextID, true);
     }
     else {
-        apForm->SetFormID(0, 1);
+        apForm->SetFormID(0, true);
         apForm->RemoveFromDataStructures();
         apForm->SetFormEditorID("");
         if (!m_DeferredDeleteList.IsInList(apForm)) {
@@ -1561,7 +1561,7 @@ void TESSaveLoadGame::LoadInitialData(TESForm* apForm, uint32_t aiFlags) {
                 TESWorldSpace* v12 = dynamic_cast<TESWorldSpace*>(FormByNumericID);
                 if (v10) {
                     if (v10 != a1->GetParentCell()) {
-                        TESObjectREFR::MoveRefToNewSpace(a1, v10, 0);
+                        TESObjectREFR::MoveRefToNewSpace(a1, v10, nullptr);
                     }
                 }
                 else {
@@ -1572,7 +1572,7 @@ void TESSaveLoadGame::LoadInitialData(TESForm* apForm, uint32_t aiFlags) {
                         TESObjectCELL* CellFromCellCoord = v12->GetCellFromCellCoord(v7, v8);
                         if ((a1->GetParentCell() && (ParentCell = a1->GetParentCell(), ParentCell->GetInterior())) ||
                             a1->GetParentCell() != CellFromCellCoord) {
-                            TESObjectREFR::MoveRefToNewSpace(a1, 0, v12);
+                            TESObjectREFR::MoveRefToNewSpace(a1, nullptr, v12);
                         }
                         else {
                             if (!CellFromCellCoord && !a1->GetRefPersists()) {
@@ -1586,9 +1586,9 @@ void TESSaveLoadGame::LoadInitialData(TESForm* apForm, uint32_t aiFlags) {
                                 TESObjectCELL* v4 = a1->GetParentCell();
                                 v4->RemoveReference(a1);
                             }
-                            a1->SetParentCell(0);
+                            a1->SetParentCell(nullptr);
                             pModelLoader->CancelReference(a1);
-                            a1->Set3D(0, 1);
+                            a1->Set3D(nullptr, true);
                         }
                         else {
                             Warning("SAVELOAD: Trying to put non-persistent reference in non-existent cell.");
@@ -1608,7 +1608,7 @@ void TESSaveLoadGame::LoadInitialData(TESForm* apForm, uint32_t aiFlags) {
 }
 
 bool TESSaveLoadGame::LoadCell(TESObjectCELL* apCell) {
-    return 0;
+    return false;
 }
 
 // Runs the init of the loaded forms (the player's first, with apPlayerFlags) and frees their entries: without
@@ -1756,12 +1756,12 @@ void TESSaveLoadGame::LoadQueuedData(bool abUpdateWorld) {
 }
 
 bool TESSaveLoadGame::GetInitArrayExists() {
-    return (m_pInitArray != 0);
+    return (m_pInitArray != nullptr);
 }
 
 void TESSaveLoadGame::StartLoadingSequence() {
     if (GetTickCount() > iLoadSequenceStartTime + 3000 && !Interface::GetLoadingMenuVisible()) {
-        TES::pInstance->ShowLoadingMenu(1, 0, 0);
+        TES::pInstance->ShowLoadingMenu(true, nullptr, false);
     }
 }
 
@@ -1831,7 +1831,7 @@ bool TESSaveLoadGame::LoadNumericID(uint32_t* apFormID, uint32_t aiSize) {
 TESPackage* TESSaveLoadGame::CreatePackage(uint32_t aiFormID, uint8_t cPackType) {
     ClearFormID(aiFormID);
     TESPackage* package = TESPackage::CreatePackage(static_cast<PACKAGE_TYPE>((int32_t)cPackType));
-    package->SetFormID(aiFormID, (bool)1);
+    package->SetFormID(aiFormID, true);
     return package;
 }
 
@@ -1871,7 +1871,7 @@ void TESSaveLoadGame::TestAllCells(uint32_t aiControl) {
                 const NiPoint3* AngleOnReference = &pPlayer->GetAngleOnReference();
                 const NiPoint3* v2 = &pPlayer->GetLocationOnReference();
                 TESObjectREFR* ReferenceAtLocation = pDataHandler->CreateReferenceAtLocation(
-                    apObject, *v2, *AngleOnReference, ParentCell, WorldSpace, 0, 0, 0
+                    apObject, *v2, *AngleOnReference, ParentCell, WorldSpace, nullptr, nullptr, nullptr
                 );
                 const NiPoint3* v3 = &ReferenceAtLocation->GetLocationOnReference();
                 a2.x = v3->x;
@@ -1883,7 +1883,7 @@ void TESSaveLoadGame::TestAllCells(uint32_t aiControl) {
         if (!(icount % 50)) {
             char apDest[264];
             BSsprintf(apDest, 260u, "Test All Cells %i.ess", icount);
-            SaveGame(0, apDest, 1);
+            SaveGame(nullptr, apDest, true);
         }
         ++icount;
     }
@@ -1979,17 +1979,17 @@ void TESSaveLoadGame::ResetVersions() {
 
 bool TESSaveLoadGame::GetSavingAllowed() {
     if ((((int32_t)pPlayer->Actor::GetLifeState()) == 2) || (((int32_t)pPlayer->Actor::GetLifeState()) == 1)) {
-        return (bool)0;
+        return false;
     }
     if (pPlayer->GetUnderAIControl()) {
-        return (bool)0;
+        return false;
     }
     if (StartMenu::PauseMenuIsActive()) {
-        return (bool)1;
+        return true;
     }
     int32_t topMenuID = (int32_t)Interface::GetTopMenuID();
     if (topMenuID && (topMenuID != 3)) {
-        return (bool)0;
+        return false;
     }
     int32_t menuModeType = (int32_t)Interface::GetMenuModeType();
     return (bool)((uint8_t)((!menuModeType) || (menuModeType == 3)));
@@ -2131,7 +2131,7 @@ TESForm* TESSaveLoadGame::CreateReferenceFromFile(uint32_t aiFormID, MovedRefere
             pFile = file->GetThreadSafeFile();
             if (pFile->FindForm(a3a) && TESObjectCELL::FindReferenceInFile(pFile, aiFormID)) {
                 tESForm = pFile->GetTESForm();
-                apObject = TESObjectREFR::CreateReference(tESForm, 1);
+                apObject = TESObjectREFR::CreateReference(tESForm, true);
                 TESDataHandler::LoadForm(apObject, pFile);
             }
         }
@@ -2146,7 +2146,7 @@ TESForm* TESSaveLoadGame::CreateReferenceFromFile(uint32_t aiFormID, MovedRefere
                 apFile = v4->GetThreadSafeFile();
                 if (apWorld->FindCellInFile(apFile, aiX, aiY) && TESObjectCELL::FindReferenceInFile(apFile, aiFormID)) {
                     v14 = apFile->GetTESForm();
-                    apObject = TESObjectREFR::CreateReference(v14, 1);
+                    apObject = TESObjectREFR::CreateReference(v14, true);
                     TESDataHandler::LoadForm(apObject, apFile);
                 }
             }
@@ -2205,12 +2205,12 @@ bool TESSaveLoadGame::SaveGame(BSFile* pFile, const char* apFileName, bool abLog
     uint32_t iformCount;
     uint32_t inumericIDArrayOffset;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_SAVELOAD, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESSaveLoadGame.cpp", 1126
+        MEM_CONTEXT_SAVELOAD, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESSaveLoadGame.cpp", 1126
     );
     if (GetLoading() || (GetSavingAllowed() || (apFileName && !BSstrcmp(apFileName, "autosave")))) {
         pIOManager->Pause();
         CleanUpExpiredData();
-        BSFile* pNewFile = 0;
+        BSFile* pNewFile = nullptr;
         if (!GetLoading()) {
             pNewFile = PrepForLoadSave(pFile, apFileName, TESSaveLoadGame::ACTION_SAVE);
         }
@@ -2221,7 +2221,7 @@ bool TESSaveLoadGame::SaveGame(BSFile* pFile, const char* apFileName, bool abLog
                 v7 = ::new (v10) SaveDataDebugInfo;
             }
             else {
-                v7 = 0;
+                v7 = nullptr;
             }
             m_pSaveLoadStats = v7;
         }
@@ -2240,7 +2240,7 @@ bool TESSaveLoadGame::SaveGame(BSFile* pFile, const char* apFileName, bool abLog
         iformCount = 0;
         NiTMapItem<uint32_t, ChangeData*>* it = m_pChanges->GetFirstPos();
         while (it) {
-            ChangeData* pchange = 0;
+            ChangeData* pchange = nullptr;
             uint32_t iformID = 0;
             m_pChanges->GetNext(it, iformID, pchange);
             if (iformID) {
@@ -2264,7 +2264,7 @@ bool TESSaveLoadGame::SaveGame(BSFile* pFile, const char* apFileName, bool abLog
                         if (m_pSaveLoadStats) {
                             m_pSaveLoadStats->AddStats(&kHeader, kBufferHeader.iSize);
                         }
-                        m_pBuffer = 0;
+                        m_pBuffer = nullptr;
                     }
                     else {
                         TESForm* pform = TESForm::GetFormByNumericID(iformID);
@@ -2284,7 +2284,7 @@ bool TESSaveLoadGame::SaveGame(BSFile* pFile, const char* apFileName, bool abLog
                                 SaveBuffer(pNewFile, ptempBuffer, isize);
                                 DestroyBuffer(ptempBuffer);
                             }
-                            m_pCurrentlySavingFormHeader = 0;
+                            m_pCurrentlySavingFormHeader = nullptr;
                             if (m_pSaveLoadStats) {
                                 m_pSaveLoadStats->AddStats(&kHeader, isize);
                             }
@@ -2310,7 +2310,7 @@ bool TESSaveLoadGame::SaveGame(BSFile* pFile, const char* apFileName, bool abLog
             if (apThis) {
                 delete apThis;
             }
-            m_pSaveLoadStats = 0;
+            m_pSaveLoadStats = nullptr;
         }
         if (!GetLoading()) {
             pNewFile->Flush();
@@ -2318,20 +2318,22 @@ bool TESSaveLoadGame::SaveGame(BSFile* pFile, const char* apFileName, bool abLog
             CleanupLoadSave(pNewFile, TESSaveLoadGame::ACTION_SAVE);
         }
         pIOManager->Resume();
-        return 1;
+        return true;
     }
     else {
         const char* v4 = sCantSaveNow.operator const char*();
-        Interface::ShowMessage(v4, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0);
-        return 0;
+        Interface::ShowMessage(
+            v4, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+        );
+        return false;
     }
 }
 
 bool TESSaveLoadGame::ResetReferencePosition(TESObjectREFR* apRef, bool abTemporaryMove) {
     bool brestore = m_bAllowChanges;
-    m_bAllowChanges = 0;
-    bool bresult = 0;
-    Actor* pactor = 0;
+    m_bAllowChanges = false;
+    bool bresult = false;
+    Actor* pactor = nullptr;
     if (apRef->IsActor()) {
         pactor = static_cast<Actor*>(apRef);
     }
@@ -2342,13 +2344,13 @@ bool TESSaveLoadGame::ResetReferencePosition(TESObjectREFR* apRef, bool abTempor
             apRef->SetLocationOnReference(pactor->GetStartingLocation());
             apRef->SetAngleOnReferenceZ(pactor->GetStartingAngle().z);
             if (abTemporaryMove) {
-                SetLoading(1);
+                SetLoading(true);
             }
             TESObjectREFR::MoveRefToNewSpace(apRef, pInteriorCell, pWorldSpace);
             if (abTemporaryMove) {
-                SetLoading(0);
+                SetLoading(false);
             }
-            bresult = 1;
+            bresult = true;
         }
     }
     else {
@@ -2357,7 +2359,7 @@ bool TESSaveLoadGame::ResetReferencePosition(TESObjectREFR* apRef, bool abTempor
             NiPoint3 angle = apRef->GetStartingAngle();
             apRef->SetLocationOnReference(loc);
             apRef->SetAngleOnReference(angle);
-            bresult = 1;
+            bresult = true;
         }
         TESForm* pstartingWorldOrCell = (&apRef->m_Extra)->GetStartingWorldOrCell();
         if (pstartingWorldOrCell) {
@@ -2365,7 +2367,7 @@ bool TESSaveLoadGame::ResetReferencePosition(TESObjectREFR* apRef, bool abTempor
             TESWorldSpace* pWorld = dynamic_cast<TESWorldSpace*>(pstartingWorldOrCell);
             if (pCell || pWorld) {
                 TESObjectREFR::MoveRefToNewSpace(apRef, pCell, pWorld);
-                bresult = 1;
+                bresult = true;
             }
         }
     }
@@ -2384,8 +2386,8 @@ bool TESSaveLoadGame::ResetReferencePosition(TESObjectREFR* apRef, bool abTempor
             }
             obj3D->SetTranslate(loc_2);
             obj3D->SetRotate(apRef->GetOrientation());
-            bhkNiCollisionObject::ResetSim(obj3D, 1);
-            NiUpdateData UpdateData(0.0f, 0, 0);
+            bhkNiCollisionObject::ResetSim(obj3D, true);
+            NiUpdateData UpdateData(0.0f, false, false);
             obj3D->Update(UpdateData);
         }
     }
@@ -2550,7 +2552,7 @@ uint32_t TESSaveLoadGame::CheckFlags(TESForm* apForm, uint32_t aiFlags) {
                     aiFlagsa |= 4u;
                 }
                 else {
-                    if (!pactor->IsDead(0)) {
+                    if (!pactor->IsDead(false)) {
                         aiFlagsa &= ~4u;
                     }
                 }
@@ -2558,7 +2560,7 @@ uint32_t TESSaveLoadGame::CheckFlags(TESForm* apForm, uint32_t aiFlags) {
             if ((aiFlagsa & 6) != 0 && !pref->GetRefPersists() && pref != pPlayer) {
                 TESWorldSpace* pcell_2;
                 TESObjectCELL* v8;
-                Actor* pactor_2 = 0;
+                Actor* pactor_2 = nullptr;
                 if (pref->IsActor()) {
                     pactor_2 = static_cast<Actor*>(pref);
                 }
@@ -2566,13 +2568,13 @@ uint32_t TESSaveLoadGame::CheckFlags(TESForm* apForm, uint32_t aiFlags) {
                     v8 = pactor_2->GetEditorLocationInteriorCell();
                 }
                 else {
-                    v8 = 0;
+                    v8 = nullptr;
                 }
                 if (pactor_2) {
                     pcell_2 = pactor_2->GetEditorLocationWorld();
                 }
                 else {
-                    pcell_2 = 0;
+                    pcell_2 = nullptr;
                 }
                 TESWorldSpace* pworld = pcell_2;
                 if (pcell_2 || v8) {
@@ -2632,7 +2634,7 @@ void TESSaveLoadGame::SaveInitialData(TESForm* a1, uint32_t a2) {
         apMemory.~ReferenceData();
         ::new (&apMemory) ReferenceData;
         TESObjectCELL* ParentCell = v11->GetParentCell();
-        TESWorldSpace* WorldSpace = 0;
+        TESWorldSpace* WorldSpace = nullptr;
         if (ParentCell) {
             WorldSpace = ParentCell->GetWorldSpace();
         }
@@ -2771,7 +2773,7 @@ void TESSaveLoadGame::SaveHeader(BSFile* apFile, const char* apFileName) {
     iscreenshotSize = 0;
     iwidth = 256;
     iheight = 256;
-    NiPixelData* ppixelData = 0;
+    NiPixelData* ppixelData = nullptr;
     uint32_t ipixSize = 0;
     if (GetLoading()) {
         double ScreenHeight = static_cast<double>(Renderer::GetScreenHeight());
@@ -2781,7 +2783,7 @@ void TESSaveLoadGame::SaveHeader(BSFile* apFile, const char* apFileName) {
     }
     else {
         pIOManager->Resume();
-        ppixelData = ScreenShot::TakeSaveGameScreenShot(iwidth, iheight, 0);
+        ppixelData = ScreenShot::TakeSaveGameScreenShot(iwidth, iheight, nullptr);
         pIOManager->Pause();
         if (ppixelData) {
             ipixSize = ppixelData->GetSizeInBytes(0, 0);
@@ -2879,7 +2881,7 @@ void TESSaveLoadGame::SaveNumericIDArrays(BSFile* a1) {
 void TESSaveLoadGame::SetMostRecentSaveGame(BSFile* apFile) {
     if (m_pMostRecentSaveGame) {
         ourFree(this->m_pMostRecentSaveGame);
-        this->m_pMostRecentSaveGame = 0;
+        this->m_pMostRecentSaveGame = nullptr;
     }
     if (apFile) {
         if (apFile->m_bGood) {
@@ -3106,15 +3108,15 @@ void TESSaveLoadGame::LoadHavokDataForReference(TESObjectREFR* apRef, void* apBu
 uint32_t TESSaveLoadGame::CalculateNextSaveNumber() {
     uint32_t isaveNumber;
     BSSimpleList<SaveGameFile*>* plist = m_pSaveGameList;
-    bool bcreatedSaveGameList = 0;
+    bool bcreatedSaveGameList = false;
     if (!plist) {
         BuildSaveGameList();
         plist = m_pSaveGameList;
-        bcreatedSaveGameList = 1;
+        bcreatedSaveGameList = true;
     }
     uint32_t ihighestNumberFound = 0;
     while (plist && !plist->IsEmpty()) {
-        GetSaveGameDisplayData(plist->m_item, &isaveNumber, 0, 0, 0);
+        GetSaveGameDisplayData(plist->m_item, &isaveNumber, nullptr, nullptr, nullptr);
         if (isaveNumber > ihighestNumberFound) {
             ihighestNumberFound = isaveNumber;
         }
@@ -3209,21 +3211,21 @@ void TESSaveLoadGame::SaveGlobals(BSFile* apFile) {
 TESForm* TESSaveLoadGame::CreateReference(uint32_t aiFormID, CreatedReferenceData* apCreatedData) {
     TESForm* pform_2;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_TES_REFERENCES, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESSaveLoadGame.cpp",
+        MEM_CONTEXT_TES_REFERENCES, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESSaveLoadGame.cpp",
         0x133B
     );
     TESForm* pform = TESForm::GetFormByNumericID(aiFormID);
-    TESBoundObject* pbound = 0;
+    TESBoundObject* pbound = nullptr;
     if (apCreatedData->eType == TES_CREATED_REFERENCE_MAGICPROJECTILE ||
         (pform_2 = TESForm::GetFormByNumericID(apCreatedData->iBoundID),
-         (pbound = dynamic_cast<TESBoundObject*>(pform_2)) != 0)) {
+         (pbound = dynamic_cast<TESBoundObject*>(pform_2)) != nullptr)) {
         if (pform) {
             TESObjectREFR* pref = dynamic_cast<TESObjectREFR*>(pform);
             if (!pref ||
                 ((apCreatedData->eType && apCreatedData->eType != TES_CREATED_REFERENCE_PERSISTENT) ||
                  pref->GetObjectReference() != pbound)) {
                 DeleteForm(pform);
-                pform = 0;
+                pform = nullptr;
             }
         }
         if (!pform) {
@@ -3235,16 +3237,16 @@ TESForm* TESSaveLoadGame::CreateReference(uint32_t aiFormID, CreatedReferenceDat
                         pform_6 = ::new (v20) ArrowProjectile;
                     }
                     else {
-                        pform_6 = 0;
+                        pform_6 = nullptr;
                     }
                     pform = pform_6;
                     TESObjectREFR* pref_3 = dynamic_cast<TESObjectREFR*>(pform_6);
                     pref_3->SetObjectReference(pbound);
-                    pform->SetFormID(aiFormID, 1);
+                    pform->SetFormID(aiFormID, true);
                 }
                 else {
                     if (apCreatedData->eType == TES_CREATED_REFERENCE_MAGICPROJECTILE) {
-                        TESForm* pform_7 = 0;
+                        TESForm* pform_7 = nullptr;
                         uint32_t iBoundID = apCreatedData->iBoundID;
                         if (iBoundID) {
                             if (iBoundID == 1) {
@@ -3255,7 +3257,7 @@ TESForm* TESSaveLoadGame::CreateReference(uint32_t aiFormID, CreatedReferenceDat
                                     pmagicProjectile_3 = ::new (v17) MagicBoltProjectile;
                                 }
                                 else {
-                                    pmagicProjectile_3 = 0;
+                                    pmagicProjectile_3 = nullptr;
                                 }
                                 pform_7 = pmagicProjectile_3;
                             }
@@ -3268,7 +3270,7 @@ TESForm* TESSaveLoadGame::CreateReference(uint32_t aiFormID, CreatedReferenceDat
                                         pmagicProjectile_2 = ::new (v18) MagicFogProjectile;
                                     }
                                     else {
-                                        pmagicProjectile_2 = 0;
+                                        pmagicProjectile_2 = nullptr;
                                     }
                                     pform_7 = pmagicProjectile_2;
                                 }
@@ -3282,12 +3284,12 @@ TESForm* TESSaveLoadGame::CreateReference(uint32_t aiFormID, CreatedReferenceDat
                                 pmagicProjectile = ::new (v19) MagicBallProjectile;
                             }
                             else {
-                                pmagicProjectile = 0;
+                                pmagicProjectile = nullptr;
                             }
                             pform_7 = pmagicProjectile;
                         }
                         pform = pform_7;
-                        pform_7->SetFormID(aiFormID, 1);
+                        pform_7->SetFormID(aiFormID, true);
                     }
                     else {
                         Warning(
@@ -3307,7 +3309,7 @@ TESForm* TESSaveLoadGame::CreateReference(uint32_t aiFormID, CreatedReferenceDat
                         pform_3 = ::new (v22) Character;
                     }
                     else {
-                        pform_3 = 0;
+                        pform_3 = nullptr;
                     }
                     pform = pform_3;
                 }
@@ -3319,7 +3321,7 @@ TESForm* TESSaveLoadGame::CreateReference(uint32_t aiFormID, CreatedReferenceDat
                             pform_4 = ::new (v21) Creature;
                         }
                         else {
-                            pform_4 = 0;
+                            pform_4 = nullptr;
                         }
                         pform = pform_4;
                     }
@@ -3330,18 +3332,18 @@ TESForm* TESSaveLoadGame::CreateReference(uint32_t aiFormID, CreatedReferenceDat
                             pform_5 = ::new (v5) TESObjectREFR;
                         }
                         else {
-                            pform_5 = 0;
+                            pform_5 = nullptr;
                         }
                         pform = pform_5;
                     }
                 }
                 TESObjectREFR* pref_2 = dynamic_cast<TESObjectREFR*>(pform);
                 pref_2->SetObjectReference(pbound);
-                pform->SetFormID(aiFormID, 1);
+                pform->SetFormID(aiFormID, true);
             }
         }
         if (pform) {
-            pform->SetStillLoading(1);
+            pform->SetStillLoading(true);
         }
         return pform;
     }
@@ -3350,7 +3352,7 @@ TESForm* TESSaveLoadGame::CreateReference(uint32_t aiFormID, CreatedReferenceDat
             "SAVELOAD: Bound object %08X no longer exists.  Reference %08X will not be created.",
             apCreatedData->iBoundID, aiFormID
         );
-        return 0;
+        return nullptr;
     }
 }
 
@@ -3409,19 +3411,19 @@ void TESSaveLoadGame::LoadAnimationForReference(TESObjectREFR* apRef, uint32_t a
     Animation* panimation;
     if (apRef == pPlayer) {
         if (aiFormID) {
-            panimation = pPlayer->GetAnimation(0);
+            panimation = pPlayer->GetAnimation(false);
         }
         else {
-            panimation = pPlayer->GetAnimation(1);
+            panimation = pPlayer->GetAnimation(true);
         }
     }
     else {
         panimation = apRef->GetAnimation();
     }
     MobileObject* pmob = dynamic_cast<MobileObject*>(apRef);
-    HighProcess* phighProcess = 0;
+    HighProcess* phighProcess = nullptr;
     ANIMATION_ACTION sanimAction = ANIM_ACTION_NONE;
-    BSAnimGroupSequence* pseq = 0;
+    BSAnimGroupSequence* pseq = nullptr;
     if (pmob) {
         if (aiFormID) {
             phighProcess = dynamic_cast<HighProcess*>(pmob->pCurrentProcess);
@@ -3563,7 +3565,7 @@ void TESSaveLoadGame::FinalizeQueuedForms() {
                 if (pref) {
                     NiAVObject* pobj3D = pref->TESObjectREFR::Get3D();
                     if (pobj3D) {
-                        NiUpdateData UpdateData(0.0f, 0, 0);
+                        NiUpdateData UpdateData(0.0f, false, false);
                         pobj3D->Update(UpdateData);
                     }
                 }
@@ -3586,7 +3588,7 @@ void TESSaveLoadGame::BuildSaveGameList() {
         v6 = ::new (v9) BSSimpleList<SaveGameFile*>;
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     m_pSaveGameList = v6;
     const char* PersonalPath = BSUtilities::GetPersonalPath();
@@ -3606,7 +3608,7 @@ void TESSaveLoadGame::BuildSaveGameList() {
                 v5 = ::new (apMemory) SaveGameFile(apDest, NiFile::READ_ONLY, 0x20000u);
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             SaveGameFile* apNewItem = v5;
             m_pSaveGameList->Insert(v5, &TESSaveLoadGame::SaveGameCompare);
@@ -3627,7 +3629,7 @@ void TESSaveLoadGame::DeleteSaveGameList() {
         if (m_pSaveGameList) {
             delete m_pSaveGameList;
         }
-        this->m_pSaveGameList = 0;
+        this->m_pSaveGameList = nullptr;
     }
 }
 
@@ -3642,7 +3644,9 @@ void TESSaveLoadGame::GetSaveGameDisplayData(
         BSstrcpy(apFileName, 255, "");
     }
     if (!RetrieveSaveGameData(apFile, reinterpret_cast<int32_t*>(apSaveGameNumber), apLevel, apTotalPlayingTime)) {
-        GetSaveGameData(apFile, apSaveGameNumber, 0, apLevel, 0, 0, 0, apTotalPlayingTime, 0, 0);
+        GetSaveGameData(
+            apFile, apSaveGameNumber, nullptr, apLevel, nullptr, nullptr, nullptr, apTotalPlayingTime, nullptr, 0
+        );
         if (apFileName) {
             // BSFile's slot-6 getter returns the address of the file's name.
             char* v6 = apFile->GetDevice();
@@ -3695,17 +3699,17 @@ NiRefObject* TESSaveLoadGame::GetSaveGameData(
     float v18;
     _SYSTEMTIME v20;
     uint16_t a5;
-    BSFile* Save = 0;
+    BSFile* Save = nullptr;
     if (a11) {
         Save = apFile;
     }
     else {
-        Save = PrepForLoadSave(apFile, 0, TESSaveLoadGame::ACTION_READ);
+        Save = PrepForLoadSave(apFile, nullptr, TESSaveLoadGame::ACTION_READ);
     }
     uint32_t aiSize = 0;
     if (Save) {
         if (Save->m_bGood) {
-            aiSize = LoadHeader(Save, 0);
+            aiSize = LoadHeader(Save, false);
         }
     }
     if (aiSize) {
@@ -3762,7 +3766,7 @@ NiRefObject* TESSaveLoadGame::GetSaveGameData(
         if (!a11) {
             CleanupLoadSave(Save, TESSaveLoadGame::ACTION_READ);
         }
-        return 0;
+        return nullptr;
     }
 }
 
@@ -3853,7 +3857,7 @@ NiRefObject* TESSaveLoadGame::ReadSaveGameDataOLD(
     if (a8) {
         *a8 = apDest;
     }
-    NiRefObject* v29 = 0;
+    NiRefObject* v29 = nullptr;
     LoadGameDataOLD(&v30, 4u);
     if (v30) {
         if (a10) {
@@ -3870,7 +3874,7 @@ NiRefObject* TESSaveLoadGame::ReadSaveGameDataOLD(
                 v15 = ::new (apMemory) NiPixelData(auiWidth, auiWidth, akFormat, 1u, 1u);
             }
             else {
-                v15 = 0;
+                v15 = nullptr;
             }
             LoadGameDataOLD(v15->GetPixels(0u, 0u), 3 * (v25 * auiWidth));
             NiTexture::FormatPrefs arPrefs;
@@ -3908,8 +3912,8 @@ char TESSaveLoadGame::RetrieveSaveGameData(BSFile* apFile, int32_t* arIndex, cha
         *arIndex = std::atoi(String);
     }
     if (apDest || Dst) {
-        char* apString2 = 0;
-        char* v11 = 0;
+        char* apString2 = nullptr;
+        char* v11 = nullptr;
         for (char* i = Str;; v11 = i) {
             i = std::strstr(i + 1, ",");
             if (!i) {
@@ -3953,7 +3957,7 @@ void TESSaveLoadGame::GenerateSaveGameFileName(char* apFileName) {
         FileFinder::FILE_LOCATION v5;
         char Src[268];
         const char* v22;
-        bool v17 = 1;
+        bool v17 = true;
         BSStringT<char> v18;
         int32_t v16 = 0;
         const char* pPlayerName = pPlayer->GetFullName();
@@ -4001,7 +4005,7 @@ void TESSaveLoadGame::GenerateSaveGameFileName(char* apFileName) {
             const char* v4 = sLocalSavePath.String();
             const void* CellOrCoords_0 = v4;
             BSsprintf(apDest, 260, "%s%s%s.ess", BSUtilities::GetPersonalPath(), CellOrCoords_0, Src);
-            v5 = FileFinder::Locate(apDest, 0, 0, 0xFFFFFFFFu);
+            v5 = FileFinder::Locate(apDest, nullptr, 0, 0xFFFFFFFFu);
             v17 = v5 == FileFinder::NOTFOUND;
             ++v16;
         }
@@ -4058,10 +4062,10 @@ uint32_t TESSaveLoadGame::LoadHeader(BSFile* apFile, bool abFullLoad) {
             "load?",
             m_cMajorVersion, m_cMinorVersion, 0, 125
         );
-        pSaveLoadGameOLD->SetLoading(1);
+        pSaveLoadGameOLD->SetLoading(true);
         const char* v6 = sNo.String();
         char iresult = Interface::CreateModalMessageMenu(a1, 1, 5, sYes.String(), v6, nullptr);
-        pSaveLoadGameOLD->SetLoading(0);
+        pSaveLoadGameOLD->SetLoading(false);
         if (iresult == 2) {
             return -1;
         }
@@ -4121,7 +4125,7 @@ void TESSaveLoadGame::SaveCreatedBaseObjects(BSFile* apFile) {
             EnchantmentItem* penchant;
             uint32_t iformID_2;
             TESForm* pform_2;
-            while (1) {
+            while (true) {
                 if (!plist) {
                     return;
                 }
@@ -4299,7 +4303,7 @@ void ChangesMap::RemoveAllChanges() {
 }
 
 ChangeData* ChangesMap::GetChanges(uint32_t auiFormID) {
-    ChangeData* a2 = 0;
+    ChangeData* a2 = nullptr;
     GetAt(auiFormID, a2);
     return a2;
 }
@@ -4311,30 +4315,30 @@ ChangeData* ChangesMap::GetChanges(TESForm* apForm) {
 
 bool ChangesMap::RemoveChange(TESForm* apForm, uint32_t aiChange) {
     if (pSaveLoadGameOLD->GetLoading()) {
-        return 0;
+        return false;
     }
     ChangeData* pchange = GetChanges(apForm);
     if (!pchange) {
-        return 0;
+        return false;
     }
     pchange->RemoveChange(aiChange);
     if (!pchange->iFlags) {
         RemoveAt(apForm->iFormID);
         delete pchange;
     }
-    return 1;
+    return true;
 }
 
 bool ChangesMap::RemoveChanges(uint32_t aiFormID, bool abForceRemove) {
     ChangeData* Changes_0 = GetChanges(aiFormID);
     if (!Changes_0) {
-        return 0;
+        return false;
     }
     if (!Changes_0->pBuffer || abForceRemove) {
         RemoveAt(aiFormID);
         delete Changes_0;
     }
-    return 1;
+    return true;
 }
 
 [[clang::disable_tail_calls]] bool ChangesMap::RemoveChanges(TESForm* apForm, bool abForceRemove) {
@@ -4347,14 +4351,15 @@ ChangeData* ChangesMap::AddChange(TESForm* apForm, uint32_t aiChange) {
     if (!GetAt(iformID, pchange)) {
         ChangeData* pchange_2;
         AutoMemContext tempMemContext(
-            MEM_CONTEXT_SAVELOAD, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESSaveLoadGame.cpp", 260
+            MEM_CONTEXT_SAVELOAD, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESSaveLoadGame.cpp",
+            260
         );
         void* v6 = ourMalloc(sizeof(ChangeData));
         if (v6) {
             pchange_2 = ::new (v6) ChangeData;
         }
         else {
-            pchange_2 = 0;
+            pchange_2 = nullptr;
         }
         pchange = pchange_2;
         SetAt(iformID, pchange_2);
@@ -4540,12 +4545,12 @@ void SaveDataDebugInfo::PrintStats(const char* apFileName) {
 // The length is BSstrlen's, zero-extended to the 64-bit count.
 bool SaveDataDebugInfo::WriteFile(BSSystemFile* aFile, const char* apBuffer) {
     uint64_t uiWritten;
-    return aFile->Write(apBuffer, static_cast<uint32_t>(BSstrlen(apBuffer)), uiWritten) == BSSystemFile::EC_NONE;
+    return aFile->Write(apBuffer, BSstrlen(apBuffer), uiWritten) == BSSystemFile::EC_NONE;
 }
 
 void SaveDataDebugInfo::AddExtraStat(uint32_t aiSize, const char* apDescription) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_SAVELOAD, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESSaveLoadGame.cpp", 615
+        MEM_CONTEXT_SAVELOAD, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESSaveLoadGame.cpp", 615
     );
     SaveDataDebugInfo::ExtraStat* pextraStat =
         static_cast<SaveDataDebugInfo::ExtraStat*>(ourMalloc(sizeof(SaveDataDebugInfo::ExtraStat)));
@@ -4559,7 +4564,7 @@ void SaveDataDebugInfo::AddExtraStat(uint32_t aiSize, const char* apDescription)
 
 void SaveDataDebugInfo::AddStats(SaveFormHeader* apHeader, uint16_t aiSize) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_SAVELOAD, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESSaveLoadGame.cpp", 630
+        MEM_CONTEXT_SAVELOAD, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESSaveLoadGame.cpp", 630
     );
     LoadFormHeader header;
     header.iFlags = apHeader->iFlags;
@@ -4574,14 +4579,14 @@ void SaveDataDebugInfo::AddStats(LoadFormHeader* apHeader) {
     LoadFormHeader* pheader;
     BSSimpleList<LoadFormHeader*>* pheaderList_2;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_SAVELOAD, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESSaveLoadGame.cpp", 646
+        MEM_CONTEXT_SAVELOAD, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESSaveLoadGame.cpp", 646
     );
     void* ecx0 = ourMalloc(sizeof(LoadFormHeader));
     if (ecx0) {
         pheader = static_cast<LoadFormHeader*>(ecx0);
     }
     else {
-        pheader = 0;
+        pheader = nullptr;
     }
     *pheader = *apHeader;
     uint8_t ckey = pheader->cFormType;
@@ -4593,7 +4598,7 @@ void SaveDataDebugInfo::AddStats(LoadFormHeader* apHeader) {
             pheaderList = ::new (v5) BSSimpleList<LoadFormHeader*>;
         }
         else {
-            pheaderList = 0;
+            pheaderList = nullptr;
         }
         pheaderList_2 = pheaderList;
         headerMap->SetAt(ckey, pheaderList);

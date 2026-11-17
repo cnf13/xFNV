@@ -132,7 +132,7 @@ void BSRenderedTexture::Pop() {
         NiPointer<NiRenderTargetGroup>* v1 = &BSRenderedTexture::spRenderTargets[--BSRenderedTexture::iNumTargets];
         if (m_pObject) {
             NiDecRefCount(m_pObject);
-            v1->m_pObject = 0;
+            v1->m_pObject = nullptr;
         }
     }
 }

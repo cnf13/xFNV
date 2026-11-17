@@ -66,7 +66,7 @@ bool RadialTile::SpecialBoundsCheck(float fx, float fy) {
         float v5 = fya * fya + fxa * fxa;
         float fMouseMagnitude = std::sqrt(static_cast<double>(v5));
         // MAYBE-INLINED 0xA218DD: a write opening BSStringT<char>'s uses: may be its inlined constructor
-        text.pString = 0;
+        text.pString = nullptr;
         // MAYBE-INLINED 0xA2190C: a write opening BSStringT<char>'s uses: may be its inlined constructor
         text.sLen = 0;
         // MAYBE-INLINED 0xA21938: a write opening BSStringT<char>'s uses: may be its inlined constructor
@@ -75,12 +75,12 @@ bool RadialTile::SpecialBoundsCheck(float fx, float fy) {
         Warning(text.pString);
         if (fMouseMagnitude >= static_cast<double>(fMinMagnitude) &&
             fMaxMagnitude >= static_cast<double>(fMouseMagnitude)) {
-            text.Set(0, 0);
-            return 1;
+            text.Set(nullptr, 0);
+            return true;
         }
-        text.Set(0, 0);
+        text.Set(nullptr, 0);
     }
-    return 0;
+    return false;
 }
 
 void RadialTile::operator delete(void* apMemory) {

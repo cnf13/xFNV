@@ -450,7 +450,7 @@ CFilter* bhkWorldObject::GetCollisionFilter(CFilter* apResult) const {
 void bhkWorldObject::SetCollisionGroup(uint32_t aiGroup) {
     auto* pkObject = static_cast<hkpWorldObject*>(phkObject);
     uint32_t uiFilter = pkObject ? pkObject->m_collidable.getCollisionFilterInfo() : 0;
-    uiFilter = static_cast<uint16_t>(uiFilter) | (static_cast<uint32_t>(aiGroup) << 16);
+    uiFilter = static_cast<uint16_t>(uiFilter) | (aiGroup << 16);
     if (pkObject) {
         pkObject->m_collidable.m_broadPhaseHandle.m_collisionFilterInfo = uiFilter;
     }
@@ -534,7 +534,7 @@ hkpShape* bhkWorldObject::GethkShape() {
 }
 
 hkpCollidable* bhkWorldObject::GetCollidableRw() {
-    hkpLinkedCollidable* pCollideRw = 0;
+    hkpLinkedCollidable* pCollideRw = nullptr;
     hkpWorldObject* pwo = operator*();
     if (pwo) {
         pCollideRw = &pwo->m_collidable;

@@ -36,8 +36,8 @@ NiObject* BSFrustumFOVController::CreateClone(NiCloningProcess& kCloning) {
         return v3;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -115,7 +115,7 @@ bool BSFrustumFOVController::InterpTargetIsCorrectType(NiObjectNET* pkTarget) co
 
 // The full angle: twice the arctangent of the camera frustum's right edge, rounded to float before the doubling.
 void BSFrustumFOVController::GetTargetFloatValue(float& fValue) {
-    float fHalfAngle = static_cast<float>(std::atan(static_cast<NiCamera*>(m_pkTarget)->m_kViewFrustum.m_fRight));
+    float fHalfAngle = std::atan(static_cast<NiCamera*>(m_pkTarget)->m_kViewFrustum.m_fRight);
     fValue = fHalfAngle + fHalfAngle;
 }
 
@@ -123,7 +123,7 @@ NiObject* BSFrustumFOVController::CreateObject() {
     BSFrustumFOVController* v0 =
         static_cast<BSFrustumFOVController*>(NiMemObject::operator new(sizeof(BSFrustumFOVController)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) BSFrustumFOVController;
 }

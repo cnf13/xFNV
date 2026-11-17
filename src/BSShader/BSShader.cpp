@@ -59,7 +59,7 @@ bool BSShader::Initialize() {
     CreateShaders();
     CreateTextures();
     CreateStagesAndPasses();
-    return (bool)1;
+    return true;
 }
 
 bool BSShader::SetupGeometry(NiGeometry* apGeometry) {
@@ -74,7 +74,7 @@ void BSShader::SetupGeometryAlphaBlending(const NiPropertyState* apState) {
     m_pObject = static_cast<NiAlphaProperty*>(apState->m_aspProps[0].m_pObject);
     BSShaderPPLightingProperty* v3 = static_cast<BSShaderPPLightingProperty*>(apState->m_aspProps[3].m_pObject);
     if (v3) {
-        v4 = (v3->iShaderPropertyType != ((-1))) ? v3 : (nullptr);
+        v4 = (v3->iShaderPropertyType != (-1)) ? v3 : nullptr;
     }
     else {
         v4 = nullptr;
@@ -89,7 +89,7 @@ void BSShader::SetupGeometryAlphaBlending(const NiPropertyState* apState) {
         }
     }
     if ((v4->fAlpha < 1.0) || ((v4->fFadeAlpha < 1.0) || v5)) {
-        BSRenderState::SetAlphaBlendEnable(1, BSRS_NOLOCK);
+        BSRenderState::SetAlphaBlendEnable(true, BSRS_NOLOCK);
         if (v6) {
             BSRenderState::SetAlphaBlendFunc(
                 static_cast<NiAlphaProperty::AlphaFunction>(
@@ -108,7 +108,7 @@ void BSShader::SetupGeometryAlphaBlending(const NiPropertyState* apState) {
         }
     }
     else {
-        BSRenderState::SetAlphaBlendEnable(0, BSRS_NOLOCK);
+        BSRenderState::SetAlphaBlendEnable(false, BSRS_NOLOCK);
     }
 }
 
@@ -187,7 +187,7 @@ void BSShader::ApplyTextureStages() {
         }
         if (pStage->bApply) {
             if (pStage->m_spTexture) {
-                pStage->ConfigureStage(0);
+                pStage->ConfigureStage(false);
             }
         }
     }
@@ -205,7 +205,7 @@ void BSShader::ApplyTextureStagesFlags() {
                 return;
             }
             if (pkStage->m_spTexture) {
-                pkStage->ConfigureStage(0);
+                pkStage->ConfigureStage(false);
             }
         }
     }
@@ -213,8 +213,8 @@ void BSShader::ApplyTextureStagesFlags() {
 
 void BSShader::SetupGeometryNonFirstPass(const NiPropertyState* apState) {
     if ((((uint32_t)BSShaderManager::eCurrentPass) < 594) || (((uint32_t)BSShaderManager::eCurrentPass) > 598)) {
-        BSRenderState::SetAlphaBlendEnable(1, BSRS_NOLOCK);
-        BSRenderState::SetZWriteEnable(0, BSRS_NOLOCK);
+        BSRenderState::SetAlphaBlendEnable(true, BSRS_NOLOCK);
+        BSRenderState::SetZWriteEnable(false, BSRS_NOLOCK);
         BSRenderState::SetZFunc(NiZBufferProperty::TEST_EQUAL, BSRS_NOLOCK);
     }
 }
@@ -255,7 +255,7 @@ bool BSShader::CreateShaders() {
 
 bool BSShader::CreateStagesAndPasses() {
     NiD3DPass::CreateNewPass(spPass);
-    return (bool)1;
+    return true;
 }
 
 // The base has no textures of its own to create: success.
@@ -708,23 +708,23 @@ void BSShader::SetupDefaultStage(
     NiD3DTextureStageGroup* m_pkTextureStageGroup;
     m_pkTextureStageGroup = apStage->m_pkTextureStageGroup;
     apStage->m_uiStage = aiStageNum;
-    m_pkTextureStageGroup->SetStageState(11, aiStageNum, 0);
-    apStage->m_pkTextureStageGroup->SetStageState(1, 1u, 0);
-    apStage->m_pkTextureStageGroup->SetStageState(2, 2u, 0);
-    apStage->m_pkTextureStageGroup->SetStageState(4, 1u, 0);
-    apStage->m_pkTextureStageGroup->SetStageState(5, 2u, 0);
+    m_pkTextureStageGroup->SetStageState(11, aiStageNum, false);
+    apStage->m_pkTextureStageGroup->SetStageState(1, 1u, false);
+    apStage->m_pkTextureStageGroup->SetStageState(2, 2u, false);
+    apStage->m_pkTextureStageGroup->SetStageState(4, 1u, false);
+    apStage->m_pkTextureStageGroup->SetStageState(5, 2u, false);
     NiD3DTextureStageGroup* v6 = apStage->m_pkTextureStageGroup;
-    apStage->m_bTextureTransform = (bool)0;
-    v6->SetStageState(24, 0, 0);
+    apStage->m_bTextureTransform = false;
+    v6->SetStageState(24, 0, false);
     if (((int32_t)aiAddressValue) == 3) {
         apStage->SetClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
     }
     else {
         apStage->SetClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
     }
-    apStage->m_pkTextureStageGroup->SetSamplerState(5, aiMipFilter, 0, 0);
-    apStage->m_pkTextureStageGroup->SetSamplerState(6, aiMipFilter, 0, 0);
-    apStage->m_pkTextureStageGroup->SetSamplerState(7, aiMipFilter, 0, 0);
+    apStage->m_pkTextureStageGroup->SetSamplerState(5, aiMipFilter, false, false);
+    apStage->m_pkTextureStageGroup->SetSamplerState(6, aiMipFilter, false, false);
+    apStage->m_pkTextureStageGroup->SetSamplerState(7, aiMipFilter, false, false);
     apStage->SetFilterMode(static_cast<NiTexturingProperty::FilterMode>((4 * ((uint8_t)abAniso)) + 2));
 }
 

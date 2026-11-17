@@ -132,10 +132,10 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 void add_11AE5D0(float a1) {
-    PrecipitationShader::fTime = (float)(PrecipitationShader::fTime + a1);
+    PrecipitationShader::fTime = (PrecipitationShader::fTime + a1);
 }
 
 void NiSinCos_Fast(float a1, float* a2, float* a3) {
@@ -161,22 +161,22 @@ void Precipitation::Load(const char* apFilename) {
         pParent->DetachChild(spCurrentPrecipRoot.m_pObject);
         spLastPrecipRoot = spCurrentPrecipRoot;
         pParent->AttachChild(spLastPrecipRoot.m_pObject, 1);
-        spCurrentPrecipRoot.operator=(static_cast<NiNode*>(0));
+        spCurrentPrecipRoot.operator=(static_cast<NiNode*>(nullptr));
     }
     if (apFilename) {
         if (*apFilename) {
-            NiNode* pprecipNode = pModelLoader->LoadFile(apFilename, LOD_MULT_NONE, 1, 0, 0, 0);
+            NiNode* pprecipNode = pModelLoader->LoadFile(apFilename, LOD_MULT_NONE, true, false, false, false);
             if (pprecipNode) {
                 NiNode* v6;
                 bool bsnow = BSstricmp(apFilename, "Sky\\Snow.NIF") == 0;
-                NiUpdateData UpdateData(0.0f, 0, 0);
+                NiUpdateData UpdateData(0.0f, false, false);
                 pprecipNode->UpdateDownwardPass(UpdateData, 0);
                 NiNode* v8 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
                 if (v8) {
                     v6 = ::new (v8) NiNode(0);
                 }
                 else {
-                    v6 = 0;
+                    v6 = nullptr;
                 }
                 spCurrentPrecipRoot.operator=(v6);
                 fBirthRate = 0.0f;
@@ -190,7 +190,7 @@ void Precipitation::Load(const char* apFilename) {
                             static_cast<NiParticleSystem*>(NiObject::DynamicCastStatic(&NiParticleSystem::ms_RTTI, v2));
                     }
                     else {
-                        pps = 0;
+                        pps = nullptr;
                     }
                     if (pps) {
                         NiGeometry* pprecipGeom = CreateShaderGeometry(pps, pParent->GetWorldTransform(), bsnow);
@@ -247,11 +247,11 @@ void Precipitation::Update(float afSecondsPassed) {
     if (pSaveLoadGameOLD->GetLoading()) {
         if (spLastPrecipRoot.m_pObject) {
             pParent->DetachChild(spLastPrecipRoot.m_pObject);
-            spLastPrecipRoot.operator=(static_cast<NiNode*>(0));
+            spLastPrecipRoot.operator=(static_cast<NiNode*>(nullptr));
         }
         if (spCurrentPrecipRoot.m_pObject) {
             pParent->DetachChild(spCurrentPrecipRoot.m_pObject);
-            spCurrentPrecipRoot.operator=(static_cast<NiNode*>(0));
+            spCurrentPrecipRoot.operator=(static_cast<NiNode*>(nullptr));
         }
         if (pSky->pLastWeather) {
             TESModel* ScriptList = &pSky->pLastWeather->precipNIF;
@@ -275,16 +275,16 @@ void Precipitation::Update(float afSecondsPassed) {
                  (min = pcurModel->GetModel(), (v5 = pQueuedModel->GetModel(), !BSstricmp(v5, min))))) {
                 TESModel* pModel = &pCurrentWeather->precipNIF;
                 const char* pfileName = pModel->GetModel();
-                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(0));
+                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
                 if (pModelLoader->FindModel(pfileName, spmodel)) {
-                    pQueuedModel = 0;
+                    pQueuedModel = nullptr;
                     Load(pfileName);
                     pModelLoader->ReleaseFile(pfileName);
                 }
                 NiPointer<Model>::Destroy(&spmodel);
             }
             else {
-                pQueuedModel = 0;
+                pQueuedModel = nullptr;
                 Load_0(pcurModel);
             }
         }
@@ -300,7 +300,7 @@ void Precipitation::Update(float afSecondsPassed) {
     if (fCurrentPct >= 1.0) {
         if (spLastPrecipRoot.m_pObject) {
             pParent->DetachChild(spLastPrecipRoot.m_pObject);
-            spLastPrecipRoot.operator=(static_cast<NiNode*>(0));
+            spLastPrecipRoot.operator=(static_cast<NiNode*>(nullptr));
         }
     }
     fBirthRate = 0.0f;
@@ -312,7 +312,7 @@ void Precipitation::Update(float afSecondsPassed) {
                     SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
                     const NiPoint3* WorldTranslate = &WorldSceneGraph->GetCameraRoot()->GetWorldTranslate();
                     if (static_cast<double>(WorldTranslate->z) < pPlayer->GetRelevantWaterHeight()) {
-                        bcull = 1;
+                        bcull = true;
                     }
                 }
             }
@@ -323,7 +323,7 @@ void Precipitation::Update(float afSecondsPassed) {
                 fBR = (fCurrentPct - fBeginPct) / (1.0 - fBeginPct);
             }
             int32_t ichild = 0;
-            while (1) {
+            while (true) {
                 PrecipitationShaderProperty* pprecipProp;
                 int32_t v19;
                 NiAVObject* pchild = spCurrentPrecipRoot.m_pObject->GetAt(ichild++);
@@ -342,7 +342,7 @@ void Precipitation::Update(float afSecondsPassed) {
                     pprecipProp = static_cast<PrecipitationShaderProperty*>(pchild->GetProperty(3));
                 }
                 else {
-                    pprecipProp = 0;
+                    pprecipProp = nullptr;
                 }
                 if (pprecipProp) {
                     NiTriBasedGeomData* pgeomData =
@@ -370,7 +370,7 @@ void Precipitation::Update(float afSecondsPassed) {
                 v32 = 1.0 - fCurrentPct / fEndPct;
             }
             uint32_t v31 = 0;
-            while (1) {
+            while (true) {
                 PrecipitationShaderProperty* pprecipProp_2;
                 int32_t v17;
                 NiAVObject* pchild_2 = spLastPrecipRoot.m_pObject->GetAt(v31++);
@@ -389,7 +389,7 @@ void Precipitation::Update(float afSecondsPassed) {
                     pprecipProp_2 = static_cast<PrecipitationShaderProperty*>(pchild_2->GetProperty(3));
                 }
                 else {
-                    pprecipProp_2 = 0;
+                    pprecipProp_2 = nullptr;
                 }
                 if (pprecipProp_2) {
                     NiTriBasedGeomData* pgeomData_2 =
@@ -414,18 +414,18 @@ void Precipitation::Update(float afSecondsPassed) {
     }
     if (spCurrentPrecipRoot.m_pObject) {
         if (bcull) {
-            spCurrentPrecipRoot.m_pObject->SetAppCulled(1);
+            spCurrentPrecipRoot.m_pObject->SetAppCulled(true);
         }
         else {
-            spCurrentPrecipRoot.m_pObject->SetAppCulled(0);
+            spCurrentPrecipRoot.m_pObject->SetAppCulled(false);
         }
     }
     if (spLastPrecipRoot.m_pObject) {
         if (bcull) {
-            spLastPrecipRoot.m_pObject->SetAppCulled(1);
+            spLastPrecipRoot.m_pObject->SetAppCulled(true);
         }
         else {
-            spLastPrecipRoot.m_pObject->SetAppCulled(0);
+            spLastPrecipRoot.m_pObject->SetAppCulled(false);
         }
     }
 }
@@ -435,13 +435,12 @@ void Precipitation::Load_0(TESModel* a1) {
         if (a1 && a1->GetModelLength()) {
             const char* v2 = a1->GetModel();
             pModelLoader->QueueModel(
-                v2, IO_TASK_PRIORITY_CRITICAL, static_cast<QueuedFile*>(0), LOD_MULT_NONE, static_cast<bool>(0),
-                static_cast<bool>(0), static_cast<bool>(0)
+                v2, IO_TASK_PRIORITY_CRITICAL, static_cast<QueuedFile*>(nullptr), LOD_MULT_NONE, false, false, false
             );
             pQueuedModel = a1;
         }
         else {
-            Load(0);
+            Load(nullptr);
         }
     }
 }
@@ -465,7 +464,7 @@ NiGeometry* Precipitation::CreateShaderGeometry(
                 NiObject::DynamicCastStatic(&NiPSysEmitter::ms_RTTI, pemitterCtlr->m_pkModifier)
             );
             NiFloatInterpolator* pfi = pemitterCtlr->GetBirthRateInterpolator();
-            pfi->Update(0.0f, 0, fmaxEmissionRate);
+            pfi->Update(0.0f, nullptr, fmaxEmissionRate);
             fmaxEmissionRate = pemitter->m_fLifeSpan * fmaxEmissionRate;
             break;
         }
@@ -890,7 +889,7 @@ NiGeometry* Precipitation::CreateShaderGeometry(
     pdata->SetDataBlockCount(1u);
     // The data block takes the points as raw bytes.
     pdata->SetDataBlock(
-        0, static_cast<uint8_t*>(static_cast<void*>(pinstanceData)), sizeof(NiPoint3) * itotalVertices, 1
+        0, static_cast<uint8_t*>(static_cast<void*>(pinstanceData)), sizeof(NiPoint3) * itotalVertices, true
     );
     ourFree(pinstanceData);
     pdata->SetDataStream(0, 0, 0, 3u, itotalVertices, sizeof(NiPoint3), sizeof(NiPoint3));
@@ -965,7 +964,7 @@ NiAVObject* NiPSysMeshUpdateModifier::GetMeshAt(uint32_t uiIndex) {
 NiPSysModifier* NiParticleSystem::GetModifierAt(uint32_t uiIndex) {
     NiTListItem<NiPointer<NiPSysModifier>>* kIter;
     if (uiIndex >= m_kModifierList.m_uiCount) {
-        return 0;
+        return nullptr;
     }
     uint32_t uiCount = 0;
     kIter = m_kModifierList.m_pkHead;
@@ -976,5 +975,5 @@ NiPSysModifier* NiParticleSystem::GetModifierAt(uint32_t uiIndex) {
             return pkModifier;
         }
     }
-    return 0;
+    return nullptr;
 }

@@ -39,7 +39,7 @@ void HighActorCuller::Operate(MobileObject* apMob) {
                 pSphere->SetCenter(kbound.m_kCenter);
                 float fBoundRadius = kbound.m_fRadius;
                 spMBSphere.m_pObject->SetRadius(fBoundRadius);
-                BSPortalGraph* pgraph = 0;
+                BSPortalGraph* pgraph = nullptr;
                 if (TES::pInstance->pInteriorCell) {
                     pgraph = TES::pInstance->pInteriorCell->GetPortalGraph();
                 }
@@ -58,7 +58,7 @@ void HighActorCuller::Operate(MobileObject* apMob) {
                                 !spMBNode.m_pObject->VisibleAgainstActiveOccluders(
                                     Culler.m_pkCamera->GetWorldTranslate(), Culler, poccluder
                                 )) {
-                                pn->SetNotVisible(1);
+                                pn->SetNotVisible(true);
                             }
                         }
                     }

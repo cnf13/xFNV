@@ -60,7 +60,7 @@
 #include "SpeedTree/SpeedTreeRT.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 SettingT<GameSettingCollection> gs_fTreeNearDistanceBase("fTreeNearDistanceBase", 2048.0f);
 SettingT<GameSettingCollection> gs_fTreeFarDistanceBase("fTreeFarDistanceBase", 16384.0f);
@@ -91,10 +91,10 @@ bool TES_FreeTexture(TES* apTES, const char* apPath, uint32_t aiUser) {
     BSTexturePalette::GetTexture(apPath, spTexture);
     if (spTexture.m_pObject && spTexture.m_pObject->m_uiRefCount <= aiUser + 2) {
         BSTexturePalette::RemoveTexture(spTexture.m_pObject);
-        return 1;
+        return true;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -154,7 +154,7 @@ BSTreeManager::~BSTreeManager() {
 }
 
 void BSTreeManager::RemoveBackgroundLoadedTree(TESObjectREFR* apRef) {
-    BSTreeNode* a1 = 0;
+    BSTreeNode* a1 = nullptr;
     if (pBackgroundLoadedTreeMap->GetAt(apRef, a1)) {
         pBackgroundLoadedTreeMap->RemoveAt(apRef);
         if (a1) {
@@ -166,19 +166,19 @@ void BSTreeManager::RemoveBackgroundLoadedTree(TESObjectREFR* apRef) {
 BSTreeNode* BSTreeManager::CreateTreeForReference(TESObjectREFR* apTreeRefr, TESObjectTREE* apTreeObj) {
     FNVD_INLINED_LOCAL(NiPointer<BSTreeModel>, spbasemodel, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_TREEART, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp",
-        462
+        MEM_CONTEXT_TREEART, true,
+        "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp", 462
     );
-    ::new (&spbasemodel) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(0));
-    BSTreeModel* pmodel = 0;
+    ::new (&spbasemodel) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
+    BSTreeModel* pmodel = nullptr;
     if (!SpeedTree::bEnableTrees::Get() ||
         (!apTreeObj ||
          (!apTreeObj->GetModel() ||
           (!apTreeObj->GetModelLength() || (apTreeRefr && apTreeRefr->GetObjectReference() != apTreeObj))))) {
         spbasemodel.~NiPointer<BSTreeModel>();
-        return 0;
+        return nullptr;
     }
-    BSTreeNode* ptreeNode = 0;
+    BSTreeNode* ptreeNode = nullptr;
     if (pBackgroundLoadedTreeMap->GetAt(apTreeRefr, ptreeNode)) {
         pBackgroundLoadedTreeMap->RemoveAt(apTreeRefr);
         BSTreeNode* v15 = ptreeNode;
@@ -189,7 +189,7 @@ BSTreeNode* BSTreeManager::CreateTreeForReference(TESObjectREFR* apTreeRefr, TES
     if (apTreeRefr) {
         iseed = apTreeRefr->GetSeed();
     }
-    BSTreeManager* Singleton = BSTreeManager::GetInstance(1);
+    BSTreeManager* Singleton = BSTreeManager::GetInstance(true);
     Singleton->GetModel(apTreeObj, iseed, spbasemodel);
     if (!spbasemodel.m_pObject) {
         goto LABEL_23;
@@ -198,7 +198,7 @@ BSTreeNode* BSTreeManager::CreateTreeForReference(TESObjectREFR* apTreeRefr, TES
         if (!spbasemodel.m_pObject->InitFromBase(apTreeObj, iseed)) {
         LABEL_23:;
             spbasemodel.~NiPointer<BSTreeModel>();
-            return 0;
+            return nullptr;
         }
         pmodel = spbasemodel.m_pObject;
     }
@@ -209,7 +209,7 @@ BSTreeNode* BSTreeManager::CreateTreeForReference(TESObjectREFR* apTreeRefr, TES
             pmodel_2 = ::new (v13) BSTreeModel;
         }
         else {
-            pmodel_2 = 0;
+            pmodel_2 = nullptr;
         }
         pmodel = pmodel_2;
         if (!pmodel_2->InitAsInstance(spbasemodel.m_pObject)) {
@@ -230,13 +230,13 @@ BSTreeNode* BSTreeManager::CreateTreeForReference(TESObjectREFR* apTreeRefr, TES
         NiFixedString* a2 = &apString;
         pretnode->SetName(*a2);
     }
-    pmodel->SetInitialized(1);
+    pmodel->SetInitialized(true);
     spbasemodel.~NiPointer<BSTreeModel>();
     return pretnode;
 }
 
 void BSTreeManager::AddBackgroundLoadedTree(TESObjectREFR* apRef, BSTreeNode* apTreeNode) {
-    if (!pBackgroundLoadedTreeMap->SetAt(apRef, apTreeNode, static_cast<bool>(0))) {
+    if (!pBackgroundLoadedTreeMap->SetAt(apRef, apTreeNode, false)) {
         if (apTreeNode) {
             delete apTreeNode;
         }
@@ -245,10 +245,10 @@ void BSTreeManager::AddBackgroundLoadedTree(TESObjectREFR* apRef, BSTreeNode* ap
 
 NiPointer<BSTreeModel>* BSTreeManager::GetModelArray(TESObjectTREE* apTree) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_TREEART, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp",
-        216
+        MEM_CONTEXT_TREEART, true,
+        "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp", 216
     );
-    NiPointer<BSTreeModel>* pretval = 0;
+    NiPointer<BSTreeModel>* pretval = nullptr;
     if (apTree) {
         if (!pModelMap) {
             NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>* v4;
@@ -260,7 +260,7 @@ NiPointer<BSTreeModel>* BSTreeManager::GetModelArray(TESObjectTREE* apTree) {
                 v4 = ::new (v9) NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>(37u);
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             pModelMap = v4;
         }
@@ -277,24 +277,24 @@ NiPointer<BSTreeModel>* BSTreeManager::GetModelArray(TESObjectTREE* apTree) {
         }
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
 void BSTreeManager::GetModel(TESObjectTREE* apTree, uint32_t aiSeed, NiPointer<BSTreeModel>& aspBSTreeModel) {
     FNVD_INLINED_LOCAL(NiPointer<BSTreeModel>, sprettree, std::nullopt, std::nullopt);
-    BSTreeManager::kModelCriticalSection.Enter(0);
-    ::new (&sprettree) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(0));
+    BSTreeManager::kModelCriticalSection.Enter(nullptr);
+    ::new (&sprettree) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
     if (apTree) {
         NiPointer<BSTreeModel>* pmodelarray = GetModelArray(apTree);
         int32_t iemptyslot = -1;
-        bool bfound = 0;
+        bool bfound = false;
         for (int32_t i = 0; i < 1; ++i) {
             BSTreeModel* ptree = pmodelarray[i].m_pObject;
             if (ptree) {
                 if (ptree->iSeed == aiSeed) {
                     sprettree.operator=(ptree);
-                    bfound = 1;
+                    bfound = true;
                     break;
                 }
             }
@@ -312,7 +312,7 @@ void BSTreeManager::GetModel(TESObjectTREE* apTree, uint32_t aiSeed, NiPointer<B
                     v4 = ::new (apMemory) BSTreeModel;
                 }
                 else {
-                    v4 = 0;
+                    v4 = nullptr;
                 }
                 sprettree.operator=(v4);
                 pmodelarray[iemptyslot].operator=(sprettree);
@@ -387,7 +387,7 @@ BSTreeManager* BSTreeManager::GetInstance(bool abCreate) {
 void BSTreeManager::Create(bool abRecreateIfFound) {
     BSTreeManager* v1;
     AutoMemContext apMemory(
-        MEM_CONTEXT_TREESYSTEM, 1,
+        MEM_CONTEXT_TREESYSTEM, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp", 177
     );
     if (pTreeManager) {
@@ -401,7 +401,7 @@ void BSTreeManager::Create(bool abRecreateIfFound) {
         v1 = ::new (v2) BSTreeManager;
     }
     else {
-        v1 = 0;
+        v1 = nullptr;
     }
     pTreeManager = v1;
 }
@@ -417,15 +417,15 @@ void BSTreeManager::ClearCanopyShadow() {
 
 // Calls GetInstance again before each use of the model map, as the game does.
 void BSTreeManager::ClearModelCache(bool abClearManagerOnlyHeldOnly) {
-    if (BSTreeManager::GetInstance(1)->pModelMap) {
-        BSTreeManager::kModelCriticalSection.Enter(0);
+    if (BSTreeManager::GetInstance(true)->pModelMap) {
+        BSTreeManager::kModelCriticalSection.Enter(nullptr);
         if (abClearManagerOnlyHeldOnly) {
             NiTMapItem<TESObjectTREE*, NiPointer<BSTreeModel>*>* pPos =
-                BSTreeManager::GetInstance(1)->pModelMap->GetFirstPos();
+                BSTreeManager::GetInstance(true)->pModelMap->GetFirstPos();
             while (pPos) {
                 TESObjectTREE* pKey;
                 NiPointer<BSTreeModel>* pModelArray;
-                BSTreeManager::GetInstance(1)->pModelMap->GetNext(pPos, pKey, pModelArray);
+                BSTreeManager::GetInstance(true)->pModelMap->GetNext(pPos, pKey, pModelArray);
                 if (pModelArray) {
                     // Only models no one but the manager holds are released.
                     bool bOnlyHeldHere = true;
@@ -435,7 +435,7 @@ void BSTreeManager::ClearModelCache(bool abClearManagerOnlyHeldOnly) {
                                 bOnlyHeldHere = false;
                             }
                             else {
-                                pModelArray[i].operator=(static_cast<BSTreeModel*>(0));
+                                pModelArray[i].operator=(static_cast<BSTreeModel*>(nullptr));
                             }
                         }
                     }
@@ -443,40 +443,40 @@ void BSTreeManager::ClearModelCache(bool abClearManagerOnlyHeldOnly) {
                         if (pModelArray) {
                             delete[] pModelArray;
                         }
-                        pModelArray = 0;
-                        BSTreeManager::GetInstance(1)->pModelMap->RemoveAt(pKey);
-                        pPos = BSTreeManager::GetInstance(1)->pModelMap->GetFirstPos();
+                        pModelArray = nullptr;
+                        BSTreeManager::GetInstance(true)->pModelMap->RemoveAt(pKey);
+                        pPos = BSTreeManager::GetInstance(true)->pModelMap->GetFirstPos();
                     }
                 }
             }
-            if (BSTreeManager::GetInstance(1)->pModelMap->IsEmpty()) {
-                BSTreeManager::GetInstance(1)->pModelMap->RemoveAll();
+            if (BSTreeManager::GetInstance(true)->pModelMap->IsEmpty()) {
+                BSTreeManager::GetInstance(true)->pModelMap->RemoveAll();
                 NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>* pModelMap =
-                    BSTreeManager::GetInstance(1)->pModelMap;
+                    BSTreeManager::GetInstance(true)->pModelMap;
                 if (pModelMap) {
                     delete pModelMap;
                 }
-                BSTreeManager::GetInstance(1)->pModelMap = 0;
+                BSTreeManager::GetInstance(true)->pModelMap = nullptr;
             }
         }
         else {
             NiTMapItem<TESObjectTREE*, NiPointer<BSTreeModel>*>* pPos =
-                BSTreeManager::GetInstance(1)->pModelMap->GetFirstPos();
+                BSTreeManager::GetInstance(true)->pModelMap->GetFirstPos();
             while (pPos) {
                 TESObjectTREE* pKey;
                 NiPointer<BSTreeModel>* pModelArray;
-                BSTreeManager::GetInstance(1)->pModelMap->GetNext(pPos, pKey, pModelArray);
+                BSTreeManager::GetInstance(true)->pModelMap->GetNext(pPos, pKey, pModelArray);
                 if (pModelArray) {
                     delete[] pModelArray;
                 }
             }
-            BSTreeManager::GetInstance(1)->pModelMap->RemoveAll();
+            BSTreeManager::GetInstance(true)->pModelMap->RemoveAll();
             NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>* pModelMap =
-                BSTreeManager::GetInstance(1)->pModelMap;
+                BSTreeManager::GetInstance(true)->pModelMap;
             if (pModelMap) {
                 delete pModelMap;
             }
-            BSTreeManager::GetInstance(1)->pModelMap = 0;
+            BSTreeManager::GetInstance(true)->pModelMap = nullptr;
         }
         BSTreeManager::kModelCriticalSection.Leave();
     }
@@ -507,30 +507,30 @@ float BSTreeManager::GetFarDistance() {
 NiTexture* BSTreeManager::GetCanopyShadow() {
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_TREEART, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp",
-        629
+        MEM_CONTEXT_TREEART, true,
+        "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp", 629
     );
-    if (!BSTreeManager::GetInstance(1)->spCanopyShadow.m_pObject) {
+    if (!BSTreeManager::GetInstance(true)->spCanopyShadow.m_pObject) {
         if (TES::pInstance) {
-            BSTreeManager* Singleton = BSTreeManager::GetInstance(1);
+            BSTreeManager* Singleton = BSTreeManager::GetInstance(true);
             TES::pInstance->CreateTextureImage(
-                "Data\\Textures\\Trees\\CanopyShadow.dds", Singleton->spCanopyShadow, 1, 0
+                "Data\\Textures\\Trees\\CanopyShadow.dds", Singleton->spCanopyShadow, true, false
             );
         }
         else {
-            BSTreeManager::GetInstance(1)->spCanopyShadow.operator=(static_cast<NiSourceTexture*>(0));
+            BSTreeManager::GetInstance(true)->spCanopyShadow.operator=(static_cast<NiSourceTexture*>(nullptr));
         }
-        BSTreeManager* v1 = BSTreeManager::GetInstance(1);
+        BSTreeManager* v1 = BSTreeManager::GetInstance(true);
         BSShaderManager::SetProjectedShadowTexture(v1->spCanopyShadow.m_pObject);
     }
-    if (!BSTreeManager::GetInstance(1)->spCanopyShadow.m_pObject) {
+    if (!BSTreeManager::GetInstance(true)->spCanopyShadow.m_pObject) {
         NiPixelData* ppixeldata;
         NiPixelData* v10 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
         if (v10) {
             ppixeldata = ::new (v10) NiPixelData(16u, 16u, NiPixelFormat_RGB24, 1u, 1u);
         }
         else {
-            ppixeldata = 0;
+            ppixeldata = nullptr;
         }
         uint8_t* ppixels = ppixeldata->GetPixels(0u, 0u);
         for (uint32_t iy = 0; iy < 16; ++iy) {
@@ -544,12 +544,12 @@ NiTexture* BSTreeManager::GetCanopyShadow() {
         NiFixedString* v6 = ::new (static_cast<void*>(&apString)) NiFixedString("CanopyShadowTexture");
         const char* HandleString = v6->GetHandleString();
         NiSourceTexture* v5 = NiSourceTexture::Create(ppixeldata, HandleString, NiSourceTexture::ms_kDefaultPrefs);
-        BSTreeManager::GetInstance(1)->spCanopyShadow.operator=(v5);
+        BSTreeManager::GetInstance(true)->spCanopyShadow.operator=(v5);
         apString.~NiFixedString();
-        BSTreeManager* v3 = BSTreeManager::GetInstance(1);
+        BSTreeManager* v3 = BSTreeManager::GetInstance(true);
         BSShaderManager::SetProjectedShadowTexture(v3->spCanopyShadow.m_pObject);
     }
-    NiTexture* v8 = BSTreeManager::GetInstance(1)->spCanopyShadow.m_pObject;
+    NiTexture* v8 = BSTreeManager::GetInstance(true)->spCanopyShadow.m_pObject;
     return v8;
 }
 
@@ -575,24 +575,24 @@ void BSTreeManager::Update(NiCamera* apCamera, bool abMenuMode) {
         if (TES::pInstance) {
             if (TES::pInstance->pSky) {
                 if (TES::pInstance->pInteriorCell) {
-                    BSTreeManager::GetInstance(1)->fWindSpeed = 0.0f;
+                    BSTreeManager::GetInstance(true)->fWindSpeed = 0.0f;
                 }
                 else {
                     float windSpeed = TES::pInstance->pSky->fWindSpeed;
-                    BSTreeManager::GetInstance(1)->fWindSpeed = windSpeed;
+                    BSTreeManager::GetInstance(true)->fWindSpeed = windSpeed;
                 }
-                if (BSTreeManager::GetInstance(1)->spBillboardMatProp.m_pObject) {
+                if (BSTreeManager::GetInstance(true)->spBillboardMatProp.m_pObject) {
                     if (TES::pInstance->pSky->GetFog()) {
                         NiColor col = *&TES::pInstance->pSky->GetFog()->m_kColor;
-                        BSTreeManager* Singleton = BSTreeManager::GetInstance(1);
-                        BSTreeManager* v4 = BSTreeManager::GetInstance(1);
-                        BSTreeManager* v5 = BSTreeManager::GetInstance(1);
+                        BSTreeManager* Singleton = BSTreeManager::GetInstance(true);
+                        BSTreeManager* v4 = BSTreeManager::GetInstance(true);
+                        BSTreeManager* v5 = BSTreeManager::GetInstance(true);
                         v5->spBillboardMatProp.m_pObject->SetEmittance(col);
                     }
                 }
             }
         }
-        BSTreeManager* v6 = BSTreeManager::GetInstance(1);
+        BSTreeManager* v6 = BSTreeManager::GetInstance(true);
         v6->UpdateWindMatrices();
     }
     // SetProjectedShadowScale takes an unsigned int.
@@ -602,29 +602,29 @@ void BSTreeManager::Update(NiCamera* apCamera, bool abMenuMode) {
 }
 
 void BSTreeManager::SetForceFullLOD(bool abForce) {
-    BSTreeManager::GetInstance(1)->m_bForceFullLOD = (bool)((uint8_t)abForce);
+    BSTreeManager::GetInstance(true)->m_bForceFullLOD = (bool)((uint8_t)abForce);
 }
 
 bool BSTreeManager::GetForceFullLOD() {
-    return (bool)((uint8_t)BSTreeManager::GetInstance(1)->m_bForceFullLOD);
+    return (bool)((uint8_t)BSTreeManager::GetInstance(true)->m_bForceFullLOD);
 }
 
 void BSTreeManager::SetTreesEnabled(bool a1) {
-    BSTreeManager::GetInstance(1)->bShowTrees = (bool)((uint8_t)a1);
+    BSTreeManager::GetInstance(true)->bShowTrees = (bool)((uint8_t)a1);
 }
 
 BSXFlags* BSTreeManager::GetHavokFlags() {
-    BSTreeManager* singleton = BSTreeManager::GetInstance(1);
+    BSTreeManager* singleton = BSTreeManager::GetInstance(true);
     return singleton->spHavokFlags;
 }
 
 NiAlphaProperty* BSTreeManager::GetDistantBillboardAlphaProperty() {
-    BSTreeManager* singleton = BSTreeManager::GetInstance(1);
+    BSTreeManager* singleton = BSTreeManager::GetInstance(true);
     return singleton->spDistantAlphaProp;
 }
 
 void BSTreeManager::SetLeavesVisible(bool abShowLeaves) {
-    BSTreeManager::GetInstance(1)->bShowLeaves = (bool)((uint8_t)abShowLeaves);
+    BSTreeManager::GetInstance(true)->bShowLeaves = (bool)((uint8_t)abShowLeaves);
 }
 
 void BSTreeManager::operator delete(void* apMemory) {
@@ -632,14 +632,14 @@ void BSTreeManager::operator delete(void* apMemory) {
 }
 
 void BSTreeManager::ClearCanopyShadow_004F3310() {
-    TESRegionDataLandscape::spDefaultFullMaskTextureProp.operator=(static_cast<NiTexturingProperty*>(0));
-    TESRegionDataLandscape::spDefaultEmptyMaskTextureProp.operator=(static_cast<NiTexturingProperty*>(0));
+    TESRegionDataLandscape::spDefaultFullMaskTextureProp.operator=(static_cast<NiTexturingProperty*>(nullptr));
+    TESRegionDataLandscape::spDefaultEmptyMaskTextureProp.operator=(static_cast<NiTexturingProperty*>(nullptr));
 }
 
 void BSTreeManager::Destroy() {
     if (pTreeManager) {
         delete pTreeManager;
-        pTreeManager = 0;
+        pTreeManager = nullptr;
     }
 }
 

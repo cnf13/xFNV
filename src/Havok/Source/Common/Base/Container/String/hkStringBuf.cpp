@@ -57,7 +57,7 @@ hkStringBuf::~hkStringBuf() {}
 
 // Compares s with the last characters before the terminating zero; the sizes compare signed.
 int32_t hkStringBuf::endsWith(const char* s) const {
-    int32_t ilen = static_cast<int32_t>(hkString::strLen(s));
+    int32_t ilen = hkString::strLen(s);
     int32_t isize = m_string.m_size;
     if (ilen > isize - 1) {
         return 0;
@@ -80,7 +80,7 @@ hkBool hkStringBuf::operator<(const char* other) const {
 
 // The insertion point is the terminating zero, read before the allocator is fetched.
 hkStringBuf& hkStringBuf::operator+=(const char* other) {
-    int32_t len = static_cast<int32_t>(hkString::strLen(other));
+    int32_t len = hkString::strLen(other);
     int32_t index = m_string.m_size - 1;
     m_string._insertAt(*hkMemoryRouter::getInstance().m_temp, index, other, len);
     return *this;
@@ -182,10 +182,10 @@ void hkStringBuf::appendJoin(
 ) {
     const char* strings[7] = {s0, s1, s2, s3, s4, s5, nullptr};
     int32_t sizes[6] = {0, 0, 0, 0, 0, 0};
-    const int32_t iOldLength = static_cast<int32_t>(m_string.m_size) - 1;
+    const int32_t iOldLength = m_string.m_size - 1;
     int32_t iNewLength = iOldLength;
     for (int32_t i = 0; strings[i] != nullptr; ++i) {
-        sizes[i] = static_cast<int32_t>(hkString::strLen(strings[i]));
+        sizes[i] = hkString::strLen(strings[i]);
         iNewLength += sizes[i];
     }
     const int32_t iNumBytes = iNewLength + 1;
@@ -210,7 +210,7 @@ void hkStringBuf::appendJoin(
 // The length is measured before the temp allocator is fetched.
 void hkStringBuf::insert(int32_t pos, const char* s, int32_t len) {
     if (len < 0) {
-        len = static_cast<int32_t>(hkString::strLen(s));
+        len = hkString::strLen(s);
     }
     m_string._insertAt(*hkMemoryRouter::getInstance().m_temp, pos, s, len);
 }
@@ -525,7 +525,7 @@ int32_t hkStringBuf::indexOfCase(const char* needle) {
     if (!*static_cast<hkArrayBase<char>&>(static_cast<hkArray<char, hkContainerTempAllocator>&>(m_string)).begin()) {
         return -1;
     }
-    while (1) {
+    while (true) {
         char v4 = *needle;
         int32_t v5 = 0;
         if (*needle) {
@@ -598,7 +598,7 @@ int32_t hkStringBuf::endsWithCase(const char* s) {
         return 1;
     }
     char* v9 = &m_string.m_data[v7];
-    while (1) {
+    while (true) {
         char v10 = v9[v8];
         if (static_cast<uint8_t>(v10 - 65) <= 25u) {
             v10 = v9[v8] + 32;

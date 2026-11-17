@@ -2,7 +2,7 @@
 
 #include "BSSystem/BSTMessageQueue.h"
 
-typedef void (*UnpackFunc)(BSPackedTask* apTask);
+using UnpackFunc = void (*)(BSPackedTask* apTask);
 
 // A queue of packed tasks (BSPackedTask) with the function that unpacks and runs them.
 class BSPackedTaskQueue {

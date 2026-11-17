@@ -159,9 +159,9 @@ void hkSweptTransformUtil::lerp2(const hkSweptTransform& sweptTrans, float t, hk
     float v18 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v17[0])));
     v19[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v20 = _mm_cmpeq_ss(v17, v19);
-    v19[0] = 3.0f - static_cast<float>(static_cast<float>(v17[0] * v18) * v18);
+    v19[0] = 3.0f - ((v17[0] * v18) * v18);
     __m128 v21 = _mm_setzero_ps();
-    v21[0] = static_cast<float>(0.5f * v18) * v19[0];
+    v21[0] = (0.5f * v18) * v19[0];
     __m128 v22 = _mm_andnot_ps(v20, v21);
     arQuaternion.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(v22, v22, 0), v14);
     transformOut.m_rotation.set(arQuaternion);
@@ -213,7 +213,7 @@ void hkSweptTransformUtil::backStepMotionState(float time, hkMotionState& motion
     v6.m_vec.m_quad = _mm_add_ps(v3.m_vec.m_quad, v4.m_vec.m_quad);
     __m128 v7 = _mm_mul_ps(v6.m_vec.m_quad, v6.m_vec.m_quad);
     __m128 v8 = _mm_add_ps(_mm_shuffle_ps(v7, v7, 78), v7);
-    double v9 = static_cast<float>(_mm_shuffle_ps(v8, v8, 177)[0] + v8[0]);
+    double v9 = (_mm_shuffle_ps(v8, v8, 177)[0] + v8[0]);
     motionState.m_sweptTransform.m_rotation1.m_vec.m_quad = v6.m_vec.m_quad;
     float v26 = 0.75 - 0.125 * v9;
     *reinterpret_cast<float*>(&v27) = (1.5 - v9 * 0.5 * v26 * v26) * v26;
@@ -242,9 +242,9 @@ void hkSweptTransformUtil::backStepMotionState(float time, hkMotionState& motion
     float v19 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v18[0])));
     v20[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v21 = _mm_cmpeq_ss(v18, v20);
-    v20[0] = 3.0f - static_cast<float>(static_cast<float>(v18[0] * v19) * v19);
+    v20[0] = 3.0f - ((v18[0] * v19) * v19);
     __m128 v22 = _mm_setzero_ps();
-    v22[0] = static_cast<float>(0.5f * v19) * v20[0];
+    v22[0] = (0.5f * v19) * v20[0];
     __m128 v23 = _mm_andnot_ps(v21, v22);
     __m128 v24 = _mm_mul_ps(_mm_shuffle_ps(v23, v23, 0), p_m_rotation1->m_vec.m_quad);
     (*p_m_rotation1).m_vec.m_quad = v24;
@@ -313,7 +313,7 @@ void hkSweptTransformUtil::freezeMotionState(float time, hkMotionState& motionSt
     float v31 = (v2 - motionState.m_sweptTransform.m_centerOfMass0.m_quad[3]) *
         motionState.m_sweptTransform.m_centerOfMass1.m_quad[3];
     __m128 v8 = _mm_add_ps(_mm_shuffle_ps(v7, v7, 78), v7);
-    double v9 = static_cast<float>(_mm_shuffle_ps(v8, v8, 177)[0] + v8[0]);
+    double v9 = (_mm_shuffle_ps(v8, v8, 177)[0] + v8[0]);
     motionState.m_sweptTransform.m_rotation1.m_vec.m_quad = v6.m_vec.m_quad;
     float v26 = 0.75 - 0.125 * v9;
     *reinterpret_cast<float*>(&v27) = (1.5 - v9 * 0.5 * v26 * v26) * v26;
@@ -341,9 +341,9 @@ void hkSweptTransformUtil::freezeMotionState(float time, hkMotionState& motionSt
     float v18 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v17[0])));
     v19[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v20 = _mm_cmpeq_ss(v17, v19);
-    v19[0] = 3.0f - static_cast<float>(static_cast<float>(v17[0] * v18) * v18);
+    v19[0] = 3.0f - ((v17[0] * v18) * v18);
     __m128 v21 = _mm_setzero_ps();
-    v21[0] = static_cast<float>(0.5f * v18) * v19[0];
+    v21[0] = (0.5f * v18) * v19[0];
     __m128 v22 = _mm_andnot_ps(v20, v21);
     p_m_rotation1->m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(v22, v22, 0), p_m_rotation1->m_vec.m_quad);
     v23.m_quad = motionState.m_sweptTransform.m_centerOfMass0.m_quad;
@@ -481,9 +481,9 @@ void hkSweptTransformUtil::lerp2Ha(
     float v19 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v18[0])));
     v20[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v21 = _mm_cmpeq_ss(v18, v20);
-    v20[0] = 3.0f - static_cast<float>(static_cast<float>(v18[0] * v19) * v19);
+    v20[0] = 3.0f - ((v18[0] * v19) * v19);
     __m128 v22 = _mm_setzero_ps();
-    v22[0] = static_cast<float>(0.5f * v19) * v20[0];
+    v22[0] = (0.5f * v19) * v20[0];
     __m128 v23 = _mm_andnot_ps(v21, v22);
     arQuaternion.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(v23, v23, 0), v15);
     transformOut.m_rotation.set(arQuaternion);
@@ -554,9 +554,9 @@ void hkSweptTransformUtil::lerp2Rel(const hkSweptTransform& sweptTrans, float r,
     float v18 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v17[0])));
     v19[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v20 = _mm_cmpeq_ss(v17, v19);
-    v19[0] = 3.0f - static_cast<float>(static_cast<float>(v17[0] * v18) * v18);
+    v19[0] = 3.0f - ((v17[0] * v18) * v18);
     __m128 v21 = _mm_setzero_ps();
-    v21[0] = static_cast<float>(0.5f * v18) * v19[0];
+    v21[0] = (0.5f * v18) * v19[0];
     __m128 v22 = _mm_andnot_ps(v20, v21);
     arQuaternion.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(v22, v22, 0), v14);
     transformOut.m_rotation.set(arQuaternion);

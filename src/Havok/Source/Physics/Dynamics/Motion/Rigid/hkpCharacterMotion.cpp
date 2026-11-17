@@ -157,9 +157,8 @@ void hkpCharacterMotion::getProjectedPointVelocity(
         ),
         m_angularVelocity.m_quad
     );
-    a3 =
-        static_cast<float>(_mm_shuffle_ps(v7, v7, 170)[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])) +
-        static_cast<float>(_mm_shuffle_ps(v6, v6, 170)[0] + static_cast<float>(_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]));
+    a3 = (_mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])) +
+        (_mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]));
     a4 = m_inertiaAndMassInv.m_quad[3];
 }
 

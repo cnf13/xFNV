@@ -33,7 +33,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 #include "Reconstruction.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 
 extern float fMaxDecalWidthSmall;
 extern float fMaxDecalWidthLarge;
@@ -175,7 +175,7 @@ void DecalCaster::Init(float afRadius, uint32_t aiGroup) {
 }
 
 bhkWorld* DecalCaster::GetWorld() {
-    bhkWorld* v4 = 0;
+    bhkWorld* v4 = nullptr;
     if (spShapePhantom.m_pObject) {
         bhkSimpleShapePhantom* v3 = spShapePhantom.m_pObject;
         const hkpWorld* v1 = v3->GethkWorld();
@@ -185,7 +185,7 @@ bhkWorld* DecalCaster::GetWorld() {
 }
 
 NiAVObject* DecalCaster::GetAVObject(uint32_t aiIndex) {
-    NiAVObject* v6 = 0;
+    NiAVObject* v6 = nullptr;
     const hkpRootCdPoint* Collision = &GetCollision(aiIndex);
     if (Collision->m_rootCollidableB) {
         hkpWorldObject* apBody = static_cast<hkpWorldObject*>(Collision->m_rootCollidableB->getOwner());
@@ -222,7 +222,7 @@ DecalCaster* DecalCaster::GetInstance(float afDecalRadius, bool abCreate) {
                 v7 = ::new (v9) DecalCaster(afRadiusa, NewSystemGroup);
             }
             else {
-                v7 = 0;
+                v7 = nullptr;
             }
             DecalCaster::pSmallInstance = v7;
         }
@@ -238,7 +238,7 @@ DecalCaster* DecalCaster::GetInstance(float afDecalRadius, bool abCreate) {
                 v8 = ::new (apMemory) DecalCaster(afRadius, v5);
             }
             else {
-                v8 = 0;
+                v8 = nullptr;
             }
             DecalCaster::pLargeInstance = v8;
         }
@@ -254,18 +254,18 @@ void DecalCaster::ClearInstance() {
     if (DecalCaster::pLargeInstance) {
         delete DecalCaster::pLargeInstance;
     }
-    DecalCaster::pLargeInstance = 0;
+    DecalCaster::pLargeInstance = nullptr;
     if (DecalCaster::pSmallInstance) {
         delete DecalCaster::pSmallInstance;
     }
-    DecalCaster::pSmallInstance = 0;
+    DecalCaster::pSmallInstance = nullptr;
 }
 
 void bhkShapePhantom::GetPenetrations(hkpCdBodyPairCollector* arCollector) {
     hkpSimpleShapePhantom* v3 = static_cast<hkpSimpleShapePhantom*>(operator*());
     if (v3) {
         if (v3->m_world) {
-            v3->getPenetrations(*arCollector, 0);
+            v3->getPenetrations(*arCollector, nullptr);
         }
     }
 }

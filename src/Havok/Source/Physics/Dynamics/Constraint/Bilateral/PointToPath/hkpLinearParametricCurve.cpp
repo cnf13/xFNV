@@ -262,8 +262,8 @@ LABEL_6:;
     v15[0] = 0.0f;
     __m128 v16 = _mm_setzero_ps();
     v16[0] = 0.5f;
-    float v18 = 3.0f - static_cast<float>(static_cast<float>(v13[0] * v14) * v14);
-    v16[0] = static_cast<float>(0.5f * v14) * v18;
+    float v18 = 3.0f - ((v13[0] * v14) * v14);
+    v16[0] = (0.5f * v14) * v18;
     __m128 v20 = _mm_andnot_ps(_mm_cmpeq_ss(v13, v15), v16);
     tangent.m_quad = _mm_mul_ps(_mm_shuffle_ps(v20, v20, 0), v9);
     float v61 = 1.0 / m_smoothingFactor;
@@ -285,8 +285,8 @@ LABEL_6:;
         v27[0] = v27[0] + v26;
         float v28 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v27[0])));
         __m128 v29 = _mm_cmpeq_ss(v27, v15);
-        float v30 = 3.0f - static_cast<float>(static_cast<float>(v27[0] * v28) * v28);
-        v16[0] = static_cast<float>(0.5f * v28) * v30;
+        float v30 = 3.0f - ((v27[0] * v28) * v28);
+        v16[0] = (0.5f * v28) * v30;
         __m128 v32 = _mm_andnot_ps(v29, v16);
         __m128 v33 = _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v62)), _mm_set_ss(std::bit_cast<float>(v62)), 0);
         __m128 v34 = _mm_add_ps(
@@ -298,8 +298,8 @@ LABEL_6:;
         __m128 v36 = _mm_shuffle_ps(v35, v35, 170);
         v36[0] = v36[0] + v23[0];
         float v37 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v36[0])));
-        float v39 = 3.0f - static_cast<float>(static_cast<float>(v36[0] * v37) * v37);
-        v16[0] = static_cast<float>(0.5f * v37) * v39;
+        float v39 = 3.0f - ((v36[0] * v37) * v37);
+        v16[0] = (0.5f * v37) * v39;
         __m128 v41 = _mm_andnot_ps(_mm_cmpeq_ss(v36, v15), v16);
         v56 = v6;
         tangent.m_quad = _mm_mul_ps(_mm_shuffle_ps(v41, v41, 0), v34);
@@ -313,9 +313,9 @@ LABEL_6:;
         *reinterpret_cast<float*>(&v63) = v21 * (v22 * (v11 - v59));
         v45[0] = v45[0] + v44;
         float v46 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v45[0])));
-        float v47 = 3.0f - static_cast<float>(static_cast<float>(v45[0] * v46) * v46);
+        float v47 = 3.0f - ((v45[0] * v46) * v46);
         __m128 v48 = _mm_cmpeq_ss(v45, v15);
-        v16[0] = static_cast<float>(0.5f * v46) * v47;
+        v16[0] = (0.5f * v46) * v47;
         __m128 v50 = _mm_andnot_ps(v48, v16);
         __m128 v51 = _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v63)), _mm_set_ss(std::bit_cast<float>(v63)), 0);
         __m128 v52 = _mm_add_ps(
@@ -327,8 +327,7 @@ LABEL_6:;
         __m128 v54 = _mm_shuffle_ps(v53, v53, 170);
         v54[0] = v54[0] + v42[0];
         v42[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v54[0])));
-        v16[0] = static_cast<float>(0.5f * v42[0]) *
-            static_cast<float>(3.0f - static_cast<float>(static_cast<float>(v54[0] * v42[0]) * v42[0]));
+        v16[0] = (0.5f * v42[0]) * (3.0f - ((v54[0] * v42[0]) * v42[0]));
         __m128 v55 = _mm_andnot_ps(_mm_cmpeq_ss(v54, v15), v16);
         v24->m_quad = _mm_mul_ps(_mm_shuffle_ps(v55, v55, 0), v52);
     }
@@ -441,7 +440,7 @@ void hkpLinearParametricCurve::getPointsToDraw(hkArray<hkVector4, hkContainerHea
 void hkpLinearParametricCurve::transformPoints(const hkTransform& transformation) {
     int32_t m_size;
     int32_t v4;
-    m_size = (int32_t)m_points.m_size;
+    m_size = m_points.m_size;
     if (m_size > 0) {
         v4 = 0;
         do {

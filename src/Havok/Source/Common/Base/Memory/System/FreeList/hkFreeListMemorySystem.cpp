@@ -155,7 +155,7 @@ hkResult hkFreeListMemorySystem::mainQuit(hkFlags<hkMemorySystem::FlagBits, int3
         m_systemAllocator->blockFree(
             m_solverAllocator.m_bufferStart, m_solverAllocator.m_bufferEnd - m_solverAllocator.m_bufferStart
         );
-        m_solverAllocator.setBuffer(0, 0);
+        m_solverAllocator.setBuffer(nullptr, 0);
         v2 = flags.get();
     }
     if ((v2 & 1) != 0) {
@@ -165,7 +165,7 @@ hkResult hkFreeListMemorySystem::mainQuit(hkFlags<hkMemorySystem::FlagBits, int3
         hkFreeListAllocator* pFreeListAllocator = &m_freeListAllocator;
         pFreeListAllocator->garbageCollect();
     }
-    m_systemAllocator = 0;
+    m_systemAllocator = nullptr;
     return HK_SUCCESS;
 }
 

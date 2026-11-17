@@ -32,7 +32,7 @@ void CombatProcedureEvade::Update() {
         if (eState == CombatProcedureEvade::EVADE_STATE_EVADING) {
             if (pattacker->DidPathingFail()) {
                 if (!pattacker->IsPathValid() && this->iLocation == 12) {
-                    pcombatState->BoostConfidence(0);
+                    pcombatState->BoostConfidence(false);
                 }
                 pcombatState->ClearCombatLocation();
                 if (pattacker->IsPathValid()) {
@@ -56,22 +56,22 @@ void CombatProcedureEvade::Update() {
         attackerLocation = pattacker->GetLocationOnReference();
         PathingRequestFlee fleeRequest;
         fleeRequest.Initialize(pattacker);
-        float a2 = pattacker->GetHeading(0);
+        float a2 = pattacker->GetHeading(false);
         fleeRequest.SetInitialPathHeading(a2);
         if (pattacker->IsCreature()) {
             TESActorBaseData* v6 = static_cast<TESActorBaseData*>(pattacker->GetActorBase());
             fleeRequest.SetCantOpenDoors(v6->GetCantOpenDoors());
         }
-        PathingAvoidNodeArray* pavoidNodeArray = 0;
+        PathingAvoidNodeArray* pavoidNodeArray = nullptr;
         int32_t iLocation = this->iLocation;
         if (iLocation == 10 || iLocation == 12) {
             fleeRequest.SetMinFleeDistance(fCombatFleeNormalDistance.Float());
             fleeRequest.SetNoDestination();
-            pavoidNodeArray = pCombatController->pCombatGroup->CreateFleeAvoidNodeArray(pattacker, 0);
+            pavoidNodeArray = pCombatController->pCombatGroup->CreateFleeAvoidNodeArray(pattacker, nullptr);
         }
         else {
             if (iLocation == 14) {
-                pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, DC_AVOID_THREAT, 1);
+                pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, DC_AVOID_THREAT, true);
                 fleeRequest.SetMinFleeDistance(128.0f);
                 if (pattacker->GetCurrentPathfindingGoal_008B3840(&destination)) {
                     PathingLocation apMemory(destination, pattacker);
@@ -83,12 +83,12 @@ void CombatProcedureEvade::Update() {
                 }
                 pavoidNodeArray = pCombatManager->pThreatMap->CreateAvoidNodeArray(attackerLocation, pattacker, -1.0f);
                 pavoidNodeArray = pCombatController->pCombatGroup->CreateMovementAvoidNodeArray(
-                    pattacker, attackerLocation, 384.0f, pavoidNodeArray, 0
+                    pattacker, attackerLocation, 384.0f, pavoidNodeArray, nullptr
                 );
             }
         }
         fleeRequest.SetAvoidNodeArray(pavoidNodeArray);
-        fleeRequest.SetAllowIncompletePath(1);
+        fleeRequest.SetAllowIncompletePath(true);
         if (pattacker->SetPathfindingHide(&fleeRequest)) {
             this->eState = CombatProcedureEvade::EVADE_STATE_EVADING;
             SetMoveMode(3);

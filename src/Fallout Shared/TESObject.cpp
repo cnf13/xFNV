@@ -148,8 +148,8 @@
 #include "SDK/MSVC/stdexcept.h"
 #include "SDK/MSVC/string.h"
 
+#include <cstdint>
 #include <memory>
-#include <stdint.h>
 #include <string>
 
 void DestroyRange(float* _First, float* _Last, [[maybe_unused]] std::allocator<float>& _Al) {
@@ -215,7 +215,7 @@ NiAVObject* TESObject::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
 void TESObject::UnClone3D(TESObjectREFR* apRequester) {
     FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     if (this == pDoorMarker || this == pTravelMarker) {
-        apRequester = 0;
+        apRequester = nullptr;
     }
     const char* pworldFilename = GetModelFileName(apRequester);
     if (pworldFilename) {
@@ -227,10 +227,10 @@ void TESObject::UnClone3D(TESObjectREFR* apRequester) {
                 char cPath[264];
                 GetScaledModelFileName(apRequester, cPath);
                 pModelLoader->ReleaseFile(cPath);
-                bool blastCopy = 1;
-                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(0));
+                bool blastCopy = true;
+                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
                 if (pModelLoader->FindModel(cPath, spmodel) && spmodel.m_pObject->iManualRefCount > 0) {
-                    blastCopy = 0;
+                    blastCopy = false;
                 }
                 if (blastCopy) {
                     pModelLoader->ReleaseFile(pworldFilename);
@@ -287,7 +287,7 @@ bool TESObject::IsMarker() {
 
 bool TESObject::IsOcclusionMarker() {
     if (!this) {
-        return 0;
+        return false;
     }
     return GetFormType() == 32 && (pRoomMarker == this || (pPlaneMarker == this || pPortalMarker == this));
 }
@@ -297,19 +297,19 @@ bool TESObject::ReplaceModel() {
     NiNode* v3 = static_cast<NiNode*>(LoadGraphics(nullptr));
     v3->UpdateProperties();
     a2.~NiUpdateData();
-    ::new (&a2) NiUpdateData(0.0, 0, 0);
+    ::new (&a2) NiUpdateData(0.0, false, false);
     v3->Update(a2);
-    return (bool)1;
+    return true;
 }
 
 NiAVObject* TESObject::LoadGraphics(TESObjectREFR* apRef) {
     FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel_2, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     const char* pworldFilename = GetModelFileName(apRef);
-    NiAVObject* pData3D = 0;
+    NiAVObject* pData3D = nullptr;
     if (apRef && (apRef->IsMarker() && apRef->GetObjectReference()->GetFormType() != LIGH_ID)) {
         NiAVObject* pData3D_2;
-        ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(0));
+        ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
         pModelLoader->FindModel(pworldFilename, spmodel);
         if (spmodel.m_pObject) {
             spmodel.m_pObject->IncManualRefCount();
@@ -319,7 +319,7 @@ NiAVObject* TESObject::LoadGraphics(TESObjectREFR* apRef) {
             pData3D_2 = ::new (apMemory) BSFadeNode;
         }
         else {
-            pData3D_2 = 0;
+            pData3D_2 = nullptr;
         }
         pData3D = pData3D_2;
         NiPointer<Model>::Destroy(&spmodel);
@@ -330,7 +330,7 @@ NiAVObject* TESObject::LoadGraphics(TESObjectREFR* apRef) {
             if (apRef->GetScale() != 1.0) {
                 char cScaledPath[264];
                 GetScaledModelFileName(apRef, cScaledPath);
-                ::new (&spmodel_2) NiPointer<Model>(static_cast<Model*>(0));
+                ::new (&spmodel_2) NiPointer<Model>(static_cast<Model*>(nullptr));
                 pModelLoader->FindModel(cScaledPath, spmodel_2);
                 if (spmodel_2.m_pObject) {
                     spmodel_2.m_pObject->IncManualRefCount();
@@ -341,7 +341,7 @@ NiAVObject* TESObject::LoadGraphics(TESObjectREFR* apRef) {
             }
         }
         if (!pData3D) {
-            return pModelLoader->LoadFile(pworldFilename, elod, 1, 0, 0, 0);
+            return pModelLoader->LoadFile(pworldFilename, elod, true, false, false, false);
         }
     }
     return pData3D;
@@ -352,7 +352,7 @@ NiAVObject* TESObject::Get3D() {
 }
 
 const char* TESObject::GetModelFileName(TESObjectREFR* apRef) {
-    const char* pPath = 0;
+    const char* pPath = nullptr;
     if (apRef) {
         pPath = apRef->GetModel();
     }
@@ -420,10 +420,10 @@ bool TESBoundObject::Activate(
 ) {
     Actor* v7 = dynamic_cast<Actor*>(apActionRef);
     if ((!v7) || (!apItemActivated)) {
-        return (bool)0;
+        return false;
     }
     v7->PickUpObject(apItemActivated, aicount, abIdFlag);
-    return (bool)1;
+    return true;
 }
 
 // The requester's copy of this object's 3D. A loaded model that only this caller holds is shared as is, unless the
@@ -595,17 +595,17 @@ bool TESBoundObject::ReplaceModel() {
 }
 
 NiAVObject* TESBoundObject::Clone3D(TESObjectREFR* pRequester) {
-    return Clone3D(pRequester, 0);
+    return Clone3D(pRequester, false);
 }
 
 bool TESBoundObject::ReplaceModel(const char* pfilename) {
     const char* Model_ = TESModel::GetModel(this);
     pModelLoader->ReleaseFile(Model_);
-    NiNode* v6 = static_cast<NiNode*>(LoadGraphics(0));
+    NiNode* v6 = static_cast<NiNode*>(LoadGraphics(nullptr));
     v6->UpdateProperties();
-    NiUpdateData a2(0.0, 0, 0);
+    NiUpdateData a2(0.0, false, false);
     v6->Update(a2);
-    return 1;
+    return true;
 }
 
 // Half the length of the bound box's diagonal.
@@ -654,12 +654,12 @@ TESBoundTreeObject::TESBoundTreeObject() {}
 TESBoundTreeObject::~TESBoundTreeObject() {}
 
 NiAVObject* TESBoundTreeObject::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
-    BSTreeNode* pnode = 0;
+    BSTreeNode* pnode = nullptr;
     if (GetFormType() != TREE_ID) {
-        return 0;
+        return nullptr;
     }
-    if (BSTreeManager::GetInstance(1)) {
-        BSTreeManager* Singleton = BSTreeManager::GetInstance(1);
+    if (BSTreeManager::GetInstance(true)) {
+        BSTreeManager* Singleton = BSTreeManager::GetInstance(true);
         pnode = Singleton->CreateTreeForReference(pRequester, static_cast<TESObjectTREE*>(this));
     }
     RefreshBound(pnode);
@@ -696,7 +696,7 @@ TESObject* TESObjectList::lnk_Place(TESObject* lpPrev, TESObject* lpNew) {
         lpPrev->nod_lpNext = lpNew;
     }
     else {
-        lpNew->nod_lpNext = 0;
+        lpNew->nod_lpNext = nullptr;
     }
     if (!lnk_GetNext(lpNew)) {
         lnk_lpTail = lpNew;
@@ -728,7 +728,7 @@ void TESObjectList::lnk_Remove(TESObject* lpNode) {
     if (pNext) {
         pNext->nod_lpPrev = lpNode->nod_lpPrev;
     }
-    lpNode->m_pParentList = 0;
+    lpNode->m_pParentList = nullptr;
     --lnk_dwCount;
 }
 
@@ -741,8 +741,8 @@ void TESObjectList::lnk_Destroy() {
         lnk_lpTail = pPrev;
     }
     lnk_dwCount = 0;
-    lnk_lpRoot = 0;
-    lnk_lpTail = 0;
+    lnk_lpRoot = nullptr;
+    lnk_lpTail = nullptr;
 }
 
 TESObject* TESObjectList::lnk_GetPrev(TESObject* lpNode) {

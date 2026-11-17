@@ -350,16 +350,16 @@ bool HeapArray<UidItem>::hasElement(const UidItem& e) const {
     int32_t m_size = m_elems.m_size;
     int32_t v3 = 0;
     if (m_size <= 0) {
-        return 0;
+        return false;
     }
     for (UidItem* i = m_elems.m_data; static_cast<uint32_t>(e.uid) != static_cast<uint32_t>(i->uid) ||
          static_cast<uint32_t>(e.uid >> 32) != static_cast<uint32_t>(i->uid >> 32);
          ++i) {
         if (++v3 >= m_size) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 // Whether patchIndex is among the patches current depends on, directly or through their own dependencies; visited
@@ -1269,7 +1269,7 @@ hkVersionPatchManager::applyPatches(hkDataWorldDict& worldToUpdate, const hkClas
     if ((m_patchIndexFromUid.m_map.m_numElems &
          hkMapBase<uint64_t, uint64_t, hkMapOperations<uint64_t>>::NUM_ELEMS_MASK) != 0 ||
         (!m_patchInfos.m_size || (result = recomputePatchDependencies(), result != HK_FAILURE))) {
-        apArray.m_data = 0;
+        apArray.m_data = nullptr;
         apArray.m_size = 0;
         apArray.m_capacityAndFlags = hkArrayBase<const hkVersionPatchManager::PatchInfo*>::DONT_DEALLOCATE_FLAG;
         hkResult v6 = preparePatches(worldToUpdate, *v3, apArray);

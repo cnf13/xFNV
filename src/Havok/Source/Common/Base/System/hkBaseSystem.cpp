@@ -213,11 +213,11 @@ hkResult hkBaseSystem::quit() {
         if (hkError::s_instance) {
             hkError::s_instance->removeReferenceLockUnchecked();
         }
-        hkError::s_instance = 0;
+        hkError::s_instance = nullptr;
         if (hkFileSystem::s_instance) {
             hkFileSystem::s_instance->removeReferenceLockUnchecked();
         }
-        hkFileSystem::s_instance = 0;
+        hkFileSystem::s_instance = nullptr;
         hkBaseSystem::quitThread();
         hkBaseSystemIsInitialized.m_bool = 0;
     }

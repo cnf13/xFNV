@@ -80,7 +80,7 @@ void hkpConstraintViewer::postSimulationCallback(hkpWorld* world) {
 
 void hkpConstraintViewer::worldAddedCallback(hkpWorld* world) {
     if (this == nullptr) {
-        world->addWorldPostSimulationListener(0);
+        world->addWorldPostSimulationListener(nullptr);
     }
     else {
         world->addWorldPostSimulationListener(this);
@@ -89,7 +89,7 @@ void hkpConstraintViewer::worldAddedCallback(hkpWorld* world) {
 
 void hkpConstraintViewer::worldRemovedCallback(hkpWorld* world) {
     if (this == nullptr) {
-        world->removeWorldPostSimulationListener(0);
+        world->removeWorldPostSimulationListener(nullptr);
     }
     else {
         world->removeWorldPostSimulationListener(this);
@@ -226,7 +226,7 @@ hkProcess* hkpConstraintViewer::create(const hkArray<hkProcessContext*, hkContai
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

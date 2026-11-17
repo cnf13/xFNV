@@ -38,8 +38,8 @@
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
 
+#include <cstdint>
 #include <cstring>
-#include <stdint.h>
 
 NiCriticalSection NiStream::ms_kCleanupCriticalSection;
 NiSemaphore NiStream::m_kSemaphore(0, 1);
@@ -182,7 +182,7 @@ NiStream::NiStream()
     m_kAffinity.m_eIdealProcessor = NiProcessorAffinity::PROCESSOR_DONT_CARE;
     m_kAffinity.m_uiAffinityMask = -1;
     m_acLastErrorMessage[0] = 0;
-    bUseDefaultPath = 1;
+    bUseDefaultPath = true;
 }
 
 NiStream::~NiStream() {
@@ -214,7 +214,7 @@ bool NiStream::Load(const char* pcFileName) {
     }
     m_uiLastError = NiStream::FILE_NOT_LOADED;
     strcpy_s(m_acLastErrorMessage, 260, "Cannot open file.");
-    return 0;
+    return false;
 }
 
 bool NiStream::Load(char* pcBuffer, int32_t iBufferSize) {
@@ -256,7 +256,7 @@ bool NiStream::Save(const char* pcFileName) {
         }
         delete pkOstr;
     }
-    return 0;
+    return false;
 }
 
 // Builds a default NiMemStream in a local buffer, saves through Save(NiBinaryStream*), hands out the buffer and its end
@@ -782,7 +782,7 @@ void NiStream::LoadFixedString(NiFixedString& kString) {
     if (uiStringID == -1) {
         const char* m_kHandle = (&kString)->GetHandle();
         if ((&kString)->GetHandle()) {
-            kString.m_kHandle = NiGlobalStringTable::AddString(0);
+            kString.m_kHandle = NiGlobalStringTable::AddString(nullptr);
             NiGlobalStringTable::ReleaseHandle(m_kHandle);
         }
     }
@@ -812,7 +812,7 @@ void NiStream::LoadCStringAsFixedString(NiFixedString& kString) {
             if (!(&kString)->GetHandle()) {
                 return;
             }
-            v13 = NiGlobalStringTable::AddString(0);
+            v13 = NiGlobalStringTable::AddString(nullptr);
         }
         else {
             char acString[1024];
@@ -1273,7 +1273,7 @@ uint32_t NiStream::GetVersionFromString(const char* pcVersionString) {
     strcpy_s(String, 16, pcVersionString);
     int32_t v1 = 24;
     uint32_t v2 = 0;
-    for (char* i = strtok_s(String, ".", &Context); i; i = strtok_s(0, ".", &Context)) {
+    for (char* i = strtok_s(String, ".", &Context); i; i = strtok_s(nullptr, ".", &Context)) {
         int32_t v4 = std::atoi(i) << v1;
         v1 -= 8;
         v2 |= v4;

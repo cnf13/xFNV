@@ -272,31 +272,34 @@ void DetectionState::InitLoadGame() {
         v2 = dynamic_cast<Actor*>(FormByNumericID);
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     pActor = v2;
 }
 
 HighProcess::HighProcess()
-  : bEvaluateDetection(0), fDetectListTimer(0.0f), bSayGoodByePlayer(0), bProcessGreetSayTo(0), plastDetected(0),
-    fTalkTimer(0.0f), pPathLookAtTarget(0), fMaxAlpha(1.0f), fPackageEvalTimer(0.0f), fUseItemTimer(0.0f),
-    fHoldAttackTimer(0.0f), sShotsFired(0), sShotsToFire(-1), sBurstsFired(0), bCheckDeadTalk(0), bSkippedUpdate(0),
-    pNode(0), fDelayTimer(0.0f), fDistanceMoved(0.0f), fTurnTime(0.0f), cLastTurnDir(0), fEvaluateAcquireTimer(0.0f),
-    pBoneLOD(0), iLastBoneLOD(-2), sAnimAction(-1), pAnimSeq(0), bAutomaticFireAtLeastOne(0), fDetectionTimer(0.0f),
-    iLastDetection(-1), WeaponLastPos(NiPoint3_ZERO), pGreetActor(0), fSoundDelay(0.0f), bGreetingFlag(0),
-    fGreetingTimer(0.0f), fIdleTimer(1.0f), fDetectGreetTimer(0.0f), fBreathTimer(20.0f), bHeadTrack(1),
-    fVoiceTimer(0.0f), bLipQuequed(0), bWeaponAlertDrawn(0), fAwarePlayerTimer(0.0f), pIdleToPlay(0),
-    bDialoguewithPlayer(0), pGreetTopic(0), bContinuingPackageforPC(0), bActivateAnim(0), fScriptPackageEndTime(0.0f),
-    fHealthBarAlphaValue(0.0f), fActorHealthPercentage(1.0f), fHealthBarEmittanceValue(0.0f), iNumberGuardsPersuing(0),
-    bStop(0), fReEquipArmorTimer(0.0f), bUnequippedArmorToSwim(0), iHasHealingSpell(-1), iHasHealingPotion(-1),
-    pLeveledSpellList(0), cLastTurn(0), bCurrentlyReanimating(0), fDetectionModifer(0.0f),
-    fDetectionModifierTimer(0.0f), fLightLevel(0.0f), fLightLevelTimer(0.0f), pLipSynicAnim(0), bWaitingForLipFile(0),
-    bLipFileFailed(0), pCurrentMuzzleFlash(0), pActorsGeneratedDetectionEvent(0), bFinishingCombatPackage(0),
-    m_pSayToDialogueTopic(0), eFadeState(BaseProcess::FADE_IN), fFadeAlpha(0.0f), pTeleportFadeRef(0),
-    pMoveToFadeStruct(0), fHeadTrackTargetTimer(-1.0f), pLastTarget(0), bForceRotate(0), ePostAnimActon(0),
-    pActorValueCache(0), fCachedActorHeight(0.0f), eSpecialIdleType(AnimIdle::PLAY_TYPE_AUTO), fRadiationTimer(0.0f),
-    fHighestRadiation(0.0f), bPlantedExplosive(0), bNeedTalkPlayer(0), fTakeBackTimer(-1.0f), pListOfAvoidAreas(0),
-    fAvoidWaitTimer(0.0f), pSubtitleVoice(0), bHiding(0), bIsDoingSayTo(0) {
+  : bEvaluateDetection(0), fDetectListTimer(0.0f), bSayGoodByePlayer(false), bProcessGreetSayTo(false),
+    plastDetected(nullptr), fTalkTimer(0.0f), pPathLookAtTarget(nullptr), fMaxAlpha(1.0f), fPackageEvalTimer(0.0f),
+    fUseItemTimer(0.0f), fHoldAttackTimer(0.0f), sShotsFired(0), sShotsToFire(-1), sBurstsFired(0),
+    bCheckDeadTalk(false), bSkippedUpdate(false), pNode(nullptr), fDelayTimer(0.0f), fDistanceMoved(0.0f),
+    fTurnTime(0.0f), cLastTurnDir(false), fEvaluateAcquireTimer(0.0f), pBoneLOD(nullptr), iLastBoneLOD(-2),
+    sAnimAction(-1), pAnimSeq(nullptr), bAutomaticFireAtLeastOne(false), fDetectionTimer(0.0f), iLastDetection(-1),
+    WeaponLastPos(NiPoint3_ZERO), pGreetActor(nullptr), fSoundDelay(0.0f), bGreetingFlag(false), fGreetingTimer(0.0f),
+    fIdleTimer(1.0f), fDetectGreetTimer(0.0f), fBreathTimer(20.0f), bHeadTrack(true), fVoiceTimer(0.0f),
+    bLipQuequed(false), bWeaponAlertDrawn(false), fAwarePlayerTimer(0.0f), pIdleToPlay(nullptr),
+    bDialoguewithPlayer(false), pGreetTopic(nullptr), bContinuingPackageforPC(false), bActivateAnim(false),
+    fScriptPackageEndTime(0.0f), fHealthBarAlphaValue(0.0f), fActorHealthPercentage(1.0f),
+    fHealthBarEmittanceValue(0.0f), iNumberGuardsPersuing(0), bStop(false), fReEquipArmorTimer(0.0f),
+    bUnequippedArmorToSwim(false), iHasHealingSpell(-1), iHasHealingPotion(-1), pLeveledSpellList(nullptr),
+    cLastTurn(0), bCurrentlyReanimating(false), fDetectionModifer(0.0f), fDetectionModifierTimer(0.0f),
+    fLightLevel(0.0f), fLightLevelTimer(0.0f), pLipSynicAnim(nullptr), bWaitingForLipFile(false), bLipFileFailed(false),
+    pCurrentMuzzleFlash(nullptr), pActorsGeneratedDetectionEvent(nullptr), bFinishingCombatPackage(false),
+    m_pSayToDialogueTopic(nullptr), eFadeState(BaseProcess::FADE_IN), fFadeAlpha(0.0f), pTeleportFadeRef(nullptr),
+    pMoveToFadeStruct(nullptr), fHeadTrackTargetTimer(-1.0f), pLastTarget(nullptr), bForceRotate(false),
+    ePostAnimActon(0), pActorValueCache(nullptr), fCachedActorHeight(0.0f), eSpecialIdleType(AnimIdle::PLAY_TYPE_AUTO),
+    fRadiationTimer(0.0f), fHighestRadiation(0.0f), bPlantedExplosive(false), bNeedTalkPlayer(false),
+    fTakeBackTimer(-1.0f), pListOfAvoidAreas(nullptr), fAvoidWaitTimer(0.0f), pSubtitleVoice(nullptr), bHiding(false),
+    bIsDoingSayTo(false) {
     iHourPackageEvaluated = -1;
     pDetectedActorList = new BSSimpleList<DetectionState*>;
     pLastSpokeToList = new BSSimpleList<Actor*>;
@@ -389,14 +392,14 @@ HighProcess::~HighProcess() {
 
 void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
     if (apRef) {
-        TESPackage* pPack = 0;
-        bGreetingFlag = 0;
+        TESPackage* pPack = nullptr;
+        bGreetingFlag = false;
         fGreetingTimer = 0.0f;
         BSAudio* v3 = &BSAudio::QInstance();
         v3->EndAllSoundsOfType(4u);
         fDelayTimer = 0.0f;
         pPack = GetPackageThatIsRunning();
-        Actor* apActor = 0;
+        Actor* apActor = nullptr;
         if (apRef->IsActor()) {
             apActor = static_cast<Actor*>(apRef);
         }
@@ -408,23 +411,23 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
             SetGreetingTimer(0.0f);
         }
         pPlayer->ResetPlayerGreetFlag();
-        bool bevalflag = 1;
+        bool bevalflag = true;
         UpdateHeadTrackTargets();
         if (apActor) {
             if (apActor->GetRefPersists()) {
-                PackageLocation* ploc = 0;
+                PackageLocation* ploc = nullptr;
                 if (GetCurrentPackage()) {
                     GetCurrentPackage()->GetLocation();
                 }
-                TESObjectREFR* pRef = 0;
-                bool bMustChange = 0;
+                TESObjectREFR* pRef = nullptr;
+                bool bMustChange = false;
                 if (fScriptPackageEndTime != 0.0) {
                     float fhour = appCalendar.GetHour();
                     float fPackageLife = fhour - this->CurrentPackage.GetPackageStartTime();
                     float ftime = std::fabs(fPackageLife) * 100.0;
                     if (fScriptPackageEndTime <= static_cast<double>(ftime)) {
                         fPackageEvalTimer = 0.0f;
-                        bMustChange = 1;
+                        bMustChange = true;
                         AddToProcedureIndexRunning(apActor, 3);
                         if (pPack) {
                             if (pPack->GetOncePerDay()) {
@@ -458,10 +461,10 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                 if (!LocReference) {
                                     LocReference = GetGenericLocation();
                                 }
-                                if (pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+                                if (pPack->IsActorAtLocation(apActor, false, -1.0f, false)) {
                                     TESBoundObject* ObjectReference;
                                     AddToProcedureIndexRunning(apActor, 1);
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     if ((LocReference &&
                                          (ObjectReference = LocReference->GetObjectReference(),
                                           ObjectReference == pXMarkerHeading)) ||
@@ -480,7 +483,7 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                 }
                                 else {
                                     if (apActor->IsPathingComplete()) {
-                                        TESObjectREFR* pRef_2 = 0;
+                                        TESObjectREFR* pRef_2 = nullptr;
                                         if (pPack->pPackLoc) {
                                             pRef_2 = pPack->pPackLoc->GetLocReference();
                                         }
@@ -491,19 +494,19 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                         }
                                         if (apActor->GetSitSleepState()) {
                                             TESPackage* CurrentPackage = apActor->GetCurrentPackage();
-                                            if (!CurrentPackage->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+                                            if (!CurrentPackage->IsActorAtLocation(apActor, false, -1.0f, false)) {
                                                 ProcessGetUpOneHour(apActor);
                                             }
                                         }
-                                        float a5 = pPack->GetPackageRadiusActorToLocation(apActor, 0);
+                                        float a5 = pPack->GetPackageRadiusActorToLocation(apActor, false);
                                         TESWorldSpace* afRadius2 = pPack->GetLocationWorld(apActor);
                                         TESObjectCELL* LocationCell = pPack->GetLocationCell(apActor);
                                         apActor->SetPathfindingGoal(
-                                            pPack->GetLocationCoord(apActor), LocationCell, afRadius2, a5, 0
+                                            pPack->GetLocationCoord(apActor), LocationCell, afRadius2, a5, nullptr
                                         );
-                                        bevalflag = 0;
+                                        bevalflag = false;
                                         if (!apActor->pCurrentProcess->eLevel &&
-                                            pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+                                            pPack->IsActorAtLocation(apActor, false, -1.0f, false)) {
                                             TESBoundObject* v8;
                                             if (!GetLockedLocation()) {
                                                 if (pPack) {
@@ -517,7 +520,7 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                                         );
                                                     }
                                                 }
-                                                SetLockedLocation(1);
+                                                SetLockedLocation(true);
                                             }
                                             if (pPack) {
                                                 if (pPack->GetUnlockDoorsAtLocation()) {
@@ -559,14 +562,14 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                         }
                                     }
                                     else {
-                                        bevalflag = 0;
+                                        bevalflag = false;
                                     }
                                 }
                                 continue;
                             }
                             case PROCEDURE_WANDER: {
                                 ProcessWanderOneHour(apActor, fTimeDelta);
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_ACTIVATE: {
@@ -578,7 +581,7 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                     ProcessGetUpOneHour(apActor);
                                 }
                                 ProcessAcquireOneHour(apActor, fTimeDelta);
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_SLEEP: {
@@ -593,7 +596,7 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                 if (apActor->GetSitSleepState()) {
                                     ProcessGetUpOneHour(apActor);
                                 }
-                                bevalflag = ProcessFollowOneHour(apActor, fTimeDelta, 1);
+                                bevalflag = ProcessFollowOneHour(apActor, fTimeDelta, true);
                                 continue;
                             }
                             case PROCEDURE_ESCORT: {
@@ -607,7 +610,7 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                 if (apActor->GetSitSleepState()) {
                                     ProcessGetUpOneHour(apActor);
                                 }
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_COMBAT: {
@@ -618,7 +621,7 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                 continue;
                             }
                             case PROCEDURE_DIALOGUE: {
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_WAIT: {
@@ -633,19 +636,19 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                     if (NumberOfFollowers < iNumberActorsAllowedToFollowPlayer.Int()) {
                                         goto LABEL_105;
                                     }
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                 }
                                 else {
                                     int32_t ipadding;
                                     if (pTarget->GetDelete() || pTarget->GetDisabled()) {
                                         if (pTarget->GetDelete()) {
-                                            pPack->SetNeverRun(pTarget, 1);
+                                            pPack->SetNeverRun(pTarget, true);
                                         }
                                         AddToProcedureIndexRunning(apActor, 1);
                                         return;
                                     }
-                                    if (pTarget->IsDead(1)) {
-                                        pPack->SetNeverRun(pTarget, 1);
+                                    if (pTarget->IsDead(true)) {
+                                        pPack->SetNeverRun(pTarget, true);
                                         return;
                                     }
                                     ipadding = pPack->GetLocationRadius(apActor) == 0 ? 400 : 0;
@@ -654,7 +657,7 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                         AddToProcedureIndexRunning(apActor, 1);
                                     }
                                     else {
-                                        bevalflag = 0;
+                                        bevalflag = false;
                                     }
                                 }
                                 break;
@@ -670,17 +673,17 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                     }
                                 }
                                 ProcessActivateOneHour(apActor, fTimeDelta);
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_PURSUE: {
-                                LowProcess::ProcessPursue(apActor, 0, 1, 257);
-                                bevalflag = 0;
+                                LowProcess::ProcessPursue(apActor, false, true, 257);
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_CREATE_FOLLOW: {
                                 ProcessCreateFollow(apActor);
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_GET_UP: {
@@ -689,30 +692,30 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                 continue;
                             }
                             case PROCEDURE_DO_NOTHING: {
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_NOTIFY: {
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_ACCOMPANY: {
                                 ProcessAccompanyOneHour(apActor, fTimeDelta);
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_USE_ITEM_AT: {
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_FEED: {
                                 ProcessSandman(apActor);
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_AMBUSH_WAIT: {
                                 ProcessAmbushWait(apActor);
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_SURFACE: {
@@ -720,17 +723,17 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                 continue;
                             }
                             case PROCEDURE_CHOOSE_CAST: {
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_REMOVE_WORN_ITEMS: {
-                                ProcessRemoveWorn(apActor, 1, 0);
-                                bevalflag = 0;
+                                ProcessRemoveWorn(apActor, true, false);
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_AVOID_RADIATION: {
                                 ProcessAvoidArea(apActor);
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_PATROL: {
@@ -738,28 +741,28 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                     ProcessGetUpOneHour(apActor);
                                 }
                                 ProcessPatrolOneHour(apActor, fTimeDelta);
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_GUARD: {
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_USE_WEAPON: {
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_CANNIBAL_FEED: {
                                 ProcessCannibal(apActor);
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             case PROCEDURE_DONE: {
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                             default: {
-                                bevalflag = 0;
+                                bevalflag = false;
                                 continue;
                             }
                         }
@@ -783,7 +786,7 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                         }
                     }
                     else {
-                        if (!pPack_2->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+                        if (!pPack_2->IsActorAtLocation(apActor, false, -1.0f, false)) {
                         LABEL_144:;
                             AddToProcedureIndexRunning(apActor, -1);
                             return;
@@ -792,7 +795,7 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                     EndMoveMessage(apActor);
                     if (bContinuingPackageforPC) {
                         AddToProcedureIndexRunning(apActor, -1);
-                        SetCurrentActionComplete(0);
+                        SetCurrentActionComplete(false);
                         return;
                     }
                     if (pPack_2) {
@@ -802,7 +805,7 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                         }
                     }
                     if (!pPack_2->GetPackageSchedule()->PSData.iDuration) {
-                        SetTarget(0);
+                        SetTarget(nullptr);
                         if (!GetRunOncePackage() || ContinuingPackageforPC()) {
                             TESPackage* v12 = GetCurrentPackage();
                             if (v12->GetIsCreated()) {
@@ -835,8 +838,8 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                         if (apThis) {
                             apThis->Delete(1u);
                         }
-                        pAcquireObject = 0;
-                        pItemBeingUsed = 0;
+                        pAcquireObject = nullptr;
+                        pItemBeingUsed = nullptr;
                         while (!ObjectList.IsEmpty()) {
                             ObjectstoAcquire* pobj = ObjectList.m_item;
                             if (pobj) {
@@ -845,13 +848,13 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                             ObjectList.Remove(pobj);
                         }
                         fDetectListTimer = 0.0f;
-                        pGenericLocation = 0;
+                        pGenericLocation = nullptr;
                         GenericLocationsList.RemoveAll();
                     }
                 }
             }
         }
-        bool bskippedpathing = 0;
+        bool bskippedpathing = false;
         BaseProcess* CurrentAIProcess = apRef->pCurrentProcess;
         CurrentAIProcess->ComputeLastTimeProcessed();
     }
@@ -863,7 +866,7 @@ void HighProcess::Update(MobileObject* apRef) {
     TESObjectREFR* ptarget;
     Actor* ptargetActor;
     bool bfleeflag;
-    TESPackage* pPack = 0;
+    TESPackage* pPack = nullptr;
     if (!apRef) {
         return;
     }
@@ -895,13 +898,13 @@ void HighProcess::Update(MobileObject* apRef) {
     if (!apRef->IsTalkingActivator()) {
         apRef->UpdateTopicInfoSayOnce();
     }
-    Actor* apActor = 0;
+    Actor* apActor = nullptr;
     if (apRef->IsActor()) {
         apActor = static_cast<Actor*>(apRef);
     }
     fGreetingTimer = fGreetingTimer - appTimer.fDelta;
     bool bfixactorpos = GetSkippedLastUpdate();
-    SetSkippedLastUpdate(0);
+    SetSkippedLastUpdate(false);
     UpdateHeadTrackTargets();
     if (!apActor) {
         if (apRef->IsTalkingActivator()) {
@@ -914,7 +917,7 @@ void HighProcess::Update(MobileObject* apRef) {
             }
         }
     LABEL_477:;
-        bool bskippedpathing = 0;
+        bool bskippedpathing = false;
         BaseProcess* CurrentAIProcess = apRef->pCurrentProcess;
         CurrentAIProcess->ComputeLastTimeProcessed();
         return;
@@ -940,7 +943,7 @@ void HighProcess::Update(MobileObject* apRef) {
     }
     bool btorsoUnderWater = apActor->IsPointDeepUnderWater(*apActor->QLocationOnReference(), pparent, 0.5f);
     if (bfixactorpos) {
-        apActor->MoveToSafePoint(0);
+        apActor->MoveToSafePoint(false);
     }
     if (this->GetBoneLOD()) {
         if (apActor->Get3D()) {
@@ -951,7 +954,7 @@ void HighProcess::Update(MobileObject* apRef) {
         bDetectLifeDetected = DetectLifeEffect::CheckActorDetected(apActor, bDetectLifeDetected);
     }
     if (apActor->IsUnConscious()) {
-        PickPackageIdles(apActor, 0);
+        PickPackageIdles(apActor, false);
         RandomlyPlaySpecialIdles(apActor);
         apActor->PickAnimations(1.0f, 1.0f);
         BaseProcess* v53 = apRef->pCurrentProcess;
@@ -968,19 +971,21 @@ void HighProcess::Update(MobileObject* apRef) {
         goto LABEL_480;
     }
     ptarget = apActor->GetCurrentPackageTarget();
-    bfleeflag = apActor->IsFleeing(0);
-    ptargetActor = 0;
+    bfleeflag = apActor->IsFleeing(false);
+    ptargetActor = nullptr;
     if (ptarget) {
         if (ptarget->IsActor()) {
             ptargetActor = static_cast<Actor*>(ptarget);
         }
     }
-    apActor->EndInterruptPackage(0);
-    if (!EnterCombat(apActor, ptargetActor, 1, bfleeflag, 0, bfleeflag, 0, 0, 0, 0, 0, 1, 0)) {
+    apActor->EndInterruptPackage(false);
+    if (!EnterCombat(
+            apActor, ptargetActor, true, bfleeflag, nullptr, bfleeflag, false, false, 0, false, false, true, nullptr
+        )) {
     LABEL_480:;
         if (bSayGoodByePlayer && !Interface::IsMenuIDVisible(Interface::eDialogMenu, 0)) {
             SayGoodBye(apActor);
-            bSayGoodByePlayer = 0;
+            bSayGoodByePlayer = false;
             return;
         }
         if (!bEvaluateDetection || !EvaluateDetection(apActor)) {
@@ -999,19 +1004,19 @@ void HighProcess::Update(MobileObject* apRef) {
             }
             bool bincombat = apActor->IsInCombat();
             if (!bincombat) {
-                SetIsAggressor(0);
+                SetIsAggressor(false);
             }
             pPack = GetPackageThatIsRunning();
             TESPackage* pcurpack = GetCurrentPackage();
             if ((!pPack || pPack->GetPackType() != PACKAGE_TYPE_COMBAT) &&
                 (!pcurpack || pcurpack->GetPackType() != PACKAGE_TYPE_COMBAT) && apActor->IsInCombat()) {
-                apActor->ClearInCombat(1);
+                apActor->ClearInCombat(true);
             }
             if (GetNeedTalkPlayer() && (!pPack || pPack->GetPackType() != PACKAGE_TYPE_GET_UP)) {
-                SetNeedTalkPlayer(0);
+                SetNeedTalkPlayer(false);
             }
             bool bDoGreetIdleChatter = false;
-            if (!pPlayer->IsImportantConversationRunning() && !apActor->IsInCombat() && !apActor->IsFleeing(0) &&
+            if (!pPlayer->IsImportantConversationRunning() && !apActor->IsInCombat() && !apActor->IsFleeing(false) &&
                 !apActor->IsUnConscious() && !apActor->IsKnockedOut()) {
                 if (!GetSoundHandle(ACTOR_SOUND_HANDLE_VOICE).IsValid() &&
                     (!GetGreetingFlag() && !pPlayer->GetPlayerGreetFlag())) {
@@ -1021,14 +1026,16 @@ void HighProcess::Update(MobileObject* apRef) {
             if (bDoGreetIdleChatter) {
                 double DistanceFromReference;
                 bool blinesight;
-                idetection = apActor->GetDetectionLevelAgainstActor(0, pPlayer, blinesight, bincombat, 0, 0, 0);
+                idetection = apActor->GetDetectionLevelAgainstActor(
+                    false, pPlayer, blinesight, bincombat, false, false, nullptr
+                );
                 if (idetection <= 0 ||
                     (apActor->IsSleeping() ||
                      (pPlayer->IsSneaking() ||
                       (pPlayer->IsTresPassing() ||
                        ((apActor->GetCurrentTarget() == pPlayer && !apActor->IsRunningRunOnce()) ||
                         (!CanSetActionHeadTrackTarget() ||
-                         (DistanceFromReference = pPlayer->GetDistanceFromReference(apActor, 0, 0),
+                         (DistanceFromReference = pPlayer->GetDistanceFromReference(apActor, false, false),
                           !(fAIMinGreetingDistance.Float() >= DistanceFromReference)))))))) {
                     if (!(fIdleChatterTimer <= 0.0) || apActor->IsinDialogue()) {
                         fIdleChatterTimer = fIdleChatterTimer - appTimer.fDelta;
@@ -1039,7 +1046,7 @@ void HighProcess::Update(MobileObject* apRef) {
                              pPack->GetFOEnableIdleChatterBehavior())) {
                             TESTopic* ptopic = TESTopic::GetTopic(DT_CONVERSATION, 3);
                             if (ptopic) {
-                                ProcessGreet(apActor, ptopic, 0, 0, 1, 0);
+                                ProcessGreet(apActor, ptopic, false, false, true, false);
                             }
                             float _Xx = fIdleChatterCommentTimerMax.Float();
                             float* v4 = &fIdleChatterCommentTimer.Float();
@@ -1048,7 +1055,7 @@ void HighProcess::Update(MobileObject* apRef) {
                     }
                 }
                 else {
-                    bsearch = 0;
+                    bsearch = false;
                     if (!pPlayer->IsPlayerCharacterInCombat(&bsearch) &&
                         !apActor->ShouldSkipFallOutBehavior(FALLOUT_BEHAVIORS_HELLOS_TO_PLAYER) &&
                         !apActor->IsContinuingPackagePCNear() && !bincombat && !apActor->IsAlarmed() &&
@@ -1063,14 +1070,14 @@ void HighProcess::Update(MobileObject* apRef) {
                 if (GetGreetingFlag()) {
                     bool bstopped = GetMovementStoped();
                     bool bque = GetLipQuequed();
-                    ProcessGreet(apActor, 0, 0, bstopped, bque, 0);
+                    ProcessGreet(apActor, nullptr, false, bstopped, bque, false);
                 }
             }
             if (!pPlayer->IsImportantConversationRunning() && !GetGreetingFlag() && !pPlayer->GetPlayerGreetFlag()) {
                 CheckIfThereSomeoneTalkWith(apActor);
             }
-            bool bNewPackage = 0;
-            bool bMustChange = 0;
+            bool bNewPackage = false;
+            bool bMustChange = false;
             pPack = GetPackageThatIsRunning();
             if (fScriptPackageEndTime != 0.0) {
                 float fhour = appCalendar.GetHour();
@@ -1079,7 +1086,7 @@ void HighProcess::Update(MobileObject* apRef) {
                 float ftime = std::fabs(v49) * 100.0;
                 if (fScriptPackageEndTime <= static_cast<double>(ftime)) {
                     fPackageEvalTimer = 0.0f;
-                    bMustChange = 1;
+                    bMustChange = true;
                     AddToProcedureIndexRunning(apActor, 3);
                     if (pPack) {
                         if (pPack->GetOncePerDay()) {
@@ -1121,11 +1128,11 @@ void HighProcess::Update(MobileObject* apRef) {
                 }
             }
             pPack = GetPackageThatIsRunning();
-            PickPackageIdles(apActor, 0);
+            PickPackageIdles(apActor, false);
             RandomlyPlaySpecialIdles(apActor);
             if (bNewPackage) {
                 apActor->AlertAccompanyToPackageChange();
-                SetLocationForPackage(apActor, 0);
+                SetLocationForPackage(apActor, false);
             }
             if (!GetRunOncePackage()) {
                 if (pPack) {
@@ -1138,7 +1145,7 @@ void HighProcess::Update(MobileObject* apRef) {
                                     (pPack->GetPCContinue() &&
                                      (pPack->GetServicesEnabled() &&
                                       (pparent && pparent->IsActorCellOwner(apActor))))) {
-                                    CreateFollownoEscort(apActor, 0);
+                                    CreateFollownoEscort(apActor, false);
                                     pPack = GetPackageThatIsRunning();
                                 }
                             }
@@ -1156,8 +1163,8 @@ void HighProcess::Update(MobileObject* apRef) {
                     fAwarePlayerTimer = 0.0f;
                     EndMoveMessage(apActor);
                     ClearRunOncePackage();
-                    ClearActionHeadTrackTarget(1);
-                    SetTarget(0);
+                    ClearActionHeadTrackTarget(true);
+                    SetTarget(nullptr);
                     pPack = GetPackageThatIsRunning();
                 }
                 else {
@@ -1179,39 +1186,39 @@ void HighProcess::Update(MobileObject* apRef) {
                             if (!GetCurrentWeapon()) {
                                 ItemChange* pweap = apActor->GetBestWeapon(COMBAT_WEAPON_TYPE_COUNT);
                                 if (pweap) {
-                                    BaseExtraList* pextra = 0;
+                                    BaseExtraList* pextra = nullptr;
                                     if (pweap->pExtraObjectList) {
                                         pextra = (BaseExtraList*)pweap->pExtraObjectList->m_item;
                                     }
                                     ExtraDataList* pextra_3 = static_cast<ExtraDataList*>(pextra);
                                     TESBoundObject* FormFlags = pweap->pContainerObj;
-                                    apActor->EquipObject(FormFlags, 1, pextra_3, 1, 0, 1);
+                                    apActor->EquipObject(FormFlags, 1, pextra_3, true, false, true);
                                 }
                             }
-                            apActor->SetWantWeaponDrawn(1);
-                            SetWantWeaponDrawn(1);
+                            apActor->SetWantWeaponDrawn(true);
+                            SetWantWeaponDrawn(true);
                             goto LABEL_204;
                         }
                     LABEL_203:;
-                        apActor->SetWantWeaponDrawn(0);
-                        SetWantWeaponDrawn(0);
+                        apActor->SetWantWeaponDrawn(false);
+                        SetWantWeaponDrawn(false);
                         goto LABEL_204;
                     }
                     if (!GetWeaponDrawn() && !GetWantWeaponDrawn()) {
                         if (!GetCurrentWeapon()) {
                             ItemChange* pweap_2 = apActor->GetBestWeapon(COMBAT_WEAPON_TYPE_COUNT);
                             if (pweap_2) {
-                                BaseExtraList* pextra_2 = 0;
+                                BaseExtraList* pextra_2 = nullptr;
                                 if (pweap_2->pExtraObjectList) {
                                     pextra_2 = (BaseExtraList*)pweap_2->pExtraObjectList->m_item;
                                 }
                                 ExtraDataList* pextra_4 = static_cast<ExtraDataList*>(pextra_2);
                                 TESBoundObject* v33 = pweap_2->pContainerObj;
-                                apActor->EquipObject(v33, 1, pextra_4, 1, 0, 1);
+                                apActor->EquipObject(v33, 1, pextra_4, true, false, true);
                             }
                         }
-                        apActor->SetWantWeaponDrawn(1);
-                        SetWantWeaponDrawn(1);
+                        apActor->SetWantWeaponDrawn(true);
+                        SetWantWeaponDrawn(true);
                     }
                 }
             }
@@ -1239,7 +1246,7 @@ void HighProcess::Update(MobileObject* apRef) {
                                 ProcessGetUpOneHour(apActor);
                             }
                             else {
-                                SetSitSleepState(apActor, SIT_SLEEP_NORMAL, 0, 127);
+                                SetSitSleepState(apActor, SIT_SLEEP_NORMAL, nullptr, 127);
                             }
                         }
                     }
@@ -1260,8 +1267,8 @@ void HighProcess::Update(MobileObject* apRef) {
                         }
                     }
                 }
-                Actor* pactarget = 0;
-                DetectionState* pdetect = 0;
+                Actor* pactarget = nullptr;
+                DetectionState* pdetect = nullptr;
                 DETECTION_LEVEL elevel = DETECTION_SEEN;
                 if (pPack->pPackLoc) {
                     if (pPack->pPackLoc->IsLocationGeneric()) {
@@ -1274,7 +1281,7 @@ void HighProcess::Update(MobileObject* apRef) {
                                 }
                             }
                             else {
-                                SetLocationForPackage(apActor, 0);
+                                SetLocationForPackage(apActor, false);
                                 SetProcedureIndexRunning(0);
                             }
                         }
@@ -1282,12 +1289,12 @@ void HighProcess::Update(MobileObject* apRef) {
                 }
                 if (!apActor->IsInCombat() && apActor->IsPathingComplete()) {
                     if (pPack) {
-                        if (pPack->IsActorAtLocation(apActor, 0, -1.0f, 0) &&
+                        if (pPack->IsActorAtLocation(apActor, false, -1.0f, false) &&
                             pPack->GetPackType() != PACKAGE_TYPE_SANDBOX &&
                             pPack->GetPackType() != PACKAGE_TYPE_GUARD &&
                             pPack->GetPackType() != PACKAGE_TYPE_USE_WEAPON && !GetGreetingFlag()) {
                             TESBoundObject* ObjectReference;
-                            TESObjectREFR* pRef = 0;
+                            TESObjectREFR* pRef = nullptr;
                             if (pPack->pPackLoc) {
                                 pRef = pPack->pPackLoc->GetLocReference();
                             }
@@ -1302,7 +1309,7 @@ void HighProcess::Update(MobileObject* apRef) {
                                     float v47 = AngleOnReference->z - (&apActor->GetAngleOnReference())->z;
                                     if (std::fabs(v47) > 0.01745329238474369) {
                                         const NiPoint3* v18 = &pRef->GetAngleOnReference();
-                                        apActor->RequestRotate(v18->z, 1);
+                                        apActor->RequestRotate(v18->z, true);
                                     }
                                 }
                             }
@@ -1312,15 +1319,15 @@ void HighProcess::Update(MobileObject* apRef) {
                 uint32_t v19 = pPack->ePROCEDURE_TYPE;
                 switch (Procedure_Action[v19][GetProcedureIndexRunning()]) {
                     case PROCEDURE_TRAVEL: {
-                        ProcessTravel(apActor, bNewPackage, 1, -1, 0);
+                        ProcessTravel(apActor, bNewPackage, true, -1, false);
                         goto LABEL_477;
                     }
                     case PROCEDURE_WANDER: {
-                        ProcessWander(apActor, 0, -1.0f);
+                        ProcessWander(apActor, nullptr, -1.0f);
                         goto LABEL_477;
                     }
                     case PROCEDURE_ACTIVATE: {
-                        ProcessActivate(apActor, 1);
+                        ProcessActivate(apActor, true);
                         goto LABEL_477;
                     }
                     case PROCEDURE_ACQUIRE: {
@@ -1332,11 +1339,11 @@ void HighProcess::Update(MobileObject* apRef) {
                         goto LABEL_477;
                     }
                     case PROCEDURE_EAT: {
-                        ProcessEat(apActor, 0);
+                        ProcessEat(apActor, nullptr);
                         goto LABEL_477;
                     }
                     case PROCEDURE_FOLLOW: {
-                        ProcessFollow(apActor, 1, 257, 0);
+                        ProcessFollow(apActor, true, 257, false);
                         goto LABEL_477;
                     }
                     case PROCEDURE_ESCORT: {
@@ -1387,7 +1394,7 @@ void HighProcess::Update(MobileObject* apRef) {
                             if (!pact ||
                                 (!pact->pCurrentProcess || (pact->IsActor() && (v76 = pact, pact->DidPathingFail())))) {
                             LABEL_288:;
-                                apActor->EndInterruptPackage(0);
+                                apActor->EndInterruptPackage(false);
                                 return;
                             }
                             BaseProcess* v45 = pact->pCurrentProcess;
@@ -1415,14 +1422,14 @@ void HighProcess::Update(MobileObject* apRef) {
                             else {
                                 if (pTarget->GetDelete() || pTarget->GetDisabled()) {
                                     if (pTarget->GetDelete()) {
-                                        pPack->SetNeverRun(pTarget, 1);
+                                        pPack->SetNeverRun(pTarget, true);
                                     }
                                 LABEL_285:;
                                     AddToProcedureIndexRunning(apActor, 1);
                                 }
                                 else {
-                                    if (pTarget->IsDead(1)) {
-                                        pPack->SetNeverRun(pTarget, 1);
+                                    if (pTarget->IsDead(true)) {
+                                        pPack->SetNeverRun(pTarget, true);
                                         return;
                                     }
                                     if (pPack->GetPackType() == PACKAGE_TYPE_DIALOGUE) {
@@ -1434,7 +1441,7 @@ void HighProcess::Update(MobileObject* apRef) {
                                         TESPackage* CurrentPackage = apActor->GetCurrentPackage();
                                         if (CurrentPackage->GetPackType() == PACKAGE_TYPE_FOLLOW) {
                                             float fwaitdistance = static_cast<float>(pPack->GetPackageTarget()->iValue);
-                                            double v22 = apActor->GetDistanceFromReference(pTarget, 0, 0);
+                                            double v22 = apActor->GetDistanceFromReference(pTarget, false, false);
                                             if (fwaitdistance < v22) {
                                                 AddToProcedureIndexRunning(apActor, 1);
                                             }
@@ -1451,11 +1458,11 @@ void HighProcess::Update(MobileObject* apRef) {
                                             else {
                                                 TESPackage* v24 = apActor->GetCurrentPackage();
                                                 if (v24->GetPackType() == PACKAGE_TYPE_ESCORT) {
-                                                    Actor* pwait = 0;
+                                                    Actor* pwait = nullptr;
                                                     if (pTarget) {
                                                         if (pTarget->IsActor()) {
                                                             pwait = static_cast<Actor*>(pTarget);
-                                                            if (GetLineSightonActor(apActor, pwait, 0, 1)) {
+                                                            if (GetLineSightonActor(apActor, pwait, 0, true)) {
                                                                 SetActionHeadTrackTarget(pTarget);
                                                             }
                                                         }
@@ -1469,7 +1476,7 @@ void HighProcess::Update(MobileObject* apRef) {
                                                                 NiPoint3(pPack->GetLocationCoord(apActor));
                                                             PathingLocation goalLoc(LocationCoord, afTargetAngle, _Xxa);
                                                             if (!ShouldWaitForEscortTarget(
-                                                                    apActor, pwait, goalLoc, 0
+                                                                    apActor, pwait, goalLoc, nullptr
                                                                 )) {
                                                                 apActor->ClearLookAtTarget();
                                                                 ClearAllHeadTrackTargets();
@@ -1505,10 +1512,10 @@ void HighProcess::Update(MobileObject* apRef) {
                         if (apActor->IsPlayingLowerBodySpecialIdle()) {
                             Animation* pactorAnim = apActor->GetAnimation();
                             if (pactorAnim) {
-                                pactorAnim->SpecialIdleFree(1, 0);
+                                pactorAnim->SpecialIdleFree(true, false);
                             }
                         }
-                        ProcessActivate(apActor, 0);
+                        ProcessActivate(apActor, false);
                         goto LABEL_477;
                     }
                     case PROCEDURE_PURSUE: {
@@ -1522,11 +1529,11 @@ void HighProcess::Update(MobileObject* apRef) {
                                 InsertIntoDetectionArray(pactarget, elevel);
                             }
                         }
-                        ProcessPursue(apActor, 0, 1, 257);
+                        ProcessPursue(apActor, false, true, 257);
                         goto LABEL_477;
                     }
                     case PROCEDURE_GREET: {
-                        ProcessGreet(apActor, 0, 0, 0, 1, 0);
+                        ProcessGreet(apActor, nullptr, false, false, true, false);
                         goto LABEL_477;
                     }
                     case PROCEDURE_CREATE_FOLLOW: {
@@ -1584,7 +1591,7 @@ void HighProcess::Update(MobileObject* apRef) {
                         goto LABEL_477;
                     }
                     case PROCEDURE_REMOVE_WORN_ITEMS: {
-                        ProcessRemoveWorn(apActor, 1, 0);
+                        ProcessRemoveWorn(apActor, true, false);
                         goto LABEL_477;
                     }
                     case PROCEDURE_SEARCH: {
@@ -1661,7 +1668,7 @@ void HighProcess::Update(MobileObject* apRef) {
                     }
                     case PROCEDURE_DONE: {
                         if (pPack->GetDrawWeaponFlag()) {
-                            apActor->SetAlert(0);
+                            apActor->SetAlert(false);
                         }
                         if (!GetRunOncePackage()) {
                             fScriptPackageEndTime = 0.0f;
@@ -1670,7 +1677,7 @@ void HighProcess::Update(MobileObject* apRef) {
                             ExtraDataList* afTargetAnglea = &apActor->m_Extra;
                             Script::SetActionFlag(pPack, afTargetAnglea, SCRIPT_ACTION_ONPACKAGEEND);
                             PackageDone(apActor, pPack);
-                            SetPackageDoneOnce(1);
+                            SetPackageDoneOnce(true);
                         }
                         switch (pPack->ePROCEDURE_TYPE) {
                             case PACKAGE_PROCEDURE_EXPLORE_WANDER:
@@ -1697,13 +1704,13 @@ void HighProcess::Update(MobileObject* apRef) {
                                 if (pPack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_PATROL) {
                                     const TESPatrolPackageData* ppatrolData = pPack->GetPatrolPackageData();
                                     bool v42 = ppatrolData && ppatrolData->bRepeatable;
-                                    bool bnewPackage = 0;
+                                    bool bnewPackage = false;
                                     PackageSchedule* psched = pPack->GetPackageSchedule();
                                     if ((!psched || static_cast<double>(psched->PSData.iDuration) <= 0.0) && !v42) {
-                                        SetCurrentActionComplete(1);
+                                        SetCurrentActionComplete(true);
                                         ClearCurrentDataforProcess(apActor);
                                         ClearCurrentPackage();
-                                        bnewPackage = CheckforNewPackage(apActor, 1);
+                                        bnewPackage = CheckforNewPackage(apActor, true);
                                     }
                                     if (v42 && !bnewPackage) {
                                         AddToProcedureIndexRunning(apActor, -1);
@@ -1733,13 +1740,13 @@ void HighProcess::Update(MobileObject* apRef) {
                                 }
                                 else {
                                     TESBoundObject* v27;
-                                    if (!pPack->IsActorAtLocation(apActor, 0, -1.0f, 1) && apActor != pPlayer) {
+                                    if (!pPack->IsActorAtLocation(apActor, false, -1.0f, true) && apActor != pPlayer) {
                                         goto LABEL_438;
                                     }
                                     if (!apActor->IsPathingComplete() || apActor->IsRotating()) {
                                         return;
                                     }
-                                    TESObjectREFR* pRef_2 = 0;
+                                    TESObjectREFR* pRef_2 = nullptr;
                                     if (pPack->pPackLoc) {
                                         pRef_2 = pPack->pPackLoc->GetLocReference();
                                     }
@@ -1755,14 +1762,14 @@ void HighProcess::Update(MobileObject* apRef) {
                                             float v41 = v28->z - (&apActor->GetAngleOnReference())->z;
                                             if (std::fabs(v41) > 0.01745329238474369) {
                                                 const NiPoint3* v29 = &pRef_2->GetAngleOnReference();
-                                                apActor->RequestRotate(v29->z, 1);
+                                                apActor->RequestRotate(v29->z, true);
                                             }
                                         }
                                     }
                                 }
                                 if (bContinuingPackageforPC) {
                                     AddToProcedureIndexRunning(apActor, -1);
-                                    SetCurrentActionComplete(0);
+                                    SetCurrentActionComplete(false);
                                     return;
                                 }
                                 if (pPack) {
@@ -1775,7 +1782,7 @@ void HighProcess::Update(MobileObject* apRef) {
                                     pPack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_EXPLORE_ACQUIRE_GENERIC) {
                                     if (!pPack->GetPackageSchedule()->PSData.iDuration &&
                                         pPack->GetPackType() != PACKAGE_TYPE_COMBAT) {
-                                        SetTarget(0);
+                                        SetTarget(nullptr);
                                         if (!ContinuingPackageforPC()) {
                                             if (GetRunOncePackage()) {
                                                 ClearRunOncePackage();
@@ -1806,8 +1813,8 @@ void HighProcess::Update(MobileObject* apRef) {
                                         if (apThis) {
                                             apThis->Delete(1u);
                                         }
-                                        pAcquireObject = 0;
-                                        pItemBeingUsed = 0;
+                                        pAcquireObject = nullptr;
+                                        pItemBeingUsed = nullptr;
                                         while (!ObjectList.IsEmpty()) {
                                             ObjectstoAcquire* pobj = (&ObjectList)->m_item;
                                             if (pobj) {
@@ -1816,11 +1823,11 @@ void HighProcess::Update(MobileObject* apRef) {
                                             ObjectList.Remove(pobj);
                                         }
                                         fDetectListTimer = 0.0f;
-                                        pGenericLocation = 0;
+                                        pGenericLocation = nullptr;
                                         GenericLocationsList.RemoveAll();
                                     }
                                     if (GetFinishingCombatPackage()) {
-                                        SetFinishingCombatPackage(0);
+                                        SetFinishingCombatPackage(false);
                                     }
                                     goto LABEL_477;
                                 }
@@ -1865,7 +1872,7 @@ float HighProcess::GetLastTimeDetected(Actor* apActor, int32_t abWhichList) {
     float v4 = -0x1.fffffe0000000p+127f;
     DetectionState* v5 = GetDetectionState(apActor, abWhichList);
     if (v5) {
-        return (float)(&v5->fLastTimeDetected)->operator float();
+        return (&v5->fLastTimeDetected)->operator float();
     }
     return v4;
 }
@@ -1876,10 +1883,10 @@ bool HighProcess::CheckforNewPackage(Actor* apActor, bool abFlag) {
     TESPackage* pRunOnce;
     if (apActor->GetSitSleepState() &&
         ((((int32_t)apActor->GetSitSleepState()) != 4) && (((int32_t)apActor->GetSitSleepState()) != 9))) {
-        return (bool)0;
+        return false;
     }
     if ((GetRunOncePackage() && (!abFlag)) || GetEndIdlesPlayed()) {
-        return (bool)0;
+        return false;
     }
     if (GetRunOncePackage()) {
         v4 = GetRunOncePackage();
@@ -1888,14 +1895,14 @@ bool HighProcess::CheckforNewPackage(Actor* apActor, bool abFlag) {
         }
     }
     apActor->GetCurrentPackage();
-    float hour = (float)(&appCalendar)->GetHour();
+    float hour = (&appCalendar)->GetHour();
     uint8_t v10 = 0;
     TESPackage* activeStablePackage = apActor->GetPackageSetAsPcurrent();
     if (activeStablePackage) {
         if (activeStablePackage->IsScriptPackage()) {
             parent = activeStablePackage->TESPackage::GetProcedureType();
             if (Procedure_Action[(uint32_t)parent][GetCurrentProcedureIndex()] != 54) {
-                return (bool)0;
+                return false;
             }
         }
     }
@@ -1906,7 +1913,7 @@ bool HighProcess::CheckforNewPackage(Actor* apActor, bool abFlag) {
         iHourPackageEvaluated = (uint32_t)((int32_t)hour);
         fPackageEvalTimer = 20.0f;
     }
-    fPackageEvalTimer = (float)(fPackageEvalTimer - (&appTimer)->GetSeconds());
+    fPackageEvalTimer = (fPackageEvalTimer - (&appTimer)->GetSeconds());
     if (v10) {
         pRunOnce = GetRunOncePackage();
         GetCurrentPackage();
@@ -1928,48 +1935,48 @@ bool HighProcess::SetupSpecialIdle(
     bool abChooseNewOne,
     bool abTestConditions
 ) {
-    Actor* pactor = 0;
+    Actor* pactor = nullptr;
     Animation* panim = apMobile->GetAnimation();
     if (apMobile->IsActor()) {
         pactor = static_cast<Actor*>(apMobile);
     }
     if (!pactor || !panim) {
-        return 0;
+        return false;
     }
     if (pactor == pPlayer && pVATS.eMode == VATS::VATS_PLAYBACK) {
-        return 0;
+        return false;
     }
     SIT_SLEEP_STATE v11 = pactor->GetSitSleepState();
     if (v11 && (v11 != SIT_SLEEP_IS_SITTING && v11 != SIT_SLEEP_IS_SLEEPING)) {
-        return 0;
+        return false;
     }
     if (pactor->IsRestrained() && !apIdle) {
-        return 0;
+        return false;
     }
     if (pactor->IsParalyzed() || pactor->IsKnockedOut()) {
-        return 0;
+        return false;
     }
     if (pactor->GetCurrentPackage()) {
         TESPackage* CurrentPackage = pactor->GetCurrentPackage();
         if (CurrentPackage->GetNoIdlesFlag()) {
-            return 0;
+            return false;
         }
     }
     if (!panim->SpecialIdleDonePlaying() && (!apIdle && (pPlayer != pactor && !abChooseNewOne))) {
-        return 0;
+        return false;
     }
     if (abTestConditions) {
         if (apIdle) {
             // The address &apIdle->Conditions is never null.
             TESObjectREFR* v9 = GetTarget();
             if (!(&apIdle->Conditions)->IsTrue(pactor, v9)) {
-                apIdle = 0;
+                apIdle = nullptr;
             }
         }
     }
     if (apIdle) {
         if (!pactor->CanUseIdle(apIdle)) {
-            apIdle = 0;
+            apIdle = nullptr;
         }
     }
     if (!apIdle && !panim->SpecialIdleWorking() &&
@@ -1978,21 +1985,21 @@ bool HighProcess::SetupSpecialIdle(
         apIdle = pIdleManager->GetIdleToPlay(apMobile, v10);
     }
     if (!apIdle || panim->IsIdleNotLoaded(apIdle)) {
-        return 0;
+        return false;
     }
     pIdleToPlay = apIdle;
     eSpecialIdleType = aeType;
-    SetEndIdlesPlayed(0);
+    SetEndIdlesPlayed(false);
     if (pactor == pPlayer) {
         if (abForce3rd) {
             FinishSetupSpecialIdle(pPlayer);
         }
-        pIdleToPlay = 0;
+        pIdleToPlay = nullptr;
     }
     else {
         AddPostAnimationAction(BaseProcess::POSTANIM_ACTION_PLAY_IDLE);
     }
-    return 1;
+    return true;
 }
 
 void HighProcess::SetLastSeenLocation() {
@@ -2004,29 +2011,29 @@ void HighProcess::SetLastSeenLocation() {
 bool HighProcess::EvaluateDetection(Actor* apActor) {
     uint32_t uiAggroRadius;
     bool bsearch;
-    if (apActor->IsDead(0)) {
-        return 0;
+    if (apActor->IsDead(false)) {
+        return false;
     }
     if (!ReferenceProcessLists.bRunDetection) {
-        return 0;
+        return false;
     }
-    bCheckDeadTalk = 0;
+    bCheckDeadTalk = false;
     TESPackage* pPack = GetPackageThatIsRunning();
     TESPackage* pEditorPack = apActor->GetPackageSetAsPcurrent();
-    bool bspectatorstart = 0;
+    bool bspectatorstart = false;
     TempRefList.RemoveAll();
     Actor* pactor = (Actor*)pPlayer;
     int32_t v66 = -100;
-    bool bcombat = 0;
+    bool bcombat = false;
     int32_t iCombatLevel = 0;
-    Actor* pcombattarget = 0;
-    bool bcrime = 0;
+    Actor* pcombattarget = nullptr;
+    bool bcrime = false;
     float fdistance = fSneakMaxDistance.Float();
-    bool bPlayerCriminal = 0;
+    bool bPlayerCriminal = false;
     int32_t pCrimeTarget = 0;
-    bool bcombattargetIsGuard = 0;
+    bool bcombattargetIsGuard = false;
     int32_t phelpgroup = 0;
-    bool bAddAvoidActor = 0;
+    bool bAddAvoidActor = false;
     float fCombatStrength = apActor->CalculateCombatStrength(-1.0f);
     CombatGroup* pcurrentGroup = apActor->GetCombatGroup();
     TESActorBase* pbase = apActor->GetActorBase();
@@ -2037,7 +2044,7 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
         uiAggroRadius = 0;
     }
     int32_t iAggroRadius = uiAggroRadius;
-    bool bAddAggroActor = 0;
+    bool bAddAggroActor = false;
     FIGHT_REACTION ereaction = FIGHT_REACTION_NEUTRAL;
     FIGHT_REACTION ereaction2 = FIGHT_REACTION_NEUTRAL;
     ACTOR_AGGRESSION eaggression = static_cast<ACTOR_AGGRESSION>(apActor->GetActorValue(ActorValue::AGGRESSION));
@@ -2046,7 +2053,7 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
     if (fThierCombatStrength == 0.0) {
         fThierCombatStrength = 1.0f;
     }
-    if (apActor->GetShouldAttackActor(pPlayer, 0, ereaction, 0)) {
+    if (apActor->GetShouldAttackActor(pPlayer, false, ereaction, false)) {
         iCombatLevel = 100;
     }
     else {
@@ -2054,7 +2061,7 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
             NiPoint3 vec = *apActor->QLocationOnReference() - *pactor->QLocationOnReference();
             double v3 = vec.SqrLength();
             if (static_cast<double>(iAggroRadius * iAggroRadius) >= v3) {
-                bAddAggroActor = 1;
+                bAddAggroActor = true;
             }
         }
     }
@@ -2064,10 +2071,10 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
         if (pstate) {
             idetection = pstate->iLevel;
         }
-        if (pPlayer->IsDead(0) && !pPlayer->IsDying()) {
+        if (pPlayer->IsDead(false) && !pPlayer->IsDying()) {
             BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
             if (!CurrentAIProcess->GetGreetingFlag() && pPlayer->fCheckMyDeadBodyTimer <= 0.0) {
-                bCheckDeadTalk = 1;
+                bCheckDeadTalk = true;
             }
         }
         float fdetectvalue = fSneakNoticedMin.Float();
@@ -2078,9 +2085,9 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
         }
         if (fdetectvalue < static_cast<double>(idetection) && (!pstate || !pstate->bEvaluated)) {
             if (pstate) {
-                pstate->bEvaluated = 1;
+                pstate->bEvaluated = true;
             }
-            if (!pactor->IsDead(0)) {
+            if (!pactor->IsDead(false)) {
                 if (bAddAvoidActor) {
                     Actor* a2 = (Actor*)pPlayer;
                     AvoidActorList.AddHead(a2);
@@ -2096,7 +2103,7 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
                     else {
                         if (!pactor->IsInCombatantFaction() ||
                             (!pcombattarget || !pcombattarget->IsInCombatantFaction())) {
-                            bool baggro = 1;
+                            bool baggro = true;
                             int32_t NumberActorsInCombat = pPlayer->GetNumberActorsInCombat();
                             if (NumberActorsInCombat >= iCombatTargetPlayerSoftCap.Int()) {
                                 double v13 = static_cast<double>(idetection);
@@ -2108,7 +2115,7 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
                                 StartCombatStates* psta;
                                 bool abflag = !apActor->IsActoraGuard();
                                 if (apActor->GetActorBase()->IsInEvilFactionsOnly()) {
-                                    abflag = 1;
+                                    abflag = true;
                                 }
                                 StartCombatStates* HighProcess__UnkCombatTarget =
                                     static_cast<StartCombatStates*>(ourMalloc(sizeof(StartCombatStates)));
@@ -2116,7 +2123,7 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
                                     psta = ::new (HighProcess__UnkCombatTarget) StartCombatStates;
                                 }
                                 else {
-                                    psta = 0;
+                                    psta = nullptr;
                                 }
                                 StartCombatStates* psta_2 = psta;
                                 psta->pTarget = pactor;
@@ -2142,7 +2149,7 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
                                         pstat = ::new (v18) StartCombatStates;
                                     }
                                     else {
-                                        pstat = 0;
+                                        pstat = nullptr;
                                     }
                                     StartCombatStates* pstat_2 = pstat;
                                     pstat->pGroup = pgroup;
@@ -2158,17 +2165,17 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
             pactor->IsTresPassing() && !apActor->IsProcessingTresPassAlarm()) {
             TESObjectCELL* pcell = pactor->GetParentCell();
             TESForm* powner = pcell->GetOwner();
-            bool bevil = 0;
+            bool bevil = false;
             if (powner) {
                 if (powner->GetFormType() == NPC__ID) {
                     if (static_cast<TESNPC*>(powner)->TESActorBaseData::IsInEvilFactionsOnly()) {
-                        bevil = 1;
+                        bevil = true;
                     }
                 }
                 else {
                     if (powner->GetFormType() == FACT_ID) {
                         if (static_cast<TESFaction*>(powner)->TESFaction::GetIsEvil()) {
-                            bevil = 1;
+                            bevil = true;
                         }
                     }
                 }
@@ -2178,12 +2185,12 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
                 TESObjectCELL* pcell_2 = pactor->GetParentCell();
                 if (pactor->IsTresPassing()) {
                     TrespassPackage* ptrespack = (&pactor->m_Extra)->GetTrespassPackage();
-                    TESForm* v30 = 0;
+                    TESForm* v30 = nullptr;
                     if (ptrespack && ptrespack->pObjectOwned) {
                         TESForm* pownedcell = ptrespack->pObjectOwned;
                         if (pownedcell->GetFormType() == CELL_ID && pcell_2 != pownedcell) {
                             (&pactor->m_Extra)->RemoveTrespassPackage();
-                            ptrespack = 0;
+                            ptrespack = nullptr;
                         }
                     }
                     else {
@@ -2199,14 +2206,16 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
                                 ptrespack_2 = ::new (v17) TrespassPackage(pactor, Owner, pcell_2, iwarningvalue);
                             }
                             else {
-                                ptrespack_2 = 0;
+                                ptrespack_2 = nullptr;
                             }
                             ptrespack = ptrespack_2;
                             (&pactor->m_Extra)->SetTrespassPackageExtra(ptrespack_2);
                             pactor->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
                         }
                     }
-                    if (!ReferenceProcessLists.GetCrimeinGlobalCrimeList(pactor, 0, PackageNS::CRIME_TYPE_TRESPASS)) {
+                    if (!ReferenceProcessLists.GetCrimeinGlobalCrimeList(
+                            pactor, nullptr, PackageNS::CRIME_TYPE_TRESPASS
+                        )) {
                         if (!apActor->IsTresPassing()) {
                             BSSimpleList<StartCombatStates*>* plist;
                             for (plist = &AggroList; plist && plist->m_item; plist = plist->m_pkNext) {
@@ -2234,12 +2243,12 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
                 }
             }
         }
-        bsearch = 0;
+        bsearch = false;
         if (pPlayer->IsPlayerCharacterInCombat(&bsearch)) {
             ObserveCombat(apActor, pactor);
         }
     }
-    plastDetected = 0;
+    plastDetected = nullptr;
     if (!apActor->GetParentCell() || !apActor->GetParentCell()->GetInterior()) {
         fdistance = fdistance + fdistance;
     }
@@ -2249,12 +2258,12 @@ bool HighProcess::EvaluateDetection(Actor* apActor) {
             break;
         }
         TESObjectREFR* pref = (TESObjectREFR*)(&ReferenceProcessLists.MobProcessArray)->GetItem(i);
-        DetectActor(pref, apActor, bspectatorstart, 0, eaggression, fConfidence, fCombatStrength);
+        DetectActor(pref, apActor, bspectatorstart, nullptr, eaggression, fConfidence, fCombatStrength);
     }
     EvaluateCombatDetectionLists(apActor);
     bEvaluateDetection = 0;
-    bool bflag = plastDetected != 0;
-    plastDetected = 0;
+    bool bflag = plastDetected != nullptr;
+    plastDetected = nullptr;
     return bflag;
 }
 
@@ -2267,7 +2276,7 @@ void HighProcess::EvaluateCombatDetectionLists(Actor* apActor) {
         }
         StartCombatStates* psta = plist->m_item;
         if (pgroup != psta->pGroup) {
-            bool baggresor = 0;
+            bool baggresor = false;
             if (psta->pGroup) {
                 Actor* pact = psta->pGroup->GetMember(0);
                 if (pact) {
@@ -2275,7 +2284,10 @@ void HighProcess::EvaluateCombatDetectionLists(Actor* apActor) {
                     baggresor = CurrentAIProcess->GetIsAggressor();
                 }
             }
-            EnterCombat(apActor, 0, 0, psta->bSendAlarm, psta->pGroup, psta->bFleeing, 0, baggresor, 0, 0, 0, 1, 0);
+            EnterCombat(
+                apActor, nullptr, false, psta->bSendAlarm, psta->pGroup, psta->bFleeing, false, baggresor, 0, false,
+                false, true, nullptr
+            );
             ourFree(psta);
             if (!apActor->GetCombatController() || pgroup != apActor->GetCombatGroup()) {
                 break;
@@ -2286,18 +2298,21 @@ void HighProcess::EvaluateCombatDetectionLists(Actor* apActor) {
     plist = &AggroList;
     // The list's address is also tested, though it is never null.
     if (!plist->m_item) {
-        SetDetectAlert(0);
+        SetDetectAlert(false);
     }
     while (plist && plist->m_item) {
         StartCombatStates* psta_2 = plist->m_item;
-        bool baggressor = 0;
-        bool bcrimecaused = 0;
+        bool baggressor = false;
+        bool bcrimecaused = false;
         FIGHT_REACTION eFactionFight = apActor->GetFactionFightReaction(psta_2->pTarget, bcrimecaused);
         if ((!apActor->IsAngryWithPlayer() || psta_2->pTarget != pPlayer) && !bcrimecaused &&
-            apActor->GetShouldAttackActor(psta_2->pTarget, 0, eFactionFight, 0)) {
-            baggressor = 1;
+            apActor->GetShouldAttackActor(psta_2->pTarget, false, eFactionFight, false)) {
+            baggressor = true;
         }
-        EnterCombat(apActor, psta_2->pTarget, 0, psta_2->bSendAlarm, 0, 0, 0, baggressor, 0, 0, 0, 1, 0);
+        EnterCombat(
+            apActor, psta_2->pTarget, false, psta_2->bSendAlarm, nullptr, false, false, baggressor, 0, false, false,
+            true, nullptr
+        );
         ourFree(psta_2);
         plist = plist->m_pkNext;
     }
@@ -2313,8 +2328,8 @@ void HighProcess::EvaluateCombatDetectionLists(Actor* apActor) {
         }
         else {
             for (Actor* pact_2 : AvoidActorList.ItemsUntilNull()) {
-                if (!apActor->IsFleeing(0)) {
-                    apActor->InitiateFlee(pact_2, 0, 1, 1, 0, 0, -1.0f, -1.0f);
+                if (!apActor->IsFleeing(false)) {
+                    apActor->InitiateFlee(pact_2, false, true, true, nullptr, nullptr, -1.0f, -1.0f);
                 }
                 FleePackage* pfleePack = static_cast<FleePackage*>(GetPackageThatIsRunning());
                 if (pfleePack) {
@@ -2426,7 +2441,7 @@ bool HighProcess::ProcessActivateOneHour(Actor* apActor, float afTimeDelta) {
         return false;
     }
     if (!pTarget->IsActor()) {
-        SetTargetActivated(1);
+        SetTargetActivated(true);
         if (pAcquireObject) {
             pTarget->Activate(
                 apActor, true, static_cast<TESBoundObject*>(pAcquireObject->pObject), pAcquireObject->iamount
@@ -2499,7 +2514,7 @@ void HighProcess::ProcessSandman(Actor* apActor) {
     if (!pTarget) {
         SetTargetForPackage(apActor);
     }
-    Actor* a1 = 0;
+    Actor* a1 = nullptr;
     if (pTarget) {
         if (pTarget->IsActor()) {
             a1 = static_cast<Actor*>(pTarget);
@@ -2507,31 +2522,31 @@ void HighProcess::ProcessSandman(Actor* apActor) {
     }
     if (static_cast<double>(static_cast<int32_t>(apActor->GetDistanceFromPoint(FurnitureMarker.Position))) <= 40.0) {
         if (GetWeaponDrawn()) {
-            SetWantWeaponDrawn(0);
+            SetWantWeaponDrawn(false);
         }
         if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
             apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
             AddToProcedureIndexRunning(apActor, 1);
             BaseProcess* CurrentAIProcess = a1->GetCurrentAIProcess();
-            CurrentAIProcess->SetRunOncePackage(0, a1);
-            SetTargetActivated(1);
-            pPlayer->SetAIControlledPackage(0);
-            a1->AttackAlarm(apActor, 0, 1);
+            CurrentAIProcess->SetRunOncePackage(nullptr, a1);
+            SetTargetActivated(true);
+            pPlayer->SetAIControlledPackage(false);
+            a1->AttackAlarm(apActor, false, true);
         }
         else {
             if (!GetCurrentFurniture() || !SitOrSleep(apActor)) {
                 if (pPlayer->GetSandManDetectionValue() <= 0) {
-                    a1->Kill(0, 0.0);
+                    a1->Kill(nullptr, 0.0);
                 }
                 else {
                     a1->Kill(apActor, 0.0);
                 }
                 AddToProcedureIndexRunning(apActor, 1);
                 BaseProcess* v7 = a1->GetCurrentAIProcess();
-                v7->SetRunOncePackage(0, a1);
+                v7->SetRunOncePackage(nullptr, a1);
                 BaseProcess* v6 = apActor->GetCurrentAIProcess();
-                v6->SetRunOncePackage(0, apActor);
-                pPlayer->SetAIControlledPackage(0);
+                v6->SetRunOncePackage(nullptr, apActor);
+                pPlayer->SetAIControlledPackage(false);
                 pPlayer->Sneak();
             }
         }
@@ -2546,7 +2561,8 @@ void HighProcess::ProcessSandman(Actor* apActor) {
             TESWorldSpace* LocationWorld = v9->GetLocationWorld(apActor);
             TESObjectCELL* LocationCell = v9->GetLocationCell(apActor);
             apActor->SetPathfindingGoal(
-                FurnitureMarker.Position, LocationCell, LocationWorld, 40.0f, static_cast<PathingAvoidNodeArray*>(0)
+                FurnitureMarker.Position, LocationCell, LocationWorld, 40.0f,
+                static_cast<PathingAvoidNodeArray*>(nullptr)
             );
         }
     }
@@ -2558,9 +2574,9 @@ void HighProcess::ProcessCannibal(Actor* apActor) {
         SetTargetForPackage(apActor);
     }
     if (GetWeaponDrawn()) {
-        SetWantWeaponDrawn(0);
+        SetWantWeaponDrawn(false);
     }
-    Actor* pTarget = 0;
+    Actor* pTarget = nullptr;
     if (this->pTarget) {
         if (this->pTarget->IsActor()) {
             pTarget = static_cast<Actor*>(this->pTarget);
@@ -2572,22 +2588,22 @@ void HighProcess::ProcessCannibal(Actor* apActor) {
             AddToProcedureIndexRunning(apActor, 1);
             if (pTarget) {
                 if (pTarget->pCurrentProcess) {
-                    pTarget->AttackAlarm(apActor, 0, 1);
+                    pTarget->AttackAlarm(apActor, false, true);
                     BaseProcess* CurrentAIProcess = pTarget->pCurrentProcess;
-                    CurrentAIProcess->SetRunOncePackage(0, pTarget);
+                    CurrentAIProcess->SetRunOncePackage(nullptr, pTarget);
                 }
             }
             BaseProcess* v2 = apActor->pCurrentProcess;
-            v2->SetRunOncePackage(0, pPlayer);
-            pPlayer->SetAIControlledPackage(0);
+            v2->SetRunOncePackage(nullptr, pPlayer);
+            pPlayer->SetAIControlledPackage(false);
         }
     }
     else {
-        SetupSpecialIdle(apActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 1, 1);
+        SetupSpecialIdle(apActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, true, true);
         if (pTarget) {
-            pTarget->SetHasBeenEaten(1);
+            pTarget->SetHasBeenEaten(true);
         }
-        SetCurrentActionComplete(1);
+        SetCurrentActionComplete(true);
     }
 }
 
@@ -2629,13 +2645,13 @@ void HighProcess::RandomlyPlaySpecialIdles(Actor* apActor) {
             }
         }
         if (GetEndIdlesPlayed() && !pAnim->SpecialIdleWorking() && pAnim->SpecialIdleDonePlaying()) {
-            SetEndIdlesPlayed(0);
+            SetEndIdlesPlayed(false);
         }
         NiNode* v2 = apActor->Get3D();
         const NiBound* WorldBound = &v2->GetWorldBound();
         float Seconds = WorldBound->m_fRadius;
         if (!pIdleToPlay) {
-            double DistanceFromReference = apActor->GetDistanceFromReference(pPlayer, 0, 1);
+            double DistanceFromReference = apActor->GetDistanceFromReference(pPlayer, false, true);
             float v11 = Seconds / 64.0;
             if (!(fAIIdleAnimationDistance.Float() * v11 < DistanceFromReference) &&
                 (!pPackage || (!pPackage->pIdleCollection && pPackage->GetPackType() != PACKAGE_TYPE_GET_UP))) {
@@ -2648,7 +2664,7 @@ void HighProcess::RandomlyPlaySpecialIdles(Actor* apActor) {
                             SetIdleTimer(v5);
                         }
                         else {
-                            SetupSpecialIdle(apActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
+                            SetupSpecialIdle(apActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
                             float* v4 = &fAIIdleWaitTime.Float();
                             SetIdleTimer(*v4);
                         }
@@ -2666,11 +2682,11 @@ void HighProcess::PostAnimFreeUpSpecialIdle(Actor* apActor) {
         ((((int32_t)apActor->GetSitSleepState()) == 4) || (((int32_t)apActor->GetSitSleepState()) == 9))) {
         v3 = apActor->GetAnimation();
         if (v3) {
-            v3->SpecialIdleFree(1, 0);
+            v3->SpecialIdleFree(true, false);
         }
         faceAnimationData = apActor->GetFaceAnimationData();
         if (faceAnimationData) {
-            faceAnimationData->ResetAnimCurrentMorphs(0.75f, (bool)1, (bool)1, (bool)1, (bool)1);
+            faceAnimationData->ResetAnimCurrentMorphs(0.75f, true, true, true, true);
         }
     }
 }
@@ -2723,14 +2739,14 @@ DetectionState* HighProcess::InsertIntoDetectionList(
 BSSimpleList<DetectionState*>* HighProcess::GetWhoDetectsMe(Actor* apActor) {
     BSSimpleList<DetectionState*>* pNewList;
     BSSimpleList<DetectionState*>* plist = pActorsWhoDetectMeList;
-    DetectionState* v9 = 0;
+    DetectionState* v9 = nullptr;
     BSSimpleList<DetectionState*>* v6 =
         static_cast<BSSimpleList<DetectionState*>*>(ourMalloc(sizeof(BSSimpleList<DetectionState*>)));
     if (v6) {
         pNewList = ::new (v6) BSSimpleList<DetectionState*>;
     }
     else {
-        pNewList = 0;
+        pNewList = nullptr;
     }
     while (plist && plist->m_item) {
         DetectionState* pstate;
@@ -2741,7 +2757,7 @@ BSSimpleList<DetectionState*>* HighProcess::GetWhoDetectsMe(Actor* apActor) {
             pstate = ::new (apMemory) DetectionState;
         }
         else {
-            pstate = 0;
+            pstate = nullptr;
         }
         DetectionState* pstate_2 = pstate;
         *pstate = *pcurrentstate;
@@ -2771,7 +2787,7 @@ void HighProcess::SetActorsDetectionEvent(
         v7 = ::new (apMemory) DetectionEvent;
     }
     else {
-        v7 = 0;
+        v7 = nullptr;
     }
     pActorsGeneratedDetectionEvent = v7;
     pActorsGeneratedDetectionEvent->iActionValue = aiSoundLevel;
@@ -2781,7 +2797,7 @@ void HighProcess::SetActorsDetectionEvent(
     pActorsGeneratedDetectionEvent->fTimeStamp = v9;
     pActorsGeneratedDetectionEvent->pRef = apRef;
     if (apRef) {
-        apRef->SetTargeted(1);
+        apRef->SetTargeted(true);
     }
 }
 
@@ -2796,7 +2812,7 @@ void HighProcess::CheckForExpiredDetectionEvent() {
     double elapsedTime;
     if (pActorsGeneratedDetectionEvent) {
         elapsedTime = (double)(&pActorsGeneratedDetectionEvent->fTimeStamp)->ElapsedTime();
-        if (((&fDetectionEventExpireTime)->Float()) < elapsedTime) {
+        if ((&fDetectionEventExpireTime)->Float() < elapsedTime) {
             ourFree(pActorsGeneratedDetectionEvent);
             pActorsGeneratedDetectionEvent = nullptr;
         }
@@ -2813,27 +2829,27 @@ void HighProcess::SetLipQuequed(bool abFlag) {
 
 void HighProcess::CreateFollownoEscort(Actor* apActor, bool abflag) {
     BaseProcess* CurrentAIProcess;
-    bool bCreate = 0;
+    bool bCreate = false;
     TESPackage* pPack = GetPackageThatIsRunning();
     if (!pPack || (CurrentAIProcess = apActor->pCurrentProcess, CurrentAIProcess->GetGreetingFlag())) {
-        bCreate = 1;
+        bCreate = true;
     }
     else {
         if (pPack->GetPCContinue() && pPack->GetServicesEnabled()) {
-            bCreate = 1;
+            bCreate = true;
         }
         else {
             if (pPack->GetPackType() == PACKAGE_TYPE_WANDER) {
                 uint32_t Count = pPack->ePROCEDURE_TYPE;
                 if (Procedure_Action[Count][GetProcedureIndexRunning()] == PROCEDURE_WANDER) {
-                    bCreate = 1;
+                    bCreate = true;
                 }
             }
             else {
                 if (pPack->GetPackType() == PACKAGE_TYPE_TRAVEL || pPack->GetPackType() == PACKAGE_TYPE_EXPLORE) {
                     uint32_t v4 = pPack->ePROCEDURE_TYPE;
                     if (Procedure_Action[v4][GetProcedureIndexRunning()] == PROCEDURE_DONE) {
-                        bCreate = 1;
+                        bCreate = true;
                     }
                 }
             }
@@ -2846,14 +2862,14 @@ void HighProcess::CreateFollownoEscort(Actor* apActor, bool abflag) {
         }
         TESPackage* ppack__pPack = TESPackage::CreatePackage(PACKAGE_TYPE_FOLLOW);
         ppack__pPack->SetPackType(PACKAGE_TYPE_FOLLOW);
-        ppack__pPack->SetMustReachLocation(1);
-        ppack__pPack->SetMustComplete(1);
+        ppack__pPack->SetMustReachLocation(true);
+        ppack__pPack->SetMustComplete(true);
         PackageTarget* v9 = static_cast<PackageTarget*>(ourMalloc(sizeof(PackageTarget)));
         if (v9) {
             pnew = ::new (v9) PackageTarget;
         }
         else {
-            pnew = 0;
+            pnew = nullptr;
         }
         ppack__pPack->SetPackageTarget(pnew);
         if (pnew) {
@@ -2873,7 +2889,7 @@ void HighProcess::CreateFollownoEscort(Actor* apActor, bool abflag) {
             ppack__pPack->SetDrawWeaponFlag(DrawWeaponFlag);
         }
         ppack__pPack->ePROCEDURE_TYPE = PACKAGE_PROCEDURE_FOLLOW_WITHOUT_ESCORT;
-        apActor->PutCreatedPackage(ppack__pPack, 1, 1);
+        apActor->PutCreatedPackage(ppack__pPack, true, true);
         SetActionHeadTrackTarget(pPlayer);
         if (abflag) {
             fAwarePlayerTimer = fAIAwareofPlayerTimer.Float();
@@ -2895,29 +2911,29 @@ void HighProcess::AddTalkedtoActor(Actor* apActor) {
 
 bool HighProcess::ComputeCanInitiateDialogueWithNPC(Actor* apActor, Actor* apTalkToActor) {
     if (pPlayer->IsImportantConversationRunning() || pPlayer->GetPlayerGreetFlag()) {
-        return 0;
+        return false;
     }
     if (!GetPackageThatIsRunning()) {
-        return 0;
+        return false;
     }
     if (!apActor->CanSpeak() || apActor->IsSleeping()) {
-        return 0;
+        return false;
     }
     if (fTalkTimer > 0.0 ||
         (apActor->ShouldSkipFallOutBehavior(FALLOUT_BEHAVIORS_RANDOM_CONVERSATIONS) ||
          (apTalkToActor == apActor ||
           (apTalkToActor == pPlayer ||
            (!apTalkToActor->CanSpeak() || (!apTalkToActor->Get3D() || !apTalkToActor->ShouldTalkTo(apActor))))))) {
-        return 0;
+        return false;
     }
     apActor->GetPackageSetAsPcurrent();
     apTalkToActor->GetPackageSetAsPcurrent();
     BaseProcess* CurrentAIProcess = apTalkToActor->pCurrentProcess;
     if (!CurrentAIProcess || !CurrentAIProcess->ComputeCanRespondToDialogueFromNPC(apTalkToActor, apActor)) {
-        return 0;
+        return false;
     }
     if (!ReferenceProcessLists.bRunDetection) {
-        return 1;
+        return true;
     }
     DetectionState* v5 = GetDetectionState(apTalkToActor, 0);
     return v5 && v5->fLastTimeDetected.ElapsedTime() < 30.0;
@@ -2930,11 +2946,11 @@ bool HighProcess::ComputeCanRespondToDialogueFromNPC(Actor* apActor, Actor* apIn
         return (bool)result;
     }
     if (!GetCurrentPackage()) {
-        return (bool)1;
+        return true;
     }
     TESPackage* v3 = GetCurrentPackage();
     if (!v3->IsInterruptPackage()) {
-        return (bool)1;
+        return true;
     }
     return (bool)result;
 }
@@ -2953,18 +2969,18 @@ bool HighProcess::IsActorInsideAmbushArea(Actor* apActor, Actor* apTarget) {
 
 bool HighProcess::CheckIfThereSomeoneTalkWith(Actor* apActor) {
     TESPackage* ppack = GetPackageThatIsRunning();
-    bool bReturnFlag = 0;
-    bool bmoving = 0;
-    Actor* ptalkactor = 0;
+    bool bReturnFlag = false;
+    bool bmoving = false;
+    Actor* ptalkactor = nullptr;
     if (ppack) {
         if (!ppack->IsInterruptPackage() &&
             !apActor->ShouldSkipFallOutBehavior(FALLOUT_BEHAVIORS_RANDOM_CONVERSATIONS)) {
-            bool bcontinue = 1;
+            bool bcontinue = true;
             switch (ppack->GetPackType()) {
                 case PACKAGE_TYPE_FOLLOW:
                 case PACKAGE_TYPE_ESCORT:
                 case PACKAGE_TYPE_ACCOMPANY: {
-                    bmoving = 1;
+                    bmoving = true;
                     ptalkactor = static_cast<Actor*>(pTarget);
                     break;
                 }
@@ -2974,7 +2990,7 @@ bool HighProcess::CheckIfThereSomeoneTalkWith(Actor* apActor) {
                 case PACKAGE_TYPE_GUARD:
                 case PACKAGE_TYPE_DIALOGUE:
                 case PACKAGE_TYPE_USE_WEAPON: {
-                    bcontinue = 0;
+                    bcontinue = false;
                     break;
                 }
                 case PACKAGE_TYPE_SANDBOX: {
@@ -2987,7 +3003,7 @@ bool HighProcess::CheckIfThereSomeoneTalkWith(Actor* apActor) {
             }
             if (fCheckToTalkTimer <= 0.0 && bcontinue) {
                 if (!ptalkactor) {
-                    bCheckDeadTalk = 0;
+                    bCheckDeadTalk = false;
                     for (DetectionState* pstate : pDetectedActorList->ItemsUntilNull()) {
                         BaseProcess* v6;
                         if (!pstate) {
@@ -3006,7 +3022,7 @@ bool HighProcess::CheckIfThereSomeoneTalkWith(Actor* apActor) {
                             if (ptargPack &&
                                 (ptargPack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_SANDBOX &&
                                  !ptargPack->SandboxGetAllowConversation())) {
-                                ptalkactor = 0;
+                                ptalkactor = nullptr;
                             }
                             else {
                                 float fsocialdistance = 200.0f;
@@ -3018,8 +3034,8 @@ bool HighProcess::CheckIfThereSomeoneTalkWith(Actor* apActor) {
                                     fsocialdistance = fAISocialRadiusToTriggerConversation.Float();
                                 }
                                 if (!(static_cast<double>(fsocialdistance) >=
-                                      ptalkactor->GetDistanceFromReference(apActor, 0, 0))) {
-                                    ptalkactor = 0;
+                                      ptalkactor->GetDistanceFromReference(apActor, false, false))) {
+                                    ptalkactor = nullptr;
                                 }
                                 else {
                                     if (pLastSpokeToList->IsEmpty()) {
@@ -3033,7 +3049,7 @@ bool HighProcess::CheckIfThereSomeoneTalkWith(Actor* apActor) {
                                     }
                                     int32_t rnone = Random() % 100;
                                     if (pLastSpokeToList->IsInList(ptalkactor)) {
-                                        ptalkactor = 0;
+                                        ptalkactor = nullptr;
                                     }
                                     else {
                                         float fchancetalk = fAISocialchanceForConversation.Float();
@@ -3046,23 +3062,25 @@ bool HighProcess::CheckIfThereSomeoneTalkWith(Actor* apActor) {
                                             CurrentAIProcess->AddTalkedtoActor(apActor);
                                             break;
                                         }
-                                        ptalkactor = 0;
+                                        ptalkactor = nullptr;
                                     }
                                 }
                             }
                         }
                         else {
-                            ptalkactor = 0;
+                            ptalkactor = nullptr;
                         }
                     }
                 }
                 if (ptalkactor) {
                     if (ptalkactor != pPlayer) {
-                        apActor->InitiateDialogue(ptalkactor, 0, 0, 1, bmoving, 0, 0, bmoving, 0);
+                        apActor->InitiateDialogue(
+                            ptalkactor, nullptr, nullptr, true, bmoving, false, nullptr, bmoving, false
+                        );
                         float afMax = fAISocialTimerForConversationsMax.Float();
                         float* v2 = &fAISocialTimerForConversationsMin.Float();
                         fCheckToTalkTimer = CombatFormulas::GetRandomBetween(*v2, afMax);
-                        return 1;
+                        return true;
                     }
                 }
             }
@@ -3076,12 +3094,12 @@ bool HighProcess::ComputeAllowSandboxConversation(Actor* apActor, Actor* apTalkT
         (apTalkToActor->GetDisabledOrDeleted() ||
          (apTalkToActor == apActor ||
           (apTalkToActor == pPlayer || !ComputeCanInitiateDialogueWithNPC(apActor, apTalkToActor))))) {
-        return 0;
+        return false;
     }
     TESPackage* ptargPack = apTalkToActor->GetCurrentPackage();
     if (ptargPack &&
         (ptargPack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_SANDBOX && !ptargPack->SandboxGetAllowConversation())) {
-        return 0;
+        return false;
     }
     if (pLastSpokeToList->IsEmpty()) {
         fClearTalkToListTimer = fAItalktosameNPCtimer.Float();
@@ -3130,7 +3148,7 @@ void HighProcess::SetSubtitleItem(DialogueItem* apItem) {
 }
 
 PathingAvoidNodeArray* HighProcess::CreateAvoidArray(Actor* apActor) {
-    PathingAvoidNodeArray* parray = 0;
+    PathingAvoidNodeArray* parray = nullptr;
     if (apActor->ShouldActorAvoidRadiation()) {
         BSSimpleList<AvoidAreaStruct*>* plist = pListOfAvoidAreas;
         if (plist) {
@@ -3142,7 +3160,7 @@ PathingAvoidNodeArray* HighProcess::CreateAvoidArray(Actor* apActor) {
                     parray_2 = ::new (apMemory) PathingAvoidNodeArray;
                 }
                 else {
-                    parray_2 = 0;
+                    parray_2 = nullptr;
                 }
                 parray = parray_2;
                 parray_2->Add(pListOfAvoidAreas->m_item->pAvoidNode);
@@ -3237,7 +3255,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
             apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
             goto LABEL_9;
         }
-        ptarg = 0;
+        ptarg = nullptr;
         if (apActor->IsInCombat() && apActor->GetCombatController()) {
             ptarg = (TESObjectREFR*)apActor->GetCombatController()->GetTarget();
         }
@@ -3255,33 +3273,33 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
         }
         if ((ptarg->GetDelete() && !(&ptarg->m_Extra)->GetReferencePointer()) || ptarg->GetDisabled()) {
             if (ptarg->GetDelete()) {
-                v96->SetNeverRun(ptarg, 1);
+                v96->SetNeverRun(ptarg, true);
             }
             if (abflag) {
                 AddToProcedureIndexRunning(apActor, 1);
             }
             return;
         }
-        if (ptarg->IsDead(1)) {
+        if (ptarg->IsDead(true)) {
             if (v96->GetIsCreated()) {
-                apActor->EndInterruptPackage(0);
-                apActor->EvaluatePackage(0, 0);
+                apActor->EndInterruptPackage(false);
+                apActor->EvaluatePackage(false, false);
             }
             else {
                 if (v96->GetPackageTarget()->GetTargType() && v96->GetPackageTarget()->GetTargType() != PTT_LINKEDREF) {
-                    SetTarget(0);
+                    SetTarget(nullptr);
                     SetProcedureIndexRunning(0);
                 }
                 else {
-                    v96->SetNeverRun(pTarget, 1);
+                    v96->SetNeverRun(pTarget, true);
                 }
             }
             return;
         }
         targetloc = ptarg->GetLocationOnReference();
         lastSeenPostion = targetloc;
-        btargetSwimming = 0;
-        ptargactor = 0;
+        btargetSwimming = false;
+        ptargactor = nullptr;
         if (ptarg->IsActor()) {
             ptargactor = static_cast<Actor*>(ptarg);
         }
@@ -3300,7 +3318,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                 }
             }
             if (ptargactor->GetCurrentProcessType() == PROCESS_TYPE_LOW &&
-                (!ptargactor->IsDead(0) &&
+                (!ptargactor->IsDead(false) &&
                  (!ptargactor->GetDisabled() &&
                   (ptargactor != apActor &&
                    (ptargactor != pPlayer &&
@@ -3310,11 +3328,11 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                 TESObjectCELL* ParentCell = ptargactor->GetParentCell();
                 float a3 = (&ptargactor->GetAngleOnReference())->z;
                 const NiPoint3* v5 = &ptargactor->GetLocationOnReference();
-                apActor->MoveActorAndFollowers(*v5, a3, ParentCell, WorldSpace, 1, 1);
+                apActor->MoveActorAndFollowers(*v5, a3, ParentCell, WorldSpace, true, true);
                 return;
             }
         }
-        bmustmove = 0;
+        bmustmove = false;
         if (v96->GetIsCreated()) {
             TESPackage* pEditorPack;
             pEditorPack = GetCurrentPackage();
@@ -3323,7 +3341,8 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                     (pEditorPack->GetServicesEnabled() &&
                      (apActor->GetParentCell() && apActor->GetParentCell()->IsActorCellOwner(apActor)))) {
                     SetActionHeadTrackTarget(pPlayer);
-                    if (apActor->LineOfSight(0, ptarg, 1, 0, 0) || !GetDetectionState(static_cast<Actor*>(ptarg), 0)) {
+                    if (apActor->LineOfSight(false, ptarg, true, nullptr, false) ||
+                        !GetDetectionState(static_cast<Actor*>(ptarg), 0)) {
                         if (!apActor->IsPathingComplete()) {
                             EndMoveMessage(apActor);
                         }
@@ -3338,7 +3357,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                         }
                     }
                     else {
-                        bmustmove = 1;
+                        bmustmove = true;
                     }
                 }
             }
@@ -3362,7 +3381,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
         bool bTargetMoving = ptargactor && ptargactor->IsMoving();
         float fbaseRadius = 0.0f;
         if (ptarg == pPlayer || v96->GetPackageTarget()) {
-            fbaseRadius = v96->GetPackageRadiusActorToRefTarget(apActor, 0);
+            fbaseRadius = v96->GetPackageRadiusActorToRefTarget(apActor, false);
         }
         if (fbaseRadius < 1.0) {
             fbaseRadius = static_cast<float>(iAIDistanceRadiusMinLocation.Int());
@@ -3378,12 +3397,12 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
             ffollowRadius = AiFormulas::GetFollowRadiusSlow(v93);
         }
         float frecalcDist = ffollowRadius * 0.75;
-        bool bpathingToBreadcrumbs = 0;
+        bool bpathingToBreadcrumbs = false;
         if (!ptarg ||
             (v96->GetPackType() == PACKAGE_TYPE_FOLLOW &&
              (v96->pPackLoc &&
               ((v96->pPackLoc->GetLocType() < PLT_CURRLOC || v96->pPackLoc->GetLocType() == PLT_LINKEDREF) &&
-               v96->IsActorAtLocation(apActor, 0, -1.0f, 0))))) {
+               v96->IsActorAtLocation(apActor, false, -1.0f, false))))) {
             if (abflag) {
                 AddToProcedureIndexRunning(apActor, 1);
                 if (v96->GetIsCreated()) {
@@ -3393,7 +3412,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                     else {
                         ClearCurrentPackage();
                     }
-                    CheckforNewPackage(apActor, 0);
+                    CheckforNewPackage(apActor, false);
                     return;
                 }
                 if (!apActor->IsPathingComplete()) {
@@ -3438,7 +3457,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                 if (pextraCrumbs) {
                     apActor->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
                     PathingLocation leaderLoc(ptargactor);
-                    bool bvalid = leaderLoc.ResolveNavMeshInfo(0);
+                    bool bvalid = leaderLoc.ResolveNavMeshInfo(nullptr);
                     if (!bvalid) {
                         bvalid = leaderLoc.ResolveToClosestNavmeshAndTriangle();
                     }
@@ -3477,7 +3496,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                                    (pcc_2 = apActor->GetCharController(),
                                     pcc_2->GetState() == HK_CHARACTER_ON_GROUND))))) {
                                 PathingLocation myLoc(apActor);
-                                if (myLoc.ResolveNavMeshInfo(0) || myLoc.ResolveToClosestNavmeshAndTriangle()) {
+                                if (myLoc.ResolveNavMeshInfo(nullptr) || myLoc.ResolveToClosestNavmeshAndTriangle()) {
                                     uint32_t myNavMeshID;
                                     const NavMeshInfo* pmyInfo = myLoc.GetBestNavMeshInfo();
                                     if (pmyInfo) {
@@ -3488,7 +3507,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                                     }
                                     if (myNavMeshID == leaderNavMeshID) {
                                         EndMoveMessage(apActor);
-                                        bpathingToBreadcrumbs = 0;
+                                        bpathingToBreadcrumbs = false;
                                         while (pextraCrumbs->GetFirstCrumb()) {
                                             pextraCrumbs->RemoveFirstCrumb();
                                         }
@@ -3499,7 +3518,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                     }
                     const ExtraFollowerSwimBreadcrumb* pcrumb = pextraCrumbs->GetFirstCrumb();
                     if (pcrumb) {
-                        bpathingToBreadcrumbs = 1;
+                        bpathingToBreadcrumbs = true;
                         if (apActor->IsPathingComplete()) {
                             TESObjectCELL* Target;
                             const NiPoint3* v16;
@@ -3528,14 +3547,14 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                                 if (spmesh.operator NavMesh*()) {
                                     TESForm* ParentSpace = spmesh.m_pObject->GetParentSpace();
                                     apActor->BuildRequest_0(
-                                        &prequest, pcrumb->StartLocation, ParentSpace, fbreadcrumbGoalRadius, 0
+                                        &prequest, pcrumb->StartLocation, ParentSpace, fbreadcrumbGoalRadius, nullptr
                                     );
                                 }
                                 else {
                                     TESWorldSpace* v26 = apActor->GetWorldSpace();
                                     TESObjectCELL* v24 = apActor->GetParentCell();
                                     apActor->BuildRequest(
-                                        &prequest, pcrumb->StartLocation, v24, v26, fbreadcrumbGoalRadius, 0
+                                        &prequest, pcrumb->StartLocation, v24, v26, fbreadcrumbGoalRadius, nullptr
                                     );
                                 }
                                 apActor->SetPathfindingGoal(&prequest);
@@ -3553,7 +3572,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                                     }
                                 }
                                 pextraCrumbs->RemoveFirstCrumb();
-                                bpathingToBreadcrumbs = pextraCrumbs->GetFirstCrumb() != 0;
+                                bpathingToBreadcrumbs = pextraCrumbs->GetFirstCrumb() != nullptr;
                             }
                         }
                     }
@@ -3566,7 +3585,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
             if (bmustmove ||
                 (frecalcDist < static_cast<double>(fdistancemoved) ||
                  (((ptargactor && ptargactor->IsMoving()) ||
-                   (v37 = ffollowRadius + v42, !apActor->IsAtPoint(targetloc, v37, 0, 0))) &&
+                   (v37 = ffollowRadius + v42, !apActor->IsAtPoint(targetloc, v37, false, false))) &&
                   (apActor->IsPathingComplete() ||
                    (!apActor->IsWaitingOnPath() && apActor->pActorMover->GetCurrentPercent() > 0.5))))) {
                 if (abpursuit) {
@@ -3575,14 +3594,14 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                         fPursueTimer = 0.0f;
                     }
                     else {
-                        if (apActor->LineOfSight(0, ptarg, 1, 0, 0)) {
+                        if (apActor->LineOfSight(false, ptarg, true, nullptr, false)) {
                             fPursueTimer = 0.0f;
                         }
                         else {
                             fPursueTimer = fPursueTimer + 1.0;
                             if (fPursueTimer >= 30.0) {
                                 if (apActor->IsInCombat()) {
-                                    Actor* ptargetActor = 0;
+                                    Actor* ptargetActor = nullptr;
                                     if (ptarg) {
                                         if (ptarg->IsActor()) {
                                             ptargetActor = static_cast<Actor*>(ptarg);
@@ -3602,26 +3621,26 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                     }
                 }
                 TESWorldSpace* v21 = ptarg->GetWorldSpace();
-                if (!apActor->SetPathfindingGoal(targetloc, ptarg->GetParentCell(), v21, ffollowRadius, 0)) {
+                if (!apActor->SetPathfindingGoal(targetloc, ptarg->GetParentCell(), v21, ffollowRadius, nullptr)) {
                     return;
                 }
                 lastSeenPostion = ptarg->GetLocationOnReference();
             }
         }
         if (!apActor->IsPathingComplete()) {
-            bool considerAlwaysRun = 1;
+            bool considerAlwaysRun = true;
             if (ptargactor) {
                 considerAlwaysRun = (ptargactor->GetMoveMode() & ActorMover::MF_RUNNING) != 0;
             }
             if (aemovemode == -1) {
                 int32_t emove = 0;
-                bool bflag = 0;
+                bool bflag = false;
                 if (v96) {
                     if (v96->GetPackType() == PACKAGE_TYPE_ALARM || v96->GetPackType() == PACKAGE_TYPE_COMBAT) {
-                        bflag = 1;
+                        bflag = true;
                     }
                 }
-                bool bcalc = 1;
+                bool bcalc = true;
                 if (v96->GetIsCreated()) {
                     TESPackage* pEditorPack_2 = GetCurrentPackage();
                     if (pEditorPack_2) {
@@ -3629,7 +3648,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                             if (apActor->GetParentCell()) {
                                 if (apActor->GetParentCell()->IsActorCellOwner(apActor)) {
                                     emove = 257;
-                                    bcalc = 0;
+                                    bcalc = false;
                                 }
                             }
                         }
@@ -3637,7 +3656,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                 }
                 if (bcalc) {
                     float fLongDistSq = ffollowRadius + ffollowRadius;
-                    emove = CalculateMoveMode(apActor, fdistFromTarget, ffollowRadius, fLongDistSq, bflag, 0);
+                    emove = CalculateMoveMode(apActor, fdistFromTarget, ffollowRadius, fLongDistSq, bflag, false);
                 }
                 SetActorsAnimation(apActor, emove, considerAlwaysRun);
             }
@@ -3666,9 +3685,9 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
             apActor->SetWalkSpeed(fwalkSpeed);
         }
         if (!bpathingToBreadcrumbs && fstopRadius > static_cast<double>(fdistFromTarget) &&
-            (ptarg != pPlayer || apActor->LineOfSight(0, ptarg, 1, 0, 0)) && !apActor->IsPathingComplete() &&
-            !apActor->IsRotating()) {
-            HighProcess* pProcess = 0;
+            (ptarg != pPlayer || apActor->LineOfSight(false, ptarg, true, nullptr, false)) &&
+            !apActor->IsPathingComplete() && !apActor->IsRotating()) {
+            HighProcess* pProcess = nullptr;
             if (apActor->pCurrentProcess) {
                 if (!apActor->pCurrentProcess->eLevel) {
                     pProcess = static_cast<HighProcess*>(apActor->pCurrentProcess);
@@ -3679,11 +3698,11 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
                 if (pProcess) {
                     apActor->SetDialogueItemTarget(pPlayer);
                     if (pTopic) {
-                        pProcess->ProcessGreet(apActor, pTopic, 0, 0, 1, 0);
+                        pProcess->ProcessGreet(apActor, pTopic, false, false, true, false);
                     }
                     else {
                         if (GetGreetingFlag()) {
-                            pProcess->ProcessGreet(apActor, 0, 0, 0, 1, 0);
+                            pProcess->ProcessGreet(apActor, nullptr, false, false, true, false);
                         }
                     }
                 }
@@ -3697,7 +3716,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
     float fFleeDoneDist;
     float fFleeStartDist;
     float FormFlags;
-    FleePackage* ppackFlee = 0;
+    FleePackage* ppackFlee = nullptr;
     TESPackage* pbasepack = GetPackageThatIsRunning();
     if (pbasepack) {
         if (pbasepack->GetPackType() == PACKAGE_TYPE_FLEE) {
@@ -3707,13 +3726,13 @@ void HighProcess::ProcessFlee(Actor* apActor) {
     if (ppackFlee) {
         ppackFlee->UpdateAvoidedRefList(this);
     }
-    TESObjectREFR* pRef = 0;
-    bool bswimflee = 0;
+    TESObjectREFR* pRef = nullptr;
+    bool bswimflee = false;
     if (apActor->GetCombatController()) {
         bswimflee = apActor->IsSwimming();
     }
     if (apActor->IsOverEncumbered()) {
-        ppackFlee->SetFleeSucceeded(0);
+        ppackFlee->SetFleeSucceeded(false);
         float v36 = ppackFlee->fFleeTimer * -1.0;
         ppackFlee->ModFleeTimer(v36);
         return;
@@ -3730,7 +3749,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
     }
     FIGHT_REACTION ereaction = FIGHT_REACTION_NEUTRAL;
     if (((!pRef || pRef->IsActor()) && (!bswimflee && !ppackFlee)) ||
-        ((ppackFlee->ShouldShutDown() && !apActor->GetShouldAttackActor(pPlayer, 0, ereaction, 0)) ||
+        ((ppackFlee->ShouldShutDown() && !apActor->GetShouldAttackActor(pPlayer, false, ereaction, false)) ||
          (pRef && (!pRef->IsActor() && (pRef->GetDestroyed() || ppackFlee->FleeSucceeded()))))) {
         AddToProcedureIndexRunning(apActor, 1);
         return;
@@ -3742,7 +3761,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
     TESObjectREFR* pavoidRef = ppackFlee->GetClosestAvoidedRef(apActor);
     TESObjectREFR* pfleeToRef = ppackFlee->GetRefFleeTo();
     bool bknows = ppackFlee->bknowstarget;
-    bool bdoor = 0;
+    bool bdoor = false;
     int32_t emove = 513;
     if (!bcombatMode && !pavoidRef) {
         pavoidRef = pRef;
@@ -3767,7 +3786,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
     if ((pfleeToRef || !pavoidRef) && (ppackFlee->GetMustComplete() || ppackFlee->GetMustReachLocation())) {
         bool v32 = true;
         if (pfleeToRef) {
-            double DistanceFromReference = apActor->GetDistanceFromReference(pfleeToRef, 0, 0);
+            double DistanceFromReference = apActor->GetDistanceFromReference(pfleeToRef, false, false);
             if (!(static_cast<double>(ppackFlee->GetLocationRadius(apActor)) > DistanceFromReference)) {
                 v32 = false;
             }
@@ -3777,12 +3796,12 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                 fPackageEvalTimer = 0.0f;
             }
             apActor->StopMoving();
-            ppackFlee->SetFleeSucceeded(1);
+            ppackFlee->SetFleeSucceeded(true);
             EndMoveMessage(apActor);
             Animation* panim = apActor->GetAnimation();
             if (panim) {
                 if (panim->SpecialIdleDonePlaying()) {
-                    SetupSpecialIdle(apActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
+                    SetupSpecialIdle(apActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
                 }
             }
             if (!(fIdleChatterTimer <= 0.0) ||
@@ -3795,7 +3814,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                 if (ichance <= iChanceFleeDialog.Int()) {
                     TESTopic* ptopic = TESTopic::GetTopic(DT_COMBAT, 3);
                     if (ptopic) {
-                        ProcessGreet(apActor, ptopic, 0, 0, 1, 0);
+                        ProcessGreet(apActor, ptopic, false, false, true, false);
                     }
                 }
                 float a2 = fIdleChatterCommentTimerMax.Float();
@@ -3812,9 +3831,9 @@ void HighProcess::ProcessFlee(Actor* apActor) {
         fIdleChatterTimer = 0.0f;
     }
     if (apActor->DidPathingFail()) {
-        apActor->SetMovementComplete(1);
-        ppackFlee->pRefFleeTo = 0;
-        ppackFlee->pTeleportDoor = 0;
+        apActor->SetMovementComplete(true);
+        ppackFlee->pRefFleeTo = nullptr;
+        ppackFlee->pTeleportDoor = nullptr;
         PathingRequestFlee fleeRequest;
         fleeRequest.Initialize(apActor);
         if (apActor->IsCreature()) {
@@ -3826,7 +3845,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
         PathingAvoidNodeArray* AvoidNodeArray = ppackFlee->CreateAvoidNodeArray();
         fleeRequest.SetAvoidNodeArray(AvoidNodeArray);
         fleeRequest.SetMinFleeDistance(FormFlags);
-        float a2c = apActor->GetHeading(0);
+        float a2c = apActor->GetHeading(false);
         fleeRequest.SetInitialPathHeading(a2c);
         if (ppackFlee->GetRefFleeTo()) {
             PathingLocation kDestination(ppackFlee->GetRefFleeTo());
@@ -3842,8 +3861,8 @@ void HighProcess::ProcessFlee(Actor* apActor) {
             Actor* v29;
             float fDistance = 3.4028235e+38f;
             if (pavoidRef) {
-                if (!pavoidRef->IsDead(0) && !pavoidRef->GetDisabled()) {
-                    fDistance = apActor->GetDistanceFromReference(pavoidRef, 0, 0);
+                if (!pavoidRef->IsDead(false) && !pavoidRef->GetDisabled()) {
+                    fDistance = apActor->GetDistanceFromReference(pavoidRef, false, false);
                 }
             }
             TESObjectREFR* prefFleeTo = ppackFlee->GetRefFleeTo();
@@ -3851,12 +3870,12 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                 v29 = static_cast<Actor*>(prefFleeTo);
             }
             else {
-                v29 = 0;
+                v29 = nullptr;
             }
-            if ((prefFleeTo && (prefFleeTo->IsDead(0) || prefFleeTo->GetDisabled())) ||
+            if ((prefFleeTo && (prefFleeTo->IsDead(false) || prefFleeTo->GetDisabled())) ||
                 (v29 && (v29->IsInCombat() || !v29->CanMove()))) {
-                prefFleeTo = 0;
-                ppackFlee->pRefFleeTo = 0;
+                prefFleeTo = nullptr;
+                ppackFlee->pRefFleeTo = nullptr;
             }
             CriticalQueuedRefCount = static_cast<MobileObject*>(ppackFlee->pTeleportDoor);
             if ((!(fFleeStartDist > static_cast<double>(fDistance)) || CriticalQueuedRefCount) &&
@@ -3888,26 +3907,26 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                     fEssentialDownTimer = fEssentialDownTimer - appTimer.fDelta;
                 }
                 else {
-                    bdoor = 1;
+                    bdoor = true;
                     fEssentialDownTimer = 20.0f;
                 }
                 if (ppackFlee->bEvaluatePoint) {
                     TESObjectREFR* pfleeDest = ppackFlee->GetRefFleeTo();
                     if (pfleeDest == pPlayer) {
-                        pfleeDest = 0;
+                        pfleeDest = nullptr;
                     }
                     if (pfleeDest) {
                         pcell = pfleeDest->GetParentCell();
                         pworld = pfleeDest->GetWorldSpace();
                     }
                     else {
-                        pcell = 0;
-                        pworld = 0;
+                        pcell = nullptr;
+                        pworld = nullptr;
                         if (bdoor) {
                             ppackFlee->FindTeleportDoor(apActor, pavoidRef);
                         }
                         else {
-                            ppackFlee->pTeleportDoor = 0;
+                            ppackFlee->pTeleportDoor = nullptr;
                         }
                     }
                 }
@@ -3917,7 +3936,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                       apActor->pActorMover->GetDistanceRemaining() < 128.0))) {
                     PathingRequestFlee fleeRequest_2;
                     fleeRequest_2.Initialize(apActor);
-                    float a2d = apActor->GetHeading(0);
+                    float a2d = apActor->GetHeading(false);
                     fleeRequest_2.SetInitialPathHeading(a2d);
                     if (apActor->IsCreature()) {
                         TESActorBaseData* v28 = static_cast<TESActorBaseData*>(apActor->GetActorBase());
@@ -3928,7 +3947,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                     fleeRequest_2.SetMinFleeDistance(FormFlags);
                     PathingAvoidNodeArray* v5 = ppackFlee->CreateAvoidNodeArray();
                     fleeRequest_2.SetAvoidNodeArray(v5);
-                    float a2f = apActor->GetHeading(0);
+                    float a2f = apActor->GetHeading(false);
                     fleeRequest_2.SetInitialPathHeading(a2f);
                     if (ppackFlee->GetRefFleeTo()) {
                         PathingLocation kDestination(ppackFlee->GetRefFleeTo());
@@ -3941,7 +3960,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                         return;
                     }
                 }
-                ppackFlee->SetFleeSucceeded(0);
+                ppackFlee->SetFleeSucceeded(false);
                 float v26 = ppackFlee->fFleeTimer * -1.0;
                 ppackFlee->ModFleeTimer(v26);
             }
@@ -3954,8 +3973,8 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                apActor->pActorMover->GetDistanceRemaining() < 128.0)))) {
             TESObjectREFR* pfleeDest_2 = ppackFlee->GetRefFleeTo();
             if (pfleeDest_2 == pPlayer) {
-                pfleeDest_2 = 0;
-                ppackFlee->pRefFleeTo = 0;
+                pfleeDest_2 = nullptr;
+                ppackFlee->pRefFleeTo = nullptr;
             }
             if (pteleportDoor) {
                 float fdistToTeleportMarker = 10000.0f;
@@ -3965,13 +3984,13 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                     DoorTeleportData* Teleport = pteleportData->pLinkedDoor->GetTeleport();
                     fdistToTeleportMarker = (*&Teleport->position - *a2g).Length();
                 }
-                float a2h = apActor->GetDistanceFromReference(pteleportDoor, 0, 0);
+                float a2h = apActor->GetDistanceFromReference(pteleportDoor, false, false);
                 float fsmallestDist = BSMIN(fdistToTeleportMarker, a2h);
                 if (!(fsmallestDist < 160.0)) {
                     if (pteleportData) {
                         PathingRequestFlee kRequest;
                         kRequest.Initialize(apActor);
-                        float a2i = apActor->GetHeading(0);
+                        float a2i = apActor->GetHeading(false);
                         kRequest.SetInitialPathHeading(a2i);
                         if (apActor->IsCreature()) {
                             TESActorBaseData* v25 = static_cast<TESActorBaseData*>(apActor->GetActorBase());
@@ -3987,7 +4006,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                             PathingLocation kDestination(v9->position, pteleportDoor);
                             kRequest.SetDestination(kDestination);
                         }
-                        float a2k = apActor->GetHeading(0);
+                        float a2k = apActor->GetHeading(false);
                         kRequest.SetInitialPathHeading(a2k);
                         if (apActor->SetPathfindingHide(&kRequest)) {}
                         else {}
@@ -3995,28 +4014,28 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                 }
                 else {
                     FreeUpSpecialIdle(apActor);
-                    ppackFlee->pTeleportDoor = 0;
-                    pteleportDoor->Activate(apActor, 0, 0, 1);
+                    ppackFlee->pTeleportDoor = nullptr;
+                    pteleportDoor->Activate(apActor, false, nullptr, 1);
                     fEssentialDownTimer = 20.0f;
                 }
             }
             else {
-                if (pfleeDest_2 && apActor->GetDistanceFromReference(pfleeDest_2, 0, 0) > 160.0) {
+                if (pfleeDest_2 && apActor->GetDistanceFromReference(pfleeDest_2, false, false) > 160.0) {
                     const NiPoint3* pactorPoint = &pfleeDest_2->GetLocationOnReference();
                     pcell = pfleeDest_2->GetParentCell();
                     pworld = pfleeDest_2->GetWorldSpace();
-                    if (!apActor->SetPathfindingGoal(*pactorPoint, pcell, pworld, 0.0f, 0)) {
-                        ppackFlee->pRefFleeTo = 0;
+                    if (!apActor->SetPathfindingGoal(*pactorPoint, pcell, pworld, 0.0f, nullptr)) {
+                        ppackFlee->pRefFleeTo = nullptr;
                     }
                 }
                 else {
                     Animation* panim_2 = apActor->GetAnimation();
                     if (panim_2) {
                         if (panim_2->SpecialIdleDonePlaying()) {
-                            SetupSpecialIdle(apActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
+                            SetupSpecialIdle(apActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
                         }
                     }
-                    ppackFlee->SetFleeSucceeded(1);
+                    ppackFlee->SetFleeSucceeded(true);
                     float a2l = appTimer.fDelta;
                     ppackFlee->ModFleeTimer(a2l);
                 }
@@ -4029,7 +4048,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                     FreeUpSpecialIdle(apActor);
                 }
             }
-            SetActorsAnimation(apActor, emove, 1);
+            SetActorsAnimation(apActor, emove, true);
         }
     }
 }
@@ -4198,7 +4217,7 @@ void HighProcess::ProcessGreet(
                         if (bStop && !bInCombat) {
                             EndMoveMessage(apActor);
                         }
-                        bGreetingFlag = 1;
+                        bGreetingFlag = true;
                     }
                     TESPackage* pRunning = GetPackageThatIsRunning();
                     if (!bInCombat && pRunning &&
@@ -4317,7 +4336,7 @@ void HighProcess::ProcessGreet(
                             pVoiceFile, SoundHandle[0], eEmotion, uiEmotionValue, iLength, pSpeakerIdle, pListenerIdle,
                             pGreetTarget, true, false, true, true, bUseIdleManager
                         );
-                        bGreetingFlag = 1;
+                        bGreetingFlag = true;
                         if (bProcessGreetSayTo && !bWaitingForLipFile) {
                             SoundHandle[0].SetCompletionCallback(
                                 &MobileObject::SayToCallBack,
@@ -4517,7 +4536,7 @@ void HighProcess::ProcessGreet(
                                 pVoiceFile, SoundHandle[0], eEmotion, uiEmotionValue, iLength, pSpeakerIdle,
                                 pListenerIdle, pGreetTarget, true, false, true, true, bUseIdleManager
                             );
-                            bGreetingFlag = 1;
+                            bGreetingFlag = true;
                             if (bProcessGreetSayTo && !bWaitingForLipFile) {
                                 SoundHandle[0].SetCompletionCallback(
                                     &MobileObject::SayToCallBack,
@@ -4572,7 +4591,7 @@ void HighProcess::ProcessGreet(
             pDialogTarget = nullptr;
             StopSoundHandle(ACTOR_SOUND_HANDLE_VOICE);
             bStop = false;
-            bGreetingFlag = 0;
+            bGreetingFlag = false;
             TESPackage* pRunning = GetPackageThatIsRunning();
             if (pRunning && pRunning->GetPackType() == PACKAGE_TYPE_DIALOGUE && pTarget == pPlayer &&
                 pRunning->GetDialogueSayToFlag()) {
@@ -4600,20 +4619,20 @@ void HighProcess::ProcessObserveCombat(Actor* apActor) {
     NiPoint3 goalPoint;
     using v18_t = BSSimpleArray<Actor*, 1024>;
     TESPackage* pbasepack = GetPackageThatIsRunning();
-    SpectatorPackage* pspecPack = 0;
+    SpectatorPackage* pspecPack = nullptr;
     if (pbasepack) {
         if (pbasepack->GetPackType() == PACKAGE_TYPE_SPECTATOR) {
             pspecPack = static_cast<SpectatorPackage*>(pbasepack);
         }
     }
     if (pspecPack) {
-        if (pCombatManager->CheckShouldFlee(apActor, 0) || apActor->GetActorValue(ActorValue::CONFIDENCE) <= 0) {
+        if (pCombatManager->CheckShouldFlee(apActor, nullptr) || apActor->GetActorValue(ActorValue::CONFIDENCE) <= 0) {
             v18_t v18;
             pspecPack->CreateThreatArray(&v18);
             int32_t FormFlags = v18.iSize;
             if (FormFlags > 0) {
-                apActor->EndInterruptPackage(0);
-                apActor->InitiateFlee(v18.operator[](0), 1, 1, 1, 0, 0, -1.0f, -1.0f);
+                apActor->EndInterruptPackage(false);
+                apActor->InitiateFlee(v18.operator[](0), true, true, true, nullptr, nullptr, -1.0f, -1.0f);
                 TESPackage* CurrentPackage = apActor->GetCurrentPackage();
                 FleePackage* pflee = dynamic_cast<FleePackage*>(CurrentPackage);
                 if (pflee) {
@@ -4625,7 +4644,7 @@ void HighProcess::ProcessObserveCombat(Actor* apActor) {
             }
         }
         if (pspecPack->IsComplete()) {
-            apActor->EndInterruptPackage(0);
+            apActor->EndInterruptPackage(false);
             return;
         }
         float fdistance = 0.0f;
@@ -4634,25 +4653,25 @@ void HighProcess::ProcessObserveCombat(Actor* apActor) {
         NiPoint3 eventCenter = pspecPack->GetEventCenter();
         float fdistFromEventCenter = apActor->GetDistanceFromPoint(eventCenter);
         TESObjectCELL* pcell = apActor->GetParentCell();
-        bool bWithinSpectatorDist = 0;
+        bool bWithinSpectatorDist = false;
         if (pcell && pcell->GetInterior()) {
             fdistance = fAIInteriorSpectatorDistance.Float();
             fendDist = fAIInteriorSpectatorDetection.Float();
             if (fdistance > static_cast<double>(fdistFromEventCenter)) {
-                bWithinSpectatorDist = 1;
+                bWithinSpectatorDist = true;
             }
         }
         else {
             fdistance = fAIExteriorSpectatorDistance.Float();
             fendDist = fAIExteriorSpectatorDetection.Float();
             if (fendDist > static_cast<double>(fdistFromEventCenter)) {
-                bWithinSpectatorDist = 1;
+                bWithinSpectatorDist = true;
             }
         }
         pspecPack->Update(apActor);
         if (apActor->IsPathingComplete()) {
-            pspecPack->LookAtCombatants(apActor, 1);
-            pspecPack->MakeCombatComment(apActor, 1);
+            pspecPack->LookAtCombatants(apActor, true);
+            pspecPack->MakeCombatComment(apActor, true);
             uint32_t itime = appTimer.iLastTime;
             if (itime > pspecPack->iLastPathRequestTime + 1500) {
                 pspecPack->iLastPathRequestTime = itime;
@@ -4676,7 +4695,7 @@ void HighProcess::ProcessObserveCombat(Actor* apActor) {
                     return;
                 }
                 if (apActor->GetBlocked()) {
-                    apActor->SetBlock(0);
+                    apActor->SetBlock(false);
                 }
                 apActor->SetMoveMode(512u);
                 if (apActor->pActorMover->GetCurrentGoal_009DE2B0(&goalPoint)) {
@@ -4684,14 +4703,14 @@ void HighProcess::ProcessObserveCombat(Actor* apActor) {
                     if (fdistancedest <= 64.0) {
                         v20 = 257;
                     }
-                    SetActorsAnimation(apActor, v20, 1);
+                    SetActorsAnimation(apActor, v20, true);
                 }
             }
         }
         else {
             if (apActor->IsNpc()) {
-                pspecPack->LookAtCombatants(apActor, 1);
-                pspecPack->MakeCombatComment(apActor, 1);
+                pspecPack->LookAtCombatants(apActor, true);
+                pspecPack->MakeCombatComment(apActor, true);
             }
         }
         apActor->DidPathingFail();
@@ -4708,9 +4727,9 @@ void HighProcess::ProcessTravel(
     NiPoint3 v64;
     NiPoint3 a1;
     NiPoint3 point;
-    TESPackage* pPack = 0;
+    TESPackage* pPack = nullptr;
     pPack = GetPackageThatIsRunning();
-    bool bIgnoreDistance = 0;
+    bool bIgnoreDistance = false;
     if (!pPack) {
         return;
     }
@@ -4723,7 +4742,7 @@ void HighProcess::ProcessTravel(
     if (epackType == PACKAGE_TYPE_FOLLOW) {
         const TESFollowPackageData* pfollowData = pPack->GetFollowPackageData();
         if (pfollowData->pStartLocation) {
-            abSecondLoc = 1;
+            abSecondLoc = true;
             SetTarget(apActor);
         }
         else {
@@ -4746,7 +4765,7 @@ void HighProcess::ProcessTravel(
     else {
         fcurrentdistance = apActor->GetDistanceFromPoint(pPack->GetLocationCoord(apActor));
     }
-    TESObjectREFR* pRef = 0;
+    TESObjectREFR* pRef = nullptr;
     if (abSecondLoc && pPack->GetPackageSecondLocation()) {
         PackageLocation* PackageSecondLocation = pPack->GetPackageSecondLocation();
         pRef = PackageSecondLocation->GetLocReference();
@@ -4757,12 +4776,12 @@ void HighProcess::ProcessTravel(
         }
     }
     if (pRef || (!pGenericLocation || GetRunOncePackage())) {
-        pGenericLocation = 0;
+        pGenericLocation = nullptr;
     }
     else {
         pRef = pGenericLocation;
     }
-    bool batRef = 0;
+    bool batRef = false;
     if (v60 && (pRef && pRef->IsFurniture())) {
         NiPoint3 v98 = apActor->GetLocationOnReference();
         uint32_t inum = GetCurrentFurnitureIndex();
@@ -4778,7 +4797,7 @@ void HighProcess::ProcessTravel(
         }
         if (apActor->GetSitSleepState() == SIT_SLEEP_NORMAL &&
             (apActor->IsPathingComplete() &&
-             (apActor != pPlayer && (pCurrentFurniture && pCurrentFurniture->GetMarkerUsed(inum, 1))))) {
+             (apActor != pPlayer && (pCurrentFurniture && pCurrentFurniture->GetMarkerUsed(inum, true))))) {
             if (abInterateindex) {
                 AddToProcedureIndexRunning(apActor, 1);
             }
@@ -4814,14 +4833,16 @@ void HighProcess::ProcessTravel(
                         uint32_t inum_2;
                         point = apActor->GetLocationOnReference();
                         inum_2 = 0;
-                        if (!pCurrentFurniture->GetClosestFreeMarker(point, 1, 1, FurnitureMarker, inum_2, 1)) {
-                            if (pCurrentFurniture->GetDistanceFromReference(apActor, 0, 0) > 200.0) {
+                        if (!pCurrentFurniture->GetClosestFreeMarker(
+                                point, true, true, FurnitureMarker, inum_2, true
+                            )) {
+                            if (pCurrentFurniture->GetDistanceFromReference(apActor, false, false) > 200.0) {
                                 PathingRequest request_2;
                                 TESWorldSpace* afRadius2a = pCurrentFurniture->GetWorldSpace();
                                 TESObjectCELL* ParentCell = pCurrentFurniture->GetParentCell();
                                 const NiPoint3* v11 = &pCurrentFurniture->GetLocationOnReference();
-                                apActor->BuildRequest(&request_2, *v11, ParentCell, afRadius2a, 200.0f, 0);
-                                request_2.SetSoftGoalRadius(0);
+                                apActor->BuildRequest(&request_2, *v11, ParentCell, afRadius2a, 200.0f, nullptr);
+                                request_2.SetSoftGoalRadius(false);
                                 if (apActor->SetPathfindingGoal(&request_2)) {
                                     if (pCurrentFurniture->Get3D()) {
                                         if (abInterateindex) {
@@ -4857,7 +4878,7 @@ void HighProcess::ProcessTravel(
                             float afOutDir[2];
                             float ftargetangle = FurnitureMarker.GetHeading();
                             afOutDir[0] = 0.0f;
-                            float afRadius2 = apActor->GetHeading(0);
+                            float afRadius2 = apActor->GetHeading(false);
                             float fangledif = GetAngleDelta(afRadius2, ftargetangle, *afOutDir);
                             afOutDir[1] = static_cast<double>(iActorKeepTurnDegree.Int()) * 0.01745329238474369;
                             PathingRequest request;
@@ -4865,10 +4886,10 @@ void HighProcess::ProcessTravel(
                             TESWorldSpace* WorldSpace = pCurrentFurniture->GetWorldSpace();
                             apActor->BuildRequest(
                                 &request, FurnitureMarker.Position, pCurrentFurniture->GetParentCell(), WorldSpace,
-                                afRadius, 0
+                                afRadius, nullptr
                             );
                             request.SetGoalAngleToFace(ftargetangle);
-                            request.SetSoftGoalRadius(1);
+                            request.SetSoftGoalRadius(true);
                             if (!apActor->SetPathfindingGoal(&request)) {
                                 return;
                             }
@@ -4878,41 +4899,41 @@ void HighProcess::ProcessTravel(
                 }
             }
             if (apActor->GetSitSleepState()) {
-                batRef = 1;
+                batRef = true;
                 goto LABEL_118;
             }
             if (apActor->GetSitSleepState() == SIT_SLEEP_NORMAL &&
                 (cCurrentFurnitureIndex != 127 &&
-                 (pCurrentFurniture->GetMarkerUsed(cCurrentFurnitureIndex, 1) && !apActor->IsPathingComplete()))) {
+                 (pCurrentFurniture->GetMarkerUsed(cCurrentFurnitureIndex, true) && !apActor->IsPathingComplete()))) {
                 ClearFurniture(apActor);
                 EndMoveMessage(apActor);
                 AddToProcedureIndexRunning(apActor, 1);
                 return;
             }
-            MobileObject* pmob = 0;
+            MobileObject* pmob = nullptr;
             if (pTarget) {
                 if (pTarget->IsMobileObject()) {
                     pmob = static_cast<MobileObject*>(pTarget);
                 }
             }
             if (abSecondLoc) {
-                batRef = pPack->IsActorAtSecondLocation(pmob, apActor, bIgnoreDistance, -1.0f, 0);
+                batRef = pPack->IsActorAtSecondLocation(pmob, apActor, bIgnoreDistance, -1.0f, false);
                 goto LABEL_118;
             }
         }
         else {
-            MobileObject* pmob_2 = 0;
+            MobileObject* pmob_2 = nullptr;
             if (pTarget) {
                 if (pTarget->IsMobileObject()) {
                     pmob_2 = static_cast<MobileObject*>(pTarget);
                 }
             }
             if (abSecondLoc) {
-                batRef = pPack->IsActorAtSecondLocation(pmob_2, apActor, bIgnoreDistance, -1.0f, 0);
+                batRef = pPack->IsActorAtSecondLocation(pmob_2, apActor, bIgnoreDistance, -1.0f, false);
                 goto LABEL_118;
             }
         }
-        batRef = pPack->IsActorAtLocation(apActor, bIgnoreDistance, -1.0f, 0);
+        batRef = pPack->IsActorAtLocation(apActor, bIgnoreDistance, -1.0f, false);
     }
 LABEL_118:;
     float fdistance = pPack->GetPackageRadiusActorToLocation(apActor, abSecondLoc);
@@ -4941,7 +4962,7 @@ LABEL_118:;
         }
     }
     if (sShotsFired) {
-        ArrowProjectile::DeleteAttachedArrows(pRef, 1);
+        ArrowProjectile::DeleteAttachedArrows(pRef, true);
         sShotsFired = 0;
         sShotsToFire = -1;
     }
@@ -4965,7 +4986,7 @@ LABEL_118:;
             else {
                 if (!iAnimActionSuccess) {
                     AddToProcedureIndexRunning(apActor, 1);
-                    pGenericLocation = 0;
+                    pGenericLocation = nullptr;
                     EndMoveMessage(apActor);
                     iAnimActionSuccess = 1;
                     return;
@@ -4989,14 +5010,14 @@ LABEL_118:;
                     else {
                         ftargetangle_3 = apActor->GetStartingAngle().z;
                     }
-                    apActor->RequestRotate(ftargetangle_3, 0);
+                    apActor->RequestRotate(ftargetangle_3, false);
                 }
             }
         }
         if (bfail &&
             (pPack->GetMustReachLocation() ||
              (pPack->GetMustComplete() && pPack->GetPackType() == PACKAGE_TYPE_TRAVEL))) {
-            abNewpackage = 1;
+            abNewpackage = true;
         }
         else {
             if (abInterateindex) {
@@ -5021,7 +5042,7 @@ LABEL_118:;
                     v31, *v33, 5000.0f, *v36, 5000.0f, &LowProcess::LockDoorsatLocation, apActor
                 );
             }
-            SetLockedLocation(1);
+            SetLockedLocation(true);
         }
         if (pPack->GetUnlockDoorsAtLocation()) {
             const NiPoint3* v37 = &apActor->GetLocationOnReference();
@@ -5033,15 +5054,15 @@ LABEL_118:;
         }
         if (pPack) {
             if (!bDoneClothesChange && pPack->GetForceUnequipWeapon()) {
-                bDoneClothesChange = 1;
+                bDoneClothesChange = true;
                 ItemChange* pweapon = GetCurrentWeapon();
                 if (pweapon) {
-                    apActor->QueueUnEquipObject(pweapon->pContainerObj, 1, 0, 0, 0, 1);
+                    apActor->QueueUnEquipObject(pweapon->pContainerObj, 1, nullptr, false, false, true);
                 }
                 ItemChange* pammo = GetCurrentAmmo();
                 if (pammo) {
                     uint32_t FormHealth_0 = pammo->iNumber;
-                    apActor->QueueUnEquipObject(pammo->pContainerObj, FormHealth_0, 0, 0, 0, 1);
+                    apActor->QueueUnEquipObject(pammo->pContainerObj, FormHealth_0, nullptr, false, false, true);
                 }
             }
         }
@@ -5053,8 +5074,8 @@ LABEL_118:;
             return;
         }
         if (!batRef && apActor->IsPathingComplete()) {
-            int32_t v59 = abSecondLoc ? !pPack->IsActorAtSecondLocation(apActor, apActor, bIgnoreDistance, -1.0f, 0)
-                                      : !pPack->IsActorAtLocation(apActor, bIgnoreDistance, -1.0f, 0);
+            int32_t v59 = abSecondLoc ? !pPack->IsActorAtSecondLocation(apActor, apActor, bIgnoreDistance, -1.0f, false)
+                                      : !pPack->IsActorAtLocation(apActor, bIgnoreDistance, -1.0f, false);
             if (v59 && !DidPathingFail(apActor)) {
                 if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
                     GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
@@ -5067,7 +5088,9 @@ LABEL_118:;
                     if (!pCurrentFurniture || pCurrentFurniture->Get3D()) {
                         if (!pCurrentFurniture ||
                             (!pCurrentFurniture->Get3D() ||
-                             !pCurrentFurniture->GetClosestFreeMarker(point_2, 1, 1, FurnitureMarker, inum_3, 1))) {
+                             !pCurrentFurniture->GetClosestFreeMarker(
+                                 point_2, true, true, FurnitureMarker, inum_3, true
+                             ))) {
                             EndMoveMessage(apActor);
                             PACKAGE_PROCEDURE_TYPE Count = pPack->ePROCEDURE_TYPE;
                             int32_t ProcedureCount = Procedure::GetProcedureCount(Count);
@@ -5078,10 +5101,12 @@ LABEL_118:;
                         float afRadiusb = fAIFurnitureDestinationRadius.Float();
                         TESWorldSpace* afRadius2c = pPack->GetLocationWorld(apActor);
                         TESObjectCELL* v18 = pPack->GetLocationCell(apActor);
-                        apActor->BuildRequest(&request_4, FurnitureMarker.Position, v18, afRadius2c, afRadiusb, 0);
+                        apActor->BuildRequest(
+                            &request_4, FurnitureMarker.Position, v18, afRadius2c, afRadiusb, nullptr
+                        );
                         float ftargetangle_4 = FurnitureMarker.GetHeading();
                         request_4.SetGoalAngleToFace(ftargetangle_4);
-                        request_4.SetSoftGoalRadius(1);
+                        request_4.SetSoftGoalRadius(true);
                         if (!apActor->SetPathfindingGoal(&request_4)) {
                             return;
                         }
@@ -5094,8 +5119,8 @@ LABEL_118:;
                         TESWorldSpace* afRadius2b = pPack->GetLocationWorld(apActor);
                         TESObjectCELL* v38 = pPack->GetLocationCell(apActor);
                         const NiPoint3* v17 = &pCurrentFurniture->GetLocationOnReference();
-                        apActor->BuildRequest(&request_3, *v17, v38, afRadius2b, afRadiusa, 0);
-                        request_3.SetSoftGoalRadius(1);
+                        apActor->BuildRequest(&request_3, *v17, v38, afRadius2b, afRadiusa, nullptr);
+                        request_3.SetSoftGoalRadius(true);
                         if (!apActor->SetPathfindingGoal(&request_3)) {
                             return;
                         }
@@ -5108,13 +5133,13 @@ LABEL_118:;
                             TESWorldSpace* afRadius2d = pPack->GetSecondLocationWorld(apActor);
                             TESObjectCELL* SecondLocationCell = pPack->GetSecondLocationCell(apActor);
                             NiPoint3* v21 = &(v64 = pPack->GetSecondLocationCoord(apActor));
-                            apActor->BuildRequest(&request_5, *v21, SecondLocationCell, afRadius2d, fdistance, 0);
+                            apActor->BuildRequest(&request_5, *v21, SecondLocationCell, afRadius2d, fdistance, nullptr);
                         }
                         else {
                             TESWorldSpace* afRadius2e = pPack->GetLocationWorld(apActor);
                             TESObjectCELL* v40 = pPack->GetLocationCell(apActor);
                             apActor->BuildRequest(
-                                &request_5, pPack->GetLocationCoord(apActor), v40, afRadius2e, fdistance, 0
+                                &request_5, pPack->GetLocationCoord(apActor), v40, afRadius2e, fdistance, nullptr
                             );
                         }
                         if (pRef) {
@@ -5125,7 +5150,7 @@ LABEL_118:;
                                 }
                             }
                         }
-                        request_5.SetSoftGoalRadius(0);
+                        request_5.SetSoftGoalRadius(false);
                         if (!apActor->SetPathfindingGoal(&request_5)) {
                             return;
                         }
@@ -5141,7 +5166,7 @@ LABEL_118:;
         }
         if (!batRef && apActor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
             float v74 = 0.0f;
-            Actor* plocactor = 0;
+            Actor* plocactor = nullptr;
             if (pPack->pPackLoc) {
                 TESObjectREFR* plocref = pPack->pPackLoc->GetLocReference();
                 if (!plocref) {
@@ -5163,8 +5188,8 @@ LABEL_118:;
                     TESWorldSpace* afRadius2f = plocactor->GetWorldSpace();
                     TESObjectCELL* v41 = plocactor->GetParentCell();
                     const NiPoint3* v28 = &plocactor->GetLocationOnReference();
-                    apActor->BuildRequest(&request_6, *v28, v41, afRadius2f, fdistance, 0);
-                    request_6.SetSoftGoalRadius(0);
+                    apActor->BuildRequest(&request_6, *v28, v41, afRadius2f, fdistance, nullptr);
+                    request_6.SetSoftGoalRadius(false);
                     if (!apActor->SetPathfindingGoal(&request_6)) {
                         return;
                     }
@@ -5183,21 +5208,21 @@ LABEL_118:;
                 else {
                     if (aemovemode == -1) {
                         int32_t v68 = 0;
-                        bool bflag = 0;
+                        bool bflag = false;
                         if (GetCurrentPackage()) {
                             TESPackage* v30;
                             TESPackage* v29 = GetCurrentPackage();
                             if (v29->GetPackType() == PACKAGE_TYPE_ALARM ||
                                 (v30 = GetCurrentPackage(), v30->GetPackType() == PACKAGE_TYPE_COMBAT)) {
-                                bflag = 1;
+                                bflag = true;
                             }
                         }
                         float v58 = fdistance + fdistance;
-                        int32_t emove = CalculateMoveMode(apActor, fcurrentdistance, fdistance, v58, bflag, 1);
+                        int32_t emove = CalculateMoveMode(apActor, fcurrentdistance, fdistance, v58, bflag, true);
                         aemovemode = emove;
                     }
                 }
-                SetActorsAnimation(apActor, aemovemode, 1);
+                SetActorsAnimation(apActor, aemovemode, true);
                 NiPoint3 entryPoint = pPack->GetLocationCoord(apActor);
                 if (pRef) {
                     if (pRef->IsFurniture()) {
@@ -5219,9 +5244,9 @@ LABEL_118:;
 }
 
 void HighProcess::RemoveDetectionActor(Actor* apActor, int32_t abWhichList) {
-    BSSimpleList<DetectionState*>* plist = 0;
-    BSSimpleList<DetectionState*>* plastlist = 0;
-    bool bnext = 0;
+    BSSimpleList<DetectionState*>* plist = nullptr;
+    BSSimpleList<DetectionState*>* plastlist = nullptr;
+    bool bnext = false;
     if (abWhichList && abWhichList != 3) {
         if (abWhichList == 1) {
             plist = pActorsWhoDetectMeList;
@@ -5232,10 +5257,10 @@ void HighProcess::RemoveDetectionActor(Actor* apActor, int32_t abWhichList) {
     }
     if (abWhichList == 3) {
         if (plist && plist->m_item) {
-            bnext = 1;
+            bnext = true;
         }
         else {
-            plastlist = 0;
+            plastlist = nullptr;
             plist = pActorsWhoDetectMeList;
         }
     }
@@ -5256,9 +5281,9 @@ void HighProcess::RemoveDetectionActor(Actor* apActor, int32_t abWhichList) {
             plist = plist->m_pkNext;
         }
         if ((!plist || !plist->m_item) && bnext) {
-            plastlist = 0;
+            plastlist = nullptr;
             plist = pActorsWhoDetectMeList;
-            bnext = 0;
+            bnext = false;
         }
     }
 }
@@ -5320,14 +5345,14 @@ void HighProcess::UpdateFollowers(Actor* apActor, float afDelta) {
             pTempList = ::new (v10) BSSimpleList<Actor*>;
         }
         else {
-            pTempList = 0;
+            pTempList = nullptr;
         }
         BSSimpleList<Actor*>* v9 = static_cast<BSSimpleList<Actor*>*>(ourMalloc(sizeof(BSSimpleList<Actor*>)));
         if (v9) {
             pHead = ::new (v9) BSSimpleList<Actor*>;
         }
         else {
-            pHead = 0;
+            pHead = nullptr;
         }
         BSSimpleList<Actor*>* plist = pHead;
         BSSimpleList<Actor*>* ptemp = pfollow->pActorlist;
@@ -5358,7 +5383,7 @@ void HighProcess::UpdateFollowers(Actor* apActor, float afDelta) {
                             ptarget->Process(0.0f);
                             if (ptarget->IsActor() && ptarget->GetCurrentProcessType() == PROCESS_TYPE_HIGH) {
                                 if (!(ptarget->GetDetectionTimer() < 0.0) ||
-                                    (ptarget->IsUnConscious() || ptarget->IsDead(0))) {
+                                    (ptarget->IsUnConscious() || ptarget->IsDead(false))) {
                                     ptarget->ReduceDetectionTimer();
                                 }
                                 else {
@@ -5806,11 +5831,11 @@ bool HighProcess::EnterCombat(
     TESPackage* v16 = GetRunOncePackage();
     GetCurrentPackage();
     if (GetFinishingCombatPackage() || (v16 && v16->GetPackType() == PACKAGE_TYPE_USE_WEAPON)) {
-        return 0;
+        return false;
     }
     if (bUnequippedArmorToSwim) {
-        ProcessRemoveWorn(apActor, 0, 0);
-        bUnequippedArmorToSwim = 0;
+        ProcessRemoveWorn(apActor, false, false);
+        bUnequippedArmorToSwim = false;
         fReEquipArmorTimer = fReEquipArmorTime.Float();
     }
     return MiddleHighProcess::EnterCombat(
@@ -5832,7 +5857,7 @@ void HighProcess::GuardCallforHelp(Actor* apActor, Actor* apCriminal) {
         ReferenceProcessLists.SendResistArresttoGuards(apCriminal, &DoorRefListCrime);
     BSSimpleList<TESObjectREFR*>* ptemplist = pListRef;
     while (pListRef && pListRef->m_item) {
-        Actor* pSendactor = 0;
+        Actor* pSendactor = nullptr;
         TESObjectREFR* m_item = pListRef->m_item;
         if (m_item->IsActor()) {
             pSendactor = static_cast<Actor*>(pListRef->m_item);
@@ -5845,7 +5870,7 @@ void HighProcess::GuardCallforHelp(Actor* apActor, Actor* apCriminal) {
                 PROCESS_TYPE a2 = pSendactor->GetCurrentProcessType();
                 ReferenceProcessLists.RemoveReference(pSendactor, a2);
                 PROCESS_TYPE CurrentProcessType = pSendactor->GetCurrentProcessType();
-                ReferenceProcessLists.AddReference(pSendactor, CurrentProcessType, 0, 0, 0);
+                ReferenceProcessLists.AddReference(pSendactor, CurrentProcessType, false, false, nullptr);
             }
         }
     }
@@ -5859,11 +5884,11 @@ void HighProcess::GuardCallforHelp(Actor* apActor, Actor* apCriminal) {
 // The alarm flag is set to 0 before it is tested, so the alarm block is never run, as the game does; the actor's
 // process is still read first.
 void HighProcess::CallforHelp(Actor* apActor, Actor* pCriminal, Crime* pcrime) {
-    TESNPC* pnpc = 0;
+    TESNPC* pnpc = nullptr;
     if (apActor->GetObjectReference()->GetFormType() == NPC__ID) {
         pnpc = static_cast<TESNPC*>(apActor->GetObjectReference());
     }
-    TESObjectREFR* pcrimeAct = 0;
+    TESObjectREFR* pcrimeAct = nullptr;
     TESObjectREFR* pcrimeRef = pcrime->pcrimetarget;
     if (pcrimeRef) {
         if (pcrimeRef->IsActor()) {
@@ -5893,7 +5918,7 @@ void HighProcess::CallforHelp(Actor* apActor, Actor* pCriminal, Crime* pcrime) {
     DoorRefListCrime.RemoveAll();
     BSSimpleList<TESObjectREFR*>* pListRef = pRefList;
     while (pListRef && pListRef->m_item) {
-        Actor* pSendactor = 0;
+        Actor* pSendactor = nullptr;
         TESObjectREFR* m_item = pListRef->m_item;
         if (m_item->IsActor()) {
             pSendactor = static_cast<Actor*>(pListRef->m_item);
@@ -5904,7 +5929,8 @@ void HighProcess::CallforHelp(Actor* apActor, Actor* pCriminal, Crime* pcrime) {
             if (!pSendactor->IsAlarmed() && !pSendactor->IsSleeping() && !pSendactor->IsInCombat() &&
                 (!pSendactor->IsActoraGuard() || !pcrime->bguardrespond) &&
                 ((pSendactor->IsActoraGuard() && !pnpc->IsInEvilFactionsOnly()) ||
-                 (!pSendactor->IsActoraGuard() && pSendactor->GetShouldAttackActor(pCriminal, 0, ereaction, 0)))) {
+                 (!pSendactor->IsActoraGuard() &&
+                  pSendactor->GetShouldAttackActor(pCriminal, false, ereaction, false)))) {
                 bool bSendAlarm = false;
                 if (pSendactor->pCurrentProcess && bSendAlarm) {
                     pSendactor->InitiateAlarm(pcrime, 0, true, nullptr);
@@ -5914,7 +5940,7 @@ void HighProcess::CallforHelp(Actor* apActor, Actor* pCriminal, Crime* pcrime) {
                         PROCESS_TYPE eOldType = pSendactor->GetCurrentProcessType();
                         ReferenceProcessLists.RemoveReference(pSendactor, eOldType);
                         PROCESS_TYPE eType = pSendactor->GetCurrentProcessType();
-                        ReferenceProcessLists.AddReference(pSendactor, eType, 0, 0, 0);
+                        ReferenceProcessLists.AddReference(pSendactor, eType, false, false, nullptr);
                     }
                 }
             }
@@ -5977,7 +6003,7 @@ void HighProcess::SetActorsAnimation(Actor* apActor, int32_t emovemode, bool abC
     TESPackage* v6;
     if (!GetMovementStoped()) {
         v6 = GetPackageThatIsRunning();
-        if (((int32_t)emovemode) == ((-1))) {
+        if (emovemode == (-1)) {
             emovemode = static_cast<uint32_t>(
                 (static_cast<uint32_t>(emovemode) & 0xffff0000u) | static_cast<uint32_t>((uint16_t)256)
             );
@@ -5992,7 +6018,7 @@ void HighProcess::SetActorsAnimation(Actor* apActor, int32_t emovemode, bool abC
             }
         }
         moveMode = (int16_t)apActor->GetMoveMode();
-        apActor->SetMoveMode((int32_t)((int16_t)(((int32_t)emovemode) | (moveMode & 3072))));
+        apActor->SetMoveMode((int32_t)((int16_t)(emovemode | (moveMode & 3072))));
     }
 }
 
@@ -6007,10 +6033,10 @@ void HighProcess::FinishDying(Actor* apActor) {
     float v10;
     float hour;
     NiNode* v12 = apActor->TESObjectREFR::Get3D();
-    uint8_t isActive = (uint8_t)bhkWorld::IsActive(v12, 1, 0);
+    uint8_t isActive = (uint8_t)bhkWorld::IsActive(v12, true, false);
     if (isActive) {
-        lastProcessHour = (float)BaseProcess::GetLastTimeProcessed();
-        hour = (float)(&appCalendar)->GetHour();
+        lastProcessHour = BaseProcess::GetLastTimeProcessed();
+        hour = (&appCalendar)->GetHour();
         if (!(lastProcessHour > ((double)hour))) {
             v2 = (double)(hour - lastProcessHour);
         }
@@ -6026,7 +6052,7 @@ void HighProcess::FinishDying(Actor* apActor) {
         if (currentSequence) {
             animGroup = currentSequence->GetAnimGroup();
             if (animGroup->GetType() == 224) {
-                fSecondsPassed = (float)Animation::GetDuration(currentSequence);
+                fSecondsPassed = Animation::GetDuration(currentSequence);
                 v7->Update(apActor, fSecondsPassed, (-0x1p+0f));
             }
         }
@@ -6034,7 +6060,7 @@ void HighProcess::FinishDying(Actor* apActor) {
     if (!isActive) {
         apActor->DoDeathStuff();
         apActor->DetachHavok();
-        apActor->SetHavokDeath((bool)1);
+        apActor->SetHavokDeath(true);
         extra = apActor->TESObjectREFR::GetExtra();
         extra->SetRagDollData(apActor);
     }
@@ -6171,7 +6197,7 @@ void HighProcess::DamageModActorValue(Actor* apActor, ActorValue::Index aiWhich,
                 v4 = ::new (apMemory) ActorValueCache;
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             pActorValueCache = v4;
         }
@@ -6263,25 +6289,25 @@ bool HighProcess::CanForceGreet(Actor* apActor) {
     TESPackage* currentPackage;
     uint8_t eSitSleepState;
     if ((&pVATS)->IsInVats()) {
-        return (bool)0;
+        return false;
     }
     if (!apActor->Has360LOS(pPlayer)) {
-        return (bool)0;
+        return false;
     }
     if (pPlayer->GetCurrentPackage()) {
         currentPackage = pPlayer->GetCurrentPackage();
         if (((int32_t)currentPackage->GetPackType()) == 6) {
-            return (bool)0;
+            return false;
         }
     }
     if (pPlayer->GetSitSleepState() && (((int32_t)pPlayer->GetSitSleepState()) != 4)) {
-        return (bool)0;
+        return false;
     }
     TESObjectCELL* parentCell = pPlayer->TESObjectREFR::GetParentCell();
     NiPoint3* mBRoomAccumList = pPlayer->TESObjectREFR::QLocationOnReference();
-    float v8 = (float)pPlayer->IsPointDeepUnderWater(mBRoomAccumList->z, parentCell);
+    float v8 = pPlayer->IsPointDeepUnderWater(mBRoomAccumList->z, parentCell);
     if (v8 >= 0.875) {
-        return (bool)0;
+        return false;
     }
     switch (sAnimAction) {
         case -1:
@@ -6294,7 +6320,7 @@ bool HighProcess::CanForceGreet(Actor* apActor) {
         case 4:
         case 5: {
             if (static_cast<const void*>(apActor) == static_cast<const void*>(pPlayer)) {
-                PlayerCharacter::bReleaseTheArrow = (bool)1;
+                PlayerCharacter::bReleaseTheArrow = true;
             }
             result = 0;
             break;
@@ -6462,7 +6488,7 @@ void HighProcess::StartTorchSound(Actor* apActor) {
         if (apActor) {
             if (psound) {
                 uint32_t CastingType = psound->iFormID;
-                BSSoundHandle* arHandle = apActor->PlaySound(&a2, CastingType, 1, 2u, 1);
+                BSSoundHandle* arHandle = apActor->PlaySound(&a2, CastingType, true, 2u, true);
                 SoundHandle[1].operator=(*arHandle);
             }
         }
@@ -6483,7 +6509,7 @@ void HighProcess::SetDetectionModifier(float afvalue) {
 }
 
 void HighProcess::SetDetectionModifierTimer() {
-    fDetectionModifierTimer = (float)((&fDetectionActionTimer)->Float());
+    fDetectionModifierTimer = (&fDetectionActionTimer)->Float();
 }
 
 float HighProcess::GetDetectionModifier() {
@@ -6682,7 +6708,7 @@ void HighProcess::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     apSaveGameBuffer->SaveDataEndian(&bWaitingForLipFile, 1u, 0);
     apSaveGameBuffer->SaveDataEndian(&bLipFileFailed, 1u, 0);
     apSaveGameBuffer->SaveDataEndian(&bLipQuequed, 1u, 0);
-    bhasLipSyncAnim = pLipSynicAnim != 0;
+    bhasLipSyncAnim = pLipSynicAnim != nullptr;
     apSaveGameBuffer->SaveDataEndian(&bhasLipSyncAnim, 1u, 0);
     apSaveGameBuffer->SaveFormID(pGreetActor, 0);
     apSaveGameBuffer->SaveFormID(plastDetected, 0);
@@ -6722,7 +6748,7 @@ void HighProcess::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
         }
     }
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount_3, isaveGameBufferPos_3);
-    bhasGreetTopic = pGreetTopic != 0;
+    bhasGreetTopic = pGreetTopic != nullptr;
     apSaveGameBuffer->SaveDataEndian(&bhasGreetTopic, 1u, 0);
     if (bhasGreetTopic) {
         pGreetTopic->SaveGame(apSaveGameBuffer);
@@ -6754,7 +6780,7 @@ void HighProcess::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
         }
     }
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount_6, isaveGameBufferPos_6);
-    bhasDetectionEvent = pActorsGeneratedDetectionEvent != 0;
+    bhasDetectionEvent = pActorsGeneratedDetectionEvent != nullptr;
     apSaveGameBuffer->SaveDataEndian(&bhasDetectionEvent, 1u, 0);
     if (bhasDetectionEvent) {
         pActorsGeneratedDetectionEvent->SaveGame(apSaveGameBuffer);
@@ -6782,7 +6808,7 @@ void HighProcess::SaveGame(uint32_t aiFlags, MobileObject* pmob) {
     uint32_t ilastDetectedID;
     MiddleHighProcess::SaveGame(aiFlags, pmob);
     iblockSize = 0;
-    uint16_t* pblockSize = 0;
+    uint16_t* pblockSize = nullptr;
     uint8_t* itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -7030,11 +7056,11 @@ void HighProcess::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         apLoadGameBuffer->LoadData(&bWaitingForLipFile, 1u);
         apLoadGameBuffer->LoadData(&bLipFileFailed, 1u);
         apLoadGameBuffer->LoadData(&bLipQuequed, 1u);
-        bhasLipSyncAnim = 0;
+        bhasLipSyncAnim = false;
         apLoadGameBuffer->LoadData(&bhasLipSyncAnim, 1u);
         if (bWaitingForLipFile || bhasLipSyncAnim) {
-            bWaitingForLipFile = 0;
-            bLipFileFailed = 1;
+            bWaitingForLipFile = false;
+            bLipFileFailed = true;
         }
     }
     apLoadGameBuffer->LoadFormID(pGreetActor);
@@ -7058,25 +7084,25 @@ void HighProcess::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     }
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     for (uint32_t iloop = 0; iloop < isaveGameCount; ++iloop) {
-        pForm = 0;
+        pForm = nullptr;
         apLoadGameBuffer->LoadFormID(pForm);
         AggroRadiusList.AddHead(pForm);
     }
     uint32_t isaveGameCount_2 = apLoadGameBuffer->LoadVariableSizedValue();
     for (uint32_t iloop_2 = 0; iloop_2 < isaveGameCount_2; ++iloop_2) {
-        pForm_2 = 0;
+        pForm_2 = nullptr;
         apLoadGameBuffer->LoadFormID(pForm_2);
         AvoidActorList.AddHead(pForm_2);
     }
     if (apLoadGameBuffer->GetVersion() >= 18u) {
         uint32_t isaveGameCount_3 = apLoadGameBuffer->LoadVariableSizedValue();
         for (uint32_t iloop_3 = 0; iloop_3 < isaveGameCount_3; ++iloop_3) {
-            pForm_3 = 0;
+            pForm_3 = nullptr;
             apLoadGameBuffer->LoadFormID(pForm_3);
             pLastSpokeToList->AddHead(pForm_3);
         }
     }
-    bhasGreetTopic = 0;
+    bhasGreetTopic = false;
     apLoadGameBuffer->LoadData(&bhasGreetTopic, 1u);
     if (bhasGreetTopic) {
         DialogueItem* v9;
@@ -7085,7 +7111,7 @@ void HighProcess::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v9 = ::new (v16) DialogueItem;
         }
         else {
-            v9 = 0;
+            v9 = nullptr;
         }
         pGreetTopic = v9;
         pGreetTopic->LoadGameBGS(apLoadGameBuffer);
@@ -7103,7 +7129,7 @@ void HighProcess::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 v8 = ::new (v15) BSSimpleList<AvoidAreaStruct*>;
             }
             else {
-                v8 = 0;
+                v8 = nullptr;
             }
             pListOfAvoidAreas = v8;
         }
@@ -7114,7 +7140,7 @@ void HighProcess::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 pavoidArea = ::new (v14) AvoidAreaStruct;
             }
             else {
-                pavoidArea = 0;
+                pavoidArea = nullptr;
             }
             AvoidAreaStruct* pavoidArea_2 = pavoidArea;
             pavoidArea->LoadGameBGS(apLoadGameBuffer);
@@ -7129,7 +7155,7 @@ void HighProcess::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             pdetectionState = ::new (apMemory) DetectionState;
         }
         else {
-            pdetectionState = 0;
+            pdetectionState = nullptr;
         }
         DetectionState* pdetectionState_2 = pdetectionState;
         pdetectionState->LoadGame(apLoadGameBuffer);
@@ -7143,13 +7169,13 @@ void HighProcess::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             pdetectionState_3 = ::new (v12) DetectionState;
         }
         else {
-            pdetectionState_3 = 0;
+            pdetectionState_3 = nullptr;
         }
         DetectionState* pdetectionState_4 = pdetectionState_3;
         pdetectionState_3->LoadGame(apLoadGameBuffer);
         pActorsWhoDetectMeList->AddHead(pdetectionState_4);
     }
-    bhasDetectionEvent = 0;
+    bhasDetectionEvent = false;
     apLoadGameBuffer->LoadData(&bhasDetectionEvent, 1u);
     if (bhasDetectionEvent) {
         DetectionEvent* v4;
@@ -7158,12 +7184,12 @@ void HighProcess::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v4 = ::new (v11) DetectionEvent;
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         pActorsGeneratedDetectionEvent = v4;
         pActorsGeneratedDetectionEvent->LoadGame(apLoadGameBuffer);
     }
-    pSaveLoadGame->QueueSubBuffer(QUEUED_SUB_BUFFER_CHAR_CONTROLLER, apLoadGameBuffer, 0);
+    pSaveLoadGame->QueueSubBuffer(QUEUED_SUB_BUFFER_CHAR_CONTROLLER, apLoadGameBuffer, nullptr);
 }
 
 void HighProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, MobileObject* pmob) {
@@ -7187,7 +7213,7 @@ void HighProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, MobileObje
     uint32_t ilastDetectedID;
     MiddleHighProcess::LoadGame(aiFlags, aiCurrentFlags, pmob);
     iblockSize = 0;
-    uint8_t* istartBufferPosition = 0;
+    uint8_t* istartBufferPosition = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockHeader, 4u);
         if (iblockHeader != 0x424C4F4B) {
@@ -7273,7 +7299,7 @@ void HighProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, MobileObje
     if (pSaveLoadGameOLD->GetCurrentVersion() < 79u) {
         pSaveLoadGameOLD->LoadNumericID(&iitemBeingUsedID, 4u);
         TESForm* pFormCheck = TESForm::GetFormByNumericID(iitemBeingUsedID);
-        pItemBeingUsed = pFormCheck->IsBoundObject() ? static_cast<TESBoundObject*>(pFormCheck) : 0;
+        pItemBeingUsed = pFormCheck->IsBoundObject() ? static_cast<TESBoundObject*>(pFormCheck) : nullptr;
     }
     pSaveLoadGameOLD->LoadNumericID(&iteleportFadeRefID, 4u);
     pTeleportFadeRef = reinterpret_cast<TESObjectREFR*>(static_cast<uintptr_t>(iteleportFadeRefID));
@@ -7296,7 +7322,7 @@ void HighProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, MobileObje
             pdetectionState = ::new (v14) DetectionState;
         }
         else {
-            pdetectionState = 0;
+            pdetectionState = nullptr;
         }
         DetectionState* pdetectionState_2 = pdetectionState;
         pSaveLoadGameOLD->LoadNumericID(&iactorID, 4u);
@@ -7312,11 +7338,11 @@ void HighProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, MobileObje
         }
         pDetectedActorList->RemoveAll();
     }
-    pAnimSeq = 0;
+    pAnimSeq = nullptr;
     if ((aiFlags & CHANGE_REFR_ANIMATION) != 0) {
         pSaveLoadGameOLD->LoadGameDataOLD(&csequenceIndex, 1u);
         if (csequenceIndex == -1) {
-            pAnimSeq = 0;
+            pAnimSeq = nullptr;
         }
         else {
             // The pointer field holds the sequence index plus 8, not a pointer, as the game does.
@@ -7361,7 +7387,7 @@ void HighProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, MobileObje
             }
         }
     }
-    MobileObject* pactor = 0;
+    MobileObject* pactor = nullptr;
     if (pmob) {
         if (pmob->IsActor()) {
             pactor = pmob;
@@ -7437,7 +7463,7 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v21 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v21 = 0;
+        v21 = nullptr;
     }
     pGreetActor = v21;
     if (plastDetected) {
@@ -7445,7 +7471,7 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v20 = dynamic_cast<TESObjectREFR*>(v3);
     }
     else {
-        v20 = 0;
+        v20 = nullptr;
     }
     plastDetected = v20;
     if (pTeleportFadeRef) {
@@ -7453,7 +7479,7 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v19 = dynamic_cast<TESObjectREFR*>(v4);
     }
     else {
-        v19 = 0;
+        v19 = nullptr;
     }
     pTeleportFadeRef = v19;
     if (pLastTarget) {
@@ -7461,7 +7487,7 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v18 = dynamic_cast<TESObjectREFR*>(v5);
     }
     else {
-        v18 = 0;
+        v18 = nullptr;
     }
     pLastTarget = v18;
     if (pDialogTarget) {
@@ -7469,7 +7495,7 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v17 = dynamic_cast<MobileObject*>(v6);
     }
     else {
-        v17 = 0;
+        v17 = nullptr;
     }
     pDialogTarget = v17;
     if (apLoadGameBuffer->GetVersion() >= 14u) {
@@ -7481,11 +7507,11 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v16 = dynamic_cast<TESObjectREFR*>(v7);
         }
         else {
-            v16 = 0;
+            v16 = nullptr;
         }
         pPathLookAtTarget = v16;
         if (this->GetPathLookAtTarget()) {
-            this->GetPathLookAtTarget()->SetTargeted(1);
+            this->GetPathLookAtTarget()->SetTargeted(true);
         }
     }
     for (uint32_t i = 0; i < 6; ++i) {
@@ -7496,18 +7522,18 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v15 = dynamic_cast<TESObjectREFR*>(v8);
         }
         else {
-            v15 = 0;
+            v15 = nullptr;
         }
         HeadTrackingTargets[i] = v15;
         if (HeadTrackingTargets[i]) {
-            HeadTrackingTargets[i]->SetTargeted(1);
+            HeadTrackingTargets[i]->SetTargeted(true);
         }
     }
     BSSimpleList<Actor*>* plist = &AggroRadiusList;
-    BSSimpleList<Actor*>* plastList = 0;
+    BSSimpleList<Actor*>* plastList = nullptr;
     while (plist && !plist->IsEmpty()) {
         Actor* pForm = plist->m_item;
-        bool bremove = 0;
+        bool bremove = false;
         if (pForm) {
             TESForm* v9 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pForm)));
             pForm = dynamic_cast<Actor*>(v9);
@@ -7515,11 +7541,11 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 plist->SetItem(pForm);
             }
             else {
-                bremove = 1;
+                bremove = true;
             }
         }
         else {
-            bremove = 1;
+            bremove = true;
         }
         if (bremove) {
             if (plastList) {
@@ -7537,10 +7563,10 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         }
     }
     BSSimpleList<Actor*>* plist_2 = &AvoidActorList;
-    BSSimpleList<Actor*>* plastList_2 = 0;
+    BSSimpleList<Actor*>* plastList_2 = nullptr;
     while (plist_2 && !plist_2->IsEmpty()) {
         Actor* pForm_2 = plist_2->m_item;
-        bool bremove_2 = 0;
+        bool bremove_2 = false;
         if (pForm_2) {
             TESForm* v10 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pForm_2)));
             pForm_2 = dynamic_cast<Actor*>(v10);
@@ -7548,11 +7574,11 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 plist_2->SetItem(pForm_2);
             }
             else {
-                bremove_2 = 1;
+                bremove_2 = true;
             }
         }
         else {
-            bremove_2 = 1;
+            bremove_2 = true;
         }
         if (bremove_2) {
             if (plastList_2) {
@@ -7571,10 +7597,10 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     }
     if (apLoadGameBuffer->GetVersion() >= 18u) {
         BSSimpleList<Actor*>* plist_3 = pLastSpokeToList;
-        BSSimpleList<Actor*>* plastList_3 = 0;
+        BSSimpleList<Actor*>* plastList_3 = nullptr;
         while (plist_3 && !plist_3->IsEmpty()) {
             Actor* pForm_3 = plist_3->m_item;
-            bool bremove_3 = 0;
+            bool bremove_3 = false;
             if (pForm_3) {
                 TESForm* v11 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pForm_3)));
                 pForm_3 = dynamic_cast<Actor*>(v11);
@@ -7582,11 +7608,11 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                     plist_3->SetItem(pForm_3);
                 }
                 else {
-                    bremove_3 = 1;
+                    bremove_3 = true;
                 }
             }
             else {
-                bremove_3 = 1;
+                bremove_3 = true;
             }
             if (bremove_3) {
                 if (plastList_3) {
@@ -7613,19 +7639,19 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         }
     }
     BSSimpleList<DetectionState*>* plist_5 = pDetectedActorList;
-    BSSimpleList<DetectionState*>* plastList_4 = 0;
+    BSSimpleList<DetectionState*>* plastList_4 = nullptr;
     while (plist_5 && !plist_5->IsEmpty()) {
         DetectionState* pdetectionState = plist_5->m_item;
-        bool bremove_4 = 0;
+        bool bremove_4 = false;
         if (pdetectionState) {
             pdetectionState->InitLoadGame();
             if (!pdetectionState->pActor) {
                 ourFree(pdetectionState);
-                bremove_4 = 1;
+                bremove_4 = true;
             }
         }
         else {
-            bremove_4 = 1;
+            bremove_4 = true;
         }
         if (bremove_4) {
             if (plastList_4) {
@@ -7642,19 +7668,19 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         }
     }
     BSSimpleList<DetectionState*>* plist_6 = pActorsWhoDetectMeList;
-    BSSimpleList<DetectionState*>* plastList_5 = 0;
+    BSSimpleList<DetectionState*>* plastList_5 = nullptr;
     while (plist_6 && !plist_6->IsEmpty()) {
         DetectionState* pdetectionState_2 = plist_6->m_item;
-        bool bremove_5 = 0;
+        bool bremove_5 = false;
         if (pdetectionState_2) {
             pdetectionState_2->InitLoadGame();
             if (!pdetectionState_2->pActor) {
                 ourFree(pdetectionState_2);
-                bremove_5 = 1;
+                bremove_5 = true;
             }
         }
         else {
-            bremove_5 = 1;
+            bremove_5 = true;
         }
         if (bremove_5) {
             if (plastList_5) {
@@ -7678,7 +7704,7 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             if (pactor != pPlayer) {
                 if (pactor->Get3D()) {
                     NiNode* proot = pactor->Get3D();
-                    proot->SetNotVisible(0);
+                    proot->SetNotVisible(false);
                     EvaluateBoneLod(pactor);
                 }
             }
@@ -7701,7 +7727,7 @@ void HighProcess::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags, MobileObje
     TESForm* v6 = TESForm::GetFormByNumericID(iteleportFadeRefID);
     pTeleportFadeRef = dynamic_cast<TESObjectREFR*>(v6);
     BSSimpleList<DetectionState*>* plist = pDetectedActorList;
-    BSSimpleList<DetectionState*>* plastList = 0;
+    BSSimpleList<DetectionState*>* plastList = nullptr;
     while (plist && !plist->IsEmpty()) {
         DetectionState* pdectectionState = plist->m_item;
         if (pdectectionState->pActor) {
@@ -7747,18 +7773,18 @@ void HighProcess::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (pActorValueCache) {
         pActorValueCache->ResetCachedActorValues();
     }
-    bDialoguewithPlayer = 0;
+    bDialoguewithPlayer = false;
     iHasHealingSpell = -1;
     iHasHealingPotion = -1;
     fDelayTimer = 0.0f;
-    bCheckDeadTalk = 0;
+    bCheckDeadTalk = false;
     iHourPackageEvaluated = -1;
     fSoundDelay = 0.0f;
-    bGreetingFlag = 0;
+    bGreetingFlag = false;
     fGreetingTimer = 0.0f;
-    bHeadTrack = 1;
-    bWeaponAlertDrawn = 0;
-    bContinuingPackageforPC = 0;
+    bHeadTrack = true;
+    bWeaponAlertDrawn = false;
+    bContinuingPackageforPC = false;
     fAwarePlayerTimer = 0.0f;
     fDetectGreetTimer = 0.0f;
     fEvaluateAcquireTimer = 0.0f;
@@ -7771,62 +7797,62 @@ void HighProcess::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     fTalkTimer = 0.0f;
     fTurnTime = 0.0f;
     fVoiceTimer = 0.0f;
-    cLastTurnDir = 0;
-    bActivateAnim = 0;
+    cLastTurnDir = false;
+    bActivateAnim = false;
     fScriptPackageEndTime = 0.0f;
     fHealthBarAlphaValue = 0.0f;
     fActorHealthPercentage = 1.0f;
     fHealthBarEmittanceValue = 0.0f;
     iNumberGuardsPersuing = 0;
-    bStop = 0;
+    bStop = false;
     fReEquipArmorTimer = 0.0f;
-    bUnequippedArmorToSwim = 0;
+    bUnequippedArmorToSwim = false;
     cLastTurn = 0;
-    bCurrentlyReanimating = 0;
-    bWaitingForLipFile = 0;
-    bLipQuequed = 0;
+    bCurrentlyReanimating = false;
+    bWaitingForLipFile = false;
+    bLipQuequed = false;
     LipSynchAnim* apThis = pLipSynicAnim;
     if (apThis) {
         delete apThis;
     }
-    pLipSynicAnim = 0;
-    bLipFileFailed = 0;
-    pAnimSeq = 0;
+    pLipSynicAnim = nullptr;
+    bLipFileFailed = false;
+    pAnimSeq = nullptr;
     sAnimAction = -1;
     fTakeBackTimer = -1.0f;
-    pIdleToPlay = 0;
-    bProcessGreetSayTo = 0;
+    pIdleToPlay = nullptr;
+    bProcessGreetSayTo = false;
     fMaxAlpha = 1.0f;
     fCheckToTalkTimer = 0.0f;
     fHeadTrackTargetTimer = -1.0f;
     fRadiationTimer = 0.0f;
     fHighestRadiation = 0.0f;
-    bPlantedExplosive = 0;
-    bNeedTalkPlayer = 0;
+    bPlantedExplosive = false;
+    bNeedTalkPlayer = false;
     fAvoidWaitTimer = 0.0f;
-    bHiding = 0;
+    bHiding = false;
     eSpecialIdleType = AnimIdle::PLAY_TYPE_AUTO;
-    bFinishingCombatPackage = 0;
+    bFinishingCombatPackage = false;
     fCachedActorHeight = 0.0f;
     fClearTalkToListTimer = fAItalktosameNPCtimer.Float();
-    pPathLookAtTarget = 0;
+    pPathLookAtTarget = nullptr;
     DialogueItem* pGreetTopic = this->pGreetTopic;
     if (pGreetTopic) {
         delete pGreetTopic;
     }
-    this->pGreetTopic = 0;
+    this->pGreetTopic = nullptr;
     AggroRadiusList.RemoveAll();
     AvoidActorList.RemoveAll();
     pLastSpokeToList->RemoveAll();
     ClearMuzzleFlash();
-    pSubtitleVoice = 0;
+    pSubtitleVoice = nullptr;
     FreeAvoidNodes();
     for (int32_t i = 0; i < 6; ++i) {
-        HeadTrackingTargets[i] = 0;
-        HeadTrackingTargetFlags[i] = 0;
+        HeadTrackingTargets[i] = nullptr;
+        HeadTrackingTargetFlags[i] = false;
     }
-    pLastTarget = 0;
-    bForceRotate = 0;
+    pLastTarget = nullptr;
+    bForceRotate = false;
     fDetectionModifer = 0.0f;
     fDetectionModifierTimer = 0.0f;
     for (BSSimpleList<DetectionState*>* ecx0 = pDetectedActorList; ecx0; ecx0 = ecx0->m_pkNext) {
@@ -7844,12 +7870,12 @@ void HighProcess::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     }
     pActorsWhoDetectMeList->RemoveAll();
     ourFree(pActorsGeneratedDetectionEvent);
-    pActorsGeneratedDetectionEvent = 0;
-    m_pSayToDialogueTopic = 0;
+    pActorsGeneratedDetectionEvent = nullptr;
+    m_pSayToDialogueTopic = nullptr;
 }
 
 void HighProcess::Revert(uint32_t aiFlags, MobileObject* pmob) {
-    Actor* v5 = 0;
+    Actor* v5 = nullptr;
     if (pmob) {
         if (pmob->IsActor()) {
             v5 = static_cast<Actor*>(pmob);
@@ -7860,19 +7886,19 @@ void HighProcess::Revert(uint32_t aiFlags, MobileObject* pmob) {
         if (pActorValueCache) {
             pActorValueCache->ResetCachedActorValues();
         }
-        bDialoguewithPlayer = 0;
+        bDialoguewithPlayer = false;
         iHasHealingSpell = -1;
         iHasHealingPotion = -1;
         fDelayTimer = 0.0;
-        bCheckDeadTalk = 0;
+        bCheckDeadTalk = false;
         iHourPackageEvaluated = -1;
         fSoundDelay = 0.0;
-        bGreetingFlag = 0;
+        bGreetingFlag = false;
         fGreetingTimer = 0.0;
-        bHeadTrack = 1;
-        bWeaponAlertDrawn = 0;
-        pGreetTopic = 0;
-        bContinuingPackageforPC = 0;
+        bHeadTrack = true;
+        bWeaponAlertDrawn = false;
+        pGreetTopic = nullptr;
+        bContinuingPackageforPC = false;
         fAwarePlayerTimer = 0.0;
         fDetectGreetTimer = 0.0;
         fEvaluateAcquireTimer = 0.0;
@@ -7885,32 +7911,32 @@ void HighProcess::Revert(uint32_t aiFlags, MobileObject* pmob) {
         fTalkTimer = 0.0;
         fTurnTime = 0.0;
         fVoiceTimer = 0.0;
-        cLastTurnDir = 0;
-        bActivateAnim = 0;
+        cLastTurnDir = false;
+        bActivateAnim = false;
         fScriptPackageEndTime = 0.0;
         fHealthBarAlphaValue = 0.0;
         fActorHealthPercentage = 1.0;
         fHealthBarEmittanceValue = 0.0;
         iNumberGuardsPersuing = 0;
-        bStop = 0;
+        bStop = false;
         fReEquipArmorTimer = 0.0;
-        bUnequippedArmorToSwim = 0;
+        bUnequippedArmorToSwim = false;
         cLastTurn = 0;
-        bCurrentlyReanimating = 0;
-        bWaitingForLipFile = 0;
-        pLipSynicAnim = 0;
-        bLipFileFailed = 0;
+        bCurrentlyReanimating = false;
+        bWaitingForLipFile = false;
+        pLipSynicAnim = nullptr;
+        bLipFileFailed = false;
         for (int32_t i = 0; i < 6; ++i) {
-            HeadTrackingTargets[i] = 0;
-            HeadTrackingTargetFlags[i] = 0;
+            HeadTrackingTargets[i] = nullptr;
+            HeadTrackingTargetFlags[i] = false;
         }
-        pLastTarget = 0;
-        bForceRotate = 0;
+        pLastTarget = nullptr;
+        bForceRotate = false;
         fDetectionModifer = 0.0;
         fDetectionModifierTimer = 0.0;
         if (pLeveledSpellList) {
             pLeveledSpellList->RemoveAll();
-            pLeveledSpellList = 0;
+            pLeveledSpellList = nullptr;
         }
         if (v5) {
             FreeUpSpecialIdle(v5);
@@ -7923,25 +7949,25 @@ void HighProcess::StartNewPackage(Actor* apActor, TESPackage* apPack) {
         Script* pscript = apPack->GetOnBeginScript();
         if (pscript) {
             ScriptLocals* ScriptLocals_ = (&apActor->m_Extra)->GetScriptLocals();
-            pscript->Run(apActor, ScriptLocals_, 0, 1);
+            pscript->Run(apActor, ScriptLocals_, nullptr, true);
         }
         TESIdleForm* pstartidle = apPack->GetOnBeginIdle();
         if (pstartidle) {
-            SetupSpecialIdle(apActor, pstartidle, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
-            SetBeginIdlesPlayed(1);
+            SetupSpecialIdle(apActor, pstartidle, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
+            SetBeginIdlesPlayed(true);
         }
         else {
-            bPickPackIdle = 1;
+            bPickPackIdle = true;
             if (apActor->GetAnimation()) {
                 Animation* v3 = apActor->GetAnimation();
                 if (!v3->SpecialIdleDonePlaying()) {
-                    SetupSpecialIdle(apActor, 0, AnimIdle::PLAY_TYPE_AUTO, 0, 1, 1);
+                    SetupSpecialIdle(apActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, false, true, true);
                 }
             }
         }
         TESTopic* pTopic = apPack->GetOnBeginTopicInfo();
         if (pTopic) {
-            ProcessGreet(apActor, pTopic, 0, 0, 1, 1);
+            ProcessGreet(apActor, pTopic, false, false, true, true);
         }
     }
     if (apActor) {
@@ -7961,16 +7987,16 @@ void HighProcess::ChangePackage(Actor* apActor, TESPackage* apPack) {
             if (v8->GetCompiledData() || v8->GetText()) {
                 extra = apActor->TESObjectREFR::GetExtra();
                 scriptLocals = extra->GetScriptLocals();
-                v8->Run(apActor, scriptLocals, nullptr, 1);
+                v8->Run(apActor, scriptLocals, nullptr, true);
             }
         }
         v6 = apPack->GetOnChangeIdle();
         if (v6) {
-            SetupSpecialIdle(apActor, v6, static_cast<AnimIdle::PLAY_TYPE_ENUM>(2), (bool)1, (bool)0, (bool)1);
+            SetupSpecialIdle(apActor, v6, static_cast<AnimIdle::PLAY_TYPE_ENUM>(2), true, false, true);
         }
         v7 = apPack->GetOnChangeTopicInfo();
         if (v7) {
-            ProcessGreet(apActor, v7, (bool)0, (bool)0, (bool)1, (bool)1);
+            ProcessGreet(apActor, v7, false, false, true, true);
         }
     }
     GetCurrentPackage();
@@ -7982,18 +8008,18 @@ void HighProcess::PackageDone(Actor* apActor, TESPackage* apPack) {
         if (v8) {
             ExtraDataList* Extra = apActor->GetExtra();
             ScriptLocals* ScriptLocals_ = Extra->GetScriptLocals();
-            v8->Run(apActor, ScriptLocals_, 0, 1);
+            v8->Run(apActor, ScriptLocals_, nullptr, true);
         }
         TESIdleForm* v6 = apPack->GetOnEndIdle();
         if (v6) {
-            SetupSpecialIdle(apActor, v6, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
+            SetupSpecialIdle(apActor, v6, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
             if (apPack->GetMustComplete()) {
-                SetEndIdlesPlayed(1);
+                SetEndIdlesPlayed(true);
             }
         }
         TESTopic* v7 = apPack->GetOnEndTopic();
         if (v7) {
-            ProcessGreet(apActor, v7, 0, 0, 1, 1);
+            ProcessGreet(apActor, v7, false, false, true, true);
         }
     }
 }
@@ -8008,7 +8034,7 @@ void HighProcess::ModNumberGuardsArresting(int32_t ivalue) {
 
 BSSimpleList<SpellItem*>* HighProcess::GetLeveledSpells(Actor* apActor, bool abIncludeDiseases) {
     if (!apActor || !apActor->GetActorBase()) {
-        return 0;
+        return nullptr;
     }
     if (pLeveledSpellList) {
         return pLeveledSpellList;
@@ -8024,7 +8050,7 @@ BSSimpleList<SpellItem*>* HighProcess::GetLeveledSpells(Actor* apActor, bool abI
                     SpellItem* pspell = pspells->m_item;
                     if (pspell) {
                         if (pspell->GetSpellType() != MagicSystem::ABILITY) {
-                            bool baddIt = 1;
+                            bool baddIt = true;
                             if (pspell->GetSpellType() == MagicSystem::DISEASE) {
                                 baddIt = abIncludeDiseases;
                             }
@@ -8038,7 +8064,7 @@ BSSimpleList<SpellItem*>* HighProcess::GetLeveledSpells(Actor* apActor, bool abI
                                         v4 = ::new (v6) BSSimpleList<SpellItem*>;
                                     }
                                     else {
-                                        v4 = 0;
+                                        v4 = nullptr;
                                     }
                                     pLeveledSpellList = v4;
                                 }
@@ -8099,7 +8125,10 @@ void HighProcess::NotifyGuardAboutActivation(Actor* apActor, TESObjectREFR* apAc
             if (pActorPackage &&
                 (pActorPackage->GetProcedureType() == PACKAGE_PROCEDURE_GUARD &&
                  (pPackage->GetTarget() == apActivated && apActor->CanAttackActor(static_cast<Actor*>(apActionRef))))) {
-                EnterCombat(apActor, static_cast<Actor*>(apActionRef), 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                EnterCombat(
+                    apActor, static_cast<Actor*>(apActionRef), false, false, nullptr, false, false, false, 0, false,
+                    false, true, nullptr
+                );
                 return;
             }
         }
@@ -8127,7 +8156,7 @@ void HighProcess::SetDefaultHeadTrackTarget(TESObjectREFR* apRef) {
     HeadTrackingTargetFlags[0] = (uint8_t)1;
     OnNewHeadTrackTarget();
     if (apRef) {
-        apRef->SetTargeted(1);
+        apRef->SetTargeted(true);
     }
 }
 
@@ -8136,7 +8165,7 @@ void HighProcess::SetActionHeadTrackTarget(TESObjectREFR* apRef) {
     if (apRef) {
         HeadTrackingTargetFlags[1] = (uint8_t)1;
         OnNewHeadTrackTarget();
-        apRef->SetTargeted(1);
+        apRef->SetTargeted(true);
     }
     else {
         HeadTrackingTargetFlags[1] = (uint8_t)0;
@@ -8148,7 +8177,7 @@ void HighProcess::SetScriptHeadTrackTarget(TESObjectREFR* apRef) {
     if (apRef) {
         HeadTrackingTargetFlags[2] = (uint8_t)1;
         OnNewHeadTrackTarget();
-        apRef->SetTargeted(1);
+        apRef->SetTargeted(true);
     }
     else {
         HeadTrackingTargetFlags[2] = (uint8_t)0;
@@ -8160,7 +8189,7 @@ void HighProcess::SetCombatHeadTrackTarget(TESObjectREFR* apRef) {
     if (apRef) {
         HeadTrackingTargetFlags[3] = (uint8_t)1;
         OnNewHeadTrackTarget();
-        apRef->SetTargeted(1);
+        apRef->SetTargeted(true);
     }
     else {
         HeadTrackingTargetFlags[3] = (uint8_t)0;
@@ -8172,7 +8201,7 @@ void HighProcess::SetDialogHeadTrackTarget(TESObjectREFR* apRef) {
     if (apRef) {
         HeadTrackingTargetFlags[4] = (uint8_t)1;
         OnNewHeadTrackTarget();
-        apRef->SetTargeted(1);
+        apRef->SetTargeted(true);
     }
     else {
         HeadTrackingTargetFlags[4] = (uint8_t)0;
@@ -8184,7 +8213,7 @@ void HighProcess::SetUseWeaponHeadTrackTarget(TESObjectREFR* apRef) {
     if (apRef) {
         HeadTrackingTargetFlags[5] = (uint8_t)1;
         OnNewHeadTrackTarget();
-        apRef->SetTargeted(1);
+        apRef->SetTargeted(true);
     }
     else {
         HeadTrackingTargetFlags[5] = (uint8_t)0;
@@ -8196,7 +8225,7 @@ void HighProcess::SetHeadTrackTarget(HEAD_TRACK_TYPE aType, TESObjectREFR* apRef
     if (apRef) {
         HeadTrackingTargetFlags[aType] = (uint8_t)1;
         OnNewHeadTrackTarget();
-        apRef->SetTargeted(1);
+        apRef->SetTargeted(true);
     }
     else {
         HeadTrackingTargetFlags[aType] = (uint8_t)0;
@@ -8212,7 +8241,7 @@ void HighProcess::ClearDefaultHeadTrackTarget() {
 void HighProcess::ClearActionHeadTrackTarget(bool abHoldDefault) {
     TESObjectREFR* pTarget = HeadTrackingTargets[1];
     HeadTrackingTargets[1] = nullptr;
-    HeadTrackingTargetFlags[1] = 0;
+    HeadTrackingTargetFlags[1] = false;
     if (abHoldDefault) {
         HeadTrackingTargets[0] = pTarget;
         SetHeadTrackChangeTimer(fAIHoldDefaultHeadTrackTimer.Float());
@@ -8225,7 +8254,7 @@ void HighProcess::ClearActionHeadTrackTarget(bool abHoldDefault) {
 void HighProcess::ClearScriptHeadTrackTarget(bool abHoldDefault) {
     TESObjectREFR* pTarget = HeadTrackingTargets[2];
     HeadTrackingTargets[2] = nullptr;
-    HeadTrackingTargetFlags[2] = 0;
+    HeadTrackingTargetFlags[2] = false;
     if (abHoldDefault) {
         HeadTrackingTargets[0] = pTarget;
         SetHeadTrackChangeTimer(fAIHoldDefaultHeadTrackTimer.Float());
@@ -8244,7 +8273,7 @@ void HighProcess::ClearCombatHeadTrackTarget() {
 void HighProcess::ClearDialogHeadTrackTarget(bool abHoldDefault) {
     TESObjectREFR* pTarget = HeadTrackingTargets[4];
     HeadTrackingTargets[4] = nullptr;
-    HeadTrackingTargetFlags[4] = 0;
+    HeadTrackingTargetFlags[4] = false;
     if (abHoldDefault) {
         HeadTrackingTargets[0] = pTarget;
         SetHeadTrackChangeTimer(fAIHoldDefaultHeadTrackTimer.Float());
@@ -8256,8 +8285,8 @@ void HighProcess::ClearDialogHeadTrackTarget(bool abHoldDefault) {
 
 void HighProcess::ClearUseWeaponHeadTrackTarget(bool abHoldDefault) {
     TESObjectREFR* v4 = HeadTrackingTargets[5];
-    HeadTrackingTargets[5] = 0;
-    HeadTrackingTargetFlags[5] = 0;
+    HeadTrackingTargets[5] = nullptr;
+    HeadTrackingTargetFlags[5] = false;
     if (abHoldDefault) {
         HeadTrackingTargets[0] = v4;
         float* v2 = &fAIHoldDefaultHeadTrackTimer.Float();
@@ -8269,7 +8298,7 @@ void HighProcess::ClearUseWeaponHeadTrackTarget(bool abHoldDefault) {
 }
 
 void HighProcess::ModDetectionModifierTimer() {
-    fDetectionModifierTimer = (float)(fDetectionModifierTimer - (&appTimer)->GetSeconds());
+    fDetectionModifierTimer = (fDetectionModifierTimer - (&appTimer)->GetSeconds());
 }
 
 float HighProcess::GetDetectionModifierTimer() {
@@ -8300,7 +8329,7 @@ bool HighProcess::CanSetDefaultHeadTrackTarget() {
     int32_t i;
     for (i = 5; i > 0; --i) {
         if (HeadTrackingTargetFlags[i]) {
-            return (bool)0;
+            return false;
         }
     }
     return (bool)((uint8_t)(GetHeadTrackChangeTimer() < 0.0));
@@ -8310,10 +8339,10 @@ bool HighProcess::CanSetActionHeadTrackTarget() {
     int32_t i;
     for (i = 5; i >= 1; --i) {
         if (HeadTrackingTargetFlags[i]) {
-            return (bool)0;
+            return false;
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool HighProcess::CanSetCombatHeadTrackTarget() {
@@ -8444,7 +8473,7 @@ void HighProcess::UpdateRadiation(Actor* apActor, float afDelta) {
                 fradDelta = -fcurrentRads;
             }
             if (std::fabsf(fradDelta) != 0.0) {
-                apActor->DamageModActorValue(ActorValue::RADIATION_RADS, fradDelta, static_cast<Actor*>(0));
+                apActor->DamageModActorValue(ActorValue::RADIATION_RADS, fradDelta, static_cast<Actor*>(nullptr));
             }
             fHighestRadiation = 0.0f;
             fRadiationTimer = 0.0f;
@@ -8467,7 +8496,7 @@ void HighProcess::FinishSetupSpecialIdle(Actor* apActor) {
                 pAnimation->SpecialIdleAuto(
                     pIdleToPlay, apActor, static_cast<ANIM_GROUP_SECTION>(idleAnimGroupSection), eSpecialIdleType
                 );
-                bDoneOnce = (bool)0;
+                bDoneOnce = false;
                 pIdleToPlay = nullptr;
                 this->eSpecialIdleType = AnimIdle::PLAY_TYPE_AUTO;
                 if (GetWeaponDrawn() && GetPlantedExplosive()) {
@@ -8500,8 +8529,8 @@ void HighProcess::SetCurrentProcessAnimIdleLoaded(AnimIdle* apAnimIdle, KFModel*
     else {
         spAnimIdleToPlay->operator=(spAnimIdleToPlay[1]);
         spAnimIdleKF->operator=(spAnimIdleKF[1]);
-        spAnimIdleToPlay[1].operator=(static_cast<AnimIdle*>(0));
-        spAnimIdleKF[1].operator=(static_cast<KFModel*>(0));
+        spAnimIdleToPlay[1].operator=(static_cast<AnimIdle*>(nullptr));
+        spAnimIdleKF[1].operator=(static_cast<KFModel*>(nullptr));
     }
 }
 
@@ -8533,7 +8562,7 @@ float HighProcess::GetRadiationDelta() {
 void HighProcess::SetPathLookAtTarget(TESObjectREFR* apRef) {
     pPathLookAtTarget = apRef;
     if (apRef) {
-        apRef->SetTargeted(1);
+        apRef->SetTargeted(true);
     }
 }
 
@@ -8548,7 +8577,7 @@ void HighProcess::ProcessEscort(Actor* apActor) {
     bool bforceWalkForEscortedActor[2];
     TESPackage* pPack = GetPackageThatIsRunning();
     ItemChange* pitem = apActor->GetItemBeingEscorted();
-    bforceWalkForEscortedActor[1] = 0;
+    bforceWalkForEscortedActor[1] = false;
     if (!pitem) {
         uint32_t v2;
         if (!pTarget || (!pTarget->IsActor() && (v2 = pTarget->iFormID, !apActor->HasObjectId(v2)))) {
@@ -8568,14 +8597,14 @@ void HighProcess::ProcessEscort(Actor* apActor) {
         if (this->pAcquireObject) {
             if (this->pAcquireObject->pRef == apActor) {
                 pitem = apActor->GetInventoryItem(this->pAcquireObject->pObject, 0);
-                bforceWalkForEscortedActor[1] = 1;
+                bforceWalkForEscortedActor[1] = true;
             }
         }
     }
-    bool bIsActor = 0;
-    Actor* pescortedActor = 0;
+    bool bIsActor = false;
+    Actor* pescortedActor = nullptr;
     if (pTarget && (pTarget->IsActor() && pTarget != apActor)) {
-        bIsActor = 1;
+        bIsActor = true;
         pescortedActor = static_cast<Actor*>(pTarget);
         Actor* pact = static_cast<Actor*>(pTarget);
         BaseProcess* CurrentAIProcess = pact->pCurrentProcess;
@@ -8602,7 +8631,7 @@ void HighProcess::ProcessEscort(Actor* apActor) {
                 return;
             }
             if (pTarget->GetDelete() && !(&pTarget->m_Extra)->GetReferencePointer()) {
-                pPack->SetNeverRun(pTarget, 1);
+                pPack->SetNeverRun(pTarget, true);
                 AddToProcedureIndexRunning(apActor, 1);
                 return;
             }
@@ -8611,11 +8640,11 @@ void HighProcess::ProcessEscort(Actor* apActor) {
     Animation* pactorAnim = apActor->GetAnimation();
     if (pactorAnim) {
         if (apActor->IsPlayingLowerBodySpecialIdle()) {
-            pactorAnim->SpecialIdleFree(1, 0);
+            pactorAnim->SpecialIdleFree(true, false);
         }
     }
-    bool bwaitForEscortedActor = 0;
-    bforceWalkForEscortedActor[0] = 0;
+    bool bwaitForEscortedActor = false;
+    bforceWalkForEscortedActor[0] = false;
     if (bIsActor) {
         TESWorldSpace* LocationWorld = pPack->GetLocationWorld(apActor);
         TESObjectCELL* afRadius = pPack->GetLocationCell(apActor);
@@ -8623,7 +8652,7 @@ void HighProcess::ProcessEscort(Actor* apActor) {
         PathingLocation goalLoc(LocationCoord, afRadius, LocationWorld);
         bwaitForEscortedActor = ShouldWaitForEscortTarget(apActor, pescortedActor, goalLoc, bforceWalkForEscortedActor);
     }
-    if (pPack->pPackLoc && pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+    if (pPack->pPackLoc && pPack->IsActorAtLocation(apActor, false, -1.0f, false)) {
         if (bIsActor) {
             TESPackage* v13;
             TESPackage* v14;
@@ -8659,8 +8688,8 @@ void HighProcess::ProcessEscort(Actor* apActor) {
             if (ptarg->IsPathingComplete()) {
                 ptarg->EndMovement();
             }
-            SetCurrentActionComplete(1);
-            CheckforNewPackage(apActor, 0);
+            SetCurrentActionComplete(true);
+            CheckforNewPackage(apActor, false);
             AddToProcedureIndexRunning(apActor, 1);
         }
         else {
@@ -8676,14 +8705,14 @@ void HighProcess::ProcessEscort(Actor* apActor) {
                     }
                     return;
                 }
-                panim->SpecialIdleFree(1, 0);
+                panim->SpecialIdleFree(true, false);
             }
             PackageLocation* ppackloc = pPack->pPackLoc;
             PackageTarget* ppacktarg = pPack->GetPackageTarget();
             if (!pitem) {
                 goto LABEL_128;
             }
-            ExtraDataList* plist = 0;
+            ExtraDataList* plist = nullptr;
             if (pitem->pExtraObjectList) {
                 plist = pitem->pExtraObjectList->m_item;
             }
@@ -8700,7 +8729,7 @@ void HighProcess::ProcessEscort(Actor* apActor) {
             }
             if (pcont && pcont->HasContainer()) {
                 if (!bActivateAnim) {
-                    bActivateAnim = 1;
+                    bActivateAnim = true;
                     FindSpecialIdletoPlay(apActor, pcont->GetObjectReference(), pcont);
                     ItemChange* v42 = pitem;
                     ItemChange* pitem_4 = pitem;
@@ -8711,13 +8740,13 @@ void HighProcess::ProcessEscort(Actor* apActor) {
                 }
                 int32_t InitialTargetCount = pPack->GetInitialTargetCount();
                 apActor->PutItemInReference(pitem->pContainerObj, plist, pcont, InitialTargetCount, id);
-                bActivateAnim = 0;
+                bActivateAnim = false;
                 goto LABEL_83;
             }
             if (pitem->pExtraObjectList) {
                 plist = pitem->pExtraObjectList->m_item;
             }
-            ppoint = 0;
+            ppoint = nullptr;
             if (ppackloc) {
                 TESObjectREFR* pref = ppackloc->GetLocReference();
                 if (!pref) {
@@ -8733,8 +8762,8 @@ void HighProcess::ProcessEscort(Actor* apActor) {
             }
             inumber = pPack->GetInitialTargetCount();
             if (bActivateAnim) {
-                apActor->DropObject(pitem->pContainerObj, plist, inumber, ppoint, 0);
-                bActivateAnim = 0;
+                apActor->DropObject(pitem->pContainerObj, plist, inumber, ppoint, nullptr);
+                bActivateAnim = false;
             LABEL_83:;
                 ItemChange* v38 = pitem;
                 ItemChange* pitem_6 = pitem;
@@ -8754,7 +8783,7 @@ void HighProcess::ProcessEscort(Actor* apActor) {
                         if (pAcquireObject) {
                             delete static_cast<Date*>(v37);
                         }
-                        this->pAcquireObject = 0;
+                        this->pAcquireObject = nullptr;
                         if (pcont && pcont->HasContainer()) {
                             int32_t v9 = pPack->GetInitialTargetCount();
                             apActor->PutItemInReference(pitem->pContainerObj, plist, pcont, v9, id);
@@ -8763,7 +8792,7 @@ void HighProcess::ProcessEscort(Actor* apActor) {
                             if (pitem->pExtraObjectList) {
                                 plist = pitem->pExtraObjectList->m_item;
                             }
-                            const NiPoint3* ppoint_2 = 0;
+                            const NiPoint3* ppoint_2 = nullptr;
                             if (ppackloc) {
                                 TESObjectREFR* pref_2 = ppackloc->GetLocReference();
                                 if (!pref_2) {
@@ -8779,43 +8808,43 @@ void HighProcess::ProcessEscort(Actor* apActor) {
                                 }
                             }
                             int32_t inumber_3 = pPack->GetInitialTargetCount();
-                            apActor->DropObject(pitem->pContainerObj, plist, inumber_3, ppoint_2, 0);
+                            apActor->DropObject(pitem->pContainerObj, plist, inumber_3, ppoint_2, nullptr);
                         }
                         ItemChange* v34 = pitem;
                         ItemChange* pitem_7 = pitem;
                         if (pitem) {
                             delete pitem_7;
                         }
-                        pitem = 0;
+                        pitem = nullptr;
                     }
-                    bool abweararmor = 1;
-                    bool abwearweapon = 1;
+                    bool abweararmor = true;
+                    bool abwearweapon = true;
                     if (GetCurrentPackage()) {
                         TESPackage* v12 = GetCurrentPackage();
                         if (v12->GetForceUnequipWeapon()) {
-                            abwearweapon = 0;
+                            abwearweapon = false;
                         }
                     }
                     if (apActor->IsNpc()) {
                         TESNPC* pnpc = static_cast<TESNPC*>(apActor->GetObjectReference());
                         if (pnpc) {
-                            pnpc->InitDefaultWorn(apActor, abweararmor, abwearweapon, 0, 1);
+                            pnpc->InitDefaultWorn(apActor, abweararmor, abwearweapon, false, true);
                         }
                     }
                     else {
                         if (apActor->IsCreature()) {
                             TESCreature* pcrea = static_cast<TESCreature*>(apActor->GetObjectReference());
                             if (pcrea) {
-                                pcrea->InitDefaultWorn(apActor, abweararmor, abwearweapon, 1);
+                                pcrea->InitDefaultWorn(apActor, abweararmor, abwearweapon, true);
                             }
                         }
                     }
                 }
-                SetCurrentActionComplete(1);
+                SetCurrentActionComplete(true);
                 goto LABEL_128;
             }
-            bActivateAnim = 1;
-            FindSpecialIdletoPlay(apActor, pitem->pContainerObj, 0);
+            bActivateAnim = true;
+            FindSpecialIdletoPlay(apActor, pitem->pContainerObj, nullptr);
             if (pitem) {
                 delete pitem;
             }
@@ -8829,15 +8858,15 @@ void HighProcess::ProcessEscort(Actor* apActor) {
                  (pescortedActor->GetCurrentPackage() &&
                   (CurrentPackage = pescortedActor->GetCurrentPackage(), CurrentPackage->IsInterruptPackage())))) {
                 if (!apActor->IsPathingComplete()) {
-                    SetCurrentMovementComplete(1);
+                    SetCurrentMovementComplete(true);
                     AddToProcedureIndexRunning(apActor, -1);
                     return;
                 }
             }
             float fcurrentdistance = 0.0f;
-            float fpackdist = pPack->GetPackageRadiusActorToLocation(apActor, 0);
+            float fpackdist = pPack->GetPackageRadiusActorToLocation(apActor, false);
             float v24 = fpackdist + fpackdist;
-            int32_t emove = CalculateMoveMode(apActor, fcurrentdistance, fpackdist, v24, 0, 0);
+            int32_t emove = CalculateMoveMode(apActor, fcurrentdistance, fpackdist, v24, false, false);
             if (bforceWalkForEscortedActor[0]) {
                 emove = (emove & 0xFFFFFCFFu) | 256;
             }
@@ -8846,7 +8875,7 @@ void HighProcess::ProcessEscort(Actor* apActor) {
                     emove = (emove & 0xFFFFFCFFu) | 512;
                 }
             }
-            SetActorsAnimation(apActor, emove, 0);
+            SetActorsAnimation(apActor, emove, false);
         }
         if (!apActor->IsPathing()) {
             if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
@@ -8855,12 +8884,12 @@ void HighProcess::ProcessEscort(Actor* apActor) {
             }
             else {
                 if (!bIsActor || !bwaitForEscortedActor) {
-                    float fpackdist_2 = pPack->GetPackageRadiusActorToLocation(apActor, 0);
+                    float fpackdist_2 = pPack->GetPackageRadiusActorToLocation(apActor, false);
                     PathingRequest request;
                     TESWorldSpace* v18 = pPack->GetLocationWorld(apActor);
                     TESObjectCELL* LocationCell = pPack->GetLocationCell(apActor);
                     apActor->BuildRequest(
-                        &request, pPack->GetLocationCoord(apActor), LocationCell, v18, fpackdist_2, 0
+                        &request, pPack->GetLocationCoord(apActor), LocationCell, v18, fpackdist_2, nullptr
                     );
                     request.SetWaitIfPlayerWaits(pescortedActor == pPlayer);
                     apActor->SetPathfindingGoal(&request);
@@ -8880,7 +8909,7 @@ void HighProcess::ProcessSleep(Actor* apActor) {
     }
     if (apActor->IsNpc() && GetSitSleepState() == SIT_SLEEP_NORMAL && !pCurrentFurniture &&
         (RefListChairBed.IsEmpty() || nFurnitureListDirtied >= nFurnitureListTimer)) {
-        FindBedChairs(apActor, 0, 0);
+        FindBedChairs(apActor, false, nullptr);
     }
     if (apActor->GetSitSleepState() != SIT_SLEEP_IS_SLEEPING && apActor->IsNpc()) {
         if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING) {
@@ -8892,7 +8921,7 @@ void HighProcess::ProcessSleep(Actor* apActor) {
                 if (TESObjectREFR::kFurnitureLock.TryLock()) {
                     pCurrentFurniture = static_cast<TESObjectREFR*>((&RefListChairBed)->m_item);
                     ClearFurnitureMarker();
-                    while (pCurrentFurniture && !pCurrentFurniture->HasFreeMarker(0)) {
+                    while (pCurrentFurniture && !pCurrentFurniture->HasFreeMarker(false)) {
                         RefListChairBed.Remove(*reinterpret_cast<void**>(&pCurrentFurniture));
                         pCurrentFurniture = static_cast<TESObjectREFR*>((&RefListChairBed)->m_item);
                         ClearFurnitureMarker();
@@ -8920,11 +8949,11 @@ void HighProcess::ProcessSleep(Actor* apActor) {
             if (!pTarget) {
                 SetTarget(pCurrentFurniture);
             }
-            ProcessActivate(apActor, 0);
+            ProcessActivate(apActor, false);
         }
     }
     if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
-        SetCurrentActionComplete(1);
+        SetCurrentActionComplete(true);
         RefListChairBed.RemoveAll();
     }
     else {
@@ -8945,7 +8974,7 @@ void HighProcess::ProcessSleep(Actor* apActor) {
         BSFaceGenAnimationData* panimData = apActor->GetFaceAnimationData();
         if (panimData) {
             if (!panimData->GetDead()) {
-                panimData->SetDead(1, 0);
+                panimData->SetDead(true, false);
             }
         }
     }
@@ -8953,7 +8982,7 @@ void HighProcess::ProcessSleep(Actor* apActor) {
 
 void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
     NiPoint3 pointB;
-    TESPackage* v47 = 0;
+    TESPackage* v47 = nullptr;
     TESPackage* pPack = GetPackageThatIsRunning();
     if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
         apActor->InitiateGetUpPackage();
@@ -8965,7 +8994,7 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
             pItemBeingUsed = pfood->pContainerObj;
         }
         if (pfood || pItemBeingUsed) {
-            if (pPack->IsActorAtLocation(apActor, 0, -1.0f, 0) || pCurrentFurniture) {
+            if (pPack->IsActorAtLocation(apActor, false, -1.0f, false) || pCurrentFurniture) {
                 TESObjectREFR* plocRef;
                 if (apLocRef) {
                     plocRef = apLocRef;
@@ -8975,11 +9004,11 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
                 }
                 if (apActor->GetSitSleepState() == SIT_SLEEP_NORMAL && !pCurrentFurniture &&
                     (RefListChairBed.IsEmpty() || nFurnitureListDirtied >= nFurnitureListTimer)) {
-                    FindBedChairs(apActor, 1, plocRef);
+                    FindBedChairs(apActor, true, plocRef);
                 }
                 if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING) {
                     Animation* panim_2 = apActor->GetAnimation();
-                    ExtraDataList* pextra = 0;
+                    ExtraDataList* pextra = nullptr;
                     if (pfood) {
                         pItemBeingUsed = pfood->pContainerObj;
                         if (pfood->pExtraObjectList) {
@@ -8987,9 +9016,9 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
                         }
                     }
                     if (!panim_2 || panim_2->SpecialIdleDonePlaying()) {
-                        apActor->Eat(pItemBeingUsed, pextra, 1);
+                        apActor->Eat(pItemBeingUsed, pextra, true);
                     }
-                    SetCurrentActionComplete(1);
+                    SetCurrentActionComplete(true);
                     RefListChairBed.RemoveAll();
                     SetIdleTimer(0.0f);
                 }
@@ -8999,7 +9028,7 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
                             if (TESObjectREFR::kFurnitureLock.TryLock()) {
                                 pCurrentFurniture = static_cast<TESObjectREFR*>((&RefListChairBed)->m_item);
                                 ClearFurnitureMarker();
-                                while (pCurrentFurniture && !pCurrentFurniture->HasFreeMarker(0)) {
+                                while (pCurrentFurniture && !pCurrentFurniture->HasFreeMarker(false)) {
                                     RefListChairBed.Remove(*reinterpret_cast<void**>(&pCurrentFurniture));
                                     pCurrentFurniture = static_cast<TESObjectREFR*>((&RefListChairBed)->m_item);
                                     ClearFurnitureMarker();
@@ -9029,7 +9058,7 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
                     if (pCurrentFurniture &&
                         (!panim ||
                          (panim->SpecialIdleDonePlaying() || pPack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_SANDBOX))) {
-                        ProcessActivate(apActor, 0);
+                        ProcessActivate(apActor, false);
                     }
                     else {
                         if (panim) {
@@ -9041,9 +9070,9 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
                     if (!pCurrentFurniture && RefListChairBed.IsEmpty()) {
                         if (pfood) {
                             pItemBeingUsed = pfood->pContainerObj;
-                            apActor->QueueEquipObject(pfood->pContainerObj, 1, 0, 1, 0, 1);
+                            apActor->QueueEquipObject(pfood->pContainerObj, 1, nullptr, true, false, true);
                         }
-                        SetCurrentActionComplete(1);
+                        SetCurrentActionComplete(true);
                         RefListChairBed.RemoveAll();
                         SetIdleTimer(0.0f);
                     }
@@ -9098,14 +9127,14 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
                     }
                     HighProcess_bEating = 1;
                     eFormType = POTYPE_FOOD;
-                    pObjecttoAcquire = 0;
+                    pObjecttoAcquire = nullptr;
                     pDataHandler->EnumReferencesCloseToPoint(
                         pCell, pointB, facquireDist, pointB, facquireDist, &LowProcess_EvaluateReferenceforAcquire,
                         apActor
                     );
                     HighProcess_bEating = 0;
                     eFormType = POTYPE_NONE;
-                    pFactiontoAquire = 0;
+                    pFactiontoAquire = nullptr;
                     EvaluateOrderAcquireList(apActor);
                 }
                 if (ObjectList.IsEmpty()) {
@@ -9117,7 +9146,7 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
                         pform_4 = ppackTarg_2->GetTargObject();
                     }
                     else {
-                        pform_4 = 0;
+                        pform_4 = nullptr;
                     }
                     if (pform_4) {
                         pfoodListWrapper_2 = static_cast<BGSListForm*>(pform_4);
@@ -9161,7 +9190,7 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
                 pAcquireObject->iamount = 1;
                 ObjectList.Remove(pAcquireObject);
                 if (pAcquireObject->eType == ACQUIRE_TYPE_BUY_NPC && !pAcquireObject->pRef->IsActor()) {
-                    TESNPC* pnpc = 0;
+                    TESNPC* pnpc = nullptr;
                     TESForm* pownerform = pAcquireObject->pRef->GetOwner();
                     if (pownerform) {
                         if (pownerform->GetFormType() == NPC__ID) {
@@ -9169,7 +9198,7 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
                         }
                     }
                     if (pnpc) {
-                        Actor* ActorRefInHigh_0 = ReferenceProcessLists.GetActorRefInHigh(pnpc, 0);
+                        Actor* ActorRefInHigh_0 = ReferenceProcessLists.GetActorRefInHigh(pnpc, false);
                         SetTarget(ActorRefInHigh_0);
                     }
                 }
@@ -9190,7 +9219,7 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
                     pform_2 = ppackTarg->GetTargObject();
                 }
                 else {
-                    pform_2 = 0;
+                    pform_2 = nullptr;
                 }
                 TESForm* pform = pform_2 ? pform_2 : BGSDefaultObjectManager::GetDefaultObject(DO_RANDOM_FOOD);
                 TESForm* pform_3 = pform;
@@ -9221,9 +9250,9 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
             }
         }
         else {
-            apActor->PickUpObject(pitemref, 1, 0);
+            apActor->PickUpObject(pitemref, 1, false);
             pItemBeingUsed = pitemref->GetObjectReference();
-            apActor->Eat(pitemref->GetObjectReference(), &pitemref->m_Extra, 1);
+            apActor->Eat(pitemref->GetObjectReference(), &pitemref->m_Extra, true);
             FreeUpSpecialIdle(apActor);
         }
         if (apActor->GetAnimation()) {
@@ -9236,10 +9265,10 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
                 }
                 else {
                     TESIdleManager::SetUsedItem(pItemBeingUsed);
-                    SetupSpecialIdle(apActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
+                    SetupSpecialIdle(apActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
                     float afMax = RandomFloat(1.0f, 6.0f);
                     SetIdleTimer(afMax);
-                    TESIdleManager::SetUsedItem(0);
+                    TESIdleManager::SetUsedItem(nullptr);
                 }
             }
         }
@@ -9248,14 +9277,14 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
 
 void HighProcess::ProcessAlarm(Actor* apActor) {
     AlarmPackage* ppack = static_cast<AlarmPackage*>(GetCurrentPackage());
-    bool bstealing = 0;
+    bool bstealing = false;
     Actor* pCriminal = static_cast<Actor*>(ppack->GetPackageTarget()->GetTargReference());
     TESPackage* pPack = (&apActor->m_Extra)->GetPackageExtra();
     if (pCriminal == pPlayer && pPlayer->GetControlsDisabled(PlayerCharacter::DPC_FIGHTING)) {
         EndMoveMessage(apActor);
     }
     else {
-        bool bcombatflag = 0;
+        bool bcombatflag = false;
         if (apActor->GetSitSleepState() &&
             (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
              apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING)) {
@@ -9269,11 +9298,11 @@ void HighProcess::ProcessAlarm(Actor* apActor) {
                 }
                 else {
                     BSSimpleList<Crime*>* plist = &ppack->Crimes;
-                    bool bflee = 1;
+                    bool bflee = true;
                     while (plist && plist->m_item) {
                         Crime* pcrime = plist->m_item;
-                        TESObjectREFR* v11 = 0;
-                        TESObjectREFR* v10 = 0;
+                        TESObjectREFR* v11 = nullptr;
+                        TESObjectREFR* v10 = nullptr;
                         TESObjectREFR* pcrimeRef = pcrime->pcrimetarget;
                         if (pcrimeRef) {
                             if (pcrimeRef->IsActor()) {
@@ -9284,7 +9313,7 @@ void HighProcess::ProcessAlarm(Actor* apActor) {
                             CallforHelp(apActor, pCriminal, pcrime);
                         }
                         if (pcrime->bguardrespond) {
-                            bflee = 0;
+                            bflee = false;
                         }
                         else {
                             if (!pcrime->ecrime || pcrime->ecrime == PackageNS::CRIME_TYPE_PICKPOCKET) {
@@ -9292,7 +9321,7 @@ void HighProcess::ProcessAlarm(Actor* apActor) {
                                 if (CastingType == pPlayer) {
                                     TESBoundObject* ObjectReference;
                                     TESForm* pownerform = pcrime->pOwnership;
-                                    TESFaction* apFaction = 0;
+                                    TESFaction* apFaction = nullptr;
                                     if (pownerform) {
                                         if (pownerform->GetFormType() == FACT_ID) {
                                             apFaction = static_cast<TESFaction*>(pownerform);
@@ -9305,7 +9334,7 @@ void HighProcess::ProcessAlarm(Actor* apActor) {
                                           static_cast<double>(
                                               apActor->GetActorBase()->GetFactionRank(apFaction, apActor == pPlayer)
                                           ) > -1.0))) {
-                                        bstealing = 1;
+                                        bstealing = true;
                                     }
                                 }
                             }
@@ -9313,14 +9342,14 @@ void HighProcess::ProcessAlarm(Actor* apActor) {
                         if (!bcombatflag) {
                             FIGHT_REACTION ereaction = FIGHT_REACTION_NEUTRAL;
                             if (pcrime->ecrime <= PackageNS::CRIME_TYPE_TRESPASS) {
-                                if (apActor->GetShouldAttackActor(pCriminal, 0, ereaction, 0)) {
-                                    bcombatflag = 1;
+                                if (apActor->GetShouldAttackActor(pCriminal, false, ereaction, false)) {
+                                    bcombatflag = true;
                                 }
                             }
                             else {
                                 if (v10) {
-                                    if (apActor->GetShouldAttackActor(pCriminal, 0, ereaction, 0)) {
-                                        bcombatflag = 1;
+                                    if (apActor->GetShouldAttackActor(pCriminal, false, ereaction, false)) {
+                                        bcombatflag = true;
                                     }
                                 }
                             }
@@ -9328,8 +9357,11 @@ void HighProcess::ProcessAlarm(Actor* apActor) {
                         plist = plist->m_pkNext;
                     }
                     if (bcombatflag) {
-                        apActor->EndInterruptPackage(0);
-                        EnterCombat(apActor, pCriminal, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                        apActor->EndInterruptPackage(false);
+                        EnterCombat(
+                            apActor, pCriminal, false, false, nullptr, false, false, false, 0, false, false, true,
+                            nullptr
+                        );
                     }
                     else {
                         if (bflee) {
@@ -9338,7 +9370,7 @@ void HighProcess::ProcessAlarm(Actor* apActor) {
                             }
                             else {
                                 if (pCriminal->IsTresPassing()) {
-                                    apActor->EndInterruptPackage(0);
+                                    apActor->EndInterruptPackage(false);
                                     TrespassPackage* ptrespack = (&pCriminal->m_Extra)->GetTrespassPackage();
                                     if (ptrespack) {
                                         ptrespack->ModWarning(0);
@@ -9356,10 +9388,10 @@ void HighProcess::ProcessAlarm(Actor* apActor) {
                             if ((pCriminal == pPlayer ||
                                  (ppack_2 &&
                                   (ppack_2->GetPackType() == PACKAGE_TYPE_SLEEP &&
-                                   ppack_2->IsActorAtLocation(apActor, 0, -1.0f, 0)))) &&
+                                   ppack_2->IsActorAtLocation(apActor, false, -1.0f, false)))) &&
                                 (pCriminal == pPlayer && pCriminal->IsTresPassing())) {
                                 SetTarget(pPlayer);
-                                ProcessFollow(apActor, 0, 257, 0);
+                                ProcessFollow(apActor, false, 257, false);
                             }
                             else {
                                 AddToProcedureIndexRunning(apActor, 4);
@@ -9377,9 +9409,9 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
     TESPackage* v12;
     if (pFaderManager->GetFaderAlpha(FADER_TO_BLACK) > 0.0 ||
         (GetSitSleepState() != SIT_SLEEP_IS_SITTING && GetSitSleepState())) {
-        return 0;
+        return false;
     }
-    TESPackage* v113 = 0;
+    TESPackage* v113 = nullptr;
     TESPackage* pPack = GetPackageThatIsRunning();
     TESPackage* peditorpack = (&apActor->m_Extra)->GetPackageExtra();
     if (!pTarget || pTarget->GetDelete()) {
@@ -9389,36 +9421,36 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
         if (abInterateindex) {
             AddToProcedureIndexRunning(apActor, 1);
         }
-        return 0;
+        return false;
     }
     if (pTarget->GetDelete() || pTarget->GetDisabled()) {
         if (pTarget->GetDelete()) {
-            pPack->SetNeverRun(pTarget, 1);
+            pPack->SetNeverRun(pTarget, true);
         }
         if (abInterateindex) {
             AddToProcedureIndexRunning(apActor, 1);
         }
-        return 0;
+        return false;
     }
-    if (pTarget->IsDead(1) && !this->pAcquireObject) {
+    if (pTarget->IsDead(true) && !this->pAcquireObject) {
         if (pPack == GetRunOncePackage()) {
-            apActor->EndInterruptPackage(0);
+            apActor->EndInterruptPackage(false);
         }
         else {
-            pPack->SetNeverRun(pTarget, 1);
+            pPack->SetNeverRun(pTarget, true);
         }
-        return 0;
+        return false;
     }
     TESObjectREFR* pstortarget = pTarget;
     if (pPack->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE) {
         if (pTarget == pPlayer &&
             (GetTalkingtoPC() &&
-             (pPlayer->GetDistanceFromReference(apActor, 0, 0) > 800.0 && pPlayer->IsPathingComplete()))) {
+             (pPlayer->GetDistanceFromReference(apActor, false, false) > 800.0 && pPlayer->IsPathingComplete()))) {
             if (peditorpack) {
                 float fpackdist = apActor->GetDistanceFromPoint(peditorpack->GetLocationCoord(apActor));
                 if (fpackdist > 600.0) {
-                    apActor->EndInterruptPackage(0);
-                    return 0;
+                    apActor->EndInterruptPackage(false);
+                    return false;
                 }
             }
         }
@@ -9435,12 +9467,12 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
         TESBoundObject* ObjectReference = pTarget->GetObjectReference();
         if (ObjectReference == pXMarkerHeading || (v7 = pTarget->GetObjectReference(), v7 == pXMarker)) {
             SetActionHeadTrackTarget(pref);
-            return 1;
+            return true;
         }
     }
     DoorTeleportData* pTel = pTarget->GetTeleport();
-    bool batRef = 0;
-    float fdistance = pPack->GetPackageRadiusActorToRefTarget(apActor, 0);
+    bool batRef = false;
+    float fdistance = pPack->GetPackageRadiusActorToRefTarget(apActor, false);
     if (pTarget->IsFurniture()) {
         if (!pCurrentFurniture || pCurrentFurniture != pTarget) {
             if (pCurrentFurniture &&
@@ -9454,24 +9486,24 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
             }
         }
         if (apActor->GetSitSleepState()) {
-            batRef = 1;
+            batRef = true;
         }
         if (pCurrentFurniture &&
             (apActor->GetSitSleepState() == SIT_SLEEP_NORMAL &&
-             (pTarget->GetMarkerUsed(cCurrentFurnitureIndex, 1) && !apActor->IsPathingComplete()))) {
-            pCurrentFurniture = 0;
+             (pTarget->GetMarkerUsed(cCurrentFurnitureIndex, true) && !apActor->IsPathingComplete()))) {
+            pCurrentFurniture = nullptr;
             EndMoveMessage(apActor);
-            SetTarget(0);
-            return 0;
+            SetTarget(nullptr);
+            return false;
         }
         NiPoint3 point = apActor->GetLocationOnReference();
         uint32_t iindex = 0;
         if (cCurrentFurnitureIndex == 127) {
             TESObjectCELL* ParentCell = apActor->GetParentCell();
             if (ParentCell == pCurrentFurniture->GetParentCell()) {
-                if (!pTarget->GetClosestFreeMarker(point, 1, 1, FurnitureMarker, iindex, 1)) {
-                    pCurrentFurniture = 0;
-                    SetTarget(0);
+                if (!pTarget->GetClosestFreeMarker(point, true, true, FurnitureMarker, iindex, true)) {
+                    pCurrentFurniture = nullptr;
+                    SetTarget(nullptr);
                     if (abInterateindex) {
                         if (pPack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_EXPLORE_ACTIVATE) {
                             AddToProcedureIndexRunning(apActor, -1);
@@ -9480,15 +9512,15 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                             AddToProcedureIndexRunning(apActor, 1);
                         }
                     }
-                    return 0;
+                    return false;
                 }
                 pCurrentFurniture = pTarget;
                 float afRadius = FurnitureMarker.GetHeading();
                 TESWorldSpace* WorldSpace = pTarget->GetWorldSpace();
                 if (!apActor->SetPathfindingGoalAndAngle_0(
-                        FurnitureMarker.Position, pTarget->GetParentCell(), WorldSpace, 20.0f, afRadius, 0
+                        FurnitureMarker.Position, pTarget->GetParentCell(), WorldSpace, 20.0f, afRadius, nullptr
                     )) {
-                    return 0;
+                    return false;
                 }
                 cCurrentFurnitureIndex = iindex;
             }
@@ -9500,7 +9532,7 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
         NiPoint3 dist = *LinkedDoorTeleportPosition - *afB;
         double v11 = dist.Length();
         if (static_cast<double>(iAIDistanceRadiusMinLocation.Int()) >= v11) {
-            batRef = 1;
+            batRef = true;
         }
     }
     else {
@@ -9514,25 +9546,25 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
         if (!apActor->DidPathingFail()) {
             TESBoundObject* v22 = pTarget->GetObjectReference();
             if (v22 == pXMarkerHeading && !DidPathingFail(apActor)) {
-                apActor->RequestRotate((&pTarget->GetAngleOnReference())->z, 0);
+                apActor->RequestRotate((&pTarget->GetAngleOnReference())->z, false);
             }
             if (pTarget != apActor && (pTarget->IsActor() && apActor->GetSitSleepState() != SIT_SLEEP_IS_SITTING)) {
                 if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
                     apActor->InitiateGetUpPackage();
-                    return 1;
+                    return true;
                 }
                 NiPoint3 v117 = pTarget->GetLocationOnReference();
-                apActor->RequestRotate(v117, 0);
+                apActor->RequestRotate(v117, false);
             }
         }
-        bool bdoneMoving = 1;
+        bool bdoneMoving = true;
         if (abInterateindex) {
             if (pTarget) {
                 if (pTarget == pPlayer && !bpathingfailed) {
                     Actor* pactor = static_cast<Actor*>(pTarget);
                     BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
                     if (!CurrentAIProcess->CanForceGreet(apActor)) {
-                        return 0;
+                        return false;
                     }
                 }
             }
@@ -9544,12 +9576,12 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                     bdoneMoving = v64;
                     if (v64) {
                         if (!bActivateAnim) {
-                            bActivateAnim = 1;
+                            bActivateAnim = true;
                             FreeUpSpecialIdle(apActor);
                             SetActionHeadTrackTarget(pTarget);
                             if (FindSpecialIdletoPlay(apActor, pTarget->GetObjectReference(), pTarget)) {
                                 fIdleTimer = 1.0f;
-                                return 0;
+                                return false;
                             }
                             fIdleTimer = 0.0f;
                         }
@@ -9558,16 +9590,16 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                         }
                         else {
                             this->pAcquireObject->pRef->Activate(
-                                apActor, 1, this->pAcquireObject->pObject, this->pAcquireObject->iamount
+                                apActor, true, this->pAcquireObject->pObject, this->pAcquireObject->iamount
                             );
                             --iNumberItemsActivate;
-                            bActivateAnim = 0;
-                            ClearActionHeadTrackTarget(1);
+                            bActivateAnim = false;
+                            ClearActionHeadTrackTarget(true);
                             if (iNumberItemsActivate <= 0) {
                                 AddToProcedureIndexRunning(apActor, 1);
-                                SetTargetActivated(1);
-                                SetCurrentActionComplete(1);
-                                bActivateAnim = 0;
+                                SetTargetActivated(true);
+                                SetCurrentActionComplete(true);
+                                bActivateAnim = false;
                             }
                         }
                     }
@@ -9576,27 +9608,29 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                 if (!pTarget->IsMobileObject() && !pTarget->IsFurniture()) {
                     Animation* panim_2 = apActor->GetAnimation();
                     if (!bActivateAnim) {
-                        bActivateAnim = 1;
+                        bActivateAnim = true;
                         FreeUpSpecialIdle(apActor);
                         SetActionHeadTrackTarget(pTarget);
                         FindSpecialIdletoPlay(apActor, pTarget->GetObjectReference(), pTarget);
-                        return 0;
+                        return false;
                     }
                     if (!panim_2 || panim_2->SpecialIdleDonePlaying()) {
                         AddToProcedureIndexRunning(apActor, 1);
                         if (this->pAcquireObject) {
-                            pTarget->Activate(apActor, 1, this->pAcquireObject->pObject, this->pAcquireObject->iamount);
+                            pTarget->Activate(
+                                apActor, true, this->pAcquireObject->pObject, this->pAcquireObject->iamount
+                            );
                         }
                         else {
-                            pTarget->Activate(apActor, 1, 0, 1);
+                            pTarget->Activate(apActor, true, nullptr, 1);
                         }
-                        SetTargetActivated(1);
+                        SetTargetActivated(true);
                         uint32_t Count = pPack->ePROCEDURE_TYPE;
                         if (Procedure_Action[Count][GetCurrentProcedureIndex()] == PROCEDURE_DONE) {
-                            SetCurrentActionComplete(1);
+                            SetCurrentActionComplete(true);
                         }
-                        ClearActionHeadTrackTarget(1);
-                        bActivateAnim = 0;
+                        ClearActionHeadTrackTarget(true);
+                        bActivateAnim = false;
                     }
                     goto LABEL_300;
                 }
@@ -9604,10 +9638,10 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                     float fcurrenttime = appCalendar.GetHour();
                     fDetectListTimer = fcurrenttime;
                     if (!apActor->IsNpc() && pTarget->IsNpc()) {
-                        pTarget->Activate(apActor, 0, 0, 1);
+                        pTarget->Activate(apActor, false, nullptr, 1);
                     }
                     else {
-                        Actor* pact_2 = 0;
+                        Actor* pact_2 = nullptr;
                         if (pTarget->IsActor()) {
                             pact_2 = static_cast<Actor*>(pTarget);
                         }
@@ -9615,7 +9649,7 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                             Actor* pact_3 = static_cast<Actor*>(pTarget);
                             BaseProcess* v63 = pact_3->pCurrentProcess;
                             v63->ProcessGetUpOneHour(pact_3);
-                            return 0;
+                            return false;
                         }
                         if (pPack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_EXPLORE_NPC && pPack->GetOncePerDay()) {
                             if (pPack->GetPackageSchedule()) {
@@ -9626,30 +9660,30 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                                 }
                             }
                         }
-                        if (!pPack->GetIsCreated() && pTarget->IsDead(1) && !this->pAcquireObject) {
-                            pPack->SetNeverRun(pTarget, 1);
+                        if (!pPack->GetIsCreated() && pTarget->IsDead(true) && !this->pAcquireObject) {
+                            pPack->SetNeverRun(pTarget, true);
                         }
-                        pTarget->Activate(apActor, 1, 0, 1);
+                        pTarget->Activate(apActor, true, nullptr, 1);
                     }
-                    return 1;
+                    return true;
                 }
                 if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
                     apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
                     AddToProcedureIndexRunning(apActor, 1);
-                    SetTargetActivated(1);
+                    SetTargetActivated(true);
                     uint32_t v24 = pPack->ePROCEDURE_TYPE;
                     if (Procedure_Action[v24][GetCurrentProcedureIndex()] == PROCEDURE_DONE) {
-                        SetCurrentActionComplete(1);
+                        SetCurrentActionComplete(true);
                     }
-                    return 1;
+                    return true;
                 }
                 if (!iAnimActionSuccess) {
                 LABEL_181:;
                     AddToProcedureIndexRunning(apActor, 1);
-                    pGenericLocation = 0;
+                    pGenericLocation = nullptr;
                     EndMoveMessage(apActor);
                     iAnimActionSuccess = 1;
-                    return 1;
+                    return true;
                 }
                 goto LABEL_182;
             }
@@ -9659,19 +9693,19 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                     FurnitureMark* pfurn_3 = v60->GetFurnitureMarker();
                     TESWorldSpace* afAngleToFacef = pTarget->GetWorldSpace();
                     TESObjectCELL* v40 = pTarget->GetParentCell();
-                    apActor->SetPathfindingGoal(pfurn_3->Position, v40, afAngleToFacef, 0.0f, 0);
+                    apActor->SetPathfindingGoal(pfurn_3->Position, v40, afAngleToFacef, 0.0f, nullptr);
                 }
                 else {
-                    float afRadiusa = pPack->GetPackageRadiusActorToRefTarget(apActor, 0);
+                    float afRadiusa = pPack->GetPackageRadiusActorToRefTarget(apActor, false);
                     TESWorldSpace* afAngleToFaceg = pTarget->GetWorldSpace();
                     TESObjectCELL* v41 = pTarget->GetParentCell();
                     const NiPoint3* v31 = &pTarget->GetLocationOnReference();
-                    apActor->SetPathfindingGoal(*v31, v41, afAngleToFaceg, afRadiusa, 0);
+                    apActor->SetPathfindingGoal(*v31, v41, afAngleToFaceg, afRadiusa, nullptr);
                 }
-                return 0;
+                return false;
             }
             if (pPack->GetPackType() == PACKAGE_TYPE_ESCORT) {
-                Actor* ptarg = 0;
+                Actor* ptarg = nullptr;
                 if (pTarget) {
                     if (pTarget->IsActor()) {
                         ptarg = static_cast<Actor*>(pTarget);
@@ -9681,17 +9715,17 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                     BaseProcess* v62 = ptarg->pCurrentProcess;
                     v62->AddToProcedureIndexRunning(ptarg, 1);
                 }
-                return 1;
+                return true;
             }
             if (bpathingfailed) {
-                bActivateAnim = 0;
-                ClearActionHeadTrackTarget(1);
+                bActivateAnim = false;
+                ClearActionHeadTrackTarget(true);
                 if (pTarget->IsFurniture()) {
                     BaseProcess* v61 = apActor->pCurrentProcess;
                     FurnitureMark* pfurn_2 = v61->GetFurnitureMarker();
                     TESWorldSpace* afAngleToFaced = pTarget->GetWorldSpace();
                     TESObjectCELL* v38 = pTarget->GetParentCell();
-                    apActor->SetPathfindingGoal(pfurn_2->Position, v38, afAngleToFaced, 0.0f, 0);
+                    apActor->SetPathfindingGoal(pfurn_2->Position, v38, afAngleToFaced, 0.0f, nullptr);
                 }
                 else {
                     if (this->pAcquireObject && iNumberItemsActivate <= 0) {
@@ -9701,30 +9735,30 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                     }
                     else {
                         if (this->pAcquireObject) {
-                            SetTarget(0);
+                            SetTarget(nullptr);
                             ObjectstoAcquire* pAcquireObject = this->pAcquireObject;
                             if (pAcquireObject) {
                                 pAcquireObject->Delete(1u);
                             }
-                            this->pAcquireObject = 0;
+                            this->pAcquireObject = nullptr;
                         }
                     }
                     if (pTarget) {
                         TESWorldSpace* afAngleToFacee = pTarget->GetWorldSpace();
                         TESObjectCELL* v39 = pTarget->GetParentCell();
                         const NiPoint3* v30 = &pTarget->GetLocationOnReference();
-                        apActor->SetPathfindingGoal(*v30, v39, afAngleToFacee, 0.0f, 0);
-                        return 0;
+                        apActor->SetPathfindingGoal(*v30, v39, afAngleToFacee, 0.0f, nullptr);
+                        return false;
                     }
                 }
-                return 1;
+                return true;
             }
             Animation* panim_3 = apActor->GetAnimation();
             if (bActivateAnim) {
                 if (!panim_3 || panim_3->SpecialIdleDonePlaying()) {
                     if (this->pAcquireObject) {
                         if (pTarget->Activate(
-                                apActor, 0, this->pAcquireObject->pObject, this->pAcquireObject->iamount
+                                apActor, false, this->pAcquireObject->pObject, this->pAcquireObject->iamount
                             )) {
                             if (this->pAcquireObject) {
                                 if (iNumberItemsActivate <= this->pAcquireObject->iamount) {
@@ -9738,14 +9772,14 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                             else {
                                 --iNumberItemsActivate;
                             }
-                            this->pAcquireObject = 0;
-                            SetTarget(0);
+                            this->pAcquireObject = nullptr;
+                            SetTarget(nullptr);
                         }
                         else {
-                            SetTarget(0);
+                            SetTarget(nullptr);
                         }
-                        bActivateAnim = 0;
-                        ClearActionHeadTrackTarget(1);
+                        bActivateAnim = false;
+                        ClearActionHeadTrackTarget(true);
                         if (this->pAcquireObject && iNumberItemsActivate <= 0) {
                             PACKAGE_PROCEDURE_TYPE v26 = pPack->ePROCEDURE_TYPE;
                             int32_t v27 = Procedure::GetProcedureCount(v26);
@@ -9753,31 +9787,31 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                         }
                         else {
                             if (this->pAcquireObject) {
-                                SetTarget(0);
+                                SetTarget(nullptr);
                                 ObjectstoAcquire* v72 = this->pAcquireObject;
                                 if (v72) {
                                     v72->Delete(1u);
                                 }
-                                this->pAcquireObject = 0;
+                                this->pAcquireObject = nullptr;
                             }
                         }
                     }
                 }
-                return 1;
+                return true;
             }
         }
         else {
             if (bpathingfailed) {
                 if (pPack->GetMustComplete()) {
-                    float afRadiusb = pPack->GetPackageRadiusActorToRefTarget(apActor, 0);
+                    float afRadiusb = pPack->GetPackageRadiusActorToRefTarget(apActor, false);
                     TESWorldSpace* afAngleToFaceh = pTarget->GetWorldSpace();
                     TESObjectCELL* v42 = pTarget->GetParentCell();
                     const NiPoint3* v32 = &pTarget->GetLocationOnReference();
-                    apActor->SetPathfindingGoal(*v32, v42, afAngleToFaceh, afRadiusb, 0);
-                    return 0;
+                    apActor->SetPathfindingGoal(*v32, v42, afAngleToFaceh, afRadiusb, nullptr);
+                    return false;
                 }
                 if (pPack->GetPackType() == PACKAGE_TYPE_ESCORT) {
-                    Actor* ptarg_2 = 0;
+                    Actor* ptarg_2 = nullptr;
                     if (pTarget) {
                         if (pTarget->IsActor()) {
                             ptarg_2 = static_cast<Actor*>(pTarget);
@@ -9789,7 +9823,7 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                             (CurrentPackage = ptarg_2->GetCurrentPackage(),
                              CurrentPackage->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_FOLLOW_WITH_ESCORT)) {
                             AddToProcedureIndexRunning(ptarg_2, -1);
-                            return 0;
+                            return false;
                         }
                         BaseProcess* v59 = ptarg_2->pCurrentProcess;
                         v59->AddToProcedureIndexRunning(ptarg_2, 1);
@@ -9800,8 +9834,8 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
             if (pTarget->IsFurniture()) {
                 if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
                     apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
-                    SetTargetActivated(1);
-                    return 1;
+                    SetTargetActivated(true);
+                    return true;
                 }
                 if (!iAnimActionSuccess) {
                     goto LABEL_181;
@@ -9813,23 +9847,23 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                 if ((panim_6 && !panim_6->SpecialIdleDonePlaying()) ||
                     (!this->pAcquireObject ||
                      ((pTarget && pTarget->IsFurniture()) || (!bdoneMoving && apActor->IsPathing())))) {
-                    return 0;
+                    return false;
                 }
                 ObjectstoAcquire* v69 = this->pAcquireObject;
                 if (v69) {
                     v69->Delete(1u);
                 }
-                this->pAcquireObject = 0;
-                SetTarget(0);
-                pSavedAcquireObject = 0;
-                return 1;
+                this->pAcquireObject = nullptr;
+                SetTarget(nullptr);
+                pSavedAcquireObject = nullptr;
+                return true;
             }
             if (this->pAcquireObject) {
                 Animation* panim_4 = apActor->GetAnimation();
                 if (bActivateAnim) {
                     if (!panim_4 || panim_4->SpecialIdleDonePlaying()) {
                         if (pTarget->Activate(
-                                apActor, 0, this->pAcquireObject->pObject, this->pAcquireObject->iamount
+                                apActor, false, this->pAcquireObject->pObject, this->pAcquireObject->iamount
                             )) {
                             if (this->pAcquireObject) {
                                 if (iNumberItemsActivate <= this->pAcquireObject->iamount) {
@@ -9840,14 +9874,14 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                             if (v70) {
                                 v70->Delete(1u);
                             }
-                            this->pAcquireObject = 0;
-                            SetTarget(0);
+                            this->pAcquireObject = nullptr;
+                            SetTarget(nullptr);
                         }
                         else {
-                            SetTarget(0);
+                            SetTarget(nullptr);
                         }
-                        bActivateAnim = 0;
-                        ClearActionHeadTrackTarget(1);
+                        bActivateAnim = false;
+                        ClearActionHeadTrackTarget(true);
                     }
                     goto LABEL_300;
                 }
@@ -9856,13 +9890,13 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                 if (pPack->GetPackType() == PACKAGE_TYPE_ACCOMPANY) {
                     AddToProcedureIndexRunning(apActor, 1);
                     EndMoveMessage(apActor);
-                    return 1;
+                    return true;
                 }
                 if (pTarget->IsNpc()) {
                     if (pTarget->GetSitSleepState() == SIT_SLEEP_NORMAL ||
                         (pTarget->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
                          pTarget->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING)) {
-                        pTarget->Activate(apActor, 0, 0, 1);
+                        pTarget->Activate(apActor, false, nullptr, 1);
                     }
                     goto LABEL_300;
                 }
@@ -9870,20 +9904,20 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                 if (bActivateAnim) {
                     if (panim_5) {
                         if (panim_5->SpecialIdleDonePlaying()) {
-                            ClearActionHeadTrackTarget(1);
-                            pTarget->Activate(apActor, 0, 0, 1);
-                            bActivateAnim = 0;
+                            ClearActionHeadTrackTarget(true);
+                            pTarget->Activate(apActor, false, nullptr, 1);
+                            bActivateAnim = false;
                         }
                     }
                     goto LABEL_300;
                 }
             }
         }
-        bActivateAnim = 1;
+        bActivateAnim = true;
         FreeUpSpecialIdle(apActor);
         FindSpecialIdletoPlay(apActor, pTarget->GetObjectReference(), pTarget);
         SetActionHeadTrackTarget(pTarget);
-        return 0;
+        return false;
     }
     if (!GetRunOncePackage() || (v12 = GetRunOncePackage(), v12->GetPackType() != PACKAGE_TYPE_IN_GAME_DIALOGUE)) {
         if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING || GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
@@ -9893,13 +9927,13 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                     if (pdia->pPackLoc->GetLocReference()) {
                         TESObjectREFR* pref_2 = pdia->pPackLoc->GetLocReference();
                         if (pref_2->IsFurniture() && pdia->GetReachedAmbushLocation()) {
-                            return 0;
+                            return false;
                         }
                     }
                 }
             }
             apActor->InitiateGetUpPackage();
-            return 0;
+            return false;
         }
     }
     const NiPoint3* v13 = &pTarget->GetLocationOnReference();
@@ -9932,7 +9966,7 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                 }
                 NiPoint3 v92 = pTarget->GetLocationOnReference();
             }
-            return 0;
+            return false;
         }
     }
     if (pTarget->GetTeleport()) {
@@ -9942,8 +9976,8 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
         afAngleToFace = pTarget->GetWorldSpace();
         v34 = pTarget->GetParentCell();
         v17 = &pTarget->GetLinkedDoorTeleportPosition();
-        if (!apActor->SetPathfindingGoal(*v17, v34, afAngleToFace, fdistance, 0)) {
-            return 0;
+        if (!apActor->SetPathfindingGoal(*v17, v34, afAngleToFace, fdistance, nullptr)) {
+            return false;
         }
     LABEL_112:;
         lastSeenPostion = pTarget->GetLocationOnReference();
@@ -9957,16 +9991,16 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
             if (pfurn) {
                 TESWorldSpace* afAngleToFacea = pTarget->GetWorldSpace();
                 TESObjectCELL* v35 = pTarget->GetParentCell();
-                if (!apActor->SetPathfindingGoal(pfurn->Position, v35, afAngleToFacea, 5.0f, 0)) {
-                    return 0;
+                if (!apActor->SetPathfindingGoal(pfurn->Position, v35, afAngleToFacea, 5.0f, nullptr)) {
+                    return false;
                 }
             }
             else {
                 TESWorldSpace* afAngleToFaceb = pTarget->GetWorldSpace();
                 TESObjectCELL* v36 = pTarget->GetParentCell();
                 const NiPoint3* v19 = &pTarget->GetLocationOnReference();
-                if (!apActor->SetPathfindingGoal(*v19, v36, afAngleToFaceb, fdistance, 0)) {
-                    return 0;
+                if (!apActor->SetPathfindingGoal(*v19, v36, afAngleToFaceb, fdistance, nullptr)) {
+                    return false;
                 }
             }
         }
@@ -9974,32 +10008,32 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
             TESWorldSpace* afAngleToFacec = pTarget->GetWorldSpace();
             TESObjectCELL* v37 = pTarget->GetParentCell();
             const NiPoint3* v20 = &pTarget->GetLocationOnReference();
-            if (!apActor->SetPathfindingGoal(*v20, v37, afAngleToFacec, fdistance, 0)) {
-                return 0;
+            if (!apActor->SetPathfindingGoal(*v20, v37, afAngleToFacec, fdistance, nullptr)) {
+                return false;
             }
         }
         goto LABEL_112;
     }
     NiPoint3 point_2 = apActor->GetLocationOnReference();
     uint32_t iindex_2 = 0;
-    if (pTarget->GetClosestFreeMarker(point_2, 1, 1, FurnitureMarker, iindex_2, 1)) {
+    if (pTarget->GetClosestFreeMarker(point_2, true, true, FurnitureMarker, iindex_2, true)) {
         PathingRequest request;
         TESWorldSpace* v18 = pTarget->GetWorldSpace();
-        apActor->BuildRequest(&request, FurnitureMarker.Position, pTarget->GetParentCell(), v18, 5.0f, 0);
-        request.SetSoftGoalRadius(1);
+        apActor->BuildRequest(&request, FurnitureMarker.Position, pTarget->GetParentCell(), v18, 5.0f, nullptr);
+        request.SetSoftGoalRadius(true);
         if (!apActor->SetPathfindingGoal(&request)) {
-            return 0;
+            return false;
         }
         cCurrentFurnitureIndex = iindex_2;
         goto LABEL_112;
     }
-    pCurrentFurniture = 0;
+    pCurrentFurniture = nullptr;
     EndMoveMessage(apActor);
-    SetTarget(0);
+    SetTarget(nullptr);
     if (abInterateindex) {
         AddToProcedureIndexRunning(apActor, 1);
     }
-    return 0;
+    return false;
 }
 
 void HighProcess::ProcessAccompany(Actor* apActor) {
@@ -10020,10 +10054,10 @@ void HighProcess::ProcessAccompany(Actor* apActor) {
                     if (pTarget->pCurrentProcess) {
                         if (CurrentAIProcess->GetPackageThatIsRunning()) {
                             NiPoint3 v8;
-                            v8 = CurrentAIProcess->GetCurrentDestinationCoordinate(pTarget, 1);
+                            v8 = CurrentAIProcess->GetCurrentDestinationCoordinate(pTarget, true);
                             TESObjectCELL* apCell = CurrentAIProcess->GetCurrentDestinationCell(pTarget);
                             TESWorldSpace* apWorld = CurrentAIProcess->GetCurrentDestinationWorldSpace(pTarget);
-                            if (pTarget->IsDead(0) || pTarget->GetDisabled()) {
+                            if (pTarget->IsDead(false) || pTarget->GetDisabled()) {
                                 AddToProcedureIndexRunning(apActor, 1);
                                 if (!apActor->IsPathingComplete()) {
                                     EndMoveMessage(apActor);
@@ -10053,7 +10087,8 @@ void HighProcess::ProcessAccompany(Actor* apActor) {
                                 if (apActor->IsPathingComplete() &&
                                     (v26 > static_cast<double>(v11) || v16 > static_cast<double>(v25))) {
                                     EndMoveMessage(apActor);
-                                    double DistanceFromReference = apActor->GetDistanceFromReference(pTarget, 0, 0);
+                                    double DistanceFromReference =
+                                        apActor->GetDistanceFromReference(pTarget, false, false);
                                     if (EscortFollowDistance + 300.0 < DistanceFromReference) {
                                         AddToProcedureIndexRunning(apActor, -1);
                                     }
@@ -10062,12 +10097,12 @@ void HighProcess::ProcessAccompany(Actor* apActor) {
                                     if (!apActor->IsPathing() && v16 < static_cast<double>(v13)) {
                                         float v7 = std::sqrtf(v13);
                                         float v5 = EscortFollowDistance * 3.0;
-                                        CalculateMoveMode(apActor, v7, EscortFollowDistance, v5, 0, 0);
+                                        CalculateMoveMode(apActor, v7, EscortFollowDistance, v5, false, false);
                                         uint32_t MoveMode = pTarget->GetMoveMode();
                                         apActor->SetMoveMode(MoveMode);
                                         apActor->SetPathfindingGoal(
                                             *arPos, apCell, apWorld, EscortFollowDistance,
-                                            static_cast<PathingAvoidNodeArray*>(0)
+                                            static_cast<PathingAvoidNodeArray*>(nullptr)
                                         );
                                     }
                                 }
@@ -10111,12 +10146,12 @@ void HighProcess::ProcessAcquire(Actor* apActor) {
         if (pPack->GetPackType() == PACKAGE_TYPE_EXPLORE &&
             (ptarg->GetTargObjectType() == POTYPE_WEAP ||
              (ptarg->GetTargObjectType() >= POTYPE_COMBATWEAR && ptarg->GetTargObjectType() <= POTYPE_WEAP_RANGED))) {
-            ProcessActivate(apActor, 1);
+            ProcessActivate(apActor, true);
             if (GetProcedureIndexRunning() > 1) {
                 if (ObjectList.IsEmpty()) {
                     AddToProcedureIndexRunning(apActor, 1);
                     if (ptarg->GetTargObjectType() == POTYPE_COMBATWEAR || ptarg->GetTargObjectType() == POTYPE_WEAR) {
-                        bool abwearweapon = 1;
+                        bool abwearweapon = true;
                         if (GetCurrentPackage()) {
                             TESPackage* v2 = GetCurrentPackage();
                             abwearweapon = !v2->GetForceUnequipWeapon();
@@ -10124,14 +10159,14 @@ void HighProcess::ProcessAcquire(Actor* apActor) {
                         if (apActor->IsNpc()) {
                             TESNPC* pnpc = static_cast<TESNPC*>(apActor->GetObjectReference());
                             if (pnpc) {
-                                pnpc->InitDefaultWorn(apActor, 1, abwearweapon, 0, 1);
+                                pnpc->InitDefaultWorn(apActor, true, abwearweapon, false, true);
                             }
                         }
                         else {
                             if (apActor->IsCreature()) {
                                 TESCreature* pcrea = static_cast<TESCreature*>(apActor->GetObjectReference());
                                 if (pcrea) {
-                                    pcrea->InitDefaultWorn(apActor, 1, abwearweapon, 1);
+                                    pcrea->InitDefaultWorn(apActor, true, abwearweapon, true);
                                 }
                             }
                         }
@@ -10151,7 +10186,7 @@ void HighProcess::ProcessAcquire(Actor* apActor) {
             if (GetRunOncePackage()) {
                 goto LABEL_45;
             }
-            if (!pPack->IsActorAtLocation(apActor, 0, -1.0f, 0) && pPack->GetPackType() == PACKAGE_TYPE_EAT) {
+            if (!pPack->IsActorAtLocation(apActor, false, -1.0f, false) && pPack->GetPackType() == PACKAGE_TYPE_EAT) {
                 SetProcedureIndexRunning(0);
                 goto LABEL_46;
             }
@@ -10199,7 +10234,7 @@ void HighProcess::ProcessAcquire(Actor* apActor) {
                         break;
                     }
                     case POTYPE_LIGH: {
-                        TESObjectLIGH* plight = 0;
+                        TESObjectLIGH* plight = nullptr;
                         if (pTarget->GetObjectReference()->GetFormType() == LIGH_ID) {
                             plight = static_cast<TESObjectLIGH*>(pTarget->GetObjectReference());
                         }
@@ -10217,7 +10252,7 @@ void HighProcess::ProcessAcquire(Actor* apActor) {
                 }
             }
             else {
-                SetTarget(0);
+                SetTarget(nullptr);
                 AddToProcedureIndexRunning(apActor, 1);
             }
             return;
@@ -10240,7 +10275,7 @@ void HighProcess::ProcessAcquire(Actor* apActor) {
                         goto LABEL_91;
                     }
                 }
-                ProcessActivate(apActor, 1);
+                ProcessActivate(apActor, true);
                 return;
             }
             if (pAcquireObject) {
@@ -10259,7 +10294,7 @@ void HighProcess::ProcessAcquire(Actor* apActor) {
                     }
                 }
             LABEL_86:;
-                ProcessActivate(apActor, 0);
+                ProcessActivate(apActor, false);
                 return;
             }
         }
@@ -10273,23 +10308,23 @@ void HighProcess::ProcessAmbushWait(Actor* apActor) {
     using apReturnArray_t = BSSimpleArray<PathingCoverLocation, 1024>;
     NiPoint3 a1;
     bool bLineOfSight;
-    TESPackage* pPack = 0;
+    TESPackage* pPack = nullptr;
     pPack = GetPackageThatIsRunning();
     NiPoint3 pLoc = pPack->GetLocationCoord(apActor);
     a1 = pPack->GetSecondLocationCoord(apActor);
     float fMaxHeightChange = 1024.0f;
     float fMaxDist = 0.0f;
-    fMaxDist = pPack->GetPackageRadiusActorToLocation(apActor, 0);
+    fMaxDist = pPack->GetPackageRadiusActorToLocation(apActor, false);
     int32_t iMaxCoverLocations = 200;
     FIGHT_REACTION a4 = FIGHT_REACTION_NEUTRAL;
     bLineOfSight = false;
-    if (apActor->GetShouldAttackActor(pPlayer, 0, a4, 0) &&
-        apActor->GetDetectionLevelAgainstActor(0, pPlayer, bLineOfSight, 0, 0, 0, 0) > 0) {
-        double DistanceFromReference = pPlayer->GetDistanceFromReference(apActor, 0, 0);
+    if (apActor->GetShouldAttackActor(pPlayer, false, a4, false) &&
+        apActor->GetDetectionLevelAgainstActor(false, pPlayer, bLineOfSight, false, false, false, nullptr) > 0) {
+        double DistanceFromReference = pPlayer->GetDistanceFromReference(apActor, false, false);
         if (fAmbushOverRideRadiusforPlayerDetection.Float() >= DistanceFromReference) {
-            apActor->StartCombat(pPlayer, 0, 1, 1, 0, 0, 1, 0);
-            apActor->SetForceSneak(0);
-            bHiding = 0;
+            apActor->StartCombat(pPlayer, nullptr, true, true, false, 0, true, nullptr);
+            apActor->SetForceSneak(false);
+            bHiding = false;
         }
     }
     if (!pPack->GetPackageTarget()) {
@@ -10308,11 +10343,11 @@ void HighProcess::ProcessAmbushWait(Actor* apActor) {
     LABEL_20:;
         NiPoint3* LocationCoord = ::new (&v16) NiPoint3(pPack->GetLocationCoord(apActor));
         float fdistance = apActor->GetDistanceFromPoint(*LocationCoord);
-        double fMaxDist_2 = pPack->GetPackageRadiusActorToLocation(apActor, 0);
+        double fMaxDist_2 = pPack->GetPackageRadiusActorToLocation(apActor, false);
         if (!(fdistance > fMaxDist_2 + 50.0)) {
             if (pPack->AmbushGetHideWhileAmbushing()) {
                 if (bHiding) {
-                    apActor->SetForceSneak(1);
+                    apActor->SetForceSneak(true);
                 }
                 else {
                     PathingRequestCover v20;
@@ -10324,7 +10359,7 @@ void HighProcess::ProcessAmbushWait(Actor* apActor) {
                     v20.SetMaxResults(200u);
                     float a2 = apActor->GetHeight();
                     v20.SetActorHeight(a2);
-                    float a2a = apActor->GetSneakHeight(0);
+                    float a2a = apActor->GetSneakHeight(false);
                     v20.SetCrouchHeight(a2a);
                     v20.bCanCrouch = apActor->CanSneak();
                     apReturnArray_t apReturnArray;
@@ -10333,69 +10368,71 @@ void HighProcess::ProcessAmbushWait(Actor* apActor) {
                             PathingCoverLocation* coverLoc = &apReturnArray.GetAt(0);
                             TESWorldSpace* WorldspaceSimple = coverLoc->pWorldSpace;
                             TESObjectCELL* Cell = coverLoc->GetCell();
-                            apActor->SetPathfindingGoal(coverLoc->GetLocation(), Cell, WorldspaceSimple, -1.0f, 0);
-                            bHiding = 1;
+                            apActor->SetPathfindingGoal(
+                                coverLoc->GetLocation(), Cell, WorldspaceSimple, -1.0f, nullptr
+                            );
+                            bHiding = true;
                         }
                     }
                 }
             }
             else {
-                if (pPack->GetPackageRadiusActorToLocation(apActor, 0) > 400.0) {
-                    float fRadius = pPack->GetPackageRadiusActorToLocation(apActor, 0);
+                if (pPack->GetPackageRadiusActorToLocation(apActor, false) > 400.0) {
+                    float fRadius = pPack->GetPackageRadiusActorToLocation(apActor, false);
                     const NiPoint3* v7 = &apActor->GetLocationOnReference();
                     ProcessWander(apActor, v7, fRadius);
                 }
             }
         }
         else {
-            apActor->SetForceSneak(0);
-            bHiding = 0;
+            apActor->SetForceSneak(false);
+            bHiding = false;
             AddToProcedureIndexRunning(apActor, -1);
         }
         if (pTarget) {
-            bool batRef = 0;
+            bool batRef = false;
             batRef = pPack->IsTargetAtSecondLocation(apActor, -1.0f);
             if (batRef && pTarget->IsActor() && (pTarget != pPlayer || !pPlayer->btransporting)) {
                 if (!apActor->IsPathingComplete()) {
                     EndMoveMessage(apActor);
                 }
                 FIGHT_REACTION ereaction = FIGHT_REACTION_NEUTRAL;
-                if (!apActor->GetShouldAttackActor(static_cast<Actor*>(pTarget), 0, ereaction, 0)) {
-                    apActor->StartCombat(static_cast<Actor*>(pTarget), 0, 1, 1, 0, 0, 1, 0);
-                    bHiding = 0;
-                    apActor->SetForceSneak(0);
+                if (!apActor->GetShouldAttackActor(static_cast<Actor*>(pTarget), false, ereaction, false)) {
+                    apActor->StartCombat(static_cast<Actor*>(pTarget), nullptr, true, true, false, 0, true, nullptr);
+                    bHiding = false;
+                    apActor->SetForceSneak(false);
                 }
             }
         }
         return;
     }
     if (!pTarget->GetDelete()) {
-        if (pTarget->IsDead(1) && !pAcquireObject) {
-            pPack->SetNeverRun(pTarget, 1);
-            apActor->SetForceSneak(0);
-            bHiding = 0;
+        if (pTarget->IsDead(true) && !pAcquireObject) {
+            pPack->SetNeverRun(pTarget, true);
+            apActor->SetForceSneak(false);
+            bHiding = false;
             return;
         }
         goto LABEL_20;
     }
     if (pTarget->GetDelete()) {
-        pPack->SetNeverRun(pTarget, 1);
+        pPack->SetNeverRun(pTarget, true);
     }
-    apActor->SetForceSneak(0);
-    bHiding = 0;
+    apActor->SetForceSneak(false);
+    bHiding = false;
     AddToProcedureIndexRunning(apActor, 2);
 }
 
 bool HighProcess::ProcessUseItemAt(Actor* apActor) {
     bool result;
-    TESPackage* ppack = 0;
+    TESPackage* ppack = nullptr;
     ppack = GetPackageThatIsRunning();
-    double DistanceFromReference = apActor->GetDistanceFromReference(pPlayer, 0, 0);
+    double DistanceFromReference = apActor->GetDistanceFromReference(pPlayer, false, false);
     if (fAIIdleAnimationDistance.Float() < DistanceFromReference) {
-        return 1;
+        return true;
     }
-    TESForm* pFormObject = 0;
-    TESObjectREFR* plocRef = 0;
+    TESForm* pFormObject = nullptr;
+    TESObjectREFR* plocRef = nullptr;
     int32_t itimesdoperform = 1;
     PackageLocation* ploc = ppack->pPackLoc;
     InventoryChanges* pchangecont = InventoryChanges::GetInventoryChanges(apActor);
@@ -10408,9 +10445,9 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
     if (!plocRef && !GetRunOncePackage()) {
         plocRef = pGenericLocation;
     }
-    if (!ppack->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+    if (!ppack->IsActorAtLocation(apActor, false, -1.0f, false)) {
         AddToProcedureIndexRunning(apActor, -1);
-        return 0;
+        return false;
     }
     if (plocRef) {
         TESBoundObject* ObjectReference = plocRef->GetObjectReference();
@@ -10418,17 +10455,17 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
             float v51 = 0.0f;
             float ftargetangle = (&plocRef->GetAngleOnReference())->z;
             float fignore = 0.0f;
-            float afStartAngle = apActor->GetHeading(0);
+            float afStartAngle = apActor->GetHeading(false);
             float fangledif = GetAngleDelta(afStartAngle, ftargetangle, fignore);
             float fdiff = static_cast<double>(iActorKeepTurnDegree.Int()) * 0.01745329238474369;
             double v4 = std::fabs(fangledif);
             if (fdiff < v4) {
-                apActor->RequestRotate(ftargetangle, 1);
-                SetActionHeadTrackTarget(0);
-                return 0;
+                apActor->RequestRotate(ftargetangle, true);
+                SetActionHeadTrackTarget(nullptr);
+                return false;
             }
             apActor->StopMoving();
-            ClearActionHeadTrackTarget(1);
+            ClearActionHeadTrackTarget(true);
             const NiPoint3* v5 = &plocRef->GetLocationOnReference();
             apActor->SetLocationOnReference(*v5);
             apActor->SetHeading((&plocRef->GetAngleOnReference())->z);
@@ -10482,23 +10519,23 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
     }
     if (!pTarget && !CheckIfHasObject(apActor, 1)) {
         AddToProcedureIndexRunning(apActor, 1);
-        return 0;
+        return false;
     }
     TESObjectREFR* poriginalTarget = pTarget;
     if (ppack->GuardGetTargetIsLinkedRef() && apActor->GetSitSleepState() != SIT_SLEEP_IS_SITTING) {
-        bool bfindChair = 1;
+        bool bfindChair = true;
         if (pCurrentFurniture) {
             TESFurniture* pfurnBase = static_cast<TESFurniture*>(pCurrentFurniture->GetObjectReference());
-            bool v23 = !pfurnBase->CanSitOn() || !pCurrentFurniture->HasFreeMarker(0);
+            bool v23 = !pfurnBase->CanSitOn() || !pCurrentFurniture->HasFreeMarker(false);
             bfindChair = v23;
         }
         if (bfindChair) {
-            FindBedChairs(apActor, 1, 0);
+            FindBedChairs(apActor, true, nullptr);
             if (RefListChairBed.ItemsInList()) {
                 if (TESObjectREFR::kFurnitureLock.TryLock()) {
                     pCurrentFurniture = static_cast<TESObjectREFR*>((&RefListChairBed)->m_item);
                     ClearFurnitureMarker();
-                    while (pCurrentFurniture && !pCurrentFurniture->HasFreeMarker(0)) {
+                    while (pCurrentFurniture && !pCurrentFurniture->HasFreeMarker(false)) {
                         RefListChairBed.Remove(*reinterpret_cast<void**>(&pCurrentFurniture));
                         pCurrentFurniture = static_cast<TESObjectREFR*>((&RefListChairBed)->m_item);
                         ClearFurnitureMarker();
@@ -10526,17 +10563,17 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
         }
         if (pCurrentFurniture) {
             SetTarget(pCurrentFurniture);
-            ProcessActivate(apActor, 0);
-            SetTarget(0);
+            ProcessActivate(apActor, false);
+            SetTarget(nullptr);
         }
         if (DidPathingFail(apActor)) {
-            pCurrentFurniture = 0;
+            pCurrentFurniture = nullptr;
             ClearFurnitureMarker();
             EndMoveMessage(apActor);
             SetIdleTimer(0.0f);
         }
         if (pCurrentFurniture) {
-            return 0;
+            return false;
         }
         SetTarget(poriginalTarget);
     }
@@ -10550,12 +10587,12 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
             PackageTarget* ptarg_2;
             TESForm* pobj;
             ptarg_2 = ppack->GetPackageTarget();
-            pobj = 0;
+            pobj = nullptr;
             if (!CheckIfHasObject(apActor, 1)) {
                 AddToProcedureIndexRunning(apActor, 2);
                 FreeUpSpecialIdle(apActor);
                 EndMoveMessage(apActor);
-                return 0;
+                return false;
             }
             if (ptarg_2->GetTargType() == PTT_OBJECT) {
                 pobj = ptarg_2->GetTargObject();
@@ -10569,7 +10606,7 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
                             pobj_2 = pref->GetObjectReference();
                         }
                         else {
-                            pobj_2 = 0;
+                            pobj_2 = nullptr;
                         }
                         pobj = (TESForm*)pobj_2;
                     }
@@ -10579,7 +10616,7 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
                 }
             }
             if (pobj) {
-                TESForm* parmor = pobj->GetFormType() == ARMO_ID ? pobj : 0;
+                TESForm* parmor = pobj->GetFormType() == ARMO_ID ? pobj : nullptr;
             }
         LABEL_90:;
             if (itimesdoperform > 0 && sShotsFired >= itimesdoperform && apActor->GetAnimAction() == ANIM_ACTION_NONE) {
@@ -10590,7 +10627,7 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
                     if (!apActor->IsPathingComplete()) {
                         EndMoveMessage(apActor);
                     }
-                    return 1;
+                    return true;
                 }
             }
             if ((plocRef && (v9 = plocRef->GetObjectReference(), v9 == pXMarkerHeading)) ||
@@ -10603,7 +10640,7 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
                     else {
                         ftargetangle_2 = apActor->GetStartingAngle().z;
                     }
-                    apActor->RequestRotate(ftargetangle_2, 0);
+                    apActor->RequestRotate(ftargetangle_2, false);
                 }
             }
             float ftargetangle_3 = 0.0f;
@@ -10614,23 +10651,23 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
                 ftargetangle_3 = apActor->GetStartingAngle().z;
             }
             float fignore_2 = 0.0f;
-            float afStartAnglea = apActor->GetHeading(0);
+            float afStartAnglea = apActor->GetHeading(false);
             float fangledif_2 = GetAngleDelta(afStartAnglea, ftargetangle_3, fignore_2);
             float fdiff_2 = static_cast<double>(iActorKeepTurnDegree.Int()) * 0.01745329238474369;
             double v10 = std::fabs(fangledif_2);
             if (fdiff_2 < v10) {
-                SetActionHeadTrackTarget(0);
-                apActor->RequestRotate(ftargetangle_3, 0);
-                return 0;
+                SetActionHeadTrackTarget(nullptr);
+                apActor->RequestRotate(ftargetangle_3, false);
+                return false;
             }
             apActor->StopMoving();
-            if (ProcessActivate(apActor, 1)) {
+            if (ProcessActivate(apActor, true)) {
                 ++sShotsFired;
             }
             if (ppack->GetOncePerDay() && !ppack->GetPackageSchedule()->PSData.iDuration) {
                 Animation* v11 = apActor->GetAnimation();
                 if (v11->SpecialIdleDonePlaying()) {
-                    ClearActionHeadTrackTarget(1);
+                    ClearActionHeadTrackTarget(true);
                     AddToProcedureIndexRunning(apActor, 2);
                 }
             }
@@ -10642,7 +10679,7 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
                 if (!apActor->IsPathingComplete()) {
                     EndMoveMessage(apActor);
                 }
-                return 1;
+                return true;
             }
             fUseItemTimer = fUseItemTimer - appTimer.fDelta;
             if (ppack->GetOncePerDay() && !ppack->GetPackageSchedule()->PSData.iDuration) {
@@ -10663,7 +10700,7 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
             const char* v7 = ppack->GetFormEditorID();
             BSsprintf(buffer, 256, "UseItem package %s has a weapon target; should be UseWeapon.", v7);
             Warning(buffer);
-            return 0;
+            return false;
         }
         case POTYPE_NPC:
         case POTYPE_CREA: {
@@ -10679,14 +10716,14 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
                  (sShotsFired >= itimesdoperform &&
                   (apActor->GetAnimAction() == ANIM_ACTION_NONE &&
                    (v13 = apActor->GetAnimation(), v13->SpecialIdleDonePlaying()))))) {
-                apActor->QueueEquipObject(pItemBeingUsed, 1, 0, 1, 0, 1);
+                apActor->QueueEquipObject(pItemBeingUsed, 1, nullptr, true, false, true);
                 AddToProcedureIndexRunning(apActor, 2);
                 ClearShootingAction(apActor);
                 FreeUpSpecialIdle(apActor);
                 if (!apActor->IsPathingComplete()) {
                     EndMoveMessage(apActor);
                 }
-                result = 1;
+                result = true;
             }
             else {
                 TESBoundObject* v14;
@@ -10701,17 +10738,17 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
                         ftargetangle_5 = apActor->GetStartingAngle().z;
                     }
                     float fignore_3 = 0.0f;
-                    float afStartAngleb = apActor->GetHeading(0);
+                    float afStartAngleb = apActor->GetHeading(false);
                     float fangledif_3 = GetAngleDelta(afStartAngleb, ftargetangle_5, fignore_3);
                     float fdiff_3 = static_cast<double>(iActorKeepTurnDegree.Int()) * 0.01745329238474369;
                     double v15 = std::fabs(fangledif_3);
                     if (fdiff_3 < v15) {
-                        apActor->RequestRotate(ftargetangle_5, 0);
-                        SetActionHeadTrackTarget(0);
-                        return 0;
+                        apActor->RequestRotate(ftargetangle_5, false);
+                        SetActionHeadTrackTarget(nullptr);
+                        return false;
                     }
                     apActor->StopMoving();
-                    ClearActionHeadTrackTarget(1);
+                    ClearActionHeadTrackTarget(true);
                 }
                 panim = apActor->GetAnimation();
                 if (pItemBeingUsed || eUseItem == POTYPE_NONE) {
@@ -10719,17 +10756,17 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
                         if (panim) {
                             if (panim->SpecialIdleDonePlaying()) {
                                 TESIdleManager::SetUsedItem(pItemBeingUsed);
-                                SetupSpecialIdle(apActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
+                                SetupSpecialIdle(apActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
                                 float v21 = static_cast<double>(Random() % 0x1388) * 0.0010000000474974513 + 5.0;
                                 SetIdleTimer(v21);
-                                TESIdleManager::SetUsedItem(0);
+                                TESIdleManager::SetUsedItem(nullptr);
                                 ++sShotsFired;
                             }
                         }
                     }
                     if (panim->SpecialIdleDonePlaying()) {
                         if (pItemBeingUsed) {
-                            apActor->QueueEquipObject(pItemBeingUsed, 1, 0, 1, 0, 1);
+                            apActor->QueueEquipObject(pItemBeingUsed, 1, nullptr, true, false, true);
                         }
                         if (ppack->GetOncePerDay() && !ppack->GetPackageSchedule()->PSData.iDuration &&
                             panim->SpecialIdleDonePlaying()) {
@@ -10738,11 +10775,11 @@ bool HighProcess::ProcessUseItemAt(Actor* apActor) {
                         }
                     }
                 LABEL_165:;
-                    result = 0;
+                    result = false;
                 }
                 else {
                     AddToProcedureIndexRunning(apActor, -2);
-                    result = 0;
+                    result = false;
                 }
             }
             break;
@@ -10756,14 +10793,14 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
     int32_t icount;
     int32_t numobjs;
     TESPackage* pPack = GetPackageThatIsRunning();
-    double DistanceFromReference = apActor->GetDistanceFromReference(pPlayer, 0, 0);
+    double DistanceFromReference = apActor->GetDistanceFromReference(pPlayer, false, false);
     if (fAIUseWeaponDistance.Float() < DistanceFromReference) {
-        return 1;
+        return true;
     }
     int32_t irand = Random() % 100;
-    TESObjectWEAP* pweap = 0;
-    TESForm* pFormObject = 0;
-    TESObjectREFR* pRef = 0;
+    TESObjectWEAP* pweap = nullptr;
+    TESForm* pFormObject = nullptr;
+    TESObjectREFR* pRef = nullptr;
     PackageLocation* ploc = pPack->pPackLoc;
     InventoryChanges* pchangecont = InventoryChanges::GetInventoryChanges(apActor);
     PackageTarget* ptarg = pPack->GetPackageTarget();
@@ -10777,27 +10814,27 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
     if (!pRef) {
         pRef = pGenericLocation;
     }
-    if (!pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+    if (!pPack->IsActorAtLocation(apActor, false, -1.0f, false)) {
         CleanUpAfterProcessUseWeapon(apActor);
         AddToProcedureIndexRunning(apActor, -1);
-        return 0;
+        return false;
     }
     if (pRef &&
         ((ObjectReference = pRef->GetObjectReference(), ObjectReference == pXMarkerHeading) && !bAimingTarget)) {
         float v87 = 0.0f;
         float ftargetangle = (&pRef->GetAngleOnReference())->z;
         float fignore = 0.0f;
-        float afStartAngle = apActor->GetHeading(0);
+        float afStartAngle = apActor->GetHeading(false);
         float fangledif = GetAngleDelta(afStartAngle, ftargetangle, fignore);
         float fdiff = static_cast<double>(iActorKeepTurnDegree.Int()) * 0.01745329238474369;
         double v4 = std::fabs(fangledif);
         if (fdiff < v4) {
-            apActor->RequestRotate(ftargetangle, 0);
-            SetActionHeadTrackTarget(0);
-            return 0;
+            apActor->RequestRotate(ftargetangle, false);
+            SetActionHeadTrackTarget(nullptr);
+            return false;
         }
         apActor->StopMoving();
-        ClearActionHeadTrackTarget(1);
+        ClearActionHeadTrackTarget(true);
         apActor->SetHeading((&pRef->GetAngleOnReference())->z);
         EndMoveMessage(apActor);
     }
@@ -10807,7 +10844,7 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
             EndMoveMessage(apActor);
         }
     }
-    Actor* pattacktarg = 0;
+    Actor* pattacktarg = nullptr;
     UseWeaponActorPackageData* pdata = static_cast<UseWeaponActorPackageData*>(GetInstanceDataThatIsRunning());
     if (pdata) {
         pattacktarg = static_cast<Actor*>(pdata->pAttackTarget);
@@ -10899,7 +10936,7 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
             if (!CheckIfHasObject(apActor, 1) && eUseItem != POTYPE_WEAP_NONE) {
                 CleanUpAfterProcessUseWeapon(apActor);
                 AddToProcedureIndexRunning(apActor, 2);
-                return 0;
+                return false;
             }
             if (pweap) {
                 switch (ptarg->GetTargType()) {
@@ -10913,8 +10950,8 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                         if (pweap == v8) {
                             goto LABEL_64;
                         }
-                        apActor->QueueEquipObject(pref->GetObjectReference(), 1, 0, 1, 0, 1);
-                        result = 1;
+                        apActor->QueueEquipObject(pref->GetObjectReference(), 1, nullptr, true, false, true);
+                        result = true;
                         break;
                     }
                     case PTT_OBJECT: {
@@ -10923,8 +10960,10 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                             goto LABEL_64;
                         }
                         TESForm* pFormObject_6 = ptarg->GetTargObject();
-                        apActor->QueueEquipObject(static_cast<TESBoundObject*>(pFormObject_6), 1, 0, 1, 0, 1);
-                        result = 1;
+                        apActor->QueueEquipObject(
+                            static_cast<TESBoundObject*>(pFormObject_6), 1, nullptr, true, false, true
+                        );
+                        result = true;
                         break;
                     }
                     case PTT_TYPE: {
@@ -10937,8 +10976,8 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                         if (!pobject) {
                             goto LABEL_64;
                         }
-                        apActor->QueueEquipObject(pobject, 1, 0, 1, 0, 1);
-                        result = 1;
+                        apActor->QueueEquipObject(pobject, 1, nullptr, true, false, true);
+                        result = true;
                         break;
                     }
                     default: {
@@ -10950,7 +10989,7 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
             LABEL_64:;
                 if (this->sShotsToFire <= 0) {
                     if (pweap) {
-                        int32_t FormClipRounds = pweap->GetFormClipRounds(0);
+                        int32_t FormClipRounds = pweap->GetFormClipRounds(false);
                         this->sShotsToFire = BSMAX(1, FormClipRounds);
                         if (ppackData) {
                             if (ppackData->bVolleyFire) {
@@ -10983,8 +11022,8 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                         }
                     }
                     if (v38) {
-                        apActor->SetWantWeaponDrawn(0);
-                        apActor->QueueUnEquipObject(pweap, 1, 0, 0, 0, 1);
+                        apActor->SetWantWeaponDrawn(false);
+                        apActor->QueueUnEquipObject(pweap, 1, nullptr, false, false, true);
                         fUseItemTimer = 0.0f;
                     }
                     else {
@@ -11009,7 +11048,7 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                     apActor->SetForceSneak(bshouldCrouch);
                     if (v37) {
                         if (v35) {
-                            panim->BlendOut(AGS_WEAPON, 0);
+                            panim->BlendOut(AGS_WEAPON, false);
                         }
                         else {
                             if (bisCrouching && !v36) {
@@ -11023,12 +11062,12 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                     }
                     if (bshouldCrouch || (bisCrouching || (v37 && v35))) {
                         if (pattacktarg) {
-                            AimAtTarget(apActor, pattacktarg, 0);
+                            AimAtTarget(apActor, pattacktarg, false);
                         }
                         if (pattacktarg) {
                             SetUseWeaponHeadTrackTarget(pattacktarg);
                         }
-                        return 0;
+                        return false;
                     }
                 }
                 else {
@@ -11044,18 +11083,18 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                                  (eactions & BaseProcess::POSTANIM_ACTION_RELOAD_WEAPON) != 0);
                             if (v32 && !v31) {
                                 apActor->QueueReload();
-                                return 0;
+                                return false;
                             }
                         }
                     }
                 }
-                if (!pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+                if (!pPack->IsActorAtLocation(apActor, false, -1.0f, false)) {
                     ClearShootingAction(apActor);
                     AddToProcedureIndexRunning(apActor, -1);
-                    return 0;
+                    return false;
                 }
                 if (GetCurrentWeapon()) {
-                    pweap = 0;
+                    pweap = nullptr;
                     if (GetCurrentWeapon()->pContainerObj) {
                         ItemChange* v15 = GetCurrentWeapon();
                         if (v15->pContainerObj->GetFormType() == WEAP_ID) {
@@ -11065,15 +11104,15 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                 }
                 if (eUseItem == POTYPE_WEAP_NONE) {
                     if (pweap) {
-                        apActor->QueueUnEquipObject(pweap, 1, 0, 0, 0, 1);
-                        return 1;
+                        apActor->QueueUnEquipObject(pweap, 1, nullptr, false, false, true);
+                        return true;
                     }
                 }
                 else {
                     if (!pweap) {
-                        TESBoundObject* pObject = 0;
+                        TESBoundObject* pObject = nullptr;
                         icount = 0;
-                        ItemChange* pchange = 0;
+                        ItemChange* pchange = nullptr;
                         if (pTarget) {
                             TESBoundObject* afTargetAnglea = pTarget->GetObjectReference();
                             pchange = pchangecont->GetInventoryItem(afTargetAnglea, 0);
@@ -11092,19 +11131,19 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                             }
                         }
                         if (pObject) {
-                            apActor->QueueEquipObject(pObject, 1, 0, 1, 0, 1);
+                            apActor->QueueEquipObject(pObject, 1, nullptr, true, false, true);
                         }
                         else {
                             CleanUpAfterProcessUseWeapon(apActor);
                             AddToProcedureIndexRunning(apActor, 2);
                         }
                         if (pchange) {
-                            apActor->QueueEquipObject(pchange->pContainerObj, 1, 0, 1, 0, 1);
+                            apActor->QueueEquipObject(pchange->pContainerObj, 1, nullptr, true, false, true);
                         }
                         if (pchange) {
                             delete pchange;
                         }
-                        return 1;
+                        return true;
                     }
                 }
                 bool breadyToFire = fUseItemTimer <= 0.0;
@@ -11113,13 +11152,13 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                     if (v16 >= ppackData->sBurstCount) {
                         CleanUpAfterProcessUseWeapon(apActor);
                         AddToProcedureIndexRunning(apActor, 2);
-                        return 1;
+                        return true;
                     }
                 }
                 if (breadyToFire) {
                     if (pattacktarg) {
                         if (pRef != pattacktarg) {
-                            breadyToFire = AimAtTarget(apActor, pattacktarg, 0);
+                            breadyToFire = AimAtTarget(apActor, pattacktarg, false);
                         }
                     }
                 }
@@ -11128,22 +11167,23 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                         if (pattacktarg) {
                             if (pattacktarg->IsMobileObject()) {
                                 MobileObject* ptargetMob = (MobileObject*)pattacktarg;
-                                breadyToFire = pPack->IsActorAtSecondLocation(pattacktarg, apActor, 0, -1.0f, 0);
+                                breadyToFire =
+                                    pPack->IsActorAtSecondLocation(pattacktarg, apActor, false, -1.0f, false);
                             }
                             else {
-                                breadyToFire = 0;
+                                breadyToFire = false;
                             }
                         }
                     }
                 }
                 if (breadyToFire && (ppackData && ppackData->IsGetHoldFire())) {
-                    float fdistSquaredToTarget_2 = apActor->GetDistanceFromReference(pattacktarg, 0, 0);
+                    float fdistSquaredToTarget_2 = apActor->GetDistanceFromReference(pattacktarg, false, false);
                     fdistSquaredToTarget_2 = fdistSquaredToTarget_2 * fdistSquaredToTarget_2;
                     BSSimpleList<DetectionState*>* pdetected = pDetectedActorList;
                     while (pdetected && !pdetected->IsEmpty()) {
                         DetectionState* pdetectState = pdetected->m_item;
                         pdetected = pdetected->m_pkNext;
-                        if (pdetectState->pActor != pattacktarg && !pdetectState->pActor->IsDead(0) &&
+                        if (pdetectState->pActor != pattacktarg && !pdetectState->pActor->IsDead(false) &&
                             pdetectState->bLineofSight && pdetectState->iLevel > 0) {
                             NiPoint3 toDetectedActor = pdetectState->LastPositionDetected;
                             const NiPoint3* v17 = &apActor->GetLocationOnReference();
@@ -11153,10 +11193,10 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                                 float fignore_2;
                                 float ftargetangle_2 = GetZAngleFromVector(toDetectedActor);
                                 float ftargetangle_3 = ftargetangle_2;
-                                float afStartAnglea = apActor->GetHeading(0);
+                                float afStartAnglea = apActor->GetHeading(false);
                                 float ftargetangledelta = GetAngleDelta(afStartAnglea, ftargetangle_3, fignore_2);
                                 if (std::fabs(ftargetangledelta) < 0.5235987901687622) {
-                                    breadyToFire = 0;
+                                    breadyToFire = false;
                                     break;
                                 }
                             }
@@ -11167,9 +11207,9 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                     if (breadyToFire) {
                         int32_t irand_2 = Random() % 100;
                         ANIM_GROUP_ENUM eattack = ANIM_GROUP_NONE;
-                        TESObjectWEAP* pweap_2 = 0;
+                        TESObjectWEAP* pweap_2 = nullptr;
                         if (GetCurrentWeapon()) {
-                            pweap_2 = 0;
+                            pweap_2 = nullptr;
                             if (GetCurrentWeapon()->pContainerObj) {
                                 ItemChange* v19 = GetCurrentWeapon();
                                 if (v19->pContainerObj->GetFormType() == WEAP_ID) {
@@ -11198,9 +11238,9 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                                             if (irand_2 >= 40 &&
                                                 (pattacktarg->GetAnimAction() == ANIM_ACTION_ATTACK ||
                                                  pattacktarg->GetAnimAction() == ANIM_ACTION_ATTACK_FOLLOW_THROUGH)) {
-                                                apActor->SetBlock(1);
+                                                apActor->SetBlock(true);
                                                 fUseItemTimer = 1.2f;
-                                                return 0;
+                                                return false;
                                             }
                                         }
                                     }
@@ -11218,7 +11258,8 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                                     animProbData[5].iProb = 30;
                                     totalProbRange = 0;
                                     for (i = 0; i < 6; ++i) {
-                                        uint16_t AnimGroup = apActor->GetAnimGroup(animProbData[i].eGroup, 0, 0, 0);
+                                        uint16_t AnimGroup =
+                                            apActor->GetAnimGroup(animProbData[i].eGroup, nullptr, false, nullptr);
                                         bool IsAttackAction = TESAnimGroup::IsAttackAction(AnimGroup);
                                         canDoAttack[i] = IsAttackAction;
                                         totalProbRange += IsAttackAction ? animProbData[i].iProb : 0;
@@ -11258,7 +11299,7 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                                 }
                                 else {
                                     if (apActor->GetBlocked()) {
-                                        apActor->SetBlock(0);
+                                        apActor->SetBlock(false);
                                     }
                                 }
                             }
@@ -11266,11 +11307,11 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                     }
                     else {
                         FreeUpSpecialIdle(apActor);
-                        ClearAutomaticShotsToFire(0);
+                        ClearAutomaticShotsToFire(false);
                         if (pattacktarg) {
-                            AimAtTarget(apActor, pattacktarg, 0);
+                            AimAtTarget(apActor, pattacktarg, false);
                         }
-                        if (!pPack->IsActorAtLocation(apActor, 0, -1.0f, 0) &&
+                        if (!pPack->IsActorAtLocation(apActor, false, -1.0f, false) &&
                             apActor->GetAnimAction() == ANIM_ACTION_NONE) {
                             Animation* v22 = apActor->GetAnimation();
                             if (v22->SpecialIdleDonePlaying()) {
@@ -11283,13 +11324,13 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                     }
                 }
                 else {
-                    apActor->SetWantWeaponDrawn(1);
-                    bWeaponAlertDrawn = 1;
+                    apActor->SetWantWeaponDrawn(true);
+                    bWeaponAlertDrawn = true;
                 }
                 if (pattacktarg) {
                     SetUseWeaponHeadTrackTarget(pattacktarg);
                 }
-                return 0;
+                return false;
             }
             return result;
         }
@@ -11300,7 +11341,7 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                 pPack->GetFormEditorID()
             );
             Warning(buffer_2);
-            return 0;
+            return false;
         }
     }
 }
@@ -11316,7 +11357,7 @@ void HighProcess::ProcessFleeNonCombat(Actor* apActor) {
     if (!pTarget) {
         SetTargetForPackage(apActor);
     }
-    SetLocationForPackage(apActor, 0);
+    SetLocationForPackage(apActor, false);
     PackageTarget_ = v9->GetPackageTarget();
     if (!pTarget) {
         if (PackageTarget_) {
@@ -11337,15 +11378,15 @@ void HighProcess::ProcessFleeNonCombat(Actor* apActor) {
             FormFlags = -1.0f;
         }
         if (apRef) {
-            v3 = static_cast<double>(LocationRadius) < apActor->GetDistanceFromReference(apRef, 0, 0);
+            v3 = static_cast<double>(LocationRadius) < apActor->GetDistanceFromReference(apRef, false, false);
         }
         else {
-            v3 = static_cast<double>(FormFlags) > apActor->GetDistanceFromReference(v10, 0, 0);
+            v3 = static_cast<double>(FormFlags) > apActor->GetDistanceFromReference(v10, false, false);
         }
         if (v3) {
-            apActor->InitiateFlee(v10, 1, 1, 0, 0, apRef, FormFlags, LocationRadius);
+            apActor->InitiateFlee(v10, true, true, false, nullptr, apRef, FormFlags, LocationRadius);
             TESPackage* v7 = GetPackageThatIsRunning();
-            FleePackage* v8 = 0;
+            FleePackage* v8 = nullptr;
             if (v7) {
                 if (v7->GetPackType() == PACKAGE_TYPE_FLEE) {
                     v8 = static_cast<FleePackage*>(v7);
@@ -11361,9 +11402,9 @@ void HighProcess::ProcessFleeNonCombat(Actor* apActor) {
             if (apActor->IsPathingComplete()) {
                 if (v9->GetMustComplete() || v9->GetMustReachLocation()) {
                     EndMoveMessage(apActor);
-                    SetCurrentActionComplete(1);
+                    SetCurrentActionComplete(true);
                     AddToProcedureIndexRunning(apActor, 1);
-                    CheckforNewPackage(apActor, 0);
+                    CheckforNewPackage(apActor, false);
                 }
             }
             else {
@@ -11371,7 +11412,7 @@ void HighProcess::ProcessFleeNonCombat(Actor* apActor) {
                 Animation* v6 = apActor->GetAnimation();
                 if (v6) {
                     if (v6->SpecialIdleDonePlaying()) {
-                        SetupSpecialIdle(apActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
+                        SetupSpecialIdle(apActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
                     }
                 }
             }
@@ -11406,7 +11447,7 @@ void HighProcess::ProcessAvoidArea(Actor* apActor) {
     float fdistance = fFleeDistanceInterior.Float();
     PathingRequestFlee fleeRequest;
     fleeRequest.Initialize(apActor);
-    float a2 = apActor->GetHeading(0);
+    float a2 = apActor->GetHeading(false);
     fleeRequest.SetInitialPathHeading(a2);
     if (apActor->IsCreature()) {
         TESActorBaseData* v4 = static_cast<TESActorBaseData*>(apActor->GetActorBase());
@@ -11431,7 +11472,7 @@ void HighProcess::ProcessGuard(Actor* apActor) {
     if (pdata) {
         TESObjectREFR* pguardedRef_3;
         TESObjectREFR* pguardedRef_2;
-        bWeaponAlertDrawn = 0;
+        bWeaponAlertDrawn = false;
         TESPackage* ppack = GetPackageThatIsRunning();
         TESObjectREFR* pguardedRef = ppack->ComputeInitialTarget(apActor);
         if (pguardedRef) {
@@ -11459,12 +11500,12 @@ void HighProcess::ProcessGuard(Actor* apActor) {
             apActor->InitiateGetUpPackage();
         }
         else {
-            bool atLoc = 1;
+            bool atLoc = true;
             if (!apActor->IsImmobile()) {
                 float fdistRemaining;
                 float ftargRadius;
                 if (ppack->pPackLoc) {
-                    atLoc = ppack->IsActorAtLocation(apActor, 0, -1.0f, 0);
+                    atLoc = ppack->IsActorAtLocation(apActor, false, -1.0f, false);
                     ftargRadius = static_cast<float>(ppack->GetLocationRadius(apActor));
                 }
                 else {
@@ -11477,7 +11518,8 @@ void HighProcess::ProcessGuard(Actor* apActor) {
                         ftargRadius_2 = 30.0f;
                     }
                     ftargRadius = ftargRadius_2;
-                    atLoc = static_cast<double>(ftargRadius_2) > apActor->GetDistanceFromReference(pguardedRef_3, 0, 0);
+                    atLoc = static_cast<double>(ftargRadius_2) >
+                        apActor->GetDistanceFromReference(pguardedRef_3, false, false);
                 }
                 if (pdata->eState) {
                     if ((apActor->IsPathingComplete() && !atLoc) || apActor->DidPathingFail()) {
@@ -11492,9 +11534,9 @@ void HighProcess::ProcessGuard(Actor* apActor) {
                     fdistRemaining = pmover->GetDistanceRemaining();
                 }
                 float v4 = ftargRadius + ftargRadius;
-                int32_t emove = CalculateMoveMode(apActor, fdistRemaining, ftargRadius, v4, 0, 0);
-                ppack->GetPackageRadiusActorToLocation(apActor, 0);
-                SetActorsAnimation(apActor, emove, 1);
+                int32_t emove = CalculateMoveMode(apActor, fdistRemaining, ftargRadius, v4, false, false);
+                ppack->GetPackageRadiusActorToLocation(apActor, false);
+                SetActorsAnimation(apActor, emove, true);
             }
             uint32_t eState = pdata->eState;
             if (eState) {
@@ -11604,45 +11646,45 @@ void HighProcess::EvaluateOrderAcquireList(Actor* apActor) {
         ballowBuying = ppack->SearchGetAllowBuying();
     }
     else {
-        ballowBuying = 0;
+        ballowBuying = false;
     }
     if (ppack) {
         ballowStealing = ppack->SearchGetAllowStealing();
     }
     else {
-        ballowStealing = 0;
+        ballowStealing = false;
     }
     if (ppack) {
         ballowKilling = ppack->SearchGetAllowKilling();
     }
     else {
-        ballowKilling = 0;
+        ballowKilling = false;
     }
     while (pRefItem && pRefItem->m_item) {
         ObjectstoAcquire* pObject = pRefItem->m_item;
         TESObjectREFR* pRef = pObject->pRef;
-        TESObjectREFR* pactor = 0;
+        TESObjectREFR* pactor = nullptr;
         TESBoundObject* pObj = pObject->pObject;
-        bool bbuyit = 0;
-        bool badd = 1;
+        bool bbuyit = false;
+        bool badd = true;
         if (pObj->GetFormType() == NPC__ID || pObj->GetFormType() == CREA_ID) {
-            badd = 1;
+            badd = true;
         }
         else {
-            if ((pRef->GetOwner() && !pRef->IsAnOwner(apActor, 1)) || pRef->IsActor()) {
-                bool bsteal = 0;
-                bool bkill = 0;
-                TESNPC* pnpc = 0;
-                Actor* pbuyactor = 0;
+            if ((pRef->GetOwner() && !pRef->IsAnOwner(apActor, true)) || pRef->IsActor()) {
+                bool bsteal = false;
+                bool bkill = false;
+                TESNPC* pnpc = nullptr;
+                Actor* pbuyactor = nullptr;
                 bool v2 = pRef->IsActor();
                 Actor* pTargetActor = v2 ? static_cast<Actor*>(pRef) : nullptr;
                 if (pTargetActor) {
                     if (pTargetActor->IsPlayerTeammate()) {
-                        badd = 0;
+                        badd = false;
                     }
                 }
-                bool bstop = 0;
-                if (!pRef->IsNpc() || pRef->IsDead(0)) {
+                bool bstop = false;
+                if (!pRef->IsNpc() || pRef->IsDead(false)) {
                     TESForm* pownerform = pRef->GetOwner();
                     if (pownerform) {
                         if (pownerform->GetFormType() == NPC__ID) {
@@ -11650,17 +11692,17 @@ void HighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                         }
                     }
                     if (pnpc) {
-                        pbuyactor = ReferenceProcessLists.GetActorRefInHigh(pnpc, 0);
+                        pbuyactor = ReferenceProcessLists.GetActorRefInHigh(pnpc, false);
                     }
                 }
                 else {
                     pbuyactor = static_cast<Actor*>(pRef);
                 }
-                if (!pbuyactor || pbuyactor->IsDead(0)) {
+                if (!pbuyactor || pbuyactor->IsDead(false)) {
                     if (pRef->IsNpc()) {
-                        badd = 1;
+                        badd = true;
                         pObject->eType = ACQUIRE_TYPE_NOOWNED_GROUND;
-                        bstop = 1;
+                        bstop = true;
                     }
                 }
                 else {
@@ -11670,42 +11712,42 @@ void HighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                             (GoldAmount = apActor->GetGoldAmount(),
                              GoldAmount >= TESValueForm::GetFormValue(pObject->pObject))) {
                             if (apActor->IsInCombat()) {
-                                badd = 0;
+                                badd = false;
                             }
                             else {
                                 pObject->eType = ACQUIRE_TYPE_BUY_NPC;
-                                double DistanceFromReference = apActor->GetDistanceFromReference(pRef, 0, 0);
+                                double DistanceFromReference = apActor->GetDistanceFromReference(pRef, false, false);
                                 pObject->iWantValue = static_cast<int32_t>(DistanceFromReference);
-                                bbuyit = 1;
+                                bbuyit = true;
                             }
                         }
                     }
                 }
                 if (!bbuyit && !bstop && (!pTargetActor || !pTargetActor->IsPlayerTeammate())) {
                     if (pRef->IsActor()) {
-                        if (pRef->IsDead(0)) {
-                            badd = 1;
+                        if (pRef->IsDead(false)) {
+                            badd = true;
                         }
                         else {
                             if (pRef->IsNpc()) {
                                 pactor = pRef;
                                 if (ballowStealing) {
-                                    bsteal = 1;
+                                    bsteal = true;
                                 }
                                 if (ballowKilling) {
-                                    bkill = 1;
+                                    bkill = true;
                                 }
                             }
                         }
                     }
                     else {
                         if (ballowStealing) {
-                            bsteal = 1;
+                            bsteal = true;
                         }
                     }
                     if ((!bsteal && !bkill) || (pTargetActor && pTargetActor->IsPlayerTeammate())) {
                         if (apActor->IsCreature()) {
-                            badd = 0;
+                            badd = false;
                         }
                         else {
                             TESBoundObject* Owner;
@@ -11714,13 +11756,13 @@ void HighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                                  ((Owner = static_cast<TESBoundObject*>(pRef->GetOwner()),
                                    Owner == apActor->GetObjectReference()) ||
                                   apActor->bPlayerTeammate))) {
-                                badd = 0;
+                                badd = false;
                             }
                             else {
                                 if (pTargetActor) {
                                     if (!pTargetActor->IsPlayerTeammate()) {
                                         pObject->eType = ACQUIRE_TYPE_KILL;
-                                        badd = 1;
+                                        badd = true;
                                     }
                                 }
                             }
@@ -11730,7 +11772,7 @@ void HighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                         if (pRef->IsActor()) {
                             if (bsteal) {
                                 if (apActor->IsInCombat()) {
-                                    badd = 0;
+                                    badd = false;
                                 }
                                 else {
                                     pObject->eType = ACQUIRE_TYPE_PICKPOCKET;
@@ -11739,7 +11781,7 @@ void HighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                             else {
                                 if (bkill) {
                                     if (apActor->IsInCombat() || apActor->bPlayerTeammate) {
-                                        badd = 0;
+                                        badd = false;
                                     }
                                     else {
                                         if (!pTargetActor || !pTargetActor->IsPlayerTeammate()) {
@@ -11755,7 +11797,7 @@ void HighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                                 pObject->eType = ACQUIRE_TYPE_PICKPOCKET;
                                 if (!apActor->HasObjects(pLockpick, POTYPE_NONE, 1, 0, eacquireItem)) {
                                     if (pRef->GetLock()) {
-                                        badd = 0;
+                                        badd = false;
                                     }
                                 }
                             }
@@ -11769,12 +11811,12 @@ void HighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                 }
             }
             else {
-                double v6 = apActor->GetDistanceFromReference(pRef, 0, 0);
+                double v6 = apActor->GetDistanceFromReference(pRef, false, false);
                 pObject->iWantValue = static_cast<int32_t>(v6);
             }
         }
         if (badd) {
-            pObject->pRef->SetTargeted(1);
+            pObject->pRef->SetTargeted(true);
             ObjectList.AddTail(pObject);
         }
         else {
@@ -11821,14 +11863,14 @@ void HighProcess::ProcessBuyObject(Actor* apActor) {
             }
         }
         DoorTeleportData* pTel = pTarget->GetTeleport();
-        bool batRef = 0;
+        bool batRef = false;
         if (pTel) {
             const NiPoint3* v11 = &apActor->GetLocationOnReference();
             const NiPoint3* LinkedDoorTeleportPosition = &pTarget->GetLinkedDoorTeleportPosition();
             NiPoint3 dist = *LinkedDoorTeleportPosition - *v11;
             double v4 = dist.Length();
             if (static_cast<double>(iAIDistanceRadiusMinLocation.Int()) >= v4) {
-                batRef = 1;
+                batRef = true;
             }
         }
         else {
@@ -11839,25 +11881,27 @@ void HighProcess::ProcessBuyObject(Actor* apActor) {
                 EndMoveMessage(apActor);
             }
             if (DidPathingFail(apActor) && !batRef) {
-                SetTarget(0);
+                SetTarget(nullptr);
             }
             else {
-                Actor* pact = 0;
+                Actor* pact = nullptr;
                 if (this->pAcquireObject->pRef->IsActor()) {
                     pact = static_cast<Actor*>(pTarget);
                     Script::SetActionFlag(pact, this->pAcquireObject->pExtra, SCRIPT_ACTION_ONSELL);
-                    pact->RemoveItem(this->pAcquireObject->pObject, 0, 1, 0, 0, apActor, 0, 0, 1, 0);
+                    pact->RemoveItem(
+                        this->pAcquireObject->pObject, nullptr, 1, false, false, apActor, nullptr, nullptr, true, false
+                    );
                 }
                 else {
                     TESForm* pownerform = this->pAcquireObject->pRef->GetOwner();
-                    TESNPC* npc = 0;
+                    TESNPC* npc = nullptr;
                     if (pownerform) {
                         if (pownerform->GetFormType() == NPC__ID) {
                             npc = static_cast<TESNPC*>(this->pAcquireObject->pRef->GetOwner());
                         }
                     }
                     if (npc) {
-                        pact = ReferenceProcessLists.GetActorRefInHigh(npc, 0);
+                        pact = ReferenceProcessLists.GetActorRefInHigh(npc, false);
                     }
                     TESBoundObject* pcompobj = (&apActor->m_Extra)->GetLevCreaOriginalBase();
                     if (!pcompobj) {
@@ -11865,7 +11909,7 @@ void HighProcess::ProcessBuyObject(Actor* apActor) {
                     }
                     (&this->pAcquireObject->pRef->m_Extra)->SetOwnership(pcompobj);
                     Script::SetActionFlag(pact, this->pAcquireObject->pExtra, SCRIPT_ACTION_ONSELL);
-                    this->pAcquireObject->pRef->Activate(apActor, 0, this->pAcquireObject->pObject, 1);
+                    this->pAcquireObject->pRef->Activate(apActor, false, this->pAcquireObject->pObject, 1);
                 }
                 if (pact) {
                     if (pact != apActor) {
@@ -11879,7 +11923,7 @@ void HighProcess::ProcessBuyObject(Actor* apActor) {
                     apThis->Delete(1u);
                 }
             }
-            this->pAcquireObject = 0;
+            this->pAcquireObject = nullptr;
         }
         else {
             if (apActor->GetSitSleepState()) {
@@ -11891,7 +11935,7 @@ void HighProcess::ProcessBuyObject(Actor* apActor) {
                     TESWorldSpace* WorldSpace = pTarget->GetWorldSpace();
                     TESObjectCELL* ParentCell = pTarget->GetParentCell();
                     const NiPoint3* v6 = &pTarget->GetLinkedDoorTeleportPosition();
-                    if (!apActor->SetPathfindingGoal(*v6, ParentCell, WorldSpace, 0.0f, 0)) {
+                    if (!apActor->SetPathfindingGoal(*v6, ParentCell, WorldSpace, 0.0f, nullptr)) {
                         return;
                     }
                 }
@@ -11899,44 +11943,44 @@ void HighProcess::ProcessBuyObject(Actor* apActor) {
                     TESWorldSpace* v9 = pTarget->GetWorldSpace();
                     TESObjectCELL* v7 = pTarget->GetParentCell();
                     const NiPoint3* v5 = &pTarget->GetLocationOnReference();
-                    if (!apActor->SetPathfindingGoal(*v5, v7, v9, 0.0f, 0)) {
+                    if (!apActor->SetPathfindingGoal(*v5, v7, v9, 0.0f, nullptr)) {
                         return;
                     }
                 }
             }
             if (!apActor->IsPathingComplete()) {
-                SetActorsAnimation(apActor, 257, 1);
+                SetActorsAnimation(apActor, 257, true);
             }
         }
     }
 }
 
 void HighProcess::ProcessSteal(Actor* apActor) {
-    apActor->SetForceSneak(1);
+    apActor->SetForceSneak(true);
     if (!apActor->IsSneaking()) {
         apActor->SetWalkRunFlagDirty();
     }
     apActor->SetMoveMode(1024);
-    if (ProcessActivate(apActor, (bool)0)) {
+    if (ProcessActivate(apActor, false)) {
         if (apActor->IsSneaking()) {
             apActor->SetWalkRunFlagDirty();
         }
-        apActor->SetForceSneak(0);
+        apActor->SetForceSneak(false);
         apActor->ClearMoveMode(0x400u);
     }
 }
 
 void HighProcess::ProcessPickPocket(Actor* apActor) {
-    apActor->SetForceSneak(1);
+    apActor->SetForceSneak(true);
     if (!apActor->IsSneaking()) {
         apActor->SetWalkRunFlagDirty();
     }
     apActor->SetMoveMode(1024);
-    if (ProcessActivate(apActor, (bool)0)) {
+    if (ProcessActivate(apActor, false)) {
         if (apActor->IsSneaking()) {
             apActor->SetWalkRunFlagDirty();
         }
-        apActor->SetForceSneak(0);
+        apActor->SetForceSneak(false);
         apActor->ClearMoveMode(0x400u);
     }
 }
@@ -12086,16 +12130,17 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
     }
     if (pCurrent->GetDialogueSayToFlag() && pTarget == pPlayer) {
         if (IsTalking(apActor)) {
-            return 1;
+            return true;
         }
-        MobileObject* ptarget = 0;
+        MobileObject* ptarget = nullptr;
         if (pTarget->IsMobileObject()) {
             ptarget = static_cast<MobileObject*>(pTarget);
         }
-        if (pCurrent->GetPackageSecondLocation() && !pCurrent->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+        if (pCurrent->GetPackageSecondLocation() && !pCurrent->IsActorAtLocation(apActor, false, -1.0f, false)) {
             goto LABEL_11;
         }
-        if (!pCurrent->GetPackageSecondLocation() || pCurrent->IsActorAtSecondLocation(ptarget, apActor, 0, -1.0f, 1)) {
+        if (!pCurrent->GetPackageSecondLocation() ||
+            pCurrent->IsActorAtSecondLocation(ptarget, apActor, false, -1.0f, true)) {
             // The package target's radius.
             float a2 = 0.0f;
             if (pCurrent->GetPackageTarget()) {
@@ -12104,10 +12149,10 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
             if (a2 <= 0.0) {
                 a2 = 120.0f;
             }
-            if (static_cast<double>(a2) < apActor->GetDistanceFromReference(pTarget, 0, 0)) {
+            if (static_cast<double>(a2) < apActor->GetDistanceFromReference(pTarget, false, false)) {
                 if (apActor->GetSitSleepState()) {
                     apActor->InitiateGetUpPackage();
-                    return 1;
+                    return true;
                 }
                 else {
                     if (apActor->IsPathingComplete()) {
@@ -12120,14 +12165,15 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
                             }
                             apActor->SetMoveMode(1024u);
                         }
-                        apActor->SetPathfindingGoal(pTarget, a2, 0);
+                        apActor->SetPathfindingGoal(pTarget, a2, nullptr);
                     }
-                    return 1;
+                    return true;
                 }
             }
             EndMoveMessage(apActor);
-            if ((apActor->IsPathing() && !apActor->IsRotating()) || !apActor->LineOfSight(0, pPlayer, 1, 0, 0)) {
-                return 1;
+            if ((apActor->IsPathing() && !apActor->IsRotating()) ||
+                !apActor->LineOfSight(false, pPlayer, true, nullptr, false)) {
+                return true;
             }
             TESTopic* ptopic = pCurrent->GetDialogueTopic();
             if (!ptopic) {
@@ -12136,33 +12182,33 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
             if (ptarget) {
                 if (pTarget != pPlayer && !pCurrent->GetDialogueNoHeadtrack()) {
                     BaseProcess* CurrentAIProcess = ptarget->pCurrentProcess;
-                    CurrentAIProcess->ClearScriptHeadTrackTarget(0);
+                    CurrentAIProcess->ClearScriptHeadTrackTarget(false);
                     BaseProcess* v22 = ptarget->pCurrentProcess;
                     v22->SetActionHeadTrackTarget(apActor);
                     ptarget->SetDialogueItemTarget(apActor);
                 }
             }
             BaseProcess* v21 = apActor->pCurrentProcess;
-            v21->ClearScriptHeadTrackTarget(0);
+            v21->ClearScriptHeadTrackTarget(false);
             BaseProcess* v20 = apActor->pCurrentProcess;
             v20->SetActionHeadTrackTarget(pTarget);
             apActor->SetDialogueItemTarget(ptarget);
             BaseProcess* v19 = apActor->pCurrentProcess;
-            v19->ProcessGreet(apActor, ptopic, 0, 0, 1, 1);
+            v19->ProcessGreet(apActor, ptopic, false, false, true, true);
         }
-        return 1;
+        return true;
     }
     if (pCurrent->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE) {
         MobileObject* pStartedConversation;
         DialoguePackage* pPack;
         MobileObject* pTargetTalker;
         if (pTarget) {
-            if (pTarget->IsDead(0)) {
+            if (pTarget->IsDead(false)) {
                 TESPackage* ppack = apActor->GetPackageSetAsPcurrent();
                 if (ppack) {
                     apActor->EndDialogue();
-                    ppack->SetNeverRun(pTarget, 1);
-                    return 0;
+                    ppack->SetNeverRun(pTarget, true);
+                    return false;
                 }
             }
         }
@@ -12172,11 +12218,11 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
         if ((!pPack->GetReachedAmbushLocation() || !apActor->IsPathing()) &&
             (pPack->pPackLoc &&
              (pPack->GetPackageSecondLocation() &&
-              (!pPack->IsActorAtLocation(pStartedConversation, 0, -1.0f, 0) &&
-               !pPack->IsActorAtSecondLocation(pTargetTalker, pStartedConversation, 0, -1.0f, 0))))) {
+              (!pPack->IsActorAtLocation(pStartedConversation, false, -1.0f, false) &&
+               !pPack->IsActorAtSecondLocation(pTargetTalker, pStartedConversation, false, -1.0f, false))))) {
         LABEL_11:;
             AddToProcedureIndexRunning(apActor, -1);
-            return 0;
+            return false;
         }
         if (pPack == GetRunOncePackage()) {
             if (GetCurrentPackage()) {
@@ -12185,9 +12231,9 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
                     (pPack->GetPackageSecondLocation() &&
                      (pPack->GetTargetContinueMoving() &&
                       (!pPack->GetTargetMoveTowardStarter() &&
-                       !pPack->IsActorAtSecondLocation(pTargetTalker, pStartedConversation, 0, -1.0f, 0))))) {
-                    apActor->EndInterruptPackage(0);
-                    return 0;
+                       !pPack->IsActorAtSecondLocation(pTargetTalker, pStartedConversation, false, -1.0f, false))))) {
+                    apActor->EndInterruptPackage(false);
+                    return false;
                 }
             }
         }
@@ -12202,19 +12248,19 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
                     if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
                         apActor->InitiateGetUpPackage();
                     }
-                    return 1;
+                    return true;
                 }
                 if (pPack->GetPackageSecondLocation() &&
-                    (!pPack->IsActorAtSecondLocation(pTargetTalker, apActor, 0, -1.0f, 1) ||
+                    (!pPack->IsActorAtSecondLocation(pTargetTalker, apActor, false, -1.0f, true) ||
                      pPack->IsActorAtRefTarget(apActor, 0))) {
                     if (pPack->GetPackageSecondLocation()) {
-                        if (pPack->IsActorAtSecondLocation(pTargetTalker, apActor, 0, -1.0f, 1)) {
+                        if (pPack->IsActorAtSecondLocation(pTargetTalker, apActor, false, -1.0f, true)) {
                             apActor->StopMoving();
-                            pPack->SetReachedAmbushLocation(1);
+                            pPack->SetReachedAmbushLocation(true);
                             BaseProcess* v14 = apActor->pCurrentProcess;
                             v14->SetHeadTrackTarget(BaseProcess::HEAD_TRACK_TYPE_DIALOG, pPlayer);
                             TESBoundObject* ObjectReference = pPlayer->GetObjectReference();
-                            ObjectReference->Activate(pPlayer, apActor, 0, 0, 1);
+                            ObjectReference->Activate(pPlayer, apActor, false, nullptr, 1);
                         }
                     }
                 }
@@ -12228,8 +12274,8 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
                           ((v7 = pPack->GetLocationReference(apActor), v7->IsFurniture()) &&
                            (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
                             apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING))))) {
-                        pPack->SetReachedAmbushLocation(1);
-                        if (ProcessActivate(apActor, 1)) {
+                        pPack->SetReachedAmbushLocation(true);
+                        if (ProcessActivate(apActor, true)) {
                             pCurrent = GetPackageThatIsRunning();
                             if (pCurrent->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE) {
                                 AddToProcedureIndexRunning(apActor, 1);
@@ -12244,25 +12290,25 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
                     if (!pTargetTalker->IsActor() ||
                         ((ptargactor = static_cast<Actor*>(pTargetTalker), pPack->GetDialogueDoNotControlTarget()) ||
                          (!pPack->GetPackageSecondLocation() ||
-                          pPack->IsActorAtSecondLocation(ptargactor, apActor, 0, -1.0f, 0)))) {
+                          pPack->IsActorAtSecondLocation(ptargactor, apActor, false, -1.0f, false)))) {
                         AddToProcedureIndexRunning(apActor, 1);
-                        pPack->SetReachedAmbushLocation(1);
+                        pPack->SetReachedAmbushLocation(true);
                     }
                     else {
                         BaseProcess* v18 = pTargetTalker->pCurrentProcess;
-                        v18->ProcessTravel(ptargactor, 0, 0, -1, 1);
+                        v18->ProcessTravel(ptargactor, false, false, -1, true);
                     }
                 }
                 else {
                     if (!pPack->GetPackageSecondLocation() ||
-                        pPack->IsActorAtSecondLocation(pTargetTalker, apActor, 0, -1.0f, 1)) {
+                        pPack->IsActorAtSecondLocation(pTargetTalker, apActor, false, -1.0f, true)) {
                         if (pPack->GetPackageSecondLocation()) {
                             if (!pPack->GetDialogueDoNotControlTarget() &&
                                 pTargetTalker->GetCurrentPackage() != pPack) {
                                 BaseProcess* v17 = pTargetTalker->pCurrentProcess;
                                 v17->SavePackageToExtraData(pTargetTalker);
                                 TESPackage* v4 = apActor->GetCurrentPackage();
-                                pTargetTalker->PutCreatedPackage(v4, 0, 1);
+                                pTargetTalker->PutCreatedPackage(v4, false, true);
                                 BaseProcess* v16 = pTargetTalker->pCurrentProcess;
                                 v16->SetTarget(pTargetTalker);
                                 BaseProcess* v15 = pTargetTalker->pCurrentProcess;
@@ -12270,19 +12316,19 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
                                 pTargetTalker->SetDialogueItemTarget(apActor);
                             }
                         }
-                        if (ProcessActivate(apActor, 1)) {
+                        if (ProcessActivate(apActor, true)) {
                             pCurrent = GetPackageThatIsRunning();
                             if (pCurrent->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE) {
                                 if (GetCurrentProcedureIndex() == 1) {
                                     AddToProcedureIndexRunning(apActor, 1);
                                 }
-                                pPack->SetReachedAmbushLocation(1);
+                                pPack->SetReachedAmbushLocation(true);
                             }
                         }
                     }
                 }
             }
-            return 1;
+            return true;
         }
         if (apActor == pTargetTalker) {
             if (pPack->GetTargetContinueMoving()) {
@@ -12300,10 +12346,10 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
                 else {
                     fradius = 400.0f;
                 }
-                bool bpath = 0;
+                bool bpath = false;
                 if (apActor->IsPathingComplete()) {
-                    bpath =
-                        static_cast<double>(fradius) < apActor->GetDistanceFromReference(pStartedConversation, 0, 0);
+                    bpath = static_cast<double>(fradius) <
+                        apActor->GetDistanceFromReference(pStartedConversation, false, false);
                 }
                 else {
                     apActor->GetCurrentPathfindingGoal_008B3840(&delta);
@@ -12312,7 +12358,7 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
                     bpath = delta.SqrLength() > 10000.0;
                 }
                 if (bpath) {
-                    apActor->SetPathfindingGoal(pStartedConversation, fradius, 0);
+                    apActor->SetPathfindingGoal(pStartedConversation, fradius, nullptr);
                 }
             }
             else {
@@ -12325,25 +12371,25 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
                     if (pPlayer->GetCurrentPackage()) {
                         TESPackage* v9 = pPlayer->GetCurrentPackage();
                         if (v9->GetPackType() == PACKAGE_TYPE_TRAVEL) {
-                            return 1;
+                            return true;
                         }
                     }
                 }
                 if (apActor->GetSitSleepState() && apActor->GetSitSleepState() != SIT_SLEEP_IS_SITTING) {
-                    return 1;
+                    return true;
                 }
             }
             pCurrent = GetPackageThatIsRunning();
-            if (ProcessActivate(apActor, 1)) {
+            if (ProcessActivate(apActor, true)) {
                 TESPackage* pnewPack = GetPackageThatIsRunning();
                 if (!pnewPack || (pnewPack != pCurrent || pnewPack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_DIALOGUE)) {
-                    return 0;
+                    return false;
                 }
                 BaseProcess* pproc = pTargetTalker->pCurrentProcess;
                 if (pproc) {
                     TESPackage* ptheirpack = pproc->GetRunOncePackage();
                     if (!ptheirpack || ptheirpack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_DIALOGUE) {
-                        pTargetTalker->PutCreatedPackage(pPack, 1, 1);
+                        pTargetTalker->PutCreatedPackage(pPack, true, true);
                         TESPackage* ptheirpackNew = pproc->GetRunOncePackage();
                         if (ptheirpackNew->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_DIALOGUE) {
                             pproc->AddToProcedureIndexRunning(pTargetTalker, 2);
@@ -12364,7 +12410,7 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
                                 if (pPack == GetRunOncePackage()) {
                                     AddToProcedureIndexRunning(apActor, 2);
                                 }
-                                return 0;
+                                return false;
                             }
                         }
                     }
@@ -12377,31 +12423,31 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
                             apActor->EndDialogue();
                             apActor->InitiateGetUpPackage();
                         }
-                        return 0;
+                        return false;
                     }
                 }
             }
         }
-        return 1;
+        return true;
     }
     if (pTarget) {
         if (pTarget->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
             // The sleeping target is an Actor.
             static_cast<Actor*>(pTarget)->InitiateGetUpPackage();
-            return 1;
+            return true;
         }
         if (pTarget->GetSitSleepState() != SIT_SLEEP_IS_SITTING && pTarget->GetSitSleepState()) {
-            return 0;
+            return false;
         }
     }
     else {
         if (!SetTargetForPackage(apActor)) {
             AddToProcedureIndexRunning(apActor, 3);
-            return 0;
+            return false;
         }
     }
     apActor->InitiateDialogue(pCurrent);
-    return 1;
+    return true;
 }
 
 void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float afRadius) {
@@ -12415,9 +12461,9 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
         EndMoveMessage(apActor);
         return;
     }
-    bool ballowChangingProcIndex = 1;
-    bool bcellwander = 0;
-    TESPackage* pPack = 0;
+    bool ballowChangingProcIndex = true;
+    bool bcellwander = false;
+    TESPackage* pPack = nullptr;
     pPack = GetPackageThatIsRunning();
     if (!(afRadius > 0.0)) {
         forigradius = static_cast<float>(pPack->GetLocationRadius(apActor));
@@ -12426,25 +12472,25 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
         forigradius = afRadius;
     }
     float forigradius_2 = forigradius;
-    bool bIsWander = 1;
+    bool bIsWander = true;
     if (pPack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_EXPLORE_WANDER) {
-        bIsWander = 0;
+        bIsWander = false;
         switch (pPack->GetPackType()) {
             case PACKAGE_TYPE_EXPLORE:
             case PACKAGE_TYPE_FIND: {
-                if (pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+                if (pPack->IsActorAtLocation(apActor, false, -1.0f, false)) {
                     break;
                 }
                 goto LABEL_20;
             }
             case PACKAGE_TYPE_EAT: {
                 ItemChange* apMemory_264 = apActor->GetBestFoodItem();
-                if (!pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+                if (!pPack->IsActorAtLocation(apActor, false, -1.0f, false)) {
                     goto LABEL_20;
                 }
                 if (apMemory_264 && apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING) {
                     pItemBeingUsed = apMemory_264->pContainerObj;
-                    SetCurrentActionComplete(1);
+                    SetCurrentActionComplete(true);
                     AddToProcedureIndexRunning(apActor, -1);
                     return;
                 }
@@ -12457,7 +12503,7 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
                 return;
             }
             case PACKAGE_TYPE_SLEEP: {
-                if (!pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+                if (!pPack->IsActorAtLocation(apActor, false, -1.0f, false)) {
                 LABEL_20:;
                     EndMoveMessage(apActor);
                     AddToProcedureIndexRunning(apActor, -2);
@@ -12472,8 +12518,8 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
             }
             case PACKAGE_TYPE_SANDBOX:
             case PACKAGE_TYPE_GUARD: {
-                bIsWander = 1;
-                ballowChangingProcIndex = 0;
+                bIsWander = true;
+                ballowChangingProcIndex = false;
                 break;
             }
             default: {
@@ -12481,13 +12527,13 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
             }
         }
     }
-    TESObjectREFR* pRef = 0;
+    TESObjectREFR* pRef = nullptr;
     ::new (&pPackPoint) NiPoint3(pPack->GetLocationCoord(apActor));
     PackageLocation* ploc = pPack->pPackLoc;
     if (ploc) {
         pRef = ploc->GetLocReference();
         if (!pRef && ploc->GetLocType() == PLT_CELL) {
-            bcellwander = 1;
+            bcellwander = true;
             pPackPoint = apActor->GetLocationOnReference();
         }
         if (!pRef) {
@@ -12503,12 +12549,12 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
         pPackPoint = *apCenter;
     }
     if (forigradius_2 < 60.0 && (bIsWander && (!bcellwander && ballowChangingProcIndex))) {
-        if (pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+        if (pPack->IsActorAtLocation(apActor, false, -1.0f, false)) {
             if (bIsWander) {
                 if (pRef) {
                     TESBoundObject* ObjectReference = pRef->GetObjectReference();
                     if (ObjectReference == pXMarkerHeading) {
-                        apActor->RequestRotate((&pRef->GetAngleOnReference())->z, 0);
+                        apActor->RequestRotate((&pRef->GetAngleOnReference())->z, false);
                     }
                 }
             }
@@ -12528,7 +12574,7 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
         fEvaluateAcquireTimer = fEvaluateAcquireTimer - appTimer.fDelta;
     }
     if (!apActor->IsPathingComplete()) {
-        SetActorsAnimation(apActor, 257, 1);
+        SetActorsAnimation(apActor, 257, true);
         return;
     }
     if (apActor->pActorMover->IsPathingComplete() &&
@@ -12565,7 +12611,7 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
         }
         else {
             TESWorldSpace* WorldSpace = apActor->GetWorldSpace();
-            apMemory_248 = pDataHandler->GetCellFromWorldCoord(pPackPoint.x, pPackPoint.y, WorldSpace, 0);
+            apMemory_248 = pDataHandler->GetCellFromWorldCoord(pPackPoint.x, pPackPoint.y, WorldSpace, false);
             if (apMemory_248) {
                 PathingRequestClosePoint apThis_208;
                 PathingLocation* aOrigin = ::new (&v22) PathingLocation(&pPackPoint, apMemory_248);
@@ -12594,7 +12640,7 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
                 apActor->InitiateGetUpPackage();
             }
             TESWorldSpace* v8 = apActor->GetWorldSpace();
-            if (apActor->SetPathfindingGoal(apMemory_252, apActor->GetParentCell(), v8, 50.0f, 0)) {
+            if (apActor->SetPathfindingGoal(apMemory_252, apActor->GetParentCell(), v8, 50.0f, nullptr)) {
                 if (!(apActor->GetDistanceFromPoint(apMemory_252) < 50.0)) {
                     apActor->GetFatiguePercentage();
                     int32_t ActorBaseEnergyLevel = apActor->GetActorBaseEnergyLevel();
@@ -12630,7 +12676,7 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
             apActor->InitiateGetUpPackage();
         LABEL_81:;
             TESWorldSpace* v6 = apActor->GetWorldSpace();
-            if (apActor->SetPathfindingGoal(apMemory_252, apActor->GetParentCell(), v6, 50.0f, 0)) {
+            if (apActor->SetPathfindingGoal(apMemory_252, apActor->GetParentCell(), v6, 50.0f, nullptr)) {
                 if (!(apActor->GetDistanceFromPoint(apMemory_252) < 50.0)) {
                     apActor->GetFatiguePercentage();
                     int32_t v7 = apActor->GetActorBaseEnergyLevel();
@@ -12652,14 +12698,14 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
     }
     else {
         if (!apActor->IsPathingComplete()) {
-            if (pCurrentFurniture && pCurrentFurniture->GetMarkerUsed(cCurrentFurnitureIndex, 1)) {
+            if (pCurrentFurniture && pCurrentFurniture->GetMarkerUsed(cCurrentFurnitureIndex, true)) {
                 EndMoveMessage(apActor);
                 fDelayTimer = 0.0f;
-                pCurrentFurniture = 0;
+                pCurrentFurniture = nullptr;
                 ClearFurnitureMarker();
             }
             else {
-                SetActorsAnimation(apActor, 257, 1);
+                SetActorsAnimation(apActor, 257, true);
                 float v24 = 0.0f;
                 pCurrentFurniture;
             }
@@ -12671,10 +12717,10 @@ bool HighProcess::ProcessSandBoxDialogue(Actor* apActor, TESObjectREFR* aptalkTa
     PackageLocation* ploc;
     bool v8;
     if (!aptalkTarget || !aptalkTarget->IsActor()) {
-        return 0;
+        return false;
     }
     if (!ComputeCanInitiateDialogueWithNPC(apActor, static_cast<Actor*>(aptalkTarget))) {
-        return 0;
+        return false;
     }
     TESPackage* ptargPack = static_cast<MobileObject*>(aptalkTarget)->MobileObject::GetCurrentPackage();
     if (ptargPack) {
@@ -12682,14 +12728,14 @@ bool HighProcess::ProcessSandBoxDialogue(Actor* apActor, TESObjectREFR* aptalkTa
         v8 = v9;
     }
     else {
-        v8 = 0;
+        v8 = false;
     }
     TESPackage* pourPack = GetPackageThatIsRunning();
     if (pourPack) {
         ploc = pourPack->pPackLoc;
     }
     else {
-        ploc = 0;
+        ploc = nullptr;
     }
     PackageLocation* ploc_2 = ploc;
     PackageLocation tempLoc;
@@ -12711,7 +12757,9 @@ bool HighProcess::ProcessSandBoxDialogue(Actor* apActor, TESObjectREFR* aptalkTa
         BaseProcess* pTargetProcess = static_cast<MobileObject*>(aptalkTarget)->GetCurrentAIProcess();
         pTargetProcess->AddTalkedtoActor(apActor);
     }
-    bool v11 = apActor->InitiateDialogue(static_cast<MobileObject*>(aptalkTarget), ploc_2, ploc_2, 1, 0, 0, 0, 1, v8);
+    bool v11 = apActor->InitiateDialogue(
+        static_cast<MobileObject*>(aptalkTarget), ploc_2, ploc_2, true, false, false, nullptr, true, v8
+    );
     return v11;
 }
 
@@ -12729,14 +12777,14 @@ void HighProcess::ProcessUseIdleMarker(Actor* apActor, TESObjectREFR* apRef) {
         else {
             if (apActor->IsPathing()) {
                 TESPackage* pPack = GetPackageThatIsRunning();
-                float fcurrentDistance = apActor->GetDistanceFromReference(apRef, 0, 0);
+                float fcurrentDistance = apActor->GetDistanceFromReference(apRef, false, false);
                 int32_t emoveMode = 257;
                 float ftooCloseToRun = 64.0f;
                 bool bcouldRun = 64.0f < static_cast<double>(fcurrentDistance);
                 if (64.0f < static_cast<double>(fcurrentDistance)) {
-                    float fdistance = pPack->GetPackageRadiusActorToLocation(apActor, 0);
+                    float fdistance = pPack->GetPackageRadiusActorToLocation(apActor, false);
                     float v6 = fdistance + fdistance;
-                    emoveMode = CalculateMoveMode(apActor, fcurrentDistance, fdistance, v6, 0, 0);
+                    emoveMode = CalculateMoveMode(apActor, fcurrentDistance, fdistance, v6, false, false);
                 }
                 SetActorsAnimation(apActor, emoveMode, bcouldRun);
             }
@@ -12769,7 +12817,7 @@ void HighProcess::ProcessUseIdleMarker(Actor* apActor, TESObjectREFR* apRef) {
                             if (panim) {
                                 if ((!pCurrentIdle || panim->SpecialIdleDonePlaying()) && !apActor->IsParalyzed()) {
                                     TESIdleForm* pPrevIdle = pCurrentIdle;
-                                    pCurrentIdle = 0;
+                                    pCurrentIdle = nullptr;
                                     if (etype) {
                                         if (etype == BGSIdleCollection::SEQUENCE) {
                                             if (iPackageIdleNumber == -1 || iPackageIdleNumber + 1 >= icount) {
@@ -12792,18 +12840,20 @@ void HighProcess::ProcessUseIdleMarker(Actor* apActor, TESObjectREFR* apRef) {
                                         }
                                     }
                                     if (pCurrentIdle) {
-                                        SetupSpecialIdle(apActor, pCurrentIdle, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 0);
+                                        SetupSpecialIdle(
+                                            apActor, pCurrentIdle, AnimIdle::PLAY_TYPE_AUTO, true, false, false
+                                        );
                                     }
                                 }
                             }
                         }
                     }
                     else {
-                        apActor->RequestRotate(fdesiredAngle, 1);
+                        apActor->RequestRotate(fdesiredAngle, true);
                     }
                 }
                 else {
-                    apActor->SetPathfindingGoalAndAngle(pTarget, fradiusForIdleMarkers, 0);
+                    apActor->SetPathfindingGoalAndAngle(pTarget, fradiusForIdleMarkers, nullptr);
                 }
             }
         }
@@ -12839,17 +12889,17 @@ void HighProcess::FadeOut(Actor* apActor, TESObjectREFR* apRef, bool abTeleport)
 bool HighProcess::ProcessFollowOneHour(Actor* apActor, float afTimeDelta, bool abInterateIndex) {
     TESPackage* pPack = GetPackageThatIsRunning();
     if (!pPack) {
-        return 0;
+        return false;
     }
     if (pPack->GetWaiting()) {
         if (pPlayer->IsPlayerFollower(apActor)) {
-            return 0;
+            return false;
         }
         int32_t NumberOfFollowers = pPlayer->GetNumberOfFollowers();
         if (NumberOfFollowers >= iNumberActorsAllowedToFollowPlayer.Int()) {
-            return 0;
+            return false;
         }
-        pPack->SetWaiting(0);
+        pPack->SetWaiting(false);
     }
     if (!pTarget) {
         SetTargetForPackage(apActor);
@@ -12857,23 +12907,23 @@ bool HighProcess::ProcessFollowOneHour(Actor* apActor, float afTimeDelta, bool a
     if (pTarget) {
         if (pTarget->GetDelete() || pTarget->GetDisabled()) {
             if (pTarget->GetDelete()) {
-                pPack->SetNeverRun(pTarget, 1);
+                pPack->SetNeverRun(pTarget, true);
             }
             if (abInterateIndex) {
                 AddToProcedureIndexRunning(apActor, 1);
             }
-            return 0;
+            return false;
         }
         else {
-            if (pTarget->IsDead(1)) {
-                pPack->SetNeverRun(pTarget, 1);
-                return 0;
+            if (pTarget->IsDead(true)) {
+                pPack->SetNeverRun(pTarget, true);
+                return false;
             }
             else {
                 if (pTarget &&
                     (!pPack->pPackLoc ||
                      (pPack->pPackLoc->GetLocType() >= PLT_CURRLOC ||
-                      !pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)))) {
+                      !pPack->IsActorAtLocation(apActor, false, -1.0f, false)))) {
                     goto LABEL_48;
                 }
                 if (abInterateIndex) {
@@ -12881,35 +12931,37 @@ bool HighProcess::ProcessFollowOneHour(Actor* apActor, float afTimeDelta, bool a
                 }
                 if (pPack->GetIsCreated()) {
                     ClearCurrentPackage();
-                    CheckforNewPackage(apActor, 0);
-                    return 0;
+                    CheckforNewPackage(apActor, false);
+                    return false;
                 }
                 else {
                     TESObjectCELL* pparent;
                     TESPackage* pEditorPack;
                 LABEL_48:;
                     if (pPack->GetIsCreated() &&
-                        ((pEditorPack = GetCurrentPackage()) != 0 &&
+                        ((pEditorPack = GetCurrentPackage()) != nullptr &&
                          ((pparent = apActor->GetParentCell(), pEditorPack->GetPCContinue()) &&
                           (pEditorPack->GetServicesEnabled() &&
                            (pparent &&
-                            (pparent->IsActorCellOwner(apActor) && apActor->LineOfSight(0, pTarget, 1, 0, 0))))))) {
+                            (pparent->IsActorCellOwner(apActor) &&
+                             apActor->LineOfSight(false, pTarget, true, nullptr, false))))))) {
                         EndMoveMessage(apActor);
-                        return 0;
+                        return false;
                     }
                     else {
-                        float fdistance = pPack->GetPackageRadiusActorToRefTarget(apActor, 0);
+                        float fdistance = pPack->GetPackageRadiusActorToRefTarget(apActor, false);
                         if (pTarget) {
-                            if (static_cast<double>(fdistance) < apActor->GetDistanceFromReference(pTarget, 0, 0) &&
+                            if (static_cast<double>(fdistance) <
+                                    apActor->GetDistanceFromReference(pTarget, false, false) &&
                                 (pTarget != pPlayer || !apActor->IsPathing())) {
                                 TESWorldSpace* LocationWorld = pPack->GetLocationWorld(apActor);
                                 TESObjectCELL* LocationCell = pPack->GetLocationCell(apActor);
                                 apActor->SetPathfindingGoal(
-                                    pPack->GetLocationCoord(apActor), LocationCell, LocationWorld, fdistance, 0
+                                    pPack->GetLocationCoord(apActor), LocationCell, LocationWorld, fdistance, nullptr
                                 );
                             }
                         }
-                        return 0;
+                        return false;
                     }
                 }
             }
@@ -12919,7 +12971,7 @@ bool HighProcess::ProcessFollowOneHour(Actor* apActor, float afTimeDelta, bool a
         if (abInterateIndex) {
             AddToProcedureIndexRunning(apActor, 1);
         }
-        return 0;
+        return false;
     }
 }
 
@@ -13012,7 +13064,7 @@ void HighProcess::ProcessTakeBackItem(Actor* apActor) {
 
 bool HighProcess::FindSpecialIdletoPlay(Actor* apActor, TESBoundObject* apObject, TESObjectREFR* apRef) {
     TESIdleManager::SetUsedItem(apObject);
-    TESIdleManager::SetUsedItemActivate(1);
+    TESIdleManager::SetUsedItemActivate(true);
     int32_t iItemLevel = 0;
     if (apRef) {
         double fEyeLevel = apActor->GetEyeLevel();
@@ -13023,9 +13075,9 @@ bool HighProcess::FindSpecialIdletoPlay(Actor* apActor, TESBoundObject* apObject
         }
     }
     TESIdleManager::SetUsedItemLevel(iItemLevel);
-    bool bIdleFound = SetupSpecialIdle(apActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
-    TESIdleManager::SetUsedItem(0);
-    TESIdleManager::SetUsedItemActivate(0);
+    bool bIdleFound = SetupSpecialIdle(apActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
+    TESIdleManager::SetUsedItem(nullptr);
+    TESIdleManager::SetUsedItemActivate(false);
     TESIdleManager::SetUsedItemLevel(-1);
     return bIdleFound;
 }
@@ -13036,19 +13088,19 @@ bool HighProcess::CheckTargetCombatDetectionState(Actor* apActor, Actor* apTarge
     if (eState) {
         if (eState == 1) {
             if (apTarget == apActor->GetCurrentCombatTarget()) {
-                return (bool)1;
+                return true;
             }
             if (apActor->IsInCombatWithActor(apTarget)) {
-                return (bool)1;
+                return true;
             }
         }
         else {
             if (eState == 2) {
                 if (apTarget == apActor->GetCurrentCombatTarget()) {
-                    return (bool)1;
+                    return true;
                 }
                 if ((!apActor->IsInCombatWithActor(apTarget)) && (!apActor->IsCombatGroupMember(apTarget))) {
-                    return (bool)1;
+                    return true;
                 }
             }
             else {
@@ -13058,26 +13110,26 @@ bool HighProcess::CheckTargetCombatDetectionState(Actor* apActor, Actor* apTarge
     }
     else {
         if (apTarget == apActor->GetCurrentCombatTarget()) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 bool HighProcess::ShouldRunCombatDetection(Actor* apActor, Actor* apTarget) {
     uint8_t bCheckCone;
-    if (apTarget->IsDead((bool)0) || apTarget->IsUnConscious()) {
-        return (bool)0;
+    if (apTarget->IsDead(false) || apTarget->IsUnConscious()) {
+        return false;
     }
     bCheckCone = (uint8_t)CombatDetectionCycles[iDetectionCounter].bCheckCone;
     if (static_cast<const void*>(apTarget) == static_cast<const void*>(pPlayer)) {
         bCheckCone = 0;
     }
     if (!CheckTargetCombatDetectionState(apActor, apTarget)) {
-        return (bool)0;
+        return false;
     }
     if (!bCheckCone) {
-        return (bool)1;
+        return true;
     }
     NiPoint3* pTargetPos = apTarget->TESObjectREFR::QLocationOnReference();
     return (bool)((uint8_t)apActor->IsPointInViewCone(*pTargetPos, 1.5707963705062866f));
@@ -13124,7 +13176,7 @@ void HighProcess::UpdateHeadTrackTargets() {
     for (int32_t iTarget = 5; iTarget >= 0; --iTarget) {
         if (HeadTrackingTargetFlags[iTarget] &&
             (!HeadTrackingTargets[iTarget] || HeadTrackingTargets[iTarget]->GetDelete())) {
-            HeadTrackingTargetFlags[iTarget] = 0;
+            HeadTrackingTargetFlags[iTarget] = false;
             HeadTrackingTargets[iTarget] = nullptr;
             bChanged = true;
         }
@@ -13144,7 +13196,7 @@ void HighProcess::OnNewHeadTrackTarget() {
         }
     }
     if (pLastTarget != v2) {
-        bForceRotate = (bool)0;
+        bForceRotate = false;
         pLastTarget = v2;
     }
 }
@@ -13194,7 +13246,7 @@ void HighProcess::SetupPhantom(Actor* apActor) {
                 pplayerShape = ::new (v18) bhkBoxShape(playerextents);
             }
             else {
-                pplayerShape = 0;
+                pplayerShape = nullptr;
             }
             ifilter.iFilter = 0;
             ifilter.SetLayer(L_DOORDETECTION);
@@ -13216,7 +13268,7 @@ void HighProcess::SetupPhantom(Actor* apActor) {
                 v9 = ::new (v10) bhkSimpleShapePhantom(csi);
             }
             else {
-                v9 = 0;
+                v9 = nullptr;
             }
             this->spShapePhantom.operator=(static_cast<bhkShapePhantom*>(v9));
             float fTime = fINIDetectDoorsForPathingTime.Float();
@@ -13275,7 +13327,7 @@ void HighProcess::ReconcileDetectionData(Actor* apActor) {
                 ptemp = ::new (pMemory) DetectionState;
             }
             else {
-                ptemp = 0;
+                ptemp = nullptr;
             }
             pDetectedActorList->AddHead(ptemp);
         }
@@ -13288,7 +13340,7 @@ void HighProcess::ReconcileDetectionData(Actor* apActor) {
     if (bupdated) {
         CombatController* pcombatController = apActor->GetCombatController();
         if (pcombatController) {
-            pcombatController->SetUpdatedDetection(1);
+            pcombatController->SetUpdatedDetection(true);
         }
     }
     for (plist = pTempActorsWhoDetectMeList; plist && plist->m_item; plist = plist->GetNext()) {
@@ -13300,7 +13352,7 @@ void HighProcess::ReconcileDetectionData(Actor* apActor) {
                 ptemp = ::new (pMemory) DetectionState;
             }
             else {
-                ptemp = 0;
+                ptemp = nullptr;
             }
             pActorsWhoDetectMeList->AddHead(ptemp);
         }
@@ -13336,7 +13388,7 @@ void HighProcess::SetCurrentRadiation(float a2) {
 }
 
 void HighProcess::ProcessAccompanyOneHour(Actor* apActor, float fTimeDelta) {
-    ProcessFollowOneHour(apActor, fTimeDelta, 1);
+    ProcessFollowOneHour(apActor, fTimeDelta, true);
 }
 
 void HighProcess::FadeAndDelete(Actor* apActor) {
@@ -13349,13 +13401,13 @@ void HighProcess::FadeAndDelete(Actor* apActor) {
     if (static_cast<const void*>(apActor) == static_cast<const void*>(pPlayer)) {
         v2 = (uint8_t)pPlayer->Is3rdPerson();
         if (!v2) {
-            pPlayer->SetFirstPerson(0);
+            pPlayer->SetFirstPerson(false);
         }
     }
     apActor->StopMoving();
     apActor->PickAnimations(1.0, 1.0);
     if (!v2) {
-        pPlayer->SetFirstPerson(1);
+        pPlayer->SetFirstPerson(true);
     }
 }
 
@@ -13369,13 +13421,13 @@ void HighProcess::FadeAndDisable(Actor* apActor) {
     if (static_cast<const void*>(apActor) == static_cast<const void*>(pPlayer)) {
         v2 = (uint8_t)pPlayer->Is3rdPerson();
         if (!v2) {
-            pPlayer->SetFirstPerson(0);
+            pPlayer->SetFirstPerson(false);
         }
     }
     apActor->StopMoving();
     apActor->PickAnimations(1.0, 1.0);
     if (!v2) {
-        pPlayer->SetFirstPerson(1);
+        pPlayer->SetFirstPerson(true);
     }
 }
 
@@ -13416,8 +13468,8 @@ void HighProcess::HighCopy(HighProcess* apProcess) {
 
 void HighProcess::ClearShootingAction(Actor* a1) {
     a1->ClearLookAtTarget();
-    ClearAutomaticShotsToFire(0);
-    bAimingTarget = 0;
+    ClearAutomaticShotsToFire(false);
+    bAimingTarget = false;
 }
 
 void HighProcess::ProcessSearch(Actor* apActor) {
@@ -13437,9 +13489,9 @@ void HighProcess::ProcessSearch(Actor* apActor) {
     if (!pTarget) {
         SetTargetForPackage(apActor);
     }
-    apActor->SetAlert(1);
-    fEvaluateAcquireTimer = (float)((&appTimer)->GetSeconds() + fEvaluateAcquireTimer);
-    SetActorsAnimation(apActor, 0x201u, (bool)1);
+    apActor->SetAlert(true);
+    fEvaluateAcquireTimer = ((&appTimer)->GetSeconds() + fEvaluateAcquireTimer);
+    SetActorsAnimation(apActor, 0x201u, true);
     if (apActor->IsPathingComplete()) {
         SetCurrentActionComplete((uint8_t)1u);
         pSearchPackage->LookForTarget(&kTargetPos, apActor);
@@ -13459,13 +13511,13 @@ void HighProcess::SayGoodBye(Actor* apActor) {
     apActor->SetDialogueItemTarget(pPlayer);
     if (topic) {
         currentAIProcess = apActor->MobileObject::GetCurrentAIProcess();
-        currentAIProcess->ProcessGreet(apActor, topic, (bool)0, (bool)1, (bool)0, (bool)0);
+        currentAIProcess->ProcessGreet(apActor, topic, false, true, false, false);
     }
     if (((int32_t)apActor->GetSitSleepState()) == 0) {
         if ((!apActor->GetCurrentPackage()) ||
             ((currentPackage = apActor->GetCurrentPackage()), (((int32_t)currentPackage->GetPackType()) != 6))) {
             v3 = apActor->MobileObject::GetCurrentAIProcess();
-            v3->CreateFollownoEscort(apActor, (bool)1);
+            v3->CreateFollownoEscort(apActor, true);
         }
     }
 }
@@ -13479,16 +13531,16 @@ void HighProcess::ProcessGuardStartTravelAndReset(Actor* a2, GuardActorPackageDa
 bool HighProcess::ProcessEatOneHour(Actor* apActor, float afTimeDelta) {
     TESPackage* v5 = GetPackageThatIsRunning();
     if (!v5) {
-        return (bool)0;
+        return false;
     }
     EndMoveMessage(apActor);
-    if (v5->IsActorAtLocation(apActor, (bool)0, (-0x1p+0f), (bool)0) || (((int32_t)apActor->GetSitSleepState()) == 4)) {
+    if (v5->IsActorAtLocation(apActor, false, (-0x1p+0f), false) || (((int32_t)apActor->GetSitSleepState()) == 4)) {
         SetCurrentActionComplete((uint8_t)1u);
-        return (bool)0;
+        return false;
     }
     else {
         SetProcedureIndexRunning((uint32_t)0);
-        return (bool)1;
+        return true;
     }
 }
 
@@ -13499,7 +13551,7 @@ bool HighProcess::FadeUpdate(Actor* apActor) {
             fFadeAlpha = 1.0f;
             apActor->UpdateAlpha();
         }
-        return 0;
+        return false;
     }
     if (apActor == pPlayer) {
         double Seconds = appTimer.fDelta;
@@ -13526,7 +13578,7 @@ bool HighProcess::FadeUpdate(Actor* apActor) {
                 fFadeAlpha = fFadeAlpha - ffadeDelta;
                 if (fFadeAlpha < 0.0) {
                     fFadeAlpha = 0.0f;
-                    pTeleportFadeRef = 0;
+                    pTeleportFadeRef = nullptr;
                 }
             }
             goto LABEL_45;
@@ -13543,8 +13595,8 @@ bool HighProcess::FadeUpdate(Actor* apActor) {
                         );
                         ourFree(pMoveToFadeStruct);
                     }
-                    pMoveToFadeStruct = 0;
-                    pTeleportFadeRef = 0;
+                    pMoveToFadeStruct = nullptr;
+                    pTeleportFadeRef = nullptr;
                 }
             }
             goto LABEL_45;
@@ -13555,7 +13607,7 @@ bool HighProcess::FadeUpdate(Actor* apActor) {
             fFadeAlpha = fFadeAlpha - ffadeDelta;
             if (fFadeAlpha < 0.0) {
                 fFadeAlpha = 0.0f;
-                apActor->SetDelete(1);
+                apActor->SetDelete(true);
             }
         }
         else {
@@ -13574,32 +13626,32 @@ bool HighProcess::FadeUpdate(Actor* apActor) {
         if (fFadeAlpha < 0.0) {
             fFadeAlpha = 0.0f;
             TESObjectREFR* ptempref_2 = pTeleportFadeRef;
-            pTeleportFadeRef = 0;
+            pTeleportFadeRef = nullptr;
             if (ptempref_2) {
-                ptempref_2->Activate(apActor, 0, 0, 1);
+                ptempref_2->Activate(apActor, false, nullptr, 1);
             }
             if (apActor != pPlayer && apActor->GetDesiredProcessLevel()) {
                 eFadeState = HighProcess::FADE_NORMAL;
-                return 1;
+                return true;
             }
-            FadeIn(apActor, 1);
+            FadeIn(apActor, true);
         }
         goto LABEL_45;
     }
     fFadeAlpha = 1.0f;
     TESObjectREFR* ptempref = pTeleportFadeRef;
-    pTeleportFadeRef = 0;
+    pTeleportFadeRef = nullptr;
     if (ptempref) {
-        ptempref->Activate(apActor, 0, 0, 1);
+        ptempref->Activate(apActor, false, nullptr, 1);
     }
     eFadeState = HighProcess::FADE_NORMAL;
-    return 1;
+    return true;
 }
 
 void HighProcess::ProcessAlertSearch(Actor* pActor) {
     Animation* pAnim;
     if (GetPackageThatIsRunning()) {
-        pActor->SetAlert(1);
+        pActor->SetAlert(true);
         if (!pTarget) {
             SetTargetForPackage(pActor);
         }
@@ -13616,39 +13668,39 @@ void HighProcess::ProcessAlertSearch(Actor* pActor) {
 bool HighProcess::ProcessSleepOneHour(Actor* apActor, float afTimeDelta) {
     TESPackage* v5 = GetPackageThatIsRunning();
     if (!v5) {
-        return (bool)0;
+        return false;
     }
     EndMoveMessage(apActor);
-    if (v5->IsActorAtLocation(apActor, (bool)0, (-0x1p+0f), (bool)0) || (((int32_t)apActor->GetSitSleepState()) == 9)) {
+    if (v5->IsActorAtLocation(apActor, false, (-0x1p+0f), false) || (((int32_t)apActor->GetSitSleepState()) == 9)) {
         SetCurrentActionComplete((uint8_t)1u);
-        return (bool)0;
+        return false;
     }
     else {
         SetProcedureIndexRunning((uint32_t)0);
-        return (bool)0;
+        return false;
     }
 }
 
 void HighProcess::ProcessGuardIdle(Actor* a1, GuardActorPackageData* a2, bool a3) {
     bool v18;
     TESPackage* ppack = GetPackageThatIsRunning();
-    bool ballowWarnAndAttack = ppack->pPackLoc != 0;
+    bool ballowWarnAndAttack = ppack->pPackLoc != nullptr;
     TESObjectREFR* pguardedRef = GetTarget();
     if (ballowWarnAndAttack) {
-        v18 = ppack->IsActorAtLocation(a1, 0, -1.0f, 0);
+        v18 = ppack->IsActorAtLocation(a1, false, -1.0f, false);
     }
     else {
-        double DistanceFromReference = a1->GetDistanceFromReference(pguardedRef, 0, 0);
+        double DistanceFromReference = a1->GetDistanceFromReference(pguardedRef, false, false);
         v18 = static_cast<double>(ppack->GetPackageTarget()->iValue) > DistanceFromReference;
     }
     TESPackage* ppack_2 = GetPackageThatIsRunning();
     float FormFlags = static_cast<float>(ppack_2->GetPackageTarget()->iValue);
     float fguardSqrRadius_2 = FormFlags * FormFlags;
-    Actor* pwarnedActor = 0;
+    Actor* pwarnedActor = nullptr;
     BSSimpleList<DetectionState*>* plist = pDetectedActorList;
     TESPackage* v5 = GetPackageThatIsRunning();
     if (!v5->GetGuardWarnBehavior()) {
-        plist = 0;
+        plist = nullptr;
     }
     while (plist && !plist->IsEmpty()) {
         DetectionState* pstate = plist->m_item;
@@ -13659,7 +13711,7 @@ void HighProcess::ProcessGuardIdle(Actor* a1, GuardActorPackageData* a2, bool a3
                 if (ptargActor->pCurrentProcess) {
                     if (!ptargActor->pCurrentProcess->eLevel &&
                         (!ptargActor ||
-                         (!ptargActor->IsDead(0) &&
+                         (!ptargActor->IsDead(false) &&
                           (!ptargActor->IsDying() &&
                            (!ptargActor->IsKnockedOut() &&
                             (!ptargActor->IsParalyzed() && !ptargActor->IsUnConscious()))))) &&
@@ -13671,8 +13723,8 @@ void HighProcess::ProcessGuardIdle(Actor* a1, GuardActorPackageData* a2, bool a3
                         if (fguardSqrRadius_2 > static_cast<double>(fsqrDist)) {
                             FIGHT_REACTION ereaction = FIGHT_REACTION_NEUTRAL;
                             if (!pguardedRef ||
-                                ((!pguardedRef->GetOwner() || !pguardedRef->IsAnOwner(ptargActor, 1)) &&
-                                 a1->GetShouldAttackActor(ptargActor, 1, ereaction, 0))) {
+                                ((!pguardedRef->GetOwner() || !pguardedRef->IsAnOwner(ptargActor, true)) &&
+                                 a1->GetShouldAttackActor(ptargActor, true, ereaction, false))) {
                                 pwarnedActor = ptargActor;
                                 break;
                             }
@@ -13685,23 +13737,23 @@ void HighProcess::ProcessGuardIdle(Actor* a1, GuardActorPackageData* a2, bool a3
     if (pwarnedActor) {
         if (a3) {
             EndMoveMessage(a1);
-            a1->RequestRotate(pwarnedActor->GetLocationOnReference(), 0);
+            a1->RequestRotate(pwarnedActor->GetLocationOnReference(), false);
         }
         a2->SetTarget(pwarnedActor);
         SayGuardWarning(a1, a2);
         a2->eState = GuardActorPackageData::GUARD_STATE_WAIT_TO_ATTACK;
     }
     else {
-        ClearActionHeadTrackTarget(0);
-        ClearUseWeaponHeadTrackTarget(0);
+        ClearActionHeadTrackTarget(false);
+        ClearUseWeaponHeadTrackTarget(false);
         a1->ClearLookAtTarget();
         if (a3) {
-            bool bwandering = 0;
+            bool bwandering = false;
             if (ballowWarnAndAttack) {
                 TESPackage* v8 = GetPackageThatIsRunning();
                 if (v8->GetLocationRadius(a1)) {
-                    ProcessWander(a1, 0, -1.0f);
-                    bwandering = 1;
+                    ProcessWander(a1, nullptr, -1.0f);
+                    bwandering = true;
                 }
             }
             else {
@@ -13709,11 +13761,11 @@ void HighProcess::ProcessGuardIdle(Actor* a1, GuardActorPackageData* a2, bool a3
                     float fradius = std::sqrtf(fguardSqrRadius_2);
                     const NiPoint3* v9 = &pguardedRef->GetLocationOnReference();
                     ProcessWander(a1, v9, fradius);
-                    bwandering = 1;
+                    bwandering = true;
                 }
             }
             if (!bwandering) {
-                TESObjectREFR* plocRef = 0;
+                TESObjectREFR* plocRef = nullptr;
                 PackageLocation* ppackLoc = ppack->pPackLoc;
                 if (ppackLoc) {
                     plocRef = ppackLoc->GetLocReference();
@@ -13730,7 +13782,7 @@ void HighProcess::ProcessGuardIdle(Actor* a1, GuardActorPackageData* a2, bool a3
                         const NiPoint3* AngleOnReference = &a1->GetAngleOnReference();
                         float v15 = fgoalAngle - AngleOnReference->z;
                         if (std::fabs(v15) > 0.01745329238474369) {
-                            a1->RequestRotate(fgoalAngle, 1);
+                            a1->RequestRotate(fgoalAngle, true);
                         }
                     }
                 }
@@ -13747,7 +13799,7 @@ void HighProcess::SayGuardWarning(Actor* a1, GuardActorPackageData* a2) {
     TESTopic* Topic = TESTopic::GetTopic(DT_COMBAT, 20);
     a2->IncWarningCount();
     a2->ClearWarningTimer();
-    ProcessGreet(a1, Topic, 0, 0, 1, 0);
+    ProcessGreet(a1, Topic, false, false, true, false);
 }
 
 // Bubble-sorts the objects-to-acquire list by eType, highest first. The return value is the last list node the outer
@@ -13759,9 +13811,9 @@ BSSimpleList<ObjectstoAcquire*>* HighProcess::SortObjectsListByType() {
         if (!iCount) {
             return nullptr;
         }
-        bool bSwapped = 1;
+        bool bSwapped = true;
         while (iCount && bSwapped) {
-            bSwapped = 0;
+            bSwapped = false;
             for (BSSimpleList<ObjectstoAcquire*>* pNode = pList; pNode; pNode = pNode->GetNext()) {
                 ObjectstoAcquire* pItem = pList->m_item;
                 ObjectstoAcquire* pOther = pNode->m_item;
@@ -13769,7 +13821,7 @@ BSSimpleList<ObjectstoAcquire*>* HighProcess::SortObjectsListByType() {
                 if (static_cast<int32_t>(pItem->eType) > static_cast<int32_t>(pOther->eType)) {
                     pList->SetItem(pOther);
                     pNode->SetItem(pItem);
-                    bSwapped = 1;
+                    bSwapped = true;
                 }
             }
             pList = pList->GetNext();
@@ -13787,9 +13839,9 @@ BSSimpleList<ObjectstoAcquire*>* HighProcess::SortObjectsListByValue() {
         if (!iCount) {
             return nullptr;
         }
-        bool bSwapped = 1;
+        bool bSwapped = true;
         while (iCount && bSwapped) {
-            bSwapped = 0;
+            bSwapped = false;
             for (BSSimpleList<ObjectstoAcquire*>* pNode = pList; pNode; pNode = pNode->GetNext()) {
                 ObjectstoAcquire* pItem = pList->m_item;
                 ObjectstoAcquire* pOther = pNode->m_item;
@@ -13797,7 +13849,7 @@ BSSimpleList<ObjectstoAcquire*>* HighProcess::SortObjectsListByValue() {
                 if (static_cast<int32_t>(pItem->iWantValue) > static_cast<int32_t>(pOther->iWantValue)) {
                     pList->SetItem(pOther);
                     pNode->SetItem(pItem);
-                    bSwapped = 1;
+                    bSwapped = true;
                 }
             }
             pList = pList->GetNext();
@@ -13809,8 +13861,8 @@ BSSimpleList<ObjectstoAcquire*>* HighProcess::SortObjectsListByValue() {
 
 void HighProcess::ProcessWarning(Actor* apActor) {
     TESPackage* pbasepack = GetPackageThatIsRunning();
-    TrespassPackage* ppack = 0;
-    Actor* ptargetactor = 0;
+    TrespassPackage* ppack = nullptr;
+    Actor* ptargetactor = nullptr;
     if (!pTarget) {
         SetTargetForPackage(apActor);
     }
@@ -13824,7 +13876,7 @@ void HighProcess::ProcessWarning(Actor* apActor) {
             ppack = static_cast<TrespassPackage*>(pbasepack);
         }
     }
-    bool bflag = 0;
+    bool bflag = false;
     if (ppack) {
         if (ptargetactor) {
             if (ptargetactor->IsTresPassing()) {
@@ -13832,22 +13884,22 @@ void HighProcess::ProcessWarning(Actor* apActor) {
                 if ((ppack->GetPackType() == PACKAGE_TYPE_STEAL_WARNING ||
                      ppack->GetPackType() == PACKAGE_TYPE_PICKPOCKET_WARNING) &&
                     (ereaction = FIGHT_REACTION_NEUTRAL,
-                     apActor->GetShouldAttackActor(ptargetactor, 0, ereaction, 0))) {
-                    apActor->EndInterruptPackage(0);
-                    apActor->StartCombat(ptargetactor, 0, 0, 0, 0, 0, 1, 0);
+                     apActor->GetShouldAttackActor(ptargetactor, false, ereaction, false))) {
+                    apActor->EndInterruptPackage(false);
+                    apActor->StartCombat(ptargetactor, nullptr, false, false, false, 0, true, nullptr);
                 }
                 else {
                     if (ppack->fwarningtimer <= 0.0) {
                         TESForm* Owner = pPlayer->GetParentCell()->GetOwner();
                         Script::SetCrimeVictim(Owner);
                         TESTopic* pTopic = TESTopic::GetTopic(DT_COMBAT, 20);
-                        Script::SetCrimeVictim(0);
+                        Script::SetCrimeVictim(nullptr);
                         if (pTopic) {
-                            ProcessGreet(apActor, pTopic, 0, 0, 0, 0);
+                            ProcessGreet(apActor, pTopic, false, false, false, false);
                             float* v3 = &fAITrespassWarningTimer.Float();
                             ppack->ModWarningTimer(*v3);
                             ppack->ModWarning(1);
-                            bflag = 1;
+                            bflag = true;
                         }
                     }
                     if (bflag) {
@@ -13870,7 +13922,7 @@ void HighProcess::ProcessWarning(Actor* apActor) {
                 pTopic_2 = TESTopic::GetTopic(DT_COMBAT, 12);
             }
             BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
-            CurrentAIProcess->ProcessGreet(ptargetactor, pTopic_2, 0, 0, 1, 0);
+            CurrentAIProcess->ProcessGreet(ptargetactor, pTopic_2, false, false, true, false);
             AddToProcedureIndexRunning(apActor, 1);
         }
     }
@@ -13906,18 +13958,18 @@ void HighProcess::ProcessCreateFollow(Actor* apActor) {
                 if (i >= inewFollowersNeeded) {
                     goto LABEL_28;
                 }
-                TESObjectREFR* EscortTargetForPackage = ppack->GetEscortTargetForPackage(apActor, 1);
+                TESObjectREFR* EscortTargetForPackage = ppack->GetEscortTargetForPackage(apActor, true);
                 SetTarget(EscortTargetForPackage);
                 if (!pTarget) {
                     break;
                 }
                 if (pTarget->IsActor()) {
                     if (pTarget == pPlayer) {
-                        bescortIncludesPlayer = 1;
+                        bescortIncludesPlayer = true;
                         --v26;
                     }
                     else {
-                        CreateFollowforEscort(apActor, ppack, 0);
+                        CreateFollowforEscort(apActor, ppack, false);
                         EscortActorPackageData* pescortData_3 =
                             static_cast<EscortActorPackageData*>(GetInstanceDataThatIsRunning());
                         ActorPackageData* pdata = pescortData_3;
@@ -13975,9 +14027,9 @@ void HighProcess::ProcessSurface(Actor* apActor) {
                 PathingRequest request;
                 float afRadius = fsurfaceGoalRadius;
                 TESWorldSpace* WorldSpace = apActor->GetWorldSpace();
-                apActor->BuildRequest(&request, surfacepos, apActor->GetParentCell(), WorldSpace, afRadius, 0);
+                apActor->BuildRequest(&request, surfacepos, apActor->GetParentCell(), WorldSpace, afRadius, nullptr);
                 request.SetGoalZDelta(fsurfaceGoalRadius);
-                request.SetGoDirectIfPathingFails(1);
+                request.SetGoDirectIfPathingFails(true);
                 apActor->SetPathfindingGoal(&request);
             }
         }
@@ -14027,10 +14079,10 @@ bool HighProcess::ShouldWaitForEscortTarget(
         *abSlowDownOut = fdistSqrSlowDown < static_cast<double>(fdistSqrMeToEscortedActor_2);
     }
     if (!(fdistSqrWait < static_cast<double>(fdistSqrMeToEscortedActor_2))) {
-        return 0;
+        return false;
     }
     if (abSlowDownOut) {
-        *abSlowDownOut = 0;
+        *abSlowDownOut = false;
     }
     TESObjectCELL* pgoalCell = goalLoc.GetCell();
     TESWorldSpace* pgoalSpace = goalLoc.pWorldSpace;
@@ -14045,16 +14097,16 @@ bool HighProcess::ShouldWaitForEscortTarget(
         if (v29->TryPop(&apThis_8)) {
             ActorPathingMessageQueue* v28 = this->spEscortedToGoalMessageQueue.m_pObject;
             if (v28->TryPop(&v46)) {
-                this->spMeToGoalRequest.operator=(static_cast<PathingRequest*>(0));
-                this->spEscortedToGoalRequest.operator=(static_cast<PathingRequest*>(0));
-                this->spMeToGoalMessageQueue.operator=(static_cast<ActorPathingMessageQueue*>(0));
-                this->spEscortedToGoalMessageQueue.operator=(static_cast<ActorPathingMessageQueue*>(0));
+                this->spMeToGoalRequest.operator=(static_cast<PathingRequest*>(nullptr));
+                this->spEscortedToGoalRequest.operator=(static_cast<PathingRequest*>(nullptr));
+                this->spMeToGoalMessageQueue.operator=(static_cast<ActorPathingMessageQueue*>(nullptr));
+                this->spEscortedToGoalMessageQueue.operator=(static_cast<ActorPathingMessageQueue*>(nullptr));
                 if (apThis_8.spSolution.m_pObject) {
                     if (v46.spSolution.m_pObject) {
                         float distMeToGoal = apThis_8.spSolution.m_pObject->ComputeVirtualPathLength();
                         float distEscortedActorToGoal = v46.spSolution.m_pObject->ComputeVirtualPathLength();
                         if (distEscortedActorToGoal > static_cast<double>(distMeToGoal)) {
-                            return 1;
+                            return true;
                         }
                     }
                 }
@@ -14072,7 +14124,7 @@ bool HighProcess::ShouldWaitForEscortTarget(
             v26 = ::new (v44) PathingRequest;
         }
         else {
-            v26 = 0;
+            v26 = nullptr;
         }
         this->spMeToGoalRequest.operator=(v26);
         this->spMeToGoalRequest.m_pObject->Initialize(apActor);
@@ -14083,7 +14135,7 @@ bool HighProcess::ShouldWaitForEscortTarget(
             v25 = ::new (apMemory) ActorPathingMessageQueue;
         }
         else {
-            v25 = 0;
+            v25 = nullptr;
         }
         this->spMeToGoalMessageQueue.operator=(v25);
         // Both smart pointers are passed by value and BuildPath releases them.
@@ -14094,7 +14146,7 @@ bool HighProcess::ShouldWaitForEscortTarget(
             v20 = ::new (v38) PathingRequest;
         }
         else {
-            v20 = 0;
+            v20 = nullptr;
         }
         this->spEscortedToGoalRequest.operator=(v20);
         this->spEscortedToGoalRequest.m_pObject->Initialize(apEscortedActor);
@@ -14106,7 +14158,7 @@ bool HighProcess::ShouldWaitForEscortTarget(
             v19 = ::new (v36) ActorPathingMessageQueue;
         }
         else {
-            v19 = 0;
+            v19 = nullptr;
         }
         this->spEscortedToGoalMessageQueue.operator=(v19);
         PathManager::QInstance()->BuildPath(this->spEscortedToGoalRequest, this->spEscortedToGoalMessageQueue, true);
@@ -14132,7 +14184,7 @@ void HighProcess::DetectDoorsForPathing(Actor* apActor) {
         NiPoint3 playerextents;
         float* v2 = &fINIDetectDoorsForPathingTime.Float();
         fDetectDoorForPathingTimer = RandomFloat(0.8f, 1.2f) * *v2;
-        TESObjectREFR* pfoundDoor = 0;
+        TESObjectREFR* pfoundDoor = nullptr;
         if (!apActor->pCurrentProcess->GetBSBound() || !apActor->Get3D()) {
             goto LABEL_21;
         }
@@ -14214,7 +14266,7 @@ void HighProcess::EvaluateBoneLod(MobileObject* apRef) {
         }
         else {
             if (apRef != pPlayer) {
-                bool bvisible = 1;
+                bool bvisible = true;
                 NiNode* pparent = apRef->Get3D()->m_pkParent;
                 if (pparent && NiObject::IsExactKindOf(&BSMultiBoundRoom::ms_RTTI, pparent)) {
                     BSMultiBound* pMultiBound = static_cast<BSMultiBoundRoom*>(pparent)->QMultiBound();
@@ -14259,7 +14311,7 @@ void HighProcess::ProcessBackUp(Actor* apActor) {
     NiPoint3 vDestination;
     TESPackage* pPack = GetPackageThatIsRunning();
     BackUpPackage* pBackUpPack = dynamic_cast<BackUpPackage*>(pPack);
-    bool bIgnoreDistance = 0;
+    bool bIgnoreDistance = false;
     if (pPack) {
         if (pBackUpPack) {
             PACKAGE_TYPE epackType = pPack->GetPackType();
@@ -14269,11 +14321,11 @@ void HighProcess::ProcessBackUp(Actor* apActor) {
                 bool v22 = epackType != PACKAGE_TYPE_SANDBOX && epackType != PACKAGE_TYPE_WANDER;
                 pBackUpPack->GetBackUpPoint(&vDestination);
                 float fcurrentdistance = apActor->GetDistanceFromPoint(vDestination);
-                bool batRef = 0;
+                bool batRef = false;
                 if (apActor->IsPathingComplete() || apActor == pPlayer) {
-                    batRef = apActor->IsAtPoint(vDestination, 75.0f, 1, 0);
+                    batRef = apActor->IsAtPoint(vDestination, 75.0f, true, false);
                 }
-                float fdistance = pPack->GetPackageRadiusActorToLocation(apActor, 0);
+                float fdistance = pPack->GetPackageRadiusActorToLocation(apActor, false);
                 if ((!batRef || !apActor->IsPathingComplete()) && !DidPathingFail(apActor)) {
                     goto LABEL_87;
                 }
@@ -14299,7 +14351,7 @@ void HighProcess::ProcessBackUp(Actor* apActor) {
                             ParentCell, *v14, 5000.0f, *v16, 5000.0f, &LowProcess::LockDoorsatLocation, apActor
                         );
                     }
-                    SetLockedLocation(1);
+                    SetLockedLocation(true);
                 }
                 if (pPack->GetUnlockDoorsAtLocation()) {
                     const NiPoint3* v17 = &apActor->GetLocationOnReference();
@@ -14317,7 +14369,8 @@ void HighProcess::ProcessBackUp(Actor* apActor) {
                     }
                     if (!batRef &&
                         (apActor->IsPathingComplete() &&
-                         (!pPack->IsActorAtLocation(apActor, bIgnoreDistance, -1.0f, 0) && !DidPathingFail(apActor)))) {
+                         (!pPack->IsActorAtLocation(apActor, bIgnoreDistance, -1.0f, false) &&
+                          !DidPathingFail(apActor)))) {
                         if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
                             GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
                             apActor->InitiateGetUpPackage();
@@ -14327,9 +14380,9 @@ void HighProcess::ProcessBackUp(Actor* apActor) {
                             PathingRequest request;
                             TESWorldSpace* afRadius2 = pPack->GetLocationWorld(apActor);
                             TESObjectCELL* LocationCell = pPack->GetLocationCell(apActor);
-                            apActor->BuildRequest(&request, vDestination, LocationCell, afRadius2, fdistance, 0);
+                            apActor->BuildRequest(&request, vDestination, LocationCell, afRadius2, fdistance, nullptr);
                             apActor->ForceMoveMode(514u);
-                            request.SetSoftGoalRadius(0);
+                            request.SetSoftGoalRadius(false);
                             if (!apActor->SetPathfindingGoal(&request)) {
                                 return;
                             }
@@ -14343,7 +14396,7 @@ void HighProcess::ProcessBackUp(Actor* apActor) {
                     }
                     if (!batRef && apActor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
                         float v30 = 0.0f;
-                        Actor* plocactor = 0;
+                        Actor* plocactor = nullptr;
                         if (pPack->pPackLoc) {
                             TESObjectREFR* plocref = pPack->pPackLoc->GetLocReference();
                             if (!plocref) {
@@ -14364,10 +14417,10 @@ void HighProcess::ProcessBackUp(Actor* apActor) {
                                 PathingRequest request_2;
                                 TESWorldSpace* WorldSpace = plocactor->GetWorldSpace();
                                 apActor->BuildRequest(
-                                    &request_2, vDestination, plocactor->GetParentCell(), WorldSpace, fdistance, 0
+                                    &request_2, vDestination, plocactor->GetParentCell(), WorldSpace, fdistance, nullptr
                                 );
                                 request_2.SetGoalAngleToFace(0.0f);
-                                request_2.SetSoftGoalRadius(0);
+                                request_2.SetSoftGoalRadius(false);
                                 apActor->ForceMoveMode(514u);
                                 if (!apActor->SetPathfindingGoal(&request_2)) {
                                     return;
@@ -14382,20 +14435,21 @@ void HighProcess::ProcessBackUp(Actor* apActor) {
                             }
                             else {
                                 if (emovemode == -1) {
-                                    bool bflag = 0;
+                                    bool bflag = false;
                                     if (GetCurrentPackage()) {
                                         TESPackage* v11;
                                         TESPackage* v10 = GetCurrentPackage();
                                         if (v10->GetPackType() == PACKAGE_TYPE_ALARM ||
                                             (v11 = GetCurrentPackage(), v11->GetPackType() == PACKAGE_TYPE_COMBAT)) {
-                                            bflag = 1;
+                                            bflag = true;
                                         }
                                     }
                                     float v21 = fdistance + fdistance;
-                                    emovemode = CalculateMoveMode(apActor, fcurrentdistance, fdistance, v21, bflag, 1);
+                                    emovemode =
+                                        CalculateMoveMode(apActor, fcurrentdistance, fdistance, v21, bflag, true);
                                 }
                             }
-                            SetActorsAnimation(apActor, emovemode, 1);
+                            SetActorsAnimation(apActor, emovemode, true);
                             NiPoint3 entryPoint = pPack->GetLocationCoord(apActor);
                         }
                     }
@@ -14423,9 +14477,9 @@ void HighProcess::ProcessSurfaceOneHour(Actor* apActor) {
         PathingRequest request;
         float afRadius = fsurfaceGoalRadius;
         TESWorldSpace* WorldSpace = apActor->GetWorldSpace();
-        apActor->BuildRequest(&request, surfacepos, apActor->GetParentCell(), WorldSpace, afRadius, 0);
+        apActor->BuildRequest(&request, surfacepos, apActor->GetParentCell(), WorldSpace, afRadius, nullptr);
         request.SetGoalZDelta(fsurfaceGoalRadius);
-        request.SetGoDirectIfPathingFails(1);
+        request.SetGoDirectIfPathingFails(true);
         apActor->SetPathfindingGoal(&request);
         ClearRunOncePackage();
     }
@@ -14435,12 +14489,12 @@ bool HighProcess::ProcessWanderOneHour(Actor* apActor, float afTimeDelta) {
     FNVD_INLINED_LOCAL(PathingLocation, result_1, std::nullopt, std::nullopt);
     NiPoint3 apMemory_192;
     if (!apActor->GetParentCell()) {
-        return 0;
+        return false;
     }
-    TESPackage* apMemory_188 = 0;
+    TESPackage* apMemory_188 = nullptr;
     apMemory_188 = GetPackageThatIsRunning();
     if (!apMemory_188) {
-        return 0;
+        return false;
     }
     if (apMemory_188->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_EXPLORE_WANDER) {
         AddToProcedureIndexRunning(apActor, -1);
@@ -14449,7 +14503,7 @@ bool HighProcess::ProcessWanderOneHour(Actor* apActor, float afTimeDelta) {
     TESObjectCELL* apMemory_204 = apActor->GetParentCell();
     if (!apMemory_204) {
         TESWorldSpace* WorldSpace = apActor->GetWorldSpace();
-        apMemory_204 = pDataHandler->GetCellFromWorldCoord(apMemory_192.x, apMemory_192.y, WorldSpace, 0);
+        apMemory_204 = pDataHandler->GetCellFromWorldCoord(apMemory_192.x, apMemory_192.y, WorldSpace, false);
     }
     PathingRequestClosePoint v11;
     PathingLocation* apOrigin = ::new (&result_1) PathingLocation(&apMemory_192, apMemory_204);
@@ -14463,7 +14517,7 @@ bool HighProcess::ProcessWanderOneHour(Actor* apActor, float afTimeDelta) {
         ProcessGetUpOneHour(apActor);
     }
     TESWorldSpace* v5 = apActor->GetWorldSpace();
-    apActor->SetPathfindingGoal(apMemory_192, apActor->GetParentCell(), v5, 100.0f, 0);
+    apActor->SetPathfindingGoal(apMemory_192, apActor->GetParentCell(), v5, 100.0f, nullptr);
     if (Interface::GetConsoleSelection() == apActor) {
         char Format[308];
         std::sprintf(
@@ -14472,11 +14526,11 @@ bool HighProcess::ProcessWanderOneHour(Actor* apActor, float afTimeDelta) {
         );
         Interface::PrintLine(static_cast<const char*>(Format));
     }
-    return 0;
+    return false;
 }
 
 bool HighProcess::IsGroupAlreadyInList(CombatGroup* pgroup) {
-    bool bflag = 0;
+    bool bflag = false;
     for (BSSimpleList<StartCombatStates*>* plist = &GroupsToHelpList; plist && (plist->m_item && !bflag);
          plist = plist->m_pkNext) {
         bflag = pgroup == plist->m_item->pGroup;
@@ -14491,16 +14545,16 @@ bool HighProcess::AimAtTarget(Actor* apActor, TESObjectREFR* apTarget, bool abHi
     NiPoint3 result;
     NiPoint3 difference;
     if (!apTarget) {
-        return 0;
+        return false;
     }
     NiPoint3 a2 = NiPoint3_ZERO;
     NiPoint3 v24 = NiPoint3_ZERO;
     TESObjectWEAP* weapon = apActor->GetCurrentWeapon();
     if (weapon) {
-        pProjectile = weapon->GetProjectile(0);
+        pProjectile = weapon->GetProjectile(nullptr);
     }
     else {
-        pProjectile = 0;
+        pProjectile = nullptr;
     }
     if (weapon) {
         AttackerFiringLocation = &(result = weapon->CalculateReleasePoint(apActor));
@@ -14529,7 +14583,7 @@ bool HighProcess::AimAtTarget(Actor* apActor, TESObjectREFR* apTarget, bool abHi
         a2 = (akPos = CombatUtilities::GetTargetFiringLocation(apTarget, ACTOR_SEGMENT_INVIEW_MIDDLE));
     }
     apActor->SetLookAtTarget(a2);
-    bAimingTarget = 1;
+    bAimingTarget = true;
     if (!weapon || weapon->IsMeleeWeapon()) {
         return CombatUtilities::IsTargetWithinStrikeAngle(apActor, apTarget, nullptr);
     }
@@ -14539,7 +14593,7 @@ bool HighProcess::AimAtTarget(Actor* apActor, TESObjectREFR* apTarget, bool abHi
     difference = *v6 - a2;
     double v7 = difference.SqrLength();
     bool v19 = sightUsage * sightUsage < v7;
-    apActor->SetIronSights(v19, 0, 0);
+    apActor->SetIronSights(v19, false, false);
     return CombatUtilities::IsTargetWithinFiringArc(apActor, a2, 0.08726646f, 0.08726646f);
 }
 
@@ -14550,7 +14604,7 @@ void HighProcess::CleanUpAfterProcessUseWeapon(Actor* apActor) {
         int32_t sBurstsFired = this->sBurstsFired;
         if (sBurstsFired >= ppackData->sBurstCount) {
             if (GetCurrentWeapon()) {
-                TESObjectWEAP* pweap = 0;
+                TESObjectWEAP* pweap = nullptr;
                 TESBoundObject* pweapBound = GetCurrentWeapon()->pContainerObj;
                 if (pweapBound) {
                     if (pweapBound->GetFormType() == WEAP_ID) {
@@ -14559,8 +14613,8 @@ void HighProcess::CleanUpAfterProcessUseWeapon(Actor* apActor) {
                 }
                 if (pweap) {
                     if (pweap->IsThrownWeapon()) {
-                        apActor->SetWantWeaponDrawn(0);
-                        apActor->QueueUnEquipObject(pweapBound, 1, 0, 0, 0, 1);
+                        apActor->SetWantWeaponDrawn(false);
+                        apActor->QueueUnEquipObject(pweapBound, 1, nullptr, false, false, true);
                     }
                 }
             }
@@ -14568,11 +14622,11 @@ void HighProcess::CleanUpAfterProcessUseWeapon(Actor* apActor) {
     }
     apActor->ClearLookAtTarget();
     apActor->SetLooking(0.0f);
-    apActor->SetIronSights(0, 0, 0);
-    apActor->SetForceSneak(0);
+    apActor->SetIronSights(false, false, false);
+    apActor->SetForceSneak(false);
     FreeUpSpecialIdle(apActor);
     ClearShootingAction(apActor);
-    ClearUseWeaponHeadTrackTarget(1);
+    ClearUseWeaponHeadTrackTarget(true);
     if (!apActor->IsPathingComplete()) {
         EndMoveMessage(apActor);
     }
@@ -14582,13 +14636,13 @@ bool HighProcess::ObserveCombat(Actor* apActor, Actor* apTarget) {
     StartCombatStates* a2;
     PlayerCharacter* v10 = static_cast<PlayerCharacter*>(apTarget->GetCombatTarget());
     FIGHT_REACTION a4 = FIGHT_REACTION_NEUTRAL;
-    if (apActor->GetShouldHelp(apTarget) || (v10 && apActor->GetShouldAttackActor(v10, 0, a4, 0))) {
-        return 0;
+    if (apActor->GetShouldHelp(apTarget) || (v10 && apActor->GetShouldAttackActor(v10, false, a4, false))) {
+        return false;
     }
     if ((apTarget == pPlayer || (apTarget->GetCombatController() && apTarget->GetCombatTarget())) &&
         !apActor->ShouldSkipFallOutBehavior(FALLOUT_BEHAVIORS_OBSERVE_COMBAT_BEHAVIOR) && !apActor->IsAlarmed() &&
         !apActor->IsInCombat()) {
-        double DistanceFromReference = apTarget->GetDistanceFromReference(apActor, 0, 1);
+        double DistanceFromReference = apTarget->GetDistanceFromReference(apActor, false, true);
         if (fAIExteriorSpectatorDetection.Float() >= DistanceFromReference) {
             StartCombatStates* started;
             StartCombatStates* HighProcess__UnkCombatTarget =
@@ -14597,16 +14651,16 @@ bool HighProcess::ObserveCombat(Actor* apActor, Actor* apTarget) {
                 started = ::new (HighProcess__UnkCombatTarget) StartCombatStates;
             }
             else {
-                started = 0;
+                started = nullptr;
             }
             a2 = started;
             started->pTarget = apTarget;
             a2->pGroup = apTarget->GetCombatGroup();
-            a2->bSpectatorOfCombat = 1;
+            a2->bSpectatorOfCombat = true;
             SpectatorList.AddHead(a2);
         }
     }
-    return 0;
+    return false;
 }
 
 void HighProcess::ProcessGuardWaitToAttack(Actor* apActor, GuardActorPackageData* apData) {
@@ -14616,14 +14670,14 @@ void HighProcess::ProcessGuardWaitToAttack(Actor* apActor, GuardActorPackageData
         v27 = 1;
         if (apActor->IsImmobile()) {
             if (pwarnedActor) {
-                ProcessGreet(pwarnedActor, 0, 0, 0, 0, 0);
+                ProcessGreet(pwarnedActor, nullptr, false, false, false, false);
             }
         }
     }
     TESObjectREFR* pguardedRef = GetTarget();
     if (!pguardedRef ||
         (!pwarnedActor ||
-         (pwarnedActor->IsDead(0) ||
+         (pwarnedActor->IsDead(false) ||
           (pwarnedActor->IsDying() ||
            (pwarnedActor->IsKnockedOut() || (pwarnedActor->IsParalyzed() || pwarnedActor->IsUnConscious())))))) {
         apData->eState = GuardActorPackageData::GUARD_STATE_INIT;
@@ -14637,7 +14691,7 @@ void HighProcess::ProcessGuardWaitToAttack(Actor* apActor, GuardActorPackageData
         float v31 = FormFlags * FormFlags;
         v32 = v32 * v32;
         char v29 = 0;
-        bool v33 = 0;
+        bool v33 = false;
         const NiPoint3* v9 = &pguardedRef->GetLocationOnReference();
         const NiPoint3* v4 = &pwarnedActor->GetLocationOnReference();
         float v34 = (*v4 - *v9).SqrLength();
@@ -14653,7 +14707,7 @@ void HighProcess::ProcessGuardWaitToAttack(Actor* apActor, GuardActorPackageData
         }
         SetActionHeadTrackTarget(plookAt);
         if (v29) {
-            AimAtTarget(apActor, pwarnedActor, 0);
+            AimAtTarget(apActor, pwarnedActor, false);
         }
         else {
             apActor->ClearLookAtTarget();
@@ -14663,17 +14717,17 @@ void HighProcess::ProcessGuardWaitToAttack(Actor* apActor, GuardActorPackageData
             float* v6 = &fAIIdleWaitTime.Float();
             SetIdleTimer(*v6);
             if (!panim->SpecialIdleDonePlaying()) {
-                panim->SpecialIdleFree(1, 0);
+                panim->SpecialIdleFree(true, false);
             }
-            bWeaponAlertDrawn = 1;
+            bWeaponAlertDrawn = true;
             if (!apActor->IsWeaponDrawn()) {
-                apActor->SetWantWeaponDrawn(1);
+                apActor->SetWantWeaponDrawn(true);
             }
             if (apActor->GetCurrentWeapon()) {
                 if (apActor->IsWeaponDrawn()) {
                     TESObjectWEAP* CurrentWeapon = apActor->GetCurrentWeapon();
                     if (CurrentWeapon->IsGunWeapon()) {
-                        SetIronSights(1);
+                        SetIronSights(true);
                     }
                 }
             }
@@ -14682,7 +14736,7 @@ void HighProcess::ProcessGuardWaitToAttack(Actor* apActor, GuardActorPackageData
                 float Seconds = appTimer.fDelta;
                 apData->UpdateWarningTimer(Seconds);
                 bool battack = v33;
-                bool bwarn = 0;
+                bool bwarn = false;
                 if (!v33) {
                     double PackageStartTime = apData->fGuardTimer;
                     if (fWarningTimer.Float() <= PackageStartTime) {
@@ -14692,7 +14746,7 @@ void HighProcess::ProcessGuardWaitToAttack(Actor* apActor, GuardActorPackageData
                             pdata = ppack->GetGuardPackageData();
                         }
                         else {
-                            pdata = 0;
+                            pdata = nullptr;
                         }
                         int32_t imaxWarningCount;
                         if (pdata) {
@@ -14707,7 +14761,10 @@ void HighProcess::ProcessGuardWaitToAttack(Actor* apActor, GuardActorPackageData
                     }
                 }
                 if (battack) {
-                    if (EnterCombat(apActor, apData->pGuardWarnedActor, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0)) {
+                    if (EnterCombat(
+                            apActor, apData->pGuardWarnedActor, false, false, nullptr, false, false, false, 0, false,
+                            false, true, nullptr
+                        )) {
                         ActorPackageData* pactorPackageData = CurrentPackage.pData;
                         if (pactorPackageData == apData) {
                             apData->eState = GuardActorPackageData::GUARD_STATE_INIT;
@@ -14722,25 +14779,25 @@ void HighProcess::ProcessGuardWaitToAttack(Actor* apActor, GuardActorPackageData
             }
         }
         else {
-            SetIronSights(0);
+            SetIronSights(false);
             TESPackage* ppack_2 = GetPackageThatIsRunning();
             if (!ppack_2 || !ppack_2->GetDrawWeaponFlag()) {
-                apActor->SetWantWeaponDrawn(0);
+                apActor->SetWantWeaponDrawn(false);
             }
             apData->eState = GuardActorPackageData::GUARD_STATE_IDLE;
             apData->ClearWarningTimer();
             apData->ClearWarningCount();
-            ClearUseWeaponHeadTrackTarget(1);
+            ClearUseWeaponHeadTrackTarget(true);
         }
     }
 }
 
 void HighProcess::FireAtObject(Actor* apActor, TESObjectWEAP* apWeapon) {
     if (CanAttack()) {
-        bool battack = 0;
+        bool battack = false;
         Animation* panim = apActor->GetAnimation();
         if (apWeapon->IsAutomaticWeapon()) {
-            bool v7 = 1;
+            bool v7 = true;
             uint8_t cshotsToFire = GetAutomaticShotsToFire(apActor);
             uint16_t Group = panim->GetGroup(AGS_WEAPON);
             if (TESAnimGroup::IsAttackSpinAction(Group)) {
@@ -14749,14 +14806,14 @@ void HighProcess::FireAtObject(Actor* apActor, TESObjectWEAP* apWeapon) {
             if (v7) {
                 if (cshotsToFire) {
                     SetShotsToFire(cshotsToFire);
-                    battack = 1;
+                    battack = true;
                 }
             }
         }
         else {
             ANIMATION_ACTION v5 = GetAnimAction();
             if (v5 == ANIM_ACTION_NONE || v5 == ANIM_ACTION_ATTACK_FOLLOW_THROUGH) {
-                battack = 1;
+                battack = true;
             }
         }
         if (battack) {
@@ -14769,7 +14826,7 @@ void HighProcess::FireAtObject(Actor* apActor, TESObjectWEAP* apWeapon) {
                     eattack_2 = ANIM_GROUP_POWER_ATTACK_STOP;
                 }
                 else {
-                    switch (panim->FindSwitchKey(0)) {
+                    switch (panim->FindSwitchKey(nullptr)) {
                         case 51: {
                             eattack_2 = ANIM_GROUP_ATTACK_3;
                             break;
@@ -14831,7 +14888,7 @@ void HighProcess::FreeAvoidNodes() {
         if (pListOfAvoidAreas) {
             delete static_cast<BSSimpleList<ActiveEffect*>*>(pListOfAvoidAreas);
         }
-        this->pListOfAvoidAreas = 0;
+        this->pListOfAvoidAreas = nullptr;
     }
 }
 
@@ -14841,10 +14898,10 @@ void HighProcess::FreeAvoidNodes() {
 bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
     TESPackage* pPack = GetPackageThatIsRunning();
     if (!pPack) {
-        return 0;
+        return false;
     }
     ItemChange* pitem = apActor->GetItemBeingEscorted();
-    bool bManyflag = 0;
+    bool bManyflag = false;
     if (!pitem) {
         uint32_t v4;
         if (!pTarget || (!pTarget->IsActor() && (v4 = pTarget->iFormID, !apActor->HasObjectId(v4)))) {
@@ -14856,7 +14913,7 @@ bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
                 if (!apActor->IsPathingComplete()) {
                     EndMoveMessage(apActor);
                 }
-                return 0;
+                return false;
             }
         }
     }
@@ -14864,21 +14921,21 @@ bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
         if (this->pAcquireObject) {
             if (this->pAcquireObject->pRef == apActor) {
                 pitem = apActor->GetInventoryItem(this->pAcquireObject->pObject, 0);
-                bManyflag = 1;
+                bManyflag = true;
             }
         }
     }
-    bool bIsActor = 0;
+    bool bIsActor = false;
     if (pTarget) {
         if (pTarget->IsActor() && pTarget != apActor) {
-            bIsActor = 1;
+            bIsActor = true;
             Actor* pact = static_cast<Actor*>(pTarget);
             BaseProcess* CurrentAIProcess = pact->pCurrentProcess;
             TESPackage* prun = CurrentAIProcess->GetCurrentPackage();
             if (pTarget != pPlayer &&
                 (!prun || (prun->GetPackType() != PACKAGE_TYPE_FOLLOW && !prun->GetIsCreated()))) {
                 SetProcedureIndexRunning(0);
-                return 0;
+                return false;
             }
         }
     }
@@ -14889,7 +14946,7 @@ bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
         distance = *v6 - *v22;
     }
     float fwaitdistance = 0.0f;
-    TESObjectREFR* ptarg = 0;
+    TESObjectREFR* ptarg = nullptr;
     if (bIsActor) {
         ptarg = pTarget;
         fwaitdistance = 0.0f;
@@ -14912,7 +14969,7 @@ bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
             }
         }
     }
-    if (pPack->pPackLoc && pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+    if (pPack->pPackLoc && pPack->IsActorAtLocation(apActor, false, -1.0f, false)) {
         NiPoint3 fMydistance;
         NiPoint3 ftargdistance;
         if (!bIsActor) {
@@ -14921,7 +14978,7 @@ bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
             ppackloc = pPack->pPackLoc;
             ppacktarg_2 = pPack->GetPackageTarget();
             if (pitem) {
-                ExtraDataList* plist = 0;
+                ExtraDataList* plist = nullptr;
                 if (pitem->pExtraObjectList) {
                     plist = pitem->pExtraObjectList->m_item;
                 }
@@ -14939,13 +14996,13 @@ bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
                 if (pcont && pcont->HasContainer()) {
                     int32_t InitialTargetCount = pPack->GetInitialTargetCount();
                     apActor->PutItemInReference(pitem->pContainerObj, plist, pcont, InitialTargetCount, id);
-                    bActivateAnim = 0;
+                    bActivateAnim = false;
                 }
                 else {
                     if (pitem->pExtraObjectList) {
                         plist = pitem->pExtraObjectList->m_item;
                     }
-                    const NiPoint3* ppoint = 0;
+                    const NiPoint3* ppoint = nullptr;
                     if (ppackloc) {
                         TESObjectREFR* pref = ppackloc->GetLocReference();
                         if (!pref) {
@@ -14961,8 +15018,8 @@ bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
                         }
                     }
                     int32_t inumber = pPack->GetInitialTargetCount();
-                    apActor->DropObject(pitem->pContainerObj, plist, inumber, ppoint, 0);
-                    bActivateAnim = 0;
+                    apActor->DropObject(pitem->pContainerObj, plist, inumber, ppoint, nullptr);
+                    bActivateAnim = false;
                 }
                 ItemChange* v38 = pitem;
                 ItemChange* pitem_2 = pitem;
@@ -14982,7 +15039,7 @@ bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
                         if (pAcquireObject) {
                             delete static_cast<Date*>(v37);
                         }
-                        this->pAcquireObject = 0;
+                        this->pAcquireObject = nullptr;
                         if (pcont && pcont->HasContainer()) {
                             int32_t v11 = pPack->GetInitialTargetCount();
                             apActor->PutItemInReference(pitem->pContainerObj, plist, pcont, v11, id);
@@ -14991,7 +15048,7 @@ bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
                             if (pitem->pExtraObjectList) {
                                 plist = pitem->pExtraObjectList->m_item;
                             }
-                            const NiPoint3* ppoint_2 = 0;
+                            const NiPoint3* ppoint_2 = nullptr;
                             if (ppackloc) {
                                 TESObjectREFR* pref_2 = ppackloc->GetLocReference();
                                 if (!pref_2) {
@@ -15007,46 +15064,46 @@ bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
                                 }
                             }
                             int32_t inumber_2 = pPack->GetInitialTargetCount();
-                            apActor->DropObject(pitem->pContainerObj, plist, inumber_2, ppoint_2, 0);
+                            apActor->DropObject(pitem->pContainerObj, plist, inumber_2, ppoint_2, nullptr);
                         }
                         ItemChange* v34 = pitem;
                         ItemChange* pitem_3 = pitem;
                         if (pitem) {
                             delete pitem_3;
                         }
-                        pitem = 0;
+                        pitem = nullptr;
                     }
-                    bool abweararmor = 1;
-                    bool abwearweapon = 1;
+                    bool abweararmor = true;
+                    bool abwearweapon = true;
                     if (GetCurrentPackage()) {
                         TESPackage* v14 = GetCurrentPackage();
                         if (v14->GetForceUnequipWeapon()) {
-                            abwearweapon = 0;
+                            abwearweapon = false;
                         }
                     }
                     if (apActor->IsNpc()) {
                         TESNPC* pnpc = static_cast<TESNPC*>(apActor->GetObjectReference());
                         if (pnpc) {
-                            pnpc->InitDefaultWorn(apActor, abweararmor, abwearweapon, 0, 1);
+                            pnpc->InitDefaultWorn(apActor, abweararmor, abwearweapon, false, true);
                         }
                     }
                     else {
                         if (apActor->IsCreature()) {
                             TESCreature* pcrea = static_cast<TESCreature*>(apActor->GetObjectReference());
                             if (pcrea) {
-                                pcrea->InitDefaultWorn(apActor, abweararmor, abwearweapon, 1);
+                                pcrea->InitDefaultWorn(apActor, abweararmor, abwearweapon, true);
                             }
                         }
                     }
                 }
-                SetCurrentActionComplete(1);
+                SetCurrentActionComplete(true);
             }
             AddToProcedureIndexRunning(apActor, 1);
         LABEL_106:;
             if (!apActor->IsPathingComplete()) {
                 EndMoveMessage(apActor);
             }
-            return 0;
+            return false;
         }
         double v15 = distance.Length();
         if (!(fwaitdistance >= v15)) {
@@ -15074,12 +15131,12 @@ bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
         if (ptarg_2->IsPathingComplete()) {
             ptarg_2->EndMovement();
         }
-        SetCurrentActionComplete(1);
-        CheckforNewPackage(apActor, 0);
-        return 0;
+        SetCurrentActionComplete(true);
+        CheckforNewPackage(apActor, false);
+        return false;
     }
     else {
-        float fdistance = pPack->GetPackageRadiusActorToRefTarget(apActor, 0);
+        float fdistance = pPack->GetPackageRadiusActorToRefTarget(apActor, false);
         if (pTarget == pPlayer) {
             apActor->ForceStopMoving();
         }
@@ -15087,16 +15144,16 @@ bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
             double DistanceFromReference;
             if (!pTarget ||
                 (!pTarget->IsActor() ||
-                 (DistanceFromReference = apActor->GetDistanceFromReference(pTarget, 0, 0),
+                 (DistanceFromReference = apActor->GetDistanceFromReference(pTarget, false, false),
                   fdistance < DistanceFromReference))) {
                 TESWorldSpace* LocationWorld = pPack->GetLocationWorld(apActor);
                 TESObjectCELL* LocationCell = pPack->GetLocationCell(apActor);
                 apActor->SetPathfindingGoal(
-                    pPack->GetLocationCoord(apActor), LocationCell, LocationWorld, fdistance, 0
+                    pPack->GetLocationCoord(apActor), LocationCell, LocationWorld, fdistance, nullptr
                 );
             }
         }
-        return 0;
+        return false;
     }
 }
 
@@ -15116,7 +15173,7 @@ void HighProcess::AddAvoidPathingArea(
         pavoidstruct = ::new (apMemory) AvoidAreaStruct;
     }
     else {
-        pavoidstruct = 0;
+        pavoidstruct = nullptr;
     }
     AvoidAreaStruct* pavoidstruct_2 = pavoidstruct;
     PathingAvoidNode* v8 = FNVD_RECONSTRUCT(PathingAvoidNode)(&v13, aPoint, afRadius, afRadiationLevel);
@@ -15125,7 +15182,7 @@ void HighProcess::AddAvoidPathingArea(
     pavoidstruct_2->fTimeExpire = afTimeToExpire;
     pavoidstruct_2->pRadiationMarker = apMarker;
     pavoidstruct_2->pRefObj = apRef;
-    apRef->SetTargeted(1);
+    apRef->SetTargeted(true);
     if (!pListOfAvoidAreas) {
         BSSimpleList<AvoidAreaStruct*>* v9;
         void* v12 = ourMalloc(sizeof(BSSimpleList<AvoidAreaStruct*>));
@@ -15133,7 +15190,7 @@ void HighProcess::AddAvoidPathingArea(
             v9 = ::new (v12) BSSimpleList<AvoidAreaStruct*>;
         }
         else {
-            v9 = 0;
+            v9 = nullptr;
         }
         pListOfAvoidAreas = v9;
     }
@@ -15167,7 +15224,7 @@ void HighProcess::DetectActor(
         uiAggroRadius = 0;
     }
     int32_t iAggroRadius = uiAggroRadius;
-    bool bAddAggroActor = 0;
+    bool bAddAggroActor = false;
     bool bmeInCombat = apActor->IsInCombat();
     CombatGroup* pcurrentGroup = apActor->GetCombatGroup();
     if (pref) {
@@ -15189,15 +15246,15 @@ void HighProcess::DetectActor(
                 }
                 if (fdetectvalue < static_cast<double>(idetection) && (!pstate || !pstate->bEvaluated)) {
                     if (pstate) {
-                        pstate->bEvaluated = 1;
+                        pstate->bEvaluated = true;
                     }
-                    if (!pactor->IsDead(0) && !pactor->IsUnConscious()) {
+                    if (!pactor->IsDead(false) && !pactor->IsUnConscious()) {
                         TESRace* v11;
                         FIGHT_REACTION ereaction;
-                        Actor* pcombattarget = 0;
+                        Actor* pcombattarget = nullptr;
                         int32_t idispcombat = 0;
                         int32_t iCombatLevel = 0;
-                        bool bcombat = 0;
+                        bool bcombat = false;
                         if (idetection > 0 && pactor->IsInCombat(!bmeInCombat)) {
                             Actor* ptarget = pactor->GetCombatTarget();
                             if (ptarget) {
@@ -15206,9 +15263,9 @@ void HighProcess::DetectActor(
                                 bcombat = pdetect && pdetect->iLevel > 0;
                             }
                         }
-                        bool bcrime = 0;
+                        bool bcrime = false;
                         int32_t pCriminal = 0;
-                        bool bcrimeagainstplayer = 0;
+                        bool bcrimeagainstplayer = false;
                         if (bcombat && fSneakSeenMin.Float() < static_cast<double>(idetection) &&
                             !pactor->IsInCombatantFaction()) {
                             CombatGroup* pgroup = pactor->GetCombatGroup();
@@ -15217,12 +15274,12 @@ void HighProcess::DetectActor(
                                     if (pgroup->GetTargetCount()) {
                                         if (!IsGroupAlreadyInList(pgroup) &&
                                             pCombatManager->GetWanttoHelpGroup(apActor, pactor)) {
-                                            bool bhelpGroup = 1;
+                                            bool bhelpGroup = true;
                                             int32_t NumberActorsInCombat = pPlayer->GetNumberActorsInCombat();
                                             if (NumberActorsInCombat >= iCombatTargetPlayerSoftCap.Int() &&
                                                 pgroup->IsTarget(pPlayer) &&
                                                 (!pcurrentGroup || !pcurrentGroup->IsTarget(pPlayer))) {
-                                                bhelpGroup = 0;
+                                                bhelpGroup = false;
                                             }
                                             if (bhelpGroup) {
                                                 StartCombatStates* pstat;
@@ -15234,7 +15291,7 @@ void HighProcess::DetectActor(
                                                     pstat = ::new (HighProcess__UnkCombatTarget) StartCombatStates;
                                                 }
                                                 else {
-                                                    pstat = 0;
+                                                    pstat = nullptr;
                                                 }
                                                 StartCombatStates* pstat_2 = pstat;
                                                 pstat->pGroup = pgroup;
@@ -15259,11 +15316,11 @@ void HighProcess::DetectActor(
                         else {
                             double fTargetsConfidence;
                             if (apActor->GetActorValue(ActorValue::AGGRESSION) ||
-                                (!pactor->GetShouldAttackActor(apActor, 0, ereaction2, 0) ||
+                                (!pactor->GetShouldAttackActor(apActor, false, ereaction2, false) ||
                                  (fTargetsConfidence = afCombatStrength / fThierCombatStrength,
                                   !(TESAIForm::GetConfidenceLevel(static_cast<int32_t>(afConfidence)) >
                                     fTargetsConfidence)))) {
-                                if (apActor->GetShouldAttackActor(pactor, 0, ereaction, 0)) {
+                                if (apActor->GetShouldAttackActor(pactor, false, ereaction, false)) {
                                     iCombatLevel = 100;
                                 }
                                 else {
@@ -15273,7 +15330,7 @@ void HighProcess::DetectActor(
                                             *apActor->QLocationOnReference() - *pactor->QLocationOnReference();
                                         double v10 = vec.SqrLength();
                                         if (static_cast<double>(iAggroRadius * iAggroRadius) >= v10) {
-                                            bAddAggroActor = 1;
+                                            bAddAggroActor = true;
                                         }
                                     }
                                 }
@@ -15314,7 +15371,7 @@ void HighProcess::DetectActor(
                                         psta_3 = ::new (v19) StartCombatStates;
                                     }
                                     else {
-                                        psta_3 = 0;
+                                        psta_3 = nullptr;
                                     }
                                     StartCombatStates* psta_4 = psta_3;
                                     psta_3->pTarget = pactor;
@@ -15333,7 +15390,7 @@ void HighProcess::DetectActor(
                                 psta = ::new (apMemory) StartCombatStates;
                             }
                             else {
-                                psta = 0;
+                                psta = nullptr;
                             }
                             StartCombatStates* psta_2 = psta;
                             psta->pTarget = pactor;
@@ -15357,7 +15414,7 @@ void HighProcess::SaveGame_00928880(BGSSaveFormBuffer* a2) {
     Actor* v7 = a2->GetActor();
     bhkCharacterController* v8 = GetCharController();
     if (v8) {
-        if (!v7 || !v7->IsDead(0)) {
+        if (!v7 || !v7->IsDead(false)) {
             cState = static_cast<char>(v8->getState());
             a2->SaveDataEndian(&cState, 1u, 0);
             cWantState = v8->eWantState;
@@ -15421,14 +15478,14 @@ NiPoint3* HighProcess::ComputeRandomPoint(
 
 bool HighProcess::FindDoorsToSendYellAlarm(TESObjectREFR* apRef, void* aiFilterData) {
     if (!apRef || (apRef->GetDelete() || apRef->GetTemporary())) {
-        return 0;
+        return false;
     }
     if (apRef->GetObjectReference()->GetFormType() == DOOR_ID) {
         if (apRef->GetTeleport()) {
             DoorRefListCrime.AddHead(apRef);
         }
     }
-    return 0;
+    return false;
 }
 
 NiPoint3* bhkBoxShape::GetHalfExtents(NiPoint3* apResult) {
@@ -15488,11 +15545,11 @@ void AvoidAreaStruct::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v3 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     pRefObj = v3;
     if (pRefObj) {
-        pRefObj->SetTargeted(1);
+        pRefObj->SetTargeted(true);
     }
 }
 
@@ -15534,11 +15591,11 @@ void DetectionEvent::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v3 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     pRef = v3;
     if (pRef) {
-        pRef->SetTargeted(1);
+        pRef->SetTargeted(true);
     }
 }
 

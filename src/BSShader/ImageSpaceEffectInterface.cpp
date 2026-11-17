@@ -50,30 +50,32 @@ void ImageSpaceEffectInterface::Render(
 }
 
 void ImageSpaceEffectInterface::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
-    bIsActive = 0;
+    bIsActive = false;
     SetEffectCount(2);
     NiTPrimitiveArray<ImageSpaceTexture*>* p_pTextures = &pTextures;
     pTextures.SetSize(5u);
     BSShaderManager::GetTexture(
-        "Data\\Textures\\Pipboy3000\\PipboyScanlines.dds", 1, ImageSpaceEffectInterface::spScanlinesTexture, 0, 0
+        "Data\\Textures\\Pipboy3000\\PipboyScanlines.dds", true, ImageSpaceEffectInterface::spScanlinesTexture, false,
+        false
     );
     NiTexture* pScanlineTexture = ImageSpaceEffectInterface::spScanlinesTexture.m_pObject;
     BSShaderManager::GetTexture(
-        "Data\\Textures\\Pipboy3000\\PipboyDistortEffectMap.dds", 1, ImageSpaceEffectInterface::spDistortTexture, 0, 0
+        "Data\\Textures\\Pipboy3000\\PipboyDistortEffectMap.dds", true, ImageSpaceEffectInterface::spDistortTexture,
+        false, false
     );
     NiTexture* pDistortTexture = ImageSpaceEffectInterface::spDistortTexture.m_pObject;
     ImageSpaceTexture* v6 =
         static_cast<ImageSpaceTexture*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceTexture)));
     if (v6) {
-        v6->bForceAniso = 0;
-        v6->bIsRenderedTexture = 0;
-        v6->bIsTextureBorrowed = 0;
-        v6->spTexture = 0;
+        v6->bForceAniso = false;
+        v6->bIsRenderedTexture = false;
+        v6->bIsTextureBorrowed = false;
+        v6->spTexture = nullptr;
         v6->eFilterMode = 0;
         v6->eClampMode = 0;
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     p_pTextures->SetAt(3u, v6);
     pTextures.m_pBase[3]->SetTexture(pScanlineTexture);
@@ -81,15 +83,15 @@ void ImageSpaceEffectInterface::Setup(ImageSpaceManager* apManager, ImageSpaceEf
     ImageSpaceTexture* v7 =
         static_cast<ImageSpaceTexture*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceTexture)));
     if (v7) {
-        v7->bForceAniso = 0;
-        v7->bIsRenderedTexture = 0;
-        v7->bIsTextureBorrowed = 0;
-        v7->spTexture = 0;
+        v7->bForceAniso = false;
+        v7->bIsRenderedTexture = false;
+        v7->bIsTextureBorrowed = false;
+        v7->spTexture = nullptr;
         v7->eFilterMode = 0;
         v7->eClampMode = 0;
     }
     else {
-        v7 = 0;
+        v7 = nullptr;
     }
     p_pTextures->SetAt(4u, v7);
     pTextures.m_pBase[4]->SetTexture(pDistortTexture);
@@ -97,19 +99,19 @@ void ImageSpaceEffectInterface::Setup(ImageSpaceManager* apManager, ImageSpaceEf
     ImageSpaceTexture* v8 =
         static_cast<ImageSpaceTexture*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceTexture)));
     if (v8) {
-        v8->bForceAniso = 0;
-        v8->bIsRenderedTexture = 0;
-        v8->bIsTextureBorrowed = 0;
-        v8->spTexture = 0;
+        v8->bForceAniso = false;
+        v8->bIsRenderedTexture = false;
+        v8->bIsTextureBorrowed = false;
+        v8->spTexture = nullptr;
         v8->eFilterMode = 0;
         v8->eClampMode = 0;
     }
     else {
-        v8 = 0;
+        v8 = nullptr;
     }
     p_pTextures->SetAt(2u, v8);
     pTextures.m_pBase[2]->SetClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
-    pTextures.m_pBase[2]->SetTexture(static_cast<NiTexture*>(0));
+    pTextures.m_pBase[2]->SetTexture(static_cast<NiTexture*>(nullptr));
     ImageSpaceEffectInterface::spMaskTexture = nullptr;
     ImageSpaceTexture** m_pBase = pTextures.m_pBase;
     float foffsetx = 0.0f;
@@ -139,11 +141,11 @@ void ImageSpaceEffectInterface::Setup(ImageSpaceManager* apManager, ImageSpaceEf
         pparam = ::new (v12) ImageSpaceShaderParam;
     }
     else {
-        pparam = 0;
+        pparam = nullptr;
     }
     pparam->InitConstantMap(0, 4);
-    pparam->bUseTexOffset[1] = 1;
-    pparam->bUseTexOffset[2] = 1;
+    pparam->bUseTexOffset[1] = true;
+    pparam->bUseTexOffset[2] = true;
     pparam->SetPixelConstant(
         0, ImageSpaceEffectInterface::fBlurIntensity, ImageSpaceEffectInterface::fVerticalHold,
         ImageSpaceEffectInterface::fTextureUsedPart, ImageSpaceEffectInterface::fScanlineFrequency
@@ -165,11 +167,11 @@ void ImageSpaceEffectInterface::Setup(ImageSpaceManager* apManager, ImageSpaceEf
         pparam2 = ::new (v15) ImageSpaceShaderParam;
     }
     else {
-        pparam2 = 0;
+        pparam2 = nullptr;
     }
     pparam2->InitConstantMap(0, 5);
-    pparam2->bUseTexOffset[1] = 1;
-    pparam2->bUseTexOffset[2] = 1;
+    pparam2->bUseTexOffset[1] = true;
+    pparam2->bUseTexOffset[2] = true;
     pparam2->SetPixelConstant(
         0, ImageSpaceEffectInterface::fBlurIntensity, ImageSpaceEffectInterface::fVerticalHold,
         ImageSpaceEffectInterface::fTextureUsedPart, ImageSpaceEffectInterface::fScanlineFrequency
@@ -208,7 +210,7 @@ void ImageSpaceEffectInterface::ReturnTextures() {
     for (int32_t i = 0; i < 5; ++i) {
         ImageSpaceTexture* ptex = pTextures.m_pBase[i];
         if (ptex) {
-            ptex->SetTexture(static_cast<NiTexture*>(0));
+            ptex->SetTexture(static_cast<NiTexture*>(nullptr));
         }
     }
 }
@@ -301,7 +303,7 @@ bool ImageSpaceEffectInterface::UpdateParams(ImageSpaceEffectParam* pParam) {
          pTextures.m_pBase[i++]->SetFilterMode(NiTexturingProperty::FILTER_BILERP)) {
         ;
     }
-    return 0;
+    return false;
 }
 
 // The shared textures are released; the shader parameters in slots 0 and 1 and the textures in slots 3, 4 and 2 are

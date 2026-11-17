@@ -22,7 +22,7 @@ bool TESObjectSTAT::Load(TESFile* apFile) {
     (void)apFile->GetTESForm();
     LoadForm(apFile);
     for (;;) {
-        CHUNK_ID eChunk = static_cast<CHUNK_ID>(apFile->GetTESChunk());
+        CHUNK_ID eChunk = apFile->GetTESChunk();
         if (eChunk == NO_CHUNK) {
             break;
         }
@@ -107,7 +107,7 @@ void TESObjectSTAT::InitItem() {
                 );
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -123,13 +123,13 @@ void TESObjectSTAT::Copy(TESForm* apCopy) {
 bool TESObjectSTAT::Compare(TESForm* apCompare) {
     TESObjectSTAT* v4 = dynamic_cast<TESObjectSTAT*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v4)) {
-        return (bool)1;
+        return true;
     }
     if (cPassThroughSoundIndex == v4->cPassThroughSoundIndex) {
         return (bool)((uint8_t)(pRandomSound != v4->pRandomSound));
     }
-    return (bool)1;
+    return true;
 }

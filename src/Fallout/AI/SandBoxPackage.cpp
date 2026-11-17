@@ -52,7 +52,7 @@ SandBoxChoiceListItem::SandBoxChoiceListItem(TESForm* apTarget, int32_t aeProces
   : pTarget(static_cast<TESObjectREFR*>(apTarget)), eProcedure(static_cast<SANDBOX_PROCEDURE>(aeProcessIndex)),
     iBaseScore((int32_t)auiBaseScore), iFullScore(0) {
     if (pTarget) {
-        pTarget->SetTargeted(1);
+        pTarget->SetTargeted(true);
     }
 }
 
@@ -82,11 +82,11 @@ void SandBoxChoiceListItem::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v3 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     pTarget = v3;
     if (pTarget) {
-        pTarget->SetTargeted(1);
+        pTarget->SetTargeted(true);
     }
 }
 
@@ -106,26 +106,26 @@ SandBoxActorPackageData::SandBoxActorPackageData()
 
 SandBoxActorPackageData::~SandBoxActorPackageData() {
     ReleaseTargetObject();
-    PotentialTargets.Clear(1);
+    PotentialTargets.Clear(true);
 }
 
 void SandBoxActorPackageData::HandleDeletedReference(TESObjectREFR* pDeletedObj) {
     if (pDeletedObj) {
-        bool breset = 0;
+        bool breset = false;
         if (pLocation == pDeletedObj) {
-            pLocation = 0;
+            pLocation = nullptr;
         }
         if (pPrevTargetObject == pDeletedObj) {
-            pPrevTargetObject = 0;
+            pPrevTargetObject = nullptr;
         }
         if (pCurrentTargetObject == pDeletedObj) {
-            breset = 1;
+            breset = true;
         }
         int32_t count = PotentialTargets.iSize;
         int32_t i = 0;
         while (i < count) {
             if ((&PotentialTargets.operator[](i))->pTarget == pDeletedObj) {
-                breset = 1;
+                breset = true;
                 PotentialTargets.RemoveFast(i, 1u);
                 --count;
             }
@@ -136,10 +136,10 @@ void SandBoxActorPackageData::HandleDeletedReference(TESObjectREFR* pDeletedObj)
         if (breset) {
             eProcedure = SANDBOX_PROCEDURE_NONE;
             fProcedureDuration = 0.0f;
-            pCurrentTargetObject = 0;
-            pPrevTargetObject = 0;
+            pCurrentTargetObject = nullptr;
+            pPrevTargetObject = nullptr;
             cCurrentTargetMarker = 127;
-            bShouldPickNewProcedure = 1;
+            bShouldPickNewProcedure = true;
             iNextTimeToScanWorld = 0;
         }
     }
@@ -213,7 +213,7 @@ void SandBoxActorPackageData::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     apLoadGameBuffer->LoadFormID(pCurrentTargetObject);
     apLoadGameBuffer->LoadFormID(pPrevTargetObject);
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
-    PotentialTargets.SetSize(isaveGameCount, 1);
+    PotentialTargets.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         SandBoxChoiceListItem* potentialTarget = &PotentialTargets.operator[](i);
         potentialTarget->LoadGame(apLoadGameBuffer);
@@ -230,7 +230,7 @@ void SandBoxActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) 
         v9 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v9 = 0;
+        v9 = nullptr;
     }
     pLocation = v9;
     if (pCurrentTargetObject) {
@@ -239,11 +239,11 @@ void SandBoxActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) 
         v8 = dynamic_cast<TESObjectREFR*>(v3);
     }
     else {
-        v8 = 0;
+        v8 = nullptr;
     }
     pCurrentTargetObject = v8;
     if (pCurrentTargetObject) {
-        pCurrentTargetObject->SetTargeted(1);
+        pCurrentTargetObject->SetTargeted(true);
     }
     if (pPrevTargetObject) {
         TESForm* v4 =
@@ -251,11 +251,11 @@ void SandBoxActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) 
         v7 = dynamic_cast<TESObjectREFR*>(v4);
     }
     else {
-        v7 = 0;
+        v7 = nullptr;
     }
     pPrevTargetObject = v7;
     if (pPrevTargetObject) {
-        pPrevTargetObject->SetTargeted(1);
+        pPrevTargetObject->SetTargeted(true);
     }
     uint32_t isaveGameCount = PotentialTargets.iSize;
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
@@ -264,7 +264,7 @@ void SandBoxActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) 
     }
     int32_t count = PotentialTargets.iSize;
     int32_t i_2 = 0;
-    bool breset = 0;
+    bool breset = false;
     while (i_2 < count) {
         SANDBOX_PROCEDURE FormHealth_0;
         SandBoxChoiceListItem* item = &PotentialTargets.operator[](i_2);
@@ -275,23 +275,23 @@ void SandBoxActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) 
         else {
             PotentialTargets.RemoveFast(i_2, 1u);
             --count;
-            breset = 1;
+            breset = true;
         }
     }
     if (pCurrentTargetObject) {
-        if (pCurrentTargetObject->HasFreeMarker(0)) {
-            pCurrentTargetObject->SetMarkerReserved(cCurrentTargetMarker, 1);
+        if (pCurrentTargetObject->HasFreeMarker(false)) {
+            pCurrentTargetObject->SetMarkerReserved(cCurrentTargetMarker, true);
         }
         else {
-            breset = 1;
+            breset = true;
         }
     }
     if (breset || !pCurrentTargetObject) {
         eProcedure = SANDBOX_PROCEDURE_NONE;
         fProcedureDuration = 0.0f;
-        pCurrentTargetObject = 0;
+        pCurrentTargetObject = nullptr;
         cCurrentTargetMarker = 127;
-        bShouldPickNewProcedure = 1;
+        bShouldPickNewProcedure = true;
         iNextTimeToScanWorld = 0;
     }
     if (pLocation) {
@@ -330,9 +330,9 @@ float SandBoxActorPackageData::GetTimeDifference(float afTimeA, float afTimeB) {
 bool SandBoxActorPackageData::IsActivityFinished(bool* abJustEndedTodayOut) {
     uint32_t Count = appCalendar.iMidnightsPassed;
     float Hour = appCalendar.GetHour();
-    bool v5 = 0;
+    bool v5 = false;
     if (eActivity == -1) {
-        return 1;
+        return true;
     }
     uint32_t iActivityStartDay = this->iActivityStartDay;
     float v8 = fActivityDuration + fActivityStartHour;
@@ -342,26 +342,26 @@ bool SandBoxActorPackageData::IsActivityFinished(bool* abJustEndedTodayOut) {
     }
     if (Count == iActivityStartDay) {
         if (v8 > static_cast<double>(Hour)) {
-            return 0;
+            return false;
         }
-        v5 = 1;
+        v5 = true;
     }
     else {
         if (Count < iActivityStartDay) {
-            return 0;
+            return false;
         }
     }
     if (abJustEndedTodayOut) {
         *abJustEndedTodayOut = v5;
     }
-    return 1;
+    return true;
 }
 
 bool SandBoxActorPackageData::IsActivityActive() {
     uint32_t Count = appCalendar.iMidnightsPassed;
     float Hour = appCalendar.GetHour();
     if (eActivity == -1) {
-        return 1;
+        return true;
     }
     uint32_t iActivityStartDay = this->iActivityStartDay;
     float v6 = fActivityDuration + fActivityStartHour;
@@ -370,10 +370,10 @@ bool SandBoxActorPackageData::IsActivityActive() {
         ++iActivityStartDay;
     }
     if (Count < this->iActivityStartDay || Count > iActivityStartDay) {
-        return 0;
+        return false;
     }
     if (Count == this->iActivityStartDay && fActivityDuration > static_cast<double>(Hour)) {
-        return 0;
+        return false;
     }
     return Count != iActivityStartDay || !(v6 <= static_cast<double>(Hour));
 }
@@ -382,12 +382,12 @@ bool SandBoxActorPackageData::IsDoneWithIdleAnims(Actor* apActor, bool bfreeIfDo
     if (!eProcedure || eProcedure == 4) {
         ANIMATION_ACTION AnimAction = apActor->GetAnimAction();
         if (AnimAction >= ANIM_ACTION_WAIT_FOR_LOWER_BODY_ANIM && AnimAction <= ANIM_ACTION_WAIT_FOR_SPECIAL_IDLE) {
-            return 0;
+            return false;
         }
         Animation* v7 = apActor->GetAnimation();
         if (v7) {
             if (!v7->SpecialIdleDonePlaying()) {
-                return 0;
+                return false;
             }
             if (bfreeIfDone) {
                 BSAnimGroupSequence* Sequence = v7->SpecialIdleGetSequence();
@@ -400,13 +400,13 @@ bool SandBoxActorPackageData::IsDoneWithIdleAnims(Actor* apActor, bool bfreeIfDo
             }
         }
     }
-    return 1;
+    return true;
 }
 
 void SandBoxActorPackageData::ReleaseTargetObject() {
     if ((!pDataHandler) || (!pDataHandler->GetClearingData())) {
         if (pCurrentTargetObject) {
-            pCurrentTargetObject->SetMarkerReserved(cCurrentTargetMarker, 0);
+            pCurrentTargetObject->SetMarkerReserved(cCurrentTargetMarker, false);
         }
     }
     pCurrentTargetObject = nullptr;
@@ -415,22 +415,22 @@ void SandBoxActorPackageData::ReleaseTargetObject() {
 
 bool SandBoxActorPackageData::MoveToNextLocation() {
     if (!pLocation) {
-        return (bool)0;
+        return false;
     }
-    if (((uint32_t)iNextTimeToChangeLocations) == ((-1))) {
-        return (bool)0;
+    if (((uint32_t)iNextTimeToChangeLocations) == (-1)) {
+        return false;
     }
     if ((&appTimer)->BSTimer::GetTime() <= ((uint32_t)iNextTimeToChangeLocations)) {
-        return (bool)0;
+        return false;
     }
     ExtraDataList* extraDataList = pLocation->TESObjectREFR::GetExtra();
     TESObjectREFR* extraLinkedRef = extraDataList->GetLinkedRef();
     if ((!extraLinkedRef) || (extraLinkedRef == pLocation)) {
-        return (bool)0;
+        return false;
     }
     pLocation = extraLinkedRef;
     iNextTimeToChangeLocations = (-1);
-    return (bool)1;
+    return true;
 }
 
 bool SandBoxActorPackageData::CanPerformActivity() {
@@ -460,7 +460,7 @@ bool SandBoxActorPackageData::CanPerformActivity() {
 
 void SandBoxActorPackageData::HandleSubprocessFinished() {
     ReleaseTargetObject();
-    bShouldPickNewProcedure = (bool)1;
+    bShouldPickNewProcedure = true;
     eState = SANDBOX_STATE_GETTING_UP;
 }
 
@@ -482,7 +482,7 @@ void SandBoxActorPackageData::PickProcedure(Actor* apActor, TESPackage* apOrigin
     TESWorldSpace* ppackageWorldSpace;
     int32_t isandboxProceduresProbabilities[NUM_SANDBOX_PROCEDURES];
     int32_t i;
-    bShouldPickNewProcedure = 0;
+    bShouldPickNewProcedure = false;
     SetUpNextActivity();
     if (fTotalTime == 0.0) {
         if (apOriginalPackage) {
@@ -503,13 +503,13 @@ void SandBoxActorPackageData::PickProcedure(Actor* apActor, TESPackage* apOrigin
     }
     if (pPrevTargetObject) {
         if (appTimer.iLastTime > iPrevTargetChangedTimeStamp) {
-            pPrevTargetObject = 0;
+            pPrevTargetObject = nullptr;
         }
     }
     if (pCurrentTargetObject) {
-        pCurrentTargetObject->SetMarkerReserved(cCurrentTargetMarker, 0);
+        pCurrentTargetObject->SetMarkerReserved(cCurrentTargetMarker, false);
     }
-    pCurrentTargetObject = 0;
+    pCurrentTargetObject = nullptr;
     cCurrentTargetMarker = 127;
     eProcedure = SANDBOX_PROCEDURE_NONE;
     fProcedureDuration = 0.0f;
@@ -592,10 +592,10 @@ void SandBoxActorPackageData::PickProcedure(Actor* apActor, TESPackage* apOrigin
                 item->iFullScore = 0;
                 continue;
             }
-            bool binterior = 0;
+            bool binterior = false;
             TESObjectCELL* ptargetCell = ptargObject->GetParentCell();
             if (ppackageCell && ptargetCell && (ppackageCell->GetInterior() || ptargetCell->GetInterior())) {
-                binterior = 1;
+                binterior = true;
                 if (ppackageCell != ptargetCell) {
                     continue;
                 }
@@ -613,7 +613,7 @@ void SandBoxActorPackageData::PickProcedure(Actor* apActor, TESPackage* apOrigin
                 item->iFullScore = 0;
                 continue;
             }
-            if (!ptargObject->HasFreeMarker(0)) {
+            if (!ptargObject->HasFreeMarker(false)) {
                 item->iFullScore = 0;
                 continue;
             }
@@ -625,8 +625,8 @@ void SandBoxActorPackageData::PickProcedure(Actor* apActor, TESPackage* apOrigin
                     continue;
                 }
                 FIGHT_REACTION ereaction = FIGHT_REACTION_NEUTRAL;
-                if (apActor->GetShouldAttackActor(ptargetActor, 0, ereaction, 0) ||
-                    ptargetActor->GetShouldAttackActor(apActor, 0, ereaction, 0)) {
+                if (apActor->GetShouldAttackActor(ptargetActor, false, ereaction, false) ||
+                    ptargetActor->GetShouldAttackActor(apActor, false, ereaction, false)) {
                     item->iFullScore = 0;
                     continue;
                 }
@@ -638,7 +638,7 @@ void SandBoxActorPackageData::PickProcedure(Actor* apActor, TESPackage* apOrigin
     if (itotalProb <= 0) {
         eProcedure = SANDBOX_PROCEDURE_NONE;
         fProcedureDuration = 0.0f;
-        pCurrentTargetObject = 0;
+        pCurrentTargetObject = nullptr;
         cCurrentTargetMarker = 127;
     }
     else {
@@ -657,7 +657,7 @@ void SandBoxActorPackageData::PickProcedure(Actor* apActor, TESPackage* apOrigin
         eProcedure = ritem.eProcedure;
         pCurrentTargetObject = ritem.pTarget;
         if (pCurrentTargetObject) {
-            iIndex = pCurrentTargetObject->GetFirstFreeMarkerIndex(0);
+            iIndex = pCurrentTargetObject->GetFirstFreeMarkerIndex(false);
         }
         else {
             iIndex = -1;
@@ -685,7 +685,7 @@ void SandBoxActorPackageData::PickProcedure(Actor* apActor, TESPackage* apOrigin
         }
         cProcedureWeight[eProcedure] = 1;
         if (pCurrentTargetObject) {
-            pCurrentTargetObject->SetMarkerReserved(cCurrentTargetMarker, 1);
+            pCurrentTargetObject->SetMarkerReserved(cCurrentTargetMarker, true);
         }
     }
     fLastTimeChanged = appCalendar.GetHour();
@@ -735,7 +735,7 @@ void SandBoxActorPackageData::InitLocation(Actor* apActor, PackageLocation* apPa
 
 void SandBoxActorPackageData::SetUpNextActivity() {
     bool bjustEndedToday;
-    bjustEndedToday = 0;
+    bjustEndedToday = false;
     if (IsActivityFinished(&bjustEndedToday)) {
         uint32_t ithisDay = appCalendar.iMidnightsPassed;
         float fthisHour = appCalendar.GetHour();
@@ -746,7 +746,7 @@ void SandBoxActorPackageData::SetUpNextActivity() {
         float fduration = 3.4028235e+38f;
         int32_t ibestActivity = -2;
         uint32_t ibestDay = 0;
-        bool bresultFound = 0;
+        bool bresultFound = false;
         for (int32_t iactivity = 0; iactivity < 4; ++iactivity) {
             AiFormulas::ComputeRandomSandboxActivityStartAndDuration(iactivity, fstart, fduration);
             if (!bjustEndedToday || (fthisHour >= fstart + fduration || iactivity != eActivity)) {
@@ -760,7 +760,7 @@ void SandBoxActorPackageData::SetUpNextActivity() {
                     uint32_t v1 = fthisHour < fstart + fduration ? ithisDay : ithisDay + 1;
                     ibestDay = v1;
                     fbestDuration = fduration;
-                    bresultFound = 1;
+                    bresultFound = true;
                     if (fhoursFromNow <= 0.0) {
                         break;
                     }
@@ -783,18 +783,18 @@ bool SandBoxActorPackageData::ShouldPickNewProcedure(Actor* apActor) {
     if (!ppack) {
         goto LABEL_16;
     }
-    bflag = 0;
+    bflag = false;
     if (bBed && !ppack->SandboxGetAllowSleeping()) {
-        bBed = 0;
-        bflag = 1;
+        bBed = false;
+        bflag = true;
     }
     if (bFood && !ppack->SandboxGetAllowEating()) {
-        bFood = 0;
-        bflag = 1;
+        bFood = false;
+        bflag = true;
     }
     if (bChair && !ppack->SandboxGetAllowFurniture()) {
-        bChair = 0;
-        bflag = 1;
+        bChair = false;
+        bflag = true;
     }
     if (bflag) {
         iNextTimeToScanWorld = appTimer.iLastTime;
@@ -805,7 +805,7 @@ bool SandBoxActorPackageData::ShouldPickNewProcedure(Actor* apActor) {
         if (!pLocation ||
             (eProcedure == SANDBOX_PROCEDURE_USE_IDLE_MARKER ||
              (iNextTimeToChangeLocations == -1 || appTimer.iLastTime <= iNextTimeToChangeLocations))) {
-            if (IsDoneWithIdleAnims(apActor, 1)) {
+            if (IsDoneWithIdleAnims(apActor, true)) {
                 if (bShouldPickNewProcedure) {
                     bresult = true;
                 }
@@ -820,11 +820,11 @@ bool SandBoxActorPackageData::ShouldPickNewProcedure(Actor* apActor) {
                         else {
                             if (eState != SandBoxActorPackageData::SANDBOX_STATE_DOINGSTUFF &&
                                 (pCurrentTargetObject &&
-                                 pCurrentTargetObject->GetMarkerUsed(cCurrentTargetMarker, 1))) {
+                                 pCurrentTargetObject->GetMarkerUsed(cCurrentTargetMarker, true))) {
                                 bresult = true;
                             }
                             else {
-                                if (IsActivityFinished(0)) {
+                                if (IsActivityFinished(nullptr)) {
                                     bresult = true;
                                 }
                                 else {
@@ -866,10 +866,10 @@ PROCEDURE SandBoxActorPackageData::GetProcedure() {
 void SandBoxActorPackageData::ScanWorld(Actor* apActor) {
     SandBoxChoiceListItem v6;
     SandBoxChoiceListItem apMemory;
-    PotentialTargets.Clear(1);
-    bBed = 0;
-    bChair = 0;
-    bFood = 0;
+    PotentialTargets.Clear(true);
+    bBed = false;
+    bChair = false;
+    bFood = false;
     float fsearchDist = fSandBoxSearchRadius.Float();
     TESObjectCELL* pcell = apActor->GetParentCell();
     NiPoint3 packageLoc = apActor->GetLocationOnReference();
@@ -902,7 +902,7 @@ void SandBoxActorPackageData::ScanWorld(Actor* apActor) {
             if (pfood->pContainerObj) {
                 SandBoxChoiceListItem* v2 = FNVD_RECONSTRUCT(SandBoxChoiceListItem)(&apMemory, nullptr, 2, 1u);
                 PotentialTargets.Add(*v2);
-                bFood = 1;
+                bFood = true;
             }
         }
     }
@@ -914,34 +914,35 @@ void SandBoxActorPackageData::ScanWorld(Actor* apActor) {
 
 bool SandBoxActorPackageData::UpdateIsActorAtLocation(MobileObject* apMobileObject, float afRadius) {
     if (!apMobileObject) {
-        return 0;
+        return false;
     }
-    Actor* apActor = 0;
+    Actor* apActor = nullptr;
     if (apMobileObject->IsActor()) {
         apActor = static_cast<Actor*>(apMobileObject);
     }
     if (!pLocation) {
         TESPackage* ppack;
-        return apActor && (ppack = apActor->GetCurrentPackage()) != 0 && ppack->IsActorAtLocation(apActor, 0, -1.0f, 0);
+        return apActor && (ppack = apActor->GetCurrentPackage()) != nullptr &&
+            ppack->IsActorAtLocation(apActor, false, -1.0f, false);
     }
     TESWorldSpace* plocworld = pLocation->GetWorldSpace();
     TESObjectCELL* plocintcell = pLocation->GetParentCell();
     if (plocintcell) {
         if (!plocintcell->GetInterior()) {
-            plocintcell = 0;
+            plocintcell = nullptr;
         }
     }
     TESWorldSpace* pactorworld = apMobileObject->GetWorldSpace();
     TESObjectCELL* pactorintcell = apMobileObject->GetParentCell();
     if (pactorintcell) {
         if (!pactorintcell->GetInterior()) {
-            pactorintcell = 0;
+            pactorintcell = nullptr;
         }
     }
-    bool bsamespace = 0;
+    bool bsamespace = false;
     if (pactorintcell || plocintcell) {
         if (pactorintcell == plocintcell) {
-            bsamespace = 1;
+            bsamespace = true;
         }
     }
     else {
@@ -949,7 +950,7 @@ bool SandBoxActorPackageData::UpdateIsActorAtLocation(MobileObject* apMobileObje
     }
     if (bsamespace) {
         float fradius = afRadius;
-        bool bexactpos = 0;
+        bool bexactpos = false;
         const NiPoint3* loccoord = &pLocation->GetLocationOnReference();
         if (afRadius == 0.0) {
             TESBoundObject* v5;
@@ -961,7 +962,7 @@ bool SandBoxActorPackageData::UpdateIsActorAtLocation(MobileObject* apMobileObje
                 if (pLocation->IsActor()) {
                     if (pLocation->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
                         fradius = 90.0f;
-                        bexactpos = 1;
+                        bexactpos = true;
                     }
                     else {
                         fradius = pLocation->GetModelBoundSize() + 20.0;
@@ -991,7 +992,7 @@ bool SandBoxActorPackageData::UpdateIsActorAtLocation(MobileObject* apMobileObje
         if (fradius == 0.0) {
             fradius = static_cast<float>(iAIDistanceRadiusMinLocation.Int());
         }
-        if (apMobileObject->IsAtPoint(*loccoord, fradius, !bexactpos, 1)) {
+        if (apMobileObject->IsAtPoint(*loccoord, fradius, !bexactpos, true)) {
             if (iNextTimeToChangeLocations == -1) {
                 if ((&pLocation->m_Extra)->GetLinkedRef()) {
                     iNextTimeToChangeLocations = 0;
@@ -1008,14 +1009,14 @@ bool SandBoxActorPackageData::UpdateIsActorAtLocation(MobileObject* apMobileObje
                     }
                 }
             }
-            return 1;
+            return true;
         }
         else {
-            return 0;
+            return false;
         }
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -1034,31 +1035,31 @@ bool SandBoxActorPackageData::EvaluateReferenceforUse(TESObjectREFR* apRef, void
     SandBoxActorPackageData* ppackData = pfilter->pPackData;
     Actor* pactor = pfilter->pActor;
     if (!ppackData) {
-        return 0;
+        return false;
     }
     if (!pactor || !pactor->GetObjectReference()) {
-        return 0;
+        return false;
     }
     if (!apRef ||
         (apRef->GetDelete() ||
          (apRef->GetTemporary() ||
-          (apRef->GetDisabled() || (pactor->IsChild(0) && !pactor->CanChildUseObject(apRef)))))) {
-        return 0;
+          (apRef->GetDisabled() || (pactor->IsChild(false) && !pactor->CanChildUseObject(apRef)))))) {
+        return false;
     }
     TESPackage* ppack = pactor->GetCurrentPackage();
     if (!ppack) {
-        return 0;
+        return false;
     }
     if (apRef->GetIgnoredBySandbox()) {
-        return 0;
+        return false;
     }
     switch (apRef->GetObjectReference()->GetFormType()) {
         case INGR_ID:
         case ALCH_ID: {
-            if (ppack->SandboxGetAllowEating() && (!apRef->GetOwner() || apRef->IsAnOwner(pactor, 1))) {
+            if (ppack->SandboxGetAllowEating() && (!apRef->GetOwner() || apRef->IsAnOwner(pactor, true))) {
                 SandBoxChoiceListItem* v8 = FNVD_RECONSTRUCT(SandBoxChoiceListItem)(&v9, apRef, 2, 1u);
                 ppackData->PotentialTargets.Add(*v8);
-                ppackData->bFood = 1;
+                ppackData->bFood = true;
             }
             break;
         }
@@ -1073,26 +1074,26 @@ bool SandBoxActorPackageData::EvaluateReferenceforUse(TESObjectREFR* apRef, void
             }
             TESFurniture* pfurn = static_cast<TESFurniture*>(apRef->GetObjectReference());
             if (ppack->SandboxGetAllowSleeping() &&
-                (pfurn->CanSleepOn() && (!apRef->GetOwner() || apRef->IsAnOwner(pactor, 1)))) {
+                (pfurn->CanSleepOn() && (!apRef->GetOwner() || apRef->IsAnOwner(pactor, true)))) {
                 SandBoxChoiceListItem* v5 = FNVD_RECONSTRUCT(SandBoxChoiceListItem)(&v12, apRef, 1, 1u);
                 ppackData->PotentialTargets.Add(*v5);
-                ppackData->bBed = 1;
+                ppackData->bBed = true;
             }
             else if (
                 ppack->SandboxGetAllowFurniture() &&
-                (pfurn->CanSitOn() && (!apRef->GetOwner() || apRef->IsAnOwner(pactor, 1)))
+                (pfurn->CanSitOn() && (!apRef->GetOwner() || apRef->IsAnOwner(pactor, true)))
             ) {
                 SandBoxChoiceListItem* v6 = FNVD_RECONSTRUCT(SandBoxChoiceListItem)(&v11, apRef, 0, 1u);
                 ppackData->PotentialTargets.Add(*v6);
-                ppackData->bChair = 1;
+                ppackData->bChair = true;
             }
             else if (
                 ppack->SandboxGetAllowFurniture() && !pfurn->CanSitOn() && !pfurn->CanSleepOn() &&
-                (!apRef->GetOwner() || apRef->IsAnOwner(pactor, 1))
+                (!apRef->GetOwner() || apRef->IsAnOwner(pactor, true))
             ) {
                 SandBoxChoiceListItem* v7 = FNVD_RECONSTRUCT(SandBoxChoiceListItem)(&v10, apRef, 0, 1u);
                 ppackData->PotentialTargets.Add(*v7);
-                ppackData->bChair = 1;
+                ppackData->bChair = true;
             }
             break;
         }
@@ -1105,11 +1106,11 @@ bool SandBoxActorPackageData::EvaluateReferenceforUse(TESObjectREFR* apRef, void
             break;
         }
         case IDLM_ID: {
-            if (ppack->SandboxGetAllowIdleMarkers() && (!apRef->GetOwner() || apRef->IsAnOwner(pactor, 1))) {
+            if (ppack->SandboxGetAllowIdleMarkers() && (!apRef->GetOwner() || apRef->IsAnOwner(pactor, true))) {
                 BGSIdleMarker* pIdleMark = static_cast<BGSIdleMarker*>(apRef->GetObjectReference());
                 int32_t icount = pIdleMark->GetIdleCount();
                 BGSIdleCollection::PICK_TYPE etype = pIdleMark->GetPickType();
-                bool badd = 0;
+                bool badd = false;
                 if (pIdleMark->HasIdleForActor(pactor, apRef)) {
                     SandBoxChoiceListItem* v3 = FNVD_RECONSTRUCT(SandBoxChoiceListItem)(&apMemory, apRef, 4, 1u);
                     ppackData->PotentialTargets.Add(*v3);
@@ -1121,5 +1122,5 @@ bool SandBoxActorPackageData::EvaluateReferenceforUse(TESObjectREFR* apRef, void
             break;
         }
     }
-    return 0;
+    return false;
 }

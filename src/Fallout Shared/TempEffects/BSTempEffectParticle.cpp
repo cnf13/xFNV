@@ -61,7 +61,7 @@ BSTempEffectParticle::BSTempEffectParticle(
 BSTempEffectParticle::~BSTempEffectParticle() {
     StopSounds();
     if (pFilename) {
-        pModelLoader->ReleaseModel(pFilename, 0, 1u);
+        pModelLoader->ReleaseModel(pFilename, false, 1u);
     }
     if (spParticleObject.m_pObject) {
         if (spParticleObject.m_pObject->m_pkParent) {
@@ -264,9 +264,9 @@ bool BSTempEffectParticle::LoadGame() {
     uint16_t icontrollerDataSize;
     float fscale;
     NiMatrix3 rot;
-    bool bvalid = 1;
+    bool bvalid = true;
     uint16_t iblockSize = 0;
-    uint8_t* istartBufferPosition = 0;
+    uint8_t* istartBufferPosition = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockHeader, 4u);
         // 'BLOK': the save game block header.
@@ -303,11 +303,11 @@ bool BSTempEffectParticle::LoadGame() {
     pSaveLoadGameOLD->LoadGameDataOLD(&fscale, 4u);
     pSaveLoadGameOLD->LoadGameDataOLD(&icontrollerDataSize, 2u);
     if (bvalid) {
-        NiNode* pnode = pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+        NiNode* pnode = pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
         if (pnode) {
             spParticleObject.operator=(static_cast<NiAVObject*>(pnode->Clone()));
             if (spParticleObject.m_pObject) {
-                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(0));
+                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
                 pModelLoader->FindModel(modelPath, spmodel);
                 pFilename = spmodel.m_pObject->pFilename;
                 static_cast<NiAVObject*>(spParticleObject.m_pObject)->NiAVObject::SetTranslate(loc);
@@ -317,7 +317,7 @@ bool BSTempEffectParticle::LoadGame() {
                 pparentnode->AttachChild(static_cast<NiAVObject*>(spParticleObject.m_pObject), 1);
                 static_cast<NiAVObject*>(spParticleObject.m_pObject)->NiAVObject::UpdateProperties();
                 float afTime = static_cast<double>(appTimer.iLastTime) / 1000.0;
-                NiUpdateData UpdateData(afTime, 1, 0);
+                NiUpdateData UpdateData(afTime, true, false);
                 static_cast<NiAVObject*>(spParticleObject.m_pObject)->NiAVObject::Update(UpdateData);
                 NiTimeController::StartAnimations(static_cast<NiAVObject*>(spParticleObject.m_pObject));
                 if (icontrollerDataSize) {
@@ -331,17 +331,17 @@ bool BSTempEffectParticle::LoadGame() {
                         );
                     }
                     else {
-                        bvalid = 0;
+                        bvalid = false;
                     }
                 }
                 NiPointer<Model>::Destroy(&spmodel);
             }
             else {
-                bvalid = 0;
+                bvalid = false;
             }
         }
         else {
-            bvalid = 0;
+            bvalid = false;
         }
     }
     if (!bvalid) {
@@ -419,10 +419,10 @@ void BSTempEffectParticle::Init(
     NiTransform particleTransform_2;
     NiTransform followTransform;
     NiPointer<NiAVObject> spmodel(
-        static_cast<NiAVObject*>(pModelLoader->LoadFile(pFilename, LOD_MULT_NONE, 1, 0, 0, 1))
+        static_cast<NiAVObject*>(pModelLoader->LoadFile(pFilename, LOD_MULT_NONE, true, false, false, true))
     );
     if (spmodel.m_pObject) {
-        spParticleObject.operator=(static_cast<NiAVObject*>(0));
+        spParticleObject.operator=(static_cast<NiAVObject*>(nullptr));
         uint32_t iresult = 0;
         if ((aiFlags & 1) != 0) {
             if (TES::pInstance) {
@@ -460,7 +460,7 @@ void BSTempEffectParticle::Init(
             if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
                 NiAVObject* pobject = spParticleObject.m_pObject;
                 TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
-                Instance->QueueNodeAttach(pobject, apSceneParent, 1, 1);
+                Instance->QueueNodeAttach(pobject, apSceneParent, true, true);
             }
             else {
                 apSceneParent->AttachChild(spParticleObject.m_pObject, 1);
@@ -492,14 +492,14 @@ void BSTempEffectParticle::StartSounds() {
             Sound1 = *BSAudio::QInstance().GetSoundHandleByNumericID(&kHandle1, isoundFileID, 258u);
             Sound1.SetPosition(static_cast<NiAVObject*>(spParticleObject.m_pObject)->GetWorldTranslate());
             Sound1.SetObjectToFollow(static_cast<NiAVObject*>(spParticleObject.m_pObject));
-            Sound1.Play(0);
+            Sound1.Play(false);
         }
         if (pDecalImpactData->pSound2) {
             uint32_t isoundFileID_2 = pDecalImpactData->pSound2->iFormID;
             Sound2 = *BSAudio::QInstance().GetSoundHandleByNumericID(&kHandle2, isoundFileID_2, 258u);
             Sound2.SetPosition(static_cast<NiAVObject*>(spParticleObject.m_pObject)->GetWorldTranslate());
             Sound2.SetObjectToFollow(static_cast<NiAVObject*>(spParticleObject.m_pObject));
-            Sound2.Play(0);
+            Sound2.Play(false);
         }
     }
 }
@@ -543,8 +543,8 @@ void BSTempEffectParticle::PlaySequence(const char* apcSequenceName) {
         a1 = v9->GetSequenceByName(*a2);
         v10 = (-1);
         if (a1) {
-            v9->ActivateSequence(a1, 0, 0, 1.0, 0.0, nullptr);
-            endKeyTime = (float)a1->GetEndKeyTime();
+            v9->ActivateSequence(a1, 0, false, 1.0, 0.0, nullptr);
+            endKeyTime = a1->GetEndKeyTime();
             if (fLifetime < ((double)endKeyTime)) {
                 fLifetime = endKeyTime;
             }
@@ -599,11 +599,11 @@ void BSTempEffectParticle::ResetGravityRecursive(
                     NiObject::DynamicCastStatic(&NiPSysGravityModifier::ms_RTTI, ModifierAt)
                 );
                 if (pgrav) {
-                    bool badd = 1;
+                    bool badd = true;
                     for (int32_t c = aiCount - 1; badd && c >= 0; --c) {
                         NiAVObject** v6 = &iArray.operator[](c);
                         if (*v6 == pgrav->m_pkGravityObj) {
-                            badd = 0;
+                            badd = false;
                         }
                     }
                     if (badd) {
@@ -659,7 +659,7 @@ BSTempEffectParticle* BSTempEffectParticle::Spawn(
 ) {
     NiMatrix3 v10;
     NiMatrix3 krandrot_2;
-    BSTempEffectParticle* presult = 0;
+    BSTempEffectParticle* presult = nullptr;
     if (apCell) {
         BSTempEffectParticle* presult_2;
         NiMatrix3 krandrot;
@@ -668,7 +668,7 @@ BSTempEffectParticle* BSTempEffectParticle::Spawn(
             presult_2 = ::new (apMemory) BSTempEffectParticle(apCell, afLifetime, apParticleFilename, apFollowObject);
         }
         else {
-            presult_2 = 0;
+            presult_2 = nullptr;
         }
         presult = presult_2;
         float frand = RandomFloatTwoPi();
@@ -693,7 +693,7 @@ BSTempEffectParticle* BSTempEffectParticle::Spawn(
     NiAVObject* apFollowObject
 ) {
     NiMatrix3 v9;
-    BSTempEffectParticle* presult = 0;
+    BSTempEffectParticle* presult = nullptr;
     if (apCell) {
         BSTempEffectParticle* presult_2;
         void* apMemory = NiMemObject::operator new(sizeof(BSTempEffectParticle));
@@ -701,7 +701,7 @@ BSTempEffectParticle* BSTempEffectParticle::Spawn(
             presult_2 = ::new (apMemory) BSTempEffectParticle(apCell, afLifetime, apParticleFilename, apFollowObject);
         }
         else {
-            presult_2 = 0;
+            presult_2 = nullptr;
         }
         presult = presult_2;
         NiNode* pparentnode = apCell->GetChildNode(TESObjectCELL::CN_DYNAMIC);

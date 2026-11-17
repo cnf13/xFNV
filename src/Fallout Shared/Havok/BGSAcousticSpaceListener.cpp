@@ -18,7 +18,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 
 BGSAcousticSpaceListener::BGSAcousticSpaceListener()
-  : bhkEntityListener(0), bBufferRemovalOperations(1), RemovalQueueMap(37u) {}
+  : bhkEntityListener(0), bBufferRemovalOperations(true), RemovalQueueMap(37u) {}
 
 BGSAcousticSpaceListener::~BGSAcousticSpaceListener() {}
 
@@ -28,12 +28,12 @@ void BGSAcousticSpaceListener::entityRemovedCallback(hkpEntity* apEntity) {
             const hkpCollidable* Collidable = apEntity->getCollidable();
             bhkWorldObject* CameraRigidBody = static_cast<bhkWorldObject*>(pPlayer->GetCameraRigidBody());
             if (Collidable == CameraRigidBody->GetCollidable()) {
-                FalloutAudio::ClearAcousticSpace(0);
+                FalloutAudio::ClearAcousticSpace(nullptr);
             }
         }
         else {
             if (TESHavokUtilities::FindCollidableRef(apEntity->getCollidable()) == pPlayer) {
-                FalloutAudio::ClearAcousticSpace(0);
+                FalloutAudio::ClearAcousticSpace(nullptr);
             }
         }
     }
@@ -69,7 +69,7 @@ void BGSAcousticSpaceListener::Update(float afTime) {
 }
 
 bool BGSAcousticSpaceListener::contactPointAddedCallback(hkpRootCdPoint& CPoint) {
-    TESObjectREFR* apRef = 0;
+    TESObjectREFR* apRef = nullptr;
     if (pPlayer->Is3rdPerson()) {
         bhkWorldObject* CameraRigidBody = static_cast<bhkWorldObject*>(pPlayer->GetCameraRigidBody());
         if (CPoint.m_rootCollidableB == CameraRigidBody->GetCollidable()) {
@@ -82,17 +82,17 @@ bool BGSAcousticSpaceListener::contactPointAddedCallback(hkpRootCdPoint& CPoint)
         }
     }
     if (!apRef) {
-        return 0;
+        return false;
     }
-    if (!bBufferRemovalOperations || !DequeueRemoval(apRef, 0)) {
+    if (!bBufferRemovalOperations || !DequeueRemoval(apRef, false)) {
         BGSAcousticSpace* ObjectReference = static_cast<BGSAcousticSpace*>(apRef->GetObjectReference());
         FalloutAudio::SetAcousticSpace(ObjectReference);
     }
-    return 1;
+    return true;
 }
 
 bool BGSAcousticSpaceListener::contactPointRemovedCallback(hkpRootCdPoint& CPoint) {
-    TESObjectREFR* apRef = 0;
+    TESObjectREFR* apRef = nullptr;
     if (pPlayer->Is3rdPerson()) {
         bhkWorldObject* CameraRigidBody = static_cast<bhkWorldObject*>(pPlayer->GetCameraRigidBody());
         if (CPoint.m_rootCollidableB == CameraRigidBody->GetCollidable()) {
@@ -113,7 +113,7 @@ bool BGSAcousticSpaceListener::contactPointRemovedCallback(hkpRootCdPoint& CPoin
             FalloutAudio::ClearAcousticSpace(ObjectReference);
         }
     }
-    return 0;
+    return false;
 }
 
 bool BGSAcousticSpaceListener::collidableEnterCallback(hkpCollidable* collidableA, hkpCollidable* collidableB) {

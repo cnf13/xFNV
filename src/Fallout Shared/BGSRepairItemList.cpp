@@ -36,7 +36,7 @@ void BGSRepairItemList::CopyComponent(BaseFormComponent* apCopyFC) {
 bool BGSRepairItemList::CompareComponent(BaseFormComponent* apCompareFC) {
     void* v5 = dynamic_cast<BGSRepairItemList*>(apCompareFC);
     if (!v5) {
-        return (bool)1;
+        return true;
     }
     BGSRepairItemList* pCompare = static_cast<BGSRepairItemList*>(v5);
     return pCompare->pListForm != pListForm;
@@ -58,7 +58,7 @@ void BGSRepairItemList::InitItem(TESForm* apOwner) {
             pownerFile = apOwner->GetFile(-1);
         }
         else {
-            pownerFile = 0;
+            pownerFile = nullptr;
         }
         TESForm::AddCompileIndex(itempint, pownerFile);
         TESForm* FormByNumericID = TESForm::GetFormByNumericID(itempint);
@@ -87,7 +87,7 @@ void BGSRepairItemList::InitItem(TESForm* apOwner) {
 }
 
 bool BGSRepairItemList::HasRepairItem(TESForm* apForm) {
-    bool v4 = 0;
+    bool v4 = false;
     if (pListForm) {
         BSSimpleList<TESForm*>* FormList = pListForm->GetFormList();
         return FormList->IsInList(apForm);
@@ -97,7 +97,7 @@ bool BGSRepairItemList::HasRepairItem(TESForm* apForm) {
 
 // The repair list subobject of an armor or a weapon; each cast is null-checked.
 BGSRepairItemList* BGSRepairItemList::GetFormAsRepairItemList(TESForm* apForm) {
-    BGSRepairItemList* pretval = 0;
+    BGSRepairItemList* pretval = nullptr;
     if (apForm) {
         int32_t FormType = apForm->GetFormType();
         if (FormType == ARMO_ID) {
@@ -114,17 +114,17 @@ BGSRepairItemList* BGSRepairItemList::GetFormAsRepairItemList(TESForm* apForm) {
 
 bool BGSRepairItemList::CanItemRepairForm(TESForm* apRepairItem, TESForm* apForm) {
     float fHasJuryRiggingPerk;
-    bool bretval = 0;
+    bool bretval = false;
     if (!apRepairItem || !apForm) {
-        return 0;
+        return false;
     }
     if (apRepairItem == apForm) {
-        return 1;
+        return true;
     }
     BGSRepairItemList* prepairlist = BGSRepairItemList::GetFormAsRepairItemList(apForm);
     if (prepairlist) {
         if (prepairlist->HasRepairItem(apRepairItem)) {
-            return 1;
+            return true;
         }
         else {
             fHasJuryRiggingPerk = 0.0;
@@ -140,7 +140,7 @@ bool BGSRepairItemList::CanItemRepairForm(TESForm* apRepairItem, TESForm* apForm
                             int32_t ArmorWeight = pRepairArmor->TESObjectARMO::GetArmorWeight();
                             if (ArmorWeight == pArmor->TESObjectARMO::GetArmorWeight()) {
                                 if (pRepairArmor->eEquipType == pArmor->eEquipType) {
-                                    return 1;
+                                    return true;
                                 }
                             }
                         }
@@ -153,7 +153,7 @@ bool BGSRepairItemList::CanItemRepairForm(TESForm* apRepairItem, TESForm* apForm
                             if (WeaponSkill == pWeapon->TESObjectWEAP::GetWeaponSkill()) {
                                 WEAPON_TYPE WeaponType = pRepairWeapon->TESObjectWEAP::GetWeaponType();
                                 if (WeaponType == pWeapon->TESObjectWEAP::GetWeaponType()) {
-                                    return 1;
+                                    return true;
                                 }
                             }
                         }

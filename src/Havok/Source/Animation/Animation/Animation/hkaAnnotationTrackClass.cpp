@@ -216,7 +216,7 @@ const void* getVtablehkMemoryResourceHandle() {
 
 // Finishes the object it is given, when there is one.
 void finishLoadedObjecthkMemoryResourceHandle(void* p, int32_t finishing) {
-    void* apObject = static_cast<void*>(p);
+    void* apObject = p;
     hkFinishLoadedObjectFlag aFlag;
     aFlag.m_finishing = finishing;
     if (apObject) {
@@ -225,7 +225,7 @@ void finishLoadedObjecthkMemoryResourceHandle(void* p, int32_t finishing) {
 }
 
 void finishLoadedObjecthkMemoryResourceContainer(void* p, int32_t finishing) {
-    void* apObject = static_cast<void*>(p);
+    void* apObject = p;
     hkFinishLoadedObjectFlag aFlag;
     aFlag.m_finishing = finishing;
     if (apObject) {
@@ -242,7 +242,7 @@ void cleanupLoadedObjecthkaSkeletonLocalFrameOnBone(void* p) {
     if (*a1) {
         (*a1)->removeReference();
     }
-    *a1 = 0;
+    *a1 = nullptr;
 }
 
 const void* getVtablehkaSkeleton() {
@@ -481,7 +481,7 @@ void cleanupLoadedObjecthkaMeshBindingMapping(void* p) {
         );
     }
     pMapping->m_mapping.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
-    pMapping->m_mapping.m_data = 0;
+    pMapping->m_mapping.m_data = nullptr;
 }
 
 void cleanupLoadedObjecthkpSimpleShapePhantom(void* p) {
@@ -517,7 +517,7 @@ const void* getVtablehkpSimpleShapePhantom() {
 
 // Finishes the object it is given, when there is one.
 void finishLoadedObjecthkpSimpleShapePhantom(void* p, int32_t finishing) {
-    void* apObject = static_cast<void*>(p);
+    void* apObject = p;
     hkFinishLoadedObjectFlag aFlag;
     aFlag.m_finishing = finishing;
     if (apObject) {

@@ -66,9 +66,9 @@ SettingT<GameSettingCollection>
     sHackIneligible("sHackIneligible", "A %s skill of %d is required to hack this terminal.");
 
 TERMINAL_MENU_ITEM::TERMINAL_MENU_ITEM() : pDisplayNote(nullptr), pSubMenu(nullptr), cFlags(0) {
-    ResultScript.SetInitialized(0);
+    ResultScript.SetInitialized(false);
     ResultScript.SetTemporary();
-    ResultScript.m_header.bIsQuestScript = 0;
+    ResultScript.m_header.bIsQuestScript = false;
 }
 
 bool TERMINAL_MENU_ITEM::IsAutoAdd() {
@@ -469,7 +469,7 @@ void BGSTerminal::Copy(TESForm* apCopy) {
                 pitem = ::new (apMemory) TERMINAL_MENU_ITEM;
             }
             else {
-                pitem = 0;
+                pitem = nullptr;
             }
             pitem->ResponseText.Copy(pcopyitem->ResponseText);
             pitem->ResultText.Copy(pcopyitem->ResultText);
@@ -477,7 +477,7 @@ void BGSTerminal::Copy(TESForm* apCopy) {
             pitem->pSubMenu = pcopyitem->pSubMenu;
             pitem->cFlags = pcopyitem->cFlags;
             pitem->ResultScript.CopyResultScript(&pcopyitem->ResultScript);
-            pitem->Conditions.Copy(&pcopyitem->Conditions, 0);
+            pitem->Conditions.Copy(&pcopyitem->Conditions, nullptr);
             AddMenuItem(pitem);
         }
         TESObjectACTI::Copy(pcopy);
@@ -487,44 +487,44 @@ void BGSTerminal::Copy(TESForm* apCopy) {
 bool BGSTerminal::Compare(TESForm* apCompare) {
     BGSTerminal* pcomp = dynamic_cast<BGSTerminal*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     BGSNote* CriticalQueuedRefCount = pPassword;
     if (CriticalQueuedRefCount != pcomp->pPassword) {
-        return 1;
+        return true;
     }
     if (std::memcmp(&Data, &pcomp->Data, sizeof(Data))) {
-        return 1;
+        return true;
     }
     BSSimpleList<TERMINAL_MENU_ITEM*>* plist = GetMenuItemList();
     BSSimpleList<TERMINAL_MENU_ITEM*>* pcomplist = pcomp->GetMenuItemList();
     int32_t v4 = plist->ItemsInList();
     if (v4 != pcomplist->ItemsInList()) {
-        return 1;
+        return true;
     }
     while (pcomplist && (!pcomplist->IsEmpty() && (plist && !plist->IsEmpty()))) {
         TERMINAL_MENU_ITEM* pcompitem = pcomplist->m_item;
         TERMINAL_MENU_ITEM* pitem = plist->m_item;
         if (static_cast<uint8_t>(pitem->ResponseText.IsNotEqual(pcompitem->ResponseText))) {
-            return 1;
+            return true;
         }
         if (static_cast<uint8_t>(pitem->ResultText.IsNotEqual(pcompitem->ResultText))) {
-            return 1;
+            return true;
         }
         if (pitem->ResultScript.CompareResultScripts(&pcompitem->ResultScript)) {
-            return 1;
+            return true;
         }
         if (pitem->Conditions.Compare(&pcompitem->Conditions)) {
-            return 1;
+            return true;
         }
         if (pitem->pDisplayNote != pcompitem->pDisplayNote) {
-            return 1;
+            return true;
         }
         if (pitem->pSubMenu != pcompitem->pSubMenu) {
-            return 1;
+            return true;
         }
         if (pitem->cFlags != pcompitem->cFlags) {
-            return 1;
+            return true;
         }
         pcomplist = pcomplist->m_pkNext;
         plist = plist->m_pkNext;
@@ -541,7 +541,7 @@ bool BGSTerminal::Activate(
 ) {
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (Interface::IsPipBoyOpening()) {
-        return 0;
+        return false;
     }
     if (BGSOpenCloseForm::GetOpenState(apItemActivated) == BGSOpenCloseForm::OBJECT_OPEN) {
         HandleOpenFinish(apItemActivated, apActionRef);
@@ -555,22 +555,23 @@ bool BGSTerminal::Activate(
             const char* timea = ActorValue::GetActorValueName(ActorValue::SCIENCE);
             strmsg.SPrintF(sHackIneligible.operator const char*(), timea, afTime);
             Interface::ShowMessage(
-                strmsg.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_angry.dds", 0, 2.0f, 0
+                strmsg.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_angry.dds", nullptr, 2.0f,
+                false
             );
             BSAudio* v7 = &BSAudio::QInstance();
             BSSoundHandle* SoundHandleByName = v7->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-            SoundHandleByName->Play(0);
+            SoundHandleByName->Play(false);
         }
         else {
             if (apActionRef == pPlayer && BGSTerminal::IsTerminalRefInUse(apItemActivated)) {
                 const char* v8 = sObjectInUse.String();
-                Interface::ShowMessage(v8, 0, 0, 0, 2.0f, 0);
-                return 0;
+                Interface::ShowMessage(v8, 0, nullptr, nullptr, 2.0f, false);
+                return false;
             }
             Actor* pActionActor = static_cast<Actor*>(apActionRef);
             if (apItemActivated->GetOwner()) {
-                if (!apItemActivated->IsAnOwner(pActionActor, 1) && !IsUnlocked()) {
-                    bool bkarma = 0;
+                if (!apItemActivated->IsAnOwner(pActionActor, true) && !IsUnlocked()) {
+                    bool bkarma = false;
                     TESForm* powner = apItemActivated->GetOwner();
                     int32_t pactor = 0;
                     if (powner->GetFormType() == FACT_ID) {
@@ -592,10 +593,10 @@ bool BGSTerminal::Activate(
                     }
                 }
             }
-            BGSOpenCloseForm::HandleActivate(apItemActivated, apActionRef, 0);
+            BGSOpenCloseForm::HandleActivate(apItemActivated, apActionRef, nullptr);
         }
     }
-    return 1;
+    return true;
 }
 
 // When the player opens the terminal: the computers menu once it is open to them, the hacking game when it is locked
@@ -676,7 +677,7 @@ LOCK_LEVEL BGSTerminal::GetHackDifficultyLockLevel(TESObjectREFR* apRef) {
     if (IsLeveled()) {
         uint32_t icalclevel;
         if (apRef) {
-            icalclevel = apRef->GetCalcLevel(0);
+            icalclevel = apRef->GetCalcLevel(false);
         }
         else {
             icalclevel = pPlayer->GetLevel();
@@ -786,7 +787,7 @@ bool BGSTerminal::IsTerminalRefInUse(TESObjectREFR* apRef) {
         return (bool)v3;
     }
     if (linkedRef->IsFurniture()) {
-        return (((int8_t)linkedRef->HasFreeMarker(1)) == 0);
+        return (((int8_t)linkedRef->HasFreeMarker(true)) == 0);
     }
     return (bool)v3;
 }

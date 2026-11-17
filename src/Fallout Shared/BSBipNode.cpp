@@ -26,7 +26,7 @@ void BSBipNode::UpdateAllButBip(float afTime) {
         }
         else {
             if (pkControl->GetRTTI() == &BSMultiTargetTreadTransfController::ms_RTTI) {
-                NiUpdateData updateData(afTime, 0, 0);
+                NiUpdateData updateData(afTime, false, false);
                 pkControl->Update(updateData);
             }
         }
@@ -59,14 +59,14 @@ void BSBipNode::UpdateBipOnly(float afTime, NiAVObject* apAccumRoot) {
          i = static_cast<BSMultiTargetTreadTransfController*>(i->GetNext())) {
         bool IsExactKindOf_0 = NiObject::IsExactKindOf(&NiMultiTargetTransformController::ms_RTTI, i);
         if (!NiObject::IsExactKindOf(&BSMultiTargetTreadTransfController::ms_RTTI, i) && !IsExactKindOf_0) {
-            NiUpdateData apMemory(afTime, 0, 0);
+            NiUpdateData apMemory(afTime, false, false);
             i->Update(apMemory);
             break;
         }
     }
     if (apAccumRoot) {
-        NiUpdateData a2(afTime, 1, 0);
-        apAccumRoot->UpdateObjectControllers(a2, 1);
+        NiUpdateData a2(afTime, true, false);
+        apAccumRoot->UpdateObjectControllers(a2, true);
     }
     bhkNiCollisionObject::SetSyncMode(bhkNiCollisionObject::SYNC_BOTH);
 }

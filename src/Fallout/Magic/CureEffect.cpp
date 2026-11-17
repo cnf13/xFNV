@@ -27,7 +27,7 @@ ActiveEffect* CurePoision(MagicCaster* a1, MagicItem* a2, EffectItem* a3) {
         return ::new (apMemory) CureEffect(a1, a2, a3, 5);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -81,7 +81,7 @@ void CureEffect::Start() {
     MagicTarget* v2;
     int32_t v3;
     int32_t v4;
-    if (((uint32_t)eArchetypeID) == ((-1))) {
+    if (((uint32_t)eArchetypeID) == (-1)) {
         v4 = (int32_t)eSpellType;
         unk24 = ActiveEffect::GetTarget();
         unk24->Dispel_4(v4);
@@ -119,6 +119,6 @@ ActiveEffect* CureEffect::InstantiateCureAddiction(MagicCaster* apCaster, MagicI
         return ::new (apMemory) CureEffect(apCaster, apSpell, apEffect, 10);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

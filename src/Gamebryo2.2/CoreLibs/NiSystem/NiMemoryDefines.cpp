@@ -89,7 +89,7 @@ void* _NiAlignedMalloc(size_t stSizeInBytes, size_t stAlignment) {
     stSizeInBytes = stAlignment;
     NiAllocator* m_pkAllocator = NiMemManager::ms_pkMemManager->m_pkAllocator;
     stAlignment = v2;
-    return m_pkAllocator->Allocate(stAlignment, stSizeInBytes, NI_ALIGNEDMALLOC, 0, 0, -1, 0);
+    return m_pkAllocator->Allocate(stAlignment, stSizeInBytes, NI_ALIGNEDMALLOC, 0, nullptr, -1, nullptr);
 }
 
 void* _NiExternalAlignedMalloc(size_t stSizeInBytes, size_t stAlignment) {
@@ -100,7 +100,9 @@ void* _NiExternalAlignedMalloc(size_t stSizeInBytes, size_t stAlignment) {
     stSizeInBytes = stAlignment;
     NiAllocator* m_pkAllocator = NiMemManager::ms_pkMemManager->m_pkAllocator;
     stAlignment = v2;
-    return m_pkAllocator->AllocateExternal(stAlignment, stSizeInBytes, NI_EXTERNAL_ALIGNEDMALLOC, 0, 0, -1, 0);
+    return m_pkAllocator->AllocateExternal(
+        stAlignment, stSizeInBytes, NI_EXTERNAL_ALIGNEDMALLOC, false, nullptr, -1, nullptr
+    );
 }
 
 void _NiExternalFree(void* pvMem) {

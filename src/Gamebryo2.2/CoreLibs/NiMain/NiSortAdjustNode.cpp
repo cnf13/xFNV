@@ -27,7 +27,7 @@ NiObject* NiSortAdjustNode::CreateClone(NiCloningProcess& kCloning) {
         pkObject_2 = ::new (pkObject) NiSortAdjustNode;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_eSortingMode = m_eSortingMode;
@@ -100,7 +100,7 @@ void NiSortAdjustNode::OnVisible(NiCullingProcess& kCuller) {
 NiObject* NiSortAdjustNode::CreateObject() {
     NiSortAdjustNode* pkObject = static_cast<NiSortAdjustNode*>(NiMemObject::operator new(sizeof(NiSortAdjustNode)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiSortAdjustNode;
 }

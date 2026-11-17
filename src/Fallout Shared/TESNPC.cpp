@@ -208,8 +208,8 @@
 #include "SDK/MSVC/string.h"
 
 #include <bit>
+#include <cstdint>
 #include <memory>
-#include <stdint.h>
 #include <vector>
 
 // The container entry the last CNTO chunk added, which a following COED chunk gives its extra data
@@ -604,10 +604,10 @@ int32_t PresetIndexSortFunction(const void* apPtr1, const void* apPtr2) {
 TESNPC::TESNPC() : spHeadBiped(nullptr), spHeadSkinned(nullptr), spBodyModTexture(nullptr), FaceGenUndoStates(0, 1) {
     cFormType = 42;
     TESNPC::InitializeData();
-    SetResponsibility(50, 0);
-    SetAggression(0, 0);
-    SetConfidence(2, 0);
-    SetEnergy(50, 0);
+    SetResponsibility(50, false);
+    SetAggression(0, false);
+    SetConfidence(2, false);
+    SetEnergy(50, false);
     iFileOffset = 0;
 }
 
@@ -728,7 +728,7 @@ void TESNPC::Save() {
         }
         TESForm::AddChunkArray(FGGS_ID, pfloats, isize);
         ourFree(pfloats);
-        pfloats = 0;
+        pfloats = nullptr;
     }
     isize = RaceFaceOffsetCoord[0][1].nrows;
     if (isize) {
@@ -743,7 +743,7 @@ void TESNPC::Save() {
         }
         TESForm::AddChunkArray(FGGA_ID, pfloats_2, isize);
         ourFree(pfloats_2);
-        pfloats_2 = 0;
+        pfloats_2 = nullptr;
     }
     isize = RaceFaceOffsetCoord[1][0].nrows;
     if (isize) {
@@ -758,7 +758,7 @@ void TESNPC::Save() {
         }
         TESForm::AddChunkArray(FGTS_ID, pfloats_3, isize);
         ourFree(pfloats_3);
-        pfloats_3 = 0;
+        pfloats_3 = nullptr;
     }
     TESForm::AddChunk(NAM5_ID, sLastRaceFaceNum);
     TESForm::AddChunk(NAM6_ID, std::bit_cast<uint32_t>(fHeight));
@@ -791,11 +791,11 @@ void TESNPC::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
         apSaveGameBuffer->SaveFormID(pOriginalRace, 0);
     }
     if (apSaveGameBuffer->GetChangeFlags().CheckFlags(CHANGE_NPC_FACE)) {
-        balternativeCoords = 0;
+        balternativeCoords = false;
         FR2MatrixVTC<float>* pfaceCoords = RaceFaceOffsetCoord[0];
         if (pAlternateFaceOffsetCoord) {
             pfaceCoords = (*pAlternateFaceOffsetCoord)[0];
-            balternativeCoords = 1;
+            balternativeCoords = true;
         }
         apSaveGameBuffer->SaveDataEndian(&balternativeCoords, 1u, 0);
         for (uint32_t i = 0; i < 2; ++i) {
@@ -865,7 +865,7 @@ void TESNPC::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     }
     bool v55 = fHeight == GetRaceHeight();
     if (apLoadGameBuffer->GetChangeFlags().CheckFlags(CHANGE_NPC_RACE)) {
-        CombatPlanLink::Key* v53 = 0;
+        CombatPlanLink::Key* v53 = nullptr;
         uint32_t v4 = apLoadGameBuffer->LoadFormID();
         TESForm* v5 = TESForm::GetFormByNumericID(v4);
         TESRace* prace = dynamic_cast<TESRace*>(v5);
@@ -882,7 +882,7 @@ void TESNPC::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         fHeight = GetRaceHeight();
     }
     if (apLoadGameBuffer->GetChangeFlags().CheckFlags(CHANGE_NPC_FACE)) {
-        balternativeCoords = 0;
+        balternativeCoords = false;
         apLoadGameBuffer->LoadData(&balternativeCoords, 1u);
         FR2MatrixVTC<float>* pfaceCoords = RaceFaceOffsetCoord[0];
         if (balternativeCoords) {
@@ -938,7 +938,7 @@ void TESNPC::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         pEyeColor = dynamic_cast<TESEyes*>(v14);
         apLoadGameBuffer->LoadData(&fHairLength, sizeof(fHairLength));
         apLoadGameBuffer->LoadData(&iHairColor, sizeof(iHairColor));
-        bool bheadPartsChanged = 0;
+        bool bheadPartsChanged = false;
         if (apLoadGameBuffer->GetVersion() >= 14u) {
             BSSimpleList<void*>* plist;
             using HeadPartScrapArray = BSScrapArray<BGSHeadPart*, 1024>;
@@ -952,7 +952,7 @@ void TESNPC::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             listHeadParts.RemoveAll();
             uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
             for (uint32_t iloop = 0; iloop < isaveGameCount; ++iloop) {
-                BGSHeadPart* a2 = 0;
+                BGSHeadPart* a2 = nullptr;
                 uint32_t v15 = apLoadGameBuffer->LoadFormID();
                 TESForm* v16 = TESForm::GetFormByNumericID(v15);
                 pForm = dynamic_cast<BGSHeadPart*>(v16);
@@ -966,14 +966,14 @@ void TESNPC::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                     uint32_t iindex =
                         oldHeadParts.Find(ppart_2, 0, &BSSimpleArray<BGSHeadPart*>::DefaultEqualFunctionByAddress);
                     if (iindex == -1) {
-                        bheadPartsChanged = 1;
+                        bheadPartsChanged = true;
                         break;
                     }
                     oldHeadParts.RemoveFast(iindex, 1u);
                 }
             }
             if (oldHeadParts.iSize) {
-                bheadPartsChanged = 1;
+                bheadPartsChanged = true;
             }
         }
         if (bheadPartsChanged ||
@@ -984,11 +984,11 @@ void TESNPC::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         }
     }
     if (apLoadGameBuffer->GetChangeFlags().CheckFlags(CHANGE_NPC_GENDER)) {
-        bfemale = 0;
+        bfemale = false;
         apLoadGameBuffer->LoadData(&bfemale, sizeof(bfemale));
         bool Flag = GetFlag(1u);
         if (Flag != bfemale) {
-            SetFlagBit(1, bfemale, 1);
+            SetFlagBit(1, bfemale, true);
             cresetFlags |= 27u;
         }
     }
@@ -1071,7 +1071,7 @@ bool TESNPC::FindInFileFast(TESFile* apFile) {
     }
     int32_t* currentFormID = reinterpret_cast<int32_t*>(static_cast<uintptr_t>(apFile->TESFile::GetID()));
     if (currentFormID == reinterpret_cast<int32_t*>(static_cast<uintptr_t>(TESForm::GetFormID()))) {
-        return (bool)1;
+        return true;
     }
     return (bool)result;
 }
@@ -1164,50 +1164,50 @@ void TESNPC::Copy(TESForm* apCopy) {
 bool TESNPC::Compare(TESForm* apCompare) {
     TESNPC* pComp = dynamic_cast<TESNPC*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
     TESNPC_Data* Skills = pComp->GetSkills();
     if (std::memcmp(&data, Skills, sizeof(data))) {
-        return 1;
+        return true;
     }
     if (pCl != pComp->GetClass()) {
-        return 1;
+        return true;
     }
     if (pHair != pComp->GetHair()) {
-        return 1;
+        return true;
     }
     if (fHairLength != pComp->GetHairLength()) {
-        return 1;
+        return true;
     }
     if (pEyeColor != pComp->GetEyeColor()) {
-        return 1;
+        return true;
     }
     if (iHairColor != pComp->GetHairColor()) {
-        return 1;
+        return true;
     }
     FR2MatrixVTC<float>(*OffsetFaceCoord)[2][2] = pComp->GetOffsetFaceCoord();
     FR2MatrixVTC<float>(*v4)[2][2] = GetOffsetFaceCoord();
     if (BSFaceGenManager::CompareFaceGenCoord(v4, OffsetFaceCoord)) {
-        return 1;
+        return true;
     }
     TESCombatStyle* v5 = GetCombatStyle();
     if (v5 != pComp->GetCombatStyle()) {
-        return 1;
+        return true;
     }
     BGSImpactDataSet::IMPACT_MATERIAL_TYPE v6 = GetBloodImpactMaterial();
     if (v6 != pComp->GetBloodImpactMaterial()) {
-        return 1;
+        return true;
     }
     int32_t v7 = GetHeadParts()->ItemsInList();
     if (v7 != pComp->GetHeadParts()->ItemsInList()) {
-        return 1;
+        return true;
     }
     for (BSSimpleList<void*>* phplist = GetHeadParts(); phplist && !phplist->IsEmpty(); phplist = phplist->m_pkNext) {
         if (!pComp->GetHeadParts()->IsInList(phplist->m_item)) {
-            return 1;
+            return true;
         }
     }
     return pComp->fHeight != fHeight || pComp->fWeight != fWeight;
@@ -1223,17 +1223,17 @@ bool TESNPC::Activate(
     Actor* pActionActor = dynamic_cast<Actor*>(apActionRef);
     Actor* pactor = dynamic_cast<Actor*>(apItemActivated);
     if (!pactor || pactor->IsDying()) {
-        return 0;
+        return false;
     }
     BaseProcess* pprocess = pactor->pCurrentProcess;
     if (!pprocess) {
-        return 0;
+        return false;
     }
-    if (pprocess->GetCommandingActor() && !pactor->IsDead(0)) {
-        return 0;
+    if (pprocess->GetCommandingActor() && !pactor->IsDead(false)) {
+        return false;
     }
     if (pprocess->GetFadeState()) {
-        return 0;
+        return false;
     }
     BaseProcess* CurrentAIProcess = pActionActor->pCurrentProcess;
     TESPackage* pactionpackage = CurrentAIProcess->GetPackageThatIsRunning();
@@ -1243,39 +1243,39 @@ bool TESNPC::Activate(
             float v48 = appCalendar.GetHour() - 1.0;
             pprocess->SetLastTimeProcessed(v48);
         }
-        return 0;
+        return false;
     }
     else {
         char msg[304];
-        if (!pactor->IsDead(0) || pactor->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN) {
+        if (!pactor->IsDead(false) || pactor->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN) {
             if (pactor->IsUnConscious() ||
                 (pactor->IsKnockedOut() || pactor->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN)) {
                 const char* a2 = sNoTalkUnConscious.String();
                 std::sprintf(msg, "%s %s", pactor->GetFullName(), a2);
                 Interface::ShowMessage(
-                    msg, 0, "Interfac\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", 0, 2.0f, 0
+                    msg, 0, "Interfac\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
                 );
-                return 0;
+                return false;
             }
-            if (pactor->IsFleeing(0)) {
+            if (pactor->IsFleeing(false)) {
                 CombatController* pcombat = pactor->GetCombatController();
                 if (!pcombat || (!pcombat->IsActoraCombatTarget(pPlayer) || pPlayer->GetBlocked())) {
                     const char* a2a = sNoTalkFleeing.String();
                     std::sprintf(msg, "%s %s", pactor->GetFullName(), a2a);
                     Interface::ShowMessage(
-                        msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                        msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
                     );
-                    return 0;
+                    return false;
                 }
             }
         }
         if (pactor->IsPlayerTeammate() && apActionRef == pPlayer) {
             if (Actor::IsConsciousAndNotAttackingPlayer(pactor)) {
                 Interface::QueueMenuCreate(
-                    Interface::OPEN_COMPANION_WHEEL, apItemActivated, 0, 0, Interface::CMM_NONE, 0
+                    Interface::OPEN_COMPANION_WHEEL, apItemActivated, nullptr, nullptr, Interface::CMM_NONE, false
                 );
             }
-            return 0;
+            return false;
         }
         else {
             if (pActionActor) {
@@ -1285,7 +1285,8 @@ bool TESNPC::Activate(
                         if (peditorpack->GetPackType() == PACKAGE_TYPE_DIALOGUE) {
                             ExtraDataList* pextra = &pactor->m_Extra;
                             TESObjectREFR* PackageExtraTarget = pextra->GetPackageExtraTarget();
-                            (&pActionActor->m_Extra)->SetPackageExtra(peditorpack, 4, PackageExtraTarget, 1, 1, 0);
+                            (&pActionActor->m_Extra)
+                                ->SetPackageExtra(peditorpack, 4, PackageExtraTarget, true, true, false);
                             if (peditorpack->GetOncePerDay()) {
                                 char Day = appCalendar.GetDay();
                                 pActionActor->SetRunOnceExtraPackage(peditorpack, Day);
@@ -1299,12 +1300,14 @@ bool TESNPC::Activate(
                 if (pActionActor != pPlayer) {
                     if (pActionActor->pCurrentProcess) {
                         BaseProcess* v46 = pActionActor->pCurrentProcess;
-                        v46->SetTargetActivated(1);
+                        v46->SetTargetActivated(true);
                     }
                 }
                 if (pactor->IsInCombat() && (pActionActor == pPlayer && pactor->IsPlayerTeammate())) {
-                    pVATS.QuitVATSPlayback(0, 0);
-                    Interface::QueueMenuCreate(Interface::OPEN_DIALOG, pactor, 0, 0, Interface::CMM_STANDARD, 0);
+                    pVATS.QuitVATSPlayback(false, false);
+                    Interface::QueueMenuCreate(
+                        Interface::OPEN_DIALOG, pactor, nullptr, nullptr, Interface::CMM_STANDARD, false
+                    );
                 }
                 else {
                     BaseProcess* v44;
@@ -1317,19 +1320,21 @@ bool TESNPC::Activate(
                             ((v45 = pactor->pCurrentProcess, v45->GetFurnitureMarker()) &&
                              (v44 = pactor->pCurrentProcess, v44->GetFurnitureMarker()->cNumber > 19u))))))) {
                         if (pactor->IsReanimated()) {
-                            return 0;
+                            return false;
                         }
-                        if (pactor->IsDead(0)) {
+                        if (pactor->IsDead(false)) {
                             if (pActionActor == pPlayer) {
                                 Interface::QueueMenuCreate(
-                                    Interface::OPEN_CONTAINER, apItemActivated, 0, 0, Interface::CMM_STANDARD, 0
+                                    Interface::OPEN_CONTAINER, apItemActivated, nullptr, nullptr,
+                                    Interface::CMM_STANDARD, false
                                 );
                             }
                             else {
                                 if (apObjecttoGet) {
                                     if (!dynamic_cast<TESNPC*>(apObjecttoGet)) {
                                         apItemActivated->RemoveItem(
-                                            apObjecttoGet, 0, aicount, 0, 0, pActionActor, 0, 0, 1, 0
+                                            apObjecttoGet, nullptr, aicount, false, false, pActionActor, nullptr,
+                                            nullptr, true, false
                                         );
                                     }
                                 }
@@ -1342,25 +1347,31 @@ bool TESNPC::Activate(
                             FIGHT_REACTION ereaction = FIGHT_REACTION_NEUTRAL;
                             if (!pactor->IsRestrained() && !pactor->IsParalyzed()) {
                                 if (pActionActor == pPlayer ||
-                                    !pActionActor->GetShouldAttackActor(pactor, 0, ereaction, 0)) {
+                                    !pActionActor->GetShouldAttackActor(pactor, false, ereaction, false)) {
                                     if (!pactor->IsActoraGuard() &&
-                                        pactor->GetShouldAttackActor(pActionActor, 0, ereaction, 0) &&
+                                        pactor->GetShouldAttackActor(pActionActor, false, ereaction, false) &&
                                         !pActionActor->IsSneaking()) {
                                         BaseProcess* v42 = pactor->pCurrentProcess;
-                                        if (v42->EnterCombat(pactor, pActionActor, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0)) {
-                                            return 1;
+                                        if (v42->EnterCombat(
+                                                pactor, pActionActor, true, true, nullptr, false, false, true, 0, false,
+                                                false, true, nullptr
+                                            )) {
+                                            return true;
                                         }
                                     }
                                 }
                                 else {
                                     BaseProcess* v43 = pActionActor->pCurrentProcess;
-                                    if (v43->EnterCombat(pActionActor, pactor, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0)) {
-                                        return 1;
+                                    if (v43->EnterCombat(
+                                            pActionActor, pactor, false, true, nullptr, false, false, true, 0, false,
+                                            false, true, nullptr
+                                        )) {
+                                        return true;
                                     }
                                 }
                             }
                             if (pActionActor == pPlayer && (pactor->IsKnockedOut() && pactor->GetEssential())) {
-                                return 0;
+                                return false;
                             }
                             if (pActionActor == pPlayer ||
                                 (pactor == pPlayer &&
@@ -1380,33 +1391,37 @@ bool TESNPC::Activate(
                                             std::sprintf(msg, "%s %s", pactor->GetFullName(), a2b);
                                             Interface::ShowMessage(
                                                 msg, 0,
-                                                "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0,
-                                                2.0f, 0
+                                                "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
+                                                nullptr, 2.0f, false
                                             );
-                                            return 0;
+                                            return false;
                                         }
                                     }
                                     Interface::QueueMenuCreate(
-                                        Interface::OPEN_CONTAINER, apItemActivated, 0, 0, Interface::CMM_PICKPOCKET, 0
+                                        Interface::OPEN_CONTAINER, apItemActivated, nullptr, nullptr,
+                                        Interface::CMM_PICKPOCKET, false
                                     );
                                 }
                                 else {
                                     BaseProcess* v40;
-                                    TESTopic* pgreetTopic = 0;
+                                    TESTopic* pgreetTopic = nullptr;
                                     if (pActionActor == pPlayer ||
                                         (v40 = pActionActor->pCurrentProcess, v40->GetNeedTalkPlayer())) {
                                         pgreetTopic = TESTopic::GetTopic(DT_TOPIC, 0);
                                     }
-                                    DialogueItem* pgreetDialogue = 0;
+                                    DialogueItem* pgreetDialogue = nullptr;
                                     if (pgreetTopic) {
                                         if (pActionActor == pPlayer) {
-                                            pgreetDialogue = pgreetTopic->CreateDialogueItem(pactor, pPlayer, 0, 0, 0);
+                                            pgreetDialogue = pgreetTopic->CreateDialogueItem(
+                                                pactor, pPlayer, nullptr, nullptr, false
+                                            );
                                         }
                                         else {
                                             BaseProcess* v39 = pActionActor->pCurrentProcess;
                                             if (v39->GetNeedTalkPlayer()) {
-                                                pgreetDialogue =
-                                                    pgreetTopic->CreateDialogueItem(pActionActor, pPlayer, 0, 0, 0);
+                                                pgreetDialogue = pgreetTopic->CreateDialogueItem(
+                                                    pActionActor, pPlayer, nullptr, nullptr, false
+                                                );
                                             }
                                         }
                                     }
@@ -1415,15 +1430,15 @@ bool TESNPC::Activate(
                                          (pgreetDialogue->FirstResponse() && !pgreetDialogue->NextResponse()))) {
                                         if (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
                                             BaseProcess* v38 = pactor->pCurrentProcess;
-                                            v38->SetNeedTalkPlayer(1);
+                                            v38->SetNeedTalkPlayer(true);
                                             pactor->InitiateGetUpPackage();
-                                            return 1;
+                                            return true;
                                         }
                                         if (pactor == pPlayer) {
-                                            pActionActor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, 0, 0);
+                                            pActionActor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, false, false);
                                         }
                                         else {
-                                            pactor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, 0, 0);
+                                            pactor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, false, false);
                                         }
                                     }
                                     else {
@@ -1439,10 +1454,10 @@ bool TESNPC::Activate(
                                         }
                                         if (pactor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
                                             NiPoint3 v73 = pActionActor->GetLocationOnReference();
-                                            pactor->RequestRotate(v73, 0);
+                                            pactor->RequestRotate(v73, false);
                                         }
-                                        TESTopic* ptopic = 0;
-                                        Actor* pspeaker = 0;
+                                        TESTopic* ptopic = nullptr;
+                                        Actor* pspeaker = nullptr;
                                         if (pActionActor == pPlayer) {
                                             if (!pactor->IsPathingComplete() && !pactor->IsRotating()) {
                                                 BaseProcess* v34 = pactor->pCurrentProcess;
@@ -1474,7 +1489,7 @@ bool TESNPC::Activate(
                                             pactor->InterruptCast();
                                             if (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
                                                 BaseProcess* v33 = pactor->pCurrentProcess;
-                                                v33->SetNeedTalkPlayer(1);
+                                                v33->SetNeedTalkPlayer(true);
                                                 pactor->InitiateGetUpPackage();
                                             }
                                             else {
@@ -1482,9 +1497,10 @@ bool TESNPC::Activate(
                                                 if (pActionActor == pPlayer) {
                                                     pact = pactor;
                                                 }
-                                                pVATS.QuitVATSPlayback(0, 0);
+                                                pVATS.QuitVATSPlayback(false, false);
                                                 Interface::QueueMenuCreate(
-                                                    Interface::OPEN_DIALOG, pact, ptopic, 0, Interface::CMM_STANDARD, 0
+                                                    Interface::OPEN_DIALOG, pact, ptopic, nullptr,
+                                                    Interface::CMM_STANDARD, false
                                                 );
                                             }
                                         }
@@ -1492,7 +1508,7 @@ bool TESNPC::Activate(
                                             if (Interface::GetMenuModeType() != Interface::eDialogMenu) {
                                                 BaseProcess* v32 = pPlayer->pCurrentProcess;
                                                 if (!v32->CanForceGreet(pActionActor)) {
-                                                    return 0;
+                                                    return false;
                                                 }
                                                 BSAudio* v14 = &BSAudio::QInstance();
                                                 v14->EndAllSoundsOfType(4u);
@@ -1534,14 +1550,14 @@ bool TESNPC::Activate(
                                                         BaseProcess::POSTANIM_FORCEIDLE_ANIMATION
                                                     );
                                                 }
-                                                pVATS.QuitVATSPlayback(0, 0);
+                                                pVATS.QuitVATSPlayback(false, false);
                                                 Actor* pact_2 = pActionActor;
                                                 if (pActionActor == pPlayer) {
                                                     pact_2 = pactor;
                                                 }
                                                 Interface::QueueMenuCreate(
-                                                    Interface::OPEN_DIALOG, pact_2, ptopic, 0, Interface::CMM_STANDARD,
-                                                    0
+                                                    Interface::OPEN_DIALOG, pact_2, ptopic, nullptr,
+                                                    Interface::CMM_STANDARD, false
                                                 );
                                             }
                                         }
@@ -1554,9 +1570,12 @@ bool TESNPC::Activate(
                             else {
                                 if (apObjecttoGet) {
                                     if (!dynamic_cast<TESNPC*>(apObjecttoGet)) {
-                                        pactor->RemoveItem(apObjecttoGet, 0, aicount, 1, 0, pActionActor, 0, 0, 1, 0);
+                                        pactor->RemoveItem(
+                                            apObjecttoGet, nullptr, aicount, true, false, pActionActor, nullptr,
+                                            nullptr, true, false
+                                        );
                                         pActionActor->PickpocketAlarm(pactor, apObjecttoGet, aicount);
-                                        return 1;
+                                        return true;
                                     }
                                 }
                                 TESPackage* v16 = pActionActor->GetCurrentPackage();
@@ -1591,18 +1610,20 @@ bool TESNPC::Activate(
                                                 if (!ppack_3->GetDialogueNoHeadtrack() &&
                                                     !ppack_3->GetDialogueDoNotControlTarget()) {
                                                     NiPoint3 v74 = pActionActor->GetLocationOnReference();
-                                                    pactor->RequestRotate(v74, 0);
+                                                    pactor->RequestRotate(v74, false);
                                                 }
                                             }
                                             else {
                                                 NiPoint3 v75 = pActionActor->GetLocationOnReference();
-                                                pactor->RequestRotate(v75, 0);
+                                                pactor->RequestRotate(v75, false);
                                             }
                                         }
                                         if (!pActionActor->IsinDialogue() && pActionActor->IsNpc() && pactor->IsNpc()) {
                                             BaseProcess* v25 = pActionActor->pCurrentProcess;
                                             v25->AddToProcedureIndexRunning(pActionActor, 1);
-                                            if (pActionActor->InitiateDialogue(pactor, 0, 0, 1, 0, 0, 0, 0, 0)) {
+                                            if (pActionActor->InitiateDialogue(
+                                                    pactor, nullptr, nullptr, true, false, false, nullptr, false, false
+                                                )) {
                                                 BaseProcess* v24 = pActionActor->pCurrentProcess;
                                                 v24->AddToProcedureIndexRunning(pActionActor, 2);
                                                 pprocess->AddToProcedureIndexRunning(pactor, 2);
@@ -1619,15 +1640,15 @@ bool TESNPC::Activate(
                             char apText[204];
                             const char* v20 = sActivateNPCCalmed.String();
                             std::sprintf(apText, "%s %s", GetFullName(), v20);
-                            Interface::ShowMessage(apText, 0, 0, 0, 2.0f, 0);
-                            return 0;
+                            Interface::ShowMessage(apText, 0, nullptr, nullptr, 2.0f, false);
+                            return false;
                         }
                     }
                 }
-                return 1;
+                return true;
             }
             else {
-                return 0;
+                return false;
             }
         }
     }
@@ -1880,8 +1901,8 @@ int32_t TESNPC::GetActorValue(ActorValue::Index aiWhich) {
 void TESNPC::SwapEyes(TESEyes* apSwapToEyes) {
     FNVD_INLINED_LOCAL(NiFixedString, v15, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    NiPointer<NiTriBasedGeom> spLeftEye(static_cast<NiTriBasedGeom*>(0));
-    NiPointer<NiTriBasedGeom> spRightEye(static_cast<NiTriBasedGeom*>(0));
+    NiPointer<NiTriBasedGeom> spLeftEye(static_cast<NiTriBasedGeom*>(nullptr));
+    NiPointer<NiTriBasedGeom> spRightEye(static_cast<NiTriBasedGeom*>(nullptr));
     if (spHeadBiped.m_pObject) {
         NiAVObject* pobj;
         uint32_t isizeArray = spHeadBiped.m_pObject->GetArrayCount();
@@ -1904,9 +1925,9 @@ void TESNPC::SwapEyes(TESEyes* apSwapToEyes) {
             else {
                 filename.SPrintF("Data\\Textures\\Characters\\Eyes\\EyeDefault.dds");
             }
-            NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(0));
+            NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(nullptr));
             char* v4 = filename.pString;
-            TES::pInstance->CreateTextureImage(v4, sptexBase, 0, 0);
+            TES::pInstance->CreateTextureImage(v4, sptexBase, false, false);
             if (sptexBase.m_pObject) {
                 NiTexturingProperty* ptexprop;
                 NiPropertyState* pstateleft = &spLeftEye.m_pObject->m_PropertyState;
@@ -1927,7 +1948,7 @@ void TESNPC::SwapEyes(TESEyes* apSwapToEyes) {
                             v13 = 0;
                         }
                         BSShaderPPLightingProperty* pshaderpropLightingLeft =
-                            v13 ? static_cast<BSShaderPPLightingProperty*>(pshadeleft) : 0;
+                            v13 ? static_cast<BSShaderPPLightingProperty*>(pshadeleft) : nullptr;
                         NiShadeProperty* pshaderight = pstateright->GetShade();
                         if (pshaderight) {
                             int32_t v10 =
@@ -1938,7 +1959,7 @@ void TESNPC::SwapEyes(TESEyes* apSwapToEyes) {
                             v11 = 0;
                         }
                         BSShaderPPLightingProperty* pshaderpropLightingRight =
-                            v11 ? static_cast<BSShaderPPLightingProperty*>(pshaderight) : 0;
+                            v11 ? static_cast<BSShaderPPLightingProperty*>(pshaderight) : nullptr;
                         if (pshaderpropLightingLeft) {
                             if (pshaderpropLightingRight) {
                                 pshaderpropLightingLeft->SetDiffuseTexture(0, sptexBase.m_pObject);
@@ -1953,7 +1974,7 @@ void TESNPC::SwapEyes(TESEyes* apSwapToEyes) {
                     ptexprop = ::new (apMemory) NiTexturingProperty;
                 }
                 else {
-                    ptexprop = 0;
+                    ptexprop = nullptr;
                 }
                 ptexprop->SetBaseTexture(sptexBase.m_pObject);
                 ptexprop->SetBaseClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
@@ -2046,12 +2067,12 @@ void TESNPC::ClearHead() {
 }
 
 void TESNPC::InitHead(BSFaceGenNiNode*& apOutNodeBiped, BSFaceGenNiNode*& apOutNodeSkinned) {
-    spHeadBiped.operator=(static_cast<BSFaceGenNiNode*>(0));
-    spHeadSkinned.operator=(static_cast<BSFaceGenNiNode*>(0));
+    spHeadBiped.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
+    spHeadSkinned.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
     if (!spHeadBiped.m_pObject && !spHeadSkinned.m_pObject) {
         if (GetFormRace()) {
             TESRace* FormHealth_0 = GetFormRace();
-            FormHealth_0->CreateHead(apOutNodeBiped, apOutNodeSkinned, this, 1, 0, TESActorBase::SEX_MALE);
+            FormHealth_0->CreateHead(apOutNodeBiped, apOutNodeSkinned, this, true, false, TESActorBase::SEX_MALE);
             TESRace* v4 = GetFormRace();
             sLastRaceFaceNum = v4->GetFaceCoordNum();
         }
@@ -2547,15 +2568,15 @@ void TESNPC::ReplaceRefModel(TESObjectREFR* apRef) {
         if ((static_cast<const void*>(apRef) == static_cast<const void*>(pPlayer)) && (v5 == 1)) {
             b3rdPerson = (uint8_t)pPlayer->Is3rdPerson();
             pBiped = pPlayer->GetBiped((bool)b3rdPerson);
-            pRoot = static_cast<NiNode*>(pPlayer->Get3D((bool)1));
+            pRoot = static_cast<NiNode*>(pPlayer->Get3D(true));
         }
-        InitParts(apRef, pBiped, 0);
-        pBiped->LoadBipedParts(0);
+        InitParts(apRef, pBiped, false);
+        pBiped->LoadBipedParts(false);
         if (pRoot) {
             pRoot->UpdateProperties();
             pRoot->UpdateWorldBound();
             a2.~NiUpdateData();
-            ::new (&a2) NiUpdateData(0.0, 0, 0);
+            ::new (&a2) NiUpdateData(0.0, false, false);
             pRoot->Update(a2);
         }
         --v5;
@@ -2730,18 +2751,18 @@ void TESNPC::InitParts(TESObjectREFR* apRef, BipedAnim* apBipedAnim, bool abForc
 
 void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim) {
     NiMatrix3 matrot;
-    NiPointer<NiObject> spTempObject(0);
+    NiPointer<NiObject> spTempObject(nullptr);
     if (BSFaceGenManager::GetInstance()) {
         if (apBipedAnim->root) {
             if (BSFaceGenManager::GetUseFaceGenHeads() &&
                 (apRef != pPlayer || !pPlayer->Is1stPersonBiped(apBipedAnim))) {
                 NiAVObject* pobjTemp = apRef->TESObjectREFR::Get3D();
-                NiNode* pnodeBase = 0;
+                NiNode* pnodeBase = nullptr;
                 if (pobjTemp) {
                     pnodeBase = pobjTemp->IsNode();
                 }
                 NiNode* pHeadNode = apBipedAnim->GetParentBone(BIPED_BONE_HEAD);
-                NiAVObjectPalette* ptmpPal = 0;
+                NiAVObjectPalette* ptmpPal = nullptr;
                 if (apRef->GetAnimation()) {
                     Animation* v3 = apRef->GetAnimation();
                     if (v3->GetControllerManager()) {
@@ -2758,10 +2779,10 @@ void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim)
                         uint32_t ichild;
                         NiTriBasedGeom* pgeom_2;
                         uint32_t ichildcount;
-                        BSFaceGenNiNode* pfaceBiped = 0;
-                        BSFaceGenNiNode* pfaceSkinned = 0;
-                        BSFaceGenAnimationData* panimdata = 0;
-                        NiPointer<NiGeometryData> spdata(0);
+                        BSFaceGenNiNode* pfaceBiped = nullptr;
+                        BSFaceGenNiNode* pfaceSkinned = nullptr;
+                        BSFaceGenAnimationData* panimdata = nullptr;
+                        NiPointer<NiGeometryData> spdata(nullptr);
                         NiPointer<NiSkinPartition> spskinpart(nullptr);
                         if (spHeadBiped.m_pObject) {
                             if (spHeadSkinned.m_pObject && spHeadSkinned.m_pObject->m_uiRefCount <= 1) {
@@ -2779,7 +2800,7 @@ void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim)
                                     pgeom = pobjTemp2->IsTriBasedGeom();
                                 }
                                 else {
-                                    pgeom = 0;
+                                    pgeom = nullptr;
                                 }
                                 pgeom_2 = pgeom;
                                 if (pgeom) {
@@ -2818,7 +2839,7 @@ void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim)
                                     pgeom_3 = pobjTemp2->IsTriBasedGeom();
                                 }
                                 else {
-                                    pgeom_3 = 0;
+                                    pgeom_3 = nullptr;
                                 }
                                 pgeom_2 = pgeom_3;
                                 if (pgeom_3) {
@@ -2882,7 +2903,9 @@ void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim)
                         }
                         if (!spHeadBiped.m_pObject && !spHeadSkinned.m_pObject) {
                             if (pFormRace) {
-                                pFormRace->CreateHead(pfaceBiped, pfaceSkinned, this, 0, 0, TESActorBase::SEX_MALE);
+                                pFormRace->CreateHead(
+                                    pfaceBiped, pfaceSkinned, this, false, false, TESActorBase::SEX_MALE
+                                );
                                 sLastRaceFaceNum = pFormRace->GetFaceCoordNum();
                                 spHeadBiped.operator=(pfaceBiped);
                                 spHeadSkinned.operator=(pfaceSkinned);
@@ -2897,13 +2920,13 @@ void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim)
                             if (pfaceBiped->GetAnimationData()) {
                                 if (apRef->GetHealth() <= 0.0) {
                                     BSFaceGenAnimationData* v17 = pfaceBiped->GetAnimationData();
-                                    v17->SetDead(1, 1);
+                                    v17->SetDead(true, true);
                                     BSFaceGenAnimationData* v16 = pfaceBiped->GetAnimationData();
-                                    v16->SetMustUpdate(1);
+                                    v16->SetMustUpdate(true);
                                 }
                             }
-                            pfaceBiped->SetAnimationUpdate(1);
-                            pfaceBiped->SetApplyRotToParent(1);
+                            pfaceBiped->SetAnimationUpdate(true);
+                            pfaceBiped->SetApplyRotToParent(true);
                             pfaceBiped->SetTranslate(NiPoint3_ZERO);
                             pfaceBiped->SetRotate(NiMatrix3_IDENTITY);
                             pHeadNode->AttachChild(pfaceBiped, 1);
@@ -2912,19 +2935,19 @@ void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim)
                         }
                         if (pfaceSkinned) {
                             matrot = NiMatrix3_IDENTITY;
-                            pfaceSkinned->SetAnimationUpdate(pfaceBiped == 0);
-                            pfaceSkinned->SetApplyRotToParent(pfaceBiped == 0);
+                            pfaceSkinned->SetAnimationUpdate(pfaceBiped == nullptr);
+                            pfaceSkinned->SetApplyRotToParent(pfaceBiped == nullptr);
                             pfaceSkinned->SetTranslate(NiPoint3_ZERO);
                             pnodeBase->AttachChild(pfaceSkinned, 1);
                             pfaceSkinned->pActor = static_cast<Actor*>(apRef);
                             RecurseAndAddObjectsToPalette(pfaceSkinned, ppal);
-                            pfaceSkinned->FixSkinInstances(pnodeBase, 1);
+                            pfaceSkinned->FixSkinInstances(pnodeBase, true);
                         }
                         if (pfaceBiped) {
                             panimdata_3 = pfaceBiped->GetAnimationData();
                         }
                         else {
-                            panimdata_3 = 0;
+                            panimdata_3 = nullptr;
                         }
                         panimdata = panimdata_3;
                         if (!panimdata_3) {
@@ -2933,15 +2956,15 @@ void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim)
                                 panimdata_4 = pfaceSkinned->GetAnimationData();
                             }
                             else {
-                                panimdata_4 = 0;
+                                panimdata_4 = nullptr;
                             }
                             panimdata = panimdata_4;
                         }
                         if (panimdata) {
-                            panimdata->ResetCurrentMorphs(0.0f, 1, 1, 1, 1, 0);
+                            panimdata->ResetCurrentMorphs(0.0f, true, true, true, true, false);
                         }
                     }
-                    NiUpdateData UpdateData(0.0f, 0, 0);
+                    NiUpdateData UpdateData(0.0f, false, false);
                     pnodeBase->Update(UpdateData);
                 }
                 else {
@@ -3122,12 +3145,12 @@ void TESNPC::RandomizeHead(bool a2, bool a3, bool a4) {
     }
     TESActorBase::SEX v6 = GetSex();
     FR2MatrixVTC<float>(*MeanFaceCoord)[2][2] = pFormRace->GetMeanFaceCoord(v6);
-    BSFaceGenManager::OffsetFaceGenCoord(MeanFaceCoord, &addr, &v21, 0);
+    BSFaceGenManager::OffsetFaceGenCoord(MeanFaceCoord, &addr, &v21, false);
     FR2MatrixVTC<float>(*OffsetFaceCoord)[2][2] = GetOffsetFaceCoord();
     if (BSFaceGenManager::CompareFaceGenCoord(&v21, OffsetFaceCoord)) {
         FR2MatrixVTC<float>(*v9)[2][2] = GetOffsetFaceCoord();
-        BSFaceGenManager::CopyFaceGenCoord(&v21, v9, 0, 0);
-        spBodyModTexture.operator=(static_cast<BSFaceGenNiNode*>(0));
+        BSFaceGenManager::CopyFaceGenCoord(&v21, v9, false, false);
+        spBodyModTexture.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
     }
     rt::eh_vector_destructor_iterator(v21, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>);
     rt::eh_vector_destructor_iterator(
@@ -3152,19 +3175,19 @@ void TESNPC::LoadObjectArray(
         TESBoundObject* pboundObject = apObjectArray->operator[](i);
         InitWornObject(apRef, apBipedAnim, pboundObject);
     }
-    FixDisplayedHeadParts(apRef, 0);
+    FixDisplayedHeadParts(apRef, nullptr);
     if (pactor) {
         if (pactor->pCurrentProcess) {
             BaseProcess* v4 = pactor->pCurrentProcess;
             v4->ClearAll3DUpdateFlags();
         }
     }
-    apBipedAnim->LoadBipedParts(1);
+    apBipedAnim->LoadBipedParts(true);
     NiAVObject* p3D = apRef->Get3D();
     if (p3D) {
         p3D->UpdateProperties();
         p3D->UpdateWorldBound();
-        NiUpdateData UpdateData(0.0f, 0, 0);
+        NiUpdateData UpdateData(0.0f, false, false);
         p3D->Update(UpdateData);
     }
 }
@@ -3196,10 +3219,10 @@ void TESNPC::FixNPCNormals(TESObjectREFR* apRef) {
         if (BSFaceGenManager::GetFixNormals()) {
             NiAVObject* pobj = (NiAVObject*)apRef->Get3D();
             uint32_t ichildren = 0;
-            BSFaceGenNiNode* phead = (&spHeadSkinned.operator=(apRef->GetFaceNode(0)))->m_pObject;
+            BSFaceGenNiNode* phead = (&spHeadSkinned.operator=(apRef->GetFaceNode(nullptr)))->m_pObject;
             const char* HeadPartNodeName = TESRace::GetHeadPartNodeName(RHP_HEAD);
             NiAVObject* ptemp = BSUtilities::GetObjectByName(pobj, HeadPartNodeName);
-            NiTriBasedGeom* pface = ptemp ? ptemp->IsTriBasedGeom() : 0;
+            NiTriBasedGeom* pface = ptemp ? ptemp->IsTriBasedGeom() : nullptr;
             if (pface) {
                 if (phead) {
                     if (!phead->GetFixedNormals()) {
@@ -3222,7 +3245,7 @@ void TESNPC::FixNPCNormals(TESObjectREFR* apRef) {
                                                 pshape = ptemp->IsTriBasedGeom();
                                             }
                                             else {
-                                                pshape = 0;
+                                                pshape = nullptr;
                                             }
                                             pshape_2 = pshape;
                                             if (pshape) {
@@ -3233,7 +3256,7 @@ void TESNPC::FixNPCNormals(TESObjectREFR* apRef) {
                                                 if (pmat) {
                                                     const char* HandleString = (&pmat->m_kName)->GetHandleString();
                                                     if (!_strnicmp(HandleString, "Skin", 4u) &&
-                                                        FixNormals(pshape_2, pface, 0.5f, 1, 0)) {
+                                                        FixNormals(pshape_2, pface, 0.5f, true, false)) {
                                                         goto LABEL_35;
                                                     }
                                                 }
@@ -3251,7 +3274,7 @@ void TESNPC::FixNPCNormals(TESObjectREFR* apRef) {
                                             pshape_3 = ptemp->IsTriBasedGeom();
                                         }
                                         else {
-                                            pshape_3 = 0;
+                                            pshape_3 = nullptr;
                                         }
                                         pshape_2 = pshape_3;
                                         if (pshape_3) {
@@ -3263,9 +3286,9 @@ void TESNPC::FixNPCNormals(TESObjectREFR* apRef) {
                                                 const char* v4;
                                                 v4 = (&pmat->m_kName)->GetHandleString();
                                                 if (!_strnicmp(v4, "Skin", 4u) &&
-                                                    FixNormals(pshape_2, pface, 0.5f, 1, 0)) {
+                                                    FixNormals(pshape_2, pface, 0.5f, true, false)) {
                                                 LABEL_35:;
-                                                    phead->SetFixedNormals(1);
+                                                    phead->SetFixedNormals(true);
                                                     break;
                                                 }
                                             }
@@ -3303,7 +3326,7 @@ void TESNPC::FixNPCNormals(TESObjectREFR* apRef) {
                             const char* v13 = TESRace::GetHeadPartNodeName(static_cast<RACE_HEAD_PART>(ipart));
                             npcdata.pHeadPartNodeName.Add(v13);
                             if (TESRace::GetFaceGenTexturing()) {
-                                NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(0));
+                                NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(nullptr));
                                 GetHeadPartModTexture(static_cast<RACE_HEAD_PART>(ipart), spTempTexture);
                                 npcdata.spTexBaseMod.Add(spTempTexture);
                             }
@@ -3326,13 +3349,13 @@ void TESNPC::InitLoadFaceGen(Character* apCharacter) {
     NiNode* v7;
     NiAVObject* v8;
     NiMatrix3 apRotIn;
-    bBipedAnimUpdateSkins = (bool)1;
+    bBipedAnimUpdateSkins = true;
     BaseProcess* currentAIProcess = apCharacter->MobileObject::GetCurrentAIProcess();
     currentAIProcess->Update3dModel(apCharacter);
-    bBipedAnimUpdateSkins = (bool)0;
+    bBipedAnimUpdateSkins = false;
     if (static_cast<const void*>(apCharacter) == static_cast<const void*>(pPlayer)) {
-        v6 = pPlayer->Get3D((bool)1);
-        v7 = (v6 != 0) ? static_cast<NiNode*>(v6) : (nullptr);
+        v6 = pPlayer->Get3D(true);
+        v7 = (v6 != nullptr) ? static_cast<NiNode*>(v6) : nullptr;
         if (v7) {
             v3 = v7->GetAtChecked(0);
         }
@@ -3389,8 +3412,8 @@ void TESNPC::SaveFaceGen(Character* apCharacter) {
 }
 
 void TESNPC::ClearFaceGenModels() {
-    spHeadBiped.operator=(static_cast<BSFaceGenNiNode*>(0));
-    spHeadSkinned.operator=(static_cast<BSFaceGenNiNode*>(0));
+    spHeadBiped.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
+    spHeadSkinned.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
 }
 
 uint16_t TESNPC::GetFaceGenSaveSize(Character* apCharacter) {
@@ -3414,24 +3437,24 @@ BSSimpleList<const char*>* TESNPC::BuildDefaultModelList(bool abArmor, bool abWe
         plist = ::new (v7) BSSimpleList<const char*>;
     }
     else {
-        plist = 0;
+        plist = nullptr;
     }
     if (abArmor) {
         TESBipedModelForm* pModels[BIPED_OBJECT_COUNT];
-        TESBipedModelForm* pupperModel = 0;
+        TESBipedModelForm* pupperModel = nullptr;
         TESActorBase::SEX esex = GetSex();
         ourMemset(pModels, 0, sizeof(pModels));
         for (BIPED_OBJECT n = BO_HEAD; n < BIPED_OBJECT_COUNT; n = static_cast<BIPED_OBJECT>(n + 1)) {
             int32_t pextra = 0;
             TESObjectARMO* parmorObj = GetBestArmor(this, n);
             if (parmorObj) {
-                if ((!pupperModel || !pupperModel->FillsBipedSlot(n, 0, 0)) && !pModels[n]) {
+                if ((!pupperModel || !pupperModel->FillsBipedSlot(n, false, nullptr)) && !pModels[n]) {
                     TESBipedModelForm* v4;
                     if (parmorObj) {
                         v4 = static_cast<TESBipedModelForm*>(parmorObj);
                     }
                     else {
-                        v4 = 0;
+                        v4 = nullptr;
                     }
                     pModels[n] = v4;
                     if (pModels[n]) {
@@ -3468,7 +3491,7 @@ void TESNPC::SwitchRace(TESRace* apRace, Actor* apActor) {
         bool v4 = fHeight == GetRaceHeight();
         if (pOriginalRace == apRace) {
             pFormRace = apRace;
-            pOriginalRace = 0;
+            pOriginalRace = nullptr;
             RemoveChange(CHANGE_NPC_RACE);
         }
         else {
@@ -3482,7 +3505,7 @@ void TESNPC::SwitchRace(TESRace* apRace, Actor* apActor) {
             fHeight = GetRaceHeight();
         }
         if (apActor) {
-            apActor->QueueReplacementLocomotions(0);
+            apActor->QueueReplacementLocomotions(false);
         }
     }
 }

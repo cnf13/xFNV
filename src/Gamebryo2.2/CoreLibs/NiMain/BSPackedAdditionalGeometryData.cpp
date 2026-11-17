@@ -101,7 +101,7 @@ void BSPackedAdditionalGeometryData::GetViewerStrings(NiTPrimitiveArray<char*>* 
 NiAdditionalGeometryData::NiAGDDataBlock* BSPackedAdditionalGeometryData::CreateAGDDataBlock() {
     void* pkMemory = MemoryManager_Singleton.Allocate(sizeof(NiBSPackedAGDDataBlock));
     if (!pkMemory) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkMemory) NiBSPackedAGDDataBlock;
 }

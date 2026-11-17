@@ -83,7 +83,7 @@ const hkpShapeContainer* hkpConvexListShape::getContainer() const {
         return static_cast<const hkpShapeContainer*>(this);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -184,8 +184,7 @@ void hkpConvexListShape::getSupportingVertexImpl(const hkVector4& dir, hkpCdVert
         hkpCdVertex support;
         m_childShapes.m_data[i]->getSupportingVertexImpl(dir, support);
         __m128 product = _mm_mul_ps(dir.m_quad, support.m_quad);
-        float dot = _mm_shuffle_ps(product, product, 170)[0] +
-            static_cast<float>(_mm_shuffle_ps(product, product, 85)[0] + product[0]);
+        float dot = _mm_shuffle_ps(product, product, 170)[0] + (_mm_shuffle_ps(product, product, 85)[0] + product[0]);
         if (maxDot < dot) {
             maxDot = dot;
             supportingVertexOut = support;
@@ -351,7 +350,7 @@ float hkpConvexTransformShape::getMaximumProjection(const hkVector4& direction) 
         ),
         direction.m_quad
     );
-    return _mm_shuffle_ps(v10, v10, 170)[0] + static_cast<float>(_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
+    return _mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
 }
 
 const hkpShapeContainer* hkpConvexTransformShape::getContainer() const {

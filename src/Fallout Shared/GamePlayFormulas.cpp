@@ -548,9 +548,10 @@ float GamePlayFormulas::GetActorWalkSpeed(
             }
         }
     }
-    double LeftMobility = 1.0 - CombatFormulas::GetBodyPartCondition(apActor, ActorValue::LEFT_MOBILITY_CONDITION, 0);
+    double LeftMobility =
+        1.0 - CombatFormulas::GetBodyPartCondition(apActor, ActorValue::LEFT_MOBILITY_CONDITION, false);
     float totalMobility =
-        1.0 - CombatFormulas::GetBodyPartCondition(apActor, ActorValue::RIGHT_MOBILITY_CONDITION, 0) + LeftMobility;
+        1.0 - CombatFormulas::GetBodyPartCondition(apActor, ActorValue::RIGHT_MOBILITY_CONDITION, false) + LeftMobility;
     float crippledLimbMult = 1.0;
     if (totalMobility == 1.0) {
         crippledLimbMult = fMoveOneCrippledLegSpeedMult.Float();
@@ -650,7 +651,7 @@ float GamePlayFormulas::GetActorRunSpeed(
                    apActor, pWeap, pArmor, abIsSneaking, abNoWeapon, abIsNpc, abOverEncumbered
                ) +
         ((float)0.0);
-    return (float)(v9 * ((&::fMoveRunMult)->Float()));
+    return (v9 * (&::fMoveRunMult)->Float());
 }
 
 float GamePlayFormulas::GetActorClothingDesirability(uint32_t aiClothingValue) {
@@ -764,7 +765,7 @@ int32_t GamePlayFormulas::GetRepairCost(int32_t aiVendorRepairSkill, float afCon
 
 float GamePlayFormulas::SwimBreathTime(int32_t aiEndurance) {
     float* v1 = &(&fActorSwimBreathBase)->Float();
-    return (float)((((&::fActorSwimBreathMult)->Float()) * ((double)aiEndurance)) + (*v1));
+    return (float)(((&::fActorSwimBreathMult)->Float() * ((double)aiEndurance)) + (*v1));
 }
 
 // The rates are per hour: 3600.0 is a double constant; the waking rate is rounded to a float local.
@@ -792,7 +793,7 @@ void GamePlayFormulas::CalculatePotionDurationMagnitude(
     bool abPoison
 ) {
     float fExponent = (float)(1.0 / (fMagicCostScale.Float() + 1.0));
-    float fBase = (float)((afPotionStrength * ::fPotionT1MagMult.Float()) / afEffectCost);
+    float fBase = ((afPotionStrength * ::fPotionT1MagMult.Float()) / afEffectCost);
     aiMagnitude = std::pow(fBase, fExponent);
     // Setting::Float is called before *aiMagnitude is reloaded, so the pow result is read back rounded.
     float* pMagMult = &::fPotionT1MagMult.Float();
@@ -801,15 +802,15 @@ void GamePlayFormulas::CalculatePotionDurationMagnitude(
     switch (aiEquipment) {
         case 1:
             if (!bhostile && !abPoison) {
-                aiMagnitude = (float)(afRetortQuality * ::fPotionT1RetMagMult.Float() * aiMagnitude + aiMagnitude);
-                aiDuration = (float)(afRetortQuality * ::fPotionT1RetDurMult.Float() * aiDuration + aiDuration);
+                aiMagnitude = (afRetortQuality * ::fPotionT1RetMagMult.Float() * aiMagnitude + aiMagnitude);
+                aiDuration = (afRetortQuality * ::fPotionT1RetDurMult.Float() * aiDuration + aiDuration);
             }
             goto Alembic;
         case 2:
         Alembic:
             if (bhostile && !abPoison) {
-                aiMagnitude = (float)(afAlembicQuality * ::fPotionT1AleMagMult.Float() * aiMagnitude + aiMagnitude);
-                aiDuration = (float)(afAlembicQuality * ::fPotionT1AleDurMult.Float() * aiDuration + aiDuration);
+                aiMagnitude = (afAlembicQuality * ::fPotionT1AleMagMult.Float() * aiMagnitude + aiMagnitude);
+                aiDuration = (afAlembicQuality * ::fPotionT1AleDurMult.Float() * aiDuration + aiDuration);
             }
             return;
         case 3: goto Calcinator;
@@ -829,8 +830,8 @@ void GamePlayFormulas::CalculatePotionDurationMagnitude(
         }
         case 5:
             if (!bhostile || abPoison) {
-                aiMagnitude = (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiMagnitude + aiMagnitude);
-                aiDuration = (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiDuration + aiDuration);
+                aiMagnitude = (afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiMagnitude + aiMagnitude);
+                aiDuration = (afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiDuration + aiDuration);
             }
             else {
                 double dAleMag = (double)(afAlembicQuality * ::fPotionT1AleMagMult.Float() * aiMagnitude);
@@ -841,8 +842,8 @@ void GamePlayFormulas::CalculatePotionDurationMagnitude(
                     (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiDuration + dAleDur + aiDuration);
             }
         Calcinator:
-            aiMagnitude = (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiMagnitude + aiMagnitude);
-            aiDuration = (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiDuration + aiDuration);
+            aiMagnitude = (afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiMagnitude + aiMagnitude);
+            aiDuration = (afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiDuration + aiDuration);
             break;
         default: return;
     }
@@ -859,7 +860,7 @@ void GamePlayFormulas::CalculatePotionDuration(
     float afCalcinatorQuality,
     bool abPoison
 ) {
-    aiDuration = (float)((afPotionStrength / afEffectCost) / fMagicDurMagBaseCostMult.Float());
+    aiDuration = ((afPotionStrength / afEffectCost) / fMagicDurMagBaseCostMult.Float());
     switch (aiEquipment) {
         case 1:
             if (!bhostile && !abPoison) {
@@ -978,7 +979,7 @@ int32_t GamePlayFormulas::GetForceLockChance(int32_t aiPlayerSkill, int32_t aiLo
 }
 
 float GamePlayFormulas::SwimBreathDamage(int32_t aiMaxHealth) {
-    return (float)(((&fActorSwimBreathDamage)->Float()) * ((double)aiMaxHealth));
+    return (float)((&fActorSwimBreathDamage)->Float() * ((double)aiMaxHealth));
 }
 
 void GamePlayFormulas::CalculateToolResistance(
@@ -1023,25 +1024,24 @@ void GamePlayFormulas::GetSurgeryAutoAttemptPercentages(
 }
 
 float GamePlayFormulas::CalcImpactShaderAmount(float afDistance) {
-    if (((&fImpactShaderMaxDistance)->Float()) < ((double)afDistance)) {
+    if ((&fImpactShaderMaxDistance)->Float() < ((double)afDistance)) {
         return 0.0;
     }
-    float v5 = (float)(1.0 - (afDistance / ((&fImpactShaderMaxDistance)->Float())));
+    float v5 = (float)(1.0 - (afDistance / (&fImpactShaderMaxDistance)->Float()));
     float* v2 = &(&::fImpactShaderMinMagnitude)->Float();
     float* v3 = &(&::fImpactShaderMaxMagnitude)->Float();
-    return (float)((((*v3) - ((&::fImpactShaderMinMagnitude)->Float())) * v5) + (*v2));
+    return ((((*v3) - (&::fImpactShaderMinMagnitude)->Float()) * v5) + (*v2));
 }
 
 int32_t
 GamePlayFormulas::GetSpeechChallengeChance(float afPlayerSpeech, float afTargetDisposition, int32_t aiTopicDifficulty) {
     float* v3 = &(&fSpeechChallengeMultiplier)->Float();
-    float v8 = (float)((((afPlayerSpeech - ((&::fSpeechChallengeSpeechBase)->Float())) * (*v3)) / 100.0) + 1.0);
+    float v8 = (float)((((afPlayerSpeech - (&::fSpeechChallengeSpeechBase)->Float()) * (*v3)) / 100.0) + 1.0);
     float* v4 = &(&::fSpeechChallengeDispositionMultiplier)->Float();
-    float v7 =
-        (float)((((afTargetDisposition - ((&::fSpeechChallengeDispositionBase)->Float())) * (*v4)) / 100.0) + 1.0);
+    float v7 = (float)((((afTargetDisposition - (&::fSpeechChallengeDispositionBase)->Float()) * (*v4)) / 100.0) + 1.0);
     float v9 = (float)(((double)(100 - aiTopicDifficulty)) / 100.0);
     float v10 = (v8 * v7) * v9;
-    if (!(((&::fSpeechAutoSuccessThreshold)->Float()) < ((double)v10))) {
+    if (!((&::fSpeechAutoSuccessThreshold)->Float() < ((double)v10))) {
         return (int32_t)((v10 * 100.0) + 0.5);
     }
     else {
@@ -1057,7 +1057,7 @@ float GamePlayFormulas::GetActorSwimWalkSpeed(
     bool abIsNpc,
     bool abOverEncumbered
 ) {
-    return (float)GamePlayFormulas::GetActorWalkSpeed(apActor, pWeap, pArmor, 0, abNoWeapon, abIsNpc, abOverEncumbered);
+    return GamePlayFormulas::GetActorWalkSpeed(apActor, pWeap, pArmor, false, abNoWeapon, abIsNpc, abOverEncumbered);
 }
 
 float GamePlayFormulas::GetActorSwimRunSpeed(
@@ -1068,12 +1068,12 @@ float GamePlayFormulas::GetActorSwimRunSpeed(
     bool abIsNpc,
     bool abOverEncumbered
 ) {
-    return (float)GamePlayFormulas::GetActorRunSpeed(apActor, pWeap, pArmor, abNoWeapon, abIsNpc, 0, abOverEncumbered);
+    return GamePlayFormulas::GetActorRunSpeed(apActor, pWeap, pArmor, abNoWeapon, abIsNpc, false, abOverEncumbered);
 }
 
 double GamePlayFormulas::CalcFatigueReturn(float aiEndurance) {
     float* v1 = &(&::fFatigueReturnBase)->Float();
-    return (float)(((aiEndurance * 10.0) * ((&::fFatigueReturnMult)->Float())) + (*v1));
+    return (float)(((aiEndurance * 10.0) * (&::fFatigueReturnMult)->Float()) + (*v1));
 }
 
 // The level is read first; Intelligence, capped at 10 by the int BSMIN, is the first argument.

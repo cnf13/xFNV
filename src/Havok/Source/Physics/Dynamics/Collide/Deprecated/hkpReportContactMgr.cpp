@@ -123,8 +123,8 @@ uint16_t hkpReportContactMgr::addContactPointImpl(
         a6.m_separatingNormal.m_quad
     );
     hkpManifoldPointAddedEvent event(
-        0, this, &a3, &a4, &a1, &a2, &a6, a5, 0,
-        _mm_shuffle_ps(v12, v12, 170)[0] + static_cast<float>(_mm_shuffle_ps(v12, v12, 85)[0] + v12[0])
+        0, this, &a3, &a4, &a1, &a2, &a6, a5, nullptr,
+        _mm_shuffle_ps(v12, v12, 170)[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0])
     );
     hkpWorldCallbackUtil::fireContactPointAdded(m_world, event);
     if (m_bodyA->m_contactListeners.m_size) {
@@ -323,8 +323,8 @@ void hkpReportContactMgr::confirmToi(hkpToiEvent& a1, float a2, hkArray<hkpEntit
     event.m_firstCallbackForFullManifold.m_bool = 0;
     event.m_lastCallbackForFullManifold.m_bool = 0;
     event.m_shapeKeyStorage = a1.m_extendedUserDatas;
-    event.m_accumulators[0] = 0;
-    event.m_accumulators[1] = 0;
+    event.m_accumulators[0] = nullptr;
+    event.m_accumulators[1] = nullptr;
     hkpWorldCallbackUtil::fireContactPointCallback(v5->m_world, event);
     hkpEntity* v6 = a1.m_entities[0u];
     event.m_source = hkpCollisionEvent::SOURCE_A;

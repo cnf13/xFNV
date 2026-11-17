@@ -66,7 +66,7 @@ TESTopicInfo::TESTopicInfo(DIALOGUE_TYPE aeType) {
     m_Data.type = (uint8_t)aeType;
     if (aeType == 1) {
         m_pConversationData = new TESConversationData();
-        SetRandom(1);
+        SetRandom(true);
     }
 }
 
@@ -120,7 +120,7 @@ void TESTopicInfo::ClearData() {
 bool TESTopicInfo::Load(TESFile* apFile) {
     uint8_t formid = apFile->GetTESForm();
     if (formid != 70) {
-        return 0;
+        return false;
     }
     if (!apFile->GetOptimizedFile()) {
         iFileOffset = apFile->GetOffset();
@@ -137,7 +137,7 @@ bool TESTopicInfo::Load(TESFile* apFile) {
             if (chunkid > RNAM_ID) {
                 if (chunkid == TCLT_ID) {
                     if (!GetConversationData()) {
-                        LoadConversation(0);
+                        LoadConversation(nullptr);
                     }
                     uint32_t topicID_2 = 0;
                     apFile->GetChunkData<uint32_t>(topicID_2);
@@ -147,7 +147,7 @@ bool TESTopicInfo::Load(TESFile* apFile) {
                 else {
                     if (chunkid == TCFU_ID) {
                         if (!GetConversationData()) {
-                            LoadConversation(0);
+                            LoadConversation(nullptr);
                         }
                         uint32_t topicInfoID = 0;
                         apFile->GetChunkData<uint32_t>(topicInfoID);
@@ -209,7 +209,7 @@ bool TESTopicInfo::Load(TESFile* apFile) {
                     switch (chunkid) {
                         case TCLF_ID: {
                             if (!GetConversationData()) {
-                                LoadConversation(0);
+                                LoadConversation(nullptr);
                             }
                             uint32_t topicID_3 = 0;
                             apFile->GetChunkData<uint32_t>(topicID_3);
@@ -224,10 +224,10 @@ bool TESTopicInfo::Load(TESFile* apFile) {
                         case DATA_ID: {
                             apFile->GetChunkData(&m_Data, sizeof(TOPIC_INFO_DATA));
                             if (m_Data.type >= 8) {
-                                SetDelete(1);
+                                SetDelete(true);
                             }
                             if (m_Data.type == 1) {
-                                LoadConversation(0);
+                                LoadConversation(nullptr);
                             }
                             break;
                         }
@@ -259,7 +259,7 @@ bool TESTopicInfo::Load(TESFile* apFile) {
             CastingType, v5
         );
     }
-    return 1;
+    return true;
 }
 
 // Within a GRUP: a top group saves as any form; a topic children group saves before this info when its topic
@@ -284,7 +284,7 @@ bool TESTopicInfo::SavesBefore(FORM* apGroupFORM) {
 }
 
 bool TESTopicInfo::SavesBefore(TESForm* apForm) {
-    bool bretval = 0;
+    bool bretval = false;
     int32_t FormType = apForm->GetFormType();
     if (FormType == 69) {
         TESTopic* pothertopic_2 = dynamic_cast<TESTopic*>(apForm);
@@ -345,7 +345,7 @@ void TESTopicInfo::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
 
 void TESTopicInfo::Revert(uint32_t aiFlags) {
     if ((aiFlags & CHANGE_TOPIC_SAIDONCE) != 0) {
-        bSaidOnce = 0;
+        bSaidOnce = false;
     }
 }
 
@@ -458,7 +458,7 @@ void TESTopicInfo::GetFormDetailedString(BSStringT<char>& aString) {
         }
     }
     v9[0] = 0;
-    TESResponse* presponse = GetResponseList(0)->pHead;
+    TESResponse* presponse = GetResponseList(nullptr)->pHead;
     if (presponse) {
         std::sprintf(v9, ", Text: \"%s\"", presponse->GetResponseText());
     }
@@ -490,17 +490,18 @@ void TESTopicInfo::Copy(TESForm* apCopy) {
             (&m_listAddTopics)->AddTail(pTopic);
         }
         ClearResponseList();
-        for (TESResponse* presponse = pInfoToCopy->GetResponseList(0)->pHead; presponse; presponse = presponse->pNext) {
+        for (TESResponse* presponse = pInfoToCopy->GetResponseList(nullptr)->pHead; presponse;
+             presponse = presponse->pNext) {
             TESResponse* pNewResponse;
             TESResponse* apMemory = static_cast<TESResponse*>(ourMalloc(sizeof(TESResponse)));
             if (apMemory) {
                 pNewResponse = ::new (apMemory) TESResponse;
             }
             else {
-                pNewResponse = 0;
+                pNewResponse = nullptr;
             }
             pNewResponse->Copy(presponse);
-            ResponseListWrapper* ResponseList = GetResponseList(0);
+            ResponseListWrapper* ResponseList = GetResponseList(nullptr);
             ResponseList->AddTail(pNewResponse);
         }
         SetPrompt((&pInfoToCopy->cPrompt)->pString);
@@ -514,7 +515,7 @@ void TESTopicInfo::Copy(TESForm* apCopy) {
             }
         }
         else {
-            pPerkSkillStat = 0;
+            pPerkSkillStat = nullptr;
         }
         eDifficulty = pInfoToCopy->eDifficulty;
         pSpeaker = pInfoToCopy->GetSpeaker();
@@ -537,7 +538,7 @@ void TESTopicInfo::Copy(TESForm* apCopy) {
 }
 
 bool TESTopicInfo::BelongsInGroup(FORM* apGroupFORM, bool abAllowParentGroups, bool abCurrentOnly) {
-    bool v6 = 0;
+    bool v6 = false;
     if (apGroupFORM) {
         if (apGroupFORM->form == formEnumString[2].uiFormString) {
             TESTopic* OwnerTopic = TESTopic::GetOwnerTopic(this);
@@ -727,7 +728,7 @@ void TESTopicInfo::RemoveInfoFromTopic(TESTopic* apTopic) {
         if (GetInfoIndex() != 0xFFFF) {
             QUEST_INFO* pQuestInfo = apTopic->GetQuestInfoElement(this);
             if (pQuestInfo) {
-                TopicInfoArray* pInfoArray = static_cast<TopicInfoArray*>(&pQuestInfo->infoArray);
+                TopicInfoArray* pInfoArray = (&pQuestInfo->infoArray);
                 if (pInfoArray->GetAt(GetInfoIndex()) == this) {
                     pInfoArray->RemoveAt(GetInfoIndex());
                 }
@@ -806,7 +807,7 @@ void TESTopicInfo::RunResult(TOPIC_INFO_RESULT_SCRIPT aeScript, TESObjectREFR* a
                 if (pScript->GetHeader()->dataSize) {
                     extraDataList = apRef->TESObjectREFR::GetExtra();
                     scriptLocals = extraDataList->GetScriptLocals();
-                    pScript->Run(apRef, scriptLocals, nullptr, 1);
+                    pScript->Run(apRef, scriptLocals, nullptr, true);
                 }
             }
         }
@@ -867,7 +868,7 @@ uint32_t TESTopicInfo::GetSpeechChallengeDifficultyMult() {
             break;
         }
         default: {
-            result = (uint32_t)((-1));
+            result = (uint32_t)(-1);
             break;
         }
     }
@@ -885,8 +886,8 @@ void TESTopicInfo::SetConditions(TESCondition* apCondition) {
 }
 
 void TESTopicInfo::GetInfoDisplayText(BSStringT<char>& aString, bool abFirstOnly) {
-    aString.Set(static_cast<const char*>(0), 0u);
-    for (TESResponse* plist = GetResponseList(0)->pHead; plist; plist = plist->pNext) {
+    aString.Set(static_cast<const char*>(nullptr), 0u);
+    for (TESResponse* plist = GetResponseList(nullptr)->pHead; plist; plist = plist->pNext) {
         aString.operator+=(plist->GetResponseText());
         if (plist->pNext) {
             aString.operator+=(" | ");
@@ -1015,7 +1016,7 @@ void TESTopicInfo::LoadConversation(TESConversationData* apSource) {
                 v3 = ::new (apMemory) TESConversationData;
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             m_pConversationData = v3;
         }
@@ -1025,14 +1026,14 @@ void TESTopicInfo::LoadConversation(TESConversationData* apSource) {
         TESConversationData* v2;
         if (m_pConversationData) {
             delete m_pConversationData;
-            m_pConversationData = 0;
+            m_pConversationData = nullptr;
         }
         TESConversationData* v5 = static_cast<TESConversationData*>(ourMalloc(sizeof(TESConversationData)));
         if (v5) {
             v2 = ::new (v5) TESConversationData;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         m_pConversationData = v2;
     }
@@ -1046,13 +1047,13 @@ bool TESTopicInfo::CheckCondition(
 ) {
     int32_t v6;
     if (GetDelete()) {
-        return 0;
+        return false;
     }
     if (IsSayOnce() && bSaidOnce) {
-        return 0;
+        return false;
     }
     DUMMY_NODE_STATE DummyFlag = GetDummyNodeState();
-    Actor* pTargetActor = 0;
+    Actor* pTargetActor = nullptr;
     if (apTargetRef) {
         if (apTargetRef->IsActor()) {
             pTargetActor = static_cast<Actor*>(apTargetRef);
@@ -1061,21 +1062,22 @@ bool TESTopicInfo::CheckCondition(
     if (pTargetActor &&
         (v6 = pTargetActor->GetActorValue(ActorValue::INTELLIGENCE), v6 <= iDialogueDummySpeakThisIntOrBelow.Int())) {
         if (DummyFlag == DUM_NON_DUMMY_ONLY) {
-            return 0;
+            return false;
         }
     }
     else {
         if (DummyFlag == DUM_DUMMY_ONLY) {
-            return 0;
+            return false;
         }
     }
-    bool bretval = 0;
-    bool bquestconditions = 1;
+    bool bretval = false;
+    bool bquestconditions = true;
     if (apQuest) {
-        bquestconditions = (&apQuest->objConditions)->IsTrueFull(apActionRef, apTargetRef, &abDispositionFailure, 0);
+        bquestconditions =
+            (&apQuest->objConditions)->IsTrueFull(apActionRef, apTargetRef, &abDispositionFailure, false);
     }
     if (bquestconditions) {
-        return (&objConditions)->IsTrueFull(apActionRef, apTargetRef, &abDispositionFailure, 0);
+        return (&objConditions)->IsTrueFull(apActionRef, apTargetRef, &abDispositionFailure, false);
     }
     return bretval;
 }
@@ -1143,12 +1145,12 @@ void ResponseListWrapper::ClearResponseList() {
             delete pResponse;
         }
     }
-    pHead = 0;
+    pHead = nullptr;
 }
 
 void ResponseListWrapper::CopyResponseList(TESResponse* apHead) {
     ClearResponseList();
-    TESResponse* pprev = 0;
+    TESResponse* pprev = nullptr;
     while (apHead) {
         TESResponse* pnewResponse;
         TESResponse* apMemory = static_cast<TESResponse*>(ourMalloc(sizeof(TESResponse)));
@@ -1156,7 +1158,7 @@ void ResponseListWrapper::CopyResponseList(TESResponse* apHead) {
             pnewResponse = ::new (apMemory) TESResponse;
         }
         else {
-            pnewResponse = 0;
+            pnewResponse = nullptr;
         }
         pnewResponse->Copy(apHead);
         if (pprev) {

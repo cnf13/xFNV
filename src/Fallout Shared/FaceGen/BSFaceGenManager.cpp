@@ -110,10 +110,10 @@
 #include "SDK/MSVC/string.h"
 
 #include <cmath>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <sstream>
-#include <stdint.h>
 #include <string>
 #include <vector>
 
@@ -204,10 +204,10 @@ bool BSFaceGenModelMap::GetAt(
 
 bool BSFaceGenModelMap::KillModelTextureData(const char* apKey) {
     if (!apKey || !*apKey) {
-        return 0;
+        return false;
     }
-    bool bres = 0;
-    NiPointer<BSFaceGenModelMap::Entry> spentry(static_cast<BSFaceGenModelMap::Entry*>(0));
+    bool bres = false;
+    NiPointer<BSFaceGenModelMap::Entry> spentry(static_cast<BSFaceGenModelMap::Entry*>(nullptr));
     BSFaceGenManager::LockFaceGenAccess();
     if (!Map.GetAt(apKey, spentry)) {
         char Dst[268];
@@ -221,7 +221,7 @@ bool BSFaceGenModelMap::KillModelTextureData(const char* apKey) {
     }
     if (spentry.m_pObject) {
         spentry.m_pObject->spModel.m_pObject->KillTextureData();
-        bres = 1;
+        bres = true;
     }
     BSFaceGenManager::UnlockFaceGenAccess();
     return bres;
@@ -248,8 +248,8 @@ void BSFaceGenModelMap::ClearEGTData() {
     BSFaceGenManager::LockFaceGenAccess();
     iterator = Map.GetFirstPos();
     while (iterator) {
-        const char* pkey = 0;
-        NiPointer<BSFaceGenModelMap::Entry> spentry(static_cast<BSFaceGenModelMap::Entry*>(0));
+        const char* pkey = nullptr;
+        NiPointer<BSFaceGenModelMap::Entry> spentry(static_cast<BSFaceGenModelMap::Entry*>(nullptr));
         Map.GetNext(iterator, pkey, spentry);
         if (spentry.m_pObject) {
             BSFaceGenModel* pm = spentry.m_pObject->spModel.m_pObject;
@@ -274,7 +274,7 @@ bool BSFaceGenModelMap::LoadEGMData(BSFaceGenModel* apModel) {
         spEntry->uiTime = BSGetTickCount();
         VerifyData(spEntry.m_pObject);
         spEntry->spModel->LoadEGMData();
-        bHasFaceGenData = 1;
+        bHasFaceGenData = true;
         bRes = true;
     }
     BSFaceGenManager::UnlockFaceGenAccess();
@@ -283,10 +283,10 @@ bool BSFaceGenModelMap::LoadEGMData(BSFaceGenModel* apModel) {
 
 bool BSFaceGenModelMap::LoadEGTData(BSFaceGenModel* apModel) {
     const char* v2;
-    NiPointer<BSFaceGenModelMap::Entry> spentry(static_cast<BSFaceGenModelMap::Entry*>(0));
+    NiPointer<BSFaceGenModelMap::Entry> spentry(static_cast<BSFaceGenModelMap::Entry*>(nullptr));
     if (apModel && (apModel->GetEGTFilename() && (v2 = apModel->GetEGTFilename(), BSstrlen(v2)))) {
         const char* EGMFilename;
-        bool bres = 0;
+        bool bres = false;
         BSFaceGenManager::LockFaceGenAccess();
         const char* EGTFilename = apModel->GetEGTFilename();
         if (Map.GetAt(EGTFilename, spentry) ||
@@ -295,14 +295,14 @@ bool BSFaceGenModelMap::LoadEGTData(BSFaceGenModel* apModel) {
             spentry.m_pObject->uiTime = v6;
             VerifyData(spentry.m_pObject);
             spentry.m_pObject->spModel.m_pObject->LoadEGTData();
-            bHasFaceGenData = 1;
-            bres = 1;
+            bHasFaceGenData = true;
+            bres = true;
         }
         BSFaceGenManager::UnlockFaceGenAccess();
         return bres;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -366,7 +366,7 @@ void BSFaceGenModelMap::UnloadAllEGMAndEGTData(bool abForce) {
             }
         }
         if (!bKeepData) {
-            bHasFaceGenData = 0;
+            bHasFaceGenData = false;
         }
         BSFaceGenManager::UnlockFaceGenAccess();
     }
@@ -389,7 +389,7 @@ void BSFaceGenModelMap::OutputModelMapContents(BSFile* apFile) {
             );
             Warning(textline.pString);
             if (apFile) {
-                apFile->Write(textline, 1);
+                apFile->Write(textline, true);
             }
         }
     }
@@ -435,7 +435,7 @@ bool BSFaceGenModelMap::GetAt(const char* apcKey, NiPointer<BSFaceGenModel>& asp
         VerifyData(spEntry.m_pObject);
         aspModel->LoadEGMData();
         aspModel->LoadEGTData();
-        bHasFaceGenData = 1;
+        bHasFaceGenData = true;
         bRes = true;
     }
     BSFaceGenManager::UnlockFaceGenAccess();
@@ -445,10 +445,10 @@ bool BSFaceGenModelMap::GetAt(const char* apcKey, NiPointer<BSFaceGenModel>& asp
 void BSFaceGenModelMap::FreeLRUData(BSFaceGenModelMap::DataType aDataType, BSFaceGenModelMap::Entry* aspNewEntry) {
     const char* pkey;
     NiTMapItem<const char*, NiPointer<BSFaceGenModelMap::Entry>>* iter;
-    pkey = 0;
-    const char* pLRUkey = 0;
-    NiPointer<BSFaceGenModelMap::Entry> spentry(static_cast<BSFaceGenModelMap::Entry*>(0));
-    NiPointer<BSFaceGenModelMap::Entry> spLRU(static_cast<BSFaceGenModelMap::Entry*>(0));
+    pkey = nullptr;
+    const char* pLRUkey = nullptr;
+    NiPointer<BSFaceGenModelMap::Entry> spentry(static_cast<BSFaceGenModelMap::Entry*>(nullptr));
+    NiPointer<BSFaceGenModelMap::Entry> spLRU(static_cast<BSFaceGenModelMap::Entry*>(nullptr));
     uint32_t curTime = BSGetTickCount();
     BSFaceGenManager::LockFaceGenAccess();
     iter = Map.GetFirstPos();
@@ -734,7 +734,7 @@ FanGenCtlsGrpC::getCaricature(FanRaceE race, FanTypeE type, FanSymmE symm, const
         float v17 = coord[type][symm].lengthSqr();
         float v14 = std::sqrt(static_cast<double>(v17));
         float v13 = std::sqrt(static_cast<double>(coord[type][symm].nrows));
-        return static_cast<float>(v14 / v13);
+        return (v14 / v13);
     }
     else {
         if (symm) {
@@ -854,7 +854,7 @@ double FanGenCtlsGrpC::getRace(int32_t race1, int32_t race2, const FR2MatrixVTC<
         float** v5 = &(::new (&a2a) FR2MatrixVTC<float>::RowT(v6->operator[](0u)))->p;
         v11 = **v5 + v11;
     }
-    return static_cast<float>(v11 + race[race1][race2].off);
+    return (v11 + race[race1][race2].off);
 }
 
 void FanGenCtlsGrpC::setRace(int32_t race1, int32_t race2, float val, FR2MatrixVTC<float> (*coord)[2]) {
@@ -1204,7 +1204,7 @@ void BSFaceGenManager::QueueHeadParts(TESNPC* apNPC, IO_TASK_PRIORITY aePriority
 void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpcData& arNpcData) {
     FNVD_INLINED_LOCAL(NiFixedString, v36, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_FACEGEN_SYSTEM, 1,
+        MEM_CONTEXT_FACEGEN_SYSTEM, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\FaceGen\\BSFaceGenManager.cpp", 3114
     );
     NiFixedString leftEye("FaceGenEyeLeft");
@@ -1216,9 +1216,9 @@ void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpc
     BSStringT<char> fileDDS;
     BSStringT<char> fileDetail;
     BSStringT<char> fileSpecular;
-    NiPointer<NiSourceTexture> sptexNormal(static_cast<NiSourceTexture*>(0));
-    NiPointer<NiTexture> sptexBaseMod(static_cast<NiTexture*>(0));
-    NiPointer<NiSourceTexture> sptexDetailMod(static_cast<NiSourceTexture*>(0));
+    NiPointer<NiSourceTexture> sptexNormal(static_cast<NiSourceTexture*>(nullptr));
+    NiPointer<NiTexture> sptexBaseMod(static_cast<NiTexture*>(nullptr));
+    NiPointer<NiSourceTexture> sptexDetailMod(static_cast<NiSourceTexture*>(nullptr));
     uint32_t ishaderindex = 0;
     BSFaceGenManager::LockFaceGenAccess();
     if (apNode && &arNpcData) {
@@ -1238,7 +1238,7 @@ void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpc
                 if (arNpcData.pModel.operator[](ipart)) {
                     if (arNpcData.pTexture.operator[](ipart)) {
                         NiFixedString* v33 = ::new (static_cast<void*>(&v36))
-                            NiFixedString(static_cast<const char*>(arNpcData.pHeadPartNodeName.operator[](ipart)));
+                            NiFixedString(arNpcData.pHeadPartNodeName.operator[](ipart));
                         NiAVObject* pobj = apNode->GetObjectByName(*v33);
                         v36.~NiFixedString();
                         if (pobj) {
@@ -1258,7 +1258,7 @@ void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpc
                                         v32 = 0;
                                     }
                                     BSShaderPPLightingProperty* pshaderpropLighting =
-                                        v32 ? static_cast<BSShaderPPLightingProperty*>(pshaderprop) : 0;
+                                        v32 ? static_cast<BSShaderPPLightingProperty*>(pshaderprop) : nullptr;
                                     if (pshaderpropLighting) {
                                         const char* Xa;
                                         if (arNpcData.spTexBaseMod.m_usSize) {
@@ -1296,12 +1296,12 @@ void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpc
                                                 );
                                             }
                                             char* fR = fileDetail.pString;
-                                            TES::pInstance->CreateTextureImage(fR, sptexDetailMod, 1, 1);
+                                            TES::pInstance->CreateTextureImage(fR, sptexDetailMod, true, true);
                                             BSUtils::CreateNormalMapString(fileSpecular, fileDetail.pString);
                                         }
                                         if (fileSpecular.pString) {
                                             char* fRa = fileSpecular.pString;
-                                            TES::pInstance->CreateTextureImage(fRa, sptexNormal, 1, 1);
+                                            TES::pInstance->CreateTextureImage(fRa, sptexNormal, true, true);
                                         }
                                         if (sptexNormal.m_pObject) {
                                             NiTexture* Xc = sptexNormal.m_pObject;
@@ -1341,13 +1341,13 @@ void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpc
                                                 char Src[264];
                                                 char DstBuf[268];
                                                 BSsprintf(Src, 260, "%s", fileSpecular.String());
-                                                BSShaderManager::GetModifiedTextureFilename(DstBuf, Src, "_sk", 1);
+                                                BSShaderManager::GetModifiedTextureFilename(DstBuf, Src, "_sk", true);
                                                 if (DstBuf[0]) {
                                                     NiPointer<NiSourceTexture> spTempSourceTexture(
-                                                        static_cast<NiSourceTexture*>(0)
+                                                        static_cast<NiSourceTexture*>(nullptr)
                                                     );
                                                     TES::pInstance->CreateTextureImage(
-                                                        DstBuf, spTempSourceTexture, 1, 1
+                                                        DstBuf, spTempSourceTexture, true, true
                                                     );
                                                     NiTexture* Xe = spTempSourceTexture.m_pObject;
                                                     pshaderpropLighting->SetTexture(
@@ -1397,7 +1397,7 @@ void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpc
                             v27 = 0;
                         }
                         BSShaderPPLightingProperty* phairprop =
-                            v27 ? static_cast<BSShaderPPLightingProperty*>(pshadeprop) : 0;
+                            v27 ? static_cast<BSShaderPPLightingProperty*>(pshadeprop) : nullptr;
                         if (phairprop) {
                             uint32_t icol = arNpcData.iHairColor;
                             float v26 = static_cast<double>(static_cast<uint8_t>(icol >> 16)) / 255.0;
@@ -1417,7 +1417,7 @@ void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpc
                                 v23 = 0;
                             }
                             Lighting30ShaderProperty* psm3prop =
-                                v23 ? static_cast<Lighting30ShaderProperty*>(pshadeprop) : 0;
+                                v23 ? static_cast<Lighting30ShaderProperty*>(pshadeprop) : nullptr;
                             if (psm3prop) {
                                 uint32_t icol_2 = arNpcData.iHairColor;
                                 float v22 = static_cast<double>(static_cast<uint8_t>(icol_2 >> 16)) / 255.0;
@@ -1435,7 +1435,7 @@ void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpc
             }
         }
         apNode->UpdateProperties();
-        NiUpdateData UpdateData(0.0f, 0, 0);
+        NiUpdateData UpdateData(0.0f, false, false);
         apNode->Update(UpdateData);
         BSFaceGenManager::UnlockFaceGenAccess();
     }
@@ -1457,12 +1457,12 @@ const char* BSFaceGenManager::GetAsNearestDetailDDSFile(
     int32_t iage = acAge;
     char cgender = 77;
     if (!apModel || (iage > 100 || aeSex >= 2)) {
-        return 0;
+        return nullptr;
     }
     BSstrcpy(cHeadName, 260, apModel);
     char* pextension = std::strrchr(cHeadName, 46);
     if (!pextension) {
-        return 0;
+        return nullptr;
     }
     *pextension = 0;
     if (aeSex == 1) {
@@ -1475,7 +1475,7 @@ const char* BSFaceGenManager::GetAsNearestDetailDDSFile(
     );
     if (!pFileEntry) {
         iage = 10 * (iage / 10);
-        while (1) {
+        while (true) {
             aOutFilename.SPrintF("Textures\\%s%c%d.dds", cHeadName, cgender, iage);
             pFileEntry = ArchiveManager::GetFileEntryForFileFromAllArchives(
                 ARCHIVE_TYPE_INDEX_TEXTURES, rDirectoryHash, rFileNameHash, aOutFilename.pString
@@ -1486,7 +1486,7 @@ const char* BSFaceGenManager::GetAsNearestDetailDDSFile(
             iage -= 10;
             if (iage < 0) {
                 aOutFilename.Set("", 0);
-                return 0;
+                return nullptr;
             }
         }
     }
@@ -1718,12 +1718,12 @@ const char* BSFaceGenManager::GetAsEGTFile(BSStringT<char>& aOutFilename, const 
     char apDest[264];
     int32_t v5 = 0;
     if (!apModel) {
-        return 0;
+        return nullptr;
     }
     BSstrcpy(Dst, 260, apModel);
     char* pextension = std::strrchr(Dst, 46);
     if (!pextension) {
-        return 0;
+        return nullptr;
     }
     *pextension = 0;
     BSsprintf(apDest, 260u, "%s.egt", Dst);
@@ -1755,7 +1755,7 @@ void BSFaceGenManager::AttachHairToHead(
     FNVD_INLINED_LOCAL(NiPointer<NiTriBasedGeom>, spshape, std::nullopt, std::nullopt);
     NiMatrix3 matrot;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_FACEGEN_SYSTEM, 1,
+        MEM_CONTEXT_FACEGEN_SYSTEM, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\FaceGen\\BSFaceGenManager.cpp", 2875
     );
     BSStringT<char> filename;
@@ -1763,8 +1763,8 @@ void BSFaceGenManager::AttachHairToHead(
     BSStringT<char> fileTRI;
     BSStringT<char> fileEGT;
     BSStringT<char> fileFIM;
-    NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(0));
-    ::new (&spshape) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(0));
+    NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(nullptr));
+    ::new (&spshape) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
     matrot.MakeYRotation(-1.5707964f);
     if (aNpcData.pHair) {
         for (HAIR_PART ehairPart = HAIR_PART_NORMAL; ehairPart < HAIR_PART_COUNT;
@@ -1773,7 +1773,7 @@ void BSFaceGenManager::AttachHairToHead(
             filename.SPrintF("Meshes\\%s", v4);
             const char* pegm = BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, ehairPart);
             const char* ptri = BSFaceGenManager::GetAsTRIFile(fileTRI, filename.pString, ehairPart);
-            BSFaceGenModel* pmodelFG = 0;
+            BSFaceGenModel* pmodelFG = nullptr;
             BSHash::MakeDirAndFile(pegm, arDirectoryHash, arFileNameHash);
             if (ArchiveManager::GetFileEntryForFileFromAllArchives(
                     ARCHIVE_TYPE_INDEX_MESHES, arDirectoryHash, arFileNameHash, pegm
@@ -1781,7 +1781,7 @@ void BSFaceGenManager::AttachHairToHead(
                 HAIR_PART v13 = ehairPart;
                 const char* v10 = ptri;
                 char* v8 = filename.pString;
-                pmodelFG = BSFaceGenManager::GetFaceGenModel(pegm, v8, v10, 0, 1, v13, 0);
+                pmodelFG = BSFaceGenManager::GetFaceGenModel(pegm, v8, v10, nullptr, true, v13, false);
             }
             else {
                 if (ehairPart == HAIR_PART_NORMAL) {
@@ -1790,7 +1790,7 @@ void BSFaceGenManager::AttachHairToHead(
                     HAIR_PART v12 = ehairPart;
                     const char* v9 = ptri;
                     char* v7 = filename.pString;
-                    pmodelFG = BSFaceGenManager::GetFaceGenModel(pegm, v7, v9, 0, 1, v12, 0);
+                    pmodelFG = BSFaceGenManager::GetFaceGenModel(pegm, v7, v9, nullptr, true, v12, false);
                     ehairPart = HAIR_PART_COUNT;
                 }
             }
@@ -1800,7 +1800,7 @@ void BSFaceGenManager::AttachHairToHead(
             if (spshape.m_pObject) {
                 char tempHairName[32];
                 if (ehairPart == HAIR_PART_HAT) {
-                    spshape.m_pObject->SetAppCulled(1);
+                    spshape.m_pObject->SetAppCulled(true);
                 }
                 char* HairName = BSFaceGenManager::GetHairName(tempHairName, ehairPart);
                 NiFixedString* a2 =
@@ -1810,7 +1810,7 @@ void BSFaceGenManager::AttachHairToHead(
                 BSFaceGenManager::ApplyHairMorph(spshape.m_pObject, aNpcData.fHairLength);
                 filename.SPrintF("Textures\\%s", aNpcData.pHair->GetTextureName());
                 char* v11 = filename.pString;
-                TES::pInstance->CreateTextureImage(v11, sptexBase, 0, 0);
+                TES::pInstance->CreateTextureImage(v11, sptexBase, false, false);
                 if (sptexBase.m_pObject) {
                     int32_t v16;
                     NiShadeProperty* pprop = static_cast<NiShadeProperty*>(spshape.m_pObject->GetProperty(3));
@@ -1821,7 +1821,8 @@ void BSFaceGenManager::AttachHairToHead(
                     else {
                         v16 = 0;
                     }
-                    BSShaderPPLightingProperty* pshaderprop = v16 ? static_cast<BSShaderPPLightingProperty*>(pprop) : 0;
+                    BSShaderPPLightingProperty* pshaderprop =
+                        v16 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
                     if (pshaderprop) {
                         NiSourceTexture* afAngle = sptexBase.m_pObject;
                         pshaderprop->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, afAngle);
@@ -1833,7 +1834,7 @@ void BSFaceGenManager::AttachHairToHead(
                 }
                 if (spshape.m_pObject->GetSkinInstance()) {
                     if (abForceNoSkinning) {
-                        spshape.m_pObject->SetSkinInstance(0);
+                        spshape.m_pObject->SetSkinInstance(nullptr);
                         spshape.m_pObject->SetTranslate(NiPoint3_ZERO);
                         spshape.m_pObject->SetRotate(matrot);
                         apOutNodeBiped->AttachChild(spshape.m_pObject, 1);
@@ -1847,9 +1848,9 @@ void BSFaceGenManager::AttachHairToHead(
                     apOutNodeBiped->AttachChild(spshape.m_pObject, 1);
                 }
             }
-            pmodelFG = 0;
-            spshape.operator=(static_cast<NiTriBasedGeom*>(0));
-            sptexBase.operator=(static_cast<NiSourceTexture*>(0));
+            pmodelFG = nullptr;
+            spshape.operator=(static_cast<NiTriBasedGeom*>(nullptr));
+            sptexBase.operator=(static_cast<NiSourceTexture*>(nullptr));
         }
     }
     spshape.~NiPointer<NiTriBasedGeom>();
@@ -1879,12 +1880,12 @@ BSFaceGenModel* BSFaceGenManager::GetFaceGenModel(
     bool abIsAccessory
 ) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_FACEGEN_SYSTEM, 1,
+        MEM_CONTEXT_FACEGEN_SYSTEM, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\FaceGen\\BSFaceGenManager.cpp", 997
     );
-    NiPointer<BSFaceGenModel> spnewModel(static_cast<BSFaceGenModel*>(0));
+    NiPointer<BSFaceGenModel> spnewModel(static_cast<BSFaceGenModel*>(nullptr));
     if (!apEGMFilename && !apEGTFilename) {
-        return 0;
+        return nullptr;
     }
     if (!BSFaceGenManager::GetInstance()->pModelMap) {
         BSFaceGenModelMap* pModelMap;
@@ -1893,7 +1894,7 @@ BSFaceGenModel* BSFaceGenManager::GetFaceGenModel(
             pModelMap = ::new (v23) BSFaceGenModelMap;
         }
         else {
-            pModelMap = 0;
+            pModelMap = nullptr;
         }
         BSFaceGenManager::GetInstance()->pModelMap = pModelMap;
         uint32_t v13 = gs_uiFaceGenMaxEGMDataSize_General.operator uint32_t();
@@ -1931,7 +1932,7 @@ BSFaceGenModel* BSFaceGenManager::GetFaceGenModel(
             v17 = ::new (v20) BSFaceGenModel;
         }
         else {
-            v17 = 0;
+            v17 = nullptr;
         }
         spnewModel.operator=(v17);
         if (spnewModel.m_pObject->LoadModel(
@@ -1949,7 +1950,7 @@ BSFaceGenModel* BSFaceGenManager::GetFaceGenModel(
             v12->pModelMap->SetAt(apcKey, v15);
         }
         else {
-            spnewModel.operator=(static_cast<BSFaceGenModel*>(0));
+            spnewModel.operator=(static_cast<BSFaceGenModel*>(nullptr));
         }
     }
     BSFaceGenModel* v19 = spnewModel.m_pObject;
@@ -2012,7 +2013,7 @@ BSFaceGenManager* BSFaceGenManager::GetInstance() {
 
 void BSFaceGenManager::InitializeSystem() {
     AutoMemContext apMemory(
-        MEM_CONTEXT_FACEGEN_SYSTEM, 1,
+        MEM_CONTEXT_FACEGEN_SYSTEM, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\FaceGen\\BSFaceGenManager.cpp", 790
     );
     if (BSFaceGenManager::pInstance) {}
@@ -2023,7 +2024,7 @@ void BSFaceGenManager::InitializeSystem() {
             v0 = ::new (v1) BSFaceGenManager;
         }
         else {
-            v0 = 0;
+            v0 = nullptr;
         }
         BSFaceGenManager::pInstance = v0;
     }
@@ -2180,7 +2181,7 @@ void BSFaceGenManager::CycleFaceGenCoordValue(Actor* apActor) {
         proot = pobj->IsNode();
     }
     else {
-        proot = 0;
+        proot = nullptr;
     }
     rt::eh_vector_constructor_iterator(
         oldcoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
@@ -2211,8 +2212,8 @@ void BSFaceGenManager::CycleFaceGenCoordValue(Actor* apActor) {
         }
     }
     BSFaceGenManager::SetFaceCoordValue(&newcoord, FANTYPE_GEO, FANSYMM_SYMM, BSFaceGenManager::iCycleCtrlID, val);
-    BSFaceGenManager::OffsetFaceGenCoord(&oldcoord, &newcoord, &diffcoord, 0);
-    BSFaceGenNiNode* pfacenode = apActor->GetFaceNodeBiped(0);
+    BSFaceGenManager::OffsetFaceGenCoord(&oldcoord, &newcoord, &diffcoord, false);
+    BSFaceGenNiNode* pfacenode = apActor->GetFaceNodeBiped(nullptr);
     for (int32_t a = 0; a < 2; ++a) {
         uint32_t isizeArray = pfacenode->GetArrayCount();
         for (uint32_t ichild = 0; ichild < isizeArray; ++ichild) {
@@ -2222,7 +2223,7 @@ void BSFaceGenManager::CycleFaceGenCoordValue(Actor* apActor) {
                 ptri = pfaceobj->IsTriBasedGeom();
             }
             else {
-                ptri = 0;
+                ptri = nullptr;
             }
             if (ptri) {
                 BSFaceGenModel* pfgmodel;
@@ -2231,19 +2232,19 @@ void BSFaceGenManager::CycleFaceGenCoordValue(Actor* apActor) {
                     pfgmodel = pmodelExtraData->GetModel();
                 }
                 else {
-                    pfgmodel = 0;
+                    pfgmodel = nullptr;
                 }
                 if (pfgmodel) {
-                    pfgmodel->ApplyCoordinateToExistingMesh(&diffcoord, ptri, 0);
+                    pfgmodel->ApplyCoordinateToExistingMesh(&diffcoord, ptri, false);
                 }
             }
         }
-        pfacenode = apActor->GetFaceNodeSkinned(0);
+        pfacenode = apActor->GetFaceNodeSkinned(nullptr);
     }
     FR2MatrixVTC<float>(*OffsetFaceCoord)[2][2] = pnpc->GetOffsetFaceCoord();
     TESActorBase::SEX Sex = pnpc->GetSex();
     FR2MatrixVTC<float>(*MeanFaceCoord)[2][2] = pnpc->GetFormRace()->GetMeanFaceCoord(Sex);
-    BSFaceGenManager::OffsetFaceGenCoord(MeanFaceCoord, &newcoord, OffsetFaceCoord, 0);
+    BSFaceGenManager::OffsetFaceGenCoord(MeanFaceCoord, &newcoord, OffsetFaceCoord, false);
     rt::eh_vector_destructor_iterator(
         diffcoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
     );
@@ -2277,7 +2278,7 @@ void BSFaceGenManager::SetUseEmotions(bool abUseEmotions) {
 }
 
 bool BSFaceGenManager::GetFixNormals() {
-    return (bool)((uint8_t)((&TESRace::bFixFaceNormals)->Bool()));
+    return (bool)((uint8_t)(&TESRace::bFixFaceNormals)->Bool());
 }
 
 BSFaceGenMorphData* BSFaceGenManager::GetFaceGenMorphData(NiTriBasedGeom* apGeom) {
@@ -2308,7 +2309,7 @@ BSFaceGenMorphDataHair* BSFaceGenManager::GetFaceGenMorphDataHair(NiTriBasedGeom
         );
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -2359,8 +2360,8 @@ void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDeta
                 );
                 NiTriBasedGeom* kCloneProc_20 = pchild->IsTriBasedGeom();
                 BSFaceGenModel* poldmodelFG = BSFaceGenManager::GetFaceGenModel(kCloneProc_20);
-                NiPointer<NiTriBasedGeom> spshape(static_cast<NiTriBasedGeom*>(0));
-                NiTriBasedGeom* pshapeHead = 0;
+                NiPointer<NiTriBasedGeom> spshape(static_cast<NiTriBasedGeom*>(nullptr));
+                NiTriBasedGeom* pshapeHead = nullptr;
                 BSStringT<char> filename;
                 BSStringT<char> lodfname;
                 BSStringT<char> fileEGM;
@@ -2372,7 +2373,7 @@ void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDeta
                     &fnvd::destructElement<FR2MatrixVTC<float>>
                 );
                 FR2MatrixVTC<float>(*pcoord)[2][2] = BSFaceGenManager::GetFaceGenCoord();
-                BSFaceGenManager::CopyFaceGenCoord(pcoord, &facecoord, 0, 0);
+                BSFaceGenManager::CopyFaceGenCoord(pcoord, &facecoord, false, false);
                 const char* EGMFilename = poldmodelFG->GetEGMFilename();
                 BSFaceGenManager::GetAsNIFFile(filename, EGMFilename);
                 if (aDetail) {
@@ -2401,7 +2402,7 @@ void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDeta
                 char* v7 = lodfname.pString;
                 const char* AsEGMFile = BSFaceGenManager::GetAsEGMFile(fileEGM, lodfname.pString, HAIR_PART_NONE);
                 ::new (&pmodelFG) NiPointer<BSFaceGenModel>(
-                    BSFaceGenManager::GetFaceGenModel(AsEGMFile, v7, AsTRIFile, AsEGTFile, 1, HAIR_PART_NONE, 0)
+                    BSFaceGenManager::GetFaceGenModel(AsEGMFile, v7, AsTRIFile, AsEGTFile, true, HAIR_PART_NONE, false)
                 );
                 if (!pmodelFG.m_pObject->ApplyCoordinateToNewMesh(&facecoord, spshape) || !spshape.m_pObject) {
                     pmodelFG.~NiPointer<BSFaceGenModel>();
@@ -2439,7 +2440,7 @@ void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDeta
                 BSShader* Shader = static_cast<NiGeometry*>(pchild)->GetShader();
                 pshapeHead->SetShader(Shader);
                 uint16_t usVertices = pshapeHead->GetActiveVertexCount();
-                if (pshapeHead->GetModelData()->LockPackedVertexData(1)) {
+                if (pshapeHead->GetModelData()->LockPackedVertexData(true)) {
                     FNVD_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint3>)(&spNewFaceGeo);
                     pshapeHead->GetModelData()->GetVerticesIterator(spNewFaceGeo);
                     if (spNewFaceGeo.m_pvCurrentPosition) {
@@ -2456,14 +2457,14 @@ void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDeta
                 }
                 apNode->SetAt(static_cast<uint32_t>(i), pshapeHead);
                 pshapeHead->UpdateProperties();
-                apNode->FixSkinInstances(apNode->m_pkParent, 0);
+                apNode->FixSkinInstances(apNode->m_pkParent, false);
                 if (aDetail) {
                     if (aDetail == 1) {
-                        apNode->bUsingLoResHead = 0;
+                        apNode->bUsingLoResHead = false;
                     }
                 }
                 else {
-                    apNode->bUsingLoResHead = 1;
+                    apNode->bUsingLoResHead = true;
                 }
                 pmodelFG.~NiPointer<BSFaceGenModel>();
                 rt::eh_vector_destructor_iterator(
@@ -2579,12 +2580,12 @@ const char* BSFaceGenManager::GetAsNIFFile(BSStringT<char>& aOutFilename, const 
     char apDest[264];
     int32_t pDot = 0;
     if (!apModel) {
-        return 0;
+        return nullptr;
     }
     BSstrcpy(cDest, 260, apModel);
     char* pextension = std::strrchr(cDest, 46);
     if (!pextension) {
-        return 0;
+        return nullptr;
     }
     *pextension = 0;
     BSsprintf(apDest, 260u, "%s.nif", cDest);
@@ -2596,7 +2597,7 @@ const char* BSFaceGenManager::GetAsNIFFileLowLOD(BSStringT<char>& aOutFilename, 
     BSHash DirectoryHash;
     BSHash FileNameHash;
     BSStringT<char> pcheckFilename;
-    char* pexists = 0;
+    char* pexists = nullptr;
     if (apModel) {
         char cDest[264];
         BSstrcpy(cDest, 260, apModel);
@@ -2621,7 +2622,7 @@ const char* BSFaceGenManager::GetAsNIFFileLowLOD(BSStringT<char>& aOutFilename, 
                     return result;
                 }
                 else {
-                    return 0;
+                    return nullptr;
                 }
             }
             else {
@@ -2630,7 +2631,7 @@ const char* BSFaceGenManager::GetAsNIFFileLowLOD(BSStringT<char>& aOutFilename, 
         }
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -2639,7 +2640,7 @@ const char* BSFaceGenManager::GetAsNIFFileHighLOD(BSStringT<char>& aOutFilename,
     char apDest[264];
     int32_t v5 = 0;
     if (!apModel) {
-        return 0;
+        return nullptr;
     }
     BSstrcpy(Dst, 260, apModel);
     char* pextension = std::strrchr(Dst, 95);
@@ -2663,14 +2664,14 @@ bool BSFaceGenManager::CreateFaceGenHead(
     BSHash v44;
     NiMatrix3 matrot;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_FACEGEN_SYSTEM, 1,
+        MEM_CONTEXT_FACEGEN_SYSTEM, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\FaceGen\\BSFaceGenManager.cpp", 2632
     );
-    BSFaceGenModel* pmodelFG = 0;
-    NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(0));
-    NiPointer<NiTriBasedGeom> spshape(static_cast<NiTriBasedGeom*>(0));
-    NiTriBasedGeom* pshapeHead = 0;
-    NiTriBasedGeom* pshapeEars = 0;
+    BSFaceGenModel* pmodelFG = nullptr;
+    NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(nullptr));
+    NiPointer<NiTriBasedGeom> spshape(static_cast<NiTriBasedGeom*>(nullptr));
+    NiTriBasedGeom* pshapeHead = nullptr;
+    NiTriBasedGeom* pshapeEars = nullptr;
     BSStringT<char> filename;
     BSStringT<char> fileEGM;
     BSStringT<char> fileTRI;
@@ -2689,7 +2690,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
                                 filename.SPrintF("Meshes\\%s", v32->GetModel());
                                 if (arNpcData.eLod == BS_FACEGEN_LOD_LOW && !ipart) {
                                     BSFaceGenManager::GetAsNIFFileLowLOD(fileLowLOD, filename.pString);
-                                    BSFileEntry* FileEntryForFileFromAllArchives = 0;
+                                    BSFileEntry* FileEntryForFileFromAllArchives = nullptr;
                                     if (fileLowLOD.pString) {
                                         BSHash::MakeDirAndFile(fileLowLOD.pString, v43, v44);
                                         FileEntryForFileFromAllArchives =
@@ -2701,7 +2702,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
                                         BSFaceGenManager::GetAsNIFFileLowLOD(filename, filename.pString);
                                     }
                                 }
-                                const char* pegtFileName = 0;
+                                const char* pegtFileName = nullptr;
                                 switch (ipart) {
                                     case 0u: {
                                         if (arNpcData.bPlayer || BSFaceGenManager::bLoadFaceGenHeadEGTFiles.Bool()) {
@@ -2714,7 +2715,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
                                         const char* AsEGMFile =
                                             BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, HAIR_PART_NONE);
                                         pmodelFG = BSFaceGenManager::GetFaceGenModel(
-                                            AsEGMFile, v11, AsTRIFile, v19, 1, HAIR_PART_NONE, 0
+                                            AsEGMFile, v11, AsTRIFile, v19, true, HAIR_PART_NONE, false
                                         );
                                         break;
                                     }
@@ -2727,7 +2728,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
                                         const char* v5 =
                                             BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, HAIR_PART_NONE);
                                         pmodelFG = BSFaceGenManager::GetFaceGenModel(
-                                            v5, v12, v16, AsEGTFile, 1, HAIR_PART_NONE, 0
+                                            v5, v12, v16, AsEGTFile, true, HAIR_PART_NONE, false
                                         );
                                         break;
                                     }
@@ -2740,8 +2741,9 @@ bool BSFaceGenManager::CreateFaceGenHead(
                                         char* v13 = filename.pString;
                                         const char* v6 =
                                             BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, HAIR_PART_NONE);
-                                        pmodelFG =
-                                            BSFaceGenManager::GetFaceGenModel(v6, v13, v17, 0, 1, HAIR_PART_NONE, 0);
+                                        pmodelFG = BSFaceGenManager::GetFaceGenModel(
+                                            v6, v13, v17, nullptr, true, HAIR_PART_NONE, false
+                                        );
                                         break;
                                     }
                                     default: {
@@ -2752,9 +2754,8 @@ bool BSFaceGenManager::CreateFaceGenHead(
                                     if (pmodelFG->ApplyCoordinateToNewMesh(&(&arNpcData)->FaceCoord, spshape)) {
                                         if (spshape.m_pObject) {
                                             int32_t v27;
-                                            NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString(
-                                                static_cast<const char*>(arNpcData.pHeadPartNodeName.operator[](ipart))
-                                            );
+                                            NiFixedString* a2 = ::new (static_cast<void*>(&apString))
+                                                NiFixedString(arNpcData.pHeadPartNodeName.operator[](ipart));
                                             spshape.m_pObject->SetName(*a2);
                                             apString.~NiFixedString();
                                             if (!ipart) {
@@ -2767,7 +2768,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
                                                 "Textures\\%s", arNpcData.pTexture.operator[](ipart)->GetTextureName()
                                             );
                                             char* v21 = filename.pString;
-                                            TES::pInstance->CreateTextureImage(v21, sptexBase, 0, 0);
+                                            TES::pInstance->CreateTextureImage(v21, sptexBase, false, false);
                                             if (sptexBase.m_pObject) {
                                                 int32_t v30;
                                                 NiShadeProperty* pprop =
@@ -2781,7 +2782,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
                                                     v30 = 0;
                                                 }
                                                 BSShaderPPLightingProperty* pshaderprop =
-                                                    v30 ? static_cast<BSShaderPPLightingProperty*>(pprop) : 0;
+                                                    v30 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
                                                 if (pshaderprop) {
                                                     NiSourceTexture* afAngle = sptexBase.m_pObject;
                                                     pshaderprop->SetTexture(
@@ -2814,7 +2815,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
                                                         pmatprop_2 = ::new (v34) NiMaterialProperty;
                                                     }
                                                     else {
-                                                        pmatprop_2 = 0;
+                                                        pmatprop_2 = nullptr;
                                                     }
                                                     NiMaterialProperty* v35 = pmatprop_2;
                                                     pmatprop = pmatprop_2;
@@ -2824,7 +2825,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
                                             }
                                             if (spshape.m_pObject->GetSkinInstance()) {
                                                 if (abForceNoSkinning) {
-                                                    spshape.m_pObject->SetSkinInstance(0);
+                                                    spshape.m_pObject->SetSkinInstance(nullptr);
                                                     spshape.m_pObject->SetTranslate(NiPoint3_ZERO);
                                                     spshape.m_pObject->SetRotate(matrot);
                                                     apOutNodeBiped->AttachChild(spshape.m_pObject, 1);
@@ -2856,13 +2857,13 @@ bool BSFaceGenManager::CreateFaceGenHead(
                                                 v27 = 0;
                                             }
                                             BSShaderPPLightingProperty* pppprop =
-                                                v27 ? static_cast<BSShaderPPLightingProperty*>(pshprop_2) : 0;
+                                                v27 ? static_cast<BSShaderPPLightingProperty*>(pshprop_2) : nullptr;
                                             if (pppprop) {
                                                 pppprop->UseDefaultNormalMap();
                                             }
-                                            pmodelFG = 0;
-                                            sptexBase.operator=(static_cast<NiSourceTexture*>(0));
-                                            spshape.operator=(static_cast<NiTriBasedGeom*>(0));
+                                            pmodelFG = nullptr;
+                                            sptexBase.operator=(static_cast<NiSourceTexture*>(nullptr));
+                                            spshape.operator=(static_cast<NiTriBasedGeom*>(nullptr));
                                         }
                                     }
                                 }
@@ -2876,7 +2877,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
     if (BSFaceGenManager::GetFixNormals()) {
         if (pshapeHead) {
             if (pshapeEars) {
-                FixNormals(pshapeHead, pshapeEars, 0.1f, 0, 0);
+                FixNormals(pshapeHead, pshapeEars, 0.1f, false, false);
             }
         }
     }
@@ -2894,7 +2895,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
         const char* v18 = BSFaceGenManager::GetAsTRIFile(fileTRI, filename.pString, HAIR_PART_NONE);
         char* v14 = filename.pString;
         const char* v9 = BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, HAIR_PART_NONE);
-        pmodelFG = BSFaceGenManager::GetFaceGenModel(v9, v14, v18, 0, 1, HAIR_PART_NONE, 1);
+        pmodelFG = BSFaceGenManager::GetFaceGenModel(v9, v14, v18, nullptr, true, HAIR_PART_NONE, true);
         if (pmodelFG) {
             if (pmodelFG->ApplyCoordinateToNewMesh(&(&arNpcData)->FaceCoord, spshape)) {
                 if (spshape.m_pObject) {
@@ -2909,7 +2910,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 void BSFaceGenManager::AttachEyesToHead(
@@ -2923,7 +2924,7 @@ void BSFaceGenManager::AttachEyesToHead(
     FNVD_INLINED_LOCAL(NiPointer<NiTriBasedGeom>, spshape, std::nullopt, std::nullopt);
     NiMatrix3 matrot;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_FACEGEN_SYSTEM, 1,
+        MEM_CONTEXT_FACEGEN_SYSTEM, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\FaceGen\\BSFaceGenManager.cpp", 2983
     );
     BSStringT<char> filename;
@@ -2931,16 +2932,16 @@ void BSFaceGenManager::AttachEyesToHead(
     BSStringT<char> fileTRI;
     BSStringT<char> fileEGT;
     BSStringT<char> fileFIM;
-    NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(0));
-    ::new (&spshape) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(0));
-    BSFaceGenModel* pmodelFG = 0;
+    NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(nullptr));
+    ::new (&spshape) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
+    BSFaceGenModel* pmodelFG = nullptr;
     matrot.MakeYRotation(-1.5707964f);
     if (aNpcData.pLeftEye) {
         filename.SPrintF("Meshes\\%s", aNpcData.pLeftEye->GetModel());
         const char* AsTRIFile = BSFaceGenManager::GetAsTRIFile(fileTRI, filename.pString, HAIR_PART_NONE);
         char* v7 = filename.pString;
         const char* AsEGMFile = BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, HAIR_PART_NONE);
-        pmodelFG = BSFaceGenManager::GetFaceGenModel(AsEGMFile, v7, AsTRIFile, 0, 1, HAIR_PART_NONE, 0);
+        pmodelFG = BSFaceGenManager::GetFaceGenModel(AsEGMFile, v7, AsTRIFile, nullptr, true, HAIR_PART_NONE, false);
         if (pmodelFG) {
             pmodelFG->ApplyCoordinateToNewMesh(&(&aNpcData)->FaceCoord, spshape);
         }
@@ -2951,10 +2952,12 @@ void BSFaceGenManager::AttachEyesToHead(
             if (aNpcData.pEyes) {
                 filename.SPrintF("Textures\\%s", aNpcData.pEyes->GetTextureName());
                 char* v11 = filename.pString;
-                TES::pInstance->CreateTextureImage(v11, sptexBase, 0, 0);
+                TES::pInstance->CreateTextureImage(v11, sptexBase, false, false);
             }
             else {
-                TES::pInstance->CreateTextureImage("Textures\\Characters\\Eyes\\EyeDefault.dds", sptexBase, 0, 0);
+                TES::pInstance->CreateTextureImage(
+                    "Textures\\Characters\\Eyes\\EyeDefault.dds", sptexBase, false, false
+                );
             }
             if (sptexBase.m_pObject) {
                 int32_t v19;
@@ -2966,7 +2969,8 @@ void BSFaceGenManager::AttachEyesToHead(
                 else {
                     v19 = 0;
                 }
-                BSShaderPPLightingProperty* pshaderprop = v19 ? static_cast<BSShaderPPLightingProperty*>(pprop) : 0;
+                BSShaderPPLightingProperty* pshaderprop =
+                    v19 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
                 if (pshaderprop) {
                     NiSourceTexture* afAngle = sptexBase.m_pObject;
                     pshaderprop->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, afAngle);
@@ -2974,7 +2978,7 @@ void BSFaceGenManager::AttachEyesToHead(
             }
             if (spshape.m_pObject->GetSkinInstance()) {
                 if (abForceNoSkinning) {
-                    spshape.m_pObject->SetSkinInstance(0);
+                    spshape.m_pObject->SetSkinInstance(nullptr);
                     spshape.m_pObject->SetTranslate(NiPoint3_ZERO);
                     spshape.m_pObject->SetRotate(matrot);
                     apOutNodeBiped->AttachChild(spshape.m_pObject, 1);
@@ -2988,9 +2992,9 @@ void BSFaceGenManager::AttachEyesToHead(
                 apOutNodeBiped->AttachChild(spshape.m_pObject, 1);
             }
         }
-        pmodelFG = 0;
-        spshape.operator=(static_cast<NiTriBasedGeom*>(0));
-        sptexBase.operator=(static_cast<NiSourceTexture*>(0));
+        pmodelFG = nullptr;
+        spshape.operator=(static_cast<NiTriBasedGeom*>(nullptr));
+        sptexBase.operator=(static_cast<NiSourceTexture*>(nullptr));
     }
     if (aNpcData.pRightEye) {
         const char* v5 = aNpcData.pRightEye->GetModel();
@@ -2998,7 +3002,7 @@ void BSFaceGenManager::AttachEyesToHead(
         const char* v10 = BSFaceGenManager::GetAsTRIFile(fileTRI, filename.pString, HAIR_PART_NONE);
         char* v8 = filename.pString;
         const char* v6 = BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, HAIR_PART_NONE);
-        pmodelFG = BSFaceGenManager::GetFaceGenModel(v6, v8, v10, 0, 1, HAIR_PART_NONE, 0);
+        pmodelFG = BSFaceGenManager::GetFaceGenModel(v6, v8, v10, nullptr, true, HAIR_PART_NONE, false);
         if (pmodelFG) {
             pmodelFG->ApplyCoordinateToNewMesh(&(&aNpcData)->FaceCoord, spshape);
         }
@@ -3009,10 +3013,12 @@ void BSFaceGenManager::AttachEyesToHead(
             if (aNpcData.pEyes) {
                 filename.SPrintF("Textures\\%s", aNpcData.pEyes->GetTextureName());
                 char* v12 = filename.pString;
-                TES::pInstance->CreateTextureImage(v12, sptexBase, 0, 0);
+                TES::pInstance->CreateTextureImage(v12, sptexBase, false, false);
             }
             else {
-                TES::pInstance->CreateTextureImage("Textures\\Characters\\Eyes\\EyeDefault.dds", sptexBase, 0, 0);
+                TES::pInstance->CreateTextureImage(
+                    "Textures\\Characters\\Eyes\\EyeDefault.dds", sptexBase, false, false
+                );
             }
             if (sptexBase.m_pObject) {
                 int32_t v16;
@@ -3024,7 +3030,8 @@ void BSFaceGenManager::AttachEyesToHead(
                 else {
                     v16 = 0;
                 }
-                BSShaderPPLightingProperty* pshaderprop_2 = v16 ? static_cast<BSShaderPPLightingProperty*>(pprop_2) : 0;
+                BSShaderPPLightingProperty* pshaderprop_2 =
+                    v16 ? static_cast<BSShaderPPLightingProperty*>(pprop_2) : nullptr;
                 if (pshaderprop_2) {
                     NiSourceTexture* afAnglea = sptexBase.m_pObject;
                     pshaderprop_2->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, afAnglea);
@@ -3032,7 +3039,7 @@ void BSFaceGenManager::AttachEyesToHead(
             }
             if (spshape.m_pObject->GetSkinInstance()) {
                 if (abForceNoSkinning) {
-                    spshape.m_pObject->SetSkinInstance(0);
+                    spshape.m_pObject->SetSkinInstance(nullptr);
                     spshape.m_pObject->SetTranslate(NiPoint3_ZERO);
                     spshape.m_pObject->SetRotate(matrot);
                     apOutNodeBiped->AttachChild(spshape.m_pObject, 1);
@@ -3046,9 +3053,9 @@ void BSFaceGenManager::AttachEyesToHead(
                 apOutNodeBiped->AttachChild(spshape.m_pObject, 1);
             }
         }
-        pmodelFG = 0;
-        spshape.operator=(static_cast<NiTriBasedGeom*>(0));
-        sptexBase.operator=(static_cast<NiSourceTexture*>(0));
+        pmodelFG = nullptr;
+        spshape.operator=(static_cast<NiTriBasedGeom*>(nullptr));
+        sptexBase.operator=(static_cast<NiSourceTexture*>(nullptr));
     }
     spshape.~NiPointer<NiTriBasedGeom>();
 }

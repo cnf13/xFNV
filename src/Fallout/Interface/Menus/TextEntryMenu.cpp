@@ -15,7 +15,7 @@
 BSStringT<char> TextEditMenu::sEnteredText;
 
 TextEditMenu::TextEditMenu() : Menu(), pTiles(), EditField(), menuCallback(nullptr) {
-    sEnteredText.Set(0, 0);
+    sEnteredText.Set(nullptr, 0);
 }
 
 TextEditMenu::~TextEditMenu() {}
@@ -48,20 +48,20 @@ bool TextEditMenu::DoKey(int32_t aiKey) {
     if (aiKey == -0x7FFFFFF8) {
         if (pTiles[1]->IsTrue(4015)) {
             DoClick(1, pTiles[1]);
-            return 1;
+            return true;
         }
         else {
-            return 0;
+            return false;
         }
     }
     else {
         if (EditField.EditingText()) {
             EditField.HandleKey(aiKey);
             UpdateText();
-            return 1;
+            return true;
         }
         else {
-            return 0;
+            return false;
         }
     }
 }
@@ -75,8 +75,8 @@ bool TextEditMenu::IsDone() {
 }
 
 void TextEditMenu::UpdateText() {
-    char* v1 = static_cast<char*>(EditField.GetDisplayText());
-    pTiles[0]->Set(4036, v1, 1);
+    char* v1 = EditField.GetDisplayText();
+    pTiles[0]->Set(4036, v1, true);
     if (menuCallback) {
         const char* v2 = EditField.GetEnteredText();
         bool v3 = menuCallback(v2);
@@ -89,7 +89,7 @@ const char* TextEditMenu::GetText() {
 }
 
 BSStringT<char>* TextEditMenu::ResetText() {
-    return &sEnteredText.operator=(0);
+    return &sEnteredText.operator=(nullptr);
 }
 
 int32_t TextEditMenu::GetMenuID() {
@@ -100,7 +100,7 @@ void TextEditMenu::Close() {
     if (TextEditMenu::pInstance) {
         TextEditMenu::pInstance->pMenu->Set(Tile::kTileValue_DeleteOnFade, 1);
         TextEditMenu::pInstance->StartFadeOut();
-        TextEditMenu::pInstance = 0;
+        TextEditMenu::pInstance = nullptr;
     }
 }
 
@@ -116,24 +116,24 @@ char TextEditMenu::Create(const char* apTitle, const char* apDefaultText, bool (
     Menu* Menu_ = th_s->GetMenu();
     if (Menu_ && (v3 = Menu_->GetClass(), v3 == TextEditMenu::GetMenuID())) {
         TileMenu* v4 = dynamic_cast<TileMenu*>(th_s);
-        Menu_->SetMenuTile(v4, 0);
+        Menu_->SetMenuTile(v4, false);
         TextEditMenu::pInstance = dynamic_cast<TextEditMenu*>(Menu_);
         if (th_s->GetFloat(4007) == 6006.0 || th_s->GetFloat(4007) == 102.0) {
-            th_s->Set(4013, afValue, 1);
+            th_s->Set(4013, afValue, true);
         }
-        TextEditMenu::pInstance->pTiles[2]->Set(4036, apTitle, 1);
-        TextEditMenu::pInstance->pTiles[0]->Set(4036, apDefaultText, 1);
+        TextEditMenu::pInstance->pTiles[2]->Set(4036, apTitle, true);
+        TextEditMenu::pInstance->pTiles[0]->Set(4036, apDefaultText, true);
         double Float = TextEditMenu::pInstance->pTiles[0]->GetFloat(4026);
         TextEditMenu::pInstance->EditField.SetMaxSize(static_cast<int32_t>(Float));
         const char* String = TextEditMenu::pInstance->pTiles[0]->GetString(4036);
         TextEditMenu::pInstance->EditField.SetText(String);
-        TextEditMenu::pInstance->EditField.SetEditing(1);
-        TextEditMenu::pInstance->EditField.bClearOnKey = 1;
+        TextEditMenu::pInstance->EditField.SetEditing(true);
+        TextEditMenu::pInstance->EditField.bClearOnKey = true;
         const char* v7 = sOk.String();
-        TextEditMenu::pInstance->pTiles[1]->Set(4036, v7, 1);
+        TextEditMenu::pInstance->pTiles[1]->Set(4036, v7, true);
         TextEditMenu::pInstance->menuCallback = apFunc;
         TextEditMenu::pInstance->UpdateText();
-        Menu_->PrepForVisibility(0);
+        Menu_->PrepForVisibility(false);
         return 1;
     }
     else {

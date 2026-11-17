@@ -81,7 +81,7 @@ void BSDamageStage::CopyMembers(BSDamageStage* pDest, NiCloningProcess& arCloneD
 NiObject* BSDamageStage::CreateObject() {
     BSDamageStage* pObject = static_cast<BSDamageStage*>(NiMemObject::operator new(sizeof(BSDamageStage)));
     if (!pObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pObject) BSDamageStage;
 }

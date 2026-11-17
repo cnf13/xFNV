@@ -130,7 +130,7 @@ void hkpVehicleDefaultAerodynamics::calcAerodynamics(
     __m128 v15 = _mm_mul_ps(_mm_shuffle_ps(v13, v13, 0), v8);
     __m128 v16 = _mm_shuffle_ps(v13, v13, 85);
     __m128 v17 = _mm_mul_ps(m_entity->m_motion.m_linearVelocity.m_quad, v14);
-    float v19 = _mm_shuffle_ps(v17, v17, 170)[0] + static_cast<float>(_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]);
+    float v19 = _mm_shuffle_ps(v17, v17, 170)[0] + (_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]);
     *reinterpret_cast<float*>(&v21) = calcAerodynamicDrag(v19);
     *reinterpret_cast<float*>(&v20) = calcAerodynamicLift(v19);
     v18.m_quad = _mm_mul_ps(

@@ -245,7 +245,7 @@ void MediaLocationController::InitItem() {
                 Warning("MASTERFILE: Could not find reputation (%08X) for MediaLocationController", pFaction);
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -299,180 +299,180 @@ void MediaLocationController::Copy(TESForm* apCopy) {
 bool MediaLocationController::Compare(TESForm* apCompare) {
     MediaLocationController* pcomp = dynamic_cast<MediaLocationController*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (iFlags != pcomp->iFlags) {
-        return 1;
+        return true;
     }
     if (pFaction != pcomp->pFaction) {
-        return 1;
+        return true;
     }
     if (rFactionConditional != pcomp->rFactionConditional) {
-        return 1;
+        return true;
     }
     if (pAudioMarker != pcomp->pAudioMarker) {
-        return 1;
+        return true;
     }
     if (pcomp->fLayerTwoPercent != fLayerTwoPercent) {
-        return 1;
+        return true;
     }
     if (pcomp->fLayerThreePercent != fLayerThreePercent) {
-        return 1;
+        return true;
     }
     if (pcomp->fLocationDelay != fLocationDelay) {
-        return 1;
+        return true;
     }
     if (pcomp->fRetriggerDelay != fRetriggerDelay) {
-        return 1;
+        return true;
     }
     if (uiDayStart != pcomp->uiDayStart) {
-        return 1;
+        return true;
     }
     if (uiNightStart != pcomp->uiNightStart) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     if (!(&pcomp->lConditionalNeutralList)->m_item) {
-        return 1;
+        return true;
     }
     if (!(&lConditionalNeutralList)->m_item) {
-        return 1;
+        return true;
     }
     int32_t v3 = pcomp->lConditionalNeutralList.ItemsInList();
     if (v3 != lConditionalNeutralList.ItemsInList()) {
-        return 1;
+        return true;
     }
     for (MediaSet*& rpItem : lConditionalNeutralList.ItemsUntilNull()) {
-        bool bFound = 0;
+        bool bFound = false;
         for (MediaSet*& rpItem_2 : pcomp->lConditionalNeutralList.ItemsUntilNull()) {
             MediaSet* m_item = rpItem;
             if (!m_item->Compare(rpItem_2)) {
-                bFound = 1;
+                bFound = true;
                 break;
             }
         }
         if (!bFound) {
-            return 1;
+            return true;
         }
     }
     if (!(&pcomp->lConditionalAllyList)->m_item) {
-        return 1;
+        return true;
     }
     if (!(&lConditionalAllyList)->m_item) {
-        return 1;
+        return true;
     }
     int32_t v4 = pcomp->lConditionalAllyList.ItemsInList();
     if (v4 != lConditionalAllyList.ItemsInList()) {
-        return 1;
+        return true;
     }
     for (MediaSet*& rpItem : lConditionalAllyList.ItemsUntilNull()) {
-        bool bFound_2 = 0;
+        bool bFound_2 = false;
         for (MediaSet*& rpItem_2 : pcomp->lConditionalAllyList.ItemsUntilNull()) {
             MediaSet* v13 = rpItem;
             if (!v13->Compare(rpItem_2)) {
-                bFound_2 = 1;
+                bFound_2 = true;
                 break;
             }
         }
         if (!bFound_2) {
-            return 1;
+            return true;
         }
     }
     if (!(&pcomp->lConditionalFriendList)->m_item) {
-        return 1;
+        return true;
     }
     if (!(&lConditionalFriendList)->m_item) {
-        return 1;
+        return true;
     }
     int32_t v5 = pcomp->lConditionalFriendList.ItemsInList();
     if (v5 != lConditionalFriendList.ItemsInList()) {
-        return 1;
+        return true;
     }
     for (MediaSet*& rpItem : lConditionalFriendList.ItemsUntilNull()) {
-        bool bFound_3 = 0;
+        bool bFound_3 = false;
         for (MediaSet*& rpItem_2 : pcomp->lConditionalFriendList.ItemsUntilNull()) {
             MediaSet* v12 = rpItem;
             if (!v12->Compare(rpItem_2)) {
-                bFound_3 = 1;
+                bFound_3 = true;
                 break;
             }
         }
         if (!bFound_3) {
-            return 1;
+            return true;
         }
     }
     if (!(&pcomp->lConditionalEnemyList)->m_item) {
-        return 1;
+        return true;
     }
     if (!(&lConditionalEnemyList)->m_item) {
-        return 1;
+        return true;
     }
     int32_t v6 = pcomp->lConditionalEnemyList.ItemsInList();
     if (v6 != lConditionalEnemyList.ItemsInList()) {
-        return 1;
+        return true;
     }
     for (MediaSet*& rpItem : lConditionalEnemyList.ItemsUntilNull()) {
-        bool bFound_4 = 0;
+        bool bFound_4 = false;
         for (MediaSet*& rpItem_2 : pcomp->lConditionalEnemyList.ItemsUntilNull()) {
             MediaSet* v11 = rpItem;
             if (!v11->Compare(rpItem_2)) {
-                bFound_4 = 1;
+                bFound_4 = true;
                 break;
             }
         }
         if (!bFound_4) {
-            return 1;
+            return true;
         }
     }
     if (!(&pcomp->lLocationList)->m_item) {
-        return 1;
+        return true;
     }
     if (!(&lLocationList)->m_item) {
-        return 1;
+        return true;
     }
     int32_t v7 = pcomp->lLocationList.ItemsInList();
     if (v7 != lLocationList.ItemsInList()) {
-        return 1;
+        return true;
     }
     for (MediaSet*& rpItem : lLocationList.ItemsUntilNull()) {
-        bool bFound_5 = 0;
+        bool bFound_5 = false;
         for (MediaSet*& rpItem_2 : pcomp->lLocationList.ItemsUntilNull()) {
             MediaSet* v10 = rpItem;
             if (!v10->Compare(rpItem_2)) {
-                bFound_5 = 1;
+                bFound_5 = true;
                 break;
             }
         }
         if (!bFound_5) {
-            return 1;
+            return true;
         }
     }
     if (!(&pcomp->lBattleList)->m_item) {
-        return 1;
+        return true;
     }
     if (!(&lBattleList)->m_item) {
-        return 1;
+        return true;
     }
     int32_t v8 = pcomp->lBattleList.ItemsInList();
     if (v8 != lBattleList.ItemsInList()) {
-        return 1;
+        return true;
     }
     for (MediaSet*& rpItem : lBattleList.ItemsUntilNull()) {
-        bool bFound_6 = 0;
+        bool bFound_6 = false;
         for (MediaSet*& rpItem_2 : pcomp->lBattleList.ItemsUntilNull()) {
             MediaSet* v9 = rpItem;
             if (!v9->Compare(rpItem_2)) {
-                bFound_6 = 1;
+                bFound_6 = true;
                 break;
             }
         }
         if (!bFound_6) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 bool MediaLocationController::GetDefaultTime() {
@@ -480,7 +480,7 @@ bool MediaLocationController::GetDefaultTime() {
 }
 
 void MediaLocationController::InitItemList(BSSimpleList<MediaSet*>* plist) {
-    BSSimpleList<MediaSet*>* plastlist = 0;
+    BSSimpleList<MediaSet*>* plastlist = nullptr;
     while (plist && !plist->IsEmpty()) {
         uint32_t tempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(plist->m_item));
         TESFile* File = GetFile(-1);
@@ -520,7 +520,7 @@ bool MediaLocationController::GetDayNight() {
     Sky* pSky = TES::pInstance->TES::GetSky();
     if (GetDefaultTime()) {
         if (!pSky) {
-            return (bool)1;
+            return true;
         }
         dSuriseBegin = (double)pSky->GetSunriseBegin();
         v9 = (pSky->GetSunriseEnd() + dSuriseBegin) / 2.0;
@@ -531,13 +531,13 @@ bool MediaLocationController::GetDayNight() {
         currentGameHour = (double)pSky->GetCurrentGameHour();
         sunsetBegin = (double)pSky->GetSunsetBegin();
         if (((pSky->GetSunsetEnd() + sunsetBegin) / 2.0) >= currentGameHour) {
-            return (bool)1;
+            return true;
         }
         return (bool)v6;
     }
     else {
         if (!pSky) {
-            return (bool)1;
+            return true;
         }
         v4 = ((double)uiDayStart) * 0.09375;
         return (bool)((uint8_t)((pSky->GetCurrentGameHour() >= v4) &&
@@ -580,13 +580,13 @@ bool MediaLocationController::Update(bool abInCombat) {
     FIGHT_REACTION eReaction;
     // Tests the marker only when pPlayer is null, calling the getter on null, as the game does.
     if (!pPlayer && pPlayer->GetClosestAudioMarkerInfo() && pPlayer->GetClosestAudioMarkerInfo()->pMarkerRef) {
-        return 0;
+        return false;
     }
     if (FalloutAudioMedia::pCurrentMediaController != this) {
         if (pCurrentMediaSet) {
             pCurrentMediaSet->Reset();
         }
-        pCurrentMediaSet = 0;
+        pCurrentMediaSet = nullptr;
     }
     FalloutAudioMedia::pCurrentMediaController = this;
     uint32_t ticks = (&BSAudio::QInstance())->GetSynchTime();
@@ -594,7 +594,7 @@ bool MediaLocationController::Update(bool abInCombat) {
         if (pCurrentMediaSet) {
             pCurrentMediaSet->Reset();
         }
-        pCurrentMediaSet = 0;
+        pCurrentMediaSet = nullptr;
     }
     if (pFaction) {
         TESFaction* DefaultObject =
@@ -619,7 +619,7 @@ bool MediaLocationController::Update(bool abInCombat) {
     // Walks the compass targets under kPerceivedActorsLock; PlayerCharacter.h says why.
     PlayerCharacter::kPerceivedActorsLock.Lock(nullptr);
     BSSimpleList<CompassTarget*>* pNearList = pPlayer->GetListofPerceivedActors();
-    bool bFoundHostile = 0;
+    bool bFoundHostile = false;
     bool bLastFoundFactionActors = uiFoundFactionActors != 0;
     uiFoundFactionActors = 0;
     uiFoundHostileActors = 0;
@@ -630,7 +630,7 @@ bool MediaLocationController::Update(bool abInCombat) {
                 if (pFaction) {
                     if (pact->pTarget->IsInFaction(pFaction)) {
                         ++uiFoundFactionActors;
-                        bFoundHostile = 1;
+                        bFoundHostile = true;
                         if (pact->bIsHostile) {
                             v19 = FIGHT_REACTION_ENEMY;
                         }
@@ -651,7 +651,7 @@ bool MediaLocationController::Update(bool abInCombat) {
     bool bChangeDay = bIsDay != GetDayNight();
     bool bChangeReaction = eCurrentFactionReaction != v19;
     if (static_cast<int32_t>(v19) == GetDeadRep()) {
-        bChangeDead = 0;
+        bChangeDead = false;
     }
     bInCombat = abInCombat;
     bInTension = uiFoundHostileActors != 0;
@@ -659,9 +659,9 @@ bool MediaLocationController::Update(bool abInCombat) {
     eCurrentFactionReaction = v19;
     fCurrentPlayerRadius = fPlayerRadius;
     if (fCurrentPlayerRadius < 100.0 && (uiLocationDelay > ticks && !bIsActive)) {
-        return 0;
+        return false;
     }
-    bIsActive = 0;
+    bIsActive = false;
     if (pCurrentMediaSet) {
         bIsActive = pCurrentMediaSet->Update(ticks, abInCombat, this);
     }
@@ -669,12 +669,12 @@ bool MediaLocationController::Update(bool abInCombat) {
         if (pCurrentMediaSet) {
             pCurrentMediaSet->Reset();
         }
-        pCurrentMediaSet = 0;
+        pCurrentMediaSet = nullptr;
     }
     if (!bIsActive && fPlayerRadius < 100.0) {
         if (pCurrentMediaSet) {
             pCurrentMediaSet->Reset();
-            pCurrentMediaSet = 0;
+            pCurrentMediaSet = nullptr;
         }
         if (!pCurrentMediaSet) {
             if (bFoundHostile) {
@@ -733,7 +733,7 @@ bool MediaLocationController::Update(bool abInCombat) {
         fCurrentPlayerRadius < 100.0 && abInCombat) {
         if (pCurrentMediaSet) {
             pCurrentMediaSet->Reset();
-            pCurrentMediaSet = 0;
+            pCurrentMediaSet = nullptr;
         }
         if (!FalloutAudioMedia::pCurrentBattleMediaSet) {
             pCurrentMediaSet = GetRandomListItem(&lBattleList);
@@ -748,7 +748,7 @@ bool MediaLocationController::Update(bool abInCombat) {
         uiLocationDelay = static_cast<int64_t>(static_cast<double>(ticks) + fLocationDelay * 1000.0);
     }
     if (!bIsActive && fCurrentPlayerRadius > 1.0) {
-        FalloutAudioMedia::pCurrentMediaController = 0;
+        FalloutAudioMedia::pCurrentMediaController = nullptr;
     }
     return bIsActive;
 }

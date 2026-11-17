@@ -50,8 +50,8 @@ void ParalysisEffect::Update(float afSecondsElapsed) {
         targetAsActor = nullptr;
     }
     if (targetAsActor) {
-        if (targetAsActor->IsDead((bool)0)) {
-            ActiveEffect::Dispel(1);
+        if (targetAsActor->IsDead(false)) {
+            ActiveEffect::Dispel(true);
         }
     }
 }

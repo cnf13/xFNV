@@ -251,14 +251,14 @@ void BSMasterParticleSystem::ClearAllParticles() {
         v2 = static_cast<NiParticleSystem*>(ChildParticles.m_pBase[i]);
         if (v2) {
             v1 = ChildParticles.m_pBase[i];
-            v2->m_bResetSystem = (bool)1;
+            v2->m_bResetSystem = true;
         }
     }
 }
 
 void BSMasterParticleSystem::ClearAllEmitterObj() {
     usActiveEmitterObjCount = (uint16_t)0;
-    FirstEmitterObjIter = (NiTListItem<NiPointer<NiAVObject>>*)0;
+    FirstEmitterObjIter = (NiTListItem<NiPointer<NiAVObject>>*)nullptr;
     (&lEmitterObjList)->NiTPointerListBase<NiPointer<NiAVObject>>::RemoveAll();
 }
 
@@ -366,7 +366,7 @@ void BSMasterParticleSystem::AddEmitterObj(NiAVObject* apEmitterObj) {
             goto LABEL_9;
         }
     }
-    v9 = 0;
+    v9 = nullptr;
 LABEL_9:;
     if (apEmitterObj) {
         NiDecRefCount(apEmitterObj);
@@ -414,8 +414,8 @@ NiObject* BSMasterParticleSystem::CreateObject() {
 bool BSMasterParticleSystem::IsMasterParticleSystem(NiParticles* apSystem) {
     for (NiTimeController* i = apSystem->m_spControllers; i; i = i->m_spNext.m_pObject) {
         if (i->GetRTTI() == &BSPSysMultiTargetEmitterCtlr::ms_RTTI) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }

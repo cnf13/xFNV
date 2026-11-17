@@ -100,11 +100,11 @@ void NightEyeEffect::ApplyVisualEffect() {
         static_cast<ImageSpaceEffectCinematic*>(pmanager->GetEffect(ImageSpaceManager::EFFECT_CINEMATIC));
     if (pPlayer->GetActorValue(ActorValue::NIGHT_EYE_BONUS) <= 0) {
         BSShaderManager::fMinAmbient = 0.0f;
-        peffect->SetNightEye(0);
+        peffect->SetNightEye(false);
     }
     else {
         BSShaderManager::fMinAmbient = fMagicNightEyeAmbient.Float();
-        peffect->SetNightEye(1);
+        peffect->SetNightEye(true);
     }
 }
 

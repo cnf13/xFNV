@@ -31,19 +31,19 @@ bool NiShaderConstantMap::LookUpObjectMapping(const char* pcMapping, uint32_t& u
     NiShaderConstantMap::PredefinedMapping* v3;
     int32_t v2 = 0;
     if (!NiShaderConstantMap::ms_uiObjectMappingCount) {
-        return 0;
+        return false;
     }
-    while (1) {
+    while (true) {
         v3 = &NiShaderConstantMap::ms_pkObjectMappings[v2];
         if (!NiStricmp(v3->m_kMappingName.GetHandle(), pcMapping)) {
             break;
         }
         if (++v2 >= NiShaderConstantMap::ms_uiObjectMappingCount) {
-            return 0;
+            return false;
         }
     }
     uiMappingID = v3->m_uiMappingID;
-    return 1;
+    return true;
 }
 
 NiShaderAttributeDesc::AttributeType
@@ -112,20 +112,20 @@ bool NiShaderConstantMap::LookUpPredefinedMapping(
         int32_t v4 = 0;
         if (NiShaderConstantMap::ms_uiPredefinedMappingCount) {
             NiShaderConstantMap::PredefinedMapping* v5;
-            while (1) {
+            while (true) {
                 v5 = &NiShaderConstantMap::ms_pkPredefinedMappings[v4];
                 if (!NiStricmp(v5->m_kMappingName.GetHandle(), pszTrueName)) {
                     break;
                 }
                 if (++v4 >= NiShaderConstantMap::ms_uiPredefinedMappingCount) {
-                    return 0;
+                    return false;
                 }
             }
             uiMappingID = v5->m_uiMappingID;
-            return 1;
+            return true;
         }
         else {
-            return 0;
+            return false;
         }
     }
     return result;
@@ -296,7 +296,7 @@ NiDynamicEffect* NiShaderConstantMap::GetDynamicEffectForObject(
     NiDynamicEffectState::ListItem* m_pProjLightList;
     int32_t v17;
     int32_t v3 = 0;
-    NiDynamicEffect* v20 = 0;
+    NiDynamicEffect* v20 = nullptr;
     if (!pkEffectState) {
         return v20;
     }
@@ -310,7 +310,7 @@ NiDynamicEffect* NiShaderConstantMap::GetDynamicEffectForObject(
             if (!m_pLightList) {
                 return v20;
             }
-            while (1) {
+            while (true) {
                 m_pItem = m_pLightList->m_pItem;
                 m_pLightList = m_pLightList->m_pNext;
                 uint32_t m_ucEffectType = m_pItem->m_ucEffectType;
@@ -322,7 +322,7 @@ NiDynamicEffect* NiShaderConstantMap::GetDynamicEffectForObject(
                     }
                 }
                 if (!m_pLightList) {
-                    return 0;
+                    return nullptr;
                 }
             }
             return m_pItem;
@@ -342,7 +342,7 @@ NiDynamicEffect* NiShaderConstantMap::GetDynamicEffectForObject(
             if (!m_pProjShadowList) {
                 return v20;
             }
-            while (1) {
+            while (true) {
                 v14 = m_pProjShadowList->m_pItem;
                 m_pProjShadowList = m_pProjShadowList->m_pNext;
                 if (v14) {
@@ -354,7 +354,7 @@ NiDynamicEffect* NiShaderConstantMap::GetDynamicEffectForObject(
                     }
                 }
                 if (!m_pProjShadowList) {
-                    return 0;
+                    return nullptr;
                 }
             }
             return v14;
@@ -377,7 +377,7 @@ NiDynamicEffect* NiShaderConstantMap::GetDynamicEffectForObject(
             v11 = !m_pFogMap->m_bOn;
         LABEL_31:;
             if (v11) {
-                return 0;
+                return nullptr;
             }
             return v20;
         }
@@ -385,7 +385,7 @@ NiDynamicEffect* NiShaderConstantMap::GetDynamicEffectForObject(
             return v20;
         }
     }
-    while (1) {
+    while (true) {
         v14 = m_pProjLightList->m_pItem;
         m_pProjLightList = m_pProjLightList->m_pNext;
         if (v14) {
@@ -397,7 +397,7 @@ NiDynamicEffect* NiShaderConstantMap::GetDynamicEffectForObject(
             }
         }
         if (!m_pProjLightList) {
-            return 0;
+            return nullptr;
         }
     }
     return v14;
@@ -444,7 +444,7 @@ bool NiShaderConstantMap::ParseKeyName(
     char* Context;
     char Str[260];
     if (uiMaxLen + 1 < 260) {
-        return 0;
+        return false;
     }
     strcpy_s(Str, 260, pszOrigName);
     strcpy_s(pszTrueName, 260, pszOrigName);
@@ -453,7 +453,7 @@ bool NiShaderConstantMap::ParseKeyName(
         if (std::isdigit(v5[1])) {
             if (!v5[2]) {
                 char* v7 = strtok_s(Str, "_", &Context);
-                char* v8 = strtok_s(0, "_", &Context);
+                char* v8 = strtok_s(nullptr, "_", &Context);
                 if (v8) {
                     uiRegisterCount = std::atoi(v8);
                     NiStrcpy(pszTrueName, uiMaxLen, v7);
@@ -461,7 +461,7 @@ bool NiShaderConstantMap::ParseKeyName(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 // Allocates arrays of 136 predefined and 25 object mappings with NiNew, each entry assigned a temporary

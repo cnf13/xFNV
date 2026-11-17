@@ -157,7 +157,7 @@ void hkpVehicleRayCastWheelCollide::collideWheels(
             hkpWorldRayCastOutput v11;
             v11.m_hitFraction = 1.0f;
             v11.m_shapeKeyIndex = 0;
-            v11.m_rootCollidable = 0;
+            v11.m_rootCollidable = nullptr;
             hkpVehicleInstance::WheelInfo* m_data = vehicle->m_wheelsInfo.m_data;
             v11.m_extraInfo = -1;
             v11.m_shapeKeys[0] = -1;
@@ -260,7 +260,7 @@ int32_t hkpVehicleRayCastWheelCollide::buildRayCastCommands(
                 v12 = static_cast<const hkpRayShapeCollectionFilter*>(collisionFilter);
             }
             else {
-                v12 = 0;
+                v12 = nullptr;
             }
             commandStorage->m_rayInput.m_rayShapeCollectionFilter = v12;
             commandStorage->m_filterType = collisionFilter->m_type.m_storage;
@@ -431,7 +431,7 @@ void hkpVehicleRayCastWheelCollide::getCollisionOutputWithoutHit(
 ) const {
     hkpVehicleInstance::WheelInfo* v4 = &vehicle->m_wheelsInfo.m_data[wheelNum];
     double m_length = vehicle->m_suspension->m_wheelParams.m_data[wheelNum].m_length;
-    cdInfo.m_contactBody = 0;
+    cdInfo.m_contactBody = nullptr;
     cdInfo.m_currentSuspensionLength = m_length;
     cdInfo.m_suspensionClosingSpeed = 0.0f;
     cdInfo.m_contactPoint.m_position = v4->m_rayEndPointWs;

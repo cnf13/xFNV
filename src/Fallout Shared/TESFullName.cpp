@@ -27,16 +27,16 @@ void TESFullName::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESFullName::CompareComponent(BaseFormComponent* apCompareFC) {
     TESFullName* pCompare = dynamic_cast<TESFullName*>(apCompareFC);
     if (!pCompare) {
-        return 1;
+        return true;
     }
     if (!GetFullNameLength() && !pCompare->GetFullNameLength()) {
-        return 0;
+        return false;
     }
     uint32_t FullNameLength = GetFullNameLength();
     if (FullNameLength != pCompare->GetFullNameLength()) {
-        return 1;
+        return true;
     }
-    return cFullName.StrCmp(pCompare->GetFullName(), 0) != 0;
+    return cFullName.StrCmp(pCompare->GetFullName(), false) != 0;
 }
 
 void TESFullName::Save() {

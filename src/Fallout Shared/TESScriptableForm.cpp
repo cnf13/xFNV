@@ -27,7 +27,7 @@ void TESScriptableForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESScriptableForm::CompareComponent(BaseFormComponent* apCompareFC) {
     TESScriptableForm* v5 = dynamic_cast<TESScriptableForm*>(apCompareFC);
     if (!v5) {
-        return (bool)1;
+        return true;
     }
     Script* v3 = TESScriptableForm::GetFormScript();
     return (bool)((uint8_t)(v3 != v5->TESScriptableForm::GetFormScript()));

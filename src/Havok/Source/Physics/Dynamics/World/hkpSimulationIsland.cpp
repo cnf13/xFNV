@@ -238,7 +238,7 @@ void hkpSimulationIsland::internalRemoveEntity(hkpEntity* entity) {
     m_entities.m_data[entity->m_storageIndex]->m_storageIndex = entity->m_storageIndex;
     --m_entities.m_size;
     entity->m_simulationIsland = nullptr;
-    entity->m_storageIndex = (uint16_t)((-1));
+    entity->m_storageIndex = (uint16_t)(-1);
     m_splitCheckRequested = 1;
 }
 
@@ -284,7 +284,7 @@ void hkpSimulationIsland::removeAction(hkpAction* act) {
         }
     }
     m_actions.m_data[v3] = 0;
-    act->m_island = 0;
+    act->m_island = nullptr;
     m_splitCheckRequested = 1;
     m_actionListCleanupNeeded = 1;
 }

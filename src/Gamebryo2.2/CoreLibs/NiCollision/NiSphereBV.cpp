@@ -60,7 +60,7 @@ void NiSphereBV::UpdateWorldData(const NiBoundingVolume& kModelABV, const NiTran
 NiBoundingVolume* NiSphereBV::Create() const {
     NiSphereBV* pkSphere = static_cast<NiSphereBV*>(MemoryManager_Singleton.Allocate(sizeof(NiSphereBV)));
     if (!pkSphere) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkSphere) NiSphereBV(1.0f, NiPoint3_ZERO);
 }
@@ -68,7 +68,7 @@ NiBoundingVolume* NiSphereBV::Create() const {
 NiBoundingVolume* NiSphereBV::Clone() const {
     NiSphereBV* pkClone = static_cast<NiSphereBV*>(MemoryManager_Singleton.Allocate(sizeof(NiSphereBV)));
     if (!pkClone) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkClone) NiSphereBV(*this);
 }
@@ -243,9 +243,9 @@ bool NiSphereBV::SphereTriFindIntersect(
             v74.y = -kNormal1.y;
             v74.z = -kNormal1.z;
             kNormal0 = v74;
-            return 1;
+            return true;
         }
-        return 1;
+        return true;
     }
     v40.x = kV0.x - kV1.x;
     double v29 = kV0.y;
@@ -257,7 +257,7 @@ bool NiSphereBV::SphereTriFindIntersect(
     v66.z = v40.z;
     float v55 = v40.x * v40.x + v40.y * v40.y + v40.z * v40.z;
     if (v55 * fTime <= 9.999999747378752e-06) {
-        return 0;
+        return false;
     }
     float v56 = kTri.m_kEdge0.y * kTri.m_kEdge1.z - kTri.m_kEdge0.z * kTri.m_kEdge1.y;
     float v60 = kTri.m_kEdge0.z * kTri.m_kEdge1.x - kTri.m_kEdge1.z * kTri.m_kEdge0.x;
@@ -278,7 +278,7 @@ bool NiSphereBV::SphereTriFindIntersect(
             NiPoint3 v76;
             float v51 = v32;
             if (v51 <= 0.0f) {
-                return 0;
+                return false;
             }
             NiPoint3* v34 =
                 ::new (&kSurfacePt) NiPoint3(static_cast<const NiSphereBV*>(&kABV0)->m_kSphere.m_fRadius * kTriNormal);
@@ -291,7 +291,7 @@ bool NiSphereBV::SphereTriFindIntersect(
             NiPoint3 v75;
             float v50 = v32;
             if (v50 >= 0.0f) {
-                return 0;
+                return false;
             }
             NiPoint3* v33 =
                 ::new (&kSurfacePt) NiPoint3(static_cast<const NiSphereBV*>(&kABV0)->m_kSphere.m_fRadius * kTriNormal);
@@ -309,7 +309,7 @@ bool NiSphereBV::SphereTriFindIntersect(
             kSurfacePt.y = v35->y + v40.y;
             kSurfacePt.z = v35->z + v40.z;
             if (kTriNormal.Dot(kSurfacePt) > v58) {
-                return 0;
+                return false;
             }
         }
     }
@@ -321,7 +321,7 @@ bool NiSphereBV::SphereTriFindIntersect(
     fIntrTime = kIntersector.GetContactTime();
     if (kIntersector.m_eIntersectionType != NiIntersector::IT_OVERLAP &&
         kIntersector.m_eIntersectionType != NiIntersector::IT_CONTACT) {
-        return 0;
+        return false;
     }
     kIntrPt = kIntersector.GetContactPoint();
     if (bCalcNormals) {
@@ -332,7 +332,7 @@ bool NiSphereBV::SphereTriFindIntersect(
         v40.z = -kNormal0.z;
         kNormal1 = v40;
     }
-    return 1;
+    return true;
 }
 
 bool NiSphereBV::SphereSphereTestIntersect(
@@ -429,7 +429,7 @@ bool NiSphereBV::SphereSphereFindIntersect(
             else {
                 v21 = v32;
                 if (!(v32 + 9.999999747378752e-06 >= fTime * (v15 * fTime + (v16 + v16)) + v20)) {
-                    return 0;
+                    return false;
                 }
             }
             double v23 = kABV1a;
@@ -439,7 +439,7 @@ bool NiSphereBV::SphereSphereFindIntersect(
             double v26 = v24 - v15 * kABV1c;
             float kABV1b = v26;
             if (!(kABV1b >= 0.0f)) {
-                return 0;
+                return false;
             }
             if (!(v25 <= 0.0)) {
                 NiPoint3 v39;
@@ -486,7 +486,7 @@ bool NiSphereBV::SphereSphereFindIntersect(
                     v75.z = -kNormal0.z;
                     kNormal1 = v75;
                 }
-                return 1;
+                return true;
             }
             else {
                 NiPoint3 v70;
@@ -511,16 +511,16 @@ bool NiSphereBV::SphereSphereFindIntersect(
                     v71.y = -kNormal0.y;
                     v71.z = -kNormal0.z;
                     kNormal1 = v71;
-                    return 1;
+                    return true;
                 }
                 else {
-                    return 1;
+                    return true;
                 }
             }
         }
     }
     if (!(v32 >= static_cast<double>(kABV1a))) {
-        return 0;
+        return false;
     }
     fIntrTime = v14;
     float kV1f = kV1.z * kV1.z + (kV1.x * kV1.x + kV1.y * kV1.y);
@@ -572,7 +572,7 @@ bool NiSphereBV::SphereSphereFindIntersect(
     v30->x = v51;
     v30->y = v53;
     v30->z = v55;
-    return 1;
+    return true;
 }
 
 // KEEP: niread: the stream reads fill locals nothing initialised: a short read (malformed data) leaves kCenter or

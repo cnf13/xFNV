@@ -47,7 +47,7 @@ GeometryDecalShader::GeometryDecalShader()
   : spGeometryDecalVertexShader{}, spGeometryDecalPixelShader{}, spVSCMETransform(nullptr),
     spVSCMESkinTransform(nullptr), spVSCMEBoneMatrix(nullptr) {
     iShaderType = 12;
-    m_bUsesNiRenderState = 1;
+    m_bUsesNiRenderState = true;
 }
 
 // The constant map entries and the shaders are held references, released here, as are the shared shader declarations;
@@ -96,7 +96,7 @@ uint32_t GeometryDecalShader::SetupBoneMatrices(
         if (a3) {
             if (!m_uiCurrentPass) {
                 if (spVSCMEBoneMatrix) {
-                    BSShaderManager::pRenderer.m_pObject->CalculateBoneMatrices(a2, a7, 0, 3u, 1);
+                    BSShaderManager::pRenderer.m_pObject->CalculateBoneMatrices(a2, a7, false, 3u, true);
                     NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject->SetShaderConstantArray(
                         spVSCMEBoneMatrix, a2->m_pvBoneMatrices, a3->m_usBones, 3u, a3->m_pusBones
                     );
@@ -112,7 +112,7 @@ void GeometryDecalShader::SetupGeometryTextures(const NiPropertyState* apState) 
     // The shade property slot holds the decal's GeometryDecalShaderProperty.
     pstage->m_spTexture =
         static_cast<GeometryDecalShaderProperty*>(apState->m_aspProps[3].m_pObject)->spDecalTexture.m_pObject;
-    pstage->ConfigureStage(0);
+    pstage->ConfigureStage(false);
 }
 
 void GeometryDecalShader::SetupGeometryConstants(const NiPropertyState* apState) {
@@ -126,7 +126,7 @@ void GeometryDecalShader::SetupGeometryConstants(const NiPropertyState* apState)
     GeometryDecalShaderProperty* m_pObject =
         static_cast<GeometryDecalShaderProperty*>(apState->m_aspProps[3].m_pObject);
     NiSkinInstance* v14 = pGeometry->m_spSkinInstance.m_pObject;
-    m_pkD3DRenderer->SetModelTransform(pGeometry->m_kWorld, 0);
+    m_pkD3DRenderer->SetModelTransform(pGeometry->m_kWorld, false);
     switch (m_pObject->cSubTexture) {
         case 0: {
             v19.x = 0.0;
@@ -165,7 +165,7 @@ void GeometryDecalShader::SetupGeometryConstants(const NiPropertyState* apState)
     uint32_t v5 = 10;
     float fLifeTime = m_pObject->fTimer;
     float v11 = 1.0;
-    while (1) {
+    while (true) {
         double v6 = fLifeTime;
         if ((v5 & 1) != 0) {
             v11 = v11 * v6;
@@ -183,7 +183,8 @@ void GeometryDecalShader::SetupGeometryConstants(const NiPropertyState* apState)
         NiD3DPixelShader* v8 = NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject;
         if (v8) {
             v7->SetShaderConstants(
-                v8, pGeometry, v14, 0, m_pkBuffData, apState, 0, pGeometry->m_kWorld, *m_kWorldBound, 0, 1
+                v8, pGeometry, v14, nullptr, m_pkBuffData, apState, nullptr, pGeometry->m_kWorld, *m_kWorldBound, 0,
+                true
             );
         }
     }
@@ -192,7 +193,8 @@ void GeometryDecalShader::SetupGeometryConstants(const NiPropertyState* apState)
         NiD3DVertexShader* v10 = NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject;
         if (v10) {
             v9->SetShaderConstants(
-                v10, pGeometry, v14, 0, m_pkBuffData, apState, 0, pGeometry->m_kWorld, *m_kWorldBound, 0, 1
+                v10, pGeometry, v14, nullptr, m_pkBuffData, apState, nullptr, pGeometry->m_kWorld, *m_kWorldBound, 0,
+                true
             );
         }
     }
@@ -215,11 +217,11 @@ void GeometryDecalShader::SetupPassConstants(uint32_t auiCurrentPass) {
     uint8_t v3;
     spVSCMETransform = this->spVSCMETransform;
     if (((int32_t)auiCurrentPass) == 589) {
-        spVSCMETransform->m_bEnabled = (bool)0;
+        spVSCMETransform->m_bEnabled = false;
         v3 = 1;
     }
     else {
-        spVSCMETransform->m_bEnabled = (bool)1;
+        spVSCMETransform->m_bEnabled = true;
         v3 = 0;
     }
     spVSCMESkinTransform->m_bEnabled = (bool)v3;
@@ -321,8 +323,8 @@ void GeometryDecalShader::ClearPassStages() {
 void GeometryDecalShader::PresetPasses() {
     bool v8;
     uint32_t uiValue;
-    NiD3DPass* v2 = 0;
-    NiD3DPass* v15 = 0;
+    NiD3DPass* v2 = nullptr;
+    NiD3DPass* v15 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         NiD3DPass* m_pObject = spGeometryDecalPass[0].m_pObject;
@@ -333,10 +335,10 @@ void GeometryDecalShader::PresetPasses() {
         }
         if (v2->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             v2->SetStage(v2->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, true);
             v2->SetStage(v2->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v4 = spGeometryDecalVertexShader[0];
@@ -346,41 +348,41 @@ void GeometryDecalShader::PresetPasses() {
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(168u, 15u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(168u, 15u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(19u, 9u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(19u, 9u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(25u, 5u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(25u, 5u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(24u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(24u, 0, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
-        v8 = v2->m_pkRenderStateGroup == 0;
+        v2->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
+        v8 = v2->m_pkRenderStateGroup == nullptr;
         *reinterpret_cast<float*>(&uiValue) = BSShaderProperty::fDepthBiasUnit;
         if (v8) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(195u, uiValue, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(195u, uiValue, true);
         if (v2 != spGeometryDecalPass[1].m_pObject) {
             v2->DecRefCount();
             v2 = spGeometryDecalPass[1].m_pObject;
@@ -391,10 +393,10 @@ void GeometryDecalShader::PresetPasses() {
         }
         if (v2->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             v2->SetStage(v2->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, true);
             v2->SetStage(v2->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v9 = spGeometryDecalVertexShader[1];
@@ -404,41 +406,41 @@ void GeometryDecalShader::PresetPasses() {
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(168u, 15u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(168u, 15u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(19u, 9u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(19u, 9u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(25u, 5u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(25u, 5u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(24u, 0, 1);
-        v8 = v2->m_pkRenderStateGroup == 0;
+        v2->m_pkRenderStateGroup->SetRenderState(24u, 0, true);
+        v8 = v2->m_pkRenderStateGroup == nullptr;
         *reinterpret_cast<float*>(&uiValue) = BSShaderProperty::fDepthBiasUnit;
         if (v8) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(195u, uiValue, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(195u, uiValue, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
     }
     v2->DecRefCount();
 }
@@ -494,7 +496,7 @@ void GeometryDecalShader::LoadShaders() {
             NiIncRefCount(v5);
         }
     }
-    const char* ptarget = BSShaderManager::GetPSTarget(1);
+    const char* ptarget = BSShaderManager::GetPSTarget(true);
     v15.strPath = "lighting\\2x\\p\\decal.p.hlsl";
     v15.kMacros[0].Name = "DECAL";
     v15.kMacros[0].Definition = "";
@@ -535,7 +537,7 @@ BSShader* GeometryDecalShader::CreateShader() {
     GeometryDecalShader::spShaderDeclaration = v0;
     NiDX9ShaderDeclaration* v2 = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 4u, 1u);
     GeometryDecalShader::spShaderDeclarationSkinned = v2;
-    GeometryDecalShader* pshader = 0;
+    GeometryDecalShader* pshader = nullptr;
     static_cast<NiShaderDeclaration*>(GeometryDecalShader::spShaderDeclaration.m_pObject)
         ->SetEntry(0, 0, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
     static_cast<NiShaderDeclaration*>(GeometryDecalShader::spShaderDeclaration.m_pObject)

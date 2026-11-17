@@ -70,12 +70,12 @@ ViewCaster::~ViewCaster() {}
 // Creates the sphere phantom in the second custom pick layer and aiGroup.
 void ViewCaster::Init(float afRadius, uint32_t aiGroup) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_HAVOK, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Havok\\ViewCaster.cpp", 73
+        MEM_CONTEXT_HAVOK, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Havok\\ViewCaster.cpp", 73
     );
     bhkSphereShape* pshape;
     bhkSphereShape* pMemory = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
     if (pMemory) {
-        pshape = ::new (pMemory) bhkSphereShape(afRadius, 1);
+        pshape = ::new (pMemory) bhkSphereShape(afRadius, true);
     }
     else {
         pshape = nullptr;
@@ -116,7 +116,7 @@ bhkWorld* ViewCaster::GetWorld() {
 
 void ViewCaster::Add(bhkWorld* apWorld) {
     AutoMemContext apMemory(
-        MEM_CONTEXT_HAVOK, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Havok\\ViewCaster.cpp", 116
+        MEM_CONTEXT_HAVOK, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Havok\\ViewCaster.cpp", 116
     );
     if (GetObject()) {
         bhkSimpleShapePhantom* v4 = static_cast<bhkSimpleShapePhantom*>(GetObject());
@@ -152,7 +152,7 @@ TESObjectREFR* ViewCaster::FindActivateREFR(
     alignas(16) CFilter fltr;
     hkBool v84;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_HAVOK, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Havok\\ViewCaster.cpp", 155
+        MEM_CONTEXT_HAVOK, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Havok\\ViewCaster.cpp", 155
     );
     ViewCaster::pFuzzyBody = nullptr;
     TESObjectREFR* presult = nullptr;
@@ -167,8 +167,8 @@ TESObjectREFR* ViewCaster::FindActivateREFR(
                 abIsFuzzy = false;
                 afObjectDistance = 3.4028235e+38f;
                 alignas(16) NiPick activatePick(0, 8u);
-                activatePick.SetFrontOnly(0);
-                activatePick.SetObserveAppCullFlag(1);
+                activatePick.SetFrontOnly(false);
+                activatePick.SetObserveAppCullFlag(true);
                 uiInterfaceCheckpoint = 3501;
                 NI2HK(hkfrom, aOrigin);
                 NI2HK(hkto, nito);
@@ -178,7 +178,8 @@ TESObjectREFR* ViewCaster::FindActivateREFR(
                 input.m_maxExtraPenetration = 0.01f;
                 input.m_to.operator=(hkto);
                 SetCustomPickCollisions();
-                static_cast<bhkShapePhantom*>(GetObject())->SetPositionAndLinearCast(hkfrom, input, PointCollector, 0);
+                static_cast<bhkShapePhantom*>(GetObject())
+                    ->SetPositionAndLinearCast(hkfrom, input, PointCollector, nullptr);
                 hkBool* pHasHit = PointCollector.hasHit(&v84);
                 if (pHasHit->operator bool()) {
                     PointCollector.sortHits();
@@ -283,7 +284,7 @@ TESObjectREFR* ViewCaster::FindActivateREFR(
                                                         NiNode* pcurrent3D = pcurrent->Get3D();
                                                         PickDistance(
                                                             &activatePick, aOrigin, aDirection, afPickDistance,
-                                                            pcurrent3D, 0
+                                                            pcurrent3D, false
                                                         );
                                                     }
                                                 }

@@ -243,14 +243,14 @@ void CTreeEngine::SetWind(float fStrength) {
     m_sWindInfo.m_fStrength = fStrength;
     float v3 = (0x1p+3f * fStrength) * m_sWindInfo.m_cLeafFactors.m_afData[1];
     float v4 = (180.0f * fStrength) * m_sWindInfo.m_cLeafFactors.m_afData[0];
-    m_sWindInfo.m_cLeafOscillation.m_afData[0] = (float)(-v4);
+    m_sWindInfo.m_cLeafOscillation.m_afData[0] = (-v4);
     CVec3* p_m_cLeafOscillation = &m_sWindInfo.m_cLeafOscillation;
     p_m_cLeafOscillation->m_afData[1] = v4;
     p_m_cLeafOscillation->m_afData[2] = v3;
 }
 
 float CTreeEngine::ComputeLod() {
-    float v3 = (float)(&CIdvCamera::m_cCameraPos)->Distance(m_cPosition);
+    float v3 = (&CIdvCamera::m_cCameraPos)->Distance(m_cPosition);
     m_fLod = (float)(1.0 - ((v3 - m_sTreeInfo.m_fNear) / (m_sTreeInfo.m_fFar - m_sTreeInfo.m_fNear)));
     if (!(m_fLod > 1.0)) {
         if (m_fLod < 0.0) {
@@ -275,7 +275,7 @@ void CTreeEngine::Compute(float fLeafSizeIncreaseFactor) {
         v9 = ::new (apMemory) CIdvBranch(nullptr);
     }
     else {
-        v9 = 0;
+        v9 = nullptr;
     }
     m_pBranch = v9;
     if (!m_bParsedLeafLods) {
@@ -354,7 +354,7 @@ void CTreeEngine::FreeTransientData() {
             Block->~CIdvBranch();
             ourFree(Block);
         }
-        m_pBranch = 0;
+        m_pBranch = nullptr;
         for (int32_t i = 0; i < m_sLeafInfo.m_nNumLeafLodLevels; ++i) {
             if (m_vLeafLods) {
                 for (uint32_t j = 0; j < m_vLeafLods[i].size(); ++j) {
@@ -362,7 +362,7 @@ void CTreeEngine::FreeTransientData() {
                     if (v6) {
                         delete v6;
                     }
-                    m_vLeafLods[i][j] = 0;
+                    m_vLeafLods[i][j] = nullptr;
                 }
                 m_vLeafLods[i].clear();
             }
@@ -371,17 +371,17 @@ void CTreeEngine::FreeTransientData() {
         if (apThis) {
             delete[] apThis;
         }
-        m_vLeafLods = 0;
+        m_vLeafLods = nullptr;
         for (uint32_t k = 0; k < m_vBranchInfo.size(); ++k) {
             SIdvBranchInfo* apMemory = m_vBranchInfo[k];
             if (apMemory) {
                 apMemory->~SIdvBranchInfo();
                 ourFree(apMemory);
             }
-            m_vBranchInfo[k] = 0;
+            m_vBranchInfo[k] = nullptr;
         }
         m_vBranchInfo.clear();
-        m_bTransientDataIntact = 0;
+        m_bTransientDataIntact = false;
     }
 }
 
@@ -621,7 +621,7 @@ void CTreeEngine::ParseLeafCluster(CTreeFileAccess& cFile) {
         }
         ++v17;
     }
-    m_bParsedLeafLods = 1;
+    m_bParsedLeafLods = true;
 }
 
 // It throws IdvFileError with a C++ throw, as SIdvBranchInfo::Parse (BranchInfo.cpp, which says where it is caught).

@@ -359,7 +359,7 @@
 #include "SDK/MSVC/string.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 // GetCalcLevel's function-local static (no guard: zero-initialised data) and the settings it reads.
@@ -420,7 +420,7 @@ TESObjectREFR::~TESObjectREFR() {
     BSSimpleList<REF_ACTIVATE_DATA*>* pactlist;
     CheckWithinMultiBoundTask::CancelAttachment(this);
     if (IsFurniture()) {
-        TESObjectREFR::kFurnitureLock.Lock(0);
+        TESObjectREFR::kFurnitureLock.Lock(nullptr);
         nFurnitureListDirtied = appTimer.iLastTime;
         for (BSSimpleList<Actor*>* pIter = ReferenceProcessLists.GetAliveActorList(); pIter; pIter = pIter->GetNext()) {
             Actor* pActor = pIter->GetItem();
@@ -448,7 +448,7 @@ TESObjectREFR::~TESObjectREFR() {
         pLoadedData->spPhantom = nullptr;
     }
     bool ballow = pSaveLoadGameOLD->m_bAllowChanges;
-    pSaveLoadGameOLD->m_bAllowChanges = 0;
+    pSaveLoadGameOLD->m_bAllowChanges = false;
     if (!GetTemporary()) {
         CleanUpTraps();
         BSDoorHavokController::ReleaseDoor(this);
@@ -460,7 +460,7 @@ TESObjectREFR::~TESObjectREFR() {
             }
             for (BSSimpleList<TESObjectREFR*>* plist = GetEnableStateChildList(); plist && !plist->IsEmpty();
                  plist = GetEnableStateChildList()) {
-                plist->m_item->SetEnableStateParent(0);
+                plist->m_item->SetEnableStateParent(nullptr);
             }
         }
         TESObjectREFR* pdropper = m_Extra.GetItemDropper();
@@ -469,7 +469,7 @@ TESObjectREFR::~TESObjectREFR() {
         }
         for (BSSimpleList<TESObjectREFR*>* pdroplist = m_Extra.GetDroppedItemList(); pdroplist && !pdroplist->IsEmpty();
              pdroplist = pdroplist->m_pkNext) {
-            pdroplist->m_item->m_Extra.SetItemDropper(0);
+            pdroplist->m_item->m_Extra.SetItemDropper(nullptr);
             if (pdroplist->m_item->GetOwner() == this) {
                 pdroplist->m_item->RemoveOwner();
             }
@@ -477,14 +477,14 @@ TESObjectREFR::~TESObjectREFR() {
         if (!pDataHandler->GetClearingData()) {
             TESObjectREFR* pashpile = m_Extra.GetAshPileRef();
             if (pashpile) {
-                pashpile->m_Extra.SetAshPileRef(0);
+                pashpile->m_Extra.SetAshPileRef(nullptr);
             }
             BSSimpleList<REF_REFLECTOR_DATA*>* preflist = m_Extra.GetReflectorRefs();
             while (preflist && preflist->m_item) {
                 REF_REFLECTOR_DATA* pdata = preflist->m_item;
                 preflist = preflist->m_pkNext;
-                pdata->pRef->m_Extra.SetReflectsRef(this, 0);
-                pdata->pRef->m_Extra.SetRefractsRef(this, 0);
+                pdata->pRef->m_Extra.SetReflectsRef(this, false);
+                pdata->pRef->m_Extra.SetRefractsRef(this, false);
             }
             Script::RemoveDelayedScriptActionReference(this);
             TESObjectREFR* pSelf = this;
@@ -495,7 +495,7 @@ TESObjectREFR::~TESObjectREFR() {
                 if (iFormType < ACHR_ID || iFormType > ACRE_ID) {
                     ReferenceProcessLists.ReferDestructorNullOut(this);
                     pPlayer->RemoveAllActionsForObject(this);
-                    ReferenceProcessLists.NullOutTargetRef(this, 1);
+                    ReferenceProcessLists.NullOutTargetRef(this, true);
                     ReferenceProcessLists.NullOutActorInCrimeList(this);
                     ReferenceProcessLists.RemoveReferenceMuzzleFlash(this);
                 }
@@ -524,7 +524,7 @@ TESObjectREFR::~TESObjectREFR() {
     }
     for (BSSimpleList<TESObjectREFR*>* preflist_2 = m_Extra.GetLinkedRefChildren();
          preflist_2 && !preflist_2->IsEmpty(); preflist_2 = preflist_2->m_pkNext) {
-        preflist_2->m_item->SetLinkedRef(0);
+        preflist_2->m_item->SetLinkedRef(nullptr);
     }
     for (pactlist = m_Extra.GetActivateParentList(); pactlist && !pactlist->IsEmpty(); pactlist = pactlist->m_pkNext) {
         pactlist->m_item->pActivateRef->m_Extra.RemoveActivateRefChild(this);
@@ -532,7 +532,7 @@ TESObjectREFR::~TESObjectREFR() {
     for (pactlist = m_Extra.GetActivateRefChildren(); pactlist && !pactlist->IsEmpty(); pactlist = pactlist->m_pkNext) {
         pactlist->m_item->pActivateRef->m_Extra.RemoveActivateParent(this);
     }
-    TESObjectREFR::SetDelete(1);
+    TESObjectREFR::SetDelete(true);
     TESObjectREFR::ClearData();
     if (pParentCell) {
         pParentCell->RemoveReference(this);
@@ -555,7 +555,7 @@ TESObjectREFR::~TESObjectREFR() {
     }
     if (!pDataHandler->GetClearingData()) {
         if (Interface::GetEnemyActor() == this) {
-            Interface::SetEnemyActor(0);
+            Interface::SetEnemyActor(nullptr);
         }
         if (pPlayer) {
             pPlayer->RemoveConflictingObject(this);
@@ -849,7 +849,7 @@ void TESObjectREFR::Save() {
 // persistent reference before a temporary one, land and navmesh after persistent references); otherwise the save cell
 // decides, through its SavesBefore(TESForm*).
 bool TESObjectREFR::SavesBefore(TESForm* apForm) {
-    bool bretval = 0;
+    bool bretval = false;
     uint8_t FormType = apForm->GetFormType();
     if (TESObjectCELL::IsFormTypeCellChild(FormType)) {
         TESChildCell* pcellchild = dynamic_cast<TESChildCell*>(apForm);
@@ -871,7 +871,7 @@ bool TESObjectREFR::SavesBefore(TESForm* apForm) {
                         }
                     }
                     else {
-                        bretval = 0;
+                        bretval = false;
                     }
                     break;
                 }
@@ -896,7 +896,7 @@ bool TESObjectREFR::SavesBefore(TESForm* apForm) {
 }
 
 bool TESObjectREFR::SavesBefore(FORM* apGroupFORM) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apGroupFORM) {
         if (apGroupFORM->form == formEnumString[2].uiFormString) {
             uint32_t iFormID = apGroupFORM->iFormID;
@@ -926,7 +926,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     );
     if (apExtra) {
         BaseExtraList* v5 = &m_Extra;
-        v5->RemoveExtra(apExtra, static_cast<bool>(0));
+        v5->RemoveExtra(apExtra, false);
     }
     BaseExtraList* v6 = &m_Extra;
     BSExtraData* v7 = v6->GetExtraData(55);
@@ -935,7 +935,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     );
     if (v45) {
         BaseExtraList* v8 = &m_Extra;
-        v8->RemoveExtra(v45, static_cast<bool>(0));
+        v8->RemoveExtra(v45, false);
     }
     BaseExtraList* v9 = &m_Extra;
     BSExtraData* v10 = v9->GetExtraData(59);
@@ -944,7 +944,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     );
     if (v40) {
         BaseExtraList* v11 = &m_Extra;
-        v11->RemoveExtra(v40, static_cast<bool>(0));
+        v11->RemoveExtra(v40, false);
     }
     BaseExtraList* v12 = &m_Extra;
     BSExtraData* v13 = v12->GetExtraData(81);
@@ -952,7 +952,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
         static_cast<BSExtraData*>(FNVD_DYNAMIC_CAST_VOID(ExtraLinkedRef)(v13, RTTI_BSExtraData, RTTI_ExtraLinkedRef));
     if (v44) {
         BaseExtraList* v14 = &m_Extra;
-        v14->RemoveExtra(v44, static_cast<bool>(0));
+        v14->RemoveExtra(v44, false);
     }
     BaseExtraList* v15 = &m_Extra;
     BSExtraData* v16 = v15->GetExtraData(81);
@@ -961,7 +961,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     );
     if (v42) {
         BaseExtraList* v17 = &m_Extra;
-        v17->RemoveExtra(v42, static_cast<bool>(0));
+        v17->RemoveExtra(v42, false);
     }
     BaseExtraList* v18 = &m_Extra;
     BSExtraData* v19 = v18->GetExtraData(87);
@@ -969,7 +969,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
         static_cast<BSExtraData*>(FNVD_DYNAMIC_CAST_VOID(ExtraDecalRefs)(v19, RTTI_BSExtraData, RTTI_ExtraDecalRefs));
     if (v46) {
         BaseExtraList* v20 = &m_Extra;
-        v20->RemoveExtra(v46, static_cast<bool>(0));
+        v20->RemoveExtra(v46, false);
     }
     BaseExtraList* v21 = &m_Extra;
     BSExtraData* v22 = v21->GetExtraData(60);
@@ -978,7 +978,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     );
     if (v41) {
         BaseExtraList* v23 = &m_Extra;
-        v23->RemoveExtra(v41, static_cast<bool>(0));
+        v23->RemoveExtra(v41, false);
     }
     BaseExtraList* v24 = &m_Extra;
     BSExtraData* v25 = v24->GetExtraData(99);
@@ -987,11 +987,11 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     );
     if (v43) {
         BaseExtraList* v26 = &m_Extra;
-        v26->RemoveExtra(v43, static_cast<bool>(0));
+        v26->RemoveExtra(v43, false);
     }
     TESObjectCELL* ParentCell = GetParentCell();
-    SetParentCell(0);
-    TESForm* DuplicateForm = TESForm::CreateDuplicateForm(0, apCopyMap);
+    SetParentCell(nullptr);
+    TESForm* DuplicateForm = TESForm::CreateDuplicateForm(false, apCopyMap);
     TESObjectREFR* v47 = dynamic_cast<TESObjectREFR*>(DuplicateForm);
     if (apExtra) {
         BaseExtraList* v28 = &m_Extra;
@@ -1026,14 +1026,14 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
         v35->AddExtra(v43);
     }
     SetParentCell(ParentCell);
-    v47->Set3D(0, 1);
-    v47->SetRefPersists(0);
+    v47->Set3D(nullptr, true);
+    v47->SetRefPersists(false);
     return v47;
 }
 
 void TESObjectREFR::PostDuplicateProcess(NiTPointerMap<TESForm*, TESForm*>* apCopyMap) {
     if (apCopyMap) {
-        TESForm* pcopy = 0;
+        TESForm* pcopy = nullptr;
         if (apCopyMap->GetAt(this, pcopy)) {
             if (pcopy) {
                 TESObjectREFR* pcopyref = dynamic_cast<TESObjectREFR*>(pcopy);
@@ -1042,7 +1042,7 @@ void TESObjectREFR::PostDuplicateProcess(NiTPointerMap<TESForm*, TESForm*>* apCo
                     TESForm* ptemp;
                     TESObjectREFR* pesparent = GetEnableStateParent();
                     if (pesparent) {
-                        ptemp = 0;
+                        ptemp = nullptr;
                         if (apCopyMap->GetAt(pesparent, ptemp)) {
                             if (ptemp) {
                                 TESObjectREFR* pcopyesparent = dynamic_cast<TESObjectREFR*>(ptemp);
@@ -1057,7 +1057,7 @@ void TESObjectREFR::PostDuplicateProcess(NiTPointerMap<TESForm*, TESForm*>* apCo
                     }
                     TESObjectREFR* ptelmark = GetRandomTeleportMarker();
                     if (ptelmark) {
-                        ptemp = 0;
+                        ptemp = nullptr;
                         if (apCopyMap->GetAt(ptelmark, ptemp)) {
                             if (ptemp) {
                                 TESObjectREFR* pcopytelmark = dynamic_cast<TESObjectREFR*>(ptemp);
@@ -1069,7 +1069,7 @@ void TESObjectREFR::PostDuplicateProcess(NiTPointerMap<TESForm*, TESForm*>* apCo
                     }
                     TESObjectREFR* plinkedref = GetLinkedRef();
                     if (plinkedref) {
-                        ptemp = 0;
+                        ptemp = nullptr;
                         if (apCopyMap->GetAt(plinkedref, ptemp)) {
                             if (ptemp) {
                                 TESObjectREFR* pcopylinkedref = dynamic_cast<TESObjectREFR*>(ptemp);
@@ -1083,7 +1083,7 @@ void TESObjectREFR::PostDuplicateProcess(NiTPointerMap<TESForm*, TESForm*>* apCo
                     for (i = 0; i < 2; ++i) {
                         TESObjectREFR* proomref = (&m_Extra)->GetPortalLinkedRoomRef(i);
                         if (proomref) {
-                            ptemp = 0;
+                            ptemp = nullptr;
                             if (apCopyMap->GetAt(proomref, ptemp) && ptemp) {
                                 TESObjectREFR* pcopyroomref = dynamic_cast<TESObjectREFR*>(ptemp);
                                 if (pcopyroomref) {
@@ -1098,7 +1098,7 @@ void TESObjectREFR::PostDuplicateProcess(NiTPointerMap<TESForm*, TESForm*>* apCo
                     for (i = 0; i < 4; ++i) {
                         TESObjectREFR* pplaneref = (&m_Extra)->GetLinkedPlaneRef(i);
                         if (pplaneref) {
-                            ptemp = 0;
+                            ptemp = nullptr;
                             if (apCopyMap->GetAt(pplaneref, ptemp)) {
                                 if (ptemp) {
                                     TESObjectREFR* pcopyPlaneref = dynamic_cast<TESObjectREFR*>(ptemp);
@@ -1110,18 +1110,18 @@ void TESObjectREFR::PostDuplicateProcess(NiTPointerMap<TESForm*, TESForm*>* apCo
                         }
                     }
                     BSSimpleList<REF_ACTIVATE_DATA*>* pactlist = (&m_Extra)->GetActivateParentList();
-                    bool baddedact = 0;
+                    bool baddedact = false;
                     while (pactlist && !pactlist->IsEmpty()) {
                         REF_ACTIVATE_DATA* pdata = pactlist->m_item;
                         pactlist = pactlist->m_pkNext;
-                        ptemp = 0;
+                        ptemp = nullptr;
                         if (apCopyMap->GetAt(pdata->pActivateRef, ptemp)) {
                             if (ptemp) {
                                 TESObjectREFR* pcopyactivateref = dynamic_cast<TESObjectREFR*>(ptemp);
                                 if (pcopyactivateref) {
                                     (&pcopyref->m_Extra)->AddActivateParent(pcopyactivateref);
                                     (&pcopyref->m_Extra)->SetActivateDelay(pcopyactivateref, pdata->fActivateDelay);
-                                    baddedact = 1;
+                                    baddedact = true;
                                     (&pcopyactivateref->m_Extra)->AddActivateRefChild(pcopyref);
                                 }
                             }
@@ -1134,7 +1134,7 @@ void TESObjectREFR::PostDuplicateProcess(NiTPointerMap<TESForm*, TESForm*>* apCo
                     for (BSSimpleList<REF_DECAL_DATA*>* pdecallist = (&m_Extra)->GetDecalRefs();
                          pdecallist && !pdecallist->IsEmpty(); pdecallist = pdecallist->m_pkNext) {
                         REF_DECAL_DATA* pdata_2 = pdecallist->m_item;
-                        ptemp = 0;
+                        ptemp = nullptr;
                         if (apCopyMap->GetAt(pdata_2->pDecalRef, ptemp)) {
                             if (ptemp) {
                                 TESObjectREFR* pcopydecal = dynamic_cast<TESObjectREFR*>(ptemp);
@@ -1146,7 +1146,7 @@ void TESObjectREFR::PostDuplicateProcess(NiTPointerMap<TESForm*, TESForm*>* apCo
                     }
                     TESObjectREFR* pmerchcont = GetMerchantContainer();
                     if (pmerchcont) {
-                        ptemp = 0;
+                        ptemp = nullptr;
                         if (apCopyMap->GetAt(pmerchcont, ptemp)) {
                             if (ptemp) {
                                 TESObjectREFR* pcopymerchcont = dynamic_cast<TESObjectREFR*>(ptemp);
@@ -1159,7 +1159,7 @@ void TESObjectREFR::PostDuplicateProcess(NiTPointerMap<TESForm*, TESForm*>* apCo
                     DoorTeleportData* ptel = GetTeleport();
                     if (ptel) {
                         if (ptel->pLinkedDoor) {
-                            ptemp = 0;
+                            ptemp = nullptr;
                             if (apCopyMap->GetAt(ptel->pLinkedDoor, ptemp)) {
                                 if (ptemp) {
                                     TESObjectREFR* pcopylinkeddoor = dynamic_cast<TESObjectREFR*>(ptemp);
@@ -1260,7 +1260,7 @@ void TESObjectREFR::SaveGame(uint32_t aiFlags) {
         TESObjectREFR::GetExtra()->SaveGame(aiFlags, this);
     }
     if (((aiFlags & 0x10000000) != 0) && !IsActor()) {
-        uint16_t usAnimationSize = static_cast<uint16_t>(GetAttachedAnimationSaveSize());
+        uint16_t usAnimationSize = GetAttachedAnimationSaveSize();
         TESForm::SaveGameDataOLD(&usAnimationSize, 2);
         if (usAnimationSize) {
             SaveAttachedAnimation();
@@ -1270,7 +1270,7 @@ void TESObjectREFR::SaveGame(uint32_t aiFlags) {
         HavokSaveData kHavokSaveData;
         kHavokSaveData.~HavokSaveData();
         ::new (&kHavokSaveData) HavokSaveData;
-        uint16_t usHavokSize = static_cast<uint16_t>(GetHavokDataSaveSize(&kHavokSaveData));
+        uint16_t usHavokSize = GetHavokDataSaveSize(&kHavokSaveData);
         TESForm::SaveGameDataOLD(&usHavokSize, 2);
         if (usHavokSize) {
             SaveHavokData(&kHavokSaveData);
@@ -1534,7 +1534,7 @@ void TESObjectREFR::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (!v26) {
         v2 = &(result = apLoadGameBuffer->GetChangeFlags());
         if (v2->CheckFlags(0x200000u)) {
-            TESForm::SetEmpty(1);
+            TESForm::SetEmpty(true);
         }
     }
     BGSChangeFlags* v3 = &(v23 = apLoadGameBuffer->GetChangeFlags());
@@ -1542,7 +1542,7 @@ void TESObjectREFR::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         apLoadGameBuffer->LoadData(static_cast<char*>(static_cast<void*>(&fRefScale)), 4u);
         SetScale(fRefScale);
     }
-    uint32_t aiFlags = (uint32_t)(v26 ? ((-1543104448)) : ((-1543365568)));
+    uint32_t aiFlags = (uint32_t)(v26 ? (-1543104448) : (-1543365568));
     BGSChangeFlags* v4 = &(v22 = apLoadGameBuffer->GetChangeFlags());
     if (v4->CheckFlags(aiFlags)) {
         extra = TESObjectREFR::GetExtra();
@@ -1581,8 +1581,8 @@ void TESObjectREFR::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                     if (TESObjectREFR::GetObjectReference()) {
                         objectReference = TESObjectREFR::GetObjectReference();
                         destructionForm = BGSDestructibleObjectForm::GetDestructionForm(objectReference);
-                        if (destructionForm->UpdateCurrentDamageStage(this, 0)) {
-                            UpdateAddonNodeSounds(0);
+                        if (destructionForm->UpdateCurrentDamageStage(this, false)) {
+                            UpdateAddonNodeSounds(false);
                         }
                     }
                 }
@@ -1751,7 +1751,7 @@ void TESObjectREFR::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     bool bactor = IsActor();
     if (!bactor) {
         if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_OBJECT_EMPTY)) {
-            SetEmpty(0);
+            SetEmpty(false);
         }
     }
     bool v23 = (&m_Extra)->GetObjectHealth() != -1.0;
@@ -1768,8 +1768,8 @@ void TESObjectREFR::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
             if (pLoadedData->m_spData3D.m_pObject) {
                 BGSDestructibleObjectForm* DestructionForm =
                     BGSDestructibleObjectForm::GetDestructionForm(GetObjectReference());
-                if (DestructionForm->UpdateCurrentDamageStage(this, 1)) {
-                    UpdateAddonNodeSounds(0);
+                if (DestructionForm->UpdateCurrentDamageStage(this, true)) {
+                    UpdateAddonNodeSounds(false);
                 }
             }
         }
@@ -1781,14 +1781,14 @@ void TESObjectREFR::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     (&m_Extra)->RevertUnsavedExtra(apLoadGameBuffer);
     if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_REFR_INVENTORY | CHANGE_REFR_LEVELED_INVENTORY)) {
         if (apLoadGameBuffer->GetRevertOnly()) {
-            ResetInventory(0);
+            ResetInventory(false);
         }
         else {
             if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(32)) {
-                TESObjectREFR::ResetInventory(0);
+                TESObjectREFR::ResetInventory(false);
             }
             else {
-                TESObjectREFR::ResetInventory(1);
+                TESObjectREFR::ResetInventory(true);
             }
         }
     }
@@ -1802,12 +1802,12 @@ void TESObjectREFR::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
             }
         }
         bool Action = GetAction(OBJECT_ACTION_OPEN_BY_DEFAULT);
-        BGSOpenCloseForm::SetOpenState(this, Action, 1);
+        BGSOpenCloseForm::SetOpenState(this, Action, true);
     }
     if (Get3D()) {
         NiNode* v10 = Get3D();
         if (TESHavokUtilities::Should3DRagDoll(this, v10) && !IsActor()) {
-            RestoreRagDollData(0);
+            RestoreRagDollData(nullptr);
         }
     }
     if (pParentCell) {
@@ -2187,7 +2187,7 @@ void TESObjectREFR::SetAltered(bool altered) {
     if (!GetTemporary() && altered) {
         TESObjectCELL* pCell = GetSaveParentCell();
         if (pCell) {
-            pCell->SetAltered(1);
+            pCell->SetAltered(true);
         }
     }
     TESForm::SetAltered(altered);
@@ -2448,35 +2448,35 @@ void TESObjectREFR::Copy(TESForm* apCopy) {
 bool TESObjectREFR::Compare(TESForm* apCompare) {
     TESObjectREFR* v8 = dynamic_cast<TESObjectREFR*>(apCompare);
     if (!v8) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v8)) {
-        return (bool)1;
+        return true;
     }
     ReferenceData* name = v8->GetData();
     if (std::memcmp(&data, name, sizeof(data))) {
-        return (bool)1;
+        return true;
     }
     TESObjectCELL* parentCell = TESObjectREFR::GetParentCell();
     if (parentCell != v8->TESObjectREFR::GetParentCell()) {
-        return (bool)1;
+        return true;
     }
     ExtraDataList* extra = v8->TESObjectREFR::GetExtra();
     if ((&m_Extra)->CompareList(extra)) {
-        return (bool)1;
+        return true;
     }
     double scale = (double)fRefScale;
     return (bool)((uint8_t)(scale != v8->fRefScale));
 }
 
 bool TESObjectREFR::BelongsInGroup(FORM* apGroupFORM, bool abAllowParentGroups, bool abCurrentOnly) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apGroupFORM && apGroupFORM->form == formEnumString[2].uiFormString) {
         TESObjectCELL* pparentcell = GetSaveParentCell();
         uint32_t iFormID = apGroupFORM->iFormID;
         if (iFormID == 6) {
             if (!abAllowParentGroups) {
-                return 0;
+                return false;
             }
         }
         else {
@@ -2491,17 +2491,17 @@ bool TESObjectREFR::BelongsInGroup(FORM* apGroupFORM, bool abAllowParentGroups, 
             if (abCurrentOnly && apGroupFORM->iFormID != 6) {
                 if (GetRefPersists()) {
                     if (apGroupFORM->iFormID == 8) {
-                        return 1;
+                        return true;
                     }
                 }
                 else {
                     if (apGroupFORM->iFormID == 9) {
-                        return 1;
+                        return true;
                     }
                 }
             }
             else {
-                return 1;
+                return true;
             }
         }
     }
@@ -2593,7 +2593,7 @@ bool TESObjectREFR::GetEditorLocation(
 ) {
     ExtraStartingPosition* pstartingPosition = static_cast<ExtraStartingPosition*>((&m_Extra)->GetExtraData(15));
     if (!pstartingPosition) {
-        return 0;
+        return false;
     }
     arpLocationForm = (&m_Extra)->GetStartingWorldOrCell();
     if (!arpLocationForm) {
@@ -2604,7 +2604,7 @@ bool TESObjectREFR::GetEditorLocation(
             }
             else {
                 if (!apLocationForm) {
-                    return 0;
+                    return false;
                 }
                 if (apLocationForm->GetFormType() == CELL_ID) {
                     if (static_cast<TESObjectCELL*>(apLocationForm)->TESObjectCELL::GetInterior()) {
@@ -2622,7 +2622,7 @@ bool TESObjectREFR::GetEditorLocation(
     }
     arOriginalLocation = pstartingPosition->startPosition;
     arOriginalAngle = pstartingPosition->startRotation;
-    return 1;
+    return true;
 }
 
 // abSayTo is never read.
@@ -2637,7 +2637,7 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
 ) {
     BSSoundHandle aSoundHand;
     [[maybe_unused]] float ftime = 0.0f;
-    DialogueItem* pVoice = apTopic->CreateDialogueItem(this, apTarget, 0, 0, 0);
+    DialogueItem* pVoice = apTopic->CreateDialogueItem(this, apTarget, nullptr, nullptr, false);
     // Stores the voice file's duration and never passes it on.
     float fSoundDuration = 0.0f;
     SetSayToTopic(apTopic);
@@ -2661,7 +2661,7 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                 char Dst[512];
                 BSstrcpy(Dst, 512, pResponse->cVoice.pString);
                 if (abForceCorrectDuration) {
-                    LipSynchAnim* panim = 0;
+                    LipSynchAnim* panim = nullptr;
                     BSStringT<char> filename;
                     filename.Set(Dst, 512u);
                     if (LipSynchAnim::ChangeFilenameToLipSynch(filename)) {
@@ -2680,7 +2680,8 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                         FNVD_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
                         aSoundHand.operator=(*BSAudio::QInstance().GetSoundHandleByFilename(
                             &kFileHandle, Dst,
-                            ivoiceEffectFlag | (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT), 0
+                            ivoiceEffectFlag | (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT),
+                            nullptr
                         ));
                     }
                     else {
@@ -2690,7 +2691,7 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                             ivoiceEffectFlag |
                                 (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_VOICE |
                                  BSGameSound::SOUND_FLAG_ONE_SHOT),
-                            0
+                            nullptr
                         ));
                     }
                 }
@@ -2699,7 +2700,8 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                         FNVD_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
                         aSoundHand.operator=(*BSAudio::QInstance().GetSoundHandleByFilename(
                             &kFileHandle, Dst,
-                            ivoiceEffectFlag | (BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT), 0
+                            ivoiceEffectFlag | (BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT),
+                            nullptr
                         ));
                     }
                     else {
@@ -2709,7 +2711,7 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                             ivoiceEffectFlag |
                                 (BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_VOICE |
                                  BSGameSound::SOUND_FLAG_ONE_SHOT),
-                            0
+                            nullptr
                         ));
                     }
                 }
@@ -2724,7 +2726,7 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                     aSoundHand.SetMinMax(fMin, fMax);
                     aSoundHand.SetObjectToFollow(Get3D());
                 }
-                aSoundHand.Play(0);
+                aSoundHand.Play(false);
                 // The callback's context is the reference's form ID.
                 aSoundHand.SetCompletionCallback(
                     &TESObjectREFR::SayToCallBack, reinterpret_cast<void*>(static_cast<uintptr_t>(iFormID))
@@ -2732,7 +2734,7 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
             }
             else {
                 if (ptopicinfo) {
-                    TESObjectREFR::SayToCallBack(reinterpret_cast<void*>(static_cast<uintptr_t>(iFormID)), 0);
+                    TESObjectREFR::SayToCallBack(reinterpret_cast<void*>(static_cast<uintptr_t>(iFormID)), false);
                 }
             }
             if (gs_bGeneralSubtitles_Gameplay.Bool() ||
@@ -2882,7 +2884,7 @@ ActorCause* TESObjectREFR::GetActorCause() {
         return pextra->GetActorCause();
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -2947,12 +2949,12 @@ TESObjectREFR* TESObjectREFR::RemoveItem(
     bool abDelete,
     bool abPreferStolen
 ) {
-    TESObjectREFR* pdroppedref = 0;
+    TESObjectREFR* pdroppedref = nullptr;
     if (!apObject) {
-        return 0;
+        return nullptr;
     }
     if (HasContainer()) {
-        bool bcheck = 0;
+        bool bcheck = false;
         if (!IsActor()) {
             if (GetParentCell()) {
                 bcheck = HasScript();
@@ -2962,7 +2964,7 @@ TESObjectREFR* TESObjectREFR::RemoveItem(
         InventoryChanges* pinventory = InventoryChanges::GetInventoryChanges(this);
         pdroppedref = pinventory->RemoveItem(
             this, apObject, abStealing, aiNumber, apExtra, abDropWorld, apContainerObj, apPoint, apRotate, abDelete,
-            abPreferStolen, 0
+            abPreferStolen, nullptr
         );
         if (IsActor()) {
             Actor* pActor = static_cast<Actor*>(this);
@@ -2971,17 +2973,17 @@ TESObjectREFR* TESObjectREFR::RemoveItem(
                 static_cast<TESObjectWEAP*>(apObject)->IsRockItLauncher() && !GetInventoryObjectCount(apObject)) {
                 pPlayer->ReturnRockItAmmo();
             }
-            if (pActor && pActor->GetCurrentAIProcess() && !pActor->IsDead(0) && this != pPlayer &&
+            if (pActor && pActor->GetCurrentAIProcess() && !pActor->IsDead(false) && this != pPlayer &&
                 !Interface::ContainerIsBarter() && !Interface::ContainerIsRecipe()) {
                 pActor->GetCurrentAIProcess()->RemoveQueuedItem(apObject, apExtra);
                 if (apObject->GetFormType() == WEAP_ID && !pActor->IsInCombat()) {
                     ItemChange* pitem = pActor->GetBestWeapon(COMBAT_WEAPON_TYPE_NONE);
                     if (pitem) {
                         if (Interface::IsInMenuMode() && pActor->IsPlayerTeammate()) {
-                            pActor->Actor::EquipObject(pitem->pContainerObj, 1, 0, 1, 0, 1);
+                            pActor->Actor::EquipObject(pitem->pContainerObj, 1, nullptr, true, false, true);
                         }
                         else {
-                            pActor->Actor::QueueEquipObject(pitem->pContainerObj, 1, 0, 1, 0, 1);
+                            pActor->Actor::QueueEquipObject(pitem->pContainerObj, 1, nullptr, true, false, true);
                         }
                     }
                 }
@@ -3012,8 +3014,8 @@ bool TESObjectREFR::AddWornItem(TESBoundObject* apObject, int32_t aiNumber, Extr
             TESChallengeManager::UpdateChallenge(CHALLENGE_TYPE_AQUIRE, aiNumber, apObject, nullptr, 0, 0, 0);
         }
         Script::SetActionFlag(this, apExtra, SCRIPT_ACTION_ONADD);
-        inventoryChanges->AddWorn(apObject, aiNumber, static_cast<Actor*>(this), apExtra, 0, 0);
-        return (bool)1;
+        inventoryChanges->AddWorn(apObject, aiNumber, static_cast<Actor*>(this), apExtra, false, false);
+        return true;
     }
     return (bool)v8;
 }
@@ -3026,7 +3028,7 @@ bool TESObjectREFR::RemoveWornItem(TESBoundObject* apObject, int32_t aiNumber, E
         inventoryChanges = InventoryChanges::GetInventoryChanges(this);
         Script::SetActionFlag(this, apExtra, SCRIPT_ACTION_ONUNEQUIP);
         inventoryChanges->RemoveWorn(
-            (bool*)(&a2), apObject, aiNumber, static_cast<Actor*>(this), apExtra, 0, 0, nullptr, nullptr
+            (bool*)(&a2), apObject, aiNumber, static_cast<Actor*>(this), apExtra, false, false, nullptr, nullptr
         );
     }
     return (bool)a2;
@@ -3052,7 +3054,7 @@ void TESObjectREFR::AddObjecttoContainer(TESBoundObject* apObj, ExtraDataList* a
                     apactor->SetCurrentTarget(this);
                 }
                 else {
-                    apactor->SetCurrentTarget(0);
+                    apactor->SetCurrentTarget(nullptr);
                 }
                 apactorlist = apactorlist->m_pkNext;
             }
@@ -3104,7 +3106,7 @@ MagicCaster* TESObjectREFR::GetMagicCaster() {
 }
 
 MagicTarget* TESObjectREFR::GetMagicTarget() {
-    NonActorMagicTarget* ptarget = 0;
+    NonActorMagicTarget* ptarget = nullptr;
     if (TESMagicTargetForm::CanBeMagicTarget(GetObjectReference())) {
         BSExtraData* ExtraData = (&m_Extra)->GetExtraData(51);
         ptarget = dynamic_cast<NonActorMagicTarget*>(ExtraData);
@@ -3115,7 +3117,7 @@ MagicTarget* TESObjectREFR::GetMagicTarget() {
                 ptarget_2 = ::new (apMemory) NonActorMagicTarget(this);
             }
             else {
-                ptarget_2 = 0;
+                ptarget_2 = nullptr;
             }
             ptarget = ptarget_2;
             (&m_Extra)->AddExtra(ptarget_2);
@@ -3126,16 +3128,16 @@ MagicTarget* TESObjectREFR::GetMagicTarget() {
         return static_cast<MagicTarget*>(ptarget);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
 BSFaceGenNiNode* TESObjectREFR::GetFaceNodeBiped(NiNode* apHeadNode) {
     if (!IsActor()) {
-        return 0;
+        return nullptr;
     }
     if (!static_cast<Actor*>(this)->GetActorType()) {
-        return 0;
+        return nullptr;
     }
     NiNode* v3 = TESObjectREFR::Get3D();
     return static_cast<BSFaceGenNiNode*>(BSUtilities::GetObjectByName(v3, "BSFaceGenNiNodeBiped"));
@@ -3179,7 +3181,7 @@ bool TESObjectREFR::ClampToGround() {
     }
     a2.z = v4;
     SetLocationOnReference(a2);
-    return (bool)1;
+    return true;
 }
 
 // Removes the 3D's Havok bodies and the phantom with the Havok update locked; an acoustic space also drops its queued
@@ -3958,13 +3960,13 @@ void TESObjectREFR::UpdateAnimation() {
     bool bactor;
     int32_t eTypeID = data.pObjectReference->GetFormType();
     if (eTypeID != 30 && eTypeID > 41 && eTypeID <= 43) {
-        bactor = 1;
+        bactor = true;
     }
     else {
         if (eTypeID == 30) {
             UpdateRefLight();
         }
-        bactor = 0;
+        bactor = false;
         NiNode* p3d = TESObjectREFR::Get3D();
         if (p3d) {
             NiTimeController* pc = p3d->GetControllers();
@@ -3991,7 +3993,7 @@ void TESObjectREFR::UpdateAnimation() {
                             }
                         }
                         if (!iactive) {
-                            pmanager->SetActive(0);
+                            pmanager->SetActive(false);
                         }
                     }
                 }
@@ -4161,7 +4163,7 @@ bool TESObjectREFR::CanUseIdle(TESIdleForm* apIdle) {
     TESIdleForm* pidle;
     char Dst[264];
     if (!apIdle) {
-        return 0;
+        return false;
     }
     for (pidle = apIdle; pidle->GetParentIdle(); pidle = pidle->GetParentIdle()) {
         ;
@@ -4172,7 +4174,7 @@ bool TESObjectREFR::CanUseIdle(TESIdleForm* apIdle) {
     if (parray) {
         for (int32_t n = 0; n < parray->m_uiSize; ++n) {
             if (parray->GetFormAt(n) == pidle) {
-                return 1;
+                return true;
             }
         }
     }
@@ -4180,11 +4182,11 @@ bool TESObjectREFR::CanUseIdle(TESIdleForm* apIdle) {
     if (parray) {
         for (int32_t n_2 = 0; n_2 < parray->m_uiSize; ++n_2) {
             if (parray->GetFormAt(n_2) == pidle) {
-                return 1;
+                return true;
             }
         }
     }
-    return 0;
+    return false;
 }
 
 void TESObjectREFR::GatherHavokSaveData(BGSHavokSaveData* apHavokSaveData) {
@@ -4195,7 +4197,7 @@ void TESObjectREFR::GatherHavokSaveData(BGSHavokSaveData* apHavokSaveData) {
         apHavokSaveData->pObj3D = pobj3D;
         apHavokSaveData->pCollisionRoot = bhkNiCollisionObject::GetbhkNiCollisionObject(pobj3D);
         recData.eAction = bhkWorldNS::OA_TOTAL;
-        recData.bRecurse = 1;
+        recData.bRecurse = true;
         recData.uDataA[0].p = apHavokSaveData;
         bhkWorld::DoObjectRec(pobj3D, recData, &TESObjectREFR::GatherHavokSaveDataForCollisionObject);
         if (apHavokSaveData->iActiveBoneCount && apHavokSaveData->iInactiveBoneCount) {
@@ -4230,7 +4232,7 @@ int32_t TESObjectREFR::GetInventoryCount(bool abBarter, bool abPlayableCount) {
 
 void TESObjectREFR::LoadAnimation(BGSLoadGameBuffer* apLoadGameBuffer) {
     char Dst[268];
-    NiControllerManager* apManager = 0;
+    NiControllerManager* apManager = nullptr;
     NiObjectNET* v7 = TESObjectREFR::Get3D();
     if (v7) {
         if (v7->GetControllers()) {
@@ -4365,7 +4367,7 @@ void TESObjectREFR::SaveHavokData(HavokSaveData* apHavokSaveData) {
         );
         SaveGameDataOLD(&sboneCount, 2);
         recData.eAction = bhkWorldNS::OA_TOTAL;
-        recData.bRecurse = 1;
+        recData.bRecurse = true;
         recData.uDataA[0].p = apHavokSaveData;
         bhkWorld::DoObjectRec(pobj3D, recData, &TESObjectREFR::SaveHavokDataForCollisionObjectOld);
     }
@@ -4413,16 +4415,16 @@ void TESObjectREFR::LoadHavokData(uint16_t aiSaveSize) {
             ::new (&havokSaveData) HavokSaveData;
             LoadGameDataOLD(&havokSaveData, 1);
             LoadGameDataOLD(&ssavedBoneCount, 2);
-            Actor* pactor = 0;
+            Actor* pactor = nullptr;
             if (IsActor()) {
                 pactor = static_cast<Actor*>(this);
             }
             if (pactor) {
                 if ((havokSaveData.cFlags & 8) != 0) {
-                    pactor->SetHavokWeapon(1);
+                    pactor->SetHavokWeapon(true);
                 }
                 else {
-                    pactor->SetHavokWeapon(0);
+                    pactor->SetHavokWeapon(false);
                 }
             }
             currentHavokSaveData.~HavokSaveData();
@@ -4435,18 +4437,18 @@ void TESObjectREFR::LoadHavokData(uint16_t aiSaveSize) {
                 havokSaveData.pObj3D = pobj3D;
                 havokSaveData.pCollisionRoot = bhkNiCollisionObject::GetbhkNiCollisionObject(pobj3D);
                 recData.eAction = bhkWorldNS::OA_TOTAL;
-                recData.bRecurse = 1;
+                recData.bRecurse = true;
                 recData.uDataA[0].p = &havokSaveData;
                 if (IsActor()) {
-                    bhkWorld::SetMotion(pobj3D, hkpMotion::MOTION_DYNAMIC, 1, 0, 1);
-                    NiUpdateData UpdateData(0.0f, 0, 0);
+                    bhkWorld::SetMotion(pobj3D, hkpMotion::MOTION_DYNAMIC, true, false, true);
+                    NiUpdateData UpdateData(0.0f, false, false);
                     pobj3D->Update(UpdateData);
                 }
                 bhkWorld::DoObjectRec(pobj3D, recData, &TESObjectREFR::LoadHavokDataForCollisionObject);
                 if (pactor) {
                     if (pactor->IsParalyzed()) {
                         bhkRigidBody::SetFixed(pobj3D, 1, 1);
-                        bhkWorld::SetMotion(pobj3D, hkpMotion::MOTION_DYNAMIC, 1, 0, 1);
+                        bhkWorld::SetMotion(pobj3D, hkpMotion::MOTION_DYNAMIC, true, false, true);
                         Animation* panim = pactor->GetAnimation();
                         if (panim) {
                             panim->ClearGroup(AGS_WHOLE_BODY, 0.0f);
@@ -4455,7 +4457,7 @@ void TESObjectREFR::LoadHavokData(uint16_t aiSaveSize) {
                     }
                 }
                 if (!IsActor()) {
-                    NiUpdateData UpdateData_2(0.0f, 0, 0);
+                    NiUpdateData UpdateData_2(0.0f, false, false);
                     pobj3D->Update(UpdateData_2);
                 }
             }
@@ -4491,7 +4493,7 @@ void TESObjectREFR::LoadHavokData(uint16_t aiSaveSize) {
                 pSaveLoadGameOLD->AdvanceBuffer(aiSaveSize - 3);
                 if (pactor) {
                     if (pactor->pRagdollController) {
-                        pactor->pRagdollController->DisableRagdollAnim(1);
+                        pactor->pRagdollController->DisableRagdollAnim(true);
                     }
                     bhkBlendController::DoKnockDown(pobj3D, NiPoint3_ZERO, 1, 0.0f, 0);
                 }
@@ -4547,7 +4549,7 @@ void TESObjectREFR::EndSequence(NiControllerSequence* apSequence) {
 }
 
 bool TESObjectREFR::GetMarkerUsed(uint32_t aiMarkerIndex, bool abIgnoreReservations) {
-    bool MarkerUsed = 0;
+    bool MarkerUsed = false;
     BaseExtraList* Extra = GetExtra();
     ExtraUsedMarkers* ExtraData = static_cast<ExtraUsedMarkers*>(Extra->GetExtraData(18u));
     BaseExtraList* v4 = GetExtra();
@@ -4579,7 +4581,7 @@ bool TESObjectREFR::Activate(
     TESObjectACTI* v6;
     bool result;
     int32_t v10;
-    bool v22 = 0;
+    bool v22 = false;
     TESObjectACTI* ObjectReference = static_cast<TESObjectACTI*>(GetObjectReference());
     if (ObjectReference == pAshPile1 || (v6 = static_cast<TESObjectACTI*>(GetObjectReference()), v6 == pAshPile2)) {
         TESObjectREFR* pashpileref = (&m_Extra)->GetAshPileRef();
@@ -4587,7 +4589,7 @@ bool TESObjectREFR::Activate(
             return pashpileref->Activate(apActionRef, abIdFlag, apObjecttoGet, aiCount);
         }
     }
-    bScriptActivate = 0;
+    bScriptActivate = false;
     if (apActionRef) {
         if (apActionRef->IsActor()) {
             Actor* pActionActor = static_cast<Actor*>(apActionRef);
@@ -4596,7 +4598,7 @@ bool TESObjectREFR::Activate(
                 if (CurrentAIProcess->GetProcessLevel() == PROCESS_TYPE_HIGH) {
                     BaseProcess* v9 = pActionActor->GetCurrentAIProcess();
                     if (v9->GetFadeState() == BaseProcess::FADE_TELEPORT_OUT) {
-                        v22 = 1;
+                        v22 = true;
                     }
                 }
             }
@@ -4606,16 +4608,16 @@ bool TESObjectREFR::Activate(
         goto LABEL_71;
     }
     if (Interface::IsPipBoyOpening()) {
-        return 1;
+        return true;
     }
     v10 = pPlayer->Is3rdPerson();
     if (v10 != pPlayer->GetWant3rdPerson()) {
-        return 0;
+        return false;
     }
-    if (pPlayer->IsChild(0) && !pPlayer->CanChildUseObject(this)) {
+    if (pPlayer->IsChild(false) && !pPlayer->CanChildUseObject(this)) {
         const char* v11 = sNoChildUse.String();
-        Interface::ShowMessage(v11, 0, 0, 0, 2.0f, 0);
-        return 1;
+        Interface::ShowMessage(v11, 0, nullptr, nullptr, 2.0f, false);
+        return true;
     }
     else {
     LABEL_71:;
@@ -4623,7 +4625,7 @@ bool TESObjectREFR::Activate(
             if (GetObjectReference() &&
                 (GetObjectReference()->GetFormType() == DOOR_ID &&
                  (apActionRef && (apActionRef->IsActor() && !*GetFullName())))) {
-                return 0;
+                return false;
             }
             else {
                 if (apActionRef != pPlayer ||
@@ -4631,7 +4633,7 @@ bool TESObjectREFR::Activate(
                      (GetObjectReference()->GetFormType() == PWAT_ID ||
                       GetObjectReference()->GetFormType() == TACT_ID))) {
                     if (GetInaccessible()) {
-                        return 0;
+                        return false;
                     }
                     else {
                         if (!(&m_Extra)->IsActivateParentOnly() || (&m_Extra)->GetActivateData(apActionRef)) {
@@ -4682,7 +4684,7 @@ bool TESObjectREFR::Activate(
                                             goto LABEL_68;
                                         }
                                         case IDLM_ID: {
-                                            return 1;
+                                            return true;
                                         }
                                         default: {
                                         LABEL_62:;
@@ -4694,26 +4696,26 @@ bool TESObjectREFR::Activate(
                                                     if (apActionRef->IsActor()) {
                                                         static_cast<Actor*>(apActionRef)
                                                             ->Actor::ActivatedReference(
-                                                                this, apObjecttoGet, aiCount, 0
+                                                                this, apObjecttoGet, aiCount, false
                                                             );
                                                         if (apActionRef != pPlayer) {
                                                             pPlayer->CheckForQuestTargetUpdate(apActionRef);
                                                         }
                                                     }
                                                 }
-                                                bScriptActivate = 1;
-                                                result = 1;
+                                                bScriptActivate = true;
+                                                result = true;
                                             }
                                             else {
                                             LABEL_68:;
-                                                result = 0;
+                                                result = false;
                                             }
                                             break;
                                         }
                                     }
                                 }
                                 else {
-                                    return 0;
+                                    return false;
                                 }
                             }
                             else {
@@ -4726,7 +4728,7 @@ bool TESObjectREFR::Activate(
                                 }
                                 if (!bScriptActivate && apActionRef->IsActor()) {
                                     static_cast<Actor*>(apActionRef)
-                                        ->Actor::ActivatedReference(this, apObjecttoGet, aiCount, 1);
+                                        ->Actor::ActivatedReference(this, apObjecttoGet, aiCount, true);
                                 }
                                 return bScriptActivate;
                             }
@@ -4735,21 +4737,21 @@ bool TESObjectREFR::Activate(
                             if (apActionRef == pPlayer) {
                                 const char* v12 = sRemoteActivation.String();
                                 Interface::ShowMessage(
-                                    v12, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_thinking.dds", 0,
-                                    2.0f, 0
+                                    v12, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_thinking.dds",
+                                    nullptr, 2.0f, false
                                 );
                             }
-                            return 0;
+                            return false;
                         }
                     }
                 }
                 else {
-                    return 0;
+                    return false;
                 }
             }
         }
         else {
-            return 1;
+            return true;
         }
     }
     return result;
@@ -4777,7 +4779,7 @@ void TESObjectREFR::SaveAttachedAnimation() {
 }
 
 uint16_t TESObjectREFR::GetAttachedAnimationSaveSize() {
-    NiControllerManager* pControllerManager = 0;
+    NiControllerManager* pControllerManager = nullptr;
     NiNode* v4 = TESObjectREFR::Get3D();
     if (v4) {
         if (v4->GetControllers()) {
@@ -4902,7 +4904,7 @@ void TESObjectREFR::GetMapNameForLocation(BSStringT<char>& aOutMapName) {
     TESObjectCELL* pint = GetParentCell();
     if (pint) {
         if (!pint->GetInterior()) {
-            pint = 0;
+            pint = nullptr;
         }
     }
     if (pint) {
@@ -5195,14 +5197,14 @@ void TESObjectREFR::SetActivateLine(bool abShow) {
                 v7 = v28->IsNode();
             }
             else {
-                v7 = 0;
+                v7 = nullptr;
             }
             NiNode* v29 = v7;
             if (v7) {
                 v29->RemoveAllChildren();
                 if (!abShow) {
                     v30->DetachChild(v29);
-                    v29 = 0;
+                    v29 = nullptr;
                 }
             }
             if (abShow) {
@@ -5223,7 +5225,7 @@ void TESObjectREFR::SetActivateLine(bool abShow) {
                     result = result * v6;
                     NiLines* Line = MakeLine(
                         aStart, *::new (&v13) NiColorA(1.0f, 1.0f, 1.0f, 1.0f), result,
-                        *::new (&v14) NiColorA(0.0f, 0.0f, 0.0f, 1.0f), 1
+                        *::new (&v14) NiColorA(0.0f, 0.0f, 0.0f, 1.0f), true
                     );
                     if (!v29) {
                         NiNode* v5;
@@ -5232,7 +5234,7 @@ void TESObjectREFR::SetActivateLine(bool abShow) {
                             v5 = ::new (apMemory) NiNode(0);
                         }
                         else {
-                            v5 = 0;
+                            v5 = nullptr;
                         }
                         NiNode* v12 = v5;
                         v29 = v5;
@@ -5247,7 +5249,7 @@ void TESObjectREFR::SetActivateLine(bool abShow) {
             }
             if (v27) {
                 v30->UpdateProperties();
-                NiUpdateData arData(0.0f, 0, 0);
+                NiUpdateData arData(0.0f, false, false);
                 v30->Update(arData);
             }
         }
@@ -5789,14 +5791,14 @@ bool TESObjectREFR::GetIsInvisibleLODMultType() {
 
 BSMultiBoundRoom* TESObjectREFR::GetMultiBoundRoom() {
     if (!IsMultiBoundRef()) {
-        return 0;
+        return nullptr;
     }
     if (GetDelete()) {
-        return 0;
+        return nullptr;
     }
     ExtraDataList* Extra = GetExtra();
     if (!Extra->GetRoomIsMaster()) {
-        return 0;
+        return nullptr;
     }
     ExtraDataList* v3 = GetExtra();
     BSMultiBoundRoom* apRoom = v3->GetRoom();
@@ -5869,10 +5871,10 @@ const NiPoint3& TESObjectREFR::GetMultiBoundHalfExtent() {
 bool TESObjectREFR::QBoundInsideMultibound(BSMultiBound* apBound) {
     NiNode* pNode = Get3D();
     if (!pNode->IsVisualObject()) {
-        return 0;
+        return false;
     }
     if (!pNode) {
-        return 0;
+        return false;
     }
     BSMultiBoundAABB* Controllers = static_cast<BSMultiBoundAABB*>(apBound->QShape());
     const NiBound* WorldBound = &pNode->GetWorldBound();
@@ -5885,7 +5887,7 @@ bool TESObjectREFR::QCenterInsideMultibound(BSMultiBound* apBound) {
 }
 
 bool TESObjectREFR::UpdateMultiboundShapeTransformsRecursive(NiAVObject* apObject) {
-    bool bfoundmbnode = 0;
+    bool bfoundmbnode = false;
     if (!apObject) {
         return bfoundmbnode;
     }
@@ -5927,23 +5929,23 @@ bool TESObjectREFR::UpdateMultiboundShapeTransformsRecursive(NiAVObject* apObjec
                 float f = extents.x;
                 extents.x = extents.y;
                 extents.y = f;
-                brotated = 0;
+                brotated = false;
             }
             float v7 = ang - 6.2831854820251465;
             if (std::fabs(v7) < 0.0001) {
-                brotated = 0;
+                brotated = false;
             }
         }
         if (brotated) {
             BSMultiBoundOBB* pobb_2;
-            paabb = 0;
+            paabb = nullptr;
             BSMultiBoundOBB* apMemory =
                 static_cast<BSMultiBoundOBB*>(NiMemObject::operator new(sizeof(BSMultiBoundOBB)));
             if (apMemory) {
                 pobb_2 = ::new (apMemory) BSMultiBoundOBB;
             }
             else {
-                pobb_2 = 0;
+                pobb_2 = nullptr;
             }
             pobb = pobb_2;
             const NiTransform* a1 = &pmbnode->GetWorldTransform();
@@ -5956,7 +5958,7 @@ bool TESObjectREFR::UpdateMultiboundShapeTransformsRecursive(NiAVObject* apObjec
             pchild = pmbnode->GetAt(0);
         }
         else {
-            pchild = 0;
+            pchild = nullptr;
         }
         if (pchild) {
             v29 = pchild->GetWorldBound().m_kCenter;
@@ -5971,14 +5973,14 @@ bool TESObjectREFR::UpdateMultiboundShapeTransformsRecursive(NiAVObject* apObjec
             pobb->SetHalfExtents(extents);
         }
         pmbnode->UpdateWorldBound();
-        bfoundmbnode = 1;
+        bfoundmbnode = true;
     }
     NiNode* pnode = apObject->IsNode();
     if (pnode) {
         for (int32_t i = 0; i < pnode->GetChildCount(); ++i) {
             NiAVObject* pchild_3 = pnode->GetAt(i);
             if (UpdateMultiboundShapeTransformsRecursive(pchild_3)) {
-                return 1;
+                return true;
             }
         }
     }
@@ -5990,7 +5992,7 @@ void TESObjectREFR::PreCalcTriStripsShapeAabb(NiAVObject* ap3D) {
     if (ap3D) {
         bhkBvTreeShape* pbhktreeshape;
         bhkRigidBody* pbody;
-        NiUpdateData updatedata(0.0f, 1, 0);
+        NiUpdateData updatedata(0.0f, true, false);
         ap3D->UpdateWorldData(updatedata);
         niwtrans = ap3D->GetWorldTransform();
         hkTransform a2;
@@ -6001,17 +6003,17 @@ void TESObjectREFR::PreCalcTriStripsShapeAabb(NiAVObject* ap3D) {
             pbody = pcol->GetRigidBody();
         }
         else {
-            pbody = 0;
+            pbody = nullptr;
         }
         if (pbody) {
             pbhktreeshape = static_cast<bhkBvTreeShape*>(pbody->GetShape());
         }
         else {
-            pbhktreeshape = 0;
+            pbhktreeshape = nullptr;
         }
         if (pbhktreeshape) {
-            hkNiTriStripsShape* pstripshape = 0;
-            hkPackedNiTriStripsShape* ppackedStripShape = 0;
+            hkNiTriStripsShape* pstripshape = nullptr;
+            hkPackedNiTriStripsShape* ppackedStripShape = nullptr;
             if (NiObject::IsKindOf_0(&bhkNiTriStripsShape::ms_RTTI, pbhktreeshape)) {
                 pstripshape = static_cast<hkNiTriStripsShape*>(pbhktreeshape->Gethk());
             }
@@ -6264,7 +6266,7 @@ void TESObjectREFR::SetUnderwater(bool abVal) {
         if ((pLoadedData->iUnderwaterCount & 0x80000000u) != 0) {
             pLoadedData->iUnderwaterCount = 0;
         }
-        pLoadedData->pCurrentWaterObject = 0;
+        pLoadedData->pCurrentWaterObject = nullptr;
         uint32_t iUnderwaterCount = pLoadedData->iUnderwaterCount;
         if (iUnderwaterCount) {
             if (iUnderwaterCount == 1) {
@@ -6273,7 +6275,7 @@ void TESObjectREFR::SetUnderwater(bool abVal) {
                     preflist = GetParentCell()->GetWaterRefList();
                 }
                 else {
-                    preflist = 0;
+                    preflist = nullptr;
                 }
                 for (TESObjectREFR* pref : preflist->ItemsUntilNull()) {
                     BGSPlaceableWater* pwater = dynamic_cast<BGSPlaceableWater*>(pref->GetObjectReference());
@@ -6283,7 +6285,7 @@ void TESObjectREFR::SetUnderwater(bool abVal) {
                     }
                 }
                 if (!IsActor() && GetObjectReference()->GetFormType() != DOOR_ID) {
-                    SetInPlaceableWater(1);
+                    SetInPlaceableWater(true);
                 }
             }
         }
@@ -6294,11 +6296,11 @@ void TESObjectREFR::SetUnderwater(bool abVal) {
                 CastingType = pmap->pHighestWaterZone->pRef;
             }
             else {
-                CastingType = 0;
+                CastingType = nullptr;
             }
             pLoadedData->pCurrentWaterObject = CastingType;
             if (!IsActor() && GetObjectReference()->GetFormType() != DOOR_ID) {
-                SetInPlaceableWater(0);
+                SetInPlaceableWater(false);
             }
         }
     }
@@ -6459,7 +6461,7 @@ void TESObjectREFR::Release3DRelatedData() {
             }
         }
         TESObjectREFR::RemoveRefFromMultiboundTestMap(this);
-        RemoveFromAllWater(0);
+        RemoveFromAllWater(false);
         for (TESObjectREFR* plrref : (&m_Extra)->GetRoomLinkedRoomRefList()->ItemsUntilNull()) {
             if (GetMultiBoundRoom()) {
                 if (plrref->GetMultiBoundRoom()) {
@@ -6489,7 +6491,7 @@ void TESObjectREFR::Release3DRelatedData() {
                 BSSimpleList<TESObjectREFR*>* preflist = (&m_Extra)->GetLitWaterRefs();
                 LightRefData* prefrlight = GetLight();
                 while (preflist && preflist->m_item) {
-                    (&preflist->m_item->m_Extra)->SetWaterLightRef(this, 0);
+                    (&preflist->m_item->m_Extra)->SetWaterLightRef(this, false);
                     if (prefrlight) {
                         if (prefrlight->spLight.m_pObject) {
                             TESObjectREFR* m_item = preflist->m_item;
@@ -6521,7 +6523,7 @@ void TESObjectREFR::Release3DRelatedData() {
             if (GetObjectReference()->GetFormType() == ASPC_ID) {
                 if (GetParentCell()) {
                     bhkWorld* v4 = GetParentCell()->GetbhkWorld();
-                    v4->pAcousticSpaceListener->BGSAcousticSpaceListener::DequeueRemoval(this, 1);
+                    v4->pAcousticSpaceListener->BGSAcousticSpaceListener::DequeueRemoval(this, true);
                 }
             }
         }
@@ -6538,10 +6540,10 @@ void TESObjectREFR::Release3DRelatedData() {
                 plistener = pParentCell->GetbhkWorld()->pWaterListener;
             }
             else {
-                plistener = 0;
+                plistener = nullptr;
             }
             if (plistener) {
-                plistener->HandleQueuedRemovals(this, 0, 1);
+                plistener->HandleQueuedRemovals(this, false, true);
             }
             if (GetObjectReference()) {
                 if (GetObjectReference()->GetFormType() == PWAT_ID) {
@@ -6591,10 +6593,10 @@ void TESObjectREFR::Release3DRelatedData() {
                                                 (&pdata->pLinkedRefs[i]->GetMultiBoundRoom()->QPortalList())
                                                     ->Remove(pportal_2);
                                                 if (i) {
-                                                    pportal_2->SetMultiBoundRoomRight(0);
+                                                    pportal_2->SetMultiBoundRoomRight(nullptr);
                                                 }
                                                 else {
-                                                    pportal_2->SetMultiBoundRoomLeft(0);
+                                                    pportal_2->SetMultiBoundRoomLeft(nullptr);
                                                 }
                                             }
                                         }
@@ -6620,8 +6622,8 @@ void TESObjectREFR::FreeUpAllMarkers() {
         if (((int32_t)baseForm->GetFormType()) == 39) {
             if (TESObjectREFR::GetObjectReference()) {
                 for (i = 0; i < 30; ++i) {
-                    SetMarkerUsed(i, 0);
-                    SetMarkerReserved(i, 0);
+                    SetMarkerUsed(i, false);
+                    SetMarkerReserved(i, false);
                 }
             }
         }
@@ -6630,19 +6632,19 @@ void TESObjectREFR::FreeUpAllMarkers() {
 
 bool TESObjectREFR::IsPlayingAnimation() {
     if ((&m_Extra)->GetLastFinishedSequence()) {
-        return 1;
+        return true;
     }
     if (!pLoadedData) {
-        return 0;
+        return false;
     }
     if (!pLoadedData->m_spData3D.m_pObject) {
-        return 0;
+        return false;
     }
     NiControllerManager* v9 = static_cast<NiControllerManager*>(
         NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, pLoadedData->m_spData3D.m_pObject->GetControllers())
     );
     if (!v9 || !v9->GetActive()) {
-        return 0;
+        return false;
     }
     uint32_t SequenceCount = v9->GetSequenceCount();
     for (uint32_t uiIndex = 0; uiIndex < SequenceCount; ++uiIndex) {
@@ -6654,12 +6656,12 @@ bool TESObjectREFR::IsPlayingAnimation() {
                 const char* v5 = animGroupInfo[2].pName;
                 const char* v3 = (&SequenceAt->m_kName)->GetHandleString();
                 if (BSstricmp(v3, v5)) {
-                    return 1;
+                    return true;
                 }
             }
         }
     }
-    return 0;
+    return false;
 }
 
 NiNode* TESObjectREFR::Get3D_Body() {
@@ -6801,23 +6803,23 @@ void TESObjectREFR::AttachWeapon(TESObjectWEAP* apWeapon) {
 }
 
 bool TESObjectREFR::IsCrimeToActivate() {
-    bool v12 = 0;
+    bool v12 = false;
     LockData* Lock = GetLock();
-    if (pPlayer->IsDead(0)) {
-        return 0;
+    if (pPlayer->IsDead(false)) {
+        return false;
     }
     if (GetObjectReference()->GetFormType() == DOOR_ID) {
-        if (GetObjectReference() && (!IsAnOwner(pPlayer, 1) && GetOwner())) {
-            if (TESObjectDOOR::CanActorIgnoreLock(this, pPlayer, 0, 0)) {
-                return 0;
+        if (GetObjectReference() && (!IsAnOwner(pPlayer, true) && GetOwner())) {
+            if (TESObjectDOOR::CanActorIgnoreLock(this, pPlayer, false, false)) {
+                return false;
             }
             if (Lock && Lock->IsLocked()) {
-                v12 = 1;
+                v12 = true;
             }
             else {
                 DoorTeleportData* Teleport = GetTeleport();
-                TESForm* Owner = 0;
-                bool IsEvil = 0;
+                TESForm* Owner = nullptr;
+                bool IsEvil = false;
                 if (Teleport) {
                     TESObjectCELL* TeleportCell = Teleport->GetTeleportCell();
                     if (TeleportCell) {
@@ -6829,7 +6831,7 @@ bool TESObjectREFR::IsCrimeToActivate() {
                             if (Owner) {
                                 if (Owner->GetFormType() == NPC__ID &&
                                     static_cast<TESNPC*>(Owner)->TESActorBaseData::IsInEvilFactionsOnly()) {
-                                    IsEvil = 1;
+                                    IsEvil = true;
                                 }
                             }
                         }
@@ -6840,11 +6842,11 @@ bool TESObjectREFR::IsCrimeToActivate() {
             }
         }
         else {
-            bool v7 = 0;
+            bool v7 = false;
             DoorTeleportData* v6 = GetTeleport();
             if (v6) {
                 TESObjectCELL* v5 = v6->GetTeleportCell();
-                TESForm* v4 = 0;
+                TESForm* v4 = nullptr;
                 if (v5) {
                     v4 = v5->GetOwner();
                     if (v4 && v4->GetFormType() == FACT_ID) {
@@ -6854,7 +6856,7 @@ bool TESObjectREFR::IsCrimeToActivate() {
                         if (v4) {
                             if (v4->GetFormType() == NPC__ID &&
                                 static_cast<TESNPC*>(v4)->TESActorBaseData::IsInEvilFactionsOnly()) {
-                                v7 = 1;
+                                v7 = true;
                             }
                         }
                     }
@@ -6863,25 +6865,25 @@ bool TESObjectREFR::IsCrimeToActivate() {
                     (v4 && (v5->GetInterior() && (!v5->GetPublicState() && (!v7 && !v5->IsActorCellOwner(pPlayer)))));
             }
             else {
-                v12 = 0;
+                v12 = false;
             }
         }
     }
     else {
         if (GetObjectReference()->GetFormType() == FURN_ID) {
             v12 = static_cast<TESFurniture*>(GetObjectReference())->TESFurniture::CanSleepOn() &&
-                (GetOwner() && !IsAnOwner(pPlayer, 1));
+                (GetOwner() && !IsAnOwner(pPlayer, true));
         }
         else {
-            if (GetObjectReference()->GetFormType() == NPC__ID && (pPlayer->IsSneaking() && !IsDead(0))) {
-                v12 = 1;
+            if (GetObjectReference()->GetFormType() == NPC__ID && (pPlayer->IsSneaking() && !IsDead(false))) {
+                v12 = true;
             }
             else {
                 if (GetObjectReference()->GetFormType() == CREA_ID && pPlayer->IsSneaking()) {
                     TESCreature* v3 = dynamic_cast<TESCreature*>(GetObjectReference());
                     if (v3) {
-                        if (v3->GetAllowPCDialogue() && !IsDead(0)) {
-                            v12 = 1;
+                        if (v3->GetAllowPCDialogue() && !IsDead(false)) {
+                            v12 = true;
                         }
                     }
                 }
@@ -6890,7 +6892,7 @@ bool TESObjectREFR::IsCrimeToActivate() {
     }
     if (!v12 && GetObjectReference()->GetFormType() != CREA_ID) {
         if (GetOwner()) {
-            return !IsAnOwner(pPlayer, 1);
+            return !IsAnOwner(pPlayer, true);
         }
     }
     return v12;
@@ -6965,7 +6967,7 @@ void TESObjectREFR::RemoveWeapon() {
                 pBone = pCurrProc->GetLeftWeaponBone(nullptr);
                 bool bBow = false;
                 if (pBone) {
-                    for (uint32_t i = 0; i < static_cast<uint32_t>(pBone->GetArrayCount()); ++i) {
+                    for (uint32_t i = 0; i < pBone->GetArrayCount(); ++i) {
                         NiAVObject* pChild = pBone->GetAt(i);
                         if (pChild) {
                             const char* pName;
@@ -7021,7 +7023,7 @@ void TESObjectREFR::RemoveWeapon() {
         pBone = pCurrProc->GetLeftWeaponBone(nullptr);
         if (pBone) {
             bool bBow = false;
-            for (uint32_t i = 0; i < static_cast<uint32_t>(pBone->GetArrayCount()); ++i) {
+            for (uint32_t i = 0; i < pBone->GetArrayCount(); ++i) {
                 NiAVObject* pChild = pBone->GetAt(i);
                 if (pChild) {
                     const char* pName;
@@ -7159,7 +7161,7 @@ bool TESObjectREFR::HasFreeMarker(bool abIgnoreReservations) {
     }
     TESBoundObject* objectReference = TESObjectREFR::GetObjectReference();
     if ((((int32_t)objectReference->TESForm::GetFormType()) == 39) || (!abIgnoreReservations)) {
-        return (bool)((uint8_t)(GetFirstFreeMarkerIndex(abIgnoreReservations) != ((-1))));
+        return (bool)((uint8_t)(GetFirstFreeMarkerIndex(abIgnoreReservations) != (-1)));
     }
     return (bool)v5;
 }
@@ -7549,7 +7551,7 @@ void TESObjectREFR::ClearAllDecals() {
     if (!pNode) {
         return;
     }
-    for (uint32_t i = 0; i < static_cast<uint32_t>(pNode->GetArrayCount()); ++i) {
+    for (uint32_t i = 0; i < pNode->GetArrayCount(); ++i) {
         NiAVObject* pChild = pNode->GetAt(i);
         if (pChild && NiObject::IsExactKindOf(&BGSDecalNode::ms_RTTI, pChild)) {
             pChild->DetachParent();
@@ -7712,7 +7714,7 @@ void TESObjectREFR::SetMarkerReserved(uint32_t aiMarkerIndex, bool abVal) {
     if (pextra) {
         pextra->SetMarkerUsed(aiMarkerIndex, abVal);
         if (!pextra->iUsedMarkers) {
-            (&m_Extra)->RemoveExtra(pextra, 1);
+            (&m_Extra)->RemoveExtra(pextra, true);
         }
     }
     else {
@@ -7723,7 +7725,7 @@ void TESObjectREFR::SetMarkerReserved(uint32_t aiMarkerIndex, bool abVal) {
                 pextra_2 = ::new (v5) ExtraReservedMarkers;
             }
             else {
-                pextra_2 = 0;
+                pextra_2 = nullptr;
             }
             (&m_Extra)->AddExtra(pextra_2);
             static_cast<ExtraUsedMarkers*>(pextra_2)->ExtraUsedMarkers::SetMarkerUsed(aiMarkerIndex, abVal);
@@ -7833,7 +7835,7 @@ void TESObjectREFR::Enable() {
         void* pMemory = ourMalloc(sizeof(LowProcess));
         LowProcess* pProcess = pMemory ? ::new (pMemory) LowProcess : nullptr;
         pMobile->SetCurrentAIProcess(pProcess);
-        ReferenceProcessLists.AddReference(pMobile, PROCESS_TYPE_LOW, 0, false, nullptr);
+        ReferenceProcessLists.AddReference(pMobile, PROCESS_TYPE_LOW, false, false, nullptr);
     }
     bool bQueued = false;
     if (GetParentCell() && TES::pInstance->IsCellLoaded(GetParentCell(), false) && !Get3D() &&
@@ -8060,20 +8062,20 @@ Animation* TESObjectREFR::SetAnimation(Animation* apAnim) {
 }
 
 BSSimpleList<const char*>* TESObjectREFR::BuildKFFileList(ANIM_GROUP_WEAPON_ENUM aeWeapType) {
-    BSSimpleList<const char*>* pfileList = 0;
+    BSSimpleList<const char*>* pfileList = nullptr;
     if (!GetObjectReference()) {
         return pfileList;
     }
     int32_t FormType = GetObjectReference()->GetFormType();
     if (FormType == 42) {
         TESNPC* pnpc_2 = static_cast<TESNPC*>(GetObjectReference());
-        if (pnpc_2->iFormID != 7 && IsDead(1)) {
+        if (pnpc_2->iFormID != 7 && IsDead(true)) {
             WEAPON_TYPE eweaponType_2;
             char Str1[264];
             char a2[268];
             BSstrcpy(Str1, 260, "Data\\Meshes\\Characters\\_Male\\Locomotion\\MTIdle.kf");
             BSstrcpy(a2, 260, "Characters\\_Male\\Locomotion\\MTIdle.kf");
-            pfileList = pModelLoader->BuildFileList(Str1, a2, 0);
+            pfileList = pModelLoader->BuildFileList(Str1, a2, nullptr);
             BSstrcpy(Str1, 260, "Data\\Meshes\\Characters\\_Male\\MTIdle.kf");
             char* pslash_3 = std::strrchr(Str1, 92);
             Actor* v30 = static_cast<Actor*>(this);
@@ -8105,11 +8107,11 @@ BSSimpleList<const char*>* TESObjectREFR::BuildKFFileList(ANIM_GROUP_WEAPON_ENUM
         else {
             char apStr[264];
             const char* v10 = pnpc_2->GetModel();
-            pfileList = pModelLoader->BuildKFFileList(v10, 1, 1, aeWeapType);
+            pfileList = pModelLoader->BuildKFFileList(v10, true, true, aeWeapType);
             const char* v11 = pnpc_2->GetModel();
             BSstrcpy(apStr, 260, v11);
             char* pslash_2 = std::strrchr(apStr, 92);
-            if (IsChild(1)) {
+            if (IsChild(true)) {
                 BSstrcpy(pslash_2, 260 - (pslash_2 - apStr) - 1, "\\Locomotion\\Child\\IdleAnims");
             }
             else {
@@ -8130,7 +8132,7 @@ BSSimpleList<const char*>* TESObjectREFR::BuildKFFileList(ANIM_GROUP_WEAPON_ENUM
             Actor* pactor = static_cast<Actor*>(this);
             if (pactor->GetCurrentAIProcess()) {
                 PROCESS_TYPE eLevel;
-                if (!pactor->IsDead(0) &&
+                if (!pactor->IsDead(false) &&
                     (eLevel = pactor->GetCurrentAIProcess()->GetProcessLevel()) >= PROCESS_TYPE_HIGH &&
                     eLevel <= PROCESS_TYPE_MIDDLE_HIGH) {
                     MiddleHighProcess* pprocess_2 = static_cast<MiddleHighProcess*>(pactor->GetCurrentAIProcess());
@@ -8146,7 +8148,7 @@ BSSimpleList<const char*>* TESObjectREFR::BuildKFFileList(ANIM_GROUP_WEAPON_ENUM
                     }
                 }
             }
-            if (IsDead(1)) {
+            if (IsDead(true)) {
                 WEAPON_TYPE eweaponType;
                 char Dst[264];
                 BSstrcpy(Dst, 260, "Data\\");
@@ -8157,7 +8159,7 @@ BSSimpleList<const char*>* TESObjectREFR::BuildKFFileList(ANIM_GROUP_WEAPON_ENUM
                 char* pslash = std::strrchr(Dst, 92);
                 BSstrcpy(pslash, 260 - (pslash - Dst), "\\MTIdle.KF");
                 const char* v6 = GetModel();
-                pfileList = pModelLoader->BuildFileList(Dst, v6, 0);
+                pfileList = pModelLoader->BuildFileList(Dst, v6, nullptr);
                 TESObjectWEAP* pweapon = pactor->GetCurrentWeapon();
                 if (pweapon) {
                     eweaponType = pweapon->GetWeaponType();
@@ -8182,7 +8184,7 @@ BSSimpleList<const char*>* TESObjectREFR::BuildKFFileList(ANIM_GROUP_WEAPON_ENUM
             }
             else {
                 const char* v4 = GetModel();
-                return pModelLoader->BuildKFFileList(v4, 1, 1, aeWeapType);
+                return pModelLoader->BuildKFFileList(v4, true, true, aeWeapType);
             }
         }
     }
@@ -8214,7 +8216,7 @@ void TESObjectREFR::SetRefPersists(bool abVal) {
             if (pcell->GetPersistentCell()) {
                 TESWorldSpace* pworld_2 = pcell->GetWorldSpace();
                 pworld_2->RemovePersistentRef(this);
-                SetAltered(1);
+                SetAltered(true);
             }
         }
     }
@@ -8488,7 +8490,7 @@ void TESObjectREFR::UpdateAddonNodeSoundsRecursive(NiAVObject* apRoot, bool abDe
     FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     if (apRoot) {
         if (apRoot->GetAppCulled()) {
-            abDetachAll = 1;
+            abDetachAll = true;
         }
         if (NiObject::IsKindOf_0(&BSValueNode::ms_RTTI, apRoot)) {
             BSValueNode* pvalueNode = static_cast<BSValueNode*>(apRoot);
@@ -8517,7 +8519,7 @@ void TESObjectREFR::UpdateAddonNodeSoundsRecursive(NiAVObject* apRoot, bool abDe
                                 v13 = ::new (apMemory) BGSAddonNodeSoundHandleExtra;
                             }
                             else {
-                                v13 = 0;
+                                v13 = nullptr;
                             }
                             spsoundHandleExtra.operator=(v13);
                             if (TESSound::ConvertLoopFlag(paddonNode->pSound->GetData().iFlags)) {
@@ -8534,7 +8536,7 @@ void TESObjectREFR::UpdateAddonNodeSoundsRecursive(NiAVObject* apRoot, bool abDe
                             spsoundHandleExtra.m_pObject->SoundHandle.SetObjectToFollow(apRoot);
                             NiPoint3 v22 = apRoot->GetWorldTranslate();
                             spsoundHandleExtra.m_pObject->SoundHandle.SetPosition(v22.x, v22.y, v22.z);
-                            spsoundHandleExtra.m_pObject->SoundHandle.Play(0);
+                            spsoundHandleExtra.m_pObject->SoundHandle.Play(false);
                             apRoot->AddExtraData(spsoundHandleExtra.m_pObject);
                         }
                     }
@@ -8645,7 +8647,7 @@ bool TESObjectREFR::RunScript() {
 }
 
 bool TESObjectREFR::UpdateChildActivates() {
-    bool bactive = 0;
+    bool bactive = false;
     float ftime = appTimer.fDelta;
     BSSimpleList<REF_ACTIVATE_DATA*>* plist = (&m_Extra)->GetActivateRefChildren();
     float fcurrentActivateChildrenTimer = (&m_Extra)->GetActivateChildrenTimer();
@@ -8655,10 +8657,10 @@ bool TESObjectREFR::UpdateChildActivates() {
         REF_ACTIVATE_DATA* pdata = *v1;
         if (fcurrentActivateChildrenTimer < static_cast<double>((*v1)->fActivateDelay)) {
             if (!(fnewActivateChildrenTimer >= static_cast<double>(pdata->fActivateDelay))) {
-                bactive = 1;
+                bactive = true;
             }
             else {
-                pdata->pActivateRef->Activate(this, 0, 0, 1);
+                pdata->pActivateRef->Activate(this, false, nullptr, 1);
             }
         }
         plist = plist->m_pkNext;
@@ -9098,9 +9100,9 @@ void TESObjectREFR::Update3DPosition() {
         v7->SetTranslate(data.kPosition);
         orientation = &(v3 = GetOrientation());
         v7->SetRotate(*orientation);
-        bhkWorld::UpdatePosition(v7, 1, 0);
+        bhkWorld::UpdatePosition(v7, true, false);
         a2.~NiUpdateData();
-        ::new (&a2) NiUpdateData(0.0, 0, 0);
+        ::new (&a2) NiUpdateData(0.0, false, false);
         v7->Update(a2);
     }
 }
@@ -9137,7 +9139,7 @@ void TESObjectREFR::CleanUpTraps() {
         pw = pcell->GetbhkWorld();
     }
     else {
-        pw = 0;
+        pw = nullptr;
     }
     if (pw) {
         TESTrapListener* ptrapListener = static_cast<TESTrapListener*>(pw->pTrapListener);
@@ -9296,7 +9298,7 @@ void TESObjectREFR::InitHavokForCollisionObject() {
         pw = this->GetParentCell()->GetbhkWorld();
     }
     else {
-        pw = 0;
+        pw = nullptr;
     }
     if (pw) {
         if (pprim) {
@@ -9306,12 +9308,12 @@ void TESObjectREFR::InitHavokForCollisionObject() {
             bhkRigidBody* prb;
             BSXFlags* pflags;
             COL_LAYER elayer;
-            bhkShape* pshape = 0;
+            bhkShape* pshape = nullptr;
             hkTransform transform;
             this->SetScale(1.0f);
             NiNode* v1 = this->Get3D();
             v1->SetScale(1.0f);
-            NiUpdateData UpdateData(0.0f, 0, 0);
+            NiUpdateData UpdateData(0.0f, false, false);
             NiNode* v2 = this->Get3D();
             v2->Update(UpdateData);
             alignas(16) NiTransform trn;
@@ -9329,7 +9331,7 @@ void TESObjectREFR::InitHavokForCollisionObject() {
                         pshape_3 = ::new (v35) bhkBoxShape(hkvec);
                     }
                     else {
-                        pshape_3 = 0;
+                        pshape_3 = nullptr;
                     }
                     pshape = pshape_3;
                     break;
@@ -9340,10 +9342,10 @@ void TESObjectREFR::InitHavokForCollisionObject() {
                         static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
                     if (v32) {
                         float v10 = NI2HK(pprim->GetRadii().x);
-                        pshape_4 = ::new (v32) bhkSphereShape(v10, 0);
+                        pshape_4 = ::new (v32) bhkSphereShape(v10, false);
                     }
                     else {
-                        pshape_4 = 0;
+                        pshape_4 = nullptr;
                     }
                     pshape = pshape_4;
                     break;
@@ -9358,7 +9360,7 @@ void TESObjectREFR::InitHavokForCollisionObject() {
                         pshape_2 = ::new (v39) bhkBoxShape(hkvec);
                     }
                     else {
-                        pshape_2 = 0;
+                        pshape_2 = nullptr;
                     }
                     pshape = pshape_2;
                     break;
@@ -9382,9 +9384,9 @@ void TESObjectREFR::InitHavokForCollisionObject() {
                 pflags = ::new (v23) BSXFlags;
             }
             else {
-                pflags = 0;
+                pflags = nullptr;
             }
-            pflags->SetFlags(2u, 1);
+            pflags->SetFlags(2u, true);
             NiNode* v5 = this->Get3D();
             v5->AddExtraData(pflags);
             bhkRigidBody* v19 = static_cast<bhkRigidBody*>(NiMemObject::operator new(sizeof(bhkRigidBody)));
@@ -9392,7 +9394,7 @@ void TESObjectREFR::InitHavokForCollisionObject() {
                 prb = ::new (v19) bhkRigidBody(info);
             }
             else {
-                prb = 0;
+                prb = nullptr;
             }
             hkrot.~hkQuaternion();
             ::new (&hkrot) hkQuaternion;
@@ -9413,7 +9415,7 @@ void TESObjectREFR::InitHavokForCollisionObject() {
                 pcoll = ::new (v12) bhkCollisionObject(v9);
             }
             else {
-                pcoll = 0;
+                pcoll = nullptr;
             }
             pcoll->SetWorldObject(prb);
         }
@@ -9434,7 +9436,7 @@ void TESObjectREFR::InitHavokForAcousticSpace() {
         pw = this->GetParentCell()->GetbhkWorld();
     }
     else {
-        pw = 0;
+        pw = nullptr;
     }
     if (pw) {
         BSXFlags* pflags;
@@ -9445,12 +9447,12 @@ void TESObjectREFR::InitHavokForAcousticSpace() {
         hkpBvShape* bvShape;
         bhkAcousticSpacePhantomCallbackShape* phantomShape;
         hkpShape* pshape;
-        hkpShape* v37 = 0;
+        hkpShape* v37 = nullptr;
         hkTransform transform;
         this->SetScale(1.0f);
         NiNode* v1 = this->Get3D();
         v1->SetScale(1.0f);
-        NiUpdateData UpdateData(0.0f, 0, 0);
+        NiUpdateData UpdateData(0.0f, false, false);
         NiNode* v2 = this->Get3D();
         v2->Update(UpdateData);
         alignas(16) NiTransform trn;
@@ -9465,7 +9467,7 @@ void TESObjectREFR::InitHavokForAcousticSpace() {
             pshape = ::new (v29) hkpBoxShape(hkvec, hkConvexShapeDefaultRadius);
         }
         else {
-            pshape = 0;
+            pshape = nullptr;
         }
         v37 = pshape;
         bhkAcousticSpacePhantomCallbackShape* v26 = static_cast<bhkAcousticSpacePhantomCallbackShape*>(
@@ -9475,7 +9477,7 @@ void TESObjectREFR::InitHavokForAcousticSpace() {
             phantomShape = ::new (v26) bhkAcousticSpacePhantomCallbackShape;
         }
         else {
-            phantomShape = 0;
+            phantomShape = nullptr;
         }
         hkpShape* pshape_2 = phantomShape;
         hkpBvShape* v22 = static_cast<hkpBvShape*>(hkReferencedObject::newObject(sizeof(hkpBvShape)));
@@ -9483,7 +9485,7 @@ void TESObjectREFR::InitHavokForAcousticSpace() {
             bvShape = ::new (v22) hkpBvShape(v37, pshape_2);
         }
         else {
-            bvShape = 0;
+            bvShape = nullptr;
         }
         hkpShape* v19 = bvShape;
         bhkRigidBodyCinfo info;
@@ -9504,7 +9506,7 @@ void TESObjectREFR::InitHavokForAcousticSpace() {
             rigidBody = ::new (v14) bhkRigidBody(info);
         }
         else {
-            rigidBody = 0;
+            rigidBody = nullptr;
         }
         bhkCollisionObject* v12 =
             static_cast<bhkCollisionObject*>(NiMemObject::operator new(sizeof(bhkCollisionObject)));
@@ -9513,16 +9515,16 @@ void TESObjectREFR::InitHavokForAcousticSpace() {
             pcollobj = ::new (v12) bhkCollisionObject(v6);
         }
         else {
-            pcollobj = 0;
+            pcollobj = nullptr;
         }
         BSXFlags* v10 = static_cast<BSXFlags*>(NiMemObject::operator new(sizeof(BSXFlags)));
         if (v10) {
             pflags = ::new (v10) BSXFlags;
         }
         else {
-            pflags = 0;
+            pflags = nullptr;
         }
-        pflags->SetFlags(2u, 1);
+        pflags->SetFlags(2u, true);
         NiNode* v7 = this->Get3D();
         v7->AddExtraData(pflags);
         pcollobj->SetWorldObject(rigidBody);
@@ -9686,7 +9688,7 @@ BGSEncounterZone* TESObjectREFR::GetLocationEncounterZone() {
 
 void TESObjectREFR::FreeMultiBound() {
     ExtraDataList* extraDataList = TESObjectREFR::GetExtra();
-    extraDataList->SetMultiBound(0);
+    extraDataList->SetMultiBound(nullptr);
 }
 
 TESObjectREFR* TESObjectREFR::GetRandomTeleportMarker() {
@@ -9740,15 +9742,15 @@ float TESObjectREFR::GetRadioStaticPct() {
     RADIO_DATA* extraRadioDataData = extra->GetRadioData();
     if (extraRadioDataData) {
         if (!extraRadioDataData->eRangeType) {
-            return (float)(extraRadioDataData->fStaticPct);
+            return extraRadioDataData->fStaticPct;
         }
     }
-    return (float)(v5);
+    return v5;
 }
 
 uint32_t TESObjectREFR::GetActionFlag() {
     ExtraDataList* extraDataList = TESObjectREFR::GetExtra();
-    return (uint32_t)extraDataList->GetActionFlag();
+    return extraDataList->GetActionFlag();
 }
 
 TESObjectREFR* TESObjectREFR::GetActionRef() {
@@ -9791,7 +9793,7 @@ bool TESObjectREFR::GetIsHiddenDoor() {
 }
 
 bool TESObjectREFR::IsCellLoaded() {
-    return (bool)((uint8_t)(pParentCell && TES::pInstance->IsCellLoaded(pParentCell, 0)));
+    return (bool)((uint8_t)(pParentCell && TES::pInstance->IsCellLoaded(pParentCell, false)));
 }
 
 TESTopic* TESObjectREFR::GetSayToTopic() {
@@ -9847,10 +9849,10 @@ void TESObjectREFR::AddReferenceItem(TESObjectREFR* apObject, int32_t aiNumber, 
         }
         if (this == pPlayer) {
             TESChallengeManager::UpdateChallenge(
-                CHALLENGE_TYPE_AQUIRE_LIST, aiNumber, apObject->GetObjectReference(), 0, 0, 0, 0
+                CHALLENGE_TYPE_AQUIRE_LIST, aiNumber, apObject->GetObjectReference(), nullptr, 0, 0, 0
             );
             TESChallengeManager::UpdateChallenge(
-                CHALLENGE_TYPE_AQUIRE, aiNumber, apObject->GetObjectReference(), 0, 0, 0, 0
+                CHALLENGE_TYPE_AQUIRE, aiNumber, apObject->GetObjectReference(), nullptr, 0, 0, 0
             );
         }
         Script::SetActionFlag(this, &apObject->m_Extra, SCRIPT_ACTION_ONADD);
@@ -9865,7 +9867,7 @@ void TESObjectREFR::AddReferenceItem(TESObjectREFR* apObject, int32_t aiNumber, 
                     pnewChange = ::new (v13) ItemChange(static_cast<Projectile*>(apObject)->pSecondaryItemChange);
                 }
                 else {
-                    pnewChange = 0;
+                    pnewChange = nullptr;
                 }
                 if (pnewChange) {
                     if (pnewChange->pExtraObjectList) {
@@ -9874,22 +9876,22 @@ void TESObjectREFR::AddReferenceItem(TESObjectREFR* apObject, int32_t aiNumber, 
                         }
                     }
                 }
-                pinventory->AddChangeItem(pnewChange, 1);
+                pinventory->AddChangeItem(pnewChange, true);
             }
             else {
                 if (static_cast<Projectile*>(apObject)->pWeaponSource) {
                     TESBoundObject* paddObject;
                     TESObjectWEAP* pweapSource = static_cast<Projectile*>(apObject)->pWeaponSource;
-                    if (pweapSource->GetProjectile(0)) {
-                        if (pweapSource->GetProjectile(0)->GetDefaultWeaponSource()) {
-                            pweapSource = pweapSource->GetProjectile(0)->GetDefaultWeaponSource();
+                    if (pweapSource->GetProjectile(nullptr)) {
+                        if (pweapSource->GetProjectile(nullptr)->GetDefaultWeaponSource()) {
+                            pweapSource = pweapSource->GetProjectile(nullptr)->GetDefaultWeaponSource();
                         }
                     }
                     if (pweapSource->IsThrownWeapon()) {
                         paddObject = (TESBoundObject*)pweapSource;
                     }
                     else {
-                        Actor* pActor = IsActor() ? static_cast<Actor*>(this) : 0;
+                        Actor* pActor = IsActor() ? static_cast<Actor*>(this) : nullptr;
                         paddObject = (TESBoundObject*)pweapSource->GetCurrentAmmo(pActor);
                     }
                     if (paddObject) {
@@ -9901,7 +9903,7 @@ void TESObjectREFR::AddReferenceItem(TESObjectREFR* apObject, int32_t aiNumber, 
                                 pextra_2 = ::new (apMemory) ExtraDataList;
                             }
                             else {
-                                pextra_2 = 0;
+                                pextra_2 = nullptr;
                             }
                             pextra_2->SetCount(1);
                             if (pextra_2) {
@@ -9915,11 +9917,11 @@ void TESObjectREFR::AddReferenceItem(TESObjectREFR* apObject, int32_t aiNumber, 
                                         pref = ::new (v11) TESObjectREFR;
                                     }
                                     else {
-                                        pref = 0;
+                                        pref = nullptr;
                                     }
                                     pref->SetTemporary();
                                     ScriptLocals* ScriptLocals_ = pextra_2->GetScriptLocals();
-                                    pscript->Run(pref, ScriptLocals_, 0, 0);
+                                    pscript->Run(pref, ScriptLocals_, nullptr, false);
                                     if (pref) {
                                         delete pref;
                                     }
@@ -9929,7 +9931,7 @@ void TESObjectREFR::AddReferenceItem(TESObjectREFR* apObject, int32_t aiNumber, 
                             pinventory->AddItem(paddObject, pextra_2, 1);
                         }
                         else {
-                            pinventory->AddItem(paddObject, 0, 1);
+                            pinventory->AddItem(paddObject, nullptr, 1);
                         }
                     }
                 }
@@ -9947,7 +9949,7 @@ void TESObjectREFR::AddReferenceItem(TESObjectREFR* apObject, int32_t aiNumber, 
 
 bool TESObjectREFR::IsOwnerEvil(TESForm* apOwner) {
     TESForm* powner;
-    bool bretval = 0;
+    bool bretval = false;
     if (apOwner) {
         powner = apOwner;
     }
@@ -9957,13 +9959,13 @@ bool TESObjectREFR::IsOwnerEvil(TESForm* apOwner) {
     if (powner) {
         if (powner->GetFormType() == FACT_ID) {
             if (static_cast<TESFaction*>(powner)->TESFaction::GetIsEvil()) {
-                return 1;
+                return true;
             }
         }
         else {
             if (powner->GetFormType() == NPC__ID) {
-                Actor* pactor = ReferenceProcessLists.GetActorRefInHigh(static_cast<TESNPC*>(powner), 1);
-                bretval = 1;
+                Actor* pactor = ReferenceProcessLists.GetActorRefInHigh(static_cast<TESNPC*>(powner), true);
+                bretval = true;
                 if (pactor) {
                     ActorValueOwner* v4 = static_cast<ActorValueOwner*>(pactor->GetActorBase());
                     float afKarma = v4->GetActorFloatValue(ActorValue::KARMA);
@@ -10072,9 +10074,9 @@ void TESObjectREFR::ResetAnimation_Old() {
     FNVD_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiAVObject* v28 = TESObjectREFR::Get3D();
-    NiControllerManager* v26 = 0;
+    NiControllerManager* v26 = nullptr;
     if (v28) {
-        bool v25 = 0;
+        bool v25 = false;
         const char* apString1 = (&m_Extra)->GetLastFinishedSequence();
         if (apString1) {
             v25 = BSstricmp(apString1, animGroupInfo[25].pName) == 0;
@@ -10092,7 +10094,7 @@ void TESObjectREFR::ResetAnimation_Old() {
                     apString.~NiFixedString();
                     if (SequenceByName) {
                         if (SequenceByName->GetState()) {
-                            v25 = 1;
+                            v25 = true;
                         }
                     }
                 }
@@ -10103,7 +10105,7 @@ void TESObjectREFR::ResetAnimation_Old() {
         }
         if (v25) {
             NiAVObject* v21 = data.pObjectReference->Clone3D(this);
-            Set3D(v21, 1);
+            Set3D(v21, true);
             InitHavok();
         }
     }
@@ -10123,38 +10125,38 @@ void TESObjectREFR::ResetAnimation_Old() {
                 v12.~NiFixedString();
                 v26->DeactivateAll(0.0f);
                 if (SequenceAt || v18) {
-                    v26->SetActive(1);
+                    v26->SetActive(true);
                     if (SequenceAt) {
                         if (!SequenceAt->GetState()) {
-                            v26->ActivateSequence(SequenceAt, 0, 0, 1.0f, 0.0f, 0);
+                            v26->ActivateSequence(SequenceAt, 0, false, 1.0f, 0.0f, nullptr);
                         }
                         SequenceAt->SetOffset(-3.4028235e+38f);
                         float a4 = SequenceAt->GetBeginKeyTime();
-                        NiUpdateData a2(a4, 1, 0);
+                        NiUpdateData a2(a4, true, false);
                         v29->Update(a2);
                     }
                     if (v18) {
                         if (!v18->GetState()) {
-                            v26->ActivateSequence(v18, 0, 0, 1.0f, 0.0f, 0);
+                            v26->ActivateSequence(v18, 0, false, 1.0f, 0.0f, nullptr);
                         }
                         v18->SetOffset(-3.4028235e+38f);
                         float a4a = v18->GetBeginKeyTime();
-                        NiUpdateData arData(a4a, 1, 0);
+                        NiUpdateData arData(a4a, true, false);
                         v29->Update(arData);
                     }
                 }
                 else {
-                    v26->SetActive(1);
+                    v26->SetActive(true);
                     SequenceAt = static_cast<BSAnimGroupSequence*>(v26->GetSequenceAt(0));
                     if (SequenceAt) {
-                        v26->ActivateSequence(SequenceAt, 0, 0, 1.0f, 0.0f, 0);
+                        v26->ActivateSequence(SequenceAt, 0, false, 1.0f, 0.0f, nullptr);
                         SequenceAt->SetOffset(-3.4028235e+38f);
                         float a4b = SequenceAt->GetBeginKeyTime();
-                        NiUpdateData apMemory(a4b, 1, 0);
+                        NiUpdateData apMemory(a4b, true, false);
                         v29->Update(apMemory);
                     }
                     v26->DeactivateAll(0.0f);
-                    v26->SetActive(0);
+                    v26->SetActive(false);
                 }
             }
         }
@@ -10163,7 +10165,7 @@ void TESObjectREFR::ResetAnimation_Old() {
         v7 = v29->GetControllers();
     }
     else {
-        v7 = 0;
+        v7 = nullptr;
     }
     NiObject* v27 = v7;
     v26 = static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, v7));
@@ -10224,7 +10226,7 @@ void TESObjectREFR::ClearInterpolators() {
     NiNode* sceneRoot;
     Animation* pAnimation = GetAnimation();
     if (pAnimation) {
-        pAnimation->SpecialIdleFree(1, 0);
+        pAnimation->SpecialIdleFree(true, false);
         pAnimation->ClearGroup(AGS_WHOLE_BODY, 0.0);
         controllerManager = pAnimation->GetControllerManager();
         controllerManager->DeactivateAll(0.0);
@@ -10276,11 +10278,11 @@ float TESObjectREFR::GetWeightInContainer(bool abIsHardcore) {
         return inventoryWeight;
     }
     if (static_cast<const void*>(this) == static_cast<const void*>(pPlayer)) {
-        return (float)(pPlayer->GetRockItLauncherWeight() + inventoryWeight);
+        return (pPlayer->GetRockItLauncherWeight() + inventoryWeight);
     }
     else {
         if (inventoryWeight > static_cast<Actor*>(this)->GetMaxCarryWeight()) {
-            return (float)static_cast<Actor*>(this)->GetMaxCarryWeight();
+            return static_cast<Actor*>(this)->GetMaxCarryWeight();
         }
     }
     return inventoryWeight;
@@ -10302,23 +10304,23 @@ bool TESObjectREFR::HasSaidTopicInfo(TESTopicInfo* apTopicInfo) {
         for (ecx0 = extraSayTopicInfoOnceADayExtra->pListofSaidOnceTopicInfos; ecx0 && ecx0->m_item;
              ecx0 = ecx0->m_pkNext) {
             if (ecx0->m_item->pInfo == apTopicInfo) {
-                return (bool)1;
+                return true;
             }
         }
     }
-    return (bool)0;
+    return false;
 }
 
 bool TESObjectREFR::SetSequencePosition(NiControllerManager* apManager, const char* apSequence, float afPosition) {
     BSAnimGroupSequence* pseq;
     NiAVObject* pobj3D = TESObjectREFR::Get3D();
     if (!apManager || !pobj3D) {
-        return 0;
+        return false;
     }
     uint32_t isequenceCount = apManager->GetSequenceCount();
     for (uint32_t n = 0;; ++n) {
         if (n >= isequenceCount) {
-            return 0;
+            return false;
         }
         pseq = static_cast<BSAnimGroupSequence*>(apManager->GetSequenceAt(n));
         if (pseq) {
@@ -10329,9 +10331,9 @@ bool TESObjectREFR::SetSequencePosition(NiControllerManager* apManager, const ch
         }
     }
     apManager->DeactivateAll(0.0f);
-    apManager->SetActive(1);
+    apManager->SetActive(true);
     if (!pseq->GetState()) {
-        apManager->ActivateSequence(pseq, 0, 0, 1.0f, 0.0f, 0);
+        apManager->ActivateSequence(pseq, 0, false, 1.0f, 0.0f, nullptr);
     }
     float fkeyTime = afPosition;
     float foffset = afPosition;
@@ -10347,13 +10349,13 @@ bool TESObjectREFR::SetSequencePosition(NiControllerManager* apManager, const ch
         float foffset_2 = -3.4028235e+38f;
         pseq->SetOffset(foffset_2);
     }
-    bhkNiCollisionObject::ResetSim(pobj3D, 1);
-    NiUpdateData UpdateData(fkeyTime, 1, 0);
+    bhkNiCollisionObject::ResetSim(pobj3D, true);
+    NiUpdateData UpdateData(fkeyTime, true, false);
     pobj3D->Update(UpdateData);
     EndSequence(pseq);
     apManager->DeactivateSequence(pseq, 0.0f);
-    apManager->SetActive(0);
-    return 1;
+    apManager->SetActive(false);
+    return true;
 }
 
 void TESObjectREFR::SetSeed(uint32_t a1) {
@@ -10385,7 +10387,7 @@ void TESObjectREFR::LoadHavokDataPreVersion81(uint16_t aiSaveSize) {
     }
     NiAVObject* pobj3D = TESObjectREFR::Get3D();
     if (pobj3D) {
-        Actor* pactor = 0;
+        Actor* pactor = nullptr;
         if (IsActor()) {
             pactor = static_cast<Actor*>(this);
         }
@@ -10416,7 +10418,7 @@ void TESObjectREFR::LoadHavokDataPreVersion81(uint16_t aiSaveSize) {
                 pSaveLoadGameOLD->AdvanceBuffer(aiSaveSize - 2);
                 if (pactor) {
                     if (pactor->pRagdollController) {
-                        pactor->pRagdollController->DisableRagdollAnim(1);
+                        pactor->pRagdollController->DisableRagdollAnim(true);
                     }
                     bhkBlendController::DoKnockDown(pobj3D, NiPoint3_ZERO, 1, 0.0f, 0);
                 }
@@ -10425,7 +10427,7 @@ void TESObjectREFR::LoadHavokDataPreVersion81(uint16_t aiSaveSize) {
         }
         bhkWorldNS::ObjectRecData recData;
         recData.eAction = bhkWorldNS::OA_TOTAL;
-        recData.bRecurse = 1;
+        recData.bRecurse = true;
         recData.uDataA[0].p = bhkNiCollisionObject::GetbhkNiCollisionObject(pobj3D);
         recData.uDataA[1].p = this;
         recData.uDataA[2].i = cflags;
@@ -10434,7 +10436,7 @@ void TESObjectREFR::LoadHavokDataPreVersion81(uint16_t aiSaveSize) {
         if (pactor) {
             if (pactor->IsParalyzed()) {
                 bhkRigidBody::SetFixed(pobj3D, 1, 1);
-                bhkWorld::SetMotion(pobj3D, hkpMotion::MOTION_DYNAMIC, 1, 0, 1);
+                bhkWorld::SetMotion(pobj3D, hkpMotion::MOTION_DYNAMIC, true, false, true);
                 Animation* panim = pactor->GetAnimation();
                 if (panim) {
                     panim->ClearGroup(AGS_WHOLE_BODY, 0.0f);
@@ -10442,7 +10444,7 @@ void TESObjectREFR::LoadHavokDataPreVersion81(uint16_t aiSaveSize) {
                 }
             }
         }
-        NiUpdateData kUpdateData(0.0f, 0, 0);
+        NiUpdateData kUpdateData(0.0f, false, false);
         pobj3D->Update(kUpdateData);
     }
     else {
@@ -10459,8 +10461,8 @@ void TESObjectREFR::ResetAnimation() {
     FNVD_INLINED_LOCAL(NiFixedString, v16, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiAVObject* pobj3D = TESObjectREFR::Get3D();
-    NiControllerManager* pmanager = 0;
-    bool v33 = 0;
+    NiControllerManager* pmanager = nullptr;
+    bool v33 = false;
     if (pobj3D) {
         const char* plastFinishedSequence = (&m_Extra)->GetLastFinishedSequence();
         if (plastFinishedSequence) {
@@ -10477,7 +10479,7 @@ void TESObjectREFR::ResetAnimation() {
                     apString.~NiFixedString();
                     if (punequipSeq) {
                         if (punequipSeq->GetState()) {
-                            v33 = 1;
+                            v33 = true;
                         }
                     }
                 }
@@ -10488,11 +10490,11 @@ void TESObjectREFR::ResetAnimation() {
         }
         if (v33) {
             NiAVObject* pnew3D = data.pObjectReference->Clone3D(this);
-            Set3D(pnew3D, 1);
+            Set3D(pnew3D, true);
             InitHavok();
             if (pParentCell) {
-                if (TES::pInstance->IsCellLoaded(pParentCell, 0)) {
-                    pParentCell->AttachReference3D(this, 0);
+                if (TES::pInstance->IsCellLoaded(pParentCell, false)) {
+                    pParentCell->AttachReference3D(this, false);
                 }
             }
         }
@@ -10517,17 +10519,17 @@ void TESObjectREFR::ResetAnimation() {
                     }
                 }
                 pmanager->DeactivateAll(0.0f);
-                pmanager->SetActive(1);
+                pmanager->SetActive(true);
                 NiControllerSequence* pfirstSeq = pmanager->GetSequenceAt(0);
                 if (pfirstSeq) {
-                    pmanager->ActivateSequence(pfirstSeq, 0, 0, 1.0f, 0.0f, 0);
+                    pmanager->ActivateSequence(pfirstSeq, 0, false, 1.0f, 0.0f, nullptr);
                     pfirstSeq->SetOffset(-3.4028235e+38f);
                     float a4 = pfirstSeq->GetBeginKeyTime();
-                    NiUpdateData UpdateData(a4, 1, 0);
+                    NiUpdateData UpdateData(a4, true, false);
                     pobj3D->Update(UpdateData);
                 }
                 pmanager->DeactivateAll(0.0f);
-                pmanager->SetActive(0);
+                pmanager->SetActive(false);
                 NiFixedString* v12 = ::new (static_cast<void*>(&v16)) NiFixedString(animGroupInfo[0].pName);
                 NiControllerSequence* pdefaultSeq1 = pmanager->GetSequenceByName(*v12);
                 v16.~NiFixedString();
@@ -10535,23 +10537,23 @@ void TESObjectREFR::ResetAnimation() {
                 NiControllerSequence* pdefaultSeq2 = pmanager->GetSequenceByName(*v11);
                 v15.~NiFixedString();
                 if (pdefaultSeq1 || pdefaultSeq2) {
-                    pmanager->SetActive(1);
+                    pmanager->SetActive(true);
                     if (pdefaultSeq1) {
                         if (!pdefaultSeq1->GetState()) {
-                            pmanager->ActivateSequence(pdefaultSeq1, 0, 0, 1.0f, 0.0f, 0);
+                            pmanager->ActivateSequence(pdefaultSeq1, 0, false, 1.0f, 0.0f, nullptr);
                         }
                         pdefaultSeq1->SetOffset(-3.4028235e+38f);
                         float a4a = pdefaultSeq1->GetBeginKeyTime();
-                        NiUpdateData UpdateData_2(a4a, 1, 0);
+                        NiUpdateData UpdateData_2(a4a, true, false);
                         pobj3D->Update(UpdateData_2);
                     }
                     if (pdefaultSeq2) {
                         if (!pdefaultSeq2->GetState()) {
-                            pmanager->ActivateSequence(pdefaultSeq2, 0, 0, 1.0f, 0.0f, 0);
+                            pmanager->ActivateSequence(pdefaultSeq2, 0, false, 1.0f, 0.0f, nullptr);
                         }
                         pdefaultSeq2->SetOffset(-3.4028235e+38f);
                         float a4b = pdefaultSeq2->GetBeginKeyTime();
-                        NiUpdateData UpdateData_3(a4b, 1, 0);
+                        NiUpdateData UpdateData_3(a4b, true, false);
                         pobj3D->Update(UpdateData_3);
                     }
                 }
@@ -10562,7 +10564,7 @@ void TESObjectREFR::ResetAnimation() {
         po_3 = pobj3D->GetControllers();
     }
     else {
-        po_3 = 0;
+        po_3 = nullptr;
     }
     NiObject* v32 = po_3;
     pmanager = static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, po_3));
@@ -10587,7 +10589,7 @@ void TESObjectREFR::SetIsImposter(bool abIsImposter) {
             v2 = ::new (apMemory) ExtraSpecialRenderFlags;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         pOEIExtra = static_cast<ExtraSpecialRenderFlags*>((&m_Extra)->AddExtra(v2));
     }
@@ -10612,7 +10614,7 @@ const NiPoint3& TESObjectREFR::GetLinkedDoorTeleportRotation() {
     TESObjectREFR* v2;
     DoorTeleportData* v4;
     DoorTeleportData* Teleport = GetTeleport();
-    if (Teleport && ((v2 = Teleport->GetLinkedDoor()) != 0 && (v4 = v2->GetTeleport()) != 0)) {
+    if (Teleport && ((v2 = Teleport->GetLinkedDoor()) != nullptr && (v4 = v2->GetTeleport()) != nullptr)) {
         return *&v4->rotation;
     }
     else {
@@ -10629,7 +10631,7 @@ LockData* TESObjectREFR::AddLock() {
             v3 = ::new (apMemory) LockData;
         }
         else {
-            v3 = 0;
+            v3 = nullptr;
         }
         apLock = v3;
         ExtraDataList* Extra = GetExtra();
@@ -10655,13 +10657,13 @@ uint32_t TESObjectREFR::GetSeed() {
 }
 
 void TESObjectREFR::InitChildActivates(TESObjectREFR* apActionRef) {
-    bool bactive = 0;
+    bool bactive = false;
     for (BSSimpleList<REF_ACTIVATE_DATA*>* plist = (&m_Extra)->GetActivateRefChildren(); plist && !plist->IsEmpty();
          plist = plist->m_pkNext) {
         REF_ACTIVATE_DATA* pdata = plist->m_item;
         pdata->fActivateDelay = (&pdata->pActivateRef->m_Extra)->GetActivateDelay(this);
         if (!(pdata->fActivateDelay <= 0.0)) {
-            bactive = 1;
+            bactive = true;
         }
         else {
             TESObjectACTI* v3;
@@ -10674,7 +10676,7 @@ void TESObjectREFR::InitChildActivates(TESObjectREFR* apActionRef) {
             else {
                 a2 = static_cast<MobileObject*>(this);
             }
-            pdata->pActivateRef->Activate(a2, 0, 0, 1);
+            pdata->pActivateRef->Activate(a2, false, nullptr, 1);
         }
     }
     if (bactive) {
@@ -10707,7 +10709,7 @@ void TESObjectREFR::SetSpellEffectLight(NiPointLight* pLight) {
         light = ::new (v4) LightRefData;
     }
     else {
-        light = 0;
+        light = nullptr;
     }
     light->spLight.operator=(static_cast<NiLight*>(pLight));
     light->fWantDimmer = 1.0f;
@@ -10746,7 +10748,7 @@ CAUSE_OF_DEATH TESObjectREFR::GetCauseOfDeath() {
 }
 
 ItemChange* TESObjectREFR::GetInventoryItem_005754A0(int32_t aiIndex, bool abBarter) {
-    ItemChange* v6 = 0;
+    ItemChange* v6 = nullptr;
     if (HasContainer()) {
         InventoryChanges* pContainer;
         if (abBarter) {
@@ -10764,8 +10766,8 @@ ItemChange* TESObjectREFR::GetInventoryItem_005754A0(int32_t aiIndex, bool abBar
 void* TESObjectREFR::GetInventoryIterator(char a1, InventoryChanges::IterData** a2, InventoryChanges** a3) {
     TESContainer* v6 = HasContainer();
     void* result = a3;
-    *a3 = 0;
-    *a2 = 0;
+    *a3 = nullptr;
+    *a2 = nullptr;
     if (v6) {
         if (a1) {
             *a3 = pDataHandler->GetBarterContainer();
@@ -10807,7 +10809,7 @@ void TESObjectREFR::ShowPrimitive(bool abShow) {
 }
 
 MobileObject* TESObjectREFR::GetMobileObjectExtra() {
-    MobileObject* v5 = 0;
+    MobileObject* v5 = nullptr;
     ExtraDataList* Extra = GetExtra();
     if (Extra->GetTalkingActorExtra()) {
         ExtraDataList* v2 = GetExtra();
@@ -10858,17 +10860,17 @@ void TESObjectREFR::SayForceGoodbyeGreetingToPlayer(
     }
     if (pactor) {
         if (pactor->pCurrentProcess) {
-            if (!pactor->IsDead(0)) {
-                DialogueItem* pVoice = apGreetTopic->CreateDialogueItem(pactor, pPlayer, 0, 0, 1);
-                pactor->bSoundFileDone = 1;
+            if (!pactor->IsDead(false)) {
+                DialogueItem* pVoice = apGreetTopic->CreateDialogueItem(pactor, pPlayer, nullptr, nullptr, true);
+                pactor->bSoundFileDone = true;
                 pactor->SetDialogueItemTarget(pPlayer);
                 if (pactor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
                     if (pactor->pCurrentProcess->GetGreetingFlag()) {
-                        pactor->EndInterruptPackage(0);
-                        pactor->pCurrentProcess->CreateFollownoEscort(pactor, 1);
+                        pactor->EndInterruptPackage(false);
+                        pactor->pCurrentProcess->CreateFollownoEscort(pactor, true);
                     }
                 }
-                pactor->pCurrentProcess->ProcessGreet(pactor, apGreetTopic, abForceSubtitle, 1, 1, 0);
+                pactor->pCurrentProcess->ProcessGreet(pactor, apGreetTopic, abForceSubtitle, true, true, false);
                 if (pVoice) {
                     pVoice->FirstResponse();
                     pVoice->GetCurrentResponse();
@@ -10908,7 +10910,7 @@ void TESObjectREFR::SayForceGoodbyeGreetingToPlayer(
             }
             else {
                 SetSayToTopic(apGreetTopic);
-                DialogueItem* pVoice_2 = apGreetTopic->CreateDialogueItem(this, 0, 0, 0, 0);
+                DialogueItem* pVoice_2 = apGreetTopic->CreateDialogueItem(this, nullptr, nullptr, nullptr, false);
                 if (pVoice_2) {
                     SetSayToTopicInfo(pVoice_2->pInfo);
                 }
@@ -10919,7 +10921,7 @@ void TESObjectREFR::SayForceGoodbyeGreetingToPlayer(
             }
         }
     }
-    SetHasSpokenFlag(1);
+    SetHasSpokenFlag(true);
     iSpeakSoundLipDistance.operator=(ioldLipDistance);
     ReferenceProcessLists.SortActorsCloseToPlayer();
 }
@@ -10933,7 +10935,7 @@ void TESObjectREFR::SetHealth(float afVal) {
         ExtraHealth* pExtraHealth = static_cast<ExtraHealth*>((&m_Extra)->GetExtraData(EXTRA_HEALTH));
         if (pExtraHealth) {
             if (afVal == static_cast<double>(pHealthForm->GetFormHealth())) {
-                (&m_Extra)->RemoveExtra(pExtraHealth, 1);
+                (&m_Extra)->RemoveExtra(pExtraHealth, true);
             }
             else {
                 pExtraHealth->fHealth = afVal;
@@ -10958,11 +10960,11 @@ bool TESObjectREFR::QVerticesInsideMultiboundRecurse(
     }
     NiGeometry* pgeom = static_cast<NiGeometry*>(NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, apObject));
     if (pgeom) {
-        abFoundGeom = 1;
+        abFoundGeom = true;
         NiGeometryData* pdata = pgeom->GetModelData();
         NiTConvertingStrideIterator<NiPoint3> kGeomDataBlock;
-        if (!pdata->LockPackedVertexData(1)) {
-            return 0;
+        if (!pdata->LockPackedVertexData(true)) {
+            return false;
         }
         int16_t v12 = 0;
         pdata->GetVerticesIterator(*static_cast<NiGeometryDataIteratorNiPoint3*>(&kGeomDataBlock));
@@ -10980,13 +10982,13 @@ bool TESObjectREFR::QVerticesInsideMultiboundRecurse(
             else {
                 if (abAllVertices) {
                     pdata->UnlockPackedVertexData();
-                    return 0;
+                    return false;
                 }
             }
         }
         pdata->UnlockPackedVertexData();
         if (!abAllVertices) {
-            return 0;
+            return false;
         }
     }
     NiNode* pnode = static_cast<NiNode*>(NiObject::DynamicCastStatic(&NiNode::ms_RTTI, apObject));
@@ -10998,7 +11000,7 @@ bool TESObjectREFR::QVerticesInsideMultiboundRecurse(
             }
             NiAVObject* v7 = pnode->GetAt(static_cast<uint32_t>(i));
             if (!TESObjectREFR::QVerticesInsideMultiboundRecurse(v7, apMulti, abFoundGeom, abAllVertices)) {
-                return 0;
+                return false;
             }
         }
     }
@@ -11029,7 +11031,7 @@ void TESObjectREFR::RandomizeAddons(NiAVObject* apObj, float afPhase) {
         }
         pNode = apObj->IsNode();
         if (pNode) {
-            for (p = 0; p < ((uint32_t)pNode->GetArrayCount()); ++p) {
+            for (p = 0; p < pNode->GetArrayCount(); ++p) {
                 pChild = pNode->GetAt(p);
                 TESObjectREFR::RandomizeAddons(pChild, afPhase);
             }
@@ -11261,7 +11263,7 @@ bool TESObjectREFR::RemoveSounds(NiNode* apNode) {
         bResult = true;
     }
     // The index compare is unsigned.
-    for (uint32_t i = 0; i < static_cast<uint32_t>(apNode->GetArrayCount()); ++i) {
+    for (uint32_t i = 0; i < apNode->GetArrayCount(); ++i) {
         NiAVObject* pChild = apNode->GetAt(i);
         if (pChild) {
             NiNode* pChildNode = pChild->IsNode();
@@ -11293,7 +11295,7 @@ bool TESObjectREFR::RemoveAddonNodes(NiNode* apNode) {
             }
         }
     }
-    for (uint32_t i = 0; i < static_cast<uint32_t>(apNode->GetArrayCount()); ++i) {
+    for (uint32_t i = 0; i < apNode->GetArrayCount(); ++i) {
         NiAVObject* pChild = apNode->GetAt(i);
         if (pChild) {
             NiNode* pChildNode = pChild->IsNode();
@@ -11610,7 +11612,7 @@ bool TESObjectREFR::AddMasterParticleAddonNodes(NiNode* apNode) {
     if (apNode->GetAppCulled()) {
         return bAdded;
     }
-    for (uint32_t i = 0; i < static_cast<uint32_t>(apNode->GetArrayCount()); ++i) {
+    for (uint32_t i = 0; i < apNode->GetArrayCount(); ++i) {
         NiAVObject* pChild = apNode->GetAt(i);
         if (pChild) {
             NiNode* pChildNode = pChild->IsNode();
@@ -11629,7 +11631,7 @@ bool TESObjectREFR::RemoveMasterParticleAddonNodes(NiNode* apNode) {
     uint32_t a1;
     BGSAddonNode* pAddonNode;
     if (!apNode) {
-        return (bool)0;
+        return false;
     }
     uint8_t v7 = 0;
     if (NiObject::IsKindOf_0(&BSValueNode::ms_RTTI, apNode)) {
@@ -11637,12 +11639,12 @@ bool TESObjectREFR::RemoveMasterParticleAddonNodes(NiNode* apNode) {
         pAddonNode = pDataHandler->GetAddonNode(aiIndex);
         if (pAddonNode) {
             if (pAddonNode->IsMasterParticleSystem()) {
-                apNode->SetAppCulled(1);
+                apNode->SetAppCulled(true);
                 v7 = 1;
             }
         }
     }
-    for (a1 = 0; a1 < ((uint32_t)apNode->GetArrayCount()); ++a1) {
+    for (a1 = 0; a1 < apNode->GetArrayCount(); ++a1) {
         v4 = apNode->GetAt(a1);
         if (v4) {
             v3 = v4->IsNode();
@@ -11915,11 +11917,11 @@ bool TESObjectREFR::AddAddonNodes(NiNode* apNode) {
     uint32_t a1;
     BGSAddonNode* addonNode;
     if (!apNode) {
-        return (bool)0;
+        return false;
     }
     uint8_t bHasAddonNodes = 0;
     if (NiObject::IsKindOf_0(&BSValueNode::ms_RTTI, apNode)) {
-        for (a1 = 0; a1 < ((uint32_t)apNode->GetArrayCount()); ++a1) {
+        for (a1 = 0; a1 < apNode->GetArrayCount(); ++a1) {
             pChild = apNode->GetAt(a1);
             if (pChild) {
                 pChildNode = pChild->IsNode();
@@ -11948,14 +11950,14 @@ bool TESObjectREFR::AddAddonNodes(NiNode* apNode) {
                         }
                         v10 = (float)(((double)(Random() % 1000)) / 100.0);
                         TESObjectREFR::RandomizeAddons(v11, v10);
-                        apNode->AttachChild(v11, (bool)1);
+                        apNode->AttachChild(v11, true);
                         bHasAddonNodes = 1;
                     }
                 }
             }
         }
     }
-    for (auiIndex = 0; auiIndex < ((uint32_t)apNode->GetArrayCount()); ++auiIndex) {
+    for (auiIndex = 0; auiIndex < apNode->GetArrayCount(); ++auiIndex) {
         v7 = apNode->GetAt(auiIndex);
         if (v7) {
             v6 = v7->IsNode();
@@ -11965,8 +11967,8 @@ bool TESObjectREFR::AddAddonNodes(NiNode* apNode) {
         }
     }
     if (bHasAddonNodes) {
-        apNode->SetSelectiveUpdate(1);
-        apNode->SetSelectiveUpdateRigid(0);
+        apNode->SetSelectiveUpdate(true);
+        apNode->SetSelectiveUpdateRigid(false);
     }
     return (bool)bHasAddonNodes;
 }
@@ -11980,23 +11982,23 @@ bool TESObjectREFR::HasAddonNodes(NiNode* apNode) {
     NiAVObject* v3;
     uint32_t a1;
     if (!apNode) {
-        return (bool)0;
+        return false;
     }
     if (NiObject::IsKindOf_0(&BSValueNode::ms_RTTI, apNode) && apNode->GetChildCount()) {
-        return (bool)1;
+        return true;
     }
-    for (a1 = 0; a1 < ((uint32_t)apNode->GetArrayCount()); ++a1) {
+    for (a1 = 0; a1 < apNode->GetArrayCount(); ++a1) {
         v3 = apNode->GetAt(a1);
         if (v3) {
             v2 = v3->IsNode();
             if (v2) {
                 if (TESObjectREFR::HasAddonNodes(v2)) {
-                    return (bool)1;
+                    return true;
                 }
             }
         }
     }
-    return (bool)0;
+    return false;
 }
 
 void TESObjectREFR::SetTerminalUnlocked(TESObjectREFR* a1, char a2) {
@@ -12032,15 +12034,15 @@ bool TESObjectREFR::IsHacked(TESObjectREFR* a1) {
 bool TESObjectREFR::IsLockedOut(TESObjectREFR* a1) {
     int32_t args;
     if (!a1) {
-        return 0;
+        return false;
     }
     ExtraDataList* Extra = a1->GetExtra();
     uint8_t TerminalState = Extra->GetTerminalState();
     if ((TerminalState & 127) == 0) {
-        return 0;
+        return false;
     }
     if ((TerminalState & 127) != 1) {
-        return 1;
+        return true;
     }
     *reinterpret_cast<float*>(&args) = 0.0;
     BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::IGNORE_LOCKED_TERMINAL, pPlayer, &args);
@@ -12056,22 +12058,22 @@ void TESObjectREFR::LoadControllerManagerBGS(NiControllerManager* a1, BGSLoadGam
     if (a1) {
         a1->DeactivateAll(0.0f);
         if (icount) {
-            a1->SetActive(1);
+            a1->SetActive(true);
         }
     }
-    bool banyFound = 0;
+    bool banyFound = false;
     TESObjectREFR* pref = a2->GetReference();
     if (pref) {
         pobj3D = pref->TESObjectREFR::Get3D();
     }
     else {
-        pobj3D = 0;
+        pobj3D = nullptr;
     }
     for (uint32_t i = 0; i < icount; ++i) {
         char apString2[268];
         a2->LoadString(apString2);
-        BSAnimGroupSequence* pseq = 0;
-        bool bfound = 0;
+        BSAnimGroupSequence* pseq = nullptr;
+        bool bfound = false;
         if (a1) {
             uint32_t isequenceCount = a1->GetSequenceCount();
             for (uint32_t n = 0; n < isequenceCount; ++n) {
@@ -12080,7 +12082,7 @@ void TESObjectREFR::LoadControllerManagerBGS(NiControllerManager* a1, BGSLoadGam
                     const char* HandleString = (&pseq->m_kName)->GetHandleString();
                     if (!BSstrcmp(HandleString, apString2)) {
                         if (!pseq->GetState()) {
-                            a1->ActivateSequence(pseq, 0, 0, 1.0f, 0.0f, 0);
+                            a1->ActivateSequence(pseq, 0, false, 1.0f, 0.0f, nullptr);
                         }
                         pseq->LoadGame(a2, a3);
                         if (pobj3D) {
@@ -12096,13 +12098,13 @@ void TESObjectREFR::LoadControllerManagerBGS(NiControllerManager* a1, BGSLoadGam
                                 }
                                 for (float fStepTime = fstartTime; a3 > static_cast<double>(fStepTime);
                                      fStepTime = fStepTime + fframeTime) {
-                                    NiUpdateData UpdateData(fStepTime, 0, 0);
+                                    NiUpdateData UpdateData(fStepTime, false, false);
                                     pobj3D->UpdateSelected(UpdateData);
                                 }
                             }
                         }
-                        bfound = 1;
-                        banyFound = 1;
+                        bfound = true;
+                        banyFound = true;
                         break;
                     }
                 }
@@ -12115,8 +12117,8 @@ void TESObjectREFR::LoadControllerManagerBGS(NiControllerManager* a1, BGSLoadGam
     }
     if (banyFound) {
         if (pobj3D) {
-            bhkNiCollisionObject::ResetSim(pobj3D, 1);
-            NiUpdateData UpdateData_2(a3, 1, 0);
+            bhkNiCollisionObject::ResetSim(pobj3D, true);
+            NiUpdateData UpdateData_2(a3, true, false);
             pobj3D->Update(UpdateData_2);
         }
     }
@@ -12137,7 +12139,7 @@ void TESObjectREFR::LoadHavokDataForCollisionObject(
     bool v12;
     HavokSaveData* phavokSaveData = static_cast<HavokSaveData*>(arData.uDataA[0u].p);
     NiObject* pkObject = apCollision->GetWorldObject();
-    apCollision->SetReset(0);
+    apCollision->SetReset(false);
     NiObjectNET* SceneGraphObject = apCollision->m_pkSceneObject;
     if (apCollision == phavokSaveData->pCollisionRoot ||
         (!SceneGraphObject ||
@@ -12149,9 +12151,9 @@ void TESObjectREFR::LoadHavokDataForCollisionObject(
                     static_cast<bhkRigidBody*>(NiObject::DynamicCastStatic(&bhkRigidBody::ms_RTTI, pkObject));
                 if (prigidBody) {
                     const hkpWorld* v3 = prigidBody->GethkWorld();
-                    bool v11 = v3 != 0;
+                    bool v11 = v3 != nullptr;
                     if (v3) {
-                        prigidBody->SetActive(0);
+                        prigidBody->SetActive(false);
                     }
                     if ((phavokSaveData->cFlags & 2) != 0) {
                         NiQuaternion ecx0_12;
@@ -12166,7 +12168,7 @@ void TESObjectREFR::LoadHavokDataForCollisionObject(
                         prigidBody->SetPosition(rotation);
                         prigidBody->SetRotation(rotation_2);
                     }
-                    v12 = 0;
+                    v12 = false;
                     if ((phavokSaveData->cFlags & 4) != 0) {
                         pSaveLoadGameOLD->LoadGameDataOLD(&v12, 1u);
                     }
@@ -12178,13 +12180,13 @@ void TESObjectREFR::LoadHavokDataForCollisionObject(
                         pSaveLoadGameOLD->LoadGameDataOLD(&kAngularVelocity, 12u);
                         prigidBody->SetLinearVelocity(kLinearVelocity);
                         prigidBody->SetAngularVelocity(kAngularVelocity);
-                        prigidBody->SetActive(1);
+                        prigidBody->SetActive(true);
                     }
                     else {
                         prigidBody->SetLinearVelocity(NiPoint3_ZERO);
                         prigidBody->SetAngularVelocity(NiPoint3_ZERO);
                         if (v11) {
-                            prigidBody->SetActive(0);
+                            prigidBody->SetActive(false);
                         }
                     }
                 }
@@ -12244,7 +12246,7 @@ char TESObjectREFR::RemoveRefFromMultiboundTestMap(TESObjectREFR* apRef) {
 NiPoint3* TESObjectREFR::GetBoundMax_0056FC30(NiPoint3* apResult, NiAVObject* apObj) {
     const NiFixedString* v2;
     BSBound* ExtraData;
-    if (apObj && (v2 = &BSBound::Tag(), (ExtraData = static_cast<BSBound*>(apObj->GetExtraData(*v2))) != 0)) {
+    if (apObj && (v2 = &BSBound::Tag(), (ExtraData = static_cast<BSBound*>(apObj->GetExtraData(*v2))) != nullptr)) {
         ExtraData->GetBoundMax(TESObjectREFR_boundMax);
         *apResult = TESObjectREFR_boundMax;
         return apResult;
@@ -12264,8 +12266,8 @@ void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint3
         if ((aiChanged & 1) != 0) {
             TESObjectCELL* prefcell = pref->GetParentCell();
             if (prefcell) {
-                bool bbadpos = 0;
-                bool bbadStartPos = 0;
+                bool bbadpos = false;
+                bool bbadStartPos = false;
                 NiPoint3 newloc = pav->GetWorldTranslate();
                 if (std::isfinite(newloc.x) &&
                     (std::isfinite(newloc.y) &&
@@ -12280,11 +12282,11 @@ void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint3
                                 NiPoint3* v4 = &kBound.m_kCenter;
                                 double fHeightDiff = v4->z - (&pav->GetWorldTranslate())->z;
                                 if (kBound.m_fRadius < fHeightDiff) {
-                                    bbadpos = 1;
+                                    bbadpos = true;
                                     NiPoint3* v5 = &kBound.m_kCenter;
                                     double fStartingPosDiff = v5->z - pref->GetStartingLocation().z;
                                     if (kBound.m_fRadius < fStartingPosDiff) {
-                                        bbadStartPos = 1;
+                                        bbadStartPos = true;
                                     }
                                 }
                             }
@@ -12296,16 +12298,16 @@ void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint3
                             float fminHeight = Land->GetMinMaxLandHeight().x - 128.0;
                             double z = (&pav->GetWorldTranslate())->z;
                             if (z < fminHeight) {
-                                bbadpos = 1;
+                                bbadpos = true;
                                 if (pref->GetStartingLocation().z < static_cast<double>(fminHeight)) {
-                                    bbadStartPos = 1;
+                                    bbadStartPos = true;
                                 }
                             }
                         }
                     }
                 }
                 else {
-                    bbadpos = 1;
+                    bbadpos = true;
                 }
                 if (bbadpos) {
                     if (bbadStartPos) {
@@ -12319,15 +12321,15 @@ void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint3
                         pav_2->SetTranslate(pref->GetStartingLocation());
                         pav_2->SetRotate(NiMatrix3_IDENTITY);
                     }
-                    bhkNiCollisionObject::ResetSim(pav_2, 1);
-                    NiUpdateData UpdateData(0.0f, 1, 0);
+                    bhkNiCollisionObject::ResetSim(pav_2, true);
+                    NiUpdateData UpdateData(0.0f, true, false);
                     pav_2->Update(UpdateData);
                     bhkRigidBody* pbody = static_cast<bhkRigidBody*>(apCollision->GetWorldObject());
                     if (pbody) {
                         float fmaxVel = pbody->GethkMaxLinearVelocity() * 0.25;
                         if (!(fmaxVel > 5.0)) {
-                            apCollision->SetMotionType(hkpMotion::MOTION_KEYFRAMED, 0, 0);
-                            apCollision->SetNotify(0);
+                            apCollision->SetMotionType(hkpMotion::MOTION_KEYFRAMED, nullptr, false);
+                            apCollision->SetNotify(false);
                             int32_t CastingType = pref->iFormID;
                             Warning(
                                 "HAVOK: Disabling collision on ref '%s' (%08X).", pref->GetFormEditorID(), CastingType
@@ -12340,7 +12342,7 @@ void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint3
                 }
             }
             NiPoint3 oldloc = pref->GetLocationOnReference();
-            bool bresetAllow = pSaveLoadGame->SetThreadAllowChanges(0);
+            bool bresetAllow = pSaveLoadGame->SetThreadAllowChanges(false);
             const NiPoint3* WorldTranslate = &pav->GetWorldTranslate();
             pref->SetLocationOnReference(*WorldTranslate);
             pSaveLoadGame->SetThreadAllowChanges(bresetAllow);
@@ -12349,30 +12351,30 @@ void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint3
                 if (pref->GetObjectReference()->GetFormType() == LIGH_ID && !pref->GetFireOff()) {
                     const NiPoint3* v10 = &pref->GetLocationOnReference();
                     if (static_cast<double>(v10->z) < pref->GetRelevantWaterHeight()) {
-                        pref->SetFireOff(1);
+                        pref->SetFireOff(true);
                         NiNode* v11 = pref->Get3D();
                         TESObjectREFR::RemoveAddonNodes(v11);
-                        pref->RemoveLight(0);
+                        pref->RemoveLight(false);
                     }
                 }
             }
             if (!TES::pInstance->pInteriorCell) {
                 TESWorldSpace* pworld = TES::pInstance->pWorldSpace;
-                Actor* pac = 0;
+                Actor* pac = nullptr;
                 if (pref) {
                     if (pref->IsActor()) {
                         pac = static_cast<Actor*>(pref);
                     }
                 }
                 if (pac) {
-                    pac->SetForceUpdateQuest(0);
+                    pac->SetForceUpdateQuest(false);
                 }
                 float afTime = (&pref->GetLocationOnReference())->y;
                 const NiPoint3* v12 = &pref->GetLocationOnReference();
-                TESObjectCELL* pnewcell = pDataHandler->GetCellFromWorldCoord(v12->x, afTime, pworld, 0);
+                TESObjectCELL* pnewcell = pDataHandler->GetCellFromWorldCoord(v12->x, afTime, pworld, false);
                 if (pnewcell != prefcell) {
                     if (pnewcell) {
-                        TESObjectREFR::MoveRefToNewSpace(pref, 0, pworld);
+                        TESObjectREFR::MoveRefToNewSpace(pref, nullptr, pworld);
                         if (!pref->IsActor()) {
                             if (pref->Get3D()) {
                                 NiNode* pdynamic = static_cast<NiNode*>(pnewcell->GetDynamicNode());
@@ -12388,11 +12390,11 @@ void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint3
                         }
                     }
                     else {
-                        bool bresetAllow_2 = pSaveLoadGame->SetThreadAllowChanges(0);
+                        bool bresetAllow_2 = pSaveLoadGame->SetThreadAllowChanges(false);
                         pref->SetLocationOnReference(oldloc);
                         pSaveLoadGame->SetThreadAllowChanges(bresetAllow_2);
                         pav->SetTranslate(oldloc);
-                        apCollision->SetMotionType(hkpMotion::MOTION_KEYFRAMED, 0, 0);
+                        apCollision->SetMotionType(hkpMotion::MOTION_KEYFRAMED, nullptr, false);
                     }
                 }
             }
@@ -12400,13 +12402,13 @@ void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint3
         if ((aiChanged & 2) != 0) {
             NiPoint3 rot;
             (&pav->GetWorldTransform())->m_Rotate.ToEulerAnglesXYZ(rot.x, rot.y, rot.z);
-            bool bresetAllow_3 = pSaveLoadGame->SetThreadAllowChanges(0);
+            bool bresetAllow_3 = pSaveLoadGame->SetThreadAllowChanges(false);
             pref->SetAngleOnReference(rot);
             pSaveLoadGame->SetThreadAllowChanges(bresetAllow_3);
         }
         NiNode* v16 = pref->Get3D();
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
-        ShadowSceneNode_->UpdateObjectLighting(v16, 1);
+        ShadowSceneNode_->UpdateObjectLighting(v16, true);
     }
 }
 
@@ -12419,7 +12421,7 @@ void TESObjectREFR::DebugDisplayCallback(NiGeometry* ap3D, const NiColor& color)
             v2 = ::new (apMemory) BSShaderNoLightingProperty;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         v2->SetFlag(48u, 1);
         ap3D->AttachProperty(v2);
@@ -12491,7 +12493,7 @@ void TESObjectREFR_LoadHavokDataForCollisionObjectFunc(bhkNiCollisionObject* a1,
     BGSHavokSaveData* i = static_cast<BGSHavokSaveData*>(a2.uDataA[0u].p);
     BGSLoadGameBuffer* pSaveLoadBuffer = static_cast<BGSLoadGameBuffer*>(i->pSaveLoadBuffer);
     NiObject* pkObject = a1->GetWorldObject();
-    a1->SetReset(0);
+    a1->SetReset(false);
     if (pkObject) {
         bhkRigidBody* pBody = static_cast<bhkRigidBody*>(NiObject::DynamicCastStatic(&bhkRigidBody::ms_RTTI, pkObject));
         if (pBody) {
@@ -12511,7 +12513,7 @@ void TESObjectREFR_LoadHavokDataForCollisionObjectFunc(bhkNiCollisionObject* a1,
                 apData = 0;
                 pSaveLoadBuffer->LoadData(&apData, 1u);
                 if ((apData & 1) != 0) {
-                    v8 = 1;
+                    v8 = true;
                 }
                 if ((apData & 2) != 0) {
                     pBody->SetMotionType(hkpMotion::MOTION_KEYFRAMED);
@@ -12522,7 +12524,7 @@ void TESObjectREFR_LoadHavokDataForCollisionObjectFunc(bhkNiCollisionObject* a1,
                 pSaveLoadBuffer->LoadData(&kAngVel, 12u);
                 pBody->SetLinearVelocity(kLinVel);
                 pBody->SetAngularVelocity(kAngVel);
-                pBody->SetActive(1);
+                pBody->SetActive(true);
             }
         }
     }
@@ -12554,7 +12556,7 @@ bhkShapeCollection* bhkBvTreeShape::GetShapeCollection() {
         return static_cast<bhkShapeCollection*>(bhkShapeCollection::Getbhk(pShape));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -12577,7 +12579,7 @@ bhkEntity::bhkEntity() {
 void bhkNiCollisionObject::SetNotify(bool abTF) {
     SetBit(abTF, 4);
     if (abTF) {
-        SetSetLocal(1);
+        SetSetLocal(true);
     }
 }
 
@@ -12628,7 +12630,7 @@ void bhkRigidBody::SetAngularVelocity(const NiPoint3& arVel) {
 bool bhkRigidBody::IsActive() {
     hkpEntity* v4 = operator*();
     if (!v4) {
-        return 0;
+        return false;
     }
     return v4->isActive().operator bool();
 }
@@ -12757,9 +12759,10 @@ void CheckWithinMultiBoundTask::Run() {
         if (pfade) {
             if (pfade->GetLinkedObj()) {
                 if (pBoundRef->Get3D()) {
-                    bool bignore = 1;
-                    bWithin =
-                        TESObjectREFR::QVerticesInsideMultiboundRecurse(sp3D.m_pObject, spBound.m_pObject, bignore, 1);
+                    bool bignore = true;
+                    bWithin = TESObjectREFR::QVerticesInsideMultiboundRecurse(
+                        sp3D.m_pObject, spBound.m_pObject, bignore, true
+                    );
                 }
             }
         }
@@ -12873,7 +12876,7 @@ uint32_t TESObjectLIGH::GetRadius() {
 }
 
 bool TESMagicTargetForm::CanBeMagicTarget(TESForm* apForm) {
-    return (dynamic_cast<TESMagicTargetForm*>(apForm) != 0);
+    return (dynamic_cast<TESMagicTargetForm*>(apForm) != nullptr);
 }
 
 void TESObjectCELL::DecRefsWithVisibleDistantCount() {

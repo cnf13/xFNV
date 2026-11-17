@@ -113,12 +113,12 @@ void MTRenderingSystem::AddThread(
     if (aiThreadIndex <= MTRenderingSystem::THREAD_2 && !TaskThreadArray[aiThreadIndex]) {
         RenderingTaskThread* pMemory =
             static_cast<RenderingTaskThread*>(MemoryManager_Singleton.Allocate(sizeof(RenderingTaskThread)));
-        RenderingTaskThread* pThread = 0;
+        RenderingTaskThread* pThread = nullptr;
         if (pMemory) {
             pThread = ::new (pMemory) RenderingTaskThread(apfnTaskFunc);
         }
         TaskThreadArray[aiThreadIndex] = pThread;
-        pThread->Initialize(aeStackSize, apThreadName, 0);
+        pThread->Initialize(aeStackSize, apThreadName, false);
         TaskThreadArray[aiThreadIndex]->SetThreadProcessor(aiHWThread);
         TaskThreadArray[aiThreadIndex]->SetThreadPriority(0);
         if (!apThreadName) {
@@ -144,7 +144,7 @@ void MTRenderingSystem::AddAccumTask(
         AccumTask& rTask = pTaskArray[aiStage];
         rTask.spCamera = apCamera;
         BSCompoundFrustum** p_pFrustum = &rTask.pFrustum;
-        *p_pFrustum = 0;
+        *p_pFrustum = nullptr;
         rTask.spScene = apScene;
         rTask.pSceneList1 = apSceneList1;
         rTask.pSceneList2 = apSceneList2;
@@ -159,7 +159,7 @@ void MTRenderingSystem::AddAccumTask(
                 v17 = ::new (v16) BSCompoundFrustum;
             }
             else {
-                v17 = 0;
+                v17 = nullptr;
             }
             *p_pFrustum = v17;
             apFrustum->CopyMembers(v17);
@@ -192,7 +192,7 @@ void MTRenderingSystem::DestroyThreads() {
             RenderingTaskThread* v3 = TaskThreadArray[ithreadIdx];
             if (v3) {
                 int32_t* p_iCount = &v3->StartProcessing.iCount;
-                v3->bKillThread = 1;
+                v3->bKillThread = true;
                 v3->StartProcessing.hSemaphore->Release();
                 InterlockedIncrementInt32(p_iCount);
                 RenderingTaskThread* v5 = TaskThreadArray[ithreadIdx];
@@ -202,7 +202,7 @@ void MTRenderingSystem::DestroyThreads() {
                 if (v6) {
                     delete v6;
                 }
-                TaskThreadArray[ithreadIdx] = 0;
+                TaskThreadArray[ithreadIdx] = nullptr;
             }
         }
     }

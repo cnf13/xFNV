@@ -40,7 +40,7 @@ NiGeometry* MakeRectangle(float afDrawSize, NiColorA* aColor, bool abWithNoLight
         plineverts = static_cast<NiPoint3*>(ptr);
     }
     else {
-        plineverts = 0;
+        plineverts = nullptr;
     }
     void* v22 = ourMalloc(4 * sizeof(NiColorA));
     if (v22) {
@@ -48,7 +48,7 @@ NiGeometry* MakeRectangle(float afDrawSize, NiColorA* aColor, bool abWithNoLight
         plineclrs = static_cast<NiColorA*>(v22);
     }
     else {
-        plineclrs = 0;
+        plineclrs = nullptr;
     }
     uint8_t* plineconn = static_cast<uint8_t*>(ourMalloc(4u));
     float y = -afDrawSize;
@@ -69,7 +69,7 @@ NiGeometry* MakeRectangle(float afDrawSize, NiColorA* aColor, bool abWithNoLight
         plines = ::new (v16) NiLines(4, plineverts, plineclrs, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, plineconn);
     }
     else {
-        plines = 0;
+        plines = nullptr;
     }
     if (abWithNoLightingProp) {
         BSShaderNoLightingProperty* pshprop;
@@ -79,7 +79,7 @@ NiGeometry* MakeRectangle(float afDrawSize, NiColorA* aColor, bool abWithNoLight
             pshprop = ::new (apMemory) BSShaderNoLightingProperty;
         }
         else {
-            pshprop = 0;
+            pshprop = nullptr;
         }
         NiProperty* pkProperty = pshprop;
         plines->AttachProperty(pshprop);
@@ -174,7 +174,7 @@ bool SeenData::UpdateSeenData(const NiPoint3& aCoord, const NiPoint3& aSeenStart
             result = a2 - aCoord;
             double v5 = result.Length();
             if (TESObjectCELL::GetSeenDataUpdateRadius() > v5) {
-                SetSeenBit(a1, 1);
+                SetSeenBit(a1, true);
                 ++v10;
             }
         }
@@ -259,13 +259,13 @@ void IntSeenData::DrawSeenData(NiNode* apDrawNode, const NiPoint3& aSeenStart, b
 }
 
 uint16_t IntSeenData::GetSaveSize(bool abRecursing) {
-    uint16_t saveSize = SeenData::GetSaveSize(0);
+    uint16_t saveSize = SeenData::GetSaveSize(false);
     if (!abRecursing) {
         saveSize += 2;
     }
     uint16_t v5 = (uint16_t)(saveSize + 2);
     if (pNextSection) {
-        v5 += pNextSection->GetSaveSize((bool)1);
+        v5 += pNextSection->GetSaveSize(true);
     }
     return v5;
 }
@@ -286,11 +286,11 @@ void IntSeenData::SaveGame(BGSSaveFormBuffer* abRecursing) {
 
 void IntSeenData::SaveGame(bool abRecursing) {
     int16_t apData;
-    SeenData::SaveGame(static_cast<bool>(0));
+    SeenData::SaveGame(false);
     if (!abRecursing) {
         apData = 1;
         IntSeenData* v4 = this;
-        while (1) {
+        while (true) {
             v4 = v4->pNextSection;
             if (!v4) {
                 break;
@@ -302,7 +302,7 @@ void IntSeenData::SaveGame(bool abRecursing) {
     pSaveLoadGameOLD->SaveGameDataOLD(&cSectionX, 1u);
     pSaveLoadGameOLD->SaveGameDataOLD(&cSectionY, 1u);
     if (pNextSection) {
-        pNextSection->SaveGame(static_cast<bool>(1));
+        pNextSection->SaveGame(true);
     }
 }
 
@@ -320,7 +320,7 @@ void IntSeenData::LoadGame(BGSLoadFormBuffer* acCount) {
                 v2 = ::new (apMemory) IntSeenData(0, 0);
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             v7->pNextSection = v2;
         }
@@ -342,7 +342,7 @@ void IntSeenData::LoadGame(uint16_t acCount) {
             v2 = ::new (apMemory) IntSeenData(0, 0);
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         pNextSection = v2;
         pNextSection->LoadGame(acCount);

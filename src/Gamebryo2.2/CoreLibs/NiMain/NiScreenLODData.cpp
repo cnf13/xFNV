@@ -228,6 +228,6 @@ NiObject* NiScreenLODData::CreateObject() {
         return ::new (v0) NiScreenLODData;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

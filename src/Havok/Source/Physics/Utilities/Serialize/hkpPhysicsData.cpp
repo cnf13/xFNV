@@ -172,9 +172,9 @@ hkpRigidBody* hkpPhysicsData::findRigidBodyByName(const char* name) const {
     int32_t v2 = 0;
     const hkpPhysicsData* v7 = pThis;
     if (pThis->m_systems.m_size <= 0) {
-        return 0;
+        return nullptr;
     }
-    while (1) {
+    while (true) {
         v3 = pThis->m_systems.m_data[v2];
         v4 = 0;
         if (v3->m_rigidBodies.m_size > 0) {
@@ -182,10 +182,10 @@ hkpRigidBody* hkpPhysicsData::findRigidBodyByName(const char* name) const {
         }
     LABEL_7:;
         if (++v2 >= pThis->m_systems.m_size) {
-            return 0;
+            return nullptr;
         }
     }
-    while (1) {
+    while (true) {
         v5 = v3->m_rigidBodies.m_data[v4];
         if ((reinterpret_cast<uintptr_t>(v5->m_name.m_stringAndFlag) & ~uintptr_t(1)) != 0) {
             break;
@@ -216,8 +216,8 @@ void hkpPhysicsData::populateFromWorld(const hkpWorld* world, int32_t saveContac
     world->getWorldAsSystems(m_systems);
     if (static_cast<uint8_t>(saveContactPoints)) {
         hkpSaveContactPointsUtil::SavePointsInput input;
-        input.m_useEntityIds = 0;
-        input.m_getIdForEntity = 0;
+        input.m_useEntityIds = false;
+        input.m_getIdForEntity = nullptr;
         hkMemoryRouter* v7 = &hkMemoryRouter::getInstance();
         hkpPhysicsSystemWithContacts* v8 =
             static_cast<hkpPhysicsSystemWithContacts*>(v7->m_heap->blockAlloc(sizeof(hkpPhysicsSystemWithContacts)));
@@ -260,12 +260,12 @@ hkpWorld* hkpPhysicsData::createWorld(hkBool registerAllAgents) {
         if (v10->hasContacts(&hasContactsResult)->m_bool) {
             hkpSaveContactPointsUtil::LoadPointsInput input;
             hkpPhysicsSystem** m_data = m_systems.begin();
-            input.m_removeSerializedAgentsWhenLoaded = 0;
-            input.m_zeroUserDataInContactPointProperties = 0;
-            input.m_getEntityFromId = 0;
-            input.m_fireContactPointAddedCallbacks = 1;
-            input.m_fireContactPointCallbacks = 1;
-            input.m_passCollidablePointersInCollisionCallbacks = 0;
+            input.m_removeSerializedAgentsWhenLoaded = false;
+            input.m_zeroUserDataInContactPointProperties = false;
+            input.m_getEntityFromId = nullptr;
+            input.m_fireContactPointAddedCallbacks = true;
+            input.m_fireContactPointCallbacks = true;
+            input.m_passCollidablePointersInCollisionCallbacks = false;
             hkpSaveContactPointsUtil::loadContactPoints(
                 input, static_cast<hkpPhysicsSystemWithContacts*>(m_data[i]), v7
             );

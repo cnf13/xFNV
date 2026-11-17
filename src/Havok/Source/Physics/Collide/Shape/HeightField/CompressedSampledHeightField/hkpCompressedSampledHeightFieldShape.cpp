@@ -78,7 +78,7 @@ hkpCompressedSampledHeightFieldShape::hkpCompressedSampledHeightFieldShape(
 hkpCompressedSampledHeightFieldShape::~hkpCompressedSampledHeightFieldShape() {}
 
 int32_t hkpCompressedSampledHeightFieldShape::calcSizeForSpu(const CalcSizeForSpuInput& a1, int32_t a2) const {
-    return (a2 >= 128) ? 128 : ((-1));
+    return (a2 >= 128) ? 128 : (-1);
 }
 
 // The SDK's hkSampledHeightFieldShape_collideSpheres for this class: per sphere, the default normal (up, depth

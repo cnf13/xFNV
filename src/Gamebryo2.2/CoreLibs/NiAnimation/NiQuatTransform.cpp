@@ -22,7 +22,7 @@ void NiQuatTransform::SetRotate(const NiQuaternion& kRotate) {
 
 void NiQuatTransform::SetScaleValid(bool bValid) {
     if (!bValid) {
-        m_fScale = (float)(-0x1.fffffe0000000p+127f);
+        m_fScale = (-0x1.fffffe0000000p+127f);
     }
 }
 
@@ -224,18 +224,18 @@ void NiQuatTransform::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) cons
 
 void NiQuatTransform::SetScale(float fScale) {
     m_fScale = fScale;
-    SetScaleValid(1);
+    SetScaleValid(true);
 }
 
 void NiQuatTransform::SetTranslateValid(bool bValid) {
     if (!bValid) {
-        m_kTranslate.x = (float)(-0x1.fffffe0000000p+127f);
+        m_kTranslate.x = (-0x1.fffffe0000000p+127f);
     }
 }
 
 void NiQuatTransform::SetTranslate(const NiPoint3& kTranslate) {
     m_kTranslate = kTranslate;
-    SetTranslateValid(1);
+    SetTranslateValid(true);
 }
 
 void NiQuatTransform::Invert(NiQuatTransform& kDest) const {

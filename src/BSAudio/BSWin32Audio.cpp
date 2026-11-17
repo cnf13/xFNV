@@ -35,7 +35,7 @@
 #include "SDK/MSVC/stdio.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 int32_t SeekFileCallback(std::FILE* Stream, int32_t Offset, int32_t a3, int32_t Origin) {
     if (Stream) {
@@ -78,7 +78,7 @@ void BSWin32Audio::Init(void* pHandle) {
             // A fixed 36 would be the 32-bit sizeof; x64 DirectSound fails the create with it and audio stays off.
             v11.dwSize = sizeof(DSBUFFERDESC);
             v11.dwFlags = 145;
-            aiResult = pDirectSound8->CreateSoundBuffer(&v11, &pPrimarySoundBuffer, 0);
+            aiResult = pDirectSound8->CreateSoundBuffer(&v11, &pPrimarySoundBuffer, nullptr);
             if (Error(aiResult, "Unable to create Primary Sound Buffer. Audio will be disabled.")) {
                 aiResult = pPrimarySoundBuffer->QueryInterface(
                     CLSID_IDirectSound3DListener, reinterpret_cast<void**>(&pDSListener)
@@ -93,7 +93,7 @@ void BSWin32Audio::Init(void* pHandle) {
                         v3 = ::new (pListener) BSWin32AudioListener(pDSListener);
                     }
                     else {
-                        v3 = 0;
+                        v3 = nullptr;
                     }
                     this->pListener = v3;
                 LABEL_13:;
@@ -105,11 +105,11 @@ void BSWin32Audio::Init(void* pHandle) {
                         this->pListener->SetPosition(v6);
                         this->pListener->SetRolloffFactor(1.0f);
                     }
-                    bInitialized = 1;
-                    bAudioEnabled = 1;
+                    bInitialized = true;
+                    bAudioEnabled = true;
                     BSAudioManager* v2 = &BSAudioManager::QInstance();
                     v2->Initialize();
-                    BSAudio::Init(0);
+                    BSAudio::Init(nullptr);
                 }
             }
         }
@@ -117,20 +117,20 @@ void BSWin32Audio::Init(void* pHandle) {
 }
 
 void BSWin32Audio::Shutdown() {
-    bInitialized = 0;
+    bInitialized = false;
     BSAudio::Shutdown();
     CoUninitialize();
     if (pListener) {
         delete pListener;
-        pListener = 0;
+        pListener = nullptr;
     }
     if (pPrimarySoundBuffer) {
         pPrimarySoundBuffer->Release();
-        pPrimarySoundBuffer = 0;
+        pPrimarySoundBuffer = nullptr;
     }
     if (pDirectSound8) {
         pDirectSound8->Release();
-        pDirectSound8 = 0;
+        pDirectSound8 = nullptr;
     }
 }
 
@@ -141,7 +141,7 @@ BSGameSound* BSWin32Audio::CreateNewGameSound(const char* apcFileName) {
         return ::new (apMemory) BSWin32GameSound(apcFileName);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

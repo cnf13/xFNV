@@ -334,9 +334,9 @@ bool TallGrassGroup::Add(TallGrassGroup::GrassInstanceData* apInstanceData, int3
     uint16_t iInstanceCount;
     iInstanceCount = this->iInstanceCount;
     if ((iInstanceCount == iMaxInstanceCount) || (!apInstanceData)) {
-        return (bool)0;
+        return false;
     }
     pInstanceData[iInstanceCount] = *apInstanceData;
     plTerrainChunkSeed[this->iInstanceCount++] = alTerrainChunkSeed;
-    return (bool)1;
+    return true;
 }

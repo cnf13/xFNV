@@ -52,7 +52,7 @@ void hkMemoryTrack::clear() {
     if (m_capacityAndFlags >= 0) {
         m_heap->bufFree(m_sectors.begin(), sizeof(char*) * m_capacityAndFlags);
     }
-    m_sectors.m_data = 0;
+    m_sectors.m_data = nullptr;
     m_sectors.m_capacityAndFlags = hkArrayBase<char*>::DONT_DEALLOCATE_FLAG;
     m_numBytesLastSector = this->m_numBytesPerSector;
 }
@@ -65,7 +65,7 @@ void hkMemoryTrack::write(const void* data, int32_t numBytes) {
     if (aiSize > 0) {
         char* v12;
         hkArray<char*, hkContainerHeapAllocator>* p_m_sectors = &m_sectors;
-        while (1) {
+        while (true) {
             int32_t m_numBytesPerSector = this->m_numBytesPerSector;
             int32_t v7 = this->m_numBytesPerSector - m_numBytesLastSector;
             if (this->m_numBytesPerSector == m_numBytesLastSector) {
@@ -127,7 +127,7 @@ void hkMemoryTrack::appendByMove(hkMemoryTrack* apOther) {
     if (m_capacityAndFlags >= 0) {
         m_heap->bufFree(apOther->m_sectors.begin(), sizeof(char*) * m_capacityAndFlags);
     }
-    apOther->m_sectors.m_data = 0;
+    apOther->m_sectors.m_data = nullptr;
     apOther->m_sectors.m_capacityAndFlags = hkArrayBase<char*>::DONT_DEALLOCATE_FLAG;
     apOther->clear();
 }
@@ -140,7 +140,7 @@ void hkMemoryTrack::read(void* data, int32_t numBytes, int32_t offset) const {
     int32_t v8 = offset % m_numBytesPerSector;
     if (numBytes > 0) {
         char* v11;
-        while (1) {
+        while (true) {
             int32_t v9 = v7 >= m_sectors.m_size - 1 ? m_numBytesLastSector : m_numBytesPerSector;
             int32_t v10 = v9 - v8;
             v11 = &m_sectors.m_data[v7][v8];

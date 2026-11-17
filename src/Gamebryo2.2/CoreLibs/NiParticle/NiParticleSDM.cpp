@@ -65,7 +65,7 @@ NiParticleSDM::NiParticleSDM() {
 
 void NiParticleSDM::Init() {
     if (!NiParticleSDM::ms_bInitialized) {
-        NiParticleSDM::ms_bInitialized = 1;
+        NiParticleSDM::ms_bInitialized = true;
         NiStream::RegisterLoader("NiMeshParticleSystem", &NiMeshParticleSystem::CreateObject);
         NiStream::RegisterLoader("NiMeshPSysData", &NiMeshPSysData::CreateObject);
         NiStream::RegisterLoader("NiParticleSystem", &NiParticleSystem::CreateObject);
@@ -126,7 +126,7 @@ void NiParticleSDM::Init() {
 // The task pool goes last: NiPSysUpdateTask::_SDMShutdown runs after the loaders are unregistered.
 void NiParticleSDM::Shutdown() {
     if (NiParticleSDM::ms_bInitialized) {
-        NiParticleSDM::ms_bInitialized = 0;
+        NiParticleSDM::ms_bInitialized = false;
         NiStream::UnregisterLoader("NiMeshParticleSystem");
         NiStream::UnregisterLoader("NiMeshPSysData");
         NiStream::UnregisterLoader("NiParticleSystem");

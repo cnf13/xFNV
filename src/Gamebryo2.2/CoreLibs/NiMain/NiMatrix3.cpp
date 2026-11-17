@@ -248,27 +248,27 @@ bool NiMatrix3::Inverse(NiMatrix3& inv) const {
     int32_t col;
     int32_t row;
     float fInvdet;
-    (&inv)->m_pEntry[0][0] = (float)((m_pEntry[1][1] * m_pEntry[2][2]) - (m_pEntry[1][2] * m_pEntry[2][1]));
-    (&inv)->m_pEntry[0][1] = (float)((m_pEntry[0][2] * m_pEntry[2][1]) - (m_pEntry[0][1] * m_pEntry[2][2]));
-    (&inv)->m_pEntry[0][2] = (float)((m_pEntry[0][1] * m_pEntry[1][2]) - (m_pEntry[0][2] * m_pEntry[1][1]));
-    (&inv)->m_pEntry[1][0] = (float)((m_pEntry[1][2] * m_pEntry[2][0]) - (m_pEntry[1][0] * m_pEntry[2][2]));
-    (&inv)->m_pEntry[1][1] = (float)((m_pEntry[0][0] * m_pEntry[2][2]) - (m_pEntry[0][2] * m_pEntry[2][0]));
-    (&inv)->m_pEntry[1][2] = (float)((m_pEntry[0][2] * m_pEntry[1][0]) - (m_pEntry[0][0] * m_pEntry[1][2]));
-    (&inv)->m_pEntry[2][0] = (float)((m_pEntry[1][0] * m_pEntry[2][1]) - (m_pEntry[1][1] * m_pEntry[2][0]));
-    (&inv)->m_pEntry[2][1] = (float)((m_pEntry[0][1] * m_pEntry[2][0]) - (m_pEntry[0][0] * m_pEntry[2][1]));
-    (&inv)->m_pEntry[2][2] = (float)((m_pEntry[0][0] * m_pEntry[1][1]) - (m_pEntry[0][1] * m_pEntry[1][0]));
+    (&inv)->m_pEntry[0][0] = ((m_pEntry[1][1] * m_pEntry[2][2]) - (m_pEntry[1][2] * m_pEntry[2][1]));
+    (&inv)->m_pEntry[0][1] = ((m_pEntry[0][2] * m_pEntry[2][1]) - (m_pEntry[0][1] * m_pEntry[2][2]));
+    (&inv)->m_pEntry[0][2] = ((m_pEntry[0][1] * m_pEntry[1][2]) - (m_pEntry[0][2] * m_pEntry[1][1]));
+    (&inv)->m_pEntry[1][0] = ((m_pEntry[1][2] * m_pEntry[2][0]) - (m_pEntry[1][0] * m_pEntry[2][2]));
+    (&inv)->m_pEntry[1][1] = ((m_pEntry[0][0] * m_pEntry[2][2]) - (m_pEntry[0][2] * m_pEntry[2][0]));
+    (&inv)->m_pEntry[1][2] = ((m_pEntry[0][2] * m_pEntry[1][0]) - (m_pEntry[0][0] * m_pEntry[1][2]));
+    (&inv)->m_pEntry[2][0] = ((m_pEntry[1][0] * m_pEntry[2][1]) - (m_pEntry[1][1] * m_pEntry[2][0]));
+    (&inv)->m_pEntry[2][1] = ((m_pEntry[0][1] * m_pEntry[2][0]) - (m_pEntry[0][0] * m_pEntry[2][1]));
+    (&inv)->m_pEntry[2][2] = ((m_pEntry[0][0] * m_pEntry[1][1]) - (m_pEntry[0][1] * m_pEntry[1][0]));
     float fDet = ((m_pEntry[0][0] * (&inv)->m_pEntry[0][0]) + (m_pEntry[0][1] * (&inv)->m_pEntry[1][0])) +
         (m_pEntry[0][2] * (&inv)->m_pEntry[2][0]);
     if (NiAbs(fDet) <= 0x1.0c6f7a0000000p-20) {
-        return (bool)0;
+        return false;
     }
     for (row = 0; row < 3; ++row) {
         for (col = 0; col < 3; ++col) {
             fInvdet = (float)(1.0 / fDet);
-            (&inv)->m_pEntry[row][col] = (float)((&inv)->m_pEntry[row][col] * fInvdet);
+            (&inv)->m_pEntry[row][col] = ((&inv)->m_pEntry[row][col] * fInvdet);
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool NiMatrix3::ToEulerAnglesXYZ(float& rfXAngle, float& rfYAngle, float& rfZAngle) const {
@@ -295,21 +295,21 @@ bool NiMatrix3::ToEulerAnglesXYZ(float& rfXAngle, float& rfYAngle, float& rfZAng
         float rfYAngleb = NiFastATan2(m_pEntry[1][0], m_pEntry[1][1]);
         rfZAngle = 0.0;
         rfXAngle = 0.0 - rfYAngleb;
-        return 0;
+        return false;
     }
     else {
         if (!(-v6 < v11)) {
             float rfYAnglea = NiFastATan2(m_pEntry[1][0], m_pEntry[1][1]);
             rfZAngle = 0.0;
             rfXAngle = rfYAnglea - 0.0;
-            return 0;
+            return false;
         }
         else {
             float fY = -m_pEntry[1][2];
             rfXAngle = -NiFastATan2(fY, m_pEntry[2][2]);
             float fYa = -m_pEntry[0][1];
             rfZAngle = -NiFastATan2(fYa, m_pEntry[0][0]);
-            return 1;
+            return true;
         }
     }
 }
@@ -338,21 +338,21 @@ bool NiMatrix3::ToEulerAnglesZXY(float& rfZAngle, float& rfXAngle, float& rfYAng
         float xa = NiFastATan2(m_pEntry[0][2], m_pEntry[0][0]);
         rfYAngle = 0.0;
         rfZAngle = 0.0 - xa;
-        return 0;
+        return false;
     }
     else {
         if (!(-v6 < v11)) {
             float x = NiFastATan2(m_pEntry[0][2], m_pEntry[0][0]);
             rfYAngle = 0.0;
             rfZAngle = x - 0.0;
-            return 0;
+            return false;
         }
         else {
             float fY = -m_pEntry[0][1];
             rfZAngle = -NiFastATan2(fY, m_pEntry[1][1]);
             float fYa = -m_pEntry[2][0];
             rfYAngle = -NiFastATan2(fYa, m_pEntry[2][2]);
-            return 1;
+            return true;
         }
     }
 }
@@ -463,15 +463,15 @@ void NiMatrix3::MakeRotation(float fAngle, float x, float y, float z) {
     float xsin = x * sinOut;
     float ysin = y * sinOut;
     float zsin = z * sinOut;
-    m_pEntry[0][0] = (float)((x2 * omcs) + cosOut);
-    m_pEntry[0][1] = (float)(xym + zsin);
-    m_pEntry[0][2] = (float)(xzm - ysin);
-    m_pEntry[1][0] = (float)(xym - zsin);
-    m_pEntry[1][1] = (float)((y2 * omcs) + cosOut);
-    m_pEntry[1][2] = (float)(yzm + xsin);
-    m_pEntry[2][0] = (float)(xzm + ysin);
-    m_pEntry[2][1] = (float)(yzm - xsin);
-    m_pEntry[2][2] = (float)((z2 * omcs) + cosOut);
+    m_pEntry[0][0] = ((x2 * omcs) + cosOut);
+    m_pEntry[0][1] = (xym + zsin);
+    m_pEntry[0][2] = (xzm - ysin);
+    m_pEntry[1][0] = (xym - zsin);
+    m_pEntry[1][1] = ((y2 * omcs) + cosOut);
+    m_pEntry[1][2] = (yzm + xsin);
+    m_pEntry[2][0] = (xzm + ysin);
+    m_pEntry[2][1] = (yzm - xsin);
+    m_pEntry[2][2] = ((z2 * omcs) + cosOut);
 }
 
 // Each sum of products is computed in double and rounded to float once, as the game does. The reference source's last
@@ -488,7 +488,7 @@ void NiMatrix3::ExtractAngleAndAxis(float& fAngle, float& fX, float& fY, float& 
         fACos = 0.0f;
     }
     else {
-        fACos = static_cast<float>(std::acos(fCos));
+        fACos = std::acos(fCos);
     }
     fAngle = fACos;
     fX = m_pEntry[1][2] - m_pEntry[2][1];
@@ -706,7 +706,7 @@ char NiMatrix3::Tridiagonal(float* a1, float* a2) {
 char NiMatrix3::QLAlgorithm(float* a1, float* a2) {
     double v3 = 1.0;
     int32_t v6 = 0;
-    while (1) {
+    while (true) {
         double v10;
         double v16;
         double v17;
@@ -955,9 +955,9 @@ float* NiMatrix3::EigenSolveSymmetric(void* apThis, [[maybe_unused]] void* apEdx
     a3[4] = v6.m_pEntry[1][1];
     a3[5] = v6.m_pEntry[2][1];
     if (v3) {
-        a3[6] = (float)(-v6.m_pEntry[0][2]);
-        a3[7] = (float)(-v6.m_pEntry[1][2]);
-        a3[8] = (float)(-v6.m_pEntry[2][2]);
+        a3[6] = (-v6.m_pEntry[0][2]);
+        a3[7] = (-v6.m_pEntry[1][2]);
+        a3[8] = (-v6.m_pEntry[2][2]);
     }
     else {
         a3[6] = v6.m_pEntry[0][2];
@@ -975,5 +975,5 @@ float NiACos(float fValue) {
     if (!(1.0 > fValue)) {
         return 0.0f;
     }
-    return static_cast<float>(std::acos(fValue));
+    return std::acos(fValue);
 }

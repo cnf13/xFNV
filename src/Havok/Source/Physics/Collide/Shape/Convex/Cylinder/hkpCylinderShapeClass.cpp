@@ -96,7 +96,7 @@ hkTypeInfo hkpCylinderShapeTypeInfo = {
 // The class registry's finish-loaded-object callback of hkpCylinderShape: the null check, then the class's finish
 // constructor.
 void finishLoadedObjecthkpCylinderShape(void* p, int32_t finishing) {
-    void* apMemory = static_cast<void*>(p);
+    void* apMemory = p;
     hkFinishLoadedObjectFlag aFlag;
     aFlag.m_finishing = finishing;
     if (!apMemory) {

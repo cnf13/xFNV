@@ -43,9 +43,9 @@ NiPixelData* NiNIFImageReader::ReadFile(NiFile& kIst, NiPixelData* pkOptDest) {
 }
 
 bool NiNIFImageReader::ReadHeader(NiFile& a1, uint32_t& a2, uint32_t& a3, NiPixelFormat& a4, bool& a5, uint32_t& a6) {
-    NiPixelData* v7 = ReadFile(a1, 0);
+    NiPixelData* v7 = ReadFile(a1, nullptr);
     if (!v7) {
-        return 0;
+        return false;
     }
     NiIncRefCount(v7);
     a2 = *v7->m_puiWidth;
@@ -54,5 +54,5 @@ bool NiNIFImageReader::ReadHeader(NiFile& a1, uint32_t& a2, uint32_t& a3, NiPixe
     a5 = v7->m_uiMipmapLevels > 1;
     a6 = v7->m_uiFaces;
     NiDecRefCount(v7);
-    return 1;
+    return true;
 }

@@ -48,7 +48,7 @@ void ChameleonEffect::FinishInitLoadGame(Actor* apActor) {
         float x2 = MagicSystem::GetChameleonMaxRefraction();
         float x1 = MagicSystem::GetChameleonMinRefraction();
         float fRefractionPower = FLerp(x1, x2, 0.0f, 1.0f, v5);
-        apActor->SetRefraction(1, fRefractionPower);
+        apActor->SetRefraction(true, fRefractionPower);
     }
     else {
         apActor->UpdateAlpha();
@@ -58,7 +58,7 @@ void ChameleonEffect::FinishInitLoadGame(Actor* apActor) {
 void ChameleonEffect::Revert(Actor* apActor) {
     ActiveEffect::Revert(apActor);
     if (BSShaderManager::IsRefractionEnabled()) {
-        apActor->SetRefraction(1, 0.0f);
+        apActor->SetRefraction(true, 0.0f);
     }
     else {
         apActor->UpdateAlpha();
@@ -70,7 +70,7 @@ void ChameleonEffect::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     // The base ActiveEffect::Revert body is empty.
     ActiveEffect::Revert(apLoadGameBuffer);
     if (BSShaderManager::IsRefractionEnabled()) {
-        pactor->SetRefraction(1, 0.0f);
+        pactor->SetRefraction(true, 0.0f);
     }
     else {
         pactor->UpdateAlpha();
@@ -90,7 +90,7 @@ void ChameleonEffect::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             float x2 = MagicSystem::GetChameleonMaxRefraction();
             float x1 = MagicSystem::GetChameleonMinRefraction();
             float fRefractionPower = FLerp(x1, x2, 0.0f, 1.0f, v5);
-            pactor->SetRefraction(1, fRefractionPower);
+            pactor->SetRefraction(true, fRefractionPower);
         }
         else {
             pactor->UpdateAlpha();
@@ -119,7 +119,7 @@ void ChameleonEffect::Start() {
         ptargetActor = pTarget->GetTargetAsActor();
     }
     else {
-        ptargetActor = 0;
+        ptargetActor = nullptr;
     }
     ValueModifierEffect::Start();
     if (ptargetActor) {
@@ -132,7 +132,7 @@ void ChameleonEffect::Start() {
             float x2 = MagicSystem::GetChameleonMaxRefraction();
             float x1 = MagicSystem::GetChameleonMinRefraction();
             float fRefractionPower = FLerp(x1, x2, 0.0f, 1.0f, v4);
-            ptargetActor->SetRefraction(1, fRefractionPower);
+            ptargetActor->SetRefraction(true, fRefractionPower);
         }
         else {
             ptargetActor->UpdateAlpha();
@@ -147,7 +147,7 @@ void ChameleonEffect::Finish() {
         ptargetActor = pTarget->GetTargetAsActor();
     }
     else {
-        ptargetActor = 0;
+        ptargetActor = nullptr;
     }
     if (ptargetActor) {
         if (BSShaderManager::IsRefractionEnabled()) {
@@ -155,7 +155,7 @@ void ChameleonEffect::Finish() {
             float a2 = BSMAX(0.0, v5);
             float v9 = BSMIN(1.0f, a2);
             if (!(v9 > 0.0)) {
-                ptargetActor->SetRefraction(1, 0.0f);
+                ptargetActor->SetRefraction(true, 0.0f);
                 ptargetActor->UpdateAlpha();
             }
             else {
@@ -163,7 +163,7 @@ void ChameleonEffect::Finish() {
                 float x2 = MagicSystem::GetChameleonMaxRefraction();
                 float x1 = MagicSystem::GetChameleonMinRefraction();
                 float fRefractionPower = FLerp(x1, x2, 0.0f, 1.0f, v4);
-                ptargetActor->SetRefraction(1, fRefractionPower);
+                ptargetActor->SetRefraction(true, fRefractionPower);
             }
         }
         else {

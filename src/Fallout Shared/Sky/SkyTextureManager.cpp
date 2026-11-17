@@ -20,7 +20,7 @@ void SkyTextureManager::LoadTextureInBackground(NiPointer<NiTexture>* apspTextur
         v2 = ::new (apMemory) SkyTask(apspTexture, apFilename);
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     pIOManager->AddTask(v2);
 }
@@ -35,9 +35,9 @@ SkyTask::~SkyTask() {}
 
 void SkyTask::Run() {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_SKY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\sky\\SkyTextureManager.cpp", 50
+        MEM_CONTEXT_SKY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\sky\\SkyTextureManager.cpp", 50
     );
-    BSShaderManager::GetTexture(pFileName, 1, *pspTexture, 1, 0);
+    BSShaderManager::GetTexture(pFileName, true, *pspTexture, true, false);
 }
 
 bool SkyTask::GetDescription(char* apDescription, uint32_t aiBufferSize) {

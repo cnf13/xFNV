@@ -31,7 +31,7 @@ NiObject* NiFogProperty::CreateClone(NiCloningProcess& kCloning) {
             v4 = ::new (v3) NiFogProperty;
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         CopyMembers(v4, kCloning);
         v4->m_uFlags = m_uFlags;
@@ -156,7 +156,7 @@ void NiFogProperty::_SDMShutdown() {
 NiObject* NiFogProperty::CreateObject() {
     NiFogProperty* pkObject = static_cast<NiFogProperty*>(NiMemObject::operator new(sizeof(NiFogProperty)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiFogProperty;
 }

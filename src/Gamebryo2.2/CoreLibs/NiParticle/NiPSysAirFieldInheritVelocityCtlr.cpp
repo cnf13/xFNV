@@ -86,7 +86,7 @@ NiObject* NiPSysAirFieldInheritVelocityCtlr::CreateObject() {
         NiMemObject::operator new(sizeof(NiPSysAirFieldInheritVelocityCtlr))
     );
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysAirFieldInheritVelocityCtlr;
 }

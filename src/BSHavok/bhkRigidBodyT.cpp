@@ -238,7 +238,7 @@ hkVector4& bhkRigidBodyT::GetPosition(hkVector4& arPos) {
         GetRotation(hkq);
         __m128 v3 = _mm_mul_ps(kLocalPos.m_quad, hkq.m_vec.m_quad);
         __m128 v4 = _mm_shuffle_ps(v3, v3, 170);
-        v4[0] = v4[0] + static_cast<float>(_mm_shuffle_ps(v3, v3, 85)[0] + v3[0]);
+        v4[0] = v4[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0]);
         __m128 v5 = _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 255);
         __m128 v8 = _mm_add_ps(
             _mm_mul_ps(
@@ -284,7 +284,7 @@ void bhkRigidBodyT::SetPosition(const hkVector4& arPos) {
             GetRotation(hkq);
             __m128 v3 = _mm_mul_ps(kLocalPos.m_quad, hkq.m_vec.m_quad);
             __m128 v4 = _mm_shuffle_ps(v3, v3, 170);
-            v4[0] = v4[0] + static_cast<float>(_mm_shuffle_ps(v3, v3, 85)[0] + v3[0]);
+            v4[0] = v4[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0]);
             __m128 v5 = _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 255);
             __m128 v6 = _mm_add_ps(
                 _mm_mul_ps(

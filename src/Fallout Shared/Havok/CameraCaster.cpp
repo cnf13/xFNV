@@ -274,7 +274,7 @@ void CameraCaster::Init(float afRadius, uint32_t aiGroup) {
     bhkSphereShape* pplayerShape;
     bhkSphereShape* pMemory = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
     if (pMemory) {
-        pplayerShape = ::new (pMemory) bhkSphereShape(afRadius, 1);
+        pplayerShape = ::new (pMemory) bhkSphereShape(afRadius, true);
     }
     else {
         pplayerShape = nullptr;

@@ -19,7 +19,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // The shared pass flag the helpers clear is bFirst; the z-only pass has its own (bZOnlyFirst).
 void BSShaderPPLightingProperty::GetRenderPasses_2x(
@@ -529,7 +529,7 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexSpecular1
     BSShaderProperty::RenderPass* ppass = nullptr;
     if (static_cast<uint8_t>(abUpdateList)) {
         int32_t iMaxLights;
-        pRenderPassList->Add(apGeom, 0, 1, 0, 0, 0, 0, 0);
+        pRenderPassList->Add(apGeom, 0, 1, 0, nullptr, nullptr, nullptr, nullptr);
         ppass = pRenderPassList->pPassA.m_pBase[pRenderPassList->iSize - 1];
         uint8_t ucLights = GetNumberofActiveNonShadowLights() + 1;
         ppass->ucNumLights = ucLights;
@@ -794,7 +794,7 @@ void BSShaderPPLightingProperty::AddLandscapePasses_2x(
     ShadowSceneLight* plight2;
     uint16_t v23;
     void* kiter;
-    kiter = 0;
+    kiter = nullptr;
     for (plight = GetFirstActiveNonShadowLight(kiter); plight; plight = GetNextActiveNonShadowLight(kiter)) {
         NiLight* m_pObject = plight->spLight.m_pObject;
         double r = m_pObject->m_kDiff.r;
@@ -869,12 +869,12 @@ void BSShaderPPLightingProperty::AddLandscapePasses_2x(
     if (static_cast<uint8_t>(abUpdateList) != 1) {
         goto LABEL_31;
     }
-    pRenderPassList->Add(apGeom, v23, 1, 1, apSunlight, 0, 0, 0);
+    pRenderPassList->Add(apGeom, v23, 1, 1, apSunlight, nullptr, nullptr, nullptr);
 LABEL_32:;
-    abFirst = 0;
+    abFirst = false;
     if (static_cast<uint8_t>(abUpdateList) == 1 &&
         (BSShaderManager::bInLODWorld && (ulFlags[1] & BSS2_No_LOD_Land_Blend) == 0)) {
-        pRenderPassList->Add(apGeom, 560, 0, 1, apSunlight, 0, 0, 0);
+        pRenderPassList->Add(apGeom, 560, 0, 1, apSunlight, nullptr, nullptr, nullptr);
         pRenderPassList->pPassA.m_pBase[pRenderPassList->iSize - 1]->ucExtraParam = 9;
     }
     else {

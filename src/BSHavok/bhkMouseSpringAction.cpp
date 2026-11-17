@@ -176,7 +176,7 @@ void bhkMouseSpringAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings)
     // MAYBE-INLINED 0xC87494: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
     arInfo.m_mousePositionInWorld.fY = 0.0f;
     // MAYBE-INLINED 0xC87498: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-    arInfo.m_body = 0;
+    arInfo.m_body = nullptr;
     // MAYBE-INLINED 0xC8749C: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
     arInfo.m_mousePositionInWorld.fZ = 0.0f;
     // MAYBE-INLINED 0xC874A0: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor

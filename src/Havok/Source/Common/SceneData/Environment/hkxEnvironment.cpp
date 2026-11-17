@@ -197,15 +197,15 @@ hkTypeInfo hkxEnvironmentTypeInfo = {
 bool needsQuotes(const char* apcString) {
     char v1 = *apcString;
     if (!*apcString) {
-        return 0;
+        return false;
     }
     while (v1 > 32 && (v1 != 61 && v1 != 59)) {
         v1 = *++apcString;
         if (!v1) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 const hkClass& hkxEnvironment::Variable::staticClass() {
@@ -260,7 +260,7 @@ const char* hkxEnvironment::getVariableValue(int32_t i) {
 const char* hkxEnvironment::getVariableValue(const char* name) {
     int32_t VariableByName = findVariableByName(name);
     if (VariableByName == -1) {
-        return 0;
+        return nullptr;
     }
     else {
         return reinterpret_cast<const char*>(

@@ -44,7 +44,7 @@ BGSTerrainManager::BGSTerrainManager(TESWorldSpace* apWorld)
     char LODPath[264];
     std::sprintf(LODPath, "Data\\LODSettings\\%s.DLODSettings", apWorld->GetFormEditorID());
     BSFile* pFile = nullptr;
-    if (FileFinder::Locate(LODPath, 0, 6u, 256u)) {
+    if (FileFinder::Locate(LODPath, nullptr, 6u, 256u)) {
         pFile = static_cast<BSFile*>(FileFinder::GetFile(LODPath, NiFile::READ_ONLY, 100u));
     }
     if (pFile) {
@@ -60,8 +60,8 @@ BGSTerrainManager::BGSTerrainManager(TESWorldSpace* apWorld)
     spLODRoot = TES::pInstance->pObjLandRoot;
     if (spLODRoot.m_pObject) {
         spLODWaterRoot = TES::pInstance->pObjLODWaterRoot;
-        spLODRoot.m_pObject->SetAlwaysDraw(1);
-        spLODRoot.m_pObject->m_pkParent->SetAlwaysDraw(1);
+        spLODRoot.m_pObject->SetAlwaysDraw(true);
+        spLODRoot.m_pObject->m_pkParent->SetAlwaysDraw(true);
     }
     bNeedsImmediateUpdate = false;
     if (!BGSTerrainManager::spRootLandLODNode.m_pObject && spLODRoot.m_pObject) {
@@ -167,16 +167,16 @@ void BGSTerrainManager::Update(const NiPoint3& aViewPosition, BGSTerrainManager:
                             const NiPoint3* v3 = &pRef->GetLocationOnReference();
                             BGSDistantTreeBlock* ptrees = GetTreeBlockForPoint(*v3);
                             if (ptrees) {
-                                ptrees->HideTree(id, 1);
+                                ptrees->HideTree(id, true);
                             }
                             else {
                                 tempTreeList.Add(TreesQueuedToHide.GetAt(static_cast<int32_t>(i)));
                             }
                         }
-                        TreesQueuedToHide.Clear(1);
+                        TreesQueuedToHide.Clear(true);
                         if (tempTreeList.iSize) {
                             uint32_t uisize_2 = tempTreeList.iSize;
-                            TreesQueuedToHide.SetSize(uisize_2, 1);
+                            TreesQueuedToHide.SetSize(uisize_2, true);
                             for (uint32_t i_2 = 0; i_2 < uisize_2; ++i_2) {
                                 TreesQueuedToHide.SetAt(i_2, tempTreeList.operator[](i_2));
                             }
@@ -186,7 +186,7 @@ void BGSTerrainManager::Update(const NiPoint3& aViewPosition, BGSTerrainManager:
             }
         }
     }
-    bNeedsImmediateUpdate = 0;
+    bNeedsImmediateUpdate = false;
 }
 
 void BGSTerrainManager::UpdateMorphParameters(const NiPoint3& aViewPosition) {
@@ -208,7 +208,7 @@ void BGSTerrainManager::HideTree(TESObjectREFR* apTreeRef, bool abQueue) {
     const NiPoint3* v3 = &apTreeRef->GetLocationOnReference();
     BGSDistantTreeBlock* TreeBlockForPoint = GetTreeBlockForPoint(*v3);
     if (TreeBlockForPoint) {
-        TreeBlockForPoint->HideTree(aID, 1);
+        TreeBlockForPoint->HideTree(aID, true);
     }
     else {
         if (abQueue) {
@@ -222,7 +222,7 @@ void BGSTerrainManager::SetNeedsImmediateUpdate(bool abUpdate) {
 }
 
 void BGSTerrainManager::UpdateMultiBoundVisibility(NiCamera* apCamera) {
-    NiCullingProcess aCullProc(0);
+    NiCullingProcess aCullProc(nullptr);
     aCullProc.SetCamera(apCamera);
     const NiFrustum* ViewFrustum = &apCamera->GetViewFrustum();
     aCullProc.SetFrustum(*ViewFrustum);
@@ -240,7 +240,7 @@ void BGSTerrainManager::ResetMultiBoundResults() {
 }
 
 bool BGSTerrainManager::HasRootNode() {
-    return (pRootNode != 0);
+    return (pRootNode != nullptr);
 }
 
 NiTexture* BGSTerrainManager::GetDiffuseTextureForPoint(const NiPoint3& aPoint) {
@@ -272,11 +272,11 @@ void BGSTerrainManager::EnableLODWaterProcessing(bool abEnable) {
 }
 
 void BGSTerrainManager::DisableBlockVisibility() {
-    BSSegmentedTriShape::SetSystemDisabled(1);
+    BSSegmentedTriShape::SetSystemDisabled(true);
 }
 
 void BGSTerrainManager::EnableBlockVisibility() {
-    BSSegmentedTriShape::SetSystemDisabled(0);
+    BSSegmentedTriShape::SetSystemDisabled(false);
 }
 
 uint32_t BGSTerrainManager::GetTreeLevel() {
@@ -296,9 +296,7 @@ void BGSTerrainManager::ShowNormalDetail() {
 }
 
 BGSTerrainManager* BGSTerrainManager::GetActiveManager() {
-    return reinterpret_cast<BGSTerrainManager*>(
-        static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(BGSTerrainManager::pActiveManager))
-    );
+    return reinterpret_cast<BGSTerrainManager*>(reinterpret_cast<uintptr_t>(BGSTerrainManager::pActiveManager));
 }
 
 bool BGSTerrainManager::GetCurrentWorldHasLOD() {
@@ -313,7 +311,7 @@ bool BGSTerrainManager::GetCurrentWorldHasLOD() {
     // Tests the whole bHasLOD byte for nonzero and returns 1, so the byte is read as untyped memory: a bool read would
     // hand back any other byte as it is.
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&pWorldSpace->GetTerrainManager()->bHasLOD)) != 0) {
-        return (bool)1;
+        return true;
     }
     return (bool)result;
 }

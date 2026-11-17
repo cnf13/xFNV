@@ -22,7 +22,7 @@
 void* GetNext(NiTListIterator& arIterator) {
     NiTListItem<void*>* pkItem = static_cast<NiTListItem<void*>*>(arIterator);
     if (!pkItem) {
-        return 0;
+        return nullptr;
     }
     arIterator = pkItem->m_pkNext;
     return pkItem->m_element;
@@ -416,7 +416,7 @@ void NiD3DShaderProgramFactory::CreateShaderCreatorMap() {
             ::new (v0) NiTStringPointerMap<NiD3DShaderProgramCreator*>(37, true);
     }
     else {
-        NiD3DShaderProgramFactory::ms_pkShaderCreators = 0;
+        NiD3DShaderProgramFactory::ms_pkShaderCreators = nullptr;
     }
 }
 
@@ -474,12 +474,12 @@ void NiD3DShaderProgramFactory::UnregisterShaderCreator(NiD3DShaderProgramCreato
         }
         else {
         LABEL_6:;
-            kIter = 0;
+            kIter = nullptr;
         }
         if (kIter) {
-            while (1) {
-                pcExt = 0;
-                pkMapCreator = 0;
+            while (true) {
+                pcExt = nullptr;
+                pkMapCreator = nullptr;
                 v1->GetNext(kIter, pcExt, pkMapCreator);
                 if (pkCreator == pkMapCreator) {
                     NiD3DShaderProgramFactory::ms_pkShaderCreators->RemoveAt(pcExt);
@@ -499,7 +499,7 @@ NiD3DShaderProgramCreator* NiD3DShaderProgramFactory::GetShaderCreator(const cha
     NiD3DShaderProgramCreator* pkCreator;
     char acFileExt[256];
     if (!NiD3DShaderProgramFactory::ms_pkShaderCreators || (!pcFilename || !*pcFilename)) {
-        return 0;
+        return nullptr;
     }
     NiD3DUtility::GetFileExtension(pcFilename, acFileExt, 256u);
     const char* pcSrc = &acFileExt[1];
@@ -516,9 +516,9 @@ NiD3DShaderProgramCreator* NiD3DShaderProgramFactory::GetShaderCreator(const cha
         ++i;
     }
     while (i < 256);
-    pkCreator = 0;
+    pkCreator = nullptr;
     bool v5 = NiD3DShaderProgramFactory::ms_pkShaderCreators->GetAt(acFileExt, pkCreator);
-    return v5 ? pkCreator : 0;
+    return v5 ? pkCreator : nullptr;
 }
 
 // KEEP: the lower-case copy stops at 256 characters without a terminator, so for an extension that long the exe's

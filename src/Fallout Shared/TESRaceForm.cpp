@@ -26,7 +26,7 @@ void TESRaceForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESRaceForm::CompareComponent(BaseFormComponent* apCompareFC) {
     TESRaceForm* v5 = dynamic_cast<TESRaceForm*>(apCompareFC);
     if (!v5) {
-        return (bool)1;
+        return true;
     }
     TESRace* v3 = TESRaceForm::GetFormRace();
     return (bool)((uint8_t)(v3 != v5->TESRaceForm::GetFormRace()));

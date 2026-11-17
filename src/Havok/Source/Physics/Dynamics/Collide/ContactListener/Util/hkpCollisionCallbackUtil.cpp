@@ -69,13 +69,13 @@ void hkpCollisionCallbackUtil::worldDeletedCallback(hkpWorld* world) {
     hkpConstraintListener* v3;
     m_endOfStepCallbackUtil.removeFromWorld(world);
     if (this == nullptr) {
-        v3 = 0;
+        v3 = nullptr;
     }
     else {
         v3 = static_cast<hkpConstraintListener*>(this);
     }
     world->removeConstraintListener(v3);
-    world->removeWorldDeletionListener(this != nullptr ? static_cast<hkpWorldDeletionListener*>(this) : 0);
+    world->removeWorldDeletionListener(this != nullptr ? static_cast<hkpWorldDeletionListener*>(this) : nullptr);
     removeReference();
 }
 

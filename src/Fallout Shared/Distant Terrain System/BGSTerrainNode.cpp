@@ -111,7 +111,7 @@ BGSTerrainNode::~BGSTerrainNode() {
 }
 
 BGSTerrainChunk* BGSTerrainNode::GetChunkForPoint(const NiPoint3& aPoint) {
-    BGSTerrainChunk* pchunk = 0;
+    BGSTerrainChunk* pchunk = nullptr;
     if (GetPointIsInNode(aPoint)) {
         if (pChunk && (pChunk->bDoneLoading && !bSplitNode)) {
             return pChunk;
@@ -131,7 +131,7 @@ BGSTerrainChunk* BGSTerrainNode::GetChunkForPoint(const NiPoint3& aPoint) {
 }
 
 BGSDistantTreeBlock* BGSTerrainNode::GetTreeBlockForPoint(const NiPoint3& aPoint) {
-    BGSDistantTreeBlock* pBlock = 0;
+    BGSDistantTreeBlock* pBlock = nullptr;
     if (GetPointIsInNode(aPoint)) {
         uint32_t FormHealth_0 = iLevel;
         if (FormHealth_0 == BGSTerrainManager::GetTreeLevel() && pTrees) {
@@ -180,7 +180,7 @@ void BGSTerrainNode::UnloadDataRecurse(DATA_TO_UNLOAD aeDataToUnload) {
             pChildren[i]->UnloadDataRecurse(aeDataToUnload);
         }
     }
-    bChildrenLoaded = 0;
+    bChildrenLoaded = false;
     if ((aeDataToUnload & UNLOAD_TREES_ONLY) != 0 && this == pManager->pRootNode) {
         BGSDistantTreeBlock::DeallocateStaticData();
     }
@@ -188,28 +188,28 @@ void BGSTerrainNode::UnloadDataRecurse(DATA_TO_UNLOAD aeDataToUnload) {
 
 bool BGSTerrainNode::CheckMeshSolid(bool abCheckIfLoadedOnly) {
     if (pChunk && pChunk->GetAttached()) {
-        return (bool)1;
+        return true;
     }
     if (pChunk && pChunk->bDoneLoading) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)CheckMeshSolidUnderMe(abCheckIfLoadedOnly));
 }
 
 bool BGSTerrainNode::CheckMeshSolidUnderMe(bool abCheckIfLoadedOnly) {
     if (iLevel == pManager->iMinLevel) {
-        return 0;
+        return false;
     }
     bool bsolid = pChildren[0]->CheckMeshSolid(abCheckIfLoadedOnly) &&
         (pChildren[1]->CheckMeshSolid(abCheckIfLoadedOnly) &&
          (pChildren[2]->CheckMeshSolid(abCheckIfLoadedOnly) && pChildren[3]->CheckMeshSolid(abCheckIfLoadedOnly)));
     if (sBaseCellX > 40 || sBaseCellX < -40) {
-        return 1;
+        return true;
     }
     if (sBaseCellY <= 44 && sBaseCellY >= -44) {
         return bsolid;
     }
-    return 1;
+    return true;
 }
 
 bool BGSTerrainNode::QSplitNode() {
@@ -261,7 +261,7 @@ float BGSTerrainNode::ComputeMorphParameter(const NiPoint3& aViewPosition) {
     ::new (&kPlayerPos) NiPoint2(aViewPosition.x, aViewPosition.y);
     ::new (&kBlockPos) NiPoint2(Center.x, Center.y);
     float fScale = (float)(((double)iLevel) * 4096.0);
-    float fRange = (float)DistToSquare(kBlockPos, fScale, kPlayerPos);
+    float fRange = DistToSquare(kBlockPos, fScale, kPlayerPos);
     if (fEndMorphDistance > ((double)fRange)) {
         return 1.0;
     }
@@ -367,15 +367,15 @@ bool BGSTerrainNode::ShouldSplit(const NiPoint3& aViewPosition) {
     NiPoint2 a1;
     NiPoint2 playerXY;
     if (((int32_t)iLevel) == pManager->iMinLevel) {
-        return (bool)0;
+        return false;
     }
     if (CheckIntersectsLoadedRange()) {
-        return (bool)1;
+        return true;
     }
     ::new (&playerXY) NiPoint2((&aViewPosition)->x, (&aViewPosition)->y);
     ::new (&a1) NiPoint2(Center.x, Center.y);
     float lodLevel = (float)(((double)iLevel) * 4096.0);
-    float range = (float)DistToSquare(a1, lodLevel, playerXY);
+    float range = DistToSquare(a1, lodLevel, playerXY);
     return (bool)((uint8_t)(fSplitDistance > ((double)range)));
 }
 
@@ -394,8 +394,8 @@ void BGSTerrainNode::UpdateBlockVisibility(bool abDebugOutput) {
     BSSegmentedTriShape* pSegmentedTriShape;
     TESWorldSpace* pWorldspace = TES::pInstance->GetWorldSpace();
     if (pBlock) {
-        if (pBlock->GetMesh(0)) {
-            mesh = static_cast<BSSegmentedTriShape*>(pBlock->GetMesh(0));
+        if (pBlock->GetMesh(false)) {
+            mesh = static_cast<BSSegmentedTriShape*>(pBlock->GetMesh(false));
             pSegmentedTriShape = mesh->IsSegmentedTriShape();
             if (CheckIntersectsLoadedRange()) {
                 if (pSegmentedTriShape) {
@@ -406,7 +406,7 @@ void BGSTerrainNode::UpdateBlockVisibility(bool abDebugOutput) {
                                 uiLevel = y + (x * this->iLevel);
                                 pCell = pWorldspace->GetCellFromCellCoord(x + this->sBaseCellX, y + this->sBaseCellY);
                                 if ((!pSegmentedTriShape->GetSegmentEmpty(uiLevel)) &&
-                                    (TES::pInstance->IsCellLoaded(pCell, 1) &&
+                                    (TES::pInstance->IsCellLoaded(pCell, true) &&
                                      pCell->All3DWithVisibleDistantFadingIn())) {
                                     pSegmentedTriShape->DisableSegment(uiLevel);
                                 }
@@ -427,16 +427,16 @@ void BGSTerrainNode::UpdateBlockVisibility(bool abDebugOutput) {
         }
     }
     if (pBlock) {
-        if (pBlock->GetNode(1)) {
+        if (pBlock->GetNode(true)) {
             if (CheckIntersectsLoadedRange()) {
                 sBaseCellY = this->sBaseCellY;
                 sBaseCellX = this->sBaseCellX;
                 iLevel = this->iLevel;
-                node = pBlock->GetNode(1);
+                node = pBlock->GetNode(true);
                 pBlock->UpdateStingerVisibility(node, iLevel, sBaseCellX, sBaseCellY);
             }
             else {
-                v7 = pBlock->GetNode(1);
+                v7 = pBlock->GetNode(true);
                 pBlock->EnableAllStingerVisibility(v7);
             }
         }
@@ -447,7 +447,7 @@ bool BGSTerrainNode::GetPointIsInNode(const NiPoint3& aPoint) {
     float v6 = (float)(((double)iLevel) * 2048.0);
     float v4 = (&aPoint)->y - Center.y;
     if (((double)v6) < std::fabs(v4)) {
-        return (bool)0;
+        return false;
     }
     float v3 = (&aPoint)->x - Center.x;
     return (bool)((uint8_t)(!(((double)v6) < std::fabs(v3))));
@@ -468,7 +468,7 @@ void BGSTerrainNode::UpdateWaterVisibility(BSSegmentedTriShape* apWater, bool ab
                     if (v3 < apWater->GetNumSegments()) {
                         a2 = j + (i * iLevel);
                         pCell = pWorld->GetCellFromCellCoord(i + sBaseCellX, j + sBaseCellY);
-                        if (apWater->GetSegmentEmpty(a2) || (!TES::pInstance->IsCellLoaded(pCell, 1))) {
+                        if (apWater->GetSegmentEmpty(a2) || (!TES::pInstance->IsCellLoaded(pCell, true))) {
                             apWater->EnableSegment(a2);
                         }
                         else {
@@ -515,7 +515,7 @@ void BGSTerrainNode::UnloadData(DATA_TO_UNLOAD aeDataToUnload) {
         this->pTrees = nullptr;
     }
     if (pParent != nullptr) {
-        pParent->bChildrenLoaded = 0;
+        pParent->bChildrenLoaded = false;
     }
 }
 
@@ -525,7 +525,7 @@ void BGSTerrainNode::DestroyRecurse() {
             if (pChunk) {
                 delete pChunk;
             }
-            pChunk = 0;
+            pChunk = nullptr;
         }
     }
     for (int32_t i = 0; i < 4; ++i) {
@@ -537,7 +537,7 @@ void BGSTerrainNode::DestroyRecurse() {
 
 void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateWaterVisibility) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LODLANDSCAPE, 1,
+        MEM_CONTEXT_LODLANDSCAPE, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Distant Terrain System\\BGSTerrainNode.cpp", 284
     );
     bool bforceSplit = pManager->iMaxLevel < iLevel;
@@ -550,7 +550,7 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
         }
     }
     if (bforceSplit || bshouldSplit) {
-        bSplitNode = 1;
+        bSplitNode = true;
         if (QPersistentNode() && !this->pChunk) {
             BGSTerrainChunk* pChunk;
             BGSTerrainChunk* v13 = static_cast<BGSTerrainChunk*>(ourMalloc(sizeof(BGSTerrainChunk)));
@@ -558,7 +558,7 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
                 pChunk = ::new (v13) BGSTerrainChunk(this, static_cast<int32_t>(iLevel), sBaseCellX, sBaseCellY);
             }
             else {
-                pChunk = 0;
+                pChunk = nullptr;
             }
             this->pChunk = pChunk;
         }
@@ -568,7 +568,7 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
             }
         }
         if (this->pChunk) {
-            if (CheckMeshSolidUnderMe(1)) {
+            if (CheckMeshSolidUnderMe(true)) {
                 for (int32_t i_2 = 0; i_2 < 4; ++i_2) {
                     if (pChildren[i_2]->pChunk) {
                         if (pChildren[i_2]->pChunk->bDoneLoading) {
@@ -579,8 +579,8 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
                 UnloadData(BGSTerrainNode::UNLOAD_TERRAIN_ONLY);
             }
         }
-        if (CheckMeshSolidUnderMe(1)) {
-            bChildrenLoaded = 1;
+        if (CheckMeshSolidUnderMe(true)) {
+            bChildrenLoaded = true;
         }
     }
     else {
@@ -590,23 +590,23 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
                 pmesh = this->pChunk->GetMesh();
             }
             else {
-                pmesh = 0;
+                pmesh = nullptr;
             }
-            bSplitNode = 0;
+            bSplitNode = false;
             if (this->pChunk) {
                 if (this->pChunk->bDoneLoading && this->pChunk->GetAttached() && QPersistentNode()) {
                     this->pChunk->Show();
                 }
                 if (this->pChunk->bDoneLoading && !this->pChunk->GetAttached() &&
-                    (!pParent || pParent->CheckMeshSolidUnderMe(1))) {
+                    (!pParent || pParent->CheckMeshSolidUnderMe(true))) {
                     this->pChunk->Attach();
                     double v7 = static_cast<double>(iLevel) / 4.0;
                     float v6 = fDetailTextureScale.Float() * v7;
                     this->pChunk->GetShadeProperty()->fTerrainDetailTexScale = v6;
                     NiNode* proot = pManager->GetLODRoot();
-                    proot->SetFixedBound(0);
+                    proot->SetFixedBound(false);
                     proot->UpdateWorldBound();
-                    proot->SetFixedBound(1);
+                    proot->SetFixedBound(true);
                 }
             }
             else {
@@ -616,7 +616,7 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
                     v8 = ::new (v12) BGSTerrainChunk(this, static_cast<int32_t>(iLevel), sBaseCellX, sBaseCellY);
                 }
                 else {
-                    v8 = 0;
+                    v8 = nullptr;
                 }
                 this->pChunk = v8;
             }
@@ -626,7 +626,7 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
                         pChildren[i_3]->UnloadDataRecurse(BGSTerrainNode::UNLOAD_TERRAIN_ONLY);
                     }
                 }
-                bChildrenLoaded = 0;
+                bChildrenLoaded = false;
             }
             if (pmesh) {
                 TESWorldSpace* World = pManager->pWorld;
@@ -635,7 +635,7 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
                     if (pactualCurrentWorld->GetParentUseFlag(TESWorldSpace::PU_LOD) &&
                         !pactualCurrentWorld->GetParentUseFlag(TESWorldSpace::PU_LAND) &&
                         CheckIntersectsLoadedRange()) {
-                        pmesh->SetAppCulled(1);
+                        pmesh->SetAppCulled(true);
                     }
                 }
             }
@@ -645,11 +645,11 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
                     NiGeometry* pwater1 = this->pChunk->GetWaterAtReflectionHeight();
                     if (pwater0) {
                         BSSegmentedTriShape* v4 = pwater0->IsSegmentedTriShape();
-                        UpdateWaterVisibility(v4, 0);
+                        UpdateWaterVisibility(v4, false);
                     }
                     if (pwater1) {
                         BSSegmentedTriShape* v5 = pwater1->IsSegmentedTriShape();
-                        UpdateWaterVisibility(v5, 0);
+                        UpdateWaterVisibility(v5, false);
                     }
                 }
             }
@@ -659,7 +659,7 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
 
 void BGSTerrainNode::UpdateBlocks(const NiPoint3& aViewPosition, bool abUpdateVisibility) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LODBUILDINGS, 1,
+        MEM_CONTEXT_LODBUILDINGS, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Distant Terrain System\\BGSTerrainNode.cpp", 430
     );
     uint32_t FormHealth_0 = iLevel;
@@ -667,12 +667,12 @@ void BGSTerrainNode::UpdateBlocks(const NiPoint3& aViewPosition, bool abUpdateVi
         if (ShouldLoadBlock(aViewPosition)) {
             bool bLoadLow = ShouldLoadBlockLowPriority(aViewPosition);
             if (pBlock) {
-                if (pBlock->GetMesh(0)) {
+                if (pBlock->GetMesh(false)) {
                     if (pBlock->bDoneLoading) {
                         pBlock->Attach();
                     }
                     if (abUpdateVisibility) {
-                        UpdateBlockVisibility(0);
+                        UpdateBlockVisibility(false);
                     }
                 }
             }
@@ -687,7 +687,7 @@ void BGSTerrainNode::UpdateBlocks(const NiPoint3& aViewPosition, bool abUpdateVi
                     );
                 }
                 else {
-                    v5 = 0;
+                    v5 = nullptr;
                 }
                 pBlock = v5;
             }
@@ -710,7 +710,7 @@ void BGSTerrainNode::UpdateBlocks(const NiPoint3& aViewPosition, bool abUpdateVi
         else {
             if (pBlock) {
                 delete pBlock;
-                pBlock = 0;
+                pBlock = nullptr;
             }
         }
     }
@@ -728,7 +728,7 @@ void BGSTerrainNode::UpdateBlocks(const NiPoint3& aViewPosition, bool abUpdateVi
 
 void BGSTerrainNode::UpdateTrees(const NiPoint3& aViewPosition) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LODTREES, 1,
+        MEM_CONTEXT_LODTREES, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Distant Terrain System\\BGSTerrainNode.cpp", 493
     );
     uint32_t FormHealth_0 = iLevel;
@@ -750,7 +750,7 @@ void BGSTerrainNode::UpdateTrees(const NiPoint3& aViewPosition) {
                     v4 = ::new (v7) BGSDistantTreeBlock(this, iLevel, sBaseCellX, sBaseCellY);
                 }
                 else {
-                    v4 = 0;
+                    v4 = nullptr;
                 }
                 pTrees = v4;
             }
@@ -761,7 +761,7 @@ void BGSTerrainNode::UpdateTrees(const NiPoint3& aViewPosition) {
                 if (apThis) {
                     delete apThis;
                 }
-                pTrees = 0;
+                pTrees = nullptr;
             }
         }
     }
@@ -787,17 +787,17 @@ void BGSTerrainNode::StartTextureMorph() {
         NiPoint2 off = GetOffsetFromParent();
         uiFadeStartTime = appTimer.iLastTime;
         plp->SetTerrainTexParams(off.x, off.y, 0.0f);
-        bTexFading = 1;
+        bTexFading = true;
     }
 }
 
 void BGSTerrainNode::EndTextureMorph() {
-    bTexFading = 0;
+    bTexFading = false;
     BSShaderPPLightingProperty* plp = pChunk->GetShadeProperty();
     if (plp) {
         plp->SetTerrainTexParams(0.0f, 0.0f, 1.0f);
-        plp->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 1u, 0);
-        plp->SetTexture(BSShaderProperty::TEXTYPE_NORMAL, 1u, 0);
+        plp->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 1u, nullptr);
+        plp->SetTexture(BSShaderProperty::TEXTYPE_NORMAL, 1u, nullptr);
     }
 }
 

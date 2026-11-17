@@ -159,7 +159,7 @@
 #include "Reconstruction.hpp"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 BSSimpleList<void*> BGSSceneInfo::CellInfoList;
@@ -314,18 +314,18 @@ void BGSSceneInfo::CollectSceneDataFromAddonNodes() {
         BGSSceneInfo::SceneDataAddonNodes.Insert(i, sdis);
         BGSAddonNode* paddonNode = pDataHandler->GetAddonNode(i);
         if (paddonNode) {
-            bool bmaster = 0;
+            bool bmaster = false;
             if (paddonNode->GetModelLength()) {
                 char modelPath[268];
                 BSstrcpy(modelPath, 260, "Meshes\\");
                 const char* v1 = paddonNode->GetModel();
                 BSstrcat(modelPath, 260, v1);
-                NiAVObject* pav = pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+                NiAVObject* pav = pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
                 if (pav) {
                     if (!BSParticleSystemManager::IsValidMasterParticleSystem(pav)) {
                         SCENE_INFO_DATA_STRUCT* v3 = &BGSSceneInfo::SceneDataAddonNodes.GetAt(i);
                         NiAVObject* v2 = static_cast<NiAVObject*>(NiObject::DynamicCastStatic(&NiNode::ms_RTTI, pav));
-                        CollectSceneDataRecursive(v2, v3, 0, 0);
+                        CollectSceneDataRecursive(v2, v3, false, nullptr);
                     }
                     pModelLoader->ReleaseFile(modelPath);
                 }
@@ -426,7 +426,7 @@ void BGSSceneInfo::CollectSceneDataRecursive(
                 uint32_t icount = pnode->GetArrayCount();
                 for (uint32_t i = 0; i < icount; ++i) {
                     NiAVObject* pchild = pnode->GetAt(i);
-                    CollectSceneDataRecursive(pchild, pStructToFill, 0, pnode);
+                    CollectSceneDataRecursive(pchild, pStructToFill, false, pnode);
                 }
             }
         }
@@ -595,7 +595,7 @@ void BGSSceneInfo::CollectSceneDataFromNode(NiNode* apNode, bool abIncludeAddonN
         CollectSceneDataFromAddonNodes();
     }
     ourMemset(&SceneData, 0, sizeof(SceneData));
-    CollectSceneDataRecursive(apNode, &SceneData, abTrackActors, 0);
+    CollectSceneDataRecursive(apNode, &SceneData, abTrackActors, nullptr);
     if (BGSSceneInfo::GetAggregateInstances()) {
         BGSSceneInfo::TextureTracker.RemoveAll();
     }
@@ -624,15 +624,15 @@ void BGSSceneInfo::CollectSceneDataForLoadedArea(
             pinfo = ::new (v11) BGSSceneInfo;
         }
         else {
-            pinfo = 0;
+            pinfo = nullptr;
         }
         BGSSceneInfo* pinfo_2 = pinfo;
         pinfo->pAssociatedForm = pcell;
         NiNode* v4 = pcell->Get3D();
-        pinfo->CollectSceneDataFromNode(v4, abIncludeAddonNodes, 0);
+        pinfo->CollectSceneDataFromNode(v4, abIncludeAddonNodes, false);
         pinfo->CollectWaterData(pcell);
         NiNode* v5 = pcell->Get3D();
-        textureusemap.CollectTexUseData(v5, pcell, 0);
+        textureusemap.CollectTexUseData(v5, pcell, false);
         cellinfolist.AddHead(pinfo_2);
     }
     else {
@@ -650,14 +650,14 @@ void BGSSceneInfo::CollectSceneDataForLoadedArea(
                         pinfo_3 = ::new (v10) BGSSceneInfo;
                     }
                     else {
-                        pinfo_3 = 0;
+                        pinfo_3 = nullptr;
                     }
                     BGSSceneInfo* pinfo_4 = pinfo_3;
                     pinfo_3->pAssociatedForm = pcell__pgridcell;
                     NiNode* v6 = pcell__pgridcell->Get3D();
-                    pinfo_4->CollectSceneDataFromNode(v6, abIncludeAddonNodes, 0);
+                    pinfo_4->CollectSceneDataFromNode(v6, abIncludeAddonNodes, false);
                     NiNode* v7 = pcell__pgridcell->Get3D();
-                    textureusemap.CollectTexUseData(v7, pcell__pgridcell, 0);
+                    textureusemap.CollectTexUseData(v7, pcell__pgridcell, false);
                     pinfo_4->CollectWaterData(pcell__pgridcell);
                     cellinfolist.AddHead(pinfo_4);
                 }
@@ -750,10 +750,10 @@ void BGSSceneInfo::ReloadBudgetCaps() {
 }
 
 void BGSSceneInfo::TexUseCB(NiTexture* apTexture, uint32_t aulMemorySize, void* apParam) {
-    bool bchecked = 0;
+    bool bchecked = false;
     if (!BGSSceneInfo::TextureTracker.GetAt(apTexture, bchecked) || !bchecked) {
         **static_cast<uint32_t**>(apParam) += aulMemorySize;
-        BGSSceneInfo::TextureTracker.SetAt(apTexture, 1);
+        BGSSceneInfo::TextureTracker.SetAt(apTexture, true);
     }
 }
 

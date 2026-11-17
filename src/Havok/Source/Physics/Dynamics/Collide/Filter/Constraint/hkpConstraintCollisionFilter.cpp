@@ -110,7 +110,7 @@ void hkpConstraintCollisionFilter::constraintBreakingCallback(const hkpConstrain
         event.m_world->queueOperation(kOperation);
     }
     else {
-        _constraintBreakingCallbackImmediate(event.m_constraintInstance, static_cast<hkBool>(1));
+        _constraintBreakingCallbackImmediate(event.m_constraintInstance, static_cast<hkBool>(true));
     }
 }
 
@@ -126,7 +126,7 @@ void hkpConstraintCollisionFilter::constraintRepairedCallback(const hkpConstrain
         event.m_world->queueOperation(kOperation);
     }
     else {
-        _constraintBreakingCallbackImmediate(event.m_constraintInstance, static_cast<hkBool>(0));
+        _constraintBreakingCallbackImmediate(event.m_constraintInstance, static_cast<hkBool>(false));
     }
 }
 

@@ -24,7 +24,7 @@ int32_t hkSocket::ReaderAdapter::read(void* buf, int32_t nbytes) {
     if (nbytes <= 0) {
         return nbytes;
     }
-    while (1) {
+    while (true) {
         int32_t v5 = m_socket->read(static_cast<char*>(buf) + v3, nbytes - v3);
         v3 += v5;
         if (!v5) {
@@ -52,7 +52,7 @@ int32_t hkSocket::WriterAdapter::write(const void* buf, int32_t nbytes) {
     if (nbytes <= 0) {
         return nbytes;
     }
-    while (1) {
+    while (true) {
         int32_t iCount = m_socket->write(static_cast<const char*>(buf) + iWritten, nbytes - iWritten);
         iWritten += iCount;
         if (!iCount) {

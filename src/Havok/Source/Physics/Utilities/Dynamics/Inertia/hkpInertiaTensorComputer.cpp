@@ -985,14 +985,14 @@ void hkpInertiaTensorComputer::computeShapeVolumeMassProperties(
 
 void hkpInertiaTensorComputer::shiftInertiaFromCom(const hkVector4& shift, float mass, hkMatrix3& inertia) {
     (&inertia)->m_col0.m_quad[0] =
-        (float)(((((&shift)->m_quad[2] * (&shift)->m_quad[2]) + ((&shift)->m_quad[1] * (&shift)->m_quad[1])) * mass) +
-                (&inertia)->m_col0.m_quad[0]);
+        (((((&shift)->m_quad[2] * (&shift)->m_quad[2]) + ((&shift)->m_quad[1] * (&shift)->m_quad[1])) * mass) +
+         (&inertia)->m_col0.m_quad[0]);
     (&inertia)->m_col1.m_quad[1] =
-        (float)(((((&shift)->m_quad[2] * (&shift)->m_quad[2]) + ((&shift)->m_quad[0] * (&shift)->m_quad[0])) * mass) +
-                (&inertia)->m_col1.m_quad[1]);
+        (((((&shift)->m_quad[2] * (&shift)->m_quad[2]) + ((&shift)->m_quad[0] * (&shift)->m_quad[0])) * mass) +
+         (&inertia)->m_col1.m_quad[1]);
     (&inertia)->m_col2.m_quad[2] =
-        (float)(((((&shift)->m_quad[1] * (&shift)->m_quad[1]) + ((&shift)->m_quad[0] * (&shift)->m_quad[0])) * mass) +
-                (&inertia)->m_col2.m_quad[2]);
+        (((((&shift)->m_quad[1] * (&shift)->m_quad[1]) + ((&shift)->m_quad[0] * (&shift)->m_quad[0])) * mass) +
+         (&inertia)->m_col2.m_quad[2]);
     float v5 = (&inertia)->m_col0.m_quad[1] - (((&shift)->m_quad[0] * mass) * (&shift)->m_quad[1]);
     (&inertia)->m_col0.m_quad[1] = v5;
     (&inertia)->m_col1.m_quad[0] = v5;
@@ -1008,9 +1008,9 @@ void hkpInertiaTensorComputer::shiftInertiaToCom(const hkVector4& shift, float m
     const float* a1 = reinterpret_cast<const float*>(&shift.m_quad);
     const float a2 = mass;
     float* a3 = reinterpret_cast<float*>(&inertia.m_col0.m_quad);
-    *a3 = (float)((*a3) - (((a1[2] * a1[2]) + (a1[1] * a1[1])) * a2));
-    a3[5] = (float)(a3[5] - (((a1[2] * a1[2]) + ((*a1) * (*a1))) * a2));
-    a3[10] = (float)(a3[10] - (((a1[1] * a1[1]) + ((*a1) * (*a1))) * a2));
+    *a3 = ((*a3) - (((a1[2] * a1[2]) + (a1[1] * a1[1])) * a2));
+    a3[5] = (a3[5] - (((a1[2] * a1[2]) + ((*a1) * (*a1))) * a2));
+    a3[10] = (a3[10] - (((a1[1] * a1[1]) + ((*a1) * (*a1))) * a2));
     float v5 = (((*a1) * a2) * a1[1]) + a3[1];
     a3[1] = v5;
     a3[4] = v5;

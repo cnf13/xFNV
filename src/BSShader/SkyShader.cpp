@@ -85,7 +85,7 @@ bool SkyShader::Initialize() {
         if (m_pObject->m_uiRefCount-- == 1) {
             m_pObject->ReturnPassToPool();
         }
-        SkyShader::spPass[0].m_pObject = 0;
+        SkyShader::spPass[0].m_pObject = nullptr;
     }
     return v2;
 }
@@ -99,7 +99,7 @@ void SkyShader::SetupGeometryTextures(const NiPropertyState* apState) {
         pstage->m_spTexture = m_pObject;
         NiTexturingProperty::ClampMode v6 = pprop->GetClampNI();
         pstage->SetClampMode(v6);
-        pstage->ConfigureStage(0);
+        pstage->ConfigureStage(false);
     }
     NiSourceTexture* v7 = pprop->spBlendTexture.m_pObject;
     if (v7 ||
@@ -109,13 +109,13 @@ void SkyShader::SetupGeometryTextures(const NiPropertyState* apState) {
             (BSShaderManager::eCurrentPass == BSShaderManager::BSSM_SKY_SUNGLARE ||
              (BSShaderManager::eCurrentPass == BSShaderManager::BSSM_SKY_CLOUDS ||
               BSShaderManager::eCurrentPass == BSShaderManager::BSSM_SKY_CLOUDS_UNDERWATER))))) &&
-         (v7 = pprop->spBaseMap.m_pObject) != 0)) {
+         (v7 = pprop->spBaseMap.m_pObject) != nullptr)) {
         NiD3DTextureStage* pstage_2 = v2->m_kStages.m_pBase[1].m_pObject;
         if (pstage_2) {
             pstage_2->m_spTexture = v7;
             NiTexturingProperty::ClampMode v9 = pprop->GetClampNI();
             pstage_2->SetClampMode(v9);
-            pstage_2->ConfigureStage(0);
+            pstage_2->ConfigureStage(false);
         }
     }
 }
@@ -146,11 +146,11 @@ void SkyShader::SetupGeometryConstants(const NiPropertyState* apState) {
             kPosDiff.z = m_pkCamera->m_kWorld.m_Translate.z + kPosDiff.z;
         }
         trans.m_Translate = kPosDiff;
-        m_pkD3DRenderer->SetModelTransform(trans, 0);
+        m_pkD3DRenderer->SetModelTransform(trans, false);
         v4 = apState;
     }
     else {
-        m_pkD3DRenderer->SetModelTransform(pgeometry->m_kWorld, 0);
+        m_pkD3DRenderer->SetModelTransform(pgeometry->m_kWorld, false);
     }
     float kPosDiffa = BSShaderLightingProperty::pShaderLightConstants[30].X() - NiRenderer::PosAdjust.x;
     float kPosDiff_4 = BSShaderLightingProperty::pShaderLightConstants[30].Y() - NiRenderer::PosAdjust.y;
@@ -209,7 +209,7 @@ void SkyShader::SetupGeometryConstants(const NiPropertyState* apState) {
         NiD3DPixelShader* v10 = NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject;
         if (v10) {
             m_pObject->SetShaderConstants(
-                v10, pgeometry, pskin, 0, pbufferData, v4, 0, pgeometry->m_kWorld, *pBound, 0, 1
+                v10, pgeometry, pskin, nullptr, pbufferData, v4, nullptr, pgeometry->m_kWorld, *pBound, 0, true
             );
             v4 = apState;
             v7 = pShaderProp;
@@ -220,7 +220,9 @@ void SkyShader::SetupGeometryConstants(const NiPropertyState* apState) {
     if (v11) {
         NiD3DVertexShader* v12 = NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject;
         if (v12) {
-            v11->SetShaderConstants(v12, pgeometry, pskin, 0, pbufferData, v4, 0, pgeometry->m_kWorld, *pBound, 0, 1);
+            v11->SetShaderConstants(
+                v12, pgeometry, pskin, nullptr, pbufferData, v4, nullptr, pgeometry->m_kWorld, *pBound, 0, true
+            );
             v7 = pShaderProp;
         }
     }
@@ -246,7 +248,7 @@ void SkyShader::PostGeometry(const NiPropertyState* apState) {
     NiStencilProperty* pStencil = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
     if (pStencil) {
         if ((pStencil->m_uFlags & 1) != 0) {
-            BSRenderState::SetStencilEnable(0, BSRS_NOLOCK);
+            BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
         }
     }
 }
@@ -356,32 +358,32 @@ bool SkyShader::LoadStagesAndPasses() {
     if (!m_pObject) {
         NiD3DPass::CreateNewPass(*this->SkyShader::spPass);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
         spPass->m_pObject->SetStage(spPass->m_pObject->m_uiCurrentStage, spStage.m_pObject);
         NiD3DPass* v3 = spPass->m_pObject;
         if (!spPass->m_pObject->m_pkRenderStateGroup) {
             v3->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v3->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v3->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         NiD3DPass* v4 = spPass->m_pObject;
         if (!spPass->m_pObject->m_pkRenderStateGroup) {
             v4->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v4->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        v4->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!v4->m_pkRenderStateGroup) {
             v4->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v4->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        v4->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         NiD3DPass* v5 = spPass->m_pObject;
         if (!spPass->m_pObject->m_pkRenderStateGroup) {
             v5->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v5->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v5->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         NiD3DPass* v6 = spPass->m_pObject;
         if (!spPass->m_pObject->m_pkRenderStateGroup) {
             v6->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v6->m_pkRenderStateGroup->SetRenderState(168u, 0, 1);
+        v6->m_pkRenderStateGroup->SetRenderState(168u, 0, true);
     }
     NiD3DPass* v7 = spPass->m_pObject;
     NiD3DVertexShader* v8 = this->spVertexShader[5];
@@ -402,38 +404,38 @@ bool SkyShader::LoadStagesAndPasses() {
     if (!this->SkyShader::spPass[8].m_pObject) {
         NiD3DPass::CreateNewPass(this->SkyShader::spPass[8]);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
         (*p_m_pObject)->SetStage((*p_m_pObject)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DPass* v14 = *p_m_pObject;
         if (!(*p_m_pObject)->m_pkRenderStateGroup) {
             v14->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v14->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        v14->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         NiD3DPass* v15 = *p_m_pObject;
         if (!(*p_m_pObject)->m_pkRenderStateGroup) {
             v15->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v15->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        v15->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         NiD3DPass* v16 = *p_m_pObject;
         if (!(*p_m_pObject)->m_pkRenderStateGroup) {
             v16->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v16->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        v16->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         NiD3DPass* v17 = *p_m_pObject;
         if (!(*p_m_pObject)->m_pkRenderStateGroup) {
             v17->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v17->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v17->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         NiD3DPass* v18 = *p_m_pObject;
         if (!(*p_m_pObject)->m_pkRenderStateGroup) {
             v18->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v18->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        v18->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         NiD3DPass* v19 = *p_m_pObject;
         if (!(*p_m_pObject)->m_pkRenderStateGroup) {
             v19->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v19->m_pkRenderStateGroup->SetRenderState(168u, 8u, 1);
+        v19->m_pkRenderStateGroup->SetRenderState(168u, 8u, true);
     }
     NiD3DPass* v20 = *p_m_pObject;
     NiD3DVertexShader* v21 = this->spVertexShader[10];
@@ -454,47 +456,47 @@ bool SkyShader::LoadStagesAndPasses() {
     if (!this->SkyShader::spPass[9].m_pObject) {
         NiD3DPass::CreateNewPass(this->SkyShader::spPass[9]);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
         (*v26)->SetStage((*v26)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DPass* v27 = *v26;
         if (!(*v26)->m_pkRenderStateGroup) {
             v27->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v27->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v27->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         NiD3DPass* v28 = *v26;
         if (!(*v26)->m_pkRenderStateGroup) {
             v28->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v28->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        v28->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!v28->m_pkRenderStateGroup) {
             v28->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v28->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        v28->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         NiD3DPass* v29 = *v26;
         if (!(*v26)->m_pkRenderStateGroup) {
             v29->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v29->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        v29->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         NiD3DPass* v30 = *v26;
         if (!(*v26)->m_pkRenderStateGroup) {
             v30->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v30->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        v30->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         NiD3DPass* v31 = *v26;
         if (!(*v26)->m_pkRenderStateGroup) {
             v31->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v31->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v31->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         NiD3DPass* v32 = *v26;
         if (!(*v26)->m_pkRenderStateGroup) {
             v32->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v32->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        v32->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         NiD3DPass* v33 = *v26;
         if (!(*v26)->m_pkRenderStateGroup) {
             v33->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v33->m_pkRenderStateGroup->SetRenderState(168u, 8u, 1);
+        v33->m_pkRenderStateGroup->SetRenderState(168u, 8u, true);
     }
     NiD3DPass* v34 = *v26;
     NiD3DVertexShader* v35 = this->spVertexShader[8];
@@ -515,50 +517,50 @@ bool SkyShader::LoadStagesAndPasses() {
     if (!this->SkyShader::spPass[10].m_pObject) {
         NiD3DPass::CreateNewPass(this->SkyShader::spPass[10]);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
         (*v40)->SetStage((*v40)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, true);
         (*v40)->SetStage((*v40)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DPass* v41 = *v40;
         if (!(*v40)->m_pkRenderStateGroup) {
             v41->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v41->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        v41->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         NiD3DPass* v42 = *v40;
         if (!(*v40)->m_pkRenderStateGroup) {
             v42->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v42->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v42->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         NiD3DPass* v43 = *v40;
         if (!(*v40)->m_pkRenderStateGroup) {
             v43->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v43->m_pkRenderStateGroup->SetRenderState(19u, 1u, 1);
+        v43->m_pkRenderStateGroup->SetRenderState(19u, 1u, true);
         if (!v43->m_pkRenderStateGroup) {
             v43->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v43->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        v43->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         NiD3DPass* v44 = *v40;
         if (!(*v40)->m_pkRenderStateGroup) {
             v44->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v44->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        v44->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         NiD3DPass* v45 = *v40;
         if (!(*v40)->m_pkRenderStateGroup) {
             v45->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v45->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v45->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         NiD3DPass* v46 = *v40;
         if (!(*v40)->m_pkRenderStateGroup) {
             v46->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v46->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        v46->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         NiD3DPass* v47 = *v40;
         if (!(*v40)->m_pkRenderStateGroup) {
             v47->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v47->m_pkRenderStateGroup->SetRenderState(168u, 8u, 1);
+        v47->m_pkRenderStateGroup->SetRenderState(168u, 8u, true);
     }
     NiD3DPass* v48 = *v40;
     NiD3DVertexShader* v49 = this->spVertexShader[9];
@@ -579,50 +581,50 @@ bool SkyShader::LoadStagesAndPasses() {
     if (!this->SkyShader::spPass[1].m_pObject) {
         NiD3DPass::CreateNewPass(this->SkyShader::spPass[1]);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
         (*v54)->SetStage((*v54)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, true);
         (*v54)->SetStage((*v54)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DPass* v55 = *v54;
         if (!(*v54)->m_pkRenderStateGroup) {
             v55->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v55->m_pkRenderStateGroup->SetRenderState(7u, 0, 1);
+        v55->m_pkRenderStateGroup->SetRenderState(7u, 0, true);
         NiD3DPass* v56 = *v54;
         if (!(*v54)->m_pkRenderStateGroup) {
             v56->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v56->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v56->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         NiD3DPass* v57 = *v54;
         if (!(*v54)->m_pkRenderStateGroup) {
             v57->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v57->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v57->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         NiD3DPass* v58 = *v54;
         if (!(*v54)->m_pkRenderStateGroup) {
             v58->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v58->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        v58->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!v58->m_pkRenderStateGroup) {
             v58->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v58->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        v58->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         NiD3DPass* v59 = *v54;
         if (!(*v54)->m_pkRenderStateGroup) {
             v59->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v59->m_pkRenderStateGroup->SetRenderState(52u, 0, 1);
+        v59->m_pkRenderStateGroup->SetRenderState(52u, 0, true);
         NiD3DPass* v60 = *v54;
         if (!(*v54)->m_pkRenderStateGroup) {
             v60->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v60->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        v60->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         NiD3DPass* v61 = *v54;
         if (!(*v54)->m_pkRenderStateGroup) {
             v61->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v61->m_pkRenderStateGroup->SetRenderState(168u, 7u, 1);
+        v61->m_pkRenderStateGroup->SetRenderState(168u, 7u, true);
     }
     NiD3DPass* v62 = *v54;
     NiD3DVertexShader* v63 = this->spVertexShader[1];
@@ -643,32 +645,32 @@ bool SkyShader::LoadStagesAndPasses() {
     if (!this->SkyShader::spPass[3].m_pObject) {
         NiD3DPass::CreateNewPass(this->SkyShader::spPass[3]);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
         (*v68)->SetStage((*v68)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DPass* v69 = *v68;
         if (!(*v68)->m_pkRenderStateGroup) {
             v69->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v69->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v69->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         NiD3DPass* v70 = *v68;
         if (!(*v68)->m_pkRenderStateGroup) {
             v70->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v70->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v70->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         NiD3DPass* v71 = *v68;
         if (!(*v68)->m_pkRenderStateGroup) {
             v71->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v71->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        v71->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!v71->m_pkRenderStateGroup) {
             v71->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v71->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        v71->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         NiD3DPass* v72 = *v68;
         if (!(*v68)->m_pkRenderStateGroup) {
             v72->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v72->m_pkRenderStateGroup->SetRenderState(168u, 7u, 1);
+        v72->m_pkRenderStateGroup->SetRenderState(168u, 7u, true);
     }
     NiD3DPass* v73 = *v68;
     NiD3DVertexShader* v74 = this->spVertexShader[4];
@@ -689,35 +691,35 @@ bool SkyShader::LoadStagesAndPasses() {
     if (!this->SkyShader::spPass[4].m_pObject) {
         NiD3DPass::CreateNewPass(this->SkyShader::spPass[4]);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
         (*v79)->SetStage((*v79)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, true);
         (*v79)->SetStage((*v79)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DPass* v80 = *v79;
         if (!(*v79)->m_pkRenderStateGroup) {
             v80->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v80->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v80->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         NiD3DPass* v81 = *v79;
         if (!(*v79)->m_pkRenderStateGroup) {
             v81->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v81->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v81->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         NiD3DPass* v82 = *v79;
         if (!(*v79)->m_pkRenderStateGroup) {
             v82->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v82->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        v82->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!v82->m_pkRenderStateGroup) {
             v82->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v82->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        v82->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         NiD3DPass* v83 = *v79;
         if (!(*v79)->m_pkRenderStateGroup) {
             v83->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v83->m_pkRenderStateGroup->SetRenderState(168u, 7u, 1);
+        v83->m_pkRenderStateGroup->SetRenderState(168u, 7u, true);
     }
     NiD3DPass* v84 = *v79;
     NiD3DVertexShader* v85 = this->spVertexShader[6];
@@ -738,35 +740,35 @@ bool SkyShader::LoadStagesAndPasses() {
     if (!this->SkyShader::spPass[5].m_pObject) {
         NiD3DPass::CreateNewPass(this->SkyShader::spPass[5]);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
         (*v90)->SetStage((*v90)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, true);
         (*v90)->SetStage((*v90)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DPass* v91 = *v90;
         if (!(*v90)->m_pkRenderStateGroup) {
             v91->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v91->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v91->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         NiD3DPass* v92 = *v90;
         if (!(*v90)->m_pkRenderStateGroup) {
             v92->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v92->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v92->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         NiD3DPass* v93 = *v90;
         if (!(*v90)->m_pkRenderStateGroup) {
             v93->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v93->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        v93->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!v93->m_pkRenderStateGroup) {
             v93->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v93->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        v93->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         NiD3DPass* v94 = *v90;
         if (!(*v90)->m_pkRenderStateGroup) {
             v94->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v94->m_pkRenderStateGroup->SetRenderState(168u, 7u, 1);
+        v94->m_pkRenderStateGroup->SetRenderState(168u, 7u, true);
     }
     NiD3DPass* v95 = *v90;
     NiD3DVertexShader* v96 = this->spVertexShader[7];
@@ -787,35 +789,35 @@ bool SkyShader::LoadStagesAndPasses() {
     if (!this->SkyShader::spPass[6].m_pObject) {
         NiD3DPass::CreateNewPass(this->SkyShader::spPass[6]);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
         (*v101)->SetStage((*v101)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, true);
         (*v101)->SetStage((*v101)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DPass* v102 = *v101;
         if (!(*v101)->m_pkRenderStateGroup) {
             v102->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v102->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v102->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         NiD3DPass* v103 = *v101;
         if (!(*v101)->m_pkRenderStateGroup) {
             v103->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v103->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v103->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         NiD3DPass* v104 = *v101;
         if (!(*v101)->m_pkRenderStateGroup) {
             v104->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v104->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        v104->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!v104->m_pkRenderStateGroup) {
             v104->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v104->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        v104->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         NiD3DPass* v105 = *v101;
         if (!(*v101)->m_pkRenderStateGroup) {
             v105->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v105->m_pkRenderStateGroup->SetRenderState(168u, 7u, 1);
+        v105->m_pkRenderStateGroup->SetRenderState(168u, 7u, true);
     }
     NiD3DPass* v106 = *v101;
     NiD3DVertexShader* v107 = this->spVertexShader[1];
@@ -836,40 +838,40 @@ bool SkyShader::LoadStagesAndPasses() {
     if (!this->SkyShader::spPass[2].m_pObject) {
         NiD3DPass::CreateNewPass(this->SkyShader::spPass[2]);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
         (*v112)->SetStage((*v112)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, true);
         (*v112)->SetStage((*v112)->m_uiCurrentStage, spStage.m_pObject);
         NiD3DPass* v113 = *v112;
         if (!(*v112)->m_pkRenderStateGroup) {
             v113->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v113->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        v113->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         NiD3DPass* v114 = *v112;
         if (!(*v112)->m_pkRenderStateGroup) {
             v114->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v114->m_pkRenderStateGroup->SetRenderState(24u, 0, 1);
+        v114->m_pkRenderStateGroup->SetRenderState(24u, 0, true);
         NiD3DPass* v115 = *v112;
         if (!(*v112)->m_pkRenderStateGroup) {
             v115->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v115->m_pkRenderStateGroup->SetRenderState(25u, 5u, 1);
+        v115->m_pkRenderStateGroup->SetRenderState(25u, 5u, true);
         NiD3DPass* v116 = *v112;
         if (!(*v112)->m_pkRenderStateGroup) {
             v116->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v116->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v116->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         NiD3DPass* v117 = *v112;
         if (!(*v112)->m_pkRenderStateGroup) {
             v117->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v117->m_pkRenderStateGroup->SetRenderState(19u, 1u, 1);
+        v117->m_pkRenderStateGroup->SetRenderState(19u, 1u, true);
         if (!v117->m_pkRenderStateGroup) {
             v117->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v117->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        v117->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
     }
     NiD3DPass* v118 = *v112;
     NiD3DVertexShader* v119 = this->spVertexShader[2];
@@ -893,26 +895,26 @@ bool SkyShader::LoadStagesAndPasses() {
         if (!v124->m_pObject->m_pkRenderStateGroup) {
             v125->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v125->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v125->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         NiD3DPass* v126 = v124->m_pObject;
         if (!v124->m_pObject->m_pkRenderStateGroup) {
             v126->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v126->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v126->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         NiD3DPass* v127 = v124->m_pObject;
         if (!v124->m_pObject->m_pkRenderStateGroup) {
             v127->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v127->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        v127->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!v127->m_pkRenderStateGroup) {
             v127->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v127->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        v127->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         NiD3DPass* v128 = v124->m_pObject;
         if (!v124->m_pObject->m_pkRenderStateGroup) {
             v128->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v128->m_pkRenderStateGroup->SetRenderState(168u, 7u, 1);
+        v128->m_pkRenderStateGroup->SetRenderState(168u, 7u, true);
     }
     NiD3DPass* v129 = v124->m_pObject;
     NiD3DVertexShader* v130 = this->spVertexShader[0];
@@ -929,7 +931,7 @@ bool SkyShader::LoadStagesAndPasses() {
     NiD3DPass* v132 = v124->m_pObject;
     NiD3DPixelShader* v133 = this->spPixelShader[0];
     v132->m_spPixelShader = v133;
-    return 1;
+    return true;
 }
 
 // Each macro list is written by storing its macros and their {0, 0} terminator one by one, then clearing the rest of
@@ -957,8 +959,8 @@ void SkyShader::LoadShaders() {
     char Str1[260];
     char v94[352];
     v90.strPath = "sky\\v\\sky.v.hlsl";
-    v90.kMacros[0].Name = 0;
-    v90.kMacros[0].Definition = 0;
+    v90.kMacros[0].Name = nullptr;
+    v90.kMacros[0].Definition = nullptr;
     std::memset(&v90.kMacros[1], 0, 8 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\v\\sky.v.hlsl", Str1);
     BSsprintf(apDest, 260, "SKY.vso");
@@ -976,9 +978,9 @@ void SkyShader::LoadShaders() {
     }
     v84.strPath = "sky\\v\\sky.v.hlsl";
     v84.kMacros[0].Name = "TEX";
-    v84.kMacros[0].Definition = 0;
-    v84.kMacros[1].Name = 0;
-    v84.kMacros[1].Definition = 0;
+    v84.kMacros[0].Definition = nullptr;
+    v84.kMacros[1].Name = nullptr;
+    v84.kMacros[1].Definition = nullptr;
     std::memset(&v84.kMacros[2], 0, 7 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\v\\sky.v.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYT.vso");
@@ -998,9 +1000,9 @@ void SkyShader::LoadShaders() {
     v81.kMacros[0].Name = "DEPTH_VALUE";
     v81.kMacros[0].Definition = "0.99995f";
     v81.kMacros[1].Name = "TEX";
-    v81.kMacros[1].Definition = 0;
-    v81.kMacros[2].Name = 0;
-    v81.kMacros[2].Definition = 0;
+    v81.kMacros[1].Definition = nullptr;
+    v81.kMacros[2].Name = nullptr;
+    v81.kMacros[2].Definition = nullptr;
     std::memset(&v81.kMacros[3], 0, 6 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\v\\sky.v.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYMM.vso");
@@ -1020,9 +1022,9 @@ void SkyShader::LoadShaders() {
     v77.kMacros[0].Name = "DEPTH_VALUE";
     v77.kMacros[0].Definition = "1.0f";
     v77.kMacros[1].Name = "HORIZFADE";
-    v77.kMacros[1].Definition = 0;
-    v77.kMacros[2].Name = 0;
-    v77.kMacros[2].Definition = 0;
+    v77.kMacros[1].Definition = nullptr;
+    v77.kMacros[2].Name = nullptr;
+    v77.kMacros[2].Definition = nullptr;
     std::memset(&v77.kMacros[3], 0, 6 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\v\\sky.v.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYSTARS.vso");
@@ -1040,9 +1042,9 @@ void SkyShader::LoadShaders() {
     }
     v89.strPath = "sky\\v\\sky.v.hlsl";
     v89.kMacros[0].Name = "OCCLUSION";
-    v89.kMacros[0].Definition = 0;
-    v89.kMacros[1].Name = 0;
-    v89.kMacros[1].Definition = 0;
+    v89.kMacros[0].Definition = nullptr;
+    v89.kMacros[1].Name = nullptr;
+    v89.kMacros[1].Definition = nullptr;
     std::memset(&v89.kMacros[2], 0, 7 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\v\\sky.v.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYOCC.vso");
@@ -1060,11 +1062,11 @@ void SkyShader::LoadShaders() {
     }
     v76.strPath = "sky\\v\\sky.v.hlsl";
     v76.kMacros[0].Name = "TEX";
-    v76.kMacros[0].Definition = 0;
+    v76.kMacros[0].Definition = nullptr;
     v76.kMacros[1].Name = "CLOUDS";
-    v76.kMacros[1].Definition = 0;
-    v76.kMacros[2].Name = 0;
-    v76.kMacros[2].Definition = 0;
+    v76.kMacros[1].Definition = nullptr;
+    v76.kMacros[2].Name = nullptr;
+    v76.kMacros[2].Definition = nullptr;
     std::memset(&v76.kMacros[3], 0, 6 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\v\\sky.v.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYCLOUDS.vso");
@@ -1082,18 +1084,18 @@ void SkyShader::LoadShaders() {
     }
     // EXE-INLINED none: memset
     for (int32_t i = 4; i < 9; ++i) {
-        v75.kMacros[i].Name = 0;
-        v75.kMacros[i].Definition = 0;
+        v75.kMacros[i].Name = nullptr;
+        v75.kMacros[i].Definition = nullptr;
     }
     v75.strPath = "sky\\v\\sky.v.hlsl";
     v75.kMacros[0].Name = "HORIZFADE";
-    v75.kMacros[0].Definition = 0;
+    v75.kMacros[0].Definition = nullptr;
     v75.kMacros[1].Name = "TEX";
-    v75.kMacros[1].Definition = 0;
+    v75.kMacros[1].Definition = nullptr;
     v75.kMacros[2].Name = "CLOUDS";
-    v75.kMacros[2].Definition = 0;
-    v75.kMacros[3].Name = 0;
-    v75.kMacros[3].Definition = 0;
+    v75.kMacros[2].Definition = nullptr;
+    v75.kMacros[3].Name = nullptr;
+    v75.kMacros[3].Definition = nullptr;
     BSShader::MakePath(v76.strPath, Str1);
     BSsprintf(apDest, 260, "SKYCLOUDSFADE.vso");
     const char* v26 = BSShaderManager::GetVSTarget();
@@ -1109,12 +1111,12 @@ void SkyShader::LoadShaders() {
         }
     }
     v91.strPath = "sky\\p\\sky.p.hlsl";
-    v91.kMacros[0].Name = 0;
-    v91.kMacros[0].Definition = 0;
+    v91.kMacros[0].Name = nullptr;
+    v91.kMacros[0].Definition = nullptr;
     std::memset(&v91.kMacros[1], 0, 8 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\p\\sky.p.hlsl", Str1);
     BSsprintf(apDest, 260, "SKY.pso");
-    const char* PSTarget = BSShaderManager::GetPSTarget(0);
+    const char* PSTarget = BSShaderManager::GetPSTarget(false);
     NiD3DPixelShader* v31 = CompilePixelShaderHLSL(Str1, v91.kMacros, PSTarget, apDest);
     NiD3DPixelShader* v32 = spPixelShader[0];
     if (v32 != v31) {
@@ -1128,13 +1130,13 @@ void SkyShader::LoadShaders() {
     }
     v82.strPath = "sky\\p\\sky.p.hlsl";
     v82.kMacros[0].Name = "TEX";
-    v82.kMacros[0].Definition = 0;
-    v82.kMacros[1].Name = 0;
-    v82.kMacros[1].Definition = 0;
+    v82.kMacros[0].Definition = nullptr;
+    v82.kMacros[1].Name = nullptr;
+    v82.kMacros[1].Definition = nullptr;
     std::memset(&v82.kMacros[2], 0, 7 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\p\\sky.p.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYTEX.pso");
-    const char* v34 = BSShaderManager::GetPSTarget(0);
+    const char* v34 = BSShaderManager::GetPSTarget(false);
     NiD3DPixelShader* v35 = CompilePixelShaderHLSL(Str1, v82.kMacros, v34, apDest);
     NiD3DPixelShader* v36 = spPixelShader[1];
     if (v36 != v35) {
@@ -1148,15 +1150,15 @@ void SkyShader::LoadShaders() {
     }
     v83.strPath = "sky\\p\\sky.p.hlsl";
     v83.kMacros[0].Name = "HORIZFADE";
-    v83.kMacros[0].Definition = 0;
+    v83.kMacros[0].Definition = nullptr;
     v83.kMacros[1].Name = "TEX";
-    v83.kMacros[1].Definition = 0;
-    v83.kMacros[2].Name = 0;
-    v83.kMacros[2].Definition = 0;
+    v83.kMacros[1].Definition = nullptr;
+    v83.kMacros[2].Name = nullptr;
+    v83.kMacros[2].Definition = nullptr;
     std::memset(&v83.kMacros[3], 0, 6 * sizeof(D3DXMACRO));
     BSShader::MakePath(v82.strPath, Str1);
     BSsprintf(apDest, 260, "SKYTEXFADE.pso");
-    const char* v38 = BSShaderManager::GetPSTarget(0);
+    const char* v38 = BSShaderManager::GetPSTarget(false);
     NiD3DPixelShader* v39 = CompilePixelShaderHLSL(Str1, v83.kMacros, v38, apDest);
     NiD3DPixelShader* v40 = spPixelShader[2];
     if (v40 != v39) {
@@ -1172,13 +1174,13 @@ void SkyShader::LoadShaders() {
     _gcvt(SkyShader::g_fSunBrightness_BlurShader, 12, v94);
     v88.strPath = "sky\\p\\sky.p.hlsl";
     v88.kMacros[0].Name = "OCCLUSION";
-    v88.kMacros[0].Definition = 0;
-    v88.kMacros[1].Name = 0;
-    v88.kMacros[1].Definition = 0;
+    v88.kMacros[0].Definition = nullptr;
+    v88.kMacros[1].Name = nullptr;
+    v88.kMacros[1].Definition = nullptr;
     std::memset(&v88.kMacros[2], 0, 7 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\p\\sky.p.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYSUNOCCL.pso");
-    const char* v42 = BSShaderManager::GetPSTarget(0);
+    const char* v42 = BSShaderManager::GetPSTarget(false);
     NiD3DPixelShader* v43 = CompilePixelShaderHLSL(Str1, v88.kMacros, v42, apDest);
     NiD3DPixelShader* v44 = spPixelShader[3];
     if (v44 != v43) {
@@ -1192,13 +1194,13 @@ void SkyShader::LoadShaders() {
     }
     v86.strPath = "sky\\p\\sky.p.hlsl";
     v86.kMacros[0].Name = "HORIZFADE";
-    v86.kMacros[0].Definition = 0;
-    v86.kMacros[1].Name = 0;
-    v86.kMacros[1].Definition = 0;
+    v86.kMacros[0].Definition = nullptr;
+    v86.kMacros[1].Name = nullptr;
+    v86.kMacros[1].Definition = nullptr;
     std::memset(&v86.kMacros[2], 0, 7 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\p\\sky.p.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYSHORIZFADE.pso");
-    const char* v46 = BSShaderManager::GetPSTarget(0);
+    const char* v46 = BSShaderManager::GetPSTarget(false);
     NiD3DPixelShader* v47 = CompilePixelShaderHLSL(Str1, v86.kMacros, v46, apDest);
     NiD3DPixelShader* v48 = spPixelShader[4];
     if (v48 != v47) {
@@ -1214,9 +1216,9 @@ void SkyShader::LoadShaders() {
     v80.kMacros[0].Name = "DEPTH_VALUE";
     v80.kMacros[0].Definition = "0.999999";
     v80.kMacros[1].Name = "SI";
-    v80.kMacros[1].Definition = 0;
-    v80.kMacros[2].Name = 0;
-    v80.kMacros[2].Definition = 0;
+    v80.kMacros[1].Definition = nullptr;
+    v80.kMacros[2].Name = nullptr;
+    v80.kMacros[2].Definition = nullptr;
     std::memset(&v80.kMacros[3], 0, 6 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\v\\sky.v.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYFAR.vso");
@@ -1234,18 +1236,18 @@ void SkyShader::LoadShaders() {
     }
     // EXE-INLINED none: memset
     for (int32_t i = 4; i < 9; ++i) {
-        v74.kMacros[i].Name = 0;
-        v74.kMacros[i].Definition = 0;
+        v74.kMacros[i].Name = nullptr;
+        v74.kMacros[i].Definition = nullptr;
     }
     v74.strPath = "sky\\v\\sky.v.hlsl";
     v74.kMacros[0].Name = "DEPTH_VALUE";
     v74.kMacros[0].Definition = "0.999999";
     v74.kMacros[1].Name = "SI";
-    v74.kMacros[1].Definition = 0;
+    v74.kMacros[1].Definition = nullptr;
     v74.kMacros[2].Name = "SI_CLOUDS";
     v74.kMacros[2].Definition = "";
-    v74.kMacros[3].Name = 0;
-    v74.kMacros[3].Definition = 0;
+    v74.kMacros[3].Name = nullptr;
+    v74.kMacros[3].Definition = nullptr;
     BSShader::MakePath("sky\\v\\sky.v.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYCLOUDSI.vso");
     const char* v54 = BSShaderManager::GetVSTarget();
@@ -1262,9 +1264,9 @@ void SkyShader::LoadShaders() {
     }
     v87.strPath = "sky\\v\\sky_quad.v.hlsl";
     v87.kMacros[0].Name = "SI";
-    v87.kMacros[0].Definition = 0;
-    v87.kMacros[1].Name = 0;
-    v87.kMacros[1].Definition = 0;
+    v87.kMacros[0].Definition = nullptr;
+    v87.kMacros[1].Name = nullptr;
+    v87.kMacros[1].Definition = nullptr;
     std::memset(&v87.kMacros[2], 0, 7 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\v\\sky_quad.v.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYQUADSI.vso");
@@ -1284,12 +1286,12 @@ void SkyShader::LoadShaders() {
     v85.strPath = "sky\\p\\sky.p.hlsl";
     v85.kMacros[0].Name = "SI";
     v85.kMacros[0].Definition = v94;
-    v85.kMacros[1].Name = 0;
-    v85.kMacros[1].Definition = 0;
+    v85.kMacros[1].Name = nullptr;
+    v85.kMacros[1].Definition = nullptr;
     std::memset(&v85.kMacros[2], 0, 7 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\p\\sky.p.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYSI.pso");
-    const char* v62 = BSShaderManager::GetPSTarget(0);
+    const char* v62 = BSShaderManager::GetPSTarget(false);
     NiD3DPixelShader* v63 = CompilePixelShaderHLSL(Str1, v85.kMacros, v62, apDest);
     NiD3DPixelShader* v64 = spPixelShader[7];
     if (v64 != v63) {
@@ -1306,13 +1308,13 @@ void SkyShader::LoadShaders() {
     v78.kMacros[0].Name = "SI";
     v78.kMacros[0].Definition = v94;
     v78.kMacros[1].Name = "SI_SUN";
-    v78.kMacros[1].Definition = 0;
-    v78.kMacros[2].Name = 0;
-    v78.kMacros[2].Definition = 0;
+    v78.kMacros[1].Definition = nullptr;
+    v78.kMacros[2].Name = nullptr;
+    v78.kMacros[2].Definition = nullptr;
     std::memset(&v78.kMacros[3], 0, 6 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\p\\sky.p.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYSISUN.pso");
-    const char* v66 = BSShaderManager::GetPSTarget(0);
+    const char* v66 = BSShaderManager::GetPSTarget(false);
     NiD3DPixelShader* v67 = CompilePixelShaderHLSL(Str1, v78.kMacros, v66, apDest);
     NiD3DPixelShader* v68 = spPixelShader[5];
     if (v68 != v67) {
@@ -1326,15 +1328,15 @@ void SkyShader::LoadShaders() {
     }
     v79.strPath = "sky\\p\\sky.p.hlsl";
     v79.kMacros[0].Name = "SI";
-    v79.kMacros[0].Definition = 0;
+    v79.kMacros[0].Definition = nullptr;
     v79.kMacros[1].Name = "SI_CLOUDS";
-    v79.kMacros[1].Definition = 0;
-    v79.kMacros[2].Name = 0;
-    v79.kMacros[2].Definition = 0;
+    v79.kMacros[1].Definition = nullptr;
+    v79.kMacros[2].Name = nullptr;
+    v79.kMacros[2].Definition = nullptr;
     std::memset(&v79.kMacros[3], 0, 6 * sizeof(D3DXMACRO));
     BSShader::MakePath("sky\\p\\sky.p.hlsl", Str1);
     BSsprintf(apDest, 260, "SKYSICLOUDS.pso");
-    const char* v70 = BSShaderManager::GetPSTarget(0);
+    const char* v70 = BSShaderManager::GetPSTarget(false);
     NiD3DPixelShader* v71 = CompilePixelShaderHLSL(Str1, v79.kMacros, v70, apDest);
     NiD3DPixelShader* v72 = spPixelShader[6];
     if (v72 != v71) {
@@ -1414,7 +1416,7 @@ void SkyShader::SetCloudTexCoordOffset(uint16_t auID, float afOffset) {
 }
 
 BSShader* SkyShader::CreateShader() {
-    SkyShader* v0 = 0;
+    SkyShader* v0 = nullptr;
     NiDX9ShaderDeclaration* v1 = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 3u, 1u);
     v1->SetEntry(0u, 0u, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0u);
     v1->SetEntry(1u, 5u, NiShaderDeclaration::SHADERPARAM_NI_COLOR, NiShaderDeclaration::SPTYPE_FLOAT4, 0u);

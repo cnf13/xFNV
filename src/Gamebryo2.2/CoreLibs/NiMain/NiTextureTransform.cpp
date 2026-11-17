@@ -72,11 +72,11 @@ bool NiTextureTransform::operator!=(const NiTextureTransform& kXform) const {
 
 void NiTextureTransform::SetTranslate(const NiPoint2& kTranslate) {
     if ((!m_bMatrixDirty) && (((&kTranslate)->x == m_kTranslate.x) && ((&kTranslate)->y == m_kTranslate.y))) {
-        m_bMatrixDirty = (bool)0;
+        m_bMatrixDirty = false;
         m_kTranslate = kTranslate;
     }
     else {
-        m_bMatrixDirty = (bool)1;
+        m_bMatrixDirty = true;
         m_kTranslate = kTranslate;
     }
 }
@@ -84,21 +84,21 @@ void NiTextureTransform::SetTranslate(const NiPoint2& kTranslate) {
 void NiTextureTransform::SetRotate(float fRotate) {
     if (m_bMatrixDirty || (fRotate != m_fRotate)) {
         m_fRotate = fRotate;
-        m_bMatrixDirty = (bool)1;
+        m_bMatrixDirty = true;
     }
     else {
         m_fRotate = fRotate;
-        m_bMatrixDirty = (bool)0;
+        m_bMatrixDirty = false;
     }
 }
 
 void NiTextureTransform::SetScale(const NiPoint2& kScale) {
     if ((!m_bMatrixDirty) && ((kScale.x == m_kScale.x) && (kScale.y == m_kScale.y))) {
-        m_bMatrixDirty = (bool)0;
+        m_bMatrixDirty = false;
         m_kScale = kScale;
     }
     else {
-        m_bMatrixDirty = (bool)1;
+        m_bMatrixDirty = true;
         m_kScale = kScale;
     }
 }
@@ -189,5 +189,5 @@ void NiTextureTransform::UpdateMatrix() const {
         goto LABEL_8;
     }
 LABEL_9:;
-    m_bMatrixDirty = 0;
+    m_bMatrixDirty = false;
 }

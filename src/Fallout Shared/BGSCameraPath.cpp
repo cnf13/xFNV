@@ -170,12 +170,12 @@ void BGSCameraPath::Save() {
 TESForm* BGSCameraPath::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap<TESForm*, TESForm*>* apCopyMap) {
     TESForm* DuplicateForm = TESForm::CreateDuplicateForm(abCreateEditorID, apCopyMap);
     BGSCameraPath* pduppath = dynamic_cast<BGSCameraPath*>(DuplicateForm);
-    TESForm* pform = 0;
+    TESForm* pform = nullptr;
     if (!apCopyMap->GetAt(pParentPath, pform) || !pform) {
         pform = (TESForm*)pParentPath;
     }
     pduppath->pParentPath = static_cast<BGSCameraPath*>(pform);
-    pform = 0;
+    pform = nullptr;
     if (!apCopyMap->GetAt(pPrevPath, pform) || !pform) {
         pform = (TESForm*)pPrevPath;
     }
@@ -185,7 +185,7 @@ TESForm* BGSCameraPath::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
         uint32_t icount = pChildPaths->m_uiSize;
         NiFormArray* pduparray = pduppath->CreateChildArray();
         pduparray->SetSize(icount);
-        BGSCameraPath* pdupchild = 0;
+        BGSCameraPath* pdupchild = nullptr;
         for (uint32_t i = 0; i < icount; ++i) {
             BGSCameraPath* pchildpath = static_cast<BGSCameraPath*>(pChildPaths->GetAt(i));
             BGSCameraPath* pdupchild_2 =
@@ -202,7 +202,7 @@ void BGSCameraPath::InitItem() {
     if (!GetInitialized()) {
         (&Conditions)->InitItem(this);
         BSSimpleList<BGSCameraShot*>* plist = &ShotList;
-        BSSimpleList<BGSCameraShot*>* plastlist = 0;
+        BSSimpleList<BGSCameraShot*>* plastlist = nullptr;
         while (plist && !plist->IsEmpty()) {
             uint32_t tempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(plist->m_item));
             TESFile* File = GetFile(-1);
@@ -236,7 +236,7 @@ void BGSCameraPath::InitItem() {
                 }
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -244,7 +244,7 @@ void BGSCameraPath::Copy(TESForm* apCopy) {
     BGSCameraPath* pcopy = dynamic_cast<BGSCameraPath*>(apCopy);
     if (pcopy) {
         CopyAllComponents(pcopy);
-        (&Conditions)->Copy(&pcopy->Conditions, 0);
+        (&Conditions)->Copy(&pcopy->Conditions, nullptr);
         ourMemcpy(&data, &pcopy->data, 1u);
         ShotList.RemoveAll();
         BSSimpleList<BGSCameraShot*>* plist = &pcopy->ShotList;
@@ -259,26 +259,26 @@ void BGSCameraPath::Copy(TESForm* apCopy) {
 bool BGSCameraPath::Compare(TESForm* apCompare) {
     BGSCameraPath* pcomp = dynamic_cast<BGSCameraPath*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     if ((&Conditions)->Compare(&pcomp->Conditions)) {
-        return 1;
+        return true;
     }
     if (std::memcmp(&data, &pcomp->data, 1u)) {
-        return 1;
+        return true;
     }
     BSSimpleList<BGSCameraShot*>* plist = &ShotList;
     BSSimpleList<BGSCameraShot*>* pcomplist = &pcomp->ShotList;
     while (pcomplist && !pcomplist->IsEmpty()) {
         if (!plist) {
-            return 1;
+            return true;
         }
         BSSimpleList<BGSCameraShot*>* v3 = plist;
         if (v3->m_item != pcomplist->m_item) {
-            return 1;
+            return true;
         }
         pcomplist = pcomplist->m_pkNext;
         plist = plist->m_pkNext;
@@ -299,7 +299,7 @@ bool BGSCameraPath::GetZoomShotList() {
 }
 
 uint32_t BGSCameraPath::GetIndexForChild(BGSCameraPath* apChild) {
-    uint32_t v3 = (uint32_t)((-1));
+    uint32_t v3 = (uint32_t)(-1);
     if (pChildPaths) {
         return pChildPaths->GetIndexForForm(apChild);
     }
@@ -329,7 +329,7 @@ BGSCameraPath* BGSCameraPath::GetChildByIndex(uint32_t aiIndex) {
 }
 
 BGSCameraPath* BGSCameraPath::GetCameraPathToPlay(TESObjectREFR* apActionRef, TESObjectREFR* apTargetRef) {
-    BGSCameraPath* pCamera = 0;
+    BGSCameraPath* pCamera = nullptr;
     if (!GetDelete()) {
         if (Conditions.IsTrue(apActionRef, apTargetRef)) {
             BSSimpleList<BGSCameraShot*>* Filename;
@@ -338,7 +338,7 @@ BGSCameraPath* BGSCameraPath::GetCameraPathToPlay(TESObjectREFR* apActionRef, TE
             }
             uint32_t NumChildren = GetChildCount();
             if (NumChildren) {
-                BGSCameraPath* CameraPathToPlay = 0;
+                BGSCameraPath* CameraPathToPlay = nullptr;
                 for (uint32_t aiIndex = 0; aiIndex < NumChildren; ++aiIndex) {
                     BGSCameraPath* ChildByIndex = GetChildByIndex(aiIndex);
                     if (ChildByIndex) {
@@ -366,8 +366,8 @@ uint32_t BGSCameraPath::GetChildCount() {
 }
 
 bool BGSCameraPath::InitParents() {
-    bool bretval = 1;
-    BGSCameraPath* pparent = 0;
+    bool bretval = true;
+    BGSCameraPath* pparent = nullptr;
     uint32_t itempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pParentPath));
     if (itempint) {
         TESFile* File = GetFile(-1);
@@ -379,11 +379,11 @@ bool BGSCameraPath::InitParents() {
             GetFormDetailedString(tempstring);
             char* v6 = tempstring.pString;
             Warning("DEFAULT: Could not find parent path (%08X) for %s.", itempint, v6);
-            bretval = 0;
+            bretval = false;
         }
         pParentPath = pparent;
     }
-    BGSCameraPath* pprev = 0;
+    BGSCameraPath* pprev = nullptr;
     itempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pPrevPath));
     if (itempint) {
         TESFile* v3 = GetFile(-1);
@@ -395,12 +395,12 @@ bool BGSCameraPath::InitParents() {
             GetFormDetailedString(tempstring_2);
             char* v7 = tempstring_2.pString;
             Warning("DEFAULT: Could not find previous path (%08X) for %s.", itempint, v7);
-            bretval = 0;
+            bretval = false;
         }
         pPrevPath = pprev;
     }
     uint32_t iindex = 0;
-    NiFormArray* parray = 0;
+    NiFormArray* parray = nullptr;
     if (pparent) {
         parray = pparent->CreateChildArray();
     }
@@ -425,7 +425,7 @@ bool BGSCameraPath::InitParents() {
         BSStringT<char> tempstring_3;
         GetFormDetailedString(tempstring_3);
         Warning("DEFAULT: Could not find parent array for %s.", tempstring_3.String());
-        bretval = 0;
+        bretval = false;
     }
     return bretval;
 }
@@ -466,7 +466,7 @@ void BGSCameraPath::FixNextPaths(NiFormArray* apArray) {
         uint32_t iindex = -1;
         uint32_t isize = apArray->m_uiSize;
         uint32_t inextindex = -1;
-        BGSCameraPath* pnextpath = 0;
+        BGSCameraPath* pnextpath = nullptr;
         for (uint32_t i = 0; i < isize; ++i) {
             BGSCameraPath* ppath = dynamic_cast<BGSCameraPath*>(apArray->GetAt(i));
             if (ppath) {
@@ -492,7 +492,7 @@ void BGSCameraPath::FixNextPaths(NiFormArray* apArray) {
             }
         }
         if (iindex != -1 && inextindex != -1 && inextindex != iindex + 1) {
-            TESForm* a3 = 0;
+            TESForm* a3 = nullptr;
             apArray->SetAt(inextindex, a3);
             apArray->Compact();
             if (inextindex < iindex) {

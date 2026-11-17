@@ -27,7 +27,7 @@ NiObject* NiPSysAgeDeathModifier::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject) NiPSysAgeDeathModifier;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_bSpawnOnDeath = m_bSpawnOnDeath;
@@ -146,7 +146,7 @@ NiObject* NiPSysAgeDeathModifier::CreateObject() {
     NiPSysAgeDeathModifier* pkObject =
         static_cast<NiPSysAgeDeathModifier*>(NiMemObject::operator new(sizeof(NiPSysAgeDeathModifier)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysAgeDeathModifier;
 }

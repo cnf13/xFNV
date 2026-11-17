@@ -198,7 +198,7 @@ void bhkConvexListShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
     bhkConvexShape::GetViewerStrings(apStrings);
     char* pcString = NiGetViewerString(bhkConvexListShape::ms_RTTI.GetName());
     apStrings->Add(pcString);
-    if (this && (phkObject = this->phkObject) != 0) {
+    if (this && (phkObject = this->phkObject) != nullptr) {
         iShapes = static_cast<hkpConvexListShape*>(phkObject)->getNumChildShapes();
     }
     else {
@@ -238,12 +238,12 @@ void bhkConvexListShape::KillCinfo(bool abCreated) {
             if (m_capacityAndFlags >= 0) {
                 m_heap->bufFree(pi->m_childShapes.begin(), sizeof(hkpConvexShape*) * m_capacityAndFlags);
             }
-            pi->m_childShapes.m_data = 0;
+            pi->m_childShapes.m_data = nullptr;
             pi->m_childShapes.m_capacityAndFlags = hkArrayBase<const hkpConvexShape*>::DONT_DEALLOCATE_FLAG;
             MemoryManager_Singleton.Deallocate(pi);
             eMemContext = v8;
         }
-        pInfo = 0;
+        pInfo = nullptr;
     }
     v3->eMemContext = eMemContext;
 }
@@ -350,7 +350,7 @@ bool bhkConvexListShape::CanShare(NiCloningProcess& arCloneData) {
 void bhkConvexListShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& arDefColor) {
     hkpConvexListShape* phkObject;
     int32_t v5;
-    if (this && (phkObject = static_cast<hkpConvexListShape*>(this->phkObject)) != 0) {
+    if (this && (phkObject = static_cast<hkpConvexListShape*>(this->phkObject)) != nullptr) {
         v5 = phkObject->getNumChildShapes();
     }
     else {

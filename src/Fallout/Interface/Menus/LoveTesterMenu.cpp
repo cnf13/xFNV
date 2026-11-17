@@ -74,7 +74,7 @@
 
 #include <cmath>
 #include <cstdarg>
-#include <stdint.h>
+#include <cstdint>
 
 NiPointer<NiCamera> LoveTesterMenu::sp3DCamera;
 
@@ -88,7 +88,7 @@ LoveTesterMenu::LoveTesterButton::LoveTesterButton(
     spButton = LoveTesterMenu::pInstance->pDynamicGeometry->GetObjectByName(kName);
     NiAVObject* pObj = LoveTesterMenu::pInstance->pDynamicGeometry->GetObjectByName(kName);
     NiProperty* pProperty = pObj->GetProperty(NiProperty::SHADE);
-    pImage = 0;
+    pImage = nullptr;
     if (pProperty &&
         static_cast<NiShadeProperty*>(pProperty)->iShaderPropertyType >=
             BSShaderManager::BSSM_PROPERTYTYPE_PPLIGHTING_FIRST &&
@@ -131,8 +131,8 @@ LoveTesterMenu::LoveTesterTextItem::LoveTesterTextItem(
                                                       : LoveTesterMenu::pInstance->pCabinetGeometry;
     const char* apNames[2] = {apTextObjectName1, apTextObjectName2};
     for (int32_t i = 0; i < 2; ++i) {
-        pTextObj[i] = 0;
-        pText[i] = 0;
+        pTextObj[i] = nullptr;
+        pText[i] = nullptr;
         // Only the second name may be null: the first one is looked up unconditionally.
         if (i > 0 && !apNames[i]) {
             continue;
@@ -176,10 +176,10 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
         case 1: {
             if (bAnimFinished) {
                 if (a1) {
-                    bPageTurned = TurnPage(0);
+                    bPageTurned = TurnPage(false);
                 }
                 else {
-                    bPageTurned = TurnPage(1);
+                    bPageTurned = TurnPage(true);
                 }
                 RefreshPage();
             }
@@ -227,12 +227,12 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
             if (ioldValue > inewValue) {
                 BSAudio* v12 = &BSAudio::QInstance();
                 BSSoundHandle* SoundHandleByName = v12->GetSoundHandleByName(&th_s, "OBJBookSpecialNumberDown", 289u);
-                SoundHandleByName->Play(0);
+                SoundHandleByName->Play(false);
             }
             if (ioldValue < inewValue) {
                 BSAudio* v13 = &BSAudio::QInstance();
                 BSSoundHandle* v26 = v13->GetSoundHandleByName(&apResult, "OBJBookSpecialNumber", 289u);
-                v26->Play(0);
+                v26->Play(false);
             }
             RefreshPage();
             break;
@@ -241,13 +241,13 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
             if (PlayerCharacter::GetSumOfSPECIALStats() == iAvailablePoints) {
                 BSAudio* v3 = &BSAudio::QInstance();
                 BSSoundHandle* v29 = v3->GetSoundHandleByName(&a12, "OBJBookSpecialNumberFinished", 289u);
-                v29->Play(0);
+                v29->Play(false);
                 Close();
             }
             else {
                 BSAudio* v5 = &BSAudio::QInstance();
                 BSSoundHandle* v28 = v5->GetSoundHandleByName(&arHandle, "UIActivateNothing", 289u);
-                v28->Play(0);
+                v28->Play(false);
             }
             break;
         }
@@ -276,12 +276,12 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
                         break;
                     }
                     NiPick activatePick(0, 8u);
-                    activatePick.SetObserveAppCullFlag(1);
+                    activatePick.SetObserveAppCullFlag(true);
                     activatePick.SetTarget(Pages[eState].Buttons.operator[](iindex)->spButton.m_pObject);
                     activatePick.m_eSortType = NiPick::SORT;
-                    activatePick.SetIsReturnTexture(1);
-                    LoveTesterMenu::sp3DCamera.m_pObject->WindowPointToRay(cx, cy, origin, dir, 0);
-                    if (activatePick.PickObjects(origin, dir, 0)) {
+                    activatePick.SetIsReturnTexture(true);
+                    LoveTesterMenu::sp3DCamera.m_pObject->WindowPointToRay(cx, cy, origin, dir, nullptr);
+                    if (activatePick.PickObjects(origin, dir, false)) {
                         uint32_t ipickIndex = 0;
                         if ((&activatePick.m_pickResults)->GetAt(ipickIndex)) {
                             // Fetches the argument before the callback.
@@ -299,12 +299,12 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
                         break;
                     }
                     NiPick activatePick_2(0, 8u);
-                    activatePick_2.SetObserveAppCullFlag(1);
+                    activatePick_2.SetObserveAppCullFlag(true);
                     activatePick_2.SetTarget(GlobalPage.Buttons.operator[](iindex_2)->spButton.m_pObject);
                     activatePick_2.m_eSortType = NiPick::SORT;
-                    activatePick_2.SetIsReturnTexture(1);
-                    LoveTesterMenu::sp3DCamera.m_pObject->WindowPointToRay(cx, cy, origin_2, dir_2, 0);
-                    if (activatePick_2.PickObjects(origin_2, dir_2, 0)) {
+                    activatePick_2.SetIsReturnTexture(true);
+                    LoveTesterMenu::sp3DCamera.m_pObject->WindowPointToRay(cx, cy, origin_2, dir_2, nullptr);
+                    if (activatePick_2.PickObjects(origin_2, dir_2, false)) {
                         uint32_t v37 = 0;
                         if ((&activatePick_2.m_pickResults)->GetAt(v37)) {
                             LoveTesterButton* pButton = GlobalPage.Buttons.operator[](iindex_2);
@@ -321,7 +321,7 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
                 eXBoxIndexState = static_cast<LoveTesterMenu::LOVE_TESTER_MENU_STATE>(eXBoxIndexState - 1);
                 BSAudio* v16 = &BSAudio::QInstance();
                 BSSoundHandle* v23 = v16->GetSoundHandleByName(&v32, "OBJBookSpecialFocus", 289u);
-                v23->Play(0);
+                v23->Play(false);
             }
             RefreshPage();
             break;
@@ -331,7 +331,7 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
                 eXBoxIndexState = static_cast<LoveTesterMenu::LOVE_TESTER_MENU_STATE>(eXBoxIndexState + 1);
                 BSAudio* v17 = &BSAudio::QInstance();
                 BSSoundHandle* v22 = v17->GetSoundHandleByName(&v31, "OBJBookSpecialFocus", 289u);
-                v22->Play(0);
+                v22->Play(false);
             }
             RefreshPage();
             break;
@@ -351,14 +351,14 @@ void LoveTesterMenu::DoIdle() {
             key = 16;
         }
         if (Controls_->GetKeyboardButton(key, 1)) {
-            DoClick(4, 0);
+            DoClick(4, nullptr);
         }
         else {
             NiTimeController* pspecialBookGeomController = pDynamicGeometry->GetControllers();
             if (pspecialBookGeomController) {
                 NiControllerManager* pspecialBookGeomControllerManager =
                     static_cast<NiControllerManager*>(pspecialBookGeomController);
-                NiControllerSequence* pseq = 0;
+                NiControllerSequence* pseq = nullptr;
                 if (!bLoveTesterAnimForward || eState > LoveTesterMenu::LTMS_START) {
                     const char* pcString;
                     if (bLoveTesterAnimForward) {
@@ -373,25 +373,25 @@ void LoveTesterMenu::DoIdle() {
                 }
                 fFrameAnimTimer = appTimer.fDelta + fFrameAnimTimer;
                 if (pseq) {
-                    pseq->Update(fFrameAnimTimer, 1);
+                    pseq->Update(fFrameAnimTimer, true);
                     double v2 = pseq->m_fLastTime;
                     bAnimFinished = !(pseq->m_fEndKeyTime > v2) || eState <= LoveTesterMenu::LTMS_START;
                 }
                 else {
-                    bAnimFinished = 1;
+                    bAnimFinished = true;
                 }
                 while (pspecialBookGeomController) {
                     if (NiObject::DynamicCastStatic(
                             &NiMultiTargetTransformController::ms_RTTI, pspecialBookGeomController
                         )) {
-                        NiUpdateData UpdateData(fFrameAnimTimer, 0, 0);
+                        NiUpdateData UpdateData(fFrameAnimTimer, false, false);
                         pspecialBookGeomController->Update(UpdateData);
                         break;
                     }
                     pspecialBookGeomController = pspecialBookGeomController->GetNext();
                 }
             }
-            NiUpdateData update(0.0f, 0, 0);
+            NiUpdateData update(0.0f, false, false);
             pDynamicGeometry->Update(update);
         }
     }
@@ -405,32 +405,32 @@ bool LoveTesterMenu::DoKey(int32_t a1) {
                 goto LABEL_8;
             }
             if (a1 != 95) {
-                return 0;
+                return false;
             }
         }
     LABEL_13:;
         ActorValue::Index SelectedSPECIAL = GetSelectedSPECIAL();
         if (SelectedSPECIAL != ActorValue::VALUE_NONE && pPlayer->GetPermanentActorValue(SelectedSPECIAL) > 1) {
-            DoClick(3, 0);
-            return 1;
+            DoClick(3, nullptr);
+            return true;
         }
-        return 0;
+        return false;
     }
     if (a1 == 43) {
     LABEL_8:;
         ActorValue::Index v5 = GetSelectedSPECIAL();
         if (v5 != ActorValue::VALUE_NONE &&
             (PlayerCharacter::GetSumOfSPECIALStats() < iAvailablePoints && pPlayer->GetPermanentActorValue(v5) < 10)) {
-            DoClick(2, 0);
-            return 1;
+            DoClick(2, nullptr);
+            return true;
         }
-        return 0;
+        return false;
     }
     switch (a1) {
         case -0x7FFFFFFF:
         case -0x7FFFFFFE: {
-            DoClick(a1 == -0x7FFFFFFF, 0);
-            bhandled = 1;
+            DoClick(a1 == -0x7FFFFFFF, nullptr);
+            bhandled = true;
             break;
         }
         case -0x7FFFFFFD: {
@@ -440,7 +440,7 @@ bool LoveTesterMenu::DoKey(int32_t a1) {
             goto LABEL_13;
         }
         default: {
-            return 0;
+            return false;
         }
     }
     return bhandled;
@@ -453,9 +453,9 @@ int32_t LoveTesterMenu::GetClass() {
 bool LoveTesterMenu::DoGamepad(int32_t a1, float a2) {
     bool result;
     if (!Interface::IsTopMenuID(Interface::eLoveTesterMenu)) {
-        return 0;
+        return false;
     }
-    ActorValue::Index eav = static_cast<ActorValue::Index>(GetSelectedSPECIAL());
+    ActorValue::Index eav = GetSelectedSPECIAL();
     switch (a1) {
         case 1: {
             goto LABEL_13;
@@ -467,19 +467,19 @@ bool LoveTesterMenu::DoGamepad(int32_t a1, float a2) {
             if (eState == LoveTesterMenu::LTMS_SUMMARY) {
             LABEL_13:;
                 if (eState == LoveTesterMenu::LTMS_SUMMARY) {
-                    result = 0;
+                    result = false;
                 }
                 else {
                 LABEL_15:;
                     if (eav != ActorValue::VALUE_NONE && PlayerCharacter::GetSumOfSPECIALStats() < iAvailablePoints &&
                         pPlayer->GetPermanentActorValue(eav) < 10) {
-                        DoClick(2, 0);
+                        DoClick(2, nullptr);
                     }
-                    result = 1;
+                    result = true;
                 }
             }
             else {
-                result = 0;
+                result = false;
             }
             break;
         }
@@ -487,18 +487,18 @@ bool LoveTesterMenu::DoGamepad(int32_t a1, float a2) {
             if (eState == LoveTesterMenu::LTMS_SUMMARY) {
             LABEL_5:;
                 if (eState == LoveTesterMenu::LTMS_SUMMARY) {
-                    result = 0;
+                    result = false;
                 }
                 else {
                 LABEL_7:;
                     if (eav != ActorValue::VALUE_NONE && pPlayer->GetPermanentActorValue(eav) > 1) {
-                        DoClick(3, 0);
+                        DoClick(3, nullptr);
                     }
-                    result = 1;
+                    result = true;
                 }
             }
             else {
-                result = 0;
+                result = false;
             }
             break;
         }
@@ -509,7 +509,7 @@ bool LoveTesterMenu::DoGamepad(int32_t a1, float a2) {
             goto LABEL_7;
         }
         default: {
-            return 0;
+            return false;
         }
     }
     return result;
@@ -521,32 +521,32 @@ bool LoveTesterMenu::TurnPage(bool bForward) {
     FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, psoundHand, std::nullopt, std::nullopt);
-    bool brunAnim = 0;
+    bool brunAnim = false;
     if (!bForward) {
-        bLoveTesterAnimForward = 0;
+        bLoveTesterAnimForward = false;
         if (eState <= LoveTesterMenu::LTMS_START) {
-            return 0;
+            return false;
         }
         eState = static_cast<LoveTesterMenu::LOVE_TESTER_MENU_STATE>(eState - 1);
-        brunAnim = 1;
+        brunAnim = true;
         BSSoundHandle psoundHand_2;
         BSAudio* v7 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v7->GetSoundHandleByName(&v16, "OBJBookSpecialPageTurn", 289u);
         psoundHand_2.operator=(*SoundHandleByName);
-        psoundHand_2.Play(0);
+        psoundHand_2.Play(false);
         goto LABEL_11;
     }
-    bLoveTesterAnimForward = 1;
+    bLoveTesterAnimForward = true;
     if (eState < LoveTesterMenu::LTMS_SUMMARY) {
         BSAudio* v2;
         BSSoundHandle* v13;
         eState = static_cast<LoveTesterMenu::LOVE_TESTER_MENU_STATE>(eState + 1);
-        brunAnim = 1;
+        brunAnim = true;
         ::new (&psoundHand) BSSoundHandle;
         v2 = &BSAudio::QInstance();
         v13 = v2->GetSoundHandleByName(&a1, "OBJBookSpecialPageTurn", 289u);
         psoundHand.operator=(*v13);
-        psoundHand.Play(0);
+        psoundHand.Play(false);
     LABEL_11:;
         if (brunAnim) {
             NiTimeController* pSPECIALBookGeomController =
@@ -554,7 +554,7 @@ bool LoveTesterMenu::TurnPage(bool bForward) {
             if (pSPECIALBookGeomController) {
                 NiControllerManager* pSPECIALBookGeomControllerManager =
                     static_cast<NiControllerManager*>(pSPECIALBookGeomController);
-                NiControllerSequence* pseq = 0;
+                NiControllerSequence* pseq = nullptr;
                 if (!bLoveTesterAnimForward || eState > LoveTesterMenu::LTMS_START) {
                     const char* pcString;
                     if (bLoveTesterAnimForward) {
@@ -569,26 +569,26 @@ bool LoveTesterMenu::TurnPage(bool bForward) {
                 }
                 if (pseq) {
                     pSPECIALBookGeomControllerManager->DeactivateAll(0.0f);
-                    pSPECIALBookGeomControllerManager->ActivateSequence(pseq, 0, 1, 1.0f, 0.0f, 0);
-                    pSPECIALBookGeomControllerManager->SetActive(1);
+                    pSPECIALBookGeomControllerManager->ActivateSequence(pseq, 0, true, 1.0f, 0.0f, nullptr);
+                    pSPECIALBookGeomControllerManager->SetActive(true);
                     pseq->ResetSequence();
                 }
             }
         }
-        return 1;
+        return true;
     }
     if (PlayerCharacter::GetSumOfSPECIALStats() == iAvailablePoints) {
         BSAudio* v3 = &BSAudio::QInstance();
         BSSoundHandle* v12 = v3->GetSoundHandleByName(&arHandle, "OBJBookSpecialNumberFinished", 289u);
-        v12->Play(0);
+        v12->Play(false);
         Close();
     }
     else {
         BSAudio* v5 = &BSAudio::QInstance();
         BSSoundHandle* v11 = v5->GetSoundHandleByName(&apResult, "UIActivateNothing", 289u);
-        v11->Play(0);
+        v11->Play(false);
     }
-    return 0;
+    return false;
 }
 
 void LoveTesterMenu::RefreshPage() {
@@ -640,20 +640,20 @@ void LoveTesterMenu::LoadButtonAndTextImages() {
     char acPath[260];
     BSsprintf(acName, 260, "%s%s", "Textures\\architecture\\Goodsprings\\", "NV_Vigor-Tester_Filament-GlowOFF.dds");
     SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spOnOffImage[0], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spOnOffImage[0], false, false);
     BSsprintf(acName, 260, "%s%s", "Textures\\architecture\\Goodsprings\\", "NV_Vigor-Tester_Filament-GlowON.dds");
     SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spOnOffImage[1], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spOnOffImage[1], false, false);
     for (int32_t i = 0; i < 11; ++i) {
         BSsprintf(acName, 260, "%s%s%i.dds", "Textures\\terminals\\", "BBNumber", i);
         SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-        TES::pInstance->CreateTextureImage(acPath, spAVValues[i], 0, 0);
+        TES::pInstance->CreateTextureImage(acPath, spAVValues[i], false, false);
     }
     // BBMessage01..04 go to spPointsText[0..3].
     for (int32_t j = 1; j < 5; ++j) {
         BSsprintf(acName, 260, "%s%s%i.dds", "Textures\\architecture\\Goodsprings\\", "BBMessage0", j);
         SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-        TES::pInstance->CreateTextureImage(acPath, spPointsText[j - 1], 0, 0);
+        TES::pInstance->CreateTextureImage(acPath, spPointsText[j - 1], false, false);
     }
     if (Interface::Has360Controller()) {
         BSstrcpy(acPlatform, 5, "XBOX");
@@ -663,35 +663,35 @@ void LoveTesterMenu::LoadButtonAndTextImages() {
     }
     BSsprintf(acName, 260, "%s%s\\%s.dds", "Textures\\terminals\\", acPlatform, "BBRTOff");
     SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spNextPageButtonImage[1], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spNextPageButtonImage[1], false, false);
     BSsprintf(acName, 260, "%s%s\\%s.dds", "Textures\\terminals\\", acPlatform, "BBRTOn");
     SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spNextPageButtonImage[0], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spNextPageButtonImage[0], false, false);
     BSsprintf(acName, 260, "%s%s\\%s.dds", "Textures\\terminals\\", acPlatform, "BBLTOff");
     SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spPreviousPageButtonImage[0], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spPreviousPageButtonImage[0], false, false);
     // BBLTOn is formatted with the Goodsprings folder and no platform folder, as the game does.
     BSsprintf(acName, 260, "%s%s.dds", "Textures\\architecture\\Goodsprings\\", "BBLTOn");
     SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spPreviousPageButtonImage[1], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spPreviousPageButtonImage[1], false, false);
     BSsprintf(acName, 260, "%s%s\\%s.dds", "Textures\\terminals\\", acPlatform, "BBXOff");
     SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spOpenCloseBookButtonImage[0], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spOpenCloseBookButtonImage[0], false, false);
     BSsprintf(acName, 260, "%s%s\\%s.dds", "Textures\\terminals\\", acPlatform, "BBXOn");
     SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spOpenCloseBookButtonImage[1], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spOpenCloseBookButtonImage[1], false, false);
     BSsprintf(acName, 260, "%s%s.dds", "Textures\\terminals\\", "BBDecreaseOff");
     SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spAVLeftArrowButtonImage[0], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spAVLeftArrowButtonImage[0], false, false);
     BSsprintf(acName, 260, "%s%s.dds", "Textures\\terminals\\", "BBDecreaseOn");
     SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spAVLeftArrowButtonImage[1], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spAVLeftArrowButtonImage[1], false, false);
     BSsprintf(acName, 260, "%s%s.dds", "Textures\\terminals\\", "BBIncreaseOff");
     SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spAVRightArrowButtonImage[0], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spAVRightArrowButtonImage[0], false, false);
     BSsprintf(acName, 260, "%s%s.dds", "Textures\\terminals\\", "BBIncreaseOn");
     SwapPlatformLanguageTexturePath(acName, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spAVRightArrowButtonImage[1], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spAVRightArrowButtonImage[1], false, false);
 }
 
 // Reads pInstance for the models, the lights and the global page's buttons, and this for the start of the animations,
@@ -1107,14 +1107,14 @@ NiCamera* LoveTesterMenu::SetupCamera() {
         v10 = ::new (apMemory) NiCamera;
     }
     else {
-        v10 = 0;
+        v10 = nullptr;
     }
     ::new (&a2) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     if (BSShaderManager::bLetterbox) {
         a2 = BSShaderManager::kFramebufferViewport;
     }
     v10->SetViewPort(a2);
-    NiFrustum kFrustum(0);
+    NiFrustum kFrustum(false);
     SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
     kFrustum.m_fFar = WorldSceneGraph->GetFarDistance();
     kFrustum.m_fNear = BSSceneGraph::fNearDistance.Float();
@@ -1135,10 +1135,10 @@ NiCamera* LoveTesterMenu::SetupCamera() {
     kFrustum.m_fBottom = -v1 * v19 * 0.75f;
     double v2 = std::tan(v16);
     kFrustum.m_fTop = v2 * v19 * 0.75f;
-    kFrustum.m_bOrtho = 0;
+    kFrustum.m_bOrtho = false;
     v10->SetViewFrustum(kFrustum);
     v10->SetTranslate(0.0f, 0.0f, 1.0f);
-    NiUpdateData arData(0.0f, 0, 0);
+    NiUpdateData arData(0.0f, false, false);
     v10->Update(arData);
     NiPoint3* a4 = ::new (&dst) NiPoint3(0.0f, 1.0f, 0.0f);
     NiPoint3* v3 = ::new (&v12) NiPoint3(0.0f, 0.0f, 0.0f);
@@ -1153,7 +1153,7 @@ NiCamera* LoveTesterMenu::SetupCamera() {
 void LoveTesterMenu::NextPage([[maybe_unused]] LoveTesterMenu::LoveTesterButton* apButton, ...) {
     if (LoveTesterMenu::pInstance) {
         if (LoveTesterMenu::pInstance->bAnimFinished) {
-            LoveTesterMenu::pInstance->TurnPage(1);
+            LoveTesterMenu::pInstance->TurnPage(true);
             LoveTesterMenu::pInstance->RefreshPage();
         }
     }
@@ -1163,7 +1163,7 @@ void LoveTesterMenu::Draw3DElements() {
     if (LoveTesterMenu::pInstance) {
         if (LoveTesterMenu::sp3DCamera.m_pObject) {
             NiRenderer* Renderer_ = NiRenderer::GetRenderer();
-            Renderer_->ClearBuffer(0, 4u);
+            Renderer_->ClearBuffer(nullptr, 4u);
             SceneGraph* apSceneGraph = Main::GetWorldSceneGraph();
             BSCullingProcess* apCuller = apSceneGraph->pCuller;
             apCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
@@ -1177,8 +1177,8 @@ void LoveTesterMenu::Draw3DElements() {
             ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
             BSShaderUtil::AccumulateScene(pcam, ShadowSceneNode_, *apCuller);
             BSShaderAccumulator* v4 = spaccum.m_pObject;
-            BSShaderUtil::RenderScene(pcam, v4, 0);
-            apCuller->SetAccumulator(0);
+            BSShaderUtil::RenderScene(pcam, v4, false);
+            apCuller->SetAccumulator(nullptr);
             apCuller->PopCullMode();
         }
     }
@@ -1198,9 +1198,9 @@ void LoveTesterMenu::Close() {
         ShadowSceneNode_->RemoveAllChildren();
         ShadowSceneNode* v3 = BSShaderManager::GetShadowSceneNode(1);
         v3->RemoveAllLights();
-        LoveTesterMenu::pInstance->pDynamicGeometry = 0;
-        LoveTesterMenu::pInstance->pCabinetGeometry = 0;
-        LoveTesterMenu::sp3DCamera.operator=(static_cast<NiCamera*>(0));
+        LoveTesterMenu::pInstance->pDynamicGeometry = nullptr;
+        LoveTesterMenu::pInstance->pCabinetGeometry = nullptr;
+        LoveTesterMenu::sp3DCamera.operator=(static_cast<NiCamera*>(nullptr));
         for (int32_t i = 0; i < 9; ++i) {
             for (uint32_t auiIndex = 0; auiIndex < LoveTesterMenu::pInstance->Pages[i].Buttons.iSize; ++auiIndex) {
                 LoveTesterMenu::LoveTesterButton* apThis =
@@ -1212,8 +1212,8 @@ void LoveTesterMenu::Close() {
             for (uint32_t j = 0; j < LoveTesterMenu::pInstance->Pages[i].TextItems.iSize; ++j) {
                 ourFree(LoveTesterMenu::pInstance->Pages[i].TextItems.operator[](j));
             }
-            LoveTesterMenu::pInstance->Pages[i].Buttons.Clear(1);
-            LoveTesterMenu::pInstance->Pages[i].TextItems.Clear(1);
+            LoveTesterMenu::pInstance->Pages[i].Buttons.Clear(true);
+            LoveTesterMenu::pInstance->Pages[i].TextItems.Clear(true);
         }
         for (uint32_t k = 0; k < LoveTesterMenu::pInstance->GlobalPage.Buttons.iSize; ++k) {
             LoveTesterMenu::LoveTesterButton* v4 = LoveTesterMenu::pInstance->GlobalPage.Buttons.operator[](k);
@@ -1224,10 +1224,10 @@ void LoveTesterMenu::Close() {
         for (uint32_t m = 0; m < LoveTesterMenu::pInstance->GlobalPage.TextItems.iSize; ++m) {
             ourFree(LoveTesterMenu::pInstance->GlobalPage.TextItems.operator[](m));
         }
-        LoveTesterMenu::pInstance->GlobalPage.Buttons.Clear(1);
-        LoveTesterMenu::pInstance->GlobalPage.TextItems.Clear(1);
-        LoveTesterMenu::pInstance->LightBulbs.Clear(1);
-        LoveTesterMenu::pInstance->LightBulbGlows.Clear(1);
+        LoveTesterMenu::pInstance->GlobalPage.Buttons.Clear(true);
+        LoveTesterMenu::pInstance->GlobalPage.TextItems.Clear(true);
+        LoveTesterMenu::pInstance->LightBulbs.Clear(true);
+        LoveTesterMenu::pInstance->LightBulbGlows.Clear(true);
         if (LoveTesterMenu::pInstance) {
             MenuByClass->Set(Tile::kTileValue_DeleteOnFade, 1);
             LoveTesterMenu::pInstance->StartFadeOut();
@@ -1239,9 +1239,7 @@ void LoveTesterMenu::Close() {
 // text property's texture 0 of type 0.
 void LoveTesterMenu::RefreshActorValue(LoveTesterTextItem* apTextItem) {
     // The ActorValueOwner base is reached without a null check, as the game does: cast through a reference.
-    int32_t iValue = static_cast<ActorValueOwner&>(*pPlayer).GetPermanentActorValue(
-        static_cast<ActorValue::Index>(apTextItem->eActorValue)
-    );
+    int32_t iValue = static_cast<ActorValueOwner&>(*pPlayer).GetPermanentActorValue(apTextItem->eActorValue);
     NiSourceTexture* pTexture = pInstance->spAVValues[iValue].operator->();
     static_cast<BSShaderPPLightingProperty*>(apTextItem->pText[0])
         ->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, pTexture);
@@ -1250,7 +1248,7 @@ void LoveTesterMenu::RefreshActorValue(LoveTesterTextItem* apTextItem) {
 // pInstance is reloaded before each call.
 void LoveTesterMenu::PreviousPage([[maybe_unused]] LoveTesterButton* apButton, ...) {
     if (pInstance && pInstance->bAnimFinished) {
-        pInstance->TurnPage(0);
+        pInstance->TurnPage(false);
         pInstance->RefreshPage();
     }
 }
@@ -1266,14 +1264,14 @@ void LoveTesterMenu::Create(int32_t aiTotalPoints) {
     Tile* ptile = v1->GetMenusRoot()->ReadFile("Data\\Menus\\CharGen\\love_tester_menu.xml");
     Menu* pmenu = ptile->GetMenu();
     if (pmenu && (v2 = pmenu->GetClass(), v2 == LoveTesterMenu::GetClassStatic())) {
-        pmenu->SetMenuTile(static_cast<TileMenu*>(ptile), 0);
+        pmenu->SetMenuTile(static_cast<TileMenu*>(ptile), false);
         LoveTesterMenu::pInstance = static_cast<LoveTesterMenu*>(pmenu);
         if (static_cast<LoveTesterMenu*>(pmenu)->LoveTesterMenu::CheckTilesExist(&imissingIndex)) {
             LoveTesterMenu::pInstance->iAvailablePoints = aiTotalPoints;
             LoveTesterMenu::pInstance->InitMachine();
             LoveTesterMenu::sp3DCamera.operator=(LoveTesterMenu::pInstance->SetupCamera());
-            HUDMainMenu::ForceObjectiveReminders(1);
-            pmenu->PrepForVisibility(0);
+            HUDMainMenu::ForceObjectiveReminders(true);
+            pmenu->PrepForVisibility(false);
         }
         else {
             Warning("MENUS:  Special book menu creation failed... Missing index = #%d", imissingIndex);
@@ -1324,7 +1322,7 @@ void LoveTesterMenu::RefreshTotalPointsValue(LoveTesterMenu::LoveTesterTextItem*
             else {
                 v1 = 0;
             }
-            apItem->pTextObj[0u]->SetAppCulled(0);
+            apItem->pTextObj[0u]->SetAppCulled(false);
             if (v2 <= 0) {
                 apItem->pText[0u]->SetTexture(
                     BSShaderProperty::TEXTYPE_DIFFUSE, 0, LoveTesterMenu::pInstance->spAVValues->m_pObject
@@ -1335,7 +1333,7 @@ void LoveTesterMenu::RefreshTotalPointsValue(LoveTesterMenu::LoveTesterTextItem*
                     BSShaderProperty::TEXTYPE_DIFFUSE, 0, LoveTesterMenu::pInstance->spAVValues[v2].m_pObject
                 );
             }
-            apItem->pTextObj[1]->SetAppCulled(0);
+            apItem->pTextObj[1]->SetAppCulled(false);
             apItem->pText[1]->SetTexture(
                 BSShaderProperty::TEXTYPE_DIFFUSE, 0, LoveTesterMenu::pInstance->spAVValues[v1].m_pObject
             );
@@ -1348,14 +1346,14 @@ void LoveTesterMenu::RefreshLeftAVButton(LoveTesterMenu::LoveTesterButton* apBut
     ActorValue::Index v4 = static_cast<LoveTesterMenu::ActorValueButton*>(apButton)->eActorValue;
     if (v4 != ActorValue::VALUE_NONE) {
         if (pPlayer->GetPermanentActorValue(v4) <= 1) {
-            apButton->spButton->SetAppCulled(1);
+            apButton->spButton->SetAppCulled(true);
         }
         else {
-            apButton->spButton->SetAppCulled(0);
+            apButton->spButton->SetAppCulled(false);
         }
         if (InterfaceManager::Has360Controller() && LoveTesterMenu::pInstance->eState == LoveTesterMenu::LTMS_SUMMARY &&
             v4 != LoveTesterMenu::pInstance->eXBoxIndexState + 4) {
-            apButton->spButton->SetAppCulled(1);
+            apButton->spButton->SetAppCulled(true);
         }
     }
 }
@@ -1367,14 +1365,14 @@ void LoveTesterMenu::RefreshRightAVButton(LoveTesterMenu::LoveTesterButton* apBu
         if (pPlayer->GetPermanentActorValue(v4) >= 10 ||
             (LoveTesterMenu::pInstance &&
              PlayerCharacter::GetSumOfSPECIALStats() >= LoveTesterMenu::pInstance->iAvailablePoints)) {
-            apButton->spButton->SetAppCulled(1);
+            apButton->spButton->SetAppCulled(true);
         }
         else {
-            apButton->spButton->SetAppCulled(0);
+            apButton->spButton->SetAppCulled(false);
         }
         if (InterfaceManager::Has360Controller() && LoveTesterMenu::pInstance->eState == LoveTesterMenu::LTMS_SUMMARY &&
             v4 != LoveTesterMenu::pInstance->eXBoxIndexState + 4) {
-            apButton->spButton->SetAppCulled(1);
+            apButton->spButton->SetAppCulled(true);
         }
     }
 }
@@ -1410,7 +1408,7 @@ void LoveTesterMenu::DecreaseActorValue(LoveTesterMenu::LoveTesterButton* apButt
                 BSAudio* v1 = &BSAudio::QInstance();
                 BSSoundHandle* arHandle = v1->GetSoundHandleByName(&a1, "OBJBookSpecialNumberDown", 289u);
                 th_s.operator=(*arHandle);
-                th_s.Play(0);
+                th_s.Play(false);
             }
             int32_t v2 = BSMAX(v6 - 1, 1);
             pPlayer->SetActorBaseValue(eActorValue, v2);
@@ -1422,8 +1420,7 @@ void LoveTesterMenu::DecreaseActorValue(LoveTesterMenu::LoveTesterButton* apButt
 void LoveTesterMenu::DecreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::LoveTesterButton* apButton, ...) {
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (LoveTesterMenu::pInstance) {
-        ActorValue::Index SelectedSPECIAL =
-            static_cast<ActorValue::Index>(LoveTesterMenu::pInstance->GetSelectedSPECIAL());
+        ActorValue::Index SelectedSPECIAL = LoveTesterMenu::pInstance->GetSelectedSPECIAL();
         if (SelectedSPECIAL != ActorValue::VALUE_NONE) {
             int32_t v5 = pPlayer->GetPermanentActorValue(SelectedSPECIAL);
             if (v5 > 1) {
@@ -1431,7 +1428,7 @@ void LoveTesterMenu::DecreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::
                 BSAudio* v0 = &BSAudio::QInstance();
                 BSSoundHandle* arHandle = v0->GetSoundHandleByName(&a1, "OBJBookSpecialNumberDown", 289u);
                 th_s.operator=(*arHandle);
-                th_s.Play(0);
+                th_s.Play(false);
             }
             int32_t v1 = BSMAX(v5 - 1, 1);
             pPlayer->SetActorBaseValue(SelectedSPECIAL, v1);
@@ -1452,7 +1449,7 @@ void LoveTesterMenu::IncreaseActorValue(LoveTesterMenu::LoveTesterButton* apButt
                 BSAudio* v1 = &BSAudio::QInstance();
                 BSSoundHandle* arHandle = v1->GetSoundHandleByName(&a1, "OBJBookSpecialNumber", 289u);
                 th_s.operator=(*arHandle);
-                th_s.Play(0);
+                th_s.Play(false);
             }
             if (PlayerCharacter::GetSumOfSPECIALStats() < LoveTesterMenu::pInstance->iAvailablePoints) {
                 int32_t v2 = BSMIN(v6 + 1, 10);
@@ -1466,8 +1463,7 @@ void LoveTesterMenu::IncreaseActorValue(LoveTesterMenu::LoveTesterButton* apButt
 void LoveTesterMenu::IncreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::LoveTesterButton* apButton, ...) {
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (LoveTesterMenu::pInstance) {
-        ActorValue::Index SelectedSPECIAL =
-            static_cast<ActorValue::Index>(LoveTesterMenu::pInstance->GetSelectedSPECIAL());
+        ActorValue::Index SelectedSPECIAL = LoveTesterMenu::pInstance->GetSelectedSPECIAL();
         if (SelectedSPECIAL != ActorValue::VALUE_NONE) {
             int32_t v5 = pPlayer->GetPermanentActorValue(SelectedSPECIAL);
             if (v5 < 10) {
@@ -1475,7 +1471,7 @@ void LoveTesterMenu::IncreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::
                 BSAudio* v0 = &BSAudio::QInstance();
                 BSSoundHandle* arHandle = v0->GetSoundHandleByName(&a1, "OBJBookSpecialNumber", 289u);
                 th_s.operator=(*arHandle);
-                th_s.Play(0);
+                th_s.Play(false);
             }
             if (PlayerCharacter::GetSumOfSPECIALStats() < LoveTesterMenu::pInstance->iAvailablePoints) {
                 int32_t v1 = BSMIN(v5 + 1, 10);
@@ -1493,12 +1489,12 @@ void LoveTesterMenu::AllDoneButtonClick([[maybe_unused]] LoveTesterMenu::LoveTes
         PlayerCharacter::GetSumOfSPECIALStats() == LoveTesterMenu::pInstance->iAvailablePoints) {
         BSAudio* v0 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v0->GetSoundHandleByName(&a1, "OBJBookSpecialNumberFinished", 289u);
-        SoundHandleByName->Play(0);
+        SoundHandleByName->Play(false);
         LoveTesterMenu::Close();
     }
     else {
         BSAudio* v2 = &BSAudio::QInstance();
         BSSoundHandle* v3 = v2->GetSoundHandleByName(&arHandle, "UIActivateNothing", 289u);
-        v3->Play(0);
+        v3->Play(false);
     }
 }

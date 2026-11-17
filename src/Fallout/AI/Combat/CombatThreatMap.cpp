@@ -287,7 +287,7 @@ void CombatThreat::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     }
     pThreat = pRef;
     if (pThreat) {
-        pThreat->SetTargeted(1);
+        pThreat->SetTargeted(true);
     }
 }
 
@@ -304,7 +304,7 @@ void CombatThreatMap::UpdateThreats() {
         float ftime = CombatTimer::GetTimer();
         while (it) {
             uint32_t ithreatID = 0;
-            CombatThreat* pthreat = 0;
+            CombatThreat* pthreat = nullptr;
             GetNext(it, ithreatID, pthreat);
             if (pthreat) {
                 if (pthreat->IsExpired(ftime)) {
@@ -321,7 +321,7 @@ void CombatThreatMap::UpdateThreats() {
 
 void CombatThreatMap::RemoveThreat(TESForm* apForm) {
     Lock.LockForWrite();
-    CombatThreat* pthreat = 0;
+    CombatThreat* pthreat = nullptr;
     if (GetAt(apForm->iFormID, pthreat)) {
         if (pthreat) {
             delete pthreat;
@@ -339,10 +339,10 @@ void CombatThreatMap::AddThreat(
     float afDamage
 ) {
     Lock.LockForWrite();
-    apRef->SetTargeted(1);
-    CombatThreat* pthreat = 0;
+    apRef->SetTargeted(true);
+    CombatThreat* pthreat = nullptr;
     if (GetAt(apRef->iFormID, pthreat)) {
-        pthreat->Initialize(apRef, afRadius, afStartTime, afEndTime, afDamage, 1);
+        pthreat->Initialize(apRef, afRadius, afStartTime, afEndTime, afDamage, true);
     }
     else {
         CombatThreat* pthreat_2;
@@ -351,7 +351,7 @@ void CombatThreatMap::AddThreat(
             pthreat_2 = ::new (pThreat) CombatThreat(apRef, afRadius, afStartTime, afEndTime, afDamage);
         }
         else {
-            pthreat_2 = 0;
+            pthreat_2 = nullptr;
         }
         pthreat = pthreat_2;
         SetAt(apRef->iFormID, pthreat_2);
@@ -364,11 +364,11 @@ void CombatThreatMap::AddThreat(TESObjectREFR* apRef, BGSExplosion* apExplosion,
     float* v4;
     float afExplosionRadius;
     float fRadius;
-    float fDamage = (float)apExplosion->BGSExplosion::GetDamage();
-    if (((&fDangerousProjectileExplosionDamage)->Float()) <= ((double)fDamage)) {
-        afExplosionRadius = (float)apExplosion->GetRadiusBSUnits();
+    float fDamage = apExplosion->BGSExplosion::GetDamage();
+    if ((&fDangerousProjectileExplosionDamage)->Float() <= ((double)fDamage)) {
+        afExplosionRadius = apExplosion->GetRadiusBSUnits();
         v4 = &fDangerousProjectileExplosionDamage.Float();
-        fRadius = (float)CombatFormulas::CalcExplosionDamageDistance(afExplosionRadius, fDamage, *v4);
+        fRadius = CombatFormulas::CalcExplosionDamageDistance(afExplosionRadius, fDamage, *v4);
         AddThreat(apRef, fRadius, (float)0.0, afTime, fDamage);
     }
 }
@@ -394,7 +394,7 @@ float CombatThreatMap::ComputeThreatScore(
     NiTMapItem<uint32_t, CombatThreat*>* it = GetFirstPos();
     while (it) {
         uint32_t ithreatID = 0;
-        CombatThreat* pthreat = 0;
+        CombatThreat* pthreat = nullptr;
         GetNext(it, ithreatID, pthreat);
         CombatTimeStamp* StartTime = pthreat->GetStartTime(&apOut);
         double DecalMinWidth = StartTime->fTimeStamp;
@@ -436,7 +436,7 @@ void CombatThreatMap::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     it = GetFirstPos();
     while (it) {
         uint32_t irefID;
-        CombatThreat* pthreat = 0;
+        CombatThreat* pthreat = nullptr;
         GetNext(it, irefID, pthreat);
         if (pthreat) {}
     }
@@ -447,7 +447,7 @@ void CombatThreatMap::RemoveAll() {
     a2 = GetFirstPos();
     while (a2) {
         uint32_t a3 = 0;
-        CombatThreat* a4 = 0;
+        CombatThreat* a4 = nullptr;
         GetNext(a2, a3, a4);
         if (a4) {
             delete a4;
@@ -462,7 +462,7 @@ PathingAvoidNodeArray* CombatThreatMap::CreateAvoidNodeArray(const NiPoint3& arL
     NiTMapItem<uint32_t, CombatThreat*>* it;
     TESCombatStyle* pcombatStyle = apActor->GetCombatStyle();
     if (pcombatStyle->GetIgnoreThreats()) {
-        return 0;
+        return nullptr;
     }
     float fcompareTime = 0.0;
     if (!(afTime < 0.0)) {
@@ -471,14 +471,14 @@ PathingAvoidNodeArray* CombatThreatMap::CreateAvoidNodeArray(const NiPoint3& arL
     else {
         fcompareTime = afTime;
     }
-    PathingAvoidNodeArray* pavoidNodeArray = 0;
-    CombatThreat* pbestThreat = 0;
+    PathingAvoidNodeArray* pavoidNodeArray = nullptr;
+    CombatThreat* pbestThreat = nullptr;
     float fhighestThreatScore = 0.0f;
     Lock.LockForRead();
     it = GetFirstPos();
     while (it) {
         uint32_t ithreatID = 0;
-        CombatThreat* pthreat = 0;
+        CombatThreat* pthreat = nullptr;
         GetNext(it, ithreatID, pthreat);
         float fthreatScore = pthreat->ComputeThreatScore(arLocation, apActor, fcompareTime, 1024.0f, 0.0f);
         if (fhighestThreatScore < static_cast<double>(fthreatScore)) {
@@ -494,7 +494,7 @@ PathingAvoidNodeArray* CombatThreatMap::CreateAvoidNodeArray(const NiPoint3& arL
                     pavoidNodeArray_2 = ::new (apMemory) PathingAvoidNodeArray;
                 }
                 else {
-                    pavoidNodeArray_2 = 0;
+                    pavoidNodeArray_2 = nullptr;
                 }
                 PathingAvoidNodeArray* v16 = pavoidNodeArray_2;
                 pavoidNodeArray = pavoidNodeArray_2;
@@ -513,7 +513,7 @@ PathingAvoidNodeArray* CombatThreatMap::CreateAvoidNodeArray(const NiPoint3& arL
                 pavoidNodeArray_3 = ::new (v12) PathingAvoidNodeArray;
             }
             else {
-                pavoidNodeArray_3 = 0;
+                pavoidNodeArray_3 = nullptr;
             }
             pavoidNodeArray = pavoidNodeArray_3;
             PathingAvoidNode* v7 = pbestThreat->GetAvoidNode(&v11, apActor);
@@ -564,13 +564,13 @@ void CombatThreatMap::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     for (uint32_t iloop = 0; iloop < isaveGameCount; ++iloop) {
         CombatThreat* pthreat;
         uint32_t irefID;
-        bool bremove = 0;
+        bool bremove = false;
         CombatThreat* v4 = static_cast<CombatThreat*>(ourMalloc(sizeof(CombatThreat)));
         if (v4) {
             pthreat = ::new (v4) CombatThreat;
         }
         else {
-            pthreat = 0;
+            pthreat = nullptr;
         }
         apLoadGameBuffer->LoadFormID(irefID);
         // The threat keeps the reference's form ID until InitLoadGame resolves it.
@@ -578,7 +578,7 @@ void CombatThreatMap::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
         pthreat->pThreat = reinterpret_cast<TESObjectREFR*>(static_cast<uintptr_t>(irefID));
         pthreat->Load(apLoadGameBuffer);
         if (!irefID) {
-            bremove = 1;
+            bremove = true;
         }
         if (bremove) {
             if (pthreat) {
@@ -595,7 +595,7 @@ void CombatThreatMap::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     NiTMapItem<uint32_t, CombatThreat*>* it = GetFirstPos();
     while (it) {
         uint32_t irefID;
-        CombatThreat* pthreat = 0;
+        CombatThreat* pthreat = nullptr;
         GetNext(it, irefID, pthreat);
         if (pthreat) {
             pthreat->InitLoadGame(apLoadGameBuffer);

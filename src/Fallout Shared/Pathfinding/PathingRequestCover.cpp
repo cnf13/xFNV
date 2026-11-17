@@ -224,10 +224,10 @@ bool PathingCoverLocation::CheckDynamicCoverValid(uint32_t aiLastMovedTime) {
         uint16_t Triangle = GetTriangle();
         if (spnavMesh.m_pObject->GetObstacleForTriangle(Triangle, spObstacle) &&
             spObstacle.m_pObject->iLastUpdateTime == aiLastMovedTime) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 uint32_t PathingCoverLocation::GetDynamicCoverObstacleTimeStamp() {

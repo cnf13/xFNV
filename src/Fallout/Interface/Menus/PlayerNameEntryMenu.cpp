@@ -23,10 +23,10 @@
 #include "Fallout/Interface/Menus/TextEntryMenu.h"
 #include "Fallout/Interface/Menus/TraitMenu.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 bool IsValidPlayerName(const char* a1) {
-    bool v10 = 0;
+    bool v10 = false;
     char v9 = 0;
     if (a1) {
         while (!v9 && *a1) {
@@ -65,13 +65,13 @@ bool IsValidPlayerName(const char* a1) {
 }
 
 PlayerNameEntryMenu::PlayerNameEntryMenu()
-  : pPlayerBase(pPlayer ? dynamic_cast<TESNPC*>(pPlayer->GetObjectReference()) : 0) {
+  : pPlayerBase(pPlayer ? dynamic_cast<TESNPC*>(pPlayer->GetObjectReference()) : nullptr) {
     if (pPlayerBase) {
         TextEditMenu::ResetText();
         TextEditMenu::Create(sEnterName.operator const char*(), pPlayerBase->GetFullName(), &IsValidPlayerName);
     }
     else {
-        SetPlayerName(0);
+        SetPlayerName(nullptr);
     }
 }
 

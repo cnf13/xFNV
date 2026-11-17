@@ -15,14 +15,14 @@
 const char* BSUtils::CreateNormalMapString(BSStringT<char>& arOut, const char* apFileName) {
     char Dst[264];
     char apDest[264];
-    char* v5 = 0;
+    char* v5 = nullptr;
     if (!apFileName) {
-        return 0;
+        return nullptr;
     }
     BSstrcpy(Dst, 260, apFileName);
     v5 = std::strrchr(Dst, 46);
     if (!v5) {
-        return 0;
+        return nullptr;
     }
     *v5 = 0;
     BSsprintf(apDest, 260u, "%s_n.dds", Dst);
@@ -54,14 +54,14 @@ void TESTexture::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESTexture::CompareComponent(BaseFormComponent* apCompareFC) {
     TESTexture* v7 = dynamic_cast<TESTexture*>(apCompareFC);
     if (!v7) {
-        return (bool)1;
+        return true;
     }
     if ((!GetTextureNameLength()) && (!v7->GetTextureNameLength())) {
-        return (bool)0;
+        return false;
     }
     uint32_t textureNameLength = GetTextureNameLength();
     if (textureNameLength != v7->GetTextureNameLength()) {
-        return (bool)1;
+        return true;
     }
     const char* fullName_0 = v7->TESTexture::GetTextureName();
     const char* v4 = TESTexture::GetTextureName();

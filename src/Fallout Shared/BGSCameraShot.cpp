@@ -190,7 +190,7 @@ void BGSCameraShot::InitItem() {
             Warning("Bad VATS CameraShot Data: '%s' has a Global Time Multiplier that is too small.", v1);
             Data.fGlobalTimeMult = 0.1f;
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -207,10 +207,10 @@ bool BGSCameraShot::Compare(TESForm* apCompare) {
     TESForm* v4 =
         static_cast<TESForm*>(FNVD_DYNAMIC_CAST_VOID(BGSCameraShot)(apCompare, RTTI_TESForm, RTTI_BGSCameraShot));
     if (!v4) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(v4)) {
-        return 1;
+        return true;
     }
     return std::memcmp(&Data, &v4[2].iFormFlags, sizeof(Data)) != 0;
 }
@@ -237,12 +237,12 @@ bool BGSCameraShot::GetIsFirstPersonCamera() {
 
 bool BGSCameraShot::IsInitialized() {
     if (Data.eCameraAction == 3) {
-        return (bool)0;
+        return false;
     }
     if (static_cast<TESModel*>(this)->GetModelLength()) {
-        return ((&spCameraNode)->operator->() != 0);
+        return ((&spCameraNode)->operator->() != nullptr);
     }
-    return (bool)1;
+    return true;
 }
 
 bool BGSCameraShot::IsStartAtTimeZero() {
@@ -251,21 +251,21 @@ bool BGSCameraShot::IsStartAtTimeZero() {
 
 void BGSCameraShot::FreeCamera() {
     FNVD_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
-    spLocationNode.operator=(static_cast<NiAVObject*>(0));
-    spTargetNode.operator=(static_cast<NiAVObject*>(0));
-    pTargetRef = 0;
-    spImagespaceTarget.operator=(static_cast<NiAVObject*>(0));
-    bCameraTooClose = 0;
+    spLocationNode.operator=(static_cast<NiAVObject*>(nullptr));
+    spTargetNode.operator=(static_cast<NiAVObject*>(nullptr));
+    pTargetRef = nullptr;
+    spImagespaceTarget.operator=(static_cast<NiAVObject*>(nullptr));
+    bCameraTooClose = false;
     if (spCameraNode.m_pObject) {
-        spCameraNode.operator=(static_cast<NiNode*>(0));
+        spCameraNode.operator=(static_cast<NiNode*>(nullptr));
         const char* v1 = GetModel();
         pModelLoader->ReleaseFile(v1);
     }
     if (bPlayCameraZoomSounds && !pVATS.GetCount()) {
-        bPlayCameraZoomSounds = 0;
+        bPlayCameraZoomSounds = false;
         BSAudio* v2 = &BSAudio::QInstance();
         v2->GetSoundHandleByName(&soundHand, "UIVATSCameraOut", 289u);
-        soundHand.Play(0);
+        soundHand.Play(false);
     }
 }
 
@@ -325,7 +325,7 @@ void BGSCameraShot::SetCameraLocation(NiAVObject* apLocation) {
             v3->SetWorldTranslate(*worldTranslate);
         }
     }
-    PlayerCharacter::bSnapChaseCamera = (bool)1;
+    PlayerCharacter::bSnapChaseCamera = true;
 }
 
 void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
@@ -337,26 +337,26 @@ void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
     NiFrustum vatsFrustum;
     if (GetModelLength()) {
         const char* v3 = GetModel();
-        spCameraNode.operator=(pModelLoader->LoadFile(v3, LOD_MULT_NONE, 1, 1, 0, 0));
+        spCameraNode.operator=(pModelLoader->LoadFile(v3, LOD_MULT_NONE, true, true, false, false));
     }
     if (spCameraNode.m_pObject) {
         NiAVObject* v4 = spCameraNode.m_pObject->GetAtChecked(0);
         pcamera = static_cast<NiCamera*>(NiObject::DynamicCastStatic(&NiCamera::ms_RTTI, v4));
     }
     else {
-        pcamera = 0;
+        pcamera = nullptr;
     }
     if (!pcamera) {
         Warning(
             "DEFAULT: VATS Camera '%s' doesn't have an NiCamera as the first child. This camera will not be used.",
             GetModel()
         );
-        spCameraNode.operator=(static_cast<NiNode*>(0));
+        spCameraNode.operator=(static_cast<NiNode*>(nullptr));
         const char* v5 = GetModel();
         pModelLoader->ReleaseFile(v5);
     }
     if (spCameraNode.m_pObject) {
-        NiUpdateData UpdateData(fVATSPlaybackTimer, 1, 0);
+        NiUpdateData UpdateData(fVATSPlaybackTimer, true, false);
         if (IsStartAtTimeZero()) {
             float afPhase = -fVATSPlaybackTimer;
             SetPhase(spCameraNode.m_pObject, afPhase);
@@ -372,7 +372,7 @@ void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
                 NiTransformInterpolator* ptrans = static_cast<NiTransformInterpolator*>(
                     NiObject::DynamicCastStatic(&NiTransformInterpolator::ms_RTTI, pinterp)
                 );
-                NiPathInterpolator* ppath = 0;
+                NiPathInterpolator* ppath = nullptr;
                 if (ptrans) {
                     NiAnimationKey::KeyType eType;
                     NiRotKey* pkRotKeys = ptrans->GetRotData(uiNumKeys, eType, ucSize);
@@ -404,14 +404,14 @@ void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
         }
     }
     pTargetRef = a1;
-    PlayerCharacter::bSnapChaseCamera = 1;
+    PlayerCharacter::bSnapChaseCamera = true;
     if (a2) {
         if (a2 == 1) {
-            bDollyToNewPos = 0;
+            bDollyToNewPos = false;
         }
         else {
             if (a2 == 2 && Data.eCameraAction == BGSCameraShot::CA_ZOOM) {
-                bDollyToNewPos = 1;
+                bDollyToNewPos = true;
                 if (!(Data.fMinTime > 0.0)) {
                     g_fVATSCameraDollyTime = fVATSCameraDollyTime.Float();
                 }
@@ -422,7 +422,7 @@ void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
         }
     }
     else {
-        bDollyToNewPos = 1;
+        bDollyToNewPos = true;
         g_fVATSCameraDollyTime = fVATSCameraDollyTime.Float();
     }
     fDollyStartTime = 0.0f;
@@ -436,18 +436,18 @@ void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
           (pcurrentCommand->pHitData->IsFlagSet(HitData::HD_CRITICAL_ON_DEATH) ||
            pcurrentCommand->pHitData->IsFlagSet(HitData::HD_FATAL))))) {
         if (Data.eCameraAction == BGSCameraShot::CA_HIT) {
-            bPlayCameraZoomSounds = 1;
+            bPlayCameraZoomSounds = true;
             BSAudio* v6 = &BSAudio::QInstance();
             v6->GetSoundHandleByName(&soundHand, "UIVATSCameraIn", 289u);
-            soundHand.Play(0);
+            soundHand.Play(false);
         }
     }
     else {
         if (bPlayCameraZoomSounds && Data.eCameraAction != BGSCameraShot::CA_HIT) {
-            bPlayCameraZoomSounds = 0;
+            bPlayCameraZoomSounds = false;
             BSAudio* v7 = &BSAudio::QInstance();
             v7->GetSoundHandleByName(&soundHand_2, "UIVATSCameraOut", 289u);
-            soundHand_2.Play(0);
+            soundHand_2.Play(false);
         }
     }
     pPlayer->Setup3rdPersonCameraCaster();
@@ -466,7 +466,7 @@ void BGSCameraShot::SetCameraTarget(NiAVObject* apTarget) {
                 v2 = ::new (apMemory) NiNode(0);
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             spTargetNode.operator=(v2);
             spTargetNode.m_pObject->SetWorldTranslate(apTarget->GetWorldTranslate());
@@ -480,11 +480,11 @@ void BGSCameraShot::SetCameraTarget(NiAVObject* apTarget) {
         else {
             spImagespaceTarget.operator=(apTarget);
         }
-        PlayerCharacter::bSnapChaseCamera = 1;
+        PlayerCharacter::bSnapChaseCamera = true;
     }
     else {
-        spTargetNode.operator=(static_cast<NiAVObject*>(0));
-        spImagespaceTarget.operator=(static_cast<NiAVObject*>(0));
+        spTargetNode.operator=(static_cast<NiAVObject*>(nullptr));
+        spImagespaceTarget.operator=(static_cast<NiAVObject*>(nullptr));
     }
 }
 
@@ -499,11 +499,11 @@ void BGSCameraShot::Update(float afTime) {
     NiPoint3 cameraLocalPos;
     NiPoint3 cameraPos;
     if (spCameraNode.m_pObject) {
-        NiUpdateData UpdateData(afTime, 1, 0);
+        NiUpdateData UpdateData(afTime, true, false);
         spCameraNode.m_pObject->Update(UpdateData);
         currentCameraPos = spCameraNode.m_pObject->GetTranslate();
         cameraPos = currentCameraPos;
-        if (!bCameraTooClose || pPlayer->IsDead(0)) {
+        if (!bCameraTooClose || pPlayer->IsDead(false)) {
             if (GetPosFollowsTarget()) {
                 if (GetFollowsBone() && (pTargetRef && Data.eLocation == 2)) {
                     cameraLocalPos_2 = cameraPos;
@@ -528,14 +528,14 @@ void BGSCameraShot::Update(float afTime) {
                 }
             }
             if (spLocationNode.m_pObject) {
-                bool bplayZoomSound = 0;
+                bool bplayZoomSound = false;
                 if (dollyStartingPos.operator==(NiPoint3_ZERO)) {
                     dollyStartingPos = chaseCameraPos;
-                    bplayZoomSound = 1;
+                    bplayZoomSound = true;
                 }
                 targetPos = spLocationNode.m_pObject->GetWorldTranslate();
                 cameraPos.operator+=(targetPos);
-                pPlayer->UpdateChaseCamera(&cameraPos, &targetPos, 0);
+                pPlayer->UpdateChaseCamera(&cameraPos, &targetPos, false);
                 chaseCameraPos = cameraPos;
                 if (bDollyToNewPos) {
                     dollyDelta = chaseCameraPos - dollyStartingPos;
@@ -545,24 +545,24 @@ void BGSCameraShot::Update(float afTime) {
                             if (bplayZoomSound && !bPlayCameraZoomSounds) {
                                 BSAudio* v4 = &BSAudio::QInstance();
                                 v4->GetSoundHandleByName(&soundHand, "UIVATSCameraIn", 289u);
-                                soundHand.Play(0);
+                                soundHand.Play(false);
                             }
                             fDollyPercentage = 1.0 / g_fVATSCameraDollyTime * (afTime - fDollyStartTime);
                             if (!(fDollyPercentage >= 1.0)) {
                                 chaseCameraPos = dollyStartingPos + dollyDelta * fDollyPercentage;
                             }
                             else {
-                                bDollyToNewPos = 0;
+                                bDollyToNewPos = false;
                                 fDollyStartTime = 0.0f;
                             }
                         }
                         else {
-                            bDollyToNewPos = 0;
+                            bDollyToNewPos = false;
                             fDollyStartTime = 0.0f;
                         }
                     }
                     else {
-                        bDollyToNewPos = 0;
+                        bDollyToNewPos = false;
                         fDollyStartTime = 0.0f;
                     }
                 }
@@ -584,12 +584,12 @@ void BGSCameraShot::Update(float afTime) {
             }
         }
         else {
-            pPlayer->SetFirstPerson(1);
+            pPlayer->SetFirstPerson(true);
         }
         NiPoint3* v8 = GetTargetPos(&apResult);
         double v10 = (*v8 - cameraPos).Length();
         if (fVATSCameraCutAwayDistance.Float() >= v10) {
-            bCameraTooClose = 1;
+            bCameraTooClose = true;
         }
     }
 }

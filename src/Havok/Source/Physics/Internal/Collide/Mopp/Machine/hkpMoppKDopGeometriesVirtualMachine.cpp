@@ -465,7 +465,7 @@ void hkpMoppKDopGeometriesVirtualMachine::addHit(uint32_t id, const uint32_t* pr
         char m_bool = m_queryObject.m_useSpecifiedID.m_bool;
         bool v9 = m_bool && id == m_queryObject.m_specifiedId;
         if (!m_bool || v9) {
-            addKDopGeometry(1, id);
+            addKDopGeometry(true, id);
             char v10 = m_queryObject.m_earlyExit.m_bool || v9;
             m_queryObject.m_earlyExit.m_bool = v10;
         }

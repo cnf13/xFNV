@@ -37,7 +37,7 @@ int32_t hkBufferedStreamReader::read(void* buf, int32_t nbytes) {
         return nbytes;
     }
     else {
-        while (1) {
+        while (true) {
             hkString::memCpy(buf, &m_buf.begin[current], v7);
             m_buf.current += v7;
             buf = static_cast<char*>(buf) + v7;
@@ -63,7 +63,7 @@ int32_t hkBufferedStreamReader::skip(int32_t nbytes) {
         return nbytes;
     }
     else {
-        while (1) {
+        while (true) {
             v4 -= v3;
             if (refillBuffer()) {
                 return nbytes - v4;
@@ -143,7 +143,7 @@ hkResult hkBufferedStreamReader::refillBuffer() {
     if (v3 <= 0) {
         return HK_SUCCESS;
     }
-    while (1) {
+    while (true) {
         int32_t v5 = m_stream->read(&m_buf.begin[m_buf.current], v3);
         m_buf.size += v5;
         v4 += v5;

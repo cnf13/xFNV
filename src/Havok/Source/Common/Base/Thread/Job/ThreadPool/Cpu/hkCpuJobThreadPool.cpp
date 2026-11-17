@@ -191,8 +191,8 @@ void hkCpuJobThreadPool::addThread() {
     WorkerThreadData* pData = &m_workerThreads[m_sharedThreadData.m_numThreads];
     pData->m_sharedThreadData = &m_sharedThreadData;
     int32_t iNumThreads = m_sharedThreadData.m_numThreads;
-    pData->m_monitorStreamBegin = 0;
-    pData->m_monitorStreamEnd = 0;
+    pData->m_monitorStreamBegin = nullptr;
+    pData->m_monitorStreamEnd = nullptr;
     pData->m_killThread = false;
     pData->m_clearTimers = false;
     pData->m_threadId = iNumThreads + 1;

@@ -107,10 +107,10 @@ void NiQuaternion::FastNormalize() {
             v9 = (float)(v7 * v13);
         }
     }
-    m_fX = (float)(m_fX * v9);
-    m_fY = (float)(v9 * m_fY);
-    m_fZ = (float)(m_fZ * v9);
-    m_fW = (float)(v9 * m_fW);
+    m_fX = (m_fX * v9);
+    m_fY = (v9 * m_fY);
+    m_fZ = (m_fZ * v9);
+    m_fW = (v9 * m_fW);
 }
 
 bool NiQuaternion::operator==(const NiQuaternion& q) const {
@@ -290,10 +290,10 @@ void NiQuaternion::Slerp(float t, const NiQuaternion& p, const NiQuaternion& q) 
         v7 = (double)NiQuaternion::CounterWarp(t, a3a);
     }
     float a4a = (float)v7;
-    m_fW = (float)((&p)->m_fW + (((&q)->m_fW - (&p)->m_fW) * a4a));
-    m_fX = (float)((((&q)->m_fX - (&p)->m_fX) * a4a) + (&p)->m_fX);
-    m_fY = (float)((((&q)->m_fY - (&p)->m_fY) * a4a) + (&p)->m_fY);
-    m_fZ = (float)((a4a * ((&q)->m_fZ - (&p)->m_fZ)) + (&p)->m_fZ);
+    m_fW = ((&p)->m_fW + (((&q)->m_fW - (&p)->m_fW) * a4a));
+    m_fX = ((((&q)->m_fX - (&p)->m_fX) * a4a) + (&p)->m_fX);
+    m_fY = ((((&q)->m_fY - (&p)->m_fY) * a4a) + (&p)->m_fY);
+    m_fZ = ((a4a * ((&q)->m_fZ - (&p)->m_fZ)) + (&p)->m_fZ);
     FastNormalize();
 }
 

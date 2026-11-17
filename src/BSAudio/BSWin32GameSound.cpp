@@ -29,7 +29,7 @@
 
 #include <cctype>
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 #include <vorbis/vorbisfile.h>
 
 SettingT<INISettingCollection> gs_bEnableEnviroEffectsOnPC("bEnableEnviroEffectsOnPC:Audio", false);
@@ -187,7 +187,7 @@ long tell_func(void* datasource) {
     }
     // The datasource is the BSFile OggVorbisFile hands ov_open_callbacks.
     BSFile* pFile = static_cast<BSFile*>(datasource);
-    if (pFile->iAuxTrueFilePos == ((-1))) {
+    if (pFile->iAuxTrueFilePos == (-1)) {
         return (int32_t)pFile->iTrueFilePos;
     }
     else {
@@ -208,11 +208,11 @@ bool BSWin32GameSound::OggVorbisFile::OpenFile(const char* apPath) {
     for (int32_t i = 0; i < 0x103; ++i) {
         cPath[i] = (char)std::tolower(cPath[i]);
     }
-    char* pcExtension = const_cast<char*>(std::strstr(cPath, ".ogg"));
+    char* pcExtension = std::strstr(cPath, ".ogg");
     if (!pcExtension) {
-        pcExtension = const_cast<char*>(std::strstr(cPath, ".mp3"));
+        pcExtension = std::strstr(cPath, ".mp3");
         if (!pcExtension) {
-            pcExtension = const_cast<char*>(std::strstr(cPath, ".wav"));
+            pcExtension = std::strstr(cPath, ".wav");
         }
         if (!pcExtension) {
             return false;
@@ -283,7 +283,7 @@ void BSWin32GameSound::OggVorbisFile::Destroy() {
         if (pFile) {
             delete pFile;
         }
-        this->pFile = 0;
+        this->pFile = nullptr;
     }
 }
 
@@ -310,34 +310,34 @@ BSWin32GameSound::~BSWin32GameSound() {
         while (pSoundBuffer->Release()) {
             ;
         }
-        pSoundBuffer = 0;
+        pSoundBuffer = nullptr;
     }
     if (p3DSoundBuffer) {
         while (p3DSoundBuffer->Release()) {
             ;
         }
-        p3DSoundBuffer = 0;
+        p3DSoundBuffer = nullptr;
     }
     if (pReverbBuffer) {
         --BSWin32GameSound::uiEffectCount;
         while (pReverbBuffer->Release()) {
             ;
         }
-        pReverbBuffer = 0;
+        pReverbBuffer = nullptr;
     }
     if (p3DReverbBuffer) {
         while (p3DReverbBuffer->Release()) {
             ;
         }
-        p3DReverbBuffer = 0;
+        p3DReverbBuffer = nullptr;
     }
     if (kBufferDesc.lpwfxFormat) {
         MemoryManager_Singleton.Deallocate(kBufferDesc.lpwfxFormat);
-        kBufferDesc.lpwfxFormat = 0;
+        kBufferDesc.lpwfxFormat = nullptr;
     }
     if (pRawBuffer) {
         MemoryManager_Singleton.Deallocate(pRawBuffer);
-        pRawBuffer = 0;
+        pRawBuffer = nullptr;
     }
     if (pEnvelope) {
         if (pEnvelope->pHeadBuf) {
@@ -355,7 +355,7 @@ BSWin32GameSound::~BSWin32GameSound() {
         BSWin32GameSound::OggVorbisFile* pFile = pOggFile;
         pFile->Destroy();
         MemoryManager_Singleton.Deallocate(pFile);
-        pOggFile = 0;
+        pOggFile = nullptr;
     }
 }
 
@@ -389,9 +389,9 @@ bool BSWin32GameSound::Open() {
         OpenOgg()) {
         return OpenResult(true);
     }
-    char* pExtension = const_cast<char*>(std::strstr(pFilename, ".mp3"));
+    char* pExtension = std::strstr(pFilename, ".mp3");
     if (!pExtension) {
-        pExtension = const_cast<char*>(std::strstr(pFilename, ".ogg"));
+        pExtension = std::strstr(pFilename, ".ogg");
     }
     if (pExtension) {
         pExtension[1] = 'w';
@@ -592,7 +592,7 @@ bool BSWin32GameSound::Prepare() {
     void* v11;
     uint32_t v14;
     if (!pDirectSound8) {
-        return OpenResult(0);
+        return OpenResult(false);
     }
     int32_t uiBytesPerSample = kBufferDesc.lpwfxFormat->wBitsPerSample / 8;
     if (Is3DSound() || Is2DRadiusSound()) {
@@ -632,7 +632,7 @@ bool BSWin32GameSound::Prepare() {
               (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0))) {
             kBufferDesc.dwFlags &= ~512u;
         }
-        HRESULT hResult = pDirectSound8->CreateSoundBuffer(&kBufferDesc, &pTempSoundBuffer, 0);
+        HRESULT hResult = pDirectSound8->CreateSoundBuffer(&kBufferDesc, &pTempSoundBuffer, nullptr);
         if (hResult < 0) {
             if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_IS_3D) != 0 && kBufferDesc.lpwfxFormat->nChannels > 1u) {
                 Warning(
@@ -647,9 +647,9 @@ bool BSWin32GameSound::Prepare() {
             }
             if (pRawBuffer) {
                 MemoryManager_Singleton.Deallocate(pRawBuffer);
-                pRawBuffer = 0;
+                pRawBuffer = nullptr;
             }
-            return OpenResult(0);
+            return OpenResult(false);
         }
         hResult = pTempSoundBuffer->QueryInterface(CLSID_IDirectSoundBuffer8, reinterpret_cast<void**>(&pSoundBuffer));
         if (pSoundBuffer) {
@@ -662,11 +662,11 @@ bool BSWin32GameSound::Prepare() {
                 pTempSoundBuffer->SetVolume(DSBVOLUME_MIN);
             }
         }
-        v11 = 0;
+        v11 = nullptr;
         v14 = 0;
-        hResult = pSoundBuffer->Lock(0, uiBufferBytes, &v11, &v14, 0, 0, 0);
+        hResult = pSoundBuffer->Lock(0, uiBufferBytes, &v11, &v14, nullptr, nullptr, 0);
         if (hResult < 0) {
-            return OpenResult(0);
+            return OpenResult(false);
         }
         void* v12 = v11;
         bool bEnvelope = (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
@@ -687,10 +687,10 @@ bool BSWin32GameSound::Prepare() {
         else {
             rt::memcpy(v12, pRawBuffer, uiBufferBytes);
         }
-        pSoundBuffer->Unlock(v11, v14, 0, 0);
+        pSoundBuffer->Unlock(v11, v14, nullptr, 0);
         if (pRawBuffer) {
             MemoryManager_Singleton.Deallocate(pRawBuffer);
-            pRawBuffer = 0;
+            pRawBuffer = nullptr;
         }
         SetVolume(fVolume);
     }
@@ -736,17 +736,17 @@ void BSWin32GameSound::Copy(BSGameSound* apToCopy, bool abPlayable) {
     if (v8->pRawBuffer) {
         v8->Prepare();
     }
-    BSGameSound::Copy(apToCopy, 1);
-    pReverbBuffer = 0;
-    pTempReverbBuffer = 0;
-    p3DReverbBuffer = 0;
+    BSGameSound::Copy(apToCopy, true);
+    pReverbBuffer = nullptr;
+    pTempReverbBuffer = nullptr;
+    p3DReverbBuffer = nullptr;
     iDirectoryHash = apToCopy->iDirectoryHash;
     uiBufferBytes = v8->uiBufferBytes;
     iSoundSize = uiBufferBytes;
     iSamplesPerSecond = v8->iSamplesPerSecond;
     iModSamplesPerSecond = v8->iModSamplesPerSecond;
-    pSoundBuffer = 0;
-    p3DSoundBuffer = 0;
+    pSoundBuffer = nullptr;
+    p3DSoundBuffer = nullptr;
     pDirectSound8 = v8->pDirectSound8;
     if (v8 && v8->pSoundBuffer) {
         char pcDest[256];
@@ -754,12 +754,12 @@ void BSWin32GameSound::Copy(BSGameSound* apToCopy, bool abPlayable) {
             (iSoundTypeFlags & BSGameSound::SOUND_FLAG_IS_3D) == 0) {
             iSoundTypeFlags = static_cast<BSGameSound::SoundFlags>(iSoundTypeFlags | BSGameSound::SOUND_FLAG_IS_2D);
         }
-        v10 = 0;
-        v13 = 0;
+        v10 = nullptr;
+        v13 = nullptr;
         v14 = 0;
         v9 = 0;
-        v15 = 0;
-        v17 = 0;
+        v15 = nullptr;
+        v17 = nullptr;
         v22 = 0;
         v16 = 0;
         kBufferDesc.dwSize = sizeof(DSBUFFERDESC);
@@ -810,7 +810,7 @@ void BSWin32GameSound::Copy(BSGameSound* apToCopy, bool abPlayable) {
         iModSamplesPerSecond = static_cast<int32_t>(static_cast<double>(iSamplesPerSecond) * v20);
         iDurationInMS = uiBufferBytes / (static_cast<int32_t>(kBufferDesc.lpwfxFormat->wBitsPerSample) >> 3) /
             (iSamplesPerSecond / 1000);
-        int32_t eError = pDirectSound8->CreateSoundBuffer(&kBufferDesc, &pTempSoundBuffer, 0);
+        int32_t eError = pDirectSound8->CreateSoundBuffer(&kBufferDesc, &pTempSoundBuffer, nullptr);
         if (eError >= 0) {
             if (pTempSoundBuffer->Lock(0, 0, &v10, &v14, &v13, &v9, 2) >= 0) {
                 if (v8->pSoundBuffer->Lock(0, 0, &v15, &v22, &v17, &v16, 2) >= 0) {
@@ -857,7 +857,7 @@ void BSWin32GameSound::Copy(BSGameSound* apToCopy, bool abPlayable) {
                     }
                 }
                 iStateFlags = 0;
-                OpenResult(1);
+                OpenResult(true);
                 if (abPlayable) {
                     Prepare();
                 }
@@ -940,7 +940,7 @@ bool BSWin32GameSound::Play(bool abLoopPlayback) {
     if (pSoundBuffer) {
         if (pDirectSound8) {
             if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_LOOP) != 0) {
-                abLoopPlayback = 1;
+                abLoopPlayback = true;
                 uint32_t iSoundSize = this->iSoundSize;
                 uint32_t v2 = rt::rand();
                 pSoundBuffer->SetCurrentPosition(v2 % (iSoundSize - 1));
@@ -949,7 +949,7 @@ bool BSWin32GameSound::Play(bool abLoopPlayback) {
                 if (((iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
                      (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0) &&
                     (!IsPaused() || (!pEnvelope || pEnvelope->uiState != 5))) {
-                    abLoopPlayback = 1;
+                    abLoopPlayback = true;
                     if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
                         (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0) {
                         if (pEnvelope) {
@@ -1063,7 +1063,7 @@ bool BSWin32GameSound::SetVolume(float afNewVolume) {
     float fReverbAttenuationa = static_cast<float>(iReverbAttenuation);
     float fReverbAttenuation = fReverbAttenuationa / 100.0;
     if (!pSoundBuffer) {
-        return 0;
+        return false;
     }
     if (!(afNewVolume > 1.0)) {
         v12 = afNewVolume;
@@ -1311,8 +1311,8 @@ bool BSWin32GameSound::Update(uint32_t adwTimeDelta) {
     if (!IsPlaying() ||
         ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
                  (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0
-             ? v3 = 1
-             : v3 = 0,
+             ? v3 = true
+             : v3 = false,
          !v3 || !pEnvelope)) {
         if (IsPlaying() && (iSoundTypeFlags & BSGameSound::SOUND_FLAG_EXTERNAL_SYNC) != 0) {
             if ((iStateFlags & BSGameSound::STATE_EXPLICIT_PAUSE) != 0 ||
@@ -1320,7 +1320,7 @@ bool BSWin32GameSound::Update(uint32_t adwTimeDelta) {
                 if ((iStateFlags & BSGameSound::STATE_EXPLICIT_PAUSE) != 0 &&
                     (BSAudio::pAudioInstance->SynchTimer.iFlags & 1) == 0) {
                     iStateFlags &= ~BSGameSound::STATE_EXPLICIT_PAUSE;
-                    Play(0);
+                    Play(false);
                 }
             }
             else {
@@ -1330,9 +1330,9 @@ bool BSWin32GameSound::Update(uint32_t adwTimeDelta) {
             if ((iStateFlags & BSGameSound::STATE_EXPLICIT_PAUSE) == 0) {
                 std::memset(&kFormat, 0, sizeof(kFormat));
                 uiCurrPos = 0;
-                bool v11 = 0;
-                pSoundBuffer->GetCurrentPosition(&uiCurrPos, 0);
-                pSoundBuffer->GetFormat(&kFormat, sizeof(WAVEFORMATEX), 0);
+                bool v11 = false;
+                pSoundBuffer->GetCurrentPosition(&uiCurrPos, nullptr);
+                pSoundBuffer->GetFormat(&kFormat, sizeof(WAVEFORMATEX), nullptr);
                 int32_t uiOffset = static_cast<int32_t>(static_cast<double>(kFormat.nAvgBytesPerSec) / 1000.0);
                 uint32_t v12 = static_cast<int64_t>(
                     static_cast<double>(uiCurrPos) / (static_cast<double>(kFormat.nAvgBytesPerSec) / 1000.0)
@@ -1368,7 +1368,7 @@ bool BSWin32GameSound::Update(uint32_t adwTimeDelta) {
                             iSoundTypeFlags & ~BSGameSound::SOUND_FLAG_EXTERNAL_SYNC
                         );
                         Stop();
-                        v11 = 1;
+                        v11 = true;
                     }
                     if (!v11) {
                         pSoundBuffer->SetCurrentPosition(iNewTime);
@@ -1385,7 +1385,7 @@ bool BSWin32GameSound::Update(uint32_t adwTimeDelta) {
     pSoundBuffer->GetCurrentPosition(reinterpret_cast<uint32_t*>(&uiPlayCursor), &uiWriteCursor);
     if (pEnvelope->uiPlayCursor <= uiPlayCursor) {
         if (pEnvelope->uiPlayCursor >= uiPlayCursor) {
-            return 0;
+            return false;
         }
         dwWriteBytes = uiPlayCursor - pEnvelope->uiPlayCursor;
     }
@@ -1417,15 +1417,15 @@ bool BSWin32GameSound::Update(uint32_t adwTimeDelta) {
         }
     LABEL_68:;
         UpdateEmitterPosition();
-        return 1;
+        return true;
     }
     if (pEnvelope->uiState == 2 && pEnvelope->uiMiddleSize) {
-        bool v15 = 0;
+        bool v15 = false;
         int32_t auiSize = 0;
         if (dwWriteBytes > pEnvelope->uiMiddleSize - pEnvelope->uiSize) {
             auiSize = dwWriteBytes - (pEnvelope->uiMiddleSize - pEnvelope->uiSize);
             dwWriteBytes = pEnvelope->uiMiddleSize - pEnvelope->uiSize;
-            v15 = 1;
+            v15 = true;
         }
         Write(pEnvelope->uiSize, pEnvelope->uiPlayCursor, dwWriteBytes, reinterpret_cast<char*>(pEnvelope->pMidBuf));
         pEnvelope->uiSize = (dwWriteBytes + pEnvelope->uiSize) % pEnvelope->uiMiddleSize;
@@ -1460,7 +1460,7 @@ bool BSWin32GameSound::Update(uint32_t adwTimeDelta) {
         }
         goto LABEL_42;
     }
-    bool v14 = 0;
+    bool v14 = false;
     if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) == 0) {
         if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0) {
             pEnvelope->uiState = 3;
@@ -1485,12 +1485,12 @@ bool BSWin32GameSound::Update(uint32_t adwTimeDelta) {
         pSoundBuffer->SetCurrentPosition(0);
         dwWriteBytes = pEnvelope->uiTailSize;
         Write(0, 0, dwWriteBytes, reinterpret_cast<char*>(pEnvelope->pTailBuf));
-        Write(0, dwWriteBytes, uiBufferBytes - dwWriteBytes, 0);
+        Write(0, dwWriteBytes, uiBufferBytes - dwWriteBytes, nullptr);
         pEnvelope->uiState = 6;
         pSoundBuffer->Play(0, 0, 0);
     }
     pEnvelope->uiPlayCursor = 0;
-    return 0;
+    return false;
 }
 
 bool BSWin32GameSound::ProcessDataRequest(int32_t aiRequestNum) {
@@ -1504,7 +1504,7 @@ bool BSWin32GameSound::SetEmitterPosition(NiPoint3 vin) {
 bool BSWin32GameSound::SetEmitterPosition(float afX, float afY, float afZ) {
     NiPoint3 kPos = NiPoint3_ZERO;
     NiPoint3 kListenerPos = NiPoint3_ZERO;
-    bool bPositionChanged = 0;
+    bool bPositionChanged = false;
     bool v4 = Is3DSound();
     if (v4 || (v4 = Is2DRadiusSound())) {
         if (pDirectSound8) {
@@ -1520,7 +1520,7 @@ bool BSWin32GameSound::SetEmitterPosition(float afX, float afY, float afZ) {
                     kPosition.x = afX;
                     kPosition.y = afY;
                     kPosition.z = afZ;
-                    bPositionChanged = 1;
+                    bPositionChanged = true;
                 }
             }
             padding224 = 1;
@@ -1805,7 +1805,7 @@ void BSWin32GameSound::Seek(uint32_t uiMilliseconds) {
     tWAVEFORMATEX kFormat;
     if (pSoundBuffer && uiMilliseconds < iDurationInMS) {
         std::memset(&kFormat, 0, sizeof(kFormat));
-        pSoundBuffer->GetFormat(&kFormat, sizeof(WAVEFORMATEX), 0);
+        pSoundBuffer->GetFormat(&kFormat, sizeof(WAVEFORMATEX), nullptr);
         pSoundBuffer->SetCurrentPosition(
             static_cast<int32_t>(static_cast<double>(kFormat.nAvgBytesPerSec) / 1000.0) * uiMilliseconds
         );
@@ -1821,13 +1821,13 @@ void BSWin32GameSound::Seek(uint32_t uiMilliseconds) {
 
 bool BSWin32GameSound::SetDirectSound() {
     if (pDirectSound8) {
-        return 1;
+        return true;
     }
     if (!static_cast<BSWin32Audio*>(BSAudio::pAudioInstance)->pDirectSound8) {
-        return 0;
+        return false;
     }
     pDirectSound8 = static_cast<BSWin32Audio*>(BSAudio::pAudioInstance)->pDirectSound8;
-    return 1;
+    return true;
 }
 
 bool BSWin32GameSound::OpenOgg() {
@@ -1839,7 +1839,7 @@ bool BSWin32GameSound::OpenOgg() {
         pOVFile = ::new (apMemory) BSWin32GameSound::OggVorbisFile;
     }
     else {
-        pOVFile = 0;
+        pOVFile = nullptr;
     }
     pOggFile = pOVFile;
     if (pOggFile->OpenFile(pFilename)) {
@@ -1932,7 +1932,7 @@ bool BSWin32GameSound::OpenOgg() {
             uiBufferBytes = kBufferDesc.dwBufferBytes;
             iDurationInMS += 500;
         }
-        return OpenResult(1);
+        return OpenResult(true);
     }
     else {
         BSWin32GameSound::OggVorbisFile* Block = pOggFile;
@@ -1940,8 +1940,8 @@ bool BSWin32GameSound::OpenOgg() {
             Block->Destroy();
             MemoryManager_Singleton.Deallocate(Block);
         }
-        pOggFile = 0;
-        return 0;
+        pOggFile = nullptr;
+        return false;
     }
 }
 
@@ -1959,38 +1959,38 @@ bool BSWin32GameSound::PrepareReverb() {
     void* v17;
     uint32_t v18;
     if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_SYSTEM_SOUND) != 0) {
-        return 0;
+        return false;
     }
     bEnableEnviroEffectsOnPC = &gs_bEnableEnviroEffectsOnPC.uValue;
     if (!bEnableEnviroEffectsOnPC->b) {
-        return 0;
+        return false;
     }
     if (!pDirectSound8) {
-        return 0;
+        return false;
     }
     if (!pSoundBuffer) {
-        return 0;
+        return false;
     }
     if (!BSAudio::pAudioInstance->pListener) {
-        return 0;
+        return false;
     }
     if (!BSAudio::pAudioInstance->pListener->GetEnvironmentType()) {
-        return 0;
+        return false;
     }
     if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
         (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0) {
-        return 0;
+        return false;
     }
     iMaxFX = &BSWin32GameSound::iMaxFX.uValue;
     if (iMaxFX->uint <= BSWin32GameSound::uiEffectCount) {
-        return 0;
+        return false;
     }
-    v9 = 0;
-    v11 = 0;
+    v9 = nullptr;
+    v11 = nullptr;
     v13 = 0;
     v8 = 0;
-    v15 = 0;
-    v17 = 0;
+    v15 = nullptr;
+    v17 = nullptr;
     v18 = 0;
     v16 = 0;
     std::memset(&kBufferDesc, 0, sizeof(kBufferDesc));
@@ -2008,7 +2008,7 @@ bool BSWin32GameSound::PrepareReverb() {
     kBufferDesc.lpwfxFormat = static_cast<tWAVEFORMATEX*>(MemoryManager_Singleton.Allocate(sizeof(tWAVEFORMATEX)));
     pSoundBuffer->GetFormat(kBufferDesc.lpwfxFormat, sizeof(WAVEFORMATEX), &v13);
     ++BSWin32GameSound::uiEffectCount;
-    if (pDirectSound8->CreateSoundBuffer(&kBufferDesc, &pTempReverbBuffer, 0) >= 0 &&
+    if (pDirectSound8->CreateSoundBuffer(&kBufferDesc, &pTempReverbBuffer, nullptr) >= 0 &&
         (pTempReverbBuffer->QueryInterface(CLSID_IDirectSoundBuffer8, reinterpret_cast<void**>(&pReverbBuffer)),
          pReverbBuffer)) {
         pReverbBuffer->QueryInterface(CLSID_IDirectSound3DBuffer, reinterpret_cast<void**>(&p3DReverbBuffer));
@@ -2017,7 +2017,7 @@ bool BSWin32GameSound::PrepareReverb() {
         v12.guidDSFXClass = CLSID_GUID_DSFX_STANDARD_I3DL2REVERB;
         v12.dwReserved1 = 0;
         v12.dwReserved2 = 0;
-        int32_t v10 = pReverbBuffer->SetFX(1, &v12, 0);
+        int32_t v10 = pReverbBuffer->SetFX(1, &v12, nullptr);
         int32_t v2 = pReverbBuffer->GetObjectInPath(
             &CLSID_GUID_DSFX_STANDARD_I3DL2REVERB, 0, &CLSID_IDirectSoundFXI3DL2Reverb,
             reinterpret_cast<void**>(&pReverbEffect)
@@ -2041,16 +2041,16 @@ bool BSWin32GameSound::PrepareReverb() {
             }
             pReverbBuffer->Unlock(v9, v13, v11, v8);
             MemoryManager_Singleton.Deallocate(kBufferDesc.lpwfxFormat);
-            return 1;
+            return true;
         }
         else {
             MemoryManager_Singleton.Deallocate(kBufferDesc.lpwfxFormat);
-            return 0;
+            return false;
         }
     }
     else {
         MemoryManager_Singleton.Deallocate(kBufferDesc.lpwfxFormat);
-        return 0;
+        return false;
     }
 }
 
@@ -2061,20 +2061,20 @@ void BSWin32GameSound::RemoveEffects() {
         while (pReverbBuffer->Release()) {
             ;
         }
-        pReverbBuffer = 0;
+        pReverbBuffer = nullptr;
     }
     if (p3DReverbBuffer) {
         while (p3DReverbBuffer->Release()) {
             ;
         }
-        p3DReverbBuffer = 0;
+        p3DReverbBuffer = nullptr;
     }
 }
 
 bool BSWin32GameSound::Write(uint32_t auiPosition, uint32_t auiOffset, uint32_t auiSize, char* apData) {
-    void* pData = 0;
+    void* pData = nullptr;
     uint32_t uiSize = 0;
-    if (pSoundBuffer->Lock(auiOffset, auiSize, &pData, &uiSize, 0, 0, 0) < 0) {
+    if (pSoundBuffer->Lock(auiOffset, auiSize, &pData, &uiSize, nullptr, nullptr, 0) < 0) {
         return false;
     }
     void* pvDest = pData;
@@ -2084,6 +2084,6 @@ bool BSWin32GameSound::Write(uint32_t auiPosition, uint32_t auiOffset, uint32_t 
     else {
         std::memset(pvDest, 0, auiSize);
     }
-    pSoundBuffer->Unlock(pData, uiSize, 0, 0);
+    pSoundBuffer->Unlock(pData, uiSize, nullptr, 0);
     return true;
 }

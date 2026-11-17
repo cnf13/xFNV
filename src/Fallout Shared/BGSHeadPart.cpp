@@ -96,7 +96,7 @@ void BGSHeadPart::InitItem() {
     if (!GetInitialized()) {
         TESModelTextureSwap::InitItem(this);
         BSSimpleList<BGSHeadPart*>* plist = &ExtraParts;
-        BSSimpleList<BGSHeadPart*>* plastlist = 0;
+        BSSimpleList<BGSHeadPart*>* plastlist = nullptr;
         while (plist && !plist->IsEmpty()) {
             uint32_t itempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(plist->m_item));
             TESFile* File = GetFile(-1);
@@ -122,7 +122,7 @@ void BGSHeadPart::InitItem() {
                 }
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -144,23 +144,23 @@ void BGSHeadPart::Copy(TESForm* apCopy) {
 bool BGSHeadPart::Compare(TESForm* apCompare) {
     BGSHeadPart* pcomp = dynamic_cast<BGSHeadPart*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     if (pcomp->BGSHeadPart::cFlags != BGSHeadPart::cFlags) {
-        return 1;
+        return true;
     }
     BSSimpleList<BGSHeadPart*>* plist = &pcomp->ExtraParts;
     while (plist && !plist->IsEmpty()) {
         BGSHeadPart* ppart = plist->m_item;
         plist = plist->m_pkNext;
         if (!(&ExtraParts)->IsInList(ppart)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 BSSimpleList<BGSHeadPart*>* BGSHeadPart::GetExtraPartList() {

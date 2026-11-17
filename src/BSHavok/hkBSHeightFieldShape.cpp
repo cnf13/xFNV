@@ -35,7 +35,7 @@ void hkBSHeightFieldShapeCinfo::CalcMinMax() {
 }
 
 float hkBSHeightFieldShape::getHeightAtImpl(int32_t aX, int32_t aZ) const {
-    return (float)(pData[aX + (m_xRes * (invZRes - aZ))].z + fOffset);
+    return (pData[aX + (m_xRes * (invZRes - aZ))].z + fOffset);
 }
 
 // The heightfield's triangles are never flipped.

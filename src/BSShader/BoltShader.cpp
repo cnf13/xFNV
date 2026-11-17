@@ -54,7 +54,7 @@ BoltShader::BoltShader(NiDX9ShaderDeclaration* apShaderDecl)
     spBoltPass(nullptr), CoreColor(NiColorA_WHITE), GlowColor(NiColorA_WHITE), spBoltVertexShader(nullptr),
     spBoltPixelShader(nullptr) {
     iShaderType = 15;
-    m_bUsesNiRenderState = 1;
+    m_bUsesNiRenderState = true;
     m_spShaderDecl = apShaderDecl;
     if (!iMaxSegments) {
         iMaxSegments = BSShaderManager::eShaderLevel < 2 ? 75 : 235;
@@ -152,7 +152,7 @@ void BoltShader::LoadShaders() {
     NiD3DVertexShader* pVertexShader =
         CompileVertexShaderHLSL(Str1, kVertexMacros.kMacros, ShaderTarget_vs_1_1, PSOFile);
     spBoltVertexShader = pVertexShader;
-    const char* ptarget = BSShaderManager::GetPSTarget(1);
+    const char* ptarget = BSShaderManager::GetPSTarget(true);
     kPixelMacros.strPath = "bolt\\p\\bolt.p.hlsl";
     kPixelMacros.kMacros[0].Name = nullptr;
     kPixelMacros.kMacros[0].Definition = nullptr;
@@ -172,8 +172,8 @@ bool BoltShader::LoadStagesAndPasses() {
 }
 
 void BoltShader::BC1210() {
-    NiD3DPass* v2 = 0;
-    NiD3DPass* v11 = 0;
+    NiD3DPass* v2 = nullptr;
+    NiD3DPass* v11 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         NiD3DPass* m_pObject = spBoltPass.m_pObject;
@@ -184,7 +184,7 @@ void BoltShader::BC1210() {
         }
         if (!v2->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             v2->SetStage(v2->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v4 = spBoltVertexShader.m_pObject;
@@ -194,43 +194,43 @@ void BoltShader::BC1210() {
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(22u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(22u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(168u, 15u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(168u, 15u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(52u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(52u, 0, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
     }
     v2->DecRefCount();
 }
@@ -381,7 +381,7 @@ BoltShaderProperty* BoltShader::Start(NiNode* apNode, bool abStartFromPoint) {
     }
     NiObject* boltGeometry = BoltShader::GetBoltGeometry();
     NiAVObject* v2 = static_cast<NiAVObject*>(boltGeometry->Clone());
-    apNode->AttachChild(v2, (bool)1);
+    apNode->AttachChild(v2, true);
     BSShaderManager::PrepareObject(v2, 0, 0);
     BSShaderProperty* property = static_cast<BSShaderProperty*>(v2->GetProperty(3));
     int32_t v4 = 0;
@@ -391,7 +391,7 @@ BoltShaderProperty* BoltShader::Start(NiNode* apNode, bool abStartFromPoint) {
             static_cast<uint32_t>((uint8_t)(property->iShaderPropertyType == 15))
         );
     }
-    BSShaderProperty* v5 = (v4 != 0) ? property : (nullptr);
+    BSShaderProperty* v5 = (v4 != 0) ? property : nullptr;
     if (!v5) {
         return nullptr;
     }
@@ -402,7 +402,7 @@ BoltShaderProperty* BoltShader::Start(NiNode* apNode, bool abStartFromPoint) {
 }
 
 BSShader* BoltShader::CreateShader() {
-    BoltShader* pshader = 0;
+    BoltShader* pshader = nullptr;
     NiDX9ShaderDeclaration* spShaderDecl = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 5u, 1u);
     spShaderDecl->SetEntry(0, 0, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
     spShaderDecl->SetEntry(1u, 3u, NiShaderDeclaration::SHADERPARAM_NI_NORMAL, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
@@ -444,10 +444,10 @@ void BoltShader::Stop(NiNode* apNode, BoltShaderProperty* apProp) {
                     }
                 }
                 else {
-                    pprop = 0;
+                    pprop = nullptr;
                     v5 = 0;
                 }
-                BoltShaderProperty* v6 = v5 ? static_cast<BoltShaderProperty*>(pprop) : 0;
+                BoltShaderProperty* v6 = v5 ? static_cast<BoltShaderProperty*>(pprop) : nullptr;
                 if (v6) {
                     if (v6 == apProp) {
                         apNode->DetachChildAt(i);

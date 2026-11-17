@@ -186,15 +186,15 @@ const hkClassMember* hkClass::getMemberByName(const char* name) const {
     const hkClassMember* Member;
     int32_t v3 = 0;
     if (getNumMembers() <= 0) {
-        return 0;
+        return nullptr;
     }
-    while (1) {
+    while (true) {
         Member = &getMember(v3);
         if (!hkString::strCmp(Member->m_name, name)) {
             break;
         }
         if (++v3 >= getNumMembers()) {
-            return 0;
+            return nullptr;
         }
     }
     return Member;
@@ -218,7 +218,7 @@ int32_t hkClass::getDeclaredMemberIndexByName(const char* name) const {
     if (getNumDeclaredMembers() <= 0) {
         return (-1);
     }
-    while (1) {
+    while (true) {
         v4 = &getDeclaredMember(v3);
         if (!hkString::strCmp(v4->m_name, name)) {
             break;
@@ -236,7 +236,7 @@ int32_t hkClass::getMemberIndexByName(const char* name) const {
     if (getNumMembers() <= 0) {
         return (-1);
     }
-    while (1) {
+    while (true) {
         v4 = &getMember(v3);
         if (!hkString::strCmp(v4->m_name, name)) {
             break;
@@ -310,15 +310,15 @@ const hkClassEnum* hkClass::getEnumByName(const char* name) const {
     const hkClassEnum* Enum;
     int32_t v3 = 0;
     if (getNumEnums() <= 0) {
-        return 0;
+        return nullptr;
     }
-    while (1) {
+    while (true) {
         Enum = &getEnum(v3);
         if (!hkString::strCmp(Enum->m_name, name)) {
             break;
         }
         if (++v3 >= getNumEnums()) {
-            return 0;
+            return nullptr;
         }
     }
     return Enum;
@@ -343,15 +343,15 @@ const hkClassEnum* hkClass::getDeclaredEnumByName(const char* name) const {
     const hkClassEnum* DeclaredEnum;
     int32_t v3 = 0;
     if (getNumDeclaredEnums() <= 0) {
-        return 0;
+        return nullptr;
     }
-    while (1) {
+    while (true) {
         DeclaredEnum = &getDeclaredEnum(v3);
         if (!hkString::strCmp(DeclaredEnum->m_name, name)) {
             break;
         }
         if (++v3 >= getNumDeclaredEnums()) {
-            return 0;
+            return nullptr;
         }
     }
     return DeclaredEnum;
@@ -367,7 +367,7 @@ const hkClassMember* hkClass::getDeclaredMemberByName(const char* name) const {
     if (getNumDeclaredMembers() <= 0) {
         return nullptr;
     }
-    while (1) {
+    while (true) {
         v4 = &getDeclaredMember(v3);
         if (!hkString::strCmp(v4->m_name, name)) {
             break;
@@ -587,18 +587,18 @@ const hkVariant* hkClass::getAttribute(const char* id) const {
         return m_attributes->getAttribute(id);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
 const hkVariant* hkCustomAttributes::getAttribute(const char* id) const {
     int32_t v3 = 0;
     if (m_numAttributes <= 0) {
-        return 0;
+        return nullptr;
     }
     for (int32_t i = 0; hkString::strCmp(m_attributes[i].m_name, id); ++i) {
         if (++v3 >= m_numAttributes) {
-            return 0;
+            return nullptr;
         }
     }
     return &m_attributes[v3].m_value;

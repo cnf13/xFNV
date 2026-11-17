@@ -25,7 +25,7 @@ public:
     // Copies nbytes from src to dst ELEMENTALIGN bytes at a time, front to back (hkArray's removeAtAndCopy calls it).
     template <int32_t ELEMENTALIGN>
     static void memCpy(void* dst, const void* src, int32_t n) {
-        typedef typename TypeFromAlign<ELEMENTALIGN>::type CopyType;
+        using CopyType = typename TypeFromAlign<ELEMENTALIGN>::type;
         for (int32_t i = 0, j = 0; i < n; i += sizeof(CopyType), ++j) {
             static_cast<CopyType*>(dst)[j] = static_cast<const CopyType*>(src)[j];
         }
@@ -42,25 +42,25 @@ public:
 
 template <>
 struct hkMemUtil::TypeFromAlign<1> {
-    typedef char type;
+    using type = char;
 };
 template <>
 struct hkMemUtil::TypeFromAlign<2> {
-    typedef int16_t type;
+    using type = int16_t;
 };
 template <>
 struct hkMemUtil::TypeFromAlign<4> {
-    typedef int32_t type;
+    using type = int32_t;
 };
 template <>
 struct hkMemUtil::TypeFromAlign<8> {
-    typedef int64_t type;
+    using type = int64_t;
 };
 // Generic body for instantiations without a specialization: copies the element's ALIGN-byte words one at a time
 // (hkArray's removeAt calls it).
 template <int32_t ELEMENTSIZE, int32_t ALIGN>
 inline void hkMemUtil::memCpyOneAligned(void* dst, const void* src) {
-    typedef typename TypeFromAlign<ALIGN>::type CopyType;
+    using CopyType = typename TypeFromAlign<ALIGN>::type;
     uint32_t i = 0;
     do {
         static_cast<CopyType*>(dst)[i] = static_cast<const CopyType*>(src)[i];

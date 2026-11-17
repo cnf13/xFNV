@@ -98,7 +98,7 @@ DialogueItem* Conversation::GetDialogueItemByIndex(int16_t aiIndex) {
         "DIALOGUE: When trying to get a dialogue item by its index, the index was larger than the size of the "
         "dialogue items list."
     );
-    return 0;
+    return nullptr;
 }
 
 uint16_t Conversation::GetSaveSizeTES() {
@@ -202,7 +202,7 @@ void Conversation::LoadGameTES() {
     uint16_t usCount;
     int16_t sCurrentItem;
     uint16_t usBlockSize = 0;
-    uint8_t* BufferPointer = 0;
+    uint8_t* BufferPointer = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&uiBlockTag, 4u);
         // The block tag, 'BLOK'.
@@ -238,7 +238,7 @@ void Conversation::LoadGameTES() {
             pdialogueItem = ::new (apMemory) DialogueItem;
         }
         else {
-            pdialogueItem = 0;
+            pdialogueItem = nullptr;
         }
         DialogueItem* pdialogueItem_2 = pdialogueItem;
         pdialogueItem_2->LoadGame();
@@ -246,7 +246,7 @@ void Conversation::LoadGameTES() {
     }
     pSaveLoadGameOLD->LoadGameDataOLD(&sCurrentItem, 2u);
     if (sCurrentItem == -1) {
-        pCurrentItem = 0;
+        pCurrentItem = nullptr;
     }
     else {
         SetCurrentItem(GetDialogueItemByIndex(sCurrentItem));
@@ -335,7 +335,7 @@ void Conversation::LoadGameBGS(BGSLoadFormBuffer* arg0) {
             pdialogueItem = ::new (apMemory) DialogueItem;
         }
         else {
-            pdialogueItem = 0;
+            pdialogueItem = nullptr;
         }
         DialogueItem* pdialogueItem_2 = pdialogueItem;
         pdialogueItem_2->LoadGameBGS(arg0);

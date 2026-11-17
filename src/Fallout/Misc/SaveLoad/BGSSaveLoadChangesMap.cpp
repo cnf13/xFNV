@@ -19,11 +19,11 @@ BGSSaveLoadChangesMap::~BGSSaveLoadChangesMap() {
 bool BGSSaveLoadChangesMap::RemoveChanges(uint32_t aiFormID) {
     BGSFormChanges* Changes = GetChanges(aiFormID);
     if (!Changes) {
-        return 0;
+        return false;
     }
     delete Changes;
     RemoveAt(aiFormID);
-    return 1;
+    return true;
 }
 
 BGSFormChanges* BGSSaveLoadChangesMap::GetChanges(uint32_t aiFormID) {
@@ -52,7 +52,7 @@ BGSUnloadedFormBuffer* BGSSaveLoadChangesMap::GetChangeBuffer(BGSUnloadedFormBuf
         apResult->pBuffer = Changes->UnloadedFormBuffer.pBuffer;
     }
     else {
-        apResult->pBuffer = 0;
+        apResult->pBuffer = nullptr;
     }
     return apResult;
 }
@@ -79,7 +79,7 @@ void BGSSaveLoadChangesMap::AddChangeFlags(uint32_t aiFormID, BGSChangeFlags aiC
             pformChanges_2 = ::new (apMemory) BGSFormChanges;
         }
         else {
-            pformChanges_2 = 0;
+            pformChanges_2 = nullptr;
         }
         pformChanges = pformChanges_2;
         SetAt(aiFormID, pformChanges_2);
@@ -92,15 +92,15 @@ bool BGSSaveLoadChangesMap::RemoveChangeFlags(uint32_t aiFormID, BGSChangeFlags 
     if (pformChanges && !pformChanges->UnloadedFormBuffer.pBuffer) {
         pformChanges->iChangeFlags.RemoveFlags(aiChangeFlags.iFlags);
         if (pformChanges->iChangeFlags.iFlags) {
-            return 0;
+            return false;
         }
         if (pDataHandler->IsFormIDCreated(aiFormID)) {
-            return 0;
+            return false;
         }
         delete pformChanges;
         RemoveAt(aiFormID);
     }
-    return 1;
+    return true;
 }
 
 void BGSSaveLoadChangesMap::SetChangeFlags(uint32_t aiFormID, BGSChangeFlags aiChangeFlags) {
@@ -112,7 +112,7 @@ void BGSSaveLoadChangesMap::SetChangeFlags(uint32_t aiFormID, BGSChangeFlags aiC
             pformChanges_2 = ::new (apMemory) BGSFormChanges;
         }
         else {
-            pformChanges_2 = 0;
+            pformChanges_2 = nullptr;
         }
         pformChanges = pformChanges_2;
         SetAt(aiFormID, pformChanges_2);
@@ -133,7 +133,7 @@ void BGSSaveLoadChangesMap::SetChanges(
             v4 = ::new (apMemory) BGSFormChanges;
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         a3 = v4;
         SetAt(aiFormID, v4);
@@ -146,7 +146,7 @@ void BGSSaveLoadChangesMap::RemoveAllChanges() {
     NiTMapItem<uint32_t, BGSFormChanges*>* it;
     it = GetFirstPos();
     while (it) {
-        BGSFormChanges* pchanges = 0;
+        BGSFormChanges* pchanges = nullptr;
         uint32_t iformID = 0;
         GetNext(it, iformID, pchanges);
         if (pchanges) {

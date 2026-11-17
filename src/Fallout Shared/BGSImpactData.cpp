@@ -220,7 +220,7 @@ void BGSImpactData::InitItem() {
             }
         }
         CopyDecalDataFromTextureSet();
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -239,24 +239,24 @@ void BGSImpactData::Copy(TESForm* apCopy) {
 bool BGSImpactData::Compare(TESForm* apCompare) {
     BGSImpactData* v4 = dynamic_cast<BGSImpactData*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v4)) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(&Data, &v4->Data, sizeof(Data))) {
-        return (bool)1;
+        return true;
     }
     if ((!GetUseTextureSetDecalData()) && (&DData)->Compare(&v4->DData)) {
-        return (bool)1;
+        return true;
     }
     if (pDecalTextureSet != v4->pDecalTextureSet) {
-        return (bool)1;
+        return true;
     }
     if (pSound1 == v4->pSound1) {
         return (bool)((uint8_t)(pSound2 != v4->pSound2));
     }
-    return (bool)1;
+    return true;
 }
 
 bool BGSImpactData::GetUseTextureSetDecalData() {

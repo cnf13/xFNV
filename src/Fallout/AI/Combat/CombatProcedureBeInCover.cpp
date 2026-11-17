@@ -41,14 +41,14 @@ void CombatProcedureBeInCover::Update() {
     Actor* ptarget = GetTarget();
     CombatState* pcombatState = pCombatController->pCombatState;
     CombatGroup* pcombatGroup = pCombatController->pCombatGroup;
-    bool breevaluatedCover = 0;
-    bool bcoverInvalid = 0;
+    bool breevaluatedCover = false;
+    bool bcoverInvalid = false;
     bool bledgeCover = pCoverLocation->IsLedgeCover();
     bool bcanSneak = pCombatController->GetAttackerCanSneak();
     if (ReevaluateCoverTimer.IsSet()) {
         if (ReevaluateCoverTimer.Check()) {
             ReevaluateCoverTimer.Reset(1.0f);
-            breevaluatedCover = 1;
+            breevaluatedCover = true;
             if (eState) {
                 if (pcombatState->GetHasTarget360LineOfSight()) {
                     bool bcoverSafe =
@@ -58,7 +58,7 @@ void CombatProcedureBeInCover::Update() {
                         ClearLookAtTarget();
                         eState = CombatProcedureBeInCover::COVER_STATE_HOLDING_GROUND;
                         HoldingGroundTimer.Reset(2.0f);
-                        bcoverInvalid = 1;
+                        bcoverInvalid = true;
                     }
                 }
                 else {
@@ -80,7 +80,7 @@ void CombatProcedureBeInCover::Update() {
     switch (eState) {
         case CombatProcedureBeInCover::COVER_STATE_INITIALIZING: {
             float fheight;
-            pCoverLocation->ReservationInfo.bHideCover = 0;
+            pCoverLocation->ReservationInfo.bHideCover = false;
             CombatUtilities::CalculateCoverPositions(
                 pCombatController, pCoverLocation, &CurrentCoverPosition, &CurrentFirePosition
             );
@@ -88,7 +88,7 @@ void CombatProcedureBeInCover::Update() {
             LookAtPosition.y = CurrentFirePosition.y;
             LookAtPosition.z = CurrentFirePosition.z;
             if (pCombatController->GetAttackerCanSneak()) {
-                fheight = pattacker->GetSneakHeight(0);
+                fheight = pattacker->GetSneakHeight(false);
             }
             else {
                 fheight = pattacker->GetHeight();
@@ -97,7 +97,7 @@ void CombatProcedureBeInCover::Update() {
             PathingRequest request;
             TESWorldSpace* WorldSpace = pattacker->GetWorldSpace();
             TESObjectCELL* ParentCell = pattacker->GetParentCell();
-            pattacker->BuildRequest(&request, CurrentCoverPosition, ParentCell, WorldSpace, 0.0f, 0);
+            pattacker->BuildRequest(&request, CurrentCoverPosition, ParentCell, WorldSpace, 0.0f, nullptr);
             if (pattacker->SetPathfindingGoal(&request)) {
                 eState = CombatProcedureBeInCover::COVER_STATE_MOVING_IN_AND_ROTATE;
                 if (pCoverLocation->HasFireLocation()) {
@@ -120,7 +120,7 @@ void CombatProcedureBeInCover::Update() {
                         PathingRequest request_2;
                         TESWorldSpace* v16 = pattacker->GetWorldSpace();
                         TESObjectCELL* v12 = pattacker->GetParentCell();
-                        pattacker->BuildRequest(&request_2, CurrentFirePosition, v12, v16, 0.0f, 0);
+                        pattacker->BuildRequest(&request_2, CurrentFirePosition, v12, v16, 0.0f, nullptr);
                         if (pattacker->SetPathfindingGoal(&request_2)) {
                             if (pCoverLocation->HasFireLocation()) {
                                 ClearLookAtTarget();
@@ -169,13 +169,13 @@ void CombatProcedureBeInCover::Update() {
             double flastAttack = static_cast<float>(pcombatState->GetLastAttackTimeStamp());
             if (!(WaitBehindCoverTimer.GetStartTime() < flastAttack)) {
                 if (WaitingOutOfCoverTimer.Check()) {
-                    pcombatState->ClearCoverLocation(0);
+                    pcombatState->ClearCoverLocation(false);
                     SetFailed("Waited out of cover without firing");
                     return;
                 }
                 if (WaitingOutOfCoverTimer.ElapsedTime() > 2.0 &&
                     (!pcombatState->GetHasTarget360LineOfSight() && pcombatGroup->GetTargetMemberLOSCount(ptarget))) {
-                    pcombatState->ClearCoverLocation(0);
+                    pcombatState->ClearCoverLocation(false);
                     SetFailed("Waited out of cover and group member has LOS on target");
                     return;
                 }
@@ -190,7 +190,7 @@ void CombatProcedureBeInCover::Update() {
             if (pcombatState->bTargetBlocked) {
                 if (TargetBlockedTimer.IsSet()) {
                     if (TargetBlockedTimer.Check()) {
-                        pcombatState->ClearCoverLocation(1);
+                        pcombatState->ClearCoverLocation(true);
                         SetFailed("Waited out of cover but was blocked");
                     }
                 }
@@ -207,7 +207,7 @@ void CombatProcedureBeInCover::Update() {
                 PathingRequest request_2;
                 TESWorldSpace* v17 = pattacker->GetWorldSpace();
                 TESObjectCELL* v13 = pattacker->GetParentCell();
-                pattacker->BuildRequest(&request_2, CurrentCoverPosition, v13, v17, 0.0f, 0);
+                pattacker->BuildRequest(&request_2, CurrentCoverPosition, v13, v17, 0.0f, nullptr);
                 if (pattacker->SetPathfindingGoal(&request_2)) {
                     int32_t v24;
                     if (bledgeCover && bcanSneak) {
@@ -282,7 +282,7 @@ void CombatProcedureBeInCover::Update() {
         case CombatProcedureBeInCover::COVER_STATE_HOLDING_GROUND: {
             if (!breevaluatedCover || bcoverInvalid) {
                 if (HoldingGroundTimer.Check()) {
-                    pcombatState->ClearCoverLocation(0);
+                    pcombatState->ClearCoverLocation(false);
                     SetFailed("Target has LOS on Cover position");
                 }
                 else {
@@ -292,7 +292,7 @@ void CombatProcedureBeInCover::Update() {
                         NiPoint3 attackerLoc = pattacker->GetLocationOnReference();
                         NiPoint3 targetVec_2 = attackerLoc - targetLoc_2;
                         if (targetVec_2.SqrLength() < 262144.0) {
-                            pcombatState->ClearCoverLocation(0);
+                            pcombatState->ClearCoverLocation(false);
                             SetFailed("Target has LOS on Cover position");
                         }
                     }
@@ -302,7 +302,7 @@ void CombatProcedureBeInCover::Update() {
                 PathingRequest request_3;
                 TESWorldSpace* v18 = pattacker->GetWorldSpace();
                 TESObjectCELL* v14 = pattacker->GetParentCell();
-                pattacker->BuildRequest(&request_3, CurrentCoverPosition, v14, v18, 0.0f, 0);
+                pattacker->BuildRequest(&request_3, CurrentCoverPosition, v14, v18, 0.0f, nullptr);
                 if (pattacker->SetPathfindingGoal(&request_3)) {
                     if (bledgeCover && bcanSneak) {
                         SetMoveMode(2);
@@ -459,7 +459,7 @@ void CombatProcedureBeInCover::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     CombatCoverLocation* SecondaryCoverLocation;
     bool bsecondaryCoverLocation;
     CombatProcedure::LoadGame(apLoadGameBuffer);
-    bsecondaryCoverLocation = 0;
+    bsecondaryCoverLocation = false;
     apLoadGameBuffer->LoadData(&eState, 4u);
     apLoadGameBuffer->LoadData(&bsecondaryCoverLocation, 1u);
     if (bsecondaryCoverLocation) {

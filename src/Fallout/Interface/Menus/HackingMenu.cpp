@@ -72,7 +72,7 @@
 #include "SDK/MSVC/string.h"
 
 #include <cctype>
-#include <stdint.h>
+#include <cstdint>
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<INISettingCollection> fHackingMinSkillVeryEasy("fHackingMinSkillVeryEasy:Hacking", 0.0f);
@@ -137,7 +137,7 @@ HackingMenu::TerminalIO::TerminalIO(
         fInterval = BSRoundToNearest(fRaw, 1.0f);
     }
     Animation.SetDisplayInterval(static_cast<int64_t>(fInterval));
-    pTextTile = HackingMenu::pMe->RenderTemplate(apParentTile, apTemplateName, 0);
+    pTextTile = HackingMenu::pMe->RenderTemplate(apParentTile, apTemplateName, nullptr);
     if (!pTextTile) {
         return;
     }
@@ -145,8 +145,8 @@ HackingMenu::TerminalIO::TerminalIO(
     Tile::Value* pString = pTextTile->GetValueQ(4036);
     Animation.SetTraits(pString, pVisibility);
     if (aucRate == 1) {
-        pPromptTile = HackingMenu::pMe->RenderTemplate(HackingMenu::pMe->pTiles[0], "hacking_intro_template", 0);
-        pPromptTile->Set(4036, ">", 1);
+        pPromptTile = HackingMenu::pMe->RenderTemplate(HackingMenu::pMe->pTiles[0], "hacking_intro_template", nullptr);
+        pPromptTile->Set(4036, ">", true);
     }
     if (aiY >= 0) {
         pTextTile->Set(4002, aiY);
@@ -346,7 +346,7 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
     if (!pguess || !*pguess) {
         return;
     }
-    Sounds[4].Play(0);
+    Sounds[4].Play(false);
     uint32_t inumCommon = get_num_matching_characters(pguess, pPassword);
     if (std::isalpha(*pguess) || BSstrlen(pguess) <= 1) {
         if (inumCommon == iWordLength) {
@@ -406,7 +406,7 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
                     const char* pWarning = sHackingWarning.operator const char*();
                     IOLines[1]->Animation.operator=(pWarning);
                     IOLines[1]->Animation.ForceFinish();
-                    IOLines[1]->Animation.SetShouldBlink(1);
+                    IOLines[1]->Animation.SetShouldBlink(true);
                 }
             }
             else {
@@ -461,13 +461,13 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
             if (iNumGuesses == 1) {
                 const char* pHeader = sHackingHeader2.operator const char*();
                 IOLines[1]->Animation.operator=(pHeader);
-                IOLines[1]->Animation.SetShouldBlink(0);
+                IOLines[1]->Animation.SetShouldBlink(false);
                 IOLines[1]->Animation.ForceFinish();
             }
             astrLog[1].SPrintF("%s%s", ">", sHackingToleranceReset1.String());
             astrLog[2].SPrintF("%s%s", ">", sHackingToleranceReset2.String());
             iNumGuesses = iTotGuesses;
-            bUsedReset = 1;
+            bUsedReset = true;
             double fCol = a2->GetFloat(4100) * 17.0;
             uint32_t uiRow = static_cast<uint32_t>(static_cast<int64_t>(a2->GetFloat(4012) + fCol));
             uint32_t uiBonus = 12 * uiRow + GetSelectedTileIndex() - 7;
@@ -489,12 +489,12 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
     IOLines[2]->Animation.operator=(strtmp.String());
     IOLines[2]->Animation.ForceFinish();
     ClearEntry();
-    bSuppressEntry = 1;
+    bSuppressEntry = true;
 }
 
 void HackingMenu::DoLeave(int32_t aiID, Tile* apTarget) {
     ClearEntry();
-    bSuppressEntry = (bool)0;
+    bSuppressEntry = false;
     pLastTarget = nullptr;
 }
 
@@ -520,7 +520,7 @@ void HackingMenu::DoIdle() {
                         uint32_t i;
                         for (i = 0; i < 46; ++i) {
                             if (IOLines[i] && !IOLines[i]->Animation.bIsTextRemaining) {
-                                Sounds[3].Play(0);
+                                Sounds[3].Play(false);
                                 IOLines[i]->Animation.Update();
                                 UpdateScrollingCursor(IOLines[i]);
                                 break;
@@ -580,41 +580,41 @@ bool HackingMenu::DoGamepad(int32_t a1, float a2) {
     bool result;
     InterfaceManager::Instance();
     if (!InterfaceManager::Has360Controller()) {
-        return 0;
+        return false;
     }
     if (!Interface::IsTopMenuID(Interface::eHackingMenu)) {
-        return 0;
+        return false;
     }
     HackingMenu::pim->pOverTileTarget = pOverTile;
     if (eStage < HackingMenu::HMS_INGAME && a1 == 9) {
-        DoClick(-1, 0);
-        return 1;
+        DoClick(-1, nullptr);
+        return true;
     }
     if (eStage != HackingMenu::HMS_INGAME) {
-        return 0;
+        return false;
     }
     // The column goes to FindTile as unsigned.
     switch (a1) {
         case 1: {
             int32_t iIndex = static_cast<int32_t>(pOverTile->GetFloat(4012));
             if (iIndex <= 0) {
-                return 0;
+                return false;
             }
-            bSuppressEntry = 0;
+            bSuppressEntry = false;
             uint32_t uiCol = static_cast<uint32_t>(static_cast<int64_t>(pOverTile->GetFloat(4100)));
             pOverTile = FindTile(iIndex - 1, uiCol);
-            result = 1;
+            result = true;
             break;
         }
         case 2: {
             int32_t iIndex = static_cast<int32_t>(pOverTile->GetFloat(4012));
             if (iIndex >= 16) {
-                return 0;
+                return false;
             }
-            bSuppressEntry = 0;
+            bSuppressEntry = false;
             uint32_t uiCol = static_cast<uint32_t>(static_cast<int64_t>(pOverTile->GetFloat(4100)));
             pOverTile = FindTile(iIndex + 1, uiCol);
-            result = 1;
+            result = true;
             break;
         }
         case 3: {
@@ -626,7 +626,7 @@ bool HackingMenu::DoGamepad(int32_t a1, float a2) {
                 v15 = std::isalpha(String[SelectedTileIndex]) != 0;
             }
             else {
-                v15 = 0;
+                v15 = false;
             }
             for (this->iCursorX += 17; v15; this->iCursorX += 17) {
                 if (GetSelectedTileIndex() == -1) {
@@ -647,7 +647,7 @@ bool HackingMenu::DoGamepad(int32_t a1, float a2) {
                     uint32_t v12 = static_cast<int32_t>(pOverTile->GetFloat(4100)) + 1;
                     Tile* ptile_2 = FindTile(iindex_2, v12);
                     if (ptile_2) {
-                        bSuppressEntry = 0;
+                        bSuppressEntry = false;
                         pOverTile = ptile_2;
                         this->iCursorX = static_cast<int32_t>(pOverTile->GetRealX() + 119.0);
                     }
@@ -657,9 +657,9 @@ bool HackingMenu::DoGamepad(int32_t a1, float a2) {
                 }
             }
             else {
-                bSuppressEntry = 0;
+                bSuppressEntry = false;
             }
-            result = 1;
+            result = true;
             break;
         }
         case 4: {
@@ -671,7 +671,7 @@ bool HackingMenu::DoGamepad(int32_t a1, float a2) {
                 v17 = std::isalpha(v4[v5]) != 0;
             }
             else {
-                v17 = 0;
+                v17 = false;
             }
             for (this->iCursorX -= 17; v17; this->iCursorX -= 17) {
                 if (GetSelectedTileIndex() < 7) {
@@ -684,7 +684,7 @@ bool HackingMenu::DoGamepad(int32_t a1, float a2) {
                 }
             }
             if (GetSelectedTileIndex() >= 7) {
-                bSuppressEntry = 0;
+                bSuppressEntry = false;
             }
             else {
                 if (!(pOverTile->GetFloat(4100) > 0.0)) {
@@ -695,7 +695,7 @@ bool HackingMenu::DoGamepad(int32_t a1, float a2) {
                     int32_t icol = static_cast<int32_t>(pOverTile->GetFloat(4100)) - 1;
                     Tile* ptile = FindTile(iindex, icol);
                     if (ptile) {
-                        bSuppressEntry = 0;
+                        bSuppressEntry = false;
                         pOverTile = ptile;
                         double RealX = pOverTile->GetRealX();
                         this->iCursorX = static_cast<int32_t>(pOverTile->GetFloat(4017) + RealX - 17.0);
@@ -705,11 +705,11 @@ bool HackingMenu::DoGamepad(int32_t a1, float a2) {
                     }
                 }
             }
-            result = 1;
+            result = true;
             break;
         }
         default: {
-            return 0;
+            return false;
         }
     }
     return result;
@@ -717,11 +717,11 @@ bool HackingMenu::DoGamepad(int32_t a1, float a2) {
 
 bool HackingMenu::DoGamepadUpEvent(int32_t a2, float a3) {
     if (a2 != 10) {
-        return (bool)0;
+        return false;
     }
     eStage = HMS_FINISHED;
     HackingMenu::Close();
-    return (bool)1;
+    return true;
 }
 
 void HackingMenu::TransitionToComputersMenu() {
@@ -731,7 +731,7 @@ void HackingMenu::TransitionToComputersMenu() {
     if (pTerminal) {
         Tile* pmenu = ComputersMenu::Create(pTerminalRef);
         pmenu->GetMenu()->SetRenderedMenu();
-        Tile::UpdateAll(0);
+        Tile::UpdateAll(false);
         FORenderedMenu* CurrentRenderedMenu = Interface::GetCurrentRenderedMenu();
         FORenderedTerminal* prm = dynamic_cast<FORenderedTerminal*>(CurrentRenderedMenu);
         if (!prm) {
@@ -745,7 +745,7 @@ void HackingMenu::TransitionToComputersMenu() {
                 prm_2 = ::new (apMemory) FORenderedTerminal;
             }
             else {
-                prm_2 = 0;
+                prm_2 = nullptr;
             }
             prm = prm_2;
         }
@@ -771,9 +771,9 @@ void HackingMenu::DoShutdown() {
             v3 = 1;
         }
         v2 = (float)(pMenu->Tile::GetFloat(4101) + ((double)(v3 * iYInterval)));
-        pMenu->Tile::Set(4101, v2, (bool)1);
+        pMenu->Tile::Set(4101, v2, true);
         dwAccessTime = BSGetTickCount() + 50;
-        (&Sounds[3])->Play(0);
+        (&Sounds[3])->Play(false);
     }
     double realY = (double)pTiles[5]->GetRealY();
     if ((pTiles[5]->GetFloat(4016) + realY) < 0.0) {
@@ -830,10 +830,10 @@ Tile* HackingMenu::FindTile(uint32_t aiIndex, uint32_t aiCol) {
 bool HackingMenu::IsWellFormedMenu(int32_t& ai) {
     for (*(&ai) = 0; (*(&ai)) < 8; ++(*(&ai))) {
         if (!pTiles[*(&ai)]) {
-            return (bool)0;
+            return false;
         }
     }
-    return (bool)1;
+    return true;
 }
 
 void HackingMenu::ScrollLog(uint32_t aiTicks, const char** pNewEntries) {
@@ -841,12 +841,12 @@ void HackingMenu::ScrollLog(uint32_t aiTicks, const char** pNewEntries) {
     while (pPos) {
         Tile* pTile = xLogTiles.GetNext(pPos);
         float fY = pTile->GetFloat(4012) + static_cast<double>(aiTicks);
-        pTile->Set(4012, fY, 1);
+        pTile->Set(4012, fY, true);
     }
     for (uint32_t i = 0; i < aiTicks; ++i) {
-        Tile* pTile = RenderTemplate(pTiles[3], "hacking_password_log_template", 0);
+        Tile* pTile = RenderTemplate(pTiles[3], "hacking_password_log_template", nullptr);
         pTile->Set(4012, aiTicks - i - 1);
-        pTile->Set(4036, pNewEntries[i], 1);
+        pTile->Set(4036, pNewEntries[i], true);
         xLogTiles.AddTail(pTile);
     }
 }
@@ -1031,9 +1031,9 @@ void HackingMenu::SetupWordTiles() {
     IOLines[2] = pLine2;
     double dX = IOLines[2]->pTextTile->GetFloat(Tile::kTileValue_X);
     float fX = static_cast<double>(17 * sLine.GetLength()) + dX;
-    pTiles[1]->Set(Tile::kTileValue_User1, fX, 1);
+    pTiles[1]->Set(Tile::kTileValue_User1, fX, true);
     float fY = IOLines[2]->pTextTile->GetFloat(Tile::kTileValue_Y);
-    pTiles[1]->Set(Tile::kTileValue_User2, fY, 1);
+    pTiles[1]->Set(Tile::kTileValue_User2, fY, true);
     HackingMenu::TerminalIO* pMem3 = static_cast<HackingMenu::TerminalIO*>(ourMalloc(sizeof(HackingMenu::TerminalIO)));
     HackingMenu::TerminalIO* pLine3;
     if (pMem3) {
@@ -1044,7 +1044,7 @@ void HackingMenu::SetupWordTiles() {
     }
     IOLines[3] = pLine3;
     Tile::Value* pValue = pTiles[1]->GetValueQ(Tile::kTileValue_User0);
-    IOLines[3]->Animation.SetTraits(0, pValue);
+    IOLines[3]->Animation.SetTraits(nullptr, pValue);
     int32_t iLine = 4;
     for (uint32_t j = 0; j < iTotGuesses; ++j) {
         AddAttemptsRemainingSquares();
@@ -1245,7 +1245,7 @@ void HackingMenu::DoIntro() {
                         SoundHandleByName->PlayAfter(afVal, 0);
                     }
                     if (IOLines[i]->Animation.bIsTextRemaining) {
-                        Sounds[4].Play(0);
+                        Sounds[4].Play(false);
                         time_11D969C = BSGetTickCount() + 500;
                     }
                 }
@@ -1253,7 +1253,7 @@ void HackingMenu::DoIntro() {
             else {
                 if (BSGetTickCount() > time_11D969C) {
                     IOLines[i]->Animation.Update();
-                    Sounds[3].Play(0);
+                    Sounds[3].Play(false);
                 }
             }
             UpdateScrollingCursor(IOLines[i]);
@@ -1278,8 +1278,8 @@ void HackingMenu::DoInGame() {
                 ClearEntry();
                 const char* String = HackingMenu::pim->pOverTileTarget->GetString(Tile::kTileValue_String);
                 if (!std::isalpha(String[ioffset + 7])) {
-                    bSuppressEntry = 0;
-                    pLastTarget = 0;
+                    bSuppressEntry = false;
+                    pLastTarget = nullptr;
                 }
             }
             else {
@@ -1299,9 +1299,9 @@ void HackingMenu::DoInGame() {
                     ourMemcpy(floatingText, pnode->m_item, iWordLength);
                 }
                 else {
-                    if (xUsedBonuses.FindPos(ibufferpos, 0)) {
+                    if (xUsedBonuses.FindPos(ibufferpos, nullptr)) {
                         const char* v4 = HackingMenu::pim->pOverTileTarget->GetString(Tile::kTileValue_String);
-                        floatingText[0] = v4[(GetSelectedTileIndex())];
+                        floatingText[0] = v4[GetSelectedTileIndex()];
                     }
                     else {
                         const char* v2 = HackingMenu::pim->pOverTileTarget->GetString(Tile::kTileValue_String);
@@ -1330,11 +1330,11 @@ void HackingMenu::DoInGame() {
                             );
                         }
                         else {
-                            handle.Play(0);
+                            handle.Play(false);
                         }
                     }
                 }
-                bool bbreakfound = 0;
+                bool bbreakfound = false;
                 ioffset = GetSelectedTileIndex();
                 if (pnode) {
                     const char* poverstring = HackingMenu::pim->pOverTileTarget->GetString(Tile::kTileValue_String);
@@ -1350,7 +1350,7 @@ void HackingMenu::DoInGame() {
                         int32_t iy2 = iy1;
                         if (poverstring[ibreakpos + ioffset]) {
                             if (!std::isalpha(poverstring[ibreakpos + ioffset])) {
-                                bbreakfound = 1;
+                                bbreakfound = true;
                                 ibreakpos = iWordLength - ibreakpos;
                                 if (HackingMenu::pim->pOverTileTarget->GetFloat(Tile::kTileValue_ListIndex) == 0.0) {
                                     int64_t Float = static_cast<int64_t>(
@@ -1371,7 +1371,7 @@ void HackingMenu::DoInGame() {
                             }
                         }
                         else {
-                            bbreakfound = 1;
+                            bbreakfound = true;
                             ix1 += 17 * ioffset;
                             if (!(HackingMenu::pim->pOverTileTarget->GetFloat(Tile::kTileValue_ListIndex) + 1.0 <
                                   17.0)) {
@@ -1392,30 +1392,30 @@ void HackingMenu::DoInGame() {
                         if (bbreakfound) {
                             char csave = floatingText[ibreakpos];
                             floatingText[ibreakpos] = 0;
-                            pTiles[2]->Set(Tile::kTileValue_User0, floatingText, 1);
+                            pTiles[2]->Set(Tile::kTileValue_User0, floatingText, true);
                             pTiles[2]->Set(Tile::kTileValue_User1, ix1);
                             pTiles[2]->Set(Tile::kTileValue_User2, iy1);
                             floatingText[ibreakpos] = csave;
-                            pTiles[2]->Set(Tile::kTileValue_User3, &floatingText[ibreakpos], 1);
+                            pTiles[2]->Set(Tile::kTileValue_User3, &floatingText[ibreakpos], true);
                             pTiles[2]->Set(Tile::kTileValue_User4, ix2);
                             pTiles[2]->Set(Tile::kTileValue_User5, iy2);
                         }
                     }
                 }
                 if (!bbreakfound) {
-                    pTiles[2]->Set(Tile::kTileValue_User0, floatingText, 1);
+                    pTiles[2]->Set(Tile::kTileValue_User0, floatingText, true);
                     double v8 = HackingMenu::pim->pOverTileTarget->GetFloat(Tile::kTileValue_X);
                     float v10 = v8 + static_cast<double>(17 * ioffset);
-                    pTiles[2]->Set(Tile::kTileValue_User1, v10, 1);
+                    pTiles[2]->Set(Tile::kTileValue_User1, v10, true);
                     float afValue = HackingMenu::pim->pOverTileTarget->GetFloat(Tile::kTileValue_Y);
-                    pTiles[2]->Set(Tile::kTileValue_User2, afValue, 1);
+                    pTiles[2]->Set(Tile::kTileValue_User2, afValue, true);
                     pTiles[2]->Set(Tile::kTileValue_User4, -1);
                 }
             }
         }
         else {
             ClearEntry();
-            bSuppressEntry = 0;
+            bSuppressEntry = false;
         }
     }
 }
@@ -1444,7 +1444,7 @@ void HackingMenu::RemoveDud() {
     for (icnt = 0; icnt < this->iWordLength && ibufferpos < 12; ++icnt) {
         newbuffer[ibufferpos++ + 7] = 46;
     }
-    ptile->Set(4036, newbuffer, 1);
+    ptile->Set(4036, newbuffer, true);
     if (IOLines[i]) {
         if (IOLines[i]->pTextTile) {
             if (IOLines[i]->pTextTile->IsTrue(4015) && icnt < this->iWordLength) {
@@ -1452,7 +1452,7 @@ void HackingMenu::RemoveDud() {
                 ptile = IOLines[i]->pTextTile;
                 const char* v3 = ptile->GetString(4036);
                 ourMemcpy(newbuffer, v3, 20u);
-                while (1) {
+                while (true) {
                     uint32_t v4 = icnt;
                     uint32_t iWordLength = this->iWordLength;
                     ++icnt;
@@ -1461,7 +1461,7 @@ void HackingMenu::RemoveDud() {
                     }
                     newbuffer[v8++ + 7] = 46;
                 }
-                ptile->Set(4036, newbuffer, 1);
+                ptile->Set(4036, newbuffer, true);
             }
         }
     }
@@ -1489,10 +1489,10 @@ void HackingMenu::HandleCursorBlink() {
     // The compare is unsigned.
     if (BSGetTickCount() > static_cast<uint32_t>(uiNextBlinkTime) && pCursorVis) {
         if (pCursorVis->fValue == 1.0) {
-            pCursorVis->SetFloat(0.0f, 1);
+            pCursorVis->SetFloat(0.0f, true);
         }
         else {
-            pCursorVis->SetFloat(1.0f, 1);
+            pCursorVis->SetFloat(1.0f, true);
         }
         // The tick count is zero-extended to 64 bits, the sum truncated to 64 bits and its low 32 bits stored.
         int64_t iNext =
@@ -1544,7 +1544,7 @@ void HackingMenu::UpdateScrollingCursor(HackingMenu::TerminalIO* apIO) {
 }
 
 void HackingMenu::AddAttemptsRemainingSquares() {
-    Tile* arg0 = HackingMenu::pMe->RenderTemplate(pTiles[1], "hacking_guess_template", 0);
+    Tile* arg0 = HackingMenu::pMe->RenderTemplate(pTiles[1], "hacking_guess_template", nullptr);
     uint32_t FormFlags = xGuessTiles.m_uiCount;
     arg0->Set(4012, FormFlags);
     xGuessTiles.AddTail(arg0);
@@ -1579,22 +1579,22 @@ Tile* HackingMenu::Create(TESObjectREFR* apTerminalRef) {
     Menu* pmenu = ptile->GetMenu();
     if (pmenu && (v4 = pmenu->GetClass(), v4 == HackingMenu::GetClassStatic())) {
         int32_t imissingIndex;
-        pmenu->SetMenuTile(static_cast<TileMenu*>(ptile), 0);
+        pmenu->SetMenuTile(static_cast<TileMenu*>(ptile), false);
         HackingMenu::pMe = static_cast<HackingMenu*>(pmenu);
         if (static_cast<HackingMenu*>(pmenu)->HackingMenu::IsWellFormedMenu(imissingIndex)) {
             BGSTerminal* pterm;
             if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
-                ptile->Set(4013, ftop_depth, 1);
+                ptile->Set(4013, ftop_depth, true);
             }
             const char* v7 = sHackingLockout3.String();
-            HackingMenu::pMe->pTiles[6]->Set(4036, v7, 1);
+            HackingMenu::pMe->pTiles[6]->Set(4036, v7, true);
             const char* v8 = sHackingLockout4.String();
-            HackingMenu::pMe->pTiles[7]->Set(4036, v8, 1);
+            HackingMenu::pMe->pTiles[7]->Set(4036, v8, true);
             if (apTerminalRef) {
                 pterm = static_cast<BGSTerminal*>(apTerminalRef->GetObjectReference());
             }
             else {
-                pterm = 0;
+                pterm = nullptr;
             }
             if (pterm && pPlayer->GetTerminalAccess(apTerminalRef) == PlayerCharacter::TAT_LOCKED) {
                 ptile->Set(4102, 1);
@@ -1645,7 +1645,7 @@ Tile* HackingMenu::Create(TESObjectREFR* apTerminalRef) {
                     iwordsWant = 20;
                 }
                 HackingMenu::pMe->Prepare(iwordsWant);
-                ptile->Set(4100, ">", 1);
+                ptile->Set(4100, ">", true);
                 Tile::Value* a2d = HackingMenu::pMe->pTiles[5]->GetValue(4003);
                 Tile::Value* ValueQ = HackingMenu::pMe->pTiles[5]->GetValueQ(4036);
                 HackingMenu::pMe->xEntryText.SetTraits(ValueQ, a2d);
@@ -1756,13 +1756,13 @@ Tile* HackingMenu::Create(TESObjectREFR* apTerminalRef) {
                       )
                     : nullptr;
             }
-            HackingMenu::pMe->Sounds->Play(0);
-            pmenu->PrepForVisibility(0);
+            HackingMenu::pMe->Sounds->Play(false);
+            pmenu->PrepForVisibility(false);
             return ptile;
         }
         else {
             Warning("MENUS: Hacking Menu Creation Failed... Missing index = #%d", imissingIndex);
-            return 0;
+            return nullptr;
         }
     }
     else {
@@ -1773,14 +1773,14 @@ Tile* HackingMenu::Create(TESObjectREFR* apTerminalRef) {
                 }
             }
         }
-        return 0;
+        return nullptr;
     }
 }
 
 void HackingMenu::Close() {
     if (HackingMenu::pMe) {
         PlayTerminalShutdownSound();
-        HackingMenu::pMe->pMenu->Set(4033, 0.75f, static_cast<bool>(1));
+        HackingMenu::pMe->pMenu->Set(4033, 0.75f, true);
         if (HackingMenu::pim->GetCurrentRenderedMenu()) {
             NiNode* MenuRoot = static_cast<NiNode*>(HackingMenu::pim->GetCurrentRenderedMenu()->GetMenuRoot());
             if (MenuRoot == HackingMenu::pMe->pMenu->GetModel()) {
@@ -1803,7 +1803,7 @@ void* HackingMenu::GetGarbageString(void* apDest, const char* apSrc) {
     uint32_t aCount = 1;
     char* v4 = std::strchr(Str, *apSrc);
     if (v4) {
-        while (1) {
+        while (true) {
             if (!apSrc[aCount] || std::isalpha(apSrc[aCount])) {
                 return ourMemcpy(apDest, apSrc, 1u);
             }

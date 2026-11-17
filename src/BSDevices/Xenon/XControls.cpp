@@ -13,7 +13,7 @@
 #include "SDK/MSVC/string.h"
 #include "platform/Ini.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 static SettingT<INISettingCollection> fAnalogMaxRunZonePercent("fAnalogMaxRunZonePercent:Controls", 0.95f);
 static SettingT<INISettingCollection> fAnalogRunZonePercent("fAnalogRunZonePercent:Controls", 0.8f);
@@ -83,7 +83,7 @@ void Controls::Rumble(
             v10 = v12;
         }
         else {
-            v10 = 0;
+            v10 = nullptr;
         }
         v10->uiDuration = timeInMillis;
         v10->uiWavelength = iWavelength;
@@ -182,7 +182,7 @@ void Controls::RemoveDuplicateControls(int32_t device, int32_t button) {
     int32_t i;
     for (i = 0; i < 28; ++i) {
         if (((uint32_t)ucKeyBinds[device][i]) == ((uint32_t)button)) {
-            ucKeyBinds[device][i] = (uint8_t)((-1));
+            ucKeyBinds[device][i] = (uint8_t)(-1);
         }
     }
 }
@@ -210,23 +210,23 @@ bool Controls::SetAction(int32_t action) {
     GetNextKeystroke(nextKeystroke);
     if (nextKeystroke) {
         SetActionMapping(eActionToSet, 0, nextKeystroke);
-        bSettingAControl = 0;
-        bUpdated = 1;
-        return 1;
+        bSettingAControl = false;
+        bUpdated = true;
+        return true;
     }
     else {
         for (int32_t buttonNumber = 1; buttonNumber <= 3; ++buttonNumber) {
             if (GetMouseButton(buttonNumber, 1)) {
                 nextKeystroke = buttonNumber;
                 SetActionMapping(eActionToSet, 1u, buttonNumber);
-                bSettingAControl = 0;
-                bUpdated = 1;
-                return 1;
+                bSettingAControl = false;
+                bUpdated = true;
+                return true;
             }
         }
-        bUpdated = 0;
-        bSettingAControl = 1;
-        return 0;
+        bUpdated = false;
+        bSettingAControl = true;
+        return false;
     }
 }
 

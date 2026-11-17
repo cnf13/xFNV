@@ -223,8 +223,8 @@
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
 
+#include <cstdint>
 #include <new>
-#include <stdint.h>
 
 using PointerArray = BSSimpleArray<void*>;
 using ShortArray = BSSimpleArray<uint16_t>;

@@ -218,7 +218,7 @@ void _hkBallSocketConstraintBuildJacobian(
         float v14 = _mm_shuffle_ps(v13, v13, 85)[0] + v13[0];
         float v15 = _mm_shuffle_ps(v13, v13, 170)[0];
         v16.m_real = apIn->hkpConstraintQueryIn::m_maxConstraintViolationSqrd.m_real;
-        v16.m_real[0] = v16.m_real[0] - static_cast<float>(v15 + v14);
+        v16.m_real[0] = v16.m_real[0] - (v15 + v14);
         if ((_mm_movemask_ps(v16.m_real) & 1) != 0) {
             // EXE-INLINED none: hkCriticalSection::atomicExchangeAdd
             // EXE-CAST: hkUint32 as LONG (the SDK's atomicExchangeAdd casts the counter for InterlockedExchangeAdd)
@@ -267,17 +267,14 @@ void _hkBallSocketConstraintBuildJacobian(
         __m128 v33 = _mm_add_ps(_mm_mul_ps(_mm_mul_ps(v30, v30), m_quad_5), _mm_mul_ps(_mm_mul_ps(v29, v29), m_quad_6));
         __m128 v34 = _mm_shuffle_ps(v33, _mm_unpackhi_ps(v33, _mm_add_ps(m_quad_6, m_quad_5)), 196);
         __m128 v35 = _mm_add_ps(_mm_shuffle_ps(v34, v34, 78), v34);
-        float v43 = static_cast<float>(_mm_shuffle_ps(v35, v35, 177)[0] + v35[0]) + 1.1920928955078125e-07;
+        float v43 = (_mm_shuffle_ps(v35, v35, 177)[0] + v35[0]) + 1.1920928955078125e-07;
         m_jacobianSchemas[2].m_quad[3] = v43;
         m_jacobianSchemas[1].m_quad[3] = m_virtMassFactor / v43;
         v36 = v39;
         __m128 v37 =
             _mm_mul_ps(_mm_sub_ps(arTransformB.m_translation.m_quad, arTransformA.m_translation.m_quad), pAxis->m_quad);
         m_jacobianSchemas->m_quad[3] =
-            static_cast<float>(
-                _mm_shuffle_ps(v37, v37, 170)[0] + static_cast<float>(_mm_shuffle_ps(v37, v37, 85)[0] + v37[0])
-            ) *
-            m_rhsFactor_1;
+            (_mm_shuffle_ps(v37, v37, 170)[0] + (_mm_shuffle_ps(v37, v37, 85)[0] + v37[0])) * m_rhsFactor_1;
         m_jacobianSchemas->m_quad[3] = v45[v39] * apIn->m_rhsFactor;
         m_jacobianSchemas->m_quad[0] = m_jacobianSchemas->m_quad[0] + 1.1920928955078125e-07;
         if (m_maxImpulse == 3.402820018375656e+38) {
@@ -1194,7 +1191,7 @@ void buildJacobianFromMassChangerModifier(
     hkSetInvMassBuildJacobian(kAccA.m_invMasses, kAccB.m_invMasses, arOut);
     if (pChild->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {
         hkSimpleContactConstraintDataBuildJacobian(
-            static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{1}, arOut
+            static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{true}, arOut
         );
     }
     else {
@@ -1520,7 +1517,7 @@ void buildJacobianFromSoftContactModifier(
     hkpConstraintAtom* pChild = arAtom.m_child;
     if (pChild->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {
         hkSimpleContactConstraintDataBuildJacobian(
-            static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{1}, arOut
+            static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{true}, arOut
         );
     }
     else {
@@ -1586,7 +1583,7 @@ void buildJacobianFromCenterOfMassChangerModifier(
     hkSetCenterOfMassBuildJacobian(kNegSkewA, kNegSkewB, arOut);
     if (pChild->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {
         hkSimpleContactConstraintDataBuildJacobian(
-            static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{1}, arOut
+            static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{true}, arOut
         );
     }
     else {
@@ -1651,7 +1648,7 @@ void buildJacobianFromMovingSurfaceModifier(
         _mm_xor_ps(_mm_sub_ps(kV, _mm_mul_ps(_mm_shuffle_ps(kDot, kDot, 0), kN)), hkQuadRealNegateMask);
     hkAddVelocityBuildJacobian(kTangential, iIsBodyB, arOut);
     kAcc.m_linearVel.m_quad = _mm_add_ps(kAcc.m_linearVel.m_quad, kTangential.m_quad);
-    hkSimpleContactConstraintDataBuildJacobian(pContact, kModifierIn, hkBool{0}, arOut);
+    hkSimpleContactConstraintDataBuildJacobian(pContact, kModifierIn, hkBool{false}, arOut);
     kTangential.m_quad = _mm_xor_ps(hkQuadRealNegateMask, kTangential.m_quad);
     hkAddVelocityBuildJacobian(kTangential, iIsBodyB, arOut);
 }
@@ -1711,13 +1708,11 @@ void hkBallSocketConstraintBuildJacobian_noSchema(
         // The three angular lanes and the sum of the inverse masses' w lanes, added across.
         const __m128 kTerms = _mm_shuffle_ps(kMass, _mm_unpackhi_ps(kMass, _mm_add_ps(kInvMassesA, kInvMassesB)), 196);
         const __m128 kPairs = _mm_add_ps(_mm_shuffle_ps(kTerms, kTerms, 78), kTerms);
-        const float fDiag =
-            static_cast<float>(_mm_shuffle_ps(kPairs, kPairs, 177)[0] + kPairs[0]) + 1.1920928955078125e-07;
+        const float fDiag = (_mm_shuffle_ps(kPairs, kPairs, 177)[0] + kPairs[0]) + 1.1920928955078125e-07;
         rJac.m_angular[1].m_quad[3] = fDiag;
         rJac.m_angular[0].m_quad[3] = fVirtMassFactor / fDiag;
         const __m128 kSeparation = _mm_mul_ps(_mm_sub_ps(posB.m_quad, posA.m_quad), kDir);
-        rJac.m_linear0.m_quad[3] =
-            static_cast<float>(kSeparation[2] + static_cast<float>(kSeparation[1] + kSeparation[0])) * fRhsFactor;
+        rJac.m_linear0.m_quad[3] = (kSeparation[2] + static_cast<float>(kSeparation[1] + kSeparation[0])) * fRhsFactor;
     }
 }
 
@@ -1875,7 +1870,7 @@ void buildViscousSurfaceJacobian(
     clearContactInfo(&static_cast<hkpSimpleContactConstraintAtom*>(pInner)->m_info);
     hkpSimpleContactConstraintAtom* v5 = static_cast<hkpSimpleContactConstraintAtom*>(atom.m_child);
     if (v5->m_type.m_storage == 22) {
-        hkSimpleContactConstraintDataBuildJacobian(v5, avgNormal, static_cast<hkBool>(1), out);
+        hkSimpleContactConstraintDataBuildJacobian(v5, avgNormal, static_cast<hkBool>(true), out);
     }
     else {
         hkSolverBuildJacobianFromAtomsNotContact(v5, m_childSize, avgNormal, out);
@@ -3120,7 +3115,7 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                 hkpConstraintAtom* pChild = pSoft->m_child;
                 if (pChild->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {
                     hkSimpleContactConstraintDataBuildJacobian(
-                        static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{1}, out
+                        static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{true}, out
                     );
                 }
                 else {
@@ -3158,7 +3153,7 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                 hkSetInvMassBuildJacobian(kAccA.m_invMasses, kAccB.m_invMasses, out);
                 if (pChild->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {
                     hkSimpleContactConstraintDataBuildJacobian(
-                        static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{1}, out
+                        static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{true}, out
                     );
                 }
                 else {
@@ -3183,7 +3178,7 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                 hkpConstraintAtom* pChild = pViscous->m_child;
                 if (pChild->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {
                     hkSimpleContactConstraintDataBuildJacobian(
-                        static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{1}, out
+                        static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{true}, out
                     );
                 }
                 else {
@@ -3242,7 +3237,7 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                         _mm_load_ps(&reinterpret_cast<float*>(&kAccB.m_linearVel.m_quad)[0])
                     )
                 );
-                hkSimpleContactConstraintDataBuildJacobian(pContact, kModifierIn, hkBool{0}, out);
+                hkSimpleContactConstraintDataBuildJacobian(pContact, kModifierIn, hkBool{false}, out);
                 _mm_store_ps(
                     &reinterpret_cast<float*>(&kTangential.m_quad)[0],
                     _mm_xor_ps(_mm_load_ps(&reinterpret_cast<float*>(&kTangential.m_quad)[0]), kNegate)
@@ -3333,7 +3328,7 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                 hkSetCenterOfMassBuildJacobian(kNegSkewA, kNegSkewB, out);
                 if (pChild->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {
                     hkSimpleContactConstraintDataBuildJacobian(
-                        static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{1}, out
+                        static_cast<hkpSimpleContactConstraintAtom*>(pChild), kModifierIn, hkBool{true}, out
                     );
                 }
                 else {

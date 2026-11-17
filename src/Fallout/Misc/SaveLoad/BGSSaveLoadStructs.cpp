@@ -52,7 +52,7 @@ void SavedFormData::GetFormName(char* apName, uint32_t aiNameSize) {
             pref = static_cast<TESObjectREFR*>(pForm);
         }
         else {
-            pref = 0;
+            pref = nullptr;
         }
         if (pref) {
             FullName = pref->GetFullName();
@@ -295,7 +295,7 @@ void BGSSaveLoadStatsMap::OutputStats() {
 void BGSSaveLoadStatsMap::SaveForm(TESForm* apForm, BGSChangeFlags aiChangeFlags, BGSSaveFormBuffer* apSaveFormBuffer) {
     apSaveFormBuffer->ClearPosition();
     uint8_t MinorVersion = pSaveLoadManager->GetMinorVersion();
-    ENUM_FORM_ID FormType = static_cast<ENUM_FORM_ID>(apForm->GetFormType());
+    ENUM_FORM_ID FormType = apForm->GetFormType();
     uint32_t CastingType = apForm->GetFormID();
     apSaveFormBuffer->SetHeader(CastingType, aiChangeFlags, FormType, MinorVersion);
     apSaveFormBuffer->SetForm(apForm);
@@ -314,7 +314,7 @@ void BGSSaveLoadStatsMap::CloseFile() {
     if (pFile) {
         delete pFile;
     }
-    pFile = 0;
+    pFile = nullptr;
 }
 
 void BGSSaveLoadStatsMap::BuildStatsMap() {
@@ -323,7 +323,7 @@ void BGSSaveLoadStatsMap::BuildStatsMap() {
     NiTMapItem<uint32_t, BGSFormChanges*>* kIter = pchangesMap->GetFirstPos();
     while (kIter) {
         uint32_t iformID = 0;
-        BGSFormChanges* pchanges = 0;
+        BGSFormChanges* pchanges = nullptr;
         pchangesMap->GetNext(kIter, iformID, pchanges);
         if (pchanges->UnloadedFormBuffer.pBuffer) {
             BGSChangeFlags v5;
@@ -332,7 +332,7 @@ void BGSSaveLoadStatsMap::BuildStatsMap() {
             uint32_t Size = pchanges->UnloadedFormBuffer.GetSize();
             v5.iFlags = pchanges->iChangeFlags.iFlags;
             ENUM_FORM_ID FormType = pchanges->UnloadedFormBuffer.GetFormType();
-            AddForm(iformID, 0, FormType, v5, Size, v9, 0, Version);
+            AddForm(iformID, nullptr, FormType, v5, Size, v9, 0, Version);
         }
         else {
             TESForm* pform = TESForm::GetFormByNumericID(iformID);
@@ -385,7 +385,7 @@ void BGSSaveLoadStatsMap::AddForm(
         pformData = ::new (apMemory) SavedFormData;
     }
     else {
-        pformData = 0;
+        pformData = nullptr;
     }
     pformData->iFormID = aiFormID;
     pformData->pForm = apForm;
@@ -394,7 +394,7 @@ void BGSSaveLoadStatsMap::AddForm(
     pformData->iOverhead = aiOverhead;
     pformData->iDebugOverhead = aiDebugOverhead;
     pformData->cVersion = acVersion;
-    BSSimpleList<SavedFormData*>* plist = 0;
+    BSSimpleList<SavedFormData*>* plist = nullptr;
     if (!GetAt(aeFormType, plist)) {
         BSSimpleList<SavedFormData*>* plist_2;
         BSSimpleList<SavedFormData*>* v12 =
@@ -403,7 +403,7 @@ void BGSSaveLoadStatsMap::AddForm(
             plist_2 = ::new (v12) BSSimpleList<SavedFormData*>;
         }
         else {
-            plist_2 = 0;
+            plist_2 = nullptr;
         }
         plist = plist_2;
         SetAt(aeFormType, plist_2);
@@ -431,10 +431,10 @@ void BGSSaveLoadStatsMap::OutputSaveLoadStats(const char* apSaveFileName) {
     }
     BSFile* apMemory = static_cast<BSFile*>(ourMalloc(sizeof(BSFile)));
     if (apMemory) {
-        v1 = ::new (apMemory) BSFile(FileName, NiFile::WRITE_ONLY, 0x4000u, 0);
+        v1 = ::new (apMemory) BSFile(FileName, NiFile::WRITE_ONLY, 0x4000u, false);
     }
     else {
-        v1 = 0;
+        v1 = nullptr;
     }
     statsMap.pFile = v1;
     statsMap.BuildStatsMap();

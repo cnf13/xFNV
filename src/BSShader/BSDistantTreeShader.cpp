@@ -140,13 +140,13 @@ void BSDistantTreeShader::SetupGeometryConstants(const NiPropertyState* apState)
     NiGeometryBufferData* m_pkBuffData = pGeometry->m_spModelData.m_pObject->m_pkBuffData;
     NiSkinInstance* m_pObject = pGeometry->m_spSkinInstance.m_pObject;
     SetupGeometryConstants_Instances(apState);
-    m_pkD3DRenderer->SetModelTransform(*p_m_kWorld, 0);
+    m_pkD3DRenderer->SetModelTransform(*p_m_kWorld, false);
     NiD3DShaderConstantMap* v6 = m_spPixelConstantMap.m_pObject;
     if (v6) {
         NiD3DPixelShader* v11 = NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject;
         if (v11) {
             v6->SetShaderConstants(
-                v11, pGeometry, m_pObject, 0, m_pkBuffData, apState, 0, *p_m_kWorld, *m_kWorldBound, 0, 1
+                v11, pGeometry, m_pObject, nullptr, m_pkBuffData, apState, nullptr, *p_m_kWorld, *m_kWorldBound, 0, true
             );
         }
     }
@@ -155,7 +155,7 @@ void BSDistantTreeShader::SetupGeometryConstants(const NiPropertyState* apState)
         NiD3DVertexShader* v8 = NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject;
         if (v8) {
             v7->SetShaderConstants(
-                v8, pGeometry, m_pObject, 0, m_pkBuffData, apState, 0, *p_m_kWorld, *m_kWorldBound, 0, 1
+                v8, pGeometry, m_pObject, nullptr, m_pkBuffData, apState, nullptr, *p_m_kWorld, *m_kWorldBound, 0, true
             );
         }
     }
@@ -188,7 +188,7 @@ void BSDistantTreeShader::SetupPassTextures(uint32_t auiCurrentPass) {
         m_pObject->m_spTexture = BSDistantTreeShader::spTextureAtlas;
         m_pObject->SetClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
         m_pObject->SetFilterMode(NiTexturingProperty::FILTER_BILERP_MIPNEAREST);
-        m_pObject->ConfigureStage(0);
+        m_pObject->ConfigureStage(false);
     }
 }
 
@@ -330,7 +330,7 @@ bool BSDistantTreeShader::LoadStagesAndPasses() {
     NiD3DPass::CreateNewPass(*spPass);
     NiPointer<NiD3DTextureStage> spStage;
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spStage.m_pObject->SetFilterMode(NiTexturingProperty::FILTER_BILERP);
     spPass->m_pObject->SetStage(spPass->m_pObject->m_uiCurrentStage, spStage.m_pObject);
     NiD3DVertexShader* spVertexShader = this->spVertexShader;
@@ -352,7 +352,7 @@ bool BSDistantTreeShader::LoadStagesAndPasses() {
     NiD3DPass::CreateNewPass(*v8);
     spStage = nullptr;
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spStage.m_pObject->SetFilterMode(NiTexturingProperty::FILTER_BILERP);
     v8->m_pObject->SetStage(v8->m_pObject->m_uiCurrentStage, spStage.m_pObject);
     NiD3DVertexShader* v10 = this->spVertexShader;
@@ -370,7 +370,7 @@ bool BSDistantTreeShader::LoadStagesAndPasses() {
     NiD3DPass* v12 = v8->m_pObject;
     NiD3DPixelShader* v13 = spPixelShader[1];
     v12->m_spPixelShader = v13;
-    return 1;
+    return true;
 }
 
 // Each macro set's unused tail is cleared as the game does: the first unused Name by a store, the rest of the array
@@ -449,7 +449,7 @@ void BSDistantTreeShader::LoadShaders() {
 }
 
 BSShader* BSDistantTreeShader::CreateShader() {
-    BSDistantTreeShader* pshader = 0;
+    BSDistantTreeShader* pshader = nullptr;
     NiDX9ShaderDeclaration* pdecl = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 4u, 1u);
     pdecl->SetEntry(0, 0, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
     pdecl->SetEntry(1u, 1u, NiShaderDeclaration::SHADERPARAM_NI_TEXCOORD0, NiShaderDeclaration::SPTYPE_FLOAT2, 0);

@@ -177,7 +177,7 @@ void ShadowSceneNode::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
                 }
             }
             else {
-                m_pObject = 0;
+                m_pObject = nullptr;
             }
             if (m_pObject->bCastShadow) {
                 ++iShadowLightCount;
@@ -387,7 +387,7 @@ void ShadowSceneNode::FindAndCullLightRecurse(NiNode* apNode, int32_t abCull) {
                     RemoveLight(static_cast<NiLight*>(pchlight__pchnode));
                 }
                 else {
-                    AddLight(static_cast<NiLight*>(pchlight__pchnode), 1);
+                    AddLight(static_cast<NiLight*>(pchlight__pchnode), true);
                 }
             }
             else {
@@ -404,9 +404,9 @@ ShadowSceneLight* ShadowSceneNode::GetLight(NiLight* apLight) {
     ShadowSceneLight* result;
     NiTListItem<NiPointer<ShadowSceneLight>>* m_pkHead = lLightList.m_pkHead;
     if (!m_pkHead) {
-        return 0;
+        return nullptr;
     }
-    while (1) {
+    while (true) {
         result = m_pkHead->m_element.m_pObject;
         m_pkHead = m_pkHead->m_pkNext;
         if (result) {
@@ -415,7 +415,7 @@ ShadowSceneLight* ShadowSceneNode::GetLight(NiLight* apLight) {
             }
         }
         if (!m_pkHead) {
-            return 0;
+            return nullptr;
         }
     }
     return result;
@@ -1555,7 +1555,7 @@ void ShadowSceneNode::UpdateLight_0(NiLight* apLight) {
     NiTListItem<NiPointer<ShadowSceneLight>>* m_pkHead = lLightList.m_pkHead;
     if (m_pkHead) {
         ShadowSceneLight* apSSLight;
-        while (1) {
+        while (true) {
             apSSLight = m_pkHead->m_element.m_pObject;
             m_pkHead = m_pkHead->m_pkNext;
             if (apSSLight) {
@@ -1854,7 +1854,7 @@ NiPoint3 ShadowSceneNode::GetCameraPos() const {
 
 void ShadowSceneNode::AddObject(NiAVObject* apObject) {
     if (apObject && !(apObject->m_uFlags & NiAVObject::APP_CULLED)) {
-        UpdateObjectLighting(apObject, 0);
+        UpdateObjectLighting(apObject, false);
     }
 }
 
@@ -2268,7 +2268,7 @@ void ShadowSceneNode::UpdateDynamicShadows(BSCullingProcess& arCuller) {
             v5 = ::new (v4) BSCubeMapCamera(0);
         }
         else {
-            v5 = 0;
+            v5 = nullptr;
         }
         BSCubeMapCamera* v6 = v2->spCubeMapCamera;
         if (v6 == v5) {
@@ -2303,11 +2303,11 @@ LABEL_12:;
                     else {
                         NiUpdateData UpdateData;
                         UpdateData.fTime = 0.0f;
-                        UpdateData.bUpdateControllers = 0;
-                        UpdateData.bParallelUpdate = 0;
-                        UpdateData.bFoundParticles = 0;
-                        UpdateData.bFoundMorphController = 0;
-                        UpdateData.bSceneGraphChange = 0;
+                        UpdateData.bUpdateControllers = false;
+                        UpdateData.bParallelUpdate = false;
+                        UpdateData.bFoundParticles = false;
+                        UpdateData.bFoundMorphController = false;
+                        UpdateData.bSceneGraphChange = false;
                         m_pObject->Update(UpdateData);
                         if (plight->usFrustumCull != 255) {
                             BSShaderManager::pShadowMapLight = plight;
@@ -2327,7 +2327,7 @@ LABEL_12:;
     BSRenderedTexture** p_spRenderedCubeMap = &v12->spRenderedCubeMap;
     if (spRenderedCubeMap) {
         NiDecRefCount(spRenderedCubeMap);
-        *p_spRenderedCubeMap = 0;
+        *p_spRenderedCubeMap = nullptr;
         v17->eMemContext = eMemContext;
     }
     else {

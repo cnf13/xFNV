@@ -125,14 +125,14 @@ void hkpRigidBodyCentreOfMassViewer::addWorld(hkpWorld* world) {
         v3 = static_cast<hkpEntityListener*>(this);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     world->addEntityListener(v3);
     if (v2) {
         v5 = static_cast<hkpWorldPostSimulationListener*>(v2);
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     world->addWorldPostSimulationListener(v5);
     int32_t v6 = 0;
@@ -184,14 +184,14 @@ void hkpRigidBodyCentreOfMassViewer::removeWorld(hkpWorld* world) {
         v3 = static_cast<hkpEntityListener*>(this);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     world->removeEntityListener(v3);
     if (v2) {
         v5 = static_cast<hkpWorldPostSimulationListener*>(v2);
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     world->removeWorldPostSimulationListener(v5);
     int32_t v6 = 0;
@@ -246,7 +246,7 @@ hkpRigidBodyCentreOfMassViewer::create(const hkArray<hkProcessContext*, hkContai
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

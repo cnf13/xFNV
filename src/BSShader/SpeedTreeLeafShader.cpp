@@ -106,7 +106,7 @@ uint32_t SpeedTreeLeafShader::SetupTransformations(
 ) {
     D3DXMATRIX model;
     D3DXMATRIX d3dInvWorld;
-    m_pkD3DRenderer->SetModelTransform(aWorld, 0);
+    m_pkD3DRenderer->SetModelTransform(aWorld, false);
     model._11 = aWorld.m_fScale * aWorld.m_Rotate.m_pEntry[0][0];
     model._12 = aWorld.m_Rotate.m_pEntry[1][0] * aWorld.m_fScale;
     model._13 = aWorld.m_Rotate.m_pEntry[2][0] * aWorld.m_fScale;
@@ -133,7 +133,7 @@ uint32_t SpeedTreeLeafShader::SetupTransformations(
             (static_cast<uint32_t>(static_cast<uint8_t>((m_pObject->iShaderPropertyType == 6))))
         );
     }
-    UpdatePointLights(v12 != 0 ? m_pObject : 0, d3dInvWorld, aWorld.m_fScale);
+    UpdatePointLights(v12 != 0 ? m_pObject : nullptr, d3dInvWorld, aWorld.m_fScale);
     SpeedTreeLeafShader::UpdateScaleAdjustment();
     return 0;
 }
@@ -175,7 +175,9 @@ void SpeedTreeLeafShader::SetupGeometryConstants(const NiPropertyState* apState)
         while (i < v2->ucNumLights);
         pThis = v13;
     }
-    pThis->SetupTransformations(pgeometry, 0, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *m_kWorldBound);
+    pThis->SetupTransformations(
+        pgeometry, nullptr, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *m_kWorldBound
+    );
     if (BSShaderManager::bLiteBrite) {
         float v16;
         float v17;
@@ -216,7 +218,8 @@ void SpeedTreeLeafShader::SetupGeometryConstants(const NiPropertyState* apState)
         NiD3DVertexShader* v8 = NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject;
         if (v8) {
             m_pObject->SetShaderConstants(
-                v8, pgeometry, pskin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *m_kWorldBound, 0, 1
+                v8, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *m_kWorldBound, 0,
+                true
             );
         }
     }
@@ -225,7 +228,8 @@ void SpeedTreeLeafShader::SetupGeometryConstants(const NiPropertyState* apState)
         NiD3DPixelShader* v10 = NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject;
         if (v10) {
             v9->SetShaderConstants(
-                v10, pgeometry, pskin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *m_kWorldBound, 0, 1
+                v10, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *m_kWorldBound, 0,
+                true
             );
         }
     }
@@ -270,37 +274,43 @@ void SpeedTreeLeafShader::CreateConstantMaps() {
             v3 = ::new (v2) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         }
         else {
-            v3 = 0;
+            v3 = nullptr;
         }
         m_spVertexConstantMap = v3;
-        m_spVertexConstantMap.m_pObject->AddEntry("WorldViewProjTranspose", 0x20000009u, 0, 0, 4u, 0, 0, 0, 0, 0);
         m_spVertexConstantMap.m_pObject->AddEntry(
-            "Ambient Color", 0x10000007u, 0, 5u, 1u, "", 16u, 4u, BSShaderLightingProperty::pShaderLightConstants, 0
+            "WorldViewProjTranspose", 0x20000009u, 0, 0, 4u, nullptr, 0, 0, nullptr, false
         );
         m_spVertexConstantMap.m_pObject->AddEntry(
-            "Diff Color 0", 0x10000007u, 0, 6u, 1u, "", 16u, 4u, &BSShaderLightingProperty::pShaderLightConstants[1], 0
+            "Ambient Color", 0x10000007u, 0, 5u, 1u, "", 16u, 4u, BSShaderLightingProperty::pShaderLightConstants, false
         );
         m_spVertexConstantMap.m_pObject->AddEntry(
-            "Diff Color 1", 0x10000007u, 0, 7u, 1u, "", 16u, 4u, &BSShaderLightingProperty::pShaderLightConstants[2], 0
+            "Diff Color 0", 0x10000007u, 0, 6u, 1u, "", 16u, 4u, &BSShaderLightingProperty::pShaderLightConstants[1],
+            false
+        );
+        m_spVertexConstantMap.m_pObject->AddEntry(
+            "Diff Color 1", 0x10000007u, 0, 7u, 1u, "", 16u, 4u, &BSShaderLightingProperty::pShaderLightConstants[2],
+            false
         );
         m_spVertexConstantMap.m_pObject->AddEntry(
             "FogParam | ShadowVolumeFatness", 0x10000007u, 0, 8u, 1u, "", 16u, 4u,
-            &BSShaderLightingProperty::pShaderLightConstants[28], 0
+            &BSShaderLightingProperty::pShaderLightConstants[28], false
         );
         m_spVertexConstantMap.m_pObject->AddEntry(
             "FogColor | ShadowVolumeExtrudeDistance", 0x10000007u, 0, 9u, 1u, "", 16u, 4u,
-            &BSShaderLightingProperty::pShaderLightConstants[29], 0
+            &BSShaderLightingProperty::pShaderLightConstants[29], false
         );
         if (BSShaderManager::bHDR) {
             m_spVertexConstantMap.m_pObject->AddEntry(
-                "Tree Dimmer", 0x10000004u, 0, 10u, 1u, "", 4u, 4u, &BSShaderManager::fTreeDimmer, 0
+                "Tree Dimmer", 0x10000004u, 0, 10u, 1u, "", 4u, 4u, &BSShaderManager::fTreeDimmer, false
             );
         }
         m_spVertexConstantMap.m_pObject->AddEntry(
-            "grouped constants", 0x10000009u, 0, 11u, 6u, "", 96u, 4u, &SpeedTreeLeafShader::kGroupedConstants, 0
+            "grouped constants", 0x10000009u, 0, 11u, 6u, "", 96u, 4u, &SpeedTreeLeafShader::kGroupedConstants, false
         );
         sub_BB2F50(m_spVertexConstantMap.m_pObject, 17u);
-        m_spVertexConstantMap.m_pObject->AddEntry("leaf data", 0x10000009u, 0, 34u, 48u, "", 768u, 4u, pLeafMaps, 0);
+        m_spVertexConstantMap.m_pObject->AddEntry(
+            "leaf data", 0x10000009u, 0, 34u, 48u, "", 768u, 4u, pLeafMaps, false
+        );
     }
 }
 
@@ -321,8 +331,8 @@ void SpeedTreeLeafShader::LoadShaders() {
     char acShaderName[260];
     char acPath[260];
     kVertexMacros[0].strPath = "speedtree\\leaf.v.hlsl";
-    kVertexMacros[0].kMacros[0].Name = 0;
-    kVertexMacros[0].kMacros[0].Definition = 0;
+    kVertexMacros[0].kMacros[0].Name = nullptr;
+    kVertexMacros[0].kMacros[0].Definition = nullptr;
     std::memset(
         &kVertexMacros[0].kMacros[0].Definition, 0,
         offsetof(BSShaderMacro, kMacros[8].Definition) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -330,8 +340,8 @@ void SpeedTreeLeafShader::LoadShaders() {
     kVertexMacros[1].strPath = "speedtree\\leaf.v.hlsl";
     kVertexMacros[1].kMacros[0].Name = "FOG";
     kVertexMacros[1].kMacros[0].Definition = "";
-    kVertexMacros[1].kMacros[1].Name = 0;
-    kVertexMacros[1].kMacros[1].Definition = 0;
+    kVertexMacros[1].kMacros[1].Name = nullptr;
+    kVertexMacros[1].kMacros[1].Definition = nullptr;
     std::memset(
         &kVertexMacros[1].kMacros[1].Definition, 0,
         offsetof(BSShaderMacro, kMacros[8].Definition) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -339,8 +349,8 @@ void SpeedTreeLeafShader::LoadShaders() {
     kVertexMacros[2].strPath = "speedtree\\leaf.v.hlsl";
     kVertexMacros[2].kMacros[0].Name = "PT";
     kVertexMacros[2].kMacros[0].Definition = "";
-    kVertexMacros[2].kMacros[1].Name = 0;
-    kVertexMacros[2].kMacros[1].Definition = 0;
+    kVertexMacros[2].kMacros[1].Name = nullptr;
+    kVertexMacros[2].kMacros[1].Definition = nullptr;
     std::memset(
         &kVertexMacros[2].kMacros[1].Definition, 0,
         offsetof(BSShaderMacro, kMacros[8].Definition) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -350,15 +360,15 @@ void SpeedTreeLeafShader::LoadShaders() {
     kVertexMacros[3].kMacros[0].Definition = "";
     kVertexMacros[3].kMacros[1].Name = "FOG";
     kVertexMacros[3].kMacros[1].Definition = "";
-    kVertexMacros[3].kMacros[2].Name = 0;
-    kVertexMacros[3].kMacros[2].Definition = 0;
+    kVertexMacros[3].kMacros[2].Name = nullptr;
+    kVertexMacros[3].kMacros[2].Definition = nullptr;
     std::memset(
         &kVertexMacros[3].kMacros[2].Definition, 0,
         offsetof(BSShaderMacro, kMacros[8].Definition) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     kPixelMacros[0].strPath = "speedtree\\leaf.p.hlsl";
-    kPixelMacros[0].kMacros[0].Name = 0;
-    kPixelMacros[0].kMacros[0].Definition = 0;
+    kPixelMacros[0].kMacros[0].Name = nullptr;
+    kPixelMacros[0].kMacros[0].Definition = nullptr;
     std::memset(
         &kPixelMacros[0].kMacros[0].Definition, 0,
         offsetof(BSShaderMacro, kMacros[8].Definition) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -366,8 +376,8 @@ void SpeedTreeLeafShader::LoadShaders() {
     kPixelMacros[1].strPath = "speedtree\\leaf.p.hlsl";
     kPixelMacros[1].kMacros[0].Name = "FOG";
     kPixelMacros[1].kMacros[0].Definition = "";
-    kPixelMacros[1].kMacros[1].Name = 0;
-    kPixelMacros[1].kMacros[1].Definition = 0;
+    kPixelMacros[1].kMacros[1].Name = nullptr;
+    kPixelMacros[1].kMacros[1].Definition = nullptr;
     std::memset(
         &kPixelMacros[1].kMacros[1].Definition, 0,
         offsetof(BSShaderMacro, kMacros[8].Definition) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -386,7 +396,7 @@ void SpeedTreeLeafShader::LoadShaders() {
             pVertexShader[i] = nullptr;
         }
     }
-    const char* ptarget = BSShaderManager::GetPSTarget(1);
+    const char* ptarget = BSShaderManager::GetPSTarget(true);
     if (BSShaderManager::eShaderLevel < 2) {
         for (int32_t i = 0; i < 2; ++i) {
             BSShaderMacro& rMacro = kPixelMacros[i];
@@ -450,7 +460,7 @@ void SpeedTreeLeafShader::LoadStagesAndPasses() {
     NiD3DPass::CreateNewPass(*this->sp1StagePass);
     NiPointer<NiD3DTextureStage> spStage;
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, true);
     sp1StagePass->m_pObject->SetStage(sp1StagePass->m_pObject->m_uiCurrentStage, spStage.m_pObject);
     NiD3DPass* m_pObject = sp1StagePass->m_pObject;
     NiD3DRenderStateGroup* FreeRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
@@ -476,7 +486,7 @@ void SpeedTreeLeafShader::LoadStagesAndPasses() {
     NiPointer<NiD3DPass>* v10 = &this->sp1StagePass[1];
     NiD3DPass::CreateNewPass(this->sp1StagePass[1]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, true);
     v10->m_pObject->SetStage(v10->m_pObject->m_uiCurrentStage, spStage.m_pObject);
     NiD3DPass* v11 = this->sp1StagePass[1].m_pObject;
     NiD3DRenderStateGroup* v12 = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
@@ -527,7 +537,7 @@ void SpeedTreeLeafShader::UpdatePointLights(
         pV.x = BSShaderLightingProperty::pShaderLightConstants[12].X();
         pV.y = BSShaderLightingProperty::pShaderLightConstants[12].Y();
         pV.z = BSShaderLightingProperty::pShaderLightConstants[12].Z();
-        D3DXVec3TransformCoord_Thunk(&pOut, &pV, static_cast<_D3DMATRIX*>(&d3dInvWorld));
+        D3DXVec3TransformCoord_Thunk(&pOut, &pV, (&d3dInvWorld));
         SpeedTreeLeafShader::kGroupedConstants.LightPos.x = pOut.x;
         SpeedTreeLeafShader::kGroupedConstants.LightPos.y = pOut.y;
         SpeedTreeLeafShader::kGroupedConstants.LightPos.z = pOut.z;
@@ -619,7 +629,7 @@ LABEL_5:;
     else {
         v16 = 0;
     }
-    SpeedTreeLeafShaderProperty* pstlsprop = v16 ? static_cast<SpeedTreeLeafShaderProperty*>(m_pObject) : 0;
+    SpeedTreeLeafShaderProperty* pstlsprop = v16 ? static_cast<SpeedTreeLeafShaderProperty*>(m_pObject) : nullptr;
     float* v18 = pstlsprop->GetLeafMaps();
     rt::memcpy(pLeafMaps, v18, sizeof(pLeafMaps));
     SpeedTreeLeafShader::kGroupedConstants.RockParams.y =
@@ -676,52 +686,52 @@ LABEL_31:;
         if (!v26->m_pkRenderStateGroup) {
             v26->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v26->m_pkRenderStateGroup->SetRenderState(52u, 1u, 1);
+        v26->m_pkRenderStateGroup->SetRenderState(52u, 1u, true);
         NiD3DPass* v27 = sp1StagePass[0].m_pObject;
         if (!v27->m_pkRenderStateGroup) {
             v27->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v27->m_pkRenderStateGroup->SetRenderState(56u, 8u, 1);
+        v27->m_pkRenderStateGroup->SetRenderState(56u, 8u, true);
         NiD3DPass* v28 = sp1StagePass[0].m_pObject;
         if (!v28->m_pkRenderStateGroup) {
             v28->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v28->m_pkRenderStateGroup->SetRenderState(55u, 7u, 1);
+        v28->m_pkRenderStateGroup->SetRenderState(55u, 7u, true);
         NiD3DPass* v29 = sp1StagePass[0].m_pObject;
         if (!v29->m_pkRenderStateGroup) {
             v29->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v29->m_pkRenderStateGroup->SetRenderState(53u, 1u, 1);
+        v29->m_pkRenderStateGroup->SetRenderState(53u, 1u, true);
         NiD3DPass* v30 = sp1StagePass[0].m_pObject;
         if (!v30->m_pkRenderStateGroup) {
             v30->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v30->m_pkRenderStateGroup->SetRenderState(54u, 1u, 1);
+        v30->m_pkRenderStateGroup->SetRenderState(54u, 1u, true);
     }
     else {
         if (!v26->m_pkRenderStateGroup) {
             v26->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v26->m_pkRenderStateGroup->SetRenderState(52u, 0, 1);
+        v26->m_pkRenderStateGroup->SetRenderState(52u, 0, true);
     }
     NiD3DPass* v34 = sp1StagePass[0].m_pObject;
     if ((BSShaderManager::usRenderFlags & 1) != 0) {
         if (!v34->m_pkRenderStateGroup) {
             v34->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v34->m_pkRenderStateGroup->SetRenderState(168u, 0, 1);
+        v34->m_pkRenderStateGroup->SetRenderState(168u, 0, true);
     }
     else {
         if (!v34->m_pkRenderStateGroup) {
             v34->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v34->m_pkRenderStateGroup->SetRenderState(168u, 7u, 1);
+        v34->m_pkRenderStateGroup->SetRenderState(168u, 7u, true);
     }
     NiD3DPass* v35 = sp1StagePass[0].m_pObject;
     if (!v35->m_pkRenderStateGroup) {
         v35->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v35->m_pkRenderStateGroup->SetRenderState(28u, 0, 1);
+    v35->m_pkRenderStateGroup->SetRenderState(28u, 0, true);
     if (v19->m_uiRefCount-- == 1) {
         v19->ReturnStageToPool();
     }
@@ -744,7 +754,7 @@ void SpeedTreeLeafShader::UpdateScaleAdjustment() {
 }
 
 BSShader* SpeedTreeLeafShader::CreateShader() {
-    SpeedTreeLeafShader* pshader = 0;
+    SpeedTreeLeafShader* pshader = nullptr;
     NiDX9ShaderDeclaration* spShaderDecl = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 4u, 1u);
     spShaderDecl->SetEntry(0, 0, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
     spShaderDecl->SetEntry(1u, 3u, NiShaderDeclaration::SHADERPARAM_NI_NORMAL, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
@@ -771,6 +781,6 @@ BSShader* SpeedTreeLeafShader::CreateShader() {
 void SpeedTreeLeafShader::UpdateWindTimers(float a1, float a2, float rockTimeScale, float rustleTimeScale) {
     SpeedTreeLeafShader::kGroupedConstants.RockParams.x = a1;
     SpeedTreeLeafShader::kGroupedConstants.RustleParams.x = a2;
-    SpeedTreeLeafShader::fRockTime = (float)(SpeedTreeLeafShader::fRockTime + rockTimeScale);
-    SpeedTreeLeafShader::fRustleTime = (float)(SpeedTreeLeafShader::fRustleTime + rustleTimeScale);
+    SpeedTreeLeafShader::fRockTime = (SpeedTreeLeafShader::fRockTime + rockTimeScale);
+    SpeedTreeLeafShader::fRustleTime = (SpeedTreeLeafShader::fRustleTime + rustleTimeScale);
 }

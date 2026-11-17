@@ -116,7 +116,7 @@
 #include "SDK/MSVC/rtti.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 // Used by NavMesh's grid clamp: sets aVal to aMax when aVal > aMax, else to aMin when aVal < aMin.
 template <class T>
@@ -845,14 +845,14 @@ float CombatFormulas::GetArmCondition(ActorValueOwner* apActor, WEAPON_TYPE aeWe
         case WEAPON_TWO_HAND_HANDLE:
         case WEAPON_TWO_HAND_LAUNCHER: {
             double BodyPartCondition =
-                CombatFormulas::GetBodyPartCondition(apActor, ActorValue::LEFT_ATTACK_CONDITION, 0);
-            v5 = (CombatFormulas::GetBodyPartCondition(apActor, ActorValue::RIGHT_ATTACK_CONDITION, 0) +
+                CombatFormulas::GetBodyPartCondition(apActor, ActorValue::LEFT_ATTACK_CONDITION, false);
+            v5 = (CombatFormulas::GetBodyPartCondition(apActor, ActorValue::RIGHT_ATTACK_CONDITION, false) +
                   BodyPartCondition) /
                 2.0;
             break;
         }
         default: {
-            v5 = CombatFormulas::GetBodyPartCondition(apActor, ActorValue::RIGHT_ATTACK_CONDITION, 0);
+            v5 = CombatFormulas::GetBodyPartCondition(apActor, ActorValue::RIGHT_ATTACK_CONDITION, false);
             break;
         }
     }
@@ -1106,11 +1106,12 @@ float CombatFormulas::GetGunSpread(
         float* v10 = &fUnaimedSpreadPenalty.Float();
         fretVal = fretVal + *v10;
     }
-    float factorLeftArmCondition = CombatFormulas::GetBodyPartCondition(apActor, ActorValue::LEFT_ATTACK_CONDITION, 0);
+    float factorLeftArmCondition =
+        CombatFormulas::GetBodyPartCondition(apActor, ActorValue::LEFT_ATTACK_CONDITION, false);
     float factorRightArmCondition =
-        CombatFormulas::GetBodyPartCondition(apActor, ActorValue::RIGHT_ATTACK_CONDITION, 0);
+        CombatFormulas::GetBodyPartCondition(apActor, ActorValue::RIGHT_ATTACK_CONDITION, false);
     // The head condition is fetched and never read, as the game does.
-    float factorHeadCondition = CombatFormulas::GetBodyPartCondition(apActor, ActorValue::PERCEPTION_CONDITION, 0);
+    float factorHeadCondition = CombatFormulas::GetBodyPartCondition(apActor, ActorValue::PERCEPTION_CONDITION, false);
     (void)factorHeadCondition;
     if (!apActor->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS)) {
         if (factorLeftArmCondition == 0.0 && factorRightArmCondition == 0.0) {
@@ -1191,36 +1192,39 @@ float CombatFormulas::CalcWeaponDamageForDisplay(
         avOwner = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer)));
     }
     else {
-        avOwner = 0;
+        avOwner = nullptr;
     }
     fresult = CombatUtilities::CalculateItemDPS(
-        avOwner, apWeapon, afCondition, 1, apItem, 0, 0, -1, 0.0f, 0.0f, 0, 0, apLoadedAmmo
+        avOwner, apWeapon, afCondition, true, apItem, false, false, -1, 0.0f, 0.0f, false, false, apLoadedAmmo
     );
     if (apWeapon && (apWeapon->IsAutomaticWeapon() && apWeapon->IsMeleeWeapon())) {
         ActorValueOwner* apActor;
-        apWeapon->SetAutomaticWeapon(0);
+        apWeapon->SetAutomaticWeapon(false);
         if (pPlayer) {
             apActor = &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer)));
         }
         else {
-            apActor = 0;
+            apActor = nullptr;
         }
-        fresult =
-            CombatFormulas::CalcWeaponDamage(apActor, apWeapon, afCondition, 1.0f, 0, 0, apItem, apLoadedAmmo != 0);
-        apWeapon->SetAutomaticWeapon(1);
+        fresult = CombatFormulas::CalcWeaponDamage(
+            apActor, apWeapon, afCondition, 1.0f, false, false, apItem, apLoadedAmmo != nullptr
+        );
+        apWeapon->SetAutomaticWeapon(true);
     }
     else {
         if (pPlayer) {
             fresult = CombatFormulas::CalcWeaponDamage(
                 &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer))), apWeapon,
-                afCondition, 1.0f, 0, 0, apItem, apLoadedAmmo != 0
+                afCondition, 1.0f, false, false, apItem, apLoadedAmmo != nullptr
             );
         }
         else {
-            fresult = CombatFormulas::CalcWeaponDamage(0, apWeapon, afCondition, 1.0f, 0, 0, apItem, apLoadedAmmo != 0);
+            fresult = CombatFormulas::CalcWeaponDamage(
+                nullptr, apWeapon, afCondition, 1.0f, false, false, apItem, apLoadedAmmo != nullptr
+            );
         }
     }
-    TESAmmo* v11 = 0;
+    TESAmmo* v11 = nullptr;
     if (apWeapon) {
         TESAmmo* CurrentAmmo;
         if (apLoadedAmmo) {
@@ -1232,7 +1236,7 @@ float CombatFormulas::CalcWeaponDamageForDisplay(
         v11 = CurrentAmmo;
     }
     if (!v11) {
-        v11 = apWeapon->GetCurrentAmmo(0);
+        v11 = apWeapon->GetCurrentAmmo(nullptr);
     }
     if (v11) {
         if (apWeapon) {
@@ -1269,7 +1273,7 @@ float CombatFormulas::CalcCombatWeaponDPS(
         if (apActorForm->GetFormType() == CREA_ID || apActorForm->GetFormType() == NPC__ID) {
             TESActorBase* pActorBase = static_cast<TESActorBase*>(apActorForm);
             fdamagePerSecond = CombatUtilities::CalculateItemDPS(
-                pActorBase, apWeapon, afCondition, 0, apItem, 0, 0, -1, 0.0f, 0.0f, 0, 0, apAmmo
+                pActorBase, apWeapon, afCondition, false, apItem, false, false, -1, 0.0f, 0.0f, false, false, apAmmo
             );
             if (!apCombatStyle) {
                 apCombatStyle = pActorBase->GetCombatStyle();
@@ -1278,7 +1282,7 @@ float CombatFormulas::CalcCombatWeaponDPS(
         else {
             Actor* pActor = static_cast<Actor*>(apActorForm);
             fdamagePerSecond = CombatUtilities::CalculateItemDPS(
-                pActor, apWeapon, afCondition, 0, apItem, 0, 0, -1, 0.0f, 0.0f, 0, 0, apAmmo
+                pActor, apWeapon, afCondition, false, apItem, false, false, -1, 0.0f, 0.0f, false, false, apAmmo
             );
             if (!apCombatStyle) {
                 apCombatStyle = pActor->Actor::GetCombatStyle();
@@ -1410,26 +1414,27 @@ float CombatFormulas::CalcWeaponDamage(
     float v31 = 0.0f;
     if (!abIgnoreExplosion) {
         if (apWeapon) {
-            if (apWeapon->GetProjectile_(abUseCurrentAmmo ? apActor : 0)) {
-                if (apWeapon->GetProjectile_(abUseCurrentAmmo ? apActor : 0)->GetExplosion()) {
+            if (apWeapon->GetProjectile_(abUseCurrentAmmo ? apActor : nullptr)) {
+                if (apWeapon->GetProjectile_(abUseCurrentAmmo ? apActor : nullptr)->GetExplosion()) {
                     bool HasModEffectActive_0;
                     Actor* apWeaponHolder;
                     if (abUseCurrentAmmo) {
                         apWeaponHolder = dynamic_cast<Actor*>(apActor);
                     }
                     else {
-                        apWeaponHolder = 0;
+                        apWeaponHolder = nullptr;
                     }
                     if (apItem) {
                         HasModEffectActive_0 = apItem->HasModEffectActive(12);
                     }
                     else {
-                        HasModEffectActive_0 = 0;
+                        HasModEffectActive_0 = false;
                     }
-                    BGSProjectile* Projectile_ = apWeapon->GetProjectile_(abUseCurrentAmmo ? apActor : 0);
+                    BGSProjectile* Projectile_ = apWeapon->GetProjectile_(abUseCurrentAmmo ? apActor : nullptr);
                     double v19 = CombatFormulas::CalcExplosionDamage(Projectile_->GetExplosion());
                     v31 =
-                        static_cast<double>(apWeapon->GetNumProjectiles(HasModEffectActive_0, 0, apWeaponHolder)) * v19;
+                        static_cast<double>(apWeapon->GetNumProjectiles(HasModEffectActive_0, false, apWeaponHolder)) *
+                        v19;
                 }
             }
         }
@@ -1479,11 +1484,11 @@ float CombatFormulas::ChooseMeleeWeapon(float afWeaponDamage, int32_t aiArmorRat
     else {
         v5 = (&::fAIMeleeWeaponMult)->Float();
     }
-    return (float)(afWeaponDamage * v5);
+    return (afWeaponDamage * v5);
 }
 
 float CombatFormulas::CalcWeaponReach(float afReachMultiplier) {
-    return (float)(afReachMultiplier * ((&fCombatDistance)->Float()));
+    return (afReachMultiplier * (&fCombatDistance)->Float());
 }
 
 float CombatFormulas::CalcExplosionPowerDistance(float afExplosionRadius, float afPower) {
@@ -1491,7 +1496,7 @@ float CombatFormulas::CalcExplosionPowerDistance(float afExplosionRadius, float 
     if (fInvDamagerRatio < 0.0) {
         return 0.0;
     }
-    return (float)(NiSqrt(fInvDamagerRatio) * afExplosionRadius);
+    return (NiSqrt(fInvDamagerRatio) * afExplosionRadius);
 }
 
 float CombatFormulas::CalcCreatureDamage(float afFatiguePercent, int32_t aiBaseDamage) {
@@ -1538,7 +1543,7 @@ float CombatFormulas::CalcExplosionDamageDistance(
 }
 
 float CombatFormulas::CalcDamageToArmor(float afHealthDamage, float afArmorRatingPercent) {
-    return (float)(((&fDamageToArmorPercentage)->Float()) * (afHealthDamage * afArmorRatingPercent));
+    return ((&fDamageToArmorPercentage)->Float() * (afHealthDamage * afArmorRatingPercent));
 }
 
 // Each sum is computed in double precision and only the named values are stored as floats, as the game does.
@@ -1572,16 +1577,16 @@ float CombatFormulas::GetBodyPartCondition(ActorValueOwner* apActor, ActorValue:
 float CombatFormulas::GetKnockbackSpeed(ActorValueOwner* apActor, int32_t aiDamage) {
     float v7 = (float)(apActor->GetClampedActorFloatValue(ActorValue::AGILITY) * 10.0);
     float* v2 = &(&fKnockbackAgilBase)->Float();
-    float v9 = (((&::fKnockbackAgilMult)->Float()) * v7) + (*v2);
+    float v9 = ((&::fKnockbackAgilMult)->Float() * v7) + (*v2);
     float* v3 = &(&::fKnockbackDamageBase)->Float();
-    float v8 = (float)((((double)aiDamage) * ((&::fKnockbackDamageMult)->Float())) + (*v3));
-    return (float)(v9 * v8);
+    float v8 = (float)((((double)aiDamage) * (&::fKnockbackDamageMult)->Float()) + (*v3));
+    return (v9 * v8);
 }
 
 float CombatFormulas::CalcBlock(int32_t aiSkill) {
     float v4 = (float)(double)aiSkill;
     float* v1 = &(&fBlockSkillBase)->Float();
-    return (float)((((&::fBlockSkillMult)->Float()) * v4) + (*v1));
+    return (((&::fBlockSkillMult)->Float() * v4) + (*v1));
 }
 
 // Takes the bound when the two are equal or unordered.
@@ -1610,19 +1615,19 @@ float CombatFormulas::ChooseAttack(
     float rockSpeed;
     float altTimer;
     if (abTargetRecoiling) {
-        altTimer = (float)apCombatStyle->GetAttackDuringRecoilStaggerBonus();
+        altTimer = apCombatStyle->GetAttackDuringRecoilStaggerBonus();
     }
     else {
         altTimer = (float)0.0;
     }
     if (abTargetUnconscious) {
-        rockSpeed = (float)apCombatStyle->GetAttackDuringUnconsciousBonus();
+        rockSpeed = apCombatStyle->GetAttackDuringUnconsciousBonus();
     }
     else {
         rockSpeed = (float)0.0;
     }
     if (abHandToHand) {
-        unk88 = (float)apCombatStyle->GetAttackHandBonus();
+        unk88 = apCombatStyle->GetAttackHandBonus();
     }
     else {
         unk88 = (float)0.0;
@@ -1633,19 +1638,19 @@ float CombatFormulas::ChooseAttack(
     float v17 =
         (float)((((((double)((int8_t)apCombatStyle->GetAttackChance())) + altTimer) + rockSpeed) + unk88) + v16);
     if (abTargetAttacking) {
-        weatherPercent = (float)apCombatStyle->GetAttackDuringAttackMult();
+        weatherPercent = apCombatStyle->GetAttackDuringAttackMult();
     }
     else {
-        weatherPercent = (float)apCombatStyle->GetAttackNoAttackMult();
+        weatherPercent = apCombatStyle->GetAttackNoAttackMult();
     }
     float v18 = v17 * weatherPercent;
     if (abTargetBlocking) {
-        maxFarNearRatio = (float)apCombatStyle->GetAttackDuringBlockMult();
+        maxFarNearRatio = apCombatStyle->GetAttackDuringBlockMult();
     }
     else {
         maxFarNearRatio = (float)1.0;
     }
-    return (float)(v18 * maxFarNearRatio);
+    return (v18 * maxFarNearRatio);
 }
 
 float CombatFormulas::ChooseBlock(
@@ -1662,14 +1667,14 @@ float CombatFormulas::ChooseBlock(
     double v11 = apCombatStyle->GetBlockSkillBase() + isDebugTextVisible;
     float v13 = (float)((apCombatStyle->GetBlockSkillMult() * v15) + v11);
     if (abTargetAttacking) {
-        explosionTimer = (float)apCombatStyle->GetBlockDuringAttackMult();
+        explosionTimer = apCombatStyle->GetBlockDuringAttackMult();
     }
     else {
-        explosionTimer = (float)apCombatStyle->GetBlockNoAttackMult();
+        explosionTimer = apCombatStyle->GetBlockNoAttackMult();
     }
     float v14 = v13 * explosionTimer;
     if (abHasShield) {
-        return (float)(v14);
+        return v14;
     }
     if (abTargetAttacking) {
         v8 = (float)1.0;
@@ -1677,7 +1682,7 @@ float CombatFormulas::ChooseBlock(
     else {
         v8 = 0x1p-2f;
     }
-    return (float)((v14 * ((&::fBlockScoreNoShieldMult)->Float())) * v8);
+    return ((v14 * (&::fBlockScoreNoShieldMult)->Float()) * v8);
 }
 
 float CombatFormulas::ChooseDodge(
@@ -1696,17 +1701,17 @@ float CombatFormulas::ChooseDodge(
         dodgeDuringAttackMult = apCombatStyle->GetDodgeDuringAttackMult();
     }
     else {
-        dodgeDuringAttackMult = (float)apCombatStyle->GetDodgeNoAttackMult();
+        dodgeDuringAttackMult = apCombatStyle->GetDodgeNoAttackMult();
     }
-    return (float)(v9 * dodgeDuringAttackMult);
+    return (v9 * dodgeDuringAttackMult);
 }
 
 float CombatFormulas::GetWeaponConditionReloadJamMult(int32_t aiCondition) {
     float v3 = (float)0.0;
     if (((uint32_t)aiCondition) <= 9) {
-        return (float)(fWeaponConditionReloadJam[aiCondition]->Float());
+        return fWeaponConditionReloadJam[aiCondition]->Float();
     }
-    return (float)(v3);
+    return v3;
 }
 
 float CombatFormulas::ApplyArmorConditionScaling(float fArmorHealthPercent) {
@@ -1714,7 +1719,7 @@ float CombatFormulas::ApplyArmorConditionScaling(float fArmorHealthPercent) {
         return (float)(1.0 - ((0.5 - fArmorHealthPercent) * 1.0));
     }
     else {
-        return (float)(1.0);
+        return (float)1.0;
     }
 }
 
@@ -1725,18 +1730,18 @@ float CombatFormulas::CalcTargetedLimbDamage(ActorValueOwner* apTarget, BGSBodyP
     if (apTarget) {
         if (apBodyPart) {
             v6 = (float)(((double)apBodyPart->GetHealthPercent()) * 0.009999999776482582);
-            v5 = (float)apTarget->GetBaseActorFloatValue(ActorValue::HEALTH);
+            v5 = apTarget->GetBaseActorFloatValue(ActorValue::HEALTH);
             if (!(v5 <= 0.0)) {
                 if (v6 > 0.0) {
                     return (float)((afHealthDamage / (v6 * v5)) * 100.0);
                 }
             }
             else {
-                return (float)(afHealthDamage);
+                return afHealthDamage;
             }
         }
     }
-    return (float)(v7);
+    return v7;
 }
 
 float CombatFormulas::GetCriticalChance(ActorValueOwner* apActor, TESObjectWEAP* apWeapon) {
@@ -1776,14 +1781,14 @@ bool CombatFormulas::ChoosePowerAttack(
     float fUnconsciousBonus;
     float fRecoilBonus;
     if (abEncumbered) {
-        return 0;
+        return false;
     }
     float v9 = static_cast<float>(apCombatStyle->QPowerAttackChance());
     if (v9 == 0.0) {
-        return 0;
+        return false;
     }
     if (v9 >= 100.0) {
-        return 1;
+        return true;
     }
     if (abTargetRecoiling) {
         fRecoilBonus = apCombatStyle->Data.fPowerAttackRecoilStaggerBonus;
@@ -1884,11 +1889,11 @@ float CombatFormulas::GetWeaponRateOfFire(ActorValueOwner* apActor, TESObjectWEA
         );
         frateOfFire = Actor::GetAttackSpeedMult(v3, apWeapon, 1, apItem);
     }
-    bool bUseSplit = 0;
+    bool bUseSplit = false;
     if (apItem) {
         bUseSplit = apItem->HasModEffectActive(12);
     }
-    return static_cast<double>(apWeapon->GetNumProjectiles(bUseSplit, 0, pactor)) * frateOfFire;
+    return static_cast<double>(apWeapon->GetNumProjectiles(bUseSplit, false, pactor)) * frateOfFire;
 }
 
 float CombatFormulas::ApplyWeaponConditionScaling(float fWeapHealthPercent) {
@@ -1911,8 +1916,8 @@ void CombatFormulas::CheckDismemberOrExplode(
     bool& abExplode
 ) {
     int32_t iexplodeChance;
-    abDismember = 0;
-    abExplode = 0;
+    abDismember = false;
+    abExplode = false;
     int32_t idieRoll = Random() % 100;
     if (abExplodeChanceAbsolute) {
         iexplodeChance = aiExplodeBonus + aiExplodeChance;
@@ -1926,26 +1931,26 @@ void CombatFormulas::CheckDismemberOrExplode(
     int32_t idismemberChance = iCombatDismemberPartChance.Int() + aiDismemberBonus;
     if (idieRoll >= iexplodeChance) {
         if (idieRoll < idismemberChance) {
-            abDismember = 1;
+            abDismember = true;
         }
     }
     else {
-        abExplode = 1;
+        abExplode = true;
     }
     if (apWeapon) {
         if (abExplode || abDismember) {
             WEAPONHITBEHAVIOR eHitBehavior = apWeapon->data.eHitBehavior;
             if (eHitBehavior == WHB_DISMEMBER_ONLY) {
-                abExplode = 0;
-                abDismember = 1;
+                abExplode = false;
+                abDismember = true;
             }
             else if (eHitBehavior == WHB_EXPLODE_ONLY) {
-                abExplode = 1;
-                abDismember = 0;
+                abExplode = true;
+                abDismember = false;
             }
             else if (eHitBehavior == WHB_NO_DISMEMBER_OR_EXPLODE) {
-                abExplode = 0;
-                abDismember = 0;
+                abExplode = false;
+                abDismember = false;
             }
         }
     }
@@ -1986,7 +1991,7 @@ double CombatFormulas::CalcExplosionDamage(BGSExplosion* apActorBase) {
         fDamage = 0.0;
     }
     float* fDamageGunWeapCondBase = &::fDamageGunWeapCondBase.Float();
-    return static_cast<float>((fDamageGunWeapCondMult.Float() + *fDamageGunWeapCondBase) * fDamage);
+    return ((fDamageGunWeapCondMult.Float() + *fDamageGunWeapCondBase) * fDamage);
 }
 
 float BGSProjectile::GetExplosionProximity() {

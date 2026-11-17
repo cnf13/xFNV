@@ -27,10 +27,10 @@ float BSFaceGenKeyframe::GetTime() {
 
 bool BSFaceGenKeyframe::SetTime(float a2) {
     if (fTime == a2) {
-        return (bool)0;
+        return false;
     }
     fTime = a2;
-    return (bool)1;
+    return true;
 }
 
 bool BSFaceGenKeyframe::IsMultiple() {
@@ -108,18 +108,18 @@ bool BSFaceGenKeyframeMultiple::MergeMorphDataFrom(BSFaceGenKeyframe* a2, float 
     }
     int8_t v15 = 0;
     if (!v12) {
-        return (bool)0;
+        return false;
     }
     if (v12 == this) {
-        return (bool)0;
+        return false;
     }
     int32_t v5 = (int32_t)GetType();
     if (v5 != ((int32_t)v12->GetType())) {
-        return (bool)0;
+        return false;
     }
     uint32_t uiNumQuantities = GetNumQuantities();
     if (uiNumQuantities != v12->GetNumQuantities()) {
-        return (bool)0;
+        return false;
     }
     if (!(a3 < 0.0)) {
         if (!(a3 > 1.0)) {
@@ -167,31 +167,31 @@ bool BSFaceGenKeyframeMultiple::MergeMorphDataFrom(BSFaceGenKeyframe* a1, BSFace
         v15 = static_cast<BSFaceGenKeyframeMultiple*>(a1);
     }
     else {
-        v15 = 0;
+        v15 = nullptr;
     }
     BSFaceGenKeyframeMultiple* v25 = v15;
     if (a2 && a2->IsMultiple()) {
         v14 = static_cast<BSFaceGenKeyframeMultiple*>(a2);
     }
     else {
-        v14 = 0;
+        v14 = nullptr;
     }
     BSFaceGenKeyframeMultiple* v22 = v14;
     char v23 = 0;
     char v21 = 0;
-    bool v20 = 0;
+    bool v20 = false;
     if (!v15) {
-        return 0;
+        return false;
     }
     if (!v14) {
-        return 0;
+        return false;
     }
     if (v15 == v14) {
-        return 0;
+        return false;
     }
     BS_FACEGEN_MORPH_TYPE v4 = v15->GetType();
     if (v4 != v14->GetType()) {
-        return 0;
+        return false;
     }
     if (v15 == this) {
         BSFaceGenKeyframeMultiple* v13;
@@ -201,7 +201,7 @@ bool BSFaceGenKeyframeMultiple::MergeMorphDataFrom(BSFaceGenKeyframe* a1, BSFace
             v13 = ::new (apMemory) BSFaceGenKeyframeMultiple(this);
         }
         else {
-            v13 = 0;
+            v13 = nullptr;
         }
         v25 = v13;
         v23 = 1;
@@ -215,7 +215,7 @@ bool BSFaceGenKeyframeMultiple::MergeMorphDataFrom(BSFaceGenKeyframe* a1, BSFace
                 v12 = ::new (v17) BSFaceGenKeyframeMultiple(this);
             }
             else {
-                v12 = 0;
+                v12 = nullptr;
             }
             v22 = v12;
             v21 = 1;
@@ -303,7 +303,7 @@ void BSFaceGenKeyframeMultiple::CopyFrom(BSFaceGenKeyframe* a1) {
         v6 = static_cast<BSFaceGenKeyframeMultiple*>(a1);
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     if (v6) {
         BS_FACEGEN_MORPH_TYPE v2 = v6->GetType();
@@ -311,7 +311,7 @@ void BSFaceGenKeyframeMultiple::CopyFrom(BSFaceGenKeyframe* a1) {
         float afQuantity = v6->GetTime();
         SetTime(afQuantity);
         uint32_t Thread = v6->iNumQuantities;
-        ResetQuantityArray(Thread, 1);
+        ResetQuantityArray(Thread, true);
         for (uint32_t aiWhichMorph = 0; aiWhichMorph < iNumQuantities; ++aiWhichMorph) {
             float afQuantitya = v6->GetQuantity(aiWhichMorph);
             SetQuantity(aiWhichMorph, afQuantitya);
@@ -325,26 +325,26 @@ bool BSFaceGenKeyframeMultiple::Compare(BSFaceGenKeyframe* a1) {
         v6 = static_cast<BSFaceGenKeyframeMultiple*>(a1);
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     if (!v6) {
-        return 1;
+        return true;
     }
     BS_FACEGEN_MORPH_TYPE v2 = v6->GetType();
     if (v2 != GetType()) {
-        return 1;
+        return true;
     }
     uint32_t Thread = v6->iNumQuantities;
     if (Thread != iNumQuantities) {
-        return 1;
+        return true;
     }
     for (uint32_t aiWhichMorph = 0; aiWhichMorph < iNumQuantities; ++aiWhichMorph) {
         double Quantity = v6->GetQuantity(aiWhichMorph);
         if (Quantity != GetQuantity(aiWhichMorph)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 float BSFaceGenKeyframeMultiple::GetStrength() {
@@ -362,10 +362,10 @@ bool BSFaceGenKeyframeMultiple::IsEmpty() {
     uint32_t i;
     for (i = 0; i < iNumQuantities; ++i) {
         if (IsValidQuantity(i) && (pQuantities[i] > 0.0)) {
-            return (bool)0;
+            return false;
         }
     }
-    return (bool)1;
+    return true;
 }
 
 void BSFaceGenKeyframeMultiple::SetToZero() {
@@ -378,22 +378,22 @@ bool BSFaceGenKeyframeMultiple::UpdateToTarget(float a1, BSFaceGenKeyframe* a2) 
         v12 = static_cast<BSFaceGenKeyframeMultiple*>(a2);
     }
     else {
-        v12 = 0;
+        v12 = nullptr;
     }
     char v15 = 0;
     if (a1 <= 0.0) {
-        return 0;
+        return false;
     }
     if (!v12) {
-        return 0;
+        return false;
     }
     BS_FACEGEN_MORPH_TYPE v3 = v12->GetType();
     if (v3 != GetType()) {
-        return 0;
+        return false;
     }
     uint32_t Thread = v12->iNumQuantities;
     if (Thread != iNumQuantities || !Compare(v12)) {
-        return 0;
+        return false;
     }
     double v11 = BSFaceGenAnimationData::GetExpressionTargetChangePerSec();
     double ExpressionStrengthAddPerSec = BSFaceGenAnimationData::GetExpressionStrengthAddPerSec();
@@ -420,7 +420,7 @@ bool BSFaceGenKeyframeMultiple::UpdateToTarget(float a1, BSFaceGenKeyframe* a2) 
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool BSFaceGenKeyframeMultiple::IsTargetAvailable() {
@@ -429,10 +429,10 @@ bool BSFaceGenKeyframeMultiple::IsTargetAvailable() {
     for (i = 0; i < ((uint32_t)((int32_t)iNumQuantities)); ++i) {
         v2 = pQuantities[i];
         if ((!(v2 < 0.0)) && ((!(v2 > 1.0)) && (v2 > 0.0))) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 bool BSFaceGenKeyframeMultiple::IsMultiple() {
@@ -441,7 +441,7 @@ bool BSFaceGenKeyframeMultiple::IsMultiple() {
 
 bool BSFaceGenKeyframeMultiple::IsValidQuantity(uint32_t aiWhichMorph) {
     if (aiWhichMorph >= iNumQuantities) {
-        return (bool)0;
+        return false;
     }
     return (bool)((uint8_t)((pQuantities[aiWhichMorph] >= 0.0) && (pQuantities[aiWhichMorph] <= 1.0)));
 }
@@ -455,7 +455,7 @@ void BSFaceGenKeyframeMultiple::ResetQuantityArray(uint32_t aiNumQuantities, boo
         iNumQuantities = aiNumQuantities;
         if (iNumQuantities) {
             pQuantities = static_cast<float*>(
-                ourMalloc(((((uint64_t)iNumQuantities) >> 30) != 0) ? ((uint32_t)((-1))) : (4 * iNumQuantities))
+                ourMalloc(((((uint64_t)iNumQuantities) >> 30) != 0) ? ((uint32_t)(-1)) : (4 * iNumQuantities))
             );
             BSFaceGenManager::ResetQuantityArray(pQuantities, iNumQuantities, abForceZero);
         }
@@ -467,10 +467,10 @@ void BSFaceGenKeyframeMultiple::ResetQuantityArray(uint32_t aiNumQuantities, boo
 
 float BSFaceGenKeyframeMultiple::GetQuantity(uint32_t aiWhichMorph) const {
     if (aiWhichMorph >= iNumQuantities) {
-        return (float)(0.0);
+        return (float)0.0;
     }
     else {
-        return (float)(pQuantities[aiWhichMorph]);
+        return pQuantities[aiWhichMorph];
     }
 }
 
@@ -480,10 +480,10 @@ void BSFaceGenKeyframeMultiple::SetQuantityNoTest(uint32_t aiWhichMorph, float a
 
 bool BSFaceGenKeyframeMultiple::SetQuantity(uint32_t aiWhichMorph, float afQuantity) {
     if ((aiWhichMorph >= iNumQuantities) || (afQuantity == pQuantities[aiWhichMorph])) {
-        return (bool)0;
+        return false;
     }
     pQuantities[aiWhichMorph] = afQuantity;
-    return (bool)1;
+    return true;
 }
 
 uint32_t BSFaceGenKeyframeMultiple::GetNumQuantities() {
@@ -496,7 +496,7 @@ void BSFaceGenKeyframeMultiple::operator=(BSFaceGenKeyframeMultiple* a2) {
         float afQuantity = a2->GetTime();
         SetTime(afQuantity);
         uint32_t Thread = a2->iNumQuantities;
-        ResetQuantityArray(Thread, 1);
+        ResetQuantityArray(Thread, true);
         for (uint32_t aiWhichMorph = 0; aiWhichMorph < iNumQuantities; ++aiWhichMorph) {
             float afQuantitya = a2->GetQuantity(aiWhichMorph);
             SetQuantity(aiWhichMorph, afQuantitya);

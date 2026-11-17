@@ -102,7 +102,7 @@ bool PathManager::BuildPath(
         pSolution = ::new (pMemory) PathingSolution;
     }
     else {
-        pSolution = 0;
+        pSolution = nullptr;
     }
     NiPointer<PathingSolution> spSolution(pSolution);
     if (Pathing::BuildPath(aspRequest.m_pObject, spSolution.m_pObject)) {
@@ -144,15 +144,15 @@ bool PathManager::DrawPath(NiPointer<NiNode>& aspNode, bool abDraw) {
 bool PathManager::Initialize() {
     PathManagerImpl* v2;
     AutoMemContext apMemory(
-        MEM_CONTEXT_PATHING, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Pathfinding\\PathManager.cpp",
-        1386
+        MEM_CONTEXT_PATHING, true,
+        "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Pathfinding\\PathManager.cpp", 1386
     );
     PathManagerImpl* v5 = static_cast<PathManagerImpl*>(ourMalloc(sizeof(PathManagerImpl)));
     if (v5) {
         v2 = ::new (v5) PathManagerImpl;
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     pImpl = v2;
     bool v4 = pImpl->Initialize();
@@ -267,15 +267,15 @@ uint8_t PathingTaskData::GetWaitingForRayCasts() {
 }
 
 bool PathingTaskData::AllRayCastPathComputed() {
-    RayCastLock.Lock(0);
+    RayCastLock.Lock(nullptr);
     for (uint32_t uiIndex = 0; uiIndex < RayCastPaths.iSize; ++uiIndex) {
         if (!RayCastPaths.GetAt(uiIndex)->eResult) {
             RayCastLock.Unlock();
-            return 0;
+            return false;
         }
     }
     RayCastLock.Unlock();
-    return 1;
+    return true;
 }
 
 RAYCASTPATH_RESULT PathingTaskData::GetRayCastPath(
@@ -286,7 +286,7 @@ RAYCASTPATH_RESULT PathingTaskData::GetRayCastPath(
     RayCastPath* ppath;
     RayCastPathRequest* prequest;
     RAYCASTPATH_RESULT eret = RCP_NONE;
-    RayCastLock.Lock(0);
+    RayCastLock.Lock(nullptr);
     for (uint32_t i = 0; i < RayCastPaths.iSize; ++i) {
         if (RayCastPaths.GetAt(static_cast<int32_t>(i))->eType == RCRT_NOMESH &&
             (RayCastRequests.GetAt(static_cast<int32_t>(i))->StartLocation.IsCloseTo(aStartLocation, 0.1f) &&
@@ -314,7 +314,7 @@ RAYCASTPATH_RESULT PathingTaskData::GetRayCastPath(
         prequest = ::new (apMemory) RayCastPathRequest;
     }
     else {
-        prequest = 0;
+        prequest = nullptr;
     }
     RayCastPathRequest* prequest_2 = prequest;
     prequest->pInitialPathRequest = spRequest.m_pObject;
@@ -326,7 +326,7 @@ RAYCASTPATH_RESULT PathingTaskData::GetRayCastPath(
         ppath = ::new (v8) RayCastPath;
     }
     else {
-        ppath = 0;
+        ppath = nullptr;
     }
     RayCastPath* ppath_2 = ppath;
     ppath->eType = prequest_2->eType;
@@ -334,7 +334,7 @@ RAYCASTPATH_RESULT PathingTaskData::GetRayCastPath(
     RayCastRequests.Add(prequest_2);
     RayCastPaths.Add(ppath_2);
     RayCastLock.Unlock();
-    bWaitingForRayCasts = 1;
+    bWaitingForRayCasts = true;
     return eret;
 }
 
@@ -347,7 +347,7 @@ RAYCASTPATH_RESULT PathingTaskData::GetRayCastPathToNavmesh(
     RayCastPath* ppath;
     RayCastPathRequest* prequest;
     RAYCASTPATH_RESULT eret = RCP_NONE;
-    RayCastLock.Lock(0);
+    RayCastLock.Lock(nullptr);
     for (uint32_t i = 0; i < RayCastPaths.iSize; ++i) {
         if (RayCastPaths.GetAt(static_cast<int32_t>(i))->eType == !abStart &&
             RayCastRequests.GetAt(static_cast<int32_t>(i))->GoalLocation.IsCloseTo(aGoalLocation, 0.1f)) {
@@ -374,7 +374,7 @@ RAYCASTPATH_RESULT PathingTaskData::GetRayCastPathToNavmesh(
         prequest = ::new (apMemory) RayCastPathRequest;
     }
     else {
-        prequest = 0;
+        prequest = nullptr;
     }
     RayCastPathRequest* prequest_2 = prequest;
     prequest->pInitialPathRequest = spRequest.m_pObject;
@@ -386,7 +386,7 @@ RAYCASTPATH_RESULT PathingTaskData::GetRayCastPathToNavmesh(
         ppath = ::new (v9) RayCastPath;
     }
     else {
-        ppath = 0;
+        ppath = nullptr;
     }
     RayCastPath* ppath_2 = ppath;
     ppath->eType = prequest_2->eType;
@@ -394,7 +394,7 @@ RAYCASTPATH_RESULT PathingTaskData::GetRayCastPathToNavmesh(
     RayCastRequests.Add(prequest_2);
     RayCastPaths.Add(ppath_2);
     RayCastLock.Unlock();
-    bWaitingForRayCasts = 1;
+    bWaitingForRayCasts = true;
     return eret;
 }
 
@@ -443,7 +443,7 @@ bool PathManagerImpl::DrawPath(NiPointer<NiNode>& aspNode, bool abDraw) {
         BSTMessageQueue* ppathsToRemove = &PathsToRemove;
         ppathsToRemove->Push(&aspNode);
     }
-    return 1;
+    return true;
 }
 
 RAYCASTPATH_RESULT PathManagerImpl::GetRayCastPathToNavmesh(
@@ -453,7 +453,7 @@ RAYCASTPATH_RESULT PathManagerImpl::GetRayCastPathToNavmesh(
     BSSimpleArray<PathingLocation, 1024>& aRetPath,
     bool abStart
 ) {
-    PathingTaskData* ptaskletData = 0;
+    PathingTaskData* ptaskletData = nullptr;
     // GetAt is called through a pointer so that it goes through the map's vtable; a call on the member itself would be
     // devirtualised.
     LockFreeMap<PathingRequest*, PathingTaskData*>* prequestMap = &RequestToTaskletDataMap;
@@ -471,7 +471,7 @@ RAYCASTPATH_RESULT PathManagerImpl::GetRayCastPath(
     PathingLocation& aGoalLocation,
     BSSimpleArray<PathingLocation, 1024>& aRetPath
 ) {
-    PathingTaskData* ptaskletData = 0;
+    PathingTaskData* ptaskletData = nullptr;
     if (RequestToTaskletDataMap.GetAt(apRequest, ptaskletData)) {
         return ptaskletData->GetRayCastPath(aStartLocation, aGoalLocation, aRetPath);
     }
@@ -487,10 +487,10 @@ void PathManagerImpl::ClearInventoryPointersFromCurrentRequests(InventoryChanges
     while (!it.GetFinished()) {
         PathingRequest* prequest;
         PathingTaskData* ptaskData;
-        if (RequestToTaskletDataMap.GetNext(it, prequest, ptaskData, 1) &&
+        if (RequestToTaskletDataMap.GetNext(it, prequest, ptaskData, true) &&
             prequest->LockData.pInventory == apInventory) {
-            prequest->LockData.pInventory = 0;
-            prequest->LockData.pActorBase = 0;
+            prequest->LockData.pInventory = nullptr;
+            prequest->LockData.pActorBase = nullptr;
         }
     }
     UpdateCriticalSection.Leave();
@@ -507,7 +507,7 @@ bool PathManagerImpl::BuildPath(
         pTaskData = ::new (pMemory) PathingTaskData(aspRequest, aspMessageQueue);
     }
     else {
-        pTaskData = 0;
+        pTaskData = nullptr;
     }
     BSTasklet task;
     task.pData = pTaskData;
@@ -516,7 +516,7 @@ bool PathManagerImpl::BuildPath(
     LockFreeMap<PathingRequest*, PathingTaskData*>* prequestMap = &RequestToTaskletDataMap;
     prequestMap->SetAt(aspRequest.m_pObject, pTaskData, true);
     bool bResult;
-    if (AttachTask(task, 0)) {
+    if (AttachTask(task, false)) {
         bResult = true;
     }
     else {
@@ -554,17 +554,17 @@ void PathManagerImpl::Update() {
     while (!it.GetFinished()) {
         PathingRequest* prequest;
         PathingTaskData* ptaskData;
-        if (RequestToTaskletDataMap.GetNext(it, prequest, ptaskData, 1) && ptaskData->bWaitingForRayCasts) {
+        if (RequestToTaskletDataMap.GetNext(it, prequest, ptaskData, true) && ptaskData->bWaitingForRayCasts) {
             int32_t v1 = ptaskData->ComputeRayCasts();
             itotalRayCasts += v1;
             if (itotalRayCasts > 10) {
                 break;
             }
             if (ptaskData->AllRayCastPathComputed()) {
-                ptaskData->bWaitingForRayCasts = 0;
+                ptaskData->bWaitingForRayCasts = false;
                 BSTasklet task;
                 task.pData = ptaskData;
-                AttachTask(task, 0);
+                AttachTask(task, false);
             }
         }
     }
@@ -589,8 +589,8 @@ void PathManagerImpl::Update() {
             default: break;
         }
     }
-    bool bpathsChanged = 0;
-    NiPointer<NiAVObject> spnode(static_cast<NiAVObject*>(0));
+    bool bpathsChanged = false;
+    NiPointer<NiAVObject> spnode(static_cast<NiAVObject*>(nullptr));
     while (ppathsToRemove->TryPop(&spnode)) {
         if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
             NiAVObject* v7 = spnode.m_pObject;
@@ -601,20 +601,20 @@ void PathManagerImpl::Update() {
             NiNode* v10 = NavMeshRender::spRootDrawNode.m_pObject;
             v10->DetachChild(spnode.m_pObject);
         }
-        bpathsChanged = 1;
+        bpathsChanged = true;
     }
     while (ppathsToDraw->TryPop(&spnode)) {
         if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
             NiNode* afTime = NavMeshRender::spRootDrawNode.m_pObject;
             NiAVObject* v5 = spnode.m_pObject;
             TaskQueueInterface* v3 = TaskQueueInterface::GetInstance();
-            v3->QueueNodeAttach(v5, afTime, 1, 0);
+            v3->QueueNodeAttach(v5, afTime, true, false);
         }
         else {
             NiNode* v9 = NavMeshRender::spRootDrawNode.m_pObject;
             v9->AttachChild(spnode.m_pObject, 1);
         }
-        bpathsChanged = 1;
+        bpathsChanged = true;
     }
     if (bpathsChanged) {
         if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
@@ -623,7 +623,7 @@ void PathManagerImpl::Update() {
             v4->QueueObjectUpdate(v8);
         }
         else {
-            NiUpdateData updateData(0.0f, 0, 0);
+            NiUpdateData updateData(0.0f, false, false);
             NavMeshRender::spRootDrawNode.m_pObject->Update(updateData);
         }
     }
@@ -672,8 +672,8 @@ void PathManagerImpl::CancelCurrentPathsAndPause() {
     using it_t = LockFreeMap<PathingRequest*, PathingTaskData*>::LockFreeMapIterator;
     UpdateCriticalSection.Enter("PathManagerImpl::CancelCurrentPathsAndPause");
     Close();
-    bCancelPaths = 1;
-    WaitForCompletion(0);
+    bCancelPaths = true;
+    WaitForCompletion(false);
     msg.~PathingMessage();
     ::new (&msg) PathingMessage;
     // The queue's TryPop and the map's RemoveAt are called through base pointers so that they stay virtual calls; calls
@@ -697,7 +697,7 @@ void PathManagerImpl::CancelCurrentPathsAndPause() {
     while (!it.GetFinished()) {
         PathingRequest* apThis_16;
         PathingTaskData* ptaskData;
-        if (RequestToTaskletDataMap.GetNext(it, apThis_16, ptaskData, 1)) {
+        if (RequestToTaskletDataMap.GetNext(it, apThis_16, ptaskData, true)) {
             ActorPathingMessageQueue* v2 = ptaskData->spMessageQueue.m_pObject;
             ActorPathingMessage* v1 = ::new (&v4) ActorPathingMessage(1u, ptaskData->spSolution);
             v2->Push(v1);
@@ -710,7 +710,7 @@ void PathManagerImpl::CancelCurrentPathsAndPause() {
     RequestToTaskletDataMap.RemoveAll(false);
     SpinLock.LockForWrite();
     eState = PathManagerImpl::PATH_MANAGER_STATE_PAUSED;
-    bCancelPaths = 0;
+    bCancelPaths = false;
     Open();
     UpdateCriticalSection.Leave();
 }
@@ -718,15 +718,15 @@ void PathManagerImpl::CancelCurrentPathsAndPause() {
 bool PathManagerImpl::Initialize() {
     BSTaskletManager* singleton = &BSTaskletManager::QInstance();
     if (!singleton->CreateTaskGroup(*this)) {
-        return (bool)0;
+        return false;
     }
     if (!BSTaskletGroup::Open()) {
-        return (bool)0;
+        return false;
     }
     eState = PATH_MANAGER_STATE_IDLE;
     iPauseRetryCount = (uint32_t)0;
-    bCancelPaths = (bool)0;
-    return (bool)1;
+    bCancelPaths = false;
+    return true;
 }
 
 bool PathManagerImpl::QCancelPaths() const {

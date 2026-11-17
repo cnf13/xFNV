@@ -124,7 +124,7 @@
 #include "SDK/MSVC/string.h"
 
 #include <cctype>
-#include <stdint.h>
+#include <cstdint>
 
 // The game settings this file defines, with their IDs and default values, in initialization order.
 SettingT<INISettingCollection> fAnimationMult("fAnimationMult:General", 1.0f);
@@ -159,13 +159,14 @@ AnimIdle::AnimIdle(
     if (spKFModel) {
         for (int32_t n = 0; n < 2; ++n) {
             if (pAnimObj[n] && apActor) {
-                spAddOnObj[n] =
-                    static_cast<NiNode*>(BipedAnim::LoadAndAttachAddOn(pAnimObj[n], pAnimObj[n], BO_NONE, apActor, 0));
+                spAddOnObj[n] = static_cast<NiNode*>(
+                    BipedAnim::LoadAndAttachAddOn(pAnimObj[n], pAnimObj[n], BO_NONE, apActor, nullptr)
+                );
                 NiControllerManager* pManager = apActor->GetAnimation()->GetControllerManager();
                 RecurseAndAddObjectsToPalette(
                     spAddOnObj[n], static_cast<NiDefaultAVObjectPalette*>(pManager->GetObjectPalette())
                 );
-                apActor->SetUpdateLighting(1);
+                apActor->SetUpdateLighting(true);
             }
         }
         if (!abForceLoad) {
@@ -206,7 +207,7 @@ KFModel* AnimIdle::GetKFModel() {
 
 void AnimIdle::Loaded(KFModel* apKFModel) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_ANIMATION, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Animation.cpp", 0x1101
+        MEM_CONTEXT_ANIMATION, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Animation.cpp", 0x1101
     );
     spKFModel.operator=(apKFModel);
     if (!apKFModel) {
@@ -219,10 +220,12 @@ void AnimIdle::Loaded(KFModel* apKFModel) {
                 NiNode* v2;
                 TESObjectANIO* v5 = pAnimObj[n];
                 if (v5) {
-                    v2 = static_cast<NiNode*>(BipedAnim::LoadAndAttachAddOn(pAnimObj[n], v5, BO_NONE, pActor, 0));
+                    v2 = static_cast<NiNode*>(BipedAnim::LoadAndAttachAddOn(pAnimObj[n], v5, BO_NONE, pActor, nullptr));
                 }
                 else {
-                    v2 = static_cast<NiNode*>(BipedAnim::LoadAndAttachAddOn(pAnimObj[n], 0, BO_NONE, pActor, 0));
+                    v2 = static_cast<NiNode*>(
+                        BipedAnim::LoadAndAttachAddOn(pAnimObj[n], nullptr, BO_NONE, pActor, nullptr)
+                    );
                 }
                 spAddOnObj[n].operator=(v2);
                 Animation* v3 = pActor->GetAnimation();
@@ -230,7 +233,7 @@ void AnimIdle::Loaded(KFModel* apKFModel) {
                 NiDefaultAVObjectPalette* apPalette =
                     static_cast<NiDefaultAVObjectPalette*>(ControllerManager->GetObjectPalette());
                 RecurseAndAddObjectsToPalette(spAddOnObj[n].m_pObject, apPalette);
-                pActor->SetUpdateLighting(1);
+                pActor->SetUpdateLighting(true);
             }
         }
     }
@@ -256,7 +259,7 @@ void AnimIdle::Loaded(KFModel* apKFModel) {
             }
         }
         else {
-            panim->SpecialIdleFree(1, 0);
+            panim->SpecialIdleFree(true, false);
         }
     }
     else {
@@ -297,7 +300,7 @@ void AnimIdle::LoadGame(BGSLoadFormBuffer* apBuffer, Animation* apAnimation) {
     if (eFlags == ANIM_IDLE_PLAYING) {
         if ((&spKFModel)->operator->()) {
             v3 = (&spKFModel)->operator->();
-            apAnimation->AddAnimation(v3, 0);
+            apAnimation->AddAnimation(v3, false);
         }
     }
 }
@@ -308,7 +311,7 @@ void AnimIdle::SaveGame(float afTime, Animation* apAnimation) {
     pSaveLoadGameOLD->SaveGameDataOLD(&eFlags, 4u);
     pSaveLoadGameOLD->SaveGameDataOLD(&eType, 4u);
     pSaveLoadGameOLD->SaveGameDataOLD(&eSection, 4u);
-    apData = pSeq.m_pObject != 0;
+    apData = pSeq.m_pObject != nullptr;
     pSaveLoadGameOLD->SaveGameDataOLD(&apData, 1u);
     if (apData) {
         AnimSequenceBase* val;
@@ -370,7 +373,7 @@ void AnimIdle::LoadGameTES(float a1, Animation* a2) {
     pSaveLoadGameOLD->LoadGameDataOLD(&bhasSequence, 1u);
     if (bhasSequence) {
         pSaveLoadGameOLD->LoadGameDataOLD(&csequenceIndex, 1u);
-        if (a2->AddAnimation(spKFModel.m_pObject, 0)) {
+        if (a2->AddAnimation(spKFModel.m_pObject, false)) {
             if (eFlags == AnimIdle::ANIM_IDLE_PLAYING) {
                 AnimSequenceBase* panimSeq;
                 uint16_t Type = spKFModel.m_pObject->GetAnimGroup()->GetType();
@@ -386,7 +389,7 @@ void AnimIdle::LoadGameTES(float a1, Animation* a2) {
             else {
                 if (eFlags) {
                     if (eFlags == AnimIdle::ANIM_IDLE_DONE_PLAYING) {
-                        AnimSequenceBase* panimSeq_2 = 0;
+                        AnimSequenceBase* panimSeq_2 = nullptr;
                         uint16_t v9 = spKFModel.m_pObject->GetAnimGroup()->GetType();
                         NiTPointerMap<uint16_t, AnimSequenceBase*>* v5 = a2->GetMapAnimSequenceBase();
                         if (v5->GetAt(v9, panimSeq_2)) {
@@ -539,7 +542,7 @@ void AnimIdle::FreeAnimIdleData(AnimIdle* apFreeIdle) {
                 }
                 const char* v6 = apFreeIdle->pAnimObj[n]->GetModel();
                 pModelLoader->ReleaseFile(v6);
-                apFreeIdle->spAddOnObj[n].operator=(static_cast<NiNode*>(0));
+                apFreeIdle->spAddOnObj[n].operator=(static_cast<NiNode*>(nullptr));
                 if (apFreeIdle->pSeq.m_pObject) {
                     apFreeIdle->pSeq.m_pObject->ValidateTargets();
                 }
@@ -554,12 +557,12 @@ void AnimIdle::FreeAnimIdleData(AnimIdle* apFreeIdle) {
                     BaseProcess* CurrentAIProcess = apFreeIdle->pActor->pCurrentProcess;
                     BSAnimGroupSequence* v7 = CurrentAIProcess->GetAnimActionAnimSeq();
                     if (v7 == apFreeIdle->pSeq.m_pObject) {
-                        apFreeIdle->pActor->SetAnimAction(ANIM_ACTION_NONE, 0);
+                        apFreeIdle->pActor->SetAnimAction(ANIM_ACTION_NONE, nullptr);
                     }
                 }
             }
         }
-        apFreeIdle->pActor = 0;
+        apFreeIdle->pActor = nullptr;
     }
 }
 
@@ -569,11 +572,11 @@ AnimIdle* AnimIdle::LoadAnimIdle(Actor* apActor, Animation* apAnimation, float a
     uint16_t iblockSize;
     uint32_t iformID;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_ANIMATION, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Animation.cpp", 0x1218
+        MEM_CONTEXT_ANIMATION, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Animation.cpp", 0x1218
     );
-    AnimIdle* panimIdle = 0;
+    AnimIdle* panimIdle = nullptr;
     iblockSize = 0;
-    uint8_t* istartBufferPosition = 0;
+    uint8_t* istartBufferPosition = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockHeader, 4u);
         if (iblockHeader != 0x424C4F4B) {
@@ -602,7 +605,7 @@ AnimIdle* AnimIdle::LoadAnimIdle(Actor* apActor, Animation* apAnimation, float a
     bool bforcedToZero = pSaveLoadGameOLD->LoadNumericID(&iformID, 4u);
     if (iformID || bforcedToZero) {
         pSaveLoadGameOLD->LoadGameDataOLD(&isize, 2u);
-        TESIdleForm* pidle = 0;
+        TESIdleForm* pidle = nullptr;
         if (iformID) {
             TESForm* FormByNumericID = TESForm::GetFormByNumericID(iformID);
             pidle = dynamic_cast<TESIdleForm*>(FormByNumericID);
@@ -612,10 +615,10 @@ AnimIdle* AnimIdle::LoadAnimIdle(Actor* apActor, Animation* apAnimation, float a
             AnimIdle* v16 = static_cast<AnimIdle*>(NiMemObject::operator new(sizeof(AnimIdle)));
             if (v16) {
                 panimIdle_2 =
-                    ::new (v16) AnimIdle(pidle, AGS_SPECIAL_IDLE, AnimIdle::PLAY_TYPE_QUEUE, apActor, 1, nullptr);
+                    ::new (v16) AnimIdle(pidle, AGS_SPECIAL_IDLE, AnimIdle::PLAY_TYPE_QUEUE, apActor, true, nullptr);
             }
             else {
-                panimIdle_2 = 0;
+                panimIdle_2 = nullptr;
             }
             panimIdle = panimIdle_2;
             panimIdle_2->LoadGameTES(afTime, apAnimation);
@@ -764,7 +767,7 @@ void Animation::ClearBlendInterps() {
     uint32_t sequenceCount;
     if ((&spManager)->m_pObject) {
         v1 = (&spManager)->m_pObject;
-        sequenceCount = (uint32_t)v1->GetSequenceCount();
+        sequenceCount = v1->GetSequenceCount();
         for (uiIndex = 0; uiIndex < sequenceCount; ++uiIndex) {
             v2 = (&spManager)->m_pObject;
             pkObject = v2->GetSequenceAt(uiIndex);
@@ -878,7 +881,7 @@ void Animation::LoadGameBGS(BGSLoadFormBuffer* apBuffer) {
                       AnimIdle(pIdleForm, AGS_SPECIAL_IDLE, AnimIdle::PLAY_TYPE_QUEUE, pActor, true, nullptr)
                 : nullptr;
             spAnimIdle = pAnimIdle;
-            spAnimIdle->LoadGame(static_cast<BGSLoadFormBuffer*>(apBuffer), this);
+            spAnimIdle->LoadGame(apBuffer, this);
         }
     }
     int8_t cSequenceMask = 0;
@@ -944,17 +947,17 @@ uint16_t Animation::PickBestAnimation(uint16_t asAnimGroup, bool abRecursive) {
         return asAnimGroup;
     }
     if ((asAnimGroup & 0x8000) != 0) {
-        sreturnGroup = PickBestAnimation(asAnimGroup & 0x7FFF, 1);
+        sreturnGroup = PickBestAnimation(asAnimGroup & 0x7FFF, true);
         if (static_cast<uint8_t>(sreturnGroup) == static_cast<uint8_t>(asAnimGroup) ||
             (TESAnimGroup::IsIronSightsAction(asAnimGroup) &&
              static_cast<uint8_t>(sreturnGroup) == static_cast<uint8_t>(asAnimGroup - 3))) {
             return sreturnGroup;
         }
     }
-    if (pActorRef == pPlayer && this == pPlayer->GetAnimation(static_cast<bool>(1)) && (asAnimGroup & 0x7000) != 0) {
+    if (pActorRef == pPlayer && this == pPlayer->GetAnimation(true) && (asAnimGroup & 0x7000) != 0) {
         ANIM_GROUP_SECTION eSectionLayer = animGroupInfo[static_cast<uint8_t>(asAnimGroup)].eSectionLayer;
         if (eSectionLayer >= AGS_WEAPON && eSectionLayer <= AGS_WEAPON_DOWN) {
-            sreturnGroup = PickBestAnimation(asAnimGroup & 4095, 1);
+            sreturnGroup = PickBestAnimation(asAnimGroup & 4095, true);
             if (static_cast<uint8_t>(sreturnGroup) == static_cast<uint8_t>(asAnimGroup) ||
                 (TESAnimGroup::IsIronSightsAction(asAnimGroup) &&
                  static_cast<uint8_t>(sreturnGroup) == static_cast<uint8_t>(asAnimGroup - 3))) {
@@ -963,7 +966,7 @@ uint16_t Animation::PickBestAnimation(uint16_t asAnimGroup, bool abRecursive) {
         }
     }
     if (TESAnimGroup::IsIronSightsAction(asAnimGroup)) {
-        return PickBestAnimation(asAnimGroup - 3, 1);
+        return PickBestAnimation(asAnimGroup - 3, true);
     }
     ANIM_GROUP_SECTION v5 = animGroupInfo[TESAnimGroup::GetType(asAnimGroup)].eSectionLayer;
     if (v5 >= AGS_WEAPON_UP && v5 <= AGS_WEAPON_DOWN) {
@@ -991,7 +994,7 @@ uint16_t Animation::PickBestAnimation(uint16_t asAnimGroup, bool abRecursive) {
     }
 LABEL_61:;
     if ((asAnimGroup & 0x8000) != 0) {
-        sreturnGroup = PickBestAnimation(asAnimGroup & 0x7FFF, 1);
+        sreturnGroup = PickBestAnimation(asAnimGroup & 0x7FFF, true);
         if (static_cast<uint8_t>(sreturnGroup) == static_cast<uint8_t>(asAnimGroup)) {
             return sreturnGroup;
         }
@@ -1022,7 +1025,7 @@ LABEL_61:;
         }
     }
     if (stestGroup != 255) {
-        sreturnGroup = PickBestAnimation(stestGroup, 1);
+        sreturnGroup = PickBestAnimation(stestGroup, true);
         if (static_cast<uint8_t>(sreturnGroup) == static_cast<uint8_t>(stestGroup)) {
             return sreturnGroup;
         }
@@ -1032,7 +1035,7 @@ LABEL_51:;
         return 0;
     }
     if ((asAnimGroup & 0x7000) != 0) {
-        sreturnGroup = PickBestAnimation(asAnimGroup & 4095, 1);
+        sreturnGroup = PickBestAnimation(asAnimGroup & 4095, true);
         if (static_cast<uint8_t>(sreturnGroup) == static_cast<uint8_t>(asAnimGroup)) {
             return sreturnGroup;
         }
@@ -1041,12 +1044,12 @@ LABEL_51:;
         return 0;
     }
     stestGroup = asAnimGroup & 0x7F00;
-    return PickBestAnimation(asAnimGroup & 0x7F00, 0);
+    return PickBestAnimation(asAnimGroup & 0x7F00, false);
 }
 
 bool Animation::SpecialIdlePlaying() {
     if (!(&spAnimIdle)->operator->()) {
-        return (bool)0;
+        return false;
     }
     AnimIdle* v2 = (&spAnimIdle)->operator->();
     return (bool)((uint8_t)(((int32_t)v2->AnimIdle::GetFlag()) == 2u));
@@ -1059,7 +1062,7 @@ NiTPointerMap<uint16_t, AnimSequenceBase*>* Animation::GetMapAnimSequenceBase() 
 TESAnimGroup* Animation::GetTESAnimGroup(uint16_t asGroup) {
     AnimSequenceBase* val;
     if (!pAnimSequenceMap->GetAt(asGroup, val)) {
-        return 0;
+        return nullptr;
     }
     BSAnimGroupSequence* v2 = val->GetSequenceToPlay(-1);
     return v2->GetAnimGroup();
@@ -1075,10 +1078,10 @@ int16_t Animation::GetGroupSpeed(uint16_t asAnimGroup) {
     if (!v5->IsSingleSeq()) {
         return 0;
     }
-    if (!v5->GetSequenceToPlay((int8_t)((-1)))) {
+    if (!v5->GetSequenceToPlay((int8_t)(-1))) {
         return 0;
     }
-    BSAnimGroupSequence* v3 = v5->GetSequenceToPlay((int8_t)((-1)));
+    BSAnimGroupSequence* v3 = v5->GetSequenceToPlay((int8_t)(-1));
     TESAnimGroup* animGroup = v3->GetAnimGroup();
     return (int32_t)animGroup->GetSpeed();
 }
@@ -1094,23 +1097,23 @@ TESIdleForm* Animation::GetSpecialIdleForm() {
 bool Animation::SpecialIdlePlay() {
     if (spAnimIdleQueued.m_pObject) {
         if (spAnimIdleQueued.m_pObject->eFlags != AnimIdle::ANIM_IDLE_LOADED) {
-            return 0;
+            return false;
         }
-        SpecialIdleFree(0, 1);
+        SpecialIdleFree(false, true);
     }
     if (!spAnimIdle.m_pObject || spAnimIdle.m_pObject->eFlags != AnimIdle::ANIM_IDLE_LOADED) {
-        return 0;
+        return false;
     }
     KFModel* pkfModel = spAnimIdle.m_pObject->GetKFModel();
-    if (!pkfModel || (!AddAnimation(pkfModel, 0) || !pkfModel->GetAnimGroup())) {
+    if (!pkfModel || (!AddAnimation(pkfModel, false) || !pkfModel->GetAnimGroup())) {
         spAnimIdle.m_pObject->eFlags = AnimIdle::ANIM_IDLE_DONE_PLAYING;
         if (spAnimIdle.m_pObject->eType == AnimIdle::PLAY_TYPE_AUTO ||
             spAnimIdle.m_pObject->eType == AnimIdle::PLAY_TYPE_AUTO_EXCLUSIVE) {
-            SpecialIdleFree(1, 0);
+            SpecialIdleFree(true, false);
         }
-        return 0;
+        return false;
     }
-    BSAnimGroupSequence* pseq = 0;
+    BSAnimGroupSequence* pseq = nullptr;
     if (spAnimIdle.m_pObject->eSection ||
         spAnimIdle.m_pObject->GetKFModel()->GetAnimGroup()->GetType() != ANIM_GROUP_DYNAMIC_IDLE) {
         // Reads the section, then the idle's loop count, then the group: locals keep that order.
@@ -1126,9 +1129,9 @@ bool Animation::SpecialIdlePlay() {
         spAnimIdle.m_pObject->eFlags = AnimIdle::ANIM_IDLE_DONE_PLAYING;
         if (spAnimIdle.m_pObject->eType == AnimIdle::PLAY_TYPE_AUTO ||
             spAnimIdle.m_pObject->eType == AnimIdle::PLAY_TYPE_AUTO_EXCLUSIVE) {
-            SpecialIdleFree(1, 0);
+            SpecialIdleFree(true, false);
         }
-        return 0;
+        return false;
     }
     if (static_cast<double>(spAnimIdle.m_pObject->pIdleForm->GetReplayDelay()) > 0.0) {
         IDLE_REPLAY_DELAY* preplayDelay = static_cast<IDLE_REPLAY_DELAY*>(ourMalloc(sizeof(IDLE_REPLAY_DELAY)));
@@ -1137,7 +1140,7 @@ bool Animation::SpecialIdlePlay() {
         replayDelayList.AddTail(preplayDelay);
     }
     spAnimIdle.m_pObject->PlayAnim(pseq);
-    return 1;
+    return true;
 }
 
 // Queues an automatic idle and plays it.
@@ -1174,7 +1177,7 @@ bool Animation::IsIdleNotLoaded(TESIdleForm* apIdle) {
         if (v2->GetIdleForm() == apIdle) {
             AnimIdle* v3 = spAnimIdle.operator->();
             if (v3->GetFlag() != AnimIdle::ANIM_IDLE_LOADED) {
-                return 1;
+                return true;
             }
         }
     }
@@ -1183,35 +1186,35 @@ bool Animation::IsIdleNotLoaded(TESIdleForm* apIdle) {
         if (v5->GetIdleForm() == apIdle) {
             AnimIdle* v6 = spAnimIdleQueued.operator->();
             if (v6->GetFlag() != AnimIdle::ANIM_IDLE_LOADED) {
-                return 1;
+                return true;
             }
         }
     }
     if (spAnimIdleFreeWhenInactiveA->operator->()) {
         AnimIdle* v7 = spAnimIdleFreeWhenInactiveA->operator->();
         if (v7->GetIdleForm() == apIdle) {
-            return 1;
+            return true;
         }
         if (pVATS.GetMode() == VATS::VATS_PLAYBACK) {
             AnimIdle* v8 = spAnimIdleFreeWhenInactiveA->operator->();
             if (v8->GetSequence()) {
-                return 1;
+                return true;
             }
         }
     }
     if (!spAnimIdleFreeWhenInactiveA[1].operator->()) {
-        return 0;
+        return false;
     }
     AnimIdle* v9 = spAnimIdleFreeWhenInactiveA[1].operator->();
     if (v9->GetIdleForm() == apIdle) {
-        return 1;
+        return true;
     }
     if (pVATS.GetMode() == VATS::VATS_PLAYBACK &&
         (v10 = spAnimIdleFreeWhenInactiveA[1].operator->(), v10->GetSequence())) {
-        return 1;
+        return true;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -1249,14 +1252,14 @@ char Animation::FindSwitchKey(float* pTime) {
 
 bool Animation::SpecialIdleDonePlaying() {
     if ((&spAnimIdleQueued)->operator->()) {
-        return (bool)0;
+        return false;
     }
     if (!(&spAnimIdle)->operator->()) {
-        return (bool)1;
+        return true;
     }
     AnimIdle* v2 = (&spAnimIdle)->operator->();
     if (!v2->AnimIdle::GetSequence()) {
-        return (bool)0;
+        return false;
     }
     AnimIdle* v3 = (&spAnimIdle)->operator->();
     return (bool)((uint8_t)(((int32_t)v3->AnimIdle::GetFlag()) == 3));
@@ -1399,7 +1402,7 @@ void Animation::ReloadTargets(bool abReload) {
         }
         for (int32_t n_3 = 0; n_3 < 8; ++n_3) {
             if (pCurrentSequence[n_3]) {
-                spManager.m_pObject->ActivateSequence(pCurrentSequence[n_3], 0, 0, 1.0f, 0.0f, 0);
+                spManager.m_pObject->ActivateSequence(pCurrentSequence[n_3], 0, false, 1.0f, 0.0f, nullptr);
             }
         }
     }
@@ -1425,7 +1428,7 @@ bool Animation::GetDelta(NiPoint3* delta, TESObjectREFR* apRef, bool applyRot, b
     float v17;
     NiMatrix3 kLocalRot;
     if (!(&pAnimRoot)->m_pObject) {
-        return (bool)0;
+        return false;
     }
     float fTimeDelta = (&appTimer)->GetSeconds() * m_fGlobalTimeMultiplier;
     NiPoint3 kZero = NiPoint3_ZERO;
@@ -1463,13 +1466,13 @@ bool Animation::GetDelta(NiPoint3* delta, TESObjectREFR* apRef, bool applyRot, b
                             kVector.z = v16;
                         }
                         if (kVector.x < (-v17)) {
-                            kVector.x = (float)(-v16);
+                            kVector.x = (-v16);
                         }
                         if (kVector.y < (-v17)) {
-                            kVector.y = (float)(-v16);
+                            kVector.y = (-v16);
                         }
                         if (kVector.z < (-v17)) {
-                            kVector.z = (float)(-v16);
+                            kVector.z = (-v16);
                         }
                     }
                 }
@@ -1482,9 +1485,9 @@ bool Animation::GetDelta(NiPoint3* delta, TESObjectREFR* apRef, bool applyRot, b
             case 5:
             case 8:
             case 10: {
-                scale = (float)apRef->GetScale();
-                kVector.x = (float)(kVector.x / scale);
-                kVector.y = (float)(kVector.y / scale);
+                scale = apRef->GetScale();
+                kVector.x = (kVector.x / scale);
+                kVector.y = (kVector.y / scale);
                 break;
             }
             default: {
@@ -1501,7 +1504,7 @@ bool Animation::GetDelta(NiPoint3* delta, TESObjectREFR* apRef, bool applyRot, b
     else {
         *delta = kVector;
     }
-    return (bool)1;
+    return true;
 }
 
 ANIM_GROUP_ACTION Animation::GetGroupAction(ANIM_GROUP_SECTION aeSection) {
@@ -1620,7 +1623,7 @@ void Animation::SetLipTimeMember(float afPercent) {
     float v6;
     if (afPercent == 0.0) {
         if (pCurrentSequence[3]) {
-            pCurrentSequence[3]->Update(0.0, 1);
+            pCurrentSequence[3]->Update(0.0, true);
             ClearGroup(AGS_TALKING, 0.0);
         }
     }
@@ -1629,16 +1632,16 @@ void Animation::SetLipTimeMember(float afPercent) {
             PlayGroup(0xE1u, ACTION_START, (-1), AGS_NONE);
             if (pCurrentSequence[3]) {
                 v4 = pCurrentSequence[3]->GetBeginKeyTime() + time;
-                pCurrentSequence[3]->Update(v4, 1);
+                pCurrentSequence[3]->Update(v4, true);
             }
         }
         if (pCurrentSequence[3]) {
             if (((int32_t)pCurrentSequence[3]->NiControllerSequence::GetState()) == 1) {
                 endKeyTime = (double)pCurrentSequence[3]->GetEndKeyTime();
                 v6 = (float)(endKeyTime - pCurrentSequence[3]->GetBeginKeyTime());
-                fLipTime = (float)(pCurrentSequence[3]->GetBeginKeyTime() + (v6 * afPercent));
+                fLipTime = (pCurrentSequence[3]->GetBeginKeyTime() + (v6 * afPercent));
                 v2 = fLipTime - time;
-                pCurrentSequence[3]->SetPhase(v2, 1);
+                pCurrentSequence[3]->SetPhase(v2, true);
             }
         }
     }
@@ -1677,7 +1680,7 @@ Animation::PlayGroup(uint16_t asNewGroup, ACTION_FLAGS aeFlags, int32_t aiLoops,
                 case ACTION_START:
                     nextGroup[eLayer] = 0xFF;
                     loopCount[eLayer] = aiLoops;
-                    pStarted = StartGroup(asNewGroup, static_cast<ANIM_GROUP_SECTION>(aeSection));
+                    pStarted = StartGroup(asNewGroup, aeSection);
                     UpdateBipOnly(time, nullptr, true);
                     break;
             }
@@ -1690,7 +1693,7 @@ Animation::PlayGroup(uint16_t asNewGroup, ACTION_FLAGS aeFlags, int32_t aiLoops,
         case AGAT_ATTACK_MINE:
         case AGAT_ATTACK_SPIN:
         case AGAT_LOOPING_RELOAD:
-            pStarted = StartGroup(asNewGroup, static_cast<ANIM_GROUP_SECTION>(aeSection));
+            pStarted = StartGroup(asNewGroup, aeSection);
             UpdateBipOnly(time, nullptr, true);
             break;
         default: break;
@@ -1727,7 +1730,7 @@ Animation::StartGroup(BSAnimGroupSequence* apSeq, uint16_t asNewGroup, ANIM_GROU
     NiNode* v5;
     NiNode* v7;
     if (SpecialIdleWorking(apSeq)) {
-        return 0;
+        return nullptr;
     }
     ANIM_GROUP_ENUM egroup = TESAnimGroup::GetType(asNewGroup);
     ANIM_GROUP_SECTION esection = aeSection;
@@ -1746,18 +1749,18 @@ Animation::StartGroup(BSAnimGroupSequence* apSeq, uint16_t asNewGroup, ANIM_GROU
     }
     BSAnimGroupSequence* plastSequence = pCurrentSequence[esection];
     ANIM_GROUP_ENUM elastGroup = TESAnimGroup::GetType(group[esection]);
-    bool bmorph = 0;
+    bool bmorph = false;
     NiControllerSequence::State elastState = NiControllerSequence::kInactive;
     if (plastSequence) {
         elastState = plastSequence->GetState();
     }
     if (!apSeq || asNewGroup == 255) {
-        return 0;
+        return nullptr;
     }
     if (esection == AGS_WEAPON || (esection == AGS_WEAPON_UP || esection == AGS_WEAPON_DOWN)) {
         MiddleHighProcess* pmid;
         bool bclear;
-        if (pActorRef == pPlayer && this == pPlayer->GetAnimation(1)) {
+        if (pActorRef == pPlayer && this == pPlayer->GetAnimation(true)) {
             if (esection == AGS_WEAPON) {
                 apSeq->SetSequenceWeight(1.0f);
                 goto LABEL_33;
@@ -1765,7 +1768,7 @@ Animation::StartGroup(BSAnimGroupSequence* apSeq, uint16_t asNewGroup, ANIM_GROU
             goto LABEL_32;
         }
         pmid = static_cast<MiddleHighProcess*>(static_cast<MobileObject*>(pActorRef)->GetCurrentAIProcess());
-        bclear = 1;
+        bclear = true;
         if (TESAnimGroup::IsAimAction(egroup) || TESAnimGroup::IsAttackAction(egroup)) {
             if (pmid) {
                 if (pmid->eLevel <= PROCESS_TYPE_MIDDLE_HIGH) {
@@ -1774,7 +1777,7 @@ Animation::StartGroup(BSAnimGroupSequence* apSeq, uint16_t asNewGroup, ANIM_GROU
                     if (poldSeq) {
                         float blendAmount = poldSeq->m_fSeqWeight;
                         apSeq->SetSequenceWeight(blendAmount);
-                        bclear = 0;
+                        bclear = false;
                     }
                 }
             }
@@ -1786,7 +1789,7 @@ Animation::StartGroup(BSAnimGroupSequence* apSeq, uint16_t asNewGroup, ANIM_GROU
     }
 LABEL_33:;
     if (apSeq->GetState() == NiControllerSequence::kEaseOut) {
-        apSeq->Deactivate(0.0f, 0);
+        apSeq->Deactivate(0.0f, false);
     }
     if (((apSeq->GetState() && apSeq->m_eCycleType == NiControllerSequence::CYCLE_LOOP) ||
          (apSeq->GetState() == NiControllerSequence::kAnimating && apSeq == plastSequence)) &&
@@ -1796,13 +1799,13 @@ LABEL_33:;
         return apSeq;
     }
     if (!Interface::IsInMenuMode() ||
-        ((v5 = pAnimRoot.m_pObject, v5 != pPlayer->Get3D(0)) || (pSaveLoadGameOLD->GetLoading() || pVATS.eMode))) {
+        ((v5 = pAnimRoot.m_pObject, v5 != pPlayer->Get3D(false)) || (pSaveLoadGameOLD->GetLoading() || pVATS.eMode))) {
         NiNode* v6;
         if (Interface::IsInPipboyMenu() &&
-            ((v6 = pAnimRoot.m_pObject, v6 == pPlayer->Get3D(1)) &&
+            ((v6 = pAnimRoot.m_pObject, v6 == pPlayer->Get3D(true)) &&
              (egroup == ANIM_GROUP_DYNAMIC_IDLE && (aeSection == AGS_IDLE && plastSequence)))) {
             ClearGroup(eclearSection, 0.0f);
-            plastSequence = 0;
+            plastSequence = nullptr;
             cSkipNextBlend = 1;
         }
         else {
@@ -1812,7 +1815,7 @@ LABEL_33:;
                     (egroup == ANIM_GROUP_PIPBOY_CHILD &&
                      (eoldGroup >= ANIM_GROUP_HAND_GRIP_1 && eoldGroup <= ANIM_GROUP_HAND_GRIP_6))) {
                     ClearGroup(eclearSection, 0.0f);
-                    plastSequence = 0;
+                    plastSequence = nullptr;
                 }
             }
             else {
@@ -1832,10 +1835,10 @@ LABEL_33:;
                     }
                     else {
                         if (pActorRef != pPlayer && esection == AGS_MOVEMENT) {
-                            return 0;
+                            return nullptr;
                         }
                         ClearGroup(eclearSection, 0.0f);
-                        plastSequence = 0;
+                        plastSequence = nullptr;
                     }
                 }
             }
@@ -1843,7 +1846,7 @@ LABEL_33:;
     }
     group[esection] = asNewGroup;
     pCurrentSequence[esection] = apSeq;
-    if (!Interface::IsInMenuMode() || (v7 = pAnimRoot.m_pObject, v7 != pPlayer->Get3D(0))) {
+    if (!Interface::IsInMenuMode() || (v7 = pAnimRoot.m_pObject, v7 != pPlayer->Get3D(false))) {
         if (plastSequence) {
             NiPointer<TESAnimGroup> spcurrentAnimGroup(apSeq->GetAnimGroup());
             NiPointer<TESAnimGroup> splastAnimGroup(plastSequence->GetAnimGroup());
@@ -1852,7 +1855,7 @@ LABEL_33:;
                     int32_t CastingType = plastSequence->m_uiArraySize;
                     if (CastingType == apSeq->m_uiArraySize) {
                         if (apSeq->CanSyncTo(plastSequence)) {
-                            bmorph = 1;
+                            bmorph = true;
                         }
                         else {
                             const char* blendAmounta = (&pAnimRoot.m_pObject->m_kName)->GetHandleString();
@@ -1882,7 +1885,7 @@ LABEL_33:;
                     "ANIMATION: Morph Error - Trying to morph from sequence to itself.\r\n'%s' on '%s'.",
                     (&plastSequence->m_kName)->GetHandleString(), blendAmountc
                 );
-                bmorph = 0;
+                bmorph = false;
             }
         }
     }
@@ -1933,10 +1936,10 @@ LABEL_33:;
     }
     float* v17 = &fAnimationMult.Float();
     fduration = fduration / *v17;
-    apSeq->SetPhase(0.0f, 0);
+    apSeq->SetPhase(0.0f, false);
     if (!plastSequence && (esection == AGS_WEAPON_UP || esection == AGS_WEAPON_DOWN)) {
         float a4a = apSeq->m_fSeqWeight;
-        spManager.m_pObject->ActivateSequence(apSeq, 0, 1, a4a, fduration, 0);
+        spManager.m_pObject->ActivateSequence(apSeq, 0, true, a4a, fduration, nullptr);
     }
     else {
         if (!(fduration < 0.009999999776482582)) {
@@ -1946,16 +1949,17 @@ LABEL_33:;
                 spManager.m_pObject->Morph(plastSequence, apSeq, fduration, 0, a6c, blendAmountd);
             }
             else {
-                bool bretVal = 0;
+                bool bretVal = false;
                 if (plastSequence) {
                     if (plastSequence->GetState()) {
                         float a6d = apSeq->m_fSeqWeight;
-                        bretVal = spManager.m_pObject->CrossFade(plastSequence, apSeq, fduration, 0, 1, a6d, 0);
+                        bretVal =
+                            spManager.m_pObject->CrossFade(plastSequence, apSeq, fduration, 0, true, a6d, nullptr);
                     }
                 }
                 if (!bretVal) {
                     if (TES::pInstance->CellTestRunning()) {
-                        spManager.m_pObject->ActivateSequence(apSeq, 0, 1, 1.0f, 0.0f, 0);
+                        spManager.m_pObject->ActivateSequence(apSeq, 0, true, 1.0f, 0.0f, nullptr);
                     }
                     else {
                         if (pActorRef) {
@@ -1970,14 +1974,14 @@ LABEL_33:;
                                 }
                             }
                         }
-                        spManager.m_pObject->BlendFromPose(apSeq, 0.0f, fduration, 0, 0);
+                        spManager.m_pObject->BlendFromPose(apSeq, 0.0f, fduration, 0, nullptr);
                     }
                 }
             }
         }
         else {
             float a4b = apSeq->m_fSeqWeight;
-            spManager.m_pObject->ActivateSequence(apSeq, 0, 1, a4b, 0.0f, 0);
+            spManager.m_pObject->ActivateSequence(apSeq, 0, true, a4b, 0.0f, nullptr);
         }
     }
     if (plastSequence) {
@@ -2020,9 +2024,9 @@ void Animation::BlendOut(ANIM_GROUP_SECTION aeSection, bool abIronSightsToggle) 
             fduration = fduration_2 / fAnimationMult.Float();
         }
     }
-    bool bclearGroup = 1;
-    bool v17 = 0;
-    bool bstartAim = 0;
+    bool bclearGroup = true;
+    bool v17 = false;
+    bool bstartAim = false;
     if (pActorRef) {
         if ((eseqSection == AGS_WEAPON || aeSection == AGS_WHOLE_BODY) && pactor->IsWeaponDrawn() &&
             !pDataHandler->GetClearingData()) {
@@ -2030,13 +2034,13 @@ void Animation::BlendOut(ANIM_GROUP_SECTION aeSection, bool abIronSightsToggle) 
             if (abIronSightsToggle &&
                 (pactor->GetAnimAction() == ANIM_ACTION_ATTACK &&
                  (CurrentAIProcess = pactor->pCurrentProcess, CurrentAIProcess->GetAnimActionAnimSeq()))) {
-                v17 = 1;
+                v17 = true;
             }
             else {
-                bstartAim = 1;
+                bstartAim = true;
             }
             if (eseqSection == AGS_WEAPON) {
-                bclearGroup = 0;
+                bclearGroup = false;
                 if ((pactor->GetAnimAction() == ANIM_ACTION_RELOAD ||
                      pactor->GetAnimAction() == ANIM_ACTION_RELOAD_LOOP) &&
                     pactor != pPlayer && fduration < 0.5) {
@@ -2088,13 +2092,13 @@ void Animation::Update(TESObjectREFR* ownerObject, float fSecondsPassed, float f
     BSAnimGroupSequence* pweapSeq;
     float fAppTimeMod = appTimer.fDelta * m_fGlobalTimeMultiplier;
     if (GetAnimsLoading()) {
-        while (1) {
+        while (true) {
             int32_t* v4 = &iAnimationClonePerLoop.Int();
             if (Animation::iAnimationsCloned >= static_cast<uint32_t>(*v4)) {
                 break;
             }
             KFModel* pkfModel = (&kfModelList)->m_item;
-            AddAnimation(pkfModel, 0);
+            AddAnimation(pkfModel, false);
             pkfModel->DecUseCount();
             kfModelList.RemoveHead();
             if (!GetAnimsLoading()) {
@@ -2125,7 +2129,7 @@ void Animation::Update(TESObjectREFR* ownerObject, float fSecondsPassed, float f
                 pPlayer->StartAnimOn1stPerson(sQueuedReloadGroup, ACTION_START);
             }
             Actor* pAct = static_cast<Actor*>(ownerObject);
-            bool bLoopReload = 0;
+            bool bLoopReload = false;
             if (pAct->GetCurrentAIProcess()) {
                 TESObjectWEAP* pWeap;
                 BaseProcess* CurrentAIProcess = pAct->pCurrentProcess;
@@ -2134,10 +2138,10 @@ void Animation::Update(TESObjectREFR* ownerObject, float fSecondsPassed, float f
                     pWeap = static_cast<TESObjectWEAP*>(v122->GetCurrentWeapon()->pContainerObj);
                 }
                 else {
-                    pWeap = 0;
+                    pWeap = nullptr;
                 }
                 if (pWeap->GetIsLoopingReload()) {
-                    bLoopReload = 1;
+                    bLoopReload = true;
                 }
             }
             if (bLoopReload) {
@@ -2171,7 +2175,7 @@ LABEL_27:;
             }
             else {
                 if (pdelayList == &replayDelayList) {
-                    pdelayList = 0;
+                    pdelayList = nullptr;
                 }
                 else {
                     pdelayList = pdelayList->m_pkNext;
@@ -2185,7 +2189,7 @@ LABEL_27:;
             }
         }
     }
-    Actor* pactor = 0;
+    Actor* pactor = nullptr;
     if (ownerObject) {
         if (ownerObject->IsActor()) {
             pactor = static_cast<Actor*>(ownerObject);
@@ -2204,7 +2208,7 @@ LABEL_27:;
                         "'%s' is trying to free a special idle '%s' sequence '%s' that is animating.",
                         pActorRef->GetFormEditorID(), arg8, afTime
                     );
-                    spAnimIdleFreeWhenInactiveA[i].operator=(static_cast<AnimIdle*>(0));
+                    spAnimIdleFreeWhenInactiveA[i].operator=(static_cast<AnimIdle*>(nullptr));
                 }
                 else {
                     if (!spAnimIdleFreeWhenInactiveA[i].m_pObject->GetSequence()->GetState()) {
@@ -2224,7 +2228,7 @@ LABEL_27:;
         ANIM_GROUP_ENUM enextGroup;
         ANIM_GROUP_SECTION esection;
         float flastScaledTime[8];
-        SetMoved(0);
+        SetMoved(false);
         movementDelta.x = 0.0f;
         movementDelta.y = 0.0f;
         if (this->cSkipUpdate == 20) {
@@ -2235,7 +2239,7 @@ LABEL_27:;
             else {
                 ft = forceTime;
             }
-            NiUpdateData UpdateData(ft, 0, 0);
+            NiUpdateData UpdateData(ft, false, false);
             pAnimRoot.m_pObject->Update(UpdateData);
             return;
         }
@@ -2263,7 +2267,7 @@ LABEL_27:;
         }
         if (forceTime != -1.0) {
             time = forceTime;
-            NiUpdateData UpdateData_2(time, 1, 0);
+            NiUpdateData UpdateData_2(time, true, false);
             pAnimRoot.m_pObject->Update(UpdateData_2);
             return;
         }
@@ -2272,7 +2276,7 @@ LABEL_27:;
         for (esection = AGS_IDLE; esection < ANIM_GROUP_SECTION_COUNT;
              esection = static_cast<ANIM_GROUP_SECTION>(esection + 1)) {
             BSAnimGroupSequence* pcurrentSequence_2 = GetCurrentSequence(esection);
-            bool bupdate = 1;
+            bool bupdate = true;
             egroup = TESAnimGroup::GetType(group[esection]);
             enextGroup = TESAnimGroup::GetType(nextGroup[esection]);
             if (egroup != ANIM_GROUP_NONE) {
@@ -2281,31 +2285,31 @@ LABEL_27:;
                     switch (this->cSkipUpdate) {
                         case 4: {
                             if (esection >= AGS_WEAPON && esection <= AGS_WEAPON_DOWN) {
-                                bupdate = 0;
+                                bupdate = false;
                             }
                             break;
                         }
                         case 20: {
-                            bupdate = 0;
+                            bupdate = false;
                             break;
                         }
                         case 21: {
                             if (esection >= AGS_LEFT_ARM && esection <= AGS_WEAPON_DOWN) {
-                                bupdate = 0;
+                                bupdate = false;
                             }
                             break;
                         }
                         case 23: {
                             if (esection != AGS_SPECIAL_IDLE) {
                                 if (esection) {
-                                    bupdate = 0;
+                                    bupdate = false;
                                 }
                             }
                             break;
                         }
                         default: {
                             if (esection == this->cSkipUpdate) {
-                                bupdate = 0;
+                                bupdate = false;
                             }
                             break;
                         }
@@ -2316,34 +2320,34 @@ LABEL_27:;
                                 if (egroup == ANIM_GROUP_EQUIP || egroup == ANIM_GROUP_UNEQUIP) {
                                     double Phase = pcurrentSequence_2->GetPhase();
                                     float v116 = Phase + (timeDelta * m_fEquipModifier - timeDelta);
-                                    pcurrentSequence_2->SetPhase(v116, 0);
+                                    pcurrentSequence_2->SetPhase(v116, false);
                                 }
                                 else {
                                     if (egroup < ANIM_GROUP_EQUIP || egroup > ANIM_GROUP_COUNTER) {
                                         if (egroup >= ANIM_GROUP_RELOAD_START && egroup <= ANIM_GROUP_RELOAD_Z) {
                                             double v12 = pcurrentSequence_2->GetPhase();
                                             float v114 = v12 + (timeDelta * m_fReloadModifier - timeDelta);
-                                            pcurrentSequence_2->SetPhase(v114, 0);
+                                            pcurrentSequence_2->SetPhase(v114, false);
                                         }
                                     }
                                     else {
                                         double v11 = pcurrentSequence_2->GetPhase();
                                         float v115 = v11 + (timeDelta * m_fAttackSpeed - timeDelta);
-                                        pcurrentSequence_2->SetPhase(v115, 0);
+                                        pcurrentSequence_2->SetPhase(v115, false);
                                     }
                                 }
                             }
                             else {
                                 double v9 = pcurrentSequence_2->GetPhase();
                                 float v117 = v9 + (timeDelta * this->GetMoveSpeed() - timeDelta);
-                                pcurrentSequence_2->SetPhase(v117, 0);
+                                pcurrentSequence_2->SetPhase(v117, false);
                             }
                         }
                     }
                     else {
                         double v8 = pcurrentSequence_2->GetPhase();
                         float v118 = v8 - timeDelta;
-                        pcurrentSequence_2->SetPhase(v118, 0);
+                        pcurrentSequence_2->SetPhase(v118, false);
                     }
                     if (bupdate && pcurrentSequence_2->GetState() == NiControllerSequence::kAnimating) {
                         switch (animGroupInfo[egroup].eAction) {
@@ -2362,7 +2366,7 @@ LABEL_27:;
                                         double v68 = GetTime(pcurrentSequence_2);
                                         TESAnimGroup* v69 = pcurrentSequence_2->GetAnimGroup();
                                         if (v69->GetTime(AGA_STOP) <= v68) {
-                                            BlendOut(esection, 0);
+                                            BlendOut(esection, false);
                                         }
                                     }
                                     else {
@@ -2370,7 +2374,7 @@ LABEL_27:;
                                         TESAnimGroup* v67 = pcurrentSequence_2->GetAnimGroup();
                                         if (v67->GetTime(AGA_STOP) <= v66) {
                                             if (esection == AGS_MOVEMENT && (pactor->GetMoveMode() & 15) == 0) {
-                                                BlendOut(esection, 0);
+                                                BlendOut(esection, false);
                                             }
                                             else {
                                                 loopCount[esection] = nextLoops[esection];
@@ -2407,7 +2411,7 @@ LABEL_27:;
                                             double EndKeyTime = pcurrentSequence_2->m_fEndKeyTime;
                                             float floopDelta_4 = EndKeyTime - pcurrentSequence_2->GetBeginKeyTime();
                                             float v106 = pcurrentSequence_2->GetPhase() - floopDelta_4;
-                                            pcurrentSequence_2->SetPhase(v106, 0);
+                                            pcurrentSequence_2->SetPhase(v106, false);
                                             if (loopCount[esection] != -1) {
                                                 --loopCount[esection];
                                             }
@@ -2416,7 +2420,7 @@ LABEL_27:;
                                             double v62 = GetTime(pcurrentSequence_2);
                                             TESAnimGroup* v63 = pcurrentSequence_2->GetAnimGroup();
                                             if (v63->GetTime(AGA_STOP) <= v62) {
-                                                BlendOut(esection, 0);
+                                                BlendOut(esection, false);
                                             }
                                         }
                                     }
@@ -2467,7 +2471,7 @@ LABEL_27:;
                                         TESAnimGroup* v53 = pcurrentSequence_2->GetAnimGroup();
                                         float floopDelta_3 = Time - v53->GetTime(AGA_STOP);
                                         float v109 = pcurrentSequence_2->GetPhase() - floopDelta_3;
-                                        pcurrentSequence_2->SetPhase(v109, 0);
+                                        pcurrentSequence_2->SetPhase(v109, false);
                                         flastScaledTime[esection] = flastScaledTime[esection] - floopDelta_3;
                                         if (loopCount[esection] != -1 && loopCount[esection] < 255) {
                                             --loopCount[esection];
@@ -2481,7 +2485,7 @@ LABEL_27:;
                                                 spAnimIdle.m_pObject->eFlags = AnimIdle::ANIM_IDLE_DONE_PLAYING;
                                             }
                                             else {
-                                                BlendOut(esection, 0);
+                                                BlendOut(esection, false);
                                             }
                                         }
                                     }
@@ -2517,7 +2521,7 @@ LABEL_27:;
                                         if (enextGroup != ANIM_GROUP_NONE) {
                                             goto LABEL_176;
                                         }
-                                        BlendOut(esection, 0);
+                                        BlendOut(esection, false);
                                         if (pactor) {
                                             if (animGroupInfo[egroup].eAction == AGAT_EQUIP ||
                                                 animGroupInfo[egroup].eAction == AGAT_UNEQUIP) {
@@ -2554,7 +2558,7 @@ LABEL_27:;
                                         if (enextGroup != ANIM_GROUP_NONE) {
                                             goto LABEL_176;
                                         }
-                                        BlendOut(esection, 0);
+                                        BlendOut(esection, false);
                                     }
                                 }
                                 break;
@@ -2575,7 +2579,7 @@ LABEL_27:;
                                         if (enextGroup != ANIM_GROUP_NONE) {
                                             goto LABEL_176;
                                         }
-                                        BlendOut(esection, 0);
+                                        BlendOut(esection, false);
                                     }
                                 }
                                 break;
@@ -2596,7 +2600,7 @@ LABEL_27:;
                                         if (enextGroup != ANIM_GROUP_NONE) {
                                             goto LABEL_176;
                                         }
-                                        BlendOut(esection, 0);
+                                        BlendOut(esection, false);
                                     }
                                 }
                                 break;
@@ -2634,7 +2638,7 @@ LABEL_27:;
                                                             break;
                                                         }
                                                         float v112 = pcurrentSequence_2->GetPhase() - floopDelta;
-                                                        pcurrentSequence_2->SetPhase(v112, 0);
+                                                        pcurrentSequence_2->SetPhase(v112, false);
                                                     }
                                                     action[esection] =
                                                         static_cast<ANIM_GROUP_ACTION>(action[esection] - 1);
@@ -2652,7 +2656,7 @@ LABEL_27:;
                                         TESAnimGroup* v42 = pcurrentSequence_2->GetAnimGroup();
                                         float floopDelta_2 = v41 - v42->GetTime(AGA_STOP);
                                         float v111 = pcurrentSequence_2->GetPhase() + floopDelta_2;
-                                        pcurrentSequence_2->SetPhase(v111, 0);
+                                        pcurrentSequence_2->SetPhase(v111, false);
                                         flastScaledTime[esection] = flastScaledTime[esection] + floopDelta_2;
                                         action[esection] = static_cast<ANIM_GROUP_ACTION>(action[esection] + 1);
                                     }
@@ -2664,7 +2668,7 @@ LABEL_27:;
                                     v44 = pcurrentSequence_2->GetAnimGroup();
                                     if (v44->GetTime(AGA_SPECIAL_IDLE_STOP) <= v43) {
                                         if (enextGroup == ANIM_GROUP_NONE) {
-                                            BlendOut(esection, 0);
+                                            BlendOut(esection, false);
                                         }
                                         else {
                                         LABEL_176:;
@@ -2687,7 +2691,7 @@ LABEL_27:;
         }
         if (pAccumRoot) {
             NiPoint3 lastPos = AccumRootTranslate;
-            bool bfakeDelta = 0;
+            bool bfakeDelta = false;
             NiPoint3 posFakeDelta = NiPoint3_ZERO;
             if (pactor->IsMoving()) {
                 uint16_t smoveMode = pactor->GetMoveMode();
@@ -2697,12 +2701,12 @@ LABEL_27:;
                         TESAnimGroup* v70 = pCurrentSequence[1]->GetAnimGroup();
                         bfakeDelta = v70->IsJumpingLoopAnim();
                         if (pCurrentSequence[1]->GetAnimGroup()->GetType() == ANIM_GROUP_JUMP_START) {
-                            bfakeDelta = 1;
+                            bfakeDelta = true;
                         }
                         else {
                             int32_t State = pCurrentSequence[1]->GetState();
                             if (State == 2 || State == 5) {
-                                bfakeDelta = 1;
+                                bfakeDelta = true;
                             }
                         }
                         NiTransformController* ptransCont = static_cast<NiTransformController*>(
@@ -2719,8 +2723,8 @@ LABEL_27:;
                                 NiObject::DynamicCastStatic(&NiBlendInterpolator::ms_RTTI, pmoveInterp)
                             );
                             const char* HandleString = (&pAccumRoot->m_kName)->GetHandleString();
-                            if (pCurrentSequence[1]->GetPriority(HandleString, 0) < ihighest) {
-                                bfakeDelta = 0;
+                            if (pCurrentSequence[1]->GetPriority(HandleString, nullptr) < ihighest) {
+                                bfakeDelta = false;
                             }
                         }
                         if (bfakeDelta) {
@@ -2773,7 +2777,7 @@ LABEL_27:;
                                 posFakeDelta = v72->GetDeltaPerSecond() * fAppTimeMod * fAnimationMult_1 * afTimej;
                             }
                             else {
-                                uint16_t sanimGroup = pactor->GetAnimGroup(eanimGroup, 0, 0, 0);
+                                uint16_t sanimGroup = pactor->GetAnimGroup(eanimGroup, nullptr, false, nullptr);
                                 eanimGroup = TESAnimGroup::GetType(sanimGroup);
                                 if (eanimGroup) {
                                     AnimSequenceBase* panimSeq;
@@ -2793,7 +2797,7 @@ LABEL_27:;
                     }
                 }
             }
-            UpdateBipOnly(time, &AccumRootTranslate, 1);
+            UpdateBipOnly(time, &AccumRootTranslate, true);
             if (bfakeDelta) {
                 movementDelta.x = posFakeDelta.x;
                 movementDelta.y = posFakeDelta.y;
@@ -2815,11 +2819,11 @@ LABEL_27:;
             }
             if (pLastMovementSequence) {
                 if (!pLastMovementSequence->GetState()) {
-                    pLastMovementSequence = 0;
+                    pLastMovementSequence = nullptr;
                 }
             }
         }
-        bool bInDialog = 0;
+        bool bInDialog = false;
         if (pactor) {
             if (pactor->pCurrentProcess) {
                 BaseProcess* v104 = pactor->pCurrentProcess;
@@ -2828,7 +2832,7 @@ LABEL_27:;
         }
         if (!bInDialog &&
             (!pAnimRoot.m_pObject->GetAppCulled() ||
-             (this == pPlayer->GetAnimation(1) && Interface::IsGunScopeVisible()))) {
+             (this == pPlayer->GetAnimation(true) && Interface::IsGunScopeVisible()))) {
             for (esection = AGS_IDLE; esection < ANIM_GROUP_SECTION_COUNT;
                  esection = static_cast<ANIM_GROUP_SECTION>(esection + 1)) {
                 char cSkipUpdate = this->cSkipUpdate;
@@ -2850,10 +2854,10 @@ LABEL_27:;
                                     (pcurrentSequence_3->GetState() == NiControllerSequence::kAnimating ||
                                      (pcurrentSequence_3->GetState() == NiControllerSequence::kEaseIn ||
                                       pcurrentSequence_3->GetState() == NiControllerSequence::kTransDest))) {
-                                    bool bplaySounds = 1;
+                                    bool bplaySounds = true;
                                     if (pSoundPriorityBoneName[esection]) {
                                         if (pSoundPriorityBone[esection]) {
-                                            BSAnimGroupSequence* phighestSeq = 0;
+                                            BSAnimGroupSequence* phighestSeq = nullptr;
                                             uint8_t cpriority = 0;
                                             for (ANIM_GROUP_SECTION etestSection = AGS_IDLE;
                                                  etestSection < ANIM_GROUP_SECTION_COUNT;
@@ -2875,12 +2879,12 @@ LABEL_27:;
                                                 }
                                             }
                                             if (!phighestSeq || phighestSeq != pcurrentSequence_3) {
-                                                bplaySounds = 0;
+                                                bplaySounds = false;
                                             }
                                         }
                                     }
                                     else {
-                                        bplaySounds = 0;
+                                        bplaySounds = false;
                                     }
                                     if (bplaySounds) {
                                         float fscaledTime_2 = pcurrentSequence_3->GetScaledTime(time);
@@ -2926,7 +2930,7 @@ bool Animation::GroupLoaded(uint16_t asTestGroup) {
 void Animation::AddAnimationsFromList(BSSimpleList<const char*>* apFileList) {
     if (apFileList) {
         AutoMemContext tempMemContext(
-            MEM_CONTEXT_ANIMATION, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Animation.cpp", 750
+            MEM_CONTEXT_ANIMATION, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Animation.cpp", 750
         );
         bool bqueueAnims = ShouldQueueSequenceCloning();
         while (!apFileList->IsEmpty()) {
@@ -2963,7 +2967,7 @@ void Animation::ForceSection(
             if (panimSeq->GetSequenceToPlay(aiSequenceIndex)) {
                 BSAnimGroupSequence* v6 = panimSeq->GetSequenceToPlay(aiSequenceIndex);
                 pCurrentSequence[esection] = v6;
-                spManager.m_pObject->ActivateSequence(pCurrentSequence[esection], 0, 0, 1.0f, 0.0f, 0);
+                spManager.m_pObject->ActivateSequence(pCurrentSequence[esection], 0, false, 1.0f, 0.0f, nullptr);
             }
         }
     }
@@ -3006,18 +3010,18 @@ void Animation::UpdateSceneGraphNoController() {
         if (pAccumRoot) {
             if (iNumHWThreads.Int() <= 1 ||
                 (cSkipThreadQueue || (GetDelayUpdateScenegraph() || pSaveLoadGame->GetSaveGameLoading()))) {
-                NiUpdateData updateData(time, 1, 0);
+                NiUpdateData updateData(time, true, false);
                 NiPointer<NiTimeController> spAnimRootCon(pAnimRoot.m_pObject->GetControllers());
                 NiPointer<NiTimeController> spAccumRootCon(pAccumRoot->GetControllers());
-                pAnimRoot.m_pObject->SetControllers(0);
-                pAccumRoot->SetControllers(0);
+                pAnimRoot.m_pObject->SetControllers(nullptr);
+                pAccumRoot->SetControllers(nullptr);
                 NiNode* v1 = pAnimRoot.m_pObject;
                 v1->UpdateDownwardPass(updateData, 0);
                 pAnimRoot.m_pObject->SetControllers(spAnimRootCon.m_pObject);
                 pAccumRoot->SetControllers(spAccumRootCon.m_pObject);
             }
             else {
-                SetDelayUpdateScenegraph(1);
+                SetDelayUpdateScenegraph(true);
             }
         }
     }
@@ -3205,12 +3209,12 @@ bool Animation::AddAnimation(KFModel* apKFModel, bool abDelaySequenceClone) {
             );
         }
     LABEL_2:;
-        return 0;
+        return false;
     }
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_ANIMATION, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Animation.cpp", 794
+        MEM_CONTEXT_ANIMATION, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Animation.cpp", 794
     );
-    AnimSequenceBase* panimSeq = 0;
+    AnimSequenceBase* panimSeq = nullptr;
     if (!pAnimSequenceMap->GetAt(sanimGroup, panimSeq)) {
         AnimSequenceBase* panimSeq_2;
         AnimSequenceSingle* v26 = static_cast<AnimSequenceSingle*>(ourMalloc(sizeof(AnimSequenceSingle)));
@@ -3218,7 +3222,7 @@ bool Animation::AddAnimation(KFModel* apKFModel, bool abDelaySequenceClone) {
             panimSeq_2 = (AnimSequenceBase*)::new (v26) AnimSequenceSingle;
         }
         else {
-            panimSeq_2 = 0;
+            panimSeq_2 = nullptr;
         }
         panimSeq = panimSeq_2;
         pAnimSequenceMap->SetAt(sanimGroup, panimSeq_2);
@@ -3234,7 +3238,7 @@ bool Animation::AddAnimation(KFModel* apKFModel, bool abDelaySequenceClone) {
                 panimSeq_3 = (AnimSequenceBase*)::new (pAnimSeqMultiple) AnimSequenceMultiple(panimSingle);
             }
             else {
-                panimSeq_3 = 0;
+                panimSeq_3 = nullptr;
             }
             panimSeq = panimSeq_3;
             pAnimSequenceMap->SetAt(sanimGroup, panimSeq_3);
@@ -3247,24 +3251,24 @@ bool Animation::AddAnimation(KFModel* apKFModel, bool abDelaySequenceClone) {
             AnimGroup = v4->GetAnimGroup();
             if (AnimGroup == apKFModel->GetAnimGroup()) {
             LABEL_77:;
-                return 1;
+                return true;
             }
-            bool bremoveSequence = 1;
+            bool bremoveSequence = true;
             if (spAnimIdleFreeWhenInactiveA->m_pObject &&
                 (v6 = spAnimIdleFreeWhenInactiveA->m_pObject->GetSequence(), v6 == panimSeq->GetSequenceToPlay(-1))) {
-                bremoveSequence = 0;
+                bremoveSequence = false;
             }
             else {
                 if (spAnimIdleFreeWhenInactiveA[1].m_pObject) {
                     BSAnimGroupSequence* Sequence = spAnimIdleFreeWhenInactiveA[1].m_pObject->GetSequence();
                     if (Sequence == panimSeq->GetSequenceToPlay(-1)) {
-                        bremoveSequence = 0;
+                        bremoveSequence = false;
                     }
                 }
             }
             if (bremoveSequence) {
                 if (panimSeq->GetSequenceToPlay(-1) == pLastMovementSequence) {
-                    pLastMovementSequence = 0;
+                    pLastMovementSequence = nullptr;
                 }
                 BSAnimGroupSequence* v8 = panimSeq->GetSequenceToPlay(-1);
                 spManager.m_pObject->RemoveSequence(v8);
@@ -3273,17 +3277,17 @@ bool Animation::AddAnimation(KFModel* apKFModel, bool abDelaySequenceClone) {
             if (pseq) {
                 for (int32_t n = 0; n < 8; ++n) {
                     if (pCurrentSequence[n] == pseq) {
-                        pCurrentSequence[n] = 0;
+                        pCurrentSequence[n] = nullptr;
                         group[n] = 0;
                     }
                 }
             }
             if (pLastMovementSequence) {
                 if (panimSeq->GetSequenceToPlay(-1) == pLastMovementSequence) {
-                    pLastMovementSequence = 0;
+                    pLastMovementSequence = nullptr;
                 }
             }
-            panimSeq->SetSequence(0, 1);
+            panimSeq->SetSequence(nullptr, true);
         }
     }
     if (abDelaySequenceClone &&
@@ -3302,10 +3306,10 @@ bool Animation::AddAnimation(KFModel* apKFModel, bool abDelaySequenceClone) {
         if (panimSeq) {
             delete panimSeq_4;
         }
-        return 0;
+        return false;
     }
     else {
-        BSAnimGroupSequence* pagSeq = 0;
+        BSAnimGroupSequence* pagSeq = nullptr;
         bool bbsSeq = NiObject::IsKindOf_0(&BSAnimGroupSequence::ms_RTTI, pseq_2);
         if (bbsSeq && pseq_2->m_uiRefCount == 1) {
             pagSeq = static_cast<BSAnimGroupSequence*>(pseq_2);
@@ -3318,49 +3322,49 @@ bool Animation::AddAnimation(KFModel* apKFModel, bool abDelaySequenceClone) {
                 pagSeq_2 = ::new (v20) BSAnimGroupSequence(apKFModel->GetAnimGroup(), pseq_2);
             }
             else {
-                pagSeq_2 = 0;
+                pagSeq_2 = nullptr;
             }
             pagSeq = pagSeq_2;
         }
-        panimSeq->SetSequence(pagSeq, 1);
-        if (spManager.m_pObject->AddSequence(pagSeq, EmptyFS, 1)) {
+        panimSeq->SetSequence(pagSeq, true);
+        if (spManager.m_pObject->AddSequence(pagSeq, EmptyFS, true)) {
             if (!pAccumRoot) {
                 pAccumRoot = static_cast<NiNode*>(spManager.m_pObject->GetAccumRoot());
             }
             AddGroup(apKFModel->GetAnimGroup());
             goto LABEL_77;
         }
-        bool bdeleteAnimSeq = 0;
+        bool bdeleteAnimSeq = false;
         const char* HandleString = (&pAnimRoot.m_pObject->m_kName)->GetHandleString();
         Warning(
             "ANIMATION: Unable to add '%s' to keyframe manager on '%s'.\r\nMake sure the animation is not skinned "
             "to bones that don't exist in our skeleton.",
             (&pagSeq->m_kName)->GetHandleString(), HandleString
         );
-        MessageHandler::IncDisableWarningCount(1);
+        MessageHandler::IncDisableWarningCount(true);
         for (uint32_t n_2 = 0;; ++n_2) {
             uint32_t CastingType = pagSeq->m_uiArraySize;
             if (n_2 >= CastingType) {
                 break;
             }
-            char* pname = 0;
-            pagSeq->GetObjectNameAt(n_2, 0);
+            char* pname = nullptr;
+            pagSeq->GetObjectNameAt(n_2, nullptr);
             NiNode* v13 = pAnimRoot.m_pObject;
             NiFixedString* v12 = ::new (static_cast<void*>(&v18)) NiFixedString(static_cast<const char*>(pname));
-            bool v19 = v13->GetObjectByName(*v12) == 0;
+            bool v19 = v13->GetObjectByName(*v12) == nullptr;
             v18.~NiFixedString();
             if (v19) {
                 Warning("ANIMATION: Object '%s' in sequence but not skeleton.", pname);
             }
             ourFree(pname);
         }
-        MessageHandler::IncDisableWarningCount(0);
+        MessageHandler::IncDisableWarningCount(false);
         if (pagSeq) {
             if (pagSeq == pLastMovementSequence) {
-                pLastMovementSequence = 0;
+                pLastMovementSequence = nullptr;
             }
             spManager.m_pObject->RemoveSequence(pagSeq);
-            bdeleteAnimSeq = panimSeq->RemoveSequence(pagSeq, 1);
+            bdeleteAnimSeq = panimSeq->RemoveSequence(pagSeq, true);
         }
         if (panimSeq) {
             if (bdeleteAnimSeq) {
@@ -3370,7 +3374,7 @@ bool Animation::AddAnimation(KFModel* apKFModel, bool abDelaySequenceClone) {
                 }
             }
         }
-        return 0;
+        return false;
     }
 }
 
@@ -3465,7 +3469,7 @@ void Animation::InitGroupSpeed(TESAnimGroup* apAnimGroup) {
         (pAnimSequenceMap->GetAt(sanimGroup, panimSeq) &&
          (eanimGroup != ANIM_GROUP_DYNAMIC_IDLE && eanimGroup != ANIM_GROUP_SPECIAL_IDLE))) {
         if (spManager.m_pObject->GetAccumRoot()) {
-            bool bcheckForMovement = 0;
+            bool bcheckForMovement = false;
             ANIM_GROUP_ACTION estart = AGA_START;
             ANIM_GROUP_ACTION estop = AGA_STOP;
             if (panimSeq->GetSequenceToPlay(-1)) {
@@ -3476,43 +3480,43 @@ void Animation::InitGroupSpeed(TESAnimGroup* apAnimGroup) {
                         case AGAT_LOOP: {
                             estart = AGA_START;
                             estop = AGA_STOP;
-                            bcheckForMovement = 1;
+                            bcheckForMovement = true;
                             break;
                         }
                         case AGAT_SPECIAL_IDLE_LOOP: {
                             estart = AGA_START;
                             estop = AGA_SPECIAL_IDLE_STOP;
-                            bcheckForMovement = 1;
+                            bcheckForMovement = true;
                             break;
                         }
                         case AGAT_ATTACK: {
                             estart = AGA_START;
                             estop = AGA_ATTACK_STOP;
-                            bcheckForMovement = 1;
+                            bcheckForMovement = true;
                             break;
                         }
                         case AGAT_ATTACK_POWER: {
                             estart = AGA_START;
                             estop = AGA_SPECIAL_IDLE_LOOP_STOP;
-                            bcheckForMovement = 1;
+                            bcheckForMovement = true;
                             break;
                         }
                         case AGAT_ATTACK_THROW: {
                             estart = AGA_START;
                             estop = AGA_ATTACK_STOP;
-                            bcheckForMovement = 1;
+                            bcheckForMovement = true;
                             break;
                         }
                         case AGAT_ATTACK_MINE: {
                             estart = AGA_START;
                             estop = AGA_SPECIAL_IDLE_STOP;
-                            bcheckForMovement = 1;
+                            bcheckForMovement = true;
                             break;
                         }
                         case AGAT_ATTACK_SPIN: {
                             estart = AGA_START;
                             estop = AGA_SPECIAL_IDLE_STOP;
-                            bcheckForMovement = 1;
+                            bcheckForMovement = true;
                             break;
                         }
                         default: {
@@ -3534,8 +3538,8 @@ void Animation::InitGroupSpeed(TESAnimGroup* apAnimGroup) {
                         float fstopTime__pinterp = spseq.m_pObject->m_fEndKeyTime;
                         NiQuatTransform quatStart;
                         NiQuatTransform quatStop;
-                        pinterp->Update(fstartTime, 0, quatStart);
-                        pinterp->Update(fstopTime__pinterp, 0, quatStop);
+                        pinterp->Update(fstartTime, nullptr, quatStart);
+                        pinterp->Update(fstopTime__pinterp, nullptr, quatStop);
                         if (quatStart.IsTranslateValid() && quatStop.IsTranslateValid()) {
                             ::new (&delta) NiPoint3((&quatStop)->m_kTranslate - (&quatStart)->m_kTranslate);
                             float v9 = fstopTime__pinterp - fstartTime;
@@ -3580,7 +3584,7 @@ void Animation::SpecialIdleFree(bool abFreeQueued, bool abForceDelete) {
         }
         if (spAnimIdle.m_pObject->GetSequence() && pCurrentSequence[esection] == spAnimIdle.m_pObject->GetSequence()) {
             if (abForceDelete) {
-                pCurrentSequence[esection] = 0;
+                pCurrentSequence[esection] = nullptr;
             }
             else {
                 int32_t State = spAnimIdle.m_pObject->GetSequence()->GetState();
@@ -3592,7 +3596,7 @@ void Animation::SpecialIdleFree(bool abFreeQueued, bool abForceDelete) {
                     return;
                 }
                 ANIM_GROUP_SECTION esection_2 = spAnimIdle.m_pObject->eSection;
-                BlendOut(esection_2, 0);
+                BlendOut(esection_2, false);
             }
         }
         if (abForceDelete || spAnimIdleFreeWhenInactiveA->m_pObject) {
@@ -3601,12 +3605,12 @@ void Animation::SpecialIdleFree(bool abFreeQueued, bool abForceDelete) {
             }
             else {
                 spAnimIdleFreeWhenInactiveA[1] = spAnimIdle;
-                spAnimIdle.operator=(static_cast<AnimIdle*>(0));
+                spAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
             }
         }
         else {
             *spAnimIdleFreeWhenInactiveA = spAnimIdle;
-            spAnimIdle.operator=(static_cast<AnimIdle*>(0));
+            spAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
         }
     }
     if (abFreeQueued && spAnimIdleQueued.m_pObject) {
@@ -3622,7 +3626,7 @@ void Animation::SpecialIdleFree(bool abFreeQueued, bool abForceDelete) {
         if (spAnimIdleQueued.m_pObject->GetSequence() &&
             pCurrentSequence[esection_3] == spAnimIdleQueued.m_pObject->GetSequence()) {
             if (abForceDelete) {
-                pCurrentSequence[esection_3] = 0;
+                pCurrentSequence[esection_3] = nullptr;
             }
             else {
                 int32_t v4 = spAnimIdleQueued.m_pObject->GetSequence()->GetState();
@@ -3633,7 +3637,7 @@ void Animation::SpecialIdleFree(bool abFreeQueued, bool abForceDelete) {
                     );
                     return;
                 }
-                BlendOut(esection_3, 0);
+                BlendOut(esection_3, false);
             }
         }
         if (abForceDelete || spAnimIdleFreeWhenInactiveA->m_pObject) {
@@ -3642,17 +3646,17 @@ void Animation::SpecialIdleFree(bool abFreeQueued, bool abForceDelete) {
             }
             else {
                 spAnimIdleFreeWhenInactiveA[1] = spAnimIdleQueued;
-                spAnimIdleQueued.operator=(static_cast<AnimIdle*>(0));
+                spAnimIdleQueued.operator=(static_cast<AnimIdle*>(nullptr));
             }
         }
         else {
             *spAnimIdleFreeWhenInactiveA = spAnimIdleQueued;
-            spAnimIdleQueued.operator=(static_cast<AnimIdle*>(0));
+            spAnimIdleQueued.operator=(static_cast<AnimIdle*>(nullptr));
         }
     }
     else {
         spAnimIdle = spAnimIdleQueued;
-        spAnimIdleQueued.operator=(static_cast<AnimIdle*>(0));
+        spAnimIdleQueued.operator=(static_cast<AnimIdle*>(nullptr));
     }
 }
 
@@ -3726,12 +3730,12 @@ void Animation::RevertTES(TESObjectREFR* apRef) {
     if (spAnimIdle.operator->()) {
         AnimIdleFree(spAnimIdle);
     }
-    spAnimIdle.operator=(static_cast<AnimIdle*>(0));
+    spAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
     if (spAnimIdleQueued.operator->()) {
         AnimIdleFree(spAnimIdleQueued);
     }
-    spAnimIdleQueued.operator=(static_cast<AnimIdle*>(0));
-    pCurrentSequence[7] = 0;
+    spAnimIdleQueued.operator=(static_cast<AnimIdle*>(nullptr));
+    pCurrentSequence[7] = nullptr;
     ClearGroup(AGS_SPECIAL_IDLE, 0.0);
     if (spManager.m_pObject) {
         NiControllerManager* v2 = spManager.m_pObject;
@@ -3740,7 +3744,7 @@ void Animation::RevertTES(TESObjectREFR* apRef) {
     NiAVObject* SceneRoot = GetSceneRoot();
     Animation::ClearControllersInterpolators(SceneRoot);
     ClearBlendInterps();
-    ReloadTargets(1);
+    ReloadTargets(true);
 }
 
 void Animation::Revert(BGSLoadGameBuffer* apLoadGameBuffer) {
@@ -3750,12 +3754,12 @@ void Animation::Revert(BGSLoadGameBuffer* apLoadGameBuffer) {
     if (spAnimIdle.m_pObject) {
         AnimIdleFree(spAnimIdle);
     }
-    spAnimIdle.operator=(static_cast<AnimIdle*>(0));
+    spAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
     if (spAnimIdleQueued.m_pObject) {
         AnimIdleFree(spAnimIdleQueued);
     }
-    spAnimIdleQueued.operator=(static_cast<AnimIdle*>(0));
-    pCurrentSequence[7] = 0;
+    spAnimIdleQueued.operator=(static_cast<AnimIdle*>(nullptr));
+    pCurrentSequence[7] = nullptr;
     ClearGroup(AGS_SPECIAL_IDLE, 0.0f);
     if (spManager.m_pObject) {
         spManager.m_pObject->DeactivateAll(0.0f);
@@ -3807,7 +3811,7 @@ void Animation::SaveGameBGS(BGSSaveGameBuffer* apSaveGameBuffer) {
         apSaveGameBuffer->SaveFormID(apForm, 0);
     }
     else {
-        apSaveGameBuffer->SaveFormID(static_cast<TESForm*>(0), 0);
+        apSaveGameBuffer->SaveFormID(static_cast<TESForm*>(nullptr), 0);
     }
     if (pAnimIdle) {
         if (pAnimIdle->pIdleForm) {
@@ -3818,7 +3822,7 @@ void Animation::SaveGameBGS(BGSSaveGameBuffer* apSaveGameBuffer) {
             apSaveGameBuffer->SaveVariableSizedValue(v12 - CastingType, started);
         }
     }
-    BSAnimGroupSequence* Sequence = 0;
+    BSAnimGroupSequence* Sequence = nullptr;
     if (spAnimIdleQueued.m_pObject) {
         if (spAnimIdle.m_pObject) {
             Sequence = spAnimIdle.m_pObject->GetSequence();
@@ -3841,7 +3845,7 @@ void Animation::SaveGameBGS(BGSSaveGameBuffer* apSaveGameBuffer) {
         pIdleSequence = pAnimIdle->GetSequence();
     }
     else {
-        pIdleSequence = 0;
+        pIdleSequence = nullptr;
     }
     for (uint32_t j = 0; j < 8; ++j) {
         if ((!Sequence || pCurrentSequence[j] != Sequence) && group[j] != 255 && group[j] != 0xFFFF) {
@@ -3850,7 +3854,7 @@ void Animation::SaveGameBGS(BGSSaveGameBuffer* apSaveGameBuffer) {
             apSaveGameBuffer->SaveDataEndian(&nextGroup[j], 2u, 0);
             apSaveGameBuffer->SaveDataEndian(&loopCount[j], 4u, 0);
             apSaveGameBuffer->SaveDataEndian(&nextLoops[j], 4u, 0);
-            AnimSequenceBase* val = 0;
+            AnimSequenceBase* val = nullptr;
             cSequenceIndex = -1;
             if (pAnimSequenceMap->GetAt(group[j], val)) {
                 cSequenceIndex = val->GetSequenceIndex(pCurrentSequence[j]);
@@ -3879,7 +3883,7 @@ void Animation::SaveGameBGS(BGSSaveGameBuffer* apSaveGameBuffer) {
 void Animation::SpecialIdleQueue(TESIdleForm* apIdleForm, ANIM_GROUP_SECTION aeSection) {
     AnimIdle* v4;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_ANIMATION, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Animation.cpp", 0x125D
+        MEM_CONTEXT_ANIMATION, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Animation.cpp", 0x125D
     );
     if (spAnimIdle.m_pObject) {
         ANIM_GROUP_SECTION esection = spAnimIdle.m_pObject->eSection;
@@ -3900,7 +3904,7 @@ void Animation::SpecialIdleQueue(TESIdleForm* apIdleForm, ANIM_GROUP_SECTION aeS
                 );
                 return;
             }
-            BlendOut(spAnimIdle.m_pObject->eSection, 0);
+            BlendOut(spAnimIdle.m_pObject->eSection, false);
         }
         if (spAnimIdleFreeWhenInactiveA->m_pObject) {
             if (spAnimIdleFreeWhenInactiveA[1].m_pObject) {
@@ -3908,21 +3912,21 @@ void Animation::SpecialIdleQueue(TESIdleForm* apIdleForm, ANIM_GROUP_SECTION aeS
             }
             else {
                 spAnimIdleFreeWhenInactiveA[1].operator=(spAnimIdle);
-                spAnimIdle.operator=(static_cast<AnimIdle*>(0));
+                spAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
             }
         }
         else {
             spAnimIdleFreeWhenInactiveA->operator=(spAnimIdle);
-            spAnimIdle.operator=(static_cast<AnimIdle*>(0));
+            spAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
         }
     }
     AnimIdle* v7 = static_cast<AnimIdle*>(NiMemObject::operator new(sizeof(AnimIdle)));
     if (v7) {
         v4 = ::new (v7)
-            AnimIdle(apIdleForm, aeSection, AnimIdle::PLAY_TYPE_QUEUE, static_cast<Actor*>(pActorRef), 0, nullptr);
+            AnimIdle(apIdleForm, aeSection, AnimIdle::PLAY_TYPE_QUEUE, static_cast<Actor*>(pActorRef), false, nullptr);
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     spAnimIdle.operator=(v4);
 }
@@ -3942,7 +3946,7 @@ uint16_t Animation::GetAnimationSaveSize(TESObjectREFR* apRef) {
             }
         }
     }
-    Actor* apActor = 0;
+    Actor* apActor = nullptr;
     if (apRef) {
         if (apRef->IsActor()) {
             apActor = static_cast<Actor*>(apRef);
@@ -4005,37 +4009,37 @@ uint16_t Animation::GetAnimationSaveSize(TESObjectREFR* apRef) {
 }
 
 void Animation::ShutdownAllAnimIdles() {
-    bShutDown = 1;
-    SpecialIdleFree(1, 1);
+    bShutDown = true;
+    SpecialIdleFree(true, true);
     for (uint32_t i = 0; i < 2; ++i) {
         if (spAnimIdleFreeWhenInactiveA[i].operator->()) {
             AnimIdleFree(spAnimIdleFreeWhenInactiveA[i]);
-            spAnimIdleFreeWhenInactiveA[i].operator=(static_cast<AnimIdle*>(0));
+            spAnimIdleFreeWhenInactiveA[i].operator=(static_cast<AnimIdle*>(nullptr));
         }
     }
 }
 
 bool Animation::ShouldBeMoving() {
     if (!pCurrentSequence[1]) {
-        return 0;
+        return false;
     }
     if (!pSoundPriorityBone[1]) {
-        return 0;
+        return false;
     }
     const char* plowerBodyBone = (&pSoundPriorityBone[1]->m_kName)->GetHandleString();
     ANIM_GROUP_ENUM eType = TESAnimGroup::GetType(group[1]);
     if (eType < ANIM_GROUP_BEGIN_MOVEMENT) {
-        return 0;
+        return false;
     }
     if (eType > ANIM_GROUP_DODGE_RIGHT) {
-        return 0;
+        return false;
     }
-    BSAnimGroupSequence* phighestSeq = 0;
+    BSAnimGroupSequence* phighestSeq = nullptr;
     uint8_t cpriority = 0;
     for (ANIM_GROUP_SECTION etestSection = AGS_IDLE; etestSection < ANIM_GROUP_SECTION_COUNT;
          etestSection = static_cast<ANIM_GROUP_SECTION>(etestSection + 1)) {
         if (pCurrentSequence[etestSection]) {
-            uint8_t ctestPriority = pCurrentSequence[etestSection]->GetPriority(plowerBodyBone, 0);
+            uint8_t ctestPriority = pCurrentSequence[etestSection]->GetPriority(plowerBodyBone, nullptr);
             if (ctestPriority <= static_cast<int32_t>(cpriority)) {
                 if (ctestPriority == cpriority && etestSection == AGS_MOVEMENT) {
                     phighestSeq = pCurrentSequence[1u];
@@ -4091,21 +4095,21 @@ char Animation::FindNextNoteKey(ANIM_GROUP_SECTION aeSection, const char* apSear
 
 bool Animation::SpecialIdlePlay(Actor* apActor) {
     if (!SpecialIdlePlay()) {
-        return 0;
+        return false;
     }
     AnimIdle* v2 = spAnimIdle.operator->();
     v2->pActor = apActor;
     AnimIdle* v3 = spAnimIdle.operator->();
     BSAnimGroupSequence* Sequence = v3->GetSequence();
     apActor->SetAnimAction(ANIM_ACTION_WAIT_FOR_SPECIAL_IDLE, Sequence);
-    return 1;
+    return true;
 }
 
 void Animation::AnimIdleFree(NiPointer<AnimIdle>& aspAnimIdle) {
     KFModel* pkfModel = aspAnimIdle.m_pObject->GetKFModel();
-    AnimSequenceBase* panimSeq = 0;
+    AnimSequenceBase* panimSeq = nullptr;
     uint16_t sanimGroup = 255;
-    NiPointer<BSAnimGroupSequence> spfadeSeq(static_cast<BSAnimGroupSequence*>(0));
+    NiPointer<BSAnimGroupSequence> spfadeSeq(static_cast<BSAnimGroupSequence*>(nullptr));
     if (pkfModel) {
         if (pkfModel->GetAnimGroup()) {
             BSAnimGroupSequence* v2;
@@ -4138,7 +4142,7 @@ void Animation::AnimIdleFree(NiPointer<AnimIdle>& aspAnimIdle) {
                 }
             }
             else {
-                panimSeq = 0;
+                panimSeq = nullptr;
             }
         }
     }
@@ -4148,7 +4152,7 @@ void Animation::AnimIdleFree(NiPointer<AnimIdle>& aspAnimIdle) {
     if (!bShutDown) {
         if (panimSeq) {
             if (panimSeq->GetSequenceToPlay(-1) == pLastMovementSequence) {
-                pLastMovementSequence = 0;
+                pLastMovementSequence = nullptr;
             }
             BSAnimGroupSequence* v5 = panimSeq->GetSequenceToPlay(-1);
             spManager.m_pObject->RemoveSequence(v5);
@@ -4156,20 +4160,20 @@ void Animation::AnimIdleFree(NiPointer<AnimIdle>& aspAnimIdle) {
         else {
             if (spfadeSeq.m_pObject) {
                 if (spfadeSeq.operator==(pLastMovementSequence)) {
-                    pLastMovementSequence = 0;
+                    pLastMovementSequence = nullptr;
                 }
                 spManager.m_pObject->RemoveSequence(spfadeSeq.m_pObject);
             }
         }
     }
     AnimIdle::FreeAnimIdleData(aspAnimIdle.m_pObject);
-    aspAnimIdle.operator=(static_cast<AnimIdle*>(0));
+    aspAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
     if (panimSeq) {
         pAnimSequenceMap->RemoveAt(sanimGroup);
         if (panimSeq) {
             delete panimSeq;
         }
-        panimSeq = 0;
+        panimSeq = nullptr;
     }
     if (!spfadeSeq.m_pObject && !panimSeq) {
         pAnimSequenceMap->RemoveAt(sanimGroup);
@@ -4188,7 +4192,7 @@ void Animation::SaveGameTES(TESForm* apForm) {
     char cSlotMask;
     char cHasCastSequence;
     char i;
-    char* pBlockStart = 0;
+    char* pBlockStart = nullptr;
     uint8_t* pStart = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         pStart = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -4241,7 +4245,7 @@ void Animation::SaveGameTES(TESForm* apForm) {
             }
         }
     }
-    Actor* pActor = 0;
+    Actor* pActor = nullptr;
     if (apForm) {
         if (apForm->IsActor()) {
             pActor = static_cast<Actor*>(apForm);
@@ -4339,7 +4343,7 @@ void Animation::LoadGameTES(TESObjectREFR* apref) {
     uint16_t sBlockSize = 0;
     char cSlotMask;
     char cHasCastSequence;
-    uint8_t* pBlockStart = 0;
+    uint8_t* pBlockStart = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iBlockID, 4u);
         if (iBlockID != 0x424C4F4B) {
@@ -4366,7 +4370,7 @@ void Animation::LoadGameTES(TESObjectREFR* apref) {
         pBlockStart = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
         pSaveLoadGameOLD->LoadGameDataOLD(&sBlockSize, 2u);
     }
-    Actor* apActor = 0;
+    Actor* apActor = nullptr;
     if (apref) {
         if (apref->IsActor()) {
             apActor = static_cast<Actor*>(apref);
@@ -4386,7 +4390,7 @@ void Animation::LoadGameTES(TESObjectREFR* apref) {
             pSaveLoadGameOLD->LoadGameDataOLD(&nextGroup[i], 2u);
             pSaveLoadGameOLD->LoadGameDataOLD(&nextLoops[i], 4u);
             pSaveLoadGameOLD->LoadGameDataOLD(&cSequenceIndex, 1u);
-            pCurrentSequence[i] = 0;
+            pCurrentSequence[i] = nullptr;
             if (cSequenceIndex != -2) {
                 SkipNextBlend();
                 ForceSection(static_cast<ANIM_GROUP_SECTION>(i), group[i], action[i], time, cSequenceIndex);
@@ -4407,7 +4411,7 @@ void Animation::LoadGameTES(TESObjectREFR* apref) {
     }
     if (spAnimIdle.m_pObject) {
         if (spAnimIdle.m_pObject->eFlags == AnimIdle::ANIM_IDLE_LOADED) {
-            pCurrentSequence[7] = 0;
+            pCurrentSequence[7] = nullptr;
         }
     }
     pSaveLoadGameOLD->LoadGameDataOLD(&cSkipNextBlend, 1u);
@@ -4436,14 +4440,14 @@ void Animation::LoadGameTES(TESObjectREFR* apref) {
                             NiControllerSequence* a1 = v25->GetSequenceByName(*g_SpecialIdle_Cast);
                             if (a1) {
                                 v25->DeactivateAll(0.0f);
-                                v25->ActivateSequence(a1, 0, 0, 1.0f, 0.0f, 0);
-                                v25->SetActive(1);
+                                v25->ActivateSequence(a1, 0, false, 1.0f, 0.0f, nullptr);
+                                v25->SetActive(true);
                                 static_cast<BSAnimGroupSequence*>(a1)->BSAnimGroupSequence::LoadGame(time);
                                 pSaveLoadGameOLD->LoadGameDataOLD(&fFadeTimer, 4u);
                                 MagicLight* pLight = apActor->pLight;
                                 if (pLight) {
                                     float v17 = a1->m_fEndKeyTime * 0.75;
-                                    pLight->Fade(1, v17);
+                                    pLight->Fade(true, v17);
                                     pLight->fFadeTimer = fFadeTimer;
                                 }
                                 bLoaded = 1;
@@ -4458,7 +4462,7 @@ void Animation::LoadGameTES(TESObjectREFR* apref) {
             pSaveLoadGameOLD->AdvanceBuffer(v6 + 4);
         }
     }
-    UpdateBipOnly(time, &AccumRootTranslate, 1);
+    UpdateBipOnly(time, &AccumRootTranslate, true);
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         uint8_t* pBlockEnd = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
         LoadFormHeader* pHeader = pSaveLoadGameOLD->m_pCurrentlyLoadingFormHeader;
@@ -4534,7 +4538,7 @@ void Animation::ClearControllersInterpolators(NiAVObject* apObj) {
         }
         v5 = apObj->IsNode();
         if (v5) {
-            for (a1a = 0; a1a < ((uint32_t)v5->GetArrayCount()); ++a1a) {
+            for (a1a = 0; a1a < v5->GetArrayCount(); ++a1a) {
                 apObja = v5->GetAt(a1a);
                 Animation::ClearControllersInterpolators(apObja);
             }
@@ -4551,15 +4555,15 @@ bool Animation::FindSkinnedNode(NiAVObject* apAVObject) {
     uint32_t a1;
     uint8_t skinnedNode = 0;
     if (!apAVObject) {
-        return (bool)0;
+        return false;
     }
     NiGeometry* v5 = apAVObject->IsGeometry();
     if (v5 && v5->GetSkinInstance()) {
-        return (bool)1;
+        return true;
     }
     NiNode* v4 = apAVObject->IsNode();
     if (v4) {
-        for (a1 = 0; a1 < ((uint32_t)v4->GetArrayCount()); ++a1) {
+        for (a1 = 0; a1 < v4->GetArrayCount(); ++a1) {
             v2 = v4->GetAt(a1);
             if (v2) {
                 skinnedNode = (uint8_t)Animation::FindSkinnedNode(v2);
@@ -4625,13 +4629,13 @@ void Animation::SaveAnimation(TESObjectREFR* apRef, Animation* apAnimation) {
     uint16_t isize;
     isize = 0;
     if (apAnimation) {
-        if (!apRef->IsDead(0)) {
+        if (!apRef->IsDead(false)) {
             isize = apAnimation->GetAnimationSaveSize(apRef);
         }
     }
     pSaveLoadGameOLD->SaveGameDataOLD(&isize, 2u);
     if (apAnimation) {
-        if (!apRef->IsDead(0)) {
+        if (!apRef->IsDead(false)) {
             apAnimation->SaveGameTES(apRef);
         }
     }
@@ -4644,7 +4648,7 @@ NiFixedString* get_g_SpecialIdle_Cast() {
 int16_t ComputeAnimationSaveSize(PlayerCharacter* a1, Animation* a2) {
     uint16_t isize = 2;
     if (a2) {
-        if (!a1->IsDead(0)) {
+        if (!a1->IsDead(false)) {
             return a2->GetAnimationSaveSize(a1) + 2;
         }
     }
@@ -4695,13 +4699,13 @@ bool AnimSequenceMultiple::RemoveSequence(BSAnimGroupSequence* apSeq, bool abRel
     apSeq->DecRefCount();
     pSeqList->Remove(apSeq);
     if (!pSeqList->IsEmpty()) {
-        return 0;
+        return false;
     }
     if (pSeqList) {
         delete pSeqList;
     }
-    pSeqList = 0;
-    return 1;
+    pSeqList = nullptr;
+    return true;
 }
 
 bool AnimSequenceMultiple::IsSingleSeq() {
@@ -4723,7 +4727,7 @@ BSAnimGroupSequence* AnimSequenceMultiple::GetSequenceToPlay(char aiSequenceInde
             return v6;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 BSAnimGroupSequence* AnimSequenceMultiple::GetSequence(TESAnimGroup* apAnimGroup) {
@@ -4757,7 +4761,7 @@ AnimSequenceMultiple::GetCorrespondingSequence(BSAnimGroupSequence* apSeq, ANIM_
     const char* HandleString = (&apSeq->m_kName)->GetHandleString();
     char* p3rdLastSlash = const_cast<char*>(std::strrchr(HandleString, 92));
     if (!p3rdLastSlash) {
-        return 0;
+        return nullptr;
     }
     if (aeSection == AGS_WEAPON_UP) {
         ourStrcpy(Destination, p3rdLastSlash);
@@ -4796,7 +4800,7 @@ AnimSequenceMultiple::GetCorrespondingSequence(BSAnimGroupSequence* apSeq, ANIM_
         }
         listIt = (void*)pSeqList->GetNextPos(static_cast<NiTListItem<BSAnimGroupSequence*>*>(listIt));
     }
-    return 0;
+    return nullptr;
 }
 
 AnimSequenceSingle::AnimSequenceSingle() : pSeq(nullptr) {}
@@ -4828,10 +4832,10 @@ void AnimSequenceSingle::SetSequence(BSAnimGroupSequence* apSeq, bool abReleaseM
 
 bool AnimSequenceSingle::RemoveSequence(BSAnimGroupSequence* apSeq, bool abReleaseModelLoader) {
     if (pSeq != apSeq) {
-        return (bool)0;
+        return false;
     }
     SetSequence(nullptr, abReleaseModelLoader);
-    return (bool)1;
+    return true;
 }
 
 bool AnimSequenceSingle::IsSingleSeq() {
@@ -4852,7 +4856,7 @@ char AnimSequenceSingle::GetSequenceIndex(BSAnimGroupSequence* apSeq) {
 }
 
 void ModelLoader::ReleaseKFFile(const char* apFilename) {
-    ReleaseKF(apFilename, 1);
+    ReleaseKF(apFilename, true);
 }
 
 bool TESAnimGroup::IsAttackAction() {
@@ -4914,7 +4918,7 @@ NiAVObject* NiControllerManager::GetAccumRoot() const {
             }
         }
     }
-    return 0;
+    return nullptr;
 }
 
 float NiControllerSequence::GetLastScaledTime() {

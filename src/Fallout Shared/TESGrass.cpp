@@ -93,7 +93,7 @@ void TESGrass::Save() {
 
 void TESGrass::InitItem() {
     if (!TESForm::GetInitialized()) {
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 
@@ -110,54 +110,54 @@ void TESGrass::Copy(TESForm* apCopy) {
 bool TESGrass::Compare(TESForm* apCompare) {
     TESGrass* v16 = dynamic_cast<TESGrass*>(apCompare);
     if (!v16) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v16)) {
-        return (bool)1;
+        return true;
     }
     int32_t v3 = (int32_t)GetDensity();
     if (((uint32_t)v3) != ((uint32_t)v16->GetDensity())) {
-        return (bool)1;
+        return true;
     }
     int32_t v4 = (int32_t)GetMinSlopeDegrees();
     if (((uint32_t)v4) != ((uint32_t)v16->GetMinSlopeDegrees())) {
-        return (bool)1;
+        return true;
     }
     int32_t v5 = (int32_t)GetMaxSlopeDegrees();
     if (((uint32_t)v5) != ((uint32_t)v16->GetMaxSlopeDegrees())) {
-        return (bool)1;
+        return true;
     }
     int32_t v6 = (int32_t)GetDistanceFromWaterLevel();
     if (((uint32_t)v6) != ((uint32_t)v16->GetDistanceFromWaterLevel())) {
-        return (bool)1;
+        return true;
     }
     uint32_t v7 = GetUnderwaterState();
     if (v7 != ((uint32_t)((int32_t)v16->GetUnderwaterState()))) {
-        return (bool)1;
+        return true;
     }
     double v8 = (double)GetPositionRange();
     if (v8 != v16->GetPositionRange()) {
-        return (bool)1;
+        return true;
     }
     double v9 = (double)GetHeightRange();
     if (v9 != v16->GetHeightRange()) {
-        return (bool)1;
+        return true;
     }
     double v10 = (double)GetColorRange();
     if (v10 != v16->GetColorRange()) {
-        return (bool)1;
+        return true;
     }
     double v11 = (double)GetWavePeriod();
     if (v11 != v16->GetWavePeriod()) {
-        return (bool)1;
+        return true;
     }
     int32_t v12 = (int32_t)GetVertexLighting();
     if (((uint32_t)v12) != ((uint32_t)((uint8_t)v16->GetVertexLighting()))) {
-        return (bool)1;
+        return true;
     }
     int32_t v13 = (int32_t)GetUniformScaling();
     if (((uint32_t)v13) != ((uint32_t)((uint8_t)v16->GetUniformScaling()))) {
-        return (bool)1;
+        return true;
     }
     int32_t v14 = (int32_t)GetFitToSlope();
     return (bool)((uint8_t)(((uint32_t)v14) != ((uint32_t)((uint8_t)v16->GetFitToSlope()))));
@@ -169,10 +169,10 @@ uint8_t TESGrass::GetDensity() {
 
 bool TESGrass::SetDensity(uint8_t acDensity) {
     if (((uint32_t)((int32_t)acDensity)) > 0x64u) {
-        return (bool)0;
+        return false;
     }
     Data.cDensity = (int8_t)acDensity;
-    return (bool)1;
+    return true;
 }
 
 uint8_t TESGrass::GetMinSlopeDegrees() {
@@ -182,10 +182,10 @@ uint8_t TESGrass::GetMinSlopeDegrees() {
 bool TESGrass::SetMinSlopeDegrees(uint8_t acMinSlopeDegrees) {
     if ((((uint32_t)((int32_t)acMinSlopeDegrees)) > 0x5Au) ||
         (((int32_t)acMinSlopeDegrees) > ((int32_t)((uint8_t)Data.cMaxSlopeDegrees)))) {
-        return (bool)0;
+        return false;
     }
     Data.cMinSlopeDegrees = (int8_t)acMinSlopeDegrees;
-    return (bool)1;
+    return true;
 }
 
 uint8_t TESGrass::GetMaxSlopeDegrees() {
@@ -195,10 +195,10 @@ uint8_t TESGrass::GetMaxSlopeDegrees() {
 bool TESGrass::SetMaxSlopeDegrees(uint8_t acMaxSlopeDegrees) {
     if ((((uint32_t)((int32_t)acMaxSlopeDegrees)) > 0x5Au) ||
         (((int32_t)acMaxSlopeDegrees) < ((int32_t)((uint8_t)Data.cMinSlopeDegrees)))) {
-        return (bool)0;
+        return false;
     }
     Data.cMaxSlopeDegrees = (int8_t)acMaxSlopeDegrees;
-    return (bool)1;
+    return true;
 }
 
 float TESGrass::GetMinSlope() {
@@ -230,10 +230,10 @@ float TESGrass::GetPositionRange() {
 
 bool TESGrass::SetPositionRange(float afRange) {
     if ((!(afRange >= 0.0)) || (!(afRange <= 512.0))) {
-        return (bool)0;
+        return false;
     }
     Data.fPositionRange = afRange;
-    return (bool)1;
+    return true;
 }
 
 float TESGrass::GetHeightRange() {
@@ -242,10 +242,10 @@ float TESGrass::GetHeightRange() {
 
 bool TESGrass::SetHeightRange(float afRange) {
     if ((!(afRange >= 0.0)) || (!(afRange <= 1.0))) {
-        return (bool)0;
+        return false;
     }
     Data.fHeightRange = afRange;
-    return (bool)1;
+    return true;
 }
 
 float TESGrass::GetColorRange() {
@@ -254,10 +254,10 @@ float TESGrass::GetColorRange() {
 
 bool TESGrass::SetColorRange(float afRange) {
     if ((!(afRange >= 0.0)) || (!(afRange <= 1.0))) {
-        return (bool)0;
+        return false;
     }
     Data.fColorRange = afRange;
-    return (bool)1;
+    return true;
 }
 
 float TESGrass::GetWavePeriod() {
@@ -266,10 +266,10 @@ float TESGrass::GetWavePeriod() {
 
 bool TESGrass::SetWavePeriod(float afPeriod) {
     if ((!(afPeriod > 0.0)) || (!(afPeriod <= 100.0))) {
-        return (bool)0;
+        return false;
     }
     Data.fWavePeriod = afPeriod;
-    return (bool)1;
+    return true;
 }
 
 bool TESGrass::GetVertexLighting() {

@@ -78,7 +78,7 @@ NiObject* NiPSysFieldAttenuationCtlr::CreateObject() {
     NiPSysFieldAttenuationCtlr* v0 =
         static_cast<NiPSysFieldAttenuationCtlr*>(NiMemObject::operator new(sizeof(NiPSysFieldAttenuationCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysFieldAttenuationCtlr;
 }

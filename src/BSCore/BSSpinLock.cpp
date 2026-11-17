@@ -31,7 +31,7 @@ bool BSSpinLock::TryLock() {
     uint32_t Exchange = BSGetCurrentThreadID();
     if (uiOwningThread == Exchange) {
         ++uiLockCount;
-        return 1;
+        return true;
     }
     else {
         uint32_t v1 = BSAtomicCompareExchange(&uiOwningThread, 0, Exchange);

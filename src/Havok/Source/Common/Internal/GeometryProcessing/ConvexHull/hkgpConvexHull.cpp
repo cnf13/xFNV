@@ -171,14 +171,14 @@ hkgpConvexHull* hkgpConvexHull::clone() const {
         hkMemoryRouter* v7 = &hkMemoryRouter::getInstance();
         v7->m_heap->blockFree(m_data, sizeof(hkgpConvexHullImpl));
     }
-    v4->m_data = 0;
+    v4->m_data = nullptr;
     v4->m_data = this->m_data->clone();
     v4->m_userData = m_userData;
     if (m_userObject) {
         v4->m_userObject = m_userObject->clone();
     }
     else {
-        v4->m_userObject = 0;
+        v4->m_userObject = nullptr;
     }
     return v4;
 }
@@ -1175,7 +1175,7 @@ void hkgpConvexHull::getSupportingVertex(const hkVector4& direction, hkVector4& 
     hkgpConvexHullImpl* m_data = this->m_data;
     if (!m_data->m_supportCache.m_size) {
         int32_t m_numUsed = m_data->m_mesh.m_vertices.m_numUsed;
-        a2a.m_data = 0;
+        a2a.m_data = nullptr;
         a2a.m_size = 0;
         a2a.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
         hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
@@ -1464,7 +1464,7 @@ void hkgpConvexHull::deleteUserObject() {
     if (m_userObject) {
         delete m_userObject;
     }
-    this->m_userObject = 0;
+    this->m_userObject = nullptr;
 }
 
 uint32_t hkgpConvexHull::uid() {
@@ -1625,7 +1625,7 @@ void hkgpConvexHull::reset() {
     if (m_userObject) {
         delete m_userObject;
     }
-    this->m_userObject = 0;
+    this->m_userObject = nullptr;
 }
 
 __m128* hkgpConvexHull::calcTrianglePlane(__m128* a1, hkgpConvexHull::Triangle* a2) {
@@ -1644,17 +1644,14 @@ __m128* hkgpConvexHull::calcTrianglePlane(__m128* a1, hkgpConvexHull::Triangle* 
     len2[0] = len2[0] + fXY;
     const float fRsqrt = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(len2[0])));
     const __m128 isZero = _mm_cmpeq_ss(len2, _mm_set_ss(0.0f));
-    const float fRefine = 3.0f - static_cast<float>(static_cast<float>(len2[0] * fRsqrt) * fRsqrt);
+    const float fRefine = 3.0f - ((len2[0] * fRsqrt) * fRsqrt);
     __m128 invLen = _mm_setzero_ps();
-    invLen[0] = static_cast<float>(0.5f * fRsqrt) * fRefine;
+    invLen[0] = (0.5f * fRsqrt) * fRefine;
     invLen = _mm_andnot_ps(isZero, invLen);
     const __m128 normal = _mm_mul_ps(_mm_shuffle_ps(invLen, invLen, 0x00), n);
     *a1 = normal;
     const __m128 nv0 = _mm_mul_ps(normal, v0);
-    (*a1)[3] = 0.0f -
-        static_cast<float>(
-                   _mm_shuffle_ps(nv0, nv0, 0xAA)[0] + static_cast<float>(_mm_shuffle_ps(nv0, nv0, 0x55)[0] + nv0[0])
-        );
+    (*a1)[3] = 0.0f - (_mm_shuffle_ps(nv0, nv0, 0xAA)[0] + (_mm_shuffle_ps(nv0, nv0, 0x55)[0] + nv0[0]));
     return a1;
 }
 
@@ -1862,7 +1859,7 @@ int32_t hkgpConvexHull::buildPlanar_0(
 ) {
     m_data->m_config = config;
     m_data->m_projectionPlane.m_quad = plane.m_quad;
-    return m_data->build(points, numPoints, 1, 0);
+    return m_data->build(points, numPoints, 1, nullptr);
 }
 
 void*& hkgpConvexHull::userData() {
@@ -2685,7 +2682,7 @@ void hkgpConvexHull::createVoronoiEdges(
 ) {
     using pieces_t = hkArray<hkgpConvexHull*, hkContainerHeapAllocator>;
     FNVD_INLINED_LOCAL(pieces_t, pieces, std::nullopt, std::nullopt);
-    pieces.m_data = 0;
+    pieces.m_data = nullptr;
     pieces.m_size = 0;
     pieces.m_capacityAndFlags = hkArrayBase<hkgpConvexHull*>::DONT_DEALLOCATE_FLAG;
     hkgpConvexHull::createVoronoiFeatures(domain, points, pieces, edges, margin);
@@ -2915,11 +2912,11 @@ int32_t hkgpConvexHullImpl::build(
                             hkVector4 normal;
                             normal.setCross(e1, e2);
                             const __m128 n2 = _mm_mul_ps(normal.m_quad, normal.m_quad);
-                            const float fNormalLength2 = _mm_shuffle_ps(n2, n2, 0xAA)[0] +
-                                static_cast<float>(_mm_shuffle_ps(n2, n2, 0x55)[0] + n2[0]);
+                            const float fNormalLength2 =
+                                _mm_shuffle_ps(n2, n2, 0xAA)[0] + (_mm_shuffle_ps(n2, n2, 0x55)[0] + n2[0]);
                             const __m128 p2 = _mm_mul_ps(m_projectionPlane.m_quad, m_projectionPlane.m_quad);
-                            const float fPlaneLength2 = _mm_shuffle_ps(p2, p2, 0xAA)[0] +
-                                static_cast<float>(_mm_shuffle_ps(p2, p2, 0x55)[0] + p2[0]);
+                            const float fPlaneLength2 =
+                                _mm_shuffle_ps(p2, p2, 0xAA)[0] + (_mm_shuffle_ps(p2, p2, 0x55)[0] + p2[0]);
                             if (fPlaneLength2 < fNormalLength2) {
                                 m_projectionPlane = normal;
                                 if (fNormalLength2 > 9.999999747378752e-05) {
@@ -2934,21 +2931,19 @@ int32_t hkgpConvexHullImpl::build(
                 // normalize3: (1, 0, 0) for a zero normal.
                 const hkVector4 plane = m_projectionPlane;
                 const __m128 q2 = _mm_mul_ps(plane.m_quad, plane.m_quad);
-                const float fLength2 =
-                    _mm_shuffle_ps(q2, q2, 0xAA)[0] + static_cast<float>(_mm_shuffle_ps(q2, q2, 0x55)[0] + q2[0]);
+                const float fLength2 = _mm_shuffle_ps(q2, q2, 0xAA)[0] + (_mm_shuffle_ps(q2, q2, 0x55)[0] + q2[0]);
                 if (fLength2 == 0.0) {
                     m_projectionPlane.set(1.0f, 0.0f, 0.0f, 0.0f);
                 }
                 else {
-                    const float fLength = static_cast<float>(std::sqrt(fLength2));
+                    const float fLength = std::sqrt(fLength2);
                     const float fInvLength = 1.0 / fLength;
                     m_projectionPlane.m_quad = _mm_mul_ps(_mm_set1_ps(fInvLength), plane.m_quad);
                 }
                 // The plane through the first point.
                 const __m128 d = _mm_mul_ps(points[0].m_quad, m_projectionPlane.m_quad);
-                m_projectionPlane.m_quad[3] = 0.0f -
-                    static_cast<float>(_mm_shuffle_ps(d, d, 0xAA)[0] +
-                                       static_cast<float>(_mm_shuffle_ps(d, d, 0x55)[0] + d[0]));
+                m_projectionPlane.m_quad[3] =
+                    0.0f - (_mm_shuffle_ps(d, d, 0xAA)[0] + (_mm_shuffle_ps(d, d, 0x55)[0] + d[0]));
             }
         }
         m_pendings.clear();
@@ -3016,17 +3011,16 @@ int32_t hkgpConvexHullImpl::build(
                     const hkVector4 axis = m_projectionAxis;
                     for (int32_t i = 1; i < numPoints; ++i) {
                         const __m128 di = _mm_mul_ps(axis.m_quad, m_pendings[i].m_source.m_quad);
-                        const float fDot = _mm_shuffle_ps(di, di, 0xAA)[0] +
-                            static_cast<float>(_mm_shuffle_ps(di, di, 0x55)[0] + di[0]);
+                        const float fDot = _mm_shuffle_ps(di, di, 0xAA)[0] + (_mm_shuffle_ps(di, di, 0x55)[0] + di[0]);
                         const __m128 dMin = _mm_mul_ps(m_pendings[iMin].m_source.m_quad, axis.m_quad);
-                        const float fMinDot = _mm_shuffle_ps(dMin, dMin, 0xAA)[0] +
-                            static_cast<float>(_mm_shuffle_ps(dMin, dMin, 0x55)[0] + dMin[0]);
+                        const float fMinDot =
+                            _mm_shuffle_ps(dMin, dMin, 0xAA)[0] + (_mm_shuffle_ps(dMin, dMin, 0x55)[0] + dMin[0]);
                         if (fMinDot > fDot) {
                             iMin = i;
                         }
                         const __m128 dMax = _mm_mul_ps(m_pendings[iMax].m_source.m_quad, axis.m_quad);
-                        const float fMaxDot = _mm_shuffle_ps(dMax, dMax, 0xAA)[0] +
-                            static_cast<float>(_mm_shuffle_ps(dMax, dMax, 0x55)[0] + dMax[0]);
+                        const float fMaxDot =
+                            _mm_shuffle_ps(dMax, dMax, 0xAA)[0] + (_mm_shuffle_ps(dMax, dMax, 0x55)[0] + dMax[0]);
                         if (fMaxDot < fDot) {
                             iMax = i;
                         }
@@ -3471,22 +3465,21 @@ bool hkgpConvexHullImpl::flushPending() {
                     len2[0] = len2[0] + fXY;
                     const float fRsqrt = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(len2[0])));
                     const __m128 isZero = _mm_cmpeq_ss(len2, _mm_set_ss(0.0f));
-                    const float fRefine = 3.0f - static_cast<float>(static_cast<float>(len2[0] * fRsqrt) * fRsqrt);
+                    const float fRefine = 3.0f - ((len2[0] * fRsqrt) * fRsqrt);
                     __m128 invLen = _mm_setzero_ps();
-                    invLen[0] = static_cast<float>(0.5f * fRsqrt) * fRefine;
+                    invLen[0] = (0.5f * fRsqrt) * fRefine;
                     invLen = _mm_andnot_ps(isZero, invLen);
                     __m128 planeEquation = _mm_mul_ps(_mm_shuffle_ps(invLen, invLen, 0x00), n);
                     const __m128 na = _mm_mul_ps(planeEquation, pa);
-                    planeEquation[3] = 0.0f -
-                        static_cast<float>(_mm_shuffle_ps(na, na, 0xAA)[0] +
-                                           static_cast<float>(_mm_shuffle_ps(na, na, 0x55)[0] + na[0]));
+                    planeEquation[3] =
+                        0.0f - (_mm_shuffle_ps(na, na, 0xAA)[0] + (_mm_shuffle_ps(na, na, 0x55)[0] + na[0]));
                     // Keeps the plane whose normal is longer than m_projectionPlane's (lengthSquared3 of each).
                     const __m128 p2 = _mm_mul_ps(planeEquation, planeEquation);
                     const float fPlaneLength2 =
-                        _mm_shuffle_ps(p2, p2, 0xAA)[0] + static_cast<float>(_mm_shuffle_ps(p2, p2, 0x55)[0] + p2[0]);
+                        _mm_shuffle_ps(p2, p2, 0xAA)[0] + (_mm_shuffle_ps(p2, p2, 0x55)[0] + p2[0]);
                     const __m128 q2 = _mm_mul_ps(m_projectionPlane.m_quad, m_projectionPlane.m_quad);
                     const float fProjectionLength2 =
-                        _mm_shuffle_ps(q2, q2, 0xAA)[0] + static_cast<float>(_mm_shuffle_ps(q2, q2, 0x55)[0] + q2[0]);
+                        _mm_shuffle_ps(q2, q2, 0xAA)[0] + (_mm_shuffle_ps(q2, q2, 0x55)[0] + q2[0]);
                     if (fProjectionLength2 < fPlaneLength2) {
                         m_projectionPlane.m_quad = planeEquation;
                     }
@@ -4282,7 +4275,7 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
             float v62 = 0.0f;
             int32_t m_numUsed = m_mesh.m_vertices.m_numUsed;
             // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>'s constructor
-            apArray.m_data = 0;
+            apArray.m_data = nullptr;
             apArray.m_size = 0;
             a1.m_quad = hkVector4Zero.m_quad;
             apArray.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -4807,7 +4800,7 @@ void hkgpConvexHullImpl::buildIndices() {
             const float fLengthSquared =
                 _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq)));
             if (fLengthSquared != 0.0f) {
-                const float fLength = static_cast<float>(std::sqrt(fLengthSquared));
+                const float fLength = std::sqrt(fLengthSquared);
                 const float fInverse = 1.0f / fLength;
                 plane.m_quad = _mm_mul_ps(_mm_set1_ps(fInverse), plane.m_quad);
             }
@@ -4968,7 +4961,7 @@ void hkgpConvexHullImpl::buildIndices() {
                     _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq))
                 );
                 if (fLengthSquared != 0.0f) {
-                    const float fLength = static_cast<float>(std::sqrt(fLengthSquared));
+                    const float fLength = std::sqrt(fLengthSquared);
                     const float fInverse = 1.0f / fLength;
                     pPlane->m_quad = _mm_mul_ps(_mm_set1_ps(fInverse), normal.m_quad);
                 }
@@ -5151,7 +5144,7 @@ void hkgpConvexHullImpl::fetchBevelPlanes(
             if (fLengthSquared == 0.0f) {
                 continue;
             }
-            const float fLength = static_cast<float>(std::sqrt(fLengthSquared));
+            const float fLength = std::sqrt(fLengthSquared);
             const float fInverse = 1.0f / fLength;
             const Vertex* pVertex = m_mesh.m_vertices.m_used;
             const __m128 x0 = _mm_add_ps(
@@ -5913,7 +5906,7 @@ void hkgpConvexHullImpl::generateVertexAdjacencyGraph(
 void hkgpConvexHullImpl::getSupportingVertexTransformed(__m128* a1, __m128* a2, __m128* a3) {
     hkgpConvexHullImpl::Vertex* m_used = m_mesh.m_vertices.m_used;
     float v9 = 0.0f;
-    for (hkgpConvexHullImpl::Vertex* i = 0; m_used; m_used = m_used->m_next) {
+    for (hkgpConvexHullImpl::Vertex* i = nullptr; m_used; m_used = m_used->m_next) {
         __m128 v6 = _mm_add_ps(
             _mm_add_ps(
                 _mm_add_ps(
@@ -5925,7 +5918,7 @@ void hkgpConvexHullImpl::getSupportingVertexTransformed(__m128* a1, __m128* a2, 
             a1[3]
         );
         __m128 v7 = _mm_mul_ps(*a2, v6);
-        float v8 = _mm_shuffle_ps(v7, v7, 170)[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+        float v8 = _mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
         if (!i || v9 < static_cast<double>(v8)) {
             v9 = v8;
             *a3 = v6;
@@ -6086,7 +6079,7 @@ double hkgpConvexHullImpl::getSpan(const hkVector4& direction, float* apMin, flo
     direction_.m_quad = _mm_xor_ps(direction.m_quad, hkQuadRealNegateMask);
     if (!m_supportCache.m_size) {
         int32_t m_numUsed = m_mesh.m_vertices.m_numUsed;
-        apArray_.m_data = 0;
+        apArray_.m_data = nullptr;
         apArray_.m_size = 0;
         apArray_.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
         hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
@@ -6117,7 +6110,7 @@ double hkgpConvexHullImpl::getSpan(const hkVector4& direction, float* apMin, flo
     hkGeometryProcessing::getSupportingVertex(m_supportCache, direction, vertexOut);
     if (!m_supportCache.m_size) {
         int32_t m_numUsed_2 = m_mesh.m_vertices.m_numUsed;
-        apArray_.m_data = 0;
+        apArray_.m_data = nullptr;
         apArray_.m_size = 0;
         apArray_.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
         hkMemoryAllocator* m_heap_2 = (&hkMemoryRouter::getInstance())->m_heap;
@@ -6154,7 +6147,7 @@ double hkgpConvexHullImpl::getSpan(const hkVector4& direction, float* apMin, flo
     const float v21 =
         _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(v20, v20, 170), _mm_add_ss(_mm_shuffle_ps(v20, v20, 85), v20)));
     *apMin = v21;
-    return static_cast<float>(*apMax - v21);
+    return (*apMax - v21);
 }
 
 // The total length of the hull's edges, by dimension: none for a point, the distance between the two vertices of a
@@ -6409,7 +6402,7 @@ float hkgpConvexHullImpl::getOrientedRectangle(
     hkVector4& halfExtents,
     hkTransform& worldTransform
 ) const {
-    typedef hkgpAbstractMesh<Edge, Vertex, Triangle, hkContainerHeapAllocator>::EdgeIterator EdgeIterator;
+    using EdgeIterator = hkgpAbstractMesh<Edge, Vertex, Triangle, hkContainerHeapAllocator>::EdgeIterator;
     if (!m_hasIndexing.m_bool) {
         char buf[512];
         hkErrStream errStream(buf, 512);
@@ -6470,7 +6463,7 @@ float hkgpConvexHullImpl::getOrientedRectangle(
             if (fLengthSquared0 == 0.0f) {
                 continue;
             }
-            const float fLength0 = static_cast<float>(std::sqrt(fLengthSquared0));
+            const float fLength0 = std::sqrt(fLengthSquared0);
             const float fInverse0 = 1.0f / fLength0;
             axis0.m_quad = _mm_mul_ps(_mm_set1_ps(fInverse0), axis0.m_quad);
             hkVector4 axis1;
@@ -6481,7 +6474,7 @@ float hkgpConvexHullImpl::getOrientedRectangle(
             if (fLengthSquared1 == 0.0f) {
                 continue;
             }
-            const float fLength1 = static_cast<float>(std::sqrt(fLengthSquared1));
+            const float fLength1 = std::sqrt(fLengthSquared1);
             const float fInverse1 = 1.0f / fLength1;
             axis1.m_quad = _mm_mul_ps(_mm_set1_ps(fInverse1), axis1.m_quad);
             const float fExtent0 = static_cast<float>(getSpan(axis0, &pSlotHigh[0], &pSlotHigh[1]));
@@ -6509,7 +6502,7 @@ float hkgpConvexHullImpl::getOrientedRectangle(
             if (fLengthSquared1 == 0.0f) {
                 continue;
             }
-            const float fLength1 = static_cast<float>(std::sqrt(fLengthSquared1));
+            const float fLength1 = std::sqrt(fLengthSquared1);
             const float fInverse1 = 1.0f / fLength1;
             axis1.m_quad = _mm_mul_ps(_mm_set1_ps(fInverse1), axis1.m_quad);
             const float fExtent0 = static_cast<float>(getSpan(axis0, &pSlotLow[0], &pSlotLow[1]));

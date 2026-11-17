@@ -78,7 +78,7 @@ BSTempEffectDebris::BSTempEffectDebris(
 
 BSTempEffectDebris::~BSTempEffectDebris() {
     if (pFilename) {
-        pModelLoader->ReleaseModel(pFilename, 0, 1u);
+        pModelLoader->ReleaseModel(pFilename, false, 1u);
     }
     if (sp3D.m_pObject) {
         if (sp3D.m_pObject->m_pkParent) {
@@ -87,8 +87,8 @@ BSTempEffectDebris::~BSTempEffectDebris() {
         }
     }
     if (iNumHWThreads == 1) {
-        bhkWorld::Activate(sp3D.m_pObject, 1, 1, 0);
-        bhkWorld::RemoveObjects(sp3D.m_pObject, 1, 0);
+        bhkWorld::Activate(sp3D.m_pObject, true, true, false);
+        bhkWorld::RemoveObjects(sp3D.m_pObject, true, false);
     }
     else {
         NiAVObject* pObject = sp3D.m_pObject;
@@ -108,7 +108,7 @@ const NiRTTI* BSTempEffectDebris::GetRTTI() const {
 bool BSTempEffectDebris::Update(float afTimeDelta) {
     bool bIsAlive = BSTempEffect::Update(afTimeDelta);
     if (bForceDelete) {
-        bIsAlive = 0;
+        bIsAlive = false;
     }
     if (bIsAlive) {
         double Time = GetLifetime();
@@ -120,7 +120,7 @@ bool BSTempEffectDebris::Update(float afTimeDelta) {
                 v3 = v7->IsNode();
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             if (v3) {
                 float v6 = v8 / fDebrisFadeTime.Float();
@@ -160,14 +160,14 @@ void BSTempEffectDebris::Init(
     float afScale,
     bool bUseCache
 ) {
-    SetIs1stPerson(0);
-    NiAVObject* pmodel = pModelLoader->LoadFile(pFilename, LOD_MULT_NONE, 1, 0, 0, 0);
+    SetIs1stPerson(false);
+    NiAVObject* pmodel = pModelLoader->LoadFile(pFilename, LOD_MULT_NONE, true, false, false, false);
     if (bUseCache) {
         if (TES::pInstance) {
             TES::pInstance->GetUnusedCachedParticleObject(pmodel, sp3D);
         }
         else {
-            sp3D.operator=(static_cast<NiAVObject*>(0));
+            sp3D.operator=(static_cast<NiAVObject*>(nullptr));
         }
     }
     else {
@@ -187,10 +187,10 @@ void BSTempEffectDebris::Init(
             BSShaderManager::SetObjectTypeRecurse(sp3D.m_pObject, BSShaderManager::BSSM_OBJ_MISC);
             InitHavok(apSourceRef);
             sp3D.m_pObject->UpdateProperties();
-            NiUpdateData UpdateData(fCellAppTime, 1, 0);
+            NiUpdateData UpdateData(fCellAppTime, true, false);
             sp3D.m_pObject->Update(UpdateData);
-            TESHavokUtilities::AddVelocity(sp3D.m_pObject, aStartLinearVelocity, 1);
-            TESHavokUtilities::AddAngularVelocity(sp3D.m_pObject, aStartAngularVelocity, 1);
+            TESHavokUtilities::AddVelocity(sp3D.m_pObject, aStartLinearVelocity, true);
+            TESHavokUtilities::AddAngularVelocity(sp3D.m_pObject, aStartAngularVelocity, true);
             ReferenceProcessLists.AddTempEffect(this);
             if (bUseDebrisCounter) {
                 BSTempEffectDebris::AddtoDebrisCounter(this);
@@ -237,7 +237,7 @@ void BSTempEffectDebris::InitHavok(TESObjectREFR* apSourceRef) {
                             CFilter kFilter;
                             static_cast<MobileObject*>(apSourceRef)->MobileObject::GetCollisionFilter(&kFilter.iFilter);
                             uint32_t Group = kFilter.GetGroup();
-                            bhkWorld::SetGroup(pav, Group, 1, 1);
+                            bhkWorld::SetGroup(pav, Group, true, true);
                         }
                     }
                     pw->AddObjectsAndMoveController(pav, proot);
@@ -278,7 +278,7 @@ void BSTempEffectDebris::LimitDebrisObjects() {
             for (void* iter = DebrisLimitList.m_pkTail; iter && ikill > 0; iter = DebrisLimitList.GetPrevPos(iter)) {
                 BSTempEffectDebris* pdebris = DebrisLimitList.Get(iter);
                 if (pdebris) {
-                    pdebris->SetForceDelete(1);
+                    pdebris->SetForceDelete(true);
                     --ikill;
                 }
             }

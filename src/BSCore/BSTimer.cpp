@@ -76,11 +76,11 @@ void BSTimer::Update(uint32_t aiTime) {
         if (fClamp == 0.0) {
             uiFrameDelta = uiTotalDelta - iLastTime;
             if (uiTotalDelta == iLastTime) {
-                bZeroDelta = (bool)1;
+                bZeroDelta = true;
                 uiFrameDelta = 1;
             }
             else {
-                bZeroDelta = (bool)0;
+                bZeroDelta = false;
                 if (uiFrameDelta > 166) {
                     uiFrameDelta = 166;
                 }
@@ -92,7 +92,7 @@ void BSTimer::Update(uint32_t aiTime) {
             fDelta = (float)(((double)uiFrameDelta) * 0.0010000000474974513);
         }
         else {
-            fClampRemainder = (float)(fClampRemainder + fClamp);
+            fClampRemainder = (fClampRemainder + fClamp);
             fOldRemainder = (uint32_t)((int64_t)fClampRemainder);
             fClampRemainder = (float)(fClampRemainder - ((double)fOldRemainder));
             uiTotalDelta = fOldRemainder + iLastTime;
@@ -100,7 +100,7 @@ void BSTimer::Update(uint32_t aiTime) {
         }
         iLastTime = uiTotalDelta;
         fDeltaUnmodified = fDelta;
-        fDelta = (float)(fDelta * BSTimer::fGlobalTimeMultiplier);
+        fDelta = (fDelta * BSTimer::fGlobalTimeMultiplier);
     }
 }
 
@@ -125,7 +125,7 @@ void BSTimer::ClampAt(uint32_t aiClamp) {
 }
 
 void BSTimer::RestoreGlobalTimeMultiplierCache() {
-    SetGlobalTimeMultiplier(BSTimer::fPreviousGlobalTimeMultiplier, 0);
+    SetGlobalTimeMultiplier(BSTimer::fPreviousGlobalTimeMultiplier, false);
 }
 
 float BSTimer::QGlobalTimeMultiplier() {

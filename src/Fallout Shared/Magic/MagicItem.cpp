@@ -45,16 +45,16 @@ MagicItem::~MagicItem() {
 
 void MagicItem::Preload(bool abNow) {
     EffectSetting* pavEffectSetting = GetAVEffect(MagicSystem::SELF);
-    bool brunNow = 0;
-    bool bloadNow = 0;
+    bool brunNow = false;
+    bool bloadNow = false;
     if (abNow || IsLoaded()) {
-        brunNow = 1;
-        bloadNow = 1;
+        brunNow = true;
+        bloadNow = true;
     }
     else {
         if (IsLoading()) {
-            brunNow = 1;
-            bloadNow = 0;
+            brunNow = true;
+            bloadNow = false;
         }
     }
     if (brunNow) {
@@ -63,7 +63,7 @@ void MagicItem::Preload(bool abNow) {
             if (bloadNow) {
                 if (pavEffectSetting->GetModelLength()) {
                     const char* v2 = pavEffectSetting->GetModel();
-                    pModelLoader->LoadFile(v2, LOD_MULT_NONE, 1, 0, 0, 0);
+                    pModelLoader->LoadFile(v2, LOD_MULT_NONE, true, false, false, false);
                 }
             }
             pavEffectSetting->IncEffectLoadedCount();
@@ -72,7 +72,7 @@ void MagicItem::Preload(bool abNow) {
             plist_2 = static_cast<EffectItemList*>(this);
         }
         else {
-            plist_2 = 0;
+            plist_2 = nullptr;
         }
         EffectItemList* plist_3 = plist_2;
         if (!plist_2->IsEmpty()) {
@@ -87,7 +87,7 @@ void MagicItem::Preload(bool abNow) {
                             if (pweapon) {
                                 if (pweapon->GetModelLength()) {
                                     const char* v3 = pweapon->GetModel();
-                                    pModelLoader->LoadFile(v3, LOD_MULT_NONE, 1, 0, 0, 0);
+                                    pModelLoader->LoadFile(v3, LOD_MULT_NONE, true, false, false, false);
                                 }
                             }
                         }
@@ -96,9 +96,9 @@ void MagicItem::Preload(bool abNow) {
                                 TESObjectARMO* parmor = dynamic_cast<TESObjectARMO*>(pform);
                                 if (parmor) {
                                     const char* BipedModel = parmor->GetBipedModel(TESActorBase::SEX_MALE);
-                                    pModelLoader->LoadFile(BipedModel, LOD_MULT_NONE, 1, 0, 0, 0);
+                                    pModelLoader->LoadFile(BipedModel, LOD_MULT_NONE, true, false, false, false);
                                     const char* v5 = parmor->GetBipedModel(TESActorBase::SEX_FEMALE);
-                                    pModelLoader->LoadFile(v5, LOD_MULT_NONE, 1, 0, 0, 0);
+                                    pModelLoader->LoadFile(v5, LOD_MULT_NONE, true, false, false, false);
                                 }
                             }
                             else {
@@ -106,11 +106,14 @@ void MagicItem::Preload(bool abNow) {
                                     if (pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_CREATURE)) {
                                         TESNPC* pnpc = dynamic_cast<TESNPC*>(pform);
                                         if (pnpc) {
-                                            BSSimpleList<const char*>* pmodelList = pnpc->BuildDefaultModelList(1, 1);
+                                            BSSimpleList<const char*>* pmodelList =
+                                                pnpc->BuildDefaultModelList(true, true);
                                             for (BSSimpleList<const char*>* plist_4 = pmodelList;
                                                  plist_4 && !plist_4->IsEmpty(); plist_4 = plist_4->GetNext()) {
                                                 const char* pfilename = plist_4->m_item;
-                                                pModelLoader->LoadFile(pfilename, LOD_MULT_NONE, 1, 0, 0, 0);
+                                                pModelLoader->LoadFile(
+                                                    pfilename, LOD_MULT_NONE, true, false, false, false
+                                                );
                                             }
                                             pmodelList->RemoveAll();
                                             if (pmodelList) {
@@ -121,7 +124,7 @@ void MagicItem::Preload(bool abNow) {
                                         if (pcreature) {
                                             char Dst[264];
                                             const char* v6 = pcreature->GetModel();
-                                            pModelLoader->LoadFile(v6, LOD_MULT_NONE, 1, 0, 0, 0);
+                                            pModelLoader->LoadFile(v6, LOD_MULT_NONE, true, false, false, false);
                                             const char* pfilename_2 = pcreature->GetModel();
                                             BSSimpleList<const char*>* pcreatureFileList = &pcreature->nifFilenames;
                                             BSstrcpy(Dst, 260, pfilename_2);
@@ -132,14 +135,18 @@ void MagicItem::Preload(bool abNow) {
                                                 const char* pitem_2 = pfilelist->m_item;
                                                 if (pitem_2) {
                                                     BSstrcat(Dst, 260, pitem_2);
-                                                    pModelLoader->LoadFile(Dst, LOD_MULT_NONE, 1, 0, 0, 0);
+                                                    pModelLoader->LoadFile(
+                                                        Dst, LOD_MULT_NONE, true, false, false, false
+                                                    );
                                                 }
                                             }
                                             const char* plastBackSlash = std::strrchr(pfilename_2, 92);
                                             if (plastBackSlash) {
                                                 if (!_strnicmp(plastBackSlash + 1, "Skeleton", 8u)) {
                                                     BSSimpleList<const char*>* pFilenameList =
-                                                        pModelLoader->BuildKFFileList(pfilename_2, 0, 0, AGW_NONE);
+                                                        pModelLoader->BuildKFFileList(
+                                                            pfilename_2, false, false, AGW_NONE
+                                                        );
                                                     for (BSSimpleList<const char*>* pnode = pFilenameList; pnode;
                                                          pnode = pnode->GetNext()) {
                                                         const char* pitem_3 = pnode->m_item;
@@ -209,7 +216,7 @@ void MagicItem::Unload(bool abRelease) {
             plist_2 = static_cast<EffectItemList*>(this);
         }
         else {
-            plist_2 = 0;
+            plist_2 = nullptr;
         }
         EffectItemList* plist_3 = plist_2;
         if (!plist_2->IsEmpty()) {
@@ -243,7 +250,8 @@ void MagicItem::Unload(bool abRelease) {
                                     if (pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_CREATURE)) {
                                         TESNPC* pnpc = dynamic_cast<TESNPC*>(pform);
                                         if (pnpc) {
-                                            BSSimpleList<const char*>* pmodelList = pnpc->BuildDefaultModelList(1, 1);
+                                            BSSimpleList<const char*>* pmodelList =
+                                                pnpc->BuildDefaultModelList(true, true);
                                             for (BSSimpleList<const char*>* plist_4 = pmodelList;
                                                  plist_4 && !plist_4->IsEmpty(); plist_4 = plist_4->GetNext()) {
                                                 const char* pfilename = plist_4->m_item;
@@ -276,7 +284,9 @@ void MagicItem::Unload(bool abRelease) {
                                             if (plastBackSlash) {
                                                 if (!_strnicmp(plastBackSlash + 1, "Skeleton", 8u)) {
                                                     BSSimpleList<const char*>* pFilenameList =
-                                                        pModelLoader->BuildKFFileList(pfilename_2, 0, 0, AGW_NONE);
+                                                        pModelLoader->BuildKFFileList(
+                                                            pfilename_2, false, false, AGW_NONE
+                                                        );
                                                     for (BSSimpleList<const char*>* pnode = pFilenameList; pnode;
                                                          pnode = pnode->GetNext()) {
                                                         const char* pitem_3 = pnode->m_item;
@@ -329,13 +339,13 @@ bool MagicItem::IsLoaded() {
     EffectItemList* plist_2;
     EffectSetting* pavEffectSetting = GetAVEffect(MagicSystem::SELF);
     if (pavEffectSetting && (pavEffectSetting->GetModelLength() && !pavEffectSetting->IsEffectLoaded())) {
-        return 0;
+        return false;
     }
     if (this) {
         plist_2 = static_cast<EffectItemList*>(this);
     }
     else {
-        plist_2 = 0;
+        plist_2 = nullptr;
     }
     EffectItemList* plist_3 = plist_2;
     if (!plist_2->IsEmpty()) {
@@ -346,28 +356,28 @@ bool MagicItem::IsLoaded() {
                 pes = pitem->pEffectSetting;
             }
             else {
-                pes = 0;
+                pes = nullptr;
             }
             if (pes && (pes->getArchType() && !pes->IsAssociatedItemLoaded())) {
-                return 0;
+                return false;
             }
             BSSimpleList<EffectItem*>* pNext = plist_3->m_pkNext;
             plist_3 = pNext ? static_cast<EffectItemList*>(pNext) : nullptr;
         }
     }
-    return 1;
+    return true;
 }
 
 bool MagicItem::IsLoading() {
     EffectItemList* plist_2;
     EffectSetting* pavEffectSetting = GetAVEffect(MagicSystem::SELF);
-    bool bfinished = 1;
+    bool bfinished = true;
     if (pavEffectSetting) {
         if (pavEffectSetting->GetModelLength()) {
             if (!pavEffectSetting->IsEffectLoaded()) {
-                bfinished = 0;
+                bfinished = false;
                 if (!pavEffectSetting->IsEffectQueued()) {
-                    return 0;
+                    return false;
                 }
             }
         }
@@ -376,7 +386,7 @@ bool MagicItem::IsLoading() {
         plist_2 = static_cast<EffectItemList*>(this);
     }
     else {
-        plist_2 = 0;
+        plist_2 = nullptr;
     }
     EffectItemList* plist_3 = plist_2;
     if (!plist_2->IsEmpty()) {
@@ -387,13 +397,13 @@ bool MagicItem::IsLoading() {
                 pes = pitem->pEffectSetting;
             }
             else {
-                pes = 0;
+                pes = nullptr;
             }
             if (pes) {
                 if (pes->getArchType() && !pes->IsAssociatedItemLoaded()) {
-                    bfinished = 0;
+                    bfinished = false;
                     if (!pes->IsAssociatedItemQueued()) {
-                        return 0;
+                        return false;
                     }
                 }
             }
@@ -420,7 +430,7 @@ void MagicItem::FinishedLoading() {
                 icount = pavEffectSetting->QueueEffectFinished();
             }
             if (pavEffectSetting->GetModelLength()) {
-                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(0));
+                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
                 const char* v1 = pavEffectSetting->GetModel();
                 pModelLoader->FindModel(v1, spmodel);
                 if (spmodel.m_pObject) {
@@ -433,7 +443,7 @@ void MagicItem::FinishedLoading() {
             plist_2 = static_cast<EffectItemList*>(this);
         }
         else {
-            plist_2 = 0;
+            plist_2 = nullptr;
         }
         EffectItemList* plist_3 = plist_2;
         if (!plist_2->IsEmpty()) {
@@ -450,7 +460,7 @@ void MagicItem::FinishedLoading() {
                         TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pform);
                         if (pweapon) {
                             if (pweapon->GetModelLength()) {
-                                ::new (&spmodel_2) NiPointer<Model>(static_cast<Model*>(0));
+                                ::new (&spmodel_2) NiPointer<Model>(static_cast<Model*>(nullptr));
                                 const char* v2 = pweapon->GetModel();
                                 pModelLoader->FindModel(v2, spmodel_2);
                                 if (spmodel_2.m_pObject) {
@@ -464,7 +474,7 @@ void MagicItem::FinishedLoading() {
                         if (pform && pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_ARMOR)) {
                             TESObjectARMO* parmor = dynamic_cast<TESObjectARMO*>(pform);
                             if (parmor) {
-                                ::new (&spmodel_3) NiPointer<Model>(static_cast<Model*>(0));
+                                ::new (&spmodel_3) NiPointer<Model>(static_cast<Model*>(nullptr));
                                 const char* BipedModel = parmor->GetBipedModel(TESActorBase::SEX_MALE);
                                 pModelLoader->FindModel(BipedModel, spmodel_3);
                                 if (spmodel_3.m_pObject) {
@@ -483,11 +493,11 @@ void MagicItem::FinishedLoading() {
                                 if (pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_CREATURE)) {
                                     TESNPC* pnpc = dynamic_cast<TESNPC*>(pform);
                                     if (pnpc) {
-                                        BSSimpleList<const char*>* pmodelList = pnpc->BuildDefaultModelList(1, 1);
+                                        BSSimpleList<const char*>* pmodelList = pnpc->BuildDefaultModelList(true, true);
                                         BSSimpleList<const char*>* plist_4 = pmodelList;
                                         while (plist_4 && !plist_4->IsEmpty()) {
                                             const char* pfilename = plist_4->m_item;
-                                            ::new (&spmodel_4) NiPointer<Model>(static_cast<Model*>(0));
+                                            ::new (&spmodel_4) NiPointer<Model>(static_cast<Model*>(nullptr));
                                             pModelLoader->FindModel(pfilename, spmodel_4);
                                             if (spmodel_4.m_pObject) {
                                                 spmodel_4.m_pObject->ModManualRefCount(icount_2);
@@ -502,7 +512,7 @@ void MagicItem::FinishedLoading() {
                                     }
                                     TESCreature* pcreature = dynamic_cast<TESCreature*>(pform);
                                     if (pcreature) {
-                                        ::new (&spmodel_5) NiPointer<Model>(static_cast<Model*>(0));
+                                        ::new (&spmodel_5) NiPointer<Model>(static_cast<Model*>(nullptr));
                                         const char* v5 = pcreature->GetModel();
                                         pModelLoader->FindModel(v5, spmodel_5);
                                         if (spmodel_5.m_pObject) {
@@ -520,7 +530,7 @@ void MagicItem::FinishedLoading() {
                                                 const char* pitem_2 = pfilelist->m_item;
                                                 if (pitem_2) {
                                                     BSstrcat(Dst, 260, pitem_2);
-                                                    ::new (&spmodel_6) NiPointer<Model>(static_cast<Model*>(0));
+                                                    ::new (&spmodel_6) NiPointer<Model>(static_cast<Model*>(nullptr));
                                                     pModelLoader->FindModel(Dst, spmodel_6);
                                                     if (spmodel_6.m_pObject) {
                                                         spmodel_6.m_pObject->ModManualRefCount(icount_2);
@@ -532,7 +542,9 @@ void MagicItem::FinishedLoading() {
                                             if (plastBackSlash) {
                                                 if (!_strnicmp(plastBackSlash + 1, "Skeleton", 8u)) {
                                                     BSSimpleList<const char*>* pFilenameList =
-                                                        pModelLoader->BuildKFFileList(pfilename_2, 0, 0, AGW_NONE);
+                                                        pModelLoader->BuildKFFileList(
+                                                            pfilename_2, false, false, AGW_NONE
+                                                        );
                                                     for (BSSimpleList<const char*>* pnode = pFilenameList; pnode;
                                                          pnode = pnode->GetNext()) {
                                                         const char* pitem_3 = pnode->m_item;
@@ -580,8 +592,8 @@ void MagicItem::FinishedLoading() {
         }
     }
     else {
-        Preload(1);
-        Unload(1);
+        Preload(true);
+        Unload(true);
     }
 }
 
@@ -599,21 +611,21 @@ uint32_t MagicItem::GetMagicItemFormID() {
 
 EffectSetting* MagicItem::GetAVEffect(MagicSystem::Range aeRange) {
     EffectItemList* plist_2;
-    EffectItem* pavEffect = 0;
+    EffectItem* pavEffect = nullptr;
     if (this) {
         plist_2 = static_cast<EffectItemList*>(this);
     }
     else {
-        plist_2 = 0;
+        plist_2 = nullptr;
     }
     EffectItemList* plist_3 = plist_2;
     if (plist_2->IsEmpty()) {
-        return 0;
+        return nullptr;
     }
     int32_t imaxCost = -1;
     while (plist_3) {
         EffectItem* pitem = plist_3->m_item;
-        int32_t ithisCost = static_cast<int32_t>(pitem->GetCost(0));
+        int32_t ithisCost = static_cast<int32_t>(pitem->GetCost(nullptr));
         MagicSystem::Range ethisRange = pitem->data.iRange;
         if (!pitem->IsDisabled() && (ethisRange > aeRange || (ethisRange == aeRange && ithisCost > imaxCost))) {
             pavEffect = pitem;
@@ -627,7 +639,7 @@ EffectSetting* MagicItem::GetAVEffect(MagicSystem::Range aeRange) {
         return pavEffect->pEffectSetting;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -635,44 +647,37 @@ BSStringT<char>* MagicItem::GetCannotCastString(BSStringT<char>* apString, Canno
     BSStringT<char>* result;
     switch (aeReason) {
         case 1: {
-            ::new (static_cast<void*>(apString))
-                BSStringT<char>(static_cast<const char*>(gs_sMagicCastInsufficientMagicka.String()));
+            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastInsufficientMagicka.String());
             result = apString;
             break;
         }
         case 2: {
-            ::new (static_cast<void*>(apString))
-                BSStringT<char>(static_cast<const char*>(gs_sMagicCastSilenced.String()));
+            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastSilenced.String());
             result = apString;
             break;
         }
         case 3: {
-            ::new (static_cast<void*>(apString))
-                BSStringT<char>(static_cast<const char*>(gs_sMagicCastInsufficientSkill.String()));
+            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastInsufficientSkill.String());
             result = apString;
             break;
         }
         case 4: {
-            ::new (static_cast<void*>(apString))
-                BSStringT<char>(static_cast<const char*>(gs_sMagicCastPowerUsed.String()));
+            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastPowerUsed.String());
             result = apString;
             break;
         }
         case 5: {
-            ::new (static_cast<void*>(apString))
-                BSStringT<char>(static_cast<const char*>(gs_sMagicCastMultipleBoundEffects.String()));
+            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastMultipleBoundEffects.String());
             result = apString;
             break;
         }
         case 6: {
-            ::new (static_cast<void*>(apString))
-                BSStringT<char>(static_cast<const char*>(gs_sMagicCastRangedUnderwater.String()));
+            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastRangedUnderwater.String());
             result = apString;
             break;
         }
         default: {
-            ::new (static_cast<void*>(apString))
-                BSStringT<char>(static_cast<const char*>(gs_sMagicCastOKText.String()));
+            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastOKText.String());
             result = apString;
             break;
         }
@@ -686,7 +691,7 @@ void MagicItem::MagicItemInitItem(TESForm* apForm) {
         plist_2 = static_cast<EffectItemList*>(this);
     }
     else {
-        plist_2 = 0;
+        plist_2 = nullptr;
     }
     EffectItemList* plist_3 = plist_2;
     iHostileCount = 0;
@@ -709,13 +714,13 @@ bool MagicItem::IsLoadingOrLoaded() {
     if (pavEffectSetting &&
         (pavEffectSetting->GetModelLength() &&
          (!pavEffectSetting->IsEffectLoaded() && !pavEffectSetting->IsEffectQueued()))) {
-        return 0;
+        return false;
     }
     if (this) {
         plist_2 = static_cast<EffectItemList*>(this);
     }
     else {
-        plist_2 = 0;
+        plist_2 = nullptr;
     }
     EffectItemList* plist_3 = plist_2;
     if (!plist_2->IsEmpty()) {
@@ -726,16 +731,16 @@ bool MagicItem::IsLoadingOrLoaded() {
                 pes = pitem->pEffectSetting;
             }
             else {
-                pes = 0;
+                pes = nullptr;
             }
             if (pes && (pes->getArchType() && (!pes->IsAssociatedItemLoaded() && !pes->IsAssociatedItemQueued()))) {
-                return 0;
+                return false;
             }
             BSSimpleList<EffectItem*>* pNext = plist_3->m_pkNext;
             plist_3 = pNext ? static_cast<EffectItemList*>(pNext) : nullptr;
         }
     }
-    return 1;
+    return true;
 }
 
 void MagicItem::DecSummonedCreatureLoadedCount() {

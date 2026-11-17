@@ -100,9 +100,9 @@ void hkpSimpleCollisionResponse::solveSingleContact(
         int32_t min = 0;
         int32_t ok1 = 1;
         int32_t ok2 = 2;
-        float a0 = static_cast<float>(std::fabs(n[0]));
-        const float a1 = static_cast<float>(std::fabs(n[1]));
-        const float a2 = static_cast<float>(std::fabs(n[2]));
+        float a0 = std::fabs(n[0]);
+        const float a1 = std::fabs(n[1]);
+        const float a2 = std::fabs(n[2]);
         if (a1 < a0) {
             ok1 = 0;
             min = 1;

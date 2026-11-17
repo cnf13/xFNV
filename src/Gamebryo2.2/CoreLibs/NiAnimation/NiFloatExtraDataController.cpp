@@ -34,8 +34,8 @@ NiObject* NiFloatExtraDataController::CreateClone(NiCloningProcess& kCloning) {
         return pkClone;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -109,7 +109,7 @@ NiInterpolator* NiFloatExtraDataController::CreatePoseInterpolator(uint16_t usIn
         return ::new (v3) NiFloatInterpolator(pkData->m_fValue);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -139,7 +139,7 @@ bool NiFloatExtraDataController::InterpolatorIsCorrectType(NiInterpolator* pkInt
 NiObject* NiFloatExtraDataController::CreateObject() {
     void* v0 = NiMemObject::operator new(sizeof(NiFloatExtraDataController));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiFloatExtraDataController;
 }

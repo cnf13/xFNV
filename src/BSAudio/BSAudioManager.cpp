@@ -113,11 +113,11 @@ void BSAudioManager::Shutdown() {
     BSSoundInfo* ptmp;
     BSGameSound* psound;
     if (!BSAudio::pAudioInstance->bMultiThread) {
-        Update(0);
-        Update(0);
-        Update(0);
+        Update(false);
+        Update(false);
+        Update(false);
     }
-    BSSoundMessage* pMsg = 0;
+    BSSoundMessage* pMsg = nullptr;
     while (Messages[0].uiCount) {
         pMsg = Messages[0].RemoveHead();
         if (pMsg) {
@@ -132,10 +132,10 @@ void BSAudioManager::Shutdown() {
             MemoryManager_Singleton.Deallocate(pMsg);
         }
     }
-    pMsg = 0;
+    pMsg = nullptr;
     if (pUpdateThread) {
         delete pUpdateThread;
-        pUpdateThread = 0;
+        pUpdateThread = nullptr;
     }
     // The sounds are deleted while an AudioLoadTask may still be opening one on the IO thread (a sound the quit's menu
     // closing played), so pausing waits for the running task and cancelling stops the queued ones (their Cancel marks a
@@ -144,7 +144,7 @@ void BSAudioManager::Shutdown() {
         pIOManager->Pause();
         pIOManager->CancelAllTasks();
     }
-    psound = 0;
+    psound = nullptr;
     ikey = 0;
     for (uint32_t i = 0; i < SoundList.m_uiHashSize; ++i) {
         if (SoundList.m_ppkHashTable[i]) {
@@ -152,13 +152,13 @@ void BSAudioManager::Shutdown() {
             goto LABEL_20;
         }
     }
-    v7 = 0;
+    v7 = nullptr;
 LABEL_20:;
     NiTMapItem<int32_t, BSGameSound*>* pos = v7;
     while (pos) {
         SoundList.GetNext(pos, ikey, psound);
         SoundList.RemoveAt(psound->iSoundID);
-        SetVoiceState(psound->iSoundID, 0);
+        SetVoiceState(psound->iSoundID, nullptr);
         if (psound) {
             delete psound;
         }
@@ -173,10 +173,10 @@ LABEL_20:;
             goto LABEL_31;
         }
     }
-    it = 0;
+    it = nullptr;
 LABEL_31:;
     NiTMapItem<int32_t, BSSoundInfo*>* it_2 = it;
-    BSSoundInfo* pdel = 0;
+    BSSoundInfo* pdel = nullptr;
     ikey = 0;
     while (it_2) {
         StateUpdateMap.GetNext(it_2, ikey, ptmp);
@@ -202,8 +202,8 @@ LABEL_31:;
     bool bCacheWasEnabled = bEnableAudioCache->b;
     // The setting's address is never null.
     p_uValue = &gs_bEnableAudioCache_Audio.uValue;
-    p_uValue->b = 0;
-    AddToCache(0);
+    p_uValue->b = false;
+    AddToCache(nullptr);
     // The setting's address is never null.
     v1 = &gs_bEnableAudioCache_Audio.uValue;
     v1->b = bCacheWasEnabled;
@@ -234,7 +234,7 @@ BSAudioManager::GetSoundHandleByNumericID(BSSoundHandle* apHandle, uint32_t auiF
     bool (*pfncallback)(uint32_t, char*, uint32_t*, void**);
     isoundTypeFlags = 0;
     if (BSAudio::pAudioInstance->bAudioEnabled &&
-        ((pfncallback = BSAudio::pAudioInstance->pfnIDCallback, (pSettingsContext = 0, pfncallback)) &&
+        ((pfncallback = BSAudio::pAudioInstance->pfnIDCallback, (pSettingsContext = nullptr, pfncallback)) &&
          pfncallback(auiFormID, apFilename, &isoundTypeFlags, &pSettingsContext))) {
         if ((isoundTypeFlags & 1) != 0 && (aiTypeFlags & BSGameSound::SOUND_FLAG_IS_3D) != 0) {
             aiTypeFlags = (aiTypeFlags & ~3u) | 1;
@@ -272,7 +272,7 @@ BSAudioManager::GetSoundHandleByNumericID(BSSoundHandle* apHandle, uint32_t auiF
     }
     else {
         apHandle->iSoundID = -1;
-        apHandle->bAssumeSuccess = 0;
+        apHandle->bAssumeSuccess = false;
         apHandle->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
         return apHandle;
     }
@@ -287,7 +287,7 @@ BSSoundHandle* BSAudioManager::GetSoundHandleByFilePath(
     FNVD_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
     if (!BSAudio::pAudioInstance->bAudioEnabled) {
         apResult->iSoundID = -1;
-        apResult->bAssumeSuccess = 0;
+        apResult->bAssumeSuccess = false;
         apResult->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
         return apResult;
     }
@@ -295,7 +295,7 @@ BSSoundHandle* BSAudioManager::GetSoundHandleByFilePath(
     if (!*apFilename) {
         Warning("Trying to create a sound with no filename\n");
         apResult->iSoundID = -1;
-        apResult->bAssumeSuccess = 0;
+        apResult->bAssumeSuccess = false;
         apResult->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
         return apResult;
     }
@@ -316,7 +316,7 @@ BSSoundHandle* BSAudioManager::GetSoundHandleByFilePath(
         pGameSound->SetEnvironmentType(pListener->GetEnvironmentType());
     }
     kHandle.iSoundID = uiSoundID;
-    kHandle.bAssumeSuccess = 0;
+    kHandle.bAssumeSuccess = false;
     kHandle.eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
     EnterCriticalSection(&this->StateCritSection);
     BSSoundInfo* pInfo;
@@ -326,11 +326,11 @@ BSSoundHandle* BSAudioManager::GetSoundHandleByFilePath(
         pNewInfo->iID = uiSoundID;
         pNewInfo->uiSoundType = 0;
         pNewInfo->uiDuration = 0;
-        pNewInfo->bIsPlaying = 0;
+        pNewInfo->bIsPlaying = false;
         pInfo = pNewInfo;
     }
     else {
-        pInfo = 0;
+        pInfo = nullptr;
     }
     SoundStateMap.SetAt(uiSoundID, pInfo);
     LeaveCriticalSection(&this->StateCritSection);
@@ -392,7 +392,7 @@ BSSoundHandle* BSAudioManager::SpawnSoundReference(
     int32_t a7
 ) {
     apResult->iSoundID = -1;
-    apResult->bAssumeSuccess = 0;
+    apResult->bAssumeSuccess = false;
     apResult->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
     return apResult;
 }
@@ -402,7 +402,7 @@ void BSAudioManager::PrecacheSoundFromID(uint32_t auiFormID, int32_t aiFlags) {
     uint32_t v6;
     v6 = aiFlags;
     bool (*pfnIDCallback)(uint32_t, char*, uint32_t*, void**) = BSAudio::pAudioInstance->pfnIDCallback;
-    pSettings = 0;
+    pSettings = nullptr;
     if (BSAudio::pAudioInstance->bAudioEnabled) {
         if (pfnIDCallback) {
             char a1[264];
@@ -487,7 +487,7 @@ void BSAudioManager::StartAudioThread() {
     if (pUpdateThread) {
         if (!pUpdateThread->m_ThreadID) {
             Setting::Info* iAudioHWThread;
-            pUpdateThread->Initialize(BSThread::MEDIUM_STACK_SIZE, "LibAudioUpdate", 0);
+            pUpdateThread->Initialize(BSThread::MEDIUM_STACK_SIZE, "LibAudioUpdate", false);
             dwAudioThreadID = pUpdateThread->m_ThreadID;
             // The setting's address is never null.
             iAudioHWThread = &gs_iAudioHWThread_Audio.uValue;
@@ -508,7 +508,7 @@ BSAudioManager::GetSoundHandleByName(BSSoundHandle* apHandle, const char* apEdit
     bool (*pfncallback)(const char*, char*, uint32_t*, void**);
     isoundTypeFlags = 0;
     if (BSAudio::pAudioInstance->bAudioEnabled &&
-        ((pfncallback = BSAudio::pAudioInstance->pfnNameCallback, (pSettingsContext = 0, pfncallback)) &&
+        ((pfncallback = BSAudio::pAudioInstance->pfnNameCallback, (pSettingsContext = nullptr, pfncallback)) &&
          pfncallback(apEditorID, apFilename, &isoundTypeFlags, &pSettingsContext))) {
         if ((isoundTypeFlags & 0x8000000) != 0) {
             aiTypeFlags |= static_cast<BSGameSound::SoundFlags>(
@@ -540,14 +540,14 @@ BSAudioManager::GetSoundHandleByName(BSSoundHandle* apHandle, const char* apEdit
         }
         else {
             apHandle->iSoundID = -1;
-            apHandle->bAssumeSuccess = 0;
+            apHandle->bAssumeSuccess = false;
             apHandle->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
         }
         return apHandle;
     }
     else {
         apHandle->iSoundID = -1;
-        apHandle->bAssumeSuccess = 0;
+        apHandle->bAssumeSuccess = false;
         apHandle->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
         return apHandle;
     }
@@ -558,7 +558,7 @@ void BSAudioManager::Precache(const char* apToCache, uint32_t aiFlags) {
     uint32_t isoundTypeFlags;
     isoundTypeFlags = aiFlags;
     bool (*pfncallback)(const char*, char*, uint32_t*, void**) = BSAudio::pAudioInstance->pfnNameCallback;
-    pSettingsContext = 0;
+    pSettingsContext = nullptr;
     if (BSAudio::pAudioInstance->bAudioEnabled) {
         if (pfncallback) {
             char a1[264];
@@ -599,7 +599,7 @@ void BSAudioManager::Update(bool abPlayGameWorldSounds) {
             "UILoadScreenInitial",
             static_cast<BSGameSound::SoundFlags>(BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT)
         );
-        bPrecacheCompleted = 1;
+        bPrecacheCompleted = true;
     }
     SynchVoiceStates();
     if (!BSAudio::pAudioInstance->bMultiThread) {
@@ -619,9 +619,9 @@ void BSAudioManager::SynchVoiceStates() {
                 goto LABEL_8;
             }
         }
-        it = 0;
+        it = nullptr;
     LABEL_8:;
-        BSSoundInfo* pdel = 0;
+        BSSoundInfo* pdel = nullptr;
         while (it) {
             StateUpdateMap.GetNext(it, ikey, ptmp);
             while (SoundStateMap.GetAt(ikey, pdel)) {
@@ -710,7 +710,7 @@ void BSAudioManager::MuteAllOfType(uint32_t aiTargetType, uint32_t aiFadeTimeMS,
 
 // The map's key is an int; the sound ID converts implicitly.
 float BSAudioManager::GetVolume(uint32_t aiSoundID) {
-    BSSoundInfo* si = 0;
+    BSSoundInfo* si = nullptr;
     float fretValue = 0.0f;
     EnterCriticalSection(&StateCritSection);
     SoundStateMap.GetAt(aiSoundID, si);
@@ -723,8 +723,8 @@ float BSAudioManager::GetVolume(uint32_t aiSoundID) {
 
 int32_t BSAudioManager::GetDuration(uint32_t aiSoundID) {
     BSSoundInfo* val[2];
-    val[1] = 0;
-    val[0] = 0;
+    val[1] = nullptr;
+    val[0] = nullptr;
     EnterCriticalSection(&StateCritSection);
     SoundStateMap.GetAt(aiSoundID, *val);
     LeaveCriticalSection(&StateCritSection);
@@ -885,7 +885,7 @@ bool BSAudioManager::SetStaticAttenuation(uint32_t aiSoundID, uint16_t aiStaticA
     ComposeMessage(
         MSET_STATIC_ATTENUATION, aiSoundID, static_cast<int32_t>(v5), nullptr, NiPointer<NiAVObject>{}, NiPoint3_ZERO
     );
-    return 0;
+    return false;
 }
 
 bool BSAudioManager::Pause(uint32_t aiSoundID) {
@@ -984,7 +984,7 @@ void BSAudioManager::StopMovingSounds(NiAVObject* apObj, float afFadeSeconds, ui
 }
 
 bool BSAudioManager::SetBalance(uint32_t aiSoundID, int32_t aiNewBalance) {
-    return (bool)0;
+    return false;
 }
 
 // Scales both distances by the double 1000.0, truncates each product to an int64 and passes the low half of each as one
@@ -1001,7 +1001,7 @@ void BSAudioManager::SetMinMax(uint32_t aiSoundID, float afMin, float afMax) {
 }
 
 bool BSAudioManager::SetOrientation(uint32_t aiSoundID, float afX, float afY, float afZ) {
-    return (bool)0;
+    return false;
 }
 
 BSSoundMessage* BSAudioManager::GetFreeMessage() {
@@ -1018,13 +1018,13 @@ bool BSAudioManager::IsPausedType(uint32_t aeFlags) {
         if ((pMutedSoundTypes[i].usState == 1) &&
             ((((int32_t)pMutedSoundTypes[i].uiTypes) & aeFlags) ==
              ((uint32_t)((int32_t)pMutedSoundTypes[i].uiTypes)))) {
-            return (bool)1;
+            return true;
         }
         if ((pMutedSoundTypes[i].usState == 2) && ((((int32_t)pMutedSoundTypes[i].uiTypes) & aeFlags) != 0)) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 bool BSAudioManager::ClearPausedType(uint32_t auiTypes, bool abExact) {
@@ -1034,10 +1034,10 @@ bool BSAudioManager::ClearPausedType(uint32_t auiTypes, bool abExact) {
             (((!abExact) && (pMutedSoundTypes[i].usState == 2)) || (abExact && (pMutedSoundTypes[i].usState == 1)))) {
             pMutedSoundTypes[i].usState = (uint16_t)0;
             pMutedSoundTypes[i].uiTypes = (uint32_t)0;
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 void BSAudioManager::PrecacheSound(char* a1, uint32_t a2, TESSound* a3) {
@@ -1052,18 +1052,18 @@ void BSAudioManager::PrecacheSound(char* a1, uint32_t a2, TESSound* a3) {
             // MAYBE-INLINED 0xADD784: a write opening BSSoundHandle's uses: may be its inlined constructor
             v16.iSoundID = ithisSoundID;
             // MAYBE-INLINED 0xADD787: a write opening BSSoundHandle's uses: may be its inlined constructor
-            v16.bAssumeSuccess = 0;
+            v16.bAssumeSuccess = false;
             // MAYBE-INLINED 0xADD78B: a write opening BSSoundHandle's uses: may be its inlined constructor
             v16.eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
             strcpy_s(pcDest, 260, a1);
             BSAudio::pAudioInstance->FixSoundPath(pcDest);
             uint32_t itestHash = BSGameSound::GetNameHash(pcDest);
-            if (IsInCache(itestHash, 1)) {}
+            if (IsInCache(itestHash, true)) {}
             else {
                 BSGameSound* pNewSound__pfnLoopPointsCallback = BSAudio::pAudioInstance->CreateNewGameSound(a1);
                 pNewSound__pfnLoopPointsCallback->iSoundID = ithisSoundID;
                 pNewSound__pfnLoopPointsCallback->iSoundTypeFlags = static_cast<BSGameSound::SoundFlags>(a2);
-                pNewSound__pfnLoopPointsCallback->SetupPath(0);
+                pNewSound__pfnLoopPointsCallback->SetupPath(false);
                 uint32_t (*pfnSettingsCallback)(BSSoundHandle*, void*, uint32_t*) =
                     BSAudio::pAudioInstance->pfnSettingsCallback;
                 imodFlags = 0;
@@ -1100,14 +1100,14 @@ void BSAudioManager::SetCacheEnabled(bool abEnableCache) {
     p_uValue = &gs_bEnableAudioCache_Audio.uValue;
     p_uValue->b = abEnableCache;
     if (!abEnableCache) {
-        AddToCache(0);
+        AddToCache(nullptr);
     }
 }
 
 void BSAudioManager::SetAudioCacheSizeInK(uint32_t auiNewSize) {
     Setting::Info* p_uValue;
     if (!auiNewSize) {
-        SetCacheEnabled(0);
+        SetCacheEnabled(false);
     }
     if (auiNewSize >= 4096) {
         Warning("AUDIO: Attempted to set audio cache size to %i. Cache size must be < 4MB", auiNewSize);
@@ -1125,7 +1125,7 @@ bool BSAudioManager::IsValid(uint32_t aiSoundID) {
     (&SoundStateMap)->GetAt(aiSoundID, v3);
     if (v3) {
         if (v3->iID == aiSoundID) {
-            return (bool)1;
+            return true;
         }
     }
     return (bool)v4;
@@ -1144,26 +1144,26 @@ float BSAudioManager::GetCorrectedVolume(float afBaseVolume, uint32_t aiTypeFlag
     p_uValue = &gs_fMasterVolumeMult.uValue;
     float v8 = ((fVolumes[0] * fVolumes[6]) * p_uValue->f) * afBaseVolume;
     if ((((int32_t)aiTypeFlags) & 0x800000u) != 0) {
-        return (float)((v8 * fVolumes[4]) * fVolumes[10]);
+        return ((v8 * fVolumes[4]) * fVolumes[10]);
     }
     else {
         if ((((int32_t)aiTypeFlags) & 8u) != 0) {
-            return (float)((fVolumes[1] * fVolumes[7]) * v8);
+            return ((fVolumes[1] * fVolumes[7]) * v8);
         }
         else {
             if ((((int32_t)aiTypeFlags) & 4u) != 0) {
-                return (float)((fVolumes[2] * fVolumes[8]) * v8);
+                return ((fVolumes[2] * fVolumes[8]) * v8);
             }
             else {
                 if ((((int32_t)aiTypeFlags) & 0x800u) != 0) {
-                    return (float)((fVolumes[4] * fVolumes[10]) * v8);
+                    return ((fVolumes[4] * fVolumes[10]) * v8);
                 }
                 else {
                     if ((((int32_t)aiTypeFlags) & 0x100000u) != 0) {
-                        return (float)((fVolumes[5] * fVolumes[11]) * v8);
+                        return ((fVolumes[5] * fVolumes[11]) * v8);
                     }
                     else {
-                        return (float)((fVolumes[3] * fVolumes[9]) * v8);
+                        return ((fVolumes[3] * fVolumes[9]) * v8);
                     }
                 }
             }
@@ -1191,17 +1191,17 @@ bool BSAudioManager::IsPlaying(uint32_t aiSoundID) {
 
 bool BSAudioManager::IsInCache(uint32_t aiSoundHash, bool abFuzzy) {
     if (!aiSoundHash) {
-        return 0;
+        return false;
     }
     EnterCriticalSection(&CacheCritSection);
-    bool bResult = 0;
+    bool bResult = false;
     for (NiTListItem<BSGameSound*>* i = CachedSoundList.m_pkHead; i; i = i->m_pkNext) {
         BSGameSound* pSound = i->m_element;
         if (pSound) {
             char v4;
             if (aiSoundHash == pSound->iSoundHash ||
                 (abFuzzy && (aiSoundHash != pSound->iDirectoryHash || !pSound->iDirectoryHash ? v4 = 0 : v4 = 1, v4))) {
-                bResult = 1;
+                bResult = true;
                 break;
             }
         }
@@ -1258,11 +1258,11 @@ void BSAudioManager::Initialize() {
                 v3 = ::new (v8) BSSoundMessage;
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             FreeMessages.Push(v3);
         }
-        FreeMessages.bBottomless = 1;
+        FreeMessages.bBottomless = true;
         for (uint32_t j = 0; j < 256; ++j) {
             BSSoundMessage* v2;
             BSSoundMessage* v7 = static_cast<BSSoundMessage*>(MemoryManager_Singleton.Allocate(sizeof(BSSoundMessage)));
@@ -1270,19 +1270,19 @@ void BSAudioManager::Initialize() {
                 v2 = ::new (v7) BSSoundMessage;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             FreeQueueMessages.Push(v2);
         }
-        FreeQueueMessages.bBottomless = 1;
-        GarbageMessages.bBottomless = 0;
+        FreeQueueMessages.bBottomless = true;
+        GarbageMessages.bBottomless = false;
         BSAudioManagerThread* apMemory =
             static_cast<BSAudioManagerThread*>(MemoryManager_Singleton.Allocate(sizeof(BSAudioManagerThread)));
         if (apMemory) {
             v1 = ::new (apMemory) BSAudioManagerThread;
         }
         else {
-            v1 = 0;
+            v1 = nullptr;
         }
         pUpdateThread = v1;
     }
@@ -1350,7 +1350,7 @@ void BSAudioManager::SetVoiceState(uint32_t aiID, BSGameSound* apSound) {
     ::new (&pDebugInfo) BSSoundInfo::Data;
     poldDebugInfo.~Data();
     ::new (&poldDebugInfo) BSSoundInfo::Data;
-    BSSoundInfo* v38 = 0;
+    BSSoundInfo* v38 = nullptr;
     // The setting's address is never null.
     p_uValue = &g_bUseAudioDebugInformation_Audio.uValue;
     bool bUseAudioDebugInformation = p_uValue->b;
@@ -1424,7 +1424,7 @@ void BSAudioManager::SetVoiceState(uint32_t aiID, BSGameSound* apSound) {
         }
     }
     EnterCriticalSection(&StateCritSection);
-    BSSoundInfo* poldInfo = 0;
+    BSSoundInfo* poldInfo = nullptr;
     if (StateUpdateMap.GetAt(aiID, poldInfo)) {
         if (bUseAudioDebugInformation) {
             apSource = pDebugInfo;
@@ -1447,7 +1447,7 @@ void BSAudioManager::SetVoiceState(uint32_t aiID, BSGameSound* apSound) {
             pnewInfo = ::new (v28) BSSoundInfo(&newInfo);
         }
         else {
-            pnewInfo = 0;
+            pnewInfo = nullptr;
         }
         if (bUseAudioDebugInformation) {
             v9 = pDebugInfo;
@@ -1471,7 +1471,7 @@ void BSAudioManager::FreeMessage(BSSoundMessage* apMsgToFree) {
             apMsgToFree->spData.operator=(spAVObject_2);
         }
         NiObjectGarbage::Add(spAVObject.m_pObject);
-        spAVObject.operator=(static_cast<NiAVObject*>(0));
+        spAVObject.operator=(static_cast<NiAVObject*>(nullptr));
     }
     {
         NiPointer<NiAVObject> ptr;
@@ -1479,7 +1479,7 @@ void BSAudioManager::FreeMessage(BSSoundMessage* apMsgToFree) {
         apMsgToFree->msg = MINVALID_MSG;
         apMsgToFree->iID = 0;
         apMsgToFree->iData = 0;
-        apMsgToFree->pData = 0;
+        apMsgToFree->pData = nullptr;
         apMsgToFree->spData.operator=(ptr);
         apMsgToFree->vector3[0] = v11.x;
         apMsgToFree->vector3[1] = v11.y;
@@ -1497,7 +1497,7 @@ void BSAudioManager::FreeQueueMessage(BSSoundMessage* apMsgToFree) {
             apMsgToFree->spData.operator=(spAVObject_2);
         }
         NiObjectGarbage::Add(spAVObject.m_pObject);
-        spAVObject.operator=(static_cast<NiAVObject*>(0));
+        spAVObject.operator=(static_cast<NiAVObject*>(nullptr));
     }
     {
         NiPointer<NiAVObject> ptr;
@@ -1505,7 +1505,7 @@ void BSAudioManager::FreeQueueMessage(BSSoundMessage* apMsgToFree) {
         apMsgToFree->msg = MINVALID_MSG;
         apMsgToFree->iID = 0;
         apMsgToFree->iData = 0;
-        apMsgToFree->pData = 0;
+        apMsgToFree->pData = nullptr;
         apMsgToFree->spData.operator=(ptr);
         apMsgToFree->vector3[0] = v11.x;
         apMsgToFree->vector3[1] = v11.y;
@@ -1536,7 +1536,7 @@ void BSAudioManager::AddToCache(BSGameSound* apToCache) {
     Setting::Info* bEnableAudioCache;
     BSGameSound* pnewCopy;
     BSGameSound* pSoundCopy;
-    pSoundCopy = 0;
+    pSoundCopy = nullptr;
     EnterCriticalSection(&CacheCritSection);
     int32_t count = CachedSoundList.m_uiCount;
     // The setting's address is never null.
@@ -1573,16 +1573,16 @@ void BSAudioManager::AddToCache(BSGameSound* apToCache) {
             goto LABEL_25;
         }
     }
-    pnewCopy = BSAudio::pAudioInstance->CreateNewGameSound(0);
+    pnewCopy = BSAudio::pAudioInstance->CreateNewGameSound(nullptr);
     pnewCopy->iSoundTypeFlags = apToCache->iSoundTypeFlags;
-    pnewCopy->Copy(apToCache, 0);
+    pnewCopy->Copy(apToCache, false);
     pnewCopy->iSoundTypeFlags =
         static_cast<BSGameSound::SoundFlags>(apToCache->iSoundTypeFlags | BSGameSound::SOUND_FLAG_CACHED);
     CachedSoundList.AddHead(pnewCopy);
     if ((apToCache->iSoundTypeFlags & BSGameSound::SOUND_FLAG_UNKBIT29) == 0) {
         iCurrentCachSize += pnewCopy->iSoundSize;
     }
-    pSoundCopy = 0;
+    pSoundCopy = nullptr;
     for (int32_t iattempts = 0;; ++iattempts) {
         Setting::Info* v2;
         // The setting's address is never null.
@@ -1613,23 +1613,23 @@ BSGameSound* BSAudioManager::GetFromCache(uint32_t aiSoundHash, uint32_t aiDirec
     BSGameSound* pSoundCopy;
     NiTListItem<BSGameSound*>* iter;
     BSGameSound* pcloseMatch;
-    bool brandomize = 0;
+    bool brandomize = false;
     if (aiDirectoryHash) {
         brandomize = aiSoundHash == 0;
     }
     EnterCriticalSection(&CacheCritSection);
     iter = CachedSoundList.m_pkHead;
-    NiTListItem<BSGameSound*>* lastMatch = 0;
-    NiTListItem<BSGameSound*>* altMatch = 0;
-    BSGameSound* pretValue = 0;
-    pcloseMatch = 0;
-    BSGameSound* pcloseMatchAlternate = 0;
+    NiTListItem<BSGameSound*>* lastMatch = nullptr;
+    NiTListItem<BSGameSound*>* altMatch = nullptr;
+    BSGameSound* pretValue = nullptr;
+    pcloseMatch = nullptr;
+    BSGameSound* pcloseMatchAlternate = nullptr;
     while (iter) {
         pSoundCopy = iter->m_element;
         if (aiSoundHash == pSoundCopy->iSoundHash) {
-            pretValue = BSAudio::pAudioInstance->CreateNewGameSound(0);
+            pretValue = BSAudio::pAudioInstance->CreateNewGameSound(nullptr);
             pretValue->iSoundTypeFlags = static_cast<BSGameSound::SoundFlags>(aiFlagsToApply);
-            pretValue->Copy(pSoundCopy, 1);
+            pretValue->Copy(pSoundCopy, true);
             pretValue->iSoundTypeFlags = static_cast<BSGameSound::SoundFlags>(aiFlagsToApply);
             CachedSoundList.RemovePos(iter);
             if ((pSoundCopy->iSoundTypeFlags & BSGameSound::SOUND_FLAG_UNKBIT29) != 0) {
@@ -1668,9 +1668,9 @@ BSGameSound* BSAudioManager::GetFromCache(uint32_t aiSoundHash, uint32_t aiDirec
     if (pcloseMatch) {
         CachedSoundList.RemovePos(lastMatch);
         CachedSoundList.AddHead(pcloseMatch);
-        pretValue = BSAudio::pAudioInstance->CreateNewGameSound(0);
+        pretValue = BSAudio::pAudioInstance->CreateNewGameSound(nullptr);
         pretValue->iSoundTypeFlags = static_cast<BSGameSound::SoundFlags>(aiFlagsToApply);
-        pretValue->Copy(pcloseMatch, 1);
+        pretValue->Copy(pcloseMatch, true);
         pretValue->iSoundTypeFlags = static_cast<BSGameSound::SoundFlags>(aiFlagsToApply);
     }
     LeaveCriticalSection(&CacheCritSection);
@@ -1682,7 +1682,7 @@ void BSAudioManager::Precache(BSGameSound* apToCache) {
     if (!BSAudio::pAudioInstance->bAudioEnabled ||
         (!apToCache->pFilename[0u] ||
          ((apToCache->iSoundTypeFlags & BSGameSound::SOUND_FLAG_DONT_CACHE) != 0 ||
-          IsInCache(apToCache->iSoundHash, 0)))) {
+          IsInCache(apToCache->iSoundHash, false)))) {
         if (apToCache) {
             goto LABEL_13;
         }
@@ -1719,7 +1719,7 @@ void BSAudioManager::Precache(BSGameSound* apToCache) {
                 pTask = ::new (apMemory) AudioLoadTask(apToCache);
             }
             else {
-                pTask = 0;
+                pTask = nullptr;
             }
             pTask_2 = pTask;
             apToCache->iStateFlags |= BSGameSound::STATE_OPENING;
@@ -1773,8 +1773,8 @@ void BSAudioManager::ProcessSoundUpdates() {
             ftimeScale = 1.0f;
         }
         NiPointer<NiAVObject> spobj;
-        bool bprocessResult = 1;
-        psound = 0;
+        bool bprocessResult = true;
+        psound = nullptr;
         NiPoint3 newDistance = NiPoint3_ZERO;
         ikey = 0;
         for (uint32_t i = 0; i < SoundList.m_uiHashSize; ++i) {
@@ -1783,7 +1783,7 @@ void BSAudioManager::ProcessSoundUpdates() {
                 goto LABEL_12;
             }
         }
-        mapIt = 0;
+        mapIt = nullptr;
     LABEL_12:;
         while (mapIt) {
             SoundList.GetNext(mapIt, ikey, psound);
@@ -1797,7 +1797,7 @@ void BSAudioManager::ProcessSoundUpdates() {
                     if (psound->QueuedMessages.m_uiCount) {
                         NiTPointerList<BSSoundMessage*>* pmsgQueue = &psound->QueuedMessages;
                         NiTPointerList<BSSoundMessage*> tmpQueue;
-                        NiTListItem<BSSoundMessage*>* it = 0;
+                        NiTListItem<BSSoundMessage*>* it = nullptr;
                         while (pmsgQueue->m_uiCount) {
                             BSSoundMessage* ptmpMessage = pmsgQueue->RemoveHead();
                             // EXE-INLINED 0xAE8BF0
@@ -1873,19 +1873,19 @@ void BSAudioManager::ProcessSoundUpdates() {
                        ((psound->iSoundTypeFlags & BSGameSound::SOUND_FLAG_LOOP) != 0 ||
                                 ((psound->iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
                                  (psound->iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0)
-                            ? v3 = 1
-                            : v3 = 0,
+                            ? v3 = true
+                            : v3 = false,
                         v3 &&
                             ((psound->iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) == 0 &&
                              psound->fMaxDist * 1.05 < psound->fDistanceToListener)))))) {
                     psound->Stop();
-                    psound->SetInaudible(1);
+                    psound->SetInaudible(true);
                 }
                 else {
                     if ((psound->iStateFlags & BSGameSound::STATE_INAUDIBLE) != 0 && !psound->IsPaused() &&
                         psound->fMaxDist > static_cast<double>(psound->fDistanceToListener)) {
-                        psound->SetInaudible(0);
-                        psound->Play(1);
+                        psound->SetInaudible(false);
+                        psound->Play(true);
                     }
                 }
                 fcurrentFrequency = psound->GetFrequency();
@@ -1916,7 +1916,7 @@ void BSAudioManager::ProcessSoundUpdates() {
                 MovingRefrList.RemoveAt(psound->iSoundID);
                 if (spobj.m_pObject) {
                     NiObjectGarbage::Add(spobj.m_pObject);
-                    spobj.operator=(static_cast<NiAVObject*>(0));
+                    spobj.operator=(static_cast<NiAVObject*>(nullptr));
                 }
                 if (psound->QueuedMessages.m_uiCount) {
                     NiTPointerList<BSSoundMessage*>* pmsgQueue_2 = &psound->QueuedMessages;
@@ -1925,14 +1925,14 @@ void BSAudioManager::ProcessSoundUpdates() {
                         FreeQueueMessage(ptmpMessage_4);
                     }
                 }
-                SetVoiceState(psound->iSoundID, 0);
+                SetVoiceState(psound->iSoundID, nullptr);
                 if (psound) {
                     delete psound;
                 }
-                psound = 0;
+                psound = nullptr;
             }
         }
-        bListenerMoved = 0;
+        bListenerMoved = false;
         UpdateMovingSounds();
         BSAudio::pAudioInstance->pListener->Update();
         iDelayTimerDelta = GetTickCount();
@@ -1940,7 +1940,7 @@ void BSAudioManager::ProcessSoundUpdates() {
 }
 
 void BSAudioManager::UpdateMovingSounds() {
-    BSGameSound* pSound = 0;
+    BSGameSound* pSound = nullptr;
     NiPointer<NiAVObject> spNode;
     if (!BSAudio::pAudioInstance->pListener) {
         return;
@@ -1951,7 +1951,7 @@ void BSAudioManager::UpdateMovingSounds() {
     int32_t ikey = 0;
     uint32_t uiRefCount = 0;
     while (pPos) {
-        pSound = 0;
+        pSound = nullptr;
         MovingRefrList.GetNext(pPos, ikey, spNode);
         SoundList.GetAt(ikey, pSound);
         uiRefCount = spNode ? spNode->m_uiRefCount : 0;
@@ -3224,8 +3224,8 @@ BSSimpleList<AudioDebugString*>* BSAudioManager::GetDebugString(uint32_t auiPage
         BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN | BSGameSound::SOUND_FLAG_UNKBIT31
     );
     SynchVoiceStates();
-    bool bCheckPaused = 0;
-    char* Destination = 0;
+    bool bCheckPaused = false;
+    char* Destination = nullptr;
     if (auiPage >= 99) {
         if (auiPage == 99) {
             eAudioFlagToCheck = BSGameSound::SOUND_FLAG_MUSIC;
@@ -3283,7 +3283,7 @@ BSSimpleList<AudioDebugString*>* BSAudioManager::GetDebugString(uint32_t auiPage
             }
             case 10u: {
                 std::strcat(Destination, "(Stopped or Silent only)");
-                bCheckPaused = 1;
+                bCheckPaused = true;
                 break;
             }
         }
@@ -3477,10 +3477,10 @@ bool BSAudioManager::SetPausedType(BSGameSound::SoundFlags auiTypes, bool abExac
         if (!pMutedSoundTypes[i].usState) {
             pMutedSoundTypes[i].usState = 2 - abExact;
             pMutedSoundTypes[i].uiTypes = auiTypes;
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 BSAudioManager& BSAudioManager::QInstance() {
@@ -3616,7 +3616,7 @@ void AudioLoadTask::Run() {
     if (!pSound->iSoundHash && pSound->iDirectoryHash != 0) {
         pSound->SetupPath(true);
         uint32_t uiSoundHash = pSound->iSoundHash;
-        bInCache = BSAudioManager::QInstance().IsInCache(uiSoundHash, 0);
+        bInCache = BSAudioManager::QInstance().IsInCache(uiSoundHash, false);
     }
     if (bInCache) {
         if (bCached) {
@@ -3716,8 +3716,8 @@ uint32_t BSAudioManagerThread::ThreadProc() {
     BSSemaphore* lpAddend = &m_SuspendSema;
     m_SuspendSema.hSemaphore->Wait();
     InterlockedDecrementInt32(&lpAddend->iCount);
-    m_bSuspended = 0;
-    while (1) {
+    m_bSuspended = false;
+    while (true) {
         if (pIOManager) {
             BSAudioManager* v1 = &BSAudioManager::QInstance();
             v1->Process();
@@ -3734,17 +3734,17 @@ void BSAudioManagerThread::Resume() {
 }
 
 void BSAudioManagerThread::Suspend() {
-    m_bSuspended = 1;
+    m_bSuspended = true;
     BSSemaphore* lpAddend = &m_SuspendedSema;
     m_SuspendedSema.hSemaphore->Release();
     InterlockedIncrementInt32(&lpAddend->iCount);
     m_SuspendSema.hSemaphore->Wait();
     InterlockedDecrementInt32(&m_SuspendSema.iCount);
-    m_bSuspended = 0;
+    m_bSuspended = false;
 }
 
 void BSAudioManagerThread::ExitThread() {
-    m_bSuspended = 1;
+    m_bSuspended = true;
     BSSemaphore* lpAddend = &m_SuspendedSema;
     m_SuspendedSema.hSemaphore->Release();
     InterlockedIncrementInt32(&lpAddend->iCount);

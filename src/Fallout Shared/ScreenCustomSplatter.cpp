@@ -120,7 +120,7 @@
 #include "Reconstruction.hpp"
 #include "SDK/MSVC/ehvec.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // The globals this file defines, in their initialization order.
 NiRTTI BSCustomSplatterExtraData::ms_RTTI("BSCustomSplatterExtraData", &NiExtraData::ms_RTTI);
@@ -150,7 +150,7 @@ void CustomBloodSplatter() {
         ScreenCustomSplatter::spRoot.m_pObject->RemoveAllChildren();
         ScreenCustomSplatter::uiCount = 0;
         fBloodSplatterFadeStart_0 = 0.0f;
-        ScreenCustomSplatter::bNoFade = 0;
+        ScreenCustomSplatter::bNoFade = false;
         const char* v0 = sBloodSplatterAlpha01OPTFilename.String();
         SkyTextureManager::LoadTextureInBackground(&ScreenCustomSplatter::spTextures[1], v0);
         const char* v1 = sBloodSplatterColor01OPTFilename.String();
@@ -194,7 +194,7 @@ void ScreenCustomSplatter::Update() {
                         double v2 = FLerp(0.0f, 1.0f, v9, y2, value);
                         splatterData->fAlpha = 1.0 - v2;
                     }
-                    NiUpdateData UpdateData(splatterData->fAge, 1, 0);
+                    NiUpdateData UpdateData(splatterData->fAge, true, false);
                     pchild->Update(UpdateData);
                 }
                 else {
@@ -245,7 +245,7 @@ void ScreenCustomSplatter::Activate(
                 ped = ::new (apMemory) BSCustomSplatterExtraData(&splatterData);
             }
             else {
-                ped = 0;
+                ped = nullptr;
             }
             pnode->AddExtraData(ped);
             NiFixedString* pName = ::new (static_cast<void*>(&sName)) NiFixedString("ScreenSplatterRoot");
@@ -255,7 +255,7 @@ void ScreenCustomSplatter::Activate(
             pRootNode->AttachChild(pnode, 1);
             float* BroadPhaseHandle = &ped->SplatterData.fAlpha;
             BSShaderBloodSplatterProperty::SetFadeSourceRecurse(pnode, BroadPhaseHandle);
-            NiUpdateData UpdateData(0.0f, 0, 0);
+            NiUpdateData UpdateData(0.0f, false, false);
             ScreenCustomSplatter::spRoot.m_pObject->Update(UpdateData);
         }
     }
@@ -264,7 +264,7 @@ void ScreenCustomSplatter::Activate(
 void ScreenCustomSplatter::Init() {
     NiPoint3 dst;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_EFFECTS_OVERHEAD, 1,
+        MEM_CONTEXT_EFFECTS_OVERHEAD, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ScreenCustomSplatter.cpp", 189
     );
     ScreenCustomSplatter::bEnabled = bCustomSplatterEnabled.Bool();
@@ -280,17 +280,17 @@ void ScreenCustomSplatter::Init() {
             NiCamera_ = ::new (v9) NiCamera;
         }
         else {
-            NiCamera_ = 0;
+            NiCamera_ = nullptr;
         }
         NiRefObject* v10 = NiCamera_;
         ScreenCustomSplatter::spCamera.operator=(NiCamera_);
         NiPoint3* v0 = ::new (&dst) NiPoint3(0.0f, 0.0f, 1.00001f);
         ScreenCustomSplatter::spCamera.m_pObject->SetTranslate(*v0);
-        NiUpdateData UpdateData1(0.0f, 0, 0);
+        NiUpdateData UpdateData1(0.0f, false, false);
         ScreenCustomSplatter::spCamera.m_pObject->Update(UpdateData1);
         ScreenCustomSplatter::spCamera.m_pObject->LookAtWorldPoint(NiPoint3_ZERO, NiPoint3_UNIT_Y);
-        NiFrustum frustum(0);
-        frustum.m_bOrtho = 0;
+        NiFrustum frustum(false);
+        frustum.m_bOrtho = false;
         frustum.m_fTop = 0.5f;
         frustum.m_fBottom = -0.5f;
         frustum.m_fLeft = faspectratio * -0.5;
@@ -298,18 +298,18 @@ void ScreenCustomSplatter::Init() {
         frustum.m_fFar = 10000.0f;
         frustum.m_fNear = 1.0f;
         ScreenCustomSplatter::spCamera.m_pObject->SetViewFrustum(frustum);
-        NiUpdateData UpdateData2(0.0f, 0, 0);
+        NiUpdateData UpdateData2(0.0f, false, false);
         ScreenCustomSplatter::spCamera.m_pObject->Update(UpdateData2);
         ScreenCustomSplatter::fWRadius = frustum.m_fRight;
         ScreenCustomSplatter::fHRadius = frustum.m_fTop;
         fBloodSplatterFadeStart_0 = fBloodSplatterFadeStart.Float();
-        ScreenCustomSplatter::bNoFade = 0;
+        ScreenCustomSplatter::bNoFade = false;
         NiNode* v7 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
         if (v7) {
             v4 = ::new (v7) NiNode(0);
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         ScreenCustomSplatter::spRoot.operator=(v4);
         ScreenCustomSplatter::uiCount = 0;
@@ -330,7 +330,7 @@ NiCamera* ScreenCustomSplatter::GetCamera() {
 
 bool ScreenCustomSplatter::IsActiveSplatter() {
     if (!(&ScreenCustomSplatter::spRoot)->operator->()) {
-        return (bool)0;
+        return false;
     }
     NiNode* v1 = (&ScreenCustomSplatter::spRoot)->operator->();
     return (v1->GetChildCount() != 0);
@@ -371,7 +371,7 @@ NiNode* ScreenCustomSplatter::CreateGeometry(uint32_t auiCount, float fSplatScal
         pnode = ::new (apMemory) NiNode(0);
     }
     else {
-        pnode = 0;
+        pnode = nullptr;
     }
     int32_t numObjs = 4 * auiCount;
     void* ptr = ourMalloc(4 * auiCount <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * (4 * auiCount) : SIZE_MAX);
@@ -380,7 +380,7 @@ NiNode* ScreenCustomSplatter::CreateGeometry(uint32_t auiCount, float fSplatScal
         pverticesA = static_cast<NiPoint3*>(ptr);
     }
     else {
-        pverticesA = 0;
+        pverticesA = nullptr;
     }
     int32_t count = 4 * auiCount;
     void* v147 = ourMalloc(4 * auiCount <= SIZE_MAX / sizeof(NiPoint2) ? sizeof(NiPoint2) * (4 * auiCount) : SIZE_MAX);
@@ -389,14 +389,14 @@ NiNode* ScreenCustomSplatter::CreateGeometry(uint32_t auiCount, float fSplatScal
         ptexcoordsA = static_cast<NiPoint2*>(v147);
     }
     else {
-        ptexcoordsA = 0;
+        ptexcoordsA = nullptr;
     }
     uint16_t* v146 = static_cast<uint16_t*>(
         ourMalloc(6 * auiCount <= SIZE_MAX / sizeof(uint16_t) ? sizeof(uint16_t) * (6 * auiCount) : SIZE_MAX)
     );
-    NiPoint3* pflareVerticesA_2 = 0;
-    NiPoint2* pflareTexcoordsA_2 = 0;
-    uint16_t* pflareIndicesA = 0;
+    NiPoint3* pflareVerticesA_2 = nullptr;
+    NiPoint2* pflareTexcoordsA_2 = nullptr;
+    uint16_t* pflareIndicesA = nullptr;
     if (BSShaderManager::bHDR) {
         NiPoint2* pflareTexcoordsA;
         NiPoint3* pflareVerticesA;
@@ -408,7 +408,7 @@ NiNode* ScreenCustomSplatter::CreateGeometry(uint32_t auiCount, float fSplatScal
             pflareVerticesA = static_cast<NiPoint3*>(v143);
         }
         else {
-            pflareVerticesA = 0;
+            pflareVerticesA = nullptr;
         }
         pflareVerticesA_2 = pflareVerticesA;
         int32_t v142 = 4 * auiCount;
@@ -419,7 +419,7 @@ NiNode* ScreenCustomSplatter::CreateGeometry(uint32_t auiCount, float fSplatScal
             pflareTexcoordsA = static_cast<NiPoint2*>(v140);
         }
         else {
-            pflareTexcoordsA = 0;
+            pflareTexcoordsA = nullptr;
         }
         pflareTexcoordsA_2 = pflareTexcoordsA;
         uint16_t* v139 = static_cast<uint16_t*>(
@@ -566,7 +566,7 @@ NiNode* ScreenCustomSplatter::CreateGeometry(uint32_t auiCount, float fSplatScal
         );
     }
     else {
-        pgeom = 0;
+        pgeom = nullptr;
     }
     NiTriShape* pgeom_2 = pgeom;
     BSShaderBloodSplatterProperty* v101 =
@@ -575,7 +575,7 @@ NiNode* ScreenCustomSplatter::CreateGeometry(uint32_t auiCount, float fSplatScal
         pshaderprop = ::new (v101) BSShaderBloodSplatterProperty;
     }
     else {
-        pshaderprop = 0;
+        pshaderprop = nullptr;
     }
     BSShaderBloodSplatterProperty* pshaderprop_2 = pshaderprop;
     NiTexture* fBloodSplatterMaxSizec = ScreenCustomSplatter::spTextures[1].m_pObject;
@@ -596,7 +596,7 @@ NiNode* ScreenCustomSplatter::CreateGeometry(uint32_t auiCount, float fSplatScal
             );
         }
         else {
-            pgeom_3 = 0;
+            pgeom_3 = nullptr;
         }
         pgeom_2 = pgeom_3;
         BSShaderBloodSplatterProperty* v99 = static_cast<BSShaderBloodSplatterProperty*>(
@@ -606,7 +606,7 @@ NiNode* ScreenCustomSplatter::CreateGeometry(uint32_t auiCount, float fSplatScal
             pshaderprop_3 = ::new (v99) BSShaderBloodSplatterProperty;
         }
         else {
-            pshaderprop_3 = 0;
+            pshaderprop_3 = nullptr;
         }
         pshaderprop_2 = pshaderprop_3;
         NiTexture* fBloodSplatterMaxSizee = ScreenCustomSplatter::spTextures[2].m_pObject;
@@ -629,12 +629,12 @@ char ScreenCustomSplatter::SetCustomSplatterTexture(char* a1, uint8_t arg4) {
 void ScreenCustomSplatter::Shutdown() {
     if (ScreenCustomSplatter::bEnabled) {
         ScreenCustomSplatter::spRoot.m_pObject->RemoveAllChildren();
-        ScreenCustomSplatter::spRoot.operator=(static_cast<NiNode*>(0));
-        ScreenCustomSplatter::spCamera.operator=(static_cast<NiCamera*>(0));
+        ScreenCustomSplatter::spRoot.operator=(static_cast<NiNode*>(nullptr));
+        ScreenCustomSplatter::spCamera.operator=(static_cast<NiCamera*>(nullptr));
     }
-    ScreenCustomSplatter::bEnabled = 0;
+    ScreenCustomSplatter::bEnabled = false;
     for (int32_t i = 0; i < 3; ++i) {
-        ScreenCustomSplatter::spTextures[i].operator=(static_cast<NiTexture*>(0));
+        ScreenCustomSplatter::spTextures[i].operator=(static_cast<NiTexture*>(nullptr));
     }
 }
 
@@ -655,7 +655,7 @@ void BSCustomSplatterExtraData::InitTag() {
         v0 = ::new (static_cast<void*>(v1)) NiFixedString("CSD");
     }
     else {
-        v0 = 0;
+        v0 = nullptr;
     }
     BSCustomSplatterExtraData::pTag = v0;
 }

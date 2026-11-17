@@ -94,7 +94,7 @@ void hk1dLinearBilateralConstraintBuildJacobianWithCustomRhs(
         _mm_add_ps(_mm_mul_ps(_mm_mul_ps(v17, v17), m_quad_1), _mm_mul_ps(_mm_mul_ps(m_quad, m_quad), m_quad_2));
     __m128 v21 = _mm_shuffle_ps(v20, _mm_unpackhi_ps(v20, _mm_add_ps(m_quad_2, m_quad_1)), 196);
     __m128 v22 = _mm_add_ps(_mm_shuffle_ps(v21, v21, 78), v21);
-    float v24 = static_cast<float>(_mm_shuffle_ps(v22, v22, 177)[0] + v22[0]) + 1.1920928955078125e-07;
+    float v24 = (_mm_shuffle_ps(v22, v22, 177)[0] + v22[0]) + 1.1920928955078125e-07;
     m_jacobianSchemas[2].m_quad[3] = v24;
     m_jacobianSchemas[1].m_quad[3] = m_virtMassFactor / v24;
     m_jacobianSchemas->m_quad[3] = in.m_rhsFactor * customRhs;
@@ -145,19 +145,15 @@ void hk1dLinearBilateralConstraintBuildJacobian(
         _mm_add_ps(_mm_mul_ps(_mm_mul_ps(m_quad, m_quad), m_quad_2), _mm_mul_ps(_mm_mul_ps(v18, v18), m_quad_1));
     __m128 v22 = _mm_shuffle_ps(v21, _mm_unpackhi_ps(v21, _mm_add_ps(m_quad_2, m_quad_1)), 196);
     __m128 v23 = _mm_add_ps(_mm_shuffle_ps(v22, v22, 78), v22);
-    float v27 = static_cast<float>(_mm_shuffle_ps(v23, v23, 177)[0] + v23[0]) + 1.1920928955078125e-07;
+    float v27 = (_mm_shuffle_ps(v23, v23, 177)[0] + v23[0]) + 1.1920928955078125e-07;
     m_jacobianSchemas[2].m_quad[3] = v27;
     m_jacobianSchemas[1].m_quad[3] = m_virtMassFactor / v27;
     __m128 v24 = _mm_mul_ps(_mm_sub_ps(info.m_pivotA.m_quad, info.m_pivotA.m_quad), info.m_constrainedDofW.m_quad);
     m_jacobianSchemas->m_quad[3] =
-        static_cast<float>(
-            _mm_shuffle_ps(v24, v24, 170)[0] + static_cast<float>(_mm_shuffle_ps(v24, v24, 85)[0] + v24[0])
-        ) *
-        m_rhsFactor_1;
+        (_mm_shuffle_ps(v24, v24, 170)[0] + (_mm_shuffle_ps(v24, v24, 85)[0] + v24[0])) * m_rhsFactor_1;
     __m128 v25 = _mm_mul_ps(_mm_sub_ps(info.m_pivotB.m_quad, info.m_pivotA.m_quad), info.m_constrainedDofW.m_quad);
-    m_jacobianSchemas->m_quad[3] = in.m_rhsFactor *
-        static_cast<float>(_mm_shuffle_ps(v25, v25, 170)[0] +
-                           static_cast<float>(_mm_shuffle_ps(v25, v25, 85)[0] + v25[0]));
+    m_jacobianSchemas->m_quad[3] =
+        in.m_rhsFactor * (_mm_shuffle_ps(v25, v25, 170)[0] + (_mm_shuffle_ps(v25, v25, 85)[0] + v25[0]));
     hkpJacobianSchema* m_jacobianSchemas_1 = out.m_jacobianSchemas + 3;
     m_jacobianSchemas_1[-3].m_quad[0] = out.m_jacobianSchemas->m_quad[0] + 1.1920928955078125e-07;
     m_jacobianSchemas_1[-3].m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_BILATERAL;
@@ -203,15 +199,12 @@ void hk1dLinearBilateralConstraintUserTauBuildJacobian(
         _mm_add_ps(_mm_mul_ps(_mm_mul_ps(v16, v16), m_quad_1), _mm_mul_ps(_mm_mul_ps(m_quad, m_quad), m_quad_2));
     __m128 v20 = _mm_shuffle_ps(v19, _mm_unpackhi_ps(v19, _mm_add_ps(m_quad_2, m_quad_1)), 196);
     __m128 v21 = _mm_add_ps(_mm_shuffle_ps(v20, v20, 78), v20);
-    float v24 = static_cast<float>(_mm_shuffle_ps(v21, v21, 177)[0] + v21[0]) + 1.1920928955078125e-07;
+    float v24 = (_mm_shuffle_ps(v21, v21, 177)[0] + v21[0]) + 1.1920928955078125e-07;
     m_jacobianSchemas[2].m_quad[3] = v24;
     m_jacobianSchemas[1].m_quad[3] = 1.0 / v24;
     __m128 v22 = _mm_mul_ps(_mm_sub_ps(info.m_pivotB.m_quad, info.m_pivotA.m_quad), info.m_constrainedDofW.m_quad);
     m_jacobianSchemas->m_quad[3] =
-        static_cast<float>(
-            _mm_shuffle_ps(v22, v22, 170)[0] + static_cast<float>(_mm_shuffle_ps(v22, v22, 85)[0] + v22[0])
-        ) *
-        m_rhsFactor;
+        (_mm_shuffle_ps(v22, v22, 170)[0] + (_mm_shuffle_ps(v22, v22, 85)[0] + v22[0])) * m_rhsFactor;
     hkpJacobianSchema* m_jacobianSchemas_1 = out.m_jacobianSchemas + 4;
     float m_damping = info.m_damping;
     m_jacobianSchemas_1[-1].m_quad[0] = info.m_tau;
@@ -270,7 +263,7 @@ void hk1dLinearBilateralConstraintBuildJacobianWithCustomRhs_noSchema(
     // The three angular lanes and the sum of the inverse masses' w lanes, added across.
     const __m128 kTerms = _mm_shuffle_ps(kMass, _mm_unpackhi_ps(kMass, _mm_add_ps(kInvMassesA, kInvMassesB)), 196);
     const __m128 kPairs = _mm_add_ps(_mm_shuffle_ps(kTerms, kTerms, 78), kTerms);
-    const float fDiag = static_cast<float>(_mm_shuffle_ps(kPairs, kPairs, 177)[0] + kPairs[0]) + 1.1920928955078125e-07;
+    const float fDiag = (_mm_shuffle_ps(kPairs, kPairs, 177)[0] + kPairs[0]) + 1.1920928955078125e-07;
     jac->m_angular[1].m_quad[3] = fDiag;
     jac->m_angular[0].m_quad[3] = fVirtMassFactor / fDiag;
     jac->m_linear0.m_quad[3] = in.m_rhsFactor * customRhs;
@@ -297,15 +290,14 @@ void hkStabilizedBallSocketConstraintBuildJacobian_noSchema(
     kRhs[2] = jac[2].m_linear0.m_quad[3];
     const __m128 kRhsSquared = _mm_mul_ps(kRhs, kRhs);
     const float fAllowed = in.m_rhsFactor * maxAllowedErrorDistance;
-    const float fLength = _mm_cvtss_f32(_mm_sqrt_ss(
-        _mm_set_ss(static_cast<float>(kRhsSquared[2] + static_cast<float>(kRhsSquared[1] + kRhsSquared[0])))
-    ));
+    const float fLength =
+        _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss((kRhsSquared[2] + static_cast<float>(kRhsSquared[1] + kRhsSquared[0])))));
     if (!(fAllowed < fLength)) {
         return;
     }
     const float fRatio = fAllowed / fLength;
-    const float fRoot = static_cast<float>(std::sqrt(fRatio));
-    const float fFactor = static_cast<float>(std::sqrt(fRoot));
+    const float fRoot = std::sqrt(fRatio);
+    const float fFactor = std::sqrt(fRoot);
     const __m128 kFactor = _mm_set1_ps(fFactor);
     const __m128 kPosB = _mm_add_ps(
         _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, kFactor), pBodyB->m_scratch0.m_quad), _mm_mul_ps(posB.m_quad, kFactor)
@@ -356,13 +348,11 @@ void hkStabilizedBallSocketConstraintBuildJacobian_noSchema(
         );
         const __m128 kTerms = _mm_shuffle_ps(kMass, _mm_unpackhi_ps(kMass, _mm_add_ps(kInvMassesA, kInvMassesB)), 196);
         const __m128 kPairs = _mm_add_ps(_mm_shuffle_ps(kTerms, kTerms, 78), kTerms);
-        const float fDiag =
-            static_cast<float>(_mm_shuffle_ps(kPairs, kPairs, 177)[0] + kPairs[0]) + 1.1920928955078125e-07;
+        const float fDiag = (_mm_shuffle_ps(kPairs, kPairs, 177)[0] + kPairs[0]) + 1.1920928955078125e-07;
         rJac.m_angular[1].m_quad[3] = fDiag;
         rJac.m_angular[0].m_quad[3] = fVirtMassFactor / fDiag;
         const __m128 kAlong = _mm_mul_ps(kSeparation, kDir);
-        rJac.m_linear0.m_quad[3] =
-            static_cast<float>(kAlong[2] + static_cast<float>(kAlong[1] + kAlong[0])) * fRhsFactor;
+        rJac.m_linear0.m_quad[3] = (kAlong[2] + static_cast<float>(kAlong[1] + kAlong[0])) * fRhsFactor;
     }
     jac[0].m_linear0.m_quad[3] = kRhs[0] * fFactor;
     jac[1].m_linear0.m_quad[3] = kRhs[1] * fFactor;
@@ -410,15 +400,12 @@ void hk1dLinearLimitBuildJacobian(
         _mm_add_ps(_mm_mul_ps(_mm_mul_ps(m_quad, m_quad), m_quad_2), _mm_mul_ps(_mm_mul_ps(v17, v17), m_quad_1));
     __m128 v21 = _mm_shuffle_ps(v20, _mm_unpackhi_ps(v20, _mm_add_ps(m_quad_2, m_quad_1)), 196);
     __m128 v22 = _mm_add_ps(_mm_shuffle_ps(v21, v21, 78), v21);
-    float v26 = static_cast<float>(_mm_shuffle_ps(v22, v22, 177)[0] + v22[0]) + 1.1920928955078125e-07;
+    float v26 = (_mm_shuffle_ps(v22, v22, 177)[0] + v22[0]) + 1.1920928955078125e-07;
     m_jacobianSchemas[2].m_quad[3] = v26;
     m_jacobianSchemas[1].m_quad[3] = m_virtMassFactor / v26;
     __m128 v23 = _mm_mul_ps(_mm_sub_ps(info.m_pivotB.m_quad, info.m_pivotA.m_quad), info.m_constrainedDofW.m_quad);
     m_jacobianSchemas->m_quad[3] =
-        static_cast<float>(
-            _mm_shuffle_ps(v23, v23, 170)[0] + static_cast<float>(_mm_shuffle_ps(v23, v23, 85)[0] + v23[0])
-        ) *
-        m_rhsFactor_1;
+        (_mm_shuffle_ps(v23, v23, 170)[0] + (_mm_shuffle_ps(v23, v23, 85)[0] + v23[0])) * m_rhsFactor_1;
     float v29 = -in.m_rhsFactor;
     hkpJacobianSchema* m_jacobianSchemas_1 = out.m_jacobianSchemas;
     float m_max = info.m_max;
@@ -469,7 +456,7 @@ void hk1dLinearFrictionBuildJacobian(
         _mm_add_ps(_mm_mul_ps(_mm_mul_ps(v16, v16), m_quad_1), _mm_mul_ps(_mm_mul_ps(m_quad, m_quad), m_quad_2));
     __m128 v20 = _mm_shuffle_ps(v19, _mm_unpackhi_ps(v19, _mm_add_ps(m_quad_2, m_quad_1)), 196);
     __m128 v21 = _mm_add_ps(_mm_shuffle_ps(v20, v20, 78), v20);
-    float v23 = static_cast<float>(_mm_shuffle_ps(v21, v21, 177)[0] + v21[0]) + 1.1920928955078125e-07;
+    float v23 = (_mm_shuffle_ps(v21, v21, 177)[0] + v21[0]) + 1.1920928955078125e-07;
     m_jacobianSchemas[2].m_quad[3] = v23;
     m_jacobianSchemas[1].m_quad[3] = m_virtMassFactor / v23;
     m_jacobianSchemas->m_quad[3] = info.m_lastSolverResults->m_internalSolverData * in.m_rhsFactor;
@@ -511,10 +498,8 @@ void hk1dAngularBilateralConstraintBuildJacobian(
         _mm_mul_ps(_mm_mul_ps(m_quad, m_quad), m_bodyA->m_invMasses.m_quad),
         _mm_mul_ps(_mm_mul_ps(v12, v12), m_bodyB->m_invMasses.m_quad)
     );
-    float v15 = static_cast<float>(
-                    _mm_shuffle_ps(v13, v13, 170)[0] + static_cast<float>(_mm_shuffle_ps(v13, v13, 85)[0] + v13[0])
-                ) +
-        1.1920928955078125e-07;
+    float v15 =
+        (_mm_shuffle_ps(v13, v13, 170)[0] + (_mm_shuffle_ps(v13, v13, 85)[0] + v13[0])) + 1.1920928955078125e-07;
     m_jacobianSchemas->m_quad[3] = m_virtMassFactor / v15;
     float v16 = info.m_constrainedDofW.m_quad[1] * info.m_zeroErrorAxisAinW.m_quad[1] +
         info.m_zeroErrorAxisAinW.m_quad[0] * info.m_constrainedDofW.m_quad[0] +
@@ -574,10 +559,7 @@ void hk1dAngularFrictionBuildJacobian(
             );
             m_jacobianSchemas += 3;
             ++m_constrainedDofW;
-            float v16 =
-                static_cast<float>(
-                    _mm_shuffle_ps(v13, v13, 170)[0] + static_cast<float>(_mm_shuffle_ps(v13, v13, 85)[0] + v13[0])
-                ) +
+            float v16 = (_mm_shuffle_ps(v13, v13, 170)[0] + (_mm_shuffle_ps(v13, v13, 85)[0] + v13[0])) +
                 1.1920928955078125e-07;
             ++pLastResults;
             v14 = --v15 < 0;

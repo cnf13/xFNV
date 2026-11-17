@@ -82,13 +82,13 @@ bool HairShader::Initialize() {
             if (v16->m_uiRefCount-- == 1) {
                 v16->ReturnPassToPool();
             }
-            spHairPass->m_pObject = 0;
+            spHairPass->m_pObject = nullptr;
         }
         ++spHairPass;
         --v14;
     }
     while (v14);
-    return 1;
+    return true;
 }
 
 void HairShader::RecreateRendererData() {
@@ -424,7 +424,7 @@ BSShader* HairShader::CreateShader() {
         pshader = ::new (v2) HairShader(spShaderDecl, pSkinnedShaderDecl);
     }
     else {
-        pshader = 0;
+        pshader = nullptr;
     }
     pshader->Initialize();
     pshader->LoadShaders();

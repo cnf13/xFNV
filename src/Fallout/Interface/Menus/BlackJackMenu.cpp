@@ -68,7 +68,7 @@
 #include "SDK/MSVC/string.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 NiPointer<NiCamera> BlackJackMenu::spCamera;
 NiPointer<NiNode> BlackJackMenu::spSceneRoot;
@@ -146,7 +146,7 @@ BlackJackMenu::~BlackJackMenu() {
     pDealerHand = nullptr;
     pPlayerHand = nullptr;
     pPlayerSplitHand = nullptr;
-    g_blackJackCasinoStats = 0;
+    g_blackJackCasinoStats = nullptr;
     BlackJackMenu::pCasino = nullptr;
     BlackJackMenu::pMe = nullptr;
     // The hand pointers are cleared above before they are tested, so these deletes never run, as the game does.
@@ -177,11 +177,11 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                     int32_t v39 = 0;
                     int32_t v36 = 0;
                     eBlackJackState = BlackJackMenu::BL_HIT_ANIM;
-                    SetFlag(BlackJackMenu::BLF_DISABLESURRENDER, 1);
+                    SetFlag(BlackJackMenu::BLF_DISABLESURRENDER, true);
                     SetTileAlphasForStage(7);
-                    SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_SPLIT, 0);
-                    SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, 0);
-                    SetFlag(BlackJackMenu::BLF_CANSPLIT, 0);
+                    SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_SPLIT, false);
+                    SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, false);
+                    SetFlag(BlackJackMenu::BLF_CANSPLIT, false);
                     if (!IsFlagSet(BLF_SPLITHANDACTIVE) || IsFlagSet(BLF_DISABLEHAND_SPLIT)) {
                         if (!IsFlagSet(BLF_SPLITHANDACTIVE) && !IsFlagSet(BLF_DISABLEHAND_MAIN)) {
                             int32_t cardindex_2 = DealCard(pPlayerHand, 1, 0);
@@ -189,12 +189,12 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                             pPlayerHand->AddTail(pCard);
                             int32_t hValue_2 = GetHandValue(pPlayerHand);
                             if (hValue_2 >= 21) {
-                                SetFlag(BlackJackMenu::BLF_DISABLEHAND_MAIN, 1);
+                                SetFlag(BlackJackMenu::BLF_DISABLEHAND_MAIN, true);
                                 if (hValue_2 > 21) {
                                     eHandResults[0] = 4;
                                 }
                             }
-                            SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, 0);
+                            SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, false);
                             BSSimpleList<BlackJackMenu::BlackJackCard*>* cl_2 = pPlayerHand;
                             int32_t cardCount_2 = 0;
                             while (cl_2 && cl_2->GetItem()) {
@@ -202,8 +202,8 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                                 cl_2 = cl_2->GetNext();
                             }
                             if (cardCount_2 >= 7) {
-                                SetFlag(BlackJackMenu::BLF_DISABLEHAND_MAIN, 1);
-                                pTiles[9]->Set(4036, "You've reached the max hand size", 1);
+                                SetFlag(BlackJackMenu::BLF_DISABLEHAND_MAIN, true);
+                                pTiles[9]->Set(4036, "You've reached the max hand size", true);
                             }
                         }
                     }
@@ -213,12 +213,12 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                         pPlayerSplitHand->AddTail(pCard);
                         int32_t hValue = GetHandValue(pPlayerSplitHand);
                         if (hValue >= 21) {
-                            SetFlag(BlackJackMenu::BLF_DISABLEHAND_SPLIT, 1);
+                            SetFlag(BlackJackMenu::BLF_DISABLEHAND_SPLIT, true);
                             if (hValue > 21) {
                                 eHandResults[1] = 4;
                             }
                         }
-                        SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_SPLIT, 0);
+                        SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_SPLIT, false);
                         BSSimpleList<BlackJackMenu::BlackJackCard*>* cl = pPlayerSplitHand;
                         int32_t cardCount = 0;
                         while (cl && cl->GetItem()) {
@@ -226,8 +226,8 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                             cl = cl->GetNext();
                         }
                         if (cardCount >= 7) {
-                            SetFlag(BlackJackMenu::BLF_DISABLEHAND_SPLIT, 1);
-                            pTiles[9]->Set(4036, "You've reached the max hand size", 1);
+                            SetFlag(BlackJackMenu::BLF_DISABLEHAND_SPLIT, true);
+                            pTiles[9]->Set(4036, "You've reached the max hand size", true);
                         }
                     }
                     SetTileAlphasForStage(10);
@@ -238,10 +238,10 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                 if (eBlackJackState == BlackJackMenu::BL_IDLE) {
                     eBlackJackState = BlackJackMenu::BL_DEALING_ANIM;
                     ZeroFlags();
-                    bBadLuck = 0;
-                    bGoodLuck = 0;
+                    bBadLuck = false;
+                    bGoodLuck = false;
                     iCurrentSplitBet = 0;
-                    SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, 1);
+                    SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, true);
                     BlackJackMenu::SetNthTileAlpha(4, 128.0f);
                     BlackJackMenu::SetNthTileAlpha(5, 128.0f);
                     BlackJackMenu::SetNthTileAlpha(6, 128.0f);
@@ -254,24 +254,24 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                         if ((!IsFlagSet(BLF_SPLITHANDACTIVE) || !IsFlagSet(BLF_CANDOUBLEDOWN_SPLIT)) &&
                             IsFlagSet(BLF_CANDOUBLEDOWN_MAIN)) {
                             iCurrentBet *= 2;
-                            SetFlag(BlackJackMenu::BLF_DOUBLEDOWN_MAIN, 1);
-                            SetFlag(BlackJackMenu::BLF_DISABLEHAND_MAIN, 1);
+                            SetFlag(BlackJackMenu::BLF_DOUBLEDOWN_MAIN, true);
+                            SetFlag(BlackJackMenu::BLF_DISABLEHAND_MAIN, true);
                             int32_t v27 = 0;
                             int32_t cardindex_3 = DealCard(pPlayerHand, 1, 0);
                             BlackJackMenu::BlackJackCard* pCard = &pDeckOfCards[cardindex_3];
                             pPlayerHand->AddTail(pCard);
                             if (!IsFlagSet(BLF_DISABLEHAND_MAIN) && IsFlagSet(BLF_CANDOUBLEDOWN_MAIN)) {
-                                CanDoubleDown(0);
+                                CanDoubleDown(false);
                             }
                             eBlackJackState = BlackJackMenu::BL_HIT_ANIM;
-                            SetFlag(BlackJackMenu::BLF_DISABLESURRENDER, 1);
+                            SetFlag(BlackJackMenu::BLF_DISABLESURRENDER, true);
                             BlackJackMenu::pMe->pTiles[0]->Poke(BlackJackMenu::iUT_X, 1.0f);
                             BlackJackMenu::pMe->pTiles[0]->Set(BlackJackMenu::iUT_X, iCurrentBet + iCurrentSplitBet);
                             int32_t hValue_3 = GetHandValue(pPlayerHand);
                             if (hValue_3 > 21) {
                                 eHandResults[0] = 4;
                             }
-                            SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, 0);
+                            SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, false);
                         }
                         SetTileAlphasForStage(10);
                     }
@@ -322,7 +322,7 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                                 BSGameSound::SOUND_FLAG_ONE_SHOT
                         );
-                        SoundHandleByName->Play(0);
+                        SoundHandleByName->Play(false);
                     }
                     SetCorrectChipMeshesVisibleForCurrentBet();
                     BlackJackMenu::pMe->pTiles[0]->Poke(BlackJackMenu::iUT_X, 1.0f);
@@ -330,10 +330,10 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                 }
                 else {
                     if (eBlackJackState == BlackJackMenu::BL_PLAYER_TURN && IsFlagSet(BLF_CANSPLIT)) {
-                        SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_SPLIT, 0);
-                        SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, 0);
+                        SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_SPLIT, false);
+                        SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, false);
                         eBlackJackState = BlackJackMenu::BL_SPLIT_ANIM;
-                        SetFlag(BlackJackMenu::BLF_DISABLESURRENDER, 1);
+                        SetFlag(BlackJackMenu::BLF_DISABLESURRENDER, true);
                         BSSimpleList<BlackJackMenu::BlackJackCard*>* clist = pPlayerHand->GetNext();
                         BlackJackMenu::BlackJackCard* cd = clist->GetItem();
                         int32_t v20 = 0;
@@ -355,16 +355,16 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                         int32_t hValue2 = GetHandValue(pPlayerHand);
                         if (hValue1 == 21) {
                             eHandResults[0] = 5;
-                            SetFlag(BlackJackMenu::BLF_DISABLEHAND_MAIN, 1);
+                            SetFlag(BlackJackMenu::BLF_DISABLEHAND_MAIN, true);
                         }
-                        CanDoubleDown(0);
+                        CanDoubleDown(false);
                         if (hValue2 == 21) {
                             eHandResults[1] = 5;
-                            SetFlag(BlackJackMenu::BLF_DISABLEHAND_SPLIT, 1);
+                            SetFlag(BlackJackMenu::BLF_DISABLEHAND_SPLIT, true);
                         }
-                        CanDoubleDown(1);
-                        SetFlag(BlackJackMenu::BLF_SPLIT, 1);
-                        SetFlag(BlackJackMenu::BLF_CANSPLIT, 0);
+                        CanDoubleDown(true);
+                        SetFlag(BlackJackMenu::BLF_SPLIT, true);
+                        SetFlag(BlackJackMenu::BLF_CANSPLIT, false);
                         HighlightSelectedDeck();
                         SetTileAlphasForStage(10);
                         BlackJackMenu::pMe->pTiles[0]->Poke(BlackJackMenu::iUT_X, 1.0f);
@@ -447,7 +447,7 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                                 BSGameSound::SOUND_FLAG_ONE_SHOT
                         );
-                        v6->Play(0);
+                        v6->Play(false);
                     }
                     SetCorrectChipMeshesVisibleForCurrentBet();
                     BlackJackMenu::pMe->pTiles[0]->Poke(BlackJackMenu::iUT_X, 1.0f);
@@ -457,14 +457,14 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                     if (eBlackJackState == BlackJackMenu::BL_PLAYER_TURN && IsFlagSet(BLF_SPLIT)) {
                         if (!IsFlagSet(BLF_SPLITHANDACTIVE) || IsFlagSet(BLF_DISABLEHAND_MAIN)) {
                             if (!IsFlagSet(BLF_SPLITHANDACTIVE) && !IsFlagSet(BLF_DISABLEHAND_SPLIT)) {
-                                SetFlag(BlackJackMenu::BLF_SPLITHANDACTIVE, 1);
+                                SetFlag(BlackJackMenu::BLF_SPLITHANDACTIVE, true);
                             }
                         }
                         else {
-                            SetFlag(BlackJackMenu::BLF_SPLITHANDACTIVE, 0);
+                            SetFlag(BlackJackMenu::BLF_SPLITHANDACTIVE, false);
                         }
                         HighlightSelectedDeck();
-                        pTiles[9]->Set(4036, "", 1);
+                        pTiles[9]->Set(4036, "", true);
                         SetTileAlphasForStage(10);
                     }
                 }
@@ -481,7 +481,7 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                     BlackJackMenu::pMe->pTiles[0]->Set(BlackJackMenu::iUT_X, iCurrentBet);
                 }
                 if (eBlackJackState == BlackJackMenu::BL_PLAYER_TURN && !IsFlagSet(BLF_DISABLESURRENDER)) {
-                    SetFlag(BlackJackMenu::BLF_DISABLEHAND_MAIN, 1);
+                    SetFlag(BlackJackMenu::BLF_DISABLEHAND_MAIN, true);
                     eHandResults[0] = 6;
                     eBlackJackState = BlackJackMenu::BL_DEALER_FLIP_ANIM;
                     SetTileAlphasForStage(10);
@@ -552,7 +552,7 @@ void BlackJackMenu::DoIdle() {
             v91 = ::new (v109) BSSimpleList<BlackJackMenu::BlackJackCard*>;
         }
         else {
-            v91 = 0;
+            v91 = nullptr;
         }
         pPlayerHand = v91;
         BSSimpleList<BlackJackMenu::BlackJackCard*>* v107 = static_cast<BSSimpleList<BlackJackMenu::BlackJackCard*>*>(
@@ -562,7 +562,7 @@ void BlackJackMenu::DoIdle() {
             v90 = ::new (v107) BSSimpleList<BlackJackMenu::BlackJackCard*>;
         }
         else {
-            v90 = 0;
+            v90 = nullptr;
         }
         pPlayerSplitHand = v90;
         BSSimpleList<BlackJackMenu::BlackJackCard*>* v105 = static_cast<BSSimpleList<BlackJackMenu::BlackJackCard*>*>(
@@ -572,7 +572,7 @@ void BlackJackMenu::DoIdle() {
             v89 = ::new (v105) BSSimpleList<BlackJackMenu::BlackJackCard*>;
         }
         else {
-            v89 = 0;
+            v89 = nullptr;
         }
         pDealerHand = v89;
         v173 = 0;
@@ -583,7 +583,7 @@ void BlackJackMenu::DoIdle() {
     eprevBlackJackState = eBlackJackState;
     if (!bisMenuOnTop) {
         InterfaceManager* v2 = InterfaceManager::Instance();
-        v2->pCursor->Set(4009, 255.0f, 1);
+        v2->pCursor->Set(4009, 255.0f, true);
     }
     switch (eBlackJackState) {
         case BlackJackMenu::BL_DEALING_ANIM: {
@@ -595,16 +595,16 @@ void BlackJackMenu::DoIdle() {
                     if (fStateSecs > 1.0) {
                         pTiles[9]->Set(4003, 0);
                     }
-                    NiUpdateData UpdateData1(fStateSecs, 1, 0);
+                    NiUpdateData UpdateData1(fStateSecs, true, false);
                     NiAVObject* v15 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(0);
                     v15->Update(UpdateData1);
                     if (fStateSecs == 0.0) {
-                        NiUpdateData UpdateData0(0.0f, 1, 0);
+                        NiUpdateData UpdateData0(0.0f, true, false);
                         BlackJackMenu::spSceneRoot.m_pObject->Update(UpdateData0);
                         BSAudio* v16 = &BSAudio::QInstance();
                         BSSoundHandle* SoundHandleByName =
                             v16->GetSoundHandleByName(&a1, "GAMEBlackJackCardDeal", 289u);
-                        SoundHandleByName->Play(0);
+                        SoundHandleByName->Play(false);
                         bCleanDealerHand = 1;
                         BSSimpleList<BlackJackMenu::BlackJackCard*>* pPl = pPlayerHand;
                         BSSimpleList<BlackJackMenu::BlackJackCard*>* pD = pDealerHand;
@@ -614,12 +614,12 @@ void BlackJackMenu::DoIdle() {
                         SwapCardTextures(2, 1, pD->m_item);
                         pD = pD->m_pkNext;
                         SwapCardTextures(2, 2, pD->m_item);
-                        pPlayerAnimManager->ActivateSequence(pPlayerAnimations[1], 0, 0, 1.0f, 0.0f, 0);
-                        pDealerAnimManager->ActivateSequence(pDealerAnimations[1], 0, 0, 1.0f, 0.0f, 0);
+                        pPlayerAnimManager->ActivateSequence(pPlayerAnimations[1], 0, false, 1.0f, 0.0f, nullptr);
+                        pDealerAnimManager->ActivateSequence(pDealerAnimations[1], 0, false, 1.0f, 0.0f, nullptr);
                         animDelay = pPlayerAnimations[1]->m_fEndKeyTime;
                     }
                     if (iAnimIndex[0] == 1) {
-                        NiUpdateData UpdateData2(fStateSecs, 1, 0);
+                        NiUpdateData UpdateData2(fStateSecs, true, false);
                         NiAVObject* v19 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(1u);
                         v19->Update(UpdateData2);
                     }
@@ -630,11 +630,11 @@ void BlackJackMenu::DoIdle() {
                                 BSAudio* v20 = &BSAudio::QInstance();
                                 BSSoundHandle* v87 =
                                     v20->GetSoundHandleByName(&arHandle, "GAMEBlackJackCardDeal", 289u);
-                                v87->Play(0);
+                                v87->Play(false);
                             }
                         }
                         float v86 = fStateSecs - animOffset;
-                        NiUpdateData UpdateData3(v86, 1, 0);
+                        NiUpdateData UpdateData3(v86, true, false);
                         NiAVObject* v21 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(3u);
                         v21->Update(UpdateData3);
                     }
@@ -645,11 +645,11 @@ void BlackJackMenu::DoIdle() {
                                 bCleanDealerHand = 1;
                                 BSAudio* v23 = &BSAudio::QInstance();
                                 BSSoundHandle* v85 = v23->GetSoundHandleByName(&th_s, "GAMEBlackJackCardDeal", 289u);
-                                v85->Play(0);
+                                v85->Play(false);
                             }
                         }
                         float v84 = fStateSecs - pPlayerAnimations[i_3]->m_fEndKeyTime;
-                        NiUpdateData UpdateData2_2(v84, 1, 0);
+                        NiUpdateData UpdateData2_2(v84, true, false);
                         NiAVObject* v24 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(1u);
                         v24->Update(UpdateData2_2);
                     }
@@ -661,11 +661,11 @@ void BlackJackMenu::DoIdle() {
                                 BSAudio* v26 = &BSAudio::QInstance();
                                 BSSoundHandle* v83 =
                                     v26->GetSoundHandleByName(&apResult, "GAMEBlackJackCardFlip", 289u);
-                                v83->Play(0);
+                                v83->Play(false);
                             }
                             double v27 = pPlayerAnimations[1]->m_fEndKeyTime;
                             float v82 = fStateSecs - (v27 + animOffset);
-                            NiUpdateData UpdateData3_2(v82, 1, 0);
+                            NiUpdateData UpdateData3_2(v82, true, false);
                             NiAVObject* v28 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(3u);
                             v28->Update(UpdateData3_2);
                         }
@@ -674,7 +674,9 @@ void BlackJackMenu::DoIdle() {
                         if (iAnimIndex[0] == 1) {
                             ++iAnimIndex[0];
                             pPlayerAnimManager->DeactivateSequence(pPlayerAnimations[i_3], 0.0f);
-                            pPlayerAnimManager->ActivateSequence(pPlayerAnimations[iAnimIndex[0]], 0, 0, 1.0f, 0.0f, 0);
+                            pPlayerAnimManager->ActivateSequence(
+                                pPlayerAnimations[iAnimIndex[0]], 0, false, 1.0f, 0.0f, nullptr
+                            );
                             double v29 = pDealerAnimations[1]->m_fEndKeyTime;
                             animDelay = v29 + animOffset;
                         }
@@ -683,7 +685,7 @@ void BlackJackMenu::DoIdle() {
                                 ++iAnimIndex[2];
                                 pDealerAnimManager->DeactivateSequence(pDealerAnimations[i_3], 0.0f);
                                 pDealerAnimManager->ActivateSequence(
-                                    pDealerAnimations[iAnimIndex[2]], 0, 0, 1.0f, 0.0f, 0
+                                    pDealerAnimations[iAnimIndex[2]], 0, false, 1.0f, 0.0f, nullptr
                                 );
                                 double v81 = pPlayerAnimations[1]->m_fEndKeyTime;
                                 animDelay = pDealerAnimations[1]->m_fEndKeyTime + v81;
@@ -700,10 +702,10 @@ void BlackJackMenu::DoIdle() {
                                     int32_t hValue = GetHandValue(pPlayerHand);
                                     if (hValue == 21) {
                                         eHandResults[0] = 5;
-                                        SetFlag(BlackJackMenu::BLF_BLACKJACK, 1);
+                                        SetFlag(BlackJackMenu::BLF_BLACKJACK, true);
                                     }
                                     if (GetHandValue(pDealerHand) == 21) {
-                                        SetFlag(BlackJackMenu::BLF_BLACKJACK, 1);
+                                        SetFlag(BlackJackMenu::BLF_BLACKJACK, true);
                                         if (eHandResults[0] == 5) {
                                             eHandResults[0] = 2;
                                         }
@@ -715,13 +717,13 @@ void BlackJackMenu::DoIdle() {
                                         BlackJackMenu::SetDealNotSwitchHands(0);
                                     }
                                     if (iChipCount < 2 * iCurrentBet) {
-                                        SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, 0);
-                                        SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_SPLIT, 0);
-                                        SetFlag(BlackJackMenu::BLF_CANSPLIT, 0);
+                                        SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, false);
+                                        SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_SPLIT, false);
+                                        SetFlag(BlackJackMenu::BLF_CANSPLIT, false);
                                     }
                                     else {
                                         if (hValue == 11) {
-                                            SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, 1);
+                                            SetFlag(BlackJackMenu::BLF_CANDOUBLEDOWN_MAIN, true);
                                         }
                                         else {
                                             CanSplitHand();
@@ -761,21 +763,21 @@ void BlackJackMenu::DoIdle() {
             if (fStateSecs > 1.0) {
                 pTiles[9]->Set(4003, 0);
             }
-            NiUpdateData UpdateData1_2(fStateSecs, 1, 0);
+            NiUpdateData UpdateData1_2(fStateSecs, true, false);
             NiAVObject* v31 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(0);
             v31->Update(UpdateData1_2);
             if (fStateSecs == 0.0) {
                 BSAudio* v32 = &BSAudio::QInstance();
                 BSSoundHandle* v79 = v32->GetSoundHandleByName(&v100, "GAMEBlackJackCardDeal", 289u);
-                v79->Play(0);
-                BSSimpleList<BlackJackMenu::BlackJackCard*>* pPl_2 = 0;
-                BlackJackMenu::BlackJackCard* cd = 0;
+                v79->Play(false);
+                BSSimpleList<BlackJackMenu::BlackJackCard*>* pPl_2 = nullptr;
+                BlackJackMenu::BlackJackCard* cd = nullptr;
                 int32_t counter = 0;
                 int32_t ihand = 0;
                 if (useSplit) {
                     ihand = 1;
                     pPlayerSplitAnimManager->ActivateSequence(
-                        pPlayerSplitAnimations[iAnimIndex[1]], 0, 0, 1.0f, 0.0f, 0
+                        pPlayerSplitAnimations[iAnimIndex[1]], 0, false, 1.0f, 0.0f, nullptr
                     );
                     pPl_2 = pPlayerSplitHand;
                     while (pPl_2 && pPl_2->m_item && counter != iAnimIndex[1]) {
@@ -785,7 +787,9 @@ void BlackJackMenu::DoIdle() {
                     }
                 }
                 else {
-                    pPlayerAnimManager->ActivateSequence(pPlayerAnimations[iAnimIndex[0]], 0, 0, 1.0f, 0.0f, 0);
+                    pPlayerAnimManager->ActivateSequence(
+                        pPlayerAnimations[iAnimIndex[0]], 0, false, 1.0f, 0.0f, nullptr
+                    );
                     pPl_2 = pPlayerHand;
                     while (pPl_2 && pPl_2->m_item && counter != iAnimIndex[0]) {
                         cd = pPl_2->m_item;
@@ -801,7 +805,7 @@ void BlackJackMenu::DoIdle() {
                 }
                 SwapCardTextures(ihand, counter, cd);
             }
-            NiUpdateData UpdateData2_3(fStateSecs, 1, 0);
+            NiUpdateData UpdateData2_3(fStateSecs, true, false);
             if (useSplit) {
                 v33 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(2u);
             }
@@ -848,32 +852,32 @@ void BlackJackMenu::DoIdle() {
                 if (pPlayerSplitAnimations[2]) {
                     if (pPlayerAnimations[2]) {
                         if (iAnimIndex[1] == 1) {
-                            SetFlag(BlackJackMenu::BLF_PLAYER_SPLIT_ANIM, 1);
-                            SetSideHandVisibility(1);
-                            pPlayerAnimManager->ActivateSequence(pPlayerAnimations[2], 0, 0, 1.0f, 0.0f, 0);
-                            NiUpdateData update0(0.0f, 1, 0);
-                            NiUpdateData update1(0.0f, 1, 0);
+                            SetFlag(BlackJackMenu::BLF_PLAYER_SPLIT_ANIM, true);
+                            SetSideHandVisibility(true);
+                            pPlayerAnimManager->ActivateSequence(pPlayerAnimations[2], 0, false, 1.0f, 0.0f, nullptr);
+                            NiUpdateData update0(0.0f, true, false);
+                            NiUpdateData update1(0.0f, true, false);
                             NiAVObject* v34 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(3u);
                             v34->Update(update1);
                             NiAVObject* v35 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(1u);
                             v35->Update(update0);
-                            SetFlag(BlackJackMenu::BLF_SPLITHANDACTIVE, 1);
+                            SetFlag(BlackJackMenu::BLF_SPLITHANDACTIVE, true);
                             --iAnimIndex[0];
                             eBlackJackState = BlackJackMenu::BL_HIT_ANIM;
                         }
                         else {
                             if (iAnimIndex[0] == 2) {
-                                SetFlag(BlackJackMenu::BLF_SPLITHANDACTIVE, 0);
+                                SetFlag(BlackJackMenu::BLF_SPLITHANDACTIVE, false);
                                 eBlackJackState = BlackJackMenu::BL_HIT_ANIM;
                             }
                             else {
                                 if (iAnimIndex[1] == 2) {
-                                    SetFlag(BlackJackMenu::BLF_SPLITHANDACTIVE, 1);
+                                    SetFlag(BlackJackMenu::BLF_SPLITHANDACTIVE, true);
                                     eBlackJackState = BlackJackMenu::BL_HIT_ANIM;
                                 }
                                 else {
-                                    SetFlag(BlackJackMenu::BLF_PLAYER_SPLIT_ANIM, 0);
-                                    SetFlag(BlackJackMenu::BLF_SPLITHANDACTIVE, 0);
+                                    SetFlag(BlackJackMenu::BLF_PLAYER_SPLIT_ANIM, false);
+                                    SetFlag(BlackJackMenu::BLF_SPLITHANDACTIVE, false);
                                     if (eHandResults[0] == 5 && eHandResults[1] == 5) {
                                         eBlackJackState = BlackJackMenu::BL_DETERMINE_WINNER;
                                     }
@@ -919,12 +923,12 @@ void BlackJackMenu::DoIdle() {
                 if (fStateSecs == 0.0 && !bCleanDealerHand) {
                     BSAudio* v36 = &BSAudio::QInstance();
                     BSSoundHandle* v78 = v36->GetSoundHandleByName(&v99, "GAMEBlackJackCardCollect", 289u);
-                    v78->Play(0);
-                    NiUpdateData UpdateData0_2(0.0f, 1, 0);
+                    v78->Play(false);
+                    NiUpdateData UpdateData0_2(0.0f, true, false);
                     BlackJackMenu::spSceneRoot.m_pObject->Update(UpdateData0_2);
-                    pTableAnimManager->ActivateSequence(pTableAnimations[0], 0, 0, 1.0f, 0.0f, 0);
-                    pPlayerAnimManager->ActivateSequence(pPlayerAnimations[0], 0, 0, 1.0f, 0.0f, 0);
-                    pPlayerSplitAnimManager->ActivateSequence(pPlayerSplitAnimations[0], 0, 0, 1.0f, 0.0f, 0);
+                    pTableAnimManager->ActivateSequence(pTableAnimations[0], 0, false, 1.0f, 0.0f, nullptr);
+                    pPlayerAnimManager->ActivateSequence(pPlayerAnimations[0], 0, false, 1.0f, 0.0f, nullptr);
+                    pPlayerSplitAnimManager->ActivateSequence(pPlayerSplitAnimations[0], 0, false, 1.0f, 0.0f, nullptr);
                     UpdateHandCardVisibility();
                 }
                 if (bCleanDealerHand || !(static_cast<double>(fStateSecs) < pPlayerAnimations[0]->m_fEndKeyTime)) {
@@ -932,9 +936,9 @@ void BlackJackMenu::DoIdle() {
                         double v77 = fStateSecs - fStartKeyTime;
                         if (pDealerAnimations[0]->m_fEndKeyTime > v77) {
                             float v76 = fStateSecs - fStartKeyTime;
-                            NiUpdateData UpdateData1_4(v76, 1, 0);
+                            NiUpdateData UpdateData1_4(v76, true, false);
                             float v75 = fStateSecs - fStartKeyTime;
-                            NiUpdateData UpdateData2_5(v75, 1, 0);
+                            NiUpdateData UpdateData2_5(v75, true, false);
                             NiAVObject* v40 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(0);
                             v40->Update(UpdateData1_4);
                             NiAVObject* v41 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(3u);
@@ -943,9 +947,9 @@ void BlackJackMenu::DoIdle() {
                     }
                 }
                 else {
-                    NiUpdateData UpdateData1_3(fStateSecs, 1, 0);
-                    NiUpdateData UpdateData2_4(fStateSecs, 1, 0);
-                    NiUpdateData UpdateData3_3(fStateSecs, 1, 0);
+                    NiUpdateData UpdateData1_3(fStateSecs, true, false);
+                    NiUpdateData UpdateData2_4(fStateSecs, true, false);
+                    NiUpdateData UpdateData3_3(fStateSecs, true, false);
                     NiAVObject* v37 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(0);
                     v37->Update(UpdateData1_3);
                     NiAVObject* v38 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(1u);
@@ -965,7 +969,7 @@ void BlackJackMenu::DoIdle() {
                             pPlayerSplitAnimManager->DeactivateAll(0.0f);
                             ShowAllHandCards();
                             ZeroFlags();
-                            SetSideHandVisibility(0);
+                            SetSideHandVisibility(false);
                             bCleanDealerHand = 0;
                             BlackJackMenu::SetDealNotSwitchHands(1);
                             int32_t iMax = (&BlackJackMenu::pCasino->data)->iMaxWinnings;
@@ -976,11 +980,11 @@ void BlackJackMenu::DoIdle() {
                                     if (static_cast<double>(iCurrentWinnings) >=
                                         static_cast<double>(iMax) * (static_cast<double>(i_4) * 0.25)) {
                                         g_blackJackCasinoStats->iWinningLevel = i_4;
-                                        bRunScriptOnExit = 1;
+                                        bRunScriptOnExit = true;
                                     }
                                 }
                                 else {
-                                    bRunScriptOnExit = 0;
+                                    bRunScriptOnExit = false;
                                 }
                             }
                             if (bRunScriptOnExit) {
@@ -997,15 +1001,15 @@ void BlackJackMenu::DoIdle() {
                 }
                 else {
                     pTableAnimManager->DeactivateSequence(pTableAnimations[0], 0.0f);
-                    pTableAnimManager->ActivateSequence(pTableAnimations[1], 0, 0, 1.0f, 0.0f, 0);
-                    pDealerAnimManager->ActivateSequence(pDealerAnimations[0], 0, 0, 1.0f, 0.0f, 0);
+                    pTableAnimManager->ActivateSequence(pTableAnimations[1], 0, false, 1.0f, 0.0f, nullptr);
+                    pDealerAnimManager->ActivateSequence(pDealerAnimations[0], 0, false, 1.0f, 0.0f, nullptr);
                     BSAudio* v42 = &BSAudio::QInstance();
                     BSSoundHandle* v74 = v42->GetSoundHandleByName(&v98, "GAMEBlackJackCardCollectDealer", 289u);
-                    v74->Play(0);
+                    v74->Play(false);
                     bCleanDealerHand = 1;
                     fStartKeyTime = fStateSecs;
-                    NiUpdateData UpdateData1_5(0.0f, 1, 0);
-                    NiUpdateData UpdateData2_6(0.0f, 1, 0);
+                    NiUpdateData UpdateData1_5(0.0f, true, false);
+                    NiUpdateData UpdateData2_6(0.0f, true, false);
                     NiAVObject* v43 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(0);
                     v43->Update(UpdateData1_5);
                     NiAVObject* v44 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(3u);
@@ -1022,20 +1026,20 @@ void BlackJackMenu::DoIdle() {
                 pTiles[9]->Set(4003, 0);
             }
             if (pDealerReveal) {
-                NiUpdateData UpdateData1_6(fStateSecs, 1, 0);
+                NiUpdateData UpdateData1_6(fStateSecs, true, false);
                 NiAVObject* v45 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(0);
                 v45->Update(UpdateData1_6);
                 if (fStateSecs == 0.0) {
-                    SetFlag(BlackJackMenu::BLF_DISABLEHAND_MAIN, 1);
-                    SetFlag(BlackJackMenu::BLF_DISABLEHAND_SPLIT, 1);
+                    SetFlag(BlackJackMenu::BLF_DISABLEHAND_MAIN, true);
+                    SetFlag(BlackJackMenu::BLF_DISABLEHAND_SPLIT, true);
                     ClearDeckHighlight();
                     BSAudio* v46 = &BSAudio::QInstance();
                     BSSoundHandle* v72 = v46->GetSoundHandleByName(&v97, "GAMEBlackJackCardFlip", 289u);
-                    v72->Play(0);
-                    pDealerAnimManager->ActivateSequence(pDealerReveal, 0, 0, 1.0f, 0.0f, 0);
+                    v72->Play(false);
+                    pDealerAnimManager->ActivateSequence(pDealerReveal, 0, false, 1.0f, 0.0f, nullptr);
                 }
                 if (static_cast<double>(fStateSecs) < pDealerReveal->m_fEndKeyTime) {
-                    NiUpdateData UpdateData2_7(fStateSecs, 1, 0);
+                    NiUpdateData UpdateData2_7(fStateSecs, true, false);
                     NiAVObject* v47 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(3u);
                     v47->Update(UpdateData2_7);
                 }
@@ -1054,16 +1058,16 @@ void BlackJackMenu::DoIdle() {
                 pTiles[9]->Set(4003, 0);
             }
             if (pDealerAnimations[iAnimIndex[2]]) {
-                NiUpdateData UpdateData1_7(fStateSecs, 1, 0);
+                NiUpdateData UpdateData1_7(fStateSecs, true, false);
                 NiAVObject* v48 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(0);
                 v48->Update(UpdateData1_7);
                 if (fStateSecs == 0.0) {
                     BSAudio* v49 = &BSAudio::QInstance();
                     BSSoundHandle* v71 = v49->GetSoundHandleByName(&v96, "GAMEBlackJackCardFlip", 289u);
-                    v71->Play(0);
+                    v71->Play(false);
                     ClearDeckHighlight();
                     BSSimpleList<BlackJackMenu::BlackJackCard*>* pPl_3 = pDealerHand;
-                    BlackJackMenu::BlackJackCard* cd_2 = 0;
+                    BlackJackMenu::BlackJackCard* cd_2 = nullptr;
                     int32_t counter_2 = 0;
                     while (pPl_3 && pPl_3->m_item) {
                         cd_2 = pPl_3->m_item;
@@ -1073,10 +1077,12 @@ void BlackJackMenu::DoIdle() {
                     if (cd_2) {
                         SwapCardTextures(2, counter_2, cd_2);
                     }
-                    pDealerAnimManager->ActivateSequence(pDealerAnimations[iAnimIndex[2]], 0, 0, 1.0f, 0.0f, 0);
+                    pDealerAnimManager->ActivateSequence(
+                        pDealerAnimations[iAnimIndex[2]], 0, false, 1.0f, 0.0f, nullptr
+                    );
                 }
                 if (static_cast<double>(fStateSecs) < pDealerAnimations[iAnimIndex[2]]->m_fEndKeyTime) {
-                    NiUpdateData UpdateData2_8(fStateSecs, 1, 0);
+                    NiUpdateData UpdateData2_8(fStateSecs, true, false);
                     NiAVObject* v50 = BlackJackMenu::spSceneRoot.m_pObject->GetAt(3u);
                     v50->Update(UpdateData2_8);
                 }
@@ -1117,21 +1123,21 @@ void BlackJackMenu::DoIdle() {
                 char msg[268];
                 BSsprintf(msg, 260, sGamblingBrokeText.String());
                 Interface::ShowMessage(
-                    msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", 0, 2.0f, 0
+                    msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
                 );
                 BSAudio* v53 = &BSAudio::QInstance();
                 BSSoundHandle* v68 = v53->GetSoundHandleByName(&v93, "UIPopUpMessageGeneral", 289u);
-                v68->Play(0);
+                v68->Play(false);
                 BlackJackMenu::SetShouldExit();
             }
             return;
         }
         case BlackJackMenu::BL_DEALER_TURN: {
-            SetFlag(BlackJackMenu::BLF_DEALERS_TURN, 1);
+            SetFlag(BlackJackMenu::BLF_DEALERS_TURN, true);
             if (IsFlagSet(8)) {
                 if (eHandResults[0] == 4 && eHandResults[1] == 4) {
                 LABEL_233:;
-                    SetFlag(BlackJackMenu::BLF_PLAYER_BUST, 1);
+                    SetFlag(BlackJackMenu::BLF_PLAYER_BUST, true);
                     eBlackJackState = BlackJackMenu::BL_DETERMINE_WINNER;
                     return;
                 }
@@ -1149,11 +1155,11 @@ void BlackJackMenu::DoIdle() {
                 int32_t cardindex = 0;
                 int32_t cardCount = 0;
                 BSSimpleList<BlackJackMenu::BlackJackCard*>* cl = pDealerHand;
-                bool bAce = 0;
+                bool bAce = false;
                 while (cl && cl->m_item) {
                     ++cardCount;
                     if (cl->m_item->uiValue == BlackJackMenu::BL_A) {
-                        bAce = 1;
+                        bAce = true;
                     }
                     cl = cl->m_pkNext;
                 }
@@ -1253,7 +1259,7 @@ void BlackJackMenu::DoIdle() {
                 if (winnings >= 0) {
                     BSsprintf(Src, 260, "%s", sYouBreakEvenText.String());
                     BlackJackMenu::pMe->pTiles[9]->Poke(4036, 1.0f);
-                    BlackJackMenu::pMe->pTiles[9]->Set(4036, Src, 1);
+                    BlackJackMenu::pMe->pTiles[9]->Set(4036, Src, true);
                     BlackJackMenu::pMe->pTiles[9]->Set(4003, 1);
                 }
                 else {
@@ -1269,9 +1275,9 @@ void BlackJackMenu::DoIdle() {
                     }
                     BSAudio* v52 = &BSAudio::QInstance();
                     BSSoundHandle* v69 = v52->GetSoundHandleByName(&v94, "GAMEBlackJackLose", 289u);
-                    v69->Play(0);
+                    v69->Play(false);
                     BlackJackMenu::pMe->pTiles[9]->Poke(4036, 1.0f);
-                    BlackJackMenu::pMe->pTiles[9]->Set(4036, Src, 1);
+                    BlackJackMenu::pMe->pTiles[9]->Set(4036, Src, true);
                     BlackJackMenu::pMe->pTiles[9]->Set(4003, 1);
                 }
             }
@@ -1288,9 +1294,9 @@ void BlackJackMenu::DoIdle() {
                 }
                 BSAudio* v51 = &BSAudio::QInstance();
                 BSSoundHandle* v70 = v51->GetSoundHandleByName(&v95, "GAMEBlackJackWin", 289u);
-                v70->Play(0);
+                v70->Play(false);
                 BlackJackMenu::pMe->pTiles[9]->Poke(4036, 1.0f);
-                BlackJackMenu::pMe->pTiles[9]->Set(4036, Src, 1);
+                BlackJackMenu::pMe->pTiles[9]->Set(4036, Src, true);
                 BlackJackMenu::pMe->pTiles[9]->Set(4003, 1);
             }
             pPlayerHand->RemoveAll();
@@ -1317,7 +1323,7 @@ void BlackJackMenu::DoIdle() {
         case BlackJackMenu::BL_CLOSING_MENU: {
             if (!(fStateSecs < 1.0) && xFadeState != Interface::FADING_OUT) {
                 InterfaceManager* v3 = InterfaceManager::Instance();
-                v3->pCursor->Set(4009, 255.0f, 1);
+                v3->pCursor->Set(4009, 255.0f, true);
                 pMenu->Set(6002, 1);
                 StartFadeOut();
                 TESCasinoChips* ChipType = BlackJackMenu::pCasino->GetChipType();
@@ -1326,9 +1332,9 @@ void BlackJackMenu::DoIdle() {
                     if (i > 0) {
                         TESContainer tempcont;
                         TESCasinoChips* v10 = BlackJackMenu::pCasino->GetChipType();
-                        tempcont.AddObject(v10, i, 0);
+                        tempcont.AddObject(v10, i, nullptr);
                         if (g_blackJackCasinoStats->iTotalWinnings >= BlackJackMenu::pCasino->GetMaxWinnings()) {
-                            tempcont.AddContainerToReference(pPlayer, 1);
+                            tempcont.AddContainerToReference(pPlayer, true);
                             BSStringT<char> pstring_2;
                             const char* fEaseOutTimea = sGamblingBannedText.String();
                             const char* timea = sAddItemtoInventory.String();
@@ -1337,21 +1343,21 @@ void BlackJackMenu::DoIdle() {
                             const char* FullName = TESFullName::GetFullName(v11);
                             pstring_2.SPrintF("%i %s%s %s\n%s", i, FullName, a4, timea, fEaseOutTimea);
                             TESCasinoChips* v13 = BlackJackMenu::pCasino->GetChipType();
-                            const char* PickUpSoundName = pPlayer->GetPickUpSoundName(v13, 1, 0);
+                            const char* PickUpSoundName = pPlayer->GetPickUpSoundName(v13, true, false);
                             Interface::ShowMessage(
                                 pstring_2.pString, 0,
                                 "Interface\\Icons\\Message Icons\\glow_message_vaultboy_very_happy.dds",
-                                PickUpSoundName, 2.0f, 0
+                                PickUpSoundName, 2.0f, false
                             );
                         }
                         else {
-                            tempcont.AddContainerToReference(pPlayer, 0);
+                            tempcont.AddContainerToReference(pPlayer, false);
                         }
                     }
                 }
                 else {
                     TESCasinoChips* v5 = BlackJackMenu::pCasino->GetChipType();
-                    pPlayer->RemoveItem(v5, 0, -i, 0, 0, 0, 0, 0, 1, 0);
+                    pPlayer->RemoveItem(v5, nullptr, -i, false, false, nullptr, nullptr, nullptr, true, false);
                     BSStringT<char> pstring;
                     const char* fEaseOutTime = sRemoveItemfromInventory.String();
                     const char* time = sPlural.String();
@@ -1359,10 +1365,10 @@ void BlackJackMenu::DoIdle() {
                     const char* v7 = TESFullName::GetFullName(v6);
                     pstring.SPrintF("%i %s%s %s", -i, v7, time, fEaseOutTime);
                     TESCasinoChips* v8 = BlackJackMenu::pCasino->GetChipType();
-                    const char* v9 = pPlayer->GetPickUpSoundName(v8, 1, 0);
+                    const char* v9 = pPlayer->GetPickUpSoundName(v8, true, false);
                     Interface::ShowMessage(
                         pstring.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", v9, 2.0f,
-                        0
+                        false
                     );
                 }
                 if (bRunScriptOnExit) {
@@ -1449,7 +1455,7 @@ bool BlackJackMenu::InitCasinoData() {
     char acStr[0x104];
     char acDest[0x104];
     char acPath[0x104];
-    for (int32_t k = 0; k < static_cast<int32_t>(iNumOfDecks); ++k) {
+    for (int32_t k = 0; k < iNumOfDecks; ++k) {
         BSstrcpy(acStr, 0x104, pCasino->GetTexture(k + 7)->GetTextureName());
         char* pSlash = std::strstr(acStr, "\\") + 1;
         pSlash = std::strstr(pSlash, "\\") + 1;
@@ -1523,10 +1529,10 @@ void BlackJackMenu::SetFlag(enumFlags aeFlag, bool abValue) {
 // The chip compares are signed; isSplitHand is tested again before each step, as the game does.
 bool BlackJackMenu::CanDoubleDown(bool isSplitHand) {
     bool bCanDoubleDown = true;
-    if (isSplitHand && static_cast<int32_t>(iChipCount) < static_cast<int32_t>(iCurrentBet + iCurrentSplitBet * 2)) {
+    if (isSplitHand && iChipCount < static_cast<int32_t>(iCurrentBet + iCurrentSplitBet * 2)) {
         bCanDoubleDown = false;
     }
-    if (!isSplitHand && static_cast<int32_t>(iChipCount) < static_cast<int32_t>(iCurrentSplitBet + iCurrentBet * 2)) {
+    if (!isSplitHand && iChipCount < static_cast<int32_t>(iCurrentSplitBet + iCurrentBet * 2)) {
         bCanDoubleDown = false;
     }
     // Sets BLF_DOUBLEDOWN_SPLIT for the split hand rather than BLF_CANDOUBLEDOWN_SPLIT, which DoClick reads and clears;
@@ -1644,10 +1650,10 @@ uint32_t BlackJackMenu::DealCard(BSSimpleList<BlackJackMenu::BlackJackCard*>* pH
                     cardindex = luckPool[bestLowIndex];
                     if (bestLowIndex) {
                         if (a3) {
-                            bBadLuck = 1;
+                            bBadLuck = true;
                         }
                         else {
-                            bGoodLuck = 1;
+                            bGoodLuck = true;
                         }
                     }
                 }
@@ -1656,10 +1662,10 @@ uint32_t BlackJackMenu::DealCard(BSSimpleList<BlackJackMenu::BlackJackCard*>* pH
                 cardindex = luckPool[bestHighIndex];
                 if (bestHighIndex) {
                     if (a3) {
-                        bBadLuck = 1;
+                        bBadLuck = true;
                     }
                     else {
-                        bGoodLuck = 1;
+                        bGoodLuck = true;
                     }
                 }
             }
@@ -1682,7 +1688,7 @@ uint32_t BlackJackMenu::DealCard(BSSimpleList<BlackJackMenu::BlackJackCard*>* pH
 int32_t BlackJackMenu::DealHand() {
     eHandResults[0] = 0;
     eHandResults[1] = 0;
-    uint32_t v9 = DealCard(0, 0, 0);
+    uint32_t v9 = DealCard(nullptr, 0, 0);
     if (pDealerHand && !pDealerHand->IsEmpty()) {
         BlackJackMenu::BlackJackCard* a2 = &pDeckOfCards[v9];
         pDealerHand->AddHead(a2);
@@ -1691,7 +1697,7 @@ int32_t BlackJackMenu::DealHand() {
         BlackJackMenu::BlackJackCard* v8 = &pDeckOfCards[v9];
         pDealerHand->SetItem(v8);
     }
-    v9 = DealCard(0, 0, 0);
+    v9 = DealCard(nullptr, 0, 0);
     if (pPlayerHand && !pPlayerHand->IsEmpty()) {
         BlackJackMenu::BlackJackCard* item = &pDeckOfCards[v9];
         pDealerHand->AddHead(item);
@@ -1724,7 +1730,7 @@ void BlackJackMenu::SetTileCasinoEarnings() {
         }
         BSsprintf(Src, 260u, "%s%i", Src, g_blackJackCasinoStats->iTotalWinnings);
     }
-    pTiles[2]->Set(g_blackJackMenuTrait_Value, Src, 1);
+    pTiles[2]->Set(g_blackJackMenuTrait_Value, Src, true);
 }
 
 void BlackJackMenu::LoadNifs() {
@@ -1759,13 +1765,13 @@ void BlackJackMenu::LoadNifs() {
     FNVD_INLINED_LOCAL(NiFixedString, v72, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     pHandGeometry = (NiAVObject*)pModelLoader->LoadFile(
-        "Meshes\\Terminals\\NV_BlackJack\\NV_Blackjack-Hand1.NIF", LOD_MULT_NONE, 1, 0, 0, 0
+        "Meshes\\Terminals\\NV_BlackJack\\NV_Blackjack-Hand1.NIF", LOD_MULT_NONE, true, false, false, false
     );
     pHandSplitGeometry = (NiAVObject*)pModelLoader->LoadFile(
-        "Meshes\\Terminals\\NV_BlackJack\\NV_Blackjack-Hand2.NIF", LOD_MULT_NONE, 1, 0, 0, 0
+        "Meshes\\Terminals\\NV_BlackJack\\NV_Blackjack-Hand2.NIF", LOD_MULT_NONE, true, false, false, false
     );
     pHandDealerGeometry = (NiAVObject*)pModelLoader->LoadFile(
-        "Meshes\\Terminals\\NV_BlackJack\\NV_Blackjack-Dealer.NIF", LOD_MULT_NONE, 1, 0, 0, 0
+        "Meshes\\Terminals\\NV_BlackJack\\NV_Blackjack-Dealer.NIF", LOD_MULT_NONE, true, false, false, false
     );
     NiAVObject* pTableGeometry = this->pTableGeometry;
     BlackJackMenu::spCamera.operator=(
@@ -1776,7 +1782,7 @@ void BlackJackMenu::LoadNifs() {
         v45 = ::new (apMemory) NiNode(0);
     }
     else {
-        v45 = 0;
+        v45 = nullptr;
     }
     NiRefObject* v75 = (NiRefObject*)v45;
     BlackJackMenu::spSceneRoot.operator=(v45);
@@ -1795,9 +1801,9 @@ void BlackJackMenu::LoadNifs() {
         v39->AttachChild(pBetShadowGeometry[i], 1);
     }
     SetCorrectChipMeshesVisibleForCurrentBet();
-    SetSideHandVisibility(0);
+    SetSideHandVisibility(false);
     ClearDeckHighlight();
-    NiUpdateData a2(0.0f, 0, 0);
+    NiUpdateData a2(0.0f, false, false);
     BlackJackMenu::spSceneRoot.m_pObject->Update(a2);
     NiControllerManager* Controller =
         static_cast<NiControllerManager*>(this->pTableGeometry->GetController(&NiControllerManager::ms_RTTI));
@@ -1908,7 +1914,7 @@ void BlackJackMenu::LoadNifs() {
         pDealerAnimManager->DeactivateAll(0.0f);
         NiTimeController::StartAnimations(pHandDealerGeometry);
     }
-    NiUpdateData arData(0.0f, 0, 0);
+    NiUpdateData arData(0.0f, false, false);
     BlackJackMenu::spSceneRoot.m_pObject->Update(arData);
     if (!BlackJackMenu::spCamera.m_pObject) {
         BlackJackMenu::spCamera.operator=(SetupCamera());
@@ -1934,7 +1940,7 @@ void BlackJackMenu::LoadNifs() {
         v9 = ObjectByName->GetProperty(NiProperty::SHADE);
     }
     else {
-        v9 = 0;
+        v9 = nullptr;
     }
     if (v9) {
         NiSourceTexture* pBackTexture = pDeckOfCards[0].spBackTexture.m_pObject;
@@ -1961,18 +1967,18 @@ void BlackJackMenu::UpdateHandCardVisibility() {
         BSsprintf(apName, 30, "Hand1_0%i_Shadow:0", i);
         ObjectByName = BSUtilities::GetObjectByName(pHandGeometry, static_cast<const char*>(blockName));
         if (i < iAnimIndex[0]) {
-            ObjectByName->SetAppCulled(0);
+            ObjectByName->SetAppCulled(false);
             ObjectByName = BSUtilities::GetObjectByName(pHandGeometry, static_cast<const char*>(apDest));
-            ObjectByName->SetAppCulled(0);
+            ObjectByName->SetAppCulled(false);
             ObjectByName = BSUtilities::GetObjectByName(pHandGeometry, static_cast<const char*>(apName));
-            ObjectByName->SetAppCulled(0);
+            ObjectByName->SetAppCulled(false);
         }
         else {
-            ObjectByName->SetAppCulled(1);
+            ObjectByName->SetAppCulled(true);
             ObjectByName = BSUtilities::GetObjectByName(pHandGeometry, static_cast<const char*>(apDest));
-            ObjectByName->SetAppCulled(1);
+            ObjectByName->SetAppCulled(true);
             ObjectByName = BSUtilities::GetObjectByName(pHandGeometry, static_cast<const char*>(apName));
-            ObjectByName->SetAppCulled(1);
+            ObjectByName->SetAppCulled(true);
         }
     }
     for (int32_t j = 1; j <= 7; ++j) {
@@ -1981,18 +1987,18 @@ void BlackJackMenu::UpdateHandCardVisibility() {
         BSsprintf(apName, 30, "Dealer_0%i_Shadow:0", j);
         ObjectByName = BSUtilities::GetObjectByName(pHandDealerGeometry, static_cast<const char*>(blockName));
         if (j < iAnimIndex[2]) {
-            ObjectByName->SetAppCulled(0);
+            ObjectByName->SetAppCulled(false);
             ObjectByName = BSUtilities::GetObjectByName(pHandDealerGeometry, static_cast<const char*>(apDest));
-            ObjectByName->SetAppCulled(0);
+            ObjectByName->SetAppCulled(false);
             ObjectByName = BSUtilities::GetObjectByName(pHandDealerGeometry, static_cast<const char*>(apName));
-            ObjectByName->SetAppCulled(0);
+            ObjectByName->SetAppCulled(false);
         }
         else {
-            ObjectByName->SetAppCulled(1);
+            ObjectByName->SetAppCulled(true);
             ObjectByName = BSUtilities::GetObjectByName(pHandDealerGeometry, static_cast<const char*>(apDest));
-            ObjectByName->SetAppCulled(1);
+            ObjectByName->SetAppCulled(true);
             ObjectByName = BSUtilities::GetObjectByName(pHandDealerGeometry, static_cast<const char*>(apName));
-            ObjectByName->SetAppCulled(1);
+            ObjectByName->SetAppCulled(true);
         }
     }
     for (int32_t k = 1; k <= 7; ++k) {
@@ -2001,18 +2007,18 @@ void BlackJackMenu::UpdateHandCardVisibility() {
         BSsprintf(apName, 30, "Hand2_0%i_Shadow:0", k);
         ObjectByName = BSUtilities::GetObjectByName(pHandSplitGeometry, static_cast<const char*>(blockName));
         if (k < iAnimIndex[1]) {
-            ObjectByName->SetAppCulled(0);
+            ObjectByName->SetAppCulled(false);
             ObjectByName = BSUtilities::GetObjectByName(pHandSplitGeometry, static_cast<const char*>(apDest));
-            ObjectByName->SetAppCulled(0);
+            ObjectByName->SetAppCulled(false);
             ObjectByName = BSUtilities::GetObjectByName(pHandSplitGeometry, static_cast<const char*>(apName));
-            ObjectByName->SetAppCulled(0);
+            ObjectByName->SetAppCulled(false);
         }
         else {
-            ObjectByName->SetAppCulled(1);
+            ObjectByName->SetAppCulled(true);
             ObjectByName = BSUtilities::GetObjectByName(pHandSplitGeometry, static_cast<const char*>(apDest));
-            ObjectByName->SetAppCulled(1);
+            ObjectByName->SetAppCulled(true);
             ObjectByName = BSUtilities::GetObjectByName(pHandSplitGeometry, static_cast<const char*>(apName));
-            ObjectByName->SetAppCulled(1);
+            ObjectByName->SetAppCulled(true);
         }
     }
     NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
@@ -2030,33 +2036,33 @@ void BlackJackMenu::ShowAllHandCards() {
         BSsprintf(apDest, 30u, "Hand1_0%i_Back:0", i);
         BSsprintf(apName, 30u, "Hand1_0%i_Shadow:0", i);
         ObjectByName = BSUtilities::GetObjectByName(static_cast<NiAVObject*>(pHandGeometry), blockName);
-        ObjectByName->SetAppCulled(0);
+        ObjectByName->SetAppCulled(false);
         ObjectByName = BSUtilities::GetObjectByName(static_cast<NiAVObject*>(pHandGeometry), apDest);
-        ObjectByName->SetAppCulled(0);
+        ObjectByName->SetAppCulled(false);
         ObjectByName = BSUtilities::GetObjectByName(static_cast<NiAVObject*>(pHandGeometry), apName);
-        ObjectByName->SetAppCulled(0);
+        ObjectByName->SetAppCulled(false);
     }
     for (int32_t j = 1; j <= 7; ++j) {
         BSsprintf(blockName, 30u, "Dealer_0%i:0", j);
         BSsprintf(apDest, 30u, "Dealer_0%i_Back:0", j);
         BSsprintf(apName, 30u, "Dealer_0%i_Shadow:0", j);
         ObjectByName = BSUtilities::GetObjectByName(static_cast<NiAVObject*>(pHandDealerGeometry), blockName);
-        ObjectByName->SetAppCulled(0);
+        ObjectByName->SetAppCulled(false);
         ObjectByName = BSUtilities::GetObjectByName(static_cast<NiAVObject*>(pHandDealerGeometry), apDest);
-        ObjectByName->SetAppCulled(0);
+        ObjectByName->SetAppCulled(false);
         ObjectByName = BSUtilities::GetObjectByName(static_cast<NiAVObject*>(pHandDealerGeometry), apName);
-        ObjectByName->SetAppCulled(0);
+        ObjectByName->SetAppCulled(false);
     }
     for (int32_t k = 1; k <= 7; ++k) {
         BSsprintf(blockName, 30u, "Hand2_0%i:%i", k, k - 1);
         BSsprintf(apDest, 30u, "Hand2_0%i_Back:0", k);
         BSsprintf(apName, 30u, "Hand2_0%i_Shadow:0", k);
         ObjectByName = BSUtilities::GetObjectByName(pHandSplitGeometry, blockName);
-        ObjectByName->SetAppCulled(0);
+        ObjectByName->SetAppCulled(false);
         ObjectByName = BSUtilities::GetObjectByName(pHandSplitGeometry, apDest);
-        ObjectByName->SetAppCulled(0);
+        ObjectByName->SetAppCulled(false);
         ObjectByName = BSUtilities::GetObjectByName(pHandSplitGeometry, apName);
-        ObjectByName->SetAppCulled(0);
+        ObjectByName->SetAppCulled(false);
     }
     NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
     NiAVObject* v1 = BlackJackMenu::spSceneRoot.m_pObject;
@@ -2198,7 +2204,7 @@ void* BlackJackMenu::SetTileAlphasForStage(int32_t a1) {
 
 char BlackJackMenu::CanSplitHand() {
     BSSimpleList<BlackJackMenu::BlackJackCard*>* pNode = pPlayerHand;
-    BlackJackMenu::BlackJackCard* pFirst = 0;
+    BlackJackMenu::BlackJackCard* pFirst = nullptr;
     int32_t i = 0;
     char bCanSplit = 0;
     while (pNode && pNode->m_item) {
@@ -2225,17 +2231,17 @@ char BlackJackMenu::CanSplitHand() {
 void BlackJackMenu::HighlightSelectedDeck() {
     if (IsFlagSet(16)) {
         NiAVObject* ObjectByName = BSUtilities::GetObjectByName(pTableGeometry, "Hand1_Arrow:0");
-        ObjectByName->SetAppCulled(1);
+        ObjectByName->SetAppCulled(true);
         NiAVObject* v6 = BSUtilities::GetObjectByName(pTableGeometry, "Hand1_Arrow:0@#2");
-        v6->SetAppCulled(0);
+        v6->SetAppCulled(false);
     }
     else {
         NiAVObject* v2 = BSUtilities::GetObjectByName(pTableGeometry, "Hand1_Arrow:0");
-        v2->SetAppCulled(0);
+        v2->SetAppCulled(false);
         NiAVObject* v7 = BSUtilities::GetObjectByName(pTableGeometry, "Hand1_Arrow:0@#2");
-        v7->SetAppCulled(1);
+        v7->SetAppCulled(true);
     }
-    NiUpdateData a2(0.0, 0, 0);
+    NiUpdateData a2(0.0, false, false);
     NiNode* v3 = BlackJackMenu::spSceneRoot.m_pObject;
     NiAVObject* v4 = v3->GetAt(1u);
     v4->Update(a2);
@@ -2405,7 +2411,7 @@ void BlackJackMenu::SetCorrectChipMeshesVisibleForCurrentBet() {
         pBetShadowGeometry[4]->SetTranslate(0.0f, 0.0f, -5.0f);
         pBetShadowGeometry[5]->SetTranslate(0.0f, 0.0f, -5.0f);
     }
-    NiUpdateData arData(0.0f, 0, 0);
+    NiUpdateData arData(0.0f, false, false);
     BlackJackMenu::spSceneRoot.m_pObject->Update(arData);
 }
 
@@ -2420,11 +2426,11 @@ NiCamera* BlackJackMenu::SetupCamera() {
         v10 = ::new (apMemory) NiCamera;
     }
     else {
-        v10 = 0;
+        v10 = nullptr;
     }
     ::new (&a2) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     v10->SetViewPort(a2);
-    NiFrustum kFrustum(0);
+    NiFrustum kFrustum(false);
     SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
     kFrustum.m_fFar = WorldSceneGraph->GetFarDistance();
     kFrustum.m_fNear = BSSceneGraph::fNearDistance.Float();
@@ -2445,13 +2451,13 @@ NiCamera* BlackJackMenu::SetupCamera() {
     kFrustum.m_fBottom = -v1 * aspectRatio * 0.75f;
     double v2 = std::tan(v16);
     kFrustum.m_fTop = v2 * aspectRatio * 0.75f;
-    kFrustum.m_bOrtho = 0;
+    kFrustum.m_bOrtho = false;
     v10->SetViewFrustum(kFrustum);
     NiPoint3* z = ::new (&dst) NiPoint3(0.0f, 0.0f, 1.0f);
     NiPoint3* v3 = ::new (&v12) NiPoint3(0.0f, 0.0f, 1.0f);
     v10->LookAtWorldPoint(*v3, *z);
     v10->SetMinNearPlaneDist(1.0f);
-    NiUpdateData arData(0.0f, 0, 0);
+    NiUpdateData arData(0.0f, false, false);
     v10->Update(arData);
     NiFixedString apString("Surgery3DCamera");
     NiFixedString* kName = &apString;
@@ -2507,7 +2513,7 @@ void BlackJackMenu::SwapCardTextures(int32_t aiHandIndex, int32_t aiCardIndex, B
             pFaceShader = static_cast<BSShaderPPLightingProperty*>(pavobj->GetProperty(3));
         }
         else {
-            pFaceShader = 0;
+            pFaceShader = nullptr;
         }
         BSShaderPPLightingProperty* pFaceShader_2 = pFaceShader;
         if (pFaceShader) {
@@ -2532,7 +2538,7 @@ void BlackJackMenu::SwapCardTextures(int32_t aiHandIndex, int32_t aiCardIndex, B
             pFaceShader_3 = static_cast<BSShaderPPLightingProperty*>(pavobj->GetProperty(3));
         }
         else {
-            pFaceShader_3 = 0;
+            pFaceShader_3 = nullptr;
         }
         pFaceShader_2 = pFaceShader_3;
         if (pFaceShader_3) {
@@ -2545,7 +2551,7 @@ void BlackJackMenu::SwapCardTextures(int32_t aiHandIndex, int32_t aiCardIndex, B
 void BlackJackMenu::DrawScene() {
     NiCamera* v6;
     NiRenderer* Renderer_ = NiRenderer::GetRenderer();
-    Renderer_->ClearBuffer(0, 4u);
+    Renderer_->ClearBuffer(nullptr, 4u);
     SceneGraph* pSceneGraph = Main::GetWorldSceneGraph();
     BSCullingProcess* pCullingProcess = pSceneGraph->pCuller;
     pCullingProcess->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
@@ -2564,9 +2570,9 @@ void BlackJackMenu::DrawScene() {
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
     BSShaderUtil::AccumulateScene(v6, ShadowSceneNode_, *pCullingProcess);
     BSShaderAccumulator* v3 = static_cast<BSShaderAccumulator*>(apMemory.m_pObject);
-    BSShaderUtil::RenderScene(v6, v3, 0);
-    pCullingProcess->SetAccumulator(0);
-    apMemory.operator=(static_cast<NiRefObject*>(0));
+    BSShaderUtil::RenderScene(v6, v3, false);
+    pCullingProcess->SetAccumulator(nullptr);
+    apMemory.operator=(static_cast<NiRefObject*>(nullptr));
     pCullingProcess->PopCullMode();
 }
 
@@ -2584,7 +2590,7 @@ void* BlackJackMenu::SetNthTileAlpha(int32_t aiIndex, float afAlpha) {
         if (!*ppHead) {
             break;
         }
-        pChildren->Get(pPos)->Set(4009, afAlpha, 1);
+        pChildren->Get(pPos)->Set(4009, afAlpha, true);
         pPos = pChildren->GetNextPos(pPos);
         result = pPos;
     }
@@ -2598,7 +2604,7 @@ void BlackJackMenu::SetShouldExit() {
         BlackJackMenu::pMe->eBlackJackState = BL_CLOSING_MENU;
         singleton = InterfaceManager::Instance();
         processLevel = static_cast<Tile*>(singleton->GetCursorTile());
-        processLevel->Set(4009, 255.0f, (bool)1);
+        processLevel->Set(4009, 255.0f, true);
     }
 }
 
@@ -2616,41 +2622,41 @@ void BlackJackMenu::SetDealNotSwitchHands(char a1) {
     BlackJackMenu::pMe->pTiles[4]->Poke(4036, 1.0);
     if (a1) {
         v6 = (&sDealText)->String();
-        BlackJackMenu::pMe->pTiles[4]->Set(4036, v6, (bool)1);
+        BlackJackMenu::pMe->pTiles[4]->Set(4036, v6, true);
         BlackJackMenu::SetNthTileAlpha(4, 255.0f);
         BlackJackMenu::pMe->pTiles[5]->Poke(4036, 1.0);
         v7 = (&sIncreaseBetText)->String();
-        BlackJackMenu::pMe->pTiles[5]->Set(4036, v7, (bool)1);
+        BlackJackMenu::pMe->pTiles[5]->Set(4036, v7, true);
         BlackJackMenu::SetNthTileAlpha(5, 255.0f);
         BlackJackMenu::pMe->pTiles[6]->Poke(4036, 1.0);
         v8 = (&sDecreaseBetText)->String();
-        BlackJackMenu::pMe->pTiles[6]->Set(4036, v8, (bool)1);
+        BlackJackMenu::pMe->pTiles[6]->Set(4036, v8, true);
         BlackJackMenu::SetNthTileAlpha(6, 255.0f);
         BlackJackMenu::pMe->pTiles[7]->Poke(4036, 1.0);
         v9 = (&gs_sBetMax)->String();
-        BlackJackMenu::pMe->pTiles[7]->Set(4036, v9, (bool)1);
+        BlackJackMenu::pMe->pTiles[7]->Set(4036, v9, true);
         BlackJackMenu::SetNthTileAlpha(7, 255.0f);
         BlackJackMenu::pMe->pTiles[8]->Poke(4036, 1.0);
         v10 = (&sExit)->String();
-        BlackJackMenu::pMe->pTiles[8]->Set(4036, v10, (bool)1);
+        BlackJackMenu::pMe->pTiles[8]->Set(4036, v10, true);
         BlackJackMenu::SetNthTileAlpha(8, 255.0f);
         BlackJackMenu::pMe->pTiles[3]->Set(4003, 0);
     }
     else {
         v1 = (&sDoubleDownText)->String();
-        BlackJackMenu::pMe->pTiles[4]->Set(4036, v1, (bool)1);
+        BlackJackMenu::pMe->pTiles[4]->Set(4036, v1, true);
         BlackJackMenu::pMe->pTiles[5]->Poke(4036, 1.0);
         v2 = (&sSplitText)->String();
-        BlackJackMenu::pMe->pTiles[5]->Set(4036, v2, (bool)1);
+        BlackJackMenu::pMe->pTiles[5]->Set(4036, v2, true);
         BlackJackMenu::pMe->pTiles[6]->Poke(4036, 1.0);
         v3 = (&sSwitchHandsText)->String();
-        BlackJackMenu::pMe->pTiles[6]->Set(4036, v3, (bool)1);
+        BlackJackMenu::pMe->pTiles[6]->Set(4036, v3, true);
         BlackJackMenu::pMe->pTiles[7]->Poke(4036, 1.0);
         v4 = (&sSurrenderText)->String();
-        BlackJackMenu::pMe->pTiles[7]->Set(4036, v4, (bool)1);
+        BlackJackMenu::pMe->pTiles[7]->Set(4036, v4, true);
         BlackJackMenu::pMe->pTiles[8]->Poke(4036, 1.0);
         v5 = (&sStayText)->String();
-        BlackJackMenu::pMe->pTiles[8]->Set(4036, v5, (bool)1);
+        BlackJackMenu::pMe->pTiles[8]->Set(4036, v5, true);
         BlackJackMenu::pMe->pTiles[3]->Set(4003, 1);
     }
 }
@@ -2673,7 +2679,7 @@ Tile* BlackJackMenu::Create(
     BlackJackMenu::pCasino = apCasino;
     g_blackJackMinChipsToPlay = aiMinBet;
     g_blackJackMaxBet = aiMaxBet;
-    g_blackJackCasinoStats = 0;
+    g_blackJackCasinoStats = nullptr;
     for (cl = pPlayer->GetCasinoDataList(); cl && cl->m_item; cl = cl->m_pkNext) {
         int32_t CastingType = BlackJackMenu::pCasino->iFormID;
         if (CastingType == cl->m_item->casinoID) {
@@ -2691,7 +2697,7 @@ Tile* BlackJackMenu::Create(
             cd = ::new (apMemory) CasinoData;
         }
         else {
-            cd = 0;
+            cd = nullptr;
         }
         CasinoData* cd_2 = cd;
         cd->casinoID = BlackJackMenu::pCasino->iFormID;
@@ -2710,12 +2716,12 @@ Tile* BlackJackMenu::Create(
         int32_t afValue = pPlayer->GetCasinoCheatTimeRemaining();
         BSsprintf(msg, 260, "%s\nTime Remaining: %i", sBlackjackAntiCheatText.String(), afValue);
         Interface::ShowMessage(
-            msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", 0, 2.0f, 0
+            msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
         );
         BSAudio* v6 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-        SoundHandleByName->Play(0);
-        return 0;
+        SoundHandleByName->Play(false);
+        return nullptr;
     }
     else {
         CASINO_DATA* Data = &BlackJackMenu::pCasino->data;
@@ -2726,12 +2732,13 @@ Tile* BlackJackMenu::Create(
                     char apString[264];
                     BSsprintf(apString, 260, sGamblingMinWinText.String());
                     Interface::ShowMessage(
-                        apString, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", 0, 2.0f, 0
+                        apString, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr,
+                        2.0f, false
                     );
                     BSAudio* v12 = &BSAudio::QInstance();
                     BSSoundHandle* v26 = v12->GetSoundHandleByName(&apResult, "UIPopUpMessageGeneral", 289u);
-                    v26->Play(0);
-                    return 0;
+                    v26->Play(false);
+                    return nullptr;
                 }
                 else {
                     int32_t v13;
@@ -2742,24 +2749,24 @@ Tile* BlackJackMenu::Create(
                     BlackJackMenu::pMe = static_cast<BlackJackMenu*>(ptile->GetMenu());
                     if (BlackJackMenu::pMe &&
                         (v13 = BlackJackMenu::pMe->GetClass(), v13 == BlackJackMenu::GetClassStatic())) {
-                        BlackJackMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), 0);
+                        BlackJackMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
                         if (BlackJackMenu::pMe->HasTiles()) {
                             char Src[64];
                             if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
                                 float time = Tile::GetMaximumDepth();
-                                ptile->Set(4013, time, 1);
+                                ptile->Set(4013, time, true);
                             }
                             BSAudio* v14 = &BSAudio::QInstance();
                             BSSoundHandle* v25 = v14->GetSoundHandleByName(&v31, "GAMEBlackJackCardShuffle", 289u);
-                            v25->Play(0);
+                            v25->Play(false);
                             BlackJackMenu::pMe->iLuckSkill = pPlayer->GetClampedActorValue(ActorValue::LUCK);
                             BlackJackMenu::pMe->iCurrentBet = g_blackJackMinChipsToPlay;
                             const char* v15 = sCurrentBetText.String();
-                            BlackJackMenu::pMe->pTiles[0]->Set(g_blackJackMenuTrait_Value, v15, 1);
+                            BlackJackMenu::pMe->pTiles[0]->Set(g_blackJackMenuTrait_Value, v15, true);
                             BlackJackMenu::pMe->pTiles[0]->Poke(BlackJackMenu::iUT_X, 1.0f);
                             BlackJackMenu::pMe->pTiles[0]->Set(BlackJackMenu::iUT_X, g_blackJackMinChipsToPlay);
                             const char* v16 = sChipCountText.String();
-                            BlackJackMenu::pMe->pTiles[1]->Set(g_blackJackMenuTrait_Value, v16, 1);
+                            BlackJackMenu::pMe->pTiles[1]->Set(g_blackJackMenuTrait_Value, v16, true);
                             BlackJackMenu::pMe->pTiles[1]->Poke(BlackJackMenu::iUT_X, 1.0f);
                             TESCasinoChips* v17 = BlackJackMenu::pCasino->GetChipType();
                             int32_t ItemCountinContainer = pPlayer->GetInventoryObjectCount(v17);
@@ -2772,7 +2779,7 @@ Tile* BlackJackMenu::Create(
                                 const char* afValuea = sCasinoEarningsText.String();
                                 BSsprintf(Src, 64, "%s %s", BlackJackMenu::pCasino->GetFormEditorID(), afValuea);
                             }
-                            BlackJackMenu::pMe->pTiles[2]->Set(g_blackJackMenuTrait_Value, Src, 1);
+                            BlackJackMenu::pMe->pTiles[2]->Set(g_blackJackMenuTrait_Value, Src, true);
                             BlackJackMenu::pMe->pTiles[2]->Poke(BlackJackMenu::iUT_X, 1.0f);
                             BlackJackMenu::pMe->pTiles[2]->Set(
                                 BlackJackMenu::iUT_X, g_blackJackCasinoStats->iTotalWinnings
@@ -2783,17 +2790,17 @@ Tile* BlackJackMenu::Create(
                             BlackJackMenu::pMe->SetTileCasinoEarnings();
                             BlackJackMenu::pMe->pTiles[3]->Poke(4036, 1.0f);
                             const char* v21 = sHitText.String();
-                            BlackJackMenu::pMe->pTiles[3]->Set(4036, v21, 1);
+                            BlackJackMenu::pMe->pTiles[3]->Set(4036, v21, true);
                             if (BlackJackMenu::pMe->InitCasinoData()) {
                                 BlackJackMenu::SetDealNotSwitchHands(1);
                                 BlackJackMenu::pMe->LoadNifs();
-                                BlackJackMenu::pMe->PrepForVisibility(0);
+                                BlackJackMenu::pMe->PrepForVisibility(false);
                                 BlackJackMenu::pMe->pTiles[3]->Set(4003, 0);
                                 BlackJackMenu::pMe->ZeroFlags();
                                 return ptile;
                             }
                             else {
-                                return 0;
+                                return nullptr;
                             }
                         }
                         else {
@@ -2801,7 +2808,7 @@ Tile* BlackJackMenu::Create(
                                 "MENUS: BlackJack Menu Creation Failed... Are your menu and art resources up to "
                                 "date?"
                             );
-                            return 0;
+                            return nullptr;
                         }
                     }
                     else {
@@ -2812,7 +2819,7 @@ Tile* BlackJackMenu::Create(
                                 }
                             }
                         }
-                        return 0;
+                        return nullptr;
                     }
                 }
             }
@@ -2820,24 +2827,25 @@ Tile* BlackJackMenu::Create(
                 char apText[264];
                 BSsprintf(apText, 260, sGamblingBrokeText.String());
                 Interface::ShowMessage(
-                    apText, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", 0, 2.0f, 0
+                    apText, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f,
+                    false
                 );
                 BSAudio* v11 = &BSAudio::QInstance();
                 BSSoundHandle* v27 = v11->GetSoundHandleByName(&th_s, "UIPopUpMessageGeneral", 289u);
-                v27->Play(0);
-                return 0;
+                v27->Play(false);
+                return nullptr;
             }
         }
         else {
             char apDest[264];
             BSsprintf(apDest, 260, sGamblingBannedText.String());
             Interface::ShowMessage(
-                apDest, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", 0, 2.0f, 0
+                apDest, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
             );
             BSAudio* v9 = &BSAudio::QInstance();
             BSSoundHandle* v28 = v9->GetSoundHandleByName(&arHandle, "UIPopUpMessageGeneral", 289u);
-            v28->Play(0);
-            return 0;
+            v28->Play(false);
+            return nullptr;
         }
     }
 }

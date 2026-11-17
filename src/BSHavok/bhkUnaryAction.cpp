@@ -40,11 +40,11 @@ void bhkUnaryAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
         apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
     }
     apStrings->SetAt(m_usSize, element);
-    if (this && (phkObject = this->phkObject) != 0) {
+    if (this && (phkObject = this->phkObject) != nullptr) {
         pEntity = static_cast<hkpUnaryAction*>(phkObject)->m_entity;
     }
     else {
-        pEntity = 0;
+        pEntity = nullptr;
     }
     // The entity's address, printed as a hex number.
     BSsprintf(apDest, 32, "0x%08X", pEntity);

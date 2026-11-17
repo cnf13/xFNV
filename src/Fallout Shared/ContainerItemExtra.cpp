@@ -66,7 +66,7 @@ ContainerItemExtra::ContainerItemExtra() : pOwnerForm(nullptr), iOwnerRank(0), f
 
 bool FloatEQ(float aX, float aY, float afPrecision) {
     if (afPrecision < 0.0) {
-        return (bool)0;
+        return false;
     }
     if (!(aY < ((double)aX))) {
         return (bool)((uint8_t)(afPrecision > (aY - aX)));
@@ -113,7 +113,7 @@ void ContainerItemExtra::InitItem(TESForm* apOwner) {
 
 bool ContainerItemExtra::Load(TESFile* apFile) {
     CONTAINER_ITEM_EXTRA loaddata;
-    bool bsuccess = 0;
+    bool bsuccess = false;
     if (apFile) {
         if (apFile->GetTESChunk() == COED_ID) {
             apFile->GetChunkData(&loaddata, 12u);
@@ -124,7 +124,7 @@ bool ContainerItemExtra::Load(TESFile* apFile) {
             pOwnerForm = reinterpret_cast<TESForm*>(static_cast<uintptr_t>(loaddata.iOwnerID));
             iUnion = loaddata.iUnion;
             fHealthMult = loaddata.fHealthMult;
-            return 1;
+            return true;
         }
     }
     return bsuccess;
@@ -142,15 +142,15 @@ bool ContainerItemExtra::IsDefault() {
 
 bool ContainerItemExtra::Compare(ContainerItemExtra* apCompare) {
     if (!apCompare) {
-        return (bool)1;
+        return true;
     }
     if (pOwnerForm != apCompare->pOwnerForm) {
-        return (bool)1;
+        return true;
     }
     if (pOwnerGlobal == apCompare->pOwnerGlobal) {
         return (bool)((uint8_t)(apCompare->fHealthMult != fHealthMult));
     }
-    return (bool)1;
+    return true;
 }
 
 // Writes the entry as a COED chunk: the owner's form ID, then the owner global's form ID or the raw union (the

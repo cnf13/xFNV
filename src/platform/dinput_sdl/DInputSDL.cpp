@@ -11,8 +11,8 @@
 //   acquired device is lost when the focus goes.
 // - Joysticks: EnumDevices reports none; the gamepad is XInput's (XInputSDL.cpp).
 #include <SDL3/SDL.h>
-#include <stdint.h>
-#include <string.h>
+#include <cstdint>
+#include <cstring>
 
 #include "platform/System.h"
 #include "scancodes_windows.h"

@@ -237,7 +237,7 @@ float NiTimeController::ComputeScaledTime(float afTime) {
             case LOOP: {
                 float fSpan = m_fHiKeyTime - m_fLoKeyTime;
                 if (fSpan != 0.0f) {
-                    float fMod = static_cast<float>(std::fmod(fScaledTime - m_fLoKeyTime, fSpan));
+                    float fMod = std::fmod(fScaledTime - m_fLoKeyTime, fSpan);
                     fScaledTime = fMod + m_fLoKeyTime;
                     if (fScaledTime < m_fLoKeyTime) {
                         fScaledTime += fSpan;
@@ -252,7 +252,7 @@ float NiTimeController::ComputeScaledTime(float afTime) {
                 float fSpan = m_fHiKeyTime - m_fLoKeyTime;
                 if (fSpan != 0.0f) {
                     float fDoubleSpan = fSpan + fSpan;
-                    float fTimeFract = static_cast<float>(std::fmod(fScaledTime, fDoubleSpan));
+                    float fTimeFract = std::fmod(fScaledTime, fDoubleSpan);
                     if (fTimeFract < 0.0f) {
                         fTimeFract += fDoubleSpan;
                     }

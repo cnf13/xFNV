@@ -210,7 +210,7 @@ void hkpBoxShape::convertVertexIdsToVerticesImpl(const uint16_t* ids, int32_t nu
     for (int32_t i = numIds - 1; i >= 0; --i) {
         int32_t v7 = *ids | 0x3F000000;
         verticesOut->m_quad = _mm_mul_ps(hkpBoxShapeVertexSigns[*ids], m_halfExtents.m_quad);
-        verticesOut->m_quad[3] = std::bit_cast<float>(static_cast<int32_t>(v7));
+        verticesOut->m_quad[3] = std::bit_cast<float>(v7);
         ++verticesOut;
         ++ids;
     }

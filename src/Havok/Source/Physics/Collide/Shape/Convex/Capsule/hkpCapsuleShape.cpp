@@ -84,18 +84,16 @@ calcClosestPointsLineLine(const __m128* a1, const __m128* a2, const __m128* a3, 
     __m128 v5 = *a4;
     __m128 v6 = *a2;
     __m128 v7 = _mm_mul_ps(*a4, *a2);
-    float v31 = _mm_shuffle_ps(v7, v7, 170)[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+    float v31 = _mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
     __m128 v8 = _mm_sub_ps(*a3, *a1);
     __m128 v9 = _mm_mul_ps(*a2, v8);
-    float v10 = _mm_shuffle_ps(v9, v9, 170)[0] + static_cast<float>(_mm_shuffle_ps(v9, v9, 85)[0] + v9[0]);
+    float v10 = _mm_shuffle_ps(v9, v9, 170)[0] + (_mm_shuffle_ps(v9, v9, 85)[0] + v9[0]);
     __m128 v11 = _mm_mul_ps(*a4, v8);
-    float v37 = _mm_shuffle_ps(v11, v11, 170)[0] + static_cast<float>(_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
+    float v37 = _mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
     __m128 v12 = _mm_mul_ps(v6, v6);
-    float v28 = _mm_shuffle_ps(v12, v12, 170)[0] + static_cast<float>(_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]);
+    float v28 = _mm_shuffle_ps(v12, v12, 170)[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]);
     __m128 v13 = _mm_mul_ps(v5, v5);
-    double v14 = static_cast<float>(
-        _mm_shuffle_ps(v13, v13, 170)[0] + static_cast<float>(_mm_shuffle_ps(v13, v13, 85)[0] + v13[0])
-    );
+    double v14 = (_mm_shuffle_ps(v13, v13, 170)[0] + (_mm_shuffle_ps(v13, v13, 85)[0] + v13[0]));
     double v15 = v14 * v28;
     double v16 = v31;
     double v17 = v31 * v31;
@@ -128,7 +126,7 @@ calcClosestPointsLineLine(const __m128* a1, const __m128* a2, const __m128* a3, 
     );
     __m128 v26 = _mm_sub_ps(v24, v25);
     __m128 v27 = _mm_mul_ps(v26, v26);
-    (*a5)[0] = _mm_shuffle_ps(v27, v27, 170)[0] + static_cast<float>(_mm_shuffle_ps(v27, v27, 85)[0] + v27[0]);
+    (*a5)[0] = _mm_shuffle_ps(v27, v27, 170)[0] + (_mm_shuffle_ps(v27, v27, 85)[0] + v27[0]);
     a5[1] = v24;
     a5[2] = v25;
     (*a5)[1] = *reinterpret_cast<float*>(&v29);
@@ -309,7 +307,7 @@ hkBool hkpCapsuleShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShapeR
         else {
             // The radius squared stays unrounded on the x87 stack; the quotient and the root are rounded to float.
             const float fChordSq = (m_radius * m_radius - fLineDistSq) / fAcrossSq;
-            const float fChord = static_cast<float>(std::sqrt(fChordSq));
+            const float fChord = std::sqrt(fChordSq);
             fHitFraction = fRayFraction - fChord;
         }
         if (results.m_hitFraction <= fHitFraction) {
@@ -396,9 +394,7 @@ void hkpCapsuleShape::getSupportingVertexImpl(const hkVector4& direction, hkpCdV
     v3.m_quad = m_vertexB.m_quad;
     v4.m_quad = m_vertexA.m_quad;
     __m128 v5 = _mm_mul_ps(_mm_sub_ps(v3.m_quad, v4.m_quad), direction.m_quad);
-    if (!(static_cast<float>(
-              _mm_shuffle_ps(v5, v5, 170)[0] + static_cast<float>(_mm_shuffle_ps(v5, v5, 85)[0] + v5[0])
-          ) < 0.0f)) {
+    if (!((_mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0])) < 0.0f)) {
         (*static_cast<hkVector4*>(&supportingVertexOut)).m_quad = v3.m_quad;
         supportingVertexOut.m_quad[3] = std::bit_cast<float>(static_cast<int32_t>(0x3F000010));
     }
@@ -441,10 +437,9 @@ void hkpCapsuleShape::closestPointLineSeg(const hkVector4& A, const hkVector4& B
     v5.m_quad = B2.m_quad;
     __m128 v6 = _mm_sub_ps(B2.m_quad, B.m_quad);
     __m128 v7 = _mm_mul_ps(_mm_sub_ps(B.m_quad, A.m_quad), v6);
-    float v10 =
-        -static_cast<float>(_mm_shuffle_ps(v7, v7, 170)[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]));
+    float v10 = -(_mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]));
     __m128 v8 = _mm_mul_ps(v6, v6);
-    float v12 = _mm_shuffle_ps(v8, v8, 170)[0] + static_cast<float>(_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
+    float v12 = _mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
     double v9 = v10;
     if (!(v10 <= 0.0f)) {
         if (!(v12 <= v9)) {

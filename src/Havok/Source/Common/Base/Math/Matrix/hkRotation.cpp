@@ -33,7 +33,7 @@ void hkRotation::set(const hkQuaternion& qi) {
     m_col0.m_quad = v8.m_quad;
     __m128 v10 = _mm_sub_ps(_mm_xor_ps(v5, rdata_10C8780), v7);
     v11.m_quad = _mm_shuffle_ps(v10, v10, 177);
-    v9[0] = static_cast<float>(1.0f - v4) - v6[0];
+    v9[0] = (1.0f - v4) - v6[0];
     m_col1.m_quad = v11.m_quad;
     m_col2.m_quad = _mm_shuffle_ps(_mm_movehl_ps(v8.m_quad, v11.m_quad), v9, 141);
 }
@@ -60,22 +60,14 @@ hkBool* hkRotation::isOrthonormal(hkBool* a2, float a3) const {
     float v13;
     v3.m_quad = m_col0.m_quad;
     __m128 v4 = _mm_mul_ps(v3.m_quad, v3.m_quad);
-    float v8 =
-        static_cast<float>(_mm_shuffle_ps(v4, v4, 170)[0] + static_cast<float>(_mm_shuffle_ps(v4, v4, 85)[0] + v4[0])) -
-        1.0;
+    float v8 = (_mm_shuffle_ps(v4, v4, 170)[0] + (_mm_shuffle_ps(v4, v4, 85)[0] + v4[0])) - 1.0;
     float v9 = std::fabs((double)v8);
     if (a3 < static_cast<double>(v9) ||
         ((v6 = _mm_mul_ps(m_col1.m_quad, m_col1.m_quad),
-          (v10 = static_cast<float>(
-                     _mm_shuffle_ps(v6, v6, 170)[0] + static_cast<float>(_mm_shuffle_ps(v6, v6, 85)[0] + v6[0])
-                 ) -
-               1.0,
+          (v10 = (_mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0])) - 1.0,
            (v11 = std::fabs((double)v10), v11 > static_cast<double>(a3)))) ||
          (v7 = _mm_mul_ps(m_col2.m_quad, m_col2.m_quad),
-          (v12 = static_cast<float>(
-                     _mm_shuffle_ps(v7, v7, 170)[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])
-                 ) -
-               1.0,
+          (v12 = (_mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])) - 1.0,
            (v13 = std::fabs((double)v12), v13 > static_cast<double>(a3)))))) {
         *a2 = false;
         return a2;

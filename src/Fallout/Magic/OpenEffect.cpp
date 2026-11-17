@@ -83,6 +83,6 @@ ActiveEffect* OpenEffect::Instantiate(MagicCaster* a1, MagicItem* a2, EffectItem
         return ::new (v5) OpenEffect(a1, a2, a3);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

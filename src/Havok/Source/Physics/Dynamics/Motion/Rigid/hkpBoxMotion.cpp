@@ -129,10 +129,8 @@ void hkpBoxMotion::getProjectedPointVelocity(
     __m128 v8 = _mm_mul_ps(m_linearVelocity.m_quad, normal.m_quad);
     __m128 v9 = _mm_sub_ps(v7, v6);
     __m128 v10 = _mm_mul_ps(m_angularVelocity.m_quad, v9);
-    velOut = static_cast<float>(
-                 _mm_shuffle_ps(v10, v10, 170)[0] + static_cast<float>(_mm_shuffle_ps(v10, v10, 85)[0] + v10[0])
-             ) +
-        static_cast<float>(_mm_shuffle_ps(v8, v8, 170)[0] + static_cast<float>(_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]));
+    velOut = (_mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0])) +
+        (_mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]));
     v11.m_quad = m_motionState.m_transform.m_rotation.m_col1.m_quad;
     v12.m_quad = m_motionState.m_transform.m_rotation.m_col2.m_quad;
     v13.m_quad = m_motionState.m_transform.m_rotation.m_col0.m_quad;
@@ -147,10 +145,8 @@ void hkpBoxMotion::getProjectedPointVelocity(
         _mm_mul_ps(_mm_shuffle_ps(v14, v12.m_quad, 228), _mm_shuffle_ps(v9, v9, 170))
     );
     __m128 v18 = _mm_mul_ps(_mm_mul_ps(m_inertiaAndMassInv.m_quad, v17), v17);
-    invVirtMassOut = m_inertiaAndMassInv.m_quad[3] +
-        static_cast<float>(
-                         _mm_shuffle_ps(v18, v18, 170)[0] + static_cast<float>(_mm_shuffle_ps(v18, v18, 85)[0] + v18[0])
-        );
+    invVirtMassOut =
+        m_inertiaAndMassInv.m_quad[3] + (_mm_shuffle_ps(v18, v18, 170)[0] + (_mm_shuffle_ps(v18, v18, 85)[0] + v18[0]));
 }
 
 void hkpBoxMotion::applyPointImpulse(const hkVector4& imp, const hkVector4& p) {

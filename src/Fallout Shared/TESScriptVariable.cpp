@@ -40,16 +40,16 @@ ScriptVariable::~ScriptVariable() {}
 
 bool ScriptVariable::Compare(ScriptVariable* apCompare) {
     if (!apCompare) {
-        return 1;
+        return true;
     }
     if (data.bIsInteger != apCompare->data.bIsInteger) {
-        return 1;
+        return true;
     }
     if (data.uiID != apCompare->data.uiID) {
-        return 1;
+        return true;
     }
     if (apCompare->data.fValue == data.fValue) {
         return static_cast<uint8_t>(cName.IsNotEqual(apCompare->cName)) != 0;
     }
-    return 1;
+    return true;
 }

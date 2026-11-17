@@ -38,14 +38,14 @@ MagicHitEffect::~MagicHitEffect() {
 }
 
 bool MagicHitEffect::Update(float afTimeDelta) {
-    fAge = (float)(fAge + afTimeDelta);
+    fAge = (fAge + afTimeDelta);
     if ((!pTarget) || ((!pTarget->Get3D()) || pTarget->TESForm::GetDelete())) {
-        return (bool)0;
+        return false;
     }
     if (fLifetime < ((double)fAge)) {
-        bFinished = (bool)1;
+        bFinished = true;
     }
-    return (bool)1;
+    return true;
 }
 
 // fAge (4) and bFinished (1), then fLifetime (4) from save version 0x72 on.
@@ -101,7 +101,7 @@ void MagicHitEffect::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
         v3 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     pTarget = v3;
 }
@@ -146,11 +146,11 @@ BSSimpleList<MagicHitEffect*>* MagicHitEffect::InstantiateHitEffects(ActiveEffec
             }
         }
     }
-    BSSimpleList<MagicHitEffect*>* plist_2 = 0;
-    peffect = 0;
+    BSSimpleList<MagicHitEffect*>* plist_2 = nullptr;
+    peffect = nullptr;
     EffectSetting* EffectSetting_ = apEffect->GetEffectSetting();
     if (EffectSetting_->IsFlagSet(EffectSetting::GORY_VISUALS) && bDisableAllGore.Bool()) {
-        return 0;
+        return nullptr;
     }
     if (!apEffect->IsFlagSet(ActiveEffect::NO_HITEFFECT_NIF) && !Main::GetSceneIsComplex()) {
         MagicHitEffect* peffect_2;
@@ -162,7 +162,7 @@ BSSimpleList<MagicHitEffect*>* MagicHitEffect::InstantiateHitEffects(ActiveEffec
             peffect_2 = (MagicHitEffect*)::new (apMemory) MagicModelHitEffect(v5, apEffect);
         }
         else {
-            peffect_2 = 0;
+            peffect_2 = nullptr;
         }
         peffect = peffect_2;
         if (peffect_2->Init()) {
@@ -173,7 +173,7 @@ BSSimpleList<MagicHitEffect*>* MagicHitEffect::InstantiateHitEffects(ActiveEffec
                 plist = ::new (v18) BSSimpleList<MagicHitEffect*>(peffect);
             }
             else {
-                plist = 0;
+                plist = nullptr;
             }
             plist_2 = plist;
         }
@@ -193,7 +193,7 @@ BSSimpleList<MagicHitEffect*>* MagicHitEffect::InstantiateHitEffects(ActiveEffec
             peffect_3 = (MagicHitEffect*)::new (v17) MagicShaderHitEffect(v7, apEffect);
         }
         else {
-            peffect_3 = 0;
+            peffect_3 = nullptr;
         }
         peffect = peffect_3;
         if (peffect_3->Init()) {
@@ -208,7 +208,7 @@ BSSimpleList<MagicHitEffect*>* MagicHitEffect::InstantiateHitEffects(ActiveEffec
                     v9 = ::new (v16) BSSimpleList<MagicHitEffect*>(peffect);
                 }
                 else {
-                    v9 = 0;
+                    v9 = nullptr;
                 }
                 return v9;
             }

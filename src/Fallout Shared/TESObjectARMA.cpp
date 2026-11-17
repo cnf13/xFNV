@@ -238,7 +238,7 @@ void TESObjectARMA::InitItem() {
         }
         static_cast<BGSDestructibleObjectForm*>(this)->InitItem(this);
         static_cast<TESBipedModelForm*>(this)->InitItem(this);
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 
@@ -253,10 +253,10 @@ bool TESObjectARMA::Compare(TESForm* apCompare) {
     TESForm* v4 =
         static_cast<TESForm*>(FNVD_DYNAMIC_CAST_VOID(TESObjectARMA)(apCompare, RTTI_TESForm, RTTI_TESObjectARMA));
     if (!v4) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(v4)) {
-        return 1;
+        return true;
     }
     return std::memcmp(&data, &v4[15].pSourceFiles, sizeof(data)) != 0;
 }

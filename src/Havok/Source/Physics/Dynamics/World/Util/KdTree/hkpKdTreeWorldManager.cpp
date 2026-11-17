@@ -126,7 +126,7 @@ void hkpKdTreeWorldManager::castRay(
     // MAYBE-INLINED 0xD0A39E: before the vptr store of hkpKdTreeCollidableRaycaster's inlined constructor
     collector.m_output = pOutput;
     // MAYBE-INLINED 0xD0A3AE: after the vptr store of hkpKdTreeCollidableRaycaster's inlined constructor
-    collector.m_collector = 0;
+    collector.m_collector = nullptr;
     // MAYBE-INLINED 0xD0A3B2: after the vptr store of hkpKdTreeCollidableRaycaster's inlined constructor
     collector.m_input = &input;
     if (filter) {
@@ -134,8 +134,8 @@ void hkpKdTreeWorldManager::castRay(
         collector.m_collectionFilter = static_cast<const hkpRayShapeCollectionFilter*>(filter);
     }
     else {
-        collector.m_filter = 0;
-        collector.m_collectionFilter = 0;
+        collector.m_filter = nullptr;
+        collector.m_collectionFilter = nullptr;
     }
     hkBool result;
     hkKdTreeUtils::castRayIterative(&result, m_kdTree, input.m_from, input.m_to, &collector);

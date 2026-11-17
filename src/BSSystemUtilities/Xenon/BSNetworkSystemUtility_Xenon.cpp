@@ -25,7 +25,7 @@ void BSNetworkSystemUtility::Idle() {
 }
 
 bool BSNetworkSystemUtility::Initialize() {
-    return (bool)1;
+    return true;
 }
 
 void BSNetworkSystemUtility::Destroy() {

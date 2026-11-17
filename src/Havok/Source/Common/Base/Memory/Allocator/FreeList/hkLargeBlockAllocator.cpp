@@ -214,7 +214,7 @@ void* hkLargeBlockAllocator::criticalAlloc(uint32_t size) {
             return v5 + 4;
         }
         else {
-            return 0;
+            return nullptr;
         }
     }
 }
@@ -357,7 +357,7 @@ void hkLargeBlockAllocator::_unlinkLargeChunk(hkMemTreeChunk* x) {
         prev = x->child[1];
         hkMemTreeChunk** v6 = &x->child[1];
         if (prev || (prev = x->child[0], (v6 = x->child, prev))) {
-            while (1) {
+            while (true) {
                 hkMemTreeChunk** child = &prev->child[1];
                 if (!prev->child[1]) {
                     child = prev->child;
@@ -368,7 +368,7 @@ void hkLargeBlockAllocator::_unlinkLargeChunk(hkMemTreeChunk* x) {
                 prev = *child;
                 v6 = child;
             }
-            *v6 = 0;
+            *v6 = nullptr;
         }
     }
     else {
@@ -530,9 +530,9 @@ void* hkLargeBlockAllocator::_allocFromTop(uint32_t nb) {
 
 void* hkLargeBlockAllocator::_alloc(uint32_t nb) {
     void* result;
-    if (!m_treemap || (result = _allocLarge(nb)) == 0) {
+    if (!m_treemap || (result = _allocLarge(nb)) == nullptr) {
         if (nb + 256 >= m_topsize) {
-            return 0;
+            return nullptr;
         }
         else {
             return _allocFromTop(nb);
@@ -751,9 +751,9 @@ void hkLargeBlockAllocator::_addAlloc(void* data, uint32_t size, void* param) {
 }
 
 uint32_t hkLargeBlockAllocator::_bitToIndex(uint32_t x) {
-    uint32_t v1 = ((((uint32_t)(x - 1)) >> ((((uint32_t)(x - 1)) >> 12) & 16)) >> 5) & 8;
-    uint32_t v2 = (((uint32_t)(x - 1)) >> ((((uint32_t)(x - 1)) >> 12) & 16)) >> v1;
-    uint32_t v3 = v1 + ((((uint32_t)(x - 1)) >> 12) & 16);
+    uint32_t v1 = (((x - 1) >> (((x - 1) >> 12) & 16)) >> 5) & 8;
+    uint32_t v2 = ((x - 1) >> (((x - 1) >> 12) & 16)) >> v1;
+    uint32_t v3 = v1 + (((x - 1) >> 12) & 16);
     int32_t v4 = (int32_t)((v2 >> 2) & 4);
     uint32_t v5 = v2 >> v4;
     return (((v5 >> ((v5 >> 1) & 2)) >> 1) & 1) +

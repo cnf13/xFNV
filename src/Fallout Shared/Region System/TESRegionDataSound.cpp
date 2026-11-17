@@ -36,7 +36,7 @@ bool TESRegionDataSound::LoadRegionDataSound(TESFile* a1) {
         else {
             uint32_t aiID[2];
             if (entrySize != RDMO_ID) {
-                return 0;
+                return false;
             }
             aiID[1] = 0;
             aiID[0] = 0;
@@ -63,7 +63,7 @@ bool TESRegionDataSound::LoadRegionDataSound(TESFile* a1) {
                 uint32_t uisize = a1->GetChunkSize();
                 uint32_t uicount = uisize / 12;
                 if (uisize == 4) {
-                    return 0;
+                    return false;
                 }
                 TESRegionSound* tmpArray = static_cast<TESRegionSound*>(ourMalloc(
                     uicount <= SIZE_MAX / sizeof(TESRegionSound) ? sizeof(TESRegionSound) * uicount : SIZE_MAX
@@ -75,7 +75,7 @@ bool TESRegionDataSound::LoadRegionDataSound(TESFile* a1) {
                     tmpArray_2 = tmpArray;
                 }
                 else {
-                    tmpArray_2 = 0;
+                    tmpArray_2 = nullptr;
                 }
                 a1->GetChunkData(tmpArray_2, static_cast<uint32_t>(sizeof(TESRegionSound) * uicount));
                 for (uint32_t i = 0; i < uicount; ++i) {
@@ -85,7 +85,7 @@ bool TESRegionDataSound::LoadRegionDataSound(TESFile* a1) {
                         tmpSound = ::new (v9) TESRegionSound;
                     }
                     else {
-                        tmpSound = 0;
+                        tmpSound = nullptr;
                     }
                     TESRegionSound* tmpSound_2 = tmpSound;
                     TESRegionSound* v4 = &tmpArray_2[i];
@@ -122,11 +122,11 @@ bool TESRegionDataSound::LoadRegionDataSound(TESFile* a1) {
                 break;
             }
             default: {
-                return 0;
+                return false;
             }
         }
     }
-    return 1;
+    return true;
 }
 
 TESRegionSound::TESRegionSound() : uiSound(0), uiFlags(15), uiChance(0) {}
@@ -193,7 +193,7 @@ void TESRegionDataSound::Save() {
             tmpArray_2 = tmpArray;
         }
         else {
-            tmpArray_2 = 0;
+            tmpArray_2 = nullptr;
         }
         for (uint32_t j = 0; tmpList_2 && (tmpList_2->m_item && j < uicount_2); ++j) {
             tmpArray_2[j] = *tmpList_2->m_item;
@@ -289,10 +289,10 @@ bool TESRegionDataSound::Validate() {
 
 bool TESRegionDataSound::SetMusicType(BGSMusicType* a2) {
     if ((!a2) || (a2 == sounds.pType)) {
-        return (bool)0;
+        return false;
     }
     sounds.pType = a2;
-    return (bool)1;
+    return true;
 }
 
 MediaSet* TESRegionDataSound::GetMediaSetIncidentals() {
@@ -304,7 +304,7 @@ MediaSet* TESRegionDataSound::GetMediaSetBattle() {
     uint32_t pItem = 0;
     // Also tests the list's address, which is never null.
     if (!pList->m_item) {
-        return 0;
+        return nullptr;
     }
     while (pList && pList->m_item) {
         if (!RandomInt(0, 3) || !pItem) {
@@ -313,7 +313,7 @@ MediaSet* TESRegionDataSound::GetMediaSetBattle() {
         pList = pList->m_pkNext;
     }
     if (!pItem) {
-        return 0;
+        return nullptr;
     }
     sounds.MediaSetBattleList.Remove(pItem);
     sounds.MediaSetBattleList.AddHead(pItem);

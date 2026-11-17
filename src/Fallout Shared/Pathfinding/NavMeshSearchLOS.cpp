@@ -129,7 +129,7 @@ bool NavMeshSearchLOS::GetNodeConnections(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool NavMeshSearchLOS::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) {
@@ -155,14 +155,14 @@ bool NavMeshSearchLOS::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSear
         else {
             pLastValidNode = apNode;
         }
-        return 0;
+        return false;
     }
     else {
         const BSSimpleArray<NiPoint3, 1024>* ignoreLocations = &pCurrentRequest->IgnoreLocations;
         for (uint32_t i = 0;; ++i) {
             uint32_t FormFlags = ignoreLocations->iSize;
             if (i >= FormFlags) {
-                return 1;
+                return true;
             }
             apNode->tNodeData.GetCenter(&triangleCenter);
             NiPoint3 vec = triangleCenter - ignoreLocations->GetAt(static_cast<int32_t>(i));
@@ -176,7 +176,7 @@ bool NavMeshSearchLOS::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSear
         if (!pFirstIgnoredGoal) {
             pFirstIgnoredGoal = apNode;
         }
-        return 0;
+        return false;
     }
 }
 
@@ -229,7 +229,7 @@ bool NavMeshSearchLOS::BuildNodePath(
     NavMeshPtr spgoalNodeMesh;
     bHasGoalNode = false;
     PathingLocation goalLoc(pCurrentRequest->Destination);
-    if (goalLoc.ResolveNavMeshInfo(0) && goalLoc.GetNavMeshAndTriangle(spgoalNodeMesh, usgoalNodeTri)) {
+    if (goalLoc.ResolveNavMeshInfo(nullptr) && goalLoc.GetNavMeshAndTriangle(spgoalNodeMesh, usgoalNodeTri)) {
         bHasGoalNode = true;
         GoalNode.pNavMesh = spgoalNodeMesh.m_pObject;
         GoalNode.sTriangle = usgoalNodeTri;
@@ -240,7 +240,7 @@ bool NavMeshSearchLOS::BuildNodePath(
     }
     cMinLOSScore = BSMIN(spLOSMap.m_pObject->iMinScore + 1, -1);
     // goalLoc and then spgoalNodeMesh are destroyed after Search, on each return path, as the game does.
-    if (Search(apReturnNodeArray, apReturnLinkArray, 0)) {
+    if (Search(apReturnNodeArray, apReturnLinkArray, false)) {
         return true;
     }
     return false;

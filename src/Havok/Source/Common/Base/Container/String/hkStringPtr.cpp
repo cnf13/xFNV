@@ -69,7 +69,7 @@ char* strDup(const char* src) {
 
 // Bounded copy of src, at most maxlen characters.
 char* strNdup(const char* src, int32_t maxlen) {
-    int32_t iLength = static_cast<int32_t>(hkString::strLen(src));
+    int32_t iLength = hkString::strLen(src);
     if (iLength > maxlen) {
         iLength = maxlen;
     }

@@ -29,7 +29,7 @@ void BGSPickupPutdownSounds::CopyComponent(BaseFormComponent* apCopyFC) {
 bool BGSPickupPutdownSounds::CompareComponent(BaseFormComponent* apCompareFC) {
     void* v6 = dynamic_cast<BGSPickupPutdownSounds*>(apCompareFC);
     if (!v6) {
-        return (bool)1;
+        return true;
     }
     BGSPickupPutdownSounds* pCompare = static_cast<BGSPickupPutdownSounds*>(v6);
     TESSound* pPickup = GetPickupSound();
@@ -39,7 +39,7 @@ bool BGSPickupPutdownSounds::CompareComponent(BaseFormComponent* apCompareFC) {
     if (vCondition1) {
         TESSound* pPutdown = GetPutdownSound();
         if (pPutdown == pCompare->GetPutdownSound()) {
-            return (bool)0;
+            return false;
         }
     }
     return (bool)result;
@@ -52,7 +52,7 @@ void BGSPickupPutdownSounds::InitItem(TESForm* apOwner) {
         pownerFile = apOwner->GetFile(-1);
     }
     else {
-        pownerFile = 0;
+        pownerFile = nullptr;
     }
     if (itempInt) {
         TESForm::AddCompileIndex(itempInt, pownerFile);

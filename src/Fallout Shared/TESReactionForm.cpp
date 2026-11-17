@@ -63,30 +63,30 @@ void TESReactionForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESReactionForm::CompareComponent(BaseFormComponent* apCompareFC) {
     TESReactionForm* pCompare = dynamic_cast<TESReactionForm*>(apCompareFC);
     if (!pCompare) {
-        return 1;
+        return true;
     }
     BSSimpleList<GROUP_REACTION*>* pList = &m_reactionList;
     BSSimpleList<GROUP_REACTION*>* pCompList = &pCompare->m_reactionList;
     while (pList) {
         if (!pCompList) {
-            return 1;
+            return true;
         }
         GROUP_REACTION* reaction = pList->m_item;
         GROUP_REACTION* compReaction = pCompList->m_item;
         if (reaction && compReaction) {
             if (reaction->pForm != compReaction->pForm) {
-                return 1;
+                return true;
             }
             if (reaction->iReaction != compReaction->iReaction) {
-                return 1;
+                return true;
             }
             if (reaction->iFightReaction != compReaction->iFightReaction) {
-                return 1;
+                return true;
             }
         }
         else {
             if (reaction || compReaction) {
-                return 1;
+                return true;
             }
         }
         pCompList = pCompList->m_pkNext;
@@ -131,7 +131,7 @@ uint16_t TESReactionForm::GetSaveSize(uint32_t aiFlags) {
 
 void TESReactionForm::SetReaction(TESForm* apForm, int32_t aiReaction) {
     if (apForm) {
-        bool foundit = 0;
+        bool foundit = false;
         for (GROUP_REACTION* fr : (&m_reactionList)->ItemsUntilNull()) {
             if (fr->pForm == apForm) {
                 if (aiReaction || fr->iFightReaction) {
@@ -141,7 +141,7 @@ void TESReactionForm::SetReaction(TESForm* apForm, int32_t aiReaction) {
                     m_reactionList.Remove(fr);
                     ourFree(fr);
                 }
-                foundit = 1;
+                foundit = true;
                 break;
             }
         }
@@ -159,12 +159,12 @@ void TESReactionForm::SetReaction(TESForm* apForm, int32_t aiReaction) {
 void TESReactionForm::InitItem(TESForm* apOwner) {
     TESFile* pownerFile;
     BSSimpleList<GROUP_REACTION*>* pList = &m_reactionList;
-    BSSimpleList<GROUP_REACTION*>* pLastList = 0;
+    BSSimpleList<GROUP_REACTION*>* pLastList = nullptr;
     if (apOwner) {
         pownerFile = apOwner->GetFile(-1);
     }
     else {
-        pownerFile = 0;
+        pownerFile = nullptr;
     }
     while (pList && pList->m_item) {
         GROUP_REACTION* reaction = pList->m_item;
@@ -236,7 +236,7 @@ void TESReactionForm::ModReaction(TESForm* apForm, int32_t aiReaction) {
     if (!apForm || !aiReaction) {
         return;
     }
-    GROUP_REACTION* pReaction = 0;
+    GROUP_REACTION* pReaction = nullptr;
     BSSimpleList<GROUP_REACTION*>* pList = QReactionList();
     bool bFound = false;
     while (pList && pList->m_item) {
@@ -337,7 +337,7 @@ void TESReactionForm::SaveGameTES(uint32_t aiFlags) {
         return;
     }
     uint16_t usBlockSize = 0;
-    char* pBlockStart = 0;
+    char* pBlockStart = nullptr;
     char* pStart = static_cast<char*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         pStart = static_cast<char*>(pSaveLoadGameOLD->m_pBuffer);
@@ -395,7 +395,7 @@ void TESReactionForm::SaveGameTES(uint32_t aiFlags) {
 void TESReactionForm::LoadGameTES(uint32_t a2, uint32_t a3) {
     if ((a2 & 4) != 0) {
         uint16_t usBlockSize = 0;
-        uint8_t* pBlockStart = 0;
+        uint8_t* pBlockStart = nullptr;
         if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
             int32_t iBlockTag;
             pSaveLoadGameOLD->LoadGameDataOLD(&iBlockTag, 4u);
@@ -497,7 +497,7 @@ void TESReactionForm::LoadGameTES(uint32_t a2, uint32_t a3) {
 void TESReactionForm::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (apLoadGameBuffer->GetChangeFlags().CheckFlags(4)) {
         BSSimpleList<GROUP_REACTION*>* pList = &m_reactionList;
-        BSSimpleList<GROUP_REACTION*>* pLastList = 0;
+        BSSimpleList<GROUP_REACTION*>* pLastList = nullptr;
         while (pList && !pList->IsEmpty()) {
             GROUP_REACTION* pReaction = pList->m_item;
             bool bRemove = false;
@@ -510,7 +510,7 @@ void TESReactionForm::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                     );
                 }
                 else {
-                    pForm = 0;
+                    pForm = nullptr;
                 }
                 pReaction->pForm = pForm;
                 if (!pReaction->pForm) {

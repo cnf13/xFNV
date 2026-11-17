@@ -39,7 +39,7 @@ bool TESAnimation::CompareComponent(BaseFormComponent* apCompareFC) {
     BSSimpleList<char*>* pkfFileListCompare;
     TESAnimation* pcompare = dynamic_cast<TESAnimation*>(apCompareFC);
     if (!pcompare) {
-        return 1;
+        return true;
     }
     BSSimpleList<char*>* pkfFileList = &kfFilenames;
     for (pkfFileListCompare = &pcompare->kfFilenames; pkfFileList && pkfFileListCompare;
@@ -47,10 +47,10 @@ bool TESAnimation::CompareComponent(BaseFormComponent* apCompareFC) {
         const char* pkfFilename = pkfFileList->m_item;
         const char* pkfFilenameCompare = pkfFileListCompare->m_item;
         if ((!pkfFilename && pkfFilenameCompare) || (pkfFilename && !pkfFilenameCompare)) {
-            return 1;
+            return true;
         }
         if (pkfFilename && (pkfFilenameCompare && BSstricmp(pkfFilename, pkfFilenameCompare))) {
-            return 1;
+            return true;
         }
         pkfFileList = pkfFileList->m_pkNext;
     }
@@ -98,13 +98,13 @@ bool TESAnimation::IsKFFileInList(const char* apFilename) {
     bool vCondition1;
     vCondition1 = (&kfFilenames)->IsEmpty();
     if (vCondition1) {
-        return (bool)0;
+        return false;
     }
     for (ecx0 = &kfFilenames; ecx0; ecx0 = ecx0->m_pkNext) {
         apString1 = ecx0->m_item;
         if (!BSstricmp(apString1, apFilename)) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }

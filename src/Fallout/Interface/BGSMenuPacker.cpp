@@ -11,7 +11,7 @@ SettingT<INISettingCollection> fMenuPackerBufferSize("fMenuPackerBufferSize:Inte
 static SettingT<INISettingCollection> fMenuPackerOverflowZone("fMenuPackerBufferOverflowZone:InterfaceFX", 15.0f);
 
 BGSMenuPacker::BGSMenuPacker() : PackedMenus(0, 1) {
-    bPackFailed = 0;
+    bPackFailed = false;
 }
 
 BGSMenuPacker::~BGSMenuPacker() {}

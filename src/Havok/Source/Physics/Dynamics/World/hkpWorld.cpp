@@ -1656,7 +1656,7 @@ void hkpWorld::calcContentStatistics(hkStatisticsCollector* collector, const hkC
         );
     }
     collector->popDir();
-    collector->m_clientData = 0;
+    collector->m_clientData = nullptr;
 }
 
 void hkpWorld::queueOperation(const hkWorldOperation::BaseOperation& operation) {
@@ -2241,7 +2241,7 @@ void hkpWorld::updateCollisionFilterOnPhantom(
     m_broadPhase->reQuerySingleObject(pPhantomHandle, pairsOut);
 
     HK_TIMER_SPLIT_LIST("UpdateOverlaps");
-    for (int32_t i = 0; i < static_cast<int32_t>(pairsOut.m_size); ++i) {
+    for (int32_t i = 0; i < pairsOut.m_size; ++i) {
         if (pairsOut.m_data[i].m_b != pPhantomHandle) {
             hkpTypedBroadPhaseHandle* pHandle = static_cast<hkpTypedBroadPhaseHandle*>(pairsOut.m_data[i].m_b);
             // The owner sits m_ownerOffset bytes from the handle, an untyped byte offset.
@@ -3224,7 +3224,7 @@ void hkpWorld::detachActionFromEntity(hkpAction* action, hkpEntity* entity) {
 void hkpWorld::getMemUsageForIntegration(hkpWorld::MemUsageInfo& infoOut) {
     infoOut.m_maxRuntimeBlockSize = 0;
     infoOut.m_sumRuntimeBlockSize = 0;
-    infoOut.m_largestSimulationIsland = 0;
+    infoOut.m_largestSimulationIsland = nullptr;
     for (int32_t i = m_activeSimulationIslands.m_size - 1; i >= 0; --i) {
         hkpSimulationIsland* v3 = m_activeSimulationIslands.m_data[i];
         int32_t v4 = 2 * (v3->m_numConstraints / 80) + 8;
@@ -3241,7 +3241,7 @@ void hkpWorld::getMemUsageForIntegration(hkpWorld::MemUsageInfo& infoOut) {
 
 void hkpWorld::internal_executePendingOperations() {
     m_pendingOperationsCount = 0;
-    static_cast<hkpWorldOperationQueue*>(m_pendingOperations)->executeAllPending();
+    m_pendingOperations->executeAllPending();
 }
 
 void hkpWorld::internal_executePendingBodyOperations() {
@@ -3278,7 +3278,7 @@ hkpStepResult hkpWorld::stepDeltaTime(float physicsDeltaTime) {
     uint32_t stepResult = m_simulation->stepDeltaTime(physicsDeltaTime);
     if (m_kdTreeManager) {
         if (m_autoUpdateTree) {
-            updateKdTree(0, 0);
+            updateKdTree(nullptr, nullptr);
             unlock();
             return static_cast<hkpStepResult>(stepResult);
         }
@@ -3294,9 +3294,7 @@ hkpStepResult hkpWorld::initMtStep(hkJobQueue* jobQueue, float physicsDeltaTime)
         hkpWorldMemoryUtil::watchHeapMemory(this);
         unlock();
     }
-    return static_cast<hkpStepResult>(
-        static_cast<hkpMultiThreadedSimulation*>(m_simulation)->stepBeginSt(jobQueue, physicsDeltaTime)
-    );
+    return static_cast<hkpMultiThreadedSimulation*>(m_simulation)->stepBeginSt(jobQueue, physicsDeltaTime);
 }
 
 hkpStepResult hkpWorld::stepMultithreaded(hkJobQueue* jobQueue, hkJobThreadPool* threadPool, float physicsDeltaTime) {
@@ -3315,11 +3313,11 @@ void hkpWorld::findInitialContactPointsOfAllEntities() {
     hkpSimulationIsland* v3;
     int32_t j;
     hkpSimulationIsland* v5;
-    for (i = 0; i < ((int32_t)m_activeSimulationIslands.m_size); ++i) {
+    for (i = 0; i < m_activeSimulationIslands.m_size; ++i) {
         v3 = m_activeSimulationIslands.m_data[i];
         findInitialContactPoints(v3->m_entities.m_data, v3->m_entities.m_size);
     }
-    for (j = 0; j < ((int32_t)m_inactiveSimulationIslands.m_size); ++j) {
+    for (j = 0; j < m_inactiveSimulationIslands.m_size; ++j) {
         v5 = m_inactiveSimulationIslands.m_data[j];
         findInitialContactPoints(v5->m_entities.m_data, v5->m_entities.m_size);
     }
@@ -3344,7 +3342,7 @@ void hkpWorld::unlockReadOnly() {
 }
 
 bool hkpWorld::checkUnmarked() {
-    return (bool)1;
+    return true;
 }
 
 hkWorldMemoryAvailableWatchDog* hkpWorld::getMemoryWatchDog() const {
@@ -3467,7 +3465,7 @@ void hkpWorld::getWorldAsSystems(hkArray<hkpPhysicsSystem*>& systemsInOut) const
 
 void hkpWorld::markTreeDirty() {
     if (m_kdTreeManager) {
-        m_kdTreeManager->setUpToDate(0);
+        m_kdTreeManager->setUpToDate(false);
     }
 }
 
@@ -3907,7 +3905,7 @@ void hkpWorld::getCinfo(hkpWorldCinfo& info) const {
         p_m_postponeAndSortCallbacks = &v13;
     }
     info.m_mtPostponeAndSortBroadPhaseBorderCallbacks.m_bool = p_m_postponeAndSortCallbacks->m_bool;
-    info.m_useKdTree.m_bool = m_kdTreeManager != 0;
+    info.m_useKdTree.m_bool = m_kdTreeManager != nullptr;
     info.m_autoUpdateKdTree.m_bool = m_autoUpdateTree.m_bool;
     info.m_expectedMaxLinearVelocity = m_collisionDispatcher->m_expectedMaxLinearVelocity;
     info.m_expectedMinPsiDeltaTime = m_collisionDispatcher->m_expectedMinPsiDeltaTime;
@@ -3963,7 +3961,7 @@ void hkpWorld::getCinfo(hkpWorldCinfo& info) const {
     info.m_allowIntegrationOfIslandsWithoutConstraintsInASeparateJob.m_bool =
         m_allowIntegrationOfIslandsWithoutConstraintsInASeparateJob.m_bool;
     info.m_minDesiredIslandSize = m_minDesiredIslandSize;
-    info.m_fireCollisionCallbacks.m_bool = m_collisionCallbackUtil != 0;
+    info.m_fireCollisionCallbacks.m_bool = m_collisionCallbackUtil != nullptr;
 }
 
 // KEEP (partcopy:): the job (0x40 bytes at esp+0x20 of the realigned frame) has bytes 3 (hkJob's padding03), 8-15
@@ -4743,7 +4741,7 @@ const hkClass& hkpWorld::staticClass() {
 hkBool* enumerateAllInactiveEntitiesInWorld(hkBool* apResult, const hkpWorld* apWorld, hkpPhysicsSystem* apSystem) {
     const hkpWorld* v3 = apWorld;
     hkpSimulationIsland* m_fixedIsland = apWorld->m_fixedIsland;
-    bool v10 = 0;
+    bool v10 = false;
     if (m_fixedIsland) {
         for (int32_t i = 0; i < m_fixedIsland->m_entities.m_size; ++i) {
             if (i || (*m_fixedIsland->m_entities.begin())->m_collidable.m_shape) {

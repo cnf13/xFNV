@@ -34,8 +34,8 @@ NiObject* NiBackToFrontAccumulator::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        NiAccumulator::CopyMembers(0, kCloning);
-        return 0;
+        NiAccumulator::CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 

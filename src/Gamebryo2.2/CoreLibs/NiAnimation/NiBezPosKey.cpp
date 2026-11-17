@@ -14,7 +14,7 @@
 #include "SDK/MSVC/string.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 void NiBezPosKey::Copy(NiAnimationKey* pkNewKey, const NiAnimationKey* pkOrigKey) {
     NiBezPosKey* pkNewBez = static_cast<NiBezPosKey*>(pkNewKey);
@@ -313,13 +313,12 @@ void NiBezPosKey::InterpolateD2(float fTime, const NiAnimationKey* pKey0, const 
 NiAnimationKey* NiBezPosKey::CreateArray(uint32_t uiNumKeys) {
     size_t v1 = uiNumKeys <= SIZE_MAX / sizeof(NiBezPosKey) ? sizeof(NiBezPosKey) * uiNumKeys : SIZE_MAX;
     size_t* v2 = static_cast<size_t*>(MemoryManager_Singleton.Allocate(
-        (static_cast<uint32_t>(static_cast<uint32_t>(v1) + static_cast<uint32_t>(sizeof(size_t))) <
-         static_cast<uint32_t>(v1))
+        ((static_cast<uint32_t>(v1) + static_cast<uint32_t>(sizeof(size_t))) < static_cast<uint32_t>(v1))
             ? -1
             : v1 + sizeof(size_t)
     ));
     if (!v2) {
-        return 0;
+        return nullptr;
     }
     *v2 = uiNumKeys;
     return reinterpret_cast<NiAnimationKey*>(v2 + 1);

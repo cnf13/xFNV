@@ -10,7 +10,7 @@ struct hkpShapeRayCastCollectorOutput;
 struct hkpWorldRayCastOutput;
 
 // The fixed buffer collector's addRayHit callback; it reads the collector's capacity and count from its third argument.
-typedef void (*hkFixedBufferRayHitCollectorAddRayHitCallbackFunc)(
+using hkFixedBufferRayHitCollectorAddRayHitCallbackFunc = void (*)(
     const hkpCdBody& cdBody,
     const hkpShapeRayCastCollectorOutput& hitInfo,
     hkpFixedBufferRayHitCollector* collector

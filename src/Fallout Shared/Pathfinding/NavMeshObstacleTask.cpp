@@ -24,7 +24,7 @@ ObstacleTaskData::~ObstacleTaskData() {}
 void ObstacleTaskData::Process() {
     FNVD_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_NAVMESH, 1,
+        MEM_CONTEXT_NAVMESH, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Pathfinding\\NavMeshObstacleTask.cpp", 357
     );
     NavMeshObstacleManager* Instance = NavMeshObstacleManager::GetInstance();
@@ -36,7 +36,7 @@ void ObstacleTaskData::Process() {
             v11 = ::new (v14) NavMesh;
         }
         else {
-            v11 = 0;
+            v11 = nullptr;
         }
         NavMeshPtr* ptr = NavMeshPtr::MakeNavMeshPtr(&apResult, v11);
         spNewNavMesh.operator=(*ptr);
@@ -173,7 +173,7 @@ bool ObstacleTaskData::AddOperation(const NiPointer<ObstacleData>& apObstacle, O
                     break;
                 }
             }
-            result = 0;
+            result = false;
             break;
         }
         case OBSTACLE_TASK_TYPE_REMOVE_OBSTACLE:
@@ -186,7 +186,7 @@ bool ObstacleTaskData::AddOperation(const NiPointer<ObstacleData>& apObstacle, O
                             "Removing previous operation ADD for Task on Navmesh 0x%08x (srcptr = 0x%08x)",
                             pInfo->NavMeshID, spSrcMesh.m_pObject
                         );
-                        Operations.Remove(a2--, 1);
+                        Operations.Remove(a2--, true);
                     }
                     else {
                         v11 = 0;
@@ -196,7 +196,7 @@ bool ObstacleTaskData::AddOperation(const NiPointer<ObstacleData>& apObstacle, O
             if (v11) {
                 goto LABEL_35;
             }
-            result = 0;
+            result = false;
             break;
         }
         case OBSTACLE_TASK_TYPE_ADD_DOOR: {
@@ -209,14 +209,14 @@ bool ObstacleTaskData::AddOperation(const NiPointer<ObstacleData>& apObstacle, O
                     break;
                 }
             }
-            result = 0;
+            result = false;
             break;
         }
         case OBSTACLE_TASK_TYPE_REMOVE_DOOR: {
             for (uint32_t j = 0; j < Operations.iSize; ++j) {
                 if ((&Operations.GetAt(static_cast<int32_t>(j)))->spObstacle.operator==(apObstacle) &&
                     (&Operations.GetAt(static_cast<int32_t>(j)))->eType == OBSTACLE_TASK_TYPE_REMOVE_DOOR) {
-                    return 0;
+                    return false;
                 }
             }
         LABEL_35:;
@@ -225,15 +225,15 @@ bool ObstacleTaskData::AddOperation(const NiPointer<ObstacleData>& apObstacle, O
                 ObstacleTaskNavMeshOperation apMemory(&apObstacle, aeType, &spmesh);
                 ObstacleTaskNavMeshOperation* aItem = &apMemory;
                 Operations.Add(*aItem);
-                result = 1;
+                result = true;
             }
             else {
-                result = 0;
+                result = false;
             }
             break;
         }
         default: {
-            result = 0;
+            result = false;
             break;
         }
     }

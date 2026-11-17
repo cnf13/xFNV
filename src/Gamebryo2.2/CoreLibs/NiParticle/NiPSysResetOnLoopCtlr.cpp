@@ -26,8 +26,8 @@ NiObject* NiPSysResetOnLoopCtlr::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -84,7 +84,7 @@ NiObject* NiPSysResetOnLoopCtlr::CreateObject() {
     NiPSysResetOnLoopCtlr* pkObject =
         static_cast<NiPSysResetOnLoopCtlr*>(NiMemObject::operator new(sizeof(NiPSysResetOnLoopCtlr)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysResetOnLoopCtlr;
 }

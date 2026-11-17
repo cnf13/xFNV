@@ -44,7 +44,7 @@
 #include "SDK/MSVC/string.h"
 
 #include <cctype>
-#include <stdint.h>
+#include <cstdint>
 
 uint32_t BSstrtoul(const char* apString, char** apEndPtr, int32_t aiBase) {
     return std::strtoul(apString, apEndPtr, aiBase);
@@ -176,14 +176,14 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
     switch (apScriptLine->sExpression) {
         case START_OF_FLOW_SECTION: {
             if (ScriptCompiler::GetNextWord(
-                    apCompileData, &scriptWord, apScriptLine->pLine, apScriptLine->uiOffset, 0, 0
+                    apCompileData, &scriptWord, apScriptLine->pLine, apScriptLine->uiOffset, false, false
                 )) {
                 int32_t n;
-                bool bFound = 0;
+                bool bFound = false;
                 for (n = 0; n < 38; ++n) {
                     if (!BSstricmp(scriptBlocks[n].pFunctionName, scriptWord.pText) ||
                         !BSstricmp(scriptBlocks[n].pShortName, scriptWord.pText)) {
-                        bFound = 1;
+                        bFound = true;
                         break;
                     }
                 }
@@ -194,7 +194,7 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
                     int32_t lines = CountBlockLines(apCompileData, apScriptLine);
                     if (lines == -1) {
                         ScriptCompiler::ScriptError(apCompileData, "Mismatched begin/end block.");
-                        return 0;
+                        return false;
                     }
                     // A placeholder for the block's end offset, patched below and at the block's 'end'.
                     *reinterpret_cast<uint32_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = 0x55555555;
@@ -204,7 +204,7 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
                     if (pFunctionDef) {
                         if (pFunctionDef->bReferenceFunction && apCompileData->header.bIsQuestScript) {
                             ScriptCompiler::ScriptError(apCompileData, "Invalid block type for quest script.");
-                            return 0;
+                            return false;
                         }
                         if (pFunctionDef->pParameters) {
                             SCRIPT_PARAMETER* pParameterDef = pFunctionDef->pParameters;
@@ -217,7 +217,7 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
                             tempLine.uiOutputSize = 0;
                             tempLine.uiLineNumber = apScriptLine->uiLineNumber;
                             if (!pCompile(sCount, pParameterDef, &tempLine, apCompileData)) {
-                                return 0;
+                                return false;
                             }
                             ourMemcpy(
                                 &apScriptLine->pOutput[apScriptLine->uiOutputSize], tempLine.pOutput,
@@ -234,11 +234,11 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
                     goto LABEL_92;
                 }
                 ScriptCompiler::ScriptError(apCompileData, "Syntax Error.  Invalid block type in 'begin' command.");
-                return 0;
+                return false;
             }
             else {
                 ScriptCompiler::ScriptError(apCompileData, "Syntax Error.  Missing block type in 'begin' command.");
-                return 0;
+                return false;
             }
         }
         case FLOW_END: {
@@ -251,7 +251,7 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
                 goto LABEL_92;
             }
             ScriptCompiler::ScriptError(apCompileData, "Syntax Error.  Failed to store the 'begin' 'end' jump block.");
-            return 0;
+            return false;
         }
         case FLOW_SHORT:
         case FLOW_LONG:
@@ -259,17 +259,17 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
         case FLOW_REF: {
             ScriptVariable* pNewVariable;
             if (!ScriptCompiler::GetNextWord(
-                    apCompileData, &scriptWord, apScriptLine->pLine, apScriptLine->uiOffset, 0, 0
+                    apCompileData, &scriptWord, apScriptLine->pLine, apScriptLine->uiOffset, false, false
                 )) {
                 ScriptCompiler::ScriptError(apCompileData, "Missing variable name in variable declaration.");
-                return 0;
+                return false;
             }
             const char* pvarname = (&scriptWord)->pText;
             if (!ScriptCompiler::IsValidVariableName(scriptWord.pText)) {
                 ScriptCompiler::ScriptError(
                     apCompileData, "Invalid variable name '%s'.\r\nCompiled script not saved!", pvarname
                 );
-                return 0;
+                return false;
             }
             void* pMemory = ourMalloc(sizeof(ScriptVariable));
             pNewVariable = pMemory ? ::new (pMemory) ScriptVariable : nullptr;
@@ -283,28 +283,30 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
             (&apCompileData->listVariables)->AddTail(pNewVariable_2);
             if (apScriptLine->sExpression == FLOW_REF) {
                 scriptWord.uiVariableID = pNewVariable_2->data.uiID;
-                apCompileData->GetReferencedObject(&scriptWord, 1, 0);
+                apCompileData->GetReferencedObject(&scriptWord, true, false);
             }
             goto LABEL_92;
         }
         case FLOW_SET: {
             char expLine[512];
             if (!ScriptCompiler::GetNextWord(
-                    apCompileData, &scriptWord, apScriptLine->pLine, apScriptLine->uiOffset, 1, 1
+                    apCompileData, &scriptWord, apScriptLine->pLine, apScriptLine->uiOffset, true, true
                 )) {
                 ScriptCompiler::ScriptError(apCompileData, "Missing variable name in set command.");
-                return 0;
+                return false;
             }
             if (!scriptWord.cVariableType || scriptWord.cVariableType == 88) {
                 ScriptCompiler::ScriptError(apCompileData, "Unknown variable '%s'.", &scriptWord);
-                return 0;
+                return false;
             }
             scriptWord2.~SCRIPT_WORD();
             ::new (&scriptWord2) SCRIPT_WORD;
-            ScriptCompiler::GetNextWord(apCompileData, &scriptWord2, apScriptLine->pLine, apScriptLine->uiOffset, 0, 0);
+            ScriptCompiler::GetNextWord(
+                apCompileData, &scriptWord2, apScriptLine->pLine, apScriptLine->uiOffset, false, false
+            );
             if (std::tolower(scriptWord2.pText[0]) != 116 || std::tolower(scriptWord2.pText[1]) != 111) {
                 ScriptCompiler::ScriptError(apCompileData, "Syntax Error.  Missing \"to\" in set command.");
-                return 0;
+                return false;
             }
             if (scriptWord.uiRefObjectIndex) {
                 if (scriptWord.cVariableType == 71) {
@@ -325,7 +327,7 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
             }
             if (!ScriptCompiler::CheckParentheses(apScriptLine->pLine, apScriptLine->uiOffset)) {
                 ScriptCompiler::ScriptError(apCompileData, "Syntax Error.  Mismatched parentheses in set command.");
-                return 0;
+                return false;
             }
             ScriptCompiler::SkipWhiteSpace(apScriptLine->pLine, apScriptLine->uiOffset);
             ourMemset(expLine, 0, 512u);
@@ -335,12 +337,12 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
             );
             if (!uiSize) {
                 ScriptCompiler::ScriptError(apCompileData, "Syntax Error.  Missing expression in set command.");
-                return 0;
+                return false;
             }
             postfix = ce.InfixToPostfix(expLine, uiSize);
             if (ce.m_ExpressionError) {
                 ScriptCompiler::ScriptError(apCompileData, "InfixToPostfix Error.");
-                return 0;
+                return false;
             }
             *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) =
                 static_cast<uint16_t>(uiSize);
@@ -355,7 +357,7 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
             uint32_t uiOffset = 0;
             if (!ScriptCompiler::CheckParentheses(apScriptLine->pLine, 0)) {
                 ScriptCompiler::ScriptError(apCompileData, "Mismatched parentheses.");
-                return 0;
+                return false;
             }
             ScriptCompiler::SkipWhiteSpace(apScriptLine->pLine, uiOffset);
             ourMemset(expLine_2, 0, 512u);
@@ -363,17 +365,17 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
             uiSize_2 =
                 ReplaceVariablesAndFunctions(apCompileData, apScriptLine, &apScriptLine->pLine[uiOffset], expLine_2);
             if (!uiSize_2) {
-                return 0;
+                return false;
             }
             postfix = ce.InfixToPostfix(expLine_2, uiSize_2);
             if (ce.m_ExpressionError) {
                 ScriptCompiler::ScriptError(apCompileData, expressionErrors[ce.m_ExpressionError]);
-                return 0;
+                return false;
             }
             int32_t lines_2 = CountIfLines(apCompileData, apScriptLine);
             if (lines_2 == -1) {
                 ScriptCompiler::ScriptError(apCompileData, "Mismatched if/then/else block.");
-                return 0;
+                return false;
             }
             *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) =
                 static_cast<uint16_t>(lines_2);
@@ -389,7 +391,7 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
             int32_t lines_3 = CountIfLines(apCompileData, apScriptLine);
             if (lines_3 == -1) {
                 ScriptCompiler::ScriptError(apCompileData, "Mismatched if/then/else block.");
-                return 0;
+                return false;
             }
             *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) =
                 static_cast<uint16_t>(lines_3);
@@ -407,14 +409,14 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
             pFunctionDef_2 = ScriptCompiler::GetFunctionDef(apScriptLine->sExpression);
             if (!pFunctionDef_2) {
                 ScriptCompiler::ScriptError(apCompileData, "Unknown function code %d.", apScriptLine->sExpression);
-                return 0;
+                return false;
             }
             if (pFunctionDef_2->bReferenceFunction &&
                 (apCompileData->header.bIsQuestScript && !apScriptLine->uiRefObjectIndex)) {
                 ScriptCompiler::ScriptError(
                     apCompileData, "Reference function requires explicit reference in quest script."
                 );
-                return 0;
+                return false;
             }
             if (pFunctionDef_2->bReferenceFunction) {
                 if (apScriptLine->uiRefObjectIndex) {
@@ -427,7 +429,7 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
                             "allowed in this context).",
                             pScriptRefObj->name.String()
                         );
-                        return 0;
+                        return false;
                     }
                 }
             }
@@ -436,7 +438,7 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
                 if (!pFunctionDef_2->pCompileFunction(
                         sCount_2, pFunctionDef_2->pParameters, apScriptLine, apCompileData
                     )) {
-                    return 0;
+                    return false;
                 }
             }
         LABEL_92:;
@@ -465,11 +467,11 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
                 );
                 apCompileData->uiOutputOffset += apScriptLine->uiOutputSize;
             LABEL_101:;
-                return 1;
+                return true;
             }
             else {
                 ScriptCompiler::ScriptError(apCompileData, "MAX_SCRIPT_SIZE exceeded.\r\nCompiled script not saved!");
-                return 0;
+                return false;
             }
         }
     }
@@ -554,28 +556,28 @@ SCRIPT_OUTPUT ScriptCompiler::GetNextExpression(ScriptCompileData* apCompileData
 }
 
 bool ScriptCompiler::VerifyBlocks(ScriptCompileData* apCompileData) {
-    bool bInsideBlock = 0;
+    bool bInsideBlock = false;
     BSSimpleList<SCRIPT_LINE*>* pList = &apCompileData->listLines;
     while (pList && !pList->IsEmpty()) {
         SCRIPT_LINE* pCurrentLine = pList->m_item;
         switch (pCurrentLine->sExpression) {
             case FLOW_BEGIN: {
                 if (!bInsideBlock) {
-                    bInsideBlock = 1;
+                    bInsideBlock = true;
                     goto LABEL_13;
                 }
                 apCompileData->uiLastLineNumber = pCurrentLine->uiLineNumber;
                 ScriptCompiler::ScriptError(apCompileData, "Nested begin/end blocks are not allowed.");
-                return 0;
+                return false;
             }
             case FLOW_END: {
                 if (bInsideBlock) {
-                    bInsideBlock = 0;
+                    bInsideBlock = false;
                     goto LABEL_13;
                 }
                 apCompileData->uiLastLineNumber = pCurrentLine->uiLineNumber;
                 ScriptCompiler::ScriptError(apCompileData, "End without matching Begin.");
-                return 0;
+                return false;
             }
             case FLOW_SHORT:
             case FLOW_LONG:
@@ -588,7 +590,7 @@ bool ScriptCompiler::VerifyBlocks(ScriptCompileData* apCompileData) {
                 if (!bInsideBlock) {
                     apCompileData->uiLastLineNumber = pCurrentLine->uiLineNumber;
                     ScriptCompiler::ScriptError(apCompileData, "All script commands must be inside a begin/end block.");
-                    return 0;
+                    return false;
                 }
             LABEL_13:;
                 pList = pList->m_pkNext;
@@ -596,7 +598,7 @@ bool ScriptCompiler::VerifyBlocks(ScriptCompileData* apCompileData) {
             }
         }
     }
-    return 1;
+    return true;
 }
 
 int32_t ScriptCompiler::CountBlockLines(ScriptCompileData* apCompileData, SCRIPT_LINE* apStartingLine) {
@@ -1036,10 +1038,10 @@ bool ScriptCompiler::CheckQuotes(const char* apExpLine, uint32_t auiLineOffset) 
 bool ScriptCompiler::IsValidVariableName(const char* apVarName) {
     SCRIPT_WORD Dst;
     if (!apVarName || !*apVarName) {
-        return 0;
+        return false;
     }
     if (TESForm::GetFormByEditorID(apVarName)) {
-        return 0;
+        return false;
     }
     Dst.~SCRIPT_WORD();
     ::new (&Dst) SCRIPT_WORD;
@@ -1081,19 +1083,19 @@ bool ScriptCompiler::StandardCompile(
         bool bLookForVariable = scriptParameterDefs[apParameters[sCurrentParam].eParamType].bCanBeVariable;
         SCRIPT_WORD currentWord;
         int32_t size = ScriptCompiler::GetNextWord(
-            apCompileData, &currentWord, apScriptLine->pLine, apScriptLine->uiOffset, bLookForVariable, 0
+            apCompileData, &currentWord, apScriptLine->pLine, apScriptLine->uiOffset, bLookForVariable, false
         );
         if (!size) {
             if (apParameters[sCurrentParam].bOptional) {
                 *reinterpret_cast<uint16_t*>(pActualParams) = sCurrentParam;
-                return 1;
+                return true;
             }
             else {
                 ScriptCompiler::ScriptError(
                     apCompileData, "Missing parameter %s.\r\nCompiled script not saved!",
                     apParameters[sCurrentParam].pParamName
                 );
-                return 0;
+                return false;
             }
         }
         if (!bLookForVariable && (currentWord.uiRefObjectIndex || currentWord.cVariableType)) {
@@ -1101,15 +1103,15 @@ bool ScriptCompiler::StandardCompile(
                 apCompileData, "Parameter %s may not be a variable.\r\nCompiled script not saved!",
                 apParameters[sCurrentParam].pParamName
             );
-            return 0;
+            return false;
         }
         if (scriptParameterDefs[apParameters[sCurrentParam].eParamType].bReferencedObject &&
-            (!apCompileData->GetReferencedObject(&currentWord, 0, 0) || !currentWord.uiRefObjectIndex)) {
+            (!apCompileData->GetReferencedObject(&currentWord, false, false) || !currentWord.uiRefObjectIndex)) {
             ScriptCompiler::ScriptError(
                 apCompileData, "Item '%s' not found for parameter %s.\r\nCompiled script not saved!", &currentWord,
                 apParameters[sCurrentParam].pParamName
             );
-            return 0;
+            return false;
         }
         if (scriptParameterDefs[apParameters[sCurrentParam].eParamType].bReferencedObject) {
             switch (apParameters[sCurrentParam].eParamType) {
@@ -1141,7 +1143,7 @@ bool ScriptCompiler::StandardCompile(
                             "Invalid object reference '%s' for parameter %s.\r\nCompiled script not saved!",
                             &currentWord, apParameters[sCurrentParam].pParamName
                         );
-                        return 0;
+                        return false;
                     }
                     eParamType = apParameters[sCurrentParam].eParamType;
                     if (eParamType == SCRIPT_PARAM_ACTOR) {
@@ -1150,7 +1152,7 @@ bool ScriptCompiler::StandardCompile(
                                 apCompileData, "Invalid actor '%s' for parameter %s.\r\nCompiled script not saved!",
                                 &currentWord, apParameters[sCurrentParam].pParamName
                             );
-                            return 0;
+                            return false;
                         }
                     }
                     else {
@@ -1162,7 +1164,7 @@ bool ScriptCompiler::StandardCompile(
                                     "Invalid map marker '%s' for parameter %s.\r\nCompiled script not saved!",
                                     &currentWord, apParameters[sCurrentParam].pParamName
                                 );
-                                return 0;
+                                return false;
                             }
                         }
                         else {
@@ -1172,7 +1174,7 @@ bool ScriptCompiler::StandardCompile(
                                     "Invalid container reference '%s' for parameter %s.\r\nCompiled script not saved!",
                                     &currentWord, apParameters[sCurrentParam].pParamName
                                 );
-                                return 0;
+                                return false;
                             }
                         }
                     }
@@ -1194,7 +1196,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid spell item '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_CELL: {
                     TESObjectCELL* pCell = dynamic_cast<TESObjectCELL*>(currentWord.pForm);
@@ -1205,7 +1207,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid interior cell '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_MAGIC_ITEM: {
                     if (currentWord.uiVariableID ||
@@ -1216,7 +1218,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid magic item '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_SOUND: {
                     if (currentWord.uiVariableID ||
@@ -1227,7 +1229,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid sound '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_TOPIC: {
                     if (currentWord.uiVariableID ||
@@ -1238,7 +1240,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid topic '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_QUEST: {
                     if (currentWord.uiVariableID ||
@@ -1249,7 +1251,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid info '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_RACE: {
                     if (currentWord.uiVariableID ||
@@ -1260,7 +1262,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid race '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_CLASS: {
                     if (currentWord.uiVariableID ||
@@ -1271,7 +1273,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid class '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_FACTION: {
                     if (currentWord.uiVariableID ||
@@ -1282,7 +1284,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid faction '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_GLOBAL: {
                     if (currentWord.uiVariableID ||
@@ -1293,7 +1295,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid global '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_FURNITURE_OR_FORMLIST: {
                     if (currentWord.uiVariableID ||
@@ -1307,7 +1309,7 @@ bool ScriptCompiler::StandardCompile(
                         "Invalid furniture object/list '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_OBJECT: {
                     if (!currentWord.uiVariableID &&
@@ -1325,7 +1327,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid actor base '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_WORLD: {
                     if (currentWord.uiVariableID ||
@@ -1336,7 +1338,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid worldspace '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_PACKAGE: {
                     if (currentWord.uiVariableID ||
@@ -1347,7 +1349,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid package '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_COMBAT_STYLE: {
                     if (currentWord.uiVariableID ||
@@ -1358,7 +1360,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid combat style '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_MAGIC_EFFECT: {
                     if (currentWord.uiVariableID ||
@@ -1369,7 +1371,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid effect setting '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_WEATHER: {
                     if (currentWord.uiVariableID ||
@@ -1380,7 +1382,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid weather '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_NPC: {
                     if (currentWord.uiVariableID ||
@@ -1391,7 +1393,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid NPC '%s' for parameter %s.\r\nCompiled script not saved!", &currentWord,
                         apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_OWNER: {
                     if (currentWord.uiVariableID ||
@@ -1404,7 +1406,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid owner '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_SHADER_EFFECT: {
                     if (currentWord.uiVariableID ||
@@ -1415,7 +1417,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid Effect Shader '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_FORMLIST: {
                     BGSListForm* pformlist = dynamic_cast<BGSListForm*>(currentWord.pForm);
@@ -1426,7 +1428,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid form list '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_MENUICON: {
                     BGSMenuIcon* picon = dynamic_cast<BGSMenuIcon*>(currentWord.pForm);
@@ -1437,7 +1439,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid menu icon '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_PERK: {
                     BGSPerk* pperk = dynamic_cast<BGSPerk*>(currentWord.pForm);
@@ -1448,7 +1450,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid perk '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_NOTE: {
                     BGSNote* pperk_2 = dynamic_cast<BGSNote*>(currentWord.pForm);
@@ -1459,7 +1461,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid note '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_IMAGESPACEMOD: {
                     if (currentWord.uiVariableID ||
@@ -1471,7 +1473,7 @@ bool ScriptCompiler::StandardCompile(
                         "Invalid Imagespace Modifier '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_IMAGESPACE: {
                     if (currentWord.uiVariableID ||
@@ -1482,7 +1484,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid Imagespace '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_ENCOUNTERZONE: {
                     BGSEncounterZone* pzone = dynamic_cast<BGSEncounterZone*>(currentWord.pForm);
@@ -1493,7 +1495,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid encounter zone '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_IDLE_FORM: {
                     TESIdleForm* pidle = dynamic_cast<TESIdleForm*>(currentWord.pForm);
@@ -1504,7 +1506,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid Idle form'%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_MESSAGE: {
                     if (currentWord.uiVariableID ||
@@ -1515,7 +1517,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid message '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_INVOBJECT_OR_FORMLIST: {
                     if (currentWord.uiVariableID) {
@@ -1532,7 +1534,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid inventory object '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_OBJECT_OR_FORMLIST: {
                     if (currentWord.uiVariableID ||
@@ -1545,7 +1547,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid object '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_MUSIC: {
                     if (currentWord.uiVariableID ||
@@ -1556,7 +1558,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid music type '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_NPC_OR_LEVCHAR: {
                     if (currentWord.uiVariableID ||
@@ -1570,7 +1572,7 @@ bool ScriptCompiler::StandardCompile(
                         "Invalid NPC or LeveledCharacter '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_CREA_OR_LEVCREA: {
                     if (currentWord.uiVariableID ||
@@ -1584,7 +1586,7 @@ bool ScriptCompiler::StandardCompile(
                         "Invalid Creature or LeveledCreature '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_LEVCHAR: {
                     if (currentWord.uiVariableID ||
@@ -1595,7 +1597,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid LeveledCharacter '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_LEVCREA: {
                     if (currentWord.uiVariableID ||
@@ -1606,7 +1608,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid LeveledCreature '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_LEVITEM: {
                     if (currentWord.uiVariableID ||
@@ -1617,7 +1619,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid LeveledItem '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_FORM: {
                     if (currentWord.uiVariableID || currentWord.pForm) {
@@ -1627,7 +1629,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid form '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_REPUTATION: {
                     if (currentWord.uiVariableID ||
@@ -1638,7 +1640,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid reputation '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_CASINO: {
                     if (currentWord.uiVariableID ||
@@ -1649,7 +1651,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid casino '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_CASINOCHIP: {
                     if (currentWord.uiVariableID ||
@@ -1660,7 +1662,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid casino chip '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_CHALLENGE: {
                     if (currentWord.uiVariableID ||
@@ -1671,7 +1673,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid challenge '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_CARAVANMONEY: {
                     if (currentWord.uiVariableID ||
@@ -1682,7 +1684,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid caravan money '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_CARAVANCARD: {
                     if (!currentWord.uiVariableID &&
@@ -1701,7 +1703,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid caravan card '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 case SCRIPT_PARAM_REGION: {
                     if (currentWord.uiVariableID ||
@@ -1712,7 +1714,7 @@ bool ScriptCompiler::StandardCompile(
                         apCompileData, "Invalid region '%s' for parameter %s.\r\nCompiled script not saved!",
                         &currentWord, apParameters[sCurrentParam].pParamName
                     );
-                    return 0;
+                    return false;
                 }
                 default: {
                     Warning(
@@ -1720,7 +1722,7 @@ bool ScriptCompiler::StandardCompile(
                         "ScriptCompiler::StandardCompile.",
                         apParameters[sCurrentParam].eParamType
                     );
-                    return 0;
+                    return false;
                 }
             }
         }
@@ -1775,7 +1777,7 @@ bool ScriptCompiler::StandardCompile(
                                     "Unknown variable '%s' for parameter %s.\r\nCompiled script not saved!",
                                     &currentWord, apParameters[sCurrentParam].pParamName
                                 );
-                                return 0;
+                                return false;
                             }
                             pOutput[apScriptLine->uiOutputSize++] = 122;
                             *reinterpret_cast<double*>(&pOutput[apScriptLine->uiOutputSize]) =
@@ -1792,7 +1794,7 @@ bool ScriptCompiler::StandardCompile(
                             apCompileData, "Invalid actor value '%s' for parameter %s.\r\nCompiled script not saved!",
                             &currentWord, apParameters[sCurrentParam].pParamName
                         );
-                        return 0;
+                        return false;
                     }
                     *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = efindActorValue;
                     apScriptLine->uiOutputSize += 2;
@@ -1805,7 +1807,7 @@ bool ScriptCompiler::StandardCompile(
                             apCompileData, "Axis (X,Y,Z) required for parameter %s.\r\nCompiled script not saved!",
                             apParameters[sCurrentParam].pParamName
                         );
-                        return 0;
+                        return false;
                     }
                     apScriptLine->pOutput[apScriptLine->uiOutputSize++] = v14;
                     continue;
@@ -1813,7 +1815,7 @@ bool ScriptCompiler::StandardCompile(
                 case SCRIPT_PARAM_ANIM_GROUP: {
                     ANIM_GROUP_ENUM animGroup = ANIM_GROUP_NONE;
                     ANIM_GROUP_ENUM egroup = ANIM_GROUP_IDLE;
-                    while (2) {
+                    while (true) {
                         if (egroup < ANIM_GROUP_COUNT) {
                             if (BSstricmp(currentWord.pText, animGroupInfo[egroup].pName)) {
                                 egroup = static_cast<ANIM_GROUP_ENUM>(egroup + 1);
@@ -1829,7 +1831,7 @@ bool ScriptCompiler::StandardCompile(
                             "Animation group \"%s\" not found for parameter %s.\r\nCompiled script not saved!",
                             &currentWord, apParameters[sCurrentParam].pParamName
                         );
-                        return 0;
+                        return false;
                     }
                     *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = animGroup;
                     apScriptLine->uiOutputSize += 2;
@@ -1851,7 +1853,7 @@ bool ScriptCompiler::StandardCompile(
                             "Sex (Male, Female) required for parameter %s.\r\nCompiled script not saved!",
                             apParameters[sCurrentParam].pParamName
                         );
-                        return 0;
+                        return false;
                     }
                     *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = v13;
                     apScriptLine->uiOutputSize += 2;
@@ -1866,7 +1868,7 @@ bool ScriptCompiler::StandardCompile(
                             "0-%d.\r\nCompiled script not saved!",
                             &currentWord, apParameters[sCurrentParam].pParamName, 4
                         );
-                        return 0;
+                        return false;
                     }
                     *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = v15;
                     apScriptLine->uiOutputSize += 2;
@@ -1875,7 +1877,7 @@ bool ScriptCompiler::StandardCompile(
                 case SCRIPT_PARAM_FORM_TYPE: {
                     uint8_t v10 = 0;
                     int32_t iobj = 0;
-                    while (2) {
+                    while (true) {
                         if (iobj < 87) {
                             if (BSstricmp(currentWord.pText, objectLabel[iobj])) {
                                 ++iobj;
@@ -1890,7 +1892,7 @@ bool ScriptCompiler::StandardCompile(
                             apCompileData, "Form Type \"%s\" not found for parameter %s.\r\nCompiled script not saved!",
                             &currentWord, apParameters[sCurrentParam].pParamName
                         );
-                        return 0;
+                        return false;
                     }
                     *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = v10;
                     apScriptLine->uiOutputSize += 2;
@@ -1903,7 +1905,7 @@ bool ScriptCompiler::StandardCompile(
                             apCompileData, "Invalid misc stat '%s' for parameter %s.\r\nCompiled script not saved!",
                             &currentWord, apParameters[sCurrentParam].pParamName
                         );
-                        return 0;
+                        return false;
                     }
                     *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) =
                         MiscStatIDFromName;
@@ -1920,7 +1922,7 @@ bool ScriptCompiler::StandardCompile(
                             apCompileData, "Invalid alignment '%s' for parameter %s.\r\nCompiled script not saved!",
                             &currentWord, apParameters[sCurrentParam].pParamName
                         );
-                        return 0;
+                        return false;
                     }
                     *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = i;
                     apScriptLine->uiOutputSize += 2;
@@ -1937,7 +1939,7 @@ bool ScriptCompiler::StandardCompile(
                             apCompileData, "Invalid EquipType '%s' for parameter %s.\r\nCompiled script not saved!",
                             &currentWord, apParameters[sCurrentParam].pParamName
                         );
-                        return 0;
+                        return false;
                     }
                     *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = sval;
                     apScriptLine->uiOutputSize += 2;
@@ -1953,7 +1955,7 @@ bool ScriptCompiler::StandardCompile(
                             apCompileData, "Invalid CriticalStage '%s' for parameter %s.\r\nCompiled script not saved!",
                             &currentWord, apParameters[sCurrentParam].pParamName
                         );
-                        return 0;
+                        return false;
                     }
                     *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = j;
                     apScriptLine->uiOutputSize += 2;
@@ -1964,24 +1966,24 @@ bool ScriptCompiler::StandardCompile(
                         "SCRIPTS: Param type '%d' unimplemented in ScriptCompiler::StandardCompile.",
                         apParameters[sCurrentParam].eParamType
                     );
-                    return 0;
+                    return false;
                 }
             }
         }
     }
     if (apScriptLine->uiOffset >= apScriptLine->uiSize) {
-        return 1;
+        return true;
     }
     ScriptCompiler::ScriptError(
         apCompileData, "Expected end of line.\r\nCompiled script not saved!", apParameters[sCurrentParam].pParamName
     );
-    return 0;
+    return false;
 }
 
 bool ScriptCompileData::GetVariable(SCRIPT_WORD* apCurrentWord) {
     int32_t size = BSstrlen(apCurrentWord->pText);
     if (apCurrentWord->pForm) {
-        Script* pScript = 0;
+        Script* pScript = nullptr;
         TESObjectREFR* pRef = dynamic_cast<TESObjectREFR*>(apCurrentWord->pForm);
         if (pRef) {
             pRef->InitScript();
@@ -1997,23 +1999,23 @@ bool ScriptCompileData::GetVariable(SCRIPT_WORD* apCurrentWord) {
         if (pScript) {
             apCurrentWord->cVariableType = pScript->FindVariable(apCurrentWord->pText, &apCurrentWord->uiVariableID);
             if (apCurrentWord->cVariableType) {
-                return 1;
+                return true;
             }
             else {
                 apCurrentWord->uiVariableID = 0;
-                return 0;
+                return false;
             }
         }
         else {
             apCurrentWord->uiVariableID = 0;
-            return 0;
+            return false;
         }
     }
     else {
         if (apCurrentWord->uiRefObjectIndex) {
             apCurrentWord->uiVariableID = 0;
             apCurrentWord->cVariableType = 0;
-            return 0;
+            return false;
         }
         else {
             BSSimpleList<ScriptVariable*>* pList = &listVariables;
@@ -2030,7 +2032,7 @@ bool ScriptCompileData::GetVariable(SCRIPT_WORD* apCurrentWord) {
                             apCurrentWord->cVariableType = 102;
                         }
                         apCurrentWord->uiVariableID = pVar->data.uiID;
-                        return 1;
+                        return true;
                     }
                 }
                 pList = pList->m_pkNext;
@@ -2038,18 +2040,18 @@ bool ScriptCompileData::GetVariable(SCRIPT_WORD* apCurrentWord) {
             if (pCurrentScript &&
                 (apCurrentWord->cVariableType =
                      pCurrentScript->FindVariable(apCurrentWord->pText, &apCurrentWord->uiVariableID)) != 0) {
-                return 1;
+                return true;
             }
             else {
-                if (pDataHandler->GetGlobal(apCurrentWord->pText) && GetReferencedObject(apCurrentWord, 0, 0)) {
+                if (pDataHandler->GetGlobal(apCurrentWord->pText) && GetReferencedObject(apCurrentWord, false, false)) {
                     apCurrentWord->uiVariableID = 0;
                     apCurrentWord->cVariableType = 71;
-                    return 1;
+                    return true;
                 }
                 else {
                     apCurrentWord->uiVariableID = 0;
                     apCurrentWord->cVariableType = 0;
-                    return 0;
+                    return false;
                 }
             }
         }
@@ -2144,10 +2146,10 @@ bool ScriptCompileData::GetReferencedObject(SCRIPT_WORD* apCurrentWord, bool abA
 Script::RefVariable* ScriptCompileData::GetReferencedObject(uint32_t aiIndex) {
     BSSimpleList<Script::RefVariable*>* ecx0;
     if (!aiIndex) {
-        return 0;
+        return nullptr;
     }
     if (aiIndex > header.refObjectCount) {
-        return 0;
+        return nullptr;
     }
     uint32_t v3 = 1;
     for (ecx0 = QReferencedObjectList(); ecx0 && (!ecx0->IsEmpty() && v3 < aiIndex); ecx0 = ecx0->m_pkNext) {

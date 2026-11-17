@@ -57,6 +57,6 @@ ActiveEffect* VampirismEffect::Instantiate(MagicCaster* apCaster, MagicItem* apS
         return ::new (v5) VampirismEffect(apCaster, apSpell, apEffect);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

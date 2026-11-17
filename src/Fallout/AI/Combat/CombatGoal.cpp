@@ -43,23 +43,23 @@ bool CombatGoal::IsActive(CombatWorldStateArray* apWorldStateArray) {
         int32_t ivalue = pstate->iValue;
         if (estate == SPECIFIED_VARIABLE_ZERO) {
             if (apWorldStateArray->GetSpecifiedVariable(ivalue)) {
-                return 0;
+                return false;
             }
         }
         else {
             if (estate == SPECIFIED_VARIABLE_NON_ZERO) {
                 if (!apWorldStateArray->GetSpecifiedVariable(ivalue)) {
-                    return 0;
+                    return false;
                 }
             }
             else {
                 if (!apWorldStateArray->IsTrue(estate, ivalue)) {
-                    return 0;
+                    return false;
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 void CombatGoal::AddActivationCondition(COMBAT_WORLD_STATE aeState, int32_t aiValue) {
@@ -99,7 +99,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v2 = ::new (v18) CombatGoalStayInCombatArea(aeGoal);
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             result = v2;
             break;
@@ -112,7 +112,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v12 = ::new (v28) CombatGoalUseCombatItem(aeGoal);
             }
             else {
-                v12 = 0;
+                v12 = nullptr;
             }
             result = v12;
             break;
@@ -124,7 +124,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v14 = ::new (v30) CombatGoalFlee(aeGoal);
             }
             else {
-                v14 = 0;
+                v14 = nullptr;
             }
             result = v14;
             break;
@@ -137,7 +137,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v15 = ::new (v31) CombatGoalAvoidThreats(aeGoal);
             }
             else {
-                v15 = 0;
+                v15 = nullptr;
             }
             result = v15;
             break;
@@ -150,7 +150,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v13 = ::new (v29) CombatGoalActivateCombatItem(aeGoal);
             }
             else {
-                v13 = 0;
+                v13 = nullptr;
             }
             result = v13;
             break;
@@ -163,7 +163,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v8 = ::new (v24) CombatGoalReachDestination(aeGoal);
             }
             else {
-                v8 = 0;
+                v8 = nullptr;
             }
             result = v8;
             break;
@@ -175,7 +175,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v6 = ::new (v22) CombatGoalGuard(aeGoal);
             }
             else {
-                v6 = 0;
+                v6 = nullptr;
             }
             result = v6;
             break;
@@ -187,7 +187,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v5 = ::new (v21) CombatGoalCluster(aeGoal);
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             result = v5;
             break;
@@ -199,7 +199,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v7 = ::new (v23) CombatGoalAdvance(aeGoal);
             }
             else {
-                v7 = 0;
+                v7 = nullptr;
             }
             result = v7;
             break;
@@ -211,7 +211,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v9 = ::new (v25) CombatGoalAmbush(aeGoal);
             }
             else {
-                v9 = 0;
+                v9 = nullptr;
             }
             result = v9;
             break;
@@ -223,7 +223,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v10 = ::new (v26) CombatGoalFallBack(aeGoal);
             }
             else {
-                v10 = 0;
+                v10 = nullptr;
             }
             result = v10;
             break;
@@ -235,7 +235,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v11 = ::new (v27) CombatGoalFlank(aeGoal);
             }
             else {
-                v11 = 0;
+                v11 = nullptr;
             }
             result = v11;
             break;
@@ -247,7 +247,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 Target = ::new (v32) CombatGoalFindTarget(aeGoal);
             }
             else {
-                Target = 0;
+                Target = nullptr;
             }
             result = Target;
             break;
@@ -259,7 +259,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v3 = ::new (v19) CombatGoalFlushTarget(aeGoal);
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             result = v3;
             break;
@@ -272,7 +272,7 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v17 = ::new (apMemory) CombatGoalKillTarget(aeGoal);
             }
             else {
-                v17 = 0;
+                v17 = nullptr;
             }
             result = v17;
             break;
@@ -285,14 +285,14 @@ CombatGoal* InitCombatGoal(CombatGoal::COMBAT_GOAL aeGoal) {
                 v4 = ::new (v20) CombatGoalHideFromTarget(aeGoal);
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             result = v4;
             break;
         }
         default: {
             Warning("COMBAT: Could not create combat goal of type %i", aeGoal);
-            result = 0;
+            result = nullptr;
             break;
         }
     }

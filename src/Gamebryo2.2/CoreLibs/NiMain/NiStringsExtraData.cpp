@@ -34,8 +34,8 @@ NiObject* NiStringsExtraData::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -140,7 +140,7 @@ NiObject* NiStringsExtraData::CreateObject() {
     NiStringsExtraData* pkObject =
         static_cast<NiStringsExtraData*>(NiMemObject::operator new(sizeof(NiStringsExtraData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiStringsExtraData;
 }

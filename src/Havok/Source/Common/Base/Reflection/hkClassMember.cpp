@@ -371,7 +371,7 @@ const hkVariant* hkClassMember::getAttribute(const char* id) const {
         return m_attributes->getAttribute(id);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

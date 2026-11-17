@@ -205,7 +205,7 @@ void TESAmmo::Save() {
         pProjectileID = reinterpret_cast<BGSProjectile*>(static_cast<uintptr_t>(NVdata.pProjectileOverride->iFormID));
     }
     else {
-        pProjectileID = 0;
+        pProjectileID = nullptr;
     }
     NVdata.pProjectileOverride = pProjectileID;
     TESForm* pAmmoConsumedID;
@@ -213,7 +213,7 @@ void TESAmmo::Save() {
         pAmmoConsumedID = reinterpret_cast<TESForm*>(static_cast<uintptr_t>(NVdata.pAmmoConsumedObject->iFormID));
     }
     else {
-        pAmmoConsumedID = 0;
+        pAmmoConsumedID = nullptr;
     }
     NVdata.pAmmoConsumedObject = pAmmoConsumedID;
     if (TESForm::QEndianSwapOnSave()) {
@@ -302,7 +302,7 @@ void TESAmmo::InitItem() {
             }
         }
         BSSimpleList<TESAmmoEffect*>* pAmmoEffectList = GetAmmoEffectList();
-        TESAmmoEffect* v17 = 0;
+        TESAmmoEffect* v17 = nullptr;
         while (pAmmoEffectList && pAmmoEffectList->m_item) {
             itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pAmmoEffectList->m_item));
             if (itempInt) {
@@ -322,7 +322,7 @@ void TESAmmo::InitItem() {
             }
             pAmmoEffectList = pAmmoEffectList->m_pkNext;
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -350,42 +350,42 @@ void TESAmmo::Copy(TESForm* apCopy) {
 bool TESAmmo::Compare(TESForm* apCompare) {
     TESAmmo* pComp = dynamic_cast<TESAmmo*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
     if (std::memcmp(&data, &pComp->data, sizeof(data))) {
-        return 1;
+        return true;
     }
     const void* ThreatLocation = &pComp->NVdata;
     if (std::memcmp(&NVdata, ThreatLocation, sizeof(NVdata))) {
-        return 1;
+        return true;
     }
-    if (cAbbrev.StrCmp(pComp->cAbbrev, 1)) {
-        return 1;
+    if (cAbbrev.StrCmp(pComp->cAbbrev, true)) {
+        return true;
     }
-    if (cDesc.StrCmp(pComp->cDesc, 1)) {
-        return 1;
+    if (cDesc.StrCmp(pComp->cDesc, true)) {
+        return true;
     }
     int32_t v4 = GetAmmoEffectList()->ItemsInList();
     if (v4 != pComp->GetAmmoEffectList()->ItemsInList()) {
-        return 1;
+        return true;
     }
     BSSimpleList<TESAmmoEffect*>* ammoeffects_2 = GetAmmoEffectList();
     BSSimpleList<TESAmmoEffect*>* copyammoeffects_2 = pComp->GetAmmoEffectList();
     while (copyammoeffects_2 && !copyammoeffects_2->IsEmpty()) {
         if (!ammoeffects_2 || ammoeffects_2->IsEmpty()) {
-            return 1;
+            return true;
         }
         TESAmmoEffect* pAmmoEffect = ammoeffects_2->m_item;
         if (pAmmoEffect->Compare(copyammoeffects_2->m_item)) {
-            return 1;
+            return true;
         }
         copyammoeffects_2 = copyammoeffects_2->m_pkNext;
         ammoeffects_2 = ammoeffects_2->m_pkNext;
     }
-    return 0;
+    return false;
 }
 
 NiAVObject* TESAmmo::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
@@ -439,7 +439,7 @@ const char* TESAmmo::GetShortName() {
 
 void TESAmmo::BuildMenuString(char* astrResult, uint32_t auiResultLen) {
     char Src[260];
-    bool bNeedNewLine = 0;
+    bool bNeedNewLine = false;
     *astrResult = 0;
     Src[0] = 0;
     BSSimpleList<TESAmmoEffect*>* pAmmoEffectList = GetAmmoEffectList();
@@ -456,7 +456,7 @@ void TESAmmo::BuildMenuString(char* astrResult, uint32_t auiResultLen) {
             }
             else {
                 BSstrcat(astrResult, static_cast<int32_t>(auiResultLen), Src);
-                bNeedNewLine = 1;
+                bNeedNewLine = true;
             }
         }
     }

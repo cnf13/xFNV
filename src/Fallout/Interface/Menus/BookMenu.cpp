@@ -55,7 +55,7 @@ void BookMenu::DoClick(int32_t aiID, Tile* apTarget) {
         if (aiID == 32) {
             extra = unk30->TESObjectREFR::GetExtra();
             count = extra->GetCount();
-            pPlayer->PickUpObject(unk30, (int32_t)count, (bool)0);
+            pPlayer->PickUpObject(unk30, (int32_t)count, false);
             Close();
         }
     }
@@ -104,17 +104,17 @@ void BookMenu::DoWheelMove(int32_t a1, Tile* a2) {
         if (static_cast<double>(iold_y) != pScrollBar->GetFloat(Tile::kTileValue_User7)) {
             DoLeave(a1, a2);
             InterfaceManager* v4 = InterfaceManager::Instance();
-            v4->ClearOverTileTarget(0);
+            v4->ClearOverTileTarget(false);
         }
     }
 }
 
 bool BookMenu::DoKey(int32_t aikey) {
     if (aikey != 32) {
-        return (bool)0;
+        return false;
     }
     Close();
-    return (bool)1;
+    return true;
 }
 
 int32_t BookMenu::GetClass() {
@@ -151,7 +151,7 @@ void BookMenu::SetupTextAndButtons(TESObjectBOOK* a1, Actor* a2) {
         pMenu->Set(Tile::kTileValue_User0, 1);
     }
     const char* Description = a1->GetDescription();
-    pMenu->Set(Tile::kTileValue_User2, Description, 1);
+    pMenu->Set(Tile::kTileValue_User2, Description, true);
     unk30 = a2;
     if (a2 && !a1->GetCantTake()) {
         pMenu->Set(Tile::kTileValue_User3, 1);
@@ -167,14 +167,14 @@ void BookMenu::SetupTextAndButtons(TESObjectBOOK* a1, Actor* a2) {
 
 void BookMenu::UseWorkbook() {
     BSStringT<char> axWorkbookPath("Data\\Menus\\workbook.html");
-    BSFile xinput(axWorkbookPath.pString, NiFile::READ_ONLY, 0x4000u, static_cast<bool>(0));
+    BSFile xinput(axWorkbookPath.pString, NiFile::READ_ONLY, 0x4000u, false);
     BSStringT<char> xdata;
     int32_t idatalen = 0;
-    xinput.BSFile::Open(0, 0);
+    xinput.BSFile::Open(false, false);
     if (xinput.m_bGood) {
         xinput.BSFile::Read(xdata, 0xFFFFFFFFu);
         idatalen = xdata.GetLength();
-        pMenu->Set(Tile::kTileValue_User2, xdata.pString, static_cast<bool>(1));
+        pMenu->Set(Tile::kTileValue_User2, xdata.pString, true);
         pMenu->Set(Tile::kTileValue_User6, -0x1869F);
         pMenu->Set(Tile::kTileValue_User6, 0);
     }
@@ -189,7 +189,7 @@ Tile* BookMenu::Create(TESObjectBOOK* apBook, TESObjectREFR* apRef) {
         delete pold_menu_tile;
     }
     if (!apBook) {
-        return 0;
+        return nullptr;
     }
     InterfaceManager* pin = InterfaceManager::Instance();
     float ftop_depth = Tile::GetMaximumDepth();
@@ -198,11 +198,11 @@ Tile* BookMenu::Create(TESObjectBOOK* apBook, TESObjectREFR* apRef) {
     pme->pBook = apBook;
     if (pme && pme->GetClass() == 1026) {
         TileMenu* v3 = dynamic_cast<TileMenu*>(ptile);
-        pme->SetMenuTile(v3, 0);
+        pme->SetMenuTile(v3, false);
         BookMenu* pme_2 = dynamic_cast<BookMenu*>(static_cast<Menu*>(pme));
         if (pme_2->IsWellFormedMenu()) {
             if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
-                ptile->Set(4013, ftop_depth, 1);
+                ptile->Set(4013, ftop_depth, true);
             }
             pme_2->SetupTextAndButtons(apBook, static_cast<Actor*>(apRef));
             if (pme_2->pBook->IsScroll()) {
@@ -211,12 +211,12 @@ Tile* BookMenu::Create(TESObjectBOOK* apBook, TESObjectREFR* apRef) {
             else {
                 InterfaceManager::PlayMenuSound(MENU_SOUND_BOOK_OPEN);
             }
-            pme->PrepForVisibility(0);
+            pme->PrepForVisibility(false);
             return ptile;
         }
         else {
             Warning("MENUS: Book Menu Creation Failed... Are your menu and art resources up to date?");
-            return 0;
+            return nullptr;
         }
     }
     else {
@@ -225,10 +225,10 @@ Tile* BookMenu::Create(TESObjectBOOK* apBook, TESObjectREFR* apRef) {
                 delete pme;
             }
         }
-        return 0;
+        return nullptr;
     }
 }
 
 const char* TESObjectBOOK::GetDescription() {
-    return GetDescription(0, DESC_ID);
+    return GetDescription(nullptr, DESC_ID);
 }

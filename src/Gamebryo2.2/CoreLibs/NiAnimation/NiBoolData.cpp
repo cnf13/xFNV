@@ -145,7 +145,7 @@ void NiBoolData::ReplaceAnim(NiBoolKey* pkKeys, uint32_t uiNumKeys, NiBoolKey::K
 NiObject* NiBoolData::CreateObject() {
     NiBoolData* pkObject = static_cast<NiBoolData*>(NiMemObject::operator new(sizeof(NiBoolData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiBoolData;
 }

@@ -577,7 +577,7 @@ void NiGeomMorpherController::AllocateInterpArray() {
 NiObject* NiGeomMorpherController::CreateObject() {
     void* pkObject = NiMemObject::operator new(sizeof(NiGeomMorpherController));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiGeomMorpherController;
 }

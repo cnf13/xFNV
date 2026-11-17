@@ -65,8 +65,8 @@
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
 
+#include <cstdint>
 #include <cstring>
-#include <stdint.h>
 #include <string>
 
 // Set by ParseFile on a syntax error; ReadFile clears it and stops at it.
@@ -89,7 +89,7 @@ void XMLStorage::operator delete(void* apMemory) {
 }
 
 Tile::Value::~Value() {
-    Tile::Reaction* preactionListA = 0;
+    Tile::Reaction* preactionListA = nullptr;
     ClearActions();
     if (Tile::ValueReactionList.GetAt(this, preactionListA)) {
         while (preactionListA) {
@@ -97,7 +97,7 @@ Tile::Value::~Value() {
                  pcurrAction = pcurrAction->pnext) {
                 if (pcurrAction->QRefValue() == this) {
                     // Only a RefValueAction has a value to return, so the action is one.
-                    static_cast<Tile::RefValueAction*>(pcurrAction)->pRefValue = 0;
+                    static_cast<Tile::RefValueAction*>(pcurrAction)->pRefValue = nullptr;
                 }
             }
             Tile::Reaction* premove = preactionListA;
@@ -110,7 +110,7 @@ Tile::Value::~Value() {
         MemoryManager_Singleton.Deallocate(strValue);
     }
     fValue = 0.0f;
-    pParent = 0;
+    pParent = nullptr;
 }
 
 void Tile::Value::SetString(const char* apString, bool abClearActions) {
@@ -118,7 +118,7 @@ void Tile::Value::SetString(const char* apString, bool abClearActions) {
         ((strValue && !apString) || (strValue && (apString && std::strcmp(strValue, apString))));
     if (strValue) {
         MemoryManager_Singleton.Deallocate(strValue);
-        strValue = 0;
+        strValue = nullptr;
     }
     if (apString) {
         size_t v5 = std::strlen(apString);
@@ -236,17 +236,17 @@ void Tile::Value::CalculateValue(bool abForceUpdate) {
                 break;
             case kTileValue_Floor: {
                 float fSum = fOperand + this->fValue;
-                this->fValue = static_cast<float>(std::floor(fSum));
+                this->fValue = std::floor(fSum);
                 break;
             }
             case kTileValue_Ceil: {
                 float fSum = fOperand + this->fValue;
-                this->fValue = static_cast<float>(std::ceil(fSum));
+                this->fValue = std::ceil(fSum);
                 break;
             }
             case kTileValue_Abs: {
                 float fSum = fOperand + this->fValue;
-                this->fValue = static_cast<float>(std::fabs(fSum));
+                this->fValue = std::fabs(fSum);
                 break;
             }
             case kTileValue_Round: {
@@ -352,7 +352,7 @@ void Tile::Value::AddAction(int32_t aiActionType, float afActionVal) {
         pnewAction_2 = ::new (pnewAction) Tile::FloatAction;
     }
     else {
-        pnewAction_2 = 0;
+        pnewAction_2 = nullptr;
     }
     pnewAction_2->eActionType = static_cast<eTileValue>(aiActionType);
     pnewAction_2->fValue = afActionVal;
@@ -376,7 +376,7 @@ void Tile::Value::AddAction(int32_t aiActionType, Tile* apSourceTile, int32_t ae
         pnewAction_2 = ::new (pnewAction) Tile::RefValueAction;
     }
     else {
-        pnewAction_2 = 0;
+        pnewAction_2 = nullptr;
     }
     pnewAction_2->eActionType = static_cast<eTileValue>(aiActionType);
     pnewAction_2->pRefValue = apSourceTile->GetOrCreateValue(aeSourceTrait);
@@ -395,17 +395,17 @@ void Tile::Value::AddAction(int32_t aiActionType, Tile* apSourceTile, int32_t ae
 void Tile::Value::ClearActions() {
     Tile::Reaction* preactionListA;
     Tile::Action** ppcurrAction = &pActionListA;
-    while (1) {
+    while (true) {
         Tile::Action* pcurrAction = *ppcurrAction;
         if (!pcurrAction) {
             break;
         }
         if (pcurrAction->QRefValue()) {
-            preactionListA = 0;
+            preactionListA = nullptr;
             if (Tile::ValueReactionList.GetAt(pcurrAction->QRefValue(), preactionListA)) {
                 Tile::Reaction** ppcurrReaction = &preactionListA;
                 Tile::Reaction* pprevhead = preactionListA;
-                while (1) {
+                while (true) {
                     Tile::Reaction* pcurrReaction = *ppcurrReaction;
                     if (!*ppcurrReaction) {
                         break;
@@ -602,7 +602,7 @@ void Tile::TileTemplate::Clear() {
     while (xList.m_uiCount) {
         Tile::TileTemplateItem* pItem = xList.RemoveHead();
         if (pItem) {
-            pItem->xStr.Set(0, 0);
+            pItem->xStr.Set(nullptr, 0);
             MemoryManager_Singleton.Deallocate(pItem);
         }
     }
@@ -626,7 +626,7 @@ Tile::TileTemplate::GetItem(int32_t aiCmd, float afVal, const char* apStr, int32
             return ::new (apMemory) Tile::TileTemplateItem(aiCmd, afVal, apStr, aiTA, aiLine);
         }
         else {
-            return 0;
+            return nullptr;
         }
     }
     return pitem;
@@ -636,7 +636,7 @@ void Tile::TileTemplate::ThrowAway(Tile::TileTemplateItem* apItem) {
     // The compare is unsigned: the array holds 10 items before one is freed instead of stored.
     if (static_cast<uint32_t>(Tile::TileTemplate::iNumItems) >= 10) {
         if (apItem) {
-            apItem->xStr.Set(0, 0);
+            apItem->xStr.Set(nullptr, 0);
             MemoryManager_Singleton.Deallocate(apItem);
         }
     }
@@ -649,7 +649,7 @@ void Tile::TileTemplate::ClearAll() {
     while (Tile::TileTemplate::iNumItems--) {
         Tile::TileTemplateItem* pItem = Tile::TileTemplate::pItemsA[Tile::TileTemplate::iNumItems];
         if (pItem) {
-            pItem->xStr.Set(0, 0);
+            pItem->xStr.Set(nullptr, 0);
             MemoryManager_Singleton.Deallocate(pItem);
         }
     }
@@ -661,7 +661,7 @@ Tile::BuildStorage::BuildStorage()
 
 Tile::BuildStorage::~BuildStorage() {
     delete pTemplate;
-    pCurrentTemplate = 0;
+    pCurrentTemplate = nullptr;
     if (bDeleteTemplates) {
         for (Tile::TileTemplate* m_item : xSubTemplates) {
             delete m_item;
@@ -704,7 +704,7 @@ Tile::TileTemplate* Tile::BuildStorage::NewSubTemplate(const char* pName) {
         ptemplate = ::new (apMemory) Tile::TileTemplate(pName, this);
     }
     else {
-        ptemplate = 0;
+        ptemplate = nullptr;
     }
     xSubTemplates.AddTail(ptemplate);
     return ptemplate;
@@ -1427,8 +1427,8 @@ bool Tile::UpdateTile(bool abClearUpdateFlags) {
                 fScreenWidth = Interface::GetRenderedMenuScreenWidth();
                 fScreenHeight = Interface::GetRenderedMenuScreenHeight();
             }
-            float fScaleX = static_cast<float>(fScreenWidth / Interface::GetScreenWidth());
-            const float fScaleY = static_cast<float>(fScreenHeight / Interface::GetScreenHeight());
+            float fScaleX = (fScreenWidth / Interface::GetScreenWidth());
+            const float fScaleY = (fScreenHeight / Interface::GetScreenHeight());
             if (Menu::ShouldScaleByResolutionRatio(this->GetMenu())) {
                 fScaleX = Interface::GetAspectRatioRatio() * fScaleX;
             }
@@ -1458,8 +1458,8 @@ bool Tile::UpdateTile(bool abClearUpdateFlags) {
                     fScreenWidth = Interface::GetRenderedMenuScreenWidth();
                     fScreenHeight = Interface::GetRenderedMenuScreenHeight();
                 }
-                float fScaleX = static_cast<float>(fScreenWidth / Interface::GetScreenWidth());
-                const float fScaleY = static_cast<float>(fScreenHeight / Interface::GetScreenHeight());
+                float fScaleX = (fScreenWidth / Interface::GetScreenWidth());
+                const float fScaleY = (fScreenHeight / Interface::GetScreenHeight());
                 if (Menu::ShouldScaleByResolutionRatio(this->GetMenu())) {
                     fScaleX = Interface::GetAspectRatioRatio() * fScaleX;
                 }
@@ -1829,7 +1829,7 @@ Tile::Value* Tile::GetValue(int32_t aiTrait) {
 
 // Like GetValueQ it builds a search key, compareVal, on first use.
 Tile::Value* Tile::GetOrCreateValue(int32_t aiTrait) {
-    Tile::Value* preturnVal_2 = 0;
+    Tile::Value* preturnVal_2 = nullptr;
     EnterCriticalSection(&Tile::TileUpdateAllCritSect.CriticalSection);
     static Tile::Value compareVal(Tile::kTileValue_Invalid, nullptr, 0.0f, nullptr, nullptr);
     uint32_t v8 = -1;
@@ -1841,14 +1841,14 @@ Tile::Value* Tile::GetOrCreateValue(int32_t aiTrait) {
         Tile::Value* preturnVal = static_cast<Tile::Value*>(MemoryManager_Singleton.Allocate(sizeof(Tile::Value)));
         if (preturnVal) {
             preturnVal->eIndex = Tile::kTileValue_Invalid;
-            preturnVal->pParent = 0;
+            preturnVal->pParent = nullptr;
             preturnVal->fValue = 0.0f;
-            preturnVal->strValue = 0;
-            preturnVal->pActionListA = 0;
+            preturnVal->strValue = nullptr;
+            preturnVal->pActionListA = nullptr;
             preturnVal_3 = preturnVal;
         }
         else {
-            preturnVal_3 = 0;
+            preturnVal_3 = nullptr;
         }
         preturnVal_2 = preturnVal_3;
         preturnVal_3->eIndex = static_cast<Tile::eTileValue>(aiTrait);
@@ -1864,7 +1864,7 @@ Tile::Value* Tile::GetOrCreateValue(int32_t aiTrait) {
 
 // The search key compareVal is built on first use and destroyed at exit. The sorted find reads it.
 Tile::Value* Tile::GetValueQ(int32_t aiTrait) {
-    Tile::Value* v5 = 0;
+    Tile::Value* v5 = nullptr;
     EnterCriticalSection(&Tile::TileUpdateAllCritSect.CriticalSection);
     static Tile::Value compareVal(Tile::kTileValue_Invalid, nullptr, 0.0f, nullptr, nullptr);
     uint32_t v6 = -1;
@@ -2160,7 +2160,7 @@ void Tile::PlayTileSound(int32_t aiSoundType) {
     // EXE-INLINED 0x41A250
     FNVD_INLINED_LOCAL(BSSoundHandle, sound, std::nullopt, std::nullopt);
     sound.iSoundID = -1;
-    sound.bAssumeSuccess = 0;
+    sound.bAssumeSuccess = false;
     sound.eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
     const char* name = this->GetString(aiSoundType);
     Menu* menu = this->GetMenu();
@@ -2313,7 +2313,7 @@ bool Tile::IsInGlowBranch() {
             th_s = th_s->pParent;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 float Tile::GetRealDepth() {
@@ -2375,11 +2375,11 @@ void Tile::RecursiveRotationUpdate() {
                 fChildY = fChildY + fParentY;
             }
             float v10 = fParentX + fParentRotateAxisX - fChildX;
-            pChildTile->Set(4091, v10, 1);
+            pChildTile->Set(4091, v10, true);
             float v9 = fParentY + fParentRotateAxisY - fChildY;
-            pChildTile->Set(4092, v9, 1);
+            pChildTile->Set(4092, v9, true);
             float afValue = GetFloat(4090);
-            pChildTile->Set(4090, afValue, 1);
+            pChildTile->Set(4090, afValue, true);
             if (pChildTile->IsTrue(4008) && pChildTile->GetType() == 902) {
                 float fdepth = pChildTile->GetFloat(4013);
                 NiPoint3 xpos = NiPoint3_ZERO;
@@ -2409,10 +2409,10 @@ void Tile::RecursiveRotationUpdate() {
                         }
                         v17 = 0;
                     LABEL_19:;
-                        ptri = v17 != 0 ? v19 : 0;
+                        ptri = v17 != 0 ? v19 : nullptr;
                     }
                     else {
-                        ptri = 0;
+                        ptri = nullptr;
                     }
                     float v15 = pChildTile->GetFloat(4091);
                     float v16 = -pChildTile->GetFloat(4092);
@@ -2515,7 +2515,7 @@ Tile* Tile::BuildTile(int32_t aiID) {
                 v7 = ::new (v13) TileRect;
             }
             else {
-                v7 = 0;
+                v7 = nullptr;
             }
             result = v7;
             break;
@@ -2528,7 +2528,7 @@ Tile* Tile::BuildTile(int32_t aiID) {
                 v6 = ::new (apMemory) TileImage;
             }
             else {
-                v6 = 0;
+                v6 = nullptr;
             }
             result = v6;
             break;
@@ -2540,7 +2540,7 @@ Tile* Tile::BuildTile(int32_t aiID) {
                 v4 = ::new (v10) TileText;
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             result = v4;
             break;
@@ -2552,7 +2552,7 @@ Tile* Tile::BuildTile(int32_t aiID) {
                 v5 = ::new (v11) Tile3D;
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             result = v5;
             break;
@@ -2564,7 +2564,7 @@ Tile* Tile::BuildTile(int32_t aiID) {
                 v3 = ::new (v9) TileMenu(nullptr, nullptr);
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             result = v3;
             break;
@@ -2576,13 +2576,13 @@ Tile* Tile::BuildTile(int32_t aiID) {
                 v2 = ::new (v8) RadialTile;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             result = v2;
             break;
         }
         default: {
-            result = 0;
+            result = nullptr;
             break;
         }
     }
@@ -2706,7 +2706,7 @@ void Tile::UpdateFadeControls() {
                     const float pct = static_cast<float>(((end - start) * t + start) / 255.0);
                     node->m_item->pParent->FadeIn3D(node->m_item->pParent->spModel.m_pObject, pct);
                 }
-                const float value = static_cast<float>((end - start) * t + start);
+                const float value = ((end - start) * t + start);
                 node->m_item->pParent->Set(trait, value, true);
                 if (t >= 1.0) {
                     finished.AddHead(node->m_item);
@@ -2742,7 +2742,7 @@ void Tile::UpdateFadeControls() {
                     }
                 }
                 if (type == 2 && flashCount >= 3.0) {
-                    const float value = static_cast<float>((end - start) * t + start);
+                    const float value = ((end - start) * t + start);
                     node->m_item->pParent->Set(trait, end < value ? end : value, true);
                     if (end <= value) {
                         finished.AddHead(node->m_item);
@@ -2753,7 +2753,7 @@ void Tile::UpdateFadeControls() {
                     const float wave = static_cast<float>(t * 2.0 - 1.0);
                     const float magnitude = static_cast<float>(std::fabs(static_cast<double>(wave)));
                     const float level = static_cast<float>(1.0 - magnitude);
-                    const float value = static_cast<float>((end - start) * level + start);
+                    const float value = ((end - start) * level + start);
                     node->m_item->pParent->Set(trait, value, true);
                 }
                 break;
@@ -2765,7 +2765,7 @@ void Tile::UpdateFadeControls() {
                     static_cast<double>(now - node->m_item->uiStartTime) / node->m_item->fDurationMillis
                 );
                 if (t < 0.16665999591350555) {
-                    const float value = static_cast<float>(start + (end - start) * ((t - 0.0f) / (0.16666f - 0.0f)));
+                    const float value = (start + (end - start) * ((t - 0.0f) / (0.16666f - 0.0f)));
                     node->m_item->pParent->Set(trait, value, true);
                 }
                 else if (t < 0.8333399891853333) {
@@ -2776,7 +2776,7 @@ void Tile::UpdateFadeControls() {
                     finished.AddHead(node->m_item);
                 }
                 else {
-                    const float value = static_cast<float>(end + (start - end) * ((t - 0.83334f) / (1.0f - 0.83334f)));
+                    const float value = (end + (start - end) * ((t - 0.83334f) / (1.0f - 0.83334f)));
                     node->m_item->pParent->Set(trait, value, true);
                 }
                 break;
@@ -2796,7 +2796,7 @@ void Tile::UpdateFadeControls() {
 
 Tile* Tile::SearchForTileByName(Tile* apTarget, const char* apName) {
     if (!apTarget) {
-        return 0;
+        return nullptr;
     }
     if (apTarget->xName.pString && !_stricmp(apTarget->xName.pString, apName)) {
         return apTarget;
@@ -2810,7 +2810,7 @@ Tile* Tile::SearchForTileByName(Tile* apTarget, const char* apName) {
             return pitem;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 void Tile::PromoteHibernators() {
@@ -3552,10 +3552,10 @@ bool Tile::InsertIncludedFiles(XMLStorage* apFile) {
     char* pstartIndex = apFile->pXMLData;
     const char* pincludeIndex = std::strstr(pstartIndex, "<include");
     if (!pincludeIndex) {
-        return 0;
+        return false;
     }
     // BSStringT's constructor is written out here: both lengths and the pointer are stored directly.
-    strfinalVersion.pString = 0;
+    strfinalVersion.pString = nullptr;
     strfinalVersion.sLen = 0;
     strfinalVersion.sMaxLen = 0;
     uint32_t strtempSize = apFile->iFileSize + 1;
@@ -3566,18 +3566,18 @@ bool Tile::InsertIncludedFiles(XMLStorage* apFile) {
         static_cast<size_t>(pincludeIndex - pstartIndex)
     );
     strfinalVersion.Set(strtemp, 0x4000);
-    bool bdone = 0;
+    bool bdone = false;
     while (!bdone) {
         FNVD_INLINED_LOCAL(BSStringT<char>, strincludeFilename, std::nullopt, std::nullopt);
-        strincludeFilename.pString = 0;
+        strincludeFilename.pString = nullptr;
         strincludeFilename.sLen = 0;
         strincludeFilename.sMaxLen = 0;
         int32_t iincludeTagLength = std::strchr(pincludeIndex, '>') - pincludeIndex + 1;
         std::memset(strtemp, 0, strtempSize);
         // pincludeIndex is const char*, but strtok_s cuts the XML data it points into in place, hence the const_cast.
         strtok_s(const_cast<char*>(pincludeIndex), "\"", &ptokenContext);
-        strincludeFilename.SPrintF("Data\\Menus\\Prefabs\\%s", strtok_s(0, "\"", &ptokenContext));
-        XMLStorage* ptmpXML = Menu::GetXML(strincludeFilename.pString, 0);
+        strincludeFilename.SPrintF("Data\\Menus\\Prefabs\\%s", strtok_s(nullptr, "\"", &ptokenContext));
+        XMLStorage* ptmpXML = Menu::GetXML(strincludeFilename.pString, false);
         strfinalVersion += static_cast<const char*>(ptmpXML->pXMLData);
         if (ptmpXML) {
             ptmpXML->~XMLStorage();
@@ -3595,10 +3595,10 @@ bool Tile::InsertIncludedFiles(XMLStorage* apFile) {
         }
         else {
             strcpy_s(strtemp, strtempSize, &pincludeIndex[iincludeTagLength]);
-            bdone = 1;
+            bdone = true;
         }
         strfinalVersion += static_cast<const char*>(strtemp);
-        strincludeFilename.Set(0, 0);
+        strincludeFilename.Set(nullptr, 0);
     }
     MemoryManager_Singleton.Deallocate(apFile->pXMLData);
     apFile->pXMLData = static_cast<char*>(MemoryManager_Singleton.Allocate(strfinalVersion.Length() + 1));
@@ -3606,8 +3606,8 @@ bool Tile::InsertIncludedFiles(XMLStorage* apFile) {
     apFile->iFileSize = strfinalVersion.Length();
     MemoryManager_Singleton.Deallocate(strtemp);
     Tile::InsertIncludedFiles(apFile);
-    strfinalVersion.Set(0, 0);
-    return 1;
+    strfinalVersion.Set(nullptr, 0);
+    return true;
 }
 
 // Looks the subtexture strSubtextureFilename (its name after the last backslash) up among the loaded atlas entries, and
@@ -3654,7 +3654,7 @@ void Tile::GetTextureAtlasInfo(
         return;
     }
     pFile = static_cast<BSFile*>(FileFinder::GetFile(acPath, NiFile::READ_ONLY, 0x4000));
-    if (pFile && pFile->Open(0, false)) {
+    if (pFile && pFile->Open(false, false)) {
         char acLine[0x400];
         while (pFile->GetLine(acLine, 0x400, '\n')) {
             std::string kName;
@@ -3738,14 +3738,14 @@ void Tile::AddReaction(Tile::Value* apRefVal, Tile::Value* apDependantVal) {
     Tile::Reaction* pnewReaction =
         static_cast<Tile::Reaction*>(MemoryManager_Singleton.Allocate(sizeof(Tile::Reaction)));
     if (pnewReaction) {
-        pnewReaction->preactionValue = 0;
-        pnewReaction->pnext = 0;
+        pnewReaction->preactionValue = nullptr;
+        pnewReaction->pnext = nullptr;
         pnewReaction_2 = pnewReaction;
     }
     else {
-        pnewReaction_2 = 0;
+        pnewReaction_2 = nullptr;
     }
-    Tile::Reaction* pfoundReactionListA = 0;
+    Tile::Reaction* pfoundReactionListA = nullptr;
     pnewReaction_2->preactionValue = apDependantVal;
     if (Tile::ValueReactionList.GetAt(apRefVal, pfoundReactionListA)) {
         bool bfound = pfoundReactionListA->preactionValue == apDependantVal;
@@ -3782,7 +3782,7 @@ Tile* FindTileByID(Tile* th_s, int32_t a2) {
             return v4;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 void RemoveAllAudioDebugStrings(void* apThis, [[maybe_unused]] void* apEdx) {

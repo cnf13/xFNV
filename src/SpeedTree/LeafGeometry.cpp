@@ -102,22 +102,22 @@ void CLeafGeometry::SetTextureCoords(uint32_t nLeafMapIndex, const float* pTexCo
             }
             v5 = &m_pLeafTexCoords[16 * nLeafMapIndex];
             *(v5++) = (float)(*pTexCoords);
-            *(v5++) = (float)(fSign * pTexCoords[1]);
+            *(v5++) = (fSign * pTexCoords[1]);
             *(v5++) = pTexCoords[2];
-            *(v5++) = (float)(fSign * pTexCoords[3]);
+            *(v5++) = (fSign * pTexCoords[3]);
             *(v5++) = pTexCoords[4];
-            *(v5++) = (float)(fSign * pTexCoords[5]);
+            *(v5++) = (fSign * pTexCoords[5]);
             *v5 = pTexCoords[6];
-            v5[1] = (float)(fSign * pTexCoords[7]);
+            v5[1] = (fSign * pTexCoords[7]);
             v6 = &m_pLeafTexCoords[(16 * nLeafMapIndex) + 8];
             *(v6++) = pTexCoords[2];
-            *(v6++) = (float)(fSign * pTexCoords[1]);
+            *(v6++) = (fSign * pTexCoords[1]);
             *(v6++) = (float)(*pTexCoords);
-            *(v6++) = (float)(fSign * pTexCoords[3]);
+            *(v6++) = (fSign * pTexCoords[3]);
             *(v6++) = pTexCoords[6];
-            *(v6++) = (float)(fSign * pTexCoords[5]);
+            *(v6++) = (fSign * pTexCoords[5]);
             *v6 = pTexCoords[4];
-            v6[1] = (float)(fSign * pTexCoords[7]);
+            v6[1] = (fSign * pTexCoords[7]);
         }
     }
 }
@@ -179,15 +179,11 @@ void CLeafGeometry::Update(
                 }
                 const CVec3& cSize = m_pLeafDimensions[i / 2];
                 float afP1[3] = {
-                    0.0f, static_cast<float>(fSizeMultiplier * (1.0f - cOrigin.m_afData[0]) * cSize.m_afData[0]),
-                    static_cast<float>(fSizeMultiplier * (1.0f - cOrigin.m_afData[1]) * cSize.m_afData[1])
+                    0.0f, (fSizeMultiplier * (1.0f - cOrigin.m_afData[0]) * cSize.m_afData[0]),
+                    (fSizeMultiplier * (1.0f - cOrigin.m_afData[1]) * cSize.m_afData[1])
                 };
-                float afP2[3] = {
-                    0.0f, static_cast<float>(fSizeMultiplier * -(cOrigin.m_afData[0] * cSize.m_afData[0])), afP1[2]
-                };
-                float afP3[3] = {
-                    0.0f, afP2[1], static_cast<float>(fSizeMultiplier * -(cOrigin.m_afData[1] * cSize.m_afData[1]))
-                };
+                float afP2[3] = {0.0f, (fSizeMultiplier * -(cOrigin.m_afData[0] * cSize.m_afData[0])), afP1[2]};
+                float afP3[3] = {0.0f, afP2[1], (fSizeMultiplier * -(cOrigin.m_afData[1] * cSize.m_afData[1]))};
                 float afP4[3] = {0.0f, afP1[1], afP3[2]};
                 // EXE-INLINED none: Assign3d
                 acRawCorners[0].m_afData[0] = afP1[0];
@@ -323,7 +319,7 @@ void CLeafGeometry::Init(
         v5 = v13;
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     m_pLeafDimensions = v5;
     int32_t v12 = this->m_usNumTextures;
@@ -340,7 +336,7 @@ void CLeafGeometry::Init(
         v4 = v11;
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     m_pLeafOrigins = v4;
     for (int32_t i_2 = 0; i_2 < this->m_usNumTextures; ++i_2) {

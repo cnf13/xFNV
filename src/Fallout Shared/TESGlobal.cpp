@@ -69,14 +69,14 @@ void TESGlobal::Copy(TESForm* apCopy) {
 bool TESGlobal::Compare(TESForm* apCompare) {
     TESGlobal* v6 = dynamic_cast<TESGlobal*>(apCompare);
     if (!v6) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(v6)) {
-        return 1;
+        return true;
     }
     int32_t Type = GetType();
     if (Type != v6->GetType()) {
-        return 1;
+        return true;
     }
     double Value = GetValue();
     return Value != v6->GetValue();
@@ -92,7 +92,7 @@ const char* TESGlobal::GetFormEditorID() {
 
 bool TESGlobal::SetFormEditorID(const char* apEditorID) {
     strEditorID.Set(apEditorID, 0u);
-    return 1;
+    return true;
 }
 
 char TESGlobal::GetType() {

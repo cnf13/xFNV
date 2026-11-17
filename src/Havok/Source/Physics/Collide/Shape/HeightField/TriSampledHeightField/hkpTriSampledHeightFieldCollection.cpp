@@ -128,7 +128,7 @@ void hkpTriSampledHeightFieldCollection::initWeldingInfo(hkpWeldingUtility::Weld
         if (m_capacityAndFlags >= 0) {
             m_heap->bufFree(m_weldingInfo.begin(), sizeof(uint16_t) * (m_capacityAndFlags & 0x3FFFFFFF));
         }
-        m_weldingInfo.m_data = 0;
+        m_weldingInfo.m_data = nullptr;
         m_weldingInfo.m_capacityAndFlags = hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG;
     }
     else {

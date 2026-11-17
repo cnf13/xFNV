@@ -146,7 +146,7 @@ void hkpReorientAction::applyAction(const hkStepInfo& stepInfo) {
     const float fAbsCos = __builtin_fabsf(fCos);
     float fAngle;
     if (!(fAbsCos >= 1.0f)) {
-        fAngle = static_cast<float>(std::acos(fCos));
+        fAngle = std::acos(fCos);
     }
     else if (0.0f < fCos) {
         fAngle = 0.0f;
@@ -213,7 +213,7 @@ hkpAction* hkpReorientAction::clone(
     const hkArray<hkpPhantom*, hkContainerHeapAllocator>& newPhantoms
 ) const {
     if (newEntities.m_size != 1 || newPhantoms.m_size) {
-        return 0;
+        return nullptr;
     }
     hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
     hkpReorientAction* v6 = static_cast<hkpReorientAction*>(Instance->m_heap->blockAlloc(sizeof(hkpReorientAction)));

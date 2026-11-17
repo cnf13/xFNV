@@ -457,7 +457,7 @@ void NiLookAtInterpolator::SetRollInterpolator(NiInterpolator* pkInterp) {
     else {
         if (m_pObject) {
             NiDecRefCount(m_pObject);
-            m_aspInterpolators[1].m_pObject = 0;
+            m_aspInterpolators[1].m_pObject = nullptr;
         }
     }
 }

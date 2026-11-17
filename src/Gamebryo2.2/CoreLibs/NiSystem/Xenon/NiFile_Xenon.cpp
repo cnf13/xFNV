@@ -18,7 +18,7 @@ static ReadErrorFunc spReadErrorFunc{};
 namespace OEI {
     uint32_t OEI::IO::fread(void* the_buffer, uint32_t the_block_count, uint32_t the_size, std::FILE* the_file) {
         OEI::IO::IO_Request new_request;
-        new_request.m_wait_handle = 0;
+        new_request.m_wait_handle = nullptr;
         new_request.m_eType = OEI::IO::IRT_READ;
         new_request.m_pFile = the_file;
         new_request.m_pMemory = the_buffer;
@@ -29,7 +29,7 @@ namespace OEI {
 
     uint32_t OEI::IO::fwrite(const void* the_buffer, uint32_t the_block_count, uint32_t the_size, std::FILE* the_file) {
         OEI::IO::IO_Request new_request;
-        new_request.m_wait_handle = 0;
+        new_request.m_wait_handle = nullptr;
         new_request.m_eType = OEI::IO::IRT_WRITE;
         new_request.m_pFile = the_file;
         // The request's buffer serves reads too, while fwrite takes it as const, hence the const_cast.
@@ -41,8 +41,8 @@ namespace OEI {
 
     int32_t OEI::IO::fseek(std::FILE* the_file, int32_t the_offset, OEI::IO::Seek_Whence_Type the_whence) {
         OEI::IO::IO_Request new_request;
-        new_request.m_pMemory = 0;
-        new_request.m_wait_handle = 0;
+        new_request.m_pMemory = nullptr;
+        new_request.m_wait_handle = nullptr;
         new_request.m_eType = OEI::IO::IRT_SEEK;
         new_request.m_pFile = the_file;
         new_request.m_eWhence = the_whence;
@@ -203,9 +203,9 @@ bool NiFile::DefaultCreateDirectoryFunc(const char* pcDirName) {
 
 void OEI::IO::terminate() {
     OEI::IO::IO_Request exit_request;
-    exit_request.m_pFile = 0;
-    exit_request.m_pMemory = 0;
-    exit_request.m_wait_handle = 0;
+    exit_request.m_pFile = nullptr;
+    exit_request.m_pMemory = nullptr;
+    exit_request.m_wait_handle = nullptr;
     exit_request.m_eType = OEI::IO::IRT_QUIT;
     OEI::IO::add_work_item_to_queue(exit_request);
     BSSemaphore* lpAddend = s_worker_thread_done;
@@ -215,37 +215,37 @@ void OEI::IO::terminate() {
     if (s_thread_0) {
         delete s_thread_0;
     }
-    s_thread_0 = 0;
+    s_thread_0 = nullptr;
     if (s_wait_handles) {
         delete[] s_wait_handles;
     }
-    s_wait_handles = 0;
+    s_wait_handles = nullptr;
     if (s_wait_handle_queue) {
         delete s_wait_handle_queue;
     }
-    s_wait_handle_queue = 0;
+    s_wait_handle_queue = nullptr;
     if (s_work_item_queue) {
         delete s_work_item_queue;
     }
-    s_work_item_queue = 0;
+    s_work_item_queue = nullptr;
     BSCriticalSection* lpCriticalSection = s_queue_lock;
     if (s_queue_lock) {
         DeleteCriticalSection(&s_queue_lock->CriticalSection);
         MemoryManager_Singleton.Deallocate(lpCriticalSection);
     }
-    s_queue_lock = 0;
+    s_queue_lock = nullptr;
     BSSemaphore* Block = s_worker_thread_done;
     if (s_worker_thread_done) {
         delete s_worker_thread_done->hSemaphore;
         MemoryManager_Singleton.Deallocate(Block);
     }
-    s_worker_thread_done = 0;
+    s_worker_thread_done = nullptr;
     BSSemaphore* apMem = s_event_sema;
     if (s_event_sema) {
         delete s_event_sema->hSemaphore;
         MemoryManager_Singleton.Deallocate(apMem);
     }
-    s_event_sema = 0;
+    s_event_sema = nullptr;
 }
 
 void OEI::IO::initialize() {
@@ -265,7 +265,7 @@ void OEI::IO::initialize() {
         v6 = v21;
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     s_event_sema = v6;
     BSSemaphore* v19 = static_cast<BSSemaphore*>(MemoryManager_Singleton.Allocate(sizeof(BSSemaphore)));
@@ -277,7 +277,7 @@ void OEI::IO::initialize() {
         v5 = v19;
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     s_worker_thread_done = v5;
     BSCriticalSection* lpCriticalSection =
@@ -287,7 +287,7 @@ void OEI::IO::initialize() {
         v4 = lpCriticalSection;
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     s_queue_lock = v4;
     BSList<OEI::IO::IO_Request*>* v15 = static_cast<BSList<OEI::IO::IO_Request*>*>(
@@ -297,7 +297,7 @@ void OEI::IO::initialize() {
         v3 = ::new (v15) BSList<OEI::IO::IO_Request*>;
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     s_work_item_queue = v3;
     BSList<BSSemaphore*>* v13 =
@@ -306,7 +306,7 @@ void OEI::IO::initialize() {
         v2 = ::new (v13) BSList<BSSemaphore*>;
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     s_wait_handle_queue = v2;
     s_wait_handles = new BSSemaphore[32];
@@ -320,8 +320,8 @@ void OEI::IO::initialize() {
         v0 = ::new (apMemory) OEI::IO::IO_Thread;
     }
     else {
-        v0 = 0;
+        v0 = nullptr;
     }
     s_thread_0 = v0;
-    s_thread_0->Initialize(BSThread::SMALL_STACK_SIZE, "Serialized IO Thread", 0);
+    s_thread_0->Initialize(BSThread::SMALL_STACK_SIZE, "Serialized IO Thread", false);
 }

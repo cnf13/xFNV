@@ -83,11 +83,11 @@ FastNavMeshEdgeHandle* FastNavMeshEdgeHandle::Copy(const FastNavMeshEdgeHandle& 
 
 // The arrays are emptied first and the info record forgets the navmesh; the compiler destroys the members and bases.
 NavMesh::~NavMesh() {
-    Vertices.Clear(1);
-    Triangles.Clear(1);
-    ExtraEdgeInfo.Clear(1);
-    DoorPortals.Clear(1);
-    CoverArray.Clear(1);
+    Vertices.Clear(true);
+    Triangles.Clear(true);
+    ExtraEdgeInfo.Clear(true);
+    DoorPortals.Clear(true);
+    CoverArray.Clear(true);
     MeshGrid.Clear();
     if (pNavMeshInfo) {
         pNavMeshInfo->SetNavMesh(nullptr);
@@ -170,7 +170,7 @@ bool NavMesh::ReconnectEnabledPortals() {
         }
         ++i_2;
     }
-    return 1;
+    return true;
 }
 
 uint32_t NavMesh::GetUndoDataIndexForObstacle(const NiPointer<ObstacleData>& apObstacle) {
@@ -186,7 +186,7 @@ uint32_t
 NavMesh::GetUndoDataIndexForObstacle(const NiPointer<ObstacleData>& apObstacle, ObstacleUndoData** apOutUndoData) {
     uint32_t i = GetUndoDataIndexForObstacle(apObstacle);
     if (i == -1) {
-        *apOutUndoData = 0;
+        *apOutUndoData = nullptr;
         return -1;
     }
     else {
@@ -257,7 +257,7 @@ bool NavMesh::RemoveObstacle(uint32_t aiUndoIndex, TaskPortalSwap& aPortalSwaps)
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool NavMesh::RemoveObstacle(const NiPointer<ObstacleData>& apObstacle, TaskPortalSwap& aPortalSwaps) {
@@ -270,7 +270,7 @@ bool NavMesh::RemoveObstacle(const NiPointer<ObstacleData>& apObstacle, TaskPort
 // them qualifies gets a POV, then each triangle records its closest POV within reach.
 void NavMesh::CreatePOVs() {
     POVs.RemoveAll();
-    ClosestPOVs.Clear(1);
+    ClosestPOVs.Clear(true);
     using VertexMap_t = NiTMap<FastNavMeshVertHandle, POVVertexData*>;
     VertexMap_t VertexMap(37u);
     FastNavMeshVertHandle key;
@@ -726,7 +726,7 @@ bool NavMesh::AddTrianglesToGrid(uint16_t ausFirstTriangleIndex, uint16_t ausLas
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool NavMesh::RemoveTrianglesFromGrid(uint16_t ausFirstTriangleIndex, uint16_t ausLastTriangleIndex) {
@@ -771,7 +771,7 @@ bool NavMesh::RemoveTrianglesFromGrid(uint16_t ausFirstTriangleIndex, uint16_t a
             }
         }
     }
-    return 1;
+    return true;
 }
 
 void NavMesh::RemoveObstacleUndoData(uint32_t aiUndoDataIndex) {
@@ -1072,11 +1072,11 @@ void NavMesh::GetOverlappedTriangleList(
                             if (Pathing::DoAABBsOverlap(
                                     apObstacle.m_pObject->aabbMin - afFudge, *x, wtriMin, wtriMax
                                 )) {
-                                bool bOverlap = 0;
+                                bool bOverlap = false;
                                 if (NavMeshObstacleManager::IsPointInBox(
                                         GetCenter(parray->GetAt(i)), apObstacle, fzheight, 128.0f
                                     )) {
-                                    bOverlap = 1;
+                                    bOverlap = true;
                                 }
                                 else {
                                     float fdontCare;
@@ -1084,7 +1084,7 @@ void NavMesh::GetOverlappedTriangleList(
                                     if (IsPointInsideTriangle(
                                             parray->GetAt(i), *p_Center, fdontCare, fzheight, 128.0f
                                         )) {
-                                        bOverlap = 1;
+                                        bOverlap = true;
                                     }
                                     else {
                                         for (uint32_t triv = 0; triv < 3; ++triv) {
@@ -1110,7 +1110,7 @@ void NavMesh::GetOverlappedTriangleList(
                                                 NiPoint3 box1 = cornersLocalSpace[boxv];
                                                 NiPoint3 box2 = cornersLocalSpace[boxw];
                                                 if (NavMeshMath::Find2DIntersection3(vert1, vert2, box1, box2)) {
-                                                    bOverlap = 1;
+                                                    bOverlap = true;
                                                     break;
                                                 }
                                             }
@@ -1250,7 +1250,7 @@ EdgeExtraInfo* NavMesh::SetEmptyEdgeExtraInfo(uint16_t aTriangle, int32_t aEdgeI
         pEdgeInfo = GetEdgeExtraInfo(aTriangle, aEdgeIndex);
     }
     pEdgeInfo->Portal.pOtherMesh = nullptr;
-    pEdgeInfo->Portal.sTriangle = (uint16_t)((-1));
+    pEdgeInfo->Portal.sTriangle = (uint16_t)(-1);
     return pEdgeInfo;
 }
 
@@ -1265,7 +1265,7 @@ bool NavMesh::IsPointInsideTriangle_0(uint16_t a1, const NiPoint3* a2, float a3,
     float v18 = (v11->Location.x - Vertex->Location.x) * (v16->Location.y - Vertex->Location.y) -
         (v16->Location.x - Vertex->Location.x) * (v11->Location.y - Vertex->Location.y);
     if (v18 == 0.0) {
-        return 0;
+        return false;
     }
     float v14 = v11->Location.x - a2->x;
     float v15 = v16->Location.x - a2->x;
@@ -1274,17 +1274,17 @@ bool NavMesh::IsPointInsideTriangle_0(uint16_t a1, const NiPoint3* a2, float a3,
     float v22 = 1.0 / v18;
     float v23 = (v14 * v25 - v15 * v13) * v22;
     if (v23 < 0.0) {
-        return 0;
+        return false;
     }
     float v17 = Vertex->Location.x - a2->x;
     float v26 = Vertex->Location.y - a2->y;
     float v21 = (v15 * v26 - v17 * v25) * v22;
     if (v21 < 0.0) {
-        return 0;
+        return false;
     }
     float v19 = (v17 * v13 - v14 * v26) * v22;
     if (v19 < 0.0) {
-        return 0;
+        return false;
     }
     *a5 = v23 * Vertex->Location.z + v21 * v11->Location.z + v19 * v16->Location.z;
     float v20 = a2->z - *a5;
@@ -1381,11 +1381,11 @@ bool NavMesh::FindClosestOpenEdgeForLocation(
         }
     }
     if (v21 == -1) {
-        return 0;
+        return false;
     }
     *apRetTriIndex = v20;
     *apRetEdgeIndex = v21;
-    return 1;
+    return true;
 }
 
 void NavMesh::GetCircumCenter2D(uint16_t apTriangle, NiPoint3& aOut) {
@@ -1413,7 +1413,7 @@ void NavMesh::GetCircumCenter2D(uint16_t apTriangle, NiPoint3& aOut) {
 }
 
 bool NavMesh::FindPortalTriangles(const NavMeshInfo* apNavMeshInfo, BSSimpleArray<int32_t, 1024>* apReturnArray) {
-    apReturnArray->SetSize(0, 1);
+    apReturnArray->SetSize(0, true);
     apReturnArray->SetReservedSize(100u);
     for (uint32_t i = 0;; ++i) {
         uint32_t FormFlags = Triangles.iSize;
@@ -1444,24 +1444,24 @@ bool NavMesh::ComputeNavMeshZForLocation(
     float& afZCoord
 ) {
     const BSSimpleArray<uint16_t, 1024>* ptriArray;
-    ptriArray = 0;
+    ptriArray = nullptr;
     MeshGrid.GetTriangleData(aLocation, ptriArray);
     if (!ptriArray) {
-        return 0;
+        return false;
     }
     uint32_t inum = ptriArray->iSize;
     for (uint32_t i = 0; i < inum; ++i) {
         if (IsPointInsideTriangle_0(ptriArray->GetAt(i), &aLocation, afMaxZdistAbove, afMaxZdistBelow, &afZCoord)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 bool NavMesh::FindRandomPointWithinRadius(const NiPoint3& aStartLocation, float aRadius, NiPoint3* apRet1) {
     NiPoint3 apResult;
     NiPoint3 result;
-    bool IsPointInsideNavmesh = 0;
+    bool IsPointInsideNavmesh = false;
     NiPoint3 aLocation = NiPoint3_ZERO;
     for (uint32_t i = 0; i < 8 && !IsPointInsideNavmesh; ++i) {
         float a1 = -aRadius;
@@ -1473,21 +1473,21 @@ bool NavMesh::FindRandomPointWithinRadius(const NiPoint3& aStartLocation, float 
         aLocation.x = v13;
         aLocation.y = v12;
         NiPoint3* v4 = &(result = aLocation + aStartLocation);
-        IsPointInsideNavmesh = this->IsPointInsideNavmesh(*v4, 0);
+        IsPointInsideNavmesh = this->IsPointInsideNavmesh(*v4, nullptr);
     }
     if (!IsPointInsideNavmesh) {
-        return 0;
+        return false;
     }
     aLocation.operator+=(aStartLocation);
     *apRet1 = *MoveAwayFromEdge(&apResult, aLocation, 64.0f);
-    return 1;
+    return true;
 }
 
 NiPoint3* NavMesh::MoveAwayFromEdge(NiPoint3* apResult, const NiPoint3& aLocation, float afDistance) {
     NiPoint3 triangleNormal_2;
     NiPoint3 triangleNormal;
     NiPoint3 retLoc = aLocation;
-    uint16_t usTri = FindTriangleForLocation(aLocation, 0);
+    uint16_t usTri = FindTriangleForLocation(aLocation, nullptr);
     if (usTri != 0xFFFF) {
         uint16_t v28[4];
         uint16_t isize = 0;
@@ -1668,14 +1668,14 @@ bool NavMesh::RemoveClosedDoor(uint32_t aiDoorID) {
             ClosedDoors.RemoveFast(i--, 1u);
         }
     }
-    return 1;
+    return true;
 }
 
 uint32_t NavMesh::GetPOVsForTriangle(uint16_t ausTriangle, BSSimpleArray<uint16_t, 1024>& aRetPOVs) {
     if (POVs.IsEmpty()) {
         CreatePOVs();
     }
-    aRetPOVs.Clear(0);
+    aRetPOVs.Clear(false);
     uint32_t itotal = 0;
     NavMeshTriangle* ptri = GetTriangle(ausTriangle);
     for (int32_t i = 0; i < 3; ++i) {
@@ -1695,7 +1695,7 @@ uint32_t NavMesh::GetPOVsForTriangle(uint16_t ausTriangle, BSSimpleArray<uint16_
 }
 
 uint32_t NavMesh::GetObstaclePOVsForTriangle(uint16_t ausTriangle, BSSimpleArray<uint16_t, 1024>& aRetObstaclePOVs) {
-    aRetObstaclePOVs.Clear(0);
+    aRetObstaclePOVs.Clear(false);
     uint32_t itotal = 0;
     NavMeshTriangle* ptri = GetTriangle(ausTriangle);
     for (int32_t i = 0; i < 3; ++i) {
@@ -1750,7 +1750,7 @@ void NavMesh::FixPortalsFromNavMeshDeletion(NavMeshInfo* apNavmeshInfo) {
                     }
                     if (spnavmesh.operator NavMesh*()) {
                         NavMesh* Object = spnavmesh.m_pObject;
-                        Object->SetAltered(1);
+                        Object->SetAltered(true);
                         for (uint32_t e = 0; e < spnavmesh.m_pObject->ExtraEdgeInfo.GetSize(); ++e) {
                             EdgeExtraInfo* pinfo_2 = spnavmesh.m_pObject->GetExtraEdgeInfo(e);
                             if (pinfo_2->Portal.pOtherMesh == apNavmeshInfo) {
@@ -1759,11 +1759,11 @@ void NavMesh::FixPortalsFromNavMeshDeletion(NavMeshInfo* apNavmeshInfo) {
                         }
                     }
                     if (p >= isize) {
-                        pinfo->PreferredAdjacentNavMeshes.Remove(p - isize, 1);
+                        pinfo->PreferredAdjacentNavMeshes.Remove(p - isize, true);
                         --iprefferedsize;
                     }
                     else {
-                        pinfo->AdjacentNavMeshes.Remove(p, 1);
+                        pinfo->AdjacentNavMeshes.Remove(p, true);
                         --isize;
                     }
                     --p;

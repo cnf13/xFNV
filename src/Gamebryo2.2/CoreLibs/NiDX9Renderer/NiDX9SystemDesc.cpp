@@ -117,7 +117,7 @@ NiDX9Renderer::DepthStencilFormat NiDX9DeviceDesc::DisplayFormatInfo::FindCloses
     uint32_t uiDesiredDepthBPP,
     uint32_t uiDesiredStencilBPP
 ) {
-    RenderTargetInfo* pkRenderTarget = 0;
+    RenderTargetInfo* pkRenderTarget = nullptr;
     if (!m_kRenderTargets.GetAt(uiStencil, pkRenderTarget)) {
         return NiDX9Renderer::DSFMT_UNKNOWN;
     }
@@ -442,8 +442,8 @@ const NiDX9AdapterDesc::ModeDesc* NiDX9AdapterDesc::ValidateFullscreenMode(
     uint32_t auiHeight,
     uint32_t& aruiRefreshRate
 ) const {
-    NiDX9AdapterDesc::ModeDesc* result = 0;
-    NiDX9AdapterDesc::ModeDesc* v7 = 0;
+    NiDX9AdapterDesc::ModeDesc* result = nullptr;
+    NiDX9AdapterDesc::ModeDesc* v7 = nullptr;
     uint32_t v8 = 0;
     if (m_kModeList.m_usSize) {
         do {
@@ -488,7 +488,7 @@ D3DCAPS9* NiDX9AdapterDesc::GetDeviceCaps(D3DDEVTYPE aeDevType) {
         return &Device->m_kD3DCaps9;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -509,7 +509,7 @@ NiDX9SystemDesc::~NiDX9SystemDesc() {
 
 NiDX9AdapterDesc* NiDX9SystemDesc::GetAdapter(uint32_t a2) {
     if (a2 >= m_kAdapterList.m_usSize) {
-        return 0;
+        return nullptr;
     }
     else {
         return m_kAdapterList.operator[](a2);
@@ -566,7 +566,7 @@ NiDX9SystemDesc* NiDX9SystemDesc::Get() {
                     pkD3D9->Release();
                     return NiDX9Renderer::ms_pkSystemDesc;
                 }
-                NiDX9Renderer::ms_pkSystemDesc = 0;
+                NiDX9Renderer::ms_pkSystemDesc = nullptr;
                 pkD3D9->Release();
             }
         }

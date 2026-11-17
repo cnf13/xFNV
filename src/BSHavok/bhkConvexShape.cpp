@@ -62,7 +62,7 @@ void bhkConvexShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
     char* pcString = NiGetViewerString(bhkConvexShape::ms_RTTI.GetName());
     apStrings->Add(pcString);
     float fRadius;
-    if (this && (phkObject = static_cast<hkpConvexShape*>(this->phkObject)) != 0) {
+    if (this && (phkObject = static_cast<hkpConvexShape*>(this->phkObject)) != nullptr) {
         fRadius = phkObject->m_radius;
     }
     else {
@@ -82,7 +82,7 @@ bhkConvexShape::~bhkConvexShape() {
 void bhkConvexShape::CopyCinfo(hkConvexShapeCinfo& arInfo) {
     hkReferencedObject* phkObject;
     bhkShape::CopyCinfo(arInfo);
-    if (this && (phkObject = this->phkObject) != 0) {
+    if (this && (phkObject = this->phkObject) != nullptr) {
         arInfo.m_radius = static_cast<hkpConvexShape*>(phkObject)->m_radius;
     }
     else {

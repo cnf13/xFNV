@@ -52,7 +52,7 @@
 #include "Reconstruction.hpp"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<INISettingCollection>
@@ -79,7 +79,7 @@ void PlayTerminalShutdownSound() {
             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT
         )
     );
-    SoundHandleByName->Play(0);
+    SoundHandleByName->Play(false);
 }
 
 FORenderedTerminal::FORenderedTerminal() : FORenderedMenu(), spExitButton(nullptr) {}
@@ -96,10 +96,10 @@ void FORenderedTerminal::Draw(
     NiNode* SynchTime = static_cast<NiNode*>(GetMenuRoot());
     if (SynchTime) {
         SynchTime->SetTranslate(OriginalPos);
-        NiUpdateData a2(0.0, 0, 0);
+        NiUpdateData a2(0.0, false, false);
         SynchTime->Update(a2);
     }
-    FORenderedMenu::Draw(apTarget, NiRenderer::CLEAR_BACKBUFFER, 0);
+    FORenderedMenu::Draw(apTarget, NiRenderer::CLEAR_BACKBUFFER, nullptr);
 }
 
 bool FORenderedTerminal::OnIdle() {
@@ -110,8 +110,8 @@ bool FORenderedTerminal::OnIdle() {
             ((v1 = FORenderedTerminal::spGeometry.m_pObject, !static_cast<uint8_t>(v1->QFadingFlag())) ||
              (v2 = FORenderedTerminal::spGeometry.m_pObject, fLastFadePercent == v2->GetLastFadePercent()))) {
             InterfaceManager* v3 = InterfaceManager::Instance();
-            v3->EnterRenderedMenu(0);
-            return 1;
+            v3->EnterRenderedMenu(nullptr);
+            return true;
         }
         BSFadeNode* v5 = FORenderedTerminal::spGeometry.m_pObject;
         fLastFadePercent = v5->GetLastFadePercent();
@@ -130,19 +130,19 @@ bool FORenderedTerminal::Pick(bool abPressed, float* apX, float* apY) {
             Camera = Main::GetWorldSceneGraph()->GetCamera();
         }
         NiPick apMemory(0, 8u);
-        apMemory.SetObserveAppCullFlag(0);
+        apMemory.SetObserveAppCullFlag(false);
         apMemory.SetTarget(spExitButton.m_pObject);
         apMemory.m_eSortType = NiPick::NO_SORT;
         int32_t ScriptProcessingDelay = static_cast<int32_t>(v15->sRealCursorPos.z);
         double DataClipDist = v15->sRealCursorPos.x;
-        Camera->WindowPointToRay(static_cast<int32_t>(DataClipDist), ScriptProcessingDelay, a1, a2, 0);
-        if (apMemory.PickObjects(a1, a2, 0)) {
+        Camera->WindowPointToRay(static_cast<int32_t>(DataClipDist), ScriptProcessingDelay, a1, a2, nullptr);
+        if (apMemory.PickObjects(a1, a2, false)) {
             NiPick::Record* v9 = (&apMemory.m_pickResults)->GetAt(0);
             if (v9) {
                 NiTriStrips* AVObject = static_cast<NiTriStrips*>(v9->GetAVObject());
                 if (AVObject == spExitButton.m_pObject) {
                     CloseMenu();
-                    return 0;
+                    return false;
                 }
             }
         }
@@ -154,7 +154,7 @@ void FORenderedTerminal::Unknown07() {
     NiNode* SynchTime = static_cast<NiNode*>(GetMenuRoot());
     if (SynchTime) {
         SynchTime->SetTranslate(OriginalPos);
-        NiUpdateData a2(0.0, 0, 0);
+        NiUpdateData a2(0.0, false, false);
         SynchTime->Update(a2);
     }
 }
@@ -163,7 +163,7 @@ void FORenderedTerminal::PostDraw() {
     NiNode* MenuRoot = static_cast<NiNode*>(GetMenuRoot());
     if (MenuRoot) {
         MenuRoot->SetTranslate(30490.0f, 0.0f, 0.0f);
-        NiUpdateData arData(0.0f, 0, 0);
+        NiUpdateData arData(0.0f, false, false);
         MenuRoot->Update(arData);
     }
 }
@@ -183,17 +183,18 @@ void FORenderedTerminal::Initialize() {
     NiMatrix3 mat1;
     NiRect<float> port;
     float* v1 = &fRenderedTerminalScanlineScale.Float();
-    SetDoScanlines(1, *v1);
-    bool bloaded = 0;
-    BSFadeNode* pgeom = 0;
+    SetDoScanlines(true, *v1);
+    bool bloaded = false;
+    BSFadeNode* pgeom = nullptr;
     if (FORenderedTerminal::spGeometry.m_pObject) {
         pgeom = FORenderedTerminal::spGeometry.m_pObject;
     }
     else {
-        pgeom = static_cast<BSFadeNode*>(pModelLoader->LoadFile(pTerminalFile, LOD_MULT_NONE, 1, 0, 0, 0));
+        pgeom =
+            static_cast<BSFadeNode*>(pModelLoader->LoadFile(pTerminalFile, LOD_MULT_NONE, true, false, false, false));
         FORenderedTerminal::spGeometry.operator=(pgeom);
         SwapPlatformLanguageTextures(pgeom);
-        bloaded = 1;
+        bloaded = true;
     }
     NiFixedString* a5 = ::new (static_cast<void*>(&apString)) NiFixedString("screen");
     NiAVObject* pscreenObj = pgeom->GetObjectByName(*a5);
@@ -224,14 +225,14 @@ void FORenderedTerminal::Initialize() {
     float fRenderedTerminalHPos = ::fRenderedTerminalHPos.Float();
     float* v5 = &fRenderedTerminalVPos.Float();
     pgeom->SetTranslate(fzoom, *v5, fRenderedTerminalHPos);
-    NiUpdateData UpdateData1(0.0f, 0, 0);
+    NiUpdateData UpdateData1(0.0f, false, false);
     pgeom->Update(UpdateData1);
     NiCamera* apMemory = static_cast<NiCamera*>(NiMemObject::operator new(sizeof(NiCamera)));
     if (apMemory) {
         pcam = ::new (apMemory) NiCamera;
     }
     else {
-        pcam = 0;
+        pcam = nullptr;
     }
     ::new (&port) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     pcam->SetViewPort(port);
@@ -240,7 +241,7 @@ void FORenderedTerminal::Initialize() {
     rot.SetRow(2u, 0.0f, 1.0f, 0.0f);
     pcam->SetRotate(NiMatrix3_IDENTITY);
     pcam->SetMinNearPlaneDist(1.0f);
-    NiFrustum fr(0);
+    NiFrustum fr(false);
     SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
     fr.m_fFar = WorldSceneGraph->GetFarDistance();
     fr.m_fNear = BSSceneGraph::fNearDistance.Float();
@@ -264,9 +265,9 @@ void FORenderedTerminal::Initialize() {
     fr.m_fBottom = -v8 * fHeightByWidth * faspectDelta;
     double v9 = std::tan(theta);
     fr.m_fTop = v9 * fHeightByWidth * faspectDelta;
-    fr.m_bOrtho = 0;
+    fr.m_bOrtho = false;
     pcam->SetViewFrustum(fr);
-    NiUpdateData UpdateData2(0.0f, 0, 0);
+    NiUpdateData UpdateData2(0.0f, false, false);
     pcam->Update(UpdateData2);
     PrepareGeometry(pscreen);
     SetScreenGeometry(pscreen);
@@ -278,7 +279,7 @@ void FORenderedTerminal::Initialize() {
         v17 = ::new (v27) NiAlphaProperty;
     }
     else {
-        v17 = 0;
+        v17 = nullptr;
     }
     pscreen->AttachProperty(v17);
     SetCamera(pcam);
@@ -291,7 +292,7 @@ void FORenderedTerminal::Initialize() {
     if (!ShadowSceneNode_->AddAllLightsFromNode_Recurse(pgeom, fradius)) {
         InitLight();
     }
-    SetScreenTexture(0);
+    SetScreenTexture(nullptr);
     bPulseAffectsLight = 0;
     FORenderedTerminal::spGeometry.m_pObject->SetLODMultType(LOD_MULT_RENDEREDMENU);
     NiColorA newcolor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -306,25 +307,25 @@ void FORenderedTerminal::OnMenuOpen() {
     NiAVObject* pscreenParent = FORenderedMenu::GetParentNodeToRender();
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
     ShadowSceneNode_->AttachChild(FORenderedMenu::GetParentNodeToRender(), 1);
-    NiUpdateData foo(0.0f, 0, 0);
+    NiUpdateData foo(0.0f, false, false);
     pscreenParent->Update(foo);
     if (GetMenuLight()) {
-        GetMenuLight()->SetAppCulled(0);
+        GetMenuLight()->SetAppCulled(false);
     }
     FORenderedMenu::OnMenuOpen();
-    bFadingOut = 0;
+    bFadingOut = false;
     fLastFadePercent = 0.0f;
     if (FORenderedTerminal::spGeometry.m_pObject) {
         FORenderedTerminal::spGeometry.m_pObject->SetRange(100000.0f, 100000.0f);
         FORenderedTerminal::spGeometry.m_pObject->TurnFadeNodeOff();
-        FORenderedTerminal::spGeometry.m_pObject->SetFadingFlag(0);
+        FORenderedTerminal::spGeometry.m_pObject->SetFadingFlag(false);
     }
 }
 
 void FORenderedTerminal::OnMenuClose() {
     if (GetMenuLight()) {
-        GetMenuLight()->SetAppCulled(1);
-        NiUpdateData foo(0.0f, 0, 0);
+        GetMenuLight()->SetAppCulled(true);
+        NiUpdateData foo(0.0f, false, false);
         GetMenuLight()->Update(foo);
     }
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
@@ -338,9 +339,9 @@ void FORenderedTerminal::CloseMenu() {
     if (Count) {
         delete Count;
     }
-    pMenuTile = 0;
+    pMenuTile = nullptr;
     InterfaceManager* v1 = InterfaceManager::Instance();
-    v1->EnterRenderedMenu(0);
+    v1->EnterRenderedMenu(nullptr);
 }
 
 void FORenderedTerminal::FadeOut() {
@@ -353,7 +354,7 @@ void FORenderedTerminal::FadeOut() {
         v1->SetRange(0.0, 0.0);
         LOD::iFadeNodeMinNearDistance::Set(iFadeNodeMinNearDistance);
     }
-    bFadingOut = (bool)1;
+    bFadingOut = true;
     fLastFadePercent = (float)1.0;
 }
 
@@ -380,7 +381,7 @@ void FORenderedTerminal::InitLight() {
             SetScreenLightColor(screenLightColor);
             SetScreenLightBaseIntensity(g_fScreenLightBaseIntensity_RenderedTerminal.Float());
             SetScreenLightFlickerIntensity(1.0f);
-            NiUpdateData foo(0.0f, 0, 0);
+            NiUpdateData foo(0.0f, false, false);
             plight->Update(foo);
         }
     }
@@ -393,7 +394,7 @@ void FORenderedTerminal::ReleaseStaticGeometry() {
     BSFadeNode* vCondition1;
     vCondition1 = (&FORenderedTerminal::spGeometry)->operator->();
     if (vCondition1) {
-        pModelLoader->ReleaseModel(pTerminalFile, 1, 1);
+        pModelLoader->ReleaseModel(pTerminalFile, true, 1);
     }
     (&FORenderedTerminal::spGeometry)->operator=(nullptr);
 }

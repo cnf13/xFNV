@@ -253,8 +253,8 @@ TESDataHandler::TESDataHandler()
     bDontRemoveIDs(false), ucGameSettingsLoadState(0), pRegionDataManager(nullptr), pBarterContainer(nullptr),
     pRecipeContainer(nullptr), pSpotterShader(nullptr), pItemDetectedShader(nullptr), pCateyeMobileShader(nullptr) {
     ourMemset(pFileIndex, 0, sizeof(pFileIndex));
-    pObjectList = new TESObjectList(1);
-    pRegionList = new TESRegionList(1);
+    pObjectList = new TESObjectList(true);
+    pRegionList = new TESRegionList(true);
     arrayInteriorCells.m_usGrowBy = 100;
     pRegionDataManager = new TESRegionDataManager();
     pIdleManager = new TESIdleManager();
@@ -523,18 +523,18 @@ void TESDataHandler::UnloadCell(TESObjectCELL* apCell) {
     uint8_t v5;
     if (apCell) {
         if (!apCell->GetDelete()) {
-            BSTaskThread::SetPauseSleepEnabled(1);
+            BSTaskThread::SetPauseSleepEnabled(true);
             v5 = 0;
             if (pSaveLoadGame->GetSaveGameLoading()) {
-                v5 = (uint8_t)pSaveLoadGame->SetThreadAllowChanges(0);
+                v5 = (uint8_t)pSaveLoadGame->SetThreadAllowChanges(false);
             }
-            apCell->Detach(1);
+            apCell->Detach(true);
             (&ReferenceProcessLists)->RemoveTempEffectsForCell(apCell);
             apCell->SetState(TESObjectCELL::CS_UNLOADING);
             apCell->UnLoadAllTempData();
             apCell->ClearReference3D();
             while (apCell->GetLowestProcessMiddleLow()) {
-                apCell->SetLowestProcessToMiddleLow(0);
+                apCell->SetLowestProcessToMiddleLow(false);
             }
             if (!pDataHandler->GetClearingData()) {
                 isSleepingorResting = (uint8_t)pPlayer->IsSleepingorResting();
@@ -545,7 +545,7 @@ void TESDataHandler::UnloadCell(TESObjectCELL* apCell) {
                 land->UnLoadVertices();
             }
             apCell->Clear3D();
-            apCell->SetAutoWaterLoaded(0);
+            apCell->SetAutoWaterLoaded(false);
             if (!apCell->GetInterior()) {
                 worldSpace = apCell->GetWorldSpace();
                 worldSpace->UnLoadCell(apCell);
@@ -553,7 +553,7 @@ void TESDataHandler::UnloadCell(TESObjectCELL* apCell) {
             if (pSaveLoadGame->GetSaveGameLoading()) {
                 pSaveLoadGame->SetThreadAllowChanges(v5);
             }
-            BSTaskThread::SetPauseSleepEnabled(0);
+            BSTaskThread::SetPauseSleepEnabled(false);
         }
     }
 }
@@ -1156,7 +1156,7 @@ bool TESDataHandler::CompileFiles(bool abDownloadedContentOnly) {
         }
         char acName[260];
         BSstrcpy(acName, 260, pFileIndex[i]->GetFilename());
-        char* pExtension = const_cast<char*>(std::strrchr(acName, '.'));
+        char* pExtension = std::strrchr(acName, '.');
         if (pExtension) {
             *pExtension = '\0';
         }
@@ -1676,29 +1676,29 @@ TESObjectCELL* TESDataHandler::GetCellByEditorID(const char* apEditorID) {
 TESObjectCELL* TESDataHandler::NewCell(const char* apName, int32_t aiX, int32_t aiY, TESWorldSpace* apWorldSpace) {
     TESObjectCELL* pCell_2;
     if (!apWorldSpace) {
-        return 0;
+        return nullptr;
     }
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_CELLS, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESDataHandler.cpp", 2013
+        MEM_CONTEXT_CELLS, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESDataHandler.cpp", 2013
     );
     TESObjectCELL* pCell = static_cast<TESObjectCELL*>(ourMalloc(sizeof(TESObjectCELL)));
     if (pCell) {
         pCell_2 = ::new (pCell) TESObjectCELL;
     }
     else {
-        pCell_2 = 0;
+        pCell_2 = nullptr;
     }
     TESObjectCELL* pCell_3 = pCell_2;
     uint32_t CastingType = apWorldSpace->iFormID;
     uint32_t icellID = pSaveLoadGameOLD->GetCreatedExteriorCellFormID(CastingType, aiX, aiY);
     if (icellID) {
-        pCell_3->SetFormID(icellID, 1);
+        pCell_3->SetFormID(icellID, true);
     }
     if (apName) {
         pCell_3->SetFormEditorID(apName);
     }
     uint8_t v13 = 0;
-    pCell_3->SetInterior(0);
+    pCell_3->SetInterior(false);
     v13 |= 2u;
     pCell_3->cCellFlags = v13;
     pCell_3->CreateCellData();
@@ -1710,7 +1710,7 @@ TESObjectCELL* TESDataHandler::NewCell(const char* apName, int32_t aiX, int32_t 
         if (pCell_3) {
             delete pCell_3;
         }
-        pCell_3 = 0;
+        pCell_3 = nullptr;
     }
     return pCell_3;
 }
@@ -1718,16 +1718,17 @@ TESObjectCELL* TESDataHandler::NewCell(const char* apName, int32_t aiX, int32_t 
 TESWorldSpace*
 TESDataHandler::GetExtCellDataFromFileByEditorID(const char* apCellID, int32_t& aiOutX, int32_t& aiOutY) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_MASTER_FILE, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESDataHandler.cpp", 4161
+        MEM_CONTEXT_MASTER_FILE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESDataHandler.cpp",
+        4161
     );
-    TESWorldSpace* pcellworld = 0;
+    TESWorldSpace* pcellworld = nullptr;
     aiOutX = 0;
     aiOutY = 0;
     if (apCellID && *apCellID) {
-        bool boptimized = 0;
+        bool boptimized = false;
         for (int32_t i = 0; i < iNumCompile; ++i) {
             if (pFileIndex[i] && pFileIndex[i]->GetOptimizedFile()) {
-                boptimized = 1;
+                boptimized = true;
                 break;
             }
         }
@@ -1745,35 +1746,35 @@ TESDataHandler::GetExtCellDataFromFileByEditorID(const char* apCellID, int32_t& 
         else {
             for (int32_t i_2 = 0; i_2 < iNumCompile; ++i_2) {
                 TESFile* pfile = pFileIndex[i_2];
-                if (pfile && pfile->OpenTES(NiFile::READ_ONLY, 0)) {
+                if (pfile && pfile->OpenTES(NiFile::READ_ONLY, false)) {
                     FORM* pFORM = pfile->GetFormData();
-                    bool bfound = 0;
+                    bool bfound = false;
                     while (pFORM && !bfound) {
-                        bool badvanced = 0;
+                        bool badvanced = false;
                         if (pFORM->form == formEnumString[GRUP_ID].uiFormString) {
                             if (pFORM->iFormID || pFORM->flags != formEnumString[WRLD_ID].uiFormString) {
                                 badvanced = pfile->NextGroup();
                             }
                             else {
-                                bfound = 1;
-                                badvanced = pfile->NextForm(1);
+                                bfound = true;
+                                badvanced = pfile->NextForm(true);
                             }
                         }
                         else {
-                            badvanced = pfile->NextForm(1);
+                            badvanced = pfile->NextForm(true);
                         }
                         if (badvanced) {
                             pFORM = pfile->GetFormData();
                         }
                         else {
-                            pFORM = 0;
+                            pFORM = nullptr;
                         }
                     }
                     if (bfound) {
                         pFORM = pfile->GetFormData();
-                        bfound = 0;
+                        bfound = false;
                         while (pFORM && !bfound) {
-                            bool badvanced_2 = 0;
+                            bool badvanced_2 = false;
                             if (pFORM->form == formEnumString[65].uiFormString) {
                                 uint32_t iformID = pFORM->iFormID;
                                 uint32_t ifileindex = static_cast<uint8_t>(iformID >> 24);
@@ -1786,7 +1787,7 @@ TESDataHandler::GetExtCellDataFromFileByEditorID(const char* apCellID, int32_t& 
                                 iformID |= CompileIndex << 24;
                                 TESForm* FormByNumericID = TESForm::GetFormByNumericID(iformID);
                                 pcellworld = dynamic_cast<TESWorldSpace*>(FormByNumericID);
-                                badvanced_2 = pfile->NextForm(1);
+                                badvanced_2 = pfile->NextForm(true);
                             }
                             else {
                                 if (pFORM->form == formEnumString[CELL_ID].uiFormString) {
@@ -1798,7 +1799,7 @@ TESDataHandler::GetExtCellDataFromFileByEditorID(const char* apCellID, int32_t& 
                                         ourMemset(pfileID, 0, static_cast<uint32_t>(isize));
                                         pfile->GetChunkData(pfileID, 0);
                                         if (!BSstricmp(pfileID, apCellID)) {
-                                            bfound = 1;
+                                            bfound = true;
                                             while (chunk) {
                                                 if (chunk == XCLC_ID) {
                                                     EXTERIOR_DATA data;
@@ -1824,7 +1825,7 @@ TESDataHandler::GetExtCellDataFromFileByEditorID(const char* apCellID, int32_t& 
                                         ourFree(pfileID);
                                     }
                                 LABEL_55:;
-                                    badvanced_2 = pfile->NextForm(1);
+                                    badvanced_2 = pfile->NextForm(true);
                                 }
                                 else {
                                     if (pFORM->form == formEnumString[2].uiFormString) {
@@ -1837,7 +1838,7 @@ TESDataHandler::GetExtCellDataFromFileByEditorID(const char* apCellID, int32_t& 
                                                 if (static_cast<uint8_t>(
                                                         TESForm::GetFormTypeFromFormString(pFORM->flags)
                                                     ) > WRLD_ID) {
-                                                    badvanced_2 = 0;
+                                                    badvanced_2 = false;
                                                 }
                                                 break;
                                             }
@@ -1861,7 +1862,7 @@ TESDataHandler::GetExtCellDataFromFileByEditorID(const char* apCellID, int32_t& 
                                 pFORM = pfile->GetFormData();
                             }
                             else {
-                                pFORM = 0;
+                                pFORM = nullptr;
                             }
                         }
                     }
@@ -1869,7 +1870,7 @@ TESDataHandler::GetExtCellDataFromFileByEditorID(const char* apCellID, int32_t& 
                     if (bfound) {
                         break;
                     }
-                    pcellworld = 0;
+                    pcellworld = nullptr;
                 }
             }
         }
@@ -2029,7 +2030,7 @@ TESDataHandler::GetCellFromCellCoord(int32_t aiX, int32_t aiY, TESWorldSpace* ap
     if (!apWorldSpace) {
         apWorldSpace = GetWorldSpaceList()->m_item;
         if (!apWorldSpace) {
-            return 0;
+            return nullptr;
         }
     }
     if (aiX <= 0x7FFF && (aiY <= 0x7FFF && (aiX >= -0x8000 && aiY >= -0x8000))) {
@@ -2039,7 +2040,7 @@ TESDataHandler::GetCellFromCellCoord(int32_t aiX, int32_t aiY, TESWorldSpace* ap
         }
         else {
             if (GetSaveLoad() || !abCreateCell) {
-                return 0;
+                return nullptr;
             }
             else {
                 return NewCell("", aiX, aiY, apWorldSpace);
@@ -2051,7 +2052,7 @@ TESDataHandler::GetCellFromCellCoord(int32_t aiX, int32_t aiY, TESWorldSpace* ap
             "CELLS: Trying to get exterior cell for invalid cell coordinate. Values must be between %i and %i.",
             -0x8000, 0x7FFF
         );
-        return 0;
+        return nullptr;
     }
 }
 
@@ -3573,21 +3574,21 @@ TESObjectREFR* TESDataHandler::CreateReferenceAtLocation(
     BGSPrimitive* apAddPrimitive,
     void* apAdditionalData
 ) {
-    TESObjectREFR* pnewactor = 0;
+    TESObjectREFR* pnewactor = nullptr;
     if (apInterior) {
         if (!apInterior->GetInterior()) {
-            apInterior = 0;
+            apInterior = nullptr;
         }
     }
     if (apInterior) {
-        apWorld = 0;
+        apWorld = nullptr;
     }
     if (apObject) {
         if (apInterior || apWorld) {
-            bool bpersistent = 0;
+            bool bpersistent = false;
             if (apReference) {
                 bpersistent = apReference->GetRefPersists();
-                apReference->SetRefPersists(0);
+                apReference->SetRefPersists(false);
                 TESObjectCELL* poldparent = apReference->GetParentCell();
                 if (poldparent) {
                     poldparent->RemoveReference(apReference);
@@ -3597,7 +3598,7 @@ TESObjectREFR* TESDataHandler::CreateReferenceAtLocation(
                     pnewactor->SetObjectReference(apObject);
                 }
                 if (pnewactor->MustRefPersist()) {
-                    bpersistent = 1;
+                    bpersistent = true;
                 }
             }
             else {
@@ -3609,7 +3610,7 @@ TESObjectREFR* TESDataHandler::CreateReferenceAtLocation(
                             pretref = (TESObjectREFR*)::new (v31) Character;
                         }
                         else {
-                            pretref = 0;
+                            pretref = nullptr;
                         }
                         pnewactor = pretref;
                         goto LABEL_32;
@@ -3621,7 +3622,7 @@ TESObjectREFR* TESDataHandler::CreateReferenceAtLocation(
                             pretref_2 = (TESObjectREFR*)::new (v29) Creature;
                         }
                         else {
-                            pretref_2 = 0;
+                            pretref_2 = nullptr;
                         }
                         pnewactor = pretref_2;
                         goto LABEL_32;
@@ -3640,7 +3641,7 @@ TESObjectREFR* TESDataHandler::CreateReferenceAtLocation(
                             pretref_3 = ::new (apMemory) TESObjectREFR;
                         }
                         else {
-                            pretref_3 = 0;
+                            pretref_3 = nullptr;
                         }
                         pnewactor = pretref_3;
                     LABEL_32:;
@@ -3658,13 +3659,13 @@ TESObjectREFR* TESDataHandler::CreateReferenceAtLocation(
                                 v17 = ::new (v25) ExtraPrimitive(apAddPrimitive);
                             }
                             else {
-                                v17 = 0;
+                                v17 = nullptr;
                             }
                             BSExtraData* apExtra = (BSExtraData*)v17;
                             (&pnewactor->m_Extra)->AddExtra(v17);
                         }
                         if (pnewactor->MustBeVisibleDistant()) {
-                            pnewactor->SetVisibleDistant(1);
+                            pnewactor->SetVisibleDistant(true);
                         }
                         bpersistent = pnewactor->MustRefPersist();
                         TESObjectLIGH* plight = dynamic_cast<TESObjectLIGH*>(apObject);
@@ -3686,11 +3687,11 @@ TESObjectREFR* TESDataHandler::CreateReferenceAtLocation(
                 pnewactor->AddChange(0);
             }
             if (BGSDestructibleObjectForm::IsDestructible(pnewactor->GetObjectReference())) {
-                pnewactor->SetDestructible(1);
+                pnewactor->SetDestructible(true);
             }
             pnewactor->SetLocationOnReference(aLocation);
             pnewactor->SetAngleOnReference(aDirection);
-            TESObjectCELL* pnewparent = 0;
+            TESObjectCELL* pnewparent = nullptr;
             if (apWorld) {
                 int32_t icellx = FloatToInt(aLocation.x) >> 12;
                 int32_t icelly = FloatToInt(aLocation.y) >> 12;
@@ -3700,8 +3701,8 @@ TESObjectREFR* TESDataHandler::CreateReferenceAtLocation(
                 pnewparent = apInterior;
             }
             if (pnewparent) {
-                NiAVObject* a1 = 0;
-                if (TES::pInstance->IsCellLoaded(pnewparent, 0)) {
+                NiAVObject* a1 = nullptr;
+                if (TES::pInstance->IsCellLoaded(pnewparent, false)) {
                     if (apObject == pBoundMarker ||
                         (apObject == pPlaneMarker ||
                          (apObject == pDoorMarker ||
@@ -3716,10 +3717,10 @@ TESObjectREFR* TESDataHandler::CreateReferenceAtLocation(
                             pmodel = (NiAVObject*)::new (v23) NiNode(0);
                         }
                         else {
-                            pmodel = 0;
+                            pmodel = nullptr;
                         }
                         a1 = pmodel;
-                        pnewactor->Set3D(pmodel, 1);
+                        pnewactor->Set3D(pmodel, true);
                     }
                     pnewactor->SetParentCell(pnewparent);
                     if (pnewactor->HasContainer()) {
@@ -3731,27 +3732,27 @@ TESObjectREFR* TESDataHandler::CreateReferenceAtLocation(
                             (&pnewactor->m_Extra)->RemoveContainerChanges();
                         }
                     }
-                    pnewactor->SetParentCell(0);
+                    pnewactor->SetParentCell(nullptr);
                 }
-                pnewactor->SetDroppedRef(1);
-                pnewparent->AddReference(pnewactor, 0);
+                pnewactor->SetDroppedRef(true);
+                pnewparent->AddReference(pnewactor, false);
                 pnewactor->SetRefPersists(bpersistent);
                 NiAVObject* pmodel_2 = (NiAVObject*)pnewactor->Get3D();
                 if (pmodel_2) {
                     const NiPoint3* v12 = &pnewactor->GetLocationOnReference();
                     pmodel_2->SetTranslate(*v12);
                     pmodel_2->SetRotate(pnewactor->GetOrientation());
-                    bhkNiCollisionObject::ResetSim(pmodel_2, 1);
+                    bhkNiCollisionObject::ResetSim(pmodel_2, true);
                     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
                     ShadowSceneNode_->AddObject(pmodel_2);
                     pmodel_2->UpdateProperties();
-                    NiUpdateData UpdateData(0.0f, 0, 0);
+                    NiUpdateData UpdateData(0.0f, false, false);
                     pmodel_2->Update(UpdateData);
                 }
             }
             else {
-                pnewactor->Set3D(0, 0);
-                pnewactor->SetRefPersists(1);
+                pnewactor->Set3D(nullptr, false);
+                pnewactor->SetRefPersists(true);
                 apWorld->AddPersistentRef(pnewactor);
             }
         }
@@ -3764,7 +3765,7 @@ TESObjectREFR* TESDataHandler::CreateReferenceAtLocation(
     }
     if (pactor) {
         if (!apReference) {
-            pactor->SetStillLoading(0);
+            pactor->SetStillLoading(false);
         }
     }
     return pnewactor;
@@ -3778,7 +3779,7 @@ void TESDataHandler::SetIsClosingFile(bool abClosing) {
 void TESDataHandler::CheckModels(bool abUpdateBounds) {
     uint16_t iflags;
     if (!bFileSkipModelChecks.Bool()) {
-        SetCheckingModels(1);
+        SetCheckingModels(true);
         if (bFileTestLoad.Bool()) {
             appMain->RenderMenuBackground();
         }
@@ -3814,10 +3815,10 @@ void TESDataHandler::CheckModels(bool abUpdateBounds) {
                         v24 = 1;
                     }
                     else {
-                        v24 = pbipedModel != 0 ? 4 : 0;
+                        v24 = pbipedModel != nullptr ? 4 : 0;
                     }
                     int32_t icount = v24;
-                    while (2) {
+                    while (true) {
                         if (!icount) {
                             goto LABEL_89;
                         }
@@ -3889,7 +3890,7 @@ void TESDataHandler::CheckModels(bool abUpdateBounds) {
                     else {
                         BSsprintf(FileName, 260, "Meshes\\%s", pmodel->GetModel());
                     }
-                    if (FileFinder::Locate(FileName, 0, 0, 0xFFFFFFFFu) == FileFinder::NOTFOUND) {
+                    if (FileFinder::Locate(FileName, nullptr, 0, 0xFFFFFFFFu) == FileFinder::NOTFOUND) {
                         if (bFileGoneMessage.Bool()) {
                             char apDevice[4];
                             char Dst[512];
@@ -3902,7 +3903,7 @@ void TESDataHandler::CheckModels(bool abUpdateBounds) {
                             BSsprintf(FileName, 260, "Meshes\\%s", apDir);
                             BSstrcpy(apDir, 260, FileName);
                             makepath(FileName, 260u, apDevice, apDir, Dst, apExt);
-                            if (FileFinder::Locate(FileName, 0, 0, 0xFFFFFFFFu)) {
+                            if (FileFinder::Locate(FileName, nullptr, 0, 0xFFFFFFFFu)) {
                                 CheckForNiRawImageData(FileName);
                             }
                             else {
@@ -3931,7 +3932,7 @@ void TESDataHandler::CheckModels(bool abUpdateBounds) {
                             pref = (TESObjectREFR*)::new (v28) Character;
                         }
                         else {
-                            pref = 0;
+                            pref = nullptr;
                         }
                         pref_2 = pref;
                     }
@@ -3943,7 +3944,7 @@ void TESDataHandler::CheckModels(bool abUpdateBounds) {
                                 pref_3 = (TESObjectREFR*)::new (v27) Creature;
                             }
                             else {
-                                pref_3 = 0;
+                                pref_3 = nullptr;
                             }
                             pref_2 = pref_3;
                         }
@@ -3954,7 +3955,7 @@ void TESDataHandler::CheckModels(bool abUpdateBounds) {
                                 pref_4 = ::new (apMemory) TESObjectREFR;
                             }
                             else {
-                                pref_4 = 0;
+                                pref_4 = nullptr;
                             }
                             pref_2 = pref_4;
                         }
@@ -3968,7 +3969,7 @@ void TESDataHandler::CheckModels(bool abUpdateBounds) {
                                     static_cast<TESActorBase*>(pboundObj), iflags
                                 ) ||
                                 (iflags & 6) == 0) {
-                                pModelLoader->QueueReference(pref_2, IO_TASK_PRIORITY_CRITICAL, 0);
+                                pModelLoader->QueueReference(pref_2, IO_TASK_PRIORITY_CRITICAL, false);
                                 pIOManager->LoadAllQueuedPriorities();
                                 goto LABEL_62;
                             }
@@ -3977,7 +3978,7 @@ void TESDataHandler::CheckModels(bool abUpdateBounds) {
                     else {
                     LABEL_62:;
                         int32_t iwarncount = MessageHandler::QWarningCount();
-                        pref_2->Load3D(0);
+                        pref_2->Load3D(false);
                         if (iwarncount != MessageHandler::QWarningCount()) {
                             const char* v16 = pboundObj->GetFormEditorID();
                             char* v13 = objectLabel[type];
@@ -4009,10 +4010,10 @@ void TESDataHandler::CheckModels(bool abUpdateBounds) {
                             NiAVObject* p3d = (NiAVObject*)pref_2->Get3D();
                             if (p3d) {
                                 NiNode* arg0 = p3d->IsNode();
-                                itriangleCount = TES::pInstance->GetFaceCount(arg0, 1);
+                                itriangleCount = TES::pInstance->GetFaceCount(arg0, true);
                             }
                             else {
-                                itriangleCount = TES::pInstance->GetFaceCount(0, 1);
+                                itriangleCount = TES::pInstance->GetFaceCount(nullptr, true);
                             }
                             iconvexVerticesCount = itriangleCount;
                         }
@@ -4032,7 +4033,7 @@ void TESDataHandler::CheckModels(bool abUpdateBounds) {
                     }
                     int32_t v7 = iobjCount++;
                     if (v7 > 20) {
-                        TES::pInstance->CleanUpUnusedTextures(0);
+                        TES::pInstance->CleanUpUnusedTextures(false);
                         iobjCount = 0;
                     }
                     goto LABEL_86;
@@ -4042,7 +4043,7 @@ void TESDataHandler::CheckModels(bool abUpdateBounds) {
         LABEL_89:;
             obj = obj->nod_lpNext;
         }
-        SetCheckingModels(0);
+        SetCheckingModels(false);
     }
 }
 
@@ -4057,28 +4058,29 @@ void TESDataHandler::CheckTexturesRecurse(NiAVObject* apObject, const char* apMo
             if (pTextProp) {
                 NiTexturingProperty::Map* DetailMap = pTextProp->GetDetailMap();
                 PrintTextureInfo(
-                    DetailMap, static_cast<NiTriBasedGeom*>(apObject), "Detail Map", apModel, pShaderProperty != 0
+                    DetailMap, static_cast<NiTriBasedGeom*>(apObject), "Detail Map", apModel, pShaderProperty != nullptr
                 );
                 NiTexturingProperty::BumpMap* BumpMap = pTextProp->GetBumpMap();
                 PrintTextureInfo(
-                    BumpMap, static_cast<NiTriBasedGeom*>(apObject), "Bump Map", apModel, pShaderProperty != 0
+                    BumpMap, static_cast<NiTriBasedGeom*>(apObject), "Bump Map", apModel, pShaderProperty != nullptr
                 );
                 NiTexturingProperty::Map* GlowMap = pTextProp->GetGlowMap();
                 PrintTextureInfo(
-                    GlowMap, static_cast<NiTriBasedGeom*>(apObject), "Glow Map", apModel, pShaderProperty != 0
+                    GlowMap, static_cast<NiTriBasedGeom*>(apObject), "Glow Map", apModel, pShaderProperty != nullptr
                 );
                 NiTexturingProperty::Map* GlossMap = pTextProp->GetGlossMap();
                 PrintTextureInfo(
-                    GlossMap, static_cast<NiTriBasedGeom*>(apObject), "Gloss Map", apModel, pShaderProperty != 0
+                    GlossMap, static_cast<NiTriBasedGeom*>(apObject), "Gloss Map", apModel, pShaderProperty != nullptr
                 );
                 NiTexturingProperty::Map* DarkMap = pTextProp->GetDarkMap();
                 PrintTextureInfo(
-                    DarkMap, static_cast<NiTriBasedGeom*>(apObject), "Dark Map", apModel, pShaderProperty != 0
+                    DarkMap, static_cast<NiTriBasedGeom*>(apObject), "Dark Map", apModel, pShaderProperty != nullptr
                 );
                 for (uint32_t uiIndex = 0; uiIndex < pTextProp->GetDecalMapCount(); ++uiIndex) {
                     NiTexturingProperty::Map* DecalMap = pTextProp->GetDecalMap(uiIndex);
                     PrintTextureInfo(
-                        DecalMap, static_cast<NiTriBasedGeom*>(apObject), "Decal Map", apModel, pShaderProperty != 0
+                        DecalMap, static_cast<NiTriBasedGeom*>(apObject), "Decal Map", apModel,
+                        pShaderProperty != nullptr
                     );
                 }
             }
@@ -4145,13 +4147,13 @@ void TESDataHandler::CreateBarterContainer(TESObjectREFR* apVendor) {
             v5 = ::new (apMemory) InventoryChanges(nullptr);
         }
         else {
-            v5 = 0;
+            v5 = nullptr;
         }
         pBarterContainer = v5;
     }
     InventoryChanges* pActorlist = (&apVendor->m_Extra)->GetContainerChanges();
     if (pActorlist) {
-        pActorlist->CreateCopyofList(pBarterContainer, apVendor, 0);
+        pActorlist->CreateCopyofList(pBarterContainer, apVendor, false);
     }
     TESObjectREFR* pmerchant = (&apVendor->m_Extra)->GetMerchantContainer();
     if (pmerchant) {
@@ -4166,18 +4168,18 @@ void TESDataHandler::CreateBarterContainer(TESObjectREFR* apVendor) {
                 pActorlist_2 = ::new (v7) InventoryChanges(pmerchant);
             }
             else {
-                pActorlist_2 = 0;
+                pActorlist_2 = nullptr;
             }
             pActorlist = pActorlist_2;
         }
-        pActorlist->CreateCopyofList(pBarterContainer, pmerchant, 0);
+        pActorlist->CreateCopyofList(pBarterContainer, pmerchant, false);
     }
     TESObjectCELL* pcell = apVendor->GetParentCell();
     if (pcell) {
         pcell->FillBarterContainer(apVendor, pBarterContainer);
         if (apVendor->IsActor()) {
             Actor* pact = static_cast<Actor*>(apVendor);
-            NiPointer<BSShaderAccumulator>* v15 = 0;
+            NiPointer<BSShaderAccumulator>* v15 = nullptr;
             for (ItemChange* pitemChange : pBarterContainer->pListofChanges->ItemsUntilNull()) {
                 TESBoundObject* pboundObject = pitemChange->pContainerObj;
                 if (pboundObject->GetFormType() == AMMO_ID) {
@@ -4199,7 +4201,7 @@ void TESDataHandler::CreateBarterContainer(TESObjectREFR* apVendor) {
                             pitemChange->iNumber = FormHealth_0 - icount;
                             if (pitemChange->iNumber <= 0 ||
                                 (!pitemChange->pExtraObjectList ||
-                                 (pitemChange->pExtraObjectList->IsEmpty() || pitemChange->GetWorn(0)))) {
+                                 (pitemChange->pExtraObjectList->IsEmpty() || pitemChange->GetWorn(false)))) {
                                 pBarterContainer->pListofChanges->Remove(pitemChange);
                             }
                             return;
@@ -4212,22 +4214,22 @@ void TESDataHandler::CreateBarterContainer(TESObjectREFR* apVendor) {
 }
 
 void TESDataHandler::RemoveItemBarterContainer(ItemChange* apitem, int32_t aiNumber, TESObjectREFR* apVendor) {
-    ExtraDataList* pextra = 0;
-    ItemChange* pitem = pBarterContainer->GetObjectInList(apitem->pContainerObj, 1, 0);
+    ExtraDataList* pextra = nullptr;
+    ItemChange* pitem = pBarterContainer->GetObjectInList(apitem->pContainerObj, true, 0);
     if (pitem) {
         BSSimpleList<ExtraDataList*>* plist = pitem->pExtraObjectList;
         if (plist) {
             pextra = plist->m_item;
         }
-        bool bflag = 0;
-        while (1) {
+        bool bflag = false;
+        while (true) {
             TESObjectREFR* pref;
             int32_t iremove;
-            while (1) {
+            while (true) {
                 if (!aiNumber) {
                     return;
                 }
-                pref = 0;
+                pref = nullptr;
                 iremove = 1;
                 if (!plist && bflag) {
                     return;
@@ -4236,9 +4238,9 @@ void TESDataHandler::RemoveItemBarterContainer(ItemChange* apitem, int32_t aiNum
                     break;
                 }
                 CreateBarterContainer(apVendor);
-                pextra = 0;
-                bflag = 1;
-                pitem = pBarterContainer->GetObjectInList(apitem->pContainerObj, 1, 0);
+                pextra = nullptr;
+                bflag = true;
+                pitem = pBarterContainer->GetObjectInList(apitem->pContainerObj, true, 0);
                 if (!pitem) {
                     return;
                 }
@@ -4253,7 +4255,7 @@ void TESDataHandler::RemoveItemBarterContainer(ItemChange* apitem, int32_t aiNum
                 int16_t Count = pextra->GetCount();
                 iremove = Count;
                 if (Count <= 0) {
-                    pref = 0;
+                    pref = nullptr;
                 }
                 else {
                     pref = pextra->GetOriginalReference();
@@ -4267,24 +4269,27 @@ void TESDataHandler::RemoveItemBarterContainer(ItemChange* apitem, int32_t aiNum
             }
             if (pref) {
                 if (pref->HasContainer()) {
-                    ExtraDataList* ppassedExtra = 0;
+                    ExtraDataList* ppassedExtra = nullptr;
                     if (pextra->ItemsInList()) {
                         if (pextra->ItemsInList() != 1 || !pextra->GetExtraData(36)) {
                             ppassedExtra = pextra;
                         }
                     }
-                    pref->RemoveItem(pitem->pContainerObj, ppassedExtra, iremove, 0, 0, pPlayer, 0, 0, 1, 0);
+                    pref->RemoveItem(
+                        pitem->pContainerObj, ppassedExtra, iremove, false, false, pPlayer, nullptr, nullptr, true,
+                        false
+                    );
                     InventoryChanges* pchangeref = (&pref->m_Extra)->GetContainerChanges();
-                    bool bdelete = 1;
+                    bool bdelete = true;
                     if (pchangeref) {
-                        ItemChange* ptempitem = pchangeref->GetObjectInList(pitem->pContainerObj, 1, 0);
+                        ItemChange* ptempitem = pchangeref->GetObjectInList(pitem->pContainerObj, true, 0);
                         if (ptempitem) {
                             if (ptempitem->pExtraObjectList) {
                                 BSSimpleList<ExtraDataList*>* ptempObj = ptempitem->pExtraObjectList;
                                 while (ptempObj && (ptempObj->m_item && bdelete)) {
                                     BSSimpleList<ExtraDataList*>* v5 = ptempObj;
                                     if (v5->m_item == pextra) {
-                                        bdelete = 0;
+                                        bdelete = false;
                                     }
                                     else {
                                         ptempObj = ptempObj->m_pkNext;
@@ -4295,14 +4300,14 @@ void TESDataHandler::RemoveItemBarterContainer(ItemChange* apitem, int32_t aiNum
                     }
                     InventoryChanges* pchangeref_2 = (&pPlayer->m_Extra)->GetContainerChanges();
                     if (pchangeref_2) {
-                        ItemChange* ptempitem_2 = pchangeref_2->GetObjectInList(pitem->pContainerObj, 1, 0);
+                        ItemChange* ptempitem_2 = pchangeref_2->GetObjectInList(pitem->pContainerObj, true, 0);
                         if (ptempitem_2) {
                             if (ptempitem_2->pExtraObjectList) {
                                 BSSimpleList<ExtraDataList*>* ptempObj_2 = ptempitem_2->pExtraObjectList;
                                 while (ptempObj_2 && (ptempObj_2->m_item && bdelete)) {
                                     BSSimpleList<ExtraDataList*>* v6 = ptempObj_2;
                                     if (v6->m_item == pextra) {
-                                        bdelete = 0;
+                                        bdelete = false;
                                     }
                                     else {
                                         ptempObj_2 = ptempObj_2->m_pkNext;
@@ -4319,20 +4324,20 @@ void TESDataHandler::RemoveItemBarterContainer(ItemChange* apitem, int32_t aiNum
                                 if (pextra) {
                                     delete pextra;
                                 }
-                                pextra = 0;
+                                pextra = nullptr;
                             }
                         }
                     }
                     if (pextra) {
                         if ((pextra->GetCount() > 1 && pextra->ItemsInList() < 2) || !pextra->ItemsInList()) {
-                            pextra = 0;
+                            pextra = nullptr;
                         }
                     }
                 }
                 else {
                     (&pref->m_Extra)->RemoveOwnership();
                     (&pref->m_Extra)->RemoveOriginalReferenceExtra();
-                    pPlayer->PickUpObject(pref, iremove, 0);
+                    pPlayer->PickUpObject(pref, iremove, false);
                     pitem->pExtraObjectList->Remove(pextra);
                     plist = pitem->pExtraObjectList;
                     if (pextra->ItemsInList() < 2 && pextra->GetCount() <= 1 && !pextra->GetScript()) {
@@ -4340,7 +4345,7 @@ void TESDataHandler::RemoveItemBarterContainer(ItemChange* apitem, int32_t aiNum
                             delete pextra;
                         }
                     }
-                    pextra = 0;
+                    pextra = nullptr;
                 }
                 aiNumber -= iremove;
                 if (plist) {
@@ -4348,7 +4353,7 @@ void TESDataHandler::RemoveItemBarterContainer(ItemChange* apitem, int32_t aiNum
                     pextra = plist->m_item;
                 }
                 else {
-                    pextra = 0;
+                    pextra = nullptr;
                 }
             }
             else {
@@ -4368,20 +4373,20 @@ void TESDataHandler::ClearFileList() {
 
 bool TESDataHandler::ClearData() {
     NiTMapItem<uint32_t, TESForm*>* it;
-    bClearingData = 1;
+    bClearingData = true;
     CleanUpBadForms();
     TESForm::pAlteredForms->RemoveAll();
-    TES::pInstance->ClearAllCells(0, 0);
+    TES::pInstance->ClearAllCells(false, false);
     TES::pInstance->ClearWorldSpace();
     TES::pInstance->GetActiveImageSpaceModifiers()->RemoveAll();
-    GarbageCollector::ClearAll(0);
+    GarbageCollector::ClearAll(false);
     BGSTalkingActivator::ClearRadioStationList();
     pPlayer->RemovePlayerMapMarker();
     InventoryChanges::KillTempRef();
     BGSTextureSet::ClearNullTextureSet();
     BGSDefaultObjectManager::ReleaseInstance();
     BGSEncounterZone::ClearNoZone();
-    while (1) {
+    while (true) {
         Script* pScript = (&listScripts)->m_item;
         if (!pScript) {
             break;
@@ -4389,7 +4394,7 @@ bool TESDataHandler::ClearData() {
         listScripts.RemoveHead();
         delete pScript;
     }
-    while (1) {
+    while (true) {
         BGSListForm* plistform = (&listListForms)->m_item;
         if (!plistform) {
             break;
@@ -4397,7 +4402,7 @@ bool TESDataHandler::ClearData() {
         listListForms.RemoveHead();
         delete plistform;
     }
-    while (1) {
+    while (true) {
         BGSMenuIcon* picon = (&listMenuIcons)->m_item;
         if (!picon) {
             break;
@@ -4405,7 +4410,7 @@ bool TESDataHandler::ClearData() {
         listMenuIcons.RemoveHead();
         delete picon;
     }
-    while (1) {
+    while (true) {
         BGSHeadPart* ppart = (&listHeadParts)->m_item;
         if (!ppart) {
             break;
@@ -4413,7 +4418,7 @@ bool TESDataHandler::ClearData() {
         listHeadParts.RemoveHead();
         delete ppart;
     }
-    while (1) {
+    while (true) {
         TESHair* phair = (&listHair)->m_item;
         if (!phair) {
             break;
@@ -4421,7 +4426,7 @@ bool TESDataHandler::ClearData() {
         listHair.RemoveHead();
         delete phair;
     }
-    while (1) {
+    while (true) {
         TESEyes* peyes = (&listEyes)->m_item;
         if (!peyes) {
             break;
@@ -4429,7 +4434,7 @@ bool TESDataHandler::ClearData() {
         listEyes.RemoveHead();
         delete peyes;
     }
-    while (1) {
+    while (true) {
         TESRace* pRace = (&listRaces)->m_item;
         if (!pRace) {
             break;
@@ -4437,8 +4442,8 @@ bool TESDataHandler::ClearData() {
         listRaces.RemoveHead();
         delete pRace;
     }
-    pUnreadDefaultObject = 0;
-    while (1) {
+    pUnreadDefaultObject = nullptr;
+    while (true) {
         BGSEncounterZone* pzone = static_cast<BGSEncounterZone*>((&listZones)->m_item);
         if (!pzone) {
             break;
@@ -4446,7 +4451,7 @@ bool TESDataHandler::ClearData() {
         listZones.RemoveHead();
         delete pzone;
     }
-    while (1) {
+    while (true) {
         TESClimate* pClimate = static_cast<TESClimate*>((&listClimates)->m_item);
         if (!pClimate) {
             break;
@@ -4454,7 +4459,7 @@ bool TESDataHandler::ClearData() {
         listClimates.RemoveHead();
         delete pClimate;
     }
-    while (1) {
+    while (true) {
         TESWeather* pWeather = static_cast<TESWeather*>((&listWeather)->m_item);
         if (!pWeather) {
             break;
@@ -4462,7 +4467,7 @@ bool TESDataHandler::ClearData() {
         listWeather.RemoveHead();
         delete pWeather;
     }
-    while (1) {
+    while (true) {
         TESClass* pClass = (&listClasses)->m_item;
         if (!pClass) {
             break;
@@ -4470,7 +4475,7 @@ bool TESDataHandler::ClearData() {
         listClasses.RemoveHead();
         delete pClass;
     }
-    while (1) {
+    while (true) {
         TESFaction* pFaction = (&listFactions)->m_item;
         if (!pFaction) {
             break;
@@ -4478,7 +4483,7 @@ bool TESDataHandler::ClearData() {
         listFactions.RemoveHead();
         delete pFaction;
     }
-    while (1) {
+    while (true) {
         TESChallenge* pChallenge = (&listChallenges)->m_item;
         if (!pChallenge) {
             break;
@@ -4486,7 +4491,7 @@ bool TESDataHandler::ClearData() {
         listChallenges.RemoveHead();
         delete pChallenge;
     }
-    while (1) {
+    while (true) {
         TESReputation* pRep = (&listReputations)->m_item;
         if (!pRep) {
             break;
@@ -4494,7 +4499,7 @@ bool TESDataHandler::ClearData() {
         listReputations.RemoveHead();
         delete pRep;
     }
-    while (1) {
+    while (true) {
         TESRecipe* pRecipe = (&listRecipes)->m_item;
         if (!pRecipe) {
             break;
@@ -4502,7 +4507,7 @@ bool TESDataHandler::ClearData() {
         listRecipes.RemoveHead();
         delete pRecipe;
     }
-    while (1) {
+    while (true) {
         TESCasino* pCasino = (&listCasinos)->m_item;
         if (!pCasino) {
             break;
@@ -4510,7 +4515,7 @@ bool TESDataHandler::ClearData() {
         listCasinos.RemoveHead();
         delete pCasino;
     }
-    while (1) {
+    while (true) {
         TESRecipeCategory* pRecipeCat = static_cast<TESRecipeCategory*>((&listRecipeCategories)->m_item);
         if (!pRecipeCat) {
             break;
@@ -4518,7 +4523,7 @@ bool TESDataHandler::ClearData() {
         listRecipeCategories.RemoveHead();
         delete pRecipeCat;
     }
-    while (1) {
+    while (true) {
         TESAmmoEffect* pAmmoEffect = static_cast<TESAmmoEffect*>((&listAmmoEffects)->m_item);
         if (!pAmmoEffect) {
             break;
@@ -4526,7 +4531,7 @@ bool TESDataHandler::ClearData() {
         listAmmoEffects.RemoveHead();
         delete pAmmoEffect;
     }
-    while (1) {
+    while (true) {
         TESGlobal* pGlobal = (&listGlobals)->m_item;
         if (!pGlobal) {
             break;
@@ -4534,7 +4539,7 @@ bool TESDataHandler::ClearData() {
         listGlobals.RemoveHead();
         delete pGlobal;
     }
-    while (1) {
+    while (true) {
         BGSVoiceType* pVoiceType = (&listVoiceTypes)->m_item;
         if (!pVoiceType) {
             break;
@@ -4542,7 +4547,7 @@ bool TESDataHandler::ClearData() {
         listVoiceTypes.RemoveHead();
         delete pVoiceType;
     }
-    while (1) {
+    while (true) {
         BGSImpactData* pimpdata = (&listImpactData)->m_item;
         if (!pimpdata) {
             break;
@@ -4550,7 +4555,7 @@ bool TESDataHandler::ClearData() {
         listImpactData.RemoveHead();
         delete pimpdata;
     }
-    while (1) {
+    while (true) {
         BGSImpactDataSet* pimpdataset = (&listImpactDataSet)->m_item;
         if (!pimpdataset) {
             break;
@@ -4558,7 +4563,7 @@ bool TESDataHandler::ClearData() {
         listImpactDataSet.RemoveHead();
         delete pimpdataset;
     }
-    while (1) {
+    while (true) {
         TESQuest* pQuest = (&listQuests)->m_item;
         if (!pQuest) {
             break;
@@ -4566,7 +4571,7 @@ bool TESDataHandler::ClearData() {
         listQuests.RemoveHead();
         delete pQuest;
     }
-    while (1) {
+    while (true) {
         TESTopic* pTopic = (&listTopics)->m_item;
         if (!pTopic) {
             break;
@@ -4586,7 +4591,7 @@ bool TESDataHandler::ClearData() {
         }
     }
     arrayInteriorCells.SetSize(0);
-    while (1) {
+    while (true) {
         TESWorldSpace* pWorld = (&listWorldSpaces)->m_item;
         if (!pWorld) {
             break;
@@ -4594,8 +4599,8 @@ bool TESDataHandler::ClearData() {
         listWorldSpaces.RemoveHead();
         delete pWorld;
     }
-    GarbageCollector::ClearAll(0);
-    while (1) {
+    GarbageCollector::ClearAll(false);
+    while (true) {
         TESSound* pSound = (&listSounds)->m_item;
         if (!pSound) {
             break;
@@ -4603,7 +4608,7 @@ bool TESDataHandler::ClearData() {
         listSounds.RemoveHead();
         delete pSound;
     }
-    while (1) {
+    while (true) {
         BGSMusicType* pmusic = GetMusicTypeList()->m_item;
         if (!pmusic) {
             break;
@@ -4611,7 +4616,7 @@ bool TESDataHandler::ClearData() {
         GetMusicTypeList()->RemoveHead();
         delete pmusic;
     }
-    while (1) {
+    while (true) {
         MediaSet* pMediaSet = GetMediaSetList()->m_item;
         if (!pMediaSet) {
             break;
@@ -4619,7 +4624,7 @@ bool TESDataHandler::ClearData() {
         GetMediaSetList()->RemoveHead();
         delete pMediaSet;
     }
-    while (1) {
+    while (true) {
         MediaLocationController* pMediaLocationController = GetMediaLocationControllerList()->m_item;
         if (!pMediaLocationController) {
             break;
@@ -4627,7 +4632,7 @@ bool TESDataHandler::ClearData() {
         GetMediaLocationControllerList()->RemoveHead();
         delete pMediaLocationController;
     }
-    while (1) {
+    while (true) {
         BGSAcousticSpace* paSpc = (&listAcousticSpaces)->m_item;
         if (!paSpc) {
             break;
@@ -4635,7 +4640,7 @@ bool TESDataHandler::ClearData() {
         listAcousticSpaces.RemoveHead();
         delete paSpc;
     }
-    while (1) {
+    while (true) {
         TESLandTexture* pLandText = (&listLandTexts)->m_item;
         if (!pLandText) {
             break;
@@ -4643,7 +4648,7 @@ bool TESDataHandler::ClearData() {
         listLandTexts.RemoveHead();
         delete pLandText;
     }
-    while (1) {
+    while (true) {
         BGSMessage* pMessage = (&listMessages)->m_item;
         if (!pMessage) {
             break;
@@ -4654,8 +4659,8 @@ bool TESDataHandler::ClearData() {
     if (pPlayer) {
         delete pPlayer;
     }
-    pPlayer = 0;
-    while (1) {
+    pPlayer = nullptr;
+    while (true) {
         TESImageSpace* pimagespace = static_cast<TESImageSpace*>((&listImageSpaces)->m_item);
         if (!pimagespace) {
             break;
@@ -4663,7 +4668,7 @@ bool TESDataHandler::ClearData() {
         listImageSpaces.RemoveHead();
         delete pimagespace;
     }
-    while (1) {
+    while (true) {
         TESImageSpaceModifier* pimagespacemodifier =
             static_cast<TESImageSpaceModifier*>((&listImageSpaceModifiers)->m_item);
         if (!pimagespacemodifier) {
@@ -4674,7 +4679,7 @@ bool TESDataHandler::ClearData() {
     }
     pObjectList->lnk_Destroy();
     arrayAddonNodes.RemoveAll();
-    while (1) {
+    while (true) {
         SpellItem* pSpellItem = static_cast<SpellItem*>((&listSpellItems)->m_item);
         if (!pSpellItem) {
             break;
@@ -4682,7 +4687,7 @@ bool TESDataHandler::ClearData() {
         listSpellItems.RemoveHead();
         delete pSpellItem;
     }
-    while (1) {
+    while (true) {
         EnchantmentItem* pEnchItem = static_cast<EnchantmentItem*>((&listEnchantmentItems)->m_item);
         if (!pEnchItem) {
             break;
@@ -4690,7 +4695,7 @@ bool TESDataHandler::ClearData() {
         listEnchantmentItems.RemoveHead();
         delete pEnchItem;
     }
-    while (1) {
+    while (true) {
         TESPackage* ppack = static_cast<TESPackage*>((&listPackages)->m_item);
         if (!ppack) {
             break;
@@ -4698,7 +4703,7 @@ bool TESDataHandler::ClearData() {
         listPackages.RemoveHead();
         delete ppack;
     }
-    while (1) {
+    while (true) {
         TESCombatStyle* pcombatStyle = (&listCombatStyles)->m_item;
         if (!pcombatStyle) {
             break;
@@ -4706,7 +4711,7 @@ bool TESDataHandler::ClearData() {
         listCombatStyles.RemoveHead();
         delete pcombatStyle;
     }
-    while (1) {
+    while (true) {
         TESLoadScreen* ploadscreen = (&listLoadScreens)->m_item;
         if (!ploadscreen) {
             break;
@@ -4714,7 +4719,7 @@ bool TESDataHandler::ClearData() {
         listLoadScreens.RemoveHead();
         delete ploadscreen;
     }
-    while (1) {
+    while (true) {
         TESLoadScreenType* pLST = (&listLoadScreenTypes)->m_item;
         if (!pLST) {
             break;
@@ -4722,7 +4727,7 @@ bool TESDataHandler::ClearData() {
         listLoadScreenTypes.RemoveHead();
         delete pLST;
     }
-    while (1) {
+    while (true) {
         TESWaterForm* pwater = (&listWater)->m_item;
         if (!pwater) {
             break;
@@ -4730,8 +4735,8 @@ bool TESDataHandler::ClearData() {
         listWater.RemoveHead();
         delete pwater;
     }
-    pDefaultWater = 0;
-    while (1) {
+    pDefaultWater = nullptr;
+    while (true) {
         TESObjectANIO* paniObj = (&animObjects)->m_item;
         if (!paniObj) {
             break;
@@ -4739,7 +4744,7 @@ bool TESDataHandler::ClearData() {
         animObjects.RemoveHead();
         delete paniObj;
     }
-    while (1) {
+    while (true) {
         TESEffectShader* peffectShader = (&listEffectShaders)->m_item;
         if (!peffectShader) {
             break;
@@ -4747,7 +4752,7 @@ bool TESDataHandler::ClearData() {
         listEffectShaders.RemoveHead();
         delete peffectShader;
     }
-    while (1) {
+    while (true) {
         BGSProjectile* pprojectile = (&listProjectiles)->m_item;
         if (!pprojectile) {
             break;
@@ -4755,7 +4760,7 @@ bool TESDataHandler::ClearData() {
         listProjectiles.RemoveHead();
         delete pprojectile;
     }
-    while (1) {
+    while (true) {
         BGSExplosion* pexplosion = static_cast<BGSExplosion*>((&listExplosions)->m_item);
         if (!pexplosion) {
             break;
@@ -4763,7 +4768,7 @@ bool TESDataHandler::ClearData() {
         listExplosions.RemoveHead();
         delete pexplosion;
     }
-    while (1) {
+    while (true) {
         BGSDebris* pdebris = (&listDebris)->m_item;
         if (!pdebris) {
             break;
@@ -4771,7 +4776,7 @@ bool TESDataHandler::ClearData() {
         listDebris.RemoveHead();
         delete pdebris;
     }
-    while (1) {
+    while (true) {
         BGSPerk* pperk = (&listPerks)->m_item;
         if (!pperk) {
             break;
@@ -4779,7 +4784,7 @@ bool TESDataHandler::ClearData() {
         listPerks.RemoveHead();
         delete pperk;
     }
-    while (1) {
+    while (true) {
         BGSRadiationStage* prad = (&listRadiation)->m_item;
         if (!prad) {
             break;
@@ -4787,7 +4792,7 @@ bool TESDataHandler::ClearData() {
         listRadiation.RemoveHead();
         delete prad;
     }
-    while (1) {
+    while (true) {
         BGSDehydrationStage* ph20 = (&listDehydration)->m_item;
         if (!ph20) {
             break;
@@ -4795,7 +4800,7 @@ bool TESDataHandler::ClearData() {
         listDehydration.RemoveHead();
         delete ph20;
     }
-    while (1) {
+    while (true) {
         BGSHungerStage* pFood = (&listHunger)->m_item;
         if (!pFood) {
             break;
@@ -4803,7 +4808,7 @@ bool TESDataHandler::ClearData() {
         listHunger.RemoveHead();
         delete pFood;
     }
-    while (1) {
+    while (true) {
         BGSSleepDeprevationStage* pSleep = (&listSleepDeprevation)->m_item;
         if (!pSleep) {
             break;
@@ -4811,7 +4816,7 @@ bool TESDataHandler::ClearData() {
         listSleepDeprevation.RemoveHead();
         delete pSleep;
     }
-    while (1) {
+    while (true) {
         BGSBodyPartData* ppartdata = (&listPartData)->m_item;
         if (!ppartdata) {
             break;
@@ -4823,7 +4828,7 @@ bool TESDataHandler::ClearData() {
     NavMeshObstacleManager* Instance = NavMeshObstacleManager::GetInstance();
     Instance->ClearAllObstacles();
     if (TES::pInstance->GetNavMeshInfoMap()) {
-        TES::pInstance->SetNavMeshInfoMap(0);
+        TES::pInstance->SetNavMeshInfoMap(nullptr);
     }
     if (appMain && appMain->bReloadContent) {
         pIdleManager->DestroyRootIdleArrayForms();
@@ -4832,7 +4837,7 @@ bool TESDataHandler::ClearData() {
         pIdleManager->DestroyRootIdleArrays();
     }
     pCameraPathManager->DestroyRootPathArrayForms();
-    while (1) {
+    while (true) {
         BGSCameraShot* pshot = (&listCameraShots)->m_item;
         if (!pshot) {
             break;
@@ -4840,7 +4845,7 @@ bool TESDataHandler::ClearData() {
         listCameraShots.RemoveHead();
         delete pshot;
     }
-    while (1) {
+    while (true) {
         BGSLightingTemplate* plt = (&listLightingTemplates)->m_item;
         if (!plt) {
             break;
@@ -4850,7 +4855,7 @@ bool TESDataHandler::ClearData() {
     }
     EffectSettingCollection::Reset();
     ActorValue::FreeActorValues();
-    while (1) {
+    while (true) {
         BGSNote* pnote = (&listNotes)->m_item;
         if (!pnote) {
             break;
@@ -4858,7 +4863,7 @@ bool TESDataHandler::ClearData() {
         listNotes.RemoveHead();
         delete pnote;
     }
-    while (1) {
+    while (true) {
         BGSRagdoll* pragdoll = (&listRagdolls)->m_item;
         if (!pragdoll) {
             break;
@@ -4866,7 +4871,7 @@ bool TESDataHandler::ClearData() {
         listRagdolls.RemoveHead();
         delete pragdoll;
     }
-    while (1) {
+    while (true) {
         TESCaravanDeck* pDeck = static_cast<TESCaravanDeck*>((&listCaravanDecks)->m_item);
         if (!pDeck) {
             break;
@@ -4875,9 +4880,9 @@ bool TESDataHandler::ClearData() {
         delete pDeck;
     }
     if (TESForm::pAllForms) {
-        MessageHandler::IncDisableWarningCount(1);
-        bool bLeaked = 0;
-        TESForm* pForm = 0;
+        MessageHandler::IncDisableWarningCount(true);
+        bool bLeaked = false;
+        TESForm* pForm = nullptr;
         uint32_t ileakedID = 0;
         it = TESForm::pAllForms->GetFirstPos();
         while (it) {
@@ -4885,7 +4890,7 @@ bool TESDataHandler::ClearData() {
             if (pForm) {
                 if (pForm->GetFormType() == GMST_ID) {
                     pForm->ClearFiles();
-                    pForm->SetFormID(0, 1);
+                    pForm->SetFormID(0, true);
                 }
                 else {
                     const char* CellOrCoords;
@@ -4903,23 +4908,23 @@ bool TESDataHandler::ClearData() {
                         FormTypeString, CellOrCoords
                     );
                     TESForm::pAllForms->SetAt(ileakedID, 0);
-                    bLeaked = 1;
+                    bLeaked = true;
                 }
             }
         }
-        MessageHandler::IncDisableWarningCount(0);
+        MessageHandler::IncDisableWarningCount(false);
         if (bLeaked) {
             Warning("FORMS: Forms were leaked during ClearData. Check Warnings file for more info.");
         }
     }
     for (uint32_t index = 0; index < iNumCompile; ++index) {
-        pFileIndex[index] = 0;
+        pFileIndex[index] = nullptr;
     }
     iNumCompile = 0;
     if (!bSaveLoadGame) {
         if (this->pActiveFile) {
             if (!GetMasterSave()) {
-                this->pActiveFile->SetActive(0);
+                this->pActiveFile->SetActive(false);
             }
             if (this->pActiveFile) {
                 TESFile* pActiveFile = this->pActiveFile;
@@ -4927,34 +4932,34 @@ bool TESDataHandler::ClearData() {
                     delete pActiveFile;
                 }
             }
-            this->pActiveFile = 0;
+            this->pActiveFile = nullptr;
             iNextID = 2048;
         }
     }
     BGSImpactDataSet::ClearDefaultImpactDataSet();
-    pDoorMarker = 0;
-    pMapMarker = 0;
-    pAudioMarker = 0;
-    pAudioBuoyMarker = 0;
-    pBoundMarker = 0;
-    pPlaneMarker = 0;
-    pRoomMarker = 0;
-    pPortalMarker = 0;
-    pCollisionMarker = 0;
-    pXMarker = 0;
-    pXMarkerHeading = 0;
-    pTravelMarker = 0;
-    pNorthMarker = 0;
-    pJailMarker = 0;
-    pTempleMarker = 0;
-    pHolyMarker = 0;
-    pLockpick = 0;
-    pHorseMarker = 0;
-    bClearingData = 0;
-    pItemDetectedShader = 0;
-    pSpotterShader = 0;
-    pCateyeMobileShader = 0;
-    return 1;
+    pDoorMarker = nullptr;
+    pMapMarker = nullptr;
+    pAudioMarker = nullptr;
+    pAudioBuoyMarker = nullptr;
+    pBoundMarker = nullptr;
+    pPlaneMarker = nullptr;
+    pRoomMarker = nullptr;
+    pPortalMarker = nullptr;
+    pCollisionMarker = nullptr;
+    pXMarker = nullptr;
+    pXMarkerHeading = nullptr;
+    pTravelMarker = nullptr;
+    pNorthMarker = nullptr;
+    pJailMarker = nullptr;
+    pTempleMarker = nullptr;
+    pHolyMarker = nullptr;
+    pLockpick = nullptr;
+    pHorseMarker = nullptr;
+    bClearingData = false;
+    pItemDetectedShader = nullptr;
+    pSpotterShader = nullptr;
+    pCateyeMobileShader = nullptr;
+    return true;
 }
 
 void TESDataHandler::SortInteriorCells() {
@@ -4993,7 +4998,7 @@ void TESDataHandler::SortInteriorCells() {
 void TESDataHandler::CleanUpBadForms() {
     if (listBadForms.IsEmpty() || !TESForm::bFormIDsBashed) {
         bool bsave = GetClearingData();
-        SetIsClosingFile(1);
+        SetIsClosingFile(true);
         NiTListItem<TESForm*>* iter = listBadForms.m_pkHead;
         while (iter) {
             TESForm* pform = listBadForms.GetNext(iter);
@@ -5020,11 +5025,11 @@ TESObjectREFR* TESDataHandler::CreateExplosionAtLocation(
     TESObjectCELL* apInterior,
     TESWorldSpace* apWorld
 ) {
-    TESObjectREFR* pref = 0;
+    TESObjectREFR* pref = nullptr;
     if (apObject) {
         if (apObject->GetFormType() == EXPL_ID) {
             BGSExplosion* pexplosionForm = static_cast<BGSExplosion*>(apObject);
-            TESObjectCELL* pnewparent = 0;
+            TESObjectCELL* pnewparent = nullptr;
             if (apWorld) {
                 int32_t icellx = FloatToInt(aLocation.x) >> 12;
                 int32_t icelly = FloatToInt(aLocation.y) >> 12;
@@ -5038,16 +5043,16 @@ TESObjectREFR* TESDataHandler::CreateExplosionAtLocation(
             }
             NiMatrix3 rot;
             rot.FromEulerAnglesZYX(aDirection.z, aDirection.y, aDirection.x);
-            TESObjectREFR* pOwner = 0;
+            TESObjectREFR* pOwner = nullptr;
             uint32_t uiFormID = apObject->iFormID;
             // The player owns the explosions of these three explosion forms.
             if (uiFormID == 0xCDEF0 || uiFormID == 0x16AF00 || uiFormID == 0x172FBD) {
                 pOwner = pPlayer;
             }
-            pref = Explosion::SpawnExplosion(pexplosionForm, pOwner, 0, pnewparent, aLocation, rot);
+            pref = Explosion::SpawnExplosion(pexplosionForm, pOwner, nullptr, pnewparent, aLocation, rot);
             if (!pnewparent) {
                 if (apWorld) {
-                    pref->SetRefPersists(1);
+                    pref->SetRefPersists(true);
                     pref->m_Extra.SetPersistentCell(apWorld->pPersistentCell);
                 }
             }
@@ -5059,10 +5064,10 @@ TESObjectREFR* TESDataHandler::CreateExplosionAtLocation(
 void TESDataHandler::CheckIcons() {
     NiTMapItem<uint32_t, TESForm*>* it;
     if (!bFileSkipIconChecks.Bool() && TESForm::pAllForms) {
-        TESForm* pform = 0;
+        TESForm* pform = nullptr;
         it = TESForm::pAllForms->GetFirstPos();
         uint32_t ignore = 0;
-        while (1) {
+        while (true) {
             do {
                 if (!it) {
                     return;
@@ -5083,7 +5088,7 @@ void TESDataHandler::CheckIcons() {
                     }
                     const char* TextureName = picon->GetTextureName();
                     BSsprintf(apDest, 260, "%s%s", picon->GetDefaultPath(), TextureName);
-                    if (FileFinder::Locate(apDest, 0, 0, 0xFFFFFFFFu) == FileFinder::NOTFOUND) {
+                    if (FileFinder::Locate(apDest, nullptr, 0, 0xFFFFFFFFu) == FileFinder::NOTFOUND) {
                         const char* v10 = pform->GetFormEditorID();
                         uint8_t FormType = pform->GetFormType();
                         char* v3 = FormIDToString(FormType);
@@ -5104,7 +5109,7 @@ void TESDataHandler::CheckIcons() {
                                 const char* v13 = ptexture->GetTextureName();
                                 BSsprintf(apName, 260, "%s%s", ptexture->GetDefaultPath(), v13);
                             }
-                            if (FileFinder::Locate(apName, 0, 0, 0xFFFFFFFFu) == FileFinder::NOTFOUND) {
+                            if (FileFinder::Locate(apName, nullptr, 0, 0xFFFFFFFFu) == FileFinder::NOTFOUND) {
                                 const char* v14 = pform->GetFormEditorID();
                                 uint8_t v5 = pform->GetFormType();
                                 char* v6 = FormIDToString(v5);
@@ -5139,7 +5144,7 @@ void TESDataHandler::CheckIcons() {
                         if (BSstrlen(piconFilename)) {
                             char apString1[268];
                             BSsprintf(apString1, 260, "%s%s", pbiped->GetIconDefaultPath(), piconFilename);
-                            if (FileFinder::Locate(apString1, 0, 0, 0xFFFFFFFFu) == FileFinder::NOTFOUND) {
+                            if (FileFinder::Locate(apString1, nullptr, 0, 0xFFFFFFFFu) == FileFinder::NOTFOUND) {
                                 const char* v15 = pform->GetFormEditorID();
                                 uint8_t v7 = pform->GetFormType();
                                 Warning(
@@ -5193,9 +5198,9 @@ bool TESDataHandler::LoadForm(TESForm* pForm, TESFile* pFile) {
 // The exe's cleanup-only C++ EH frame is left out.
 TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_TES_FORMS, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESDataHandler.cpp", 7192
+        MEM_CONTEXT_TES_FORMS, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESDataHandler.cpp", 7192
     );
-    TESForm* pForm_3 = 0;
+    TESForm* pForm_3 = nullptr;
     switch (aType) {
         case 4: {
             TESForm* pForm_81;
@@ -5204,7 +5209,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_81 = (TESForm*)::new (v132) BGSTextureSet;
             }
             else {
-                pForm_81 = 0;
+                pForm_81 = nullptr;
             }
             pForm_3 = pForm_81;
             break;
@@ -5216,7 +5221,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_41 = (TESForm*)::new (v172) BGSMenuIcon;
             }
             else {
-                pForm_41 = 0;
+                pForm_41 = nullptr;
             }
             pForm_3 = pForm_41;
             break;
@@ -5228,7 +5233,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_54 = (TESForm*)::new (v159) TESGlobal;
             }
             else {
-                pForm_54 = 0;
+                pForm_54 = nullptr;
             }
             pForm_3 = pForm_54;
             break;
@@ -5240,7 +5245,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_48 = (TESForm*)::new (v165) TESClass;
             }
             else {
-                pForm_48 = 0;
+                pForm_48 = nullptr;
             }
             pForm_3 = pForm_48;
             break;
@@ -5252,7 +5257,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_49 = (TESForm*)::new (v164) TESFaction;
             }
             else {
-                pForm_49 = 0;
+                pForm_49 = nullptr;
             }
             pForm_3 = pForm_49;
             break;
@@ -5264,7 +5269,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_43 = (TESForm*)::new (v170) BGSHeadPart;
             }
             else {
-                pForm_43 = 0;
+                pForm_43 = nullptr;
             }
             pForm_3 = pForm_43;
             break;
@@ -5276,7 +5281,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_44 = (TESForm*)::new (v169) TESHair;
             }
             else {
-                pForm_44 = 0;
+                pForm_44 = nullptr;
             }
             pForm_3 = pForm_44;
             break;
@@ -5288,7 +5293,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_45 = (TESForm*)::new (v168) TESEyes;
             }
             else {
-                pForm_45 = 0;
+                pForm_45 = nullptr;
             }
             pForm_3 = pForm_45;
             break;
@@ -5300,7 +5305,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_46 = (TESForm*)::new (v167) TESRace;
             }
             else {
-                pForm_46 = 0;
+                pForm_46 = nullptr;
             }
             pForm_3 = pForm_46;
             break;
@@ -5312,7 +5317,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_52 = (TESForm*)::new (v161) TESSound;
             }
             else {
-                pForm_52 = 0;
+                pForm_52 = nullptr;
             }
             pForm_3 = pForm_52;
             break;
@@ -5324,7 +5329,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_53 = (TESForm*)::new (v160) BGSAcousticSpace;
             }
             else {
-                pForm_53 = 0;
+                pForm_53 = nullptr;
             }
             pForm_3 = pForm_53;
             break;
@@ -5336,7 +5341,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_65 = (TESForm*)::new (v148) TESSkill;
             }
             else {
-                pForm_65 = 0;
+                pForm_65 = nullptr;
             }
             pForm_3 = pForm_65;
             break;
@@ -5348,7 +5353,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_58 = (TESForm*)::new (v155) EffectSetting;
             }
             else {
-                pForm_58 = 0;
+                pForm_58 = nullptr;
             }
             pForm_3 = pForm_58;
             break;
@@ -5360,7 +5365,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_70 = (TESForm*)::new (v143) Script;
             }
             else {
-                pForm_70 = 0;
+                pForm_70 = nullptr;
             }
             pForm_3 = pForm_70;
             break;
@@ -5372,7 +5377,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_66 = (TESForm*)::new (v147) TESLandTexture;
             }
             else {
-                pForm_66 = 0;
+                pForm_66 = nullptr;
             }
             pForm_3 = pForm_66;
             break;
@@ -5384,7 +5389,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_36 = (TESForm*)::new (v177) EnchantmentItem;
             }
             else {
-                pForm_36 = 0;
+                pForm_36 = nullptr;
             }
             pForm_3 = pForm_36;
             break;
@@ -5396,7 +5401,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_35 = (TESForm*)::new (v178) SpellItem;
             }
             else {
-                pForm_35 = 0;
+                pForm_35 = nullptr;
             }
             pForm_3 = pForm_35;
             break;
@@ -5408,7 +5413,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_4 = (TESForm*)::new (v211) TESObjectACTI;
             }
             else {
-                pForm_4 = 0;
+                pForm_4 = nullptr;
             }
             pForm_3 = pForm_4;
             break;
@@ -5420,7 +5425,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_5 = (TESForm*)::new (v210) BGSTalkingActivator;
             }
             else {
-                pForm_5 = 0;
+                pForm_5 = nullptr;
             }
             pForm_3 = pForm_5;
             break;
@@ -5432,7 +5437,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_6 = (TESForm*)::new (v209) BGSTerminal;
             }
             else {
-                pForm_6 = 0;
+                pForm_6 = nullptr;
             }
             pForm_3 = pForm_6;
             break;
@@ -5444,7 +5449,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_7 = (TESForm*)::new (v208) TESObjectARMO;
             }
             else {
-                pForm_7 = 0;
+                pForm_7 = nullptr;
             }
             pForm_3 = pForm_7;
             break;
@@ -5456,7 +5461,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_9 = (TESForm*)::new (v206) TESObjectBOOK;
             }
             else {
-                pForm_9 = 0;
+                pForm_9 = nullptr;
             }
             pForm_3 = pForm_9;
             break;
@@ -5468,7 +5473,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_10 = (TESForm*)::new (v205) TESObjectCLOT;
             }
             else {
-                pForm_10 = 0;
+                pForm_10 = nullptr;
             }
             pForm_3 = pForm_10;
             break;
@@ -5480,7 +5485,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_11 = (TESForm*)::new (v204) TESObjectCONT;
             }
             else {
-                pForm_11 = 0;
+                pForm_11 = nullptr;
             }
             pForm_3 = pForm_11;
             break;
@@ -5492,7 +5497,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_12 = (TESForm*)::new (v203) TESObjectDOOR;
             }
             else {
-                pForm_12 = 0;
+                pForm_12 = nullptr;
             }
             pForm_3 = pForm_12;
             break;
@@ -5504,7 +5509,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_13 = (TESForm*)::new (v202) IngredientItem;
             }
             else {
-                pForm_13 = 0;
+                pForm_13 = nullptr;
             }
             pForm_3 = pForm_13;
             break;
@@ -5516,7 +5521,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_14 = (TESForm*)::new (v201) TESObjectLIGH;
             }
             else {
-                pForm_14 = 0;
+                pForm_14 = nullptr;
             }
             pForm_3 = pForm_14;
             break;
@@ -5528,7 +5533,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_15 = (TESForm*)::new (v200) TESObjectMISC;
             }
             else {
-                pForm_15 = 0;
+                pForm_15 = nullptr;
             }
             pForm_3 = pForm_15;
             break;
@@ -5540,7 +5545,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_19 = (TESForm*)::new (v196) TESObjectSTAT;
             }
             else {
-                pForm_19 = 0;
+                pForm_19 = nullptr;
             }
             pForm_3 = pForm_19;
             break;
@@ -5552,7 +5557,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_20 = (TESForm*)::new (v195) BGSStaticCollection;
             }
             else {
-                pForm_20 = 0;
+                pForm_20 = nullptr;
             }
             pForm_3 = pForm_20;
             break;
@@ -5565,13 +5570,13 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 v90 = ::new (v194) BGSMovableStatic;
             }
             else {
-                v90 = 0;
+                v90 = nullptr;
             }
             if (v90) {
                 pForm = static_cast<TESObjectSTAT*>(v90);
             }
             else {
-                pForm = 0;
+                pForm = nullptr;
             }
             pForm_3 = (TESForm*)pForm;
             break;
@@ -5583,7 +5588,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_21 = (TESForm*)::new (v193) BGSPlaceableWater;
             }
             else {
-                pForm_21 = 0;
+                pForm_21 = nullptr;
             }
             pForm_3 = pForm_21;
             break;
@@ -5595,7 +5600,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_22 = (TESForm*)::new (v192) TESGrass;
             }
             else {
-                pForm_22 = 0;
+                pForm_22 = nullptr;
             }
             pForm_3 = pForm_22;
             break;
@@ -5607,7 +5612,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_27 = (TESForm*)::new (v187) TESObjectTREE;
             }
             else {
-                pForm_27 = 0;
+                pForm_27 = nullptr;
             }
             pForm_3 = pForm_27;
             break;
@@ -5620,13 +5625,13 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 v81 = ::new (v186) TESFlora;
             }
             else {
-                v81 = 0;
+                v81 = nullptr;
             }
             if (v81) {
                 pForm_2 = static_cast<TESObjectACTI*>(v81);
             }
             else {
-                pForm_2 = 0;
+                pForm_2 = nullptr;
             }
             pForm_3 = (TESForm*)pForm_2;
             break;
@@ -5638,7 +5643,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_28 = (TESForm*)::new (v185) TESFurniture;
             }
             else {
-                pForm_28 = 0;
+                pForm_28 = nullptr;
             }
             pForm_3 = pForm_28;
             break;
@@ -5650,7 +5655,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_29 = (TESForm*)::new (v184) TESObjectWEAP;
             }
             else {
-                pForm_29 = 0;
+                pForm_29 = nullptr;
             }
             pForm_3 = pForm_29;
             break;
@@ -5662,7 +5667,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_30 = (TESForm*)::new (v183) TESAmmo;
             }
             else {
-                pForm_30 = 0;
+                pForm_30 = nullptr;
             }
             pForm_3 = pForm_30;
             break;
@@ -5674,7 +5679,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_31 = (TESForm*)::new (v182) TESNPC;
             }
             else {
-                pForm_31 = 0;
+                pForm_31 = nullptr;
             }
             pForm_3 = pForm_31;
             break;
@@ -5686,7 +5691,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_32 = (TESForm*)::new (v181) TESCreature;
             }
             else {
-                pForm_32 = 0;
+                pForm_32 = nullptr;
             }
             pForm_3 = pForm_32;
             break;
@@ -5698,7 +5703,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_33 = (TESForm*)::new (v180) TESLevCreature;
             }
             else {
-                pForm_33 = 0;
+                pForm_33 = nullptr;
             }
             pForm_3 = pForm_33;
             break;
@@ -5710,7 +5715,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_34 = (TESForm*)::new (v179) TESLevCharacter;
             }
             else {
-                pForm_34 = 0;
+                pForm_34 = nullptr;
             }
             pForm_3 = pForm_34;
             break;
@@ -5722,7 +5727,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_18 = (TESForm*)::new (v197) TESKey;
             }
             else {
-                pForm_18 = 0;
+                pForm_18 = nullptr;
             }
             pForm_3 = pForm_18;
             break;
@@ -5734,7 +5739,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_37 = (TESForm*)::new (v176) AlchemyItem;
             }
             else {
-                pForm_37 = 0;
+                pForm_37 = nullptr;
             }
             pForm_3 = pForm_37;
             break;
@@ -5746,7 +5751,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_25 = (TESForm*)::new (v189) BGSIdleMarker;
             }
             else {
-                pForm_25 = 0;
+                pForm_25 = nullptr;
             }
             pForm_3 = pForm_25;
             break;
@@ -5758,7 +5763,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_40 = (TESForm*)::new (v173) BGSNote;
             }
             else {
-                pForm_40 = 0;
+                pForm_40 = nullptr;
             }
             pForm_3 = pForm_40;
             break;
@@ -5771,7 +5776,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_17 = (TESForm*)::new (v198) BGSConstructibleObject;
             }
             else {
-                pForm_17 = 0;
+                pForm_17 = nullptr;
             }
             pForm_3 = pForm_17;
             break;
@@ -5783,7 +5788,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_78 = (TESForm*)::new (v135) BGSProjectile;
             }
             else {
-                pForm_78 = 0;
+                pForm_78 = nullptr;
             }
             pForm_3 = pForm_78;
             break;
@@ -5795,7 +5800,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_38 = (TESForm*)::new (v175) TESLevItem;
             }
             else {
-                pForm_38 = 0;
+                pForm_38 = nullptr;
             }
             pForm_3 = pForm_38;
             break;
@@ -5807,7 +5812,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_62 = (TESForm*)::new (v151) TESWeather;
             }
             else {
-                pForm_62 = 0;
+                pForm_62 = nullptr;
             }
             pForm_3 = pForm_62;
             break;
@@ -5819,7 +5824,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_59 = (TESForm*)::new (v154) TESClimate;
             }
             else {
-                pForm_59 = 0;
+                pForm_59 = nullptr;
             }
             pForm_3 = pForm_59;
             break;
@@ -5831,7 +5836,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_69 = (TESForm*)::new (v144) TESRegion;
             }
             else {
-                pForm_69 = 0;
+                pForm_69 = nullptr;
             }
             pForm_3 = pForm_69;
             break;
@@ -5843,7 +5848,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_64 = (TESForm*)::new (v149) TESObjectCELL;
             }
             else {
-                pForm_64 = 0;
+                pForm_64 = nullptr;
             }
             pForm_3 = pForm_64;
             break;
@@ -5855,7 +5860,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_39 = (TESForm*)::new (v174) TESObjectREFR;
             }
             else {
-                pForm_39 = 0;
+                pForm_39 = nullptr;
             }
             pForm_3 = pForm_39;
             break;
@@ -5867,7 +5872,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_63 = (TESForm*)::new (v150) TESWorldSpace;
             }
             else {
-                pForm_63 = 0;
+                pForm_63 = nullptr;
             }
             pForm_3 = pForm_63;
             break;
@@ -5879,7 +5884,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_76 = (TESForm*)::new (v137) TESObjectLAND;
             }
             else {
-                pForm_76 = 0;
+                pForm_76 = nullptr;
             }
             pForm_3 = pForm_76;
             break;
@@ -5891,7 +5896,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_82 = (TESForm*)::new (v131) NavMesh;
             }
             else {
-                pForm_82 = 0;
+                pForm_82 = nullptr;
             }
             pForm_3 = pForm_82;
             break;
@@ -5903,7 +5908,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_68 = (TESForm*)::new (v145) TESQuest;
             }
             else {
-                pForm_68 = 0;
+                pForm_68 = nullptr;
             }
             pForm_3 = pForm_68;
             break;
@@ -5915,7 +5920,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_23 = (TESForm*)::new (v191) TESIdleForm;
             }
             else {
-                pForm_23 = 0;
+                pForm_23 = nullptr;
             }
             pForm_3 = pForm_23;
             break;
@@ -5927,7 +5932,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_26 = (TESForm*)::new (v188) TESPackage;
             }
             else {
-                pForm_26 = 0;
+                pForm_26 = nullptr;
             }
             pForm_3 = pForm_26;
             break;
@@ -5939,7 +5944,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_71 = (TESForm*)::new (v142) TESCombatStyle;
             }
             else {
-                pForm_71 = 0;
+                pForm_71 = nullptr;
             }
             pForm_3 = pForm_71;
             break;
@@ -5951,7 +5956,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_72 = (TESForm*)::new (v141) TESLoadScreen;
             }
             else {
-                pForm_72 = 0;
+                pForm_72 = nullptr;
             }
             pForm_3 = pForm_72;
             break;
@@ -5963,7 +5968,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_74 = (TESForm*)::new (v139) TESLevSpell;
             }
             else {
-                pForm_74 = 0;
+                pForm_74 = nullptr;
             }
             pForm_3 = pForm_74;
             break;
@@ -5975,7 +5980,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_75 = (TESForm*)::new (v138) TESObjectANIO;
             }
             else {
-                pForm_75 = 0;
+                pForm_75 = nullptr;
             }
             pForm_3 = pForm_75;
             break;
@@ -5987,7 +5992,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_73 = (TESForm*)::new (v140) TESWaterForm;
             }
             else {
-                pForm_73 = 0;
+                pForm_73 = nullptr;
             }
             pForm_3 = pForm_73;
             break;
@@ -5999,7 +6004,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_77 = (TESForm*)::new (v136) TESEffectShader;
             }
             else {
-                pForm_77 = 0;
+                pForm_77 = nullptr;
             }
             pForm_3 = pForm_77;
             break;
@@ -6011,7 +6016,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_79 = (TESForm*)::new (v134) BGSExplosion;
             }
             else {
-                pForm_79 = 0;
+                pForm_79 = nullptr;
             }
             pForm_3 = pForm_79;
             break;
@@ -6023,7 +6028,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_80 = (TESForm*)::new (v133) BGSDebris;
             }
             else {
-                pForm_80 = 0;
+                pForm_80 = nullptr;
             }
             pForm_3 = pForm_80;
             break;
@@ -6035,7 +6040,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_60 = (TESForm*)::new (v153) TESImageSpace;
             }
             else {
-                pForm_60 = 0;
+                pForm_60 = nullptr;
             }
             pForm_3 = pForm_60;
             break;
@@ -6047,7 +6052,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_61 = (TESForm*)::new (v152) TESImageSpaceModifier;
             }
             else {
-                pForm_61 = 0;
+                pForm_61 = nullptr;
             }
             pForm_3 = pForm_61;
             break;
@@ -6059,7 +6064,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_42 = (TESForm*)::new (v171) BGSListForm;
             }
             else {
-                pForm_42 = 0;
+                pForm_42 = nullptr;
             }
             pForm_3 = pForm_42;
             break;
@@ -6071,7 +6076,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_83 = (TESForm*)::new (v130) BGSPerk;
             }
             else {
-                pForm_83 = 0;
+                pForm_83 = nullptr;
             }
             pForm_3 = pForm_83;
             break;
@@ -6083,7 +6088,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_84 = (TESForm*)::new (v129) BGSBodyPartData;
             }
             else {
-                pForm_84 = 0;
+                pForm_84 = nullptr;
             }
             pForm_3 = pForm_84;
             break;
@@ -6095,7 +6100,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_85 = (TESForm*)::new (v128) BGSAddonNode;
             }
             else {
-                pForm_85 = 0;
+                pForm_85 = nullptr;
             }
             pForm_3 = pForm_85;
             break;
@@ -6107,7 +6112,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_86 = (TESForm*)::new (v127) ActorValueInfo(ActorValue::VALUE_NONE, nullptr);
             }
             else {
-                pForm_86 = 0;
+                pForm_86 = nullptr;
             }
             pForm_3 = pForm_86;
             break;
@@ -6119,7 +6124,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_87 = (TESForm*)::new (v126) BGSRadiationStage;
             }
             else {
-                pForm_87 = 0;
+                pForm_87 = nullptr;
             }
             pForm_3 = pForm_87;
             break;
@@ -6131,7 +6136,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_67 = (TESForm*)::new (v146) BGSCameraShot;
             }
             else {
-                pForm_67 = 0;
+                pForm_67 = nullptr;
             }
             pForm_3 = pForm_67;
             break;
@@ -6143,7 +6148,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_24 = (TESForm*)::new (v190) BGSCameraPath;
             }
             else {
-                pForm_24 = 0;
+                pForm_24 = nullptr;
             }
             pForm_3 = pForm_24;
             break;
@@ -6155,7 +6160,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_55 = (TESForm*)::new (v158) BGSVoiceType;
             }
             else {
-                pForm_55 = 0;
+                pForm_55 = nullptr;
             }
             pForm_3 = pForm_55;
             break;
@@ -6167,7 +6172,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_56 = (TESForm*)::new (v157) BGSImpactData;
             }
             else {
-                pForm_56 = 0;
+                pForm_56 = nullptr;
             }
             pForm_3 = pForm_56;
             break;
@@ -6179,7 +6184,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_57 = (TESForm*)::new (v156) BGSImpactDataSet;
             }
             else {
-                pForm_57 = 0;
+                pForm_57 = nullptr;
             }
             pForm_3 = pForm_57;
             break;
@@ -6191,7 +6196,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_8 = (TESForm*)::new (v207) TESObjectARMA;
             }
             else {
-                pForm_8 = 0;
+                pForm_8 = nullptr;
             }
             pForm_3 = pForm_8;
             break;
@@ -6203,7 +6208,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_47 = (TESForm*)::new (v166) BGSEncounterZone;
             }
             else {
-                pForm_47 = 0;
+                pForm_47 = nullptr;
             }
             pForm_3 = pForm_47;
             break;
@@ -6215,7 +6220,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_91 = (TESForm*)::new (v122) BGSMessage;
             }
             else {
-                pForm_91 = 0;
+                pForm_91 = nullptr;
             }
             pForm_3 = pForm_91;
             break;
@@ -6227,7 +6232,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_92 = (TESForm*)::new (v121) BGSRagdoll;
             }
             else {
-                pForm_92 = 0;
+                pForm_92 = nullptr;
             }
             pForm_3 = pForm_92;
             break;
@@ -6239,7 +6244,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_93 = (TESForm*)::new (v120) BGSLightingTemplate;
             }
             else {
-                pForm_93 = 0;
+                pForm_93 = nullptr;
             }
             pForm_3 = pForm_93;
             break;
@@ -6251,7 +6256,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_94 = (TESForm*)::new (v119) BGSMusicType;
             }
             else {
-                pForm_94 = 0;
+                pForm_94 = nullptr;
             }
             pForm_3 = pForm_94;
             break;
@@ -6263,7 +6268,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_16 = (TESForm*)::new (v199) TESObjectIMOD;
             }
             else {
-                pForm_16 = 0;
+                pForm_16 = nullptr;
             }
             pForm_3 = pForm_16;
             break;
@@ -6275,7 +6280,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_50 = (TESForm*)::new (v163) TESReputation;
             }
             else {
-                pForm_50 = 0;
+                pForm_50 = nullptr;
             }
             pForm_3 = pForm_50;
             break;
@@ -6287,7 +6292,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_95 = (TESForm*)::new (v118) TESRecipe;
             }
             else {
-                pForm_95 = 0;
+                pForm_95 = nullptr;
             }
             pForm_3 = pForm_95;
             break;
@@ -6299,7 +6304,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_96 = (TESForm*)::new (v117) TESRecipeCategory;
             }
             else {
-                pForm_96 = 0;
+                pForm_96 = nullptr;
             }
             pForm_3 = pForm_96;
             break;
@@ -6311,7 +6316,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_98 = (TESForm*)::new (v115) TESCasinoChips;
             }
             else {
-                pForm_98 = 0;
+                pForm_98 = nullptr;
             }
             pForm_3 = pForm_98;
             break;
@@ -6323,7 +6328,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_100 = (TESForm*)::new (v113) TESCasino;
             }
             else {
-                pForm_100 = 0;
+                pForm_100 = nullptr;
             }
             pForm_3 = pForm_100;
             break;
@@ -6335,7 +6340,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_99 = (TESForm*)::new (v114) TESLoadScreenType;
             }
             else {
-                pForm_99 = 0;
+                pForm_99 = nullptr;
             }
             pForm_3 = pForm_99;
             break;
@@ -6347,7 +6352,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_101 = (TESForm*)::new (v112) MediaSet;
             }
             else {
-                pForm_101 = 0;
+                pForm_101 = nullptr;
             }
             pForm_3 = pForm_101;
             break;
@@ -6360,7 +6365,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_102 = (TESForm*)::new (v111) MediaLocationController;
             }
             else {
-                pForm_102 = 0;
+                pForm_102 = nullptr;
             }
             pForm_3 = pForm_102;
             break;
@@ -6372,7 +6377,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_51 = (TESForm*)::new (v162) TESChallenge;
             }
             else {
-                pForm_51 = 0;
+                pForm_51 = nullptr;
             }
             pForm_3 = pForm_51;
             break;
@@ -6384,7 +6389,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_97 = (TESForm*)::new (v116) TESAmmoEffect;
             }
             else {
-                pForm_97 = 0;
+                pForm_97 = nullptr;
             }
             pForm_3 = pForm_97;
             break;
@@ -6396,7 +6401,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_103 = (TESForm*)::new (v110) TESCaravanCard;
             }
             else {
-                pForm_103 = 0;
+                pForm_103 = nullptr;
             }
             pForm_3 = pForm_103;
             break;
@@ -6408,7 +6413,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_104 = (TESForm*)::new (v109) TESCaravanMoney;
             }
             else {
-                pForm_104 = 0;
+                pForm_104 = nullptr;
             }
             pForm_3 = pForm_104;
             break;
@@ -6420,7 +6425,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_105 = (TESForm*)::new (v108) TESCaravanDeck;
             }
             else {
-                pForm_105 = 0;
+                pForm_105 = nullptr;
             }
             pForm_3 = pForm_105;
             break;
@@ -6432,7 +6437,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_88 = (TESForm*)::new (v125) BGSDehydrationStage;
             }
             else {
-                pForm_88 = 0;
+                pForm_88 = nullptr;
             }
             pForm_3 = pForm_88;
             break;
@@ -6444,7 +6449,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_89 = (TESForm*)::new (v124) BGSHungerStage;
             }
             else {
-                pForm_89 = 0;
+                pForm_89 = nullptr;
             }
             pForm_3 = pForm_89;
             break;
@@ -6457,7 +6462,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
                 pForm_90 = (TESForm*)::new (v123) BGSSleepDeprevationStage;
             }
             else {
-                pForm_90 = 0;
+                pForm_90 = nullptr;
             }
             pForm_3 = pForm_90;
             break;
@@ -6516,7 +6521,7 @@ void TESDataHandler::EnsureFactionFriendshipsAreTwoWay() {
 }
 
 void TESDataHandler::RegisterError() {
-    MessageHandler::bShowNextWarning = (bool)1;
+    MessageHandler::bShowNextWarning = true;
 }
 
 void TESDataHandler::operator delete(void* apMemory) {

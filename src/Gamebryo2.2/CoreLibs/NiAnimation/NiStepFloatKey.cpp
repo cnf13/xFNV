@@ -7,7 +7,7 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiStepPosKey.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 void NiStepFloatKey::Interpolate(
     float fTime,

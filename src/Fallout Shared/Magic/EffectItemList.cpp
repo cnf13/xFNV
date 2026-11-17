@@ -50,7 +50,7 @@ float EffectItemList::GetCost(Actor* apActor) {
                 p_m_pkNext = static_cast<EffectItemList*>(pNext);
             }
             else {
-                p_m_pkNext = 0;
+                p_m_pkNext = nullptr;
             }
             plist = p_m_pkNext;
         }
@@ -65,7 +65,7 @@ float EffectItemList::GetCost(Actor* apActor) {
 
 void EffectItemList::GetEffectsString(char* apBuffer, uint32_t auiSize) {
     FNVD_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
-    bool bDispositionFailure = 0;
+    bool bDispositionFailure = false;
     StatsMenu::StatusDataList kStatusList;
     bool bMedicine = IsMedicine();
     bool bFood = IsFood();
@@ -76,7 +76,7 @@ void EffectItemList::GetEffectsString(char* apBuffer, uint32_t auiSize) {
     BSSimpleList<EffectItem*>* pEffectNode = static_cast<BSSimpleList<EffectItem*>*>(this);
     while (pEffectNode && pEffectNode->m_item) {
         if (!pEffectNode->m_item->IsUsageMonitorEffect()) {
-            if (pEffectNode->m_item->Conditions.IsTrueFull(pPlayer, 0, &bDispositionFailure, 0)) {
+            if (pEffectNode->m_item->Conditions.IsTrueFull(pPlayer, nullptr, &bDispositionFailure, false)) {
                 if (pEffectNode->m_item->pEffectSetting->IsFlagSet(EffectSetting::DISPLAY_EFFECT_NAME)) {
                     BSStringT<char>* EffectName = pEffectNode->m_item->GetEffectName(&apString);
                     BSstrcpy(Dst, 128, EffectName->pString);
@@ -182,9 +182,9 @@ void EffectItemList::GetEffectsString(char* apBuffer, uint32_t auiSize) {
 bool EffectItemList::HasEffect(EffectSetting::EffectFlag aeFlag) {
     EffectItemList* pIter = this;
     if (IsEmpty()) {
-        return 0;
+        return false;
     }
-    bool bFound = 0;
+    bool bFound = false;
     while (pIter && !bFound) {
         EffectItem* pItem = pIter->m_item;
         if (pItem) {
@@ -202,9 +202,9 @@ bool EffectItemList::HasEffect(EffectSetting::EffectFlag aeFlag) {
 bool EffectItemList::HasSelfEffect() {
     EffectItemList* pIter = this;
     if (IsEmpty()) {
-        return 0;
+        return false;
     }
-    bool bFound = 0;
+    bool bFound = false;
     while (pIter && !bFound) {
         EffectItem* pItem = pIter->m_item;
         if (pItem) {
@@ -226,7 +226,7 @@ bool EffectItemList::HasTouchEffect() {
     bool vCondition1;
     vCondition1 = static_cast<BSSimpleList<EffectItem*>*>(this)->IsEmpty();
     if (vCondition1) {
-        return (bool)0;
+        return false;
     }
     uint8_t bEnabled = 0;
     while (pIter && (!bEnabled)) {
@@ -299,7 +299,7 @@ void EffectItemList::Load(TESFile* apFile, const char* apSpellName) {
                     pNew = ::new (pMemory) EffectItem(pEffectSetting);
                 }
                 else {
-                    pNew = 0;
+                    pNew = nullptr;
                 }
                 EffectItem* pEffect = pNew;
                 apFile->NextChunk();
@@ -327,7 +327,7 @@ void EffectItemList::Load(TESFile* apFile, const char* apSpellName) {
                     if (pEffect) {
                         delete pEffect;
                     }
-                    pEffect = 0;
+                    pEffect = nullptr;
                 }
                 pLastEffect = pEffect;
             }
@@ -357,12 +357,12 @@ bool EffectItemList::CanBePoison() {
     bool vCondition1;
     vCondition1 = static_cast<BSSimpleList<EffectItem*>*>(this)->IsEmpty();
     if (vCondition1) {
-        return (bool)0;
+        return false;
     }
     while (v5) {
         v4 = static_cast<BSSimpleList<EffectItem*>*>(v5)->m_item;
         if (v4 && ((!v4->IsDisabled()) && (!v4->IsHostile()))) {
-            return (bool)0;
+            return false;
         }
         v3 = static_cast<BSSimpleList<EffectItem*>*>(v5)->m_pkNext;
         if (v3) {
@@ -373,7 +373,7 @@ bool EffectItemList::CanBePoison() {
         }
         v5 = v2;
     }
-    return (bool)1;
+    return true;
 }
 
 void EffectItemList::RemoveAllEffects() {
@@ -391,7 +391,7 @@ void EffectItemList::RemoveAllEffects() {
                 p_m_pkNext = static_cast<EffectItemList*>(pNext);
             }
             else {
-                p_m_pkNext = 0;
+                p_m_pkNext = nullptr;
             }
             pThis = p_m_pkNext;
         }
@@ -456,7 +456,7 @@ bool EffectItemList::HasTargetEffect() {
     bool vCondition1;
     vCondition1 = static_cast<BSSimpleList<EffectItem*>*>(this)->IsEmpty();
     if (vCondition1) {
-        return (bool)0;
+        return false;
     }
     uint8_t v6 = 0;
     while (pIter && (!v6)) {
@@ -480,7 +480,7 @@ bool EffectItemList::HasTargetEffect() {
 
 ActorValue::Index EffectItemList::GetAssociatedSkill() {
     int32_t v2 = (-1);
-    EffectItem* costliestEffect = GetCostliestEffect(MagicSystem::RANGE_COUNT, 0);
+    EffectItem* costliestEffect = GetCostliestEffect(MagicSystem::RANGE_COUNT, false);
     if (costliestEffect) {
         return static_cast<ActorValue::Index>((int32_t)costliestEffect->GetMagicSchool());
     }
@@ -573,7 +573,7 @@ EffectItem* EffectItemList::GetEffectItemByIndex(uint8_t aiIndex) {
         v3 = static_cast<BSSimpleList<EffectItem*>*>(this);
     }
     else {
-        v3 = (BSSimpleList<EffectItem*>*)0;
+        v3 = (BSSimpleList<EffectItem*>*)nullptr;
     }
     for (ecx0 = v3; ecx0; ecx0 = ecx0->m_pkNext) {
         if (v5 == aiIndex) {
@@ -597,7 +597,7 @@ bool EffectItemList::IsDisabled() {
     bool vCondition1;
     vCondition1 = static_cast<BSSimpleList<EffectItem*>*>(this)->IsEmpty();
     if (vCondition1) {
-        return (bool)0;
+        return false;
     }
     while (pIter && (!bIsDisabled)) {
         v4 = static_cast<BSSimpleList<EffectItem*>*>(pIter)->m_item;
@@ -620,7 +620,7 @@ bool EffectItemList::IsDisabled() {
 bool EffectItemList::Compare(EffectItemList* apCompare) {
     int32_t iCount = apCompare->ItemsInList();
     if (iCount != ItemsInList()) {
-        return 1;
+        return true;
     }
     if (!IsEmpty()) {
         EffectItemList* pThisList = this;
@@ -629,7 +629,7 @@ bool EffectItemList::Compare(EffectItemList* apCompare) {
             EffectItem* pThisItem = pThisList->m_item;
             EffectItem* pOtherItem = pOtherList->m_item;
             if (pThisItem && (pOtherItem && pThisItem->MatchesEffect(pOtherItem))) {
-                return 1;
+                return true;
             }
             BSSimpleList<EffectItem*>* pNext = pThisList->m_pkNext;
             pThisList = pNext ? static_cast<EffectItemList*>(pNext) : nullptr;
@@ -637,7 +637,7 @@ bool EffectItemList::Compare(EffectItemList* apCompare) {
             pOtherList = pOtherNext ? static_cast<EffectItemList*>(pOtherNext) : nullptr;
         }
     }
-    return 0;
+    return false;
 }
 
 uint8_t EffectItemList::GetEffectItemIndex(EffectItem* apEffect) {
@@ -647,7 +647,7 @@ uint8_t EffectItemList::GetEffectItemIndex(EffectItem* apEffect) {
         v3 = static_cast<BSSimpleList<EffectItem*>*>(this);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     for (EffectItem*& rpItem : *v3) {
         if (apEffect == rpItem) {
@@ -666,9 +666,9 @@ uint8_t EffectItemList::GetEffectItemIndex(EffectItem* apEffect) {
 bool EffectItemList::HasScript(Script* apScript) {
     EffectItemList* pIter = this;
     if (IsEmpty()) {
-        return 0;
+        return false;
     }
-    bool bFound = 0;
+    bool bFound = false;
     while (pIter && !bFound) {
         EffectItem* pItem = pIter->m_item;
         if (pItem) {

@@ -100,7 +100,7 @@ void SetTerminalMenuPos(float afX, float afY, float afScale) {
 }
 
 void SurgeryMenu::LimbWound::ResetLimb() {
-    bResetLimb = 1;
+    bResetLimb = true;
     for (BSSimpleList<SurgeryMenu::SequenceInfo*>* psequenceList = xSequenceInfo;
          psequenceList && !psequenceList->IsEmpty(); psequenceList = psequenceList->m_pkNext) {
         psequenceList->m_item->xBoneList->RemoveAll();
@@ -366,15 +366,15 @@ void SurgeryMenu::DoIdle() {
 bool SurgeryMenu::DoKey(int32_t aiKey) {
     if ((aiKey == 87) || (aiKey == 119)) {
         DoClick(6, nullptr);
-        return (bool)1;
+        return true;
     }
     else {
         if ((aiKey == 83) || (aiKey == 115)) {
             DoClick(5, nullptr);
-            return (bool)1;
+            return true;
         }
         else {
-            return (bool)0;
+            return false;
         }
     }
 }
@@ -460,7 +460,7 @@ void SurgeryMenu::UpdateAnimations() {
     NiTimeController* psurgerygeomController = pFrameGeometry->GetControllers();
     if (psurgerygeomController) {
         NiControllerManager* ppsurgerygeomControllerManager = static_cast<NiControllerManager*>(psurgerygeomController);
-        NiControllerSequence* pseq = 0;
+        NiControllerSequence* pseq = nullptr;
         SurgeryMenu::SURGERY_MENU_ANIMATION eAnimation = this->eAnimation;
         switch (eAnimation) {
             case SurgeryMenu::SMA_GAME_START: {
@@ -484,10 +484,10 @@ void SurgeryMenu::UpdateAnimations() {
         }
         fFrameAnimTimer = appTimer.fDelta + fFrameAnimTimer;
         if (pseq) {
-            pseq->Update(fFrameAnimTimer, 1);
+            pseq->Update(fFrameAnimTimer, true);
             while (psurgerygeomController) {
                 if (NiObject::DynamicCastStatic(&NiMultiTargetTransformController::ms_RTTI, psurgerygeomController)) {
-                    NiUpdateData UpdateData(fFrameAnimTimer, 0, 0);
+                    NiUpdateData UpdateData(fFrameAnimTimer, false, false);
                     psurgerygeomController->Update(UpdateData);
                     break;
                 }
@@ -495,7 +495,7 @@ void SurgeryMenu::UpdateAnimations() {
             }
         }
     }
-    NiUpdateData update(0.0f, 0, 0);
+    NiUpdateData update(0.0f, false, false);
     pFrameGeometry->Update(update);
 }
 
@@ -528,7 +528,7 @@ void SurgeryMenu::UpdateToolLocation(bool abBurning) {
         float fmouseSpeedScalar;
         float fmagnitude;
         float fresistanceTime;
-        bBurning = 1;
+        bBurning = true;
         pTiles[12]->Set(4003, 1);
         int32_t a1 = pPlayer->GetActorValue(ActorValue::MEDICINE);
         float afPainPercent = fPainPercent / 100.0;
@@ -610,7 +610,7 @@ void SurgeryMenu::UpdateToolLocation(bool abBurning) {
         pim->SetCursorPos(v13, v15);
     }
     else {
-        bBurning = 0;
+        bBurning = false;
         fToolMovement = 0.0f;
         pTiles[12]->Set(4003, 0);
         InterfaceManager::Instance();
@@ -654,7 +654,7 @@ void SurgeryMenu::BurnFlesh() {
                     BSAudio* v3 = &BSAudio::QInstance();
                     BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&apResult, "UISurgeryPain03", 289u);
                     soundHand_3.operator=(*SoundHandleByName);
-                    soundHand_3.Play(0);
+                    soundHand_3.Play(false);
                 }
             }
             else {
@@ -662,7 +662,7 @@ void SurgeryMenu::BurnFlesh() {
                 BSAudio* v2 = &BSAudio::QInstance();
                 BSSoundHandle* v12 = v2->GetSoundHandleByName(&arHandle, "UISurgeryPain02", 289u);
                 soundHand_2.operator=(*v12);
-                soundHand_2.Play(0);
+                soundHand_2.Play(false);
             }
         }
         else {
@@ -670,7 +670,7 @@ void SurgeryMenu::BurnFlesh() {
             BSAudio* v1 = &BSAudio::QInstance();
             BSSoundHandle* v13 = v1->GetSoundHandleByName(&a1, "UISurgeryPain01", 289u);
             soundHand.operator=(*v13);
-            soundHand.Play(0);
+            soundHand.Play(false);
         }
     }
     uiPainTimer = appTimer.iLastTime;
@@ -681,12 +681,12 @@ void SurgeryMenu::BurnFlesh() {
     float value = static_cast<float>(pPlayer->GetActorValue(ActorValue::MEDICINE));
     float valuea = FLerp(100.0f, 500.0f, 0.0f, 100.0f, value);
     if (FLerp(valuea, 1000.0f, 100.0f, 0.0f, fPainPercent) < static_cast<double>(v10)) {
-        pPlayer->DamageModActorValue(ActorValue::HEALTH, -1, 0);
+        pPlayer->DamageModActorValue(ActorValue::HEALTH, -1, nullptr);
         uiHitPointTimer = appTimer.iLastTime;
     }
     BSsprintf(tmp, 256, "%i%%", pPlayer->GetActorValue(ActorValue::MEDICINE));
     int32_t v5 = Tile::TextToTrait("_Value");
-    pTiles[9]->Set(v5, tmp, 1);
+    pTiles[9]->Set(v5, tmp, true);
 }
 
 bool SurgeryMenu::IsCursorInFlesh() {
@@ -698,7 +698,7 @@ bool SurgeryMenu::IsCursorInFlesh() {
     NiPoint2 Vector;
     InterfaceManager::Instance();
     if (InterfaceManager::Has360Controller()) {
-        return 1;
+        return true;
     }
     NiFixedString* v9 = ::new (static_cast<void*>(&apString)) NiFixedString("CenterNode");
     NiAVObject* pcenter = pFrameGeometry->GetObjectByName(*v9);
@@ -747,7 +747,7 @@ void SurgeryMenu::UpdateFace() {
         float bface = FLerp(0.0f, 1.0f, 0.0f, 100.0f, fPainPercent);
         bface_2->SetExpressionTarget(BS_FG_EXPRESSION_MOOD_PAINED, bface);
         float afTime = static_cast<double>(appTimer.iLastTime) / 1000.0;
-        NiUpdateData update(afTime, 1, 0);
+        NiUpdateData update(afTime, true, false);
         SurgeryMenu::spPlayer3D.m_pObject->Update(update);
     }
 }
@@ -759,7 +759,7 @@ void SurgeryMenu::SetAnimation(SurgeryMenu::SURGERY_MENU_ANIMATION aeAnimation) 
         SurgeryMenu::pSurgeryMenu->pFrameGeometry->GetController(&NiControllerManager::ms_RTTI);
     if (psurgerygeomController) {
         NiControllerManager* ppsurgerygeomControllerManager = static_cast<NiControllerManager*>(psurgerygeomController);
-        NiControllerSequence* pseq = 0;
+        NiControllerSequence* pseq = nullptr;
         SurgeryMenu::SURGERY_MENU_ANIMATION eAnimation = this->eAnimation;
         switch (eAnimation) {
             case SurgeryMenu::SMA_GAME_START: {
@@ -783,8 +783,8 @@ void SurgeryMenu::SetAnimation(SurgeryMenu::SURGERY_MENU_ANIMATION aeAnimation) 
         }
         if (pseq) {
             ppsurgerygeomControllerManager->DeactivateAll(0.0f);
-            ppsurgerygeomControllerManager->ActivateSequence(pseq, 0, 1, 1.0f, 0.0f, 0);
-            ppsurgerygeomControllerManager->SetActive(1);
+            ppsurgerygeomControllerManager->ActivateSequence(pseq, 0, true, 1.0f, 0.0f, nullptr);
+            ppsurgerygeomControllerManager->SetActive(true);
             pseq->ResetSequence();
         }
     }
@@ -834,9 +834,9 @@ int32_t SurgeryMenu::ShowLimbCondition() {
     }
     float v4 = static_cast<double>(static_cast<int32_t>(fscale)) / 100.0;
     int32_t v1 = Tile::TextToTrait("_Value");
-    pTiles[17]->Set(v1, v4, 1);
+    pTiles[17]->Set(v1, v4, true);
     const char* ActorValueName = ActorValue::GetActorValueName(eCurrentDamagedPart);
-    pTiles[8]->Set(4036, ActorValueName, 1);
+    pTiles[8]->Set(4036, ActorValueName, true);
     return static_cast<int32_t>(fscale);
 }
 
@@ -860,9 +860,9 @@ float SurgeryMenu::GetLimbPercentFromSequences() {
     }
     else {
         int32_t v1 = Tile::TextToTrait("_Value");
-        pTiles[17]->Set(v1, 1.0f, 1);
+        pTiles[17]->Set(v1, 1.0f, true);
         const char* ActorValueName = ActorValue::GetActorValueName(eCurrentDamagedPart);
-        pTiles[8]->Set(4036, ActorValueName, 1);
+        pTiles[8]->Set(4036, ActorValueName, true);
         return 0.0f;
     }
 }
@@ -873,10 +873,10 @@ void SurgeryMenu::SetLimbSequences(float afPercent) {
     while (psequenceInfoList && !psequenceInfoList->IsEmpty()) {
         // The phase is rounded to a float before it is passed.
         float afPhase = psequenceInfoList->m_item->Sequence->m_fEndKeyTime * afPercent;
-        psequenceInfoList->m_item->Sequence->SetPhase(afPhase, 1);
+        psequenceInfoList->m_item->Sequence->SetPhase(afPhase, true);
         psequenceInfoList = psequenceInfoList->m_pkNext;
     }
-    NiUpdateData update(0.0f, 1, 0);
+    NiUpdateData update(0.0f, true, false);
     SurgeryMenu::sp3DSkin.m_pObject->Update(update);
 }
 
@@ -945,7 +945,7 @@ float SurgeryMenu::UpdateFlesh() {
         }
         if (binsideWound) {
             if (!BurningWoundSoundHand.IsPlaying()) {
-                BurningWoundSoundHand.Play(0);
+                BurningWoundSoundHand.Play(false);
             }
             if (uiWoundBurnTime) {
                 uint32_t uiBurnTime = appTimer.iLastTime - uiWoundBurnTime;
@@ -977,25 +977,25 @@ float SurgeryMenu::UpdateFlesh() {
                         uiWoundCloseTime = appTimer.iLastTime;
                     }
                     for (int32_t i = 0; i < 2; ++i) {
-                        psequence[i]->SetPhase(fsequenceTime[i], 1);
+                        psequence[i]->SetPhase(fsequenceTime[i], true);
                         pseqinfo[i]->fSequenceTime = fsequenceTime[i];
                     }
-                    NiUpdateData update(0.0f, 1, 0);
+                    NiUpdateData update(0.0f, true, false);
                     int32_t iindex = GetIndexFromActorValue(pwound->eLimb);
                     static_cast<NiAVObject*>(SurgeryMenu::pSurgeryMenu->pSkinGeometry[iindex].m_pObject)
                         ->NiAVObject::Update(update);
                     if (SurgeryMenu::pSurgeryMenu->pScar) {
                         if ((fsequenceTime[0] + fsequenceTime[1]) / 2.0 < 0.10000000149011612) {
-                            PlaceDecal(toolLoc, 1);
+                            PlaceDecal(toolLoc, true);
                         }
                     }
                 }
             }
         }
         else {
-            PlaceDecal(toolLoc, 0);
+            PlaceDecal(toolLoc, false);
             if (!BurningFleshSoundHand.IsPlaying()) {
-                BurningFleshSoundHand.Play(0);
+                BurningFleshSoundHand.Play(false);
             }
             if (BurningWoundSoundHand.IsPlaying()) {
                 BurningWoundSoundHand.Stop();
@@ -1023,7 +1023,7 @@ float SurgeryMenu::UpdateFlesh() {
     [[maybe_unused]] NiPoint3 p = static_cast<NiAVObject*>(pSkinGeometry[iindex].m_pObject)->GetTranslate();
     iindex = GetIndexFromActorValue(pwound->eLimb);
     static_cast<NiAVObject*>(pSkinGeometry[iindex].m_pObject)->NiAVObject::SetTranslate(movement.x, movement.y, 1.0f);
-    NiUpdateData UpdateData1(0.0f, 0, 0);
+    NiUpdateData UpdateData1(0.0f, false, false);
     iindex = GetIndexFromActorValue(pwound->eLimb);
     static_cast<NiAVObject*>(pSkinGeometry[iindex].m_pObject)->NiAVObject::Update(UpdateData1);
     if (binsideWound) {
@@ -1076,9 +1076,9 @@ void SurgeryMenu::PlaceToolInWindow(int32_t aiX, int32_t aiY) {
         Vector.operator*=(static_cast<float>(radius));
     }
     float afValue = static_cast<double>(icenterX) + Vector.x;
-    pTiles[6]->Set(4001, afValue, 1);
+    pTiles[6]->Set(4001, afValue, true);
     float v6 = static_cast<double>(icenterY) + Vector.y;
-    pTiles[6]->Set(4002, v6, 1);
+    pTiles[6]->Set(4002, v6, true);
 }
 
 void SurgeryMenu::PlaceDecal(NiPoint2 aToolLocation, bool abInWound) {
@@ -1090,13 +1090,13 @@ void SurgeryMenu::PlaceDecal(NiPoint2 aToolLocation, bool abInWound) {
     float fx = static_cast<double>(Renderer::GetScreenWidth()) * aToolLocation.x;
     float fy = static_cast<double>(Renderer::GetScreenHeight()) * aToolLocation.y;
     SurgeryMenu::sp3DCamera.m_pObject->WindowPointToRay(
-        static_cast<int32_t>(fx), static_cast<int32_t>(fy), korigin, kdir, 0
+        static_cast<int32_t>(fx), static_cast<int32_t>(fy), korigin, kdir, nullptr
     );
     NiPoint3 isect = NiPoint3_ZERO;
     NiPick activatePick(0, 8u);
-    activatePick.SetObserveAppCullFlag(0);
+    activatePick.SetObserveAppCullFlag(false);
     activatePick.SetTarget(SurgeryMenu::pSurgeryMenu->pScar);
-    if (activatePick.PickObjects(korigin, kdir, 0)) {
+    if (activatePick.PickObjects(korigin, kdir, false)) {
         uint32_t uiIndex = 0;
         NiPick::Record* ppickRecord = (&activatePick.m_pickResults)->GetAt(uiIndex);
         if (ppickRecord) {
@@ -1117,7 +1117,7 @@ void SurgeryMenu::PlaceDecal(NiPoint2 aToolLocation, bool abInWound) {
     pdecalData.pAVObj = SurgeryMenu::pSurgeryMenu->pScar;
     pdecalData.fRotation = RandomFloatTwoPi();
     pdecalData.pTexSet = pgoodTextureSet;
-    pdecalData.bUseOcclusionQuery = 0;
+    pdecalData.bUseOcclusionQuery = false;
     pdecalData.pParentCell = pPlayer->GetParentCell();
     pdecalData.fDecalWidth = 0.5f;
     pdecalData.fDecalHeight = 0.5f;
@@ -1125,18 +1125,18 @@ void SurgeryMenu::PlaceDecal(NiPoint2 aToolLocation, bool abInWound) {
     pdecalData.fPlacementRadius = 0.0f;
     pdecalData.fVertexColor = *FNVD_RECONSTRUCT(NiColor)(&kColor, 1.0f, 0.0f, 0.0f);
     pdecalData.fDecalEpsilon = 75.0f;
-    pdecalData.bAlphaTesting = 1;
-    pdecalData.bAlphaBlending = 1;
-    pdecalData.bModelSpace = 0;
+    pdecalData.bAlphaTesting = true;
+    pdecalData.bAlphaBlending = true;
+    pdecalData.bModelSpace = false;
     BGSDecalManager* Singleton = BGSDecalManager::GetSingleton();
-    Singleton->AddDecal(pdecalData, BGSDecalManager::DECAL_TYPE_SIMPLE, 1);
+    Singleton->AddDecal(pdecalData, BGSDecalManager::DECAL_TYPE_SIMPLE, true);
 }
 
 void SurgeryMenu::Draw3DElements() {
     if (SurgeryMenu::sp3DSkin.m_pObject) {
         if (SurgeryMenu::spPlayer3D.m_pObject) {
             NiRenderer* Renderer_ = NiRenderer::GetRenderer();
-            Renderer_->ClearBuffer(0, 4u);
+            Renderer_->ClearBuffer(nullptr, 4u);
             SceneGraph* apSceneGraph = Main::GetWorldSceneGraph();
             BSCullingProcess* apCuller = apSceneGraph->pCuller;
             apCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
@@ -1150,14 +1150,14 @@ void SurgeryMenu::Draw3DElements() {
             apCuller->SetAccumulator(afScale);
             BSShaderUtil::AccumulateScene(pcam, pssnode, *apCuller);
             BSShaderAccumulator* v4 = spaccum.m_pObject;
-            BSShaderUtil::RenderScene(pcam, v4, 0);
-            SurgeryMenu::spPlayer3D.m_pObject->SetAppCulled(0);
+            BSShaderUtil::RenderScene(pcam, v4, false);
+            SurgeryMenu::spPlayer3D.m_pObject->SetAppCulled(false);
             ShadowSceneNode* pssnode_2 = BSShaderManager::GetShadowSceneNode(3);
             BSShaderUtil::AccumulateScene(pcam, pssnode_2, *apCuller);
             BSShaderAccumulator* v5 = spaccum.m_pObject;
-            BSShaderUtil::RenderScene(pcam, v5, 0);
-            apCuller->SetAccumulator(0);
-            spaccum.operator=(static_cast<BSShaderAccumulator*>(0));
+            BSShaderUtil::RenderScene(pcam, v5, false);
+            apCuller->SetAccumulator(nullptr);
+            spaccum.operator=(static_cast<BSShaderAccumulator*>(nullptr));
             apCuller->PopCullMode();
         }
     }
@@ -1228,7 +1228,7 @@ void SurgeryMenu::Close() {
             BSAudio* v1 = &BSAudio::QInstance();
             BSSoundHandle* arHandle = v1->GetSoundHandleByName(&a1, "UISurgeryExit", 289u);
             soundHand.operator=(*arHandle);
-            soundHand.Play(0);
+            soundHand.Play(false);
             ptile->Set(Tile::kTileValue_DeleteOnFade, 1);
             SurgeryMenu::pSurgeryMenu->StartFadeOut();
             for (BSSimpleList<SurgeryMenu::LimbWound*>* plist = &SurgeryMenu::xLimbWounds; plist && !plist->IsEmpty();
@@ -1249,17 +1249,17 @@ void SurgeryMenu::Close() {
 void SurgeryMenu::PrepareSequences(NiAVObject* apNode) {
     if (apNode) {
         NiTimeController* pcontroller = apNode->GetController(&NiControllerManager::ms_RTTI);
-        bool bwoundPreviouslyCreated = 1;
+        bool bwoundPreviouslyCreated = true;
         if (pcontroller) {
             SurgeryMenu::pSurgeryMenu->pSkinControllerManager = static_cast<NiControllerManager*>(pcontroller);
             SurgeryMenu::LimbWound* plimbWound = SurgeryMenu::pSurgeryMenu->GetCurrentLimbWound();
-            SurgeryMenu::LimbWound* pwound = 0;
+            SurgeryMenu::LimbWound* pwound = nullptr;
             if (plimbWound) {
                 pwound = plimbWound;
             }
             else {
                 BSSimpleList<SurgeryMenu::SequenceInfo*>* v16;
-                bwoundPreviouslyCreated = 0;
+                bwoundPreviouslyCreated = false;
                 SurgeryMenu::LimbWound* v23 =
                     static_cast<SurgeryMenu::LimbWound*>(ourMalloc(sizeof(SurgeryMenu::LimbWound)));
                 pwound = v23;
@@ -1273,10 +1273,10 @@ void SurgeryMenu::PrepareSequences(NiAVObject* apNode) {
                     v16 = ::new (v21) BSSimpleList<SurgeryMenu::SequenceInfo*>;
                 }
                 else {
-                    v16 = 0;
+                    v16 = nullptr;
                 }
                 pwound->xSequenceInfo = v16;
-                pwound->bResetLimb = 0;
+                pwound->bResetLimb = false;
                 SurgeryMenu::xLimbWounds.AddHead(pwound);
             }
             for (int32_t n = 0;; ++n) {
@@ -1289,7 +1289,7 @@ void SurgeryMenu::PrepareSequences(NiAVObject* apNode) {
                     SurgeryMenu::pSurgeryMenu->pSkinControllerManager->GetSequenceAt(static_cast<uint32_t>(n));
                 const char* HandleString = (&pseq->m_kName)->GetHandleString();
                 std::sprintf(goodTargets, "Bone%s", HandleString);
-                SurgeryMenu::SequenceInfo* sseqInfo_2 = 0;
+                SurgeryMenu::SequenceInfo* sseqInfo_2 = nullptr;
                 if (!plimbWound || plimbWound->bResetLimb) {
                     BSSimpleList<NiAVObject*>* v15;
                     SurgeryMenu::SequenceInfo* sseqInfo =
@@ -1301,7 +1301,7 @@ void SurgeryMenu::PrepareSequences(NiAVObject* apNode) {
                         v15 = ::new (v18) BSSimpleList<NiAVObject*>;
                     }
                     else {
-                        v15 = 0;
+                        v15 = nullptr;
                     }
                     BSSimpleList<NiAVObject*>* v19 = v15;
                     sseqInfo_2->xBoneList = v15;
@@ -1373,27 +1373,27 @@ void SurgeryMenu::PrepareSequences(NiAVObject* apNode) {
                     if (ParentCell == SurgeryMenu::pSurgeryMenu->pSkinControllerManager) {
                         NiControllerSequence* Sequence = psequenceInfoList->m_item->Sequence;
                         SurgeryMenu::pSurgeryMenu->pSkinControllerManager->ActivateSequence(
-                            Sequence, 0, 1, 1.0f, 0.0f, 0
+                            Sequence, 0, true, 1.0f, 0.0f, nullptr
                         );
                     }
-                    psequenceInfoList->m_item->Sequence->Update(0.0f, 1);
+                    psequenceInfoList->m_item->Sequence->Update(0.0f, true);
                     if (bwoundPreviouslyCreated && !plimbWounds->bResetLimb) {
                         SurgeryMenu::SequenceInfo* m_item = psequenceInfoList->m_item;
-                        psequenceInfoList->m_item->Sequence->SetPhase(m_item->fSequenceTime, 1);
+                        psequenceInfoList->m_item->Sequence->SetPhase(m_item->fSequenceTime, true);
                     }
                     else {
                         double EndKeyTime = psequenceInfoList->m_item->Sequence->m_fEndKeyTime;
                         float v13 = EndKeyTime * fscale;
-                        psequenceInfoList->m_item->Sequence->SetPhase(v13, 1);
+                        psequenceInfoList->m_item->Sequence->SetPhase(v13, true);
                         double v9 = psequenceInfoList->m_item->Sequence->m_fEndKeyTime;
                         double v12 = v9 * fscale;
                         psequenceInfoList->m_item->fSequenceTime = v12;
                     }
                 }
-                plimbWounds->bResetLimb = 0;
+                plimbWounds->bResetLimb = false;
             }
         }
-        NiUpdateData update(0.0f, 1, 0);
+        NiUpdateData update(0.0f, true, false);
         apNode->Update(update);
     }
 }
@@ -1409,15 +1409,15 @@ void SurgeryMenu::Shutdown3DElements() {
     v2->RemoveAllLights();
     ShadowSceneNode* v3 = BSShaderManager::GetShadowSceneNode(3);
     v3->RemoveAllLights();
-    pPlayer->CloneInventory3D(0);
+    pPlayer->CloneInventory3D(false);
     int32_t TagSkillCount = TESClass::GetTagSkillCount();
     NiAVObject* v4 = SurgeryMenu::spPlayer3D.m_pObject;
     v4->RemoveProperty(TagSkillCount);
     NiAVObject* v5 = SurgeryMenu::spPlayer3D.m_pObject;
     v5->UpdateProperties();
-    SurgeryMenu::sp3DCamera.operator=(static_cast<NiCamera*>(0));
-    SurgeryMenu::sp3DSkin.operator=(static_cast<NiNode*>(0));
-    SurgeryMenu::spPlayer3D.operator=(static_cast<NiAVObject*>(0));
+    SurgeryMenu::sp3DCamera.operator=(static_cast<NiCamera*>(nullptr));
+    SurgeryMenu::sp3DSkin.operator=(static_cast<NiNode*>(nullptr));
+    SurgeryMenu::spPlayer3D.operator=(static_cast<NiAVObject*>(nullptr));
 }
 
 // Compares each bone's distance and, when it is the nearest so far, computes it again to store it.

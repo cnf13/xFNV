@@ -147,7 +147,7 @@ void bhkPCollisionObject::NitohkTransform() {
                     _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(-1.0f), _mm_set_ss(-1.0f), 0), kHalfExtent), kCenter.m_quad
                 );
                 kAabb.m_max.m_quad = _mm_add_ps(kCenter.m_quad, kHalfExtent);
-                bhkNiCollisionObject::kKeyframeLock.Lock(0);
+                bhkNiCollisionObject::kKeyframeLock.Lock(nullptr);
                 hkpAabbPhantom* pPhantom = static_cast<hkpAabbPhantom*>(pWorldObject->phkObject);
                 if (pPhantom) {
                     pWorldObject->MarkWrite();

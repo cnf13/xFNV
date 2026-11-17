@@ -819,15 +819,15 @@ void hkaTrackAnalysis::analyze(const hkaTrackAnalysis::AnalysisInput& input, uin
     v16.m_scaleTolerance.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
     v16.m_useThreeComponentQuaternions.m_capacityAndFlags = hkArrayBase<hkBool>::DONT_DEALLOCATE_FLAG;
     const hkQsTransform* m_boneData = input.m_boneData;
-    v16.m_absolutePositionTolerance.m_data = 0;
+    v16.m_absolutePositionTolerance.m_data = nullptr;
     v16.m_absolutePositionTolerance.m_size = 0;
-    v16.m_relativePositionTolerance.m_data = 0;
+    v16.m_relativePositionTolerance.m_data = nullptr;
     v16.m_relativePositionTolerance.m_size = 0;
-    v16.m_rotationTolerance.m_data = 0;
+    v16.m_rotationTolerance.m_data = nullptr;
     v16.m_rotationTolerance.m_size = 0;
-    v16.m_scaleTolerance.m_data = 0;
+    v16.m_scaleTolerance.m_data = nullptr;
     v16.m_scaleTolerance.m_size = 0;
-    v16.m_useThreeComponentQuaternions.m_data = 0;
+    v16.m_useThreeComponentQuaternions.m_data = nullptr;
     v16.m_useThreeComponentQuaternions.m_size = 0;
     v16.m_boneData = m_boneData;
     v16.m_numberOfTransformTracks = m_numberOfTransformTracks;
@@ -907,5 +907,5 @@ void hkaTrackAnalysis::analyze(const hkaTrackAnalysis::AnalysisInput& input, uin
         v16.m_rotationTolerance.m_data[v15 - 1] = input.m_rotationTolerance;
         v16.m_scaleTolerance.m_data[v15 - 1] = input.m_scaleTolerance;
     }
-    hkaTrackAnalysis::analyzeQsTransform(v16, staticMask, staticDOFs, static_cast<hkBool>(1));
+    hkaTrackAnalysis::analyzeQsTransform(v16, staticMask, staticDOFs, static_cast<hkBool>(true));
 }

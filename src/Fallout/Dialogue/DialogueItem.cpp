@@ -108,7 +108,7 @@ bool DialogueItem::NextResponse() {
     if (pCurrentResponse) {
         pCurrentResponse = pCurrentResponse->m_pkNext;
     }
-    return (pCurrentResponse != 0);
+    return (pCurrentResponse != nullptr);
 }
 
 void DialogueItem::SetCurrentResponse(DialogueResponse* apDialogueResponse) {
@@ -148,7 +148,7 @@ DialogueResponse* DialogueItem::GetDialogueResponseByIndex(int16_t aiIndex) {
         "DIALOGUE: When trying to get a dialogue response by its index, the index was larger than the size of the "
         "dialogue responses list."
     );
-    return 0;
+    return nullptr;
 }
 
 void DialogueItem::SaveGameTES() {
@@ -307,7 +307,7 @@ void DialogueItem::PrecacheSounds() {
             if (BSstrlen((&pNode->m_item->cText)->pString) > 1) {
                 char* v2 = pNode->m_item->GetVoice()->pString;
                 BSAudio* v1 = &BSAudio::QInstance();
-                v1->PrecacheSound(v2, 0x20100001u, 0);
+                v1->PrecacheSound(v2, 0x20100001u, nullptr);
             }
         }
         pNode = pNode->m_pkNext;

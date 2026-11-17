@@ -239,7 +239,7 @@ void Writer::writeBinaryValue(const hkDataObject::Value& value, const hkDataClas
         return;
     }
     switch (value.getType()) {
-        case hkDataObject::TYPE_BYTE: m_oa.write8u(static_cast<int32_t>(value.asInt())); return;
+        case hkDataObject::TYPE_BYTE: m_oa.write8u(value.asInt()); return;
         case hkDataObject::TYPE_INT: writeInt(value.asInt()); return;
         case hkDataObject::TYPE_REAL: m_oa.writeFloat32(value.asReal()); return;
         case hkDataObject::TYPE_VEC_4:
@@ -536,7 +536,7 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
         case hkDataObject::TYPE_BYTE: {
             for (int32_t i = 0; i < numItems; ++i) {
                 alignas(8) hkDataArray::Value item;
-                m_oa.write8u(static_cast<int32_t>(arr.access(&item, i)->asInt()));
+                m_oa.write8u(arr.access(&item, i)->asInt());
             }
             return;
         }

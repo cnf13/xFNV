@@ -2,8 +2,8 @@
 // XInputGetState and XInputSetState for user index 0, on the first gamepad SDL knows (any pad SDL maps looks like an
 // Xbox pad: its south button is A). Other user indices report no controller.
 #include <SDL3/SDL.h>
-#include <stdint.h>
-#include <string.h>
+#include <cstdint>
+#include <cstring>
 
 // The SDK's name of the exports' convention (WINAPI).
 #include "SDK/Windows/windef.h"

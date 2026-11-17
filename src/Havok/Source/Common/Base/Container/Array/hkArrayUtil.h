@@ -36,17 +36,17 @@ public:
     // Destroys n elements at t; the class version, an empty loop for elements without a destructor. Each instantiation
     // in use gets an explicit specialization.
     template <typename T>
-    static void destruct(T* t, int32_t n, hkTraitBool<0>);
+    static void destruct(T* t, int32_t n, hkTraitBool<false>);
     // Copy-constructs n elements at t from tcopy; the class version.
     template <typename T>
-    static void construct(T* t, int32_t n, const T& tcopy, hkTraitBool<0>);
+    static void construct(T* t, int32_t n, const T& tcopy, hkTraitBool<false>);
 
     // The plain-data versions of destruct and construct: empty.
     template <typename T>
-    static void destruct(T* t, int32_t n, hkTraitBool<1>) {}
+    static void destruct(T* t, int32_t n, hkTraitBool<true>) {}
 
     template <typename T>
-    static void construct(T* t, int32_t n, hkTraitBool<1>) {}
+    static void construct(T* t, int32_t n, hkTraitBool<true>) {}
 
     // The plain-data copies: tcopy into each of the n elements at t, and the n elements of tcopy into t.
     template <typename T>
@@ -77,14 +77,14 @@ public:
 
 // The class versions: each element's own constructor, copy constructor or destructor is called.
 template <typename T>
-void hkArrayUtil::destruct(T* t, int32_t n, hkTraitBool<0>) {
+void hkArrayUtil::destruct(T* t, int32_t n, hkTraitBool<false>) {
     for (int32_t i = 0; i < n; ++i) {
         t[i].~T();
     }
 }
 
 template <typename T>
-void hkArrayUtil::construct(T* t, int32_t n, const T& tcopy, hkTraitBool<0>) {
+void hkArrayUtil::construct(T* t, int32_t n, const T& tcopy, hkTraitBool<false>) {
     for (int32_t i = 0; i < n; ++i) {
         new (t + i) T(tcopy);
     }

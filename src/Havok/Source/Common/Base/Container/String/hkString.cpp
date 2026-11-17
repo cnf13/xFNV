@@ -80,8 +80,7 @@ float hkString::atof(const char* in) {
 }
 
 char* hkString::strDup(const char* apcString, hkMemoryAllocator& apAllocator) {
-    char* pcCopy =
-        static_cast<char*>(hkMemoryRouter::easyAlloc(apAllocator, static_cast<int32_t>(strLen(apcString)) + 1));
+    char* pcCopy = static_cast<char*>(hkMemoryRouter::easyAlloc(apAllocator, strLen(apcString) + 1));
     strCpy(pcCopy, apcString);
     return pcCopy;
 }
@@ -150,8 +149,8 @@ void hkString::memSet(void* dst, int32_t c, int32_t n) {
 
 // Whether apcString ends with apcEnding; the lengths compare signed.
 hkBool* hkString::endsWith(hkBool* arResult, const char* apcString, const char* apcEnding) {
-    const int32_t iStringLen = static_cast<int32_t>(strLen(apcString));
-    const int32_t iEndingLen = static_cast<int32_t>(strLen(apcEnding));
+    const int32_t iStringLen = strLen(apcString);
+    const int32_t iEndingLen = strLen(apcEnding);
     if (iStringLen < iEndingLen) {
         arResult->m_bool = 0;
         return arResult;
@@ -249,7 +248,7 @@ hkBool* hkString::findAllOccurrences(
     hkArray<int32_t>& arOffsets,
     ReplaceType eReplaceType
 ) {
-    const int32_t iSubLength = static_cast<int32_t>(strLen(apcSubString));
+    const int32_t iSubLength = strLen(apcSubString);
     const char* pcFound = strStr(apcString, apcSubString);
     arResult->m_bool = 0;
     if (pcFound == nullptr) {
@@ -347,5 +346,5 @@ int32_t hkString::memCmp(const void* buf1, const void* buf2, int32_t n) {
 }
 
 int32_t hkString::atoi(const char* String, int32_t Radix) {
-    return std::strtoul(String, 0, Radix);
+    return std::strtoul(String, nullptr, Radix);
 }

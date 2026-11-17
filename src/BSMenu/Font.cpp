@@ -78,7 +78,7 @@ Font::TextData::~TextData() {
     xLineWidths.RemoveAll();
 }
 
-Font::Font(int32_t aiFontNum, char* apFilename, bool abLoad) : iRefCount(0), pFontFile(0), pFontData(0) {
+Font::Font(int32_t aiFontNum, char* apFilename, bool abLoad) : iRefCount(0), pFontFile(nullptr), pFontData(nullptr) {
     MEM_CONTEXT eMemContext = GetThreadTLSData()->eMemContext;
     GetThreadTLSData()->eMemContext = MEM_CONTEXT_FONTS;
     if (apFilename) {
@@ -98,7 +98,7 @@ Font::Font(int32_t aiFontNum, char* apFilename, bool abLoad) : iRefCount(0), pFo
 Font::~Font() {
     MemoryManager_Singleton.Deallocate(fontBuffer);
     fontBufferSize = 0;
-    fontBuffer = 0;
+    fontBuffer = nullptr;
     KillData();
     MemoryManager_Singleton.Deallocate(pFontFile);
 }
@@ -583,7 +583,7 @@ NiTriShape* Font::MakeIconsTriShape() {
         pvertices = v22;
     }
     else {
-        pvertices = 0;
+        pvertices = nullptr;
     }
     NiPoint2* v19 = static_cast<NiPoint2*>(
         MemoryManager_Singleton.Allocate(iverts <= SIZE_MAX / sizeof(NiPoint2) ? sizeof(NiPoint2) * iverts : SIZE_MAX)
@@ -596,7 +596,7 @@ NiTriShape* Font::MakeIconsTriShape() {
         ptextures = v19;
     }
     else {
-        ptextures = 0;
+        ptextures = nullptr;
     }
     uint16_t* pvert_order = static_cast<uint16_t*>(_NiMalloc(6 * sizeof(uint16_t) * ButtonIcons.iSize));
     void* apMemory = NiMemObject::operator new(sizeof(BSScissorTriShape));
@@ -607,7 +607,7 @@ NiTriShape* Font::MakeIconsTriShape() {
         );
     }
     else {
-        pshape = 0;
+        pshape = nullptr;
     }
     NiTriShapeData* pd = static_cast<NiTriShapeData*>(pshape->m_spModelData.m_pObject);
     pd->m_ucKeepFlags = 0;
@@ -624,10 +624,10 @@ NiTriShape* Font::MakeIconsTriShape() {
     pshape->m_spModelData.m_pObject->SetConsistency(NiGeometryData::STATIC);
     TileShaderProperty* v14 = static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
     if (v14) {
-        ptsp = ::new (v14) TileShaderProperty(0);
+        ptsp = ::new (v14) TileShaderProperty(false);
     }
     else {
-        ptsp = 0;
+        ptsp = nullptr;
     }
     pshape->AttachProperty(ptsp);
     ptsp->TintColor = NiColorA_WHITE;
@@ -636,7 +636,7 @@ NiTriShape* Font::MakeIconsTriShape() {
     BSsprintf(pcString, 260, "Data\\Textures\\%s", pcDest);
     // pcString is an array, so its address is never null.
     v13.m_kHandle = NiGlobalStringTable::AddString(pcString);
-    NiSourceTexture* v1 = NiSourceTexture::Create(v13, NiSourceTexture::ms_kDefaultPrefs, 1, 0);
+    NiSourceTexture* v1 = NiSourceTexture::Create(v13, NiSourceTexture::ms_kDefaultPrefs, true, false);
     ptsp->SetTileTexture(v1);
     // The destructor of v13.
     // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
@@ -762,7 +762,7 @@ void Font::AddIcon(int32_t aiIconIndex, NiTriShape* apShape, NiPoint3& aPos) {
     v19[3] = (uint16_t)((4 * aiIconIndex) + 2);
     v19[4] = (uint16_t)((4 * aiIconIndex) + 1);
     v19[5] = (uint16_t)((4 * aiIconIndex) + 3);
-    (&aPos)->x = (float)((fWidth + ButtonIcons.pBuffer[aiIconIndex].fSpacing) + (&aPos)->x);
+    (&aPos)->x = ((fWidth + ButtonIcons.pBuffer[aiIconIndex].fSpacing) + (&aPos)->x);
 }
 
 void Font::AddTextIcon(const char* astrIcon) {
@@ -971,7 +971,7 @@ NiAVObject* Font::MakeString(
         sLen = apTextString.sLen;
     }
     if (!sLen || !pFontData) {
-        return 0;
+        return nullptr;
     }
     float fx_offset = static_cast<float>(aiWidth);
     GetLineOffsets(apTextString.pString, fx_offset, *afY, aiFlags, 0);
@@ -984,12 +984,12 @@ NiAVObject* Font::MakeString(
     }
     for (itext_count = 0;; ++itext_count) {
         uint32_t v16 = apTextString.sLen == 0xFFFF ? std::strlen(apTextString.pString) : apTextString.sLen;
-        if (itext_count >= v16 || !apTextString.pString[apTextString.pString != 0 ? itext_count : 0]) {
+        if (itext_count >= v16 || !apTextString.pString[apTextString.pString != nullptr ? itext_count : 0]) {
             break;
         }
     }
     if (!itext_count) {
-        return 0;
+        return nullptr;
     }
     NiTriShape* pflat = MakeTriShape(static_cast<int32_t>(itext_count), axFontColor, abPrepareObject);
     afY[1] = afStartX;
@@ -998,7 +998,7 @@ NiAVObject* Font::MakeString(
     pflat->m_kLocal.m_Translate.x = afStartX;
     pflat->m_kLocal.m_Translate.y = y;
     pflat->m_kLocal.m_Translate.z = z;
-    NiColorA* pcurrent_color = 0;
+    NiColorA* pcurrent_color = nullptr;
     // MAYBE-INLINED 0xA125F6: a write opening NiColorA's uses: may be its inlined constructor
     pspecial_color.r = 0.0f;
     // MAYBE-INLINED 0xA125FB: a write opening NiColorA's uses: may be its inlined constructor
@@ -1010,13 +1010,13 @@ NiAVObject* Font::MakeString(
     aiWidth = 0;
     float fstart_x = xpos.x;
     int32_t iverts = 0;
-    for (uint32_t a = 0; apTextString.pString[apTextString.pString != 0 ? a : 0]; ++a) {
+    for (uint32_t a = 0; apTextString.pString[apTextString.pString != nullptr ? a : 0]; ++a) {
         int32_t v13;
         uint8_t ch[5];
-        if (apTextString.pString[apTextString.pString != 0 ? a : 0] == 3) {
-            pcurrent_color = 0;
+        if (apTextString.pString[apTextString.pString != nullptr ? a : 0] == 3) {
+            pcurrent_color = nullptr;
         }
-        char v15 = apTextString.pString[apTextString.pString != 0 ? a : 0];
+        char v15 = apTextString.pString[apTextString.pString != nullptr ? a : 0];
         if (v15 == 9) {
             float v14 = std::fmod(static_cast<double>(xpos.x), static_cast<double>(75.0f));
             xpos.x = 75.0 - v14 + xpos.x;
@@ -1030,7 +1030,7 @@ NiAVObject* Font::MakeString(
                 xpos.z = xpos.z - pFontData->fBaseLine;
             }
         }
-        ch[0] = apTextString.pString[apTextString.pString != 0 ? a : 0];
+        ch[0] = apTextString.pString[apTextString.pString != nullptr ? a : 0];
         Font::ConvertCharacter(*ch);
         // Writes the character's code as a 32-bit value over the raw bytes at ch+1.
         *reinterpret_cast<uint32_t*>(&ch[1]) = ch[0];
@@ -1043,7 +1043,7 @@ NiAVObject* Font::MakeString(
             v13 = static_cast<int32_t>(xpos.x - fstart_x);
         }
         aiWidth = v13;
-        if (apTextString.pString[apTextString.pString != 0 ? a : 0] == 2) {
+        if (apTextString.pString[apTextString.pString != nullptr ? a : 0] == 2) {
             pcurrent_color = &pspecial_color;
         }
     }
@@ -1072,7 +1072,7 @@ void Font::GetLineOffsets(const char* apTextString, float& afX, float& afY, int3
     else {
         if (v6 == 4) {
             v10 = *FontManager::pInstance->CalculateStringDimensions(&v8, apTextString, iFontNum, v11, aiStart);
-            afX = (float)(-v10.x);
+            afX = (-v10.x);
         }
         else {
             afX = (float)0.0;
@@ -1124,11 +1124,11 @@ void Font::TrimToLine(BSStringT<char>& axTextString, uint32_t aiLine) {
     else {
         sLen = axTextString.sLen;
     }
-    for (size_t i = 0; i < sLen && axTextString.pString[axTextString.pString != 0 ? i : 0]; ++i) {
+    for (size_t i = 0; i < sLen && axTextString.pString[axTextString.pString != nullptr ? i : 0]; ++i) {
         if (v5 == aiLine && v9 == -1) {
             v9 = i;
         }
-        if (axTextString.pString[axTextString.pString != 0 ? i : 0] == 10) {
+        if (axTextString.pString[axTextString.pString != nullptr ? i : 0] == 10) {
             ++v5;
         }
         if (v5 == aiLine + 1) {
@@ -1148,7 +1148,7 @@ void Font::TrimToLine(BSStringT<char>& axTextString, uint32_t aiLine) {
             void* v4 = MemoryManager_Singleton.Allocate(sizeof(char) * static_cast<size_t>(v6 - v9 + 1));
             std::memset(v4, 0, v6 - v9 + 1);
             for (j = 0; j < v6 - v9; ++j) {
-                *(static_cast<uint8_t*>(v4) + j) = axTextString.pString[axTextString.pString != 0 ? v9 + j : 0];
+                *(static_cast<uint8_t*>(v4) + j) = axTextString.pString[axTextString.pString != nullptr ? v9 + j : 0];
             }
             *(static_cast<uint8_t*>(v4) + j) = 0;
             axTextString.Set(" ", 0);
@@ -1187,15 +1187,15 @@ int32_t Font::LineBreakText(
     if (!aiWidth) {
         aiWidth = 0xF423F;
     }
-    for (n = 0; n < sLen && axTextString.pString[axTextString.pString != 0 ? n : 0]; ++n) {
-        char v17 = axTextString.pString[axTextString.pString != 0 ? n : 0];
+    for (n = 0; n < sLen && axTextString.pString[axTextString.pString != nullptr ? n : 0]; ++n) {
+        char v17 = axTextString.pString[axTextString.pString != nullptr ? n : 0];
         if (v17 == 9) {
             iwidth += 75 - iwidth % 75;
         }
         else {
             if (v17 == 10) {
                 int32_t v16;
-                axTextString.pString[axTextString.pString != 0 ? n : 0] = acEolChar;
+                axTextString.pString[axTextString.pString != nullptr ? n : 0] = acEolChar;
                 iheight += static_cast<int32_t>(pFontData->fBaseLine);
                 if (imax_width <= iwidth) {
                     v16 = iwidth;
@@ -1212,7 +1212,7 @@ int32_t Font::LineBreakText(
                 if (v17 == 32) {
                     iindex = n;
                 }
-                uint8_t ch = axTextString.pString[axTextString.pString != 0 ? n : 0];
+                uint8_t ch = axTextString.pString[axTextString.pString != nullptr ? n : 0];
                 Font::ConvertCharacter(ch);
                 FontLetter* pfont_letter = &pFontData->pFontLetters[ch];
                 iwidth += static_cast<int32_t>(pfont_letter->fWidth + pfont_letter->fSpacing);
@@ -1222,7 +1222,7 @@ int32_t Font::LineBreakText(
                 if (iwidth > aiWidth) {
                     if (iindex) {
                         int32_t v15;
-                        axTextString.pString[axTextString.pString != 0 ? iindex : 0] = acEolChar;
+                        axTextString.pString[axTextString.pString != nullptr ? iindex : 0] = acEolChar;
                         iheight += static_cast<int32_t>(pFontData->fBaseLine);
                         if (imax_width <= iindex_width) {
                             v15 = iindex_width;
@@ -1261,7 +1261,7 @@ int32_t Font::LineBreakText(
                                 else {
                                     v10 = axTextString.sLen;
                                 }
-                                axTextString.pString[axTextString.pString != 0 ? v10 - 1 : 0] = 0;
+                                axTextString.pString[axTextString.pString != nullptr ? v10 - 1 : 0] = 0;
                             }
                             else {
                                 size_t v11;
@@ -1273,22 +1273,22 @@ int32_t Font::LineBreakText(
                                 else {
                                     v12 = axTextString.sLen;
                                 }
-                                axTextString.pString[axTextString.pString != 0 ? v12 - 1 : 0] = 0;
+                                axTextString.pString[axTextString.pString != nullptr ? v12 - 1 : 0] = 0;
                                 if (axTextString.sLen == 0xFFFF) {
                                     v11 = std::strlen(axTextString.pString);
                                 }
                                 else {
                                     v11 = axTextString.sLen;
                                 }
-                                axTextString.pString[axTextString.pString != 0 ? v11 - 2 : 0] = 0;
+                                axTextString.pString[axTextString.pString != nullptr ? v11 - 2 : 0] = 0;
                             }
                         }
                         for (uint32_t a = sLen + 2; a > n; --a) {
-                            axTextString.pString[axTextString.pString != 0 ? a : 0] =
-                                axTextString.pString[axTextString.pString != 0 ? a - 2 : 0];
+                            axTextString.pString[axTextString.pString != nullptr ? a : 0] =
+                                axTextString.pString[axTextString.pString != nullptr ? a - 2 : 0];
                         }
-                        axTextString.pString[axTextString.pString != 0 ? n - 1 : 0] = 45;
-                        axTextString.pString[axTextString.pString != 0 ? n : 0] = acEolChar;
+                        axTextString.pString[axTextString.pString != nullptr ? n - 1 : 0] = 45;
+                        axTextString.pString[axTextString.pString != nullptr ? n : 0] = acEolChar;
                         iheight += static_cast<int32_t>(pFontData->fBaseLine);
                         if (imax_width <=
                             iwidth - static_cast<int32_t>(pfont_letter->fSpacing + pfont_letter->fWidth)) {
@@ -1306,10 +1306,10 @@ int32_t Font::LineBreakText(
             }
         }
         if (imax_lines > 0 && iline_count >= imax_lines) {
-            while (axTextString.pString[axTextString.pString != 0 ? n : 0] != acEolChar) {
+            while (axTextString.pString[axTextString.pString != nullptr ? n : 0] != acEolChar) {
                 --n;
             }
-            axTextString.pString[axTextString.pString != 0 ? n : 0] = 0;
+            axTextString.pString[axTextString.pString != nullptr ? n : 0] = 0;
             iheight -= static_cast<int32_t>(pFontData->fBaseLine);
             break;
         }
@@ -1381,7 +1381,7 @@ FontManager::CharData* FontManager::CharData::Copy() {
         pnew = ::new (v4) FontManager::CharData(iFontIndex, cChar, xColor, iJustification);
     }
     else {
-        pnew = 0;
+        pnew = nullptr;
     }
     pnew->xFilename.Set(xFilename);
     pnew->iWidth = iWidth;
@@ -1400,7 +1400,7 @@ void FontManager::CharData::RevertToDefault() {
     p_xColor->b = 0.1294f;
     p_xColor->a = 1.0f;
     iJustification = 1;
-    xFilename.Set(static_cast<const char*>(0), 0u);
+    xFilename.Set(static_cast<const char*>(nullptr), 0u);
     SetChar(32);
 }
 
@@ -1434,7 +1434,7 @@ FontManager::TextLine::TextLine(
 )
   : iWidth(0), iNextSpacing(0), iRise(0), iDrop(0), iSkippedSpace(aiSkippedSpace), iJustify(apChar->iJustification),
     iPageWidth(aiPageWidth), pPage(apPage) {
-    AddChar(apChar, 0);
+    AddChar(apChar, false);
 }
 
 FontManager::TextLine::~TextLine() {
@@ -1444,24 +1444,24 @@ FontManager::TextLine::~TextLine() {
 }
 
 FontManager::TextLine* FontManager::TextLine::AddChar(FontManager::CharData* apChar, bool abToFront) {
-    FontManager::TextLine* pline = 0;
+    FontManager::TextLine* pline = nullptr;
     if (apChar->iWidth + this->iWidth <= iPageWidth) {
         char* pString;
         int32_t iWidth;
         if (!apChar->xFilename.pString || (pString = apChar->xFilename.pString, !*pString)) {
             int32_t iDrop;
-            bool bAdjustLineHeight = 0;
+            bool bAdjustLineHeight = false;
             if (!xChars.m_uiCount) {
                 this->iRise = aFontRise[apChar->iFontIndex];
             }
             if (abToFront) {
-                FontManager::CharData* pfirst = 0;
+                FontManager::CharData* pfirst = nullptr;
                 if (xChars.m_uiCount) {
                     pfirst = xChars.m_pkHead->m_element;
                 }
                 if (pfirst) {
                     if (apChar->iFontIndex != pfirst->iFontIndex) {
-                        bAdjustLineHeight = 1;
+                        bAdjustLineHeight = true;
                     }
                 }
                 apChar->iX = apChar->iLeadingEdge;
@@ -1476,13 +1476,13 @@ FontManager::TextLine* FontManager::TextLine::AddChar(FontManager::CharData* apC
                 }
             }
             else {
-                FontManager::CharData* pfirst_2 = 0;
+                FontManager::CharData* pfirst_2 = nullptr;
                 if (xChars.m_uiCount) {
                     pfirst_2 = xChars.m_pkTail->m_element;
                 }
                 if (pfirst_2) {
                     if (apChar->iFontIndex != pfirst_2->iFontIndex) {
-                        bAdjustLineHeight = 1;
+                        bAdjustLineHeight = true;
                     }
                 }
                 apChar->iX = apChar->iLeadingEdge + this->iWidth;
@@ -1564,7 +1564,7 @@ FontManager::TextLine* FontManager::TextLine::AddChar(FontManager::CharData* apC
                 pline_4 = ::new (v19) FontManager::TextLine(pPage, apChar, 0, iPageWidth);
             }
             else {
-                pline_4 = 0;
+                pline_4 = nullptr;
             }
             pline = pline_4;
             pline_4->iRise = aFontRise[apChar->iFontIndex];
@@ -1584,17 +1584,17 @@ FontManager::TextLine* FontManager::TextLine::AddChar(FontManager::CharData* apC
                     pline_2 = ::new (v22) FontManager::TextLine(pPage, apChar, 0, iPageWidth);
                 }
                 else {
-                    pline_2 = 0;
+                    pline_2 = nullptr;
                 }
                 pline = pline_2;
                 pline_2->iRise = aFontRise[apChar->iFontIndex];
                 for (pchar = xChars.RemoveTail(); xChars.m_uiCount && pchar->cChar != 32;
                      this->iWidth -= pchar->iWidth) {
-                    pline_2->AddChar(pchar, 1);
+                    pline_2->AddChar(pchar, true);
                     pchar = xChars.RemoveTail();
                 }
                 if (pchar) {
-                    pchar->xFilename.Set(0, 0);
+                    pchar->xFilename.Set(nullptr, 0);
                     MemoryManager_Singleton.Deallocate(pchar);
                 }
             }
@@ -1610,7 +1610,7 @@ FontManager::TextLine* FontManager::TextLine::AddChar(FontManager::CharData* apC
                     pline_3 = ::new (v21) FontManager::TextLine(pPage, apChar, 0, iPageWidth);
                 }
                 else {
-                    pline_3 = 0;
+                    pline_3 = nullptr;
                 }
                 pline = pline_3;
                 pline_3->iRise = aFontRise[apChar->iFontIndex];
@@ -1630,15 +1630,15 @@ FontManager::TextLine* FontManager::TextLine::AddChar(FontManager::CharData* apC
                     phyphen = ::new (v20) FontManager::CharData(0, 45, v5, 1);
                 }
                 else {
-                    phyphen = 0;
+                    phyphen = nullptr;
                 }
                 for (iend_width = 0; xChars.m_uiCount && phyphen->iWidth + (this->iWidth - iend_width) > iPageWidth;
                      iend_width += plast->iWidth) {
                     plast = xChars.RemoveTail();
-                    pline_3->AddChar(plast, 1);
+                    pline_3->AddChar(plast, true);
                 }
                 this->iWidth -= iend_width;
-                AddChar(phyphen, 0);
+                AddChar(phyphen, false);
             }
         }
     }
@@ -1709,7 +1709,7 @@ int32_t FontManager::TextPage::GetCharCountForFont(int32_t aiFont) {
 }
 
 FontManager::TextPage* FontManager::TextPage::AddChar(FontManager::CharData* apChar, int32_t aiNewLines) {
-    FontManager::TextLine* pline = 0;
+    FontManager::TextLine* pline = nullptr;
     int32_t iskipped = 0;
     while (aiNewLines > 1) {
         iskipped += iLastFontHeight;
@@ -1723,12 +1723,12 @@ FontManager::TextPage* FontManager::TextPage::AddChar(FontManager::CharData* apC
             pline_2 = ::new (v15) FontManager::TextLine(this, apChar, iskipped, iPageWidth);
         }
         else {
-            pline_2 = 0;
+            pline_2 = nullptr;
         }
         pline = pline_2;
     }
     else {
-        pline = xLines.m_pkTail->m_element->AddChar(apChar, 0);
+        pline = xLines.m_pkTail->m_element->AddChar(apChar, false);
     }
     if (apChar) {
         char* pString;
@@ -1754,7 +1754,7 @@ FontManager::TextPage* FontManager::TextPage::AddChar(FontManager::CharData* apC
                 ppage_2 = ::new (v14) FontManager::TextPage(pDoc, pline, iPageWidth, iPageHeight);
             }
             else {
-                ppage_2 = 0;
+                ppage_2 = nullptr;
             }
             ppage = ppage_2;
             ppage_2->iHeight = pline->iRise;
@@ -1775,7 +1775,7 @@ FontManager::TextPage* FontManager::TextPage::AddChar(FontManager::CharData* apC
             }
         }
     }
-    return 0;
+    return nullptr;
 }
 
 FontManager::TextDoc::~TextDoc() {
@@ -1786,7 +1786,7 @@ FontManager::TextDoc::~TextDoc() {
 
 void FontManager::TextDoc::AddChar(FontManager::CharData* apChar, int32_t aiNewLines, bool abNewPage) {
     FontManager::TextPage* ppage;
-    ppage = 0;
+    ppage = nullptr;
     if (!xPages.m_uiCount || abNewPage) {
         FontManager::TextPage* ppage_2;
         FontManager::TextPage* v6 =
@@ -1795,7 +1795,7 @@ void FontManager::TextDoc::AddChar(FontManager::CharData* apChar, int32_t aiNewL
             ppage_2 = ::new (v6) FontManager::TextPage(this, apChar, iPageWidth, iPageHeight);
         }
         else {
-            ppage_2 = 0;
+            ppage_2 = nullptr;
         }
         ppage = ppage_2;
     }
@@ -1810,7 +1810,7 @@ void FontManager::TextDoc::AddChar(FontManager::CharData* apChar, int32_t aiNewL
 FontManager::TextPage* FontManager::TextDoc::CurrentPage() {
     NiTListItem<FontManager::TextPage*>* i;
     if (!xPages.m_uiCount) {
-        return 0;
+        return nullptr;
     }
     int32_t a = iPageNum;
     for (i = xPages.m_pkHead; i; i = i->m_pkNext) {
@@ -1822,7 +1822,7 @@ FontManager::TextPage* FontManager::TextDoc::CurrentPage() {
         return i->m_element;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -1832,7 +1832,7 @@ void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apDat
     NiTriShape* ptri_2;
     NiTListItem<FontManager::TextPage*>* i;
     NiTList<NiTriShape*> ximages;
-    FontManager::TextPage* v86 = 0;
+    FontManager::TextPage* v86 = nullptr;
     int32_t a = iPageNum;
     int32_t iiconIndex = 0;
     NiTListItem<FontManager::TextPage*>* m_pkHead = xPages.m_pkHead;
@@ -1849,7 +1849,7 @@ void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apDat
         FontManager::TextPage* ppage = i->m_element;
         for (uint32_t a_2 = 0; a_2 < 8; ++a_2) {
             ptri_index[a_2] = 0;
-            pflats[a_2] = 0;
+            pflats[a_2] = nullptr;
             int32_t ichar_count = ppage->GetCharCountForFont(a_2);
             if (ichar_count > 0) {
                 // MAYBE-INLINED 0xA19152: a write opening NiColorA's uses: may be its inlined constructor
@@ -1862,7 +1862,7 @@ void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apDat
                 axColor.a = 1.0f;
                 FontManager* v54 = FontManager::pInstance;
                 Font* v53 = FontManager::pInstance->pFont[a_2];
-                NiTriShape* TriShape = v53->MakeTriShape(ichar_count, axColor, 1);
+                NiTriShape* TriShape = v53->MakeTriShape(ichar_count, axColor, true);
                 pflats[a_2] = TriShape;
                 NiTriShape* v52 = pflats[a_2];
                 v52->m_kLocal.m_Translate = NiPoint3_ZERO;
@@ -1872,7 +1872,7 @@ void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apDat
         ximages.m_uiCount = 0;
         ximages.m_pkHead = nullptr;
         ximages.m_pkTail = nullptr;
-        NiTriShape* pIconShape = 0;
+        NiTriShape* pIconShape = nullptr;
         FontManager* v51 = FontManager::pInstance;
         Font* v50 = FontManager::pInstance->pFont[0];
         if (v50->ButtonIcons.iSize) {
@@ -1966,7 +1966,7 @@ void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apDat
                     }
                 }
             }
-            bool bvalid = 0;
+            bool bvalid = false;
             for (uint32_t b = 0; b < 8; ++b) {
                 if (pflats[b]) {
                     NiUpdateData UpdateData;
@@ -1981,17 +1981,17 @@ void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apDat
                     v27->m_kLocal.m_Translate = NiPoint3_ZERO;
                     pflats[b]->UpdateProperties();
                     UpdateData.fTime = 0.0f;
-                    UpdateData.bUpdateControllers = 0;
-                    UpdateData.bParallelUpdate = 0;
-                    UpdateData.bFoundParticles = 0;
-                    UpdateData.bFoundMorphController = 0;
-                    UpdateData.bSceneGraphChange = 0;
+                    UpdateData.bUpdateControllers = false;
+                    UpdateData.bParallelUpdate = false;
+                    UpdateData.bFoundParticles = false;
+                    UpdateData.bFoundMorphController = false;
+                    UpdateData.bSceneGraphChange = false;
                     pflats[b]->Update(UpdateData);
                     apParent->AttachChild(pflats[b], 1);
-                    bvalid = 1;
+                    bvalid = true;
                 }
             }
-            while (1) {
+            while (true) {
                 NiUpdateData UpdateData_2;
                 uint32_t m_uiCount = ximages.m_uiCount;
                 if (!ximages.m_uiCount) {
@@ -2008,11 +2008,11 @@ void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apDat
                 ptri_3->m_kLocal.m_Translate = NiPoint3_ZERO;
                 ptri_3->UpdateProperties();
                 UpdateData_2.fTime = 0.0f;
-                UpdateData_2.bUpdateControllers = 0;
-                UpdateData_2.bParallelUpdate = 0;
-                UpdateData_2.bFoundParticles = 0;
-                UpdateData_2.bFoundMorphController = 0;
-                UpdateData_2.bSceneGraphChange = 0;
+                UpdateData_2.bUpdateControllers = false;
+                UpdateData_2.bParallelUpdate = false;
+                UpdateData_2.bFoundParticles = false;
+                UpdateData_2.bFoundMorphController = false;
+                UpdateData_2.bSceneGraphChange = false;
                 ptri_3->Update(UpdateData_2);
                 apParent->AttachChild(ptri_3, 1);
             }
@@ -2020,7 +2020,7 @@ void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apDat
         FontManager* v20 = FontManager::pInstance;
         Font* v19 = FontManager::pInstance->pFont[0];
         v9 = 1;
-        v19->ButtonIcons.Clear(1);
+        v19->ButtonIcons.Clear(true);
         ximages.RemoveAll();
     }
 }
@@ -2065,9 +2065,9 @@ bool FontManager::CreateText(BSStringT<char> axTextString, FontManager::TextData
         pdocument->~TextDoc();
         MemoryManager_Singleton.Deallocate(pdocument);
     }
-    xtext.Set(0, 0);
-    axTextString.Set(0, 0);
-    return 1;
+    xtext.Set(nullptr, 0);
+    axTextString.Set(nullptr, 0);
+    return true;
 }
 
 NiPoint3* FontManager::CalculateStringDimensions(
@@ -2671,7 +2671,7 @@ FontManager::TextDoc* FontManager::PrepText(BSStringT<char>& axTextString, FontM
     FontManager::TextDoc* pdocument;
     FNVD_INLINED_LOCAL(FontManager::CharData, xchar, std::nullopt, std::nullopt);
     if (!axTextString.pString) {
-        return 0;
+        return nullptr;
     }
     if (axData.iWidth < 2) {
         axData.iWidth = 0x7FFFFFFF;
@@ -2696,7 +2696,7 @@ FontManager::TextDoc* FontManager::PrepText(BSStringT<char>& axTextString, FontM
         pdocument = v19;
     }
     else {
-        pdocument = 0;
+        pdocument = nullptr;
     }
     pdocument_2 = pdocument;
     // MAYBE-INLINED 0xA18BA3: a write opening NiColorA's uses: may be its inlined constructor
@@ -2734,7 +2734,7 @@ FontManager::TextDoc* FontManager::PrepText(BSStringT<char>& axTextString, FontM
         if (a_2 >= v8) {
             break;
         }
-        uint8_t ch = axTextString.pString[axTextString.pString != 0 ? a_2 : 0];
+        uint8_t ch = axTextString.pString[axTextString.pString != nullptr ? a_2 : 0];
         Font::ConvertCharacter(ch);
         if (ch == axData.cLineSep) {
             ++inew_line;
@@ -2744,12 +2744,12 @@ FontManager::TextDoc* FontManager::PrepText(BSStringT<char>& axTextString, FontM
                 xchar.SetChar(ch);
                 int32_t v6 = inew_line;
                 FontManager::CharData* v4 = xchar.Copy();
-                pdocument_2->AddChar(v4, v6, 0);
+                pdocument_2->AddChar(v4, v6, false);
                 inew_line = 0;
             }
         }
     }
-    axData.bIsHypertext = 0;
+    axData.bIsHypertext = false;
     axData.iNumPages = 0;
     axData.iWidth = 0;
     axData.iHeight = 0;
@@ -2778,7 +2778,7 @@ FontManager::TextDoc* FontManager::PrepText(BSStringT<char>& axTextString, FontM
             axData.iNumLines = ppage->xLines.m_uiCount;
         }
     }
-    xchar.xFilename.Set(0, 0);
+    xchar.xFilename.Set(nullptr, 0);
     return pdocument_2;
 }
 
@@ -2799,7 +2799,7 @@ NiTriShape* FontManager::MakeImage(BSStringT<char> axFilename, NiPoint3 axPos, i
         pvertices = v74;
     }
     else {
-        pvertices = 0;
+        pvertices = nullptr;
     }
     NiPoint2* v72 = static_cast<NiPoint2*>(MemoryManager_Singleton.Allocate(4 * sizeof(NiPoint2)));
     if (v72) {
@@ -2810,7 +2810,7 @@ NiTriShape* FontManager::MakeImage(BSStringT<char> axFilename, NiPoint3 axPos, i
         ptextures = v72;
     }
     else {
-        ptextures = 0;
+        ptextures = nullptr;
     }
     uint16_t* pvert_order = static_cast<uint16_t*>(_NiMalloc(6 * sizeof(uint16_t)));
     float x = axPos.x;
@@ -2862,12 +2862,12 @@ NiTriShape* FontManager::MakeImage(BSStringT<char> axFilename, NiPoint3 axPos, i
         if (a >= sLen) {
             break;
         }
-        if (axFilename.pString[axFilename.pString != 0 ? a : 0] == 47) {
-            axFilename.pString[axFilename.pString != 0 ? a : 0] = 92;
+        if (axFilename.pString[axFilename.pString != nullptr ? a : 0] == 47) {
+            axFilename.pString[axFilename.pString != nullptr ? a : 0] = 92;
         }
     }
     fscale = 1.0f;
-    NiTexture* ptex = 0;
+    NiTexture* ptex = nullptr;
     if (axFilename.pString) {
         if (*axFilename.pString) {
             uint8_t v18[8];
@@ -2916,21 +2916,21 @@ NiTriShape* FontManager::MakeImage(BSStringT<char> axFilename, NiPoint3 axPos, i
         );
     }
     else {
-        pshape = 0;
+        pshape = nullptr;
     }
     TileShaderProperty* v43 = static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
     if (v43) {
-        ptsp = ::new (v43) TileShaderProperty(0);
+        ptsp = ::new (v43) TileShaderProperty(false);
     }
     else {
-        ptsp = 0;
+        ptsp = nullptr;
     }
     ptsp->SetTileTexture(ptex);
     pshape->AttachProperty(ptsp);
     NiD3DShader* pshader = (NiD3DShader*)BSShaderManager::GetShader(32);
     pshape->m_spShader = static_cast<BSShader*>(pshader);
     pshape->UpdateProperties();
-    axFilename.Set(0, 0);
+    axFilename.Set(nullptr, 0);
     return pshape;
 }
 

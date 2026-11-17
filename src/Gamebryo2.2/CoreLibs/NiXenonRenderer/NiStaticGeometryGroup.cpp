@@ -69,7 +69,7 @@ void NiStaticGeometryGroup::AddObject(
             v5 = ::new (v4) NiGeometryBufferData;
         }
         else {
-            v5 = 0;
+            v5 = nullptr;
         }
         v5->m_eType = static_cast<D3DPRIMITIVETYPE>((pkPartition->m_usStrips != 0) + D3DPT_TRIANGLELIST);
         pkPartition->m_pkBuffData = v5;
@@ -84,7 +84,7 @@ void NiStaticGeometryGroup::AddObject(
             v5 = ::new (v6) NiGeometryBufferData;
         }
         else {
-            v5 = 0;
+            v5 = nullptr;
         }
         const NiRTTI* v7 = pkData->GetRTTI();
         if (v7) {
@@ -160,7 +160,7 @@ NiVBChip* NiStaticGeometryGroup::CreateChip(NiGeometryBufferData* pkBuffData, ui
     uint32_t pkBuffDataa;
     uint32_t uiIndex = pkBuffData->m_uiFVF;
     NiStaticGeometryGroup* v5 = this;
-    NiVBSet* pkSet = 0;
+    NiVBSet* pkSet = nullptr;
     if (uiStream >= pkBuffData->m_uiStreamCount) {
         pkBuffDataa = 0;
     }

@@ -32,7 +32,7 @@ static void _subdivideRecursive(hkGeometry* a1, int32_t arg4, float a3, float a4
         int32_t v4 = arg4;
         __m128 v5 = _mm_setzero_ps();
         v5[0] = 0.5f;
-        while (1) {
+        while (true) {
             __m128 v15 = _mm_undefined_ps();
             int32_t m_size = a1->m_vertices.m_size;
             int32_t v56 = a1->m_triangles.m_size;
@@ -74,8 +74,8 @@ static void _subdivideRecursive(hkGeometry* a1, int32_t arg4, float a3, float a4
             v25[0] = v25[0] + v24;
             float v26 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v25[0])));
             __m128 v27 = _mm_cmpeq_ss(v25, v58);
-            float v28 = 3.0f - static_cast<float>(static_cast<float>(v25[0] * v26) * v26);
-            v5[0] = static_cast<float>(v5[0] * v26) * v28;
+            float v28 = 3.0f - ((v25[0] * v26) * v26);
+            v5[0] = (v5[0] * v26) * v28;
             __m128 v30 = _mm_andnot_ps(v27, v5);
             __m128 v31 = _mm_mul_ps(_mm_shuffle_ps(v30, v30, 0), v21);
             (*v19).m_quad = v21;
@@ -90,8 +90,8 @@ static void _subdivideRecursive(hkGeometry* a1, int32_t arg4, float a3, float a4
             float v35 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v34[0])));
             v19[1].m_quad = v32;
             __m128 v36 = _mm_cmpeq_ss(v34, v15);
-            float v37 = 3.0f - static_cast<float>(static_cast<float>(v34[0] * v35) * v35);
-            v5[0] = static_cast<float>(v5[0] * v35) * v37;
+            float v37 = 3.0f - ((v34[0] * v35) * v35);
+            v5[0] = (v5[0] * v35) * v37;
             __m128 v39 = _mm_andnot_ps(v36, v5);
             float v54 = a4 - 1.0;
             __m128 v40 = _mm_mul_ps(_mm_shuffle_ps(v39, v39, 0), v32);
@@ -106,8 +106,8 @@ static void _subdivideRecursive(hkGeometry* a1, int32_t arg4, float a3, float a4
             v43[0] = v43[0] + v39[0];
             float v44 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v43[0])));
             __m128 v45 = v43;
-            float v46 = 3.0f - static_cast<float>(static_cast<float>(v43[0] * v44) * v44);
-            v5[0] = static_cast<float>(v5[0] * v44) * v46;
+            float v46 = 3.0f - ((v43[0] * v44) * v44);
+            v5[0] = (v5[0] * v44) * v46;
             __m128 v48 = _mm_andnot_ps(_mm_cmpeq_ss(v45, v15), v5);
             __m128 v49 = _mm_mul_ps(_mm_shuffle_ps(v48, v48, 0), v41);
             (*v20).m_quad = v49;
@@ -159,16 +159,16 @@ void hkDisplaySphere::buildGeometry() {
     hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
     hkGeometry* v7 = static_cast<hkGeometry*>(Instance->m_heap->blockAlloc(sizeof(hkGeometry)));
     if (v7) {
-        v7->m_vertices.m_data = 0;
+        v7->m_vertices.m_data = nullptr;
         v7->m_vertices.m_size = 0;
         v7->m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-        v7->m_triangles.m_data = 0;
+        v7->m_triangles.m_data = nullptr;
         v7->m_triangles.m_size = 0;
         v7->m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;
         v8 = v7;
     }
     else {
-        v8 = 0;
+        v8 = nullptr;
     }
     m_geometry = v8;
     float a3 = m_sphere.m_pos.m_quad[3];

@@ -86,11 +86,11 @@ hkxAttributeHolder::~hkxAttributeHolder() {}
 const hkxAttributeGroup* hkxAttributeHolder::findAttributeGroupByName(const char* name) const {
     hkxAttributeGroup* v8;
     if (!name) {
-        return 0;
+        return nullptr;
     }
     int32_t v4 = 0;
     if (m_attributeGroups.m_size <= 0) {
-        return 0;
+        return nullptr;
     }
     for (int32_t i = 0;; ++i) {
         hkxAttributeGroup* m_data = m_attributeGroups.m_data;
@@ -103,7 +103,7 @@ const hkxAttributeGroup* hkxAttributeHolder::findAttributeGroupByName(const char
             break;
         }
         if (++v4 >= m_attributeGroups.m_size) {
-            return 0;
+            return nullptr;
         }
     }
     return v8;
@@ -153,7 +153,7 @@ hkRefVariant* hkxAttributeHolder::findAttributeVariantByName(hkRefVariant* apRes
         return v7;
     }
     int32_t v5 = 0;
-    while (1) {
+    while (true) {
         m_attributeGroups.m_data[v5].findAttributeVariantByName(&apResulta, name);
         if (apResulta.m_pntr) {
             break;
@@ -161,7 +161,7 @@ hkRefVariant* hkxAttributeHolder::findAttributeVariantByName(hkRefVariant* apRes
         ++v4;
         ++v5;
         bool v6 = v4 < m_attributeGroups.m_size;
-        apResulta.m_pntr = 0;
+        apResulta.m_pntr = nullptr;
         if (!v6) {
             goto LABEL_6;
         }

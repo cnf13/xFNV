@@ -29,7 +29,7 @@ NiPoint3* SearchPackage::LookForTarget(NiPoint3* a1, TESObjectREFR* a2) {
     arg0 = this->LocationCenter;
     if (this->LocationCenter.operator==(NiPoint3_ZERO)) {
         NiPoint3 v20 = a2->GetLocationOnReference();
-        this->LocationCenter = *HighProcess::ComputeRandomPoint(&apResult, v20, 800.0f, 1000.0f, 0);
+        this->LocationCenter = *HighProcess::ComputeRandomPoint(&apResult, v20, 800.0f, 1000.0f, false);
         const NiPoint3* afMaxRadius = &a2->GetLocationOnReference();
         TESObjectCELL* ParentCell = a2->GetParentCell();
         TESWorldSpace* WorldSpace = a2->GetWorldSpace();
@@ -46,7 +46,7 @@ NiPoint3* SearchPackage::LookForTarget(NiPoint3* a1, TESObjectREFR* a2) {
             FindCoverToSearch(v19, kTargetPos, pcell, v11);
         }
         if (coverPoints.IsEmpty() || iCurrentCover >= coverPoints.iSize) {
-            arg0 = *HighProcess::ComputeRandomPoint(&v13, this->LocationCenter, 800.0f, 300.0f, 0);
+            arg0 = *HighProcess::ComputeRandomPoint(&v13, this->LocationCenter, 800.0f, 300.0f, false);
             TESObjectCELL* v8 = a2->GetParentCell();
             TESWorldSpace* v6 = a2->GetWorldSpace();
             Pathing::FindPointOnNavMesh(v6, v8, arg0, 300.0f, &arg0);

@@ -86,12 +86,12 @@ NiShader* NiD3DShaderFactory::RetrieveShader(const char* pcName, uint32_t uiImpl
 NiShader* NiD3DShaderFactory::FindShader(const char* pcName, uint32_t uiImplementation) {
     char acFullName[260];
     if (!m_pkShaderMap) {
-        return 0;
+        return nullptr;
     }
-    NiShader* pkShader = 0;
+    NiShader* pkShader = nullptr;
     NiSprintf(acFullName, 260u, "%s%d", pcName, uiImplementation);
     bool v4 = m_pkShaderMap->GetAt(acFullName, pkShader);
-    return v4 ? pkShader : 0;
+    return v4 ? pkShader : nullptr;
 }
 
 // The second FindShader asks for the default implementation; the shader's implementation id is then compared with the
@@ -122,27 +122,27 @@ bool NiD3DShaderFactory::ReleaseShaderFromLibrary(const char* pcName, uint32_t u
 
 bool NiD3DShaderFactory::ReleaseShaderFromLibrary(NiShader* pkShader) {
     if (!pkShader) {
-        return 0;
+        return false;
     }
     NiShader* v4 = FindShader((&pkShader->m_kName)->GetHandle(), pkShader->m_uiImplementation);
     if (!v4 || v4 != pkShader) {
         NiShader* pkTestShader = FindShader((&pkShader->m_kName)->GetHandle(), NiShader::DEFAULT_IMPLEMENTATION);
         if (!pkTestShader || pkTestShader != pkShader) {
-            return 0;
+            return false;
         }
     }
     m_kShaderMapLock.Lock();
     NiShaderLibrary* pkLibrary = GetFirstLibrary();
-    bool bRet = 0;
+    bool bRet = false;
     if (pkLibrary) {
         while (!pkLibrary->ReleaseShader(pkShader)) {
             pkLibrary = GetNextLibrary();
             if (!pkLibrary) {
                 m_kShaderMapLock.Unlock();
-                return 0;
+                return false;
             }
         }
-        bRet = 1;
+        bRet = true;
     }
     m_kShaderMapLock.Unlock();
     return bRet;
@@ -308,7 +308,7 @@ void NiD3DShaderFactory::RestoreAllShaderRendererData() {
         if (m_pkShaderMap) {
             uint32_t m_uiHashSize = m_pkShaderMap->m_uiHashSize;
             uint32_t v4 = 0;
-            pkShader = 0;
+            pkShader = nullptr;
             if (m_uiHashSize) {
                 NiTMapItem<const char*, NiShader*>** m_ppkHashTable = m_pkShaderMap->m_ppkHashTable;
                 NiTMapItem<const char*, NiShader*>** v6 = m_ppkHashTable;
@@ -323,7 +323,7 @@ void NiD3DShaderFactory::RestoreAllShaderRendererData() {
             }
             else {
             LABEL_7:;
-                kIter = 0;
+                kIter = nullptr;
             }
             while (kIter) {
                 this->m_pkShaderMap->GetNext(kIter, pcName, pkShader);

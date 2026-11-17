@@ -71,13 +71,13 @@ void MuzzleFlash::Update(float afDelta, TESObjectREFR* apParentRef) {
             NiNode* v6 = static_cast<NiNode*>(spAVObject.m_pObject);
             NiNode* v3 = v6->IsNode();
             TESObjectREFR::AddMasterParticleAddonNodes(v3);
-            bMPSEnabled = 1;
+            bMPSEnabled = true;
         }
         if (!bEnabled && bMPSEnabled) {
             NiAVObject* v5 = spAVObject.m_pObject;
             NiNode* v4 = v5->IsNode();
             TESObjectREFR::RemoveMasterParticleAddonNodes(v4);
-            bMPSEnabled = 0;
+            bMPSEnabled = false;
         }
         if (bUpdateLight) {
             UpdateLight();
@@ -92,8 +92,8 @@ void MuzzleFlash::Update(float afDelta, TESObjectREFR* apParentRef) {
             if (fDurationTimer <= 0.0) {
                 fDurationTimer = pProjectile->Data.fMuzzleFlashDuration;
                 fEnableTimer = 0.1f;
-                bEnabled = 0;
-                bUpdateLight = 1;
+                bEnabled = false;
+                bUpdateLight = true;
             }
         }
     }
@@ -125,7 +125,7 @@ void MuzzleFlash::UpdateLight() {
             if (!shadowSceneNode->GetLight(v5)) {
                 v4 = spLight.m_pObject;
                 v2 = BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD);
-                v2->AddLight(v4, 1);
+                v2->AddLight(v4, true);
             }
         }
         if (bEnabled) {
@@ -141,8 +141,8 @@ void MuzzleFlash::UpdateLight() {
 
 void MuzzleFlash::Enable() {
     if (fEnableTimer <= 0.0) {
-        bEnabled = (bool)1;
-        bUpdateLight = (bool)1;
+        bEnabled = true;
+        bUpdateLight = true;
         fDurationTimer = pProjectile->Data.fMuzzleFlashDuration;
     }
 }
@@ -172,7 +172,7 @@ void MuzzleFlash::Init(TESObjectREFR* apParentRef) {
     if (pModel) {
         if (pModel->GetModelLength()) {
             const char* v2 = pModel->GetModel();
-            NiNode* pObject = pModelLoader->LoadFile(v2, LOD_MULT_NONE, 1, 0, 0, 0);
+            NiNode* pObject = pModelLoader->LoadFile(v2, LOD_MULT_NONE, true, false, false, false);
             if (pObject) {
                 spAVObject.operator=(static_cast<NiAVObject*>(pObject->Clone()));
             }
@@ -185,7 +185,7 @@ void MuzzleFlash::Init(TESObjectREFR* apParentRef) {
         NiTimeController::StartAnimations(spAVObject.m_pObject);
         spAVObject.m_pObject->UpdateProperties();
         float fPrevTime = fCellAppTime - 0.032999999821186066;
-        NiUpdateData kUpdateData(fPrevTime, 1, 0);
+        NiUpdateData kUpdateData(fPrevTime, true, false);
         spAVObject.m_pObject->Update(kUpdateData);
         kUpdateData.fTime = fCellAppTime;
         spAVObject.m_pObject->Update(kUpdateData);
@@ -210,11 +210,11 @@ void MuzzleFlash::Position3D(TESObjectREFR* apParentRef) {
                             pprojectileNode_2 = pWeaponSource->GetFireNode(v2);
                         }
                         else {
-                            pprojectileNode_2 = 0;
+                            pprojectileNode_2 = nullptr;
                         }
                         pprojectileNode = pprojectileNode_2;
                     }
-                    bool bupdate = 0;
+                    bool bupdate = false;
                     float fupdateTime_2 = 0.0f;
                     if (pprojectileNode) {
                         NiNode* psceneParent;
@@ -224,7 +224,7 @@ void MuzzleFlash::Position3D(TESObjectREFR* apParentRef) {
                                 psceneParent = pPlayer->Get3D();
                             }
                             else {
-                                psceneParent = static_cast<NiNode*>(pPlayer->Get3D(1));
+                                psceneParent = static_cast<NiNode*>(pPlayer->Get3D(true));
                             }
                             NiTransform kplayerInvTransform;
                             if (psceneParent) {
@@ -239,7 +239,7 @@ void MuzzleFlash::Position3D(TESObjectREFR* apParentRef) {
                             }
                             ktrans =
                                 *::new (&kDest) NiTransform(kplayerInvTransform * pprojectileNode->GetWorldTransform());
-                            bupdate = 1;
+                            bupdate = true;
                             if (pPlayer->IsActually3rdPerson()) {
                                 float fupdateTime;
                                 if (pPlayer->GetAnimation()) {
@@ -253,8 +253,8 @@ void MuzzleFlash::Position3D(TESObjectREFR* apParentRef) {
                             }
                             else {
                                 float fupdateTime_3;
-                                if (pPlayer->GetAnimation(1)) {
-                                    Animation* Animation_0 = pPlayer->GetAnimation(1);
+                                if (pPlayer->GetAnimation(true)) {
+                                    Animation* Animation_0 = pPlayer->GetAnimation(true);
                                     fupdateTime_3 = Animation_0->GetTime();
                                 }
                                 else {
@@ -274,7 +274,7 @@ void MuzzleFlash::Position3D(TESObjectREFR* apParentRef) {
                                 if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
                                     NiAVObject* v8 = spAVObject.m_pObject;
                                     TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
-                                    Instance->QueueNodeAttach(v8, psceneParent, 1, 0);
+                                    Instance->QueueNodeAttach(v8, psceneParent, true, false);
                                 }
                                 else {
                                     NiAVObject* v10 = spAVObject.m_pObject;
@@ -292,11 +292,11 @@ void MuzzleFlash::Position3D(TESObjectREFR* apParentRef) {
                             if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
                                 if (bwarnOnce) {
                                     Warning("Trying to update a Muzzle Flash when not in the main thread");
-                                    bwarnOnce = 0;
+                                    bwarnOnce = false;
                                 }
                             }
                             else {
-                                NiUpdateData UpdateData(fupdateTime_2, 0, 0);
+                                NiUpdateData UpdateData(fupdateTime_2, false, false);
                                 spAVObject.m_pObject->Update(UpdateData);
                             }
                         }
@@ -312,7 +312,7 @@ void MuzzleFlash::AttachLight() {
         if (pProjectile->Data.pMuzzleFlashLight) {
             NiAVObject* v2 = spAVObject.m_pObject;
             TESObjectLIGH* FormOne = pProjectile->Data.pMuzzleFlashLight;
-            spLight.operator=(FormOne->GenDynamic(0, v2, 1));
+            spLight.operator=(FormOne->GenDynamic(nullptr, v2, true));
         }
     }
 }

@@ -353,9 +353,9 @@ void hkpLimitedHingeConstraintData::setInWorldSpace(
     int32_t v13 = 1;
     __m128 v14 = _mm_setzero_ps();
     v14[0] = 0.5f;
-    float v15 = 3.0f - static_cast<float>(static_cast<float>(v9[0] * v10) * v10);
+    float v15 = 3.0f - ((v9[0] * v10) * v10);
     __m128 v16 = _mm_cmpeq_ss(v9, v11);
-    v14[0] = static_cast<float>(0.5f * v10) * v15;
+    v14[0] = (0.5f * v10) * v15;
     __m128 v18 = _mm_andnot_ps(v16, v14);
     __m128 m_quad = _mm_mul_ps(_mm_shuffle_ps(v18, v18, 0), arVector_.m_quad);
     arVector_.m_quad = m_quad;
@@ -380,8 +380,7 @@ void hkpLimitedHingeConstraintData::setInWorldSpace(
     __m128 v24 = _mm_shuffle_ps(v22, v22, 170);
     v24[0] = v24[0] + v23;
     float v25 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v24[0])));
-    v14[0] = static_cast<float>(0.5f * v25) *
-        static_cast<float>(3.0f - static_cast<float>(static_cast<float>(v24[0] * v25) * v25));
+    v14[0] = (0.5f * v25) * (3.0f - ((v24[0] * v25) * v25));
     __m128 v26 = _mm_andnot_ps(_mm_cmpeq_ss(v24, v11), v14);
     arVector.m_quad = _mm_mul_ps(_mm_shuffle_ps(v26, v26, 0), arVector.m_quad);
     arVector__1.m_quad = _mm_sub_ps(
@@ -422,8 +421,8 @@ void hkpLimitedHingeConstraintData::setInBodySpace(
     __m128 v13 = _mm_setzero_ps();
     v13[0] = 0.5f;
     __m128 v14 = _mm_cmpeq_ss(v10, v12);
-    float v15 = 3.0f - static_cast<float>(static_cast<float>(v10[0] * v11) * v11);
-    v13[0] = static_cast<float>(0.5f * v11) * v15;
+    float v15 = 3.0f - ((v10[0] * v11) * v11);
+    v13[0] = (0.5f * v11) * v15;
     __m128 v17 = _mm_andnot_ps(v14, v13);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(v17, v17, 0), v7.m_quad);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad = axisAPerp.m_quad;
@@ -433,8 +432,8 @@ void hkpLimitedHingeConstraintData::setInBodySpace(
     __m128 v20 = _mm_shuffle_ps(v19, v19, 170);
     v20[0] = v20[0] + v17[0];
     float v21 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v20[0])));
-    float v23 = 3.0f - static_cast<float>(static_cast<float>(v20[0] * v21) * v21);
-    v13[0] = static_cast<float>(0.5f * v21) * v23;
+    float v23 = 3.0f - ((v20[0] * v21) * v21);
+    v13[0] = (0.5f * v21) * v23;
     __m128 v25 = _mm_andnot_ps(_mm_cmpeq_ss(v20, v12), v13);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v25, v25, 0), v18.m_quad);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad = _mm_sub_ps(
@@ -468,8 +467,8 @@ void hkpLimitedHingeConstraintData::setInBodySpace(
     v28[0] = v28[0] + v25[0];
     float v29 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v28[0])));
     __m128 v30 = _mm_cmpeq_ss(v28, v12);
-    float v31 = 3.0f - static_cast<float>(static_cast<float>(v28[0] * v29) * v29);
-    v13[0] = static_cast<float>(0.5f * v29) * v31;
+    float v31 = 3.0f - ((v28[0] * v29) * v29);
+    v13[0] = (0.5f * v29) * v31;
     __m128 v33 = _mm_andnot_ps(v30, v13);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(v33, v33, 0), v26.m_quad);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad = axisBPerp.m_quad;
@@ -479,8 +478,7 @@ void hkpLimitedHingeConstraintData::setInBodySpace(
     __m128 v36 = _mm_shuffle_ps(v35, v35, 170);
     v36[0] = v36[0] + v33[0];
     v33[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v36[0])));
-    v13[0] = static_cast<float>(0.5f * v33[0]) *
-        static_cast<float>(3.0f - static_cast<float>(static_cast<float>(v36[0] * v33[0]) * v33[0]));
+    v13[0] = (0.5f * v33[0]) * (3.0f - ((v36[0] * v33[0]) * v33[0]));
     __m128 v37 = _mm_andnot_ps(_mm_cmpeq_ss(v36, v12), v13);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v37, v37, 0), v34.m_quad);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col2.m_quad = _mm_sub_ps(

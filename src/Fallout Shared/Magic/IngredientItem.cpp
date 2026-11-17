@@ -66,7 +66,7 @@ float IngredientItem::GetCost(Actor* apActor) {
         return static_cast<float>(data.iCostOverride);
     }
     else {
-        return static_cast<EffectItemList*>(this)->EffectItemList::GetCost(0);
+        return static_cast<EffectItemList*>(this)->EffectItemList::GetCost(nullptr);
     }
 }
 
@@ -89,7 +89,7 @@ uint32_t IngredientItem::GetDataSize() {
 bool IngredientItem::CompareMagicItemData(MagicItem* apCompare) {
     IngredientItem* palchemy = dynamic_cast<IngredientItem*>(apCompare);
     if (!palchemy) {
-        return 1;
+        return true;
     }
     int32_t MusicType = palchemy->data.iCostOverride;
     return MusicType != data.iCostOverride || palchemy->data.iFlags != data.iFlags;

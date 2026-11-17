@@ -63,7 +63,7 @@ void MemoryLevelManager::BeginMemoryFree(
         aFreeData->bLockedFaceGen = (bool)((uint8_t)BSFaceGenManager::TryLockFaceGenAccess());
     }
     else {
-        aFreeData->bLockedFaceGen = (bool)0;
+        aFreeData->bLockedFaceGen = false;
     }
     if (abLockRenderer) {
         renderer = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
@@ -96,7 +96,7 @@ MemoryLevelManager* MemoryLevelManager::QInstance() {
 
 void MemoryLevelManager::RunNonDestructiveFree() {
     MemoryLevelManager::MEM_FREE_DATA freedata;
-    MemoryLevelManager::BeginMemoryFree(&freedata, 1, 1, 1);
+    MemoryLevelManager::BeginMemoryFree(&freedata, true, true, true);
     MemoryLevelManager::FreeReleasedObjects(freedata.bLockedFaceGen);
     if (pPlayer->GetAllowEGMCacheClear()) {
         if (BSFaceGenManager::GetModelCache()) {
@@ -104,7 +104,7 @@ void MemoryLevelManager::RunNonDestructiveFree() {
             if (ModelCache->bHasFaceGenData) {
                 if (!Menu::GetMenuByClass(1036)) {
                     BSFaceGenModelMap* v1 = BSFaceGenManager::GetModelCache();
-                    v1->UnloadAllEGMAndEGTData(0);
+                    v1->UnloadAllEGMAndEGTData(false);
                 }
             }
         }

@@ -55,10 +55,10 @@ bool BSPolygon2D::IsPointInsidePoly(NiPoint2 afPoint) {
                 afPoint, pIndexSimpleArray->pBuffer[3 * i], pIndexSimpleArray->pBuffer[(3 * i) + 1],
                 pIndexSimpleArray->pBuffer[(3 * i) + 2]
             )) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 bool BSPolygon2D::IsPointInsideTri(NiPoint2 afPoint, int32_t aiIndex1, int32_t aiIndex2, int32_t aiIndex3) {
@@ -100,10 +100,10 @@ void BSPolygon2D::StoreConcaveVertices() {
             v2 = ::new (v5) BSSimpleArray<uint16_t, 1024>;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         pConcaveVertexIndexList = v2;
-        bool bfoundcolinear = 0;
+        bool bfoundcolinear = false;
         for (int32_t b = 0; b < iVertexCount; ++b) {
             int32_t a;
             if (bfoundcolinear) {
@@ -120,16 +120,16 @@ void BSPolygon2D::StoreConcaveVertices() {
             int32_t iangle = InternalAngle(
                 pVertexSimpleArray->pBuffer[b], pVertexSimpleArray->pBuffer[a], pVertexSimpleArray->pBuffer[c]
             );
-            bfoundcolinear = 0;
+            bfoundcolinear = false;
             if (iangle == -1) {
                 uint16_t aItem = b;
                 pConcaveVertexIndexList->Add(aItem);
             }
             else {
                 if (!iangle) {
-                    pVertexSimpleArray->Remove(static_cast<uint32_t>(b), 1);
+                    pVertexSimpleArray->Remove(static_cast<uint32_t>(b), true);
                     --iVertexCount;
-                    bfoundcolinear = 1;
+                    bfoundcolinear = true;
                 }
             }
         }
@@ -186,7 +186,7 @@ void BSPolygon2D::Triangulate() {
                     v2 = ::new (v15) BSSimpleArray<uint16_t, 1024>;
                 }
                 else {
-                    v2 = 0;
+                    v2 = nullptr;
                 }
                 pIndexSimpleArray = v2;
             }
@@ -197,7 +197,7 @@ void BSPolygon2D::Triangulate() {
             uint16_t v12 = indexlist.pBuffer[j];
             pIndexSimpleArray->Add(v12);
             ++iTriangleCount;
-            indexlist.Remove(--i, 1);
+            indexlist.Remove(--i, true);
             if (pConcaveVertexIndexList) {
                 uint32_t iindex_3;
                 int32_t j_2 = i - 1;
@@ -238,7 +238,7 @@ void BSPolygon2D::Triangulate() {
                         pVertexSimpleArray->pBuffer[indexlist.pBuffer[k_2]]
                     );
                     if (angle == 1) {
-                        pConcaveVertexIndexList->Remove(iindex_3, 1);
+                        pConcaveVertexIndexList->Remove(iindex_3, true);
                     }
                 }
                 j_2 = i - 1;
@@ -279,7 +279,7 @@ void BSPolygon2D::Triangulate() {
                         pVertexSimpleArray->pBuffer[indexlist.pBuffer[i]]
                     );
                     if (angle_2 == 1) {
-                        pConcaveVertexIndexList->Remove(iindex_3, 1);
+                        pConcaveVertexIndexList->Remove(iindex_3, true);
                     }
                 }
             }
@@ -321,27 +321,27 @@ void BSPolygon2D::Triangulate() {
             v1 = ::new (apMemory) NiNode(0);
         }
         else {
-            v1 = 0;
+            v1 = nullptr;
         }
         spRootNode.operator=(v1);
         spRootNode.m_pObject->AttachChild(sp3D.m_pObject, 1);
         if (sp3D.m_pObject) {
-            pVertexArray = 0;
-            pNormalArray = 0;
-            pTexcoordArray = 0;
-            pColorArray = 0;
-            pIndexArray = 0;
+            pVertexArray = nullptr;
+            pNormalArray = nullptr;
+            pTexcoordArray = nullptr;
+            pColorArray = nullptr;
+            pIndexArray = nullptr;
         }
     }
 }
 
 bool BSPolygon2D::IsAnEar(int32_t aiIndex, int32_t aiPrev, int32_t aiNext) {
     if (!pConcaveVertexIndexList || !pConcaveVertexIndexList->iSize) {
-        return 1;
+        return true;
     }
     uint16_t aValue = aiIndex;
     if (pConcaveVertexIndexList->IsInArray(aValue)) {
-        return 0;
+        return false;
     }
     for (uint32_t i = 0; i < pConcaveVertexIndexList->iSize; ++i) {
         int32_t v8 = pConcaveVertexIndexList->pBuffer[i];
@@ -350,11 +350,11 @@ bool BSPolygon2D::IsAnEar(int32_t aiIndex, int32_t aiPrev, int32_t aiNext) {
             afPoint.x = pVertexSimpleArray->pBuffer[v8].x;
             afPoint.y = pVertexSimpleArray->pBuffer[v8].y;
             if (IsPointInsideTri(afPoint, aiPrev, aiIndex, aiNext)) {
-                return 0;
+                return false;
             }
         }
     }
-    return 1;
+    return true;
 }
 
 NiTriShape* BSPolygon2D::CreateTriShape(NiTriShapeData* data) {
@@ -363,7 +363,7 @@ NiTriShape* BSPolygon2D::CreateTriShape(NiTriShapeData* data) {
         return ::new (apMemory) NiTriShape(data);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -382,7 +382,7 @@ NiTriShapeData* BSPolygon2D::CreateTriData() {
         v9 = v28;
     }
     else {
-        v9 = 0;
+        v9 = nullptr;
     }
     pVertexArray = v9;
     uint32_t v27 = this->iVertexCount;
@@ -393,7 +393,7 @@ NiTriShapeData* BSPolygon2D::CreateTriData() {
         v8 = v26;
     }
     else {
-        v8 = 0;
+        v8 = nullptr;
     }
     pNormalArray = v8;
     uint32_t v25 = this->iVertexCount;
@@ -404,7 +404,7 @@ NiTriShapeData* BSPolygon2D::CreateTriData() {
         v7 = v24;
     }
     else {
-        v7 = 0;
+        v7 = nullptr;
     }
     this->pTexcoordArray = v7;
     uint32_t v23 = this->iVertexCount;
@@ -422,7 +422,7 @@ NiTriShapeData* BSPolygon2D::CreateTriData() {
         v6 = v22;
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     pColorArray = v6;
     pIndexArray = static_cast<uint16_t*>(_NiMalloc(sizeof(uint16_t) * (3 * iTriangleCount)));
@@ -457,7 +457,7 @@ NiTriShapeData* BSPolygon2D::CreateTriData() {
         );
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

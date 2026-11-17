@@ -83,10 +83,7 @@ void hkpConvexTranslateShape::calcContentStatistics(hkStatisticsCollector* colle
 float hkpConvexTranslateShape::getMaximumProjection(const hkVector4& direction) const {
     float v6 = m_childShape.m_childShape->getMaximumProjection(direction);
     __m128 v3 = _mm_mul_ps(m_translation.m_quad, direction.m_quad);
-    return static_cast<float>(
-               _mm_shuffle_ps(v3, v3, 170)[0] + static_cast<float>(_mm_shuffle_ps(v3, v3, 85)[0] + v3[0])
-           ) +
-        v6;
+    return (_mm_shuffle_ps(v3, v3, 170)[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0])) + v6;
 }
 
 const hkpShapeContainer* hkpConvexTranslateShape::getContainer() const {

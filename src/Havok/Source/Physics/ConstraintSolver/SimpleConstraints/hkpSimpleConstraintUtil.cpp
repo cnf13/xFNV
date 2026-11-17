@@ -35,7 +35,7 @@ float hkpSimpleConstraintInfo::BodyInfo::getEnergy(const hkpBodyVelocity& vel) c
     __m128 v13 = _mm_shuffle_ps(v11, v11, 255);
     __m128 v14 =
         _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v13, v13, 0), _mm_mul_ps(vel.m_linear.m_quad, vel.m_linear.m_quad)), v12);
-    return _mm_shuffle_ps(v14, v14, 170)[0] + static_cast<float>(_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]);
+    return _mm_shuffle_ps(v14, v14, 170)[0] + (_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]);
 }
 
 // Per body: the jacobians are massRelPos crossed with each direction, the inverse inertia is applied to them, the

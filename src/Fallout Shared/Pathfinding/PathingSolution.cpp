@@ -11,7 +11,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // Returns the raw byte.
 uint8_t PathingSolution::IsIncomplete() {
@@ -191,7 +191,7 @@ bool PathingSolution::FindPointOnPath(
     NiPoint3* apNewPoint
 ) {
     if (!GetNodeCount()) {
-        return 0;
+        return false;
     }
     if (abForward) {
         int32_t isize = GetNodeCount() - 1;
@@ -220,7 +220,7 @@ bool PathingSolution::FindPointOnPath(
                         PathingNode* LastNode = GetLastNode();
                         *apNewPoint = (&LastNode->Location)->GetLocation();
                     }
-                    return 0;
+                    return false;
                 }
                 PathingNode* v13 = &CurrentPathingNodes.GetAt(icurrentSpline + 1);
                 PathingSplineKey kNextKeyA = v13->GetSplineKey();
@@ -230,7 +230,7 @@ bool PathingSolution::FindPointOnPath(
             if (apNewParameter) {
                 *apNewParameter = static_cast<double>(icurrentSpline) + *apNewParameter;
             }
-            return 1;
+            return true;
         }
         else {
             if (apNewParameter) {
@@ -240,7 +240,7 @@ bool PathingSolution::FindPointOnPath(
                 PathingNode* v7 = GetLastNode();
                 *apNewPoint = (&v7->Location)->GetLocation();
             }
-            return 0;
+            return false;
         }
     }
     else {
@@ -262,8 +262,9 @@ bool PathingSolution::FindPointOnPath(
             PathingNode* v18 = &CurrentPathingNodes.GetAt(icurrentSpline_2);
             spline_2.SetKeys(v18->GetSplineKey(), kNextKeyB);
             float v30 = fcurrentParameter_2 - static_cast<double>(icurrentSpline_2);
-            for (bool bfound_2 = spline_2.FindPointOnSpline(v30, fdist_2, 0, apNewParameter, apNewPoint, 1.0f);
-                 !bfound_2; bfound_2 = spline_2.FindPointOnSpline(1.0f, fdist_2, 0, apNewParameter, apNewPoint, 1.0f)) {
+            for (bool bfound_2 = spline_2.FindPointOnSpline(v30, fdist_2, false, apNewParameter, apNewPoint, 1.0f);
+                 !bfound_2;
+                 bfound_2 = spline_2.FindPointOnSpline(1.0f, fdist_2, false, apNewParameter, apNewPoint, 1.0f)) {
                 float afEndParam = fcurrentParameter_2 - static_cast<double>(icurrentSpline_2);
                 double v20 = spline_2.ApproxLength(0.0f, afEndParam, 2u);
                 fdist_2 = fdist_2 - v20;
@@ -276,7 +277,7 @@ bool PathingSolution::FindPointOnPath(
                         PathingNode* FirstNode = GetFirstNode();
                         *apNewPoint = (&FirstNode->Location)->GetLocation();
                     }
-                    return 0;
+                    return false;
                 }
                 PathingNode* v22 = &CurrentPathingNodes.GetAt(icurrentSpline_2 + 1);
                 PathingSplineKey kNextKeyC = v22->GetSplineKey();
@@ -286,7 +287,7 @@ bool PathingSolution::FindPointOnPath(
             if (apNewParameter) {
                 *apNewParameter = static_cast<double>(icurrentSpline_2) + *apNewParameter;
             }
-            return 1;
+            return true;
         }
         if (apNewParameter) {
             *apNewParameter = 0.0f;
@@ -295,7 +296,7 @@ bool PathingSolution::FindPointOnPath(
             PathingNode* v16 = GetFirstNode();
             *apNewPoint = (&v16->Location)->GetLocation();
         }
-        return 0;
+        return false;
     }
 }
 
@@ -320,27 +321,27 @@ void PathingSolution::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     apLoadGameBuffer->LoadData(&iFirstLoadedVirtualNodeIndex, 4u);
     apLoadGameBuffer->LoadData(&iLastLoadedVirtualNodeIndex, 4u);
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
-    VirtualPathingNodes.SetSize(isaveGameCount, 1);
+    VirtualPathingNodes.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         VirtualPathingNode* virtualNode = &VirtualPathingNodes.operator[](i);
         virtualNode->LoadGame(apLoadGameBuffer);
     }
     uint32_t isaveGameCount_2 = apLoadGameBuffer->LoadVariableSizedValue();
-    CurrentPathingNodes.SetSize(isaveGameCount_2, 1);
+    CurrentPathingNodes.SetSize(isaveGameCount_2, true);
     for (uint32_t i_2 = 0; i_2 < isaveGameCount_2; ++i_2) {
         PathingNode* pathingNode = &CurrentPathingNodes.operator[](i_2);
         pathingNode->LoadGame(apLoadGameBuffer);
     }
     PathingAvoidNodeArray avoidNodeArrayDummy;
     uint32_t isaveGameCount_3 = apLoadGameBuffer->LoadVariableSizedValue();
-    avoidNodeArrayDummy.SetSize(isaveGameCount_3, 1);
+    avoidNodeArrayDummy.SetSize(isaveGameCount_3, true);
     for (uint32_t i_3 = 0; i_3 < isaveGameCount_3; ++i_3) {
         PathingAvoidNode* avoidNode = &avoidNodeArrayDummy.GetAt(i_3);
         avoidNode->LoadGame(apLoadGameBuffer);
     }
     if (apLoadGameBuffer->GetVersion() >= 18u) {
         uint32_t isaveGameCount_4 = apLoadGameBuffer->LoadVariableSizedValue();
-        DoorIDs.SetSize(isaveGameCount_4, 1);
+        DoorIDs.SetSize(isaveGameCount_4, true);
         for (uint32_t i_4 = 0; i_4 < isaveGameCount_4; ++i_4) {
             apLoadGameBuffer->LoadFormID(DoorIDs.operator[](i_4));
         }

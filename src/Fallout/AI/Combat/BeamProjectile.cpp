@@ -69,14 +69,14 @@ Projectile::PROJECTILE_TYPE BeamProjectile::GetProjectileType() {
 }
 
 void BeamProjectile::Initialize() {
-    Projectile::SetFlag(Projectile::TRACER, 0);
-    Projectile::SetFlag(Projectile::HITSCAN_MODE, 1);
-    Projectile::SetFlag(Projectile::NO_3D, 0);
-    Projectile::SetFlag(Projectile::NO_COLLISION, 1);
-    Projectile::SetFlag(Projectile::FADING, 1);
-    Projectile::SetFlag(Projectile::CHECK_BEHIND_WALL, 1);
-    Projectile::SetFlag(Projectile::POST_PROCESS, 1);
-    Projectile::SetFlag(Projectile::SPAWN_EXPLOSION_AT_IMPACT, 1);
+    Projectile::SetFlag(Projectile::TRACER, false);
+    Projectile::SetFlag(Projectile::HITSCAN_MODE, true);
+    Projectile::SetFlag(Projectile::NO_3D, false);
+    Projectile::SetFlag(Projectile::NO_COLLISION, true);
+    Projectile::SetFlag(Projectile::FADING, true);
+    Projectile::SetFlag(Projectile::CHECK_BEHIND_WALL, true);
+    Projectile::SetFlag(Projectile::POST_PROCESS, true);
+    Projectile::SetFlag(Projectile::SPAWN_EXPLOSION_AT_IMPACT, true);
     Projectile::Initialize();
     if (spBeamProperty.operator->()) {
         float fRange = GetRange();
@@ -200,7 +200,7 @@ float BeamProjectile::FindBeamGeometryLength(NiParticleSystem* apObject) {
                 (v6 = ModelData->GetAdditionalGeometryData(), v6->GetVBReady())) {
                 NiTConvertingStrideIterator<NiPoint3> apMemory;
                 NiAdditionalGeometryData* AdditionalGeometryData = ModelData->GetAdditionalGeometryData();
-                if (ModelData->LockPackedVertexData(1)) {
+                if (ModelData->LockPackedVertexData(true)) {
                     for (int32_t a2 = 0;; ++a2) {
                         uint16_t LevelExact = AdditionalGeometryData->m_usVertexCount;
                         if (a2 >= LevelExact) {
@@ -261,7 +261,7 @@ void BeamProjectile::ScaleBeamGeometryLength(NiGeometry* apObject, float afValue
                 if (a2->GetAdditionalGeometryData() && (v6 = a2->GetAdditionalGeometryData(), v6->GetVBReady())) {
                     NiTConvertingStrideIterator<NiPoint3> apMemory;
                     NiAdditionalGeometryData* AdditionalGeometryData = a2->GetAdditionalGeometryData();
-                    if (a2->LockPackedVertexData(1)) {
+                    if (a2->LockPackedVertexData(true)) {
                         a2->GetVerticesIterator(*static_cast<NiGeometryDataIteratorNiPoint3*>(&apMemory));
                         for (int32_t auiIndex = 0;; ++auiIndex) {
                             uint16_t LevelExact = AdditionalGeometryData->m_usVertexCount;

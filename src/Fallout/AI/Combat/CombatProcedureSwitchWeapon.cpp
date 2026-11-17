@@ -35,7 +35,7 @@ void CombatProcedureSwitchWeapon::Update() {
         pcurrentWeapon = static_cast<TESObjectWEAP*>(pcurrentWeaponItem->pContainerObj);
     }
     else {
-        pcurrentWeapon = 0;
+        pcurrentWeapon = nullptr;
     }
     if (bEquipQueued || pcurrentWeapon == pWeapon) {
         if (pcurrentWeapon != pWeapon) {
@@ -43,7 +43,7 @@ void CombatProcedureSwitchWeapon::Update() {
         }
         BaseProcess* v2 = pattacker->pCurrentProcess;
         if (!v2->GetWeaponDrawn()) {
-            pattacker->SetWantWeaponDrawn(1);
+            pattacker->SetWantWeaponDrawn(true);
         }
         if (!pcurrentWeapon || pcurrentWeapon->IsMeleeWeapon()) {
             pCombatController->InitPowerAttackDistances();
@@ -52,7 +52,7 @@ void CombatProcedureSwitchWeapon::Update() {
     }
     BaseProcess* v3 = pattacker->pCurrentProcess;
     if (v3->GetWeaponDrawn()) {
-        pattacker->SetWantWeaponDrawn(0);
+        pattacker->SetWantWeaponDrawn(false);
     }
     else {
         if (pWeapon) {
@@ -60,13 +60,13 @@ void CombatProcedureSwitchWeapon::Update() {
             if (pWeapon->IsThrownWeapon()) {
                 icount = pattacker->GetInventoryObjectCount(pWeapon);
             }
-            pattacker->QueueEquipObject(pWeapon, static_cast<int32_t>(icount), 0, 1, 0, 1);
+            pattacker->QueueEquipObject(pWeapon, static_cast<int32_t>(icount), nullptr, true, false, true);
         }
         else {
             uint32_t FormHealth_0 = pcurrentWeaponItem->iNumber;
-            pattacker->QueueUnEquipObject(pcurrentWeapon, FormHealth_0, 0, 0, 0, 1);
+            pattacker->QueueUnEquipObject(pcurrentWeapon, FormHealth_0, nullptr, false, false, true);
         }
-        bEquipQueued = 1;
+        bEquipQueued = true;
     }
 }
 

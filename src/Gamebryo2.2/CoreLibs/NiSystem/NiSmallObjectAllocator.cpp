@@ -3,7 +3,7 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiCriticalSection.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // KEEP: the exe builds the new chunk's second dword on the stack from two byte stores (m_ucFirstAvailableBlock,
 // m_ucBlocksAvailable) and copies the whole dword into m_pkChunks, so the chunk's two padding bytes get stack bytes
@@ -82,7 +82,7 @@ NiFixedAllocator::Chunk* NiFixedAllocator::VicinityFind(void* p) {
     NiFixedAllocator::Chunk* result = m_pkDeallocChunk + 1;
     NiFixedAllocator::Chunk* v6 = &m_pkChunks[m_stNumChunks];
     if (&m_pkDeallocChunk[1] == v6) {
-        result = 0;
+        result = nullptr;
     }
 LABEL_3:;
     while (!m_pkDeallocChunk) {
@@ -96,7 +96,7 @@ LABEL_3:;
             --m_pkDeallocChunk;
             goto LABEL_10;
         }
-        m_pkDeallocChunk = 0;
+        m_pkDeallocChunk = nullptr;
         if (!result) {
             return result;
         }
@@ -107,7 +107,7 @@ LABEL_3:;
         if (++result != v6) {
             goto LABEL_3;
         }
-        result = 0;
+        result = nullptr;
         if (!m_pkDeallocChunk) {
             return result;
         }

@@ -60,9 +60,9 @@ void CombatProcedureEngageTarget::Update() {
             pCombatController, pCombatController->GetCurrentWeapon(), fMinOptimalRange, fMaxOptimalRange,
             fAbsoluteMaxRange
         );
-        bool brangeChanged = 0;
+        bool brangeChanged = false;
         if (fMinOptimalRange != ftempMinOptimalRange || fMaxOptimalRange != ftempMaxOptimalRange) {
-            brangeChanged = 1;
+            brangeChanged = true;
         }
         ptarget->GetWorldLocation(&targetWorldLoc);
         pattacker->GetWorldLocation(&attackerWorldLoc);
@@ -88,13 +88,13 @@ void CombatProcedureEngageTarget::Update() {
                 if (!(pcombatState->GetLastTarget360LineOfSightTimeStamp().ElapsedTime() > 0.5)) {
                     goto LABEL_17;
                 }
-                if (!(fsquaredDistance < 262144.0) || !pcombatState->CheckMovement(targetWorldLoc, 1, 0)) {
+                if (!(fsquaredDistance < 262144.0) || !pcombatState->CheckMovement(targetWorldLoc, true, false)) {
                     goto LABEL_17;
                 }
                 ::new (&request) PathingRequest;
                 Space = targetWorldLoc.pSpace;
                 Point = &(&targetWorldLoc)->Point;
-                pattacker->BuildRequest_0(&request, *Point, Space, -1.0f, 0);
+                pattacker->BuildRequest_0(&request, *Point, Space, -1.0f, nullptr);
                 if (pattacker->SetPathfindingGoal(&request)) {
                     Destination = targetWorldLoc;
                     SetMoveMode(1);
@@ -130,7 +130,7 @@ void CombatProcedureEngageTarget::Update() {
                 ::new (&request_2) PathingRequest;
                 WorldSpace = pattacker->GetWorldSpace();
                 ParentCell = pattacker->GetParentCell();
-                pattacker->BuildRequest(&request_2, LeftRightDodgeStartLocation, ParentCell, WorldSpace, 0.0f, 0);
+                pattacker->BuildRequest(&request_2, LeftRightDodgeStartLocation, ParentCell, WorldSpace, 0.0f, nullptr);
                 if (pattacker->SetPathfindingGoal(&request_2)) {
                     SetMoveMode(1);
                     this->eState = CombatProcedureEngageTarget::ENGAGE_STATE_DODGING_LEFT_RIGHT;
@@ -168,7 +168,7 @@ void CombatProcedureEngageTarget::Update() {
                         TESWorldSpace* v13 = pattacker->GetWorldSpace();
                         TESObjectCELL* v8 = pattacker->GetParentCell();
                         const NiPoint3* Pos = &dodgeLocation.GetPoint();
-                        pattacker->BuildRequest(&request_3, *Pos, v8, v13, 16.0f, 0);
+                        pattacker->BuildRequest(&request_3, *Pos, v8, v13, 16.0f, nullptr);
                         NiPoint3 center = (&request_3.Origin)->GetLocation();
                         float v28 = fdistance + 256.0;
                         request_3.SetCenterRadius(center, v28);
@@ -183,11 +183,11 @@ void CombatProcedureEngageTarget::Update() {
                     }
                     goto LABEL_58;
                 }
-                if (pcombatState->CheckMovement(targetWorldLoc, 1, 0)) {
+                if (pcombatState->CheckMovement(targetWorldLoc, true, false)) {
                     PathingRequest request_4;
                     TESForm* v14 = targetWorldLoc.pSpace;
                     NiPoint3* v9 = &(&targetWorldLoc)->Point;
-                    pattacker->BuildRequest_0(&request_4, *v9, v14, 128.0f, 0);
+                    pattacker->BuildRequest_0(&request_4, *v9, v14, 128.0f, nullptr);
                     if (pattacker->SetPathfindingGoal(&request_4)) {
                         Destination = targetWorldLoc;
                         SetMoveMode(3);
@@ -202,21 +202,21 @@ void CombatProcedureEngageTarget::Update() {
                     NiPoint3* a1;
                     TESObjectCELL* ptargetCell;
                     TESWorldSpace* ptargetWorld;
-                    ptargetCell = 0;
-                    ptargetWorld = 0;
+                    ptargetCell = nullptr;
+                    ptargetWorld = nullptr;
                     targetWorldLoc.GetCellOrWorld(ptargetCell, ptargetWorld);
                     a1 = &(&targetWorldLoc)->Point;
                     if (!Pathing::FindClosestPointOnNavmesh(ptargetWorld, ptargetCell, *a1, &newPoint) ||
-                        (v15 = targetWorldLoc.pSpace, !pcombatState->CheckMovement(newPoint, v15, 1, 0))) {
+                        (v15 = targetWorldLoc.pSpace, !pcombatState->CheckMovement(newPoint, v15, true, false))) {
                     LABEL_58:;
                         if (HoldingTimer.Check()) {
                             BaseProcess* v26;
                             float fdodgeDistance;
-                            bool bcanDodge = 1;
+                            bool bcanDodge = true;
                             BaseProcess* CurrentAIProcess = pattacker->pCurrentProcess;
                             if (!CurrentAIProcess->HasMovementAnim(ANIM_GROUP_MOVE_LEFT) ||
                                 (v26 = pattacker->pCurrentProcess, !v26->HasMovementAnim(ANIM_GROUP_MOVE_RIGHT))) {
-                                bcanDodge = 0;
+                                bcanDodge = false;
                             }
                             if (bcanDodge &&
                                 (!RandomBool(0.25f) &&
@@ -232,7 +232,7 @@ void CombatProcedureEngageTarget::Update() {
                                 TESWorldSpace* v16 = pattacker->GetWorldSpace();
                                 TESObjectCELL* v10 = pattacker->GetParentCell();
                                 const NiPoint3* v4 = &dodgeLocation_2.GetPoint();
-                                pattacker->BuildRequest(&request_6, *v4, v10, v16, 16.0f, 0);
+                                pattacker->BuildRequest(&request_6, *v4, v10, v16, 16.0f, nullptr);
                                 NiPoint3 center_2 = (&request_6.Origin)->GetLocation();
                                 float v25 = fdodgeDistance + 256.0;
                                 request_6.SetCenterRadius(center_2, v25);
@@ -272,7 +272,7 @@ void CombatProcedureEngageTarget::Update() {
                         return;
                     }
                     PathingRequest request_5;
-                    pattacker->BuildRequest(&request_5, newPoint, ptargetCell, ptargetWorld, 128.0f, 0);
+                    pattacker->BuildRequest(&request_5, newPoint, ptargetCell, ptargetWorld, 128.0f, nullptr);
                     if (pattacker->SetPathfindingGoal(&request_5)) {
                         Destination.SetPoint(newPoint);
                         Destination.pSpace = targetWorldLoc.pSpace;
@@ -290,8 +290,8 @@ void CombatProcedureEngageTarget::Update() {
             case CombatProcedureEngageTarget::ENGAGE_STATE_APPROACHING_TARGET:
             case CombatProcedureEngageTarget::ENGAGE_STATE_MOVING_TO_TARGET: {
                 bLeftRightDodgeLostLOS = 0;
-                bool bforceComplete = 0;
-                bool bforceStopMoving = 0;
+                bool bforceComplete = false;
+                bool bforceStopMoving = false;
                 if (!pattacker->DidPathingFail()) {
                     goto LABEL_122;
                 }
@@ -301,7 +301,7 @@ void CombatProcedureEngageTarget::Update() {
                         float a2c = CombatTimer::GetTimer();
                         CombatTimeStamp failedTimeStamp(a2c);
                         fOptimalLocationPathingFailedTimeStamp = failedTimeStamp;
-                        bforceComplete = 1;
+                        bforceComplete = true;
                     }
                     else {
                         pcombatState->AddUnreachableLocation(Destination);
@@ -323,7 +323,7 @@ void CombatProcedureEngageTarget::Update() {
                             else {
                                 if (eState == CombatProcedureEngageTarget::ENGAGE_STATE_MOVING_TO_TARGET &&
                                     pcombatState->GetHasTarget360LineOfSight() && !boutsideAbsoluteRange) {
-                                    bforceComplete = 1;
+                                    bforceComplete = true;
                                 }
                             }
                         }
@@ -336,9 +336,11 @@ void CombatProcedureEngageTarget::Update() {
                         cCheckedOptimalPath = 1;
                         if (pattacker->GetCurrentPathfindingGoal_008B3840(&optimalLocation)) {
                             TESForm* v17 = attackerWorldLoc.pSpace;
-                            if (pcombatState->CheckMovement(optimalLocation, v17, 0, 0)) {
+                            if (pcombatState->CheckMovement(optimalLocation, v17, false, false)) {
                                 const NiPoint3* v5 = &ptarget->GetLocationOnReference();
-                                if (!CombatUtilities::CalculateLOS(pattacker, ptarget, optimalLocation, *v5, 0, -1)) {
+                                if (!CombatUtilities::CalculateLOS(
+                                        pattacker, ptarget, optimalLocation, *v5, false, -1
+                                    )) {
                                     cCheckedOptimalPath = -2;
                                 }
                             }
@@ -346,8 +348,8 @@ void CombatProcedureEngageTarget::Update() {
                                 cCheckedOptimalPath = -1;
                             }
                             if (cCheckedOptimalPath < 0) {
-                                bforceComplete = 1;
-                                bforceStopMoving = 1;
+                                bforceComplete = true;
+                                bforceStopMoving = true;
                                 float a2d = CombatTimer::GetTimer();
                                 CombatTimeStamp failedTimeStamp(a2d);
                                 fOptimalLocationPathingFailedTimeStamp = failedTimeStamp;
@@ -448,7 +450,7 @@ void CombatProcedureEngageTarget::Update() {
                         if (LeftRightDodgeLOSTimer.IsSet()) {
                             if (LeftRightDodgeLOSTimer.Check()) {
                                 pattacker->StopMoving();
-                                bLeftRightDodgeHadLOS = 0;
+                                bLeftRightDodgeHadLOS = false;
                                 LeftRightDodgeLOSTimer.Clear();
                             }
                         }
@@ -645,7 +647,7 @@ void CombatProcedureEngageTarget::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuff
 bool CombatProcedureEngageTarget::CanAttackerSneak() {
     NiPoint3 v5;
     if (!pCombatController->GetAttackerCanSneak()) {
-        return (bool)0;
+        return false;
     }
     Actor* shader = pCombatController->GetTarget();
     NiPoint3 v6 = shader->GetLocationOnReference();
@@ -659,7 +661,7 @@ bool CombatProcedureEngageTarget::CreateOptimalLocationPath(bool abOutsideAbsolu
     BGSWorldLocation v15;
     BGSWorldLocation apLocation;
     if (fOptimalLocationPathingFailedTimeStamp.ElapsedTime() < 5.0) {
-        return 0;
+        return false;
     }
     cCheckedOptimalPath = 1;
     if (bUseBackgroundOptimalLocationPathing) {
@@ -669,7 +671,7 @@ bool CombatProcedureEngageTarget::CreateOptimalLocationPath(bool abOutsideAbsolu
         TESWorldSpace* a5 = pattacker->GetWorldSpace();
         TESObjectCELL* a4 = pattacker->GetParentCell();
         const NiPoint3* v4 = &ptarget->GetLocationOnReference();
-        pattacker->BuildRequest(&request, *v4, a4, a5, 16.0f, 0);
+        pattacker->BuildRequest(&request, *v4, a4, a5, 16.0f, nullptr);
         request.SetMinDistance(fMinOptimalRange);
         request.SetMaxDistance(fMaxOptimalRange);
         float v13 = fMinOptimalRange * 0.5;
@@ -679,10 +681,10 @@ bool CombatProcedureEngageTarget::CreateOptimalLocationPath(bool abOutsideAbsolu
             TargetOptimalWorldLoc = *ptarget->GetWorldLocation(&apLocation);
             SetMoveMode(abOutsideAbsoluteRange ? 3 : 1);
             cCheckedOptimalPath = 0;
-            return 1;
+            return true;
         }
         else {
-            return 0;
+            return false;
         }
     }
     else {
@@ -692,30 +694,30 @@ bool CombatProcedureEngageTarget::CreateOptimalLocationPath(bool abOutsideAbsolu
         CombatState* pcombatState = pCombatController->pCombatState;
         float v12 = fMinOptimalRange * 0.5;
         if (pcombatState->FindOptimalLocation(
-                fMinOptimalRange, fMaxOptimalRange, v12, fAbsoluteMaxRange, &optimalLocation, 1
+                fMinOptimalRange, fMaxOptimalRange, v12, fAbsoluteMaxRange, &optimalLocation, true
             )) {
-            if (pcombatState->CheckMovement(optimalLocation.WorldLoc, 1, 0)) {
+            if (pcombatState->CheckMovement(optimalLocation.WorldLoc, true, false)) {
                 PathingRequest request_2;
                 TESWorldSpace* a5b = pattacker_2->GetWorldSpace();
                 TESObjectCELL* a4a = pattacker_2->GetParentCell();
                 const NiPoint3* Pos = &optimalLocation.GetPoint();
-                pattacker_2->BuildRequest(&request_2, *Pos, a4a, a5b, 16.0f, 0);
+                pattacker_2->BuildRequest(&request_2, *Pos, a4a, a5b, 16.0f, nullptr);
                 if (pattacker_2->SetPathfindingGoal(&request_2)) {
                     Destination = optimalLocation.WorldLoc;
                     TargetOptimalWorldLoc = *ptarget_2->GetWorldLocation(&v15);
                     SetMoveMode(abOutsideAbsoluteRange ? 3 : 1);
-                    return 1;
+                    return true;
                 }
                 else {
-                    return 0;
+                    return false;
                 }
             }
             else {
-                return 0;
+                return false;
             }
         }
         else {
-            return 0;
+            return false;
         }
     }
 }

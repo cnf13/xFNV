@@ -14,7 +14,7 @@ class hkpBroadPhaseHandle;
 class hkpCollidable;
 
 // The cache calcAabbCache fills: a byte buffer of getAabbCacheSize() bytes.
-typedef char hkpBroadPhaseAabbCache;
+using hkpBroadPhaseAabbCache = char;
 
 // The broad phase: finds the pairs of objects whose AABBs overlap. Every query is pure virtual, except
 // checkDeterminism.

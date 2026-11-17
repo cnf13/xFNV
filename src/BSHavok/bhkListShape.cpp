@@ -459,7 +459,7 @@ hkpShape* bhkListShape::GetChildhkShape(int32_t aiAt) {
         return const_cast<hkpShape*>(v4->getChildShapeInl(aiAt));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

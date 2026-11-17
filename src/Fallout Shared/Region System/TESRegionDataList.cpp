@@ -19,19 +19,19 @@ TESRegionData* TESRegionDataList::Find(const REGION_DATA_ID aFind) {
         }
         pThis = static_cast<TESRegionDataList*>(pThis->m_pkNext);
     }
-    return 0;
+    return nullptr;
 }
 
 bool TESRegionDataList::Add(TESRegionData* apData) {
     if (!apData) {
-        return 0;
+        return false;
     }
     REGION_DATA_ID v2 = apData->GetID();
     if (Find(v2)) {
-        return 0;
+        return false;
     }
     AddHead(apData);
-    return 1;
+    return true;
 }
 
 // Calls each entry's Validate. The iterator is deliberately never advanced, as the game does: an empty list or a first
@@ -59,7 +59,7 @@ TESRegionDataList* TESRegionDataList::Copy(TESRegionDataList* apCopyIntoList) {
             pcopy_2 = ::new (apMemory) TESRegionDataList(bOwnsDataMemory);
         }
         else {
-            pcopy_2 = 0;
+            pcopy_2 = nullptr;
         }
         pcopy = pcopy_2;
     }

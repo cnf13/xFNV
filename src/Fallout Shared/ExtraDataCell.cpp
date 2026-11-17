@@ -22,35 +22,35 @@ void BSExtraData::operator delete(void* apMemory) {
 bool ExtraCellImageSpace::Compare(BSExtraData* apCompare) {
     ExtraCellImageSpace* v4 = dynamic_cast<ExtraCellImageSpace*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(v4->pImageSpace != pImageSpace));
 }
 
-ExtraCellImpactSwap::ExtraCellImpactSwap() : BSExtraData(140u), pImpactSwap(0) {}
+ExtraCellImpactSwap::ExtraCellImpactSwap() : BSExtraData(140u), pImpactSwap(nullptr) {}
 
 bool ExtraCellImpactSwap::Compare(BSExtraData* apCompare) {
     ExtraCellImpactSwap* pComp = dynamic_cast<ExtraCellImpactSwap*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return 1;
+        return true;
     }
     if (pComp->pImpactSwap && pImpactSwap) {
         if (pComp->pImpactSwap->Compare(pImpactSwap)) {
-            return 1;
+            return true;
         }
     }
     else {
         if (pComp->pImpactSwap || pImpactSwap) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 ExtraCellImpactSwap::~ExtraCellImpactSwap() {
@@ -60,10 +60,10 @@ ExtraCellImpactSwap::~ExtraCellImpactSwap() {
 bool ExtraCellMusicType::Compare(BSExtraData* apCompare) {
     ExtraCellMusicType* v4 = dynamic_cast<ExtraCellMusicType*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(v4->pType != pType));
 }
@@ -71,10 +71,10 @@ bool ExtraCellMusicType::Compare(BSExtraData* apCompare) {
 bool ExtraCellWaterType::Compare(BSExtraData* apCompare) {
     ExtraCellWaterType* v4 = dynamic_cast<ExtraCellWaterType*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(v4->pWater != pWater));
 }
@@ -84,21 +84,21 @@ ExtraCellCanopyShadowMask::ExtraCellCanopyShadowMask(
     NiRenderedTexture* apTex
 )
   : BSExtraData(10), eState(aeState), spMask(apTex) {
-    Rect.pBits = 0;
+    Rect.pBits = nullptr;
 }
 
 ExtraCellCanopyShadowMask::~ExtraCellCanopyShadowMask() {
     eState = ExtraCellCanopyShadowMask::CS_NONE;
-    Rect.pBits = 0;
+    Rect.pBits = nullptr;
 }
 
 bool ExtraCellAcousticSpace::Compare(BSExtraData* apCompare) {
     ExtraCellAcousticSpace* v4 = dynamic_cast<ExtraCellAcousticSpace*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(v4->pSpace != pSpace));
 }
@@ -106,10 +106,10 @@ bool ExtraCellAcousticSpace::Compare(BSExtraData* apCompare) {
 bool ExtraCellClimate::Compare(BSExtraData* apCompare) {
     ExtraCellClimate* v4 = dynamic_cast<ExtraCellClimate*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BSExtraData::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(v4->pClimate != pClimate));
 }

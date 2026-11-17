@@ -60,12 +60,12 @@ NiAVObject* FORenderedMenuRaceSex::GetParentNodeToRender() {
 
 void FORenderedMenuRaceSex::Draw(BSRenderedTexture* a1, NiRenderer::ClearFlags a2, BSRenderedTexture* a3) {
     // The background is always tinted.
-    bool bTintBackground = 1;
+    bool bTintBackground = true;
     NiRenderer* pr = NiRenderer::GetRenderer();
     NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
     BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
     NiPointer<BSRenderedTexture> spswap(
-        TextureManager->BorrowRenderedTexture(Renderer_, BSTextureManager::TEX_INTERFACE_RACESEXMENU, 0, 0, 0)
+        TextureManager->BorrowRenderedTexture(Renderer_, BSTextureManager::TEX_INTERFACE_RACESEXMENU, 0, nullptr, 0)
     );
     NiColorA kPrevColor(0.0f, 0.0f, 0.0f, 0.0f);
     NiColorA kColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -86,32 +86,32 @@ void FORenderedMenuRaceSex::Draw(BSRenderedTexture* a1, NiRenderer::ClearFlags a
     a12.PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(3);
     BSShaderUtil::AccumulateScene(spClonedPlayerCamera.m_pObject, ShadowSceneNode_, a12);
-    BSShaderUtil::RenderScene(spClonedPlayerCamera.m_pObject, spaccum.m_pObject, 0);
+    BSShaderUtil::RenderScene(spClonedPlayerCamera.m_pObject, spaccum.m_pObject, false);
     a12.PopCullMode();
-    a12.SetAccumulator(0);
-    spaccum.operator=(static_cast<BSShaderAccumulator*>(0));
+    a12.SetAccumulator(nullptr);
+    spaccum.operator=(static_cast<BSShaderAccumulator*>(nullptr));
     BSRenderedTexture::StopOffscreen();
     FORenderedMenu::Draw(a1, NiRenderer::CLEAR_NONE, spswap.m_pObject);
     BSRenderedTexture* fB = spswap.m_pObject;
     BSTextureManager* v11 = BSShaderManager::TextureManagerPtr();
     v11->ReturnRenderedTexture(fB);
-    spswap.operator=(static_cast<BSRenderedTexture*>(0));
+    spswap.operator=(static_cast<BSRenderedTexture*>(nullptr));
 }
 
 bool FORenderedMenuRaceSex::OnIdle() {
     Animation* animation;
     Animation* v3;
     if (FORenderedMenu::GetInitialized()) {
-        animation = pPlayer->GetAnimation((bool)0);
+        animation = pPlayer->GetAnimation(false);
         animation->SkipUpdate(AGS_SKIP_ALL_BUT_SPECIAL_IDLE);
         pPlayer->UpdateAnimation();
-        v3 = pPlayer->GetAnimation((bool)0);
+        v3 = pPlayer->GetAnimation(false);
         pPlayer->UpdateAnimationMovement(v3, 0.0);
         return (bool)((uint8_t)FORenderedMenu::OnIdle());
     }
     else {
         Interface::EmergencyCloseAllMenusAndBreakStuff();
-        return (bool)0;
+        return false;
     }
 }
 
@@ -127,9 +127,9 @@ bool FORenderedMenuRaceSex::Pick(bool a1, float* a2, float* a3) {
         }
         if (v20) {
             NiPick apMemory(0, 8u);
-            apMemory.SetObserveAppCullFlag(1);
+            apMemory.SetObserveAppCullFlag(true);
             apMemory.m_eSortType = NiPick::SORT;
-            apMemory.SetIsReturnTexture(0);
+            apMemory.SetIsReturnTexture(false);
             int32_t v18 = -1;
             for (int32_t j = 0; v18 < 0 && j < 4; ++j) {
                 NiPoint3 a2a;
@@ -138,8 +138,8 @@ bool FORenderedMenuRaceSex::Pick(bool a1, float* a2, float* a3) {
                 int32_t ScriptProcessingDelay = static_cast<int32_t>(v21->sRealCursorPos.z);
                 int32_t DataClipDist = static_cast<int32_t>(v21->sRealCursorPos.x);
                 NiCamera* Camera = GetCamera();
-                Camera->WindowPointToRay(DataClipDist, ScriptProcessingDelay, a1a, a2a, 0);
-                if (apMemory.PickObjects(a1a, a2a, 0)) {
+                Camera->WindowPointToRay(DataClipDist, ScriptProcessingDelay, a1a, a2a, nullptr);
+                if (apMemory.PickObjects(a1a, a2a, false)) {
                     if ((&apMemory.m_pickResults)->GetAt(0)) {
                         v18 = j;
                     }
@@ -148,10 +148,10 @@ bool FORenderedMenuRaceSex::Pick(bool a1, float* a2, float* a3) {
             if (v18 >= 0) {
                 BSAudio* v5 = &BSAudio::QInstance();
                 BSSoundHandle* SoundHandleByName = v5->GetSoundHandleByName(&arHandle, "UIMenuMode", 289u);
-                SoundHandleByName->Play(0);
+                SoundHandleByName->Play(false);
                 RaceSexMenu* Menu_ = static_cast<RaceSexMenu*>(pMenuTile->GetMenu());
                 Menu_->SetActiveList(static_cast<RaceSexMenu::ListID>(v18));
-                return 1;
+                return true;
             }
         }
     }
@@ -186,7 +186,7 @@ void FORenderedMenuRaceSex::Initialize() {
     NiMatrix3 rot;
     NiMatrix3 mat1;
     NiRect<float> port;
-    bFakeDistortActive = 0;
+    bFakeDistortActive = false;
     double Time = static_cast<double>(appTimer.iLastTime);
     int32_t v1 = rt::rand();
     fNextFakeDistortTime = static_cast<double>(v1 % gs_iDistortMaxInterval_InterfaceFX.Int()) + Time;
@@ -196,14 +196,14 @@ void FORenderedMenuRaceSex::Initialize() {
     if (Instance->GetColor(3, newcolor)) {
         SetTintColor(newcolor);
     }
-    BSFadeNode* pgeom = 0;
+    BSFadeNode* pgeom = nullptr;
     if (spGeometry.m_pObject) {
         pgeom = static_cast<BSFadeNode*>(spGeometry.m_pObject);
     }
     else {
         RaceSexMenu* pRaceSexMenu = static_cast<RaceSexMenu*>(pMenuTile->GetMenu());
         const char* v4 = pRaceSexMenu->GetProjectorFile();
-        pgeom = static_cast<BSFadeNode*>(pModelLoader->LoadFile(v4, LOD_MULT_NONE, 1, 0, 0, 0));
+        pgeom = static_cast<BSFadeNode*>(pModelLoader->LoadFile(v4, LOD_MULT_NONE, true, false, false, false));
         spGeometry.operator=(static_cast<NiNode*>(pgeom));
         SwapPlatformLanguageTextures(pgeom);
     }
@@ -213,10 +213,10 @@ void FORenderedMenuRaceSex::Initialize() {
     NiFixedString* a10 = ::new (static_cast<void*>(&apString)) NiFixedString("Screen");
     NiAVObject* pscreen = pgeom->GetObjectByName(*a10);
     apString.~NiFixedString();
-    SetScreenTexture(0);
+    SetScreenTexture(nullptr);
     bPulseAffectsLight = 0;
-    spPlayer3D.operator=(static_cast<NiNode*>(0));
-    spClonedPlayerCamera.operator=(static_cast<NiCamera*>(0));
+    spPlayer3D.operator=(static_cast<NiNode*>(nullptr));
+    spClonedPlayerCamera.operator=(static_cast<NiCamera*>(nullptr));
     NiFixedString* a9 = ::new (static_cast<void*>(&v63)) NiFixedString("SexBtn:0");
     spButtons->operator=(pgeom->GetObjectByName(*a9));
     v63.~NiFixedString();
@@ -266,14 +266,14 @@ void FORenderedMenuRaceSex::Initialize() {
         float* v7 = &fRaceSexMenuHPos.Float();
         pgeom->SetTranslate(fzoom, 0.0f, *v7);
     }
-    NiUpdateData UpdateData1(0.0f, 0, 0);
+    NiUpdateData UpdateData1(0.0f, false, false);
     pgeom->Update(UpdateData1);
     void* apMemory = NiMemObject::operator new(sizeof(NiCamera));
     if (apMemory) {
         pcam = ::new (apMemory) NiCamera;
     }
     else {
-        pcam = 0;
+        pcam = nullptr;
     }
     ::new (&port) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     pcam->SetViewPort(port);
@@ -282,7 +282,7 @@ void FORenderedMenuRaceSex::Initialize() {
     rot.SetRow(2u, 0.0f, 1.0f, 0.0f);
     pcam->SetRotate(NiMatrix3_IDENTITY);
     pcam->SetMinNearPlaneDist(1.0f);
-    NiFrustum fr(0);
+    NiFrustum fr(false);
     SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
     fr.m_fFar = WorldSceneGraph->GetFarDistance();
     fr.m_fNear = BSSceneGraph::fNearDistance.Float();
@@ -306,11 +306,11 @@ void FORenderedMenuRaceSex::Initialize() {
     fr.m_fBottom = -v11 * fHeightByWidth * faspectDelta;
     double v12 = std::tan(theta);
     fr.m_fTop = v12 * fHeightByWidth * faspectDelta;
-    fr.m_bOrtho = 0;
+    fr.m_bOrtho = false;
     pcam->SetViewFrustum(fr);
     float* v13 = &fRenderedTerminalFOV.Float();
     NiCamera::HandleEyeFinityFOVScale(pcam, *v13);
-    NiUpdateData UpdateData2(0.0f, 0, 0);
+    NiUpdateData UpdateData2(0.0f, false, false);
     pcam->Update(UpdateData2);
     SetCamera(pcam);
     if (pscreen->IsGeometry()) {
@@ -334,7 +334,7 @@ void FORenderedMenuRaceSex::Initialize() {
         v28 = ::new (v51) NiAlphaProperty;
     }
     else {
-        v28 = 0;
+        v28 = nullptr;
     }
     NiProperty* pkProperty = (NiProperty*)v28;
     GetScreenGeometry()->AttachProperty(v28);
@@ -348,7 +348,7 @@ void FORenderedMenuRaceSex::Initialize() {
             plight = ::new (v49) NiPointLight;
         }
         else {
-            plight = 0;
+            plight = nullptr;
         }
         pgeom->AttachChild(plight, 1);
         NiPoint3* v19 = ::new (&dst) NiPoint3(0.0f, -50.0f, 0.0f);
@@ -356,10 +356,10 @@ void FORenderedMenuRaceSex::Initialize() {
         plight->SetDiffuseColor(*FNVD_RECONSTRUCT(NiColor)(&v47, 0.75f, 0.75f, 0.75f));
         plight->SetSpecularColor(*FNVD_RECONSTRUCT(NiColor)(&v46, 1000.0f, 0.0f, 0.0f));
         plight->SetDimmer(1.0f);
-        NiUpdateData ud(0.0f, 0, 0);
+        NiUpdateData ud(0.0f, false, false);
         plight->Update(ud);
         ShadowSceneNode* v22 = BSShaderManager::GetShadowSceneNode(1);
-        v22->AddLight(plight, 0);
+        v22->AddLight(plight, false);
         CreateLight();
     }
     FORenderedMenu::Initialize();
@@ -370,16 +370,16 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiRect<float> port;
     appMain->RenderMenuBackground();
-    ImageSpaceManager::bEOFEnabled = 0;
+    ImageSpaceManager::bEOFEnabled = false;
     if (GetInitialized()) {
         NiCamera* v16;
         NiNode* v20;
         NiAVObject* pscreenParent = FORenderedMenu::GetParentNodeToRender();
-        NiUpdateData foo(0.0f, 0, 0);
+        NiUpdateData foo(0.0f, false, false);
         pscreenParent->Update(foo);
         RaceSexMenu* prsm = static_cast<RaceSexMenu*>(pMenuTile->GetMenu());
         if (GetMenuLight()) {
-            GetMenuLight()->SetAppCulled(0);
+            GetMenuLight()->SetAppCulled(false);
         }
         FORenderedMenu::OnMenuOpen();
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
@@ -387,17 +387,17 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
         Controls* Instance = Controls::GetInstance();
         Instance->ClearUserActions();
         BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
-        CurrentAIProcess->SetWeaponDrawn(pPlayer, 0);
+        CurrentAIProcess->SetWeaponDrawn(pPlayer, false);
         pPlayer->SetWalkRunFlagDirty();
         pPlayer->ClearMoveMode(1024u);
-        Animation* Animation_0 = pPlayer->GetAnimation(0);
+        Animation* Animation_0 = pPlayer->GetAnimation(false);
         Animation_0->ClearGroup(AGS_WHOLE_BODY, 0.0f);
-        Animation* v4 = pPlayer->GetAnimation(0);
+        Animation* v4 = pPlayer->GetAnimation(false);
         v4->SkipUpdate(AGS_SKIP_ALL_BUT_SPECIAL_IDLE);
-        Animation* v5 = pPlayer->GetAnimation(0);
+        Animation* v5 = pPlayer->GetAnimation(false);
         v5->PlayGroup(0, ACTION_START, -1, AGS_NONE);
         pPlayer->Update(0.0f);
-        spPlayer3D.operator=(static_cast<NiNode*>(pPlayer->Get3D(0)));
+        spPlayer3D.operator=(static_cast<NiNode*>(pPlayer->Get3D(false)));
         ptSavedPlayerTranslation = spPlayer3D.m_pObject->GetTranslate();
         mtxSavedPlayerRotation = (*&spPlayer3D.m_pObject->m_kLocal).m_Rotate;
         NiNode* v22 = spPlayer3D.m_pObject;
@@ -411,15 +411,15 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
             v20 = ::new (apMemory) NiNode(0);
         }
         else {
-            v20 = 0;
+            v20 = nullptr;
         }
         NiRefObject* v29 = (NiRefObject*)v20;
         spPlayerParent.operator=(v20);
         ShadowSceneNode* v6 = BSShaderManager::GetShadowSceneNode(3);
         v6->AttachChild(spPlayerParent.m_pObject, 1);
-        spPlayerLights.operator=(static_cast<NiAVObject*>(
-            pModelLoader->LoadFile("Meshes\\Terminals\\PlayerFaceLights01.NIF", LOD_MULT_NONE, 1, 0, 0, 0)
-        ));
+        spPlayerLights.operator=(static_cast<NiAVObject*>(pModelLoader->LoadFile(
+            "Meshes\\Terminals\\PlayerFaceLights01.NIF", LOD_MULT_NONE, true, false, false, false
+        )));
         NiNode* v19 = spPlayerParent.m_pObject;
         v19->AttachChild(spPlayer3D.m_pObject, 1);
         NiNode* v18 = spPlayerParent.m_pObject;
@@ -433,7 +433,7 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
         spPlayerParent.m_pObject->SetRotate(3.1415927f, 0.0f, 0.0f, 1.0f);
         spPlayer3D.m_pObject->SetTranslate(0.0f, -5.0f, 0.0f);
         spPlayer3D.m_pObject->SetRotate(NiMatrix3_IDENTITY);
-        NiUpdateData bar(0.0f, 0, 0);
+        NiUpdateData bar(0.0f, false, false);
         spPlayerParent.m_pObject->Update(bar);
         NiNode* a4 = spPlayerParent.m_pObject;
         prsm->SetPlayerNode(a4);
@@ -442,7 +442,7 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
             v16 = ::new (v26) NiCamera;
         }
         else {
-            v16 = 0;
+            v16 = nullptr;
         }
         NiRefObject* v27 = (NiRefObject*)v16;
         spClonedPlayerCamera.operator=(v16);
@@ -452,7 +452,7 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
         NiPoint3 ptlook(0.0f, 1.0f, 0.0f);
         NiPoint3* v9 = ::new (&v25) NiPoint3(0.0f, 0.0f, 1.0f);
         spClonedPlayerCamera.m_pObject->LookAtWorldPoint(ptlook, *v9);
-        NiFrustum fr(0);
+        NiFrustum fr(false);
         SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
         fr.m_fFar = WorldSceneGraph->GetFarDistance();
         fr.m_fNear = BSSceneGraph::fNearDistance.Float();
@@ -464,24 +464,24 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
         fr.m_fRight = std::tan(theta);
         fr.m_fBottom = -std::tan(theta);
         fr.m_fTop = std::tan(theta);
-        fr.m_bOrtho = 0;
+        fr.m_bOrtho = false;
         spClonedPlayerCamera.m_pObject->SetViewFrustum(fr);
-        NiUpdateData UpdateData2(0.0f, 0, 0);
+        NiUpdateData UpdateData2(0.0f, false, false);
         spClonedPlayerCamera.m_pObject->Update(UpdateData2);
-        spPlayer3D.m_pObject->SetAppCulled(0);
-        prsm->RotatePlayer(0.5235988f, 1);
-        prsm->ZoomPlayer(0.0f, 1);
+        spPlayer3D.m_pObject->SetAppCulled(false);
+        prsm->RotatePlayer(0.5235988f, true);
+        prsm->ZoomPlayer(0.0f, true);
         LightButton(prsm->GetActiveList());
     }
 }
 
 void FORenderedMenuRaceSex::OnMenuClose() {
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    ImageSpaceManager::bEOFEnabled = 1;
+    ImageSpaceManager::bEOFEnabled = true;
     if (GetInitialized()) {
         if (GetMenuLight()) {
-            GetMenuLight()->SetAppCulled(1);
-            NiUpdateData foo(0.0f, 0, 0);
+            GetMenuLight()->SetAppCulled(true);
+            NiUpdateData foo(0.0f, false, false);
             GetMenuLight()->Update(foo);
         }
         NiNode* v10 = spPlayerParent.m_pObject;
@@ -490,7 +490,7 @@ void FORenderedMenuRaceSex::OnMenuClose() {
         v9->DetachChild(spPlayer3D.m_pObject);
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(3);
         ShadowSceneNode_->DetachChild(spPlayerParent.m_pObject);
-        spPlayerParent.operator=(static_cast<NiNode*>(0));
+        spPlayerParent.operator=(static_cast<NiNode*>(nullptr));
         ShadowSceneNode* v2 = BSShaderManager::GetShadowSceneNode(1);
         v2->DetachChild(FORenderedMenu::GetParentNodeToRender());
         NiNode* v8 = spPlayer3DParent.m_pObject;
@@ -503,15 +503,15 @@ void FORenderedMenuRaceSex::OnMenuClose() {
         spPlayer3D.m_pObject->SetRotate(mtxSavedPlayerRotation);
         spPlayer3D.m_pObject->SetTranslate(ptSavedPlayerTranslation);
         spPlayer3D.m_pObject->SetAppCulled(bPlayer3DCulled);
-        spPlayer3D.operator=(static_cast<NiNode*>(0));
-        spClonedPlayerCamera.operator=(static_cast<NiCamera*>(0));
-        spGeometry.operator=(static_cast<NiNode*>(0));
+        spPlayer3D.operator=(static_cast<NiNode*>(nullptr));
+        spClonedPlayerCamera.operator=(static_cast<NiCamera*>(nullptr));
+        spGeometry.operator=(static_cast<NiNode*>(nullptr));
         ShadowSceneNode* v4 = BSShaderManager::GetShadowSceneNode(1);
         v4->RemoveAllLights();
         FORenderedMenu::OnMenuClose();
         // No button lit.
         LightButton(static_cast<uint32_t>(-1));
-        spPlayerLights.operator=(static_cast<NiAVObject*>(0));
+        spPlayerLights.operator=(static_cast<NiAVObject*>(nullptr));
     }
 }
 
@@ -562,14 +562,14 @@ void FORenderedMenuRaceSex::DoEffect(BSRenderedTexture* a1, BSRenderedTexture* a
     }
     NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
     ImageSpaceManager* ImageSpaceManager_ = BSShaderManager::GetImageSpaceManager();
-    ImageSpaceManager_->RenderEffect(ImageSpaceManager::EFFECT_TV, Renderer_, a1, a2, 0, 1);
+    ImageSpaceManager_->RenderEffect(ImageSpaceManager::EFFECT_TV, Renderer_, a1, a2, nullptr, 1);
 }
 
 void FORenderedMenuRaceSex::UpdateFakeDistort(float a1) {
     float v4 = a1 - fFakeDistortStartTime;
     fFakeDistortPosition = v4 / fFakeDistortDuration;
     if (fFakeDistortPosition > gs_fDistortVerticalScale_InterfaceFX.Float() + 1.0) {
-        bFakeDistortActive = 0;
+        bFakeDistortActive = false;
         int32_t v2 = rt::rand();
         fNextFakeDistortTime = static_cast<double>(v2 % gs_iDistortMaxInterval_InterfaceFX.Int()) + a1;
     }

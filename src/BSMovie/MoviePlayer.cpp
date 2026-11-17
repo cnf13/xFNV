@@ -65,27 +65,27 @@ void Movie::Resume() {
 
 bool Movie::PlayBackground(const char* apFileName, bool abPreloadBink) {
     ePlayingState = MOVIE_PLAYING_BACKGROUND;
-    bLoading = (bool)1;
-    if (LoadBink(apFileName, 1, abPreloadBink, 0)) {
-        bLoading = (bool)0;
-        return (bool)1;
+    bLoading = true;
+    if (LoadBink(apFileName, true, abPreloadBink, false)) {
+        bLoading = false;
+        return true;
     }
     else {
-        bLoading = (bool)0;
-        return (bool)0;
+        bLoading = false;
+        return false;
     }
 }
 
 bool Movie::Update(bool abAllowInterruption, bool abLoop, bool abLetterBoxed) {
     char cFrameSkipped = 0;
     if (!pMoviePlayer->CheckContinuePlaying(abAllowInterruption)) {
-        return 0;
+        return false;
     }
     if (!pMoviePlayer->bPAL50) {
         if (BinkWait(pBink)) {
             if (ePlayingState != MOVIE_PLAYING_BACKGROUND) {
                 Sleep(1u);
-                return 1;
+                return true;
             }
         }
         else {
@@ -180,9 +180,9 @@ void MoviePlayer::PlaySequence(char* apString) {
     std::strcpy(pstring, apString);
     char* pfilename =
         reinterpret_cast<char*>(_mbstok(reinterpret_cast<uint8_t*>(pstring), reinterpret_cast<const uint8_t*>(",")));
-    bBinkOpenSignaled = 0;
+    bBinkOpenSignaled = false;
     while (pfilename) {
-        if (!bStopSequence && CheckContinuePlaying(1)) {
+        if (!bStopSequence && CheckContinuePlaying(true)) {
             char* pextension = &pfilename[std::strlen(pfilename) - 3];
             if (_mbsicmp(reinterpret_cast<const uint8_t*>(pextension), reinterpret_cast<const uint8_t*>("bik"))) {
                 Warning("DEFAULT: Unknown file type on file %s", pfilename);
@@ -192,17 +192,17 @@ void MoviePlayer::PlaySequence(char* apString) {
                 // The setting's address is never null.
                 bPreloadIntroSequence = &gs_bPreloadIntroSequence_General.uValue;
                 Play(
-                    pfilename, 1, 1, 0, bPreloadIntroSequence->b, bLetterBoxedSequence, 0, bSequenceMutesGameAudio,
-                    bSequencePausesGameAudio
+                    pfilename, true, true, false, bPreloadIntroSequence->b, bLetterBoxedSequence, false,
+                    bSequenceMutesGameAudio, bSequencePausesGameAudio
                 );
             }
         }
         pfilename = reinterpret_cast<char*>(_mbstok(nullptr, reinterpret_cast<const uint8_t*>(",")));
     }
     MemoryManager_Singleton.Deallocate(pstring);
-    bStopSequence = 0;
+    bStopSequence = false;
     if (!bWaitingForSequenceToEnd) {
-        hSequenceThreadHandle = 0;
+        hSequenceThreadHandle = nullptr;
     }
     uint32_t CurrentThreadId = GetCurrentThreadId();
     if (CurrentThreadId != GetMainThreadID() && !bBinkOpenSignaled) {
@@ -214,9 +214,9 @@ void MoviePlayer::PlaySequence(char* apString) {
 
 void MoviePlayer::SetThreadLoadedMovie(Movie* apMovie) {
     pThreadLoadedMovie = apMovie;
-    hMovieLoadingThreadHandle = 0;
+    hMovieLoadingThreadHandle = nullptr;
     fpThreadLoadCallback();
-    fpThreadLoadCallback = 0;
+    fpThreadLoadCallback = nullptr;
 }
 
 void MoviePlayer::SetSequenceThreadPriority(int32_t aiPriority) {
@@ -261,19 +261,19 @@ void MoviePlayer::SetSequenceThreadPriority(int32_t aiPriority) {
 bool MoviePlayer::GetPlayingSequence() {
     uint32_t exitCode;
     if (!hSequenceThreadHandle) {
-        return (bool)0;
+        return false;
     }
     return (bool)((uint8_t)(hSequenceThreadHandle->ExitCode() == BSSystemThread::STILL_ACTIVE));
 }
 
 void MoviePlayer::WaitForSequenceToEnd() {
     if (hSequenceThreadHandle) {
-        bWaitingForSequenceToEnd = (bool)1;
+        bWaitingForSequenceToEnd = true;
         hSequenceThreadHandle->Wait();
         // The finished thread is closed here.
         delete hSequenceThreadHandle;
         hSequenceThreadHandle = nullptr;
-        bWaitingForSequenceToEnd = (bool)0;
+        bWaitingForSequenceToEnd = false;
     }
 }
 
@@ -318,8 +318,8 @@ bool MoviePlayer::Play(
         Pause();
         if (bUseThreadLoadedMovie && pThreadLoadedMovie) {
             pCurrentMovie = pThreadLoadedMovie;
-            pThreadLoadedMovie = 0;
-            bUseThreadLoadedMovie = 0;
+            pThreadLoadedMovie = nullptr;
+            bUseThreadLoadedMovie = false;
         }
         else {
             Movie* v11;
@@ -328,7 +328,7 @@ bool MoviePlayer::Play(
                 v11 = ::new (apMemory) Movie;
             }
             else {
-                v11 = 0;
+                v11 = nullptr;
             }
             pCurrentMovie = v11;
         }
@@ -343,7 +343,7 @@ bool MoviePlayer::Play(
 }
 
 void MoviePlayer::StopSequence() {
-    bStopSequence = (bool)1;
+    bStopSequence = true;
 }
 
 void MoviePlayer::IncreaseSequenceThreadPriority() {
@@ -394,7 +394,7 @@ float MoviePlayer::CalculateScale(uint32_t afWidth, uint32_t afHeight, bool abLe
 // The horizontal position the movie is drawn at: half the gap left by the scaled movie in the screen width, plus the
 // screen offset.
 float MoviePlayer::CalculateXOffset(float afScale, uint32_t afWidth, bool abLetterBoxed) {
-    const uint32_t uiOffset = static_cast<uint32_t>(GetScreenOffsetX());
+    const uint32_t uiOffset = GetScreenOffsetX();
     if (abLetterBoxed) {
         return (float)uiOffset;
     }
@@ -408,7 +408,7 @@ float MoviePlayer::CalculateYOffset(float afScale, uint32_t afHeight, bool abLet
         return (float)((((double)GetScreenHeight()) - (((double)afHeight) * afScale)) / 2.0);
     }
     else {
-        return (float)(0.0);
+        return (float)0.0;
     }
 }
 
@@ -427,7 +427,7 @@ bool MoviePlayer::PlayBackground(const char* apFileName, bool abPreloadBink) {
     if (bUseThreadLoadedMovie && pThreadLoadedMovie) {
         pCurrentMovie = pThreadLoadedMovie;
         pThreadLoadedMovie = nullptr;
-        bUseThreadLoadedMovie = (bool)0;
+        bUseThreadLoadedMovie = false;
     }
     else {
         apMemory = (&MemoryManager_Singleton)->Allocate(sizeof(Movie));
@@ -468,12 +468,12 @@ void MoviePlayer::DeleteBinkPaths() {
             goto LABEL_7;
         }
     }
-    v2 = 0;
+    v2 = nullptr;
 LABEL_7:;
     a2 = v2;
     while (a2) {
-        a3 = 0;
-        a4 = 0;
+        a3 = nullptr;
+        a4 = nullptr;
         BinkPaths.GetNext(a2, a3, a4);
         MemoryManager_Singleton.Deallocate(a4);
     }
@@ -494,9 +494,9 @@ uint32_t MoviePlayer::MovieLoadingThread(void* apFileName) {
         v2 = ::new (apMemory) Movie;
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
-    v2->OpenBink(static_cast<char*>(apFileName), 1, 1, 1);
+    v2->OpenBink(static_cast<char*>(apFileName), true, true, true);
     pMoviePlayer->SetThreadLoadedMovie(v2);
     return 0;
 }

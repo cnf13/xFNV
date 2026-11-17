@@ -78,7 +78,7 @@ void BGSDistantTreeBlock::TreeType::InitValues(BGSDistantTreeBlock::TreeType* ap
     NiPoint2* v5;
     NiPoint3* v6;
     AutoMemContext apMemory(
-        MEM_CONTEXT_LODTREES, 1,
+        MEM_CONTEXT_LODTREES, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Distant Terrain System\\BGSDistantTreeBlock.cpp", 149
     );
     // The triangle count, compared unsigned and passed on as a count.
@@ -92,7 +92,7 @@ void BGSDistantTreeBlock::TreeType::InitValues(BGSDistantTreeBlock::TreeType* ap
         v6 = static_cast<NiPoint3*>(ptr);
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     void* v10 = ourMalloc(v19 <= SIZE_MAX / sizeof(NiPoint2) ? sizeof(NiPoint2) * v19 : SIZE_MAX);
     if (v10) {
@@ -100,7 +100,7 @@ void BGSDistantTreeBlock::TreeType::InitValues(BGSDistantTreeBlock::TreeType* ap
         v5 = static_cast<NiPoint2*>(v10);
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     void* v9 = ourMalloc(v19 <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * v19 : SIZE_MAX);
     if (v9) {
@@ -108,7 +108,7 @@ void BGSDistantTreeBlock::TreeType::InitValues(BGSDistantTreeBlock::TreeType* ap
         v4 = static_cast<NiPoint3*>(v9);
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     uint16_t* pusTriList = static_cast<uint16_t*>(
         ourMalloc(3 * v18 <= SIZE_MAX / sizeof(uint16_t) ? sizeof(uint16_t) * (3 * v18) : SIZE_MAX)
@@ -217,12 +217,12 @@ void BGSDistantTreeBlock::TreeType::InitValues(BGSDistantTreeBlock::TreeType* ap
         additionalGeo = ::new (v8) NiAdditionalGeometryData(v19);
     }
     else {
-        additionalGeo = 0;
+        additionalGeo = nullptr;
     }
     additionalGeo->SetDataBlockCount(1u);
     additionalGeo->SetDataStreamCount(1u);
     // The data block is raw bytes to the geometry data: the float buffer goes in as uint8_t*.
-    additionalGeo->SetDataBlock(0, reinterpret_cast<uint8_t*>(a2), 4 * v19, 1);
+    additionalGeo->SetDataBlock(0, reinterpret_cast<uint8_t*>(a2), 4 * v19, true);
     additionalGeo->SetDataStream(0, 0, 0, 1u, v19, 4u, 4u);
     ourFree(a2);
     NiTriShapeData* v7 = static_cast<NiTriShapeData*>(NiMemObject::operator new(sizeof(NiTriShapeData)));
@@ -230,12 +230,12 @@ void BGSDistantTreeBlock::TreeType::InitValues(BGSDistantTreeBlock::TreeType* ap
         v2 = ::new (v7) NiTriShapeData(v19, v6, v4, nullptr, v5, 1, NiGeometryData::NBT_METHOD_NONE, v18, pusTriList);
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     NiPointer<NiTriShapeData> v22(v2);
     v22->SetAdditionalGeometryData(additionalGeo);
     apTreeType->spSharedModelData.operator=(v22);
-    v22.operator=(static_cast<NiTriShapeData*>(0));
+    v22.operator=(static_cast<NiTriShapeData*>(nullptr));
 }
 
 void BGSDistantTreeBlock::TreeType::operator delete(void* apMemory) {
@@ -268,16 +268,16 @@ BGSDistantTreeBlock::~BGSDistantTreeBlock() {
     ClearTrees();
     ClearQueuedTrees();
     if (spLoadTask.m_pObject) {
-        pIOManager->CancelTask(spLoadTask.m_pObject, 0);
+        pIOManager->CancelTask(spLoadTask.m_pObject, nullptr);
     }
 }
 
 void BGSDistantTreeBlock::ShowTree(uint32_t aID) {
-    BGSDistantTreeBlock::InstanceData* pinst = 0;
+    BGSDistantTreeBlock::InstanceData* pinst = nullptr;
     if (InstanceMap.GetAt(aID, pinst)) {
-        pinst->bHidden = 0;
+        pinst->bHidden = false;
         // GetAt takes an int; the index is stored unsigned.
-        TreeGroups.GetAt(static_cast<int32_t>(pinst->uiGroup))->bShaderPropertyUpToDate = 0;
+        TreeGroups.GetAt(static_cast<int32_t>(pinst->uiGroup))->bShaderPropertyUpToDate = false;
     }
 }
 
@@ -310,18 +310,18 @@ void BGSDistantTreeBlock::SetupShaderProperty(
         a3a.x = 0.0f;
         apProp->SetInstanceData(i_2, a3a, 0.0f, 0.0f);
     }
-    aGroup.bShaderPropertyUpToDate = 1;
+    aGroup.bShaderPropertyUpToDate = true;
 }
 
 void BGSDistantTreeBlock::ClearQueuedTrees() {
-    (&TreesQueuedToHide)->Clear(1);
+    (&TreesQueuedToHide)->Clear(true);
 }
 
 void BGSDistantTreeBlock::HideTree(const uint32_t aID, bool abQueue) {
-    BGSDistantTreeBlock::InstanceData* pinst = 0;
+    BGSDistantTreeBlock::InstanceData* pinst = nullptr;
     if (InstanceMap.GetAt(aID, pinst)) {
-        pinst->bHidden = 1;
-        TreeGroups.GetAt(pinst->uiGroup)->bShaderPropertyUpToDate = 0;
+        pinst->bHidden = true;
+        TreeGroups.GetAt(pinst->uiGroup)->bShaderPropertyUpToDate = false;
     }
     else {
         if (abQueue) {
@@ -331,19 +331,19 @@ void BGSDistantTreeBlock::HideTree(const uint32_t aID, bool abQueue) {
 }
 
 void BGSDistantTreeBlock::FinishLoad() {
-    bDoneLoading = 1;
+    bDoneLoading = true;
     BGSTerrainManager* v1 = pNode->GetManager();
-    v1->SetNeedsImmediateUpdate(1);
-    spLoadTask.operator=(static_cast<QueuedFile*>(0));
+    v1->SetNeedsImmediateUpdate(true);
+    spLoadTask.operator=(static_cast<QueuedFile*>(nullptr));
 }
 
 void BGSDistantTreeBlock::AddTree(const uint32_t uiType, const BGSDistantTreeBlock::InstanceData& apInstanceData) {
     uint32_t v3;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LODTREES, 1,
+        MEM_CONTEXT_LODTREES, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Distant Terrain System\\BGSDistantTreeBlock.cpp", 331
     );
-    BGSDistantTreeBlock::TreeGroup* pgroup = 0;
+    BGSDistantTreeBlock::TreeGroup* pgroup = nullptr;
     bool bfound = NextGroup.GetAt(uiType, pgroup);
     if (!bfound || (!pgroup || (v3 = pgroup->Instances.iSize, v3 == BGSDistantTreeBlock::GetMaxInstanceCount()))) {
         BGSDistantTreeBlock::TreeGroup* pgroup_2;
@@ -357,7 +357,7 @@ void BGSDistantTreeBlock::AddTree(const uint32_t uiType, const BGSDistantTreeBlo
             pgroup_2 = ::new (v9) BGSDistantTreeBlock::TreeGroup;
         }
         else {
-            pgroup_2 = 0;
+            pgroup_2 = nullptr;
         }
         pgroup = pgroup_2;
         BGSDistantTreeBlock::TreeType* v4 = &BGSDistantTreeBlock::TreeTypes.GetAt(uiType);
@@ -368,30 +368,30 @@ void BGSDistantTreeBlock::AddTree(const uint32_t uiType, const BGSDistantTreeBlo
         pgroup->uiNum = FormFlags - 1;
         uint32_t MaxInstanceCount = BGSDistantTreeBlock::GetMaxInstanceCount();
         pgroup->Instances.SetReservedSize(MaxInstanceCount);
-        pgroup->bShaderPropertyUpToDate = 0;
+        pgroup->bShaderPropertyUpToDate = false;
     }
     pgroup->Instances.Add(apInstanceData);
     uint32_t uinum = pgroup->Instances.iSize - 1;
     BGSDistantTreeBlock::InstanceData* pinst = &pgroup->Instances.GetAt(uinum);
     pinst->uiGroup = pgroup->uiNum;
-    pinst->bHidden = 0;
+    pinst->bHidden = false;
     InstanceMap.SetAt(pinst->id, pinst);
 }
 
 void BGSDistantTreeBlock::ClearTrees() {
     for (uint32_t i = 0; i < TreeGroups.iSize; ++i) {
-        TreeGroups.GetAt(i)->Instances.Clear(1);
+        TreeGroups.GetAt(i)->Instances.Clear(true);
         if (TreeGroups.GetAt(i)->spGeometry.m_pObject) {
             NiNode* TreeNode = pNode->pManager->GetTreeNode();
             TreeNode->DetachChild(TreeGroups.GetAt(i)->spGeometry.m_pObject);
-            TreeGroups.GetAt(i)->spGeometry.operator=(static_cast<BSResizableTriShape*>(0));
+            TreeGroups.GetAt(i)->spGeometry.operator=(static_cast<BSResizableTriShape*>(nullptr));
         }
         BGSDistantTreeBlock::TreeGroup* v3 = TreeGroups.GetAt(i);
         if (v3) {
             delete v3;
         }
     }
-    TreeGroups.Clear(1);
+    TreeGroups.Clear(true);
 }
 
 NiBound* BGSDistantTreeBlock::CalculateBound(NiBound* apBound, BGSDistantTreeBlock::TreeGroup* apGroup) {
@@ -425,7 +425,7 @@ void BGSDistantTreeBlock::Read(NiFile* apInputFile) {
     uint32_t v6;
     uint32_t pvBuffer;
     AutoMemContext apMemory(
-        MEM_CONTEXT_LODTREES, 1,
+        MEM_CONTEXT_LODTREES, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Distant Terrain System\\BGSDistantTreeBlock.cpp", 516
     );
     ClearTrees();
@@ -444,7 +444,7 @@ void BGSDistantTreeBlock::Read(NiFile* apInputFile) {
 void BGSDistantTreeBlock::Attach() {
     NiBound arg0;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LODTREES, 1,
+        MEM_CONTEXT_LODTREES, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Distant Terrain System\\BGSDistantTreeBlock.cpp", 576
     );
     if (!bDoneLoading || bAttached) {
@@ -468,7 +468,7 @@ void BGSDistantTreeBlock::Attach() {
                 v9 = ::new (v14) BSResizableTriShape(v4);
             }
             else {
-                v9 = 0;
+                v9 = nullptr;
             }
             NiRefObject* v15 = v9;
             group->spGeometry.operator=(v9);
@@ -481,7 +481,7 @@ void BGSDistantTreeBlock::Attach() {
                 psp_2 = ::new (v12) BSDistantTreeShaderProperty;
             }
             else {
-                psp_2 = 0;
+                psp_2 = nullptr;
             }
             BSDistantTreeShaderProperty* v13 = psp_2;
             BSDistantTreeShaderProperty* psp = psp_2;
@@ -495,17 +495,17 @@ void BGSDistantTreeBlock::Attach() {
             NiNode* TreeNode = pNode->pManager->GetTreeNode();
             TreeNode->AttachChild(group->spGeometry.m_pObject, 1);
             group->spGeometry.m_pObject->UpdateProperties();
-            NiUpdateData foobar(0.0f, 0, 0);
+            NiUpdateData foobar(0.0f, false, false);
             group->spGeometry.m_pObject->Update(foobar);
-            NiUpdateData bar(0.0f, 0, 0);
+            NiUpdateData bar(0.0f, false, false);
             pNode->pManager->GetLODRoot()->Update(bar);
             BSResizableTriShape* v7 = group->spGeometry.m_pObject;
             NiBound v24 = *CalculateBound(&arg0, group);
             v7->SetLocalBound(v24);
-            NiUpdateData foo(0.0f, 0, 0);
+            NiUpdateData foo(0.0f, false, false);
             group->spGeometry.m_pObject->Update(foo);
         }
-        bAttached = 1;
+        bAttached = true;
     }
 }
 
@@ -527,7 +527,7 @@ void BGSDistantTreeBlock::UpdateShaderProperties() {
 
 void BGSDistantTreeBlock::HideQueuedTrees() {
     for (uint32_t i = 0; i < TreesQueuedToHide.iSize; ++i) {
-        HideTree(TreesQueuedToHide.GetAt(i), 0);
+        HideTree(TreesQueuedToHide.GetAt(i), false);
     }
     ClearQueuedTrees();
 }
@@ -575,16 +575,16 @@ void BGSDistantTreeBlock::AllocateStaticData(TESWorldSpace* apWorld) {
 void BGSDistantTreeBlock::ReadTypes(NiFile* apInputFile) {
     uint32_t uinumTypes;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LODTREES, 1,
+        MEM_CONTEXT_LODTREES, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Distant Terrain System\\BGSDistantTreeBlock.cpp", 638
     );
-    BGSDistantTreeBlock::TreeTypes.Clear(1);
+    BGSDistantTreeBlock::TreeTypes.Clear(true);
     uinumTypes = 0;
     apInputFile->Read(&uinumTypes, 4u);
     for (uint32_t i = 0; i < uinumTypes; ++i) {
         BGSDistantTreeBlock::TreeType newType;
         apInputFile->Read(&newType, 32u);
-        newType.spSharedModelData.operator=(static_cast<NiTriShapeData*>(0));
+        newType.spSharedModelData.operator=(static_cast<NiTriShapeData*>(nullptr));
         BGSDistantTreeBlock::AddType(newType);
     }
 }
@@ -614,13 +614,13 @@ void BGSDistantTreeBlock::operator delete(void* apMemory) {
 void BGSDistantTreeBlock::DeallocateStaticData() {
     for (uint32_t i = 0; i < BGSDistantTreeBlock::TreeTypes.iSize; ++i) {
         BGSDistantTreeBlock::TreeType* v0 = &BGSDistantTreeBlock::TreeTypes.GetAt(i);
-        v0->spSharedModelData.operator=(static_cast<NiTriShapeData*>(0));
+        v0->spSharedModelData.operator=(static_cast<NiTriShapeData*>(nullptr));
     }
-    BGSDistantTreeBlock::spSharedStencil.operator=(static_cast<NiStencilProperty*>(0));
-    BGSDistantTreeBlock::spSharedAlpha.operator=(static_cast<NiAlphaProperty*>(0));
-    BGSDistantTreeBlock::spAtlasTexture.operator=(static_cast<NiSourceTexture*>(0));
-    BSDistantTreeShader::SetTextureAtlas(0);
-    BGSDistantTreeBlock::bStaticDataLoaded = 0;
+    BGSDistantTreeBlock::spSharedStencil.operator=(static_cast<NiStencilProperty*>(nullptr));
+    BGSDistantTreeBlock::spSharedAlpha.operator=(static_cast<NiAlphaProperty*>(nullptr));
+    BGSDistantTreeBlock::spAtlasTexture.operator=(static_cast<NiSourceTexture*>(nullptr));
+    BSDistantTreeShader::SetTextureAtlas(nullptr);
+    BGSDistantTreeBlock::bStaticDataLoaded = false;
 }
 
 void BGSDistantTreeBlock::AddType(const BGSDistantTreeBlock::TreeType& aType) {
@@ -652,12 +652,12 @@ void BGSDistantTreeBlockLoadTask::Run() {
     char* ProcessLevel = pFileName;
     NiFile* apInputFile = FileFinder::GetFile(ProcessLevel, NiFile::READ_ONLY, 2048u, 1u);
     if (!apInputFile || bCanceled) {
-        bFileExists = 0;
+        bFileExists = false;
     }
     else {
         pBlock->Read(apInputFile);
         delete apInputFile;
-        bFileExists = 1;
+        bFileExists = true;
         pBlock->HideQueuedTrees();
     }
 }
@@ -669,7 +669,7 @@ void BGSDistantTreeBlockLoadTask::Finish() {
 }
 
 void BGSDistantTreeBlockLoadTask::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
-    bCanceled = (bool)1;
+    bCanceled = true;
     QueuedFile::Cancel(aePreviousState, apTaskOwner);
 }
 
@@ -680,7 +680,7 @@ bool BGSDistantTreeBlockLoadTask::GetDescription(char* apDescription, uint32_t a
 }
 
 void BGSDistantTreeBlockLoadTask::QueueMe() {
-    bFinishedQueuing = (bool)1;
+    bFinishedQueuing = true;
     CheckFinished();
 }
 

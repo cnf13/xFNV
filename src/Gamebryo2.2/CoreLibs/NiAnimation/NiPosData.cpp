@@ -139,7 +139,7 @@ void NiPosData::SetAnim(NiPosKey* pkKeys, uint32_t uiNumKeys, NiAnimationKey::Ke
     }
     else {
         m_uiNumKeys = 0;
-        m_pkKeys = 0;
+        m_pkKeys = nullptr;
         m_ucKeySize = 0;
         m_eType = NiAnimationKey::NOINTERP;
     }
@@ -148,7 +148,7 @@ void NiPosData::SetAnim(NiPosKey* pkKeys, uint32_t uiNumKeys, NiAnimationKey::Ke
 NiObject* NiPosData::CreateObject() {
     NiPosData* pkObject = static_cast<NiPosData*>(NiMemObject::operator new(sizeof(NiPosData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPosData;
 }

@@ -68,17 +68,17 @@ void BSRenderState::SetColorWriteEnableMrt(
 ) {
     uint32_t v4 = BSRenderState::uiD3D2BSRS[190];
     if (!BSRenderState::iLock[BSRenderState::uiD3D2BSRS[190]]) {
-        BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(190u, auiMask1, 0, 0);
+        BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(190u, auiMask1, 0, false);
     }
     BSRenderState::iLock[v4] += aeLock;
     uint32_t v5 = BSRenderState::uiD3D2BSRS[191];
     if (!BSRenderState::iLock[BSRenderState::uiD3D2BSRS[191]]) {
-        BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(191u, auiMask2, 0, 0);
+        BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(191u, auiMask2, 0, false);
     }
     BSRenderState::iLock[v5] += aeLock;
     uint32_t v6 = BSRenderState::uiD3D2BSRS[192];
     if (!BSRenderState::iLock[BSRenderState::uiD3D2BSRS[192]]) {
-        BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(192u, auiMask3, 0, 0);
+        BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(192u, auiMask3, 0, false);
     }
     BSRenderState::iLock[v6] += aeLock;
 }
@@ -158,7 +158,7 @@ void BSRenderState::SetAlphaToCoverageEnable(bool abEnabled, BSRENDERSTATE_LOCK 
     if (BSRenderState::eGPUVendor != 1) {
         if (BSRenderState::eGPUVendor == 2) {
             BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(
-                154u, abEnabled ? 0x314D3241 : 0x304D3241, 0, 0
+                154u, abEnabled ? 0x314D3241 : 0x304D3241, 0, false
             );
             BSRenderState::iLock[20] += aeLock;
             return;
@@ -171,7 +171,7 @@ void BSRenderState::SetAlphaToCoverageEnable(bool abEnabled, BSRENDERSTATE_LOCK 
     else {
         v2 = 207.32912f;
     }
-    BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(181u, std::bit_cast<uint32_t>(v2), 0, 0);
+    BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(181u, std::bit_cast<uint32_t>(v2), 0, false);
     BSRenderState::iLock[20] += aeLock;
 }
 
@@ -399,18 +399,18 @@ void BSRenderState::SetStencilFunc(
 ) {
     if (!BSRenderState::iLock[BSRenderState::uiD3D2BSRS[56]]) {
         BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(
-            56u, BSRenderState::NiToD3DAlphaTestCmpFunc[aeFunc], 0, 0
+            56u, BSRenderState::NiToD3DAlphaTestCmpFunc[aeFunc], 0, false
         );
     }
     if (!BSRenderState::iLock[BSRenderState::uiD3D2BSRS[57]]) {
-        BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(57u, auiRef, 0, 0);
+        BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(57u, auiRef, 0, false);
     }
     uint32_t v4 = BSRenderState::uiD3D2BSRS[58];
     if (BSRenderState::iLock[BSRenderState::uiD3D2BSRS[58]]) {
         BSRenderState::iLock[BSRenderState::uiD3D2BSRS[58]] += aeLock;
     }
     else {
-        BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(58u, auiTestMask, 0, 0);
+        BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(58u, auiTestMask, 0, false);
         BSRenderState::iLock[v4] += aeLock;
     }
 }
@@ -442,7 +442,7 @@ void BSRenderState::SetUserClipPlaneEnables(
             152u,
             (abPlane5 ? 32 : 0) |
                 ((abPlane4 ? 16 : 0) | ((abPlane3 ? 8 : 0) | ((abPlane2 ? 4 : 0) | ((abPlane1 ? 2 : 0) | abPlane0)))),
-            0, 0
+            0, false
         );
         BSRenderState::iLock[v7] += aeLock;
     }
@@ -455,7 +455,7 @@ void BSRenderState::SetDepthBias(float afDepthBias, BSRENDERSTATE_LOCK aeLock) {
     }
     else {
         BSShaderManager::pRenderer.m_pObject->m_pkRenderState->SetRenderState(
-            195u, std::bit_cast<uint32_t>(afDepthBias), 0, 0
+            195u, std::bit_cast<uint32_t>(afDepthBias), 0, false
         );
         BSRenderState::iLock[v2] += aeLock;
     }

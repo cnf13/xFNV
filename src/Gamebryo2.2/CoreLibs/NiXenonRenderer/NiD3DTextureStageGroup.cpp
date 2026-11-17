@@ -12,7 +12,7 @@
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DShaderProgram.h"
 #include "SDK/MSVC/ehvec.h"
 
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 // Not renderer-owned, no counts or iterators, every value and flag cleared.
@@ -74,14 +74,14 @@ void NiD3DTextureStageGroup::SetSamplerState(uint32_t uiState, uint32_t uiValue,
             goto LABEL_12;
         }
         if (m_abSavedSamplerValid[v5]) {
-            m_abSavedSamplerValid[v5] = 0;
+            m_abSavedSamplerValid[v5] = false;
             --m_uiNumSavedSamplers;
             if (m_abSamplerUseMapValue[v5]) {
                 --m_uiNumUseMapValue;
             }
-            m_abSamplerUseMapValue[v5] = 0;
+            m_abSamplerUseMapValue[v5] = false;
         }
-        m_abSamplerValid[v5] = 1;
+        m_abSamplerValid[v5] = true;
         m_auiSamplerArray[v5] = uiValue;
         ++m_uiNumSamplers;
     LABEL_23:;
@@ -93,14 +93,14 @@ void NiD3DTextureStageGroup::SetSamplerState(uint32_t uiState, uint32_t uiValue,
     }
     if (!m_abSavedSamplerValid[v5]) {
         if (m_abSamplerValid[v5]) {
-            m_abSamplerValid[v5] = 0;
+            m_abSamplerValid[v5] = false;
             --m_uiNumSamplers;
             if (m_abSamplerUseMapValue[v5]) {
                 --m_uiNumUseMapValue;
             }
-            m_abSamplerUseMapValue[v5] = 0;
+            m_abSamplerUseMapValue[v5] = false;
         }
-        m_abSavedSamplerValid[v5] = 1;
+        m_abSavedSamplerValid[v5] = true;
         m_auiSavedSamplerArray[v5] = uiValue;
         ++m_uiNumSavedSamplers;
         goto LABEL_23;
@@ -143,7 +143,7 @@ bool NiD3DTextureStageGroup::GetStageState(uint32_t uiState, uint32_t& uiValue, 
 }
 
 void NiD3DTextureStageGroup::SetStageState(uint32_t uiState, uint32_t uiValue, bool bSave) {
-    uint16_t v4 = (uint16_t)NiD3DRenderState::ms_auiTextureStagesStatesRevMappings[uiState];
+    uint16_t v4 = NiD3DRenderState::ms_auiTextureStagesStatesRevMappings[uiState];
     if (((uint32_t)((int32_t)v4)) < 8u) {
         if (bSave) {
             if (m_abSavedStageValid[v4]) {
@@ -186,8 +186,8 @@ void NiD3DTextureStageGroup::RemoveAllStageStates() {
     bool* m_abStageValid = this->m_abStageValid;
     int32_t v2 = 8;
     do {
-        *(m_abStageValid - 48) = 0;
-        *m_abStageValid++ = 0;
+        *(m_abStageValid - 48) = false;
+        *m_abStageValid++ = false;
         --v2;
     }
     while (v2);
@@ -199,9 +199,9 @@ void NiD3DTextureStageGroup::RemoveAllSamplerStates() {
     bool* m_abSamplerValid = this->m_abSamplerValid;
     int32_t v2 = 5;
     do {
-        *(m_abSamplerValid - 36) = 0;
-        *m_abSamplerValid = 0;
-        m_abSamplerValid[12] = 0;
+        *(m_abSamplerValid - 36) = false;
+        *m_abSamplerValid = false;
+        m_abSamplerValid[12] = false;
         ++m_abSamplerValid;
         --v2;
     }
@@ -225,7 +225,7 @@ NiD3DTextureStageGroup* NiD3DTextureStageGroup::GetFreeTextureStageGroup() {
     NiD3DTextureStageGroup* result = *v1->m_kFreeObjects.m_pBase;
     *m_pBase = m_pBase[--*p_m_uiUsed];
     if (!result->m_bRendererOwned) {
-        result->m_bRendererOwned = 1;
+        result->m_bRendererOwned = true;
     }
     return result;
 }

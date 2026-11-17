@@ -55,7 +55,7 @@ float EnchantmentItem::GetCost(Actor* apActor) {
         return static_cast<float>(data.iCostOverride);
     }
     else {
-        return static_cast<EffectItemList*>(this)->EffectItemList::GetCost(0);
+        return static_cast<EffectItemList*>(this)->EffectItemList::GetCost(nullptr);
     }
 }
 
@@ -74,7 +74,7 @@ uint32_t EnchantmentItem::GetDataSize() {
 bool EnchantmentItem::CompareMagicItemData(MagicItem* apCompare) {
     EnchantmentItem* v7 = dynamic_cast<EnchantmentItem*>(apCompare);
     if (!v7) {
-        return 1;
+        return true;
     }
     int32_t ConversationData = v7->data.iChargeOverride;
     bool result = true;
@@ -174,42 +174,42 @@ bool EnchantmentItem::IsValidEffectForEnchantment(
 ) {
     bool result;
     if (!apEnchantableItem || !apEffectSetting) {
-        return 0;
+        return false;
     }
     if (apEnchantableItem->GetFormType() == 43) {
-        return 1;
+        return true;
     }
     if (!dynamic_cast<TESEnchantableForm*>(apEnchantableItem)) {
-        return 0;
+        return false;
     }
     switch (apEnchantableItem->GetFormType()) {
         case 24u:
         case 26u: {
             if (apEffectSetting->IsFlagSet(EffectSetting::RANGE_SELF)) {
                 if (apEffectSetting->IsFlagSet(EffectSetting::USE_ASSOCIATED_CREATURE)) {
-                    result = 0;
+                    result = false;
                 }
                 else {
                     if (apEffectSetting->IsFlagSet(EffectSetting::NO_DURATION)) {
-                        result = 0;
+                        result = false;
                     }
                     else {
                         if (apEffectSetting->IsFlagSet(EffectSetting::NO_MAGNITUDE)) {
-                            result = 0;
+                            result = false;
                         }
                         else {
                             if (apExtra && apExtra->GetCanNotWear()) {
-                                result = 0;
+                                result = false;
                             }
                             else {
                                 if (dynamic_cast<TESBipedModelForm*>(apEnchantableItem)) {
                                     if (!apEffectSetting->IsFlagSet(EffectSetting::USE_ASSOCIATED_ARMOR)) {
                                         goto LABEL_30;
                                     }
-                                    result = 0;
+                                    result = false;
                                 }
                                 else {
-                                    result = 0;
+                                    result = false;
                                 }
                             }
                         }
@@ -217,7 +217,7 @@ bool EnchantmentItem::IsValidEffectForEnchantment(
                 }
             }
             else {
-                result = 0;
+                result = false;
             }
             break;
         }
@@ -227,16 +227,16 @@ bool EnchantmentItem::IsValidEffectForEnchantment(
                 if (!apExtra || !apExtra->GetCanNotWear()) {
                     goto LABEL_30;
                 }
-                result = 0;
+                result = false;
             }
             else {
-                result = 0;
+                result = false;
             }
             break;
         }
         default: {
         LABEL_30:;
-            result = 1;
+            result = true;
             break;
         }
     }

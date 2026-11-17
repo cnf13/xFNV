@@ -93,7 +93,7 @@
 #include "SDK/MSVC/string.h"
 
 #include <bit>
-#include <stdint.h>
+#include <cstdint>
 
 ShadowLightShaderPassArray ShadowLightShader::spPass;
 NiRTTI ShadowLightShader::ms_RTTI("ShadowLightShader", &NiD3DDefaultShader::ms_RTTI);
@@ -221,7 +221,7 @@ uint32_t ShadowLightShader::SetupBoneMatrices(
           (ShadowLightShader::spVertexConstantMapEntries[10] &&
            ShadowLightShader::spVertexConstantMapEntries[10]->m_bEnabled))) ||
         m_spVertexConstantMap.m_pObject == spTexEffectVConstantMap.m_pObject) {
-        BSShaderManager::pRenderer.m_pObject->CalculateBoneMatrices(a2, a7, 0, 3u, 1);
+        BSShaderManager::pRenderer.m_pObject->CalculateBoneMatrices(a2, a7, false, 3u, true);
         NiD3DShaderConstantMap* pTexEffectMap = spTexEffectVConstantMap.m_pObject;
         if (m_spVertexConstantMap.m_pObject == pTexEffectMap) {
             NiD3DVertexShader* pVertexShader = NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject;
@@ -273,7 +273,8 @@ void ShadowLightShader::SetupGeometryTextures(const NiPropertyState* apState) {
             NiSourceTexture* v15;
             BSShaderPPLightingProperty::TextureEffectData* m_pObject = pprop->spTexEffectData.m_pObject;
             NiD3DTextureStage* v14 = NiD3DShader::m_spCurrentPass->m_kStages.m_pBase->m_pObject;
-            if (!m_pObject || (v15 = static_cast<NiSourceTexture*>(m_pObject->spBlockOutTexture.m_pObject)) == 0) {
+            if (!m_pObject ||
+                (v15 = static_cast<NiSourceTexture*>(m_pObject->spBlockOutTexture.m_pObject)) == nullptr) {
                 v15 = BSShaderManager::spDefaultTexEffectMap;
             }
             BSShaderPPLightingProperty* v16 =
@@ -741,7 +742,7 @@ void ShadowLightShader::SetupGeometryConstants(const NiPropertyState* apState) {
     if ((BSShaderManager::eCurrentPass == BSShaderManager::BSSM_CONSTALPHA ||
          BSShaderManager::eCurrentPass == BSShaderManager::BSSM_CONSTALPHA_S) &&
         (pprop->ulFlags[0] & BSS1_Hair) != 0 && (palphaProp->m_uFlags & 1) != 0) {
-        BSRenderState::SetZWriteEnable(0, BSRS_LOCK);
+        BSRenderState::SetZWriteEnable(false, BSRS_LOCK);
         BSRenderState::SetColorWriteEnable(0, BSRS_LOCK);
     }
     BSUtilities::GetInverseWorldMatrix(pgeometry->m_kWorld, apSkin, d3dInvWorld);
@@ -780,7 +781,7 @@ void ShadowLightShader::SetupGeometryConstants(const NiPropertyState* apState) {
         NiD3DPixelShader* v16 = NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject;
         if (v16) {
             m_pObject->SetShaderConstants(
-                v16, pgeometry, apSkin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *v24, 0, 1
+                v16, pgeometry, apSkin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *v24, 0, true
             );
         }
     }
@@ -789,7 +790,7 @@ void ShadowLightShader::SetupGeometryConstants(const NiPropertyState* apState) {
         NiD3DVertexShader* v18 = NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject;
         if (v18) {
             v17->SetShaderConstants(
-                v18, pgeometry, apSkin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *v24, 0, 1
+                v18, pgeometry, apSkin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *v24, 0, true
             );
         }
     }
@@ -810,14 +811,14 @@ void ShadowLightShader::PostGeometry(const NiPropertyState* apState) {
     NiStencilProperty* m_pObject = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
     if (m_pObject) {
         if ((m_pObject->m_uFlags & 1) != 0) {
-            BSRenderState::SetStencilEnable(0, BSRS_NOLOCK);
+            BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
         }
     }
     // The shade property slot holds the BSShaderProperty; its first flag word is tested.
     if ((v2 == BSShaderManager::BSSM_CONSTALPHA || v2 == BSShaderManager::BSSM_CONSTALPHA_S) &&
         (static_cast<BSShaderProperty*>(apState->m_aspProps[3].m_pObject)->ulFlags[0] & BSS1_Hair) != 0) {
         --BSRenderState::iLock[1];
-        BSRenderState::SetZWriteEnable(1, BSRS_NOLOCK);
+        BSRenderState::SetZWriteEnable(true, BSRS_NOLOCK);
         --BSRenderState::iLock[16];
         BSRenderState::SetColorWriteEnable(7u, BSRS_NOLOCK);
     }
@@ -1989,37 +1990,37 @@ void ShadowLightShader::LoadVertexShaders() {
     char path[260];
     char compiledShaderName[260];
     kMacroArray_SM1[0].strPath = "lighting\\1x\\v\\base.v.hlsl";
-    kMacroArray_SM1[0].kMacros[0].Name = 0;
+    kMacroArray_SM1[0].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[0].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
-    kMacroArray_SM1[1].strPath = 0;
-    kMacroArray_SM1[1].kMacros[0].Name = 0;
+    kMacroArray_SM1[1].strPath = nullptr;
+    kMacroArray_SM1[1].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[1].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
-    kMacroArray_SM1[2].strPath = 0;
-    kMacroArray_SM1[2].kMacros[0].Name = 0;
+    kMacroArray_SM1[2].strPath = nullptr;
+    kMacroArray_SM1[2].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[2].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray_SM1[3].strPath = "lighting\\1x\\v\\diffusePt.v.hlsl";
-    kMacroArray_SM1[3].kMacros[0].Name = 0;
+    kMacroArray_SM1[3].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[3].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray_SM1[4].strPath = "lighting\\1x\\v\\diffuseDir.v.hlsl";
-    kMacroArray_SM1[4].kMacros[0].Name = 0;
+    kMacroArray_SM1[4].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[4].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray_SM1[5].strPath = "lighting\\1x\\v\\base.v.hlsl";
-    kMacroArray_SM1[5].kMacros[0].Name = 0;
+    kMacroArray_SM1[5].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[5].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -2027,7 +2028,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[6].strPath = "lighting\\1x\\v\\base.v.hlsl";
     kMacroArray_SM1[6].kMacros[0].Name = "VC";
     kMacroArray_SM1[6].kMacros[0].Definition = "";
-    kMacroArray_SM1[6].kMacros[1].Name = 0;
+    kMacroArray_SM1[6].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[6].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2035,25 +2036,25 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[7].strPath = "lighting\\1x\\v\\base.v.hlsl";
     kMacroArray_SM1[7].kMacros[0].Name = "FACEGENBLEND";
     kMacroArray_SM1[7].kMacros[0].Definition = "";
-    kMacroArray_SM1[7].kMacros[1].Name = 0;
+    kMacroArray_SM1[7].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[7].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM1[8].strPath = "lighting\\1x\\v\\specularPt.v.hlsl";
-    kMacroArray_SM1[8].kMacros[0].Name = 0;
+    kMacroArray_SM1[8].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[8].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray_SM1[9].strPath = "lighting\\1x\\v\\specularDir.v.hlsl";
-    kMacroArray_SM1[9].kMacros[0].Name = 0;
+    kMacroArray_SM1[9].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[9].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray_SM1[10].strPath = "lighting\\1x\\v\\ambDiffuseDirTexture.v.hlsl";
-    kMacroArray_SM1[10].kMacros[0].Name = 0;
+    kMacroArray_SM1[10].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[10].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -2061,7 +2062,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[11].strPath = "lighting\\1x\\v\\ambDiffuseDirTexture.v.hlsl";
     kMacroArray_SM1[11].kMacros[0].Name = "FOG";
     kMacroArray_SM1[11].kMacros[0].Definition = "";
-    kMacroArray_SM1[11].kMacros[1].Name = 0;
+    kMacroArray_SM1[11].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[11].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2069,7 +2070,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[12].strPath = "lighting\\1x\\v\\ambDiffuseDirTexture.v.hlsl";
     kMacroArray_SM1[12].kMacros[0].Name = "VC";
     kMacroArray_SM1[12].kMacros[0].Definition = "";
-    kMacroArray_SM1[12].kMacros[1].Name = 0;
+    kMacroArray_SM1[12].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[12].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2079,7 +2080,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[13].kMacros[0].Definition = "";
     kMacroArray_SM1[13].kMacros[1].Name = "VC";
     kMacroArray_SM1[13].kMacros[1].Definition = "";
-    kMacroArray_SM1[13].kMacros[2].Name = 0;
+    kMacroArray_SM1[13].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[13].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2087,7 +2088,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[14].strPath = "lighting\\1x\\v\\ambDiffuseDirTexture.v.hlsl";
     kMacroArray_SM1[14].kMacros[0].Name = "FACEGENBLEND";
     kMacroArray_SM1[14].kMacros[0].Definition = "";
-    kMacroArray_SM1[14].kMacros[1].Name = 0;
+    kMacroArray_SM1[14].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[14].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2097,13 +2098,13 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[15].kMacros[0].Definition = "";
     kMacroArray_SM1[15].kMacros[1].Name = "FOG";
     kMacroArray_SM1[15].kMacros[1].Definition = "";
-    kMacroArray_SM1[15].kMacros[2].Name = 0;
+    kMacroArray_SM1[15].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[15].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     kMacroArray_SM1[16].strPath = "lighting\\1x\\v\\ambDiffuseDirAndPt.v.hlsl";
-    kMacroArray_SM1[16].kMacros[0].Name = 0;
+    kMacroArray_SM1[16].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[16].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -2113,7 +2114,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[17].kMacros[0].Definition = "";
     kMacroArray_SM1[17].kMacros[1].Name = "NO_TEX";
     kMacroArray_SM1[17].kMacros[1].Definition = "";
-    kMacroArray_SM1[17].kMacros[2].Name = 0;
+    kMacroArray_SM1[17].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[17].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2123,19 +2124,19 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[18].kMacros[0].Definition = "";
     kMacroArray_SM1[18].kMacros[1].Name = "TEX";
     kMacroArray_SM1[18].kMacros[1].Definition = "";
-    kMacroArray_SM1[18].kMacros[2].Name = 0;
+    kMacroArray_SM1[18].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[18].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     kMacroArray_SM1[19].strPath = "lighting\\1x\\v\\envmap.v.hlsl";
-    kMacroArray_SM1[19].kMacros[0].Name = 0;
+    kMacroArray_SM1[19].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[19].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray_SM1[20].strPath = "lighting\\1x\\v\\vertDir.v.hlsl";
-    kMacroArray_SM1[20].kMacros[0].Name = 0;
+    kMacroArray_SM1[20].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[20].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -2143,13 +2144,13 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[21].strPath = "lighting\\1x\\v\\vertDir.v.hlsl";
     kMacroArray_SM1[21].kMacros[0].Name = "VC";
     kMacroArray_SM1[21].kMacros[0].Definition = "";
-    kMacroArray_SM1[21].kMacros[1].Name = 0;
+    kMacroArray_SM1[21].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[21].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM1[22].strPath = "lighting\\1x\\v\\vertDirAndPt.v.hlsl";
-    kMacroArray_SM1[22].kMacros[0].Name = 0;
+    kMacroArray_SM1[22].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[22].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -2157,7 +2158,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[23].strPath = "lighting\\1x\\v\\vertDirAndPt.v.hlsl";
     kMacroArray_SM1[23].kMacros[0].Name = "VC";
     kMacroArray_SM1[23].kMacros[0].Definition = "";
-    kMacroArray_SM1[23].kMacros[1].Name = 0;
+    kMacroArray_SM1[23].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[23].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2165,13 +2166,13 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[24].strPath = "lighting\\1x\\v\\base.v.hlsl";
     kMacroArray_SM1[24].kMacros[0].Name = "SI";
     kMacroArray_SM1[24].kMacros[0].Definition = "";
-    kMacroArray_SM1[24].kMacros[1].Name = 0;
+    kMacroArray_SM1[24].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[24].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM1[25].strPath = "lighting\\1x\\v\\land.v.hlsl";
-    kMacroArray_SM1[25].kMacros[0].Name = 0;
+    kMacroArray_SM1[25].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[25].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -2179,7 +2180,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[26].strPath = "lighting\\1x\\v\\land.v.hlsl";
     kMacroArray_SM1[26].kMacros[0].Name = "LANDALPHA";
     kMacroArray_SM1[26].kMacros[0].Definition = "";
-    kMacroArray_SM1[26].kMacros[1].Name = 0;
+    kMacroArray_SM1[26].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[26].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2189,7 +2190,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[27].kMacros[0].Definition = "";
     kMacroArray_SM1[27].kMacros[1].Name = "SI";
     kMacroArray_SM1[27].kMacros[1].Definition = "";
-    kMacroArray_SM1[27].kMacros[2].Name = 0;
+    kMacroArray_SM1[27].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[27].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2197,7 +2198,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[28].strPath = "lighting\\1x\\v\\land.v.hlsl";
     kMacroArray_SM1[28].kMacros[0].Name = "PTLIGHT";
     kMacroArray_SM1[28].kMacros[0].Definition = "";
-    kMacroArray_SM1[28].kMacros[1].Name = 0;
+    kMacroArray_SM1[28].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[28].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2207,13 +2208,13 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1[29].kMacros[0].Definition = "";
     kMacroArray_SM1[29].kMacros[1].Name = "PTLIGHT";
     kMacroArray_SM1[29].kMacros[1].Definition = "";
-    kMacroArray_SM1[29].kMacros[2].Name = 0;
+    kMacroArray_SM1[29].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[29].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
-    kMacroArray_SM1[30].strPath = 0;
-    kMacroArray_SM1[30].kMacros[0].Name = 0;
+    kMacroArray_SM1[30].strPath = nullptr;
+    kMacroArray_SM1[30].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[30].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -2221,7 +2222,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[0].strPath = "lighting\\1x\\v\\base.v.hlsl";
     kMacroArray_SM1S[0].kMacros[0].Name = "SKIN";
     kMacroArray_SM1S[0].kMacros[0].Definition = "";
-    kMacroArray_SM1S[0].kMacros[1].Name = 0;
+    kMacroArray_SM1S[0].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[0].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2233,7 +2234,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[1].kMacros[1].Definition = "";
     kMacroArray_SM1S[1].kMacros[2].Name = "NO_TEX";
     kMacroArray_SM1S[1].kMacros[2].Definition = "";
-    kMacroArray_SM1S[1].kMacros[3].Name = 0;
+    kMacroArray_SM1S[1].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[1].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2245,7 +2246,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[2].kMacros[1].Definition = "";
     kMacroArray_SM1S[2].kMacros[2].Name = "TEX";
     kMacroArray_SM1S[2].kMacros[2].Definition = "";
-    kMacroArray_SM1S[2].kMacros[3].Name = 0;
+    kMacroArray_SM1S[2].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[2].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2253,7 +2254,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[3].strPath = "lighting\\1x\\v\\diffusePt.v.hlsl";
     kMacroArray_SM1S[3].kMacros[0].Name = "SKIN";
     kMacroArray_SM1S[3].kMacros[0].Definition = "";
-    kMacroArray_SM1S[3].kMacros[1].Name = 0;
+    kMacroArray_SM1S[3].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[3].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2261,7 +2262,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[4].strPath = "lighting\\1x\\v\\diffuseDir.v.hlsl";
     kMacroArray_SM1S[4].kMacros[0].Name = "SKIN";
     kMacroArray_SM1S[4].kMacros[0].Definition = "";
-    kMacroArray_SM1S[4].kMacros[1].Name = 0;
+    kMacroArray_SM1S[4].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[4].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2269,7 +2270,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[5].strPath = "lighting\\1x\\v\\base.v.hlsl";
     kMacroArray_SM1S[5].kMacros[0].Name = "SKIN";
     kMacroArray_SM1S[5].kMacros[0].Definition = "";
-    kMacroArray_SM1S[5].kMacros[1].Name = 0;
+    kMacroArray_SM1S[5].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[5].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2279,7 +2280,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[6].kMacros[0].Definition = "";
     kMacroArray_SM1S[6].kMacros[1].Name = "VC";
     kMacroArray_SM1S[6].kMacros[1].Definition = "";
-    kMacroArray_SM1S[6].kMacros[2].Name = 0;
+    kMacroArray_SM1S[6].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[6].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2289,7 +2290,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[7].kMacros[0].Definition = "";
     kMacroArray_SM1S[7].kMacros[1].Name = "FACEGENBLEND";
     kMacroArray_SM1S[7].kMacros[1].Definition = "";
-    kMacroArray_SM1S[7].kMacros[2].Name = 0;
+    kMacroArray_SM1S[7].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[7].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2297,7 +2298,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[8].strPath = "lighting\\1x\\v\\specularPt.v.hlsl";
     kMacroArray_SM1S[8].kMacros[0].Name = "SKIN";
     kMacroArray_SM1S[8].kMacros[0].Definition = "";
-    kMacroArray_SM1S[8].kMacros[1].Name = 0;
+    kMacroArray_SM1S[8].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[8].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2305,7 +2306,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[9].strPath = "lighting\\1x\\v\\specularDir.v.hlsl";
     kMacroArray_SM1S[9].kMacros[0].Name = "SKIN";
     kMacroArray_SM1S[9].kMacros[0].Definition = "";
-    kMacroArray_SM1S[9].kMacros[1].Name = 0;
+    kMacroArray_SM1S[9].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[9].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2313,7 +2314,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[10].strPath = "lighting\\1x\\v\\ambDiffuseDirTexture.v.hlsl";
     kMacroArray_SM1S[10].kMacros[0].Name = "SKIN";
     kMacroArray_SM1S[10].kMacros[0].Definition = "";
-    kMacroArray_SM1S[10].kMacros[1].Name = 0;
+    kMacroArray_SM1S[10].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[10].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2323,7 +2324,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[11].kMacros[0].Definition = "";
     kMacroArray_SM1S[11].kMacros[1].Name = "VC";
     kMacroArray_SM1S[11].kMacros[1].Definition = "";
-    kMacroArray_SM1S[11].kMacros[2].Name = 0;
+    kMacroArray_SM1S[11].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[11].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2333,7 +2334,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[12].kMacros[0].Definition = "";
     kMacroArray_SM1S[12].kMacros[1].Name = "FOG";
     kMacroArray_SM1S[12].kMacros[1].Definition = "";
-    kMacroArray_SM1S[12].kMacros[2].Name = 0;
+    kMacroArray_SM1S[12].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[12].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2345,7 +2346,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[13].kMacros[1].Definition = "";
     kMacroArray_SM1S[13].kMacros[2].Name = "VC";
     kMacroArray_SM1S[13].kMacros[2].Definition = "";
-    kMacroArray_SM1S[13].kMacros[3].Name = 0;
+    kMacroArray_SM1S[13].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[13].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2355,7 +2356,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[14].kMacros[0].Definition = "";
     kMacroArray_SM1S[14].kMacros[1].Name = "FACEGENBLEND";
     kMacroArray_SM1S[14].kMacros[1].Definition = "";
-    kMacroArray_SM1S[14].kMacros[2].Name = 0;
+    kMacroArray_SM1S[14].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[14].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2367,7 +2368,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[15].kMacros[1].Definition = "";
     kMacroArray_SM1S[15].kMacros[2].Name = "FOG";
     kMacroArray_SM1S[15].kMacros[2].Definition = "";
-    kMacroArray_SM1S[15].kMacros[3].Name = 0;
+    kMacroArray_SM1S[15].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[15].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2375,7 +2376,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[16].strPath = "lighting\\1x\\v\\ambDiffuseDirAndPt.v.hlsl";
     kMacroArray_SM1S[16].kMacros[0].Name = "SKIN";
     kMacroArray_SM1S[16].kMacros[0].Definition = "";
-    kMacroArray_SM1S[16].kMacros[1].Name = 0;
+    kMacroArray_SM1S[16].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[16].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2383,19 +2384,19 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[17].strPath = "lighting\\1x\\v\\envmap.v.hlsl";
     kMacroArray_SM1S[17].kMacros[0].Name = "SKIN";
     kMacroArray_SM1S[17].kMacros[0].Definition = "";
-    kMacroArray_SM1S[17].kMacros[1].Name = 0;
+    kMacroArray_SM1S[17].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[17].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
-    kMacroArray_SM1S[18].strPath = 0;
-    kMacroArray_SM1S[18].kMacros[0].Name = 0;
+    kMacroArray_SM1S[18].strPath = nullptr;
+    kMacroArray_SM1S[18].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[18].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
-    kMacroArray_SM1S[19].strPath = 0;
-    kMacroArray_SM1S[19].kMacros[0].Name = 0;
+    kMacroArray_SM1S[19].strPath = nullptr;
+    kMacroArray_SM1S[19].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[19].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -2405,19 +2406,19 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM1S[20].kMacros[0].Definition = "";
     kMacroArray_SM1S[20].kMacros[1].Name = "SI";
     kMacroArray_SM1S[20].kMacros[1].Definition = "";
-    kMacroArray_SM1S[20].kMacros[2].Name = 0;
+    kMacroArray_SM1S[20].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[20].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
-    kMacroArray_SM1S[21].strPath = 0;
-    kMacroArray_SM1S[21].kMacros[0].Name = 0;
+    kMacroArray_SM1S[21].strPath = nullptr;
+    kMacroArray_SM1S[21].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1S[21].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray_SM2[0].strPath = "lighting\\2x\\v\\ADTS.v.hlsl";
-    kMacroArray_SM2[0].kMacros[0].Name = 0;
+    kMacroArray_SM2[0].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[0].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -2425,7 +2426,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[1].strPath = "lighting\\2x\\v\\ADTS.v.hlsl";
     kMacroArray_SM2[1].kMacros[0].Name = "LOD";
     kMacroArray_SM2[1].kMacros[0].Definition = "";
-    kMacroArray_SM2[1].kMacros[1].Name = 0;
+    kMacroArray_SM2[1].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[1].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2437,7 +2438,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[2].kMacros[1].Definition = "";
     kMacroArray_SM2[2].kMacros[2].Name = "GEOMORPH";
     kMacroArray_SM2[2].kMacros[2].Definition = "";
-    kMacroArray_SM2[2].kMacros[3].Name = 0;
+    kMacroArray_SM2[2].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[2].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2445,7 +2446,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[3].strPath = "lighting\\2x\\v\\ADTS.v.hlsl";
     kMacroArray_SM2[3].kMacros[0].Name = "SKIN";
     kMacroArray_SM2[3].kMacros[0].Definition = "";
-    kMacroArray_SM2[3].kMacros[1].Name = 0;
+    kMacroArray_SM2[3].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[3].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2453,7 +2454,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[4].strPath = "lighting\\2x\\v\\ADTS.v.hlsl";
     kMacroArray_SM2[4].kMacros[0].Name = "PROJ_SHADOW";
     kMacroArray_SM2[4].kMacros[0].Definition = "";
-    kMacroArray_SM2[4].kMacros[1].Name = 0;
+    kMacroArray_SM2[4].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[4].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2467,22 +2468,22 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[5].kMacros[2].Definition = "";
     kMacroArray_SM2[5].kMacros[3].Name = "GEOMORPH";
     kMacroArray_SM2[5].kMacros[3].Definition = "";
-    kMacroArray_SM2[5].kMacros[4].Name = 0;
-    kMacroArray_SM2[5].kMacros[4].Definition = 0;
-    kMacroArray_SM2[5].kMacros[5].Name = 0;
-    kMacroArray_SM2[5].kMacros[5].Definition = 0;
-    kMacroArray_SM2[5].kMacros[6].Name = 0;
-    kMacroArray_SM2[5].kMacros[6].Definition = 0;
-    kMacroArray_SM2[5].kMacros[7].Name = 0;
-    kMacroArray_SM2[5].kMacros[7].Definition = 0;
-    kMacroArray_SM2[5].kMacros[8].Name = 0;
-    kMacroArray_SM2[5].kMacros[8].Definition = 0;
+    kMacroArray_SM2[5].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[5].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[5].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[5].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[5].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[5].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[5].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[5].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[5].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[5].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[6].strPath = "lighting\\2x\\v\\ADTS.v.hlsl";
     kMacroArray_SM2[6].kMacros[0].Name = "SKIN";
     kMacroArray_SM2[6].kMacros[0].Definition = "";
     kMacroArray_SM2[6].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[6].kMacros[1].Definition = "";
-    kMacroArray_SM2[6].kMacros[2].Name = 0;
+    kMacroArray_SM2[6].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[6].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2490,7 +2491,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[7].strPath = "lighting\\2x\\v\\ADTS.v.hlsl";
     kMacroArray_SM2[7].kMacros[0].Name = "STBB";
     kMacroArray_SM2[7].kMacros[0].Definition = "";
-    kMacroArray_SM2[7].kMacros[1].Name = 0;
+    kMacroArray_SM2[7].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[7].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2498,7 +2499,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[8].strPath = "lighting\\2x\\v\\ADTS.v.hlsl";
     kMacroArray_SM2[8].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[8].kMacros[0].Definition = "2";
-    kMacroArray_SM2[8].kMacros[1].Name = 0;
+    kMacroArray_SM2[8].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[8].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2508,7 +2509,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[9].kMacros[0].Definition = "2";
     kMacroArray_SM2[9].kMacros[1].Name = "SKIN";
     kMacroArray_SM2[9].kMacros[1].Definition = "";
-    kMacroArray_SM2[9].kMacros[2].Name = 0;
+    kMacroArray_SM2[9].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[9].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2518,7 +2519,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[10].kMacros[0].Definition = "2";
     kMacroArray_SM2[10].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[10].kMacros[1].Definition = "";
-    kMacroArray_SM2[10].kMacros[2].Name = 0;
+    kMacroArray_SM2[10].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[10].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2530,7 +2531,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[11].kMacros[1].Definition = "";
     kMacroArray_SM2[11].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[11].kMacros[2].Definition = "";
-    kMacroArray_SM2[11].kMacros[3].Name = 0;
+    kMacroArray_SM2[11].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[11].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2538,7 +2539,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[12].strPath = "lighting\\2x\\v\\ADTS.v.hlsl";
     kMacroArray_SM2[12].kMacros[0].Name = "SPECULAR";
     kMacroArray_SM2[12].kMacros[0].Definition = "";
-    kMacroArray_SM2[12].kMacros[1].Name = 0;
+    kMacroArray_SM2[12].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[12].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2548,7 +2549,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[13].kMacros[0].Definition = "";
     kMacroArray_SM2[13].kMacros[1].Name = "SKIN";
     kMacroArray_SM2[13].kMacros[1].Definition = "";
-    kMacroArray_SM2[13].kMacros[2].Name = 0;
+    kMacroArray_SM2[13].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[13].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2558,7 +2559,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[14].kMacros[0].Definition = "";
     kMacroArray_SM2[14].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[14].kMacros[1].Definition = "";
-    kMacroArray_SM2[14].kMacros[2].Name = 0;
+    kMacroArray_SM2[14].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[14].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2570,7 +2571,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[15].kMacros[1].Definition = "";
     kMacroArray_SM2[15].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[15].kMacros[2].Definition = "";
-    kMacroArray_SM2[15].kMacros[3].Name = 0;
+    kMacroArray_SM2[15].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[15].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2580,7 +2581,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[16].kMacros[0].Definition = "";
     kMacroArray_SM2[16].kMacros[1].Name = "LIGHTS";
     kMacroArray_SM2[16].kMacros[1].Definition = "2";
-    kMacroArray_SM2[16].kMacros[2].Name = 0;
+    kMacroArray_SM2[16].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[16].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2592,7 +2593,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[17].kMacros[1].Definition = "2";
     kMacroArray_SM2[17].kMacros[2].Name = "SKIN";
     kMacroArray_SM2[17].kMacros[2].Definition = "";
-    kMacroArray_SM2[17].kMacros[3].Name = 0;
+    kMacroArray_SM2[17].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[17].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2604,7 +2605,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[18].kMacros[1].Definition = "2";
     kMacroArray_SM2[18].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[18].kMacros[2].Definition = "";
-    kMacroArray_SM2[18].kMacros[3].Name = 0;
+    kMacroArray_SM2[18].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[18].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2618,20 +2619,20 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[19].kMacros[2].Definition = "";
     kMacroArray_SM2[19].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray_SM2[19].kMacros[3].Definition = "";
-    kMacroArray_SM2[19].kMacros[4].Name = 0;
-    kMacroArray_SM2[19].kMacros[4].Definition = 0;
-    kMacroArray_SM2[19].kMacros[5].Name = 0;
-    kMacroArray_SM2[19].kMacros[5].Definition = 0;
-    kMacroArray_SM2[19].kMacros[6].Name = 0;
-    kMacroArray_SM2[19].kMacros[6].Definition = 0;
-    kMacroArray_SM2[19].kMacros[7].Name = 0;
-    kMacroArray_SM2[19].kMacros[7].Definition = 0;
-    kMacroArray_SM2[19].kMacros[8].Name = 0;
-    kMacroArray_SM2[19].kMacros[8].Definition = 0;
+    kMacroArray_SM2[19].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[19].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[19].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[19].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[19].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[19].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[19].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[19].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[19].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[19].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[20].strPath = "lighting\\2x\\v\\ADTS10.v.hlsl";
     kMacroArray_SM2[20].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[20].kMacros[0].Definition = "9";
-    kMacroArray_SM2[20].kMacros[1].Name = 0;
+    kMacroArray_SM2[20].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[20].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2641,7 +2642,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[21].kMacros[0].Definition = "9";
     kMacroArray_SM2[21].kMacros[1].Name = "SKIN";
     kMacroArray_SM2[21].kMacros[1].Definition = "";
-    kMacroArray_SM2[21].kMacros[2].Name = 0;
+    kMacroArray_SM2[21].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[21].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2649,7 +2650,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[22].strPath = "lighting\\2x\\v\\ADTS10.v.hlsl";
     kMacroArray_SM2[22].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[22].kMacros[0].Definition = "4";
-    kMacroArray_SM2[22].kMacros[1].Name = 0;
+    kMacroArray_SM2[22].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[22].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2659,7 +2660,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[23].kMacros[0].Definition = "";
     kMacroArray_SM2[23].kMacros[1].Name = "LIGHTS";
     kMacroArray_SM2[23].kMacros[1].Definition = "4";
-    kMacroArray_SM2[23].kMacros[2].Name = 0;
+    kMacroArray_SM2[23].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[23].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2669,7 +2670,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[24].kMacros[0].Definition = "4";
     kMacroArray_SM2[24].kMacros[1].Name = "SKIN";
     kMacroArray_SM2[24].kMacros[1].Definition = "";
-    kMacroArray_SM2[24].kMacros[2].Name = 0;
+    kMacroArray_SM2[24].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[24].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2679,7 +2680,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[25].kMacros[0].Definition = "";
     kMacroArray_SM2[25].kMacros[1].Name = "LIGHTS";
     kMacroArray_SM2[25].kMacros[1].Definition = "4";
-    kMacroArray_SM2[25].kMacros[2].Name = 0;
+    kMacroArray_SM2[25].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[25].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2691,7 +2692,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[26].kMacros[1].Definition = "";
     kMacroArray_SM2[26].kMacros[2].Name = "LIGHTS";
     kMacroArray_SM2[26].kMacros[2].Definition = "4";
-    kMacroArray_SM2[26].kMacros[3].Name = 0;
+    kMacroArray_SM2[26].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[26].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2703,7 +2704,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[27].kMacros[1].Definition = "4";
     kMacroArray_SM2[27].kMacros[2].Name = "SKIN";
     kMacroArray_SM2[27].kMacros[2].Definition = "";
-    kMacroArray_SM2[27].kMacros[3].Name = 0;
+    kMacroArray_SM2[27].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[27].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2711,7 +2712,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[28].strPath = "lighting\\2x\\v\\AD.v.hlsl";
     kMacroArray_SM2[28].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[28].kMacros[0].Definition = "2";
-    kMacroArray_SM2[28].kMacros[1].Name = 0;
+    kMacroArray_SM2[28].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[28].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2721,7 +2722,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[29].kMacros[0].Definition = "2";
     kMacroArray_SM2[29].kMacros[1].Name = "SKIN";
     kMacroArray_SM2[29].kMacros[1].Definition = "";
-    kMacroArray_SM2[29].kMacros[2].Name = 0;
+    kMacroArray_SM2[29].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[29].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2731,7 +2732,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[30].kMacros[0].Definition = "2";
     kMacroArray_SM2[30].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[30].kMacros[1].Definition = "";
-    kMacroArray_SM2[30].kMacros[2].Name = 0;
+    kMacroArray_SM2[30].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[30].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2743,7 +2744,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[31].kMacros[1].Definition = "";
     kMacroArray_SM2[31].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[31].kMacros[2].Definition = "";
-    kMacroArray_SM2[31].kMacros[3].Name = 0;
+    kMacroArray_SM2[31].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[31].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2751,7 +2752,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[32].strPath = "lighting\\2x\\v\\AD.v.hlsl";
     kMacroArray_SM2[32].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[32].kMacros[0].Definition = "3";
-    kMacroArray_SM2[32].kMacros[1].Name = 0;
+    kMacroArray_SM2[32].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[32].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2761,7 +2762,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[33].kMacros[0].Definition = "3";
     kMacroArray_SM2[33].kMacros[1].Name = "SKIN";
     kMacroArray_SM2[33].kMacros[1].Definition = "";
-    kMacroArray_SM2[33].kMacros[2].Name = 0;
+    kMacroArray_SM2[33].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[33].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2771,7 +2772,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[34].kMacros[0].Definition = "3";
     kMacroArray_SM2[34].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[34].kMacros[1].Definition = "";
-    kMacroArray_SM2[34].kMacros[2].Name = 0;
+    kMacroArray_SM2[34].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[34].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2783,7 +2784,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[35].kMacros[1].Definition = "";
     kMacroArray_SM2[35].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[35].kMacros[2].Definition = "";
-    kMacroArray_SM2[35].kMacros[3].Name = 0;
+    kMacroArray_SM2[35].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[35].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2791,7 +2792,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[36].strPath = "lighting\\2x\\v\\DiffusePt.v.hlsl";
     kMacroArray_SM2[36].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[36].kMacros[0].Definition = "2";
-    kMacroArray_SM2[36].kMacros[1].Name = 0;
+    kMacroArray_SM2[36].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[36].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2801,7 +2802,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[37].kMacros[0].Definition = "2";
     kMacroArray_SM2[37].kMacros[1].Name = "SKIN";
     kMacroArray_SM2[37].kMacros[1].Definition = "";
-    kMacroArray_SM2[37].kMacros[2].Name = 0;
+    kMacroArray_SM2[37].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[37].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2809,7 +2810,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[38].strPath = "lighting\\2x\\v\\DiffusePt.v.hlsl";
     kMacroArray_SM2[38].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[38].kMacros[0].Definition = "3";
-    kMacroArray_SM2[38].kMacros[1].Name = 0;
+    kMacroArray_SM2[38].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[38].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2819,13 +2820,13 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[39].kMacros[0].Definition = "3";
     kMacroArray_SM2[39].kMacros[1].Name = "SKIN";
     kMacroArray_SM2[39].kMacros[1].Definition = "";
-    kMacroArray_SM2[39].kMacros[2].Name = 0;
+    kMacroArray_SM2[39].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[39].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     kMacroArray_SM2[40].strPath = "lighting\\2x\\v\\Specular.v.hlsl";
-    kMacroArray_SM2[40].kMacros[0].Name = 0;
+    kMacroArray_SM2[40].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[40].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -2833,7 +2834,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[41].strPath = "lighting\\2x\\v\\Specular.v.hlsl";
     kMacroArray_SM2[41].kMacros[0].Name = "SKIN";
     kMacroArray_SM2[41].kMacros[0].Definition = "";
-    kMacroArray_SM2[41].kMacros[1].Name = 0;
+    kMacroArray_SM2[41].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[41].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2841,7 +2842,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[42].strPath = "lighting\\2x\\v\\Specular.v.hlsl";
     kMacroArray_SM2[42].kMacros[0].Name = "PROJ_SHADOW";
     kMacroArray_SM2[42].kMacros[0].Definition = "";
-    kMacroArray_SM2[42].kMacros[1].Name = 0;
+    kMacroArray_SM2[42].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[42].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2851,7 +2852,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[43].kMacros[0].Definition = "";
     kMacroArray_SM2[43].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[43].kMacros[1].Definition = "";
-    kMacroArray_SM2[43].kMacros[2].Name = 0;
+    kMacroArray_SM2[43].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[43].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2859,7 +2860,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[44].strPath = "lighting\\2x\\v\\Specular.v.hlsl";
     kMacroArray_SM2[44].kMacros[0].Name = "POINT";
     kMacroArray_SM2[44].kMacros[0].Definition = "";
-    kMacroArray_SM2[44].kMacros[1].Name = 0;
+    kMacroArray_SM2[44].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[44].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2869,7 +2870,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[45].kMacros[0].Definition = "";
     kMacroArray_SM2[45].kMacros[1].Name = "POINT";
     kMacroArray_SM2[45].kMacros[1].Definition = "";
-    kMacroArray_SM2[45].kMacros[2].Name = 0;
+    kMacroArray_SM2[45].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[45].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2879,7 +2880,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[46].kMacros[0].Definition = "2";
     kMacroArray_SM2[46].kMacros[1].Name = "POINT";
     kMacroArray_SM2[46].kMacros[1].Definition = "";
-    kMacroArray_SM2[46].kMacros[2].Name = 0;
+    kMacroArray_SM2[46].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[46].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2891,7 +2892,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[47].kMacros[1].Definition = "";
     kMacroArray_SM2[47].kMacros[2].Name = "POINT";
     kMacroArray_SM2[47].kMacros[2].Definition = "";
-    kMacroArray_SM2[47].kMacros[3].Name = 0;
+    kMacroArray_SM2[47].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[47].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2901,7 +2902,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[48].kMacros[0].Definition = "3";
     kMacroArray_SM2[48].kMacros[1].Name = "POINT";
     kMacroArray_SM2[48].kMacros[1].Definition = "";
-    kMacroArray_SM2[48].kMacros[2].Name = 0;
+    kMacroArray_SM2[48].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[48].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2913,7 +2914,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[49].kMacros[1].Definition = "";
     kMacroArray_SM2[49].kMacros[2].Name = "POINT";
     kMacroArray_SM2[49].kMacros[2].Definition = "";
-    kMacroArray_SM2[49].kMacros[3].Name = 0;
+    kMacroArray_SM2[49].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[49].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -2921,7 +2922,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[50].strPath = "lighting\\2x\\v\\EnvMap.v.hlsl";
     kMacroArray_SM2[50].kMacros[0].Name = "ENVMAP";
     kMacroArray_SM2[50].kMacros[0].Definition = "";
-    kMacroArray_SM2[50].kMacros[1].Name = 0;
+    kMacroArray_SM2[50].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[50].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2931,7 +2932,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[51].kMacros[0].Definition = "";
     kMacroArray_SM2[51].kMacros[1].Name = "ENVMAP";
     kMacroArray_SM2[51].kMacros[1].Definition = "";
-    kMacroArray_SM2[51].kMacros[2].Name = 0;
+    kMacroArray_SM2[51].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[51].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2940,8 +2941,8 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[52].kMacros[0].Name = "ENVMAP";
     kMacroArray_SM2[52].kMacros[0].Definition = "";
     kMacroArray_SM2[52].kMacros[1].Name = "EYE";
-    kMacroArray_SM2[52].kMacros[1].Definition = 0;
-    kMacroArray_SM2[52].kMacros[2].Name = 0;
+    kMacroArray_SM2[52].kMacros[1].Definition = nullptr;
+    kMacroArray_SM2[52].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[52].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2949,7 +2950,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[53].strPath = "lighting\\2x\\v\\land.v.hlsl";
     kMacroArray_SM2[53].kMacros[0].Name = "PROJ_SHADOW";
     kMacroArray_SM2[53].kMacros[0].Definition = "";
-    kMacroArray_SM2[53].kMacros[1].Name = 0;
+    kMacroArray_SM2[53].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[53].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2959,7 +2960,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[54].kMacros[0].Definition = "";
     kMacroArray_SM2[54].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[54].kMacros[1].Definition = "";
-    kMacroArray_SM2[54].kMacros[2].Name = 0;
+    kMacroArray_SM2[54].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[54].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2969,7 +2970,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[55].kMacros[0].Definition = "";
     kMacroArray_SM2[55].kMacros[1].Name = "PTLIGHT";
     kMacroArray_SM2[55].kMacros[1].Definition = "";
-    kMacroArray_SM2[55].kMacros[2].Name = 0;
+    kMacroArray_SM2[55].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[55].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2977,12 +2978,12 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[56].strPath = "lighting\\2x\\v\\landlighting.v.hlsl";
     kMacroArray_SM2[56].kMacros[0].Name = "SPECULAR";
     kMacroArray_SM2[56].kMacros[0].Definition = "";
-    kMacroArray_SM2[56].kMacros[1].Name = 0;
+    kMacroArray_SM2[56].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[56].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
-    kMacroArray_SM2[57].strPath = 0;
+    kMacroArray_SM2[57].strPath = nullptr;
     std::memset(
         &kMacroArray_SM2[57].kMacros[0].Name, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Name)
     );
@@ -2993,7 +2994,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[58].kMacros[1].Definition = "";
     kMacroArray_SM2[58].kMacros[2].Name = "PTLIGHT";
     kMacroArray_SM2[58].kMacros[2].Definition = "";
-    kMacroArray_SM2[58].kMacros[3].Name = 0;
+    kMacroArray_SM2[58].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[58].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -3003,12 +3004,12 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[59].kMacros[0].Definition = "";
     kMacroArray_SM2[59].kMacros[1].Name = "SPECULAR";
     kMacroArray_SM2[59].kMacros[1].Definition = "";
-    kMacroArray_SM2[59].kMacros[2].Name = 0;
+    kMacroArray_SM2[59].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[59].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
-    kMacroArray_SM2[60].strPath = 0;
+    kMacroArray_SM2[60].strPath = nullptr;
     std::memset(
         &kMacroArray_SM2[60].kMacros[0].Name, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Name)
     );
@@ -3017,7 +3018,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[61].kMacros[0].Definition = "";
     kMacroArray_SM2[61].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[61].kMacros[1].Definition = "";
-    kMacroArray_SM2[61].kMacros[2].Name = 0;
+    kMacroArray_SM2[61].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[61].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3029,7 +3030,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[62].kMacros[1].Definition = "";
     kMacroArray_SM2[62].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[62].kMacros[2].Definition = "";
-    kMacroArray_SM2[62].kMacros[3].Name = 0;
+    kMacroArray_SM2[62].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[62].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -3037,7 +3038,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[63].strPath = "lighting\\2x\\v\\depthmap.v.hlsl";
     kMacroArray_SM2[63].kMacros[0].Name = "DEPTHMAP";
     kMacroArray_SM2[63].kMacros[0].Definition = "";
-    kMacroArray_SM2[63].kMacros[1].Name = 0;
+    kMacroArray_SM2[63].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[63].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3047,7 +3048,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[64].kMacros[0].Definition = "";
     kMacroArray_SM2[64].kMacros[1].Name = "ALPHATEST";
     kMacroArray_SM2[64].kMacros[1].Definition = "";
-    kMacroArray_SM2[64].kMacros[2].Name = 0;
+    kMacroArray_SM2[64].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[64].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3057,7 +3058,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[65].kMacros[0].Definition = "";
     kMacroArray_SM2[65].kMacros[1].Name = "SKIN";
     kMacroArray_SM2[65].kMacros[1].Definition = "";
-    kMacroArray_SM2[65].kMacros[2].Name = 0;
+    kMacroArray_SM2[65].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[65].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3069,7 +3070,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[66].kMacros[1].Definition = "";
     kMacroArray_SM2[66].kMacros[2].Name = "ALPHATEST";
     kMacroArray_SM2[66].kMacros[2].Definition = "";
-    kMacroArray_SM2[66].kMacros[3].Name = 0;
+    kMacroArray_SM2[66].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[66].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -3079,13 +3080,13 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[67].kMacros[0].Definition = "";
     kMacroArray_SM2[67].kMacros[1].Name = "WATERDEPTH";
     kMacroArray_SM2[67].kMacros[1].Definition = "";
-    kMacroArray_SM2[67].kMacros[2].Name = 0;
+    kMacroArray_SM2[67].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[67].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     kMacroArray_SM2[68].strPath = "lighting\\2x\\v\\renderNormals.v.hlsl";
-    kMacroArray_SM2[68].kMacros[0].Name = 0;
+    kMacroArray_SM2[68].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[68].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3093,7 +3094,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[69].strPath = "lighting\\2x\\v\\renderNormals.v.hlsl";
     kMacroArray_SM2[69].kMacros[0].Name = "SKIN";
     kMacroArray_SM2[69].kMacros[0].Definition = "";
-    kMacroArray_SM2[69].kMacros[1].Name = 0;
+    kMacroArray_SM2[69].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[69].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3101,7 +3102,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[70].strPath = "lighting\\2x\\v\\renderNormals.v.hlsl";
     kMacroArray_SM2[70].kMacros[0].Name = "FIRE";
     kMacroArray_SM2[70].kMacros[0].Definition = "";
-    kMacroArray_SM2[70].kMacros[1].Name = 0;
+    kMacroArray_SM2[70].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[70].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3109,7 +3110,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[71].strPath = "lighting\\2x\\v\\renderNormals.v.hlsl";
     kMacroArray_SM2[71].kMacros[0].Name = "CLEAR";
     kMacroArray_SM2[71].kMacros[0].Definition = "";
-    kMacroArray_SM2[71].kMacros[1].Name = 0;
+    kMacroArray_SM2[71].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[71].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3119,13 +3120,13 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[72].kMacros[0].Definition = "";
     kMacroArray_SM2[72].kMacros[1].Name = "SKIN";
     kMacroArray_SM2[72].kMacros[1].Definition = "";
-    kMacroArray_SM2[72].kMacros[2].Name = 0;
+    kMacroArray_SM2[72].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[72].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     kMacroArray_SM2[73].strPath = "lighting\\2x\\v\\renderDepth.v.hlsl";
-    kMacroArray_SM2[73].kMacros[0].Name = 0;
+    kMacroArray_SM2[73].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[73].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3133,7 +3134,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[74].strPath = "lighting\\2x\\v\\renderDepth.v.hlsl";
     kMacroArray_SM2[74].kMacros[0].Name = "SKIN";
     kMacroArray_SM2[74].kMacros[0].Definition = "";
-    kMacroArray_SM2[74].kMacros[1].Name = 0;
+    kMacroArray_SM2[74].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[74].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3141,13 +3142,13 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[75].strPath = "lighting\\2x\\v\\renderDepth.v.hlsl";
     kMacroArray_SM2[75].kMacros[0].Name = "MODELSPACENORM";
     kMacroArray_SM2[75].kMacros[0].Definition = "";
-    kMacroArray_SM2[75].kMacros[1].Name = 0;
+    kMacroArray_SM2[75].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[75].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM2[76].strPath = "lighting\\2x\\v\\renderVelocity.v.hlsl";
-    kMacroArray_SM2[76].kMacros[0].Name = 0;
+    kMacroArray_SM2[76].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[76].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3155,13 +3156,13 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[77].strPath = "lighting\\2x\\v\\renderVelocity.v.hlsl";
     kMacroArray_SM2[77].kMacros[0].Name = "SKIN";
     kMacroArray_SM2[77].kMacros[0].Definition = "";
-    kMacroArray_SM2[77].kMacros[1].Name = 0;
+    kMacroArray_SM2[77].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[77].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM2[78].strPath = "lighting\\2x\\v\\land.v.hlsl";
-    kMacroArray_SM2[78].kMacros[0].Name = 0;
+    kMacroArray_SM2[78].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[78].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3169,7 +3170,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[79].strPath = "lighting\\2x\\v\\land.v.hlsl";
     kMacroArray_SM2[79].kMacros[0].Name = "LANDALPHA";
     kMacroArray_SM2[79].kMacros[0].Definition = "";
-    kMacroArray_SM2[79].kMacros[1].Name = 0;
+    kMacroArray_SM2[79].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[79].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3179,7 +3180,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[80].kMacros[0].Definition = "";
     kMacroArray_SM2[80].kMacros[1].Name = "FOG";
     kMacroArray_SM2[80].kMacros[1].Definition = "";
-    kMacroArray_SM2[80].kMacros[2].Name = 0;
+    kMacroArray_SM2[80].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[80].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3189,7 +3190,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[81].kMacros[0].Definition = "";
     kMacroArray_SM2[81].kMacros[1].Name = "SI";
     kMacroArray_SM2[81].kMacros[1].Definition = "";
-    kMacroArray_SM2[81].kMacros[2].Name = 0;
+    kMacroArray_SM2[81].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[81].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3197,7 +3198,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[82].strPath = "lighting\\2x\\v\\land.v.hlsl";
     kMacroArray_SM2[82].kMacros[0].Name = "PTLIGHT";
     kMacroArray_SM2[82].kMacros[0].Definition = "";
-    kMacroArray_SM2[82].kMacros[1].Name = 0;
+    kMacroArray_SM2[82].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[82].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3207,13 +3208,13 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[83].kMacros[0].Definition = "";
     kMacroArray_SM2[83].kMacros[1].Name = "PTLIGHT";
     kMacroArray_SM2[83].kMacros[1].Definition = "";
-    kMacroArray_SM2[83].kMacros[2].Name = 0;
+    kMacroArray_SM2[83].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[83].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     kMacroArray_SM2[84].strPath = "lighting\\2x\\v\\localMap.v.hlsl";
-    kMacroArray_SM2[84].kMacros[0].Name = 0;
+    kMacroArray_SM2[84].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[84].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3221,7 +3222,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[85].strPath = "lighting\\2x\\v\\localMap.v.hlsl";
     kMacroArray_SM2[85].kMacros[0].Name = "SKIN";
     kMacroArray_SM2[85].kMacros[0].Definition = "";
-    kMacroArray_SM2[85].kMacros[1].Name = 0;
+    kMacroArray_SM2[85].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[85].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3229,13 +3230,13 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[86].strPath = "lighting\\2x\\v\\localMap.v.hlsl";
     kMacroArray_SM2[86].kMacros[0].Name = "CLEAR";
     kMacroArray_SM2[86].kMacros[0].Definition = "";
-    kMacroArray_SM2[86].kMacros[1].Name = 0;
+    kMacroArray_SM2[86].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[86].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM2[87].strPath = "lighting\\1x\\v\\texEffect.v.hlsl";
-    kMacroArray_SM2[87].kMacros[0].Name = 0;
+    kMacroArray_SM2[87].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[87].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3243,7 +3244,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[88].strPath = "lighting\\1x\\v\\texEffect.v.hlsl";
     kMacroArray_SM2[88].kMacros[0].Name = "SKIN";
     kMacroArray_SM2[88].kMacros[0].Definition = "";
-    kMacroArray_SM2[88].kMacros[1].Name = 0;
+    kMacroArray_SM2[88].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[88].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3251,7 +3252,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[89].strPath = "lighting\\2x\\v\\SimpleShadow.v.hlsl";
     kMacroArray_SM2[89].kMacros[0].Name = "SHADOWMAP";
     kMacroArray_SM2[89].kMacros[0].Definition = "";
-    kMacroArray_SM2[89].kMacros[1].Name = 0;
+    kMacroArray_SM2[89].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[89].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3261,7 +3262,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[90].kMacros[0].Definition = "";
     kMacroArray_SM2[90].kMacros[1].Name = "SKIN";
     kMacroArray_SM2[90].kMacros[1].Definition = "";
-    kMacroArray_SM2[90].kMacros[2].Name = 0;
+    kMacroArray_SM2[90].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[90].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3273,13 +3274,13 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[91].kMacros[1].Definition = "";
     kMacroArray_SM2[91].kMacros[2].Name = "VC";
     kMacroArray_SM2[91].kMacros[2].Definition = "";
-    kMacroArray_SM2[91].kMacros[3].Name = 0;
+    kMacroArray_SM2[91].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[91].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
     kMacroArray_SM2[92].strPath = "lighting\\2x\\v\\WaterFog.v.hlsl";
-    kMacroArray_SM2[92].kMacros[0].Name = 0;
+    kMacroArray_SM2[92].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[92].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3287,7 +3288,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[93].strPath = "lighting\\2x\\v\\WaterFog.v.hlsl";
     kMacroArray_SM2[93].kMacros[0].Name = "SKIN";
     kMacroArray_SM2[93].kMacros[0].Definition = "";
-    kMacroArray_SM2[93].kMacros[1].Name = 0;
+    kMacroArray_SM2[93].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[93].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3295,7 +3296,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[94].strPath = "lighting\\2x\\v\\WaterFog.v.hlsl";
     kMacroArray_SM2[94].kMacros[0].Name = "TEXCOORD";
     kMacroArray_SM2[94].kMacros[0].Definition = "";
-    kMacroArray_SM2[94].kMacros[1].Name = 0;
+    kMacroArray_SM2[94].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[94].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3305,7 +3306,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[95].kMacros[0].Definition = "";
     kMacroArray_SM2[95].kMacros[1].Name = "TEXCOORD";
     kMacroArray_SM2[95].kMacros[1].Definition = "";
-    kMacroArray_SM2[95].kMacros[2].Name = 0;
+    kMacroArray_SM2[95].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[95].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3313,7 +3314,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[96].strPath = "lighting\\2x\\v\\WaterFog.v.hlsl";
     kMacroArray_SM2[96].kMacros[0].Name = "VC";
     kMacroArray_SM2[96].kMacros[0].Definition = "";
-    kMacroArray_SM2[96].kMacros[1].Name = 0;
+    kMacroArray_SM2[96].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[96].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3323,7 +3324,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[97].kMacros[0].Definition = "";
     kMacroArray_SM2[97].kMacros[1].Name = "SKIN";
     kMacroArray_SM2[97].kMacros[1].Definition = "";
-    kMacroArray_SM2[97].kMacros[2].Name = 0;
+    kMacroArray_SM2[97].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[97].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3333,7 +3334,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[98].kMacros[0].Definition = "";
     kMacroArray_SM2[98].kMacros[1].Name = "TEXCOORD";
     kMacroArray_SM2[98].kMacros[1].Definition = "";
-    kMacroArray_SM2[98].kMacros[2].Name = 0;
+    kMacroArray_SM2[98].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[98].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3345,7 +3346,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[99].kMacros[1].Definition = "";
     kMacroArray_SM2[99].kMacros[2].Name = "TEXCOORD";
     kMacroArray_SM2[99].kMacros[2].Definition = "";
-    kMacroArray_SM2[99].kMacros[3].Name = 0;
+    kMacroArray_SM2[99].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[99].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -3353,7 +3354,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[100].strPath = "lighting\\2x\\v\\LandO.v.hlsl";
     kMacroArray_SM2[100].kMacros[0].Name = "FOG";
     kMacroArray_SM2[100].kMacros[0].Definition = "";
-    kMacroArray_SM2[100].kMacros[1].Name = 0;
+    kMacroArray_SM2[100].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[100].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3363,7 +3364,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[101].kMacros[0].Definition = "";
     kMacroArray_SM2[101].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[101].kMacros[1].Definition = "";
-    kMacroArray_SM2[101].kMacros[2].Name = 0;
+    kMacroArray_SM2[101].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[101].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3371,7 +3372,7 @@ void ShadowLightShader::LoadVertexShaders() {
     kMacroArray_SM2[102].strPath = "lighting\\2x\\v\\adts.v.hlsl";
     kMacroArray_SM2[102].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[102].kMacros[0].Definition = a0_0;
-    kMacroArray_SM2[102].kMacros[1].Name = 0;
+    kMacroArray_SM2[102].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[102].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3450,7 +3451,7 @@ void ShadowLightShader::LoadVertexShaders() {
                 NiD3DVertexShader* v12 = ShadowLightShader::spVertexShaders[v11 + 53];
                 if (v12) {
                     NiDecRefCount(v12);
-                    ShadowLightShader::spVertexShaders[v11 + 53] = 0;
+                    ShadowLightShader::spVertexShaders[v11 + 53] = nullptr;
                 }
             }
             ++v11;
@@ -3473,19 +3474,19 @@ void ShadowLightShader::LoadPixelShaders() {
     _gcvt(ImageSpaceEffectBlur::fSpecularMult, 12, fSpecularMult);
     _gcvt(ImageSpaceEffectBlur::fEmmisiveMult, 12, fEmissiveMult);
     kMacroArray_SM1[0].strPath = "lighting\\1x\\p\\base.p.hlsl";
-    kMacroArray_SM1[0].kMacros[0].Name = 0;
+    kMacroArray_SM1[0].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[0].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray_SM1[1].strPath = "lighting\\1x\\p\\diffusePt.p.hlsl";
-    kMacroArray_SM1[1].kMacros[0].Name = 0;
+    kMacroArray_SM1[1].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[1].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray_SM1[2].strPath = "lighting\\1x\\p\\diffuseDir.p.hlsl";
-    kMacroArray_SM1[2].kMacros[0].Name = 0;
+    kMacroArray_SM1[2].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[2].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3493,7 +3494,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[3].strPath = "lighting\\1x\\p\\base.p.hlsl";
     kMacroArray_SM1[3].kMacros[0].Name = "TEX";
     kMacroArray_SM1[3].kMacros[0].Definition = "";
-    kMacroArray_SM1[3].kMacros[1].Name = 0;
+    kMacroArray_SM1[3].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[3].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3503,7 +3504,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[4].kMacros[0].Definition = "";
     kMacroArray_SM1[4].kMacros[1].Name = "VC";
     kMacroArray_SM1[4].kMacros[1].Definition = "";
-    kMacroArray_SM1[4].kMacros[2].Name = 0;
+    kMacroArray_SM1[4].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[4].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3513,7 +3514,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[5].kMacros[0].Definition = "";
     kMacroArray_SM1[5].kMacros[1].Name = "FACEGENBLEND";
     kMacroArray_SM1[5].kMacros[1].Definition = "";
-    kMacroArray_SM1[5].kMacros[2].Name = 0;
+    kMacroArray_SM1[5].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[5].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3523,7 +3524,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[6].kMacros[0].Definition = "";
     kMacroArray_SM1[6].kMacros[1].Name = "HAIR";
     kMacroArray_SM1[6].kMacros[1].Definition = "";
-    kMacroArray_SM1[6].kMacros[2].Name = 0;
+    kMacroArray_SM1[6].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[6].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3531,7 +3532,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[7].strPath = "lighting\\1x\\p\\specularPt.p.hlsl";
     kMacroArray_SM1[7].kMacros[0].Name = "SPECMULT";
     kMacroArray_SM1[7].kMacros[0].Definition = fSpecularMult;
-    kMacroArray_SM1[7].kMacros[1].Name = 0;
+    kMacroArray_SM1[7].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[7].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3539,13 +3540,13 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[8].strPath = "lighting\\1x\\p\\specularDir.p.hlsl";
     kMacroArray_SM1[8].kMacros[0].Name = "SPECMULT";
     kMacroArray_SM1[8].kMacros[0].Definition = fSpecularMult;
-    kMacroArray_SM1[8].kMacros[1].Name = 0;
+    kMacroArray_SM1[8].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[8].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM1[9].strPath = "lighting\\1x\\p\\ambDiffDirTexture.p.hlsl";
-    kMacroArray_SM1[9].kMacros[0].Name = 0;
+    kMacroArray_SM1[9].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[9].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3553,7 +3554,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[10].strPath = "lighting\\1x\\p\\ambDiffDirTexture.p.hlsl";
     kMacroArray_SM1[10].kMacros[0].Name = "FOG";
     kMacroArray_SM1[10].kMacros[0].Definition = "";
-    kMacroArray_SM1[10].kMacros[1].Name = 0;
+    kMacroArray_SM1[10].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[10].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3561,7 +3562,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[11].strPath = "lighting\\1x\\p\\ambDiffDirTexture.p.hlsl";
     kMacroArray_SM1[11].kMacros[0].Name = "ALPHA";
     kMacroArray_SM1[11].kMacros[0].Definition = "";
-    kMacroArray_SM1[11].kMacros[1].Name = 0;
+    kMacroArray_SM1[11].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[11].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3571,7 +3572,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[12].kMacros[0].Definition = "";
     kMacroArray_SM1[12].kMacros[1].Name = "FOG";
     kMacroArray_SM1[12].kMacros[1].Definition = "";
-    kMacroArray_SM1[12].kMacros[2].Name = 0;
+    kMacroArray_SM1[12].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[12].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3579,7 +3580,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[13].strPath = "lighting\\1x\\p\\ambDiffDirTexture.p.hlsl";
     kMacroArray_SM1[13].kMacros[0].Name = "VC";
     kMacroArray_SM1[13].kMacros[0].Definition = "";
-    kMacroArray_SM1[13].kMacros[1].Name = 0;
+    kMacroArray_SM1[13].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[13].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3589,7 +3590,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[14].kMacros[0].Definition = "";
     kMacroArray_SM1[14].kMacros[1].Name = "FOG";
     kMacroArray_SM1[14].kMacros[1].Definition = "";
-    kMacroArray_SM1[14].kMacros[2].Name = 0;
+    kMacroArray_SM1[14].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[14].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3599,7 +3600,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[15].kMacros[0].Definition = "";
     kMacroArray_SM1[15].kMacros[1].Name = "ALPHA";
     kMacroArray_SM1[15].kMacros[1].Definition = "";
-    kMacroArray_SM1[15].kMacros[2].Name = 0;
+    kMacroArray_SM1[15].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[15].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3611,7 +3612,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[16].kMacros[1].Definition = "";
     kMacroArray_SM1[16].kMacros[2].Name = "FOG";
     kMacroArray_SM1[16].kMacros[2].Definition = "";
-    kMacroArray_SM1[16].kMacros[3].Name = 0;
+    kMacroArray_SM1[16].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[16].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -3619,7 +3620,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[17].strPath = "lighting\\1x\\p\\ambDiffDirTexture.p.hlsl";
     kMacroArray_SM1[17].kMacros[0].Name = "FACEGENBLEND";
     kMacroArray_SM1[17].kMacros[0].Definition = "";
-    kMacroArray_SM1[17].kMacros[1].Name = 0;
+    kMacroArray_SM1[17].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[17].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3629,7 +3630,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[18].kMacros[0].Definition = "";
     kMacroArray_SM1[18].kMacros[1].Name = "FOG";
     kMacroArray_SM1[18].kMacros[1].Definition = "";
-    kMacroArray_SM1[18].kMacros[2].Name = 0;
+    kMacroArray_SM1[18].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[18].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3639,7 +3640,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[19].kMacros[0].Definition = "";
     kMacroArray_SM1[19].kMacros[1].Name = "ALPHA";
     kMacroArray_SM1[19].kMacros[1].Definition = "";
-    kMacroArray_SM1[19].kMacros[2].Name = 0;
+    kMacroArray_SM1[19].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[19].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3651,7 +3652,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[20].kMacros[1].Definition = "";
     kMacroArray_SM1[20].kMacros[2].Name = "ALPHA";
     kMacroArray_SM1[20].kMacros[2].Definition = "";
-    kMacroArray_SM1[20].kMacros[3].Name = 0;
+    kMacroArray_SM1[20].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[20].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -3659,7 +3660,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[21].strPath = "lighting\\1x\\p\\ambDiffDirTexture.p.hlsl";
     kMacroArray_SM1[21].kMacros[0].Name = "SI";
     kMacroArray_SM1[21].kMacros[0].Definition = "";
-    kMacroArray_SM1[21].kMacros[1].Name = 0;
+    kMacroArray_SM1[21].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[21].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3669,7 +3670,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[22].kMacros[0].Definition = "";
     kMacroArray_SM1[22].kMacros[1].Name = "FOG";
     kMacroArray_SM1[22].kMacros[1].Definition = "";
-    kMacroArray_SM1[22].kMacros[2].Name = 0;
+    kMacroArray_SM1[22].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[22].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3679,7 +3680,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[23].kMacros[0].Definition = "";
     kMacroArray_SM1[23].kMacros[1].Name = "ALPHA";
     kMacroArray_SM1[23].kMacros[1].Definition = "";
-    kMacroArray_SM1[23].kMacros[2].Name = 0;
+    kMacroArray_SM1[23].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[23].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3691,7 +3692,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[24].kMacros[1].Definition = "";
     kMacroArray_SM1[24].kMacros[2].Name = "FOG";
     kMacroArray_SM1[24].kMacros[2].Definition = "";
-    kMacroArray_SM1[24].kMacros[3].Name = 0;
+    kMacroArray_SM1[24].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[24].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -3701,7 +3702,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[25].kMacros[0].Definition = "";
     kMacroArray_SM1[25].kMacros[1].Name = "VC";
     kMacroArray_SM1[25].kMacros[1].Definition = "";
-    kMacroArray_SM1[25].kMacros[2].Name = 0;
+    kMacroArray_SM1[25].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[25].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3713,7 +3714,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[26].kMacros[1].Definition = "";
     kMacroArray_SM1[26].kMacros[2].Name = "FOG";
     kMacroArray_SM1[26].kMacros[2].Definition = "";
-    kMacroArray_SM1[26].kMacros[3].Name = 0;
+    kMacroArray_SM1[26].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[26].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -3725,7 +3726,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[27].kMacros[1].Definition = "";
     kMacroArray_SM1[27].kMacros[2].Name = "ALPHA";
     kMacroArray_SM1[27].kMacros[2].Definition = "";
-    kMacroArray_SM1[27].kMacros[3].Name = 0;
+    kMacroArray_SM1[27].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[27].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -3739,18 +3740,18 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[28].kMacros[2].Definition = "";
     kMacroArray_SM1[28].kMacros[3].Name = "FOG";
     kMacroArray_SM1[28].kMacros[3].Definition = "";
-    kMacroArray_SM1[28].kMacros[4].Name = 0;
-    kMacroArray_SM1[28].kMacros[4].Definition = 0;
-    kMacroArray_SM1[28].kMacros[5].Name = 0;
-    kMacroArray_SM1[28].kMacros[5].Definition = 0;
-    kMacroArray_SM1[28].kMacros[6].Name = 0;
-    kMacroArray_SM1[28].kMacros[6].Definition = 0;
-    kMacroArray_SM1[28].kMacros[7].Name = 0;
-    kMacroArray_SM1[28].kMacros[7].Definition = 0;
-    kMacroArray_SM1[28].kMacros[8].Name = 0;
-    kMacroArray_SM1[28].kMacros[8].Definition = 0;
+    kMacroArray_SM1[28].kMacros[4].Name = nullptr;
+    kMacroArray_SM1[28].kMacros[4].Definition = nullptr;
+    kMacroArray_SM1[28].kMacros[5].Name = nullptr;
+    kMacroArray_SM1[28].kMacros[5].Definition = nullptr;
+    kMacroArray_SM1[28].kMacros[6].Name = nullptr;
+    kMacroArray_SM1[28].kMacros[6].Definition = nullptr;
+    kMacroArray_SM1[28].kMacros[7].Name = nullptr;
+    kMacroArray_SM1[28].kMacros[7].Definition = nullptr;
+    kMacroArray_SM1[28].kMacros[8].Name = nullptr;
+    kMacroArray_SM1[28].kMacros[8].Definition = nullptr;
     kMacroArray_SM1[29].strPath = "lighting\\1x\\p\\ambDiffDirAndPt.p.hlsl";
-    kMacroArray_SM1[29].kMacros[0].Name = 0;
+    kMacroArray_SM1[29].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[29].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3758,7 +3759,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[30].strPath = "lighting\\1x\\p\\base.p.hlsl";
     kMacroArray_SM1[30].kMacros[0].Name = "FOG";
     kMacroArray_SM1[30].kMacros[0].Definition = "";
-    kMacroArray_SM1[30].kMacros[1].Name = 0;
+    kMacroArray_SM1[30].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[30].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3768,13 +3769,13 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[31].kMacros[0].Definition = "";
     kMacroArray_SM1[31].kMacros[1].Name = "TEX";
     kMacroArray_SM1[31].kMacros[1].Definition = "";
-    kMacroArray_SM1[31].kMacros[2].Name = 0;
+    kMacroArray_SM1[31].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[31].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     kMacroArray_SM1[32].strPath = "lighting\\1x\\p\\envmap.p.hlsl";
-    kMacroArray_SM1[32].kMacros[0].Name = 0;
+    kMacroArray_SM1[32].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[32].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3782,19 +3783,19 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[33].strPath = "lighting\\1x\\p\\envmap.p.hlsl";
     kMacroArray_SM1[33].kMacros[0].Name = "VC";
     kMacroArray_SM1[33].kMacros[0].Definition = "";
-    kMacroArray_SM1[33].kMacros[1].Name = 0;
+    kMacroArray_SM1[33].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[33].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM1[34].strPath = "lighting\\1x\\p\\vertDir.p.hlsl";
-    kMacroArray_SM1[34].kMacros[0].Name = 0;
+    kMacroArray_SM1[34].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[34].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray_SM1[35].strPath = "lighting\\1x\\p\\vertDirAndPt.p.hlsl";
-    kMacroArray_SM1[35].kMacros[0].Name = 0;
+    kMacroArray_SM1[35].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[35].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3804,7 +3805,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[36].kMacros[0].Definition = "";
     kMacroArray_SM1[36].kMacros[1].Name = "EMMITMULT";
     kMacroArray_SM1[36].kMacros[1].Definition = fEmissiveMult;
-    kMacroArray_SM1[36].kMacros[2].Name = 0;
+    kMacroArray_SM1[36].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[36].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3812,27 +3813,27 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[37].strPath = "lighting\\1x\\p\\SI.p.hlsl";
     kMacroArray_SM1[37].kMacros[0].Name = "EMMITMULT";
     kMacroArray_SM1[37].kMacros[0].Definition = fEmissiveMult;
-    kMacroArray_SM1[37].kMacros[1].Name = 0;
+    kMacroArray_SM1[37].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[37].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM1[38].strPath = "lighting\\1x\\p\\SI.p.hlsl";
     kMacroArray_SM1[38].kMacros[0].Name = "SIBLOCK";
-    kMacroArray_SM1[38].kMacros[0].Definition = 0;
-    kMacroArray_SM1[38].kMacros[1].Name = 0;
+    kMacroArray_SM1[38].kMacros[0].Definition = nullptr;
+    kMacroArray_SM1[38].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[38].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM1[39].strPath = "lighting\\1x\\p\\base.p.hlsl";
-    kMacroArray_SM1[39].kMacros[0].Name = 0;
+    kMacroArray_SM1[39].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[39].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray_SM1[40].strPath = "lighting\\1x\\p\\land.p.hlsl";
-    kMacroArray_SM1[40].kMacros[0].Name = 0;
+    kMacroArray_SM1[40].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[40].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3840,7 +3841,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[41].strPath = "lighting\\1x\\p\\land.p.hlsl";
     kMacroArray_SM1[41].kMacros[0].Name = "LANDALPHA";
     kMacroArray_SM1[41].kMacros[0].Definition = "";
-    kMacroArray_SM1[41].kMacros[1].Name = 0;
+    kMacroArray_SM1[41].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[41].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3848,7 +3849,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[42].strPath = "lighting\\1x\\p\\land.p.hlsl";
     kMacroArray_SM1[42].kMacros[0].Name = "SI";
     kMacroArray_SM1[42].kMacros[0].Definition = "";
-    kMacroArray_SM1[42].kMacros[1].Name = 0;
+    kMacroArray_SM1[42].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[42].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3858,7 +3859,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[43].kMacros[0].Definition = "";
     kMacroArray_SM1[43].kMacros[1].Name = "SI";
     kMacroArray_SM1[43].kMacros[1].Definition = "";
-    kMacroArray_SM1[43].kMacros[2].Name = 0;
+    kMacroArray_SM1[43].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[43].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3866,7 +3867,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[44].strPath = "lighting\\1x\\p\\land.p.hlsl";
     kMacroArray_SM1[44].kMacros[0].Name = "PTLIGHT";
     kMacroArray_SM1[44].kMacros[0].Definition = "";
-    kMacroArray_SM1[44].kMacros[1].Name = 0;
+    kMacroArray_SM1[44].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[44].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3876,25 +3877,25 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM1[45].kMacros[0].Definition = "";
     kMacroArray_SM1[45].kMacros[1].Name = "PTLIGHT";
     kMacroArray_SM1[45].kMacros[1].Definition = "";
-    kMacroArray_SM1[45].kMacros[2].Name = 0;
+    kMacroArray_SM1[45].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[45].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
-    kMacroArray_SM1[46].strPath = 0;
+    kMacroArray_SM1[46].strPath = nullptr;
     std::memset(
         &kMacroArray_SM1[46].kMacros[0].Name, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Name)
     );
     kMacroArray_SM1[47].strPath = "lighting\\1x\\p\\base.p.hlsl";
     kMacroArray_SM1[47].kMacros[0].Name = "CONSTALPHA";
     kMacroArray_SM1[47].kMacros[0].Definition = "";
-    kMacroArray_SM1[47].kMacros[1].Name = 0;
+    kMacroArray_SM1[47].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM1[47].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM2[0].strPath = "lighting\\2x\\p\\ADTS.p.hlsl";
-    kMacroArray_SM2[0].kMacros[0].Name = 0;
+    kMacroArray_SM2[0].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[0].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -3902,7 +3903,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[1].strPath = "lighting\\2x\\p\\ADTS.p.hlsl";
     kMacroArray_SM2[1].kMacros[0].Name = "OPT";
     kMacroArray_SM2[1].kMacros[0].Definition = "";
-    kMacroArray_SM2[1].kMacros[1].Name = 0;
+    kMacroArray_SM2[1].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[1].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3912,7 +3913,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[2].kMacros[0].Definition = "";
     kMacroArray_SM2[2].kMacros[1].Name = "LOD";
     kMacroArray_SM2[2].kMacros[1].Definition = "";
-    kMacroArray_SM2[2].kMacros[2].Name = 0;
+    kMacroArray_SM2[2].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[2].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3924,7 +3925,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[3].kMacros[1].Definition = "";
     kMacroArray_SM2[3].kMacros[2].Name = "LODLANDNOISE";
     kMacroArray_SM2[3].kMacros[2].Definition = "";
-    kMacroArray_SM2[3].kMacros[3].Name = 0;
+    kMacroArray_SM2[3].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[3].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -3932,7 +3933,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[4].strPath = "lighting\\2x\\p\\ADTS.p.hlsl";
     kMacroArray_SM2[4].kMacros[0].Name = "SI";
     kMacroArray_SM2[4].kMacros[0].Definition = "";
-    kMacroArray_SM2[4].kMacros[1].Name = 0;
+    kMacroArray_SM2[4].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[4].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3940,7 +3941,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[5].strPath = "lighting\\2x\\p\\ADTS.p.hlsl";
     kMacroArray_SM2[5].kMacros[0].Name = "PROJ_SHADOW";
     kMacroArray_SM2[5].kMacros[0].Definition = "";
-    kMacroArray_SM2[5].kMacros[1].Name = 0;
+    kMacroArray_SM2[5].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[5].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3952,7 +3953,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[6].kMacros[1].Definition = "";
     kMacroArray_SM2[6].kMacros[2].Name = "LODLANDCLIP";
     kMacroArray_SM2[6].kMacros[2].Definition = "";
-    kMacroArray_SM2[6].kMacros[3].Name = 0;
+    kMacroArray_SM2[6].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[6].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -3962,7 +3963,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[7].kMacros[0].Definition = "";
     kMacroArray_SM2[7].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[7].kMacros[1].Definition = "";
-    kMacroArray_SM2[7].kMacros[2].Name = 0;
+    kMacroArray_SM2[7].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[7].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3970,7 +3971,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[8].strPath = "lighting\\2x\\p\\ADTS.p.hlsl";
     kMacroArray_SM2[8].kMacros[0].Name = "STBB";
     kMacroArray_SM2[8].kMacros[0].Definition = "";
-    kMacroArray_SM2[8].kMacros[1].Name = 0;
+    kMacroArray_SM2[8].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[8].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3978,7 +3979,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[9].strPath = "lighting\\2x\\p\\ADTS.p.hlsl";
     kMacroArray_SM2[9].kMacros[0].Name = "HAIR";
     kMacroArray_SM2[9].kMacros[0].Definition = "";
-    kMacroArray_SM2[9].kMacros[1].Name = 0;
+    kMacroArray_SM2[9].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[9].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -3988,7 +3989,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[10].kMacros[0].Definition = "";
     kMacroArray_SM2[10].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[10].kMacros[1].Definition = "";
-    kMacroArray_SM2[10].kMacros[2].Name = 0;
+    kMacroArray_SM2[10].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[10].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -3996,7 +3997,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[11].strPath = "lighting\\2x\\p\\ADTS.p.hlsl";
     kMacroArray_SM2[11].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[11].kMacros[0].Definition = "2";
-    kMacroArray_SM2[11].kMacros[1].Name = 0;
+    kMacroArray_SM2[11].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[11].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4006,7 +4007,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[12].kMacros[0].Definition = "2";
     kMacroArray_SM2[12].kMacros[1].Name = "SI";
     kMacroArray_SM2[12].kMacros[1].Definition = "";
-    kMacroArray_SM2[12].kMacros[2].Name = 0;
+    kMacroArray_SM2[12].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[12].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4016,7 +4017,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[13].kMacros[0].Definition = "2";
     kMacroArray_SM2[13].kMacros[1].Name = "HAIR";
     kMacroArray_SM2[13].kMacros[1].Definition = "";
-    kMacroArray_SM2[13].kMacros[2].Name = 0;
+    kMacroArray_SM2[13].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[13].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4026,7 +4027,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[14].kMacros[0].Definition = "2";
     kMacroArray_SM2[14].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[14].kMacros[1].Definition = "";
-    kMacroArray_SM2[14].kMacros[2].Name = 0;
+    kMacroArray_SM2[14].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[14].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4038,7 +4039,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[15].kMacros[1].Definition = "";
     kMacroArray_SM2[15].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[15].kMacros[2].Definition = "";
-    kMacroArray_SM2[15].kMacros[3].Name = 0;
+    kMacroArray_SM2[15].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[15].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4050,7 +4051,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[16].kMacros[1].Definition = "";
     kMacroArray_SM2[16].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[16].kMacros[2].Definition = "";
-    kMacroArray_SM2[16].kMacros[3].Name = 0;
+    kMacroArray_SM2[16].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[16].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4058,7 +4059,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[17].strPath = "lighting\\2x\\p\\ADTS.p.hlsl";
     kMacroArray_SM2[17].kMacros[0].Name = "SPECULAR";
     kMacroArray_SM2[17].kMacros[0].Definition = "";
-    kMacroArray_SM2[17].kMacros[1].Name = 0;
+    kMacroArray_SM2[17].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[17].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4068,7 +4069,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[18].kMacros[0].Definition = "";
     kMacroArray_SM2[18].kMacros[1].Name = "SI";
     kMacroArray_SM2[18].kMacros[1].Definition = "";
-    kMacroArray_SM2[18].kMacros[2].Name = 0;
+    kMacroArray_SM2[18].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[18].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4078,7 +4079,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[19].kMacros[0].Definition = "";
     kMacroArray_SM2[19].kMacros[1].Name = "HAIR";
     kMacroArray_SM2[19].kMacros[1].Definition = "";
-    kMacroArray_SM2[19].kMacros[2].Name = 0;
+    kMacroArray_SM2[19].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[19].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4088,7 +4089,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[20].kMacros[0].Definition = "";
     kMacroArray_SM2[20].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[20].kMacros[1].Definition = "";
-    kMacroArray_SM2[20].kMacros[2].Name = 0;
+    kMacroArray_SM2[20].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[20].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4100,7 +4101,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[21].kMacros[1].Definition = "";
     kMacroArray_SM2[21].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[21].kMacros[2].Definition = "";
-    kMacroArray_SM2[21].kMacros[3].Name = 0;
+    kMacroArray_SM2[21].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[21].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4112,7 +4113,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[22].kMacros[1].Definition = "";
     kMacroArray_SM2[22].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[22].kMacros[2].Definition = "";
-    kMacroArray_SM2[22].kMacros[3].Name = 0;
+    kMacroArray_SM2[22].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[22].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4122,7 +4123,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[23].kMacros[0].Definition = "";
     kMacroArray_SM2[23].kMacros[1].Name = "LIGHTS";
     kMacroArray_SM2[23].kMacros[1].Definition = "2";
-    kMacroArray_SM2[23].kMacros[2].Name = 0;
+    kMacroArray_SM2[23].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[23].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4134,12 +4135,12 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[24].kMacros[1].Definition = "2";
     kMacroArray_SM2[24].kMacros[2].Name = "SI";
     kMacroArray_SM2[24].kMacros[2].Definition = "";
-    kMacroArray_SM2[24].kMacros[3].Name = 0;
+    kMacroArray_SM2[24].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[24].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
-    kMacroArray_SM2[25].strPath = 0;
+    kMacroArray_SM2[25].strPath = nullptr;
     std::memset(
         &kMacroArray_SM2[25].kMacros[0].Name, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Name)
     );
@@ -4150,7 +4151,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[26].kMacros[1].Definition = "2";
     kMacroArray_SM2[26].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[26].kMacros[2].Definition = "";
-    kMacroArray_SM2[26].kMacros[3].Name = 0;
+    kMacroArray_SM2[26].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[26].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4164,24 +4165,24 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[27].kMacros[2].Definition = "";
     kMacroArray_SM2[27].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray_SM2[27].kMacros[3].Definition = "";
-    kMacroArray_SM2[27].kMacros[4].Name = 0;
-    kMacroArray_SM2[27].kMacros[4].Definition = 0;
-    kMacroArray_SM2[27].kMacros[5].Name = 0;
-    kMacroArray_SM2[27].kMacros[5].Definition = 0;
-    kMacroArray_SM2[27].kMacros[6].Name = 0;
-    kMacroArray_SM2[27].kMacros[6].Definition = 0;
-    kMacroArray_SM2[27].kMacros[7].Name = 0;
-    kMacroArray_SM2[27].kMacros[7].Definition = 0;
-    kMacroArray_SM2[27].kMacros[8].Name = 0;
-    kMacroArray_SM2[27].kMacros[8].Definition = 0;
-    kMacroArray_SM2[28].strPath = 0;
+    kMacroArray_SM2[27].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[27].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[27].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[27].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[27].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[27].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[27].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[27].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[27].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[27].kMacros[8].Definition = nullptr;
+    kMacroArray_SM2[28].strPath = nullptr;
     std::memset(
         &kMacroArray_SM2[28].kMacros[0].Name, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Name)
     );
     kMacroArray_SM2[29].strPath = "lighting\\2x\\p\\ADTS10.p.hlsl";
     kMacroArray_SM2[29].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[29].kMacros[0].Definition = "9";
-    kMacroArray_SM2[29].kMacros[1].Name = 0;
+    kMacroArray_SM2[29].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[29].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4190,8 +4191,8 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[30].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[30].kMacros[0].Definition = "9";
     kMacroArray_SM2[30].kMacros[1].Name = "SI";
-    kMacroArray_SM2[30].kMacros[1].Definition = 0;
-    kMacroArray_SM2[30].kMacros[2].Name = 0;
+    kMacroArray_SM2[30].kMacros[1].Definition = nullptr;
+    kMacroArray_SM2[30].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[30].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4199,7 +4200,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[31].strPath = "lighting\\2x\\p\\ADTS10.p.hlsl";
     kMacroArray_SM2[31].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[31].kMacros[0].Definition = "4";
-    kMacroArray_SM2[31].kMacros[1].Name = 0;
+    kMacroArray_SM2[31].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[31].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4209,7 +4210,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[32].kMacros[0].Definition = "";
     kMacroArray_SM2[32].kMacros[1].Name = "LIGHTS";
     kMacroArray_SM2[32].kMacros[1].Definition = "4";
-    kMacroArray_SM2[32].kMacros[2].Name = 0;
+    kMacroArray_SM2[32].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[32].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4218,8 +4219,8 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[33].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[33].kMacros[0].Definition = "4";
     kMacroArray_SM2[33].kMacros[1].Name = "SI";
-    kMacroArray_SM2[33].kMacros[1].Definition = 0;
-    kMacroArray_SM2[33].kMacros[2].Name = 0;
+    kMacroArray_SM2[33].kMacros[1].Definition = nullptr;
+    kMacroArray_SM2[33].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[33].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4229,7 +4230,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[34].kMacros[0].Definition = "";
     kMacroArray_SM2[34].kMacros[1].Name = "LIGHTS";
     kMacroArray_SM2[34].kMacros[1].Definition = "4";
-    kMacroArray_SM2[34].kMacros[2].Name = 0;
+    kMacroArray_SM2[34].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[34].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4241,7 +4242,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[35].kMacros[1].Definition = "";
     kMacroArray_SM2[35].kMacros[2].Name = "LIGHTS";
     kMacroArray_SM2[35].kMacros[2].Definition = "4";
-    kMacroArray_SM2[35].kMacros[3].Name = 0;
+    kMacroArray_SM2[35].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[35].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4252,8 +4253,8 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[36].kMacros[1].Name = "LIGHTS";
     kMacroArray_SM2[36].kMacros[1].Definition = "4";
     kMacroArray_SM2[36].kMacros[2].Name = "SI";
-    kMacroArray_SM2[36].kMacros[2].Definition = 0;
-    kMacroArray_SM2[36].kMacros[3].Name = 0;
+    kMacroArray_SM2[36].kMacros[2].Definition = nullptr;
+    kMacroArray_SM2[36].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[36].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4261,7 +4262,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[37].strPath = "lighting\\2x\\p\\AD.p.hlsl";
     kMacroArray_SM2[37].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[37].kMacros[0].Definition = "2";
-    kMacroArray_SM2[37].kMacros[1].Name = 0;
+    kMacroArray_SM2[37].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[37].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4271,7 +4272,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[38].kMacros[0].Definition = "2";
     kMacroArray_SM2[38].kMacros[1].Name = "SI";
     kMacroArray_SM2[38].kMacros[1].Definition = "";
-    kMacroArray_SM2[38].kMacros[2].Name = 0;
+    kMacroArray_SM2[38].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[38].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4281,7 +4282,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[39].kMacros[0].Definition = "2";
     kMacroArray_SM2[39].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[39].kMacros[1].Definition = "";
-    kMacroArray_SM2[39].kMacros[2].Name = 0;
+    kMacroArray_SM2[39].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[39].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4293,7 +4294,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[40].kMacros[1].Definition = "";
     kMacroArray_SM2[40].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[40].kMacros[2].Definition = "";
-    kMacroArray_SM2[40].kMacros[3].Name = 0;
+    kMacroArray_SM2[40].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[40].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4301,7 +4302,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[41].strPath = "lighting\\2x\\p\\AD.p.hlsl";
     kMacroArray_SM2[41].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[41].kMacros[0].Definition = "3";
-    kMacroArray_SM2[41].kMacros[1].Name = 0;
+    kMacroArray_SM2[41].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[41].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4311,7 +4312,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[42].kMacros[0].Definition = "3";
     kMacroArray_SM2[42].kMacros[1].Name = "SI";
     kMacroArray_SM2[42].kMacros[1].Definition = "";
-    kMacroArray_SM2[42].kMacros[2].Name = 0;
+    kMacroArray_SM2[42].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[42].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4321,7 +4322,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[43].kMacros[0].Definition = "3";
     kMacroArray_SM2[43].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[43].kMacros[1].Definition = "";
-    kMacroArray_SM2[43].kMacros[2].Name = 0;
+    kMacroArray_SM2[43].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[43].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4333,7 +4334,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[44].kMacros[1].Definition = "";
     kMacroArray_SM2[44].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[44].kMacros[2].Definition = "";
-    kMacroArray_SM2[44].kMacros[3].Name = 0;
+    kMacroArray_SM2[44].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[44].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4341,7 +4342,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[45].strPath = "lighting\\2x\\p\\DiffusePt.p.hlsl";
     kMacroArray_SM2[45].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[45].kMacros[0].Definition = "2";
-    kMacroArray_SM2[45].kMacros[1].Name = 0;
+    kMacroArray_SM2[45].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[45].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4349,13 +4350,13 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[46].strPath = "lighting\\2x\\p\\DiffusePt.p.hlsl";
     kMacroArray_SM2[46].kMacros[0].Name = "LIGHTS";
     kMacroArray_SM2[46].kMacros[0].Definition = "3";
-    kMacroArray_SM2[46].kMacros[1].Name = 0;
+    kMacroArray_SM2[46].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[46].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM2[47].strPath = "lighting\\2x\\p\\Specular.p.hlsl";
-    kMacroArray_SM2[47].kMacros[0].Name = 0;
+    kMacroArray_SM2[47].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[47].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -4363,7 +4364,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[48].strPath = "lighting\\2x\\p\\Specular.p.hlsl";
     kMacroArray_SM2[48].kMacros[0].Name = "HAIR";
     kMacroArray_SM2[48].kMacros[0].Definition = "";
-    kMacroArray_SM2[48].kMacros[1].Name = 0;
+    kMacroArray_SM2[48].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[48].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4371,7 +4372,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[49].strPath = "lighting\\2x\\p\\Specular.p.hlsl";
     kMacroArray_SM2[49].kMacros[0].Name = "PROJ_SHADOW";
     kMacroArray_SM2[49].kMacros[0].Definition = "";
-    kMacroArray_SM2[49].kMacros[1].Name = 0;
+    kMacroArray_SM2[49].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[49].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4381,7 +4382,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[50].kMacros[0].Definition = "";
     kMacroArray_SM2[50].kMacros[1].Name = "HAIR";
     kMacroArray_SM2[50].kMacros[1].Definition = "";
-    kMacroArray_SM2[50].kMacros[2].Name = 0;
+    kMacroArray_SM2[50].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[50].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4389,7 +4390,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[51].strPath = "lighting\\2x\\p\\Specular.p.hlsl";
     kMacroArray_SM2[51].kMacros[0].Name = "POINT";
     kMacroArray_SM2[51].kMacros[0].Definition = "";
-    kMacroArray_SM2[51].kMacros[1].Name = 0;
+    kMacroArray_SM2[51].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[51].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4399,7 +4400,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[52].kMacros[0].Definition = "";
     kMacroArray_SM2[52].kMacros[1].Name = "HAIR";
     kMacroArray_SM2[52].kMacros[1].Definition = "";
-    kMacroArray_SM2[52].kMacros[2].Name = 0;
+    kMacroArray_SM2[52].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[52].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4409,7 +4410,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[53].kMacros[0].Definition = "2";
     kMacroArray_SM2[53].kMacros[1].Name = "POINT";
     kMacroArray_SM2[53].kMacros[1].Definition = "";
-    kMacroArray_SM2[53].kMacros[2].Name = 0;
+    kMacroArray_SM2[53].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[53].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4421,7 +4422,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[54].kMacros[1].Definition = "";
     kMacroArray_SM2[54].kMacros[2].Name = "HAIR";
     kMacroArray_SM2[54].kMacros[2].Definition = "";
-    kMacroArray_SM2[54].kMacros[3].Name = 0;
+    kMacroArray_SM2[54].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[54].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4431,7 +4432,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[55].kMacros[0].Definition = "3";
     kMacroArray_SM2[55].kMacros[1].Name = "POINT";
     kMacroArray_SM2[55].kMacros[1].Definition = "";
-    kMacroArray_SM2[55].kMacros[2].Name = 0;
+    kMacroArray_SM2[55].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[55].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4443,13 +4444,13 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[56].kMacros[1].Definition = "";
     kMacroArray_SM2[56].kMacros[2].Name = "HAIR";
     kMacroArray_SM2[56].kMacros[2].Definition = "";
-    kMacroArray_SM2[56].kMacros[3].Name = 0;
+    kMacroArray_SM2[56].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[56].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
     kMacroArray_SM2[57].strPath = "lighting\\2x\\p\\EnvMap.p.hlsl";
-    kMacroArray_SM2[57].kMacros[0].Name = 0;
+    kMacroArray_SM2[57].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[57].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -4457,7 +4458,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[58].strPath = "lighting\\2x\\p\\EnvMap.p.hlsl";
     kMacroArray_SM2[58].kMacros[0].Name = "WINDOW";
     kMacroArray_SM2[58].kMacros[0].Definition = "";
-    kMacroArray_SM2[58].kMacros[1].Name = 0;
+    kMacroArray_SM2[58].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[58].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4465,7 +4466,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[59].strPath = "lighting\\2x\\p\\EnvMap.p.hlsl";
     kMacroArray_SM2[59].kMacros[0].Name = "EYE";
     kMacroArray_SM2[59].kMacros[0].Definition = "";
-    kMacroArray_SM2[59].kMacros[1].Name = 0;
+    kMacroArray_SM2[59].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[59].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4473,7 +4474,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[60].strPath = "lighting\\2x\\p\\land.p.hlsl";
     kMacroArray_SM2[60].kMacros[0].Name = "PROJ_SHADOW";
     kMacroArray_SM2[60].kMacros[0].Definition = "";
-    kMacroArray_SM2[60].kMacros[1].Name = 0;
+    kMacroArray_SM2[60].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[60].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4483,7 +4484,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[61].kMacros[0].Definition = "";
     kMacroArray_SM2[61].kMacros[1].Name = "LANDALPHA";
     kMacroArray_SM2[61].kMacros[1].Definition = "";
-    kMacroArray_SM2[61].kMacros[2].Name = 0;
+    kMacroArray_SM2[61].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[61].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4493,7 +4494,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[62].kMacros[0].Definition = "";
     kMacroArray_SM2[62].kMacros[1].Name = "PTLIGHT";
     kMacroArray_SM2[62].kMacros[1].Definition = "";
-    kMacroArray_SM2[62].kMacros[2].Name = 0;
+    kMacroArray_SM2[62].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[62].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4501,12 +4502,12 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[63].strPath = "lighting\\2x\\p\\landlighting.p.hlsl";
     kMacroArray_SM2[63].kMacros[0].Name = "SPECULAR";
     kMacroArray_SM2[63].kMacros[0].Definition = "";
-    kMacroArray_SM2[63].kMacros[1].Name = 0;
+    kMacroArray_SM2[63].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[63].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
-    kMacroArray_SM2[64].strPath = 0;
+    kMacroArray_SM2[64].strPath = nullptr;
     std::memset(
         &kMacroArray_SM2[64].kMacros[0].Name, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Name)
     );
@@ -4517,7 +4518,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[65].kMacros[1].Definition = "";
     kMacroArray_SM2[65].kMacros[2].Name = "PTLIGHT";
     kMacroArray_SM2[65].kMacros[2].Definition = "";
-    kMacroArray_SM2[65].kMacros[3].Name = 0;
+    kMacroArray_SM2[65].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[65].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4527,12 +4528,12 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[66].kMacros[0].Definition = "";
     kMacroArray_SM2[66].kMacros[1].Name = "SPECULAR";
     kMacroArray_SM2[66].kMacros[1].Definition = "";
-    kMacroArray_SM2[66].kMacros[2].Name = 0;
+    kMacroArray_SM2[66].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[66].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
-    kMacroArray_SM2[67].strPath = 0;
+    kMacroArray_SM2[67].strPath = nullptr;
     std::memset(
         &kMacroArray_SM2[67].kMacros[0].Name, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Name)
     );
@@ -4541,7 +4542,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[68].kMacros[0].Definition = "";
     kMacroArray_SM2[68].kMacros[1].Name = "PROJ_SHADOW";
     kMacroArray_SM2[68].kMacros[1].Definition = "";
-    kMacroArray_SM2[68].kMacros[2].Name = 0;
+    kMacroArray_SM2[68].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[68].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4553,7 +4554,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[69].kMacros[1].Definition = "";
     kMacroArray_SM2[69].kMacros[2].Name = "PROJ_SHADOW";
     kMacroArray_SM2[69].kMacros[2].Definition = "";
-    kMacroArray_SM2[69].kMacros[3].Name = 0;
+    kMacroArray_SM2[69].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[69].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4563,7 +4564,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[70].kMacros[0].Definition = "";
     kMacroArray_SM2[70].kMacros[1].Name = "SHADOWMODE";
     kMacroArray_SM2[70].kMacros[1].Definition = "3";
-    kMacroArray_SM2[70].kMacros[2].Name = 0;
+    kMacroArray_SM2[70].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[70].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4575,7 +4576,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[71].kMacros[1].Definition = "3";
     kMacroArray_SM2[71].kMacros[2].Name = "ALPHATEST";
     kMacroArray_SM2[71].kMacros[2].Definition = "";
-    kMacroArray_SM2[71].kMacros[3].Name = 0;
+    kMacroArray_SM2[71].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[71].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4587,7 +4588,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[72].kMacros[1].Definition = "3";
     kMacroArray_SM2[72].kMacros[2].Name = "SKIN";
     kMacroArray_SM2[72].kMacros[2].Definition = "";
-    kMacroArray_SM2[72].kMacros[3].Name = 0;
+    kMacroArray_SM2[72].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[72].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4601,28 +4602,28 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[73].kMacros[2].Definition = "";
     kMacroArray_SM2[73].kMacros[3].Name = "ALPHATEST";
     kMacroArray_SM2[73].kMacros[3].Definition = "";
-    kMacroArray_SM2[73].kMacros[4].Name = 0;
-    kMacroArray_SM2[73].kMacros[4].Definition = 0;
-    kMacroArray_SM2[73].kMacros[5].Name = 0;
-    kMacroArray_SM2[73].kMacros[5].Definition = 0;
-    kMacroArray_SM2[73].kMacros[6].Name = 0;
-    kMacroArray_SM2[73].kMacros[6].Definition = 0;
-    kMacroArray_SM2[73].kMacros[7].Name = 0;
-    kMacroArray_SM2[73].kMacros[7].Definition = 0;
-    kMacroArray_SM2[73].kMacros[8].Name = 0;
-    kMacroArray_SM2[73].kMacros[8].Definition = 0;
+    kMacroArray_SM2[73].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[73].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[73].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[73].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[73].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[73].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[73].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[73].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[73].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[73].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[74].strPath = "lighting\\2x\\p\\depthmap.p.hlsl";
     kMacroArray_SM2[74].kMacros[0].Name = "DEPTHMAP";
     kMacroArray_SM2[74].kMacros[0].Definition = "";
     kMacroArray_SM2[74].kMacros[1].Name = "WATERDEPTH";
     kMacroArray_SM2[74].kMacros[1].Definition = "";
-    kMacroArray_SM2[74].kMacros[2].Name = 0;
+    kMacroArray_SM2[74].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[74].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     kMacroArray_SM2[75].strPath = "lighting\\2x\\p\\renderNormals.p.hlsl";
-    kMacroArray_SM2[75].kMacros[0].Name = 0;
+    kMacroArray_SM2[75].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[75].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -4630,7 +4631,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[76].strPath = "lighting\\2x\\p\\renderNormals.p.hlsl";
     kMacroArray_SM2[76].kMacros[0].Name = "FIRE";
     kMacroArray_SM2[76].kMacros[0].Definition = "";
-    kMacroArray_SM2[76].kMacros[1].Name = 0;
+    kMacroArray_SM2[76].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[76].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4638,25 +4639,25 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[77].strPath = "lighting\\2x\\p\\renderNormals.p.hlsl";
     kMacroArray_SM2[77].kMacros[0].Name = "CLEAR";
     kMacroArray_SM2[77].kMacros[0].Definition = "";
-    kMacroArray_SM2[77].kMacros[1].Name = 0;
+    kMacroArray_SM2[77].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[77].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM2[78].strPath = "lighting\\2x\\p\\renderDepth.p.hlsl";
-    kMacroArray_SM2[78].kMacros[0].Name = 0;
+    kMacroArray_SM2[78].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[78].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray_SM2[79].strPath = "lighting\\2x\\p\\renderVelocity.p.hlsl";
-    kMacroArray_SM2[79].kMacros[0].Name = 0;
+    kMacroArray_SM2[79].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[79].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray_SM2[80].strPath = "lighting\\2x\\p\\land.p.hlsl";
-    kMacroArray_SM2[80].kMacros[0].Name = 0;
+    kMacroArray_SM2[80].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[80].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -4664,7 +4665,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[81].strPath = "lighting\\2x\\p\\land.p.hlsl";
     kMacroArray_SM2[81].kMacros[0].Name = "LANDALPHA";
     kMacroArray_SM2[81].kMacros[0].Definition = "";
-    kMacroArray_SM2[81].kMacros[1].Name = 0;
+    kMacroArray_SM2[81].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[81].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4674,7 +4675,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[82].kMacros[0].Definition = "";
     kMacroArray_SM2[82].kMacros[1].Name = "FOG";
     kMacroArray_SM2[82].kMacros[1].Definition = "";
-    kMacroArray_SM2[82].kMacros[2].Name = 0;
+    kMacroArray_SM2[82].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[82].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4682,7 +4683,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[83].strPath = "lighting\\2x\\p\\land.p.hlsl";
     kMacroArray_SM2[83].kMacros[0].Name = "SI";
     kMacroArray_SM2[83].kMacros[0].Definition = "";
-    kMacroArray_SM2[83].kMacros[1].Name = 0;
+    kMacroArray_SM2[83].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[83].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4692,7 +4693,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[84].kMacros[0].Definition = "";
     kMacroArray_SM2[84].kMacros[1].Name = "SI";
     kMacroArray_SM2[84].kMacros[1].Definition = "";
-    kMacroArray_SM2[84].kMacros[2].Name = 0;
+    kMacroArray_SM2[84].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[84].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -4700,7 +4701,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[85].strPath = "lighting\\2x\\p\\land.p.hlsl";
     kMacroArray_SM2[85].kMacros[0].Name = "PTLIGHT";
     kMacroArray_SM2[85].kMacros[0].Definition = "";
-    kMacroArray_SM2[85].kMacros[1].Name = 0;
+    kMacroArray_SM2[85].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[85].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4710,13 +4711,13 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[86].kMacros[0].Definition = "";
     kMacroArray_SM2[86].kMacros[1].Name = "PTLIGHT";
     kMacroArray_SM2[86].kMacros[1].Definition = "";
-    kMacroArray_SM2[86].kMacros[2].Name = 0;
+    kMacroArray_SM2[86].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[86].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     kMacroArray_SM2[87].strPath = "lighting\\2x\\p\\localMap.p.hlsl";
-    kMacroArray_SM2[87].kMacros[0].Name = 0;
+    kMacroArray_SM2[87].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[87].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -4724,7 +4725,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[88].strPath = "lighting\\2x\\p\\localMap.p.hlsl";
     kMacroArray_SM2[88].kMacros[0].Name = "CLEAR";
     kMacroArray_SM2[88].kMacros[0].Definition = "";
-    kMacroArray_SM2[88].kMacros[1].Name = 0;
+    kMacroArray_SM2[88].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[88].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4732,13 +4733,13 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[89].strPath = "lighting\\1x\\p\\texEffect.p.hlsl";
     kMacroArray_SM2[89].kMacros[0].Name = "HQ";
     kMacroArray_SM2[89].kMacros[0].Definition = "";
-    kMacroArray_SM2[89].kMacros[1].Name = 0;
+    kMacroArray_SM2[89].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[89].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray_SM2[90].strPath = "lighting\\2x\\p\\WaterFog.p.hlsl";
-    kMacroArray_SM2[90].kMacros[0].Name = 0;
+    kMacroArray_SM2[90].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[90].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -4746,7 +4747,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[91].strPath = "lighting\\2x\\p\\WaterFog.p.hlsl";
     kMacroArray_SM2[91].kMacros[0].Name = "ALPHATESTING";
     kMacroArray_SM2[91].kMacros[0].Definition = "";
-    kMacroArray_SM2[91].kMacros[1].Name = 0;
+    kMacroArray_SM2[91].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[91].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -4758,7 +4759,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[92].kMacros[1].Definition = "";
     kMacroArray_SM2[92].kMacros[2].Name = "HIGHQUAL";
     kMacroArray_SM2[92].kMacros[2].Definition = "";
-    kMacroArray_SM2[92].kMacros[3].Name = 0;
+    kMacroArray_SM2[92].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[92].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4772,16 +4773,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[93].kMacros[2].Definition = "";
     kMacroArray_SM2[93].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray_SM2[93].kMacros[3].Definition = "";
-    kMacroArray_SM2[93].kMacros[4].Name = 0;
-    kMacroArray_SM2[93].kMacros[4].Definition = 0;
-    kMacroArray_SM2[93].kMacros[5].Name = 0;
-    kMacroArray_SM2[93].kMacros[5].Definition = 0;
-    kMacroArray_SM2[93].kMacros[6].Name = 0;
-    kMacroArray_SM2[93].kMacros[6].Definition = 0;
-    kMacroArray_SM2[93].kMacros[7].Name = 0;
-    kMacroArray_SM2[93].kMacros[7].Definition = 0;
-    kMacroArray_SM2[93].kMacros[8].Name = 0;
-    kMacroArray_SM2[93].kMacros[8].Definition = 0;
+    kMacroArray_SM2[93].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[93].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[93].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[93].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[93].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[93].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[93].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[93].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[93].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[93].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[94].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[94].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[94].kMacros[0].Definition = "1";
@@ -4791,16 +4792,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[94].kMacros[2].Definition = "";
     kMacroArray_SM2[94].kMacros[3].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[94].kMacros[3].Definition = "";
-    kMacroArray_SM2[94].kMacros[4].Name = 0;
-    kMacroArray_SM2[94].kMacros[4].Definition = 0;
-    kMacroArray_SM2[94].kMacros[5].Name = 0;
-    kMacroArray_SM2[94].kMacros[5].Definition = 0;
-    kMacroArray_SM2[94].kMacros[6].Name = 0;
-    kMacroArray_SM2[94].kMacros[6].Definition = 0;
-    kMacroArray_SM2[94].kMacros[7].Name = 0;
-    kMacroArray_SM2[94].kMacros[7].Definition = 0;
-    kMacroArray_SM2[94].kMacros[8].Name = 0;
-    kMacroArray_SM2[94].kMacros[8].Definition = 0;
+    kMacroArray_SM2[94].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[94].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[94].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[94].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[94].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[94].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[94].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[94].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[94].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[94].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[95].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[95].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[95].kMacros[0].Definition = "1";
@@ -4812,14 +4813,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[95].kMacros[3].Definition = "";
     kMacroArray_SM2[95].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[95].kMacros[4].Definition = "";
-    kMacroArray_SM2[95].kMacros[5].Name = 0;
-    kMacroArray_SM2[95].kMacros[5].Definition = 0;
-    kMacroArray_SM2[95].kMacros[6].Name = 0;
-    kMacroArray_SM2[95].kMacros[6].Definition = 0;
-    kMacroArray_SM2[95].kMacros[7].Name = 0;
-    kMacroArray_SM2[95].kMacros[7].Definition = 0;
-    kMacroArray_SM2[95].kMacros[8].Name = 0;
-    kMacroArray_SM2[95].kMacros[8].Definition = 0;
+    kMacroArray_SM2[95].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[95].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[95].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[95].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[95].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[95].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[95].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[95].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[96].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[96].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[96].kMacros[0].Definition = "1";
@@ -4829,16 +4830,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[96].kMacros[2].Definition = "";
     kMacroArray_SM2[96].kMacros[3].Name = "PTLIGHTS";
     kMacroArray_SM2[96].kMacros[3].Definition = "";
-    kMacroArray_SM2[96].kMacros[4].Name = 0;
-    kMacroArray_SM2[96].kMacros[4].Definition = 0;
-    kMacroArray_SM2[96].kMacros[5].Name = 0;
-    kMacroArray_SM2[96].kMacros[5].Definition = 0;
-    kMacroArray_SM2[96].kMacros[6].Name = 0;
-    kMacroArray_SM2[96].kMacros[6].Definition = 0;
-    kMacroArray_SM2[96].kMacros[7].Name = 0;
-    kMacroArray_SM2[96].kMacros[7].Definition = 0;
-    kMacroArray_SM2[96].kMacros[8].Name = 0;
-    kMacroArray_SM2[96].kMacros[8].Definition = 0;
+    kMacroArray_SM2[96].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[96].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[96].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[96].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[96].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[96].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[96].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[96].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[96].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[96].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[97].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[97].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[97].kMacros[0].Definition = "1";
@@ -4850,14 +4851,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[97].kMacros[3].Definition = "";
     kMacroArray_SM2[97].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[97].kMacros[4].Definition = "";
-    kMacroArray_SM2[97].kMacros[5].Name = 0;
-    kMacroArray_SM2[97].kMacros[5].Definition = 0;
-    kMacroArray_SM2[97].kMacros[6].Name = 0;
-    kMacroArray_SM2[97].kMacros[6].Definition = 0;
-    kMacroArray_SM2[97].kMacros[7].Name = 0;
-    kMacroArray_SM2[97].kMacros[7].Definition = 0;
-    kMacroArray_SM2[97].kMacros[8].Name = 0;
-    kMacroArray_SM2[97].kMacros[8].Definition = 0;
+    kMacroArray_SM2[97].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[97].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[97].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[97].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[97].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[97].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[97].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[97].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[98].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[98].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[98].kMacros[0].Definition = "1";
@@ -4869,14 +4870,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[98].kMacros[3].Definition = "";
     kMacroArray_SM2[98].kMacros[4].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[98].kMacros[4].Definition = "";
-    kMacroArray_SM2[98].kMacros[5].Name = 0;
-    kMacroArray_SM2[98].kMacros[5].Definition = 0;
-    kMacroArray_SM2[98].kMacros[6].Name = 0;
-    kMacroArray_SM2[98].kMacros[6].Definition = 0;
-    kMacroArray_SM2[98].kMacros[7].Name = 0;
-    kMacroArray_SM2[98].kMacros[7].Definition = 0;
-    kMacroArray_SM2[98].kMacros[8].Name = 0;
-    kMacroArray_SM2[98].kMacros[8].Definition = 0;
+    kMacroArray_SM2[98].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[98].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[98].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[98].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[98].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[98].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[98].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[98].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[99].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[99].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[100].kMacros[0].Name = "TEXCOUNT";
@@ -4891,19 +4892,19 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[99].kMacros[4].Definition = "";
     kMacroArray_SM2[99].kMacros[5].Name = "PROJ_SHADOW";
     kMacroArray_SM2[99].kMacros[5].Definition = "";
-    kMacroArray_SM2[99].kMacros[6].Name = 0;
-    kMacroArray_SM2[99].kMacros[6].Definition = 0;
-    kMacroArray_SM2[99].kMacros[7].Name = 0;
-    kMacroArray_SM2[99].kMacros[7].Definition = 0;
-    kMacroArray_SM2[99].kMacros[8].Name = 0;
-    kMacroArray_SM2[99].kMacros[8].Definition = 0;
+    kMacroArray_SM2[99].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[99].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[99].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[99].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[99].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[99].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[100].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[100].kMacros[0].Definition = "2";
     kMacroArray_SM2[100].kMacros[1].Name = "FOG";
     kMacroArray_SM2[100].kMacros[1].Definition = "";
     kMacroArray_SM2[100].kMacros[2].Name = "HIGHQUAL";
     kMacroArray_SM2[100].kMacros[2].Definition = "";
-    kMacroArray_SM2[100].kMacros[3].Name = 0;
+    kMacroArray_SM2[100].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[100].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -4917,16 +4918,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[101].kMacros[2].Definition = "";
     kMacroArray_SM2[101].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray_SM2[101].kMacros[3].Definition = "";
-    kMacroArray_SM2[101].kMacros[4].Name = 0;
-    kMacroArray_SM2[101].kMacros[4].Definition = 0;
-    kMacroArray_SM2[101].kMacros[5].Name = 0;
-    kMacroArray_SM2[101].kMacros[5].Definition = 0;
-    kMacroArray_SM2[101].kMacros[6].Name = 0;
-    kMacroArray_SM2[101].kMacros[6].Definition = 0;
-    kMacroArray_SM2[101].kMacros[7].Name = 0;
-    kMacroArray_SM2[101].kMacros[7].Definition = 0;
-    kMacroArray_SM2[101].kMacros[8].Name = 0;
-    kMacroArray_SM2[101].kMacros[8].Definition = 0;
+    kMacroArray_SM2[101].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[101].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[101].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[101].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[101].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[101].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[101].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[101].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[101].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[101].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[102].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[102].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[102].kMacros[0].Definition = "2";
@@ -4936,16 +4937,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[102].kMacros[2].Definition = "";
     kMacroArray_SM2[102].kMacros[3].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[102].kMacros[3].Definition = "";
-    kMacroArray_SM2[102].kMacros[4].Name = 0;
-    kMacroArray_SM2[102].kMacros[4].Definition = 0;
-    kMacroArray_SM2[102].kMacros[5].Name = 0;
-    kMacroArray_SM2[102].kMacros[5].Definition = 0;
-    kMacroArray_SM2[102].kMacros[6].Name = 0;
-    kMacroArray_SM2[102].kMacros[6].Definition = 0;
-    kMacroArray_SM2[102].kMacros[7].Name = 0;
-    kMacroArray_SM2[102].kMacros[7].Definition = 0;
-    kMacroArray_SM2[102].kMacros[8].Name = 0;
-    kMacroArray_SM2[102].kMacros[8].Definition = 0;
+    kMacroArray_SM2[102].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[102].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[102].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[102].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[102].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[102].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[102].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[102].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[102].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[102].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[103].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[103].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[103].kMacros[0].Definition = "2";
@@ -4957,14 +4958,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[103].kMacros[3].Definition = "";
     kMacroArray_SM2[103].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[103].kMacros[4].Definition = "";
-    kMacroArray_SM2[103].kMacros[5].Name = 0;
-    kMacroArray_SM2[103].kMacros[5].Definition = 0;
-    kMacroArray_SM2[103].kMacros[6].Name = 0;
-    kMacroArray_SM2[103].kMacros[6].Definition = 0;
-    kMacroArray_SM2[103].kMacros[7].Name = 0;
-    kMacroArray_SM2[103].kMacros[7].Definition = 0;
-    kMacroArray_SM2[103].kMacros[8].Name = 0;
-    kMacroArray_SM2[103].kMacros[8].Definition = 0;
+    kMacroArray_SM2[103].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[103].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[103].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[103].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[103].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[103].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[103].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[103].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[104].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[104].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[104].kMacros[0].Definition = "2";
@@ -4974,16 +4975,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[104].kMacros[2].Definition = "";
     kMacroArray_SM2[104].kMacros[3].Name = "PTLIGHTS";
     kMacroArray_SM2[104].kMacros[3].Definition = "";
-    kMacroArray_SM2[104].kMacros[4].Name = 0;
-    kMacroArray_SM2[104].kMacros[4].Definition = 0;
-    kMacroArray_SM2[104].kMacros[5].Name = 0;
-    kMacroArray_SM2[104].kMacros[5].Definition = 0;
-    kMacroArray_SM2[104].kMacros[6].Name = 0;
-    kMacroArray_SM2[104].kMacros[6].Definition = 0;
-    kMacroArray_SM2[104].kMacros[7].Name = 0;
-    kMacroArray_SM2[104].kMacros[7].Definition = 0;
-    kMacroArray_SM2[104].kMacros[8].Name = 0;
-    kMacroArray_SM2[104].kMacros[8].Definition = 0;
+    kMacroArray_SM2[104].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[104].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[104].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[104].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[104].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[104].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[104].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[104].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[104].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[104].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[105].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[105].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[105].kMacros[0].Definition = "2";
@@ -4995,14 +4996,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[105].kMacros[3].Definition = "";
     kMacroArray_SM2[105].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[105].kMacros[4].Definition = "";
-    kMacroArray_SM2[105].kMacros[5].Name = 0;
-    kMacroArray_SM2[105].kMacros[5].Definition = 0;
-    kMacroArray_SM2[105].kMacros[6].Name = 0;
-    kMacroArray_SM2[105].kMacros[6].Definition = 0;
-    kMacroArray_SM2[105].kMacros[7].Name = 0;
-    kMacroArray_SM2[105].kMacros[7].Definition = 0;
-    kMacroArray_SM2[105].kMacros[8].Name = 0;
-    kMacroArray_SM2[105].kMacros[8].Definition = 0;
+    kMacroArray_SM2[105].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[105].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[105].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[105].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[105].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[105].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[105].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[105].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[106].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[106].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[106].kMacros[0].Definition = "2";
@@ -5014,14 +5015,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[106].kMacros[3].Definition = "";
     kMacroArray_SM2[106].kMacros[4].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[106].kMacros[4].Definition = "";
-    kMacroArray_SM2[106].kMacros[5].Name = 0;
-    kMacroArray_SM2[106].kMacros[5].Definition = 0;
-    kMacroArray_SM2[106].kMacros[6].Name = 0;
-    kMacroArray_SM2[106].kMacros[6].Definition = 0;
-    kMacroArray_SM2[106].kMacros[7].Name = 0;
-    kMacroArray_SM2[106].kMacros[7].Definition = 0;
-    kMacroArray_SM2[106].kMacros[8].Name = 0;
-    kMacroArray_SM2[106].kMacros[8].Definition = 0;
+    kMacroArray_SM2[106].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[106].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[106].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[106].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[106].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[106].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[106].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[106].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[107].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[107].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[107].kMacros[0].Definition = "2";
@@ -5035,20 +5036,20 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[107].kMacros[4].Definition = "";
     kMacroArray_SM2[107].kMacros[5].Name = "PROJ_SHADOW";
     kMacroArray_SM2[107].kMacros[5].Definition = "";
-    kMacroArray_SM2[107].kMacros[6].Name = 0;
+    kMacroArray_SM2[107].kMacros[6].Name = nullptr;
     kMacroArray_SM2[108].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
-    kMacroArray_SM2[107].kMacros[6].Definition = 0;
-    kMacroArray_SM2[107].kMacros[7].Name = 0;
-    kMacroArray_SM2[107].kMacros[7].Definition = 0;
-    kMacroArray_SM2[107].kMacros[8].Name = 0;
-    kMacroArray_SM2[107].kMacros[8].Definition = 0;
+    kMacroArray_SM2[107].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[107].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[107].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[107].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[107].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[108].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[108].kMacros[0].Definition = "3";
     kMacroArray_SM2[108].kMacros[1].Name = "FOG";
     kMacroArray_SM2[108].kMacros[1].Definition = "";
     kMacroArray_SM2[108].kMacros[2].Name = "HIGHQUAL";
     kMacroArray_SM2[108].kMacros[2].Definition = "";
-    kMacroArray_SM2[108].kMacros[3].Name = 0;
+    kMacroArray_SM2[108].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[108].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -5062,16 +5063,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[109].kMacros[2].Definition = "";
     kMacroArray_SM2[109].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray_SM2[109].kMacros[3].Definition = "";
-    kMacroArray_SM2[109].kMacros[4].Name = 0;
-    kMacroArray_SM2[109].kMacros[4].Definition = 0;
-    kMacroArray_SM2[109].kMacros[5].Name = 0;
-    kMacroArray_SM2[109].kMacros[5].Definition = 0;
-    kMacroArray_SM2[109].kMacros[6].Name = 0;
-    kMacroArray_SM2[109].kMacros[6].Definition = 0;
-    kMacroArray_SM2[109].kMacros[7].Name = 0;
-    kMacroArray_SM2[109].kMacros[7].Definition = 0;
-    kMacroArray_SM2[109].kMacros[8].Name = 0;
-    kMacroArray_SM2[109].kMacros[8].Definition = 0;
+    kMacroArray_SM2[109].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[109].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[109].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[109].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[109].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[109].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[109].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[109].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[109].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[109].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[110].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[110].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[110].kMacros[0].Definition = "3";
@@ -5081,16 +5082,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[110].kMacros[2].Definition = "";
     kMacroArray_SM2[110].kMacros[3].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[110].kMacros[3].Definition = "";
-    kMacroArray_SM2[110].kMacros[4].Name = 0;
-    kMacroArray_SM2[110].kMacros[4].Definition = 0;
-    kMacroArray_SM2[110].kMacros[5].Name = 0;
-    kMacroArray_SM2[110].kMacros[5].Definition = 0;
-    kMacroArray_SM2[110].kMacros[6].Name = 0;
-    kMacroArray_SM2[110].kMacros[6].Definition = 0;
-    kMacroArray_SM2[110].kMacros[7].Name = 0;
-    kMacroArray_SM2[110].kMacros[7].Definition = 0;
-    kMacroArray_SM2[110].kMacros[8].Name = 0;
-    kMacroArray_SM2[110].kMacros[8].Definition = 0;
+    kMacroArray_SM2[110].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[110].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[110].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[110].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[110].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[110].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[110].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[110].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[110].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[110].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[111].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[111].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[111].kMacros[0].Definition = "3";
@@ -5102,14 +5103,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[111].kMacros[3].Definition = "";
     kMacroArray_SM2[111].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[111].kMacros[4].Definition = "";
-    kMacroArray_SM2[111].kMacros[5].Name = 0;
-    kMacroArray_SM2[111].kMacros[5].Definition = 0;
-    kMacroArray_SM2[111].kMacros[6].Name = 0;
-    kMacroArray_SM2[111].kMacros[6].Definition = 0;
-    kMacroArray_SM2[111].kMacros[7].Name = 0;
-    kMacroArray_SM2[111].kMacros[7].Definition = 0;
-    kMacroArray_SM2[111].kMacros[8].Name = 0;
-    kMacroArray_SM2[111].kMacros[8].Definition = 0;
+    kMacroArray_SM2[111].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[111].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[111].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[111].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[111].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[111].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[111].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[111].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[112].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[112].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[112].kMacros[0].Definition = "3";
@@ -5119,16 +5120,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[112].kMacros[2].Definition = "";
     kMacroArray_SM2[112].kMacros[3].Name = "PTLIGHTS";
     kMacroArray_SM2[112].kMacros[3].Definition = "";
-    kMacroArray_SM2[112].kMacros[4].Name = 0;
-    kMacroArray_SM2[112].kMacros[4].Definition = 0;
-    kMacroArray_SM2[112].kMacros[5].Name = 0;
-    kMacroArray_SM2[112].kMacros[5].Definition = 0;
-    kMacroArray_SM2[112].kMacros[6].Name = 0;
-    kMacroArray_SM2[112].kMacros[6].Definition = 0;
-    kMacroArray_SM2[112].kMacros[7].Name = 0;
-    kMacroArray_SM2[112].kMacros[7].Definition = 0;
-    kMacroArray_SM2[112].kMacros[8].Name = 0;
-    kMacroArray_SM2[112].kMacros[8].Definition = 0;
+    kMacroArray_SM2[112].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[112].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[112].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[112].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[112].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[112].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[112].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[112].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[112].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[112].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[113].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[113].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[113].kMacros[0].Definition = "3";
@@ -5140,14 +5141,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[113].kMacros[3].Definition = "";
     kMacroArray_SM2[113].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[113].kMacros[4].Definition = "";
-    kMacroArray_SM2[113].kMacros[5].Name = 0;
-    kMacroArray_SM2[113].kMacros[5].Definition = 0;
-    kMacroArray_SM2[113].kMacros[6].Name = 0;
-    kMacroArray_SM2[113].kMacros[6].Definition = 0;
-    kMacroArray_SM2[113].kMacros[7].Name = 0;
-    kMacroArray_SM2[113].kMacros[7].Definition = 0;
-    kMacroArray_SM2[113].kMacros[8].Name = 0;
-    kMacroArray_SM2[113].kMacros[8].Definition = 0;
+    kMacroArray_SM2[113].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[113].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[113].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[113].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[113].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[113].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[113].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[113].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[114].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[114].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[114].kMacros[0].Definition = "3";
@@ -5159,14 +5160,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[114].kMacros[3].Definition = "";
     kMacroArray_SM2[114].kMacros[4].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[114].kMacros[4].Definition = "";
-    kMacroArray_SM2[114].kMacros[5].Name = 0;
-    kMacroArray_SM2[114].kMacros[5].Definition = 0;
-    kMacroArray_SM2[114].kMacros[6].Name = 0;
-    kMacroArray_SM2[114].kMacros[6].Definition = 0;
-    kMacroArray_SM2[114].kMacros[7].Name = 0;
-    kMacroArray_SM2[114].kMacros[7].Definition = 0;
-    kMacroArray_SM2[114].kMacros[8].Name = 0;
-    kMacroArray_SM2[114].kMacros[8].Definition = 0;
+    kMacroArray_SM2[114].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[114].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[114].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[114].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[114].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[114].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[114].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[114].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[115].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[115].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[115].kMacros[0].Definition = "3";
@@ -5180,12 +5181,12 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[115].kMacros[4].Definition = "";
     kMacroArray_SM2[115].kMacros[5].Name = "PROJ_SHADOW";
     kMacroArray_SM2[115].kMacros[5].Definition = "";
-    kMacroArray_SM2[115].kMacros[6].Name = 0;
-    kMacroArray_SM2[115].kMacros[6].Definition = 0;
-    kMacroArray_SM2[115].kMacros[7].Name = 0;
-    kMacroArray_SM2[115].kMacros[7].Definition = 0;
-    kMacroArray_SM2[115].kMacros[8].Name = 0;
-    kMacroArray_SM2[115].kMacros[8].Definition = 0;
+    kMacroArray_SM2[115].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[115].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[115].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[115].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[115].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[115].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[116].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[116].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[116].kMacros[0].Definition = "4";
@@ -5193,7 +5194,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[116].kMacros[1].Definition = "";
     kMacroArray_SM2[116].kMacros[2].Name = "HIGHQUAL";
     kMacroArray_SM2[116].kMacros[2].Definition = "";
-    kMacroArray_SM2[116].kMacros[3].Name = 0;
+    kMacroArray_SM2[116].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[116].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -5207,16 +5208,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[117].kMacros[2].Definition = "";
     kMacroArray_SM2[117].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray_SM2[117].kMacros[3].Definition = "";
-    kMacroArray_SM2[117].kMacros[4].Name = 0;
-    kMacroArray_SM2[117].kMacros[4].Definition = 0;
-    kMacroArray_SM2[117].kMacros[5].Name = 0;
-    kMacroArray_SM2[117].kMacros[5].Definition = 0;
-    kMacroArray_SM2[117].kMacros[6].Name = 0;
-    kMacroArray_SM2[117].kMacros[6].Definition = 0;
-    kMacroArray_SM2[117].kMacros[7].Name = 0;
-    kMacroArray_SM2[117].kMacros[7].Definition = 0;
-    kMacroArray_SM2[117].kMacros[8].Name = 0;
-    kMacroArray_SM2[117].kMacros[8].Definition = 0;
+    kMacroArray_SM2[117].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[117].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[117].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[117].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[117].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[117].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[117].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[117].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[117].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[117].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[118].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[118].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[118].kMacros[0].Definition = "4";
@@ -5226,16 +5227,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[118].kMacros[2].Definition = "";
     kMacroArray_SM2[118].kMacros[3].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[118].kMacros[3].Definition = "";
-    kMacroArray_SM2[118].kMacros[4].Name = 0;
-    kMacroArray_SM2[118].kMacros[4].Definition = 0;
-    kMacroArray_SM2[118].kMacros[5].Name = 0;
-    kMacroArray_SM2[118].kMacros[5].Definition = 0;
-    kMacroArray_SM2[118].kMacros[6].Name = 0;
-    kMacroArray_SM2[118].kMacros[6].Definition = 0;
-    kMacroArray_SM2[118].kMacros[7].Name = 0;
-    kMacroArray_SM2[118].kMacros[7].Definition = 0;
-    kMacroArray_SM2[118].kMacros[8].Name = 0;
-    kMacroArray_SM2[118].kMacros[8].Definition = 0;
+    kMacroArray_SM2[118].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[118].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[118].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[118].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[118].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[118].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[118].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[118].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[118].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[118].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[119].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[119].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[119].kMacros[0].Definition = "4";
@@ -5247,14 +5248,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[119].kMacros[3].Definition = "";
     kMacroArray_SM2[119].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[119].kMacros[4].Definition = "";
-    kMacroArray_SM2[119].kMacros[5].Name = 0;
-    kMacroArray_SM2[119].kMacros[5].Definition = 0;
-    kMacroArray_SM2[119].kMacros[6].Name = 0;
-    kMacroArray_SM2[119].kMacros[6].Definition = 0;
-    kMacroArray_SM2[119].kMacros[7].Name = 0;
-    kMacroArray_SM2[119].kMacros[7].Definition = 0;
-    kMacroArray_SM2[119].kMacros[8].Name = 0;
-    kMacroArray_SM2[119].kMacros[8].Definition = 0;
+    kMacroArray_SM2[119].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[119].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[119].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[119].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[119].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[119].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[119].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[119].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[120].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[120].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[120].kMacros[0].Definition = "4";
@@ -5264,20 +5265,20 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[120].kMacros[2].Definition = "";
     kMacroArray_SM2[120].kMacros[3].Name = "PTLIGHTS";
     kMacroArray_SM2[120].kMacros[3].Definition = "";
-    kMacroArray_SM2[120].kMacros[4].Name = 0;
-    kMacroArray_SM2[120].kMacros[4].Definition = 0;
-    kMacroArray_SM2[120].kMacros[5].Name = 0;
-    kMacroArray_SM2[120].kMacros[5].Definition = 0;
-    kMacroArray_SM2[120].kMacros[6].Name = 0;
-    kMacroArray_SM2[120].kMacros[6].Definition = 0;
-    kMacroArray_SM2[120].kMacros[7].Name = 0;
+    kMacroArray_SM2[120].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[120].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[120].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[120].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[120].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[120].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[120].kMacros[7].Name = nullptr;
     kMacroArray_SM2[121].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[122].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[123].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[124].kMacros[0].Name = "TEXCOUNT";
-    kMacroArray_SM2[120].kMacros[7].Definition = 0;
-    kMacroArray_SM2[120].kMacros[8].Name = 0;
-    kMacroArray_SM2[120].kMacros[8].Definition = 0;
+    kMacroArray_SM2[120].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[120].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[120].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[121].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[121].kMacros[0].Definition = "4";
     kMacroArray_SM2[121].kMacros[1].Name = "FOG";
@@ -5288,14 +5289,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[121].kMacros[3].Definition = "";
     kMacroArray_SM2[121].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[121].kMacros[4].Definition = "";
-    kMacroArray_SM2[121].kMacros[5].Name = 0;
-    kMacroArray_SM2[121].kMacros[5].Definition = 0;
-    kMacroArray_SM2[121].kMacros[6].Name = 0;
-    kMacroArray_SM2[121].kMacros[6].Definition = 0;
-    kMacroArray_SM2[121].kMacros[7].Name = 0;
-    kMacroArray_SM2[121].kMacros[7].Definition = 0;
-    kMacroArray_SM2[121].kMacros[8].Name = 0;
-    kMacroArray_SM2[121].kMacros[8].Definition = 0;
+    kMacroArray_SM2[121].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[121].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[121].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[121].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[121].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[121].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[121].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[121].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[122].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[122].kMacros[0].Definition = "4";
     kMacroArray_SM2[122].kMacros[1].Name = "FOG";
@@ -5306,14 +5307,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[122].kMacros[3].Definition = "";
     kMacroArray_SM2[122].kMacros[4].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[122].kMacros[4].Definition = "";
-    kMacroArray_SM2[122].kMacros[5].Name = 0;
-    kMacroArray_SM2[122].kMacros[5].Definition = 0;
-    kMacroArray_SM2[122].kMacros[6].Name = 0;
-    kMacroArray_SM2[122].kMacros[6].Definition = 0;
-    kMacroArray_SM2[122].kMacros[7].Name = 0;
-    kMacroArray_SM2[122].kMacros[7].Definition = 0;
-    kMacroArray_SM2[122].kMacros[8].Name = 0;
-    kMacroArray_SM2[122].kMacros[8].Definition = 0;
+    kMacroArray_SM2[122].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[122].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[122].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[122].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[122].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[122].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[122].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[122].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[123].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[123].kMacros[0].Definition = "4";
     kMacroArray_SM2[123].kMacros[1].Name = "FOG";
@@ -5326,19 +5327,19 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[123].kMacros[4].Definition = "";
     kMacroArray_SM2[123].kMacros[5].Name = "PROJ_SHADOW";
     kMacroArray_SM2[123].kMacros[5].Definition = "";
-    kMacroArray_SM2[123].kMacros[6].Name = 0;
-    kMacroArray_SM2[123].kMacros[6].Definition = 0;
-    kMacroArray_SM2[123].kMacros[7].Name = 0;
-    kMacroArray_SM2[123].kMacros[7].Definition = 0;
-    kMacroArray_SM2[123].kMacros[8].Name = 0;
-    kMacroArray_SM2[123].kMacros[8].Definition = 0;
+    kMacroArray_SM2[123].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[123].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[123].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[123].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[123].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[123].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[124].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[124].kMacros[0].Definition = "5";
     kMacroArray_SM2[124].kMacros[1].Name = "FOG";
     kMacroArray_SM2[124].kMacros[1].Definition = "";
     kMacroArray_SM2[124].kMacros[2].Name = "HIGHQUAL";
     kMacroArray_SM2[124].kMacros[2].Definition = "";
-    kMacroArray_SM2[124].kMacros[3].Name = 0;
+    kMacroArray_SM2[124].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[124].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -5352,16 +5353,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[125].kMacros[2].Definition = "";
     kMacroArray_SM2[125].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray_SM2[125].kMacros[3].Definition = "";
-    kMacroArray_SM2[125].kMacros[4].Name = 0;
-    kMacroArray_SM2[125].kMacros[4].Definition = 0;
-    kMacroArray_SM2[125].kMacros[5].Name = 0;
-    kMacroArray_SM2[125].kMacros[5].Definition = 0;
-    kMacroArray_SM2[125].kMacros[6].Name = 0;
-    kMacroArray_SM2[125].kMacros[6].Definition = 0;
-    kMacroArray_SM2[125].kMacros[7].Name = 0;
-    kMacroArray_SM2[125].kMacros[7].Definition = 0;
-    kMacroArray_SM2[125].kMacros[8].Name = 0;
-    kMacroArray_SM2[125].kMacros[8].Definition = 0;
+    kMacroArray_SM2[125].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[125].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[125].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[125].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[125].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[125].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[125].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[125].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[125].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[125].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[126].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[126].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[126].kMacros[0].Definition = "5";
@@ -5371,16 +5372,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[126].kMacros[2].Definition = "";
     kMacroArray_SM2[126].kMacros[3].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[126].kMacros[3].Definition = "";
-    kMacroArray_SM2[126].kMacros[4].Name = 0;
-    kMacroArray_SM2[126].kMacros[4].Definition = 0;
-    kMacroArray_SM2[126].kMacros[5].Name = 0;
-    kMacroArray_SM2[126].kMacros[5].Definition = 0;
-    kMacroArray_SM2[126].kMacros[6].Name = 0;
-    kMacroArray_SM2[126].kMacros[6].Definition = 0;
-    kMacroArray_SM2[126].kMacros[7].Name = 0;
-    kMacroArray_SM2[126].kMacros[7].Definition = 0;
-    kMacroArray_SM2[126].kMacros[8].Name = 0;
-    kMacroArray_SM2[126].kMacros[8].Definition = 0;
+    kMacroArray_SM2[126].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[126].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[126].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[126].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[126].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[126].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[126].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[126].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[126].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[126].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[127].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[127].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[127].kMacros[0].Definition = "5";
@@ -5392,14 +5393,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[127].kMacros[3].Definition = "";
     kMacroArray_SM2[127].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[127].kMacros[4].Definition = "";
-    kMacroArray_SM2[127].kMacros[5].Name = 0;
-    kMacroArray_SM2[127].kMacros[5].Definition = 0;
-    kMacroArray_SM2[127].kMacros[6].Name = 0;
-    kMacroArray_SM2[127].kMacros[6].Definition = 0;
-    kMacroArray_SM2[127].kMacros[7].Name = 0;
-    kMacroArray_SM2[127].kMacros[7].Definition = 0;
-    kMacroArray_SM2[127].kMacros[8].Name = 0;
-    kMacroArray_SM2[127].kMacros[8].Definition = 0;
+    kMacroArray_SM2[127].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[127].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[127].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[127].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[127].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[127].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[127].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[127].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[128].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[128].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[128].kMacros[0].Definition = "5";
@@ -5409,16 +5410,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[128].kMacros[2].Definition = "";
     kMacroArray_SM2[128].kMacros[3].Name = "PTLIGHTS";
     kMacroArray_SM2[128].kMacros[3].Definition = "";
-    kMacroArray_SM2[128].kMacros[4].Name = 0;
-    kMacroArray_SM2[128].kMacros[4].Definition = 0;
-    kMacroArray_SM2[128].kMacros[5].Name = 0;
-    kMacroArray_SM2[128].kMacros[5].Definition = 0;
-    kMacroArray_SM2[128].kMacros[6].Name = 0;
-    kMacroArray_SM2[128].kMacros[6].Definition = 0;
-    kMacroArray_SM2[128].kMacros[7].Name = 0;
-    kMacroArray_SM2[128].kMacros[7].Definition = 0;
-    kMacroArray_SM2[128].kMacros[8].Name = 0;
-    kMacroArray_SM2[128].kMacros[8].Definition = 0;
+    kMacroArray_SM2[128].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[128].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[128].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[128].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[128].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[128].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[128].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[128].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[128].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[128].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[129].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[129].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[129].kMacros[0].Definition = "5";
@@ -5433,14 +5434,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[132].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[129].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[129].kMacros[4].Definition = "";
-    kMacroArray_SM2[129].kMacros[5].Name = 0;
-    kMacroArray_SM2[129].kMacros[5].Definition = 0;
-    kMacroArray_SM2[129].kMacros[6].Name = 0;
-    kMacroArray_SM2[129].kMacros[6].Definition = 0;
-    kMacroArray_SM2[129].kMacros[7].Name = 0;
-    kMacroArray_SM2[129].kMacros[7].Definition = 0;
-    kMacroArray_SM2[129].kMacros[8].Name = 0;
-    kMacroArray_SM2[129].kMacros[8].Definition = 0;
+    kMacroArray_SM2[129].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[129].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[129].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[129].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[129].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[129].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[129].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[129].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[130].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[130].kMacros[0].Definition = "5";
     kMacroArray_SM2[130].kMacros[1].Name = "FOG";
@@ -5451,14 +5452,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[130].kMacros[3].Definition = "";
     kMacroArray_SM2[130].kMacros[4].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[130].kMacros[4].Definition = "";
-    kMacroArray_SM2[130].kMacros[5].Name = 0;
-    kMacroArray_SM2[130].kMacros[5].Definition = 0;
-    kMacroArray_SM2[130].kMacros[6].Name = 0;
-    kMacroArray_SM2[130].kMacros[6].Definition = 0;
-    kMacroArray_SM2[130].kMacros[7].Name = 0;
-    kMacroArray_SM2[130].kMacros[7].Definition = 0;
-    kMacroArray_SM2[130].kMacros[8].Name = 0;
-    kMacroArray_SM2[130].kMacros[8].Definition = 0;
+    kMacroArray_SM2[130].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[130].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[130].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[130].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[130].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[130].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[130].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[130].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[131].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[131].kMacros[0].Definition = "5";
     kMacroArray_SM2[131].kMacros[1].Name = "FOG";
@@ -5471,19 +5472,19 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[131].kMacros[4].Definition = "";
     kMacroArray_SM2[131].kMacros[5].Name = "PROJ_SHADOW";
     kMacroArray_SM2[131].kMacros[5].Definition = "";
-    kMacroArray_SM2[131].kMacros[6].Name = 0;
-    kMacroArray_SM2[131].kMacros[6].Definition = 0;
-    kMacroArray_SM2[131].kMacros[7].Name = 0;
-    kMacroArray_SM2[131].kMacros[7].Definition = 0;
-    kMacroArray_SM2[131].kMacros[8].Name = 0;
-    kMacroArray_SM2[131].kMacros[8].Definition = 0;
+    kMacroArray_SM2[131].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[131].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[131].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[131].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[131].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[131].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[132].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[132].kMacros[0].Definition = "6";
     kMacroArray_SM2[132].kMacros[1].Name = "FOG";
     kMacroArray_SM2[132].kMacros[1].Definition = "";
     kMacroArray_SM2[132].kMacros[2].Name = "HIGHQUAL";
     kMacroArray_SM2[132].kMacros[2].Definition = "";
-    kMacroArray_SM2[132].kMacros[3].Name = 0;
+    kMacroArray_SM2[132].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[132].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -5497,16 +5498,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[133].kMacros[2].Definition = "";
     kMacroArray_SM2[133].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray_SM2[133].kMacros[3].Definition = "";
-    kMacroArray_SM2[133].kMacros[4].Name = 0;
-    kMacroArray_SM2[133].kMacros[4].Definition = 0;
-    kMacroArray_SM2[133].kMacros[5].Name = 0;
-    kMacroArray_SM2[133].kMacros[5].Definition = 0;
-    kMacroArray_SM2[133].kMacros[6].Name = 0;
-    kMacroArray_SM2[133].kMacros[6].Definition = 0;
-    kMacroArray_SM2[133].kMacros[7].Name = 0;
-    kMacroArray_SM2[133].kMacros[7].Definition = 0;
-    kMacroArray_SM2[133].kMacros[8].Name = 0;
-    kMacroArray_SM2[133].kMacros[8].Definition = 0;
+    kMacroArray_SM2[133].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[133].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[133].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[133].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[133].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[133].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[133].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[133].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[133].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[133].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[134].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[134].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[134].kMacros[0].Definition = "6";
@@ -5516,16 +5517,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[134].kMacros[2].Definition = "";
     kMacroArray_SM2[134].kMacros[3].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[134].kMacros[3].Definition = "";
-    kMacroArray_SM2[134].kMacros[4].Name = 0;
-    kMacroArray_SM2[134].kMacros[4].Definition = 0;
-    kMacroArray_SM2[134].kMacros[5].Name = 0;
-    kMacroArray_SM2[134].kMacros[5].Definition = 0;
-    kMacroArray_SM2[134].kMacros[6].Name = 0;
-    kMacroArray_SM2[134].kMacros[6].Definition = 0;
-    kMacroArray_SM2[134].kMacros[7].Name = 0;
-    kMacroArray_SM2[134].kMacros[7].Definition = 0;
-    kMacroArray_SM2[134].kMacros[8].Name = 0;
-    kMacroArray_SM2[134].kMacros[8].Definition = 0;
+    kMacroArray_SM2[134].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[134].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[134].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[134].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[134].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[134].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[134].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[134].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[134].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[134].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[135].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[135].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[135].kMacros[0].Definition = "6";
@@ -5537,14 +5538,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[135].kMacros[3].Definition = "";
     kMacroArray_SM2[135].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[135].kMacros[4].Definition = "";
-    kMacroArray_SM2[135].kMacros[5].Name = 0;
-    kMacroArray_SM2[135].kMacros[5].Definition = 0;
-    kMacroArray_SM2[135].kMacros[6].Name = 0;
-    kMacroArray_SM2[135].kMacros[6].Definition = 0;
-    kMacroArray_SM2[135].kMacros[7].Name = 0;
-    kMacroArray_SM2[135].kMacros[7].Definition = 0;
-    kMacroArray_SM2[135].kMacros[8].Name = 0;
-    kMacroArray_SM2[135].kMacros[8].Definition = 0;
+    kMacroArray_SM2[135].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[135].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[135].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[135].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[135].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[135].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[135].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[135].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[136].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[136].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[136].kMacros[0].Definition = "6";
@@ -5554,16 +5555,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[136].kMacros[2].Definition = "";
     kMacroArray_SM2[136].kMacros[3].Name = "PTLIGHTS";
     kMacroArray_SM2[136].kMacros[3].Definition = "";
-    kMacroArray_SM2[136].kMacros[4].Name = 0;
-    kMacroArray_SM2[136].kMacros[4].Definition = 0;
-    kMacroArray_SM2[136].kMacros[5].Name = 0;
-    kMacroArray_SM2[136].kMacros[5].Definition = 0;
-    kMacroArray_SM2[136].kMacros[6].Name = 0;
-    kMacroArray_SM2[136].kMacros[6].Definition = 0;
-    kMacroArray_SM2[136].kMacros[7].Name = 0;
-    kMacroArray_SM2[136].kMacros[7].Definition = 0;
-    kMacroArray_SM2[136].kMacros[8].Name = 0;
-    kMacroArray_SM2[136].kMacros[8].Definition = 0;
+    kMacroArray_SM2[136].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[136].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[136].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[136].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[136].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[136].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[136].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[136].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[136].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[136].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[137].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[137].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[137].kMacros[0].Definition = "6";
@@ -5575,14 +5576,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[137].kMacros[3].Definition = "";
     kMacroArray_SM2[137].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[137].kMacros[4].Definition = "";
-    kMacroArray_SM2[137].kMacros[5].Name = 0;
-    kMacroArray_SM2[137].kMacros[5].Definition = 0;
-    kMacroArray_SM2[137].kMacros[6].Name = 0;
-    kMacroArray_SM2[137].kMacros[6].Definition = 0;
-    kMacroArray_SM2[137].kMacros[7].Name = 0;
-    kMacroArray_SM2[137].kMacros[7].Definition = 0;
-    kMacroArray_SM2[137].kMacros[8].Name = 0;
-    kMacroArray_SM2[137].kMacros[8].Definition = 0;
+    kMacroArray_SM2[137].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[137].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[137].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[137].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[137].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[137].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[137].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[137].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[138].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[138].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[138].kMacros[0].Definition = "6";
@@ -5595,14 +5596,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[138].kMacros[3].Definition = "";
     kMacroArray_SM2[138].kMacros[4].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[138].kMacros[4].Definition = "";
-    kMacroArray_SM2[138].kMacros[5].Name = 0;
-    kMacroArray_SM2[138].kMacros[5].Definition = 0;
-    kMacroArray_SM2[138].kMacros[6].Name = 0;
-    kMacroArray_SM2[138].kMacros[6].Definition = 0;
-    kMacroArray_SM2[138].kMacros[7].Name = 0;
-    kMacroArray_SM2[138].kMacros[7].Definition = 0;
-    kMacroArray_SM2[138].kMacros[8].Name = 0;
-    kMacroArray_SM2[138].kMacros[8].Definition = 0;
+    kMacroArray_SM2[138].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[138].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[138].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[138].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[138].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[138].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[138].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[138].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[139].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[139].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[139].kMacros[1].Name = "FOG";
@@ -5615,12 +5616,12 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[139].kMacros[4].Definition = "";
     kMacroArray_SM2[139].kMacros[5].Name = "PROJ_SHADOW";
     kMacroArray_SM2[139].kMacros[5].Definition = "";
-    kMacroArray_SM2[139].kMacros[6].Name = 0;
-    kMacroArray_SM2[139].kMacros[6].Definition = 0;
-    kMacroArray_SM2[139].kMacros[7].Name = 0;
-    kMacroArray_SM2[139].kMacros[7].Definition = 0;
-    kMacroArray_SM2[139].kMacros[8].Name = 0;
-    kMacroArray_SM2[139].kMacros[8].Definition = 0;
+    kMacroArray_SM2[139].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[139].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[139].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[139].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[139].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[139].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[140].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[140].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[140].kMacros[0].Definition = "7";
@@ -5628,7 +5629,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[140].kMacros[1].Definition = "";
     kMacroArray_SM2[140].kMacros[2].Name = "HIGHQUAL";
     kMacroArray_SM2[140].kMacros[2].Definition = "";
-    kMacroArray_SM2[140].kMacros[3].Name = 0;
+    kMacroArray_SM2[140].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[140].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -5642,16 +5643,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[141].kMacros[2].Definition = "";
     kMacroArray_SM2[141].kMacros[3].Name = "PROJ_SHADOW";
     kMacroArray_SM2[141].kMacros[3].Definition = "";
-    kMacroArray_SM2[141].kMacros[4].Name = 0;
-    kMacroArray_SM2[141].kMacros[4].Definition = 0;
-    kMacroArray_SM2[141].kMacros[5].Name = 0;
-    kMacroArray_SM2[141].kMacros[5].Definition = 0;
-    kMacroArray_SM2[141].kMacros[6].Name = 0;
-    kMacroArray_SM2[141].kMacros[6].Definition = 0;
-    kMacroArray_SM2[141].kMacros[7].Name = 0;
-    kMacroArray_SM2[141].kMacros[7].Definition = 0;
-    kMacroArray_SM2[141].kMacros[8].Name = 0;
-    kMacroArray_SM2[141].kMacros[8].Definition = 0;
+    kMacroArray_SM2[141].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[141].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[141].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[141].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[141].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[141].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[141].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[141].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[141].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[141].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[142].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[142].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[142].kMacros[0].Definition = "7";
@@ -5661,16 +5662,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[142].kMacros[2].Definition = "";
     kMacroArray_SM2[142].kMacros[3].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[142].kMacros[3].Definition = "";
-    kMacroArray_SM2[142].kMacros[4].Name = 0;
-    kMacroArray_SM2[142].kMacros[4].Definition = 0;
-    kMacroArray_SM2[142].kMacros[5].Name = 0;
-    kMacroArray_SM2[142].kMacros[5].Definition = 0;
-    kMacroArray_SM2[142].kMacros[6].Name = 0;
-    kMacroArray_SM2[142].kMacros[6].Definition = 0;
-    kMacroArray_SM2[142].kMacros[7].Name = 0;
-    kMacroArray_SM2[142].kMacros[7].Definition = 0;
-    kMacroArray_SM2[142].kMacros[8].Name = 0;
-    kMacroArray_SM2[142].kMacros[8].Definition = 0;
+    kMacroArray_SM2[142].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[142].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[142].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[142].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[142].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[142].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[142].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[142].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[142].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[142].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[143].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[143].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[143].kMacros[0].Definition = "7";
@@ -5682,14 +5683,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[143].kMacros[3].Definition = "";
     kMacroArray_SM2[143].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[143].kMacros[4].Definition = "";
-    kMacroArray_SM2[143].kMacros[5].Name = 0;
-    kMacroArray_SM2[143].kMacros[5].Definition = 0;
-    kMacroArray_SM2[143].kMacros[6].Name = 0;
-    kMacroArray_SM2[143].kMacros[6].Definition = 0;
-    kMacroArray_SM2[143].kMacros[7].Name = 0;
-    kMacroArray_SM2[143].kMacros[7].Definition = 0;
-    kMacroArray_SM2[143].kMacros[8].Name = 0;
-    kMacroArray_SM2[143].kMacros[8].Definition = 0;
+    kMacroArray_SM2[143].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[143].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[143].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[143].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[143].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[143].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[143].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[143].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[144].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[144].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[144].kMacros[0].Definition = "7";
@@ -5699,16 +5700,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[144].kMacros[2].Definition = "";
     kMacroArray_SM2[144].kMacros[3].Name = "PTLIGHTS";
     kMacroArray_SM2[144].kMacros[3].Definition = "";
-    kMacroArray_SM2[144].kMacros[4].Name = 0;
-    kMacroArray_SM2[144].kMacros[4].Definition = 0;
-    kMacroArray_SM2[144].kMacros[5].Name = 0;
-    kMacroArray_SM2[144].kMacros[5].Definition = 0;
-    kMacroArray_SM2[144].kMacros[6].Name = 0;
-    kMacroArray_SM2[144].kMacros[6].Definition = 0;
-    kMacroArray_SM2[144].kMacros[7].Name = 0;
-    kMacroArray_SM2[144].kMacros[7].Definition = 0;
-    kMacroArray_SM2[144].kMacros[8].Name = 0;
-    kMacroArray_SM2[144].kMacros[8].Definition = 0;
+    kMacroArray_SM2[144].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[144].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[144].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[144].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[144].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[144].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[144].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[144].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[144].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[144].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[145].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[145].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[145].kMacros[0].Definition = "7";
@@ -5720,14 +5721,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[145].kMacros[3].Definition = "";
     kMacroArray_SM2[145].kMacros[4].Name = "PROJ_SHADOW";
     kMacroArray_SM2[145].kMacros[4].Definition = "";
-    kMacroArray_SM2[145].kMacros[5].Name = 0;
-    kMacroArray_SM2[145].kMacros[5].Definition = 0;
-    kMacroArray_SM2[145].kMacros[6].Name = 0;
-    kMacroArray_SM2[145].kMacros[6].Definition = 0;
-    kMacroArray_SM2[145].kMacros[7].Name = 0;
-    kMacroArray_SM2[145].kMacros[7].Definition = 0;
-    kMacroArray_SM2[145].kMacros[8].Name = 0;
-    kMacroArray_SM2[145].kMacros[8].Definition = 0;
+    kMacroArray_SM2[145].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[145].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[145].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[145].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[145].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[145].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[145].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[145].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[146].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[146].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[146].kMacros[0].Definition = "7";
@@ -5739,16 +5740,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[146].kMacros[3].Definition = "";
     kMacroArray_SM2[146].kMacros[4].Name = "IGNORE_NORMALS";
     kMacroArray_SM2[146].kMacros[4].Definition = "";
-    kMacroArray_SM2[146].kMacros[5].Name = 0;
-    kMacroArray_SM2[146].kMacros[5].Definition = 0;
-    kMacroArray_SM2[146].kMacros[6].Name = 0;
-    kMacroArray_SM2[146].kMacros[6].Definition = 0;
-    kMacroArray_SM2[146].kMacros[7].Name = 0;
+    kMacroArray_SM2[146].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[146].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[146].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[146].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[146].kMacros[7].Name = nullptr;
     kMacroArray_SM2[147].kMacros[0].Definition = "7";
     kMacroArray_SM2[147].kMacros[2].Name = "HIGHQUAL";
-    kMacroArray_SM2[146].kMacros[7].Definition = 0;
-    kMacroArray_SM2[146].kMacros[8].Name = 0;
-    kMacroArray_SM2[146].kMacros[8].Definition = 0;
+    kMacroArray_SM2[146].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[146].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[146].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[147].strPath = "lighting\\2x\\p\\LandO.p.hlsl";
     kMacroArray_SM2[147].kMacros[0].Name = "TEXCOUNT";
     kMacroArray_SM2[147].kMacros[1].Name = "FOG";
@@ -5760,12 +5761,12 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[147].kMacros[4].Definition = "";
     kMacroArray_SM2[147].kMacros[5].Name = "PROJ_SHADOW";
     kMacroArray_SM2[147].kMacros[5].Definition = "";
-    kMacroArray_SM2[147].kMacros[6].Name = 0;
-    kMacroArray_SM2[147].kMacros[6].Definition = 0;
-    kMacroArray_SM2[147].kMacros[7].Name = 0;
-    kMacroArray_SM2[147].kMacros[7].Definition = 0;
-    kMacroArray_SM2[147].kMacros[8].Name = 0;
-    kMacroArray_SM2[147].kMacros[8].Definition = 0;
+    kMacroArray_SM2[147].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[147].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[147].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[147].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[147].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[147].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[148].strPath = "lighting\\2x\\p\\Lando.p.hlsl";
     kMacroArray_SM2[148].kMacros[0].Name = "FOG";
     kMacroArray_SM2[148].kMacros[0].Definition = "";
@@ -5781,22 +5782,22 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[149].kMacros[2].Definition = "";
     kMacroArray_SM2[149].kMacros[3].Name = "SILHOUETTE";
     kMacroArray_SM2[149].kMacros[3].Definition = "";
-    kMacroArray_SM2[149].kMacros[4].Name = 0;
-    kMacroArray_SM2[149].kMacros[4].Definition = 0;
-    kMacroArray_SM2[149].kMacros[5].Name = 0;
-    kMacroArray_SM2[149].kMacros[5].Definition = 0;
-    kMacroArray_SM2[149].kMacros[6].Name = 0;
-    kMacroArray_SM2[149].kMacros[6].Definition = 0;
-    kMacroArray_SM2[149].kMacros[7].Name = 0;
-    kMacroArray_SM2[149].kMacros[7].Definition = 0;
-    kMacroArray_SM2[149].kMacros[8].Name = 0;
-    kMacroArray_SM2[149].kMacros[8].Definition = 0;
+    kMacroArray_SM2[149].kMacros[4].Name = nullptr;
+    kMacroArray_SM2[149].kMacros[4].Definition = nullptr;
+    kMacroArray_SM2[149].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[149].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[149].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[149].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[149].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[149].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[149].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[149].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[150].strPath = "lighting\\1x\\p\\base.p.hlsl";
     kMacroArray_SM2[150].kMacros[0].Name = "FOG";
     kMacroArray_SM2[150].kMacros[0].Definition = "";
     kMacroArray_SM2[150].kMacros[1].Name = "FOGANDAMBIENT";
     kMacroArray_SM2[150].kMacros[1].Definition = "";
-    kMacroArray_SM2[150].kMacros[2].Name = 0;
+    kMacroArray_SM2[150].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[150].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -5806,7 +5807,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[151].kMacros[0].Definition = a0_0;
     kMacroArray_SM2[151].kMacros[1].Name = "SILHOUETTE";
     kMacroArray_SM2[151].kMacros[1].Definition = "";
-    kMacroArray_SM2[151].kMacros[2].Name = 0;
+    kMacroArray_SM2[151].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[151].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -5822,14 +5823,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[152].kMacros[3].Definition = "1";
     kMacroArray_SM2[152].kMacros[4].Name = "SHADOWMODE";
     kMacroArray_SM2[152].kMacros[4].Definition = "3";
-    kMacroArray_SM2[152].kMacros[5].Name = 0;
-    kMacroArray_SM2[152].kMacros[5].Definition = 0;
-    kMacroArray_SM2[152].kMacros[6].Name = 0;
-    kMacroArray_SM2[152].kMacros[6].Definition = 0;
-    kMacroArray_SM2[152].kMacros[7].Name = 0;
-    kMacroArray_SM2[152].kMacros[7].Definition = 0;
-    kMacroArray_SM2[152].kMacros[8].Name = 0;
-    kMacroArray_SM2[152].kMacros[8].Definition = 0;
+    kMacroArray_SM2[152].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[152].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[152].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[152].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[152].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[152].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[152].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[152].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[153].strPath = "lighting\\2x\\p\\SimpleShadow.p.hlsl";
     kMacroArray_SM2[153].kMacros[0].Name = "SHADOWMAP";
     kMacroArray_SM2[153].kMacros[0].Definition = "";
@@ -5843,12 +5844,12 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[153].kMacros[4].Definition = "";
     kMacroArray_SM2[153].kMacros[5].Name = "SHADOWMODE";
     kMacroArray_SM2[153].kMacros[5].Definition = "3";
-    kMacroArray_SM2[153].kMacros[6].Name = 0;
-    kMacroArray_SM2[153].kMacros[6].Definition = 0;
-    kMacroArray_SM2[153].kMacros[7].Name = 0;
-    kMacroArray_SM2[153].kMacros[7].Definition = 0;
-    kMacroArray_SM2[153].kMacros[8].Name = 0;
-    kMacroArray_SM2[153].kMacros[8].Definition = 0;
+    kMacroArray_SM2[153].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[153].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[153].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[153].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[153].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[153].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[154].strPath = "lighting\\2x\\p\\SimpleShadow.p.hlsl";
     kMacroArray_SM2[154].kMacros[0].Name = "SHADOWMAP";
     kMacroArray_SM2[154].kMacros[0].Definition = "";
@@ -5860,14 +5861,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[154].kMacros[3].Definition = "1";
     kMacroArray_SM2[154].kMacros[4].Name = "SHADOWMODE";
     kMacroArray_SM2[154].kMacros[4].Definition = "3";
-    kMacroArray_SM2[154].kMacros[5].Name = 0;
-    kMacroArray_SM2[154].kMacros[5].Definition = 0;
-    kMacroArray_SM2[154].kMacros[6].Name = 0;
-    kMacroArray_SM2[154].kMacros[6].Definition = 0;
-    kMacroArray_SM2[154].kMacros[7].Name = 0;
-    kMacroArray_SM2[154].kMacros[7].Definition = 0;
-    kMacroArray_SM2[154].kMacros[8].Name = 0;
-    kMacroArray_SM2[154].kMacros[8].Definition = 0;
+    kMacroArray_SM2[154].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[154].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[154].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[154].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[154].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[154].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[154].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[154].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[155].strPath = "lighting\\2x\\p\\SimpleShadow.p.hlsl";
     kMacroArray_SM2[155].kMacros[0].Name = "SHADOWMAP";
     kMacroArray_SM2[155].kMacros[0].Definition = "";
@@ -5881,12 +5882,12 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[155].kMacros[4].Definition = "";
     kMacroArray_SM2[155].kMacros[5].Name = "SHADOWMODE";
     kMacroArray_SM2[155].kMacros[5].Definition = "3";
-    kMacroArray_SM2[155].kMacros[6].Name = 0;
-    kMacroArray_SM2[155].kMacros[6].Definition = 0;
-    kMacroArray_SM2[155].kMacros[7].Name = 0;
-    kMacroArray_SM2[155].kMacros[7].Definition = 0;
-    kMacroArray_SM2[155].kMacros[8].Name = 0;
-    kMacroArray_SM2[155].kMacros[8].Definition = 0;
+    kMacroArray_SM2[155].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[155].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[155].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[155].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[155].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[155].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[156].strPath = "lighting\\2x\\p\\SimpleShadow.p.hlsl";
     kMacroArray_SM2[156].kMacros[0].Name = "SHADOWMAP";
     kMacroArray_SM2[156].kMacros[0].Definition = "";
@@ -5900,14 +5901,14 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[157].kMacros[3].Name = "PASSES";
     kMacroArray_SM2[156].kMacros[3].Definition = "2";
     kMacroArray_SM2[156].kMacros[4].Name = "SHADOWMODE";
-    kMacroArray_SM2[156].kMacros[5].Name = 0;
-    kMacroArray_SM2[156].kMacros[5].Definition = 0;
-    kMacroArray_SM2[156].kMacros[6].Name = 0;
-    kMacroArray_SM2[156].kMacros[6].Definition = 0;
-    kMacroArray_SM2[156].kMacros[7].Name = 0;
-    kMacroArray_SM2[156].kMacros[7].Definition = 0;
-    kMacroArray_SM2[156].kMacros[8].Name = 0;
-    kMacroArray_SM2[156].kMacros[8].Definition = 0;
+    kMacroArray_SM2[156].kMacros[5].Name = nullptr;
+    kMacroArray_SM2[156].kMacros[5].Definition = nullptr;
+    kMacroArray_SM2[156].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[156].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[156].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[156].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[156].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[156].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[157].strPath = "lighting\\2x\\p\\SimpleShadow.p.hlsl";
     kMacroArray_SM2[157].kMacros[0].Name = "SHADOWMAP";
     kMacroArray_SM2[157].kMacros[0].Definition = "";
@@ -5919,16 +5920,16 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[157].kMacros[4].Name = "ALPHATEST";
     kMacroArray_SM2[157].kMacros[4].Definition = "";
     kMacroArray_SM2[157].kMacros[5].Name = "SHADOWMODE";
-    kMacroArray_SM2[157].kMacros[6].Name = 0;
-    kMacroArray_SM2[157].kMacros[6].Definition = 0;
-    kMacroArray_SM2[157].kMacros[7].Name = 0;
-    kMacroArray_SM2[157].kMacros[7].Definition = 0;
-    kMacroArray_SM2[157].kMacros[8].Name = 0;
-    kMacroArray_SM2[157].kMacros[8].Definition = 0;
+    kMacroArray_SM2[157].kMacros[6].Name = nullptr;
+    kMacroArray_SM2[157].kMacros[6].Definition = nullptr;
+    kMacroArray_SM2[157].kMacros[7].Name = nullptr;
+    kMacroArray_SM2[157].kMacros[7].Definition = nullptr;
+    kMacroArray_SM2[157].kMacros[8].Name = nullptr;
+    kMacroArray_SM2[157].kMacros[8].Definition = nullptr;
     kMacroArray_SM2[158].strPath = "lighting\\2x\\p\\WaterFog.p.hlsl";
     kMacroArray_SM2[158].kMacros[0].Name = "SRT_EYE";
     kMacroArray_SM2[158].kMacros[0].Definition = "";
-    kMacroArray_SM2[158].kMacros[1].Name = 0;
+    kMacroArray_SM2[158].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[158].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -5936,7 +5937,7 @@ void ShadowLightShader::LoadPixelShaders() {
     kMacroArray_SM2[159].strPath = "lighting\\2x\\p\\WaterFog.p.hlsl";
     kMacroArray_SM2[159].kMacros[0].Name = "SRT_HEIGHT";
     kMacroArray_SM2[159].kMacros[0].Definition = "";
-    kMacroArray_SM2[159].kMacros[1].Name = 0;
+    kMacroArray_SM2[159].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray_SM2[159].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -5987,7 +5988,7 @@ void ShadowLightShader::LoadPixelShaders() {
         kMacroArray_SM2[73].kMacros[1].Definition = acShadowMode;
         int32_t v7 = 0;
         BSShaderMacro* v14 = kMacroArray_SM2;
-        while (1) {
+        while (true) {
             if (v6->strPath) {
                 if (v7 <= 153 || v5 >= 5) {
                     BSShader::MakePath(v6->strPath, HLSLFile);
@@ -6013,7 +6014,7 @@ void ShadowLightShader::LoadPixelShaders() {
                 NiD3DPixelShader* v8 = ShadowLightShader::spPixelShaders[v7 + 48];
                 if (v8) {
                     NiDecRefCount(v8);
-                    ShadowLightShader::spPixelShaders[v7 + 48] = 0;
+                    ShadowLightShader::spPixelShaders[v7 + 48] = nullptr;
                 }
             }
             ++v7;
@@ -6076,7 +6077,7 @@ bool ShadowLightShader::LoadStagesAndPasses() {
         PresetTextureEffectPasses_2x();
         PresetWaterFogPasses_2x();
     }
-    return 1;
+    return true;
 }
 
 NiSourceTexture* ShadowLightShader::GetCubeMap(BSShaderPPLightingProperty* apShaderProp, uint32_t aiTextureNumber) {
@@ -6248,7 +6249,7 @@ void ShadowLightShader::SetGlowMap(
         m_pObject->m_spTexture = v6;
     }
     else {
-        m_pObject->m_spTexture = abUseDefaultOnNULL ? BSShaderManager::spDefaultHeightMap.m_pObject : (nullptr);
+        m_pObject->m_spTexture = abUseDefaultOnNULL ? BSShaderManager::spDefaultHeightMap.m_pObject : nullptr;
     }
 }
 
@@ -6298,10 +6299,10 @@ void ShadowLightShader::UpdatePipelineTexEffect(
         pTexEffectData->eSrcBlendMode, pTexEffectData->eDestBlendMode, 0, 0
     );
     NiD3DShader::m_spCurrentPass->GetD3DRenderState()->SetRenderState(
-        D3DRS_BLENDOP, pTexEffectData->eBlendOperation, 0, 0
+        D3DRS_BLENDOP, pTexEffectData->eBlendOperation, 0, false
     );
     NiD3DShader::m_spCurrentPass->GetD3DRenderState()->SetRenderState(
-        D3DRS_ZFUNC, pTexEffectData->eZTestFunction, 0, 0
+        D3DRS_ZFUNC, pTexEffectData->eZTestFunction, 0, false
     );
     UpdateTexEffectConstants(apGeometry, apBSSProp);
     ApplyTextureStages();
@@ -6423,7 +6424,7 @@ void ShadowLightShader::UpdatePipelineZOnlyTexEffect(
             v8->m_spTexture = v7;
             v9 = (int32_t)apBSSProp->GetClampNI();
             v8->SetClampMode(static_cast<NiTexturingProperty::ClampMode>(v9));
-            BSRenderState::SetAlphaTestEnable(1, BSRS_NOLOCK);
+            BSRenderState::SetAlphaTestEnable(true, BSRS_NOLOCK);
             BSRenderState::SetAlphaTestFuncRef(NiAlphaProperty::TEST_GREATER, m_pObject->iAlphaTest, BSRS_NOLOCK);
             ApplyTextureStages();
             NiD3DShader::m_spCurrentPass = v6;
@@ -6554,7 +6555,7 @@ void ShadowLightShader::SetupGeometryConstants_SimpleShadowClipPlanes(uint32_t e
             pM1._43 = -v19;
             pM2 = m_pkD3DRenderer->m_kD3DProj;
             D3DXMatrixMultiply_Thunk(&kworldtoclip, &pM1, &pM2);
-            D3DXMatrixInverse_Thunk(&kinv, 0, &kworldtoclip);
+            D3DXMatrixInverse_Thunk(&kinv, nullptr, &kworldtoclip);
             D3DXMatrixTranspose_Thunk(&kworldtoclip, &kinv);
             for (uint32_t i = 0; i < 6; ++i) {
                 const NiPlane& rPlane = pP->kShadowCameraPlanes.m_akCullingPlanes[i];
@@ -6576,14 +6577,14 @@ void ShadowLightShader::SetupGeometryConstants_SimpleShadowClipPlanes(uint32_t e
                 pRenderer->m_pkD3DDevice9->SetClipPlane(i, &afClipPlanes[i * 4]);
             }
             rt::memcpy(pP->pfClipSpacePlanes, afClipPlanes, sizeof(pP->pfClipSpacePlanes));
-            pP->bClipSpacePlanesReady = 1;
+            pP->bClipSpacePlanesReady = true;
         }
     }
 }
 
 void ShadowLightShader::SetupGeometryOpt_WorldViewProj(NiGeometry* apGeometry, const NiTransform& aWorld) {
     alignas(16) D3DXMATRIX mat;
-    m_pkD3DRenderer->SetModelTransform(aWorld, 0);
+    m_pkD3DRenderer->SetModelTransform(aWorld, false);
     D3DXMatrixMultiplyTranspose_Thunk(&mat, &m_pkD3DRenderer->m_kD3DMat, &m_pkD3DRenderer->m_kViewProj);
     NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject->m_pkD3DDevice->SetVertexShaderConstantF(0, &mat._11, 4);
 }
@@ -6599,10 +6600,10 @@ void ShadowLightShader::Setup_ADT_Opt(NiPropertyState* a1) {
     v6->m_spTexture = BSShaderPPLightingProperty::GetNormalMap(m_pObject, 0);
     NiTexturingProperty::ClampMode v7 = m_pObject->GetClampNI();
     v6->SetClampMode(v7);
-    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase->m_pObject->ConfigureStage(0);
-    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase[1].m_pObject->ConfigureStage(0);
+    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase->m_pObject->ConfigureStage(false);
+    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase[1].m_pObject->ConfigureStage(false);
     NiGeometry* pGeometry = BSShaderManager::pCurrentRenderPass->pGeometry;
-    BSUtilities::GetInverseWorldMatrix(BSShaderManager::pCurrentRenderPass->pGeometry->m_kWorld, 0, a1a);
+    BSUtilities::GetInverseWorldMatrix(BSShaderManager::pCurrentRenderPass->pGeometry->m_kWorld, nullptr, a1a);
     SetupGeometryOpt_WorldViewProj(pGeometry, pGeometry->m_kWorld);
     SetLightDirection(&a1a);
 }
@@ -6618,10 +6619,10 @@ void ShadowLightShader::Setup_ADT4_Opt(NiPropertyState* a1) {
     v6->m_spTexture = BSShaderPPLightingProperty::GetNormalMap(m_pObject, 0);
     NiTexturingProperty::ClampMode v7 = m_pObject->GetClampNI();
     v6->SetClampMode(v7);
-    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase->m_pObject->ConfigureStage(0);
-    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase[1].m_pObject->ConfigureStage(0);
+    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase->m_pObject->ConfigureStage(false);
+    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase[1].m_pObject->ConfigureStage(false);
     NiGeometry* pGeometry = BSShaderManager::pCurrentRenderPass->pGeometry;
-    BSUtilities::GetInverseWorldMatrix(BSShaderManager::pCurrentRenderPass->pGeometry->m_kWorld, 0, pM);
+    BSUtilities::GetInverseWorldMatrix(BSShaderManager::pCurrentRenderPass->pGeometry->m_kWorld, nullptr, pM);
     SetupGeometryOpt_WorldViewProj(pGeometry, pGeometry->m_kWorld);
     SetupGeometryOpt_Lights(pM, pGeometry->m_kWorld.m_fScale);
     NiD3DShaderConstantMap* v9 = m_spPixelConstantMap.m_pObject;
@@ -6630,7 +6631,8 @@ void ShadowLightShader::Setup_ADT4_Opt(NiPropertyState* a1) {
             NiBound v10;
             NiTransform v12;
             v9->SetShaderConstants(
-                NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject, 0, 0, 0, 0, 0, 0, v12, v10, 0, 1
+                NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject, nullptr, nullptr, nullptr, nullptr, nullptr,
+                nullptr, v12, v10, 0, true
             );
         }
     }
@@ -6682,7 +6684,7 @@ void ShadowLightShader::SetupGeometryConstants_Lights(
         float v15;
         float v16;
         float v17;
-        while (1) {
+        while (true) {
             ShadowSceneLight* psslight;
             uint16_t v12;
             if (i >= 10u) {
@@ -6907,7 +6909,7 @@ void ShadowLightShader::SetupGeometryConstants_LODLandParams(
                 fTime = BSMAX(static_cast<float>(0.0), fTime);
                 fTime = BSMIN(static_cast<float>(1.0), fTime);
                 if (1.0 == fTime) {
-                    BSShaderManager::bLODFadeInProgress = 0;
+                    BSShaderManager::bLODFadeInProgress = false;
                 }
                 BSShaderLightingProperty::kLODLandParams.x = pprop->LandBlendParamsA.X();
                 BSShaderLightingProperty::kLODLandParams.y = pprop->LandBlendParamsA.Y();
@@ -7072,7 +7074,7 @@ void ShadowLightShader::SetupGeometryConstants_Toggles(
             );
         }
         else {
-            UpdateTogglesConstantLand(pgeometry, 0, pprop, 0);
+            UpdateTogglesConstantLand(pgeometry, nullptr, pprop, 0);
         }
         double v10 = 0.0;
         if (apRenderPass) {
@@ -7287,7 +7289,7 @@ void ShadowLightShader::SetParallaxTexture(BSShaderPPLightingProperty* a1, int32
         m_pObject->m_spTexture = a1->GetTexture(BSShaderProperty::TEXTYPE_HEIGHT, a3);
     }
     else {
-        m_pObject->m_spTexture = a4 != 0 ? BSShaderManager::spDefaultHeightMap.m_pObject : 0;
+        m_pObject->m_spTexture = a4 != 0 ? BSShaderManager::spDefaultHeightMap.m_pObject : nullptr;
     }
 }
 
@@ -7313,7 +7315,7 @@ void ShadowLightShader::SetupGeometryOpt_Lights(_D3DMATRIX& aInvworld, float afW
     uint8_t i = 1;
     if (ucNumLights > 1u) {
         float v16 = static_cast<double>(ucNumLights) - 1.0;
-        while (1) {
+        while (true) {
             NiColor v30;
             ShadowSceneLight* psslLight = v3->ppSceneLights[i];
             NiLight* m_pObject = psslLight->spLight.m_pObject;
@@ -7328,7 +7330,7 @@ void ShadowLightShader::SetupGeometryOpt_Lights(_D3DMATRIX& aInvworld, float afW
             vLightPos.x = vLightPos.x + x;
             vLightPos.y = vLightPos.y + y;
             vLightPos.z = vLightPos.z + z;
-            D3DXVec3TransformCoord_Thunk(&vLightObjectPos, &vLightPos, static_cast<_D3DMATRIX*>(&aInvworld));
+            D3DXVec3TransformCoord_Thunk(&vLightObjectPos, &vLightPos, (&aInvworld));
             NiD3DPass* v9 = NiD3DShader::m_spCurrentPass;
             int32_t i_2 = i;
             float v17 = m_pObject->m_kSpec.r / afWorldScale;
@@ -7422,7 +7424,7 @@ void ShadowLightShader::SetupGeometryOpt_LightsSpecular(
             vLightPos.x = vLightPos.x + x;
             vLightPos.y = vLightPos.y + y;
             vLightPos.z = vLightPos.z + z;
-            D3DXVec3TransformCoord_Thunk(&vLightObjectPos, &vLightPos, static_cast<_D3DMATRIX*>(&aInvworld));
+            D3DXVec3TransformCoord_Thunk(&vLightObjectPos, &vLightPos, (&aInvworld));
             NiD3DPass* v12 = NiD3DShader::m_spCurrentPass;
             int32_t i_2 = i;
             float fRadius = m_pObject->m_kSpec.r / afWorldScale;
@@ -7466,7 +7468,7 @@ void ShadowLightShader::SetupGeometryOpt_LightsSpecular(
 }
 
 void ShadowLightShader::SetupPass_ADT_Opt() {
-    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase[5].m_pObject->ConfigureStage(0);
+    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase[5].m_pObject->ConfigureStage(false);
     SetupPassOpt_FogConstants();
     ShadowLightShader::spVertexConstantMapEntries[6]->m_uiRegisterCount = 1;
     ShadowLightShader::spPixelConstantMapEntries[2]->m_uiRegisterCount = 1;
@@ -7479,7 +7481,8 @@ void ShadowLightShader::SetupPass_ADT_Opt() {
             NiBound v3;
             NiTransform v4;
             m_pObject->SetShaderConstants(
-                NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject, 0, 0, 0, 0, 0, 0, v4, v3, 0, 1
+                NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject, nullptr, nullptr, nullptr, nullptr, nullptr,
+                nullptr, v4, v3, 0, true
             );
         }
     }
@@ -7497,11 +7500,11 @@ void ShadowLightShader::Setup_ADTS10_Opt(NiPropertyState* a2) {
     v6->m_spTexture = (NiTexture*)BSShaderPPLightingProperty::GetNormalMap(m_pObject, 0);
     NiTexturingProperty::ClampMode v7 = m_pObject->GetClampNI();
     v6->SetClampMode(v7);
-    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase->m_pObject->ConfigureStage(0);
-    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase[1].m_pObject->ConfigureStage(0);
+    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase->m_pObject->ConfigureStage(false);
+    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase[1].m_pObject->ConfigureStage(false);
     BSShaderProperty::RenderPass* v8 = BSShaderManager::pCurrentRenderPass;
     NiGeometry* pGeometry = BSShaderManager::pCurrentRenderPass->pGeometry;
-    BSUtilities::GetInverseWorldMatrix(BSShaderManager::pCurrentRenderPass->pGeometry->m_kWorld, 0, pM);
+    BSUtilities::GetInverseWorldMatrix(BSShaderManager::pCurrentRenderPass->pGeometry->m_kWorld, nullptr, pM);
     SetupGeometryOpt_WorldViewProj(pGeometry, pGeometry->m_kWorld);
     SetupGeometryOpt_LightsSpecular(
         pM, pGeometry->m_kWorld.m_fScale, static_cast<NiMaterialProperty*>(a2->m_aspProps[2].m_pObject)
@@ -7522,7 +7525,8 @@ void ShadowLightShader::Setup_ADTS10_Opt(NiPropertyState* a2) {
         if (NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject) {
             NiTransform v14;
             v10->SetShaderConstants(
-                NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject, 0, 0, 0, 0, 0, 0, v14, pOut, 0, 1
+                NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject, nullptr, nullptr, nullptr, nullptr, nullptr,
+                nullptr, v14, pOut, 0, true
             );
         }
     }
@@ -7549,11 +7553,11 @@ void ShadowLightShader::Setup_ADT_PxOpt(NiPropertyState* apProperties) {
     else {
         v8->m_spTexture = (NiTexture*)BSShaderManager::spDefaultHeightMap;
     }
-    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase->m_pObject->ConfigureStage(0);
-    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase[1].m_pObject->ConfigureStage(0);
-    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase[3].m_pObject->ConfigureStage(0);
+    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase->m_pObject->ConfigureStage(false);
+    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase[1].m_pObject->ConfigureStage(false);
+    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase[3].m_pObject->ConfigureStage(false);
     NiGeometry* pGeometry = BSShaderManager::pCurrentRenderPass->pGeometry;
-    BSUtilities::GetInverseWorldMatrix(BSShaderManager::pCurrentRenderPass->pGeometry->m_kWorld, 0, pM);
+    BSUtilities::GetInverseWorldMatrix(BSShaderManager::pCurrentRenderPass->pGeometry->m_kWorld, nullptr, pM);
     SetupGeometryOpt_WorldViewProj(pGeometry, pGeometry->m_kWorld);
     SetLightDirection(&pM);
     float apPropertiesa = pGeometry->m_kWorld.m_fScale;
@@ -7567,8 +7571,8 @@ void ShadowLightShader::Setup_ADT_PxOpt(NiPropertyState* apProperties) {
 }
 
 void ShadowLightShader::PresetAmbientPasses_1x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v69 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v69 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         if (ShadowLightShader::spPass[9].m_pObject) {
@@ -7578,7 +7582,7 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v2 = m_pObject->m_spVertexShader.m_pObject;
@@ -7597,23 +7601,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(22u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(22u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[9] = 2048;
         ShadowLightShader::ulPixelConstantFlags[9] = 4;
         if (m_pObject != ShadowLightShader::spPass[88].m_pObject) {
@@ -7626,7 +7630,7 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v7 = ShadowLightShader::spVertexShaders[0];
@@ -7636,23 +7640,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[88] = 0;
         ShadowLightShader::ulPixelConstantFlags[88] = 4;
         if (m_pObject != ShadowLightShader::spPass[97].m_pObject) {
@@ -7665,7 +7669,7 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v11 = ShadowLightShader::spVertexShaders[55];
@@ -7675,23 +7679,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[97] = 0x420304;
         ShadowLightShader::ulPixelConstantFlags[97] = 4;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[97] = 0x20304;
@@ -7705,7 +7709,7 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v15 = ShadowLightShader::spVertexShaders[17];
@@ -7715,23 +7719,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[98] = 768;
         ShadowLightShader::ulPixelConstantFlags[98] = 4;
         if (m_pObject != ShadowLightShader::spPass[99].m_pObject) {
@@ -7744,7 +7748,7 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v19 = ShadowLightShader::spVertexShaders[155];
@@ -7754,23 +7758,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[99] = 768;
         ShadowLightShader::ulPixelConstantFlags[99] = 4;
         if (m_pObject != ShadowLightShader::spPass[89].m_pObject) {
@@ -7783,10 +7787,10 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v23 = ShadowLightShader::spVertexShaders[24];
@@ -7796,23 +7800,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[89] = 0;
         ShadowLightShader::ulPixelConstantFlags[89] = 20;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[89] = 4;
@@ -7826,7 +7830,7 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v27 = ShadowLightShader::spVertexShaders[0];
@@ -7836,23 +7840,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[90] = 0;
         ShadowLightShader::ulPixelConstantFlags[90] = 4;
         if (m_pObject != ShadowLightShader::spPass[91].m_pObject) {
@@ -7865,10 +7869,10 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v31 = ShadowLightShader::spVertexShaders[24];
@@ -7878,23 +7882,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[91] = 0;
         ShadowLightShader::ulPixelConstantFlags[91] = 20;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[91] = 4;
@@ -7908,7 +7912,7 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v35 = ShadowLightShader::spVertexShaders[31];
@@ -7918,23 +7922,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[92] = 2048;
         ShadowLightShader::ulPixelConstantFlags[92] = 4;
         if (m_pObject != ShadowLightShader::spPass[93].m_pObject) {
@@ -7947,10 +7951,10 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v39 = ShadowLightShader::spVertexShaders[51];
@@ -7960,23 +7964,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[93] = 2048;
         ShadowLightShader::ulPixelConstantFlags[93] = 20;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[93] = 4;
@@ -7990,7 +7994,7 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v43 = ShadowLightShader::spVertexShaders[31];
@@ -8000,23 +8004,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[94] = 2048;
         ShadowLightShader::ulPixelConstantFlags[94] = 4;
         if (m_pObject != ShadowLightShader::spPass[95].m_pObject) {
@@ -8029,10 +8033,10 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v47 = ShadowLightShader::spVertexShaders[51];
@@ -8042,23 +8046,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[95] = 2048;
         ShadowLightShader::ulPixelConstantFlags[95] = 20;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[95] = 4;
@@ -8072,7 +8076,7 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v51 = ShadowLightShader::spVertexShaders[24];
@@ -8082,23 +8086,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[726] = 0;
         ShadowLightShader::ulPixelConstantFlags[726] = 20;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[726] = 4;
@@ -8112,7 +8116,7 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v55 = ShadowLightShader::spVertexShaders[51];
@@ -8122,23 +8126,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[727] = 2048;
         ShadowLightShader::ulPixelConstantFlags[727] = 20;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[727] = 4;
@@ -8157,23 +8161,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[20] = 0;
         ShadowLightShader::ulPixelConstantFlags[20] = 20;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[20] = 4;
@@ -8192,23 +8196,23 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[21] = 2048;
         ShadowLightShader::ulPixelConstantFlags[21] = 20;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[21] = 4;
@@ -8218,8 +8222,8 @@ void ShadowLightShader::PresetAmbientPasses_1x() {
 
 void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
     bool v6;
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v67 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v67 = nullptr;
     {
         NiPointer<NiD3DTextureStage> spstage;
         if (ShadowLightShader::spPass[100].m_pObject) {
@@ -8229,10 +8233,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v2 = m_pObject->m_spVertexShader.m_pObject;
@@ -8251,23 +8255,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[BSShaderManager::BSSM_AMBDIFFTEX] = 128;
         ShadowLightShader::ulPixelConstantFlags[100] = 12;
         if (m_pObject != ShadowLightShader::spPass[101].m_pObject) {
@@ -8280,10 +8284,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v7 = ShadowLightShader::spVertexShaders[12];
@@ -8293,23 +8297,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[101] = 128;
         ShadowLightShader::ulPixelConstantFlags[101] = 12;
         if (m_pObject != ShadowLightShader::spPass[127].m_pObject) {
@@ -8322,10 +8326,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v11 = ShadowLightShader::spVertexShaders[11];
@@ -8335,23 +8339,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[127] = 896;
         ShadowLightShader::ulPixelConstantFlags[127] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[127] = 768;
@@ -8365,10 +8369,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v15 = ShadowLightShader::spVertexShaders[13];
@@ -8378,23 +8382,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[128] = 896;
         ShadowLightShader::ulPixelConstantFlags[128] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[128] = 768;
@@ -8408,13 +8412,13 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v19 = ShadowLightShader::spVertexShaders[10];
@@ -8424,23 +8428,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[102] = 128;
         ShadowLightShader::ulPixelConstantFlags[102] = 28;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[102] = 4;
@@ -8454,13 +8458,13 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v23 = ShadowLightShader::spVertexShaders[12];
@@ -8470,23 +8474,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[103] = 128;
         ShadowLightShader::ulPixelConstantFlags[103] = 28;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[103] = 4;
@@ -8500,13 +8504,13 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v27 = ShadowLightShader::spVertexShaders[11];
@@ -8516,23 +8520,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[129] = 896;
         ShadowLightShader::ulPixelConstantFlags[129] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[129] = 768;
@@ -8546,13 +8550,13 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v31 = ShadowLightShader::spVertexShaders[13];
@@ -8562,23 +8566,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[130] = 896;
         ShadowLightShader::ulPixelConstantFlags[130] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[130] = 768;
@@ -8592,16 +8596,16 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v35 = ShadowLightShader::spVertexShaders[14];
@@ -8611,23 +8615,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[104] = 128;
         ShadowLightShader::ulPixelConstantFlags[104] = 12;
         if (m_pObject != ShadowLightShader::spPass[105].m_pObject) {
@@ -8640,10 +8644,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v39 = ShadowLightShader::spVertexShaders[10];
@@ -8653,31 +8657,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[105] = 128;
         ShadowLightShader::ulPixelConstantFlags[105] = 12;
         if (m_pObject != ShadowLightShader::spPass[106].m_pObject) {
@@ -8690,10 +8694,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v43 = ShadowLightShader::spVertexShaders[12];
@@ -8703,31 +8707,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[106] = 128;
         ShadowLightShader::ulPixelConstantFlags[106] = 12;
         if (m_pObject != ShadowLightShader::spPass[131].m_pObject) {
@@ -8740,10 +8744,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v47 = ShadowLightShader::spVertexShaders[11];
@@ -8753,31 +8757,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[131] = 896;
         ShadowLightShader::ulPixelConstantFlags[131] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[131] = 768;
@@ -8791,10 +8795,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v51 = ShadowLightShader::spVertexShaders[13];
@@ -8804,31 +8808,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[132] = 896;
         ShadowLightShader::ulPixelConstantFlags[132] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[132] = 768;
@@ -8842,13 +8846,13 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v55 = ShadowLightShader::spVertexShaders[10];
@@ -8858,31 +8862,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[107] = 128;
         ShadowLightShader::ulPixelConstantFlags[107] = 28;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[107] = 4;
@@ -8896,13 +8900,13 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         NiD3DVertexShader* v59 = ShadowLightShader::spVertexShaders[12];
@@ -8911,31 +8915,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[108] = 128;
         ShadowLightShader::ulPixelConstantFlags[108] = 28;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[108] = 4;
@@ -8949,16 +8953,16 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[15]);
@@ -8966,23 +8970,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[133] = 896;
         ShadowLightShader::ulPixelConstantFlags[133] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[133] = 768;
@@ -8996,16 +9000,16 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[14]);
@@ -9013,31 +9017,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         NiD3DPass* v61 = ShadowLightShader::spPass[110].m_pObject;
         ShadowLightShader::ulVertexConstantFlags[109] = 128;
         ShadowLightShader::ulPixelConstantFlags[109] = 12;
@@ -9046,7 +9050,7 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
             if (v6) {
                 v61->ReturnPassToPool();
             }
-            ShadowLightShader::spPass[110].m_pObject = 0;
+            ShadowLightShader::spPass[110].m_pObject = nullptr;
         }
         NiD3DPass* v62 = ShadowLightShader::spPass[136].m_pObject;
         if (ShadowLightShader::spPass[136].m_pObject) {
@@ -9054,7 +9058,7 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
             if (v6) {
                 v62->ReturnPassToPool();
             }
-            ShadowLightShader::spPass[136].m_pObject = 0;
+            ShadowLightShader::spPass[136].m_pObject = nullptr;
         }
         if (m_pObject != ShadowLightShader::spPass[111].m_pObject) {
             m_pObject->DecRefCount();
@@ -9066,10 +9070,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[41]);
@@ -9077,23 +9081,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[111] = 2176;
         ShadowLightShader::ulPixelConstantFlags[111] = 12;
         if (m_pObject != ShadowLightShader::spPass[112].m_pObject) {
@@ -9106,10 +9110,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[42]);
@@ -9117,23 +9121,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[112] = 2176;
         ShadowLightShader::ulPixelConstantFlags[112] = 12;
         if (m_pObject != ShadowLightShader::spPass[137].m_pObject) {
@@ -9146,10 +9150,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[43]);
@@ -9157,23 +9161,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[137] = 2944;
         ShadowLightShader::ulPixelConstantFlags[137] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[137] = 768;
@@ -9187,10 +9191,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[44]);
@@ -9198,23 +9202,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[138] = 2944;
         ShadowLightShader::ulPixelConstantFlags[138] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[138] = 768;
@@ -9228,13 +9232,13 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[41]);
@@ -9242,23 +9246,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[113] = 2176;
         ShadowLightShader::ulPixelConstantFlags[113] = 28;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[113] = 4;
@@ -9272,13 +9276,13 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[43]);
@@ -9286,23 +9290,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[139] = 2944;
         ShadowLightShader::ulPixelConstantFlags[139] = 28;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[139] = 768;
@@ -9317,13 +9321,13 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[44]);
@@ -9331,23 +9335,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[139] = 2944;
         ShadowLightShader::ulPixelConstantFlags[139] = 28;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[139] = 768;
@@ -9362,16 +9366,16 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[45]);
@@ -9379,23 +9383,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[115] = 2176;
         ShadowLightShader::ulPixelConstantFlags[115] = 12;
         if (m_pObject != ShadowLightShader::spPass[143].m_pObject) {
@@ -9408,16 +9412,16 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[46]);
@@ -9425,23 +9429,23 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[143] = 2944;
         ShadowLightShader::ulPixelConstantFlags[143] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[143] = 768;
@@ -9455,10 +9459,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[41]);
@@ -9466,31 +9470,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[116] = 2176;
         ShadowLightShader::ulPixelConstantFlags[116] = 12;
         if (m_pObject != ShadowLightShader::spPass[117].m_pObject) {
@@ -9503,10 +9507,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[42]);
@@ -9514,31 +9518,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[117] = 2176;
         ShadowLightShader::ulPixelConstantFlags[117] = 12;
         if (m_pObject != ShadowLightShader::spPass[141].m_pObject) {
@@ -9551,10 +9555,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[43]);
@@ -9562,31 +9566,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[141] = 2944;
         ShadowLightShader::ulPixelConstantFlags[141] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[141] = 768;
@@ -9600,10 +9604,10 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[44]);
@@ -9611,31 +9615,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[142] = 2944;
         ShadowLightShader::ulPixelConstantFlags[142] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[142] = 768;
@@ -9649,13 +9653,13 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[41]);
@@ -9663,31 +9667,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[118] = 2176;
         ShadowLightShader::ulPixelConstantFlags[118] = 28;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[118] = 4;
@@ -9701,13 +9705,13 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[42]);
@@ -9715,31 +9719,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[119] = 2176;
         ShadowLightShader::ulPixelConstantFlags[119] = 28;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[119] = 4;
@@ -9753,16 +9757,16 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[45]);
@@ -9770,31 +9774,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[120] = 2176;
         ShadowLightShader::ulPixelConstantFlags[120] = 12;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[120] = 4;
@@ -9808,13 +9812,13 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[43]);
@@ -9822,31 +9826,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[144] = 2944;
         ShadowLightShader::ulPixelConstantFlags[144] = 28;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[144] = 768;
@@ -9861,13 +9865,13 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spstage);
-            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spstage.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spstage.m_pObject);
         }
         m_pObject->SetVertexShader(ShadowLightShader::spVertexShaders[44]);
@@ -9875,31 +9879,31 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         NiD3DPass* v63 = ShadowLightShader::spPass[121].m_pObject;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[145] = 4;
         ShadowLightShader::ulVertexConstantFlags[145] = 2944;
@@ -9910,7 +9914,7 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
             if (v6) {
                 v63->ReturnPassToPool();
             }
-            ShadowLightShader::spPass[121].m_pObject = 0;
+            ShadowLightShader::spPass[121].m_pObject = nullptr;
         }
         NiD3DPass* v64 = ShadowLightShader::spPass[146].m_pObject;
         if (ShadowLightShader::spPass[146].m_pObject) {
@@ -9918,15 +9922,15 @@ void ShadowLightShader::PresetAmbDiffTexPasses_1x() {
             if (v6) {
                 v64->ReturnPassToPool();
             }
-            ShadowLightShader::spPass[146].m_pObject = 0;
+            ShadowLightShader::spPass[146].m_pObject = nullptr;
         }
     }
     m_pObject->DecRefCount();
 }
 
 void ShadowLightShader::PresetAmbDiffDirAndPtPasses_1x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v13 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v13 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         if (ShadowLightShader::spPass[124].m_pObject) {
@@ -9936,18 +9940,18 @@ void ShadowLightShader::PresetAmbDiffDirAndPtPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, true);
             a1.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 3u, 2u, true);
             a1.m_pObject->m_spTexture = BSShaderManager::pAttenuationZ;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, true);
             a1.m_pObject->m_spTexture = BSShaderManager::spCubeMapTexture.m_pObject;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
@@ -9967,23 +9971,23 @@ void ShadowLightShader::PresetAmbDiffDirAndPtPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[124] = 128;
         ShadowLightShader::ulPixelConstantFlags[124] = 12;
         if (m_pObject != ShadowLightShader::spPass[125].m_pObject) {
@@ -9996,18 +10000,18 @@ void ShadowLightShader::PresetAmbDiffDirAndPtPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, true);
             a1.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 3u, 2u, true);
             a1.m_pObject->m_spTexture = BSShaderManager::pAttenuationZ;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, true);
             a1.m_pObject->m_spTexture = BSShaderManager::spCubeMapTexture.m_pObject;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
@@ -10018,23 +10022,23 @@ void ShadowLightShader::PresetAmbDiffDirAndPtPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[125] = 2176;
         ShadowLightShader::ulPixelConstantFlags[125] = 12;
     }
@@ -10042,8 +10046,8 @@ void ShadowLightShader::PresetAmbDiffDirAndPtPasses_1x() {
 }
 
 void ShadowLightShader::PresetDiffuseLightPasses_1x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v22 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v22 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         if (ShadowLightShader::spPass[300].m_pObject) {
@@ -10053,7 +10057,7 @@ void ShadowLightShader::PresetDiffuseLightPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v2 = m_pObject->m_spVertexShader.m_pObject;
@@ -10072,11 +10076,11 @@ void ShadowLightShader::PresetDiffuseLightPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[300] = 128;
         ShadowLightShader::ulPixelConstantFlags[300] = 8;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[300] = 8;
@@ -10090,7 +10094,7 @@ void ShadowLightShader::PresetDiffuseLightPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v8 = ShadowLightShader::spVertexShaders[35];
@@ -10100,11 +10104,11 @@ void ShadowLightShader::PresetDiffuseLightPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[302] = 2176;
         ShadowLightShader::ulPixelConstantFlags[302] = 8;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[302] = 8;
@@ -10118,18 +10122,18 @@ void ShadowLightShader::PresetDiffuseLightPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, true);
             a1.m_pObject->m_spTexture = (NiTexture*)BSShaderManager::pAttenuationXY;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 3u, 2u, true);
             a1.m_pObject->m_spTexture = (NiTexture*)BSShaderManager::pAttenuationZ;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, true);
             a1.m_pObject->m_spTexture = (NiTexture*)BSShaderManager::spCubeMapTexture.m_pObject;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
@@ -10140,11 +10144,11 @@ void ShadowLightShader::PresetDiffuseLightPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[301] = 128;
         ShadowLightShader::ulPixelConstantFlags[301] = 8;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[301] = 8;
@@ -10158,18 +10162,18 @@ void ShadowLightShader::PresetDiffuseLightPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, true);
             a1.m_pObject->m_spTexture = (NiTexture*)BSShaderManager::pAttenuationXY;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 3u, 2u, true);
             a1.m_pObject->m_spTexture = (NiTexture*)BSShaderManager::pAttenuationZ;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, true);
             a1.m_pObject->m_spTexture = (NiTexture*)BSShaderManager::spCubeMapTexture.m_pObject;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
@@ -10180,11 +10184,11 @@ void ShadowLightShader::PresetDiffuseLightPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulPixelConstantFlags[303] = 8;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[303] = 8;
         ShadowLightShader::ulVertexConstantFlags[303] = 2176;
@@ -10193,8 +10197,8 @@ void ShadowLightShader::PresetDiffuseLightPasses_1x() {
 }
 
 void ShadowLightShader::PresetTexturePasses_1x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v37 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v37 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         if (ShadowLightShader::spPass[330].m_pObject) {
@@ -10204,7 +10208,7 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v2 = m_pObject->m_spVertexShader.m_pObject;
@@ -10223,11 +10227,11 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[330] = 0;
         ShadowLightShader::ulPixelConstantFlags[330] = 0;
         if (m_pObject != ShadowLightShader::spPass[331].m_pObject) {
@@ -10240,13 +10244,13 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v7 = ShadowLightShader::spVertexShaders[7];
@@ -10256,11 +10260,11 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[331] = 0;
         ShadowLightShader::ulPixelConstantFlags[331] = 0;
         if (m_pObject != ShadowLightShader::spPass[332].m_pObject) {
@@ -10273,10 +10277,10 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v11 = ShadowLightShader::spVertexShaders[6];
@@ -10286,11 +10290,11 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[332] = 0;
         ShadowLightShader::ulPixelConstantFlags[332] = 16;
         if (m_pObject != ShadowLightShader::spPass[333].m_pObject) {
@@ -10303,7 +10307,7 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v15 = ShadowLightShader::spVertexShaders[36];
@@ -10313,11 +10317,11 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[333] = 2048;
         ShadowLightShader::ulPixelConstantFlags[333] = 0;
         if (m_pObject != ShadowLightShader::spPass[334].m_pObject) {
@@ -10330,7 +10334,7 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v19 = ShadowLightShader::spVertexShaders[6];
@@ -10340,11 +10344,11 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[334] = 0;
         ShadowLightShader::ulPixelConstantFlags[334] = 0;
         if (m_pObject != ShadowLightShader::spPass[335].m_pObject) {
@@ -10357,7 +10361,7 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v23 = ShadowLightShader::spVertexShaders[37];
@@ -10367,11 +10371,11 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[335] = 2048;
         ShadowLightShader::ulPixelConstantFlags[335] = 0;
         if (m_pObject != ShadowLightShader::spPass[336].m_pObject) {
@@ -10384,13 +10388,13 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 3) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v27 = ShadowLightShader::spVertexShaders[38];
@@ -10400,11 +10404,11 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[336] = 2048;
         ShadowLightShader::ulPixelConstantFlags[336] = 0;
         if (m_pObject != ShadowLightShader::spPass[338].m_pObject) {
@@ -10417,10 +10421,10 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v31 = ShadowLightShader::spVertexShaders[37];
@@ -10430,11 +10434,11 @@ void ShadowLightShader::PresetTexturePasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 9u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[338] = 2048;
         ShadowLightShader::ulPixelConstantFlags[338] = 16;
     }
@@ -10442,8 +10446,8 @@ void ShadowLightShader::PresetTexturePasses_1x() {
 }
 
 void ShadowLightShader::PresetSpecularPasses_1x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v21 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v21 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         if (ShadowLightShader::spPass[340].m_pObject) {
@@ -10453,7 +10457,7 @@ void ShadowLightShader::PresetSpecularPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v2 = m_pObject->m_spVertexShader.m_pObject;
@@ -10472,11 +10476,11 @@ void ShadowLightShader::PresetSpecularPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[BSShaderManager::BSSM_SPECULARDIR] = 1152;
         ShadowLightShader::ulPixelConstantFlags[BSShaderManager::BSSM_SPECULARDIR] = 8;
         if (m_pObject != ShadowLightShader::spPass[341].m_pObject) {
@@ -10489,18 +10493,18 @@ void ShadowLightShader::PresetSpecularPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, true);
             a1.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 3u, 2u, true);
             a1.m_pObject->m_spTexture = BSShaderManager::pAttenuationZ;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, true);
             a1.m_pObject->m_spTexture = BSShaderManager::spCubeMapTexture.m_pObject;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
@@ -10511,11 +10515,11 @@ void ShadowLightShader::PresetSpecularPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[341] = 1152;
         ShadowLightShader::ulPixelConstantFlags[341] = 8;
         if (m_pObject != ShadowLightShader::spPass[342].m_pObject) {
@@ -10528,7 +10532,7 @@ void ShadowLightShader::PresetSpecularPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v11 = ShadowLightShader::spVertexShaders[40];
@@ -10538,11 +10542,11 @@ void ShadowLightShader::PresetSpecularPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[342] = 3200;
         ShadowLightShader::ulPixelConstantFlags[342] = 8;
         if (m_pObject != ShadowLightShader::spPass[343].m_pObject) {
@@ -10555,18 +10559,18 @@ void ShadowLightShader::PresetSpecularPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 3u, 2u, true);
             a1.m_pObject->m_spTexture = BSShaderManager::pAttenuationXY;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 3u, 2u, true);
             a1.m_pObject->m_spTexture = BSShaderManager::pAttenuationZ;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, true);
             a1.m_pObject->m_spTexture = BSShaderManager::spCubeMapTexture.m_pObject;
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
@@ -10577,11 +10581,11 @@ void ShadowLightShader::PresetSpecularPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         ShadowLightShader::ulVertexConstantFlags[343] = 3200;
         ShadowLightShader::ulPixelConstantFlags[343] = 8;
     }
@@ -10589,8 +10593,8 @@ void ShadowLightShader::PresetSpecularPasses_1x() {
 }
 
 void ShadowLightShader::PresetEnvMapPasses_1x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v21 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v21 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         if (ShadowLightShader::spPass[580].m_pObject) {
@@ -10600,16 +10604,16 @@ void ShadowLightShader::PresetEnvMapPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v2 = m_pObject->m_spVertexShader.m_pObject;
@@ -10628,31 +10632,31 @@ void ShadowLightShader::PresetEnvMapPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[580] = 1028;
         ShadowLightShader::ulPixelConstantFlags[580] = 36;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[580] = 4;
@@ -10666,16 +10670,16 @@ void ShadowLightShader::PresetEnvMapPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v7 = ShadowLightShader::spVertexShaders[19];
@@ -10685,31 +10689,31 @@ void ShadowLightShader::PresetEnvMapPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[581] = 1028;
         ShadowLightShader::ulPixelConstantFlags[581] = 36;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[581] = 4;
@@ -10723,16 +10727,16 @@ void ShadowLightShader::PresetEnvMapPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v11 = ShadowLightShader::spVertexShaders[48];
@@ -10742,31 +10746,31 @@ void ShadowLightShader::PresetEnvMapPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[582] = 3076;
         ShadowLightShader::ulPixelConstantFlags[582] = 36;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[582] = 4;
@@ -10780,16 +10784,16 @@ void ShadowLightShader::PresetEnvMapPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 4) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 2u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 3u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v15 = ShadowLightShader::spVertexShaders[48];
@@ -10799,31 +10803,31 @@ void ShadowLightShader::PresetEnvMapPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[583] = 3076;
         ShadowLightShader::ulPixelConstantFlags[583] = 36;
         ShadowLightShader::uiPixelNonVolatileConstantFlags[583] = 4;
@@ -10832,8 +10836,8 @@ void ShadowLightShader::PresetEnvMapPasses_1x() {
 }
 
 void ShadowLightShader::PresetFogPasses_1x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v21 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v21 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         if (ShadowLightShader::spPass[594].m_pObject) {
@@ -10843,7 +10847,7 @@ void ShadowLightShader::PresetFogPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v2 = m_pObject->m_spVertexShader.m_pObject;
@@ -10862,31 +10866,31 @@ void ShadowLightShader::PresetFogPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[594] = 768;
         ShadowLightShader::ulPixelConstantFlags[594] = 0;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[594] = 768;
@@ -10900,7 +10904,7 @@ void ShadowLightShader::PresetFogPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v7 = ShadowLightShader::spVertexShaders[18];
@@ -10910,31 +10914,31 @@ void ShadowLightShader::PresetFogPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[595] = 768;
         ShadowLightShader::ulPixelConstantFlags[595] = 0;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[595] = 768;
@@ -10948,7 +10952,7 @@ void ShadowLightShader::PresetFogPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v11 = ShadowLightShader::spVertexShaders[32];
@@ -10958,31 +10962,31 @@ void ShadowLightShader::PresetFogPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[596] = 2816;
         ShadowLightShader::ulPixelConstantFlags[596] = 0;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[596] = 768;
@@ -10996,7 +11000,7 @@ void ShadowLightShader::PresetFogPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v15 = ShadowLightShader::spVertexShaders[33];
@@ -11006,31 +11010,31 @@ void ShadowLightShader::PresetFogPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[597] = 2816;
         ShadowLightShader::ulPixelConstantFlags[597] = 0;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[597] = 768;
@@ -11039,8 +11043,8 @@ void ShadowLightShader::PresetFogPasses_1x() {
 }
 
 void ShadowLightShader::PresetLandscape_1x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v29 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v29 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         if (ShadowLightShader::spPass[147].m_pObject) {
@@ -11050,10 +11054,10 @@ void ShadowLightShader::PresetLandscape_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v2 = m_pObject->m_spVertexShader.m_pObject;
@@ -11072,23 +11076,23 @@ void ShadowLightShader::PresetLandscape_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         ShadowLightShader::ulVertexConstantFlags[BSShaderManager::BSSM_LANDAD] = 128;
         ShadowLightShader::ulPixelConstantFlags[147] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[147] = 128;
@@ -11103,10 +11107,10 @@ void ShadowLightShader::PresetLandscape_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v7 = ShadowLightShader::spVertexShaders[26];
@@ -11116,39 +11120,39 @@ void ShadowLightShader::PresetLandscape_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(25u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(25u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(24u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(24u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[498] = 128;
         ShadowLightShader::ulPixelConstantFlags[498] = 12;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[498] = 128;
@@ -11163,10 +11167,10 @@ void ShadowLightShader::PresetLandscape_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v11 = ShadowLightShader::spVertexShaders[27];
@@ -11176,35 +11180,35 @@ void ShadowLightShader::PresetLandscape_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(25u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(25u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(24u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(24u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[497] = 0;
         ShadowLightShader::ulPixelConstantFlags[497] = 8;
         if (m_pObject != ShadowLightShader::spPass[500].m_pObject) {
@@ -11217,10 +11221,10 @@ void ShadowLightShader::PresetLandscape_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v15 = ShadowLightShader::spVertexShaders[27];
@@ -11230,39 +11234,39 @@ void ShadowLightShader::PresetLandscape_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(25u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(25u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(24u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(24u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[500] = 0;
         ShadowLightShader::ulPixelConstantFlags[500] = 8;
         if (m_pObject != ShadowLightShader::spPass[495].m_pObject) {
@@ -11275,10 +11279,10 @@ void ShadowLightShader::PresetLandscape_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v19 = ShadowLightShader::spVertexShaders[28];
@@ -11288,35 +11292,35 @@ void ShadowLightShader::PresetLandscape_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(25u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(25u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(24u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(24u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::uiVertexNonVolatileConstantFlags[147] = 128;
         ShadowLightShader::ulVertexConstantFlags[495] = 128;
         ShadowLightShader::ulPixelConstantFlags[495] = 8;
@@ -11330,10 +11334,10 @@ void ShadowLightShader::PresetLandscape_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v23 = ShadowLightShader::spVertexShaders[29];
@@ -11343,39 +11347,39 @@ void ShadowLightShader::PresetLandscape_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(25u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(25u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(24u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(24u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[501] = 128;
         ShadowLightShader::ulPixelConstantFlags[501] = 8;
     }
@@ -11383,8 +11387,8 @@ void ShadowLightShader::PresetLandscape_1x() {
 }
 
 void ShadowLightShader::PresetTextureEffectPasses_1x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v13 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v13 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         if (ShadowLightShader::spPass[590].m_pObject) {
@@ -11394,10 +11398,10 @@ void ShadowLightShader::PresetTextureEffectPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v2 = m_pObject->m_spVertexShader.m_pObject;
@@ -11416,31 +11420,31 @@ void ShadowLightShader::PresetTextureEffectPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[590] = 0;
         ShadowLightShader::ulPixelConstantFlags[590] = 0;
         if (m_pObject != ShadowLightShader::spPass[591].m_pObject) {
@@ -11453,10 +11457,10 @@ void ShadowLightShader::PresetTextureEffectPasses_1x() {
         }
         if (m_pObject->m_uiStageCount < 2) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 1u, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v7 = ShadowLightShader::spVertexShaders[52];
@@ -11466,31 +11470,31 @@ void ShadowLightShader::PresetTextureEffectPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 3u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[591] = 0;
         ShadowLightShader::ulPixelConstantFlags[591] = 0;
     }
@@ -11498,8 +11502,8 @@ void ShadowLightShader::PresetTextureEffectPasses_1x() {
 }
 
 void ShadowLightShader::PresetZOnlyPasses_1x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v25 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v25 = nullptr;
     {
         NiPointer<NiD3DTextureStage> spStage;
         if (ShadowLightShader::spPass[1].m_pObject) {
@@ -11523,27 +11527,27 @@ void ShadowLightShader::PresetZOnlyPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[1] = 0;
         ShadowLightShader::ulPixelConstantFlags[BSShaderManager::BSSM_ZONLY] = 0;
         if (m_pObject != ShadowLightShader::spPass[2].m_pObject) {
@@ -11559,32 +11563,32 @@ void ShadowLightShader::PresetZOnlyPasses_1x() {
         NiD3DPixelShader* v9 = ShadowLightShader::spPixelShaders[0];
         m_pObject->m_spPixelShader = v9;
         NiD3DTextureStage::CreateNewStage(spStage);
-        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, 1);
+        BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, true);
         m_pObject->SetStage(m_pObject->m_uiCurrentStage, spStage.m_pObject);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[2] = 0;
         ShadowLightShader::ulPixelConstantFlags[2] = 0;
         if (m_pObject != ShadowLightShader::spPass[3].m_pObject) {
@@ -11602,27 +11606,27 @@ void ShadowLightShader::PresetZOnlyPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 0, true);
         ShadowLightShader::ulVertexConstantFlags[3] = 2048;
         ShadowLightShader::ulPixelConstantFlags[3] = 0;
         if (m_pObject != ShadowLightShader::spPass[4].m_pObject) {
@@ -11635,7 +11639,7 @@ void ShadowLightShader::PresetZOnlyPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(spStage);
-            BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spStage.m_pObject);
         }
         NiD3DVertexShader* v15 = ShadowLightShader::spVertexShaders[0];
@@ -11645,32 +11649,32 @@ void ShadowLightShader::PresetZOnlyPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 0, true);
         float uiValue = BSShaderProperty::fDepthBiasUnit;
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(195u, std::bit_cast<uint32_t>(uiValue), 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(195u, std::bit_cast<uint32_t>(uiValue), true);
         ShadowLightShader::ulVertexConstantFlags[4] = 0;
         ShadowLightShader::ulPixelConstantFlags[4] = 0;
         if (m_pObject != ShadowLightShader::spPass[5].m_pObject) {
@@ -11683,7 +11687,7 @@ void ShadowLightShader::PresetZOnlyPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(spStage);
-            BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spStage.m_pObject);
         }
         NiD3DVertexShader* v19 = ShadowLightShader::spVertexShaders[31];
@@ -11693,32 +11697,32 @@ void ShadowLightShader::PresetZOnlyPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 0, true);
         uiValue = BSShaderProperty::fDepthBiasUnit;
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(195u, std::bit_cast<uint32_t>(uiValue), 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(195u, std::bit_cast<uint32_t>(uiValue), true);
         ShadowLightShader::ulVertexConstantFlags[5] = 2048;
         ShadowLightShader::ulPixelConstantFlags[5] = 0;
     }
@@ -11726,8 +11730,8 @@ void ShadowLightShader::PresetZOnlyPasses_1x() {
 }
 
 void ShadowLightShader::PresetConstAlphaPasses_1x() {
-    NiD3DPass* m_pObject = 0;
-    NiD3DPass* v17 = 0;
+    NiD3DPass* m_pObject = nullptr;
+    NiD3DPass* v17 = nullptr;
     {
         NiPointer<NiD3DTextureStage> spStage;
         if (ShadowLightShader::spPass[6].m_pObject) {
@@ -11737,7 +11741,7 @@ void ShadowLightShader::PresetConstAlphaPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(spStage);
-            BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spStage.m_pObject);
         }
         NiD3DVertexShader* v2 = m_pObject->m_spVertexShader.m_pObject;
@@ -11756,27 +11760,27 @@ void ShadowLightShader::PresetConstAlphaPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 3u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 3u, true);
         ShadowLightShader::ulVertexConstantFlags[6] = 0;
         ShadowLightShader::ulPixelConstantFlags[6] = 4;
         if (m_pObject != ShadowLightShader::spPass[7].m_pObject) {
@@ -11789,7 +11793,7 @@ void ShadowLightShader::PresetConstAlphaPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(spStage);
-            BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spStage.m_pObject);
         }
         NiD3DVertexShader* v7 = ShadowLightShader::spVertexShaders[0];
@@ -11799,27 +11803,27 @@ void ShadowLightShader::PresetConstAlphaPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 3u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 3u, true);
         ShadowLightShader::ulVertexConstantFlags[7] = 0;
         ShadowLightShader::ulPixelConstantFlags[7] = 4;
         if (m_pObject != ShadowLightShader::spPass[8].m_pObject) {
@@ -11832,7 +11836,7 @@ void ShadowLightShader::PresetConstAlphaPasses_1x() {
         }
         if (!m_pObject->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(spStage);
-            BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spStage.m_pObject, 0, 1u, 2u, true);
             m_pObject->SetStage(m_pObject->m_uiCurrentStage, spStage.m_pObject);
         }
         NiD3DVertexShader* v11 = ShadowLightShader::spVertexShaders[31];
@@ -11842,27 +11846,27 @@ void ShadowLightShader::PresetConstAlphaPasses_1x() {
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(14u, 1u, true);
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 3u, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(168u, 3u, true);
         ShadowLightShader::ulVertexConstantFlags[8] = 2048;
         ShadowLightShader::ulPixelConstantFlags[8] = 4;
     }
@@ -11953,7 +11957,7 @@ void ShadowLightShader::SetEmitConstant(NiMaterialProperty* apMat) {
 }
 
 void ShadowLightShader::SetProjectedShadowScale(uint32_t aiScale) {
-    ShadowLightShader::kShadowProjTransform.w = (float)((float)aiScale);
+    ShadowLightShader::kShadowProjTransform.w = ((float)aiScale);
 }
 
 uint32_t ShadowLightShader::GetProjectedShadowScale() {
@@ -12024,13 +12028,13 @@ void ShadowLightShader::EnableConstantsForPass(uint32_t auiPassEnum, bool abAlph
         if (!m_pObject->m_pkRenderStateGroup) {
             m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        m_pObject->m_pkRenderStateGroup->SetRenderState(28u, 0, 1);
+        m_pObject->m_pkRenderStateGroup->SetRenderState(28u, 0, true);
         if ((BSShaderManager::usRenderFlags & 1) != 0) {
             NiD3DPass* v6 = ShadowLightShader::spPass[auiPassEnum].m_pObject;
             if (!v6->m_pkRenderStateGroup) {
                 v6->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v6->m_pkRenderStateGroup->SetRenderState(168u, 0, 1);
+            v6->m_pkRenderStateGroup->SetRenderState(168u, 0, true);
             goto LABEL_48;
         }
         if ((auiPassEnum < 482 || auiPassEnum > 486) && auiPassEnum - 492 > 2) {
@@ -12042,34 +12046,34 @@ void ShadowLightShader::EnableConstantsForPass(uint32_t auiPassEnum, bool abAlph
                     if (auiPassEnum - 1 > 4) {
                         if (auiPassEnum - 6 > 2) {
                             if (auiPassEnum == 9) {
-                                ShadowLightShader::spPass[9].m_pObject->SetRenderState(168u, 0, 0);
+                                ShadowLightShader::spPass[9].m_pObject->SetRenderState(168u, 0, false);
                             LABEL_48:;
                                 if (BSShaderManager::eRenderMode == 6) {
                                     NiD3DPass* v7 = ShadowLightShader::spPass[auiPassEnum].m_pObject;
                                     if (!v7->m_pkRenderStateGroup) {
                                         v7->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                                     }
-                                    v7->m_pkRenderStateGroup->SetRenderState(52u, 1u, 1);
+                                    v7->m_pkRenderStateGroup->SetRenderState(52u, 1u, true);
                                     NiD3DPass* v8 = ShadowLightShader::spPass[auiPassEnum].m_pObject;
                                     if (!v8->m_pkRenderStateGroup) {
                                         v8->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                                     }
-                                    v8->m_pkRenderStateGroup->SetRenderState(56u, 8u, 1);
+                                    v8->m_pkRenderStateGroup->SetRenderState(56u, 8u, true);
                                     NiD3DPass* v9 = ShadowLightShader::spPass[auiPassEnum].m_pObject;
                                     if (!v9->m_pkRenderStateGroup) {
                                         v9->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                                     }
-                                    v9->m_pkRenderStateGroup->SetRenderState(55u, 7u, 1);
+                                    v9->m_pkRenderStateGroup->SetRenderState(55u, 7u, true);
                                     NiD3DPass* v10 = ShadowLightShader::spPass[auiPassEnum].m_pObject;
                                     if (!v10->m_pkRenderStateGroup) {
                                         v10->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                                     }
-                                    v10->m_pkRenderStateGroup->SetRenderState(53u, 1u, 1);
+                                    v10->m_pkRenderStateGroup->SetRenderState(53u, 1u, true);
                                     NiD3DPass* v11 = ShadowLightShader::spPass[auiPassEnum].m_pObject;
                                     if (!v11->m_pkRenderStateGroup) {
                                         v11->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                                     }
-                                    v11->m_pkRenderStateGroup->SetRenderState(54u, 1u, 1);
+                                    v11->m_pkRenderStateGroup->SetRenderState(54u, 1u, true);
                                 }
                                 if (auiPassEnum == 565) {
                                     BSShaderLightingProperty::pShaderLightConstants[35] = kDefaultRefractionParams;
@@ -12110,7 +12114,7 @@ void ShadowLightShader::EnableConstantsForPass(uint32_t auiPassEnum, bool abAlph
         else {
             v16 = 15;
         }
-        ShadowLightShader::spPass[auiPassEnum].m_pObject->SetRenderState(168u, v16, 0);
+        ShadowLightShader::spPass[auiPassEnum].m_pObject->SetRenderState(168u, v16, false);
         goto LABEL_48;
     }
 }
@@ -12255,7 +12259,7 @@ BSShader* ShadowLightShader::CreateShader() {
             ShadowLightShader(spShaderDecl, pSkinnedShaderDecl, pModelSpaceNormShaderDecl, pSplatTexturingShaderDecl);
     }
     else {
-        pshader = 0;
+        pshader = nullptr;
     }
     pshader->Initialize();
     pshader->LoadShaders();

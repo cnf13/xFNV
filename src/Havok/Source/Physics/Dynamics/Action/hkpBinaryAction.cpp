@@ -140,7 +140,7 @@ void hkpBinaryAction::setEntityB(hkpEntity* entityB) {
             m_world->detachActionFromEntity(this, this->getEntityB());
         }
         this->getEntityB()->removeReference();
-        m_entityB = 0;
+        m_entityB = nullptr;
     }
     hkpWorld* v4 = this->m_world;
     m_entityB = entityB;

@@ -36,21 +36,21 @@ bool CombatDialogueManager::StartDialogue(
     BGSWorldLocation memberWorldLoc;
     BGSWorldLocation speakerWorldLoc;
     if (bDisableCombatDialogue.Bool()) {
-        return 0;
+        return false;
     }
     if (!apSpeaker->IsActor()) {
-        return 0;
+        return false;
     }
     uint32_t buseDialoguePackage = BSGetTickCount();
     if (buseDialoguePackage - CombatDialogueManager::uiLastCombatAttackSoundTime < 1500) {
-        return 0;
+        return false;
     }
     CombatDialogueManager::uiLastCombatAttackSoundTime = buseDialoguePackage;
     Actor* pspeaker = static_cast<Actor*>(apSpeaker);
     if (!apCombatController) {
         apCombatController = pspeaker->GetCombatController();
     }
-    CombatTimer* ptimer = 0;
+    CombatTimer* ptimer = nullptr;
     if (apCombatController) {
         CombatState* pcombatState = apCombatController->pCombatState;
         CombatGroup* pcombatGroup = apCombatController->pCombatGroup;
@@ -88,15 +88,15 @@ bool CombatDialogueManager::StartDialogue(
         }
     }
     if (ptimer && !ptimer->Check()) {
-        return 0;
+        return false;
     }
     if (pspeaker->IsUnConscious() || pspeaker->GetCurrentProcessType()) {
-        return 0;
+        return false;
     }
-    bool buseDialoguePackage_2 = 1;
+    bool buseDialoguePackage_2 = true;
     if (abInterrupt) {
         if (pspeaker->GetSitSleepState()) {
-            buseDialoguePackage_2 = 0;
+            buseDialoguePackage_2 = false;
         }
         else {
             BaseProcess* CurrentAIProcess = pspeaker->pCurrentProcess;
@@ -109,26 +109,26 @@ bool CombatDialogueManager::StartDialogue(
     else {
         BaseProcess* v31 = pspeaker->pCurrentProcess;
         if (v31->GetGreetingFlag()) {
-            return 0;
+            return false;
         }
         BaseProcess* v30 = pspeaker->pCurrentProcess;
         if (v30->GetRunOncePackage()) {
-            return 0;
+            return false;
         }
         BaseProcess* v29 = pspeaker->pCurrentProcess;
         TESPackage* ppack = v29->GetCurrentPackage();
         if (ppack && ppack->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE) {
-            return 0;
+            return false;
         }
         BaseProcess* v28 = pspeaker->pCurrentProcess;
         TESPackage* ppack_2 = v28->GetRunOncePackage();
         if (ppack_2 &&
             (ppack_2->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE ||
              ppack_2->GetPackType() == PACKAGE_TYPE_GET_UP)) {
-            return 0;
+            return false;
         }
         if (pspeaker == pPlayer && pPlayer->IsPlayingCombatAttackSound()) {
-            return 0;
+            return false;
         }
     }
     if (ptimer) {
@@ -191,7 +191,7 @@ bool CombatDialogueManager::StartDialogue(
         }
         ptimer->Reset(ftime);
     }
-    Actor* pdialogueTarget = 0;
+    Actor* pdialogueTarget = nullptr;
     if (buseDialoguePackage_2) {
         if (apCombatController) {
             CombatGroup* pgroup = apCombatController->pCombatGroup;
@@ -227,15 +227,15 @@ bool CombatDialogueManager::StartDialogue(
     }
     TESTopic* ptopic = TESTopic::GetTopic(aeDialogueType, aiDialogueTopic);
     if (!ptopic) {
-        return 0;
+        return false;
     }
     if (pspeaker == pPlayer) {
-        DialogueItem* pvoice = ptopic->CreateDialogueItem(apSpeaker, apTarget, ptopic, 0, 1);
+        DialogueItem* pvoice = ptopic->CreateDialogueItem(apSpeaker, apTarget, ptopic, nullptr, true);
         if (pvoice) {
             if (pvoice->FirstResponse()) {
                 DialogueResponse* presponse = pvoice->GetCurrentResponse();
                 if (presponse) {
-                    pPlayer->SetSpeaking(1);
+                    pPlayer->SetSpeaking(true);
                     BaseProcess* v23 = pspeaker->pCurrentProcess;
                     BSSoundHandle pSoundHandlePointer = v23->GetSoundHandle(ACTOR_SOUND_HANDLE_VOICE);
                     uint32_t Length = presponse->cText.GetLength();
@@ -243,9 +243,10 @@ bool CombatDialogueManager::StartDialogue(
                     DIALOGUE_EMOTION FormFlags = presponse->eEmotion;
                     char* v13 = presponse->GetVoice()->pString;
                     pspeaker->SpeakSoundFunction(
-                        v13, pSoundHandlePointer, FormFlags, CastingType, Length, 0, 0, 0, 0, 0, 0, 0, 1
+                        v13, pSoundHandlePointer, FormFlags, CastingType, Length, nullptr, nullptr, nullptr, false,
+                        false, false, false, true
                     );
-                    pSoundHandlePointer.SetCompletionCallback(&PlayerCharacter::SpeakDoneCallback, 0);
+                    pSoundHandlePointer.SetCompletionCallback(&PlayerCharacter::SpeakDoneCallback, nullptr);
                     pvoice->RunResult(TIRS_BEGIN);
                 }
             }
@@ -257,14 +258,14 @@ bool CombatDialogueManager::StartDialogue(
     else {
         if (!buseDialoguePackage_2) {
             BaseProcess* v22 = pspeaker->pCurrentProcess;
-            v22->ProcessGreet(pspeaker, ptopic, 0, 0, 0, 0);
-            return 1;
+            v22->ProcessGreet(pspeaker, ptopic, false, false, false, false);
+            return true;
         }
-        if (pspeaker->InitiateDialogue(pdialogueTarget, 0, 0, 0, 1, 1, ptopic, 1, 0)) {
-            return 1;
+        if (pspeaker->InitiateDialogue(pdialogueTarget, nullptr, nullptr, false, true, true, ptopic, true, false)) {
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void CombatDialogueManager::Create() {

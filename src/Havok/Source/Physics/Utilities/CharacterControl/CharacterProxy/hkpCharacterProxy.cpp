@@ -158,7 +158,7 @@ void hkpCharacterProxy::calcContentStatistics(hkStatisticsCollector* collector, 
         );
         collector->addChunk(
             hkStatisticsCollector::MEM_ARRAY, "Manifold", m_manifold.m_data,
-            (int32_t)(static_cast<int32_t>(sizeof(*m_manifold.m_data)) * m_manifold.m_size), v5
+            (static_cast<int32_t>(sizeof(*m_manifold.m_data)) * m_manifold.m_size), v5
         );
     }
     int32_t v6 = (int32_t)m_bodies.m_capacityAndFlags;
@@ -168,7 +168,7 @@ void hkpCharacterProxy::calcContentStatistics(hkStatisticsCollector* collector, 
         );
         collector->addChunk(
             hkStatisticsCollector::MEM_ARRAY, "OverlapsPntr", m_bodies.m_data,
-            (int32_t)(static_cast<int32_t>(sizeof(*m_bodies.m_data)) * m_bodies.m_size), v7
+            (static_cast<int32_t>(sizeof(*m_bodies.m_data)) * m_bodies.m_size), v7
         );
     }
     int32_t v8 = (int32_t)m_phantoms.m_capacityAndFlags;
@@ -178,7 +178,7 @@ void hkpCharacterProxy::calcContentStatistics(hkStatisticsCollector* collector, 
         );
         collector->addChunk(
             hkStatisticsCollector::MEM_ARRAY, "Manifold", m_phantoms.m_data,
-            (int32_t)(static_cast<int32_t>(sizeof(*m_phantoms.m_data)) * m_phantoms.m_size), v9
+            (static_cast<int32_t>(sizeof(*m_phantoms.m_data)) * m_phantoms.m_size), v9
         );
     }
     int32_t v10 = (int32_t)m_listeners.m_capacityAndFlags;
@@ -188,7 +188,7 @@ void hkpCharacterProxy::calcContentStatistics(hkStatisticsCollector* collector, 
         );
         collector->addChunk(
             hkStatisticsCollector::MEM_ARRAY, "ListnrPntr", m_listeners.m_data,
-            (int32_t)(static_cast<int32_t>(sizeof(*m_listeners.m_data)) * m_listeners.m_size), v11
+            (static_cast<int32_t>(sizeof(*m_listeners.m_data)) * m_listeners.m_size), v11
         );
     }
 }
@@ -926,7 +926,7 @@ void hkpCharacterProxy::updateFromCinfo(const hkpCharacterProxyCinfo& info) {
     m_maxCharacterSpeedForSolver = info.m_maxCharacterSpeedForSolver;
     m_characterStrength = info.m_characterStrength;
     m_characterMass = info.m_characterMass;
-    float fMaxSlopeCosine = static_cast<float>(std::cos(info.m_maxSlope));
+    float fMaxSlopeCosine = std::cos(info.m_maxSlope);
     m_maxSlopeCosine = fMaxSlopeCosine;
     m_penetrationRecoverySpeed = info.m_penetrationRecoverySpeed;
     m_maxCastIterations = info.m_maxCastIterations;
@@ -1716,10 +1716,8 @@ float hkpCharacterProxy::moveToLinearCastHitPosition(
     float v7 = _mm_shuffle_ps(v6, v6, 85)[0] + v6[0];
     float v8 = _mm_shuffle_ps(v6, v6, 170)[0];
     __m128 v9 = _mm_mul_ps(m_data->m_contact.m_separatingNormal.m_quad, output.m_position.m_quad);
-    double v10 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(static_cast<float>((v8 + v7)))));
-    float v19 =
-        static_cast<float>(_mm_shuffle_ps(v9, v9, 170)[0] + static_cast<float>(_mm_shuffle_ps(v9, v9, 85)[0] + v9[0])) /
-        v10;
+    double v10 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss((v8 + v7))));
+    float v19 = (_mm_shuffle_ps(v9, v9, 170)[0] + (_mm_shuffle_ps(v9, v9, 85)[0] + v9[0])) / v10;
     float v20 = m_keepDistance / -v19;
     float v16 = m_data->m_contact.m_position.m_quad[3] - v20 / v10;
     double v11 = 1.0;

@@ -28,11 +28,11 @@ char* GetGunWobble(ANIM_GROUP_WEAPON_ENUM aeWeaponType, float afTime, NiMatrix3&
         NiTimeController* pcontroller = pWobbleNode[aeWeaponType]->GetControllers();
         if (aeWeaponType) {
             float fstartTime = pcontroller->m_fLoKeyTime;
-            NiUpdateData UpdateData1(fstartTime, 1, 0);
+            NiUpdateData UpdateData1(fstartTime, true, false);
             pWobbleNode[aeWeaponType]->Update(UpdateData1);
         }
         startRot = (*&pWobbleNode[aeWeaponType]->m_kLocal).m_Rotate;
-        NiUpdateData UpdateData2(afTime, 1, 0);
+        NiUpdateData UpdateData2(afTime, true, false);
         pWobbleNode[aeWeaponType]->Update(UpdateData2);
         NiTransform* LocalTransform = &pWobbleNode[aeWeaponType]->m_kLocal;
         NiMatrix3* v4 = startRot.Inverse(&apResult);
@@ -41,7 +41,7 @@ char* GetGunWobble(ANIM_GROUP_WEAPON_ENUM aeWeaponType, float afTime, NiMatrix3&
     }
     else {
         apReturnWobble = NiMatrix3_IDENTITY;
-        return 0;
+        return nullptr;
     }
 }
 
@@ -96,11 +96,11 @@ void FreeGunWobble() {
             NiFixedString* Name = &pWobbleNode[i]->m_kName;
             const char* HandleString = Name->GetHandleString();
             pModelLoader->ReleaseFile(HandleString);
-            pWobbleNode[i] = 0;
+            pWobbleNode[i] = nullptr;
         }
         if (pWobbleBoneName[i]) {
             ourFree(pWobbleBoneName[i]);
-            pWobbleBoneName[i] = 0;
+            pWobbleBoneName[i] = nullptr;
         }
     }
 }

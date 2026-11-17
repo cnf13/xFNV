@@ -17,8 +17,8 @@
 #include "SDK/FaceGen/TriFileIO.h"
 #include "SDK/MSVC/crtdefs.h"
 
+#include <cstdint>
 #include <memory>
-#include <stdint.h>
 #include <vector>
 
 SettingT<INISettingCollection> gs_bFaceMipMaps_General("bFaceMipMaps:General", true);
@@ -65,14 +65,14 @@ NiSourceTexture* BSFaceGenImage::GetCompressedImage(
                 if (afUncompressedMax > static_cast<double>(afUncompressedMin)) {
                     float v58;
                     NiDevImageConverter imageConverter;
-                    NiPointer<NiSourceTexture> sptex(static_cast<NiSourceTexture*>(0));
-                    NiPixelData* ppixeldata = 0;
-                    NiPixelData* ppixeldataDest = 0;
+                    NiPointer<NiSourceTexture> sptex(static_cast<NiSourceTexture*>(nullptr));
+                    NiPixelData* ppixeldata = nullptr;
+                    NiPixelData* ppixeldataDest = nullptr;
                     BSFaceGenRGBAVector::iterator* v6 =
                         ::new (&v66) BSFaceGenRGBAVector::iterator(this->UncompressedImage.begin());
                     v65 = *v6;
                     uint32_t v64 = this->iHeight * this->iWidth;
-                    uint8_t* pbuffer = 0;
+                    uint8_t* pbuffer = nullptr;
                     if (aFormat.m_eFormat) {
                         NiPixelData* ppixeldata_3;
                         NiPixelData* v41 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
@@ -81,7 +81,7 @@ NiSourceTexture* BSFaceGenImage::GetCompressedImage(
                                 ::new (v41) NiPixelData(this->iWidth, this->iHeight, NiPixelFormat_RGBA32, 1u, 1u);
                         }
                         else {
-                            ppixeldata_3 = 0;
+                            ppixeldata_3 = nullptr;
                         }
                         ppixeldata = ppixeldata_3;
                         pbuffer = ppixeldata_3->GetPixels(0u, 0u);
@@ -170,7 +170,7 @@ NiSourceTexture* BSFaceGenImage::GetCompressedImage(
                                 ::new (v62) NiPixelData(this->iWidth, this->iHeight, NiPixelFormat_RGB24, 1u, 1u);
                         }
                         else {
-                            ppixeldata_2 = 0;
+                            ppixeldata_2 = nullptr;
                         }
                         ppixeldata = ppixeldata_2;
                         pbuffer = ppixeldata_2->GetPixels(0u, 0u);
@@ -234,20 +234,24 @@ NiSourceTexture* BSFaceGenImage::GetCompressedImage(
                         }
                     }
                     if (gs_bFaceMipMaps_General.operator bool()) {
-                        ppixeldataDest = imageConverter.NiDevImageConverter::GenerateMipmapLevels(ppixeldata, 0);
+                        ppixeldataDest = imageConverter.NiDevImageConverter::GenerateMipmapLevels(ppixeldata, nullptr);
                         if (ppixeldata) {
                             delete ppixeldata;
                         }
                         if (BSShaderManager::GetTintMipMaps()) {
                             BSShaderUtil::TintUncompressedPixelDataByMipMap(ppixeldataDest);
                         }
-                        sptex.operator=(NiSourceTexture::Create(ppixeldataDest, 0, NiSourceTexture::ms_kDefaultPrefs));
+                        sptex.operator=(
+                            NiSourceTexture::Create(ppixeldataDest, nullptr, NiSourceTexture::ms_kDefaultPrefs)
+                        );
                     }
                     else {
                         if (BSShaderManager::GetTintMipMaps()) {
                             BSShaderUtil::TintUncompressedPixelDataByMipMap(ppixeldata);
                         }
-                        sptex.operator=(NiSourceTexture::Create(ppixeldata, 0, NiSourceTexture::ms_kDefaultPrefs));
+                        sptex.operator=(
+                            NiSourceTexture::Create(ppixeldata, nullptr, NiSourceTexture::ms_kDefaultPrefs)
+                        );
                     }
                     if (aFormat.m_eFormat != NiPixelFormat::FORMAT_RGBA && aFormat.m_eFormat) {
                         NiSourceTexture* x = BSShaderUtil::ConvertTexture(sptex.m_pObject, aFormat);

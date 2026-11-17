@@ -25,7 +25,7 @@
 #include "Reconstruction.hpp"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 NavMeshSearchFlee::NavMeshSearchFlee() : pCurrentRequest(nullptr), bFavorGoingTowardsGoal(false) {}
 
@@ -121,7 +121,7 @@ bool NavMeshSearchFlee::GetNodeConnections(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool NavMeshSearchFlee::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) {
@@ -133,26 +133,26 @@ bool NavMeshSearchFlee::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSea
         if (pdest->GetNavMeshAndTriangle(spmeshPtr, sgoalTri)) {
             const NavMeshSearchNode* thisNode = &apNode->GetNodeData();
             if (thisNode->pNavMesh == spmeshPtr.m_pObject && thisNode->sTriangle == sgoalTri) {
-                return 1;
+                return true;
             }
         }
     }
     if (apNode == pStartNode) {
-        return 0;
+        return false;
     }
     apNode->tNodeData.GetCenter(&nodeCenter);
     // The squared horizontal length is stored to a float before the compare.
     float fsqrLength = (pCurrentRequest->Origin.GetLocation() - nodeCenter).SqrXYLength();
     double fminDistance = pCurrentRequest->fMinFleeDistance;
     if (fsqrLength < pCurrentRequest->fMinFleeDistance * fminDistance) {
-        return 0;
+        return false;
     }
     if (bFavorGoingTowardsGoal) {
         NiPoint3 destinationVec = GoalLocation - nodeCenter;
         NiPoint3 originDestinationVec = pCurrentRequest->Origin.GetLocation() - GoalLocation;
         double foriginDestSqrLength = originDestinationVec.SqrLength();
         if (destinationVec.SqrLength() > foriginDestSqrLength) {
-            return 0;
+            return false;
         }
     }
     float fscore = 0.0f;
@@ -183,7 +183,7 @@ bool NavMeshSearchFlee::BuildNodePath(
         AddStartNode(GetKeyForNode(aStartNode.pNavMesh, aStartNode.sTriangle), aStartNode, 0.0f);
     SetNodeData(pstartNode, aStartNode.pNavMesh, aStartNode.sTriangle);
     if (!apRequest->Destination.QUnused()) {
-        bFavorGoingTowardsGoal = 1;
+        bFavorGoingTowardsGoal = true;
         GoalLocation = pCurrentRequest->Destination.GetLocation();
     }
     bool bresult = Search(apReturnNodeArray, apReturnLinkArray, pCurrentRequest->bAllowIncompletePath);
@@ -194,7 +194,7 @@ bool NavMeshSearchFlee::BuildNodePath(
         fminDistance = BSMIN(fminDistance, 256.0f);
         NiPoint3 vec = startPoint - endLocation;
         if (fminDistance * fminDistance < vec.SqrLength()) {
-            return 1;
+            return true;
         }
     }
     return bresult;

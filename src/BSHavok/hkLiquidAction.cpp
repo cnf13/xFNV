@@ -92,7 +92,7 @@ hkpAction* hkLiquidAction::clone(
     MEM_CONTEXT eMemContext = v4->eMemContext;
     v4->eMemContext = MEM_CONTEXT_HAVOK;
     if (newEntities.m_size != 2 || newPhantoms.m_size) {
-        result = 0;
+        result = nullptr;
     }
     else {
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();

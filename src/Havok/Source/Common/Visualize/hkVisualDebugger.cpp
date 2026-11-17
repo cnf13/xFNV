@@ -142,21 +142,17 @@ void hkVisualDebugger::pollForNewClients() {
             m_frameTimer.m_running_flag.m_bool = 1;
             uint64_t v4 = hkStopwatch::getTickCounter();
             m_frameTimer.m_ticks_at_start = v4;
+            v4 = static_cast<uint64_t>((v4 & 0xFFFFFFFFull) | (static_cast<uint64_t>(static_cast<uint32_t>(v4)) << 32));
             v4 = static_cast<uint64_t>(
-                (static_cast<uint64_t>(v4) & 0xFFFFFFFFull) | (static_cast<uint64_t>(static_cast<uint32_t>(v4)) << 32)
-            );
-            v4 = static_cast<uint64_t>(
-                (static_cast<uint64_t>(v4) & 0xFFFFFFFF00000000ull) |
-                (static_cast<uint64_t>(
-                    static_cast<uint32_t>(static_cast<uint32_t>(m_frameTimer.m_ticks_at_start >> 32))
-                ))
+                (v4 & 0xFFFFFFFF00000000ull) |
+                (static_cast<uint64_t>(static_cast<uint32_t>(m_frameTimer.m_ticks_at_start >> 32)))
             );
             m_frameTimer.m_ticks_at_split = static_cast<uint64_t>(
-                (static_cast<uint64_t>(m_frameTimer.m_ticks_at_split) & 0xFFFFFFFF00000000ull) |
-                (static_cast<uint64_t>(static_cast<uint32_t>(static_cast<uint32_t>(v4 >> 32))))
+                (m_frameTimer.m_ticks_at_split & 0xFFFFFFFF00000000ull) |
+                (static_cast<uint64_t>(static_cast<uint32_t>(v4 >> 32)))
             );
             m_frameTimer.m_ticks_at_split = static_cast<uint64_t>(
-                (static_cast<uint64_t>(m_frameTimer.m_ticks_at_split) & 0xFFFFFFFFull) |
+                (m_frameTimer.m_ticks_at_split & 0xFFFFFFFFull) |
                 (static_cast<uint64_t>(static_cast<uint32_t>(v4)) << 32)
             );
         }
@@ -406,7 +402,7 @@ void hkVisualDebugger::shutdown() {
     hkSocket* m_server = this->m_server;
     if (m_server) {
         delete m_server;
-        this->m_server = 0;
+        this->m_server = nullptr;
         ::new (&apThis) hkErrStream(buf, 512);
         apThis.operator<<("Server deleted.");
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\hkVisualDebugger.cpp", 88);

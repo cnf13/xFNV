@@ -343,10 +343,10 @@ void NiPersistentSrcTextureRendererData::AllocateData(uint32_t uiLevels, uint32_
 void NiPersistentSrcTextureRendererData::FreeData() {
     if (m_pucPixels) {
         _NiFree(m_pucPixels);
-        m_puiOffsetInBytes = (uint32_t*)0;
-        m_puiHeight = (uint32_t*)0;
-        m_puiWidth = (uint32_t*)0;
-        m_pucPixels = (uint8_t*)0;
+        m_puiOffsetInBytes = (uint32_t*)nullptr;
+        m_puiHeight = (uint32_t*)nullptr;
+        m_puiWidth = (uint32_t*)nullptr;
+        m_pucPixels = (uint8_t*)nullptr;
     }
 }
 
@@ -363,6 +363,6 @@ NiObject* NiPersistentSrcTextureRendererData::CreateObject() {
         return ::new (v0) NiPersistentSrcTextureRendererData;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

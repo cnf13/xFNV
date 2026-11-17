@@ -58,10 +58,10 @@ void BSTempNodeManager::RemoveExpired(float afTime) {
             }
             v7 = 0;
         LABEL_14:;
-            v11 = v7 != 0 ? static_cast<BSTempNode*>(m_pObject) : 0;
+            v11 = v7 != 0 ? static_cast<BSTempNode*>(m_pObject) : nullptr;
         }
         else {
-            v11 = 0;
+            v11 = nullptr;
         }
         if (v11) {
             float v9 = fPrevTime;

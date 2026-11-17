@@ -16,7 +16,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiAnimationKey* NiStepColorKey::CreateArray(uint32_t uiNumKeys) {
     // EXE-INLINED none: NiNew NiStepColorKey[uiNumKeys] (the overflow-clamped size, the count cookie,

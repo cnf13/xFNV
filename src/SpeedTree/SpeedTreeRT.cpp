@@ -32,9 +32,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <exception>
 #include <memory>
-#include <stdint.h>
 #include <string>
 #include <vector>
 
@@ -98,8 +98,10 @@ float CVec3::Distance(const CVec3& cVec) const {
 }
 
 float CVec3::operator*(const CVec3& cVec) const {
-    return (float)(((m_afData[0] * (&cVec)->m_afData[0]) + (m_afData[1] * (&cVec)->m_afData[1])) +
-                   (m_afData[2] * (&cVec)->m_afData[2]));
+    return (
+        ((m_afData[0] * (&cVec)->m_afData[0]) + (m_afData[1] * (&cVec)->m_afData[1])) +
+        (m_afData[2] * (&cVec)->m_afData[2])
+    );
 }
 
 CVec3 CVec3::operator*(const CTransform& cTransform) const {
@@ -133,9 +135,9 @@ CVec3 CVec3::operator*(const CRotTransform& cTransform) const {
 
 CVec3* CVec3::Scale(CVec3* a2, float a3) const {
     CVec3 v4;
-    v4.m_afData[0] = (float)(a3 * m_afData[0]);
-    v4.m_afData[1] = (float)(a3 * m_afData[1]);
-    v4.m_afData[2] = (float)(a3 * m_afData[2]);
+    v4.m_afData[0] = (a3 * m_afData[0]);
+    v4.m_afData[1] = (a3 * m_afData[1]);
+    v4.m_afData[2] = (a3 * m_afData[2]);
     *a2 = v4;
     return a2;
 }
@@ -218,21 +220,21 @@ CSpeedTreeRT::SGeometry::SLeaf::~SLeaf() {
 }
 
 CSpeedTreeRT::SGeometry::SLeaf* CSpeedTreeRT::SGeometry::SLeaf::Init() {
-    m_bIsActive = 0;
+    m_bIsActive = false;
     m_fAlphaTestValue = -1.0f;
     m_nDiscreteLodLevel = -1;
     m_usLeafCount = 0;
-    m_pLeafMapIndices = 0;
-    m_pLeafClusterIndices = 0;
-    m_pCenterCoords = 0;
-    m_pLeafMapTexCoords = 0;
-    m_pLeafMapCoords = 0;
-    m_pColors = 0;
-    m_pNormals = 0;
-    m_pBinormals = 0;
-    m_pTangents = 0;
-    m_pWindWeights = 0;
-    m_pWindMatrixIndices = 0;
+    m_pLeafMapIndices = nullptr;
+    m_pLeafClusterIndices = nullptr;
+    m_pCenterCoords = nullptr;
+    m_pLeafMapTexCoords = nullptr;
+    m_pLeafMapCoords = nullptr;
+    m_pColors = nullptr;
+    m_pNormals = nullptr;
+    m_pBinormals = nullptr;
+    m_pTangents = nullptr;
+    m_pWindWeights = nullptr;
+    m_pWindMatrixIndices = nullptr;
     return this;
 }
 
@@ -523,7 +525,7 @@ int16_t CSpeedTreeRT::GetDiscreteBranchLodLevel(float fLodLevel) {
     if (fLodLevel == -1.0) {
         fLodLevel = GetLodLevel();
     }
-    int32_t nNumLodLevels = (uint16_t)GetNumBranchLodLevels();
+    int32_t nNumLodLevels = GetNumBranchLodLevels();
     int16_t sLevel = (int16_t)(int32_t)((1.0 - fLodLevel) * nNumLodLevels);
     if (sLevel == nNumLodLevels) {
         --sLevel;
@@ -563,14 +565,14 @@ uint16_t CSpeedTreeRT::GetDiscreteLeafLodLevel(float fLodLevel) {
         fLodLevel = GetLodLevel();
     }
     if (m_bDropToBillboard) {
-        int32_t nNumLodLevels = (uint16_t)GetNumLeafLodLevels() + 1;
+        int32_t nNumLodLevels = GetNumLeafLodLevels() + 1;
         nLevel = (uint16_t)(int32_t)((1.0 - fLodLevel) * nNumLodLevels);
         if (nLevel == nNumLodLevels) {
             --nLevel;
         }
     }
     else {
-        int32_t nNumLodLevels = (uint16_t)GetNumLeafLodLevels();
+        int32_t nNumLodLevels = GetNumLeafLodLevels();
         nLevel = (uint16_t)(int32_t)((1.0 - fLodLevel) * nNumLodLevels);
         if (nLevel == nNumLodLevels) {
             --nLevel;
@@ -672,10 +674,10 @@ void CSpeedTreeRT::GetSimpleBillboardGeometry(CSpeedTreeRT::SGeometry& sGeometry
                 sGeometry.m_sBillboard0.m_pTexCoords = m_pEmbeddedTexCoords->m_pBillboardTexCoords;
             }
             else {
-                sGeometry.m_sBillboard0.m_pTexCoords = 0;
+                sGeometry.m_sBillboard0.m_pTexCoords = nullptr;
             }
         }
-        sGeometry.m_sBillboard1.m_bIsActive = 0;
+        sGeometry.m_sBillboard1.m_bIsActive = false;
         sGeometry.m_sBillboard1.m_usWhich = 0;
         if (m_bHorizontalBillboard) {
             sGeometry.m_sHorizontalBillboard.m_pCoords = m_afHorizontalCoords;
@@ -684,21 +686,21 @@ void CSpeedTreeRT::GetSimpleBillboardGeometry(CSpeedTreeRT::SGeometry& sGeometry
                     &m_pEmbeddedTexCoords->m_pBillboardTexCoords[8 * m_pEmbeddedTexCoords->m_nNumBillboards - 8];
             }
             else {
-                sGeometry.m_sHorizontalBillboard.m_pTexCoords = 0;
+                sGeometry.m_sHorizontalBillboard.m_pTexCoords = nullptr;
             }
             sGeometry.m_sHorizontalBillboard.m_fAlphaTestValue = sGeometry.m_sBillboard0.m_fAlphaTestValue;
             sGeometry.m_sHorizontalBillboard.m_bIsActive = sGeometry.m_sHorizontalBillboard.m_fAlphaTestValue >= 0.0;
             sGeometry.m_sHorizontalBillboard.m_fAlphaTestValue = CSpeedTreeRT::m_fHorizontalFadeValue;
         }
         else {
-            sGeometry.m_sHorizontalBillboard.m_bIsActive = 0;
+            sGeometry.m_sHorizontalBillboard.m_bIsActive = false;
         }
         sGeometry.m_sHorizontalBillboard.m_usWhich = 0;
     }
     else {
-        sGeometry.m_sBillboard0.m_bIsActive = 0;
-        sGeometry.m_sBillboard1.m_bIsActive = 0;
-        sGeometry.m_sHorizontalBillboard.m_bIsActive = 0;
+        sGeometry.m_sBillboard0.m_bIsActive = false;
+        sGeometry.m_sBillboard1.m_bIsActive = false;
+        sGeometry.m_sHorizontalBillboard.m_bIsActive = false;
     }
 }
 
@@ -782,7 +784,7 @@ void CSpeedTreeRT::ComputeSelfShadowTexCoords() {
             if (m_pProjectedShadow) {
                 v5 = m_pTreeSizes[1];
                 v6 = m_pTreeSizes[2];
-                v10.m_afData[0] = (float)(*m_pTreeSizes);
+                v10.m_afData[0] = (*m_pTreeSizes);
                 v10.m_afData[1] = v5;
                 v10.m_afData[2] = v6;
                 v3 = m_pTreeSizes[4];
@@ -1208,9 +1210,7 @@ void CSpeedTreeRT::SetLocalMatrices(uint32_t nStartingMatrix, uint32_t nMatrixSp
         if (m_bTreeComputed) {
             SetError(const_cast<char*>("SetLocalMatrices() has no effect after Compute() has been called"));
         }
-        else if (
-            static_cast<uint32_t>(nStartingMatrix + nMatrixSpan - 1) >= CWindEngine::m_cWindMatrices.m_usNumMatrices
-        ) {
+        else if ((nStartingMatrix + nMatrixSpan - 1) >= CWindEngine::m_cWindMatrices.m_usNumMatrices) {
             SetError(const_cast<char*>("SetLocalMatrices() parameters exceed available wind matrices"));
         }
         else {
@@ -1724,7 +1724,7 @@ void CSpeedTreeRT::GetFrondGeometry(SGeometry& sGeometry, int16_t sOverrideLodVa
         sFronds.m_pStrips =
             const_cast<const uint16_t**>(m_pFrondGeometry->GetStripsPointer(static_cast<uint16_t>(sLodLevel)));
         if (m_bDropToBillboard) {
-            uint16_t usLodStageCount = static_cast<uint16_t>(static_cast<uint16_t>(GetNumLeafLodLevels()) + 1);
+            uint16_t usLodStageCount = static_cast<uint16_t>(GetNumLeafLodLevels() + 1);
             float fHighValue = -1.0f;
             float fLowValue = -1.0f;
             int16_t sHighLod = -1;
@@ -1757,7 +1757,7 @@ void CSpeedTreeRT::GetFrondGeometry(SGeometry& sGeometry, int16_t sOverrideLodVa
 // usLodStageCount adds 1 for m_bDropToBillboard alone, without speedtree-2's embedded-billboard test. Before choosing,
 // it runs CLeafGeometry::Update on every LOD into the first leaves.
 void CSpeedTreeRT::GetLeafGeometry(SGeometry& sGeometry, int16_t sOverrideLeafLodValue) {
-    uint16_t usLeafLodCount = static_cast<uint16_t>(GetNumLeafLodLevels());
+    uint16_t usLeafLodCount = GetNumLeafLodLevels();
     uint16_t usLodStageCount = static_cast<uint16_t>(usLeafLodCount + (m_bDropToBillboard ? 1 : 0));
     CVec3 cCameraPos;
     cCameraPos.m_afData[2] = 0.0f;
@@ -1784,7 +1784,7 @@ void CSpeedTreeRT::GetLeafGeometry(SGeometry& sGeometry, int16_t sOverrideLeafLo
     float fPitchRadians = static_cast<float>(std::asin(static_cast<double>(fZ)));
     float fPitchDegrees = static_cast<float>(fPitchRadians * 57.295780181884766);
     float fPitch = -fPitchDegrees;
-    for (uint16_t usLod = 0; usLod < static_cast<uint16_t>(GetNumLeafLodLevels()); ++usLod) {
+    for (uint16_t usLod = 0; usLod < GetNumLeafLodLevels(); ++usLod) {
         m_pLeafGeometry->Update(sGeometry.m_sLeaves0, usLod, fAzimuth, fPitch, m_fLeafSizeIncreaseFactor);
     }
     if (sOverrideLeafLodValue > -1) {
@@ -1829,7 +1829,7 @@ void CSpeedTreeRT::GetLeafGeometry(SGeometry& sGeometry, int16_t sOverrideLeafLo
     }
     else {
         uint16_t usDiscreteLodLevel = GetDiscreteLeafLodLevel(-1.0f);
-        if (usDiscreteLodLevel < static_cast<uint16_t>(GetNumLeafLodLevels())) {
+        if (usDiscreteLodLevel < GetNumLeafLodLevels()) {
             m_pLeafGeometry->SmallUpdate(
                 sGeometry.m_sLeaves0, usDiscreteLodLevel, fAzimuth, fPitch, m_fLeafSizeIncreaseFactor
             );
@@ -1867,7 +1867,7 @@ void CSpeedTreeRT::SetupHorizontalBillboard() {
 // filled when fLodLevel is not below 0.0, so NaN fills them too. LOD_SMOOTH first updates LOD 0 of the first leaves,
 // unlike speedtree-2's GetLeafGeometry.
 void CSpeedTreeRT::GetBSGeometryLODData(SGeometry& sGeometry, float afLODlevel) {
-    uint16_t usLeafLodCount = static_cast<uint16_t>(GetNumLeafLodLevels());
+    uint16_t usLeafLodCount = GetNumLeafLodLevels();
     uint16_t usLodStageCount = static_cast<uint16_t>(usLeafLodCount + (m_bDropToBillboard ? 1 : 0));
     float fHighLodAlphaValue = -1.0f;
     float fLowLodAlphaValue = -1.0f;
@@ -1957,7 +1957,7 @@ void CSpeedTreeRT::GetBSGeometryLODData(SGeometry& sGeometry, float afLODlevel) 
     }
     else {
         uint16_t usDiscreteLodLevel = GetDiscreteLeafLodLevel(-1.0f);
-        if (usDiscreteLodLevel < static_cast<uint16_t>(GetNumLeafLodLevels())) {
+        if (usDiscreteLodLevel < GetNumLeafLodLevels()) {
             m_pLeafGeometry->SmallUpdate(
                 sGeometry.m_sLeaves0, usDiscreteLodLevel, fAzimuth, fPitch, m_fLeafSizeIncreaseFactor
             );
@@ -1982,7 +1982,7 @@ void CSpeedTreeRT::ComputeLeafStaticLighting() {
         cTreeCenter.m_afData[1] = fY;
         cTreeCenter.m_afData[2] = fZ;
         std::vector<CBillboardLeaf*, std::allocator<CBillboardLeaf*>>* pAllLeaves = m_pEngine->m_vLeafLods;
-        uint16_t usNumLeafLods = (uint16_t)GetNumLeafLodLevels();
+        uint16_t usNumLeafLods = GetNumLeafLodLevels();
         m_pLightingEngine->ComputeLeafStaticLighting(cTreeCenter, pAllLeaves, usNumLeafLods);
     }
     catch (rt::exception& cException) {
@@ -2494,7 +2494,7 @@ void CSpeedTreeRT::Get360BillboardGeometry(CSpeedTreeRT::SGeometry& sGeometry, u
                 sLowLod[0] -= m_usNum360Billboards;
             }
             if ((ulBitVector & 32) != 0) {
-                sGeometry.m_sBillboard0.m_bIsActive = 1;
+                sGeometry.m_sBillboard0.m_bIsActive = true;
                 if (!(fLowValue > static_cast<double>(fHighValue))) {
                     sGeometry.m_sBillboard0.m_pTexCoords = &m_pEmbeddedTexCoords->m_pBillboardTexCoords[8 * sLowLod[0]];
                     float m_ucTargetAlphaValue = static_cast<float>(this->m_ucTargetAlphaValue);
@@ -2507,7 +2507,7 @@ void CSpeedTreeRT::Get360BillboardGeometry(CSpeedTreeRT::SGeometry& sGeometry, u
                     float v8 = static_cast<float>(this->m_ucTargetAlphaValue);
                     sGeometry.m_sBillboard0.m_fAlphaTestValue = fFade * (255.0f - v8) + v8;
                 }
-                sGeometry.m_sBillboard1.m_bIsActive = 0;
+                sGeometry.m_sBillboard1.m_bIsActive = false;
             }
             else {
                 if (m_pEmbeddedTexCoords) {
@@ -2515,7 +2515,7 @@ void CSpeedTreeRT::Get360BillboardGeometry(CSpeedTreeRT::SGeometry& sGeometry, u
                         &m_pEmbeddedTexCoords->m_pBillboardTexCoords[8 * sHighLod[0]];
                 }
                 else {
-                    sGeometry.m_sBillboard0.m_pTexCoords = 0;
+                    sGeometry.m_sBillboard0.m_pTexCoords = nullptr;
                 }
                 sGeometry.m_sBillboard0.m_fAlphaTestValue = fFade * (255.0f - fHighValue) + fHighValue;
                 sGeometry.m_sBillboard0.m_usWhich = sHighLod[0];
@@ -2524,10 +2524,10 @@ void CSpeedTreeRT::Get360BillboardGeometry(CSpeedTreeRT::SGeometry& sGeometry, u
                     sGeometry.m_sBillboard1.m_pTexCoords = &m_pEmbeddedTexCoords->m_pBillboardTexCoords[8 * sLowLod[0]];
                 }
                 else {
-                    sGeometry.m_sBillboard1.m_pTexCoords = 0;
+                    sGeometry.m_sBillboard1.m_pTexCoords = nullptr;
                 }
                 sGeometry.m_sBillboard1.m_usWhich = sLowLod[0];
-                sGeometry.m_sBillboard1.m_bIsActive = 1;
+                sGeometry.m_sBillboard1.m_bIsActive = true;
                 sGeometry.m_sBillboard1.m_fAlphaTestValue = fFade * (255.0f - fLowValue) + fLowValue;
             }
         }
@@ -2539,7 +2539,7 @@ void CSpeedTreeRT::Get360BillboardGeometry(CSpeedTreeRT::SGeometry& sGeometry, u
 const float* CSpeedTreeRT::GetLeafLodSizeAdjustments() {
     try {
         if (!m_pLeafLodSizeFactors) {
-            int32_t nNumLeafLods = (uint16_t)GetNumLeafLodLevels();
+            int32_t nNumLeafLods = GetNumLeafLodLevels();
             size_t uiSize =
                 (uint32_t)nNumLeafLods > SIZE_MAX / sizeof(float) ? SIZE_MAX : sizeof(float) * (uint32_t)nNumLeafLods;
             m_pLeafLodSizeFactors = static_cast<float*>(MemoryManager_Singleton.Allocate(uiSize));
@@ -2706,7 +2706,7 @@ void CSpeedTreeRT::GetTransitionValues(
         sHighLod = (int16_t)(usDiscreteTransitionPoint - 1);
         v14 = (float)(1.0 - v15);
         v13 = (float)std::pow((double)v14, (double)fCurveExponent);
-        fHighValue = (float)((v13 * (255.0f - fTargetAlphaValue)) + fTargetAlphaValue);
+        fHighValue = ((v13 * (255.0f - fTargetAlphaValue)) + fTargetAlphaValue);
         v22 = (float)(fTransitionStage / (1.0 - fTransitionFactor));
         if (!(v22 < 1.0)) {
             v12 = (float)1.0;
@@ -2717,12 +2717,12 @@ void CSpeedTreeRT::GetTransitionValues(
         sLowLod = (int16_t)usDiscreteTransitionPoint;
         v11 = (float)(1.0 - v12);
         v10 = (float)std::pow((double)v11, (double)fCurveExponent);
-        fLowValue = (float)((v10 * (255.0f - fTargetAlphaValue)) + fTargetAlphaValue);
+        fLowValue = ((v10 * (255.0f - fTargetAlphaValue)) + fTargetAlphaValue);
     }
     else {
         fHighValue = fTargetAlphaValue;
         sHighLod = (int16_t)((int32_t)((1.0 - fLodLevel) * ((double)usLodCount)));
-        if (((int32_t)(sHighLod)) >= ((int32_t)((int16_t)(usLodCount - 1)))) {
+        if (((int32_t)sHighLod) >= ((int32_t)((int16_t)(usLodCount - 1)))) {
             v16 = (int16_t)(usLodCount - 1);
         }
         else {
@@ -3234,7 +3234,7 @@ void CLightingEngine::ComputeLeafStaticLighting(
             for (int32_t nLod = 0; nLod < nNumLeafLods; ++nLod) {
                 const LeafVector& vLeaves = pLeafLods[nLod];
                 LeafVector::const_iterator hProcess = vLeaves.begin();
-                while (1) {
+                while (true) {
                     CVec3 cDominantLight;
                     CVec3 cColor;
                     LeafVector::const_iterator apMemory = vLeaves.end();
@@ -3341,7 +3341,7 @@ void CLightingEngine::ComputeLeafStaticLighting(
                         cColor.m_afData[2] = 0.0f;
                     }
                     if ((m_eStaticLightingStyle & CSpeedTreeRT::SLS_USE_LIGHT_SOURCES) != 0) {
-                        hProcess.operator*()->SetColor(cColor, 0);
+                        hProcess.operator*()->SetColor(cColor, false);
                     }
                     if ((m_eStaticLightingStyle & CSpeedTreeRT::SLS_SIMULATE_SHADOWS) != 0) {
                         hProcess.operator*()->AdjustStaticLighting(
@@ -3425,7 +3425,7 @@ const float* CSimpleBillboard::GetBillboardCoords(float fWidth, float fHeight) {
         m_acTreeBillboard[9] = fWidth * CSimpleBillboard::m_acUnitBillboard[3][0];
         m_acTreeBillboard[10] = fWidth * CSimpleBillboard::m_acUnitBillboard[3][1];
         m_acTreeBillboard[11] = fHeight * CSimpleBillboard::m_acUnitBillboard[3][2];
-        m_bValid = 1;
+        m_bValid = true;
     }
     return m_acTreeBillboard;
 }
@@ -3446,7 +3446,7 @@ void CWindMatrices::Resize(uint16_t usCount) {
             v2 = v6;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         m_pMatrices = v2;
     }

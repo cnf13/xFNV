@@ -36,7 +36,7 @@ NiD3DGeometryGroupManager::~NiD3DGeometryGroupManager() {
 
 NiGeometryGroup* NiD3DGeometryGroupManager::CreateGroup(NiGeometryGroupManager::RepackingBehavior eBehavior) {
     NiGeometryGroup* pkGroup;
-    NiGeometryGroup* result = 0;
+    NiGeometryGroup* result = nullptr;
     if (eBehavior) {
         if (eBehavior == NiGeometryGroupManager::UNSHARED) {
             pkGroup = NiUnsharedGeometryGroup::Create();
@@ -177,10 +177,10 @@ bool NiD3DGeometryGroupManager::AddObjectToGroup(
     uint32_t auiBonesPerVertex
 ) {
     NiSkinPartition* m_pObject;
-    if (apSkinInstance && (abHWSkinning && (m_pObject = apSkinInstance->m_spSkinPartition.m_pObject) != 0)) {
+    if (apSkinInstance && (abHWSkinning && (m_pObject = apSkinInstance->m_spSkinPartition.m_pObject) != nullptr)) {
         NiSkinPartition::Partition* m_pkPartitions = m_pObject->m_pkPartitions;
         if (m_pkPartitions->m_pkBuffData) {
-            return 0;
+            return false;
         }
         else {
             uint32_t m_uiPartitions = m_pObject->m_uiPartitions;
@@ -192,16 +192,16 @@ bool NiD3DGeometryGroupManager::AddObjectToGroup(
                 }
                 while (v11);
             }
-            return 1;
+            return true;
         }
     }
     else {
         if (apData->m_pkBuffData) {
-            return 0;
+            return false;
         }
         else {
-            apGroup->AddObject(apData, apSkinInstance, static_cast<NiSkinPartition::Partition*>(0));
-            return 1;
+            apGroup->AddObject(apData, apSkinInstance, static_cast<NiSkinPartition::Partition*>(nullptr));
+            return true;
         }
     }
 }

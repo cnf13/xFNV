@@ -20,7 +20,7 @@ bool BSSearchPath::GetNextSearchPath(char* apPath, uint32_t uiStringLen) {
 }
 
 bool BSSearchPath::Access(char* apFile) {
-    return 1;
+    return true;
 }
 
 void BSSearchPath::InitCallback() {

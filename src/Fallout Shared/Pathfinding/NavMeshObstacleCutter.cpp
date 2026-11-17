@@ -106,20 +106,20 @@ bool NavMeshObstacleCutter::SplitNavMeshFromObstacle(
     NiPoint3 kFudge;
     pNavMesh = apNavMesh;
     this->spObstacle.operator=(aBox);
-    this->Vertices.Clear(0);
+    this->Vertices.Clear(false);
     for (uint32_t i = 0; i < this->Edges.iSize; ++i) {
         if (this->Edges.GetAt(static_cast<int32_t>(i))->spObstacle.m_pObject) {
             this->Edges.GetAt(static_cast<int32_t>(i))->spObstacle.m_pObject->DecRefCount();
         }
     }
-    this->Edges.Clear(0);
+    this->Edges.Clear(false);
     void* pMemory = NiMemObject::operator new(sizeof(ObstacleUndoData));
     ObstacleUndoData* pNewUndoData;
     if (pMemory) {
         pNewUndoData = ::new (pMemory) ObstacleUndoData;
     }
     else {
-        pNewUndoData = 0;
+        pNewUndoData = nullptr;
     }
     this->pUndoData = pNewUndoData;
     BSSimpleArray<uint16_t, 1024>* pOverlapped = &this->pUndoData->OverlappedTriangles;
@@ -127,7 +127,7 @@ bool NavMeshObstacleCutter::SplitNavMeshFromObstacle(
     this->pNavMesh->GetOverlappedTriangleList(aBox, *pFudge, pOverlapped);
     if (this->pUndoData->OverlappedTriangles.IsEmpty()) {
         delete this->pUndoData;
-        return 0;
+        return false;
     }
     else {
         this->pUndoData->eState = ObstacleUndoData::OBSTACLE_UNDO_STATE_ACTIVE;
@@ -144,7 +144,7 @@ bool NavMeshObstacleCutter::SplitNavMeshFromObstacle(
         this->GenerateOutsideVertsAndEdges();
         for (uint32_t i_3 = 0; i_3 < this->pUndoData->OverlappedTriangles.iSize; ++i_3) {
             uint16_t ustriangle = this->pUndoData->OverlappedTriangles.GetAt(static_cast<int32_t>(i_3));
-            NiPointer<ObstacleData> sppreviousObstacle(static_cast<ObstacleData*>(0));
+            NiPointer<ObstacleData> sppreviousObstacle(static_cast<ObstacleData*>(nullptr));
             if (this->pNavMesh->pTriangleToObstacleMap->GetAt(ustriangle, sppreviousObstacle)) {
                 // The by-value argument is copied by NiPointer's copy constructor.
                 this->pUndoData->RemovedTriangleToObstacleMap.SetAt(ustriangle, sppreviousObstacle);
@@ -155,7 +155,7 @@ bool NavMeshObstacleCutter::SplitNavMeshFromObstacle(
         this->SplitEdges();
         for (uint32_t i_4 = 0; i_4 < this->Vertices.iSize; ++i_4) {
             if (this->IsVertInObstacleArea(this->Vertices.GetAt(static_cast<int32_t>(i_4)))) {
-                this->Vertices.GetAt(static_cast<int32_t>(i_4))->bInObstacleArea = 1;
+                this->Vertices.GetAt(static_cast<int32_t>(i_4))->bInObstacleArea = true;
             }
         }
         this->RemoveInvalidEdges();
@@ -179,13 +179,13 @@ bool NavMeshObstacleCutter::SplitNavMeshFromObstacle(
             this->UpdateCoverArray();
             this->AddNewPOVs();
             this->pNavMesh->AddObstacleUndoData(this->pUndoData);
-            return 1;
+            return true;
         }
         else {
-            this->pNavMesh->Vertices.SetSize(this->pUndoData->iFirstAddedVertexIndex, 1);
-            this->pNavMesh->Triangles.SetSize(this->pUndoData->iFirstAddedTriangleIndex, 1);
+            this->pNavMesh->Vertices.SetSize(this->pUndoData->iFirstAddedVertexIndex, true);
+            this->pNavMesh->Triangles.SetSize(this->pUndoData->iFirstAddedTriangleIndex, true);
             delete this->pUndoData;
-            return 0;
+            return false;
         }
     }
 }
@@ -195,13 +195,13 @@ bool NavMeshObstacleCutter::CheckPotentialEdgeAgainstRunningEdgeList(
     NavMeshObstacleVertex* apVert2
 ) {
     if (apVert1->bOnObstacle && apVert2->bOnObstacle) {
-        return 0;
+        return false;
     }
     if (!apVert1->bOnObstacle && apVert1->bInObstacleArea) {
-        return 0;
+        return false;
     }
     if (!apVert2->bOnObstacle && apVert2->bInObstacleArea) {
-        return 0;
+        return false;
     }
     NavMeshVertex* a2_8 = pNavMesh->GetVertex(apVert1->usVertexIndex);
     NiPoint3* vert2Loc = &pNavMesh->GetVertex(apVert2->usVertexIndex)->Location;
@@ -210,7 +210,7 @@ bool NavMeshObstacleCutter::CheckPotentialEdgeAgainstRunningEdgeList(
     if (apVert1->bOnObstacle != apVert2->bOnObstacle) {
         NiPoint3 midPoint = (a2_8->Location + *vert2Loc) * 0.5f;
         if (!IsPointInOverlappedArea(midPoint)) {
-            return 0;
+            return false;
         }
     }
     for (uint32_t i = Edges.iSize - 1; i != -1; --i) {
@@ -218,7 +218,7 @@ bool NavMeshObstacleCutter::CheckPotentialEdgeAgainstRunningEdgeList(
              Edges.GetAt(static_cast<int32_t>(i))->pVerts[1] == apVert2) ||
             (Edges.GetAt(static_cast<int32_t>(i))->pVerts[0] == apVert2 &&
              Edges.GetAt(static_cast<int32_t>(i))->pVerts[1] == apVert1)) {
-            return 0;
+            return false;
         }
         if (Edges.GetAt(static_cast<int32_t>(i))->pVerts[0] != apVert1 &&
             Edges.GetAt(static_cast<int32_t>(i))->pVerts[1] != apVert1 &&
@@ -231,11 +231,11 @@ bool NavMeshObstacleCutter::CheckPotentialEdgeAgainstRunningEdgeList(
             NiPoint2 a3(edgeVert1Loc->x, edgeVert1Loc->y);
             NiPoint2 v9(edgeVert2Loc->x, edgeVert2Loc->y);
             if (NavMeshMath::Find2DIntersection(a1, v14, a3, v9)) {
-                return 0;
+                return false;
             }
         }
     }
-    return 1;
+    return true;
 }
 
 NavMeshObstacleEdge* NavMeshObstacleCutter::CreateEdge(
@@ -258,15 +258,15 @@ bool NavMeshObstacleCutter::IsPointInOverlappedArea(const NiPoint3& aPoint) {
     for (i = 0; i < (&pUndoData->OverlappedTriangles)->iSize; ++i) {
         v2 = &(&pUndoData->OverlappedTriangles)->GetAt(i);
         if (pNavMesh->IsPointInsideTriangle(*v2, aPoint, arZDiff, 180.0f, 180.0f)) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 bool NavMeshObstacleCutter::IsVertInOverlappedArea(NavMeshObstacleVertex* apVert) {
     if (apVert->bOnBounds || apVert->bOnOpenEdge) {
-        return (bool)1;
+        return true;
     }
     NavMeshVertex* vertex = pNavMesh->GetVertex(apVert->usVertexIndex);
     return (bool)((uint8_t)IsPointInOverlappedArea(vertex->Location));
@@ -295,19 +295,19 @@ void NavMeshObstacleCutter::RemoveTrianglesFromNavMeshGrid() {
 bool NavMeshObstacleCutter::IsPointInObstacleArea(const NiPoint3& aPoint) const {
     for (uint32_t i = 0; i < pUndoData->OverlappedTriangles.iSize; ++i) {
         if (NavMeshObstacleManager::IsPointInBox(aPoint, spObstacle, 200.0f, 32.0f)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 bool NavMeshObstacleCutter::ResetNavMeshFromObstacleUndoData(NavMesh* apNavMesh, ObstacleUndoData* apUndoData) {
     pNavMesh = apNavMesh;
     pUndoData = apUndoData;
     RemoveTrianglesFromNavMeshGrid();
-    (&pNavMesh->Vertices)->SetSize(pUndoData->iFirstAddedVertexIndex, 1);
-    (&pNavMesh->Triangles)->SetSize(pUndoData->iFirstAddedTriangleIndex, 1);
-    return (bool)1;
+    (&pNavMesh->Vertices)->SetSize(pUndoData->iFirstAddedVertexIndex, true);
+    (&pNavMesh->Triangles)->SetSize(pUndoData->iFirstAddedTriangleIndex, true);
+    return true;
 }
 
 bool NavMeshObstacleCutter::CheckTriangleAgainstOverlapped(
@@ -348,7 +348,7 @@ bool NavMeshObstacleCutter::CheckTriangleAgainstObstacle(
             (pvert != apVert2 &&
              (pvert != apVert3 &&
               NavMeshMath::IsPointInsideTriangle(vert1Loc, vert2Loc, vert3Loc, vertLoc, dontCare, 128.0f, 180.0f)))) {
-            return 0;
+            return false;
         }
     }
     return !NavMeshObstacleManager::IsPointInBox(center, spObstacle, 128.0f, 180.0f);
@@ -399,18 +399,18 @@ void NavMeshObstacleCutter::GetModifiedTriangleList(BSSimpleArray<BoundsTriangle
                     if (pUndoData->OverlappedTriangles.Find(
                             boundsTriangle, 0, &BSSimpleArray<uint16_t, 1024>::DefaultEqualFunctionByAddress
                         ) == -1) {
-                        bool bInList = 0;
+                        bool bInList = false;
                         for (uint32_t j = 0; j < aBoundsTriangle.iSize; ++j) {
                             int32_t usTriangleIndex =
                                 (&aBoundsTriangle.GetAt(static_cast<int32_t>(j)))->usTriangleIndex;
                             if (usTriangleIndex == boundsTriangle) {
-                                bInList = 1;
+                                bInList = true;
                                 break;
                             }
                         }
                         if (!bInList) {
                             int32_t iboundsTriangleIndex = aBoundsTriangle.iSize;
-                            aBoundsTriangle.SetSize(iboundsTriangleIndex + 1, 1);
+                            aBoundsTriangle.SetSize(iboundsTriangleIndex + 1, true);
                             BoundsTriangleInfo* v6 = &aBoundsTriangle.GetAt(iboundsTriangleIndex);
                             v6->usTriangleIndex = boundsTriangle;
                             ptri->SetFlag(256);
@@ -441,22 +441,22 @@ void NavMeshObstacleCutter::GenerateOutsideVertsAndEdges() {
         NavMeshTriangle* ptri = pNavMesh->GetTriangle(*v2);
         for (int32_t e = 0; e < 3; ++e) {
             EDGE_TYPE eedgeType = EDGE_TYPE_OPEN;
-            bool bOnBoundsEdge = 0;
-            bool bOnOpenEdge = 0;
+            bool bOnBoundsEdge = false;
+            bool bOnOpenEdge = false;
             if (ptri->EdgeHasExtraInfo(e)) {
                 eedgeType = EDGE_TYPE_PORTAL;
-                bOnOpenEdge = 1;
+                bOnOpenEdge = true;
             }
             else {
                 if (ptri->GetTriOrExtraInfo(e) == 0xFFFF) {
                     eedgeType = EDGE_TYPE_OPEN;
-                    bOnOpenEdge = 1;
+                    bOnOpenEdge = true;
                 }
                 else {
                     uint16_t aValue = ptri->GetTriOrExtraInfo(e);
                     if (pUndoData->OverlappedTriangles.Find(aValue, 0, return_equals) == -1) {
                         eedgeType = EDGE_TYPE_BOUNDS;
-                        bOnBoundsEdge = 1;
+                        bOnBoundsEdge = true;
                     }
                 }
             }
@@ -468,7 +468,7 @@ void NavMeshObstacleCutter::GenerateOutsideVertsAndEdges() {
                 for (uint32_t v = 0; v < 2; ++v) {
                     uint32_t ivertIndex = FindVert(edgeVerts[v]);
                     if (ivertIndex == -1) {
-                        NavMeshObstacleVertex* pvert = CreateVertex(edgeVerts[v], 0, bOnBoundsEdge, bOnOpenEdge);
+                        NavMeshObstacleVertex* pvert = CreateVertex(edgeVerts[v], false, bOnBoundsEdge, bOnOpenEdge);
                         Vertices.Add(pvert);
                         edgeObsVertices[v] = pvert;
                     }
@@ -538,7 +538,7 @@ void NavMeshObstacleCutter::GenerateBoxVertsAndEdges() {
             NiPoint3(spObstacle.m_pObject->BoxMax.x, spObstacle.m_pObject->BoxMin.y, spObstacle.m_pObject->BoxMin.z);
     ObstacleData* v1 = spObstacle.m_pObject;
     float fzheight = v1->aabbMax.z - spObstacle.m_pObject->aabbMin.z;
-    uint16_t coverData = NavMeshTriangle::GetCoverLevel(fzheight, 1, 0);
+    uint16_t coverData = NavMeshTriangle::GetCoverLevel(fzheight, true, false);
     rt::eh_vector_constructor_iterator(corners, sizeof(NiPoint3), 4, &emptyPointConstructor);
     for (uint32_t i = 0; i < 4; ++i) {
         NiPoint3* z = &spObstacle.m_pObject->Center;
@@ -552,7 +552,7 @@ void NavMeshObstacleCutter::GenerateBoxVertsAndEdges() {
         NavMeshVertex kVertex;
         kVertex.Location = corners[i_1];
         uint16_t ivertIndex = pNavMesh->AddVertex(kVertex);
-        pboxverts[i_1] = CreateVertex(ivertIndex, 1, 0, 0);
+        pboxverts[i_1] = CreateVertex(ivertIndex, true, false, false);
         Vertices.Add(pboxverts[i_1]);
     }
     for (uint32_t i_2 = 0; i_2 < 4; ++i_2) {
@@ -565,8 +565,8 @@ void NavMeshObstacleCutter::GenerateBoxVertsAndEdges() {
         NavMeshVertex* v6 = pNavMesh->GetVertex(pboxedges[i_3]->pVerts[1]->usVertexIndex);
         if ((v6->Location - za->Location).SqrXYLength() > 64.0) {
             pboxedges[i_3]->coverData = coverData;
-            pboxedges[i_3]->bLeftSide = 1;
-            pboxedges[i_3]->bRightSide = 1;
+            pboxedges[i_3]->bLeftSide = true;
+            pboxedges[i_3]->bRightSide = true;
             pboxedges[i_3]->spObstacle.operator=(spObstacle);
         }
     }
@@ -603,53 +603,53 @@ void NavMeshObstacleCutter::SplitEdges() {
                             )) {
                             NavMeshObstacleVertex* pintersectionVert;
                             float fminIntersectionLengthSqr = 0.0001f;
-                            bool bcutObstacleEdge = 0;
-                            bool bcutOpenEdge = 0;
+                            bool bcutObstacleEdge = false;
+                            bool bcutOpenEdge = false;
                             if (fminIntersectionLengthSqr > (*openVert1Loc - intersection).SqrXYLength()) {
                                 pintersectionVert = pOpenVert1;
-                                bcutObstacleEdge = 1;
-                                bcutOpenEdge = 0;
+                                bcutObstacleEdge = true;
+                                bcutOpenEdge = false;
                             }
                             else if (fminIntersectionLengthSqr > (*openVert2Loc - intersection).SqrXYLength()) {
                                 pintersectionVert = pOpenVert2;
-                                bcutObstacleEdge = 1;
-                                bcutOpenEdge = 0;
+                                bcutObstacleEdge = true;
+                                bcutOpenEdge = false;
                             }
                             else if (fminIntersectionLengthSqr > (*obsVert1Loc - intersection).SqrXYLength()) {
                                 pintersectionVert = pObsVert1;
-                                bcutObstacleEdge = 0;
-                                bcutOpenEdge = 1;
+                                bcutObstacleEdge = false;
+                                bcutOpenEdge = true;
                             }
                             else if (fminIntersectionLengthSqr > (*obsVert2Loc - intersection).SqrXYLength()) {
                                 pintersectionVert = pObsVert2;
-                                bcutObstacleEdge = 0;
-                                bcutOpenEdge = 1;
+                                bcutObstacleEdge = false;
+                                bcutOpenEdge = true;
                             }
                             else {
                                 NavMeshVertex kVertex;
                                 kVertex.Location = intersection;
                                 uint16_t ivertIndex = pNavMesh->AddVertex(kVertex);
-                                pintersectionVert = CreateVertex(ivertIndex, 1, 0, 1);
+                                pintersectionVert = CreateVertex(ivertIndex, true, false, true);
                                 Vertices.Add(pintersectionVert);
-                                bcutObstacleEdge = 1;
-                                bcutOpenEdge = 1;
+                                bcutObstacleEdge = true;
+                                bcutOpenEdge = true;
                             }
-                            NavMeshObstacleEdge* pobsEdge1 = 0;
-                            NavMeshObstacleEdge* pobsEdge2 = 0;
-                            NavMeshObstacleEdge* popenEdge1 = 0;
-                            NavMeshObstacleEdge* popenEdge2 = 0;
+                            NavMeshObstacleEdge* pobsEdge1 = nullptr;
+                            NavMeshObstacleEdge* pobsEdge2 = nullptr;
+                            NavMeshObstacleEdge* popenEdge1 = nullptr;
+                            NavMeshObstacleEdge* popenEdge2 = nullptr;
                             if (bcutObstacleEdge) {
                                 pobsEdge1 = CreateEdge(pObsVert1, pintersectionVert, EDGE_TYPE_OBSTACLE);
                                 pobsEdge2 = CreateEdge(pintersectionVert, pObsVert2, EDGE_TYPE_OBSTACLE);
-                                pobsEdge1->bFromSplit = 1;
-                                pobsEdge2->bFromSplit = 1;
+                                pobsEdge1->bFromSplit = true;
+                                pobsEdge2->bFromSplit = true;
                                 pobsEdge1->coverData = pObstacleEdge->coverData;
                                 pobsEdge2->coverData = pObstacleEdge->coverData;
                                 if (pObstacleEdge->bLeftSide) {
-                                    pobsEdge1->bLeftSide = 1;
+                                    pobsEdge1->bLeftSide = true;
                                 }
                                 if (pObstacleEdge->bRightSide) {
-                                    pobsEdge2->bRightSide = 1;
+                                    pobsEdge2->bRightSide = true;
                                 }
                                 pobsEdge1->spObstacle.operator=(pObstacleEdge->spObstacle);
                                 pobsEdge2->spObstacle.operator=(pObstacleEdge->spObstacle);
@@ -657,19 +657,19 @@ void NavMeshObstacleCutter::SplitEdges() {
                             if (bcutOpenEdge) {
                                 popenEdge1 = CreateEdge(pOpenVert1, pintersectionVert, pOpenEdge->EdgeType);
                                 popenEdge2 = CreateEdge(pintersectionVert, pOpenVert2, pOpenEdge->EdgeType);
-                                popenEdge1->bFromSplit = 1;
+                                popenEdge1->bFromSplit = true;
                                 popenEdge1->hOriginalEdge.Copy(pOpenEdge->hOriginalEdge);
                                 popenEdge1->hOriginalEdgeExtraInfo = pOpenEdge->hOriginalEdgeExtraInfo;
-                                popenEdge2->bFromSplit = 1;
+                                popenEdge2->bFromSplit = true;
                                 popenEdge2->hOriginalEdge.Copy(pOpenEdge->hOriginalEdge);
                                 popenEdge2->hOriginalEdgeExtraInfo = pOpenEdge->hOriginalEdgeExtraInfo;
                                 popenEdge1->coverData = pOpenEdge->coverData;
                                 popenEdge2->coverData = pOpenEdge->coverData;
                                 if (pOpenEdge->bLeftSide) {
-                                    popenEdge1->bLeftSide = 1;
+                                    popenEdge1->bLeftSide = true;
                                 }
                                 if (pOpenEdge->bRightSide) {
-                                    popenEdge2->bRightSide = 1;
+                                    popenEdge2->bRightSide = true;
                                 }
                                 popenEdge1->spObstacle.operator=(pOpenEdge->spObstacle);
                                 popenEdge2->spObstacle.operator=(pOpenEdge->spObstacle);
@@ -682,8 +682,8 @@ void NavMeshObstacleCutter::SplitEdges() {
                                     if (Edges.GetAt(static_cast<int32_t>(j))->spObstacle.m_pObject) {
                                         Edges.GetAt(static_cast<int32_t>(j))->spObstacle.m_pObject->DecRefCount();
                                     }
-                                    Edges.Remove(j, 1);
-                                    Edges.Remove(i--, 1);
+                                    Edges.Remove(j, true);
+                                    Edges.Remove(i--, true);
                                 }
                                 else {
                                     if (Edges.GetAt(static_cast<int32_t>(i))->spObstacle.m_pObject) {
@@ -692,8 +692,8 @@ void NavMeshObstacleCutter::SplitEdges() {
                                     if (Edges.GetAt(static_cast<int32_t>(j))->spObstacle.m_pObject) {
                                         Edges.GetAt(static_cast<int32_t>(j))->spObstacle.m_pObject->DecRefCount();
                                     }
-                                    Edges.Remove(i, 1);
-                                    Edges.Remove(j, 1);
+                                    Edges.Remove(i, true);
+                                    Edges.Remove(j, true);
                                     i -= 2;
                                 }
                             }
@@ -702,13 +702,13 @@ void NavMeshObstacleCutter::SplitEdges() {
                                     if (Edges.GetAt(static_cast<int32_t>(i))->spObstacle.m_pObject) {
                                         Edges.GetAt(static_cast<int32_t>(i))->spObstacle.m_pObject->DecRefCount();
                                     }
-                                    Edges.Remove(i--, 1);
+                                    Edges.Remove(i--, true);
                                 }
                                 if (bcutOpenEdge) {
                                     if (Edges.GetAt(static_cast<int32_t>(j))->spObstacle.m_pObject) {
                                         Edges.GetAt(static_cast<int32_t>(j))->spObstacle.m_pObject->DecRefCount();
                                     }
-                                    Edges.Remove(j, 1);
+                                    Edges.Remove(j, true);
                                     if (i > j) {
                                         --i;
                                     }
@@ -886,7 +886,7 @@ void NavMeshObstacleCutter::CreateSwappedEdgeList(TaskPortalSwap& aPortalSwaps) 
             ::new (&swapEdge) PortalEdgeSwap;
             swapEdge.hNewEdge.Copy(hNewEdge);
             swapEdge.hOldEdge.Copy(Edges.GetAt(static_cast<int32_t>(uiIndex))->hOriginalEdge);
-            swapEdge.bFromAddition = 1;
+            swapEdge.bFromAddition = true;
             pUndoData->EdgeSwap.Add(swapEdge);
             uint32_t uiChildIndex = aPortalSwaps.PotentialChildren.Find(swapEdge.hOldEdge, 0, &EdgeHandleEqual);
             if (static_cast<int32_t>(uiChildIndex) == -1) {
@@ -908,7 +908,7 @@ void NavMeshObstacleCutter::CreateSwappedEdgeList(TaskPortalSwap& aPortalSwaps) 
     if (!childSwapsToRemove.IsEmpty()) {
         childSwapsToRemove.Sort(&fnvd::callFunction<&CompareUInt>);
         for (int32_t i = childSwapsToRemove.iSize - 1; i >= 0; --i) {
-            aPortalSwaps.PotentialChildren.Remove(childSwapsToRemove.GetAt(i), 1);
+            aPortalSwaps.PotentialChildren.Remove(childSwapsToRemove.GetAt(i), true);
         }
     }
 }
@@ -1066,7 +1066,7 @@ bool NavMeshObstacleCutter::UndoNavMeshFromObstacleUndoData(
         ::new (&reverseSwap) PortalEdgeSwap;
         reverseSwap.hNewEdge.Copy(pUndoData->EdgeSwap.GetAt(static_cast<int32_t>(i)).hOldEdge);
         reverseSwap.hOldEdge.Copy(pUndoData->EdgeSwap.GetAt(static_cast<int32_t>(i)).hNewEdge);
-        reverseSwap.bFromAddition = 0;
+        reverseSwap.bFromAddition = false;
         uint32_t index =
             static_cast<uint32_t>(aPortalSwaps.PotentialChildren.Find(reverseSwap.hOldEdge, 0, &EdgeHandleEqual));
         if (index == 0xFFFFFFFF) {
@@ -1128,7 +1128,7 @@ bool NavMeshObstacleCutter::UndoNavMeshFromObstacleUndoData(
     NiTMapItem<uint16_t, NiPointer<ObstacleData>>* it = pUndoData->RemovedTriangleToObstacleMap.GetFirstPos();
     while (it) {
         uint16_t ustriangle;
-        NiPointer<ObstacleData> sppreviousObstacle(static_cast<ObstacleData*>(0));
+        NiPointer<ObstacleData> sppreviousObstacle(static_cast<ObstacleData*>(nullptr));
         pUndoData->RemovedTriangleToObstacleMap.GetNext(it, ustriangle, sppreviousObstacle);
         // The by-value argument is copied by NiPointer's copy constructor.
         pNavMesh->pTriangleToObstacleMap->SetAt(ustriangle, sppreviousObstacle);
@@ -1160,10 +1160,10 @@ uint32_t NavMeshObstacleCutter::FindVert(uint16_t a2) {
 
 bool NavMeshObstacleCutter::IsEdgeInObstacle(NavMeshObstacleEdge* apEdge) {
     if (!apEdge->pVerts[0]->bOnObstacle && apEdge->pVerts[0]->bInObstacleArea) {
-        return 1;
+        return true;
     }
     if (!apEdge->pVerts[1]->bOnObstacle && apEdge->pVerts[1]->bInObstacleArea) {
-        return 1;
+        return true;
     }
     return apEdge->pVerts[0]->bOnObstacle && (apEdge->pVerts[1]->bOnObstacle && apEdge->EdgeType != 1);
 }
@@ -1201,10 +1201,10 @@ NavMeshObstacleEdge::NavMeshObstacleEdge(
 
 bool NavMeshObstacleEdge::CanBeUsed() const {
     if (Triangles[0] == 65535) {
-        return (bool)1;
+        return true;
     }
     if (Triangles[1] != 65535) {
-        return (bool)0;
+        return false;
     }
     return (bool)((uint8_t)((EdgeType != 1) && ((EdgeType != 3) && (EdgeType != 4))));
 }

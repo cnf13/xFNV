@@ -149,7 +149,7 @@ void BGSTextureSet::Copy(TESForm* apCopy) {
                     v2 = ::new (apMemory) DecalData;
                 }
                 else {
-                    v2 = 0;
+                    v2 = nullptr;
                 }
                 pDecalData = v2;
             }
@@ -158,7 +158,7 @@ void BGSTextureSet::Copy(TESForm* apCopy) {
         else {
             if (pDecalData) {
                 delete pDecalData;
-                pDecalData = 0;
+                pDecalData = nullptr;
             }
         }
         iFlags = pcopy->iFlags;
@@ -169,24 +169,24 @@ void BGSTextureSet::Copy(TESForm* apCopy) {
 bool BGSTextureSet::Compare(TESForm* apCompare) {
     BGSTextureSet* pcompare = dynamic_cast<BGSTextureSet*>(apCompare);
     if (!pcompare) {
-        return 1;
+        return true;
     }
     for (int32_t i = 0; i < 6; ++i) {
         if (pTextures[i].CompareComponent(&pcompare->pTextures[i])) {
-            return 1;
+            return true;
         }
     }
     if (pcompare->pDecalData) {
         if (!pDecalData) {
-            return 1;
+            return true;
         }
         if (pDecalData->Compare(pcompare->pDecalData)) {
-            return 1;
+            return true;
         }
     }
     else {
         if (pDecalData) {
-            return 1;
+            return true;
         }
     }
     return iFlags != pcompare->iFlags || CompareAllComponents(pcompare);
@@ -226,14 +226,14 @@ const char* BGSTextureSet::GetTextureFilename(BSShaderProperty::TextureTypeEnum 
 }
 
 void BGSTextureSet::GetTexture(BSShaderProperty::TextureTypeEnum aiType, NiPointer<NiTexture>& aspTexture) {
-    NiPointer<NiTexture> sptexture(static_cast<NiTexture*>(0));
+    NiPointer<NiTexture> sptexture(static_cast<NiTexture*>(nullptr));
     const char* ptexfile = static_cast<BSTextureSet*>(this)->GetTextureFilename(aiType);
     if (ptexfile) {
         if (*ptexfile) {
             char Src[264];
             BSstrcpy(Src, 260, "Data\\Textures\\");
             BSstrcat(Src, 260, ptexfile);
-            BSShaderManager::GetTexture(Src, 1, sptexture, 1, 0);
+            BSShaderManager::GetTexture(Src, true, sptexture, true, false);
         }
     }
     aspTexture.operator=(sptexture);
@@ -253,7 +253,7 @@ void BGSTextureSet::SetTextureFilename(BSShaderProperty::TextureTypeEnum aiType,
 }
 
 bool BGSTextureSet::HasDecalData() {
-    return (pDecalData != 0);
+    return (pDecalData != nullptr);
 }
 
 DecalData* BGSTextureSet::GetDecalData() {
@@ -295,7 +295,7 @@ BSShaderTextureSet* BGSTextureSet::CreateShaderTextureSet() {
         ptexset = ::new (apMemory) BSShaderTextureSet;
     }
     else {
-        ptexset = 0;
+        ptexset = nullptr;
     }
     for (BSShaderProperty::TextureTypeEnum i = BSShaderProperty::TEXTYPE_DIFFUSE;
          i < BSShaderProperty::TEXTYPE_SPECULAR; i = static_cast<BSShaderProperty::TextureTypeEnum>(i + 1)) {
@@ -330,7 +330,7 @@ void BGSTextureSet::CreateNullTextureSet() {
             v0 = nullptr;
         }
         BGSTextureSet::pNullTextureSet = v0;
-        v0->SetFormID(0x28u, (bool)1);
+        v0->SetFormID(0x28u, true);
         BGSTextureSet::pNullTextureSet->SetFormEditorID("NullTextureSet");
         pDataHandler->AddFormToDataHandler(BGSTextureSet::pNullTextureSet);
     }

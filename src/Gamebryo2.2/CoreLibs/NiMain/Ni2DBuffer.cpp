@@ -116,7 +116,7 @@ void Ni2DBuffer::SetRendererData(RendererData* pkRendererData) {
 
 Ni2DBuffer* Ni2DBuffer::Create(uint32_t uiWidth, uint32_t uiHeight, Ni2DBuffer::RendererData* pkData) {
     if (!pkData || !pkData->m_pkPixelFormat) {
-        return 0;
+        return nullptr;
     }
     NiObject* pkBuffer = static_cast<NiObject*>(NiMemObject::operator new(sizeof(Ni2DBuffer)));
     Ni2DBuffer* pkBuffer_2 = static_cast<Ni2DBuffer*>(pkBuffer);
@@ -124,7 +124,7 @@ Ni2DBuffer* Ni2DBuffer::Create(uint32_t uiWidth, uint32_t uiHeight, Ni2DBuffer::
         ::new (pkBuffer) Ni2DBuffer;
     }
     else {
-        pkBuffer_2 = 0;
+        pkBuffer_2 = nullptr;
     }
     pkBuffer_2->m_uiHeight = uiHeight;
     pkBuffer_2->m_uiWidth = uiWidth;

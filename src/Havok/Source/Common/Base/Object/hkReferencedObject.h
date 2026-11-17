@@ -40,7 +40,7 @@ public:
 
     // The reference count.
     int32_t getReferenceCount() const {
-        return static_cast<int16_t>(m_referenceCount);
+        return m_referenceCount;
     }
     // The size the object was allocated with.
     int32_t getAllocatedSize() const {

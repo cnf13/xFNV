@@ -9,10 +9,8 @@ struct hkpRootCdPoint;
 
 void _setHit(hkpRootCdPoint* insertAt, const hkpCdPoint* event);
 
-typedef void (*hkFixedBufferCdPointCollectorAddCdPointCallbackFunc)(
-    const hkpCdPoint& event,
-    hkpFixedBufferCdPointCollector* collector
-);
+using hkFixedBufferCdPointCollectorAddCdPointCallbackFunc =
+    void (*)(const hkpCdPoint& event, hkpFixedBufferCdPointCollector* collector);
 
 // A point collector that fills a caller-supplied buffer of root contact points and stops taking points when it is
 // full.

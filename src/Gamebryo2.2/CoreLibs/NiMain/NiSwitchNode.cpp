@@ -295,6 +295,6 @@ NiObject* NiSwitchNode::CreateObject() {
         return ::new (v0) NiSwitchNode;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

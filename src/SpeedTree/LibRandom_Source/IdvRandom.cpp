@@ -45,7 +45,7 @@ void CIdvRandom::Reseed(int32_t lSeed) {
         }
         Random::SetLong(lSeed);
     }
-    SIdvRandomImpl::m_bInit = 1;
+    SIdvRandomImpl::m_bInit = true;
 }
 
 Random::~Random() {}

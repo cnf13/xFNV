@@ -22,12 +22,12 @@ TriggerEntry::RefList::~RefList() {
 bool TriggerEntry::RefList::IsInList(TESObjectREFR* apRef) {
     int32_t i;
     uint32_t v5 = apRef->TESForm::GetFormID();
-    for (i = 0; i < ((int32_t)iArraySize); ++i) {
+    for (i = 0; i < iArraySize; ++i) {
         if (v5 == pRefArray[i].RefID) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 void TriggerEntry::RefList::Reset() {

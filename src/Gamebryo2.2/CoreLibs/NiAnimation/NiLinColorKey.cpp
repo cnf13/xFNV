@@ -15,7 +15,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 bool NiLinColorKey::Equal(const NiAnimationKey& key0, const NiAnimationKey& key1) {
     return NiColorKey::Equal(key0, key1);

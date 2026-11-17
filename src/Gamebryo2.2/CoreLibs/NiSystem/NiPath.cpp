@@ -58,10 +58,10 @@ bool NiPath::Standardize(char* pcPath) {
 // Each match is shifted out with strcpy_s over its own length, overlapping as it is, as the game does.
 void NiPath::RemoveSlashDotSlash(char* pcPath) {
     char acSubStr[4] = "\\.\\";
-    char* pcFound = const_cast<char*>(std::strstr(pcPath, acSubStr));
+    char* pcFound = std::strstr(pcPath, acSubStr);
     while (pcFound) {
         strcpy_s(pcFound, strlen(pcFound), pcFound + 2);
-        pcFound = const_cast<char*>(std::strstr(pcPath, acSubStr));
+        pcFound = std::strstr(pcPath, acSubStr);
     }
 }
 
@@ -141,7 +141,7 @@ void NiPath::RemoveDotDots(char* pcPath) {
     }
     char* pcEnd = pcStart + strlen(pcStart) + 1;
     char acSubStr[4] = "\\..";
-    char* pcFound = const_cast<char*>(std::strstr(pcStart, acSubStr));
+    char* pcFound = std::strstr(pcStart, acSubStr);
     while (pcFound) {
         *pcFound = '\0';
         // Calls the C strrchr, not the C++ non-const overload.
@@ -163,6 +163,6 @@ void NiPath::RemoveDotDots(char* pcPath) {
             }
             while (--iCount);
         }
-        pcFound = const_cast<char*>(std::strstr(pcStart, acSubStr));
+        pcFound = std::strstr(pcStart, acSubStr);
     }
 }

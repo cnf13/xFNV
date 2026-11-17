@@ -149,7 +149,7 @@ NiObject* NiBlendBoolInterpolator::CreateObject() {
     NiBlendBoolInterpolator* pkObject =
         static_cast<NiBlendBoolInterpolator*>(NiMemObject::operator new(sizeof(NiBlendBoolInterpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     ::new (pkObject) NiBlendBoolInterpolator;
     return pkObject;

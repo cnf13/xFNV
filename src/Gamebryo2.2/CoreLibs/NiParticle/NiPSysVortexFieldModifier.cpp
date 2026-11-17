@@ -137,7 +137,7 @@ void NiPSysVortexFieldModifier::Update(float fTime, NiPSysData* pkData) {
         else {
             // The product is kept at double precision.
             double dScaled = fDeltaT * m_fMagnitude;
-            float fPow = static_cast<float>(std::pow(fDist, m_fAttenuation));
+            float fPow = std::pow(fDist, m_fAttenuation);
             fScale = static_cast<float>(dScaled / fPow);
         }
         kForce *= fScale;
@@ -256,7 +256,7 @@ NiObject* NiPSysVortexFieldModifier::CreateObject() {
     NiPSysVortexFieldModifier* pkObject =
         static_cast<NiPSysVortexFieldModifier*>(NiMemObject::operator new(sizeof(NiPSysVortexFieldModifier)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysVortexFieldModifier;
 }

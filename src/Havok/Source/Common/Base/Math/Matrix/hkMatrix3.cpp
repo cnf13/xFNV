@@ -151,7 +151,7 @@ hkSimdReal hkMatrix3::getDeterminant() const {
         )
     );
     v8.m_real = _mm_shuffle_ps(v7, v7, 170);
-    v8.m_real[0] = v8.m_real[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+    v8.m_real[0] = v8.m_real[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
     result.m_real = v8.m_real;
     return result;
 }
@@ -249,7 +249,7 @@ hkResult hkMatrix3::invert(float epsilon) {
     __m128 v12 = _mm_sub_ps(v6, _mm_mul_ps(v5, v4));
     v13.m_quad = m_col2.m_quad;
     __m128 v14 = _mm_mul_ps(m_col0.m_quad, v12);
-    float v15 = _mm_shuffle_ps(v14, v14, 170)[0] + static_cast<float>(_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]);
+    float v15 = _mm_shuffle_ps(v14, v14, 170)[0] + (_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]);
     float v21 = std::fabs((double)v15);
     __m128 v16 = _mm_shuffle_ps(v13.m_quad, v13.m_quad, 201);
     __m128 v17 = _mm_shuffle_ps(v13.m_quad, v13.m_quad, 210);
@@ -390,7 +390,7 @@ void hkMatrix3::invertSymmetric() {
         _mm_mul_ps(_mm_shuffle_ps(m_col1.m_quad, m_col1.m_quad, 201), v7)
     );
     __m128 v11 = _mm_mul_ps(m_col0.m_quad, v6);
-    float v13 = _mm_shuffle_ps(v11, v11, 170)[0] + static_cast<float>(_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
+    float v13 = _mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
     if (v13 < 1.6940658945086007e-21) {
         v13 = 1.6940659e-21f;
     }

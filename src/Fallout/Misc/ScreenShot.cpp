@@ -42,7 +42,7 @@ NiPixelData* ScreenShot::TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHei
     D3DLOCKED_RECT kLockedRect;
     NiPixelFormat v44;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_SAVELOAD, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\ScreenShot.cpp", 313
+        MEM_CONTEXT_SAVELOAD, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\ScreenShot.cpp", 313
     );
     NiDX9Renderer* pDXRenderer = Renderer::GetNIRenderer();
     MTRenderingSystem::QInstance()->StartThreads();
@@ -56,23 +56,23 @@ NiPixelData* ScreenShot::TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHei
     uint32_t v7 = aiWidth;
     NiFixedString* pTextureName = ::new (static_cast<void*>(&TextureName)) NiFixedString("Screenshot RT");
     NiPointer<BSRenderedTexture> sptexture(
-        BSRenderedTexture::Create(*pTextureName, v7, v8, kprefs, Ni2DBuffer::MULTISAMPLE_NONE, 1, 0, 0, 0)
+        BSRenderedTexture::Create(*pTextureName, v7, v8, kprefs, Ni2DBuffer::MULTISAMPLE_NONE, 1, nullptr, nullptr, 0)
     );
     TextureName.~NiFixedString();
     if (sptexture.m_pObject) {
         double uiScreenWidth = static_cast<double>(Renderer::GetScreenHeight());
         float aspectRatio = uiScreenWidth / static_cast<double>(Renderer::GetScreenWidth());
         int32_t inewHeight = static_cast<int32_t>(static_cast<double>(aiHeight) * aspectRatio);
-        pPlayer->UpdateCamera(0, 0);
+        pPlayer->UpdateCamera(false, false);
         float bottom = 1.0 - aspectRatio;
         ImageSpaceManager* ImageSpaceManager_ = BSShaderManager::GetImageSpaceManager();
         ImageSpaceManager_->SetCustomViewPort(0.0f, 1.0f, 1.0f, bottom);
         BSRenderedTexture* a3 = sptexture.m_pObject;
-        appMain->DrawWorld(a3, 0, 0);
+        appMain->DrawWorld(a3, false, false);
         ImageSpaceManager* v6 = BSShaderManager::GetImageSpaceManager();
         v6->ResetViewport();
         if (appMain->bFlyCamera) {
-            pPlayer->UpdateFlyCamera(0.0f, 1);
+            pPlayer->UpdateFlyCamera(0.0f, true);
         }
         MTRenderingSystem::QInstance()->SetThreadStage(MTRenderingSystem::THREAD_1, 23);
         MTRenderingSystem::QInstance()->WaitOnThreadStage(MTRenderingSystem::THREAD_2, 23);
@@ -89,7 +89,7 @@ NiPixelData* ScreenShot::TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHei
                 aiHeight, aiWidth, d3dTextureSurfaceDesc.Format, D3DPOOL_SYSTEMMEM, &pLocalSurf, nullptr
             )) {
             Warning("DEFAULT: (ScreenShot) Unable to create image surface.");
-            return 0;
+            return nullptr;
         }
         else {
             NiPixelData* ppixelData;
@@ -104,7 +104,7 @@ NiPixelData* ScreenShot::TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHei
                     NiPixelData(static_cast<uint32_t>(aiWidth), static_cast<uint32_t>(aiHeight), *kPixFmt, 1u, 1u);
             }
             else {
-                ppixelData = 0;
+                ppixelData = nullptr;
             }
             uint8_t* pSrc = static_cast<uint8_t*>(kLockedRect.pBits);
             uint8_t* pdataOut = ppixelData->GetPixels(0u, 0u);
@@ -119,19 +119,19 @@ NiPixelData* ScreenShot::TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHei
             }
             pLocalSurf->UnlockRect();
             pLocalSurf->Release();
-            sptexture.operator=(static_cast<BSRenderedTexture*>(0));
+            sptexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
             if (apScreenshotFileName) {
                 if (BSstrlen(apScreenshotFileName)) {
                     BSFile* pfile;
                     BSSystemFile::DeleteFileA(apScreenshotFileName);
                     BSFile* v16 = static_cast<BSFile*>(ourMalloc(sizeof(BSFile)));
                     if (v16) {
-                        pfile = ::new (v16) BSFile(apScreenshotFileName, NiFile::WRITE_ONLY, 0x4000u, 0);
+                        pfile = ::new (v16) BSFile(apScreenshotFileName, NiFile::WRITE_ONLY, 0x4000u, false);
                     }
                     else {
-                        pfile = 0;
+                        pfile = nullptr;
                     }
-                    if (pfile->Open(0, 0)) {
+                    if (pfile->Open(false, false)) {
                         BMPHeader bmpHeader;
                         uint32_t width = aiWidth;
                         uint32_t height = aiHeight;
@@ -183,7 +183,7 @@ NiPixelData* ScreenShot::TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHei
     }
     else {
         Warning("DEFAULT: (ScreenShot) Unable to create render texture.");
-        return 0;
+        return nullptr;
     }
 }
 
@@ -235,7 +235,7 @@ void ScreenShot::TakeScreenShot(char* apName) {
                     pkPixelData = ::new (apMemory) NiPixelData(ScreenWidth, ScreenHeight, pixelFormat, 1u, 1u);
                 }
                 else {
-                    pkPixelData = 0;
+                    pkPixelData = nullptr;
                 }
                 uint32_t uiRowWidth = pkPixelData->GetWidth(0, 0);
                 uint32_t uiRowSize = pkPixelData->m_uiPixelStride * uiRowWidth;
@@ -256,7 +256,7 @@ void ScreenShot::TakeScreenShot(char* apName) {
                     const char* v4 = g_sScreenShotBaseName_Display.String();
                     BSsprintf(Dst, 260, "%s%d.bmp", v4, v8);
                 }
-                BSSystemFile kFile(Dst, 2u, 2u, 0);
+                BSSystemFile kFile(Dst, 2u, 2u, false);
                 if (kFile.eLastError != BSSystemFile::EC_NONE) {
                     Warning("DEFAULT: (ScreenShot) Unable to create file '%s'.", Dst);
                 }
@@ -300,7 +300,7 @@ void ScreenShot::TakeScreenShot(char* apName) {
                     if (!apName) {
                         char msg[268];
                         std::sprintf(msg, "ScreenShot: File '%s' created.", Dst);
-                        Interface::ShowMessage(msg, 0, 0, 0, 2.0f, 0);
+                        Interface::ShowMessage(msg, 0, nullptr, nullptr, 2.0f, false);
                         int32_t v5 = g_iScreenShotIndex_Display.Int() + 1;
                         g_iScreenShotIndex_Display.Int() = v5;
                         INIPrefSettingCollection* Collection = SettingT<INIPrefSettingCollection>::GetCollection();

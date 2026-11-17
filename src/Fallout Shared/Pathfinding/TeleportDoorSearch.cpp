@@ -26,7 +26,7 @@ bool TeleportDoorSearch::GetNodeConnections(
     NiPoint3 result;
     DoorLock doorLock;
     AStarNode<ParentSpaceNode, TeleportLink>* pnode;
-    DoorList.Clear(0);
+    DoorList.Clear(false);
     if (apNode->tNodeData.bWorldSpace) {
         apNode->tNodeData.pWorldSpace->BuildTeleportDoorList(DoorList);
     }
@@ -38,7 +38,7 @@ bool TeleportDoorSearch::GetNodeConnections(
         for (uint32_t i = 0;; ++i) {
             uint32_t FormFlags = DoorList.iSize;
             if (i >= FormFlags) {
-                return 1;
+                return true;
             }
             TESObjectREFR* pdoor = DoorList.GetAt(static_cast<int32_t>(i));
             if (!pdoor->GetDisabled()) {
@@ -101,15 +101,15 @@ bool TeleportDoorSearch::GetNodeConnections(
                             else {
                                 DoorTeleportData* v13 = pdoor->GetTeleport();
                                 if (v13->GetTeleportWorldSpace()) {
-                                    pnode->tNodeData.bWorldSpace = 1;
-                                    pnode->tNodeData.pInteriorCell = 0;
+                                    pnode->tNodeData.bWorldSpace = true;
+                                    pnode->tNodeData.pInteriorCell = nullptr;
                                     DoorTeleportData* v14 = pdoor->GetTeleport();
                                     TESWorldSpace* ikey_3 = v14->GetTeleportWorldSpace();
                                     pnode->tNodeData.pWorldSpace = ikey_3;
                                 }
                                 else {
-                                    pnode->tNodeData.bWorldSpace = 0;
-                                    pnode->tNodeData.pWorldSpace = 0;
+                                    pnode->tNodeData.bWorldSpace = false;
+                                    pnode->tNodeData.pWorldSpace = nullptr;
                                     DoorTeleportData* v16 = pdoor->GetTeleport();
                                     TESObjectCELL* TeleportCell = v16->GetTeleportCell();
                                     pnode->tNodeData.pInteriorCell = TeleportCell;
@@ -146,7 +146,7 @@ bool TeleportDoorSearch::GetNodeConnections(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool TeleportDoorSearch::IsGoalNode(const AStarNode<ParentSpaceNode, TeleportLink>* apNode) {
@@ -184,37 +184,37 @@ bool TeleportDoorSearch::BuildNodePath(
     StartLocation.operator=(aStartLocation);
     if (aStartLocation.pWorldSpace) {
         StartNode.pWorldSpace = aStartLocation.pWorldSpace;
-        StartNode.bWorldSpace = 1;
-        StartNode.pInteriorCell = 0;
+        StartNode.bWorldSpace = true;
+        StartNode.pInteriorCell = nullptr;
         // The start node's key is its space's address, as the source hashes it.
         istartKey = reinterpret_cast<uintptr_t>(StartNode.pWorldSpace);
     }
     else {
         if (!aStartLocation.GetCell()) {
-            return 0;
+            return false;
         }
         StartNode.pInteriorCell = aStartLocation.GetCell();
-        StartNode.bWorldSpace = 0;
-        StartNode.pWorldSpace = 0;
+        StartNode.bWorldSpace = false;
+        StartNode.pWorldSpace = nullptr;
         istartKey = reinterpret_cast<uintptr_t>(StartNode.pInteriorCell);
     }
     Restrictions = aRestrictions;
     if (StartNode.pWorldSpace && aRestrictions == Pathing::TELEPORT_DOOR_PATH_INTERIORS_ONLY) {
-        return 0;
+        return false;
     }
     fMaxDist = afMaxDist;
     DoorLockDisposition = aDisposition;
     if (Restrictions != Pathing::TELEPORT_DOOR_PATH_FIND_FIRST_WORLDSPACE) {
         if (aGoalLocation.pWorldSpace) {
             GoalNode.pWorldSpace = aGoalLocation.pWorldSpace;
-            GoalNode.bWorldSpace = 1;
-            GoalNode.pInteriorCell = 0;
+            GoalNode.bWorldSpace = true;
+            GoalNode.pInteriorCell = nullptr;
         }
         else {
             if (aGoalLocation.GetCell()) {
                 GoalNode.pInteriorCell = aGoalLocation.GetCell();
-                GoalNode.bWorldSpace = 0;
-                GoalNode.pWorldSpace = 0;
+                GoalNode.bWorldSpace = false;
+                GoalNode.pWorldSpace = nullptr;
             }
         }
     }
@@ -222,5 +222,5 @@ bool TeleportDoorSearch::BuildNodePath(
     apRetPath->Start = aStartLocation.GetLocation();
     apRetPath->End = aGoalLocation.GetLocation();
     AddStartNode(istartKey, StartNode, 1.0f);
-    return Search(&apRetPath->Spaces, &apRetPath->Doors, 1);
+    return Search(&apRetPath->Spaces, &apRetPath->Doors, true);
 }

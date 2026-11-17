@@ -212,7 +212,7 @@ int32_t LoadUIntArray(NiStream& arStream, hkArray<uint32_t, hkContainerHeapAlloc
         m_heap->bufFree(v7->begin(), sizeof(uint32_t) * m_capacityAndFlags);
     }
     int32_t v10 = v19;
-    v7->m_data = 0;
+    v7->m_data = nullptr;
     v7->m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
     hkMemoryAllocator* v11 = (&hkMemoryRouter::getInstance())->m_heap;
     int32_t v12 = v7->m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK;

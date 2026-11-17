@@ -337,7 +337,7 @@ bool bhkCollisionObject::QKeyframe() {
     int32_t m_type;
     spWorldObject = this->spWorldObject;
     if (!spWorldObject) {
-        return (bool)0;
+        return false;
     }
     phkObject = static_cast<hkpRigidBody*>(spWorldObject->phkObject);
     uint8_t result = 1;
@@ -346,7 +346,7 @@ bool bhkCollisionObject::QKeyframe() {
     }
     m_type = (int32_t)phkObject->m_motion.m_type.m_storage;
     if ((m_type != 4) && (m_type != 5)) {
-        return (bool)0;
+        return false;
     }
     return (bool)result;
 }

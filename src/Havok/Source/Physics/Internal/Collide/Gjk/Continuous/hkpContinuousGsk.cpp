@@ -882,7 +882,7 @@ float hk4dGskCalcPointVelocityAssumingAngularVelError(
     *reinterpret_cast<float*>(&v22) = (afTime - apMotionA->m_sweptTransform.m_centerOfMass0.m_quad[3]) *
         apMotionA->m_sweptTransform.m_centerOfMass1.m_quad[3];
     __m128 v7 = _mm_mul_ps(_mm_xor_ps(apLinearTimInfo->m_quad, hkQuadRealNegateMask), apNormal->m_quad);
-    float v8 = _mm_shuffle_ps(v7, v7, 170)[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+    float v8 = _mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
     __m128 v9 = _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v22)), _mm_set_ss(std::bit_cast<float>(v22)), 0);
     __m128 v10 = _mm_sub_ps(
         apPoint->m_quad,
@@ -898,9 +898,7 @@ float hk4dGskCalcPointVelocityAssumingAngularVelError(
         ),
         apNormal->m_quad
     );
-    double v12 = static_cast<float>(
-        _mm_shuffle_ps(v11, v11, 170)[0] + static_cast<float>(_mm_shuffle_ps(v11, v11, 85)[0] + v11[0])
-    );
+    double v12 = (_mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]));
     if (!(v12 <= 0.0)) {
         v13 = v12 / 1.2000000476837158;
     }
@@ -925,9 +923,7 @@ float hk4dGskCalcPointVelocityAssumingAngularVelError(
         ),
         apNormal->m_quad
     );
-    double v17 = static_cast<float>(
-        _mm_shuffle_ps(v16, v16, 170)[0] + static_cast<float>(_mm_shuffle_ps(v16, v16, 85)[0] + v16[0])
-    );
+    double v17 = (_mm_shuffle_ps(v16, v16, 170)[0] + (_mm_shuffle_ps(v16, v16, 85)[0] + v16[0]));
     if (!(v17 >= 0.0)) {
         return v20 - v17 / 1.2000000476837158;
     }

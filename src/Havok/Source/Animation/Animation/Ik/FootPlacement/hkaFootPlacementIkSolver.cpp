@@ -113,8 +113,8 @@ bool hkaFootPlacementIkSolver::castFoot(
         if (bFootEndHit) {
             kUpWS.m_quad = m_setup.m_worldUpDirectionWS.m_quad;
             const __m128 kUpDot = _mm_mul_ps(kUpWS.m_quad, kFootEndNormalWS.m_quad);
-            const float fUpDot = _mm_shuffle_ps(kUpDot, kUpDot, 170)[0] +
-                static_cast<float>(_mm_shuffle_ps(kUpDot, kUpDot, 85)[0] + kUpDot[0]);
+            const float fUpDot =
+                _mm_shuffle_ps(kUpDot, kUpDot, 170)[0] + (_mm_shuffle_ps(kUpDot, kUpDot, 85)[0] + kUpDot[0]);
             if (fUpDot <= 0.0f) {
                 bFootEndHit = false;
             }
@@ -131,8 +131,7 @@ bool hkaFootPlacementIkSolver::castFoot(
                     kFootEndNormalWS.m_quad
                 );
                 const float fNegHitDot = 0.0f -
-                    static_cast<float>(_mm_shuffle_ps(kHitDot, kHitDot, 170)[0] +
-                                       static_cast<float>(_mm_shuffle_ps(kHitDot, kHitDot, 85)[0] + kHitDot[0]));
+                    (_mm_shuffle_ps(kHitDot, kHitDot, 170)[0] + (_mm_shuffle_ps(kHitDot, kHitDot, 85)[0] + kHitDot[0]));
                 const __m128 kFromDot = _mm_mul_ps(
                     _mm_add_ps(
                         _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(fDistanceUp), _mm_set_ss(fDistanceUp), 0), kUpWS.m_quad),
@@ -141,7 +140,7 @@ bool hkaFootPlacementIkSolver::castFoot(
                     kFootEndNormalWS.m_quad
                 );
                 const float fFromDot = _mm_shuffle_ps(kFromDot, kFromDot, 170)[0] +
-                    static_cast<float>(_mm_shuffle_ps(kFromDot, kFromDot, 85)[0] + kFromDot[0]);
+                    (_mm_shuffle_ps(kFromDot, kFromDot, 85)[0] + kFromDot[0]);
                 const float fNumerator = -(fFromDot + fNegHitDot);
                 const float fDenominator = fUpDot * -fTotalDistance;
                 fFootEndHitFraction = fNumerator / fDenominator;
@@ -241,7 +240,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
     v5.m_vec.m_quad = input.m_worldFromModel.m_rotation.m_vec.m_quad;
     __m128 v6 = _mm_mul_ps(input.m_worldFromModel.m_translation.m_quad, v5.m_vec.m_quad);
     __m128 v7 = _mm_shuffle_ps(v6, v6, 170);
-    v7[0] = v7[0] + static_cast<float>(_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]);
+    v7[0] = v7[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]);
     __m128 v8 = _mm_shuffle_ps(v5.m_vec.m_quad, v5.m_vec.m_quad, 255);
     __m128 v9 = _mm_add_ps(
         _mm_mul_ps(
@@ -279,7 +278,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
     v14.m_quad = m_setup.m_worldUpDirectionWS.m_quad;
     __m128 v15 = _mm_mul_ps(v10, v14.m_quad);
     __m128 v16 = _mm_shuffle_ps(v15, v15, 170);
-    v16[0] = v16[0] + static_cast<float>(_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]);
+    v16[0] = v16[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]);
     __m128 v17 = _mm_shuffle_ps(v10, v10, 255);
     __m128 v173 = v10;
     __m128 v174 = v13;
@@ -300,15 +299,14 @@ void hkaFootPlacementIkSolver::doFootPlacement(
             _mm_mul_ps(_mm_shuffle_ps(v16, v16, 0), v10)
         )
     );
-    output.m_hitSomething = 1;
+    output.m_hitSomething = true;
     v20.m_quad = m_setup.m_modelUpDirectionMS.m_quad;
     uint32_t* m_data = poseInOut.m_boneFlags.begin();
     __m128 v178 = _mm_add_ps(v19, v19);
     __m128 v22 = _mm_mul_ps(input.m_originalAnkleTransformMS.m_translation.m_quad, v20.m_quad);
     const hkQuaternion& kOriginalAnkleRotationMS = input.m_originalAnkleTransformMS.m_rotation;
     int32_t m_ankleIndex = m_setup.m_ankleIndex;
-    float m_footPlantedAnkleHeightMS =
-        _mm_shuffle_ps(v22, v22, 170)[0] + static_cast<float>(_mm_shuffle_ps(v22, v22, 85)[0] + v22[0]);
+    float m_footPlantedAnkleHeightMS = _mm_shuffle_ps(v22, v22, 170)[0] + (_mm_shuffle_ps(v22, v22, 85)[0] + v22[0]);
     if ((m_data[m_ankleIndex] & 2) != 0) {
         poseInOut.calculateBoneModelSpace(m_ankleIndex);
         v17 = v168;
@@ -361,7 +359,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
     m_lockedFootPositionInWS.m_quad = m_lockedFootPositionInWS_2;
     apResult.m_bool = m_footPlacementOn;
     if (!m_footPlacementOn) {
-        output.m_hitSomething = 0;
+        output.m_hitSomething = false;
         groundNormalWSOut.m_quad = m_previousGroundNormalWS.m_quad;
         footEndWS.m_quad = _mm_add_ps(
             _mm_mul_ps(
@@ -374,9 +372,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
             m_quad_3
         );
         v36 = _mm_mul_ps(m_setup.m_worldUpDirectionWS.m_quad, m_lockedFootPositionInWS_2);
-        v37 = static_cast<float>(
-                  _mm_shuffle_ps(v36, v36, 170)[0] + static_cast<float>(_mm_shuffle_ps(v36, v36, 85)[0] + v36[0])
-              ) +
+        v37 = (_mm_shuffle_ps(v36, v36, 170)[0] + (_mm_shuffle_ps(v36, v36, 85)[0] + v36[0])) +
             this->m_previousVerticalDisplacement;
     LABEL_21:;
         m_previousGroundHeightWS_1 = v37 - m_footPlantedAnkleHeightMS;
@@ -398,7 +394,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
             m_lockedFootPositionInWS.m_quad = this->m_lockedFootPositionInWS.m_quad;
             __m128 v41 = _mm_mul_ps(v40, v10);
             __m128 v42 = _mm_shuffle_ps(v41, v41, 170);
-            v42[0] = v42[0] + static_cast<float>(_mm_shuffle_ps(v41, v41, 85)[0] + v41[0]);
+            v42[0] = v42[0] + (_mm_shuffle_ps(v41, v41, 85)[0] + v41[0]);
             __m128 v43 = _mm_add_ps(
                 _mm_mul_ps(
                     _mm_sub_ps(
@@ -422,7 +418,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
             __m128 v48 = _mm_mul_ps(footEndWS.m_quad, m_quad_1);
             __m128 v49 = _mm_mul_ps(v48, m_quad_2);
             __m128 v50 = _mm_shuffle_ps(v49, v49, 170);
-            v50[0] = v50[0] + static_cast<float>(_mm_shuffle_ps(v49, v49, 85)[0] + v49[0]);
+            v50[0] = v50[0] + (_mm_shuffle_ps(v49, v49, 85)[0] + v49[0]);
             __m128 v51 = _mm_shuffle_ps(m_quad_2, m_quad_2, 255);
             __m128 v52 = _mm_add_ps(
                 _mm_mul_ps(
@@ -441,7 +437,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
             v54.m_vec.m_quad = input.m_worldFromModel.m_rotation.m_vec.m_quad;
             __m128 v56 = _mm_mul_ps(v53, v54.m_vec.m_quad);
             __m128 v57 = _mm_shuffle_ps(v56, v56, 170);
-            v57[0] = v57[0] + static_cast<float>(_mm_shuffle_ps(v56, v56, 85)[0] + v56[0]);
+            v57[0] = v57[0] + (_mm_shuffle_ps(v56, v56, 85)[0] + v56[0]);
             __m128 v58 = _mm_shuffle_ps(v54.m_vec.m_quad, v54.m_vec.m_quad, 255);
             __m128 v59 = _mm_add_ps(
                 _mm_mul_ps(
@@ -472,7 +468,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
     v64 = _mm_mul_ps(footEndWS.m_quad, m_quad_1);
     v65 = _mm_mul_ps(v64, m_quad_2);
     v66 = _mm_shuffle_ps(v65, v65, 170);
-    v66[0] = v66[0] + static_cast<float>(_mm_shuffle_ps(v65, v65, 85)[0] + v65[0]);
+    v66[0] = v66[0] + (_mm_shuffle_ps(v65, v65, 85)[0] + v65[0]);
     q0_.m_vec.m_quad = _mm_shuffle_ps(m_quad_2, m_quad_2, 210);
     m_quad_6 = _mm_shuffle_ps(m_quad_2, m_quad_2, 255);
     from.m_quad = _mm_shuffle_ps(m_quad_2, m_quad_2, 201);
@@ -497,7 +493,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
         v72.m_vec.m_quad = input.m_worldFromModel.m_rotation.m_vec.m_quad;
         __m128 v73 = _mm_mul_ps(v71, v72.m_vec.m_quad);
         __m128 v74 = _mm_shuffle_ps(v73, v73, 170);
-        v74[0] = v74[0] + static_cast<float>(_mm_shuffle_ps(v73, v73, 85)[0] + v73[0]);
+        v74[0] = v74[0] + (_mm_shuffle_ps(v73, v73, 85)[0] + v73[0]);
         __m128 v75 = _mm_shuffle_ps(v72.m_vec.m_quad, v72.m_vec.m_quad, 255);
         __m128 v76 = _mm_add_ps(
             _mm_mul_ps(
@@ -519,7 +515,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
     }
     footEndWS.m_quad = v70.m_quad;
     if (!castFoot(input, m_lockedFootPositionInWS, footEndWS, projectedFootWSOut_, groundNormalWSOut)) {
-        output.m_hitSomething = 0;
+        output.m_hitSomething = false;
         double m_previousVerticalDisplacement = this->m_previousVerticalDisplacement;
         groundNormalWSOut.m_quad = m_previousGroundNormalWS.m_quad;
         footEndWS.m_quad = _mm_add_ps(
@@ -534,9 +530,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
         );
         __m128 v78 = _mm_mul_ps(m_setup.m_worldUpDirectionWS.m_quad, m_lockedFootPositionInWS.m_quad);
         v37 = m_previousVerticalDisplacement +
-            static_cast<float>(
-                  _mm_shuffle_ps(v78, v78, 170)[0] + static_cast<float>(_mm_shuffle_ps(v78, v78, 85)[0] + v78[0])
-            );
+            (_mm_shuffle_ps(v78, v78, 170)[0] + (_mm_shuffle_ps(v78, v78, 85)[0] + v78[0]));
         goto LABEL_21;
     }
     projectedFootWSOut__1 = projectedFootWSOut_.m_quad;
@@ -548,7 +542,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
         m_lockedFootPositionInWS.m_quad = projectedFootWSOut__1;
         __m128 v85 = _mm_mul_ps(v173, v82);
         __m128 v86 = _mm_shuffle_ps(v85, v85, 170);
-        v86[0] = v86[0] + static_cast<float>(_mm_shuffle_ps(v85, v85, 85)[0] + v85[0]);
+        v86[0] = v86[0] + (_mm_shuffle_ps(v85, v85, 85)[0] + v85[0]);
         __m128 v87 = _mm_add_ps(
             _mm_mul_ps(
                 _mm_sub_ps(
@@ -566,7 +560,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
         __m128 v89 = _mm_mul_ps(m_quad_1, footEndWS.m_quad);
         __m128 v90 = _mm_mul_ps(m_quad_2, v89);
         __m128 v91 = _mm_shuffle_ps(v90, v90, 170);
-        v91[0] = v91[0] + static_cast<float>(_mm_shuffle_ps(v90, v90, 85)[0] + v90[0]);
+        v91[0] = v91[0] + (_mm_shuffle_ps(v90, v90, 85)[0] + v90[0]);
         __m128 v92 = _mm_add_ps(
             _mm_mul_ps(
                 _mm_sub_ps(
@@ -585,7 +579,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
         __m128 v95 = _mm_shuffle_ps(v93.m_vec.m_quad, v93.m_vec.m_quad, 255);
         __m128 v96 = _mm_mul_ps(v93.m_vec.m_quad, v94);
         __m128 v97 = _mm_shuffle_ps(v96, v96, 170);
-        v97[0] = v97[0] + static_cast<float>(_mm_shuffle_ps(v96, v96, 85)[0] + v96[0]);
+        v97[0] = v97[0] + (_mm_shuffle_ps(v96, v96, 85)[0] + v96[0]);
         __m128 v98 = _mm_add_ps(
             _mm_mul_ps(
                 _mm_sub_ps(
@@ -607,17 +601,15 @@ void hkaFootPlacementIkSolver::doFootPlacement(
     else {
         m_quad_7 = m_quad_3;
     }
-    output.m_hitSomething = 1;
+    output.m_hitSomething = true;
     v100 = _mm_mul_ps(m_setup.m_worldUpDirectionWS.m_quad, projectedFootWSOut__1);
     v101 = _mm_shuffle_ps(v100, v100, 85)[0] + v100[0];
     v102 = _mm_shuffle_ps(v100, v100, 170)[0];
     v103 = _mm_mul_ps(m_setup.m_worldUpDirectionWS.m_quad, input.m_worldFromModel.m_translation.m_quad);
-    m_previousGroundHeightWS = static_cast<float>(v102 + v101);
+    m_previousGroundHeightWS = (v102 + v101);
     output.m_verticalError = m_previousGroundHeightWS -
         (m_setup.m_originalGroundHeightMS +
-         static_cast<float>(
-             _mm_shuffle_ps(v103, v103, 170)[0] + static_cast<float>(_mm_shuffle_ps(v103, v103, 85)[0] + v103[0])
-         ));
+         (_mm_shuffle_ps(v103, v103, 170)[0] + (_mm_shuffle_ps(v103, v103, 85)[0] + v103[0])));
     v106.m_quad = m_setup.m_worldUpDirectionWS.m_quad;
     groundNormalWSOut.m_quad[3] = 0.0;
     v155 = -m_previousGroundHeightWS;
@@ -687,7 +679,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
     v112 = _mm_mul_ps(v173, v111);
     m_minAnkleHeightMS = m_setup.m_minAnkleHeightMS;
     v113 = _mm_shuffle_ps(v112, v112, 170);
-    v113[0] = v113[0] + static_cast<float>(_mm_shuffle_ps(v112, v112, 85)[0] + v112[0]);
+    v113[0] = v113[0] + (_mm_shuffle_ps(v112, v112, 85)[0] + v112[0]);
     v114 = _mm_mul_ps(
         _mm_sub_ps(
             _mm_mul_ps(_mm_shuffle_ps(v111, v111, 210), v171), _mm_mul_ps(_mm_shuffle_ps(v111, v111, 201), v169)
@@ -702,9 +694,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
     );
     v119.m_quad = m_setup.m_modelUpDirectionMS.m_quad;
     v120 = _mm_mul_ps(m_quad_8, v119.m_quad);
-    m_maxAnkleHeightMS_1 = static_cast<float>(
-        _mm_shuffle_ps(v120, v120, 170)[0] + static_cast<float>(_mm_shuffle_ps(v120, v120, 85)[0] + v120[0])
-    );
+    m_maxAnkleHeightMS_1 = (_mm_shuffle_ps(v120, v120, 170)[0] + (_mm_shuffle_ps(v120, v120, 85)[0] + v120[0]));
     footEndWS.m_quad = m_quad_8;
     if (m_maxAnkleHeightMS < m_maxAnkleHeightMS_1) {
         v158 = m_maxAnkleHeightMS - m_maxAnkleHeightMS_1;
@@ -715,7 +705,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
         m_bool = apResult.m_bool;
     }
     else {
-        output.m_hitSomething = 0;
+        output.m_hitSomething = false;
         __m128 v125 = _mm_mul_ps(m_setup.m_worldUpDirectionWS.m_quad, m_lockedFootPositionInWS.m_quad);
         groundNormalWSOut.m_quad = m_previousGroundNormalWS.m_quad;
         __m128 v126 = _mm_mul_ps(
@@ -724,8 +714,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
             ),
             v178
         );
-        m_minAnkleHeightMS =
-            _mm_shuffle_ps(v125, v125, 170)[0] + static_cast<float>(_mm_shuffle_ps(v125, v125, 85)[0] + v125[0]);
+        m_minAnkleHeightMS = _mm_shuffle_ps(v125, v125, 170)[0] + (_mm_shuffle_ps(v125, v125, 85)[0] + v125[0]);
         double v127 = m_minAnkleHeightMS + this->m_previousVerticalDisplacement;
         m_quad_8 = _mm_add_ps(v126, m_quad_7);
         m_bool = 0;
@@ -734,8 +723,7 @@ void hkaFootPlacementIkSolver::doFootPlacement(
         output.m_verticalError = 0.0;
     }
     v129 = _mm_mul_ps(_mm_sub_ps(m_quad_8, m_quad_7), m_setup.m_modelUpDirectionMS.m_quad);
-    m_minAnkleHeightMS =
-        _mm_shuffle_ps(v129, v129, 170)[0] + static_cast<float>(_mm_shuffle_ps(v129, v129, 85)[0] + v129[0]);
+    m_minAnkleHeightMS = _mm_shuffle_ps(v129, v129, 170)[0] + (_mm_shuffle_ps(v129, v129, 85)[0] + v129[0]);
     this->m_previousVerticalDisplacement = m_minAnkleHeightMS;
     if (m_bool) {
         m_currentWeight_1 = 0.0;
@@ -779,7 +767,7 @@ LABEL_49:;
         v137.m_quad = m_setup.m_worldUpDirectionWS.m_quad;
         __m128 v138 = _mm_mul_ps(v173, v137.m_quad);
         __m128 v139 = _mm_shuffle_ps(v138, v138, 170);
-        v139[0] = v139[0] + static_cast<float>(_mm_shuffle_ps(v138, v138, 85)[0] + v138[0]);
+        v139[0] = v139[0] + (_mm_shuffle_ps(v138, v138, 85)[0] + v138[0]);
         __m128 v140 = _mm_add_ps(
             _mm_mul_ps(
                 _mm_sub_ps(
@@ -796,7 +784,7 @@ LABEL_49:;
         from.m_quad = _mm_add_ps(v140, v140);
         __m128 v141 = _mm_mul_ps(v173, groundNormalWSOut.m_quad);
         __m128 v142 = _mm_shuffle_ps(v141, v141, 170);
-        v142[0] = v142[0] + static_cast<float>(_mm_shuffle_ps(v141, v141, 85)[0] + v141[0]);
+        v142[0] = v142[0] + (_mm_shuffle_ps(v141, v141, 85)[0] + v141[0]);
         __m128 v143 = _mm_add_ps(
             _mm_mul_ps(
                 _mm_sub_ps(

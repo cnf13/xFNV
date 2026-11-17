@@ -77,7 +77,7 @@ void BGSSaveLoadHistory::Load(BGSSaveLoadFile* apFile) {
     icount = 0;
     loadBuffer.LoadData(&icount, 4u);
     for (uint32_t i = 0; i < icount; ++i) {
-        char* pstring = apLoadGameBuffer->LoadString(0);
+        char* pstring = apLoadGameBuffer->LoadString(nullptr);
         Notes.Add(pstring);
     }
 }
@@ -97,5 +97,5 @@ void BGSSaveLoadHistory::Clear() {
     for (uint32_t i = Notes.iSize; i_2 < i; i = Notes.iSize) {
         ourFree(Notes.operator[](i_2++));
     }
-    Notes.SetSize(0, 0);
+    Notes.SetSize(0, false);
 }

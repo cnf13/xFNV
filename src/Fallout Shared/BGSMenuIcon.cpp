@@ -22,7 +22,7 @@ bool BGSMenuIcon::Load(TESFile* apFile) {
 
     LoadForm(apFile);
     for (;;) {
-        CHUNK_ID eChunk = static_cast<CHUNK_ID>(apFile->GetTESChunk());
+        CHUNK_ID eChunk = apFile->GetTESChunk();
         if (eChunk == NO_CHUNK) {
             break;
         }

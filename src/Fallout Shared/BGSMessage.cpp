@@ -151,9 +151,9 @@ void BGSMessage::InitItem() {
             plist = plist->m_pkNext;
             pitem->Conditions.InitItem(this);
             int32_t iprevwarnings = MessageHandler::QWarningCount();
-            MessageHandler::IncDisableWarningCount(1);
+            MessageHandler::IncDisableWarningCount(true);
             MessageHandler::SetWarningCount(0);
-            MessageHandler::IncDisableWarningCount(0);
+            MessageHandler::IncDisableWarningCount(false);
             int32_t iwarnings = MessageHandler::QWarningCount();
             MessageHandler::SetWarningCount(iprevwarnings);
             if (iwarnings) {
@@ -166,7 +166,7 @@ void BGSMessage::InitItem() {
             }
             ++iindex;
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -188,10 +188,10 @@ void BGSMessage::Copy(TESForm* apCopy) {
             pitem = ::new (apMemory) MESSAGEBOX_BUTTON;
         }
         else {
-            pitem = 0;
+            pitem = nullptr;
         }
         pitem->Text.Copy(pcopyitem->Text);
-        pitem->Conditions.Copy(&pcopyitem->Conditions, 0);
+        pitem->Conditions.Copy(&pcopyitem->Conditions, nullptr);
         AddButton(pitem);
     }
     CopyAllComponents(apCopy);
@@ -199,38 +199,38 @@ void BGSMessage::Copy(TESForm* apCopy) {
 
 bool BGSMessage::Compare(TESForm* apCompare) {
     if (!apCompare) {
-        return 1;
+        return true;
     }
     // apCopy is used as a BGSMessage without a type check, as the game does.
     BGSMessage* pCompare = static_cast<BGSMessage*>(apCompare);
     if (pIcon != pCompare->pIcon) {
-        return 1;
+        return true;
     }
     int32_t IsMessageBox = GetIsMessageBox();
     if (IsMessageBox != pCompare->BGSMessage::GetIsMessageBox()) {
-        return 1;
+        return true;
     }
     int32_t IsMsgFlag2Set = this->IsMsgFlag2Set();
     if (IsMsgFlag2Set != pCompare->BGSMessage::IsMsgFlag2Set()) {
-        return 1;
+        return true;
     }
     if (iDisplayTime != pCompare->iDisplayTime) {
-        return 1;
+        return true;
     }
     BSSimpleList<MESSAGEBOX_BUTTON*>* plist = &ButtonList;
     BSSimpleList<MESSAGEBOX_BUTTON*>* pcomplist = &pCompare->ButtonList;
     int32_t v7 = plist->ItemsInList();
     if (v7 != pcomplist->ItemsInList()) {
-        return 1;
+        return true;
     }
     while (pcomplist && (!pcomplist->IsEmpty() && (plist && !plist->IsEmpty()))) {
         MESSAGEBOX_BUTTON* pcompitem = pcomplist->m_item;
         MESSAGEBOX_BUTTON* pitem = plist->m_item;
         if (static_cast<uint8_t>(pitem->Text.IsNotEqual(pcompitem->Text))) {
-            return 1;
+            return true;
         }
         if (pitem->Conditions.Compare(&pcompitem->Conditions)) {
-            return 1;
+            return true;
         }
         pcomplist = pcomplist->m_pkNext;
         plist = plist->m_pkNext;

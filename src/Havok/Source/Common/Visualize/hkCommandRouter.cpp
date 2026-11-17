@@ -15,7 +15,7 @@
 
 // Maps each command handler consumes to handler.
 void hkCommandRouter::registerProcess(hkProcess* handler) {
-    uint8_t* commands = 0;
+    uint8_t* commands = nullptr;
     int32_t numCommands = 0;
     handler->getConsumableCommands(commands, numCommands);
     for (int32_t i = 0; i < numCommands; ++i) {
@@ -25,7 +25,7 @@ void hkCommandRouter::registerProcess(hkProcess* handler) {
 
 void hkCommandRouter::unregisterProcess(hkProcess* handler) {
     int32_t v4 = 0;
-    uint8_t* v7 = 0;
+    uint8_t* v7 = nullptr;
     int32_t v6 = 0;
     handler->getConsumableCommands(v7, v6);
     if (v6 > 0) {

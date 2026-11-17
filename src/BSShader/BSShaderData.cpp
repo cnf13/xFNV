@@ -50,39 +50,39 @@ BSShaderData::BSShaderData() {
     pAlphaController = nullptr;
     pEmittanceMultController = nullptr;
     fParallaxOcclusionHieghtScale = 1.0f;
-    bAlphaBlend = 0;
+    bAlphaBlend = false;
     eAlphaSrcBlendMode = NiAlphaProperty::ALPHA_SRCALPHA;
     fParallaxOcclusionMaxPasses = 4.0f;
     eAlphaDestBlendMode = NiAlphaProperty::ALPHA_INVSRCALPHA;
-    bAlphaTest = 0;
+    bAlphaTest = false;
     eAlphaTestFunction = NiAlphaProperty::TEST_GREATER;
     ucAlphaTestRef = 0;
-    bVertexAlpha = 0;
-    bModelSpaceNormals = 0;
-    bRemappableTextures = 0;
-    bDecal = 0;
-    bExternalEmittance = 0;
-    bHideSecret = 0;
-    bNoFade = 0;
-    bLightFade = 0;
-    bZBufferWrite = 1;
-    bZBufferTest = 1;
-    bRefraction = 0;
-    bRefractionFire = 0;
+    bVertexAlpha = false;
+    bModelSpaceNormals = false;
+    bRemappableTextures = false;
+    bDecal = false;
+    bExternalEmittance = false;
+    bHideSecret = false;
+    bNoFade = false;
+    bLightFade = false;
+    bZBufferWrite = true;
+    bZBufferTest = true;
+    bRefraction = false;
+    bRefractionFire = false;
     iRefractionFirePeriod = 0;
     pRefractionStrengthController = nullptr;
     pRefractionFirePeriodController = nullptr;
-    bParallax = 0;
-    bParallaxOcclusion = 0;
+    bParallax = false;
+    bParallaxOcclusion = false;
     VolumetricFogColor = NiColor_BLACK;
     fVolumetricFogDensity = 10.0f;
     fEnvironmentMappingMaskScale = 1.0f;
-    bEnvironmentMapping = 0;
-    bEnvironmentMappingEye = 0;
-    bEnvironmentMappingWindow = 0;
+    bEnvironmentMapping = false;
+    bEnvironmentMappingEye = false;
+    bEnvironmentMappingWindow = false;
     pTextureSet = nullptr;
     for (int32_t i = 0; i < 6; ++i) {
-        pbTextureHasAlpha[i] = 0;
+        pbTextureHasAlpha[i] = false;
     }
     eClampMode = NiTexturingProperty::WRAP_S_WRAP_T;
 }
@@ -176,7 +176,7 @@ void BSShaderData::AddAlphaProperty(NiAVObject* apTarget) {
             palphaprop_2 = palphaprop;
         }
         else {
-            palphaprop_2 = 0;
+            palphaprop_2 = nullptr;
         }
         if (bAlphaBlend) {
             palphaprop_2->m_uFlags |= 1u;
@@ -211,7 +211,7 @@ void BSShaderData::AddMaterialProperty(NiAVObject* apTarget) {
         v4 = ::new (v3) NiMaterialProperty;
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     v4->m_spec.r = SpecularColor.r;
     v4->m_spec.g = SpecularColor.g;
@@ -373,7 +373,7 @@ void BSShaderData::CheckTextureAlphas() {
                 }
                 NiPixelFormat::Format eFormat = pPixelFormat->m_eFormat;
                 if (eFormat == NiPixelFormat::FORMAT_DXT3 || eFormat == NiPixelFormat::FORMAT_DXT5) {
-                    pbTextureHasAlpha[i] = 1;
+                    pbTextureHasAlpha[i] = true;
                 }
             }
             if (pTexture) {

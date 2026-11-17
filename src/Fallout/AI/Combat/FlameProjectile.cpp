@@ -80,13 +80,13 @@ Projectile::PROJECTILE_TYPE FlameProjectile::GetProjectileType() {
 }
 
 void FlameProjectile::Initialize() {
-    Projectile::SetFlag(Projectile::TRACER, 0);
-    Projectile::SetFlag(Projectile::HITSCAN_MODE, 0);
-    Projectile::SetFlag(Projectile::NO_3D, 0);
-    Projectile::SetFlag(Projectile::NO_COLLISION, 1);
-    Projectile::SetFlag(Projectile::FADING, 0);
-    Projectile::SetFlag(Projectile::POST_PROCESS, 1);
-    Projectile::SetFlag(Projectile::CHECK_BEHIND_WALL, 1);
+    Projectile::SetFlag(Projectile::TRACER, false);
+    Projectile::SetFlag(Projectile::HITSCAN_MODE, false);
+    Projectile::SetFlag(Projectile::NO_3D, false);
+    Projectile::SetFlag(Projectile::NO_COLLISION, true);
+    Projectile::SetFlag(Projectile::FADING, false);
+    Projectile::SetFlag(Projectile::POST_PROCESS, true);
+    Projectile::SetFlag(Projectile::CHECK_BEHIND_WALL, true);
     Projectile::Initialize();
 }
 
@@ -119,7 +119,7 @@ void FlameProjectile::UpdateProjectile(float afDelta) {
             pfireNode = Shooter->GetFireNode();
         }
         else {
-            pfireNode = 0;
+            pfireNode = nullptr;
         }
         NiAVObject* p3d = Get3D();
         if (pfireNode) {
@@ -141,12 +141,12 @@ void FlameProjectile::UpdateProjectile(float afDelta) {
             NiNode* v4 = v10->IsNode();
             TESObjectREFR::AddMasterParticleAddonNodes(v4);
             NiNode* v5 = Get3D();
-            v5->SetAppCulled(0);
+            v5->SetAppCulled(false);
         }
         else {
             if (fExpirationTimer > 0.30000001192092896) {
                 NiNode* v6 = Get3D();
-                v6->SetAppCulled(1);
+                v6->SetAppCulled(true);
                 NiNode* v9 = Get3D();
                 NiNode* v7 = v9->IsNode();
                 TESObjectREFR::RemoveMasterParticleAddonNodes(v7);
@@ -216,7 +216,7 @@ bool FlameProjectile::RunTargetPick() {
     NiPoint3 akPoints[4];
     rt::eh_vector_constructor_iterator(akPoints, sizeof(NiPoint3), 4, &emptyPointConstructor);
     float fRotation = RandomFloatTwoPi();
-    float fRange = static_cast<float>(GetProjectileBase()->GetRange());
+    float fRange = GetProjectileBase()->GetRange();
     float fConeAngle = GetConeAngle();
     float fLooking = GetLooking();
     float fHeading = GetHeading(false);
@@ -296,7 +296,7 @@ void FlameProjectile::ResetExpirationTimer() {
         ImpactList.RemoveHead();
     }
     SpawnMuzzleFlash();
-    bImpactProcessed = 0;
+    bImpactProcessed = false;
 }
 
 float FlameProjectile::FindFlameConeAngle(NiAVObject* apObject) {
@@ -323,7 +323,7 @@ float FlameProjectile::FindFlameConeAngle(NiAVObject* apObject) {
     }
     NiNode* v7 = apObject->IsNode();
     if (v7) {
-        for (a1 = 0; a1 < ((uint32_t)v7->GetArrayCount()); ++a1) {
+        for (a1 = 0; a1 < v7->GetArrayCount(); ++a1) {
             v1 = static_cast<NiParticleSystem*>(v7->GetAt(a1));
             flameConeAngle = FlameProjectile::FindFlameConeAngle(v1);
             if (fDeclinationVar < ((double)flameConeAngle)) {

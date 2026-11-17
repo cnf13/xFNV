@@ -42,11 +42,11 @@ bool NiCollisionTraversals::FindIntersections(
 ) {
     NiPoint3 distance;
     if (!pkRoot || (kPick.m_bObserveAppCullFlag && (pkRoot->m_uFlags & NiAVObject::APP_CULLED) != 0)) {
-        return 0;
+        return false;
     }
     NiNode* pnode = pkRoot->IsNode();
     if (pnode && (pnode->m_uFlags & NiAVObject::IGNORES_PICKING) != 0) {
-        return 0;
+        return false;
     }
     if (NiCollisionUtils::FindBoundIntersect(pkRoot, kOrigin, kDir) ||
         (pnode && (pnode->m_uFlags & NiAVObject::FIXED_BOUND) != 0)) {
@@ -63,7 +63,7 @@ bool NiCollisionTraversals::FindIntersections(
             if (!(kDir.Dot(distance) < 0.0f)) {
                 float pkRootb = distance.Length();
                 kPick.m_pickResults.AddNew(pkRoot)->m_fDistance = pkRootb;
-                return 0;
+                return false;
             }
         }
         else {
@@ -76,13 +76,13 @@ bool NiCollisionTraversals::FindIntersections(
                     if (kPick.m_eIntersectType == NiPick::TRIANGLE_INTERSECT) {
                         NiPoint3* v9 = &(distance = kDir * pkRoota);
                         v8->m_intersect = kOrigin + *v9;
-                        return 0;
+                        return false;
                     }
                 }
             }
         }
     }
-    return 0;
+    return false;
 }
 
 bool NiCollisionTraversals::FindIntersectionsSwitchNode(
@@ -116,7 +116,7 @@ bool NiCollisionTraversals::FindIntersectionsNode(
 ) {
     if (kPick.m_eIntersectType || kPick.m_ePickType != NiPick::FIND_FIRST) {
         const NiRTTI* v6;
-        if (pkNode && (v6 = pkNode->GetRTTI()) != 0) {
+        if (pkNode && (v6 = pkNode->GetRTTI()) != nullptr) {
             while (v6 != &NiSwitchNode::ms_RTTI) {
                 v6 = v6->GetBaseRTTI();
                 if (!v6) {
@@ -130,21 +130,21 @@ bool NiCollisionTraversals::FindIntersectionsNode(
         else {
         LABEL_8:;
             int32_t v7 = 0;
-            bool bFound = 0;
+            bool bFound = false;
             if (pkNode->m_kChildren.m_usSize) {
                 while (kPick.m_ePickType != NiPick::FIND_FIRST ||
                        (kPick.m_eSortType != NiPick::NO_SORT || !kPick.m_pickResults.m_uiValidResults)) {
                     NiPointer<NiAVObject>* m_pBase = pkNode->m_kChildren.m_pBase;
                     if (m_pBase[v7].m_pObject) {
                         if (NiCollisionTraversals::FindIntersections(kOrigin, kDir, kPick, m_pBase[v7].m_pObject)) {
-                            bFound = 1;
+                            bFound = true;
                         }
                     }
                     if (++v7 >= static_cast<uint32_t>(pkNode->m_kChildren.m_usSize)) {
                         return bFound;
                     }
                 }
-                return 1;
+                return true;
             }
             else {
                 return bFound;
@@ -153,7 +153,7 @@ bool NiCollisionTraversals::FindIntersectionsNode(
     }
     else {
         kPick.m_pickResults.AddNew(pkNode);
-        return 1;
+        return true;
     }
 }
 
@@ -558,7 +558,7 @@ bool NiCollisionTraversals::FindIntersectionsOneStripFastPath(
         float fSqrLength = kDelta.x * kDelta.x + kDelta.y * kDelta.y + kDelta.z * kDelta.z;
         float fLength = std::sqrt(fSqrLength);
         pkRecord->m_fDistance = fLength;
-        return 1;
+        return true;
     }
 
     for (uint16_t i = 0; i < usTris; i++) {
@@ -779,7 +779,7 @@ bool NiCollisionTraversals::FindIntersectionsOneStripFastPath(
             if (bLocked) {
                 pkData->UnlockPackedVertexData();
             }
-            return 1;
+            return true;
         }
     }
 
@@ -1121,8 +1121,8 @@ NiPick::Record* NiPick::Results::AddNew(NiAVObject* pObject) {
         NiPick::Record* v6 = static_cast<NiPick::Record*>(MemoryManager_Singleton.Allocate(sizeof(NiPick::Record)));
         NiPick::Record* v7 = v6;
         if (v6) {
-            v6->m_spObject.m_pObject = 0;
-            v6->m_spProxyParent.m_pObject = 0;
+            v6->m_spObject.m_pObject = nullptr;
+            v6->m_spProxyParent.m_pObject = nullptr;
             v6->m_color.r = 0.0f;
             v6->m_color.g = 0.0f;
             v6->m_color.b = 0.0f;
@@ -1130,7 +1130,7 @@ NiPick::Record* NiPick::Results::AddNew(NiAVObject* pObject) {
             v6->Initialize(pObject);
         }
         else {
-            v7 = 0;
+            v7 = nullptr;
         }
         uint32_t m_usMaxSize = this->m_usMaxSize;
         uint32_t m_usSize = this->m_usSize;

@@ -45,7 +45,7 @@ void PathingRequestSafeStraightLine::InitLoadGame(BGSLoadFormBuffer* apLoadGameB
         v3 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     pTarget = v3;
 }

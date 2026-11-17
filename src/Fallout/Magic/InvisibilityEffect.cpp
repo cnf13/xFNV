@@ -51,7 +51,7 @@ void InvisibilityEffect::FinishInitLoadGame(Actor* apActor) {
     if (BSShaderManager::IsRefractionEnabled() &&
         (static_cast<const void*>(apActor) == static_cast<const void*>(pPlayer))) {
         apActor->SetAlpha((float)1.0);
-        apActor->SetRefraction((bool)1, 0.05000000074505806f);
+        apActor->SetRefraction(true, 0.05000000074505806f);
     }
     else {
         apActor->UpdateAlpha();
@@ -61,7 +61,7 @@ void InvisibilityEffect::FinishInitLoadGame(Actor* apActor) {
 void InvisibilityEffect::Revert(Actor* apActor) {
     ActiveEffect::Revert(apActor);
     if (BSShaderManager::IsRefractionEnabled() && apActor == pPlayer) {
-        apActor->SetRefraction(1, 0.0f);
+        apActor->SetRefraction(true, 0.0f);
     }
     else {
         apActor->UpdateAlpha();
@@ -89,20 +89,20 @@ void InvisibilityEffect::Start() {
         ptargetActor = pTarget->GetTargetAsActor();
     }
     else {
-        ptargetActor = 0;
+        ptargetActor = nullptr;
     }
     ValueModifierEffect::Start();
     if (ptargetActor) {
         if (static_cast<double>(ptargetActor->GetActorValue(eWhichActorValue)) > 0.0) {
             if (BSShaderManager::IsRefractionEnabled() && ptargetActor == pPlayer) {
                 ptargetActor->SetAlpha(1.0f);
-                ptargetActor->SetRefraction(1, 0.05f);
+                ptargetActor->SetRefraction(true, 0.05f);
             }
             else {
                 HighProcess* pprocess = dynamic_cast<HighProcess*>(ptargetActor->pCurrentProcess);
                 if (pprocess) {
                     if (pprocess->GetFadeState() != 4) {
-                        pprocess->FadeOut(ptargetActor, 0, 0);
+                        pprocess->FadeOut(ptargetActor, nullptr, false);
                     }
                 }
             }
@@ -117,18 +117,18 @@ void InvisibilityEffect::Finish() {
         ptargetActor = pTarget->GetTargetAsActor();
     }
     else {
-        ptargetActor = 0;
+        ptargetActor = nullptr;
     }
     if (ptargetActor) {
         if (static_cast<double>(ptargetActor->GetActorValue(eWhichActorValue)) == 0.0) {
             if (BSShaderManager::IsRefractionEnabled() && ptargetActor == pPlayer) {
-                ptargetActor->SetRefraction(1, 0.0f);
+                ptargetActor->SetRefraction(true, 0.0f);
             }
             else {
                 HighProcess* pprocess = dynamic_cast<HighProcess*>(ptargetActor->pCurrentProcess);
                 if (pprocess) {
                     if (pprocess->GetFadeState() != BaseProcess::FADE_TELEPORT_OUT) {
-                        pprocess->FadeIn(ptargetActor, 0);
+                        pprocess->FadeIn(ptargetActor, false);
                     }
                 }
             }
@@ -137,12 +137,12 @@ void InvisibilityEffect::Finish() {
                 float x2 = MagicSystem::GetChameleonMaxRefraction();
                 float x1 = MagicSystem::GetChameleonMinRefraction();
                 float fRefractionPower = FLerp(x1, x2, 0.0f, 1.0f, value);
-                ptargetActor->SetRefraction(1, fRefractionPower);
+                ptargetActor->SetRefraction(true, fRefractionPower);
             }
             else {
                 ptargetActor->UpdateAlpha();
             }
-            MagicHitEffect* peffect = 0;
+            MagicHitEffect* peffect = nullptr;
             if (GetEffectSetting()->GetModelLength()) {
                 MagicHitEffect* peffect_2;
                 MagicModelHitEffect* apMemory =
@@ -153,7 +153,7 @@ void InvisibilityEffect::Finish() {
                     peffect_2 = (MagicHitEffect*)::new (apMemory) MagicModelHitEffect(ptargetActor, v1, -1.0f);
                 }
                 else {
-                    peffect_2 = 0;
+                    peffect_2 = nullptr;
                 }
                 peffect = peffect_2;
             }

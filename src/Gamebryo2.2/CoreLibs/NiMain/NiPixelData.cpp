@@ -354,7 +354,7 @@ uint32_t NiPixelData::ComputeMipmapLevels(uint32_t uiWidth, uint32_t uiHeight) {
 NiObject* NiPixelData::CreateObject() {
     void* pkObject = NiMemObject::operator new(sizeof(NiPixelData));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPixelData;
 }

@@ -69,7 +69,7 @@ void NiMeshPSysData::LoadBinary(NiStream& kStream) {
                     ::new (pkPool) NiTObjectArray<NiPointer<NiAVObject>>;
                 }
                 else {
-                    pkPool = 0;
+                    pkPool = nullptr;
                 }
                 NiAVObjectArray_SetSize(pkPool, uiGenerationPoolSize);
                 m_kPools.SetAt(uiLoop, pkPool);
@@ -189,7 +189,7 @@ void NiMeshPSysData::SetNumGenerations(uint32_t uiNumGenerations) {
                     ::new (pkPool) NiTObjectArray<NiPointer<NiAVObject>>;
                 }
                 else {
-                    pkPool = 0;
+                    pkPool = nullptr;
                 }
                 uint32_t m_uiDefaultPoolSize = this->m_uiDefaultPoolSize;
                 NiTObjectArray<NiPointer<NiAVObject>>* v13 = pkPool;
@@ -207,7 +207,7 @@ void NiMeshPSysData::SetNumGenerations(uint32_t uiNumGenerations) {
                 m_kPools.m_usSize = v7;
                 NiTObjectArray<NiPointer<NiAVObject>>** v8 = &m_pBase[v7];
                 NiTObjectArray<NiPointer<NiAVObject>>* v9 = *v8;
-                *v8 = 0;
+                *v8 = nullptr;
                 if (v9) {
                     --m_kPools.m_usESize;
                     delete v9;

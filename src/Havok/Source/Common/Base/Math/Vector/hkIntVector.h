@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 // The four 32-bit integers an integer vector is stored in.
-typedef __m128i hkQuadUint;
+using hkQuadUint = __m128i;
 
 // An integer vector's lanes as four unsigned integers.
 union hkQuadUintUnion {

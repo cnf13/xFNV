@@ -21,7 +21,7 @@ bool NavMeshBounds::IsPointInBounds(const NiPoint3& aPoint) {
           (BoundingBoxMax.y >= static_cast<double>(aPoint.y) &&
            (aPoint.z >= BoundingBoxMin.z - 180.0 && aPoint.z <= BoundingBoxMax.z + 180.0))))) {
         if (Vertices.IsEmpty()) {
-            return 1;
+            return true;
         }
         float afMaxZdistAbove = BoundingBoxMax.z - BoundingBoxMin.z;
         for (uint32_t auiIndex = 0;; ++auiIndex) {
@@ -39,11 +39,11 @@ bool NavMeshBounds::IsPointInBounds(const NiPoint3& aPoint) {
             if (NavMeshMath::IsPointInsideTriangle(
                     aTriVert1Loc, aTriVert2Loc, aTriVert3Loc, aPoint, afZDiff, afMaxZdistAbove, afMaxZdistAbove
                 )) {
-                return 1;
+                return true;
             }
         }
     }
-    return 0;
+    return false;
 }
 
 NiPoint3 NavMeshBounds::DistanceFromPointToBounds(const NiPoint3& aPoint) {
@@ -229,29 +229,29 @@ void NavMeshBounds::SetFromBoundsChunk(char* apChunkBuffer, TESFile* apFile, int
     Clear();
     BoundingBoxMin = *reinterpret_cast<NiPoint3*>(apChunkBuffer);
     if (apFile->QEndian()) {
-        ENDIAN<float>(BoundingBoxMin.x, 0);
-        ENDIAN<float>(BoundingBoxMin.y, 0);
-        ENDIAN<float>(BoundingBoxMin.z, 0);
+        ENDIAN<float>(BoundingBoxMin.x, false);
+        ENDIAN<float>(BoundingBoxMin.y, false);
+        ENDIAN<float>(BoundingBoxMin.z, false);
     }
     apChunkBuffer += sizeof(NiPoint3);
     BoundingBoxMax = *reinterpret_cast<NiPoint3*>(apChunkBuffer);
     if (apFile->QEndian()) {
-        ENDIAN<float>(BoundingBoxMax.x, 0);
-        ENDIAN<float>(BoundingBoxMax.y, 0);
-        ENDIAN<float>(BoundingBoxMax.z, 0);
+        ENDIAN<float>(BoundingBoxMax.x, false);
+        ENDIAN<float>(BoundingBoxMax.y, false);
+        ENDIAN<float>(BoundingBoxMax.z, false);
     }
     apChunkBuffer += sizeof(NiPoint3);
     uint16_t sizeOfVertexArray = *reinterpret_cast<uint16_t*>(apChunkBuffer);
     if (apFile->QEndian()) {
-        ENDIAN<uint16_t>(sizeOfVertexArray, 0);
+        ENDIAN<uint16_t>(sizeOfVertexArray, false);
     }
-    Vertices.SetSize(sizeOfVertexArray, 1);
+    Vertices.SetSize(sizeOfVertexArray, true);
     apChunkBuffer += sizeof(uint16_t);
     uint16_t sizeOfTriangleArray = *reinterpret_cast<uint16_t*>(apChunkBuffer);
     if (apFile->QEndian()) {
-        ENDIAN<uint16_t>(sizeOfTriangleArray, 0);
+        ENDIAN<uint16_t>(sizeOfTriangleArray, false);
     }
-    Triangles.SetSize(sizeOfTriangleArray, 1);
+    Triangles.SetSize(sizeOfTriangleArray, true);
     apChunkBuffer += sizeof(uint16_t);
     if (!Vertices.IsEmpty()) {
         int32_t v8 = sizeof(NiPoint3) * Vertices.iSize;
@@ -259,9 +259,9 @@ void NavMeshBounds::SetFromBoundsChunk(char* apChunkBuffer, TESFile* apFile, int
         BSmemcpy(&Vertices.GetAt(0), sizeof(NiPoint3) * FormFlags, apChunkBuffer, v8);
         if (apFile->QEndian()) {
             for (uint32_t i = 0; i < sizeOfVertexArray; ++i) {
-                ENDIAN<float>((&Vertices.GetAt(static_cast<int32_t>(i)))->x, 0);
-                ENDIAN<float>((&Vertices.GetAt(static_cast<int32_t>(i)))->y, 0);
-                ENDIAN<float>((&Vertices.GetAt(static_cast<int32_t>(i)))->z, 0);
+                ENDIAN<float>((&Vertices.GetAt(static_cast<int32_t>(i)))->x, false);
+                ENDIAN<float>((&Vertices.GetAt(static_cast<int32_t>(i)))->y, false);
+                ENDIAN<float>((&Vertices.GetAt(static_cast<int32_t>(i)))->z, false);
             }
         }
         char* apDataStreamd = &apChunkBuffer[sizeof(NiPoint3) * Vertices.iSize];
@@ -271,9 +271,9 @@ void NavMeshBounds::SetFromBoundsChunk(char* apChunkBuffer, TESFile* apFile, int
         BSmemcpy(v5, v7, apDataStreamd, v9);
         if (apFile->QEndian()) {
             for (uint32_t i_2 = 0; i_2 < sizeOfTriangleArray; ++i_2) {
-                ENDIAN<uint16_t>((&Triangles.GetAt(static_cast<int32_t>(i_2)))->Vertices[0], 0);
-                ENDIAN<uint16_t>((&Triangles.GetAt(static_cast<int32_t>(i_2)))->Vertices[1], 0);
-                ENDIAN<uint16_t>((&Triangles.GetAt(static_cast<int32_t>(i_2)))->Vertices[2], 0);
+                ENDIAN<uint16_t>((&Triangles.GetAt(static_cast<int32_t>(i_2)))->Vertices[0], false);
+                ENDIAN<uint16_t>((&Triangles.GetAt(static_cast<int32_t>(i_2)))->Vertices[1], false);
+                ENDIAN<uint16_t>((&Triangles.GetAt(static_cast<int32_t>(i_2)))->Vertices[2], false);
             }
         }
     }
@@ -286,8 +286,8 @@ void NavMeshBounds::Clear() {
     NiPoint3 dst;
     BoundingBoxMin = *::new (&dst) NiPoint3(-3.4028235e+38f, -3.4028235e+38f, -3.4028235e+38f);
     BoundingBoxMax = *::new (&v2) NiPoint3(3.4028235e+38f, 3.4028235e+38f, 3.4028235e+38f);
-    Vertices.Clear(1);
-    Triangles.Clear(1);
+    Vertices.Clear(true);
+    Triangles.Clear(true);
 }
 
 void NavMeshBounds::operator delete(void* apMemory) {

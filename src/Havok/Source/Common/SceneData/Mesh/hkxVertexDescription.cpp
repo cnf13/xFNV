@@ -152,13 +152,13 @@ hkxVertexDescription::getElementDecl(hkxVertexDescription::DataUsage a1, int32_t
     int32_t v4 = 0;
     int32_t v5 = 0;
     if (m_size <= 0) {
-        return 0;
+        return nullptr;
     }
     hkxVertexDescription::ElementDecl* m_data = m_decls.begin();
     for (i = &m_data->m_usage; i->m_storage != static_cast<uint16_t>(a1); i += 6) {
     LABEL_6:;
         if (++v5 >= m_size) {
-            return 0;
+            return nullptr;
         }
     }
     if (v4 != a2) {

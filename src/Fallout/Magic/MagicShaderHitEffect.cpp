@@ -73,7 +73,7 @@ MagicShaderHitEffect::MagicShaderHitEffect(TESObjectREFR* a1, TESEffectShader* a
   : MagicHitEffect(a1, nullptr), bWeaponEnchantment(false), pWornObject(nullptr), pEffectData(a2), fAlphaTimer(0.0f),
     spParticleNode(nullptr), b3rdPerson(false), fAddonAlpha(1.0f), fAddonScale(1.0f), spTexEffectData(nullptr) {
     if (pTarget == pPlayer) {
-        NiAVObject* p3D = pPlayer->Get3D(0);
+        NiAVObject* p3D = pPlayer->Get3D(false);
         b3rdPerson = p3D && !p3D->GetAppCulled();
     }
     if (!(a3 < 0.0)) {
@@ -85,7 +85,7 @@ MagicShaderHitEffect::MagicShaderHitEffect(TESObjectREFR* a1, TESEffectShader* a
     if (pEffectData && pEffectData->Data.pAddonModels) {
         for (BSSimpleList<BGSDebrisData*>* pdebrisList = pEffectData->Data.pAddonModels->GetData();
              pdebrisList && !pdebrisList->IsEmpty(); pdebrisList = pdebrisList->m_pkNext) {
-            pModelLoader->LoadFile(pdebrisList->m_item->pFileName, LOD_MULT_NONE, 1, 0, 0, 0);
+            pModelLoader->LoadFile(pdebrisList->m_item->pFileName, LOD_MULT_NONE, true, false, false, false);
         }
     }
 }
@@ -96,13 +96,13 @@ MagicShaderHitEffect::MagicShaderHitEffect(TESObjectREFR* a1, ActiveEffect* a2)
     EffectSetting* AVEffect = a2->pSpell->GetAVEffect(MagicSystem::SELF);
     pEffectData = AVEffect->data.pEffectShader;
     if (pTarget == pPlayer) {
-        NiAVObject* p3D = pPlayer->Get3D(0);
+        NiAVObject* p3D = pPlayer->Get3D(false);
         b3rdPerson = p3D && !p3D->GetAppCulled();
     }
     if (pEffectData && pEffectData->Data.pAddonModels) {
         for (BSSimpleList<BGSDebrisData*>* pdebrisList = pEffectData->Data.pAddonModels->GetData();
              pdebrisList && !pdebrisList->IsEmpty(); pdebrisList = pdebrisList->m_pkNext) {
-            pModelLoader->LoadFile(pdebrisList->m_item->pFileName, LOD_MULT_NONE, 1, 0, 0, 0);
+            pModelLoader->LoadFile(pdebrisList->m_item->pFileName, LOD_MULT_NONE, true, false, false, false);
         }
     }
 }
@@ -113,11 +113,11 @@ MagicShaderHitEffect::~MagicShaderHitEffect() {
     }
     if (spTexEffectData.m_pObject) {
         if (pTarget == pPlayer) {
-            NiAVObject* pav = pPlayer->Get3D(1);
+            NiAVObject* pav = pPlayer->Get3D(true);
             if (pav) {
                 pEffectData->StopTextureShader(pav, spTexEffectData.m_pObject);
             }
-            NiAVObject* pav_2 = pPlayer->Get3D(0);
+            NiAVObject* pav_2 = pPlayer->Get3D(false);
             if (pav_2) {
                 pEffectData->StopTextureShader(pav_2, spTexEffectData.m_pObject);
             }
@@ -198,7 +198,7 @@ bool MagicShaderHitEffect::Update(float afTimeDelta) {
         }
     }
     if (ParticlePropertyArray.iSize) {
-        if (spParticleNode.operator!=(static_cast<NiNode*>(0))) {
+        if (spParticleNode.operator!=(static_cast<NiNode*>(nullptr))) {
             float flastParticleCount = 0.0f;
             for (int32_t i = 0; i < ParticlePropertyArray.iSize; ++i) {
                 double BranchDimming = (&ParticlePropertyArray.operator[](i))->m_pObject->fMaxParticleRatio;
@@ -208,7 +208,7 @@ bool MagicShaderHitEffect::Update(float afTimeDelta) {
             float fparticleCount =
                 pEffectData->AnimateParticleEffectBirthrate(flastParticleCount, afTimeDelta, fAlphaTimer, bFinished);
             if (fparticleCount > 0.0) {
-                bdone = 0;
+                bdone = false;
             }
             for (int32_t i_2 = 0; i_2 < ParticlePropertyArray.iSize; ++i_2) {
                 float a2a = static_cast<float>(ParticleShader::GetMaxInstanceSize());
@@ -218,9 +218,9 @@ bool MagicShaderHitEffect::Update(float afTimeDelta) {
                 float v18 = fparticleCountForThisPass / static_cast<double>(ParticleShader::GetMaxInstanceSize());
                 pparticleProp->SetMaxParticleRatio(v18);
                 pparticleProp->SetFade(falpha);
-                pparticleProp->UpdateParticles(fAlphaTimer, 0, 1);
+                pparticleProp->UpdateParticles(fAlphaTimer, false, true);
                 if (pparticleProp->iParticleCount > 0) {
-                    bdone = 0;
+                    bdone = false;
                 }
             }
             if (AddOnObjects.iSize) {
@@ -238,7 +238,7 @@ bool MagicShaderHitEffect::Update(float afTimeDelta) {
                 float a2b = BSMIN(1.0f, v16);
                 fAddonAlpha = BSMAX(0.0f, a2b);
                 if (fAddonAlpha > 0.0) {
-                    bdone = 0;
+                    bdone = false;
                 }
                 if (bFinished) {
                     addonScaleOutTime = pEffectData->GetAddOnScaleOutTime() * -1.0;
@@ -277,21 +277,21 @@ bool MagicShaderHitEffect::Update(float afTimeDelta) {
         float* v10 = &spTexEffectData.m_pObject->CurrentRimColor.a;
         *v10 = *v10 * falpha;
         if (spTexEffectData.m_pObject->RimColor.a > 0.0 || spTexEffectData.m_pObject->FillColor.a > 0.0) {
-            bdone = 0;
+            bdone = false;
         }
     }
     if (bFinished && bdone) {
         if (pTarget->IsActor()) {
             if (static_cast<Actor*>(pTarget)->GetCurrentAIProcess()) {
                 BaseProcess* CurrentAIProcess = static_cast<Actor*>(pTarget)->GetCurrentAIProcess();
-                CurrentAIProcess->SetShouldRefreshMagicShadersEffects(1, 1, 0);
+                CurrentAIProcess->SetShouldRefreshMagicShadersEffects(true, true, false);
             }
         }
     LABEL_4:;
         ClearTarget();
-        return 0;
+        return false;
     }
-    return 1;
+    return true;
 }
 
 bool MagicShaderHitEffect::CheckShouldSave() {
@@ -307,7 +307,7 @@ bool MagicShaderHitEffect::CheckShouldSave() {
 }
 
 uint16_t MagicShaderHitEffect::GetSaveSize() {
-    return GetSaveSize(static_cast<ActiveEffect*>(0), pTarget) + 8;
+    return GetSaveSize(static_cast<ActiveEffect*>(nullptr), pTarget) + 8;
 }
 
 void MagicShaderHitEffect::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
@@ -328,7 +328,7 @@ void MagicShaderHitEffect::SaveGame() {
     pSaveLoadGameOLD->SaveNumericID(reinterpret_cast<uint32_t*>(&a2), 4u);
     apFormID = pEffectData->GetFormID();
     pSaveLoadGameOLD->SaveNumericID(&apFormID, 4u);
-    SaveGame(static_cast<ActiveEffect*>(0), pTarget);
+    SaveGame(static_cast<ActiveEffect*>(nullptr), pTarget);
 }
 
 void MagicShaderHitEffect::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
@@ -352,24 +352,24 @@ bool MagicShaderHitEffect::LoadGame() {
     TESObjectCELL* ParentCell;
     uint32_t aiSearchID;
     uint32_t apFormID;
-    bool v9 = 1;
+    bool v9 = true;
     pSaveLoadGameOLD->LoadNumericID(&apFormID, 4u);
     TESForm* FormByNumericID = TESForm::GetFormByNumericID(apFormID);
     pTarget = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     if (!pTarget ||
         (!pTarget->GetParentCell() || (ParentCell = pTarget->GetParentCell(), !ParentCell->GetAttached()))) {
-        v9 = 0;
+        v9 = false;
     }
     pSaveLoadGameOLD->LoadNumericID(&aiSearchID, 4u);
     TESForm* v3 = TESForm::GetFormByNumericID(aiSearchID);
     char* v7 = static_cast<char*>(FNVD_DYNAMIC_CAST_VOID(TESEffectShader)(v3, RTTI_TESForm, RTTI_TESEffectShader));
     if (!v7) {
-        v9 = 0;
+        v9 = false;
     }
-    LoadGame(static_cast<ActiveEffect*>(0), pTarget);
+    LoadGame(static_cast<ActiveEffect*>(nullptr), pTarget);
     if (v9) {
-        InitLoadGame(static_cast<ActiveEffect*>(0), pTarget);
-        FinishInitLoadGame(0, pTarget, v7);
+        InitLoadGame(static_cast<ActiveEffect*>(nullptr), pTarget);
+        FinishInitLoadGame(nullptr, pTarget, v7);
     }
     return v9;
 }
@@ -405,24 +405,24 @@ bool MagicShaderHitEffect::Init() {
             fAlphaTimer = 100.0f;
         }
     }
-    bool bsword = 0;
-    bool bactorRoot = 0;
+    bool bsword = false;
+    bool bactorRoot = false;
     float fswordLength = 0.0f;
-    bool switching = 0;
+    bool switching = false;
     if (pTarget == pPlayer) {
-        if (pPlayer->Get3D(0)) {
-            NiAVObject* v2 = pPlayer->Get3D(0);
+        if (pPlayer->Get3D(false)) {
+            NiAVObject* v2 = pPlayer->Get3D(false);
             bool b3rd = !v2->GetAppCulled();
             bool v32 = this->MagicHitEffect::fAge > 0.0 && b3rd != b3rdPerson;
             switching = v32;
             b3rdPerson = b3rd;
         }
     }
-    NiAVObject* pmembraneRoot = 0;
-    NiAVObject* pparticleRoot = 0;
+    NiAVObject* pmembraneRoot = nullptr;
+    NiAVObject* pparticleRoot = nullptr;
     GetAffectedScenegraph(bactorRoot, bsword, fswordLength, pmembraneRoot, pparticleRoot);
     if (!pmembraneRoot || (!pparticleRoot || !pEffectData)) {
-        return 0;
+        return false;
     }
     // The form IDs of two effect shaders that play the fire loop.
     if (pEffectData->iFormID == 0x852FE || pEffectData->iFormID == 0x84A51) {
@@ -431,20 +431,20 @@ bool MagicShaderHitEffect::Init() {
         NiPoint3 v61 = pTarget->GetLocationOnReference();
         handle.SetPosition(v61.x, v61.y, v61.z);
         handle.SetVolume(1.0f);
-        handle.Play(1);
+        handle.Play(true);
         NiNode* v4 = pTarget->Get3D();
         handle.SetObjectToFollow(v4);
     }
-    bool bdoParticles = 1;
+    bool bdoParticles = true;
     if (bWeaponEnchantment && pTarget->IsActor()) {
         if (static_cast<Actor*>(pTarget)->GetCurrentAIProcess()) {
             BaseProcess* CurrentAIProcess = static_cast<Actor*>(pTarget)->GetCurrentAIProcess();
             if (CurrentAIProcess->IsCurrentWeaponGrenadeOrMine()) {
-                bdoParticles = 0;
+                bdoParticles = false;
             }
             BaseProcess* v30 = static_cast<Actor*>(pTarget)->GetCurrentAIProcess();
             if (!v30->GetWeaponDrawn() && pPlayer->GetMagicShaderHitEffect() != this) {
-                bdoParticles = 0;
+                bdoParticles = false;
             }
         }
     }
@@ -456,23 +456,23 @@ bool MagicShaderHitEffect::Init() {
                         spParticleNode.m_pObject, (&ParticlePropertyArray.operator[](i_2))->m_pObject
                     );
                 }
-                ParticlePropertyArray.Clear(1);
+                ParticlePropertyArray.Clear(true);
                 if (spParticleNode.m_pObject) {
-                    spParticleNode.m_pObject->AttachParent(0);
+                    spParticleNode.m_pObject->AttachParent(nullptr);
                 }
-                spParticleNode.operator=(static_cast<NiNode*>(0));
+                spParticleNode.operator=(static_cast<NiNode*>(nullptr));
             }
         }
     }
     else {
-        if (spParticleNode.operator==(static_cast<NiNode*>(0))) {
+        if (spParticleNode.operator==(static_cast<NiNode*>(nullptr))) {
             NiNode* v29;
             void* apMemory = NiMemObject::operator new(sizeof(NiNode));
             if (apMemory) {
                 v29 = ::new (apMemory) NiNode(0);
             }
             else {
-                v29 = 0;
+                v29 = nullptr;
             }
             spParticleNode.operator=(v29);
             NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString("ParticleShader Geometry");
@@ -481,10 +481,10 @@ bool MagicShaderHitEffect::Init() {
             spParticleNode.m_pObject->SetRotate(NiMatrix3_IDENTITY);
         }
         if (!ParticlePropertyArray.iSize) {
-            NiPointer<NiSourceTexture> sptexture(static_cast<NiSourceTexture*>(0));
+            NiPointer<NiSourceTexture> sptexture(static_cast<NiSourceTexture*>(nullptr));
             if (pEffectData->ParticleShaderTexture.GetTextureNameLength()) {
                 BSsprintf(path, 260, "%s\\%s", "Textures", pEffectData->ParticleShaderTexture.GetTextureName());
-                TES::pInstance->CreateTextureImage(path, sptexture, 0, 0);
+                TES::pInstance->CreateTextureImage(path, sptexture, false, false);
                 float arPos_8 = pEffectData->Data.fParticlePersistent;
                 float arPos_4 = pEffectData->Data.fParticleFull;
                 int32_t imaxParticles = static_cast<int32_t>(BSMAX(arPos_4, arPos_8));
@@ -509,7 +509,7 @@ bool MagicShaderHitEffect::Init() {
                 particleProperty_2->SetEmitterTypeRay(fswordLength);
             }
             if (bWeaponEnchantment) {
-                particleProperty_2->SetByte6C(0);
+                particleProperty_2->SetByte6C(false);
             }
             if (pTarget) {
                 TESObjectACTI* pactivator = dynamic_cast<TESObjectACTI*>(pTarget->GetObjectReference());
@@ -526,23 +526,23 @@ bool MagicShaderHitEffect::Init() {
             if (switching) {
                 particleProperty_2->InitParticleData(0.0f);
                 float v27 = fAlphaTimer - 0.16599999368190765;
-                particleProperty_2->UpdateParticles(v27, 0, 1);
-                particleProperty_2->UpdateParticles(fAlphaTimer, 0, 1);
+                particleProperty_2->UpdateParticles(v27, false, true);
+                particleProperty_2->UpdateParticles(fAlphaTimer, false, true);
             }
         }
         UpdatePosition();
     }
     if (!pEffectData->IsFlagSet(TESEffectShader::DISABLE_TEXTURE_SHADER)) {
-        if (spTexEffectData.operator==(static_cast<BSShaderPPLightingProperty::TextureEffectData*>(0))) {
-            NiPointer<NiSourceTexture> sptexture_2(static_cast<NiSourceTexture*>(0));
+        if (spTexEffectData.operator==(static_cast<BSShaderPPLightingProperty::TextureEffectData*>(nullptr))) {
+            NiPointer<NiSourceTexture> sptexture_2(static_cast<NiSourceTexture*>(nullptr));
             if (pEffectData->GetTextureShaderTexture()->GetTextureNameLength()) {
                 BSsprintf(v47, 260, "%s\\%s", "Textures", pEffectData->GetTextureShaderTexture()->GetTextureName());
-                TES::pInstance->CreateTextureImage(v47, sptexture_2, 0, 0);
+                TES::pInstance->CreateTextureImage(v47, sptexture_2, false, false);
             }
-            NiPointer<NiSourceTexture> spblockoutTexture(static_cast<NiSourceTexture*>(0));
+            NiPointer<NiSourceTexture> spblockoutTexture(static_cast<NiSourceTexture*>(nullptr));
             if (pEffectData->GetBlockOutTexture()->GetTextureNameLength()) {
                 BSsprintf(path_1, 260, "%s\\%s", "Textures", pEffectData->GetBlockOutTexture()->GetTextureName());
-                TES::pInstance->CreateTextureImage(path_1, spblockoutTexture, 0, 0);
+                TES::pInstance->CreateTextureImage(path_1, spblockoutTexture, false, false);
             }
             NiSourceTexture* arPos_8b = spblockoutTexture.m_pObject;
             NiSourceTexture* arPos_4b = sptexture_2.m_pObject;
@@ -574,7 +574,7 @@ bool MagicShaderHitEffect::Init() {
                             for (BSSimpleList<BGSDebrisData*>* pdebrisList = pEffectData->Data.pAddonModels->GetData();
                                  pdebrisList && !pdebrisList->IsEmpty(); pdebrisList = pdebrisList->m_pkNext) {
                                 char* pFileName = pdebrisList->m_item->pFileName;
-                                pModelLoader->LoadFile(pFileName, LOD_MULT_NONE, 1, 0, 0, 0);
+                                pModelLoader->LoadFile(pFileName, LOD_MULT_NONE, true, false, false, false);
                                 uint32_t arPos_8d = pdebrisList->m_item->cPercentage;
                                 randomDebris.AddWeightedResult(pdebrisList->m_item->pFileName, arPos_8d);
                             }
@@ -587,7 +587,7 @@ bool MagicShaderHitEffect::Init() {
                                 }
                                 NiAVObject* pobject = (&pparticleProp->GetTargetArray()->operator[](i_3))->m_pObject;
                                 if (pobject->IsNode()) {
-                                    ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(0));
+                                    ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
                                     char* v11 = randomDebris.PickResult();
                                     pModelLoader->FindModel(v11, spmodel);
                                     if (spmodel.m_pObject) {
@@ -599,7 +599,7 @@ bool MagicShaderHitEffect::Init() {
                                                 NiNode* arPos = pobject->IsNode();
                                                 NiAVObject* v15 = paddon;
                                                 TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
-                                                Instance->QueueNodeAttach(v15, arPos, 1, 0);
+                                                Instance->QueueNodeAttach(v15, arPos, true, false);
                                             }
                                             else {
                                                 NiNode* fScale = pobject->IsNode();
@@ -637,11 +637,11 @@ void MagicShaderHitEffect::ClearTarget() {
     }
     if (spTexEffectData.m_pObject) {
         if (pTarget == pPlayer) {
-            NiAVObject* pav = pPlayer->Get3D(1);
+            NiAVObject* pav = pPlayer->Get3D(true);
             if (pav) {
                 pEffectData->StopTextureShader(pav, spTexEffectData.m_pObject);
             }
-            NiAVObject* pav_2 = pPlayer->Get3D(0);
+            NiAVObject* pav_2 = pPlayer->Get3D(false);
             if (pav_2) {
                 pEffectData->StopTextureShader(pav_2, spTexEffectData.m_pObject);
             }
@@ -655,20 +655,20 @@ void MagicShaderHitEffect::ClearTarget() {
             }
         }
     }
-    if (spParticleNode.operator!=(static_cast<NiNode*>(0))) {
+    if (spParticleNode.operator!=(static_cast<NiNode*>(nullptr))) {
         for (int32_t i = 0; i < ParticlePropertyArray.iSize; ++i) {
             pEffectData->StopParticleShader(
                 spParticleNode.m_pObject, (&ParticlePropertyArray.operator[](i))->m_pObject
             );
         }
     }
-    ParticlePropertyArray.Clear(1);
-    if (spParticleNode.operator!=(static_cast<NiNode*>(0))) {
-        spParticleNode.m_pObject->AttachParent(0);
+    ParticlePropertyArray.Clear(true);
+    if (spParticleNode.operator!=(static_cast<NiNode*>(nullptr))) {
+        spParticleNode.m_pObject->AttachParent(nullptr);
     }
-    spParticleNode.operator=(static_cast<NiNode*>(0));
-    spTexEffectData.operator=(static_cast<BSShaderPPLightingProperty::TextureEffectData*>(0));
-    pTarget = 0;
+    spParticleNode.operator=(static_cast<NiNode*>(nullptr));
+    spTexEffectData.operator=(static_cast<BSShaderPPLightingProperty::TextureEffectData*>(nullptr));
+    pTarget = nullptr;
 }
 
 void MagicShaderHitEffect::UpdatePosition() {
@@ -682,15 +682,15 @@ void MagicShaderHitEffect::UpdatePosition() {
     bool v11 = false;
     if (bplayer) {
         if (pPlayer) {
-            if (pPlayer->Get3D(0)) {
-                NiAVObject* ptarget = pPlayer->Get3D(0);
+            if (pPlayer->Get3D(false)) {
+                NiAVObject* ptarget = pPlayer->Get3D(false);
                 if (ptarget->GetAppCulled()) {
                     v11 = true;
                 }
             }
         }
     }
-    NiAVObject* ptarget_2 = 0;
+    NiAVObject* ptarget_2 = nullptr;
     if (bWeaponEnchantment) {
         NiAVObject* pparticleTarget;
         NiAVObject* pmembraneTarget;
@@ -701,13 +701,13 @@ void MagicShaderHitEffect::UpdatePosition() {
     }
     else {
         if (bplayer) {
-            ptarget_2 = pPlayer->Get3D(0);
+            ptarget_2 = pPlayer->Get3D(false);
         }
         else {
             ptarget_2 = pTarget->Get3D();
         }
     }
-    if (spParticleNode.operator!=(static_cast<NiNode*>(0))) {
+    if (spParticleNode.operator!=(static_cast<NiNode*>(nullptr))) {
         if (ptarget_2) {
             const void* WorldTransform;
             if (bWeaponEnchantment) {
@@ -718,8 +718,8 @@ void MagicShaderHitEffect::UpdatePosition() {
             }
             rt::memcpy(&targetRot, WorldTransform, sizeof(targetRot));
             if (!v12) {
-                if (v11 && pPlayer->Get3D(1)) {
-                    NiAVObject* v3 = pPlayer->Get3D(1);
+                if (v11 && pPlayer->Get3D(true)) {
+                    NiAVObject* v3 = pPlayer->Get3D(true);
                     NiNode* pnode = static_cast<NiNode*>(NiObject::DynamicCastStatic(&NiNode::ms_RTTI, v3));
                     if (pnode) {
                         if (pnode != spParticleNode.m_pObject->m_pkParent) {
@@ -735,7 +735,7 @@ void MagicShaderHitEffect::UpdatePosition() {
                         NiMatrix3* v6 =
                             (&spParticleNode.m_pObject->m_pkParent->GetWorldTransform())->m_Rotate.Inverse(&v16);
                         spParticleNode.m_pObject->SetTranslate(*v6 * *v9);
-                        NiUpdateData UpdateData(0.0f, 0, 0);
+                        NiUpdateData UpdateData(0.0f, false, false);
                         spParticleNode.m_pObject->Update(UpdateData);
                     }
                     else {
@@ -751,7 +751,7 @@ void MagicShaderHitEffect::UpdatePosition() {
         }
     }
     if (v11 || v12) {
-        UpdateParentCell(0);
+        UpdateParentCell(nullptr);
     }
     else {
         UpdateParentCell(spParticleNode.m_pObject);
@@ -832,16 +832,16 @@ void MagicShaderHitEffect::GetAffectedScenegraph(
     NiAVObject*& apMembraneRoot,
     NiAVObject*& apParticleRoot
 ) {
-    bool bdisintigrateWeapon = 0;
-    bool disintigrateArmor = 0;
-    NiAVObject* pav = 0;
-    bool binventoryEnchantment = 0;
+    bool bdisintigrateWeapon = false;
+    bool disintigrateArmor = false;
+    NiAVObject* pav = nullptr;
+    bool binventoryEnchantment = false;
     Actor* pactor = dynamic_cast<Actor*>(pTarget);
-    BipedAnim* pbiped = 0;
+    BipedAnim* pbiped = nullptr;
     if (pactor) {
         if (pactor == pPlayer) {
             if (pPlayer->GetInventory3D() && pPlayer->GetMagicShaderHitEffect() == this) {
-                binventoryEnchantment = 1;
+                binventoryEnchantment = true;
             }
             else {
                 pbiped = pPlayer->GetBiped(!b3rdPerson);
@@ -869,15 +869,15 @@ void MagicShaderHitEffect::GetAffectedScenegraph(
                 if (pTarget == pPlayer) {
                     pav = pPlayer->Get3D(!b3rdPerson);
                 }
-                abActorRoot = 1;
+                abActorRoot = true;
             }
             else {
                 if (dynamic_cast<TESObjectWEAP*>(pTarget->GetObjectReference())) {
                     if (pav) {
-                        abSword = 1;
+                        abSword = true;
                         const NiBound* WorldBound = &pav->GetWorldBound();
                         if (WorldBound->m_fRadius <= 0.0) {
-                            NiUpdateData UpdateData(0.0f, 0, 0);
+                            NiUpdateData UpdateData(0.0f, false, false);
                             pav->Update(UpdateData);
                         }
                         const NiPoint3* WorldTranslate = &pav->GetWorldTranslate();

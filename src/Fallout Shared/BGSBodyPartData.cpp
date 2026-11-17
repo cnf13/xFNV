@@ -135,7 +135,7 @@ void BGSBodyPartData::InitItem() {
                 );
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -182,7 +182,7 @@ void BGSBodyPartData::ShowChildLimbs(
                                     pskin = ptri->GetSkinInstance();
                                 }
                                 else {
-                                    pskin = 0;
+                                    pskin = nullptr;
                                 }
                                 BSDismemberSkinInstance* pdSkinInstance = static_cast<BSDismemberSkinInstance*>(
                                     NiObject::DynamicCastStatic(&BSDismemberSkinInstance::ms_RTTI, pskin)
@@ -190,7 +190,7 @@ void BGSBodyPartData::ShowChildLimbs(
                                 if (pdSkinInstance) {
                                     for (int32_t j = 0; j < 15; ++j) {
                                         if (j == n) {
-                                            pdSkinInstance->SetBodyPartEnabled(n, 1);
+                                            pdSkinInstance->SetBodyPartEnabled(n, true);
                                         }
                                     }
                                 }
@@ -211,7 +211,7 @@ void BGSBodyPartData::ClearParts() {
         if (pPartArray[i]) {
             delete pPartArray[i];
         }
-        pPartArray[i] = 0;
+        pPartArray[i] = nullptr;
     }
 }
 
@@ -269,7 +269,7 @@ void BGSBodyPartData::AddBodyPart(BGSBodyPart* apPart) {
 }
 
 BGSBodyPart* BGSBodyPartData::GetBodyPart_005E5130(ActorValue::Index aeIndex) {
-    BGSBodyPart* v6 = 0;
+    BGSBodyPart* v6 = nullptr;
     for (int32_t i = 0; i < 15; ++i) {
         BGSBodyPart* v4 = pPartArray[i];
         if (v4 && v4->GetActorValue() == aeIndex) {
@@ -312,13 +312,13 @@ void BGSBodyPartData::HideChildLimbs(
                                     pskin = ptri->GetSkinInstance();
                                 }
                                 else {
-                                    pskin = 0;
+                                    pskin = nullptr;
                                 }
                                 BSDismemberSkinInstance* pdSkinInstance = static_cast<BSDismemberSkinInstance*>(
                                     NiObject::DynamicCastStatic(&BSDismemberSkinInstance::ms_RTTI, pskin)
                                 );
                                 if (pdSkinInstance) {
-                                    pdSkinInstance->SetBodyPartEnabled(n, 0);
+                                    pdSkinInstance->SetBodyPartEnabled(n, false);
                                 }
                             }
                             while (pnode && i < pnode->GetArrayCount());
@@ -348,10 +348,10 @@ void BGSBodyPartData::GenerateDefaultBodyPartData() {
             v3 = nullptr;
         }
         BGSBodyPartData::pDefaultBodyPartData = v3;
-        v3->SetFormID(0x1Du, (bool)1);
+        v3->SetFormID(0x1Du, true);
         BGSBodyPartData::pDefaultBodyPartData->SetFormEditorID("DefaultBodyPartData");
         pDataHandler->AddFormToDataHandler(BGSBodyPartData::pDefaultBodyPartData);
-        BGSBodyPartData::pDefaultBodyPartData->SetAltered((bool)0);
+        BGSBodyPartData::pDefaultBodyPartData->SetAltered(false);
     }
     TESForm* v1 = TESForm::GetFormByNumericID(0x1Cu);
     BGSBodyPartData::pPlayerBodyPartData = dynamic_cast<BGSBodyPartData*>(v1);
@@ -364,10 +364,10 @@ void BGSBodyPartData::GenerateDefaultBodyPartData() {
             v2 = nullptr;
         }
         BGSBodyPartData::pPlayerBodyPartData = v2;
-        v2->SetFormID(0x1Cu, (bool)1);
+        v2->SetFormID(0x1Cu, true);
         BGSBodyPartData::pPlayerBodyPartData->SetFormEditorID("PlayerBodyPartData");
         pDataHandler->AddFormToDataHandler(BGSBodyPartData::pPlayerBodyPartData);
-        BGSBodyPartData::pPlayerBodyPartData->SetAltered((bool)0);
+        BGSBodyPartData::pPlayerBodyPartData->SetAltered(false);
         BGSBodyPartData::pPlayerBodyPartData = nullptr;
     }
 }

@@ -52,7 +52,7 @@ hkpCollidableMediator::hkpCollidableMediator(
 hkpCollidableMediator::~hkpCollidableMediator() {}
 
 int32_t hkpCollidableMediator::getNumPrimitives() const {
-    return (int32_t)m_collidables->m_size;
+    return m_collidables->m_size;
 }
 
 // The SDK's: a primitive's id is its collidable's address as an integer (its hkUlong(...) cast; the tree treats the id

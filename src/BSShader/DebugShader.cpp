@@ -43,7 +43,7 @@
 
 DebugShader::DebugShader() : spTextureToRender{}, spScreenTriShape(nullptr), spVertexShader(nullptr), spPixelShader{} {
     iShaderType = 10;
-    m_bUsesNiRenderState = 1;
+    m_bUsesNiRenderState = true;
 }
 
 // The shaders, the screen shape and the textures are held references, released here.
@@ -408,9 +408,9 @@ void DebugShader::LoadShaders() {
     char v20[64];
     char PSOFile[260];
     char HLSLFile[260];
-    const char* ptarget = BSShaderManager::GetPSTarget(1);
-    Size.Name = 0;
-    Size.Definition = 0;
+    const char* ptarget = BSShaderManager::GetPSTarget(true);
+    Size.Name = nullptr;
+    Size.Definition = nullptr;
     const char* apFile = "imagespace\\1x\\v\\base_old.v.hlsl";
     std::memset(v20, 0, sizeof(v20));
     BSShader::MakePath("imagespace\\1x\\v\\base_old.v.hlsl", HLSLFile);
@@ -427,8 +427,8 @@ void DebugShader::LoadShaders() {
         }
     }
     const char* v15 = "imagespace\\1x\\p\\copy.p.hlsl";
-    v16.Name = 0;
-    v16.Definition = 0;
+    v16.Name = nullptr;
+    v16.Definition = nullptr;
     std::memset(v17, 0, sizeof(v17));
     BSShader::MakePath("imagespace\\1x\\p\\copy.p.hlsl", HLSLFile);
     BSsprintf(PSOFile, 260, "DEBUG00.pso");
@@ -467,7 +467,7 @@ bool DebugShader::LoadStagesAndPasses() {
     NiD3DPass::CreateNewPass(spPass);
     NiPointer<NiD3DTextureStage> aspD3DTextureStage;
     NiD3DTextureStage::CreateNewStage(aspD3DTextureStage);
-    BSShader::SetupDefaultStage(aspD3DTextureStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(aspD3DTextureStage.m_pObject, 0, 3u, 2u, true);
     aspD3DTextureStage.m_pObject->SetFilterMode(NiTexturingProperty::FILTER_NEAREST);
     p_spPass->m_pObject->SetStage(p_spPass->m_pObject->m_uiCurrentStage, aspD3DTextureStage.m_pObject);
     p_spPass->m_pObject->m_spVertexShader = this->spVertexShader;
@@ -487,36 +487,36 @@ bool DebugShader::LoadStagesAndPasses() {
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         v8->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v8->m_pkRenderStateGroup->SetRenderState(7u, 0, 1);
+    v8->m_pkRenderStateGroup->SetRenderState(7u, 0, true);
     NiD3DPass* v9 = p_spPass->m_pObject;
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         v9->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v9->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+    v9->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
     NiD3DPass* v10 = p_spPass->m_pObject;
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         v10->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v10->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+    v10->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
     NiD3DPass* v11 = p_spPass->m_pObject;
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         v11->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v11->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+    v11->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
     if (!v11->m_pkRenderStateGroup) {
         v11->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v11->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+    v11->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
     NiD3DPass* v12 = p_spPass->m_pObject;
     if (!v12->m_pkRenderStateGroup) {
         v12->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v12->m_pkRenderStateGroup->SetRenderState(168u, 15u, 1);
-    return 1;
+    v12->m_pkRenderStateGroup->SetRenderState(168u, 15u, true);
+    return true;
 }
 
 BSShader* DebugShader::CreateShader() {
-    DebugShader* v0 = 0;
+    DebugShader* v0 = nullptr;
     NiDX9ShaderDeclaration* v1 = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 2u, 1u);
     v1->SetEntry(0u, 0u, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0u);
     v1->SetEntry(1u, 7u, NiShaderDeclaration::SHADERPARAM_NI_TEXCOORD0, NiShaderDeclaration::SPTYPE_FLOAT2, 0u);

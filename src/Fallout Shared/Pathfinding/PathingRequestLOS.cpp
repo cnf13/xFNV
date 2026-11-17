@@ -54,7 +54,7 @@ void PathingRequestLOS::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
 void PathingRequestLOS::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     PathingRequest::LoadGame(apLoadGameBuffer);
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
-    IgnoreLocations.SetSize(isaveGameCount, 1);
+    IgnoreLocations.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         apLoadGameBuffer->LoadData(&IgnoreLocations.operator[](i), 12u);
     }

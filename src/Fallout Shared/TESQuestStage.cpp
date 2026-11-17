@@ -26,14 +26,14 @@ static ScriptVariable* pNewVariable;
 TESQuestStageItem::TESQuestStageItem()
   : m_fileOffset(0), ucIndex(0), m_bHasLogEntry(false), m_pLogDate(nullptr), m_pOwner(nullptr), m_pNextQuest(nullptr) {
     ourMemset(&m_Data, 0, 1u);
-    cResultScript.SetInitialized(0);
+    cResultScript.SetInitialized(false);
     cResultScript.SetTemporary();
-    cResultScript.m_header.bIsQuestScript = 1;
+    cResultScript.m_header.bIsQuestScript = true;
 }
 
 TESQuestStageItem::~TESQuestStageItem() {
-    pCurrentItem = 0;
-    cLogEntry.Set(0, 0);
+    pCurrentItem = nullptr;
+    cLogEntry.Set(nullptr, 0);
     if (m_pLogDate) {
         delete m_pLogDate;
     }
@@ -193,7 +193,7 @@ void TESQuestStageItem::Resolve(bool abAlwaysPass) {
         Warning("QUESTS: Trying to resolve a quest stage item that already has a log date.");
     }
     else {
-        if (abAlwaysPass || (&objConditions)->IsTrue(pPlayer, 0)) {
+        if (abAlwaysPass || (&objConditions)->IsTrue(pPlayer, nullptr)) {
             Date* pDate;
             void* apMemory = ourMalloc(sizeof(Date));
             if (apMemory) {
@@ -209,17 +209,17 @@ void TESQuestStageItem::Resolve(bool abAlwaysPass) {
             m_pLogDate = pDate;
             if (GetEndQuest()) {
                 if (m_pOwner) {
-                    m_pOwner->SetCompleted(1);
+                    m_pOwner->SetCompleted(true);
                     if (m_pOwner == pPlayer->GetActiveQuest()) {
-                        pPlayer->SetActiveQuest(0);
+                        pPlayer->SetActiveQuest(nullptr);
                     }
                 }
             }
             if (GetFailQuest()) {
                 if (m_pOwner) {
-                    m_pOwner->SetFailed(1);
+                    m_pOwner->SetFailed(true);
                     if (m_pOwner == pPlayer->GetActiveQuest()) {
-                        pPlayer->SetActiveQuest(0);
+                        pPlayer->SetActiveQuest(nullptr);
                     }
                 }
             }
@@ -230,9 +230,9 @@ void TESQuestStageItem::Resolve(bool abAlwaysPass) {
             if (Script::GetProcessScripts()) {
                 if (apResultScript) {
                     if ((&apResultScript->m_header)->dataSize) {
-                        (&apResultScript->m_header)->bIsQuestScript = 0;
+                        (&apResultScript->m_header)->bIsQuestScript = false;
                         ScriptLocals* ScriptLocals_ = (&pPlayer->m_Extra)->GetScriptLocals();
-                        apResultScript->Run(pPlayer, ScriptLocals_, 0, 1);
+                        apResultScript->Run(pPlayer, ScriptLocals_, nullptr, true);
                     }
                 }
             }
@@ -243,10 +243,10 @@ void TESQuestStageItem::Resolve(bool abAlwaysPass) {
 void TESQuestStageItem::InitItem(TESForm* apOwner, TESQuestStage* apItem) {
     (&objConditions)->InitItem(apOwner);
     int32_t iprevwarnings = MessageHandler::QWarningCount();
-    MessageHandler::IncDisableWarningCount(1);
+    MessageHandler::IncDisableWarningCount(true);
     MessageHandler::SetWarningCount(0);
     (&cResultScript)->InitItem(apOwner);
-    MessageHandler::IncDisableWarningCount(0);
+    MessageHandler::IncDisableWarningCount(false);
     int32_t irefwarnings = MessageHandler::QWarningCount();
     MessageHandler::SetWarningCount(iprevwarnings);
     if (irefwarnings) {
@@ -349,7 +349,7 @@ void TESQuestStage::InitItem(TESForm* apOwner) {
         TESQuestStageItem* pitem = pList->m_item;
         if (pitem) {
             pitem->InitItem(apOwner, this);
-            (&(&pitem->cResultScript)->m_header)->bIsQuestScript = 0;
+            (&(&pitem->cResultScript)->m_header)->bIsQuestScript = false;
             ++iItemCount;
         }
         pList = pList->m_pkNext;

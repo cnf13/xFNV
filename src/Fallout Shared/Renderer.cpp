@@ -66,8 +66,8 @@
 
 #include <SDL3/SDL.h>
 #include <cmath>
+#include <cstdint>
 #include <filesystem>
-#include <stdint.h>
 #include <string>
 #include <xmmintrin.h>
 
@@ -250,7 +250,7 @@ NiDX9Renderer* Renderer::Init(HWND__* ahWnd, HINSTANCE__* ahInstance) {
         iMultiSamples = iMultiSample;
     }
     if (!ValidateSettings(true)) {
-        return 0;
+        return nullptr;
     }
     if (bFullScreen.operator bool()) {
         iFlags |= 4;
@@ -349,7 +349,7 @@ NiDX9Renderer* Renderer::Init(HWND__* ahWnd, HINSTANCE__* ahInstance) {
     }
     if (!spRenderer.operator->()) {
         SetErrorString("Unknown error creating the Gamebryo Renderer.");
-        return 0;
+        return nullptr;
     }
     NiDX9Renderer* pRenderer = spRenderer.operator->();
     pRenderer->SetBackgroundColor(*BSShaderManager::GetBackgroundColor());
@@ -357,7 +357,7 @@ NiDX9Renderer* Renderer::Init(HWND__* ahWnd, HINSTANCE__* ahInstance) {
         IDirect3DDevice9* pDevice = spRenderer.operator->()->GetD3DDevice();
         if (pDevice) {
             // The segment count is converted as a signed int.
-            pDevice->SetNPatchMode(static_cast<float>(static_cast<int32_t>(GetNPatchSegments())));
+            pDevice->SetNPatchMode(static_cast<float>(GetNPatchSegments()));
         }
     }
     void* pMemory = NiMemObject::operator new(sizeof(NiDevImageConverter));
@@ -365,19 +365,19 @@ NiDX9Renderer* Renderer::Init(HWND__* ahWnd, HINSTANCE__* ahInstance) {
     NiImageConverter::SetImageConverter(pConverter);
     NiSourceTexture::SetUsePreloading(true);
     NiTexture::SetMipmapByDefault(false);
-    NiDX9AdapterDesc* pAdapter = GetAdapterDesc(static_cast<uint32_t>(GetAdapterIndex()));
+    NiDX9AdapterDesc* pAdapter = GetAdapterDesc(GetAdapterIndex());
     // Takes both strings before it tests the adapter, as the game does.
     char* pDescription = pAdapter->GetDescription();
     D3DADAPTER_IDENTIFIER9* pIdentifier = pAdapter->GetAdapterIdentifier();
     if (!pAdapter) {
         SetErrorString("GetAdapterDesc() failed.");
-        return 0;
+        return nullptr;
     }
     D3DPERF_SetOptions(1);
     D3DCAPS9* pCaps = pAdapter->GetDeviceCaps(D3DDEVTYPE_HAL);
     if (!pCaps) {
         SetErrorString("NiXAdapaterDesc::GetDeviceCaps() failed.");
-        return 0;
+        return nullptr;
     }
     if (bFullScreen.operator bool()) {
         bGammaSupport = (pCaps->Caps2 & D3DCAPS2_FULLSCREENGAMMA) != 0;
@@ -435,8 +435,8 @@ NiDX9Renderer* Renderer::Init(HWND__* ahWnd, HINSTANCE__* ahInstance) {
     BSShaderManager::bBlurShader = !BSShaderManager::bHDR && bUseBlurShader.Bool();
     BSShaderManager::bAllow20ShaderHair = bIniAllow20HairShader.Bool();
     BSShaderManager::SetShaderVersion(
-        static_cast<uint32_t>(iPixelShaderVersion), static_cast<uint32_t>(iVertexShaderVersion), bForce1XShaders.Bool(),
-        pDescription, pIdentifier->Driver, usInstructionSlots
+        iPixelShaderVersion, iVertexShaderVersion, bForce1XShaders.Bool(), pDescription, pIdentifier->Driver,
+        usInstructionSlots
     );
     if (BSShaderManager::GetShaderLevel(BSShaderManager::VertexShader) < 5) {
         bShadowsOnGrass = false;
@@ -763,7 +763,7 @@ int32_t Renderer::GetScreenHeight() {
 }
 
 bool Renderer::GetFullScreen() {
-    return (bool)((uint8_t)((&Renderer::bFullScreen)->Bool()));
+    return (bool)((uint8_t)(&Renderer::bFullScreen)->Bool());
 }
 
 bool Renderer::is_bEyeFinity() {
@@ -850,11 +850,11 @@ void Renderer::Reposition(int32_t aiX, int32_t aiY) {
 }
 
 uint32_t Renderer::GetPixelShaderVersion() {
-    return (uint32_t)Renderer::iPixelShaderVersion;
+    return Renderer::iPixelShaderVersion;
 }
 
 uint32_t Renderer::GetVertexShaderVersion() {
-    return (uint32_t)Renderer::iVertexShaderVersion;
+    return Renderer::iVertexShaderVersion;
 }
 
 NiDX9SystemDesc* Renderer::GetSystemDesc() {
@@ -869,23 +869,23 @@ bool Renderer::QUseShaders() {
 }
 
 bool Renderer::QDoCanopyShadowPass() {
-    return (bool)((&Renderer::bDoCanopyShadowPass)->Bool());
+    return (&Renderer::bDoCanopyShadowPass)->Bool();
 }
 
 bool Renderer::QDoActorShadows() {
-    return (bool)((uint8_t)((&Renderer::bDoActorShadows)->Bool()));
+    return (bool)((uint8_t)(&Renderer::bDoActorShadows)->Bool());
 }
 
 bool Renderer::QDoStaticAndArchShadows() {
-    return (bool)((uint8_t)((&Renderer::bDoStaticAndArchShadows)->Bool()));
+    return (bool)((uint8_t)(&Renderer::bDoStaticAndArchShadows)->Bool());
 }
 
 bool Renderer::QDOStaticMenuBackground() {
-    return (bool)((uint8_t)((&Renderer::bStaticMenuBG)->Bool()));
+    return (bool)((uint8_t)(&Renderer::bStaticMenuBG)->Bool());
 }
 
 bool Renderer::QDoShadows() {
-    return (bool)((&Renderer::bDrawShadows)->Bool());
+    return (&Renderer::bDrawShadows)->Bool();
 }
 
 float Renderer::GetSkinnedDecalLODStart() {
@@ -934,7 +934,7 @@ bool Renderer::GetWidescreen() {
 void Renderer::SetGamma(float afGamma) {
     if ((afGamma != Renderer::fCurGamma) && (afGamma > 0.0)) {
         Renderer::fCurGamma = afGamma;
-        Renderer::bGammaDirty = (bool)1;
+        Renderer::bGammaDirty = true;
         BSShaderManager::fGamma = afGamma;
     }
 }
@@ -953,7 +953,7 @@ void Renderer::DoResize() {
                 Interface::Free();
                 Main::DestroyInterfaceSceneGraph();
                 Main::DestroyInterface3DSceneGraph();
-                Renderer::GetNIRenderer()->SetSorter(0);
+                Renderer::GetNIRenderer()->SetSorter(nullptr);
                 uint32_t v11 = Renderer::iTargetHeight;
                 uint32_t v9 = Renderer::iTargetWidth;
                 NiDX9Renderer* NIRenderer = Renderer::GetNIRenderer();
@@ -982,7 +982,7 @@ void Renderer::DoResize() {
                 WorldSceneGraph->UpdateCameraFOV();
                 Main::CreateMenuRootNode();
                 Main::CreateMenuRootNode3D();
-                Interface::Init(0);
+                Interface::Init(false);
                 Interface::InitSecond();
                 Interface::CreateStartMenu();
             }
@@ -991,7 +991,7 @@ void Renderer::DoResize() {
 }
 
 bool Renderer::ValidateSettings(bool abCheckDims) {
-    bool FullScreen = 0;
+    bool FullScreen = false;
     // The desktop's size: SDL's primary display's desktop mode.
     const SDL_DisplayMode* pDesktop = SDL_GetDesktopDisplayMode(SDL_GetPrimaryDisplay());
     uint32_t uiDesktopWidth = pDesktop ? static_cast<uint32_t>(pDesktop->w) : 0;
@@ -1009,7 +1009,7 @@ bool Renderer::ValidateSettings(bool abCheckDims) {
                 }
             }
             if (FullScreen) {
-                FullScreen = 0;
+                FullScreen = false;
                 int32_t a2 = AdapterDesc->GetModeCount();
                 uint32_t aiIndex = a2 + 1;
                 while (a2--) {
@@ -1020,7 +1020,7 @@ bool Renderer::ValidateSettings(bool abCheckDims) {
                             float v12;
                             float v13;
                             if (!Renderer::GetFullScreen()) {
-                                FullScreen = 1;
+                                FullScreen = true;
                                 break;
                             }
                             float aspectRatio =
@@ -1039,7 +1039,7 @@ bool Renderer::ValidateSettings(bool abCheckDims) {
                             else {
                                 if (Renderer::GetScreenWidth() == Mode->m_uiWidth &&
                                     Renderer::GetScreenHeight() == Mode->m_uiHeight) {
-                                    FullScreen = 1;
+                                    FullScreen = true;
                                     break;
                                 }
                                 if (Renderer::GetFullScreen() && Renderer::GetScreenWidth() == Mode->m_uiWidth) {
@@ -1062,8 +1062,8 @@ bool Renderer::ValidateSettings(bool abCheckDims) {
                     if (!FullScreen && aiIndex <= AdapterDesc->GetModeCount()) {
                         Renderer::iScreenWidth = AdapterDesc->GetMode(aiIndex)->m_uiWidth;
                         Renderer::iScreenHeight = AdapterDesc->GetMode(aiIndex)->m_uiHeight;
-                        FullScreen = 1;
-                        Renderer::bLetterbox = 1;
+                        FullScreen = true;
+                        Renderer::bLetterbox = true;
                     }
                 }
                 else {
@@ -1074,7 +1074,7 @@ bool Renderer::ValidateSettings(bool abCheckDims) {
                 }
             }
             if (FullScreen) {
-                FullScreen = 0;
+                FullScreen = false;
                 _D3DCAPS9* DeviceCaps = AdapterDesc->GetDeviceCaps(D3DDEVTYPE_HAL);
                 if (DeviceCaps && Renderer::QUseShaders()) {
                     FullScreen = (DeviceCaps->DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) != 0;
@@ -1110,10 +1110,10 @@ bool Renderer::ValidateSettings(bool abCheckDims) {
                     Renderer::iPixelShaderVersion = 0;
                     bool* v7 = &Renderer::bForce1XShaders.Bool();
                     BSShaderManager::SetShaderVersion(
-                        Renderer::iPixelShaderVersion, Renderer::iVertexShaderVersion, *v7, 0, 0, 0
+                        Renderer::iPixelShaderVersion, Renderer::iVertexShaderVersion, *v7, nullptr, nullptr, 0
                     );
                     if (!Renderer::QUseShaders()) {
-                        return 1;
+                        return true;
                     }
                 }
             }
@@ -1133,7 +1133,7 @@ NiDX9AdapterDesc* Renderer::GetAdapterDesc(uint32_t auiIndex) {
         return Renderer::m_kAdapters->GetAdapter(auiIndex);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -1152,7 +1152,8 @@ bool Renderer::GetMultiSampleTypeSupported(D3DMULTISAMPLE_TYPE aeMultiSample, D3
         int32_t bWindowed = !Renderer::bFullScreen;
         uint32_t DevType = Renderer::spRenderer.m_pObject->GetDevType();
         uint32_t AdapterIndex = Renderer::GetAdapterIndex();
-        if (Direct3D->CheckDeviceMultiSampleType(AdapterIndex, DevType, D3DFormat, bWindowed, aeMultiSample, 0) >= 0) {
+        if (Direct3D->CheckDeviceMultiSampleType(AdapterIndex, DevType, D3DFormat, bWindowed, aeMultiSample, nullptr) >=
+            0) {
             return true;
         }
     }
@@ -1210,7 +1211,7 @@ void Renderer::SetupEyefinity() {
 }
 
 bool Renderer::QDoDiffusePass() {
-    return (bool)((&gs_bDoDiffusePass_Display)->Bool());
+    return (&gs_bDoDiffusePass_Display)->Bool();
 }
 
 void Renderer::SetErrorString(const char* apReason) {
@@ -1222,7 +1223,7 @@ void Renderer::SetErrorString(const char* apReason) {
 
 void Renderer::UpdateGamma() {
     D3DGAMMARAMP v3;
-    Renderer::bGammaDirty = 0;
+    Renderer::bGammaDirty = false;
     gs_fGamma_Display = Renderer::fCurGamma;
     for (uint16_t us = 0; us < 256u; ++us) {
         float afX = static_cast<double>(us) / 255.0;
@@ -1284,7 +1285,7 @@ void* CALLBACK ADLMainMemoryAlloc(uint32_t Size) {
 void ADLMainMemoryFree(void** a1) {
     if (*a1) {
         ourFree(*a1);
-        *a1 = 0;
+        *a1 = nullptr;
     }
 }
 

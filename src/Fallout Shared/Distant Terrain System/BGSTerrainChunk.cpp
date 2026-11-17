@@ -76,7 +76,7 @@ BGSTerrainChunk::~BGSTerrainChunk() {
         }
     }
     else if (spLoadTask.m_pObject) {
-        pIOManager->CancelTask(spLoadTask.m_pObject, 0);
+        pIOManager->CancelTask(spLoadTask.m_pObject, nullptr);
     }
     RemoveWaterFromSystem(false);
     NiObjectGarbage::Add(spNode.m_pObject);
@@ -105,7 +105,7 @@ void BGSTerrainChunk::SetMorphParameter(float afMorphParam) {
 }
 
 NiTexture* BGSTerrainChunk::GetTexture(BGSTerrainChunk::ChunkTextureType aTexType) {
-    NiTexture* ptex = 0;
+    NiTexture* ptex = nullptr;
     if (spMesh.m_pObject) {
         int32_t v7;
         int32_t Type = NiShadeProperty::GetType();
@@ -117,7 +117,7 @@ NiTexture* BGSTerrainChunk::GetTexture(BGSTerrainChunk::ChunkTextureType aTexTyp
         else {
             v7 = 0;
         }
-        BSShaderPPLightingProperty* pplp = v7 ? static_cast<BSShaderPPLightingProperty*>(psp) : 0;
+        BSShaderPPLightingProperty* pplp = v7 ? static_cast<BSShaderPPLightingProperty*>(psp) : nullptr;
         if (pplp) {
             if (aTexType) {
                 return pplp->GetNormalTexture(0);
@@ -200,7 +200,7 @@ void BGSTerrainChunk::Prepare() {
             static_cast<NiDX9Renderer*>(Renderer_)->PrecacheGeometry(spMesh.m_pObject, 0, 0, v2);
             NiDX9Renderer* v3 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
             v3->PerformPrecache();
-            bPrepared = 1;
+            bPrepared = true;
         }
     }
 }
@@ -210,14 +210,14 @@ void BGSTerrainChunk::OnLoadFinished() {
     spLoadTask.m_pObject->GetWater(spWater);
     spLoadTask.m_pObject->GetWaterAtReflectionHeight(spWaterAtReflectionHeight);
     spLoadTask.m_pObject->GetNode(spNode);
-    spLoadTask.operator=(static_cast<BGSTerrainChunkLoadTask*>(0));
-    bDoneLoading = 1;
-    pNode->pManager->SetNeedsImmediateUpdate(1);
+    spLoadTask.operator=(static_cast<BGSTerrainChunkLoadTask*>(nullptr));
+    bDoneLoading = true;
+    pNode->pManager->SetNeedsImmediateUpdate(true);
 }
 
 void BGSTerrainChunk::Attach() {
     if (bDoneLoading && !bAttached) {
-        BSMultiBoundAABB* pwaterMB = 0;
+        BSMultiBoundAABB* pwaterMB = nullptr;
         ++BGSTerrainChunk::iChunkCount;
         if (spNode.m_pObject) {
             BSMultiBound* pbound_4;
@@ -237,7 +237,7 @@ void BGSTerrainChunk::Attach() {
                 pwaterMB_2 = ::new (apMemory) BSMultiBoundAABB;
             }
             else {
-                pwaterMB_2 = 0;
+                pwaterMB_2 = nullptr;
             }
             pwaterMB = pwaterMB_2;
             c.z = pNode->pManager->pWorld->GetDefaultWaterHeight();
@@ -249,7 +249,7 @@ void BGSTerrainChunk::Attach() {
                 v8 = ::new (v15) BSMultiBoundNode;
             }
             else {
-                v8 = 0;
+                v8 = nullptr;
             }
             spWaterNode.operator=(v8);
             BSMultiBound* v14 = static_cast<BSMultiBound*>(NiMemObject::operator new(sizeof(BSMultiBound)));
@@ -257,7 +257,7 @@ void BGSTerrainChunk::Attach() {
                 pbound_2 = ::new (v14) BSMultiBound;
             }
             else {
-                pbound_2 = 0;
+                pbound_2 = nullptr;
             }
             BSMultiBound* pbound = pbound_2;
             pbound_2->SetShape(pwaterMB);
@@ -267,7 +267,7 @@ void BGSTerrainChunk::Attach() {
                 pwaterMB_3 = ::new (v13) BSMultiBoundAABB;
             }
             else {
-                pwaterMB_3 = 0;
+                pwaterMB_3 = nullptr;
             }
             pwaterMB = pwaterMB_3;
             c.z = pNode->pManager->pWorld->GetDefaultWaterHeight();
@@ -279,7 +279,7 @@ void BGSTerrainChunk::Attach() {
                 v5 = ::new (v12) BSMultiBoundNode;
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             spWaterReflNode.operator=(v5);
             BSMultiBound* v11 = static_cast<BSMultiBound*>(NiMemObject::operator new(sizeof(BSMultiBound)));
@@ -287,7 +287,7 @@ void BGSTerrainChunk::Attach() {
                 pbound_4 = ::new (v11) BSMultiBound;
             }
             else {
-                pbound_4 = 0;
+                pbound_4 = nullptr;
             }
             pbound = pbound_4;
             pbound_4->SetShape(pwaterMB);
@@ -298,15 +298,15 @@ void BGSTerrainChunk::Attach() {
             v2->AttachChild(spMesh.m_pObject, 1);
         }
         spMesh.m_pObject->UpdateProperties();
-        NiUpdateData foobar(0.0f, 0, 0);
+        NiUpdateData foobar(0.0f, false, false);
         spMesh.m_pObject->Update(foobar);
-        AddWaterToSystem(0);
-        NiUpdateData bar(0.0f, 0, 0);
+        AddWaterToSystem(false);
+        NiUpdateData bar(0.0f, false, false);
         NiNode* v3 = pNode->pManager->GetLODLandRoot();
         v3->Update(bar);
         Prepare();
         AddToStaticList();
-        bAttached = 1;
+        bAttached = true;
         if (pNode->QPersistentNode() && pNode->QSplitNode()) {
             Hide();
         }
@@ -321,8 +321,8 @@ void BGSTerrainChunk::AddWaterToSystem(bool abForce) {
             TESWorldSpace* World = pNode->pManager->pWorld;
             NiGeometry* v6 = spWaterAtReflectionHeight.m_pObject;
             pLODWaterAtReflectionHeightRef =
-                TES::pInstance->GetWaterSystem()->AddLODWater(v6, World, WaterLODRoot, v12, 1);
-            spWaterReflNode.operator=(static_cast<BSMultiBoundNode*>(0));
+                TES::pInstance->GetWaterSystem()->AddLODWater(v6, World, WaterLODRoot, v12, true);
+            spWaterReflNode.operator=(static_cast<BSMultiBoundNode*>(nullptr));
             if (pLODWaterAtReflectionHeightRef) {
                 NiNode* pWaterPlanesNode = pLODWaterAtReflectionHeightRef->Get3D();
                 NiNode* v2 = pWaterPlanesNode->IsNode();
@@ -341,8 +341,8 @@ void BGSTerrainChunk::AddWaterToSystem(bool abForce) {
             NiNode* v11 = pNode->pManager->GetWaterLODRoot();
             TESWorldSpace* v9 = pNode->pManager->pWorld;
             NiGeometry* v7 = spWater.m_pObject;
-            pLODWaterRef = TES::pInstance->GetWaterSystem()->AddLODWater(v7, v9, v11, v13, 0);
-            spWaterNode.operator=(static_cast<BSMultiBoundNode*>(0));
+            pLODWaterRef = TES::pInstance->GetWaterSystem()->AddLODWater(v7, v9, v11, v13, false);
+            spWaterNode.operator=(static_cast<BSMultiBoundNode*>(nullptr));
             if (pLODWaterRef) {
                 NiNode* v17 = pLODWaterRef->Get3D();
                 NiNode* v4 = v17->IsNode();
@@ -375,7 +375,7 @@ void BGSTerrainChunk::RemoveWaterFromSystem(bool abForce) {
                 if (pLODWaterRef) {
                     delete pLODWaterRef;
                 }
-                pLODWaterRef = 0;
+                pLODWaterRef = nullptr;
             }
         }
         if (spWaterAtReflectionHeight.m_pObject) {
@@ -392,7 +392,7 @@ void BGSTerrainChunk::RemoveWaterFromSystem(bool abForce) {
                 if (pLODWaterAtReflectionHeightRef) {
                     delete pLODWaterAtReflectionHeightRef;
                 }
-                pLODWaterAtReflectionHeightRef = 0;
+                pLODWaterAtReflectionHeightRef = nullptr;
             }
         }
     }
@@ -407,10 +407,10 @@ void BGSTerrainChunk::EnableLODWaterProcessing(bool abEnable) {
         for (BGSTerrainChunk* pChunk : BGSTerrainChunk::ChunksLoaded) {
             if (pChunk) {
                 if (abEnable) {
-                    pChunk->AddWaterToSystem(1);
+                    pChunk->AddWaterToSystem(true);
                 }
                 else {
-                    pChunk->RemoveWaterFromSystem(1);
+                    pChunk->RemoveWaterFromSystem(true);
                 }
             }
         }
@@ -438,7 +438,7 @@ void BGSTerrainChunk::ShowNormalDetail() {
         BGSTerrainNode* v1;
         BGSTerrainChunk* v2 = ecx0->m_item;
         BGSTerrainNode* v0 = v2->pNode;
-        if (v0->QPersistentNode() && ((v1 = v2->pNode, v1->QSplitNode()) && v2->pNode->CheckMeshSolidUnderMe(0))) {
+        if (v0->QPersistentNode() && ((v1 = v2->pNode, v1->QSplitNode()) && v2->pNode->CheckMeshSolidUnderMe(false))) {
             v2->Hide();
         }
         else {
@@ -553,7 +553,7 @@ BGSTerrainChunkLoadTask::~BGSTerrainChunkLoadTask() {}
 
 void BGSTerrainChunkLoadTask::Run() {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LODLANDSCAPE, 1,
+        MEM_CONTEXT_LODLANDSCAPE, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Distant Terrain System\\BGSTerrainChunk.cpp", 664
     );
     BSFile* pfile = GetFile(ARCHIVE_TYPE_INDEX_MESHES, ARCHIVE_TYPE_MESHES);
@@ -571,7 +571,7 @@ void BGSTerrainChunkLoadTask::Run() {
                     NiObject* v3 = spWater.m_pObject;
                     BSSegmentedTriShape* v1 = v3->IsSegmentedTriShape();
                     if (v1->GetNumSegments() == 3) {
-                        spWater.operator=(static_cast<NiGeometry*>(0));
+                        spWater.operator=(static_cast<NiGeometry*>(nullptr));
                     }
                 }
             }
@@ -597,9 +597,9 @@ void BGSTerrainChunkLoadTask::Finish() {
     if (spMesh.m_pObject) {
         if (this->bCanceled) {
             int32_t bCanceled = this->bCanceled;
-            spMesh.operator=(static_cast<NiGeometry*>(0));
-            spWater.operator=(static_cast<NiGeometry*>(0));
-            spWaterAtReflectionHeight.operator=(static_cast<NiGeometry*>(0));
+            spMesh.operator=(static_cast<NiGeometry*>(nullptr));
+            spWater.operator=(static_cast<NiGeometry*>(nullptr));
+            spWaterAtReflectionHeight.operator=(static_cast<NiGeometry*>(nullptr));
         }
         else {
             char pcString[268];
@@ -649,7 +649,7 @@ void BGSTerrainChunkLoadTask::Finish() {
 }
 
 void BGSTerrainChunkLoadTask::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
-    bCanceled = (bool)1;
+    bCanceled = true;
     QueuedFile::Cancel(aePreviousState, apTaskOwner);
 }
 
@@ -667,7 +667,7 @@ void BGSTerrainChunkLoadTask::QueueMe() {
     BGSTerrainChunk::BuildLODObjectNormalFilename(apTextureFileName, pWorldSpace, iLevel, iX, iY);
     IO_TASK_PRIORITY v2 = GetIOTaskPriority();
     pModelLoader->QueueTexture(apTextureFileName, v2, this);
-    bFinishedQueuing = 1;
+    bFinishedQueuing = true;
     CheckFinished();
 }
 

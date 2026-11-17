@@ -75,13 +75,13 @@ void CombatProcedureAttackRanged::Update() {
     BGSProjectile* pprojectile = pweapon->GetProjectile(pattacker);
     bool bautomaticWeapon = pweapon->IsAutomaticWeapon();
     bool v31 = bautomaticWeapon || pweapon->GetBurstShot();
-    bool btooCloseToTarget = 0;
-    NiPoint3 targetPoint = CalculateTargetedPoint(0);
+    bool btooCloseToTarget = false;
+    NiPoint3 targetPoint = CalculateTargetedPoint(nullptr);
     BaseProcess* CurrentAIProcess = pattacker->pCurrentProcess;
     bool bCanAttack = CurrentAIProcess->CanAttack() || pattacker->IsAttacking();
     bool bcanAttack = bCanAttack;
     if (pCombatController->IsSwitchingWeapons()) {
-        bcanAttack = 0;
+        bcanAttack = false;
     }
     if (this->eState) {
         if (!bcanAttack) {
@@ -104,10 +104,10 @@ void CombatProcedureAttackRanged::Update() {
         NiPoint3 vec = targetPointModified - *v3;
         float targetDist_2 = vec.SqrLength();
         if (targetDist_2 > fabsoluteMaxRange * fabsoluteMaxRange) {
-            bcanAttack = 0;
+            bcanAttack = false;
         }
         if (targetDist_2 < fminRange * fminRange) {
-            btooCloseToTarget = 1;
+            btooCloseToTarget = true;
         }
     }
     if (pcombatState->GetHasTarget360LineOfSight()) {
@@ -201,7 +201,7 @@ void CombatProcedureAttackRanged::Update() {
             pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, DC_ATTACK, false);
         }
     }
-    bool buseIronSights = 0;
+    bool buseIronSights = false;
     if (ptarget) {
         float* v8 = &fCombatIronSightsDistance.Float();
         float fironSightsDistance = pweapon->GetIronSightUseMult() * *v8;
@@ -210,7 +210,7 @@ void CombatProcedureAttackRanged::Update() {
         NiPoint3 targetVec = *v9 - *targetActorPos;
         double v10 = targetVec.SqrLength();
         if (fironSightsDistance * fironSightsDistance < v10) {
-            buseIronSights = 1;
+            buseIronSights = true;
         }
     }
     pCombatController->SetUseIronSights(buseIronSights);
@@ -250,22 +250,22 @@ void CombatProcedureAttackRanged::Update() {
     }
     if (this->eState != CombatProcedureAttackRanged::ATTACK_STATE_COOLDOWN && (AimAtTarget() || btooCloseToTarget) &&
         FireDelayTimer.Check()) {
-        bool battack = 0;
+        bool battack = false;
         uint8_t cshotsToFire = 1;
         if (bautomaticWeapon) {
-            bool bweaponReadyToFire = 1;
+            bool bweaponReadyToFire = true;
             BaseProcess* v27 = pattacker->pCurrentProcess;
             cshotsToFire = v27->GetAutomaticShotsToFire(pattacker);
             uint16_t Group = panim->GetGroup(AGS_WEAPON);
             if (TESAnimGroup::IsAttackSpinAction(Group)) {
                 ANIM_GROUP_ACTION eaction = panim->GetGroupAction(AGS_WEAPON);
                 if (eaction != AGA_STOP) {
-                    bweaponReadyToFire = 0;
+                    bweaponReadyToFire = false;
                 }
             }
             if (bweaponReadyToFire) {
                 if (cshotsToFire) {
-                    battack = 1;
+                    battack = true;
                 }
             }
         }
@@ -273,18 +273,18 @@ void CombatProcedureAttackRanged::Update() {
             BaseProcess* v26 = pattacker->pCurrentProcess;
             ANIMATION_ACTION v25 = v26->GetAnimAction();
             if (v25 == ANIM_ACTION_NONE) {
-                battack = 1;
+                battack = true;
             }
             else {
                 if (v25 == ANIM_ACTION_ATTACK_FOLLOW_THROUGH &&
                     panim->GetGroupAction(AGS_WEAPON) == AGA_SPECIAL_IDLE_STOP) {
-                    battack = 1;
+                    battack = true;
                 }
             }
         }
         if (battack) {
-            phitRef = 0;
-            Actor* apActor = 0;
+            phitRef = nullptr;
+            Actor* apActor = nullptr;
             fdistanceFraction = 0.0f;
             CombatUtilities::GetBackProjectedAttackerFiringLocation(&firingLocation, pattacker);
             bool bprojectilePickHit = CombatUtilities::CalculateProjectileLOS(
@@ -299,14 +299,14 @@ void CombatProcedureAttackRanged::Update() {
                         projectileImpactPoint = hitPoint;
                     }
                     float ftime = CombatUtilities::ComputeProjectileTime_(
-                        pprojectile, firingLocation, projectileImpactPoint, 0, 0.0f
+                        pprojectile, firingLocation, projectileImpactPoint, false, 0.0f
                     );
                     if (pCombatManager->CheckExplosionAttack(pattacker, pexplosion_2, projectileImpactPoint, ftime)) {
-                        pCombatController->pCombatState->pExplosiveProjectileBlocked = 0;
+                        pCombatController->pCombatState->pExplosiveProjectileBlocked = nullptr;
                         ExplosiveProjectileBlockedTimer.Clear();
                     }
                     else {
-                        battack = 0;
+                        battack = false;
                         if (ExplosiveProjectileBlockedTimer.IsSet()) {
                             if (ExplosiveProjectileBlockedTimer.Check()) {
                                 pCombatController->pCombatState->pExplosiveProjectileBlocked = pexplosion_2;
@@ -319,7 +319,7 @@ void CombatProcedureAttackRanged::Update() {
                     }
                 }
                 if (battack) {
-                    switch (panim->FindSwitchKey(0)) {
+                    switch (panim->FindSwitchKey(nullptr)) {
                         case 51: {
                             eattack_2 = ANIM_GROUP_ATTACK_3;
                             break;
@@ -381,7 +381,7 @@ void CombatProcedureAttackRanged::Update() {
                 }
                 return;
             }
-            bool battackAnyway = 0;
+            bool battackAnyway = false;
             CombatProcedureAttackRanged::ATTACK_STATE v24 = this->eState;
             if (v24 == CombatProcedureAttackRanged::ATTACK_STATE_FIRING) {
                 if (phitRef) {
@@ -389,7 +389,7 @@ void CombatProcedureAttackRanged::Update() {
                         Actor* phitActor = static_cast<Actor*>(phitRef);
                         Actor* ptarget_2 = GetTarget();
                         if (phitActor == ptarget_2 || pcombatGroup->IsTarget(phitActor)) {
-                            battackAnyway = 1;
+                            battackAnyway = true;
                         }
                     }
                 }
@@ -400,7 +400,7 @@ void CombatProcedureAttackRanged::Update() {
                         float fmissDistance = missVector.Length();
                         double RadiusBSUnits = pexplosion->GetRadiusBSUnits();
                         if (fmissDistance <= RadiusBSUnits) {
-                            battackAnyway = 1;
+                            battackAnyway = true;
                         }
                     }
                 }
@@ -409,15 +409,15 @@ void CombatProcedureAttackRanged::Update() {
                 if (v24 == CombatProcedureAttackRanged::ATTACK_STATE_SUPPRESSIVE_FIRE) {
                     if (phitRef && phitRef->IsActor()) {
                         if (phitRef) {
-                            if (phitRef->IsActor() && !phitRef->IsDead(0) &&
+                            if (phitRef->IsActor() && !phitRef->IsDead(false) &&
                                 pcombatGroup->IsTarget(static_cast<Actor*>(phitRef))) {
-                                battackAnyway = 1;
+                                battackAnyway = true;
                             }
                         }
                     }
                     else {
                         if (fdistanceFraction > 0.5) {
-                            battackAnyway = 1;
+                            battackAnyway = true;
                         }
                     }
                     if (!battackAnyway) {
@@ -429,11 +429,11 @@ void CombatProcedureAttackRanged::Update() {
                 }
             }
             if (battackAnyway) {
-                pCombatController->pCombatState->SetTargetBlocked(0);
+                pCombatController->pCombatState->SetTargetBlocked(false);
                 goto LABEL_141;
             }
             if (!pCombatController->pCombatState->bTargetBlocked) {
-                pCombatController->pCombatState->SetTargetBlocked(1);
+                pCombatController->pCombatState->SetTargetBlocked(true);
             }
         }
     }
@@ -631,7 +631,7 @@ NiPoint3 CombatProcedureAttackRanged::CalculateTargetedPoint(NiPoint3* apRelease
         BGSProjectile* Projectile_ = ConsoleSelection->GetProjectile(Attacker);
         Actor* v5 = GetAttacker();
         NiPoint3 arResult = CombatUtilities::GetProjectedPointForTarget(
-            v5, apTarget, apReleasePoint, Projectile_, static_cast<float>(0.0), static_cast<bool>(0)
+            v5, apTarget, apReleasePoint, Projectile_, static_cast<float>(0.0), false
         );
         result = arResult;
     }

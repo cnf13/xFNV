@@ -26,7 +26,7 @@ void TESAttackDamageForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESAttackDamageForm::CompareComponent(BaseFormComponent* apCompareFC) {
     TESAttackDamageForm* v5 = dynamic_cast<TESAttackDamageForm*>(apCompareFC);
     if (!v5) {
-        return (bool)1;
+        return true;
     }
     int32_t v3 = (int32_t)GetAttackDamage();
     return (bool)((uint8_t)(((uint32_t)v3) != ((uint32_t)v5->GetAttackDamage())));

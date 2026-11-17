@@ -35,7 +35,7 @@ NiObject* NiPSysGravityFieldModifier::CreateClone(NiCloningProcess& kCloning) {
         pkObject = ::new (v3) NiPSysGravityFieldModifier;
     }
     else {
-        pkObject = 0;
+        pkObject = nullptr;
     }
     CopyMembers(pkObject, kCloning);
     pkObject->m_kDirection = m_kDirection;
@@ -133,7 +133,7 @@ void NiPSysGravityFieldModifier::Update(float fTime, NiPSysData* pkData) {
         else {
             // The scaled step is kept as a double.
             double dScaledStep = fDeltaT * m_fMagnitude;
-            float fPow = static_cast<float>(std::pow(fDistSqr, fHalfAttenuation));
+            float fPow = std::pow(fDistSqr, fHalfAttenuation);
             fScale = static_cast<float>(dScaledStep / BSMAX(1.0f, fPow));
         }
         float fAddX = kDir.x * fScale;
@@ -191,6 +191,6 @@ NiObject* NiPSysGravityFieldModifier::CreateObject() {
         return ::new (v0) NiPSysGravityFieldModifier;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

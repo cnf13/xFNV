@@ -364,7 +364,7 @@ int32_t hkpCompressedMeshShape::Chunk::getNextIndex(int32_t index, int32_t& wind
     int32_t v7 = 0;
     char v8 = 0;
     if (m_size && (m_data = pThis->m_stripLengths.begin(), (v7 = *m_data, v5 >= v7))) {
-        while (1) {
+        while (true) {
             ++v6;
             ++m_data;
             if (v6 >= m_size) {

@@ -556,7 +556,7 @@ bool hkpSimulation::isSimulationAtMarker() {
 }
 
 void hkpSimulation::setFrameTimeMarker(float a1) {
-    m_simulateUntilTime = (float)(m_currentTime + a1);
+    m_simulateUntilTime = (m_currentTime + a1);
 }
 
 void hkpSimulation::processAgentResetCollisionInformation(
@@ -734,10 +734,7 @@ hkpStepResult hkpSimulation::integrateInternal(const hkStepInfo& stepInfoIn) {
     }
     alignas(16) hkpConstraintQueryIn queryIn;
 
-    queryIn.set(
-        m_world->m_dynamicsStepInfo.m_solverInfo, stepInfoIn,
-        static_cast<hkpViolatedConstraintArray*>(m_world->m_violatedConstraintArray)
-    );
+    queryIn.set(m_world->m_dynamicsStepInfo.m_solverInfo, stepInfoIn, m_world->m_violatedConstraintArray);
     HK_TIMER_SPLIT_LIST("Integrate");
     // Takes the island array's address once and reloads its data each iteration, last island first.
     hkArray<hkpSimulationIsland*>& activeIslands = m_world->m_activeSimulationIslands;

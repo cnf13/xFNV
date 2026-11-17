@@ -475,7 +475,7 @@ hkpSphereTriangleAgent::ClosestPointResult hkpSphereTriangleAgent::getClosestPoi
         }
     }
     hkpCollideTriangleUtil::ClosestPointTriangleStatus status =
-        hkpCollideTriangleUtil::closestPointTriangle(sphereCentre, triVertices, cache, result, 0);
+        hkpCollideTriangleUtil::closestPointTriangle(sphereCentre, triVertices, cache, result, nullptr);
     float radiusSum = sphereA->m_radius + triB->m_radius;
     float limit = input.m_tolerance + radiusSum;
     if (!(limit > result.distance)) {

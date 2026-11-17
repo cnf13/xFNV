@@ -347,7 +347,7 @@ NiDX9RenderState* NiDX9RenderState::Create(NiDX9Renderer* a1, _D3DCAPS9* a2, boo
         ::new (v4) NiDX9RenderState(a1, a2);
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     v4->ReadRenderStateCaps();
     for (uint32_t i = 0; i < 256; i += 4) {

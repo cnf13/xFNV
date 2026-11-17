@@ -71,7 +71,7 @@ void AILinearTaskThreadManager::WaitForThreads() {
             AITaskThreadArray[i]->BSLinearTaskThread::WaitForCompletion();
         }
     }
-    AILinearTaskThreadManager::bIsRunningThreads = (bool)0;
+    AILinearTaskThreadManager::bIsRunningThreads = false;
 }
 
 void AILinearTaskThreadManager::StartThreads() {
@@ -84,7 +84,7 @@ void AILinearTaskThreadManager::StartThreads() {
     for (uint32_t k = 0; k < 2; ++k) {
         AITaskThreadStage[k] = 0;
     }
-    AILinearTaskThreadManager::bIsRunningThreads = 1;
+    AILinearTaskThreadManager::bIsRunningThreads = true;
     for (uint32_t m = 0; m < 2; ++m) {
         if (AITaskThreadArray[m]) {
             AITaskThreadArray[m]->StartProcessingTasks();
@@ -134,7 +134,7 @@ void AILinearTaskThreadManager::DestroyThreads() {
             if (AITaskThreadArray[ithreadIdx]) {
                 delete AITaskThreadArray[ithreadIdx];
             }
-            AITaskThreadArray[ithreadIdx] = 0;
+            AITaskThreadArray[ithreadIdx] = nullptr;
         }
     }
     for (int32_t i = 0; i <= 11; ++i) {
@@ -161,10 +161,10 @@ void AILinearTaskThreadManager::AddThread(
             v6 = ::new (apMemory) AILinearTaskThread(apfnTaskFunc);
         }
         else {
-            v6 = 0;
+            v6 = nullptr;
         }
         AITaskThreadArray[aiThreadIndex] = v6;
-        AITaskThreadArray[aiThreadIndex]->Initialize(aeStackSize, apThreadName, 0);
+        AITaskThreadArray[aiThreadIndex]->Initialize(aeStackSize, apThreadName, false);
         AITaskThreadArray[aiThreadIndex]->SetThreadProcessor(aiHWThread);
         AITaskThreadArray[aiThreadIndex]->SetThreadPriority(0);
         if (!apThreadName) {
@@ -206,8 +206,8 @@ void AILinearTaskThreadManager::SignalRenderSema() {
 }
 
 bool AILinearTaskThreadManager::ShouldQueue3DTask() {
-    bool bretval = 0;
-    bool bretvalBug44071 = 0;
+    bool bretval = false;
+    bool bretvalBug44071 = false;
     if (iNumHWThreads.Int() > 1 && AILinearTaskThreadManager::QRunningThreads()) {
         TaskQueueInterface* pqueueInterface = TaskQueueInterface::GetInstance();
         bretvalBug44071 = pqueueInterface->QQueueFurtherTasks();
@@ -232,7 +232,7 @@ bool AILinearTaskThreadManager::ShouldQueue3DTask() {
                 (v0 = AILinearTaskThreadManager::QInstance(),
                  v0->GetMyThreadStage(AILinearTaskThreadManager::AI_THREAD_2) <
                      AILinearTaskThreadManager::AI_2_WORLDUPDATE)) {
-                bretval = 1;
+                bretval = true;
             }
         }
         if (!bretval) {

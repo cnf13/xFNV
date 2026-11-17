@@ -28,7 +28,7 @@ NiObject* NiPointLight::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject_2) NiPointLight;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     NiLight::CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fAtten0 = m_fAtten0;
@@ -107,7 +107,7 @@ void NiPointLight::CopyMembers(NiPointLight* pDest, NiCloningProcess& kCloning) 
 NiObject* NiPointLight::CreateObject() {
     void* pkObject = NiMemObject::operator new(sizeof(NiPointLight));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPointLight;
 }

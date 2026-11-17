@@ -33,7 +33,7 @@ void QueuedFile::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
             NiPointer<QueuedFile>* p_spParent = &spParent;
             if (spParent.m_pObject) {
                 p_spParent->m_pObject->DecRefCount();
-                p_spParent->m_pObject = 0;
+                p_spParent->m_pObject = nullptr;
                 if (p_spParent->m_pObject) {
                     InterlockedIncrementInt32(&p_spParent->m_pObject->iRefCount);
                 }
@@ -51,7 +51,7 @@ void QueuedFile::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
                     if (pAdditionalParents) {
                         delete pAdditionalParents;
                     }
-                    pAdditionalParents = 0;
+                    pAdditionalParents = nullptr;
                 }
             }
         }
@@ -60,7 +60,7 @@ void QueuedFile::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
         NiPointer<QueuedFile>* v4 = &spParent;
         if (spParent.m_pObject) {
             v4->m_pObject->DecRefCount();
-            v4->m_pObject = 0;
+            v4->m_pObject = nullptr;
             if (v4->m_pObject) {
                 InterlockedIncrementInt32(&v4->m_pObject->iRefCount);
             }
@@ -68,7 +68,7 @@ void QueuedFile::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
         if (pAdditionalParents) {
             delete pAdditionalParents;
         }
-        pAdditionalParents = 0;
+        pAdditionalParents = nullptr;
     }
     if (spParent.m_pObject || pAdditionalParents) {
         if (aePreviousState == BS_TASK_STATE_QUEUED) {
@@ -114,7 +114,7 @@ void QueuedFile::CheckFinished() {
             bFinished = pChildren->iSize == pChildren->iNumChildrenFinished;
         }
         else {
-            bFinished = 1;
+            bFinished = true;
         }
         if (bFinished) {
             InterlockedIncrementInt32(&iRefCount);
@@ -123,7 +123,7 @@ void QueuedFile::CheckFinished() {
                 NiPointer<QueuedFile>* p_spParent = &spParent;
                 if (spParent.m_pObject) {
                     p_spParent->m_pObject->DecRefCount();
-                    p_spParent->m_pObject = 0;
+                    p_spParent->m_pObject = nullptr;
                     if (p_spParent->m_pObject) {
                         InterlockedIncrementInt32(&p_spParent->m_pObject->iRefCount);
                     }
@@ -136,7 +136,7 @@ void QueuedFile::CheckFinished() {
                 if (pAdditionalParents) {
                     delete pAdditionalParents;
                 }
-                pAdditionalParents = 0;
+                pAdditionalParents = nullptr;
             }
             DecRefCount();
         }
@@ -158,7 +158,7 @@ void QueuedFile::AddChild(QueuedFile* apChild) {
             pNewChildren = ::new (apMemory) QueuedChildren;
         }
         else {
-            pNewChildren = 0;
+            pNewChildren = nullptr;
         }
         pChildren = pNewChildren;
     }
@@ -181,7 +181,7 @@ void QueuedFile::AddAdditionalParent(QueuedFile* apAdditionalParent) {
             pNewParents = ::new (apMemory) QueuedParents;
         }
         else {
-            pNewParents = 0;
+            pNewParents = nullptr;
         }
         pAdditionalParents = pNewParents;
     }
@@ -240,7 +240,7 @@ void QueuedFileEntry::GenerateKey() {
         );
         Key = static_cast<int64_t>(
             (static_cast<uint64_t>(Key) & 0xFFFFFFFFull) |
-            (static_cast<uint64_t>(static_cast<uint32_t>((static_cast<uint32_t>(v5 >> 32) | v4))) << 32)
+            (static_cast<uint64_t>((static_cast<uint32_t>(v5 >> 32) | v4)) << 32)
         );
     }
     else {
@@ -278,7 +278,7 @@ bool QueuedFileEntry::GetDescription(char* apDescription, size_t aiBufferSize, c
             }
         }
     }
-    return 1;
+    return true;
 }
 
 void QueuedFileEntry::SetFileName(const char* apFileName) {

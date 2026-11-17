@@ -22,9 +22,9 @@ void hkpConstraintDrawer::setScale(float scale) {
 // Draws m_RA's columns as arrows at body A (red, green, blue) and m_RB's at body B (yellow, orange, magenta), each
 // arrow's head opened towards the next column.
 void hkpConstraintDrawer::drawBodyFrames(int32_t id, int32_t tag) {
-    int32_t yellow = static_cast<int32_t>(hkColor::rgbFromFloats(1.0f, 1.0f, 0.0f, 1.0f));
-    int32_t orange = static_cast<int32_t>(hkColor::rgbFromFloats(1.0f, 0.5f, 0.0f, 1.0f));
-    int32_t magenta = static_cast<int32_t>(hkColor::rgbFromFloats(1.0f, 0.0f, 1.0f, 1.0f));
+    int32_t yellow = hkColor::rgbFromFloats(1.0f, 1.0f, 0.0f, 1.0f);
+    int32_t orange = hkColor::rgbFromFloats(1.0f, 0.5f, 0.0f, 1.0f);
+    int32_t magenta = hkColor::rgbFromFloats(1.0f, 0.0f, 1.0f, 1.0f);
 
     alignas(16) hkVector4 axisA0 = m_RA.m_col0;
     alignas(16) hkVector4 axisA1 = m_RA.m_col1;

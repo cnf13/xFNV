@@ -27,11 +27,11 @@
 #include <cxxabi.h>
 #include <typeinfo>
 
+#include <climits>
+#include <csignal>
 #include <fcntl.h>
-#include <limits.h>
 #include <link.h>
 #include <pthread.h>
-#include <signal.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
 #include <sys/uio.h>

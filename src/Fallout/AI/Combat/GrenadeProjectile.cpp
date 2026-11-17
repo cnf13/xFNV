@@ -92,23 +92,23 @@ Projectile::PROJECTILE_TYPE GrenadeProjectile::GetProjectileType() {
 }
 
 void GrenadeProjectile::Initialize() {
-    Projectile::SetFlag(Projectile::NO_CHARCONTROLLER, 1);
+    Projectile::SetFlag(Projectile::NO_CHARCONTROLLER, true);
     if (Projectile::IsFlagSet(Projectile::ACTIVE_IN_INVENTORY)) {
-        Projectile::SetFlag(Projectile::NO_3D, 1);
-        Projectile::SetFlag(Projectile::CHECK_BEHIND_WALL, 0);
+        Projectile::SetFlag(Projectile::NO_3D, true);
+        Projectile::SetFlag(Projectile::CHECK_BEHIND_WALL, false);
     }
     else {
-        Projectile::SetFlag(Projectile::CHECK_BEHIND_WALL, 1);
+        Projectile::SetFlag(Projectile::CHECK_BEHIND_WALL, true);
     }
     if (!GetProjectileBase()->GetHasExplosion() || GetProjectileBase()->GetHasExplosionAltTrigger() ||
         GetProjectileBase()->GetHasExplosionDetonates()) {
-        Projectile::SetFlag(Projectile::SPAWN_EXPLOSION_AT_IMPACT, 0);
+        Projectile::SetFlag(Projectile::SPAWN_EXPLOSION_AT_IMPACT, false);
     }
     else {
-        Projectile::SetFlag(Projectile::SPAWN_EXPLOSION_AT_IMPACT, 1);
+        Projectile::SetFlag(Projectile::SPAWN_EXPLOSION_AT_IMPACT, true);
     }
-    Projectile::SetFlag(Projectile::KILL_ON_EXPLOSION, 1);
-    Projectile::SetFlag(Projectile::WHOLE_BODY_TARGETED, 1);
+    Projectile::SetFlag(Projectile::KILL_ON_EXPLOSION, true);
+    Projectile::SetFlag(Projectile::WHOLE_BODY_TARGETED, true);
     Projectile::Initialize();
 }
 
@@ -118,8 +118,8 @@ void GrenadeProjectile::UpdateProjectile(float afDelta) {
         if (!bCollisionGroupReset && GetAge() > 1.0) {
             uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
             NiNode* v2 = Get3D();
-            bhkWorld::SetGroup(v2, NewSystemGroup, 1, 0);
-            bCollisionGroupReset = 1;
+            bhkWorld::SetGroup(v2, NewSystemGroup, true, false);
+            bCollisionGroupReset = true;
             if (GetProjectileBase()) {
                 if (GetProjectileBase()->Data.pActiveSoundLoop) {
                     TESSound* WorldSpace = GetProjectileBase()->Data.pActiveSoundLoop;
@@ -131,7 +131,7 @@ void GrenadeProjectile::UpdateProjectile(float afDelta) {
                         v6->GetSoundHandleByFilename(&sndHandle, Filename, 258u, afDelta);
                         const NiPoint3* v7 = &GetLocationOnReference();
                         sndHandle.SetPosition(*v7);
-                        sndHandle.Play(0);
+                        sndHandle.Play(false);
                     }
                 }
             }
@@ -250,43 +250,43 @@ void GrenadeProjectile::ReportCollision(hkpContactPointAddedEvent& arEvent) {
         pcolA = bhkCollisionObject::Getbhk(pbodyA);
     }
     else {
-        pcolA = 0;
+        pcolA = nullptr;
     }
     if (pcolA) {
         pavA = pcolA->m_pkSceneObject;
     }
     else {
-        pavA = 0;
+        pavA = nullptr;
     }
     if (pavA) {
         prefA = TESObjectREFR::FindReferenceFor3D(pavA);
     }
     else {
-        prefA = 0;
+        prefA = nullptr;
     }
     hkpRigidBody* pbodyB = hkpGetRigidBody(arEvent.m_bodyB->getRootCollidable());
     if (pbodyB) {
         pcolB = bhkCollisionObject::Getbhk(pbodyB);
     }
     else {
-        pcolB = 0;
+        pcolB = nullptr;
     }
     if (pcolB) {
         pavB = pcolB->m_pkSceneObject;
     }
     else {
-        pavB = 0;
+        pavB = nullptr;
     }
     if (pavB) {
         prefB = TESObjectREFR::FindReferenceFor3D(pavB);
     }
     else {
-        prefB = 0;
+        prefB = nullptr;
     }
-    TESObjectREFR* pcollidee = 0;
+    TESObjectREFR* pcollidee = nullptr;
     NiPoint3 contactPoint = NiPoint3_ZERO;
     NiPoint3 contactNormal = NiPoint3_ZERO;
-    const hkpCollidable* pcollidable = 0;
+    const hkpCollidable* pcollidable = nullptr;
     uint32_t ikey = -1;
     if (prefA && prefA->IsProjectile()) {
         pcollidee = prefB;

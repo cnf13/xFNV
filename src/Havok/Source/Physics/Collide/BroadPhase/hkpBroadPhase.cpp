@@ -43,7 +43,7 @@ void hkpBroadPhase::enableMultiThreading(int32_t spinCountForCriticalSection) {
             m_criticalSection = ::new (v4) hkCriticalSection(spinCountForCriticalSection);
         }
         else {
-            m_criticalSection = 0;
+            m_criticalSection = nullptr;
         }
         m_multiThreadCheck.enableChecks();
     }

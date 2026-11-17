@@ -30,7 +30,7 @@ void WaterDisplacementRainRipple::ReloadShaders() {
     v3.kMacros[0].Definition = nullptr;
     v3.kMacros[1].Name = nullptr;
     std::memset(&v3.kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition));
-    const char* PSTarget = BSShaderManager::GetPSTarget(1);
+    const char* PSTarget = BSShaderManager::GetPSTarget(true);
     LoadShaders(v4, v3, "WATERDISPLACEMENTRAINRIPPLE", ShaderTarget_vs_1_1, PSTarget);
     LoadStagesAndPasses();
 }

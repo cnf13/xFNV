@@ -99,7 +99,7 @@ void HitData::ReduceDamage(bool abIgnoreBlocking) {
                         v3 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_FATIGUE, pEffectList, fFatigueDamage);
                     }
                     else {
-                        v3 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_FATIGUE, 0, fFatigueDamage);
+                        v3 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_FATIGUE, nullptr, fFatigueDamage);
                     }
                     fFatigueDamage = v3;
                 }
@@ -119,7 +119,7 @@ void HitData::ReduceDamage(bool abIgnoreBlocking) {
                         v6 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DR, AmmoEffectList, farmorRating);
                     }
                     else {
-                        v6 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DR, 0, farmorRating);
+                        v6 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DR, nullptr, farmorRating);
                     }
                     farmorRating = v6;
                 }
@@ -152,7 +152,7 @@ void HitData::ReduceDamage(bool abIgnoreBlocking) {
                         fDDT = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DT, v32, fDDT_2);
                     }
                     else {
-                        fDDT = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DT, 0, fDDT_2);
+                        fDDT = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DT, nullptr, fDDT_2);
                     }
                     fDDT_2 = fDDT;
                 }
@@ -164,11 +164,11 @@ void HitData::ReduceDamage(bool abIgnoreBlocking) {
                         bool IsTargetWithinStrikeAngle;
                         if (pSourceRef) {
                             IsTargetWithinStrikeAngle =
-                                CombatUtilities::IsTargetWithinStrikeAngle(pTarget, pSourceRef, 0);
+                                CombatUtilities::IsTargetWithinStrikeAngle(pTarget, pSourceRef, nullptr);
                         }
                         else {
                             IsTargetWithinStrikeAngle =
-                                CombatUtilities::IsTargetWithinStrikeAngle(pTarget, pAggressor, 0);
+                                CombatUtilities::IsTargetWithinStrikeAngle(pTarget, pAggressor, nullptr);
                         }
                         if (IsTargetWithinStrikeAngle) {
                             TESObjectWEAP* pTargetWeap;
@@ -178,14 +178,14 @@ void HitData::ReduceDamage(bool abIgnoreBlocking) {
                                 pTargetWeap = static_cast<TESObjectWEAP*>(v27->GetCurrentWeapon()->pContainerObj);
                             }
                             else {
-                                pTargetWeap = 0;
+                                pTargetWeap = nullptr;
                             }
                             SetFlag(HitData::HD_BLOCKED, 1);
                             if (pPlayer == pTarget) {
                                 float* v11 = &fCounterAttackTimer.Float();
                                 pPlayer->SetBlockCounterTimer(*v11);
                             }
-                            bool IsWeaponDrawn = 0;
+                            bool IsWeaponDrawn = false;
                             if (pTargetWeap) {
                                 IsWeaponDrawn = pTarget->IsWeaponDrawn();
                             }
@@ -237,7 +237,7 @@ void HitData::ReduceDamage(bool abIgnoreBlocking) {
                     }
                 }
                 fDDT_2 = fDDT_2 - fDecreaseDT + fIncreaseDT;
-                bool bArmorPierced = 0;
+                bool bArmorPierced = false;
                 if (fOldDDT > 0.0) {
                     bArmorPierced = fDDT_2 <= 0.0;
                 }
@@ -249,7 +249,7 @@ void HitData::ReduceDamage(bool abIgnoreBlocking) {
                             BaseProcess* v24 = pAggressor->pCurrentProcess;
                             ItemChange* v12 = v24->GetCurrentWeapon();
                             if (v12->HasModEffectActive(12) && fDDT_2 > 0.0) {
-                                int32_t NumProjectiles = pWeapon->GetNumProjectiles(1, 0, pAggressor);
+                                int32_t NumProjectiles = pWeapon->GetNumProjectiles(true, false, pAggressor);
                                 fDDT_2 = fDDT_2 / static_cast<double>(NumProjectiles);
                             }
                         }
@@ -273,7 +273,7 @@ void HitData::ReduceDamage(bool abIgnoreBlocking) {
                         v15 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DAM, v22, fHealthDamage);
                     }
                     else {
-                        v15 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DAM, 0, fHealthDamage);
+                        v15 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DAM, nullptr, fHealthDamage);
                     }
                     fHealthDamage = v15;
                 }
@@ -294,7 +294,7 @@ void HitData::ReduceDamage(bool abIgnoreBlocking) {
                             Interface::ShowDDTIcon(bArmorPierced);
                         }
                         else {
-                            if (pAggressor == pPlayer && !pTarget->IsDead(0)) {
+                            if (pAggressor == pPlayer && !pTarget->IsDead(false)) {
                                 Interface::ShowEnemyDDTIcon(bArmorPierced);
                             }
                         }
@@ -306,7 +306,7 @@ void HitData::ReduceDamage(bool abIgnoreBlocking) {
                         Interface::ShowDDTIcon(bArmorPierced);
                     }
                     else {
-                        if (pAggressor == pPlayer && !pTarget->IsDead(0)) {
+                        if (pAggressor == pPlayer && !pTarget->IsDead(false)) {
                             Interface::ShowEnemyDDTIcon(bArmorPierced);
                         }
                     }
@@ -372,8 +372,8 @@ void HitData::DetermineOutcome() {
                 }
             }
             int32_t iexplodeChance = 0;
-            bool balwaysExplode = 0;
-            bool bexplodeAbsolute = 0;
+            bool balwaysExplode = false;
+            bool bexplodeAbsolute = false;
             if (eDamageLimb == BGSBodyPart::LIMB_WEAPON) {
                 TESObjectWEAP* ptargetWeapon;
                 BaseProcess* CurrentAIProcess = this->pTarget->pCurrentProcess;
@@ -382,10 +382,10 @@ void HitData::DetermineOutcome() {
                     ptargetWeapon = static_cast<TESObjectWEAP*>(ptargetWeaponItem->pContainerObj);
                 }
                 else {
-                    ptargetWeapon = 0;
+                    ptargetWeapon = nullptr;
                 }
                 if (ptargetWeapon) {
-                    float fcurrentHealth = ptargetWeaponItem->GetItemHealth(0);
+                    float fcurrentHealth = ptargetWeaponItem->GetItemHealth(false);
                     if (fcurrentHealth - fTargetedLimbDamage <= 0.0) {
                         if (this->pTarget->IsCreature() || ptargetWeapon->IsEmbeddedWeapon()) {
                             SetFlag(HitData::HD_DISABLE_WEAPON, 1);
@@ -423,7 +423,7 @@ void HitData::DetermineOutcome() {
             if (fcurrentHealth_2 - fHealthDamage * fshotMultiplier <= 0.0) {
                 SetFlag(HitData::HD_FATAL, 1);
                 if (eDamageLimb != BGSBodyPart::LIMB_NONE) {
-                    bool bdismember = 0;
+                    bool bdismember = false;
                     bool bexplode = balwaysExplode;
                     if (!balwaysExplode) {
                         TESObjectWEAP* apWeapon;
@@ -431,7 +431,7 @@ void HitData::DetermineOutcome() {
                             apWeapon = pWeapon;
                         }
                         else {
-                            apWeapon = eAttackSkill != ActorValue::UNARMED ? 0 : pFists;
+                            apWeapon = eAttackSkill != ActorValue::UNARMED ? nullptr : pFists;
                         }
                         Actor* pTarget = this->pTarget;
                         if (pTarget) {
@@ -441,7 +441,7 @@ void HitData::DetermineOutcome() {
                         }
                         else {
                             CombatFormulas::CheckDismemberOrExplode(
-                                0, apWeapon, iexplodeChance, 0, 0, bexplodeAbsolute, bdismember, bexplode
+                                nullptr, apWeapon, iexplodeChance, 0, 0, bexplodeAbsolute, bdismember, bexplode
                             );
                         }
                     }
@@ -534,7 +534,7 @@ void HitData::SetTargetedLimb(Projectile* apProjectile) {
         if (this->pTarget->IsActor()) {
             TESActorBase* ActorBase = this->pTarget->GetActorBase();
             BGSBodyPartData* pbodyPartData = ActorBase->GetBodyPartData();
-            BGSBodyPart* pbodyPart = 0;
+            BGSBodyPart* pbodyPart = nullptr;
             char v69 = 0;
             if (this->pVATSCommand) {
                 if (this->pVATSCommand->eLimb == ActorValue::VALUE_NONE) {
@@ -586,8 +586,8 @@ void HitData::SetTargetedLimb(Projectile* apProjectile) {
             if (v69) {
                 NiPoint3 viewdir;
                 alignas(16) NiPoint3 eyepos;
-                NiPoint3 roughHitPos = this->pAggressor->GetWeaponPosition(1);
-                this->pAggressor->GetEyeVector(eyepos, viewdir, 0);
+                NiPoint3 roughHitPos = this->pAggressor->GetWeaponPosition(true);
+                this->pAggressor->GetEyeVector(eyepos, viewdir, false);
                 NiPoint3 origin = eyepos;
                 NiPoint3 direction = viewdir * 200.0f;
                 float fdistance = 200.0f;
@@ -595,8 +595,9 @@ void HitData::SetTargetedLimb(Projectile* apProjectile) {
                 alignas(16) BSWeightedRandom<BGSBodyPart*> bodyPartChooser;
                 TESObjectCELL* pcell = this->pAggressor->GetParentCell();
                 if (pcell) {
-                    HitCaster* phitCaster =
-                        HitCaster::GetInstance(static_cast<HitCaster::HitCasterSize>(this->pAggressor != pPlayer), 1);
+                    HitCaster* phitCaster = HitCaster::GetInstance(
+                        static_cast<HitCaster::HitCasterSize>(this->pAggressor != pPlayer), true
+                    );
                     bhkWorld* v3 = pcell->GetbhkWorld();
                     phitCaster->Add(v3);
                     phitCaster->CastShape(origin, viewdir, fdistance);
@@ -656,7 +657,7 @@ void HitData::SetTargetedLimb(Projectile* apProjectile) {
                             NiNode* v10 = this->pAggressor->Get3D();
                             alignas(16) NiPoint3 attackerPos = (&v10->GetWorldBound())->m_kCenter;
                             this->kHitLocation =
-                                victimPos + (this->pAggressor->GetWeaponPosition(1) - victimPos) / 6.0f;
+                                victimPos + (this->pAggressor->GetWeaponPosition(true) - victimPos) / 6.0f;
                             this->kHitDirection = victimPos - attackerPos;
                             ::new (&hitSphere) NiBound;
                             NI2HK(pos, roughHitPos);
@@ -722,7 +723,7 @@ void HitData::SetTargetedLimb(Projectile* apProjectile) {
                         v21 = CombatFormulas::CalcTargetedLimbDamage(pTarget, pbodyPart, this->fHealthDamage);
                     }
                     else {
-                        v21 = CombatFormulas::CalcTargetedLimbDamage(0, pbodyPart, this->fHealthDamage);
+                        v21 = CombatFormulas::CalcTargetedLimbDamage(nullptr, pbodyPart, this->fHealthDamage);
                     }
                     this->fTargetedLimbDamage = v21;
                     if (this->pTarget->IsPc()) {
@@ -769,10 +770,11 @@ void HitData::CheckCriticalStrike() {
         fCriticalChance = fCriticalChance + *pBonus;
     }
     fCriticalChance = fCriticalChance * 10.0;
-    if (pAggressor && pAggressor->IsPc() && pTarget && pTarget->IsActor() && !pTarget->IsDead(0) &&
+    if (pAggressor && pAggressor->IsPc() && pTarget && pTarget->IsActor() && !pTarget->IsDead(false) &&
         pAggressor->IsSneaking() && !pTarget->IsInCombatWithActor(pAggressor)) {
-        bool bLineOfSight = pTarget->LineOfSight(0, pAggressor, 1, 0, 0);
-        if (pTarget->GetDetectionLevelAgainstActor(0, pAggressor, bLineOfSight, 0, 0, 0, 0) <= 0) {
+        bool bLineOfSight = pTarget->LineOfSight(false, pAggressor, true, nullptr, false);
+        if (pTarget->GetDetectionLevelAgainstActor(false, pAggressor, bLineOfSight, false, false, false, nullptr) <=
+            0) {
             float* pMult = &fCombatSneakAttackBonusMult.Float();
             fCriticalChance = fCriticalChance * *pMult;
             SetFlag(HitData::HD_SNEAK_ATTACK, 1);
@@ -857,11 +859,11 @@ void HitData::InitializeHitData(
             FormFlags = static_cast<TESObjectWEAP*>(apWeaponItem->pContainerObj);
         }
         else {
-            FormFlags = 0;
+            FormFlags = nullptr;
         }
         apData->pWeapon = FormFlags;
         if (apWeaponItem) {
-            ItemHealth = apWeaponItem->GetItemHealth(1);
+            ItemHealth = apWeaponItem->GetItemHealth(true);
         }
         else {
             ItemHealth = 1.0f;
@@ -871,12 +873,12 @@ void HitData::InitializeHitData(
             bapplyDamage = apData->pVATSCommand->bSuccess;
         }
         else {
-            bapplyDamage = 1;
+            bapplyDamage = true;
         }
         bool v20 = bapplyDamage;
         if (apData->pVATSCommand) {
             if (!apData->pVATSCommand->bSuccess && (!apData->pWeapon || apData->pWeapon->IsMeleeWeapon())) {
-                v20 = 1;
+                v20 = true;
             }
         }
         Animation* v5 = apAggressor->GetAnimation();
@@ -899,10 +901,10 @@ void HitData::InitializeHitData(
                     fdamageMultiplier = fdamageMultiplier_2;
                 }
                 if (apAggressor) {
-                    ModifiedAttackDamage = apWeaponItem->GetModifiedAttackDamage(apAggressor, fdamageMultiplier, 0);
+                    ModifiedAttackDamage = apWeaponItem->GetModifiedAttackDamage(apAggressor, fdamageMultiplier, false);
                 }
                 else {
-                    ModifiedAttackDamage = apWeaponItem->GetModifiedAttackDamage(0, fdamageMultiplier, 0);
+                    ModifiedAttackDamage = apWeaponItem->GetModifiedAttackDamage(nullptr, fdamageMultiplier, false);
                 }
                 apData->fHealthDamage = ModifiedAttackDamage;
                 if (apData->pVATSCommand) {
@@ -957,7 +959,7 @@ void HitData::InitializeHitData(
                         v11 = apTarget->IsKnockedOut();
                     }
                     else {
-                        v11 = 0;
+                        v11 = false;
                     }
                     if (apAggressor) {
                         CombatFormulas::CalcHandToHandDamage(
@@ -965,7 +967,9 @@ void HitData::InitializeHitData(
                         );
                     }
                     else {
-                        CombatFormulas::CalcHandToHandDamage(0, v11, apData->fHealthDamage, apData->fFatigueDamage);
+                        CombatFormulas::CalcHandToHandDamage(
+                            nullptr, v11, apData->fHealthDamage, apData->fFatigueDamage
+                        );
                     }
                     apData->eAttackSkill = ActorValue::UNARMED;
                     if (abPowerAttack) {
@@ -1000,9 +1004,9 @@ void HitData::InitializeHitData(
                 apData->fHealthDamage = apData->fHealthDamage * fNerveBonus;
             }
             apData->CheckCriticalStrike();
-            apData->ReduceDamage(0);
+            apData->ReduceDamage(false);
         }
-        apData->SetTargetedLimb(0);
+        apData->SetTargetedLimb(nullptr);
         if (v20) {
             apData->DetermineOutcome();
         }
@@ -1029,7 +1033,7 @@ void HitData::InitializeHitData(
         }
         apData->pWeapon = mode;
         if (apWeaponItem) {
-            itemHealth = (float)apWeaponItem->GetItemHealth(1);
+            itemHealth = (float)apWeaponItem->GetItemHealth(true);
         }
         else {
             itemHealth = (float)1.0;
@@ -1038,11 +1042,11 @@ void HitData::InitializeHitData(
         apData->pSourceRef = apProjectile;
         apData->fHealthDamage = apProjectile->GetDamage();
         if (apAggressor) {
-            apData->fHealthDamage = (float)(apAggressor->fRefScale * apData->fHealthDamage);
+            apData->fHealthDamage = (apAggressor->fRefScale * apData->fHealthDamage);
         }
         apData->fTotalDamage = apData->fHealthDamage;
         apData->CheckCriticalStrike();
-        apData->ReduceDamage(1);
+        apData->ReduceDamage(true);
         apData->SetTargetedLimb(apProjectile);
         apData->DetermineOutcome();
     }
@@ -1059,7 +1063,7 @@ void HitData::InitializeHitData(HitData* apData, VATS_COMMAND* apCommand) {
                     apTarget = static_cast<Actor*>(apCommand->pTarget);
                 }
                 else {
-                    apTarget = 0;
+                    apTarget = nullptr;
                 }
                 BaseProcess* CurrentAIProcess = pPlayer->GetCurrentAIProcess();
                 ItemChange* v2 = CurrentAIProcess->GetCurrentWeapon();
@@ -1090,7 +1094,7 @@ float HitData::PredictVATSCommandHealthDamage(VATS_COMMAND* apVATSCommand) {
         hitData.SetFlag(HitData::HD_IGNORE_CRITICAL, 1);
         hitData.SetFlag(HitData::HD_PREDICT_DAMAGE, 1);
         bool bsuccess = apVATSCommand->bSuccess;
-        apVATSCommand->bSuccess = 1;
+        apVATSCommand->bSuccess = true;
         HitData::InitializeHitData(&hitData, apVATSCommand);
         apVATSCommand->bSuccess = bsuccess;
         return hitData.fHealthDamage;
@@ -1143,10 +1147,10 @@ void HitData::InitializeExplosionData(
                                 pcurrentWeaponItem = CurrentAIProcess->GetCurrentWeapon();
                             }
                             else {
-                                pcurrentWeaponItem = 0;
+                                pcurrentWeaponItem = nullptr;
                             }
                             if (pcurrentWeaponItem) {
-                                ItemHealth = pcurrentWeaponItem->GetItemHealth(1);
+                                ItemHealth = pcurrentWeaponItem->GetItemHealth(true);
                             }
                             else {
                                 ItemHealth = 1.0f;
@@ -1160,7 +1164,7 @@ void HitData::InitializeExplosionData(
         apData->pSourceRef = apSourceRef;
         apData->fHealthDamage = afDamage;
         apData->fTotalDamage = apData->fHealthDamage;
-        apData->ReduceDamage(1);
+        apData->ReduceDamage(true);
         apData->CheckCriticalStrike();
         apData->DetermineOutcome();
     }

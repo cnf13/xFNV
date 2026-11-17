@@ -244,7 +244,7 @@ BSShaderProperty::RenderPassArray* TallGrassShaderProperty::GetRenderPasses(
             v15 = apGeom;
         }
     LABEL_32:;
-        pRenderPassArray->Add(v15, v17, 1, 0, 0, 0, 0, 0);
+        pRenderPassArray->Add(v15, v17, 1, 0, nullptr, nullptr, nullptr, nullptr);
         if (inumlights) {
             this->pRenderPassList->pPassA.m_pBase[this->pRenderPassList->iSize - 1]->SetLights(
                 1, GetFirstActiveNonShadowLight(kIter)
@@ -257,18 +257,18 @@ BSShaderProperty::RenderPassArray* TallGrassShaderProperty::GetRenderPasses(
                     BSShaderProperty::RenderPassArray* v19 = this->pRenderPassList;
                     if (bFitSlope) {
                         if (bBillboard) {
-                            v19->Add(v15, 647, 0, 1, psslight, 0, 0, 0);
+                            v19->Add(v15, 647, 0, 1, psslight, nullptr, nullptr, nullptr);
                         }
                         else {
-                            v19->Add(v15, 645, 0, 1, psslight, 0, 0, 0);
+                            v19->Add(v15, 645, 0, 1, psslight, nullptr, nullptr, nullptr);
                         }
                     }
                     else {
                         if (bBillboard) {
-                            v19->Add(v15, 646, 0, 1, psslight, 0, 0, 0);
+                            v19->Add(v15, 646, 0, 1, psslight, nullptr, nullptr, nullptr);
                         }
                         else {
-                            v19->Add(v15, 644, 0, 1, psslight, 0, 0, 0);
+                            v19->Add(v15, 644, 0, 1, psslight, nullptr, nullptr, nullptr);
                         }
                     }
                 }
@@ -340,7 +340,7 @@ void TallGrassShaderProperty::ClearStaticMaps() {
     }
     else {
     LABEL_5:;
-        kiter = 0;
+        kiter = nullptr;
     }
     NiTMapItem<const char*, NiPointer<TallGrassShaderProperty::CachedGeometry>>* kiter_2 = kiter;
     // The last geometry GetNext handed out is released when spCache goes out of scope.
@@ -355,7 +355,7 @@ void TallGrassShaderProperty::ClearStaticMaps() {
                     if (!m_pObject->bQueued) {
                         m_pObject->spTriGeomData = nullptr;
                         MemoryManager_Singleton.Deallocate(m_pObject->pInstanceIndex);
-                        m_pObject->pInstanceIndex = 0;
+                        m_pObject->pInstanceIndex = nullptr;
                         m_pObject->spBaseTexture = nullptr;
                         m_pObject->spAlphaNoBlend = nullptr;
                         m_pObject->spAlphaBlend = nullptr;
@@ -381,9 +381,9 @@ void TallGrassShaderProperty::SetFadeParameters(
     float afLowMaxFade
 ) {
     TallGrassShaderProperty::kFadeParams.x = afLowMinFade;
-    TallGrassShaderProperty::kFadeParams.y = (float)(afLowMin - afLowMinFade);
+    TallGrassShaderProperty::kFadeParams.y = (afLowMin - afLowMinFade);
     TallGrassShaderProperty::kFadeParams.z = afLowMax;
-    TallGrassShaderProperty::kFadeParams.w = (float)(afLowMaxFade - afLowMax);
+    TallGrassShaderProperty::kFadeParams.w = (afLowMaxFade - afLowMax);
 }
 
 // The stream's factory: a property built in freshly allocated memory, or null.
@@ -805,10 +805,10 @@ void TallGrassShaderProperty::RemoveFromTerrainChunk(int32_t alTerrainChunkSeed)
     }
     else {
     LABEL_5:;
-        v8 = 0;
+        v8 = nullptr;
     }
     pos = v8;
-    TallGrassShaderProperty::CachedGrass* pCachedGrass = 0;
+    TallGrassShaderProperty::CachedGrass* pCachedGrass = nullptr;
     if (TallGrassShaderProperty::GetCachedGrassMap()->m_kAllocator.m_uiCount) {
         if (v8) {
             do {
@@ -848,12 +848,12 @@ void TallGrassShaderProperty::RemoveFromTerrainChunk(int32_t alTerrainChunkSeed)
                                                 *p_m_element = nullptr;
                                                 // EXE-INLINED 0x45CEE0
                                                 using PoolAllocator = NiTAbstractPoolAllocator<uint32_t>;
-                                                PoolAllocator::ms_kSpinLock.Lock(0);
+                                                PoolAllocator::ms_kSpinLock.Lock(nullptr);
                                                 // The pool treats a freed list item as untyped node storage, as the
                                                 // allocator's own Deallocate (NiTPointerAllocator) casts it.
                                                 PoolAllocator::AllocNode* pkFreed =
                                                     reinterpret_cast<PoolAllocator::AllocNode*>(v14);
-                                                pkFreed->m_pkData = 0;
+                                                pkFreed->m_pkData = nullptr;
                                                 pkFreed->m_pkNext = PoolAllocator::ms_pkFreeMem;
                                                 bool v17 = PoolAllocator::ms_kSpinLock.uiLockCount-- == 1;
                                                 PoolAllocator::ms_pkFreeMem = pkFreed;
@@ -992,10 +992,10 @@ void TallGrassShaderProperty::RemoveAllGrass() {
     }
     else {
     LABEL_5:;
-        kiter = 0;
+        kiter = nullptr;
     }
     kiter_2 = kiter;
-    pcgrass = 0;
+    pcgrass = nullptr;
     if (TallGrassShaderProperty::GetCachedGrassMap()->m_kAllocator.m_uiCount) {
         if (kiter) {
             do {
@@ -1026,14 +1026,14 @@ uint16_t TallGrassShaderProperty::GetGrassGroup(
     MEM_CONTEXT eMemContext = v5->eMemContext;
     v5->eMemContext = MEM_CONTEXT_GRASS;
     TallGrassGroup** v6 = apGrassGroup;
-    *apGrassGroup = 0;
+    *apGrassGroup = nullptr;
     TallGrassShaderProperty::CachedGeometry* pcachedGeom = TallGrassShaderProperty::GetCachedGeometry(apGrassParam);
     if (!pcachedGeom) {
         v5->eMemContext = eMemContext;
         return 0;
     }
     uint32_t iGrassID = apGrassParam->iGrassID;
-    pgrass = 0;
+    pgrass = nullptr;
     if (!TallGrassShaderProperty::GetCachedGrassMap()->GetAt(iGrassID, pgrass)) {
         TallGrassShaderProperty::CachedGrass* v8 = static_cast<TallGrassShaderProperty::CachedGrass*>(
             MemoryManager_Singleton.Allocate(sizeof(TallGrassShaderProperty::CachedGrass))
@@ -1042,7 +1042,7 @@ uint16_t TallGrassShaderProperty::GetGrassGroup(
             pgrass = ::new (v8) TallGrassShaderProperty::CachedGrass;
         }
         else {
-            pgrass = 0;
+            pgrass = nullptr;
         }
         pgrass->spCachedLowGeometry.SetNew(pcachedGeom);
         rt::memcpy(&pgrass->kGrassParam, apGrassParam, sizeof(TallGrassShaderProperty::GrassParam));
@@ -1078,10 +1078,10 @@ uint16_t TallGrassShaderProperty::GetGrassGroup(
     LABEL_21:;
         TallGrassGroup* v14 = static_cast<TallGrassGroup*>(MemoryManager_Singleton.Allocate(sizeof(TallGrassGroup)));
         if (v14) {
-            v15 = ::new (v14) TallGrassGroup(pcachedGeom, aiCellX, aiCellY, 0);
+            v15 = ::new (v14) TallGrassGroup(pcachedGeom, aiCellX, aiCellY, false);
         }
         else {
-            v15 = 0;
+            v15 = nullptr;
         }
         *v6 = v15;
         ++uiGrassGeometryCount;
@@ -1115,8 +1115,8 @@ void TallGrassShaderProperty::AddGrass(
     int32_t i = 0;
     int32_t v11 = 0;
     if (aiNumPositions) {
-        while (1) {
-            v29 = 0;
+        while (true) {
+            v29 = nullptr;
             uint16_t ilen = TallGrassShaderProperty::GetGrassGroup(apGrassParam, aiCellX, aiCellY, &v29, apGrassNode);
             if (!v29) {
                 break;
@@ -1174,7 +1174,7 @@ void TallGrassShaderProperty::AddGrass(
     LABEL_15:;
         apGrassNode->UpdateWorldBound();
         uint32_t iGrassID = apGrassParam->iGrassID;
-        TallGrassShaderProperty::CachedGrass* pCachedGrass = 0;
+        TallGrassShaderProperty::CachedGrass* pCachedGrass = nullptr;
         TallGrassShaderProperty::GetCachedGrassMap()->GetAt(iGrassID, pCachedGrass);
         pCachedGrass->pLowTerrainChunkMap.SetAt_B57EA0(alTerrainChunkSeed, alTerrainChunkSeed);
         v8->eMemContext = eMemContext;
@@ -1193,7 +1193,7 @@ GrassLoadTask::~GrassLoadTask() {}
 void GrassLoadTask::Run() {
     char apStandardizedFileName[260];
     StandardizeModelPath(pFileName, apStandardizedFileName, 260u);
-    m_kStream.Load(apStandardizedFileName, static_cast<NiFile*>(0));
+    m_kStream.Load(apStandardizedFileName, static_cast<NiFile*>(nullptr));
 }
 
 bool GrassLoadTask::GetDescription(char* apDescription, uint32_t aiBufferSize) {

@@ -238,60 +238,60 @@ void TESActorBaseData::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESActorBaseData::CompareComponent(BaseFormComponent* apCompareFC) {
     TESActorBaseData* pCompare = dynamic_cast<TESActorBaseData*>(apCompareFC);
     if (!pCompare) {
-        return 1;
+        return true;
     }
     if (actorData.iActorBaseFlags != pCompare->actorData.iActorBaseFlags) {
-        return 1;
+        return true;
     }
     int32_t v4 = GetFatigue();
     if (v4 != pCompare->GetFatigue()) {
-        return 1;
+        return true;
     }
     double v5 = GetKarma();
     if (v5 != pCompare->GetKarma()) {
-        return 1;
+        return true;
     }
     int32_t BarterGold = GetBarterGold();
     if (BarterGold != pCompare->GetBarterGold()) {
-        return 1;
+        return true;
     }
     int32_t LevelExact = GetLevelExact();
     if (LevelExact != pCompare->GetLevelExact()) {
-        return 1;
+        return true;
     }
     int32_t CalcMin = GetCalcMin();
     if (CalcMin != pCompare->GetCalcMin()) {
-        return 1;
+        return true;
     }
     int32_t CalcLevelMax = GetCalcLevelMax();
     if (CalcLevelMax != pCompare->GetCalcLevelMax()) {
-        return 1;
+        return true;
     }
     TESLevItem* DeathItem = pDeathItem;
     if (DeathItem != pCompare->pDeathItem) {
-        return 1;
+        return true;
     }
     int32_t SpeedMultiplier = GetSpeedMultiplier();
     if (SpeedMultiplier != pCompare->GetSpeedMultiplier()) {
-        return 1;
+        return true;
     }
     int32_t BaseDisposition = GetBaseDisposition();
     if (BaseDisposition != pCompare->GetBaseDisposition()) {
-        return 1;
+        return true;
     }
     int32_t v13 = (&listFactions)->ItemsInList();
     if (v13 != (&pCompare->listFactions)->ItemsInList()) {
-        return 1;
+        return true;
     }
     for (FACTION_RANK* pFacRank : *&listFactions) {
         // The rank is sign-extended before comparing it with GetFactionRank's result.
-        if (pFacRank && pCompare->GetFactionRank(pFacRank->pFaction, 0) != static_cast<int8_t>(pFacRank->cRank)) {
-            return 1;
+        if (pFacRank && pCompare->GetFactionRank(pFacRank->pFaction, false) != static_cast<int8_t>(pFacRank->cRank)) {
+            return true;
         }
     }
     BGSVoiceType* v14 = GetVoiceType();
     if (v14 != pCompare->GetVoiceType()) {
-        return 1;
+        return true;
     }
     TESForm* v15 = pTemplateForm;
     return v15 != pCompare->pTemplateForm || actorData.sTemplateUseFlags != pCompare->actorData.sTemplateUseFlags;
@@ -341,7 +341,7 @@ void TESActorBaseData::InitItem(TESForm* apOwner) {
         pownerFile = apOwner->GetFile(-1);
     }
     else {
-        pownerFile = 0;
+        pownerFile = nullptr;
     }
     while (pList) {
         FACTION_RANK* pFacRank = pList->m_item;
@@ -882,7 +882,7 @@ void TESActorBaseData::LoadGameTES(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     int32_t apData;
     uint16_t usBlockSize;
     usBlockSize = 0;
-    uint8_t* BufferPointer = 0;
+    uint8_t* BufferPointer = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&apData, 4u);
         // 'BLOK', the block header.
@@ -1047,13 +1047,13 @@ void TESActorBaseData::SetVoiceType(BGSVoiceType* apVoiceType) {
 
 void TESActorBaseData::SetKarma(float afKarma) {
     actorData.fKarma = afKarma;
-    if (!(((&fAlignMaxKarma)->Float()) < ((double)actorData.fKarma))) {
-        if (((&::fAlignMinKarma)->Float()) > ((double)actorData.fKarma)) {
-            actorData.fKarma = (float)((&::fAlignMinKarma)->Float());
+    if (!((&fAlignMaxKarma)->Float() < ((double)actorData.fKarma))) {
+        if ((&::fAlignMinKarma)->Float() > ((double)actorData.fKarma)) {
+            actorData.fKarma = (&::fAlignMinKarma)->Float();
         }
     }
     else {
-        actorData.fKarma = (float)((&fAlignMaxKarma)->Float());
+        actorData.fKarma = (&fAlignMaxKarma)->Float();
     }
     AddFormChange(2u);
 }
@@ -1093,7 +1093,7 @@ void TESActorBaseData::RemoveChangeFlags(int32_t aiChangeFlags) {
 }
 
 void TESActorBaseData::SetEssential(bool abVal) {
-    SetFlagBit(2u, abVal, 1);
+    SetFlagBit(2u, abVal, true);
 }
 
 void TESActorBaseData::Save() {
@@ -1119,19 +1119,19 @@ void TESActorBaseData::SetPCFactionFlags(PC_FACTION_FLAG aeflag) {
     for (FACTION_RANK* m_item : (&listFactions)->ItemsUntilNull()) {
         TESFaction* pfaction = m_item->pFaction;
         if (m_item) {
-            if (pPlayer->GetActorBase()->GetFactionRank(pfaction, 1) != -1) {
+            if (pPlayer->GetActorBase()->GetFactionRank(pfaction, true) != -1) {
                 if (aeflag) {
                     if (aeflag == PC_FACTIONFLAG_ATTACK) {
-                        pfaction->SetPCAttack(1);
+                        pfaction->SetPCAttack(true);
                     }
                     else {
                         if (aeflag == PC_FACTIONFLAG_PLAYER_IS_ENEMY) {
-                            pfaction->SetPCAnEnemy(1);
+                            pfaction->SetPCAnEnemy(true);
                         }
                     }
                 }
                 else {
-                    pfaction->SetPCMurder(1);
+                    pfaction->SetPCMurder(true);
                 }
             }
         }

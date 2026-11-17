@@ -38,7 +38,7 @@ void BGSIdleCollection::Load(TESFile* apFile) {
 #endif
                             if (apFile->QEndian()) {
                                 for (int32_t ii = 0; ii < cIdleCount; ++ii) {
-                                    ENDIAN<TESIdleForm*>(pIdleArray[ii], 0);
+                                    ENDIAN<TESIdleForm*>(pIdleArray[ii], false);
                                 }
                             }
                         }
@@ -97,7 +97,7 @@ void BGSIdleCollection::CopyComponent(BaseFormComponent* apCopyFC) {
     if (pcopy) {
         cIdleFlags = pcopy->cIdleFlags;
         ourFree(pIdleArray);
-        pIdleArray = 0;
+        pIdleArray = nullptr;
         cIdleCount = 0;
         if (pcopy->cIdleCount) {
             pIdleArray = static_cast<TESIdleForm**>(ourMalloc(
@@ -114,23 +114,23 @@ void BGSIdleCollection::CopyComponent(BaseFormComponent* apCopyFC) {
 bool BGSIdleCollection::CompareComponent(BaseFormComponent* apCompareFC) {
     BGSIdleCollection* pcompare = dynamic_cast<BGSIdleCollection*>(apCompareFC);
     if (!pcompare) {
-        return 1;
+        return true;
     }
     if (cIdleFlags != pcompare->cIdleFlags) {
-        return 1;
+        return true;
     }
     if (cIdleCount != pcompare->cIdleCount) {
-        return 1;
+        return true;
     }
     if (pcompare->fTimerCheckForIdle != fTimerCheckForIdle) {
-        return 1;
+        return true;
     }
     return pIdleArray &&
         (pcompare->pIdleArray && std::memcmp(pIdleArray, pcompare->pIdleArray, sizeof(TESIdleForm*) * cIdleCount));
 }
 
 void BGSIdleCollection::InitItem(TESForm* apOwner) {
-    TESIdleForm* v11 = 0;
+    TESIdleForm* v11 = nullptr;
     for (uint32_t i = 0; i < cIdleCount; ++i) {
         uint32_t iid = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pIdleArray[i]));
         TESFile* File = apOwner->GetFile(-1);
@@ -194,7 +194,7 @@ void BGSIdleCollection::RemoveIdleAtIndex(uint32_t aiIndex) {
         if (cIdleCount == 1) {
             cIdleCount = 0;
             ourFree(pIdleArray);
-            pIdleArray = 0;
+            pIdleArray = nullptr;
         }
         else {
             --cIdleCount;
@@ -220,12 +220,12 @@ bool BGSIdleCollection::HasIdleForActor(Actor* apActor, TESObjectREFR* apTargetR
     if (apActor) {
         for (int32_t i = 0; i < cIdleCount; ++i) {
             TESIdleForm* pidle = pIdleArray[i];
-            if (pidle && (apActor->CanUseIdle(pidle) && pidle->CheckConditions(apActor, apTargetRef, 1))) {
-                return 1;
+            if (pidle && (apActor->CanUseIdle(pidle) && pidle->CheckConditions(apActor, apTargetRef, true))) {
+                return true;
             }
         }
     }
-    return 0;
+    return false;
 }
 
 uint32_t BGSIdleCollection::GetIdlesForActor(
@@ -242,7 +242,7 @@ uint32_t BGSIdleCollection::GetIdlesForActor(
         for (int32_t i = 0; i < cIdleCount; ++i) {
             TESIdleForm* pidle = pIdleArray[i];
             if (pidle) {
-                if (apActor->CanUseIdle(pidle) && pidle->CheckConditions(apActor, apTargetRef, 1)) {
+                if (apActor->CanUseIdle(pidle) && pidle->CheckConditions(apActor, apTargetRef, true)) {
                     if (apOutIdleArray) {
                         if (iidlecount >= iarraysize) {
                             apOutIdleArray->Add(pidle);

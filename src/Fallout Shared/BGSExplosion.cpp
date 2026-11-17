@@ -257,7 +257,7 @@ void BGSExplosion::InitItem() {
         }
         TESImageSpaceModifiableForm::InitItem(this);
         TESEnchantableForm::InitItem(this);
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -289,14 +289,14 @@ bool BGSExplosion::Compare(TESForm* apCompare) {
 }
 
 NiAVObject* BGSExplosion::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
-    NiAVObject* pav = 0;
-    bool bunderWater = 0;
+    NiAVObject* pav = nullptr;
+    bool bunderWater = false;
     Explosion* pexplosion = static_cast<Explosion*>(pRequester);
     if (!static_cast<Explosion*>(pRequester)->Explosion::GetUnderWater()) {
         return TESBoundObject::Clone3D(pRequester, deepCopy);
     }
     const char* pfilename = pWaterExplosion->GetModel();
-    NiAVObject* ploadedArt = pModelLoader->LoadFile(pfilename, LOD_MULT_NONE, 1, 0, 0, 0);
+    NiAVObject* ploadedArt = pModelLoader->LoadFile(pfilename, LOD_MULT_NONE, true, false, false, false);
     BSCloningProcess cloneData(1.0f);
     if (ploadedArt) {
         pav = static_cast<NiAVObject*>(ploadedArt->Clone(cloneData));
@@ -318,13 +318,13 @@ void BGSExplosion::QueueFiles(IO_TASK_PRIORITY aePriority, QueuedFile* apParent)
     if (GetModelLength()) {
         TESModel* apModel;
         if (this == nullptr) {
-            apModel = 0;
+            apModel = nullptr;
         }
         else {
             apModel = static_cast<TESModel*>(this);
         }
         ENUM_LOD_MULT LODMult = TES::GetLODMult(this);
-        pModelLoader->QueueModel(apModel, aePriority, apParent, LODMult, 1, 0, 0);
+        pModelLoader->QueueModel(apModel, aePriority, apParent, LODMult, true, false, false);
     }
     if (Data.pImpactDataSet) {
         Data.pImpactDataSet->QueueFiles(aePriority, apParent);
@@ -333,17 +333,17 @@ void BGSExplosion::QueueFiles(IO_TASK_PRIORITY aePriority, QueuedFile* apParent)
         if (pWaterExplosion->GetModelLength()) {
             TESModel* v5 = pWaterExplosion;
             ENUM_LOD_MULT v4 = TES::GetLODMult(this);
-            pModelLoader->QueueModel(v5, aePriority, apParent, v4, 1, 0, 0);
+            pModelLoader->QueueModel(v5, aePriority, apParent, v4, true, false, false);
         }
     }
 }
 
 float BGSExplosion::GetRadiusBSUnits() {
     if (GetFlag(1)) {
-        return (float)(Data.fRadius);
+        return Data.fRadius;
     }
     else {
-        return (float)(Data.fRadius * ((&fBSUnitsPerFoot)->Float()));
+        return (Data.fRadius * (&fBSUnitsPerFoot)->Float());
     }
 }
 
@@ -360,7 +360,7 @@ double BGSExplosion::GetISRadius() {
         return Data.fImageSpaceRadius;
     }
     else {
-        return (float)(Data.fImageSpaceRadius * ((&fBSUnitsPerFoot)->Float()));
+        return (Data.fImageSpaceRadius * (&fBSUnitsPerFoot)->Float());
     }
 }
 
@@ -369,7 +369,7 @@ double BGSExplosion::GetRADRadius() {
         return Data.fRadiationRadius;
     }
     else {
-        return (float)(Data.fRadiationRadius * ((&fBSUnitsPerFoot)->Float()));
+        return (Data.fRadiationRadius * (&fBSUnitsPerFoot)->Float());
     }
 }
 

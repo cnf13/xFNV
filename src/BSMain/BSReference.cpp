@@ -55,7 +55,7 @@ bool BSReference::IsEqual(NiObject* apObject) {
 
 void BSReference::SetName(const char* apName) {
     MemoryManager_Singleton.Deallocate(pName);
-    pName = 0;
+    pName = nullptr;
     if (apName) {
         size_t Size = std::strlen(apName) + 1;
         pName = static_cast<char*>(MemoryManager_Singleton.Allocate(Size));
@@ -68,7 +68,7 @@ void BSReference::SetName(const char* apName) {
 NiObject* BSReference::CreateObject() {
     BSReference* v2 = static_cast<BSReference*>(NiMemObject::operator new(sizeof(BSReference)));
     if (!v2) {
-        return 0;
+        return nullptr;
     }
     return ::new (v2) BSReference;
 }
@@ -167,7 +167,7 @@ bool BSNodeReferences::AddParentRef(BSStream& arStream, NiObject* apObject) {
 NiObject* BSNodeReferences::CreateObject() {
     BSNodeReferences* v2 = static_cast<BSNodeReferences*>(NiMemObject::operator new(sizeof(BSNodeReferences)));
     if (!v2) {
-        return 0;
+        return nullptr;
     }
     return ::new (v2) BSNodeReferences;
 }

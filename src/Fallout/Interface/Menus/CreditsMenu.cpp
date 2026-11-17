@@ -75,7 +75,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<INISettingCollection> fCreditsScrollSpeed("fCreditsScrollSpeed:Menu", 55.0f);
@@ -109,7 +109,7 @@ void ContinuePlayingAfterCreditsCallback() {
     StartMenu::pMe->SetFlag(StartMenu::kSomethingSave, 0);
     if (!Interface::GetMessageMenuResult()) {
         if (hooverDamSave) {
-            FalloutAudio::SetMainMenuMusic(0);
+            FalloutAudio::SetMainMenuMusic(false);
             FalloutAudioMedia::MediaStop();
             hooverDamSave->LoadGame();
         }
@@ -120,7 +120,7 @@ CreditsMenu::CreditsMenu()
   : Menu(), pClickRect(nullptr), pBackgroundTile(nullptr), spScrollRoot(nullptr), iFileOffset(0), iFileSize(0),
     pFileData(nullptr), eFont(FONT_2), iJustification(1), iX(0), iY(0), Color(NiColorA_WHITE), uiCreditsTotalHeight(0),
     fBackgroundSwapTimer(0.0f), uiBackgroundIndexCounter(0) {
-    hooverDamSave = 0;
+    hooverDamSave = nullptr;
 }
 
 CreditsMenu::~CreditsMenu() {
@@ -156,7 +156,7 @@ void CreditsMenu::DoIdle() {
         }
         if (pcontrols->GetMouseButton(0, 1) ||
             (pcontrols->GetUserAction(Controls::UACTN_UP, 1) ||
-             InterfaceManager::CheckMenuButton(Interface::eButtonA, 1) == 2)) {
+             InterfaceManager::CheckMenuButton(Interface::eButtonA, true) == 2)) {
             CreditsMenu::Close();
         }
         if (spScrollRoot.m_pObject) {
@@ -166,7 +166,7 @@ void CreditsMenu::DoIdle() {
                     uint32_t uiIndex = uiBackgroundIndexCounter;
                     uiBackgroundIndexCounter = uiIndex + 1;
                     const char* HandleString = (&BackgroundTextureFilenames.GetAt(uiIndex))->GetHandleString();
-                    pBackgroundTile->Set(4044, HandleString, 1);
+                    pBackgroundTile->Set(4044, HandleString, true);
                     fBackgroundSwapTimer = fBackgroundSwapInterval;
                 }
             }
@@ -174,7 +174,7 @@ void CreditsMenu::DoIdle() {
             float* v2 = &fCreditsScrollSpeed.Float();
             pos.z = appTimer.fDelta * *v2 + pos.z;
             spScrollRoot.m_pObject->SetTranslate(pos);
-            NiUpdateData UpdateData(0.0f, 0, 0);
+            NiUpdateData UpdateData(0.0f, false, false);
             spScrollRoot.m_pObject->Update(UpdateData);
             const NiBound* WorldBound = &spScrollRoot.m_pObject->GetWorldBound();
             double Seconds = WorldBound->m_fRadius;
@@ -213,12 +213,12 @@ void CreditsMenu::InitCreditsRoot() {
     Controls* Controls_ = appMain->GetControls();
     TESForm* FormByNumericID = TESForm::GetFormByNumericID(0xED568u);
     BGSPerk* v35 = dynamic_cast<BGSPerk*>(FormByNumericID);
-    bool v18 =
-        Controls_->GetKeyboardButton(29, 0) || (Controls_->GetKeyboardButton(157, 0) || pPlayer->GetPerkRank(v35, 0));
+    bool v18 = Controls_->GetKeyboardButton(29, 0) ||
+        (Controls_->GetKeyboardButton(157, 0) || pPlayer->GetPerkRank(v35, false));
     bool bUseWackyCredits = v18;
     if (pPlayCredits) {
         if (pPlayCredits->fValue == 2.0) {
-            bUseWackyCredits = 1;
+            bUseWackyCredits = true;
         }
     }
     static constexpr char kDataPrefix[] = "DATA\\";
@@ -236,12 +236,12 @@ void CreditsMenu::InitCreditsRoot() {
     else {
         BSstrcat(Dst, 260, "CREDITS.TXT");
     }
-    BSFile LangSpecificFile(Dst, NiFile::READ_ONLY, 0x4000u, 0);
+    BSFile LangSpecificFile(Dst, NiFile::READ_ONLY, 0x4000u, false);
     if (bUseWackyCredits) {
-        ::new (&DefaultCreditsFile) BSFile("DATA\\CREDITSWACKY.TXT", NiFile::READ_ONLY, 0x4000u, 0);
+        ::new (&DefaultCreditsFile) BSFile("DATA\\CREDITSWACKY.TXT", NiFile::READ_ONLY, 0x4000u, false);
     }
     else {
-        ::new (&DefaultCreditsFile) BSFile("DATA\\CREDITS.TXT", NiFile::READ_ONLY, 0x4000u, 0);
+        ::new (&DefaultCreditsFile) BSFile("DATA\\CREDITS.TXT", NiFile::READ_ONLY, 0x4000u, false);
     }
     BSstrcpy(Dst, 260, "DATA\\");
     const char* v3 = GetLanguageString(elang);
@@ -253,12 +253,12 @@ void CreditsMenu::InitCreditsRoot() {
     else {
         BSstrcat(Dst, 260, "CREDITSPATCH.TXT");
     }
-    ::new (&LangSpecificFile_2) BSFile(Dst, NiFile::READ_ONLY, 0x4000u, 0);
+    ::new (&LangSpecificFile_2) BSFile(Dst, NiFile::READ_ONLY, 0x4000u, false);
     if (bUseWackyCredits) {
-        ::new (&LangSpecificFile_3) BSFile("DATA\\CREDITSWACKYPATCH.TXT", NiFile::READ_ONLY, 0x4000u, 0);
+        ::new (&LangSpecificFile_3) BSFile("DATA\\CREDITSWACKYPATCH.TXT", NiFile::READ_ONLY, 0x4000u, false);
     }
     else {
-        ::new (&LangSpecificFile_3) BSFile("DATA\\CREDITSPATCH.TXT", NiFile::READ_ONLY, 0x4000u, 0);
+        ::new (&LangSpecificFile_3) BSFile("DATA\\CREDITSPATCH.TXT", NiFile::READ_ONLY, 0x4000u, false);
     }
     if (LangSpecificFile.BSFile::Exist()) {
         BSFile* pFileToUse;
@@ -293,7 +293,7 @@ void CreditsMenu::InitCreditsRoot() {
                 v15 = ::new (v24) NiNode(0);
             }
             else {
-                v15 = 0;
+                v15 = nullptr;
             }
             NiRefObject* v25 = (NiRefObject*)v15;
             spScrollRoot.operator=(v15);
@@ -308,9 +308,9 @@ void CreditsMenu::InitCreditsRoot() {
                 palpha_2 = ::new (v21) NiAlphaProperty;
             }
             else {
-                palpha_2 = 0;
+                palpha_2 = nullptr;
             }
-            palpha_2->SetAlphaBlending(1);
+            palpha_2->SetAlphaBlending(true);
             spScrollRoot.m_pObject->AttachProperty(palpha_2);
             Font* pfont = FontManager::Instance()->GetFont(static_cast<int32_t>(eFont));
             ::new (&string) BSStringT<char>;
@@ -415,8 +415,9 @@ void CreditsMenu::InitCreditsRoot() {
                             if (static_cast<uint8_t>(pFileData[iFileOffset]) >= 32u) {
                                 GetString(&string);
                                 iwidth = 1280;
-                                NiAVObject* pobj =
-                                    pfont->MakeString(0.0f, 0.0f, 0.0f, string, iwidth, iJustification, Color, 1, 1);
+                                NiAVObject* pobj = pfont->MakeString(
+                                    0.0f, 0.0f, 0.0f, string, iwidth, iJustification, Color, true, true
+                                );
                                 pobj->SetTranslate(static_cast<float>(iX), 0.0f, static_cast<float>(iY));
                                 NiNode* v9 = spScrollRoot.m_pObject;
                                 v9->AttachChild(pobj, 1);
@@ -433,9 +434,9 @@ void CreditsMenu::InitCreditsRoot() {
                 ++iFileOffset;
             }
             ourFree(pFileData);
-            pFileData = 0;
+            pFileData = nullptr;
             BSShaderManager::PrepareObject(spScrollRoot.m_pObject, 0, 0);
-            NiUpdateData UpdateData(0.0f, 0, 0);
+            NiUpdateData UpdateData(0.0f, false, false);
             spScrollRoot.m_pObject->Update(UpdateData);
             NiDX9Renderer* v6 = Renderer::GetNIRenderer();
             v6->UnlockRenderer();
@@ -446,7 +447,7 @@ void CreditsMenu::InitCreditsRoot() {
         }
         else {
             ourFree(pFileData);
-            pFileData = 0;
+            pFileData = nullptr;
             LangSpecificFile_3.~BSFile();
             LangSpecificFile_2.~BSFile();
             DefaultCreditsFile.~BSFile();
@@ -516,7 +517,7 @@ NiNode* CreditsMenu::CreateImage(BSStringT<char>* apImageFilename, int32_t aiWid
         pvertices = static_cast<NiPoint3*>(ptr);
     }
     else {
-        pvertices = 0;
+        pvertices = nullptr;
     }
     void* v63 = ourMalloc(4 * sizeof(NiPoint2));
     if (v63) {
@@ -524,7 +525,7 @@ NiNode* CreditsMenu::CreateImage(BSStringT<char>* apImageFilename, int32_t aiWid
         ptextures = static_cast<NiPoint2*>(v63);
     }
     else {
-        ptextures = 0;
+        ptextures = nullptr;
     }
     void* v64 = ptextures;
     uint16_t* pvertOrder = static_cast<uint16_t*>(_NiMalloc(6 * sizeof(uint16_t)));
@@ -567,7 +568,7 @@ NiNode* CreditsMenu::CreateImage(BSStringT<char>* apImageFilename, int32_t aiWid
         pnode = ::new (apMemory) NiNode(0);
     }
     else {
-        pnode = 0;
+        pnode = nullptr;
     }
     int32_t ix = iX;
     if (iJustification == 2) {
@@ -584,9 +585,9 @@ NiNode* CreditsMenu::CreateImage(BSStringT<char>* apImageFilename, int32_t aiWid
         palphaProp = ::new (v51) NiAlphaProperty;
     }
     else {
-        palphaProp = 0;
+        palphaProp = nullptr;
     }
-    palphaProp->SetAlphaBlending(1);
+    palphaProp->SetAlphaBlending(true);
     pnode->AttachProperty(palphaProp);
     NiTriShape* v49 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
     if (v49) {
@@ -594,7 +595,7 @@ NiNode* CreditsMenu::CreateImage(BSStringT<char>* apImageFilename, int32_t aiWid
             NiTriShape(4, pvertices, nullptr, nullptr, ptextures, 1, NiGeometryData::NBT_METHOD_NONE, 2, pvertOrder);
     }
     else {
-        ptri = 0;
+        ptri = nullptr;
     }
     pnode->AttachChild(ptri, 1);
     NiFixedString textureFilename;
@@ -605,14 +606,14 @@ NiNode* CreditsMenu::CreateImage(BSStringT<char>* apImageFilename, int32_t aiWid
     textureFilename_2.~NiFixedString();
     NiFixedString* kFilename =
         ::new (static_cast<void*>(&textureFilename_3)) NiFixedString(static_cast<const char*>(apDest));
-    NiSourceTexture* ptexture = NiSourceTexture::Create(*kFilename, NiSourceTexture::ms_kDefaultPrefs, 1, 0);
+    NiSourceTexture* ptexture = NiSourceTexture::Create(*kFilename, NiSourceTexture::ms_kDefaultPrefs, true, false);
     textureFilename_3.~NiFixedString();
     TileShaderProperty* v46 = static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
     if (v46) {
-        ptprop = ::new (v46) TileShaderProperty(0);
+        ptprop = ::new (v46) TileShaderProperty(false);
     }
     else {
-        ptprop = 0;
+        ptprop = nullptr;
     }
     ptprop->SetTileTexture(ptexture);
     ptprop->SetTileAlpha(afAlpha);
@@ -622,7 +623,7 @@ NiNode* CreditsMenu::CreateImage(BSStringT<char>* apImageFilename, int32_t aiWid
         pmaterial = ::new (v45) NiMaterialProperty;
     }
     else {
-        pmaterial = 0;
+        pmaterial = nullptr;
     }
     pmaterial->SetEmittance(NiColor_WHITE);
     ptri->AttachProperty(pmaterial);
@@ -644,11 +645,11 @@ bool CreditsMenu::Create() {
     Menu* pmenu = ptile->GetMenu();
     if (pmenu && (v0 = pmenu->GetClass(), v0 == CreditsMenu::GetClassStatic())) {
         TileMenu* v1 = dynamic_cast<TileMenu*>(ptile);
-        pmenu->SetMenuTile(v1, 0);
+        pmenu->SetMenuTile(v1, false);
         CreditsMenu* pme = dynamic_cast<CreditsMenu*>(pmenu);
         if (pme->IsWellFormedMenu()) {
             if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
-                ptile->Set(4013, ftop_depth, 1);
+                ptile->Set(4013, ftop_depth, true);
             }
             bool v3 = pin->IsInMenuMode();
             ptile->Set(Tile::kTileValue_User0, static_cast<int32_t>(v3));
@@ -663,7 +664,7 @@ bool CreditsMenu::Create() {
                 pme->uiBackgroundIndexCounter = uiIndex + 1;
                 const char* HandleString =
                     (&pme->BackgroundTextureFilenames.GetAt(static_cast<int32_t>(uiIndex)))->GetHandleString();
-                pme->pBackgroundTile->Set(4044, HandleString, 1);
+                pme->pBackgroundTile->Set(4044, HandleString, true);
             }
             else {
                 if (bPlayingCreditsMenuMovie || !pme->BackgroundTextureFilenames.iSize) {
@@ -678,14 +679,14 @@ bool CreditsMenu::Create() {
                 NiPoint3 pos = pnode->GetTranslate();
                 pos.x = pos.x + 214.0;
                 pnode->SetTranslate(pos);
-                NiUpdateData UpdateData(0.0f, 0, 0);
+                NiUpdateData UpdateData(0.0f, false, false);
                 pnode->Update(UpdateData);
             }
-            return 1;
+            return true;
         }
         else {
             Warning("Credits Menu Creation Failed... Are your menu and art resources up to date?");
-            return 0;
+            return false;
         }
     }
     else {
@@ -694,7 +695,7 @@ bool CreditsMenu::Create() {
                 delete pmenu;
             }
         }
-        return 0;
+        return false;
     }
 }
 
@@ -719,7 +720,7 @@ void CreditsMenu::Close() {
                                     const char* v0 = sYes.String();
                                     Interface::CreateMessageMenu(
                                         gs_sContinuePlayingAfterCredits.operator const char*(),
-                                        static_cast<const char*>(0), static_cast<const char*>(0),
+                                        static_cast<const char*>(nullptr), static_cast<const char*>(nullptr),
                                         &ContinuePlayingAfterCreditsCallback, 0, 18, 0.0f, 0.0f, v0, v1, nullptr
                                     );
                                     return;

@@ -209,23 +209,23 @@ hkpIslandsAgentEntriesInfo* getIslandEntriesInfo(
         }
         hkpIslandsAgentEntriesInfo* v5 = &r_esi->m_data[r_esi->m_size];
         if (v5) {
-            v5->m_island = 0;
+            v5->m_island = nullptr;
             v5->m_numEntries = 0;
             v5->m_firstEntryIdx = 0;
             v5->m_nextEntryIdx = 0;
-            v5->m_ppuAgentNnEntryJob = 0;
-            v5->m_spuAgentNnEntryJob = 0;
+            v5->m_ppuAgentNnEntryJob = nullptr;
+            v5->m_spuAgentNnEntryJob = nullptr;
         }
         int32_t m_size = r_esi->m_size;
         hkpIslandsAgentEntriesInfo* v7 = &r_esi->m_data[m_size];
         r_esi->m_size = m_size + 1;
         if (v7) {
-            v7->m_island = 0;
+            v7->m_island = nullptr;
             v7->m_numEntries = 0;
             v7->m_firstEntryIdx = 0;
             v7->m_nextEntryIdx = 0;
-            v7->m_ppuAgentNnEntryJob = 0;
-            v7->m_spuAgentNnEntryJob = 0;
+            v7->m_ppuAgentNnEntryJob = nullptr;
+            v7->m_spuAgentNnEntryJob = nullptr;
         }
         r_esi->m_data[r_esi->m_size - 1].m_island = island;
         return &r_esi->m_data[r_esi->m_size - 1];

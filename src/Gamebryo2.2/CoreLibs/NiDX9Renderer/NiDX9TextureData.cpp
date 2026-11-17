@@ -481,7 +481,7 @@ void NiDX9SourceCubeMapData::CopyRendererDataToCubeMapFace(
 }
 
 bool NiDX9SourceCubeMapData::UpdatePalette(NiPalette* a2) {
-    bool result = 0;
+    bool result = false;
     if (a2) {
         uint32_t m_uiRevID = a2->m_uiRevID;
         result = m_uiPalRevID != m_uiRevID;
@@ -489,7 +489,7 @@ bool NiDX9SourceCubeMapData::UpdatePalette(NiPalette* a2) {
         NiPointer<NiPalette>* p_m_spPalette = &m_spPalette;
         if (p_m_spPalette->m_pObject != a2) {
             p_m_spPalette->SetNew(a2);
-            return 1;
+            return true;
         }
     }
     return result;

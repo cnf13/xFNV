@@ -132,13 +132,13 @@ hkxNode::~hkxNode() {}
 hkxNode* hkxNode::findChildByName(const char* childName) const {
     hkxNode* m_pntr;
     if (!childName) {
-        return 0;
+        return nullptr;
     }
     int32_t v4 = 0;
     if (m_children.m_size <= 0) {
-        return 0;
+        return nullptr;
     }
-    while (1) {
+    while (true) {
         m_pntr = m_children.m_data[v4].val();
         const char* m_stringAndFlag = m_pntr->m_name.m_stringAndFlag;
         if ((reinterpret_cast<uintptr_t>(m_stringAndFlag) & ~uintptr_t(1)) != 0 &&
@@ -148,7 +148,7 @@ hkxNode* hkxNode::findChildByName(const char* childName) const {
             break;
         }
         if (++v4 >= m_children.m_size) {
-            return 0;
+            return nullptr;
         }
     }
     return m_pntr;
@@ -157,13 +157,13 @@ hkxNode* hkxNode::findChildByName(const char* childName) const {
 hkxNode* hkxNode::findDescendantByName(const char* name) const {
     hkxNode* m_pntr;
     if (!name) {
-        return 0;
+        return nullptr;
     }
     int32_t v4 = 0;
     if (m_children.m_size <= 0) {
-        return 0;
+        return nullptr;
     }
-    while (1) {
+    while (true) {
         m_pntr = m_children.m_data[v4].val();
         const char* m_stringAndFlag = m_pntr->m_name.m_stringAndFlag;
         if ((reinterpret_cast<uintptr_t>(m_stringAndFlag) & ~uintptr_t(1)) != 0 &&
@@ -177,7 +177,7 @@ hkxNode* hkxNode::findDescendantByName(const char* name) const {
             return result;
         }
         if (++v4 >= m_children.m_size) {
-            return 0;
+            return nullptr;
         }
     }
     return m_pntr;
@@ -227,18 +227,18 @@ hkRefVariant hkxNode::findVariantByObject(const hkReferencedObject* object) cons
         int32_t v7 = 0;
         if (m_children.m_size <= 0) {
         LABEL_8:;
-            result.m_pntr = 0;
+            result.m_pntr = nullptr;
             return result;
         }
         else {
             hkRefVariant v10;
-            while (1) {
+            while (true) {
                 v10 = m_children.m_data[v7].val()->findVariantByObject(object);
                 if (v10.m_pntr) {
                     break;
                 }
                 bool v8 = ++v7 < m_children.m_size;
-                v10.m_pntr = 0;
+                v10.m_pntr = nullptr;
                 if (!v8) {
                     goto LABEL_8;
                 }
@@ -271,7 +271,7 @@ hkResult hkxNode::getPathToNode(const hkxNode* theNode, hkArray<const hkxNode*, 
         --pathOut.m_size;
     }
     else {
-        while (1) {
+        while (true) {
             result = m_children.m_data[v6].val()->getPathToNode(theNode, pathOut);
             if (result == HK_SUCCESS) {
                 break;

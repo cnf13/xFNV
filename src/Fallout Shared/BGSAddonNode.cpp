@@ -151,18 +151,18 @@ void BGSAddonNode::Copy(TESForm* apCopy) {
 bool BGSAddonNode::Compare(TESForm* apCompare) {
     BGSAddonNode* v4 = dynamic_cast<BGSAddonNode*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v4)) {
-        return (bool)1;
+        return true;
     }
     if (iIndex != v4->iIndex) {
-        return (bool)1;
+        return true;
     }
     if (pSound == v4->pSound) {
         return (std::memcmp(&Data, &v4->Data, sizeof(Data)) != 0);
     }
-    return (bool)1;
+    return true;
 }
 
 uint32_t BGSAddonNode::GetIndex() {
@@ -183,7 +183,7 @@ void BGSAddonNodeSoundHandleExtra::InitTag() {
     NiFixedString* v0;
     void* v1 = ourMalloc(sizeof(NiFixedString));
     if (v1) {
-        v0 = ::new (static_cast<void*>(v1)) NiFixedString(const_cast<char*>("ASH"));
+        v0 = ::new (v1) NiFixedString(const_cast<char*>("ASH"));
     }
     else {
         v0 = nullptr;
@@ -200,6 +200,6 @@ NiFixedString* BGSAddonNodeSoundHandleExtra::KillSDM() {
     if (BGSAddonNodeSoundHandleExtra::pTag) {
         result = FNVD_DELETE(NiFixedString)(BGSAddonNodeSoundHandleExtra::pTag, 1u);
     }
-    BGSAddonNodeSoundHandleExtra::pTag = 0;
+    BGSAddonNodeSoundHandleExtra::pTag = nullptr;
     return result;
 }

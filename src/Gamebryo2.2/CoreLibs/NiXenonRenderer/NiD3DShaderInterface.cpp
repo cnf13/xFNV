@@ -66,12 +66,12 @@ void NiD3DShaderInterface::SetD3DRenderer(NiDX9Renderer* pkD3DRenderer) {
 NiD3DShaderInterface* NiD3DShaderInterface::DynamicCast(NiShader* apShader, const NiRTTI* apRTTI) {
     const NiRTTI* v3 = apShader->GetRTTI();
     if (!v3) {
-        return 0;
+        return nullptr;
     }
     while (v3 != apRTTI) {
         v3 = v3->GetBaseRTTI();
         if (!v3) {
-            return 0;
+            return nullptr;
         }
     }
     return static_cast<NiD3DShaderInterface*>(apShader);

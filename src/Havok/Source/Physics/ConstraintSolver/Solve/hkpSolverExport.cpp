@@ -205,10 +205,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                     const __m128 linDiff = _mm_sub_ps(accA->m_scratch0.m_quad, accB->m_scratch0.m_quad);
                     results->m_impulseApplied = temp->m_impulseApplied;
                     const __m128 vel = _mm_add_ps(angVel, _mm_mul_ps(linDiff, bilateralJac->m_linear0.m_quad));
-                    const float velSum = static_cast<float>(
-                        _mm_shuffle_ps(vel, vel, 0xAA)[0] +
-                        static_cast<float>(_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0])
-                    );
+                    const float velSum =
+                        (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0]));
                     const float scaledVel = velSum * stepsDt;
                     results->m_internalSolverData = rhs - scaledVel;
                     results = reinterpret_cast<hkpSolverResults*>(reinterpret_cast<char*>(results) + striding);
@@ -249,10 +247,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                     results->m_impulseApplied = temp->m_impulseApplied;
                     const __m128 vel = _mm_add_ps(angVel, _mm_mul_ps(linDiff, scaledJac->m_linear0.m_quad));
                     temp = nextTemp;
-                    const float velSum = static_cast<float>(
-                        _mm_shuffle_ps(vel, vel, 0xAA)[0] +
-                        static_cast<float>(_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0])
-                    );
+                    const float velSum =
+                        (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0]));
                     const float scaledVel = velSum * stepsDt;
                     const float unscaledRhs = rhs - scaledVel;
                     results->m_internalSolverData = unscaledRhs * impulseFactor;
@@ -273,9 +269,7 @@ void hkSolverExport::exportImpulsesAndRhs(
                 );
                 const float rhs = jac.m_linear[0].m_quad[3] * dampDivTauDt;
                 schema = reinterpret_cast<const hkpJacobianSchema*>(pulley + 1);
-                const float velSum = static_cast<float>(
-                    _mm_shuffle_ps(vel, vel, 0xAA)[0] + static_cast<float>(_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0])
-                );
+                const float velSum = (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0]));
                 const float scaledVel = velSum * stepsDt;
                 results->m_internalSolverData = rhs - scaledVel;
                 results = reinterpret_cast<hkpSolverResults*>(reinterpret_cast<char*>(results) + striding);
@@ -304,10 +298,7 @@ void hkSolverExport::exportImpulsesAndRhs(
                         angVelB, _mm_mul_ps(accA->m_scratch123.m_col0.m_quad, angularJac->m_angular[0].m_quad)
                     );
                     results->m_internalSolverData = rhs * deltaTime -
-                        static_cast<float>(
-                            _mm_shuffle_ps(vel, vel, 0xAA)[0] +
-                            static_cast<float>(_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0])
-                        ) * stepsDt;
+                        (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0])) * stepsDt;
                     results = reinterpret_cast<hkpSolverResults*>(reinterpret_cast<char*>(results) + striding);
                     temp++;
                     continue;
@@ -346,10 +337,7 @@ void hkSolverExport::exportImpulsesAndRhs(
                         angVelB, _mm_mul_ps(accA->m_scratch123.m_col0.m_quad, scaledAngularJac->m_angular[0].m_quad)
                     );
                     const float unscaledRhs = rhs * deltaTime -
-                        static_cast<float>(
-                            _mm_shuffle_ps(vel, vel, 0xAA)[0] +
-                            static_cast<float>(_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0])
-                        ) * stepsDt;
+                        (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0])) * stepsDt;
                     results->m_internalSolverData = unscaledRhs * impulseFactor;
                     results = reinterpret_cast<hkpSolverResults*>(reinterpret_cast<char*>(results) + striding);
                     continue;
@@ -369,10 +357,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                     _mm_mul_ps(jac.m_jac0.m_linear0.m_quad, linDiff)
                 );
                 const float rhs1 = dampDivTauDt * jac.m_jac1.m_linear0.m_quad[3];
-                const float velSum0 = static_cast<float>(
-                    _mm_shuffle_ps(vel0, vel0, 0xAA)[0] +
-                    static_cast<float>(_mm_shuffle_ps(vel0, vel0, 0x55)[0] + vel0[0])
-                );
+                const float velSum0 =
+                    (_mm_shuffle_ps(vel0, vel0, 0xAA)[0] + (_mm_shuffle_ps(vel0, vel0, 0x55)[0] + vel0[0]));
                 const __m128 vel1 = _mm_add_ps(
                     _mm_add_ps(
                         _mm_mul_ps(jac.m_jac1.m_angular[0].m_quad, accA->m_scratch123.m_col0.m_quad),
@@ -386,10 +372,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                 results = reinterpret_cast<hkpSolverResults*>(reinterpret_cast<char*>(results) + striding);
                 results->m_impulseApplied = temp[1].m_impulseApplied;
                 schema = reinterpret_cast<const hkpJacobianSchema*>(pair + 1);
-                const float velSum1 = static_cast<float>(
-                    _mm_shuffle_ps(vel1, vel1, 0xAA)[0] +
-                    static_cast<float>(_mm_shuffle_ps(vel1, vel1, 0x55)[0] + vel1[0])
-                );
+                const float velSum1 =
+                    (_mm_shuffle_ps(vel1, vel1, 0xAA)[0] + (_mm_shuffle_ps(vel1, vel1, 0x55)[0] + vel1[0]));
                 const float scaledVel1 = velSum1 * stepsDt;
                 results->m_internalSolverData = rhs1 - scaledVel1;
                 results = reinterpret_cast<hkpSolverResults*>(reinterpret_cast<char*>(results) + striding);
@@ -412,10 +396,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                 );
                 const float rhs1 = jac.m_jac1.m_linear0.m_quad[3] * dampDivFrictionTauDt;
                 const float impulse1 = temp[1].m_impulseApplied;
-                const float velSum0 = static_cast<float>(
-                    _mm_shuffle_ps(vel0, vel0, 0xAA)[0] +
-                    static_cast<float>(_mm_shuffle_ps(vel0, vel0, 0x55)[0] + vel0[0])
-                );
+                const float velSum0 =
+                    (_mm_shuffle_ps(vel0, vel0, 0xAA)[0] + (_mm_shuffle_ps(vel0, vel0, 0x55)[0] + vel0[0]));
                 const __m128 vel1 = _mm_add_ps(
                     _mm_add_ps(
                         _mm_mul_ps(jac.m_jac1.m_angular[0].m_quad, accA->m_scratch123.m_col0.m_quad),
@@ -431,10 +413,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                 temp += 3;
                 frictionResults[0].m_internalSolverData = unscaledRhs0 * factor;
                 frictionResults[1].m_impulseApplied = impulse1;
-                const float velSum1 = static_cast<float>(
-                    _mm_shuffle_ps(vel1, vel1, 0xAA)[0] +
-                    static_cast<float>(_mm_shuffle_ps(vel1, vel1, 0x55)[0] + vel1[0])
-                );
+                const float velSum1 =
+                    (_mm_shuffle_ps(vel1, vel1, 0xAA)[0] + (_mm_shuffle_ps(vel1, vel1, 0x55)[0] + vel1[0]));
                 const float scaledVel1 = velSum1 * stepsDt;
                 const float unscaledRhs1 = rhs1 - scaledVel1;
                 frictionResults[1].m_internalSolverData = factor * unscaledRhs1;
@@ -457,10 +437,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                     ),
                     _mm_mul_ps(jac.m_jac0.m_linear0.m_quad, linDiff)
                 );
-                const float velSum0 = static_cast<float>(
-                    _mm_shuffle_ps(vel0, vel0, 0xAA)[0] +
-                    static_cast<float>(_mm_shuffle_ps(vel0, vel0, 0x55)[0] + vel0[0])
-                );
+                const float velSum0 =
+                    (_mm_shuffle_ps(vel0, vel0, 0xAA)[0] + (_mm_shuffle_ps(vel0, vel0, 0x55)[0] + vel0[0]));
                 const float scaledVel0 = velSum0 * stepsDt;
                 const __m128 vel1 = _mm_add_ps(
                     _mm_add_ps(
@@ -470,10 +448,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                     _mm_mul_ps(jac.m_jac1.m_linear0.m_quad, linDiff)
                 );
                 const float unscaledRhs0 = rhs0 - scaledVel0;
-                const float velSum1 = static_cast<float>(
-                    _mm_shuffle_ps(vel1, vel1, 0xAA)[0] +
-                    static_cast<float>(_mm_shuffle_ps(vel1, vel1, 0x55)[0] + vel1[0])
-                );
+                const float velSum1 =
+                    (_mm_shuffle_ps(vel1, vel1, 0xAA)[0] + (_mm_shuffle_ps(vel1, vel1, 0x55)[0] + vel1[0]));
                 const float scaledRhs0 = unscaledRhs0 * factor;
                 const float impulse1 = temp[1].m_impulseApplied;
                 const __m128 vel2 = _mm_add_ps(
@@ -490,10 +466,7 @@ void hkSolverExport::exportImpulsesAndRhs(
                 frictionResults[1].m_internalSolverData = unscaledRhs1 * factor;
                 frictionResults[2].m_impulseApplied = temp[-2].m_impulseApplied;
                 const float unscaledRhs2 = rhs2 * dampDivFrictionTauDt -
-                    static_cast<float>(
-                        _mm_shuffle_ps(vel2, vel2, 0xAA)[0] +
-                        static_cast<float>(_mm_shuffle_ps(vel2, vel2, 0x55)[0] + vel2[0])
-                    ) * stepsDt;
+                    (_mm_shuffle_ps(vel2, vel2, 0xAA)[0] + (_mm_shuffle_ps(vel2, vel2, 0x55)[0] + vel2[0])) * stepsDt;
                 frictionResults[2].m_internalSolverData = factor * unscaledRhs2;
                 continue;
             }
@@ -509,8 +482,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                     _mm_mul_ps(friction->m_jac0.m_angular[0].m_quad, accA->m_scratch123.m_col0.m_quad)
                 );
                 const float impulse1 = temp[1].m_impulseApplied;
-                const float velSum0 = static_cast<float>(_mm_shuffle_ps(vel0, vel0, 0xAA)[0]) +
-                    static_cast<float>(_mm_shuffle_ps(vel0, vel0, 0x55)[0] + vel0[0]);
+                const float velSum0 =
+                    _mm_shuffle_ps(vel0, vel0, 0xAA)[0] + (_mm_shuffle_ps(vel0, vel0, 0x55)[0] + vel0[0]);
                 const __m128 vel1 = _mm_add_ps(
                     _mm_mul_ps(friction->m_jac1.m_angular[1].m_quad, accB->m_scratch123.m_col0.m_quad),
                     _mm_mul_ps(accA->m_scratch123.m_col0.m_quad, friction->m_jac1.m_angular[0].m_quad)
@@ -522,10 +495,7 @@ void hkSolverExport::exportImpulsesAndRhs(
                 frictionResults[0].m_internalSolverData = unscaledRhs0 * factor;
                 frictionResults[1].m_impulseApplied = impulse1;
                 const float unscaledRhs1 = rhs1 * deltaTime -
-                    static_cast<float>(
-                        _mm_shuffle_ps(vel1, vel1, 0xAA)[0] +
-                        static_cast<float>(_mm_shuffle_ps(vel1, vel1, 0x55)[0] + vel1[0])
-                    ) * stepsDt;
+                    (_mm_shuffle_ps(vel1, vel1, 0xAA)[0] + (_mm_shuffle_ps(vel1, vel1, 0x55)[0] + vel1[0])) * stepsDt;
                 frictionResults[1].m_internalSolverData = factor * unscaledRhs1;
                 temp += numTemps;
                 continue;
@@ -603,10 +573,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                         const __m128 linDiff = _mm_sub_ps(chainAccA->m_scratch0.m_quad, chainAccB->m_scratch0.m_quad);
                         results->m_impulseApplied = temp->m_impulseApplied;
                         const __m128 vel = _mm_add_ps(angVel, _mm_mul_ps(linDiff, jac->m_linear0.m_quad));
-                        const float velSum = static_cast<float>(
-                            _mm_shuffle_ps(vel, vel, 0xAA)[0] +
-                            static_cast<float>(_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0])
-                        );
+                        const float velSum =
+                            (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0]));
                         const float scaledVel = velSum * stepsDt;
                         temp++;
                         jac++;
@@ -648,10 +616,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                             const __m128 vel = _mm_add_ps(angVel, _mm_mul_ps(linDiff, jac->m_linear0.m_quad));
                             temp++;
                             jac++;
-                            const float velSum = static_cast<float>(
-                                _mm_shuffle_ps(vel, vel, 0xAA)[0] +
-                                static_cast<float>(_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0])
-                            );
+                            const float velSum =
+                                (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0]));
                             const float scaledVel = velSum * stepsDt;
                             results->m_internalSolverData = rhs - scaledVel;
                             results = reinterpret_cast<hkpSolverResults*>(reinterpret_cast<char*>(results) + striding);
@@ -702,10 +668,9 @@ void hkSolverExport::exportImpulsesAndRhs(
                                 )
                             );
                             results->m_impulseApplied = temp[row].m_impulseApplied;
-                            const float linVelSum = static_cast<float>(
-                                _mm_shuffle_ps(linVel, linVel, 0xAA)[0] +
-                                static_cast<float>(_mm_shuffle_ps(linVel, linVel, 0x55)[0] + linVel[0])
-                            );
+                            const float linVelSum =
+                                (_mm_shuffle_ps(linVel, linVel, 0xAA)[0] +
+                                 (_mm_shuffle_ps(linVel, linVel, 0x55)[0] + linVel[0]));
                             const float scaledLinVel = linVelSum * stepsDt;
                             results->m_internalSolverData = linRhs - scaledLinVel;
                             const __m128 angVel = _mm_add_ps(
@@ -713,10 +678,9 @@ void hkSolverExport::exportImpulsesAndRhs(
                                 _mm_mul_ps(angJac->m_angular[0].m_quad, chainAccA->m_scratch123.m_col0.m_quad)
                             );
                             float angRhs = angJac->m_angular[1].m_quad[3] * deltaTime -
-                                static_cast<float>(
-                                    _mm_shuffle_ps(angVel, angVel, 0xAA)[0] +
-                                    static_cast<float>(_mm_shuffle_ps(angVel, angVel, 0x55)[0] + angVel[0])
-                                ) * stepsDt;
+                                (_mm_shuffle_ps(angVel, angVel, 0xAA)[0] +
+                                 (_mm_shuffle_ps(angVel, angVel, 0x55)[0] + angVel[0])) *
+                                    stepsDt;
                             angularResults[row].m_impulseApplied = temp[3 + row].m_impulseApplied;
                             angularResults[row].m_internalSolverData = angRhs;
                             // The motor's state for this row (bits 2 * row and 2 * row + 1): a broken minimum bounds

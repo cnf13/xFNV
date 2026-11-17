@@ -141,8 +141,8 @@ void hk1dLinearVelocityMotorBeginJacobian(const hkVector4& directionOfConstraint
 	__m128 v20 = _mm_add_ps(_mm_mul_ps(_mm_mul_ps(v16, v16), v19), _mm_mul_ps(_mm_mul_ps(v17, v17), v18));
 	__m128 v21 = _mm_shuffle_ps(v20, _mm_unpackhi_ps(v20, _mm_add_ps(v19, v18)), 196);
 	__m128 v22 = _mm_add_ps(_mm_shuffle_ps(v21, v21, 78), v21);
-	float v23 = static_cast<float>(_mm_shuffle_ps(v22, v22, 177)[0] + v22[0]) + 1.1920928955078125e-07;
-	jac[2].m_quad[3] = v23;
+    float v23 = (_mm_shuffle_ps(v22, v22, 177)[0] + v22[0]) + 1.1920928955078125e-07;
+    jac[2].m_quad[3] = v23;
 	float v24 = 1.0 / v23;
 	jac[1].m_quad[3] = v24;
 	statusOut->m_virtualMass = v24;

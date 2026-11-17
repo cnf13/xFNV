@@ -155,13 +155,13 @@ NiDX9Renderer::~NiDX9Renderer() {
     if (m_pkD3DDevice9) {
         if (m_pkRenderState) {
             for (uint32_t i = 0; i < NiD3DPass::ms_uiMaxTextureBlendStages; ++i) {
-                m_pkRenderState->SetTexture(i, 0);
+                m_pkRenderState->SetTexture(i, nullptr);
             }
         }
         for (uint32_t i = 0; i < m_uiMaxStreams; ++i) {
-            m_pkD3DDevice9->SetStreamSource(i, 0, 0, 0);
+            m_pkD3DDevice9->SetStreamSource(i, nullptr, 0, 0);
         }
-        m_pkD3DDevice9->SetIndices(0);
+        m_pkD3DDevice9->SetIndices(nullptr);
     }
 
     // NiDelete of a NiPixelFormat is MemoryManager::Deallocate, with no null test.
@@ -1214,7 +1214,7 @@ void NiDX9Renderer::Do_RenderScreenTexture(NiScreenTexture* apScreenTexture) {
                         v5 = ::new (v4) NiPropertyState;
                     }
                     else {
-                        v5 = 0;
+                        v5 = nullptr;
                     }
                     m_spScreenTexturePropertyState = v5;
                     NiVertexColorProperty* v6 =
@@ -1223,7 +1223,7 @@ void NiDX9Renderer::Do_RenderScreenTexture(NiScreenTexture* apScreenTexture) {
                         v7 = ::new (v6) NiVertexColorProperty;
                     }
                     else {
-                        v7 = 0;
+                        v7 = nullptr;
                     }
                     v7->m_uFlags = (v7->m_uFlags & 0xFFC7) | 16;
                     m_spScreenTexturePropertyState->SetProperty(v7);
@@ -1233,7 +1233,7 @@ void NiDX9Renderer::Do_RenderScreenTexture(NiScreenTexture* apScreenTexture) {
                         v9 = ::new (v8) NiAlphaProperty;
                     }
                     else {
-                        v9 = 0;
+                        v9 = nullptr;
                     }
                     v9->m_uFlags = (v9->m_uFlags & 0xFE00) | 237;
                     m_spScreenTexturePropertyState->SetProperty(v9);
@@ -1243,7 +1243,7 @@ void NiDX9Renderer::Do_RenderScreenTexture(NiScreenTexture* apScreenTexture) {
                         v11 = ::new (v10) NiZBufferProperty;
                     }
                     else {
-                        v11 = 0;
+                        v11 = nullptr;
                     }
                     v11->m_uFlags &= 0xFFFCu;
                     m_spScreenTexturePropertyState->SetProperty(v11);
@@ -1252,7 +1252,7 @@ void NiDX9Renderer::Do_RenderScreenTexture(NiScreenTexture* apScreenTexture) {
                 NiUnsharedGeometryGroup* m_pkDefaultGroup = this->m_pkDefaultGroup;
                 m_pkCurrProp = m_spScreenTexturePropertyState;
                 NiD3DGeometryGroupManager* m_pkGeometryGroupManager = this->m_pkGeometryGroupManager;
-                m_pkCurrEffects = 0;
+                m_pkCurrEffects = nullptr;
                 m_pkGeometryGroupManager->AddObjectToGroup(m_pkDefaultGroup, apScreenTexture);
                 PackScreenTextureGeomBuffer(apScreenTexture);
                 kWorld.m_Rotate = NiMatrix3_IDENTITY;
@@ -1261,7 +1261,7 @@ void NiDX9Renderer::Do_RenderScreenTexture(NiScreenTexture* apScreenTexture) {
                 NiGeometryBufferData* m_pkBuffData = apScreenTexture->m_pkBuffData;
                 kWorld.m_Translate.y = NiPoint3_ZERO.y;
                 kWorld.m_Translate.z = NiPoint3_ZERO.z;
-                DrawPrimitive(0, 0, 0, kWorld, kWorldBound, m_pkBuffData);
+                DrawPrimitive(nullptr, nullptr, nullptr, kWorld, kWorldBound, m_pkBuffData);
                 m_spScreenTexturePropertyState->SetProperty(NiTexturingProperty::ms_spDefault.m_pObject);
                 m_pkCurrProp = pkScreenTexture;
                 m_pkCurrEffects = pkOldEffects;
@@ -1714,7 +1714,7 @@ bool NiDX9Renderer::Initialize(
     m_uiCreationBackBufferCount = auiBackBufferCount;
     m_uiCreationRefreshRate = static_cast<NiDX9Renderer::RefreshRate>(auiRefreshRate);
     NiDX9Renderer::ms_fPosAdjustClipHeight = 0.0f;
-    NiRenderer::bPosAdjust = 0;
+    NiRenderer::bPosAdjust = false;
     NiDX9SystemDesc::Get();
     m_uiAdapter = auiAdapter;
     m_kWndDevice = akWndDevice;
@@ -1873,7 +1873,7 @@ bool NiDX9Renderer::Initialize(
         return false;
     }
 
-    m_pkRenderState = NiDX9RenderState::Create(this, &m_kD3DCaps9, 1);
+    m_pkRenderState = NiDX9RenderState::Create(this, &m_kD3DCaps9, true);
     NiD3DShaderInterface::InitializeShaderSystem(this);
     NiDX9VertexBufferManager* pkVBManager =
         static_cast<NiDX9VertexBufferManager*>(NiMemObject::operator new(sizeof(NiDX9VertexBufferManager)));
@@ -1895,7 +1895,7 @@ bool NiDX9Renderer::Initialize(
     m_pkLightManager =
         pkLightManager ? ::new (pkLightManager) NiDX9LightManager(m_pkRenderState, m_pkD3DDevice9) : nullptr;
     if (pkBackData->m_kD3DPresentParams.MultiSampleType) {
-        m_pkRenderState->SetAntiAlias(1);
+        m_pkRenderState->SetAntiAlias(true);
     }
 
     // The default camera: a unit frustum and the full viewport, through the default target.

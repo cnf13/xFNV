@@ -28,7 +28,7 @@ NiObject* BSGrabIKNote::CreateClone(NiCloningProcess& arCloneData) {
         ::new (pkCtlr) BSGrabIKNote;
     }
     else {
-        pkCtlr_2 = 0;
+        pkCtlr_2 = nullptr;
     }
     CopyMembers(pkCtlr_2, arCloneData);
     pkCtlr_2->eArm = eArm;
@@ -132,7 +132,7 @@ bool BSGrabIKNote::ParseTextKey(const NiTextKey* apTextKey) {
 NiObject* BSGrabIKNote::CreateObject() {
     BSGrabIKNote* pkObject = static_cast<BSGrabIKNote*>(NiMemObject::operator new(sizeof(BSGrabIKNote)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) BSGrabIKNote;
 }

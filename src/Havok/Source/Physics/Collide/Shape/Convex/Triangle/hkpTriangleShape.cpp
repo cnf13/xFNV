@@ -116,9 +116,9 @@ __m128* calcTriangleNormal(const __m128* a1, const __m128* a2, __m128* a3, const
     float v10 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v9[0])));
     v11[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v12 = _mm_cmpeq_ss(v9, v11);
-    v11[0] = 3.0f - static_cast<float>(static_cast<float>(v9[0] * v10) * v10);
+    v11[0] = 3.0f - ((v9[0] * v10) * v10);
     __m128 v13 = _mm_setzero_ps();
-    v13[0] = static_cast<float>(0.5f * v10) * v11[0];
+    v13[0] = (0.5f * v10) * v11[0];
     __m128 v14 = _mm_andnot_ps(v12, v13);
     *a3 = _mm_mul_ps(_mm_shuffle_ps(v14, v14, 0), v7);
     return a3;
@@ -567,7 +567,7 @@ int32_t hkpTriangleShape::weldContactPointImpl(
         _mm_shuffle_ps(cosProduct, cosProduct, 0xAA),
         _mm_add_ss(_mm_shuffle_ps(cosProduct, cosProduct, 0x55), cosProduct)
     ));
-    const float absCosAngle = static_cast<float>(std::fabs(cosAngle));
+    const float absCosAngle = std::fabs(cosAngle);
     float distance = absCosAngle * separatingNormal.m_quad[3];
     hkVector4 edge;
     edge.setSub4(getVertex(mod3Table[edgeId + 1]), getVertex(edgeId));

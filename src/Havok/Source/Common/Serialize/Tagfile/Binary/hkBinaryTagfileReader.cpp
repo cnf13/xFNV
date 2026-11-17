@@ -227,7 +227,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
                 alignas(8) float vec[16];
                 for (int32_t k = 0; k < iNumReals; ++k) {
                     alignas(8) float fReal;
-                    m_ia.readArrayGeneric(const_cast<float*>(&fReal), 4, 1);
+                    m_ia.readArrayGeneric((&fReal), 4, 1);
                     vec[k] = fReal;
                 }
                 alignas(8) hkDataArray::Value value;
@@ -410,7 +410,7 @@ void Reader::readBinaryValue(hkDataObject::Value value, const hkDataClass::Membe
             const int32_t iNumReals = 4 * eType - 12;
             for (int32_t i = 0; i < iNumReals; ++i) {
                 float fReal;
-                m_ia.readArrayGeneric(const_cast<float*>(&fReal), 4, 1);
+                m_ia.readArrayGeneric((&fReal), 4, 1);
                 vec[i] = fReal;
             }
             value.setVec(vec, iNumReals);
@@ -628,7 +628,7 @@ hkDataObject* Reader::readObjectTree(hkDataObject* apResult) {
     if (array == -0x354FF2E2 && v5 == -0x2FEE0532) {
         int32_t v3 = readInt<int32_t>();
         if (v3 != -1) {
-            while (2) {
+            while (true) {
                 switch (v3) {
                     case 1: {
                         if (!readInt<int32_t>()) {

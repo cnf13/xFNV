@@ -145,7 +145,7 @@ void hkpToiContactPointViewer::contactPointCallback(const hkpContactPointEvent& 
 
 void hkpToiContactPointViewer::worldAddedCallback(hkpWorld* w) {
     if (this == nullptr) {
-        w->addContactListener(0);
+        w->addContactListener(nullptr);
     }
     else {
         w->addContactListener(this);
@@ -154,7 +154,7 @@ void hkpToiContactPointViewer::worldAddedCallback(hkpWorld* w) {
 
 void hkpToiContactPointViewer::worldRemovedCallback(hkpWorld* w) {
     if (this == nullptr) {
-        w->removeContactListener(0);
+        w->removeContactListener(nullptr);
     }
     else {
         w->removeContactListener(this);
@@ -171,7 +171,7 @@ hkProcess* hkpToiContactPointViewer::create(const hkArray<hkProcessContext*, hkC
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

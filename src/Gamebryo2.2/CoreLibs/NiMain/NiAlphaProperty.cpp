@@ -221,7 +221,7 @@ void NiAlphaProperty::_SDMShutdown() {
 NiObject* NiAlphaProperty::CreateObject() {
     NiAlphaProperty* pkObject = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiAlphaProperty;
 }

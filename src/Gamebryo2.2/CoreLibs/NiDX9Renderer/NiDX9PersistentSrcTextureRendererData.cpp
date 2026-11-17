@@ -9,7 +9,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 NiRTTI NiDX9PersistentSrcTextureRendererData::ms_RTTI(
@@ -20,7 +20,7 @@ NiRTTI NiDX9PersistentSrcTextureRendererData::ms_RTTI(
 NiObject* NiDX9PersistentSrcTextureRendererData_CreateObject() {
     void* pkMemory = NiMemObject::operator new(sizeof(NiDX9PersistentSrcTextureRendererData));
     if (!pkMemory) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkMemory) NiDX9PersistentSrcTextureRendererData;
 }

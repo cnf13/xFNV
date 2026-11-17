@@ -198,19 +198,19 @@ void hkpConvexRadiusViewer::addWorld(hkpWorld* world) {
     hkpEntityListener* v4;
     hkpWorldPostSimulationListener* v6;
     hkpConvexRadiusViewer* v2 = this;
-    hkpConvexRadiusViewer::WorldToEntityData* v3 = 0;
+    hkpConvexRadiusViewer::WorldToEntityData* v3 = nullptr;
     if (this) {
         v4 = static_cast<hkpEntityListener*>(this);
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     world->addEntityListener(v4);
     if (v2) {
         v6 = static_cast<hkpWorldPostSimulationListener*>(v2);
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     world->addWorldPostSimulationListener(v6);
     hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
@@ -218,7 +218,7 @@ void hkpConvexRadiusViewer::addWorld(hkpWorld* world) {
         Instance->m_heap->blockAlloc(sizeof(hkpConvexRadiusViewer::WorldToEntityData))
     );
     if (v8) {
-        v8->entitiesCreated.m_data = 0;
+        v8->entitiesCreated.m_data = nullptr;
         v8->entitiesCreated.m_size = 0;
         v8->entitiesCreated.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
         v3 = v8;
@@ -294,7 +294,7 @@ void hkpConvexRadiusViewer::removeWorld(int32_t i) {
         v3 = static_cast<hkpEntityListener*>(this);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     m_worldEntities.m_data[i]->world->removeEntityListener(v3);
     m_worldEntities.m_data[i]->world->removeWorldPostSimulationListener(this);
@@ -307,7 +307,7 @@ void hkpConvexRadiusViewer::removeWorld(int32_t i) {
         if (m_capacityAndFlags >= 0) {
             m_heap->bufFree(v4->entitiesCreated.begin(), static_cast<int32_t>(sizeof(hkUlong)) * m_capacityAndFlags);
         }
-        v4->entitiesCreated.m_data = 0;
+        v4->entitiesCreated.m_data = nullptr;
         v4->entitiesCreated.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
         Instance->m_heap->blockFree(v4, sizeof(hkpConvexRadiusViewer::WorldToEntityData));
@@ -340,7 +340,7 @@ hkProcess* hkpConvexRadiusViewer::create(const hkArray<hkProcessContext*, hkCont
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

@@ -167,7 +167,7 @@ uint32_t hkpSingleShapeContainer::getFirstKey() const {
 }
 
 uint32_t hkpSingleShapeContainer::getNextKey(uint32_t a1) const {
-    return (uint32_t)((-1));
+    return (uint32_t)(-1);
 }
 
 const hkpShape* hkpSingleShapeContainer::getChildShape(uint32_t key, char (&buffer)[512]) const {

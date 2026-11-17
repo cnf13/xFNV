@@ -166,7 +166,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // The actor move mode flags of each combat move mode, indexed by COMBAT_MOVE_MODE.
 using CombatMoveModeFlagsArray = uint32_t[COMBAT_MOVE_MODE_COUNT];
@@ -232,7 +232,7 @@ CombatController::~CombatController() {
         SetTarget(nullptr);
         SetMovementProcedure(nullptr);
         pAttacker->ClearLookAtTarget();
-        pAttacker->SetIronSights(0, 0, 0);
+        pAttacker->SetIronSights(false, false, false);
         SetActionProcedure(nullptr);
     }
     ClearBackgroundProcedures();
@@ -243,9 +243,9 @@ CombatController::~CombatController() {
     if (pCombatState) {
         delete pCombatState;
     }
-    UpdateDebugGeometry(1);
+    UpdateDebugGeometry(true);
     if (!pSaveLoadGameOLD->GetLoading() && pAttacker && pAttacker->GetBlocked()) {
-        pAttacker->SetBlock(0);
+        pAttacker->SetBlock(false);
     }
     if (--iStaggerPeriodicUpdateCounter < 0) {
         iStaggerPeriodicUpdateCounter = 0;
@@ -271,7 +271,7 @@ void CombatController::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         SaveProcedure(BackgroundProcedures.operator[](i), apSaveGameBuffer);
     }
-    apData = pCombatPlan != 0;
+    apData = pCombatPlan != nullptr;
     apSaveGameBuffer->SaveDataEndian(&apData, 1u, 0);
     if (apData) {
         pCombatPlan->SaveGame(apSaveGameBuffer);
@@ -318,11 +318,11 @@ void CombatController::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     LoadProcedure(pActionProcedure, apLoadGameBuffer);
     LoadProcedure(pMovementProcedure, apLoadGameBuffer);
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
-    BackgroundProcedures.SetSize(isaveGameCount, 1);
+    BackgroundProcedures.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         LoadProcedure(BackgroundProcedures.operator[](i), apLoadGameBuffer);
     }
-    bhasPlan = 0;
+    bhasPlan = false;
     apLoadGameBuffer->LoadData(&bhasPlan, 1u);
     if (bhasPlan) {
         CombatPlan* v2;
@@ -331,7 +331,7 @@ void CombatController::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v2 = ::new (apMemory) CombatPlan(this);
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         pCombatPlan = v2;
         pCombatPlan->LoadGame(apLoadGameBuffer);
@@ -374,7 +374,7 @@ void CombatController::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v5 = dynamic_cast<Actor*>(FormByNumericID);
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     pAttacker = v5;
     if (pTarget) {
@@ -382,7 +382,7 @@ void CombatController::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v4 = dynamic_cast<Actor*>(v3);
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     pTarget = v4;
     if (pTarget) {
@@ -403,7 +403,7 @@ void CombatController::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (pCombatPlan) {}
     if (pCombatGroup) {
         if (!pCombatGroup->IsMember(pAttacker) && !pCombatGroup->AddMember(pAttacker)) {
-            pCombatGroup = 0;
+            pCombatGroup = nullptr;
         }
     }
     if (!pCombatGroup) {
@@ -425,7 +425,7 @@ void CombatController::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 }
 
 void CombatController::UpdateCurrentWeapon() {
-    pCurrentWeapon = 0;
+    pCurrentWeapon = nullptr;
     CombatProcedureSwitchWeapon* pswitchWeapon = static_cast<CombatProcedureSwitchWeapon*>(GetBackgroundProcedure(5));
     if (pswitchWeapon) {
         pCurrentWeapon = pswitchWeapon->pWeapon;
@@ -437,7 +437,7 @@ void CombatController::UpdateCurrentWeapon() {
 
 void CombatController::ClearReferencePointers(TESObjectREFR* apRef) {
     if (pCombatState) {
-        pCombatState->ClearReferencePointer(apRef, 0);
+        pCombatState->ClearReferencePointer(apRef, false);
     }
     if (pActionProcedure) {
         pActionProcedure->ClearReferencePointers(apRef);
@@ -452,7 +452,7 @@ void CombatController::ClearReferencePointers(TESObjectREFR* apRef) {
 
 void CombatController::CalculateAttackerInfo() {
     fAttackerHeight = pAttacker->GetHeight();
-    fAttackerSneakHeight = pAttacker->GetSneakHeight(0);
+    fAttackerSneakHeight = pAttacker->GetSneakHeight(false);
     bAttackerCanSneak = (bool)((int32_t)pAttacker->CanSneak());
     TESActorBase* actorBase = pAttacker->GetActorBase();
     bAttackerCanMove = (bool)((uint8_t)(!actorBase->IsImmobile()));
@@ -485,7 +485,7 @@ void CombatController::LoadProcedure(CombatProcedure*& arpProcedure, BGSLoadForm
     if (cType != -1) {
         arpProcedure = CombatProcedure::CreateProcedure(cType);
         arpProcedure->Initialize(this);
-        arpProcedure->LoadGame(static_cast<BGSLoadFormBuffer*>(apLoadGameBuffer));
+        arpProcedure->LoadGame(apLoadGameBuffer);
     }
 }
 
@@ -557,14 +557,14 @@ void CombatController::InitPowerAttackDistances() {
     float yDistanceForAnimGroup;
     int32_t i;
     TESCombatStyle* pCombatStyle = GetCurrentCombatStyle();
-    uint8_t bCanPowerAttack = (uint8_t)(((double)((int8_t)pCombatStyle->QPowerAttackChance())) > 0.0);
-    bHasForwardAttacks = (bool)0;
+    uint8_t bCanPowerAttack = (uint8_t)(((double)pCombatStyle->QPowerAttackChance()) > 0.0);
+    bHasForwardAttacks = false;
     for (i = 0; i < 5; ++i) {
         yDistanceForAnimGroup = GetPowerAttackForwardDistance(static_cast<ANIM_GROUP_ENUM>(i + 92));
         if (bCanPowerAttack && (yDistanceForAnimGroup > 0.0)) {
             packageOwner = GetAttacker();
-            fPowerAttackRanges[i] = (float)(packageOwner->GetScale() * yDistanceForAnimGroup);
-            bHasForwardAttacks = (bool)1;
+            fPowerAttackRanges[i] = (packageOwner->GetScale() * yDistanceForAnimGroup);
+            bHasForwardAttacks = true;
         }
         else {
             fPowerAttackRanges[i] = (float)0.0;
@@ -572,7 +572,7 @@ void CombatController::InitPowerAttackDistances() {
         v3 = GetAttacker();
         fPowerAttackHitTimes[i] = Actor::GetAnimGroupDuration(v3, static_cast<ANIM_GROUP_ENUM>(i + 92));
     }
-    bDeterminedPowerAttackDeltas = (bool)1;
+    bDeterminedPowerAttackDeltas = true;
 }
 
 bool CombatController::IsActoraCombatTarget(Actor* apActor) {
@@ -597,7 +597,7 @@ bool CombatController::GetAimLocation(NiPoint3* arOut, const NiPoint3* arStartLo
 
 void CombatController::DebugCombatPlan() {
     CombatPlanner kPlanner;
-    CombatPlan* v3 = kPlanner.CreatePlan_0(this, 1u);
+    CombatPlan* v3 = kPlanner.CreatePlan_0(this, true);
     if (v3) {
         delete v3;
     }
@@ -605,7 +605,7 @@ void CombatController::DebugCombatPlan() {
 
 void CombatController::ChangeProcessLevel(PROCESS_TYPE aeOldLevel, PROCESS_TYPE aeNewLevel) {
     if (aeNewLevel == PROCESS_TYPE_HIGH) {
-        bFirstUpdate = 0;
+        bFirstUpdate = false;
         ForcePlanUpdate();
         bool bfleeing = pCombatState->cFleeState != 0;
         BaseProcess* CurrentAIProcess = pAttacker->pCurrentProcess;
@@ -623,13 +623,13 @@ void CombatController::ChangeProcessLevel(PROCESS_TYPE aeOldLevel, PROCESS_TYPE 
                 pcurrentWeapon = static_cast<TESObjectWEAP*>(pcurrentWeaponItem->pContainerObj);
             }
             else {
-                pcurrentWeapon = 0;
+                pcurrentWeapon = nullptr;
             }
             if (!pweapon || pweapon == pcurrentWeapon) {
                 if (!pweapon) {
                     if (pcurrentWeapon) {
                         uint32_t FormHealth_0 = pcurrentWeaponItem->iNumber;
-                        pAttacker->UnEquipObject(pcurrentWeapon, FormHealth_0, 0, 0, 0, 1);
+                        pAttacker->UnEquipObject(pcurrentWeapon, FormHealth_0, nullptr, false, false, true);
                     }
                 }
             }
@@ -641,7 +641,7 @@ void CombatController::ChangeProcessLevel(PROCESS_TYPE aeOldLevel, PROCESS_TYPE 
                 else {
                     count = 1;
                 }
-                pAttacker->EquipObject(pweapon, count, 0, 1, 0, 1);
+                pAttacker->EquipObject(pweapon, count, nullptr, true, false, true);
             }
         }
         else {
@@ -663,7 +663,7 @@ void CombatController::UpdateCurrentCombatStyle() {
     pCurrentCombatStyle = pAttacker->GetCombatStyle();
     if (pCombatStyle) {
         if (pCombatStyle != pCurrentCombatStyle) {
-            pCombatState->SetInventoryDirty(1);
+            pCombatState->SetInventoryDirty(true);
             ForcePlanUpdate();
         }
     }
@@ -710,7 +710,7 @@ CombatProcedure* CombatController::GetBackgroundProcedure(int32_t aiProcedureTyp
             return v4;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 bool CombatController::CombatPlanContainsAction(int32_t aiAction) {
@@ -718,7 +718,7 @@ bool CombatController::CombatPlanContainsAction(int32_t aiAction) {
         return (bool)pCombatPlan->HasAction(aiAction);
     }
     else {
-        return (bool)0;
+        return false;
     }
 }
 
@@ -739,7 +739,7 @@ void CombatController::SetMoveMode(COMBAT_MOVE_MODE aeCombatMoveMode) {
 void CombatController::FinishedPackageTask() {
     TESPackage* ppackage;
     if (GetPretendInCombat() || GetContinueDuringCombat()) {
-        ppackage = 0;
+        ppackage = nullptr;
         BaseProcess* pProcess = pAttacker->pCurrentProcess;
         if (pProcess->ShouldUpdateCombatControllerOrEndCombat(pAttacker, ppackage)) {
             ForceStopCombat();
@@ -749,8 +749,8 @@ void CombatController::FinishedPackageTask() {
                 UpdatePackageData(ppackage);
             }
             else {
-                SetPretendInCombat(0);
-                SetContinueDuringCombat(0);
+                SetPretendInCombat(false);
+                SetContinueDuringCombat(false);
             }
         }
     }
@@ -806,15 +806,15 @@ void CombatController::ClearBackgroundProcedures() {
 }
 
 void CombatController::ForceCombat() {
-    bForceCombat = (bool)1;
+    bForceCombat = true;
 }
 
 float CombatController::GetCombatPosition() {
     if (!(fCombatPosition < 0.0)) {
-        return (float)(fCombatPosition);
+        return fCombatPosition;
     }
     else {
-        return (float)(0.0);
+        return (float)0.0;
     }
 }
 
@@ -846,17 +846,17 @@ void CombatController::DamagedByAttacker(Actor* apAttacker, float afDamage) {
 
 bool CombatController::GetProcedureFailed() {
     if (pActionProcedure && pActionProcedure->GetFailed()) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(pMovementProcedure && pMovementProcedure->GetFailed()));
 }
 
 bool CombatController::GetProcedureFinished() {
     if (pActionProcedure && pActionProcedure->GetFinished()) {
-        return (bool)1;
+        return true;
     }
     if (pMovementProcedure && pMovementProcedure->GetFinished()) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)((!pActionProcedure) && (!pMovementProcedure)));
 }
@@ -869,33 +869,33 @@ bool CombatController::ShouldStopCombat() {
     BaseProcess* currentProcess;
     uint8_t v4;
     if (bStopCombat) {
-        return (bool)1;
+        return true;
     }
     if (pTarget || (pCombatGroup->GetTargetCount() || TESPackage::GetPretendInCombat())) {
-        bStoppingCombat = (bool)0;
-        return (bool)0;
+        bStoppingCombat = false;
+        return false;
     }
     else {
-        if (pAttacker->GetAnimAction() == ((-1))) {
+        if (pAttacker->GetAnimAction() == (-1)) {
             currentProcess = pAttacker->MobileObject::GetCurrentAIProcess();
-            v4 = (uint8_t)(currentProcess->GetRunOncePackage() == 0);
+            v4 = (uint8_t)(currentProcess->GetRunOncePackage() == nullptr);
         }
         else {
             v4 = 0;
         }
         if (v4) {
-            return (bool)1;
+            return true;
         }
         else {
-            bStoppingCombat = (bool)1;
-            return (bool)0;
+            bStoppingCombat = true;
+            return false;
         }
     }
 }
 
 void CombatController::SetForceSneak(bool abValue) {
     if (bAttackerCanSneak) {
-        if (((uint8_t)bForceSneak) != ((uint8_t)abValue)) {
+        if (bForceSneak != ((uint8_t)abValue)) {
             bForceSneak = (bool)((uint8_t)abValue);
             SetActualMoveMode(iMoveMode);
         }
@@ -915,7 +915,7 @@ void CombatController::SetLookAtTarget(uint8_t acIndex, const NiPoint3& arLookAt
 }
 
 void CombatController::ClearLookAtTarget(uint8_t acIndex) {
-    ucLookAtTargetPriorities[static_cast<uint8_t>(acIndex)] = (uint8_t)0;
+    ucLookAtTargetPriorities[acIndex] = (uint8_t)0;
 }
 
 int32_t CombatController::IsNotDetectingTarget() {
@@ -923,7 +923,7 @@ int32_t CombatController::IsNotDetectingTarget() {
 }
 
 bool CombatController::IsSwitchingWeapons() {
-    return (GetBackgroundProcedure(5) != 0);
+    return (GetBackgroundProcedure(5) != nullptr);
 }
 
 uint8_t CombatController::GetForceSneak() {
@@ -998,7 +998,7 @@ void CombatController::SetInventoryDirty(bool abValue) {
 }
 
 void CombatController::Disarmed(Actor* apOpponent) {
-    bDeterminedPowerAttackDeltas = (bool)0;
+    bDeterminedPowerAttackDeltas = false;
     pCombatState->Disarmed();
     if (pActionProcedure) {
         pActionProcedure->Disarmed(apOpponent);
@@ -1011,7 +1011,7 @@ void CombatController::ClearCombatPlan() {
         if (pCombatPlan) {
             delete pCombatPlan;
         }
-        pCombatPlan = 0;
+        pCombatPlan = nullptr;
     }
 }
 
@@ -1026,18 +1026,18 @@ void CombatController::SetTarget(Actor* apTarget) {
         }
         Actor* pPrevTarget = pTarget;
         pTarget = apTarget;
-        if (!bDestructing && !pAttacker->IsDead(0)) {
+        if (!bDestructing && !pAttacker->IsDead(false)) {
             if (!pPrevTarget || pTarget) {
                 if (pTarget) {
                     if (!pPrevTarget && pCombatGroup->GetDetectionValue(apTarget) > 0) {
                         Script::SetActionFlag(pTarget, &pAttacker->m_Extra, SCRIPT_ACTION_ONSTARTCOMBAT);
-                        pCombatDialogueManager->StartDialogue(this, DT_DETECTION, 4, 1);
+                        pCombatDialogueManager->StartDialogue(this, DT_DETECTION, 4, true);
                     }
                 }
             }
             else {
                 if (!pCombatGroup->iSearchCount) {
-                    pCombatDialogueManager->StartDialogue(this, DT_DETECTION, 6, 0);
+                    pCombatDialogueManager->StartDialogue(this, DT_DETECTION, 6, false);
                 }
             }
         }
@@ -1077,7 +1077,7 @@ bool CombatController::StopCombat(Actor* apTarget) {
     Actor* pOwner = GetAttacker();
     if (pOwner->GetBlocked()) {
         attacker = GetAttacker();
-        attacker->SetBlock(0);
+        attacker->SetBlock(false);
     }
     return (bool)v7;
 }
@@ -1090,7 +1090,7 @@ void CombatController::TakeHit(Actor* apAttacker, ActiveEffect* apEffect) {
     int32_t v8;
     if (!bFirstUpdate) {
         FirstUpdate();
-        bFirstUpdate = (bool)1;
+        bFirstUpdate = true;
     }
     if (pCombatGroup) {
         pCombatGroup->NotifyMemberHit(pAttacker, apAttacker);
@@ -1102,13 +1102,13 @@ void CombatController::TakeHit(Actor* apAttacker, ActiveEffect* apEffect) {
                 a4[1] = 0;
                 a4[0] = 0;
                 attacker = GetAttacker();
-                if (attacker->GetShouldAttackActor(apAttacker, 1, *reinterpret_cast<FIGHT_REACTION*>(a4), 0)) {
+                if (attacker->GetShouldAttackActor(apAttacker, true, *reinterpret_cast<FIGHT_REACTION*>(a4), false)) {
                     v8 = 100;
                 }
                 if (v8 > 0) {
                     currentAIProcess = apAttacker->MobileObject::GetCurrentAIProcess();
                     a3a = (int32_t)currentAIProcess->GetPotentialThreatDamage(apAttacker, pAttacker);
-                    AddTarget(apAttacker, a3a, 0, 0.0, 0.0);
+                    AddTarget(apAttacker, a3a, false, 0.0, 0.0);
                 }
             }
         }
@@ -1129,7 +1129,7 @@ void CombatController::UpdateLowMovement() {
     if (fLowMovementDelta > 0.0) {
         if (pAttacker->IsPathing()) {
             pAttacker->UpdateActorMover(fLowMovementDelta);
-            pAttacker->UpdateMovement(fLowMovementDelta, (bool)0);
+            pAttacker->UpdateMovement(fLowMovementDelta, false);
         }
         fLowMovementDelta = (float)0.0;
     }
@@ -1160,16 +1160,16 @@ void CombatController::Update() {
                     }
                     if (!bFirstUpdate) {
                         FirstUpdate();
-                        bFirstUpdate = 1;
+                        bFirstUpdate = true;
                     }
                     if (pattacker->IsDying()) {
                         return;
                     }
-                    if (!pattacker->IsDead(0)) {
+                    if (!pattacker->IsDead(false)) {
                         UpdateCurrentWeapon();
                         Actor* ptarget__pattacker = GetTarget();
                         if (ptarget__pattacker &&
-                            ((ptarget__pattacker->IsDead(0) && !ptarget__pattacker->IsDying()) ||
+                            ((ptarget__pattacker->IsDead(false) && !ptarget__pattacker->IsDying()) ||
                              (ptarget__pattacker->GetDisabled() || ptarget__pattacker->GetDelete()))) {
                             pattacker->StopCombat(ptarget__pattacker);
                         }
@@ -1181,9 +1181,9 @@ void CombatController::Update() {
                                 pCombatState->Update();
                                 if (!bStopCombat && !pCombatState->bInitializing && !panimation->GetAnimsLoading() &&
                                     !pattacker->IsKnockedOut() && !pattacker->IsSurfacing()) {
-                                    bool bneedNewPlan = 0;
+                                    bool bneedNewPlan = false;
                                     if (GetProcedureFailed()) {
-                                        bneedNewPlan = 1;
+                                        bneedNewPlan = true;
                                         if (pActionProcedure) {
                                             if (pActionProcedure->GetFailed()) {
                                                 AddFailedCombatProcedure(pActionProcedure);
@@ -1196,13 +1196,13 @@ void CombatController::Update() {
                                         }
                                     }
                                     if (PlanTimer.Check()) {
-                                        bneedNewPlan = 1;
+                                        bneedNewPlan = true;
                                     }
                                     if (!bneedNewPlan && GetProcedureFinished()) {
                                         if (pCombatPlan) {
                                             if (pCombatPlan->IsFinished()) {
                                                 pCombatGroup->NotifyMemberPlanFinished(this, pCombatPlan->pGoal);
-                                                bneedNewPlan = 1;
+                                                bneedNewPlan = true;
                                             }
                                             else {
                                                 pCombatPlan->ExecuteNextAction(this);
@@ -1223,17 +1223,17 @@ void CombatController::Update() {
                                         }
                                         CombatAI_Planning.Start();
                                         CombatPlanner planner;
-                                        pCombatPlan = planner.CreatePlan_0(this, 0);
+                                        pCombatPlan = planner.CreatePlan_0(this, false);
                                         if (pCombatPlan) {
                                             CastingType = pCombatPlan->pGoal;
                                         }
                                         else {
-                                            CastingType = 0;
+                                            CastingType = nullptr;
                                         }
                                         pCurrentGoal = CastingType;
                                         InitializeCombatPlanData();
                                         planner.CleanUp();
-                                        pCombatPlannerData = 0;
+                                        pCombatPlannerData = nullptr;
                                         CombatAI_Planning.Stop();
                                         PlanTimer.Reset(1.0f);
                                         if (pCombatPlan) {
@@ -1241,7 +1241,7 @@ void CombatController::Update() {
                                         }
                                         else {
                                             ClearProcedures();
-                                            pCurrentAction = 0;
+                                            pCurrentAction = nullptr;
                                         }
                                         if (pMovementProcedure) {
                                             pMovementProcedure->FinishedPlanning();
@@ -1275,8 +1275,8 @@ void CombatController::Update() {
                                             }
                                         }
                                         UpdateLookAtTarget();
-                                        bool banimBlendCheck = 0;
-                                        pattacker->SetIronSights(cUseIronSights == 1, 0, 0);
+                                        bool banimBlendCheck = false;
+                                        pattacker->SetIronSights(cUseIronSights == 1, false, false);
                                         eLowState = COMBAT_LOW_STATE_NONE;
                                     }
                                 }
@@ -1285,7 +1285,7 @@ void CombatController::Update() {
                         return;
                     }
                 }
-                pattacker->StopCombat(0);
+                pattacker->StopCombat(nullptr);
             }
         }
     }
@@ -1306,16 +1306,16 @@ void CombatController::InitializeCombatPlanData() {
     else {
         icombatLocation = -1;
     }
-    bool v8 = 0;
-    bool v7 = 0;
+    bool v8 = false;
+    bool v7 = false;
     if (icombatLocation != -1) {
         CombatLocation* pcombatLocation = pCombatPlannerData->GetLocation(icombatLocation);
         if (pcombatLocation) {
-            v8 = 1;
+            v8 = true;
             pCombatState->SetCombatLocation(pcombatLocation);
             CombatCoverLocation* pcombatCoverLocation = pCombatPlannerData->GetCombatCoverLocation(icombatLocation);
             if (pcombatCoverLocation) {
-                v7 = 1;
+                v7 = true;
                 pCombatState->SetCoverLocation(pcombatCoverLocation);
             }
             pCombatPlannerData->ClearLocation(icombatLocation);
@@ -1328,7 +1328,7 @@ void CombatController::InitializeCombatPlanData() {
             CombatCoverLocation* pcombatCoverLocation_2 = pCombatState->GetCoverLocation();
             if (pcombatCoverLocation_2) {
                 if (pcombatCoverLocation_2->iLocation == icombatLocation) {
-                    v7 = 1;
+                    v7 = true;
                 }
             }
         }
@@ -1340,7 +1340,7 @@ void CombatController::InitializeCombatPlanData() {
         pCombatState->ReserveCoverLocation();
     }
     else {
-        pCombatState->ClearCoverLocation(0);
+        pCombatState->ClearCoverLocation(false);
     }
 }
 
@@ -1383,7 +1383,7 @@ void CombatController::UpdateLow() {
     BGSWorldLocation targetWorldLoc;
     if (!bFirstUpdate) {
         FirstUpdate();
-        bFirstUpdate = 1;
+        bFirstUpdate = true;
     }
     if (fLowMovementDelta < 0.0) {
         PlanTimer.Reset(1.0f);
@@ -1392,13 +1392,13 @@ void CombatController::UpdateLow() {
             if (bEncounterZoneTargetRestrict.Bool()) {
                 BGSEncounterZone* LocationEncounterZone = pTarget->GetLocationEncounterZone();
                 if (LocationEncounterZone != pAttacker->GetLocationEncounterZone()) {
-                    SetTarget(0);
+                    SetTarget(nullptr);
                 }
             }
         }
     }
     if (PlanTimer.Check()) {
-        bool bproceduresFinished = 0;
+        bool bproceduresFinished = false;
         if (GetProcedureFailed()) {
             if (pActionProcedure) {
                 if (pActionProcedure->GetFailed()) {
@@ -1410,13 +1410,13 @@ void CombatController::UpdateLow() {
                     AddFailedCombatProcedure(pMovementProcedure);
                 }
             }
-            SetTarget(0);
+            SetTarget(nullptr);
         }
         else {
             if (GetProcedureFinished()) {
                 ClearProcedures();
                 eLowState = COMBAT_LOW_STATE_NONE;
-                bproceduresFinished = 1;
+                bproceduresFinished = true;
             }
         }
         if (!pTarget) {
@@ -1469,7 +1469,7 @@ void CombatController::UpdateLow() {
                             v9 = ::new (apMemory) CombatProcedureAttackLow;
                         }
                         else {
-                            v9 = 0;
+                            v9 = nullptr;
                         }
                         SetActionProcedure(v9);
                         break;
@@ -1478,7 +1478,7 @@ void CombatController::UpdateLow() {
                         targetLocation.~CombatLocation();
                         ::new (&targetLocation) CombatLocation;
                         targetLocation.SetRef(pTarget);
-                        if (pCombatState->CheckMovement(*&targetLocation.WorldLoc, 1, 1)) {
+                        if (pCombatState->CheckMovement(*&targetLocation.WorldLoc, true, true)) {
                             CombatProcedure* pmovementProcedure_4;
                             CombatProcedureMove* v17 =
                                 static_cast<CombatProcedureMove*>(ourMalloc(sizeof(CombatProcedureMove)));
@@ -1487,7 +1487,7 @@ void CombatController::UpdateLow() {
                                     CombatProcedureMove(&targetLocation, kCombatLocationTypeData[0].fRadius, 0);
                             }
                             else {
-                                pmovementProcedure_4 = 0;
+                                pmovementProcedure_4 = nullptr;
                             }
                             SetMovementProcedure(pmovementProcedure_4);
                         }
@@ -1499,7 +1499,7 @@ void CombatController::UpdateLow() {
                         ::new (&targetLocation_2) CombatLocation;
                         BGSWorldLocation lastDetectedLocation;
                         if (pCombatGroup->GetTargetLastDetectedLocation(pTarget, lastDetectedLocation) &&
-                            pCombatState->CheckMovement(lastDetectedLocation, 1, 1)) {
+                            pCombatState->CheckMovement(lastDetectedLocation, true, true)) {
                             pAttacker->GetWorldLocation(&attackerWorldLoc_2);
                             if (attackerWorldLoc_2.GetDistanceSquared(lastDetectedLocation) > 100.0) {
                                 CombatProcedure* pmovementProcedure_5;
@@ -1511,7 +1511,7 @@ void CombatController::UpdateLow() {
                                         CombatProcedureMove(&targetLocation_2, kCombatLocationTypeData[0].fRadius, 15);
                                 }
                                 else {
-                                    pmovementProcedure_5 = 0;
+                                    pmovementProcedure_5 = nullptr;
                                 }
                                 SetMovementProcedure(pmovementProcedure_5);
                                 enewState = COMBAT_LOW_STATE_INVESTIGATING;
@@ -1527,7 +1527,7 @@ void CombatController::UpdateLow() {
                             v6 = ::new (v15) CombatProcedureSearch;
                         }
                         else {
-                            v6 = 0;
+                            v6 = nullptr;
                         }
                         SetMovementProcedure(v6);
                         break;
@@ -1545,7 +1545,7 @@ void CombatController::UpdateLow() {
                             pCombatState->cFleeState = 1;
                             fleeLocation.~CombatLocation();
                             ::new (&fleeLocation) CombatLocation;
-                            if (pCombatState->FindBestFleeLocation(0, &fleeLocation, 12)) {
+                            if (pCombatState->FindBestFleeLocation(nullptr, &fleeLocation, 12)) {
                                 CombatProcedure* pmovementProcedure_2;
                                 if (fleeLocation.GetFlag(1u)) {
                                     CombatProcedure* pmovementProcedure;
@@ -1555,7 +1555,7 @@ void CombatController::UpdateLow() {
                                         pmovementProcedure = (CombatProcedure*)::new (v20) CombatProcedureEvade(12);
                                     }
                                     else {
-                                        pmovementProcedure = 0;
+                                        pmovementProcedure = nullptr;
                                     }
                                     pmovementProcedure_2 = pmovementProcedure;
                                 }
@@ -1568,7 +1568,7 @@ void CombatController::UpdateLow() {
                                             CombatProcedureMove(&fleeLocation, kCombatLocationTypeData[12].fRadius, 12);
                                     }
                                     else {
-                                        pmovementProcedure_3 = 0;
+                                        pmovementProcedure_3 = nullptr;
                                     }
                                     pmovementProcedure_2 = pmovementProcedure_3;
                                 }
@@ -1646,9 +1646,9 @@ void CombatController::UpdatePackageData(TESPackage* apCurrentPackage) {
         }
         pCombatState->RemoveTargetedObject(2);
     }
-    SetPretendInCombat(0);
-    SetContinueDuringCombat(0);
-    pCombatStyle = 0;
+    SetPretendInCombat(false);
+    SetContinueDuringCombat(false);
+    pCombatStyle = nullptr;
     if (apCurrentPackage) {
         pCombatStyle = apCurrentPackage->pCombatStyle;
         uint32_t ipackageFlags = apCurrentPackage->PackData.iPackFlags;
@@ -1656,14 +1656,14 @@ void CombatController::UpdatePackageData(TESPackage* apCurrentPackage) {
             SetPretendInCombat((ipackageFlags & kPackageFlag_PretendInCombat) != 0);
             SetContinueDuringCombat((ipackageFlags & kPackageFlag_ContinueDuringCombat) != 0);
             BaseProcess* pproc = pAttacker->pCurrentProcess;
-            bool bhasRefForLocation = 1;
+            bool bhasRefForLocation = true;
             if (apCurrentPackage->pPackLoc) {
                 PACK_LOC_TYPE LocType = apCurrentPackage->pPackLoc->GetLocType();
                 if (LocType > PLT_REFERENCE) {
                     bhasRefForLocation = LocType > PLT_EDITORLOC;
                 }
             }
-            TESObjectREFR* pref = pproc->GetCurrentDestinationReference(pAttacker, 0);
+            TESObjectREFR* pref = pproc->GetCurrentDestinationReference(pAttacker, false);
             // The destination radius and the package target's value share one float: the default case passes the radius
             // unless the package target replaced it.
             float fradius = pproc->GetCurrentDestinationRadius(pAttacker);
@@ -1686,7 +1686,7 @@ void CombatController::UpdatePackageData(TESPackage* apCurrentPackage) {
                         apObject = pref->GetObjectReference();
                     }
                     else {
-                        apObject = 0;
+                        apObject = nullptr;
                     }
                     pCombatState->AddObjectToTarget(2u, pref, apObject);
                     break;
@@ -1726,7 +1726,7 @@ void CombatController::UpdatePackageData(TESPackage* apCurrentPackage) {
                     }
                     else {
                         TESObjectCELL* pcell_2 = pproc->GetCurrentDestinationCell(pAttacker);
-                        TESForm* pspace_4 = 0;
+                        TESForm* pspace_4 = nullptr;
                         if (pcell_2) {
                             TESForm* pspace_5;
                             if (pcell_2->GetInterior()) {
@@ -1740,7 +1740,7 @@ void CombatController::UpdatePackageData(TESPackage* apCurrentPackage) {
                         else {
                             pspace_4 = pproc->GetCurrentDestinationWorldSpace(pAttacker);
                         }
-                        BGSWorldLocation worldLoc_2(pproc->GetCurrentDestinationCoordinate(pAttacker, 1), pspace_4);
+                        BGSWorldLocation worldLoc_2(pproc->GetCurrentDestinationCoordinate(pAttacker, true), pspace_4);
                         pCombatState->SetLocationTargetLocation(
                             &worldLoc_2, 1, fguardDistanceMin_4, fguardDistanceMax_4
                         );
@@ -1750,7 +1750,7 @@ void CombatController::UpdatePackageData(TESPackage* apCurrentPackage) {
                 case PACKAGE_TYPE_GUARD: {
                     float fguardDistanceMin_2;
                     if (IsPackageFlag4Set(apCurrentPackage, nullptr)) {
-                        bhasRefForLocation = 1;
+                        bhasRefForLocation = true;
                     }
                     PackageTarget* ppackTarg = apCurrentPackage->GetPackageTarget();
                     if (apCurrentPackage->SandboxGetAllowConversation() && apCurrentPackage->pPackLoc) {
@@ -1776,7 +1776,7 @@ void CombatController::UpdatePackageData(TESPackage* apCurrentPackage) {
                     }
                     else {
                         TESObjectCELL* pcell = pproc->GetCurrentDestinationCell(pAttacker);
-                        TESForm* pspace = 0;
+                        TESForm* pspace = nullptr;
                         if (pcell) {
                             TESForm* pspace_2;
                             if (pcell->GetInterior()) {
@@ -1790,7 +1790,7 @@ void CombatController::UpdatePackageData(TESPackage* apCurrentPackage) {
                         else {
                             pspace = pproc->GetCurrentDestinationWorldSpace(pAttacker);
                         }
-                        BGSWorldLocation worldLoc(pproc->GetCurrentDestinationCoordinate(pAttacker, 1), pspace);
+                        BGSWorldLocation worldLoc(pproc->GetCurrentDestinationCoordinate(pAttacker, true), pspace);
                         pCombatState->SetLocationTargetLocation(&worldLoc, 1, fguardDistanceMin_2, fguardDistanceMax_2);
                     }
                     break;
@@ -1801,7 +1801,7 @@ void CombatController::UpdatePackageData(TESPackage* apCurrentPackage) {
                     }
                     else {
                         TESObjectCELL* pcell_3 = pproc->GetCurrentDestinationCell(pAttacker);
-                        TESForm* pspace_7 = 0;
+                        TESForm* pspace_7 = nullptr;
                         if (pcell_3) {
                             TESForm* pspace_8;
                             if (pcell_3->GetInterior()) {
@@ -1815,7 +1815,7 @@ void CombatController::UpdatePackageData(TESPackage* apCurrentPackage) {
                         else {
                             pspace_7 = pproc->GetCurrentDestinationWorldSpace(pAttacker);
                         }
-                        BGSWorldLocation worldLoc_3(pproc->GetCurrentDestinationCoordinate(pAttacker, 1), pspace_7);
+                        BGSWorldLocation worldLoc_3(pproc->GetCurrentDestinationCoordinate(pAttacker, true), pspace_7);
                         pCombatState->SetLocationTargetLocation(&worldLoc_3, 0, fradius, fradius);
                     }
                     ForcePlanUpdate();
@@ -1840,15 +1840,15 @@ void CombatController::SetShowVerboseMessages(bool abShowVerboseMessages) {
 }
 
 bool CombatController::CheckHasEquip(Actor* apAttacker, ItemChange* apWeapon) {
-    bool v8 = 0;
-    uint16_t usGroup = apAttacker->GetAnimGroup(ANIM_GROUP_WEAPONS_START, apWeapon, apWeapon == 0, 0);
+    bool v8 = false;
+    uint16_t usGroup = apAttacker->GetAnimGroup(ANIM_GROUP_WEAPONS_START, apWeapon, apWeapon == nullptr, nullptr);
     if (usGroup) {
         Animation* v6 = apAttacker->GetAnimation();
         if (v6) {
             AnimSequenceBase* val;
             NiTPointerMap<uint16_t, AnimSequenceBase*>* MapAnimSequenceBase = v6->GetMapAnimSequenceBase();
             if (MapAnimSequenceBase->GetAt(usGroup, val)) {
-                return 1;
+                return true;
             }
         }
     }

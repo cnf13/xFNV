@@ -58,7 +58,7 @@ bool RagDollData::UpdateDataFromReference(TESObjectREFR* apRef) {
 bool RagDollData::UpdateReferenceFromData(TESObjectREFR* apRef) {
     NiMatrix3 result;
     uint32_t aiBoneIndex = 0;
-    bool bUpdated = 1;
+    bool bUpdated = true;
     if (apRef) {
         if (apRef->TESObjectREFR::Get3D()) {
             if (iBoneCount) {
@@ -68,7 +68,7 @@ bool RagDollData::UpdateReferenceFromData(TESObjectREFR* apRef) {
                     pRootNode = pRoot->IsNode();
                 }
                 else {
-                    pRootNode = 0;
+                    pRootNode = nullptr;
                 }
                 NiAVObject* a1 = pRootNode;
                 if (apRef->IsActor()) {
@@ -82,13 +82,13 @@ bool RagDollData::UpdateReferenceFromData(TESObjectREFR* apRef) {
                         const NiPoint3* v3 = &apRef->GetLocationOnReference();
                         pRoot->SetTranslate(*v3);
                         pRoot->SetRotate(apRef->GetOrientation());
-                        bhkNiCollisionObject::ResetSim(pRoot, 1);
-                        NiUpdateData a2(0.0f, 0, 0);
+                        bhkNiCollisionObject::ResetSim(pRoot, true);
+                        NiUpdateData a2(0.0f, false, false);
                         pRoot->Update(a2);
                     }
                 }
                 if (!bUpdated) {
-                    bhkWorld::SetMotion(a1, hkpMotion::MOTION_DYNAMIC, 1, 0, 1);
+                    bhkWorld::SetMotion(a1, hkpMotion::MOTION_DYNAMIC, true, false, true);
                 }
             }
         }
@@ -189,7 +189,7 @@ void RagDollData::CreateRagDollBoneArray(TESObjectREFR* apRef) {
 bool RagDollData::UpdateRagDollDataFromNode(NiNode* apNode, uint32_t& aiBoneIndex, bool abInit) {
     CFilter apResult;
     CFilter a2;
-    bool bsuccess = 1;
+    bool bsuccess = true;
     if (apNode && aiBoneIndex < iBoneCount) {
         bhkNiCollisionObject* pcol = bhkNiCollisionObject::GetbhkNiCollisionObject(apNode);
         if (pcol) {
@@ -201,7 +201,7 @@ bool RagDollData::UpdateRagDollDataFromNode(NiNode* apNode, uint32_t& aiBoneInde
                 int32_t iBoneID = pBoneArray[aiBoneIndex].iBoneID;
                 CFilter* v6 = pcol->GetWorldObject()->GetCollisionFilter(&apResult);
                 if (iBoneID != v6->GetPart()) {
-                    return 0;
+                    return false;
                 }
             }
             pBoneArray[aiBoneIndex].BonePos = apNode->GetTranslate();
@@ -215,11 +215,11 @@ bool RagDollData::UpdateRagDollDataFromNode(NiNode* apNode, uint32_t& aiBoneInde
         uint32_t icount = apNode->GetArrayCount();
         for (uint32_t i = 0; i < icount; ++i) {
             NiAVObject* pav = apNode->GetAt(i);
-            NiNode* pnode = pav ? pav->IsNode() : 0;
+            NiNode* pnode = pav ? pav->IsNode() : nullptr;
             NiNode* pnode_2 = pnode;
             if (pnode) {
                 if (!UpdateRagDollDataFromNode(pnode_2, aiBoneIndex, abInit)) {
-                    bsuccess = 0;
+                    bsuccess = false;
                 }
             }
             if (aiBoneIndex >= iBoneCount) {
@@ -276,7 +276,7 @@ void RagDollData::UpdateBip01NodeFromRagdollData(TESObjectREFR* apRef) {
                 (&ecx0)->FromEulerAnglesXYZ(Bip01Rot.x, Bip01Rot.y, Bip01Rot.z);
                 v7->SetRotate(ecx0);
                 apMemory.~NiUpdateData();
-                ::new (&apMemory) NiUpdateData(0.0, 0, 0);
+                ::new (&apMemory) NiUpdateData(0.0, false, false);
                 v7->UpdateWorldData(apMemory);
             }
         }
@@ -304,20 +304,20 @@ void RagDollData::Save() {
 
 bool RagDollData::Compare(RagDollData* apCompare) {
     if (!apCompare) {
-        return 1;
+        return true;
     }
     if (iBoneCount != apCompare->iBoneCount) {
-        return 1;
+        return true;
     }
     if (Bip01Rot.operator!=(apCompare->Bip01Rot)) {
-        return 1;
+        return true;
     }
     return iBoneCount && std::memcmp(pBoneArray, apCompare->pBoneArray, sizeof(RagDollBone) * iBoneCount);
 }
 
 bool RagDollData::UpdateNodeFromRagDollData(NiNode* apNode, uint32_t& aiBoneIndex) {
     CFilter a2;
-    bool bretval = 1;
+    bool bretval = true;
     if (apNode && aiBoneIndex < iBoneCount) {
         bhkNiCollisionObject* pcol = bhkNiCollisionObject::GetbhkNiCollisionObject(apNode);
         if (pcol) {
@@ -325,27 +325,27 @@ bool RagDollData::UpdateNodeFromRagDollData(NiNode* apNode, uint32_t& aiBoneInde
             CFilter* CollisionFilter = pcol->GetWorldObject()->GetCollisionFilter(&a2);
             uint32_t iboneID = CollisionFilter->GetPart();
             if (pBoneArray[aiBoneIndex].iBoneID != iboneID) {
-                return 0;
+                return false;
             }
             apNode->SetTranslate(pBoneArray[aiBoneIndex].BonePos);
             rot.FromEulerAnglesXYZ(
                 pBoneArray[aiBoneIndex].BoneRot.x, pBoneArray[aiBoneIndex].BoneRot.y, pBoneArray[aiBoneIndex].BoneRot.z
             );
             apNode->SetRotate(rot);
-            pcol->SetReset(1);
-            pcol->SetMotionType(hkpMotion::MOTION_DYNAMIC, 0, 0);
+            pcol->SetReset(true);
+            pcol->SetMotionType(hkpMotion::MOTION_DYNAMIC, nullptr, false);
             ++aiBoneIndex;
         }
-        NiUpdateData UpdateData(0.0f, 0, 0);
+        NiUpdateData UpdateData(0.0f, false, false);
         apNode->UpdateWorldData(UpdateData);
         uint32_t icount = apNode->GetArrayCount();
         for (uint32_t i = 0; i < icount; ++i) {
             NiAVObject* pav = apNode->GetAt(i);
-            NiNode* pnode = pav ? pav->IsNode() : 0;
+            NiNode* pnode = pav ? pav->IsNode() : nullptr;
             NiNode* pnode_2 = pnode;
             if (pnode) {
                 if (!UpdateNodeFromRagDollData(pnode_2, aiBoneIndex)) {
-                    bretval = 0;
+                    bretval = false;
                 }
             }
             if (aiBoneIndex >= iBoneCount) {
@@ -363,8 +363,8 @@ uint8_t RagDollData::CountRagDollBones(NiNode* apNode) {
     uint32_t arrayCount;
     int8_t v6 = 0;
     if (apNode) {
-        v6 = (int8_t)(bhkNiCollisionObject::GetbhkNiCollisionObject(apNode) != 0);
-        arrayCount = (uint32_t)apNode->GetArrayCount();
+        v6 = (int8_t)(bhkNiCollisionObject::GetbhkNiCollisionObject(apNode) != nullptr);
+        arrayCount = apNode->GetArrayCount();
         for (a1 = 0; a1 < arrayCount; ++a1) {
             v3 = apNode->GetAt(a1);
             if (v3) {

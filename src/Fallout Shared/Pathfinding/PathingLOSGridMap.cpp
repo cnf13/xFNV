@@ -42,7 +42,7 @@ bool PathingLOSGridMap::Setup(const BSSimpleArray<NavMeshPtr, 1024>& aNavMeshes)
             break;
         }
         NavMeshPtr spmesh(aNavMeshes.GetAt(static_cast<int32_t>(i)));
-        PathingLOSGrid* pgrid = 0;
+        PathingLOSGrid* pgrid = nullptr;
         if (NavMeshToLOSGridMap.GetAt(spmesh.m_pObject->iFormID, pgrid)) {
             pgrid->Setup(spmesh);
         }
@@ -53,14 +53,14 @@ bool PathingLOSGridMap::Setup(const BSSimpleArray<NavMeshPtr, 1024>& aNavMeshes)
                 pgrid_2 = ::new (v6) PathingLOSGrid(spmesh);
             }
             else {
-                pgrid_2 = 0;
+                pgrid_2 = nullptr;
             }
             pgrid = pgrid_2;
             NavMeshToLOSGridMap.SetAt(spmesh.m_pObject->iFormID, pgrid_2);
         }
     }
     Lock.UnlockWrite();
-    return 1;
+    return true;
 }
 
 bool PathingLOSGridMap::IsValid() {
@@ -73,7 +73,7 @@ void PathingLOSGridMap::Clear() {
     it = NavMeshToLOSGridMap.GetFirstPos();
     while (it) {
         uint32_t inavmeshID = 0;
-        PathingLOSGrid* pgrid = 0;
+        PathingLOSGrid* pgrid = nullptr;
         NavMeshToLOSGridMap.GetNext(it, inavmeshID, pgrid);
         if (pgrid) {
             delete pgrid;
@@ -203,7 +203,7 @@ bool PathingLOSGridMap::SetLOSMapFromSeenTriangles(NiPointer<PathingLOSMap>& asp
         }
     }
     Lock.UnlockRead();
-    return 1;
+    return true;
 }
 
 bool PathingLOSGridMap::SetSeenTrianglesFromLOSMap(NiPointer<PathingLOSMap>& aspLOSMap) {
@@ -215,7 +215,7 @@ bool PathingLOSGridMap::SetSeenTrianglesFromLOSMap(NiPointer<PathingLOSMap>& asp
         }
         NavMeshPtr* NavMeshByIndex = &aspLOSMap.m_pObject->GetNavMeshByIndex(i);
         NavMeshPtr spmesh(*NavMeshByIndex);
-        PathingLOSGrid* pgrid = 0;
+        PathingLOSGrid* pgrid = nullptr;
         if (!NavMeshToLOSGridMap.GetAt(spmesh.m_pObject->iFormID, pgrid)) {
             PathingLOSGrid* pgrid_2;
             PathingLOSGrid* v8 = static_cast<PathingLOSGrid*>(ourMalloc(sizeof(PathingLOSGrid)));
@@ -224,7 +224,7 @@ bool PathingLOSGridMap::SetSeenTrianglesFromLOSMap(NiPointer<PathingLOSMap>& asp
                 pgrid_2 = ::new (v8) PathingLOSGrid(NavMeshInfo_);
             }
             else {
-                pgrid_2 = 0;
+                pgrid_2 = nullptr;
             }
             pgrid = pgrid_2;
             NavMeshToLOSGridMap.SetAt(spmesh.m_pObject->iFormID, pgrid_2);
@@ -233,24 +233,24 @@ bool PathingLOSGridMap::SetSeenTrianglesFromLOSMap(NiPointer<PathingLOSMap>& asp
     }
     fPercentSeen = aspLOSMap.m_pObject->GetSeenPercent();
     Lock.UnlockWrite();
-    return 1;
+    return true;
 }
 
 bool PathingLOSGridMap::IsLocationSeen(const PathingLocation& arLocation) {
     const NavMeshInfo* pinfo = arLocation.pNavMesh;
     if (!pinfo || arLocation.GetTriangle() == 0xFFFF) {
-        return 0;
+        return false;
     }
-    PathingLOSGrid* pgrid = 0;
+    PathingLOSGrid* pgrid = nullptr;
     return NavMeshToLOSGridMap.GetAt(pinfo->NavMeshID, pgrid) && pgrid->IsLocationSeen(arLocation);
 }
 
 bool PathingLOSGridMap::SetLocationSeen(const PathingLocation& arLocation, bool abSeen) {
     const NavMeshInfo* pinfo = arLocation.pNavMesh;
     if (!pinfo || arLocation.GetTriangle() == 0xFFFF) {
-        return 0;
+        return false;
     }
-    PathingLOSGrid* pgrid = 0;
+    PathingLOSGrid* pgrid = nullptr;
     return NavMeshToLOSGridMap.GetAt(pinfo->NavMeshID, pgrid) && pgrid->SetLocationSeen(arLocation, abSeen);
 }
 
@@ -281,18 +281,18 @@ bool PathingLOSGrid::SetLocationSeen(const PathingLocation& arLocation, bool abS
         gridCells_t gridCells;
         uint16_t Triangle = arLocation.GetTriangle();
         spmesh.m_pObject->GetGridIndicesForTriangle(Triangle, &gridCells);
-        bool bresult = 0;
+        bool bresult = false;
         for (uint32_t iindex = 0; iindex < gridCells.iSize; ++iindex) {
             uint32_t uiIndex = gridCells.operator[](iindex);
             if (uiIndex < LOSGridCells.iSize &&
                 LOSGridCells.GetAt(static_cast<int32_t>(uiIndex))->SetLocationSeen(arLocation, abSeen)) {
-                bresult = 1;
+                bresult = true;
             }
         }
         return bresult;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -307,7 +307,7 @@ void PathingLOSGrid::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     NavMeshInfoMap* NavMeshInfoMap_ = TES::pInstance->GetNavMeshInfoMap();
     pNavMeshInfo = NavMeshInfoMap_->GetNavMeshInfo(v3);
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
-    LOSGridCells.SetSize(isaveGameCount, 1);
+    LOSGridCells.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         PathingLOSGridCell* v4;
         PathingLOSGridCell** plosGridCell = &LOSGridCells.operator[](i);
@@ -316,7 +316,7 @@ void PathingLOSGrid::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
             v4 = ::new (v6) PathingLOSGridCell;
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         *plosGridCell = v4;
         (*plosGridCell)->Load(apLoadGameBuffer);
@@ -353,14 +353,14 @@ void PathingLOSGrid::Setup(NavMeshInfo* a1) {
         Setup(spmesh);
     }
     else {
-        pNavMeshInfo = 0;
+        pNavMeshInfo = nullptr;
     }
 }
 
 void PathingLOSGrid::Setup(const NavMeshPtr& aspNavMesh) {
     uint32_t igridCellCount = aspNavMesh.m_pObject->GetGridCellCount();
     if (!pNavMeshInfo || LOSGridCells.iSize != igridCellCount) {
-        LOSGridCells.Clear(0);
+        LOSGridCells.Clear(false);
         LOSGridCells.SetReservedSize(igridCellCount);
         for (uint32_t i = 0; i < igridCellCount; ++i) {
             PathingLOSGridCell* v4;
@@ -371,7 +371,7 @@ void PathingLOSGrid::Setup(const NavMeshPtr& aspNavMesh) {
                 v4 = ::new (apMemory) PathingLOSGridCell(NavMeshInfo_, v3);
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             PathingLOSGridCell* a2 = v4;
             LOSGridCells.Add(a2);
@@ -385,7 +385,7 @@ bool PathingLOSGrid::SetLOSMapFromSeenTriangles(NiPointer<PathingLOSMap>& aspLOS
     for (uint32_t i = LOSGridCells.iSize; i_2 < i; i = LOSGridCells.iSize) {
         LOSGridCells.GetAt(i_2++)->SetLOSMapFromSeenTriangles(aspLOSMap);
     }
-    return 1;
+    return true;
 }
 
 bool PathingLOSGrid::SetSeenTrianglesFromLOSMap(NiPointer<PathingLOSMap>& aspLOSMap) {
@@ -393,7 +393,7 @@ bool PathingLOSGrid::SetSeenTrianglesFromLOSMap(NiPointer<PathingLOSMap>& aspLOS
     for (uint32_t i = LOSGridCells.iSize; i_2 < i; i = LOSGridCells.iSize) {
         LOSGridCells.GetAt(i_2++)->SetSeenTrianglesFromLOSMap(aspLOSMap);
     }
-    return 1;
+    return true;
 }
 
 bool PathingLOSGrid::IsLocationSeen(const PathingLocation& arLocation) {
@@ -409,7 +409,7 @@ bool PathingLOSGrid::IsLocationSeen(const PathingLocation& arLocation) {
         return IsLocationSeen;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -430,11 +430,11 @@ bool PathingLOSGridCell::SetLOSMapFromSeenTriangles(NiPointer<PathingLOSMap>& as
     const BSSimpleArray<uint16_t, 1024>* ptriangles;
     char* pdestArray = aspLOSMap.m_pObject->GetArrayForNavMesh(pNavMeshInfo->NavMeshID);
     if (!pdestArray) {
-        return 0;
+        return false;
     }
     NavMeshPtr spmesh;
     if (pNavMeshInfo->GetNavMesh(spmesh) &&
-        (ptriangles = spmesh.m_pObject->GetTrianglesForGridCell(iNavMeshGridCellIndex)) != 0) {
+        (ptriangles = spmesh.m_pObject->GetTrianglesForGridCell(iNavMeshGridCellIndex)) != nullptr) {
         if (SeenTriangleList.IsEmpty()) {
             if (bAllSeen) {
                 for (uint32_t i_2 = 0; i_2 < ptriangles->iSize; ++i_2) {
@@ -458,10 +458,10 @@ bool PathingLOSGridCell::SetLOSMapFromSeenTriangles(NiPointer<PathingLOSMap>& as
                 pdestArray[ptriangles->GetAt(static_cast<int32_t>(i))] = *pseen;
             }
         }
-        return 1;
+        return true;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -470,35 +470,35 @@ bool PathingLOSGridCell::SetSeenTrianglesFromLOSMap(NiPointer<PathingLOSMap>& as
     const BSSimpleArray<uint16_t, 1024>* ptriangles;
     char* psrcArray = aspLOSMap.m_pObject->GetArrayForNavMesh(pNavMeshInfo->NavMeshID);
     if (!psrcArray) {
-        return 0;
+        return false;
     }
     NavMeshPtr spmesh;
     if (pNavMeshInfo->GetNavMesh(spmesh) &&
-        (ptriangles = spmesh.m_pObject->GetTrianglesForGridCell(iNavMeshGridCellIndex)) != 0) {
-        SeenTriangleList.Clear(0);
+        (ptriangles = spmesh.m_pObject->GetTrianglesForGridCell(iNavMeshGridCellIndex)) != nullptr) {
+        SeenTriangleList.Clear(false);
         uint32_t FormFlags = ptriangles->iSize;
-        SeenTriangleList.SetSize(FormFlags, 1);
-        bAllSeen = 1;
+        SeenTriangleList.SetSize(FormFlags, true);
+        bAllSeen = true;
         for (uint32_t i = 0; i < ptriangles->iSize; ++i) {
             int32_t itriangle = ptriangles->GetAt(static_cast<int32_t>(i));
             SeenTriangleList.GetAt(static_cast<int32_t>(i)) = psrcArray[itriangle];
             if (SeenTriangleList.GetAt(static_cast<int32_t>(i)) <= 0 ||
                 SeenTriangleList.GetAt(static_cast<int32_t>(i)) == 127) {
-                bAllSeen = 0;
+                bAllSeen = false;
             }
         }
         if (bAllSeen) {
-            SeenTriangleList.Clear(1);
+            SeenTriangleList.Clear(true);
         }
-        return 1;
+        return true;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
 void PathingLOSGridCell::Setup(NavMeshInfo* apNavMeshInfo, uint32_t aiGridIndex) {
-    bAllSeen = (bool)0;
+    bAllSeen = false;
     pNavMeshInfo = apNavMeshInfo;
     iNavMeshGridCellIndex = aiGridIndex;
 }
@@ -506,7 +506,7 @@ void PathingLOSGridCell::Setup(NavMeshInfo* apNavMeshInfo, uint32_t aiGridIndex)
 bool PathingLOSGridCell::SetLocationSeen(const PathingLocation& arLocation, bool abSeen) {
     NavMeshPtr spmesh;
     if (!pNavMeshInfo->GetNavMesh(spmesh)) {
-        return 0;
+        return false;
     }
     const BSSimpleArray<uint16_t, 1024>* ptriangles = spmesh.m_pObject->GetTrianglesForGridCell(iNavMeshGridCellIndex);
     if (!bAllSeen) {
@@ -515,15 +515,15 @@ bool PathingLOSGridCell::SetLocationSeen(const PathingLocation& arLocation, bool
                 int32_t striangle = ptriangles->GetAt(static_cast<int32_t>(i));
                 if (striangle == arLocation.GetTriangle()) {
                     SeenTriangleList.GetAt(static_cast<int32_t>(i)) = abSeen ? 1 : -1;
-                    return 1;
+                    return true;
                 }
             }
         }
-        return 0;
+        return false;
     }
     if (!abSeen) {
-        bAllSeen = 0;
-        SeenTriangleList.SetSize(ptriangles->iSize, 1);
+        bAllSeen = false;
+        SeenTriangleList.SetSize(ptriangles->iSize, true);
         for (uint32_t i = 0; i < ptriangles->iSize; ++i) {
             int32_t striangle = ptriangles->GetAt(static_cast<int32_t>(i));
             if (striangle == arLocation.GetTriangle()) {
@@ -534,7 +534,7 @@ bool PathingLOSGridCell::SetLocationSeen(const PathingLocation& arLocation, bool
             }
         }
     }
-    return 1;
+    return true;
 }
 
 uint32_t PathingLOSGridCell::Load(BGSLoadGameBuffer* a1) {
@@ -543,7 +543,7 @@ uint32_t PathingLOSGridCell::Load(BGSLoadGameBuffer* a1) {
     uint32_t result = bAllSeen;
     if (!bAllSeen) {
         uint32_t auiNewSize = a1->LoadVariableSizedValue();
-        SeenTriangleList.SetSize(auiNewSize, 1);
+        SeenTriangleList.SetSize(auiNewSize, true);
         for (uint32_t aiIndex = 0;; ++aiIndex) {
             result = aiIndex;
             if (aiIndex >= auiNewSize) {
@@ -558,7 +558,7 @@ uint32_t PathingLOSGridCell::Load(BGSLoadGameBuffer* a1) {
 
 bool PathingLOSGridCell::IsLocationSeen(const PathingLocation& arLocation) {
     if (bAllSeen) {
-        return 1;
+        return true;
     }
     NavMeshPtr spmesh;
     if (pNavMeshInfo->GetNavMesh(spmesh)) {
@@ -574,7 +574,7 @@ bool PathingLOSGridCell::IsLocationSeen(const PathingLocation& arLocation) {
             }
         }
     }
-    return 0;
+    return false;
 }
 
 void PathingLOSGridCell::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {

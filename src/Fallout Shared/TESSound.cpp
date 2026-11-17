@@ -185,14 +185,14 @@ bool TESSound::Compare(TESForm* apCompare) {
     int32_t i;
     TESSound* v5 = dynamic_cast<TESSound*>(apCompare);
     if (!v5) {
-        return (bool)1;
+        return true;
     }
     if (((uint8_t)v5->cRandomPercentChance) != ((uint8_t)cRandomPercentChance)) {
-        return (bool)1;
+        return true;
     }
     for (i = 0; i < 5; ++i) {
         if (v5->data.pAttenuationCurve[i] != data.pAttenuationCurve[i]) {
-            return (bool)1;
+            return true;
         }
     }
     return (
@@ -221,7 +221,7 @@ const char* TESSound::GetFormEditorID() {
 
 bool TESSound::SetFormEditorID(const char* apEditorID) {
     strEditorID.Set(apEditorID, 0u);
-    return 1;
+    return true;
 }
 
 char TESSound::GetRandomPercentChance() {
@@ -287,7 +287,7 @@ void TESSound::GenerateDefaultObjects() {
 }
 
 TESSound* TESSound::FindSoundByFilename(const char* apFilename) {
-    TESSound* pretsound = 0;
+    TESSound* pretsound = nullptr;
     if (apFilename) {
         for (BSSimpleList<TESSound*>* plist = pDataHandler->GetSoundList(); plist && !plist->IsEmpty();
              plist = plist->m_pkNext) {
@@ -322,12 +322,12 @@ bool TESSound::PickRandomFilename(char* pPath) {
         pfilenameList = FileFinder::BuildFileList(wavPath, Dst, 8u, nullptr);
     }
     if (!pfilenameList) {
-        return 0;
+        return false;
     }
     uint32_t icount = pfilenameList->ItemsInList();
     if (!icount) {
         delete pfilenameList;
-        return 0;
+        return false;
     }
     int32_t irandVal = Random() % icount;
     if (icount > 1) {
@@ -355,7 +355,7 @@ bool TESSound::PickRandomFilename(char* pPath) {
     }
     pfilenameList->RemoveAll();
     delete pfilenameList;
-    return 1;
+    return true;
 }
 
 // Both bounds are tested signed.

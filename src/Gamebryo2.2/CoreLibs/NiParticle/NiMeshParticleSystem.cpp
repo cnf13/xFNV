@@ -37,7 +37,7 @@ NiObject* NiMeshParticleSystem::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject_2) NiMeshParticleSystem;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fTime = m_fTime;
@@ -250,7 +250,7 @@ NiObject* NiMeshParticleSystem::CreateObject() {
     NiMeshParticleSystem* pkObject =
         static_cast<NiMeshParticleSystem*>(NiMemObject::operator new(sizeof(NiMeshParticleSystem)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiMeshParticleSystem;
 }

@@ -10,7 +10,7 @@
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiRTTI BSRangeNode::ms_RTTI("BSRangeNode", &BSNiNode::ms_RTTI);
 
@@ -138,6 +138,6 @@ NiObject* BSRangeNode::CreateObject() {
         return ::new (apMemory) BSRangeNode;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

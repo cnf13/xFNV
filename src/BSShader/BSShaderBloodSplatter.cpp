@@ -45,7 +45,7 @@ BSShaderBloodSplatter::BSShaderBloodSplatter() {
     BSShaderBloodSplatter::Constant::LightLoc.z = 0.0f;
     BSShaderBloodSplatter::Constant::LightLoc.w = 0.1f;
     BSShaderManager::GetTexture(
-        "Textures\\Effects\\WhiteFlash.dds", 1, BSShaderBloodSplatter::spDefaultFlareTexture, 1, 0
+        "Textures\\Effects\\WhiteFlash.dds", true, BSShaderBloodSplatter::spDefaultFlareTexture, true, false
     );
 }
 
@@ -122,7 +122,7 @@ void BSShaderBloodSplatter::SetupGeometryConstants(const NiPropertyState* apStat
     }
     NiGeometryBufferData* pbufferData = pgeometry->m_spModelData.m_pObject->m_pkBuffData;
     const NiSkinInstance* pskin = pgeometry->m_spSkinInstance.m_pObject;
-    m_pkD3DRenderer->SetModelTransform(pgeometry->m_kWorld, 0);
+    m_pkD3DRenderer->SetModelTransform(pgeometry->m_kWorld, false);
     // The geometry's shader property: its fade alpha source times its alpha.
     BSShaderBloodSplatterProperty* pprop =
         static_cast<BSShaderBloodSplatterProperty*>(apState->m_aspProps[3].m_pObject);
@@ -137,7 +137,8 @@ void BSShaderBloodSplatter::SetupGeometryConstants(const NiPropertyState* apStat
         NiD3DPixelShader* v10 = NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject;
         if (v10) {
             m_pObject->SetShaderConstants(
-                v10, pgeometry, pskin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *pWorldBound, 0, 1
+                v10, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *pWorldBound, 0,
+                true
             );
         }
     }
@@ -146,7 +147,8 @@ void BSShaderBloodSplatter::SetupGeometryConstants(const NiPropertyState* apStat
         NiD3DVertexShader* v11 = NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject;
         if (v11) {
             v6->SetShaderConstants(
-                v11, pgeometry, pskin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *pWorldBound, 0, 1
+                v11, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *pWorldBound, 0,
+                true
             );
         }
     }
@@ -256,7 +258,7 @@ bool BSShaderBloodSplatter::LoadStagesAndPasses() {
     for (uint32_t i = 0; i < 2; ++i) {
         NiPointer<NiD3DTextureStage> spTexStage;
         NiD3DTextureStage::CreateNewStage(spTexStage);
-        BSShader::SetupDefaultStage(spTexStage.m_pObject, i, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(spTexStage.m_pObject, i, 3u, 2u, true);
         spTexStage.m_pObject->SetFilterMode(NiTexturingProperty::FILTER_BILERP);
         spPass->m_pObject->SetStage(spPass->m_pObject->m_uiCurrentStage, spTexStage.m_pObject);
     }
@@ -264,26 +266,26 @@ bool BSShaderBloodSplatter::LoadStagesAndPasses() {
     if (!spPass->m_pObject->m_pkRenderStateGroup) {
         v5->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v5->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+    v5->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
     NiD3DPass* v6 = spPass->m_pObject;
     if (!spPass->m_pObject->m_pkRenderStateGroup) {
         v6->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v6->m_pkRenderStateGroup->SetRenderState(7u, 0, 1);
+    v6->m_pkRenderStateGroup->SetRenderState(7u, 0, true);
     NiD3DPass* v7 = spPass->m_pObject;
     if (!spPass->m_pObject->m_pkRenderStateGroup) {
         v7->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v7->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+    v7->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
     NiD3DPass* v8 = spPass->m_pObject;
     if (!spPass->m_pObject->m_pkRenderStateGroup) {
         v8->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v8->m_pkRenderStateGroup->SetRenderState(19u, 1u, 1);
+    v8->m_pkRenderStateGroup->SetRenderState(19u, 1u, true);
     if (!v8->m_pkRenderStateGroup) {
         v8->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v8->m_pkRenderStateGroup->SetRenderState(20u, 3u, 1);
+    v8->m_pkRenderStateGroup->SetRenderState(20u, 3u, true);
     NiD3DPass* v9 = spPass->m_pObject;
     NiD3DVertexShader* v10 = spVertexShader[0].m_pObject;
     NiD3DVertexShader* v11 = spPass->m_pObject->m_spVertexShader.m_pObject;
@@ -304,7 +306,7 @@ bool BSShaderBloodSplatter::LoadStagesAndPasses() {
     for (uint32_t j = 0; j < 2; ++j) {
         NiPointer<NiD3DTextureStage> aspD3DTextureStage;
         NiD3DTextureStage::CreateNewStage(aspD3DTextureStage);
-        BSShader::SetupDefaultStage(aspD3DTextureStage.m_pObject, j, 3u, 2u, 1);
+        BSShader::SetupDefaultStage(aspD3DTextureStage.m_pObject, j, 3u, 2u, true);
         aspD3DTextureStage.m_pObject->SetFilterMode(NiTexturingProperty::FILTER_BILERP);
         (*p_m_pObject)->SetStage((*p_m_pObject)->m_uiCurrentStage, aspD3DTextureStage.m_pObject);
     }
@@ -312,32 +314,32 @@ bool BSShaderBloodSplatter::LoadStagesAndPasses() {
     if (!(*p_m_pObject)->m_pkRenderStateGroup) {
         v19->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v19->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+    v19->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
     NiD3DPass* v20 = *p_m_pObject;
     if (!(*p_m_pObject)->m_pkRenderStateGroup) {
         v20->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v20->m_pkRenderStateGroup->SetRenderState(7u, 0, 1);
+    v20->m_pkRenderStateGroup->SetRenderState(7u, 0, true);
     NiD3DPass* v21 = *p_m_pObject;
     if (!(*p_m_pObject)->m_pkRenderStateGroup) {
         v21->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v21->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+    v21->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
     NiD3DPass* v22 = *p_m_pObject;
     if (!(*p_m_pObject)->m_pkRenderStateGroup) {
         v22->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v22->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+    v22->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
     if (!v22->m_pkRenderStateGroup) {
         v22->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v22->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+    v22->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
     NiD3DVertexShader* v23 = this->spVertexShader[1].m_pObject;
     (*p_m_pObject)->m_spVertexShader = v23;
     NiD3DPass* v26 = *p_m_pObject;
     NiD3DPixelShader* v27 = this->spPixelShader[1].m_pObject;
     v26->m_spPixelShader = v27;
-    return 1;
+    return true;
 }
 
 void BSShaderBloodSplatter::SetFlareMult(float afFlareMult) {
@@ -420,7 +422,7 @@ void BSShaderBloodSplatter::ComputeScreenSpaceLightLoc(NiCamera* apCamera) {
 }
 
 BSShader* BSShaderBloodSplatter::CreateShader() {
-    BSShaderBloodSplatter* v0 = 0;
+    BSShaderBloodSplatter* v0 = nullptr;
     NiDX9ShaderDeclaration* v1 = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 2u, 1u);
     v1->SetEntry(0u, 0u, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0u);
     v1->SetEntry(1u, 7u, NiShaderDeclaration::SHADERPARAM_NI_TEXCOORD0, NiShaderDeclaration::SPTYPE_FLOAT2, 0u);

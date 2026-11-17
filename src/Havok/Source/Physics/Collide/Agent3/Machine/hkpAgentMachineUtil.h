@@ -4,7 +4,7 @@ class hkpAgentNnTrack;
 class hkpCollisionInput;
 class hkStatisticsCollector;
 
-typedef void hkpAgentData;
+using hkpAgentData = void;
 
 // Havok's static helpers reporting the agents of Nn and 1n tracks to a statistics collector (calcNnStatistics,
 // calcNnStatisticsContactMgrsOnly, calc1nStatistics). No data.

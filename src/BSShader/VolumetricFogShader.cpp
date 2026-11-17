@@ -49,7 +49,7 @@ bool VolumetricFogShader::Initialize() {
             if (m_pObject->m_uiRefCount-- == 1) {
                 m_pObject->ReturnPassToPool();
             }
-            spPass->m_pObject = 0;
+            spPass->m_pObject = nullptr;
         }
         ++spPass;
         --v3;
@@ -206,7 +206,7 @@ bool VolumetricFogShader::LoadStagesAndPasses() {
                 NiD3DPass::CreateNewPass(v1->VolumetricFogShader::spPass[v2]);
                 NiPointer<NiD3DTextureStage> aspD3DTextureStage;
                 NiD3DTextureStage::CreateNewStage(aspD3DTextureStage);
-                BSShader::SetupDefaultStage(aspD3DTextureStage.m_pObject, 0, 3u, 2u, 1);
+                BSShader::SetupDefaultStage(aspD3DTextureStage.m_pObject, 0, 3u, 2u, true);
                 aspD3DTextureStage.m_pObject->SetFilterMode(NiTexturingProperty::FILTER_NEAREST);
                 (*p_m_pObject)->SetStage((*p_m_pObject)->m_uiCurrentStage, aspD3DTextureStage.m_pObject);
             }
@@ -230,42 +230,42 @@ bool VolumetricFogShader::LoadStagesAndPasses() {
             if (!(*p_m_pObject)->m_pkRenderStateGroup) {
                 v14->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v14->m_pkRenderStateGroup->SetRenderState(168u, 15u, 1);
+            v14->m_pkRenderStateGroup->SetRenderState(168u, 15u, true);
             NiD3DPass* v15 = *p_m_pObject;
             if (!(*p_m_pObject)->m_pkRenderStateGroup) {
                 v15->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v15->m_pkRenderStateGroup->SetRenderState(7u, 0, 1);
+            v15->m_pkRenderStateGroup->SetRenderState(7u, 0, true);
             NiD3DPass* v16 = *p_m_pObject;
             if (!(*p_m_pObject)->m_pkRenderStateGroup) {
                 v16->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v16->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+            v16->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
             NiD3DPass* v17 = *p_m_pObject;
             if (!(*p_m_pObject)->m_pkRenderStateGroup) {
                 v17->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v17->m_pkRenderStateGroup->SetRenderState(23u, 8u, 1);
+            v17->m_pkRenderStateGroup->SetRenderState(23u, 8u, true);
             NiD3DPass* v18 = *p_m_pObject;
             if (!(*p_m_pObject)->m_pkRenderStateGroup) {
                 v18->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v18->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+            v18->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
             NiD3DPass* v19 = *p_m_pObject;
             if (!(*p_m_pObject)->m_pkRenderStateGroup) {
                 v19->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v19->m_pkRenderStateGroup->SetRenderState(19u, 2u, 1);
+            v19->m_pkRenderStateGroup->SetRenderState(19u, 2u, true);
             if (!v19->m_pkRenderStateGroup) {
                 v19->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v19->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+            v19->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
             if (v2 == 1) {
                 NiD3DPass* v20 = v1->VolumetricFogShader::spPass[1].m_pObject;
                 if (!v20->m_pkRenderStateGroup) {
                     v20->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v20->m_pkRenderStateGroup->SetRenderState(22u, 3u, 1);
+                v20->m_pkRenderStateGroup->SetRenderState(22u, 3u, true);
             }
             else {
                 if (v2) {
@@ -274,7 +274,7 @@ bool VolumetricFogShader::LoadStagesAndPasses() {
                         if (!v22->m_pkRenderStateGroup) {
                             v22->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                         }
-                        v22->m_pkRenderStateGroup->SetRenderState(22u, 1u, 1);
+                        v22->m_pkRenderStateGroup->SetRenderState(22u, 1u, true);
                     }
                 }
                 else {
@@ -282,43 +282,43 @@ bool VolumetricFogShader::LoadStagesAndPasses() {
                     if (!v21->m_pkRenderStateGroup) {
                         v21->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                     }
-                    v21->m_pkRenderStateGroup->SetRenderState(22u, 2u, 1);
+                    v21->m_pkRenderStateGroup->SetRenderState(22u, 2u, true);
                 }
             }
             NiD3DPass* v23 = *p_m_pObject;
             if (!(*p_m_pObject)->m_pkRenderStateGroup) {
                 v23->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v23->m_pkRenderStateGroup->SetRenderState(52u, 1u, 1);
+            v23->m_pkRenderStateGroup->SetRenderState(52u, 1u, true);
             NiD3DPass* v24 = *p_m_pObject;
             if (!(*p_m_pObject)->m_pkRenderStateGroup) {
                 v24->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v24->m_pkRenderStateGroup->SetRenderState(56u, 8u, 1);
+            v24->m_pkRenderStateGroup->SetRenderState(56u, 8u, true);
             NiD3DPass* v25 = *p_m_pObject;
             if (!(*p_m_pObject)->m_pkRenderStateGroup) {
                 v25->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v25->m_pkRenderStateGroup->SetRenderState(57u, 1u, 1);
+            v25->m_pkRenderStateGroup->SetRenderState(57u, 1u, true);
             NiD3DPass* v26 = *p_m_pObject;
             if (!(*p_m_pObject)->m_pkRenderStateGroup) {
                 v26->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v26->m_pkRenderStateGroup->SetRenderState(55u, 3u, 1);
+            v26->m_pkRenderStateGroup->SetRenderState(55u, 3u, true);
             NiD3DPass* v27 = *p_m_pObject;
             if (!v27->m_pkRenderStateGroup) {
                 v27->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v27->m_pkRenderStateGroup->SetRenderState(54u, 3u, 1);
+            v27->m_pkRenderStateGroup->SetRenderState(54u, 3u, true);
         }
         v31 = ++v2;
     }
     while (v2 < 3);
-    return 1;
+    return true;
 }
 
 BSShader* VolumetricFogShader::CreateShader() {
-    VolumetricFogShader* v0 = 0;
+    VolumetricFogShader* v0 = nullptr;
     NiDX9ShaderDeclaration* v1 = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 2u, 1u);
     v1->SetEntry(0u, 0u, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0u);
     v1->GetD3DDeclaration();

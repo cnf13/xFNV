@@ -195,7 +195,7 @@ hkBool* hkpKdTreeCollidableRaycaster::addMidPhaseHit(hkBool* arResult, hkPrimiti
 }
 
 hkBool* hkpKdTreeCollidableRaycaster::hasHit(hkBool* arResult) {
-    arResult->m_bool = m_output->m_rootCollidable != 0;
+    arResult->m_bool = m_output->m_rootCollidable != nullptr;
     return arResult;
 }
 

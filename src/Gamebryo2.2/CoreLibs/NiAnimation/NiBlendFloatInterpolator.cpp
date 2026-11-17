@@ -32,7 +32,7 @@ NiObject* NiBlendFloatInterpolator::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject) NiBlendFloatInterpolator;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fFloatValue = m_fFloatValue;
@@ -140,7 +140,7 @@ NiObject* NiBlendFloatInterpolator::CreateObject() {
     NiBlendFloatInterpolator* pkObject =
         static_cast<NiBlendFloatInterpolator*>(NiMemObject::operator new(sizeof(NiBlendFloatInterpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     ::new (pkObject) NiBlendFloatInterpolator;
     return pkObject;

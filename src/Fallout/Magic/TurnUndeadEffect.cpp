@@ -75,11 +75,11 @@ bool TurnUndeadEffect::CheckTarget(MagicTarget* apTarget) {
         TargetAsActor = apTarget->GetTargetAsActor();
     }
     else {
-        TargetAsActor = 0;
+        TargetAsActor = nullptr;
     }
     bool result = false;
     if (TargetAsActor) {
-        if (!TargetAsActor->IsDead(0) && !TargetAsActor->IsDying()) {
+        if (!TargetAsActor->IsDead(false) && !TargetAsActor->IsDying()) {
             float afMagnitude = GetMagnitude();
             uint16_t Level = TargetAsActor->GetLevel();
             if (MagicFormulas::CheckTargetLevelMagnitude(Level, afMagnitude) &&
@@ -98,19 +98,19 @@ void TurnUndeadEffect::Start() {
         ptargetActor = pTarget->GetTargetAsActor();
     }
     else {
-        ptargetActor = 0;
+        ptargetActor = nullptr;
     }
     if (pCaster) {
         pcasterActor = pCaster->GetCasterAsActor();
     }
     else {
-        pcasterActor = 0;
+        pcasterActor = nullptr;
     }
     if (ptargetActor) {
         if (pcasterActor) {
             if (ptargetActor->GetCombatController()) {
                 ptargetActor->GetCombatController()->ForceFlee(pcasterActor, 0);
-                bTurned = 1;
+                bTurned = true;
             }
         }
     }
@@ -144,8 +144,8 @@ void TurnUndeadEffect::Finish() {
                     if (targetAsActor->MobileObject::GetCurrentAIProcess()) {
                         currentAIProcess = targetAsActor->MobileObject::GetCurrentAIProcess();
                         currentAIProcess->EnterCombat(
-                            targetAsActor, casterAsActor, (bool)1, (bool)0, nullptr, (bool)0, (bool)0, (bool)0, (bool)0,
-                            (bool)0, (bool)0, (bool)1, nullptr
+                            targetAsActor, casterAsActor, true, false, nullptr, false, false, false, false, false,
+                            false, true, nullptr
                         );
                     }
                 }

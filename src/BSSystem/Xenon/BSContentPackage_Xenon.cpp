@@ -1,6 +1,6 @@
 #include "BSSystem/BSContentPackage.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 char _10A47B3;
 

@@ -123,7 +123,7 @@ void NiDynamicGeometryGroup::AddObject(
             pkBuffData = ::new (v4) NiGeometryBufferData;
         }
         else {
-            pkBuffData = 0;
+            pkBuffData = nullptr;
         }
         pkBuffData->m_eType = static_cast<D3DPRIMITIVETYPE>((apPartition->m_usStrips != 0) + D3DPT_TRIANGLELIST);
         apPartition->m_pkBuffData = pkBuffData;
@@ -138,7 +138,7 @@ void NiDynamicGeometryGroup::AddObject(
             pkBuffData = ::new (v6) NiGeometryBufferData;
         }
         else {
-            pkBuffData = 0;
+            pkBuffData = nullptr;
         }
         const NiRTTI* v7 = apData->GetRTTI();
         if (v7) {
@@ -189,7 +189,7 @@ void NiDynamicGeometryGroup::RemoveObject(NiScreenTexture* apScreenTexture) {
             std::memset(m_ppkVBChip, 0, sizeof(NiVBChip*) * pkBuffData->m_uiStreamCount);
         }
         delete pkBuffData;
-        apScreenTexture->m_pkBuffData = 0;
+        apScreenTexture->m_pkBuffData = nullptr;
     }
 }
 
@@ -202,7 +202,7 @@ void NiDynamicGeometryGroup::RemoveObject(NiSkinPartition::Partition* apPartitio
             std::memset(m_ppkVBChip, 0, sizeof(NiVBChip*) * m_pkBuffData->m_uiStreamCount);
         }
         delete m_pkBuffData;
-        apPartition->m_pkBuffData = 0;
+        apPartition->m_pkBuffData = nullptr;
     }
 }
 
@@ -224,7 +224,7 @@ void NiDynamicGeometryGroup::RemoveObject(NiGeometryData* apData) {
 NiVBChip* NiDynamicGeometryGroup::CreateChip(NiGeometryBufferData* pkBuffData, uint32_t uiStream) {
     uint32_t uiNumStreams = pkBuffData->m_uiStreamCount;
     uint32_t uiFVF = pkBuffData->m_uiFVF;
-    NiVBChip* pkChip = 0;
+    NiVBChip* pkChip = nullptr;
     uint32_t uiVertexStride;
     if (uiStream >= uiNumStreams) {
         uiVertexStride = 0;
@@ -236,7 +236,7 @@ NiVBChip* NiDynamicGeometryGroup::CreateChip(NiGeometryBufferData* pkBuffData, u
     uint32_t uiOffset = 0;
     uint32_t uiFlags = 0;
     if (uiNumStreams <= 1) {
-        NiVBDynamicSet* pkSet = 0;
+        NiVBDynamicSet* pkSet = nullptr;
         uint32_t uiIndex;
         if (uiFVF) {
             uiIndex = uiFVF;
@@ -257,7 +257,7 @@ NiVBChip* NiDynamicGeometryGroup::CreateChip(NiGeometryBufferData* pkBuffData, u
             pkChip->m_uiSize = uiSize;
         }
         else {
-            pkChip = NiVBChip::Create(0, pkVB, uiOffset, uiSize, 0);
+            pkChip = NiVBChip::Create(nullptr, pkVB, uiOffset, uiSize, 0);
             m_kChips.SetAt(uiIndex, pkChip);
         }
         pkChip->m_pkDynamicSet = pkSet;
@@ -287,7 +287,7 @@ NiVBChip* NiDynamicGeometryGroup::CreateChip(NiGeometryBufferData* pkBuffData, u
             pkMultiChip->m_uiSize = uiSize;
         }
         else {
-            pkMultiChip = NiVBChip::Create(0, pkVB, uiOffset, uiSize, 0);
+            pkMultiChip = NiVBChip::Create(nullptr, pkVB, uiOffset, uiSize, 0);
             pkChip = pkMultiChip;
             m_kMultiStreamChips.SetAt(m_uiNextIndex, pkChip);
         }
@@ -304,10 +304,10 @@ void NiDynamicGeometryGroup::ReleaseChip(NiGeometryBufferData* pkBuffData, uint3
         NiVBChip* v3 = pkBuffData->m_ppkVBChip[uiStream];
         if (v3) {
             if (v3->GetVB()) {
-                v3->m_pkVB = 0;
+                v3->m_pkVB = nullptr;
             }
             if (uiStream < pkBuffData->m_uiStreamCount) {
-                pkBuffData->m_ppkVBChip[uiStream] = 0;
+                pkBuffData->m_ppkVBChip[uiStream] = nullptr;
             }
         }
     }
@@ -329,14 +329,14 @@ NiVBDynamicSet*
 NiVBDynamicSet::Create(uint32_t uiBlockSize, IDirect3DDevice9* pkD3DDevice, uint32_t uiFVF, uint32_t uiIndex) {
     NiVBDynamicSet* pkSet = static_cast<NiVBDynamicSet*>(NiMemObject::operator new(sizeof(NiVBDynamicSet)));
     if (!pkSet) {
-        return 0;
+        return nullptr;
     }
     uint32_t v5 = uiBlockSize;
     pkSet->m_uiIndex = 0;
     pkSet->m_uiFVF = 0;
     pkSet->m_uiBlockSize = 0;
-    pkSet->m_pkD3DDevice = 0;
-    pkSet->m_pkVB = 0;
+    pkSet->m_pkD3DDevice = nullptr;
+    pkSet->m_pkVB = nullptr;
     if ((uiBlockSize & 15) != 0) {
         v5 = (uiBlockSize & 0xFFFFFFF0u) + 32;
     }
@@ -350,7 +350,7 @@ NiVBDynamicSet::Create(uint32_t uiBlockSize, IDirect3DDevice9* pkD3DDevice, uint
         pkD3DDevice->AddRef();
     }
     else {
-        pkSet->m_pkD3DDevice = 0;
+        pkSet->m_pkD3DDevice = nullptr;
     }
     pkSet->m_uiFVF = uiFVF;
     pkSet->m_uiIndex = uiIndex;

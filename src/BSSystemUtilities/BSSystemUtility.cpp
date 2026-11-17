@@ -14,14 +14,14 @@
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 void DestroySteamAwardsUtility() {
     if (BSSteamAwardsSystemUtility::m_pInstance) {
         BSSteamAwardsSystemUtility* Block = BSSteamAwardsSystemUtility::m_pInstance;
         BSSteamAwardsSystemUtility::m_pInstance->~BSSteamAwardsSystemUtility();
         MemoryManager_Singleton.Deallocate(Block);
-        BSSteamAwardsSystemUtility::m_pInstance = 0;
+        BSSteamAwardsSystemUtility::m_pInstance = nullptr;
     }
 }
 
@@ -35,7 +35,7 @@ void DestroyDLCUtility() {
         BSDLCSystemUtility* Block = BSDLCSystemUtility::pSingleton;
         BSDLCSystemUtility::pSingleton->~BSDLCSystemUtility();
         MemoryManager_Singleton.Deallocate(Block);
-        BSDLCSystemUtility::pSingleton = 0;
+        BSDLCSystemUtility::pSingleton = nullptr;
     }
 }
 
@@ -104,10 +104,10 @@ void BSSystemUtility::Destroy() {
     BSCacheDriveSystemUtility* v1 = BSCacheDriveSystemUtility::GetSingleton();
     v1->Destroy();
     std::memset(cTitle, 0, sizeof(cTitle));
-    bLostFocus = 0;
+    bLostFocus = false;
     eRegion = SYSUTIL_REGION_UNKNOWN;
-    pEventNotificationCallback = 0;
-    pFocusNotificationCallback = 0;
+    pEventNotificationCallback = nullptr;
+    pFocusNotificationCallback = nullptr;
 }
 
 void BSSystemUtility::Update() {

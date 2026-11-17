@@ -279,7 +279,7 @@ void FalloutRadio::StationState::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
             v2 = ::new (apMemory) Conversation;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         pConvo = v2;
         pConvo->LoadGameBGS(static_cast<BGSLoadFormBuffer*>(apLoadGameBuffer));
@@ -319,7 +319,7 @@ void FalloutRadio::StationState::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
         }
     }
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount, isaveGameBufferPos);
-    bhasConvo = pConvo != 0;
+    bhasConvo = pConvo != nullptr;
     apSaveGameBuffer->SaveDataEndian(reinterpret_cast<char*>(&bhasConvo), 1u, 0);
     if (bhasConvo) {
         pConvo->SaveGameBGS(static_cast<BGSSaveFormBuffer*>(apSaveGameBuffer));
@@ -331,15 +331,15 @@ void FalloutRadio::StationState::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffe
         pConvo->InitItem(apLoadGameBuffer);
     }
     BSSimpleList<FalloutRadio::FORadioReceiver*>* plist = &StationUsers;
-    BSSimpleList<FalloutRadio::FORadioReceiver*>* plastList = 0;
+    BSSimpleList<FalloutRadio::FORadioReceiver*>* plastList = nullptr;
     while (plist && !plist->IsEmpty()) {
         bool bremove;
         FalloutRadio::FORadioReceiver* preceiver = plist->m_item;
         if (preceiver) {
-            bremove = preceiver->pRadio == 0;
+            bremove = preceiver->pRadio == nullptr;
         }
         else {
-            bremove = 1;
+            bremove = true;
         }
         if (bremove) {
             if (plastList) {
@@ -367,7 +367,7 @@ void FalloutRadio::StationState::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuf
         if (pConvo) {
             delete pConvo;
         }
-        pConvo = 0;
+        pConvo = nullptr;
     }
     for (BSSimpleList<FalloutRadio::FORadioReceiver*>* users = &StationUsers;
          users && (!users->IsEmpty() && users->m_item); users = users->m_pkNext) {
@@ -379,7 +379,7 @@ void FalloutRadio::StationState::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuf
             users->m_item->Hndl.Release();
             users->m_item->StaticHndl.Stop();
             users->m_item->StaticHndl.Release();
-            users->m_item->bShouldBePlaying = 0;
+            users->m_item->bShouldBePlaying = false;
         }
     }
 }
@@ -407,7 +407,7 @@ void FalloutRadio::FORadioStation::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuf
         v3 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     pStation = v3;
     CurrentState.InitLoadGame(apLoadGameBuffer);
@@ -423,9 +423,9 @@ void FalloutRadio::FORadioStation::operator delete(void* apMemory) {
 
 bool FalloutRadio::GetBroadcastState(TESObjectREFR* apTargetStation) {
     if (FalloutRadio::bShutdown) {
-        return 0;
+        return false;
     }
-    bool bretValue = 0;
+    bool bretValue = false;
     FalloutRadio::FORadioStation* pstation =
         FalloutRadio::GetActiveStation(static_cast<BGSTalkingActivator*>(apTargetStation->GetObjectReference()));
     if (pstation) {
@@ -435,7 +435,7 @@ bool FalloutRadio::GetBroadcastState(TESObjectREFR* apTargetStation) {
 }
 
 void FalloutRadio::StartRadioConversation(TESObjectREFR* apTargetStation, TESTopic* apTopic) {
-    FalloutRadio::FORadioStation* pstation = 0;
+    FalloutRadio::FORadioStation* pstation = nullptr;
     if (!FalloutRadio::bShutdown) {
         TESTopic* ptopicToUse;
         for (FalloutRadio::FORadioStation*& rpItem : FalloutRadio::ActiveStationList.ItemsUntilNull()) {
@@ -445,7 +445,7 @@ void FalloutRadio::StartRadioConversation(TESObjectREFR* apTargetStation, TESTop
             }
         }
         if (!pstation) {
-            pstation = FalloutRadio::InitStation(apTargetStation, 0);
+            pstation = FalloutRadio::InitStation(apTargetStation, nullptr);
         }
         if (apTopic) {
             ptopicToUse = apTopic;
@@ -463,7 +463,7 @@ void FalloutRadio::StartRadioConversation(TESObjectREFR* apTargetStation, TESTop
                     }
                 }
                 if (pstation->CurrentState.IsTransmitting()) {
-                    pstation->CurrentState.SetContBroadcast(0);
+                    pstation->CurrentState.SetContBroadcast(false);
                     pstation->CurrentState.iCurrentItemDuration = 1;
                     FalloutRadio::UpdateStation(pstation);
                 }
@@ -472,8 +472,8 @@ void FalloutRadio::StartRadioConversation(TESObjectREFR* apTargetStation, TESTop
                     FalloutRadio::PipboyVoiceHndl.Release();
                     if (FalloutRadio::GetIsDialogueOnlyRadio()) {
                         FalloutAudioMedia::MediaClose();
-                        FalloutAudioMedia::MediaSetRadio(1);
-                        FalloutAudioMedia::MediaOpen(MEDIA_RADIO, 0, 1000u, 0, 0, 0.0f, 0);
+                        FalloutAudioMedia::MediaSetRadio(true);
+                        FalloutAudioMedia::MediaOpen(MEDIA_RADIO, nullptr, 1000u, false, false, 0.0f, 0);
                         FalloutAudioMedia::MediaPlay();
                     }
                 }
@@ -491,8 +491,8 @@ void FalloutRadio::StartRadioConversation(TESObjectREFR* apTargetStation, TESTop
                         FalloutRadio::PipboyVoiceHndl.Release();
                         if (FalloutRadio::GetIsDialogueOnlyRadio()) {
                             FalloutAudioMedia::MediaClose();
-                            FalloutAudioMedia::MediaSetRadio(1);
-                            FalloutAudioMedia::MediaOpen(MEDIA_RADIO, 0, 1000u, 0, 0, 0.0f, 0);
+                            FalloutAudioMedia::MediaSetRadio(true);
+                            FalloutAudioMedia::MediaOpen(MEDIA_RADIO, nullptr, 1000u, false, false, 0.0f, 0);
                             FalloutAudioMedia::MediaPlay();
                         }
                     }
@@ -503,14 +503,14 @@ void FalloutRadio::StartRadioConversation(TESObjectREFR* apTargetStation, TESTop
                     if (apThis) {
                         delete apThis;
                     }
-                    pstation->CurrentState.pConvo = 0;
+                    pstation->CurrentState.pConvo = nullptr;
                     pstation->CurrentState.iCurrentItemDuration = 1;
                 }
                 if (pstation->CurrentState.iCurrentItemDuration > 1) {
                     pstation->CurrentState.iCurrentItemDuration = 0;
                 }
                 pstation->CurrentState.iCurrentItemStartTime = BSAudio::QInstance().GetSynchTime() + 50;
-                pstation->CurrentState.SetPlayingBreakIn(1);
+                pstation->CurrentState.SetPlayingBreakIn(true);
                 pstation->CurrentState.SetContBroadcast(bwasContBroadcast);
                 FalloutRadio::RadioUpdateCriticalSection.Leave();
             }
@@ -520,7 +520,7 @@ void FalloutRadio::StartRadioConversation(TESObjectREFR* apTargetStation, TESTop
 
 void FalloutRadio::ClearInactiveReceivers(bool bRemoveAll) {
     BSSimpleList<FalloutRadio::FORadioReceiver*>* pactReceivers = &FalloutRadio::ActiveRadioList;
-    FalloutRadio::FORadioReceiver* pemitter = 0;
+    FalloutRadio::FORadioReceiver* pemitter = nullptr;
     while (pactReceivers && !pactReceivers->IsEmpty()) {
         if (pactReceivers->m_item->bShouldBePlaying && !bRemoveAll) {
             pactReceivers = pactReceivers->m_pkNext;
@@ -567,22 +567,22 @@ void FalloutRadio::UpdateStations(bool abUpdateSignals) {
                             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                                 BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_RADIO
                         );
-                        alertSound.Play(0);
+                        alertSound.Play(false);
                         const char* FullName = rpItem->GetFullName();
                         strtemp.SPrintF(sRadioStationDiscovered.operator const char*(), FullName);
                         Interface::ShowMessage(
-                            strtemp.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_radio_tower.dds", 0,
-                            2.0f, 0
+                            strtemp.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_radio_tower.dds",
+                            nullptr, 2.0f, false
                         );
                     }
                     FalloutRadio::DiscoveredStationList.AddHead(rpItem);
                 }
             }
-            FalloutRadio::bFirstUpdate = 0;
+            FalloutRadio::bFirstUpdate = false;
         }
-        NiPlane* v23 = 0;
-        NiPlane* v25 = 0;
-        bool bmatch = 0;
+        NiPlane* v23 = nullptr;
+        NiPlane* v25 = nullptr;
+        bool bmatch = false;
         float fdistance = 3.4028235e+38f;
         float v16 = 0.0f;
         float v18 = 0.0f;
@@ -592,16 +592,16 @@ void FalloutRadio::UpdateStations(bool abUpdateSignals) {
              pactStations && !pactStations->IsEmpty(); pactStations = pactStations->m_pkNext) {
             BSSimpleList<TESObjectREFR*>* stations = &stationlist;
             BSSimpleList<float>* pdistances = &stationDistances;
-            bmatch = 0;
+            bmatch = false;
             fdistance = 3.4028235e+38f;
             FalloutRadio::FORadioStation* pstation = pactStations->m_item;
             if (pstation) {
                 while (abUpdateSignals && (stations && pdistances)) {
                     BSSimpleList<TESObjectREFR*>* v2 = stations;
                     if (v2->m_item == pstation->pStation) {
-                        bmatch = 1;
+                        bmatch = true;
                         uint8_t isignalPower = 100;
-                        pstation->CurrentState.SetOutOfPBRange(0);
+                        pstation->CurrentState.SetOutOfPBRange(false);
                         fdistance = pdistances->m_item;
                         float fradioRadius = pstation->pStation->GetRadioStationRadius();
                         if (pstation->pStation->GetRadioStaticPct() != 0.0) {
@@ -618,8 +618,8 @@ void FalloutRadio::UpdateStations(bool abUpdateSignals) {
                             }
                         }
                         pstation->CurrentState.cTargetPower = isignalPower;
-                        stations = 0;
-                        pdistances = 0;
+                        stations = nullptr;
+                        pdistances = nullptr;
                     }
                     else {
                         stations = stations->m_pkNext;
@@ -627,7 +627,7 @@ void FalloutRadio::UpdateStations(bool abUpdateSignals) {
                     }
                 }
                 if (abUpdateSignals && !bmatch) {
-                    pstation->CurrentState.SetOutOfPBRange(1);
+                    pstation->CurrentState.SetOutOfPBRange(true);
                     pstation->CurrentState.cTargetPower = 0;
                 }
                 if (bmatch && FalloutRadio::pLostPipboyStation == pstation) {
@@ -638,16 +638,16 @@ void FalloutRadio::UpdateStations(bool abUpdateSignals) {
                         BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                             BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_RADIO
                     );
-                    alertSound_2.Play(0);
+                    alertSound_2.Play(false);
                     const char* v5 = pstation->pStation->GetFullName();
                     strtemp_2.SPrintF(sRadioStationDiscovered.operator const char*(), v5);
                     Interface::ShowMessage(
-                        strtemp_2.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_radio_tower.dds", 0, 2.0f,
-                        0
+                        strtemp_2.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_radio_tower.dds", nullptr,
+                        2.0f, false
                     );
-                    FalloutRadio::PipboyRadioEnable(1);
-                    FalloutRadio::TunePipboyToStation(pstation->pStation, 0);
-                    FalloutRadio::pLostPipboyStation = 0;
+                    FalloutRadio::PipboyRadioEnable(true);
+                    FalloutRadio::TunePipboyToStation(pstation->pStation, false);
+                    FalloutRadio::pLostPipboyStation = nullptr;
                 }
                 FalloutRadio::UpdateStation(pstation);
             }
@@ -658,11 +658,11 @@ void FalloutRadio::UpdateStations(bool abUpdateSignals) {
 }
 
 FalloutRadio::FORadioStation* FalloutRadio::GetActiveStation(BGSTalkingActivator* apRequestedStation) {
-    FalloutRadio::FORadioStation* preturnValue = 0;
+    FalloutRadio::FORadioStation* preturnValue = nullptr;
     BSSimpleList<FalloutRadio::FORadioStation*>* pactStations = &FalloutRadio::ActiveStationList;
     RADIO_RANGE_TYPE erangeType = RADIO_RANGE_RADIUS;
     if (FalloutRadio::bShutdown) {
-        return 0;
+        return nullptr;
     }
     while (pactStations && !pactStations->IsEmpty()) {
         if (apRequestedStation == pactStations->m_item->pStation->GetObjectReference() &&
@@ -685,13 +685,13 @@ bool FalloutRadio::SetIsDialogueOnlyRadio(bool abDialogueOnly) {
 }
 
 bool FalloutRadio::Update(bool abForceStationUpdate) {
-    bool v4 = 0;
+    bool v4 = false;
     if (!FalloutRadio::iLastRadioUpdate) {
         FalloutRadio::iLastRadioUpdate = appTimer.GetTime();
     }
     uint32_t v1 = appTimer.GetTime() - FalloutRadio::iLastRadioUpdate;
     if (v1 > iRadioUpdateInterval.UInt() && !Interface::GetLoadingMenuVisible()) {
-        v4 = 1;
+        v4 = true;
         FalloutRadio::iLastRadioUpdate = appTimer.GetTime();
     }
     if (pPlayer) {
@@ -699,12 +699,12 @@ bool FalloutRadio::Update(bool abForceStationUpdate) {
             TESObjectCELL* ParentCell = pPlayer->GetParentCell();
             if (ParentCell->GetInterior()) {
                 v4 = !FalloutRadio::bWasInInterior;
-                FalloutRadio::bWasInInterior = 1;
+                FalloutRadio::bWasInInterior = true;
             }
         }
     }
     if (abForceStationUpdate) {
-        v4 = 1;
+        v4 = true;
     }
     if ((FalloutRadio::iQueuedState & 1) != 0) {
         FalloutRadio::iRadioState &= ~2u;
@@ -717,22 +717,22 @@ bool FalloutRadio::Update(bool abForceStationUpdate) {
         }
     }
     FalloutRadio::iQueuedState = 0;
-    FalloutRadio::ClearInactiveReceivers(0);
+    FalloutRadio::ClearInactiveReceivers(false);
     if (!FalloutRadio::pRadioAttenuationModel) {
         FalloutRadio::pRadioAttenuationModel = pDataHandler->GetSound("AMLRadio");
     }
     FalloutRadio::UpdateStations(v4);
-    FalloutRadio::ClearInactiveReceivers(0);
+    FalloutRadio::ClearInactiveReceivers(false);
     FalloutRadio::iRadioState = 0;
-    return 1;
+    return true;
 }
 
 void FalloutRadio::ActivateRadio(TESObjectREFR* apRadio, bool abOn) {
     if (!FalloutRadio::bShutdown) {
         FalloutRadio::FORadioReceiver* a2[2];
-        BGSTalkingActivator* prequestedStation = 0;
+        BGSTalkingActivator* prequestedStation = nullptr;
         a2[0] = FalloutRadio::GetActiveReceiver(apRadio);
-        a2[1] = 0;
+        a2[1] = nullptr;
         char v6 = 0;
         if (!a2[0] || ((!abOn || !a2[0]->bShouldBePlaying) && (abOn || a2[0]->bShouldBePlaying))) {
             if (apRadio) {
@@ -743,7 +743,7 @@ void FalloutRadio::ActivateRadio(TESObjectREFR* apRadio, bool abOn) {
             if (prequestedStation) {
                 FalloutRadio::FORadioStation* pstation = FalloutRadio::GetActiveStation(prequestedStation);
                 if (abOn) {
-                    if (pstation || (pstation = FalloutRadio::InitStation(apRadio, 0)) != 0) {
+                    if (pstation || (pstation = FalloutRadio::InitStation(apRadio, nullptr)) != nullptr) {
                         if (!a2[0]) {
                             FalloutRadio::FORadioReceiver* pemitter;
                             FalloutRadio::FORadioReceiver* apMemory = static_cast<FalloutRadio::FORadioReceiver*>(
@@ -753,23 +753,23 @@ void FalloutRadio::ActivateRadio(TESObjectREFR* apRadio, bool abOn) {
                                 pemitter = ::new (apMemory) FalloutRadio::FORadioReceiver;
                             }
                             else {
-                                pemitter = 0;
+                                pemitter = nullptr;
                             }
                             a2[0] = pemitter;
                             v6 = 1;
                         }
                         a2[0]->pRadio = apRadio;
-                        a2[0]->bShouldBePlaying = 1;
-                        a2[0]->bJustStarted = 1;
-                        a2[0]->bIsActor = 0;
+                        a2[0]->bShouldBePlaying = true;
+                        a2[0]->bJustStarted = true;
+                        a2[0]->bIsActor = false;
                         if (v6) {
                             FalloutRadio::ActiveRadioList.AddHead(*a2);
                         }
                         pstation->CurrentState.StationUsers.AddHead(*a2);
-                        pstation->CurrentState.SetShouldBePlaying(1);
+                        pstation->CurrentState.SetShouldBePlaying(true);
                         if (pstation->CurrentState.ShouldStartPaused()) {
                             pstation->CurrentState.iCurrentItemStartTime = (&BSAudio::QInstance())->GetSynchTime() + 50;
-                            pstation->CurrentState.SetStartPaused(0);
+                            pstation->CurrentState.SetStartPaused(false);
                         }
                     }
                 }
@@ -779,8 +779,8 @@ void FalloutRadio::ActivateRadio(TESObjectREFR* apRadio, bool abOn) {
                         a2[0]->Hndl.Release();
                         a2[0]->StaticHndl.Stop();
                         a2[0]->StaticHndl.Release();
-                        a2[0]->bShouldBePlaying = 0;
-                        FalloutRadio::ClearInactiveReceivers(0);
+                        a2[0]->bShouldBePlaying = false;
+                        FalloutRadio::ClearInactiveReceivers(false);
                     }
                 }
             }
@@ -813,17 +813,17 @@ void FalloutRadio::SetBroadcastState(TESObjectREFR* apTargetStation, bool abEnab
                     FalloutRadio::PipboyVoiceHndl.Release();
                     if (!FalloutRadio::GetIsDialogueOnlyRadio()) {
                         FalloutAudioMedia::MediaClose();
-                        FalloutAudioMedia::MediaSetRadio(1);
-                        FalloutAudioMedia::MediaOpen(MEDIA_RADIO, 0, 1000u, 0, 0, 0.0f, 0);
+                        FalloutAudioMedia::MediaSetRadio(true);
+                        FalloutAudioMedia::MediaOpen(MEDIA_RADIO, nullptr, 1000u, false, false, 0.0f, 0);
                         FalloutAudioMedia::MediaPlay();
                     }
                 }
-                pstation->CurrentState.SetTransmitting(0);
+                pstation->CurrentState.SetTransmitting(false);
                 Conversation* apThis = pstation->CurrentState.pConvo;
                 if (apThis) {
                     delete apThis;
                 }
-                pstation->CurrentState.pConvo = 0;
+                pstation->CurrentState.pConvo = nullptr;
             }
             pstation->CurrentState.SetContBroadcast(abEnabled);
         }
@@ -832,20 +832,20 @@ void FalloutRadio::SetBroadcastState(TESObjectREFR* apTargetStation, bool abEnab
 }
 
 void FalloutRadio::NewCellEntered() {
-    FalloutRadio::bWasInInterior = (bool)0;
+    FalloutRadio::bWasInInterior = false;
 }
 
 void FalloutRadio::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     BSSimpleList<FalloutRadio::FORadioStation*>* plist = &FalloutRadio::ActiveStationList;
-    BSSimpleList<FalloutRadio::FORadioStation*>* plastList = 0;
+    BSSimpleList<FalloutRadio::FORadioStation*>* plastList = nullptr;
     while (plist && !plist->IsEmpty()) {
         FalloutRadio::FORadioStation* pstation = plist->m_item;
-        bool bremove = 0;
+        bool bremove = false;
         if (pstation) {
             pstation->FinishLoadGame(apLoadGameBuffer);
         }
         else {
-            bremove = 1;
+            bremove = true;
         }
         if (bremove) {
             if (plastList) {
@@ -863,17 +863,17 @@ void FalloutRadio::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     }
     FalloutRadio::PipboyRadioEnable(FalloutRadio::bPipboyRadioEnabled);
     if (FalloutRadio::pCurrentPipboyStation) {
-        FalloutRadio::PipboyUpdate(1);
+        FalloutRadio::PipboyUpdate(true);
     }
 }
 
 void FalloutRadio::Revert(BGSLoadGameBuffer* apLoadGameBuffer) {
-    FalloutRadio::pCurrentPipboyStation = 0;
-    FalloutRadio::pLostPipboyStation = 0;
+    FalloutRadio::pCurrentPipboyStation = nullptr;
+    FalloutRadio::pLostPipboyStation = nullptr;
     FalloutRadio::iLastRadioUpdate = 1;
     FalloutRadio::iAvailableStationCount = 0;
-    FalloutRadio::bPipboyRadioEnabled = 0;
-    FalloutRadio::bFirstUpdate = 1;
+    FalloutRadio::bPipboyRadioEnabled = false;
+    FalloutRadio::bFirstUpdate = true;
     FalloutRadio::cLastPipboyFilename[0] = 0;
     while (!FalloutRadio::ActiveStationList.IsEmpty()) {
         RadioEntry* m_item = (&FalloutRadio::ActiveStationList)->m_item;
@@ -911,20 +911,20 @@ void FalloutRadio::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
         }
     }
     BSSimpleList<FalloutRadio::FORadioStation*>* plist_2 = &FalloutRadio::ActiveStationList;
-    BSSimpleList<FalloutRadio::FORadioStation*>* plastList = 0;
+    BSSimpleList<FalloutRadio::FORadioStation*>* plastList = nullptr;
     while (plist_2 && !plist_2->IsEmpty()) {
         FalloutRadio::FORadioStation* pstation = plist_2->m_item;
-        bool bremove = 0;
+        bool bremove = false;
         if (pstation) {
             pstation->InitLoadGame(apLoadGameBuffer);
             if (!pstation->pStation) {
                 delete pstation;
-                pstation = 0;
-                bremove = 1;
+                pstation = nullptr;
+                bremove = true;
             }
         }
         else {
-            bremove = 1;
+            bremove = true;
         }
         if (bremove) {
             if (plastList) {
@@ -941,19 +941,19 @@ void FalloutRadio::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
         }
     }
     BSSimpleList<FalloutRadio::FORadioReceiver*>* plist_3 = &FalloutRadio::ActiveRadioList;
-    BSSimpleList<FalloutRadio::FORadioReceiver*>* plastList_2 = 0;
+    BSSimpleList<FalloutRadio::FORadioReceiver*>* plastList_2 = nullptr;
     while (plist_3 && !plist_3->IsEmpty()) {
         FalloutRadio::FORadioReceiver* preceiver_2 = plist_3->m_item;
-        bool bremove_2 = 0;
+        bool bremove_2 = false;
         if (preceiver_2) {
             if (!preceiver_2->pRadio) {
                 delete preceiver_2;
-                preceiver_2 = 0;
-                bremove_2 = 1;
+                preceiver_2 = nullptr;
+                bremove_2 = true;
             }
         }
         else {
-            bremove_2 = 1;
+            bremove_2 = true;
         }
         if (bremove_2) {
             if (plastList_2) {
@@ -981,10 +981,10 @@ void FalloutRadio::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     }
     if (apLoadGameBuffer->GetVersion() >= 10u) {
         BSSimpleList<TESObjectREFR*>* plist_4 = &FalloutRadio::DiscoveredStationList;
-        BSSimpleList<TESObjectREFR*>* plastList_3 = 0;
+        BSSimpleList<TESObjectREFR*>* plastList_3 = nullptr;
         while (plist_4 && !plist_4->IsEmpty()) {
             TESObjectREFR* pForm = plist_4->m_item;
-            bool bremove_3 = 0;
+            bool bremove_3 = false;
             if (pForm) {
                 // LoadGame left the form ID in the pointer slot, which is used as untyped storage here.
                 TESForm* FormByNumericID =
@@ -994,11 +994,11 @@ void FalloutRadio::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
                     plist_4->SetItem(pForm);
                 }
                 else {
-                    bremove_3 = 1;
+                    bremove_3 = true;
                 }
             }
             else {
-                bremove_3 = 1;
+                bremove_3 = true;
             }
             if (bremove_3) {
                 if (plastList_3) {
@@ -1052,14 +1052,14 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
     FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     NiPoint3 listenerLocation;
-    bool bsong = 0;
-    bool bleadIn = 0;
-    bool v61 = 0;
-    bool bstaticPlaying = 0;
+    bool bsong = false;
+    bool bleadIn = false;
+    bool v61 = false;
+    bool bstaticPlaying = false;
     int32_t v62 = 0;
     char v58 = 100;
-    bool bpipboyUpdated = 0;
-    bool bforcePipboyChange = 0;
+    bool bpipboyUpdated = false;
+    bool bforcePipboyChange = false;
     if (pStation) {
         if (pStation->pStation) {
             bool bdisabledStation = pStation->pStation->GetDisabled();
@@ -1071,7 +1071,7 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
             v1->GetListenerPosition(&listenerLocation);
             FalloutRadio::RadioUpdateCriticalSection.Enter("FalloutRadio::UpdateStation");
             DialogueItem* pcurrentItem =
-                pStation->CurrentState.pConvo ? pStation->CurrentState.pConvo->GetCurrentItem() : 0;
+                pStation->CurrentState.pConvo ? pStation->CurrentState.pConvo->GetCurrentItem() : nullptr;
             DialogueItem* pcurrentItem_2 = pcurrentItem;
             BSSimpleList<FalloutRadio::FORadioReceiver*>* pusers = &pStation->CurrentState.StationUsers;
             if (!FalloutRadio::bShutdown) {
@@ -1107,8 +1107,8 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                                 }
                                 else {
                                     if (v60 && puser->m_item->bShouldBePlaying) {
-                                        puser->m_item->Hndl.Play(0);
-                                        puser->m_item->StaticHndl.Play(0);
+                                        puser->m_item->Hndl.Play(false);
+                                        puser->m_item->StaticHndl.Play(false);
                                     }
                                 }
                             }
@@ -1116,7 +1116,7 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                     }
                     if (bpipboyStation) {
                         if (bdisabledStation) {
-                            FalloutRadio::PipboyRadioEnable(0);
+                            FalloutRadio::PipboyRadioEnable(false);
                         }
                         if (FalloutRadio::pCurrentPipboyStation &&
                             FalloutRadio::pCurrentPipboyStation->CurrentState.IsPlayingSong()) {
@@ -1126,7 +1126,7 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                             }
                             else {
                                 if (v60) {
-                                    FalloutRadio::PipboyStaticHndl.Play(0);
+                                    FalloutRadio::PipboyStaticHndl.Play(false);
                                     FalloutAudioMedia::MediaUnPause();
                                 }
                             }
@@ -1138,8 +1138,8 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                             }
                             else {
                                 if (v60) {
-                                    FalloutRadio::PipboyStaticHndl.Play(0);
-                                    FalloutRadio::PipboyVoiceHndl.Play(0);
+                                    FalloutRadio::PipboyStaticHndl.Play(false);
+                                    FalloutRadio::PipboyVoiceHndl.Play(false);
                                 }
                             }
                         }
@@ -1171,11 +1171,11 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                 if (pStation->CurrentState.iCurrentItemDuration > 0 &&
                     pStation->CurrentState.iCurrentItemDuration + pStation->CurrentState.iCurrentItemStartTime <
                         icurrentTime) {
-                    bool bisNext = 0;
+                    bool bisNext = false;
                     if (pStation->CurrentState.pConvo) {
                         if (pStation->CurrentState.pConvo->GetCurrentItem()) {
                             if (pStation->CurrentState.pConvo->GetNext()) {
-                                bisNext = 1;
+                                bisNext = true;
                                 if (pStation->CurrentState.pConvo->GetCurrentItem()->pInfo) {
                                     if (!pStation->CurrentState.pConvo->GetCurrentItem()->pInfo->IsRunImmediately()) {
                                         pStation->CurrentState.pConvo->GetCurrentItem()->pInfo->RunResult(
@@ -1189,7 +1189,7 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                                 pStation->CurrentState.iCurrentItemDuration = 0;
                                 if (pStation->CurrentState.StationUsers.IsEmpty() &&
                                     !FalloutRadio::pCurrentPipboyStation) {
-                                    pStation->CurrentState.SetStartPaused(1);
+                                    pStation->CurrentState.SetStartPaused(true);
                                 }
                             }
                             else {
@@ -1197,12 +1197,12 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                                 if (pConvo) {
                                     delete pConvo;
                                 }
-                                pStation->CurrentState.pConvo = 0;
-                                pcurrentItem_2 = 0;
+                                pStation->CurrentState.pConvo = nullptr;
+                                pcurrentItem_2 = nullptr;
                                 pStation->CurrentState.iCurrentItemStartTime = 0;
                                 pStation->CurrentState.iCurrentItemDuration = 0;
                                 if (pStation->CurrentState.IsPlayingBreakIn()) {
-                                    pStation->CurrentState.SetPlayingBreakIn(0);
+                                    pStation->CurrentState.SetPlayingBreakIn(false);
                                 }
                             }
                             for (pusers = &pStation->CurrentState.StationUsers; pusers && !pusers->IsEmpty();
@@ -1215,8 +1215,8 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                                 FalloutRadio::PipboyVoiceHndl.Release();
                                 if (!FalloutRadio::GetIsDialogueOnlyRadio()) {
                                     FalloutAudioMedia::MediaClose();
-                                    FalloutAudioMedia::MediaSetRadio(1);
-                                    FalloutAudioMedia::MediaOpen(MEDIA_RADIO, 0, 1000u, 0, 0, 0.0f, 0);
+                                    FalloutAudioMedia::MediaSetRadio(true);
+                                    FalloutAudioMedia::MediaOpen(MEDIA_RADIO, nullptr, 1000u, false, false, 0.0f, 0);
                                     FalloutAudioMedia::MediaPlay();
                                 }
                             }
@@ -1224,8 +1224,8 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                     }
                     if (!pStation->CurrentState.pConvo || !pStation->CurrentState.pConvo->GetCurrentItem()) {
                         if (pStation->CurrentState.IsContBroadcast()) {
-                            pStation->CurrentState.SetTransmitting(1);
-                            FalloutRadio::GetNextConversation(pStation, 0);
+                            pStation->CurrentState.SetTransmitting(true);
+                            FalloutRadio::GetNextConversation(pStation, nullptr);
                             pStation->CurrentState.pConvo->PrecacheSounds();
                             pStation->CurrentState.pConvo->FirstItem();
                             if (pStation->CurrentState.pConvo->GetCurrentItem()) {
@@ -1253,7 +1253,7 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                             }
                         }
                         else {
-                            pStation->CurrentState.SetTransmitting(0);
+                            pStation->CurrentState.SetTransmitting(false);
                         }
                     }
                 }
@@ -1269,14 +1269,14 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                 pStation->CurrentState.cStationPower = pStation->CurrentState.cTargetPower;
                 uint8_t isignalStrength = pStation->CurrentState.GetStationPower();
                 if (isignalStrength < 100u) {
-                    bstaticPlaying = 1;
+                    bstaticPlaying = true;
                 }
                 pusers = &pStation->CurrentState.StationUsers;
-                while (1) {
-                    while (1) {
+                while (true) {
+                    while (true) {
                         if (!pusers || pusers->IsEmpty()) {
                             if (pStation == FalloutRadio::pCurrentPipboyStation && !bpipboyUpdated) {
-                                FalloutRadio::PipboyUpdate(0);
+                                FalloutRadio::PipboyUpdate(false);
                             }
                             FalloutRadio::RadioUpdateCriticalSection.Leave();
                             return;
@@ -1312,7 +1312,7 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                              (ParentCell = pusers->m_item->pRadio->GetParentCell(),
                               ParentCell != pPlayer->GetParentCell()))) {
                             pusers->m_item->Hndl.SetVolume(0.0f);
-                            pusers->m_item->bShouldBePlaying = 0;
+                            pusers->m_item->bShouldBePlaying = false;
                         }
                         if (pusers->m_item) {
                             if (pusers->m_item->Hndl.IsValid()) {
@@ -1343,19 +1343,19 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                                     BSGameSound::SOUND_FLAG_RADIO
                             );
                             pusers->m_item->StaticHndl.operator=(*arHandle);
-                            pusers->m_item->StaticHndl.bAssumeSuccess = 1;
+                            pusers->m_item->StaticHndl.bAssumeSuccess = true;
                             pusers->m_item->StaticHndl.SetPosition(loc.x, loc.y, loc.z);
                             float v31 = static_cast<double>(100 - isignalStrength) / 100.0;
                             float Y = std::powf(v31, 0.75f);
                             pusers->m_item->StaticHndl.SetVolume(Y);
-                            pusers->m_item->StaticHndl.Play(0);
+                            pusers->m_item->StaticHndl.Play(false);
                         }
                         if (!pcurrentItem_2 ||
                             (pusers->m_item->Hndl.IsValid() ||
                              (!pStation->CurrentState.ShouldBePlaying() ||
                               (!pusers->m_item->bShouldBePlaying || !pusers->m_item->pRadio)))) {
                             if (!pusers->m_item->pRadio) {
-                                pusers->m_item->bShouldBePlaying = 0;
+                                pusers->m_item->bShouldBePlaying = false;
                             }
                             goto LABEL_104;
                         }
@@ -1370,7 +1370,7 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                             goto LABEL_104;
                         }
                         if (pcurrentItem_2->GetCurrentResponse()->pVoiceSound) {
-                            bsong = 1;
+                            bsong = true;
                         }
                         if (pcurrentItem_2->GetCurrentResponse()) {
                             if ((&pcurrentItem_2->GetCurrentResponse()->cText)->pString) {
@@ -1394,16 +1394,16 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                                     BSstrcat(Str, 260, Dst);
                                 }
                             }
-                            pStation->CurrentState.SetPlayingSong(1);
+                            pStation->CurrentState.SetPlayingSong(true);
                             goto LABEL_154;
                         }
                         if (v61) {
                             BSstrcpy(Str, 260, pcurrentItem_2->GetCurrentResponse()->GetVoice()->pString);
-                            pStation->CurrentState.SetPlayingSong(0);
+                            pStation->CurrentState.SetPlayingSong(false);
                         LABEL_154:;
-                            bool bthisActorIsSpeaking = 0;
-                            bool bcreatureRadio = 0;
-                            Actor* pact_2 = 0;
+                            bool bthisActorIsSpeaking = false;
+                            bool bcreatureRadio = false;
+                            Actor* pact_2 = nullptr;
                             if (pusers->m_item->pRadio) {
                                 TESObjectREFR* pRadio = pusers->m_item->pRadio;
                                 if (pRadio->IsActor()) {
@@ -1411,11 +1411,11 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                                     if (pcurrentItem_2->pInfo) {
                                         TESActorBase* ActorBase = pact_2->GetActorBase();
                                         if (ActorBase == pcurrentItem_2->pInfo->GetSpeaker()) {
-                                            bthisActorIsSpeaking = 1;
+                                            bthisActorIsSpeaking = true;
                                         }
                                     }
                                     if (pact_2->IsCreature()) {
-                                        bcreatureRadio = 1;
+                                        bcreatureRadio = true;
                                     }
                                 }
                             }
@@ -1439,8 +1439,8 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                                     DIALOGUE_EMOTION FormFlags = pcurrentItem_2->GetCurrentResponse()->eEmotion;
                                     BSSoundHandle* p_Hndl = &pusers->m_item->Hndl;
                                     pact_2->SpeakSoundFunction(
-                                        Str, *p_Hndl, FormFlags, CastingType, 150, SpeakerIdle, ListenerIdle, v18, 0, 0,
-                                        0, 1, 1
+                                        Str, *p_Hndl, FormFlags, CastingType, 150, SpeakerIdle, ListenerIdle, v18,
+                                        false, false, false, true, true
                                     );
                                 }
                                 else {
@@ -1451,7 +1451,7 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                                              BSGameSound::SOUND_FLAG_RADIO | BSGameSound::SOUND_FLAG_UNKBIT22);
                                         BSAudio* v10 = &BSAudio::QInstance();
                                         BSSoundHandle* SoundHandleByFilename =
-                                            v10->GetSoundHandleByFilename(&out, Str, X, 0);
+                                            v10->GetSoundHandleByFilename(&out, Str, X, nullptr);
                                         pusers->m_item->Hndl.operator=(*SoundHandleByFilename);
                                         float Yb = fCreatureRadioMax.Float();
                                         float* v11 = &fCreatureRadioMin.Float();
@@ -1474,24 +1474,24 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                                     pusers->m_item->Hndl.SetPosition(loc.x, loc.y, loc.z);
                                     float v25 = static_cast<double>(isignalStrength) / 100.0;
                                     pusers->m_item->Hndl.SetVolume(v25);
-                                    pusers->m_item->Hndl.Play(0);
+                                    pusers->m_item->Hndl.Play(false);
                                 }
                                 if (bpipboyStation && !pusers->m_item->bJustStarted && !bpipboyUpdated) {
-                                    bpipboyUpdated = 1;
-                                    FalloutRadio::PipboyUpdate(1);
+                                    bpipboyUpdated = true;
+                                    FalloutRadio::PipboyUpdate(true);
                                 }
                                 if (pusers->m_item->bJustStarted) {
-                                    pusers->m_item->bJustStarted = 0;
+                                    pusers->m_item->bJustStarted = false;
                                 }
                             }
                             goto LABEL_104;
                         }
                         pStation->CurrentState.iCurrentItemDuration = 1;
                         pusers = pusers->m_pkNext;
-                        pStation->CurrentState.SetPlayingSong(0);
+                        pStation->CurrentState.SetPlayingSong(false);
                     }
                     else {
-                        pusers->m_item->bShouldBePlaying = 0;
+                        pusers->m_item->bShouldBePlaying = false;
                         pusers = pusers->m_pkNext;
                     }
                 }
@@ -1504,13 +1504,13 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
 }
 
 FalloutRadio::FORadioReceiver* FalloutRadio::GetActiveReceiver(TESObjectREFR* apRequestedReceiver) {
-    FalloutRadio::FORadioReceiver* preturnValue = 0;
+    FalloutRadio::FORadioReceiver* preturnValue = nullptr;
     BSSimpleList<FalloutRadio::FORadioReceiver*>* pactReceivers = &FalloutRadio::ActiveRadioList;
-    bool bfound = 0;
+    bool bfound = false;
     while (pactReceivers && (!pactReceivers->IsEmpty() && !bfound)) {
         if (apRequestedReceiver == pactReceivers->m_item->pRadio) {
             preturnValue = pactReceivers->m_item;
-            bfound = 1;
+            bfound = true;
         }
         pactReceivers = pactReceivers->m_pkNext;
     }
@@ -1541,7 +1541,7 @@ void FalloutRadio::DisableNPCRadio(TESObjectREFR* apNPCRadio) {
         if (v1) {
             (&v1->Hndl)->Stop();
             (&v1->Hndl)->Release();
-            v1->bShouldBePlaying = (bool)0;
+            v1->bShouldBePlaying = false;
             v1->pRadio = nullptr;
         }
     }
@@ -1561,18 +1561,18 @@ FalloutRadio::FORadioStation* FalloutRadio::InitStation(TESObjectREFR* pWorldRad
     FalloutRadio::FORadioStation* presult;
     BGSTalkingActivator* ptunedStation_2;
     if (!pWorldRadio) {
-        return 0;
+        return nullptr;
     }
-    bool breceiver = 0;
-    bool btransmitter = 0;
-    TESObjectREFR* pstation = 0;
+    bool breceiver = false;
+    bool btransmitter = false;
+    TESObjectREFR* pstation = nullptr;
     FalloutRadio::FORadioStation* apMemory =
         static_cast<FalloutRadio::FORadioStation*>(ourMalloc(sizeof(FalloutRadio::FORadioStation)));
     if (apMemory) {
         presult = ::new (apMemory) FalloutRadio::FORadioStation;
     }
     else {
-        presult = 0;
+        presult = nullptr;
     }
     FalloutRadio::FORadioStation* presult_2 = presult;
     if (pWorldRadio->GetObjectReference()->GetFormType() == ACTI_ID ||
@@ -1580,10 +1580,10 @@ FalloutRadio::FORadioStation* FalloutRadio::InitStation(TESObjectREFR* pWorldRad
          (pWorldRadio->GetObjectReference()->GetFormType() == CREA_ID ||
           (pWorldRadio->GetObjectReference()->GetFormType() == LVLC_ID ||
            pWorldRadio->GetObjectReference()->GetFormType() == LVLN_ID)))) {
-        breceiver = 1;
+        breceiver = true;
     }
     if (pWorldRadio->GetObjectReference()->GetFormType() == TACT_ID) {
-        btransmitter = 1;
+        btransmitter = true;
     }
     if (breceiver && !pWorldRadio->IsActor()) {
         // Reads the base object's radio station without checking the base object's type, as the game does.
@@ -1593,14 +1593,14 @@ FalloutRadio::FORadioStation* FalloutRadio::InitStation(TESObjectREFR* pWorldRad
             if (presult_2) {
                 delete presult_2;
             }
-            return 0;
+            return nullptr;
         }
         pstation = FalloutRadio::GetRadioRefrForStation(ptunedStation, pWorldRadio);
         if (!pstation) {
             if (presult_2) {
                 delete presult_2;
             }
-            return 0;
+            return nullptr;
         }
         goto LABEL_39;
     }
@@ -1615,15 +1615,15 @@ FalloutRadio::FORadioStation* FalloutRadio::InitStation(TESObjectREFR* pWorldRad
         if (presult_2) {
             delete presult_2;
         }
-        return 0;
+        return nullptr;
     }
     pstation = FalloutRadio::GetRadioRefrForStation(ptunedStation_2, pWorldRadio);
     if (pstation) {
     LABEL_39:;
         if (pstation) {
             presult_2->pStation = pstation;
-            presult_2->CurrentState.pConvo = 0;
-            presult_2->CurrentState.pNextConvo = 0;
+            presult_2->CurrentState.pConvo = nullptr;
+            presult_2->CurrentState.pNextConvo = nullptr;
             uint32_t SynchTime = (&BSAudio::QInstance())->GetSynchTime();
             presult_2->CurrentState.iCurrentItemStartTime = SynchTime - RandomInt(0, 0x7530);
             presult_2->CurrentState.iCurrentItemDuration = 1;
@@ -1632,7 +1632,7 @@ FalloutRadio::FORadioStation* FalloutRadio::InitStation(TESObjectREFR* pWorldRad
             presult_2->CurrentState.SetContBroadcast(v4);
             bool IsContBroadcast = presult_2->CurrentState.IsContBroadcast();
             presult_2->CurrentState.SetTransmitting(IsContBroadcast);
-            presult_2->CurrentState.SetJustTurnedOn(1);
+            presult_2->CurrentState.SetJustTurnedOn(true);
             presult_2->CurrentState.cStationPower = 100;
             presult_2->CurrentState.cTargetPower = 100;
             FalloutRadio::ActiveStationList.AddHead(presult_2);
@@ -1642,31 +1642,31 @@ FalloutRadio::FORadioStation* FalloutRadio::InitStation(TESObjectREFR* pWorldRad
             if (presult_2) {
                 delete presult_2;
             }
-            return 0;
+            return nullptr;
         }
     }
     if (presult_2) {
         delete presult_2;
     }
-    return 0;
+    return nullptr;
 }
 
 TESObjectREFR*
 FalloutRadio::GetRadioRefrForStation(BGSTalkingActivator* apRequestedStation, TESObjectREFR* pWorldRadio) {
-    TESObjectREFR* presult = 0;
+    TESObjectREFR* presult = nullptr;
     BSSimpleList<TESObjectREFR*> stationlist;
     if (pWorldRadio) {
-        BGSTalkingActivator::GetRadioStationsInRangeOfRef(pWorldRadio, &stationlist, 0);
+        BGSTalkingActivator::GetRadioStationsInRangeOfRef(pWorldRadio, &stationlist, nullptr);
     }
     else {
-        BGSTalkingActivator::GetRadioStationsInRangeOfRef(pPlayer, &stationlist, 0);
+        BGSTalkingActivator::GetRadioStationsInRangeOfRef(pPlayer, &stationlist, nullptr);
     }
     BSSimpleList<TESObjectREFR*>* stations = &stationlist;
-    bool bdone = 0;
+    bool bdone = false;
     while (!bdone && (stations && (stations->m_item && stations->m_item->GetObjectReference()))) {
         if (apRequestedStation == stations->m_item->GetObjectReference()) {
             presult = stations->m_item;
-            bdone = 1;
+            bdone = true;
         }
         stations = stations->m_pkNext;
     }
@@ -1674,8 +1674,8 @@ FalloutRadio::GetRadioRefrForStation(BGSTalkingActivator* apRequestedStation, TE
 }
 
 void FalloutRadio::Shutdown() {
-    FalloutRadio::bShutdown = 1;
-    FalloutRadio::ClearInactiveReceivers(1);
+    FalloutRadio::bShutdown = true;
+    FalloutRadio::ClearInactiveReceivers(true);
     for (BSSimpleList<FalloutRadio::FORadioStation*>* pactStations = &FalloutRadio::ActiveStationList;
          pactStations && !pactStations->IsEmpty(); pactStations = pactStations->m_pkNext) {
         if (pactStations->m_item->CurrentState.pConvo) {
@@ -1683,7 +1683,7 @@ void FalloutRadio::Shutdown() {
             if (apThis) {
                 delete apThis;
             }
-            pactStations->m_item->CurrentState.pConvo = 0;
+            pactStations->m_item->CurrentState.pConvo = nullptr;
         }
         RadioEntry* m_item = pactStations->m_item;
         if (m_item) {
@@ -1704,19 +1704,19 @@ void FalloutRadio::Shutdown() {
 
 bool FalloutRadio::TunePipboyToStation(TESObjectREFR* apTargetStation, bool abForceStationUpdate) {
     if (!FalloutRadio::bPipboyRadioEnabled || FalloutRadio::bShutdown) {
-        return 0;
+        return false;
     }
     ourMemset(FalloutRadio::cLastPipboyFilename, 0, 260u);
     int32_t iseekTime = 0;
     if (apTargetStation) {
         if (abForceStationUpdate) {
-            FalloutRadio::pLostPipboyStation = 0;
-            FalloutRadio::UpdateStations(1);
+            FalloutRadio::pLostPipboyStation = nullptr;
+            FalloutRadio::UpdateStations(true);
         }
     }
     else {
         BSSimpleList<TESObjectREFR*> stationlist;
-        BGSTalkingActivator::GetRadioStationsInRangeOfRef(pPlayer, &stationlist, 0);
+        BGSTalkingActivator::GetRadioStationsInRangeOfRef(pPlayer, &stationlist, nullptr);
         BSSimpleList<TESObjectREFR*>* stations = &stationlist;
         if (&stationlist) {
             if (stations->m_item) {
@@ -1735,22 +1735,22 @@ bool FalloutRadio::TunePipboyToStation(TESObjectREFR* apTargetStation, bool abFo
         }
     }
     else {
-        FalloutRadio::pCurrentPipboyStation = FalloutRadio::InitStation(apTargetStation, 0);
+        FalloutRadio::pCurrentPipboyStation = FalloutRadio::InitStation(apTargetStation, nullptr);
         if (!FalloutRadio::pCurrentPipboyStation) {
-            FalloutRadio::PipboyRadioEnable(0);
+            FalloutRadio::PipboyRadioEnable(false);
         }
         if (!abForceStationUpdate) {
-            FalloutRadio::UpdateStations(1);
+            FalloutRadio::UpdateStations(true);
         }
     }
     if (FalloutRadio::pCurrentPipboyStation->CurrentState.ShouldStartPaused()) {
         uint32_t v4 = (&BSAudio::QInstance())->GetSynchTime() + 50;
         FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemStartTime = v4;
-        FalloutRadio::pCurrentPipboyStation->CurrentState.SetStartPaused(0);
+        FalloutRadio::pCurrentPipboyStation->CurrentState.SetStartPaused(false);
     }
-    FalloutRadio::pCurrentPipboyStation->CurrentState.SetShouldBePlaying(1);
-    FalloutRadio::pLostPipboyStation = 0;
-    return 1;
+    FalloutRadio::pCurrentPipboyStation->CurrentState.SetShouldBePlaying(true);
+    FalloutRadio::pLostPipboyStation = nullptr;
+    return true;
 }
 
 void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
@@ -1769,7 +1769,7 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
         v33 = 0.0;
     }
     float fsignalVolumeModifier = v33;
-    bool bvolumeAlreadySet = 0;
+    bool bvolumeAlreadySet = false;
     if (FalloutRadio::pCurrentPipboyStation && FalloutRadio::pCurrentPipboyStation->CurrentState.OutOfPBRange()) {
         BSStringT<char> strtemp;
         BSAudio* v1 = &BSAudio::QInstance();
@@ -1778,16 +1778,16 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT |
                 BSGameSound::SOUND_FLAG_RADIO
         );
-        alertSound.Play(0);
+        alertSound.Play(false);
         const char* pstationName = FalloutRadio::pCurrentPipboyStation->pStation->GetFullName();
         strtemp.SPrintF(sRadioSignalLost.String(), pstationName);
         FalloutRadio::pLostPipboyStation = FalloutRadio::pCurrentPipboyStation;
-        FalloutRadio::PipboyRadioEnable(0);
+        FalloutRadio::PipboyRadioEnable(false);
         FalloutRadio::PipboyStaticHndl.Stop();
         FalloutRadio::PipboyStaticHndl.Release();
         HUDMainMenu::pme->ShowMessage(
             strtemp.String(), HUDMainMenu::HME_NEUTRAL, "Interface\\Icons\\Message Icons\\glow_message_radio_tower.dds",
-            0, 2.0f, 0
+            nullptr, 2.0f, false
         );
         return;
     }
@@ -1803,7 +1803,7 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
                     BSGameSound::SOUND_FLAG_RADIO
             );
             FalloutRadio::PipboyStaticHndl.operator=(*SoundHandleByName);
-            FalloutRadio::PipboyStaticHndl.Play(0);
+            FalloutRadio::PipboyStaticHndl.Play(false);
         }
         int32_t v30 = 100 - FalloutRadio::pCurrentPipboyStation->CurrentState.GetStationPower();
         float v29 = static_cast<double>(v30) / 100.0;
@@ -1830,34 +1830,34 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
     }
     if (FalloutRadio::pCurrentPipboyStation &&
         (FalloutRadio::pCurrentPipboyStation->CurrentState.pConvo &&
-         ((!FalloutAudioMedia::MediaIsPlaying(MEDIA_RADIO, 1) && !FalloutRadio::PipboyVoiceHndl.IsValid()) ||
+         ((!FalloutAudioMedia::MediaIsPlaying(MEDIA_RADIO, true) && !FalloutRadio::PipboyVoiceHndl.IsValid()) ||
           abForceUpdate))) {
         DialogueItem* pcurrentItem = FalloutRadio::pCurrentPipboyStation->CurrentState.pConvo->GetCurrentItem();
         if (!pcurrentItem) {
             return;
         }
-        bool bsong = 0;
+        bool bsong = false;
         char v46 = 0;
         if (!pcurrentItem->GetCurrentResponse()) {
             pcurrentItem->FirstResponse();
         }
         if (pcurrentItem->GetCurrentResponse() &&
             (pcurrentItem->GetCurrentResponse()->pVoiceSound && !FalloutRadio::GetIsDialogueOnlyRadio())) {
-            bsong = 1;
+            bsong = true;
             if (FalloutRadio::pCurrentPipboyStation) {
-                FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingSong(1);
+                FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingSong(true);
             }
         }
         else {
             if (FalloutRadio::pCurrentPipboyStation) {
-                FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingSong(0);
+                FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingSong(false);
             }
         }
         if (pcurrentItem->GetCurrentResponse()) {
             if ((&pcurrentItem->GetCurrentResponse()->cText)->pString) {
                 uint32_t ivoiceTextLength = BSstrlen((&pcurrentItem->GetCurrentResponse()->cText)->pString);
                 int32_t v28 = ivoiceTextLength > 2 &&
-                    pcurrentItem->GetCurrentResponse()->GetVoice()->operator!=(static_cast<const char*>(0));
+                    pcurrentItem->GetCurrentResponse()->GetVoice()->operator!=(static_cast<const char*>(nullptr));
                 v46 = v28;
                 if (!v28) {
                     if (pcurrentItem->GetCurrentResponse()->pVoiceSound) {
@@ -1872,7 +1872,7 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
         uint32_t v45 = (&BSAudio::QInstance())->GetSynchTime() -
             FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemStartTime;
         if (v46) {
-            bool v42 = pcurrentItem->GetCurrentResponse()->pVoiceSound != 0;
+            bool v42 = pcurrentItem->GetCurrentResponse()->pVoiceSound != nullptr;
             FalloutRadio::PipboyVoiceHndl.Stop();
             FalloutRadio::PipboyVoiceHndl.Release();
             if (v42) {
@@ -1892,7 +1892,8 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
                 BSAudio* v5 = &BSAudio::QInstance();
                 BSSoundHandle* v25 = v5->GetSoundHandleByFilename(
                     &a4, pvoiceFilename,
-                    BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_RADIO, 0
+                    BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_RADIO,
+                    nullptr
                 );
                 FalloutRadio::PipboyVoiceHndl.operator=(*v25);
             }
@@ -1912,8 +1913,8 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
                 float v22 = RadioVolume * fsignalVolumeModifier;
                 FalloutRadio::PipboyVoiceHndl.SetVolume(v22);
             }
-            bvolumeAlreadySet = 1;
-            FalloutRadio::PipboyVoiceHndl.Play(0);
+            bvolumeAlreadySet = true;
+            FalloutRadio::PipboyVoiceHndl.Play(false);
             if (!FalloutRadio::PipboyVoiceHndl.IsValid()) {
                 NiPoint3 speakerLoc = pPlayer->GetLocationOnReference();
                 subtitleHandle.operator=(FalloutRadio::PipboyVoiceHndl);
@@ -1922,7 +1923,7 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
             }
         }
         if (!bsong || FalloutRadio::GetIsDialogueOnlyRadio()) {
-            FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingSong(0);
+            FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingSong(false);
         }
         else {
             char Src[268];
@@ -1930,11 +1931,11 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
             BSsprintf(Src, 260, "%s%s", "data\\sound\\", psongFilename);
             BSStringT<char> lipString(static_cast<const char*>(Src));
             FalloutAudioMedia::MediaOpen(
-                MEDIA_RADIO, Src, 500u, 0, 1, 0.0f,
+                MEDIA_RADIO, Src, 500u, false, true, 0.0f,
                 FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemStartTime
             );
             BSstrcpy(FalloutRadio::cLastPipboyFilename, 260, Src);
-            FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingSong(1);
+            FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingSong(true);
             if (FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemDuration <= 0) {
                 if (FalloutAudioMedia::MediaGetDuration(MEDIA_RADIO)) {
                     FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemDuration =
@@ -1960,10 +1961,10 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
                     BSGameSound::SOUND_FLAG_RADIO
             );
             FalloutRadio::PipboyVoiceHndl.operator=(*v19);
-            FalloutRadio::PipboyVoiceHndl.bAssumeSuccess = 1;
-            FalloutRadio::PipboyVoiceHndl.Play(0);
-            FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingStatic(1);
-            FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingSong(0);
+            FalloutRadio::PipboyVoiceHndl.bAssumeSuccess = true;
+            FalloutRadio::PipboyVoiceHndl.Play(false);
+            FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingStatic(true);
+            FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingSong(false);
         }
     }
     if (!bvolumeAlreadySet) {
@@ -1984,7 +1985,7 @@ void FalloutRadio::EnableNPCRadio(TESObjectREFR* apNPCRadio, TESObjectREFR* apTa
     int32_t prequestedStation = 0;
     FalloutRadio::FORadioReceiver* pemitter = FalloutRadio::GetActiveReceiver(apNPCRadio);
     uint32_t iseekTime = 0;
-    bool baddToList = 0;
+    bool baddToList = false;
     if (!FalloutRadio::bShutdown) {
         FalloutRadio::FORadioStation* pstation =
             FalloutRadio::GetActiveStation(static_cast<BGSTalkingActivator*>(apTargetStation->GetObjectReference()));
@@ -1999,20 +2000,20 @@ void FalloutRadio::EnableNPCRadio(TESObjectREFR* apNPCRadio, TESObjectREFR* apTa
                     pemitter_2 = ::new (apMemory) FalloutRadio::FORadioReceiver;
                 }
                 else {
-                    pemitter_2 = 0;
+                    pemitter_2 = nullptr;
                 }
                 pemitter = pemitter_2;
-                baddToList = 1;
+                baddToList = true;
             }
             pemitter->pRadio = apNPCRadio;
-            pemitter->bShouldBePlaying = 1;
-            pemitter->bJustStarted = 1;
-            pemitter->bIsActor = 1;
+            pemitter->bShouldBePlaying = true;
+            pemitter->bJustStarted = true;
+            pemitter->bIsActor = true;
             if (baddToList) {
                 FalloutRadio::ActiveRadioList.AddHead(pemitter);
             }
             pstation->CurrentState.StationUsers.AddHead(pemitter);
-            pstation->CurrentState.SetShouldBePlaying(1);
+            pstation->CurrentState.SetShouldBePlaying(true);
             return;
         }
         pstation = FalloutRadio::InitStation(apNPCRadio, apTargetStation);
@@ -2049,12 +2050,12 @@ void FalloutRadio::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
         }
     }
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount_2, isaveGameBufferPos_2);
-    TESBoundObject* pcurrentPipboyStationObject = 0;
+    TESBoundObject* pcurrentPipboyStationObject = nullptr;
     if (FalloutRadio::pCurrentPipboyStation) {
         pcurrentPipboyStationObject = FalloutRadio::pCurrentPipboyStation->pStation->GetObjectReference();
     }
     apSaveGameBuffer->SaveFormID(pcurrentPipboyStationObject, 0);
-    TESBoundObject* plostPipboyStationObject = 0;
+    TESBoundObject* plostPipboyStationObject = nullptr;
     if (FalloutRadio::pLostPipboyStation) {
         plostPipboyStationObject = FalloutRadio::pLostPipboyStation->pStation->GetObjectReference();
     }
@@ -2084,7 +2085,7 @@ void FalloutRadio::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
             preceiver = ::new (apMemory) FalloutRadio::FORadioReceiver;
         }
         else {
-            preceiver = 0;
+            preceiver = nullptr;
         }
         FalloutRadio::FORadioReceiver* preceiver_2 = preceiver;
         preceiver->LoadGame(apLoadGameBuffer);
@@ -2098,7 +2099,7 @@ void FalloutRadio::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
             pstation = ::new (v7) FalloutRadio::FORadioStation;
         }
         else {
-            pstation = 0;
+            pstation = nullptr;
         }
         FalloutRadio::FORadioStation* pstation_2 = pstation;
         pstation->LoadGame(apLoadGameBuffer);
@@ -2118,7 +2119,7 @@ void FalloutRadio::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     if (apLoadGameBuffer->GetVersion() >= 10u) {
         uint32_t isaveGameCount_3 = apLoadGameBuffer->LoadVariableSizedValue();
         for (uint32_t iloop_3 = 0; iloop_3 < isaveGameCount_3; ++iloop_3) {
-            pForm = 0;
+            pForm = nullptr;
             // The form ID is kept in the pointer slot, untyped storage until InitLoadGame resolves it.
             apLoadGameBuffer->LoadFormID(pForm);
             FalloutRadio::DiscoveredStationList.AddHead(pForm);
@@ -2141,23 +2142,23 @@ bool FalloutRadio::GetNextConversation(FalloutRadio::FORadioStation* apStation, 
             if (apThis) {
                 delete apThis;
             }
-            apStation->CurrentState.pConvo = 0;
+            apStation->CurrentState.pConvo = nullptr;
         }
         apStation->CurrentState.pConvo = apStation->CurrentState.pNextConvo;
         Conversation* pNextConvo = apStation->CurrentState.pNextConvo;
         if (pNextConvo) {
             delete pNextConvo;
         }
-        apStation->CurrentState.pNextConvo = 0;
+        apStation->CurrentState.pNextConvo = nullptr;
         RadioConvTask* apMemory = static_cast<RadioConvTask*>(ourMalloc(sizeof(RadioConvTask)));
         if (apMemory) {
             v4 = ::new (apMemory) RadioConvTask(apStation);
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         pIOManager->AddTask(v4);
-        return 1;
+        return true;
     }
     else {
         Conversation* v3;
@@ -2166,17 +2167,17 @@ bool FalloutRadio::GetNextConversation(FalloutRadio::FORadioStation* apStation, 
             if (pConvo) {
                 delete pConvo;
             }
-            apStation->CurrentState.pConvo = 0;
+            apStation->CurrentState.pConvo = nullptr;
         }
         Conversation* v6 = static_cast<Conversation*>(ourMalloc(sizeof(Conversation)));
         if (v6) {
             v3 = ::new (v6) Conversation(apStation->pStation, apStation->pStation, Topic);
         }
         else {
-            v3 = 0;
+            v3 = nullptr;
         }
         apStation->CurrentState.pConvo = v3;
-        return 0;
+        return false;
     }
 }
 

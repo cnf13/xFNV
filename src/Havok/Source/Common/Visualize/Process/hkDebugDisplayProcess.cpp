@@ -180,6 +180,6 @@ hkProcess* hkDebugDisplayProcess::create(const hkArray<hkProcessContext*, hkCont
         return static_cast<hkProcess*>(v3);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

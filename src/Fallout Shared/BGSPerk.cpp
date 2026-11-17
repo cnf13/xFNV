@@ -73,11 +73,11 @@ BGSPerk::~BGSPerk() {
 }
 
 void BGSPerk::InitializeData() {
-    Data.bTrait = (bool)0;
+    Data.bTrait = false;
     Data.cLevel = 0;
     Data.cNumRanks = (uint8_t)1;
-    Data.bPlayable = (bool)1;
-    Data.bHidden = (bool)0;
+    Data.bPlayable = true;
+    Data.bHidden = false;
 }
 
 // Deletes each entry, then calls RemoveAll and ClearAllConditionItems.
@@ -207,7 +207,7 @@ void BGSPerk::Copy(TESForm* apCopy) {
     if (pperk) {
         ourMemcpy(&Data, &pperk->Data, sizeof(Data));
         CopyAllComponents(apCopy);
-        PerkConditions.Copy(&pperk->PerkConditions, 0);
+        PerkConditions.Copy(&pperk->PerkConditions, nullptr);
         for (BGSPerkEntry* pentry : pperk->PerkEntries) {
             if (pentry) {
                 BGSPerkEntry* pduplicate = pentry->Duplicate();
@@ -220,23 +220,23 @@ void BGSPerk::Copy(TESForm* apCopy) {
 bool BGSPerk::Compare(TESForm* apCompare) {
     BGSPerk* pperk = dynamic_cast<BGSPerk*>(apCompare);
     if (!pperk) {
-        return 1;
+        return true;
     }
     if (Data.bPlayable != pperk->Data.bPlayable ||
         (Data.bTrait != pperk->Data.bTrait ||
          (Data.cLevel != pperk->Data.cLevel ||
           (Data.cNumRanks != pperk->Data.cNumRanks || Data.bHidden != pperk->Data.bHidden)))) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pperk)) {
-        return 1;
+        return true;
     }
     if (PerkConditions.Compare(&pperk->PerkConditions)) {
-        return 1;
+        return true;
     }
     int32_t v3 = PerkEntries.ItemsInList();
     if (v3 != pperk->PerkEntries.ItemsInList()) {
-        return 1;
+        return true;
     }
     BSSimpleList<BGSPerkEntry*>* plist1 = &PerkEntries;
     BSSimpleList<BGSPerkEntry*>* plist2 = &pperk->PerkEntries;
@@ -244,20 +244,20 @@ bool BGSPerk::Compare(TESForm* apCompare) {
         BGSPerkEntry* pperkEntry1 = plist1->m_item;
         BGSPerkEntry* pperkEntry2 = plist2->m_item;
         if ((pperkEntry1 && !pperkEntry2) || (!pperkEntry1 && pperkEntry2)) {
-            return 1;
+            return true;
         }
         if (pperkEntry1 && (pperkEntry2 && pperkEntry1->Compare(pperkEntry2))) {
-            return 1;
+            return true;
         }
         plist1 = plist1->m_pkNext;
         plist2 = plist2->m_pkNext;
     }
-    return 0;
+    return false;
 }
 
 bool BGSPerk::IsPerkAvailable(TESObjectREFR* apActionRef) {
     uint8_t arg8;
-    return (bool)((uint8_t)(&PerkConditions)->IsTrueFull(apActionRef, nullptr, (bool*)(&arg8), 0));
+    return (bool)((uint8_t)(&PerkConditions)->IsTrueFull(apActionRef, nullptr, (bool*)(&arg8), false));
 }
 
 uint8_t BGSPerk::GetNumRanks() {
@@ -296,10 +296,10 @@ BGSPerkEntry* BGSPerk::GetPerkEntryByRank(uint8_t acRank) {
 
 bool BGSPerk::AddPerkEntry(BGSPerkEntry* apPerkEntry) {
     if (!apPerkEntry || PerkEntries.IsInList(apPerkEntry)) {
-        return 0;
+        return false;
     }
     PerkEntries.Insert(apPerkEntry, &BGSPerk::PerkEntryRankSortFunction);
-    return 1;
+    return true;
 }
 
 void BGSPerk::AddPerkEntryPoints(Actor* apActor, uint8_t acRank, bool bAlt) {
@@ -334,7 +334,7 @@ void BGSPerk::RemovePerk(Actor* apActor, bool bAlt) {
                 }
             }
             else {
-                pperkEntry_2->RemovePerkEntry(apActor, 0);
+                pperkEntry_2->RemovePerkEntry(apActor, false);
             }
         }
     }
@@ -351,7 +351,7 @@ bool BGSPerk::GetIsPlayable() {
                 // A condition item stores its function's index from the function section's start.
                 if (pitem->GetConditionFunction() == FUNCTION_GET_IS_SEX - START_OF_FUNCTION_SECTION) {
                     bool bignore;
-                    bresult = pitem->IsTrue(pPlayer, 0, bignore);
+                    bresult = pitem->IsTrue(pPlayer, nullptr, bignore);
                 }
             }
         }
@@ -379,11 +379,11 @@ void BGSPerk::ApplyPerk(Actor* apActor, uint8_t acOldRank, uint8_t acNewRank, bo
             }
             else {
                 if (pperkEntry_2->cRank + 1 == acOldRank) {
-                    pperkEntry_2->RemovePerkEntry(apActor, 0);
+                    pperkEntry_2->RemovePerkEntry(apActor, false);
                 }
                 else {
                     if (pperkEntry_2->cRank + 1 == acNewRank) {
-                        pperkEntry_2->ApplyPerkEntry(apActor, 0);
+                        pperkEntry_2->ApplyPerkEntry(apActor, false);
                     }
                 }
             }
@@ -392,14 +392,14 @@ void BGSPerk::ApplyPerk(Actor* apActor, uint8_t acOldRank, uint8_t acNewRank, bo
 }
 
 bool BGSPerk::IsPerkAttainable(TESObjectREFR* apActionRef) {
-    bool bresult = 1;
+    bool bresult = true;
     TESConditionItem* pcurrCondition = PerkConditions.GetConditionItem(0);
     int32_t iconditionIndex = 1;
     while (pcurrCondition) {
         if (pcurrCondition->Data.kFunctionData.usFunction == 70) {
             double freturnVal = 0.0;
             void* v3 = pcurrCondition->Data.kFunctionData.uParam[0].pPointer;
-            Script::GetIsSexConditionFunction(apActionRef, v3, 0, freturnVal);
+            Script::GetIsSexConditionFunction(apActionRef, v3, nullptr, freturnVal);
             bresult = 1.0 == freturnVal;
         }
         pcurrCondition = PerkConditions.GetConditionItem(iconditionIndex++);
@@ -514,7 +514,7 @@ void BGSPerk::BuildDescriptionString(char* apOutText, uint32_t aiOutSize) {
     BSstrcat(apOutText, static_cast<int32_t>(aiOutSize), "\n");
     BSsprintf(Src, 128, "%s: %d\n\n", sRanksText.String(), Data.cNumRanks);
     BSstrcat(apOutText, static_cast<int32_t>(aiOutSize), Src);
-    const char* v9 = GetDescription(0, DESC_ID);
+    const char* v9 = GetDescription(nullptr, DESC_ID);
     BSstrcat(apOutText, static_cast<int32_t>(aiOutSize), v9);
 }
 
@@ -617,10 +617,10 @@ BGSPerkEntry* BGSAbilityPerkEntry::Duplicate() {
 bool BGSAbilityPerkEntry::Compare(BGSPerkEntry* apCompare) {
     BGSAbilityPerkEntry* v4 = dynamic_cast<BGSAbilityPerkEntry*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BGSPerkEntry::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(pAbility != v4->pAbility));
 }
@@ -685,7 +685,7 @@ bool BGSEntryPointPerkEntry::CheckConditionFilters(uint32_t aiNumFilterForms, TE
     if (aiNumFilterForms == Data.cNumConditions) {
         for (uint32_t i = 0; i < aiNumFilterForms; ++i) {
             TESForm* pform = apFilterForms[i];
-            TESObjectREFR* pref = 0;
+            TESObjectREFR* pref = nullptr;
             TESObjectREFR tempRef;
             tempRef.SetTemporary();
             if (pform->IsBoundObject()) {
@@ -698,8 +698,8 @@ bool BGSEntryPointPerkEntry::CheckConditionFilters(uint32_t aiNumFilterForms, TE
                 }
             }
             if (pref) {
-                if (!pConditionsArray[i].IsTrueFull(pref, 0, &bignore, 0)) {
-                    return 0;
+                if (!pConditionsArray[i].IsTrueFull(pref, nullptr, &bignore, false)) {
+                    return false;
                 }
             }
             else {
@@ -710,7 +710,7 @@ bool BGSEntryPointPerkEntry::CheckConditionFilters(uint32_t aiNumFilterForms, TE
                 );
             }
         }
-        return 1;
+        return true;
     }
     else {
         Warning(
@@ -718,7 +718,7 @@ bool BGSEntryPointPerkEntry::CheckConditionFilters(uint32_t aiNumFilterForms, TE
             "%i conditions",
             aiNumFilterForms, Data.cNumConditions
         );
-        return 0;
+        return false;
     }
 }
 
@@ -767,7 +767,7 @@ BGSPerkEntry* BGSEntryPointPerkEntry::Duplicate() {
         pduplicate = ::new (apMemory) BGSEntryPointPerkEntry;
     }
     else {
-        pduplicate = 0;
+        pduplicate = nullptr;
     }
     pduplicate->Data.cEntryPoint = Data.cEntryPoint;
     pduplicate->Data.cFunction = Data.cFunction;
@@ -781,8 +781,7 @@ BGSPerkEntry* BGSEntryPointPerkEntry::Duplicate() {
         int32_t v1 =
             Data.cNumConditions <= SIZE_MAX / sizeof(TESCondition) ? sizeof(TESCondition) * cNumConditions : SIZE_MAX;
         size_t* v6 = static_cast<size_t*>(ourMalloc(
-            (static_cast<uint32_t>(static_cast<uint32_t>(v1) + static_cast<uint32_t>(sizeof(size_t))) <
-             static_cast<uint32_t>(v1))
+            ((static_cast<uint32_t>(v1) + static_cast<uint32_t>(sizeof(size_t))) < static_cast<uint32_t>(v1))
                 ? -1
                 : v1 + sizeof(size_t)
         ));
@@ -796,11 +795,11 @@ BGSPerkEntry* BGSEntryPointPerkEntry::Duplicate() {
             v3 = reinterpret_cast<TESCondition*>(v6 + 1);
         }
         else {
-            v3 = 0;
+            v3 = nullptr;
         }
         pduplicate->pConditionsArray = v3;
         for (uint32_t i = 0; i < Data.cNumConditions; ++i) {
-            pduplicate->pConditionsArray[i].Copy(&pConditionsArray[i], 0);
+            pduplicate->pConditionsArray[i].Copy(&pConditionsArray[i], nullptr);
         }
     }
     pduplicate->Copy(this);
@@ -810,34 +809,34 @@ BGSPerkEntry* BGSEntryPointPerkEntry::Duplicate() {
 bool BGSEntryPointPerkEntry::Compare(BGSPerkEntry* apCompare) {
     BGSEntryPointPerkEntry* pentryPointPerkEntry = dynamic_cast<BGSEntryPointPerkEntry*>(apCompare);
     if (!pentryPointPerkEntry) {
-        return 1;
+        return true;
     }
     if (BGSPerkEntry::Compare(apCompare)) {
-        return 1;
+        return true;
     }
     if (Data.cEntryPoint != pentryPointPerkEntry->Data.cEntryPoint) {
-        return 1;
+        return true;
     }
     if (Data.cFunction != pentryPointPerkEntry->Data.cFunction) {
-        return 1;
+        return true;
     }
     if (Data.cNumConditions != pentryPointPerkEntry->Data.cNumConditions) {
-        return 1;
+        return true;
     }
     if ((pFunctionData && !pentryPointPerkEntry->pFunctionData) ||
         (!pFunctionData && pentryPointPerkEntry->pFunctionData)) {
-        return 1;
+        return true;
     }
     if (pFunctionData &&
         (pentryPointPerkEntry->pFunctionData && pFunctionData->Compare(pentryPointPerkEntry->pFunctionData))) {
-        return 1;
+        return true;
     }
     for (uint32_t i = 0; i < Data.cNumConditions; ++i) {
         if (pConditionsArray[i].Compare(&pentryPointPerkEntry->pConditionsArray[i])) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void BGSEntryPointPerkEntry::Save() {
@@ -875,7 +874,7 @@ bool BGSEntryPointPerkEntry::Load(TESFile* apFile) {
                             "MASTERFILE: Function data chunk is loading without function data existing on perk "
                             "entry"
                         );
-                        return 0;
+                        return false;
                     }
                     pFunctionData->Load(apFile);
                 }
@@ -884,12 +883,12 @@ bool BGSEntryPointPerkEntry::Load(TESFile* apFile) {
                 if (chunkid == EPFT_ID) {
                     cfunctionDataType = 0;
                     if (apFile->GetChunkSize() != 1) {
-                        return 0;
+                        return false;
                     }
                     apFile->GetChunkData(&cfunctionDataType, 0);
                     pFunctionData = (BGSEntryPointFunctionData*)CreateEntryPointFunctionObject(cfunctionDataType);
                     if (!pFunctionData) {
-                        return 0;
+                        return false;
                     }
                 }
                 else {
@@ -901,7 +900,7 @@ bool BGSEntryPointPerkEntry::Load(TESFile* apFile) {
         }
         else {
             if (chunkid == PRKF_ID) {
-                return 1;
+                return true;
             }
             if (chunkid > DATA_ID) {
                 if (chunkid == PRKC_ID) {
@@ -919,7 +918,7 @@ bool BGSEntryPointPerkEntry::Load(TESFile* apFile) {
                         TESCondition* v4;
                         uint32_t isize = apFile->GetChunkSize();
                         if (isize != 3) {
-                            return 0;
+                            return false;
                         }
                         apFile->GetChunkData(&Data, 3u);
                         int32_t cNumConditions = Data.cNumConditions;
@@ -927,7 +926,7 @@ bool BGSEntryPointPerkEntry::Load(TESFile* apFile) {
                             ? sizeof(TESCondition) * cNumConditions
                             : SIZE_MAX;
                         size_t* v6 = static_cast<size_t*>(ourMalloc(
-                            (static_cast<uint32_t>(static_cast<uint32_t>(v3) + static_cast<uint32_t>(sizeof(size_t))) <
+                            ((static_cast<uint32_t>(v3) + static_cast<uint32_t>(sizeof(size_t))) <
                              static_cast<uint32_t>(v3))
                                 ? -1
                                 : v3 + sizeof(size_t)
@@ -942,7 +941,7 @@ bool BGSEntryPointPerkEntry::Load(TESFile* apFile) {
                             v4 = reinterpret_cast<TESCondition*>(v6 + 1);
                         }
                         else {
-                            v4 = 0;
+                            v4 = nullptr;
                         }
                         pConditionsArray = v4;
                         break;
@@ -953,7 +952,7 @@ bool BGSEntryPointPerkEntry::Load(TESFile* apFile) {
                     }
                     case CIDA_ID: {
                         if (!pConditionsArray) {
-                            return 0;
+                            return false;
                         }
                         pConditionsArray[ccurrentConditionsIndex].Load(apFile);
                         break;
@@ -963,7 +962,7 @@ bool BGSEntryPointPerkEntry::Load(TESFile* apFile) {
         }
     }
     while (apFile->NextChunk());
-    return 1;
+    return true;
 }
 
 void BGSEntryPointPerkEntry::ApplyPerkEntry(Actor* apActor, bool bAlt) {
@@ -1024,7 +1023,7 @@ BGSPerkEntry* BGSPerkEntry::CreatePerkEntryOfType(PERK_ENTRY_TYPE aePerkEntryTyp
                 return ::new (v6) BGSAbilityPerkEntry;
             }
             else {
-                return 0;
+                return nullptr;
             }
         }
         else {
@@ -1035,11 +1034,11 @@ BGSPerkEntry* BGSPerkEntry::CreatePerkEntryOfType(PERK_ENTRY_TYPE aePerkEntryTyp
                     return ::new (v5) BGSEntryPointPerkEntry;
                 }
                 else {
-                    return 0;
+                    return nullptr;
                 }
             }
             else {
-                return 0;
+                return nullptr;
             }
         }
     }
@@ -1049,7 +1048,7 @@ BGSPerkEntry* BGSPerkEntry::CreatePerkEntryOfType(PERK_ENTRY_TYPE aePerkEntryTyp
             return ::new (apMemory) BGSQuestPerkEntry;
         }
         else {
-            return 0;
+            return nullptr;
         }
     }
 }
@@ -1096,7 +1095,7 @@ BGSPerkEntry* BGSQuestPerkEntry::Duplicate() {
         v2 = ::new (apMemory) BGSQuestPerkEntry;
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     // Copies the two fields, not the struct's padding.
     v2->Data.pQuest = Data.pQuest;
@@ -1108,15 +1107,15 @@ BGSPerkEntry* BGSQuestPerkEntry::Duplicate() {
 bool BGSQuestPerkEntry::Compare(BGSPerkEntry* apCompare) {
     BGSQuestPerkEntry* v4 = dynamic_cast<BGSQuestPerkEntry*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (BGSPerkEntry::Compare(apCompare)) {
-        return (bool)1;
+        return true;
     }
     if (Data.pQuest == v4->Data.pQuest) {
         return (bool)((uint8_t)(Data.cQuestStage != v4->Data.cQuestStage));
     }
-    return (bool)1;
+    return true;
 }
 
 // Writes the PRKE header, then DATA with the quest swapped for its form ID, then PRKF.

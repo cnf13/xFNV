@@ -46,8 +46,8 @@ Clouds::~Clouds() {
 void Clouds::Initialize(NiNode* apSkyRoot) {
     SkyObject::Initialize(apSkyRoot);
     BSStream apMemory_28;
-    if (apMemory_28.BSStream::Load("Meshes\\Sky\\Clouds.nif", 0)) {
-        Model v6("Meshes\\Sky\\Clouds.nif", &apMemory_28, 0, 0);
+    if (apMemory_28.BSStream::Load("Meshes\\Sky\\Clouds.nif", nullptr)) {
+        Model v6("Meshes\\Sky\\Clouds.nif", &apMemory_28, false, false);
         NiNode* apMemory_20 = v6.GetModel();
         apSkyRoot->AttachChild(spRoot.m_pObject, 1);
         int32_t apMemory_16 = 0;
@@ -94,7 +94,7 @@ void Clouds::Update(Sky* apSky, float afSecondsPassed) {
                     Shade = static_cast<SkyShaderProperty*>((&spClouds[i_2].m_pObject->m_PropertyState)->GetShade());
                 }
                 else {
-                    Shade = 0;
+                    Shade = nullptr;
                 }
                 SkyShaderProperty* pshadeProperty = Shade;
                 if (Shade) {
@@ -119,7 +119,7 @@ void Clouds::Update(Sky* apSky, float afSecondsPassed) {
             }
         }
         if (apSky->GetWeatherUpdateFlag() || bForceUpdate) {
-            bForceUpdate = 0;
+            bForceUpdate = false;
             if (pLastWeather) {
                 for (int32_t i_3 = 0;; ++i_3) {
                     int32_t v10 = GetNumLayers();
@@ -138,7 +138,7 @@ void Clouds::Update(Sky* apSky, float afSecondsPassed) {
                         SkyTextureManager::LoadTextureInBackground(&spTransTexture[i_3], fWeatherPercent);
                     }
                     else {
-                        spTransTexture[i_3].operator=(static_cast<NiTexture*>(0));
+                        spTransTexture[i_3].operator=(static_cast<NiTexture*>(nullptr));
                     }
                 }
             }
@@ -159,8 +159,8 @@ void Clouds::Update(Sky* apSky, float afSecondsPassed) {
                                 strfilename_2.operator=(v14);
                                 const char* v15 = ptestexture_2->GetTextureName();
                                 strfilename_2.operator+=(v15);
-                                NiPointer<NiTexture> spTex(static_cast<NiTexture*>(0));
-                                BSShaderManager::GetTexture(strfilename_2.pString, 1, spTex, 1, 0);
+                                NiPointer<NiTexture> spTex(static_cast<NiTexture*>(nullptr));
+                                BSShaderManager::GetTexture(strfilename_2.pString, true, spTex, true, false);
                                 NiTexture* ptex = spTex.m_pObject;
                                 if (ptex) {
                                     pprop_2->SetTexture(static_cast<NiSourceTexture*>(ptex));
@@ -194,8 +194,8 @@ void Clouds::Update(Sky* apSky, float afSecondsPassed) {
                 if (!pLastWeather) {
                     NiTexture* fWeatherPercentc = spTransTexture[i_5].m_pObject;
                     pskyprop->SetTexture(static_cast<NiSourceTexture*>(fWeatherPercentc));
-                    spTransTexture[i_5].operator=(static_cast<NiTexture*>(0));
-                    pskyprop->SetBlendTexture(0);
+                    spTransTexture[i_5].operator=(static_cast<NiTexture*>(nullptr));
+                    pskyprop->SetBlendTexture(nullptr);
                     pskyprop->SetBlendValue(0.0f);
                 }
             }
@@ -265,5 +265,5 @@ void Clouds::RemoveTextures() {
 }
 
 void Clouds::ForceTransTextureUpdate() {
-    bForceUpdate = (bool)1;
+    bForceUpdate = true;
 }

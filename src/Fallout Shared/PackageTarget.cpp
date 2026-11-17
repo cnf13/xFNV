@@ -207,7 +207,7 @@ void PackageTarget::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             FormByNumericID = TESForm::GetFormByNumericID(uObject.iFormID);
         }
         else {
-            FormByNumericID = 0;
+            FormByNumericID = nullptr;
         }
         uObject.pObject = FormByNumericID;
     }
@@ -252,27 +252,27 @@ void PackageTarget::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
 
 bool PackageTarget::Compare(PackageTarget* apCompare) {
     if (!apCompare) {
-        return (bool)1;
+        return true;
     }
     int32_t targType = (int32_t)GetTargType();
     if (targType != ((int32_t)apCompare->GetTargType())) {
-        return (bool)1;
+        return true;
     }
     TESObjectREFR* targReference = GetTargReference();
     if (targReference != apCompare->GetTargReference()) {
-        return (bool)1;
+        return true;
     }
     TESForm* targObject = GetTargObject();
     if (targObject != apCompare->GetTargObject()) {
-        return (bool)1;
+        return true;
     }
     uint32_t targObjectType = (uint32_t)GetTargObjectType();
     if (targObjectType != ((uint32_t)apCompare->GetTargObjectType())) {
-        return (bool)1;
+        return true;
     }
     uint32_t formFlags = iValue;
     if (formFlags != static_cast<uint32_t>(apCompare->iValue)) {
-        return (bool)1;
+        return true;
     }
     double seconds = (double)GetTargAcquireRadius();
     return (bool)((uint8_t)(seconds != apCompare->GetTargAcquireRadius()));

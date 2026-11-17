@@ -58,8 +58,8 @@ NiObject* NiControllerManager::CreateClone(NiCloningProcess& kCloning) {
         return v4;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -406,16 +406,16 @@ NiControllerSequence* NiControllerManager::FindControllerSequence(NiInterpolator
     NiControllerManager* v3 = this;
     int32_t v4 = 0;
     if (!m_kSequenceArray.m_usSize) {
-        return 0;
+        return nullptr;
     }
-    while (1) {
+    while (true) {
         m_pObject = v3->m_kSequenceArray.m_pBase[v4].m_pObject;
         if (m_pObject) {
             break;
         }
     LABEL_13:;
         if (++v4 >= static_cast<uint32_t>(v3->m_kSequenceArray.m_usSize)) {
-            return 0;
+            return nullptr;
         }
     }
     NiIncRefCount(m_pObject);
@@ -505,7 +505,7 @@ void NiControllerManager::RemoveAllSequences() {
         NiControllerSequence* pkSequence = m_kSequenceArray.m_pBase[ui].m_pObject;
         if (pkSequence) {
             pkSequence->ClearTargets();
-            pkSequence->m_pkOwner = 0;
+            pkSequence->m_pkOwner = nullptr;
         }
     }
     m_kSequenceArray.RemoveAll();
@@ -527,7 +527,7 @@ void NiControllerManager::RemoveSequence(
         NiControllerSequence* m_pObject;
         NiTMapItem<const char*, NiControllerSequence*>* v12;
         NiControllerSequence* v21;
-        while (1) {
+        while (true) {
             m_pObject = m_kSequenceArray.m_pBase[ui].m_pObject;
             v21 = m_pObject;
             if (m_pObject) {
@@ -561,11 +561,11 @@ void NiControllerManager::RemoveSequence(
         }
         else {
         LABEL_21:;
-            v12 = 0;
+            v12 = nullptr;
         }
         if (v12) {
             const char* pcName;
-            while (1) {
+            while (true) {
                 NiControllerSequence* pkVal = v12->m_val;
                 pcName = v12->m_key;
                 v12 = v12->m_pkNext;
@@ -575,7 +575,7 @@ void NiControllerManager::RemoveSequence(
                     uint32_t v17 = v15 + 1;
                     if (v17 >= v16) {
                     LABEL_28:;
-                        v12 = 0;
+                        v12 = nullptr;
                     }
                     else {
                         NiTMapItem<const char*, NiControllerSequence*>** v18 = &m_kStringMap.m_ppkHashTable[v17];
@@ -606,7 +606,7 @@ void NiControllerManager::RemoveSequence(
             }
         }
         m_pObject->ClearTargets();
-        m_pObject->m_pkOwner = 0;
+        m_pObject->m_pkOwner = nullptr;
         NiControllerSequence* v20 = aspControllerSequence.m_pObject;
         if (aspControllerSequence.m_pObject != m_pObject) {
             if (v20) {
@@ -622,7 +622,7 @@ void NiControllerManager::RemoveSequence(
         NiControllerSequence* v6 = aspControllerSequence.m_pObject;
         if (aspControllerSequence.m_pObject) {
             NiDecRefCount(v6);
-            aspControllerSequence.m_pObject = 0;
+            aspControllerSequence.m_pObject = nullptr;
         }
     }
 }
@@ -635,23 +635,23 @@ bool NiControllerManager::AddSequence(
     bool bStoreTargets
 ) {
     if (this && pkSequence->m_pkOwner) {
-        return 0;
+        return false;
     }
-    bool v5 = pkSequence->m_kAccumRootName.GetHandle() == 0;
+    bool v5 = pkSequence->m_kAccumRootName.GetHandle() == nullptr;
     pkSequence->m_pkOwner = this;
     if (v5) {
         pkSequence->SetAccumRootName(m_pkTarget->m_kName);
     }
     if (bStoreTargets && !pkSequence->StoreTargets(static_cast<NiAVObject*>(m_pkTarget))) {
-        pkSequence->m_pkOwner = 0;
-        return 0;
+        pkSequence->m_pkOwner = nullptr;
+        return false;
     }
     if (kName.GetHandle() != NiGlobalStringTable::NULL_STRING) {
         pkSequence->SetName(kName);
     }
     m_kSequenceArray.AddFirstEmpty(pkSequence);
     m_kStringMap.SetAt(pkSequence->m_kName.GetHandle(), pkSequence);
-    return 1;
+    return true;
 }
 
 NiObject* NiControllerManager::CreateObject() {
@@ -660,7 +660,7 @@ NiObject* NiControllerManager::CreateObject() {
         return ::new (v0) NiControllerManager;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

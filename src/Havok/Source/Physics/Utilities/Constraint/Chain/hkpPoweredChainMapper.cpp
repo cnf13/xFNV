@@ -118,7 +118,7 @@ void hkpPoweredChainMapper::setMotors(int32_t linkIndex, int32_t coordinateIndex
     hkpPoweredChainMapper::LinkInfo* linkIndexa = &pThis->m_links.m_data[linkIndex];
     hkpPoweredChainMapper::LinkInfo* v4 = linkIndexa;
     if (linkIndexa->m_numTargets > 0) {
-        while (1) {
+        while (true) {
             hkpPoweredChainMapper::Target* m_data = pThis->m_targets.begin();
             int32_t v7 = v5 + v4->m_firstTargetIdx;
             hkpPoweredChainData* m_chain = m_data[v7].m_chain;

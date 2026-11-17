@@ -72,7 +72,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "SDK/MSVC/rtti.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 PackageEventAction::PackageEventAction() : pIdle(nullptr), pResultScript(nullptr), pTopic(nullptr), eType(PEAT_BEGIN) {}
 
@@ -95,7 +95,7 @@ void PackageEventAction::Copy(PackageEventAction* apCopy) {
                 v2 = ::new (apMemory) Script;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pResultScript = v2;
             pResultScript->SetTemporary();
@@ -106,7 +106,7 @@ void PackageEventAction::Copy(PackageEventAction* apCopy) {
         if (pResultScript) {
             delete pResultScript;
         }
-        pResultScript = 0;
+        pResultScript = nullptr;
     }
 }
 
@@ -237,7 +237,7 @@ void PackageEventAction::InitItem(TESForm* apOwner) {
                 int32_t CastingType = apOwner->iFormID;
                 Warning("MASTERFILE: Unable to find Idle (%08X) on owner object (%08X).", tempint, CastingType);
             }
-            pIdle = 0;
+            pIdle = nullptr;
         }
     }
     tempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this->QTopic()));
@@ -258,17 +258,17 @@ void PackageEventAction::InitItem(TESForm* apOwner) {
                 int32_t v9 = apOwner->iFormID;
                 Warning("MASTERFILE: Unable to find Topic (%08X) on owner object (%08X).", tempint, v9);
             }
-            pTopic = 0;
+            pTopic = nullptr;
         }
     }
     if (pResultScript) {
         int32_t iprevwarnings = MessageHandler::QWarningCount();
-        MessageHandler::IncDisableWarningCount(1);
+        MessageHandler::IncDisableWarningCount(true);
         MessageHandler::SetWarningCount(0);
         pResultScript->SetTemporary();
         pResultScript->InitItem(apOwner);
-        (&pResultScript->m_header)->bIsQuestScript = 0;
-        MessageHandler::IncDisableWarningCount(0);
+        (&pResultScript->m_header)->bIsQuestScript = false;
+        MessageHandler::IncDisableWarningCount(false);
         int32_t iwarnings = MessageHandler::QWarningCount();
         MessageHandler::SetWarningCount(iprevwarnings);
         if (iwarnings) {
@@ -307,16 +307,16 @@ void PackageEventAction::Save(CHUNK_ID aeChunk) {
 
 bool PackageEventAction::Compare(PackageEventAction* apCompare) {
     if (this->QIdle() != apCompare->pIdle) {
-        return 1;
+        return true;
     }
     if (this->QTopic() != apCompare->pTopic) {
-        return 1;
+        return true;
     }
     if (!pResultScript && !apCompare->pResultScript) {
-        return 0;
+        return false;
     }
     if (!pResultScript || !apCompare->pResultScript) {
-        return 1;
+        return true;
     }
     return pResultScript->CompareResultScripts(apCompare->pResultScript);
 }

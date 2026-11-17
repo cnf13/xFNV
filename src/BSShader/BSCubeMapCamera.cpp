@@ -88,7 +88,7 @@ void BSCubeMapCamera::Click(int32_t aiFace) {
     BSRenderedTexture* spRenderedCubeMap = this->spRenderedCubeMap;
     if (spRenderedCubeMap) {
         NiDecRefCount(spRenderedCubeMap);
-        this->spRenderedCubeMap = 0;
+        this->spRenderedCubeMap = nullptr;
     }
     // Releases the six pointers: decrement the count, then delete through the object's virtual DeleteThis.
     for (int32_t i = 0; i < 6; ++i) {
@@ -98,7 +98,7 @@ void BSCubeMapCamera::Click(int32_t aiFace) {
             if (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&pObject->m_uiRefCount))) {
                 pObject->DeleteThis();
             }
-            this->spRenderedTexture[i] = 0;
+            this->spRenderedTexture[i] = nullptr;
         }
     }
 }
@@ -117,59 +117,59 @@ void BSCubeMapCamera::SetupTransformation(NiRenderedCubeMap::FaceID aeFace) {
     NiPoint3 v12;
     switch ((int32_t)aeFace) {
         case 0: {
-            kWorldUp.x = (float)(-NiPoint3_UNIT_Y.x);
-            kWorldUp.y = (float)(-NiPoint3_UNIT_Y.y);
-            kWorldUp.z = (float)(-NiPoint3_UNIT_Y.z);
-            kWorldPt.x = (float)(m_kWorld.m_Translate.x - NiPoint3_UNIT_X.x);
-            kWorldPt.y = (float)(m_kWorld.m_Translate.y - NiPoint3_UNIT_X.y);
-            kWorldPt.z = (float)(m_kWorld.m_Translate.z - NiPoint3_UNIT_X.z);
+            kWorldUp.x = (-NiPoint3_UNIT_Y.x);
+            kWorldUp.y = (-NiPoint3_UNIT_Y.y);
+            kWorldUp.z = (-NiPoint3_UNIT_Y.z);
+            kWorldPt.x = (m_kWorld.m_Translate.x - NiPoint3_UNIT_X.x);
+            kWorldPt.y = (m_kWorld.m_Translate.y - NiPoint3_UNIT_X.y);
+            kWorldPt.z = (m_kWorld.m_Translate.z - NiPoint3_UNIT_X.z);
             NiCamera::LookAtWorldPoint(kWorldPt, kWorldUp);
             break;
         }
         case 1: {
-            v5.x = (float)(-NiPoint3_UNIT_Y.x);
-            v5.y = (float)(-NiPoint3_UNIT_Y.y);
-            v5.z = (float)(-NiPoint3_UNIT_Y.z);
-            v9.x = (float)(NiPoint3_UNIT_X.x + m_kWorld.m_Translate.x);
-            v9.y = (float)(m_kWorld.m_Translate.y + NiPoint3_UNIT_X.y);
-            v9.z = (float)(m_kWorld.m_Translate.z + NiPoint3_UNIT_X.z);
+            v5.x = (-NiPoint3_UNIT_Y.x);
+            v5.y = (-NiPoint3_UNIT_Y.y);
+            v5.z = (-NiPoint3_UNIT_Y.z);
+            v9.x = (NiPoint3_UNIT_X.x + m_kWorld.m_Translate.x);
+            v9.y = (m_kWorld.m_Translate.y + NiPoint3_UNIT_X.y);
+            v9.z = (m_kWorld.m_Translate.z + NiPoint3_UNIT_X.z);
             NiCamera::LookAtWorldPoint(v9, v5);
             break;
         }
         case 2: {
-            v7.x = (float)(m_kWorld.m_Translate.x - NiPoint3_UNIT_Y.x);
-            v7.y = (float)(m_kWorld.m_Translate.y - NiPoint3_UNIT_Y.y);
-            v7.z = (float)(m_kWorld.m_Translate.z - NiPoint3_UNIT_Y.z);
+            v7.x = (m_kWorld.m_Translate.x - NiPoint3_UNIT_Y.x);
+            v7.y = (m_kWorld.m_Translate.y - NiPoint3_UNIT_Y.y);
+            v7.z = (m_kWorld.m_Translate.z - NiPoint3_UNIT_Y.z);
             NiCamera::LookAtWorldPoint(v7, NiPoint3_UNIT_Z);
             break;
         }
         case 3: {
-            v2.x = (float)(-NiPoint3_UNIT_Z.x);
-            v2.y = (float)(-NiPoint3_UNIT_Z.y);
-            v2.z = (float)(-NiPoint3_UNIT_Z.z);
-            v4.x = (float)(m_kWorld.m_Translate.x + NiPoint3_UNIT_Y.x);
-            v4.y = (float)(m_kWorld.m_Translate.y + NiPoint3_UNIT_Y.y);
-            v4.z = (float)(m_kWorld.m_Translate.z + NiPoint3_UNIT_Y.z);
+            v2.x = (-NiPoint3_UNIT_Z.x);
+            v2.y = (-NiPoint3_UNIT_Z.y);
+            v2.z = (-NiPoint3_UNIT_Z.z);
+            v4.x = (m_kWorld.m_Translate.x + NiPoint3_UNIT_Y.x);
+            v4.y = (m_kWorld.m_Translate.y + NiPoint3_UNIT_Y.y);
+            v4.z = (m_kWorld.m_Translate.z + NiPoint3_UNIT_Y.z);
             NiCamera::LookAtWorldPoint(v4, v2);
             break;
         }
         case 4: {
-            v6.x = (float)(-NiPoint3_UNIT_Y.x);
-            v6.y = (float)(-NiPoint3_UNIT_Y.y);
-            v6.z = (float)(-NiPoint3_UNIT_Y.z);
-            v8.x = (float)(m_kWorld.m_Translate.x - NiPoint3_UNIT_Z.x);
-            v8.y = (float)(m_kWorld.m_Translate.y - NiPoint3_UNIT_Z.y);
-            v8.z = (float)(m_kWorld.m_Translate.z - NiPoint3_UNIT_Z.z);
+            v6.x = (-NiPoint3_UNIT_Y.x);
+            v6.y = (-NiPoint3_UNIT_Y.y);
+            v6.z = (-NiPoint3_UNIT_Y.z);
+            v8.x = (m_kWorld.m_Translate.x - NiPoint3_UNIT_Z.x);
+            v8.y = (m_kWorld.m_Translate.y - NiPoint3_UNIT_Z.y);
+            v8.z = (m_kWorld.m_Translate.z - NiPoint3_UNIT_Z.z);
             NiCamera::LookAtWorldPoint(v8, v6);
             break;
         }
         case 5: {
-            v10.x = (float)(-NiPoint3_UNIT_Y.x);
-            v10.y = (float)(-NiPoint3_UNIT_Y.y);
-            v10.z = (float)(-NiPoint3_UNIT_Y.z);
-            v12.x = (float)(m_kWorld.m_Translate.x + NiPoint3_UNIT_Z.x);
-            v12.y = (float)(m_kWorld.m_Translate.y + NiPoint3_UNIT_Z.y);
-            v12.z = (float)(m_kWorld.m_Translate.z + NiPoint3_UNIT_Z.z);
+            v10.x = (-NiPoint3_UNIT_Y.x);
+            v10.y = (-NiPoint3_UNIT_Y.y);
+            v10.z = (-NiPoint3_UNIT_Y.z);
+            v12.x = (m_kWorld.m_Translate.x + NiPoint3_UNIT_Z.x);
+            v12.y = (m_kWorld.m_Translate.y + NiPoint3_UNIT_Z.y);
+            v12.z = (m_kWorld.m_Translate.z + NiPoint3_UNIT_Z.z);
             NiCamera::LookAtWorldPoint(v12, v10);
             break;
         }

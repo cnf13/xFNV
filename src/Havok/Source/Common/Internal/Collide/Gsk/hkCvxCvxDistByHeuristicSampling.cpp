@@ -104,9 +104,9 @@ void hkCvxCvxDistByHeuristicSampling(
 
         // A direction perpendicular to the normal: the two components other than the smallest of x and y, or z
         // when it is smaller still, swapped with one negated.
-        float absX = static_cast<float>(std::fabs(normal(0)));
-        float absY = static_cast<float>(std::fabs(normal(1)));
-        float absZ = static_cast<float>(std::fabs(normal(2)));
+        float absX = std::fabs(normal(0));
+        float absY = std::fabs(normal(1));
+        float absZ = std::fabs(normal(2));
         int32_t smallest = 0;
         int32_t i0 = 1;
         int32_t i1 = 2;

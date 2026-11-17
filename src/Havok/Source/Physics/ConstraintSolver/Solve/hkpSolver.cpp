@@ -115,7 +115,7 @@ static int32_t hkPoweredChain_BuildVelocities(const hkpChainSolverInfo& info, hk
                         _mm_set1_ps(tauFactor)
                     )
                 );
-                const float dot = static_cast<float>(sum[2] + static_cast<float>(sum[1] + sum[0]));
+                const float dot = (sum[2] + static_cast<float>(sum[1] + sum[0]));
                 velocity->m_lin(n) = static_cast<float>(tau * jac->m_linear0(3) - dot);
                 // The motor row n.
                 const float motorTau = motor[n].m_tau;
@@ -135,8 +135,8 @@ static int32_t hkPoweredChain_BuildVelocities(const hkpChainSolverInfo& info, hk
                         _mm_set1_ps(motor[n].m_damping)
                     )
                 );
-                const float dotAng = static_cast<float>(sumAng[2] + static_cast<float>(sumAng[1] + sumAng[0]));
-                velocity->m_ang(n) = static_cast<float>(motorTau * jacAng->m_angular[1](3) - dotAng);
+                const float dotAng = (sumAng[2] + static_cast<float>(sumAng[1] + sumAng[0]));
+                velocity->m_ang(n) = (motorTau * jacAng->m_angular[1](3) - dotAng);
                 ++jac;
                 ++jacAng;
             }
@@ -182,8 +182,8 @@ static hkVector8* hkPoweredChain_computeMotorVelocity(
             _mm_set1_ps(tauFactor)
         )
     );
-    const float dot = static_cast<float>(sum[2] + static_cast<float>(sum[1] + sum[0]));
-    velocities[constraintIndex].m_ang(motorIndex) = static_cast<float>(motorTau * jac.m_angular[1](3) - dot);
+    const float dot = (sum[2] + static_cast<float>(sum[1] + sum[0]));
+    velocities[constraintIndex].m_ang(motorIndex) = (motorTau * jac.m_angular[1](3) - dot);
     return velocities;
 }
 
@@ -488,8 +488,7 @@ int32_t hkSolveConstraintsByTheSteps(
                     float v202 = _mm_shuffle_ps(v201, v201, 85)[0] + v201[0];
                     float v203 = _mm_shuffle_ps(v201, v201, 170)[0];
                     __m128 v204 = _mm_shuffle_ps(m_quad_1, m_quad_1, 255);
-                    v204[0] = static_cast<float>(v204[0] - static_cast<float>(v203 + v202)) *
-                        _mm_shuffle_ps(m_quad, m_quad, 255)[0];
+                    v204[0] = (v204[0] - (v203 + v202)) * _mm_shuffle_ps(m_quad, m_quad, 255)[0];
                     __m128 v205 = v204;
                     __m128 v206 = _mm_shuffle_ps(v205, v205, 0);
                     __m128 v207 = _mm_mul_ps(invB, v206);
@@ -523,17 +522,12 @@ int32_t hkSolveConstraintsByTheSteps(
                     );
                     __m128 m_quad_3 = l0;
                     __m128 v214 = _mm_shuffle_ps(l0, l0, 255);
-                    v214[0] = static_cast<float>(
-                                  v214[0] -
-                                  static_cast<float>(
-                                      _mm_shuffle_ps(v212, v212, 170)[0] +
-                                      static_cast<float>(_mm_shuffle_ps(v212, v212, 85)[0] + v212[0])
-                                  )
-                              ) *
+                    v214[0] = (v214[0] -
+                               (_mm_shuffle_ps(v212, v212, 170)[0] + (_mm_shuffle_ps(v212, v212, 85)[0] + v212[0]))) *
                         _mm_shuffle_ps(m_quad_2, m_quad_2, 255)[0];
                     __m128 m_quad_4 = hkQuadReal0000;
                     __m128 v216 = _mm_shuffle_ps(a1, a1, 255);
-                    m_quad_4[0] = static_cast<float>(0.0f - v216[0]) - elemTemp->m_deltaRhs;
+                    m_quad_4[0] = (0.0f - v216[0]) - elemTemp->m_deltaRhs;
                     v216[0] = v216[0] - elemTemp->m_deltaRhs;
                     __m128 v217 = _mm_min_ps(v216, _mm_max_ps(m_quad_4, v214));
                     __m128 v218 = _mm_shuffle_ps(v217, v217, 0);
@@ -585,8 +579,7 @@ int32_t hkSolveConstraintsByTheSteps(
                             )
                         )
                     );
-                    float v384 = _mm_shuffle_ps(v231, v231, 170)[0] +
-                        static_cast<float>(_mm_shuffle_ps(v231, v231, 85)[0] + v231[0]);
+                    float v384 = _mm_shuffle_ps(v231, v231, 170)[0] + (_mm_shuffle_ps(v231, v231, 85)[0] + v231[0]);
                     __m128 m_quad_7 = l0;
                     float v340 = v230 * v367 - v384;
                     __m128 v233 = _mm_set_ss(v340);
@@ -620,10 +613,7 @@ int32_t hkSolveConstraintsByTheSteps(
                         _mm_add_ps(_mm_mul_ps(a1, angB), _mm_mul_ps(a0, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                     );
                     float v388 = _mm_shuffle_ps(l0, l0, 255)[0] -
-                        static_cast<float>(
-                                     _mm_shuffle_ps(v248, v248, 170)[0] +
-                                     static_cast<float>(_mm_shuffle_ps(v248, v248, 85)[0] + v248[0])
-                        );
+                        (_mm_shuffle_ps(v248, v248, 170)[0] + (_mm_shuffle_ps(v248, v248, 85)[0] + v248[0]));
                     float v359 = v388;
                     float v343 = -elemTemp->m_deltaRhs;
                     float v312 = v388 - pS->m_minRhs;
@@ -675,10 +665,7 @@ int32_t hkSolveConstraintsByTheSteps(
                         _mm_add_ps(_mm_mul_ps(a1, angB), _mm_mul_ps(a0, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                     );
                     float v386 = _mm_shuffle_ps(l0, l0, 255)[0] -
-                        static_cast<float>(
-                                     _mm_shuffle_ps(v239, v239, 170)[0] +
-                                     static_cast<float>(_mm_shuffle_ps(v239, v239, 85)[0] + v239[0])
-                        );
+                        (_mm_shuffle_ps(v239, v239, 170)[0] + (_mm_shuffle_ps(v239, v239, 85)[0] + v239[0]));
                     float v311 = a0[3] * v386;
                     float v341 = std::fabs(static_cast<double>(v311));
                     if (!(pS->m_maxImpulse < static_cast<double>(v341))) {
@@ -734,8 +721,7 @@ int32_t hkSolveConstraintsByTheSteps(
                     __m128 v269 = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v346), _mm_set_ss(v346), 0), v268);
                     v268[0] = v261;
                     __m128 v270 = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v268, v268, 0), v266), v269);
-                    float v375 = _mm_shuffle_ps(v270, v270, 170)[0] +
-                        static_cast<float>(_mm_shuffle_ps(v270, v270, 85)[0] + v270[0]);
+                    float v375 = _mm_shuffle_ps(v270, v270, 170)[0] + (_mm_shuffle_ps(v270, v270, 85)[0] + v270[0]);
                     float v347 = v267 * v360 - v375;
                     double v271 = a0[3] * v347;
                     float v361 = v271;
@@ -782,7 +768,7 @@ int32_t hkSolveConstraintsByTheSteps(
                 );
                 hkSimdReal sDot;
                 sDot.m_real = _mm_shuffle_ps(v280, v280, 170);
-                sDot.m_real[0] = sDot.m_real[0] + static_cast<float>(_mm_shuffle_ps(v280, v280, 85)[0] + v280[0]);
+                sDot.m_real[0] = sDot.m_real[0] + (_mm_shuffle_ps(v280, v280, 85)[0] + v280[0]);
                 hkSimdReal sRhs;
                 sRhs.m_real = _mm_shuffle_ps(l0, l0, 255);
                 hkSimdReal sDelta = sRhs - sDot;
@@ -813,10 +799,9 @@ int32_t hkSolveConstraintsByTheSteps(
                     const __m128& a0 = pS->m_jac.m_angular[0].m_quad;
                     __m128 m_quad_9 = pS->m_jac.m_angular[1].m_quad;
                     __m128 v190 = _mm_add_ps(_mm_mul_ps(m_quad_9, angB), _mm_mul_ps(angA, a0));
-                    float v191 = _mm_shuffle_ps(v190, v190, 170)[0] +
-                        static_cast<float>(_mm_shuffle_ps(v190, v190, 85)[0] + v190[0]);
+                    float v191 = _mm_shuffle_ps(v190, v190, 170)[0] + (_mm_shuffle_ps(v190, v190, 85)[0] + v190[0]);
                     __m128 v192 = _mm_shuffle_ps(m_quad_9, m_quad_9, 255);
-                    v192[0] = static_cast<float>(v192[0] - v191) * _mm_shuffle_ps(a0, a0, 255)[0];
+                    v192[0] = (v192[0] - v191) * _mm_shuffle_ps(a0, a0, 255)[0];
                     float v193 = v192[0];
                     __m128 v194 = _mm_shuffle_ps(v192, v192, 0);
                     __m128 v195 = _mm_mul_ps(_mm_mul_ps(v194, invA), a0);
@@ -854,8 +839,7 @@ int32_t hkSolveConstraintsByTheSteps(
                             _mm_add_ps(_mm_mul_ps(a1, s1B), _mm_mul_ps(s1A, a0))
                         )
                     );
-                    float v376 = _mm_shuffle_ps(v163, v163, 170)[0] +
-                        static_cast<float>(_mm_shuffle_ps(v163, v163, 85)[0] + v163[0]);
+                    float v376 = _mm_shuffle_ps(v163, v163, 170)[0] + (_mm_shuffle_ps(v163, v163, 85)[0] + v163[0]);
                     float v378 = v162 * v304 - v376;
                     float v334 = -elemTemp->m_deltaRhs;
                     float v305 = v378 - pS->m_minRhs;
@@ -899,10 +883,7 @@ int32_t hkSolveConstraintsByTheSteps(
                     double v153;
                     __m128 v152 = _mm_add_ps(_mm_mul_ps(a1, angB), _mm_mul_ps(angA, a0));
                     float v391 = _mm_shuffle_ps(a1, a1, 255)[0] -
-                        static_cast<float>(
-                                     _mm_shuffle_ps(v152, v152, 170)[0] +
-                                     static_cast<float>(_mm_shuffle_ps(v152, v152, 85)[0] + v152[0])
-                        );
+                        (_mm_shuffle_ps(v152, v152, 170)[0] + (_mm_shuffle_ps(v152, v152, 85)[0] + v152[0]));
                     float v303 = a0[3] * v391;
                     float v329 = std::fabs(static_cast<double>(v303));
                     if (!(pS->m_maxImpulse < static_cast<double>(v329))) {
@@ -947,8 +928,7 @@ int32_t hkSolveConstraintsByTheSteps(
                     __m128 v180 = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v336), _mm_set_ss(v336), 0), v179);
                     v179[0] = v173;
                     __m128 v181 = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v179, v179, 0), v178), v180);
-                    float v380 = _mm_shuffle_ps(v181, v181, 170)[0] +
-                        static_cast<float>(_mm_shuffle_ps(v181, v181, 85)[0] + v181[0]);
+                    float v380 = _mm_shuffle_ps(v181, v181, 170)[0] + (_mm_shuffle_ps(v181, v181, 85)[0] + v181[0]);
                     float v337 = v177 * v309 - v380;
                     float v310 = a0[3] * v337;
                     double v182 = v310;
@@ -993,13 +973,8 @@ int32_t hkSolveConstraintsByTheSteps(
                         _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                     );
                     __m128 v66 = _mm_shuffle_ps(l0, l0, 255);
-                    v66[0] = static_cast<float>(
-                                 v66[0] -
-                                 static_cast<float>(
-                                     _mm_shuffle_ps(v65, v65, 170)[0] +
-                                     static_cast<float>(_mm_shuffle_ps(v65, v65, 85)[0] + v65[0])
-                                 )
-                             ) *
+                    v66[0] =
+                        (v66[0] - (_mm_shuffle_ps(v65, v65, 170)[0] + (_mm_shuffle_ps(v65, v65, 85)[0] + v65[0]))) *
                         _mm_shuffle_ps(m_quad_11, m_quad_11, 255)[0];
                     pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
                     __m128 m_quad_13 = hkQuadReal0000;
@@ -1037,13 +1012,8 @@ int32_t hkSolveConstraintsByTheSteps(
                         _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                     );
                     __m128 v76 = _mm_shuffle_ps(l0, l0, 255);
-                    v76[0] = static_cast<float>(
-                                 v76[0] -
-                                 static_cast<float>(
-                                     _mm_shuffle_ps(v75, v75, 170)[0] +
-                                     static_cast<float>(_mm_shuffle_ps(v75, v75, 85)[0] + v75[0])
-                                 )
-                             ) *
+                    v76[0] =
+                        (v76[0] - (_mm_shuffle_ps(v75, v75, 170)[0] + (_mm_shuffle_ps(v75, v75, 85)[0] + v75[0]))) *
                         _mm_shuffle_ps(m_quad_14, m_quad_14, 255)[0];
                     __m128 m_quad_15 = hkQuadReal0000;
                     m_quad_15[0] = 0.0f - elemTemp->m_deltaRhs;
@@ -1082,20 +1052,14 @@ int32_t hkSolveConstraintsByTheSteps(
                 __m128 v12 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a01, angB), _mm_mul_ps(a00, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                 );
-                float v395 =
-                    _mm_shuffle_ps(l0, l0, 255)[0] -
-                    static_cast<float>(
-                        _mm_shuffle_ps(v12, v12, 170)[0] + static_cast<float>(_mm_shuffle_ps(v12, v12, 85)[0] + v12[0])
-                    );
+                float v395 = _mm_shuffle_ps(l0, l0, 255)[0] -
+                    (_mm_shuffle_ps(v12, v12, 170)[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]));
                 __m128 v15 = l1;
                 __m128 v16 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a11, angB), _mm_mul_ps(a10, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), v15)
                 );
-                float v17 =
-                    _mm_shuffle_ps(v15, v15, 255)[0] -
-                    static_cast<float>(
-                        _mm_shuffle_ps(v16, v16, 170)[0] + static_cast<float>(_mm_shuffle_ps(v16, v16, 85)[0] + v16[0])
-                    );
+                float v17 = _mm_shuffle_ps(v15, v15, 255)[0] -
+                    (_mm_shuffle_ps(v16, v16, 170)[0] + (_mm_shuffle_ps(v16, v16, 85)[0] + v16[0]));
                 float v350 = v395 * a01[3] + v17 * pS->m_invJac01;
                 float v296 = v395 * pS->m_invJac01 + v17 * a11[3];
                 bool bFirstOnly;
@@ -1183,18 +1147,12 @@ int32_t hkSolveConstraintsByTheSteps(
                     _mm_add_ps(_mm_mul_ps(a01, angB), _mm_mul_ps(a00, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                 );
                 float v393 = _mm_shuffle_ps(l0, l0, 255)[0] -
-                    static_cast<float>(
-                                 _mm_shuffle_ps(v136, v136, 170)[0] +
-                                 static_cast<float>(_mm_shuffle_ps(v136, v136, 85)[0] + v136[0])
-                    );
+                    (_mm_shuffle_ps(v136, v136, 170)[0] + (_mm_shuffle_ps(v136, v136, 85)[0] + v136[0]));
                 __m128 v137 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a11, angB), _mm_mul_ps(a10, angA)), _mm_mul_ps(l1, _mm_sub_ps(linA, linB))
                 );
                 float v385 = _mm_shuffle_ps(l1, l1, 255)[0] -
-                    static_cast<float>(
-                                 _mm_shuffle_ps(v137, v137, 170)[0] +
-                                 static_cast<float>(_mm_shuffle_ps(v137, v137, 85)[0] + v137[0])
-                    );
+                    (_mm_shuffle_ps(v137, v137, 170)[0] + (_mm_shuffle_ps(v137, v137, 85)[0] + v137[0]));
                 float v366 = pS->m_maxImpulse * pS->m_maxImpulse;
                 float v357 = a01[3] * v393 + v385 * pS->m_invJac01;
                 float v302 = v393 * pS->m_invJac01 + v385 * a11[3];
@@ -1253,25 +1211,16 @@ int32_t hkSolveConstraintsByTheSteps(
                     _mm_add_ps(_mm_mul_ps(a01, angB), _mm_mul_ps(a00, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                 );
                 float v381 = _mm_shuffle_ps(l0, l0, 255)[0] -
-                    static_cast<float>(
-                                 _mm_shuffle_ps(v113, v113, 170)[0] +
-                                 static_cast<float>(_mm_shuffle_ps(v113, v113, 85)[0] + v113[0])
-                    );
+                    (_mm_shuffle_ps(v113, v113, 170)[0] + (_mm_shuffle_ps(v113, v113, 85)[0] + v113[0]));
                 __m128 v114 = l1;
                 __m128 v115 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a11, angB), _mm_mul_ps(a10, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), v114)
                 );
                 float v389 = _mm_shuffle_ps(v114, v114, 255)[0] -
-                    static_cast<float>(
-                                 _mm_shuffle_ps(v115, v115, 170)[0] +
-                                 static_cast<float>(_mm_shuffle_ps(v115, v115, 85)[0] + v115[0])
-                    );
+                    (_mm_shuffle_ps(v115, v115, 170)[0] + (_mm_shuffle_ps(v115, v115, 85)[0] + v115[0]));
                 __m128 v116 = _mm_add_ps(_mm_mul_ps(a21, angB), _mm_mul_ps(a20, angA));
                 float v383 = _mm_shuffle_ps(a21, a21, 255)[0] -
-                    static_cast<float>(
-                                 _mm_shuffle_ps(v116, v116, 170)[0] +
-                                 static_cast<float>(_mm_shuffle_ps(v116, v116, 85)[0] + v116[0])
-                    );
+                    (_mm_shuffle_ps(v116, v116, 170)[0] + (_mm_shuffle_ps(v116, v116, 85)[0] + v116[0]));
                 float v355 = v383 * a20[3];
                 float v365 = a01[3] * v381 + pS->m_invJac01 * v389;
                 float v301 = v381 * pS->m_invJac01 + v389 * a11[3];
@@ -1337,17 +1286,11 @@ int32_t hkSolveConstraintsByTheSteps(
                 __m128 v101 = _mm_add_ps(_mm_mul_ps(a01, angB), _mm_mul_ps(angA, a00));
                 double v102 = a00[3];
                 float v387 = _mm_shuffle_ps(a01, a01, 255)[0] -
-                    static_cast<float>(
-                                 _mm_shuffle_ps(v101, v101, 170)[0] +
-                                 static_cast<float>(_mm_shuffle_ps(v101, v101, 85)[0] + v101[0])
-                    );
+                    (_mm_shuffle_ps(v101, v101, 170)[0] + (_mm_shuffle_ps(v101, v101, 85)[0] + v101[0]));
                 float v300 = v102 * v387;
                 __m128 v103 = _mm_add_ps(_mm_mul_ps(a11, angB), _mm_mul_ps(a10, angA));
                 float v379 = _mm_shuffle_ps(a11, a11, 255)[0] -
-                    static_cast<float>(
-                                 _mm_shuffle_ps(v103, v103, 170)[0] +
-                                 static_cast<float>(_mm_shuffle_ps(v103, v103, 85)[0] + v103[0])
-                    );
+                    (_mm_shuffle_ps(v103, v103, 170)[0] + (_mm_shuffle_ps(v103, v103, 85)[0] + v103[0]));
                 float v354 = a10[3] * v379;
                 float v364 = v354 * v354 + v300 * v300;
                 if (!(v318 < static_cast<double>(v364))) {

@@ -57,7 +57,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiRTTI BSBatchRenderer::ms_RTTI("BSBatchRenderer", &NiObject::ms_RTTI);
 
@@ -69,13 +69,13 @@ void PersistentPassList_Sort(
     apList->CleanUnusedNodes();
     if (v2->m_pkHead) {
         int32_t v13 = 1;
-        while (1) {
+        while (true) {
             PersistentPassList::ListItem* i;
             PersistentPassList::ListItem* m_pkHead = v2->m_pkHead;
             uint32_t v4 = v13;
-            PersistentPassList::ListItem* v5 = 0;
-            v2->m_pkHead = 0;
-            PersistentPassList::ListItem* v12 = 0;
+            PersistentPassList::ListItem* v5 = nullptr;
+            v2->m_pkHead = nullptr;
+            PersistentPassList::ListItem* v12 = nullptr;
             int32_t v14 = 0;
             if (!m_pkHead) {
                 goto LABEL_24;
@@ -92,7 +92,7 @@ void PersistentPassList_Sort(
                     }
                 }
                 int32_t v9 = v4;
-                while (1) {
+                while (true) {
                     PersistentPassList::ListItem* v10;
                     int32_t v11;
                     if (v6 > 0) {
@@ -127,7 +127,7 @@ void PersistentPassList_Sort(
                     else {
                         apList->m_pkHead = v10;
                         v4 = v13;
-                        v10->m_pkPrev = 0;
+                        v10->m_pkPrev = nullptr;
                     }
                     v12 = v10;
                     v5 = v10;
@@ -137,7 +137,7 @@ void PersistentPassList_Sort(
             while (i);
             v2 = apList;
         LABEL_24:;
-            v5->m_pkNext = 0;
+            v5->m_pkNext = nullptr;
             v13 = 2 * v4;
             if (v14 == 1) {
                 v2->m_pkTail = v5;
@@ -203,15 +203,15 @@ PersistentPassList::~PersistentPassList() {
 void PersistentPassList::CleanUnusedNodes() {
     PersistentPassList::ListItem* pNextFreeItem = this->pNextFreeItem;
     if (pNextFreeItem) {
-        NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.Lock(0);
+        NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.Lock(nullptr);
         do {
             // A freed list item's memory is reused as a pool node (NiTAbstractPoolAllocator's node holds the free-list
             // link and a data pointer), so the item is read as one.
             NiTAbstractPoolAllocator<uint32_t>::AllocNode* v3 =
                 reinterpret_cast<NiTAbstractPoolAllocator<uint32_t>::AllocNode*>(pNextFreeItem);
             pNextFreeItem = pNextFreeItem->m_pkNext;
-            NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.Lock(0);
-            v3->m_pkData = 0;
+            NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.Lock(nullptr);
+            v3->m_pkData = nullptr;
             v3->m_pkNext = NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
             bool v4 = NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.uiLockCount-- == 1;
             NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem = v3;
@@ -225,9 +225,9 @@ void PersistentPassList::CleanUnusedNodes() {
         }
     }
     PersistentPassList::ListItem* m_pkTail = this->m_pkTail;
-    this->pNextFreeItem = 0;
+    this->pNextFreeItem = nullptr;
     if (m_pkTail) {
-        m_pkTail->m_pkNext = 0;
+        m_pkTail->m_pkNext = nullptr;
     }
 }
 
@@ -263,7 +263,7 @@ void PersistentPassList::AddBack(BSShaderProperty::RenderPass** apRenderPass) {
         pNextFreeItem = static_cast<PersistentPassList::ListItem*>(Allocator.Allocate());
     }
     pNextFreeItem->m_element = *apRenderPass;
-    pNextFreeItem->m_pkNext = 0;
+    pNextFreeItem->m_pkNext = nullptr;
     pNextFreeItem->m_pkPrev = this->m_pkTail;
     PersistentPassList::ListItem* m_pkTail = this->m_pkTail;
     if (m_pkTail) {
@@ -309,7 +309,7 @@ void BSBatchRenderer::PassGroup::AddHead(int32_t aiBucket, BSShaderProperty::Ren
     }
     pNextFreeItem->m_element = apRenderPass;
     pNextFreeItem->m_pkNext = v4->m_pkHead;
-    pNextFreeItem->m_pkPrev = 0;
+    pNextFreeItem->m_pkPrev = nullptr;
     PersistentPassList::ListItem* m_pkHead = v4->m_pkHead;
     if (m_pkHead) {
         m_pkHead->m_pkPrev = pNextFreeItem;
@@ -332,7 +332,7 @@ void BSBatchRenderer::PassGroup::AddTail(int32_t aiBucket, BSShaderProperty::Ren
         pNextFreeItem = static_cast<PersistentPassList::ListItem*>(v4->Allocator.Allocate());
     }
     pNextFreeItem->m_element = apRenderPass;
-    pNextFreeItem->m_pkNext = 0;
+    pNextFreeItem->m_pkNext = nullptr;
     pNextFreeItem->m_pkPrev = v4->m_pkTail;
     PersistentPassList::ListItem* m_pkTail = v4->m_pkTail;
     if (m_pkTail) {
@@ -383,7 +383,7 @@ void BSBatchRenderer::GeometryGroup::RegisterPass(BSShaderProperty::RenderPass* 
                 v5 = ::new (v4) BSBatchRenderer(uiPassCount, 100);
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             pBatchRenderer = v5;
         }
@@ -402,7 +402,7 @@ void BSBatchRenderer::GeometryGroup::ClearPasses() {
     p_kPassList->Allocator.uiCount = (uint32_t)0;
     pBatchRenderer = this->pBatchRenderer;
     if (pBatchRenderer) {
-        pBatchRenderer->ClearRenderPasses(0);
+        pBatchRenderer->ClearRenderPasses(false);
     }
     usCount = (uint16_t)0;
 }
@@ -436,7 +436,7 @@ BSBatchRenderer::BSBatchRenderer(uint32_t auiPassCount, int32_t a2) : RenderPass
     pRenderPassA = new PassGroup[auiPassCount];
     uiRenderPassCount = auiPassCount;
     iGroupingAlphas = 0;
-    ClearRenderPasses(0);
+    ClearRenderPasses(false);
     if (a2 == 99) {
         static const uint32_t kPassCounts[GG_COUNT] = {759, 759, 759, 759, 759, 759, 6, 1, 4, 759, 759, 6, 4};
         for (uint32_t i = 0; i < GG_COUNT; ++i) {
@@ -468,7 +468,7 @@ BSBatchRenderer::BSBatchRenderer(uint32_t auiPassCount, int32_t a2) : RenderPass
 
 // The pass groups, the instance renderer and the geometry groups are owned; the lists and the map free their own.
 BSBatchRenderer::~BSBatchRenderer() {
-    ClearRenderPasses(0);
+    ClearRenderPasses(false);
     delete[] pRenderPassA;
     uiRenderPassCount = 0;
     if (pInstanceRenderer) {
@@ -489,7 +489,7 @@ void BSBatchRenderer::RegisterPass(BSShaderProperty::RenderPass* apRenderPass, u
             int32_t rbt;
             uint32_t uiindex;
             BSBatchRenderer* v11;
-            bool v4 = 0;
+            bool v4 = false;
             BSShaderPPLightingProperty* m_pObject =
                 static_cast<BSShaderPPLightingProperty*>(pGeometry->m_PropertyState.m_aspProps[3].m_pObject);
             if (pGeometry->m_PropertyState.m_aspProps[4].m_pObject) {
@@ -535,7 +535,7 @@ void BSBatchRenderer::RegisterPass(BSShaderProperty::RenderPass* apRenderPass, u
                 uiindex = RenderPassMap.m_kAllocator.m_uiCount;
                 RenderPassMap.SetAt(uipass, uiindex);
                 v11 = this;
-                pRenderPassA[uiindex].Clear(0);
+                pRenderPassA[uiindex].Clear(false);
             }
             if (!v11->pRenderPassA[uiindex].iSize) {
                 v11->kActivePassIndexList.Insert(uipass, &ComparePasses);
@@ -577,7 +577,7 @@ void BSBatchRenderer::RenderBatches(
                 if (BSShaderAccumulator::IsShadowPass(uiPass) &&
                     (BSShaderManager::GetAccumulator()->bWaterReflection ||
                      BSShaderManager::GetAccumulator()->bWaterRefraction)) {
-                    pRenderPassA[uiIndex].Clear(0);
+                    pRenderPassA[uiIndex].Clear(false);
                 }
                 else {
                     for (int32_t iBucket = 0; iBucket < 5; ++iBucket) {
@@ -652,7 +652,7 @@ void BSBatchRenderer::RenderBatches(
                             --BSRenderState::iLock[4];
                         }
                     }
-                    pRenderPassA[uiIndex].Clear(0);
+                    pRenderPassA[uiIndex].Clear(false);
                 }
             }
             pNode = pNode->GetNext();
@@ -862,9 +862,9 @@ bool BSBatchRenderer::QWaterRefractionPassWithinRange(
 ) {
     BSSimpleList<uint16_t>* pkList = &kActivePassIndexList;
     if (!pkList) {
-        return 0;
+        return false;
     }
-    while (1) {
+    while (true) {
         uint32_t m_item = pkList->m_item;
         if (m_item <= aeEndRange &&
             (m_item >= aeStartRange &&
@@ -904,10 +904,10 @@ bool BSBatchRenderer::QWaterRefractionPassWithinRange(
         }
         pkList = pkList->GetNext();
         if (!pkList) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 void BSBatchRenderer::RegisterAlphaPass(BSShaderProperty::RenderPass* apRenderPass, uint32_t aiIndex) {
@@ -989,17 +989,17 @@ void BSBatchRenderer::StartGroupingAlphas(
             pGroup = ::new (pGroup) BSBatchRenderer::GeometryGroup(759);
         }
         else {
-            pGroup = 0;
+            pGroup = nullptr;
         }
         // Clears the group's passes, as GeometryGroup::ClearPasses does.
         pGroup->PassList.CleanUnusedNodes();
         pGroup->PassList.pNextFreeItem = pGroup->PassList.m_pkHead;
-        pGroup->PassList.m_pkHead = 0;
-        pGroup->PassList.m_pkTail = 0;
+        pGroup->PassList.m_pkHead = nullptr;
+        pGroup->PassList.m_pkTail = nullptr;
         pGroup->PassList.Allocator.uiCount = 0;
         BSBatchRenderer* pBatchRenderer = pGroup->pBatchRenderer;
         if (pBatchRenderer) {
-            pBatchRenderer->ClearRenderPasses(0);
+            pBatchRenderer->ClearRenderPasses(false);
         }
         pGroup->usCount = 0;
         float fDirX = apCamera->m_kWorld.m_Rotate.m_pEntry[0][0];
@@ -1024,7 +1024,7 @@ void BSBatchRenderer::StartGroupingAlphas(
         NiTListItem<BSBatchRenderer::GeometryGroup*>* pPos = kList.m_pkHead;
         while (pPos) {
             if (pGroup->fDepth > pPos->m_element->fDepth) {
-                NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.Lock(0);
+                NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.Lock(nullptr);
                 NiTAbstractPoolAllocator<uint32_t>::AllocNode* pFree = NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
                 if (!NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem) {
                     NiTAbstractPoolAllocator<uint32_t>::CreateFreeMem();
@@ -1032,8 +1032,8 @@ void BSBatchRenderer::StartGroupingAlphas(
                 }
                 NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem = pFree->m_pkNext;
                 pFree->m_element = 0;
-                pFree->m_pkNext = 0;
-                pFree->m_pkData = 0;
+                pFree->m_pkNext = nullptr;
+                pFree->m_pkData = nullptr;
                 if (!--NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.uiLockCount) {
                     NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.uiOwningThread = 0;
                 }
@@ -1067,7 +1067,7 @@ void BSBatchRenderer::StartGroupingAlphas(
                     reinterpret_cast<NiTPointerAllocator<uint32_t>*>(&kList.m_uiCount)->Allocate()
                 );
             pNode->m_element = pGroup;
-            pNode->m_pkNext = 0;
+            pNode->m_pkNext = nullptr;
             pNode->m_pkPrev = kList.m_pkTail;
             if (kList.m_pkTail) {
                 kList.m_pkTail->m_pkNext = pNode;
@@ -1113,7 +1113,7 @@ bool BSBatchRenderer::SkipNextRenderPass(uint32_t& auiPass, int32_t& aiBucket, b
     uint32_t v7 = auiPass;
     uint32_t iTestAlpha = 0;
     RenderPassMap.GetAt(v7, iTestAlpha);
-    pRenderPassA[iTestAlpha].Clear(0);
+    pRenderPassA[iTestAlpha].Clear(false);
     return PrepareNextRenderPass(auiPass, aiBucket, abFirstPass);
 }
 
@@ -1138,8 +1138,8 @@ void BSBatchRenderer::RenderNextAlpha(
         pkItem_3 = pkItem;
     }
     else {
-        pkItem_3 = 0;
-        pkItem = 0;
+        pkItem_3 = nullptr;
+        pkItem = nullptr;
     }
     float fdepth_2 = 0.0f;
     double v9 = kCamDir_8;
@@ -1172,11 +1172,11 @@ void BSBatchRenderer::RenderNextAlpha(
         m_element = pList->m_pkHead->m_element;
     }
     else {
-        m_element = 0;
+        m_element = nullptr;
     }
     float afStopDeptha = afStopDepth - 0.0010000000474974513;
     do {
-        while (1) {
+        while (true) {
             BSBatchRenderer* v17;
             NiTListItem<BSBatchRenderer::GeometryGroup*>* pNode;
             NiTListItem<BSBatchRenderer::GeometryGroup*>* pNext;
@@ -1212,10 +1212,10 @@ void BSBatchRenderer::RenderNextAlpha(
             pNext = pNode->m_pkNext;
             pList->m_pkHead = pNext;
             if (pNext) {
-                pNext->m_pkPrev = 0;
+                pNext->m_pkPrev = nullptr;
             }
             else {
-                pList->m_pkTail = 0;
+                pList->m_pkTail = nullptr;
             }
             pNode->m_element = 0;
             // EXE-INLINED none: NiTAbstractPoolAllocator::Deallocate. As Gamebryo's DeleteItem, the node goes to the
@@ -1223,14 +1223,14 @@ void BSBatchRenderer::RenderNextAlpha(
             pItemMemory = pNode;
             pFree = static_cast<NiTAbstractPoolAllocator<uint32_t>::AllocNode*>(pItemMemory);
             NiTAbstractPoolAllocator<uint32_t>::Lock();
-            pFree->m_pkData = 0;
+            pFree->m_pkData = nullptr;
             pFree->m_pkNext = NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
             NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem = pFree;
             NiTAbstractPoolAllocator<uint32_t>::Unlock();
             --pList->m_uiCount;
             if (!pList->m_uiCount) {
                 v5 = aiIndex;
-                m_element = 0;
+                m_element = nullptr;
             LABEL_36:;
                 if (!pkItem) {
                     goto LABEL_77;
@@ -1259,7 +1259,7 @@ void BSBatchRenderer::RenderNextAlpha(
                         if (!BSShaderManager::bUseDepthBias) {
                             fdepthBias = 0.0f;
                         }
-                        BSRenderState::SetZWriteEnable(0, BSRS_LOCK);
+                        BSRenderState::SetZWriteEnable(false, BSRS_LOCK);
                         BSRenderState::SetDepthBias(fdepthBias, BSRS_LOCK);
                     }
                     else {
@@ -1268,7 +1268,7 @@ void BSBatchRenderer::RenderNextAlpha(
                     BSBatchRenderer::RenderPassImmediately(pkItem_3, pkItem_3->usPassEnum, 1, 1, 1);
                     if (v26) {
                         --BSRenderState::iLock[1];
-                        BSRenderState::SetZWriteEnable(1, BSRS_NOLOCK);
+                        BSRenderState::SetZWriteEnable(true, BSRS_NOLOCK);
                         --BSRenderState::iLock[3];
                         BSRenderState::SetDepthBias(0.0f, BSRS_NOLOCK);
                     }
@@ -1281,12 +1281,12 @@ void BSBatchRenderer::RenderNextAlpha(
                 PersistentPassList::ListItem* v28 = v27->PassList.m_pkHead;
                 if (v28) {
                     if (v28 == v27->PassList.m_pkTail) {
-                        v27->PassList.m_pkTail = 0;
+                        v27->PassList.m_pkTail = nullptr;
                     }
-                    PersistentPassList::ListItem* v29 = 0;
+                    PersistentPassList::ListItem* v29 = nullptr;
                     if (v28->m_pkNext) {
                         v29 = v28->m_pkNext;
-                        v28->m_pkNext->m_pkPrev = 0;
+                        v28->m_pkNext->m_pkPrev = nullptr;
                     }
                     PersistentPassList::ListItem* pNextFreeItem = v27->PassList.pNextFreeItem;
                     if (pNextFreeItem) {
@@ -1301,14 +1301,14 @@ void BSBatchRenderer::RenderNextAlpha(
             }
             PersistentPassList::ListItem* v32 = pAlphaGroups[v5]->PassList.m_pkHead;
             if (!v32) {
-                pkItem_3 = 0;
-                pkItem = 0;
+                pkItem_3 = nullptr;
+                pkItem = nullptr;
                 goto LABEL_77;
             }
             BSShaderProperty::RenderPass* pkItem_2 = v32->m_element;
             pkItem_3 = pkItem_2;
             if (!pkItem_2) {
-                pkItem = 0;
+                pkItem = nullptr;
                 goto LABEL_77;
             }
             if (abGetSortByClosestPoint) {
@@ -1364,7 +1364,7 @@ void BSBatchRenderer::EndPass() {
         }
     }
     BSBatchRenderer::uiLastPass = 0;
-    BSBatchRenderer::pLastShader = 0;
+    BSBatchRenderer::pLastShader = nullptr;
 }
 
 void BSBatchRenderer::RenderPassImmediately(
@@ -1388,13 +1388,13 @@ void BSBatchRenderer::RenderPassImmediately(
             NiAlphaProperty* m_pObject =
                 static_cast<NiAlphaProperty*>(prenderpass->pGeometry->m_PropertyState.m_aspProps[0].m_pObject);
             if (m_pObject && (m_pObject->m_uFlags & 512) != 0) {
-                BSRenderState::SetAlphaToCoverageEnable(1, BSRS_NOLOCK);
+                BSRenderState::SetAlphaToCoverageEnable(true, BSRS_NOLOCK);
             }
             else {
-                BSRenderState::SetAlphaToCoverageEnable(0, BSRS_NOLOCK);
+                BSRenderState::SetAlphaToCoverageEnable(false, BSRS_NOLOCK);
             }
         }
-        if (BSShaderManager::pRenderer.m_pObject->IsHardwareSkinned(prenderpass->pGeometry, 0)) {
+        if (BSShaderManager::pRenderer.m_pObject->IsHardwareSkinned(prenderpass->pGeometry, nullptr)) {
             BSBatchRenderer::RenderPassImmediately_Skinned(
                 prenderpass, balphaTest, abAlphaPass, abGeometryRenderStates
             );
@@ -1481,8 +1481,8 @@ void BSBatchRenderer::RenderPassImmediately_Standard(
     NiD3DGeometryGroupManager* v8 = v7->m_pkGeometryGroupManager;
     NiRenderer* prenderer = NiRenderer::ms_pkRenderer;
     NiRenderer::ms_pkRenderer->m_pkCurrProp = &apRenderPass->pGeometry->m_PropertyState;
-    v7->m_pkCurrEffects = 0;
-    v8->AddObjectToGroup(v9, pgeomData, 0, 0, 0, 0);
+    v7->m_pkCurrEffects = nullptr;
+    v8->AddObjectToGroup(v9, pgeomData, nullptr, false, 0, 0);
     NiGeometryBufferData* pbuffData = pgeomData->m_pkBuffData;
     switch (uipass) {
         case 202u: {
@@ -1538,7 +1538,7 @@ void BSBatchRenderer::RenderPassImmediately_Standard(
             else {
                 if (BSBatchRenderer::bFirstPass && !BSShaderAccumulator::IsShadowPass(uipass)) {
                     pshader->SetupGeometryNonFirstPass(&pgeometry->m_PropertyState);
-                    BSBatchRenderer::bFirstPass = 0;
+                    BSBatchRenderer::bFirstPass = false;
                 }
             }
         LABEL_32:;
@@ -1552,7 +1552,7 @@ void BSBatchRenderer::RenderPassImmediately_Standard(
             break;
         }
     }
-    pshader->PrepareGeometryForRendering(pgeometry, 0, pbuffData, &pgeometry->m_PropertyState);
+    pshader->PrepareGeometryForRendering(pgeometry, nullptr, pbuffData, &pgeometry->m_PropertyState);
     pgeometry->OnlyRenderImmediate(prenderer);
     pshader->PostGeometry(&pgeometry->m_PropertyState);
 }
@@ -1580,15 +1580,15 @@ void BSBatchRenderer::RenderPassImmediately_Skinned(
     NiD3DGeometryGroupManager* v9 = v8->m_pkGeometryGroupManager;
     NiDX9Renderer* pRenderer = static_cast<NiDX9Renderer*>(NiRenderer::ms_pkRenderer);
     NiRenderer::ms_pkRenderer->m_pkCurrProp = ppropState;
-    v8->m_pkCurrEffects = 0;
-    v9->AddObjectToGroup(v17, pgeomData, pkSkinInstance, 1, 0, 0);
+    v8->m_pkCurrEffects = nullptr;
+    v9->AddObjectToGroup(v17, pgeomData, pkSkinInstance, true, 0, 0);
     uint32_t uiPartitionCount = m_pObject->m_uiPartitions;
     uint32_t v10 = 0;
-    BSDismemberSkinInstance::PartitionData* pDismemberPartitions = 0;
+    BSDismemberSkinInstance::PartitionData* pDismemberPartitions = nullptr;
     if (pkSkinInstance->GetRTTI() == &BSDismemberSkinInstance::ms_RTTI) {
         pDismemberPartitions = static_cast<BSDismemberSkinInstance*>(pkSkinInstance)->pPartitionDataArray;
     }
-    bool bFirstDraw = 1;
+    bool bFirstDraw = true;
     uint32_t v22 = 0;
     if (uiPartitionCount) {
         do {
@@ -1606,7 +1606,7 @@ void BSBatchRenderer::RenderPassImmediately_Skinned(
                     if (!apRenderPass->bFirstPass || BSShaderAccumulator::IsShadowPass(uipass)) {
                         if (BSBatchRenderer::bFirstPass) {
                             pshader->SetupGeometryNonFirstPass(ppropState);
-                            BSBatchRenderer::bFirstPass = 0;
+                            BSBatchRenderer::bFirstPass = false;
                         }
                     }
                     else {
@@ -1623,7 +1623,7 @@ void BSBatchRenderer::RenderPassImmediately_Skinned(
                             ppropState, reinterpret_cast<const bool&>(apRenderPass->bFirstPass)
                         );
                     }
-                    bFirstDraw = 0;
+                    bFirstDraw = false;
                 }
                 NiGeometryBufferData* pkBuffData_2 = static_cast<NiGeometryBufferData*>(
                     pshader->PrepareGeometryForRendering(pgeometry, pkCurrPartition, pkBuffData, ppropState)
@@ -1668,22 +1668,22 @@ void BSBatchRenderer::BeginPass(uint32_t auiPass, BSShader* apShader) {
     BSBatchRenderer::EndPass();
     BSShader::sShadowAlphaTestRef = -1;
     apShader->InitPass(auiPass);
-    NiD3DTextureStage::pShadowedTextures[0] = 0;
-    NiD3DTextureStage::pShadowedTextures[1] = 0;
-    NiD3DTextureStage::pShadowedTextures[2] = 0;
-    NiD3DTextureStage::pShadowedTextures[3] = 0;
-    NiD3DTextureStage::pShadowedTextures[4] = 0;
-    NiD3DTextureStage::pShadowedTextures[5] = 0;
-    NiD3DTextureStage::pShadowedTextures[6] = 0;
-    NiD3DTextureStage::pShadowedTextures[7] = 0;
-    NiD3DTextureStage::pShadowedTextures[8] = 0;
-    NiD3DTextureStage::pShadowedTextures[9] = 0;
-    NiD3DTextureStage::pShadowedTextures[10] = 0;
-    NiD3DTextureStage::pShadowedTextures[11] = 0;
-    NiD3DTextureStage::pShadowedTextures[12] = 0;
-    NiD3DTextureStage::pShadowedTextures[13] = 0;
-    NiD3DTextureStage::pShadowedTextures[14] = 0;
-    NiD3DTextureStage::pShadowedTextures[15] = 0;
+    NiD3DTextureStage::pShadowedTextures[0] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[1] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[2] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[3] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[4] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[5] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[6] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[7] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[8] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[9] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[10] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[11] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[12] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[13] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[14] = nullptr;
+    NiD3DTextureStage::pShadowedTextures[15] = nullptr;
     switch (auiPass) {
         case 202u:
         case 209u: {
@@ -1693,7 +1693,7 @@ void BSBatchRenderer::BeginPass(uint32_t auiPass, BSShader* apShader) {
         case 252u:
         case 253u: {
             static_cast<ShadowLightShader*>(apShader)->ShadowLightShader::SetupPass_ADT_Opt();
-            BSRenderState::SetZEnable(1, BSRS_NOLOCK);
+            BSRenderState::SetZEnable(true, BSRS_NOLOCK);
             break;
         }
         case 258u: {
@@ -1710,5 +1710,5 @@ void BSBatchRenderer::BeginPass(uint32_t auiPass, BSShader* apShader) {
     apShader->SetupPassShaders(auiPass);
     BSBatchRenderer::uiLastPass = auiPass;
     BSBatchRenderer::pLastShader = apShader;
-    BSBatchRenderer::bFirstPass = 1;
+    BSBatchRenderer::bFirstPass = true;
 }

@@ -77,7 +77,7 @@ NiObject* NiPSysGravityStrengthCtlr::CreateObject() {
     NiPSysGravityStrengthCtlr* v0 =
         static_cast<NiPSysGravityStrengthCtlr*>(NiMemObject::operator new(sizeof(NiPSysGravityStrengthCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysGravityStrengthCtlr;
 }

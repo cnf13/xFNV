@@ -45,7 +45,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiRTTI ParticleShaderProperty::ms_RTTI("ParticleShaderProperty", &BSShaderProperty::ms_RTTI);
 
@@ -104,7 +104,7 @@ void ParticleShaderProperty::GetViewerStrings(NiTPrimitiveArray<char*>* apString
 
 bool ParticleShaderProperty::SetupGeometry(NiGeometry* apGeometry) {
     pMyGeometry = apGeometry;
-    return 1;
+    return true;
 }
 
 BSShaderProperty::RenderPassArray* ParticleShaderProperty::GetRenderPasses(
@@ -514,7 +514,7 @@ void ParticleShaderProperty::GenerateFromGeometry(uint32_t aiIndex) {
         }
         while (!m_pObject);
         // m_kChildren.m_usESize is the children array's effective size, i.e. the child count.
-        if (static_cast<NiNode*>(m_pObject)->m_kChildren.m_usESize && (m_pkParent = m_pObject->m_pkParent) != 0) {
+        if (static_cast<NiNode*>(m_pObject)->m_kChildren.m_usESize && (m_pkParent = m_pObject->m_pkParent) != nullptr) {
             float v18 = static_cast<double>(rt::rand()) / 32767.0;
             double v5 = v18;
             float v19 = 1.0 - v18;

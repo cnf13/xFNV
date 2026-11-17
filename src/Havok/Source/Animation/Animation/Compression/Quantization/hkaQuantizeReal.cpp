@@ -46,7 +46,7 @@ void hkQuantizeCalcDesc(const float* data, uint32_t nValues, hkaQuantizeDesc& de
 void hkQuantizeReal(const float* data, uint32_t nValues, const hkaQuantizeDesc& desc, uint8_t* quantized) {
     for (int32_t i = 0; i < desc.m_preserved; ++i) {
         float fValue = data[i];
-        const uint32_t uiBits = std::bit_cast<uint32_t>(static_cast<float>(fValue));
+        const uint32_t uiBits = std::bit_cast<uint32_t>(fValue);
         quantized[0] = static_cast<uint8_t>(uiBits);
         quantized[1] = static_cast<uint8_t>(uiBits >> 8);
         quantized[2] = static_cast<uint8_t>(uiBits >> 16);

@@ -113,7 +113,7 @@
 
 #include <SDL3/SDL.h>
 #include <cstdarg>
-#include <stdint.h>
+#include <cstdint>
 
 SettingT<INIPrefSettingCollection> gs_bDialogueSubtitles_GamePlay("bDialogueSubtitles:GamePlay", true);
 SettingT<INIPrefSettingCollection> gs_bGeneralSubtitles_Gameplay("bGeneralSubtitles:GamePlay", false);
@@ -208,7 +208,7 @@ bool Interface::ShowSubtitle(
 ) {
     FNVD_INLINED_LOCAL(BSSoundHandle, v7, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_INTERFACE, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Interface\\Interface.cpp", 2284
+        MEM_CONTEXT_INTERFACE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Interface\\Interface.cpp", 2284
     );
     if (InterfaceManager::Instance()) {
         InterfaceManager* v5 = InterfaceManager::Instance();
@@ -219,7 +219,7 @@ bool Interface::ShowSubtitle(
             }
         }
     }
-    bool v12 = 0;
+    bool v12 = false;
     return v12;
 }
 
@@ -239,7 +239,7 @@ void Interface::SetMapMenuVisible(bool abVisibility, bool abAnyVisibleState) {
                         Menu* Menu_ = pmap->GetMenu();
                         Menu_->StartFadeOut();
                         Menu* v16 = pmap->GetMenu();
-                        v16->DoLeave(0, 0);
+                        v16->DoLeave(0, nullptr);
                     }
                 }
             }
@@ -284,7 +284,7 @@ void Interface::SetMapMenuVisible(bool abVisibility, bool abAnyVisibleState) {
                 InterfaceManager* v14 = InterfaceManager::Instance();
                 FOPipboyManager* v15 = v14->GetPipboy();
                 if (v15->GetInitialized()) {
-                    MapMenu::SetKnobPosition(0);
+                    MapMenu::SetKnobPosition(false);
                 }
             }
         }
@@ -295,10 +295,10 @@ void Interface::OpenConsole() {
     if (InterfaceManager::Instance()) {
         InterfaceManager* v0 = InterfaceManager::Instance();
         if (v0->IsDoneFirstInit()) {
-            if (MenuConsole::Instance(0)) {
-                MenuConsole* v1 = MenuConsole::Instance(1);
+            if (MenuConsole::Instance(false)) {
+                MenuConsole* v1 = MenuConsole::Instance(true);
                 if (!v1->IsVisible()) {
-                    MenuConsole* v2 = MenuConsole::Instance(1);
+                    MenuConsole* v2 = MenuConsole::Instance(true);
                     v2->ToggleVisible();
                     InterfaceManager* v3 = InterfaceManager::Instance();
                     v3->AddToEnterStack(3);
@@ -386,7 +386,7 @@ void Interface::SetInventoryMenuVisible(bool abVisibility, bool abAnyVisibleStat
                 v15 = InterfaceManager::Instance();
                 v16 = v15->GetPipboy();
                 if (v16->GetInitialized()) {
-                    InventoryMenu::SetKnobPosition(0);
+                    InventoryMenu::SetKnobPosition(false);
                 }
             }
             else {
@@ -461,7 +461,7 @@ void Interface::SetStatsMenuVisible(bool abVisibility, bool abAnyVisibleState) {
                 InterfaceManager* v15 = InterfaceManager::Instance();
                 FOPipboyManager* v16 = v15->GetPipboy();
                 if (v16->GetInitialized()) {
-                    StatsMenu::SetKnobPosition(0);
+                    StatsMenu::SetKnobPosition(false);
                 }
             }
         }
@@ -501,7 +501,7 @@ void Interface::ForceReload() {
     if (InterfaceManager::Instance()) {
         singleton = InterfaceManager::Instance();
         if (singleton->IsDoneFirstInit()) {
-            StartMenu::Create(1, 1);
+            StartMenu::Create(true, true);
         }
     }
 }
@@ -572,13 +572,13 @@ void Interface::FinishLoadGame(BGSLoadGameBuffer* /*apLoadGameBuffer*/) {
 
 bool Interface::IsTopOfMenuStackReady() {
     if (!InterfaceManager::Instance()) {
-        return 0;
+        return false;
     }
     InterfaceManager* v0 = InterfaceManager::Instance();
     if (!v0->bFirstInit) {
-        return 0;
+        return false;
     }
-    Tile* MenuByClass = 0;
+    Tile* MenuByClass = nullptr;
     InterfaceManager* v1 = InterfaceManager::Instance();
     int32_t aiClass = v1->GetEnterStackTop();
     if (aiClass == 1) {
@@ -622,7 +622,7 @@ Tile* Interface::CreateContainerMenu(TESObjectREFR* apContainer, Interface::CONT
     }
     if ((aeMode == CMM_STANDARD) && (!apContainer->IsActor())) {
         if (apContainer->GetOwner()) {
-            if (!apContainer->IsAnOwner(pPlayer, 1)) {
+            if (!apContainer->IsAnOwner(pPlayer, true)) {
                 aeMode = CMM_PICKPOCKET;
             }
         }
@@ -632,41 +632,41 @@ Tile* Interface::CreateContainerMenu(TESObjectREFR* apContainer, Interface::CONT
 
 bool Interface::CreateHackingMenu(TESObjectREFR* apTerminalRef) {
     if (!InterfaceManager::Instance()) {
-        return 0;
+        return false;
     }
     InterfaceManager* v1 = InterfaceManager::Instance();
     if (!v1->bFirstInit) {
-        return 0;
+        return false;
     }
     Tile* pmenu = HackingMenu::Create(apTerminalRef);
     if (bUseRenderedTerminals.Bool()) {
         FORenderedTerminal* prm;
-        Tile::UpdateAll(0);
+        Tile::UpdateAll(false);
         FORenderedTerminal* apMemory = static_cast<FORenderedTerminal*>(ourMalloc(sizeof(FORenderedTerminal)));
         if (apMemory) {
             prm = ::new (apMemory) FORenderedTerminal;
         }
         else {
-            prm = 0;
+            prm = nullptr;
         }
         prm->pMenuTile = pmenu;
         prm->SetMenuRoot(pmenu->GetModel());
         InterfaceManager* v2 = InterfaceManager::Instance();
         v2->EnterRenderedMenu(prm);
     }
-    return 1;
+    return true;
 }
 
 bool Interface::CreateComputersMenu(TESObjectREFR* apTerminalRef) {
     if (!InterfaceManager::Instance()) {
-        return 0;
+        return false;
     }
     InterfaceManager* v1 = InterfaceManager::Instance();
     if (!v1->bFirstInit) {
-        return 0;
+        return false;
     }
     Tile* pmenu = ComputersMenu::Create(apTerminalRef);
-    Tile::UpdateAll(0);
+    Tile::UpdateAll(false);
     if (bUseRenderedTerminals.Bool()) {
         FORenderedTerminal* prm;
         FORenderedTerminal* apMemory = static_cast<FORenderedTerminal*>(ourMalloc(sizeof(FORenderedTerminal)));
@@ -674,14 +674,14 @@ bool Interface::CreateComputersMenu(TESObjectREFR* apTerminalRef) {
             prm = ::new (apMemory) FORenderedTerminal;
         }
         else {
-            prm = 0;
+            prm = nullptr;
         }
         prm->pMenuTile = pmenu;
         prm->SetMenuRoot(pmenu->GetModel());
         InterfaceManager* v2 = InterfaceManager::Instance();
         v2->EnterRenderedMenu(prm);
     }
-    return 1;
+    return true;
 }
 
 void Interface::CreateRaceSexMenu(RaceSexMenuContext aeContext) {
@@ -719,7 +719,7 @@ void Interface::DrawCaravanMenu3D() {
 
 Tile* Interface::CreateDialogMenu(TESObjectREFR* apSpeaker, TESTopic* apGreetTopic, MobileObject* apSpeakeras) {
     InterfaceManager* singleton;
-    (&appTimer)->SetGlobalTimeMultiplier(1.0, 1);
+    (&appTimer)->SetGlobalTimeMultiplier(1.0, true);
     if (InterfaceManager::Instance() && ((singleton = InterfaceManager::Instance()), singleton->IsDoneFirstInit())) {
         return static_cast<TileMenu*>(
             DialogMenu::Create(static_cast<Actor*>(apSpeaker), apGreetTopic, static_cast<Actor*>(apSpeakeras))
@@ -996,7 +996,7 @@ bool Interface::FindTextReplacementString(
     uint32_t aiBufferSize,
     bool abAddPushText
 ) {
-    bool bfound = 0;
+    bool bfound = false;
     if (apString) {
         if (*apString) {
             if (apOutBuffer) {
@@ -1004,7 +1004,7 @@ bool Interface::FindTextReplacementString(
                     int32_t iindex = Interface::MatchTextReplaceConstantToGameSettings(apString);
                     if (iindex < 28) {
                         Interface::GetControlPushTextFor(iindex, apOutBuffer, abAddPushText);
-                        bfound = 1;
+                        bfound = true;
                     }
                     if (!bfound) {
                         TESGlobal* pglob = static_cast<TESGlobal*>(TESForm::GetFormByEditorID(apString));
@@ -1019,37 +1019,37 @@ bool Interface::FindTextReplacementString(
                                         static_cast<int32_t>(pglob->fValue)
                                     );
                                 }
-                                bfound = 1;
+                                bfound = true;
                             }
                         }
                     }
                     if (!bfound && !BSstricmp(apString, "PCName")) {
                         const char* FullName = pPlayer->GetFullName();
                         BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), FullName);
-                        bfound = 1;
+                        bfound = true;
                     }
                     if (!bfound && !BSstricmp(apString, "PCRace")) {
                         const char* RaceFullName = pPlayer->GetRaceFullName();
                         BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), RaceFullName);
-                        bfound = 1;
+                        bfound = true;
                     }
                     if (!bfound && !BSstricmp(apString, "PCSex")) {
                         TESActorBase::SEX Sex = pPlayer->GetSex();
                         const char* v11 = pSexNameGS[Sex]->String();
                         BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), v11);
-                        bfound = 1;
+                        bfound = true;
                     }
                     if (!bfound && !BSstricmp(apString, "PCSexPronoun")) {
                         TESActorBase::SEX v6 = pPlayer->GetSex();
                         const char* v7 = pSexPronounGS[v6]->String();
                         BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), v7);
-                        bfound = 1;
+                        bfound = true;
                     }
                     if (!bfound && !BSstricmp(apString, "PCSexPossessive")) {
                         TESActorBase::SEX v8 = pPlayer->GetSex();
                         const char* v12 = pSexPossessiveGS[v8]->String();
                         BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), v12);
-                        bfound = 1;
+                        bfound = true;
                     }
                     if (!bfound) {
                         return Interface::TestConstantForGameSettings(apString, apOutBuffer);
@@ -1104,7 +1104,7 @@ void Interface::SetRootMapSpace(TESWorldSpace* apNewSpace) {
 }
 
 bool Interface::PreloadWorldMap() {
-    return (bool)0;
+    return false;
 }
 
 void Interface::DrawHUDMenu3D() {
@@ -1242,15 +1242,15 @@ void Interface::ShowMenus() {
                 case 1002:
                 case 1035:
                 case 1061: {
-                    Interface::SetInventoryMenuVisible(1, 0, 1);
+                    Interface::SetInventoryMenuVisible(true, false, true);
                     break;
                 }
                 case 1003: {
-                    Interface::SetStatsMenuVisible(1, 0);
+                    Interface::SetStatsMenuVisible(true, false);
                     break;
                 }
                 case 1023: {
-                    Interface::SetMapMenuVisible(1, 0);
+                    Interface::SetMapMenuVisible(true, false);
                     break;
                 }
                 default: {
@@ -1713,7 +1713,7 @@ bool Interface::ShowMessage(
     bool abMoveToHead
 ) {
     AutoMemContext apMemory(
-        MEM_CONTEXT_INTERFACE, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Interface\\Interface.cpp", 2305
+        MEM_CONTEXT_INTERFACE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Interface\\Interface.cpp", 2305
     );
     if (InterfaceManager::Instance()) {
         InterfaceManager* v6 = InterfaceManager::Instance();
@@ -1727,7 +1727,7 @@ bool Interface::ShowMessage(
             }
         }
     }
-    return 0;
+    return false;
 }
 
 void Interface::SetRegionText(TESRegion* apRegion, BSStringT<char> xDisplayText, bool bUpdateLastRegion) {
@@ -1759,7 +1759,7 @@ void Interface::CreateSleepMenu(bool abSleep) {
                 pmenu = dynamic_cast<SleepWaitMenu*>(Menu_);
             }
             else {
-                pmenu = 0;
+                pmenu = nullptr;
             }
             if (pmenu) {
                 delete pmenu;
@@ -1949,7 +1949,7 @@ void Interface::HideMenus() {
             }
             Interface::CloseContainer();
             if (StartMenu::PauseMenuIsActive()) {
-                StartMenu::Close(1);
+                StartMenu::Close(true);
             }
             v19->EnterRenderedMenu(nullptr);
         }
@@ -2049,7 +2049,7 @@ void Interface::ResetPipboy() {
 }
 
 Menu* Interface::CreateMenuByClass(int32_t aiMenuClass) {
-    return MenuManager::Instance(1)->CreateMenuByClass(aiMenuClass);
+    return MenuManager::Instance(true)->CreateMenuByClass(aiMenuClass);
 }
 
 // The tabs are clamped to the menus' four pages through BSMAX and BSMIN; each step fetches the interface manager again,
@@ -2207,11 +2207,11 @@ bool Interface::GetIsVATSRescanning() {
 
 bool Interface::IsActivatePickFuzzy() {
     if (!InterfaceManager::Instance()) {
-        return (bool)0;
+        return false;
     }
     InterfaceManager* singleton = InterfaceManager::Instance();
     if (!singleton->IsDoneFirstInit()) {
-        return (bool)0;
+        return false;
     }
     InterfaceManager* v1 = InterfaceManager::Instance();
     return (bool)((uint8_t)v1->IsActivatePickFuzzy());
@@ -2415,11 +2415,11 @@ void Interface::SaveGameTES() {
 }
 
 bool Interface::ContainerIsRecipe() {
-    return (Menu::GetMenuByClass(1077) != 0);
+    return (Menu::GetMenuByClass(1077) != nullptr);
 }
 
 bool Interface::ContainerIsBarter() {
-    return (Menu::GetMenuByClass(1053) != 0);
+    return (Menu::GetMenuByClass(1053) != nullptr);
 }
 
 void Interface::SetDragDroppingState(int32_t abSetTo) {
@@ -2449,11 +2449,11 @@ void Interface::UpdateInventory() {
                 }
                 else {
                     if (Interface::IsMenuIDVisible(Interface::eBarterMenu, 0)) {
-                        BarterMenu::ForceBarterUpdate(1);
+                        BarterMenu::ForceBarterUpdate(true);
                     }
                     else {
                         if (Interface::IsMenuIDVisible(Interface::eRecipeMenu, 0)) {
-                            RecipeMenu::ForceRecipeUpdate(1);
+                            RecipeMenu::ForceRecipeUpdate(true);
                         }
                         else {
                             if (Interface::IsMenuIDVisible(Interface::eContainerMenu, 0)) {
@@ -2541,7 +2541,7 @@ void Interface::SetItemModMenuVisible(bool abVisibility, bool abAnyVisibleState,
                 v15 = InterfaceManager::Instance();
                 v16 = v15->GetPipboy();
                 if (v16->GetInitialized()) {
-                    InventoryMenu::SetKnobPosition(0);
+                    InventoryMenu::SetKnobPosition(false);
                 }
             }
             else {
@@ -2574,8 +2574,7 @@ void Interface::GetControlPushTextFor(int32_t aiIndex, char* axReturn, bool abAd
         *axReturn = 0;
         if (InterfaceManager::Has360Controller()) {
             Controls* pControls = appMain->GetControls();
-            pbuttonSetting =
-                psXBoxGamepadText[(pControls->RemapAction(static_cast<Controls::USERACTIONS>(aiIndex), 3u))];
+            pbuttonSetting = psXBoxGamepadText[pControls->RemapAction(static_cast<Controls::USERACTIONS>(aiIndex), 3u)];
         }
         else {
             Controls* v4 = appMain->GetControls();
@@ -2702,8 +2701,8 @@ void Interface::SetTargetREFR(TESObjectREFR* apRef) {
                 Singleton->GetFont(v8)->GetBaseLine();
                 float a4 = static_cast<float>(iDebugTextTopBottomOffset.Int());
                 char* v5 = xMessage.pString;
-                DebugText* v3 = DebugText::Instance(1);
-                v3->Print(v5, 640.0f, a4, 2, -1, -1.0f, 0, 0);
+                DebugText* v3 = DebugText::Instance(true);
+                v3->Print(v5, 640.0f, a4, 2, -1, -1.0f, 0, nullptr);
             }
             InterfaceManager* v4 = InterfaceManager::Instance();
             v4->SetTargetREFR(apRef);
@@ -2729,8 +2728,8 @@ void Interface::SetFirstChanceTextureRelease_00703920() {
         InterfaceManager* v0 = InterfaceManager::Instance();
         if (v0->IsDoneFirstInit()) {
             InterfaceManager* v1 = InterfaceManager::Instance();
-            v1->SetFirstChanceTextureRelease(1);
-            Tile::UpdateAll(0);
+            v1->SetFirstChanceTextureRelease(true);
+            Tile::UpdateAll(false);
         }
     }
 }
@@ -2787,7 +2786,7 @@ void Interface::SetRepairMenuVisible(bool abVisibility, bool abAnyVisibleState, 
                 InterfaceManager* v14 = InterfaceManager::Instance();
                 FOPipboyManager* v15 = v14->GetPipboy();
                 if (v15->GetInitialized()) {
-                    InventoryMenu::SetKnobPosition(0);
+                    InventoryMenu::SetKnobPosition(false);
                 }
             }
             else {
@@ -2822,7 +2821,7 @@ void Interface::CreateVATSMenu() {
                 pmenu = dynamic_cast<VATSMenu*>(Menu_);
             }
             else {
-                pmenu = 0;
+                pmenu = nullptr;
             }
             if (pmenu) {
                 delete pmenu;

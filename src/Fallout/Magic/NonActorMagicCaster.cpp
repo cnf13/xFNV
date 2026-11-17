@@ -42,20 +42,20 @@ void NonActorMagicCaster::CleanUpOtherMobileObjects() {
             pactor = static_cast<Actor*>(pmob);
         }
         else {
-            pactor = 0;
+            pactor = nullptr;
         }
         if (pmob && pmob->IsProjectile()) {
             pprojectile = dynamic_cast<MagicProjectile*>(pmob);
         }
         else {
-            pprojectile = 0;
+            pprojectile = nullptr;
         }
         if (pactor) {
             if (this) {
                 pactor->CheckDeletedCaster(this);
             }
             else {
-                pactor->CheckDeletedCaster(0);
+                pactor->CheckDeletedCaster(nullptr);
             }
         }
         else {
@@ -64,7 +64,7 @@ void NonActorMagicCaster::CleanUpOtherMobileObjects() {
                     pprojectile->CheckDeletedCaster(this);
                 }
                 else {
-                    pprojectile->CheckDeletedCaster(0);
+                    pprojectile->CheckDeletedCaster(nullptr);
                 }
             }
         }
@@ -79,20 +79,20 @@ void NonActorMagicCaster::CleanUpOtherMobileObjects() {
             pactor_2 = static_cast<Actor*>(pmob_2);
         }
         else {
-            pactor_2 = 0;
+            pactor_2 = nullptr;
         }
         if (pmob_2 && pmob_2->IsProjectile()) {
             pprojectile_2 = dynamic_cast<MagicProjectile*>(pmob_2);
         }
         else {
-            pprojectile_2 = 0;
+            pprojectile_2 = nullptr;
         }
         if (pactor_2) {
             if (this) {
                 pactor_2->CheckDeletedCaster(this);
             }
             else {
-                pactor_2->CheckDeletedCaster(0);
+                pactor_2->CheckDeletedCaster(nullptr);
             }
         }
         else {
@@ -101,7 +101,7 @@ void NonActorMagicCaster::CleanUpOtherMobileObjects() {
                     pprojectile_2->CheckDeletedCaster(this);
                 }
                 else {
-                    pprojectile_2->CheckDeletedCaster(0);
+                    pprojectile_2->CheckDeletedCaster(nullptr);
                 }
             }
         }
@@ -111,7 +111,7 @@ void NonActorMagicCaster::CleanUpOtherMobileObjects() {
             pPlayer->CheckDeletedCaster(this);
         }
         else {
-            pPlayer->CheckDeletedCaster(0);
+            pPlayer->CheckDeletedCaster(nullptr);
         }
     }
 }

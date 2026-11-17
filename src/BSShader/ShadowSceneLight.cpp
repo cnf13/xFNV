@@ -333,7 +333,7 @@ void ShadowSceneLight::AddTriGeom(NiTriBasedGeom* apTriGeom) {
                 }
                 if (pPos) {
                     NiTListItem<NiPointer<NiGeometry>>* pItem;
-                    while (1) {
+                    while (true) {
                         pItem = pPos;
                         pPos = pPos->m_pkNext;
                         if (pItem->m_element.m_pObject == apTriGeom) {
@@ -362,7 +362,7 @@ void ShadowSceneLight::AddTriGeom(NiTriBasedGeom* apTriGeom) {
                         }
                         pshprop->AttachLight(this, v10);
                         lGeomList.AddHead(sptriGeom);
-                        sptriGeom.m_pObject = 0;
+                        sptriGeom.m_pObject = nullptr;
                     }
                 }
             }
@@ -403,7 +403,7 @@ void ShadowSceneLight::InsertUnusedFence() {
             pShape = ::new (pMemory) NiTriShape(static_cast<NiTriShapeData*>(nullptr));
         }
         else {
-            pShape = 0;
+            pShape = nullptr;
         }
         kGeomListFenceObject = pShape;
         // kName's destructor releases the string handle.
@@ -522,7 +522,7 @@ void ShadowSceneLight::TestFrustumCull(NiCullingProcess& arCuller) {
     bool bCastShadow = this->bCastShadow;
     kbound.m_kCenter = m_pObject->m_kWorld.m_Translate;
     int32_t newcull = 0;
-    bool bpointlightinfrustum = 1;
+    bool bpointlightinfrustum = true;
     if (bCastShadow && spShadowCamera.m_pObject) {
         newcull = FrustumFrustumIntersection(arCuller.m_pkCamera, spShadowCamera.m_pObject) ? 0 : 255;
     LABEL_19:;
@@ -548,7 +548,7 @@ void ShadowSceneLight::TestFrustumCull(NiCullingProcess& arCuller) {
             }
             float v44 = v7 - m_fConstant;
             if (v44 < 0.0f) {
-                bpointlightinfrustum = 0;
+                bpointlightinfrustum = false;
             }
         }
         ++v5;
@@ -709,7 +709,7 @@ LABEL_51:;
                     }
                     BSShaderLightingProperty* v40 = v39 ? static_cast<BSShaderLightingProperty*>(v38) : nullptr;
                     if (v40) {
-                        v40->bLightListChanged = 1;
+                        v40->bLightListChanged = true;
                     }
                 }
             }
@@ -818,7 +818,7 @@ void ShadowSceneLight::ParseObjectAddFrustum(NiAVObject* apObject) {
             NiBound* v10;
             uint32_t m_uFlags = m_pObject->m_uFlags;
             if (((m_uFlags & NiAVObject::ALWAYS_DRAW) != 0 ||
-                 ((v10 = m_pObject->m_kWorldBound) != 0 && 0.0 != v10->m_fRadius)) &&
+                 ((v10 = m_pObject->m_kWorldBound) != nullptr && 0.0 != v10->m_fRadius)) &&
                 (m_uFlags & 1) == 0) {
                 ParseObjectAddFrustum(m_pObject);
             }
@@ -1182,13 +1182,13 @@ void ShadowSceneLight::ComputeWeightedShadowLight(
     v68 = v45;
     pLightPos->z = v68;
     NiAVObject* v46 = spLight.m_pObject;
-    UpdateData.bUpdateControllers = 0;
+    UpdateData.bUpdateControllers = false;
     float v65 = v58 * 8.0;
-    UpdateData.bParallelUpdate = 0;
-    UpdateData.bFoundParticles = 0;
+    UpdateData.bParallelUpdate = false;
+    UpdateData.bFoundParticles = false;
     UpdateData.fTime = 0.0f;
-    UpdateData.bFoundMorphController = 0;
-    UpdateData.bSceneGraphChange = 0;
+    UpdateData.bFoundMorphController = false;
+    UpdateData.bSceneGraphChange = false;
     v46->Update(UpdateData);
     float v92 = g * 0.4000000059604645 + r * 0.4000000059604645 + 0.4000000059604645 * b;
     double v47 = v92;
@@ -1222,10 +1222,10 @@ void ShadowSceneLight::AccumulateGeometry(BSCullingProcess* a1, int32_t a2) {
     alignas(16) NiPoint3 v62;
     NiPoint3 arData;
     alignas(16) NiTransform kLightPos;
-    bool bRender = 1;
+    bool bRender = true;
     if ((!bCastShadow || (BSShaderManager::eShaderLevel < 3 || (BSShaderManager::iEnabledPasses & 16) == 0)) &&
         !bShadowSpotlight) {
-        bRender = 0;
+        bRender = false;
     }
     if (!spDynamicShadowMap.m_pObject) {
         BSRenderedTexture* v4 = BSShaderManager::pTextureManager->BorrowFrustumShadowTexture();
@@ -1266,9 +1266,9 @@ void ShadowSceneLight::AccumulateGeometry(BSCullingProcess* a1, int32_t a2) {
             kWorldPt.z = v9;
         }
         kWorldUp = *::new (&v62) NiPoint3(v55.UnitCross(kWorldPt));
-        NiFrustum kFrustum(0);
+        NiFrustum kFrustum(false);
         NiNode* v10 = spShadowCaster.m_pObject;
-        kFrustum.m_bOrtho = 1;
+        kFrustum.m_bOrtho = true;
         NiExtraData* ExtraData = v10->GetExtraData(*BSBound::pTag);
         NiNode* v12 = spShadowCaster.m_pObject;
         float v13 = v12->m_kWorld.m_Translate.y;
@@ -1337,7 +1337,7 @@ void ShadowSceneLight::AccumulateGeometry(BSCullingProcess* a1, int32_t a2) {
                     v27 = ::new (v26) NiCamera;
                 }
                 else {
-                    v27 = 0;
+                    v27 = nullptr;
                 }
                 p_spShadowCamera->operator=(v27);
             }
@@ -1399,8 +1399,8 @@ void ShadowSceneLight::AccumulateGeometry(BSCullingProcess* a1, int32_t a2) {
             v37->SetViewFrustum(kFrustum);
             spShadowAccumulator.m_pObject->SetShadowLight(this);
             MTRenderingSystem_Instance.AddAccumTask(
-                spShadowCamera.m_pObject, 0, spShadowCaster.m_pObject, 0, 0, spShadowAccumulator.m_pObject,
-                BSCullingProcess::BSCP_CULL_NORMAL, a2 + 17, 0
+                spShadowCamera.m_pObject, nullptr, spShadowCaster.m_pObject, nullptr, nullptr,
+                spShadowAccumulator.m_pObject, BSCullingProcess::BSCP_CULL_NORMAL, a2 + 17, 0
             );
         }
     }
@@ -1425,7 +1425,7 @@ void ShadowSceneLight::MTRenderFrustumDepthMap(BSCullingProcess& arCuller, int32
     BSRenderedTexture::StartOffscreen(7u, spDynamicShadowMap.m_pObject->GetGroup());
     NiRenderer::ms_pkRenderer->SetBackgroundColor(kOrgColor);
     arCuller.spAccumulator = spShadowAccumulator.m_pObject;
-    BSShaderUtil::RenderScene(spShadowCamera.m_pObject, spShadowAccumulator.m_pObject, 0);
+    BSShaderUtil::RenderScene(spShadowCamera.m_pObject, spShadowAccumulator.m_pObject, false);
     spShadowAccumulator.m_pObject->spShadowLight = nullptr;
     arCuller.spAccumulator = nullptr;
     NiCamera* pCamera = spShadowCamera.m_pObject;
@@ -1466,9 +1466,9 @@ void ShadowSceneLight::MTRenderFrustumDepthMap(BSCullingProcess& arCuller, int32
     if (BSShaderManager::eShadowMode == BSShaderManager::BSSM_SHADOW_ISFILTER) {
         BSRenderedTexture* pBlur = BSShaderManager::pTextureManager->BorrowFrustumShadowTexture();
         ImageSpaceTexture kBlurTexture;
-        kBlurTexture.bForceAniso = 0;
-        kBlurTexture.bIsRenderedTexture = 0;
-        kBlurTexture.bIsTextureBorrowed = 0;
+        kBlurTexture.bForceAniso = false;
+        kBlurTexture.bIsRenderedTexture = false;
+        kBlurTexture.bIsTextureBorrowed = false;
         kBlurTexture.spTexture = nullptr;
         kBlurTexture.eFilterMode = 0;
         kBlurTexture.eClampMode = 0;
@@ -1491,7 +1491,7 @@ void ShadowSceneLight::MTRenderFrustumDepthMap(BSCullingProcess& arCuller, int32
         DebugShader* Shader = static_cast<DebugShader*>(BSShaderManager::GetShader(9));
         Shader->SetTextureToRender(Texture);
     }
-    bClipSpacePlanesReady = 0;
+    bClipSpacePlanesReady = false;
 }
 
 bool ShadowSceneLight::BoundWithinLightFrustum(const NiBound& arBound) {
@@ -1502,7 +1502,7 @@ bool ShadowSceneLight::BoundWithinLightFrustum(const NiBound& arBound) {
         ++v4;
         p_z += 4;
         if (v4 >= 6) {
-            return 1;
+            return true;
         }
     }
     float arBoundb = *(p_z - 1) * arBound.m_kCenter.y + *(p_z - 2) * arBound.m_kCenter.x + arBound.m_kCenter.z * *p_z;
@@ -1513,7 +1513,7 @@ bool ShadowSceneLight::BoundWithinLightFrustum(const NiBound& arBound) {
         }
         goto LABEL_6;
     }
-    return 0;
+    return false;
 }
 
 bool ShadowSceneLight::FrustumFrustumIntersection(NiCamera* apCamera1, NiCamera* apCamera2) {
@@ -1766,7 +1766,7 @@ bool ShadowSceneLight::FrustumFrustumIntersection(NiCamera* apCamera1, NiCamera*
     double v32 = 0.0;
     int32_t v33 = 0;
     v260.m_uiActivePlanes = 63;
-    float* v243 = 0;
+    float* v243 = nullptr;
 LABEL_8:;
     if (v33) {
         if (v33 != 1) {
@@ -1825,7 +1825,7 @@ LABEL_14:;
                 float v251 = v45[2];
                 int32_t v47 = 0;
                 float* v48 = &v260.m_akCullingPlanes[0].m_kNormal.z;
-                while (1) {
+                while (true) {
                     int32_t v52;
                     int32_t v53;
                     double v58;
@@ -1927,7 +1927,7 @@ LABEL_14:;
                         }
                         v39 = ++v189;
                         if (v189 >= 2) {
-                            return 0;
+                            return false;
                         }
                         goto LABEL_21;
                     }
@@ -1946,7 +1946,7 @@ LABEL_14:;
     }
     while (v37 < 6);
 LABEL_52:;
-    return 1;
+    return true;
 }
 
 bool ShadowSceneLight::CubeFaceFrustumFrustumIntersection(
@@ -1964,11 +1964,11 @@ bool ShadowSceneLight::CubeFaceFrustumFrustumIntersection(
     kCamera.m_kLocal.m_Translate = aBound.m_kCenter;
     kCamera.SetupTransformation(static_cast<NiRenderedCubeMap::FaceID>(ausCubeFace));
     updateData.fTime = 0.0;
-    updateData.bUpdateControllers = 0;
-    updateData.bParallelUpdate = 0;
-    updateData.bFoundParticles = 0;
-    updateData.bFoundMorphController = 0;
-    updateData.bSceneGraphChange = 0;
+    updateData.bUpdateControllers = false;
+    updateData.bParallelUpdate = false;
+    updateData.bFoundParticles = false;
+    updateData.bFoundMorphController = false;
+    updateData.bSceneGraphChange = false;
     kCamera.Update(updateData);
     bool v8 = FrustumFrustumIntersection(m_pkCamera, &kCamera);
     kCamera.~BSCubeMapCamera();

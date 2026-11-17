@@ -71,13 +71,13 @@ MagicBallProjectile::MagicBallProjectile(
         Set3DSimple(apData3D);
     }
     else {
-        MagicProjectile::Load3D(0);
+        MagicProjectile::Load3D(false);
     }
     Init3D();
     MagicBallProjectile::InitHavok();
     hkVector4 kVelocity(-3.4028235e+38f, 0.0f, 0.0f, 0.0f);
     GetCharController()->SetLinearVelocity(kVelocity);
-    GetParentCell()->AddReference(this, 0);
+    GetParentCell()->AddReference(this, false);
     if (pAVEffect->GetBoltSound()) {
         uint32_t CastingType = pAVEffect->GetBoltSound()->iFormID;
         if (Sound.IsValid()) {
@@ -85,9 +85,9 @@ MagicBallProjectile::MagicBallProjectile(
         }
         BSSoundHandle kSound;
         Sound = *PlaySound(
-            &kSound, CastingType, 1,
+            &kSound, CastingType, true,
             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
-            1
+            true
         );
     }
     if (apLight) {
@@ -116,7 +116,7 @@ MagicBallProjectile::~MagicBallProjectile() {
         }
     }
     delete pLight;
-    pLight = 0;
+    pLight = nullptr;
 }
 
 uint16_t MagicBallProjectile::GetSaveSize(uint32_t aiFlags) {
@@ -173,7 +173,7 @@ void MagicBallProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
     float ffadeTimer;
     MagicProjectile::InitLoadGame(aiFlags, aiOldFlags);
     Init3D();
-    GetParentCell()->AddReference(this, 0);
+    GetParentCell()->AddReference(this, false);
     if (eState != MagicBallProjectile::BALL_STATE_EXPLODING) {
         if (pAVEffect->GetBoltSound()) {
             uint32_t isoundFileID = pAVEffect->GetBoltSound()->iFormID;
@@ -181,10 +181,10 @@ void MagicBallProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
                 Sound.Release();
             }
             BSSoundHandle* arHandle = PlaySound(
-                &arHandleOut, isoundFileID, 1,
+                &arHandleOut, isoundFileID, true,
                 BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                     BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
-                1
+                true
             );
             Sound.operator=(*arHandle);
         }
@@ -195,7 +195,7 @@ void MagicBallProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
         v3->SetScale(a3);
     }
     ourMemcpy(&ffadeTimer, &pLight, sizeof(ffadeTimer));
-    pLight = 0;
+    pLight = nullptr;
     if (Get3D()) {
         if (pAVEffect->data.pLight) {
             MagicLight* v10;
@@ -206,7 +206,7 @@ void MagicBallProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
                 v10 = ::new (v14) MagicLight(CastingType, a3a);
             }
             else {
-                v10 = 0;
+                v10 = nullptr;
             }
             pLight = v10;
             if (eState == MagicBallProjectile::BALL_STATE_EXPLODING) {
@@ -217,7 +217,7 @@ void MagicBallProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
                         po = ptopav->GetControllers();
                     }
                     else {
-                        po = 0;
+                        po = nullptr;
                     }
                     NiObject* pkObject = (NiObject*)po;
                     NiControllerManager* pmanager = static_cast<NiControllerManager*>(
@@ -230,7 +230,7 @@ void MagicBallProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
                         apString.~NiFixedString();
                         if (pseqArea) {
                             float v7 = pseqArea->m_fEndKeyTime * 0.75;
-                            pLight->Fade(0, v7);
+                            pLight->Fade(false, v7);
                             pLight->SetFadeTimer(ffadeTimer);
                         }
                     }
@@ -253,7 +253,7 @@ void MagicBallProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFla
         if (GetCaster() && (v16 = GetCaster(), v16->GetCasterStatsObject())) {
             MagicCaster* Caster = GetCaster();
             TESObjectREFR* pref = Caster->GetCasterStatsObject();
-            Actor* pactor = pref->IsActor() ? static_cast<Actor*>(pref) : 0;
+            Actor* pactor = pref->IsActor() ? static_cast<Actor*>(pref) : nullptr;
             if (pactor) {
                 CFilter v20;
                 // GetGroup is called on the pointer GetCollisionFilter returns, which is &v20.
@@ -269,7 +269,7 @@ void MagicBallProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFla
                     prb = pcol->GetRigidBody();
                 }
                 else {
-                    prb = 0;
+                    prb = nullptr;
                 }
                 if (prb) {
                     CFilter* v5 = prb->GetCollisionFilter(&apResult);
@@ -290,7 +290,7 @@ void MagicBallProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFla
                 prb_2 = pcol_2->GetRigidBody();
             }
             else {
-                prb_2 = 0;
+                prb_2 = nullptr;
             }
             if (prb_2) {
                 CFilter* v7 = prb_2->GetCollisionFilter(&v18);
@@ -311,7 +311,7 @@ void MagicBallProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFla
         pcaster = v10->GetCasterStatsObject();
     }
     else {
-        pcaster = 0;
+        pcaster = nullptr;
     }
     if (pcaster != pPlayer) {
         float* v8 = &fMagicTrackingMultBall.Float();
@@ -478,7 +478,7 @@ void MagicBallProjectile::InitHavok() {
 void MagicBallProjectile::Update(float afDelta) {
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (afDelta >= 60.0) {
-        SetDelete(1);
+        SetDelete(true);
     }
     if (afDelta >= 0.0) {
         MagicBallProjectile::State eState = this->eState;
@@ -491,7 +491,7 @@ void MagicBallProjectile::Update(float afDelta) {
                         po = ptopav->GetControllers();
                     }
                     else {
-                        po = 0;
+                        po = nullptr;
                     }
                     NiObject* pkObject = (NiObject*)po;
                     NiControllerManager* pmanager = static_cast<NiControllerManager*>(
@@ -506,13 +506,13 @@ void MagicBallProjectile::Update(float afDelta) {
                         if (!pseqStop ||
                             ((v8 = pseqStop->m_fLastTime, pseqStop->m_fEndKeyTime < v8) || !pseqStop->GetState())) {
                             pmanager->DeactivateAll(0.0f);
-                            SetDisabled(1);
-                            SetDelete(1);
+                            SetDisabled(true);
+                            SetDelete(true);
                         }
                     }
                     else {
-                        SetDelete(1);
-                        SetDisabled(1);
+                        SetDelete(true);
+                        SetDisabled(true);
                     }
                     if (pLight) {
                         pLight->Update(afDelta);
@@ -543,7 +543,7 @@ void MagicBallProjectile::Update(float afDelta) {
                 }
                 fDistanceMoved = (newLoc - oldLoc).Length() + fDistanceMoved;
                 if (fMagicProjectileMaxDistance.Float() < static_cast<double>(fDistanceMoved)) {
-                    SetDelete(1);
+                    SetDelete(true);
                 }
                 if (pLight) {
                     pLight->Update(afDelta);
@@ -568,7 +568,7 @@ void MagicBallProjectile::Collide(
         v20 = static_cast<Actor*>(apCollidee);
     }
     else {
-        v20 = 0;
+        v20 = nullptr;
     }
     if (!v20 || !v20->GetGhost()) {
         NiTimeController* po;
@@ -620,14 +620,14 @@ void MagicBallProjectile::Collide(
         eState = MagicBallProjectile::BALL_STATE_EXPLODING;
         if (!abFizzle) {
             NiPoint3 v37 = GetLocationOnReference();
-            GetCaster()->FindTargets_0(pSpell, GetParentCell(), v37, this, apCollidee, 0, 1.0f, 1.0f);
+            GetCaster()->FindTargets_0(pSpell, GetParentCell(), v37, this, apCollidee, false, 1.0f, 1.0f);
         }
         NiAVObject* ptopav = Get3D();
         if (ptopav) {
             po = ptopav->GetControllers();
         }
         else {
-            po = 0;
+            po = nullptr;
         }
         NiObject* pkObject = po;
         NiControllerManager* pmanager =
@@ -638,12 +638,12 @@ void MagicBallProjectile::Collide(
             v22.~NiFixedString();
             if (pseqArea) {
                 pmanager->DeactivateAll(0.0f);
-                pmanager->ActivateSequence(pseqArea, 0, 0, 1.0f, 0.0f, 0);
-                pmanager->SetActive(1);
+                pmanager->ActivateSequence(pseqArea, 0, false, 1.0f, 0.0f, nullptr);
+                pmanager->SetActive(true);
                 pseqArea->SetOffset(-3.4028235e+38f);
                 if (pLight) {
                     float v15 = pseqArea->m_fEndKeyTime * 0.75;
-                    pLight->Fade(0, v15);
+                    pLight->Fade(false, v15);
                 }
             }
         }
@@ -656,7 +656,7 @@ void MagicBallProjectile::Collide(
                 v9->GetSoundHandleByNumericID(&soundHand, arPos_4, 258u);
                 NiPoint3 v27 = GetLocationOnReference();
                 soundHand.SetPosition(v27.x, v27.y, v27.z);
-                soundHand.Play(0);
+                soundHand.Play(false);
             }
         }
     }
@@ -690,7 +690,7 @@ void MagicBallProjectile::BuildAreaEffectGeometry() {
             double Area = static_cast<double>(GetDominantEffect()->GetArea());
             double v4 = fMagicUnitsPerFoot.Float() * Area;
             float farea = v4 / pav->m_kLocal.m_fScale;
-            NiAVObject* pdebugSphere = BSTestObjects::CreateSphere(farea, 10, 10, 0);
+            NiAVObject* pdebugSphere = BSTestObjects::CreateSphere(farea, 10, 10, nullptr);
             NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString("MagicAreaDisplay");
             pdebugSphere->SetName(*a2);
             apString.~NiFixedString();
@@ -704,7 +704,7 @@ void MagicBallProjectile::BuildAreaEffectGeometry() {
                 pmat = ::new (apMemory) NiMaterialProperty;
             }
             else {
-                pmat = 0;
+                pmat = nullptr;
             }
             pmat->SetEmittance(clr);
             pdebugSphere->AttachProperty(pmat);
@@ -735,11 +735,11 @@ void MagicBallProjectile::Init3D() {
             apString.~NiFixedString();
             if (pseq) {
                 pmanager->DeactivateAll(0.0f);
-                pmanager->ActivateSequence(pseq, 0, 0, 1.0f, 0.0f, 0);
-                pmanager->SetActive(1);
+                pmanager->ActivateSequence(pseq, 0, false, 1.0f, 0.0f, nullptr);
+                pmanager->SetActive(true);
                 pseq->SetOffset(-3.4028235e+38f);
                 float v3 = fCellAppTime - 0.10000000149011612;
-                NiUpdateData UpdateData(v3, 1, 0);
+                NiUpdateData UpdateData(v3, true, false);
                 pn->Update(UpdateData);
             }
         }

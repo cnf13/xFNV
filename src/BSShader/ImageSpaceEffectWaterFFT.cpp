@@ -106,36 +106,36 @@ void ImageSpaceEffectWaterFFT::Render(
         bParamsChanged = UpdateParams(apParam);
     }
     int32_t v6 = 0;
-    pFourierSpectrum.bForceAniso = 0;
-    pFourierSpectrum.bIsRenderedTexture = 0;
-    pFourierSpectrum.bIsTextureBorrowed = 0;
+    pFourierSpectrum.bForceAniso = false;
+    pFourierSpectrum.bIsRenderedTexture = false;
+    pFourierSpectrum.bIsTextureBorrowed = false;
     pFourierSpectrum.spTexture = nullptr;
     pFourierSpectrum.eFilterMode = 0;
     pFourierSpectrum.eClampMode = 0;
-    psrc.bForceAniso = 0;
-    psrc.bIsRenderedTexture = 0;
-    psrc.bIsTextureBorrowed = 0;
+    psrc.bForceAniso = false;
+    psrc.bIsRenderedTexture = false;
+    psrc.bIsTextureBorrowed = false;
     psrc.spTexture = nullptr;
     psrc.eFilterMode = 0;
     psrc.eClampMode = 0;
-    pdst.bForceAniso = 0;
-    pdst.bIsRenderedTexture = 0;
-    pdst.bIsTextureBorrowed = 0;
+    pdst.bForceAniso = false;
+    pdst.bIsRenderedTexture = false;
+    pdst.bIsTextureBorrowed = false;
     pdst.spTexture = nullptr;
     pdst.eFilterMode = 0;
     pdst.eClampMode = 0;
     pFourierSpectrum.BorrowRenderedTexture(BSTextureManager::TEX_TESWATER_FFT);
     pdst.BorrowRenderedTexture(BSTextureManager::TEX_TESWATER_FFT);
     psrc.BorrowRenderedTexture(BSTextureManager::TEX_TESWATER_FFT);
-    tmpptr.bForceAniso = 0;
-    tmpptr.bIsRenderedTexture = 0;
-    tmpptr.bIsTextureBorrowed = 0;
+    tmpptr.bForceAniso = false;
+    tmpptr.bIsRenderedTexture = false;
+    tmpptr.bIsTextureBorrowed = false;
     tmpptr.spTexture = nullptr;
     tmpptr.eFilterMode = 0;
     tmpptr.eClampMode = 0;
     ImageSpaceEffect* peffect = pEffectList.m_pBase->m_pObject;
     if (!peffect || peffect == reinterpret_cast<ImageSpaceEffect*>(static_cast<uintptr_t>(108))) {
-        peffect_2 = 0;
+        peffect_2 = nullptr;
     }
     else {
         peffect_2 = peffect;
@@ -148,7 +148,7 @@ void ImageSpaceEffectWaterFFT::Render(
     peffect_2->Render(apGeometry, apRenderer, pparam, 1);
     ImageSpaceEffect* m_pObject = pEffectList.m_pBase[3].m_pObject;
     if (!m_pObject || m_pObject == reinterpret_cast<ImageSpaceEffect*>(static_cast<uintptr_t>(108))) {
-        peffect_3 = 0;
+        peffect_3 = nullptr;
     }
     else {
         peffect_3 = pEffectList.m_pBase[3].m_pObject;
@@ -163,7 +163,7 @@ void ImageSpaceEffectWaterFFT::Render(
     pdst.operator=(tmpptr);
     ImageSpaceEffect* v13 = pEffectList.m_pBase[1].m_pObject;
     if (!v13 || v13 == reinterpret_cast<ImageSpaceEffect*>(static_cast<uintptr_t>(108))) {
-        peffect_4 = 0;
+        peffect_4 = nullptr;
     }
     else {
         peffect_4 = pEffectList.m_pBase[1].m_pObject;
@@ -188,7 +188,7 @@ void ImageSpaceEffectWaterFFT::Render(
     }
     ImageSpaceEffect* v16 = pEffectList.m_pBase[4].m_pObject;
     if (!v16 || v16 == reinterpret_cast<ImageSpaceEffect*>(static_cast<uintptr_t>(108))) {
-        peffect_5 = 0;
+        peffect_5 = nullptr;
     }
     else {
         peffect_5 = pEffectList.m_pBase[4].m_pObject;
@@ -204,7 +204,7 @@ void ImageSpaceEffectWaterFFT::Render(
     pdst.operator=(tmpptr);
     ImageSpaceEffect* v20 = pEffectList.m_pBase[2].m_pObject;
     if (!v20 || v20 == reinterpret_cast<ImageSpaceEffect*>(static_cast<uintptr_t>(108))) {
-        peffect_6 = 0;
+        peffect_6 = nullptr;
     }
     else {
         peffect_6 = pEffectList.m_pBase[2].m_pObject;
@@ -241,7 +241,7 @@ void ImageSpaceEffectWaterFFT::Render(
     if (ImageSpaceEffectWaterFFT::bNormals) {
         ImageSpaceEffect* v25 = m_pBase[5].m_pObject;
         if (!v25 || v25 == reinterpret_cast<ImageSpaceEffect*>(static_cast<uintptr_t>(108))) {
-            v26 = 0;
+            v26 = nullptr;
         }
         else {
             v26 = v25;
@@ -252,7 +252,7 @@ void ImageSpaceEffectWaterFFT::Render(
     else {
         ImageSpaceEffect* v28 = m_pBase[6].m_pObject;
         if (!v28 || v28 == reinterpret_cast<ImageSpaceEffect*>(static_cast<uintptr_t>(108))) {
-            v26 = 0;
+            v26 = nullptr;
         }
         else {
             v26 = v28;
@@ -293,11 +293,11 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
         pparam = ::new (v4) ImageSpaceShaderParam;
     }
     else {
-        pparam = 0;
+        pparam = nullptr;
     }
     pparam->InitConstantMap(2, 3);
     NiTPrimitiveArray<NiPointer<ImageSpaceShaderParam>>* p_pEffectParamList = &pEffectParamList;
-    pparam->bUseTexOffset[1] = 0;
+    pparam->bUseTexOffset[1] = false;
     spParam.m_pObject = pparam;
     pEffectParamList.SetAt(0, spParam);
     SetEffect(0, apManager->pEffectList.m_pBase[93], pparam, 0);
@@ -308,10 +308,10 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
         pparam_2 = ::new (v8) ImageSpaceShaderParam;
     }
     else {
-        pparam_2 = 0;
+        pparam_2 = nullptr;
     }
     pparam_2->InitConstantMap(2, 3);
-    pparam_2->bUseTexOffset[1] = 0;
+    pparam_2->bUseTexOffset[1] = false;
     spParam.m_pObject = pparam_2;
     p_pEffectParamList->SetAt(1u, spParam);
     SetEffect(1, apManager->pEffectList.m_pBase[94], pparam_2, 0);
@@ -322,10 +322,10 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
         pparam_3 = ::new (v10) ImageSpaceShaderParam;
     }
     else {
-        pparam_3 = 0;
+        pparam_3 = nullptr;
     }
     pparam_3->InitConstantMap(2, 3);
-    pparam_3->bUseTexOffset[1] = 0;
+    pparam_3->bUseTexOffset[1] = false;
     spParam.m_pObject = pparam_3;
     p_pEffectParamList->SetAt(2u, spParam);
     SetEffect(2, apManager->pEffectList.m_pBase[95], pparam_3, 0);
@@ -336,10 +336,10 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
         pparam_4 = ::new (v12) ImageSpaceShaderParam;
     }
     else {
-        pparam_4 = 0;
+        pparam_4 = nullptr;
     }
     pparam_4->InitConstantMap(2, 3);
-    pparam_4->bUseTexOffset[1] = 0;
+    pparam_4->bUseTexOffset[1] = false;
     spParam.m_pObject = pparam_4;
     p_pEffectParamList->SetAt(3u, spParam);
     SetEffect(3, apManager->pEffectList.m_pBase[96], pparam_4, 0);
@@ -350,10 +350,10 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
         pparam_5 = ::new (v14) ImageSpaceShaderParam;
     }
     else {
-        pparam_5 = 0;
+        pparam_5 = nullptr;
     }
     pparam_5->InitConstantMap(2, 3);
-    pparam_5->bUseTexOffset[1] = 0;
+    pparam_5->bUseTexOffset[1] = false;
     spParam.m_pObject = pparam_5;
     p_pEffectParamList->SetAt(4u, spParam);
     SetEffect(4, apManager->pEffectList.m_pBase[97], pparam_5, 0);
@@ -364,10 +364,10 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
         pparam_6 = ::new (v16) ImageSpaceShaderParam;
     }
     else {
-        pparam_6 = 0;
+        pparam_6 = nullptr;
     }
     pparam_6->InitConstantMap(2, 3);
-    pparam_6->bUseTexOffset[1] = 0;
+    pparam_6->bUseTexOffset[1] = false;
     spParam.m_pObject = pparam_6;
     p_pEffectParamList->SetAt(5u, spParam);
     SetEffect(5, apManager->pEffectList.m_pBase[98], pparam_6, 0);
@@ -378,10 +378,10 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
         pparam_7 = ::new (v18) ImageSpaceShaderParam;
     }
     else {
-        pparam_7 = 0;
+        pparam_7 = nullptr;
     }
     pparam_7->InitConstantMap(2, 3);
-    pparam_7->bUseTexOffset[1] = 0;
+    pparam_7->bUseTexOffset[1] = false;
     spParam.m_pObject = pparam_7;
     p_pEffectParamList->SetAt(6u, spParam);
     SetEffect(6, apManager->pEffectList.m_pBase[99], pparam_7, 0);
@@ -616,7 +616,7 @@ void ImageSpaceEffectWaterFFT::FillWaterUtilityTextures(bool* abFirstTimeThrough
             }
         }
         pD3DTexture->UnlockRect(0);
-        *abFirstTimeThrough = 0;
+        *abFirstTimeThrough = false;
     }
     NiTexture* pAmplitudeTexture = pHighAmplitude0Tex.GetTexture();
     IDirect3DTexture9* pAmplitudeD3DTexture = static_cast<IDirect3DTexture9*>(
@@ -652,7 +652,7 @@ void ImageSpaceEffectWaterFFT::FillWaterUtilityBuffers() {
     v2->eMemContext = MEM_CONTEXT_WATER;
     int32_t v3 = ImageSpaceEffectWaterFFT::iGridResolution;
     int32_t v4 = 0;
-    for (bFirstTimeThrough = 1; v4 < v3 + 1; ++v4) {
+    for (bFirstTimeThrough = true; v4 < v3 + 1; ++v4) {
         std::memset(HighW[v4], 0, sizeof(float) * v3 + 1);
         std::memset(HighAmplitude0[v4], 0, sizeof(float) * ImageSpaceEffectWaterFFT::iGridResolution + 1);
         v3 = ImageSpaceEffectWaterFFT::iGridResolution;
@@ -665,7 +665,7 @@ void ImageSpaceEffectWaterFFT::FillWaterUtilityBuffers() {
     float kx = 0.0f;
     if (WaterHighResolution) {
         if (v3 >= 0) {
-            while (1) {
+            while (true) {
                 v6 = 0;
                 ky_2 = 0.0f;
                 kx = (static_cast<double>(std::bit_cast<int32_t>(kx)) -
@@ -682,7 +682,7 @@ void ImageSpaceEffectWaterFFT::FillWaterUtilityBuffers() {
                 }
             }
             v23 = kx * kx;
-            while (1) {
+            while (true) {
                 int32_t v7;
                 ky_2 = (static_cast<double>(std::bit_cast<int32_t>(ky_2)) -
                         static_cast<double>(ImageSpaceEffectWaterFFT::iGridResolution) * 0.5) *

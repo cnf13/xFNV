@@ -22,7 +22,7 @@ TESObjectREFR* BGSSaveFormBuffer::GetReference() {
         return v2;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -55,7 +55,7 @@ void BGSSaveFormBuffer::SetHeader(
 uint32_t BGSSaveFormBuffer::GetOverhead() {
     uint32_t v1 = BGSSaveGameBuffer::GetBufferPosition();
     SIZE_TYPE v2 = GetSizeTypeForSize(v1);
-    return (uint32_t)((int32_t)(((uint32_t)GetSizeTypeSize(v2)) + 9));
+    return (uint32_t)((int32_t)(GetSizeTypeSize(v2) + 9));
 }
 
 void BGSSaveFormBuffer::Save(BGSSaveLoadFile* apFile) {

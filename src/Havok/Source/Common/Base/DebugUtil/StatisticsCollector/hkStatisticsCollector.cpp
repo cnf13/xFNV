@@ -61,16 +61,16 @@ void hkStatisticsCollector::addStringPtr(const char* name, const hkStringPtr& st
 
 const hkClass* hkStatisticsCollector::findClassType(const hkReferencedObject* obj) {
     if (!obj) {
-        return 0;
+        return nullptr;
     }
     const hkClass* ClassType = obj->getClassType();
     if (!ClassType) {
         if (!this->getVtblClassRegistry()) {
-            return 0;
+            return nullptr;
         }
         ClassType = this->getVtblClassRegistry()->getClassFromVirtualInstance(obj);
         if (!ClassType) {
-            return 0;
+            return nullptr;
         }
     }
     return ClassType;
@@ -81,7 +81,7 @@ void hkStatisticsCollector::addReferencedObjectMemory(const hkReferencedObject* 
         int32_t ReferencedObjectSize = getReferencedObjectSize(obj);
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
         int32_t v6 = Instance->m_heap->getAllocatedSize(obj, ReferencedObjectSize);
-        addChunk(hkStatisticsCollector::MEM_OBJECT, 0, obj, ReferencedObjectSize, v6);
+        addChunk(hkStatisticsCollector::MEM_OBJECT, nullptr, obj, ReferencedObjectSize, v6);
     }
 }
 
@@ -90,7 +90,7 @@ void hkStatisticsCollector::addObjectMemory(const hkClass& cls, const void* obj,
         int32_t ObjectSizeOutOfLine = cls.getObjectSize();
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
         int32_t v7 = Instance->m_heap->getAllocatedSize(obj, ObjectSizeOutOfLine);
-        addChunk(hkStatisticsCollector::MEM_OBJECT, 0, obj, ObjectSizeOutOfLine, v7);
+        addChunk(hkStatisticsCollector::MEM_OBJECT, nullptr, obj, ObjectSizeOutOfLine, v7);
     }
 }
 

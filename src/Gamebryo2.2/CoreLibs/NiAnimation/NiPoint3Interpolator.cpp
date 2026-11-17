@@ -37,7 +37,7 @@ NiObject* NiPoint3Interpolator::CreateClone(NiCloningProcess& kCloning) {
     }
     else {
         CopyMembers(nullptr, kCloning);
-        return 0;
+        return nullptr;
     }
 }
 
@@ -232,7 +232,7 @@ NiObject* NiPoint3Interpolator::CreateObject() {
     NiPoint3Interpolator* pkObject =
         static_cast<NiPoint3Interpolator*>(NiMemObject::operator new(sizeof(NiPoint3Interpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPoint3Interpolator(static_cast<NiPosData*>(nullptr));
 }

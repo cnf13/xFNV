@@ -192,7 +192,7 @@ void ScriptEffect::Finish() {
         if (apThis) {
             delete apThis;
         }
-        this->pEffectLocals = 0;
+        this->pEffectLocals = nullptr;
     }
 }
 

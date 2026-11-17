@@ -75,18 +75,18 @@ bool DemoralizeEffect::CheckTarget(MagicTarget* apTarget) {
         targetAsActor = nullptr;
     }
     if (!targetAsActor) {
-        return (bool)0;
+        return false;
     }
-    if (targetAsActor->IsDead((bool)0)) {
-        return (bool)0;
+    if (targetAsActor->IsDead(false)) {
+        return false;
     }
     if (targetAsActor->IsDying()) {
-        return (bool)0;
+        return false;
     }
     float afMagnitude = fMagnitude;
     uint16_t level = targetAsActor->GetLevel();
     if (!MagicFormulas::CheckTargetLevelMagnitude(level, afMagnitude)) {
-        return (bool)0;
+        return false;
     }
     return (bool)((uint8_t)(dynamic_cast<Creature*>(apTarget) || (!targetAsActor->IsReanimated())));
 }
@@ -98,25 +98,25 @@ void DemoralizeEffect::Start() {
         ptargetActor = pTarget->GetTargetAsActor();
     }
     else {
-        ptargetActor = 0;
+        ptargetActor = nullptr;
     }
     if (pCaster) {
         pcasterActor = pCaster->GetCasterAsActor();
     }
     else {
-        pcasterActor = 0;
+        pcasterActor = nullptr;
     }
     if (ptargetActor) {
         if (pcasterActor) {
             if (ptargetActor->GetCombatController()) {
                 ptargetActor->GetCombatController()->ForceFlee(pcasterActor, false);
-                bTurned = 1;
+                bTurned = true;
             }
             else {
-                if (!ptargetActor->IsFleeing(0)) {
-                    ptargetActor->EndInterruptPackage(0);
-                    ptargetActor->InitiateFlee(pcasterActor, 1, 1, 1, 0, 0, -1.0f, -1.0f);
-                    bTurned = 1;
+                if (!ptargetActor->IsFleeing(false)) {
+                    ptargetActor->EndInterruptPackage(false);
+                    ptargetActor->InitiateFlee(pcasterActor, true, true, true, nullptr, nullptr, -1.0f, -1.0f);
+                    bTurned = true;
                 }
             }
         }
@@ -151,14 +151,14 @@ void DemoralizeEffect::Finish() {
                     if (targetAsActor->MobileObject::GetCurrentAIProcess()) {
                         currentAIProcess = targetAsActor->MobileObject::GetCurrentAIProcess();
                         currentAIProcess->EnterCombat(
-                            targetAsActor, casterAsActor, (bool)1, (bool)0, nullptr, (bool)0, (bool)0, (bool)0, (bool)0,
-                            (bool)0, (bool)0, (bool)1, nullptr
+                            targetAsActor, casterAsActor, true, false, nullptr, false, false, false, false, false,
+                            false, true, nullptr
                         );
                     }
                 }
             }
             else {
-                if (targetAsActor->IsFleeing(0)) {
+                if (targetAsActor->IsFleeing(false)) {
                     targetAsActor->RemoveFleeTarget(casterAsActor);
                 }
             }
@@ -172,6 +172,6 @@ ActiveEffect* DemoralizeEffect::Create(MagicCaster* a1, MagicItem* a2, EffectIte
         return ::new (apMemory) DemoralizeEffect(a1, a2, a3);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

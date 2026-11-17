@@ -177,7 +177,7 @@ hkSerializableCinfo& bhkTriangleShape::CreateCinfo(bool& arCreated) {
     TLSData* v3 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v3->eMemContext;
     v3->eMemContext = MEM_CONTEXT_HAVOK;
-    bool v5 = pInfo == 0;
+    bool v5 = pInfo == nullptr;
     arCreated = v5;
     if (v5) {
         hkTriangleShapeCinfo* v6 =
@@ -199,9 +199,9 @@ hkSerializableCinfo& bhkTriangleShape::CreateCinfo(bool& arCreated) {
             v6->m_vertexC.fW = 0.0f;
         }
         else {
-            v6 = 0;
+            v6 = nullptr;
         }
-        bool v7 = phkObject == 0;
+        bool v7 = phkObject == nullptr;
         pInfo = v6;
         if (!v7) {
             CopyCinfo(*v6);

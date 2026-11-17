@@ -33,19 +33,19 @@ void TESRegionData::Save() {
 
 bool TESRegionData::LoadRegionData(REGION_DATA_BASE* a1) {
     if (!a1) {
-        return 0;
+        return false;
     }
     bOverride = a1->bOverride;
     SetPriority(a1->cPriority);
-    return 1;
+    return true;
 }
 
 bool TESRegionData::SetPriority(const uint8_t acPriority) {
     if (((uint32_t)((int32_t)acPriority)) > 0x64u) {
-        return (bool)0;
+        return false;
     }
     cPriority = (int8_t)acPriority;
-    return (bool)1;
+    return true;
 }
 
 bool TESRegionData::GetOverride() {

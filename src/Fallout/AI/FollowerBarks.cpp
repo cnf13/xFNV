@@ -131,7 +131,7 @@ void FollowerBarks::FollowerBarkEntry::Trigger() {
 bool FollowerBarks::FollowerBarkEntry::GetShouldRepeat() {
     bool result;
     if (!m_pSpeaker) {
-        return 0;
+        return false;
     }
     switch (m_eBarkType) {
         case FollowerBarks::BARK_KNOCKED_OUT:
@@ -145,7 +145,7 @@ bool FollowerBarks::FollowerBarkEntry::GetShouldRepeat() {
         case FollowerBarks::BARK_CAME_TO:
         case FollowerBarks::BARK_STEALTHING:
         case FollowerBarks::BARK_REGENERATING: {
-            result = 0;
+            result = false;
             break;
         }
         case FollowerBarks::BARK_MINOR_HEALTH_WARNING: {
@@ -172,14 +172,14 @@ bool FollowerBarks::FollowerBarkEntry::GetShouldRepeat() {
             for (ActorValue::Index eav = ActorValue::PERCEPTION_CONDITION; eav < ActorValue::BRAIN_CONDITION;
                  eav = static_cast<ActorValue::Index>(eav + 1)) {
                 if (m_pSpeaker->GetActorFloatValue(eav) == 0.0) {
-                    return 1;
+                    return true;
                 }
             }
-            result = 0;
+            result = false;
             break;
         }
         default: {
-            result = 0;
+            result = false;
             break;
         }
     }
@@ -188,8 +188,8 @@ bool FollowerBarks::FollowerBarkEntry::GetShouldRepeat() {
 
 void FollowerBarks::TriggerFollowerBark(Actor* apSpeaker, FollowerBarks::FollowerBarkType aeBarkType) {
     uint32_t nCurrentTime = BSGetTickCount();
-    bool bPlayBark = 1;
-    bool bAddBark = 1;
+    bool bPlayBark = true;
+    bool bAddBark = true;
     BSSimpleList<FollowerBarks::FollowerBarkEntry*>* pHistory = &FollowerBarks::m_BarkHistory;
     while (pHistory) {
         FollowerBarks::FollowerBarkEntry* pEntry = pHistory->m_item;
@@ -199,11 +199,11 @@ void FollowerBarks::TriggerFollowerBark(Actor* apSpeaker, FollowerBarks::Followe
                 int32_t BarkPriority = FollowerBarks::GetBarkPriority(pEntry->m_eBarkType);
                 if (BarkPriority >= FollowerBarks::GetBarkPriority(aeBarkType) &&
                     pEntry->m_tNoOtherBarksExpiration > nCurrentTime) {
-                    bPlayBark = 0;
+                    bPlayBark = false;
                 }
                 if (pEntry->m_eBarkType == aeBarkType && pEntry->m_tNoRepeatExpiration > nCurrentTime) {
-                    bPlayBark = 0;
-                    bAddBark = 0;
+                    bPlayBark = false;
+                    bAddBark = false;
                 }
             }
         }
@@ -213,7 +213,7 @@ void FollowerBarks::TriggerFollowerBark(Actor* apSpeaker, FollowerBarks::Followe
         pHistory = &FollowerBarks::m_BarkHistory;
         while (pHistory) {
             FollowerBarks::FollowerBarkEntry* pEntry_2 = pHistory->m_item;
-            bool bDeleteEntry = 0;
+            bool bDeleteEntry = false;
             if (pEntry_2) {
                 if (apSpeaker == pEntry_2->m_pSpeaker) {
                     bDeleteEntry = pEntry_2->m_eBarkType == aeBarkType;
@@ -233,7 +233,7 @@ void FollowerBarks::TriggerFollowerBark(Actor* apSpeaker, FollowerBarks::Followe
             pNewEntry = v4;
         }
         else {
-            pNewEntry = 0;
+            pNewEntry = nullptr;
         }
         FollowerBarks::FollowerBarkEntry* pNewEntry_2 = pNewEntry;
         FollowerBarks::m_BarkHistory.AddHead(pNewEntry_2);
@@ -264,7 +264,7 @@ TESTopic* FollowerBarks::GetBarkTopicByType(FollowerBarks::FollowerBarkType aeBa
             break;
         }
         case FollowerBarks::BARK_DIED: {
-            result = 0;
+            result = nullptr;
             break;
         }
         case FollowerBarks::BARK_MINOR_HEALTH_WARNING: {
@@ -313,7 +313,7 @@ TESTopic* FollowerBarks::GetBarkTopicByType(FollowerBarks::FollowerBarkType aeBa
             break;
         }
         default: {
-            result = 0;
+            result = nullptr;
             break;
         }
     }
@@ -369,7 +369,7 @@ void FollowerBarks::ProcessFollowerBarks() {
     BSSimpleList<FollowerBarks::FollowerBarkEntry*>* pHistory = &FollowerBarks::m_BarkHistory;
     while (pHistory) {
         FollowerBarks::FollowerBarkEntry* pEntry = pHistory->m_item;
-        bool bDeleteEntry = 0;
+        bool bDeleteEntry = false;
         if (pEntry) {
             if (pEntry->m_pSpeaker) {
                 if (pEntry->m_tNoRepeatExpiration <= nCurrentTime) {
@@ -380,11 +380,11 @@ void FollowerBarks::ProcessFollowerBarks() {
                     else {
                         if (pEntry->m_tNoOtherBarksExpiration > nCurrentTime) {
                             if (!pEntry->m_pSpeaker->IsPlayerTeammate()) {
-                                bDeleteEntry = 1;
+                                bDeleteEntry = true;
                             }
                         }
                         else {
-                            bDeleteEntry = 1;
+                            bDeleteEntry = true;
                         }
                     }
                 }

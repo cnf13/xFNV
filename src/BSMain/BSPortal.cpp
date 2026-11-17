@@ -41,7 +41,7 @@ NiObject* BSPortal::CreateClone(NiCloningProcess& arCloneData) {
         pobj = ::new (apMemory) BSPortal;
     }
     else {
-        pobj = 0;
+        pobj = nullptr;
     }
     CopyMembers(pobj, arCloneData);
     return pobj;

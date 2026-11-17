@@ -80,7 +80,7 @@ void bhkMoppBvTreeShape::LoadBinary(NiStream& arStream) {
     bool bCreated;
     bhkBvTreeShape::LoadBinary(arStream);
     hkMoppBvTreeShapeCinfo* cinfo = static_cast<hkMoppBvTreeShapeCinfo*>(&CreateCinfo(bCreated));
-    hkpMoppCode* pc = 0;
+    hkpMoppCode* pc = nullptr;
     bhkStream::LoadBinary(arStream, pc);
     cinfo->m_code = pc;
 }
@@ -133,11 +133,11 @@ void bhkMoppBvTreeShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
         apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
     }
     apStrings->SetAt(m_usSize, element);
-    if (this && (phkObject = this->phkObject) != 0) {
+    if (this && (phkObject = this->phkObject) != nullptr) {
         pcode = static_cast<hkpMoppBvTreeShape*>(phkObject)->m_code;
     }
     else {
-        pcode = 0;
+        pcode = nullptr;
     }
     BSsprintf(apDest, 32, "0x%8X", pcode);
     char* ViewerString_9 = NiGetViewerString("MoppCode", static_cast<const char*>(apDest));

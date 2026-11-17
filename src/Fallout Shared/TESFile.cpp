@@ -60,12 +60,12 @@ void TESFileHeaderInfo::Endian() {
 }
 
 TESFile* TESFile::GetFileForTempID(uint32_t aiID) {
-    TESFile* pownerfile = 0;
+    TESFile* pownerfile = nullptr;
     if (TESFile::pOwnedTempIDMap && TESFile::pOwnedTempIDMap->GetAt(aiID, pownerfile)) {
         return pownerfile;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -150,9 +150,9 @@ bool TESFile::FindForm(TESForm* apForm) {
         if (apForm->FindInFileFast(this)) {
             return true;
         }
-        TESRewind(1);
+        TESRewind(true);
         while (m_currentform.form == formEnumString[TES4_ID].uiFormString) {
-            NextForm(1);
+            NextForm(true);
         }
         uint32_t ifileformtype = formEnumString[apForm->GetSavedFormType()].uiFormString;
         uint32_t ifileformid = apForm->iFormID;
@@ -161,7 +161,7 @@ bool TESFile::FindForm(TESForm* apForm) {
             if (m_currentform.form == formEnumString[GRUP_ID].uiFormString) {
                 // A group the form may be in is entered (its first record is next), any other is skipped whole.
                 if (apForm->BelongsInGroup(&m_currentform, true, false)) {
-                    NextForm(1);
+                    NextForm(true);
                 }
                 else {
                     NextGroup();
@@ -172,7 +172,7 @@ bool TESFile::FindForm(TESForm* apForm) {
                 bretval = true;
             }
             else {
-                NextForm(1);
+                NextForm(true);
             }
         }
     }
@@ -387,7 +387,7 @@ ENUM_FORM_ID TESFile::GetTESForm() {
         GetTESChunk();
     }
 
-    return static_cast<ENUM_FORM_ID>(TESForm::GetFormTypeFromFormString(m_currentform.form));
+    return TESForm::GetFormTypeFromFormString(m_currentform.form);
 }
 
 void TESFile::GetTESFormNoRet() {
@@ -519,7 +519,7 @@ bool TESFile::ReadChunkHeader() {
     }
     else {
         uint32_t uiFormOffset = m_formoffset;
-        char* pBuffer = static_cast<char*>(GetDecompressedBuffer());
+        char* pBuffer = GetDecompressedBuffer();
         if (!pBuffer || uiFormOffset >= GetDecompressedBufferSize()) {
             ClearCurrentChunk();
             return false;
@@ -818,7 +818,7 @@ bool TESFile::GetChunkData(void* apData, uint32_t auiMaxSize) {
         }
         else {
             uint32_t uiOffset = m_formoffset + sizeof(CHUNK);
-            char* pSource = static_cast<char*>(GetDecompressedBuffer()) + uiOffset;
+            char* pSource = GetDecompressedBuffer() + uiOffset;
             ourMemcpy(apData, pSource, auiMaxSize - 1);
             m_chunkoffset = auiMaxSize - 1;
         }
@@ -850,7 +850,7 @@ bool TESFile::GetChunkData(void* apData, uint32_t auiMaxSize) {
     }
     else {
         uint32_t uiOffset = m_formoffset + sizeof(CHUNK);
-        char* pSource = static_cast<char*>(GetDecompressedBuffer()) + uiOffset;
+        char* pSource = GetDecompressedBuffer() + uiOffset;
         ourMemcpy(apData, pSource, m_actualChunkSize);
         m_chunkoffset = m_actualChunkSize;
     }
@@ -910,13 +910,13 @@ void TESFile::SetTempIDOwnedByFile(uint32_t aiID, TESFile* apFile) {
             v2 = ::new (apMemory) NiTMap<uint32_t, TESFile*>(1001u);
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         TESFile::pOwnedTempIDMap = v2;
     }
     TESFile::pOwnedTempIDMap->SetAt(aiID, apFile);
     if (!apFile->GetTempIDOwner()) {
-        apFile->SetTempIDOwner(1);
+        apFile->SetTempIDOwner(true);
         ++TESFile::iOwnerFileCount;
     }
 }
@@ -1152,7 +1152,7 @@ const char* TESFile::GetIndexName(uint32_t index) {
 bool TESFile::MastersChanged() {
     BSSimpleList<char*>* pMNList = GetMasterList();
     BSSimpleList<_ULARGE_INTEGER*>* pMDList = GetMasterDataList();
-    bool filechanged = 0;
+    bool filechanged = false;
     while (pMNList && (pMNList->m_item && (pMDList && pMDList->m_item))) {
         char FileName[264];
         BSsprintf(FileName, 260, "%s", pMNList->m_item);
@@ -1160,14 +1160,14 @@ bool TESFile::MastersChanged() {
         const std::vector<platform::FileEntry> kFound = platform::FindFiles(FileName);
         if (kFound.empty()) {
             if (plargeint->u.LowPart || plargeint->u.HighPart) {
-                filechanged = 1;
+                filechanged = true;
             }
         }
         else {
             const uint64_t uiSize = kFound.front().size;
             if (static_cast<uint32_t>(uiSize) != plargeint->u.LowPart ||
                 static_cast<uint32_t>(uiSize >> 32) != plargeint->u.HighPart) {
-                filechanged = 1;
+                filechanged = true;
             }
         }
         pMNList = pMNList->m_pkNext;
@@ -1245,7 +1245,7 @@ bool TESFile::OpenTES(const char* ppath, const char* pfilename, NiFile::OpenMode
         if (!m_pFile) {
             return false;
         }
-        m_pFile->Open(1, false);
+        m_pFile->Open(true, false);
         if (!m_pFile->FileIsGood()) {
             // ENOENT and EACCES
             int32_t iError = errno;
@@ -1314,9 +1314,9 @@ TESFile* TESFile::GetThreadSafeFileForThread(uint32_t aiThreadID) {
         uint8_t ucCompileIndex = GetCompileIndex();
         pretfile->SetCompileIndex(ucCompileIndex);
         BSSimpleList<TESFile*>* pFileList = pDataHandler->GetFileList();
-        pretfile->GenIndexTable(pFileList, 0);
+        pretfile->GenIndexTable(pFileList, false);
         pretfile->SetThreadSafeParent(this);
-        pretfile->OpenTES(NiFile::READ_ONLY, 0);
+        pretfile->OpenTES(NiFile::READ_ONLY, false);
         if (!pThreadSafeFileMap) {
             NiTPointerMap<uint32_t, TESFile*>* pMap;
             NiTPointerMap<uint32_t, TESFile*>* pMapMemory =
@@ -1513,26 +1513,26 @@ void TESFile::OpenGroup(FORM* apGroupData) {
 void TESFile::StartAndEndGroupsForForm(TESForm* apForm) {
     FORM groupform;
     if (apForm && apForm->GetFormType() != TES4_ID) {
-        FORM_GROUP* pgroup = 0;
-        FORM_GROUP* pstopgroup = 0;
+        FORM_GROUP* pgroup = nullptr;
+        FORM_GROUP* pstopgroup = nullptr;
         for (BSSimpleList<FORM_GROUP*>* pgrouplist = GetGroupList(); pgrouplist; pgrouplist = pgrouplist->m_pkNext) {
             pgroup = pgrouplist->m_item;
             if (pgroup) {
-                if (!apForm->BelongsInGroup(&pgroup->GroupData, 1, 1)) {
+                if (!apForm->BelongsInGroup(&pgroup->GroupData, true, true)) {
                     pstopgroup = pgroup;
                 }
             }
         }
         if (pstopgroup) {
         LABEL_10:;
-            for (pgroup = GetCurrentGroup(); pgroup; pgroup = 0) {
+            for (pgroup = GetCurrentGroup(); pgroup; pgroup = nullptr) {
                 EndGroup();
                 if (pgroup != pstopgroup) {
                     goto LABEL_10;
                 }
             }
         }
-        for (pgroup = GetCurrentGroup(); !pgroup || !apForm->BelongsInGroup(&pgroup->GroupData, 0, 1);
+        for (pgroup = GetCurrentGroup(); !pgroup || !apForm->BelongsInGroup(&pgroup->GroupData, false, true);
              pgroup = GetCurrentGroup()) {
             apForm->CreateGroupData(&groupform, pgroup);
             if (groupform.form != formEnumString[2].uiFormString) {
@@ -1551,7 +1551,7 @@ void TESFile::StartAndEndGroupsForForm(TESForm* apForm) {
 
 void TESFile::RemoveFromOwnedIDMap() {
     if (GetTempIDOwner()) {
-        SetTempIDOwner(0);
+        SetTempIDOwner(false);
         if (--TESFile::iOwnerFileCount) {
             NiTPrimitiveArray<uint32_t> ownedIDs(100, 100);
             uint32_t iindex = 0;

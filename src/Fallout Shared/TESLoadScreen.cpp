@@ -25,7 +25,7 @@ void LOAD_FORM_DATA::Endian() {
 TESLoadScreen::TESLoadScreen()
   : TESForm(), TESTexture(), TESDescription(), LoadFormList(), pLoadScreenType(nullptr), cDescText() {
     cFormType = 75;
-    SetInitialized(1);
+    SetInitialized(true);
 }
 
 TESLoadScreen::~TESLoadScreen() {
@@ -122,7 +122,7 @@ void TESLoadScreen::InitItem() {
             uint32_t a1 = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this->pLoadScreenType));
             TESFile* file = this->GetFile(-1);
             TESForm::AddCompileIndex(a1, file);
-            this->pLoadScreenType = static_cast<TESLoadScreenType*>(pDataHandler->GetLoadScreenType(a1));
+            this->pLoadScreenType = pDataHandler->GetLoadScreenType(a1);
         }
         this->SetInitialized(true);
     }
@@ -149,21 +149,21 @@ void TESLoadScreen::Copy(TESForm* apCopy) {
 bool TESLoadScreen::Compare(TESForm* apCompare) {
     TESLoadScreen* pcomp = dynamic_cast<TESLoadScreen*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     BSSimpleList<LOAD_FORM_DATA*>* pcomplist = &pcomp->LoadFormList;
     int32_t v3 = LoadFormList.ItemsInList();
     if (v3 != pcomp->LoadFormList.ItemsInList()) {
-        return 1;
+        return true;
     }
     while (pcomplist && !pcomplist->IsEmpty()) {
         if (!LoadFormList.IsInList(pcomplist->m_item)) {
-            return 1;
+            return true;
         }
         pcomplist = pcomplist->m_pkNext;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     TESLoadScreenType* LoadScreenType = pLoadScreenType;
     return LoadScreenType != pcomp->pLoadScreenType;

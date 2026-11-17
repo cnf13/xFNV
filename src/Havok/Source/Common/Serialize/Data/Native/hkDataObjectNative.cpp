@@ -83,7 +83,7 @@ const char* hkDataArrayNative::asString(int32_t index) const {
     int32_t v2 = m_nativeType;
 #if FNVD_64BIT
     // The element is the string pointer (29), or the pointer with its low bit as a flag (33), read at its own width.
-    const void* pElement = static_cast<const char*>(m_address) + static_cast<int32_t>(index * m_elementStride);
+    const void* pElement = static_cast<const char*>(m_address) + (index * m_elementStride);
     if (v2 == 29) {
         return *static_cast<const char* const*>(pElement);
     }
@@ -504,7 +504,7 @@ hkBool hkDataClassNative::isSuperClass(const hkDataClassImpl* k) const {
     hkBool result;
     const hkDataClassImpl* v3 = k;
     if (k) {
-        while (1) {
+        while (true) {
             const char* v7 = getName();
             const char* v5 = v3->getName();
             if (!hkString::strCmp(v5, v7)) {
@@ -856,9 +856,9 @@ hkDataArrayImpl* hkDataObjectNative::asArray(const char* name) {
         }
         default: {
             elementStride = 0;
-            address = 0;
+            address = nullptr;
             arraySize = 0;
-            klass = 0;
+            klass = nullptr;
             type = hkClassMember::TYPE_VOID;
             break;
         }
@@ -881,14 +881,14 @@ const char* hkDataObjectNative::asString(const char* name) {
             reinterpret_cast<uintptr_t>((&apMemory.asStringPtr(0))->m_stringAndFlag) & ~uintptr_t(1)
         );
     }
-    return 0;
+    return nullptr;
 }
 
 int64_t hkDataObjectNative::asInt(const char* name) {
     hkClassMemberAccessor apMemory(m_object, name);
     const hkClassMember* ClassMember = &apMemory.getClassMember();
     uint32_t v3 = ClassMember->m_type.m_storage - 1;
-    while (2) {
+    while (true) {
         int64_t result;
         switch (v3) {
             case 0u:

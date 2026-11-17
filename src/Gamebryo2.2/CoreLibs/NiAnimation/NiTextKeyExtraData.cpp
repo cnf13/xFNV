@@ -33,7 +33,7 @@ NiObject* NiTextKeyExtraData::CreateClone(NiCloningProcess& kCloning) {
     }
     else {
         CopyMembers(nullptr, kCloning);
-        return 0;
+        return nullptr;
     }
 }
 
@@ -171,7 +171,7 @@ void NiTextKeyExtraData::CopyMembers(NiTextKeyExtraData* pDest, NiCloningProcess
         }
     }
     else {
-        pDest->m_pKeys = 0;
+        pDest->m_pKeys = nullptr;
     }
 }
 
@@ -179,7 +179,7 @@ NiObject* NiTextKeyExtraData::CreateObject() {
     NiTextKeyExtraData* pkObject =
         static_cast<NiTextKeyExtraData*>(NiMemObject::operator new(sizeof(NiTextKeyExtraData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiTextKeyExtraData;
 }

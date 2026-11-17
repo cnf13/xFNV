@@ -14,7 +14,7 @@
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayGeometry.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayGeometryTypes.h"
 
-#include <math.h>
+#include <cmath>
 #include <xmmintrin.h>
 
 hkDisplayCylinder::hkDisplayCylinder(

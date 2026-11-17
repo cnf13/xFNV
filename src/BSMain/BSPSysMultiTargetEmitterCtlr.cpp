@@ -43,7 +43,7 @@ NiObject* BSPSysMultiTargetEmitterCtlr::CreateClone(NiCloningProcess& kCloning) 
         v3 = ::new (apMemory) BSPSysMultiTargetEmitterCtlr;
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     CopyMembers(v3, kCloning);
     return v3;
@@ -300,6 +300,6 @@ NiObject* BSPSysMultiTargetEmitterCtlr::CreateObject() {
         return ::new (apMemory) BSPSysMultiTargetEmitterCtlr;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

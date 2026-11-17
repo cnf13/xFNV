@@ -36,8 +36,8 @@ public:
     };
 
     // The collide callback: what to do after the collision.
-    typedef int32_t (*Callback)(Intersect& arIntersect);
-    typedef NiTPrimitiveArray<Record*> NiRecordArray;
+    using Callback = int32_t (*)(Intersect& arIntersect);
+    using NiRecordArray = NiTPrimitiveArray<Record*>;
 
 protected:
     NiRecordArray m_kColliders;

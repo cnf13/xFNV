@@ -40,7 +40,7 @@ CombatTargetMap::~CombatTargetMap() {
 }
 
 void CombatTargetMap::RemoveTarget(Actor* apTarget) {
-    CombatTargetData* a2 = 0;
+    CombatTargetData* a2 = nullptr;
     if (GetAt(apTarget, a2)) {
         RemoveAt(apTarget);
         if (a2) {
@@ -51,10 +51,10 @@ void CombatTargetMap::RemoveTarget(Actor* apTarget) {
 
 void CombatTargetMap::AddTargetAttacker(Actor* apTarget, Actor* apAttacker) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_COMBAT_AI, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\CombatTargetMap.cpp",
+        MEM_CONTEXT_COMBAT_AI, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\CombatTargetMap.cpp",
         124
     );
-    CombatTargetData* ptargetData = 0;
+    CombatTargetData* ptargetData = nullptr;
     if (!GetAt(apTarget, ptargetData)) {
         CombatTargetData* ptargetData_2;
         CombatTargetData* v5 = static_cast<CombatTargetData*>(ourMalloc(sizeof(CombatTargetData)));
@@ -62,7 +62,7 @@ void CombatTargetMap::AddTargetAttacker(Actor* apTarget, Actor* apAttacker) {
             ptargetData_2 = ::new (v5) CombatTargetData;
         }
         else {
-            ptargetData_2 = 0;
+            ptargetData_2 = nullptr;
         }
         ptargetData = ptargetData_2;
         SetAt(apTarget, ptargetData_2);
@@ -71,7 +71,7 @@ void CombatTargetMap::AddTargetAttacker(Actor* apTarget, Actor* apAttacker) {
 }
 
 void CombatTargetMap::RemoveTargetAttacker(Actor* apTarget, Actor* apAttacker) {
-    CombatTargetData* ptargetData = 0;
+    CombatTargetData* ptargetData = nullptr;
     if (GetAt(apTarget, ptargetData)) {
         for (uint32_t i = 0; i < ptargetData->Attackers.iSize; ++i) {
             if (ptargetData->Attackers.operator[](i) == apAttacker) {
@@ -91,9 +91,9 @@ void CombatTargetMap::RemoveTargetAttacker(Actor* apTarget, Actor* apAttacker) {
 }
 
 CombatTargetData* CombatTargetMap::GetTargetAttackerArray(Actor* apTarget) {
-    CombatTargetData* ptargetData = 0;
+    CombatTargetData* ptargetData = nullptr;
     if (GetAt(apTarget, ptargetData)) {
         return ptargetData;
     }
-    return 0;
+    return nullptr;
 }

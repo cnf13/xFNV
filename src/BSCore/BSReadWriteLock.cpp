@@ -50,12 +50,12 @@ bool BSReadWriteLock::TryLockForRead() {
              InterlockedCompareExchangeUInt32(&uiLock, uiComperand + 1, uiComperand) != uiComperand;
              uiComperand = uiLock & 0xFFFFFFF) {
             if ((uiLock & 0x80000000u) != 0) {
-                return 0;
+                return false;
             }
             Sleep(0);
         }
     }
-    return 1;
+    return true;
 }
 
 // Takes the write lock if no writer holds it: sets the writer flag over the current readers, then turns the lone flag
@@ -105,7 +105,7 @@ bool BSReadWriteLock::TryLockForWrite() {
     uint32_t uicurrentThread = GetCurrentThreadId();
     if (uiWriterThread == uicurrentThread) {
         ++uiLock;
-        return 1;
+        return true;
     }
     else {
         uint32_t v1 = InterlockedCompareExchangeUInt32(&uiLock, 0x80000001u, 0);

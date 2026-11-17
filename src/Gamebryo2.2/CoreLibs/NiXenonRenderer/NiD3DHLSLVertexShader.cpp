@@ -40,7 +40,7 @@ uint32_t NiD3DHLSLVertexShader::GetVariableCount() {
 const char* NiD3DHLSLVertexShader::GetVariableName(uint32_t uiIndex) {
     ID3DXConstantTable* m_pkConstantTable;
     _D3DXCONSTANT_DESC kDesc;
-    const char* hConstant = this->m_pkConstantTable->GetConstant(0, uiIndex);
+    const char* hConstant = this->m_pkConstantTable->GetConstant(nullptr, uiIndex);
     if (hConstant &&
         ((m_pkConstantTable = this->m_pkConstantTable,
           (uiIndex = 1, m_pkConstantTable->GetConstantDesc(hConstant, &kDesc, &uiIndex) >= 0)) &&
@@ -48,7 +48,7 @@ const char* NiD3DHLSLVertexShader::GetVariableName(uint32_t uiIndex) {
         return kDesc.Name;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

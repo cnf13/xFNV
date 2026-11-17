@@ -33,7 +33,7 @@ void TESImageSpaceModifiableForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESImageSpaceModifiableForm::CompareComponent(BaseFormComponent* apCompareFC) {
     TESImageSpaceModifiableForm* pcompare = dynamic_cast<TESImageSpaceModifiableForm*>(apCompareFC);
     if (!pcompare) {
-        return 1;
+        return true;
     }
     TESImageSpaceModifier* FormHealth_0 = pFormImageSpaceModifying;
     return FormHealth_0 != pcompare->pFormImageSpaceModifying;

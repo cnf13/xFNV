@@ -51,10 +51,10 @@ bool BSArchive::IsFileEntryInArchive(BSFileEntry* apFileEntry) {
     uint32_t i;
     for (i = 0; i < iDirectories; ++i) {
         if ((&pDirectories[i])->IsFileEntryInDirectory(apFileEntry)) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 int32_t BSArchive::GetFlag(int32_t a2) {

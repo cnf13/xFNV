@@ -315,7 +315,7 @@ void hkGskManifold_verifyAndGetPoints(
                 const hkQuadReal& rB0 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[1]);
                 const hkQuadReal diff = _mm_sub_ps(rA0, rB0);
                 const hkQuadReal diff2 = _mm_mul_ps(diff, diff);
-                const float fLen2 = static_cast<float>(diff2[2] + static_cast<float>(diff2[1] + diff2[0]));
+                const float fLen2 = (diff2[2] + static_cast<float>(diff2[1] + diff2[0]));
                 if (work.m_radiusSumSqrd.m_storage < static_cast<double>(fLen2)) {
                     break;
                 }
@@ -348,12 +348,12 @@ void hkGskManifold_verifyAndGetPoints(
                     _mm_shuffle_ps(_mm_unpackhi_ps(prod1, prod0), cross2, 228),
                     _mm_add_ps(_mm_shuffle_ps(_mm_movehl_ps(mixed, lo), cross2, 212), mixed)
                 );
-                const float fEdgeLen2 = static_cast<float>(edge2[2] + static_cast<float>(edge2[1] + edge2[0]));
+                const float fEdgeLen2 = (edge2[2] + static_cast<float>(edge2[1] + edge2[0]));
                 if (work.m_radiusSumSqrd.m_storage * fEdgeLen2 < sums[3] ||
                     (_mm_movemask_ps(_mm_cmplt_ps(sums, _mm_setzero_ps())) & 3) != 0) {
                     break;
                 }
-                sums[0] = sums[0] / static_cast<float>(sums[0] + sums[1]);
+                sums[0] = sums[0] / (sums[0] + sums[1]);
                 const hkQuadReal t = _mm_shuffle_ps(sums, sums, 0);
                 // EXE-INLINED 0x5DBF70
                 const hkQuadReal pointB =
@@ -380,10 +380,9 @@ void hkGskManifold_verifyAndGetPoints(
                 const hkQuadReal cross = _mm_sub_ps(_mm_mul_ps(e12Yzx, e20Zxy), _mm_mul_ps(e12Zxy, e20Yzx));
                 // EXE-INLINED 0x62AEA0
                 const hkQuadReal cross2 = _mm_mul_ps(cross, cross);
-                const float fLen2 = static_cast<float>(cross2[2] + static_cast<float>(cross2[1] + cross2[0]));
+                const float fLen2 = (cross2[2] + static_cast<float>(cross2[1] + cross2[0]));
                 const float fApprox = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(fLen2)));
-                const float fRefined = static_cast<float>(0.5f * fApprox) *
-                    static_cast<float>(3.0f - static_cast<float>(static_cast<float>(fLen2 * fApprox) * fApprox));
+                const float fRefined = (0.5f * fApprox) * (3.0f - (static_cast<float>(fLen2 * fApprox) * fApprox));
                 const hkQuadReal invLen =
                     _mm_andnot_ps(_mm_cmpeq_ss(_mm_set_ss(fLen2), _mm_set_ss(0.0f)), _mm_set_ss(fRefined));
                 triNormal = _mm_mul_ps(_mm_shuffle_ps(invLen, invLen, 0), cross);
@@ -440,12 +439,12 @@ void hkGskManifold_verifyAndGetPoints(
                     _mm_shuffle_ps(_mm_unpackhi_ps(prod1, prod0), cross2, 228),
                     _mm_add_ps(_mm_shuffle_ps(_mm_movehl_ps(mixed, lo), cross2, 212), mixed)
                 );
-                const float fEdgeLen2 = static_cast<float>(edge2[2] + static_cast<float>(edge2[1] + edge2[0]));
+                const float fEdgeLen2 = (edge2[2] + static_cast<float>(edge2[1] + edge2[0]));
                 if (work.m_radiusSumSqrd.m_storage * fEdgeLen2 < sums[3] ||
                     (_mm_movemask_ps(_mm_cmplt_ps(sums, _mm_setzero_ps())) & 3) != 0) {
                     break;
                 }
-                sums[0] = sums[0] / static_cast<float>(sums[0] + sums[1]);
+                sums[0] = sums[0] / (sums[0] + sums[1]);
                 const hkQuadReal t = _mm_shuffle_ps(sums, sums, 0);
                 // EXE-INLINED 0x5DBF70
                 pointA = _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, t), rA1), _mm_mul_ps(t, rA0));
@@ -489,12 +488,12 @@ void hkGskManifold_verifyAndGetPoints(
                     break;
                 }
                 hkQuadReal tA = sums;
-                tA[0] = sums[0] / static_cast<float>(sums[0] - sums[2]);
+                tA[0] = sums[0] / (sums[0] - sums[2]);
                 tA = _mm_shuffle_ps(tA, tA, 0);
                 // EXE-INLINED 0x5DBF70
                 pointA = _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tA), rA0), _mm_mul_ps(tA, rA1));
                 hkQuadReal tB = _mm_shuffle_ps(sums, sums, 85);
-                tB[0] = tB[0] / static_cast<float>(tB[0] - sums[3]);
+                tB[0] = tB[0] / (tB[0] - sums[3]);
                 tB = _mm_shuffle_ps(tB, tB, 0);
                 // EXE-INLINED 0x5DBF70
                 const hkQuadReal pointB =
@@ -519,10 +518,9 @@ void hkGskManifold_verifyAndGetPoints(
                 const hkQuadReal cross = _mm_sub_ps(_mm_mul_ps(e12Yzx, e20Zxy), _mm_mul_ps(e12Zxy, e20Yzx));
                 // EXE-INLINED 0x62AEA0
                 const hkQuadReal cross2 = _mm_mul_ps(cross, cross);
-                const float fLen2 = static_cast<float>(cross2[2] + static_cast<float>(cross2[1] + cross2[0]));
+                const float fLen2 = (cross2[2] + static_cast<float>(cross2[1] + cross2[0]));
                 const float fApprox = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(fLen2)));
-                const float fRefined = static_cast<float>(0.5f * fApprox) *
-                    static_cast<float>(3.0f - static_cast<float>(static_cast<float>(fLen2 * fApprox) * fApprox));
+                const float fRefined = (0.5f * fApprox) * (3.0f - (static_cast<float>(fLen2 * fApprox) * fApprox));
                 const hkQuadReal invLen =
                     _mm_andnot_ps(_mm_cmpeq_ss(_mm_set_ss(fLen2), _mm_set_ss(0.0f)), _mm_set_ss(fRefined));
                 const hkQuadReal fromA2 = _mm_sub_ps(rB0, rA2);
@@ -556,7 +554,7 @@ void hkGskManifold_verifyAndGetPoints(
                 edges23Hi = _mm_shuffle_ps(c0, master, 238);
                 edges23Lo = _mm_shuffle_ps(c0, master, 68);
                 const hkQuadReal depth = _mm_mul_ps(triNormal, aMinusB);
-                const float fDepth = static_cast<float>(depth[2] + static_cast<float>(depth[1] + depth[0]));
+                const float fDepth = (depth[2] + static_cast<float>(depth[1] + depth[0]));
                 pointA = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(fDepth), triNormal), rB0);
                 edges01Hi = _mm_shuffle_ps(c1, c2, 238);
                 bTriangle = true;
@@ -580,7 +578,7 @@ void hkGskManifold_verifyAndGetPoints(
         }
         if (invalid == 0) {
             const hkQuadReal prod = _mm_mul_ps(normal, aMinusB);
-            const float fDist = static_cast<float>(prod[2] + static_cast<float>(prod[1] + prod[0]));
+            const float fDist = (prod[2] + static_cast<float>(prod[1] + prod[0]));
             const float fOffsetB = work.m_radiusB.m_storage - fDist;
             const float fRadiusSum = work.m_radiusA.m_storage + work.m_radiusB.m_storage;
             const float fDistance = fDist - fRadiusSum;
@@ -710,8 +708,7 @@ int32_t hkGskManifold_convertFeature(
             );
             const float approx = _mm_cvtss_f32(_mm_rsqrt_ss(lengthSq));
             const float lengthSqValue = _mm_cvtss_f32(lengthSq);
-            const float refined = static_cast<float>(0.5f * approx) *
-                static_cast<float>(3.0f - static_cast<float>(static_cast<float>(lengthSqValue * approx) * approx));
+            const float refined = (0.5f * approx) * (3.0f - (static_cast<float>(lengthSqValue * approx) * approx));
             const __m128 invLength = _mm_andnot_ps(_mm_cmpeq_ss(lengthSq, _mm_setzero_ps()), _mm_set_ss(refined));
             const __m128 triNormal = _mm_mul_ps(_mm_shuffle_ps(invLength, invLength, 0), cross);
             const __m128 toB2 = _mm_sub_ps(pA, pB2);
@@ -874,8 +871,7 @@ int32_t hkGskManifold_convertFeature(
             );
             const float approx = _mm_cvtss_f32(_mm_rsqrt_ss(lengthSq));
             const float lengthSqValue = _mm_cvtss_f32(lengthSq);
-            const float refined = static_cast<float>(0.5f * approx) *
-                static_cast<float>(3.0f - static_cast<float>(static_cast<float>(lengthSqValue * approx) * approx));
+            const float refined = (0.5f * approx) * (3.0f - (static_cast<float>(lengthSqValue * approx) * approx));
             const __m128 invLength = _mm_andnot_ps(_mm_cmpeq_ss(lengthSq, _mm_setzero_ps()), _mm_set_ss(refined));
             const __m128 triNormal = _mm_mul_ps(_mm_shuffle_ps(invLength, invLength, 0), cross);
             const __m128 fromA1 = _mm_sub_ps(pB, pA1);

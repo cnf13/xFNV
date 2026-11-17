@@ -10,7 +10,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiQuaternion NiRotKey::ms_kDefault(NiQuaternion_IDENTITY);
 

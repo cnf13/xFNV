@@ -169,11 +169,11 @@ void bhkConstraint::Link(bool abAttach) {
 const hkpWorld* bhkConstraint::GethkWorld() const {
     hkpEntity* pe;
     hkpRigidBody* phkObject = static_cast<hkpRigidBody*>(this->phkObject);
-    if (phkObject && (phkObject->m_world && (pe = GethkEntityA()) != 0)) {
+    if (phkObject && (phkObject->m_world && (pe = GethkEntityA()) != nullptr)) {
         return (hkpWorld*)pe->m_world;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -190,7 +190,7 @@ bool bhkConstraint::Add(bhkWorld* apWorld) {
         pc = static_cast<hkpConstraintInstance*>(phkObject);
     }
     else {
-        pc = 0;
+        pc = nullptr;
     }
     if (!pc) {
         return false;
@@ -214,7 +214,7 @@ bool bhkConstraint::Remove() {
     TLSData* v2 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v2->eMemContext;
     v2->eMemContext = MEM_CONTEXT_HAVOK;
-    bhkWorld* pbw = 0;
+    bhkWorld* pbw = nullptr;
     const hkpWorld* v5 = GethkWorld();
     if (v5) {
         pbw = static_cast<bhkWorld*>(static_cast<const ahkpWorld*>(v5)->m_userData);
@@ -280,7 +280,7 @@ void bhkConstraint::SetEntityB(hkpEntity* apEntity) {
 // The wrapped constraint instance's first entity, null without one.
 hkpEntity* bhkConstraint::GethkEntityA() const {
     hkReferencedObject* phkObject = this->phkObject;
-    hkpEntity* pent = 0;
+    hkpEntity* pent = nullptr;
     if (phkObject) {
         return static_cast<hkpConstraintInstance*>(phkObject)->getEntityA();
     }
@@ -290,7 +290,7 @@ hkpEntity* bhkConstraint::GethkEntityA() const {
 // The wrapped constraint instance's second entity, null without one.
 hkpEntity* bhkConstraint::GethkEntityB() const {
     hkReferencedObject* phkObject = this->phkObject;
-    hkpEntity* pent = 0;
+    hkpEntity* pent = nullptr;
     if (phkObject) {
         return static_cast<hkpConstraintInstance*>(phkObject)->getEntityB();
     }
@@ -366,16 +366,16 @@ bool bhkConstraint::ProcessEntityB(bhkWorld* apWorld, bool abAdd) {
 // and both entities are cleared and the priority is left as it is.
 void bhkConstraint::CopyCinfo(hkConstraintCinfo& arInfo) {
     hkpConstraintInstance* pkConstraint;
-    if (this && (pkConstraint = static_cast<hkpConstraintInstance*>(phkObject)) != 0) {
+    if (this && (pkConstraint = static_cast<hkpConstraintInstance*>(phkObject)) != nullptr) {
         arInfo.SetData(pkConstraint->m_data);
         arInfo.pEntityA = pkConstraint->m_entities[0];
         arInfo.pEntityB = pkConstraint->m_entities[1];
         arInfo.ePriority = static_cast<hkpConstraintInstance::ConstraintPriority>(pkConstraint->m_priority.m_storage);
     }
     else {
-        arInfo.SetData(0);
-        arInfo.pEntityA = 0;
-        arInfo.pEntityB = 0;
+        arInfo.SetData(nullptr);
+        arInfo.pEntityA = nullptr;
+        arInfo.pEntityB = nullptr;
     }
 }
 
@@ -395,8 +395,8 @@ void bhkConstraint::CopyCloneMembers(bhkSerializable* apClone, NiCloningProcess&
     bhkEntity* pa = pEntityA ? static_cast<bhkEntity*>(pEntityA->m_userData) : nullptr;
     hkpEntity* pEntityB = pkCinfo->pEntityB;
     bhkEntity* pb = pEntityB ? static_cast<bhkEntity*>(pEntityB->m_userData) : nullptr;
-    pkCinfo->pEntityA = 0;
-    pkCinfo->pEntityB = 0;
+    pkCinfo->pEntityA = nullptr;
+    pkCinfo->pEntityB = nullptr;
     if (pa) {
         NiObject* pkCloneA;
         if (arCloning.m_pkCloneMap->GetAt_A53C30(pa, pkCloneA)) {

@@ -279,7 +279,7 @@ void TESQuest::SaveGame(uint32_t aiFlags) {
     uint32_t iblockHeader;
     TESForm::SaveGame(aiFlags);
     uint16_t iblockSize = 0;
-    uint16_t* pblockSize = 0;
+    uint16_t* pblockSize = nullptr;
     uint8_t* itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -397,7 +397,7 @@ void TESQuest::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
                     if (pstageItem) {
                         cindex2 = pstageItem->ucIndex;
                         Date* pdate = pstageItem->m_pLogDate;
-                        bhasDate = pdate != 0;
+                        bhasDate = pdate != nullptr;
                         apSaveGameBuffer->SaveDataEndian(&cindex2, 1u, 0);
                         apSaveGameBuffer->SaveDataEndian(&bhasDate, 1u, 0);
                         if (bhasDate) {
@@ -627,7 +627,7 @@ void TESQuest::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             uint32_t isaveGameCount_2 = apLoadGameBuffer->LoadVariableSizedValue();
             for (uint32_t iloop_2 = 0; iloop_2 < isaveGameCount_2; ++iloop_2) {
                 cindex2 = 0;
-                bhasDate = 0;
+                bhasDate = false;
                 Date date;
                 apLoadGameBuffer->LoadData(&cindex2, 1u);
                 apLoadGameBuffer->LoadData(&bhasDate, 1u);
@@ -690,10 +690,10 @@ void TESQuest::Revert(uint32_t aiFlags) {
                         LogDate = m_item->m_pLogDate;
                     }
                     else {
-                        LogDate = 0;
+                        LogDate = nullptr;
                     }
                     if (LogDate) {
-                        m_item->SetLogDate(0);
+                        m_item->SetLogDate(nullptr);
                         delete static_cast<Date*>(LogDate);
                     }
                 }
@@ -722,7 +722,7 @@ void TESQuest::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
                             if (pdate) {
                                 delete pdate;
                             }
-                            pstageItem->m_pLogDate = 0;
+                            pstageItem->m_pLogDate = nullptr;
                         }
                     }
                 }
@@ -777,7 +777,7 @@ void TESQuest::InitItem() {
         }
         bool Enabled = GetEnabled();
         SetStartsEnabled(Enabled);
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -827,7 +827,7 @@ bool TESQuest::SetStageDone(uint8_t aucIndex) {
     BSSimpleList<TESQuestStage*>* pList;
     for (pList = &m_listStages;; pList = pList->m_pkNext) {
         if (!pList || pList->IsEmpty()) {
-            return 0;
+            return false;
         }
         if (pList->m_item->m_Data.ucIndex == aucIndex) {
             break;
@@ -839,9 +839,9 @@ bool TESQuest::SetStageDone(uint8_t aucIndex) {
     if (aucIndex > static_cast<int32_t>(cCurrentStage)) {
         cCurrentStage = aucIndex;
     }
-    pList->m_item->SetDone(this, 0);
+    pList->m_item->SetDone(this, false);
     AddChange(CHANGE_QUEST_STAGES);
-    return 1;
+    return true;
 }
 
 // Change flag 2 is the quest's flags.
@@ -903,10 +903,10 @@ bool TESQuest::ValidateTargetList(
                  apPlayerObjectiveList->IsInList(pObjectiveList->m_item))) {
                 for (TESQuestTarget* ptarget : *&pObjectiveList->m_item->ListTargets) {
                     if (ptarget) {
-                        TESObjectREFR* Reference = ptarget->GetReference(0);
-                        if ((&ptarget->objConditions)->IsTrue(Reference, 0)) {
+                        TESObjectREFR* Reference = ptarget->GetReference(false);
+                        if ((&ptarget->objConditions)->IsTrue(Reference, nullptr)) {
                             if (!pSuppliedList || (!pSuppliedList->m_item || pSuppliedList->m_item != ptarget)) {
-                                return 0;
+                                return false;
                             }
                             pSuppliedList = pSuppliedList->m_pkNext;
                         }
@@ -1084,7 +1084,7 @@ void TESQuest::ResetQuest() {
                     pLogDate = nullptr;
                 }
                 if (pLogDate) {
-                    m_item->SetLogDate(0);
+                    m_item->SetLogDate(nullptr);
                     delete pLogDate;
                 }
             }
@@ -1105,8 +1105,8 @@ void TESQuest::ResetQuest() {
     // The getter's byte is passed on without being normalised to 0 or 1.
     uint8_t ucFlag0x10 = static_cast<uint8_t>(GetFlag0x10());
     SetEnabled(ucFlag0x10);
-    SetCompleted(0);
-    SetFailed(0);
+    SetCompleted(false);
+    SetFailed(false);
     SetDisplayedQuestStarted(0);
 }
 

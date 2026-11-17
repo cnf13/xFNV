@@ -91,12 +91,12 @@ bool TESAmmoEffect::Compare(TESForm* apCompare) {
     TESForm* v4 =
         static_cast<TESForm*>(FNVD_DYNAMIC_CAST_VOID(TESAmmoEffect)(apCompare, RTTI_TESForm, RTTI_TESAmmoEffect));
     if (!v4) {
-        return 1;
+        return true;
     }
     if (!std::memcmp(&data, &v4[1].iFormID, sizeof(data))) {
         return CompareAllComponents(v4);
     }
-    return 1;
+    return true;
 }
 
 // An effect type past AMMO_EFFECT_FATIGUE takes the switch's default, and BSsprintf then reads Dst, which nothing wrote
@@ -171,7 +171,7 @@ float TESAmmoEffect::ApplyAmmoEffect(
             pEffectsLocal = ::new (v6) BSSimpleList<TESAmmoEffect*>;
         }
         else {
-            pEffectsLocal = 0;
+            pEffectsLocal = nullptr;
         }
         BSSimpleList<TESAmmoEffect*>* pEffectsLocal_2 = pEffectsLocal;
         while (pEffectList && pEffectList->m_item) {

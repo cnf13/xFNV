@@ -46,13 +46,13 @@ void FOIslandActivationListener::islandActivatedCallback(hkpSimulationIsland* ap
                 pavObject = pniColObject->m_pkSceneObject;
             }
             else {
-                pavObject = 0;
+                pavObject = nullptr;
             }
             if (pavObject) {
                 pobjectRef = TESObjectREFR::FindReferenceFor3D(pavObject);
             }
             else {
-                pobjectRef = 0;
+                pobjectRef = nullptr;
             }
             if (pobjectRef) {
                 if (!pobjectRef->IsActor()) {
@@ -63,7 +63,7 @@ void FOIslandActivationListener::islandActivatedCallback(hkpSimulationIsland* ap
                         pdynamicnode = static_cast<NiNode*>(pcell->GetDynamicNode());
                     }
                     else {
-                        pdynamicnode = 0;
+                        pdynamicnode = nullptr;
                     }
                     if (pdynamicnode) {
                         if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
@@ -109,20 +109,20 @@ void FOIslandActivationListener::islandDeactivatedCallback(hkpSimulationIsland* 
             if (pobjectRef->IsActor() || pmodelSwap || (bComplex && !bArticulated)) {
                 if (!pobjectRef->IsActor()) {
                     NiNode* p3D = pobjectRef->Get3D();
-                    BSShaderManager::GetShadowSceneNode(0)->UpdateObjectLighting(p3D, 0);
+                    BSShaderManager::GetShadowSceneNode(0)->UpdateObjectLighting(p3D, false);
                 }
             }
             else {
                 TESObjectCELL* pcell = pobjectRef->GetParentCell();
                 if (pcell) {
-                    pcell->AttachReference3D(pobjectRef, 0);
+                    pcell->AttachReference3D(pobjectRef, false);
                 }
                 if (pobjectRef->GetMotionBlur()) {
                     BSShaderManager::ResetMotionBluredObject();
                 }
             }
             if (pobjectRef->GetObjectReference() == pAshPile1 || pobjectRef->GetObjectReference() == pAshPile2) {
-                bhkWorld::SetMotion(pavObject, hkpMotion::MOTION_FIXED, 1, 0, 1);
+                bhkWorld::SetMotion(pavObject, hkpMotion::MOTION_FIXED, true, false, true);
             }
         }
         alignas(16) CFilter kFilter;
@@ -134,13 +134,13 @@ void FOIslandActivationListener::islandDeactivatedCallback(hkpSimulationIsland* 
                 pRigidBody->SetMotionType(hkpMotion::MOTION_KEYFRAMED);
                 bhkNiCollisionObject* pcol = bhkNiCollisionObject::Getbhk(pentity);
                 if (pcol && !pcol->QSetLocal()) {
-                    pcol->SetSetLocal(1);
+                    pcol->SetSetLocal(true);
                     hkTransform hktransf;
                     NiTransform nitransf;
                     pRigidBody->GetTransform(hktransf);
                     HK2NI(nitransf, hktransf);
                     pcol->SetTransform(nitransf);
-                    pcol->SetSetLocal(0);
+                    pcol->SetSetLocal(false);
                 }
             }
         }

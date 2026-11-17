@@ -57,10 +57,10 @@ NiObject* NiPSysSphericalCollider::CreateClone(NiCloningProcess& kCloning) {
     NiPSysSphericalCollider* v3 =
         static_cast<NiPSysSphericalCollider*>(NiMemObject::operator new(sizeof(NiPSysSphericalCollider)));
     if (v3) {
-        pkObject = ::new (v3) NiPSysSphericalCollider(1.0f, 0, 0, nullptr, nullptr, 1.0f);
+        pkObject = ::new (v3) NiPSysSphericalCollider(1.0f, false, false, nullptr, nullptr, 1.0f);
     }
     else {
-        pkObject = 0;
+        pkObject = nullptr;
     }
     CopyMembers(pkObject, kCloning);
     pkObject->m_fRadius = m_fRadius;
@@ -189,7 +189,7 @@ NiPSysSphericalCollider::Resolve(float fInitialTime, float& fCollisionTime, NiPS
             if (bInside || fClosestSqrDist < m_fRadiusSq) {
                 float fRemainder = m_fRadiusSq - fClosestSqrDist;
                 float fQuotient = fRemainder / fSqrSpeed;
-                float fRoot = static_cast<float>(std::sqrt(fQuotient));
+                float fRoot = std::sqrt(fQuotient);
                 float fTime;
                 if (bInside) {
                     fTime = fRoot + fClosestTime;
@@ -298,7 +298,7 @@ void NiPSysSphericalCollider::SetResolveConstants() {
 NiObject* NiPSysSphericalCollider::CreateObject() {
     void* v0 = NiMemObject::operator new(sizeof(NiPSysSphericalCollider));
     if (v0) {
-        return ::new (v0) NiPSysSphericalCollider(1.0, 0, 0, nullptr, nullptr, 1.0);
+        return ::new (v0) NiPSysSphericalCollider(1.0, false, false, nullptr, nullptr, 1.0);
     }
     else {
         return nullptr;

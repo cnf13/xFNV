@@ -58,7 +58,7 @@ uint32_t BSTexturePalette::GetContainerNumber(const char* apPath) {
 BSTexMapItem* BSTexturePalette::GetItemFor(const NiTexture* apTexture) {
     BSTexMapItem* pitem;
     const char* pname = (&apTexture->GetFilename())->GetHandle();
-    uint32_t ioffset = FindTexturePathOffset(pname, 1);
+    uint32_t ioffset = FindTexturePathOffset(pname, true);
     uint32_t ContainerNumber = BSTexturePalette::GetContainerNumber(&pname[ioffset]);
     uint32_t I = 0;
     // The same bucket of each group's table, indexed by table: sizeof(BSTexMap) is pointer-dependent.
@@ -99,11 +99,11 @@ void BSTexturePalette::SetTexture(NiTexture* apTex, const BSFileEntry* apEntry) 
         v2 = BSTexturePalette::DeterminePriority(apTex);
         v3 = (uint16_t)v2;
         v4 = (&BSTexturePalette::pTexMap[v2])->SetAt(apTex);
-        v5 = (uint8_t)(v4->pFileEntry == 0);
+        v5 = (uint8_t)(v4->pFileEntry == nullptr);
         v4->sPriority = v3;
         if (v5) {
             entryForTexture = apEntry;
-            if (apEntry || ((entryForTexture = BSTexturePalette::FindEntryForTexture(apTex)) != 0)) {
+            if (apEntry || ((entryForTexture = BSTexturePalette::FindEntryForTexture(apTex)) != nullptr)) {
                 BSTexturePalette::pEntryMap->SetAt(entryForTexture, v4);
             }
         }
@@ -138,9 +138,9 @@ bool BSTexturePalette::RemoveTexture(const NiTexture* apTexture) {
 void BSTexturePalette::PurgeUnusedTextures() {
     if (BSTexturePalette::pEntryMap) {
         BSTexMapIterator iterator;
-        BSTexturePalette::AddCrit.Lock(0);
+        BSTexturePalette::AddCrit.Lock(nullptr);
         int32_t iPurged = 0;
-        BSTexturePalette::bPartiallyPurgedS = 0;
+        BSTexturePalette::bPartiallyPurgedS = false;
         if (BSTexturePalette::GetFirstPos(iterator)) {
             bool bFound;
             NiPointer<NiTexture> spTexture;
@@ -159,11 +159,11 @@ void BSTexturePalette::PurgeUnusedTextures() {
                 }
                 else {
                     if (iterator.iPriority) {
-                        while (1) {
+                        while (true) {
                             BSTexMap* pGroup = &BSTexturePalette::pTexMap[--iPriority];
-                            pItem = 0;
+                            pItem = nullptr;
                             iterator.iIndex = 0;
-                            iterator.pItem = 0;
+                            iterator.pItem = nullptr;
                             if (pGroup->iCount) {
                                 uint32_t i = 0;
                                 while (!pGroup->pItemA[i]) {
@@ -177,7 +177,7 @@ void BSTexturePalette::PurgeUnusedTextures() {
                                 iterator.pItem = pItem;
                             }
                         LABEL_12:;
-                            bFound = pItem != 0;
+                            bFound = pItem != nullptr;
                             if (pItem) {
                                 break;
                             }
@@ -243,12 +243,12 @@ bool BSTexturePalette::IsPartiallyPurged() {
 }
 
 bool BSTexturePalette::RemoveTexture_0(const char* a1) {
-    bool bres = 0;
+    bool bres = false;
     if (!BSTexturePalette::pEntryMap) {
-        return 0;
+        return false;
     }
     NiPointer<NiTexture> sptex;
-    BSTexturePalette::AddCrit.Lock(0);
+    BSTexturePalette::AddCrit.Lock(nullptr);
     if (BSTexturePalette::GetTexture(a1, sptex)) {
         bres = BSTexturePalette::RemoveTexture(sptex);
     }
@@ -260,7 +260,7 @@ bool BSTexturePalette::RemoveTexture_0(const char* a1) {
 
 void BSTexturePalette::RemoveAll() {
     if (BSTexturePalette::pEntryMap) {
-        BSTexturePalette::AddCrit.Lock(0);
+        BSTexturePalette::AddCrit.Lock(nullptr);
         BSTexturePalette::pEntryMap->RemoveAll();
         for (uint32_t i = 0; i < 7; ++i) {
             BSTexturePalette::pTexMap[i].FreeTextures();
@@ -295,9 +295,9 @@ bool BSTexturePalette::ArePathsEqual(const char* apRequestedPath, const char* ap
     const char* v2 = apRequestedPath;
     char v3 = *apRequestedPath;
     if (!*apRequestedPath) {
-        return 1;
+        return true;
     }
-    while (1) {
+    while (true) {
         v5 = std::tolower(v3);
         ++v2;
         v6 = std::tolower(*apPath++);
@@ -305,21 +305,21 @@ bool BSTexturePalette::ArePathsEqual(const char* apRequestedPath, const char* ap
             break;
         }
         if (v6 != 46) {
-            return 0;
+            return false;
         }
         if (!v2[3]) {
-            return 1;
+            return true;
         }
     LABEL_7:;
         v3 = *v2;
         if (!*v2) {
-            return 1;
+            return true;
         }
     }
     if (v5 == v6) {
         goto LABEL_7;
     }
-    return 0;
+    return false;
 }
 
 void BSTexturePalette::Init() {
@@ -333,7 +333,7 @@ void BSTexturePalette::Init() {
         BSTexturePalette::pEntryMap = pMap;
     }
     else {
-        BSTexturePalette::pEntryMap = 0;
+        BSTexturePalette::pEntryMap = nullptr;
     }
     // Equivalent of new BSTexMap[7]: the element count, then the seven groups built by BSTexMap's constructor.
     PathMap* pPathMap = static_cast<PathMap*>(MemoryManager_Singleton.Allocate(sizeof(PathMap)));
@@ -347,9 +347,9 @@ void BSTexturePalette::Init() {
     }
     else {
         pTLSData->eMemContext = eMemContext;
-        BSTexturePalette::pTexMap = 0;
+        BSTexturePalette::pTexMap = nullptr;
     }
-    BSTexturePalette::bPartiallyPurgedS = 0;
+    BSTexturePalette::bPartiallyPurgedS = false;
 }
 
 void BSTexturePalette::Kill() {
@@ -359,7 +359,7 @@ void BSTexturePalette::Kill() {
         BSTexturePalette::pEntryMap->RemoveAll();
         MemoryManager_Singleton.Deallocate(v0);
     }
-    BSTexturePalette::pEntryMap = 0;
+    BSTexturePalette::pEntryMap = nullptr;
     if (BSTexturePalette::pTexMap) {
         uint32_t* p_iCount = &BSTexturePalette::pTexMap[-1].iCount;
         BSTexMap* v2 = &BSTexturePalette::pTexMap[BSTexturePalette::pTexMap[-1].iCount];
@@ -368,7 +368,7 @@ void BSTexturePalette::Kill() {
         }
         MemoryManager_Singleton.Deallocate(p_iCount);
     }
-    BSTexturePalette::pTexMap = 0;
+    BSTexturePalette::pTexMap = nullptr;
 }
 
 bool BSTexturePalette::GetFirstPos(BSTexMapIterator& arIterator) {
@@ -377,7 +377,7 @@ bool BSTexturePalette::GetFirstPos(BSTexMapIterator& arIterator) {
     do {
         BSTexMap* v2 = &BSTexturePalette::pTexMap[--I];
         arIterator.iIndex = 0;
-        arIterator.pItem = 0;
+        arIterator.pItem = nullptr;
         if (v2->iCount) {
             uint32_t v3 = 0;
             while (!v2->pItemA[v3]) {
@@ -391,7 +391,7 @@ bool BSTexturePalette::GetFirstPos(BSTexMapIterator& arIterator) {
             arIterator.iPriority = v4->sPriority;
         }
     LABEL_8:;
-        bres = arIterator.pItem != 0;
+        bres = arIterator.pItem != nullptr;
     }
     while (!arIterator.pItem && I * 2856);
     return bres;
@@ -400,13 +400,13 @@ bool BSTexturePalette::GetFirstPos(BSTexMapIterator& arIterator) {
 BSTexMapItem* BSTexMap::SetAt(NiTexture* apValue) {
     BSTexMapItem* result;
     const char* m_kHandle = (&apValue->GetFilename())->GetHandle();
-    uint32_t TexturePathOffset = FindTexturePathOffset(m_kHandle, 1);
+    uint32_t TexturePathOffset = FindTexturePathOffset(m_kHandle, true);
     const char* v6 = &m_kHandle[TexturePathOffset];
     int16_t usOffset = TexturePathOffset;
     uint32_t ContainerNumber = BSTexturePalette::GetContainerNumber(v6);
     BSTexMapItem* v8 = pItemA[ContainerNumber];
     if (v8) {
-        while (1) {
+        while (true) {
             const NiFixedString* v9 = &v8->spTexture.m_pObject->GetFilename();
             if (BSTexturePalette::ArePathsEqual(v6, &v9->m_kHandle[v8->sNameBaseOffset])) {
                 return v8;
@@ -424,14 +424,14 @@ BSTexMapItem* BSTexMap::SetAt(NiTexture* apValue) {
             BSTexMapItem* v11 = pItemA[ContainerNumber];
             v10->spTexture.m_pObject = apValue;
             NiIncRefCount(apValue);
-            v10->pFileEntry = 0;
+            v10->pFileEntry = nullptr;
             v10->pNext = v11;
             v10->sPriority = 0;
             v10->sNameBaseOffset = 0;
             result = v10;
         }
         else {
-            result = 0;
+            result = nullptr;
         }
         result->sNameBaseOffset = usOffset;
         pItemA[ContainerNumber] = result;
@@ -443,29 +443,29 @@ BSTexMapItem* BSTexMap::SetAt(NiTexture* apValue) {
 bool BSTexMap::GetTexture(uint32_t auiContainer, const char* apPath, NiPointer<NiTexture>* aspTexture) {
     BSTexMapItem* v4 = pItemA[auiContainer];
     if (!v4) {
-        return 0;
+        return false;
     }
-    while (1) {
+    while (true) {
         const NiFixedString* v5 = &v4->spTexture.m_pObject->GetFilename();
         if (BSTexturePalette::ArePathsEqual(apPath, &v5->m_kHandle[v4->sNameBaseOffset])) {
             break;
         }
         v4 = v4->pNext;
         if (!v4) {
-            return 0;
+            return false;
         }
     }
     *aspTexture = v4->spTexture;
-    return 1;
+    return true;
 }
 
 void BSTexMap::Remove(BSTexMapItem* apValue) {
     const char* m_kHandle = (&apValue->spTexture.m_pObject->GetFilename())->GetHandle();
-    uint32_t TexturePathOffset = FindTexturePathOffset(m_kHandle, 1);
+    uint32_t TexturePathOffset = FindTexturePathOffset(m_kHandle, true);
     uint32_t ContainerNumber = BSTexturePalette::GetContainerNumber(&m_kHandle[TexturePathOffset]);
     BSTexMapItem* v6 = pItemA[ContainerNumber];
     if (v6) {
-        BSTexMapItem* v7 = 0;
+        BSTexMapItem* v7 = nullptr;
         while (v6 != apValue) {
             v7 = v6;
             v6 = v6->pNext;
@@ -506,7 +506,7 @@ void BSTexMap::FreeTextures() {
             while (v2);
             pThis = v5;
         }
-        pThis->pItemA[i] = 0;
+        pThis->pItemA[i] = nullptr;
     }
     pThis->iCount = 0;
 }
@@ -535,20 +535,20 @@ bool BSTexMap::GetNext(BSTexMapIterator& arIterator, NiPointer<NiTexture>& arVal
         arIterator.pItem = pNext;
         if (!pNext && ++arIterator.iIndex < 713) {
             uint32_t iIndex;
-            while (1) {
+            while (true) {
                 iIndex = arIterator.iIndex;
                 if (pItemA[iIndex]) {
                     break;
                 }
                 if (++arIterator.iIndex >= 713) {
-                    return arIterator.pItem != 0;
+                    return arIterator.pItem != nullptr;
                 }
             }
             uint32_t v9 = arIterator.iIndex;
             arIterator.pItem = pItemA[iIndex];
         }
     }
-    return arIterator.pItem != 0;
+    return arIterator.pItem != nullptr;
 }
 
 // Reads the entry of apFileEntry at bucket aIndex into arTexture: release the old object, then hold the new one.
@@ -629,7 +629,7 @@ void BSEntryMap::SetAt(const BSFileEntry* apEntry, BSTexMapItem* apValue) {
         pItemA[iindex] = pNewItem;
     }
     else {
-        pItemA[iindex] = 0;
+        pItemA[iindex] = nullptr;
     }
     ++iCount;
 }

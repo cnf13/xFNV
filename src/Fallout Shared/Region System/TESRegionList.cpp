@@ -54,21 +54,21 @@ TESRegionList::GetDerivedData(REGION_DATA_ID aeFind, TESRegionPoint* apPoint, TE
     BSSimpleList<TESRegion*>* pcurrent;
     char v12 = 0;
     uint16_t shighestOverride = 0;
-    TESRegionData* phighestOverride = 0;
-    TESRegionData* pderived = 0;
+    TESRegionData* phighestOverride = nullptr;
+    TESRegionData* pderived = nullptr;
     if (this) {
         pcurrent = static_cast<BSSimpleList<TESRegion*>*>(this);
     }
     else {
-        pcurrent = 0;
+        pcurrent = nullptr;
     }
     BSSimpleList<TESRegion*>* pcurrent_2 = pcurrent;
     TESRegionList* apMemory = static_cast<TESRegionList*>(ourMalloc(sizeof(TESRegionList)));
     if (apMemory) {
-        pRegionsWithData = ::new (apMemory) TESRegionList(0);
+        pRegionsWithData = ::new (apMemory) TESRegionList(false);
     }
     else {
-        pRegionsWithData = 0;
+        pRegionsWithData = nullptr;
     }
     TESRegionList* pRegionsWithData_2 = pRegionsWithData;
     while (pcurrent_2 && pcurrent_2->m_item) {
@@ -106,19 +106,19 @@ TESRegionList::GetDerivedData(REGION_DATA_ID aeFind, TESRegionPoint* apPoint, TE
         BSSimpleList<TESRegion*>* pcurrent_3;
         TESRegionData* pdataDelete = TESRegionList::kCachedData[aeFind].pData;
         if (pdataDelete) {
-            TESRegionList::kCachedData[aeFind].pData = 0;
+            TESRegionList::kCachedData[aeFind].pData = nullptr;
             delete pdataDelete;
         }
         TESRegionList* plistDelete = TESRegionList::kCachedData[aeFind].pList;
         if (plistDelete) {
-            TESRegionList::kCachedData[aeFind].pList = 0;
+            TESRegionList::kCachedData[aeFind].pList = nullptr;
             delete plistDelete;
         }
         if (pRegionsWithData) {
             pcurrent_3 = static_cast<BSSimpleList<TESRegion*>*>(pRegionsWithData);
         }
         else {
-            pcurrent_3 = 0;
+            pcurrent_3 = nullptr;
         }
         for (TESRegion*& rpItem : pcurrent_3->ItemsUntilNull()) {
             TESRegionData* pfound_2 = rpItem->pDataList->Find(aeFind);
@@ -127,7 +127,7 @@ TESRegionList::GetDerivedData(REGION_DATA_ID aeFind, TESRegionPoint* apPoint, TE
                     v12 = 1;
                     if (pderived) {
                         delete pderived;
-                        pderived = 0;
+                        pderived = nullptr;
                     }
                     if (pfound_2->cPriority > static_cast<int32_t>(shighestOverride)) {
                         phighestOverride = pfound_2;
@@ -161,7 +161,7 @@ TESRegionList::GetDerivedData(REGION_DATA_ID aeFind, TESRegionPoint* apPoint, TE
                 }
             }
             TESRegionList::kCachedData[aeFind].pList = pRegionsWithData;
-            pRegionsWithData_2 = 0;
+            pRegionsWithData_2 = nullptr;
         }
         if (pRegionsWithData_2) {
             pRegionsWithData_2->RemoveAll();
@@ -206,7 +206,7 @@ TESRegion* TESRegionList::HasRegion(uint32_t auiFormID) {
         pList = static_cast<BSSimpleList<TESRegion*>*>(this);
     }
     else {
-        pList = 0;
+        pList = nullptr;
     }
     for (BSSimpleList<TESRegion*>* pIter = pList; pIter; pIter = pIter->m_pkNext) {
         if (pIter->m_item) {
@@ -216,17 +216,17 @@ TESRegion* TESRegionList::HasRegion(uint32_t auiFormID) {
             }
         }
     }
-    return 0;
+    return nullptr;
 }
 
 bool TESRegionList::Add(TESRegion* apRegion) {
     if (!apRegion) {
-        return 0;
+        return false;
     }
     if (!IsInList(apRegion)) {
         AddHead(apRegion);
     }
-    return 1;
+    return true;
 }
 
 bool TESRegionList::Compare(TESRegionList* apList) {
@@ -236,29 +236,29 @@ bool TESRegionList::Compare(TESRegionList* apList) {
         pIter = static_cast<BSSimpleList<TESRegion*>*>(this);
     }
     else {
-        pIter = 0;
+        pIter = nullptr;
     }
     if (apList) {
         pOther = static_cast<BSSimpleList<TESRegion*>*>(apList);
     }
     else {
-        pOther = 0;
+        pOther = nullptr;
     }
     if (!pIter || !pOther) {
-        return 0;
+        return false;
     }
     while (pIter) {
         if (pIter->m_item != pOther->m_item) {
-            return 0;
+            return false;
         }
         pIter = pIter->m_pkNext;
         pOther = pOther->m_pkNext;
         if (!pIter && !pOther) {
-            return 1;
+            return true;
         }
         if ((!pIter && pOther) || (pIter && !pOther)) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }

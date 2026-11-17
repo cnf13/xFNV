@@ -233,7 +233,7 @@ void NiTransformData::GetSequenceData(float fStartTime, float fEndTime, NiPointe
         NiIncRefCount(spDeepCopy.m_pObject);
     }
     uint16_t m_usNumRotKeys = this->m_usNumRotKeys;
-    NiAnimationKey* pkNewKeys = 0;
+    NiAnimationKey* pkNewKeys = nullptr;
     uint32_t uiNewNumKeys = 0;
     if (m_usNumRotKeys) {
         NiAnimationKey::CopySequence(
@@ -343,7 +343,7 @@ void NiTransformData::SetPosAnim(NiPosKey* pkKeys, uint32_t uiNumKeys, NiAnimati
         m_usNumPosKeys = (uint16_t)uiNumKeys;
         m_pkPosKeys = pkKeys;
         m_ePosType = static_cast<NiAnimationKey::KeyType>((int32_t)eType);
-        m_ucPosSize = (uint8_t)NiAnimationKey::ms_keysizes[((int32_t)eType) + 6];
+        m_ucPosSize = NiAnimationKey::ms_keysizes[((int32_t)eType) + 6];
     }
     else {
         m_usNumPosKeys = (uint16_t)0;
@@ -358,7 +358,7 @@ void NiTransformData::SetScaleAnim(NiFloatKey* pkKeys, uint32_t uiNumKeys, NiAni
         m_usNumScaleKeys = (uint16_t)uiNumKeys;
         m_pkScaleKeys = pkKeys;
         m_eScaleType = static_cast<NiAnimationKey::KeyType>((int32_t)eType);
-        m_ucScaleSize = (uint8_t)NiAnimationKey::ms_keysizes[(int32_t)eType];
+        m_ucScaleSize = NiAnimationKey::ms_keysizes[(int32_t)eType];
     }
     else {
         m_usNumScaleKeys = (uint16_t)0;
@@ -371,7 +371,7 @@ void NiTransformData::SetScaleAnim(NiFloatKey* pkKeys, uint32_t uiNumKeys, NiAni
 NiObject* NiTransformData::CreateObject() {
     NiTransformData* pkObject = static_cast<NiTransformData*>(NiMemObject::operator new(sizeof(NiTransformData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiTransformData;
 }

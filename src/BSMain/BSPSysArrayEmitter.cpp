@@ -97,7 +97,7 @@ void ObjectArray_Compact(NiTPrimitiveArray<NiPointer<NiAVObject>>* apArray) {
             }
         }
         else {
-            apArray->m_pBase = 0;
+            apArray->m_pBase = nullptr;
         }
         _NiFree(pvMem);
     }
@@ -142,7 +142,7 @@ void PArrayPoint::KillSDM() {
         NiGlobalStringTable::ReleaseHandle(PArrayPoint::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }
-    PArrayPoint::pTag = 0;
+    PArrayPoint::pTag = nullptr;
 }
 
 BSPSysArrayEmitter::BSPSysArrayEmitter() : eType(PAT_NODES), aObjects(0, 1) {}
@@ -193,7 +193,7 @@ NiObject* BSPSysArrayEmitter::CreateClone(NiCloningProcess& arCloneData) {
         v3 = ::new (apMemory) BSPSysArrayEmitter;
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     CopyMembers(v3, arCloneData);
     return v3;

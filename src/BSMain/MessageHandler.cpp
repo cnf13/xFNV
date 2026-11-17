@@ -50,7 +50,7 @@ void MessageHandler::InitSDM() {
     MessageHandler* v0;
     void* v1 = (&MemoryManager_Singleton)->Allocate(sizeof(MessageHandler));
     if (v1) {
-        v0 = ::new (v1) MessageHandler(0);
+        v0 = ::new (v1) MessageHandler(false);
     }
     else {
         v0 = nullptr;

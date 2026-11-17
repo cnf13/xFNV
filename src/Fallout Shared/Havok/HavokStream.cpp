@@ -35,8 +35,8 @@
 #include "Havok/Source/Physics/Collide/Query/Collector/PointCollector/hkpRootCdPoint.h"
 #include "SDK/MSVC/string.h"
 
+#include <cstdint>
 #include <new>
-#include <stdint.h>
 #include <xmmintrin.h>
 
 SettingT<INISettingCollection> gs_iSimType_HAVOK("iSimType:HAVOK", 1);
@@ -148,7 +148,7 @@ void HavokError::disableReport(const char* apFile, int32_t aiLine) {
     HavokError::hkFileLine ap;
     char src[132];
     char Src[32];
-    BSsplitpath(apFile, 0, 0, 0, 0, src, 128, Src, 32);
+    BSsplitpath(apFile, nullptr, 0, nullptr, 0, src, 128, Src, 32);
     BSstrcat(src, 128, Src);
     ap.m_file = hkString::strDup(src);
     ap.m_line = aiLine;
@@ -158,7 +158,7 @@ void HavokError::disableReport(const char* apFile, int32_t aiLine) {
 void HavokError::enableReport(const char* apFile, int32_t aiLine) {
     char Dst[132];
     char Src[32];
-    BSsplitpath(apFile, 0, 0, 0, 0, Dst, 128, Src, 32);
+    BSsplitpath(apFile, nullptr, 0, nullptr, 0, Dst, 128, Src, 32);
     BSstrcat(Dst, 128, Src);
     for (int32_t i = 0; i < m_disabledReports.getSize(); ++i) {
         hkFileLine ap = m_disabledReports[i];
@@ -232,7 +232,7 @@ void HavokError::errorMessage(
     int32_t aiLine
 ) {
     MessageHandler::Handler();
-    Warning(0, "%s:%d: %s : %s'", apFile, aiLine, apWhat, apDescription);
+    Warning(nullptr, "%s:%d: %s : %s'", apFile, aiLine, apWhat, apDescription);
 }
 
 void HavokError::warningMessage(
@@ -295,7 +295,7 @@ bool HavokError::isReportEnabled(const char* apFile, int32_t aiLine) {
     if (m_disabledReports.getSize()) {
         char Dst[132];
         char Src[32];
-        BSsplitpath(apFile, 0, 0, 0, 0, Dst, 128, Src, 32);
+        BSsplitpath(apFile, nullptr, 0, nullptr, 0, Dst, 128, Src, 32);
         BSstrcat(Dst, 128, Src);
         for (int32_t i = 0; i < m_disabledReports.getSize(); ++i) {
             hkFileLine ap = m_disabledReports[i];
@@ -326,7 +326,7 @@ hkBool* HavokFileStreambufReader::isOk(hkBool* arResult) const {
         ::new (arResult) hkBool(isGood);
     }
     else {
-        ::new (arResult) hkBool(0);
+        ::new (arResult) hkBool(false);
     }
     return arResult;
 }
@@ -382,7 +382,7 @@ hkBool* HavokFileStreambufWriter::isOk(hkBool* arResult) const {
         ::new (arResult) hkBool(isGood);
     }
     else {
-        ::new (arResult) hkBool(0);
+        ::new (arResult) hkBool(false);
     }
     return arResult;
 }
@@ -433,7 +433,7 @@ hkStreamWriter* HavokStreambufFactory::openWriter(const char* apName) {
         return ::new (v4) HavokFileStreambufWriter(apName);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

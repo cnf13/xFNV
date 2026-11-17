@@ -27,7 +27,7 @@ NiObject* NiPSysEmitterLifeSpanCtlr::CreateClone(NiCloningProcess& kCloning) {
     }
     else {
         NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-        return 0;
+        return nullptr;
     }
 }
 
@@ -77,7 +77,7 @@ NiObject* NiPSysEmitterLifeSpanCtlr::CreateObject() {
     NiPSysEmitterLifeSpanCtlr* v0 =
         static_cast<NiPSysEmitterLifeSpanCtlr*>(NiMemObject::operator new(sizeof(NiPSysEmitterLifeSpanCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysEmitterLifeSpanCtlr;
 }

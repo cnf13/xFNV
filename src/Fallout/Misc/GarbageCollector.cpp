@@ -47,7 +47,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Reconstruction.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiTObjectArray<TESObjectREFR*> GarbageCollector::ObjectGarbageA(0, 5000);
 NiTObjectArray<TESObjectREFR*> GarbageCollector::kQueuedTESObjectREFRs(0, 5000);
@@ -139,7 +139,7 @@ void GarbageCollector::LeaveCS() {
 }
 
 void GarbageCollector::Update() {
-    GarbageCollector::EnterCrit("GarbageCollector::Update()", 1);
+    GarbageCollector::EnterCrit("GarbageCollector::Update()", true);
     uint32_t inumObjects = 0;
     uint32_t iremovecount = 0;
     uint32_t ifreemult = 1;
@@ -241,7 +241,7 @@ void GarbageCollector::Update() {
                                         --inumObjects;
                                         --iremovecount;
                                         GarbageCollector::kNavMeshes.GetAt(0)->DecRefCount();
-                                        GarbageCollector::kNavMeshes.Remove(0, 1);
+                                        GarbageCollector::kNavMeshes.Remove(0, true);
                                     }
                                 }
                                 else {
@@ -249,7 +249,7 @@ void GarbageCollector::Update() {
                                         MoveQueuedNavMeshes(
                                             &GarbageCollector::kQueuedNavMeshes, &GarbageCollector::kNavMeshes
                                         );
-                                        GarbageCollector::kQueuedNavMeshes.Clear(1);
+                                        GarbageCollector::kQueuedNavMeshes.Clear(true);
                                     }
                                 }
                             }
@@ -259,7 +259,7 @@ void GarbageCollector::Update() {
             }
         }
     }
-    GarbageCollector::LeaveCrit(1);
+    GarbageCollector::LeaveCrit(true);
 }
 
 void GarbageCollector::Add(NavMeshPtr& arNavMesh) {
@@ -280,17 +280,17 @@ void GarbageCollector::Add(NavMeshPtr& arNavMesh) {
 
 void GarbageCollector::ClearAll(bool abTryEnter) {
     if (!GarbageCollector::bRunning) {
-        bool bLocked = 1;
+        bool bLocked = true;
         if (abTryEnter) {
             bLocked = GarbageCollector::TryEnterCrit();
         }
         else {
-            GarbageCollector::EnterCrit("GarbageCollector::ClearAll()", 1);
+            GarbageCollector::EnterCrit("GarbageCollector::ClearAll()", true);
         }
         if (bLocked) {
-            GarbageCollector::bRunning = 1;
+            GarbageCollector::bRunning = true;
             bool bCollectGarbage = GetThreadTLSData()->bCollectGarbage;
-            GetThreadTLSData()->bCollectGarbage = 0;
+            GetThreadTLSData()->bCollectGarbage = false;
             if (!GarbageCollectorCS::GetFlag(16u) && BSTexturePalette::TryLock()) {
                 GarbageCollector::EffectGarbageA.RemoveAll();
                 BSTexturePalette::Unlock();
@@ -339,7 +339,7 @@ void GarbageCollector::ClearAll(bool abTryEnter) {
                 for (uint32_t k = 0; k < GarbageCollector::kNavMeshes.iSize; ++k) {
                     GarbageCollector::kNavMeshes.GetAt(static_cast<int32_t>(k))->DecRefCount();
                 }
-                GarbageCollector::kNavMeshes.Clear(1);
+                GarbageCollector::kNavMeshes.Clear(true);
             }
             GetThreadTLSData()->bCollectGarbage = bCollectGarbage;
             if (GetThreadTLSData()->bCollectGarbage) {
@@ -354,10 +354,10 @@ void GarbageCollector::ClearAll(bool abTryEnter) {
                 MoveQueuedTempEffects(&GarbageCollector::kBSTempEffectArray, &GarbageCollector::EffectGarbageA);
                 GarbageCollector::kBSTempEffectArray.RemoveAll();
                 MoveQueuedNavMeshes(&GarbageCollector::kQueuedNavMeshes, &GarbageCollector::kNavMeshes);
-                GarbageCollector::kQueuedNavMeshes.Clear(1);
+                GarbageCollector::kQueuedNavMeshes.Clear(true);
             }
-            GarbageCollector::bRunning = 0;
-            GarbageCollector::LeaveCrit(1);
+            GarbageCollector::bRunning = false;
+            GarbageCollector::LeaveCrit(true);
         }
     }
 }
@@ -397,7 +397,7 @@ void GarbageCollector::Add(TESObjectREFR* apRef) {
     GarbageCollector kGuard;
     kGuard.EnterCS(1, "GarbageCollector::Add(TESObjectREFR)");
     if (TESForm::GetFormByNumericID(apRef->iFormID) == apRef) {
-        apRef->SetDelete(1);
+        apRef->SetDelete(true);
         apRef->Release3DRelatedData();
         if (apRef->IsActor()) {
             static_cast<Actor*>(apRef)->StopCombat(nullptr);
@@ -417,7 +417,7 @@ void GarbageCollector::Add(TESObjectREFR* apRef) {
                 }
             }
         }
-        apRef->SetParentCell(0);
+        apRef->SetParentCell(nullptr);
         if (!GetThreadTLSData()->bCollectGarbage || (pSaveLoadGame && pSaveLoadGame->GetSaveGameLoading())) {
             if (pModelLoader->TryLockModelMap()) {
                 if (apRef) {

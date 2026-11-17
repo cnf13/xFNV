@@ -1,6 +1,6 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiInterpScalar.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // The sum is kept in higher precision and rounded to float once.
 float NiInterpScalar::Linear(float fTime, float fP, float fQ) {
@@ -40,7 +40,7 @@ float* NiInterpScalar::AdjustBezier(
     float v18 = (float)(((v15 * 3.0) - ((*a3) * 2.0)) - (*a6));
     float v21 = (float)(((((2.0 * v18) + v14) * v20) + (*a3)) / v13);
     *a9 = v21;
-    *a10 = (float)(v21 * v22);
+    *a10 = (v21 * v22);
     *a9 = (float)(v11 * (*a9));
     *a3 = (float)(v12 * (*a3));
     *a6 = (float)((v22 / v13) * (*a6));

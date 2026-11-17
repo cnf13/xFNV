@@ -33,12 +33,12 @@ void hkQuaternion::setAndNormalize(const hkRotation& r) {
 // cosine.
 void hkQuaternion::setAxisAngle(const hkVector4& axis, float angle) {
     const float fHalfAngle = angle * 0.5;
-    const float fSin = static_cast<float>(std::sin(fHalfAngle));
+    const float fSin = std::sin(fHalfAngle);
     _mm_store_ps(
         &reinterpret_cast<float*>(&m_vec.m_quad)[0],
         _mm_mul_ps(_mm_set1_ps(fSin), _mm_load_ps(&reinterpret_cast<const float*>(&axis.m_quad)[0]))
     );
-    m_vec.m_quad[3] = static_cast<float>(std::cos(fHalfAngle));
+    m_vec.m_quad[3] = std::cos(fHalfAngle);
 }
 
 // The cosine is the four-lane dot product, taken positive with the sign kept for q1's weight. At or above 0.999 (a NaN
@@ -66,9 +66,9 @@ void hkQuaternion::setSlerp(const hkQuaternion& q0, const hkQuaternion& q1, floa
         const float fInvSin = 1.0f / fSinTheta;
         const float fTTheta = fTheta * t;
         const float fRest = fTheta - fTTheta;
-        float fW0 = static_cast<float>(std::sin(fRest));
+        float fW0 = std::sin(fRest);
         fW0 = fW0 * fInvSin;
-        float fW1 = static_cast<float>(std::sin(fTTheta));
+        float fW1 = std::sin(fTTheta);
         fW1 = fW1 * fInvSin;
         fW1 = fW1 * fSign;
         vResult = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(fW1), vQ1), _mm_mul_ps(_mm_set1_ps(fW0), vQ0));
@@ -94,7 +94,7 @@ void hkQuaternion::removeAxisComponent(const hkVector4& axis) {
     __m128 m_quad = m_vec.m_quad;
     __m128 v4 = _mm_mul_ps(axis.m_quad, m_vec.m_quad);
     __m128 v5 = _mm_shuffle_ps(v4, v4, 170);
-    v5[0] = v5[0] + static_cast<float>(_mm_shuffle_ps(v4, v4, 85)[0] + v4[0]);
+    v5[0] = v5[0] + (_mm_shuffle_ps(v4, v4, 85)[0] + v4[0]);
     __m128 v6 = _mm_shuffle_ps(m_quad, m_quad, 255);
     __m128 v7 = _mm_shuffle_ps(axis.m_quad, axis.m_quad, 201);
     __m128 v8 = _mm_shuffle_ps(axis.m_quad, axis.m_quad, 210);
@@ -112,9 +112,7 @@ void hkQuaternion::removeAxisComponent(const hkVector4& axis) {
     );
     __m128 v10 = _mm_add_ps(v9, v9);
     __m128 v11 = _mm_mul_ps(axis.m_quad, v10);
-    double v12 = static_cast<float>(
-        _mm_shuffle_ps(v11, v11, 170)[0] + static_cast<float>(_mm_shuffle_ps(v11, v11, 85)[0] + v11[0])
-    );
+    double v12 = (_mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]));
     if (!(v12 - 1.0 > -0.0010000000474974513)) {
         hkVector4 arAxis;
         if (!(v12 + 1.0 < 0.0010000000474974513)) {
@@ -129,9 +127,9 @@ void hkQuaternion::removeAxisComponent(const hkVector4& axis) {
             float v21 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v20[0])));
             v22[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
             __m128 v23 = _mm_cmpeq_ss(v20, v22);
-            v22[0] = 3.0f - static_cast<float>(static_cast<float>(v20[0] * v21) * v21);
+            v22[0] = 3.0f - ((v20[0] * v21) * v21);
             __m128 v24 = _mm_setzero_ps();
-            v24[0] = static_cast<float>(0.5f * v21) * v22[0];
+            v24[0] = (0.5f * v21) * v22[0];
             __m128 v25 = _mm_andnot_ps(v23, v24);
             float r = v12;
             arAxis.m_quad = _mm_mul_ps(_mm_shuffle_ps(v25, v25, 0), v17);
@@ -171,7 +169,7 @@ double hkQuaternion::getAngle() const {
     float v6 = std::fabs((double)v5);
     if (!(v6 >= 1.0f)) {
         float ad = std::acos(v1);
-        return static_cast<float>(ad + ad);
+        return (ad + ad);
     }
     else {
         bool v2 = v1 > 0.0;
@@ -180,7 +178,7 @@ double hkQuaternion::getAngle() const {
             v3 = 3.1415927f;
         }
         float ab = v3;
-        return static_cast<float>(ab + ab);
+        return (ab + ab);
     }
 }
 
@@ -210,7 +208,7 @@ hkBool* hkQuaternion::isOk(hkBool* a1) const {
     ::new (a1) hkBool(m_vec.isOk4());
     __m128 v3 = _mm_mul_ps(m_vec.m_quad, m_vec.m_quad);
     __m128 v4 = _mm_add_ps(_mm_shuffle_ps(v3, v3, 78), v3);
-    float v6 = static_cast<float>(_mm_shuffle_ps(v4, v4, 177)[0] + v4[0]) - 1.0;
+    float v6 = (_mm_shuffle_ps(v4, v4, 177)[0] + v4[0]) - 1.0;
     float v7 = std::fabs((double)v6);
     if (a1->m_bool && v7 < 0.001f) {
         a1->m_bool = 1;
@@ -249,9 +247,9 @@ void hkQuaternion::setFlippedRotation(const hkVector4& from) {
     float v9 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v8[0])));
     v10[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v11 = _mm_cmpeq_ss(v8, v10);
-    v10[0] = 3.0f - static_cast<float>(static_cast<float>(v8[0] * v9) * v9);
+    v10[0] = 3.0f - ((v8[0] * v9) * v9);
     __m128 v12 = _mm_setzero_ps();
-    v12[0] = static_cast<float>(0.5f * v9) * v10[0];
+    v12[0] = (0.5f * v9) * v10[0];
     __m128 v13 = _mm_andnot_ps(v11, v12);
     v18 = _mm_mul_ps(_mm_shuffle_ps(v13, v13, 0), v18);
     v18[3] = 0.0f;

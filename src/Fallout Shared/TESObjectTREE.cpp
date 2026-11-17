@@ -220,7 +220,7 @@ void TESObjectTREE::Save() {
 void TESObjectTREE::InitItem() {
     if (!TESForm::GetInitialized()) {
         static_cast<BGSDestructibleObjectForm*>(this)->InitItem(this);
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 
@@ -243,23 +243,23 @@ void TESObjectTREE::Copy(TESForm* apCopy) {
 bool TESObjectTREE::Compare(TESForm* apCompare) {
     TESObjectTREE* pcomp = dynamic_cast<TESObjectTREE*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     OBJ_TREE* v3 = pcomp->GetData();
     if (std::memcmp(&Data, v3, sizeof(Data))) {
-        return 1;
+        return true;
     }
     if (BillboardSize.operator!=(pcomp->BillboardSize)) {
-        return 1;
+        return true;
     }
     uint32_t isize = SeedArray.m_usSize;
     if (isize != pcomp->SeedArray.m_usSize) {
-        return 1;
+        return true;
     }
     for (uint32_t i = 0; i < isize; ++i) {
         uint32_t* v4 = &SeedArray.operator[](i);
         if (*v4 != pcomp->SeedArray.operator[](i)) {
-            return 1;
+            return true;
         }
     }
     return CompareAllComponents(pcomp);
@@ -267,7 +267,7 @@ bool TESObjectTREE::Compare(TESForm* apCompare) {
 
 uint8_t TESObjectTREE::GetIndexForSeed(uint32_t aiSeed) {
     uint32_t i;
-    uint8_t v5 = (uint8_t)((-1));
+    uint8_t v5 = (uint8_t)(-1);
     for (i = 0; i < ((uint32_t)((int32_t)(&SeedArray)->NiTArray<uint32_t, NiTMallocInterface<uint32_t>>::GetSize()));
          ++i) {
         if ((&SeedArray)->NiTArray<uint32_t, NiTMallocInterface<uint32_t>>::operator[](i) == aiSeed) {
@@ -367,14 +367,14 @@ void TESObjectTREE::CreateDistant3D(
     NiNode* apFullNode
 ) {
     AutoMemContext apMemory(
-        MEM_CONTEXT_LODLANDSCAPE, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectTREE.cpp", 552
+        MEM_CONTEXT_LODLANDSCAPE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectTREE.cpp", 552
     );
     if (!apInstancedNode ||
         (!apLocArray ||
          (!apColorArray || (!aiArraySize || (!SpeedTree::bEnableTrees::Get() || !IsLargeEnoughForDistantLOD()))))) {
         return;
     }
-    NiBillboardNode* v18 = 0;
+    NiBillboardNode* v18 = nullptr;
     uint32_t CastingType = iFormID;
     if (!DistantLODShaderProperty::HasCachedGeometry(CastingType)) {
         char cFormattedPath[268];
@@ -392,12 +392,12 @@ void TESObjectTREE::CreateDistant3D(
                 );
             }
             else {
-                v10 = 0;
+                v10 = nullptr;
             }
             pModelLoader->QueueTreeBillboard(cFormattedPath, v10);
             return;
         }
-        v18 = static_cast<NiBillboardNode*>(BuildDistant3D(1));
+        v18 = static_cast<NiBillboardNode*>(BuildDistant3D(true));
         if (!v18) {
             return;
         }
@@ -405,7 +405,7 @@ void TESObjectTREE::CreateDistant3D(
     DistantLODShaderProperty::DistantLODParam apParam;
     apParam.iBaseObjectID = iFormID;
     apParam.p3DData = v18;
-    apParam.pcGeomFilename = 0;
+    apParam.pcGeomFilename = nullptr;
     DistantLODShaderProperty::AddDistantLOD(
         aiCellChunk, aiCellKey, apInstancedNode, &apParam, apLocArray, apColorArray, aiArraySize
     );
@@ -455,7 +455,7 @@ void TESObjectTREE::CreateBillboardGeomData(bool abZUp, NiPointer<NiTriShapeData
     NiPoint3 dst;
     float STBBNBT[36];
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LODLANDSCAPE, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectTREE.cpp", 409
+        MEM_CONTEXT_LODLANDSCAPE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectTREE.cpp", 409
     );
     STBBNBT[0] = 0.0f;
     STBBNBT[1] = 1.0f;
@@ -499,7 +499,7 @@ void TESObjectTREE::CreateBillboardGeomData(bool abZUp, NiPointer<NiTriShapeData
         pverts = static_cast<NiPoint3*>(ptr);
     }
     else {
-        pverts = 0;
+        pverts = nullptr;
     }
     float y = BillboardSize.y;
     float v66 = BillboardSize.x;
@@ -530,7 +530,7 @@ void TESObjectTREE::CreateBillboardGeomData(bool abZUp, NiPointer<NiTriShapeData
         pnorm_2 = pnorm;
     }
     else {
-        pnorm_2 = 0;
+        pnorm_2 = nullptr;
     }
     ourMemcpy(pnorm_2, static_cast<void*>(STBBNBT), sizeof(NiPoint3) * 12);
     void* v48 = ourMalloc(4 * sizeof(NiPoint2));
@@ -539,7 +539,7 @@ void TESObjectTREE::CreateBillboardGeomData(bool abZUp, NiPointer<NiTriShapeData
         ptext = static_cast<NiPoint2*>(v48);
     }
     else {
-        ptext = 0;
+        ptext = nullptr;
     }
     NiPoint2* v9 = ::new (&v47) NiPoint2(1.0f, 1.0f);
     float v10 = v9->x;
@@ -567,7 +567,7 @@ void TESObjectTREE::CreateBillboardGeomData(bool abZUp, NiPointer<NiTriShapeData
         pcol = static_cast<NiColorA*>(v42);
     }
     else {
-        pcol = 0;
+        pcol = nullptr;
     }
     NiColorA v41(1.0f, 1.0f, 1.0f, 0.0f);
     NiColorA* v25 = &v41;
@@ -594,7 +594,7 @@ void TESObjectTREE::CreateBillboardGeomData(bool abZUp, NiPointer<NiTriShapeData
             ::new (v37) NiTriShapeData(4, pverts, pnorm_2, pcol, ptext, 1, NiGeometryData::NBT_METHOD_NDL, 2, ptrilist);
     }
     else {
-        v31 = 0;
+        v31 = nullptr;
     }
     NiPointer<NiTriShapeData> spgeomData(static_cast<NiTriShapeData*>(v31));
     aspTriShapeData.operator=(spgeomData);
@@ -606,10 +606,10 @@ NiNode* TESObjectTREE::BuildDistant3D(bool abZUp) {
     NiTriShape* p3D;
     char a2[268];
     if (!IsLargeEnoughForDistantLOD()) {
-        return 0;
+        return nullptr;
     }
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LODLANDSCAPE, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectTREE.cpp", 470
+        MEM_CONTEXT_LODLANDSCAPE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectTREE.cpp", 470
     );
     NiPointer<NiTriShapeData> spgeomData(nullptr);
     CreateBillboardGeomData(abZUp, spgeomData);
@@ -618,7 +618,7 @@ NiNode* TESObjectTREE::BuildDistant3D(bool abZUp) {
         p3D = ::new (v12) NiTriShape(spgeomData.m_pObject);
     }
     else {
-        p3D = 0;
+        p3D = nullptr;
     }
     NiAlphaProperty* paprop = BSTreeManager::GetDistantBillboardAlphaProperty();
     if (paprop) {
@@ -631,7 +631,7 @@ NiNode* TESObjectTREE::BuildDistant3D(bool abZUp) {
         pbillboardProp = ::new (v11) SpeedTreeBillboardShaderProperty;
     }
     else {
-        pbillboardProp = 0;
+        pbillboardProp = nullptr;
     }
     p3D->AttachProperty(pbillboardProp);
     GetBillboardTextureFilename(a2);
@@ -640,7 +640,7 @@ NiNode* TESObjectTREE::BuildDistant3D(bool abZUp) {
         ptextureSet = ::new (v10) BSShaderTextureSet;
     }
     else {
-        ptextureSet = 0;
+        ptextureSet = nullptr;
     }
     ptextureSet->SetTextureFilename(BSShaderProperty::TEXTYPE_DIFFUSE, a2);
     pbillboardProp->LoadTextureSet("STBB", ptextureSet);
@@ -648,7 +648,7 @@ NiNode* TESObjectTREE::BuildDistant3D(bool abZUp) {
     NiPointer<NiTexture> spTempTexture(nullptr);
     ptextureSet->GetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, spTempTexture);
     if (spTempTexture.operator==(nullptr)) {
-        return 0;
+        return nullptr;
     }
     else {
         NiBillboardNode* pnode;
@@ -657,7 +657,7 @@ NiNode* TESObjectTREE::BuildDistant3D(bool abZUp) {
             pnode = ::new (v9) NiBillboardNode;
         }
         else {
-            pnode = 0;
+            pnode = nullptr;
         }
         pnode->SetMode(NiBillboardNode::BSROTATE_ABOUT_UP);
         pnode->AttachChild(p3D, 1);

@@ -5,7 +5,7 @@
 #include "BSCore/MemoryManager.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 BSWin32AudioListener::BSWin32AudioListener(IDirectSound3DListener* apListener) : pListener(apListener) {
     fRolloffFactor = 0.0f;
@@ -14,7 +14,7 @@ BSWin32AudioListener::BSWin32AudioListener(IDirectSound3DListener* apListener) :
 BSWin32AudioListener::~BSWin32AudioListener() {
     if (pListener) {
         pListener->Release();
-        pListener = 0;
+        pListener = nullptr;
     }
 }
 

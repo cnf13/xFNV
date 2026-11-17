@@ -189,7 +189,7 @@ NiPalette& NiPalette::operator=(const NiPalette& kPal) {
         NiPalette::RendererData* m_pkRendererData = this->m_pkRendererData;
         if (m_pkRendererData) {
             delete m_pkRendererData;
-            this->m_pkRendererData = 0;
+            this->m_pkRendererData = nullptr;
         }
         uint32_t m_uiEntries = this->m_uiEntries;
         m_bAlpha = kPal.m_bAlpha;

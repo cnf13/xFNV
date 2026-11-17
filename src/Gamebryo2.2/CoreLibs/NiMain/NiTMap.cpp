@@ -165,7 +165,7 @@
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 void* AllocateVertexDistMapItem() {
     return ourMalloc(sizeof(NiTMapItem<uint32_t, VertexDist>));

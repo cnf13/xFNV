@@ -3,9 +3,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 
 NiFixedString* FixedStrings::GetBip01_Spine() {
-    return reinterpret_cast<NiFixedString*>(
-        static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(FixedStrings::Bip01_Spine))
-    );
+    return reinterpret_cast<NiFixedString*>(reinterpret_cast<uintptr_t>(FixedStrings::Bip01_Spine));
 }
 
 NiFixedString& FixedStrings::QPrn() {

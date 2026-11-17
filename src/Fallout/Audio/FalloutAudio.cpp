@@ -64,28 +64,28 @@ void FalloutAudio::UpdateRegionSounds() {
             pAcousticSpace = pPlayer->GetParentCell()->GetAcousticSpace();
         }
         else {
-            pAcousticSpace = 0;
+            pAcousticSpace = nullptr;
         }
         v54 = pAcousticSpace;
     }
     else {
-        v54 = 0;
+        v54 = nullptr;
     }
     if (FalloutAudio::pCurrentSpace) {
         if (!FalloutAudio::pCurrentSpace->IsInterior()) {
             if (v54) {
                 if (v54->IsInterior()) {
                     FalloutAudio::SetAcousticSpace(v54);
-                    FalloutAudio::bUpdateAcousticSpace = 0;
-                    FalloutAudio::pCurrentCellSpace = 0;
+                    FalloutAudio::bUpdateAcousticSpace = false;
+                    FalloutAudio::pCurrentCellSpace = nullptr;
                 }
             }
         }
     }
     if (FalloutAudio::bUpdateAcousticSpace) {
         if (FalloutAudio::pCurrentCellSpace == FalloutAudio::pCurrentSpace) {
-            FalloutAudio::pCurrentCellSpace = 0;
-            FalloutAudio::bUpdateAcousticSpace = 0;
+            FalloutAudio::pCurrentCellSpace = nullptr;
+            FalloutAudio::bUpdateAcousticSpace = false;
         }
         else {
             FalloutAudio::SetAcousticSpace(FalloutAudio::pCurrentCellSpace);
@@ -104,7 +104,7 @@ void FalloutAudio::UpdateRegionSounds() {
         (!pPlayer ||
          (!pPlayer->GetParentCell() || pPlayer->GetParentCell()->GetAcousticSpace() == FalloutAudio::pCurrentSpace))) {
         if (!pPlayer || (!pPlayer->GetParentCell() && !pPlayer->IsAcousticSpaceTransition())) {
-            FalloutAudio::ClearAcousticSpace(0);
+            FalloutAudio::ClearAcousticSpace(nullptr);
         }
     }
     else {
@@ -133,8 +133,8 @@ void FalloutAudio::UpdateRegionSounds() {
         BSAudio* v5 = &BSAudio::QInstance();
         BSSoundHandle* arHandle = v5->GetSoundHandleByName(&a1, "AMBUnderwaterLP", 0x2101u);
         FalloutAudio::UnderwaterLoop.operator=(*arHandle);
-        FalloutAudio::UnderwaterLoop.bAssumeSuccess = 1;
-        FalloutAudio::UnderwaterLoop.Play(0);
+        FalloutAudio::UnderwaterLoop.bAssumeSuccess = true;
+        FalloutAudio::UnderwaterLoop.Play(false);
     }
     else {
         if ((!blistenerUnderwater || !pPlayer->GetParentCell()) && FalloutAudio::UnderwaterLoop.IsPlaying()) {
@@ -168,7 +168,7 @@ void FalloutAudio::UpdateRegionSounds() {
                 if (plookup) {
                     delete plookup;
                 }
-                plookup = 0;
+                plookup = nullptr;
             }
         }
         return;
@@ -188,19 +188,19 @@ void FalloutAudio::UpdateRegionSounds() {
         if (FalloutAudio::pCurrentSpace->IsInterior()) {
             bool bShouldUseWalla = FalloutAudio::bUpdateAcousticSpace;
             if (!FalloutAudio::kAmbientLoop.IsValid()) {
-                bShouldUseWalla = 1;
+                bShouldUseWalla = true;
             }
             if (bShouldUseWalla) {
                 if (FalloutAudio::bUpdateAcousticSpace) {
-                    FalloutAudio::pCurrentCellSpace = 0;
-                    FalloutAudio::bUpdateAcousticSpace = 0;
+                    FalloutAudio::pCurrentCellSpace = nullptr;
+                    FalloutAudio::bUpdateAcousticSpace = false;
                 }
                 if (FalloutAudio::kAmbientLoop.IsPlaying()) {
                     float* v8 = &gs_fASFadeOutTime_Audio.Float();
                     FalloutAudio::kAmbientLoop.FadeOutAndRelease(static_cast<int64_t>(*v8 * 500.0));
                     FalloutAudio::kAmbientLoop.Clear();
                 }
-                FalloutAudio::bUseWalla = 0;
+                FalloutAudio::bUseWalla = false;
                 TESSound* pambSound = FalloutAudio::pCurrentSpace->pDawnSound;
                 if (pambSound) {
                     const char* aPositiona = pambSound->GetFilename();
@@ -219,21 +219,21 @@ void FalloutAudio::UpdateRegionSounds() {
                 case 0: {
                     float* v10 = &gs_fDayTime_Audio.Float();
                     if (*v10 < static_cast<double>(ftimeOfDay)) {
-                        bHasChanged = 1;
+                        bHasChanged = true;
                     }
                     break;
                 }
                 case 1: {
                     float* v11 = &gs_fDuskTime_Audio.Float();
                     if (*v11 < static_cast<double>(ftimeOfDay)) {
-                        bHasChanged = 1;
+                        bHasChanged = true;
                     }
                     break;
                 }
                 case 2: {
                     float* v12 = &gs_fNightTime_Audio.Float();
                     if (*v12 < static_cast<double>(ftimeOfDay)) {
-                        bHasChanged = 1;
+                        bHasChanged = true;
                     }
                     break;
                 }
@@ -242,7 +242,7 @@ void FalloutAudio::UpdateRegionSounds() {
                     if (*v13 < static_cast<double>(ftimeOfDay)) {
                         float* v14 = &gs_fNightTime_Audio.Float();
                         if (*v14 > static_cast<double>(ftimeOfDay)) {
-                            bHasChanged = 1;
+                            bHasChanged = true;
                         }
                     }
                     break;
@@ -256,15 +256,15 @@ void FalloutAudio::UpdateRegionSounds() {
             goto LABEL_97;
         }
         if (FalloutAudio::bUpdateAcousticSpace) {
-            FalloutAudio::pCurrentCellSpace = 0;
-            FalloutAudio::bUpdateAcousticSpace = 0;
+            FalloutAudio::pCurrentCellSpace = nullptr;
+            FalloutAudio::bUpdateAcousticSpace = false;
         }
         else {
             float* v15 = &gs_fASFadeOutTime_Audio.Float();
             FalloutAudio::kAmbientLoop.FadeOutAndRelease(static_cast<int64_t>(*v15 * 1000.0));
             FalloutAudio::kAmbientLoop.Clear();
         }
-        FalloutAudio::bUseWalla = 0;
+        FalloutAudio::bUseWalla = false;
         float* v16 = &gs_fDawnTime_Audio.Float();
         if (*v16 < static_cast<double>(ftimeOfDay)) {
             float* v17 = &gs_fDayTime_Audio.Float();
@@ -306,11 +306,11 @@ LABEL_97:;
         TESSound* psoundData;
         BSSimpleList<TESRegionSound*>* plistPtr = soundList;
         BSSoundHandle hndle(0);
-        bool bcanPlay = 1;
-        bool bisLoop = 0;
+        bool bcanPlay = true;
+        bool bisLoop = false;
         BSAudioListener* plstnr = (&BSAudio::QInstance())->pListener;
         while (plistPtr && !plistPtr->IsEmpty()) {
-            bcanPlay = 1;
+            bcanPlay = true;
             prgnSound = plistPtr->m_item;
             // The source keeps the resolved sound in the form ID field (TESRegionDataSound's InitItem); the exe
             // reads it before testing prgnSound.
@@ -330,7 +330,7 @@ LABEL_97:;
                                 psky->pCurrentWeather->GetWeatherDataRaw(TESWeather::WD_DIVIDER2);
                             if (((prgnSound->uiFlags & 0xFFFF) & icurrentConditions) == 0) {
                                 if (icurrentConditions) {
-                                    bcanPlay = 0;
+                                    bcanPlay = false;
                                 }
                             }
                         }
@@ -343,7 +343,7 @@ LABEL_97:;
                          (fEndTime < static_cast<double>(fBeginTime) &&
                           (ftimeOfDay < static_cast<double>(fBeginTime) &&
                            ftimeOfDay > static_cast<double>(fEndTime))))) {
-                        bcanPlay = 0;
+                        bcanPlay = false;
                     }
                 }
                 bool bisInMap = FalloutAudio::CurrentRegionSounds.GetAt(psoundData->iFormID, plookup);
@@ -354,7 +354,7 @@ LABEL_97:;
                         phndle = ::new (pMemory) BSSoundHandle;
                     }
                     else {
-                        phndle = 0;
+                        phndle = nullptr;
                     }
                     TESSound* pSoundForm = psoundData;
                     const char* pFilename = psoundData->GetFilename();
@@ -362,7 +362,7 @@ LABEL_97:;
                     BSSoundHandle* pSoundHandle =
                         pAudio->GetSoundHandleByFilename(&apResult, pFilename, 0x11011u, pSoundForm);
                     phndle->operator=(*pSoundHandle);
-                    phndle->bAssumeSuccess = 1;
+                    phndle->bAssumeSuccess = true;
                     FalloutAudio::CurrentRegionSounds.SetAt(psoundData->iFormID, phndle);
                     float* pfFadeIn = &gs_fRegionLoopFadeInTime_Audio.Float();
                     phndle->FadeInPlay(static_cast<int64_t>(*pfFadeIn * 1000.0));
@@ -421,7 +421,7 @@ LABEL_97:;
                                 loc.z = loc.z + 256.0;
                                 hndle.SetPriority(255u);
                                 hndle.SetPosition(loc.x, loc.y, loc.z);
-                                hndle.Play(0);
+                                hndle.Play(false);
                             }
                         }
                     }
@@ -431,7 +431,7 @@ LABEL_97:;
         }
         uint32_t ikey = 0;
         // The found flag is cleared and the list restarted once, before the map loop, not per entry, as the game does.
-        bool bisInList = 0;
+        bool bisInList = false;
         NiTMapItem<uint32_t, BSSoundHandle*>* pPos = FalloutAudio::CurrentRegionSounds.GetFirstPos();
         plistPtr = soundList;
         while (pPos) {
@@ -444,7 +444,7 @@ LABEL_97:;
                 psoundData = reinterpret_cast<TESSound*>(static_cast<uintptr_t>(prgnSound->uiSound));
 #endif
                 if (ikey == psoundData->iFormID) {
-                    bisInList = 1;
+                    bisInList = true;
                     break;
                 }
                 plistPtr = plistPtr->m_pkNext;
@@ -457,7 +457,7 @@ LABEL_97:;
                 if (plookup) {
                     delete plookup;
                 }
-                plookup = 0;
+                plookup = nullptr;
             }
         }
     }
@@ -472,7 +472,7 @@ void PlayMysteriousStrangerMusic() {
         BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_DONT_CACHE |
             BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE
     );
-    a1.Play(0);
+    a1.Play(false);
     BSAudio* v1 = &BSAudio::QInstance();
     v1->Precache(
         "MUSMysteriousStrangerA02",
@@ -488,7 +488,7 @@ void PlaySound_MUSMysteriousStrangerA02() {
         &a1, "MUSMysteriousStrangerA02",
         BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE
     );
-    a1.Play(0);
+    a1.Play(false);
 }
 
 void FalloutAudio::ClearAcousticSpace(BGSAcousticSpace* apSpace) {
@@ -500,7 +500,7 @@ void FalloutAudio::ClearAcousticSpace(BGSAcousticSpace* apSpace) {
             (&FalloutAudio::kAmbientLoop)->FadeOutAndRelease((int64_t)((*v1) * 1000.0));
             (&FalloutAudio::kAmbientLoop)->Clear();
             FalloutAudio::pCurrentSpace = nullptr;
-            FalloutAudio::bUpdateAcousticSpace = (bool)1;
+            FalloutAudio::bUpdateAcousticSpace = true;
             singleton = &BSAudio::QInstance();
             singleton->SetEnvironment(0);
         }
@@ -520,7 +520,7 @@ void FalloutAudio::SetAcousticSpace(BGSAcousticSpace* apSpace) {
     uint32_t sound1;
     int64_t v3;
     if (FalloutAudio::pCurrentSpace != apSpace) {
-        v3 = (int64_t)(((&gs_fASFadeOutTime_Audio)->Float()) * 1000.0);
+        v3 = (int64_t)((&gs_fASFadeOutTime_Audio)->Float() * 1000.0);
         (&FalloutAudio::kAmbientLoop)->FadeOutAndRelease(v3);
         (&FalloutAudio::kAmbientLoop)->Clear();
         if (apSpace) {
@@ -529,7 +529,7 @@ void FalloutAudio::SetAcousticSpace(BGSAcousticSpace* apSpace) {
             singleton->SetEnvironment(sound1);
         }
         FalloutAudio::pCurrentSpace = apSpace;
-        FalloutAudio::bUpdateAcousticSpace = (bool)1;
+        FalloutAudio::bUpdateAcousticSpace = true;
     }
 }
 
@@ -540,11 +540,11 @@ void FalloutAudio::SetMainMenuMusic(bool abMainMenuMusic) {
 }
 
 void FalloutAudio::MuteRadio() {
-    FalloutAudio::bRadioMute = (bool)1;
+    FalloutAudio::bRadioMute = true;
 }
 
 void FalloutAudio::UnMuteRadio() {
-    FalloutAudio::bRadioMute = (bool)0;
+    FalloutAudio::bRadioMute = false;
 }
 
 bool FalloutAudio::GetNewGameMusic() {
@@ -583,7 +583,7 @@ bool FalloutAudio::ResolveSoundID(
 ) {
     TESSound* psound = pDataHandler->GetSound(aiFormID);
     if (!psound || (!psound->GetFilename() || !apFilename)) {
-        return 0;
+        return false;
     }
     const char* Filename = psound->GetFilename();
     BSstrcpy(apFilename, 260, Filename);
@@ -605,7 +605,7 @@ bool FalloutAudio::ResolveSoundID(
     }
     *aiSoundTypeFlags |= TESSound::ConvertLoopFlag(psound->GetData().iFlags);
     *apSettingsContext = psound;
-    return 1;
+    return true;
 }
 
 bool FalloutAudio::ResolveSoundName(
@@ -615,7 +615,7 @@ bool FalloutAudio::ResolveSoundName(
     void** apSettingsContext
 ) {
     if (!apFormName) {
-        return 0;
+        return false;
     }
     TESSound* psound = pDataHandler->GetSound(apFormName);
     if (psound && (psound->GetFilename() && apFilename)) {
@@ -639,7 +639,7 @@ bool FalloutAudio::ResolveSoundName(
         }
         *aiSoundTypeFlags |= TESSound::ConvertLoopFlag(psound->GetData().iFlags);
         *apSettingsContext = (void*)psound;
-        return 1;
+        return true;
     }
     else {
         if (pDataHandler) {
@@ -649,7 +649,7 @@ bool FalloutAudio::ResolveSoundName(
                 }
             }
         }
-        return 0;
+        return false;
     }
 }
 
@@ -716,23 +716,23 @@ bool FalloutAudio::GetLoopPoints(void* apSettingsContext, uint32_t* aiLoopStart,
     TESSound::SOUND_DATA v6;
     TESSound::SOUND_DATA result;
     if (!apSettingsContext) {
-        return 0;
+        return false;
     }
     TESSound* v8 = static_cast<TESSound*>(apSettingsContext);
     if (!(&(result = static_cast<TESSound*>(apSettingsContext)->GetData()))->iLoopBegin &&
         !(&(v6 = v8->GetData()))->iLoopEnd) {
-        return 0;
+        return false;
     }
     *aiLoopStart = (&(v5 = v8->GetData()))->iLoopBegin;
     *aiLoopEnd = (&(v4 = v8->GetData()))->iLoopEnd;
-    return 1;
+    return true;
 }
 
 bool FalloutAudio::SoundDistanceTest(TESSound* apSound, NiPoint3 aLoc, float aMod) {
     BSAudio* v3 = &BSAudio::QInstance();
     BSWin32AudioListener* pListener = static_cast<BSWin32AudioListener*>(v3->pListener);
     if (!apSound || !pListener) {
-        return 0;
+        return false;
     }
     NiPoint3* v5 = &pListener->GetPosition();
     float x = v5->x;

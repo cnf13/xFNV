@@ -211,7 +211,7 @@ void ImageSpaceEffectFullScreenBlur::Render(
     }
     else {
         i_2 = 9;
-        BSRenderState::SetAlphaBlendEnable(1, BSRS_LOCK);
+        BSRenderState::SetAlphaBlendEnable(true, BSRS_LOCK);
         BSRenderState::SetAlphaBlendFunc(
             NiAlphaProperty::ALPHA_SRCALPHA, NiAlphaProperty::ALPHA_INVSRCALPHA, BSRS_NOLOCK
         );
@@ -222,7 +222,7 @@ void ImageSpaceEffectFullScreenBlur::Render(
     peffect_2->Render(apGeometry, apRenderer, pEffectParamList.m_pBase[i_2].m_pObject, abEndFrame);
     if (ImageSpaceEffectFullScreenBlur_fRadius < 1.0f) {
         --BSRenderState::iLock[6];
-        BSRenderState::SetAlphaBlendEnable(0, BSRS_NOLOCK);
+        BSRenderState::SetAlphaBlendEnable(false, BSRS_NOLOCK);
     }
     ReturnTextures();
 }
@@ -237,10 +237,10 @@ void ImageSpaceEffectFullScreenBlur::Setup(ImageSpaceManager* apManager, ImageSp
         pparam = ::new (v4) ImageSpaceShaderParam;
     }
     else {
-        pparam = 0;
+        pparam = nullptr;
     }
     pparam->InitConstantMap(0, 24);
-    pparam->bUseTexOffset[1] = 0;
+    pparam->bUseTexOffset[1] = false;
     pparam->CopyConstantGroup(3, kHDRConstants11ADD48, 64u);
     SetEffect(0, apManager->pEffectList.m_pBase[65], pparam, 2);
     spParam.m_pObject = pparam;
@@ -250,31 +250,31 @@ void ImageSpaceEffectFullScreenBlur::Setup(ImageSpaceManager* apManager, ImageSp
     spParam.m_pObject = nullptr;
     pEffectParamList.SetAt(1u, spParam);
     SetEffectInputs(1, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
-    SetEffect(1, apManager->pEffectList.m_pBase[16], 0, 2);
+    SetEffect(1, apManager->pEffectList.m_pBase[16], nullptr, 2);
     spParam.m_pObject = nullptr;
     pEffectParamList.SetAt(2u, spParam);
     SetEffectInputs(2, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
-    SetEffect(2, apManager->pEffectList.m_pBase[17], 0, 2);
+    SetEffect(2, apManager->pEffectList.m_pBase[17], nullptr, 2);
     spParam.m_pObject = nullptr;
     pEffectParamList.SetAt(3u, spParam);
     SetEffectInputs(3, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
-    SetEffect(3, apManager->pEffectList.m_pBase[18], 0, 2);
+    SetEffect(3, apManager->pEffectList.m_pBase[18], nullptr, 2);
     spParam.m_pObject = nullptr;
     pEffectParamList.SetAt(4u, spParam);
     SetEffectInputs(4, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
-    SetEffect(4, apManager->pEffectList.m_pBase[19], 0, 2);
+    SetEffect(4, apManager->pEffectList.m_pBase[19], nullptr, 2);
     spParam.m_pObject = nullptr;
     pEffectParamList.SetAt(5u, spParam);
     SetEffectInputs(5, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
-    SetEffect(5, apManager->pEffectList.m_pBase[20], 0, 2);
+    SetEffect(5, apManager->pEffectList.m_pBase[20], nullptr, 2);
     spParam.m_pObject = nullptr;
     pEffectParamList.SetAt(6u, spParam);
     SetEffectInputs(6, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
-    SetEffect(6, apManager->pEffectList.m_pBase[21], 0, 2);
+    SetEffect(6, apManager->pEffectList.m_pBase[21], nullptr, 2);
     spParam.m_pObject = nullptr;
     pEffectParamList.SetAt(7u, spParam);
     SetEffectInputs(7, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
-    SetEffect(7, apManager->pEffectList.m_pBase[22], 0, 2);
+    SetEffect(7, apManager->pEffectList.m_pBase[22], nullptr, 2);
     ImageSpaceShaderParam* v8 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
     spParam.m_pObject = v8;

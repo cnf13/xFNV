@@ -146,8 +146,8 @@ struct hkGeometryProcessing {
     // A function from IN_TYPE to OUT_TYPE.
     template <typename IN_TYPE, typename OUT_TYPE>
     struct IFunction {
-        typedef IN_TYPE typeIn;
-        typedef OUT_TYPE typeOut;
+        using typeIn = IN_TYPE;
+        using typeOut = OUT_TYPE;
 
         virtual ~IFunction();
 
@@ -171,12 +171,12 @@ struct hkGeometryProcessing {
         typename FUNCTION_TYPE::typeOut m_value;
     };
 
-    typedef IFunction<hkVector4, float> IFunction_4_1;
+    using IFunction_4_1 = IFunction<hkVector4, float>;
 
     // The interval [m_bounds[0], m_bounds[1]] a set of vertices covers along a direction.
     template <typename T>
     struct Span {
-        typedef T type;
+        using type = T;
 
         T m_bounds[2];
     };

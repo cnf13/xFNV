@@ -212,7 +212,7 @@ void hkxMeshSection::getTriangleIndices(
     uint32_t v7 = 0;
     if (m_indexBuffers.m_size > 0) {
         hkxIndexBuffer* m_pntr;
-        while (1) {
+        while (true) {
             m_pntr = m_indexBuffers.m_data[v6].val();
             uint32_t v9 = v7 + m_pntr->getNumTriangles();
             if (triIndex < v9) {

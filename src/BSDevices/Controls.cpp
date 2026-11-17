@@ -15,7 +15,7 @@
 #include "platform/System.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 SettingT<INISettingCollection> gs_bUseJoystick_Controls("bUse Joystick:Controls", true);
 SettingT<INISettingCollection> gs_bBackgroundKeyboard_Controls("bBackground Keyboard:Controls", true);
@@ -224,13 +224,13 @@ void XRumbleControl::Rumble(RUMBLE_SIDE aeLeftOrRight, _XINPUT_VIBRATION* XInput
 Controls::Controls(HINSTANCE__* a1) : uiFlags(0), uiJoyStickCount(0), usOverrideFlags(0) {
     bool bUsesGamepad;
     IDirectInputDevice8A* pDevice;
-    DirectInput8Create_0(a1, 2048u, &CLSID_IDirectInput8A, reinterpret_cast<void**>(&pDirectInput), 0);
+    DirectInput8Create_0(a1, 2048u, &CLSID_IDirectInput8A, reinterpret_cast<void**>(&pDirectInput), nullptr);
     bUsesGamepad = gs_bUseJoystick_Controls.uValue.b;
     if (bUsesGamepad) {
-        EnableJoysticks(1);
+        EnableJoysticks(true);
     }
-    pKeyboard = 0;
-    if (!pDirectInput->CreateDevice(&CLSID_GUID_SysKeyboard, &pDevice, 0)) {
+    pKeyboard = nullptr;
+    if (!pDirectInput->CreateDevice(&CLSID_GUID_SysKeyboard, &pDevice, nullptr)) {
         bool bBackgroundKeyboard;
         DIPROPDWORD kBufferSize;
         uiFlags |= 4;
@@ -246,7 +246,7 @@ Controls::Controls(HINSTANCE__* a1) : uiFlags(0), uiJoyStickCount(0), usOverride
         // DIPROP_BUFFERSIZE is MAKEDIPROP(1).
         pKeyboard->SetProperty(reinterpret_cast<const void*>(1), &kBufferSize.diph);
     }
-    pMouse = 0;
+    pMouse = nullptr;
     // HKEY_CURRENT_USER\Control Panel\Mouse's MouseSensitivity read with atoi (6 when missing), SwapMouseButton's
     // state (swapped and restored) and GetDoubleClickTime.
     const platform::MouseInfo kMouse = platform::MouseSettings();
@@ -261,7 +261,7 @@ Controls::Controls(HINSTANCE__* a1) : uiFlags(0), uiJoyStickCount(0), usOverride
     if (bBackgroundMouse) {
         uiFlags |= 8;
     }
-    if (!pDirectInput->CreateDevice(&CLSID_GUID_SysMouse, &pDevice, 0)) {
+    if (!pDirectInput->CreateDevice(&CLSID_GUID_SysMouse, &pDevice, nullptr)) {
         uiFlags |= 2;
         pMouse = pDevice;
         pMouse->GetCapabilities(&kMouseCaps);
@@ -271,8 +271,8 @@ Controls::Controls(HINSTANCE__* a1) : uiFlags(0), uiJoyStickCount(0), usOverride
     std::memset(kJoyStickState, 0, sizeof(kJoyStickState));
     std::memset(ucKeyboardState, 0, sizeof(ucKeyboardState));
     std::memset(kMouseState, 0, sizeof(kMouseState));
-    bSettingAControl = 0;
-    bUpdated = 0;
+    bSettingAControl = false;
+    bUpdated = false;
     pControllerVibration = new XRumbleControl(0);
     // Freed through MemoryManager::Deallocate by the destructor, so allocated through the MemoryManager.
     pVibrationProperties = static_cast<_RUMBLE_EFFECT*>(MemoryManager_Singleton.Allocate(sizeof(_RUMBLE_EFFECT)));
@@ -284,15 +284,15 @@ Controls::Controls(HINSTANCE__* a1) : uiFlags(0), uiJoyStickCount(0), usOverride
     pVibrationProperties->RampDown.uiDuration = 0;
     pControllerVibration->InitRumble(RIGHT, pVibrationProperties);
     pControllerVibration->InitRumble(LEFT, pVibrationProperties);
-    bIsControllerEnabled = 1;
+    bIsControllerEnabled = true;
     InitDefaultKeybinds(4);
-    bIsControllerDisabled = 0;
+    bIsControllerDisabled = false;
 }
 
 // Deliberately frees neither pControllerVibration nor the joystick devices here, as the game does.
 Controls::~Controls() {
     if ((uiFlags & 1) != 0) {
-        EnableJoysticks(0);
+        EnableJoysticks(false);
     }
     if (pKeyboard) {
         pKeyboard->Unacquire();
@@ -337,11 +337,11 @@ void Controls::InitDefaultKeybinds(int32_t aiDevice) {
     for (i = 0; i < 28; ++i) {
         if (aiDevice >= 4) {
             for (j = 0; j < 4; ++j) {
-                ucKeyBinds[j][i] = (uint8_t)((-1));
+                ucKeyBinds[j][i] = (uint8_t)(-1);
             }
         }
         else {
-            ucKeyBinds[aiDevice][i] = (uint8_t)((-1));
+            ucKeyBinds[aiDevice][i] = (uint8_t)(-1);
         }
     }
     if ((!aiDevice) || (aiDevice == 4)) {
@@ -954,7 +954,7 @@ bool Controls::SetControl(uint32_t auiAction, uint32_t auiDevice, uint8_t aucKey
                    ((aucKey == 59) ||
                     ((aucKey == 60) ||
                      ((aucKey == 61) || ((aucKey == 62) || ((aucKey == 199) || (aucKey == 43)))))))))))))))))) {
-        return (bool)0;
+        return false;
     }
     if ((auiDevice == 3) &&
         ((aucKey != 8) &&
@@ -964,7 +964,7 @@ bool Controls::SetControl(uint32_t auiAction, uint32_t auiDevice, uint8_t aucKey
             ((aucKey != 12) &&
              ((aucKey != 13) &&
               ((aucKey != 14) && ((aucKey != 15) && ((aucKey != 16) && ((aucKey != 7) && (aucKey != 17)))))))))))) {
-        return (bool)0;
+        return false;
     }
     for (i = 0; i < 28; ++i) {
         if (ucKeyBinds[auiDevice][i] == aucKey) {
@@ -973,7 +973,7 @@ bool Controls::SetControl(uint32_t auiAction, uint32_t auiDevice, uint8_t aucKey
         }
     }
     ucKeyBinds[auiDevice][auiAction] = aucKey;
-    return (bool)1;
+    return true;
 }
 
 void Controls::SetActionMapping(uint32_t auiAction, uint32_t auiDevice, uint8_t aucKey) {
@@ -1093,15 +1093,15 @@ uint32_t Controls::HasJoySticks() const {
 
 // Returns 0 or 1 in the full 32-bit value, and HasInputInterfaces returns that value as it is.
 uint32_t Controls::HasKeyboard() const {
-    return pKeyboard != 0;
+    return pKeyboard != nullptr;
 }
 
 uint32_t Controls::HasMouse() const {
-    return pMouse != 0;
+    return pMouse != nullptr;
 }
 
 void Controls::RemoveKeybind(int32_t a2, int32_t a3) {
-    ucKeyBinds[a3][a2] = (uint8_t)((-1));
+    ucKeyBinds[a3][a2] = (uint8_t)(-1);
 }
 
 int32_t Controls::GetKeybind(int32_t a2) {
@@ -1129,7 +1129,7 @@ void Controls::InitControlsFromIni() {
         if (platform::IniGetString(
                 FileName, "Controls", userActionKeys[a2], nullptr, std::span<char>(ReturnedString, uiSize)
             )) {
-            EndPtr = 0;
+            EndPtr = nullptr;
             int32_t a3 = std::strtol(ReturnedString, &EndPtr, 16);
             SetKeybind(a2, a3);
         }
@@ -1201,7 +1201,7 @@ void Controls::SetMouseBackgroundStatus(bool abBackground) {
     if (pMouse) {
         pMouse->Unacquire();
         pMouse->Release();
-        if (!pDirectInput->CreateDevice(&CLSID_GUID_SysMouse, &v4, 0)) {
+        if (!pDirectInput->CreateDevice(&CLSID_GUID_SysMouse, &v4, nullptr)) {
             pMouse = v4;
             if (abBackground) {
                 pMouse->SetCooperativeLevel(GetActiveWindow_SDL(), 6);
@@ -1296,7 +1296,7 @@ int32_t CALLBACK DIEnumDevicesCallback(const DIDEVICEINSTANCEA* lpddi, void* apR
         return 1;
     }
     rt::memcpy(&pvRef->kJoyStickInstances[pvRef->uiJoyStickCount], lpddi, sizeof(DIDEVICEINSTANCEA));
-    pvRef->pDirectInput->CreateDevice(&lpddi->guidInstance, &v4, 0);
+    pvRef->pDirectInput->CreateDevice(&lpddi->guidInstance, &v4, nullptr);
     IDirectInputDevice8A* pDevice = v4;
     pDevice->SetCooperativeLevel(GetActiveWindow_SDL(), 6);
     pDevice->SetDataFormat(&c_dfDIJoystick);

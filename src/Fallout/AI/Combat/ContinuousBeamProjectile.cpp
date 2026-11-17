@@ -76,14 +76,14 @@ Projectile::PROJECTILE_TYPE ContinuousBeamProjectile::GetProjectileType() {
 
 // Becomes the shooter's one persistent beam, ending the previous one; a beam without a shooter ends at once.
 void ContinuousBeamProjectile::Initialize() {
-    Projectile::SetFlag(Projectile::TRACER, 0);
-    Projectile::SetFlag(Projectile::HITSCAN_MODE, 1);
-    Projectile::SetFlag(Projectile::NO_3D, 0);
-    Projectile::SetFlag(Projectile::NO_COLLISION, 1);
-    Projectile::SetFlag(Projectile::FADING, 0);
-    Projectile::SetFlag(Projectile::CHECK_BEHIND_WALL, 1);
-    Projectile::SetFlag(Projectile::POST_PROCESS, 1);
-    Projectile::SetFlag(Projectile::SPAWN_EXPLOSION_AT_IMPACT, 1);
+    Projectile::SetFlag(Projectile::TRACER, false);
+    Projectile::SetFlag(Projectile::HITSCAN_MODE, true);
+    Projectile::SetFlag(Projectile::NO_3D, false);
+    Projectile::SetFlag(Projectile::NO_COLLISION, true);
+    Projectile::SetFlag(Projectile::FADING, false);
+    Projectile::SetFlag(Projectile::CHECK_BEHIND_WALL, true);
+    Projectile::SetFlag(Projectile::POST_PROCESS, true);
+    Projectile::SetFlag(Projectile::SPAWN_EXPLOSION_AT_IMPACT, true);
     iShotsFired = 0;
     Projectile::Initialize();
     if (spBeamProperty.operator->()) {
@@ -142,14 +142,14 @@ void ContinuousBeamProjectile::UpdateProjectile(float afDelta) {
             pactor_2 = static_cast<Actor*>(GetShooter());
         }
         else {
-            pactor_2 = 0;
+            pactor_2 = nullptr;
         }
         if (GetShooter()) {
             Actor* pactor_4 = static_cast<Actor*>(GetShooter());
             pfireNode = pactor_4->GetFireNode();
         }
         else {
-            pfireNode = 0;
+            pfireNode = nullptr;
         }
         if (IsFlagSet(Projectile::FADING) && GetAlpha() < 0.01) {
             Kill();
@@ -157,7 +157,7 @@ void ContinuousBeamProjectile::UpdateProjectile(float afDelta) {
         if (pactor_2) {
             TESPackage* ppack;
             float faimLooking = pactor_2->GetLooking();
-            float faimHeading = pactor_2->GetHeading(0);
+            float faimHeading = pactor_2->GetHeading(false);
             if (pactor_2 == pPlayer) {
                 NiPoint3 kAutoAim;
                 NiPoint3* v2 = pPlayer->GetBulletAutoAim(&kAutoAim);
@@ -170,12 +170,12 @@ void ContinuousBeamProjectile::UpdateProjectile(float afDelta) {
                 float funused;
                 (&pfireNode->GetWorldTransform())->m_Rotate.ToEulerAnglesZXY(faimHeading, faimLooking, funused);
             }
-            bool balwaysHit = 0;
+            bool balwaysHit = false;
             if (pactor_2) {
                 ppack = pactor_2->GetCurrentPackage();
             }
             else {
-                ppack = 0;
+                ppack = nullptr;
             }
             if (ppack) {
                 const TESUseWeaponPackageData* ppackData = ppack->GetUseWeaponPackageData();
@@ -194,13 +194,13 @@ void ContinuousBeamProjectile::UpdateProjectile(float afDelta) {
                     pactorAIProcess = pactor_2->pCurrentProcess;
                 }
                 else {
-                    pactorAIProcess = 0;
+                    pactorAIProcess = nullptr;
                 }
                 if (pactorAIProcess) {
                     pweaponItem = pactorAIProcess->GetCurrentWeapon();
                 }
                 else {
-                    pweaponItem = 0;
+                    pweaponItem = nullptr;
                 }
                 if (pactor_2) {
                     fskill = pactor_2->GetGunSkill(GUN_SKILL_GUN);
@@ -208,12 +208,12 @@ void ContinuousBeamProjectile::UpdateProjectile(float afDelta) {
                 else {
                     fskill = fGunReferenceSkill.Float();
                 }
-                bool bUseSpreadMod = 0;
+                bool bUseSpreadMod = false;
                 if (pactor_2) {
                     if (pactor_2->pCurrentProcess) {
                         if (pweaponItem) {
                             if (pweaponItem->HasModEffectActive(3)) {
-                                bUseSpreadMod = 1;
+                                bUseSpreadMod = true;
                             }
                         }
                     }
@@ -239,9 +239,9 @@ void ContinuousBeamProjectile::UpdateProjectile(float afDelta) {
         NiNode* p3d = Get3D();
         if (pfireNode) {
             if (p3d) {
-                bool bRoot = 0;
+                bool bRoot = false;
                 if (pWeaponSource->HasScope() && pactor_2->GetIronSights() && pactor_2 == pPlayer) {
-                    bRoot = 1;
+                    bRoot = true;
                 }
                 NiCamera* pcam = Main::WorldRootCamera();
                 if (bRoot && pcam) {
@@ -253,7 +253,7 @@ void ContinuousBeamProjectile::UpdateProjectile(float afDelta) {
                 }
             }
         }
-        Sync3DWithReference(1, 0);
+        Sync3DWithReference(true, false);
         SetRange(10000.0f);
         RunTargetPick();
         Process3D();
@@ -358,7 +358,7 @@ void ContinuousBeamProjectile::ScaleBeamGeometryLength(NiGeometry* apGeometry, f
                 if (pdata->GetAdditionalGeometryData() && (v7 = pdata->GetAdditionalGeometryData(), v7->GetVBReady())) {
                     NiTConvertingStrideIterator<NiPoint3> apMemory;
                     NiAdditionalGeometryData* AdditionalGeometryData = pdata->GetAdditionalGeometryData();
-                    if (pdata->LockPackedVertexData(1)) {
+                    if (pdata->LockPackedVertexData(true)) {
                         pdata->GetVerticesIterator(*static_cast<NiGeometryDataIteratorNiPoint3*>(&apMemory));
                         for (int32_t auiIndex = 0;; ++auiIndex) {
                             uint16_t LevelExact = AdditionalGeometryData->m_usVertexCount;
@@ -414,7 +414,7 @@ float ContinuousBeamProjectile::FindBeamGeometryLength(NiGeometry* apGeometry) {
                 (pAdditionalData = pModelData->GetAdditionalGeometryData(), pAdditionalData->GetVBReady())) {
                 NiTConvertingStrideIterator<NiPoint3> kIterator;
                 NiAdditionalGeometryData* pVertexData = pModelData->GetAdditionalGeometryData();
-                if (pModelData->LockPackedVertexData(1)) {
+                if (pModelData->LockPackedVertexData(true)) {
                     for (int32_t i = 0; i < pVertexData->m_usVertexCount; ++i) {
                         NiPoint3 kVertex = NiPoint3_ZERO;
                         pModelData->GetVerticesIterator(*static_cast<NiGeometryDataIteratorNiPoint3*>(&kIterator));

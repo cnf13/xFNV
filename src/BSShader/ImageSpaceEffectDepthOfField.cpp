@@ -74,24 +74,24 @@ void ImageSpaceEffectDepthOfField::Setup(ImageSpaceManager* apManager, ImageSpac
         pparam = ::new (v6) ImageSpaceShaderParam;
     }
     else {
-        pparam = 0;
+        pparam = nullptr;
     }
     pparam->InitConstantMap(0, 24);
     pparam->CopyConstantGroup(3, kHDRConstants11ADD48, 64u);
     float v15 = 1.0 / fblurheight;
     float afVal0 = 1.0 / fblurwidth;
     pparam->SetPixelConstant(2, afVal0, v15, 0.0f, 0.0f);
-    pparam->bUseTexOffset[1] = 0;
+    pparam->bUseTexOffset[1] = false;
     SetEffect(0, apManager->pEffectList.m_pBase[65], pparam, 2);
     spParam.m_pObject = pparam;
     NiTPrimitiveArray<NiPointer<ImageSpaceShaderParam>>* p_pEffectParamList = &pEffectParamList;
-    ImageSpaceShaderParam* pparam_2 = 0;
+    ImageSpaceShaderParam* pparam_2 = nullptr;
     pEffectParamList.SetAt(0, spParam);
     SetEffectInputs(0, 1, NiTexturingProperty::FILTER_BILERP);
     spParam.m_pObject = nullptr;
     pEffectParamList.SetAt(1u, spParam);
     SetEffectInputs(1, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
-    SetEffect(1, apManager->pEffectList.m_pBase[18], 0, 2);
+    SetEffect(1, apManager->pEffectList.m_pBase[18], nullptr, 2);
     ImageSpaceShaderParam* v11 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
     spParam.m_pObject = v11;
@@ -100,7 +100,7 @@ void ImageSpaceEffectDepthOfField::Setup(ImageSpaceManager* apManager, ImageSpac
     }
     pparam_2->InitConstantMap(0, 3);
     pparam_2->SetPixelConstant(0, 1.0f, 1000.0f, 500.0f, fRenderDepthMaxDepth.uValue.f);
-    pparam_2->bUseTexOffset[2] = 0;
+    pparam_2->bUseTexOffset[2] = false;
     spParam.m_pObject = pparam_2;
     p_pEffectParamList->SetAt(2u, spParam);
     SetEffectInputs(
@@ -115,11 +115,11 @@ void ImageSpaceEffectDepthOfField::Setup(ImageSpaceManager* apManager, ImageSpac
         pparam_3 = ::new (v12) ImageSpaceShaderParam;
     }
     else {
-        pparam_3 = 0;
+        pparam_3 = nullptr;
     }
     pparam_3->InitConstantMap(0, 4);
     pparam_3->SetPixelConstant(0, 1.0f, 1000.0f, 500.0f, fRenderDepthMaxDepth.uValue.f);
-    pparam_3->bUseTexOffset[2] = 0;
+    pparam_3->bUseTexOffset[2] = false;
     spParam.m_pObject = pparam_3;
     p_pEffectParamList->SetAt(3u, spParam);
     SetEffectInputs(
@@ -154,16 +154,16 @@ void ImageSpaceEffectDepthOfField::BorrowTextures(ImageSpaceEffectParam* pParam)
 
 void ImageSpaceEffectDepthOfField::ReturnTextures() {
     pTextures.m_pBase[2]->ReturnRenderedTexture();
-    ImageSpaceTexture* a3 = 0;
+    ImageSpaceTexture* a3 = nullptr;
     pTextures.SetAt(2u, a3);
     pTextures.m_pBase[3]->ReturnRenderedTexture();
-    a3 = 0;
+    a3 = nullptr;
     pTextures.SetAt(3u, a3);
-    a3 = 0;
+    a3 = nullptr;
     pTextures.SetAt(4u, a3);
     if (pTextures.m_pBase[5]) {
         MaskBuffer.ReturnRenderedTexture();
-        a3 = 0;
+        a3 = nullptr;
         pTextures.SetAt(5u, a3);
     }
 }
@@ -219,7 +219,7 @@ bool ImageSpaceEffectDepthOfField::UpdateParams(ImageSpaceEffectParam* apParam) 
         pparam_2->SetPixelConstant(3, v20, v19, fblurconst, 0.0f);
     }
     ImageSpaceEffectBlur::fBlurRadius = 3.0f;
-    return 1;
+    return true;
 }
 
 BSRenderedTexture* ImageSpaceEffectDepthOfField::BorrowMaskTexture() {

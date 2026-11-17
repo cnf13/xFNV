@@ -49,9 +49,9 @@ bool FileFinder::PlatformFindSingleFile(const char* apSearchName) {
 bool FileFinder::PlatformGetFileTime(const char* apFileName, _FILETIME& arFileTime) {
 	const std::vector<platform::FileEntry> kFound = platform::FindFiles(apFileName);
 	if (kFound.empty()) {
-		return 0;
-	}
+        return false;
+    }
 	arFileTime.dwLowDateTime = static_cast<uint32_t>(kFound[0].writeTime);
 	arFileTime.dwHighDateTime = static_cast<uint32_t>(kFound[0].writeTime >> 32);
-	return 1;
+    return true;
 }

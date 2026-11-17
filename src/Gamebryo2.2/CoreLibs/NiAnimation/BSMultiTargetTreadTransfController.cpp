@@ -50,8 +50,8 @@ NiObject* BSMultiTargetTreadTransfController::CreateClone(NiCloningProcess& kClo
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -177,12 +177,12 @@ uint16_t BSMultiTargetTreadTransfController::GetInterpolatorTargetIndex(NiAVObje
     usNumLinks = this->usNumLinks;
     uint16_t result = 0;
     if (!usNumLinks) {
-        return (uint16_t)((-1));
+        return (uint16_t)(-1);
     }
     BSMultiTargetTreadTransfController::LinkAVObj** ppLinks = pLinksA;
     while (static_cast<const void*>(ppLinks[result]->pTarget) != static_cast<const void*>(apTarget)) {
         if (((uint32_t)((int32_t)(++result))) >= ((uint32_t)((int32_t)usNumLinks))) {
-            return (uint16_t)((-1));
+            return (uint16_t)(-1);
         }
     }
     return result;
@@ -192,7 +192,7 @@ void BSMultiTargetTreadTransfController::RemoveNodeRecurse(NiNode* apObject) {
     if (apObject) {
         uint16_t InterpolatorTargetIndex = GetInterpolatorTargetIndex(apObject);
         if (InterpolatorTargetIndex != NiInterpController::INVALID_INDEX) {
-            A35FC0(InterpolatorTargetIndex, 0);
+            A35FC0(InterpolatorTargetIndex, nullptr);
         }
     }
     NiNode* pNode = apObject->IsNode();
@@ -244,11 +244,11 @@ void BSMultiTargetTreadTransfController::AllocateStorage(uint16_t usCount, uint1
                 if (pLink) {
                     pLink->usBlendIdx = 0;
                     pLink->unk02 = 0;
-                    pLink->pTarget = 0;
-                    pLink->pLink = 0;
+                    pLink->pTarget = nullptr;
+                    pLink->pLink = nullptr;
                 }
                 else {
-                    pLink = 0;
+                    pLink = nullptr;
                 }
                 pLinksA[iLink++] = pLink;
                 --iLinksLeft;
@@ -302,7 +302,7 @@ NiObject* BSMultiTargetTreadTransfController::CreateObject() {
         NiMemObject::operator new(sizeof(BSMultiTargetTreadTransfController))
     );
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) BSMultiTargetTreadTransfController;
 }

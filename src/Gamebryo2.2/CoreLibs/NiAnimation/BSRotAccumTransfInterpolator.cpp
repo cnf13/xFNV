@@ -28,7 +28,7 @@ NiObject* BSRotAccumTransfInterpolator::CreateClone(NiCloningProcess& kCloning) 
         ::new (pkObject) BSRotAccumTransfInterpolator;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->PrevKeyRot = PrevKeyRot;
@@ -126,7 +126,7 @@ NiObject* BSRotAccumTransfInterpolator::CreateObject() {
     BSRotAccumTransfInterpolator* pkObject =
         static_cast<BSRotAccumTransfInterpolator*>(NiMemObject::operator new(sizeof(BSRotAccumTransfInterpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) BSRotAccumTransfInterpolator;
 }

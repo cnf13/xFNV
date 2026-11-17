@@ -25,17 +25,15 @@ int32_t hkLineSegmentUtil::closestLineSegLineSeg(
     __m128 m_quad = dA.m_quad;
     __m128 v6 = _mm_sub_ps(B.m_quad, A.m_quad);
     __m128 v7 = _mm_mul_ps(dB.m_quad, dA.m_quad);
-    float v34 = _mm_shuffle_ps(v7, v7, 170)[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+    float v34 = _mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
     __m128 v8 = _mm_mul_ps(dA.m_quad, v6);
-    float v9 = _mm_shuffle_ps(v8, v8, 170)[0] + static_cast<float>(_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
+    float v9 = _mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
     __m128 v10 = _mm_mul_ps(dB.m_quad, v6);
-    float v30 = _mm_shuffle_ps(v10, v10, 170)[0] + static_cast<float>(_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
+    float v30 = _mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
     __m128 v11 = _mm_mul_ps(m_quad, m_quad);
     __m128 v12 = _mm_mul_ps(dB.m_quad, dB.m_quad);
-    float v33 = _mm_shuffle_ps(v11, v11, 170)[0] + static_cast<float>(_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
-    double v13 = static_cast<float>(
-        _mm_shuffle_ps(v12, v12, 170)[0] + static_cast<float>(_mm_shuffle_ps(v12, v12, 85)[0] + v12[0])
-    );
+    float v33 = _mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
+    double v13 = (_mm_shuffle_ps(v12, v12, 170)[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]));
     double v14 = v33 * v13;
     double v15 = v34;
     double v16 = v34 * v34;
@@ -106,8 +104,7 @@ LABEL_18:;
         v24.m_quad, _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v32), _mm_set_ss(v32), 0), dB.m_quad), B.m_quad)
     );
     __m128 v25 = _mm_mul_ps(result.m_closestAminusClosestB.m_quad, result.m_closestAminusClosestB.m_quad);
-    result.m_distanceSquared.m_storage =
-        _mm_shuffle_ps(v25, v25, 170)[0] + static_cast<float>(_mm_shuffle_ps(v25, v25, 85)[0] + v25[0]);
+    result.m_distanceSquared.m_storage = _mm_shuffle_ps(v25, v25, 170)[0] + (_mm_shuffle_ps(v25, v25, 85)[0] + v25[0]);
     return v18;
 }
 
@@ -121,10 +118,9 @@ int32_t hkLineSegmentUtil::closestPointLineSeg(
     __m128 m_quad = a2.m_quad;
     __m128 v5 = _mm_sub_ps(a3.m_quad, a2.m_quad);
     __m128 v6 = _mm_mul_ps(_mm_sub_ps(A.m_quad, a2.m_quad), v5);
-    double v7 =
-        static_cast<float>(_mm_shuffle_ps(v6, v6, 170)[0] + static_cast<float>(_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]));
+    double v7 = (_mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]));
     __m128 v8 = _mm_mul_ps(v5, v5);
-    float v10 = _mm_shuffle_ps(v8, v8, 170)[0] + static_cast<float>(_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
+    float v10 = _mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
     if (!(v7 <= 0.0)) {
         if (!(v10 <= v7)) {
             *reinterpret_cast<float*>(&v11) = v7 / v10;

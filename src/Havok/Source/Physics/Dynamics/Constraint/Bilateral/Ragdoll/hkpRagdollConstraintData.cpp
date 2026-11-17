@@ -248,10 +248,10 @@ hkpRagdollConstraintData::hkpRagdollConstraintData() {
     m_atoms.m_ragdollMotors.m_target_bRca.m_col0.m_quad[0] = 1.0f;
     m_atoms.m_ragdollMotors.m_target_bRca.m_col1.m_quad[1] = 1.0f;
     m_atoms.m_ragdollMotors.m_target_bRca.m_col2.m_quad[2] = 1.0f;
-    m_atoms.m_ragdollMotors.m_motors[0] = 0;
+    m_atoms.m_ragdollMotors.m_motors[0] = nullptr;
     m_atoms.m_twistLimit.m_minAngle = -0.5236f;
-    m_atoms.m_ragdollMotors.m_motors[1] = 0;
-    m_atoms.m_ragdollMotors.m_motors[2] = 0;
+    m_atoms.m_ragdollMotors.m_motors[1] = nullptr;
+    m_atoms.m_ragdollMotors.m_motors[2] = nullptr;
     m_atoms.m_twistLimit.m_maxAngle = 0.5236f;
     m_atoms.m_twistLimit.m_twistAxis = 0;
     m_atoms.m_twistLimit.m_refAxis = 1;
@@ -430,8 +430,8 @@ void hkpRagdollConstraintData::setInBodySpace(
     __m128 v12 = _mm_setzero_ps();
     v12[0] = 0.5f;
     __m128 v13 = _mm_cmpeq_ss(v9, v11);
-    float v14 = 3.0f - static_cast<float>(static_cast<float>(v9[0] * v10) * v10);
-    v12[0] = static_cast<float>(0.5f * v10) * v14;
+    float v14 = 3.0f - ((v9[0] * v10) * v10);
+    v12[0] = (0.5f * v10) * v14;
     __m128 v16 = _mm_andnot_ps(v13, v12);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad =
         _mm_mul_ps(_mm_shuffle_ps(v16, v16, 0), twistAxisA.m_quad);
@@ -442,8 +442,8 @@ void hkpRagdollConstraintData::setInBodySpace(
     __m128 v19 = _mm_shuffle_ps(v18, v18, 170);
     v19[0] = v19[0] + v16[0];
     float v20 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v19[0])));
-    float v22 = 3.0f - static_cast<float>(static_cast<float>(v19[0] * v20) * v20);
-    v12[0] = static_cast<float>(0.5f * v20) * v22;
+    float v22 = 3.0f - ((v19[0] * v20) * v20);
+    v12[0] = (0.5f * v20) * v22;
     __m128 v24 = _mm_andnot_ps(_mm_cmpeq_ss(v19, v11), v12);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v24, v24, 0), v17.m_quad);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad = _mm_sub_ps(
@@ -475,8 +475,8 @@ void hkpRagdollConstraintData::setInBodySpace(
     v26[0] = v26[0] + v24[0];
     float v27 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v26[0])));
     __m128 v28 = _mm_cmpeq_ss(v26, v11);
-    float v29 = 3.0f - static_cast<float>(static_cast<float>(v26[0] * v27) * v27);
-    v12[0] = static_cast<float>(0.5f * v27) * v29;
+    float v29 = 3.0f - ((v26[0] * v27) * v27);
+    v12[0] = (0.5f * v27) * v29;
     __m128 v31 = _mm_andnot_ps(v28, v12);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad =
         _mm_mul_ps(_mm_shuffle_ps(v31, v31, 0), twistAxisB.m_quad);
@@ -487,8 +487,7 @@ void hkpRagdollConstraintData::setInBodySpace(
     __m128 v34 = _mm_shuffle_ps(v33, v33, 170);
     v34[0] = v34[0] + v31[0];
     v31[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v34[0])));
-    v12[0] = static_cast<float>(0.5f * v31[0]) *
-        static_cast<float>(3.0f - static_cast<float>(static_cast<float>(v34[0] * v31[0]) * v31[0]));
+    v12[0] = (0.5f * v31[0]) * (3.0f - ((v34[0] * v31[0]) * v31[0]));
     __m128 v35 = _mm_andnot_ps(_mm_cmpeq_ss(v34, v11), v12);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v35, v35, 0), v32.m_quad);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col2.m_quad = _mm_sub_ps(
@@ -536,7 +535,7 @@ void hkpRagdollConstraintData::setAsymmetricConeAngle(float cone_min, float cone
     v11.setAxisAngle(m_atoms.m_transforms.m_transformB.m_rotation.m_col1, -v10);
     __m128 v5 = _mm_mul_ps(m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad, v11.m_vec.m_quad);
     __m128 v6 = _mm_shuffle_ps(v5, v5, 170);
-    v6[0] = v6[0] + static_cast<float>(_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
+    v6[0] = v6[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
     __m128 v7 = _mm_shuffle_ps(v11.m_vec.m_quad, v11.m_vec.m_quad, 255);
     __m128 v8 = _mm_add_ps(
         _mm_mul_ps(

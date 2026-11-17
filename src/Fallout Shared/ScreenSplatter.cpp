@@ -65,7 +65,7 @@ void ScreenSplatter::Activate(uint32_t auiCount, float afDuration, ScreenSplatte
                 ped = ::new (apMemory) BSSplatterExtraData(splatterData);
             }
             else {
-                ped = 0;
+                ped = nullptr;
             }
             BSSplatterExtraData* v14 = static_cast<BSSplatterExtraData*>(ped);
             pnode->AddExtraData(ped);
@@ -76,7 +76,7 @@ void ScreenSplatter::Activate(uint32_t auiCount, float afDuration, ScreenSplatte
             v5->AttachChild(pnode, 1);
             float* BroadPhaseHandle = &v14->SplatterData.fAlpha;
             BSShaderBloodSplatterProperty::SetFadeSourceRecurse(pnode, BroadPhaseHandle);
-            NiUpdateData UpdateData(0.0f, 0, 0);
+            NiUpdateData UpdateData(0.0f, false, false);
             ScreenSplatter::spRoot.m_pObject->Update(UpdateData);
         }
     }
@@ -91,7 +91,7 @@ void ScreenSplatter::Clear() {
 
 bool ScreenSplatter::IsActiveSplatter() {
     if (!(&ScreenSplatter::spRoot)->operator->()) {
-        return (bool)0;
+        return false;
     }
     NiNode* v1 = (&ScreenSplatter::spRoot)->operator->();
     return (v1->GetChildCount() != 0);
@@ -126,7 +126,7 @@ void ScreenSplatter::Update() {
                         double v2 = FLerp(0.0f, 1.0f, v7, y2, value);
                         splatterData->fAlpha = 1.0 - v2;
                     }
-                    NiUpdateData UpdateData(splatterData->fAge, 1, 0);
+                    NiUpdateData UpdateData(splatterData->fAge, true, false);
                     pchild->Update(UpdateData);
                 }
                 else {
@@ -152,8 +152,8 @@ void ScreenSplatter::Update() {
 void ScreenSplatter::Init() {
     NiPoint3 dst;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_EFFECTS_OVERHEAD, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ScreenSplatter.cpp",
-        181
+        MEM_CONTEXT_EFFECTS_OVERHEAD, true,
+        "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ScreenSplatter.cpp", 181
     );
     ScreenSplatter::bEnabled = bBloodSplatterEnabled.Bool();
     // Tests the whole byte of bEnabled, not its low bit.
@@ -168,17 +168,17 @@ void ScreenSplatter::Init() {
             v5 = ::new (v9) NiCamera;
         }
         else {
-            v5 = 0;
+            v5 = nullptr;
         }
         NiRefObject* v10 = v5;
         ScreenSplatter::spCamera.operator=(v5);
         NiPoint3* v0 = ::new (&dst) NiPoint3(0.0f, 0.0f, 1.00001f);
         ScreenSplatter::spCamera.m_pObject->SetTranslate(*v0);
-        NiUpdateData UpdateData1(0.0f, 0, 0);
+        NiUpdateData UpdateData1(0.0f, false, false);
         ScreenSplatter::spCamera.m_pObject->Update(UpdateData1);
         ScreenSplatter::spCamera.m_pObject->LookAtWorldPoint(NiPoint3_ZERO, NiPoint3_UNIT_Y);
-        NiFrustum frustum(0);
-        frustum.m_bOrtho = 0;
+        NiFrustum frustum(false);
+        frustum.m_bOrtho = false;
         frustum.m_fTop = 0.5f;
         frustum.m_fBottom = -0.5f;
         frustum.m_fLeft = faspectratio * -0.5;
@@ -186,7 +186,7 @@ void ScreenSplatter::Init() {
         frustum.m_fFar = 10000.0f;
         frustum.m_fNear = 1.0f;
         ScreenSplatter::spCamera.m_pObject->SetViewFrustum(frustum);
-        NiUpdateData UpdateData2(0.0f, 0, 0);
+        NiUpdateData UpdateData2(0.0f, false, false);
         ScreenSplatter::spCamera.m_pObject->Update(UpdateData2);
         ScreenSplatter::fWRadius = frustum.m_fRight;
         ScreenSplatter::fHRadius = frustum.m_fTop;
@@ -195,7 +195,7 @@ void ScreenSplatter::Init() {
             v4 = ::new (v7) NiNode(0);
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         ScreenSplatter::spRoot.operator=(v4);
         ScreenSplatter::uiCount = 0;
@@ -213,12 +213,12 @@ void ScreenSplatter::Init() {
 void ScreenSplatter::Shutdown() {
     if (ScreenSplatter::bEnabled) {
         ScreenSplatter::spRoot.m_pObject->RemoveAllChildren();
-        ScreenSplatter::spRoot.operator=(static_cast<NiNode*>(0));
-        ScreenSplatter::spCamera.operator=(static_cast<NiCamera*>(0));
+        ScreenSplatter::spRoot.operator=(static_cast<NiNode*>(nullptr));
+        ScreenSplatter::spCamera.operator=(static_cast<NiCamera*>(nullptr));
     }
-    ScreenSplatter::bEnabled = 0;
+    ScreenSplatter::bEnabled = false;
     for (int32_t i = 0; i < 3; ++i) {
-        ScreenSplatter::spTextures[i].operator=(static_cast<NiTexture*>(0));
+        ScreenSplatter::spTextures[i].operator=(static_cast<NiTexture*>(nullptr));
     }
 }
 
@@ -253,7 +253,7 @@ NiNode* ScreenSplatter::CreateGeometry(uint32_t auiCount) {
         pnode = ::new (apMemory) NiNode(0);
     }
     else {
-        pnode = 0;
+        pnode = nullptr;
     }
     int32_t numObjs = 4 * auiCount;
     void* ptr = ourMalloc(4 * auiCount <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * (4 * auiCount) : SIZE_MAX);
@@ -262,7 +262,7 @@ NiNode* ScreenSplatter::CreateGeometry(uint32_t auiCount) {
         pverticesA = static_cast<NiPoint3*>(ptr);
     }
     else {
-        pverticesA = 0;
+        pverticesA = nullptr;
     }
     int32_t count = 4 * auiCount;
     void* v145 = ourMalloc(4 * auiCount <= SIZE_MAX / sizeof(NiPoint2) ? sizeof(NiPoint2) * (4 * auiCount) : SIZE_MAX);
@@ -271,14 +271,14 @@ NiNode* ScreenSplatter::CreateGeometry(uint32_t auiCount) {
         ptexcoordsA = static_cast<NiPoint2*>(v145);
     }
     else {
-        ptexcoordsA = 0;
+        ptexcoordsA = nullptr;
     }
     uint16_t* v144 = static_cast<uint16_t*>(
         ourMalloc(6 * auiCount <= SIZE_MAX / sizeof(uint16_t) ? sizeof(uint16_t) * (6 * auiCount) : SIZE_MAX)
     );
-    NiPoint3* pflareVerticesA_2 = 0;
-    NiPoint2* pflareTexcoordsA_2 = 0;
-    uint16_t* pflareIndicesA = 0;
+    NiPoint3* pflareVerticesA_2 = nullptr;
+    NiPoint2* pflareTexcoordsA_2 = nullptr;
+    uint16_t* pflareIndicesA = nullptr;
     if (BSShaderManager::bHDR) {
         NiPoint2* pflareTexcoordsA;
         NiPoint3* pflareVerticesA;
@@ -290,7 +290,7 @@ NiNode* ScreenSplatter::CreateGeometry(uint32_t auiCount) {
             pflareVerticesA = static_cast<NiPoint3*>(v141);
         }
         else {
-            pflareVerticesA = 0;
+            pflareVerticesA = nullptr;
         }
         pflareVerticesA_2 = pflareVerticesA;
         int32_t v140 = 4 * auiCount;
@@ -301,7 +301,7 @@ NiNode* ScreenSplatter::CreateGeometry(uint32_t auiCount) {
             pflareTexcoordsA = static_cast<NiPoint2*>(v138);
         }
         else {
-            pflareTexcoordsA = 0;
+            pflareTexcoordsA = nullptr;
         }
         pflareTexcoordsA_2 = pflareTexcoordsA;
         uint16_t* v137 = static_cast<uint16_t*>(
@@ -445,7 +445,7 @@ NiNode* ScreenSplatter::CreateGeometry(uint32_t auiCount) {
         );
     }
     else {
-        pgeom = 0;
+        pgeom = nullptr;
     }
     NiTriShape* pgeom_2 = pgeom;
     BSShaderBloodSplatterProperty* v99 =
@@ -454,7 +454,7 @@ NiNode* ScreenSplatter::CreateGeometry(uint32_t auiCount) {
         pshaderprop = ::new (v99) BSShaderBloodSplatterProperty;
     }
     else {
-        pshaderprop = 0;
+        pshaderprop = nullptr;
     }
     BSShaderBloodSplatterProperty* pshaderprop_2 = pshaderprop;
     NiTexture* BloodSplatterMaxSizec = ScreenSplatter::spTextures[1].m_pObject;
@@ -475,7 +475,7 @@ NiNode* ScreenSplatter::CreateGeometry(uint32_t auiCount) {
             );
         }
         else {
-            pgeom_3 = 0;
+            pgeom_3 = nullptr;
         }
         pgeom_2 = pgeom_3;
         BSShaderBloodSplatterProperty* v97 = static_cast<BSShaderBloodSplatterProperty*>(
@@ -485,7 +485,7 @@ NiNode* ScreenSplatter::CreateGeometry(uint32_t auiCount) {
             pshaderprop_3 = ::new (v97) BSShaderBloodSplatterProperty;
         }
         else {
-            pshaderprop_3 = 0;
+            pshaderprop_3 = nullptr;
         }
         pshaderprop_2 = pshaderprop_3;
         NiTexture* BloodSplatterMaxSizee = ScreenSplatter::spTextures[2].m_pObject;
@@ -510,7 +510,7 @@ void BSSplatterExtraData::InitTag() {
     NiFixedString* v0;
     void* v1 = ourMalloc(sizeof(NiFixedString));
     if (v1) {
-        v0 = ::new (static_cast<void*>(v1)) NiFixedString(const_cast<char*>("SPD"));
+        v0 = ::new (v1) NiFixedString(const_cast<char*>("SPD"));
     }
     else {
         v0 = nullptr;
@@ -522,5 +522,5 @@ void BSSplatterExtraData::KillSDM() {
     if (BSSplatterExtraData::pTag) {
         delete BSSplatterExtraData::pTag;
     }
-    BSSplatterExtraData::pTag = 0;
+    BSSplatterExtraData::pTag = nullptr;
 }

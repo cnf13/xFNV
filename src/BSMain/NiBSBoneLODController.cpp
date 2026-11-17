@@ -346,7 +346,7 @@ bool NiBSBoneLODController::InitializeData(NiNode* pkBoneRoot) {
     uint32_t uiCurrentLOD = 0;
     BuildBoneMap(pkBoneRoot, kBoneToLOD, uiCurrentLOD);
     SetBoneLOD(-1);
-    return 1;
+    return true;
 }
 
 void NiBSBoneLODController::CollectMarkedBones(
@@ -364,16 +364,16 @@ void NiBSBoneLODController::CollectMarkedBones(
             bool bIsStringExtraData;
             for (const NiRTTI* j = pExtraData->GetRTTI(); j; j = j->GetBaseRTTI()) {
                 if (j == &NiStringExtraData::ms_RTTI) {
-                    bIsStringExtraData = 1;
+                    bIsStringExtraData = true;
                     goto LABEL_11;
                 }
             }
-            bIsStringExtraData = 0;
+            bIsStringExtraData = false;
         LABEL_11:;
-            pStringExtraData = bIsStringExtraData ? static_cast<NiStringExtraData*>(pExtraData) : 0;
+            pStringExtraData = bIsStringExtraData ? static_cast<NiStringExtraData*>(pExtraData) : nullptr;
         }
         else {
-            pStringExtraData = 0;
+            pStringExtraData = nullptr;
         }
         if (pStringExtraData) {
             const char* pcString = pStringExtraData->m_kString.GetHandle();
@@ -385,14 +385,14 @@ void NiBSBoneLODController::CollectMarkedBones(
                     char* String = strtok_s(pcDest, "#", &Context);
                     if (String) {
                         if (!std::strcmp(String, "BSBoneLOD")) {
-                            char* Stringa = strtok_s(0, "#", &Context);
+                            char* Stringa = strtok_s(nullptr, "#", &Context);
                             if (Stringa) {
                                 if (!std::strcmp(Stringa, "Bone")) {
-                                    char* pcLOD = strtok_s(0, "#", &Context);
+                                    char* pcLOD = strtok_s(nullptr, "#", &Context);
                                     if (pcLOD) {
                                         uint32_t uiLOD = std::atoi(pcLOD);
                                         kBoneToLOD.SetAt(pkBone, uiLOD);
-                                        kUsedLODs.SetAt(uiLOD, 1);
+                                        kUsedLODs.SetAt(uiLOD, true);
                                     }
                                 }
                             }
@@ -454,12 +454,12 @@ bool NiBSBoneLODController::GetHasBones() {
                 }
                 NiTPrimitiveSet<NiNode*>* v2 = m_kBoneArray.m_pBase[i];
                 if (v5->m_pBase[j]) {
-                    return 1;
+                    return true;
                 }
             }
         }
     }
-    return 0;
+    return false;
 }
 
 NiObject* NiBSBoneLODController::CreateObject() {
@@ -487,22 +487,22 @@ bool NiBSBoneLODController::ProcessScene(NiNode* pkSceneRoot) {
                 pkCtlr = ::new (apMemory) NiBSBoneLODController;
             }
             else {
-                pkCtlr = 0;
+                pkCtlr = nullptr;
             }
             pkCtlr->SetTarget(pkBoneRoot);
             if (!pkCtlr->InitializeData(pkBoneRoot)) {
                 pkBoneRoot->RemoveController(pkCtlr);
                 _NiFree(kBoneRootNodes.m_pBase);
-                return 0;
+                return false;
             }
             pkCtlr->SetBoneLOD(0);
         }
         _NiFree(kBoneRootNodes.m_pBase);
-        return 1;
+        return true;
     }
     else {
         _NiFree(kBoneRootNodes.m_pBase);
-        return 0;
+        return false;
     }
 }
 
@@ -516,16 +516,16 @@ void NiBSBoneLODController::FindBoneRootNodes(NiNode* pkNode, NiTPrimitiveSet<Ni
             bool v2;
             for (const NiRTTI* j = pkExtra->GetRTTI(); j; j = j->GetBaseRTTI()) {
                 if (j == &NiStringExtraData::ms_RTTI) {
-                    v2 = 1;
+                    v2 = true;
                     goto LABEL_11;
                 }
             }
-            v2 = 0;
+            v2 = false;
         LABEL_11:;
-            pkStringExtra = v2 ? pkExtra : 0;
+            pkStringExtra = v2 ? pkExtra : nullptr;
         }
         else {
-            pkStringExtra = 0;
+            pkStringExtra = nullptr;
         }
         if (pkStringExtra) {
             const char* pcString = pkStringExtra->m_kString.GetHandle();

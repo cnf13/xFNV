@@ -14,8 +14,8 @@ T* hkAddByteOffset(T* base, int32_t offset);
 class hkBool {
 public:
     // The two return types whose sizes tell hkIsPodType's test apart (hkTypeTraits.h).
-    typedef char CompileTimeTrueType;
-    typedef int32_t CompileTimeFalseType;
+    using CompileTimeTrueType = char;
+    using CompileTimeFalseType = int32_t;
 
     hkBool() = default;
     constexpr hkBool(bool abValue) : m_bool(abValue) {}
@@ -36,7 +36,7 @@ public:
 // plain-data elements, hkTraitBool<0> for classes. An empty tag passed by value.
 template <bool N>
 struct hkTraitBool {
-    typedef hkTraitBool<N> type;
+    using type = hkTraitBool<N>;
 
     enum { result = N };
 };

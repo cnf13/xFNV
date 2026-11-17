@@ -35,7 +35,7 @@ bool NiOBBRoot::TestCollision(
     int32_t iTestMaxDepth
 ) {
     if (this == pTestRoot) {
-        return (bool)0;
+        return false;
     }
     else {
         return (bool)((int32_t)m_pTree->TestCollision(

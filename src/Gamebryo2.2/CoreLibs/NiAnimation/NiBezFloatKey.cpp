@@ -17,7 +17,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // Clears the slot's curvature and derivative entries before it sets the guard, then stores its own functions'
 // addresses.
@@ -59,7 +59,7 @@ NiAnimationKey* NiBezFloatKey::CreateFromStream(NiStream& stream, uint32_t uiNum
         pkBezKeys = reinterpret_cast<NiBezFloatKey*>(puiCookie + 1);
     }
     else {
-        pkBezKeys = 0;
+        pkBezKeys = nullptr;
     }
     for (uint32_t ui = 0; ui < uiNumKeys; ++ui) {
         // EXE-INLINED none: NiBezFloatKey::LoadBinary
@@ -96,13 +96,12 @@ void NiBezFloatKey::Interpolate(
 NiAnimationKey* NiBezFloatKey::CreateArray(uint32_t uiNumKeys) {
     size_t v1 = uiNumKeys <= SIZE_MAX / sizeof(NiBezFloatKey) ? sizeof(NiBezFloatKey) * uiNumKeys : SIZE_MAX;
     size_t* v2 = static_cast<size_t*>(MemoryManager_Singleton.Allocate(
-        (static_cast<uint32_t>(static_cast<uint32_t>(v1) + static_cast<uint32_t>(sizeof(size_t))) <
-         static_cast<uint32_t>(v1))
+        ((static_cast<uint32_t>(v1) + static_cast<uint32_t>(sizeof(size_t))) < static_cast<uint32_t>(v1))
             ? -1
             : v1 + sizeof(size_t)
     ));
     if (!v2) {
-        return 0;
+        return nullptr;
     }
     *v2 = uiNumKeys;
     return reinterpret_cast<NiAnimationKey*>(v2 + 1);

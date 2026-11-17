@@ -86,15 +86,15 @@ void ValueAndConditionsEffect::ModifyActorValue(
     int32_t i;
     float v6;
     float v7;
-    if (((int32_t)eTargetBodyPart) == ((-1))) {
+    if (((int32_t)eTargetBodyPart) == (-1)) {
         ValueModifierEffect::ModifyActorValue(apActor, afModifier, static_cast<ActorValue::Index>(-1));
-        v6 = afModifier * ((&fMagicVACNoPartTargetedMult)->Float());
+        v6 = afModifier * (&fMagicVACNoPartTargetedMult)->Float();
         for (i = 25; i < 32; ++i) {
             ValueModifierEffect::ModifyActorValue(apActor, v6, static_cast<ActorValue::Index>(i));
         }
     }
     else {
-        v7 = afModifier * ((&fMagicVACPartTargetedMult)->Float());
+        v7 = afModifier * (&fMagicVACPartTargetedMult)->Float();
         ValueModifierEffect::ModifyActorValue(apActor, afModifier, eTargetBodyPart);
         ValueModifierEffect::ModifyActorValue(apActor, v7, static_cast<ActorValue::Index>(-1));
     }
@@ -110,6 +110,6 @@ ActiveEffect* ValueAndConditionsEffect::Create(MagicCaster* apCaster, MagicItem*
         return ::new (v5) ValueAndConditionsEffect(apCaster, apItem, apEffect);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

@@ -119,12 +119,12 @@ bool TESRegionDataLandscape::Validate() {
 
 bool TESRegionDataLandscape::LoadRegionDataLandscape(TESFile* apFile) {
     if (!apFile) {
-        return (bool)0;
+        return false;
     }
     if (apFile->GetTESChunk() == 1313817417) {
         TESTexture::LoadTextureChunk(pCanopyShadowTexture, apFile);
     }
-    return (bool)1;
+    return true;
 }
 
 void TESRegionDataLandscape::GetCanopyShadowTexture(BSStringT<char>* a1) const {
@@ -140,10 +140,10 @@ bool TESRegionDataLandscape::SetCanopyShadowTexture(BSStringT<char>* a1) {
     if (!pCanopyShadowTexture ||
         (pCanopyShadowTexture->GetTextureNameLength() &&
          !BSstricmp(pCanopyShadowTexture->GetTextureName(), a1->pString))) {
-        return 0;
+        return false;
     }
     pCanopyShadowTexture->SetTextureName(a1->pString);
-    return 1;
+    return true;
 }
 
 NiTexturingProperty* TESRegionDataLandscape::GetDefaultFullMaskTextureProp() {
@@ -160,7 +160,7 @@ NiTexturingProperty* TESRegionDataLandscape::GetDefaultFullMaskTextureProp() {
         ppixeldata = ::new (apMemory) NiPixelData(64u, 64u, NiPixelFormat_RGBA32, 1u, 1u);
     }
     else {
-        ppixeldata = 0;
+        ppixeldata = nullptr;
     }
     uint8_t* ppixels = ppixeldata->GetPixels(0u, 0u);
     for (uint32_t iy = 0; iy < 64; ++iy) {
@@ -181,7 +181,7 @@ NiTexturingProperty* TESRegionDataLandscape::GetDefaultFullMaskTextureProp() {
         v1 = ::new (v6) NiTexturingProperty(ppixeldata, *kName, myPrefs);
     }
     else {
-        v1 = 0;
+        v1 = nullptr;
     }
     NiRefObject* v7 = v1;
     TESRegionDataLandscape::spDefaultFullMaskTextureProp.operator=(v1);

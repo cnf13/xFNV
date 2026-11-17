@@ -71,9 +71,9 @@ NiColor& NiColor::operator+=(const NiColor& c) {
 
 NiColor* NiColor::Add(NiColor* a2, NiColor* a3) {
     NiColor v4;
-    v4.r = (float)(r + a3->r);
-    v4.g = (float)(g + a3->g);
-    v4.b = (float)(b + a3->b);
+    v4.r = (r + a3->r);
+    v4.g = (g + a3->g);
+    v4.b = (b + a3->b);
     *a2 = v4;
     return a2;
 }
@@ -120,10 +120,10 @@ NiColorA& NiColorA::Scale(float afScale) {
 
 NiColorA* NiColorA::Divide(NiColorA* a2, float a3) {
     NiColorA v4;
-    v4.r = (float)(r / a3);
-    v4.g = (float)(g / a3);
-    v4.b = (float)(b / a3);
-    v4.a = (float)(a / a3);
+    v4.r = (r / a3);
+    v4.g = (g / a3);
+    v4.b = (b / a3);
+    v4.a = (a / a3);
     *a2 = v4;
     return a2;
 }

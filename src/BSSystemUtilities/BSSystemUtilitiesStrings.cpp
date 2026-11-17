@@ -20,7 +20,7 @@ void BSSystemUtilitiesStrings::Destroy() {
     for (uint32_t i = 0; i < 8; ++i) {
         if (pcStrings[i]) {
             MemoryManager_Singleton.Deallocate(pcStrings[i]);
-            pcStrings[i] = 0;
+            pcStrings[i] = nullptr;
         }
     }
 }
@@ -28,7 +28,7 @@ void BSSystemUtilitiesStrings::Destroy() {
 void BSSystemUtilitiesStrings::SetString(BSSystemUtilitiesStrings::STRING aeType, const char* apcString) {
     if (pcStrings[aeType]) {
         MemoryManager_Singleton.Deallocate(pcStrings[aeType]);
-        pcStrings[aeType] = 0;
+        pcStrings[aeType] = nullptr;
     }
     if (apcString) {
         size_t Size = std::strlen(apcString) + 1;

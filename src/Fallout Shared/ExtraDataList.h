@@ -103,7 +103,7 @@ class NiTMap;
 // The calling thread's id (GetCurrentThreadId).
 uint32_t BSGetCurrentThreadID();
 
-typedef struct _D3DLOCKED_RECT D3DLOCKED_RECT;
+using D3DLOCKED_RECT = struct _D3DLOCKED_RECT;
 
 // The action bits a reference's ExtraAction holds.
 enum OBJECT_ACTION : int32_t {

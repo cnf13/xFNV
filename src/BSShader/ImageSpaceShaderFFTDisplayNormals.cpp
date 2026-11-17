@@ -23,7 +23,7 @@ void ImageSpaceShaderFFTDisplayNormals::ReloadShaders() {
     v3.strPath = "water\\2_ab\\p\\waterhmap.p.hlsl";
     v3.kMacros[0].Name = "DISPLAY_NORMALS";
     std::memset(&v3.kMacros[0].Definition, 0, sizeof(v3) - offsetof(BSShaderMacro, kMacros[0].Definition));
-    const char* PSTarget = BSShaderManager::GetPSTarget(1);
+    const char* PSTarget = BSShaderManager::GetPSTarget(true);
     LoadShaders(v4, v3, "FFTDISPLAYNORMALS", ShaderTarget_vs_1_1, PSTarget);
     LoadStagesAndPasses();
 }

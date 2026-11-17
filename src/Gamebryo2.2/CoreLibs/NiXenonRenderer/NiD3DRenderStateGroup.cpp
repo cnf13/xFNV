@@ -13,7 +13,7 @@
 #include "Reconstruction.hpp"
 #include "SDK/MSVC/ehvec.h"
 
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 // new NiD3DRenderStateGroup[auiCount]. The overflow guards turn a size that overflows into 0xFFFFFFFF, so the
@@ -98,7 +98,7 @@ NiD3DRenderStateGroup::~NiD3DRenderStateGroup() {
 
 void NiD3DRenderStateGroup::SetRenderState(uint32_t uiRenderState, uint32_t uiValue, bool bSave) {
     bool bInSave;
-    bInSave = 0;
+    bInSave = false;
     NiD3DRenderStateGroup::NiD3DRSEntry* pkRSEntry = FindRenderStateEntry(uiRenderState, bInSave);
     if (pkRSEntry) {
         bool v6 = bInSave;
@@ -111,7 +111,7 @@ void NiD3DRenderStateGroup::SetRenderState(uint32_t uiRenderState, uint32_t uiVa
                     m_pkRenderStates->m_pkPrev = pkRSEntry;
                     pkRSEntry->m_pkNext = this->m_pkRenderStates;
                 }
-                pkRSEntry->m_pkPrev = 0;
+                pkRSEntry->m_pkPrev = nullptr;
                 ++m_uiStateCount;
                 this->m_pkRenderStates = pkRSEntry;
             }
@@ -122,7 +122,7 @@ void NiD3DRenderStateGroup::SetRenderState(uint32_t uiRenderState, uint32_t uiVa
                     m_pkSavedRenderStates->m_pkPrev = pkRSEntry;
                     pkRSEntry->m_pkNext = this->m_pkSavedRenderStates;
                 }
-                pkRSEntry->m_pkPrev = 0;
+                pkRSEntry->m_pkPrev = nullptr;
                 ++m_uiSavedStateCount;
                 this->m_pkSavedRenderStates = pkRSEntry;
             }
@@ -142,8 +142,8 @@ void NiD3DRenderStateGroup::SetRenderState(uint32_t uiRenderState, uint32_t uiVa
         NiD3DRenderStateGroup::NiD3DRSEntry** m_pBase = v10->m_kFreeObjects.m_pBase;
         NiD3DRenderStateGroup::NiD3DRSEntry* v13 = *v10->m_kFreeObjects.m_pBase;
         *m_pBase = m_pBase[--*p_m_uiUsed];
-        v13->m_pkNext = 0;
-        v13->m_pkPrev = 0;
+        v13->m_pkNext = nullptr;
+        v13->m_pkPrev = nullptr;
         v13->m_uiRenderState = uiRenderState;
         v13->m_uiValue = uiValue;
         if (bSave) {
@@ -152,7 +152,7 @@ void NiD3DRenderStateGroup::SetRenderState(uint32_t uiRenderState, uint32_t uiVa
                 v14->m_pkPrev = v13;
                 v13->m_pkNext = this->m_pkSavedRenderStates;
             }
-            v13->m_pkPrev = 0;
+            v13->m_pkPrev = nullptr;
             ++m_uiSavedStateCount;
             this->m_pkSavedRenderStates = v13;
         }
@@ -162,7 +162,7 @@ void NiD3DRenderStateGroup::SetRenderState(uint32_t uiRenderState, uint32_t uiVa
                 v15->m_pkPrev = v13;
                 v13->m_pkNext = this->m_pkRenderStates;
             }
-            v13->m_pkPrev = 0;
+            v13->m_pkPrev = nullptr;
             ++m_uiStateCount;
             this->m_pkRenderStates = v13;
         }
@@ -236,7 +236,7 @@ NiD3DRenderStateGroup::NiD3DRSEntry* NiD3DRenderStateGroup::FindRenderStateEntry
                 goto LABEL_4;
             }
         }
-        bInSaveList = 0;
+        bInSaveList = false;
     }
     else {
     LABEL_4:;
@@ -245,13 +245,13 @@ NiD3DRenderStateGroup::NiD3DRSEntry* NiD3DRenderStateGroup::FindRenderStateEntry
             while (result->GetRenderState() != uiState) {
                 result = result->GetNext();
                 if (!result) {
-                    return 0;
+                    return nullptr;
                 }
             }
-            bInSaveList = 1;
+            bInSaveList = true;
         }
         else {
-            return 0;
+            return nullptr;
         }
     }
     return result;
@@ -260,7 +260,7 @@ NiD3DRenderStateGroup::NiD3DRSEntry* NiD3DRenderStateGroup::FindRenderStateEntry
 void NiD3DRenderStateGroup::RemoveRenderState(uint32_t uiRenderState) {
     bool bInSave;
     NiD3DRenderStateGroup::NiD3DRSEntry* v7;
-    bInSave = 0;
+    bInSave = false;
     NiD3DRenderStateGroup::NiD3DRSEntry* pkRSEntry = FindRenderStateEntry(uiRenderState, bInSave);
     if (pkRSEntry) {
         NiD3DRenderStateGroup::NiD3DRSEntry* m_pkNext = pkRSEntry->GetNext();
@@ -289,8 +289,8 @@ void NiD3DRenderStateGroup::RemoveRenderState(uint32_t uiRenderState) {
             }
             --m_uiStateCount;
         }
-        pkRSEntry->m_pkPrev = 0;
-        pkRSEntry->m_pkNext = 0;
+        pkRSEntry->m_pkPrev = nullptr;
+        pkRSEntry->m_pkNext = nullptr;
         v7 = pkRSEntry;
         NiD3DRenderStateGroup::ms_pkRenderStateEntryPool->ReleaseObject(v7);
     }
@@ -324,7 +324,7 @@ void NiD3DRenderStateGroup::ReleaseRenderStateGroup(NiD3DRenderStateGroup* pkGro
                 NiD3DRenderStateGroup::ms_pkRenderStateEntryPool->ReleaseObject(pkEntry);
                 pkEntry = pkNext;
             }
-            pkGroup->m_pkRenderStates = 0;
+            pkGroup->m_pkRenderStates = nullptr;
             pkGroup->m_uiStateCount = 0;
             pkEntry = pkGroup->m_pkSavedRenderStates;
             while (pkEntry) {
@@ -332,7 +332,7 @@ void NiD3DRenderStateGroup::ReleaseRenderStateGroup(NiD3DRenderStateGroup* pkGro
                 NiD3DRenderStateGroup::ms_pkRenderStateEntryPool->ReleaseObject(pkEntry);
                 pkEntry = pkNext;
             }
-            pkGroup->m_pkSavedRenderStates = 0;
+            pkGroup->m_pkSavedRenderStates = nullptr;
             pkGroup->m_uiSavedStateCount = 0;
             NiD3DRenderStateGroup::ms_pkRenderStateGroupPool->ReleaseObject(pkGroup);
         }
@@ -358,31 +358,31 @@ void NiD3DRenderStateGroup::InitializePools() {
         MemoryManager_Singleton.Allocate(sizeof(NiD3DRenderStateGroup::RSGroupPool))
     );
     if (v0) {
-        v0->m_kFreeObjects.m_pBase = 0;
+        v0->m_kFreeObjects.m_pBase = nullptr;
         v0->m_kFreeObjects.m_uiAlloced = 0;
         v0->m_kFreeObjects.m_uiUsed = 0;
-        v0->m_pkContainers = 0;
+        v0->m_pkContainers = nullptr;
         v0->m_uiCurrentSize = 8;
         v0->m_uiInitialSize = 8;
         NiD3DRenderStateGroup::ms_pkRenderStateGroupPool = v0;
     }
     else {
-        NiD3DRenderStateGroup::ms_pkRenderStateGroupPool = 0;
+        NiD3DRenderStateGroup::ms_pkRenderStateGroupPool = nullptr;
     }
     NiD3DRenderStateGroup::RSEntryPool* v1 = static_cast<NiD3DRenderStateGroup::RSEntryPool*>(
         MemoryManager_Singleton.Allocate(sizeof(NiD3DRenderStateGroup::RSEntryPool))
     );
     if (v1) {
-        v1->m_kFreeObjects.m_pBase = 0;
+        v1->m_kFreeObjects.m_pBase = nullptr;
         v1->m_kFreeObjects.m_uiAlloced = 0;
         v1->m_kFreeObjects.m_uiUsed = 0;
-        v1->m_pkContainers = 0;
+        v1->m_pkContainers = nullptr;
         v1->m_uiCurrentSize = 16;
         v1->m_uiInitialSize = 16;
         NiD3DRenderStateGroup::ms_pkRenderStateEntryPool = v1;
     }
     else {
-        NiD3DRenderStateGroup::ms_pkRenderStateEntryPool = 0;
+        NiD3DRenderStateGroup::ms_pkRenderStateEntryPool = nullptr;
     }
 }
 

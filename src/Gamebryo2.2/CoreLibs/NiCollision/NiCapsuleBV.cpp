@@ -88,7 +88,7 @@ void NiCapsuleBV::UpdateWorldData(const NiBoundingVolume& kModelABV, const NiTra
 NiBoundingVolume* NiCapsuleBV::Create() const {
     NiCapsuleBV* v1 = static_cast<NiCapsuleBV*>(MemoryManager_Singleton.Allocate(sizeof(NiCapsuleBV)));
     if (!v1) {
-        return 0;
+        return nullptr;
     }
     return ::new (v1) NiCapsuleBV(1.0f, 1.0f, NiPoint3_ZERO, NiPoint3_UNIT_X);
 }
@@ -552,9 +552,9 @@ bool NiCapsuleBV::CapsuleTriFindIntersect(
             v78.y = -kNormal1.y;
             v78.z = -kNormal1.z;
             kNormal0 = v78;
-            return 1;
+            return true;
         }
-        return 1;
+        return true;
     }
     kSurfacePt_2.x = kV0.x - kV1.x;
     double v34 = kV0.y;
@@ -566,7 +566,7 @@ bool NiCapsuleBV::CapsuleTriFindIntersect(
     v70.z = kSurfacePt_2.z;
     result.x = kSurfacePt_2.x * kSurfacePt_2.x + kSurfacePt_2.y * kSurfacePt_2.y + kSurfacePt_2.z * kSurfacePt_2.z;
     if (result.x * fTime <= 9.999999747378752e-06) {
-        return 0;
+        return false;
     }
     result.x = kTri.m_kEdge0.y * kTri.m_kEdge1.z - kTri.m_kEdge0.z * kTri.m_kEdge1.y;
     result.y = kTri.m_kEdge0.z * kTri.m_kEdge1.x - kTri.m_kEdge1.z * kTri.m_kEdge0.x;
@@ -606,11 +606,11 @@ bool NiCapsuleBV::CapsuleTriFindIntersect(
             kSurfacePt_2 = *::new (&result) NiPoint3(static_cast<const NiCapsuleBV*>(&kABV0)->m_kCenter + *v44);
             goto LABEL_14;
         }
-        return 0;
+        return false;
     }
     v61 = v42;
     if (v61 >= 0.0f) {
-        return 0;
+        return false;
     }
     v43 = ::new (&kSurfacePt) NiPoint3(v66 * kTriNormal);
     kSurfacePt_2 = *::new (&result) NiPoint3(static_cast<const NiCapsuleBV*>(&kABV0)->m_kCenter - *v43);
@@ -625,7 +625,7 @@ LABEL_14:;
         kSurfacePt.z = v45->z + kSurfacePt_2.z;
         double v46 = kTriNormal.Dot(kSurfacePt);
         if (v46 > fLimit) {
-            return 0;
+            return false;
         }
     }
 LABEL_16:;
@@ -636,7 +636,7 @@ LABEL_16:;
     fIntrTime = kIntersector.GetContactTime();
     if (kIntersector.m_eIntersectionType != NiIntersector::IT_OVERLAP &&
         kIntersector.m_eIntersectionType != NiIntersector::IT_CONTACT) {
-        return 0;
+        return false;
     }
     kIntrPt = kIntersector.GetContactPoint();
     if (bCalcNormals) {
@@ -647,5 +647,5 @@ LABEL_16:;
         kSurfacePt_2.z = -kNormal0.z;
         kNormal1 = kSurfacePt_2;
     }
-    return 1;
+    return true;
 }

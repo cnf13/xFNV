@@ -54,10 +54,10 @@ void CombatProcedureAttackGrenade::Update() {
             }
         }
         if (!bTargetLocation && eState == CombatProcedureAttackGrenade::ATTACK_STATE_IDLE) {
-            bHighArc = 0;
+            bHighArc = false;
         }
         if (pcombatState->GetHasBufferedDetection() && !pcombatState->bTargetSpaceDifferent) {
-            pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, 0, 0);
+            pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, 0, false);
             TargetedPoint = *CalculateTargetedPoint(&a1);
             float fminRange = 0.0f;
             float fmaxRange = 0.0f;
@@ -86,10 +86,10 @@ void CombatProcedureAttackGrenade::Update() {
                             BGSProjectile* pprojectile_2 = pweapon->GetProjectile(pattacker);
                             if (bTargetLocation ||
                                 CombatUtilities::CalculateGrenadeThrow_(
-                                    pattacker, ptarget, pprojectile_2, 0, &bHighArc, &TargetedPoint, -1.0f
+                                    pattacker, ptarget, pprojectile_2, nullptr, &bHighArc, &TargetedPoint, -1.0f
                                 )) {
                                 if (pexplosion) {
-                                    pcombatState->pExplosiveProjectileBlocked = 0;
+                                    pcombatState->pExplosiveProjectileBlocked = nullptr;
                                     ExplosiveProjectileBlockedTimer.Clear();
                                 }
                                 BaseProcess* v3 = pattacker->pCurrentProcess;
@@ -98,7 +98,7 @@ void CombatProcedureAttackGrenade::Update() {
                                 eState = CombatProcedureAttackGrenade::ATTACK_STATE_ATTACKING;
                                 if (pexplosion) {
                                     if (CombatUtilities::IsDangerousExplosion(pexplosion)) {
-                                        pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, 4, 1);
+                                        pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, 4, true);
                                     }
                                 }
                             }
@@ -163,14 +163,14 @@ bool CombatProcedureAttackGrenade::GetTargetedPoint(NiPoint3& arTargetedPoint, N
     TESObjectWEAP* pweapon = pCombatController->GetCurrentWeapon();
     BGSProjectile* pprojectile = pweapon->GetProjectile(pattacker);
     BGSExplosion* pexplosion = pprojectile->GetExplosion();
-    bool barcValid = 0;
+    bool barcValid = false;
     if (bTargetLocation) {
         if (CombatUtilities::CheckProjectileArc(
                 pattacker, ptarget, pprojectile, arReleasePoint, TargetLocation, NiPoint3_ZERO, bHighArc, TargetedPoint,
                 -1.0f
             )) {
             arTargetedPoint = TargetedPoint;
-            barcValid = 1;
+            barcValid = true;
         }
     }
     else {
@@ -181,7 +181,7 @@ bool CombatProcedureAttackGrenade::GetTargetedPoint(NiPoint3& arTargetedPoint, N
                 pattacker_2, Target, Projectile_, &arReleasePoint, &bHighArc, &TargetedPoint, -1.0f
             )) {
             arTargetedPoint = TargetedPoint;
-            barcValid = 1;
+            barcValid = true;
         }
     }
     if (barcValid) {
@@ -197,12 +197,12 @@ bool CombatProcedureAttackGrenade::GetTargetedPoint(NiPoint3& arTargetedPoint, N
             float ftime =
                 CombatUtilities::ComputeProjectileTime_(pprojectile, arReleasePoint, hitLocation, bHighArc, 0.0f);
             if (!CheckExplosion(pexplosion, hitLocation, ftime)) {
-                barcValid = 0;
+                barcValid = false;
             }
         }
     }
     if (!barcValid && bTargetLocation) {
-        pCombatController->pCombatState->SetTargetFlushed(1);
+        pCombatController->pCombatState->SetTargetFlushed(true);
         SetFinished();
     }
     return barcValid;
@@ -213,9 +213,9 @@ void CombatProcedureAttackGrenade::FiredProjectile(Projectile* apProjectile) {
         float* v2 = &gs_fGrenadeHighArcSpeedPercentage.Float();
         apProjectile->SetSpeedMult(*v2);
     }
-    bHighArc = 0;
+    bHighArc = false;
     if (bTargetLocation) {
-        pCombatController->pCombatState->SetTargetFlushed(1);
+        pCombatController->pCombatState->SetTargetFlushed(true);
         SetFinished();
     }
 }
@@ -254,7 +254,7 @@ bool CombatProcedureAttackGrenade::CheckExplosion(BGSExplosion* apExplosion, con
     Actor* pattacker = pCombatController->pAttacker;
     CombatState* pcombatState = pCombatController->pCombatState;
     if (pCombatManager->CheckExplosionAttack(pattacker, apExplosion, arLocation, afTime)) {
-        return 1;
+        return true;
     }
     if (ExplosiveProjectileBlockedTimer.IsSet()) {
         if (ExplosiveProjectileBlockedTimer.Check()) {
@@ -266,10 +266,10 @@ bool CombatProcedureAttackGrenade::CheckExplosion(BGSExplosion* apExplosion, con
         ExplosiveProjectileBlockedTimer.Reset(*v4);
     }
     if (bTargetLocation) {
-        pcombatState->SetTargetFlushed(1);
+        pcombatState->SetTargetFlushed(true);
         SetFinished();
     }
-    return 0;
+    return false;
 }
 
 NiPoint3* CombatProcedureAttackGrenade::CalculateTargetedPoint(NiPoint3* a1) {
@@ -292,7 +292,7 @@ NiPoint3* CombatProcedureAttackGrenade::CalculateTargetedPoint(NiPoint3* a1) {
         if (bTargetLocation) {
             Actor* v6 = GetAttacker();
             ProjectedPointForTarget = CombatUtilities::GetProjectedPointForTarget(
-                &v11, v6, TargetLocation, 0, apProjectile, afProjectileSpeed, bHighArc
+                &v11, v6, TargetLocation, nullptr, apProjectile, afProjectileSpeed, bHighArc
             );
         }
         else {
@@ -300,7 +300,7 @@ NiPoint3* CombatProcedureAttackGrenade::CalculateTargetedPoint(NiPoint3* a1) {
             Actor* v4 = GetAttacker();
             ProjectedPointForTarget =
                 &(arResult = CombatUtilities::GetProjectedPointForTarget(
-                      v4, Target, 0, apProjectile, afProjectileSpeed, bHighArc
+                      v4, Target, nullptr, apProjectile, afProjectileSpeed, bHighArc
                   ));
         }
         NiPoint3 ecx0 = *ProjectedPointForTarget;

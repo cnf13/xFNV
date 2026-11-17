@@ -30,14 +30,14 @@ void PatrolActorPackageData::HandleDeletedReference(TESObjectREFR* apDeletedObj)
     if (apDeletedObj == pActor) {
         ClearReservedPatrolRef();
         eState = PATROL_STATE_DEBUG_ACTOR_DELETED;
-        pActor = 0;
-        pPackage = 0;
-        pPackageData = 0;
+        pActor = nullptr;
+        pPackage = nullptr;
+        pPackageData = nullptr;
     }
     else {
         for (uint32_t a3 = 0; a3 < References.iSize; ++a3) {
             if (*static_cast<TESObjectREFR**>(&References.GetAt(a3)) == apDeletedObj) {
-                References.Remove(a3, 1);
+                References.Remove(a3, true);
                 if (iCurrentReference >= a3) {
                     --iCurrentReference;
                 }
@@ -90,7 +90,7 @@ void PatrolActorPackageData::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     TESForm* FormByNumericID = TESForm::GetFormByNumericID(FormID_0);
     pPackage = dynamic_cast<TESPackage*>(FormByNumericID);
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
-    References.SetSize(isaveGameCount, 1);
+    References.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         // Each slot holds the reference's form ID until InitLoadGame resolves it.
         apLoadGameBuffer->LoadFormID(References.operator[](i));
@@ -101,7 +101,7 @@ void PatrolActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     uint32_t isaveGameCount = References.iSize;
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         TESObjectREFR* pResolved;
-        bool bremove = 0;
+        bool bremove = false;
         TESObjectREFR** ppatrolRef = &References.operator[](i);
         // The slot holds the form ID LoadGame read into it.
         if (*ppatrolRef) {
@@ -109,15 +109,15 @@ void PatrolActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             pResolved = dynamic_cast<TESObjectREFR*>(FormByNumericID);
         }
         else {
-            pResolved = 0;
+            pResolved = nullptr;
         }
         *ppatrolRef = pResolved;
         if (*ppatrolRef) {
-            (*ppatrolRef)->SetTargeted(1);
+            (*ppatrolRef)->SetTargeted(true);
         }
         else {
             uint32_t inewReference;
-            bremove = 1;
+            bremove = true;
             if (iCurrentReference) {
                 inewReference = iCurrentReference - 1;
             }
@@ -147,7 +147,7 @@ void PatrolActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 ppatrolExtra = &ppatrolRef->m_Extra;
             }
             else {
-                ppatrolExtra = 0;
+                ppatrolExtra = nullptr;
             }
             if (ppatrolExtra) {
                 ppatrolExtra->SetPatrolRefInUse(pActor);
@@ -160,7 +160,7 @@ PatrolActorPackageData::~PatrolActorPackageData() {
     if (!pDataHandler->GetClearingData()) {
         ClearReservedPatrolRef();
     }
-    References.SetSize(0, 1);
+    References.SetSize(0, true);
     eState = PATROL_STATE_DEBUG_DESTRUCTED;
     pActor = nullptr;
     pPackage = nullptr;
@@ -172,7 +172,7 @@ bool PatrolActorPackageData::Init(Actor* apActor, TESPackage* apPackage) {
     pPackage = apPackage;
     pPackageData = apPackage->GetPatrolPackageData();
     iCurrentReference = 0;
-    bPatrolDirection = 1;
+    bPatrolDirection = true;
     iLoopAroundIndex = 0;
     bool bvalid = BuildReferenceArray();
     if (bvalid) {
@@ -188,12 +188,12 @@ bool PatrolActorPackageData::SetNextReferenceForPatrol(bool abWaitForOccupiedPoi
     bool brepeatable;
     uint32_t inextReference_2;
     uint32_t inextReference = iCurrentReference;
-    bool bkeepPatrolling = 1;
+    bool bkeepPatrolling = true;
     if (pPackageData) {
         brepeatable = pPackageData->bRepeatable;
     }
     else {
-        brepeatable = 0;
+        brepeatable = false;
     }
     if (bPatrolDirection) {
         inextReference_2 = inextReference + 1;
@@ -214,7 +214,7 @@ bool PatrolActorPackageData::SetNextReferenceForPatrol(bool abWaitForOccupiedPoi
             }
             else {
                 inextReference_2 = 0;
-                bkeepPatrolling = 0;
+                bkeepPatrolling = false;
             }
         }
     }
@@ -224,7 +224,7 @@ bool PatrolActorPackageData::SetNextReferenceForPatrol(bool abWaitForOccupiedPoi
             if (brepeatable) {
                 if (bCircularArray) {
                     inextReference_2 = 0;
-                    bkeepPatrolling = 0;
+                    bkeepPatrolling = false;
                 }
                 else {
                     inextReference_2 = References.iSize != 1;
@@ -233,7 +233,7 @@ bool PatrolActorPackageData::SetNextReferenceForPatrol(bool abWaitForOccupiedPoi
             }
             else {
                 inextReference_2 = 0;
-                bkeepPatrolling = 0;
+                bkeepPatrolling = false;
             }
         }
     }
@@ -248,14 +248,14 @@ bool PatrolActorPackageData::SetNextReferenceForPatrol(bool abWaitForOccupiedPoi
                     pnewExtra = &pref->m_Extra;
                 }
                 else {
-                    pnewExtra = 0;
+                    pnewExtra = nullptr;
                 }
                 if (i != iCurrentReference && (!pnewExtra || !pnewExtra->GetPatrolRefCanBeUsedBy(pActor))) {
                     --iavailable;
                 }
             }
             if (!iavailable) {
-                return SetNextReferenceForPatrol(0);
+                return SetNextReferenceForPatrol(false);
             }
         }
     }
@@ -296,16 +296,16 @@ TESObjectREFR* PatrolActorPackageData::GetCurrentReference() {
 bool PatrolActorPackageData::BuildReferenceArray() {
     bool brepeatable;
     TESObjectREFR* pcurrentReference = PatrolActorPackageData::GetInitialReferenceForSetup(pActor, pPackage);
-    bCircularArray = 0;
-    References.SetSize(0, 1);
+    bCircularArray = false;
+    References.SetSize(0, true);
     if (pPackageData) {
         brepeatable = pPackageData->bRepeatable;
     }
     else {
-        brepeatable = 0;
+        brepeatable = false;
     }
     while (pcurrentReference) {
-        pcurrentReference->SetTargeted(1);
+        pcurrentReference->SetTargeted(true);
         References.Add(pcurrentReference);
         pcurrentReference = pcurrentReference->GetLinkedRef();
         if (!pcurrentReference) {
@@ -315,7 +315,7 @@ bool PatrolActorPackageData::BuildReferenceArray() {
             References.Find(pcurrentReference, 0, &BSSimpleArray<TESObjectREFR*>::DefaultEqualFunctionByAddress);
         if (iloopIndex != -1) {
             if (brepeatable) {
-                bCircularArray = 1;
+                bCircularArray = true;
                 iLoopAroundIndex = iloopIndex;
             }
             else {
@@ -331,17 +331,17 @@ void PatrolActorPackageData::ResumeRepeatablePatrol(const NiPoint3* arPoint) {
     if (pActor) {
         int32_t FormFlags = References.iSize;
         SetCurrentReference(0);
-        this->bPatrolDirection = 1;
-        TESObjectREFR* v20 = 0;
-        const NiPoint3* pt = 0;
+        this->bPatrolDirection = true;
+        TESObjectREFR* v20 = nullptr;
+        const NiPoint3* pt = nullptr;
         uint32_t iCurrentReference = 0;
-        bool bPatrolDirection = 1;
+        bool bPatrolDirection = true;
         TESObjectREFR* CurrentReference = GetCurrentReference();
         if (CurrentReference) {
             const NiPoint3* v15 = &CurrentReference->GetLocationOnReference();
             float v19 = 3.4028235e+38f;
             uint32_t aiRefIndex = 0;
-            bool v12 = 1;
+            bool v12 = true;
             char v16 = 0;
             for (int32_t i = 0; i < FormFlags; ++i) {
                 ExtraDataList* Extra;
@@ -349,13 +349,13 @@ void PatrolActorPackageData::ResumeRepeatablePatrol(const NiPoint3* arPoint) {
                 bPatrolDirection = this->bPatrolDirection;
                 v20 = CurrentReference;
                 pt = v15;
-                SetNextReferenceForPatrol(0);
+                SetNextReferenceForPatrol(false);
                 TESObjectREFR* v8 = GetCurrentReference();
                 if (v8) {
                     Extra = v8->GetExtra();
                 }
                 else {
-                    Extra = 0;
+                    Extra = nullptr;
                 }
                 ExtraDataList* v7 = Extra;
                 if (!Extra || v7->GetPatrolRefCanBeUsedBy(pActor)) {
@@ -381,7 +381,7 @@ void PatrolActorPackageData::ResumeRepeatablePatrol(const NiPoint3* arPoint) {
                 SetCurrentReference(aiRefIndex);
                 this->bPatrolDirection = v12;
             }
-            this->bPatrolDirection = 1;
+            this->bPatrolDirection = true;
         }
     }
 }
@@ -393,13 +393,13 @@ bool PatrolActorPackageData::SetCurrentReference(uint32_t aiRefIndex) {
         aiclampedRefIndex = aiRefIndex;
         int32_t isize = References.iSize - 1;
         BSClamp<int32_t>(aiclampedRefIndex, 0, isize);
-        bool bsuccess = 1;
+        bool bsuccess = true;
         TESObjectREFR* pnewRef = References.GetAt(aiclampedRefIndex);
         if (pnewRef) {
             pnewExtra = &pnewRef->m_Extra;
         }
         else {
-            pnewExtra = 0;
+            pnewExtra = nullptr;
         }
         if (pnewExtra) {
             if (pnewExtra->GetPatrolRefCanBeUsedBy(pActor)) {
@@ -408,14 +408,14 @@ bool PatrolActorPackageData::SetCurrentReference(uint32_t aiRefIndex) {
                 iCurrentReference = aiclampedRefIndex;
             }
             else {
-                return 0;
+                return false;
             }
         }
         return bsuccess;
     }
     else {
         iCurrentReference = aiRefIndex;
-        return 1;
+        return true;
     }
 }
 

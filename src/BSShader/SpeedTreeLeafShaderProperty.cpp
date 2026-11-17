@@ -109,7 +109,7 @@ BSShaderProperty::RenderPassArray* SpeedTreeLeafShaderProperty::GetRenderPasses(
         CheckCreateRenderPassArray(0xFFFFFFFF);
         pRenderPassList->iSize = 0;
         ShadowSceneLight* pSun = BSShaderManager::GetAccumulator()->pActiveShadowSceneNode->pSunLight;
-        if (static_cast<uint16_t>(GetNumberofActiveNonShadowLights()) == 0) {
+        if (GetNumberofActiveNonShadowLights() == 0) {
             // BSSM_LEAVES_AD
             pRenderPassList->Add(apGeom, 0x3E, true, 1, pSun, nullptr, nullptr, nullptr);
         }
@@ -157,7 +157,7 @@ NiAdditionalGeometryData* SpeedTreeLeafShaderProperty::CreateRendererSpecificPro
     }
     pData->SetDataBlockCount(1);
     // The wind info is handed over as raw bytes.
-    pData->SetDataBlock(0, reinterpret_cast<uint8_t*>(GetWindInfo()), static_cast<uint32_t>(usVertexCount) << 4, false);
+    pData->SetDataBlock(0, reinterpret_cast<uint8_t*>(GetWindInfo()), usVertexCount << 4, false);
     pData->SetDataStream(0, 0, 0, NiAdditionalGeometryData::AGD_NITYPE_FLOAT4, usVertexCount, 0x10, 0x10);
     return pData;
 }

@@ -43,7 +43,7 @@ ActiveEffect* LockEffect::Copy() {
 bool LockEffect::CheckTarget(MagicTarget* apTarget) {
     NonActorMagicTarget* pnaTarget = dynamic_cast<NonActorMagicTarget*>(apTarget);
     if (!pnaTarget || !pnaTarget->GetTargetStatsObject()) {
-        return 0;
+        return false;
     }
     TESObjectREFR* v3 = pnaTarget->GetTargetStatsObject();
     TESObjectDOOR* pdoor = dynamic_cast<TESObjectDOOR*>(v3->GetObjectReference());
@@ -59,13 +59,13 @@ void LockEffect::Start() {
             TESObjectREFR* v1 = pnaTarget->GetTargetStatsObject();
             LockData* plock = v1->GetLock();
             if (plock && ((plock->cFlags & 2) == 0 || (plock->cFlags & 1) != 0)) {
-                Dispel(0);
+                Dispel(false);
             }
             else {
                 TESObjectREFR* v2 = pnaTarget->GetTargetStatsObject();
                 LockData* plock_2 = v2->AddLock();
                 plock_2->cLockLevel = static_cast<int32_t>(fMagnitude);
-                plock_2->pKey = 0;
+                plock_2->pKey = nullptr;
                 plock_2->cFlags = 2;
                 TESObjectREFR* v3 = pnaTarget->GetTargetStatsObject();
                 v3->AddLockChange();

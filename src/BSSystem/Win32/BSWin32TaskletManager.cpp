@@ -40,7 +40,7 @@ BSWin32TaskletManager::~BSWin32TaskletManager() {
 }
 
 void BSWin32TaskletManager::ShutdownAllTasks() {
-    bTerminated = 1;
+    bTerminated = true;
     if (bSignaled) {
         for (uint32_t i = 0; i < uiNumThreadsCreated; ++i) {
             kStartSemaphore.hSemaphore->Release();
@@ -77,10 +77,10 @@ bool BSWin32TaskletManager::CreateTaskGroupData(BSTaskletGroupData*& a1) {
         pData = ::new (apMemory) BSWin32TaskletGroupData;
     }
     else {
-        pData = 0;
+        pData = nullptr;
     }
     a1 = pData;
-    return pData != 0;
+    return pData != nullptr;
 }
 
 // The PC group data is a BSWin32TaskletGroupData: its lock, semaphore and flags are read.
@@ -162,8 +162,8 @@ void BSWin32TaskletManager::DestroyTaskGroupData(BSTaskletGroupData* a1) {
 
 void BSWin32TaskletManager::ProcessQueue() {
     while (!bTerminated) {
-        BSWin32TaskletData* pTaskletData = 0;
-        BSWin32TaskletGroupData* pGroupData = 0;
+        BSWin32TaskletData* pTaskletData = nullptr;
+        BSWin32TaskletGroupData* pGroupData = nullptr;
         kStartSemaphore.hSemaphore->Wait();
         InterlockedDecrementInt32(&kStartSemaphore.iCount);
         if (!bTerminated) {
@@ -184,7 +184,7 @@ void BSWin32TaskletManager::ProcessQueue() {
             if (pTaskletData) {
                 if (pGroupData) {
                     if (!pGroupData->padding2E && (!pTaskletData->bRunOnStartup || pTaskletData->OnStartup())) {
-                        pTaskletData->bRunOnStartup = 0;
+                        pTaskletData->bRunOnStartup = false;
                         pTaskletData->Process();
                     }
                 }
@@ -193,7 +193,7 @@ void BSWin32TaskletManager::ProcessQueue() {
                 if (pGroupData) {
                     if (!pTaskletData->bYielding || pGroupData->padding2E) {
                         pTaskletData->OnComplete();
-                        pTaskletData->pGroupData = 0;
+                        pTaskletData->pGroupData = nullptr;
                         pTaskletData->TaskDataLock = 0;
                         pGroupData->CompleteTask();
                     }
@@ -221,8 +221,8 @@ char BSWin32TaskletManager::QueueTaskData(BSWin32TaskletData* arData) {
     }
     *ppQueueTail[uiPriority] = arData;
     ppQueueTail[uiPriority] = &arData->pLink;
-    arData->pLink = 0;
-    arData->bYielding = 0;
+    arData->pLink = nullptr;
+    arData->bYielding = false;
     LeaveCriticalSection(&kQueueLock);
     kStartSemaphore.hSemaphore->Release();
     InterlockedIncrementInt32(&kStartSemaphore.iCount);

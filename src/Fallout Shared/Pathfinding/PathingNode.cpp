@@ -23,7 +23,7 @@ PathingNode::PathingNode(const PathingLocation* a1, const NiPoint3* a2)
 PathingNode::~PathingNode() {}
 
 bool PathingNode::ActivateNode(Actor* apActor) {
-    return (bool)((uint8_t)(IsTeleportDoorNode() && pDoorRef->Activate(apActor, 0, nullptr, 1)));
+    return (bool)((uint8_t)(IsTeleportDoorNode() && pDoorRef->Activate(apActor, false, nullptr, 1)));
 }
 
 PathingNode* PathingNode::Copy(PathingNode* apSource) {

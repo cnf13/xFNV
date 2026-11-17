@@ -65,7 +65,7 @@
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiGeometryBufferData.h"
 #include "SDK/MSVC/ehvec.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // Belongs to CreateConstantMaps: set once the vertex entries are built.
 static bool bvscminitialized;
@@ -220,7 +220,7 @@ uint32_t Lighting30Shader::SetupBoneMatrices(
           m_spVertexConstantMap.m_pObject != spTexEffectVConstantMap.m_pObject))) {
         return 0;
     }
-    BSShaderManager::pRenderer.m_pObject->CalculateBoneMatrices(a2, a7, 0, 3u, 1);
+    BSShaderManager::pRenderer.m_pObject->CalculateBoneMatrices(a2, a7, false, 3u, true);
     NiD3DShaderConstantMap* pTexEffectMap = spTexEffectVConstantMap.m_pObject;
     if (m_spVertexConstantMap.m_pObject == pTexEffectMap) {
         // The texture effect map's own bone matrix entry, looked up by name.
@@ -269,10 +269,10 @@ void Lighting30Shader::SetupGeometryConstants(const NiPropertyState* apState) {
     if (eCurrentPass - BSShaderManager::BSSM_3XCONSTALPHA <= 3 &&
         (static_cast<NiAlphaProperty*>(apState->m_aspProps[0].m_pObject)->m_uFlags &
          NiAlphaProperty::ALPHA_BLEND_MASK) != 0) {
-        BSRenderState::SetZWriteEnable(0, BSRS_LOCK);
+        BSRenderState::SetZWriteEnable(false, BSRS_LOCK);
     }
     BSUtilities::GetInverseWorldMatrix(worldTransform, pskin, d3dInvWorld);
-    m_pkD3DRenderer->SetModelTransform(worldTransform, 0);
+    m_pkD3DRenderer->SetModelTransform(worldTransform, false);
     if (eCurrentPass == BSShaderManager::BSSM_3XTEXEFFECT || eCurrentPass == BSShaderManager::BSSM_3XTEXEFFECT_S) {
         UpdatePipelineTexEffect(pprop, NiD3DShader::m_spCurrentPass);
         UpdateTexEffectConstants(pgeometry, pprop, NiD3DShader::m_spCurrentPass);
@@ -346,7 +346,7 @@ void Lighting30Shader::SetupGeometryConstants(const NiPropertyState* apState) {
                 kD3DView._43 = -kOffset.Dot(kAxis);
                 kprojection = m_pkD3DRenderer->m_kD3DProj;
                 D3DXMatrixMultiply_Thunk(&kworldtoclip, &kD3DView, &kprojection);
-                D3DXMatrixInverse_Thunk(&kinv, 0, &kworldtoclip);
+                D3DXMatrixInverse_Thunk(&kinv, nullptr, &kworldtoclip);
                 D3DXMatrixTranspose_Thunk(&kworldtoclip, &kinv);
                 // Planes transform by the inverse transpose of the point transform.
                 for (int32_t i = 0; i < 6; ++i) {
@@ -389,7 +389,8 @@ void Lighting30Shader::SetupGeometryConstants(const NiPropertyState* apState) {
         NiD3DPixelShader* pPixelShader = pPass->m_spPixelShader.m_pObject;
         if (pPixelShader) {
             pPass->m_spPixelConstantMap.m_pObject->SetShaderConstants(
-                pPixelShader, pgeometry, pskin, 0, pbufferData, apState, 0, worldTransform, *pWorldBound, 0, 1
+                pPixelShader, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, worldTransform, *pWorldBound, 0,
+                true
             );
             pPass = NiD3DShader::m_spCurrentPass;
         }
@@ -398,7 +399,8 @@ void Lighting30Shader::SetupGeometryConstants(const NiPropertyState* apState) {
         NiD3DVertexShader* pVertexShader = pPass->m_spVertexShader.m_pObject;
         if (pVertexShader) {
             pPass->m_spVertexConstantMap.m_pObject->SetShaderConstants(
-                pVertexShader, pgeometry, pskin, 0, pbufferData, apState, 0, worldTransform, *pWorldBound, 0, 1
+                pVertexShader, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, worldTransform, *pWorldBound,
+                0, true
             );
         }
     }
@@ -426,7 +428,7 @@ void Lighting30Shader::PostGeometry(const NiPropertyState* apState) {
     NiStencilProperty* pStencil = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
     if (pStencil) {
         if ((pStencil->m_uFlags & NiStencilProperty::ENABLE_MASK) != 0) {
-            BSRenderState::SetStencilEnable(0, BSRS_NOLOCK);
+            BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
         }
     }
     // The alpha property is read without a null test, as the game does.
@@ -434,7 +436,7 @@ void Lighting30Shader::PostGeometry(const NiPropertyState* apState) {
     if (ePass - BSShaderManager::BSSM_3XCONSTALPHA <= 3 &&
         (pAlpha->m_uFlags & NiAlphaProperty::ALPHA_BLEND_MASK) != 0) {
         --BSRenderState::iLock[1];
-        BSRenderState::SetZWriteEnable(1, BSRS_NOLOCK);
+        BSRenderState::SetZWriteEnable(true, BSRS_NOLOCK);
     }
 }
 
@@ -471,7 +473,7 @@ void Lighting30Shader::InitPass(uint32_t auiCurrentPass) {
     Lighting30Shader::kPSConstants[0].y = NiColorA_BLACK.g;
     Lighting30Shader::kPSConstants[0].z = NiColorA_BLACK.b;
     Lighting30Shader::kPSConstants[0].w = NiColorA_BLACK.a;
-    Lighting30Shader::pPixelConstantMapEntry[0]->m_bEnabled = 1;
+    Lighting30Shader::pPixelConstantMapEntry[0]->m_bEnabled = true;
     Lighting30Shader::bAmbientEnabled = 1;
     Lighting30Shader::bMatAlphaEnabled = 1;
     if (auiCurrentPass == 480 || auiCurrentPass == 481) {
@@ -699,7 +701,7 @@ void Lighting30Shader::SetupPassConstants(uint32_t auiCurrentPass) {
 
 NiD3DShaderDeclaration* Lighting30Shader::GetShaderDecl(NiGeometry* apGeometry, BSShaderProperty* apProperty) {
     uint8_t v3 = (uint8_t)((((int32_t)(apProperty->ulFlags[1] & 32)) != 0) ||
-                           (apGeometry->m_spModelData.m_pObject->m_pkColor != 0));
+                           (apGeometry->m_spModelData.m_pObject->m_pkColor != nullptr));
     if (((int32_t)(apProperty->ulFlags[0] & 2)) != 0) {
         if (v3) {
             return spSkinnedShaderDeclVC.m_pObject;
@@ -1082,33 +1084,33 @@ void Lighting30Shader::LoadShaders() {
 void Lighting30Shader::LoadVertexShaders() {
     BSShaderMacro apMacro[57];
     apMacro[0].strPath = "lighting\\3x\\SM3Lighting.v.hlsl";
-    apMacro[0].kMacros[0].Name = 0;
+    apMacro[0].kMacros[0].Name = nullptr;
     std::memset(
         &apMacro[0].kMacros[0].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     apMacro[1].strPath = "lighting\\3x\\SM3Lighting.v.hlsl";
-    apMacro[1].kMacros[0].Name = 0;
+    apMacro[1].kMacros[0].Name = nullptr;
     std::memset(
         &apMacro[1].kMacros[0].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     apMacro[2].strPath = "lighting\\3x\\SM3Lighting.v.hlsl";
     apMacro[2].kMacros[0].Name = "SKIN";
     apMacro[2].kMacros[0].Definition = "";
-    apMacro[2].kMacros[1].Name = 0;
+    apMacro[2].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[2].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     apMacro[3].strPath = "lighting\\3x\\SM3Lighting.v.hlsl";
     apMacro[3].kMacros[0].Name = "VC";
     apMacro[3].kMacros[0].Definition = "";
-    apMacro[3].kMacros[1].Name = 0;
+    apMacro[3].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[3].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     apMacro[4].strPath = "lighting\\3x\\SM3Lighting.v.hlsl";
     apMacro[4].kMacros[0].Name = "VC";
     apMacro[4].kMacros[0].Definition = "";
-    apMacro[4].kMacros[1].Name = 0;
+    apMacro[4].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[4].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -1117,21 +1119,21 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[5].kMacros[0].Definition = "";
     apMacro[5].kMacros[1].Name = "VC";
     apMacro[5].kMacros[1].Definition = "";
-    apMacro[5].kMacros[2].Name = 0;
+    apMacro[5].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[5].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     apMacro[6].strPath = "lighting\\3x\\SM3Lighting.v.hlsl";
     apMacro[6].kMacros[0].Name = "PROJSHADOW";
     apMacro[6].kMacros[0].Definition = "";
-    apMacro[6].kMacros[1].Name = 0;
+    apMacro[6].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[6].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     apMacro[7].strPath = "lighting\\3x\\SM3Lighting.v.hlsl";
     apMacro[7].kMacros[0].Name = "PROJSHADOW";
     apMacro[7].kMacros[0].Definition = "";
-    apMacro[7].kMacros[1].Name = 0;
+    apMacro[7].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[7].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -1140,7 +1142,7 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[8].kMacros[0].Definition = "";
     apMacro[8].kMacros[1].Name = "PROJSHADOW";
     apMacro[8].kMacros[1].Definition = "";
-    apMacro[8].kMacros[2].Name = 0;
+    apMacro[8].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[8].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1149,7 +1151,7 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[9].kMacros[0].Definition = "";
     apMacro[9].kMacros[1].Name = "PROJSHADOW";
     apMacro[9].kMacros[1].Definition = "";
-    apMacro[9].kMacros[2].Name = 0;
+    apMacro[9].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[9].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1158,7 +1160,7 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[10].kMacros[0].Definition = "";
     apMacro[10].kMacros[1].Name = "PROJSHADOW";
     apMacro[10].kMacros[1].Definition = "";
-    apMacro[10].kMacros[2].Name = 0;
+    apMacro[10].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[10].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1169,7 +1171,7 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[11].kMacros[1].Definition = "";
     apMacro[11].kMacros[2].Name = "PROJSHADOW";
     apMacro[11].kMacros[2].Definition = "";
-    apMacro[11].kMacros[3].Name = 0;
+    apMacro[11].kMacros[3].Name = nullptr;
     std::memset(
         &apMacro[11].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -1177,8 +1179,8 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[12].kMacros[0].Name = "SM3";
     apMacro[12].kMacros[0].Definition = "";
     apMacro[12].kMacros[1].Name = "ENVMAP";
-    apMacro[12].kMacros[1].Definition = 0;
-    apMacro[12].kMacros[2].Name = 0;
+    apMacro[12].kMacros[1].Definition = nullptr;
+    apMacro[12].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[12].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1186,10 +1188,10 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[13].kMacros[0].Name = "SM3";
     apMacro[13].kMacros[0].Definition = "";
     apMacro[13].kMacros[1].Name = "ENVMAP";
-    apMacro[13].kMacros[1].Definition = 0;
+    apMacro[13].kMacros[1].Definition = nullptr;
     apMacro[13].kMacros[2].Name = "VC";
     apMacro[13].kMacros[2].Definition = "";
-    apMacro[13].kMacros[3].Name = 0;
+    apMacro[13].kMacros[3].Name = nullptr;
     std::memset(
         &apMacro[13].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -1197,10 +1199,10 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[14].kMacros[0].Name = "SM3";
     apMacro[14].kMacros[0].Definition = "";
     apMacro[14].kMacros[1].Name = "ENVMAP";
-    apMacro[14].kMacros[1].Definition = 0;
+    apMacro[14].kMacros[1].Definition = nullptr;
     apMacro[14].kMacros[2].Name = "SKIN";
     apMacro[14].kMacros[2].Definition = "";
-    apMacro[14].kMacros[3].Name = 0;
+    apMacro[14].kMacros[3].Name = nullptr;
     std::memset(
         &apMacro[14].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -1209,35 +1211,35 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[15].kMacros[0].Name = "SM3";
     apMacro[15].kMacros[0].Definition = "";
     apMacro[15].kMacros[1].Name = "ENVMAP";
-    apMacro[15].kMacros[1].Definition = 0;
+    apMacro[15].kMacros[1].Definition = nullptr;
     apMacro[15].kMacros[2].Name = "SKIN";
     apMacro[15].kMacros[2].Definition = "";
     apMacro[15].kMacros[3].Name = "VC";
     apMacro[15].kMacros[3].Definition = "";
-    apMacro[15].kMacros[4].Name = 0;
-    apMacro[15].kMacros[4].Definition = 0;
-    apMacro[15].kMacros[5].Name = 0;
-    apMacro[15].kMacros[5].Definition = 0;
-    apMacro[15].kMacros[6].Name = 0;
-    apMacro[15].kMacros[6].Definition = 0;
-    apMacro[15].kMacros[7].Name = 0;
-    apMacro[15].kMacros[7].Definition = 0;
-    apMacro[15].kMacros[8].Name = 0;
-    apMacro[15].kMacros[8].Definition = 0;
+    apMacro[15].kMacros[4].Name = nullptr;
+    apMacro[15].kMacros[4].Definition = nullptr;
+    apMacro[15].kMacros[5].Name = nullptr;
+    apMacro[15].kMacros[5].Definition = nullptr;
+    apMacro[15].kMacros[6].Name = nullptr;
+    apMacro[15].kMacros[6].Definition = nullptr;
+    apMacro[15].kMacros[7].Name = nullptr;
+    apMacro[15].kMacros[7].Definition = nullptr;
+    apMacro[15].kMacros[8].Name = nullptr;
+    apMacro[15].kMacros[8].Definition = nullptr;
     apMacro[16].kMacros[0].Name = "SM3";
     apMacro[16].kMacros[0].Definition = "";
     apMacro[16].kMacros[1].Name = "ENVMAP";
-    apMacro[16].kMacros[1].Definition = 0;
+    apMacro[16].kMacros[1].Definition = nullptr;
     apMacro[16].kMacros[2].Name = "EYE";
-    apMacro[16].kMacros[2].Definition = 0;
-    apMacro[16].kMacros[3].Name = 0;
+    apMacro[16].kMacros[2].Definition = nullptr;
+    apMacro[16].kMacros[3].Name = nullptr;
     std::memset(
         &apMacro[16].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
     apMacro[17].strPath = "lighting\\2x\\v\\WaterFog.v.hlsl";
     apMacro[17].kMacros[0].Name = "SM3";
     apMacro[17].kMacros[0].Definition = "";
-    apMacro[17].kMacros[1].Name = 0;
+    apMacro[17].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[17].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -1246,7 +1248,7 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[18].kMacros[0].Definition = "";
     apMacro[18].kMacros[1].Name = "SKIN";
     apMacro[18].kMacros[1].Definition = "";
-    apMacro[18].kMacros[2].Name = 0;
+    apMacro[18].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[18].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1255,7 +1257,7 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[19].kMacros[0].Definition = "";
     apMacro[19].kMacros[1].Name = "TEXCOORD";
     apMacro[19].kMacros[1].Definition = "";
-    apMacro[19].kMacros[2].Name = 0;
+    apMacro[19].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[19].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1266,7 +1268,7 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[20].kMacros[1].Definition = "";
     apMacro[20].kMacros[2].Name = "TEXCOORD";
     apMacro[20].kMacros[2].Definition = "";
-    apMacro[20].kMacros[3].Name = 0;
+    apMacro[20].kMacros[3].Name = nullptr;
     std::memset(
         &apMacro[20].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -1275,7 +1277,7 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[21].kMacros[0].Definition = "";
     apMacro[21].kMacros[1].Name = "VC";
     apMacro[21].kMacros[1].Definition = "";
-    apMacro[21].kMacros[2].Name = 0;
+    apMacro[21].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[21].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1286,7 +1288,7 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[22].kMacros[1].Definition = "";
     apMacro[22].kMacros[2].Name = "VC";
     apMacro[22].kMacros[2].Definition = "";
-    apMacro[22].kMacros[3].Name = 0;
+    apMacro[22].kMacros[3].Name = nullptr;
     std::memset(
         &apMacro[22].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -1297,7 +1299,7 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[23].kMacros[1].Definition = "";
     apMacro[23].kMacros[2].Name = "VC";
     apMacro[23].kMacros[2].Definition = "";
-    apMacro[23].kMacros[3].Name = 0;
+    apMacro[23].kMacros[3].Name = nullptr;
     std::memset(
         &apMacro[23].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -1310,32 +1312,32 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[24].kMacros[2].Definition = "";
     apMacro[24].kMacros[3].Name = "VC";
     apMacro[24].kMacros[3].Definition = "";
-    apMacro[24].kMacros[4].Name = 0;
-    apMacro[24].kMacros[4].Definition = 0;
-    apMacro[24].kMacros[5].Name = 0;
-    apMacro[24].kMacros[5].Definition = 0;
-    apMacro[24].kMacros[6].Name = 0;
-    apMacro[24].kMacros[6].Definition = 0;
-    apMacro[24].kMacros[7].Name = 0;
-    apMacro[24].kMacros[7].Definition = 0;
-    apMacro[24].kMacros[8].Name = 0;
-    apMacro[24].kMacros[8].Definition = 0;
+    apMacro[24].kMacros[4].Name = nullptr;
+    apMacro[24].kMacros[4].Definition = nullptr;
+    apMacro[24].kMacros[5].Name = nullptr;
+    apMacro[24].kMacros[5].Definition = nullptr;
+    apMacro[24].kMacros[6].Name = nullptr;
+    apMacro[24].kMacros[6].Definition = nullptr;
+    apMacro[24].kMacros[7].Name = nullptr;
+    apMacro[24].kMacros[7].Definition = nullptr;
+    apMacro[24].kMacros[8].Name = nullptr;
+    apMacro[24].kMacros[8].Definition = nullptr;
     apMacro[25].strPath = "lighting\\3x\\SM3SimpleShadow.v.hlsl";
-    apMacro[25].kMacros[0].Name = 0;
+    apMacro[25].kMacros[0].Name = nullptr;
     std::memset(
         &apMacro[25].kMacros[0].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     apMacro[26].strPath = "lighting\\3x\\SM3SimpleShadow.v.hlsl";
     apMacro[26].kMacros[0].Name = "VC";
-    apMacro[26].kMacros[0].Definition = 0;
-    apMacro[26].kMacros[1].Name = 0;
+    apMacro[26].kMacros[0].Definition = nullptr;
+    apMacro[26].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[26].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     apMacro[27].strPath = "lighting\\3x\\SM3SimpleShadow.v.hlsl";
     apMacro[27].kMacros[0].Name = "SKIN";
     apMacro[27].kMacros[0].Definition = "";
-    apMacro[27].kMacros[1].Name = 0;
+    apMacro[27].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[27].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -1343,27 +1345,27 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[28].kMacros[0].Name = "SKIN";
     apMacro[28].kMacros[0].Definition = "";
     apMacro[28].kMacros[1].Name = "VC";
-    apMacro[28].kMacros[1].Definition = 0;
-    apMacro[28].kMacros[2].Name = 0;
+    apMacro[28].kMacros[1].Definition = nullptr;
+    apMacro[28].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[28].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     apMacro[29].strPath = "lighting\\3x\\SM3DepthMap.v.hlsl";
-    apMacro[29].kMacros[0].Name = 0;
+    apMacro[29].kMacros[0].Name = nullptr;
     std::memset(
         &apMacro[29].kMacros[0].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     apMacro[30].strPath = "lighting\\3x\\SM3DepthMap.v.hlsl";
     apMacro[30].kMacros[0].Name = "VC";
     apMacro[30].kMacros[0].Definition = "";
-    apMacro[30].kMacros[1].Name = 0;
+    apMacro[30].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[30].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     apMacro[31].strPath = "lighting\\3x\\SM3DepthMap.v.hlsl";
     apMacro[31].kMacros[0].Name = "SKIN";
     apMacro[31].kMacros[0].Definition = "";
-    apMacro[31].kMacros[1].Name = 0;
+    apMacro[31].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[31].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -1372,160 +1374,160 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[32].kMacros[0].Definition = "";
     apMacro[32].kMacros[1].Name = "SKIN";
     apMacro[32].kMacros[1].Definition = "";
-    apMacro[32].kMacros[2].Name = 0;
+    apMacro[32].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[32].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     apMacro[33].strPath = "lighting\\2x\\v\\renderNormals.v.hlsl";
     apMacro[33].kMacros[0].Name = "SM3";
-    apMacro[33].kMacros[0].Definition = 0;
-    apMacro[33].kMacros[1].Name = 0;
+    apMacro[33].kMacros[0].Definition = nullptr;
+    apMacro[33].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[33].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     apMacro[34].strPath = "lighting\\2x\\v\\renderNormals.v.hlsl";
     apMacro[34].kMacros[0].Name = "SM3";
-    apMacro[34].kMacros[0].Definition = 0;
+    apMacro[34].kMacros[0].Definition = nullptr;
     apMacro[34].kMacros[1].Name = "SKIN";
     apMacro[34].kMacros[1].Definition = "";
-    apMacro[34].kMacros[2].Name = 0;
+    apMacro[34].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[34].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     apMacro[35].strPath = "lighting\\2x\\v\\renderNormals.v.hlsl";
     apMacro[35].kMacros[0].Name = "SM3";
-    apMacro[35].kMacros[0].Definition = 0;
+    apMacro[35].kMacros[0].Definition = nullptr;
     apMacro[35].kMacros[1].Name = "FIRE";
     apMacro[35].kMacros[1].Definition = "";
-    apMacro[35].kMacros[2].Name = 0;
+    apMacro[35].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[35].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     apMacro[36].strPath = "lighting\\2x\\v\\renderNormals.v.hlsl";
     apMacro[36].kMacros[0].Name = "SM3";
-    apMacro[36].kMacros[0].Definition = 0;
+    apMacro[36].kMacros[0].Definition = nullptr;
     apMacro[36].kMacros[1].Name = "CLEAR";
     apMacro[36].kMacros[1].Definition = "";
-    apMacro[36].kMacros[2].Name = 0;
+    apMacro[36].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[36].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     apMacro[37].strPath = "lighting\\2x\\v\\renderNormals.v.hlsl";
     apMacro[37].kMacros[0].Name = "SM3";
-    apMacro[37].kMacros[0].Definition = 0;
+    apMacro[37].kMacros[0].Definition = nullptr;
     apMacro[37].kMacros[1].Name = "CLEAR";
     apMacro[37].kMacros[1].Definition = "";
     apMacro[37].kMacros[2].Name = "SKIN";
     apMacro[37].kMacros[2].Definition = "";
-    apMacro[37].kMacros[3].Name = 0;
+    apMacro[37].kMacros[3].Name = nullptr;
     std::memset(
         &apMacro[37].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
     apMacro[38].strPath = "lighting\\2x\\v\\renderDepth.v.hlsl";
     apMacro[38].kMacros[0].Name = "SM3";
-    apMacro[38].kMacros[0].Definition = 0;
-    apMacro[38].kMacros[1].Name = 0;
+    apMacro[38].kMacros[0].Definition = nullptr;
+    apMacro[38].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[38].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     apMacro[39].strPath = "lighting\\2x\\v\\renderDepth.v.hlsl";
     apMacro[39].kMacros[0].Name = "SM3";
-    apMacro[39].kMacros[0].Definition = 0;
+    apMacro[39].kMacros[0].Definition = nullptr;
     apMacro[39].kMacros[1].Name = "VC";
-    apMacro[39].kMacros[1].Definition = 0;
-    apMacro[39].kMacros[2].Name = 0;
+    apMacro[39].kMacros[1].Definition = nullptr;
+    apMacro[39].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[39].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     apMacro[40].strPath = "lighting\\2x\\v\\renderDepth.v.hlsl";
     apMacro[40].kMacros[0].Name = "SM3";
-    apMacro[40].kMacros[0].Definition = 0;
+    apMacro[40].kMacros[0].Definition = nullptr;
     apMacro[40].kMacros[1].Name = "SKIN";
     apMacro[40].kMacros[1].Definition = "";
-    apMacro[40].kMacros[2].Name = 0;
+    apMacro[40].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[40].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     apMacro[41].strPath = "lighting\\2x\\v\\renderDepth.v.hlsl";
     apMacro[41].kMacros[0].Name = "SM3";
-    apMacro[41].kMacros[0].Definition = 0;
+    apMacro[41].kMacros[0].Definition = nullptr;
     apMacro[41].kMacros[1].Name = "SKIN";
     apMacro[41].kMacros[1].Definition = "";
     apMacro[41].kMacros[2].Name = "VC";
-    apMacro[41].kMacros[2].Definition = 0;
-    apMacro[41].kMacros[3].Name = 0;
+    apMacro[41].kMacros[2].Definition = nullptr;
+    apMacro[41].kMacros[3].Name = nullptr;
     std::memset(
         &apMacro[41].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
     apMacro[42].strPath = "lighting\\2x\\v\\renderVelocity.v.hlsl";
     apMacro[42].kMacros[0].Name = "SM3";
-    apMacro[42].kMacros[0].Definition = 0;
-    apMacro[42].kMacros[1].Name = 0;
+    apMacro[42].kMacros[0].Definition = nullptr;
+    apMacro[42].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[42].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     apMacro[43].strPath = "lighting\\2x\\v\\renderVelocity.v.hlsl";
     apMacro[43].kMacros[0].Name = "SM3";
-    apMacro[43].kMacros[0].Definition = 0;
+    apMacro[43].kMacros[0].Definition = nullptr;
     apMacro[43].kMacros[1].Name = "SKIN";
     apMacro[43].kMacros[1].Definition = "";
-    apMacro[43].kMacros[2].Name = 0;
+    apMacro[43].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[43].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     apMacro[44].strPath = "lighting\\2x\\v\\localMap.v.hlsl";
     apMacro[44].kMacros[0].Name = "SM3";
-    apMacro[44].kMacros[0].Definition = 0;
-    apMacro[44].kMacros[1].Name = 0;
+    apMacro[44].kMacros[0].Definition = nullptr;
+    apMacro[44].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[44].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     apMacro[45].strPath = "lighting\\2x\\v\\localMap.v.hlsl";
     apMacro[45].kMacros[0].Name = "SM3";
-    apMacro[45].kMacros[0].Definition = 0;
+    apMacro[45].kMacros[0].Definition = nullptr;
     apMacro[45].kMacros[1].Name = "SKIN";
     apMacro[45].kMacros[1].Definition = "";
-    apMacro[45].kMacros[2].Name = 0;
+    apMacro[45].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[45].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     apMacro[46].strPath = "lighting\\2x\\v\\localMap.v.hlsl";
     apMacro[46].kMacros[0].Name = "SM3";
-    apMacro[46].kMacros[0].Definition = 0;
+    apMacro[46].kMacros[0].Definition = nullptr;
     apMacro[46].kMacros[1].Name = "CLEAR";
     apMacro[46].kMacros[1].Definition = "";
-    apMacro[46].kMacros[2].Name = 0;
+    apMacro[46].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[46].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     apMacro[47].strPath = "lighting\\1x\\v\\texEffect.v.hlsl";
-    apMacro[47].kMacros[0].Name = 0;
+    apMacro[47].kMacros[0].Name = nullptr;
     std::memset(
         &apMacro[47].kMacros[0].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     apMacro[48].strPath = "lighting\\1x\\v\\texEffect.v.hlsl";
     apMacro[48].kMacros[0].Name = "SKIN";
     apMacro[48].kMacros[0].Definition = "";
-    apMacro[48].kMacros[1].Name = 0;
+    apMacro[48].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[48].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     apMacro[49].strPath = "lighting\\3x\\SM3ZOnly.v.hlsl";
-    apMacro[49].kMacros[0].Name = 0;
+    apMacro[49].kMacros[0].Name = nullptr;
     std::memset(
         &apMacro[49].kMacros[0].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     apMacro[50].strPath = "lighting\\3x\\SM3ZOnly.v.hlsl";
     apMacro[50].kMacros[0].Name = "SKIN";
     apMacro[50].kMacros[0].Definition = "";
-    apMacro[50].kMacros[1].Name = 0;
+    apMacro[50].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[50].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     apMacro[51].strPath = "lighting\\3x\\SM3ZOnly.v.hlsl";
     apMacro[51].kMacros[0].Name = "VC";
     apMacro[51].kMacros[0].Definition = "";
-    apMacro[51].kMacros[1].Name = 0;
+    apMacro[51].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[51].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -1534,31 +1536,31 @@ void Lighting30Shader::LoadVertexShaders() {
     apMacro[52].kMacros[0].Definition = "";
     apMacro[52].kMacros[1].Name = "SKIN";
     apMacro[52].kMacros[1].Definition = "";
-    apMacro[52].kMacros[2].Name = 0;
+    apMacro[52].kMacros[2].Name = nullptr;
     std::memset(
         &apMacro[52].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     apMacro[53].strPath = "lighting\\3x\\SM3ZOnly.v.hlsl";
-    apMacro[53].kMacros[0].Name = 0;
+    apMacro[53].kMacros[0].Name = nullptr;
     std::memset(
         &apMacro[53].kMacros[0].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     apMacro[54].strPath = "lighting\\3x\\SM3ZOnly.v.hlsl";
     apMacro[54].kMacros[0].Name = "SKIN";
     apMacro[54].kMacros[0].Definition = "";
-    apMacro[54].kMacros[1].Name = 0;
+    apMacro[54].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[54].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     apMacro[55].strPath = "lighting\\3x\\SM3ZOnly.v.hlsl";
-    apMacro[55].kMacros[0].Name = 0;
+    apMacro[55].kMacros[0].Name = nullptr;
     std::memset(
         &apMacro[55].kMacros[0].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     apMacro[56].strPath = "lighting\\3x\\SM3ZOnly.v.hlsl";
     apMacro[56].kMacros[0].Name = "SKIN";
     apMacro[56].kMacros[0].Definition = "";
-    apMacro[56].kMacros[1].Name = 0;
+    apMacro[56].kMacros[1].Name = nullptr;
     std::memset(
         &apMacro[56].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -1624,7 +1626,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[0].strPath = "lighting\\3x\\SM3Lighting.p.hlsl";
     kMacroArray[0].kMacros[0].Name = "MAXLIGHTS";
     kMacroArray[0].kMacros[0].Definition = "9";
-    kMacroArray[0].kMacros[1].Name = 0;
+    kMacroArray[0].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[0].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -1632,8 +1634,8 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[1].kMacros[0].Name = "MAXLIGHTS";
     kMacroArray[1].kMacros[0].Definition = "8";
     kMacroArray[1].kMacros[1].Name = "SPECULAR";
-    kMacroArray[1].kMacros[1].Definition = 0;
-    kMacroArray[1].kMacros[2].Name = 0;
+    kMacroArray[1].kMacros[1].Definition = nullptr;
+    kMacroArray[1].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[1].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1642,7 +1644,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[2].kMacros[0].Definition = "8";
     kMacroArray[2].kMacros[1].Name = "HAIR";
     kMacroArray[2].kMacros[1].Definition = "1";
-    kMacroArray[2].kMacros[2].Name = 0;
+    kMacroArray[2].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[2].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1652,8 +1654,8 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[3].kMacros[1].Name = "HAIR";
     kMacroArray[3].kMacros[1].Definition = "1";
     kMacroArray[3].kMacros[2].Name = "SPECULAR";
-    kMacroArray[3].kMacros[2].Definition = 0;
-    kMacroArray[3].kMacros[3].Name = 0;
+    kMacroArray[3].kMacros[2].Definition = nullptr;
+    kMacroArray[3].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[3].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -1662,7 +1664,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[4].kMacros[0].Name = "MAXLIGHTS";
     kMacroArray[4].kMacros[1].Name = "PARALLAX";
     kMacroArray[4].kMacros[1].Definition = "";
-    kMacroArray[4].kMacros[2].Name = 0;
+    kMacroArray[4].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[4].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1671,7 +1673,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[5].kMacros[0].Definition = "8";
     kMacroArray[5].kMacros[1].Name = "PARALLAXOCC";
     kMacroArray[5].kMacros[1].Definition = "30";
-    kMacroArray[5].kMacros[2].Name = 0;
+    kMacroArray[5].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[5].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1681,8 +1683,8 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[6].kMacros[1].Name = "PARALLAX";
     kMacroArray[6].kMacros[1].Definition = "";
     kMacroArray[6].kMacros[2].Name = "SPECULAR";
-    kMacroArray[6].kMacros[2].Definition = 0;
-    kMacroArray[6].kMacros[3].Name = 0;
+    kMacroArray[6].kMacros[2].Definition = nullptr;
+    kMacroArray[6].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[6].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -1692,8 +1694,8 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[7].kMacros[1].Name = "PARALLAXOCC";
     kMacroArray[7].kMacros[1].Definition = "30";
     kMacroArray[7].kMacros[2].Name = "SPECULAR";
-    kMacroArray[7].kMacros[2].Definition = 0;
-    kMacroArray[7].kMacros[3].Name = 0;
+    kMacroArray[7].kMacros[2].Definition = nullptr;
+    kMacroArray[7].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[7].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -1702,7 +1704,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[8].kMacros[0].Definition = "8";
     kMacroArray[8].kMacros[1].Name = "FACEGENBLEND";
     kMacroArray[8].kMacros[1].Definition = "";
-    kMacroArray[8].kMacros[2].Name = 0;
+    kMacroArray[8].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[8].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1712,8 +1714,8 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[9].kMacros[1].Name = "FACEGENBLEND";
     kMacroArray[9].kMacros[1].Definition = "";
     kMacroArray[9].kMacros[2].Name = "SPECULAR";
-    kMacroArray[9].kMacros[2].Definition = 0;
-    kMacroArray[9].kMacros[3].Name = 0;
+    kMacroArray[9].kMacros[2].Definition = nullptr;
+    kMacroArray[9].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[9].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -1722,7 +1724,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[10].kMacros[0].Definition = "8";
     kMacroArray[10].kMacros[1].Name = "GLOW";
     kMacroArray[10].kMacros[1].Definition = "";
-    kMacroArray[10].kMacros[2].Name = 0;
+    kMacroArray[10].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[10].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -1733,8 +1735,8 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[11].kMacros[1].Name = "GLOW";
     kMacroArray[11].kMacros[1].Definition = "";
     kMacroArray[11].kMacros[2].Name = "SPECULAR";
-    kMacroArray[11].kMacros[2].Definition = 0;
-    kMacroArray[11].kMacros[3].Name = 0;
+    kMacroArray[11].kMacros[2].Definition = nullptr;
+    kMacroArray[11].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[11].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -1744,7 +1746,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[12].kMacros[0].Definition = "8";
     kMacroArray[12].kMacros[1].Name = "PROJSHADOW";
     kMacroArray[12].kMacros[1].Definition = "";
-    kMacroArray[12].kMacros[2].Name = 0;
+    kMacroArray[12].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[12].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -1753,10 +1755,10 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[13].kMacros[0].Name = "MAXLIGHTS";
     kMacroArray[13].kMacros[0].Definition = "8";
     kMacroArray[13].kMacros[1].Name = "SPECULAR";
-    kMacroArray[13].kMacros[1].Definition = 0;
+    kMacroArray[13].kMacros[1].Definition = nullptr;
     kMacroArray[13].kMacros[2].Name = "PROJSHADOW";
     kMacroArray[13].kMacros[2].Definition = "";
-    kMacroArray[13].kMacros[3].Name = 0;
+    kMacroArray[13].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[13].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -1768,7 +1770,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[14].kMacros[1].Definition = "1";
     kMacroArray[14].kMacros[2].Name = "PROJSHADOW";
     kMacroArray[14].kMacros[2].Definition = "";
-    kMacroArray[14].kMacros[3].Name = 0;
+    kMacroArray[14].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[14].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -1781,25 +1783,25 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[15].kMacros[1].Name = "HAIR";
     kMacroArray[15].kMacros[1].Definition = "1";
     kMacroArray[15].kMacros[2].Name = "SPECULAR";
-    kMacroArray[15].kMacros[2].Definition = 0;
+    kMacroArray[15].kMacros[2].Definition = nullptr;
     kMacroArray[15].kMacros[3].Definition = "";
-    kMacroArray[15].kMacros[4].Name = 0;
-    kMacroArray[15].kMacros[4].Definition = 0;
-    kMacroArray[15].kMacros[5].Name = 0;
-    kMacroArray[15].kMacros[5].Definition = 0;
-    kMacroArray[15].kMacros[6].Name = 0;
-    kMacroArray[15].kMacros[6].Definition = 0;
-    kMacroArray[15].kMacros[7].Name = 0;
-    kMacroArray[15].kMacros[7].Definition = 0;
-    kMacroArray[15].kMacros[8].Name = 0;
-    kMacroArray[15].kMacros[8].Definition = 0;
+    kMacroArray[15].kMacros[4].Name = nullptr;
+    kMacroArray[15].kMacros[4].Definition = nullptr;
+    kMacroArray[15].kMacros[5].Name = nullptr;
+    kMacroArray[15].kMacros[5].Definition = nullptr;
+    kMacroArray[15].kMacros[6].Name = nullptr;
+    kMacroArray[15].kMacros[6].Definition = nullptr;
+    kMacroArray[15].kMacros[7].Name = nullptr;
+    kMacroArray[15].kMacros[7].Definition = nullptr;
+    kMacroArray[15].kMacros[8].Name = nullptr;
+    kMacroArray[15].kMacros[8].Definition = nullptr;
     kMacroArray[16].strPath = "lighting\\3x\\SM3Lighting.p.hlsl";
     kMacroArray[16].kMacros[0].Name = "MAXLIGHTS";
     kMacroArray[16].kMacros[0].Definition = "8";
     kMacroArray[16].kMacros[1].Name = "PARALLAX";
     kMacroArray[16].kMacros[1].Definition = "";
     kMacroArray[16].kMacros[2].Definition = "";
-    kMacroArray[16].kMacros[3].Name = 0;
+    kMacroArray[16].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[16].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -1811,7 +1813,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[17].kMacros[1].Definition = "30";
     kMacroArray[17].kMacros[2].Name = "PROJSHADOW";
     kMacroArray[17].kMacros[2].Definition = "";
-    kMacroArray[17].kMacros[3].Name = 0;
+    kMacroArray[17].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[17].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -1823,37 +1825,37 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[18].kMacros[1].Definition = "";
     kMacroArray[18].kMacros[2].Name = "SPECULAR";
     kMacroArray[19].kMacros[2].Name = "SPECULAR";
-    kMacroArray[18].kMacros[2].Definition = 0;
+    kMacroArray[18].kMacros[2].Definition = nullptr;
     kMacroArray[18].kMacros[3].Name = "PROJSHADOW";
     kMacroArray[18].kMacros[3].Definition = "";
-    kMacroArray[18].kMacros[4].Name = 0;
-    kMacroArray[18].kMacros[4].Definition = 0;
-    kMacroArray[18].kMacros[5].Name = 0;
-    kMacroArray[18].kMacros[5].Definition = 0;
-    kMacroArray[18].kMacros[6].Name = 0;
-    kMacroArray[18].kMacros[6].Definition = 0;
-    kMacroArray[18].kMacros[7].Name = 0;
-    kMacroArray[18].kMacros[7].Definition = 0;
-    kMacroArray[18].kMacros[8].Name = 0;
-    kMacroArray[18].kMacros[8].Definition = 0;
+    kMacroArray[18].kMacros[4].Name = nullptr;
+    kMacroArray[18].kMacros[4].Definition = nullptr;
+    kMacroArray[18].kMacros[5].Name = nullptr;
+    kMacroArray[18].kMacros[5].Definition = nullptr;
+    kMacroArray[18].kMacros[6].Name = nullptr;
+    kMacroArray[18].kMacros[6].Definition = nullptr;
+    kMacroArray[18].kMacros[7].Name = nullptr;
+    kMacroArray[18].kMacros[7].Definition = nullptr;
+    kMacroArray[18].kMacros[8].Name = nullptr;
+    kMacroArray[18].kMacros[8].Definition = nullptr;
     kMacroArray[19].strPath = "lighting\\3x\\SM3Lighting.p.hlsl";
     kMacroArray[19].kMacros[0].Name = "MAXLIGHTS";
     kMacroArray[19].kMacros[0].Definition = "8";
     kMacroArray[19].kMacros[1].Name = "PARALLAXOCC";
     kMacroArray[19].kMacros[1].Definition = "30";
-    kMacroArray[19].kMacros[2].Definition = 0;
+    kMacroArray[19].kMacros[2].Definition = nullptr;
     kMacroArray[19].kMacros[3].Name = "PROJSHADOW";
     kMacroArray[19].kMacros[3].Definition = "";
-    kMacroArray[19].kMacros[4].Name = 0;
-    kMacroArray[19].kMacros[4].Definition = 0;
-    kMacroArray[19].kMacros[5].Name = 0;
-    kMacroArray[19].kMacros[5].Definition = 0;
-    kMacroArray[19].kMacros[6].Name = 0;
-    kMacroArray[19].kMacros[6].Definition = 0;
-    kMacroArray[19].kMacros[7].Name = 0;
-    kMacroArray[19].kMacros[7].Definition = 0;
-    kMacroArray[19].kMacros[8].Name = 0;
-    kMacroArray[19].kMacros[8].Definition = 0;
+    kMacroArray[19].kMacros[4].Name = nullptr;
+    kMacroArray[19].kMacros[4].Definition = nullptr;
+    kMacroArray[19].kMacros[5].Name = nullptr;
+    kMacroArray[19].kMacros[5].Definition = nullptr;
+    kMacroArray[19].kMacros[6].Name = nullptr;
+    kMacroArray[19].kMacros[6].Definition = nullptr;
+    kMacroArray[19].kMacros[7].Name = nullptr;
+    kMacroArray[19].kMacros[7].Definition = nullptr;
+    kMacroArray[19].kMacros[8].Name = nullptr;
+    kMacroArray[19].kMacros[8].Definition = nullptr;
     kMacroArray[20].strPath = "lighting\\3x\\SM3Lighting.p.hlsl";
     kMacroArray[20].kMacros[0].Name = "MAXLIGHTS";
     kMacroArray[20].kMacros[0].Definition = "8";
@@ -1861,7 +1863,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[20].kMacros[1].Definition = "";
     kMacroArray[20].kMacros[2].Name = "PROJSHADOW";
     kMacroArray[20].kMacros[2].Definition = "";
-    kMacroArray[20].kMacros[3].Name = 0;
+    kMacroArray[20].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[20].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -1873,26 +1875,26 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[21].kMacros[1].Name = "FACEGENBLEND";
     kMacroArray[21].kMacros[1].Definition = "";
     kMacroArray[21].kMacros[2].Name = "SPECULAR";
-    kMacroArray[21].kMacros[2].Definition = 0;
+    kMacroArray[21].kMacros[2].Definition = nullptr;
     kMacroArray[21].kMacros[3].Name = "PROJSHADOW";
     kMacroArray[21].kMacros[3].Definition = "";
-    kMacroArray[21].kMacros[4].Name = 0;
-    kMacroArray[21].kMacros[4].Definition = 0;
-    kMacroArray[21].kMacros[5].Name = 0;
-    kMacroArray[21].kMacros[5].Definition = 0;
-    kMacroArray[21].kMacros[6].Name = 0;
-    kMacroArray[21].kMacros[6].Definition = 0;
-    kMacroArray[21].kMacros[7].Name = 0;
-    kMacroArray[21].kMacros[7].Definition = 0;
-    kMacroArray[21].kMacros[8].Name = 0;
-    kMacroArray[21].kMacros[8].Definition = 0;
+    kMacroArray[21].kMacros[4].Name = nullptr;
+    kMacroArray[21].kMacros[4].Definition = nullptr;
+    kMacroArray[21].kMacros[5].Name = nullptr;
+    kMacroArray[21].kMacros[5].Definition = nullptr;
+    kMacroArray[21].kMacros[6].Name = nullptr;
+    kMacroArray[21].kMacros[6].Definition = nullptr;
+    kMacroArray[21].kMacros[7].Name = nullptr;
+    kMacroArray[21].kMacros[7].Definition = nullptr;
+    kMacroArray[21].kMacros[8].Name = nullptr;
+    kMacroArray[21].kMacros[8].Definition = nullptr;
     kMacroArray[22].strPath = "lighting\\3x\\SM3Lighting.p.hlsl";
     kMacroArray[22].kMacros[0].Name = "MAXLIGHTS";
     kMacroArray[22].kMacros[1].Name = "GLOW";
     kMacroArray[22].kMacros[1].Definition = "";
     kMacroArray[22].kMacros[2].Name = "PROJSHADOW";
     kMacroArray[22].kMacros[2].Definition = "";
-    kMacroArray[22].kMacros[3].Name = 0;
+    kMacroArray[22].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[22].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -1903,23 +1905,23 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[23].kMacros[1].Name = "GLOW";
     kMacroArray[23].kMacros[1].Definition = "";
     kMacroArray[23].kMacros[2].Name = "SPECULAR";
-    kMacroArray[23].kMacros[2].Definition = 0;
+    kMacroArray[23].kMacros[2].Definition = nullptr;
     kMacroArray[23].kMacros[3].Name = "PROJSHADOW";
     kMacroArray[23].kMacros[3].Definition = "";
-    kMacroArray[23].kMacros[4].Name = 0;
-    kMacroArray[23].kMacros[4].Definition = 0;
-    kMacroArray[23].kMacros[5].Name = 0;
-    kMacroArray[23].kMacros[5].Definition = 0;
-    kMacroArray[23].kMacros[6].Name = 0;
-    kMacroArray[23].kMacros[6].Definition = 0;
-    kMacroArray[23].kMacros[7].Name = 0;
-    kMacroArray[23].kMacros[7].Definition = 0;
-    kMacroArray[23].kMacros[8].Name = 0;
-    kMacroArray[23].kMacros[8].Definition = 0;
+    kMacroArray[23].kMacros[4].Name = nullptr;
+    kMacroArray[23].kMacros[4].Definition = nullptr;
+    kMacroArray[23].kMacros[5].Name = nullptr;
+    kMacroArray[23].kMacros[5].Definition = nullptr;
+    kMacroArray[23].kMacros[6].Name = nullptr;
+    kMacroArray[23].kMacros[6].Definition = nullptr;
+    kMacroArray[23].kMacros[7].Name = nullptr;
+    kMacroArray[23].kMacros[7].Definition = nullptr;
+    kMacroArray[23].kMacros[8].Name = nullptr;
+    kMacroArray[23].kMacros[8].Definition = nullptr;
     kMacroArray[24].strPath = "lighting\\2x\\p\\EnvMap.p.hlsl";
     kMacroArray[24].kMacros[0].Name = "SM3";
     kMacroArray[24].kMacros[0].Definition = "";
-    kMacroArray[24].kMacros[1].Name = 0;
+    kMacroArray[24].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[24].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -1928,8 +1930,8 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[25].kMacros[0].Name = "SM3";
     kMacroArray[25].kMacros[0].Definition = "";
     kMacroArray[25].kMacros[1].Name = "WINDOW";
-    kMacroArray[25].kMacros[1].Definition = 0;
-    kMacroArray[25].kMacros[2].Name = 0;
+    kMacroArray[25].kMacros[1].Definition = nullptr;
+    kMacroArray[25].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[25].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -1938,8 +1940,8 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[26].kMacros[0].Name = "SM3";
     kMacroArray[26].kMacros[0].Definition = "";
     kMacroArray[26].kMacros[1].Name = "EYE";
-    kMacroArray[26].kMacros[1].Definition = 0;
-    kMacroArray[26].kMacros[2].Name = 0;
+    kMacroArray[26].kMacros[1].Definition = nullptr;
+    kMacroArray[26].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[26].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -1947,7 +1949,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[27].strPath = "lighting\\2x\\p\\WaterFog.p.hlsl";
     kMacroArray[27].kMacros[0].Name = "SM3";
     kMacroArray[27].kMacros[0].Definition = "";
-    kMacroArray[27].kMacros[1].Name = 0;
+    kMacroArray[27].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[27].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -1957,7 +1959,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[28].kMacros[0].Definition = "";
     kMacroArray[28].kMacros[1].Name = "ALPHATESTING";
     kMacroArray[28].kMacros[1].Definition = "";
-    kMacroArray[28].kMacros[2].Name = 0;
+    kMacroArray[28].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[28].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -1969,7 +1971,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[29].kMacros[1].Definition = "-2";
     kMacroArray[29].kMacros[2].Name = "SHADOWMODE";
     kMacroArray[29].kMacros[2].Definition = "3";
-    kMacroArray[29].kMacros[3].Name = 0;
+    kMacroArray[29].kMacros[3].Name = nullptr;
     std::memset(
         &kMacroArray[29].kMacros[3].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
@@ -1977,7 +1979,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[30].strPath = "lighting\\3x\\SM3DepthMap.p.hlsl";
     kMacroArray[30].kMacros[0].Name = "SHADOWMODE";
     kMacroArray[30].kMacros[0].Definition = "3";
-    kMacroArray[30].kMacros[1].Name = 0;
+    kMacroArray[30].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[30].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -1985,53 +1987,53 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[31].strPath = "lighting\\3x\\SM3DepthMap.p.hlsl";
     kMacroArray[31].kMacros[0].Name = "SHADOWMODE";
     kMacroArray[31].kMacros[0].Definition = "3";
-    kMacroArray[31].kMacros[1].Name = 0;
+    kMacroArray[31].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[31].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray[32].strPath = "lighting\\2x\\p\\renderNormals.p.hlsl";
     kMacroArray[32].kMacros[0].Name = "SM3";
-    kMacroArray[32].kMacros[0].Definition = 0;
-    kMacroArray[32].kMacros[1].Name = 0;
+    kMacroArray[32].kMacros[0].Definition = nullptr;
+    kMacroArray[32].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[32].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray[33].strPath = "lighting\\2x\\p\\renderNormals.p.hlsl";
     kMacroArray[33].kMacros[0].Name = "SM3";
-    kMacroArray[33].kMacros[0].Definition = 0;
-    kMacroArray[33].kMacros[1].Name = 0;
+    kMacroArray[33].kMacros[0].Definition = nullptr;
+    kMacroArray[33].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[33].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray[34].strPath = "lighting\\2x\\p\\renderNormals.p.hlsl";
     kMacroArray[34].kMacros[0].Name = "SM3";
-    kMacroArray[34].kMacros[0].Definition = 0;
+    kMacroArray[34].kMacros[0].Definition = nullptr;
     kMacroArray[34].kMacros[1].Name = "FIRE";
     kMacroArray[34].kMacros[1].Definition = "";
-    kMacroArray[34].kMacros[2].Name = 0;
+    kMacroArray[34].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[34].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     kMacroArray[35].strPath = "lighting\\2x\\p\\renderNormals.p.hlsl";
     kMacroArray[35].kMacros[0].Name = "SM3";
-    kMacroArray[35].kMacros[0].Definition = 0;
+    kMacroArray[35].kMacros[0].Definition = nullptr;
     kMacroArray[35].kMacros[1].Name = "CLEAR";
     kMacroArray[35].kMacros[1].Definition = "";
-    kMacroArray[35].kMacros[2].Name = 0;
+    kMacroArray[35].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[35].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     kMacroArray[36].strPath = "lighting\\2x\\p\\renderNormals.p.hlsl";
     kMacroArray[36].kMacros[0].Name = "SM3";
-    kMacroArray[36].kMacros[0].Definition = 0;
+    kMacroArray[36].kMacros[0].Definition = nullptr;
     kMacroArray[36].kMacros[1].Name = "CLEAR";
     kMacroArray[36].kMacros[1].Definition = "";
-    kMacroArray[36].kMacros[2].Name = 0;
+    kMacroArray[36].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[36].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2041,41 +2043,41 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[37].kMacros[0].Definition = "1";
     kMacroArray[37].kMacros[1].Name = "SILHOUETTE";
     kMacroArray[37].kMacros[1].Definition = "";
-    kMacroArray[37].kMacros[2].Name = 0;
+    kMacroArray[37].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[37].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     kMacroArray[38].strPath = "lighting\\2x\\p\\renderDepth.p.hlsl";
     kMacroArray[38].kMacros[0].Name = "SM3";
-    kMacroArray[38].kMacros[0].Definition = 0;
-    kMacroArray[38].kMacros[1].Name = 0;
+    kMacroArray[38].kMacros[0].Definition = nullptr;
+    kMacroArray[38].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[38].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray[39].strPath = "lighting\\2x\\p\\renderVelocity.p.hlsl";
     kMacroArray[39].kMacros[0].Name = "SM3";
-    kMacroArray[39].kMacros[0].Definition = 0;
-    kMacroArray[39].kMacros[1].Name = 0;
+    kMacroArray[39].kMacros[0].Definition = nullptr;
+    kMacroArray[39].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[39].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray[40].strPath = "lighting\\2x\\p\\localMap.p.hlsl";
     kMacroArray[40].kMacros[0].Name = "SM3";
-    kMacroArray[40].kMacros[0].Definition = 0;
-    kMacroArray[40].kMacros[1].Name = 0;
+    kMacroArray[40].kMacros[0].Definition = nullptr;
+    kMacroArray[40].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[40].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray[41].strPath = "lighting\\2x\\p\\localMap.p.hlsl";
     kMacroArray[41].kMacros[0].Name = "SM3";
-    kMacroArray[41].kMacros[0].Definition = 0;
+    kMacroArray[41].kMacros[0].Definition = nullptr;
     kMacroArray[41].kMacros[1].Name = "CLEAR";
-    kMacroArray[41].kMacros[1].Definition = 0;
-    kMacroArray[41].kMacros[2].Name = 0;
+    kMacroArray[41].kMacros[1].Definition = nullptr;
+    kMacroArray[41].kMacros[2].Name = nullptr;
     std::memset(
         &kMacroArray[41].kMacros[2].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
@@ -2083,7 +2085,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[42].strPath = "lighting\\1x\\p\\texEffect.p.hlsl";
     kMacroArray[42].kMacros[0].Name = "HQ";
     kMacroArray[42].kMacros[0].Definition = "";
-    kMacroArray[42].kMacros[1].Name = 0;
+    kMacroArray[42].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[42].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2091,31 +2093,31 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[43].strPath = "lighting\\1x\\p\\texEffect.p.hlsl";
     kMacroArray[43].kMacros[0].Name = "HQ";
     kMacroArray[43].kMacros[0].Definition = "";
-    kMacroArray[43].kMacros[1].Name = 0;
+    kMacroArray[43].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[43].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     kMacroArray[44].strPath = "lighting\\3x\\SM3ZOnly.p.hlsl";
-    kMacroArray[44].kMacros[0].Name = 0;
+    kMacroArray[44].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray[44].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray[45].strPath = "lighting\\3x\\SM3ZOnly.p.hlsl";
-    kMacroArray[45].kMacros[0].Name = 0;
+    kMacroArray[45].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray[45].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray[46].strPath = "lighting\\3x\\SM3ZOnly.p.hlsl";
-    kMacroArray[46].kMacros[0].Name = 0;
+    kMacroArray[46].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray[46].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     kMacroArray[47].strPath = "lighting\\3x\\SM3ZOnly.p.hlsl";
-    kMacroArray[47].kMacros[0].Name = 0;
+    kMacroArray[47].kMacros[0].Name = nullptr;
     std::memset(
         &kMacroArray[47].kMacros[0].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
@@ -2123,7 +2125,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[48].strPath = "lighting\\3x\\SM3ZOnly.p.hlsl";
     kMacroArray[48].kMacros[0].Name = "CONSTALPHA";
     kMacroArray[48].kMacros[0].Definition = "";
-    kMacroArray[48].kMacros[1].Name = 0;
+    kMacroArray[48].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[48].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
@@ -2131,12 +2133,12 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[49].strPath = "lighting\\3x\\SM3ZOnly.p.hlsl";
     kMacroArray[49].kMacros[0].Name = "CONSTALPHA";
     kMacroArray[49].kMacros[0].Definition = "";
-    kMacroArray[49].kMacros[1].Name = 0;
+    kMacroArray[49].kMacros[1].Name = nullptr;
     std::memset(
         &kMacroArray[49].kMacros[1].Definition, 0,
         sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
-    const char* ptarget_2 = BSShaderManager::GetPSTarget(0);
+    const char* ptarget_2 = BSShaderManager::GetPSTarget(false);
     // The MAXLIGHTS values "4" and "2" and the value "20", built on the stack as three-byte strings.
     char v18[3] = "4";
     char v15[3] = "20";
@@ -2148,7 +2150,7 @@ void Lighting30Shader::LoadPixelShaders() {
     kMacroArray[31].kMacros[0].Definition = v14;
     int32_t i = 0;
     BSShaderMacro* pMacro = kMacroArray;
-    while (1) {
+    while (true) {
         _D3DXMACRO* kMacros = pMacro->kMacros;
         NiD3DPixelShader* v6;
         NiD3DPixelShader* m_pObject;
@@ -2161,7 +2163,7 @@ void Lighting30Shader::LoadPixelShaders() {
         char HLSLFile[260];
         BSShader::MakePath(pMacro->strPath, HLSLFile);
         BSsprintf(PSOFile, 260, "SM3%03i.pso", i);
-        BSShaderManager::etShaderLevel ShaderLevel = BSShaderManager::GetShaderLevel(0);
+        BSShaderManager::etShaderLevel ShaderLevel = BSShaderManager::GetShaderLevel(false);
         if (ShaderLevel == BSShaderManager::BSSM_SV_3_0) {
             if (i < 24) {
                 kMacros->Definition = v18;
@@ -2280,7 +2282,7 @@ bool Lighting30Shader::LoadStagesAndPasses() {
     }
     while (v3);
     PresetStages();
-    return 1;
+    return true;
 }
 
 void Lighting30Shader::SetTextureMode(NiD3DTextureStage* apStage, BSShaderPPLightingProperty* apProp) {
@@ -2290,7 +2292,7 @@ void Lighting30Shader::SetTextureMode(NiD3DTextureStage* apStage, BSShaderPPLigh
 
 void Lighting30Shader::DisableNonVolatileConstantsForPass(uint32_t auiPassEnum) {
     Lighting30Shader::bVSConstantEnable[15] = (uint8_t)0;
-    Lighting30Shader::pVertexConstantMapEntry[15]->m_bEnabled = (bool)0;
+    Lighting30Shader::pVertexConstantMapEntry[15]->m_bEnabled = false;
 }
 
 void Lighting30Shader::SetupGeometryConstants_WorldBoundCenter(const NiBound& worldBound) {
@@ -2538,7 +2540,7 @@ void Lighting30Shader::UpdatePipelineTexEffect(BSShaderPPLightingProperty* apBSS
         for (uint32_t i = 2; i < apPass->m_uiStageCount; ++i) {
             NiD3DTextureStage* v10 = apPass->m_kStages.m_pBase[i].m_pObject;
             if (v10) {
-                v10->m_spTexture = 0;
+                v10->m_spTexture = nullptr;
             }
         }
         NiAlphaProperty::AlphaFunction NiAlphaFunctionFromD3D =
@@ -2816,7 +2818,7 @@ void Lighting30Shader::SetupGeometryConstants_Emittance(
     double r = m_external_emit->r;
     double b = m_external_emit->b;
     double g = m_external_emit->g;
-    bool v7 = pprop->spTextures[2]->m_pObject != 0;
+    bool v7 = pprop->spTextures[2]->m_pObject != nullptr;
     if (NiColor_BLACK.r != r || (NiColor_BLACK.g != g || (NiColor_BLACK.b != b || pprop->spTextures[2]->m_pObject))) {
         if (BSShaderManager::bHDR) {
             // EXE-INLINED 0x4EBBC0
@@ -2869,7 +2871,7 @@ void Lighting30Shader::SetupGeometryConstants_Emittance(
             Lighting30Shader::kPSConstants[0].x = v9;
             Lighting30Shader::kPSConstants[0].y = v12;
             Lighting30Shader::kPSConstants[0].z = v15;
-            Lighting30Shader::pPixelConstantMapEntry[0]->m_bEnabled = 1;
+            Lighting30Shader::pPixelConstantMapEntry[0]->m_bEnabled = true;
             Lighting30Shader::bAmbientEnabled = 1;
         }
     }
@@ -3063,7 +3065,7 @@ void Lighting30Shader::SetupGeometryConstants_Lights(
 
 NiD3DPass* Lighting30Shader::SelectPass(BSShaderManager::eBSSMPassEnum a1) {
     NiD3DPass* result;
-    NiD3DPass* v2 = 0;
+    NiD3DPass* v2 = nullptr;
     if (a1 > BSShaderManager::BSSM_3XOCCLUSION) {
         switch (a1) {
             case BSShaderManager::BSSM_3XLIGHTING: {
@@ -3962,7 +3964,7 @@ void Lighting30Shader::EnableConstantsForPass(uint32_t auiPassEnum, bool abAlpha
         if (!v22->m_pkRenderStateGroup) {
             v22->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v22->m_pkRenderStateGroup->SetRenderState(168u, 3u, 1);
+        v22->m_pkRenderStateGroup->SetRenderState(168u, 3u, true);
         return;
     }
     if (v3 - 460 <= 19) {
@@ -3970,7 +3972,7 @@ void Lighting30Shader::EnableConstantsForPass(uint32_t auiPassEnum, bool abAlpha
         if (!v23->m_pkRenderStateGroup) {
             v23->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v23->m_pkRenderStateGroup->SetRenderState(168u, 15u, 1);
+        v23->m_pkRenderStateGroup->SetRenderState(168u, 15u, true);
         return;
     }
     if (v3 - 377 > 104) {
@@ -3979,14 +3981,14 @@ void Lighting30Shader::EnableConstantsForPass(uint32_t auiPassEnum, bool abAlpha
         if (!v25->m_pkRenderStateGroup) {
             v25->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v25->m_pkRenderStateGroup->SetRenderState(168u, 0, 1);
+        v25->m_pkRenderStateGroup->SetRenderState(168u, 0, true);
     }
     else {
         NiD3DPass* v24 = Lighting30Shader::spPass[ioffset].m_pObject;
         if (!v24->m_pkRenderStateGroup) {
             v24->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v24->m_pkRenderStateGroup->SetRenderState(168u, 7u, 1);
+        v24->m_pkRenderStateGroup->SetRenderState(168u, 7u, true);
     }
 }
 
@@ -4004,11 +4006,11 @@ void Lighting30Shader::SetAmbientColor(const NiColorA& akColor, bool abModified)
     Lighting30Shader::kPSConstants[0].z = akColor.b;
     Lighting30Shader::kPSConstants[0].w = akColor.a;
     if (abModified || Lighting30Shader::bAmbientEnabled) {
-        Lighting30Shader::pPixelConstantMapEntry[0]->m_bEnabled = 1;
+        Lighting30Shader::pPixelConstantMapEntry[0]->m_bEnabled = true;
         Lighting30Shader::bAmbientEnabled = abModified;
     }
     else {
-        Lighting30Shader::pPixelConstantMapEntry[0]->m_bEnabled = 0;
+        Lighting30Shader::pPixelConstantMapEntry[0]->m_bEnabled = false;
         Lighting30Shader::bAmbientEnabled = 0;
     }
 }
@@ -4018,7 +4020,7 @@ void Lighting30Shader::ResetPerFrameConstantData() {
     Lighting30Shader::kPSConstants[0].y = NiColorA_BLACK.g;
     Lighting30Shader::kPSConstants[0].z = NiColorA_BLACK.b;
     Lighting30Shader::kPSConstants[0].w = NiColorA_BLACK.a;
-    Lighting30Shader::pPixelConstantMapEntry[0]->m_bEnabled = 1;
+    Lighting30Shader::pPixelConstantMapEntry[0]->m_bEnabled = true;
     Lighting30Shader::bAmbientEnabled = 1;
     Lighting30Shader::bMatAlphaEnabled = 1;
 }
@@ -4187,7 +4189,7 @@ BSShader* Lighting30Shader::CreateShader() {
         pshader = ::new (v4) Lighting30Shader(pshaderDecl, pskinnedShaderDecl, pshaderDeclVC, pskinnedShaderDeclVC);
     }
     else {
-        pshader = 0;
+        pshader = nullptr;
     }
     pshader->Initialize();
     NiDX9ShaderDeclaration* m_pObject = pshader->spShaderDeclNC.m_pObject;
@@ -4237,7 +4239,7 @@ void Lighting30Shader::CreateDefaultStages(NiD3DPass* a1, int32_t x0) {
         uint32_t i = 0;
         do {
             NiD3DTextureStage::CreateNewStage(spStage);
-            BSShader::SetupDefaultStage(spStage.m_pObject, i, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spStage.m_pObject, i, 1u, 2u, true);
             a1->SetStage(a1->m_uiCurrentStage, spStage.m_pObject);
             bool bApply = (static_cast<int8_t>(x0) & uiMask) != 0;
             ++i;

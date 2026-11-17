@@ -103,7 +103,7 @@ uint32_t NiDX9ErrorShader::SetupTransformations(
     float kWorldBoundb = (static_cast<double>(v13) + static_cast<double>(v13)) / 32767.0 - 1.0;
     kNewWorld.m_Translate.z = kWorldBoundb * kWorld + kNewWorld.m_Translate.z;
     return NiD3DShader::SetupTransformations(
-        apGeometry, 0, 0, apRendererData, apState, apEffects, kNewWorld, akWorldBound
+        apGeometry, nullptr, nullptr, apRendererData, apState, apEffects, kNewWorld, akWorldBound
     );
 }
 
@@ -112,7 +112,7 @@ bool NiDX9ErrorShader::CreateShaderDeclaration() {
     m_spShaderDecl = v2;
     static_cast<NiShaderDeclaration*>(m_spShaderDecl.m_pObject)
         ->SetEntry(0, 0, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
-    return 1;
+    return true;
 }
 
 // One pass with one stage that outputs the texture factor (UpdatePipeline sets it). The current pass is set without a

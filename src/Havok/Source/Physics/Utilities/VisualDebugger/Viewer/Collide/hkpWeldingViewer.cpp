@@ -225,7 +225,7 @@ void hkpWeldingViewer::postSimulationCallback(hkpWorld* world) {
 
 void hkpWeldingViewer::worldAddedCallback(hkpWorld* world) {
     if (this == nullptr) {
-        world->addWorldPostSimulationListener(0);
+        world->addWorldPostSimulationListener(nullptr);
     }
     else {
         world->addWorldPostSimulationListener(this);
@@ -234,7 +234,7 @@ void hkpWeldingViewer::worldAddedCallback(hkpWorld* world) {
 
 void hkpWeldingViewer::worldRemovedCallback(hkpWorld* world) {
     if (this == nullptr) {
-        world->removeWorldPostSimulationListener(0);
+        world->removeWorldPostSimulationListener(nullptr);
     }
     else {
         world->removeWorldPostSimulationListener(this);
@@ -250,7 +250,7 @@ hkProcess* hkpWeldingViewer::create(const hkArray<hkProcessContext*, hkContainer
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

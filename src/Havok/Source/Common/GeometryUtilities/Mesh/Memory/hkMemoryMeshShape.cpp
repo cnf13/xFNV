@@ -323,7 +323,7 @@ const void* getVtablehkxMaterialShaderSet() {
 
 // The class registry's finish-loaded-object callback: the null check, then the class's finish constructor.
 void finishLoadedObjecthkxMaterialShaderSet(void* p, int32_t finishing) {
-    void* apMemory = static_cast<void*>(p);
+    void* apMemory = p;
     hkFinishLoadedObjectFlag aFlag;
     aFlag.m_finishing = finishing;
     if (!apMemory) {
@@ -500,10 +500,10 @@ void hkMemoryMeshShape::lockSection(int32_t sectionIndex, uint8_t accessFlags, h
         m_vertexBuffer = v4->m_vertexBuffer;
     }
     else {
-        m_vertexBuffer = 0;
+        m_vertexBuffer = nullptr;
     }
     sectionOut.m_vertexBuffer = m_vertexBuffer;
-    sectionOut.m_indices = 0;
+    sectionOut.m_indices = nullptr;
     if ((accessFlags & 1) != 0) {
         if (v4->m_indexType.m_storage) {
             sectionOut.m_indices = v4->m_indices;

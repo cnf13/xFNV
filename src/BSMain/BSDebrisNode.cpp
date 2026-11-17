@@ -58,7 +58,7 @@ void BSDebrisNode::CopyMembers(BSDebrisNode* pDest, NiCloningProcess& arCloneDat
 NiObject* BSDebrisNode::CreateObject() {
     BSDebrisNode* v2 = static_cast<BSDebrisNode*>(NiMemObject::operator new(sizeof(BSDebrisNode)));
     if (!v2) {
-        return 0;
+        return nullptr;
     }
     return ::new (v2) BSDebrisNode;
 }

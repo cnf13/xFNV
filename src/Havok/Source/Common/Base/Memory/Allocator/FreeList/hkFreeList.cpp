@@ -238,24 +238,24 @@ void hkFreeList::_init(
     m_free = nullptr;
     m_blocks = nullptr;
     m_freeBlocks = nullptr;
-    m_blockSize = (uint32_t)blockSize;
+    m_blockSize = blockSize;
     m_top = nullptr;
     m_blockEnd = nullptr;
     m_numFreeElements = 0;
     m_totalNumElements = 0;
     m_lastIncrementalBlock = nullptr;
-    m_align = (uint32_t)align;
+    m_align = align;
     m_memoryServer = memoryServer;
     // The element size is compared with the alignment unsigned, and the larger is rounded up to the alignment.
     uint32_t uiElementSize;
-    if ((uint32_t)elementSize >= (uint32_t)align) {
-        uiElementSize = ((uint32_t)elementSize + (uint32_t)align - 1) & ~((uint32_t)align - 1);
+    if (elementSize >= align) {
+        uiElementSize = (elementSize + align - 1) & ~(align - 1);
     }
     else {
-        uiElementSize = (uint32_t)align;
+        uiElementSize = align;
     }
     m_elementSize = uiElementSize;
-    m_maxBlockSize = bestBlockSize(0xFF0u, (uint32_t)align);
+    m_maxBlockSize = bestBlockSize(0xFF0u, align);
 }
 
 // The elements of both block lists, the free blocks' first.
@@ -274,8 +274,8 @@ void hkFreeList::freeAll() {
         result = m_blocks;
         m_freeBlocks = result;
         m_blocks = nullptr;
-        m_top = (uint8_t*)0;
-        m_blockEnd = (uint8_t*)0;
+        m_top = (uint8_t*)nullptr;
+        m_blockEnd = (uint8_t*)nullptr;
         m_lastIncrementalBlock = nullptr;
     }
 }

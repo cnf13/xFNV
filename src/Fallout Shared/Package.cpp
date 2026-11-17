@@ -94,7 +94,7 @@ TESPackage::~TESPackage() {
         }
         --uiRefCount;
     }
-    SetIsCreated(0);
+    SetIsCreated(false);
     TESPackage::ClearData();
 }
 
@@ -427,18 +427,14 @@ void TESPackage::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     BGSChangeFlags v8;
     BGSChangeFlags v9;
     uint32_t v2 = TESForm::GetFormID();
-    v3 = static_cast<uint32_t>(
-        (static_cast<uint32_t>(v3) & 0xffffff00u) | static_cast<uint32_t>((uint8_t)pDataHandler->IsFormIDCreated(v2))
-    );
+    v3 = static_cast<uint32_t>((v3 & 0xffffff00u) | static_cast<uint32_t>((uint8_t)pDataHandler->IsFormIDCreated(v2)));
     if (!((uint8_t)v3)) {
         v4 = &(v9 = apLoadGameBuffer->GetOldChangeFlags());
         if (v4->CheckFlags(0x80000000u)) {
             PackData.iPackFlags &= (~0x8000u);
         }
         v5 = &(v8 = apLoadGameBuffer->GetOldChangeFlags());
-        v3 = static_cast<uint32_t>(
-            (static_cast<uint32_t>(v3) & 0xffffff00u) | static_cast<uint32_t>((uint8_t)v5->CheckFlags(0x40000000u))
-        );
+        v3 = static_cast<uint32_t>((v3 & 0xffffff00u) | static_cast<uint32_t>((uint8_t)v5->CheckFlags(0x40000000u)));
         if ((uint8_t)v3) {
             v3 = PackData.iPackFlags & 0xFFFEFFFFu;
             PackData.iPackFlags = v3;
@@ -581,101 +577,101 @@ void TESPackage::Copy(TESForm* apCopy) {
 bool TESPackage::Compare(TESForm* apCompare) {
     TESPackage* pcomp = dynamic_cast<TESPackage*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     PACKAGE_TYPE PackType = GetPackType();
     if (PackType != pcomp->GetPackType()) {
-        return 1;
+        return true;
     }
     int32_t ShaderPropertyType = PackData.iPackFlags;
     if (ShaderPropertyType != pcomp->PackData.iPackFlags) {
-        return 1;
+        return true;
     }
     if (PackData.iFOBehaviorFlags != pcomp->PackData.iFOBehaviorFlags) {
-        return 1;
+        return true;
     }
     if (PackData.iPackageSpecificFlags != pcomp->PackData.iPackageSpecificFlags) {
-        return 1;
+        return true;
     }
     if (pIdleCollection) {
         BGSIdleCollection* Interior = pIdleCollection;
         if (Interior->CompareComponent(pcomp->pIdleCollection)) {
-            return 1;
+            return true;
         }
     }
     else {
         if (pcomp->pIdleCollection) {
-            return 1;
+            return true;
         }
     }
     if (pPackLoc) {
         if (pPackLoc->Compare(pcomp->pPackLoc)) {
-            return 1;
+            return true;
         }
     }
     else {
         if (pcomp->pPackLoc) {
-            return 1;
+            return true;
         }
     }
     if (GetPackageSecondLocation()) {
         PackageLocation* PackageSecondLocation = pcomp->GetPackageSecondLocation();
         PackageLocation* v5 = GetPackageSecondLocation();
         if (v5->Compare(PackageSecondLocation)) {
-            return 1;
+            return true;
         }
     }
     else {
         if (pcomp->GetPackageSecondLocation()) {
-            return 1;
+            return true;
         }
     }
     if (GetPackageTarget()) {
         if (GetPackageTarget()->Compare(pcomp->GetPackageTarget())) {
-            return 1;
+            return true;
         }
     }
     else {
         if (pcomp->GetPackageTarget()) {
-            return 1;
+            return true;
         }
     }
     if (GetPackageSchedule()) {
         if (GetPackageSchedule()->Compare(pcomp->GetPackageSchedule())) {
-            return 1;
+            return true;
         }
     }
     else {
         if (pcomp->GetPackageSchedule()) {
-            return 1;
+            return true;
         }
     }
     // The game tests this address (&packConditions) for null. It never is null, so Save() is called unconditionally.
     if ((&packConditions)->Compare(&pcomp->packConditions)) {
-        return 1;
+        return true;
     }
     if (pCombatStyle) {
         TESCombatStyle* CombatStyle = pCombatStyle;
         if (CombatStyle->Compare(pcomp->pCombatStyle)) {
-            return 1;
+            return true;
         }
     }
     else {
         if (pcomp->pCombatStyle) {
-            return 1;
+            return true;
         }
     }
     if (pPackData && pcomp->pPackData) {
         if (pPackData->Compare(pcomp->pPackData)) {
-            return 1;
+            return true;
         }
     }
     else {
         if (pPackData || pcomp->pPackData) {
-            return 1;
+            return true;
         }
     }
     return OnBegin.Compare(&pcomp->OnBegin) || (OnEnd.Compare(&pcomp->OnEnd) || OnChange.Compare(&pcomp->OnChange));
@@ -861,39 +857,39 @@ bool TESPackage::IsActorAtSecondLocation(
 ) {
     BaseProcess* v14;
     if (!apMobileObject) {
-        return 0;
+        return false;
     }
-    Actor* apActor = 0;
+    Actor* apActor = nullptr;
     if (apMobileObject->IsActor()) {
         apActor = static_cast<Actor*>(apMobileObject);
     }
     PackageLocation* pLoc = GetPackageSecondLocation();
     if (!pLoc) {
-        return 1;
+        return true;
     }
     if (pLoc->GetLocType() == PLT_EDITORLOC && !apPackageowner->HasEditorLocation()) {
-        return 1;
+        return true;
     }
     TESWorldSpace* plocworld = GetSecondLocationWorld(apPackageowner);
     TESObjectCELL* plocintcell = GetSecondLocationCell(apPackageowner);
     if (plocintcell) {
         if (!plocintcell->GetInterior()) {
-            plocintcell = 0;
+            plocintcell = nullptr;
         }
     }
     TESWorldSpace* pactorworld = apMobileObject->GetWorldSpace();
     TESObjectCELL* pactorintcell = apMobileObject->GetParentCell();
     if (pactorintcell) {
         if (!pactorintcell->GetInterior()) {
-            pactorintcell = 0;
+            pactorintcell = nullptr;
         }
     }
-    bool bsamespace = 0;
+    bool bsamespace = false;
     if (pactorintcell || plocintcell) {
         if (pactorintcell == plocintcell) {
-            bsamespace = 1;
+            bsamespace = true;
             if (pLoc->GetLocType() == PLT_CELL) {
-                return 1;
+                return true;
             }
         }
     }
@@ -901,15 +897,15 @@ bool TESPackage::IsActorAtSecondLocation(
         bsamespace = pactorworld == plocworld;
     }
     if (!bsamespace) {
-        return 0;
+        return false;
     }
-    bool btriggered = 0;
+    bool btriggered = false;
     if (pLoc->IsRefAtLocationTrigger(apPackageowner, apMobileObject, btriggered)) {
         return btriggered;
     }
     int32_t iRadius = GetSecondLocationRadius();
     if (iRadius > 0) {
-        bInfurniture = 0;
+        bInfurniture = false;
     }
     if (bignoredistance) {
         iRadius = 0;
@@ -919,9 +915,9 @@ bool TESPackage::IsActorAtSecondLocation(
             iRadius = static_cast<int32_t>(afOtherRadius);
         }
     }
-    bool bexactpos = 0;
+    bool bexactpos = false;
     NiPoint3 loccoord = GetSecondLocationCoord(apPackageowner);
-    TESObjectREFR* pRef = 0;
+    TESObjectREFR* pRef = nullptr;
     if (pLoc) {
         pRef = GetSecondLocationReference(apPackageowner);
     }
@@ -937,20 +933,20 @@ bool TESPackage::IsActorAtSecondLocation(
                         loccoord = CurrentAIProcess->GetFurnitureMarker()->Position;
                     }
                     iRadius = 20;
-                    bexactpos = 1;
+                    bexactpos = true;
                 }
                 else {
                     TESBoundObject* v8;
                     TESBoundObject* ObjectReference = pRef->GetObjectReference();
                     if (ObjectReference == pXMarkerHeading || (v8 = pRef->GetObjectReference(), v8 == pXMarker)) {
                         iRadius = 20;
-                        bexactpos = 1;
+                        bexactpos = true;
                     }
                     else {
                         if (pRef->IsActor()) {
                             if (pRef->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
                                 iRadius = 90;
-                                bexactpos = 1;
+                                bexactpos = true;
                             }
                             else {
                                 iRadius = static_cast<int32_t>(pRef->GetModelBoundSize()) + 20;
@@ -980,7 +976,7 @@ bool TESPackage::IsActorAtSecondLocation(
             }
             else {
                 if (pLoc->GetLocType() == PLT_EDITORLOC) {
-                    bexactpos = 1;
+                    bexactpos = true;
                     iRadius = 10;
                 }
             }
@@ -989,17 +985,17 @@ bool TESPackage::IsActorAtSecondLocation(
     if (!iRadius) {
         iRadius = iAIDistanceRadiusMinLocation.Int();
     }
-    bool bGoodPt = 0;
+    bool bGoodPt = false;
     if (GetPackType() == PACKAGE_TYPE_WANDER) {
         if (pactorintcell) {
             const NiPoint3* v9 = &apMobileObject->GetLocationOnReference();
             float v15 = v9->z - GetSecondLocationCoord(apPackageowner).z;
             if (std::fabs(v15) > 100.0) {
-                return 0;
+                return false;
             }
         }
     }
-    bool boverride = 0;
+    bool boverride = false;
     if (bInfurniture &&
         (pRef &&
          (pRef->IsFurniture() &&
@@ -1012,15 +1008,15 @@ bool TESPackage::IsActorAtSecondLocation(
                 BaseProcess* v13 = apActor->pCurrentProcess;
                 TESObjectREFR* v11 = v13->GetCurrentFurniture();
                 if (v11 == pRef) {
-                    return 1;
+                    return true;
                 }
             }
         }
     }
     else {
         float v12 = static_cast<float>(iRadius);
-        if (apMobileObject->IsAtPoint(loccoord, v12, !bexactpos, 1) && !boverride) {
-            return 1;
+        if (apMobileObject->IsAtPoint(loccoord, v12, !bexactpos, true) && !boverride) {
+            return true;
         }
     }
     return bGoodPt;
@@ -1029,13 +1025,13 @@ bool TESPackage::IsActorAtSecondLocation(
 bool TESPackage::IsActorAtRefTarget(MobileObject* apMobileObject, int32_t aiExtraRadius) {
     BaseProcess* v13;
     if (!apMobileObject || !apMobileObject->GetCurrentTarget()) {
-        return 0;
+        return false;
     }
-    MobileObject* apActor = 0;
+    MobileObject* apActor = nullptr;
     if (apMobileObject->IsActor()) {
         apActor = apMobileObject;
     }
-    bool bexactpos = 0;
+    bool bexactpos = false;
     TESObjectREFR* ptargref = apMobileObject->GetCurrentTarget();
     NiPoint3 targloc = ptargref->GetLocationOnReference();
     if (ptargref->GetTeleport()) {
@@ -1045,30 +1041,30 @@ bool TESPackage::IsActorAtRefTarget(MobileObject* apMobileObject, int32_t aiExtr
     TESObjectCELL* ptargintcell = ptargref->GetParentCell();
     if (ptargintcell) {
         if (!ptargintcell->GetInterior()) {
-            ptargintcell = 0;
+            ptargintcell = nullptr;
         }
     }
     TESWorldSpace* pactorworld = apMobileObject->GetWorldSpace();
     TESObjectCELL* pactorintcell = apMobileObject->GetParentCell();
     if (pactorintcell) {
         if (!pactorintcell->GetInterior()) {
-            pactorintcell = 0;
+            pactorintcell = nullptr;
         }
     }
-    bool bsamespace = 0;
+    bool bsamespace = false;
     if (pactorintcell || ptargintcell) {
         if (pactorintcell == ptargintcell) {
-            bsamespace = 1;
+            bsamespace = true;
         }
     }
     else {
         bsamespace = pactorworld == ptargworld;
     }
     if (!bsamespace) {
-        return 0;
+        return false;
     }
-    int32_t iRadius = static_cast<int32_t>(GetPackageRadiusActorToRefTarget(apMobileObject, 0));
-    bool bGoodPt = 0;
+    int32_t iRadius = static_cast<int32_t>(GetPackageRadiusActorToRefTarget(apMobileObject, false));
+    bool bGoodPt = false;
     const NiPoint3* v4 = &apMobileObject->GetLocationOnReference();
     NiPoint3 dist = targloc - *v4;
     if (ptargref->IsFurniture() &&
@@ -1078,12 +1074,12 @@ bool TESPackage::IsActorAtRefTarget(MobileObject* apMobileObject, int32_t aiExtr
             targloc = CurrentAIProcess->GetFurnitureMarker()->Position;
         }
         iRadius = 10;
-        bexactpos = 1;
+        bexactpos = true;
     }
     else {
         if (ptargref->GetObjectReference()->GetFormType() == IDLM_ID) {
             iRadius = 10;
-            bexactpos = 1;
+            bexactpos = true;
         }
         else {
             if (iRadius > 20 || (!ptargref->IsActor() || ptargref == pPlayer)) {
@@ -1091,18 +1087,18 @@ bool TESPackage::IsActorAtRefTarget(MobileObject* apMobileObject, int32_t aiExtr
                 TESBoundObject* ObjectReference = ptargref->GetObjectReference();
                 if (ObjectReference == pXMarkerHeading || (v6 = ptargref->GetObjectReference(), v6 == pXMarker)) {
                     iRadius = 20;
-                    bexactpos = 1;
+                    bexactpos = true;
                 }
             }
             else {
                 if (ptargref->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
                     iRadius = 90;
-                    bexactpos = 1;
+                    bexactpos = true;
                 }
                 else {
                     if (apMobileObject->GetSitSleepState() == SIT_SLEEP_IS_SITTING) {
                         iRadius = 200;
-                        bexactpos = 1;
+                        bexactpos = true;
                     }
                     else {
                         iRadius = static_cast<int32_t>(ptargref->GetModelBoundSize()) + 20;
@@ -1116,9 +1112,9 @@ bool TESPackage::IsActorAtRefTarget(MobileObject* apMobileObject, int32_t aiExtr
     if (fPathPointZDistanceAllowance.Float() > v11) {
         dist.z = 0.0f;
     }
-    bool boverride = 0;
-    if (apMobileObject->IsAtPoint(targloc, static_cast<float>(iRadius), !bexactpos, 0) && !boverride) {
-        bGoodPt = 1;
+    bool boverride = false;
+    if (apMobileObject->IsAtPoint(targloc, static_cast<float>(iRadius), !bexactpos, false) && !boverride) {
+        bGoodPt = true;
     }
     if (ptargref) {
         if (ptargref->IsFurniture()) {
@@ -1130,7 +1126,7 @@ bool TESPackage::IsActorAtRefTarget(MobileObject* apMobileObject, int32_t aiExtr
                     // The length is compared as a double against 100.0.
                     if ((dist_2.XYLength() < 100.0 && apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING) ||
                         apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
-                        bGoodPt = 1;
+                        bGoodPt = true;
                     }
                 }
             }
@@ -1152,37 +1148,37 @@ bool TESPackage::IsTargetAtLocation(MobileObject* apActor, int32_t aiExtraRadius
     NiPoint3 v14;
     bool abRefInsideTriggerOut;
     if (!apActor || !apActor->GetCurrentTarget()) {
-        return 0;
+        return false;
     }
     TESObjectREFR* apRef = apActor->GetCurrentTarget();
     TESWorldSpace* WorldSpace = apRef->GetWorldSpace();
     TESObjectCELL* ParentCell = apRef->GetParentCell();
     if (ParentCell) {
         if (!ParentCell->GetInterior()) {
-            ParentCell = 0;
+            ParentCell = nullptr;
         }
     }
     TESWorldSpace* LocationWorld = GetLocationWorld(apActor);
     TESObjectCELL* LocationCell = GetLocationCell(apActor);
     if (LocationCell) {
         if (!LocationCell->GetInterior()) {
-            LocationCell = 0;
+            LocationCell = nullptr;
         }
     }
-    bool v13 = 0;
+    bool v13 = false;
     if (LocationCell || ParentCell) {
         if (LocationCell == ParentCell) {
-            v13 = 1;
+            v13 = true;
         }
     }
     else {
         v13 = LocationWorld == WorldSpace;
     }
     if (!v13) {
-        return 0;
+        return false;
     }
     PackageLocation* Location_ = GetLocation();
-    abRefInsideTriggerOut = 0;
+    abRefInsideTriggerOut = false;
     if (Location_ && Location_->IsRefAtLocationTrigger(apActor, apRef, abRefInsideTriggerOut)) {
         return abRefInsideTriggerOut;
     }
@@ -1199,13 +1195,13 @@ bool TESPackage::IsTargetAtLocation(MobileObject* apActor, int32_t aiExtraRadius
         LocationRadius = iAIDistanceRadiusMinLocation.UInt();
     }
     LocationRadius += aiExtraRadius;
-    bool v17 = 0;
+    bool v17 = false;
     const NiPoint3* v6 = &apRef->GetLocationOnReference();
     NiPoint3* LocationCoord = &(result = GetLocationCoord(apActor));
     v14 = *LocationCoord - *v6;
     int32_t v5 = static_cast<int32_t>(v14.XYLength());
     if (v5 <= LocationRadius) {
-        return 1;
+        return true;
     }
     return v17;
 }
@@ -1462,7 +1458,7 @@ void TESPackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 v4 = ::new (v7) PackageLocation;
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             pPackLoc = v4;
             pPackLoc->LoadGame(apLoadGameBuffer);
@@ -1474,7 +1470,7 @@ void TESPackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 v3 = ::new (v6) PackageTarget;
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             pPackTarg = v3;
             pPackTarg->LoadGame(apLoadGameBuffer);
@@ -1812,7 +1808,7 @@ void TESPackage::CalculateProcedureType(TESObjectREFR* apLinkedRef) {
                 }
                 goto LABEL_98;
             }
-            bool bflag = 0;
+            bool bflag = false;
             if (!GetPackageTarget() ||
                 (!GetPackageTarget()->GetTargReference() &&
                  (!GetPackageTarget()->GetTargObject() && GetPackageTarget()->GetTargObjectType() == POTYPE_NONE))) {
@@ -1832,7 +1828,7 @@ void TESPackage::CalculateProcedureType(TESObjectREFR* apLinkedRef) {
                         case FLOR_ID:
                         case FURN_ID:
                         case CREA_ID: {
-                            bflag = 1;
+                            bflag = true;
                             goto LABEL_30;
                         }
                         case NPC__ID: {
@@ -1856,7 +1852,7 @@ void TESPackage::CalculateProcedureType(TESObjectREFR* apLinkedRef) {
                         case FLOR_ID:
                         case FURN_ID:
                         case CREA_ID: {
-                            bflag = 1;
+                            bflag = true;
                             goto LABEL_30;
                         }
                         case NPC__ID: {
@@ -1877,7 +1873,7 @@ void TESPackage::CalculateProcedureType(TESObjectREFR* apLinkedRef) {
                         case POTYPE_FLOR:
                         case POTYPE_FURN:
                         case POTYPE_CREA: {
-                            bflag = 1;
+                            bflag = true;
                             goto LABEL_30;
                         }
                         case POTYPE_NPC: {
@@ -1905,7 +1901,7 @@ void TESPackage::CalculateProcedureType(TESObjectREFR* apLinkedRef) {
                         case FLOR_ID:
                         case FURN_ID:
                         case CREA_ID: {
-                            bflag = 1;
+                            bflag = true;
                             goto LABEL_30;
                         }
                         case NPC__ID: {
@@ -1949,7 +1945,7 @@ void TESPackage::CalculateProcedureType(TESObjectREFR* apLinkedRef) {
             goto LABEL_98;
         }
         case PACKAGE_TYPE_ESCORT: {
-            bool bflag_2 = 0;
+            bool bflag_2 = false;
             if (GetPackageTarget()) {
                 PACK_TARG_TYPE etype_2 = GetPackageTarget()->GetTargType();
                 switch (etype_2) {
@@ -1961,7 +1957,7 @@ void TESPackage::CalculateProcedureType(TESObjectREFR* apLinkedRef) {
                                 if (v4->GetObjectReference()->GetFormType() == NPC__ID ||
                                     (v5 = GetPackageTarget()->GetTargReference(),
                                      v5->GetObjectReference()->GetFormType() == CREA_ID)) {
-                                    bflag_2 = 1;
+                                    bflag_2 = true;
                                 }
                             }
                         }
@@ -1973,14 +1969,14 @@ void TESPackage::CalculateProcedureType(TESObjectREFR* apLinkedRef) {
                         if ((GetPackageTarget()->GetTargObject() &&
                              (v6 = GetPackageTarget()->GetTargObject(), v6->GetFormType() == NPC__ID)) ||
                             (v7 = GetPackageTarget()->GetTargObject(), v7->GetFormType() == CREA_ID)) {
-                            bflag_2 = 1;
+                            bflag_2 = true;
                         }
                         break;
                     }
                     case PTT_TYPE: {
                         if (GetPackageTarget()->GetTargObjectType() == POTYPE_NPC ||
                             GetPackageTarget()->GetTargObjectType() == POTYPE_CREA) {
-                            bflag_2 = 1;
+                            bflag_2 = true;
                         }
                         break;
                     }
@@ -1989,7 +1985,7 @@ void TESPackage::CalculateProcedureType(TESObjectREFR* apLinkedRef) {
                             if (apLinkedRef->GetObjectReference()) {
                                 if (apLinkedRef->GetObjectReference()->GetFormType() == NPC__ID ||
                                     apLinkedRef->GetObjectReference()->GetFormType() == CREA_ID) {
-                                    bflag_2 = 1;
+                                    bflag_2 = true;
                                 }
                             }
                         }
@@ -2620,7 +2616,7 @@ PackageLocation* TESPackage::GetPackageSearchLocation() {
             break;
         }
         default: {
-            result = 0;
+            result = nullptr;
             break;
         }
     }
@@ -2902,7 +2898,7 @@ double TESPackage::GetPackageRadiusActorToRefTarget(MobileObject* apMobileObject
     else {
         ploc = pPackLoc;
     }
-    Actor* apActor = 0;
+    Actor* apActor = nullptr;
     if (apMobileObject->IsActor()) {
         apActor = static_cast<Actor*>(apMobileObject);
     }
@@ -2990,7 +2986,7 @@ void TESPackage::SetNeverRun(TESObjectREFR* pref, bool abVal) {
 }
 
 TESObjectCELL* TESPackage::GetSecondLocationCell(MobileObject* apActor) {
-    TESObjectCELL* pRetCell = 0;
+    TESObjectCELL* pRetCell = nullptr;
     PackageLocation* pLoc = GetPackageSecondLocation();
     if (!pLoc || pLoc->GetLocType() == PLT_CURRLOC) {
         if (apActor) {
@@ -3684,7 +3680,7 @@ bool TESPackage::GetWaiting() {
 }
 
 uint32_t TESPackage::DecRefCount() {
-    return (uint32_t)NiAtomicDecrement(uiRefCount);
+    return NiAtomicDecrement(uiRefCount);
 }
 
 bool TESPackage::SearchGetAllowBuying() {
@@ -3922,7 +3918,7 @@ TESTopic* TESPackage::GetOnChangeTopicInfo() {
 }
 
 TESWorldSpace* TESPackage::GetSecondLocationWorld(MobileObject* apActor) {
-    TESWorldSpace* pretworld = 0;
+    TESWorldSpace* pretworld = nullptr;
     PackageLocation* ploc = GetPackageSecondLocation();
     if (!ploc || ploc->GetLocType() == PLT_CURRLOC) {
         if (apActor) {
@@ -4085,36 +4081,36 @@ bool TESPackage::IsTargetAtSecondLocation(MobileObject* apActor, float aiRadius)
     bool abRefInsideTriggerOut;
     TESObjectREFR* apRef = apActor->GetCurrentTarget();
     if (!apActor || !apRef) {
-        return 0;
+        return false;
     }
     TESWorldSpace* WorldSpace = apRef->GetWorldSpace();
     TESObjectCELL* ParentCell = apRef->GetParentCell();
     if (ParentCell) {
         if (!ParentCell->GetInterior()) {
-            ParentCell = 0;
+            ParentCell = nullptr;
         }
     }
     TESWorldSpace* LocationWorld = GetLocationWorld(apActor);
     TESObjectCELL* LocationCell = GetLocationCell(apActor);
     if (LocationCell) {
         if (!LocationCell->GetInterior()) {
-            LocationCell = 0;
+            LocationCell = nullptr;
         }
     }
-    bool v13 = 0;
+    bool v13 = false;
     if (LocationCell || ParentCell) {
         if (LocationCell == ParentCell) {
-            v13 = 1;
+            v13 = true;
         }
     }
     else {
         v13 = LocationWorld == WorldSpace;
     }
     if (!v13) {
-        return 0;
+        return false;
     }
     PackageLocation* PackageSecondLocation = GetPackageSecondLocation();
-    abRefInsideTriggerOut = 0;
+    abRefInsideTriggerOut = false;
     if (PackageSecondLocation && PackageSecondLocation->IsRefAtLocationTrigger(apActor, apRef, abRefInsideTriggerOut)) {
         return abRefInsideTriggerOut;
     }
@@ -4134,12 +4130,12 @@ bool TESPackage::IsTargetAtSecondLocation(MobileObject* apActor, float aiRadius)
         }
         aiRadius = static_cast<float>(SecondLocationRadius);
     }
-    bool v17 = 0;
+    bool v17 = false;
     const NiPoint3* v5 = &apRef->GetLocationOnReference();
     NiPoint3* SecondLocationCoord = &(a1 = GetSecondLocationCoord(apActor));
     v14 = *SecondLocationCoord - *v5;
     if (aiRadius >= static_cast<double>(static_cast<int32_t>(v14.XYLength()))) {
-        return 1;
+        return true;
     }
     return v17;
 }
@@ -4167,7 +4163,7 @@ void TESPackage::SetDialogueNoHeadTrack(bool abHead) {
                 v2 = ::new (apMemory) TESDialoguePackageData;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pPackData = v2;
             this->pPackData = v2;
@@ -4190,7 +4186,7 @@ void TESPackage::SetDialogueFOV(float afFov) {
                 pdata = ::new (apMemory) TESDialoguePackageData;
             }
             else {
-                pdata = 0;
+                pdata = nullptr;
             }
             pdata_2 = pdata;
             pPackData = pdata;
@@ -4208,7 +4204,7 @@ void TESPackage::SetPackageIdles(BGSIdleCollection* apIdles) {
                 v2 = ::new (apMemory) BGSIdleCollection;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pIdleCollection = v2;
         }
@@ -4218,13 +4214,13 @@ void TESPackage::SetPackageIdles(BGSIdleCollection* apIdles) {
         if (pIdleCollection) {
             delete pIdleCollection;
         }
-        pIdleCollection = 0;
+        pIdleCollection = nullptr;
     }
 }
 
 TESObjectREFR* TESPackage::GetSecondLocationReference(MobileObject* apActor) {
     PackageLocation* PackageSecondLocation = GetPackageSecondLocation();
-    MobileObject* LocReference = 0;
+    MobileObject* LocReference = nullptr;
     if (!PackageSecondLocation || PackageSecondLocation->GetLocType() == PLT_CURRLOC) {
         if (apActor) {
             return apActor;
@@ -4299,7 +4295,7 @@ const TESFollowPackageData* TESPackage::GetFollowPackageData() {
         return static_cast<TESFollowPackageData*>(pPackData);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -4355,7 +4351,7 @@ const GuardPackageData* TESPackage::GetGuardPackageData() {
         return static_cast<GuardPackageData*>(pPackData);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -4648,7 +4644,7 @@ bool TESPackage::FormMatchesPackageObjectType(TESForm* apForm, PACKAGE_OBJECT_TY
 
 bool TESPackage::EvaluateEscortReference(TESObjectREFR* apRef, void* aiEnumData) {
     if (!aiEnumData) {
-        return 0;
+        return false;
     }
     // aiEnumData is the context GetEscortTargetForPackage hands the reference enumeration.
     TESEvaluateEscortContext* pContext = static_cast<TESEvaluateEscortContext*>(aiEnumData);
@@ -4656,31 +4652,31 @@ bool TESPackage::EvaluateEscortReference(TESObjectREFR* apRef, void* aiEnumData)
     Actor* pRequester = pContext->pRequester;
     bool bSkipExistingFollowers = pContext->bSkipExistingFollowers;
     if (!pObject->IsBoundObject()) {
-        return 0;
+        return false;
     }
     TESBoundObject* pBoundObject = static_cast<TESBoundObject*>(pObject);
     if (!apRef->GetIsOfType(pBoundObject) || apRef->GetDelete()) {
-        return 0;
+        return false;
     }
     if (apRef->IsActor()) {
         if (apRef == pRequester) {
-            return 0;
+            return false;
         }
-        if (apRef->IsDead(1)) {
-            return 0;
+        if (apRef->IsDead(true)) {
+            return false;
         }
         if (bSkipExistingFollowers) {
             TESPackage* ppack = static_cast<MobileObject*>(apRef)->MobileObject::GetCurrentPackage();
             if (ppack && ppack->GetPackType() == PACKAGE_TYPE_FOLLOW) {
-                return 0;
+                return false;
             }
             if (pRequester->HasFollower(static_cast<Actor*>(apRef))) {
-                return 0;
+                return false;
             }
         }
     }
     pTempTarget = apRef;
-    return 1;
+    return true;
 }
 
 void PackageEventAction::SetType(int32_t aeType) {

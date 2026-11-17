@@ -62,7 +62,7 @@ bool SettingCollection::OpenPath(const char* apPath, bool abWrite) {
 }
 
 void SettingCollection::SetFileHandle(void* apHandle) {
-    SetFileName(0);
+    SetFileName(nullptr);
     pHandle = apHandle;
 }
 
@@ -74,7 +74,7 @@ SettingCollectionList::SettingCollectionList() {}
 
 uint32_t SettingCollectionList::GetViewerStrings(NiTPrimitiveArray<char*>* apStringsA) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_GAMESETTING, 1, "d:\\_fallout3\\platforms\\common\\code\\bsmain\\Setting.h", 806
+        MEM_CONTEXT_GAMESETTING, true, "d:\\_fallout3\\platforms\\common\\code\\bsmain\\Setting.h", 806
     );
     BSSimpleList<Setting*>* pcur = Head();
     uint32_t I = 0;
@@ -89,7 +89,7 @@ uint32_t SettingCollectionList::GetViewerStrings(NiTPrimitiveArray<char*>* apStr
 
 void SettingCollectionList::Add(Setting* apSetting) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_GAMESETTING, 1, "d:\\_fallout3\\platforms\\common\\code\\bsmain\\Setting.h", 765
+        MEM_CONTEXT_GAMESETTING, true, "d:\\_fallout3\\platforms\\common\\code\\bsmain\\Setting.h", 765
     );
     if (!SettingsA.IsEmpty()) {
         for (BSSimpleList<Setting*>* pIter = &SettingsA; pIter; pIter = pIter->m_pkNext) {
@@ -122,7 +122,7 @@ bool SettingCollectionList::WriteSettings() {
 
 bool SettingCollectionList::ReadSettings() {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_GAMESETTING, 1, "d:\\_fallout3\\platforms\\common\\code\\bsmain\\Setting.h", 855
+        MEM_CONTEXT_GAMESETTING, true, "d:\\_fallout3\\platforms\\common\\code\\bsmain\\Setting.h", 855
     );
     bool bres = SettingCollection::ReadSettings();
     if (bres) {
@@ -143,7 +143,7 @@ BSSimpleList<Setting*>* SettingCollectionList::Head() {
 }
 
 Setting* SettingCollectionList::GetPtr(const char* apID) {
-    Setting* arpGS = 0;
+    Setting* arpGS = nullptr;
     Get(apID, arpGS);
     return arpGS;
 }
@@ -154,16 +154,16 @@ BSSimpleList<Setting*>* SettingCollectionList::Next(BSSimpleList<Setting*>* apLi
 
 bool SettingCollectionList::Get(const char* apID, Setting*& arpGS) {
     if (!apID) {
-        return 0;
+        return false;
     }
     for (BSSimpleList<Setting*>* ecx0 = &SettingsA; ecx0 && !ecx0->IsEmpty(); ecx0 = ecx0->m_pkNext) {
         Setting* v4 = ecx0->m_item;
         if (!BSstricmp(v4->pKey, apID)) {
             arpGS = v4;
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 INISettingCollection::INISettingCollection() {}
@@ -348,7 +348,7 @@ bool INISettingCollection::Close() {
 }
 
 uint8_t INISettingCollection::SaveAll(char* a2) {
-    uint8_t v4 = (uint8_t)SettingCollection::OpenPath(a2, 1);
+    uint8_t v4 = (uint8_t)SettingCollection::OpenPath(a2, true);
     if (v4) {
         v4 = (uint8_t)WriteSettings();
         Close();
@@ -405,7 +405,7 @@ bool GameSettingCollection::WriteSetting(Setting& arSetting) {
 }
 
 bool GameSettingCollection::Open(bool abWrite) {
-    return (pHandle != 0);
+    return (pHandle != nullptr);
 }
 
 bool GameSettingCollection::Close() {
@@ -414,7 +414,7 @@ bool GameSettingCollection::Close() {
 }
 
 bool GameSettingCollection::ReadSetting(TESFile* apFile, const char* apKey) {
-    bool bres = 0;
+    bool bres = false;
     SetFileHandle(apFile);
     Setting* psetting = GetPtr(apKey);
     if (psetting) {
@@ -430,7 +430,7 @@ bool GameSettingCollection::GetSetting(const char* apKey, Setting** appSetting) 
 
 Setting* GameSettingCollection::GetPtr(const char* apID) {
     Setting* appSetting;
-    appSetting = 0;
+    appSetting = nullptr;
     GetSetting(apID, &appSetting);
     return appSetting;
 }

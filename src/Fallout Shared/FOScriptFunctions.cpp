@@ -93,7 +93,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 bool GetVATSValueFunction(
     const SCRIPT_PARAMETER* apParameters,
@@ -108,8 +108,8 @@ bool GetVATSValueFunction(
     char* a3;
     void* a8;
     char v10 = 1;
-    a8 = 0;
-    a3 = 0;
+    a8 = nullptr;
+    a3 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &a3
            ) &&
@@ -122,7 +122,7 @@ bool Cmd_GetVATSValue(TESObjectREFR* apRefObject, void* apParam1, void* apParam2
     TESForm* ObjectReference;
     TESForm* item;
     afReturnValue = 0.0;
-    bool v29 = 0;
+    bool v29 = false;
     if (pVATS.eMode == VATS::VATS_PLAYBACK) {
         CurrentAction = pVATS.GetCurrentAction();
     }
@@ -132,7 +132,7 @@ bool Cmd_GetVATSValue(TESObjectREFR* apRefObject, void* apParam1, void* apParam2
             CurrentQueuedAction = VATSMenu::GetCurrentQueuedAction();
         }
         else {
-            CurrentQueuedAction = 0;
+            CurrentQueuedAction = nullptr;
         }
         CurrentAction = CurrentQueuedAction;
     }
@@ -192,7 +192,8 @@ bool Cmd_GetVATSValue(TESObjectREFR* apRefObject, void* apParam1, void* apParam2
                     break;
                 }
                 case 4: {
-                    afReturnValue = CombatUtilities::GetDistanceBetweenFacingActors(pPlayer, CurrentAction->pTarget, 0);
+                    afReturnValue =
+                        CombatUtilities::GetDistanceBetweenFacingActors(pPlayer, CurrentAction->pTarget, false);
                     break;
                 }
                 case 5: {
@@ -344,7 +345,7 @@ bool Cmd_GetVATSValue(TESObjectREFR* apRefObject, void* apParam1, void* apParam2
                     break;
                 }
             }
-            v29 = 1;
+            v29 = true;
         }
     }
     if (Interface::IsConsoleVisible()) {
@@ -358,7 +359,7 @@ bool Cmd_GetVATSValue(TESObjectREFR* apRefObject, void* apParam1, void* apParam2
 
 bool FOScriptFunctions::GetParamIsTESForm(FunctionData* apFuncData, uint32_t aiParam) {
     uint8_t v3 = 0;
-    if (((uint32_t)aiParam) == 1) {
+    if (aiParam == 1) {
         switch ((int32_t)apFuncData->uParam[0].uiNumber) {
             case 0:
             case 1:

@@ -126,11 +126,11 @@ uint32_t BSFile::GetFileSize() const {
 bool BSFile::Open(bool abWaitForOpen, bool abTextMode) {
     const char* pMode;
     if (m_pFile) {
-        return 1;
+        return true;
     }
     m_uiPos = 0;
     m_uiBufferReadSize = 0;
-    m_pBuffer = 0;
+    m_pBuffer = nullptr;
     NiFile::OpenMode eMode = m_eMode;
     if (eMode) {
         if (eMode == NiFile::WRITE_ONLY) {
@@ -164,10 +164,10 @@ bool BSFile::Open(bool abWaitForOpen, bool abTextMode) {
         }
         pMode = v6;
     }
-    m_pFile = 0;
+    m_pFile = nullptr;
     rt::fopen_s(&m_pFile, pFileName, pMode);
     if (!m_pFile && m_eMode == NiFile::WRITE_ONLY) {
-        m_pFile = 0;
+        m_pFile = nullptr;
         if (abTextMode) {
             rt::fopen_s(&m_pFile, pFileName, "wt");
         }
@@ -177,7 +177,7 @@ bool BSFile::Open(bool abWaitForOpen, bool abTextMode) {
         if (m_pFile) {
             std::fclose(m_pFile);
         }
-        m_pFile = 0;
+        m_pFile = nullptr;
         rt::fopen_s(&m_pFile, pFileName, pMode);
     }
     CheckIsGood();
@@ -186,12 +186,12 @@ bool BSFile::Open(bool abWaitForOpen, bool abTextMode) {
 
 bool BSFile::OpenByFilePointer(std::FILE* apFile) {
     if (m_pFile) {
-        return (bool)1;
+        return true;
     }
     m_uiPos = (uint32_t)0;
     m_uiBufferReadSize = (uint32_t)0;
     m_pBuffer = nullptr;
-    m_pFile = static_cast<std::FILE*>(apFile);
+    m_pFile = apFile;
     CheckIsGood();
     return (bool)((uint8_t)m_bGood);
 }
@@ -199,12 +199,12 @@ bool BSFile::OpenByFilePointer(std::FILE* apFile) {
 uint32_t BSFile::Read(BSStringT<char16_t>& arString, uint32_t aiMaxLength) {
     char16_t v7;
     if (!m_pFile) {
-        Open(0, 0);
+        Open(false, false);
     }
     uint32_t ibuffer = 0;
     uint32_t itotal = 0;
     uint32_t ibytesRead = 0;
-    while (1) {
+    while (true) {
         char16_t String[260];
         do {
             uint32_t v6[2];
@@ -240,12 +240,12 @@ uint32_t BSFile::Read(BSStringT<char16_t>& arString, uint32_t aiMaxLength) {
 uint32_t BSFile::Read(BSStringT<char>& arString, uint32_t aiMaxLength) {
     char v7;
     if (!m_pFile) {
-        Open(0, 0);
+        Open(false, false);
     }
     int32_t v11 = 0;
     int32_t v9 = 0;
     int32_t result = 0;
-    while (1) {
+    while (true) {
         char apString[264];
         do {
             int32_t v6[2];
@@ -350,12 +350,12 @@ void BSFile::CheckIsGood() {
     uint8_t bEmpty;
     int32_t eMemContext;
     if (m_pFile) {
-        m_bGood = (bool)1;
+        m_bGood = true;
         if (m_uiBufferAllocSize) {
             if (!m_pBuffer) {
                 eMemContext = GetThreadMemContext();
                 GetThreadMemContext() = 23;
-                bEmpty = (uint8_t)(m_uiBufferAllocSize == ((-1)));
+                bEmpty = (uint8_t)(m_uiBufferAllocSize == (-1));
                 if (m_uiBufferAllocSize == 0xFFFFFFFFu) {
                     m_uiBufferAllocSize = GetFileSize();
                 }
@@ -365,8 +365,8 @@ void BSFile::CheckIsGood() {
                 if (bEmpty) {
                     m_uiBufferReadSize = m_uiBufferAllocSize;
                     m_uiPos = (uint32_t)0;
-                    if (((uint32_t)NiFile::DiskRead(m_pBuffer, m_uiBufferAllocSize)) != m_uiBufferAllocSize) {
-                        m_bGood = (bool)0;
+                    if (NiFile::DiskRead(m_pBuffer, m_uiBufferAllocSize) != m_uiBufferAllocSize) {
+                        m_bGood = false;
                     }
                 }
                 GetThreadMemContext() = eMemContext;
@@ -374,7 +374,7 @@ void BSFile::CheckIsGood() {
         }
     }
     else {
-        m_bGood = (bool)0;
+        m_bGood = false;
     }
 }
 
@@ -400,7 +400,7 @@ char BSFile::Flush() {
 
 bool BSFile::ChangeBufferSize(uint32_t aiNewSize) {
     uint32_t v3;
-    bool bResult = 1;
+    bool bResult = true;
     uint32_t uiCurrentSize = GetSize();
     if (uiCurrentSize >= 0x4000) {
         v3 = uiCurrentSize;
@@ -412,7 +412,7 @@ bool BSFile::ChangeBufferSize(uint32_t aiNewSize) {
         aiNewSize = v3;
     }
     if (aiNewSize == m_uiBufferAllocSize) {
-        return 1;
+        return true;
     }
     MEM_CONTEXT eMemContext = GetThreadTLSData()->eMemContext;
     GetThreadTLSData()->eMemContext = MEM_CONTEXT_BSFILE;
@@ -424,7 +424,7 @@ bool BSFile::ChangeBufferSize(uint32_t aiNewSize) {
     if (!m_pBuffer) {
         m_uiBufferAllocSize = uiTESStandardBufferSize;
         m_pBuffer = static_cast<char*>(MemoryManager_Singleton.Allocate(m_uiBufferAllocSize));
-        bResult = 0;
+        bResult = false;
     }
     iTrueFilePos = 0;
     GetThreadTLSData()->eMemContext = eMemContext;
@@ -445,7 +445,7 @@ _SYSTEMTIME* BSFile::GetLastSaveTime(_SYSTEMTIME* result) {
             FileTime.dwHighDateTime = static_cast<uint32_t>(kFound[0].writeTime >> 32);
         }
         FileTimeToSystemTime(&FileTime, &SystemTime);
-        SystemTimeToTzSpecificLocalTime(0, &SystemTime, &LocalTime);
+        SystemTimeToTzSpecificLocalTime(nullptr, &SystemTime, &LocalTime);
         *result = LocalTime;
         return result;
     }

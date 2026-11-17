@@ -97,7 +97,7 @@ void hkpToiCountViewer::worldAddedCallback(hkpWorld* w) {
     hkpWorldPostSimulationListener* v4;
     hkpToiCountViewer* v3 = this;
     if (this == nullptr) {
-        v4 = 0;
+        v4 = nullptr;
     }
     else {
         v4 = static_cast<hkpWorldPostSimulationListener*>(this);
@@ -107,7 +107,7 @@ void hkpToiCountViewer::worldAddedCallback(hkpWorld* w) {
         w->addContactListener(this);
     }
     else {
-        w->addContactListener(0);
+        w->addContactListener(nullptr);
     }
 }
 
@@ -190,13 +190,13 @@ void hkpToiCountViewer::postSimulationCallback(hkpWorld* world) {
 
 // The map's keys are the rigid bodies the viewer counts; the entity is one of them.
 void hkpToiCountViewer::entityRemovedCallback(hkpEntity* entity) {
-    entity->removeEntityListener(this != nullptr ? static_cast<hkpEntityListener*>(this) : 0);
+    entity->removeEntityListener(this != nullptr ? static_cast<hkpEntityListener*>(this) : nullptr);
     m_toiCounts.remove(static_cast<hkpRigidBody*>(entity));
 }
 
 // The map's keys are the rigid bodies the viewer counts; the entity is one of them.
 void hkpToiCountViewer::entityDeletedCallback(hkpEntity* entity) {
-    entity->removeEntityListener(this != nullptr ? static_cast<hkpEntityListener*>(this) : 0);
+    entity->removeEntityListener(this != nullptr ? static_cast<hkpEntityListener*>(this) : nullptr);
     m_toiCounts.remove(static_cast<hkpRigidBody*>(entity));
 }
 
@@ -257,7 +257,7 @@ void hkpToiCountViewer::displayCountForBody(hkpRigidBody* body, hkpToiCountViewe
         }
         hkpToiCountViewer::displayTextAtBody(
             m_displayHandler, getProcessTag(), body, displayPosition, str.m_string.begin(),
-            static_cast<int32_t>(hkColor::MAROON), 0.1f, static_cast<hkBool>(1)
+            static_cast<int32_t>(hkColor::MAROON), 0.1f, static_cast<hkBool>(true)
         );
         m_toiCounts.m_map.m_elem[it].val = numToi;
         // EXE-INLINED 0xCBBD40
@@ -278,7 +278,7 @@ hkProcess* hkpToiCountViewer::create(const hkArray<hkProcessContext*, hkContaine
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

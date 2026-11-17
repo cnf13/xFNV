@@ -42,12 +42,12 @@ bool NavMeshSearchSLPoint::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMesh
         NiPoint3 validPoint;
         float fminCheckRadii = fMinValidRadius - ftriangleRadius;
         if (fminCheckRadii > 0.0 && fdistanceSqr < fminCheckRadii * fminCheckRadii) {
-            return 0;
+            return false;
         }
         apNode->tNodeData.GetCenter(&triCenter);
         if (CheckPointOnGoalCircle(triCenter, targetLoc, pmesh, validPoint)) {
             GoalLocation = validPoint;
-            return 1;
+            return true;
         }
         if (fActorRadius < static_cast<double>(ftriangleRadius)) {
             // The three vertex pointers are kept side by side so they can be indexed.
@@ -86,13 +86,13 @@ bool NavMeshSearchSLPoint::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMesh
                 testPoint.operator+=(translatedStartTestPoint);
                 if (CheckPointOnGoalCircle(testPoint, targetLoc, pmesh, validPoint)) {
                     GoalLocation = validPoint;
-                    return 1;
+                    return true;
                 }
                 fsamplePoint = fsamplePoint + fsampleDistance;
             }
         }
     }
-    return 0;
+    return false;
 }
 
 void NavMeshSearchSLPoint::GetGoalLocation(NiPoint3& aOut) const {
@@ -113,9 +113,9 @@ bool NavMeshSearchSLPoint::FindStraightLinePath(
     fMinValidRadius = apRequest->fTargetRadius + MinDistance;
     fActorRadius = apRequest->fActorRadius;
     using nodes_t = BSScrapArray<NavMeshSearchNode, 1024>;
-    nodes_t nodes(32u, 0u, static_cast<ScrapHeap*>(0));
-    links_t links(32u, 0u, static_cast<ScrapHeap*>(0));
-    bool v8 = BuildNodePath(apRequest, aStartNode, aGoalNode, &nodes, &links, 0);
+    nodes_t nodes(32u, 0u, static_cast<ScrapHeap*>(nullptr));
+    links_t links(32u, 0u, static_cast<ScrapHeap*>(nullptr));
+    bool v8 = BuildNodePath(apRequest, aStartNode, aGoalNode, &nodes, &links, nullptr);
     return v8;
 }
 
@@ -126,7 +126,7 @@ bool NavMeshSearchSLPoint::BuildPathToSafeStraightLine(
     BSSimpleArray<NavMeshSearchNode, 1024>* apNodes,
     BSSimpleArray<NavMeshSearchLink, 1024>* apLinks
 ) {
-    PathingLocation* LocalTransform = static_cast<PathingLocation*>(&apRequest->GetDestination());
+    PathingLocation* LocalTransform = (&apRequest->GetDestination());
     TargetLocation.operator=(*LocalTransform);
     fTargetRadius = apRequest->GetTargetRadius();
     double LastFadePercent = apRequest->GetMaxDistance();
@@ -134,7 +134,7 @@ bool NavMeshSearchSLPoint::BuildPathToSafeStraightLine(
     double MinDistance = apRequest->GetMinDistance();
     fMinValidRadius = apRequest->GetTargetRadius() + MinDistance;
     fActorRadius = apRequest->GetActorRadius();
-    return BuildNodePath(apRequest, aStartNode, aGoalNode, apNodes, apLinks, 0);
+    return BuildNodePath(apRequest, aStartNode, aGoalNode, apNodes, apLinks, nullptr);
 }
 
 bool NavMeshSearchSLPoint::CheckPointOnGoalCircle(
@@ -175,24 +175,25 @@ bool NavMeshSearchSLPoint::CheckPointOnGoalCircle(
     PathingLocation aStartLocation(&TestStartPoint, NavMeshInfo_);
     PathingLocation aGoalLocation(aLocation, TargetLocation);
     if (!Pathing::CheckLineOfSight(
-            aStartLocation, aGoalLocation, static_cast<PathingLocation*>(0),
-            static_cast<Pathing::CheckLineOfSightFilter*>(0)
+            aStartLocation, aGoalLocation, static_cast<PathingLocation*>(nullptr),
+            static_cast<Pathing::CheckLineOfSightFilter*>(nullptr)
         )) {
-        return 0;
+        return false;
     }
     PathingLocation apMemory(TestStartPoint - pt, aStartLocation);
     PathingLocation apLocation(aLocation - pt, aGoalLocation);
     if (!Pathing::CheckLineOfSight(
-            apMemory, apLocation, static_cast<PathingLocation*>(0), static_cast<Pathing::CheckLineOfSightFilter*>(0)
+            apMemory, apLocation, static_cast<PathingLocation*>(nullptr),
+            static_cast<Pathing::CheckLineOfSightFilter*>(nullptr)
         )) {
-        return 0;
+        return false;
     }
     PathingLocation v41(TestStartPoint + pt, aStartLocation);
     PathingLocation v40(aLocation + pt, aGoalLocation);
     if (!Pathing::CheckLineOfSight(
-            v41, v40, static_cast<PathingLocation*>(0), static_cast<Pathing::CheckLineOfSightFilter*>(0)
+            v41, v40, static_cast<PathingLocation*>(nullptr), static_cast<Pathing::CheckLineOfSightFilter*>(nullptr)
         )) {
-        return 0;
+        return false;
     }
     PathingLocation v36(arLocatiom, aStartLocation);
     NavMeshPtr v34;
@@ -224,7 +225,7 @@ bool NavMeshSearchSLPoint::CheckPointOnGoalCircle(
         v22 = v22 * v22;
         if (v23 < static_cast<double>(v22) || (v28 = v23 - v22, (v28 = NiSqrt(v28), v26 <= static_cast<double>(v28)))) {
         LABEL_15:;
-            return 0;
+            return false;
         }
         float v25 = v26 - v28;
         v24.operator*=(v25);
@@ -233,7 +234,7 @@ bool NavMeshSearchSLPoint::CheckPointOnGoalCircle(
     }
     arLocatiom.z = arLocatiom.z + arZDiff;
     aOutValidPoint = arLocatiom;
-    return 1;
+    return true;
 }
 
 NiPoint2& NiPoint2::operator*=(float fScalar) {

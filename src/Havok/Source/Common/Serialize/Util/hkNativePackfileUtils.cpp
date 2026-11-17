@@ -70,8 +70,8 @@ namespace {
     void hkNativeResource::callDestructors() {
         if (m_contents) {
             hkNativePackfileUtils::unload(m_data.begin(), m_data.m_size);
-            m_contents = 0;
-            m_contentsTypeName = 0;
+            m_contents = nullptr;
+            m_contentsTypeName = nullptr;
         }
     }
 
@@ -302,7 +302,7 @@ void* _getSectionDataByIndex(
         return static_cast<char*>(base) + (v4->m_absoluteDataStart + offset);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

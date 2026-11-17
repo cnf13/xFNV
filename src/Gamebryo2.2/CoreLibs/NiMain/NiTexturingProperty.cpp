@@ -292,8 +292,8 @@ NiObject* NiTexturingProperty::CreateClone(NiCloningProcess& kCloning) {
             return v4;
         }
         else {
-            CopyMembers(0, kCloning);
-            return 0;
+            CopyMembers(nullptr, kCloning);
+            return nullptr;
         }
     }
     else {
@@ -922,52 +922,52 @@ void NiTexturingProperty::_SDMShutdown() {
     NiTexturingProperty::ms_spDefault = nullptr;
     const char* m_kHandle = NiTexturingProperty::ms_akMapIDtoNames[0].GetHandle();
     if (NiTexturingProperty::ms_akMapIDtoNames[0].GetHandle()) {
-        NiTexturingProperty::ms_akMapIDtoNames[0].m_kHandle = NiGlobalStringTable::AddString(0);
+        NiTexturingProperty::ms_akMapIDtoNames[0].m_kHandle = NiGlobalStringTable::AddString(nullptr);
         NiGlobalStringTable::ReleaseHandle(m_kHandle);
     }
     const char* v2 = NiTexturingProperty::ms_akMapIDtoNames[1].GetHandle();
     if (NiTexturingProperty::ms_akMapIDtoNames[1].GetHandle()) {
-        NiTexturingProperty::ms_akMapIDtoNames[1].m_kHandle = NiGlobalStringTable::AddString(0);
+        NiTexturingProperty::ms_akMapIDtoNames[1].m_kHandle = NiGlobalStringTable::AddString(nullptr);
         NiGlobalStringTable::ReleaseHandle(v2);
     }
     const char* v3 = NiTexturingProperty::ms_akMapIDtoNames[2].GetHandle();
     if (NiTexturingProperty::ms_akMapIDtoNames[2].GetHandle()) {
-        NiTexturingProperty::ms_akMapIDtoNames[2].m_kHandle = NiGlobalStringTable::AddString(0);
+        NiTexturingProperty::ms_akMapIDtoNames[2].m_kHandle = NiGlobalStringTable::AddString(nullptr);
         NiGlobalStringTable::ReleaseHandle(v3);
     }
     const char* v4 = NiTexturingProperty::ms_akMapIDtoNames[3].GetHandle();
     if (NiTexturingProperty::ms_akMapIDtoNames[3].GetHandle()) {
-        NiTexturingProperty::ms_akMapIDtoNames[3].m_kHandle = NiGlobalStringTable::AddString(0);
+        NiTexturingProperty::ms_akMapIDtoNames[3].m_kHandle = NiGlobalStringTable::AddString(nullptr);
         NiGlobalStringTable::ReleaseHandle(v4);
     }
     const char* v5 = NiTexturingProperty::ms_akMapIDtoNames[4].GetHandle();
     if (NiTexturingProperty::ms_akMapIDtoNames[4].GetHandle()) {
-        NiTexturingProperty::ms_akMapIDtoNames[4].m_kHandle = NiGlobalStringTable::AddString(0);
+        NiTexturingProperty::ms_akMapIDtoNames[4].m_kHandle = NiGlobalStringTable::AddString(nullptr);
         NiGlobalStringTable::ReleaseHandle(v5);
     }
     const char* v6 = NiTexturingProperty::ms_akMapIDtoNames[5].GetHandle();
     if (NiTexturingProperty::ms_akMapIDtoNames[5].GetHandle()) {
-        NiTexturingProperty::ms_akMapIDtoNames[5].m_kHandle = NiGlobalStringTable::AddString(0);
+        NiTexturingProperty::ms_akMapIDtoNames[5].m_kHandle = NiGlobalStringTable::AddString(nullptr);
         NiGlobalStringTable::ReleaseHandle(v6);
     }
     const char* v7 = NiTexturingProperty::ms_akMapIDtoNames[6].GetHandle();
     if (NiTexturingProperty::ms_akMapIDtoNames[6].GetHandle()) {
-        NiTexturingProperty::ms_akMapIDtoNames[6].m_kHandle = NiGlobalStringTable::AddString(0);
+        NiTexturingProperty::ms_akMapIDtoNames[6].m_kHandle = NiGlobalStringTable::AddString(nullptr);
         NiGlobalStringTable::ReleaseHandle(v7);
     }
     const char* v8 = NiTexturingProperty::ms_akMapIDtoNames[7].GetHandle();
     if (NiTexturingProperty::ms_akMapIDtoNames[7].GetHandle()) {
-        NiTexturingProperty::ms_akMapIDtoNames[7].m_kHandle = NiGlobalStringTable::AddString(0);
+        NiTexturingProperty::ms_akMapIDtoNames[7].m_kHandle = NiGlobalStringTable::AddString(nullptr);
         NiGlobalStringTable::ReleaseHandle(v8);
     }
     const char* v9 = NiTexturingProperty::ms_akMapIDtoNames[8].GetHandle();
     if (NiTexturingProperty::ms_akMapIDtoNames[8].GetHandle()) {
-        NiTexturingProperty::ms_akMapIDtoNames[8].m_kHandle = NiGlobalStringTable::AddString(0);
+        NiTexturingProperty::ms_akMapIDtoNames[8].m_kHandle = NiGlobalStringTable::AddString(nullptr);
         NiGlobalStringTable::ReleaseHandle(v9);
     }
     const char* v10 = NiTexturingProperty::ms_akMapIDtoNames[9].GetHandle();
     if (NiTexturingProperty::ms_akMapIDtoNames[9].GetHandle()) {
-        NiTexturingProperty::ms_akMapIDtoNames[9].m_kHandle = NiGlobalStringTable::AddString(0);
+        NiTexturingProperty::ms_akMapIDtoNames[9].m_kHandle = NiGlobalStringTable::AddString(nullptr);
         NiGlobalStringTable::ReleaseHandle(v10);
     }
 }
@@ -978,7 +978,7 @@ NiObject* NiTexturingProperty::CreateObject() {
         return ::new (v0) NiTexturingProperty;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -989,7 +989,7 @@ void NiTexturingProperty::_SDMInit() {
         v1 = ::new (v0) NiTexturingProperty;
     }
     else {
-        v1 = 0;
+        v1 = nullptr;
     }
     NiTexturingProperty::ms_spDefault = v1;
     const char* m_kHandle = NiTexturingProperty::ms_akMapIDtoNames[0].GetHandle();

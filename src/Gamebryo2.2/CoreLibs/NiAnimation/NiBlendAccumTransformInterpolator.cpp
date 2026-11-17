@@ -67,8 +67,8 @@ NiObject* NiBlendAccumTransformInterpolator::CreateClone(NiCloningProcess& kClon
         return v4;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -258,7 +258,7 @@ void NiBlendAccumTransformInterpolator::ClearAccumulatedTransform() {
         (&m_kAccumulatedTransformValue)->SetRotate(NiQuaternion_IDENTITY);
         (&m_kAccumulatedTransformValue)->SetScale(1.0);
     }
-    m_bReset = (bool)1;
+    m_bReset = true;
 }
 
 bool NiBlendAccumTransformInterpolator::StoreSingleValue(
@@ -273,7 +273,7 @@ bool NiBlendAccumTransformInterpolator::StoreSingleValue(
         fTime = m_fSingleTime;
     }
     if (-3.4028235e+38f == fTime) {
-        return 0;
+        return false;
     }
     CalculateSingleValue(fTime, pkInterpTarget);
     double v6 = -3.4028234663852886e+38;
@@ -306,16 +306,16 @@ bool NiBlendAccumTransformInterpolator::StoreSingleValue(
             p_arTransform = &(result = m_kAccumulatedTransformValue.HierApply(arTransform));
         }
         *p_m_kAccumulatedTransformValue = *p_arTransform;
-        m_bReset = 0;
+        m_bReset = false;
     }
     if (p_m_kAccumulatedTransformValue->m_fScale == v6 &&
         (p_m_kAccumulatedTransformValue->m_kRotate.m_fX == v6 &&
          p_m_kAccumulatedTransformValue->m_kTranslate.x == v6)) {
-        return 0;
+        return false;
     }
     kValue =
         (result = p_m_kAccumulatedTransformValue->HierApply(this->m_pkAccumArray[this->m_ucSingleIdx].m_kLastValue));
-    return 1;
+    return true;
 }
 
 bool NiBlendAccumTransformInterpolator::BlendValues(float fTime, NiObjectNET* pkInterpTarget, NiQuatTransform& kValue) {
@@ -352,7 +352,7 @@ bool NiBlendAccumTransformInterpolator::BlendValues(float fTime, NiObjectNET* pk
     char v21 = 1;
     uint8_t uc = 0;
     if (!m_ucArraySize) {
-        return 0;
+        return false;
     }
     do {
         NiBlendInterpolator::InterpArrayItem* kItem = &m_pkInterpArray[uc_2];
@@ -417,7 +417,7 @@ bool NiBlendAccumTransformInterpolator::BlendValues(float fTime, NiObjectNET* pk
     }
     while (uc_2 < m_ucArraySize);
     if (!v20 && (!v18 && !v19)) {
-        return 0;
+        return false;
     }
     kFinalTransform.m_fScale = -3.4028235e+38f;
     double v14 = 1.0;
@@ -452,10 +452,10 @@ bool NiBlendAccumTransformInterpolator::BlendValues(float fTime, NiObjectNET* pk
     *v32 = *v16;
     if (-3.4028234663852886e+38 == v32->m_fScale &&
         (v32->m_kRotate.m_fX == -3.4028235e+38f && v32->m_kTranslate.x == -3.4028235e+38f)) {
-        return 0;
+        return false;
     }
     kValue = *v32;
-    return 1;
+    return true;
 }
 
 void NiBlendAccumTransformInterpolator::CalculateValue(uint8_t ucIndex, float fTime, NiObjectNET* pkInterpTarget) {
@@ -559,7 +559,7 @@ void NiBlendAccumTransformInterpolator::CalculateValue(uint8_t ucIndex, float fT
         kAccumItem->m_kDeltaValue = *::new (&result) NiQuatTransform(kAccumItem->m_kDeltaValue * *p_m_kLastValue);
     }
     *p_m_kLastValue = kNowTransform;
-    m_bReset = 0;
+    m_bReset = false;
     kAccumItem->m_fLastTime = fTime;
 }
 

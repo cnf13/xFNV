@@ -45,7 +45,7 @@
 #include "platform/System.h"
 
 #include <cstdarg>
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 // The game settings this file defines, with their IDs and values, in the game's initialization order.
@@ -59,7 +59,7 @@ void CellUpdateParallelArrayTaskFunc(void* apData, uint32_t aiIndex) {
         static_cast<BSSimpleArray<NiPointer<NiAVObject>, 1024>*>(apData);
     NiAVObject* pobj = (*parray)[aiIndex];
     if (pobj) {
-        NiUpdateData updateData(0.0f, 0, 0);
+        NiUpdateData updateData(0.0f, false, false);
         pobj->UpdateTransformAndBounds(updateData);
     }
 }
@@ -97,7 +97,7 @@ void CreateDeferredCellNodeArray(BSSimpleArray<NiPointer<NiAVObject>, 1024>* apA
             }
         }
     }
-    CellTransformsUpdateList.Clear(0);
+    CellTransformsUpdateList.Clear(false);
 }
 
 TaskQueueInterface::TaskQueueInterface(BSPackedTaskQueue& apQueue, BSPackedTaskQueue& apSecondaryQueue)
@@ -709,7 +709,7 @@ void TaskQueueInterface::TaskUnpackFunc(const BSPackedTask& arTask) {
                 ::new (&actorHavokSyncTask)
                     BSParallelArrayTask(&ActorHavokSyncParallelArrayTaskFunc, &DeferredActorHavokSyncArray, uiCount);
                 pParallelTaskManager->RunTask(&actorHavokSyncTask);
-                DeferredActorHavokSyncArray.Clear(0);
+                DeferredActorHavokSyncArray.Clear(false);
             }
             if (CellTransformsUpdateList.iSize) {
                 using cellNodeArray_t = BSScrapArray<NiPointer<NiAVObject>, 1024>;
@@ -732,7 +732,7 @@ void TaskQueueInterface::TaskUnpackFunc(const BSPackedTask& arTask) {
             if (bNoRadius && pnode_2->GetWorldBoundRadius() > 0.0f) {
                 TESObjectREFR* pRef = TESObjectREFR::FindReferenceFor3D(pnode_2);
                 TESObjectCELL* CurrentCell = TES::pInstance->GetCurrentCell();
-                CurrentCell->TestObjectAgainstMultibounds(pRef, 0, 0);
+                CurrentCell->TestObjectAgainstMultibounds(pRef, false, false);
             }
             pnode_2->DecRefCount();
             return;
@@ -777,7 +777,7 @@ void TaskQueueInterface::TaskUnpackFunc(const BSPackedTask& arTask) {
         }
         case 10: {
             NiAVObject* pobject_4 = static_cast<NiAVObject*>(arTask.pTaskDataA[1].pData);
-            NiUpdateData UpdateData(0.0f, 0, 0);
+            NiUpdateData UpdateData(0.0f, false, false);
             pobject_4->Update(UpdateData);
             pobject_4->DecRefCount();
             return;
@@ -883,16 +883,16 @@ void TaskQueueInterface::TaskUnpackFunc(const BSPackedTask& arTask) {
                     pcell = pref_2->GetParentCell();
                 }
                 else {
-                    pcell = 0;
+                    pcell = nullptr;
                 }
                 if (pcell) {
                     pworld = pcell->GetbhkWorld();
                 }
                 else {
-                    pworld = 0;
+                    pworld = nullptr;
                 }
                 if (pworld) {
-                    pworld->AddObjects(p3D, 1, 1, 0, 0);
+                    pworld->AddObjects(p3D, true, true, 0, false);
                 }
                 p3D->DecRefCount();
             }
@@ -901,8 +901,8 @@ void TaskQueueInterface::TaskUnpackFunc(const BSPackedTask& arTask) {
         case 20: {
             NiAVObject* p3D_2 = static_cast<NiAVObject*>(arTask.pTaskDataA[1].pData);
             if (p3D_2) {
-                bhkWorld::Activate(p3D_2, 1, 1, 0);
-                bhkWorld::RemoveObjects(p3D_2, 1, 0);
+                bhkWorld::Activate(p3D_2, true, true, false);
+                bhkWorld::RemoveObjects(p3D_2, true, false);
                 p3D_2->DecRefCount();
             }
             return;
@@ -924,7 +924,7 @@ void TaskQueueInterface::TaskUnpackFunc(const BSPackedTask& arTask) {
                         pactor_7->RemoveWeapon();
                         if (pactor_7->pCurrentProcess) {
                             BaseProcess* v12 = pactor_7->pCurrentProcess;
-                            v12->SetCurrentWeapon(0, 0, 0);
+                            v12->SetCurrentWeapon(nullptr, nullptr, false);
                         }
                     }
                 }
@@ -942,7 +942,7 @@ void TaskQueueInterface::TaskUnpackFunc(const BSPackedTask& arTask) {
                 ->DismemberLimb(
                     static_cast<ActorValue::Index>(arTask.pTaskDataA[2].iData),
                     static_cast<BGSBodyPart::LIMB_ENUM>(arTask.pTaskDataA[3].iData), arTask.pTaskDataA[3].bData,
-                    arTask.pTaskDataA[4].bData, 1, 0
+                    arTask.pTaskDataA[4].bData, true, false
                 );
             return;
         }
@@ -1078,7 +1078,7 @@ void TaskQueueInterface::TaskUnpackFunc(const BSPackedTask& arTask) {
             NiAVObject* p3D_3 = static_cast<NiAVObject*>(arTask.pTaskDataA[1].pData);
             hkpMotion::MotionType emotionType = static_cast<hkpMotion::MotionType>(arTask.pTaskDataA[2].iData);
             if (p3D_3) {
-                bhkWorld::SetMotion(p3D_3, emotionType, 1, 0, 1);
+                bhkWorld::SetMotion(p3D_3, emotionType, true, false, true);
                 p3D_3->DecRefCount();
             }
             return;

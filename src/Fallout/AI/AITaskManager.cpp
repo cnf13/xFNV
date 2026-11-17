@@ -69,7 +69,7 @@ void MobileObjectTaskletData::Process() {
 }
 
 bool MobileObjectTaskletData::HandleMessage(const MobileObjectMessage& aMessage, uint32_t aiThread) {
-    bool bTrue = 1;
+    bool bTrue = true;
     MobileObjectMessage::MsgType eMsgType = aMessage.eMsgType;
     if (aMessage.eMsgType) {
         if (eMsgType == MobileObjectMessage::MT_MOB) {
@@ -78,7 +78,7 @@ bool MobileObjectTaskletData::HandleMessage(const MobileObjectMessage& aMessage,
         else {
             if (eMsgType == MobileObjectMessage::MT_END) {
                 HandleEndMessage(aiThread);
-                return 0;
+                return false;
             }
         }
     }
@@ -179,7 +179,7 @@ void PackageUpdateTaskData::HandleCountMessage(uint32_t uiCount) {
     iUpdated = 0;
     iNotUpdated = 0;
     HighProcess::ClearWanderStarted();
-    pPlayer->SetHostileDetection(0);
+    pPlayer->SetHostileDetection(false);
     (&MobileObjectTaskletData::kPackageUpdateLock)->Enter(nullptr);
 }
 
@@ -189,8 +189,8 @@ void PackageUpdateTaskData::HandleMobMessage(MobileObject* apMob) {
         if (!apMob->IsStillLoading() && !apMob->GetDelete() && !apMob->GetDisabled()) {
             if (apMob->pCurrentProcess) {
                 if (apMob->GetCurrentProcessType() == PROCESS_TYPE_HIGH) {
-                    Actor* pact = 0;
-                    bool updatefollower = 1;
+                    Actor* pact = nullptr;
+                    bool updatefollower = true;
                     if (apMob) {
                         if (apMob->IsActor()) {
                             pact = static_cast<Actor*>(apMob);
@@ -199,10 +199,10 @@ void PackageUpdateTaskData::HandleMobMessage(MobileObject* apMob) {
                     if (!pact || pact->bProcessMe) {
                         if (pact && pact->CanSkipActorUpdate()) {
                             BaseProcess* CurrentAIProcess = pact->pCurrentProcess;
-                            CurrentAIProcess->CheckforNewPackage(pact, 0);
-                            updatefollower = 0;
+                            CurrentAIProcess->CheckforNewPackage(pact, false);
+                            updatefollower = false;
                             ++iNotUpdated;
-                            static_cast<HighProcess*>(pact->pCurrentProcess)->HighProcess::SetSkippedLastUpdate(1);
+                            static_cast<HighProcess*>(pact->pCurrentProcess)->HighProcess::SetSkippedLastUpdate(true);
                         }
                         else {
                             apMob->Process(0.0f);
@@ -215,7 +215,7 @@ void PackageUpdateTaskData::HandleMobMessage(MobileObject* apMob) {
                             }
                         }
                         if (apMob->GetCurrentProcessType()) {
-                            pmoblist = 0;
+                            pmoblist = nullptr;
                         }
                         if (updatefollower) {
                             ExtraFollower* pfollow;
@@ -228,7 +228,7 @@ void PackageUpdateTaskData::HandleMobMessage(MobileObject* apMob) {
                                     pTempList = ::new (pTempMemory) BSSimpleList<Actor*>;
                                 }
                                 else {
-                                    pTempList = 0;
+                                    pTempList = nullptr;
                                 }
                                 BSSimpleList<Actor*>* pHead;
                                 void* pHeadMemory = ourMalloc(sizeof(BSSimpleList<Actor*>));
@@ -236,7 +236,7 @@ void PackageUpdateTaskData::HandleMobMessage(MobileObject* apMob) {
                                     pHead = ::new (pHeadMemory) BSSimpleList<Actor*>;
                                 }
                                 else {
-                                    pHead = 0;
+                                    pHead = nullptr;
                                 }
                                 BSSimpleList<Actor*>* plist = pHead;
                                 for (BSSimpleList<Actor*>* ptemp = pfollow->pActorlist; ptemp && ptemp->m_item;
@@ -327,7 +327,7 @@ void DetectionTaskData::HandleMobMessage(MobileObject* apMob) {
     float ftime = appTimer.fDelta * uiHighActorCount;
     ftime = BSMIN(ftime, 5.0f);
     ftime = RandomFloat(0.0f, ftime);
-    Actor* toDetect = 0;
+    Actor* toDetect = nullptr;
     if (apMob) {
         if (apMob->IsActor()) {
             Actor* pmob = static_cast<Actor*>(apMob);
@@ -335,9 +335,10 @@ void DetectionTaskData::HandleMobMessage(MobileObject* apMob) {
             if (pdetectact->bProcessMe) {
                 TESActorBaseData* v5 = static_cast<TESActorBaseData*>(pdetectact->GetActorBase());
                 if (!v5->GetIsGhost()) {
-                    float fdistancefromplayer = pdetectact->GetDistanceFromReference(pPlayer, 0, 0);
+                    float fdistancefromplayer = pdetectact->GetDistanceFromReference(pPlayer, false, false);
                     if (pdetectact != pPlayer && !pSaveLoadGameOLD->GetLoading()) {
-                        if (!(pmob->GetDetectionTimer() < 0.0) || (pdetectact->IsUnConscious() || pmob->IsDead(0))) {
+                        if (!(pmob->GetDetectionTimer() < 0.0) ||
+                            (pdetectact->IsUnConscious() || pmob->IsDead(false))) {
                             if (pmob->GetDetectionTimer() < 0.0) {
                                 pPlayer->RemovePerceivedActor(pmob);
                             }
@@ -348,23 +349,23 @@ void DetectionTaskData::HandleMobMessage(MobileObject* apMob) {
                                 pmob->EvaluateDetection(ftime);
                                 BaseProcess* CurrentAIProcess = pdetectact->pCurrentProcess;
                                 if (CurrentAIProcess->ShouldRunPlayerDetection(pdetectact)) {
-                                    bool blinesight = 0;
+                                    bool blinesight = false;
                                     bool bcombat = pmob->IsInCombat();
-                                    b360LineofSight = 0;
+                                    b360LineofSight = false;
                                     int32_t iplayerdetect = pPlayer->GetDetectionLevelAgainstActor(
-                                        1, pmob, blinesight, bcombat, 0, 0, &b360LineofSight
+                                        true, pmob, blinesight, bcombat, false, false, &b360LineofSight
                                     );
-                                    bool battack = 0;
+                                    bool battack = false;
                                     FIGHT_REACTION ereaction = FIGHT_REACTION_NEUTRAL;
-                                    if (pmob->GetShouldAttackActor(pPlayer, 0, ereaction, 0) ||
+                                    if (pmob->GetShouldAttackActor(pPlayer, false, ereaction, false) ||
                                         pmob->IsInCombatWithActor(pPlayer)) {
-                                        battack = 1;
+                                        battack = true;
                                     }
                                     else {
                                         if (ereaction == FIGHT_REACTION_NEUTRAL || ereaction == FIGHT_REACTION_ENEMY) {
                                             if (pmob->GetActorBase()->AIData.bAggroRadius) {
                                                 if (pmob->GetActorBase()->AIData.uiAggroRadius) {
-                                                    battack = 1;
+                                                    battack = true;
                                                 }
                                             }
                                         }
@@ -378,14 +379,14 @@ void DetectionTaskData::HandleMobMessage(MobileObject* apMob) {
                                     double v3 = static_cast<double>(iplayerdetect);
                                     if (!(fPlayerDetectActorValue.Float() <= v3)) {
                                         if (b360LineofSight || blinesight) {
-                                            pPlayer->InsertPerceivedActor(pmob, battack, 1);
+                                            pPlayer->InsertPerceivedActor(pmob, battack, true);
                                         }
                                         else {
                                             pPlayer->RemovePerceivedActor(pmob);
                                         }
                                     }
                                     else {
-                                        pPlayer->InsertPerceivedActor(pmob, battack, 0);
+                                        pPlayer->InsertPerceivedActor(pmob, battack, false);
                                     }
                                 }
                             }
@@ -476,10 +477,10 @@ void AITaskThreadManager::AddThread(uint32_t aiThread) {
             pThread = ::new (apMemory) AITaskThread(aiThread);
         }
         else {
-            pThread = 0;
+            pThread = nullptr;
         }
         AITaskThreadArray[iTaskThreads] = pThread;
-        AITaskThreadArray[iTaskThreads]->Initialize(BSThread::LARGE_STACK_SIZE, 0, 0);
+        AITaskThreadArray[iTaskThreads]->Initialize(BSThread::LARGE_STACK_SIZE, nullptr, false);
         AITaskThreadArray[iTaskThreads]->SetThreadProcessor(aiThread);
         AITaskThreadArray[iTaskThreads]->SetName("AI Task Thread");
         ++iTaskThreads;
@@ -535,7 +536,7 @@ void AITaskManager::UpdateTasks() {
             AITaskThreadManager_kInstance.AddThread(3u);
             AITaskThreadManager_kInstance.AddThread(5u);
         }
-        AITaskManager::bFirstTime = 0;
+        AITaskManager::bFirstTime = false;
     }
     if (ReferenceProcessLists.bRunScheduals) {
         if ((&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH)) {
@@ -655,7 +656,7 @@ void AITaskManager::UpdateTasks() {
 void AITaskManager::WaitForTasksDuringRendering() {
     if (bWaitForThreads) {
         (&AITaskThreadManager_kInstance)->WaitForThread(2);
-        bWaitForThreads = (bool)0;
+        bWaitForThreads = false;
     }
 }
 
@@ -706,7 +707,7 @@ void AITaskManager::StartTasksDuringRendering() {
                     AITaskQueue::kInstance.Enqueue(&TaskDataActorMovement);
                 }
                 AITaskThreadManager_kInstance.StartThread(2u);
-                bWaitForThreads = 1;
+                bWaitForThreads = true;
             }
             else {
                 if (bRunDetectionDuringRendering.Bool()) {
@@ -727,12 +728,12 @@ AITaskThread::~AITaskThread() {}
 
 uint32_t AITaskThread::ThreadProc() {
     OnStartup();
-    while (1) {
+    while (true) {
         StartProcessing.Wait();
         if (bKillThread) {
             break;
         }
-        while (1) {
+        while (true) {
             MobileObjectTaskletData* ptaskData = AITaskQueue::kInstance.Dequeue();
             if (!ptaskData) {
                 break;

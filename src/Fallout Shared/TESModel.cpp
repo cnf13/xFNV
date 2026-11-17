@@ -79,7 +79,7 @@ void TESTextureList::LoadFromBuffer(
                         apBuffer[i].iDirCRC
                     );
                     BSFileEntry* FileEntryForFileFromAllArchives = ArchiveManager::GetFileEntryForFileFromAllArchives(
-                        ARCHIVE_TYPE_INDEX_TEXTURES, dirhash, filehash2, 0
+                        ARCHIVE_TYPE_INDEX_TEXTURES, dirhash, filehash2, nullptr
                     );
                     pTextureOffsetArray[i] = FileEntryForFileFromAllArchives;
                     if (bWarnOnMissingFileEntry.Bool() && ArchiveManager::ArchivesEnabled() &&
@@ -115,7 +115,7 @@ bool TESTextureList::ClearData() {
     uint8_t v3 = 0;
     if (pTextureOffsetArray) {
         ourFree(pTextureOffsetArray);
-        pTextureOffsetArray = (BSFileEntry**)0;
+        pTextureOffsetArray = (BSFileEntry**)nullptr;
         v3 = 1;
     }
     cTextureCount = (uint8_t)0;

@@ -415,7 +415,7 @@
 
 #include <bit>
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 using TESModelArray = NiTArray<TESModel*, NiTMallocInterface<TESModel*>>;
@@ -449,7 +449,7 @@ bool Cmd_GetCurrentWeatherPercent_Execute(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetWeatherPercentConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetWeatherPercentConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_GetDisabled_Execute(
@@ -476,7 +476,7 @@ bool au_re_Cmd_GetIsLockBroken(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetIsLockBrokenConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetIsLockBrokenConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_RemoveFromAllFactions(
@@ -509,7 +509,7 @@ bool Cmd_RemoveFromAllFactions(
             factionChangesExtra->ExpelFromAllFactions(actorBase);
         }
     }
-    return 1;
+    return true;
 }
 
 bool au_re_Cmd_GetXPForNextLevel(
@@ -522,7 +522,7 @@ bool au_re_Cmd_GetXPForNextLevel(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetXPForNextLevelConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetXPForNextLevelConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_IsActorDetected_Execute(
@@ -541,7 +541,7 @@ bool Cmd_IsActorDetected_Execute(
     if (apActor) {
         afReturnValue = (double)(&ReferenceProcessLists)->IsActorDetected(apActor);
         if (Script::GetThreadSystemOutput()) {
-            if (0.0 == (afReturnValue)) {
+            if (0.0 == afReturnValue) {
                 fullName = apActor->GetFullName();
                 Interface::PrintLine(" %s is not detected", fullName);
             }
@@ -551,7 +551,7 @@ bool Cmd_IsActorDetected_Execute(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowTraitSelectMenu(
@@ -567,7 +567,7 @@ bool Cmd_ShowTraitSelectMenu(
     if (pPlayer) {
         TraitSelectMenu::Create();
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowTraitMenu(
@@ -583,7 +583,7 @@ bool Cmd_ShowTraitMenu(
     if (pPlayer) {
         TraitMenu::Create();
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetIsGhost_Execute(
@@ -596,7 +596,7 @@ bool Cmd_GetIsGhost_Execute(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetGhostConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetGhostConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool au_re_Cmd_GetMinorCrimeCount(
@@ -609,7 +609,7 @@ bool au_re_Cmd_GetMinorCrimeCount(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetMinorCrimeCountConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetMinorCrimeCountConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_DrawSkeleton(
@@ -634,7 +634,7 @@ bool Cmd_DrawSkeleton(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v15,
             &v16
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         pActor = dynamic_cast<Actor*>(apRefObject);
@@ -654,7 +654,7 @@ bool Cmd_DrawSkeleton(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool au_re_Cmd_IsGoreDisabled(
@@ -667,7 +667,7 @@ bool au_re_Cmd_IsGoreDisabled(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::IsGoreDisabledConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::IsGoreDisabledConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool au_re_Cmd_SetArgTo0AndReturnTrue_0(
@@ -693,11 +693,11 @@ bool Cmd_GetTimeDead_Execute(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Script::GetTimeDeadConditionFunction(apRefObject, 0, 0, afReturnValue);
+    Script::GetTimeDeadConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("time dead >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ToggleCombatStats(
@@ -711,7 +711,7 @@ bool Cmd_ToggleCombatStats(
     uint32_t& auiOffset
 ) {
     Interface::PrintLine("Command removed. Use TDT and switch to COMBAT INFO page.");
-    return 1;
+    return true;
 }
 
 bool Cmd_AddCardToPlayer(
@@ -745,7 +745,7 @@ bool Cmd_AddCardToPlayer(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetPlayerTeammate_Execute(
@@ -758,7 +758,7 @@ bool Cmd_GetPlayerTeammate_Execute(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetPlayerTeammateConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetPlayerTeammateConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_ShowWhoDetectsPlayer(
@@ -773,7 +773,7 @@ bool Cmd_ShowWhoDetectsPlayer(
 ) {
     (&ReferenceProcessLists)->ProcessLists::UpdateEmptyStep(1, (-1));
     Interface::PrintLine("Detection list printed");
-    return 1;
+    return true;
 }
 
 bool Cmd_DispelAllSpells(
@@ -790,10 +790,10 @@ bool Cmd_DispelAllSpells(
     if (apRefObject) {
         v4 = dynamic_cast<Actor*>(apRefObject);
         if (v4) {
-            static_cast<MagicTarget*>(v4)->RemoveEffects(0);
+            static_cast<MagicTarget*>(v4)->RemoveEffects(false);
         }
     }
-    return 1;
+    return true;
 }
 
 bool au_re_Cmd_GetLocked(
@@ -833,7 +833,7 @@ bool au_re_Cmd_GetIsPlayableRace(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetIsPlayableRaceConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetIsPlayableRaceConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_IsActor_Execute(
@@ -846,11 +846,11 @@ bool Cmd_IsActor_Execute(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Script::IsActorConditionFunction(apRefObject, 0, 0, afReturnValue);
+    Script::IsActorConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsActor >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool au_re_Cmd_GetMajorCrimeCount(
@@ -863,7 +863,7 @@ bool au_re_Cmd_GetMajorCrimeCount(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetMajorCrimeCountConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetMajorCrimeCountConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool au_re_Cmd_GetActorAggroRadiusViolated(
@@ -876,7 +876,7 @@ bool au_re_Cmd_GetActorAggroRadiusViolated(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetAggroRadiusViolatedConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetAggroRadiusViolatedConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool GetForceHitReactionFunction(
@@ -892,12 +892,12 @@ bool GetForceHitReactionFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject->IsActor()) {
         afReturnValue = (double)static_cast<Actor*>(apRefObject)->GetForceHitReaction();
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_AddFaceAnimNote(
@@ -915,7 +915,7 @@ bool Cmd_AddFaceAnimNote(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         v9 = apRefObject->GetFaceAnimationData(nullptr);
@@ -923,7 +923,7 @@ bool Cmd_AddFaceAnimNote(
             v9->AddAnimationDataFromNote(static_cast<const char*>(static_cast<const void*>(a8)));
         }
     }
-    return 1;
+    return true;
 }
 
 bool au_re_Cmd_HasBeenEaten(
@@ -953,7 +953,7 @@ bool Cmd_IsEssential_Execute(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsEssential >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IsPlayerMovingIntoNewSpace_Execute(
@@ -970,7 +970,7 @@ bool Cmd_IsPlayerMovingIntoNewSpace_Execute(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Player is moving to new area >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_DropMe_Execute(
@@ -984,15 +984,15 @@ bool Cmd_DropMe_Execute(
     uint32_t& auiOffset
 ) {
     if ((!apRefObject) || (!apContainer)) {
-        return 1;
+        return true;
     }
     TESBoundObject* objectReference = apRefObject->TESObjectREFR::GetObjectReference();
-    apContainer->RemoveItem(objectReference, nullptr, 1, (bool)0, (bool)1, nullptr, nullptr, nullptr, (bool)1, (bool)0);
+    apContainer->RemoveItem(objectReference, nullptr, 1, false, true, nullptr, nullptr, nullptr, true, false);
     pPlayer->CheckForQuestTargetUpdate(apRefObject);
     if (Interface::IsInMenuMode()) {
         Interface::UpdateInventory();
     }
-    return 0;
+    return false;
 }
 
 bool Cmd_DeprecatedDOF(
@@ -1008,7 +1008,7 @@ bool Cmd_DeprecatedDOF(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("This function is no longer supported");
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_CloseAllMenus(
@@ -1022,7 +1022,7 @@ bool Cmd_CloseAllMenus(
     uint32_t& auiOffset
 ) {
     Interface::EmergencyCloseAllMenusAndBreakStuff();
-    return 1;
+    return true;
 }
 
 bool Cmd_RemoveMe_Execute(
@@ -1036,32 +1036,32 @@ bool Cmd_RemoveMe_Execute(
     uint32_t& auiOffset
 ) {
     TESObjectREFR* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (!apRefObject || !apContainer) {
-        return 1;
+        return true;
     }
     TESObjectREFR* v11 =
         static_cast<TESObjectREFR*>(FNVD_DYNAMIC_CAST_VOID(Actor)(apContainer, RTTI_TESObjectREFR, RTTI_Actor));
-    ExtraDataList* v10 = 0;
+    ExtraDataList* v10 = nullptr;
     if (v11) {
         if (v11->WearingObject(apRefObject->GetObjectReference())) {
             InventoryChanges* InventoryChanges_ = InventoryChanges::GetInventoryChanges(apContainer);
             if (InventoryChanges_) {
-                v10 = InventoryChanges_->WearingObject(apRefObject->GetObjectReference(), 0);
+                v10 = InventoryChanges_->WearingObject(apRefObject->GetObjectReference(), false);
             }
         }
     }
-    apContainer->RemoveItem(apRefObject->GetObjectReference(), v10, 1, 0, 0, a8, 0, 0, 1, 0);
+    apContainer->RemoveItem(apRefObject->GetObjectReference(), v10, 1, false, false, a8, nullptr, nullptr, true, false);
     pPlayer->CheckForQuestTargetUpdate(apRefObject);
     if (apContainer == pPlayer) {
         Interface::UpdateInventory();
     }
-    return 0;
+    return false;
 }
 
 bool Cmd_DuplicateAllItems_Execute(
@@ -1076,12 +1076,12 @@ bool Cmd_DuplicateAllItems_Execute(
 ) {
     TESObjectREFR* a8;
     int32_t v11;
-    a8 = 0;
+    a8 = nullptr;
     v11 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v11
         )) {
-        return 0;
+        return false;
     }
     bool v12 = v11 != 0;
     if (apRefObject) {
@@ -1091,7 +1091,7 @@ bool Cmd_DuplicateAllItems_Execute(
             ContainerChanges->DuplicateAllItems(apRefObject, a8);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_RemoveAllTypedItems(
@@ -1109,27 +1109,29 @@ bool Cmd_RemoveAllTypedItems(
     int32_t aiFormType;
     int32_t v13;
     BGSListForm* apDoNotRemoveList;
-    a8 = 0;
+    a8 = nullptr;
     v11 = 0;
     v13 = 0;
     aiFormType = -1;
-    apDoNotRemoveList = 0;
+    apDoNotRemoveList = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v11,
             &v13, &aiFormType, &apDoNotRemoveList
         )) {
-        return 0;
+        return false;
     }
     bool v15 = v11 != 0;
     if (apRefObject) {
         // &apRefObject->m_Extra is never null.
         InventoryChanges* ContainerChanges = (&apRefObject->m_Extra)->GetContainerChanges();
         if (ContainerChanges) {
-            ContainerChanges->RemoveAllTypedItems(apRefObject, a8, 0, v15, 0, v13 != 0, aiFormType, apDoNotRemoveList);
+            ContainerChanges->RemoveAllTypedItems(
+                apRefObject, a8, false, v15, false, v13 != 0, aiFormType, apDoNotRemoveList
+            );
             pPlayer->CheckForQuestTargetUpdate(apRefObject);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_RemoveAllItems(
@@ -1145,25 +1147,25 @@ bool Cmd_RemoveAllItems(
     TESObjectREFR* a8;
     int32_t v11;
     int32_t v12;
-    a8 = 0;
+    a8 = nullptr;
     v11 = 0;
     v12 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v11,
             &v12
         )) {
-        return 0;
+        return false;
     }
     bool v13 = v11 != 0;
     if (apRefObject) {
         // &apRefObject->m_Extra is never null.
         InventoryChanges* ContainerChanges = (&apRefObject->m_Extra)->GetContainerChanges();
         if (ContainerChanges) {
-            ContainerChanges->RemoveAllItems(apRefObject, a8, 0, v13, 0, v12 != 0, -1, 0);
+            ContainerChanges->RemoveAllItems(apRefObject, a8, false, v13, false, v12 != 0, -1, nullptr);
             pPlayer->CheckForQuestTargetUpdate(apRefObject);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IsOwner_Execute(
@@ -1178,17 +1180,17 @@ bool Cmd_IsOwner_Execute(
 ) {
     TESBoundObject* a8;
     afReturnValue = 0.0;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (!a8) {
         a8 = pPlayer->GetObjectReference();
     }
-    Cmd_IsOwner_Eval(apRefObject, a8, 0, afReturnValue);
-    return 1;
+    Cmd_IsOwner_Eval(apRefObject, a8, nullptr, afReturnValue);
+    return true;
 }
 
 bool Cmd_SetOwnership(
@@ -1202,11 +1204,11 @@ bool Cmd_SetOwnership(
     uint32_t& auiOffset
 ) {
     TESBoundObject* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (!a8) {
         a8 = pPlayer->GetObjectReference();
@@ -1215,7 +1217,7 @@ bool Cmd_SetOwnership(
         (&apRefObject->m_Extra)->SetOwnership(a8);
         apRefObject->AddChange(64);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_Drop_Execute(
@@ -1230,17 +1232,17 @@ bool Cmd_Drop_Execute(
 ) {
     int32_t v9;
     TESBoundObject* a8;
-    a8 = 0;
+    a8 = nullptr;
     v9 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v9
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
-        apRefObject->RemoveItem(a8, 0, v9, 0, 1, 0, 0, 0, 1, 0);
+        apRefObject->RemoveItem(a8, nullptr, v9, false, true, nullptr, nullptr, nullptr, true, false);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IsActionRef(
@@ -1255,11 +1257,11 @@ bool Cmd_IsActionRef(
 ) {
     TESObjectREFR* a8;
     afReturnValue = 0.0;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (a8) {
@@ -1272,7 +1274,7 @@ bool Cmd_IsActionRef(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("IsActionRef >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_PlayerSpellBook(
@@ -1301,7 +1303,7 @@ bool Cmd_PlayerSpellBook(
         pNode = pNode->m_pkNext;
     }
     Interface::PrintLine("%d spells added to Player Character", iCount);
-    return 1;
+    return true;
 }
 
 bool Cmd_PrintAiList(
@@ -1315,7 +1317,7 @@ bool Cmd_PrintAiList(
     uint32_t& auiOffset
 ) {
     Interface::PrintLine("Ai Lists Printed");
-    return 1;
+    return true;
 }
 
 bool Cmd_SetWeather(
@@ -1330,12 +1332,12 @@ bool Cmd_SetWeather(
 ) {
     int32_t v10;
     TESWeather* a8;
-    a8 = 0;
+    a8 = nullptr;
     v10 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v10
         )) {
-        return 0;
+        return false;
     }
     Sky* Instance = Sky::GetInstance();
     if (Instance->pCurrentWeather) {
@@ -1344,16 +1346,16 @@ bool Cmd_SetWeather(
         }
         else {
             Instance->pDefaultWeather = a8;
-            pPlayer->SetOccupiedRegion(0);
+            pPlayer->SetOccupiedRegion(nullptr);
         }
         if (!GetThreadTLSData()->bSystemOutput) {
-            Instance->SetAcceleration(1);
+            Instance->SetAcceleration(true);
         }
     }
     else {
         Instance->ForceWeather(a8, v10 != 0);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ForceWeather(
@@ -1368,18 +1370,18 @@ bool Cmd_ForceWeather(
 ) {
     int32_t v12;
     TESWeather* a8;
-    a8 = 0;
+    a8 = nullptr;
     v12 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v12
         )) {
-        return 0;
+        return false;
     }
     bool v11 = v12 != 0;
     TESWeather* v10 = a8;
     Sky* Instance = Sky::GetInstance();
     Instance->ForceWeather(v10, v11);
-    return 1;
+    return true;
 }
 
 bool Cmd_ReleaseWeatherOverride(
@@ -1394,7 +1396,7 @@ bool Cmd_ReleaseWeatherOverride(
 ) {
     Sky* Instance = Sky::GetInstance();
     Instance->ReleaseWeatherOverride();
-    return 1;
+    return true;
 }
 
 bool Cmd_ApplyImageSpaceModifier(
@@ -1409,16 +1411,16 @@ bool Cmd_ApplyImageSpaceModifier(
 ) {
     TESImageSpaceModifier* a8;
     float afStrength;
-    a8 = 0;
+    a8 = nullptr;
     afStrength = 1.0f;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8,
             &afStrength
         )) {
-        return 0;
+        return false;
     }
-    ImageSpaceModifierInstanceForm::Trigger(a8, afStrength, 0);
-    return 1;
+    ImageSpaceModifierInstanceForm::Trigger(a8, afStrength, nullptr);
+    return true;
 }
 
 bool Cmd_SetCellImageSpace(
@@ -1433,16 +1435,16 @@ bool Cmd_SetCellImageSpace(
 ) {
     TESObjectCELL* a8;
     TESImageSpace* apImageSpace;
-    apImageSpace = 0;
-    a8 = 0;
+    apImageSpace = nullptr;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8,
             &apImageSpace
         )) {
-        return 0;
+        return false;
     }
     a8->SetImageSpace(apImageSpace);
-    return 1;
+    return true;
 }
 
 bool Cmd_SetImageSpace(
@@ -1456,11 +1458,11 @@ bool Cmd_SetImageSpace(
     uint32_t& auiOffset
 ) {
     TESImageSpace* pImageSpace;
-    pImageSpace = 0;
+    pImageSpace = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pImageSpace
         )) {
-        return 0;
+        return false;
     }
     if (pImageSpace) {
         ImageSpaceParameterData* pData = &pImageSpace->Data;
@@ -1469,11 +1471,11 @@ bool Cmd_SetImageSpace(
     }
     else {
         ImageSpaceManager* pManager = BSShaderManager::GetImageSpaceManager();
-        pManager->SetActiveImageSpaceParams(0);
+        pManager->SetActiveImageSpaceParams(nullptr);
     }
     ImageSpaceManager* pManager = BSShaderManager::GetImageSpaceManager();
     pManager->ResetToBaseParameterData();
-    return 1;
+    return true;
 }
 
 bool Cmd_ModScale(
@@ -1491,7 +1493,7 @@ bool Cmd_ModScale(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         double Scale = apRefObject->GetScale();
@@ -1506,7 +1508,7 @@ bool Cmd_ModScale(
         }
         Script::SetScaleBase(apRefObject, a8);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetLineOfSight(
@@ -1520,11 +1522,11 @@ bool Cmd_GetLineOfSight(
     uint32_t& auiOffset
 ) {
     TESObjectREFR* pTarget;
-    pTarget = 0;
+    pTarget = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pTarget
            ) &&
-        Script::GetLOSConditionFunction(apRefObject, pTarget, 0, afReturnValue);
+        Script::GetLOSConditionFunction(apRefObject, pTarget, nullptr, afReturnValue);
 }
 
 bool Cmd_RemoveSpell(
@@ -1538,11 +1540,11 @@ bool Cmd_RemoveSpell(
     uint32_t& auiOffset
 ) {
     SpellItem* pSpell;
-    pSpell = 0;
+    pSpell = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pSpell
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         Actor* pTarget = dynamic_cast<Actor*>(apRefObject);
@@ -1558,7 +1560,7 @@ bool Cmd_RemoveSpell(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_CastImmediateOnSelf(
@@ -1572,27 +1574,27 @@ bool Cmd_CastImmediateOnSelf(
     uint32_t& auiOffset
 ) {
     MagicItem* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (!a8 || a8->GetSpellType() == MagicSystem::ABILITY) {
-            return 1;
+            return true;
         }
         MagicCaster* v9 = apRefObject->GetMagicCaster();
         MagicTarget* v10 = apRefObject->GetMagicTarget();
         v9->InterruptCast();
         TESObjectCELL* a1 = apRefObject->GetParentCell();
         if (a1) {
-            if (TES::pInstance->IsCellLoaded(a1, 1) && TES::pInstance->IsCellLoaded(a1, 0)) {
-                v9->CastSpellImmediate(a8, 0, v10, 1.0, 0);
+            if (TES::pInstance->IsCellLoaded(a1, true) && TES::pInstance->IsCellLoaded(a1, false)) {
+                v9->CastSpellImmediate(a8, false, v10, 1.0, false);
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_Dispel(
@@ -1607,23 +1609,23 @@ bool Cmd_Dispel(
 ) {
     MagicItem* a8;
     int32_t v11;
-    a8 = 0;
+    a8 = nullptr;
     v11 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v11
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         Actor* v9 = dynamic_cast<Actor*>(apRefObject);
         if (v9) {
-            v9->Dispel(a8, 0, 0);
+            v9->Dispel(a8, nullptr, nullptr);
             if (a8->HasScript(apScript)) {
-                return 0;
+                return false;
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_DisableAllActors(
@@ -1643,12 +1645,12 @@ bool Cmd_DisableAllActors(
         MobileObject* Item = (&ReferenceProcessLists.MobProcessArray)->GetItem(uiIndex);
         if (Item) {
             if (Item->IsActor() && Item != v11 && !Item->GetDisabled()) {
-                Script::AddPendingDisabledReference(Item, 1);
+                Script::AddPendingDisabledReference(Item, true);
                 apScriptLocals->m_cFlags |= 1;
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetIsFormType(
@@ -1666,7 +1668,7 @@ bool Cmd_GetIsFormType(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
     int32_t FormType = apRefObject->GetObjectReference()->GetFormType();
     if (!std::strcmp(formEnumString[FormType].pFormString, a8)) {
@@ -1675,7 +1677,7 @@ bool Cmd_GetIsFormType(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("Get Is Form Type >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetDetected_Execute(
@@ -1689,11 +1691,11 @@ bool Cmd_GetDetected_Execute(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetDetectedConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetDetectedConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Cmd_GetQuestRunning_0(
@@ -1707,11 +1709,11 @@ bool Cmd_GetQuestRunning_0(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetQuestRunningConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetQuestRunningConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Cmd_StartQuest(
@@ -1725,16 +1727,16 @@ bool Cmd_StartQuest(
     uint32_t& auiOffset
 ) {
     TESQuest* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         a8->SetEnabled(1);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_StopQuest(
@@ -1748,16 +1750,16 @@ bool Cmd_StopQuest(
     uint32_t& auiOffset
 ) {
     TESQuest* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         a8->SetEnabled(0);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_CompleteQuest(
@@ -1771,16 +1773,16 @@ bool Cmd_CompleteQuest(
     uint32_t& auiOffset
 ) {
     TESQuest* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
-        a8->SetCompleted(1);
+        a8->SetCompleted(true);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ModFactionRank_Execute(
@@ -1795,17 +1797,17 @@ bool Cmd_ModFactionRank_Execute(
 ) {
     TESFaction* a8;
     int32_t v12;
-    a8 = 0;
+    a8 = nullptr;
     v12 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v12
         )) {
-        return 0;
+        return false;
     }
     afReturnValue = 0.0;
     Actor* v10 = dynamic_cast<Actor*>(apRefObject);
     if (!v10) {
-        return 1;
+        return true;
     }
     TESActorBase* ActorBase = v10->GetActorBase();
     if (v10) {
@@ -1813,7 +1815,7 @@ bool Cmd_ModFactionRank_Execute(
             v10->ModFactionRank(a8, v12, v10 == pPlayer);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetFactionReaction(
@@ -1829,13 +1831,13 @@ bool Cmd_GetFactionReaction(
     TESFaction* a8;
     TESFaction* pFaction;
     afReturnValue = 0.0;
-    a8 = 0;
-    pFaction = 0;
+    a8 = nullptr;
+    pFaction = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8,
             &pFaction
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         if (pFaction) {
@@ -1847,7 +1849,7 @@ bool Cmd_GetFactionReaction(
         const char* FullName = pFaction->GetFullName();
         Interface::PrintLine("%.20s reaction to %.20s is %.1f", a8->GetFullName(), FullName, v10);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetFactionReaction(
@@ -1863,14 +1865,14 @@ bool Cmd_SetFactionReaction(
     TESFaction* a8;
     TESFaction* pFaction;
     int32_t reaction;
-    a8 = 0;
-    pFaction = 0;
+    a8 = nullptr;
+    pFaction = nullptr;
     reaction = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8,
             &pFaction, &reaction
         )) {
-        return 0;
+        return false;
     }
     afReturnValue = 0.0;
     if (pFaction) {
@@ -1878,7 +1880,7 @@ bool Cmd_SetFactionReaction(
             a8->SetFactionReaction_0(pFaction, reaction);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetAlly(
@@ -1895,15 +1897,15 @@ bool Cmd_SetAlly(
     TESForm* a2;
     int32_t v11;
     int32_t v12;
-    a8 = 0;
-    a2 = 0;
+    a8 = nullptr;
+    a2 = nullptr;
     v12 = 0;
     v11 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &a2,
             &v12, &v11
         )) {
-        return 0;
+        return false;
     }
     afReturnValue = 0.0;
     if (a2) {
@@ -1922,7 +1924,7 @@ bool Cmd_SetAlly(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetEnemy(
@@ -1939,15 +1941,15 @@ bool Cmd_SetEnemy(
     TESForm* a2;
     int32_t v11;
     int32_t v12;
-    a8 = 0;
-    a2 = 0;
+    a8 = nullptr;
+    a2 = nullptr;
     v12 = 0;
     v11 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &a2,
             &v12, &v11
         )) {
-        return 0;
+        return false;
     }
     afReturnValue = 0.0;
     if (a2) {
@@ -1966,7 +1968,7 @@ bool Cmd_SetEnemy(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ModFactionReaction(
@@ -1989,7 +1991,7 @@ bool Cmd_ModFactionReaction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pFaction,
             &pOtherFaction, &iReaction
         )) {
-        return 0;
+        return false;
     }
     afReturnValue = 0.0;
     if (pOtherFaction) {
@@ -1997,7 +1999,7 @@ bool Cmd_ModFactionReaction(
             pFaction->ModFactionReaction(pOtherFaction, iReaction);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowPivot(
@@ -2035,7 +2037,7 @@ bool Cmd_ShowPivot(
             pkVertex = static_cast<NiPoint3*>(ptr);
         }
         else {
-            pkVertex = 0;
+            pkVertex = nullptr;
         }
         void* v44 = ourMalloc(6 * sizeof(NiColorA));
         if (v44) {
@@ -2043,15 +2045,15 @@ bool Cmd_ShowPivot(
             pkColor = static_cast<NiColorA*>(v44);
         }
         else {
-            pkColor = 0;
+            pkColor = nullptr;
         }
         bool* v43 = static_cast<bool*>(ourMalloc(6 * sizeof(bool)));
-        *v43 = 1;
-        v43[1] = 0;
-        v43[2] = 1;
-        v43[3] = 0;
-        v43[4] = 1;
-        v43[5] = 0;
+        *v43 = true;
+        v43[1] = false;
+        v43[2] = true;
+        v43[3] = false;
+        v43[4] = true;
+        v43[5] = false;
         NiColorA apMemory(1.0f, 1.0f, 0.0f, 1.0f);
         NiColorA* v10 = &apMemory;
         *pkColor = *v10;
@@ -2089,13 +2091,13 @@ bool Cmd_ShowPivot(
             );
         }
         else {
-            v27 = 0;
+            v27 = nullptr;
         }
         const NiPoint3* v22 = &apRefObject->GetLocationOnReference();
         v27->SetTranslate(*v22);
         TES::pInstance->AddTempDebugObject(v27, 20.0f);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetIsCurrentPackage_Execute(
@@ -2109,16 +2111,16 @@ bool Cmd_GetIsCurrentPackage_Execute(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject && a8) {
-        return Script::GetIsCurrentPackageConditionFunction(apRefObject, a8, 0, afReturnValue);
+        return Script::GetIsCurrentPackageConditionFunction(apRefObject, a8, nullptr, afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowSlotMachineMenu(
@@ -2144,7 +2146,7 @@ bool Cmd_ShowSlotMachineMenu(
                 &aiMinBet, &aiMaxBet, &aiMinWinnings
             )) {
             if (a8) {
-                SlotMachineMenu::Create(a8, aiMinBet, aiMaxBet, aiMinWinnings, 0);
+                SlotMachineMenu::Create(a8, aiMinBet, aiMaxBet, aiMinWinnings, false);
             }
             else {
                 Warning("Invalid EditorFormID used in script ShowSlotMachineMenu -- is not a valid EditorFormID");
@@ -2154,7 +2156,7 @@ bool Cmd_ShowSlotMachineMenu(
             Warning("Invalid Parameters used in script ShowSlotMachineMenu ");
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowBlackJackMenu(
@@ -2180,7 +2182,7 @@ bool Cmd_ShowBlackJackMenu(
                 &aiMinBet, &aiMaxBet, &v12
             )) {
             if (a8) {
-                BlackJackMenu::Create(a8, aiMinBet, aiMaxBet, 0, 0);
+                BlackJackMenu::Create(a8, aiMinBet, aiMaxBet, 0, false);
             }
             else {
                 Warning("Invalid EditorFormID used in script ShowBlackJackMenu --  is not a valid EditorFormID");
@@ -2190,7 +2192,7 @@ bool Cmd_ShowBlackJackMenu(
             Warning("Invalid Parameters used in script ShowBlackJackMenu ");
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowRouletteMenu(
@@ -2216,7 +2218,7 @@ bool Cmd_ShowRouletteMenu(
                 &aiMinBet, &aiMaxBet, &aiMinWinnings
             )) {
             if (a8) {
-                RouletteMenu::Create(a8, aiMinBet, aiMaxBet, aiMinWinnings, 0);
+                RouletteMenu::Create(a8, aiMinBet, aiMaxBet, aiMinWinnings, false);
             }
             else {
                 Warning("Invalid EditorFormID used in script ShowBlackJackMenu -- is not a valid EditorFormID");
@@ -2226,7 +2228,7 @@ bool Cmd_ShowRouletteMenu(
             Warning("Invalid Parameters used in script ShowRouletteMenu");
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowCaravanMenu(
@@ -2243,9 +2245,9 @@ bool Cmd_ShowCaravanMenu(
     int32_t aiDiffLevel;
     float afBetPercentage;
     if (pPlayer) {
-        a8 = 0;
-        MobileObject* pMobile = 0;
-        Actor* arg0 = 0;
+        a8 = nullptr;
+        MobileObject* pMobile = nullptr;
+        Actor* arg0 = nullptr;
         aiDiffLevel = 0;
         afBetPercentage = 0.0f;
         if (!Script::ParseParameters(
@@ -2253,7 +2255,7 @@ bool Cmd_ShowCaravanMenu(
                 &aiDiffLevel, &afBetPercentage
             )) {
             Warning("Invalid Parameters used in script ShowCaravanMenu ");
-            return 1;
+            return true;
         }
         if (apRefObject) {
             if (apRefObject != pPlayer) {
@@ -2264,7 +2266,7 @@ bool Cmd_ShowCaravanMenu(
                     else {
                         BGSTalkingActivator* pActivator =
                             dynamic_cast<BGSTalkingActivator*>(apRefObject->GetObjectReference());
-                        arg0 = pActivator ? pActivator->pTempRef : 0;
+                        arg0 = pActivator ? pActivator->pTempRef : nullptr;
                     }
                     if (pMobile) {
                         if (pMobile->IsActor()) {
@@ -2277,12 +2279,12 @@ bool Cmd_ShowCaravanMenu(
                                     ->pTempRef;
                         }
                     }
-                    CaravanMenu::Create(arg0, a8, aiDiffLevel, afBetPercentage, 0);
+                    CaravanMenu::Create(arg0, a8, aiDiffLevel, afBetPercentage, false);
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IsPlayerInRegion(
@@ -2308,7 +2310,7 @@ bool Cmd_IsPlayerInRegion(
                     if (GetThreadTLSData()->bSystemOutput) {
                         Interface::PrintLine("IsPlayerInRegion >> %0.f", afReturnValue);
                     }
-                    return 1;
+                    return true;
                 }
                 // Walks the nodes as region lists: each next node is downcast to the list around it.
                 BSSimpleList<TESRegion*>* pNext = i->m_pkNext;
@@ -2316,7 +2318,7 @@ bool Cmd_IsPlayerInRegion(
                     p_m_pkNext = static_cast<TESRegionList*>(pNext);
                 }
                 else {
-                    p_m_pkNext = 0;
+                    p_m_pkNext = nullptr;
                 }
             }
         }
@@ -2327,7 +2329,7 @@ bool Cmd_IsPlayerInRegion(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("IsPlayerInRegion >> %0.f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowComputersInterface(
@@ -2342,12 +2344,16 @@ bool Cmd_ShowComputersInterface(
 ) {
     TESBoundObject* ObjectReference;
     if (apRefObject && (ObjectReference = apRefObject->GetObjectReference(), ObjectReference->GetFormType() == 23)) {
-        Interface::QueueMenuCreate(Interface::OPEN_COMPUTERS, apRefObject, 0, 0, Interface::CMM_STANDARD, 0);
+        Interface::QueueMenuCreate(
+            Interface::OPEN_COMPUTERS, apRefObject, nullptr, nullptr, Interface::CMM_STANDARD, false
+        );
     }
     else {
-        Interface::QueueMenuCreate(Interface::OPEN_COMPUTERS, 0, 0, 0, Interface::CMM_STANDARD, 0);
+        Interface::QueueMenuCreate(
+            Interface::OPEN_COMPUTERS, nullptr, nullptr, nullptr, Interface::CMM_STANDARD, false
+        );
     }
-    return 1;
+    return true;
 }
 
 bool GetSandmanFunction(
@@ -2360,7 +2366,7 @@ bool GetSandmanFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetSandmanConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetSandmanConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool GetCannibalFunction(
@@ -2373,7 +2379,7 @@ bool GetCannibalFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetCannibalConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetCannibalConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_StartMisterSandMan(
@@ -2386,11 +2392,11 @@ bool Cmd_StartMisterSandMan(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Actor* pTarget = 0;
+    Actor* pTarget = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pTarget
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject->IsActor()) {
         if (pTarget) {
@@ -2408,7 +2414,7 @@ bool Cmd_StartMisterSandMan(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_StartCannibal(
@@ -2421,11 +2427,11 @@ bool Cmd_StartCannibal(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Actor* pTarget = 0;
+    Actor* pTarget = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pTarget
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject->IsActor()) {
         if (pTarget) {
@@ -2434,7 +2440,7 @@ bool Cmd_StartCannibal(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetGhost_Execute(
@@ -2452,7 +2458,7 @@ bool Cmd_SetGhost_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     Actor* v10 = dynamic_cast<Actor*>(apRefObject);
     if (v10) {
@@ -2461,7 +2467,7 @@ bool Cmd_SetGhost_Execute(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("SetGhost >> %d", a8);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_EquipItem_Execute(
@@ -2477,14 +2483,14 @@ bool Cmd_EquipItem_Execute(
     int32_t v20;
     TESForm* item;
     int32_t v22;
-    item = 0;
+    item = nullptr;
     v20 = 0;
     v22 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &item, &v20,
             &v22
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         Actor* v18 = dynamic_cast<Actor*>(apRefObject);
@@ -2492,7 +2498,7 @@ bool Cmd_EquipItem_Execute(
         if (item) {
             if (v18) {
                 InventoryChanges* ContainerChanges = (&v18->m_Extra)->GetContainerChanges();
-                ItemChange* InventoryItem = 0;
+                ItemChange* InventoryItem = nullptr;
                 uint8_t bEquip = 1;
                 if (ContainerChanges) {
                     InventoryItem = ContainerChanges->GetInventoryItem(static_cast<TESBoundObject*>(item), 0);
@@ -2501,7 +2507,7 @@ bool Cmd_EquipItem_Execute(
                         BSSimpleList<ExtraDataList*>* pNode = InventoryItem->pExtraObjectList;
                         while (pNode && pNode->GetItem()) {
                             ExtraDataList* pList = pNode->GetItem();
-                            if (pList && pList->ExtraDataList::GetWorn(0)) {
+                            if (pList && pList->ExtraDataList::GetWorn(false)) {
                                 pList->ExtraDataList::SetCanNotWear(v19);
                                 bEquip = 0;
                                 break;
@@ -2512,18 +2518,18 @@ bool Cmd_EquipItem_Execute(
                     }
                 }
                 if (bEquip) {
-                    v18->QueueEquipObject(static_cast<TESBoundObject*>(item), 1, 0, 1, v19, 1);
+                    v18->QueueEquipObject(static_cast<TESBoundObject*>(item), 1, nullptr, true, v19, true);
                     if (v18 == pPlayer && !v22) {
                         BSStringT<char> v11;
                         const char* v9 = sEquipItemOnPlayer.String();
                         v11.SPrintF("%s %s.", TESFullName::GetFullName(item), v9);
                         Interface::ShowMessage(
-                            v11.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_neutral.dds", 0,
-                            2.0f, 0
+                            v11.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_neutral.dds",
+                            nullptr, 2.0f, false
                         );
                         pPlayer->UpdatePlayer3d();
                         BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
-                        CurrentAIProcess->SetShouldRefreshMagicShadersEffects(1, 0, 0);
+                        CurrentAIProcess->SetShouldRefreshMagicShadersEffects(true, false, false);
                         Interface::UpdateInventory();
                     }
                 }
@@ -2533,7 +2539,7 @@ bool Cmd_EquipItem_Execute(
             Warning("SCRIPTS: EquipItem in script '%s' failed to generate an item.", apScript->GetFormEditorID());
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_UnequipItem_Execute(
@@ -2551,14 +2557,14 @@ bool Cmd_UnequipItem_Execute(
     int32_t v26;
     TESBoundObject* a8;
     int32_t v28;
-    a8 = 0;
+    a8 = nullptr;
     v26 = 0;
     v28 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v26,
             &v28
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         Actor* v24 = dynamic_cast<Actor*>(apRefObject);
@@ -2567,21 +2573,22 @@ bool Cmd_UnequipItem_Execute(
             if (v24) {
                 InventoryChanges* InventoryChanges_ = InventoryChanges::GetInventoryChanges(apRefObject);
                 if (InventoryChanges_) {
-                    ExtraDataList* v22 = InventoryChanges_->WearingObject(a8, 0);
+                    ExtraDataList* v22 = InventoryChanges_->WearingObject(a8, false);
                     if (v22) {
-                        v22->SetCanNotWear(0);
-                        v24->QueueUnEquipObject(a8, 1, 0, 1, v25, 1);
+                        v22->SetCanNotWear(false);
+                        v24->QueueUnEquipObject(a8, 1, nullptr, true, v25, true);
                         if (v24 == pPlayer && !v28) {
                             BSStringT<char> apString;
                             const char* v9 = sUnequipItemOnPlayer.String();
                             apString.SPrintF("%s %s.", TESFullName::GetFullName(a8), v9);
                             Interface::ShowMessage(
                                 apString.pString, 0,
-                                "Interface\\Icons\\Message Icons\\glow_message_vaultboy_neutral.dds", 0, 2.0f, 0
+                                "Interface\\Icons\\Message Icons\\glow_message_vaultboy_neutral.dds", nullptr, 2.0f,
+                                false
                             );
                             pPlayer->UpdatePlayer3d();
                             BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
-                            CurrentAIProcess->SetShouldRefreshMagicShadersEffects(1, 0, 0);
+                            CurrentAIProcess->SetShouldRefreshMagicShadersEffects(true, false, false);
                             Interface::UpdateInventory();
                         }
                     }
@@ -2605,7 +2612,7 @@ bool Cmd_UnequipItem_Execute(
                                 v12 = ::new (apMemory) ExtraDataList;
                             }
                             else {
-                                v12 = 0;
+                                v12 = nullptr;
                             }
                             a2 = v12;
                             a2->SetCanNotWear(v25);
@@ -2621,7 +2628,7 @@ bool Cmd_UnequipItem_Execute(
                             v11 = ::new (v15) BSSimpleList<ExtraDataList*>;
                         }
                         else {
-                            v11 = 0;
+                            v11 = nullptr;
                         }
                         InventoryItem->pExtraObjectList = v11;
                         ExtraDataList* v14 = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
@@ -2629,7 +2636,7 @@ bool Cmd_UnequipItem_Execute(
                             v10 = ::new (v14) ExtraDataList;
                         }
                         else {
-                            v10 = 0;
+                            v10 = nullptr;
                         }
                         item = v10;
                         item->SetCanNotWear(v25);
@@ -2642,7 +2649,7 @@ bool Cmd_UnequipItem_Execute(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetClass_Execute(
@@ -2656,11 +2663,11 @@ bool Cmd_SetClass_Execute(
     uint32_t& auiOffset
 ) {
     TESClass* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         Actor* v11 = dynamic_cast<Actor*>(apRefObject);
@@ -2670,12 +2677,12 @@ bool Cmd_SetClass_Execute(
                 TESNPC* v10 = dynamic_cast<TESNPC*>(ObjectReference);
                 if (v10) {
                     v10->SetClass(a8);
-                    v10->InitValues(0);
+                    v10->InitValues(false);
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ResetInterior(
@@ -2689,16 +2696,16 @@ bool Cmd_ResetInterior(
     uint32_t& auiOffset
 ) {
     TESObjectCELL* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
-        a8->SetDetachTime(0xFFFFFFFFu, 0);
+        a8->SetDetachTime(0xFFFFFFFFu, false);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_WaterShallowColor(
@@ -2718,9 +2725,9 @@ bool Cmd_WaterShallowColor(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v22,
             &v23
         )) {
-        return 0;
+        return false;
     }
-    WaterShaderProperty* v24 = 0;
+    WaterShaderProperty* v24 = nullptr;
     if (apRefObject) {
         NiNode* v18 = apRefObject->Get3D();
         NiNode* v19 = static_cast<NiNode*>(v18->GetAt(0));
@@ -2745,7 +2752,7 @@ bool Cmd_WaterShallowColor(
             WaterShader::kShallowColor = *v10;
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_WaterDeepColor(
@@ -2765,9 +2772,9 @@ bool Cmd_WaterDeepColor(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v22,
             &v23
         )) {
-        return 0;
+        return false;
     }
-    WaterShaderProperty* v24 = 0;
+    WaterShaderProperty* v24 = nullptr;
     if (apRefObject) {
         NiNode* v18 = apRefObject->Get3D();
         NiNode* v19 = static_cast<NiNode*>(v18->GetAt(0));
@@ -2792,7 +2799,7 @@ bool Cmd_WaterDeepColor(
             WaterShader::kDeepColor = *v10;
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_WaterReflectionColor(
@@ -2813,9 +2820,9 @@ bool Cmd_WaterReflectionColor(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v22,
             &v23
         )) {
-        return 0;
+        return false;
     }
-    WaterShaderProperty* v24 = 0;
+    WaterShaderProperty* v24 = nullptr;
     if (apRefObject) {
         NiNode* v18 = apRefObject->Get3D();
         NiNode* v19 = static_cast<NiNode*>(v18->GetAt(0));
@@ -2838,7 +2845,7 @@ bool Cmd_WaterReflectionColor(
             WaterShader::kReflectionColor = *::new (&v16) NiColorA(v10, v11, v12, 1.0f);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_DamageObject(
@@ -2856,10 +2863,10 @@ bool Cmd_DamageObject(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (!apRefObject) {
-        return 0;
+        return false;
     }
     if (iNumHWThreads.Int() <= 1) {
         Script::DamageObjectBase(apRefObject, a8);
@@ -2867,7 +2874,7 @@ bool Cmd_DamageObject(
     else {
         TaskQueueInterface::GetInstance()->QueueScriptFunctionCall(0x116Cu, apRefObject, a8);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ResetAllTerminals(
@@ -2881,7 +2888,7 @@ bool Cmd_ResetAllTerminals(
     uint32_t& auiOffset
 ) {
     PlayerCharacter::DebugResetAllTerminals();
-    return 1;
+    return true;
 }
 
 bool Cmd_ExitGame_Execute(
@@ -2896,11 +2903,11 @@ bool Cmd_ExitGame_Execute(
 ) {
     TESForm* FormByNumericID = TESForm::GetFormByNumericID(0xED568u);
     BGSPerk* v11 = dynamic_cast<BGSPerk*>(FormByNumericID);
-    float afValue = static_cast<float>((pPlayer->GetPerkRank(v11, 0) != 0) + 1);
+    float afValue = static_cast<float>((pPlayer->GetPerkRank(v11, false) != 0) + 1);
     pPlayCredits->SetValue(afValue);
     Interface::CloseConsole();
     StartMenu::ChooseMainMenu();
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowWarning_Execute(
@@ -2917,17 +2924,17 @@ bool Cmd_ShowWarning_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &result[2]
         )) {
-        return 0;
+        return false;
     }
     BSStringT<char> out;
     if (Script::ParseString(
             apParameters, apCompiledParams, apRefObject, apContainer, apScript, apScriptLocals, &afReturnValue,
             &auiOffset, &result[2], &out
         )) {
-        return 1;
+        return true;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -2942,11 +2949,11 @@ bool Cmd_EnterTrigger_Execute(
     uint32_t& auiOffset
 ) {
     TESForm* a1;
-    a1 = 0;
+    a1 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a1
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         Script::InitActionList(apRefObject, &apRefObject->m_Extra);
@@ -2961,7 +2968,7 @@ bool Cmd_EnterTrigger_Execute(
             GetThreadTLSData()->unk290 = GetThreadTLSData()->unk290 - 1;
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetConsoleOutputFile_Execute(
@@ -2978,11 +2985,11 @@ bool Cmd_SetConsoleOutputFile_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
     a8[271] = 0;
     if (a8[0] && a8[0] != 48) {
-        MenuConsole* v10 = MenuConsole::Instance(1);
+        MenuConsole* v10 = MenuConsole::Instance(true);
         v10->SetOutputFilename(a8);
         if (GetThreadTLSData()->bSystemOutput) {
             Interface::PrintLine("SetConsoleOutputFilename >> '%s'", a8);
@@ -2992,10 +2999,10 @@ bool Cmd_SetConsoleOutputFile_Execute(
         if (GetThreadTLSData()->bSystemOutput) {
             Interface::PrintLine("SetConsoleOutputFilename >> OUTPUT_DISABLED");
         }
-        MenuConsole* v9 = MenuConsole::Instance(1);
-        v9->SetOutputFilename(0);
+        MenuConsole* v9 = MenuConsole::Instance(true);
+        v9->SetOutputFilename(nullptr);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_TestRaceSexTerimnal(
@@ -3009,7 +3016,7 @@ bool Cmd_TestRaceSexTerimnal(
     uint32_t& auiOffset
 ) {
     Interface::CreateRaceSexMenu(RSM_CONTEXT_NONE);
-    return 1;
+    return true;
 }
 
 bool Cmd_SetPlayerTeammate_Execute(
@@ -3027,14 +3034,14 @@ bool Cmd_SetPlayerTeammate_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (apRefObject->IsActor()) {
             static_cast<Actor*>(apRefObject)->Actor::SetPlayerTeammate(a8 != 0);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_OpenTeammateContainer(
@@ -3056,11 +3063,13 @@ bool Cmd_OpenTeammateContainer(
                 apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
             );
             if (pActor->IsPlayerTeammate() || a8) {
-                Interface::QueueMenuCreate(Interface::OPEN_CONTAINER, apRefObject, 0, 0, Interface::CMM_TEAMMATE, 0);
+                Interface::QueueMenuCreate(
+                    Interface::OPEN_CONTAINER, apRefObject, nullptr, nullptr, Interface::CMM_TEAMMATE, false
+                );
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ClearFactionPlayerEnemyFlag(
@@ -3074,14 +3083,14 @@ bool Cmd_ClearFactionPlayerEnemyFlag(
     uint32_t& auiOffset
 ) {
     TESFaction* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
-    a8->SetPCAnEnemy(0);
-    return 1;
+    a8->SetPCAnEnemy(false);
+    return true;
 }
 
 bool Cmd_ResetQuest(
@@ -3095,16 +3104,16 @@ bool Cmd_ResetQuest(
     uint32_t& auiOffset
 ) {
     TESQuest* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         a8->ResetQuest();
     }
-    return 1;
+    return true;
 }
 
 // The quest's script delay, and its change flag CHANGE_QUEST_SCRIPT_DELAY (4) for the save game.
@@ -3124,13 +3133,13 @@ bool Cmd_SetQuestDelay(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pquest,
             &fdelay
         )) {
-        return 0;
+        return false;
     }
     if (pquest) {
         pquest->SetScriptProcessingDelay(fdelay);
         pquest->AddChange(4);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ClearDestruction(
@@ -3144,7 +3153,7 @@ bool Cmd_ClearDestruction(
     uint32_t& auiOffset
 ) {
     BGSDestructibleObjectForm::ClearDestruction(apRefObject);
-    return 1;
+    return true;
 }
 
 bool Cmd_FireWeapon(
@@ -3158,11 +3167,11 @@ bool Cmd_FireWeapon(
     uint32_t& auiOffset
 ) {
     TESForm* v12;
-    v12 = 0;
+    v12 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &v12
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (v12 && v12->GetFormType() == 40) {
@@ -3180,7 +3189,7 @@ bool Cmd_FireWeapon(
             Warning("SCRIPTS: FireWeapon in script '%s' called with non-weapon parameter.", v10);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetWeaponHealthPerc(
@@ -3198,7 +3207,7 @@ bool Cmd_SetWeaponHealthPerc(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (apRefObject->IsActor()) {
@@ -3212,7 +3221,7 @@ bool Cmd_SetWeaponHealthPerc(
                     float FormHealth = static_cast<float>(static_cast<TESObjectWEAP*>(v19->pContainerObj)
                                                               ->TESObjectWEAP::GetFormHealth(HasModEffectActive_0));
                     float afA = FormHealth * a8;
-                    float v15 = afA - v19->GetItemHealth(0);
+                    float v15 = afA - v19->GetItemHealth(false);
                     if (!(v15 > 0.0)) {
                         pactor->DamageEquipment(v19, -v15, true);
                     }
@@ -3221,13 +3230,13 @@ bool Cmd_SetWeaponHealthPerc(
                         InventoryChanges* ContainerChanges = pactor->m_Extra.GetContainerChanges();
                         float v13 = FormHealth - 1.0;
                         float arg0 = BSMIN(afA, v13);
-                        v19->SetItemHealth(arg0, ContainerChanges, m_item, 1);
+                        v19->SetItemHealth(arg0, ContainerChanges, m_item, true);
                     }
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ModWeaponHealthPerc(
@@ -3245,7 +3254,7 @@ bool Cmd_ModWeaponHealthPerc(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (apRefObject->IsActor()) {
@@ -3254,7 +3263,7 @@ bool Cmd_ModWeaponHealthPerc(
                 BaseProcess* pProc = pactor->GetCurrentAIProcess();
                 ItemChange* v17 = pProc->GetCurrentWeapon();
                 if (v17) {
-                    double ItemHealth = v17->GetItemHealth(1);
+                    double ItemHealth = v17->GetItemHealth(true);
                     a8 = ItemHealth + a8;
                     a8 = a8 / 100.0;
                     if (a8 < 0.0) {
@@ -3262,20 +3271,20 @@ bool Cmd_ModWeaponHealthPerc(
                     }
                     float FormHealth = static_cast<float>(TESHealthForm::GetFormHealth(v17->pContainerObj));
                     float v16 = FormHealth * a8;
-                    float v14 = v16 - v17->GetItemHealth(0);
+                    float v14 = v16 - v17->GetItemHealth(false);
                     if (!(v14 > 0.0)) {
                         pactor->DamageEquipment(v17, -v14, true);
                     }
                     else {
                         ExtraDataList* m_item = v17->pExtraObjectList->m_item;
                         InventoryChanges* ContainerChanges = pactor->m_Extra.GetContainerChanges();
-                        v17->SetItemHealth(v16, ContainerChanges, m_item, 1);
+                        v17->SetItemHealth(v16, ContainerChanges, m_item, true);
                     }
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetRumble(
@@ -3298,13 +3307,13 @@ bool Cmd_SetRumble(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v10,
             &v12
         )) {
-        return 0;
+        return false;
     }
     Controls* Controls_ = appMain->GetControls();
     if (Controls_) {
-        Controls_->Rumble(a8, v10, static_cast<int32_t>(v12 * 1000.0), 0, CONSTANT, 0, 1);
+        Controls_->Rumble(a8, v10, static_cast<int32_t>(v12 * 1000.0), 0, CONSTANT, false, true);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetNoActivationSound(
@@ -3318,7 +3327,7 @@ bool Cmd_SetNoActivationSound(
     uint32_t& auiOffset
 ) {
     TESSound* a1;
-    a1 = 0;
+    a1 = nullptr;
     if (Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a1
         )) {
@@ -3338,7 +3347,7 @@ bool Cmd_SetNoActivationSound(
             FalloutAudio::SetNoActivationSound(a1);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_Abs(
@@ -3356,10 +3365,10 @@ bool Cmd_Abs(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     afReturnValue = std::fabs(a8);
-    return 1;
+    return true;
 }
 
 bool Cmd_EnableWeaponMod(
@@ -3378,7 +3387,7 @@ bool Cmd_EnableWeaponMod(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pWeapon,
             &iModSlot
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject->IsActor() && iModSlot > 0 && iModSlot <= 3) {
         Actor* pActor = static_cast<Actor*>(apRefObject);
@@ -3387,7 +3396,7 @@ bool Cmd_EnableWeaponMod(
         ExtraDataList* pList = pChange->pExtraObjectList->m_item;
         pList->SetWeaponModSlot(1 << (iModSlot - 1));
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_AddReputation(
@@ -3405,17 +3414,17 @@ bool Cmd_AddReputation(
     TESReputation* a8;
     a1 = 0;
     a2 = 0;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &a1, &a2
         )) {
-        return 0;
+        return false;
     }
     if (a1 > 1) {
-        return 0;
+        return false;
     }
     a8->AddReputation(static_cast<ReputationType>(a1), a2);
-    return 1;
+    return true;
 }
 
 bool Cmd_AddReputationExact(
@@ -3433,18 +3442,18 @@ bool Cmd_AddReputationExact(
     TESReputation* a8;
     a2 = 0;
     v10 = 0.0f;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &a2,
             &v10
         )) {
-        return 0;
+        return false;
     }
     if (a2 < 0 || a2 > 1) {
-        return 0;
+        return false;
     }
     a8->AddReputationExact(static_cast<ReputationType>(a2), v10);
-    return 1;
+    return true;
 }
 
 bool Cmd_RemoveReputation(
@@ -3462,17 +3471,17 @@ bool Cmd_RemoveReputation(
     TESReputation* a8;
     a1 = 0;
     a2 = 0;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &a1, &a2
         )) {
-        return 0;
+        return false;
     }
     if (a1 > 1) {
-        return 0;
+        return false;
     }
     a8->RemoveReputation(static_cast<ReputationType>(a1), a2);
-    return 1;
+    return true;
 }
 
 bool Cmd_RemoveReputationExact(
@@ -3490,18 +3499,18 @@ bool Cmd_RemoveReputationExact(
     TESReputation* a8;
     a2 = 0;
     v10 = 0.0f;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &a2,
             &v10
         )) {
-        return 0;
+        return false;
     }
     if (a2 < 0 || a2 > 1) {
-        return 0;
+        return false;
     }
     a8->RemoveReputationExact(static_cast<ReputationType>(a2), v10);
-    return 1;
+    return true;
 }
 
 bool Cmd_SetReputation(
@@ -3519,17 +3528,17 @@ bool Cmd_SetReputation(
     TESReputation* a8;
     a2 = 0;
     a3 = 0.0f;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &a2, &a3
         )) {
-        return 0;
+        return false;
     }
     if (a2 > 1) {
-        return 0;
+        return false;
     }
     a8->SetReputation(a2, a3);
-    return 1;
+    return true;
 }
 
 bool Cmd_DetonatePlacedExplosives(
@@ -3553,13 +3562,13 @@ bool Cmd_DetonatePlacedExplosives(
                     (Owner = static_cast<TESActorBase*>(Item->GetOwner()),
                      Owner == apRefObject->GetTemplateActorBase())) {
                     if (Item->GetProjectileBase()->GetHasExplosionDetonates()) {
-                        Item->SetFlag(Projectile::DETONATE, 1);
+                        Item->SetFlag(Projectile::DETONATE, true);
                     }
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IsLoadingMenuEnabled(
@@ -3576,7 +3585,7 @@ bool Cmd_IsLoadingMenuEnabled(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("IsLoadingMenuEnabled >> %0.f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IsActorRefEssential(
@@ -3602,7 +3611,7 @@ bool Cmd_IsActorRefEssential(
             Interface::PrintLine("IsActorRefEssential >> Invalid actor reference ");
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetActorRefEssential(
@@ -3619,7 +3628,7 @@ bool Cmd_SetActorRefEssential(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject->IsActor()) {
         Actor* v9 = dynamic_cast<Actor*>(apRefObject);
@@ -3630,7 +3639,7 @@ bool Cmd_SetActorRefEssential(
             Interface::PrintLine("SetActorRefEssential >> Invalid actor reference ");
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IsNoHumanGoreExe(
@@ -3647,7 +3656,7 @@ bool Cmd_IsNoHumanGoreExe(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("IsNoHumanGoreExe >> %0.f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IncrementScriptedChallenge(
@@ -3664,10 +3673,10 @@ bool Cmd_IncrementScriptedChallenge(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     TESChallengeManager::IncrementScriptedChallenge(a8, 1);
-    return 1;
+    return true;
 }
 
 bool Cmd_PersistentRefCount(
@@ -3681,9 +3690,9 @@ bool Cmd_PersistentRefCount(
     uint32_t& auiOffset
 ) {
     if (!TESForm::pAllForms) {
-        return 1;
+        return true;
     }
-    TESForm* a4 = 0;
+    TESForm* a4 = nullptr;
     NiTMapItem<uint32_t, TESForm*>* a2 = TESForm::pAllForms->GetFirstPos();
     uint32_t a3 = 0;
     uint32_t v12 = 0;
@@ -3700,7 +3709,7 @@ bool Cmd_PersistentRefCount(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("PersistentRefCount >> %u", v12);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_AlwaysShowActorSubtitles(
@@ -3718,7 +3727,7 @@ bool Cmd_AlwaysShowActorSubtitles(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject->IsActor()) {
         Actor* v9 = dynamic_cast<Actor*>(apRefObject);
@@ -3729,7 +3738,7 @@ bool Cmd_AlwaysShowActorSubtitles(
             Interface::PrintLine("AlwaysShowActorSubtitles >> Invalid actor reference ");
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ModWaterShader(
@@ -3752,7 +3761,7 @@ bool Cmd_ModWaterShader(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, apString1,
             &v21
         )) {
-        WaterShaderProperty* v22 = 0;
+        WaterShaderProperty* v22 = nullptr;
         if (apRefObject) {
             NiNode* WaterGeometry =
                 static_cast<NiNode*>(TES::pInstance->GetWaterSystem()->GetWaterGeometry(apRefObject));
@@ -3874,10 +3883,7 @@ bool Cmd_ModWaterShader(
                                                                                                                 "second"
                                                                                                                 "s: %f",
                                                                                                                 v10->GetCellName(),
-                                                                                                                static_cast<
-                                                                                                                    int64_t>(
-                                                                                                                    v11
-                                                                                                                ),
+                                                                                                                v11,
                                                                                                                 microSeconds
                                                                                                             );
                                                                                                             InitializationFlow(
@@ -3901,8 +3907,9 @@ bool Cmd_ModWaterShader(
                                                                                                             TES::pInstance
                                                                                                                 ->GetWaterSystem()
                                                                                                                 ->DisplayWater(
-                                                                                                                    1,
-                                                                                                                    1, 1
+                                                                                                                    true,
+                                                                                                                    true,
+                                                                                                                    true
                                                                                                                 );
                                                                                                         }
                                                                                                         Interface::
@@ -3933,7 +3940,7 @@ bool Cmd_ModWaterShader(
                                                                                                                 )
                                                                                                             );
                                                                                                             v22->bUpdateConstants =
-                                                                                                                0;
+                                                                                                                false;
                                                                                                         }
                                                                                                         else {
                                                                                                             WaterShader::
@@ -3961,7 +3968,8 @@ bool Cmd_ModWaterShader(
                                                                                             else {
                                                                                                 if (v22) {
                                                                                                     if (v22->bDepth) {
-                                                                                                        v22->bDepth = 0;
+                                                                                                        v22->bDepth =
+                                                                                                            false;
                                                                                                         Interface::
                                                                                                             PrintLine(
                                                                                                                 "Toggle"
@@ -3971,7 +3979,8 @@ bool Cmd_ModWaterShader(
                                                                                                             );
                                                                                                     }
                                                                                                     else {
-                                                                                                        v22->bDepth = 1;
+                                                                                                        v22->bDepth =
+                                                                                                            true;
                                                                                                         Interface::
                                                                                                             PrintLine(
                                                                                                                 "Toggle"
@@ -4022,7 +4031,7 @@ bool Cmd_ModWaterShader(
                                                                                             if (v22) {
                                                                                                 if (v22->bRefractions) {
                                                                                                     v22->bRefractions =
-                                                                                                        0;
+                                                                                                        false;
                                                                                                     Interface::
                                                                                                         PrintLine(
                                                                                                             "Toggle "
@@ -4032,7 +4041,7 @@ bool Cmd_ModWaterShader(
                                                                                                 }
                                                                                                 else {
                                                                                                     v22->bReflections =
-                                                                                                        1;
+                                                                                                        true;
                                                                                                     Interface::
                                                                                                         PrintLine(
                                                                                                             "Toggle "
@@ -4076,7 +4085,8 @@ bool Cmd_ModWaterShader(
                                                                                     else {
                                                                                         if (v22) {
                                                                                             if (v22->bReflections) {
-                                                                                                v22->bReflections = 0;
+                                                                                                v22->bReflections =
+                                                                                                    false;
                                                                                                 Interface::PrintLine(
                                                                                                     "Toggle "
                                                                                                     "Reflections : "
@@ -4084,7 +4094,8 @@ bool Cmd_ModWaterShader(
                                                                                                 );
                                                                                             }
                                                                                             else {
-                                                                                                v22->bReflections = 1;
+                                                                                                v22->bReflections =
+                                                                                                    true;
                                                                                                 Interface::PrintLine(
                                                                                                     "Toggle "
                                                                                                     "Reflections : ON"
@@ -4181,7 +4192,7 @@ bool Cmd_ModWaterShader(
                                                 }
                                                 else {
                                                     if (v22) {
-                                                        v22->bUpdateConstants = 1;
+                                                        v22->bUpdateConstants = true;
                                                     }
                                                     else {
                                                         g_bIsUseModdedWaterShaders = 0;
@@ -4196,7 +4207,7 @@ bool Cmd_ModWaterShader(
                                                     if (v22) {
                                                         v22->fNoiseScale = v21;
                                                         Interface::PrintLine("set noise scale to %f", v21);
-                                                        v22->bUpdateConstants = 0;
+                                                        v22->bUpdateConstants = false;
                                                     }
                                                     else {
                                                         ImageSpaceEffectNoise::fNoiseScale = v21;
@@ -4217,7 +4228,7 @@ bool Cmd_ModWaterShader(
                                                 Interface::PrintLine(
                                                     "set water opacity to %d", static_cast<int32_t>(v21)
                                                 );
-                                                v22->bUpdateConstants = 0;
+                                                v22->bUpdateConstants = false;
                                             }
                                             else {
                                                 WaterShader::pVarAmounts.b = v21 / 100.0;
@@ -4237,7 +4248,7 @@ bool Cmd_ModWaterShader(
                                         if (v22) {
                                             v22->fFresnelAmount = v21;
                                             Interface::PrintLine("set fresnel term to %f", v21);
-                                            v22->bUpdateConstants = 0;
+                                            v22->bUpdateConstants = false;
                                         }
                                         else {
                                             g_fWaterFresnelTerm = v21;
@@ -4251,7 +4262,7 @@ bool Cmd_ModWaterShader(
                                 if (v22) {
                                     v22->pVarAmounts.w = v21;
                                     Interface::PrintLine("set water distortion amount to %f", v21);
-                                    v22->bUpdateConstants = 0;
+                                    v22->bUpdateConstants = false;
                                 }
                                 else {
                                     WaterShader::pVarAmounts.a = v21;
@@ -4268,7 +4279,7 @@ bool Cmd_ModWaterShader(
                                 if (v22) {
                                     v22->pVarAmounts.y = v21;
                                     Interface::PrintLine("set water reflectivity amount to %f", v21);
-                                    v22->bUpdateConstants = 0;
+                                    v22->bUpdateConstants = false;
                                 }
                                 else {
                                     WaterShader::pVarAmounts.g = v21;
@@ -4281,11 +4292,11 @@ bool Cmd_ModWaterShader(
                 }
             }
         }
-        return 1;
+        return true;
     }
     else {
         Interface::PrintLine("reflectamt, fresnel, opacity, speed, noise, reflect, refract, lod");
-        return 0;
+        return false;
     }
 }
 
@@ -4295,7 +4306,7 @@ bool Cmd_EssentialDeathReload_Parse(
     SCRIPT_LINE* apScriptLine,
     ScriptCompileData* apCompileData
 ) {
-    return Cmd_NonDefault_Parse(asParamCount, apParameters, apScriptLine, apCompileData, 1, 0);
+    return Cmd_NonDefault_Parse(asParamCount, apParameters, apScriptLine, apCompileData, true, false);
 }
 
 bool Cmd_ShowMessage_Parse(
@@ -4304,7 +4315,7 @@ bool Cmd_ShowMessage_Parse(
     SCRIPT_LINE* apScriptLine,
     ScriptCompileData* apCompileData
 ) {
-    return Cmd_NonDefault_Parse(asParamCount, apParameters, apScriptLine, apCompileData, 0, 0);
+    return Cmd_NonDefault_Parse(asParamCount, apParameters, apScriptLine, apCompileData, false, false);
 }
 
 bool Cmd_ShowWarning_Parse(
@@ -4313,7 +4324,7 @@ bool Cmd_ShowWarning_Parse(
     SCRIPT_LINE* apScriptLine,
     ScriptCompileData* apCompileData
 ) {
-    return Cmd_NonDefault_Parse(asParamCount, apParameters, apScriptLine, apCompileData, 0, 1);
+    return Cmd_NonDefault_Parse(asParamCount, apParameters, apScriptLine, apCompileData, false, true);
 }
 
 // The compiled line is raw bytecode: its 16-bit and 32-bit values are written into the output byte buffer unaligned.
@@ -4333,10 +4344,12 @@ bool Cmd_NonDefault_Parse(
     BGSMessage* pMessage = nullptr;
     int32_t aCount = 0;
     if (a6) {
-        aCount = ScriptCompiler::GetNextWord(apCompileData, &apWord, apScriptLine->pLine, apScriptLine->uiOffset, 0, 0);
+        aCount = ScriptCompiler::GetNextWord(
+            apCompileData, &apWord, apScriptLine->pLine, apScriptLine->uiOffset, false, false
+        );
         if (!aCount) {
             ScriptCompiler::ScriptError(apCompileData, "No message text.");
-            return 0;
+            return false;
         }
         *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) =
             static_cast<uint16_t>(aCount);
@@ -4346,26 +4359,28 @@ bool Cmd_NonDefault_Parse(
     }
     else {
         SCRIPT_WORD String;
-        aCount = ScriptCompiler::GetNextWord(apCompileData, &String, apScriptLine->pLine, apScriptLine->uiOffset, 0, 0);
+        aCount = ScriptCompiler::GetNextWord(
+            apCompileData, &String, apScriptLine->pLine, apScriptLine->uiOffset, false, false
+        );
         if (!aCount) {
             ScriptCompiler::ScriptError(
                 apCompileData, "Missing parameter %s.\r\nCompiled script not saved!", apParameters->pParamName
             );
-            return 0;
+            return false;
         }
         if (String.uiRefObjectIndex || String.cVariableType) {
             ScriptCompiler::ScriptError(
                 apCompileData, "Parameter %s may not be a variable.\r\nCompiled script not saved!",
                 apParameters->pParamName
             );
-            return 0;
+            return false;
         }
-        if (!apCompileData->GetReferencedObject(&String, 0, 0) || !String.uiRefObjectIndex) {
+        if (!apCompileData->GetReferencedObject(&String, false, false) || !String.uiRefObjectIndex) {
             ScriptCompiler::ScriptError(
                 apCompileData, "Item '%s' not found for parameter %s.\r\nCompiled script not saved!", String.pText,
                 apParameters->pParamName
             );
-            return 0;
+            return false;
         }
         pMessage = dynamic_cast<BGSMessage*>(String.pForm);
         if (!String.uiVariableID && !pMessage) {
@@ -4373,7 +4388,7 @@ bool Cmd_NonDefault_Parse(
                 apCompileData, "Invalid message '%s' for parameter %s.\r\nCompiled script not saved!", String.pText,
                 apParameters->pParamName
             );
-            return 0;
+            return false;
         }
         char* pOutput = apScriptLine->pOutput;
         pOutput[apScriptLine->uiOutputSize++] = 'r';
@@ -4410,26 +4425,27 @@ bool Cmd_NonDefault_Parse(
     }
     if (v20 >= 10) {
         ScriptCompiler::ScriptError(apCompileData, "Max variables of %d exceeded.", 10);
-        return 0;
+        return false;
     }
     *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = static_cast<uint16_t>(v20);
     apScriptLine->uiOutputSize += 2;
     char* v17 = apScriptLine->pOutput;
     for (int32_t i = 0; i < v20; ++i) {
         SCRIPT_WORD apMemory;
-        aCount =
-            ScriptCompiler::GetNextWord(apCompileData, &apMemory, apScriptLine->pLine, apScriptLine->uiOffset, 1, 0);
+        aCount = ScriptCompiler::GetNextWord(
+            apCompileData, &apMemory, apScriptLine->pLine, apScriptLine->uiOffset, true, false
+        );
         if (!aCount) {
             ScriptCompiler::ScriptError(
                 apCompileData, "Too few variables in MessageBox parameters; expected %d, found %d.", v20, i
             );
-            return 0;
+            return false;
         }
         if (!apMemory.cVariableType) {
             ScriptCompiler::ScriptError(
                 apCompileData, "Unknown variable '%s' in MessageBox parameters.", apMemory.pText
             );
-            return 0;
+            return false;
         }
         if (apMemory.uiRefObjectIndex) {
             if (apMemory.cVariableType == 'G') {
@@ -4448,7 +4464,7 @@ bool Cmd_NonDefault_Parse(
                     apCompileData, "Unknown compiler error in MessageBoxCompile.  Failed to parse variable '%s'.",
                     apMemory.pText
                 );
-                return 0;
+                return false;
             }
             v17[apScriptLine->uiOutputSize++] = apMemory.cVariableType;
             *reinterpret_cast<uint16_t*>(&v17[apScriptLine->uiOutputSize]) =
@@ -4463,7 +4479,7 @@ bool Cmd_NonDefault_Parse(
             rt::eh_vector_constructor_iterator(aButtons, sizeof(SCRIPT_WORD), 10, &fnvd::constructElement<SCRIPT_WORD>);
             do {
                 aCount = ScriptCompiler::GetNextWord(
-                    apCompileData, &aButtons[v12], apScriptLine->pLine, apScriptLine->uiOffset, 0, 0
+                    apCompileData, &aButtons[v12], apScriptLine->pLine, apScriptLine->uiOffset, false, false
                 );
                 if (aCount <= 0) {
                     break;
@@ -4489,14 +4505,14 @@ bool Cmd_NonDefault_Parse(
             int32_t v8 = 0;
             SCRIPT_WORD apNextWord;
             aCount = ScriptCompiler::GetNextWord(
-                apCompileData, &apNextWord, apScriptLine->pLine, apScriptLine->uiOffset, 0, 0
+                apCompileData, &apNextWord, apScriptLine->pLine, apScriptLine->uiOffset, false, false
             );
             if (aCount > 0) {
                 if (!IsStringInteger(apNextWord.pText)) {
                     ScriptCompiler::ScriptError(
                         apCompileData, "Message time must be an integer.\r\nCompiled script not saved!"
                     );
-                    return 0;
+                    return false;
                 }
                 v8 = std::atol(apNextWord.pText);
             }
@@ -4504,7 +4520,7 @@ bool Cmd_NonDefault_Parse(
             apScriptLine->uiOutputSize += 4;
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_EssentialDeathReload_Execute(
@@ -4521,21 +4537,21 @@ bool Cmd_EssentialDeathReload_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
     if (pSaveLoadGameOLD->GetMostRecentSaveGame()) {
         Interface::CreateMessageMenu(
-            a8, static_cast<const char*>(0), static_cast<const char*>(0), &PlayerCharacter::ForceReload, 1, 0, 0.0f,
-            0.0f, sOk.operator const char*(), nullptr
+            a8, static_cast<const char*>(nullptr), static_cast<const char*>(nullptr), &PlayerCharacter::ForceReload, 1,
+            0, 0.0f, 0.0f, sOk.operator const char*(), nullptr
         );
     }
     else {
         Interface::CreateMessageMenu(
-            a8, static_cast<const char*>(0), static_cast<const char*>(0), &PlayerCharacter::ForceRestart, 1, 0, 0.0f,
-            0.0f, sOk.operator const char*(), nullptr
+            a8, static_cast<const char*>(nullptr), static_cast<const char*>(nullptr), &PlayerCharacter::ForceRestart, 1,
+            0, 0.0f, 0.0f, sOk.operator const char*(), nullptr
         );
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_PrintDeprecatedReturnTrue(
@@ -4549,7 +4565,7 @@ bool Cmd_PrintDeprecatedReturnTrue(
     uint32_t& auiOffset
 ) {
     Interface::PrintLine("OutputMemContexts is no longer supported.  Use Sherlock or OutputMemStats for context info.");
-    return 1;
+    return true;
 }
 
 // The texture's memory size for the dump. Always returns 0, as the game does.
@@ -4578,10 +4594,10 @@ bool Cmd_OutputTextureUseMap(
     BGSTextureUseMap kTexUseMap;
     if (apRefObject && apRefObject->Get3D()) {
         NiNode* v8 = apRefObject->Get3D();
-        kTexUseMap.CollectTexUseDataRecursive(v8, 1);
+        kTexUseMap.CollectTexUseDataRecursive(v8, true);
     }
     else {
-        kTexUseMap.CollectSceneTexUseData(1);
+        kTexUseMap.CollectSceneTexUseData(true);
     }
     if (kTexUseMap.WriteToFile(apFileName)) {
         Interface::PrintLine("map written to file '%s'", apFileName);
@@ -4606,7 +4622,7 @@ bool Cmd_OutputTextureUseMap(
     }
     string.operator+=(" textures in use.");
     Interface::PrintLine(static_cast<const char*>(string.pString));
-    return 1;
+    return true;
 }
 
 bool Cmd_TestAllCells(
@@ -4625,7 +4641,7 @@ bool Cmd_TestAllCells(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &arg0
         )) {
-        return 0;
+        return false;
     }
     if (!arg0) {
         arg0 = -1;
@@ -4638,7 +4654,7 @@ bool Cmd_TestAllCells(
         v9 = "stopped";
     }
     Interface::PrintLine("TestAllCells %s", v9);
-    return 1;
+    return true;
 }
 
 bool Cmd_RenderTestCell(
@@ -4653,13 +4669,13 @@ bool Cmd_RenderTestCell(
 ) {
     if (pPlayer->GetParentCell()) {
         TESObjectCELL* ParentCell = pPlayer->GetParentCell();
-        TESObjectCELL::RenderTestCell(ParentCell, 0, 1);
+        TESObjectCELL::RenderTestCell(ParentCell, nullptr, true);
         Interface::PrintLine("RenderTestCell complete. Check warnings file for more info.");
     }
     else {
         Interface::PrintLine("RenderTestCell failed: no cell");
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_RenderTestHere(
@@ -4674,13 +4690,13 @@ bool Cmd_RenderTestHere(
 ) {
     if (pPlayer->GetParentCell()) {
         TESObjectCELL* ParentCell = pPlayer->GetParentCell();
-        TESObjectCELL::RenderTestCell(ParentCell, 0, 0);
+        TESObjectCELL::RenderTestCell(ParentCell, nullptr, false);
         Interface::PrintLine("RenderTestCell complete. Check warnings file for more info.");
     }
     else {
         Interface::PrintLine("RenderTestCell failed: no cell");
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ToggleConversations(
@@ -4701,7 +4717,7 @@ bool Cmd_ToggleConversations(
     else {
         Interface::PrintLine("Conversation stats %s", "hidden.");
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ToggleCollisionGeometry(
@@ -4715,7 +4731,7 @@ bool Cmd_ToggleCollisionGeometry(
     uint32_t& auiOffset
 ) {
     TES::pInstance->ToggleCollisionGeometry();
-    return 1;
+    return true;
 }
 
 bool Cmd_ToggleProjectileDebug(
@@ -4736,7 +4752,7 @@ bool Cmd_ToggleProjectileDebug(
         Interface::PrintLine("    -Blue diamond for non-supersonic/non-hit-scan projectile sound start.");
         Interface::PrintLine("    -Teal diamond for near miss sound from supersonic.");
     }
-    return 1;
+    return true;
 }
 
 void ToggleProjectileDebug() {
@@ -4761,7 +4777,7 @@ bool Cmd_SetTargetRefractionFire(
         if (!Script::ParseParameters(
                 apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v13
             )) {
-            return 0;
+            return false;
         }
         if (!dynamic_cast<Actor*>(apRefObject)) {
             float a1_4 = BSMIN(a8, 1.0f);
@@ -4778,7 +4794,7 @@ bool Cmd_SetTargetRefractionFire(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ToggleLiteBrite(
@@ -4803,7 +4819,7 @@ bool Cmd_ToggleLiteBrite(
         }
         Interface::PrintLine("Lite Brite -> %s", v1);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetDebugText(
@@ -4824,7 +4840,7 @@ bool Cmd_SetDebugText(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, String,
             &aiValue
         )) {
-        return 0;
+        return false;
     }
     if (String[0]) {
         char FileName[264];
@@ -4840,7 +4856,7 @@ bool Cmd_SetDebugText(
         DebugTextManager* v9 = DebugTextManager::GetSingleton();
         v9->OutputDebugPageNames(&Interface::PrintLine);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowFullScenegraph(
@@ -4865,7 +4881,7 @@ bool Cmd_ShowFullScenegraph(
         );
     }
     else {
-        v16 = 0;
+        v16 = nullptr;
     }
     if (apRefObject) {
         NiNode* v8 = apRefObject->Get3D();
@@ -4883,7 +4899,7 @@ bool Cmd_ShowFullScenegraph(
         NiNode* Root = ScreenSplatter::GetRoot();
         v16->CreateTree(Root, "Fallout Screen Splatter Scene Graph");
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetTerminalMenuPos(
@@ -4907,10 +4923,10 @@ bool Cmd_SetTerminalMenuPos(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &afY,
             &afScale, v11
         )) {
-        return 0;
+        return false;
     }
     SetTerminalMenuPos(a8, afY, afScale);
-    return 1;
+    return true;
 }
 
 bool Cmd_MovePipboyKnob(
@@ -4928,13 +4944,13 @@ bool Cmd_MovePipboyKnob(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v12
         )) {
-        return 0;
+        return false;
     }
     float afAmount = v12;
     FOPipboyManager::Knobs v10 = static_cast<FOPipboyManager::Knobs>(a8);
     FOPipboyManager* Pipboy = Interface::GetPipboy();
-    Pipboy->MoveKnob(v10, afAmount, 0.0005f, 1);
-    return 1;
+    Pipboy->MoveKnob(v10, afAmount, 0.0005f, true);
+    return true;
 }
 
 bool Cmd_ToggleTestLight(
@@ -4954,7 +4970,7 @@ bool Cmd_ToggleTestLight(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v14
         )) {
-        return 0;
+        return false;
     }
     bTestLightOn = !(a8 <= 0.0) || !(v14 <= 0.0) || !bTestLightOn;
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
@@ -4964,7 +4980,7 @@ bool Cmd_ToggleTestLight(
     NiPoint3 v17 = cameraPos;
     int32_t v11 = bTestLightOn;
     ShadowSceneNode* v10 = BSShaderManager::GetShadowSceneNode(0);
-    return 1;
+    return true;
 }
 
 bool Cmd_ToggleCombatAI(
@@ -4988,7 +5004,7 @@ bool Cmd_ToggleCombatAI(
         }
         Interface::PrintLine("All Combat AI processing is %s", v1);
     }
-    return 1;
+    return true;
 }
 
 bool ToggleCombatAI() {
@@ -5023,7 +5039,7 @@ bool Cmd_ShowHeadTrackTarget(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ToggleHighProcess(
@@ -5050,7 +5066,7 @@ bool Cmd_ToggleHighProcess(
     if (!ReferenceProcessLists.bProcessHigh) {
         ReferenceProcessLists.TurnOffMovementinHigh();
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ToggleLowProcess(
@@ -5074,7 +5090,7 @@ bool Cmd_ToggleLowProcess(
         }
         Interface::PrintLine("AI Processing for actors in Low is  %s", v1);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ToggleMiddleLowProcess(
@@ -5098,7 +5114,7 @@ bool Cmd_ToggleMiddleLowProcess(
         }
         Interface::PrintLine("AI Processing for actors in Middle Low is  %s", v1);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ToggleMiddleHighProcess(
@@ -5122,7 +5138,7 @@ bool Cmd_ToggleMiddleHighProcess(
         }
         Interface::PrintLine("AI Processing for actors in Middle High is  %s", v1);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SpeakSound(
@@ -5140,7 +5156,7 @@ bool Cmd_SpeakSound(
     Actor* v19;
     char Dst[512];
     int32_t v22;
-    char* Src = 0;
+    char* Src = nullptr;
     BSSoundHandle th_s;
     BSStringT<char> v15;
     v16 = 0;
@@ -5151,7 +5167,7 @@ bool Cmd_SpeakSound(
         ) &&
         ((Src = a8, (BSstrcpy(Dst, 512, a8), Src)) &&
          (apRefObject &&
-          ((v19 = dynamic_cast<Actor*>(apRefObject)) != 0 &&
+          ((v19 = dynamic_cast<Actor*>(apRefObject)) != nullptr &&
            (v19->pCurrentProcess && v19->GetCurrentProcessType() == PROCESS_TYPE_HIGH))))) {
         if (v16 < 0) {
             v16 = 0;
@@ -5169,18 +5185,19 @@ bool Cmd_SpeakSound(
         uint32_t v11 = v22;
         DIALOGUE_EMOTION v10 = static_cast<DIALOGUE_EMOTION>(v16);
         char* v9 = v15.pString;
-        float v20 = v19->SpeakSoundFunction(v9, th_s, v10, v11, 0, 0, 0, 0, 0, 0, 0, 1, 1);
+        float v20 =
+            v19->SpeakSoundFunction(v9, th_s, v10, v11, 0, nullptr, nullptr, nullptr, false, false, false, true, true);
         BaseProcess* CurrentAIProcess = v19->pCurrentProcess;
-        CurrentAIProcess->SetGreetingFlag(1);
+        CurrentAIProcess->SetGreetingFlag(true);
         BaseProcess* v12 = v19->pCurrentProcess;
         v12->SetSoundDelay(v20);
         if (GetThreadTLSData()->bSystemOutput) {
             Interface::PrintLine("The NPC will speak the sound now.");
         }
-        return 1;
+        return true;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -5292,7 +5309,7 @@ bool Cmd_Help(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_DisableNavMesh_Execute(
@@ -5310,7 +5327,7 @@ bool Cmd_DisableNavMesh_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
     aiID = 0;
     std::sscanf(a8, "%x", &aiID);
@@ -5325,7 +5342,7 @@ bool Cmd_DisableNavMesh_Execute(
         NavMeshObstacleManager* Instance = NavMeshObstacleManager::GetInstance();
         Instance->DisableNavMesh(v11);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_EnableNavmesh_Execute(
@@ -5343,7 +5360,7 @@ bool Cmd_EnableNavmesh_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
     aiID = 0;
     std::sscanf(a8, "%x", &aiID);
@@ -5358,7 +5375,7 @@ bool Cmd_EnableNavmesh_Execute(
         NavMeshObstacleManager* Instance = NavMeshObstacleManager::GetInstance();
         Instance->EnableNavMesh(v11);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_CenterOnCell_Execute(
@@ -5375,11 +5392,11 @@ bool Cmd_CenterOnCell_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
     Interface::CloseConsole();
-    pPlayer->CenterOnCell(a8, 0);
-    return 1;
+    pPlayer->CenterOnCell(a8, nullptr);
+    return true;
 }
 
 bool Cmd_CenterOnExterior(
@@ -5399,14 +5416,14 @@ bool Cmd_CenterOnExterior(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &aiY
         )) {
-        return 0;
+        return false;
     }
     TESWorldSpace* apWorldSpace = TES::pInstance->pWorldSpace;
     if (!apWorldSpace) {
         apWorldSpace = static_cast<TESWorldSpace*>(pDataHandler->GetWorldSpaceList()->m_item);
     }
     if (!apWorldSpace) {
-        return 0;
+        return false;
     }
     if (pExteriorCellLoader) {
         pExteriorCellLoader->CancelAllCellLoads();
@@ -5416,14 +5433,14 @@ bool Cmd_CenterOnExterior(
         apCellIn = apWorldSpace->LoadCell(a8, aiY);
     }
     if (!apCellIn) {
-        apCellIn = pDataHandler->NewCell(0, a8, aiY, apWorldSpace);
+        apCellIn = pDataHandler->NewCell(nullptr, a8, aiY, apWorldSpace);
     }
     if (apCellIn) {
         Interface::CloseConsole();
-        pPlayer->CenterOnCell(0, apCellIn);
+        pPlayer->CenterOnCell(nullptr, apCellIn);
     }
-    pPlayer->bForceQuestTargetUpdate = 1;
-    return 1;
+    pPlayer->bForceQuestTargetUpdate = true;
+    return true;
 }
 
 bool Cmd_CenterOnWorld(
@@ -5439,17 +5456,17 @@ bool Cmd_CenterOnWorld(
     int32_t aiY;
     TESWorldSpace* a8;
     int32_t aiX;
-    a8 = 0;
+    a8 = nullptr;
     aiX = 0;
     aiY = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &aiX,
             &aiY
         )) {
-        return 0;
+        return false;
     }
     if (!a8) {
-        return 0;
+        return false;
     }
     if (pExteriorCellLoader) {
         pExteriorCellLoader->CancelAllCellLoads();
@@ -5459,14 +5476,14 @@ bool Cmd_CenterOnWorld(
         apCellIn = a8->LoadCell(aiX, aiY);
     }
     if (!apCellIn) {
-        apCellIn = pDataHandler->NewCell(0, aiX, aiY, a8);
+        apCellIn = pDataHandler->NewCell(nullptr, aiX, aiY, a8);
     }
     if (apCellIn) {
         Interface::CloseConsole();
-        pPlayer->CenterOnCell(0, apCellIn);
+        pPlayer->CenterOnCell(nullptr, apCellIn);
     }
-    pPlayer->bForceQuestTargetUpdate = 1;
-    return 1;
+    pPlayer->bForceQuestTargetUpdate = true;
+    return true;
 }
 
 bool Cmd_SetSize(
@@ -5484,7 +5501,7 @@ bool Cmd_SetSize(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     MobileObject* v10 =
         static_cast<MobileObject*>(FNVD_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
@@ -5494,7 +5511,7 @@ bool Cmd_SetSize(
             CharController->SetSize(a8);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_KillActor_Execute(
@@ -5510,7 +5527,7 @@ bool Cmd_KillActor_Execute(
     Actor* killer;
     CAUSE_OF_DEATH a2;
     BGSBodyPart::LIMB_ENUM a3;
-    killer = 0;
+    killer = nullptr;
     a3 = BGSBodyPart::LIMB_NONE;
     a2 = CAUSE_OF_DEATH_NONE;
     Script::ParseParameters(
@@ -5520,9 +5537,9 @@ bool Cmd_KillActor_Execute(
         static_cast<PlayerCharacter*>(FNVD_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
     if (a1) {
         if (a1->IsInvulnerable()) {
-            return 1;
+            return true;
         }
-        if (a1 == pPlayer && a1->IsChild(0)) {
+        if (a1 == pPlayer && a1->IsChild(false)) {
             a3 = BGSBodyPart::LIMB_NONE;
         }
         bool ShouldQueue3DTask = AILinearTaskThreadManager::ShouldQueue3DTask();
@@ -5541,7 +5558,7 @@ bool Cmd_KillActor_Execute(
             a1->SetLifeState(ACTOR_LIFE_STATE_ALIVE);
         }
         if (ShouldQueue3DTask) {
-            DISMEMBER_DATA* apDismemberData = 0;
+            DISMEMBER_DATA* apDismemberData = nullptr;
             if (a3 != BGSBodyPart::LIMB_NONE) {
                 apDismemberData = static_cast<DISMEMBER_DATA*>(ourMalloc(sizeof(DISMEMBER_DATA)));
                 apDismemberData->iCause = a2;
@@ -5561,7 +5578,7 @@ bool Cmd_KillActor_Execute(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_KillAllActors(
@@ -5575,12 +5592,11 @@ bool Cmd_KillAllActors(
     uint32_t& auiOffset
 ) {
     Actor* killer;
-    killer = 0;
+    killer = nullptr;
     if (!Script::ParseParameters(
-            apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript,
-            static_cast<ScriptLocals*>(apScriptLocals), &killer
+            apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &killer
         )) {
-        return 0;
+        return false;
     }
     for (uint32_t uiIndex = 0;; ++uiIndex) {
         ProcessArray* ActorPackageThatIsRunning = ReferenceProcessLists.GetProcessArray();
@@ -5595,7 +5611,7 @@ bool Cmd_KillAllActors(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ResurrectActor(
@@ -5614,15 +5630,15 @@ bool Cmd_ResurrectActor(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (pActor) {
-        ReferenceProcessLists.kUpdateLock.Lock(0);
-        bool bAttach3D = pActor->TESObjectREFR::Get3D() != 0;
+        ReferenceProcessLists.kUpdateLock.Lock(nullptr);
+        bool bAttach3D = pActor->TESObjectREFR::Get3D() != nullptr;
         pActor->Resurrect(true, bAttach3D, a8 == 1);
         ReferenceProcessLists.kUpdateLock.Unlock();
     }
-    return 1;
+    return true;
 }
 
 bool GetFatiguePercentageFunction(
@@ -5635,7 +5651,7 @@ bool GetFatiguePercentageFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetFatiguePercentageConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetFatiguePercentageConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_GetHealthPercentage_Execute(
@@ -5648,7 +5664,7 @@ bool Cmd_GetHealthPercentage_Execute(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetHealthPercentageConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetHealthPercentageConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_GetBaseActorValue_Execute(
@@ -5669,7 +5685,7 @@ bool Cmd_GetBaseActorValue_Execute(
         return Script::GetBaseActorValue_Eval(static_cast<Actor*>(apRefObject), a8, 0, &afReturnValue);
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -5698,14 +5714,14 @@ bool Cmd_FriendDispositionBoost(
 ) {
     if (apRefObject) {
         if (apRefObject->IsActor()) {
-            int32_t v5 = static_cast<Actor*>(apRefObject)->GetDisposition(pPlayer, 0);
+            int32_t v5 = static_cast<Actor*>(apRefObject)->GetDisposition(pPlayer, nullptr);
             if (v5 < iDialogueDispositionFriendValue.Int()) {
                 float v4 = static_cast<float>(iDialogueDispositionFriendValue.Int() - v5);
                 static_cast<Actor*>(apRefObject)->ModifyDispositionTowardActor(pPlayer, v4);
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetGameSetting(
@@ -5723,7 +5739,7 @@ bool Cmd_GetGameSetting(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
     GameSettingCollection* Collection = SettingT<GameSettingCollection>::GetCollection();
     Setting* Ptr = Collection->GetPtr(a8);
@@ -5766,7 +5782,7 @@ bool Cmd_GetGameSetting(
             Interface::PrintLine("GameSetting %s >> NOT FOUND", a8, Ptr->String());
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetGameSetting(
@@ -5784,7 +5800,7 @@ bool Cmd_SetGameSetting(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8, String
         )) {
-        return 0;
+        return false;
     }
     GameSettingCollection* Collection = SettingT<GameSettingCollection>::GetCollection();
     SettingT<GameSettingCollection>* Ptr = static_cast<SettingT<GameSettingCollection>*>(Collection->GetPtr(a8));
@@ -5826,7 +5842,7 @@ bool Cmd_SetGameSetting(
     else {
         Interface::PrintLine("GameSetting %s >> NOT FOUND", a8);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetIniSetting_Execute(
@@ -5843,7 +5859,7 @@ bool Cmd_GetIniSetting_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
     INISettingCollection* Collection = SettingT<INISettingCollection>::GetCollection();
     Setting* Ptr = Collection->GetPtr(a8);
@@ -5878,7 +5894,7 @@ bool Cmd_GetIniSetting_Execute(
     else {
         Interface::PrintLine("INISetting %s >> NOT FOUND", a8);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetINISetting(
@@ -5896,7 +5912,7 @@ bool Cmd_SetINISetting(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8, String
         )) {
-        return 0;
+        return false;
     }
     INISettingCollection* Collection = SettingT<INISettingCollection>::GetCollection();
     SettingT<GameSettingCollection>* Ptr = static_cast<SettingT<GameSettingCollection>*>(Collection->GetPtr(a8));
@@ -5946,7 +5962,7 @@ bool Cmd_SetINISetting(
     else {
         Interface::PrintLine("INISetting %s >> NOT FOUND", a8);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_FadeSFX(
@@ -5967,15 +5983,12 @@ bool Cmd_FadeSFX(
         uint32_t v10 = 1000 * static_cast<int64_t>(a8);
         BSAudio* v8 = &BSAudio::QInstance();
         v8->MuteType(
-            static_cast<uint32_t>(
-                BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_IS_3D |
-                BSGameSound::SOUND_FLAG_MAYBE_UNDERWATER | BSGameSound::SOUND_FLAG_IS_2D_RADIUS |
-                BSGameSound::SOUND_FLAG_BEAM_EMITTER
-            ),
+            (BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_MAYBE_UNDERWATER |
+             BSGameSound::SOUND_FLAG_IS_2D_RADIUS | BSGameSound::SOUND_FLAG_BEAM_EMITTER),
             v10, 0x1770u
         );
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetLocationSpecificLoadScreensOnly(
@@ -5993,15 +6006,15 @@ bool Cmd_SetLocationSpecificLoadScreensOnly(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
-        SetIsLocationSpecificLoadScreensOnly(1);
+        SetIsLocationSpecificLoadScreensOnly(true);
     }
     else {
-        SetIsLocationSpecificLoadScreensOnly(0);
+        SetIsLocationSpecificLoadScreensOnly(false);
     }
-    return 1;
+    return true;
 }
 
 bool SetIsLocationSpecificLoadScreensOnly(bool a1) {
@@ -6035,7 +6048,7 @@ bool Cmd_ShowQuests(
             Interface::PrintLine("%s (%s) -- Stage %d", v3->GetEditorName(), v2, CurrentStage);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_Show1stPerson(
@@ -6049,25 +6062,25 @@ bool Cmd_Show1stPerson(
     uint32_t& auiOffset
 ) {
     if (pPlayer->Is3rdPerson()) {
-        NiAVObject* v0 = pPlayer->Get3D(static_cast<bool>(0));
+        NiAVObject* v0 = pPlayer->Get3D(false);
         if (v0->GetAppCulled()) {
-            pPlayer->Force3rdPerson(0);
+            pPlayer->Force3rdPerson(false);
             if (GetThreadTLSData()->bSystemOutput) {
                 Interface::PrintLine("Normal 1st person mode.");
             }
         }
         else {
-            NiAVObject* v1 = pPlayer->Get3D(static_cast<bool>(1));
+            NiAVObject* v1 = pPlayer->Get3D(true);
             if (v1->GetAppCulled()) {
-                NiAVObject* v3 = pPlayer->Get3D(static_cast<bool>(1));
-                v3->SetAppCulled(0);
+                NiAVObject* v3 = pPlayer->Get3D(true);
+                v3->SetAppCulled(false);
                 if (GetThreadTLSData()->bSystemOutput) {
                     Interface::PrintLine("Showing 1st and 3rd person models.");
                 }
             }
             else {
-                NiAVObject* v2 = pPlayer->Get3D(static_cast<bool>(1));
-                v2->SetAppCulled(1);
+                NiAVObject* v2 = pPlayer->Get3D(true);
+                v2->SetAppCulled(true);
                 if (GetThreadTLSData()->bSystemOutput) {
                     Interface::PrintLine("Normal 3rd person mode.");
                 }
@@ -6075,12 +6088,12 @@ bool Cmd_Show1stPerson(
         }
     }
     else {
-        pPlayer->Force3rdPerson(1);
+        pPlayer->Force3rdPerson(true);
         if (GetThreadTLSData()->bSystemOutput) {
             Interface::PrintLine("Showing 1st person model in 3rd person camera.");
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_LoadGame_Execute(
@@ -6097,13 +6110,12 @@ bool Cmd_LoadGame_Execute(
     char a2[516];
     v9 = 0;
     if (!Script::ParseParameters(
-            apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript,
-            static_cast<ScriptLocals*>(apScriptLocals), a2, &v9
+            apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a2, &v9
         )) {
-        return 0;
+        return false;
     }
-    pSaveLoadManager->LoadGame(a2, -1, v9 != 0, 1);
-    return 1;
+    pSaveLoadManager->LoadGame(a2, -1, v9 != 0, true);
+    return true;
 }
 
 bool Cmd_Autosave(
@@ -6119,7 +6131,7 @@ bool Cmd_Autosave(
     if (bAllowScriptedAutosave.Bool()) {
         pSaveLoadManager->SetAutoSaveTimerTo1();
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ForceSave(
@@ -6135,7 +6147,7 @@ bool Cmd_ForceSave(
     if (bAllowScriptedForceSave.Bool() && pSaveLoadManager->CanSave(-1)) {
         pSaveLoadManager->SetForceSaveTimer();
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ToggleCellNode(
@@ -6153,10 +6165,10 @@ bool Cmd_ToggleCellNode(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8 != TESObjectCELL::CN_NONE) {
-        const char* v11 = 0;
+        const char* v11 = nullptr;
         switch (a8) {
             case TESObjectCELL::CN_ACTOR: {
                 v11 = "Actor";
@@ -6195,10 +6207,10 @@ bool Cmd_ToggleCellNode(
             // The node index is the same value as a cull bit (CN_x == CCN_x for 0-6) and ShowCellNode's int; the value
             // is passed unchanged to both.
             bool IsNodeCulled = TESObjectCELL::IsNodeCulled(static_cast<TESObjectCELL::CELL_CULL_NODE>(a8));
-            TES::pInstance->ShowCellNode(static_cast<int32_t>(a8), IsNodeCulled, 0);
+            TES::pInstance->ShowCellNode(static_cast<int32_t>(a8), IsNodeCulled, false);
             if (a8 == TESObjectCELL::CN_PORTAL) {
                 if (TES::pInstance->GetWaterSystem()) {
-                    TES::pInstance->GetWaterSystem()->DisplayWater(IsNodeCulled, 0, 0);
+                    TES::pInstance->GetWaterSystem()->DisplayWater(IsNodeCulled, false, false);
                 }
             }
             if (IsNodeCulled) {
@@ -6213,7 +6225,7 @@ bool Cmd_ToggleCellNode(
             Interface::PrintLine("Invalid node index. (0-6).");
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_DumpTexturePalette(
@@ -6232,7 +6244,7 @@ bool Cmd_DumpTexturePalette(
         !Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, Destination
         )) {
-        return 0;
+        return false;
     }
     if (!Destination[0]) {
         TESObjectCELL* Interior = TES::pInstance->pInteriorCell;
@@ -6256,10 +6268,10 @@ bool Cmd_DumpTexturePalette(
     if (!Destination[0]) {
         ourStrcpy(Destination, "D:\\TexDump.txt");
     }
-    MessageHandler::IncDisableWarningCount(1);
+    MessageHandler::IncDisableWarningCount(true);
     Warning("TEXTURES: <<< DUMPTEXTUREPALETTE results");
-    BSFile apMemory(Destination, NiFile::WRITE_ONLY, 0x4000u, 0);
-    apMemory.BSFile::Open(0, 0);
+    BSFile apMemory(Destination, NiFile::WRITE_ONLY, 0x4000u, false);
+    apMemory.BSFile::Open(false, false);
     using TextureArray = NiPointer<NiTexture>[2048];
     FNVD_INLINED_LOCAL(TextureArray, aspTextures, std::nullopt, std::nullopt);
     rt::eh_vector_constructor_iterator(
@@ -6394,11 +6406,11 @@ bool Cmd_DumpTexturePalette(
     }
     apMemory.Close();
     Warning("TEXTURES: >>> DUMPTEXTUREPALETTE results");
-    MessageHandler::IncDisableWarningCount(0);
+    MessageHandler::IncDisableWarningCount(false);
     rt::eh_vector_destructor_iterator(
         aspTextures, sizeof(NiPointer<NiTexture>), 2048, &fnvd::destructElement<NiPointer<NiRefObject>>
     );
-    return 1;
+    return true;
 }
 
 bool Cmd_GetItemCount(
@@ -6412,11 +6424,11 @@ bool Cmd_GetItemCount(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetItemCountConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetItemCountConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Cmd_SetShowQuestItems(
@@ -6434,15 +6446,15 @@ bool Cmd_SetShowQuestItems(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8 <= 0) {
-        pPlayer->bShowQuestItemsInInventory = 0;
+        pPlayer->bShowQuestItemsInInventory = false;
     }
     else {
-        pPlayer->bShowQuestItemsInInventory = 1;
+        pPlayer->bShowQuestItemsInInventory = true;
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ResetHealth(
@@ -6471,7 +6483,7 @@ bool Cmd_ResetHealth(
             pActor->RestoreActorValue(ActorValue::BRAIN_CONDITION, 999.0f);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetEquipped(
@@ -6485,11 +6497,11 @@ bool Cmd_GetEquipped(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetEquippedConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetEquippedConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool GetInWorldspaceFunction(
@@ -6503,11 +6515,11 @@ bool GetInWorldspaceFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_GetInWorldspace(apRefObject, a8, 0, afReturnValue);
+        Cmd_GetInWorldspace(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Cmd_SetCellPublicFlag(
@@ -6522,17 +6534,17 @@ bool Cmd_SetCellPublicFlag(
 ) {
     int32_t v9;
     TESObjectCELL* a8;
-    a8 = 0;
+    a8 = nullptr;
     v9 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v9
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         a8->SetPublic(v9 > 0);
     }
-    return 1;
+    return true;
 }
 
 bool GetInSameCellFunction(
@@ -6546,11 +6558,11 @@ bool GetInSameCellFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetInSameCellConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetInSameCellConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool GetIsClassFunction(
@@ -6564,11 +6576,11 @@ bool GetIsClassFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_GetIsClass(apRefObject, a8, 0, afReturnValue);
+        Cmd_GetIsClass(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Cmd_SetInChargen(
@@ -6586,15 +6598,15 @@ bool Cmd_SetInChargen(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
-        pPlayer->SetInCharGen(1);
+        pPlayer->SetInCharGen(true);
     }
     else {
-        pPlayer->SetInCharGen(0);
+        pPlayer->SetInCharGen(false);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetInCharGen(
@@ -6611,10 +6623,10 @@ bool Cmd_GetInCharGen(
     if (pPlayer) {
         afReturnValue = (double)pPlayer->GetInChargen();
         if (Script::GetThreadSystemOutput()) {
-            Interface::PrintLine("GetChargenValue >> %i", (int32_t)(afReturnValue));
+            Interface::PrintLine("GetChargenValue >> %i", (int32_t)afReturnValue);
         }
     }
-    return 1;
+    return true;
 }
 
 bool GetIsRaceFunction(
@@ -6628,11 +6640,11 @@ bool GetIsRaceFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetIsRaceConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetIsRaceConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool GetIsCreatureTypeFunction(
@@ -6646,11 +6658,11 @@ bool GetIsCreatureTypeFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_GetIsCreatureType(apRefObject, a8, 0, afReturnValue);
+        Cmd_GetIsCreatureType(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Cmd_SayTo_Execute(
@@ -6691,24 +6703,25 @@ bool Cmd_SayTo_Execute(
     if (pSpeaker && pTarget) {
         pSpeaker->StopCurrentDialogue();
         if (pSpeaker->pCurrentProcess) {
-            if (!pSpeaker->IsDead(1)) {
+            if (!pSpeaker->IsDead(true)) {
                 if (pTarget->pCurrentProcess) {
-                    pSpeaker->pCurrentProcess->SetWaitingforLipFile(0);
+                    pSpeaker->pCurrentProcess->SetWaitingforLipFile(false);
                     pSpeaker->pCurrentProcess->ClearGreetingInfoData();
                     if (pSpeaker->GetCurrentProcessType() == PROCESS_TYPE_HIGH) {
                         if (!iNoTargetLook) {
-                            pTarget->pCurrentProcess->ClearScriptHeadTrackTarget(0);
+                            pTarget->pCurrentProcess->ClearScriptHeadTrackTarget(false);
                             pTarget->pCurrentProcess->SetActionHeadTrackTarget(pSpeaker);
                             pTarget->SetDialogueItemTarget(pSpeaker);
                         }
-                        pSpeaker->pCurrentProcess->ClearScriptHeadTrackTarget(0);
+                        pSpeaker->pCurrentProcess->ClearScriptHeadTrackTarget(false);
                         pSpeaker->pCurrentProcess->SetActionHeadTrackTarget(pTarget);
                     }
                     if (pPlayer->IsSleepingorResting() ||
                         (pSpeaker->pCurrentProcess->eLevel ||
                          (pSpeaker->GetEssential() && pSpeaker->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN))) {
-                        DialogueItem* pItem =
-                            static_cast<TESTopic*>(pTopic)->TESTopic::CreateDialogueItem(pSpeaker, pTarget, 0, 0, 1);
+                        DialogueItem* pItem = static_cast<TESTopic*>(pTopic)->TESTopic::CreateDialogueItem(
+                            pSpeaker, pTarget, nullptr, nullptr, true
+                        );
                         if (pItem) {
                             pItem->FirstResponse();
                             pItem->GetCurrentResponse();
@@ -6721,7 +6734,7 @@ bool Cmd_SayTo_Execute(
                     else {
                         pSpeaker->SetDialogueItemTarget(pTarget);
                         pSpeaker->pCurrentProcess->ProcessGreet(
-                            pSpeaker, static_cast<TESTopic*>(pTopic), bForceSubtitles, 0, 1, 1
+                            pSpeaker, static_cast<TESTopic*>(pTopic), bForceSubtitles, false, true, true
                         );
                     }
                 }
@@ -6734,13 +6747,14 @@ bool Cmd_SayTo_Execute(
                 (apRefObject->IsMobileObject() &&
                  static_cast<MobileObject*>(apRefObject)->GetTalkingActivator()->Get3D())) {
                 apRefObject->SetSayToTopic(static_cast<TESTopic*>(pTopic));
-                DialogueItem* pItem =
-                    static_cast<TESTopic*>(pTopic)->TESTopic::CreateDialogueItem(apRefObject, 0, 0, 0, 0);
+                DialogueItem* pItem = static_cast<TESTopic*>(pTopic)->TESTopic::CreateDialogueItem(
+                    apRefObject, nullptr, nullptr, nullptr, false
+                );
                 if (pItem) {
                     apRefObject->SetSayToTopicInfo(pItem->pInfo);
                 }
                 BSSoundHandle kVoice = apRefObject->VoiceSoundFunction(
-                    static_cast<TESTopic*>(pTopic), pTarget, 0, 0, 0, 0, bForceSubtitles
+                    static_cast<TESTopic*>(pTopic), pTarget, false, false, false, false, bForceSubtitles
                 );
                 // The callback's context is untyped: the speaker's form ID is passed in it.
                 kVoice.SetCompletionCallback(
@@ -6766,10 +6780,10 @@ bool Cmd_ResetAI(
     Actor* v4 = dynamic_cast<Actor*>(apRefObject);
     if (v4) {
         if (((!v4->GetDisabled()) && (!v4->GetDelete())) && (!v4->IsPc())) {
-            v4->EvaluatePackage(0, 1);
+            v4->EvaluatePackage(false, true);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_EvaluatePackage_Execute(
@@ -6785,10 +6799,10 @@ bool Cmd_EvaluatePackage_Execute(
     Actor* v4 = dynamic_cast<Actor*>(apRefObject);
     if (v4) {
         if (((!v4->GetDisabled()) && (!v4->GetDelete())) && (!v4->IsPc())) {
-            v4->EvaluatePackage(0, 0);
+            v4->EvaluatePackage(false, false);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_AddTopic(
@@ -6802,14 +6816,14 @@ bool Cmd_AddTopic(
     uint32_t& auiOffset
 ) {
     TESTopic* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
-    pPlayer->AddTopic(a8, 1, 0);
-    return 1;
+    pPlayer->AddTopic(a8, true, false);
+    return true;
 }
 
 bool Cmd_SetAlert(
@@ -6827,7 +6841,7 @@ bool Cmd_SetAlert(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         Actor* v9 = dynamic_cast<Actor*>(apRefObject);
@@ -6835,7 +6849,7 @@ bool Cmd_SetAlert(
             v9->SetAlert(a8 > 0);
         }
     }
-    return 1;
+    return true;
 }
 
 bool au_re_Cmd_GetIsAlerted(
@@ -6848,7 +6862,7 @@ bool au_re_Cmd_GetIsAlerted(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetAlertConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetAlertConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool GetPlantedExplosiveFunction(
@@ -6861,7 +6875,7 @@ bool GetPlantedExplosiveFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetPlantedExplosiveConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetPlantedExplosiveConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_CompleteAllObjectives(
@@ -6875,14 +6889,14 @@ bool Cmd_CompleteAllObjectives(
     uint32_t& auiOffset
 ) {
     TESQuest* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     a8->SetAllObjectivesComplete(1);
-    return 1;
+    return true;
 }
 
 bool Cmd_Look(
@@ -6897,12 +6911,12 @@ bool Cmd_Look(
 ) {
     int32_t v12;
     Actor* a8;
-    a8 = 0;
+    a8 = nullptr;
     v12 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v12
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (a8) {
@@ -6914,7 +6928,7 @@ bool Cmd_Look(
                         v11->SetLookAtTarget(v14);
                         BaseProcess* CurrentAIProcess = v11->pCurrentProcess;
                         CurrentAIProcess->SetPathLookAtTarget(a8);
-                        a8->SetTargeted(1);
+                        a8->SetTargeted(true);
                     }
                     else {
                         BaseProcess* v10 = v11->pCurrentProcess;
@@ -6926,7 +6940,7 @@ bool Cmd_Look(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_StopLook_Execute(
@@ -6950,14 +6964,14 @@ bool Cmd_StopLook_Execute(
             extra->SetHeadTrackTargetExtra(nullptr);
             if (v7->MobileObject::GetCurrentAIProcess()) {
                 currentAIProcess = v7->MobileObject::GetCurrentAIProcess();
-                currentAIProcess->ClearScriptHeadTrackTarget((bool)1);
+                currentAIProcess->ClearScriptHeadTrackTarget(true);
                 v7->ClearLookAtTarget();
                 v5 = v7->MobileObject::GetCurrentAIProcess();
                 v5->SetPathLookAtTarget(nullptr);
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetSkyParam(
@@ -6977,11 +6991,11 @@ bool Cmd_SetSkyParam(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v9
         )) {
-        return 0;
+        return false;
     }
     BSShaderManager::fSunlightDimmer = std::fabs(a8);
     SkyShader::pLUMRamp[0] = std::fabs(v9);
-    return 1;
+    return true;
 }
 
 char Event_OnAdd(
@@ -6995,7 +7009,7 @@ char Event_OnAdd(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7016,7 +7030,7 @@ char Event_OnSell(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7037,7 +7051,7 @@ char Event_OnEquip(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7058,7 +7072,7 @@ char Event_OnUnEquip(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7079,7 +7093,7 @@ char Event_OnDrop(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, static_cast<const char*>(scriptData), *opcodeOffsetPtr, thisObj, containingObj, scriptObj,
             eventList, &a8
@@ -7102,7 +7116,7 @@ char Cmd_OnActivate_Execute(
 ) {
     TESForm* a8;
     *a7 = 0.0;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, static_cast<const char*>(scriptData), *opcodeOffsetPtr, thisObj, containingObj, scriptObj,
             static_cast<ScriptLocals*>(eventList), &a8
@@ -7130,7 +7144,7 @@ char Cmd_OnNPCActivate_Execute(
     uint32_t* opcodeOffsetPtr
 ) {
     *afReturnValue = 0.0;
-    Actor* pActor = 0;
+    Actor* pActor = nullptr;
     // GetActorCause is called through the vtable each time rather than cached, as the game does.
     if (thisObj->GetActorCause()) {
         if (thisObj->GetActorCause()->IsValid()) {
@@ -7197,7 +7211,7 @@ char Event_OnGrab(
     double* afReturnValue
 ) {
     *afReturnValue = 0.0;
-    Script::CheckFlagFunction(SCRIPT_ACTION_ONGRAB, apRefObject, 0, apScriptLocals, *afReturnValue);
+    Script::CheckFlagFunction(SCRIPT_ACTION_ONGRAB, apRefObject, nullptr, apScriptLocals, *afReturnValue);
     return 1;
 }
 
@@ -7235,7 +7249,7 @@ char Event_OnDestructionStageChange(
         return 0;
     }
     // 0x200000 is the OnDestructionStageChange action flag. The result is otherwise unused.
-    Script::CheckFlagFunction(SCRIPT_ACTION_ONDESTRUCTIONSTAGECHANGE, thisObj, 0, eventList, *afReturnValue);
+    Script::CheckFlagFunction(SCRIPT_ACTION_ONDESTRUCTIONSTAGECHANGE, thisObj, nullptr, eventList, *afReturnValue);
     return 1;
 }
 
@@ -7250,7 +7264,7 @@ char Event_OnHit(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7271,7 +7285,7 @@ char Event_OnHitWith(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* v12;
-    v12 = 0;
+    v12 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &v12
         )) {
@@ -7289,7 +7303,7 @@ char Event_OnHitWith(
             }
             TESForm* v10 = pIter->GetItem();
             pIter = pIter->GetNext();
-            TESForm* apActionForm = 0;
+            TESForm* apActionForm = nullptr;
             if (v10->IsBoundObject()) {
                 apActionForm = v10;
             }
@@ -7314,7 +7328,7 @@ char Event_OnDeath(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7335,7 +7349,7 @@ char Event_OnStartCombat(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7356,7 +7370,7 @@ char Event_OnMurder(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7375,7 +7389,7 @@ char Event_OnCombatEnd(
     ScriptLocals* apScriptLocals,
     double* afReturnValue
 ) {
-    Script::CheckFlagFunction(SCRIPT_ACTION_ONCOMBATEND, apRefObject, 0, apScriptLocals, *afReturnValue);
+    Script::CheckFlagFunction(SCRIPT_ACTION_ONCOMBATEND, apRefObject, nullptr, apScriptLocals, *afReturnValue);
     return 1;
 }
 
@@ -7391,7 +7405,7 @@ char Event_SayToDone(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     Script::ParseParameters(paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8);
     // 0x40000 is the SayToDone action flag.
     Script::CheckFlagFunction(SCRIPT_ACTION_ONSAYTODONE, thisObj, a8, eventList, *afReturnValue);
@@ -7409,7 +7423,7 @@ char Event_OnPackageStart(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7430,7 +7444,7 @@ char Event_OnPackageDone(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7451,7 +7465,7 @@ char Event_OnPackageChange(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7483,7 +7497,7 @@ char Event_OnReset(
     ScriptLocals* apScriptLocals,
     double* afReturnValue
 ) {
-    Script::CheckFlagFunction(SCRIPT_ACTION_ONRESET, apRefObject, 0, apScriptLocals, *afReturnValue);
+    Script::CheckFlagFunction(SCRIPT_ACTION_ONRESET, apRefObject, nullptr, apScriptLocals, *afReturnValue);
     return 1;
 }
 
@@ -7498,7 +7512,7 @@ char Event_OnMagicEffectHit(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7519,7 +7533,7 @@ char Event_OnTrigger(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7540,7 +7554,7 @@ char Event_OnTriggerEnter(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7561,7 +7575,7 @@ char Event_OnTriggerLeave(
     uint32_t* opcodeOffsetPtr
 ) {
     TESForm* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             paramInfo, scriptData, *opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList, &a8
         )) {
@@ -7593,7 +7607,7 @@ bool Cmd_EnablePlayerControls_Execute(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v11,
             &v16, &v10, &v14, &v15, &v9
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         uiFlags |= 1u;
@@ -7617,7 +7631,7 @@ bool Cmd_EnablePlayerControls_Execute(
         uiFlags |= 0x40u;
     }
     pPlayer->SetControlsDisabled(false, static_cast<PlayerCharacter::DISABLE_PLAYER_CONTROLS>(uiFlags));
-    return 1;
+    return true;
 }
 
 bool Cmd_DisablePlayerControls_Execute(
@@ -7649,7 +7663,7 @@ bool Cmd_DisablePlayerControls_Execute(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v11,
             &v16, &v10, &v14, &v15, &v9
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         uiFlags = static_cast<PlayerCharacter::DISABLE_PLAYER_CONTROLS>(uiFlags | PlayerCharacter::DPC_MOVEMENT);
@@ -7672,8 +7686,8 @@ bool Cmd_DisablePlayerControls_Execute(
     if (v9) {
         uiFlags = static_cast<PlayerCharacter::DISABLE_PLAYER_CONTROLS>(uiFlags | PlayerCharacter::DPC_SNEAKING);
     }
-    pPlayer->SetControlsDisabled(1, uiFlags);
-    return 1;
+    pPlayer->SetControlsDisabled(true, uiFlags);
+    return true;
 }
 
 bool GetPlayerControlsDisabledFunction(
@@ -7706,7 +7720,7 @@ bool GetPlayerControlsDisabledFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v11,
             &v16, &v10, &v14, &v15, &v9
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         uiFlags |= 1u;
@@ -7730,8 +7744,10 @@ bool GetPlayerControlsDisabledFunction(
         uiFlags |= 64u;
     }
     // The flags go in the condition function's first parameter slot, where Cmd_GetPlayerControlsDisabled reads them.
-    Cmd_GetPlayerControlsDisabled(0, reinterpret_cast<void*>(static_cast<uintptr_t>(uiFlags)), 0, afReturnValue);
-    return 1;
+    Cmd_GetPlayerControlsDisabled(
+        nullptr, reinterpret_cast<void*>(static_cast<uintptr_t>(uiFlags)), nullptr, afReturnValue
+    );
+    return true;
 }
 
 bool Cmd_PickIdle(
@@ -7752,11 +7768,11 @@ bool Cmd_PickIdle(
             if (IdleToPlay) {
                 Animation* v16 = v18->GetAnimation();
                 if (!v16) {
-                    return 1;
+                    return true;
                 }
                 bool v15 = !v16->SpecialIdleDonePlaying();
                 if (v16->spAnimIdleQueued.m_pObject && v16->spAnimIdleQueued.m_pObject->pIdleForm == IdleToPlay) {
-                    return 1;
+                    return true;
                 }
                 if (v15) {
                     if (v16->spAnimIdle.m_pObject) {
@@ -7764,7 +7780,7 @@ bool Cmd_PickIdle(
                             (v16->spAnimIdle.m_pObject->GetSequence() &&
                              v16->spAnimIdle.m_pObject->GetSequence()->m_eCycleType ==
                                  NiControllerSequence::CYCLE_LOOP)) {
-                            v15 = 0;
+                            v15 = false;
                         }
                     }
                 }
@@ -7784,7 +7800,7 @@ bool Cmd_PickIdle(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_PlayIdle(
@@ -7802,7 +7818,7 @@ bool Cmd_PlayIdle(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
     if (v18) {
         if (v18->pCurrentProcess) {
@@ -7811,12 +7827,12 @@ bool Cmd_PlayIdle(
             if (pIdleForm) {
                 Animation* pAnimation = v18->GetAnimation();
                 if (!pAnimation) {
-                    return 1;
+                    return true;
                 }
                 bool bPlaying = !pAnimation->SpecialIdleDonePlaying();
                 if (pAnimation->spAnimIdleQueued.m_pObject &&
                     pAnimation->spAnimIdleQueued.m_pObject->pIdleForm == pIdleForm) {
-                    return 1;
+                    return true;
                 }
                 if (bPlaying) {
                     if (pAnimation->spAnimIdle.m_pObject) {
@@ -7824,7 +7840,7 @@ bool Cmd_PlayIdle(
                             (pAnimation->spAnimIdle.m_pObject->GetSequence() &&
                              pAnimation->spAnimIdle.m_pObject->GetSequence()->m_eCycleType ==
                                  NiControllerSequence::CYCLE_LOOP)) {
-                            bPlaying = 0;
+                            bPlaying = false;
                         }
                     }
                 }
@@ -7846,7 +7862,7 @@ bool Cmd_PlayIdle(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool IsWeaponInListFunction(
@@ -7860,11 +7876,11 @@ bool IsWeaponInListFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_IsWeaponInList(apRefObject, a8, 0, afReturnValue);
+        Cmd_IsWeaponInList(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool IsTorchOutFunction(
@@ -7877,7 +7893,7 @@ bool IsTorchOutFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return !apRefObject || Cmd_SetArgTo0AndReturnTrue(apRefObject, 0, 0, afReturnValue);
+    return !apRefObject || Cmd_SetArgTo0AndReturnTrue(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_IsFacingUp_Execute(
@@ -7890,7 +7906,7 @@ bool Cmd_IsFacingUp_Execute(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return !apRefObject || Script::IsFacingUpConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return !apRefObject || Script::IsFacingUpConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_IsLeftUp_Execute(
@@ -7904,10 +7920,10 @@ bool Cmd_IsLeftUp_Execute(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return Script::IsLeftUpConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::IsLeftUpConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return 1;
+        return true;
     }
 }
 
@@ -7922,10 +7938,10 @@ bool au_re_Cmd_GetKnockedState(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return Script::GetKnockedStateConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::GetKnockedStateConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return 1;
+        return true;
     }
 }
 
@@ -7940,16 +7956,16 @@ bool IsWeaponSkillTypeFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
-        return Cmd_IsWeaponSkillType(apRefObject, a8, 0, afReturnValue);
+        return Cmd_IsWeaponSkillType(apRefObject, a8, nullptr, afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetCurrentAIPackage_Execute(
@@ -7963,10 +7979,10 @@ bool Cmd_GetCurrentAIPackage_Execute(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return Script::GetCurrentAIPackageConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::GetCurrentAIPackageConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return 1;
+        return true;
     }
 }
 
@@ -7981,10 +7997,10 @@ bool au_re_Cmd_IsWaiting(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return Script::IsWaitingConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::IsWaitingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return 1;
+        return true;
     }
 }
 
@@ -8002,7 +8018,7 @@ bool au_re_Cmd_IsIdlePlaying(
         return (int8_t)Script::IsIdlePlayingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return 1;
+        return true;
     }
 }
 
@@ -8034,8 +8050,8 @@ bool Cmd_ShowQuestTargets_Execute(
             BSStringT<char> v21;
             BSStringT<char> apString;
             apString.Set("Same cell/exterior", 0);
-            TESObjectREFR* Reference = v20->GetReference(0);
-            TESObjectREFR* v18 = v20->GetReference(1);
+            TESObjectREFR* Reference = v20->GetReference(false);
+            TESObjectREFR* v18 = v20->GetReference(true);
             if (v18) {
                 if (Reference) {
                     if (v18 == Reference) {
@@ -8065,7 +8081,7 @@ bool Cmd_ShowQuestTargets_Execute(
     else {
         Interface::PrintLine("No active quest");
     }
-    return 1;
+    return true;
 }
 
 // The CRT takes the strings as unsigned char bytes: a signedness change of the same bytes.
@@ -8086,14 +8102,14 @@ bool Cmd_ShowFullQuestLog(
     uint32_t& auiOffset
 ) {
     TESQuest* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     BSSimpleList<TESQuestStageItem*> kQuestLog;
-    TESQuest::GetQuestLog(&kQuestLog, a8, 0, 0, 0);
+    TESQuest::GetQuestLog(&kQuestLog, a8, false, false, false);
     BSSimpleList<TESQuestStageItem*>* pIter = &kQuestLog;
     while (pIter && pIter->m_item) {
         char cLogEntry[260];
@@ -8111,7 +8127,7 @@ bool Cmd_ShowFullQuestLog(
         Interface::PrintLine("%s", pItem->m_pOwner->TESFullName::GetFullName());
         Interface::PrintLine("%s", cLogEntry);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetPCFactionMurder(
@@ -8126,20 +8142,20 @@ bool Cmd_SetPCFactionMurder(
 ) {
     TESFaction* a8;
     int32_t v10;
-    a8 = 0;
+    a8 = nullptr;
     v10 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v10
         )) {
-        return 0;
+        return false;
     }
     if (v10) {
-        a8->SetPCMurder(1);
+        a8->SetPCMurder(true);
     }
     else {
-        a8->SetPCMurder(0);
+        a8->SetPCMurder(false);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetPCEnemyofFaction(
@@ -8154,20 +8170,20 @@ bool Cmd_SetPCEnemyofFaction(
 ) {
     TESFaction* a8;
     int32_t v10;
-    a8 = 0;
+    a8 = nullptr;
     v10 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v10
         )) {
-        return 0;
+        return false;
     }
     if (v10) {
-        a8->SetPCAnEnemy(1);
+        a8->SetPCAnEnemy(true);
     }
     else {
-        a8->SetPCAnEnemy(0);
+        a8->SetPCAnEnemy(false);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetPCFactionAttack(
@@ -8182,20 +8198,20 @@ bool Cmd_SetPCFactionAttack(
 ) {
     TESFaction* a8;
     int32_t v10;
-    a8 = 0;
+    a8 = nullptr;
     v10 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v10
         )) {
-        return 0;
+        return false;
     }
     if (v10) {
-        a8->SetPCAttack(1);
+        a8->SetPCAttack(true);
     }
     else {
-        a8->SetPCAttack(0);
+        a8->SetPCAttack(false);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetSelf_Execute(
@@ -8222,7 +8238,7 @@ bool Cmd_GetSelf_Execute(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetSelf >> (%08x)", apID);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetCombatTarget_Execute(
@@ -8248,7 +8264,7 @@ bool Cmd_GetCombatTarget_Execute(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetCombatTarget >> (%08x)", apID);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetPackageTarget_Execute(
@@ -8275,7 +8291,7 @@ bool Cmd_GetPackageTarget_Execute(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetPackageTarget >> (%08x)", apID);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetContainer(
@@ -8299,7 +8315,7 @@ bool Cmd_GetContainer(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetContainer >>(%08x)", apID);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetParentRef(
@@ -8325,7 +8341,7 @@ bool Cmd_GetParentRef(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetParentRef >> (%08x)", apID);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetLinkedRef(
@@ -8351,7 +8367,7 @@ bool Cmd_GetLinkedRef(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetLinkedRef >> (%08x)", apID);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetForceRun(
@@ -8374,7 +8390,7 @@ bool Cmd_GetForceRun(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetForceRun >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetForceRun(
@@ -8395,19 +8411,19 @@ bool Cmd_SetForceRun(
         if (!Script::ParseParameters(
                 apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
             )) {
-            return 0;
+            return false;
         }
         if (a8) {
-            v10->bForceRun = 1;
+            v10->bForceRun = true;
         }
         else {
-            v10->bForceRun = 0;
+            v10->bForceRun = false;
         }
         if (GetThreadTLSData()->bSystemOutput) {
             Interface::PrintLine("SetForceRun >> %0.2f", a8);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetForceSneak(
@@ -8430,7 +8446,7 @@ bool Cmd_GetForceSneak(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetForceSneak >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetForceSneak(
@@ -8451,19 +8467,19 @@ bool Cmd_SetForceSneak(
         if (!Script::ParseParameters(
                 apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
             )) {
-            return 0;
+            return false;
         }
         if (a8) {
-            v10->SetForceSneak(1);
+            v10->SetForceSneak(true);
         }
         else {
-            v10->SetForceSneak(0);
+            v10->SetForceSneak(false);
         }
         if (GetThreadTLSData()->bSystemOutput) {
             Interface::PrintLine("SetForceSneak >> %0.2f", a8);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_AdvLevel_Execute(
@@ -8481,7 +8497,7 @@ bool Cmd_AdvLevel_Execute(
         pPlayer->GetActorBase()->SetLevel(Level + 1);
         LevelUpMenu::Create();
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_HasMagicEffect_Execute(
@@ -8495,11 +8511,11 @@ bool Cmd_HasMagicEffect_Execute(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::HasMagicEffectConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::HasMagicEffectConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool IsSpellTargetFunction(
@@ -8513,11 +8529,11 @@ bool IsSpellTargetFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::IsSpellTargetConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::IsSpellTargetConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool GetSpellUsageNumberFunction(
@@ -8531,11 +8547,11 @@ bool GetSpellUsageNumberFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetSpellUsageNumberConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetSpellUsageNumberConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool au_re_Cmd_GetVATSMode(
@@ -8561,7 +8577,7 @@ bool GetVATSTargetHeightFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetVATSTargetHeightConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetVATSTargetHeightConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_SetDefaultOpen(
@@ -8579,7 +8595,7 @@ bool Cmd_SetDefaultOpen(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         bool bWasOpenByDefault = apRefObject->GetAction(OBJECT_ACTION_OPEN_BY_DEFAULT);
@@ -8603,12 +8619,12 @@ bool Cmd_SetDefaultOpen(
                 apRefObject->AddChange(CHANGE_OBJECT_OPEN_DEFAULT_STATE);
             }
         }
-        BGSOpenCloseForm::SetOpenState(apRefObject, bOpenByDefault, 1);
+        BGSOpenCloseForm::SetOpenState(apRefObject, bOpenByDefault, true);
     }
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("SetDefaultOpen >> %0.2f", a8);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowRaceMenu_Execute(
@@ -8630,7 +8646,7 @@ bool Cmd_ShowRaceMenu_Execute(
             Interface::CreateRaceSexMenu(RSM_CONTEXT_CHARGEN);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowBarberMenu(
@@ -8646,7 +8662,7 @@ bool Cmd_ShowBarberMenu(
     if (pPlayer) {
         Interface::CreateRaceSexMenu(RSM_CONTEXT_BARBER);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowPlasticSurgeonMenu(
@@ -8662,7 +8678,7 @@ bool Cmd_ShowPlasticSurgeonMenu(
     if (pPlayer) {
         Interface::CreateRaceSexMenu(RSM_CONTEXT_PLASTIC_SURGEON);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowNameMenu(
@@ -8681,7 +8697,7 @@ bool Cmd_ShowNameMenu(
         );
     }
     else {
-        return 1;
+        return true;
     }
 }
 
@@ -8702,8 +8718,8 @@ bool Cmd_ShowBarterMenu(
     );
     if (apRefObject) {
         if (apRefObject != pPlayer) {
-            TESObjectREFR* v11 = 0;
-            TESObjectREFR* apRef = 0;
+            TESObjectREFR* v11 = nullptr;
+            TESObjectREFR* apRef = nullptr;
             if (apRefObject->IsMobileObject()) {
                 v11 = apRefObject;
             }
@@ -8714,7 +8730,7 @@ bool Cmd_ShowBarterMenu(
                     CloseSound = v10->pTempRef;
                 }
                 else {
-                    CloseSound = 0;
+                    CloseSound = nullptr;
                 }
                 apRef = CloseSound;
             }
@@ -8737,7 +8753,7 @@ bool Cmd_ShowBarterMenu(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool GetRestrainedFunction(
@@ -8750,7 +8766,7 @@ bool GetRestrainedFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetRestrainedConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetRestrainedConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_ForceFlee(
@@ -8765,15 +8781,15 @@ bool Cmd_ForceFlee(
 ) {
     TESObjectCELL* pCell;
     TESObjectREFR* a2;
-    a2 = 0;
-    pCell = 0;
+    a2 = nullptr;
+    pCell = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pCell, &a2
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject == pPlayer) {
-        return 1;
+        return true;
     }
     if (apRefObject) {
         Actor* v14 = dynamic_cast<Actor*>(apRefObject);
@@ -8788,23 +8804,23 @@ bool Cmd_ForceFlee(
                         PackageLocation* Location_ = v12->pPackLoc;
                         if (a2) {
                             Location_->SetLocReference(a2);
-                            v12->SetEvaluatePoint(0);
+                            v12->SetEvaluatePoint(false);
                         }
                         else {
                             if (pCell) {
                                 Location_->SetLocCell(pCell);
-                                v12->SetEvaluatePoint(0);
+                                v12->SetEvaluatePoint(false);
                             }
                         }
                     }
                 }
                 else {
-                    v14->InitiateFlee(0, false, false, true, pCell, a2, -1.0f, -1.0f);
+                    v14->InitiateFlee(nullptr, false, false, true, pCell, a2, -1.0f, -1.0f);
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ForceTakeCover(
@@ -8820,15 +8836,15 @@ bool Cmd_ForceTakeCover(
     Actor* a8;
     // The duration is an integer parameter.
     int32_t v13;
-    a8 = 0;
+    a8 = nullptr;
     v13 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v13
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject == pPlayer) {
-        return 1;
+        return true;
     }
     if (apRefObject) {
         Actor* v11 = dynamic_cast<Actor*>(apRefObject);
@@ -8841,7 +8857,7 @@ bool Cmd_ForceTakeCover(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool au_re_Cmd_GetOffersServicesNow(
@@ -8854,7 +8870,7 @@ bool au_re_Cmd_GetOffersServicesNow(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetOffersServiceConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetOffersServiceConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_ModBarterGold(
@@ -8874,12 +8890,12 @@ bool Cmd_ModBarterGold(
         !Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("Actor Barter Gold is  %d ", v10->GetBarterGold());
     }
-    return 1;
+    return true;
 }
 
 // pNPC's barter gold is read for the line even when the reference's base is no NPC, as the game does.
@@ -8902,7 +8918,7 @@ bool Cmd_SetBarterGold(
                     apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals,
                     &iGold
                 )) {
-                return 0;
+                return false;
             }
             pNPC->SetBarterGold(static_cast<uint16_t>(iGold));
         }
@@ -8910,7 +8926,7 @@ bool Cmd_SetBarterGold(
             Interface::PrintLine(" Actor's base barter gold is  %d ", pNPC->GetBarterGold());
         }
     }
-    return 1;
+    return true;
 }
 
 bool au_re_Cmd_GetBarterGold(
@@ -8923,7 +8939,7 @@ bool au_re_Cmd_GetBarterGold(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetBarterGoldConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetBarterGoldConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_SetLevel_Execute(
@@ -8951,7 +8967,7 @@ bool Cmd_SetLevel_Execute(
                 apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8,
                 &v18, &v17, &v16
             )) {
-            return 0;
+            return false;
         }
         if (pActor->IsPc()) {
             CharacterProgression* CharacterProgressionInfo = pPlayer->GetCharacterProgressionInfo();
@@ -8960,31 +8976,31 @@ bool Cmd_SetLevel_Execute(
         else {
             ActorBase->SetLevel(a8);
             if (v18) {
-                ActorBase->SetMatchesPCLevel(1);
+                ActorBase->SetMatchesPCLevel(true);
             }
             if (v17 != -1) {
                 ActorBase->SetCalcLevelMin(v17);
-                ActorBase->SetMatchesPCLevel(1);
+                ActorBase->SetMatchesPCLevel(true);
             }
             if (v16 != -1) {
                 ActorBase->SetCalcLevelMax(v16);
-                ActorBase->SetMatchesPCLevel(1);
+                ActorBase->SetMatchesPCLevel(true);
             }
             TESContainer* pContainer = pActor->HasContainer();
             InventoryChanges* pInvChanges = InventoryChanges::GetInventoryChanges(pActor);
             if (pContainer) {
                 if (pInvChanges) {
-                    pInvChanges->RemoveAllObjectsWorn(0, 0);
+                    pInvChanges->RemoveAllObjectsWorn(false, nullptr);
                     pInvChanges->RemoveDefaultLeveledItems();
                     pInvChanges->InitLeveledItems();
                     TESNPC* v11 = dynamic_cast<TESNPC*>(ActorBase);
                     TESCreature* v10 = dynamic_cast<TESCreature*>(ActorBase);
                     if (v11) {
-                        v11->InitDefaultWorn(pActor, 1, 1, 0, 1);
+                        v11->InitDefaultWorn(pActor, true, true, false, true);
                     }
                     else {
                         if (v10) {
-                            v10->InitDefaultWorn(pActor, 1, 1, 1);
+                            v10->InitDefaultWorn(pActor, true, true, true);
                         }
                     }
                 }
@@ -8992,12 +9008,12 @@ bool Cmd_SetLevel_Execute(
             if (pActor->IsNpc()) {
                 TESNPC* v9 = dynamic_cast<TESNPC*>(pActor->GetObjectReference());
                 if (v9) {
-                    v9->InitValues(0);
+                    v9->InitValues(false);
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool au_re_Cmd_IsXBox(
@@ -9023,7 +9039,7 @@ bool au_re_IsPS3(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::IsPS3ConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::IsPS3ConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool au_re_Cmd_IsPC(
@@ -9036,7 +9052,7 @@ bool au_re_Cmd_IsPC(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::IsPCConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::IsPCConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool IsActorUsingATorchFunction(
@@ -9049,7 +9065,7 @@ bool IsActorUsingATorchFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::IsActorUsingATorchConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::IsActorUsingATorchConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Cmd_ModPCAttribute(
@@ -9069,13 +9085,13 @@ bool Cmd_ModPCAttribute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v11
         )) {
-        return 0;
+        return false;
     }
     if (ActorValue::IsSPECIAL(a8)) {
         int32_t v9 = pPlayer->GetBaseActorValue(a8);
         pPlayer->SetActorBaseValue(a8, v11 + v9);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_DamageWeapon(
@@ -9092,18 +9108,18 @@ bool Cmd_DamageWeapon(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &fDamage
         )) {
-        return 0;
+        return false;
     }
     Actor* pActor = dynamic_cast<Actor*>(apRefObject);
     if (!pActor) {
-        return 0;
+        return false;
     }
     BaseProcess* pProcess = pActor->MobileObject::GetCurrentAIProcess();
     ItemChange* pWeapon = pProcess->GetCurrentWeapon();
     if (pWeapon) {
-        pActor->DamageEquipment(pWeapon, fDamage, 1);
+        pActor->DamageEquipment(pWeapon, fDamage, true);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetWeaponHealth(
@@ -9116,20 +9132,20 @@ bool Cmd_GetWeaponHealth(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    bool bResult = 1;
+    bool bResult = true;
     Actor* pActor = dynamic_cast<Actor*>(apRefObject);
     if (pActor) {
         BaseProcess* pProcess = pActor->MobileObject::GetCurrentAIProcess();
         ItemChange* pWeapon = pProcess->GetCurrentWeapon();
         if (pWeapon) {
-            Interface::PrintLine("%.2f/100.0", pWeapon->GetItemHealth(0));
+            Interface::PrintLine("%.2f/100.0", pWeapon->GetItemHealth(false));
         }
         else {
             Interface::PrintLine("%s has no weapon equipped.", pActor->GetFullName());
         }
     }
     else {
-        bResult = 0;
+        bResult = false;
     }
     return bResult;
 }
@@ -9146,12 +9162,12 @@ bool Cmd_SetCellOwnership(
 ) {
     TESObjectCELL* a8;
     TESForm* apOwner;
-    apOwner = 0;
-    a8 = 0;
+    apOwner = nullptr;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &apOwner
         )) {
-        return 0;
+        return false;
     }
     if (!apOwner) {
         apOwner = pPlayer->GetObjectReference();
@@ -9159,7 +9175,7 @@ bool Cmd_SetCellOwnership(
     if (a8) {
         a8->SetCellOwnership(apOwner);
     }
-    return 1;
+    return true;
 }
 
 bool au_re_Cmd_SetArgTo0AndReturnTrue_1(
@@ -9173,7 +9189,7 @@ bool au_re_Cmd_SetArgTo0AndReturnTrue_1(
     uint32_t& auiOffset
 ) {
     ::Cmd_SetArgTo0AndReturnTrue(apRefObject, nullptr, nullptr, afReturnValue);
-    return 1;
+    return true;
 }
 
 bool Cmd_SetCellFullName(
@@ -9192,7 +9208,7 @@ bool Cmd_SetCellFullName(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pCell,
             &pMessage
         )) {
-        return 0;
+        return false;
     }
     if (pCell) {
         if (pMessage) {
@@ -9200,7 +9216,7 @@ bool Cmd_SetCellFullName(
             pCell->AddChange(CHANGE_CELL_FULLNAME);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetActorFullName(
@@ -9215,12 +9231,12 @@ bool Cmd_SetActorFullName(
 ) {
     BGSMessage* pMessage = nullptr;
     if (!apRefObject) {
-        return 1;
+        return true;
     }
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pMessage
         )) {
-        return 0;
+        return false;
     }
     if (pMessage) {
         if (apRefObject->IsActor()) {
@@ -9238,7 +9254,7 @@ bool Cmd_SetActorFullName(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool au_re_Cmd_GetIsActorRunning(
@@ -9251,8 +9267,8 @@ bool au_re_Cmd_GetIsActorRunning(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Script::IsRunningConditionFunction(apRefObject, 0, 0, afReturnValue);
-    return 1;
+    Script::IsRunningConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
+    return true;
 }
 
 bool au_re_Cmd_GetFriendHit(
@@ -9265,8 +9281,8 @@ bool au_re_Cmd_GetFriendHit(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Script::GetFriendHitConditionFunction(apRefObject, 0, 0, afReturnValue);
-    return 1;
+    Script::GetFriendHitConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
+    return true;
 }
 
 bool Cmd_IsInCombat_Execute(
@@ -9280,7 +9296,7 @@ bool Cmd_IsInCombat_Execute(
     uint32_t& auiOffset
 ) {
     Script::IsInCombatConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
-    return 1;
+    return true;
 }
 
 bool Cmd_SetPackDuration_Execute(
@@ -9298,7 +9314,7 @@ bool Cmd_SetPackDuration_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &fDuration
         )) {
-        return 0;
+        return false;
     }
     if (pActor) {
         if (pActor->GetCurrentAIProcess()) {
@@ -9308,7 +9324,7 @@ bool Cmd_SetPackDuration_Execute(
             Interface::PrintLine("Package duration is set to  %.02f ", fDuration);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_PlayMagicShaderVisuals_Execute(
@@ -9324,36 +9340,36 @@ bool Cmd_PlayMagicShaderVisuals_Execute(
     MagicShaderHitEffect* v9;
     float duration;
     TESEffectShader* TESEffectShader_;
-    TESEffectShader_ = 0;
+    TESEffectShader_ = nullptr;
     duration = -1.0f;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals,
             &TESEffectShader_, &duration
         )) {
-        return 0;
+        return false;
     }
     if (!apRefObject) {
         apRefObject = pPlayer;
     }
     TESObjectCELL* cell = apRefObject->GetParentCell();
-    if (!TES::pInstance->IsCellLoaded(cell, 0)) {
-        return 1;
+    if (!TES::pInstance->IsCellLoaded(cell, false)) {
+        return true;
     }
     if (!apRefObject->Get3D()) {
-        return 1;
+        return true;
     }
     AutoMemContext apMemory(
-        MEM_CONTEXT_TES_ACTOR, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESScriptFunctions.cpp",
+        MEM_CONTEXT_TES_ACTOR, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESScriptFunctions.cpp",
         0x409C
     );
-    BSTempEffect* apEffect = 0;
+    BSTempEffect* apEffect = nullptr;
     MagicShaderHitEffect* v10 =
         static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
     if (v10) {
         v9 = ::new (v10) MagicShaderHitEffect(apRefObject, TESEffectShader_, duration);
     }
     else {
-        v9 = 0;
+        v9 = nullptr;
     }
     apEffect = v9;
     if (v9->Init()) {
@@ -9380,7 +9396,7 @@ bool Cmd_PlayMagicShaderVisuals_Execute(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_PlayMagicEffectVisuals(
@@ -9395,23 +9411,23 @@ bool Cmd_PlayMagicEffectVisuals(
 ) {
     float fTime;
     EffectSetting* pEffectSetting;
-    pEffectSetting = 0;
+    pEffectSetting = nullptr;
     fTime = -1.0f;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals,
             &pEffectSetting, &fTime
         )) {
-        return 0;
+        return false;
     }
     if (!apRefObject) {
         apRefObject = pPlayer;
     }
     TESObjectCELL* a1 = apRefObject->GetParentCell();
-    if (!TES::pInstance->IsCellLoaded(a1, 0)) {
-        return 1;
+    if (!TES::pInstance->IsCellLoaded(a1, false)) {
+        return true;
     }
     if (apRefObject->Get3D()) {
-        MagicHitEffect* pEffect = 0;
+        MagicHitEffect* pEffect = nullptr;
         if (pEffectSetting) {
             if (pEffectSetting->GetModelLength()) {
                 MagicModelHitEffect* v19;
@@ -9423,7 +9439,7 @@ bool Cmd_PlayMagicEffectVisuals(
                     v19 = ::new (apMemory) MagicModelHitEffect(apRefObject, yb, z);
                 }
                 else {
-                    v19 = 0;
+                    v19 = nullptr;
                 }
                 pEffect = v19;
             }
@@ -9454,7 +9470,7 @@ bool Cmd_PlayMagicEffectVisuals(
                 }
             }
         }
-        return 1;
+        return true;
     }
     else {
         NiPoint3 v29 = apRefObject->GetAngleOnReference();
@@ -9466,7 +9482,7 @@ bool Cmd_PlayMagicEffectVisuals(
         // The effect's model is read without testing the parsed effect for null on this path, as the game does.
         const char* v9 = pEffectSetting->GetModel();
         BSTempEffectParticle* v22 =
-            BSTempEffectParticle::Spawn(apRefObject->GetParentCell(), 1.0f, v9, v28, v30, 1.0f, 7u, 0);
+            BSTempEffectParticle::Spawn(apRefObject->GetParentCell(), 1.0f, v9, v28, v30, 1.0f, 7u, nullptr);
         v22->PlaySequence("SpecialIdle_HitEffect");
         if (GetThreadTLSData()->bSystemOutput) {
             if (apRefObject->GetFullName()) {
@@ -9477,7 +9493,7 @@ bool Cmd_PlayMagicEffectVisuals(
                 Interface::PrintLine("Visual effect has been applied to reference");
             }
         }
-        return 1;
+        return true;
     }
 }
 
@@ -9493,12 +9509,12 @@ bool Cmd_StopMagicShaderVisuals(
 ) {
     float v9;
     TESEffectShader* a8;
-    a8 = 0;
+    a8 = nullptr;
     v9 = -1.0f;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v9
         )) {
-        return 0;
+        return false;
     }
     if (!apRefObject) {
         apRefObject = pPlayer;
@@ -9510,7 +9526,7 @@ bool Cmd_StopMagicShaderVisuals(
     else {
         Interface::PrintLine("Shader effect has been removed from reference");
     }
-    return 1;
+    return true;
 }
 
 // The command's parameters are an EffectSetting (a form id the parser resolves) and a float; the effect setting's
@@ -9525,13 +9541,13 @@ bool Cmd_StopMagicEffectVisuals(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    EffectSetting* pEffectSetting = 0;
+    EffectSetting* pEffectSetting = nullptr;
     float fValue = -1.0f;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals,
             &pEffectSetting, &fValue
         )) {
-        return 0;
+        return false;
     }
     if (!apRefObject) {
         apRefObject = pPlayer;
@@ -9551,7 +9567,7 @@ bool Cmd_StopMagicEffectVisuals(
             Interface::PrintLine("Visual effect has been removed from reference");
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_PreloadMagicEffect(
@@ -9566,25 +9582,25 @@ bool Cmd_PreloadMagicEffect(
 ) {
     FNVD_INLINED_LOCAL(NiPointer<Model>, spModel, std::nullopt, std::nullopt);
     EffectSetting* pEffectSetting;
-    pEffectSetting = 0;
+    pEffectSetting = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals,
             &pEffectSetting
         )) {
-        return 0;
+        return false;
     }
     if (pEffectSetting) {
         if (pEffectSetting->GetModelLength()) {
-            ::new (&spModel) NiPointer<Model>(static_cast<Model*>(0));
+            ::new (&spModel) NiPointer<Model>(static_cast<Model*>(nullptr));
             if (!pModelLoader->FindModel(pEffectSetting->GetModel(), spModel)) {
                 pModelLoader->QueueModel(
-                    pEffectSetting->GetModel(), IO_TASK_PRIORITY_VERY_LOW, 0, LOD_MULT_NONE, 1, 0, 0
+                    pEffectSetting->GetModel(), IO_TASK_PRIORITY_VERY_LOW, nullptr, LOD_MULT_NONE, true, false, false
                 );
             }
             NiPointer<Model>::Destroy(&spModel);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetIgnoreFriendlyHits(
@@ -9602,13 +9618,13 @@ bool Cmd_SetIgnoreFriendlyHits(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8 != -1) {
         static_cast<Actor*>(apRefObject)->Actor::SetIgnoreFriendlyHits(a8 != 0);
         apRefObject->AddChange(1);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetIgnoreFriendlyHits_Execute(
@@ -9623,7 +9639,7 @@ bool Cmd_GetIgnoreFriendlyHits_Execute(
 ) {
     bool ignoreFriendlyHits = Cmd_GetIgnoreFriendlyHits(apRefObject, nullptr, nullptr, afReturnValue);
     if (Script::GetThreadSystemOutput()) {
-        if (0.0 == (afReturnValue)) {
+        if (0.0 == afReturnValue) {
             Interface::PrintLine("%s", "Actor counts friendly hits");
         }
         else {
@@ -9644,12 +9660,12 @@ bool Cmd_SetItemValue(
     uint32_t& auiOffset
 ) {
     int32_t a8;
-    TESBoundObject* ObjectReference = 0;
+    TESBoundObject* ObjectReference = nullptr;
     a8 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         ObjectReference = apRefObject->GetObjectReference();
@@ -9660,11 +9676,11 @@ bool Cmd_SetItemValue(
                 if (GetThreadTLSData()->bSystemOutput) {
                     Interface::PrintLine("%s has been set to a VALUE of %i", apRefObject->GetFullName(), a8);
                 }
-                BarterMenu::ForceBarterUpdate(0);
+                BarterMenu::ForceBarterUpdate(false);
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetActorRefraction(
@@ -9682,7 +9698,7 @@ bool Cmd_SetActorRefraction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (!apRefObject) {
         apRefObject = pPlayer;
@@ -9699,16 +9715,16 @@ bool Cmd_SetActorRefraction(
                 float v16 = BSMIN(1.0f, a2);
                 if (static_cast<float>(0.0) > 0.0 && v18 == pPlayer) {
                     v18->SetAlpha(1.0f);
-                    v18->SetRefraction(1, 0.05f);
+                    v18->SetRefraction(true, 0.05f);
                 }
                 else {
                     if (!(v16 > 0.0)) {
                         if (!(a8 > 0.0)) {
-                            v18->SetRefraction(0, 0.0f);
+                            v18->SetRefraction(false, 0.0f);
                             v18->UpdateAlpha();
                         }
                         else {
-                            v18->SetRefraction(1, a8);
+                            v18->SetRefraction(true, a8);
                         }
                     }
                     else {
@@ -9717,7 +9733,7 @@ bool Cmd_SetActorRefraction(
                         float fChameleonMaxRefraction_4 = MagicSystem::GetChameleonMaxRefraction();
                         float fChameleonMaxRefraction = MagicSystem::GetChameleonMinRefraction();
                         float v15 = FLerp(fChameleonMaxRefraction, fChameleonMaxRefraction_4, 0.0f, 1.0f, v13);
-                        v18->SetRefraction(1, v15);
+                        v18->SetRefraction(true, v15);
                     }
                 }
             }
@@ -9726,7 +9742,7 @@ bool Cmd_SetActorRefraction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_RunCellTest(
@@ -9744,10 +9760,10 @@ bool Cmd_RunCellTest(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     TES::pInstance->RunCellTest(a8);
-    return 1;
+    return true;
 }
 
 bool Cmd_StartAllQuests(
@@ -9768,7 +9784,7 @@ bool Cmd_StartAllQuests(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("All Quests Enabled.", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetsNewGammaRamp_Execute(
@@ -9786,10 +9802,10 @@ bool Cmd_SetsNewGammaRamp_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     Renderer::SetGamma(a8);
-    return 1;
+    return true;
 }
 
 bool Cmd_SetMaxAniso(
@@ -9808,7 +9824,7 @@ bool Cmd_SetMaxAniso(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     int32_t v9 = static_cast<int32_t>(a8);
     if (v9 >= 2) {
@@ -9841,7 +9857,7 @@ bool Cmd_SetMaxAniso(
         Interface::PrintLine("Maxaniso set to %d", v10);
     }
     NiRenderer::iMaxAnisotropy = v10;
-    return 1;
+    return true;
 }
 
 bool Cmd_SetTalkingActivatorActor(
@@ -9855,7 +9871,7 @@ bool Cmd_SetTalkingActivatorActor(
     uint32_t& auiOffset
 ) {
     TESObjectREFR* a8;
-    a8 = 0;
+    a8 = nullptr;
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
     );
@@ -9865,7 +9881,7 @@ bool Cmd_SetTalkingActivatorActor(
             ObjectReference->SetTempRef(a8);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_AddPerk_Execute(
@@ -9883,7 +9899,7 @@ bool Cmd_AddPerk_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pPerk, &iAlt
         )) {
-        return 0;
+        return false;
     }
     bool bAlt = iAlt != 0;
     if (pPerk) {
@@ -9905,7 +9921,7 @@ bool Cmd_AddPerk_Execute(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_RemovePerk(
@@ -9920,12 +9936,12 @@ bool Cmd_RemovePerk(
 ) {
     BGSPerk* pperk;
     int32_t v11;
-    pperk = 0;
+    pperk = nullptr;
     v11 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pperk, &v11
         )) {
-        return 0;
+        return false;
     }
     bool v10 = v11 != 0;
     if (pperk) {
@@ -9933,7 +9949,7 @@ bool Cmd_RemovePerk(
             static_cast<Actor*>(apRefObject)->RemovePerk(pperk, v10);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_HasPerk_Execute(
@@ -9948,8 +9964,8 @@ bool Cmd_HasPerk_Execute(
 ) {
     void* a8;
     void* aiParam2;
-    a8 = 0;
-    aiParam2 = 0;
+    a8 = nullptr;
+    aiParam2 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8,
                &aiParam2
@@ -9990,7 +10006,7 @@ bool Cmd_SendSherlockDebugText(
             Interface::PrintLine("You must supply a debug page name if debug text is not showing");
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_RewardXP(
@@ -10008,10 +10024,10 @@ bool Cmd_RewardXP(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     pPlayer->RewardExperience(a8);
-    return 1;
+    return true;
 }
 
 bool Cmd_RewardKarma(
@@ -10029,10 +10045,10 @@ bool Cmd_RewardKarma(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     pPlayer->RewardKarma(a8);
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowRepairMenu(
@@ -10050,7 +10066,7 @@ bool Cmd_ShowRepairMenu(
             Interface::CreateRepairServicesMenu(static_cast<Actor*>(apRefObject));
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_AddNote(
@@ -10064,16 +10080,16 @@ bool Cmd_AddNote(
     uint32_t& auiOffset
 ) {
     BGSNote* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         pPlayer->AddNote(a8, GetThreadTLSData()->bSystemOutput);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_RemoveNote(
@@ -10087,11 +10103,11 @@ bool Cmd_RemoveNote(
     uint32_t& auiOffset
 ) {
     BGSNote* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         pPlayer->RemoveNote(a8);
@@ -10099,7 +10115,7 @@ bool Cmd_RemoveNote(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("Removed Note %s from Player ", a8->GetFullName());
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_AddToFaction(
@@ -10114,19 +10130,19 @@ bool Cmd_AddToFaction(
 ) {
     TESFaction* a8;
     int32_t aiRank;
-    a8 = 0;
+    a8 = nullptr;
     aiRank = -1;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &aiRank
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         if (apRefObject->IsActor()) {
             static_cast<Actor*>(apRefObject)->Actor::AddFaction(a8, aiRank);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_RemoveFromFaction(
@@ -10140,18 +10156,18 @@ bool Cmd_RemoveFromFaction(
     uint32_t& auiOffset
 ) {
     TESFaction* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         if (apRefObject->IsActor()) {
             static_cast<Actor*>(apRefObject)->Actor::RemoveFaction(a8);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetDisposition(
@@ -10166,24 +10182,24 @@ bool Cmd_SetDisposition(
 ) {
     Actor* a8;
     int32_t v12;
-    Actor* v13 = 0;
+    Actor* v13 = nullptr;
     if (apRefObject->IsActor()) {
         v13 = static_cast<Actor*>(apRefObject);
     }
-    a8 = 0;
+    a8 = nullptr;
     v12 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v12
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         if (v13) {
-            int32_t v10 = v13->GetDisposition(a8, 0);
+            int32_t v10 = v13->GetDisposition(a8, nullptr);
             v13->ModifyDispositionTowardActor(a8, static_cast<float>(v12 - v10));
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetHitLocation_Execute(
@@ -10196,11 +10212,11 @@ bool Cmd_GetHitLocation_Execute(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Script::GetHitLocationConditionFunction(apRefObject, 0, 0, afReturnValue);
+    Script::GetHitLocationConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetHitLocation >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetLastHitCritical_Execute(
@@ -10213,11 +10229,11 @@ bool Cmd_GetLastHitCritical_Execute(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Script::GetLastHitCriticalConditionFunction(apRefObject, 0, 0, afReturnValue);
+    Script::GetLastHitCriticalConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetLastHitCritical >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IsPC1stPerson_Execute(
@@ -10230,11 +10246,11 @@ bool Cmd_IsPC1stPerson_Execute(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Script::IsPC1stPersonConditionFunction(apRefObject, 0, 0, afReturnValue);
+    Script::IsPC1stPersonConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("IsPC1stPerson >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetCombatActionCost(
@@ -10253,7 +10269,7 @@ bool Cmd_SetCombatActionCost(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8, &afCost
         )) {
-        return 0;
+        return false;
     }
     char v11 = SetCombatActionCost(a8, afCost);
     if (GetThreadTLSData()->bSystemOutput) {
@@ -10264,7 +10280,7 @@ bool Cmd_SetCombatActionCost(
             Interface::PrintLine("%s not found", a8);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ToggleCombatDebug(
@@ -10480,7 +10496,7 @@ bool Cmd_SetActorsAI(
         if (!Script::ParseParameters(
                 apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
             )) {
-            return 0;
+            return false;
         }
         TESObjectREFR* v10 =
             static_cast<TESObjectREFR*>(FNVD_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
@@ -10503,7 +10519,7 @@ bool Cmd_SetActorsAI(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ClearOwnership(
@@ -10522,7 +10538,7 @@ bool Cmd_ClearOwnership(
         extra->RemoveOwnership();
         apRefObject->AddChange(0x40u);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowInventory(
@@ -10540,7 +10556,7 @@ bool Cmd_ShowInventory(
         if (apRefObject->IsActor()) {
             pActor = static_cast<Actor*>(apRefObject);
         }
-        int32_t iCount = apRefObject->GetInventoryCount(0, 1);
+        int32_t iCount = apRefObject->GetInventoryCount(false, true);
         if (iCount > 0) {
             const char* pRefName;
             if (apRefObject->GetFormEditorIDLength()) {
@@ -10552,7 +10568,7 @@ bool Cmd_ShowInventory(
             Interface::PrintLine("%s (%08X) has %i items:", pRefName, apRefObject->iFormID, iCount);
             // The index compare is unsigned.
             for (uint32_t i = 0; i < static_cast<uint32_t>(iCount); ++i) {
-                ItemChange* pItem = apRefObject->GetInventoryItem_005754A0(i, 0);
+                ItemChange* pItem = apRefObject->GetInventoryItem_005754A0(i, false);
                 if (pItem) {
                     if (pItem->pContainerObj) {
                         TESBoundObject* pObject = pItem->pContainerObj;
@@ -10560,7 +10576,7 @@ bool Cmd_ShowInventory(
                         if (iFormType == 24) {
                             const char* pName;
                             const char* pWorn;
-                            if (pItem->GetWorn(0)) {
+                            if (pItem->GetWorn(false)) {
                                 pWorn = " - Worn";
                             }
                             else {
@@ -10572,8 +10588,8 @@ bool Cmd_ShowInventory(
                             else {
                                 pName = TESFullName::GetFullName(pObject);
                             }
-                            double fHealthPercent = pItem->GetItemHealth(1);
-                            double fHealth = pItem->GetItemHealth(0);
+                            double fHealthPercent = pItem->GetItemHealth(true);
+                            double fHealth = pItem->GetItemHealth(false);
                             Interface::PrintLine(
                                 "%d - %s (%08X) (%.0f,%0.2f%%)%s", pItem->iNumber, pName, pObject->iFormID, fHealth,
                                 fHealthPercent, pWorn
@@ -10589,7 +10605,7 @@ bool Cmd_ShowInventory(
                             else {
                                 pCannotEquip = " [CANNOT EQUIP]";
                             }
-                            if (pItem->GetWorn(0)) {
+                            if (pItem->GetWorn(false)) {
                                 pWorn = " - Worn";
                             }
                             else {
@@ -10601,8 +10617,8 @@ bool Cmd_ShowInventory(
                             else {
                                 pName = TESFullName::GetFullName(pObject);
                             }
-                            double fHealthPercent = pItem->GetItemHealth(1);
-                            double fHealth = pItem->GetItemHealth(0);
+                            double fHealthPercent = pItem->GetItemHealth(true);
+                            double fHealth = pItem->GetItemHealth(false);
                             Interface::PrintLine(
                                 "%d - %s (%08X) (%.0f,%0.2f%%)%s%s", pItem->iNumber, pName, pObject->iFormID, fHealth,
                                 fHealthPercent, pWorn, pCannotEquip
@@ -10611,7 +10627,7 @@ bool Cmd_ShowInventory(
                         else {
                             const char* pName;
                             const char* pWorn;
-                            if (pItem->GetWorn(0)) {
+                            if (pItem->GetWorn(false)) {
                                 pWorn = " - Worn";
                             }
                             else {
@@ -10676,7 +10692,7 @@ bool Cmd_ShowChargenMenuParams(
     int32_t v9;
     int32_t aiMaxPoints;
     int32_t a8;
-    bool v11 = 1;
+    bool v11 = true;
     a8 = 0;
     v9 = 0;
     aiMaxPoints = 0;
@@ -10684,15 +10700,15 @@ bool Cmd_ShowChargenMenuParams(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v9,
             &aiMaxPoints
         )) {
-        return 0;
+        return false;
     }
     if (a8 <= 0) {
         if (aiMaxPoints > 0) {
-            CharGenMenu::Create_(1, aiMaxPoints, 0, 1);
+            CharGenMenu::Create_(1, aiMaxPoints, false, true);
         }
     }
     else {
-        CharGenMenu::Create_(0, a8, 0, 1);
+        CharGenMenu::Create_(0, a8, false, true);
     }
     return v11;
 }
@@ -10710,7 +10726,7 @@ bool Cmd_ShowChargenMenuModValues(
     int32_t v9;
     int32_t aiMaxPoints;
     int32_t a8;
-    bool v11 = 1;
+    bool v11 = true;
     a8 = 0;
     v9 = 0;
     aiMaxPoints = 0;
@@ -10718,15 +10734,15 @@ bool Cmd_ShowChargenMenuModValues(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v9,
             &aiMaxPoints
         )) {
-        return 0;
+        return false;
     }
     if (a8 <= 0) {
         if (aiMaxPoints > 0) {
-            CharGenMenu::Create_(1, aiMaxPoints, 1, 1);
+            CharGenMenu::Create_(1, aiMaxPoints, true, true);
         }
     }
     else {
-        CharGenMenu::Create_(0, a8, 1, 1);
+        CharGenMenu::Create_(0, a8, true, true);
     }
     return v11;
 }
@@ -10742,14 +10758,14 @@ bool Cmd_SetSPECIALPoints(
     uint32_t& auiOffset
 ) {
     int32_t a8;
-    bool v10 = 1;
+    bool v10 = true;
     a8 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
-    CharGenMenu::Create_(0, a8, 0, 1);
+    CharGenMenu::Create_(0, a8, false, true);
     return v10;
 }
 
@@ -10764,14 +10780,14 @@ bool Cmd_AddSPECIALPoints(
     uint32_t& auiOffset
 ) {
     int32_t a8;
-    bool v10 = 1;
+    bool v10 = true;
     a8 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
-    CharGenMenu::Create_(0, a8, 1, 1);
+    CharGenMenu::Create_(0, a8, true, true);
     return v10;
 }
 
@@ -10787,15 +10803,15 @@ bool Cmd_SetTagSkills(
 ) {
     int32_t a8;
     int32_t v11;
-    bool v10 = 1;
+    bool v10 = true;
     a8 = 0;
     v11 = 1;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v11
         )) {
-        return 0;
+        return false;
     }
-    CharGenMenu::Create_(1, a8, 0, v11 == 1);
+    CharGenMenu::Create_(1, a8, false, v11 == 1);
     return v10;
 }
 
@@ -10810,14 +10826,14 @@ bool Cmd_AddTagSkills(
     uint32_t& auiOffset
 ) {
     int32_t a8;
-    bool v10 = 1;
+    bool v10 = true;
     a8 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
-    CharGenMenu::Create_(1, a8, 1, 1);
+    CharGenMenu::Create_(1, a8, true, true);
     return v10;
 }
 
@@ -10836,8 +10852,8 @@ bool Cmd_ShowLockpickMenu(
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
     );
-    _ShowLockPickMenu(0, a8 - 1, 0);
-    return 1;
+    _ShowLockPickMenu(nullptr, a8 - 1, false);
+    return true;
 }
 
 bool Cmd_ShowLockpickMenuDebug(
@@ -10855,8 +10871,8 @@ bool Cmd_ShowLockpickMenuDebug(
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
     );
-    _ShowLockPickMenu(0, a8 - 1, 1);
-    return 1;
+    _ShowLockPickMenu(nullptr, a8 - 1, true);
+    return true;
 }
 
 bool Cmd_ResetPerformanceTimers(
@@ -10870,7 +10886,7 @@ bool Cmd_ResetPerformanceTimers(
     uint32_t& auiOffset
 ) {
     InitializationFlow();
-    return 1;
+    return true;
 }
 
 bool Cmd_ToggleDebugDecal(
@@ -10888,7 +10904,7 @@ bool Cmd_ToggleDebugDecal(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8 != -1) {
         switch (a8) {
@@ -10961,11 +10977,11 @@ bool Cmd_ToggleDebugDecal(
                 break;
             }
             default: {
-                return 1;
+                return true;
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetImageSpaceModifiersEnable(
@@ -10983,15 +10999,15 @@ bool Cmd_SetImageSpaceModifiersEnable(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (!a8) {
-        TESImageSpaceModifier::SetEnable(0);
+        TESImageSpaceModifier::SetEnable(false);
     }
     if (a8 == 1) {
-        TESImageSpaceModifier::SetEnable(1);
+        TESImageSpaceModifier::SetEnable(true);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IsMoving(
@@ -11008,7 +11024,7 @@ bool Cmd_IsMoving(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsMoving >> %0.0f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IsTurning(
@@ -11021,11 +11037,11 @@ bool Cmd_IsTurning(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Script::GetIsTurningConditionFunction(apRefObject, 0, 0, afReturnValue);
+    Script::GetIsTurningConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsTurning >> %0.0f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetAnimAction_Execute(
@@ -11038,11 +11054,11 @@ bool Cmd_GetAnimAction_Execute(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Script::GetAnimActionConditionFunction(apRefObject, 0, 0, afReturnValue);
+    Script::GetAnimActionConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetAnimAction >> %0.0f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_UseWeapon(
@@ -11095,7 +11111,7 @@ bool Cmd_EvaluateSpellConditions(
     if (v4) {
         v4->EvaluateSpellConditions();
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ClearScreenBlood(
@@ -11109,7 +11125,7 @@ bool Cmd_ClearScreenBlood(
     uint32_t& auiOffset
 ) {
     ScreenSplatter::Clear();
-    return 1;
+    return true;
 }
 
 bool Cmd_TriggerScreenSplatter(
@@ -11130,10 +11146,10 @@ bool Cmd_TriggerScreenSplatter(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &uiCount,
             &fDuration, &fSizeMult, &fOpacityMult
         )) {
-        return 0;
+        return false;
     }
     ScreenCustomSplatter::Activate((uint32_t)uiCount, fDuration, SCREENSCUSTOMPLATTER_BLOOD, fSizeMult, fOpacityMult);
-    return 1;
+    return true;
 }
 
 bool Cmd_SetScreenSplatterFade(
@@ -11155,10 +11171,10 @@ bool Cmd_SetScreenSplatterFade(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &fFadeStart,
             &iNoFade
         )) {
-        return 0;
+        return false;
     }
     SetCustomSplatterFade(fFadeStart, static_cast<uint8_t>(iNoFade) != 0);
-    return 1;
+    return true;
 }
 
 bool Cmd_SetScreenSplatterTexture(
@@ -11178,10 +11194,10 @@ bool Cmd_SetScreenSplatterTexture(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8, &iValue
         )) {
-        return 0;
+        return false;
     }
     ScreenCustomSplatter::SetCustomSplatterTexture(a8, static_cast<uint8_t>(iValue));
-    return 1;
+    return true;
 }
 
 bool Cmd_ClearScreenSplatter(
@@ -11195,7 +11211,7 @@ bool Cmd_ClearScreenSplatter(
     uint32_t& auiOffset
 ) {
     CustomBloodSplatter();
-    return 1;
+    return true;
 }
 
 bool Cmd_AgeRace_Execute(
@@ -11213,7 +11229,7 @@ bool Cmd_AgeRace_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         if (apRefObject) {
@@ -11243,13 +11259,13 @@ bool Cmd_AgeRace_Execute(
                 }
                 if (apRace != FormRace) {
                     bool v9 = apRefObject->IsActor();
-                    ObjectReference->SwitchRace(apRace, v9 ? static_cast<Actor*>(apRefObject) : 0);
+                    ObjectReference->SwitchRace(apRace, v9 ? static_cast<Actor*>(apRefObject) : nullptr);
                     static_cast<Character*>(apRefObject)->Character::Reset3D();
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool GetVATSBackAreaFreeFunction(
@@ -11263,11 +11279,11 @@ bool GetVATSBackAreaFreeFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetVATSBackAreaFreeConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetVATSBackAreaFreeConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool GetVATSFrontAreaFreeFunction(
@@ -11281,11 +11297,11 @@ bool GetVATSFrontAreaFreeFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetVATSFrontAreaFreeConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetVATSFrontAreaFreeConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 void Set(char a1) {
@@ -11303,11 +11319,11 @@ bool GetVATSRightTargetVisibleFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetVATSRightTargetVisibleConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetVATSRightTargetVisibleConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool GetVATSLeftTargetVisibleFunction(
@@ -11321,11 +11337,11 @@ bool GetVATSLeftTargetVisibleFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetVATSLeftTargetVisibleConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetVATSLeftTargetVisibleConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool GetVATSBackTargetVisibleFunction(
@@ -11339,11 +11355,11 @@ bool GetVATSBackTargetVisibleFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetVATSBackTargetVisibleConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetVATSBackTargetVisibleConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool GetVATSFrontTargetVisibleFunction(
@@ -11357,11 +11373,11 @@ bool GetVATSFrontTargetVisibleFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetVATSFrontTargetVisibleConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetVATSFrontTargetVisibleConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Cmd_SetCriticalStage(
@@ -11379,14 +11395,14 @@ bool Cmd_SetCriticalStage(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (apRefObject->IsActor()) {
             static_cast<Actor*>(apRefObject)->Actor::SetCriticalStage(a8);
         }
     }
-    return 1;
+    return true;
 }
 
 bool IsInCriticalStageFunction(
@@ -11400,11 +11416,11 @@ bool IsInCriticalStageFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_IsInCriticalStage(apRefObject, a8, 0, afReturnValue);
+        Cmd_IsInCriticalStage(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Cmd_Sin(
@@ -11424,7 +11440,7 @@ bool Cmd_Sin(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v10
         )) {
-        return 0;
+        return false;
     }
     if (v10) {
         if (a8 < -1.0) {
@@ -11439,7 +11455,7 @@ bool Cmd_Sin(
         float afX = a8 * 0.01745329238474369;
         afReturnValue = std::sin(afX);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_Cos(
@@ -11459,7 +11475,7 @@ bool Cmd_Cos(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v10
         )) {
-        return 0;
+        return false;
     }
     if (v10) {
         if (a8 < -1.0) {
@@ -11474,7 +11490,7 @@ bool Cmd_Cos(
         float afX = a8 * 0.01745329238474369;
         afReturnValue = std::cos(afX);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_Tan(
@@ -11494,7 +11510,7 @@ bool Cmd_Tan(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v10
         )) {
-        return 0;
+        return false;
     }
     if (v10) {
         afReturnValue = std::atan(a8) * 57.2957763671875;
@@ -11503,7 +11519,7 @@ bool Cmd_Tan(
         float v9 = a8 * 0.01745329238474369;
         afReturnValue = std::tan(v9);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_Sqrt(
@@ -11521,10 +11537,10 @@ bool Cmd_Sqrt(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     afReturnValue = std::sqrt(a8);
-    return 1;
+    return true;
 }
 
 bool Cmd_Log(
@@ -11544,7 +11560,7 @@ bool Cmd_Log(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &afX
         )) {
-        return 0;
+        return false;
     }
     if (afX == 1.0) {
         afReturnValue = 0.0;
@@ -11553,7 +11569,7 @@ bool Cmd_Log(
         double v9 = std::log(a8);
         afReturnValue = v9 / std::log(afX);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_ShowQuestStages(
@@ -11567,11 +11583,11 @@ bool Cmd_ShowQuestStages(
     uint32_t& auiOffset
 ) {
     TESQuest* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     BSStringT<char> kStages;
     if (GetThreadTLSData()->bSystemOutput) {
@@ -11600,7 +11616,7 @@ bool Cmd_ShowQuestStages(
             // Natively C++ passes PrintLine a copy of this raw-storage local, so the local is destroyed here.
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SetTaskThreadUpdateSleep(
@@ -11618,11 +11634,11 @@ bool Cmd_SetTaskThreadUpdateSleep(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a1
         )) {
-        return 0;
+        return false;
     }
     BSTaskThread::SetUpdateSleepValue(a1);
     Interface::PrintLine("BSTaskThread::sUpdateSleepValue set to %d ms", a1);
-    return 1;
+    return true;
 }
 
 bool Cmd_AddFormToFormList_Execute(
@@ -11637,20 +11653,20 @@ bool Cmd_AddFormToFormList_Execute(
 ) {
     BGSListForm* a8;
     TESForm* a2;
-    a8 = 0;
-    a2 = 0;
+    a8 = nullptr;
+    a2 = nullptr;
     afReturnValue = 0.0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &a2
         )) {
-        return 0;
+        return false;
     }
     if (a2) {
         if (a8) {
             a8->AddForm(a2);
         }
     }
-    return 1;
+    return true;
 }
 
 // The leveled list the script names is the TESLeveledList base of a leveled actor (at +0x30); the form it adds is
@@ -11676,7 +11692,7 @@ bool Cmd_AddNPCToLeveledList(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pList,
             &pForm, &iLevel
         )) {
-        return 0;
+        return false;
     }
     if (pList) {
         if (pForm) {
@@ -11685,7 +11701,7 @@ bool Cmd_AddNPCToLeveledList(
             );
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_AddItemToLeveledList(
@@ -11713,7 +11729,7 @@ bool Cmd_AddItemToLeveledList(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pList,
             &pForm, &iLevel, &iCount, &fHealth
         )) {
-        return 0;
+        return false;
     }
     if (pList) {
         if (pForm) {
@@ -11734,7 +11750,7 @@ bool Cmd_AddItemToLeveledList(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_RemapWaterType(
@@ -11749,28 +11765,28 @@ bool Cmd_RemapWaterType(
 ) {
     TESForm* v9;
     TESForm* a2;
-    v9 = 0;
-    a2 = 0;
+    v9 = nullptr;
+    a2 = nullptr;
     afReturnValue = 0.0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &v9, &a2
         )) {
-        return 0;
+        return false;
     }
     if (!v9 || v9->GetFormType() != 78) {
         Warning("Invalid water type for water to be remapped.");
-        v9 = 0;
+        v9 = nullptr;
     }
     if (!a2 || a2->GetFormType() != 78) {
         Warning("Invalid water type for water to remap to.");
-        a2 = 0;
+        a2 = nullptr;
     }
     if (v9) {
         if (a2) {
             static_cast<TESWaterForm*>(v9)->TESWaterForm::SetRemappedWaterForm(static_cast<TESWaterForm*>(a2));
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_IsHardcore_Execute(
@@ -11801,18 +11817,18 @@ bool Cmd_SetHardcore_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &iHardcore
         )) {
-        return 0;
+        return false;
     }
     if (pPlayer && iHardcore >= GamePlayFormulas::HARDCORE_OFF && iHardcore <= GamePlayFormulas::HARDCORE_ON) {
-        pPlayer->SetHardcore(static_cast<GamePlayFormulas::HardcoreSetting>(iHardcore), 0);
+        pPlayer->SetHardcore(static_cast<GamePlayFormulas::HardcoreSetting>(iHardcore), false);
         if (iHardcore != GamePlayFormulas::HARDCORE_ON) {
             pPlayer->ClearsHardcoreFlag();
         }
-        return 1;
+        return true;
     }
     else {
         Warning("Attempting to set hardcore on an invalid player!");
-        return 0;
+        return false;
     }
 }
 
@@ -11844,7 +11860,7 @@ bool Cmd_ObjectUnderReticle_Execute(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, afParam,
             &fDistance
         )) {
-        return 0;
+        return false;
     }
     fDistance = BSMIN(fDistance, 50000.0f);
     bhkPickData kPickData;
@@ -11876,13 +11892,13 @@ bool Cmd_ObjectUnderReticle_Execute(
         pRef = TESObjectREFR::FindReferenceFor3D(pPicked);
     }
     else {
-        pRef = 0;
+        pRef = nullptr;
     }
     if (pRef) {
         uint32_t uiID = pRef->iFormID;
         Script::PutNumericIDInDouble(uiID, afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_GetDLCCount(
@@ -11913,11 +11929,11 @@ bool Cmd_GetDLCCount(
             static_cast<uint32_t>(static_cast<int64_t>(afReturnValue))
         );
         Interface::PrintLine(Format);
-        return 1;
+        return true;
     }
     else {
         afReturnValue = 0.0;
-        return 0;
+        return false;
     }
 }
 
@@ -11970,12 +11986,12 @@ bool Cmd_GetContainerInventoryCount(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        afReturnValue = static_cast<double>(apRefObject->GetInventoryCount(0, 1));
+        afReturnValue = static_cast<double>(apRefObject->GetInventoryCount(false, true));
         if (GetThreadTLSData()->bSystemOutput) {
             Interface::PrintLine("GetContainerInventoryCount >> %i", static_cast<int32_t>(afReturnValue));
         }
     }
-    return 1;
+    return true;
 }
 
 bool Cmd_SystemSave(
@@ -11991,7 +12007,7 @@ bool Cmd_SystemSave(
     if ((&bAllowScriptedAutosave)->Bool()) {
         pSaveLoadManager->SetShouldSystemSave();
     }
-    return 1;
+    return true;
 }
 
 int32_t hkGetByteOffset(const void* base, const void* pntr) {
@@ -12004,7 +12020,7 @@ void MobDialogueFlagResetter::Operate(MobileObject* apMob) {
     if (apMob->IsActor()) {
         BaseProcess* CurrentAIProcess = apMob->pCurrentProcess;
         if (CurrentAIProcess) {
-            CurrentAIProcess->SetGreetingFlag(0);
+            CurrentAIProcess->SetGreetingFlag(false);
         }
     }
     (&apMob->m_Extra)->RemoveExtra(115);
@@ -12147,7 +12163,7 @@ void ShadowSceneNode::ToggleWireframe() {
 }
 
 bool ActorCause::IsValid() {
-    return pActor != 0;
+    return pActor != nullptr;
 }
 
 bool BGSProjectile::GetHasExplosionDetonates() {
@@ -12181,12 +12197,12 @@ void Renderer::SetDoCanopyShadowPass(bool abVal) {
 void Script::SetScaleBase(TESObjectREFR* apRefObject, float afValue) {
     if (apRefObject) {
         apRefObject->SetScale(afValue);
-        apRefObject->SetAltered(1);
+        apRefObject->SetAltered(true);
     }
 }
 
 void Script::DamageObjectBase(TESObjectREFR* apRef, float afValue) {
-    apRef->DamageObject(afValue, 1);
+    apRef->DamageObject(afValue, true);
 }
 
 void Script::MatchFaceGeometryBase(TESObjectREFR* apRef, TESObjectREFR* apMatchActor, int32_t aiValue) {
@@ -12214,24 +12230,24 @@ void Script::MatchFaceGeometryBase(TESObjectREFR* apRef, TESObjectREFR* apMatchA
             TESActorBase::SEX Sex = pnpcToMatch->GetSex();
             TESRace* Race = pnpcToMatch->GetRace();
             TESNPC::FillCharGenPresetList(Race, Sex, &xPresetHeads);
-            TESNPC* ppresetNPC = 0;
+            TESNPC* ppresetNPC = nullptr;
             if (xPresetHeads.GetAt(0)) {
                 ppresetNPC = xPresetHeads.GetAt(0);
             }
             FR2MatrixVTC<float>(*pcoord)[2][2] = pnpcToChange->pAlternateFaceOffsetCoord;
             if (pcoord) {
                 (*pcoord)[0][0].DeleteArray(3u);
-                pcoord = 0;
-                pnpcToChange->pAlternateFaceOffsetCoord = 0;
+                pcoord = nullptr;
+                pnpcToChange->pAlternateFaceOffsetCoord = nullptr;
             }
             FR2MatrixVTC<float>(*coordToChange)[2][2] = pnpcToChange->GetOffsetFaceCoord();
             FR2MatrixVTC<float>(*coordToMatch)[2][2] = pnpcToMatch->GetOffsetFaceCoord();
             FR2MatrixVTC<float>(*presetOffsetCoord)[2][2] = ppresetNPC->GetOffsetFaceCoord();
-            BSFaceGenManager::OffsetFaceGenCoord(presetOffsetCoord, coordToMatch, &chargenoffset, 0);
+            BSFaceGenManager::OffsetFaceGenCoord(presetOffsetCoord, coordToMatch, &chargenoffset, false);
             float fvalOldGeo = BSFaceGenManager::GetFaceCoordAttribute(*coordToChange, FANATT_AGE, FANTYPE_GEO);
             BSFaceGenManager::InitFaceGenCoord(&blendedcoord);
-            BSFaceGenManager::ScaleFaceCoord(fval, &chargenoffset, 1);
-            BSFaceGenManager::MergeFaceGenCoord(coordToChange, &chargenoffset, &blendedcoord, 1, 0.0f);
+            BSFaceGenManager::ScaleFaceCoord(fval, &chargenoffset, true);
+            BSFaceGenManager::MergeFaceGenCoord(coordToChange, &chargenoffset, &blendedcoord, true, 0.0f);
             BSFaceGenManager::SetFaceCoordAttribute(blendedcoord, FANATT_AGE, FANTYPE_GEO, fvalOldGeo);
             // new FR2MatrixVTC<float>[2][2]: new[]'s cookie, the element count, is written by hand in the size_t before
             // the elements.
@@ -12245,15 +12261,15 @@ void Script::MatchFaceGeometryBase(TESObjectREFR* apRef, TESObjectREFR* apMatchA
                 pNewCoord = reinterpret_cast<FR2MatrixVTC<float>(*)[2][2]>(&pCookie[1]);
             }
             else {
-                pNewCoord = 0;
+                pNewCoord = nullptr;
             }
             pcoord = pNewCoord;
             BSFaceGenManager::InitFaceGenCoord(pcoord);
             TESRace* v4 = pnpcToChange->GetRace();
             BSFaceGenManager::OffsetFaceGenCoord(
-                v4->GetMeanFaceCoord(TESActorBase::SEX_MALE), &blendedcoord, pcoord, 0
+                v4->GetMeanFaceCoord(TESActorBase::SEX_MALE), &blendedcoord, pcoord, false
             );
-            BSFaceGenManager::CopyFaceGenCoord(coordToChange, pcoord, 0, 1);
+            BSFaceGenManager::CopyFaceGenCoord(coordToChange, pcoord, false, true);
             pnpcToChange->pAlternateFaceOffsetCoord = pcoord;
             pnpcToChange->AddChange(2048);
             if (apRef->Get3D()) {
@@ -12271,7 +12287,7 @@ void Script::MatchFaceGeometryBase(TESObjectREFR* apRef, TESObjectREFR* apMatchA
 }
 
 bool Script::GetBaseActorValue_Eval(Actor* apActor, ActorValue::Index aeActorValue, int32_t aiArg2, double* apResult) {
-    Actor* v5 = 0;
+    Actor* v5 = nullptr;
     if (apActor) {
         if (apActor->IsActor()) {
             v5 = apActor;
@@ -12285,7 +12301,7 @@ bool Script::GetBaseActorValue_Eval(Actor* apActor, ActorValue::Index aeActorVal
             );
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ParseString(
@@ -12308,16 +12324,16 @@ bool Script::ParseString(
     for (int16_t i = 0; i < v12; ++i) {
         apDest[i] = 0.0;
         if (!Script::GetValue(
-                apDest[i], apCompiledParams, *auiOffset, apRefObject, apContainer, apScript, apScriptLocals, 1
+                apDest[i], apCompiledParams, *auiOffset, apRefObject, apContainer, apScript, apScriptLocals, true
             )) {
-            return 0;
+            return false;
         }
     }
     apOut->SPrintF(
         apText, apDest[0], apDest[1], apDest[2], apDest[3], apDest[4], apDest[5], apDest[6], apDest[7], apDest[8],
         apDest[9]
     );
-    return 1;
+    return true;
 }
 
 // Prints the HDR image space parameters to the console. Every float is passed as a double, including the blur pass
@@ -12389,7 +12405,7 @@ bool Script::AddScriptPackageFunction(
         SetActionFlag(pOldPackage, pActor->GetExtra(), 0x800);
         pActor->GetCurrentAIProcess()->ChangePackage(pActor, pOldPackage);
     }
-    pActor->GetCurrentAIProcess()->SetPackageDoneOnce(0);
+    pActor->GetCurrentAIProcess()->SetPackageDoneOnce(false);
     // 0x200 is the OnPackageStart script event.
     SetActionFlag(pPackage, pActor->GetExtra(), 0x200);
     pActor->GetCurrentAIProcess()->StartNewPackage(pActor, pPackage);
@@ -12408,7 +12424,7 @@ bool Script::AddScriptPackageFunction(
         if (pActor->GetCurrentAIProcess()->GetProcessLevel() == PROCESS_TYPE_MIDDLE_HIGH) {
             ReferenceProcessLists.RemoveReference(pActor, pActor->GetCurrentAIProcess()->GetProcessLevel());
             ReferenceProcessLists.AddReference(
-                pActor, pActor->GetCurrentAIProcess()->GetProcessLevel(), 0, false, nullptr
+                pActor, pActor->GetCurrentAIProcess()->GetProcessLevel(), false, false, nullptr
             );
         }
     }
@@ -12430,21 +12446,21 @@ bool Script::ActivateFunction(
 ) {
     int32_t v10;
     MobileObject* apActivator;
-    apActivator = 0;
+    apActivator = nullptr;
     v10 = 0;
     if (pPlayer == apRefObject) {
         Warning("SCRIPTS: Never have the player character activate something in a script very Bad");
-        return 0;
+        return false;
     }
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &apActivator,
             &v10
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (GetThreadTLSData()->uiActivateRecursionDepth > 5) {
-            return 1;
+            return true;
         }
         GetThreadTLSData()->uiActivateRecursionDepth = GetThreadTLSData()->uiActivateRecursionDepth + 1;
         if (!apActivator) {
@@ -12453,7 +12469,7 @@ bool Script::ActivateFunction(
         if (apActivator) {
             if (!apActivator->GetDisabled()) {
                 if (v10) {
-                    apRefObject->Activate(apActivator, 0, 0, 1);
+                    apRefObject->Activate(apActivator, false, nullptr, 1);
                 }
                 else {
                     bool Action = apRefObject->GetAction(OBJECT_ACTION_USE_DEFAULT);
@@ -12461,7 +12477,7 @@ bool Script::ActivateFunction(
                         apRefObject->SetAction(OBJECT_ACTION_USE_DEFAULT);
                     }
                     apRefObject->SetAction(OBJECT_ACTION_ACTIVATE);
-                    apRefObject->Activate(apActivator, 0, 0, 1);
+                    apRefObject->Activate(apActivator, false, nullptr, 1);
                     apRefObject->ClearAction(OBJECT_ACTION_ACTIVATE);
                     if (!Action) {
                         apRefObject->ClearAction(OBJECT_ACTION_USE_DEFAULT);
@@ -12471,7 +12487,7 @@ bool Script::ActivateFunction(
         }
         GetThreadTLSData()->uiActivateRecursionDepth = GetThreadTLSData()->uiActivateRecursionDepth - 1;
     }
-    return 1;
+    return true;
 }
 
 bool Script::DuplicateNPCStatsFunction(
@@ -12496,7 +12512,7 @@ bool Script::DuplicateNPCStatsFunction(
         if (pTarget && pSourceNPC) {
             pTarget->SetClass(pSourceNPC->GetClass());
             pTarget->SetLevel(pSourceNPC->GetLevel());
-            pTarget->InitValues(0);
+            pTarget->InitValues(false);
         }
     }
     return true;
@@ -12513,11 +12529,11 @@ bool Script::GetDisposition(
     uint32_t& auiOffset
 ) {
     TESObjectREFR* a2;
-    a2 = 0;
+    a2 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a2
            ) &&
-        Script::GetDispositionConditionFunction(apRefObject, a2, 0, afReturnValue);
+        Script::GetDispositionConditionFunction(apRefObject, a2, nullptr, afReturnValue);
 }
 
 bool Script::GetPCFactionMurderFunction(
@@ -12531,14 +12547,14 @@ bool Script::GetPCFactionMurderFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
-    Cmd_GetPCFactionMurder(apRefObject, a8, 0, afReturnValue);
-    return 1;
+    Cmd_GetPCFactionMurder(apRefObject, a8, nullptr, afReturnValue);
+    return true;
 }
 
 bool Script::GetPlayerEnemyofFactionFunction(
@@ -12552,14 +12568,14 @@ bool Script::GetPlayerEnemyofFactionFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
-    Cmd_GetPCEnemyofFaction(apRefObject, a8, 0, afReturnValue);
-    return 1;
+    Cmd_GetPCEnemyofFaction(apRefObject, a8, nullptr, afReturnValue);
+    return true;
 }
 
 bool Script::GetPCFactionAttackFunction(
@@ -12573,14 +12589,14 @@ bool Script::GetPCFactionAttackFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
-    Cmd_GetPCFactionAttack(apRefObject, a8, 0, afReturnValue);
-    return 1;
+    Cmd_GetPCFactionAttack(apRefObject, a8, nullptr, afReturnValue);
+    return true;
 }
 
 bool Script::IsPlayerActionActiveFunction(
@@ -12594,11 +12610,11 @@ bool Script::IsPlayerActionActiveFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::IsPlayerActionActiveConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::IsPlayerActionActiveConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetTalkingActivatorActorFunction(
@@ -12612,11 +12628,11 @@ bool Script::GetTalkingActivatorActorFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetTalkingActivatorActorConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetTalkingActivatorActorConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetHasNoteFunction(
@@ -12630,11 +12646,11 @@ bool Script::GetHasNoteFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetHasNoteConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetHasNoteConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::ExistsFunction(
@@ -12648,22 +12664,22 @@ bool Script::ExistsFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_Exists(apRefObject, a8, 0, afReturnValue);
+        Cmd_Exists(apRefObject, a8, nullptr, afReturnValue);
 }
 
 void Script::MoveToFunctionBase(TESObjectREFR* apMoveRef, TESObjectREFR* apTargetRef, float afX, float afY, float afZ) {
-    if (apMoveRef != pPlayer || !pPlayer->IsDead(0)) {
+    if (apMoveRef != pPlayer || !pPlayer->IsDead(false)) {
         if (apMoveRef) {
             if (apTargetRef) {
                 NiPoint3 position;
                 bool bactor = apMoveRef->IsActor();
                 if (bactor) {
                     Actor* pact = static_cast<Actor*>(apMoveRef);
-                    ReferenceProcessLists.StopCombatandAlarmonActor(static_cast<Actor*>(apMoveRef), 0);
+                    ReferenceProcessLists.StopCombatandAlarmonActor(static_cast<Actor*>(apMoveRef), false);
                     BaseProcess* pcurProc = pact->GetCurrentAIProcess();
                     if (pcurProc) {
                         if (pcurProc->GetSitSleepState()) {
@@ -12688,12 +12704,12 @@ void Script::MoveToFunctionBase(TESObjectREFR* apMoveRef, TESObjectREFR* apTarge
                         ploc = ::new (apMemory) PLAYER_TARGET_LOC;
                     }
                     else {
-                        ploc = 0;
+                        ploc = nullptr;
                     }
                     ploc->Location = position;
                     ploc->Angle.z = afz.z;
                     ploc->Angle.x = afz.x;
-                    ploc->bResetWeather = 1;
+                    ploc->bResetWeather = true;
                     if (pWorld) {
                         ploc->pWorld = pWorld;
                     }
@@ -12711,7 +12727,7 @@ void Script::MoveToFunctionBase(TESObjectREFR* apMoveRef, TESObjectREFR* apTarge
                 else {
                     bool bmob = apMoveRef->IsMobileObject();
                     apMoveRef->SetLocationOnReference(position);
-                    if (pCell && TES::pInstance->IsCellLoaded(pCell, 0)) {
+                    if (pCell && TES::pInstance->IsCellLoaded(pCell, false)) {
                         apMoveRef->SetAngleOnReferenceZ(afz.z);
                         apMoveRef->SetAngleOnReferenceX(0.0f);
                         NiAVObject* p3D = (NiAVObject*)apMoveRef->Get3D();
@@ -12719,8 +12735,8 @@ void Script::MoveToFunctionBase(TESObjectREFR* apMoveRef, TESObjectREFR* apTarge
                             const NiPoint3* v7 = &apMoveRef->GetLocationOnReference();
                             p3D->SetTranslate(*v7);
                             p3D->SetRotate(apMoveRef->GetOrientation());
-                            bhkNiCollisionObject::ResetSim(p3D, 1);
-                            NiUpdateData UpdateData(0.0f, 0, 0);
+                            bhkNiCollisionObject::ResetSim(p3D, true);
+                            NiUpdateData UpdateData(0.0f, false, false);
                             p3D->Update(UpdateData);
                         }
                     }
@@ -12732,7 +12748,7 @@ void Script::MoveToFunctionBase(TESObjectREFR* apMoveRef, TESObjectREFR* apTarge
                     TESObjectREFR::MoveRefToNewSpace(apMoveRef, pCell, pWorld);
                     if (apMoveRef->GetParentCell()) {
                         TESObjectCELL* ParentCell = apMoveRef->GetParentCell();
-                        if (TES::pInstance->IsCellLoaded(ParentCell, 0)) {
+                        if (TES::pInstance->IsCellLoaded(ParentCell, false)) {
                             apMoveRef->InitHavok();
                         }
                     }
@@ -12751,7 +12767,7 @@ void Script::MoveToFunctionBase(TESObjectREFR* apMoveRef, TESObjectREFR* apTarge
                             CurrentAIProcess->ComputeLastTimeProcessed();
                             pactor->StopMoving();
                             BaseProcess* v10 = pactor->pCurrentProcess;
-                            v10->CheckforNewPackage(pactor, 1);
+                            v10->CheckforNewPackage(pactor, true);
                             pactor->FadeIn();
                             pactor->UpdateAlpha();
                         }
@@ -13193,9 +13209,9 @@ bool Script::SetRigidBodyMass(
 // Sets the rigid body mass of apRefObject's physics body.
 void Script::SetRigidBodyMassBase(TESObjectREFR* apRefObject, float afValue) {
     bhkWorldNS::ObjectRecData recData;
-    recData.pWorld = 0;
+    recData.pWorld = nullptr;
     recData.eAction = bhkWorldNS::OA_TOTAL;
-    recData.bRecurse = 1;
+    recData.bRecurse = true;
     recData.uDataA[0].f = afValue;
     NiNode* v2 = apRefObject->Get3D();
     bhkWorld::DoObjects(v2, recData, &SetRBMass);
@@ -13726,7 +13742,7 @@ bool Script::AddDecal(
             kDecal.iIndex = -1;
             kDecal.fRotation = RandomFloatTwoPi();
             kDecal.cSubTex = (char)std::floor(RandomFloat(0.0f, 4.0f));
-            float fMaxWidth = (float)pImpact->GetDecalMaxWidth();
+            float fMaxWidth = pImpact->GetDecalMaxWidth();
             float fMinWidth = (float)pImpact->GetMinWidth();
             float fSize = RandomFloat(fMinWidth, fMaxWidth);
             kDecal.fDecalHeight = fSize;
@@ -13971,7 +13987,7 @@ TESObjectREFR* Script::PlaceAtMeFunctionBase(
     NiPoint3 rotation;
     int32_t v64;
     int32_t* v59 = &v64;
-    TESObjectREFR* pplacedref = 0;
+    TESObjectREFR* pplacedref = nullptr;
     if (apPlaceAtRef && apObject) {
         alignas(16) NiPoint3 pointArray[9];
         rotation = apPlaceAtRef->GetAngleOnReference();
@@ -14014,7 +14030,7 @@ TESObjectREFR* Script::PlaceAtMeFunctionBase(
             ang = ang + 0.7853981852531433;
         }
         if (apObject->GetFormType() == LVLC_ID || apObject->GetFormType() == LVLN_ID) {
-            uint32_t icalclevel = apPlaceAtRef->GetCalcLevel(0);
+            uint32_t icalclevel = apPlaceAtRef->GetCalcLevel(false);
             alignas(16) TESContainer tempcont;
             // Casts to the leveled creature or the leveled character by form type; both reach their TESLeveledList base
             // without a null test.
@@ -14032,8 +14048,9 @@ TESObjectREFR* Script::PlaceAtMeFunctionBase(
                         while (pCO->i_count > 0) {
                             TESWorldSpace* X_4a = apPlaceAtRef->GetWorldSpace();
                             TESObjectCELL* Xa = apPlaceAtRef->GetParentCell();
-                            pplacedref =
-                                pDataHandler->CreateReferenceAtLocation(pCO->pObj, pos, rotation, Xa, X_4a, 0, 0, 0);
+                            pplacedref = pDataHandler->CreateReferenceAtLocation(
+                                pCO->pObj, pos, rotation, Xa, X_4a, nullptr, nullptr, nullptr
+                            );
                             if (pplacedref) {
                                 if (pplacedref->IsActor()) {
                                     Actor* pActor = static_cast<Actor*>(pplacedref);
@@ -14085,9 +14102,11 @@ TESObjectREFR* Script::PlaceAtMeFunctionBase(
                     }
                     TESWorldSpace* X_4b = apPlaceAtRef->GetWorldSpace();
                     TESObjectCELL* Xb = apPlaceAtRef->GetParentCell();
-                    pplacedref = pDataHandler->CreateReferenceAtLocation(pboundobj, pos, rotation, Xb, X_4b, 0, 0, 0);
+                    pplacedref = pDataHandler->CreateReferenceAtLocation(
+                        pboundobj, pos, rotation, Xb, X_4b, nullptr, nullptr, nullptr
+                    );
                     if (!pplacedref) {
-                        return 0;
+                        return nullptr;
                     }
                     if (pplacedref->IsActor()) {
                         Actor* pActor_2 = static_cast<Actor*>(pplacedref);
@@ -14252,7 +14271,7 @@ bool Script::MenuModeFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &iMenuMode
         )) {
-        return 0;
+        return false;
     }
     // The condition function's parameter slots are untyped: the menu mode goes in as the slot's integer value.
     return Script::GetMenuModeConditionFunction(
@@ -14274,7 +14293,7 @@ bool Script::ToggleGrassFunction(
 ) {
     NiNode* pGrassNode = TESTerrainLODManager::GetGrassNode();
     if (!pGrassNode) {
-        return 1;
+        return true;
     }
     bool bIsDisabled = !static_cast<uint8_t>(pGrassNode->GetAppCulled());
     pGrassNode->SetAppCulled(bIsDisabled);
@@ -14289,7 +14308,7 @@ bool Script::ToggleGrassFunction(
         }
     }
     Interface::PrintLine("Grass Display %s", bIsDisabled ? "Disabled." : "Enabled.");
-    return 1;
+    return true;
 }
 
 bool Script::ShowFunction(
@@ -14323,9 +14342,9 @@ bool Script::IsTrespassingFunction(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return Script::IsTrespassingConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::IsTrespassingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 // The condition function's result is dropped: the opcode always succeeds.
@@ -14339,7 +14358,7 @@ bool Script::GetAmountStolenSoldFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Script::GetAmountStolenSoldConditionFunction(apRefObject, 0, 0, afReturnValue);
+    Script::GetAmountStolenSoldConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     return true;
 }
 
@@ -14353,7 +14372,7 @@ bool Script::GetGroupMemberCountFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetGroupMemberCountConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetGroupMemberCountConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetPlayerTeammateCountFunction(
@@ -14407,7 +14426,7 @@ bool Script::GameModeFunction(
     else {
         afReturnValue = 1.0;
     }
-    return 1;
+    return true;
 }
 
 char Script::ScriptEffectStart(
@@ -14446,7 +14465,7 @@ bool Script::SetCameraFOV(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &fMainFOV,
             &fViewModelFOV
         )) {
-        return 0;
+        return false;
     }
     fMainFOV = BSMIN(fMainFOV, 160.0f);
     if (fMainFOV == 0.0) {
@@ -14478,7 +14497,7 @@ bool Script::SetCameraFOV(
     pPlayer->Set1stPersonFOV(f1stPersonFOV);
     BSSceneGraph::fDefaultWorldFOV = fWorldFOV;
     BSSceneGraph::fDefault1stPersonFOV = f1stPersonFOV;
-    return 1;
+    return true;
 }
 
 void Script::CheckFlagFunction(
@@ -14523,7 +14542,7 @@ bool Script::PlaySoundFunction(
         kTemp.~BSSoundHandle();
         kHandle.Play(false);
     }
-    return 1;
+    return true;
 }
 
 bool Script::TestCode(
@@ -14925,9 +14944,9 @@ bool Script::GetWalkSpeedFunction(
     uint32_t& auiOffset
 ) {
     if (apRefObject == nullptr) {
-        return 0;
+        return false;
     }
-    return GetWalkSpeedConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return GetWalkSpeedConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::ShowHackingMiniGame(
@@ -14948,7 +14967,7 @@ bool Script::ShowHackingMiniGame(
     else {
         Interface::QueueMenuCreate(Interface::OPEN_HACKING, nullptr, nullptr, nullptr, Interface::CMM_STANDARD, false);
     }
-    return 1;
+    return true;
 }
 
 bool Script::TriggerScreenBlood(
@@ -14965,10 +14984,10 @@ bool Script::TriggerScreenBlood(
     if (!ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &uiCount
         )) {
-        return 0;
+        return false;
     }
     ScreenSplatter::Activate(uiCount, 0.0f, SCREENSPLATTER_BLOOD);
-    return 1;
+    return true;
 }
 
 bool Script::GetPlayerName(
@@ -14985,7 +15004,7 @@ bool Script::GetPlayerName(
     Interface::QueueMenuCreate(
         Interface::OPEN_PLAYER_NAME_ENTRY, pPlayer, nullptr, nullptr, Interface::CMM_STANDARD, false
     );
-    return 1;
+    return true;
 }
 
 bool Script::ToggleShadowVolumesFunction(
@@ -15000,7 +15019,7 @@ bool Script::ToggleShadowVolumesFunction(
 ) {
     uint8_t v9 = (uint8_t)(!BSShaderManager::GetVisibleShadowVolumes());
     BSShaderManager::SetVisibleShadowVolumes(v9);
-    return (bool)1;
+    return true;
 }
 
 void Script::HandleMessageMenu() {
@@ -15018,7 +15037,7 @@ bool Script::ToggleFullScreenMotionBlur(
     uint32_t& auiOffset
 ) {
     ReturnTrue();
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetButtonPressedFunction(
@@ -15034,14 +15053,14 @@ bool Script::GetButtonPressedFunction(
     int32_t* v8;
     if ((!apRefObject) || apRefObject->TESForm::GetTemporary()) {
         if (!apScript) {
-            return (bool)0;
+            return false;
         }
         v8 = reinterpret_cast<int32_t*>(static_cast<uintptr_t>(apScript->TESForm::GetFormID()));
     }
     else {
         v8 = reinterpret_cast<int32_t*>(static_cast<uintptr_t>(apRefObject->TESForm::GetFormID()));
     }
-    if ((((int32_t)Script::m_cButtonValue) > ((-1))) &&
+    if ((((int32_t)Script::m_cButtonValue) > (-1)) &&
         (v8 == reinterpret_cast<int32_t*>(static_cast<uintptr_t>(Script::m_iButtonOwner)))) {
         afReturnValue = (double)Script::m_cButtonValue;
         Script::m_cButtonValue = (-1);
@@ -15050,7 +15069,7 @@ bool Script::GetButtonPressedFunction(
     else {
         afReturnValue = (-1.0);
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::ToggleCharControllerShapeFunction(
@@ -15064,15 +15083,15 @@ bool Script::ToggleCharControllerShapeFunction(
     uint32_t& auiOffset
 ) {
     if (!apRefObject) {
-        return (bool)1;
+        return true;
     }
     Actor* v6 = dynamic_cast<Actor*>(apRefObject);
     if (!v6) {
-        return (bool)1;
+        return true;
     }
     void* charController = v6->MobileObject::GetCharController();
     if (!charController) {
-        return (bool)1;
+        return true;
     }
     int32_t shapeType = (int32_t)static_cast<bhkCharacterController*>(charController)->QShapeType();
     if (shapeType == 0) {
@@ -15085,7 +15104,7 @@ bool Script::ToggleCharControllerShapeFunction(
         static_cast<bhkCharacterController*>(charController)
             ->SetShapeType(static_cast<bhkCharacterController::SHAPE_TYPES>(shapeType));
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::SkipAnimFunction(
@@ -15099,14 +15118,14 @@ bool Script::SkipAnimFunction(
     uint32_t& auiOffset
 ) {
     if (!apRefObject) {
-        return (bool)1;
+        return true;
     }
     if (!apRefObject->GetAnimation()) {
-        return (bool)1;
+        return true;
     }
     Animation* v3 = apRefObject->GetAnimation();
     v3->SkipUpdate(AGS_WHOLE_BODY);
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetTalkedToPC(
@@ -15119,7 +15138,7 @@ bool Script::GetTalkedToPC(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetTalkedToPCConditionFunction(apRefObject, nullptr, 0, afReturnValue);
+    return Script::GetTalkedToPCConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::ForceRadioStationUpdateFunction(
@@ -15132,8 +15151,8 @@ bool Script::ForceRadioStationUpdateFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    FalloutRadio::Update(1);
-    return (bool)1;
+    FalloutRadio::Update(true);
+    return true;
 }
 
 bool Script::RevertWorld(
@@ -15147,7 +15166,7 @@ bool Script::RevertWorld(
     uint32_t& auiOffset
 ) {
     pSaveLoadGame->RevertCurrentChanges(nullptr, nullptr);
-    return (bool)1;
+    return true;
 }
 
 bool Script::ToggleRefractionDebug(
@@ -15163,7 +15182,7 @@ bool Script::ToggleRefractionDebug(
     if (BSShaderManager::IsRefractionEnabled()) {
         BSShaderAccumulator::ToggleRefractionDebugTexture();
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::DumpMenuPackingInfo(
@@ -15177,7 +15196,7 @@ bool Script::DumpMenuPackingInfo(
     uint32_t& auiOffset
 ) {
     Interface::DumpMenuPackingInfo();
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetCurrentAIProcedureFunction(
@@ -15191,10 +15210,10 @@ bool Script::GetCurrentAIProcedureFunction(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return (bool)Script::GetCurrentAIProcedureConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::GetCurrentAIProcedureConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return (bool)1;
+        return true;
     }
 }
 
@@ -15210,9 +15229,9 @@ bool Script::ToggleWaterRadius(
 ) {
     TES::pInstance->TES::GetWaterSystem();
     if (TESWaterSystem::GetWaterEnabled()) {
-        TESWaterSystem::bDisplayWaterSoundPlacement = (bool)1;
+        TESWaterSystem::bDisplayWaterSoundPlacement = true;
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::Reset3DStateFunction(
@@ -15226,14 +15245,14 @@ bool Script::Reset3DStateFunction(
     uint32_t& auiOffset
 ) {
     if (!apRefObject) {
-        return (bool)1;
+        return true;
     }
     apRefObject->ResetAnimation_Old();
     ExtraDataList* extraDataList = apRefObject->TESObjectREFR::GetExtra();
     extraDataList->RemoveSavedAnimation();
     ExtraDataList* v4 = apRefObject->TESObjectREFR::GetExtra();
     v4->RemoveSavedHavokData();
-    return (bool)1;
+    return true;
 }
 
 bool Script::ClearActorsFactionsPlayerEnemyFunction(
@@ -15247,12 +15266,12 @@ bool Script::ClearActorsFactionsPlayerEnemyFunction(
     uint32_t& auiOffset
 ) {
     if (!apRefObject) {
-        return (bool)1;
+        return true;
     }
     if (apRefObject->IsActor()) {
         static_cast<Actor*>(apRefObject)->RemoveEnemyFlagFromAllFactions();
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetActorCrimePlayerEnemyFunction(
@@ -15265,7 +15284,7 @@ bool Script::GetActorCrimePlayerEnemyFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetActorCrimePlayerEnemyConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetActorCrimePlayerEnemyConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetActorsInHighFunction(
@@ -15278,7 +15297,7 @@ bool Script::GetActorsInHighFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetActorsInHighConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetActorsInHighConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::ShowRenderPasses(
@@ -15291,8 +15310,8 @@ bool Script::ShowRenderPasses(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    BSShaderAccumulator::bRequestRenderPassesScenegraph = (bool)1;
-    return (bool)1;
+    BSShaderAccumulator::bRequestRenderPassesScenegraph = true;
+    return true;
 }
 
 bool Script::TriggerLODApocalypseFunction(
@@ -15308,7 +15327,7 @@ bool Script::TriggerLODApocalypseFunction(
     TESWorldSpace* worldSpace;
     TESWorldSpace* v1;
     BGSTerrainManager* terrainManager;
-    pPlayer->SetMegatonDestroyed(1);
+    pPlayer->SetMegatonDestroyed(true);
     if (TES::pInstance->GetWorldSpace()) {
         worldSpace = TES::pInstance->GetWorldSpace();
         if (worldSpace->GetTerrainManager()) {
@@ -15317,7 +15336,7 @@ bool Script::TriggerLODApocalypseFunction(
             terrainManager->TriggerApocalypse();
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::ToggleVerboseFunction(
@@ -15338,7 +15357,7 @@ bool Script::ToggleVerboseFunction(
     else {
         Interface::PrintLine("Verbose messages %s", "hidden.");
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::ToggleDemigodModeFunction(
@@ -15360,7 +15379,7 @@ bool Script::ToggleDemigodModeFunction(
     else {
         Interface::PrintLine("Demigod Mode %s", "disabled.");
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::ToggleSafeZoneFunction(
@@ -15374,7 +15393,7 @@ bool Script::ToggleSafeZoneFunction(
     uint32_t& auiOffset
 ) {
     Interface::ToggleSafeZone(2);
-    return (bool)1;
+    return true;
 }
 
 bool Script::SetAllReachable(
@@ -15403,7 +15422,7 @@ bool Script::HasLoaded3DFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::HasLoaded3DConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::HasLoaded3DConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetKillingBlowLimbFunction(
@@ -15416,7 +15435,7 @@ bool Script::GetKillingBlowLimbFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetKillingBlowLimbConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetKillingBlowLimbConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::HasFriendDispositionFunction(
@@ -15429,7 +15448,7 @@ bool Script::HasFriendDispositionFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::HasFriendDispositionConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::HasFriendDispositionConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetScaleFunction(
@@ -15442,7 +15461,7 @@ bool Script::GetScaleFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetScaleConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetScaleConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::ScriptEffectUpdateFunction(
@@ -15457,15 +15476,15 @@ bool Script::ScriptEffectUpdateFunction(
 ) {
     afReturnValue = 0.0;
     if (!apScript) {
-        return (bool)1;
+        return true;
     }
     if (!apScript->GetHeader()) {
-        return (bool)1;
+        return true;
     }
     if (apScript->GetHeader()->bIsMagicEffectScript) {
         afReturnValue = 1.0;
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::ScriptEffectElapsedTimeFunction(
@@ -15484,7 +15503,7 @@ bool Script::ScriptEffectElapsedTimeFunction(
             afReturnValue = (double)apScriptLocals->m_pScriptEffectData->m_fSecondsElapsed;
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetDisease(
@@ -15497,7 +15516,7 @@ bool Script::GetDisease(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetDiseaseConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetDiseaseConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetVampire(
@@ -15510,7 +15529,7 @@ bool Script::GetVampire(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetVampireConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetVampireConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetClothingValue(
@@ -15523,7 +15542,7 @@ bool Script::GetClothingValue(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetClothingValueConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetClothingValueConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetDead(
@@ -15536,7 +15555,7 @@ bool Script::GetDead(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetDeadConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetDeadConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetGold(
@@ -15549,7 +15568,7 @@ bool Script::GetGold(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetGoldConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetGoldConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetSleeping(
@@ -15562,7 +15581,7 @@ bool Script::GetSleeping(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetSleepingConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetSleepingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetSitting(
@@ -15575,7 +15594,7 @@ bool Script::GetSitting(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetSittingConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetSittingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetFurnitureMarkerID(
@@ -15588,7 +15607,7 @@ bool Script::GetFurnitureMarkerID(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetFurnitureMarkerIDConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetFurnitureMarkerIDConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetAlarmed(
@@ -15601,7 +15620,9 @@ bool Script::GetAlarmed(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)((uint8_t)Script::GetAlarmedConditionFunction(static_cast<Actor*>(apRefObject), 0, 0, afReturnValue));
+    return (bool)((uint8_t)Script::GetAlarmedConditionFunction(
+        static_cast<Actor*>(apRefObject), nullptr, nullptr, afReturnValue
+    ));
 }
 
 bool Script::GetIsPleasant(
@@ -15614,7 +15635,7 @@ bool Script::GetIsPleasant(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetIsPleasantConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetIsPleasantConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetIsRaining(
@@ -15627,7 +15648,7 @@ bool Script::GetIsRaining(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetIsRainingConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetIsRainingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetIsSnowing(
@@ -15640,7 +15661,7 @@ bool Script::GetIsSnowing(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetIsSnowingConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetIsSnowingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetWindSpeedFunction(
@@ -15653,7 +15674,7 @@ bool Script::GetWindSpeedFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetWindSpeedConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetWindSpeedConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetIsCreature(
@@ -15666,7 +15687,7 @@ bool Script::GetIsCreature(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetIsCreatureConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetIsCreatureConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetIsChild(
@@ -15679,7 +15700,7 @@ bool Script::GetIsChild(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetIsChildConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetIsChildConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetUsedItemLevelFunction(
@@ -15692,7 +15713,7 @@ bool Script::GetUsedItemLevelFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetUsedItemLevelConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetUsedItemLevelConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetUsedItemActivateFunction(
@@ -15705,7 +15726,7 @@ bool Script::GetUsedItemActivateFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetUsedItemActivateConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetUsedItemActivateConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetRandomPercent(
@@ -15718,7 +15739,7 @@ bool Script::GetRandomPercent(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetRandomPercentConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetRandomPercentConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetLevel(
@@ -15731,7 +15752,7 @@ bool Script::GetLevel(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetLevelConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetLevelConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetArmorRating(
@@ -15744,7 +15765,7 @@ bool Script::GetArmorRating(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetArmorRatingConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetArmorRatingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::IsGuard(
@@ -15758,10 +15779,10 @@ bool Script::IsGuard(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return (bool)Script::IsGuardConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::IsGuardConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return (bool)0;
+        return false;
     }
 }
 
@@ -15776,10 +15797,10 @@ bool Script::IsTalkingFunction(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return (bool)Script::IsTalkingConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::IsTalkingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return (bool)0;
+        return false;
     }
 }
 
@@ -15794,10 +15815,10 @@ bool Script::GetTrespassWarningLevelFunction(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return (bool)Script::GetTrespassWarningLevelConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::GetTrespassWarningLevelConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return (bool)1;
+        return true;
     }
 }
 
@@ -15812,10 +15833,10 @@ bool Script::IsInMyOwnedCellFunction(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return (bool)Script::IsInMyOwnedCellConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::IsInMyOwnedCellConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return (bool)1;
+        return true;
     }
 }
 
@@ -15830,10 +15851,10 @@ bool Script::IsContinuingPackagePCNearFunction(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return (bool)Script::IsContinuingPackagePCNearConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::IsContinuingPackagePCNearConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return (bool)1;
+        return true;
     }
 }
 
@@ -15848,10 +15869,10 @@ bool Script::CanHaveFlamesFunction(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return (bool)Script::CanHaveFlamesConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::CanHaveFlamesConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return (bool)1;
+        return true;
     }
 }
 
@@ -15866,10 +15887,10 @@ bool Script::HasFlamesFunction(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return (bool)Script::HasFlamesConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::HasFlamesConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return (bool)1;
+        return true;
     }
 }
 
@@ -15884,10 +15905,10 @@ bool Script::GetOpenStateFunction(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return (bool)Script::GetOpenStateConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
+        return Script::GetOpenStateConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return (bool)1;
+        return true;
     }
 }
 
@@ -15901,7 +15922,7 @@ bool Script::GetDayOfWeekFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetDayOfWeekConditionFunction(nullptr, 0, 0, afReturnValue);
+    return Script::GetDayOfWeekConditionFunction(nullptr, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::IsPCSleepingFunction(
@@ -15914,7 +15935,7 @@ bool Script::IsPCSleepingFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::IsPCSleepingConditionFunction(nullptr, 0, 0, afReturnValue);
+    return Script::IsPCSleepingConditionFunction(nullptr, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::IsPCAMurdererFunction(
@@ -15927,7 +15948,7 @@ bool Script::IsPCAMurdererFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::IsPCAMurdererConditionFunction(nullptr, 0, 0, afReturnValue);
+    return Script::IsPCAMurdererConditionFunction(nullptr, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::IsSwimming(
@@ -15941,10 +15962,10 @@ bool Script::IsSwimming(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        return (bool)Script::IsSwimmingConditionFunction(apRefObject, 0, 0, afReturnValue);
+        return Script::IsSwimmingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
     else {
-        return (bool)0;
+        return false;
     }
 }
 
@@ -15959,7 +15980,7 @@ bool Script::GetPlayerSleepHours(
     uint32_t& auiOffset
 ) {
     afReturnValue = (double)pPlayer->GetSleepHours();
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetDestroyedFunction(
@@ -15972,8 +15993,8 @@ bool Script::GetDestroyedFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Script::GetDestroyedConditionFunction(apRefObject, 0, 0, afReturnValue);
-    return (bool)1;
+    Script::GetDestroyedConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
+    return true;
 }
 
 bool Script::IsActorEvilFunction(
@@ -15986,7 +16007,7 @@ bool Script::IsActorEvilFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::IsActorEvilConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::IsActorEvilConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::IsActorVictimFunction(
@@ -15999,7 +16020,7 @@ bool Script::IsActorVictimFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::IsActorVictimConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::IsActorVictimConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetIdleDoneOnceFunction(
@@ -16012,7 +16033,7 @@ bool Script::GetIdleDoneOnceFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetIdleDoneOnceConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetIdleDoneOnceConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetNoRumorsFunction(
@@ -16042,7 +16063,7 @@ bool Script::GetWhichServiceFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    int8_t v8 = Script::GetWhichServiceConditionFunction(apRefObject, 0, 0, afReturnValue);
+    int8_t v8 = Script::GetWhichServiceConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetWhichSerivce >> %0.2f", afReturnValue);
     }
@@ -16059,7 +16080,7 @@ bool Script::IsActorRidingHorseFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    int8_t isRidingHorse = Script::IsActorRidingHorseConditionFunction(apRefObject, 0, 0, afReturnValue);
+    int8_t isRidingHorse = Script::IsActorRidingHorseConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is actor riding horse >> %0.2f", afReturnValue);
     }
@@ -16076,7 +16097,7 @@ bool Script::IsInDangerousWaterFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    int8_t v8 = Script::IsInDangerousWaterConditionFunction(apRefObject, 0, 0, afReturnValue);
+    int8_t v8 = Script::IsInDangerousWaterConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Actor is in lava >> %0.2f", afReturnValue);
     }
@@ -16093,7 +16114,7 @@ bool Script::GetLastPlayerActionFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetLastPlayerActionConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetLastPlayerActionConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetBroadcastState(
@@ -16117,7 +16138,7 @@ bool Script::GetBroadcastState(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetBroadcastState >> %0.2f", afReturnValue);
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::SetBroadcastState(
@@ -16134,10 +16155,10 @@ bool Script::SetBroadcastState(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return (bool)0;
+        return false;
     }
     FalloutRadio::SetBroadcastState(apRefObject, a8 > 0);
-    return (bool)1;
+    return true;
 }
 
 bool Script::IsActorTalkingThroughActivatorFunction(
@@ -16150,7 +16171,7 @@ bool Script::IsActorTalkingThroughActivatorFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::IsActorTalkingThroughActivatorConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::IsActorTalkingThroughActivatorConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::RemoveMerchantContainer(
@@ -16164,7 +16185,7 @@ bool Script::RemoveMerchantContainer(
     uint32_t& auiOffset
 ) {
     apRefObject->SetMerchantContainer(nullptr);
-    return (bool)1;
+    return true;
 }
 
 bool Script::ClearLocationMarkersFunction(
@@ -16182,7 +16203,7 @@ bool Script::ClearLocationMarkersFunction(
         parentCell = pPlayer->TESObjectREFR::GetParentCell();
         parentCell->ClearLocationMarkers();
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetDialogueEmotionFunction(
@@ -16195,7 +16216,7 @@ bool Script::GetDialogueEmotionFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetDialogueEmotionConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetDialogueEmotionConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetDialogueEmotionValueFunction(
@@ -16208,7 +16229,7 @@ bool Script::GetDialogueEmotionValueFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetDialogueEmotionValueConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetDialogueEmotionValueConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::IsWaterObjectFunction(
@@ -16221,7 +16242,7 @@ bool Script::IsWaterObjectFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::IsWaterObjectConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::IsWaterObjectConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetActorFactionPlayerEnemyFunction(
@@ -16234,7 +16255,7 @@ bool Script::GetActorFactionPlayerEnemyFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetActorFactionPlayerEnemyConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetActorFactionPlayerEnemyConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetPlayerGrabbedRefFunction(
@@ -16258,7 +16279,7 @@ bool Script::GetPlayerGrabbedRefFunction(
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetPlayerGrabbedRef >> (%08x)", v9);
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetDestructionStageFunction(
@@ -16271,7 +16292,7 @@ bool Script::GetDestructionStageFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetDestructionStageConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetDestructionStageConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetRadiationLevelFunction(
@@ -16284,7 +16305,7 @@ bool Script::GetRadiationLevelFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetRadiationLevel(apRefObject, nullptr, nullptr, afReturnValue);
+    return Script::GetRadiationLevel(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetMapMarkerVisibleFunction(
@@ -16297,7 +16318,7 @@ bool Script::GetMapMarkerVisibleFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetMapMarkerVisibleConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetMapMarkerVisibleConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetWeaponHealthPercFunction(
@@ -16310,7 +16331,7 @@ bool Script::GetWeaponHealthPercFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetWeaponHealthPercConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetWeaponHealthPercConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::ClearNoActivationSound(
@@ -16324,7 +16345,7 @@ bool Script::ClearNoActivationSound(
     uint32_t& auiOffset
 ) {
     FalloutAudio::ClearNoActivationSound();
-    return (bool)1;
+    return true;
 }
 
 bool Script::IsGreetingPlayerFunction(
@@ -16337,7 +16358,7 @@ bool Script::IsGreetingPlayerFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::IsGreetingPlayerConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::IsGreetingPlayerConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetIgnoreCrimeFunction(
@@ -16350,7 +16371,7 @@ bool Script::GetIgnoreCrimeFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return (bool)Script::GetIgnoreCrimeConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetIgnoreCrimeConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::ResetPipboyManagerFunction(
@@ -16365,9 +16386,9 @@ bool Script::ResetPipboyManagerFunction(
 ) {
     FOPipboyManager* pipboyManager = Interface::GetPipboy();
     if (pipboyManager) {
-        pipboyManager->SetPipBoyManagerReset(1);
+        pipboyManager->SetPipBoyManagerReset(true);
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::ForceTerminalBackFunction(
@@ -16391,7 +16412,7 @@ bool Script::ForceTerminalBackFunction(
     if (menu) {
         menu->DisplayPreviousTerminal();
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::RadioShutOffFunction(
@@ -16404,8 +16425,8 @@ bool Script::RadioShutOffFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    FalloutRadio::PipboyRadioEnable(0);
-    return (bool)1;
+    FalloutRadio::PipboyRadioEnable(false);
+    return true;
 }
 
 bool Script::GetCurrentTimeFunction(
@@ -16445,9 +16466,9 @@ bool Script::ResetInventoryFunction(
     uint32_t& auiOffset
 ) {
     if (apRefObject) {
-        apRefObject->ResetInventory((bool)0);
+        apRefObject->ResetInventory(false);
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::AddFlamesFunction(
@@ -16474,7 +16495,7 @@ bool Script::AddFlamesFunction(
             if (0.0 != afReturnValue) {
                 apNode->UpdateProperties();
                 a2.~NiUpdateData();
-                ::new (&a2) NiUpdateData(0.0, 1, 0);
+                ::new (&a2) NiUpdateData(0.0, true, false);
                 apNode->Update(a2);
             }
             if (Script::GetThreadSystemOutput()) {
@@ -16482,7 +16503,7 @@ bool Script::AddFlamesFunction(
             }
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::PlayBinkFunction(
@@ -16510,7 +16531,7 @@ bool Script::PlayBinkFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, source, &v16,
             &bFadeAudio, &v17, &v15
         )) {
-        return (bool)0;
+        return false;
     }
     if (bFadeAudio) {
         v10 = &BSAudio::QInstance();
@@ -16519,13 +16540,13 @@ bool Script::PlayBinkFunction(
     else {
         if (!bMultiThreadedAudio) {
             v11 = &BSAudio::QInstance();
-            v11->SetMultiThreaded(1);
+            v11->SetMultiThreaded(true);
         }
     }
     pIOManager->Pause();
     pMoviePlayer->Play(
-        static_cast<const char*>(static_cast<const void*>(source)), v16 != 0, 0, 0, 0, v15 != 0, 0, bFadeAudio != 0,
-        v17 != 0
+        static_cast<const char*>(static_cast<const void*>(source)), v16 != 0, false, false, false, v15 != 0, false,
+        bFadeAudio != 0, v17 != 0
     );
     pIOManager->Resume();
     if (bFadeAudio) {
@@ -16535,10 +16556,10 @@ bool Script::PlayBinkFunction(
     else {
         if (!bMultiThreadedAudio) {
             v13 = &BSAudio::QInstance();
-            v13->SetMultiThreaded(0);
+            v13->SetMultiThreaded(false);
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::StopCombatAlarmOnActorFunction(
@@ -16555,11 +16576,11 @@ bool Script::StopCombatAlarmOnActorFunction(
     if (apRefObject) {
         a1 = static_cast<PlayerCharacter*>(dynamic_cast<Actor*>(apRefObject));
         if (a1) {
-            (&ReferenceProcessLists)->StopCombatandAlarmonActor(a1, 0);
+            (&ReferenceProcessLists)->StopCombatandAlarmonActor(a1, false);
             a1->StopCombat(nullptr);
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetArmorRatingUpperFunction(
@@ -16586,7 +16607,7 @@ bool Script::FreezeRendererAccumulation(
     uint32_t& auiOffset
 ) {
     Interface::PrintLine("Deprecated, use TFC 2 instead");
-    return (bool)1;
+    return true;
 }
 
 void Script::SetAngleBase(TESObjectREFR* apRefObject, char acAxis, float afValue) {
@@ -16615,10 +16636,10 @@ void Script::SetAngleBase(TESObjectREFR* apRefObject, char acAxis, float afValue
         if (v6) {
             orientation = &(result = apRefObject->GetOrientation());
             v6->SetRotate(*orientation);
-            bhkNiCollisionObject::ResetSim(v6, 1);
+            bhkNiCollisionObject::ResetSim(v6, true);
             if (!apRefObject->GetAnimation()) {
                 a2.~NiUpdateData();
-                ::new (&a2) NiUpdateData(0.0, 0, 0);
+                ::new (&a2) NiUpdateData(0.0, false, false);
                 v6->Update(a2);
             }
         }
@@ -16654,14 +16675,14 @@ bool Script::ReloadCurrentClimate(
     TESFile* file = pClimate->GetFile((-1));
     if (file) {
         pFile = file->GetThreadSafeFile();
-        pFile->OpenTES(NiFile::READ_ONLY, (bool)0);
+        pFile->OpenTES(NiFile::READ_ONLY, false);
         pFile->FindForm(pClimate);
         pClimate->ClearData();
         pClimate->Load(pFile);
         pSky = Sky::GetInstance();
-        pSky->SetCurrentClimate(pClimate, 1);
+        pSky->SetCurrentClimate(pClimate, true);
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::ForceCloseFile(
@@ -16680,14 +16701,14 @@ bool Script::ForceCloseFile(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return (bool)0;
+        return false;
     }
     if (a8[0]) {
         listFile = pDataHandler->GetListFile(static_cast<const char*>(static_cast<const void*>(a8)));
         if (listFile) {
-            pDataHandler->SetIsClosingFile(1);
+            pDataHandler->SetIsClosingFile(true);
             listFile->CloseTES();
-            pDataHandler->SetIsClosingFile(0);
+            pDataHandler->SetIsClosingFile(false);
             if (Script::GetThreadSystemOutput()) {
                 Interface::PrintLine("Closed file '%s'.", a8);
             }
@@ -16703,7 +16724,7 @@ bool Script::ForceCloseFile(
             Interface::PrintLine("ERR: No Filename.");
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::GetSecondsPassedFunction(
@@ -16745,7 +16766,7 @@ bool Script::StopCombatFunction(
             }
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::RemoveFlamesFunction(
@@ -16772,7 +16793,7 @@ bool Script::RemoveFlamesFunction(
             }
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool Script::RevokeCodeFunction(
@@ -16789,15 +16810,15 @@ bool Script::RevokeCodeFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return (bool)0;
+        return false;
     }
     XGamerProfile* singleton = XGamerProfile::Instance();
     singleton->RevokeCode(static_cast<const char*>(static_cast<const void*>(a8)));
-    return (bool)1;
+    return true;
 }
 
 void Script::SavePendingReferences(BGSSaveGameBuffer* a1) {
-    Script::ScriptRefListCrit.Enter(0);
+    Script::ScriptRefListCrit.Enter(nullptr);
     uint32_t aiVariableValue = 0;
     uint32_t aiPosition = a1->StartVariableSizedValue();
     for (BSSimpleList<TESObjectREFR*>* ecx0 = &Script::ReferencesToEnable; ecx0; ecx0 = ecx0->m_pkNext) {
@@ -16860,7 +16881,7 @@ bool Script::ToggleOcclusion(
         v1 = "off";
     }
     Interface::PrintLine("Occlusion Query : %s", v1);
-    return 1;
+    return true;
 }
 
 bool Script::GetActorValueInfoFunction(
@@ -16878,7 +16899,7 @@ bool Script::GetActorValueInfoFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &iIndex
         )) {
-        return 0;
+        return false;
     }
     if (GetThreadTLSData()->bSystemOutput) {
         if (apRefObject) {
@@ -16938,7 +16959,7 @@ bool Script::GetActorValueInfoFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetPosFunction(
@@ -16957,7 +16978,7 @@ bool Script::SetPosFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &cAxis, &fPos
         )) {
-        return 0;
+        return false;
     }
     if (!apRefObject || apRefObject->CanBeMoved()) {
         if (iNumHWThreads.Int() <= 1) {
@@ -16966,7 +16987,7 @@ bool Script::SetPosFunction(
         else {
             TaskQueueInterface::GetInstance()->QueueScriptFunctionCall(0x1007u, apRefObject, cAxis, fPos);
         }
-        return 1;
+        return true;
     }
     else {
         if (GetThreadTLSData()->bSystemOutput) {
@@ -16982,7 +17003,7 @@ bool Script::SetPosFunction(
                 apScript->GetFormEditorID(), v10, afValue, afValue_4
             );
         }
-        return 1;
+        return true;
     }
 }
 
@@ -17017,8 +17038,8 @@ void Script::SetPosBase(TESObjectREFR* apRefObject, char acAxis, float afValue) 
         NiAVObject* obj3D = apRefObject->Get3D();
         if (obj3D) {
             obj3D->SetTranslate(pos);
-            bhkNiCollisionObject::ResetSim(obj3D, 1);
-            NiUpdateData UpdateData(0.0f, 0, 0);
+            bhkNiCollisionObject::ResetSim(obj3D, true);
+            NiUpdateData UpdateData(0.0f, false, false);
             obj3D->Update(UpdateData);
         }
     }
@@ -17049,7 +17070,7 @@ bool Script::ShowVarsFunction(
                     pList = pList->m_pkNext;
                     if (ownerLocals->IsReferenceVariable(pVar->data.uiID)) {
                         uint32_t iid = 0;
-                        double fval = ownerLocals->GetVariable(pVar->data.uiID, 0);
+                        double fval = ownerLocals->GetVariable(pVar->data.uiID, nullptr);
                         Script::GetNumericIDFromDouble(iid, fval);
                         uint32_t v13 = iid;
                         char* v6 = pVar->cName.pString;
@@ -17057,12 +17078,12 @@ bool Script::ShowVarsFunction(
                     }
                     else {
                         if (pVar->data.bIsInteger) {
-                            int32_t Variable = static_cast<int32_t>(ownerLocals->GetVariable(pVar->data.uiID, 0));
+                            int32_t Variable = static_cast<int32_t>(ownerLocals->GetVariable(pVar->data.uiID, nullptr));
                             char* v7 = pVar->cName.pString;
                             Interface::PrintLine("%s->%s = %d", ownerScript->GetFormEditorID(), v7, Variable);
                         }
                         else {
-                            double v8 = ownerLocals->GetVariable(pVar->data.uiID, 0);
+                            double v8 = ownerLocals->GetVariable(pVar->data.uiID, nullptr);
                             char* v4 = pVar->cName.pString;
                             Interface::PrintLine("%s->%s = %0.4f", ownerScript->GetFormEditorID(), v4, v8);
                         }
@@ -17073,7 +17094,7 @@ bool Script::ShowVarsFunction(
         }
         if (apRefObject->HasContainer()) {
             InventoryChanges* pinventory = InventoryChanges::GetInventoryChanges(apRefObject);
-            int32_t iCount = pinventory->GetCount(1);
+            int32_t iCount = pinventory->GetCount(true);
             for (int32_t i = 0; i < iCount; ++i) {
                 ItemChange* pitem = pinventory->GetItembyIndex(i);
                 if (pitem) {
@@ -17090,7 +17111,7 @@ bool Script::ShowVarsFunction(
                                 pList_2 = pList_2->m_pkNext;
                                 if (ownerLocals_2->IsReferenceVariable(pVar_2->data.uiID)) {
                                     uint32_t iid_2 = 0;
-                                    double fval_2 = ownerLocals_2->GetVariable(pVar_2->data.uiID, 0);
+                                    double fval_2 = ownerLocals_2->GetVariable(pVar_2->data.uiID, nullptr);
                                     Script::GetNumericIDFromDouble(iid_2, fval_2);
                                     uint32_t v15 = iid_2;
                                     char* v9 = pVar_2->cName.pString;
@@ -17098,13 +17119,14 @@ bool Script::ShowVarsFunction(
                                 }
                                 else {
                                     if (pVar_2->data.bIsInteger) {
-                                        int32_t v16 =
-                                            static_cast<int32_t>(ownerLocals_2->GetVariable(pVar_2->data.uiID, 0));
+                                        int32_t v16 = static_cast<int32_t>(
+                                            ownerLocals_2->GetVariable(pVar_2->data.uiID, nullptr)
+                                        );
                                         char* v10 = pVar_2->cName.pString;
                                         Interface::PrintLine("%s->%s = %d", ownerScript_2->GetFormEditorID(), v10, v16);
                                     }
                                     else {
-                                        double v11 = ownerLocals_2->GetVariable(pVar_2->data.uiID, 0);
+                                        double v11 = ownerLocals_2->GetVariable(pVar_2->data.uiID, nullptr);
                                         char* v5 = pVar_2->cName.pString;
                                         Interface::PrintLine(
                                             "%s->%s = %0.4f", ownerScript_2->GetFormEditorID(), v5, v11
@@ -17151,7 +17173,7 @@ bool Script::ShowVarsFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::StartConversation(
@@ -17170,23 +17192,23 @@ bool Script::StartConversation(
     int32_t bHeadTrack;
     int32_t bMove;
     TESObjectREFR* pLocationSpeaker;
-    ptarget = 0;
-    ptopic = 0;
-    pLocationSpeaker = 0;
-    pLocationTarget = 0;
+    ptarget = nullptr;
+    ptopic = nullptr;
+    pLocationSpeaker = nullptr;
+    pLocationTarget = nullptr;
     bHeadTrack = 1;
     bMove = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &ptarget,
             &ptopic, &pLocationSpeaker, &pLocationTarget, &bHeadTrack, &bMove
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (ptarget) {
             if (!apRefObject->GetDisabled() && !ptarget->GetDisabled()) {
-                PackageLocation* ploc1 = 0;
-                PackageLocation* ploc2 = 0;
+                PackageLocation* ploc1 = nullptr;
+                PackageLocation* ploc2 = nullptr;
                 PackageLocation tempFirstLoc;
                 PackageLocation tempSecondLoc;
                 if (pLocationSpeaker) {
@@ -17197,11 +17219,11 @@ bool Script::StartConversation(
                     ploc2 = &tempSecondLoc;
                     tempSecondLoc.SetLocReference(pLocationTarget);
                 }
-                MobileObject* pactor = 0;
+                MobileObject* pactor = nullptr;
                 if (apRefObject->IsActor()) {
                     pactor = static_cast<MobileObject*>(apRefObject);
                 }
-                MobileObject* ptargetchar = 0;
+                MobileObject* ptargetchar = nullptr;
                 if (ptarget->IsActor()) {
                     ptargetchar = static_cast<MobileObject*>(ptarget);
                 }
@@ -17215,17 +17237,17 @@ bool Script::StartConversation(
                        (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING ||
                         (Script::IsPendingFadeDisabledReference(pactor) ||
                          Script::IsPendingFadeDisabledReference(ptargetchar))))))) {
-                    apRefObject->Activate(ptarget, 0, 0, 1);
+                    apRefObject->Activate(ptarget, false, nullptr, 1);
                 }
                 else {
                     if (pactor == pPlayer) {
-                        ptargetchar->Activate(pPlayer, 0, 0, 1);
+                        ptargetchar->Activate(pPlayer, false, nullptr, 1);
                     }
                     else {
                         if (pactor->pCurrentProcess) {
                             if (ptargetchar->pCurrentProcess) {
                                 pactor->InitiateDialogue(
-                                    ptargetchar, ploc1, ploc2, bHeadTrack == 1, bMove == 1, 0, ptopic, 0, 0
+                                    ptargetchar, ploc1, ploc2, bHeadTrack == 1, bMove == 1, false, ptopic, false, false
                                 );
                                 DialoguePackage* ppack = static_cast<DialoguePackage*>(pactor->GetCurrentPackage());
                                 if (ppack) {
@@ -17240,7 +17262,7 @@ bool Script::StartConversation(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::CompleteAllQuestStages(
@@ -17254,14 +17276,14 @@ bool Script::CompleteAllQuestStages(
     uint32_t& auiOffset
 ) {
     bool bwason = Script::GetProcessScripts();
-    Script::SetProcessScripts(0);
+    Script::SetProcessScripts(false);
     for (BSSimpleList<TESQuest*>* plist = pDataHandler->GetQuestList(); plist && !plist->IsEmpty();
          plist = plist->m_pkNext) {
         TESQuest* pquest = plist->m_item;
         for (BSSimpleList<TESQuestStage*>* pstagelist = &pquest->m_listStages; pstagelist && !pstagelist->IsEmpty();
              pstagelist = pstagelist->m_pkNext) {
             TESQuestStage** v8 = &pstagelist->m_item;
-            (*v8)->SetDone(pquest, 1);
+            (*v8)->SetDone(pquest, true);
         }
         for (BSSimpleList<BGSQuestObjective*>* pobjlist = pquest->GetObjectiveList(); pobjlist && !pobjlist->IsEmpty();
              pobjlist = pobjlist->m_pkNext) {
@@ -17274,7 +17296,7 @@ bool Script::CompleteAllQuestStages(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("All Quest Stages Completed.", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetObjectiveCompletedFunction(
@@ -17294,7 +17316,7 @@ bool Script::SetObjectiveCompletedFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pQuest,
             &uiIndex, &iCompleted
         )) {
-        return 0;
+        return false;
     }
     if (pQuest) {
         BGSQuestObjective* pObjective = pQuest->GetObjective(uiIndex);
@@ -17321,7 +17343,7 @@ bool Script::SetObjectiveCompletedFunction(
         uint32_t uiFormID = pQuest->iFormID;
         Warning("Script error: quest %s (%08X) does not exist.", pQuest->GetEditorName(), uiFormID);
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetMPSParticleMax(
@@ -17339,13 +17361,13 @@ bool Script::SetMPSParticleMax(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8 >= 0x10000) {
-        return 0;
+        return false;
     }
     BSPSysMultiTargetEmitterCtlr::SetMaxParticlesPerEmitter(a8);
-    return 1;
+    return true;
 }
 
 bool Script::GetDistanceFunction(
@@ -17359,11 +17381,11 @@ bool Script::GetDistanceFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetDistanceConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetDistanceConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetInZoneFunction(
@@ -17377,11 +17399,11 @@ bool Script::GetInZoneFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetInZoneConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetInZoneConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::AddItemFunction(
@@ -17397,22 +17419,22 @@ bool Script::AddItemFunction(
     int32_t iCount;
     int32_t iSilent;
     TESForm* pWeap;
-    pWeap = 0;
+    pWeap = nullptr;
     iCount = 0;
     iSilent = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pWeap,
             &iCount, &iSilent
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
-        uint32_t icalclevel = apRefObject->GetCalcLevel(0);
+        uint32_t icalclevel = apRefObject->GetCalcLevel(false);
         TESContainer tempcont;
-        TESLevItem* plevitem = 0;
-        BGSListForm* pformlist = 0;
-        TESBoundObject* pobject = 0;
-        bool bWeap = 0;
+        TESLevItem* plevitem = nullptr;
+        BGSListForm* pformlist = nullptr;
+        TESBoundObject* pobject = nullptr;
+        bool bWeap = false;
         int32_t FormType = pWeap->GetFormType();
         if (FormType != 40) {
             if (FormType == 52) {
@@ -17439,13 +17461,13 @@ bool Script::AddItemFunction(
                         TESForm* paddform = plist->m_item;
                         plist = plist->m_pkNext;
                         if (paddform->IsBoundObject()) {
-                            tempcont.AddObject(static_cast<TESObject*>(paddform), iCount, 0);
+                            tempcont.AddObject(static_cast<TESObject*>(paddform), iCount, nullptr);
                         }
                     }
                 }
                 else {
                     if (pobject && iCount) {
-                        tempcont.AddObject(pobject, iCount, 0);
+                        tempcont.AddObject(pobject, iCount, nullptr);
                     }
                     else {
                         Warning(
@@ -17460,14 +17482,14 @@ bool Script::AddItemFunction(
             tempcont.AddContainerToReference(apRefObject, iSilent == 1);
             if (apRefObject->IsActor() && apRefObject != pPlayer && apRefObject->IsNpc()) {
                 BipedAnim* v9 = apRefObject->GetBiped();
-                static_cast<TESNPC*>(apRefObject->GetObjectReference())->TESNPC::InitParts(apRefObject, v9, 1);
+                static_cast<TESNPC*>(apRefObject->GetObjectReference())->TESNPC::InitParts(apRefObject, v9, true);
             }
-            return 1;
+            return true;
         }
-        bWeap = 1;
+        bWeap = true;
         goto LABEL_11;
     }
-    return 1;
+    return true;
 }
 
 bool Script::RemoveItemFunction(
@@ -17483,15 +17505,15 @@ bool Script::RemoveItemFunction(
     int32_t icount;
     int32_t isilent;
     TESForm* pformlist;
-    pformlist = 0;
-    TESBoundObject* pobject = 0;
+    pformlist = nullptr;
+    TESBoundObject* pobject = nullptr;
     icount = 0;
     isilent = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pformlist,
             &icount, &isilent
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (pformlist) {
@@ -17532,26 +17554,28 @@ bool Script::RemoveItemFunction(
                 Actor* pactor = dynamic_cast<Actor*>(apRefObject);
                 if (pactor) {
                     double iActualCount = static_cast<double>(iremovecount);
-                    Script::GetItemCountConditionFunction(apRefObject, pobject, 0, iActualCount);
+                    Script::GetItemCountConditionFunction(apRefObject, pobject, nullptr, iActualCount);
                     if (static_cast<double>(iremovecount) > iActualCount) {
                         iremovecount = static_cast<int32_t>(iActualCount);
                     }
-                    ExtraDataList* pextra = 0;
+                    ExtraDataList* pextra = nullptr;
                     if (pactor->WearingObject(pobject)) {
                         InventoryChanges* pinventory = InventoryChanges::GetInventoryChanges(apRefObject);
                         if (pinventory) {
-                            pextra = pinventory->WearingObject(pobject, 0);
+                            pextra = pinventory->WearingObject(pobject, false);
                             if (pextra) {
-                                pextra->SetCanNotWear(0);
+                                pextra->SetCanNotWear(false);
                             }
                         }
                     }
                     if (iremovecount > 0) {
                         bool bworn = pactor->WearingObject(pobject);
                         if (bworn) {
-                            pactor->Dispel(pobject, 1);
+                            pactor->Dispel(pobject, true);
                         }
-                        pactor->RemoveItem(pobject, pextra, iremovecount, 0, 0, 0, 0, 0, 1, 0);
+                        pactor->RemoveItem(
+                            pobject, pextra, iremovecount, false, false, nullptr, nullptr, nullptr, true, false
+                        );
                         if (pactor == pPlayer) {
                             if (!isilent) {
                                 BSStringT<char> pstring;
@@ -17570,15 +17594,15 @@ bool Script::RemoveItemFunction(
                                     case ARMO_ID: {
                                         const char* apSoundName;
                                         if (isilent) {
-                                            apSoundName = 0;
+                                            apSoundName = nullptr;
                                         }
                                         else {
-                                            apSoundName = pPlayer->GetPickUpSoundName(pobject, 0, 0);
+                                            apSoundName = pPlayer->GetPickUpSoundName(pobject, false, false);
                                         }
                                         Interface::ShowMessage(
                                             pstring.pString, 0,
                                             "Interface\\Icons\\Message Icons\\glow_message_vaultboy_neutral.dds",
-                                            apSoundName, 2.0f, 0
+                                            apSoundName, 2.0f, false
                                         );
                                         break;
                                     }
@@ -17596,15 +17620,15 @@ bool Script::RemoveItemFunction(
                                     case CMNY_ID: {
                                         const char* soundName;
                                         if (isilent) {
-                                            soundName = 0;
+                                            soundName = nullptr;
                                         }
                                         else {
-                                            soundName = pPlayer->GetPickUpSoundName(pobject, 0, 0);
+                                            soundName = pPlayer->GetPickUpSoundName(pobject, false, false);
                                         }
                                         Interface::ShowMessage(
                                             pstring.pString, 0,
                                             "Interface\\Icons\\Message Icons\\glow_message_vaultboy_neutral.dds",
-                                            soundName, 2.0f, 0
+                                            soundName, 2.0f, false
                                         );
                                         break;
                                     }
@@ -17620,7 +17644,7 @@ bool Script::RemoveItemFunction(
                                 if (pactor->pCurrentProcess) {
                                     if (pactor->Get3D()) {
                                         BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
-                                        CurrentAIProcess->ProcessRemoveWorn(pactor, 0);
+                                        CurrentAIProcess->ProcessRemoveWorn(pactor, false);
                                     }
                                 }
                             }
@@ -17628,12 +17652,14 @@ bool Script::RemoveItemFunction(
                     }
                 }
                 else {
-                    apRefObject->RemoveItem(pobject, 0, iremovecount, 0, 0, 0, 0, 0, 1, 0);
+                    apRefObject->RemoveItem(
+                        pobject, nullptr, iremovecount, false, false, nullptr, nullptr, nullptr, true, false
+                    );
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleDialogSubtitle(
@@ -17651,10 +17677,10 @@ bool Script::ToggleDialogSubtitle(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     ReferenceProcessLists.bShowSubtitle = a8 != 0;
-    return 1;
+    return true;
 }
 
 // KEEP: when ParseParameters fails the exe never writes apString1 ([ebp-0x11C]), yet formats it into the model and
@@ -17687,12 +17713,12 @@ bool Script::OutputMemStats(
     }
     MemoryManagerFile file(input);
     MemoryManager* pManager = &MemoryManager::Instance();
-    pManager->OutputDebugInfo(&file, 0);
+    pManager->OutputDebugInfo(&file, false);
     BSsprintf(input, 512, "ModelDump%s.txt", apString1);
-    BSFile outfile(input, NiFile::WRITE_ONLY, 0x4000, 0);
-    outfile.BSFile::Open(0, 0);
+    BSFile outfile(input, NiFile::WRITE_ONLY, 0x4000, false);
+    outfile.BSFile::Open(false, false);
     if (pModelLoader) {
-        pModelLoader->OutputModelMapContents(&outfile, 0);
+        pModelLoader->OutputModelMapContents(&outfile, false);
     }
     if (BSFaceGenManager::GetModelCache()) {
         BSFaceGenModelMap* pModelCache = BSFaceGenManager::GetModelCache();
@@ -17700,8 +17726,8 @@ bool Script::OutputMemStats(
     }
     outfile.Close();
     BSsprintf(input, 512, "TextureDump%s.txt", apString1);
-    BSFile outfile2(input, NiFile::WRITE_ONLY, 0x4000, 0);
-    outfile2.BSFile::Open(0, 0);
+    BSFile outfile2(input, NiFile::WRITE_ONLY, 0x4000, false);
+    outfile2.BSFile::Open(false, false);
     int32_t imaxtex = 2048;
     rt::eh_vector_constructor_iterator(
         pLargestTex, sizeof(NiPointer<NiTexture>), imaxtex, &fnvd::constructElement<NiPointer<NiRefObject>>,
@@ -17741,7 +17767,7 @@ bool Script::OutputMemStats(
             const char* pquality;
             char Str[264];
             char buf[512];
-            bool bsystemtex = 0;
+            bool bsystemtex = false;
             if (NiObject::IsKindOf_0(&NiSourceTexture::ms_RTTI, pLargestTex[i_3].m_pObject)) {
                 NiSourceTexture* psrctex = static_cast<NiSourceTexture*>(pLargestTex[i_3].m_pObject);
                 const NiFixedString* pfilename = &psrctex->GetFilename();
@@ -17757,7 +17783,7 @@ bool Script::OutputMemStats(
                 }
             }
             else {
-                bsystemtex = 1;
+                bsystemtex = true;
                 const char* ptexname_2 = (&pLargestTex[i_3].m_pObject->m_kName)->GetHandleString();
                 if (ptexname_2 && *ptexname_2) {
                     BSsprintf(Str, 260, "RENDERED_TEXTURE (%s)", ptexname_2);
@@ -17837,7 +17863,7 @@ bool Script::OutputMemStats(
     rt::eh_vector_destructor_iterator(
         pLargestTex, sizeof(NiPointer<NiTexture>), 2048, &fnvd::destructElement<NiPointer<NiRefObject>>
     );
-    return 1;
+    return true;
 }
 
 bool Script::OutputMemStatsFullWalk(
@@ -17860,8 +17886,8 @@ bool Script::OutputMemStatsFullWalk(
     }
     MemoryManagerFile result_1(a8);
     MemoryManager* v8 = &MemoryManager::Instance();
-    v8->OutputDebugInfo(&result_1, 1);
-    return 1;
+    v8->OutputDebugInfo(&result_1, true);
+    return true;
 }
 
 bool Script::ToggleMapMarkersFunction(
@@ -17884,13 +17910,13 @@ bool Script::ToggleMapMarkersFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &iturnon,
             &ienabletravel, &ishowall
         )) {
-        return 0;
+        return false;
     }
     BSSimpleList<TESWorldSpace*>* pworldlist = pDataHandler->GetWorldSpaceList();
     while (pworldlist && !pworldlist->IsEmpty()) {
         TESWorldSpace* pworld = pworldlist->m_item;
         pworldlist = pworldlist->m_pkNext;
-        BSSimpleList<TESObjectREFR*>* pmarkerlist = pworld->BuildMapMarkerList(0);
+        BSSimpleList<TESObjectREFR*>* pmarkerlist = pworld->BuildMapMarkerList(false);
         if (pmarkerlist) {
             while (!pmarkerlist->IsEmpty()) {
                 TESObjectREFR* pref = pmarkerlist->m_item;
@@ -17905,7 +17931,7 @@ bool Script::ToggleMapMarkersFunction(
                     }
                     else {
                         pdata->SetIsVisible(0);
-                        pdata->SetTravelLoc(0);
+                        pdata->SetTravelLoc(false);
                     }
                     pref->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
                 }
@@ -17921,7 +17947,7 @@ bool Script::ToggleMapMarkersFunction(
             Interface::PrintLine("All map markers %s", "shown.");
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleGodModeFunction(
@@ -17938,7 +17964,7 @@ bool Script::ToggleGodModeFunction(
     bool IsGodMode = PlayerCharacter::IsGodMode();
     PlayerCharacter::SetGodMode(!IsGodMode);
     if (!PlayerCharacter::IsGodMode() && PlayerCharacter::IsDemigodMode()) {
-        PlayerCharacter::SetDemigodMode(0);
+        PlayerCharacter::SetDemigodMode(false);
         Interface::PrintLine("Demigod Mode disabled");
     }
     if (PlayerCharacter::IsGodMode()) {
@@ -17948,7 +17974,7 @@ bool Script::ToggleGodModeFunction(
         v10 = "disabled.";
     }
     Interface::PrintLine("God Mode %s", v10);
-    return 1;
+    return true;
 }
 
 bool Script::ToggleEmotionsFunction(
@@ -17971,7 +17997,7 @@ bool Script::ToggleEmotionsFunction(
         v2 = "Disabled.";
     }
     Interface::PrintLine("NPC Facial Emotions %s", v2);
-    return 1;
+    return true;
 }
 
 bool Script::RemoveImageSpaceModifier(
@@ -17986,15 +18012,15 @@ bool Script::RemoveImageSpaceModifier(
 ) {
     TESImageSpaceModifier* a8;
     float v10;
-    a8 = 0;
+    a8 = nullptr;
     v10 = 1.0f;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v10
         )) {
-        return 0;
+        return false;
     }
     ImageSpaceModifierInstanceForm::Stop(a8);
-    return 1;
+    return true;
 }
 
 bool Script::TestLocalMap(
@@ -18022,14 +18048,14 @@ bool Script::TestLocalMap(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &ifog
         )) {
-        return 0;
+        return false;
     }
     void* apMemory = NiMemObject::operator new(sizeof(NiNode));
     if (apMemory) {
         pnode = ::new (apMemory) NiNode(0);
     }
     else {
-        pnode = 0;
+        pnode = nullptr;
     }
     NiPoint3 playerloc = pPlayer->GetLocationOnReference();
     playerloc.z = playerloc.z + 10.0;
@@ -18056,15 +18082,15 @@ bool Script::TestLocalMap(
         int32_t isectx = static_cast<uint32_t>(itri) % static_cast<uint32_t>(*v9);
         int32_t* v10 = &uGridsToLoad.Int();
         int32_t isecty = static_cast<uint32_t>(itri) / static_cast<uint32_t>(*v10);
-        NiPointer<NiTexture> spmaptex(static_cast<NiTexture*>(0));
-        SeenData* pseendata = 0;
-        TESObjectCELL* pseencell = 0;
+        NiPointer<NiTexture> spmaptex(static_cast<NiTexture*>(nullptr));
+        SeenData* pseendata = nullptr;
+        TESObjectCELL* pseencell = nullptr;
         NiPoint3 sectoffset = NiPoint3_ZERO;
         if (pPlayer->GetInterior()) {
             pseencell = pPlayer->GetParentCell();
             if (pseencell) {
                 NiPoint3 playerintloc = playerloc;
-                pseencell->AdjustCoordForNorthRotation(playerloc, playerintloc, 1);
+                pseencell->AdjustCoordForNorthRotation(playerloc, playerintloc, true);
                 int32_t iseenx = (FloatToInt(playerintloc.x) - 2048) >> 12;
                 int32_t iseeny = (FloatToInt(playerintloc.y) - 2048) >> 12;
                 int32_t iintsectionx = isectx + iseenx - (imapside >> 1);
@@ -18073,7 +18099,7 @@ bool Script::TestLocalMap(
                     static_cast<float>((iintsectionx << 12) + 2048), static_cast<float>((iintsectiony << 12) + 2048),
                     0.0f
                 );
-                pseendata = pseencell->GetIntSeenSection(iintsectionx, iintsectiony, 0);
+                pseendata = pseencell->GetIntSeenSection(iintsectionx, iintsectiony, false);
                 pseencell->GetInteriorLocalMapTexture(iintsectionx, iintsectiony, spmaptex);
             }
         }
@@ -18101,7 +18127,7 @@ bool Script::TestLocalMap(
             pverts = static_cast<NiPoint3*>(ptr);
         }
         else {
-            pverts = 0;
+            pverts = nullptr;
         }
         NiPoint3* v73 = pverts;
         NiPoint3* pverts_2 = pverts;
@@ -18112,7 +18138,7 @@ bool Script::TestLocalMap(
             pnorm = static_cast<NiPoint3*>(v69);
         }
         else {
-            pnorm = 0;
+            pnorm = nullptr;
         }
         NiPoint3* v70 = pnorm;
         NiPoint3* pnorm_2 = pnorm;
@@ -18123,7 +18149,7 @@ bool Script::TestLocalMap(
             ptex = static_cast<NiPoint2*>(v66);
         }
         else {
-            ptex = 0;
+            ptex = nullptr;
         }
         NiPoint2* v67 = ptex;
         NiPoint2* ptex_2 = ptex;
@@ -18134,7 +18160,7 @@ bool Script::TestLocalMap(
             pcolor = static_cast<NiColorA*>(v63);
         }
         else {
-            pcolor = 0;
+            pcolor = nullptr;
         }
         NiColorA* a1 = pcolor;
         NiColorA* pcolor_2 = pcolor;
@@ -18216,7 +18242,7 @@ bool Script::TestLocalMap(
             );
         }
         else {
-            ptri = 0;
+            ptri = nullptr;
         }
         NiTriShape* v58 = ptri;
         NiTriShape* ptri_2 = ptri;
@@ -18234,7 +18260,7 @@ bool Script::TestLocalMap(
                 ptexprop = ::new (v55) NiTexturingProperty;
             }
             else {
-                ptexprop = 0;
+                ptexprop = nullptr;
             }
             NiTexturingProperty* v56 = ptexprop;
             NiProperty* ptexprop_2 = ptexprop;
@@ -18244,14 +18270,14 @@ bool Script::TestLocalMap(
                 ->NiTexturingProperty::SetBaseClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
             static_cast<NiTexturingProperty*>(ptexprop_2)->SetApplyMode(NiTexturingProperty::APPLY_MODULATE);
             ptri_2->AttachProperty(ptexprop_2);
-            spmaptex.operator=(static_cast<NiTexture*>(0));
+            spmaptex.operator=(static_cast<NiTexture*>(nullptr));
         }
     }
     NiPoint3 playerpos = pPlayer->GetLocationOnReference();
     if (pPlayer->GetInterior()) {
         NiPoint3 playerintloc_2;
         const NiPoint3* v21 = &pPlayer->GetLocationOnReference();
-        pPlayer->GetParentCell()->AdjustCoordForNorthRotation(*v21, playerintloc_2, 1);
+        pPlayer->GetParentCell()->AdjustCoordForNorthRotation(*v21, playerintloc_2, true);
         int32_t isectx_2 = (FloatToInt(playerintloc_2.x) - 2048) >> 12;
         int32_t isecty_2 = (FloatToInt(playerintloc_2.y) - 2048) >> 12;
         mapworldcenter = *::new (&v54) NiPoint3(
@@ -18279,7 +18305,7 @@ bool Script::TestLocalMap(
     NiPoint3 pointsw(-0.5f, -0.5f, 1.0f);
     NiColorA kColor(1.0f, 0.0f, 0.0f, 0.0f);
     NiColorA* a3d = &kColor;
-    NiTriShape* pmark = MakeTriangle(pointn, pointse, pointsw, *a3d, 1);
+    NiTriShape* pmark = MakeTriangle(pointn, pointse, pointsw, *a3d, true);
     pmark->SetTranslate(playeroffset);
     markrot = NiMatrix3_IDENTITY;
     double NorthRotation = pPlayer->GetParentCell()->GetNorthRotation();
@@ -18288,11 +18314,11 @@ bool Script::TestLocalMap(
     pmark->SetRotate(markrot);
     pnode->AttachChild(pmark, 1);
     pnode->SetTranslate(playerloc);
-    NiUpdateData UpdateData(0.0f, 0, 0);
+    NiUpdateData UpdateData(0.0f, false, false);
     pnode->Update(UpdateData);
     pnode->UpdateProperties();
     TES::pInstance->AddTempDebugObject(pnode, 30.0f);
-    return 1;
+    return true;
 }
 
 bool Script::ToggleMagicStatsFunction(
@@ -18315,7 +18341,7 @@ bool Script::ToggleMagicStatsFunction(
         v10 = "hidden.";
     }
     Interface::PrintLine("Magic stats %s", v10);
-    return 1;
+    return true;
 }
 
 bool Script::SaveWorldFunction(
@@ -18332,10 +18358,10 @@ bool Script::SaveWorldFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
     TES::pInstance->SaveWorld(a8);
-    return 1;
+    return true;
 }
 
 bool Script::ToggleMenus(
@@ -18360,7 +18386,7 @@ bool Script::ToggleMenus(
         }
         Interface::PrintLine("Menus -> %s", v1);
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleLeavesFunction(
@@ -18385,7 +18411,7 @@ bool Script::ToggleLeavesFunction(
         }
         Interface::PrintLine("Leaves -> %s", v10);
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleDetectionStats(
@@ -18400,11 +18426,11 @@ bool Script::ToggleDetectionStats(
 ) {
     Actor* a8;
     ReferenceProcessLists.bShowDetectionStats = !ReferenceProcessLists.bShowDetectionStats;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     ReferenceProcessLists.pStatdetect = a8;
     if (GetThreadTLSData()->bSystemOutput) {
@@ -18417,7 +18443,7 @@ bool Script::ToggleDetectionStats(
         }
         Interface::PrintLine("AI Detection stats printing is  %s", v9);
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetTargetRefraction(
@@ -18436,7 +18462,7 @@ bool Script::SetTargetRefraction(
         if (!Script::ParseParameters(
                 apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &famount
             )) {
-            return 0;
+            return false;
         }
         if (!apRefObject) {
             apRefObject = pPlayer;
@@ -18460,7 +18486,7 @@ bool Script::SetTargetRefraction(
             Interface::PrintLine("%s refraction has been set to %f", apRefObject->GetFullName(), famount);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetMotionBlur(
@@ -18478,12 +18504,12 @@ bool Script::SetMotionBlur(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     float afConst = a8;
     ImageSpaceManager* ImageSpaceManager_ = BSShaderManager::GetImageSpaceManager();
     ImageSpaceManager_->SetMotionBlurConst(afConst);
-    return 1;
+    return true;
 }
 
 bool Script::SetVelFunction(
@@ -18502,7 +18528,7 @@ bool Script::SetVelFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &cAxis, &fPos
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         NiPoint3 pos(0.0f, 0.0f, 0.0f);
@@ -18521,9 +18547,9 @@ bool Script::SetVelFunction(
             }
         }
         NiNode* v9 = apRefObject->Get3D();
-        TESHavokUtilities::AddVelocity(v9, pos, 1);
+        TESHavokUtilities::AddVelocity(v9, pos, true);
     }
-    return 1;
+    return true;
 }
 
 bool Script::ShowViewerStrings(
@@ -18545,12 +18571,12 @@ bool Script::ShowViewerStrings(
             v11 = ::new (apMemory) NiTPrimitiveArray<char*>(0, 1);
         }
         else {
-            v11 = 0;
+            v11 = nullptr;
         }
         if (v18) {
             if (v18->IsNode()) {
                 NiNode* v17 = v18;
-                v18 = 0;
+                v18 = nullptr;
                 uint32_t a1 = 0;
                 for (uint32_t i = v17->GetArrayCount(); a1 < i && !v18; i = v17->GetArrayCount()) {
                     v18 = static_cast<NiNode*>(v17->GetAt(a1++));
@@ -18559,7 +18585,7 @@ bool Script::ShowViewerStrings(
         }
         if (!v18) {
             Interface::PrintLine("Node with no children supplied as reference...");
-            return 1;
+            return true;
         }
         v18->GetViewerStrings(v11);
         for (uint32_t uiIndex = 0; uiIndex < v11->m_usSize; ++uiIndex) {
@@ -18584,7 +18610,7 @@ bool Script::ShowViewerStrings(
     else {
         Interface::PrintLine("Must supply a valid reference to show viewer string.");
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleLODLand(
@@ -18603,11 +18629,11 @@ bool Script::ToggleLODLand(
         !Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
     BGSTerrainManager* terrainManager = TES::pInstance->pWorldSpace->GetTerrainManager();
     if (!terrainManager) {
-        return 1;
+        return true;
     }
     char v23 = 0;
     char v21 = 0;
@@ -18667,11 +18693,11 @@ bool Script::ToggleLODLand(
                 terrainManager->GetWaterLODRoot()->SetAppCulled(!AppCulled);
             }
         }
-        return 1;
+        return true;
     }
     else {
         Interface::PrintLine("Invalid parameter.  Please specify land, objects, trees, water, or all.");
-        return 1;
+        return true;
     }
 }
 
@@ -18694,11 +18720,11 @@ bool Script::SetLODObjectDistanceFunction(
         !Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &f0, &f1
         )) {
-        return 0;
+        return false;
     }
     BGSTerrainManager* pm = TES::pInstance->pWorldSpace->GetTerrainManager();
     if (!pm) {
-        return 1;
+        return true;
     }
     fBlockLoadDistanceLow.operator=(f0);
     fBlockLoadDistance.operator=(f1);
@@ -18713,7 +18739,7 @@ bool Script::SetLODObjectDistanceFunction(
     updatePos = *Translate;
     const NiPoint3* v11 = &pPlayer->GetLocationOnReference();
     pm->Update(*v11, BGSTerrainManager::UPDATE_LAND_AND_BLOCKS);
-    return 1;
+    return true;
 }
 
 bool Script::HighlightBodyPart(
@@ -18735,19 +18761,19 @@ bool Script::HighlightBodyPart(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, v14,
             &v13, v15
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (apRefObject->Get3D()) {
             BGSBodyPart::LIMB_ENUM v11 = static_cast<BGSBodyPart::LIMB_ENUM>(static_cast<int32_t>(a8));
             FOVATSEffectManager* VATSEffect = Interface::GetVATSEffect();
-            VATSEffect->SetTarget(apRefObject, v11, 0);
+            VATSEffect->SetTarget(apRefObject, v11, false);
             FOVATSEffectManager::VATS_EFFECT_MODE a2 = FOVATSEffectManager::SINGLE_TARGET;
             FOVATSEffectManager* v10 = Interface::GetVATSEffect();
             v10->SetEffectMode(a2);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::HighlightAdditionalReference(
@@ -18769,7 +18795,7 @@ bool Script::HighlightAdditionalReference(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, v14,
             v13, v15
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (apRefObject->Get3D()) {
@@ -18782,7 +18808,7 @@ bool Script::HighlightAdditionalReference(
             v11->SetEffectMode(a2);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::DeactivateAllHighlights(
@@ -18804,12 +18830,12 @@ bool Script::DeactivateAllHighlights(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, v14,
             v13, v15
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (apRefObject->Get3D()) {
             FOVATSEffectManager* VATSEffect = Interface::GetVATSEffect();
-            VATSEffect->SetTarget(0, BGSBodyPart::LIMB_TORSO, 0);
+            VATSEffect->SetTarget(nullptr, BGSBodyPart::LIMB_TORSO, false);
             FOVATSEffectManager* v10 = Interface::GetVATSEffect();
             v10->ClearMultiTargets();
             FOVATSEffectManager::VATS_EFFECT_MODE a2 = FOVATSEffectManager::SINGLE_TARGET;
@@ -18817,7 +18843,7 @@ bool Script::DeactivateAllHighlights(
             v11->SetEffectMode(a2);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::AddOcclusionPlane(
@@ -18838,13 +18864,13 @@ bool Script::AddOcclusionPlane(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &ksize.y,
             &ksize
         )) {
-        return 0;
+        return false;
     }
     if (ksize.x == 0.0 || ksize.y == 0.0) {
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
         BSPortalGraph* PortalGraph = ShadowSceneNode_->GetPortalGraph();
         PortalGraph->RemoveAllOccluders();
-        return 1;
+        return true;
     }
     else {
         BSOcclusionPlane* v15;
@@ -18866,14 +18892,14 @@ bool Script::AddOcclusionPlane(
             v15 = ::new (apMemory) BSOcclusionPlane(&kpos, &ksize, &kcamerarot);
         }
         else {
-            v15 = 0;
+            v15 = nullptr;
         }
         NiPointer<BSOcclusionPlane> spoccluder(v15);
         BSOcclusionPlane* angle = spoccluder.m_pObject;
         ShadowSceneNode* v12 = BSShaderManager::GetShadowSceneNode(0);
         BSPortalGraph* v13 = v12->GetPortalGraph();
         v13->AddOccluder(angle);
-        return 1;
+        return true;
     }
 }
 
@@ -18893,10 +18919,10 @@ bool Script::SetGlobalRadialBlur(
     float fdownstart;
     float frampdown;
     float fstart;
-    bool bret = 1;
+    bool bret = true;
     if (g_radialBlurIMOD) {
         ImageSpaceModifierInstance::Stop(g_radialBlurIMOD);
-        g_radialBlurIMOD = 0;
+        g_radialBlurIMOD = nullptr;
     }
     if (Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &fstrength,
@@ -18907,14 +18933,14 @@ bool Script::SetGlobalRadialBlur(
             fstrength, frampup, fstart, frampdown, fdownstart, *v8, 0.0f
         );
         if (g_radialBlurIMOD) {
-            g_radialBlurIMOD->SetPermanent(1);
+            g_radialBlurIMOD->SetPermanent(true);
         }
     }
     else {
         if (GetThreadTLSData()->bSystemOutput) {
             Interface::PrintLine("SetGlobalRadialBlur strength rampup start rampdown downstart");
         }
-        return 0;
+        return false;
     }
     return bret;
 }
@@ -18930,11 +18956,11 @@ bool Script::ToggleAI(
     uint32_t& auiOffset
 ) {
     Actor* pActor;
-    pActor = 0;
+    pActor = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pActor
         )) {
-        return 0;
+        return false;
     }
     if (!pActor) {
         pActor = dynamic_cast<Actor*>(apRefObject);
@@ -18971,7 +18997,7 @@ bool Script::ToggleAI(
             ReferenceProcessLists.TurnOffMovementinHigh();
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleFlyCam(
@@ -18989,26 +19015,26 @@ bool Script::ToggleFlyCam(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &ifreezeTime
         )) {
-        return 0;
+        return false;
     }
-    bool v11 = 0;
+    bool v11 = false;
     if (ifreezeTime != 4) {
         bool bisFlyCam;
         if ((ifreezeTime >= 1 && ifreezeTime <= 2) || ifreezeTime == 5) {
-            bisFlyCam = pPlayer->ToggleFlyCam(1);
+            bisFlyCam = pPlayer->ToggleFlyCam(true);
         }
         else {
-            bisFlyCam = pPlayer->ToggleFlyCam(0);
+            bisFlyCam = pPlayer->ToggleFlyCam(false);
         }
         v11 = bisFlyCam;
     }
     if (v11 && ifreezeTime >= 1) {
-        BSShaderProperty::PreviousTransform::SetFreeze(1);
+        BSShaderProperty::PreviousTransform::SetFreeze(true);
     }
     else {
-        BSShaderProperty::PreviousTransform::SetFreeze(0);
+        BSShaderProperty::PreviousTransform::SetFreeze(false);
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleNavMesh(
@@ -19026,7 +19052,7 @@ bool Script::ToggleNavMesh(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &eMode
         )) {
-        return 0;
+        return false;
     }
     if (eMode > 6) {
         eMode = 4;
@@ -19041,8 +19067,8 @@ bool Script::ToggleNavMesh(
         if (bIsDraw) {
             eMode = NavMeshRender::iNavMeshDrawMode;
             NavMeshRender* v10 = NavMeshRender::GetInstance();
-            v10->SetDraw(0);
-            bIsDraw = 0;
+            v10->SetDraw(false);
+            bIsDraw = false;
         }
         else {
             eMode = 0;
@@ -19053,21 +19079,21 @@ bool Script::ToggleNavMesh(
         if (bIsDraw) {
             eMode = NavMeshRender::iNavMeshDrawMode;
             NavMeshRender* v11 = NavMeshRender::GetInstance();
-            v11->SetDraw(0);
-            bIsDraw = 0;
+            v11->SetDraw(false);
+            bIsDraw = false;
         }
         eMode = 3;
     }
     if (eMode) {
-        NavMeshRender::bDrawTriangles = 1;
+        NavMeshRender::bDrawTriangles = true;
         if (eMode == 2) {
             NavMeshRender* v12 = NavMeshRender::GetInstance();
-            v12->SetTransparentOverLayMode(1);
+            v12->SetTransparentOverLayMode(true);
         }
         else {
             if (eMode == 1 || eMode == 3) {
                 NavMeshRender* v13 = NavMeshRender::GetInstance();
-                v13->SetTransparentOverLayMode(0);
+                v13->SetTransparentOverLayMode(false);
             }
         }
         NavMeshRender::iNavMeshDrawMode = eMode;
@@ -19076,7 +19102,7 @@ bool Script::ToggleNavMesh(
             if (CurrentCell) {
                 if (CurrentCell->GetInterior()) {
                     NavMeshRender* v16 = NavMeshRender::GetInstance();
-                    v16->AddDrawOnlyNavMeshes(CurrentCell, 0);
+                    v16->AddDrawOnlyNavMeshes(CurrentCell, false);
                 }
                 else {
                     int32_t v22 = (uGridsToLoad.Int() - 1) / 2;
@@ -19085,21 +19111,21 @@ bool Script::ToggleNavMesh(
                             TESWorldSpace* WorldSpace = CurrentCell->GetWorldSpace();
                             TESObjectCELL* apCell = WorldSpace->GetCellFromCellCoord(aiX, aiY);
                             NavMeshRender* v15 = NavMeshRender::GetInstance();
-                            v15->AddDrawOnlyNavMeshes(apCell, 0);
+                            v15->AddDrawOnlyNavMeshes(apCell, false);
                         }
                     }
                 }
             }
             NavMeshRender* v17 = NavMeshRender::GetInstance();
-            v17->SetDraw(1);
+            v17->SetDraw(true);
         }
     }
     else {
-        NavMeshRender::bDrawTriangles = 0;
+        NavMeshRender::bDrawTriangles = false;
         NavMeshRender* v18 = NavMeshRender::GetInstance();
-        v18->SetDraw(0);
+        v18->SetDraw(false);
     }
-    return 1;
+    return true;
 }
 
 bool Script::PickRefByIDFunction(
@@ -19113,11 +19139,11 @@ bool Script::PickRefByIDFunction(
     uint32_t& auiOffset
 ) {
     TESObjectREFR* pPickRef;
-    pPickRef = 0;
+    pPickRef = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pPickRef
         )) {
-        return 0;
+        return false;
     }
     if (pPickRef) {
         int32_t FormType = pPickRef->GetFormType();
@@ -19130,12 +19156,12 @@ bool Script::PickRefByIDFunction(
             int32_t v17 = static_cast<int32_t>(Singleton->GetFont(v14)->GetBaseLine() + 3.0) - 5;
             float a4 = static_cast<float>(v17);
             char* v11 = v16.pString;
-            DebugText* v10 = DebugText::Instance(1);
-            v10->Print(v11, 640.0f, a4, 2, -1, -1.0f, 0, 0);
+            DebugText* v10 = DebugText::Instance(true);
+            v10->Print(v11, 640.0f, a4, 2, -1, -1.0f, 0, nullptr);
             Interface::SetTargetREFR(pPickRef);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetActorValueFunction(
@@ -19149,11 +19175,11 @@ bool Script::GetActorValueFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetActorValueConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetActorValueConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetPermanentActorValueFunction(
@@ -19167,11 +19193,11 @@ bool Script::GetPermanentActorValueFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetPermanentActorValueConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetPermanentActorValueConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::SetActorValueFunction(
@@ -19191,7 +19217,7 @@ bool Script::SetActorValueFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v11
         )) {
-        return 0;
+        return false;
     }
     Actor* pActor = dynamic_cast<Actor*>(apRefObject);
     if (pActor) {
@@ -19207,7 +19233,7 @@ bool Script::SetActorValueFunction(
             pActor->SetActorValue(a8, v11);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ModActorValueFunction(
@@ -19226,7 +19252,7 @@ bool Script::ModActorValueFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &eIndex,
             &iValue
         )) {
-        return 0;
+        return false;
     }
     Actor* pActor = dynamic_cast<Actor*>(apRefObject);
     if (pActor) {
@@ -19240,10 +19266,10 @@ bool Script::ModActorValueFunction(
         }
         else {
             // Slot 234 (+0x3A8): the int32_t overload.
-            pActor->PermanentModActorValue(eIndex, iValue, static_cast<Actor*>(0));
+            pActor->PermanentModActorValue(eIndex, iValue, static_cast<Actor*>(nullptr));
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::RestoreActorValueFunction(
@@ -19263,7 +19289,7 @@ bool Script::RestoreActorValueFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v12
         )) {
-        return 0;
+        return false;
     }
     Actor* v10 = dynamic_cast<Actor*>(apRefObject);
     if (v10) {
@@ -19286,7 +19312,7 @@ bool Script::RestoreActorValueFunction(
             v10->RestoreActorValue(a8, v9);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ForceActorValueFunction(
@@ -19306,7 +19332,7 @@ bool Script::ForceActorValueFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v13
         )) {
-        return 0;
+        return false;
     }
     Actor* pActor = dynamic_cast<Actor*>(apRefObject);
     if (pActor) {
@@ -19321,10 +19347,10 @@ bool Script::ForceActorValueFunction(
         else {
             double v9 = static_cast<double>(v13);
             float v10 = v9 - pActor->GetActorFloatValue(a8);
-            pActor->PermanentModActorValue(a8, v10, 0);
+            pActor->PermanentModActorValue(a8, v10, nullptr);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsLimbGoneFunction(
@@ -19343,22 +19369,22 @@ bool Script::IsLimbGoneFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &iLimb,
             &iLastLimb
         )) {
-        return 0;
+        return false;
     }
     if (iLastLimb <= 0) {
         return Script::IsLimbGoneConditionFunction(
-            apRefObject, reinterpret_cast<void*>(static_cast<intptr_t>(iLimb)), 0, afReturnValue
+            apRefObject, reinterpret_cast<void*>(static_cast<intptr_t>(iLimb)), nullptr, afReturnValue
         );
     }
     if (apRefObject && apRefObject->IsActor()) {
         for (int32_t i = iLimb; i <= iLastLimb; ++i) {
             if (apRefObject->GetDismembered(static_cast<BGSBodyPart::LIMB_ENUM>(i))) {
                 afReturnValue = 1.0;
-                return 1;
+                return true;
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetLightingPassesFunction(
@@ -19375,7 +19401,7 @@ bool Script::SetLightingPassesFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, input
         )) {
-        return 0;
+        return false;
     }
     char* pcurrent = input;
     uint16_t passes = 0;
@@ -19388,7 +19414,7 @@ bool Script::SetLightingPassesFunction(
             passes |= 2u;
             passes |= 4u;
             passes |= 8u;
-            passes |= BSShaderManager::GetShaderLevel(0) < BSShaderManager::BSSM_SV_2_0 ? 0 : 32;
+            passes |= BSShaderManager::GetShaderLevel(false) < BSShaderManager::BSSM_SV_2_0 ? 0 : 32;
         }
         goto LABEL_55;
     }
@@ -19411,11 +19437,12 @@ bool Script::SetLightingPassesFunction(
                 passes |= 8u;
             }
         }
-        if (BSShaderManager::GetShaderLevel(0) >= BSShaderManager::BSSM_SV_2_0 && (!++pcurrent || *pcurrent != 48)) {
+        if (BSShaderManager::GetShaderLevel(false) >= BSShaderManager::BSSM_SV_2_0 &&
+            (!++pcurrent || *pcurrent != 48)) {
             passes |= 32u;
         }
         BSShaderManager::SetEnabledPasses(passes);
-        return 1;
+        return true;
     }
     if (pcurrent && *pcurrent == 51) {
         passes = 1;
@@ -19430,7 +19457,7 @@ bool Script::SetLightingPassesFunction(
             passes |= 2u;
             passes |= 4u;
             passes |= 8u;
-            passes |= BSShaderManager::GetShaderLevel(0) < BSShaderManager::BSSM_SV_2_0 ? 0 : 32;
+            passes |= BSShaderManager::GetShaderLevel(false) < BSShaderManager::BSSM_SV_2_0 ? 0 : 32;
         }
         goto LABEL_55;
     }
@@ -19478,18 +19505,18 @@ bool Script::SetLightingPassesFunction(
     }
     if (!_strnicmp("psh", pcurrent, 2u)) {
         if ((BSShaderManager::GetEnabledPasses() & 32) != 0) {
-            Renderer::SetDoCanopyShadowPass(0);
-            BSShaderManager::SetProjectedShadowMaskTexture(0);
+            Renderer::SetDoCanopyShadowPass(false);
+            BSShaderManager::SetProjectedShadowMaskTexture(nullptr);
             uint16_t passes_3 = BSShaderManager::GetEnabledPasses() & 0xFFDF;
             BSShaderManager::SetEnabledPasses(passes_3);
         }
         else {
-            Renderer::SetDoCanopyShadowPass(1);
+            Renderer::SetDoCanopyShadowPass(true);
             TES::pInstance->pGridCellA->RecreateCanopyShadowMaskTexture();
             uint16_t passes_2 = BSShaderManager::GetEnabledPasses() | 32;
             BSShaderManager::SetEnabledPasses(passes_2);
         }
-        return 1;
+        return true;
     }
     else {
         if (*pcurrent == 116) {
@@ -19503,7 +19530,7 @@ bool Script::SetLightingPassesFunction(
             }
             else {
                 if (!_strnicmp("alpha", pcurrent, 5u)) {
-                    return 1;
+                    return true;
                 }
             }
             goto LABEL_55;
@@ -19517,7 +19544,7 @@ bool Script::SetLightingPassesFunction(
                 }
             }
         }
-        return 1;
+        return true;
     }
 }
 
@@ -19539,7 +19566,7 @@ bool Script::SetFogDepthFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &iDistNear,
             &iDistFar
         )) {
-        return 0;
+        return false;
     }
     BSFogProperty* pbsfog = TES::pInstance->pSky->pAtmosphere->GetFog();
     if (pbsfog) {
@@ -19549,7 +19576,7 @@ bool Script::SetFogDepthFunction(
         float fDistNear = static_cast<float>(std::bit_cast<int32_t>(iDistNear));
         pbsfog->SetDistance(fDistNear, fDistFar);
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetImageSpaceGlowParamFunction(
@@ -19569,9 +19596,9 @@ bool Script::SetImageSpaceGlowParamFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals,
             &fClipDistance
         )) {
-        return 0;
+        return false;
     }
-    bool bUpdateFogDistance = 0;
+    bool bUpdateFogDistance = false;
     if (!(fClipDistance <= 0.0)) {
         if (fClipDistance > 163840.0) {
             fClipDistance = 163840.0f;
@@ -19579,7 +19606,7 @@ bool Script::SetImageSpaceGlowParamFunction(
     }
     else {
         fClipDistance = 163840.0f;
-        bUpdateFogDistance = 1;
+        bUpdateFogDistance = true;
     }
     NiCamera* pCamera = Main::GetWorldSceneGraph()->GetCamera();
     if (pCamera) {
@@ -19592,7 +19619,7 @@ bool Script::SetImageSpaceGlowParamFunction(
             TES::pInstance->pSky->pAtmosphere->SetUpdateFogDistance(bUpdateFogDistance);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetHUDGlowConstants(
@@ -19616,7 +19643,7 @@ bool Script::SetHUDGlowConstants(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &c1,
             &c2, c3
         )) {
-        return 0;
+        return false;
     }
     float a2 = a8;
     FOHUDEffectManager* HUDEffects = Interface::GetHUDEffects();
@@ -19625,7 +19652,7 @@ bool Script::SetHUDGlowConstants(
     float a2a = c2;
     FOHUDEffectManager* v10 = Interface::GetHUDEffects();
     v10->SetScanlineFrequencyHUD(a2a);
-    return 1;
+    return true;
 }
 
 bool Script::HairTint(
@@ -19647,14 +19674,14 @@ bool Script::HairTint(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &iR, &iG, &iB
         )) {
-        return 0;
+        return false;
     }
     float fB = static_cast<double>(iB) / 256.0;
     float fG = static_cast<double>(iG) / 256.0;
     float fR = static_cast<double>(iR) / 256.0;
     FNVD_INLINED_LOCAL(NiColorA, kTint, std::nullopt, std::nullopt);
     BSShaderLightingProperty::kHairTint = *::new (&kTint) NiColorA(fR, fG, fB, 1.0f);
-    return 1;
+    return true;
 }
 
 bool Script::RotateFunction(
@@ -19674,7 +19701,7 @@ bool Script::RotateFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &cAxis,
             &iSpeed
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         NiAVObject* obj3D = apRefObject->Get3D();
@@ -19718,12 +19745,12 @@ bool Script::RotateFunction(
             }
             obj3D->SetRotate(apRefObject->GetOrientation());
             if (!apRefObject->GetAnimation()) {
-                NiUpdateData UpdateData(0.0f, 0, 0);
+                NiUpdateData UpdateData(0.0f, false, false);
                 obj3D->Update(UpdateData);
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetAngleFunction(
@@ -19743,7 +19770,7 @@ bool Script::SetAngleFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &cAxis,
             &fDegrees
         )) {
-        return 0;
+        return false;
     }
     if (!apRefObject || apRefObject->CanBeMoved()) {
         if (iNumHWThreads.Int() <= 1) {
@@ -19752,7 +19779,7 @@ bool Script::SetAngleFunction(
         else {
             TaskQueueInterface::GetInstance()->QueueScriptFunctionCall(0x1009u, apRefObject, cAxis, fDegrees);
         }
-        return 1;
+        return true;
     }
     else {
         if (GetThreadTLSData()->bSystemOutput) {
@@ -19768,7 +19795,7 @@ bool Script::SetAngleFunction(
                 apScript->GetFormEditorID(), v10, afValue, afValue_4
             );
         }
-        return 1;
+        return true;
     }
 }
 
@@ -19790,14 +19817,14 @@ bool Script::PlayGroupFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &eAnimGroup,
             &aeFlags
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         apRefObject->AddChange(CHANGE_REFR_ANIMATION);
         if (apRefObject->GetAnimation() && apRefObject->IsActor()) {
             Actor* pactor = dynamic_cast<Actor*>(apRefObject);
             ACTION_FLAGS a4 = static_cast<ACTION_FLAGS>(aeFlags);
-            uint16_t AnimGroup = pactor->GetAnimGroup(eAnimGroup, 0, 0, 0);
+            uint16_t AnimGroup = pactor->GetAnimGroup(eAnimGroup, nullptr, false, nullptr);
             Animation* v9 = apRefObject->GetAnimation();
             v9->PlayGroup(AnimGroup, a4, -1, AGS_NONE);
             if (eAnimGroup) {
@@ -19807,14 +19834,14 @@ bool Script::PlayGroupFunction(
             }
             else {
                 if (pactor->GetAnimAction() == ANIM_ACTION_FORCE_SCRIPT_ANIM) {
-                    pactor->SetAnimAction(ANIM_ACTION_NONE, 0);
+                    pactor->SetAnimAction(ANIM_ACTION_NONE, nullptr);
                 }
             }
         }
         else {
             if (eAnimGroup != ANIM_GROUP_NONE) {
                 NiAVObject* pobj = apRefObject->Get3D();
-                NiNode* obj3D = 0;
+                NiNode* obj3D = nullptr;
                 if (pobj) {
                     obj3D = pobj->IsNode();
                 }
@@ -19849,13 +19876,13 @@ bool Script::PlayGroupFunction(
                             }
                             if (aeFlags) {
                                 float v24 = static_cast<double>(aeFlags) * 0.10000000149011612;
-                                pmanager->ActivateSequence(pseq, 0, 1, 1.0f, v24, 0);
+                                pmanager->ActivateSequence(pseq, 0, true, 1.0f, v24, nullptr);
                             }
                             else {
-                                pmanager->ActivateSequence(pseq, 0, 0, 1.0f, 0.0f, 0);
+                                pmanager->ActivateSequence(pseq, 0, false, 1.0f, 0.0f, nullptr);
                             }
                             pseq->SetOffset(-3.4028235e+38f);
-                            pmanager->SetActive(1);
+                            pmanager->SetActive(true);
                         }
                         else {
                             int32_t fEaseOutTimeb = apRefObject->iFormID;
@@ -19885,9 +19912,9 @@ bool Script::PlayGroupFunction(
                 }
             }
         }
-        apRefObject->SetAltered(1);
+        apRefObject->SetAltered(true);
     }
-    return 1;
+    return true;
 }
 
 bool Script::LoopGroupFunction(
@@ -19910,15 +19937,15 @@ bool Script::LoopGroupFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &eAnimGroup,
             &iLoops, &eFlags
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (apRefObject->GetAnimation()) {
             apRefObject->GetAnimation()->PlayGroup(static_cast<uint16_t>(eAnimGroup), eFlags, iLoops, AGS_NONE);
-            apRefObject->SetAltered(1);
+            apRefObject->SetAltered(true);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsAnimPlayingFunction(
@@ -19938,7 +19965,7 @@ bool Script::IsAnimPlayingFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, uiGroup
         )) {
-        return 0;
+        return false;
     }
     afReturnValue = 0.0;
     if (apRefObject) {
@@ -19965,7 +19992,7 @@ bool Script::IsAnimPlayingFunction(
                 pnode = pav->IsNode();
             }
             else {
-                pnode = 0;
+                pnode = nullptr;
             }
             if (pnode) {
                 if (pnode->GetControllers()) {
@@ -20001,7 +20028,7 @@ bool Script::IsAnimPlayingFunction(
             Interface::PrintLine("IsAnimPlaying -> %1.0f", afReturnValue);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::StartCombatFunction(
@@ -20015,17 +20042,17 @@ bool Script::StartCombatFunction(
     uint32_t& auiOffset
 ) {
     Actor* pTarget;
-    pTarget = 0;
+    pTarget = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pTarget
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         Actor* pAttacker = dynamic_cast<Actor*>(apRefObject);
         if (pAttacker) {
-            if (!pAttacker->IsDead(0) &&
-                (pTarget && (!pTarget->IsDead(0) && (pAttacker->pCurrentProcess && pTarget->pCurrentProcess)))) {
+            if (!pAttacker->IsDead(false) &&
+                (pTarget && (!pTarget->IsDead(false) && (pAttacker->pCurrentProcess && pTarget->pCurrentProcess)))) {
                 CombatController* v9;
                 Actor* v11;
                 if (pAttacker->IsinDialogue() && pTarget != pPlayer) {
@@ -20034,10 +20061,10 @@ bool Script::StartCombatFunction(
                         "dialogue results",
                         pAttacker->GetFullName()
                     );
-                    return 1;
+                    return true;
                 }
                 if (pTarget == pPlayer && pPlayer->IsSleepingorResting()) {
-                    pPlayer->SetSleeping(0, 1);
+                    pPlayer->SetSleeping(0, true);
                     ReferenceProcessLists.RemoveActorFromTempChangeList(pAttacker);
                 }
                 bool bagressor = !pAttacker->IsActoraGuard();
@@ -20046,11 +20073,14 @@ bool Script::StartCombatFunction(
                      (v11 = pTarget, (v9 = pAttacker->GetCombatController(), !v9->IsActoraCombatTarget(v11))))) {
                     if (pAttacker->pCurrentProcess) {
                         BaseProcess* pProcess = pAttacker->pCurrentProcess;
-                        pProcess->EnterCombat(pAttacker, pTarget, 1, 1, 0, 0, 0, bagressor, 0, 1, 0, 1, 0);
+                        pProcess->EnterCombat(
+                            pAttacker, pTarget, true, true, nullptr, false, false, bagressor, 0, true, false, true,
+                            nullptr
+                        );
                     }
                 }
                 if (!bagressor) {
-                    pPlayer->SetPlayerResistingArrest(1);
+                    pPlayer->SetPlayerResistingArrest(true);
                     BaseProcess* CurrentAIProcess = pAttacker->pCurrentProcess;
                     CurrentAIProcess->GuardCallforHelp(pAttacker, pTarget);
                 }
@@ -20059,13 +20089,13 @@ bool Script::StartCombatFunction(
                     if (v13->GetCurrentPackageSpell()) {
                         BaseProcess* v12 = pAttacker->pCurrentProcess;
                         MagicItem* v10 = v12->GetCurrentPackageSpell();
-                        pAttacker->CastSpell(v10, pAttacker, 0);
+                        pAttacker->CastSpell(v10, pAttacker, false);
                     }
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::AddSpell_Execute(
@@ -20079,11 +20109,11 @@ bool Script::AddSpell_Execute(
     uint32_t& auiOffset
 ) {
     SpellItem* pSpell;
-    pSpell = 0;
+    pSpell = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pSpell
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         Actor* pTarget = dynamic_cast<Actor*>(apRefObject);
@@ -20098,7 +20128,7 @@ bool Script::AddSpell_Execute(
                     v12.SPrintF("%s %s", pSpell->GetFullName(), v10);
                     BSStringT<char> v13;
                     v13.SPrintF("%s", "Interface\\Icons\\Message Icons\\glow_message_vaultboy_very_happy.dds");
-                    Interface::ShowMessage(v12.pString, 0, v13.pString, 0, 2.0f, 0);
+                    Interface::ShowMessage(v12.pString, 0, v13.pString, nullptr, 2.0f, false);
                 }
             }
             else {
@@ -20107,7 +20137,7 @@ bool Script::AddSpell_Execute(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::StreamMusicFunction(
@@ -20124,7 +20154,7 @@ bool Script::StreamMusicFunction(
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
     );
-    return 1;
+    return true;
 }
 
 // Prints the low-level path from the player to the reference to the console and shows a magenta line from the
@@ -20166,7 +20196,7 @@ bool Script::CalcLowPathToPointFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &v121, &v118,
             &v122
         )) {
-        return 0;
+        return false;
     }
     TeleportPath kPath;
     ActorLockData apActorData(pPlayer);
@@ -20227,8 +20257,8 @@ bool Script::CalcLowPathToPointFunction(
                 &(&kPath.Doors.GetAt(a2))->pDoor->GetLinkedDoorTeleportPosition();
             PathingLocation v105(LinkedDoorTeleportPosition, afTimea, afTime_4c);
             char v102 = 1;
-            if (v101.ResolveNavMeshInfo(0)) {
-                if (v105.ResolveNavMeshInfo(0)) {
+            if (v101.ResolveNavMeshInfo(nullptr)) {
+                if (v105.ResolveNavMeshInfo(nullptr)) {
                     NavMeshInfoSearch apThis;
                     a7_t a7;
                     apArray_t apArray;
@@ -20354,8 +20384,8 @@ bool Script::CalcLowPathToPointFunction(
         }
         PathingLocation v111(apRefObject);
         char v109 = 1;
-        if (v108.ResolveNavMeshInfo(0)) {
-            if (v111.ResolveNavMeshInfo(0)) {
+        if (v108.ResolveNavMeshInfo(nullptr)) {
+            if (v111.ResolveNavMeshInfo(nullptr)) {
                 NavMeshInfoSearch v96;
                 apNavMeshInfoArray_t apNavMeshInfoArray;
                 a8_t a8;
@@ -20405,21 +20435,21 @@ bool Script::CalcLowPathToPointFunction(
         if (kPath.Doors.IsEmpty()) {
             const NiPoint3* v39 = &apRefObject->GetLocationOnReference();
             const NiPoint3* v30 = &pPlayer->GetLocationOnReference();
-            NiAVObject* Line = (NiAVObject*)MakeLine(*v30, NiColorA_Magenta, *v39, NiColorA_Magenta, 1);
+            NiAVObject* Line = (NiAVObject*)MakeLine(*v30, NiColorA_Magenta, *v39, NiColorA_Magenta, true);
             TES::pInstance->AddTempDebugObject(Line, 30.0f);
         }
         else {
             TESObjectREFR* v59 = (&kPath.Doors.GetAt(0))->pDoor;
             const NiPoint3* v38 = &v59->GetLocationOnReference();
             const NiPoint3* v29 = &pPlayer->GetLocationOnReference();
-            NiAVObject* apObject = (NiAVObject*)MakeLine(*v29, NiColorA_Magenta, *v38, NiColorA_Magenta, 1);
+            NiAVObject* apObject = (NiAVObject*)MakeLine(*v29, NiColorA_Magenta, *v38, NiColorA_Magenta, true);
             TES::pInstance->AddTempDebugObject(apObject, 30.0f);
         }
     }
     else {
         Interface::PrintLine("No Path found.");
     }
-    return 1;
+    return true;
 }
 
 bool Script::ShowQuestVarsFunction(
@@ -20433,11 +20463,11 @@ bool Script::ShowQuestVarsFunction(
     uint32_t& auiOffset
 ) {
     TESQuest* pQuest;
-    pQuest = 0;
+    pQuest = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pQuest
         )) {
-        return 0;
+        return false;
     }
     if (pQuest) {
         const char* v15;
@@ -20454,7 +20484,7 @@ bool Script::ShowQuestVarsFunction(
                     pList_2 = pList_2->m_pkNext;
                     if (ownerLocals->IsReferenceVariable(pVar->data.uiID)) {
                         uint32_t iid = 0;
-                        double fval = ownerLocals->GetVariable(pVar->data.uiID, 0);
+                        double fval = ownerLocals->GetVariable(pVar->data.uiID, nullptr);
                         Script::GetNumericIDFromDouble(iid, fval);
                         uint32_t v13 = iid;
                         const char* v10 = pVar->cName.String();
@@ -20463,12 +20493,12 @@ bool Script::ShowQuestVarsFunction(
                     else {
                         // Tests the whole byte; a bool read would test bit 0 only.
                         if (static_cast<uint8_t>(pVar->data.bIsInteger)) {
-                            int32_t Variable = static_cast<int32_t>(ownerLocals->GetVariable(pVar->data.uiID, 0));
+                            int32_t Variable = static_cast<int32_t>(ownerLocals->GetVariable(pVar->data.uiID, nullptr));
                             const char* v11 = pVar->cName.String();
                             Interface::PrintLine("%s->%s = %d", ownerScript->GetFormEditorID(), v11, Variable);
                         }
                         else {
-                            double v12 = ownerLocals->GetVariable(pVar->data.uiID, 0);
+                            double v12 = ownerLocals->GetVariable(pVar->data.uiID, nullptr);
                             const char* v9 = pVar->cName.String();
                             Interface::PrintLine("%s->%s = %0.4f", ownerScript->GetFormEditorID(), v9, v12);
                         }
@@ -20487,7 +20517,7 @@ bool Script::ShowQuestVarsFunction(
         Interface::PrintLine("Current stage: %d", pQuest->GetCurrentStage());
         Interface::PrintLine("Priority:      %d", pQuest->GetPriority());
     }
-    return 1;
+    return true;
 }
 
 bool Script::ShowAnim(
@@ -20572,7 +20602,7 @@ bool Script::ShowAnim(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::EnableFunction(
@@ -20590,10 +20620,10 @@ bool Script::EnableFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &bFadeIn
         )) {
-        return 0;
+        return false;
     }
     if (!bFadeIn) {
-        apRefObject->SetDisableFade(1);
+        apRefObject->SetDisableFade(true);
     }
     if (!apRefObject) {
         goto LABEL_28;
@@ -20610,7 +20640,7 @@ bool Script::EnableFunction(
             pfade = pav->IsFadeNode();
         }
         else {
-            pfade = 0;
+            pfade = nullptr;
         }
         if (pfade) {
             if (pfade->GetMultType() == LOD_MULT_INVISIBLE) {
@@ -20618,11 +20648,11 @@ bool Script::EnableFunction(
             }
         }
         if (apRefObject->GetIsInvisibleLODMultType()) {
-            apRefObject->SetIsInvisibleLODMultType(0);
+            apRefObject->SetIsInvisibleLODMultType(false);
         }
     LABEL_28:;
         apScriptLocals->m_cFlags &= ~1;
-        return 1;
+        return true;
     }
     if (apScript && apScript->iFormID) {
         const char* FullName;
@@ -20656,7 +20686,7 @@ bool Script::EnableFunction(
             apRefObject->iFormID, v14, v10, v12
         );
     }
-    return 1;
+    return true;
 }
 
 bool Script::DisableFunction(
@@ -20674,7 +20704,7 @@ bool Script::DisableFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &bFadeOut
         )) {
-        return 0;
+        return false;
     }
     if (!apRefObject || (apRefObject->GetDisabled() || apRefObject->GetTemporary())) {
         goto LABEL_27;
@@ -20687,19 +20717,19 @@ bool Script::DisableFunction(
                 pFadeNode = pRootNode->IsFadeNode();
             }
             else {
-                pFadeNode = 0;
+                pFadeNode = nullptr;
             }
             if (pFadeNode) {
                 pFadeNode->ForceLODMultType(LOD_MULT_INVISIBLE);
             }
             if (!apRefObject->GetIsInvisibleLODMultType()) {
-                apRefObject->SetIsInvisibleLODMultType(1);
+                apRefObject->SetIsInvisibleLODMultType(true);
             }
         }
         Script::AddPendingDisabledReference(apRefObject, bFadeOut != 0);
     LABEL_27:;
         apScriptLocals->m_cFlags |= 1;
-        return 1;
+        return true;
     }
     if (apScript && apScript->iFormID) {
         const char* FullName;
@@ -20733,7 +20763,7 @@ bool Script::DisableFunction(
             apRefObject->iFormID, pName, v10, v12
         );
     }
-    return 1;
+    return true;
 }
 
 bool Script::SaveGame_Execute(
@@ -20752,10 +20782,10 @@ bool Script::SaveGame_Execute(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8, &v9
         )) {
-        return 0;
+        return false;
     }
     pSaveLoadManager->SaveGame(a8, -1, v9 != 0);
-    return 1;
+    return true;
 }
 
 bool Script::CopySaves(
@@ -20773,17 +20803,17 @@ bool Script::CopySaves(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, Destination
         )) {
-        return 0;
+        return false;
     }
     if (pSaveLoadManager) {
         if (BSstricmp(Destination, "ms")) {
-            pSaveLoadManager->CopySaveGames(0);
+            pSaveLoadManager->CopySaveGames(false);
         }
         else {
-            pSaveLoadManager->CopySaveGames(1);
+            pSaveLoadManager->CopySaveGames(true);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::DumpModelMap(
@@ -20803,15 +20833,15 @@ bool Script::DumpModelMap(
         !Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
-    MessageHandler::IncDisableWarningCount(1);
+    MessageHandler::IncDisableWarningCount(true);
     Warning("MODELS: <<< DUMPMODELMAP results");
     BSsprintf(&result[1], 260, "ModelDump%s.txt", a8);
-    BSFile outfile(&result[1], NiFile::WRITE_ONLY, 0x4000u, 0);
-    outfile.BSFile::Open(0, 0);
+    BSFile outfile(&result[1], NiFile::WRITE_ONLY, 0x4000u, false);
+    outfile.BSFile::Open(false, false);
     if (pModelLoader) {
-        pModelLoader->OutputModelMapContents(&outfile, 0);
+        pModelLoader->OutputModelMapContents(&outfile, false);
     }
     if (BSFaceGenManager::GetModelCache()) {
         BSFaceGenModelMap* ModelCache = BSFaceGenManager::GetModelCache();
@@ -20819,8 +20849,8 @@ bool Script::DumpModelMap(
     }
     outfile.Close();
     Warning("MODELS: >>> DUMPMODELMAP results");
-    MessageHandler::IncDisableWarningCount(0);
-    return 1;
+    MessageHandler::IncDisableWarningCount(false);
+    return true;
 }
 
 bool Script::SexChange(
@@ -20841,7 +20871,7 @@ bool Script::SexChange(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &isex,
             &iuseDefaultPreset
         )) {
-        return 0;
+        return false;
     }
     Character* pactor = (Character*)pPlayer;
     if (apRefObject) {
@@ -20852,12 +20882,12 @@ bool Script::SexChange(
     if (pactor) {
         TESActorBase::SEX Sex = pactor->GetSex();
         if (Sex == isex) {
-            return 1;
+            return true;
         }
         TESNPC* pnpc = static_cast<TESNPC*>(pactor->GetObjectReference());
         TESActorBase::SEX esex = TESActorBase::SEX_MALE;
         NiAVObject* pobj = (NiAVObject*)pactor->Get3D();
-        NiNode* proot = 0;
+        NiNode* proot = nullptr;
         if (pobj) {
             proot = pobj->IsNode();
         }
@@ -20871,7 +20901,7 @@ bool Script::SexChange(
                 esex = TESActorBase::SEX_FEMALE;
             }
         }
-        pnpc->SetFlagBit(1, esex == TESActorBase::SEX_FEMALE, 1);
+        pnpc->SetFlagBit(1, esex == TESActorBase::SEX_FEMALE, true);
         if (pactor->IsPc()) {
             if (iuseDefaultPreset) {
                 using presets_t = BSSimpleArray<TESNPC*, 1024>;
@@ -20892,7 +20922,7 @@ bool Script::SexChange(
             Interface::PrintLine(static_cast<const char*>(message.pString));
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsCurrentFurnitureRef(
@@ -20906,11 +20936,11 @@ bool Script::IsCurrentFurnitureRef(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::IsCurrentFurnitureRefConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::IsCurrentFurnitureRefConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::IsCurrentFurnitureObj(
@@ -20924,11 +20954,11 @@ bool Script::IsCurrentFurnitureObj(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::IsCurrentFurnitureObjConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::IsCurrentFurnitureObjConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetTalkedToPCParam(
@@ -20942,11 +20972,11 @@ bool Script::GetTalkedToPCParam(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetTalkedToPCConditionFunction(0, a8, 0, afReturnValue);
+        Script::GetTalkedToPCConditionFunction(nullptr, a8, nullptr, afReturnValue);
 }
 
 bool Script::SetStage(
@@ -20962,19 +20992,19 @@ bool Script::SetStage(
     int32_t v9;
     TESQuest* a8;
     afReturnValue = 0.0;
-    a8 = 0;
+    a8 = nullptr;
     v9 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v9
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         if (a8->SetStageDone(v9)) {
             afReturnValue = 1.0;
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetIsCurrentWeatherFunction(
@@ -20988,11 +21018,11 @@ bool Script::GetIsCurrentWeatherFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_GetIsCurrentWeather(apRefObject, a8, 0, afReturnValue);
+        Cmd_GetIsCurrentWeather(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetLockLevelFunction(
@@ -21005,7 +21035,7 @@ bool Script::GetLockLevelFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetLockLevelConditionFunction(apRefObject, apScriptLocals, 0, afReturnValue);
+    return Script::GetLockLevelConditionFunction(apRefObject, apScriptLocals, nullptr, afReturnValue);
 }
 
 bool Script::GetIsVoiceTypeFunction(
@@ -21019,11 +21049,11 @@ bool Script::GetIsVoiceTypeFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetIsVoiceTypeConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetIsVoiceTypeConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::SameFaction(
@@ -21037,11 +21067,11 @@ bool Script::SameFaction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_SameFaction(apRefObject, a8, 0, afReturnValue);
+        Cmd_SameFaction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::SameRace(
@@ -21055,11 +21085,11 @@ bool Script::SameRace(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_SameRace(apRefObject, a8, 0, afReturnValue);
+        Cmd_SameRace(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::SameSex(
@@ -21073,11 +21103,11 @@ bool Script::SameSex(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_SameSex(apRefObject, a8, 0, afReturnValue);
+        Cmd_SameSex(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::SameRaceAsPC(
@@ -21117,11 +21147,11 @@ bool Script::GetQuestCompleted(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_GetQuestCompleted(apRefObject, a8, 0, afReturnValue);
+        Cmd_GetQuestCompleted(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetStage(
@@ -21135,11 +21165,11 @@ bool Script::GetStage(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetStageConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetStageConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetStageDone(
@@ -21154,8 +21184,8 @@ bool Script::GetStageDone(
 ) {
     void* apParam2;
     void* a8;
-    a8 = 0;
-    apParam2 = 0;
+    a8 = nullptr;
+    apParam2 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8,
                &apParam2
@@ -21175,8 +21205,8 @@ bool Script::GetFactionRankDifference(
 ) {
     void* a8;
     void* apParam2;
-    a8 = 0;
-    apParam2 = 0;
+    a8 = nullptr;
+    apParam2 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8,
                &apParam2
@@ -21195,11 +21225,11 @@ bool Script::GetInFaction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetInFactionConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetInFactionConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetPCIsClass(
@@ -21213,11 +21243,11 @@ bool Script::GetPCIsClass(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_GetIsClass(pPlayer, a8, 0, afReturnValue);
+        Cmd_GetIsClass(pPlayer, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetPCIsRace(
@@ -21231,11 +21261,11 @@ bool Script::GetPCIsRace(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetIsRaceConditionFunction(pPlayer, a8, 0, afReturnValue);
+        Script::GetIsRaceConditionFunction(pPlayer, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetGlobalValue(
@@ -21249,11 +21279,11 @@ bool Script::GetGlobalValue(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetGlobalValueConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetGlobalValueConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetShouldAttack(
@@ -21267,11 +21297,11 @@ bool Script::GetShouldAttack(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetShouldAttackConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetShouldAttackConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetInCellParam(
@@ -21285,11 +21315,11 @@ bool Script::GetInCellParam(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetInCellConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetInCellConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetInCell(
@@ -21304,8 +21334,8 @@ bool Script::GetInCell(
 ) {
     void* a8;
     void* apParam2;
-    apParam2 = 0;
-    a8 = 0;
+    apParam2 = nullptr;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8,
                &apParam2
@@ -21324,11 +21354,11 @@ bool Script::GetPCInFaction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetInFactionConditionFunction(pPlayer, a8, 0, afReturnValue);
+        Script::GetInFactionConditionFunction(pPlayer, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetIsID(
@@ -21342,11 +21372,11 @@ bool Script::GetIsID(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetIsIDConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetIsIDConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::IsInListFunction(
@@ -21360,11 +21390,11 @@ bool Script::IsInListFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::IsInListConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::IsInListConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetIsUsedItem(
@@ -21378,11 +21408,11 @@ bool Script::GetIsUsedItem(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetIsUsedItemConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetIsUsedItemConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetIsRef(
@@ -21396,11 +21426,11 @@ bool Script::GetIsRef(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetIsRefConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetIsRefConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetFactionRank(
@@ -21414,11 +21444,11 @@ bool Script::GetFactionRank(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetFactionRankConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetFactionRankConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::SetFactionRank(
@@ -21433,18 +21463,18 @@ bool Script::SetFactionRank(
 ) {
     int32_t iRank;
     TESFaction* pFaction;
-    pFaction = 0;
+    pFaction = nullptr;
     iRank = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pFaction,
             &iRank
         )) {
-        return 0;
+        return false;
     }
     afReturnValue = 0.0;
     Actor* pact = dynamic_cast<Actor*>(apRefObject);
     if (!pact) {
-        return 1;
+        return true;
     }
     TESActorBase* pactorbase = pact->GetActorBase();
     if (pact) {
@@ -21452,7 +21482,7 @@ bool Script::SetFactionRank(
             pact->SetFactionRank(pFaction, iRank);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ModDisposition(
@@ -21467,20 +21497,20 @@ bool Script::ModDisposition(
 ) {
     Actor* ptarget;
     int32_t iValue;
-    ptarget = 0;
+    ptarget = nullptr;
     iValue = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &ptarget,
             &iValue
         )) {
-        return 0;
+        return false;
     }
     Actor* pactor = dynamic_cast<Actor*>(apRefObject);
     if (!pactor || !ptarget) {
-        return 0;
+        return false;
     }
     pactor->ModifyDispositionTowardActor(ptarget, static_cast<float>(iValue));
-    return Script::GetDispositionConditionFunction(apRefObject, ptarget, 0, afReturnValue);
+    return Script::GetDispositionConditionFunction(apRefObject, ptarget, nullptr, afReturnValue);
 }
 
 bool Script::GetDeadCount(
@@ -21494,11 +21524,11 @@ bool Script::GetDeadCount(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetDeadCountConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetDeadCountConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::ShowMap(
@@ -21514,12 +21544,12 @@ bool Script::ShowMap(
     TESObjectREFR* a8;
     int32_t v15;
     char v16 = 0;
-    a8 = 0;
+    a8 = nullptr;
     v15 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v15
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         if (a8->GetMapMarkerData()) {
@@ -21536,18 +21566,18 @@ bool Script::ShowMap(
                     v16 = 1;
                 }
                 MapMarkerData* v12 = a8->GetMapMarkerData();
-                v12->SetTravelLoc(1);
+                v12->SetTravelLoc(true);
             }
         }
     }
     if (v16) {
         const char* v13 = sMapMarkerAdded.String();
         Interface::ShowMessage(
-            v13, 0, "Interface\\Icons\\Message Icons\\glow_message_map.dds", "UIPopUpMapMarkerAdded", 2.0f, 0
+            v13, 0, "Interface\\Icons\\Message Icons\\glow_message_map.dds", "UIPopUpMapMarkerAdded", 2.0f, false
         );
     }
     afReturnValue = 1.0;
-    return 1;
+    return true;
 }
 
 // SayToCallBack is passed as the callback, with the reference's form ID as the callback's context.
@@ -21569,16 +21599,16 @@ bool Script::SayFunction(
     TESActorBase* pNpc;
     TESTopic* ptopic;
     afReturnValue = 0.0;
-    ptopic = 0;
+    ptopic = nullptr;
     isubtitle = 0;
-    pNpc = 0;
+    pNpc = nullptr;
     iPCHead = 0;
     iAlwaysPlay = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &ptopic,
             &isubtitle, &pNpc, &iPCHead, &iAlwaysPlay
         )) {
-        return 0;
+        return false;
     }
     bool bplayerhead = iPCHead != 0;
     bool bforcesub = isubtitle > 0;
@@ -21591,13 +21621,13 @@ bool Script::SayFunction(
     }
     if (!pactor) {
         if (apRefObject && pNpc) {
-            TESObjectREFR* ptempactor = TESObjectREFR::CreateReference(59, 0);
+            TESObjectREFR* ptempactor = TESObjectREFR::CreateReference(59, false);
             ptempactor->SetTemporary();
             ptempactor->SetObjectReference(pNpc);
             const NiPoint3* v10 = &apRefObject->GetLocationOnReference();
             ptempactor->SetLocationOnReference(*v10);
             apRefObject->SetSayToTopic(ptopic);
-            DialogueItem* pVoice_3 = ptopic->CreateDialogueItem(ptempactor, 0, 0, 0, 0);
+            DialogueItem* pVoice_3 = ptopic->CreateDialogueItem(ptempactor, nullptr, nullptr, nullptr, false);
             if (pVoice_3) {
                 apRefObject->SetSayToTopicInfo(pVoice_3->pInfo);
             }
@@ -21617,7 +21647,7 @@ bool Script::SayFunction(
                 (apRefObject->IsMobileObject() &&
                  (Unk6C = static_cast<MobileObject*>(apRefObject)->pTalkingActivator, Unk6C->Get3D()))) {
                 apRefObject->SetSayToTopic(ptopic);
-                DialogueItem* pVoice_4 = ptopic->CreateDialogueItem(apRefObject, 0, 0, 0, 0);
+                DialogueItem* pVoice_4 = ptopic->CreateDialogueItem(apRefObject, nullptr, nullptr, nullptr, false);
                 if (pVoice_4) {
                     apRefObject->SetSayToTopicInfo(pVoice_4->pInfo);
                 }
@@ -21630,18 +21660,18 @@ bool Script::SayFunction(
         }
         goto LABEL_37;
     }
-    if (!pactor->pCurrentProcess || pactor->IsDead(1)) {
+    if (!pactor->pCurrentProcess || pactor->IsDead(true)) {
         if (pactor->pCurrentProcess) {
             ExtraDataList* Extra = &pactor->m_Extra;
             Script::SetActionFlag(ptopic, Extra, SCRIPT_ACTION_ONSAYTODONE);
             BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
-            CurrentAIProcess->SetDoingSayTo(0);
+            CurrentAIProcess->SetDoingSayTo(false);
         }
         goto LABEL_37;
     }
     pactor->fSayToFailVoiceTimer = -1.0f;
     v23 = pactor->pCurrentProcess;
-    v23->SetWaitingforLipFile(0);
+    v23->SetWaitingforLipFile(false);
     v22 = pactor->pCurrentProcess;
     v22->ClearDialogTarget();
     if (pactor->GetCurrentProcessType() == PROCESS_TYPE_HIGH) {
@@ -21653,7 +21683,7 @@ bool Script::SayFunction(
         v21 = pactor->pCurrentProcess;
         pcurrentScriptTarget = v21->GetCurrentHeadTrackTarget(BaseProcess::HEAD_TRACK_TYPE_SCRIPT);
         v20 = pactor->pCurrentProcess;
-        v20->ClearScriptHeadTrackTarget(0);
+        v20->ClearScriptHeadTrackTarget(false);
         v19 = pactor->pCurrentProcess;
         v19->SetActionHeadTrackTarget(pcurrentScriptTarget);
         v18 = pactor->pCurrentProcess;
@@ -21662,7 +21692,7 @@ bool Script::SayFunction(
         if (pPlayer->IsSleepingorResting() ||
             (pactor->pCurrentProcess->eLevel ||
              (pactor->GetEssential() && pactor->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN))) {
-            DialogueItem* pVoice_2 = ptopic->CreateDialogueItem(pactor, 0, 0, 0, 1);
+            DialogueItem* pVoice_2 = ptopic->CreateDialogueItem(pactor, nullptr, nullptr, nullptr, true);
             if (pVoice_2) {
                 pVoice_2->FirstResponse();
                 DialogueResponse* pResponse = pVoice_2->GetCurrentResponse();
@@ -21675,17 +21705,17 @@ bool Script::SayFunction(
         }
         else {
             BaseProcess* v17 = pactor->pCurrentProcess;
-            v17->ProcessGreet(pactor, ptopic, bforcesub, 0, 1, 1);
+            v17->ProcessGreet(pactor, ptopic, bforcesub, false, true, true);
         }
     LABEL_37:;
         iSpeakSoundLipDistance.operator=(ioldLipDistance);
-        return 1;
+        return true;
     }
     if (!iPCHead) {
         goto LABEL_13;
     }
     pactor->SetSayToTopic(ptopic);
-    DialogueItem* pVoice = ptopic->CreateDialogueItem(pactor, 0, 0, 0, 0);
+    DialogueItem* pVoice = ptopic->CreateDialogueItem(pactor, nullptr, nullptr, nullptr, false);
     if (pVoice) {
         apRefObject->SetSayToTopicInfo(pVoice->pInfo);
     }
@@ -21693,7 +21723,7 @@ bool Script::SayFunction(
     aSoundHand.SetCompletionCallback(
         &TESObjectREFR::SayToCallBack, reinterpret_cast<void*>(static_cast<uintptr_t>(apRefObject->iFormID))
     );
-    return 1;
+    return true;
 }
 
 bool Script::PlayVATSCameras(
@@ -21710,7 +21740,7 @@ bool Script::PlayVATSCameras(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8
         )) {
-        return 0;
+        return false;
     }
     TESForm* FormByEditorID = TESForm::GetFormByEditorID(a8);
     pForceCameraPath = dynamic_cast<BGSCameraPath*>(FormByEditorID);
@@ -21722,7 +21752,7 @@ bool Script::PlayVATSCameras(
             Interface::PrintLine("PlayVATSCameras '%s' not found.", a8);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ShowQuestLog(
@@ -21740,11 +21770,11 @@ bool Script::ShowQuestLog(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     bool bShowCompleted = a8 != 0;
     BSSimpleList<TESQuestStageItem*> kQuestLog;
-    TESQuest::GetQuestLog(&kQuestLog, 0, bShowCompleted, 0, 0);
+    TESQuest::GetQuestLog(&kQuestLog, nullptr, bShowCompleted, false, false);
     BSSimpleList<TESQuestStageItem*>* pIter = &kQuestLog;
     while (pIter && pIter->GetItem()) {
         TESQuestStageItem* pItem = pIter->GetItem();
@@ -21762,7 +21792,7 @@ bool Script::ShowQuestLog(
         Interface::PrintLine("%s", pItem->m_pOwner->TESFullName::GetFullName());
         Interface::PrintLine("%s", acLogEntry);
     }
-    return 1;
+    return true;
 }
 
 bool Script::LockFunction(
@@ -21778,7 +21808,7 @@ bool Script::LockFunction(
     int32_t iCount;
     int32_t iLockAsOwner;
     if (!apRefObject) {
-        return 0;
+        return false;
     }
     iCount = 0;
     iLockAsOwner = 0;
@@ -21786,10 +21816,10 @@ bool Script::LockFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &iCount,
             &iLockAsOwner
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject->GetAction(OBJECT_ACTION_OPEN)) {
-        BGSOpenCloseForm::SetOpenState(apRefObject, 0, 1);
+        BGSOpenCloseForm::SetOpenState(apRefObject, false, true);
     }
     LockData* pLock = apRefObject->GetLock();
     if (!pLock) {
@@ -21819,20 +21849,20 @@ bool Script::LockFunction(
         if (iCount) {
             pLock->cLockLevel = iCount;
         }
-        pLock->SetLocked(1);
+        pLock->SetLocked(true);
         apRefObject->AddLockChange();
         if (iLockAsOwner > 0) {
             DoorTeleportData* ptel = apRefObject->GetTeleport();
             if (ptel) {
-                ptel->SetConnectedCellsPublic(apRefObject, 0);
+                ptel->SetConnectedCellsPublic(apRefObject, false);
             }
         }
-        apRefObject->SetAltered(1);
+        apRefObject->SetAltered(true);
     }
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("Locked %s with lock level %d", apRefObject->GetFullName(), iCount);
     }
-    return 1;
+    return true;
 }
 
 bool Script::UnlockFunction(
@@ -21847,26 +21877,26 @@ bool Script::UnlockFunction(
 ) {
     int32_t iUnlockAsOwner;
     if (!apRefObject) {
-        return 0;
+        return false;
     }
     iUnlockAsOwner = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals,
             &iUnlockAsOwner
         )) {
-        return 0;
+        return false;
     }
     LockData* pLock = apRefObject->GetLock();
     if (pLock) {
-        pLock->SetLocked(0);
+        pLock->SetLocked(false);
         apRefObject->AddLockChange();
         if (iUnlockAsOwner > 0) {
             DoorTeleportData* ptel = apRefObject->GetTeleport();
             if (ptel) {
-                ptel->SetConnectedCellsPublic(apRefObject, 1);
+                ptel->SetConnectedCellsPublic(apRefObject, true);
             }
         }
-        apRefObject->SetAltered(1);
+        apRefObject->SetAltered(true);
     }
     else {
         if (apRefObject->GetObjectReference()->GetFormType() == TERM_ID) {
@@ -21877,7 +21907,7 @@ bool Script::UnlockFunction(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("Unlocked %s ", apRefObject->GetFullName());
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetCrimeKnownFunction(
@@ -21895,20 +21925,20 @@ bool Script::GetCrimeKnownFunction(
     uint32_t a8;
     afReturnValue = 0.0;
     a8 = 0;
-    pCriminal = 0;
-    pVictim = 0;
+    pCriminal = nullptr;
+    pVictim = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8,
             &pCriminal, &pVictim
         )) {
-        return 0;
+        return false;
     }
     PackageNS::CRIME_TYPE v10 = static_cast<PackageNS::CRIME_TYPE>(a8);
     Actor* v9 = dynamic_cast<Actor*>(apRefObject);
-    if (ReferenceProcessLists.IsCrimeinGlobalCrimeList(pVictim, pCriminal, v9, v10, 0, -1)) {
+    if (ReferenceProcessLists.IsCrimeinGlobalCrimeList(pVictim, pCriminal, v9, v10, nullptr, -1)) {
         afReturnValue = 1.0;
     }
-    return 1;
+    return true;
 }
 
 // The crime type goes in the condition function's untyped second parameter slot as the integer itself (the slot
@@ -21927,18 +21957,18 @@ bool Script::GetCrimeFunction(
     int32_t iCrime;
     afReturnValue = 0.0;
     iCrime = -1;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &iCrime
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         return Script::GetCrimeConditionFunction(
             apRefObject, a8, reinterpret_cast<void*>(static_cast<intptr_t>(iCrime)), afReturnValue
         );
     }
-    return 1;
+    return true;
 }
 
 bool Script::MoveToQuestTargetFunction(
@@ -21956,9 +21986,9 @@ bool Script::MoveToQuestTargetFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
-    TESObjectREFR* apTargetRef = 0;
+    TESObjectREFR* apTargetRef = nullptr;
     if (pPlayer->GetActiveQuest()) {
         BSSimpleList<TESQuestTarget*>* ecx0 = pPlayer->GetCurrentTargetList();
         if (!ecx0) {
@@ -21967,7 +21997,7 @@ bool Script::MoveToQuestTargetFunction(
         for (int32_t i = 0; ecx0 && (ecx0->m_item && i < a8); ++i) {
             TESQuestTarget* v9 = ecx0->m_item;
             ecx0 = ecx0->m_pkNext;
-            apTargetRef = v9->GetReference(1);
+            apTargetRef = v9->GetReference(true);
         }
     }
     else {
@@ -21976,7 +22006,7 @@ bool Script::MoveToQuestTargetFunction(
     if (apTargetRef) {
         Script::MoveToFunctionBase(pPlayer, apTargetRef, 0.0f, 0.0f, 0.0f);
     }
-    return 1;
+    return true;
 }
 
 bool Script::WakeUpPCFunction(
@@ -21994,18 +22024,18 @@ bool Script::WakeUpPCFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (pPlayer->IsSleeping()) {
         if (a8 < 0) {
             a8 = 0;
         }
-        pPlayer->SetSleeping(a8, 1);
+        pPlayer->SetSleeping(a8, true);
         if (!a8) {
             Interface::CloseSleepMenu();
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetCombatStyleFunction(
@@ -22019,11 +22049,11 @@ bool Script::SetCombatStyleFunction(
     uint32_t& auiOffset
 ) {
     TESCombatStyle* pcombatStyle;
-    pcombatStyle = 0;
+    pcombatStyle = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pcombatStyle
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         Actor* pactor = dynamic_cast<Actor*>(apRefObject);
@@ -22032,17 +22062,17 @@ bool Script::SetCombatStyleFunction(
             if (pactor->IsPlayerTeammate()) {
                 if (pactor->IsCreature()) {
                     static_cast<TESCreature*>(pactor->GetObjectReference())
-                        ->TESCreature::InitDefaultWorn(pactor, 1, 1, 1);
+                        ->TESCreature::InitDefaultWorn(pactor, true, true, true);
                 }
                 else {
                     TESNPC* pnpc = static_cast<TESNPC*>(pactor->GetObjectReference());
                     BipedAnim* v9 = pactor->GetBiped();
-                    pnpc->InitParts(pactor, v9, 1);
+                    pnpc->InitParts(pactor, v9, true);
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SelectPlayerSpellFunction(
@@ -22056,11 +22086,11 @@ bool Script::SelectPlayerSpellFunction(
     uint32_t& auiOffset
 ) {
     TESForm* pparamForm;
-    pparamForm = 0;
+    pparamForm = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pparamForm
         )) {
-        return 0;
+        return false;
     }
     if (pparamForm) {
         SpellItem* pspell = dynamic_cast<SpellItem*>(pparamForm);
@@ -22073,7 +22103,7 @@ bool Script::SelectPlayerSpellFunction(
                 pPlayer->SetSelectedSpell(pspell);
             }
             else {
-                pPlayer->SetSelectedSpell(0);
+                pPlayer->SetSelectedSpell(nullptr);
             }
         }
         if (GetThreadTLSData()->bSystemOutput) {
@@ -22087,7 +22117,7 @@ bool Script::SelectPlayerSpellFunction(
             Interface::PrintLine("Player Spell set to %s", FullName);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetEssentialFunction(
@@ -22103,18 +22133,18 @@ bool Script::SetEssentialFunction(
     TESActorBase* pactorBase;
     int32_t v10;
     afReturnValue = 0.0;
-    pactorBase = 0;
+    pactorBase = nullptr;
     v10 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pactorBase,
             &v10
         )) {
-        return 0;
+        return false;
     }
     if (pactorBase) {
         pactorBase->SetEssential(v10 > 0);
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetQuestObjectFunction(
@@ -22130,18 +22160,18 @@ bool Script::SetQuestObjectFunction(
     TESObject* pobject;
     int32_t v10;
     afReturnValue = 0.0;
-    pobject = 0;
+    pobject = nullptr;
     v10 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pobject,
             &v10
         )) {
-        return 0;
+        return false;
     }
     if (pobject) {
         pobject->SetQuestObject(v10 > 0);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetDetectionLevelFunction(
@@ -22155,11 +22185,11 @@ bool Script::GetDetectionLevelFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetDetectionLevelConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetDetectionLevelConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::StopWaitingFunction(
@@ -22173,11 +22203,11 @@ bool Script::StopWaitingFunction(
     uint32_t& auiOffset
 ) {
     TESPackage* pPackage;
-    pPackage = 0;
+    pPackage = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pPackage
         )) {
-        return 0;
+        return false;
     }
     Actor* pActor = dynamic_cast<Actor*>(apRefObject);
     if (pActor) {
@@ -22187,7 +22217,7 @@ bool Script::StopWaitingFunction(
             if (ActiveStablePackage == pPackage ||
                 (PackageExtra = (&pActor->m_Extra)->GetPackageExtra(), PackageExtra == pPackage)) {
                 if (pPackage->GetPackType() == PACKAGE_TYPE_ESCORT) {
-                    pPackage->SetWaiting(0);
+                    pPackage->SetWaiting(false);
                     BaseProcess* CurrentAIProcess = pActor->pCurrentProcess;
                     CurrentAIProcess->SetProcedureIndexRunning(3);
                 }
@@ -22201,11 +22231,11 @@ bool Script::StopWaitingFunction(
                             (pPlayer->IsPlayerFollower(pActor) ||
                              (NumberOfFollowers = pPlayer->GetNumberOfFollowers(),
                               NumberOfFollowers <= iNumberActorsAllowedToFollowPlayer.Int()))) {
-                            pPackage->SetWaiting(0);
+                            pPackage->SetWaiting(false);
                         }
                         else {
                             const char* v13 = sNoMoreFollowers.String();
-                            Interface::ShowMessage(v13, 0, 0, 0, 2.0f, 0);
+                            Interface::ShowMessage(v13, 0, nullptr, nullptr, 2.0f, false);
                         }
                     }
                     else {
@@ -22219,7 +22249,7 @@ bool Script::StopWaitingFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetPlayerSleepHours(
@@ -22237,10 +22267,10 @@ bool Script::SetPlayerSleepHours(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
-    pPlayer->SetSleeping(a8, 1);
-    return 1;
+    pPlayer->SetSleeping(a8, true);
+    return true;
 }
 
 bool Script::ModAmountStolenSoldFunction(
@@ -22258,10 +22288,10 @@ bool Script::ModAmountStolenSoldFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     pPlayer->ModAmountStolenSold(a8);
-    return 1;
+    return true;
 }
 
 bool Script::GetPCExpelledFunction(
@@ -22275,14 +22305,14 @@ bool Script::GetPCExpelledFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
-    Cmd_GetPCExpelled(apRefObject, a8, 0, afReturnValue);
-    return 1;
+    Cmd_GetPCExpelled(apRefObject, a8, nullptr, afReturnValue);
+    return true;
 }
 
 bool Script::SetPCExpelledFunction(
@@ -22297,24 +22327,24 @@ bool Script::SetPCExpelledFunction(
 ) {
     TESFaction* a8;
     int32_t v11;
-    a8 = 0;
+    a8 = nullptr;
     v11 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v11
         )) {
-        return 0;
+        return false;
     }
     if (v11) {
-        a8->SetPCExpelled(1);
+        a8->SetPCExpelled(true);
         TESObjectCELL* pcell = pPlayer->GetParentCell();
         if (pcell) {
             pcell->GetOwner();
         }
     }
     else {
-        a8->SetPCExpelled(0);
+        a8->SetPCExpelled(false);
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetDestroyedFunction(
@@ -22332,17 +22362,17 @@ bool Script::SetDestroyedFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (a8) {
-            apRefObject->SetDestroyed(1);
+            apRefObject->SetDestroyed(true);
         }
         else {
-            apRefObject->SetDestroyed(0);
+            apRefObject->SetDestroyed(false);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetSecuritronExpression(
@@ -22358,12 +22388,12 @@ bool Script::SetSecuritronExpression(
     TESObjectREFR* pSecuritron;
     char asPersonality[516];
     char asMood[516];
-    pSecuritron = 0;
+    pSecuritron = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pSecuritron,
             asPersonality, asMood
         )) {
-        return 0;
+        return false;
     }
     if (pSecuritron) {
         NiAVObject* pMesh = (NiAVObject*)pSecuritron->Get3D();
@@ -22377,7 +22407,7 @@ bool Script::SetSecuritronExpression(
                     pFaceExtra_2 = ::new (apMemory) ExtraSecuritronFace;
                 }
                 else {
-                    pFaceExtra_2 = 0;
+                    pFaceExtra_2 = nullptr;
                 }
                 pFaceExtra = pFaceExtra_2;
                 (&pSecuritron->m_Extra)->AddExtra(pFaceExtra_2);
@@ -22391,7 +22421,7 @@ bool Script::SetSecuritronExpression(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SwapTextureOnRef(
@@ -22408,7 +22438,7 @@ bool Script::SwapTextureOnRef(
     char GeometryName[512];
     char TextureName[512];
     char path[260];
-    pRef = 0;
+    pRef = nullptr;
     BSStringT<char> BSGeometryName;
     BSStringT<char> BSTextureName;
     if (Script::ParseParameters(
@@ -22430,10 +22460,10 @@ bool Script::SwapTextureOnRef(
                     BSShaderPPLightingProperty* pLightShader;
                     int32_t v21;
                     char apDest[264];
-                    NiPointer<NiSourceTexture> TexPtr(static_cast<NiSourceTexture*>(0));
+                    NiPointer<NiSourceTexture> TexPtr(static_cast<NiSourceTexture*>(nullptr));
                     BSsprintf(apDest, 260, "Textures\\%s.dds", BSTextureName.String());
                     SwapPlatformLanguageTexturePath(apDest, path, 260u);
-                    TES::pInstance->CreateTextureImage(path, TexPtr, 0, 0);
+                    TES::pInstance->CreateTextureImage(path, TexPtr, false, false);
                     NiProperty* Property = pGeom->GetProperty(3);
                     if (NiObject::DynamicCastStatic(&NiShadeProperty::ms_RTTI, Property)) {
                         NiProperty* v10 = pGeom->GetProperty(3);
@@ -22461,7 +22491,7 @@ bool Script::SwapTextureOnRef(
                         );
                     }
                     else {
-                        pLightShader = 0;
+                        pLightShader = nullptr;
                     }
                     if (pLightShader) {
                         NiSourceTexture* v17 = TexPtr.m_pObject;
@@ -22479,10 +22509,10 @@ bool Script::SwapTextureOnRef(
                 }
             }
         }
-        return 1;
+        return true;
     }
     else {
-        return 0;
+        return false;
     }
 }
 
@@ -22501,22 +22531,22 @@ bool Script::SetUnconsciousFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         Actor* pactor = dynamic_cast<Actor*>(apRefObject);
         if (pactor) {
             if (a8) {
-                pactor->StopCombat(0);
+                pactor->StopCombat(nullptr);
                 if (!pactor->IsUnConscious()) {
                     if (pactor->pCurrentProcess) {
                         BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
                         CurrentAIProcess->AddPostAnimationAction(BaseProcess::POSTANIM_FREEUP_SPECIAL_IDLE);
                         BaseProcess* v12 = pactor->pCurrentProcess;
-                        v12->SetCurrentProcessIdle(0);
+                        v12->SetCurrentProcessIdle(nullptr);
                     }
                 }
-                pactor->SetUnConscious(1);
+                pactor->SetUnConscious(true);
                 pactor->EndMovement();
                 if (pactor->pCurrentProcess) {
                     BaseProcess* v11 = pactor->pCurrentProcess;
@@ -22529,14 +22559,14 @@ bool Script::SetUnconsciousFunction(
                         BaseProcess* v10 = pactor->pCurrentProcess;
                         v10->AddPostAnimationAction(BaseProcess::POSTANIM_FREEUP_SPECIAL_IDLE);
                         BaseProcess* v9 = pactor->pCurrentProcess;
-                        v9->SetCurrentProcessIdle(0);
+                        v9->SetCurrentProcessIdle(nullptr);
                     }
                 }
-                pactor->SetUnConscious(0);
+                pactor->SetUnConscious(false);
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetRestrainedFunction(
@@ -22554,21 +22584,21 @@ bool Script::SetRestrainedFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         Actor* pactor = dynamic_cast<Actor*>(apRefObject);
         if (pactor) {
             if (a8) {
-                pactor->SetRestrained(1);
+                pactor->SetRestrained(true);
                 pactor->EndMovement();
             }
             else {
-                pactor->SetRestrained(0);
+                pactor->SetRestrained(false);
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetCanPCFastTravelFunction(
@@ -22591,11 +22621,11 @@ bool Script::SetCanPCFastTravelFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals,
             &bCanFastTravel, &bCanWait, &bKeepOnCellChange
         )) {
-        return 0;
+        return false;
     }
     if (bCanFastTravel) {
-        pPlayer->SetCanFastTravel(1);
-        pPlayer->SetCanWait(1);
+        pPlayer->SetCanFastTravel(true);
+        pPlayer->SetCanWait(true);
         // Tests bKeepOnCellChange against 1, not against 0.
         if (bKeepOnCellChange == 1) {
             pPlayer->SetDisableFastTravelResetsOnCellChange(1);
@@ -22605,18 +22635,18 @@ bool Script::SetCanPCFastTravelFunction(
         }
     }
     else {
-        pPlayer->SetCanFastTravel(0);
+        pPlayer->SetCanFastTravel(false);
         if (bCanWait) {
-            pPlayer->SetCanWait(1);
+            pPlayer->SetCanWait(true);
         }
         else {
-            pPlayer->SetCanWait(0);
+            pPlayer->SetCanWait(false);
         }
         if (bKeepOnCellChange == 1) {
             pPlayer->SetDisableFastTravelResetsOnCellChange(1);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ModPCMiscStat(
@@ -22636,10 +22666,10 @@ bool Script::ModPCMiscStat(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &iamount
         )) {
-        return 0;
+        return false;
     }
     MiscStatManager::ModVal(a8, iamount);
-    return 1;
+    return true;
 }
 
 bool Script::GetPCMiscStat(
@@ -22653,14 +22683,14 @@ bool Script::GetPCMiscStat(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
-    Cmd_GetPCMiscStat(apRefObject, a8, 0, afReturnValue);
-    return 1;
+    Cmd_GetPCMiscStat(apRefObject, a8, nullptr, afReturnValue);
+    return true;
 }
 
 bool Script::SetNoRumorsFunction(
@@ -22678,7 +22708,7 @@ bool Script::SetNoRumorsFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &ibool
         )) {
-        return 0;
+        return false;
     }
     Actor* pactor = dynamic_cast<Actor*>(apRefObject);
     if (pactor) {
@@ -22692,7 +22722,7 @@ bool Script::SetNoRumorsFunction(
         }
         pactor->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
     }
-    return 1;
+    return true;
 }
 
 bool Script::TriggerHitShaderFunction(
@@ -22710,12 +22740,12 @@ bool Script::TriggerHitShaderFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     float afStrength = a8;
     TESImageSpaceModifier* Hit = TESImageSpaceModifier::GetGetHit();
-    ImageSpaceModifierInstanceForm::Trigger(Hit, afStrength, 0);
-    return 1;
+    ImageSpaceModifierInstanceForm::Trigger(Hit, afStrength, nullptr);
+    return true;
 }
 
 bool Script::AddAchievement(
@@ -22733,14 +22763,14 @@ bool Script::AddAchievement(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (!g_bHasPlayerUsedConsole) {
         int32_t v10 = a8;
         BSSteamAwardsSystemUtility* v9 = BSSteamAwardsSystemUtility::QInstance();
         v9->Unlock(v10);
     }
-    return 1;
+    return true;
 }
 
 bool Script::FlushPersistantActors(
@@ -22758,13 +22788,13 @@ bool Script::FlushPersistantActors(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     ReferenceProcessLists.FlushNonPersistActors(a8);
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("Deleted all non persistent actors in high process.");
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleFogOfWar(
@@ -22789,7 +22819,7 @@ bool Script::ToggleFogOfWar(
         }
         Interface::PrintLine("Fog of war - %s.", v10);
     }
-    return 1;
+    return true;
 }
 
 bool Script::OutputLocalMapPictures(
@@ -22802,13 +22832,13 @@ bool Script::OutputLocalMapPictures(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    ImageSpaceEffectMap::bSaveMode = 1;
+    ImageSpaceEffectMap::bSaveMode = true;
     MapMenu::ClearCount128();
     for (uint32_t i = 0; i < 25; ++i) {
         MapMenu::RenderNextGridToDisk();
     }
-    ImageSpaceEffectMap::bSaveMode = 0;
-    return 1;
+    ImageSpaceEffectMap::bSaveMode = false;
+    return true;
 }
 
 bool Script::WasteMemory(
@@ -22839,11 +22869,11 @@ bool Script::SendCrimeAlarmFunction(
     uint32_t& auiOffset
 ) {
     Actor* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     Actor* pSender = dynamic_cast<Actor*>(apRefObject);
     if (a8) {
@@ -22852,7 +22882,7 @@ bool Script::SendCrimeAlarmFunction(
             a8->TrespassAlarm(pSender, ObjectReference, -1);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ForceGroupStrategy(
@@ -22870,7 +22900,7 @@ bool Script::ForceGroupStrategy(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, Destination
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject->IsActor()) {
         CombatController* pController = static_cast<Actor*>(apRefObject)->GetCombatController();
@@ -22892,16 +22922,16 @@ bool Script::ForceGroupStrategy(
                     }
                 }
                 else {
-                    CombatGroup_->ForceGroupStrategy(0);
+                    CombatGroup_->ForceGroupStrategy(nullptr);
                     if (GetThreadTLSData()->bSystemOutput) {
                         Interface::PrintLine("Group strategy cleared");
                     }
                 }
-                return 1;
+                return true;
             }
             else {
                 Interface::PrintLine("The combat group has only one member");
-                return 1;
+                return true;
             }
         }
         else {
@@ -22913,7 +22943,7 @@ bool Script::ForceGroupStrategy(
                 FullName = apRefObject->GetFullName();
             }
             Interface::PrintLine("%s is not in combat", FullName);
-            return 1;
+            return true;
         }
     }
     else {
@@ -22925,7 +22955,7 @@ bool Script::ForceGroupStrategy(
             v10 = apRefObject->GetFullName();
         }
         Interface::PrintLine("%s is not an actor", v10);
-        return 1;
+        return true;
     }
 }
 
@@ -22941,13 +22971,13 @@ bool Script::PushActorAwayFunction(
 ) {
     Actor* a8;
     int32_t aiDamage;
-    a8 = 0;
+    a8 = nullptr;
     aiDamage = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8,
             &aiDamage
         )) {
-        return 0;
+        return false;
     }
     if (a8->IsActor()) {
         Actor* v13 = a8;
@@ -22961,7 +22991,7 @@ bool Script::PushActorAwayFunction(
                     pWeapon = v12->pContainerObj;
                 }
                 else {
-                    pWeapon = 0;
+                    pWeapon = nullptr;
                 }
                 TESChallengeManager::UpdateChallenge(
                     CHALLENGE_TYPE_HIT, 1, v13->GetObjectReference(), pWeapon, 0xFFFF, 2, 0
@@ -22978,7 +23008,7 @@ bool Script::PushActorAwayFunction(
             );
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetObjectiveCompletedFunction(
@@ -22998,7 +23028,7 @@ bool Script::GetObjectiveCompletedFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pquest,
             &iindex, &ival
         )) {
-        return 0;
+        return false;
     }
     if (pquest) {
         BGSQuestObjective* pobjective = pquest->GetObjective(static_cast<uint32_t>(iindex));
@@ -23016,7 +23046,7 @@ bool Script::GetObjectiveCompletedFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetObjectiveDisplayedFunction(
@@ -23036,7 +23066,7 @@ bool Script::GetObjectiveDisplayedFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pquest,
             &iindex, &ival
         )) {
-        return 0;
+        return false;
     }
     if (pquest) {
         BGSQuestObjective* pobjective = pquest->GetObjective(static_cast<uint32_t>(iindex));
@@ -23054,7 +23084,7 @@ bool Script::GetObjectiveDisplayedFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::PipboyRadio(
@@ -23069,29 +23099,29 @@ bool Script::PipboyRadio(
 ) {
     char a8[524];
     TESObjectREFR* pTarg;
-    pTarg = 0;
+    pTarg = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8, &pTarg
         )) {
-        return 0;
+        return false;
     }
     a8[523] = a8[0] == 49;
     bool v9 = a8[0] == 48;
     if (a8[0] != 49 && (BSstricmp(a8, "enable") && BSstricmp(a8, "on"))) {
         if (!v9 && (BSstricmp(a8, "disable") && BSstricmp(a8, "off"))) {
             if (!BSstricmp(a8, "tune")) {
-                FalloutRadio::TunePipboyToStation(pTarg, 1);
+                FalloutRadio::TunePipboyToStation(pTarg, true);
             }
         }
         else {
-            FalloutRadio::PipboyRadioEnable(0);
+            FalloutRadio::PipboyRadioEnable(false);
         }
     }
     else {
-        FalloutRadio::PipboyRadioEnable(1);
-        FalloutRadio::TunePipboyToStation(pTarg, 1);
+        FalloutRadio::PipboyRadioEnable(true);
+        FalloutRadio::TunePipboyToStation(pTarg, true);
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetNPCRadio(
@@ -23106,16 +23136,16 @@ bool Script::SetNPCRadio(
 ) {
     TESObjectREFR* pstation;
     uint32_t a8[2];
-    pstation = 0;
+    pstation = nullptr;
     a8[1] = 0;
     a8[0] = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, a8, &pstation
         )) {
-        return 0;
+        return false;
     }
     if (!apRefObject || (!apRefObject->IsActor() || !pstation)) {
-        return 0;
+        return false;
     }
     if (a8[0] == 1) {
         FalloutRadio::EnableNPCRadio(apRefObject, pstation);
@@ -23125,7 +23155,7 @@ bool Script::SetNPCRadio(
             FalloutRadio::DisableNPCRadio(apRefObject);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::StartRadioConversation(
@@ -23139,14 +23169,14 @@ bool Script::StartRadioConversation(
     uint32_t& auiOffset
 ) {
     TESTopic* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     FalloutRadio::StartRadioConversation(apRefObject, a8);
-    return 1;
+    return true;
 }
 
 bool Script::PlaceLocationMarkerFunction(
@@ -23172,7 +23202,7 @@ bool Script::PlaceLocationMarkerFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &x, &y, &z_2,
             Str, &icolor
         )) {
-        return 0;
+        return false;
     }
     if (pPlayer->GetParentCell()) {
         NiPoint3 location(x, y, z_2);
@@ -23185,7 +23215,7 @@ bool Script::PlaceLocationMarkerFunction(
             pPlayer->GetParentCell()->AddLocationMarker(location, nullptr, pColor);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetIsObjectTypeFunction(
@@ -23205,7 +23235,7 @@ bool Script::GetIsObjectTypeFunction(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, formtype
            ) &&
         Script::GetIsObjectTypeConditionFunction(
-               apRefObject, reinterpret_cast<void*>(static_cast<uintptr_t>(formtype[0])), 0, afReturnValue
+               apRefObject, reinterpret_cast<void*>(static_cast<uintptr_t>(formtype[0])), nullptr, afReturnValue
         );
 }
 
@@ -23221,13 +23251,13 @@ bool Script::MarkForDelete(
 ) {
     if (apRefObject) {
         if (!apRefObject->GetDelete() && apRefObject != pPlayer) {
-            apRefObject->SetDelete(1);
+            apRefObject->SetDelete(true);
             if (!apRefObject->GetFile(0)) {
                 Script::ReferencesToDelete.AddHead(apRefObject);
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetPlayerTagSkillFunction(
@@ -23247,7 +23277,7 @@ bool Script::SetPlayerTagSkillFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &a2
         )) {
-        return 0;
+        return false;
     }
     if (ActorValue::IsSkill(a8) && a2 >= 0 && a2 < TESClass::GetTagSkillCount()) {
         ActorValue::Index v11 = a8;
@@ -23255,7 +23285,7 @@ bool Script::SetPlayerTagSkillFunction(
         TESClass* Class = pPlayer->GetClass();
         Class->SetMajorSkill(v10, v11);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsPlayerTagSkillFunction(
@@ -23273,7 +23303,7 @@ bool Script::IsPlayerTagSkillFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     afReturnValue = 0.0;
     if (ActorValue::IsSkill(a8)) {
@@ -23286,7 +23316,7 @@ bool Script::IsPlayerTagSkillFunction(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("IsPlayerTagSkill >> %.0f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsPlayerGrabbedRefFunction(
@@ -23300,11 +23330,11 @@ bool Script::IsPlayerGrabbedRefFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::IsPlayerGrabbedRefConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::IsPlayerGrabbedRefConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::PlaceLeveledActorAtMeFunction(
@@ -23321,20 +23351,20 @@ bool Script::PlaceLeveledActorAtMeFunction(
     TESActorBase* a8;
     BGSEncounterZone* pforcezone;
     afReturnValue = 0.0;
-    a8 = 0;
+    a8 = nullptr;
     aiVal = 4;
-    pforcezone = 0;
+    pforcezone = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &aiVal,
             &pforcezone
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         if (a8->IsActorBase()) {
             if (apRefObject) {
                 TESActorBase* pbase = a8;
-                Actor* pplacedref = 0;
+                Actor* pplacedref = nullptr;
                 int32_t FormType = a8->GetFormType();
                 if (FormType == 42) {
                     Actor* pplacedref_2;
@@ -23343,7 +23373,7 @@ bool Script::PlaceLeveledActorAtMeFunction(
                         pplacedref_2 = ::new (apMemory) Character;
                     }
                     else {
-                        pplacedref_2 = 0;
+                        pplacedref_2 = nullptr;
                     }
                     pplacedref = pplacedref_2;
                 }
@@ -23355,7 +23385,7 @@ bool Script::PlaceLeveledActorAtMeFunction(
                             pplacedref_3 = ::new (v15) Creature;
                         }
                         else {
-                            pplacedref_3 = 0;
+                            pplacedref_3 = nullptr;
                         }
                         pplacedref = pplacedref_3;
                     }
@@ -23374,7 +23404,7 @@ bool Script::PlaceLeveledActorAtMeFunction(
                     TESObjectCELL* pint_2 = apRefObject->GetParentCell();
                     if (pint_2) {
                         if (!pint_2->GetInterior()) {
-                            pint_2 = 0;
+                            pint_2 = nullptr;
                         }
                     }
                     TESWorldSpace* pworld = apRefObject->GetWorldSpace();
@@ -23382,16 +23412,16 @@ bool Script::PlaceLeveledActorAtMeFunction(
                     const NiPoint3* v10 = &apRefObject->GetLocationOnReference();
                     TESBoundObject* ObjectReference = pplacedref->GetObjectReference();
                     pDataHandler->CreateReferenceAtLocation(
-                        ObjectReference, *v10, *AngleOnReference, pint_2, pworld, pplacedref, 0, 0
+                        ObjectReference, *v10, *AngleOnReference, pint_2, pworld, pplacedref, nullptr, nullptr
                     );
-                    pplacedref->SetStillLoading(0);
+                    pplacedref->SetStillLoading(false);
                     uint32_t iid = pplacedref->iFormID;
                     Script::PutNumericIDInDouble(iid, afReturnValue);
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ForceActiveQuestFunction(
@@ -23405,16 +23435,16 @@ bool Script::ForceActiveQuestFunction(
     uint32_t& auiOffset
 ) {
     TESQuest* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (a8) {
         pPlayer->SetActiveQuest(a8);
     }
-    return 1;
+    return true;
 }
 
 bool Script::MatchFaceGeometryFunction(
@@ -23429,12 +23459,12 @@ bool Script::MatchFaceGeometryFunction(
 ) {
     int32_t ival;
     TESObjectREFR* a8;
-    a8 = 0;
+    a8 = nullptr;
     ival = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &ival
         )) {
-        return 0;
+        return false;
     }
     if (iNumHWThreads.Int() <= 1) {
         Script::MatchFaceGeometryBase(apRefObject, a8, ival);
@@ -23442,7 +23472,7 @@ bool Script::MatchFaceGeometryFunction(
     else {
         TaskQueueInterface::GetInstance()->QueueScriptFunctionCall(0x11DFu, apRefObject, a8, ival);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetIsUsedItemEquipTypeFunction(
@@ -23462,7 +23492,7 @@ bool Script::GetIsUsedItemEquipTypeFunction(
                &iEquipType
            ) &&
         Script::GetIsUsedItemEquipTypeConditionFunction(
-               apRefObject, reinterpret_cast<void*>(static_cast<intptr_t>(iEquipType)), 0, afReturnValue
+               apRefObject, reinterpret_cast<void*>(static_cast<intptr_t>(iEquipType)), nullptr, afReturnValue
         );
 }
 
@@ -23480,7 +23510,7 @@ bool Script::AddItemHealthPercentFunction(
     float v18;
     int32_t v19;
     TESForm* v20;
-    v20 = 0;
+    v20 = nullptr;
     aiCount = 0;
     v18 = 0.0f;
     v19 = 0;
@@ -23488,14 +23518,14 @@ bool Script::AddItemHealthPercentFunction(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &v20,
             &aiCount, &v18, &v19
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
-        uint32_t CalcLevel = apRefObject->GetCalcLevel(0);
+        uint32_t CalcLevel = apRefObject->GetCalcLevel(false);
         TESContainer kContainer;
-        TESLevItem* pLevItem = 0;
-        BGSListForm* pListForm = 0;
-        TESBoundObject* v12 = 0;
+        TESLevItem* pLevItem = nullptr;
+        BGSListForm* pListForm = nullptr;
+        TESBoundObject* v12 = nullptr;
         int32_t FormType = v20->GetFormType();
         if (FormType == LVLI_ID) {
             pLevItem = static_cast<TESLevItem*>(v20);
@@ -23520,13 +23550,13 @@ bool Script::AddItemHealthPercentFunction(
                     TESForm* pForm = pIter->GetItem();
                     pIter = pIter->GetNext();
                     if (pForm->IsBoundObject()) {
-                        kContainer.AddObject(static_cast<TESBoundObject*>(pForm), aiCount, 0);
+                        kContainer.AddObject(static_cast<TESBoundObject*>(pForm), aiCount, nullptr);
                     }
                 }
             }
             else {
                 if (v12 && aiCount) {
-                    kContainer.AddObject(v12, aiCount, 0);
+                    kContainer.AddObject(v12, aiCount, nullptr);
                 }
                 else {
                     Warning("SCRIPTS: AddItem in script '%s' failed to generate an item.", apScript->GetFormEditorID());
@@ -23536,7 +23566,7 @@ bool Script::AddItemHealthPercentFunction(
         kContainer.ApplyHealthPercentToContainer(v18);
         kContainer.AddContainerToReference(apRefObject, v19 == 1);
     }
-    return 1;
+    return true;
 }
 
 bool Script::SendAssaultAlarmFunction(
@@ -23551,9 +23581,9 @@ bool Script::SendAssaultAlarmFunction(
 ) {
     TESFaction* apFaction;
     PlayerCharacter* a8;
-    TES* v17 = 0;
-    a8 = 0;
-    apFaction = 0;
+    TES* v17 = nullptr;
+    a8 = nullptr;
+    apFaction = nullptr;
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &apFaction
     );
@@ -23561,37 +23591,46 @@ bool Script::SendAssaultAlarmFunction(
         PlayerCharacter* v18 = a8;
         if (a8 || apFaction) {
             if (v18 && (v18 != pPlayer && v18->pCurrentProcess)) {
-                v18->AttackAlarm(pPlayer, 0, 1);
+                v18->AttackAlarm(pPlayer, false, true);
                 BaseProcess* CurrentAIProcess = v18->pCurrentProcess;
-                CurrentAIProcess->EnterCombat(v18, pPlayer, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                CurrentAIProcess->EnterCombat(
+                    v18, pPlayer, true, false, nullptr, false, false, false, 0, false, false, true, nullptr
+                );
             }
             else {
                 if (apFaction) {
-                    Actor* ActorRefInHigh = ReferenceProcessLists.GetActorRefInHigh(apFaction, 1, 1);
+                    Actor* ActorRefInHigh = ReferenceProcessLists.GetActorRefInHigh(apFaction, true, true);
                     if (ActorRefInHigh) {
                         if (ActorRefInHigh->IsCreature()) {
                             if (ActorRefInHigh->GetOwner()) {
                                 Actor* ActorRefInHigh_0;
                                 TESForm* Owner = ActorRefInHigh->GetOwner();
                                 if (Owner->GetFormType() == FACT_ID) {
-                                    ActorRefInHigh_0 =
-                                        ReferenceProcessLists.GetActorRefInHigh(static_cast<TESFaction*>(Owner), 0, 1);
+                                    ActorRefInHigh_0 = ReferenceProcessLists.GetActorRefInHigh(
+                                        static_cast<TESFaction*>(Owner), false, true
+                                    );
                                 }
                                 else {
                                     ActorRefInHigh_0 =
-                                        ReferenceProcessLists.GetActorRefInHigh(static_cast<TESNPC*>(Owner), 0);
+                                        ReferenceProcessLists.GetActorRefInHigh(static_cast<TESNPC*>(Owner), false);
                                 }
                                 if (ActorRefInHigh_0) {
-                                    ActorRefInHigh_0->AttackAlarm(pPlayer, 0, 1);
+                                    ActorRefInHigh_0->AttackAlarm(pPlayer, false, true);
                                     BaseProcess* v10 = ActorRefInHigh->pCurrentProcess;
-                                    v10->EnterCombat(ActorRefInHigh, pPlayer, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                                    v10->EnterCombat(
+                                        ActorRefInHigh, pPlayer, true, false, nullptr, false, false, false, 0, false,
+                                        false, true, nullptr
+                                    );
                                 }
                             }
                         }
                         else {
-                            ActorRefInHigh->AttackAlarm(pPlayer, 0, 1);
+                            ActorRefInHigh->AttackAlarm(pPlayer, false, true);
                             BaseProcess* v9 = ActorRefInHigh->pCurrentProcess;
-                            v9->EnterCombat(ActorRefInHigh, pPlayer, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                            v9->EnterCombat(
+                                ActorRefInHigh, pPlayer, true, false, nullptr, false, false, false, 0, false, false,
+                                true, nullptr
+                            );
                         }
                     }
                 }
@@ -23599,11 +23638,13 @@ bool Script::SendAssaultAlarmFunction(
         }
         else {
             Actor* pActor = static_cast<Actor*>(apRefObject);
-            pActor->Actor::AttackAlarm(pPlayer, 0, 1);
-            pActor->GetCurrentAIProcess()->EnterCombat(pActor, pPlayer, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+            pActor->Actor::AttackAlarm(pPlayer, false, true);
+            pActor->GetCurrentAIProcess()->EnterCombat(
+                pActor, pPlayer, true, false, nullptr, false, false, false, 0, false, false, true, nullptr
+            );
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetThreatRatioFunction(
@@ -23617,11 +23658,11 @@ bool Script::GetThreatRatioFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetThreatRatioConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetThreatRatioConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::MatchRaceFunction(
@@ -23638,7 +23679,7 @@ bool Script::MatchRaceFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pactor
         )) {
-        return 0;
+        return false;
     }
     if (pactor) {
         if (pactor->IsNpc()) {
@@ -23662,14 +23703,14 @@ bool Script::MatchRaceFunction(
                             --ilevel;
                         }
                         BSFaceGenManager::ClearBodyTexturesFromPalette(pnpc);
-                        pnpc->SwitchRace(pnewrace, 0);
+                        pnpc->SwitchRace(pnewrace, nullptr);
                         static_cast<Character*>(apRefObject)->Character::Reset3D();
                     }
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetPCYoungFunction(
@@ -23687,10 +23728,10 @@ bool Script::SetPCYoungFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     pPlayer->SetPCYoung(a8 != 0);
-    return 1;
+    return true;
 }
 
 bool Script::SetPCToddlerFunction(
@@ -23708,10 +23749,10 @@ bool Script::SetPCToddlerFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     pPlayer->SetPCToddler(a8 != 0);
-    return 1;
+    return true;
 }
 
 bool Script::GetConcussedFunction(
@@ -23725,11 +23766,11 @@ bool Script::GetConcussedFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_GetConcussed(apRefObject, a8, 0, afReturnValue);
+        Cmd_GetConcussed(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::SetVATSTargetFunction(
@@ -23747,24 +23788,24 @@ bool Script::SetVATSTargetFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &ival
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject->GetDestructible()) {
         bool bwanttotarget = ival != 0;
-        bool btargetable = 0;
+        bool btargetable = false;
         BGSDestructibleObjectForm* pdestruct =
             BGSDestructibleObjectForm::GetDestructionForm(apRefObject->GetObjectReference());
         if (pdestruct) {
             btargetable = pdestruct->GetTargetableInVATS();
         }
         if (btargetable == bwanttotarget) {
-            apRefObject->SetVATSTargetOverride(0);
+            apRefObject->SetVATSTargetOverride(false);
         }
         else {
-            apRefObject->SetVATSTargetOverride(1);
+            apRefObject->SetVATSTargetOverride(true);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetZoneRespawnsFunction(
@@ -23779,18 +23820,18 @@ bool Script::SetZoneRespawnsFunction(
 ) {
     BGSEncounterZone* pzone;
     int32_t v10;
-    pzone = 0;
+    pzone = nullptr;
     v10 = 0;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pzone, &v10
         )) {
-        return 0;
+        return false;
     }
     if (pzone) {
         pzone->SetNeverReset(v10 == 0);
         pzone->AddChange(2);
     }
-    return 1;
+    return true;
 }
 
 bool Script::CreateDetectionEventFunction(
@@ -23811,7 +23852,7 @@ bool Script::CreateDetectionEventFunction(
                 apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pref,
                 &isound, &ievent
             )) {
-            return 0;
+            return false;
         }
         if (pref) {
             if (pref->IsActor()) {
@@ -23825,7 +23866,7 @@ bool Script::CreateDetectionEventFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::IgnoreCrimeFunction(
@@ -23842,7 +23883,7 @@ bool Script::IgnoreCrimeFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &iignorecrime
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (apRefObject->IsActor()) {
@@ -23855,7 +23896,7 @@ bool Script::IgnoreCrimeFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsCombatTargetFunction(
@@ -23869,11 +23910,11 @@ bool Script::IsCombatTargetFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::IsCombatTargetConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::IsCombatTargetConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 // Places an ash pile (the second one for a parsed 2, else the first) at the actor: a pick straight down from 32 units
@@ -23900,7 +23941,7 @@ bool Script::AttachAshPileFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &iparam
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject) {
         if (apRefObject->IsActor()) {
@@ -23937,7 +23978,7 @@ bool Script::AttachAshPileFunction(
                 bool MaterialVarType = v27->GetMaterialVarType(MVT_STAIRS);
                 if (!MaterialVarType) {
                     const hkpShape* v26 = Shape;
-                    const hkpShape* v25 = 0;
+                    const hkpShape* v25 = nullptr;
                     uint32_t v24 = -1;
                     v23.~hkLocalBuffer<char[512]>();
                     ::new (&v23) hkLocalBuffer<char[512]>(8, nullptr);
@@ -23979,18 +24020,19 @@ bool Script::AttachAshPileFunction(
             }
             TESWorldSpace* WorldSpace = apRefObject->GetWorldSpace();
             TESObjectCELL* ParentCell = apRefObject->GetParentCell();
-            TESObjectREFR* v15 =
-                pDataHandler->CreateReferenceAtLocation(v16, v38, v37, ParentCell, WorldSpace, 0, 0, 0);
+            TESObjectREFR* v15 = pDataHandler->CreateReferenceAtLocation(
+                v16, v38, v37, ParentCell, WorldSpace, nullptr, nullptr, nullptr
+            );
             v15->SetDroppedRef(v36 == 0);
-            v15->SetDisableFade(1);
-            v15->SetRefPersists(1);
+            v15->SetDisableFade(true);
+            v15->SetRefPersists(true);
             (&v15->m_Extra)->SetAshPileRef(apRefObject);
             (&apRefObject->m_Extra)->SetAshPileRef(v15);
             v15->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
             apRefObject->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetMinimalUseFunction(
@@ -24008,7 +24050,7 @@ bool Script::SetMinimalUseFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject &&
         (apRefObject->GetObjectReference() && apRefObject->GetObjectReference()->GetFormType() == DOOR_ID)) {
@@ -24018,7 +24060,7 @@ bool Script::SetMinimalUseFunction(
     else {
         Warning("SCRIPTS: SetMinimalUse must be called on a door reference.", apScript->GetFormEditorID());
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetPCCanUsePowerArmorFunction(
@@ -24036,11 +24078,11 @@ bool Script::SetPCCanUsePowerArmorFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     bool v10 = a8 != 0;
     pPlayer->SetPCCanUsePowerArmor(a8 != 0);
-    return 1;
+    return true;
 }
 
 bool Script::GetReputationThreshold(
@@ -24055,17 +24097,17 @@ bool Script::GetReputationThreshold(
 ) {
     uint32_t v9;
     TESReputation* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &v9
         )) {
-        return 0;
+        return false;
     }
     if (v9 > 2) {
-        return 0;
+        return false;
     }
     afReturnValue = static_cast<double>(a8->GetReputationThreshold(v9));
-    return 1;
+    return true;
 }
 
 bool Script::SetLastExtDoorActivated(
@@ -24079,11 +24121,11 @@ bool Script::SetLastExtDoorActivated(
     uint32_t& auiOffset
 ) {
     TESObjectREFR* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     pPlayer->pLastExtDoorActivated = a8;
     if (a8) {
@@ -24092,7 +24134,7 @@ bool Script::SetLastExtDoorActivated(
             Interface::SetRootMapSpace(WorldSpace);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::SetTaskThreadSleepFunction(
@@ -24110,11 +24152,11 @@ bool Script::SetTaskThreadSleepFunction(
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     BSTaskThread::SetPauseSleepValue(a8);
     Interface::PrintLine("BSTaskThread::sPauseSleepValue set to %d ms", a8);
-    return 1;
+    return true;
 }
 
 bool Script::IsImageSpaceActive(
@@ -24137,7 +24179,7 @@ bool Script::IsImageSpaceActive(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pImageSpace,
             &fStrength
         )) {
-        return 0;
+        return false;
     }
     // The list, its items and its links are read through trivial accessors.
     BSSimpleList<NiPointer<ImageSpaceModifierInstance>>* pNode = &TES::pInstance->listActiveImageSpaceModifiers;
@@ -24162,7 +24204,7 @@ bool Script::IsImageSpaceActive(
     else {
         Interface::PrintLine("ImageSpace is active ");
     }
-    return 1;
+    return true;
 }
 
 bool Script::ResetXP_Execute(
@@ -24180,14 +24222,12 @@ bool Script::ResetXP_Execute(
     );
     if (pPlayer) {
         float v10 = pPlayer->GetActorFloatValue(ActorValue::EXPERIENCE_POINTS);
-        pPlayer->PermanentModActorValue(
-            ActorValue::EXPERIENCE_POINTS, static_cast<float>(-v10), static_cast<Actor*>(0)
-        );
-        return 1;
+        pPlayer->PermanentModActorValue(ActorValue::EXPERIENCE_POINTS, (-v10), static_cast<Actor*>(nullptr));
+        return true;
     }
     else {
         Warning("Attempting to reset xp on an invalid player!");
-        return 0;
+        return false;
     }
 }
 
@@ -24210,7 +24250,7 @@ bool Script::PlaceAtReticle(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pObject,
             &iCount, &fUnused, &fDistance
         )) {
-        return 0;
+        return false;
     }
     fDistance = BSMIN(fDistance, 50000.0f);
     bhkPickData kPick;
@@ -24256,10 +24296,10 @@ bool Script::PlaceAtReticle(
             TESObjectCELL* pParentCell = pPlayer->GetParentCell();
             const NiPoint3* pAngle = &pPlayer->GetAngleOnReference();
             TESObjectREFR* pRef = pDataHandler->CreateReferenceAtLocation(
-                pBoundObject, kLocation, *pAngle, pParentCell, pWorldSpace, 0, 0, 0
+                pBoundObject, kLocation, *pAngle, pParentCell, pWorldSpace, nullptr, nullptr, nullptr
             );
             if (!pRef) {
-                return 0;
+                return false;
             }
             if (pRef->IsActor()) {
                 Actor* pActor = static_cast<Actor*>(pRef);
@@ -24273,7 +24313,7 @@ bool Script::PlaceAtReticle(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ShowSleepWaitMenu(
@@ -24293,7 +24333,7 @@ bool Script::ShowSleepWaitMenu(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &iSleep,
             &iPassTimeOnly
         )) {
-        return 0;
+        return false;
     }
     // Both parsed values are tested against 1.
     if (iPassTimeOnly == 1) {
@@ -24302,7 +24342,7 @@ bool Script::ShowSleepWaitMenu(
     else {
         Interface::CreateSleepMenu(iSleep == 1);
     }
-    return 1;
+    return true;
 }
 
 bool Script::SaveIniFiles(
@@ -24321,7 +24361,7 @@ bool Script::SaveIniFiles(
     char (*v12)[260] = &SettingT<INIPrefSettingCollection>::GetCollection()->pSettingFile;
     INIPrefSettingCollection* v9 = SettingT<INIPrefSettingCollection>::GetCollection();
     v9->SaveAll(reinterpret_cast<char*>(v12));
-    return 1;
+    return true;
 }
 
 bool Script::ReloadCurrentWeather(
@@ -24339,12 +24379,12 @@ bool Script::ReloadCurrentWeather(
     TESFile* File = Thread->GetFile(-1);
     if (File) {
         TESFile* ThreadSafeFile = File->GetThreadSafeFile();
-        ThreadSafeFile->OpenTES(NiFile::READ_ONLY, static_cast<bool>(0));
+        ThreadSafeFile->OpenTES(NiFile::READ_ONLY, false);
         ThreadSafeFile->FindForm(Thread);
         Thread->ClearData();
         Thread->Load(ThreadSafeFile);
     }
-    return 1;
+    return true;
 }
 
 bool Script::TestSeenData(
@@ -24364,7 +24404,7 @@ bool Script::TestSeenData(
         pnode = ::new (apMemory) NiNode(0);
     }
     else {
-        pnode = 0;
+        pnode = nullptr;
     }
     TESObjectCELL* pcell = pPlayer->GetParentCell();
     if (pcell->GetInterior()) {
@@ -24372,7 +24412,7 @@ bool Script::TestSeenData(
         if (pdata) {
             const NiPoint3* v8 = &pPlayer->GetLocationOnReference();
             NiPoint3 coord(static_cast<float>(0.0), static_cast<float>(0.0), v8->z);
-            pdata->DrawSeenData(pnode, coord, 1);
+            pdata->DrawSeenData(pnode, coord, true);
             float frot = pcell->GetNorthRotation() * -1.0;
             if (frot != 0.0) {
                 rot = NiMatrix3_IDENTITY;
@@ -24384,12 +24424,12 @@ bool Script::TestSeenData(
     else {
         for (int32_t x_2 = 0;; ++x_2) {
             // The grid count is compared unsigned.
-            if (static_cast<uint32_t>(x_2) >= static_cast<uint32_t>(uGridsToLoad.UInt())) {
+            if (static_cast<uint32_t>(x_2) >= uGridsToLoad.UInt()) {
                 break;
             }
             for (int32_t y_2 = 0;; ++y_2) {
                 SeenData* pdata_2;
-                if (static_cast<uint32_t>(y_2) >= static_cast<uint32_t>(uGridsToLoad.UInt())) {
+                if (static_cast<uint32_t>(y_2) >= uGridsToLoad.UInt()) {
                     break;
                 }
                 TESObjectCELL* pcell_2 = TES::pInstance->GetGridCell(x_2, y_2)->pCell;
@@ -24397,7 +24437,7 @@ bool Script::TestSeenData(
                     pdata_2 = pcell_2->GetSeenData();
                 }
                 else {
-                    pdata_2 = 0;
+                    pdata_2 = nullptr;
                 }
                 SeenData* pdata_3 = pdata_2;
                 if (pdata_2) {
@@ -24405,16 +24445,16 @@ bool Script::TestSeenData(
                     float y = static_cast<float>(pcell_2->GetDataY() << 12);
                     float x = static_cast<float>(pcell_2->GetDataX() << 12);
                     NiPoint3 coord_2(x, y, a2);
-                    pdata_3->DrawSeenData(pnode, coord_2, 1);
+                    pdata_3->DrawSeenData(pnode, coord_2, true);
                 }
             }
         }
     }
-    NiUpdateData UpdateData(0.0f, 0, 0);
+    NiUpdateData UpdateData(0.0f, false, false);
     pnode->Update(UpdateData);
     pnode->UpdateProperties();
     TES::pInstance->AddTempDebugObject(pnode, 30.0f);
-    return 1;
+    return true;
 }
 
 bool Script::ToggleFullHelp(
@@ -24436,7 +24476,7 @@ bool Script::ToggleFullHelp(
         v9 = "hidden.";
     }
     Interface::PrintLine("Toggle Full Help %s", v9);
-    return 1;
+    return true;
 }
 
 bool Script::ToggleSkyFunction(
@@ -24478,7 +24518,7 @@ bool Script::ToggleSkyFunction(
         }
         Interface::PrintLine("Sky -> %s", v9);
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleCollisionFunction(
@@ -24518,7 +24558,7 @@ bool Script::ToggleCollisionFunction(
             Interface::PrintLine("Collision -> %s", v9);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleWireframeFunction(
@@ -24545,7 +24585,7 @@ bool Script::ToggleWireframeFunction(
         }
         Interface::PrintLine("Wireframe -> %s", v9);
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleFootIK(
@@ -24591,7 +24631,7 @@ bool Script::ToggleFootIK(
             Interface::PrintLine("FootIK %s", v12);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleDebugTextFunction(
@@ -24615,7 +24655,7 @@ bool Script::ToggleDebugTextFunction(
         }
         Interface::PrintLine("Debug Text -> %s", v9);
     }
-    return 1;
+    return true;
 }
 
 bool Script::ShowScenegraphFunction(
@@ -24649,7 +24689,7 @@ bool Script::ShowScenegraphFunction(
                     NiTreeCtrl(appMain->hInstance, FormFlags, v20, windowName, 0x80000000u, 0x80000000u, 800, 600);
             }
             else {
-                pWindow = 0;
+                pWindow = nullptr;
             }
             if (pPlayer->Is3rdPerson()) {
                 a3 = "Player 1st Person";
@@ -24686,7 +24726,7 @@ bool Script::ShowScenegraphFunction(
             );
         }
         else {
-            v23 = 0;
+            v23 = nullptr;
         }
         SceneGraph* v11 = Main::MenuRootNode();
         v23->CreateTree(v11, "Fallout Interface Scene Graph");
@@ -24705,7 +24745,7 @@ bool Script::ShowScenegraphFunction(
             v23->CreateTree(Root, "Fallout Screen Splatter Scene Graph");
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleEOFImageSpace(
@@ -24719,7 +24759,7 @@ bool Script::ToggleEOFImageSpace(
     uint32_t& auiOffset
 ) {
     ImageSpaceManager::bEOFEnabled = !ImageSpaceManager::bEOFEnabled;
-    return 1;
+    return true;
 }
 
 bool Script::ToggleAiDetection(
@@ -24743,7 +24783,7 @@ bool Script::ToggleAiDetection(
         }
         Interface::PrintLine("AI Detection is  %s", v9);
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleActorAI(
@@ -24770,7 +24810,7 @@ bool Script::ToggleActorAI(
             Interface::PrintLine("%s processing is  %s", pActor->GetFullName(), v9);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsActorsAIOff(
@@ -24802,7 +24842,7 @@ bool Script::IsActorsAIOff(
             Interface::PrintLine("%s processing is  %s", pActor->GetFullName(), v9);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleAISchedules(
@@ -24826,7 +24866,7 @@ bool Script::ToggleAISchedules(
         }
         Interface::PrintLine("AI Processing of Actor's Editor Schedules is  %s", v9);
     }
-    return 1;
+    return true;
 }
 
 bool Script::TogglePathingInfoFunction(
@@ -24840,17 +24880,17 @@ bool Script::TogglePathingInfoFunction(
     uint32_t& auiOffset
 ) {
     if (g_bIsShowPathingInfo) {
-        g_bIsShowPathingInfo = 0;
+        g_bIsShowPathingInfo = false;
     }
     else {
-        g_bIsShowPathingInfo = 1;
+        g_bIsShowPathingInfo = true;
         if (!Interface::IsDebugTextVisible()) {
             Interface::ToggleDebugTextVisible();
         }
         DebugTextManager* Singleton = DebugTextManager::GetSingleton();
         Singleton->SetScreenDebugPage("Pathing", 0);
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleGrassUpdateFunction(
@@ -24864,7 +24904,7 @@ bool Script::ToggleGrassUpdateFunction(
     uint32_t& auiOffset
 ) {
     bIsToggleGrassUpdate = !bIsToggleGrassUpdate;
-    return 1;
+    return true;
 }
 
 bool Script::SetAtStartFunction(
@@ -24905,12 +24945,12 @@ bool Script::SetAtStartFunction(
             v23->SetRotate(v21);
             // apRefObject is tested again here, as the game does.
             if (!apRefObject || !apRefObject->GetAnimation()) {
-                NiUpdateData arData(0.0f, 0, 0);
+                NiUpdateData arData(0.0f, false, false);
                 v23->Update(arData);
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::PlayExplosionFunction(
@@ -24925,13 +24965,13 @@ bool Script::PlayExplosionFunction(
 ) {
     if (apRefObject) {
         NiAVObject* pobj = apRefObject->Get3D();
-        NiNode* obj3D = 0;
+        NiNode* obj3D = nullptr;
         if (pobj) {
             obj3D = pobj->IsNode();
         }
         if (obj3D && obj3D->GetControllers()) {
             NiTimeController* po = obj3D->GetControllers();
-            NiControllerManager* pmanager = 0;
+            NiControllerManager* pmanager = nullptr;
             while (po) {
                 if (NiObject::IsKindOf_0(&NiControllerManager::ms_RTTI, po)) {
                     pmanager = static_cast<NiControllerManager*>(po);
@@ -24951,9 +24991,9 @@ bool Script::PlayExplosionFunction(
                             pmanager->DeactivateSequence(pdisableSeq, 0.0f);
                         }
                     }
-                    pmanager->ActivateSequence(pseq, 0, 0, 1.0f, 0.0f, 0);
+                    pmanager->ActivateSequence(pseq, 0, false, 1.0f, 0.0f, nullptr);
                     pseq->SetOffset(-3.4028235e+38f);
-                    pmanager->SetActive(1);
+                    pmanager->SetActive(true);
                 }
                 else {
                     int32_t fEaseOutTimeb = apRefObject->iFormID;
@@ -24978,9 +25018,9 @@ bool Script::PlayExplosionFunction(
                 apRefObject->GetFullName(), fEaseOutTimed
             );
         }
-        apRefObject->SetAltered(1);
+        apRefObject->SetAltered(true);
     }
-    return 1;
+    return true;
 }
 
 bool Script::ScriptEffectFinishFunction(
@@ -25001,7 +25041,7 @@ bool Script::ScriptEffectFinishFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetIsCloudy(
@@ -25014,7 +25054,7 @@ bool Script::GetIsCloudy(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetIsCloudyConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetIsCloudyConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetAttacked(
@@ -25027,7 +25067,7 @@ bool Script::GetAttacked(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetAttackedConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::GetAttackedConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::RemoveScriptPackageFunction(
@@ -25042,7 +25082,7 @@ bool Script::RemoveScriptPackageFunction(
 ) {
     Actor* pActor = dynamic_cast<Actor*>(apRefObject);
     if (pActor) {
-        pActor->StopCombat(0);
+        pActor->StopCombat(nullptr);
         TESPackage* pPackage = pActor->GetPackageSetAsPcurrent();
         if (pPackage) {
             if (pPackage->GetIsCreated()) {
@@ -25056,18 +25096,18 @@ bool Script::RemoveScriptPackageFunction(
                 BaseProcess* CurrentAIProcess = pActor->pCurrentProcess;
                 CurrentAIProcess->ClearCurrentPackage();
                 BaseProcess* v11 = pActor->pCurrentProcess;
-                v11->CheckforNewPackage(pActor, 1);
+                v11->CheckforNewPackage(pActor, true);
             }
         }
         if (pActor == pPlayer) {
-            pPlayer->SetAIControlledPackage(0);
-            Animation* Animation_0 = pPlayer->GetAnimation(static_cast<bool>(1));
-            Animation_0->SpecialIdleFree(1, 0);
-            Animation* v9 = pPlayer->GetAnimation(static_cast<bool>(0));
-            v9->SpecialIdleFree(1, 0);
+            pPlayer->SetAIControlledPackage(false);
+            Animation* Animation_0 = pPlayer->GetAnimation(true);
+            Animation_0->SpecialIdleFree(true, false);
+            Animation* v9 = pPlayer->GetAnimation(false);
+            v9->SpecialIdleFree(true, false);
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetActionRefFunction(
@@ -25093,7 +25133,7 @@ bool Script::GetActionRefFunction(
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetActionRef >> (%08x)", apID);
     }
-    return 1;
+    return true;
 }
 
 bool Script::ResetFallDamageTimerFunction(
@@ -25113,7 +25153,7 @@ bool Script::ResetFallDamageTimerFunction(
             CharController->QFallStartHeight();
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsPlayersLastRiddenHorseFunction(
@@ -25126,7 +25166,7 @@ bool Script::IsPlayersLastRiddenHorseFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    bool bretval = Cmd_SetArgTo0AndReturnTrue(apRefObject, 0, 0, afReturnValue);
+    bool bretval = Cmd_SetArgTo0AndReturnTrue(apRefObject, nullptr, nullptr, afReturnValue);
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("Actor players last ridden horse >> %0.2f", afReturnValue);
     }
@@ -25146,7 +25186,7 @@ bool Script::ClearAdaptedLight(
     if (BSShaderManager::bHDR) {
         ImageSpaceEffectHDR::ClearAdaptedLight();
     }
-    return 1;
+    return true;
 }
 
 bool Script::ToggleVATSLight(
@@ -25160,7 +25200,7 @@ bool Script::ToggleVATSLight(
     uint32_t& auiOffset
 ) {
     if (!pVATS.GetVATSLight()) {
-        return 1;
+        return true;
     }
     ShadowSceneLight* VATSLight = pVATS.GetVATSLight();
     NiLight* Light = VATSLight->GetLight();
@@ -25168,7 +25208,7 @@ bool Script::ToggleVATSLight(
         Interface::PrintLine("VATS Lighting On");
         ShadowSceneLight* v10 = pVATS.GetVATSLight();
         NiLight* v11 = v10->GetLight();
-        v11->SetAppCulled(0);
+        v11->SetAppCulled(false);
         ShadowSceneLight* v16 = pVATS.GetVATSLight();
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
         ShadowSceneNode_->UpdateLight(v16);
@@ -25177,9 +25217,9 @@ bool Script::ToggleVATSLight(
         Interface::PrintLine("VATS Lighting Off");
         ShadowSceneLight* v14 = pVATS.GetVATSLight();
         NiLight* v15 = v14->GetLight();
-        v15->SetAppCulled(1);
+        v15->SetAppCulled(true);
     }
-    return 1;
+    return true;
 }
 
 bool Script::ResetDialogueFlags(
@@ -25199,15 +25239,15 @@ bool Script::ResetDialogueFlags(
     pPlayer->ResetPlayerGreetFlag();
     TESTopic* pInfoRefusalTopic = TESTopic::GetTopic(DT_MISCELLANEOUS, 12);
     TESTopic* pHelloTopic = TESTopic::GetTopic(DT_CONVERSATION, 0);
-    bool bfoundInfoRefusal = 0;
+    bool bfoundInfoRefusal = false;
     for (TESTopic* ptopic : *pDataHandler->GetTopicList()) {
         if (ptopic) {
             if (ptopic == pInfoRefusalTopic) {
-                bfoundInfoRefusal = 1;
+                bfoundInfoRefusal = true;
             }
             for (QUEST_INFO* pQuestInfo : *&ptopic->m_listQuestInfo) {
                 if (pQuestInfo) {
-                    TopicInfoArray* pInfoArray = static_cast<TopicInfoArray*>(&pQuestInfo->infoArray);
+                    TopicInfoArray* pInfoArray = (&pQuestInfo->infoArray);
                     uint32_t maxSize = pInfoArray->m_uiSize;
                     for (uint32_t i = 0; i < maxSize; ++i) {
                         TESTopicInfo* pti = pInfoArray->GetAt(i);
@@ -25220,7 +25260,7 @@ bool Script::ResetDialogueFlags(
         }
     }
     DialogMenu::DebugResetSaidOnceFlags();
-    return 1;
+    return true;
 }
 
 bool Script::ToggleDepthBiasFunction(
@@ -25242,7 +25282,7 @@ bool Script::ToggleDepthBiasFunction(
         v9 = "OFF";
     }
     Interface::PrintLine("Depth Bias is now %s!", v9);
-    return 1;
+    return true;
 }
 
 bool Script::DisableAllMinesFunction(
@@ -25265,7 +25305,7 @@ bool Script::DisableAllMinesFunction(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool Script::KillQuestUpdates(
@@ -25281,7 +25321,7 @@ bool Script::KillQuestUpdates(
     if (HUDMainMenu::pme) {
         HUDMainMenu::pme->KillQuestUpdates();
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetHeadingAngleFunction(
@@ -25295,16 +25335,16 @@ bool Script::GetHeadingAngleFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject && a8) {
-        return Script::GetHeadingAngleConditionFunction(apRefObject, a8, 0, afReturnValue);
+        return Script::GetHeadingAngleConditionFunction(apRefObject, a8, nullptr, afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsWeaponOutFunction(
@@ -25317,7 +25357,7 @@ bool Script::IsWeaponOutFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return !apRefObject || Script::IsWeaponOutConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return !apRefObject || Script::IsWeaponOutConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetDefaultOpenFunction(
@@ -25331,12 +25371,12 @@ bool Script::GetDefaultOpenFunction(
     uint32_t& auiOffset
 ) {
     if (!Cmd_GetDefaultOpen(apRefObject, nullptr, nullptr, afReturnValue)) {
-        return 0;
+        return false;
     }
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetDefaultOpen >> %0.2f", afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsTimePassingFunction(
@@ -25349,7 +25389,7 @@ bool Script::IsTimePassingFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::IsTimePassingConditionFunction(apRefObject, 0, 0, afReturnValue);
+    return Script::IsTimePassingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetCellOwnershipFunction(
@@ -25365,18 +25405,18 @@ bool Script::GetCellOwnershipFunction(
     void* a8;
     TESForm* a3;
     afReturnValue = 0.0;
-    a8 = 0;
-    a3 = 0;
+    a8 = nullptr;
+    a3 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &a3
         )) {
-        return 0;
+        return false;
     }
     if (!a3) {
         a3 = pPlayer->GetObjectReference();
     }
     Cmd_IsCellOwner(apRefObject, a8, a3, afReturnValue);
-    return 1;
+    return true;
 }
 
 bool Script::IsSneakingFunction(
@@ -25389,8 +25429,8 @@ bool Script::IsSneakingFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Script::IsSneakingConditionFunction(apRefObject, 0, 0, afReturnValue);
-    return 1;
+    Script::IsSneakingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
+    return true;
 }
 
 bool Script::IsInInteriorFunction(
@@ -25403,8 +25443,8 @@ bool Script::IsInInteriorFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    Script::IsInInteriorConditionFunction(apRefObject, 0, 0, afReturnValue);
-    return 1;
+    Script::IsInInteriorConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
+    return true;
 }
 
 bool Script::GetKillerFunction(
@@ -25418,11 +25458,11 @@ bool Script::GetKillerFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetKillerConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetKillerConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetKillerObjectFunction(
@@ -25436,11 +25476,11 @@ bool Script::GetKillerObjectFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetKillerObjectConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetKillerObjectConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetFactionCombatReactionFunction(
@@ -25455,8 +25495,8 @@ bool Script::GetFactionCombatReactionFunction(
 ) {
     void* a8;
     TESForm* apParam2;
-    a8 = 0;
-    apParam2 = 0;
+    a8 = nullptr;
+    apParam2 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8,
                &apParam2
@@ -25475,16 +25515,16 @@ bool Script::GetFactionRelationFunction(
     uint32_t& auiOffset
 ) {
     Actor* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject && a8) {
-        return Cmd_GetFactionRelation(apRefObject, a8, 0, afReturnValue);
+        return Cmd_GetFactionRelation(apRefObject, a8, nullptr, afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::IsLastIdlePlayedFunction(
@@ -25498,16 +25538,16 @@ bool Script::IsLastIdlePlayedFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
         )) {
-        return 0;
+        return false;
     }
     if (apRefObject && a8) {
-        return Cmd_IsLastIdlePlayed(apRefObject, a8, 0, afReturnValue);
+        return Cmd_IsLastIdlePlayed(apRefObject, a8, nullptr, afReturnValue);
     }
-    return 1;
+    return true;
 }
 
 bool Script::GetIsAlignmentFunction(
@@ -25525,7 +25565,7 @@ bool Script::GetIsAlignmentFunction(
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Cmd_GetIsAlignment(apRefObject, a8, 0, afReturnValue);
+        Cmd_GetIsAlignment(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetVATSRightAreaFreeFunction(
@@ -25539,11 +25579,11 @@ bool Script::GetVATSRightAreaFreeFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetVATSRightAreaFreeConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetVATSRightAreaFreeConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetVATSLeftAreaFreeFunction(
@@ -25557,11 +25597,11 @@ bool Script::GetVATSLeftAreaFreeFunction(
     uint32_t& auiOffset
 ) {
     void* a8;
-    a8 = 0;
+    a8 = nullptr;
     return Script::ParseParameters(
                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
            ) &&
-        Script::GetVATSLeftAreaFreeConditionFunction(apRefObject, a8, 0, afReturnValue);
+        Script::GetVATSLeftAreaFreeConditionFunction(apRefObject, a8, nullptr, afReturnValue);
 }
 
 bool Script::GetReputationFunction(
@@ -25576,17 +25616,17 @@ bool Script::GetReputationFunction(
 ) {
     int32_t RepType;
     TESReputation* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &RepType
         )) {
-        return 0;
+        return false;
     }
     if (RepType < 0 || RepType > 1) {
-        return 0;
+        return false;
     }
     afReturnValue = a8->GetReputationValue(static_cast<ReputationType>(RepType));
-    return 1;
+    return true;
 }
 
 bool Script::GetReputationPctFunction(
@@ -25601,17 +25641,17 @@ bool Script::GetReputationPctFunction(
 ) {
     int32_t RepType;
     TESReputation* a8;
-    a8 = 0;
+    a8 = nullptr;
     if (!Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8, &RepType
         )) {
-        return 0;
+        return false;
     }
     if (RepType < 0 || RepType > 1) {
-        return 0;
+        return false;
     }
     afReturnValue = a8->GetReputationPct(static_cast<ReputationType>(RepType));
-    return 1;
+    return true;
 }
 
 bool Script::ChallengeLockedFunction(
@@ -25625,15 +25665,15 @@ bool Script::ChallengeLockedFunction(
     uint32_t& auiOffset
 ) {
     TESChallenge* a8;
-    a8 = 0;
+    a8 = nullptr;
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
     );
     if (!a8) {
-        return 0;
+        return false;
     }
     afReturnValue = static_cast<double>(a8->GetUnlocked());
-    return 1;
+    return true;
 }
 
 bool Script::GetChallengeCompletedFunction(
@@ -25647,16 +25687,16 @@ bool Script::GetChallengeCompletedFunction(
     uint32_t& auiOffset
 ) {
     TESChallenge* a8;
-    a8 = 0;
+    a8 = nullptr;
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
     );
     if (!a8) {
-        return 0;
+        return false;
     }
     int32_t v9 = a8->GetCompleted() || a8->GetCompletedRecurring();
     afReturnValue = static_cast<double>(v9);
-    return 1;
+    return true;
 }
 
 TESClimate* Sky::GetCurrentClimate() const {

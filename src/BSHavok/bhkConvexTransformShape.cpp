@@ -79,7 +79,7 @@ void bhkConvexTransformShape::LinkObject(NiStream& arStream) {
         cinfo->m_childShape = static_cast<hkpConvexShape*>(ps->phkObject);
     }
     else {
-        cinfo->m_childShape = 0;
+        cinfo->m_childShape = nullptr;
     }
     bhkShape::LinkObject(arStream);
 }

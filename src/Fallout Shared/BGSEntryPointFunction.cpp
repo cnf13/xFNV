@@ -43,7 +43,7 @@ BGSEntryPointFunctionData* CreateEntryPointFunctionObject(int32_t a1) {
             if (pMemory) {
                 return ::new (pMemory) BGSEntryPointFunctionDataOneValue;
             }
-            return 0;
+            return nullptr;
         }
         case 2: {
             BGSEntryPointFunctionDataTwoValue* pMemory =
@@ -51,7 +51,7 @@ BGSEntryPointFunctionData* CreateEntryPointFunctionObject(int32_t a1) {
             if (pMemory) {
                 return ::new (pMemory) BGSEntryPointFunctionDataTwoValue;
             }
-            return 0;
+            return nullptr;
         }
         case 3: {
             BGSEntryPointFunctionDataLeveledList* pMemory = static_cast<BGSEntryPointFunctionDataLeveledList*>(
@@ -60,7 +60,7 @@ BGSEntryPointFunctionData* CreateEntryPointFunctionObject(int32_t a1) {
             if (pMemory) {
                 return ::new (pMemory) BGSEntryPointFunctionDataLeveledList;
             }
-            return 0;
+            return nullptr;
         }
         case 4: {
             BGSEntryPointFunctionDataActivateChoice* pMemory = static_cast<BGSEntryPointFunctionDataActivateChoice*>(
@@ -69,9 +69,9 @@ BGSEntryPointFunctionData* CreateEntryPointFunctionObject(int32_t a1) {
             if (pMemory) {
                 return ::new (pMemory) BGSEntryPointFunctionDataActivateChoice;
             }
-            return 0;
+            return nullptr;
         }
-        default: return 0;
+        default: return nullptr;
     }
 }
 
@@ -198,7 +198,7 @@ void BGSEntryPointFunction::EntryPointFunction::AddLeveledList(
         if (InventoryChanges_) {
             while (ecx0 && (!ecx0->IsEmpty() && ecx0->m_item)) {
                 ContainerObject* m_item = ecx0->m_item;
-                TESBoundObject* pObj = 0;
+                TESBoundObject* pObj = nullptr;
                 if (m_item->pObj) {
                     if (m_item->pObj->IsBoundObject()) {
                         pObj = m_item->pObj;
@@ -207,7 +207,7 @@ void BGSEntryPointFunction::EntryPointFunction::AddLeveledList(
                 if (pObj) {
                     Script* apScript = TESScriptableForm::GetFormScript(m_item->pObj);
                     if (apScript) {
-                        ExtraDataList* v10 = 0;
+                        ExtraDataList* v10 = nullptr;
                         for (int32_t i = 0; i < m_item->i_count; ++i) {
                             ExtraDataList* v7;
                             ExtraDataList* apMemory = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
@@ -215,7 +215,7 @@ void BGSEntryPointFunction::EntryPointFunction::AddLeveledList(
                                 v7 = ::new (apMemory) ExtraDataList;
                             }
                             else {
-                                v7 = 0;
+                                v7 = nullptr;
                             }
                             v10 = v7;
                             v7->SetCount(1);
@@ -231,7 +231,7 @@ void BGSEntryPointFunction::EntryPointFunction::AddLeveledList(
                         a1->AddObjecttoContainer(pObj, v10, 1);
                     }
                     else {
-                        a1->AddObjecttoContainer(pObj, 0, m_item->i_count);
+                        a1->AddObjecttoContainer(pObj, nullptr, m_item->i_count);
                     }
                 }
                 ecx0 = ecx0->m_pkNext;
@@ -260,7 +260,7 @@ void BGSEntryPointFunction::EntryPointFunction::AddActivateChoice(
                 if (static_cast<uint8_t>(a2->GetRunImmediately())) {
                     Script* Script_ = &a2->ActivateChoiceScript;
                     if (Script_) {
-                        Script_->Run(ownerObject, 0, 0, 0);
+                        Script_->Run(ownerObject, nullptr, nullptr, false);
                     }
                 }
                 else {
@@ -411,7 +411,7 @@ BGSEntryPointFunctionData* BGSEntryPointFunctionDataActivateChoice::Duplicate() 
         v4 = ::new (apMemory) BGSEntryPointFunctionDataActivateChoice;
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     v4->SetLabel(pActivateChoiceLabel);
     Script* Name = GetScript();
@@ -425,19 +425,19 @@ bool BGSEntryPointFunctionDataActivateChoice::Compare(BGSEntryPointFunctionData*
     BGSEntryPointFunctionDataActivateChoice* pactivateChoice =
         dynamic_cast<BGSEntryPointFunctionDataActivateChoice*>(apCompare);
     if (!pactivateChoice) {
-        return 1;
+        return true;
     }
     if ((pActivateChoiceLabel && !pactivateChoice->pActivateChoiceLabel) ||
         (!pActivateChoiceLabel && pactivateChoice->pActivateChoiceLabel)) {
-        return 1;
+        return true;
     }
     if (pActivateChoiceLabel &&
         (pactivateChoice->pActivateChoiceLabel &&
          BSstrcmp(pActivateChoiceLabel, pactivateChoice->pActivateChoiceLabel))) {
-        return 1;
+        return true;
     }
     if ((&ActivateChoiceScript)->CompareResultScripts(&pactivateChoice->ActivateChoiceScript)) {
-        return 1;
+        return true;
     }
     return cFlags != pactivateChoice->cFlags;
 }
@@ -524,12 +524,12 @@ bool BGSEntryPointFunctionDataActivateChoice::Load(TESFile* apFile) {
 // Resolves the choice script's form references, then reports what its InitItem warned about, tagged with the owning
 // form's editor ID and form ID.
 void BGSEntryPointFunctionDataActivateChoice::InitItem(TESForm* apOwner) {
-    int32_t iOldWarningCount = static_cast<int32_t>(MessageHandler::QWarningCount());
+    int32_t iOldWarningCount = MessageHandler::QWarningCount();
     MessageHandler::IncDisableWarningCount(true);
     MessageHandler::SetWarningCount(0);
     ActivateChoiceScript.InitItem(apOwner);
     MessageHandler::IncDisableWarningCount(false);
-    int32_t iWarningCount = static_cast<int32_t>(MessageHandler::QWarningCount());
+    int32_t iWarningCount = MessageHandler::QWarningCount();
     MessageHandler::SetWarningCount(iOldWarningCount);
     if (iWarningCount) {
         // Reads the form ID before the editor ID.
@@ -546,13 +546,13 @@ void BGSEntryPointFunctionDataActivateChoice::InitItem(TESForm* apOwner) {
 
 void BGSEntryPointFunctionDataActivateChoice::InitializeData() {
     cFlags = (uint16_t)0;
-    (&ActivateChoiceScript)->TESForm::SetInitialized(0);
+    (&ActivateChoiceScript)->TESForm::SetInitialized(false);
     (&ActivateChoiceScript)->TESForm::SetTemporary();
 }
 
 void BGSEntryPointFunctionDataActivateChoice::SetLabel(const char* apLabel) {
     ourFree(pActivateChoiceLabel);
-    pActivateChoiceLabel = 0;
+    pActivateChoiceLabel = nullptr;
     if (apLabel) {
         uint32_t v2 = BSstrlen(apLabel);
         pActivateChoiceLabel = static_cast<char*>(ourMalloc(v2 + 1));
@@ -720,12 +720,12 @@ BGSEntryPointFunctionData* BGSEntryPointFunctionDataTwoValue::Duplicate() {
 bool BGSEntryPointFunctionDataTwoValue::Compare(BGSEntryPointFunctionData* apCompare) {
     BGSEntryPointFunctionDataTwoValue* v4 = dynamic_cast<BGSEntryPointFunctionDataTwoValue*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (v4->fValue1 == fValue1) {
         return (bool)((uint8_t)(v4->fValue2 != fValue2));
     }
-    return (bool)1;
+    return true;
 }
 
 void BGSEntryPointFunctionDataTwoValue::Save() {
@@ -746,7 +746,7 @@ bool BGSEntryPointFunctionDataTwoValue::Load(TESFile* apFile) {
     TwoValues kData;
     uint32_t isize = apFile->GetChunkSize();
     if (isize != 8) {
-        return 0;
+        return false;
     }
     apFile->GetChunkData(&kData, 8u);
     if (apFile->QEndian()) {
@@ -754,5 +754,5 @@ bool BGSEntryPointFunctionDataTwoValue::Load(TESFile* apFile) {
     }
     fValue1 = kData.fValue1;
     fValue2 = kData.fValue2;
-    return 1;
+    return true;
 }

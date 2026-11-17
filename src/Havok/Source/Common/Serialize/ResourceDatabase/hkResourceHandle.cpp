@@ -303,10 +303,11 @@ hkResourceContainer::~hkResourceContainer() {}
 void hkResourceContainer::findAllResourceRecursively(
     hkArray<hkResourceHandle*, hkContainerHeapAllocator>& resourcesOut
 ) {
-    for (hkResourceContainer* i = findContainerByName(0, 0); i; i = findContainerByName(0, i)) {
+    for (hkResourceContainer* i = findContainerByName(nullptr, nullptr); i; i = findContainerByName(nullptr, i)) {
         i->findAllResourceRecursively(resourcesOut);
     }
-    for (hkResourceHandle* j = findResourceByName(0, 0, 0); j; j = findResourceByName(0, 0, j)) {
+    for (hkResourceHandle* j = findResourceByName(nullptr, nullptr, nullptr); j;
+         j = findResourceByName(nullptr, nullptr, j)) {
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
         if (resourcesOut.m_size == (resourcesOut.m_capacityAndFlags & hkArrayBase<hkResourceHandle*>::CAPACITY_MASK)) {
             hkArrayUtil::_reserveMore(*Instance->m_heap, &resourcesOut, sizeof(hkResourceHandle*));
@@ -323,7 +324,7 @@ void hkResourceContainer::findAllContainersRecursively(
         hkArrayUtil::_reserveMore(*Instance->m_heap, &resourcesOut, sizeof(hkResourceContainer*));
     }
     resourcesOut.m_data[resourcesOut.m_size++] = this;
-    for (hkResourceContainer* i = findContainerByName(0, 0); i; i = findContainerByName(0, i)) {
+    for (hkResourceContainer* i = findContainerByName(nullptr, nullptr); i; i = findContainerByName(nullptr, i)) {
         i->findAllContainersRecursively(resourcesOut);
     }
 }
@@ -446,9 +447,9 @@ hkResourceHandle* hkMemoryResourceContainer::findResourceByName(
     bool v7 = v5 < m_resourceHandles.m_size;
     int32_t v22 = v5;
     if (!v7) {
-        return 0;
+        return nullptr;
     }
-    while (1) {
+    while (true) {
         const hkClass* v13;
         const hkClass* v14;
         hkMemoryResourceHandle* v8 = m_resourceHandles.m_data[v22];
@@ -500,18 +501,18 @@ hkResourceHandle* hkMemoryResourceContainer::findResourceByName(
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, -0xFCB12DE, buf, ".\\ResourceDatabase\\hkResourceHandle.cpp", 312
             );
-            return 0;
+            return nullptr;
         }
     LABEL_18:;
         v7 = ++v22 < m_resourceHandles.m_size;
         if (!v7) {
-            return 0;
+            return nullptr;
         }
     }
 }
 
 hkResourceContainer* hkMemoryResourceContainer::createContainer(const char* name) {
-    hkResourceContainer* result = findContainerByName(name, 0);
+    hkResourceContainer* result = findContainerByName(name, nullptr);
     if (!result) {
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
         hkMemoryResourceContainer* v5 =
@@ -576,7 +577,7 @@ void hkMemoryResourceContainer::destroyContainer(hkResourceContainer* container2
         if (v8) {
             v8->removeReference();
         }
-        *v9 = 0;
+        *v9 = nullptr;
         uint32_t v10 = --m_children.m_size;
         if (v10 != v6) {
             m_children.m_data[v6] = m_children.m_data[v10];
@@ -607,9 +608,9 @@ hkResourceContainer* hkMemoryResourceContainer::findContainerByName(
     while (*v5 != prevContainer);
     int32_t v6 = v4;
     if (v4 >= m_children.m_size) {
-        return 0;
+        return nullptr;
     }
-    while (1) {
+    while (true) {
         v7 = m_children.m_data[v6];
         if (!containerName ||
             !hkString::strCmp(
@@ -619,7 +620,7 @@ hkResourceContainer* hkMemoryResourceContainer::findContainerByName(
             break;
         }
         if (++v6 >= m_children.m_size) {
-            return 0;
+            return nullptr;
         }
     }
     return v7;

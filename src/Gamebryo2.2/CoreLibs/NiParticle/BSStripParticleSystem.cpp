@@ -25,8 +25,8 @@ NiObject* BSStripParticleSystem::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -80,7 +80,7 @@ NiObject* BSStripParticleSystem::CreateObject() {
     BSStripParticleSystem* pkObject =
         static_cast<BSStripParticleSystem*>(NiMemObject::operator new(sizeof(BSStripParticleSystem)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) BSStripParticleSystem;
 }

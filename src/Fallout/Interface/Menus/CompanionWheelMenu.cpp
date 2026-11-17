@@ -81,7 +81,7 @@
 #include "SDK/MSVC/stdio.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 int32_t return_1075() {
     return 1075;
@@ -157,7 +157,7 @@ void CompanionWheelMenu::DoClick(int32_t aiID, Tile* apTarget) {
             }
             case 11: {
                 InterfaceManager::PlayMenuSound(MENU_SOUND_OK);
-                CompanionWheelMenu::Close(1);
+                CompanionWheelMenu::Close(true);
                 break;
             }
             default: {
@@ -185,7 +185,7 @@ void CompanionWheelMenu::DoIdle() {
         if (BSGetTickCount() > m_nTimeToClearSubtitle) {
             m_nTimeToClearSubtitle = 0;
             if (pTiles[12]) {
-                pTiles[12]->Set(4036, "", 1);
+                pTiles[12]->Set(4036, "", true);
             }
         }
     }
@@ -236,7 +236,7 @@ void CompanionWheelMenu::DoIdle() {
 bool CompanionWheelMenu::DoGamepad(int32_t aiButton, float afValue) {
     int8_t v5 = 0;
     if (!Interface::IsTopMenuID(static_cast<Interface::enumMenus>(1075))) {
-        return (bool)0;
+        return false;
     }
     if (aiButton == 9) {
         if (m_CurrentlySelectedTile == -1) {
@@ -245,12 +245,12 @@ bool CompanionWheelMenu::DoGamepad(int32_t aiButton, float afValue) {
         else {
             DoClick(m_CurrentlySelectedTile, pTiles[m_CurrentlySelectedTile]);
         }
-        return (bool)1;
+        return true;
     }
     else {
         if (aiButton == 10) {
             DoClick(11, pTiles[11]);
-            return (bool)1;
+            return true;
         }
     }
     return (bool)v5;
@@ -260,10 +260,10 @@ bool CompanionWheelMenu::IsWellFormedMenu() {
     int32_t i;
     for (i = 0; i < 16; ++i) {
         if (!pTiles[i]) {
-            return (bool)0;
+            return false;
         }
     }
-    return (bool)1;
+    return true;
 }
 
 void CompanionWheelMenu::Do_Backup() {
@@ -295,7 +295,7 @@ void CompanionWheelMenu::RunTopicScript(TESTopic* a2) {
             if (resultScript->GetHeader()->dataSize) {
                 extraDataList = m_pRelatedCompanion->TESObjectREFR::GetExtra();
                 scriptLocals = extraDataList->GetScriptLocals();
-                resultScript->Run(m_pRelatedCompanion, scriptLocals, nullptr, 1);
+                resultScript->Run(m_pRelatedCompanion, scriptLocals, nullptr, true);
             }
         }
         v8 = matchingInfo_1->GetResultScript(TIRS_END);
@@ -303,7 +303,7 @@ void CompanionWheelMenu::RunTopicScript(TESTopic* a2) {
             if (v8->GetHeader()->dataSize) {
                 v3 = m_pRelatedCompanion->TESObjectREFR::GetExtra();
                 v5 = v3->GetScriptLocals();
-                v8->Run(m_pRelatedCompanion, v5, nullptr, 1);
+                v8->Run(m_pRelatedCompanion, v5, nullptr, true);
             }
         }
     }
@@ -311,7 +311,7 @@ void CompanionWheelMenu::RunTopicScript(TESTopic* a2) {
 
 void CompanionWheelMenu::SetButtonPreviewText(const char* asText) {
     if (pTiles[9]) {
-        pTiles[9]->Set(4036, asText, (bool)1);
+        pTiles[9]->Set(4036, asText, true);
     }
 }
 
@@ -370,7 +370,7 @@ void CompanionWheelMenu::SpeakTopic(TESTopic* a1) {
     FNVD_INLINED_LOCAL(BSStringT<char>, v10, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, v11, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
-    TESTopicInfo* apTopicInfo = 0;
+    TESTopicInfo* apTopicInfo = nullptr;
     TESObjectREFR* apTarget = (TESObjectREFR*)pPlayer;
     Actor* apSpeaker = m_pRelatedCompanion;
     if (a1) {
@@ -383,7 +383,7 @@ void CompanionWheelMenu::SpeakTopic(TESTopic* a1) {
         if (pResponse) {
             if (pResponse->pVoiceSound) {
                 int32_t refID = pResponse->pVoiceSound->iFormID;
-                BSSoundHandle* v16 = apSpeaker->PlaySound(&a2, refID, 0, 258u, 1);
+                BSSoundHandle* v16 = apSpeaker->PlaySound(&a2, refID, false, 258u, true);
                 this->m_hCurrentReactivityBark.operator=(*v16);
             }
             else {
@@ -396,7 +396,7 @@ void CompanionWheelMenu::SpeakTopic(TESTopic* a1) {
                 char* v3 = pResponse->GetVoice()->pString;
                 float v21 = apSpeaker->SpeakSoundFunction(
                     v3, this->m_hCurrentReactivityBark, FormFlags, CastingType, Length, SpeakerIdle, ListenerIdle, v9,
-                    1, 1, 0, 0, 1
+                    true, true, false, false, true
                 );
             }
             BSSoundHandle* v19 = &v11;
@@ -412,7 +412,7 @@ void CompanionWheelMenu::SpeakTopic(TESTopic* a1) {
 }
 
 void CompanionWheelMenu::OpenInventory() {
-    CompanionWheelMenu::Close(1);
+    CompanionWheelMenu::Close(true);
     TESForm* formByEditorID = TESForm::GetFormByEditorID("FollowersTrade");
     TESTopic* a2 = dynamic_cast<TESTopic*>(formByEditorID);
     if (m_pRelatedCompanion) {
@@ -426,7 +426,7 @@ void CompanionWheelMenu::HandleMouseoverForTile(int32_t aiID, uint8_t a2) {
     if (a2 || m_CurrentlySelectedTile != aiID) {
         BSAudio* v3 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "UIPipBoyScroll", 289u);
-        SoundHandleByName->Play(0);
+        SoundHandleByName->Play(false);
         if (m_CurrentlySelectedTile != CompanionWheelMenu::TI_NO_TILE) {
             if (pTiles[m_CurrentlySelectedTile]) {
                 pTiles[m_CurrentlySelectedTile]->Set(Tile::kTileValue_User10, 0);
@@ -701,12 +701,12 @@ void CompanionWheelMenu::Do_UseStim() {
                     Actor* m_pRelatedCompanion = this->m_pRelatedCompanion;
                     if (m_pRelatedCompanion) {
                         BodyPartCondition = CombatFormulas::GetBodyPartCondition(
-                            m_pRelatedCompanion, ActorValue::LEFT_ATTACK_CONDITION, 0
+                            m_pRelatedCompanion, ActorValue::LEFT_ATTACK_CONDITION, false
                         );
                     }
                     else {
                         BodyPartCondition =
-                            CombatFormulas::GetBodyPartCondition(0, ActorValue::LEFT_ATTACK_CONDITION, 0);
+                            CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::LEFT_ATTACK_CONDITION, false);
                     }
                     float v24 = BodyPartCondition;
                     if (v24 == 0.0) {
@@ -714,10 +714,10 @@ void CompanionWheelMenu::Do_UseStim() {
                     }
                     Actor* v16 = this->m_pRelatedCompanion;
                     if (v16) {
-                        v3 = CombatFormulas::GetBodyPartCondition(v16, ActorValue::LEFT_MOBILITY_CONDITION, 0);
+                        v3 = CombatFormulas::GetBodyPartCondition(v16, ActorValue::LEFT_MOBILITY_CONDITION, false);
                     }
                     else {
-                        v3 = CombatFormulas::GetBodyPartCondition(0, ActorValue::LEFT_MOBILITY_CONDITION, 0);
+                        v3 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::LEFT_MOBILITY_CONDITION, false);
                     }
                     float v27 = v3;
                     if (v27 == 0.0) {
@@ -725,10 +725,10 @@ void CompanionWheelMenu::Do_UseStim() {
                     }
                     Actor* v15 = this->m_pRelatedCompanion;
                     if (v15) {
-                        v4 = CombatFormulas::GetBodyPartCondition(v15, ActorValue::RIGHT_MOBILITY_CONDITION, 0);
+                        v4 = CombatFormulas::GetBodyPartCondition(v15, ActorValue::RIGHT_MOBILITY_CONDITION, false);
                     }
                     else {
-                        v4 = CombatFormulas::GetBodyPartCondition(0, ActorValue::RIGHT_MOBILITY_CONDITION, 0);
+                        v4 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::RIGHT_MOBILITY_CONDITION, false);
                     }
                     float v25 = v4;
                     if (v25 == 0.0) {
@@ -736,10 +736,10 @@ void CompanionWheelMenu::Do_UseStim() {
                     }
                     Actor* v14 = this->m_pRelatedCompanion;
                     if (v14) {
-                        v5 = CombatFormulas::GetBodyPartCondition(v14, ActorValue::RIGHT_ATTACK_CONDITION, 0);
+                        v5 = CombatFormulas::GetBodyPartCondition(v14, ActorValue::RIGHT_ATTACK_CONDITION, false);
                     }
                     else {
-                        v5 = CombatFormulas::GetBodyPartCondition(0, ActorValue::RIGHT_ATTACK_CONDITION, 0);
+                        v5 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::RIGHT_ATTACK_CONDITION, false);
                     }
                     float v21 = v5;
                     if (v21 == 0.0) {
@@ -747,10 +747,10 @@ void CompanionWheelMenu::Do_UseStim() {
                     }
                     Actor* v13 = this->m_pRelatedCompanion;
                     if (v13) {
-                        v6 = CombatFormulas::GetBodyPartCondition(v13, ActorValue::PERCEPTION_CONDITION, 0);
+                        v6 = CombatFormulas::GetBodyPartCondition(v13, ActorValue::PERCEPTION_CONDITION, false);
                     }
                     else {
-                        v6 = CombatFormulas::GetBodyPartCondition(0, ActorValue::PERCEPTION_CONDITION, 0);
+                        v6 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::PERCEPTION_CONDITION, false);
                     }
                     float v23 = v6;
                     if (v23 == 0.0) {
@@ -758,10 +758,10 @@ void CompanionWheelMenu::Do_UseStim() {
                     }
                     Actor* v12 = this->m_pRelatedCompanion;
                     if (v12) {
-                        v7 = CombatFormulas::GetBodyPartCondition(v12, ActorValue::ENDURANCE_CONDITION, 0);
+                        v7 = CombatFormulas::GetBodyPartCondition(v12, ActorValue::ENDURANCE_CONDITION, false);
                     }
                     else {
-                        v7 = CombatFormulas::GetBodyPartCondition(0, ActorValue::ENDURANCE_CONDITION, 0);
+                        v7 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::ENDURANCE_CONDITION, false);
                     }
                     float v26 = v7;
                     if (v26 == 0.0) {
@@ -775,20 +775,20 @@ void CompanionWheelMenu::Do_UseStim() {
                                 apList = InventoryItem_0->pExtraObjectList->m_item;
                             }
                             else {
-                                apList = 0;
+                                apList = nullptr;
                             }
                             AlchemyItem* v8 = dynamic_cast<AlchemyItem*>(InventoryItem_0->pContainerObj);
-                            this->m_pRelatedCompanion->DrinkPotion(v8, apList, 1);
+                            this->m_pRelatedCompanion->DrinkPotion(v8, apList, true);
                         }
                         if (InventoryItem_0->pExtraObjectList) {
                             m_item = InventoryItem_0->pExtraObjectList->m_item;
                         }
                         else {
-                            m_item = 0;
+                            m_item = nullptr;
                         }
                         TESBoundObject* FormFlags = InventoryItem_0->pContainerObj;
-                        pPlayer->RemoveItem(FormFlags, m_item, 1, 0, 0, 0, 0, 0, 1, 0);
-                        this->m_pRelatedCompanion->UpdateMagic(0, 1);
+                        pPlayer->RemoveItem(FormFlags, m_item, 1, false, false, nullptr, nullptr, nullptr, true, false);
+                        this->m_pRelatedCompanion->UpdateMagic(false, true);
                         this->m_pRelatedCompanion->RestoreActorValue(ActorValue::BRAIN_CONDITION, 1000.0f);
                         this->m_pRelatedCompanion->RestoreActorValue(ActorValue::LEFT_MOBILITY_CONDITION, 1000.0f);
                         this->m_pRelatedCompanion->RestoreActorValue(ActorValue::RIGHT_MOBILITY_CONDITION, 1000.0f);
@@ -813,7 +813,7 @@ void CompanionWheelMenu::TransitionFromCloseToTalkTo() {
         if (!pactor->IsDying()) {
             BaseProcess* pprocess = pactor->pCurrentProcess;
             if (pprocess) {
-                if ((!pprocess->GetCommandingActor() || pactor->IsDead(0)) && !pprocess->GetFadeState()) {
+                if ((!pprocess->GetCommandingActor() || pactor->IsDead(false)) && !pprocess->GetFadeState()) {
                     BaseProcess* pPlayerProc = pActionActor->pCurrentProcess;
                     TESPackage* pactionpackage = pPlayerProc->GetPackageThatIsRunning();
                     TESPackage* potherpackage = pprocess->GetPackageThatIsRunning();
@@ -821,9 +821,9 @@ void CompanionWheelMenu::TransitionFromCloseToTalkTo() {
                         BaseProcess* v22;
                         BaseProcess* v23;
                         if (pactor->IsInCombat() && (pActionActor == pPlayer && pactor->IsPlayerTeammate())) {
-                            pVATS.QuitVATSPlayback(0, 0);
+                            pVATS.QuitVATSPlayback(false, false);
                             Interface::QueueMenuCreate(
-                                Interface::OPEN_DIALOG, pactor, 0, 0, Interface::CMM_STANDARD, 0
+                                Interface::OPEN_DIALOG, pactor, nullptr, nullptr, Interface::CMM_STANDARD, false
                             );
                             return;
                         }
@@ -834,7 +834,7 @@ void CompanionWheelMenu::TransitionFromCloseToTalkTo() {
                                (pactor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
                                 ((v23 = pactor->pCurrentProcess, v23->GetFurnitureMarker()) &&
                                  (v22 = pactor->pCurrentProcess, v22->GetFurnitureMarker()->cNumber > 19u))))))) {
-                            if (!pactor->IsReanimated() && !pactor->IsDead(0) &&
+                            if (!pactor->IsReanimated() && !pactor->IsDead(false) &&
                                 (pActionActor != pPlayer || (!pactor->IsKnockedOut() || !pactor->GetEssential()))) {
                                 TESPackage* v1;
                                 TESPackage* v2;
@@ -851,23 +851,25 @@ void CompanionWheelMenu::TransitionFromCloseToTalkTo() {
                                           (!pPlayer->IsSneaking() || pactor->IsPlayerTeammate())) ||
                                          pactor->GetGhost())) {
                                         BaseProcess* CurrentAIProcess;
-                                        TESTopic* pgreetTopic = 0;
+                                        TESTopic* pgreetTopic = nullptr;
                                         if (pActionActor == pPlayer ||
                                             (CurrentAIProcess = pActionActor->pCurrentProcess,
                                              CurrentAIProcess->GetNeedTalkPlayer())) {
                                             pgreetTopic = TESTopic::GetTopic(DT_TOPIC, 0);
                                         }
-                                        DialogueItem* pgreetDialogue = 0;
+                                        DialogueItem* pgreetDialogue = nullptr;
                                         if (pgreetTopic) {
                                             if (pActionActor == pPlayer) {
-                                                pgreetDialogue =
-                                                    pgreetTopic->CreateDialogueItem(pactor, pPlayer, 0, 0, 0);
+                                                pgreetDialogue = pgreetTopic->CreateDialogueItem(
+                                                    pactor, pPlayer, nullptr, nullptr, false
+                                                );
                                             }
                                             else {
                                                 BaseProcess* v20 = pActionActor->pCurrentProcess;
                                                 if (v20->GetNeedTalkPlayer()) {
-                                                    pgreetDialogue =
-                                                        pgreetTopic->CreateDialogueItem(pActionActor, pPlayer, 0, 0, 0);
+                                                    pgreetDialogue = pgreetTopic->CreateDialogueItem(
+                                                        pActionActor, pPlayer, nullptr, nullptr, false
+                                                    );
                                                 }
                                             }
                                         }
@@ -876,15 +878,17 @@ void CompanionWheelMenu::TransitionFromCloseToTalkTo() {
                                              (pgreetDialogue->FirstResponse() && !pgreetDialogue->NextResponse()))) {
                                             if (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
                                                 BaseProcess* v19 = pactor->pCurrentProcess;
-                                                v19->SetNeedTalkPlayer(1);
+                                                v19->SetNeedTalkPlayer(true);
                                                 pactor->InitiateGetUpPackage();
                                                 return;
                                             }
                                             if (pactor == pPlayer) {
-                                                pActionActor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, 0, 0);
+                                                pActionActor->SayForceGoodbyeGreetingToPlayer(
+                                                    pgreetTopic, false, false
+                                                );
                                             }
                                             else {
-                                                pactor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, 0, 0);
+                                                pactor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, false, false);
                                             }
                                         }
                                         else {
@@ -900,10 +904,10 @@ void CompanionWheelMenu::TransitionFromCloseToTalkTo() {
                                             }
                                             if (pactor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
                                                 NiPoint3 v40 = pActionActor->GetLocationOnReference();
-                                                pactor->RequestRotate(v40, static_cast<bool>(0));
+                                                pactor->RequestRotate(v40, false);
                                             }
-                                            TESTopic* ptopic = 0;
-                                            Actor* pspeaker = 0;
+                                            TESTopic* ptopic = nullptr;
+                                            Actor* pspeaker = nullptr;
                                             if (pActionActor == pPlayer) {
                                                 if (!pactor->IsPathingComplete() && !pactor->IsRotating()) {
                                                     BaseProcess* v15 = pactor->pCurrentProcess;
@@ -935,7 +939,7 @@ void CompanionWheelMenu::TransitionFromCloseToTalkTo() {
                                                 pactor->InterruptCast();
                                                 if (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
                                                     BaseProcess* v14 = pactor->pCurrentProcess;
-                                                    v14->SetNeedTalkPlayer(1);
+                                                    v14->SetNeedTalkPlayer(true);
                                                     pactor->InitiateGetUpPackage();
                                                 }
                                                 else {
@@ -943,10 +947,10 @@ void CompanionWheelMenu::TransitionFromCloseToTalkTo() {
                                                     if (pActionActor == pPlayer) {
                                                         pact = pactor;
                                                     }
-                                                    pVATS.QuitVATSPlayback(0, 0);
+                                                    pVATS.QuitVATSPlayback(false, false);
                                                     Interface::QueueMenuCreate(
-                                                        Interface::OPEN_DIALOG, pact, ptopic, 0,
-                                                        Interface::CMM_STANDARD, 0
+                                                        Interface::OPEN_DIALOG, pact, ptopic, nullptr,
+                                                        Interface::CMM_STANDARD, false
                                                     );
                                                 }
                                             }
@@ -996,14 +1000,14 @@ void CompanionWheelMenu::TransitionFromCloseToTalkTo() {
                                                             BaseProcess::POSTANIM_FORCEIDLE_ANIMATION
                                                         );
                                                     }
-                                                    pVATS.QuitVATSPlayback(0, 0);
+                                                    pVATS.QuitVATSPlayback(false, false);
                                                     Actor* pact_2 = pActionActor;
                                                     if (pActionActor == pPlayer) {
                                                         pact_2 = pactor;
                                                     }
                                                     Interface::QueueMenuCreate(
-                                                        Interface::OPEN_DIALOG, pact_2, ptopic, 0,
-                                                        Interface::CMM_STANDARD, 0
+                                                        Interface::OPEN_DIALOG, pact_2, ptopic, nullptr,
+                                                        Interface::CMM_STANDARD, false
                                                     );
                                                 }
                                             }
@@ -1021,7 +1025,7 @@ void CompanionWheelMenu::TransitionFromCloseToTalkTo() {
                                     char msg[200];
                                     const char* v8 = sActivateNPCCalmed.String();
                                     std::sprintf(msg, "%s %s", pactor->GetFullName(), v8);
-                                    Interface::ShowMessage(msg, 0, 0, 0, 2.0f, 0);
+                                    Interface::ShowMessage(msg, 0, nullptr, nullptr, 2.0f, false);
                                 }
                             }
                         }
@@ -1037,7 +1041,7 @@ void CompanionWheelMenu::DisplayCompanionWheelSubtitle(BSStringT<char> asText, B
         if (gs_bGeneralSubtitles_Gameplay.Bool() ||
             (m_pRelatedCompanion && static_cast<uint8_t>(m_pRelatedCompanion->GetShowSubtitles()))) {
             if (pTiles[12]) {
-                pTiles[12]->Set(4036, asText.pString, 1);
+                pTiles[12]->Set(4036, asText.pString, true);
             }
             float Duration = static_cast<float>(ahSound.GetDuration());
             if (Duration == 0.0) {
@@ -1057,12 +1061,12 @@ bool CompanionWheelMenu::CreateCompanionWheelMenu(Actor* apRelatedCompanion) {
         pmenu = dynamic_cast<CompanionWheelMenu*>(Menu_);
     }
     else {
-        pmenu = 0;
+        pmenu = nullptr;
     }
     if (pmenu) {
         delete pmenu;
     }
-    return CompanionWheelMenu::Create(apRelatedCompanion) != 0;
+    return CompanionWheelMenu::Create(apRelatedCompanion) != nullptr;
 }
 
 void CompanionWheelMenu::Close(bool abClearOutSpeech) {
@@ -1123,39 +1127,39 @@ Tile* CompanionWheelMenu::Create(Actor* apRelatedCompanion) {
             );
         }
         if (CompanionWheelMenu::pMe->pTiles[12]) {
-            CompanionWheelMenu::pMe->pTiles[12]->Set(4036, "", 1);
+            CompanionWheelMenu::pMe->pTiles[12]->Set(4036, "", true);
         }
         if (CompanionWheelMenu::pMe->pTiles[8]) {
             const char* v3 = sCWheelTitle.String();
-            CompanionWheelMenu::pMe->pTiles[8]->Set(4036, v3, 1);
+            CompanionWheelMenu::pMe->pTiles[8]->Set(4036, v3, true);
         }
         if (CompanionWheelMenu::pMe->pTiles[13]) {
             const char* v4 = sExit.String();
-            CompanionWheelMenu::pMe->pTiles[13]->Set(4036, v4, 1);
+            CompanionWheelMenu::pMe->pTiles[13]->Set(4036, v4, true);
         }
         if (CompanionWheelMenu::pMe->pTiles[14]) {
             const char* v5 = sSelect.String();
-            CompanionWheelMenu::pMe->pTiles[14]->Set(4036, v5, 1);
+            CompanionWheelMenu::pMe->pTiles[14]->Set(4036, v5, true);
         }
         if (CompanionWheelMenu::pMe->pTiles[15]) {
             const char* v6 = sNavigate.String();
-            CompanionWheelMenu::pMe->pTiles[15]->Set(4036, v6, 1);
+            CompanionWheelMenu::pMe->pTiles[15]->Set(4036, v6, true);
         }
-        CompanionWheelMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), 0);
+        CompanionWheelMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
         if (CompanionWheelMenu::pMe->IsWellFormedMenu()) {
             BSAudio* v8 = &BSAudio::QInstance();
             BSSoundHandle* SoundHandleByName = v8->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-            SoundHandleByName->Play(0);
+            SoundHandleByName->Play(false);
             if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
                 float afValue = Tile::GetMaximumDepth();
-                ptile->Set(4013, afValue, 1);
+                ptile->Set(4013, afValue, true);
             }
-            CompanionWheelMenu::pMe->PrepForVisibility(0);
+            CompanionWheelMenu::pMe->PrepForVisibility(false);
             return ptile;
         }
         else {
             Warning("MENUS: Companion Wheel Menu Creation Failed... Are your menu and art resources up to date?");
-            return 0;
+            return nullptr;
         }
     }
     else {
@@ -1166,7 +1170,7 @@ Tile* CompanionWheelMenu::Create(Actor* apRelatedCompanion) {
                 }
             }
         }
-        return 0;
+        return nullptr;
     }
 }
 

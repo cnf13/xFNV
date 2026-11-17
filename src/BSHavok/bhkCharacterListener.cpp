@@ -17,11 +17,11 @@
 // Builds the listener: the up direction, the slope's cosine (rounded to float), the support surface and the empty
 // support heights. hkSupportNorm is deliberately left as it was, as the game does.
 bhkCharacterListener::bhkCharacterListener(const hkVector4& arUp, float afMaxSlope, float afStepHeight)
-  : iFlags(0), hkUp(arUp), fMaxSlope(static_cast<float>(std::cos(afMaxSlope))), eSupportMaterial(BHK_MATERIAL_MAX),
+  : iFlags(0), hkUp(arUp), fMaxSlope(std::cos(afMaxSlope)), eSupportMaterial(BHK_MATERIAL_MAX),
     eSupportLayer(L_UNIDENTIFIED), SupportHeight{1.17549435e-38f, 1.17549435e-38f, 1.17549435e-38f, 1.17549435e-38f},
     fStepHeight(afStepHeight), bAllSurfacesStopped(false), bStickyCollisions(false), iNumCollisions(0) {
     hkSupportVelocity.setZero4();
-    float fSin = static_cast<float>(std::sin(afMaxSlope));
+    float fSin = std::sin(afMaxSlope);
     fCastDepth = static_cast<float>(
         static_cast<double>(afStepHeight) / static_cast<double>(fSin) * static_cast<double>(fMaxSlope)
     );
@@ -79,9 +79,9 @@ void bhkCharacterListener::characterInteractionCallback(
         float v7 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v6[0])));
         v8[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
         __m128 v9 = _mm_cmpeq_ss(v6, v8);
-        v8[0] = 3.0f - static_cast<float>(static_cast<float>(v6[0] * v7) * v7);
+        v8[0] = 3.0f - ((v6[0] * v7) * v7);
         __m128 v10 = _mm_setzero_ps();
-        v10[0] = static_cast<float>(0.5f * v7) * v8[0];
+        v10[0] = (0.5f * v7) * v8[0];
         __m128 v11 = _mm_andnot_ps(v9, v10);
         v13.m_quad = _mm_add_ps(
             (&apOtherProxy->getLinearVelocity())->m_quad,

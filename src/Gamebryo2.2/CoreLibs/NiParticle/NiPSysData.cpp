@@ -45,8 +45,8 @@ NiObject* NiPSysData::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -249,12 +249,12 @@ void NiPSysData::CopyMembers(NiPSysData* pkDest, NiCloningProcess& kCloning) {
     NiPoint3* pkVertex = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(m_usVertices * sizeof(NiPoint3)));
     size_t stPointBytes = m_usVertices * sizeof(NiPoint3);
     rt::memcpy(pkVertex, m_pkVertex, stPointBytes);
-    NiPoint3* pkNormal = 0;
+    NiPoint3* pkNormal = nullptr;
     if (m_pkNormal) {
         pkNormal = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(m_usVertices * sizeof(NiPoint3)));
         rt::memcpy(pkNormal, m_pkNormal, stPointBytes);
     }
-    NiColorA* pkColor = 0;
+    NiColorA* pkColor = nullptr;
     if (m_pkColor) {
         int32_t iNumObjs = m_usVertices;
         pkColor = static_cast<NiColorA*>(MemoryManager_Singleton.Allocate(m_usVertices * sizeof(NiColorA)));
@@ -262,12 +262,12 @@ void NiPSysData::CopyMembers(NiPSysData* pkDest, NiCloningProcess& kCloning) {
             rt::eh_vector_constructor_iterator(pkColor, sizeof(NiColorA), iNumObjs, &fnvd::constructElement<NiColorA>);
         }
         else {
-            pkColor = 0;
+            pkColor = nullptr;
         }
         rt::memcpy(pkColor, m_pkColor, m_usVertices * sizeof(NiColorA));
     }
-    pkDest->Replace(m_usVertices, pkVertex, pkNormal, pkColor, 0, 0, NiGeometryData::NBT_METHOD_NONE);
-    NiQuaternion* pkRotations = 0;
+    pkDest->Replace(m_usVertices, pkVertex, pkNormal, pkColor, nullptr, 0, NiGeometryData::NBT_METHOD_NONE);
+    NiQuaternion* pkRotations = nullptr;
     if (m_pkRotations) {
         pkRotations = static_cast<NiQuaternion*>(MemoryManager_Singleton.Allocate(m_usVertices * sizeof(NiQuaternion)));
         rt::memcpy(pkRotations, m_pkRotations, m_usVertices * sizeof(NiQuaternion));
@@ -301,7 +301,7 @@ void NiPSysData::CopyMembers(NiPSysData* pkDest, NiCloningProcess& kCloning) {
         rt::memcpy(pkSubTextureOffsets, m_pkSubTextureOffsets, sizeof(NiColorA) * m_ucSubTextureOffsetCount);
         pkDest->ReplaceSubTextureOffsets(pkSubTextureOffsets, m_ucSubTextureOffsetCount);
     }
-    NiParticleInfo* pkParticleInfo = 0;
+    NiParticleInfo* pkParticleInfo = nullptr;
     if (m_pkParticleInfo) {
         int32_t iNumInfos = m_usVertices;
         pkParticleInfo =
@@ -312,13 +312,13 @@ void NiPSysData::CopyMembers(NiPSysData* pkDest, NiCloningProcess& kCloning) {
             );
         }
         else {
-            pkParticleInfo = 0;
+            pkParticleInfo = nullptr;
         }
         rt::memcpy(pkParticleInfo, m_pkParticleInfo, m_usVertices * sizeof(NiParticleInfo));
     }
     MemoryManager_Singleton.Deallocate(pkDest->m_pkParticleInfo);
     pkDest->m_pkParticleInfo = pkParticleInfo;
-    float* pfRotationSpeeds = 0;
+    float* pfRotationSpeeds = nullptr;
     if (m_pfRotationSpeeds) {
         pfRotationSpeeds = static_cast<float*>(_NiMalloc(sizeof(float) * m_usVertices));
         rt::memcpy(pfRotationSpeeds, m_pfRotationSpeeds, sizeof(float) * m_usVertices);
@@ -336,7 +336,7 @@ void NiPSysData::CopyMembers(NiPSysData* pkDest, NiCloningProcess& kCloning) {
 }
 
 void NiPSysData::SortVertices(int32_t a2, int32_t a3) {
-    while (1) {
+    while (true) {
         int32_t v6 = a2;
         int32_t a3a = a3;
         uint16_t v18 = this->m_ausRenderOrder[a2];
@@ -399,7 +399,7 @@ void NiPSysData::SortVertices(int32_t a2, int32_t a3) {
 NiObject* NiPSysData::CreateObject() {
     NiPSysData* pkObject = static_cast<NiPSysData*>(NiMemObject::operator new(sizeof(NiPSysData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysData;
 }

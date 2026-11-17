@@ -222,7 +222,7 @@ void NiMorphData::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
 NiObject* NiMorphData::CreateObject() {
     NiMorphData* pkObject = static_cast<NiMorphData*>(NiMemObject::operator new(sizeof(NiMorphData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiMorphData;
 }

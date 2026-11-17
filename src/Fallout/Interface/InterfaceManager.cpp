@@ -130,7 +130,7 @@
 
 #include <bit>
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 // Idle's function-local static clast_menu_mode: the menu mode the HUD was last set for.
 static int32_t clast_menu_mode = 99;
@@ -178,7 +178,7 @@ int32_t GetIsControllerConnected() {
 }
 
 void QueueRenderedMenuDelete(FORenderedMenu* pRenderedMenu) {
-    kRenderedMenuCriticalSection.Enter(0);
+    kRenderedMenuCriticalSection.Enter(nullptr);
     s_RenderedMenuDeleteList.AddTail(pRenderedMenu);
     kRenderedMenuCriticalSection.Leave();
 }
@@ -284,7 +284,7 @@ bool GetIsFullHelp() {
         return (bool)((uint8_t)InterfaceManager::Instance()->bFullHelp);
     }
     else {
-        return (bool)0;
+        return false;
     }
 }
 
@@ -339,7 +339,7 @@ TileMenu* _ShowLockPickMenu(TESObjectREFR* apRef, int32_t aiLockLevel, bool abFl
 }
 
 void ClearRenderedMenuDeleteList() {
-    kRenderedMenuCriticalSection.Enter(0);
+    kRenderedMenuCriticalSection.Enter(nullptr);
     while (!s_RenderedMenuDeleteList.IsEmpty()) {
         FORenderedMenu* v0 = s_RenderedMenuDeleteList.RemoveHead();
         if (v0) {
@@ -408,7 +408,7 @@ bool InterfaceManager::TutorialManager::ShowMessage(
                 pMessage = dynamic_cast<BGSMessage*>(pForm);
             }
             else {
-                pMessage = 0;
+                pMessage = nullptr;
             }
             bShow = pMessage && pMessage->IsMsgFlag2Set() && ReturnTrue() && !tMessages[aeID].bMessageShown;
         }
@@ -443,7 +443,7 @@ void InterfaceManager::TutorialManager::Save(char* apSaveString) {
     uint32_t j;
     int8_t v6;
     uint32_t v7 = 0;
-    for (i = (uint32_t)GetSaveLoadSize(); v7 < i; i = (uint32_t)GetSaveLoadSize()) {
+    for (i = GetSaveLoadSize(); v7 < i; i = GetSaveLoadSize()) {
         v6 = 0;
         for (j = 0; j < 8; ++j) {
             aeID = (int32_t)(j + (8 * v7));
@@ -481,7 +481,7 @@ void InterfaceManager::TutorialManager::Update() {
             // The tutorial messages' form IDs start at 0x168, in TutorialMessageID order.
             TESForm* pForm = TESForm::GetFormByNumericID(static_cast<uint32_t>(eDisplayID) + 0x168);
             BGSMessage* pMessage = dynamic_cast<BGSMessage*>(pForm);
-            if (!pMessage || !TutorialMenu::Create(pMessage, 0) || !FlagAsShown(eDisplayID)) {
+            if (!pMessage || !TutorialMenu::Create(pMessage, false) || !FlagAsShown(eDisplayID)) {
                 Warning("Error occurred while trying to display tutorial message");
             }
             uiNextDisplay = 0;
@@ -526,47 +526,47 @@ bool InterfaceManager::TutorialManager::FlagAsShown(Interface::TutorialMessageID
 }
 
 InterfaceManager::InterfaceManager()
-  : bFirstInit(0), bSecondInit(0), spSceneGraph(nullptr), sp3DSceneGraph(nullptr),
-    cMenuMode(InterfaceManager::eMenuModeOff), bExternalForcedMenuMode(0), bLockMenuModeForFade(0),
+  : bFirstInit(false), bSecondInit(false), spSceneGraph(nullptr), sp3DSceneGraph(nullptr),
+    cMenuMode(InterfaceManager::eMenuModeOff), bExternalForcedMenuMode(false), bLockMenuModeForFade(false),
     cStatsPageNumber(-1), cInventoryPageNumber(-1), cMagicPageNumber(-1), cMapPageNumber(-1), iPickDistance(80),
     pPlayerLight(nullptr), pCursor(nullptr), fMouseWheel(0.0f), fMouseHeldTime(0.0f), pDragTarget(nullptr),
     iDragStartX(0), iDragStartY(0), iCursorOffsetX(0), iCursorOffsetY(0), ConsolePickRefs(), iCurrentPickIndex(0),
-    bShowMouse(0), pInterfaceRoot(nullptr), pCursorRoot(nullptr), pPlayerRoot(nullptr), spInterfaceAccum(nullptr),
+    bShowMouse(false), pInterfaceRoot(nullptr), pCursorRoot(nullptr), pPlayerRoot(nullptr), spInterfaceAccum(nullptr),
     sp3dInterfaceAccum(nullptr), pShadowNode(nullptr), pMenusRoot(nullptr), pDebugTextRoot(nullptr),
     fOneToOneDistance(0.0f), spAlphaProp(nullptr), iCharHit(0), pTargetReticle(nullptr), pSafeZone(nullptr),
-    pMouseOverTarget(nullptr), iLastXDefault(100), bPreLoadMainMenus(1), bFirstChanceLoad(0), pOverTileTarget(nullptr),
-    pOverTileMenu(nullptr), pDragOverTileTarget(nullptr), pDragOverTileMenu(nullptr), bFullHelp(0),
-    cLastMessageButtonClicked(-1), fpResult(nullptr), bTextureRelease(0), bMouseInMotion(1), pPickRef(nullptr),
-    pReticleRef(nullptr), pCrossHairRef(nullptr), pActivateRef(nullptr), pTelekinesisRef(nullptr),
-    pActivatePickLocation(0.0f, 0.0f, 0.0f), bFuzzyActivatePick(0), iEnterStack(), bClickMultithreaded(0),
-    bShiftDown(0), iModifierKeys(0), iRepeatingKey(0), uKeyDownTime(0), iLastGamepadEvent(Interface::eButtonNone),
-    bIsInRenderedMenu(0), pCurrentRenderedMenu(nullptr), bMouseOverRenderedMenu(0), pPipboy(nullptr), HUDEffects(),
-    VATSEffect(), fPipboyMouseX(0.0f), fPipboyMouseY(0.0f), iPipboyMenuToSet(0),
-    ePipboyState(InterfaceManager::PS_CLOSED), pPipboyCallback(nullptr), xGlowBranchTiles(), bQueueCloseSupportMenus(0),
-    bContainerOpenQueued(0), fAspectRatioRatio(1.0f), xTutorialManager() {
+    pMouseOverTarget(nullptr), iLastXDefault(100), bPreLoadMainMenus(true), bFirstChanceLoad(false),
+    pOverTileTarget(nullptr), pOverTileMenu(nullptr), pDragOverTileTarget(nullptr), pDragOverTileMenu(nullptr),
+    bFullHelp(false), cLastMessageButtonClicked(-1), fpResult(nullptr), bTextureRelease(false), bMouseInMotion(true),
+    pPickRef(nullptr), pReticleRef(nullptr), pCrossHairRef(nullptr), pActivateRef(nullptr), pTelekinesisRef(nullptr),
+    pActivatePickLocation(0.0f, 0.0f, 0.0f), bFuzzyActivatePick(false), iEnterStack(), bClickMultithreaded(false),
+    bShiftDown(false), iModifierKeys(0), iRepeatingKey(0), uKeyDownTime(0), iLastGamepadEvent(Interface::eButtonNone),
+    bIsInRenderedMenu(false), pCurrentRenderedMenu(nullptr), bMouseOverRenderedMenu(false), pPipboy(nullptr),
+    HUDEffects(), VATSEffect(), fPipboyMouseX(0.0f), fPipboyMouseY(0.0f), iPipboyMenuToSet(0),
+    ePipboyState(InterfaceManager::PS_CLOSED), pPipboyCallback(nullptr), xGlowBranchTiles(),
+    bQueueCloseSupportMenus(false), bContainerOpenQueued(false), fAspectRatioRatio(1.0f), xTutorialManager() {
     AutoMemContext kMemContext(MEM_CONTEXT_INTERFACE);
     InterfaceManager::fCurrAlphaDPS = 0.0f;
-    InterfaceManager::bAlphaGoingDown = 0;
+    InterfaceManager::bAlphaGoingDown = false;
     InterfaceManager::iLastDPSFadeTime = appTimer.iLastTime;
     double fHalfWidth = InterfaceManager::GetScreenWidth() / 2.0;
     float fHeight = fHalfWidth / std::sin(0.65449846f);
     fOneToOneDistance = std::cos(0.65449846f) * fHeight;
     if (!spAlphaProp.m_pObject) {
         spAlphaProp = new NiAlphaProperty();
-        spAlphaProp->SetAlphaBlending(1);
-        spAlphaProp->SetNoSorter(0);
+        spAlphaProp->SetAlphaBlending(true);
+        spAlphaProp->SetNoSorter(false);
         spAlphaProp->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
         spAlphaProp->SetDestBlendMode(NiAlphaProperty::ALPHA_INVSRCALPHA);
     }
-    sp3DSceneGraph = InitSceneGraph(Main::MenuRootNode3D(), "Menu3DRoot", 1);
-    spSceneGraph = InitSceneGraph(Main::MenuRootNode(), "MenuRoot", 0);
-    MenuManager::Instance(1);
+    sp3DSceneGraph = InitSceneGraph(Main::MenuRootNode3D(), "Menu3DRoot", true);
+    spSceneGraph = InitSceneGraph(Main::MenuRootNode(), "MenuRoot", false);
+    MenuManager::Instance(true);
     pViewCaster = new ViewCaster();
     pTimers = new InterfaceManager::Timer();
     pTimers->pPrev = pTimers;
     spInterfaceAccum = new BSShaderAccumulator(100, 1u, 759u);
     spInterfaceAccum->SetRenderMode(BSShaderManager::BSSM_RENDER_INTERFACE);
-    spInterfaceAccum->SetInterfaceSort(1);
+    spInterfaceAccum->SetInterfaceSort(true);
     sp3dInterfaceAccum = new BSShaderAccumulator(99, 1u, 759u);
 }
 
@@ -604,10 +604,10 @@ InterfaceManager::~InterfaceManager() {
 
 void InterfaceManager::ToggleDebugTextVisible() {
     if (bDebugTextVisible) {
-        SetDebugTextVisible(0);
+        SetDebugTextVisible(false);
     }
     else {
-        SetDebugTextVisible(1);
+        SetDebugTextVisible(true);
     }
 }
 
@@ -645,7 +645,7 @@ void InterfaceManager::HandleControllerStateChange(int32_t aiState) {
         HeadPos = pMenusRoot->xChildren.m_pkHead;
     }
     else {
-        HeadPos = 0;
+        HeadPos = nullptr;
     }
     NiTListItem<Tile*>* pos = HeadPos;
     while (pos) {
@@ -679,11 +679,11 @@ void InterfaceManager::ToggleSafeZone(int32_t abForceSetTo) {
         if (pSafeZone) {
             delete pSafeZone;
         }
-        pSafeZone = 0;
+        pSafeZone = nullptr;
     }
     if (pSafeZone) {
         delete pSafeZone;
-        pSafeZone = 0;
+        pSafeZone = nullptr;
     }
     else {
         pSafeZone = GetMenusRoot()->ReadFile("Data\\Menus\\Main\\safe_zone.xml");
@@ -703,13 +703,13 @@ void InterfaceManager::UpdateScreenShape(int32_t isizex, int32_t isizey) {
         }
     }
     float afValue = InterfaceManager::GetScreenSafeX();
-    pMenusRoot->Set(4032, afValue, static_cast<bool>(1));
+    pMenusRoot->Set(4032, afValue, true);
     float afValuea = InterfaceManager::GetScreenSafeY();
-    pMenusRoot->Set(4031, afValuea, static_cast<bool>(1));
+    pMenusRoot->Set(4031, afValuea, true);
     float afValueb = InterfaceManager::GetScreenWidth();
-    pMenusRoot->Set(4017, afValueb, static_cast<bool>(1));
+    pMenusRoot->Set(4017, afValueb, true);
     float afValuec = InterfaceManager::GetScreenHeight();
-    pMenusRoot->Set(4016, afValuec, static_cast<bool>(1));
+    pMenusRoot->Set(4016, afValuec, true);
 }
 
 void InterfaceManager::SetCursorPos(float afX, float afY) {
@@ -721,7 +721,7 @@ void InterfaceManager::SetCursorPos(float afX, float afY) {
     double v13 = InterfaceManager::GetScreenHeight() * -afY;
     sCursorPos.z = InterfaceManager::GetScreenHeight() / 2.0 + v13;
     pCursor->GetModel()->SetTranslate(sCursorPos);
-    NiUpdateData UpdateData(0.0f, 0, 0);
+    NiUpdateData UpdateData(0.0f, false, false);
     pCursor->GetModel()->Update(UpdateData);
     double v12 = sCursorPos.x + 3.0;
     double RealScreenWidth = InterfaceManager::GetRealScreenWidth();
@@ -737,15 +737,15 @@ void InterfaceManager::SetCursorPos(float afX, float afY) {
         xnewpos.y = pCursor->GetFloat(4013) * -0.00800000037997961;
         sRealCursorPos = xnewpos;
         if (!InterfaceManager::Has360Controller() || bShowMouse) {
-            bMouseInMotion = 1;
+            bMouseInMotion = true;
             if (GetCurrentMode() == 2) {
-                pCursor->GetModel()->SetAppCulled(0);
+                pCursor->GetModel()->SetAppCulled(false);
                 pCursor->Set(4003, 1);
             }
         }
     }
     if (xnewpos.x != sRealCursorPos.x || xnewpos.z != sRealCursorPos.z) {
-        bMouseInMotion = 1;
+        bMouseInMotion = true;
         double v6 = InterfaceManager::GetRealScreenWidth();
         double v5 = v6 / InterfaceManager::GetScreenWidth() * sRealCursorPos.x;
         sRealCursorPos.x = InterfaceManager::GetRealScreenWidth() / 2.0 + v5;
@@ -773,8 +773,8 @@ void InterfaceManager::EmergencyCloseAllMenusAndBreakStuff() {
             }
             else {
                 if (iEnterStack[i] == 3) {
-                    if (MenuConsole::Instance(0)) {
-                        MenuConsole* v1 = MenuConsole::Instance(1);
+                    if (MenuConsole::Instance(false)) {
+                        MenuConsole* v1 = MenuConsole::Instance(true);
                         v1->ToggleVisible();
                     }
                 }
@@ -784,7 +784,7 @@ void InterfaceManager::EmergencyCloseAllMenusAndBreakStuff() {
     }
     Interface::HideMenus();
     cMenuMode = eMenuModeLeaving;
-    Interface::bAllowPauseMenu = 1;
+    Interface::bAllowPauseMenu = true;
 }
 
 void InterfaceManager::ClosePipboy(void (*apCallback)()) {
@@ -1631,7 +1631,7 @@ void InterfaceManager::DoLeave(Menu* apMenu, int32_t aiID, Tile* apTarget) {
         ListBoxBase* m_item = pnode->m_item;
         if (m_item->GetHighlightedItem() == apTarget) {
             ListBoxBase* v4 = pnode->m_item;
-            if (v4->Highlight(0)) {
+            if (v4->Highlight(nullptr)) {
                 break;
             }
         }
@@ -3000,11 +3000,11 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
     int32_t itype_2;
     int32_t imax_focus;
     int32_t itype;
-    bool bisUpEvent = 0;
+    bool bisUpEvent = false;
     NiTListItem<Tile*>* elem = GetMenusRoot()->xChildren.m_pkTail;
     while (elem) {
         Tile* pmenutile_2 = GetMenusRoot()->xChildren.GetPrev(elem);
-        Menu* pmenu = 0;
+        Menu* pmenu = nullptr;
         if (pmenutile_2) {
             pmenu = pmenutile_2->GetMenu();
         }
@@ -3013,8 +3013,8 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
         }
     }
     if (InterfaceManager::Has360Controller() && !bShowMouse) {
-        bool brepeats_v = 0;
-        bool brepeats_h = 0;
+        bool brepeats_v = false;
+        bool brepeats_h = false;
         Tile* ptarget = pMouseOverTarget;
         if (ptarget && (ptarget->GetMenu() && ptarget->GetMenu()->xFadeState != Interface::FADE_SHOWN)) {
             return;
@@ -3033,12 +3033,12 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
             }
         }
     }
-    Menu* pmenu_2 = MenuManager::Instance(1)->GetFrontmostMenu();
+    Menu* pmenu_2 = MenuManager::Instance(true)->GetFrontmostMenu();
     if (pmenu_2) {
         pmenutile = pmenu_2->pMenu;
     }
     else {
-        pmenutile = 0;
+        pmenutile = nullptr;
     }
     Tile* pmenutile_3 = (Tile*)pmenutile;
     if (!pmenu_2 || (bisUpEvent || !DoGamepad(pmenu_2, aiButton, 1.0f))) {
@@ -3053,7 +3053,7 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
                 if (aiButton == Interface::eButtonDPadUp ||
                     (aiButton == Interface::eButtonDPadDown ||
                      (aiButton == Interface::eButtonDPadLeft || aiButton == Interface::eButtonDPadRight))) {
-                    bMouseInMotion = 0;
+                    bMouseInMotion = false;
                     itype = 4035;
                     int32_t iid = 0;
                     switch (aiButton) {
@@ -3085,7 +3085,7 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
                         }
                         if (pnext) {
                             if (xlast.IsInList(pnext) && (!pnext->IsTrue(4003) || !pnext->IsTrue(4015))) {
-                                pnext = 0;
+                                pnext = nullptr;
                             }
                         }
                         xlast.RemoveAll();
@@ -3096,7 +3096,7 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
                             if (pnext != ptarget_2 && itype == 4039) {
                                 pnext->PlayTileSound(4043);
                             }
-                            SetCurrentFocusTarget(pnext, itype, 1);
+                            SetCurrentFocusTarget(pnext, itype, true);
                         }
                         else {
                             if (DoGamepad(pmenu_2, aiButton, 1.0f) || ptarget_2 == pMouseOverTarget) {
@@ -3107,7 +3107,7 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
                                 }
                             }
                             else {
-                                SetCurrentFocusTarget(ptarget_2, itype, 1);
+                                SetCurrentFocusTarget(ptarget_2, itype, true);
                                 if (ptarget_2) {
                                     ptarget_2->PlayTileSound(4072);
                                 }
@@ -3116,8 +3116,8 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
                     }
                     else {
                         imax_focus = INT32_MIN;
-                        Tile* ptile = ScanForMaxFocus(imax_focus, 0);
-                        SetCurrentFocusTarget(ptile, 4035, 1);
+                        Tile* ptile = ScanForMaxFocus(imax_focus, nullptr);
+                        SetCurrentFocusTarget(ptile, 4035, true);
                         if (!ptile) {
                             Tile* ptile_2 = pmenutile_3->GetFirstRefCopy(iid, itype);
                             if (ptile_2) {
@@ -3140,13 +3140,13 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
                     NiTListItem<Tile*>* elem_2 = GetMenusRoot()->xChildren.m_pkTail;
                     while (elem_2) {
                         Tile* pmenutile_4 = GetMenusRoot()->xChildren.GetPrev(elem_2);
-                        Menu* pmenu_3 = 0;
+                        Menu* pmenu_3 = nullptr;
                         if (pmenutile_4) {
                             pmenu_3 = pmenutile_4->GetMenu();
                         }
                         if (pmenu_3) {
                             if (pmenutile_4->IsVisible()) {
-                                float afValueb = static_cast<float>(InterfaceManager::CheckMenuButton(aiButton, 1));
+                                float afValueb = static_cast<float>(InterfaceManager::CheckMenuButton(aiButton, true));
                                 if (DoGamepad(pmenu_3, aiButton, afValueb)) {
                                     InterfaceManager::ClearMenuButton(aiButton);
                                     return;
@@ -3259,7 +3259,7 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
                 }
             }
             else {
-                MenuConsole* v5 = MenuConsole::Instance(1);
+                MenuConsole* v5 = MenuConsole::Instance(true);
                 if (v5->IsVisible() &&
                     (aiButton == Interface::eButtonDPadUp || aiButton == Interface::eButtonDPadDown)) {
                     iCurrentPickIndex += 2 * (aiButton != Interface::eButtonDPadDown) - 1;
@@ -3664,7 +3664,7 @@ void InterfaceManager::RecursiveFade(NiAVObject* apObject, float afAmount, float
         }
     }
     if (pNode && (!pTile || pTile->GetFloat(Tile::kTileValue_ID) != 9000.0)) {
-        for (uint32_t i = 0; i < static_cast<uint32_t>(pNode->GetArrayCount()); ++i) {
+        for (uint32_t i = 0; i < pNode->GetArrayCount(); ++i) {
             this->RecursiveFade(pNode->GetAt(i), afAmount, fAlpha);
         }
     }
@@ -4052,7 +4052,7 @@ void InterfaceManager::LastMinuteUpdate() {
     Tile::UpdateFadeControls();
     Tile::ResetUpdateCount();
     if (!InterfaceManager::xTileUpdateList.IsEmpty()) {
-        Tile::GetTileUpdateAllCriticalSectionLock()->Enter(0);
+        Tile::GetTileUpdateAllCriticalSectionLock()->Enter(nullptr);
         this->UpdateTileModels();
         Tile::GetTileUpdateAllCriticalSectionLock()->Leave();
     }
@@ -4086,7 +4086,7 @@ int32_t InterfaceManager::GetCursorY() {
 // previous selection printed below them.
 void InterfaceManager::DisplayCurrentPickRef() {
     static int32_t ilastLoc;
-    TESObjectREFR* pSelected = 0;
+    TESObjectREFR* pSelected = nullptr;
     // Reads the font setting before it fetches the font manager.
     int32_t iFont = iDebugTextFont.Int() - 1;
     int32_t iLineHeight = static_cast<int32_t>(FontManager::Instance()->GetFont(iFont)->GetBaseLine()) + 3;
@@ -4104,13 +4104,15 @@ void InterfaceManager::DisplayCurrentPickRef() {
         pPickRef = pSelected;
         uint32_t uiFormID = pPickRef->iFormID;
         sLine.SPrintF("\"%s\" (%08x)", pPickRef->GetFullName(), uiFormID);
-        DebugText::Instance(1)->Print(sLine.pString, 640.0f, static_cast<float>(iTop), 2, -1, -1.0f, 0, 0);
+        DebugText::Instance(true)->Print(sLine.pString, 640.0f, static_cast<float>(iTop), 2, -1, -1.0f, 0, nullptr);
         if (bFullHelp) {
             if (pPickRef->m_Extra.GetScript()) {
                 Script* pScript = pPickRef->m_Extra.GetScript();
                 uint32_t uiScriptID = pPickRef->m_Extra.GetScript()->iFormID;
                 sLine.SPrintF("Script name '%s' (%08x)", pScript->GetFormEditorID(), uiScriptID);
-                DebugText::Instance(1)->Print(sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, 0);
+                DebugText::Instance(true)->Print(
+                    sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, nullptr
+                );
                 iY += iLineHeight;
             }
             if (pPickRef->IsActor()) {
@@ -4122,7 +4124,9 @@ void InterfaceManager::DisplayCurrentPickRef() {
                     TESObjectREFR* pFurniture = pNameProcess->GetCurrentFurniture();
                     uint32_t uiFurnitureID = pIDProcess->GetCurrentFurniture()->iFormID;
                     sLine.SPrintF("current Furniture '%s' (%08x)", pFurniture->GetFormEditorID(), uiFurnitureID);
-                    DebugText::Instance(1)->Print(sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, 0);
+                    DebugText::Instance(true)->Print(
+                        sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, nullptr
+                    );
                     iY += iLineHeight;
                 }
             }
@@ -4130,12 +4134,16 @@ void InterfaceManager::DisplayCurrentPickRef() {
                 TESForm* pOwner = pPickRef->GetOwner();
                 uint32_t uiOwnerID = pPickRef->GetOwner()->iFormID;
                 sLine.SPrintF("Owner name '%s' (%08x)", pOwner->GetFormEditorID(), uiOwnerID);
-                DebugText::Instance(1)->Print(sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, 0);
+                DebugText::Instance(true)->Print(
+                    sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, nullptr
+                );
                 iY += iLineHeight;
             }
             if (pPickRef->m_Extra.GetCount() != 1) {
                 sLine.SPrintF("Count %d", pPickRef->m_Extra.GetCount());
-                DebugText::Instance(1)->Print(sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, 0);
+                DebugText::Instance(true)->Print(
+                    sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, nullptr
+                );
                 iY += iLineHeight;
             }
             if (pPickRef->IsActor()) {
@@ -4160,7 +4168,9 @@ void InterfaceManager::DisplayCurrentPickRef() {
                             pActor->GetCurrentAIProcess()->GetCurrentFurnitureIndex()
                         );
                     }
-                    DebugText::Instance(1)->Print(sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, 0);
+                    DebugText::Instance(true)->Print(
+                        sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, nullptr
+                    );
                     iY += iLineHeight;
                 }
             }
@@ -4168,7 +4178,9 @@ void InterfaceManager::DisplayCurrentPickRef() {
                 sLine.SPrintF(
                     "Orentation %d deg", static_cast<int32_t>(pPickRef->GetAngleOnReference().z * 57.2957763671875)
                 );
-                DebugText::Instance(1)->Print(sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, 0);
+                DebugText::Instance(true)->Print(
+                    sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, nullptr
+                );
                 iY += iLineHeight;
                 FurnitureMark kMarker(255u);
                 for (uint32_t uiMarker = 0; pPickRef->GetMarkerAtIndex(uiMarker, kMarker); ++uiMarker) {
@@ -4177,7 +4189,7 @@ void InterfaceManager::DisplayCurrentPickRef() {
                     if (pFurniture->GetMarkerEnabled(uiMarker)) {
                         float fScale = pPlayer->GetScale();
                         NiPoint3 kOffset = pFurniture->GetMarkerTargetOffset(kMarker.GetType(), fScale);
-                        const char* pUsed = pPickRef->GetMarkerUsed(uiMarker, 1) ? "USED" : "UNUSED";
+                        const char* pUsed = pPickRef->GetMarkerUsed(uiMarker, true) ? "USED" : "UNUSED";
                         const char* pKind = TESFurniture::IsSitMarker(uiType) ? "Sit" : "Sleep";
                         int32_t iHeading =
                             static_cast<int32_t>(pFurniture->GetMarkerHeadingOffset(uiType) * 57.2957763671875);
@@ -4190,7 +4202,9 @@ void InterfaceManager::DisplayCurrentPickRef() {
                         const char* pKind = TESFurniture::IsSitMarker(uiType) ? "Sit" : "Sleep";
                         sLine.SPrintF("Disabled %s Marker %d", pKind, uiType);
                     }
-                    DebugText::Instance(1)->Print(sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, 0);
+                    DebugText::Instance(true)->Print(
+                        sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, nullptr
+                    );
                     iY += iLineHeight;
                 }
             }
@@ -4199,11 +4213,15 @@ void InterfaceManager::DisplayCurrentPickRef() {
                 const char* pState = pLock->IsLocked() ? "Locked" : "Unlocked";
                 int32_t iLockLevel = pLock->GetLockLevel(pPickRef);
                 sLine.SPrintF("Lock '%s' %s.", pLockLevelNames[iLockLevel]->String(), pState);
-                DebugText::Instance(1)->Print(sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, 0);
+                DebugText::Instance(true)->Print(
+                    sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, nullptr
+                );
                 iY += iLineHeight;
                 if (pLock->pKey) {
                     sLine.SPrintF("Key '%s'.", static_cast<TESFullName*>(pLock->pKey)->GetFullName());
-                    DebugText::Instance(1)->Print(sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, 0);
+                    DebugText::Instance(true)->Print(
+                        sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, nullptr
+                    );
                     iY += iLineHeight;
                 }
             }
@@ -4223,7 +4241,9 @@ void InterfaceManager::DisplayCurrentPickRef() {
                     pDoorName = pDoor->GetFullName();
                 }
                 sLine.SPrintF("Teleport Cell '%s' Door '%s'.", pCellName, pDoorName);
-                DebugText::Instance(1)->Print(sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, 0);
+                DebugText::Instance(true)->Print(
+                    sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, nullptr
+                );
                 iY += iLineHeight;
             }
             uint32_t uiActionFlags = pPickRef->GetActionFlag();
@@ -4243,33 +4263,35 @@ void InterfaceManager::DisplayCurrentPickRef() {
                     BSstrcat(acFlags, 256, ", OPEN_BY_DEFAULT");
                 }
                 sLine.SPrintF(acFlags);
-                DebugText::Instance(1)->Print(sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, 0);
+                DebugText::Instance(true)->Print(
+                    sLine.pString, 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, nullptr
+                );
                 iY += iLineHeight;
             }
         }
     }
     else {
-        pPickRef = 0;
-        SetTargetREFR(0);
+        pPickRef = nullptr;
+        SetTargetREFR(nullptr);
         // The line height is measured here and discarded, as the game does.
         int32_t iNoRefFont = iDebugTextFont.Int() - 1;
         static_cast<void>(static_cast<int32_t>(FontManager::Instance()->GetFont(iNoRefFont)->GetBaseLine()));
         float fTop = static_cast<float>(iDebugTextTopBottomOffset.Int());
-        DebugText::Instance(1)->Print("", 640.0f, fTop, 2, -1, -1.0f, 0, 0);
+        DebugText::Instance(true)->Print("", 640.0f, fTop, 2, -1, -1.0f, 0, nullptr);
     }
     int32_t iLastY = iY;
     while (iY < ilastLoc) {
-        DebugText::Instance(1)->Print("", 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, 0);
+        DebugText::Instance(true)->Print("", 640.0f, static_cast<float>(iY), 2, -1, -1.0f, 0, nullptr);
         iY += iLineHeight;
     }
     ilastLoc = iLastY;
 }
 
 void InterfaceManager::OpenPipboy(void (*apCallback)(), Interface::enumMenus aeMenuToOpen) {
-    if (!pPlayer->GetControlsDisabled(PlayerCharacter::DPC_PIPBOY) && !pPlayer->IsDead(0)) {
+    if (!pPlayer->GetControlsDisabled(PlayerCharacter::DPC_PIPBOY) && !pPlayer->IsDead(false)) {
         int32_t Want3rdPerson = pPlayer->GetWant3rdPerson();
         if (Want3rdPerson == pPlayer->Is3rdPerson() && !pPlayer->GetUnderAIControl() && !pPlayer->GetTempPerson() &&
-            (!HUDMainMenu::pme || !HUDMainMenu::pme->IsHotKeyWheelVisible()) && TileIsAcceptingEvents(0) &&
+            (!HUDMainMenu::pme || !HUDMainMenu::pme->IsHotKeyWheelVisible()) && TileIsAcceptingEvents(nullptr) &&
             !pPlayer->IsKnockedOut() && !pVATS.eMode && !bDelayVATSMenu && GetCameraShakeMult() == 0.0 &&
             !pFaderManager->IsFaderVisible(FADER_TO_BLACK)) {
             if (aeMenuToOpen) {
@@ -4296,15 +4318,15 @@ void InterfaceManager::GetRefsUnderCrosshair() {
     NiPick kPick(0, 8u);
     BSSimpleList<TESObjectREFR*> kPicked;
     bool bSameRefs = true;
-    kPick.SetObserveAppCullFlag(1);
+    kPick.SetObserveAppCullFlag(true);
     kPick.SetTarget(TES::pInstance->pObjRoot);
     kPick.m_eSortType = NiPick::SORT;
     float fWorldFOV = pPlayer->GetWorldFOV();
-    Main::GetWorldSceneGraph()->SetCameraFOV(fWorldFOV, 0, 0, 0);
+    Main::GetWorldSceneGraph()->SetCameraFOV(fWorldFOV, false, nullptr, false);
     int32_t iCursorY = static_cast<int32_t>(sRealCursorPos.z);
     int32_t iCursorX = static_cast<int32_t>(sRealCursorPos.x);
-    Main::GetWorldSceneGraph()->GetCamera()->WindowPointToRay(iCursorX, iCursorY, kOrigin, kDir, 0);
-    if (kPick.PickObjects(kOrigin, kDir, 0)) {
+    Main::GetWorldSceneGraph()->GetCamera()->WindowPointToRay(iCursorX, iCursorY, kOrigin, kDir, nullptr);
+    if (kPick.PickObjects(kOrigin, kDir, false)) {
         // The node of ConsolePickRefs the next picked reference is compared with.
         BSSimpleList<TESObjectREFR*>* pListed = &ConsolePickRefs;
         for (uint32_t i = 0; i < kPick.m_pickResults.GetSize(); ++i) {
@@ -4399,9 +4421,9 @@ void InterfaceManager::HandleMenuAndListboxScroll(Menu* apMenu, float aiID, Tile
         if (m_item->GetHighlightedItem()) {
             Tile* th_s;
             uint32_t v9 = 0;
-            while (1) {
+            while (true) {
                 ListBoxBase* v6 = ecx0->m_item;
-                th_s = v6->GetTileAt(v9++, 0);
+                th_s = v6->GetTileAt(v9++, false);
                 if (!th_s) {
                     break;
                 }
@@ -4455,10 +4477,10 @@ bool InterfaceManager::IsMenuInStack(uint32_t aiMenuID) {
     uint32_t a2a;
     for (a2a = 0; a2a < 10; ++a2a) {
         if (GetEnterStack(a2a) == ((int32_t)aiMenuID)) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 void InterfaceManager::PreLoadMenus() {
@@ -4468,7 +4490,7 @@ void InterfaceManager::PreLoadMenus() {
             uiMenuMode = cMenuMode;
             PreLoadMainMenus();
             cMenuMode = static_cast<eMenuModeType>(uiMenuMode);
-            bFirstChanceLoad = (bool)0;
+            bFirstChanceLoad = false;
         }
     }
 }
@@ -4518,7 +4540,7 @@ void InterfaceManager::FreeTimerList() {
 void InterfaceManager::Free() {
     if (InterfaceManager::pInstance) {
         delete InterfaceManager::pInstance;
-        InterfaceManager::pInstance = 0;
+        InterfaceManager::pInstance = nullptr;
     }
 }
 
@@ -4906,7 +4928,7 @@ void InterfaceManager::PlayMenuSound(MENU_SOUNDS aeMenuSound) {
             v16 = v1->GetSoundHandleByName(&a1, "UIMenuMode", 289u);
             psoundHand.operator=(*v16);
         LABEL_11:;
-            psoundHand.Play(0);
+            psoundHand.Play(false);
             break;
         }
         default: {
@@ -4959,11 +4981,11 @@ void InterfaceManager::UpdatePipBoyInventoryEffects(
     float fAlphaDAMdisp = 255.0 - fAlphaDPSdisp;
     BSClamp(fAlphaDAMdisp, 0.0f, 255.0f);
     if (pTileFade1 && pTileFade2) {
-        pTileFade1->Set(Tile::kTileValue_Alpha, fAlphaDAMdisp, 1);
-        pTileFade2->Set(Tile::kTileValue_Alpha, fAlphaDPSdisp, 1);
+        pTileFade1->Set(Tile::kTileValue_Alpha, fAlphaDAMdisp, true);
+        pTileFade2->Set(Tile::kTileValue_Alpha, fAlphaDPSdisp, true);
     }
     if (pTilePulseSTR && pItemPulseSTRREQ && !abSkill) {
-        TESBoundObject* pObject = pItemPulseSTRREQ ? pItemPulseSTRREQ->pContainerObj : 0;
+        TESBoundObject* pObject = pItemPulseSTRREQ ? pItemPulseSTRREQ->pContainerObj : nullptr;
         float fStrMod = 0.0f;
         BGSEntryPoint::HandleEntryPoint(
             BGSEntryPoint::WEAPON_HANDLING_STRENGTH_BONUS, pPlayer, pItemPulseSTRREQ->pContainerObj, &fStrMod
@@ -4974,14 +4996,14 @@ void InterfaceManager::UpdatePipBoyInventoryEffects(
             fStrMod < static_cast<double>(
                           static_cast<int32_t>(static_cast<TESObjectWEAP*>(pObject)->TESObjectWEAP::GetStrRequired())
                       )) {
-            pTilePulseSTR->Set(Tile::kTileValue_Alpha, fAlphaDAMdisp > 128.0 ? fAlphaDAMdisp : fAlphaDPSdisp, 1);
+            pTilePulseSTR->Set(Tile::kTileValue_Alpha, fAlphaDAMdisp > 128.0 ? fAlphaDAMdisp : fAlphaDPSdisp, true);
         }
         else {
-            pTilePulseSTR->Set(Tile::kTileValue_Alpha, 255.0f, 1);
+            pTilePulseSTR->Set(Tile::kTileValue_Alpha, 255.0f, true);
         }
     }
     else if (pTilePulseSTR && pItemPulseSTRREQ && abSkill) {
-        TESBoundObject* pObject = pItemPulseSTRREQ ? pItemPulseSTRREQ->pContainerObj : 0;
+        TESBoundObject* pObject = pItemPulseSTRREQ ? pItemPulseSTRREQ->pContainerObj : nullptr;
         // The weapon's skill is read before the object's type is tested, as the game does.
         TESObjectWEAP* pWeapon = static_cast<TESObjectWEAP*>(pObject);
         ActorValue::Index eSkill = pWeapon->TESObjectWEAP::GetWeaponSkill();
@@ -4989,10 +5011,10 @@ void InterfaceManager::UpdatePipBoyInventoryEffects(
         // The strength requirement is read as a signed value.
         if (pObject && pObject->GetFormType() == WEAP_ID &&
             fSkill < static_cast<double>(static_cast<int32_t>(pWeapon->data.iSkillRequirement))) {
-            pTilePulseSTR->Set(Tile::kTileValue_Alpha, fAlphaDAMdisp > 128.0 ? fAlphaDAMdisp : fAlphaDPSdisp, 1);
+            pTilePulseSTR->Set(Tile::kTileValue_Alpha, fAlphaDAMdisp > 128.0 ? fAlphaDAMdisp : fAlphaDPSdisp, true);
         }
         else {
-            pTilePulseSTR->Set(Tile::kTileValue_Alpha, 255.0f, 1);
+            pTilePulseSTR->Set(Tile::kTileValue_Alpha, 255.0f, true);
         }
     }
     uint32_t iLastDPSFadeTimeLocal = appTimer.iLastTime;
@@ -5008,10 +5030,10 @@ void InterfaceManager::UpdatePipBoyInventoryEffects(
     }
     BSClamp(InterfaceManager::fCurrAlphaDPS, fMinAlpha, fMaxAlpha);
     if (fMaxAlpha <= static_cast<double>(InterfaceManager::fCurrAlphaDPS)) {
-        InterfaceManager::bAlphaGoingDown = 1;
+        InterfaceManager::bAlphaGoingDown = true;
     }
     if (fMinAlpha >= static_cast<double>(InterfaceManager::fCurrAlphaDPS)) {
-        InterfaceManager::bAlphaGoingDown = 0;
+        InterfaceManager::bAlphaGoingDown = false;
     }
 }
 
@@ -5113,26 +5135,26 @@ SystemColorManager::SystemColor* SystemColorManager::Find(int32_t aiID) {
             return pcolor;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 bool SystemColorManager::GetColor(int32_t aiID, NiColorA& aOutColor) {
     SystemColor* v4 = Find(aiID);
     if (!v4) {
-        return (bool)0;
+        return false;
     }
     // Every colour Find returns is read as a soft colour, through the base's virtual GetColor only.
     static_cast<SystemColorManager::SoftSystemColor*>(v4)->GetColor(&aOutColor);
-    return (bool)1;
+    return true;
 }
 
 bool SystemColorManager::SetColor(int32_t a2, const NiColorA& a3) {
     SystemColor* v4 = Find(a2);
     if (!v4) {
-        return (bool)0;
+        return false;
     }
     v4->SetColor(const_cast<NiColorA*>(&a3));
-    return (bool)1;
+    return true;
 }
 
 void SystemColorManager::Add(const char* apName, uint32_t aiRed, uint32_t aiGreen, uint32_t aiBlue, int32_t aiID) {
@@ -5146,7 +5168,7 @@ void SystemColorManager::Add(const char* apName, uint32_t aiRed, uint32_t aiGree
         pHardColor = ::new (pMemory) SystemColorManager::HardSystemColor(apName, uiRGBA, aiID);
     }
     else {
-        pHardColor = 0;
+        pHardColor = nullptr;
     }
     SystemColorManager::SystemColor* pColor = pHardColor;
     SystemColorList.AddTail(pColor);
@@ -5171,7 +5193,7 @@ void SystemColorManager::Add(
         pSoftColor = ::new (pMemory) SystemColorManager::SoftSystemColor(apName, apSetting, aiID);
     }
     else {
-        pSoftColor = 0;
+        pSoftColor = nullptr;
     }
     SystemColorManager::SystemColor* pColor = pSoftColor;
     SystemColorList.AddTail(pColor);
@@ -5200,10 +5222,10 @@ void SystemColorManager::RemoveAll() {
 bool SystemColorManager::SetColor_00719120(int32_t aiID, uint32_t aiColor) {
     SystemColorManager::SystemColor* pcolor = Find(aiID);
     if (!pcolor) {
-        return 0;
+        return false;
     }
     pcolor->SetColor(aiColor);
-    return 1;
+    return true;
 }
 
 void SystemColorManager::operator delete(void* apMemory) {
@@ -5218,7 +5240,7 @@ SystemColorManager* SystemColorManager::GetInstance() {
             pManager = ::new (pMemory) SystemColorManager;
         }
         else {
-            pManager = 0;
+            pManager = nullptr;
         }
         g_sysColorManager = pManager;
     }
@@ -5230,7 +5252,7 @@ void SystemColorManager::DeleteInstance() {
     if (g_sysColorManager) {
         delete g_sysColorManager;
     }
-    g_sysColorManager = 0;
+    g_sysColorManager = nullptr;
 }
 
 int32_t Controls::GetButtonState(int32_t aiDevice, uint8_t aucKey, CONTROL_TOGGLE_FLAGS aeFlags) {
@@ -5284,7 +5306,7 @@ void ImageSpaceManager::SetMenuBGBlendValue(float afStrength) {
 
 EditableTextField::EditableTextField()
   : sText(), sDisplayText(), iCurPos(0), iMaxPixelSize(static_cast<uint32_t>(-1)), iFontIdx(1), uLastBlinkTime(0),
-    bCursorOn(0), bEditing(0) {}
+    bCursorOn(false), bEditing(false) {}
 
 bool EditableTextField::EditingText() {
     return bEditing;
@@ -5496,7 +5518,7 @@ void LoadingMenu::KillThread() {
     if (LoadingMenu::pLoadingThread) {
         delete LoadingMenu::pLoadingThread;
     }
-    LoadingMenu::pLoadingThread = 0;
+    LoadingMenu::pLoadingThread = nullptr;
 }
 
 // Only the low byte of the tab is read, sign-extended.

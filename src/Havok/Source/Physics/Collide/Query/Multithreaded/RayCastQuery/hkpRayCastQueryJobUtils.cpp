@@ -105,7 +105,7 @@ void hkTreeRayCastJobUtil::castRayKdTree(
         v13.m_result = m_results;
         v13.m_nextFreeResult = m_results;
         v13.m_workInput.m_filterInfo = command->m_rayInput.m_filterInfo;
-        const hkpCollisionFilter* v9 = command->m_rayInput.m_enableShapeCollectionFilter.m_bool != 0 ? filter : 0;
+        const hkpCollisionFilter* v9 = command->m_rayInput.m_enableShapeCollectionFilter.m_bool != 0 ? filter : nullptr;
         v13.m_filter = filter;
         v13.m_originalInput = &command->m_rayInput;
         v13.m_command = command;
@@ -113,7 +113,7 @@ void hkTreeRayCastJobUtil::castRayKdTree(
             v13.m_workInput.m_rayShapeCollectionFilter = static_cast<const hkpRayShapeCollectionFilter*>(v9);
         }
         else {
-            v13.m_workInput.m_rayShapeCollectionFilter = 0;
+            v13.m_workInput.m_rayShapeCollectionFilter = nullptr;
         }
         command->m_useCollector.m_bool;
         if (command->m_useCollector.m_bool) {
@@ -124,12 +124,12 @@ void hkTreeRayCastJobUtil::castRayKdTree(
                 v13.m_fixedBufferRayHitCollector = fixedBufferHitCollector;
             }
             else {
-                v13.m_fixedBufferRayHitCollector = 0;
+                v13.m_fixedBufferRayHitCollector = nullptr;
             }
             g_FixedBufferRayHitCollectorAddRayHitCallbackFunc = &hkpFixedBufferRayHitCollector::addRayHitImplementation;
         }
         else {
-            v13.m_fixedBufferRayHitCollector = 0;
+            v13.m_fixedBufferRayHitCollector = nullptr;
         }
         hkKdTreeUtils::castRayIterative(&arResult, kdTree, command->m_rayInput.m_from, command->m_rayInput.m_to, &v13);
     }

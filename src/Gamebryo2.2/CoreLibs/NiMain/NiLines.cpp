@@ -85,7 +85,7 @@ void NiLines::RenderImmediate(NiRenderer* apkRenderer) {
 NiObject* NiLines::CreateObject() {
     NiLines* pkObject = static_cast<NiLines*>(NiMemObject::operator new(sizeof(NiLines)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiLines;
 }

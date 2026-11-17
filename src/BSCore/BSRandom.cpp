@@ -56,7 +56,7 @@ float BSRandom::Float0To1() {
 }
 
 void BSRandom::Seed(uint32_t aiSeed) {
-    mt[0] = (int32_t)((uint32_t)aiSeed);
+    mt[0] = (int32_t)aiSeed;
     for (mti = (uint32_t)1; mti < 0x270u; ++mti) {
         mt[mti] = 69069 * mt[mti - 1];
     }

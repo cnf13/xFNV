@@ -29,8 +29,8 @@ NiObject* NiPSysColliderManager::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -141,7 +141,7 @@ NiObject* NiPSysColliderManager::CreateObject() {
     NiPSysColliderManager* pkObject =
         static_cast<NiPSysColliderManager*>(NiMemObject::operator new(sizeof(NiPSysColliderManager)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysColliderManager;
 }

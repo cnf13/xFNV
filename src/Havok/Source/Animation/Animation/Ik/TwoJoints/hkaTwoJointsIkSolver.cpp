@@ -244,9 +244,9 @@ hkBool* hkaTwoJointsIkSolver::solve(hkBool* apResult, const Setup& setup, hkaPos
             const float fSecondSq = _mm_cvtss_f32(dot3(kSecondAcross, kSecondAcross));
             // The law of cosines for the hinge angle that puts the end at the target's distance.
             const double dNumerator = (static_cast<double>(fTargetAcrossSq) - fFirstSq) - fSecondSq;
-            const float fFirstLength = static_cast<float>(std::sqrt(fFirstSq));
+            const float fFirstLength = std::sqrt(fFirstSq);
             const double dMinusTwoFirst = static_cast<double>(fFirstLength) * -2.0;
-            const float fSecondLength = static_cast<float>(std::sqrt(fSecondSq));
+            const float fSecondLength = std::sqrt(fSecondSq);
             float fCosine = static_cast<float>(dNumerator / (static_cast<double>(fSecondLength) * dMinusTwoFirst));
             // The hinge limits: a NaN cosine is kept.
             if (fCosine > fCosineMinHingeAngle) {

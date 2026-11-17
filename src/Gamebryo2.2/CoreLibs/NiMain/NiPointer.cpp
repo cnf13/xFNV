@@ -26,11 +26,11 @@
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DTextureStage.h"
 
 void NiPointerDefaultConstructor(NiPointer<NiRefObject>* apThis) {
-    ::new (apThis) NiPointer<NiRefObject>(static_cast<NiRefObject*>(0));
+    ::new (apThis) NiPointer<NiRefObject>(static_cast<NiRefObject*>(nullptr));
 }
 
 void NiPointer_DefaultConstructorClosure_B54620(NiPointer<NiRefObject>* apThis) {
-    apThis->m_pObject = 0;
+    apThis->m_pObject = nullptr;
 }
 
 void NiPointer_Destruct_AE9290(NiPointer<NiRefObject>* apThis) {

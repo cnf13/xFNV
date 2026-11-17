@@ -74,10 +74,10 @@ bool IsDrBagUsable() {
          eav = static_cast<ActorValue::Index>(eav + 1)) {
         int32_t v0 = pPlayer->GetActorValue(eav);
         if (v0 < pPlayer->GetPermanentActorValue(eav)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 int32_t InventoryMenu_SortFunc(ListBoxItem<ItemChange*>* a1, ListBoxItem<ItemChange*>* a2) {
@@ -97,21 +97,21 @@ int32_t InventoryMenu_SortFunc(ListBoxItem<ItemChange*>* a1, ListBoxItem<ItemCha
     }
     else {
         int32_t v8;
-        double ItemHealth = a1->data->GetItemHealth(0);
-        if (!(a2->data->GetItemHealth(0) < ItemHealth)) {
-            double v7 = a1->data->GetItemHealth(0);
-            v8 = a2->data->GetItemHealth(0) > v7;
+        double ItemHealth = a1->data->GetItemHealth(false);
+        if (!(a2->data->GetItemHealth(false) < ItemHealth)) {
+            double v7 = a1->data->GetItemHealth(false);
+            v8 = a2->data->GetItemHealth(false) > v7;
         }
         else {
             v8 = -1;
         }
         v10 = v8;
         if (!v8) {
-            if (a1->data->GetWorn(0)) {
+            if (a1->data->GetWorn(false)) {
                 return -1;
             }
             else {
-                return a2->data->GetWorn(0);
+                return a2->data->GetWorn(false);
             }
         }
     }
@@ -130,7 +130,7 @@ void InventoryMenu_InitFunc(Tile* a1, ItemChange* a2) {
                 uint32_t v5 = a2->iNumber;
                 BSsprintf(Src, 128, "%s (%d)", a2->GetFullName(), v5);
             }
-            a1->Set(4036, Src, 1);
+            a1->Set(4036, Src, true);
         }
         a1->Set(4010, 29);
         if (a2->pContainerObj->GetFormType() == AMMO_ID ||
@@ -150,7 +150,7 @@ void InventoryMenu_InitFunc(Tile* a1, ItemChange* a2) {
             a1->xChildren.Get(a1->xChildren.m_pkHead)->Set(4003, static_cast<int32_t>(v8));
         }
         else {
-            int32_t a3 = a2->GetWorn(0);
+            int32_t a3 = a2->GetWorn(false);
             a1->xChildren.Get(a1->xChildren.m_pkHead)->Set(4003, a3);
         }
     }
@@ -422,51 +422,51 @@ void InventoryMenu::DoEnter(int32_t aiID, Tile* apTarget) {
                 float afRate = fScrollKnobRate.Float();
                 InterfaceManager* v4 = InterfaceManager::Instance();
                 FOPipboyManager* Pipboy = v4->GetPipboy();
-                Pipboy->MoveKnob(FOPipboyManager::KNOB_SCROLL, afAmount, afRate, 1);
+                Pipboy->MoveKnob(FOPipboyManager::KNOB_SCROLL, afAmount, afRate, true);
                 g_lastInventoryMenuSelectionListIndex = inewHighlightIndex;
             }
             float fMaintainValue = 75.0f;
             if (InventoryMenu::pCurrItem->pContainerObj->GetFormType() == ARMO_ID) {
                 fMaintainValue = 50.0f;
             }
-            if (!(static_cast<double>(fMaintainValue) <= InventoryMenu::pCurrItem->GetItemHealth(1))) {
+            if (!(static_cast<double>(fMaintainValue) <= InventoryMenu::pCurrItem->GetItemHealth(true))) {
                 v6 = sRepairItem.String();
             }
             else {
                 v6 = sMaintainItem.String();
             }
-            pTiles[8]->Set(4036, v6, 1);
+            pTiles[8]->Set(4036, v6, true);
             InventoryMenu::SetupItemDataTile(InventoryMenu::pCurrItem, pTiles[12]);
             pTiles[12]->Set(4003, 1);
             bool CanEquipOrUseObject = pPlayer->CanEquipOrUseObject(InventoryMenu::pCurrItem);
             pMenu->Set(InventoryMenu::iUT_EquippableItem, static_cast<int32_t>(CanEquipOrUseObject));
-            const char* IconOne = InventoryMenu::pCurrItem->GetIconOne(0);
-            pTiles[11]->Set(4044, IconOne, 1);
-            TESObjectWEAP* v25 = 0;
+            const char* IconOne = InventoryMenu::pCurrItem->GetIconOne(nullptr);
+            pTiles[11]->Set(4044, IconOne, true);
+            TESObjectWEAP* v25 = nullptr;
             if (InventoryMenu::pCurrItem->pContainerObj->GetFormType() == WEAP_ID) {
                 char Src[132];
                 TESObjectWEAP* pweap = static_cast<TESObjectWEAP*>(InventoryMenu::pCurrItem->pContainerObj);
                 ActorValue::Index WeaponSkill = pweap->GetWeaponSkill();
                 const char* ItemWeaponTypeBadge = ActorValue::GetItemWeaponTypeBadge(WeaponSkill);
-                pTiles[20]->Set(4044, ItemWeaponTypeBadge, 1);
+                pTiles[20]->Set(4044, ItemWeaponTypeBadge, true);
                 BSsprintf(Src, 128, "%d", pweap->data.iSkillRequirement);
                 if (pTiles[22]) {
-                    pTiles[22]->Set(4036, Src, 1);
+                    pTiles[22]->Set(4036, Src, true);
                 }
             }
             const char* v17 = sMissingImage.String();
             const char* String = pTiles[11]->GetString(4044);
             if (BSstrcmp(String, v17) && InventoryMenu::pCurrItem->pContainerObj->GetFormType() == AMMO_ID) {
                 float v19 = -40.0f + 450.0;
-                pTiles[11]->Set(4001, v19, 1);
+                pTiles[11]->Set(4001, v19, true);
                 float v18 = -30.0f + 380.0;
-                pTiles[11]->Set(4017, v18, 1);
-                pTiles[11]->Set(4016, v18, 1);
+                pTiles[11]->Set(4017, v18, true);
+                pTiles[11]->Set(4016, v18, true);
             }
             else {
-                pTiles[11]->Set(4001, 450.0f, 1);
-                pTiles[11]->Set(4017, 380.0f, 1);
-                pTiles[11]->Set(4016, 380.0f, 1);
+                pTiles[11]->Set(4001, 450.0f, true);
+                pTiles[11]->Set(4017, 380.0f, true);
+                pTiles[11]->Set(4016, 380.0f, true);
             }
             pTiles[11]->AddNeedsUpdate(17);
             BSstrcpy(Dst, 260, "Interface\\Icons\\");
@@ -479,7 +479,7 @@ void InventoryMenu::DoEnter(int32_t aiID, Tile* apTarget) {
                 pTiles[5]->xChildren.GetHead()->Set(4003, 0);
             }
             else {
-                pTiles[5]->xChildren.GetHead()->Set(4044, Dst, 1);
+                pTiles[5]->xChildren.GetHead()->Set(4044, Dst, true);
                 pTiles[5]->xChildren.GetHead()->Set(4003, 1);
             }
             if (!HKWheel.GetVisible()) {
@@ -491,12 +491,12 @@ void InventoryMenu::DoEnter(int32_t aiID, Tile* apTarget) {
     else {
         if (aiID == 30) {
             ClearCurrentItem();
-            pTiles[11]->Set(4044, "Interface\\Icons\\PipboyImages\\Items\\item_keyring.dds", 1);
+            pTiles[11]->Set(4044, "Interface\\Icons\\PipboyImages\\Items\\item_keyring.dds", true);
             if (!HKWheel.GetVisible()) {
                 pTiles[11]->Set(4003, 1);
             }
             const char* v15 = psTargetTypes[2]->String();
-            pTiles[6]->Set(4036, v15, 1);
+            pTiles[6]->Set(4036, v15, true);
             pTiles[6]->Set(4015, 1);
         }
     }
@@ -524,11 +524,11 @@ void InventoryMenu::DoIdle() {
                     int32_t icurrHighlight = HKWheel.MoveHighlight(-1);
                     if (icurrHighlight < 0) {
                         if (bwheelUsed) {
-                            if (InventoryMenu::pCurrItem && InventoryMenu::pCurrItem->GetItemHealth(1) == 0.0) {
+                            if (InventoryMenu::pCurrItem && InventoryMenu::pCurrItem->GetItemHealth(true) == 0.0) {
                                 const char* v2 = sCantHotkeyBrokenItem.String();
                                 Interface::ShowMessage(
                                     v2, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
-                                    "UIVATSInsufficientAP", 2.0f, 0
+                                    "UIVATSInsufficientAP", 2.0f, false
                                 );
                             }
                             else {
@@ -538,7 +538,7 @@ void InventoryMenu::DoIdle() {
                                     const char* v3 = sCantHotkeyItem.String();
                                     Interface::ShowMessage(
                                         v3, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
-                                        "UIVATSInsufficientAP", 2.0f, 0
+                                        "UIVATSInsufficientAP", 2.0f, false
                                     );
                                 }
                                 else {
@@ -546,7 +546,7 @@ void InventoryMenu::DoIdle() {
                                     TESBoundObject* a2 = InventoryMenu::pCurrItem->pContainerObj;
                                     ItemUpdateList.AddHead(a2);
                                     InventoryMenu::UpdateList();
-                                    HKWheel.SetVisible(1);
+                                    HKWheel.SetVisible(true);
                                     pTiles[11]->Set(4003, 0);
                                 }
                             }
@@ -563,17 +563,17 @@ void InventoryMenu::DoIdle() {
                             pTiles[20]->Set(4003, 1);
                             pTiles[22]->Set(4003, 1);
                             InterfaceManager::UpdatePipBoyInventoryEffects(
-                                0, 0, pTiles[20], InventoryMenu::pCurrItem, 1
+                                nullptr, nullptr, pTiles[20], InventoryMenu::pCurrItem, true
                             );
                             InterfaceManager::UpdatePipBoyInventoryEffects(
-                                0, 0, pTiles[22], InventoryMenu::pCurrItem, 1
+                                nullptr, nullptr, pTiles[22], InventoryMenu::pCurrItem, true
                             );
                         }
                     }
                 }
             }
             else {
-                bool bbuttonPressed = 0;
+                bool bbuttonPressed = false;
                 if (InventoryMenu::pCurrItem) {
                     if (InventoryMenu::pCurrItem->pContainerObj->GetFormType() == WEAP_ID) {
                         pTiles[20]->Set(4003, 1);
@@ -598,15 +598,15 @@ void InventoryMenu::DoIdle() {
                             pTiles[22]->Set(4003, 0);
                         }
                         else {
-                            HKWheel.SetVisible(1);
+                            HKWheel.SetVisible(true);
                             pTiles[11]->Set(4003, 0);
                         }
                         HKWheel.MoveHighlight(ihotkeyCt);
-                        bbuttonPressed = 1;
+                        bbuttonPressed = true;
                     }
                 }
                 if (!bbuttonPressed && HKWheel.GetVisible()) {
-                    HKWheel.SetVisible(0);
+                    HKWheel.SetVisible(false);
                     if (lbInventoryList.GetHighlightedItem()) {
                         pTiles[11]->Set(4003, 1);
                     }
@@ -618,7 +618,7 @@ void InventoryMenu::DoIdle() {
                     if (lbInventoryList.GetHighlightedItem()) {
                         Controls* v7 = appMain->GetControls();
                         if (!v7->GetUserAction(Controls::UACTN_MENUMODE, 1)) {
-                            DoClick(7, 0);
+                            DoClick(7, nullptr);
                         }
                     }
                 }
@@ -626,7 +626,7 @@ void InventoryMenu::DoIdle() {
             int32_t icurrTabIndex = InventoryMenu::pMe->iCurrTab + 24;
             if (icurrTabIndex == 24) {
                 InterfaceManager::UpdatePipBoyInventoryEffects(
-                    pTiles[14], pTiles[15], pTiles[16], InventoryMenu::pCurrItem, 0
+                    pTiles[14], pTiles[15], pTiles[16], InventoryMenu::pCurrItem, false
                 );
             }
             else {
@@ -635,7 +635,7 @@ void InventoryMenu::DoIdle() {
                     if (!InventoryMenu::pCurrItem ||
                         static_cast<TESObjectARMO*>(InventoryMenu::pCurrItem->pContainerObj)
                                 ->TESObjectARMO::GetDamageThreshold() == 0.0) {
-                        pTileFade2 = 0;
+                        pTileFade2 = nullptr;
                     }
                     else {
                         pTileFade2 = pTiles[18];
@@ -643,21 +643,27 @@ void InventoryMenu::DoIdle() {
                     if (!InventoryMenu::pCurrItem ||
                         static_cast<TESObjectARMO*>(InventoryMenu::pCurrItem->pContainerObj)
                                 ->TESObjectARMO::GetArmorRating() == 0.0) {
-                        InterfaceManager::UpdatePipBoyInventoryEffects(0, pTileFade2, 0, InventoryMenu::pCurrItem, 0);
+                        InterfaceManager::UpdatePipBoyInventoryEffects(
+                            nullptr, pTileFade2, nullptr, InventoryMenu::pCurrItem, false
+                        );
                     }
                     else {
                         InterfaceManager::UpdatePipBoyInventoryEffects(
-                            pTiles[17], pTileFade2, 0, InventoryMenu::pCurrItem, 0
+                            pTiles[17], pTileFade2, nullptr, InventoryMenu::pCurrItem, false
                         );
                     }
                 }
             }
-            pTiles[2]->Set(4009, 0.0, 1);
+            pTiles[2]->Set(4009, 0.0, true);
             if (pPlayer->GetActorFloatValue(ActorValue::DAMAGE_RESISTANCE) == 0.0) {
-                InterfaceManager::UpdatePipBoyInventoryEffects(0, pTiles[21], 0, InventoryMenu::pCurrItem, 0);
+                InterfaceManager::UpdatePipBoyInventoryEffects(
+                    nullptr, pTiles[21], nullptr, InventoryMenu::pCurrItem, false
+                );
             }
             else {
-                InterfaceManager::UpdatePipBoyInventoryEffects(pTiles[2], pTiles[21], 0, InventoryMenu::pCurrItem, 0);
+                InterfaceManager::UpdatePipBoyInventoryEffects(
+                    pTiles[2], pTiles[21], nullptr, InventoryMenu::pCurrItem, false
+                );
             }
         }
     }
@@ -669,13 +675,13 @@ int32_t InventoryMenu::GetClass() {
 
 bool InventoryMenu::DoGamepad(int32_t aiButton, float afValue) {
     if (!Interface::IsTopMenuID(Interface::eInventoryMenu)) {
-        return 0;
+        return false;
     }
     FOPipboyManager* Pipboy = Interface::GetPipboy();
     if (!Pipboy->GetInitialized()) {
-        return 0;
+        return false;
     }
-    bool IsDPadPressed = 0;
+    bool IsDPadPressed = false;
     if (Interface::Has360Controller() && HKWheel.GetVisible() && aiButton > 0 && aiButton <= 4) {
         IsDPadPressed = HotKeysWheel::IsDPadPressed();
     }
@@ -686,7 +692,7 @@ bool InventoryMenu::DoGamepad(int32_t aiButton, float afValue) {
                 int32_t v5;
                 uint32_t eFilter = this->iCurrTab;
                 bool Visible = HKWheel.GetVisible();
-                DoLeave(29, 0);
+                DoLeave(29, nullptr);
                 int32_t v8 = eFilter + (2 * (aiButton != 4) - 1);
                 int32_t v9 = v8 > 4 ? 0 : v8;
                 if (v9 >= 0) {
@@ -695,36 +701,36 @@ bool InventoryMenu::DoGamepad(int32_t aiButton, float afValue) {
                 else {
                     v5 = 4;
                 }
-                DoClick(v5 + 24, 0);
+                DoClick(v5 + 24, nullptr);
                 if (Visible) {
-                    HKWheel.SetVisible(1);
+                    HKWheel.SetVisible(true);
                 }
-                IsDPadPressed = 1;
+                IsDPadPressed = true;
                 break;
             }
             case 13: {
                 InterfaceManager::PlayMenuSound(MENU_SOUND_MODE);
-                Interface::SetStatsMenuVisible(1, 0);
-                IsDPadPressed = 1;
+                Interface::SetStatsMenuVisible(true, false);
+                IsDPadPressed = true;
                 break;
             }
             case 14: {
                 InterfaceManager::PlayMenuSound(MENU_SOUND_MODE);
-                Interface::SetMapMenuVisible(1, 0);
-                IsDPadPressed = 1;
+                Interface::SetMapMenuVisible(true, false);
+                IsDPadPressed = true;
                 break;
             }
             case 15: {
-                DoClick(19, 0);
-                IsDPadPressed = 1;
+                DoClick(19, nullptr);
+                IsDPadPressed = true;
                 break;
             }
             case 16: {
                 if (pTiles[TI_HOTKEY_BTN]->GetFloat(4015) != 0.0) {
-                    HKWheel.SetVisible(1);
+                    HKWheel.SetVisible(true);
                     pTiles[TI_ITEM_ICON]->Set(4003, 0);
                 }
-                IsDPadPressed = 1;
+                IsDPadPressed = true;
                 break;
             }
             default: {
@@ -740,15 +746,15 @@ bool InventoryMenu::DoGamepadUpEvent(int32_t aiButton, float afValue) {
     if (Interface::IsTopMenuID(Interface::eInventoryMenu)) {
         if (aiButton == 10) {
             DoClick(10, nullptr);
-            return (bool)1;
+            return true;
         }
         else {
             if (aiButton == 16) {
-                (&HKWheel)->SetVisible(0);
+                (&HKWheel)->SetVisible(false);
                 if ((&lbInventoryList)->GetHighlightedItem()) {
                     pTiles[TI_ITEM_ICON]->Set(4003, 1);
                 }
-                return (bool)1;
+                return true;
             }
         }
     }
@@ -759,16 +765,16 @@ void InventoryMenu::UpdateButtons() {
     if (InventoryMenu::pCurrItem) {
         if (InventoryMenu::pCurrItem->pContainerObj->GetFormType() == BOOK_ID) {
             const char* afValue = psTargetTypes[6]->String();
-            pTiles[6]->Set(4036, afValue, 1);
+            pTiles[6]->Set(4036, afValue, true);
         }
         else {
-            if (InventoryMenu::pCurrItem->GetWorn(0)) {
+            if (InventoryMenu::pCurrItem->GetWorn(false)) {
                 const char* v1 = sInventoryUnequip.String();
-                pTiles[6]->Set(4036, v1, 1);
+                pTiles[6]->Set(4036, v1, true);
             }
         }
         float afValuea = pMenu->GetFloat(InventoryMenu::iUT_EquippableItem);
-        pTiles[6]->Set(4015, afValuea, 1);
+        pTiles[6]->Set(4015, afValuea, true);
         pTiles[7]->Set(4015, 1);
         int32_t FormType = InventoryMenu::pCurrItem->pContainerObj->GetFormType();
         pTiles[9]->Set(4015, static_cast<int32_t>(FormType != 41));
@@ -779,11 +785,11 @@ void InventoryMenu::UpdateButtons() {
     else {
         if (InventoryMenu::pMe->iCurrTab == 2) {
             const char* afValueb = sInventoryUse.String();
-            pTiles[6]->Set(4036, afValueb, 1);
+            pTiles[6]->Set(4036, afValueb, true);
         }
         else {
             const char* v3 = sInventoryEquip.String();
-            pTiles[6]->Set(4036, v3, 1);
+            pTiles[6]->Set(4036, v3, true);
         }
         pTiles[6]->Set(4015, 0);
         pTiles[7]->Set(4015, 0);
@@ -794,10 +800,10 @@ void InventoryMenu::UpdateButtons() {
 }
 
 void InventoryMenu::ClearCurrentItem() {
-    InventoryMenu::pCurrItem = 0;
+    InventoryMenu::pCurrItem = nullptr;
     pTiles[12]->Set(4003, 0);
-    pTiles[11]->Set(4003, 0.0f, 0);
-    pTiles[20]->Set(4003, 0.0f, 0);
+    pTiles[11]->Set(4003, 0.0f, false);
+    pTiles[20]->Set(4003, 0.0f, false);
     pTiles[22]->Set(4003, 0);
     pTiles[5]->xChildren.GetHead()->Set(4003, 0);
     UpdateButtons();
@@ -813,7 +819,7 @@ void InventoryMenu::SelectCurrentItem() {
         pextra = InventoryMenu::pCurrItem->pExtraObjectList->m_item;
     }
     else {
-        pextra = 0;
+        pextra = nullptr;
     }
     if (pMenu->IsTrue(InventoryMenu::iUT_EquippableItem)) {
         lbInventoryList.Traverse(&InventoryMenu::AddToChangedItemsListIfWorn, 0, 0x7FFFFFFF);
@@ -829,16 +835,16 @@ void InventoryMenu::SelectCurrentItem() {
           v5 == BGSDefaultObjectManager::GetDefaultObject(DO_DOCTOR_BAG)) &&
          !IsDrBagUsable())) {
         const char* v4 = sFullHealth.operator const char*();
-        Interface::ShowMessage(v4, 0, 0, 0, 2.0f, 0);
+        Interface::ShowMessage(v4, 0, nullptr, nullptr, 2.0f, false);
     }
     else {
-        if (InventoryMenu::pCurrItem->GetWorn(0)) {
+        if (InventoryMenu::pCurrItem->GetWorn(false)) {
             uint32_t FormHealth_0 = InventoryMenu::pCurrItem->iNumber;
-            pPlayer->QueueUnEquipObject(pobjectRef, FormHealth_0, pextra, 0, 0, 1);
+            pPlayer->QueueUnEquipObject(pobjectRef, FormHealth_0, pextra, false, false, true);
         }
         else {
             uint32_t v6 = InventoryMenu::pCurrItem->iNumber;
-            pPlayer->QueueEquipObject(pobjectRef, v6, pextra, 0, 0, 1);
+            pPlayer->QueueEquipObject(pobjectRef, v6, pextra, false, false, true);
         }
     }
     InventoryMenu::UpdateList();
@@ -847,23 +853,23 @@ void InventoryMenu::SelectCurrentItem() {
 bool InventoryMenu::IsWellFormedMenu() {
     for (int32_t i = 0; i < 23; ++i) {
         if (!pTiles[i]) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 bool InventoryMenu::IsItemRepairable(ItemChange* apItem) {
     TESBoundObject* pobj;
-    bool bcanRepair = 0;
+    bool bcanRepair = false;
     if (apItem) {
         pobj = apItem->pContainerObj;
     }
     else {
-        pobj = 0;
+        pobj = nullptr;
     }
     if (apItem) {
-        float aIn = apItem->GetItemHealth(1);
+        float aIn = apItem->GetItemHealth(true);
         if (FloatCeil(aIn) == 100.0) {
             return bcanRepair;
         }
@@ -871,7 +877,7 @@ bool InventoryMenu::IsItemRepairable(ItemChange* apItem) {
     if (apItem) {
         if (pobj) {
             if ((pobj->GetFormType() == WEAP_ID || pobj->GetFormType() == ARMO_ID) &&
-                apItem->GetItemHealth(1) < 100.0) {
+                apItem->GetItemHealth(true) < 100.0) {
                 if (apItem->iNumber <= 1) {
                     ExtraDataList* m_item;
                     BSSimpleList<ItemChange*> pnewItemGroup;
@@ -880,7 +886,7 @@ bool InventoryMenu::IsItemRepairable(ItemChange* apItem) {
                         m_item = apItem->pExtraObjectList->m_item;
                     }
                     else {
-                        m_item = 0;
+                        m_item = nullptr;
                     }
                     BSSimpleList<ItemChange*>* ptemp = &pnewItemGroup;
                     pinventory->GetRepairItemGroup(pobj, &pnewItemGroup);
@@ -891,14 +897,14 @@ bool InventoryMenu::IsItemRepairable(ItemChange* apItem) {
                             pcurrExtra = rpItem->pExtraObjectList->m_item;
                         }
                         else {
-                            pcurrExtra = 0;
+                            pcurrExtra = nullptr;
                         }
-                        if (!rpItem->GetWorn(0)) {
+                        if (!rpItem->GetWorn(false)) {
                             float aIna;
                             if (pcurrObj != pobj ||
-                                ((aIna = rpItem->GetItemHealth(1), FloatCeil(aIna) < 100.0) &&
+                                ((aIna = rpItem->GetItemHealth(true), FloatCeil(aIna) < 100.0) &&
                                  (pcurrExtra != m_item && (pcurrExtra && !pcurrExtra->HasWeaponMods())))) {
-                                bcanRepair = 1;
+                                bcanRepair = true;
                             }
                         }
                     }
@@ -911,7 +917,7 @@ bool InventoryMenu::IsItemRepairable(ItemChange* apItem) {
                     }
                 }
                 else {
-                    return 1;
+                    return true;
                 }
             }
         }
@@ -1045,7 +1051,7 @@ void InventoryMenu::SetupItemDataTile(ItemChange* apItem, Tile* apTile) {
     float fMod3Offset = 0.0f;
     float fValue = apItem->GetItemValue();
     bool bHardcore = pPlayer->IsHardcore();
-    float fWeight = static_cast<float>(TESWeightForm::GetFormWeight(apItem->GetItemChangeObject(), bHardcore));
+    float fWeight = TESWeightForm::GetFormWeight(apItem->GetItemChangeObject(), bHardcore);
     if (!apItem || !apTile) {
         return;
     }
@@ -1448,17 +1454,17 @@ void InventoryMenu::DropCurrentItem(int32_t aiAmountChosen) {
         v2 = *static_cast<ExtraDataList**>(v1);
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     ExtraDataList* v4 = v2;
     if (aiAmountChosen) {
         if (v4) {
             if (v4->GetCount() < aiAmountChosen) {
-                v4 = 0;
+                v4 = nullptr;
             }
         }
-        pPlayer->GetDropPoint(a3, a4, 1, 1);
-        pPlayer->DropObject(a3, v4, aiAmountChosen, &a4, 0);
+        pPlayer->GetDropPoint(a3, a4, true, true);
+        pPlayer->DropObject(a3, v4, aiAmountChosen, &a4, nullptr);
         if (InventoryMenu::pMe) {
             if (InventoryMenu::pCurrItem) {
                 TESBoundObject* a2 = InventoryMenu::pCurrItem->pContainerObj;
@@ -1579,7 +1585,7 @@ void InventoryMenu::LoadPageState() {
 
 bool InventoryMenu::KeyFilterFunc(ItemChange* apItem) {
     if (!apItem) {
-        return 1;
+        return true;
     }
     TESBoundObject* FormFlags = apItem->pContainerObj;
     return FormFlags->GetFormType() != 46;
@@ -1598,7 +1604,7 @@ bool InventoryMenu::FilterFunc(ItemChange* apItem) {
             pammo = static_cast<TESAmmo*>(apItem->pContainerObj);
         }
         else {
-            pammo = 0;
+            pammo = nullptr;
         }
         int32_t icurrTabIndex = InventoryMenu::pMe->iCurrTab + 24;
         if (pammo) {
@@ -1607,7 +1613,7 @@ bool InventoryMenu::FilterFunc(ItemChange* apItem) {
             if ((pbipedForm && !pbipedForm->GetPlayable()) ||
                 (TESContainer::IsGold(pammo) ||
                  ((pammo->GetQuestObject() && !pPlayer->IsShowQuestItems()) || eid_2 == KEYM_ID))) {
-                v1 = 1;
+                v1 = true;
             }
             else {
                 switch (icurrTabIndex) {
@@ -1640,7 +1646,7 @@ bool InventoryMenu::FilterFunc(ItemChange* apItem) {
                             v1 = pList && pList->GetItemIndex(pammo) >= 0;
                         }
                         else {
-                            v1 = 1;
+                            v1 = true;
                         }
                         break;
                     }
@@ -1656,7 +1662,7 @@ bool InventoryMenu::FilterFunc(ItemChange* apItem) {
     }
     else {
     LABEL_43:;
-        v1 = 1;
+        v1 = true;
     }
     return v1;
 }

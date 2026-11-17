@@ -140,5 +140,5 @@ void BSTextureData::KillSDM() {
         NiGlobalStringTable::ReleaseHandle(BSTextureData::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }
-    BSTextureData::pTag = 0;
+    BSTextureData::pTag = nullptr;
 }

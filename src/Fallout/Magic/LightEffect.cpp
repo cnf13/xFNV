@@ -59,7 +59,7 @@ void LightEffect::Update(float afSecondsElapsed) {
             v2 = spPointLight.m_pObject;
             if (!a1->GetLight(v2)) {
                 v3 = spPointLight.m_pObject;
-                a1->AddLight(v3, 1);
+                a1->AddLight(v3, true);
             }
         }
     }
@@ -129,7 +129,7 @@ void LightEffect::DetachLight() {
         TargetAsActor = Unk24->GetTargetAsActor();
     }
     else {
-        TargetAsActor = 0;
+        TargetAsActor = nullptr;
     }
     if (spPointLight.m_pObject) {
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
@@ -144,9 +144,9 @@ void LightEffect::DetachLight() {
             Parent->DetachChild(v4);
         }
         if (TargetAsActor) {
-            TargetAsActor->KillLight(1);
+            TargetAsActor->KillLight(true);
         }
-        spPointLight.operator=(static_cast<NiPointLight*>(0));
+        spPointLight.operator=(static_cast<NiPointLight*>(nullptr));
         if (--LightEffect::iLightCount < 0) {
             LightEffect::iLightCount = 0;
         }
@@ -160,7 +160,7 @@ void LightEffect::AttachLight() {
         ptargetActor = pTarget->GetTargetAsActor();
     }
     else {
-        ptargetActor = 0;
+        ptargetActor = nullptr;
     }
     if (!spPointLight.m_pObject) {
         if (ptargetActor) {
@@ -177,7 +177,7 @@ void LightEffect::AttachLight() {
                             v16 = ::new (apMemory) NiPointLight;
                         }
                         else {
-                            v16 = 0;
+                            v16 = nullptr;
                         }
                         spPointLight.operator=(v16);
                         uint32_t ucolor = plight->GetColor();
@@ -195,7 +195,7 @@ void LightEffect::AttachLight() {
                         spPointLight.m_pObject->SetDimmer(ba);
                         ShadowSceneNode* pnode = BSShaderManager::GetShadowSceneNode(0);
                         if (pnode) {
-                            pnode->AddLight(spPointLight.m_pObject, 1);
+                            pnode->AddLight(spPointLight.m_pObject, true);
                         }
                         float* v3 = &fMagicLightSideOffset.Float();
                         float fX = ptargetActor->GetScale() * *v3;
@@ -207,7 +207,7 @@ void LightEffect::AttachLight() {
                         float fZ = ptargetActor->GetScale() * *v5 + Height;
                         spPointLight.m_pObject->SetTranslate(fX, fY, fZ);
                         if (ptargetActor == pPlayer) {
-                            v12 = static_cast<NiNode*>(pPlayer->Get3D(0));
+                            v12 = static_cast<NiNode*>(pPlayer->Get3D(false));
                         }
                         else {
                             v12 = ptargetActor->Get3D();
@@ -233,7 +233,7 @@ void LightEffect::AttachLight() {
 
 void LightEffect::AttachBestLightEffect(MagicTarget* apTarget) {
     if (apTarget) {
-        LightEffect* v6 = 0;
+        LightEffect* v6 = nullptr;
         for (BSSimpleList<ActiveEffect*>* ecx0 = apTarget->GetActiveEffectList(); ecx0 && !ecx0->IsEmpty();
              ecx0 = ecx0->m_pkNext) {
             ActiveEffect* v4 = ecx0->m_item;

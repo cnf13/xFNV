@@ -280,7 +280,7 @@ void AlarmPackage::RemoveCrime(Crime* apcrime, Actor* apActor) {
     bool vCondition1;
     vCondition1 = (&Crimes)->IsEmpty();
     if (vCondition1) {
-        apActor->EndInterruptPackage(0);
+        apActor->EndInterruptPackage(false);
     }
 }
 
@@ -312,7 +312,7 @@ Crime::Crime(
     breported(false), pObjectStolen(apObject), inumberstolen(aiNumber), pOwnership(apOwnership),
     pListofEnemyFactions(nullptr) {
     if (apTarget) {
-        apTarget->SetTargeted(1);
+        apTarget->SetTargeted(true);
     }
     iCrimeNumber = ReferenceProcessLists.GetCrimeNumber();
     int32_t iMonthDay = appCalendar.GetDay() | (static_cast<int32_t>(appCalendar.GetMonth()) << 9);
@@ -337,7 +337,7 @@ Crime::~Crime() {
                  plist = plist->m_pkNext) {
                 TESFaction* pfac = plist->m_item;
                 if (!ReferenceProcessLists.IsEnemyFactionofOtherCrime(pfac, this)) {
-                    pfac->SetPCAnEnemy(0);
+                    pfac->SetPCAnEnemy(false);
                 }
             }
             Actor* pact = static_cast<Actor*>(pcrimetarget);
@@ -351,11 +351,11 @@ Crime::~Crime() {
                 }
             }
             // prespond is never advanced, so a non-empty result loops for ever, as the game does.
-            BSSimpleList<TESObjectREFR*>* prespond = ReferenceProcessLists.GetActorsProcessCrimeAlarm(this, 1);
+            BSSimpleList<TESObjectREFR*>* prespond = ReferenceProcessLists.GetActorsProcessCrimeAlarm(this, true);
             while (prespond) {
                 Actor* pact_2 = static_cast<Actor*>(prespond->m_item);
                 if (pact_2->IsAlarmed()) {
-                    pact_2->EndInterruptPackage(0);
+                    pact_2->EndInterruptPackage(false);
                 }
                 BSSimpleList<Crime*>* pcrimelist_2 = pact_2->m_Extra.GetPlayerCrimeList();
                 if (pcrimelist_2) {
@@ -382,7 +382,7 @@ void Crime::InitItem(BGSLoadGameBuffer* apLoadGameBuffer) {
         v8 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v8 = 0;
+        v8 = nullptr;
     }
     pcrimetarget = v8;
     if (pcriminal) {
@@ -390,21 +390,21 @@ void Crime::InitItem(BGSLoadGameBuffer* apLoadGameBuffer) {
         v7 = dynamic_cast<Actor*>(v3);
     }
     else {
-        v7 = 0;
+        v7 = nullptr;
     }
     pcriminal = v7;
     if (pOwnership) {
         v6 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pOwnership)));
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     pOwnership = v6;
     BSSimpleList<Actor*>* plist = &pActorsknowofCrime;
-    BSSimpleList<Actor*>* plastList = 0;
+    BSSimpleList<Actor*>* plastList = nullptr;
     while (plist && !plist->IsEmpty()) {
         Actor* pForm = plist->m_item;
-        bool bremove = 0;
+        bool bremove = false;
         if (pForm) {
             TESForm* v4 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pForm)));
             pForm = dynamic_cast<Actor*>(v4);
@@ -412,11 +412,11 @@ void Crime::InitItem(BGSLoadGameBuffer* apLoadGameBuffer) {
                 plist->SetItem(pForm);
             }
             else {
-                bremove = 1;
+                bremove = true;
             }
         }
         else {
-            bremove = 1;
+            bremove = true;
         }
         if (bremove) {
             if (plastList) {
@@ -434,7 +434,7 @@ void Crime::InitItem(BGSLoadGameBuffer* apLoadGameBuffer) {
         }
     }
     if (pcrimetarget) {
-        pcrimetarget->SetTargeted(1);
+        pcrimetarget->SetTargeted(true);
     }
 }
 
@@ -463,7 +463,7 @@ bool Crime::ShouldCrimeBeRemoved() {
             bool bdead = true;
             while (plist && plist->m_item && bdead) {
                 Actor* pact = plist->m_item;
-                if (!pact->IsDead(0)) {
+                if (!pact->IsDead(false)) {
                     bdead = false;
                 }
                 plist = plist->m_pkNext;
@@ -522,7 +522,7 @@ void Crime::AddEnemyFactions(TESFaction* apFaction) {
             v2 = ::new (v4) BSSimpleList<TESFaction*>;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         pListofEnemyFactions = v2;
     }

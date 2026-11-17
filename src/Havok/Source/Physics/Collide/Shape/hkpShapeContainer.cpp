@@ -11,7 +11,7 @@ hkClass
 int32_t hkpShapeContainer::getNumChildShapes() const {
     uint32_t i;
     int32_t v2 = 0;
-    for (i = getFirstKey(); i != ((-1)); i = getNextKey(i)) {
+    for (i = getFirstKey(); i != (-1); i = getNextKey(i)) {
         ++v2;
     }
     return v2;

@@ -42,7 +42,7 @@ NiObject* BGSDecalNode::CreateClone(NiCloningProcess& arCloneData) {
         return ::new (v4) BGSDecalNode;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -90,7 +90,7 @@ void BGSDecalNode::RemoveFromDecalList(BSTempEffect* apDecal) {
 }
 
 void BGSDecalNode::DetachChild(BSTempEffect* apDecal) {
-    NiPointer<NiAVObject> spobject(static_cast<NiAVObject*>(0));
+    NiPointer<NiAVObject> spobject(static_cast<NiAVObject*>(nullptr));
     DetachChild(apDecal, spobject);
 }
 

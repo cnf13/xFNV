@@ -40,7 +40,7 @@ void BGSNote::InitializeData() {
     cType = (uint8_t)0;
     pNoteSound = nullptr;
     pSpeaker = nullptr;
-    bHasBeenRead = (bool)0;
+    bHasBeenRead = false;
 }
 
 void BGSNote::ClearData() {
@@ -48,7 +48,7 @@ void BGSNote::ClearData() {
     uint8_t cType = this->cType;
     if (cType == 1) {
         ourFree(this->pNoteSound);
-        this->pNoteSound = 0;
+        this->pNoteSound = nullptr;
     }
     else {
         if (cType == 2) {
@@ -56,7 +56,7 @@ void BGSNote::ClearData() {
             if (apThis) {
                 delete apThis;
             }
-            this->pNoteSound = 0;
+            this->pNoteSound = nullptr;
         }
     }
 }
@@ -246,14 +246,14 @@ void BGSNote::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 
 void BGSNote::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_NOTE_READ)) {
-        bHasBeenRead = 0;
+        bHasBeenRead = false;
     }
 }
 
 void BGSNote::InitItem() {
     if (!GetInitialized()) {
         BSSimpleList<TESQuest*>* plist = &OwnerQuests;
-        BSSimpleList<TESQuest*>* plastlist = 0;
+        BSSimpleList<TESQuest*>* plastlist = nullptr;
         while (plist && !plist->IsEmpty()) {
             uint32_t itempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(plist->m_item));
             TESFile* File = GetFile(-1);
@@ -321,7 +321,7 @@ void BGSNote::InitItem() {
             }
         }
         BGSPickupPutdownSounds::InitItem(this);
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -371,13 +371,13 @@ bool BGSNote::Compare(TESForm* apCompare) {
     bool result;
     BGSNote* pcomp = dynamic_cast<BGSNote*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     if (pcomp->cType != this->cType) {
-        return 1;
+        return true;
     }
     switch (this->cType) {
         case 0: {
@@ -385,7 +385,7 @@ bool BGSNote::Compare(TESForm* apCompare) {
             if (NoteSound == pcomp->GetNoteSound()) {
                 goto LABEL_33;
             }
-            result = 1;
+            result = true;
             break;
         }
         case 1: {
@@ -395,13 +395,13 @@ bool BGSNote::Compare(TESForm* apCompare) {
                 if (!pdesc->CompareComponent(pcompdesc)) {
                     goto LABEL_33;
                 }
-                result = 1;
+                result = true;
             }
             else {
                 if (!pdesc && !pcompdesc) {
                     goto LABEL_33;
                 }
-                result = 1;
+                result = true;
             }
             break;
         }
@@ -412,13 +412,13 @@ bool BGSNote::Compare(TESForm* apCompare) {
                 if (!ptexture->CompareComponent(pcomptexture)) {
                     goto LABEL_33;
                 }
-                result = 1;
+                result = true;
             }
             else {
                 if (!ptexture && !pcomptexture) {
                     goto LABEL_33;
                 }
-                result = 1;
+                result = true;
             }
             break;
         }
@@ -429,10 +429,10 @@ bool BGSNote::Compare(TESForm* apCompare) {
                 if (NoteSpeaker == pcomp->GetNoteSpeaker()) {
                     goto LABEL_33;
                 }
-                result = 1;
+                result = true;
             }
             else {
-                result = 1;
+                result = true;
             }
             break;
         }
@@ -444,13 +444,13 @@ bool BGSNote::Compare(TESForm* apCompare) {
                      plist_2 = plist_2->m_pkNext) {
                     TESQuest* pquest = plist_2->m_item;
                     if (!(&pcomp->OwnerQuests)->IsInList(pquest)) {
-                        return 1;
+                        return true;
                     }
                 }
-                result = 0;
+                result = false;
             }
             else {
-                result = 1;
+                result = true;
             }
             break;
         }
@@ -466,13 +466,13 @@ bool BGSNote::Activate(
     int32_t aiCount
 ) {
     FNVD_DYNAMIC_CAST_VOID(Actor)(apActionRef, RTTI_TESObjectREFR, RTTI_Actor);
-    bool v12 = 0;
+    bool v12 = false;
     if (apActionRef != pPlayer) {
-        return 0;
+        return false;
     }
     TESForm* powner = apItemActivated->GetOwner();
     if (powner) {
-        if (!apItemActivated->IsAnOwner(pPlayer, 1)) {
+        if (!apItemActivated->IsAnOwner(pPlayer, true)) {
             if (powner->GetFormType() == FACT_ID) {
                 v12 = !static_cast<TESFaction*>(powner)->TESFaction::GetIsEvil();
             }
@@ -494,9 +494,9 @@ bool BGSNote::Activate(
         double v6 = fKarmaModStealing.Float();
         pPlayer->RewardKarma(static_cast<int32_t>(v6));
     }
-    pPlayer->AddNote(this, 1);
+    pPlayer->AddNote(this, true);
     apItemActivated->Disable();
-    return 1;
+    return true;
 }
 
 NOTE_TYPE BGSNote::GetNoteType() {
@@ -554,7 +554,7 @@ TESTexture* BGSNote::GetNoteImage() {
         return this->pNoteImage;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -563,7 +563,7 @@ TESDescription* BGSNote::GetNoteText() {
         return this->pNoteText;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -573,7 +573,7 @@ void BGSNote::SetNoteType(NOTE_TYPE aeVal) {
         uint8_t cType = this->cType;
         if (cType == 1) {
             ourFree(this->pNoteSound);
-            this->pNoteSound = 0;
+            this->pNoteSound = nullptr;
         }
         else {
             if (cType == 2) {
@@ -581,7 +581,7 @@ void BGSNote::SetNoteType(NOTE_TYPE aeVal) {
                 if (apThis) {
                     delete apThis;
                 }
-                this->pNoteSound = 0;
+                this->pNoteSound = nullptr;
             }
         }
         this->cType = aeVal;
@@ -593,7 +593,7 @@ void BGSNote::SetNoteType(NOTE_TYPE aeVal) {
                 v3 = ::new (apMemory) TESDescription;
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             this->pNoteText = v3;
         }
@@ -605,7 +605,7 @@ void BGSNote::SetNoteType(NOTE_TYPE aeVal) {
                     v2 = ::new (v7) TESTexture;
                 }
                 else {
-                    v2 = 0;
+                    v2 = nullptr;
                 }
                 this->pNoteImage = v2;
             }
@@ -636,6 +636,6 @@ TESTopic* BGSNote::GetNoteTopic() {
         return this->pNoteTopic;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

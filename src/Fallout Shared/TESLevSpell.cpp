@@ -32,7 +32,7 @@ int32_t retn_minusOne() {
 // The entry the last LVLO chunk created; the COED chunk that follows gives it its extra data.
 TESLevSpell::TESLevSpell() : TESBoundObject(), TESLeveledList() {
     SetFormType(0x4Cu);
-    SetInitialized(1);
+    SetInitialized(true);
 }
 
 TESLevSpell::~TESLevSpell() {
@@ -124,7 +124,7 @@ void TESLevSpell::Save() {
 void TESLevSpell::InitItem() {
     if (!TESForm::GetInitialized()) {
         static_cast<TESLeveledList*>(this)->InitItem(this);
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 
@@ -156,7 +156,7 @@ void TESLevSpell::CalculateCurrentForm(
         BSSimpleList<LEVELED_OBJECT*>* plist;
         int32_t ivalidcount = 1;
         int32_t ilastvalid = 0;
-        BSSimpleList<LEVELED_OBJECT*>* pfirstvalid = 0;
+        BSSimpleList<LEVELED_OBJECT*>* pfirstvalid = nullptr;
         for (plist = &leveledList; plist; plist = plist->m_pkNext) {
             if (!plist->m_item) {
                 break;
@@ -198,7 +198,7 @@ void TESLevSpell::CalculateCurrentForm(
             TESLevSpell* plevlist = dynamic_cast<TESLevSpell*>(pdata_2->pForm);
             if (plevlist) {
                 if (abRecurse) {
-                    psubform = 0;
+                    psubform = nullptr;
                     ssubcount = 0;
                     plevlist->CalculateCurrentForm(aeSchool, asLevel, psubform, ssubcount, abRecurse);
                     poutform = psubform;
@@ -223,7 +223,7 @@ SpellItem* TESLevSpell::GetLeveledSpell(MagicSystem::School aeSchool, int16_t as
 }
 
 BSSimpleList<SpellItem*>* TESLevSpell::GetLeveledSpells(MagicSystem::School aeSchool, int16_t asLevel) {
-    BSSimpleList<SpellItem*>* plist_2 = 0;
+    BSSimpleList<SpellItem*>* plist_2 = nullptr;
     if (GetUseAll()) {
         for (LEVELED_OBJECT* pobject : *&leveledList) {
             if (pobject) {
@@ -236,14 +236,14 @@ BSSimpleList<SpellItem*>* TESLevSpell::GetLeveledSpells(MagicSystem::School aeSc
                         plist = ::new (v8) BSSimpleList<SpellItem*>;
                     }
                     else {
-                        plist = 0;
+                        plist = nullptr;
                     }
                     plist_2 = plist;
                 }
                 SpellItem* pspell = dynamic_cast<SpellItem*>(pobject->pForm);
                 if (pspell ||
-                    ((plevSpell = dynamic_cast<TESLevSpell*>(pobject->pForm)) != 0 &&
-                     (pspell = plevSpell->GetLeveledSpell(aeSchool, asLevel)) != 0)) {
+                    ((plevSpell = dynamic_cast<TESLevSpell*>(pobject->pForm)) != nullptr &&
+                     (pspell = plevSpell->GetLeveledSpell(aeSchool, asLevel)) != nullptr)) {
                     plist_2->AddHead(pspell);
                 }
             }
@@ -259,7 +259,7 @@ BSSimpleList<SpellItem*>* TESLevSpell::GetLeveledSpells(MagicSystem::School aeSc
                 plist_3 = ::new (v7) BSSimpleList<SpellItem*>;
             }
             else {
-                plist_3 = 0;
+                plist_3 = nullptr;
             }
             plist_2 = plist_3;
             plist_3->AddHead(pspell_2);
@@ -269,7 +269,7 @@ BSSimpleList<SpellItem*>* TESLevSpell::GetLeveledSpells(MagicSystem::School aeSc
 }
 
 BSSimpleList<SpellItem*>* TESLevSpell::GetLeveledSpells_(Actor* apActor) {
-    BSSimpleList<SpellItem*>* presultingList_2 = 0;
+    BSSimpleList<SpellItem*>* presultingList_2 = nullptr;
     for (MagicSystem::School emagicSchool = MagicSystem::ALTERATION; emagicSchool < MagicSystem::SCHOOL_COUNT;
          emagicSchool = static_cast<MagicSystem::School>(emagicSchool + 1)) {
         ActorValue::Index v2 = static_cast<ActorValue::Index>(retn_minusOne());
@@ -279,7 +279,7 @@ BSSimpleList<SpellItem*>* TESLevSpell::GetLeveledSpells_(Actor* apActor) {
         while (plist) {
             SpellItem* pitem = plist->m_item;
             if (pitem) {
-                bool baddIt = 1;
+                bool baddIt = true;
                 if (presultingList_2) {
                     baddIt = !presultingList_2->IsInList(pitem);
                 }
@@ -291,7 +291,7 @@ BSSimpleList<SpellItem*>* TESLevSpell::GetLeveledSpells_(Actor* apActor) {
                         presultingList = ::new (v7) BSSimpleList<SpellItem*>;
                     }
                     else {
-                        presultingList = 0;
+                        presultingList = nullptr;
                     }
                     presultingList_2 = presultingList;
                 }

@@ -56,7 +56,7 @@ void ImageSpaceEffectNoise::Render(
     pTexBuffer.BorrowRenderedTexture(BSTextureManager::TEX_NOISE_BUFFER);
     ImageSpaceEffect* m_pObject = pEffectList.m_pBase->m_pObject;
     if (!m_pObject || m_pObject == reinterpret_cast<ImageSpaceEffect*>(static_cast<uintptr_t>(108))) {
-        peffect = 0;
+        peffect = nullptr;
     }
     else {
         peffect = pEffectList.m_pBase->m_pObject;
@@ -81,7 +81,7 @@ void ImageSpaceEffectNoise::Render(
     peffect->Render(apGeometry, apRenderer, pparam, 1);
     ImageSpaceEffect* v9 = pEffectList.m_pBase[1].m_pObject;
     if (!v9 || v9 == reinterpret_cast<ImageSpaceEffect*>(static_cast<uintptr_t>(108))) {
-        peffect_2 = 0;
+        peffect_2 = nullptr;
     }
     else {
         peffect_2 = pEffectList.m_pBase[1].m_pObject;

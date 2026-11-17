@@ -865,7 +865,7 @@ void NiCamera::HandleEyeFinityFOVScale(NiCamera* apCamera, float afScale) {
 }
 
 double NiCamera::retn_0_75() {
-    return (float)0.75f;
+    return 0.75f;
 }
 
 NiObject* NiCamera::CreateObject() {

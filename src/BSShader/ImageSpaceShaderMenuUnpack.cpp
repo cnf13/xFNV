@@ -50,14 +50,14 @@ void ImageSpaceShaderMenuUnpack::Render(
             NiTriShape** p_spMenuUnpackGeom = &BSShaderManager::pImageSpaceManager->spMenuUnpackGeom;
             if (spMenuUnpackGeom) {
                 NiDecRefCount(spMenuUnpackGeom);
-                *p_spMenuUnpackGeom = 0;
+                *p_spMenuUnpackGeom = nullptr;
             }
             NiScreenElements* v8 = static_cast<NiScreenElements*>(NiMemObject::operator new(sizeof(NiScreenElements)));
             if (v8) {
                 NiScreenElementsData* v9 =
                     static_cast<NiScreenElementsData*>(NiMemObject::operator new(sizeof(NiScreenElementsData)));
                 if (v9) {
-                    NiScreenElementsData* v10 = ::new (v9) NiScreenElementsData(0, 0, 1, 1, 1, 4, 1, 2, 1);
+                    NiScreenElementsData* v10 = ::new (v9) NiScreenElementsData(false, false, 1, 1, 1, 4, 1, 2, 1);
                     v11 = ::new (v8) NiScreenElements(v10);
                 }
                 else {
@@ -65,7 +65,7 @@ void ImageSpaceShaderMenuUnpack::Render(
                 }
             }
             else {
-                v11 = 0;
+                v11 = nullptr;
             }
             int32_t v12 = 0;
             if (ImageSpaceShaderMenuUnpack::kPackedRegions.m_usSize) {
@@ -102,7 +102,7 @@ void ImageSpaceShaderMenuUnpack::Render(
                     float apParama = static_cast<double>(m_uiWidth) / static_cast<double>(m_uiHeight);
                     float apParamb = apParama / 1.3333333730697632;
                     static_cast<NiScreenElementsData*>(v11->m_spModelData.m_pObject)
-                        ->NiScreenElementsData::Insert(4, 0, 0);
+                        ->NiScreenElementsData::Insert(4, 0, nullptr);
                     double v19 = apParamb * 1280.0;
                     NiFrustum* v20 = static_cast<NiFrustum*>(ImageSpaceShaderMenuUnpack::kPackedRegions.m_pBase[v12]);
                     NiScreenElementsData* m_pObject = static_cast<NiScreenElementsData*>(v11->m_spModelData.m_pObject);
@@ -138,11 +138,11 @@ void ImageSpaceShaderMenuUnpack::Render(
             }
             v11->UpdateProperties();
             arData.fTime = 0.0f;
-            arData.bUpdateControllers = 0;
-            arData.bParallelUpdate = 0;
-            arData.bFoundParticles = 0;
-            arData.bFoundMorphController = 0;
-            arData.bSceneGraphChange = 0;
+            arData.bUpdateControllers = false;
+            arData.bParallelUpdate = false;
+            arData.bFoundParticles = false;
+            arData.bFoundMorphController = false;
+            arData.bSceneGraphChange = false;
             v11->Update(arData);
             v11->m_spShader = (BSShader*)this;
             NiTriShape* v24 = BSShaderManager::pImageSpaceManager->spMenuUnpackGeom;
@@ -175,6 +175,6 @@ void ImageSpaceShaderMenuUnpack::Render(
             v29 = NiRenderer::ms_pkRenderer;
         }
         v27->Draw(v29);
-        ImageSpaceShaderMenuUnpack::bChangedFlag = 0;
+        ImageSpaceShaderMenuUnpack::bChangedFlag = false;
     }
 }

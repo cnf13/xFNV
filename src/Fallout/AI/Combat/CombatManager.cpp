@@ -77,7 +77,7 @@ void CombatManager::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
         pNewMap = ::new (apMemory) NiTMap<Actor*, int64_t>(37u);
     }
     else {
-        pNewMap = 0;
+        pNewMap = nullptr;
     }
     pLocalActorTargetingMap = pNewMap;
     NiTMapItem<Actor*, int64_t>* it = ptempMap->GetFirstPos();
@@ -93,7 +93,7 @@ void CombatManager::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
             pactor_2 = dynamic_cast<Actor*>(FormByNumericID);
         }
         else {
-            pactor_2 = 0;
+            pactor_2 = nullptr;
         }
         pactor = pactor_2;
         if (pactor_2) {
@@ -115,7 +115,8 @@ void CombatManager::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
 
 void CombatManager::Update(bool abTimeStopped) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_COMBAT_AI, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\CombatManager.cpp", 139
+        MEM_CONTEXT_COMBAT_AI, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\CombatManager.cpp",
+        139
     );
     if (!abTimeStopped) {
         float afElapsedTime = appTimer.fDelta;
@@ -196,7 +197,8 @@ void CombatManager::UpdateMainThread(bool abTimeStopped) {
 CombatGroup* CombatManager::CreateCombatGroup() {
     CombatGroup* pgroup;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_COMBAT_AI, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\CombatManager.cpp", 353
+        MEM_CONTEXT_COMBAT_AI, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\CombatManager.cpp",
+        353
     );
     CombatGroup* pMemory = static_cast<CombatGroup*>(ourMalloc(sizeof(CombatGroup)));
     if (pMemory) {
@@ -205,7 +207,7 @@ CombatGroup* CombatManager::CreateCombatGroup() {
         pgroup = ::new (pMemory) CombatGroup(aiGroupID);
     }
     else {
-        pgroup = 0;
+        pgroup = nullptr;
     }
     CombatGroup* pgroup_2 = pgroup;
     uint32_t ipos = CombatGroups.AddFirstEmpty(pgroup_2);
@@ -267,16 +269,16 @@ bool CombatManager::GetWantToHelpTarget(Actor* apActor, Actor* apAttacker) {
     uint32_t i;
     CombatGroup* v7 = apAttacker->GetCombatGroup();
     if (!v7) {
-        return (bool)0;
+        return false;
     }
     uint32_t targetCount = v7->GetTargetCount();
     for (i = 0; i < targetCount; ++i) {
         target = v7->GetTarget(i);
         if (GetWanttoHelpGroup(apActor, target)) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 void CombatManager::TargetLocalActor(Actor* apActor, CombatGroup* apGroup) {
@@ -391,7 +393,7 @@ CombatGroup* CombatManager::GetCombatGroup(uint32_t aiGroupID) {
         }
         ++i_2;
     }
-    return 0;
+    return nullptr;
 }
 
 CombatGroup* CombatManager::GetCombatGroupByIndex(uint32_t aiIndex) {
@@ -409,17 +411,17 @@ bool CombatManager::CheckExplosionAttack(
     uint32_t apOutNumSelf[2];
     uint32_t apOutNumTargets;
     if (!apExplosion) {
-        return 1;
+        return true;
     }
     float fradius = apExplosion->GetRadiusBSUnits();
     float fdamage = apExplosion->Data.fDamage;
     if (fDangerousProjectileExplosionDamage.Float() > static_cast<double>(fdamage)) {
-        return 1;
+        return true;
     }
     float* v6 = &fDangerousProjectileExplosionDamage.Float();
     fradius = CombatFormulas::CalcExplosionDamageDistance(fradius, fdamage, *v6);
     if (fDangerousProjectileExplosionRadius.Float() > static_cast<double>(fradius)) {
-        return 1;
+        return true;
     }
     apOutNumSelf[0] = 0;
     inumGroupMembersInRadius = 0;
@@ -431,13 +433,13 @@ bool CombatManager::CheckExplosionAttack(
     );
     TESCombatStyle* pcombatStyle = apAttacker->GetCombatStyle();
     if (apOutNumSelf[0] && !pcombatStyle->GetExplosiveWeaponsIgnoreSelf()) {
-        return 0;
+        return false;
     }
     if (inumGroupMembersInRadius && !pcombatStyle->GetExplosiveWeaponsIgnoreGroup()) {
-        return 0;
+        return false;
     }
     if (!inumNonTargetsInRadius) {
-        return 1;
+        return true;
     }
     int32_t v7 = apAttacker->GetActorValue(ActorValue::RESPONSIBILITY);
     return v7 < iAvoidHurtingNonTargetsResponsibility.Int() || pcombatStyle->GetExplosiveWeaponsIgnoreSpectators();
@@ -458,7 +460,7 @@ void CombatManager::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
 }
 
 void CombatManager::Revert(BGSLoadGameBuffer* apLoadGameBuffer) {
-    ClearData(1);
+    ClearData(true);
     InitializeData();
 }
 
@@ -473,7 +475,7 @@ bool CombatManager::GetWanttoHelpGroup(Actor* apActor, Actor* apActorToHelp) {
     CombatGroup* pTargetsCombatGroup;
     int32_t v12 = 0;
     if (!apActor->GetShouldHelp(apActorToHelp)) {
-        return (bool)0;
+        return false;
     }
     if (apActor) {
         if (apActorToHelp) {
@@ -483,21 +485,21 @@ bool CombatManager::GetWanttoHelpGroup(Actor* apActor, Actor* apActorToHelp) {
                 for (i = 0; i < targetCount; ++i) {
                     apActora = pTargetsCombatGroup->GetTarget(i);
                     if (apActor->GetShouldHelp(apActora)) {
-                        return (bool)0;
+                        return false;
                     }
                 }
                 memberCount = pTargetsCombatGroup->GetMemberCount();
                 for (j = 0; ((uint32_t)j) < memberCount; ++j) {
                     pMember = static_cast<PlayerCharacter*>(pTargetsCombatGroup->GetMember(j));
                     a4 = FIGHT_REACTION_NEUTRAL;
-                    if (apActor->GetShouldAttackActor(pMember, 0, a4, 0)) {
-                        return (bool)0;
+                    if (apActor->GetShouldAttackActor(pMember, false, a4, false)) {
+                        return false;
                     }
                 }
             }
         }
     }
-    return (bool)1;
+    return true;
 }
 
 void CombatManager::AddSpectatorForCombatGroup(Actor* apSpectator, Actor* apCombatant) {
@@ -541,7 +543,7 @@ void CombatManager::InitializeData() {
         v4 = ::new (apMemory) CombatCoverMap;
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     pCoverMap = v4;
     CombatThreatMap* v8 = static_cast<CombatThreatMap*>(ourMalloc(sizeof(CombatThreatMap)));
@@ -549,7 +551,7 @@ void CombatManager::InitializeData() {
         v3 = ::new (v8) CombatThreatMap;
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     pThreatMap = v3;
     CombatTargetMap* v7 = static_cast<CombatTargetMap*>(ourMalloc(sizeof(CombatTargetMap)));
@@ -557,7 +559,7 @@ void CombatManager::InitializeData() {
         v2 = ::new (v7) CombatTargetMap;
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     pTargetMap = v2;
     NiTMap<Actor*, int64_t>* v6 = static_cast<NiTMap<Actor*, int64_t>*>(ourMalloc(sizeof(NiTMap<Actor*, int64_t>)));
@@ -565,7 +567,7 @@ void CombatManager::InitializeData() {
         v1 = ::new (v6) NiTMap<Actor*, int64_t>(37u);
     }
     else {
-        v1 = 0;
+        v1 = nullptr;
     }
     pLocalActorTargetingMap = v1;
 }
@@ -602,7 +604,7 @@ void CombatManager::ClearData(bool abNotifyGroupMembers) {
             Parent->DetachChild(spDebugGeometry.m_pObject);
         }
     }
-    spDebugGeometry.operator=(static_cast<NiNode*>(0));
+    spDebugGeometry.operator=(static_cast<NiNode*>(nullptr));
 }
 
 void CombatManager::UpdateDebugGeometry() {
@@ -626,7 +628,7 @@ void CombatManager::UpdateDebugGeometry() {
             Parent->DetachChild(spDebugGeometry.m_pObject);
         }
     }
-    spDebugGeometry.operator=(static_cast<NiNode*>(0));
+    spDebugGeometry.operator=(static_cast<NiNode*>(nullptr));
     if (pPlayer->GetParentCell()) {
         if (pPlayer->GetParentCell()->GetMarkerNode()) {
             if (bDebugCombatDetectionEvents.Bool()) {
@@ -637,7 +639,7 @@ void CombatManager::UpdateDebugGeometry() {
                         v7 = ::new (apMemory) NiNode(0);
                     }
                     else {
-                        v7 = 0;
+                        v7 = nullptr;
                     }
                     spDebugGeometry.operator=(v7);
                 }
@@ -685,16 +687,16 @@ void CombatManager::UpdateDebugGeometry() {
                     palpha = ::new (v10) NiAlphaProperty;
                 }
                 else {
-                    palpha = 0;
+                    palpha = nullptr;
                 }
-                palpha->SetAlphaBlending(1);
+                palpha->SetAlphaBlending(true);
                 spDebugGeometry.m_pObject->AttachProperty(palpha);
                 AddNoLightingPropertyRecurse(spDebugGeometry.m_pObject);
                 BSShaderManager::PrepareObject(spDebugGeometry.m_pObject, 0, 0);
                 NiNode* MarkerNode = pPlayer->GetParentCell()->GetMarkerNode();
                 MarkerNode->AttachChild(spDebugGeometry.m_pObject, 1);
                 spDebugGeometry.m_pObject->UpdateProperties();
-                NiUpdateData UpdateData(0.0f, 0, 0);
+                NiUpdateData UpdateData(0.0f, false, false);
                 spDebugGeometry.m_pObject->Update(UpdateData);
             }
         }
@@ -704,7 +706,8 @@ void CombatManager::UpdateDebugGeometry() {
 CombatController*
 CombatManager::AddCombatant(Actor* apActor, Actor* apTarget, uint32_t aiPriority, bool abHighPriority) {
     AutoMemContext apMemory(
-        MEM_CONTEXT_COMBAT_AI, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\CombatManager.cpp", 423
+        MEM_CONTEXT_COMBAT_AI, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\CombatManager.cpp",
+        423
     );
     CombatController* v11 = apActor->GetCombatController();
     if (v11) {
@@ -715,7 +718,7 @@ CombatManager::AddCombatant(Actor* apActor, Actor* apTarget, uint32_t aiPriority
         CombatController* v6;
         if (!apActor->CanAttackActor(apTarget)) {
         LABEL_3:;
-            return 0;
+            return nullptr;
         }
         CombatGroup* apGroup = CreateCombatGroup();
         apGroup->AddMember(apActor);
@@ -724,7 +727,7 @@ CombatManager::AddCombatant(Actor* apActor, Actor* apTarget, uint32_t aiPriority
             v6 = ::new (v8) CombatController(apActor, apGroup, nullptr);
         }
         else {
-            v6 = 0;
+            v6 = nullptr;
         }
         v11 = v6;
         if (!apGroup->AddTarget(apTarget)) {
@@ -739,7 +742,8 @@ CombatManager::AddCombatant(Actor* apActor, Actor* apTarget, uint32_t aiPriority
 
 CombatController* CombatManager::AddGroupMember(Actor* apActor, CombatGroup* apGroup) {
     AutoMemContext apMemory(
-        MEM_CONTEXT_COMBAT_AI, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\CombatManager.cpp", 454
+        MEM_CONTEXT_COMBAT_AI, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\CombatManager.cpp",
+        454
     );
     CombatController* pCombatController = apActor->GetCombatController();
     if (pCombatController) {
@@ -756,7 +760,7 @@ CombatController* CombatManager::AddGroupMember(Actor* apActor, CombatGroup* apG
                 v4 = ::new (pCombatController) CombatController(apActor, apGroup, nullptr);
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             pCombatController = v4;
         }
@@ -787,11 +791,11 @@ uint32_t CombatManager::FindLocalActorsInRadius(
     }
     NiTMapItem<Actor*, int64_t>* it = pLocalActorTargetingMap->GetFirstPos();
     while (it) {
-        Actor* pactor = 0;
+        Actor* pactor = nullptr;
         int64_t itargetingBitfield = 0;
         pLocalActorTargetingMap->GetNext(it, pactor, itargetingBitfield);
         if (pactor) {
-            if (!pactor->IsDead(0) && !pactor->GetDisabled() && !pactor->GetDelete()) {
+            if (!pactor->IsDead(false) && !pactor->GetDisabled() && !pactor->GetDelete()) {
                 NiPoint3 actorLoc = pactor->CalculateAnticipatedLocation(afTime);
                 NiPoint3 vec = aLocation - actorLoc;
                 double v9 = vec.SqrLength();
@@ -841,9 +845,9 @@ bool CombatManager::ShouldPlayCombatMusic() {
         return bplayingMusic;
     }
     CombatMusicUpdateTimer.Reset(fCombatMusicUpdateTime.Float());
-    bool bplayCombatMusic = 0;
+    bool bplayCombatMusic = false;
     float fnearbyGroupCombatStrength = 0.0f;
-    bool bnearbyGroupDetected = 0;
+    bool bnearbyGroupDetected = false;
     float fplayerCombatStrength = pPlayer->CalculateCombatStrength(-1.0f);
     for (uint32_t i = 0;; ++i) {
         uint32_t Size = CombatGroups.m_usSize;
@@ -860,7 +864,7 @@ bool CombatManager::ShouldPlayCombatMusic() {
                 double fElapsed = flastDetectedTimeSTamp.ElapsedTime();
                 if (fCombatDetectionLostTime.Float() > fElapsed) {
                     if (bplayingMusic) {
-                        bplayCombatMusic = 1;
+                        bplayCombatMusic = true;
                     }
                     else {
                         float fgroupCombatStrength = 0.0f;
@@ -878,7 +882,7 @@ bool CombatManager::ShouldPlayCombatMusic() {
                         if (fgroupCombatStrength > 0.0) {
                             float fthreatRatio = fplayerCombatStrength / fgroupCombatStrength;
                             if (fCombatMusicPlayerTargetedThreatRatio.Float() > static_cast<double>(fthreatRatio)) {
-                                bplayCombatMusic = 1;
+                                bplayCombatMusic = true;
                             }
                         }
                     }
@@ -888,7 +892,7 @@ bool CombatManager::ShouldPlayCombatMusic() {
                 if (pgroup->ShouldPlayCombatMusic()) {
                     if (bplayingMusic) {
                         if (pgroup->FindMemberNearActor(pPlayer, fCombatMusicNearCombatOuterRadius.Float())) {
-                            bplayCombatMusic = 1;
+                            bplayCombatMusic = true;
                         }
                     }
                     else {
@@ -898,17 +902,17 @@ bool CombatManager::ShouldPlayCombatMusic() {
                                 for (uint32_t i_3 = 0; i_3 < imemberCount_2; ++i_3) {
                                     Actor* pmember_2 = pgroup->GetMember(i_3);
                                     if (pPlayer->IsPerceivedActorDetected(pmember_2)) {
-                                        bnearbyGroupDetected = 1;
+                                        bnearbyGroupDetected = true;
                                         break;
                                     }
                                 }
                             }
                             fnearbyGroupCombatStrength =
-                                pgroup->GetMemberCombatStrength(0) + fnearbyGroupCombatStrength;
+                                pgroup->GetMemberCombatStrength(nullptr) + fnearbyGroupCombatStrength;
                             if (bnearbyGroupDetected) {
                                 if (fnearbyGroupCombatStrength >
                                     fplayerCombatStrength * fCombatMusicPlayerNearStrengthMult.Float()) {
-                                    bplayCombatMusic = 1;
+                                    bplayCombatMusic = true;
                                 }
                             }
                         }
@@ -998,7 +1002,7 @@ void CombatManager::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
             pgroup = ::new (apMemory) CombatGroup(0);
         }
         else {
-            pgroup = 0;
+            pgroup = nullptr;
         }
         CombatGroup* pgroup_2 = pgroup;
         pgroup->iGroupNum = igroupNum;
@@ -1009,7 +1013,7 @@ void CombatManager::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     pThreatMap->LoadGame(apLoadGameBuffer);
     uint32_t icount = apLoadGameBuffer->LoadVariableSizedValue();
     for (uint32_t i_2 = 0; i_2 < icount; ++i_2) {
-        pactor = 0;
+        pactor = nullptr;
         // The map is keyed by the loaded form ID until InitLoadGame resolves it to the actor; the raw ID is written
         // into the pointer slot.
         apLoadGameBuffer->LoadFormID(pactor);
@@ -1035,15 +1039,15 @@ void CombatManager::Create() {
     if (!pCombatManager) {
         CombatManager* v0;
         AutoMemContext apMemory(
-            MEM_CONTEXT_COMBAT_AI, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\CombatManager.cpp",
-            67
+            MEM_CONTEXT_COMBAT_AI, true,
+            "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\Combat\\CombatManager.cpp", 67
         );
         CombatManager* v1 = static_cast<CombatManager*>(ourMalloc(sizeof(CombatManager)));
         if (v1) {
             v0 = ::new (v1) CombatManager;
         }
         else {
-            v0 = 0;
+            v0 = nullptr;
         }
         pCombatManager = v0;
         CombatAction::InitActions();

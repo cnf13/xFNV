@@ -32,7 +32,7 @@ bool NavMeshInfoMap::ProcessBeforeSave() {
     NiTMapItem<uint32_t, NavMeshInfo*>* it;
     NiTMapItem<uint32_t, NavMeshInfo*>* it_2;
     if (!GetAltered()) {
-        return 1;
+        return true;
     }
     uint32_t inumAltForms = TESForm::pAlteredForms->m_uiSize;
     int32_t inavmeshes = 0;
@@ -45,14 +45,14 @@ bool NavMeshInfoMap::ProcessBeforeSave() {
     if (inavmeshes) {
         goto LABEL_16;
     }
-    bhasAlteredInfo = 0;
+    bhasAlteredInfo = false;
     it = InfoMap.GetFirstPos();
     while (it) {
         uint32_t navmeshID;
         NavMeshInfo* pinfo;
         InfoMap.GetNext(it, navmeshID, pinfo);
         if (pinfo->GetAltered()) {
-            bhasAlteredInfo = 1;
+            bhasAlteredInfo = true;
             break;
         }
     }
@@ -70,11 +70,11 @@ bool NavMeshInfoMap::ProcessBeforeSave() {
             }
         }
         CheckMap();
-        return 1;
+        return true;
     }
     else {
-        SetAltered(0);
-        return 1;
+        SetAltered(false);
+        return true;
     }
 }
 
@@ -242,7 +242,7 @@ void NavMeshInfoMap::Save() {
         uint32_t* pchunkPointer = static_cast<uint32_t*>(pchunkdata_2);
         uint32_t inavmeshId = pinfo_2->NavMeshID;
         if (TESForm::QEndianSwapOnSave()) {
-            ENDIAN<uint32_t>(inavmeshId, 0);
+            ENDIAN<uint32_t>(inavmeshId, false);
         }
         *pchunkPointer++ = inavmeshId;
         pinfo_2->FillPortalChunk(reinterpret_cast<char*>(pchunkPointer));
@@ -264,18 +264,18 @@ void NavMeshInfoMap::InitItem() {
     while (it) {
         uint32_t navmeshID;
         InfoMap.GetNext(it, navmeshID, pinfo);
-        bool bnavmeshBad = 0;
+        bool bnavmeshBad = false;
         TESForm* pparentSpace = TESForm::GetFormByNumericID(pinfo->ParentSpaceID);
         if (!pparentSpace) {
             Warning(
                 "MASTERFILE: Could not find Parent Space with ID %08x for NavmeshInfo %08x", pinfo->ParentSpaceID,
                 navmeshID
             );
-            bnavmeshBad = 1;
+            bnavmeshBad = true;
         }
         if (std::fabs(pinfo->ApproxLocation.z) > 100000000376832.0) {
             Warning("MASTERFILE: NavmeshInfo %08x has bad approx location, ignoring", navmeshID);
-            bnavmeshBad = 1;
+            bnavmeshBad = true;
         }
         if (bnavmeshBad) {
             infosToRemove.Add(pinfo);
@@ -318,14 +318,14 @@ void NavMeshInfoMap::DeleteNavMeshInfo(uint32_t auiNavMeshID) {
     NavMeshInfo* a2;
     if (InfoMap.GetAt(auiNavMeshID, a2)) {
         RemoveInfoFromCellKeyMap(a2);
-        bool bMaster = 0;
+        bool bMaster = false;
         ::new (&apMemory) NavMeshPtr;
         if (a2->GetNavMeshEvenDisabled(*static_cast<NavMeshPtr*>(&apMemory))) {
             TESForm* v2 = apMemory.m_pObject;
             TESFile* File = v2->GetFile(0);
             if (File) {
                 if (File->GetMaster()) {
-                    bMaster = 1;
+                    bMaster = true;
                 }
             }
         }
@@ -334,7 +334,7 @@ void NavMeshInfoMap::DeleteNavMeshInfo(uint32_t auiNavMeshID) {
         }
         InfoMap.RemoveAt(auiNavMeshID);
         if (bMaster) {
-            SetAltered(1);
+            SetAltered(true);
         }
         apMemory.~NiPointer<NavMesh>();
     }
@@ -359,7 +359,7 @@ void NavMeshInfoMap::RemoveNavMeshInfo(uint32_t auiNavMeshID) {
         if (!CellKeyNavMeshInfoMap.IsEmpty()) {
             RemoveInfoFromCellKeyMap(pinfo);
         }
-        SetAltered(1);
+        SetAltered(true);
     }
 }
 
@@ -367,7 +367,7 @@ void NavMeshInfoMap::AddNavMeshInfo(NavMeshInfo* apNavMeshInfo) {
     uint32_t v2 = apNavMeshInfo->GetNavMeshID();
     (&InfoMap)->SetAt((int32_t)v2, apNavMeshInfo);
     AddInfoToCellKeyMap(apNavMeshInfo);
-    SetAltered((bool)1);
+    SetAltered(true);
 }
 
 [[clang::disable_tail_calls]] const BSSimpleArray<NavMeshInfo*, 1024>*
@@ -491,14 +491,14 @@ void NavMeshInfoMap::CheckMap() {
                         if (i >= uiSize) {
                             break;
                         }
-                        bool bremove = 0;
+                        bool bremove = false;
                         if (pinfo->AdjacentNavMeshes.GetAt(static_cast<int32_t>(i))) {
                             if (!GetNavMeshInfo(pinfo->AdjacentNavMeshes.GetAt(static_cast<int32_t>(i))->NavMeshID)) {
-                                bremove = 1;
+                                bremove = true;
                             }
                         }
                         else {
-                            bremove = 1;
+                            bremove = true;
                         }
                         if (bremove) {
                             const char* v20;
@@ -514,7 +514,7 @@ void NavMeshInfoMap::CheckMap() {
                                 "the portal",
                                 pinfo->NavMeshID, v20
                             );
-                            pinfo->AdjacentNavMeshes.Remove(i--, 1);
+                            pinfo->AdjacentNavMeshes.Remove(i--, true);
                         }
                     }
                     for (uint32_t i_2 = 0;; ++i_2) {
@@ -522,16 +522,16 @@ void NavMeshInfoMap::CheckMap() {
                         if (i_2 >= v2) {
                             break;
                         }
-                        bool bremove_2 = 0;
+                        bool bremove_2 = false;
                         if (pinfo->PreferredAdjacentNavMeshes.GetAt(static_cast<int32_t>(i_2))) {
                             if (!GetNavMeshInfo(
                                     pinfo->PreferredAdjacentNavMeshes.GetAt(static_cast<int32_t>(i_2))->NavMeshID
                                 )) {
-                                bremove_2 = 1;
+                                bremove_2 = true;
                             }
                         }
                         else {
-                            bremove_2 = 1;
+                            bremove_2 = true;
                         }
                         if (bremove_2) {
                             const char* v18;
@@ -547,7 +547,7 @@ void NavMeshInfoMap::CheckMap() {
                                 "the portal",
                                 pinfo->NavMeshID, v18
                             );
-                            pinfo->PreferredAdjacentNavMeshes.Remove(i_2--, 1);
+                            pinfo->PreferredAdjacentNavMeshes.Remove(i_2--, true);
                         }
                     }
                     potentialAdjacentInfos_t potentialAdjacentInfos;
@@ -578,7 +578,7 @@ void NavMeshInfoMap::CheckMap() {
                     }
                     NavMeshPtr spMesh;
                     if (pinfo->GetNavMeshEvenDisabled(spMesh)) {
-                        bool bShouldRegenerateInfo = 0;
+                        bool bShouldRegenerateInfo = false;
                         for (uint32_t i_4 = 0;; ++i_4) {
                             uint32_t v5 = pinfo->AdjacentNavMeshes.iSize;
                             if (i_4 >= v5) {
@@ -593,7 +593,7 @@ void NavMeshInfoMap::CheckMap() {
                                     "no triangle portal between the two, updating the NavMeshInfo",
                                     pinfo->NavMeshID, potherMesh->NavMeshID
                                 );
-                                bShouldRegenerateInfo = 1;
+                                bShouldRegenerateInfo = true;
                                 break;
                             }
                         }
@@ -612,7 +612,7 @@ void NavMeshInfoMap::CheckMap() {
                                     "no triangle portal between the two, updating the NavMeshInfo",
                                     pinfo->NavMeshID, potherMesh_2->NavMeshID
                                 );
-                                bShouldRegenerateInfo = 1;
+                                bShouldRegenerateInfo = true;
                                 break;
                             }
                         }
@@ -621,12 +621,12 @@ void NavMeshInfoMap::CheckMap() {
                             EdgeExtraInfo* ExtraEdgeInfo = spMesh.m_pObject->GetExtraEdgeInfo(i_6);
                             if (ExtraEdgeInfo->Portal.IsValid()) {
                                 potherMesh_3 = spMesh.m_pObject->GetExtraEdgeInfo(i_6)->Portal.pOtherMesh;
-                                bool bmissingPortal = 1;
+                                bool bmissingPortal = true;
                                 uint32_t iotherSize = pinfo->AdjacentNavMeshes.iSize;
                                 for (uint32_t k = 0; k < iotherSize; ++k) {
                                     NavMeshInfo* v8 = pinfo->AdjacentNavMeshes.GetAt(static_cast<int32_t>(k));
                                     if (v8 == potherMesh_3) {
-                                        bmissingPortal = 0;
+                                        bmissingPortal = false;
                                         break;
                                     }
                                 }
@@ -635,7 +635,7 @@ void NavMeshInfoMap::CheckMap() {
                                     NavMeshInfo** v9 =
                                         &pinfo->PreferredAdjacentNavMeshes.GetAt(static_cast<int32_t>(k_2));
                                     if (*v9 == potherMesh_3) {
-                                        bmissingPortal = 0;
+                                        bmissingPortal = false;
                                         break;
                                     }
                                 }
@@ -649,7 +649,7 @@ void NavMeshInfoMap::CheckMap() {
                                         "but the navmesh does, updating the NavMeshInfo",
                                         pinfo->NavMeshID, uiOtherID
                                     );
-                                    bShouldRegenerateInfo = 1;
+                                    bShouldRegenerateInfo = true;
                                     break;
                                 }
                             }
@@ -666,16 +666,16 @@ void NavMeshInfoMap::CheckMap() {
                                     "the navmesh does, updating the NavMeshInfo",
                                     pinfo->NavMeshID, uiDoorID
                                 );
-                                bShouldRegenerateInfo = 1;
+                                bShouldRegenerateInfo = true;
                                 break;
                             }
                         }
                         for (uint32_t i_8 = 0; i_8 < pinfo->ConnectedDoors.iSize; ++i_8) {
                             TESObjectREFR* pdoor = pinfo->ConnectedDoors.GetAt(static_cast<int32_t>(i_8));
-                            bool bhasPortal = 0;
+                            bool bhasPortal = false;
                             for (uint32_t j = 0; j < spMesh.m_pObject->GetNumDoorPortals(); ++j) {
                                 if (spMesh.m_pObject->GetDoorPortalFromArray(j)->pDoorForm == pdoor) {
-                                    bhasPortal = 1;
+                                    bhasPortal = true;
                                     break;
                                 }
                             }
@@ -686,7 +686,7 @@ void NavMeshInfoMap::CheckMap() {
                                     "not, updating the NavMeshInfo",
                                     pinfo->NavMeshID, v11
                                 );
-                                bShouldRegenerateInfo = 1;
+                                bShouldRegenerateInfo = true;
                                 break;
                             }
                         }
@@ -809,12 +809,12 @@ void NavMeshInfoMap::Clear() {
         delete pcellKeyMap;
     }
     CellKeyNavMeshInfoMap.RemoveAll();
-    SetAltered(1);
+    SetAltered(true);
 }
 
 void NavMeshInfoMap::GetAllNavMeshInfo(BSSimpleArray<NavMeshInfo*, 1024>* apReturnArray) {
     NiTMapItem<uint32_t, NavMeshInfo*>* it;
-    apReturnArray->SetSize(0, 0);
+    apReturnArray->SetSize(0, false);
     apReturnArray->SetReservedSize(2048u);
     it = InfoMap.GetFirstPos();
     while (it) {
@@ -839,7 +839,7 @@ void NavMeshInfoMap::RemoveInfoFromCellKeyMap(NavMeshInfo* apNavMeshInfo) {
     if (CellKeyNavMeshInfoMap.GetAt(worldspaceId, themap) && themap->GetAt(icellKey, thearray)) {
         int32_t index = thearray->Find(apNavMeshInfo, 0, &BSSimpleArray<NavMeshInfo*>::DefaultEqualFunctionByAddress);
         if (index != -1) {
-            thearray->Remove(index, 1);
+            thearray->Remove(index, true);
             if (thearray->IsEmpty()) {
                 themap->RemoveAt(icellKey);
                 if (thearray) {

@@ -284,7 +284,7 @@ bool NiObjectNET::RemoveExtraDataAt(int32_t usExtraDataIndex) {
 
 // Only the low word of the size is read.
 bool NiObjectNET::SetExtraDataSize(uint16_t usSize) {
-    uint16_t usNewSize = static_cast<uint16_t>(usSize);
+    uint16_t usNewSize = usSize;
     if (!usNewSize) {
         return false;
     }
@@ -319,7 +319,7 @@ void NiObjectNET::RemoveAllExtraData() {
 
 bool NiObjectNET::InsertExtraData(NiExtraData* pkExtra) {
     if (!pkExtra) {
-        return 0;
+        return false;
     }
     NiIncRefCount(pkExtra);
     EnterCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
@@ -335,17 +335,18 @@ bool NiObjectNET::InsertExtraData(NiExtraData* pkExtra) {
             this->m_ppkExtra = ppkNewExtra_2;
         }
         this->m_ppkExtra[m_usExtraDataSize++] = pkExtra;
-        for (int32_t i = m_usExtraDataSize; static_cast<uint16_t>(i) < this->m_usMaxSize; this->m_ppkExtra[i_2] = 0) {
+        for (int32_t i = m_usExtraDataSize; static_cast<uint16_t>(i) < this->m_usMaxSize;
+             this->m_ppkExtra[i_2] = nullptr) {
             i_2 = static_cast<uint16_t>(i++);
         }
         uint16_t i_3 = m_usExtraDataSize - 1;
         if (m_usExtraDataSize == 1) {
         LABEL_13:;
             LeaveCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
-            return 1;
+            return true;
         }
         else {
-            while (1) {
+            while (true) {
                 int32_t i_4 = i_3;
                 const char* m_kHandle = (&this->m_ppkExtra[i_4 - 1]->GetName())->GetHandle();
                 int32_t v13 = m_kHandle - (&this->m_ppkExtra[i_4]->GetName())->GetHandle();
@@ -366,7 +367,7 @@ bool NiObjectNET::InsertExtraData(NiExtraData* pkExtra) {
             }
             DeleteExtraData(i_3);
             LeaveCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
-            return 0;
+            return false;
         }
     }
     else {
@@ -376,7 +377,7 @@ bool NiObjectNET::InsertExtraData(NiExtraData* pkExtra) {
         this->m_ppkExtra = ppkNewExtra;
         *ppkNewExtra = pkExtra;
         LeaveCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
-        return 1;
+        return true;
     }
 }
 
@@ -562,23 +563,23 @@ NiExtraData* NiObjectNET::GetExtraData(const NiFixedString& kKey) const {
 
 bool NiObjectNET::RemoveExtraData(const NiFixedString& kKey) {
     if (!m_usExtraDataSize) {
-        return 0;
+        return false;
     }
     EnterCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
     if ((&kKey)->GetHandle() == NiGlobalStringTable::NULL_STRING) {
         LeaveCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
-        return 0;
+        return false;
     }
     int16_t sTop = m_usExtraDataSize - 1;
     int16_t sBottom = 0;
     if (sTop < 0) {
     LABEL_11:;
         LeaveCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
-        return 0;
+        return false;
     }
     else {
         int16_t sMiddle;
-        while (1) {
+        while (true) {
             const char* m_kHandle = (&kKey)->GetHandle();
             sMiddle = (sBottom + sTop) >> 1;
             int32_t v8 = m_kHandle - (&this->m_ppkExtra[sMiddle]->GetName())->GetHandle();
@@ -597,7 +598,7 @@ bool NiObjectNET::RemoveExtraData(const NiFixedString& kKey) {
         }
         DeleteExtraData(static_cast<uint16_t>(sMiddle));
         LeaveCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
-        return 1;
+        return true;
     }
 }
 
@@ -641,7 +642,7 @@ bool NiObjectNET::AddExtraData(NiExtraData* pkExtra) {
 
 bool NiObjectNET::AddExtraData(const NiFixedString& kKey, NiExtraData* pkExtra) {
     if ((&kKey)->GetHandle() == NiGlobalStringTable::NULL_STRING) {
-        return 0;
+        return false;
     }
     if (pkExtra) {
         if ((&pkExtra->GetName())->GetHandle() == NiGlobalStringTable::NULL_STRING) {
@@ -652,7 +653,7 @@ bool NiObjectNET::AddExtraData(const NiFixedString& kKey, NiExtraData* pkExtra) 
             return InsertExtraData(pkExtra);
         }
     }
-    return 0;
+    return false;
 }
 
 void NiObjectNET::SetName(const NiFixedString& strName) {

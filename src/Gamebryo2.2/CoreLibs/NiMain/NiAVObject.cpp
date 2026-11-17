@@ -77,7 +77,7 @@ void NiAVObject::LoadBinary(NiStream& kStream) {
     }
     if (kStream.m_uiNifFileVersion < NiStream::GetVersion(4, 1, 0, 12)) {
         uint32_t usFlags = static_cast<uint16_t>(m_uFlags);
-        uint32_t uiFlags = (static_cast<uint32_t>(m_uFlags) << 4) & 0xFFFFFF00;
+        uint32_t uiFlags = (m_uFlags << 4) & 0xFFFFFF00;
         m_uFlags = static_cast<NiFlags>((usFlags & 0xF) | (uiFlags & 0xFFFFFF7F) | 0x70);
     }
     if (kStream.m_uiNifFileVersion < NiStream::GetVersion(5, 0, 0, 1)) {
@@ -849,7 +849,7 @@ void NiAVObject::PushLocalProperties(
     while (pkItem) {
         NiProperty* pkProperty = pkItem->m_element.m_pObject;
         pkItem = pkItem->m_pkNext;
-        if (pkProperty && static_cast<int32_t>(pkProperty->Type()) <= static_cast<int32_t>(NiProperty::MAX_TYPES)) {
+        if (pkProperty && pkProperty->Type() <= static_cast<int32_t>(NiProperty::MAX_TYPES)) {
             NiProperty** ppkSlot = &pkState->m_aspProps[pkProperty->Type()].m_pObject;
             NiProperty* pkOld = *ppkSlot;
             if (pkOld != pkProperty) {
@@ -905,9 +905,9 @@ void NiAVObject::CloneProperties(
     while (pkItem) {
         NiProperty* pkProperty = pkItem->m_element.m_pObject;
         pkItem = pkItem->m_pkPrev;
-        if (pkProperty && static_cast<int32_t>(pkProperty->Type()) < static_cast<int32_t>(NiProperty::MAX_TYPES)) {
+        if (pkProperty && pkProperty->Type() < static_cast<int32_t>(NiProperty::MAX_TYPES)) {
             NiProperty* pkClone = static_cast<NiProperty*>(pkProperty->CreateSharedClone(kCloning));
-            if (static_cast<int32_t>(pkClone->Type()) < static_cast<int32_t>(NiProperty::MAX_TYPES)) {
+            if (pkClone->Type() < static_cast<int32_t>(NiProperty::MAX_TYPES)) {
                 NiPointer<NiProperty> spClone;
                 spClone.m_pObject = pkClone;
                 NiIncRefCount(pkClone);

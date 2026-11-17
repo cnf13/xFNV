@@ -12,35 +12,35 @@ const char* MapMarkerData::GetLocationName() {
 
 bool MapMarkerData::Load(TESFile* apFile) {
     if (!apFile) {
-        return 0;
+        return false;
     }
     if (apFile->GetTESChunk() != XMRK_ID) {
-        return 0;
+        return false;
     }
     if (!apFile->NextChunk()) {
-        return 0;
+        return false;
     }
     if (apFile->GetTESChunk() == FNAM_ID) {
         apFile->GetChunkData(&cFlags, 1u);
         cOriginalFlags = cFlags;
         if (!apFile->NextChunk()) {
-            return 0;
+            return false;
         }
     }
     if (apFile->GetTESChunk() != FULL_ID) {
-        return 0;
+        return false;
     }
     TESFullName::LoadFullNameChunk(&LocationName, apFile);
     if (!apFile->NextChunk()) {
-        return 0;
+        return false;
     }
     if (apFile->GetTESChunk() != TNAM_ID) {
-        return 0;
+        return false;
     }
     apFile->LoadWord(reinterpret_cast<int16_t*>(&sType));
     uint32_t uRewind = apFile->GetOffsetChunk();
     if (!apFile->NextChunk()) {
-        return 0;
+        return false;
     }
     if (apFile->GetTESChunk() == WMI1_ID) {
         uint32_t itempint = 0;
@@ -52,7 +52,7 @@ bool MapMarkerData::Load(TESFile* apFile) {
     else {
         apFile->SetOffsetChunk(uRewind);
     }
-    return 1;
+    return true;
 }
 
 void MapMarkerData::Save() {
@@ -66,15 +66,15 @@ void MapMarkerData::Save() {
 
 bool MapMarkerData::Compare(MapMarkerData* apCompare) {
     if (LocationName.CompareComponent(&apCompare->LocationName)) {
-        return 1;
+        return true;
     }
     if (cFlags != apCompare->cFlags) {
-        return 1;
+        return true;
     }
     if (sType == apCompare->sType) {
         return pReputation != apCompare->pReputation;
     }
-    return 1;
+    return true;
 }
 
 bool MapMarkerData::GetHidden() {

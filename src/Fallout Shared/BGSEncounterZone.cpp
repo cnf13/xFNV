@@ -174,10 +174,10 @@ bool BGSEncounterZone::Compare(TESForm* apCompare) {
     TESForm* v4 =
         static_cast<TESForm*>(FNVD_DYNAMIC_CAST_VOID(BGSEncounterZone)(apCompare, RTTI_TESForm, RTTI_BGSEncounterZone));
     if (!v4) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(v4)) {
-        return 1;
+        return true;
     }
     return std::memcmp(&Data, &v4[1], sizeof(Data)) != 0;
 }
@@ -241,7 +241,7 @@ bool BGSEncounterZone::ShouldReset() {
             if (iDetachTime) {
                 uint32_t iHoursPassed = appCalendar.GetHoursPassed();
                 // The compare is unsigned.
-                if (iHoursPassed - iDetachTime <= static_cast<uint32_t>(TESObjectCELL::GetHoursToRespawnCell())) {
+                if (iHoursPassed - iDetachTime <= TESObjectCELL::GetHoursToRespawnCell()) {
                     bReset = false;
                 }
             }
@@ -255,7 +255,7 @@ bool BGSEncounterZone::ShouldReset() {
 
 bool BGSEncounterZone::ShouldCellRecalc(TESObjectCELL* apCell) {
     return (bool)((uint8_t)(GameData.iResetTime &&
-                            (((uint32_t)apCell->GetDetachTime()) < ((uint32_t)((int32_t)GameData.iResetTime)))));
+                            (apCell->GetDetachTime() < ((uint32_t)((int32_t)GameData.iResetTime)))));
 }
 
 void BGSEncounterZone::SetNeverReset(bool abVal) {
@@ -307,7 +307,7 @@ void BGSEncounterZone::CreateNoZone() {
             v0 = nullptr;
         }
         BGSEncounterZone::pNoZone = v0;
-        v0->SetFormID(0x1Eu, (bool)1);
+        v0->SetFormID(0x1Eu, true);
         BGSEncounterZone::pNoZone->SetFormEditorID("NoZoneZone");
         pDataHandler->AddFormToDataHandler(BGSEncounterZone::pNoZone);
     }

@@ -450,7 +450,7 @@ bool ImageSpaceEffectHDR::UpdateParams(ImageSpaceEffectParam* apParam) {
 }
 
 void ImageSpaceEffectHDR::SetParams(float* apfData) {
-    bParamsChanged = (bool)1;
+    bParamsChanged = true;
     pfData = apfData;
 }
 

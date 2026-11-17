@@ -132,9 +132,9 @@ void hkpMousePickingViewer::releaseObject() {
             m_mouseSpring = this->m_mouseSpring;
         }
         m_mouseSpring->removeReference();
-        this->m_mouseSpring = 0;
+        this->m_mouseSpring = nullptr;
     }
-    m_currentWorld = 0;
+    m_currentWorld = nullptr;
 }
 
 hkProcess* hkpMousePickingViewer::create(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts) {
@@ -147,7 +147,7 @@ hkProcess* hkpMousePickingViewer::create(const hkArray<hkProcessContext*, hkCont
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

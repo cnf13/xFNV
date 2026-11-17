@@ -45,7 +45,7 @@ ModifierList::~ModifierList() {
 // The key is passed sign-extended to GetActorValueInfo and zero-extended to AddFastModifier.
 void ModifierList::AddModifier(Modifier* apModifier) {
     if (apModifier) {
-        char cKey = static_cast<char>(apModifier->GetKey());
+        char cKey = apModifier->GetKey();
         ActorValueInfo* pInfo = ActorValue::GetActorValueInfo(static_cast<ActorValue::Index>(cKey));
         if (pInfo && (pInfo->uFlags & 1)) {
             AddFastModifier(cKey, apModifier);
@@ -71,7 +71,7 @@ void ModifierList::AddFastModifier(char acKey, Modifier* apNew) {
                         v3 = ::new (apMemory) FastModifierCollection;
                     }
                     else {
-                        v3 = 0;
+                        v3 = nullptr;
                     }
                     pFastModifiers = v3;
                 }
@@ -83,10 +83,9 @@ void ModifierList::AddFastModifier(char acKey, Modifier* apNew) {
 
 void ModifierList::DeleteModifier(Modifier* apModifier) {
     if (apModifier) {
-        ActorValueInfo* pInfo =
-            ActorValue::GetActorValueInfo(static_cast<ActorValue::Index>(static_cast<char>(apModifier->GetKey())));
+        ActorValueInfo* pInfo = ActorValue::GetActorValueInfo(static_cast<ActorValue::Index>(apModifier->GetKey()));
         if (pInfo && (pInfo->uFlags & 1) && pFastModifiers) {
-            pFastModifiers->DeleteModifier(static_cast<char>(apModifier->GetKey()));
+            pFastModifiers->DeleteModifier(apModifier->GetKey());
         }
         else {
             Remove(apModifier);
@@ -98,7 +97,7 @@ void ModifierList::DeleteModifier(Modifier* apModifier) {
 void ModifierList::DeleteAllModifiers() {
     FastModifierCollection* pFastModifiers;
     Modifier* v3;
-    while (1) {
+    while (true) {
         v3 = m_item;
         if (!v3) {
             break;
@@ -180,7 +179,7 @@ void ModifierList::operator=(const ModifierList& arList) {
                 v3 = ::new (v6) FastModifierCollection(arList.pFastModifiers);
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             pFastModifiers = v3;
         }
@@ -193,7 +192,7 @@ void ModifierList::operator=(const ModifierList& arList) {
                 v2 = ::new (apMemory) Modifier(pitem);
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             AddModifier(v2);
         }
@@ -237,7 +236,7 @@ void ModifierList::AdjustModifier(char acKey, float afValue, ClampStyle aeClampS
     Modifier* pModifier = GetModifierItem(acKey);
     if (pModifier) {
         fValue = pModifier->GetValue();
-        v8 = (float)ModifierList::ModifyAndClamp(fValue, afValue, aeClampStyle);
+        v8 = ModifierList::ModifyAndClamp(fValue, afValue, aeClampStyle);
         pModifier->SetValue(v8);
         if ((pModifier->GetValue() == 0.0) && (!bZeroValuesAllowed)) {
             DeleteModifier(pModifier);
@@ -263,13 +262,13 @@ void ModifierList::Revert() {
 
 bool ModifierList::WriteModifier(Modifier* apModifier) {
     if (!apModifier) {
-        return (bool)0;
+        return false;
     }
     int8_t v3 = (int8_t)apModifier->GetKey();
     float flt004 = apModifier->GetValue();
     pSaveLoadGameOLD->SaveGameDataOLD(&v3, 1);
     pSaveLoadGameOLD->SaveGameDataOLD(&flt004, 4);
-    return (bool)1;
+    return true;
 }
 
 void ModifierList::RevertBGS(BGSLoadFormBuffer* apBuffer) {
@@ -315,7 +314,7 @@ void ModifierList::LoadGameTES() {
             v1 = ::new (apMemory) Modifier(v4, v5);
         }
         else {
-            v1 = 0;
+            v1 = nullptr;
         }
         AddModifier(v1);
     }
@@ -341,7 +340,7 @@ void ModifierList::SaveGame_009378D0() {
             ++usCount;
         }
     }
-    int32_t iFastCount = pFastModifiers != 0 ? FastModifierCollection::uiModifierCount : 0;
+    int32_t iFastCount = pFastModifiers != nullptr ? FastModifierCollection::uiModifierCount : 0;
     if (iFastCount) {
         for (int32_t i = 0; i < iFastCount; ++i) {
             WriteModifier(pFastModifiers->pModifiers[i]);
@@ -406,7 +405,7 @@ void FastModifierCollection::DeleteModifier(uint32_t auiIndex) {
             if (FastModifierCollection::uiAVMapping[auiIndex] < 77) {
                 if (pModifiers[FastModifierCollection::uiAVMapping[auiIndex]]) {
                     ourFree(pModifiers[FastModifierCollection::uiAVMapping[auiIndex]]);
-                    pModifiers[FastModifierCollection::uiAVMapping[auiIndex]] = 0;
+                    pModifiers[FastModifierCollection::uiAVMapping[auiIndex]] = nullptr;
                 }
             }
         }

@@ -372,10 +372,10 @@ bool TESCreature::Load(TESFile* apFile) {
 TESCreature::TESCreature() {
     SetFormType(CREA_ID);
     TESCreature::InitializeData();
-    SetResponsibility(50u, 0);
-    SetAggression(1u, 0);
-    SetConfidence(2u, 0);
-    SetEnergy(2u, 0);
+    SetResponsibility(50u, false);
+    SetAggression(1u, false);
+    SetConfidence(2u, false);
+    SetEnergy(2u, false);
     if (!pDataHandler->GetSaveLoad()) {
         SetFactionRank(pCreatureFaction, 0);
     }
@@ -686,73 +686,73 @@ void TESCreature::Copy(TESForm* apCopy) {
 bool TESCreature::Compare(TESForm* apCompare) {
     TESCreature* pComp = dynamic_cast<TESCreature*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
     CREATURE_DATA* Data = pComp->GetData();
     if (std::memcmp(&this->Data, Data, sizeof(this->Data))) {
-        return 1;
+        return true;
     }
     int32_t DisableLightUpdate = cHandReach;
     if (DisableLightUpdate != pComp->cHandReach) {
-        return 1;
+        return true;
     }
     double TurnSpeed = GetTurnSpeed();
     if (TurnSpeed != pComp->GetTurnSpeed()) {
-        return 1;
+        return true;
     }
     double BaseScale = fBaseScale;
     if (BaseScale != pComp->fBaseScale) {
-        return 1;
+        return true;
     }
     double FootWeight = GetFootWeight();
     if (FootWeight != pComp->GetFootWeight()) {
-        return 1;
+        return true;
     }
     BGSImpactDataSet::IMPACT_MATERIAL_TYPE v8 = GetBloodImpactMaterial();
     if (v8 != pComp->GetBloodImpactMaterial()) {
-        return 1;
+        return true;
     }
     TESCombatStyle* v9 = GetCombatStyle();
     if (v9 != pComp->GetCombatStyle()) {
-        return 1;
+        return true;
     }
     BGSBodyPartData* v10 = GetBodyPartData();
     if (v10 != pComp->GetBodyPartData()) {
-        return 1;
+        return true;
     }
     SOUND_LEVEL SoundLevel_0 = GetSoundLevel();
     if (SoundLevel_0 != pComp->GetSoundLevel()) {
-        return 1;
+        return true;
     }
     if (GetFlag(256u)) {
         CreatureSounds* psounds = GetCreatureSounds();
         CreatureSounds* pcompsounds = pComp->GetCreatureSounds();
         if (psounds) {
             if (!pcompsounds) {
-                return 1;
+                return true;
             }
             if (psounds->Compare(pcompsounds)) {
-                return 1;
+                return true;
             }
         }
         else {
             if (pcompsounds) {
-                return 1;
+                return true;
             }
         }
     }
     else {
         TESCreature* SoundCreature = GetSoundCreature();
         if (SoundCreature != pComp->GetSoundCreature()) {
-            return 1;
+            return true;
         }
     }
     BGSImpactDataSet* ImpactDataSet = GetImpactDataSet();
     if (ImpactDataSet != pComp->GetImpactDataSet()) {
-        return 1;
+        return true;
     }
     BGSListForm* WeaponList = GetWeaponList();
     return WeaponList != pComp->GetWeaponList();
@@ -769,17 +769,17 @@ bool TESCreature::Activate(
     Actor* pactionActor = dynamic_cast<Actor*>(apActionRef);
     Actor* pactor = dynamic_cast<Actor*>(apItemActivated);
     if (!pactor || (!pactionActor || pactor->IsDying())) {
-        return 0;
+        return false;
     }
     BaseProcess* pprocess = pactor->pCurrentProcess;
     if (!pprocess) {
-        return 0;
+        return false;
     }
-    if (pprocess->GetCommandingActor() && !pactor->IsDead(0)) {
-        return 0;
+    if (pprocess->GetCommandingActor() && !pactor->IsDead(false)) {
+        return false;
     }
     if (pprocess->GetFadeState()) {
-        return 0;
+        return false;
     }
     BaseProcess* CurrentAIProcess = pactionActor->pCurrentProcess;
     TESPackage* pactionpackage = CurrentAIProcess->GetPackageThatIsRunning();
@@ -789,7 +789,7 @@ bool TESCreature::Activate(
         if (peditorpack) {
             if (peditorpack->GetPackType() == PACKAGE_TYPE_DIALOGUE) {
                 TESObjectREFR* PackageExtraTarget = (&pactor->m_Extra)->GetPackageExtraTarget();
-                (&pactionActor->m_Extra)->SetPackageExtra(peditorpack, 4, PackageExtraTarget, 0, 0, 0);
+                (&pactionActor->m_Extra)->SetPackageExtra(peditorpack, 4, PackageExtraTarget, false, false, false);
                 BaseProcess* v32 = pactor->pCurrentProcess;
                 v32->PackageDone(pactionActor, peditorpack);
                 if (peditorpack->GetOncePerDay()) {
@@ -807,43 +807,49 @@ bool TESCreature::Activate(
             const char* v14 = sNoTalkUnConscious.String();
             std::sprintf(msg, "%s %s", pactor->GetFullName(), v14);
             Interface::ShowMessage(
-                msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", 0, 2.0f, 0
+                msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
             );
         }
-        return 0;
+        return false;
     }
-    if (pactor->IsFleeing(0)) {
+    if (pactor->IsFleeing(false)) {
         CombatController* pcombat = pactor->GetCombatController();
         if (!pcombat || (!pcombat->IsActoraCombatTarget(pPlayer) || pPlayer->GetBlocked())) {
             const char* v15 = sNoTalkFleeing.String();
             std::sprintf(msg, "%s %s", pactor->GetFullName(), v15);
             Interface::ShowMessage(
-                msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
             );
-            return 0;
+            return false;
         }
-        return 1;
+        return true;
     }
-    if (pactor->IsDead(0)) {
+    if (pactor->IsDead(false)) {
         if (pactionActor == pPlayer) {
-            Interface::QueueMenuCreate(Interface::OPEN_CONTAINER, apItemActivated, 0, 0, Interface::CMM_STANDARD, 0);
+            Interface::QueueMenuCreate(
+                Interface::OPEN_CONTAINER, apItemActivated, nullptr, nullptr, Interface::CMM_STANDARD, false
+            );
         }
         else {
             if (apObjecttoGet) {
                 if (!dynamic_cast<TESNPC*>(apObjecttoGet)) {
-                    apItemActivated->RemoveItem(apObjecttoGet, 0, aicount, 0, 0, pactionActor, 0, 0, 1, 0);
+                    apItemActivated->RemoveItem(
+                        apObjecttoGet, nullptr, aicount, false, false, pactionActor, nullptr, nullptr, true, false
+                    );
                 }
             }
         }
-        return 1;
+        return true;
     }
-    if (pactionActor != pPlayer && pactionActor->GetShouldAttackActor(pactor, 0, ereaction, 0)) {
+    if (pactionActor != pPlayer && pactionActor->GetShouldAttackActor(pactor, false, ereaction, false)) {
         BaseProcess* v31 = pactionActor->pCurrentProcess;
-        v31->EnterCombat(pactionActor, pactor, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0);
-        return 1;
+        v31->EnterCombat(
+            pactionActor, pactor, false, true, nullptr, false, false, true, 0, false, false, true, nullptr
+        );
+        return true;
     }
     if (pactionActor == pPlayer && (pactor->IsKnockedOut() && pactor->GetEssential())) {
-        return 0;
+        return false;
     }
     TESActorBaseData* v30 = static_cast<TESActorBaseData*>(pactor->GetActorBase());
     if (v30->GetAllowPickPocket() &&
@@ -858,22 +864,26 @@ bool TESCreature::Activate(
                 const char* v16 = gs_sNoPickPocketAgain.String();
                 std::sprintf(msg, "%s %s", pactor->GetFullName(), v16);
                 Interface::ShowMessage(
-                    msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                    msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
                 );
-                return 0;
+                return false;
             }
         }
-        Interface::QueueMenuCreate(Interface::OPEN_CONTAINER, apItemActivated, 0, 0, Interface::CMM_PICKPOCKET, 0);
-        return 1;
+        Interface::QueueMenuCreate(
+            Interface::OPEN_CONTAINER, apItemActivated, nullptr, nullptr, Interface::CMM_PICKPOCKET, false
+        );
+        return true;
     }
     if (!pactor->CanTalk() && pactionActor == pPlayer) {
         if (!pactor->bPlayerTeammate || apActionRef != pPlayer) {
-            return 1;
+            return true;
         }
         if (Actor::IsConsciousAndNotAttackingPlayer(pactor)) {
-            Interface::QueueMenuCreate(Interface::OPEN_COMPANION_WHEEL, apItemActivated, 0, 0, Interface::CMM_NONE, 0);
+            Interface::QueueMenuCreate(
+                Interface::OPEN_COMPANION_WHEEL, apItemActivated, nullptr, nullptr, Interface::CMM_NONE, false
+            );
         }
-        return 0;
+        return false;
     }
     else {
         if (!pactor->bPlayerTeammate || apActionRef != pPlayer) {
@@ -883,26 +893,28 @@ bool TESCreature::Activate(
                 pgreetTopic = TESTopic::GetTopic(DT_TOPIC, 0);
             }
             else {
-                pgreetTopic = 0;
+                pgreetTopic = nullptr;
             }
             if (pgreetTopic) {
-                pgreetDialogue = pgreetTopic->CreateDialogueItem(pactor, pPlayer, 0, 0, 0);
+                pgreetDialogue = pgreetTopic->CreateDialogueItem(pactor, pPlayer, nullptr, nullptr, false);
             }
             else {
-                pgreetDialogue = 0;
+                pgreetDialogue = nullptr;
             }
             if (pgreetDialogue &&
                 (pgreetDialogue->pInfo->IsGoodbye() &&
                  (pgreetDialogue->FirstResponse() && !pgreetDialogue->NextResponse()))) {
-                pactor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, 0, 0);
+                pactor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, false, false);
             }
             else {
                 if (!pgreetDialogue) {
-                    return 0;
+                    return false;
                 }
                 if (pactor->IsInCombat() && (pactionActor == pPlayer && pactor->bPlayerTeammate)) {
-                    pVATS.QuitVATSPlayback(0, 0);
-                    Interface::QueueMenuCreate(Interface::OPEN_DIALOG, pactor, 0, 0, Interface::CMM_STANDARD, 0);
+                    pVATS.QuitVATSPlayback(false, false);
+                    Interface::QueueMenuCreate(
+                        Interface::OPEN_DIALOG, pactor, nullptr, nullptr, Interface::CMM_STANDARD, false
+                    );
                 }
                 else {
                     if (pactor) {
@@ -915,7 +927,7 @@ bool TESCreature::Activate(
                                   (pactor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
                                    ((v26 = pactor->pCurrentProcess, v26->GetFurnitureMarker()) &&
                                     (v25 = pactor->pCurrentProcess, v25->GetFurnitureMarker()->cNumber > 19u)))))) {
-                                TESTopic* ptopic = 0;
+                                TESTopic* ptopic = nullptr;
                                 if (pactionActor == pPlayer) {
                                     if (!pactor->IsPathingComplete()) {
                                         BaseProcess* v24 = pactor->pCurrentProcess;
@@ -942,16 +954,19 @@ bool TESCreature::Activate(
                                     pactor->ForceIdleAnimation();
                                     pactionActor->ForceIdleAnimation();
                                     if (pprocess->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
-                                        pactor->InitiateDialogue(pPlayer, 0, 0, 1, 0, 0, 0, 0, 0);
+                                        pactor->InitiateDialogue(
+                                            pPlayer, nullptr, nullptr, true, false, false, nullptr, false, false
+                                        );
                                     }
                                     else {
-                                        pVATS.QuitVATSPlayback(0, 0);
+                                        pVATS.QuitVATSPlayback(false, false);
                                         Actor* pact = pactionActor;
                                         if (pactionActor == pPlayer) {
                                             pact = pactor;
                                         }
                                         Interface::QueueMenuCreate(
-                                            Interface::OPEN_DIALOG, pact, 0, 0, Interface::CMM_STANDARD, 0
+                                            Interface::OPEN_DIALOG, pact, nullptr, nullptr, Interface::CMM_STANDARD,
+                                            false
                                         );
                                     }
                                 }
@@ -970,7 +985,7 @@ bool TESCreature::Activate(
                                         }
                                         if (pactor != pactionActor && pactor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
                                             NiPoint3 v48 = pactionActor->GetLocationOnReference();
-                                            pactor->RequestRotate(v48, 0);
+                                            pactor->RequestRotate(v48, false);
                                         }
                                         if (pactionActor->IsinDialogue()) {
                                             BaseProcess* v17 = pactionActor->pCurrentProcess;
@@ -986,7 +1001,9 @@ bool TESCreature::Activate(
                                                 BaseProcess* v20 = pactionActor->pCurrentProcess;
                                                 v20->AddToProcedureIndexRunning(pactionActor, 2);
                                             }
-                                            if (pactionActor->InitiateDialogue(pactor, 0, 0, 1, 0, 0, 0, 0, 0)) {
+                                            if (pactionActor->InitiateDialogue(
+                                                    pactor, nullptr, nullptr, true, false, false, nullptr, false, false
+                                                )) {
                                                 BaseProcess* v18 = pactionActor->pCurrentProcess;
                                                 v18->AddToProcedureIndexRunning(pactionActor, 2);
                                                 pprocess->AddToProcedureIndexRunning(pactor, 2);
@@ -996,7 +1013,7 @@ bool TESCreature::Activate(
                                     else {
                                         BaseProcess* v23 = pactor->pCurrentProcess;
                                         if (!v23->CanForceGreet(pactionActor)) {
-                                            return 0;
+                                            return false;
                                         }
                                         BSAudio* v10 = &BSAudio::QInstance();
                                         v10->EndAllSoundsOfType(4u);
@@ -1019,13 +1036,14 @@ bool TESCreature::Activate(
                                         pactor->InterruptCast();
                                         pactor->ForceIdleAnimation();
                                         pactionActor->ForceIdleAnimation();
-                                        pVATS.QuitVATSPlayback(0, 0);
+                                        pVATS.QuitVATSPlayback(false, false);
                                         Actor* pact_2 = pactionActor;
                                         if (pactionActor == pPlayer) {
                                             pact_2 = pactor;
                                         }
                                         Interface::QueueMenuCreate(
-                                            Interface::OPEN_DIALOG, pact_2, ptopic, 0, Interface::CMM_STANDARD, 0
+                                            Interface::OPEN_DIALOG, pact_2, ptopic, nullptr, Interface::CMM_STANDARD,
+                                            false
                                         );
                                     }
                                 }
@@ -1035,12 +1053,14 @@ bool TESCreature::Activate(
                 }
             }
             delete pgreetDialogue;
-            return 1;
+            return true;
         }
         if (Actor::IsConsciousAndNotAttackingPlayer(pactor)) {
-            Interface::QueueMenuCreate(Interface::OPEN_COMPANION_WHEEL, apItemActivated, 0, 0, Interface::CMM_NONE, 0);
+            Interface::QueueMenuCreate(
+                Interface::OPEN_COMPANION_WHEEL, apItemActivated, nullptr, nullptr, Interface::CMM_NONE, false
+            );
         }
-        return 0;
+        return false;
     }
 }
 
@@ -1112,7 +1132,7 @@ void TESCreature::CopyFromTemplateForm(TESActorBase* apForceTemplate) {
     if (static_cast<TESActorBaseData*>(this)->pTemplateForm || apForceTemplate) {
         TESCreature defaultcreature;
         defaultcreature.pCombatStyle = TESCombatStyle::GetDefaultCombatStyle();
-        TESCreature* pactor = 0;
+        TESCreature* pactor = nullptr;
         if (!static_cast<TESActorBaseData*>(this)->IsTemplateLeveled()) {
             pactor = static_cast<TESCreature*>(static_cast<TESActorBaseData*>(this)->pTemplateForm);
         }
@@ -1124,7 +1144,7 @@ void TESCreature::CopyFromTemplateForm(TESActorBase* apForceTemplate) {
         if (pactor) {
             if (pactor->pTemplateForm) {
                 if (!pactor->QCopiedTemplate()) {
-                    pactor->CopyFromTemplateForm(0);
+                    pactor->CopyFromTemplateForm(nullptr);
                 }
             }
         }
@@ -1136,7 +1156,7 @@ void TESCreature::CopyFromTemplateForm(TESActorBase* apForceTemplate) {
                 TESScriptableForm::CopyComponent(&static_cast<TESScriptableForm&>(static_cast<TESActorBase&>(*pactor)));
             }
             else {
-                TESScriptableForm::CopyComponent(0);
+                TESScriptableForm::CopyComponent(nullptr);
             }
         }
         if (static_cast<TESActorBaseData*>(this)->GetTemplateUseFlag(TESActorBaseData::TU_INVENTORY)) {
@@ -1144,7 +1164,7 @@ void TESCreature::CopyFromTemplateForm(TESActorBase* apForceTemplate) {
                 TESContainer::CopyComponent(&static_cast<TESContainer&>(static_cast<TESActorBase&>(*pactor)));
             }
             else {
-                TESContainer::CopyComponent(0);
+                TESContainer::CopyComponent(nullptr);
             }
         }
         if (static_cast<TESActorBaseData*>(this)->GetTemplateUseFlag(TESActorBaseData::TU_BASEDATA)) {
@@ -1153,7 +1173,7 @@ void TESCreature::CopyFromTemplateForm(TESActorBase* apForceTemplate) {
                 v28 = &static_cast<TESFullName&>(static_cast<TESActorBase&>(*pactor));
             }
             else {
-                v28 = 0;
+                v28 = nullptr;
             }
             TESFullName::CopyComponent(v28);
             uint32_t v33 = static_cast<TESActorBaseData*>(this)->actorData.iActorBaseFlags & 0xEF8FDDF5u;
@@ -1169,20 +1189,20 @@ void TESCreature::CopyFromTemplateForm(TESActorBase* apForceTemplate) {
                 TESModel::CopyComponent(&static_cast<TESModel&>(static_cast<TESActorBase&>(*pactor)));
             }
             else {
-                TESModel::CopyComponent(0);
+                TESModel::CopyComponent(nullptr);
             }
             if (pactor) {
                 v27 = static_cast<TESModelList*>(pactor);
             }
             else {
-                v27 = 0;
+                v27 = nullptr;
             }
             TESModelList::CopyComponent(v27);
             if (pactor) {
                 v26 = &static_cast<TESAnimation&>(static_cast<TESActorBase&>(*pactor));
             }
             else {
-                v26 = 0;
+                v26 = nullptr;
             }
             TESAnimation::CopyComponent(v26);
             BGSBodyPartData* v2 = pactor->GetBodyPartData();
@@ -1196,7 +1216,7 @@ void TESCreature::CopyFromTemplateForm(TESActorBase* apForceTemplate) {
                 v25 = &static_cast<BGSDestructibleObjectForm&>(static_cast<TESActorBase&>(*pactor));
             }
             else {
-                v25 = 0;
+                v25 = nullptr;
             }
             BGSDestructibleObjectForm::CopyComponent(v25);
             uint32_t v32 = static_cast<TESActorBaseData*>(this)->actorData.iActorBaseFlags & 0xB4707F8Eu;
@@ -1251,20 +1271,20 @@ void TESCreature::CopyFromTemplateForm(TESActorBase* apForceTemplate) {
                 TESAttributes::CopyComponent(&static_cast<TESAttributes&>(static_cast<TESActorBase&>(*pactor)));
             }
             else {
-                TESAttributes::CopyComponent(0);
+                TESAttributes::CopyComponent(nullptr);
             }
             if (pactor) {
                 v24 = &static_cast<TESHealthForm&>(static_cast<TESActorBase&>(*pactor));
             }
             else {
-                v24 = 0;
+                v24 = nullptr;
             }
             TESHealthForm::CopyComponent(v24);
             if (pactor) {
                 v23 = static_cast<TESAttackDamageForm*>(pactor);
             }
             else {
-                v23 = 0;
+                v23 = nullptr;
             }
             TESAttackDamageForm::CopyComponent(v23);
             uint16_t SpeedMultiplier = pactor->GetSpeedMultiplier();
@@ -1286,7 +1306,7 @@ void TESCreature::CopyFromTemplateForm(TESActorBase* apForceTemplate) {
                 static_cast<TESActorBaseData*>(this)->CopyFactionList(pactor);
             }
             else {
-                static_cast<TESActorBaseData*>(this)->CopyFactionList(0);
+                static_cast<TESActorBaseData*>(this)->CopyFactionList(nullptr);
             }
         }
         if (static_cast<TESActorBaseData*>(this)->GetTemplateUseFlag(TESActorBaseData::TU_SPELLS)) {
@@ -1295,14 +1315,14 @@ void TESCreature::CopyFromTemplateForm(TESActorBase* apForceTemplate) {
                 v22 = &static_cast<TESSpellList&>(static_cast<TESActorBase&>(*pactor));
             }
             else {
-                v22 = 0;
+                v22 = nullptr;
             }
             TESSpellList::CopyComponent(v22);
             if (pactor) {
                 BGSTouchSpellForm::CopyComponent(&static_cast<BGSTouchSpellForm&>(static_cast<TESActorBase&>(*pactor)));
             }
             else {
-                BGSTouchSpellForm::CopyComponent(0);
+                BGSTouchSpellForm::CopyComponent(nullptr);
             }
         }
         if (static_cast<TESActorBaseData*>(this)->GetTemplateUseFlag(TESActorBaseData::TU_AIDATA)) {
@@ -1310,7 +1330,7 @@ void TESCreature::CopyFromTemplateForm(TESActorBase* apForceTemplate) {
                 CopyAIData(pactor);
             }
             else {
-                CopyAIData(0);
+                CopyAIData(nullptr);
             }
         }
         if (static_cast<TESActorBaseData*>(this)->GetTemplateUseFlag(TESActorBaseData::TU_AIPACKAGES)) {
@@ -1318,7 +1338,7 @@ void TESCreature::CopyFromTemplateForm(TESActorBase* apForceTemplate) {
                 CopyAIPackageList(pactor);
             }
             else {
-                CopyAIPackageList(0);
+                CopyAIPackageList(nullptr);
             }
         }
         scompositeflags = 0;
@@ -1327,7 +1347,7 @@ void TESCreature::CopyFromTemplateForm(TESActorBase* apForceTemplate) {
             static_cast<TESActorBaseData*>(this)->pTemplateForm = pleveledtemplate;
             static_cast<TESActorBaseData*>(this)->SetTemplateUseFlags(scompositeflags);
         }
-        static_cast<TESActorBaseData*>(this)->SetCopiedTemplate(1);
+        static_cast<TESActorBaseData*>(this)->SetCopiedTemplate(true);
     }
 }
 
@@ -1505,7 +1525,7 @@ void TESCreature::InitDefaultWorn(TESObjectREFR* apRef, bool abArmor, bool abWea
 bool TESCreature::CanWearItem(TESForm* apItem) {
     int32_t FormType = apItem->GetFormType();
     if (FormType == 30 || (FormType > 39 && FormType <= 41)) {
-        return 1;
+        return true;
     }
     return apItem->GetFormType() == 40 && static_cast<TESObjectWEAP*>(apItem)->TESObjectWEAP::IsEmbeddedWeapon();
 }

@@ -230,7 +230,7 @@ OEI::IO::IO_Thread::IO_Thread() {}
 // request's semaphore; a quit request ends the loop and signals s_worker_thread_done.
 uint32_t OEI::IO::IO_Thread::ThreadProc() {
     SetThreadProcessor(1u);
-    while (1) {
+    while (true) {
         // EXE-INLINED 0x4424E0
         BSSemaphore* pEventSema = s_event_sema;
         pEventSema->hSemaphore->Wait();

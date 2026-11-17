@@ -235,8 +235,8 @@
 #include <SDL3/SDL.h>
 #include <cctype>
 #include <cfloat>
+#include <cstdint>
 #include <memory>
-#include <stdint.h>
 #include <vector>
 
 template <uint32_t Flag>
@@ -335,9 +335,10 @@ void Model::InitModel(const char* apFilename, BSStream* apStream, bool abPrepare
     int32_t iFilenameLen = BSstrlen(apFilename) + 1;
     pFilename = static_cast<char*>(ourMalloc(static_cast<uint32_t>(iFilenameLen)));
     BSstrcpy(pFilename, iFilenameLen, apFilename);
-    if (apStream->GetObjectCount() || (apStream->FreeAllObjects(), apStream->Load("Meshes\\Marker_Error.NIF", 0))) {
+    if (apStream->GetObjectCount() ||
+        (apStream->FreeAllObjects(), apStream->Load("Meshes\\Marker_Error.NIF", nullptr))) {
         NiNode* pNewObject = static_cast<NiNode*>(apStream->GetObjectAt(0));
-        bool bLoaded = 0;
+        bool bLoaded = false;
         if (pNewObject && pNewObject->IsNode()) {
             const char* pname = (&pNewObject->m_kName)->GetHandleString();
             if (pname && WildCard::Match(pname, "Bip[0-9][0-9]")) {
@@ -347,7 +348,7 @@ void Model::InitModel(const char* apFilename, BSStream* apStream, bool abPrepare
                     pNewObject_2 = (NiObject*)::new (apMemory) NiNode(0);
                 }
                 else {
-                    pNewObject_2 = 0;
+                    pNewObject_2 = nullptr;
                 }
                 spObject3D.operator=(static_cast<NiNode*>(pNewObject_2));
                 NiNode* v11 = spObject3D.m_pObject;
@@ -356,7 +357,7 @@ void Model::InitModel(const char* apFilename, BSStream* apStream, bool abPrepare
             else {
                 spObject3D.operator=(pNewObject);
             }
-            bLoaded = 1;
+            bLoaded = true;
         }
         else {
             uint32_t iChild = 0;
@@ -371,13 +372,13 @@ void Model::InitModel(const char* apFilename, BSStream* apStream, bool abPrepare
                                 pNewObject_3 = (NiObject*)::new (v14) NiNode(0);
                             }
                             else {
-                                pNewObject_3 = 0;
+                                pNewObject_3 = nullptr;
                             }
                             spObject3D.operator=(static_cast<NiNode*>(pNewObject_3));
                         }
                         NiNode* v9 = spObject3D.m_pObject;
                         v9->SetAt(iChild++, pChild);
-                        bLoaded = 1;
+                        bLoaded = true;
                     }
                 }
             }
@@ -392,13 +393,13 @@ void Model::InitModel(const char* apFilename, BSStream* apStream, bool abPrepare
                     NiAVObjectPalette* ppal = pman->GetObjectPalette();
                     if (ppal) {
                         if ((&spObject3D.m_pObject->m_kName)->GetHandleString()) {
-                            ppal->SetAVObject(*&spObject3D.m_pObject->m_kName, 0);
+                            ppal->SetAVObject(*&spObject3D.m_pObject->m_kName, nullptr);
                         }
                     }
                 }
             }
-            bool bHasBadProperties = 0;
-            MessageHandler::IncDisableWarningCount(1);
+            bool bHasBadProperties = false;
+            MessageHandler::IncDisableWarningCount(true);
             int32_t Type = NiZBufferProperty::GetType();
             NiZBufferProperty* pzBuf = static_cast<NiZBufferProperty*>(spObject3D.m_pObject->GetProperty(Type));
             if (pzBuf) {
@@ -406,7 +407,7 @@ void Model::InitModel(const char* apFilename, BSStream* apStream, bool abPrepare
                 if (pzBuf->IsEqualFast(*Default)) {
                     int32_t v7 = NiZBufferProperty::GetType();
                     spObject3D.m_pObject->RemoveProperty(v7);
-                    bHasBadProperties = 1;
+                    bHasBadProperties = true;
                 }
             }
             NiProperty* pprop = spObject3D.m_pObject->GetProperty(NiVertexColorProperty::GetType());
@@ -414,7 +415,7 @@ void Model::InitModel(const char* apFilename, BSStream* apStream, bool abPrepare
                 NiVertexColorProperty* v8 = NiVertexColorProperty::GetDefault();
                 if (static_cast<NiVertexColorProperty*>(pprop)->IsEqualFast(*v8)) {
                     spObject3D.m_pObject->RemoveProperty(NiVertexColorProperty::GetType());
-                    bHasBadProperties = 1;
+                    bHasBadProperties = true;
                 }
             }
             if (bHasBadProperties) {
@@ -430,18 +431,18 @@ void Model::InitModel(const char* apFilename, BSStream* apStream, bool abPrepare
                     );
                 }
             }
-            MessageHandler::IncDisableWarningCount(0);
+            MessageHandler::IncDisableWarningCount(false);
             if (abPrepareObject) {
-                bool bskipprecache = 0;
+                bool bskipprecache = false;
                 if (abFaceGenModel || HasMorpherController(spObject3D.m_pObject)) {
-                    bskipprecache = 1;
+                    bskipprecache = true;
                 }
                 BSShaderManager::PrepareObject(spObject3D.m_pObject, abFaceGenModel, bskipprecache);
             }
         }
     }
     else {
-        pFilename = 0;
+        pFilename = nullptr;
     }
 }
 
@@ -458,8 +459,8 @@ void AttachDistant3DTask::PostProcess() {
         v1 = (&spNode)->operator->();
         pRef->Set3DSimple(v1);
         parentCell = pRef->TESObjectREFR::GetParentCell();
-        TES::pInstance->AttachModel(pRef, parentCell, nullptr, 0);
-        pRef->SetHasTemp3D(1);
+        TES::pInstance->AttachModel(pRef, parentCell, nullptr, false);
+        pRef->SetHasTemp3D(true);
     }
 }
 
@@ -490,7 +491,7 @@ LoadedFile::~LoadedFile() {
             acMessage, "%s ref object at mem %i being destroyed with %i references\r\n", pFileName, this, iRefCount
         );
         if (BSCoreMessage::HasHandler()) {
-            BSCoreMessage::GetInstance()->Message(BSCoreMessage::MS_DEBUGSTRING, acMessage, 0, 0, 0);
+            BSCoreMessage::GetInstance()->Message(BSCoreMessage::MS_DEBUGSTRING, acMessage, nullptr, 0, 0);
         }
     }
     ourFree(pFileName);
@@ -533,7 +534,7 @@ QueuedFileLoad::QueuedFileLoad(const char* apFileName, IO_TASK_PRIORITY aePriori
 
 void QueuedFileLoad::Run() {
     AutoMemContext tempMemContext(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2422
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2422
     );
     char* ProcessLevel = pFileName;
     LoadedFile* LoadedFileFromMap = pModelLoader->GetLoadedFileFromMap(ProcessLevel);
@@ -548,7 +549,7 @@ void QueuedFileLoad::Run() {
                 v4 = ::new (v6) LoadedFile(pFileName, pfile);
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             spLoadedFile.operator=(v4);
         }
@@ -622,7 +623,7 @@ QueuedTexture::QueuedTexture(NiTexture* apTexture, IO_TASK_PRIORITY aePriority)
 
 void QueuedTexture::Run() {
     AutoMemContext tempMemContext(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 695
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 695
     );
     if (pFileEntry) {
         BSTexturePalette::GetTexture(pFileEntry, spTexture);
@@ -658,7 +659,7 @@ void QueuedTexture::Run() {
             }
             else {
                 spTexture.operator=(static_cast<NiTexture*>(
-                    NiSourceTexture::Create(pfile, pfileName, NiSourceTexture::ms_kDefaultPrefs, 1)
+                    NiSourceTexture::Create(pfile, pfileName, NiSourceTexture::ms_kDefaultPrefs, true)
                 ));
             }
             NiTexture::SetLoadMethod(iloadMethod);
@@ -702,7 +703,7 @@ void QueuedTexture::Finish() {
     }
     if (QueuedFileEntry::GetFileEntry()) {
         if (GetTrackedFile()) {
-            SetInQueuedTextureMap(0);
+            SetInQueuedTextureMap(false);
             v3 = QueuedFileEntry::GetFileEntry();
             pModelLoader->RemoveQueuedTextureFromMap(v3);
         }
@@ -715,7 +716,7 @@ void QueuedTexture::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
     QueuedFile::Cancel(aePreviousState, apTaskOwner);
     if (QueuedFileEntry::GetFileEntry()) {
         if (GetTrackedFile()) {
-            SetInQueuedTextureMap(0);
+            SetInQueuedTextureMap(false);
             location = QueuedFileEntry::GetFileEntry();
             pModelLoader->RemoveQueuedTextureFromMap(location);
         }
@@ -733,7 +734,7 @@ void QueuedTexture::QueueMe() {
         SetInQueuedTextureMap(v3);
     }
     if (pModelLoader->GetLoadTexturesDegraded()) {
-        SetLoadDegraded(1);
+        SetLoadDegraded(true);
     }
     pIOManager->AddTask(this);
 }
@@ -743,7 +744,7 @@ uint8_t QueuedTexture::GetFileIndex() {
     Archive* pArchive;
     if (QueuedFileEntry::GetFileEntry() &&
         ((location = QueuedFileEntry::GetFileEntry()),
-         ((pArchive = ArchiveManager::GetArchiveForFileEntry(location, ARCHIVE_TYPE_TEXTURES)) != 0))) {
+         ((pArchive = ArchiveManager::GetArchiveForFileEntry(location, ARCHIVE_TYPE_TEXTURES)) != nullptr))) {
         return (uint8_t)(pArchive->GetRuntimeID() + 4);
     }
     else {
@@ -816,13 +817,13 @@ QueuedModel::QueuedModel(Model* apModel, IO_TASK_PRIORITY aePriority)
 
 void QueuedModel::Run() {
     AutoMemContext tempMemContext(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 952
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 952
     );
     if (BSstrlen(pFileName)) {
         char* ProcessLevel = pFileName;
         pModelLoader->FindModel(ProcessLevel, spModel);
         if (spModel.m_pObject) {
-            SetAlreadyInModelMap(1);
+            SetAlreadyInModelMap(true);
             return;
         }
         BSFile* pfile = GetFile(ARCHIVE_TYPE_INDEX_MESHES, ARCHIVE_TYPE_MESHES);
@@ -837,7 +838,7 @@ void QueuedModel::Run() {
                 v5 = ::new (v7) Model(pFileName, &kstream, PrepareAfterLoad, FaceGenModel);
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             spModel.operator=(v5);
         }
@@ -851,7 +852,7 @@ void QueuedModel::Run() {
             }
             Warning("MODEL ERROR: Could not %s file '%s'.", v4, pFileName);
         }
-        BSShaderManager::pCurrentModelContext = 0;
+        BSShaderManager::pCurrentModelContext = nullptr;
     }
 }
 
@@ -859,7 +860,7 @@ void QueuedModel::Finish() {
     NiPoint3 apResult;
     NiUpdateData a2;
     AutoMemContext apMemory(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 997
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 997
     );
     if (spModel.m_pObject) {
         if (GetAddRefCount()) {
@@ -875,7 +876,7 @@ void QueuedModel::Finish() {
                 if (fadeNode) {
                     float v15;
                     a2.~NiUpdateData();
-                    ::new (&a2) NiUpdateData(0.0, 0, 0);
+                    ::new (&a2) NiUpdateData(0.0, false, false);
                     fadeNode->Update(a2);
                     const NiBound* WorldBound = &fadeNode->GetWorldBound();
                     float radius = WorldBound->m_fRadius;
@@ -885,7 +886,7 @@ void QueuedModel::Finish() {
                         radius = TESObjectREFR::GetBoundMax_0056FC30(&apResult, v6)->z * 0.5;
                     }
                     float v21 = 3.4028235e+38f;
-                    const uint32_t uiGridsToLoad = static_cast<uint32_t>(::uGridsToLoad.UInt());
+                    const uint32_t uiGridsToLoad = ::uGridsToLoad.UInt();
                     v21 = static_cast<double>(uiGridsToLoad << 12) * 0.5 - (radius + 2048.0);
                     float* fLODBoundRadiusMult = &::fLODBoundRadiusMult.Float();
                     float LODBoundRadius = radius * *fLODBoundRadiusMult;
@@ -985,13 +986,13 @@ void QueuedModel::QueueMe(TESTextureList* apTextureList) {
                 if (pswap) {
                     if (pswap->pNewTexture) {
                         IO_TASK_PRIORITY v3 = GetIOTaskPriority();
-                        pswap->pNewTexture->QueueTextureSet(v3, this, 0);
+                        pswap->pNewTexture->QueueTextureSet(v3, this, false);
                     }
                 }
             }
         }
     }
-    SetFinishedQueuing(1);
+    SetFinishedQueuing(true);
     CheckFinished();
 }
 
@@ -1067,13 +1068,13 @@ QueuedKF::~QueuedKF() {}
 
 void QueuedKF::Run() {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_ANIMATION, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 1321
+        MEM_CONTEXT_ANIMATION, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 1321
     );
     char* ProcessLevel = pFileName;
     KFModel* KFModel_ = pModelLoader->FindKFModel(ProcessLevel);
     spKFModel.operator=(KFModel_);
     if (spKFModel.m_pObject) {
-        SetAlreadyInKFMap(1);
+        SetAlreadyInKFMap(true);
     }
     else {
         BSFile* pfile = GetFile(ARCHIVE_TYPE_INDEX_MESHES, ARCHIVE_TYPE_MESHES);
@@ -1085,7 +1086,7 @@ void QueuedKF::Run() {
                 v4 = ::new (v6) KFModel(pFileName, &kstream);
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             spKFModel.operator=(v4);
         }
@@ -1186,10 +1187,10 @@ void QueuedAnimIdle::QueueMe() {
                     apModel = static_cast<TESModelTextureSwap*>(AnimObject);
                 }
                 else {
-                    apModel = 0;
+                    apModel = nullptr;
                 }
                 IO_TASK_PRIORITY IOTaskPriority = GetIOTaskPriority();
-                pModelLoader->QueueModel(apModel, IOTaskPriority, this, LOD_MULT_ITEMS, 1, 0, 0);
+                pModelLoader->QueueModel(apModel, IOTaskPriority, this, LOD_MULT_ITEMS, true, false, false);
             }
         }
     }
@@ -1248,14 +1249,13 @@ void QueuedHelmet::QueueMe() {
             TESModel* a2 = pBipedAnim->GetBipObject(aeBipedObject)->pPart;
             IO_TASK_PRIORITY IOTaskPriority = GetIOTaskPriority();
             pModelLoader->QueueModel(
-                a2, spQueuedHelmetModel[aeBipedObject], IOTaskPriority, this, LOD_MULT_ACTORS, static_cast<bool>(1),
-                static_cast<bool>(1), static_cast<bool>(1), 0.0f
+                a2, spQueuedHelmetModel[aeBipedObject], IOTaskPriority, this, LOD_MULT_ACTORS, true, true, true, 0.0f
             );
             IO_TASK_PRIORITY v1 = GetIOTaskPriority();
             pModelLoader->QueueEGMFile(a2, v1, this, -1);
         }
     }
-    SetFinishedQueuing(1);
+    SetFinishedQueuing(true);
     CheckFinished();
 }
 
@@ -1267,10 +1267,10 @@ void QueuedHelmet::CheckFinished() {
         }
         else {
             AutoMemContext tempMemContext(
-                MEM_CONTEXT_TES_ACTOR, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp",
+                MEM_CONTEXT_TES_ACTOR, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp",
                 1680
             );
-            NiPointer<NiObject> spTempObject(static_cast<NiObject*>(0));
+            NiPointer<NiObject> spTempObject(static_cast<NiObject*>(nullptr));
             if (IsTaskFinished() && (GetAllChildrenFinished() && (!IsCancelled() && pRef != pPlayer))) {
                 for (BIPED_OBJECT n = BO_HEAD; n < BIPED_OBJECT_COUNT; n = static_cast<BIPED_OBJECT>(n + 1)) {
                     if (spQueuedHelmetModel[n].m_pObject) {
@@ -1284,7 +1284,7 @@ void QueuedHelmet::CheckFinished() {
                                     pBipedAnim->CloneHelmet(spHelmetFaceGenModel[n].m_pObject, Controllers, afAngle);
                                 spClonedHelmetNode[n].operator=(afAnglea);
                                 if (spClonedHelmetNode[n].m_pObject) {
-                                    bool bskin = 0;
+                                    bool bskin = false;
                                     for (int32_t i = 0;; ++i) {
                                         uint32_t ArrayCount = spClonedHelmetNode[n].m_pObject->GetArrayCount();
                                         if (i >= ArrayCount) {
@@ -1297,7 +1297,7 @@ void QueuedHelmet::CheckFinished() {
                                             if (ptri->IsGeometry()) {
                                                 NiAVObject* pobj = (NiAVObject*)ptri;
                                                 if (ptri->GetSkinInstance()) {
-                                                    bskin = 1;
+                                                    bskin = true;
                                                     break;
                                                 }
                                             }
@@ -1341,7 +1341,7 @@ void QueuedHelmet::CheckFinished() {
                                                                         &fnvd::destructElement<FR2MatrixVTC<float>>
                                                                     );
                                                                     ::new (&spdata) NiPointer<NiGeometryData>(
-                                                                        static_cast<NiGeometryData*>(0)
+                                                                        static_cast<NiGeometryData*>(nullptr)
                                                                     );
                                                                     ptri_2->GetModelData()->CreateDeepCopy(
                                                                         spTempObject
@@ -1354,7 +1354,7 @@ void QueuedHelmet::CheckFinished() {
                                                                     pnpc_2->GetFaceCoord(fgcoord);
                                                                     if (!BSFaceGenManager::GetUseFaceGenHeads() ||
                                                                         pfgmodel_2->ApplyCoordinateToExistingMesh(
-                                                                            &fgcoord, ptri_2, 0
+                                                                            &fgcoord, ptri_2, false
                                                                         )) {
                                                                         NiMatrix3 matrot;
                                                                         matrot.MakeYRotation(-1.5707964f);
@@ -1418,7 +1418,7 @@ QueuedMagicItem::~QueuedMagicItem() {}
 
 void QueuedMagicItem::QueueMe() {
     EffectItemList* plist_2;
-    bool beffectModelQueued = 0;
+    bool beffectModelQueued = false;
     if (this->pEffectSetting->GetModelLength()) {
         if (!this->pEffectSetting->IsEffectQueued()) {
             TESModel* apModel;
@@ -1427,11 +1427,11 @@ void QueuedMagicItem::QueueMe() {
                 apModel = static_cast<TESModel*>(pEffectSetting);
             }
             else {
-                apModel = 0;
+                apModel = nullptr;
             }
             IO_TASK_PRIORITY IOTaskPriority = GetIOTaskPriority();
-            pModelLoader->QueueModel(apModel, IOTaskPriority, this, LOD_MULT_NONE, 1, 0, 0);
-            beffectModelQueued = 1;
+            pModelLoader->QueueModel(apModel, IOTaskPriority, this, LOD_MULT_NONE, true, false, false);
+            beffectModelQueued = true;
         }
     }
     this->pEffectSetting->QueueEffect();
@@ -1440,7 +1440,7 @@ void QueuedMagicItem::QueueMe() {
         plist_2 = static_cast<EffectItemList*>(pMagicItem);
     }
     else {
-        plist_2 = 0;
+        plist_2 = nullptr;
     }
     EffectItemList* plist_3 = plist_2;
     if (!plist_2->IsEmpty()) {
@@ -1457,7 +1457,7 @@ void QueuedMagicItem::QueueMe() {
                                 ENUM_LOD_MULT LODMult = TES::GetLODMult(pnpc__parmor__pweapon);
                                 IO_TASK_PRIORITY v2 = GetIOTaskPriority();
                                 pModelLoader->QueueModel(
-                                    static_cast<TESModelTextureSwap*>(pWeapon), v2, this, LODMult, 1, 0, 0
+                                    static_cast<TESModelTextureSwap*>(pWeapon), v2, this, LODMult, true, false, false
                                 );
                             }
                         }
@@ -1470,21 +1470,22 @@ void QueuedMagicItem::QueueMe() {
                                 TESObjectARMO* pArmor = static_cast<TESObjectARMO*>(pnpc__parmor__pweapon);
                                 TESModelTextureSwap* BipedTESModel =
                                     static_cast<TESBipedModelForm*>(pArmor)->GetBipedTESModel(TESActorBase::SEX_MALE);
-                                pModelLoader->QueueModel(BipedTESModel, v8, this, v11, 1, 0, 0);
+                                pModelLoader->QueueModel(BipedTESModel, v8, this, v11, true, false, false);
                                 ENUM_LOD_MULT v12 = TES::GetLODMult(pnpc__parmor__pweapon);
                                 IO_TASK_PRIORITY v9 = GetIOTaskPriority();
                                 TESModelTextureSwap* v4 =
                                     static_cast<TESBipedModelForm*>(pArmor)->GetBipedTESModel(TESActorBase::SEX_FEMALE);
-                                pModelLoader->QueueModel(v4, v9, this, v12, 1, 0, 0);
+                                pModelLoader->QueueModel(v4, v9, this, v12, true, false, false);
                             }
                         }
                         else {
                             if (pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_CREATURE)) {
                                 if (pnpc__parmor__pweapon->GetFormType() == NPC__ID) {
-                                    BSSimpleList<const char*>* modelList = static_cast<TESNPC*>(pnpc__parmor__pweapon)
-                                                                               ->TESNPC::BuildDefaultModelList(1, 1);
+                                    BSSimpleList<const char*>* modelList =
+                                        static_cast<TESNPC*>(pnpc__parmor__pweapon)
+                                            ->TESNPC::BuildDefaultModelList(true, true);
                                     IO_TASK_PRIORITY v5 = GetIOTaskPriority();
-                                    pModelLoader->QueueModelList(modelList, 0, v5, this, 0);
+                                    pModelLoader->QueueModelList(modelList, nullptr, v5, this, nullptr);
                                     modelList->RemoveAll();
                                     if (modelList) {
                                         delete modelList;
@@ -1494,10 +1495,10 @@ void QueuedMagicItem::QueueMe() {
                                     if (pnpc__parmor__pweapon->GetFormType() == CREA_ID) {
                                         IO_TASK_PRIORITY v6 = GetIOTaskPriority();
                                         TESModel* pCreatureModel = static_cast<TESCreature*>(pnpc__parmor__pweapon);
-                                        pModelLoader->QueueAnimations(pCreatureModel, v6, this, 0, 1, 1);
+                                        pModelLoader->QueueAnimations(pCreatureModel, v6, this, nullptr, true, true);
                                         ENUM_LOD_MULT v13 = TES::GetLODMult(pnpc__parmor__pweapon);
                                         IO_TASK_PRIORITY v7 = GetIOTaskPriority();
-                                        pModelLoader->QueueModel(pCreatureModel, v7, this, v13, 1, 0, 0);
+                                        pModelLoader->QueueModel(pCreatureModel, v7, this, v13, true, false, false);
                                     }
                                 }
                             }
@@ -1582,7 +1583,8 @@ void QueuedHead::CheckFinished() {
 
 void QueuedHead::Attach(TESObjectREFR* apRef, BipedAnim* apBipedAnim) {
     AutoMemContext apMemory(
-        MEM_CONTEXT_FACEGEN_SYSTEM, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 1555
+        MEM_CONTEXT_FACEGEN_SYSTEM, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp",
+        1555
     );
     static_cast<TESNPC*>(apRef->GetObjectReference())
         ->TESNPC::AttachHead(apRef, apBipedAnim, spBipedNode.m_pObject, spSkinnedNode.m_pObject);
@@ -1615,8 +1617,8 @@ void QueuedReference::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
     if (spCloned3D.m_pObject) {
         NiAVObject* v4 = spCloned3D.m_pObject;
         pRef->Set3DVerySimple(v4);
-        spCloned3D.operator=(static_cast<NiAVObject*>(0));
-        pRef->Set3D(0, 0);
+        spCloned3D.operator=(static_cast<NiAVObject*>(nullptr));
+        pRef->Set3D(nullptr, false);
     }
     pModelLoader->RemoveReferenceFromMap(pRef);
     if (pRef->GetParentCell()) {
@@ -1631,14 +1633,14 @@ void QueuedReference::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
 
 bool QueuedReference::GetDescription(char* apDescription, uint32_t aiBufferSize) {
     if (IOTask::IsCancelled()) {
-        return (bool)0;
+        return false;
     }
     TESBoundObject* objectReference = pRef->TESObjectREFR::GetObjectReference();
     const char* formTypeString = objectReference->TESForm::GetFormTypeString();
     uint32_t v6 = pRef->TESForm::GetFormID();
     const char* v5 = pRef->GetFormEditorID();
     BSsprintf(apDescription, aiBufferSize, "Queued ref '%s' (%08X) of type %s", v5, v6, formTypeString);
-    return (bool)1;
+    return true;
 }
 
 void QueuedReference::PostProcess() {
@@ -1647,7 +1649,7 @@ void QueuedReference::PostProcess() {
 
 void QueuedReference::QueueMe() {
     AutoMemContext tempMemContext(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 1834
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 1834
     );
     if (pRef) {
         if (pRef->GetVisibleDistant() && !pRef->Get3D()) {
@@ -1663,7 +1665,7 @@ void QueuedReference::QueueMe() {
                 if (pdata->pDecalRef->GetObjectReference()->GetFormType() == TXST_ID) {
                     BGSTextureSet* ptexset_2 = static_cast<BGSTextureSet*>(pdata->pDecalRef->GetObjectReference());
                     uint8_t Priority = GetPriority();
-                    ptexset_2->QueueTextureSet(static_cast<IO_TASK_PRIORITY>(Priority), this, 0);
+                    ptexset_2->QueueTextureSet(static_cast<IO_TASK_PRIORITY>(Priority), this, false);
                 }
             }
         }
@@ -1683,17 +1685,17 @@ void QueuedReference::CheckFinished() {
                 spModel.operator=(AdditionalGeometryData);
             }
         }
-        bool bCanBeCloned = 0;
+        bool bCanBeCloned = false;
         if (spModel.m_pObject) {
             if (pRef != pPlayer) {
                 TESObjectCELL* ParentCell = pRef->GetParentCell();
-                if (TES::pInstance->IsCellLoaded(ParentCell, 0) && TES::pInstance->CanAttach3D(pRef)) {
-                    bCanBeCloned = pRef->TESObjectREFR::Get3D() == 0;
+                if (TES::pInstance->IsCellLoaded(ParentCell, false) && TES::pInstance->CanAttach3D(pRef)) {
+                    bCanBeCloned = pRef->TESObjectREFR::Get3D() == nullptr;
                 }
             }
         }
         if (pRef->IsProjectile() || pRef->IsExplosion()) {
-            bCanBeCloned = 0;
+            bCanBeCloned = false;
         }
         if (bCanBeCloned) {
             pModelLoader->AddBackgroundCloneReference(this);
@@ -1706,7 +1708,7 @@ void QueuedReference::CheckFinished() {
 
 void QueuedReference::QueueModels() {
     AutoMemContext apMemory(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 1874
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 1874
     );
     TESForm* a2 = this->pRef->GetObjectReference();
     TESModel* TESModel_ = this->pRef->GetTESModel();
@@ -1731,9 +1733,9 @@ void QueuedReference::QueueModels() {
 void QueuedReference::UseDistant3D() {
     char cPath[264];
     FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
-    NiNode* ptempnode = 0;
+    NiNode* ptempnode = nullptr;
     TESModel::GetDistantModelName_(cPath, pRef->GetObjectReference());
-    ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(0));
+    ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
     pModelLoader->FindModel(cPath, spmodel);
     if (spmodel.m_pObject) {
         if (spmodel.m_pObject->GetModel()) {
@@ -1768,8 +1770,8 @@ void QueuedReference::AttachDistant3D(NiNode* apNode) {
     if (v4 == BSGetCurrentThreadID()) {
         pRef->Set3DSimple(apNode);
         TESObjectCELL* ParentCell = pRef->GetParentCell();
-        TES::pInstance->AttachModel(pRef, ParentCell, 0, 0);
-        pRef->SetHasTemp3D(1);
+        TES::pInstance->AttachModel(pRef, ParentCell, nullptr, false);
+        pRef->SetHasTemp3D(true);
     }
     else {
         AttachDistant3DTask* v8;
@@ -1778,7 +1780,7 @@ void QueuedReference::AttachDistant3D(NiNode* apNode) {
             v8 = ::new (apMemory) AttachDistant3DTask(pRef, apNode);
         }
         else {
-            v8 = 0;
+            v8 = nullptr;
         }
         spAttachDistant3DTask.operator=(v8);
         AttachDistant3DTask* Xa = spAttachDistant3DTask.m_pObject;
@@ -1787,32 +1789,32 @@ void QueuedReference::AttachDistant3D(NiNode* apNode) {
 }
 
 bool QueuedReference::BackgroundClone() {
-    bool bResult = 0;
+    bool bResult = false;
     AutoMemContext apMemory(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2026
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2026
     );
     TESObjectCELL* pCell = pRef->GetParentCell();
-    if (TES::pInstance->IsCellLoaded(pCell, 0)) {
+    if (TES::pInstance->IsCellLoaded(pCell, false)) {
         if (TES::pInstance->CanAttach3D(pRef) && !pRef->TESObjectREFR::Get3D()) {
-            NiAVObject* pCloned = pRef->Load3D(1);
+            NiAVObject* pCloned = pRef->Load3D(true);
             spCloned3D.operator=(pCloned);
             if (spCloned3D.m_pObject) {
                 NiRefObject* v3 = spCloned3D.m_pObject;
                 v3->DecRefCount();
             }
         }
-        bResult = 1;
+        bResult = true;
     }
     return bResult;
 }
 
 void QueuedReference::Attach() {
     AutoMemContext apMemory(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2052
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2052
     );
     if (!IsCancelled()) {
         TESObjectCELL* pCell;
-        bool v12 = 0;
+        bool v12 = false;
         bool bIsDisabled = pRef->GetDisabled() || pRef->GetDelete();
         v12 = bIsDisabled;
         if (pRef->GetParentCell()) {
@@ -1821,14 +1823,14 @@ void QueuedReference::Attach() {
         }
         if (!v12) {
             pCell = pRef->GetParentCell();
-            if (TES::pInstance->IsCellLoaded(pCell, 0)) {
+            if (TES::pInstance->IsCellLoaded(pCell, false)) {
                 if (spModel.m_pObject) {
                     Model* v3 = spModel.m_pObject;
                     NiNode* Controllers = v3->GetModel();
                     pModelLoader->LoadAddonNodes(pRef, Controllers);
                 }
                 pCell = pRef->GetParentCell();
-                TES::pInstance->AttachModel(pRef, pCell, this, 0);
+                TES::pInstance->AttachModel(pRef, pCell, this, false);
             }
         }
         pModelLoader->RemoveReferenceFromMap(pRef);
@@ -2106,7 +2108,7 @@ QueuedTree::QueuedTree(TESObjectREFR* apRef, IO_TASK_PRIORITY aePriority) : Queu
 
 void QueuedTree::QueueModels() {
     AutoMemContext apMemory(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2119
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2119
     );
     TESForm* apObj = pRef->GetObjectReference();
     void* a3 = apObj;
@@ -2126,7 +2128,7 @@ void QueuedTree::QueueModels() {
 }
 
 void QueuedTree::UseDistant3D() {
-    NiNode* ptempnode = static_cast<TESObjectTREE*>(pRef->GetObjectReference())->TESObjectTREE::BuildDistant3D(0);
+    NiNode* ptempnode = static_cast<TESObjectTREE*>(pRef->GetObjectReference())->TESObjectTREE::BuildDistant3D(false);
     if (ptempnode) {
         SpeedTreeBillboardShaderProperty* pprop_2;
         int32_t v3;
@@ -2148,7 +2150,7 @@ void QueuedTree::UseDistant3D() {
             pprop_2 = static_cast<SpeedTreeBillboardShaderProperty*>(pgeom->GetProperty(3));
         }
         else {
-            pprop_2 = 0;
+            pprop_2 = nullptr;
         }
         if (pprop_2) {
             pprop_2->SetFlag(13u, 1);
@@ -2210,19 +2212,19 @@ QueuedCreature::QueuedCreature(TESObjectREFR* apRef, IO_TASK_PRIORITY aePriority
 void QueuedCreature::QueueModels() {
     TESModel* pmodel;
     AutoMemContext tempMemContext(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2341
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2341
     );
     TESCreature* pcreature = static_cast<TESCreature*>(this->pRef->GetObjectReference());
     Actor* pactor = static_cast<Actor*>(this->pRef);
-    bool bwearweapon = 1;
+    bool bwearweapon = true;
     TESPackage* ppack = pactor->GetCurrentPackage();
     if (ppack) {
         if (ppack->GetForceUnequipWeapon()) {
-            bwearweapon = 0;
+            bwearweapon = false;
         }
     }
     if (pcreature->ShouldRunInitDefaultWorn(this->pRef)) {
-        pcreature->InitDefaultWorn(this->pRef, 1, bwearweapon, 0);
+        pcreature->InitDefaultWorn(this->pRef, true, bwearweapon, false);
     }
     else {
         pcreature->InitWorn(this->pRef);
@@ -2231,11 +2233,11 @@ void QueuedCreature::QueueModels() {
         pmodel = &static_cast<TESModel&>(static_cast<TESActorBase&>(*pcreature));
     }
     else {
-        pmodel = 0;
+        pmodel = nullptr;
     }
     TESObjectREFR* pRef = this->pRef;
     IO_TASK_PRIORITY IOTaskPriority = GetIOTaskPriority();
-    pModelLoader->QueueAnimations(pmodel, IOTaskPriority, this, pRef, 1, 0);
+    pModelLoader->QueueAnimations(pmodel, IOTaskPriority, this, pRef, true, false);
     TESObjectREFR* v4 = this->pRef;
     IO_TASK_PRIORITY v2 = GetIOTaskPriority();
     pModelLoader->QueueCreatureParts(pmodel, v2, this, v4);
@@ -2250,7 +2252,7 @@ QueuedCharacter::QueuedCharacter(TESObjectREFR* apRef, IO_TASK_PRIORITY aePriori
 void QueuedCharacter::QueueModels() {
     TESModel* pmodel;
     AutoMemContext tempMemContext(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2250
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2250
     );
     TESNPC* pnpc = static_cast<TESNPC*>(this->pRef->GetObjectReference());
     BipedAnim* pbipedAnim = this->pRef->GetBiped();
@@ -2258,7 +2260,7 @@ void QueuedCharacter::QueueModels() {
         pbipedAnim = pnpc->CreateBipedAnim(this->pRef);
     }
     if (pbipedAnim) {
-        pnpc->InitParts(this->pRef, pbipedAnim, 0);
+        pnpc->InitParts(this->pRef, pbipedAnim, false);
         IO_TASK_PRIORITY IOTaskPriority = GetIOTaskPriority();
         pbipedAnim->QueueBipedParts(IOTaskPriority, spQueuedHelmet, this);
         IO_TASK_PRIORITY v2 = GetIOTaskPriority();
@@ -2268,17 +2270,17 @@ void QueuedCharacter::QueueModels() {
         pmodel = &static_cast<TESModel&>(static_cast<TESActorBase&>(*pnpc));
     }
     else {
-        pmodel = 0;
+        pmodel = nullptr;
     }
     TESObjectREFR* pRef = this->pRef;
     IO_TASK_PRIORITY v3 = GetIOTaskPriority();
-    pModelLoader->QueueAnimations(pmodel, v3, this, pRef, 0, 0);
+    pModelLoader->QueueAnimations(pmodel, v3, this, pRef, false, false);
     QueuedActor::QueueModels();
 }
 
 bool QueuedCharacter::BackgroundClone() {
     AutoMemContext apMemory(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2276
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2276
     );
     bool v6 = QueuedReference::BackgroundClone();
     if (v6) {
@@ -2298,7 +2300,7 @@ void QueuedCharacter::Attach() {
 
 void QueuedCharacter::FinishAttach() {
     AutoMemContext tempMemContext(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2303
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2303
     );
     if (!GetCloned3D()) {
         AttachHeadParts();
@@ -2328,7 +2330,7 @@ QueuedPlayer::QueuedPlayer(IO_TASK_PRIORITY aePriority) : QueuedCharacter(pPlaye
 
 void QueuedPlayer::QueueModels() {
     AutoMemContext apMemory(
-        eContext, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2382
+        eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2382
     );
     IO_TASK_PRIORITY IOTaskPriority = GetIOTaskPriority();
     pPlayer->QueuePlayerAnims(IOTaskPriority, this);
@@ -2355,7 +2357,7 @@ void BackgroundCloneThread::ThreadUpdate() {
     while (!bExit) {
         WaitTask();
         NiAtomicIncrement(iRunningCount);
-        NiPointer<QueuedReference> spqueuedReference(static_cast<QueuedReference*>(0));
+        NiPointer<QueuedReference> spqueuedReference(static_cast<QueuedReference*>(nullptr));
         pCloneReferencesQueue->Pop(spqueuedReference);
         if (spqueuedReference.m_pObject) {
             while (spqueuedReference.m_pObject) {
@@ -2409,7 +2411,7 @@ void BackgroundCloneThread::Resume() {
 }
 
 void BackgroundCloneThread::SetExiting() {
-    bExit = (bool)1;
+    bExit = true;
 }
 
 // Builds the maps and queues of what is loaded or queued, starts the clone thread and hooks the IO manager's callbacks.
@@ -2516,7 +2518,7 @@ void ModelLoader::QueueTreeModel(
     ENUM_LOD_MULT aeLODMult
 ) {
     FNVD_INLINED_LOCAL(NiPointer<QueuedModel>, spqueuedModel, std::nullopt, std::nullopt);
-    ::new (&spqueuedModel) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
+    ::new (&spqueuedModel) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
     QueueTreeModel(apRef, apTree, spqueuedModel, aePriority, apCounter, aeLODMult);
     spqueuedModel.~NiPointer<QueuedModel>();
 }
@@ -2536,7 +2538,7 @@ void ModelLoader::QueueTreeModel(
         v8 = ::new (v9) QueuedTreeModel(apRef, apTree, aePriority, aeLODMult);
     }
     else {
-        v8 = 0;
+        v8 = nullptr;
     }
     ::new (static_cast<void*>(&spqueuedTreeModel)) NiPointer<QueuedFile>(static_cast<QueuedFile*>(v8));
     spqueuedTreeModel.m_pObject->SetParent(apCounter);
@@ -2554,7 +2556,7 @@ void ModelLoader::QueueBoundObject(
     TESObjectREFR* apRefr
 ) {
     FNVD_INLINED_LOCAL(NiPointer<QueuedModel>, spqueuedModel, std::nullopt, std::nullopt);
-    ::new (&spqueuedModel) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
+    ::new (&spqueuedModel) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
     QueueBoundObject(apObj, spqueuedModel, aePriority, apParent, apRefr);
     spqueuedModel.~NiPointer<QueuedModel>();
 }
@@ -2564,13 +2566,13 @@ void ModelLoader::RemoveReplacementKFListFromMap(Animation* apAnim) {
 }
 
 void ModelLoader::ReleaseKF(const char* apKFFileName, bool abDeleteIfUnreferenced) {
-    KFModel* v4 = 0;
+    KFModel* v4 = nullptr;
     if (pKFModelMap->GetAt(apKFFileName, v4)) {
         v4->DecUseCount();
         if (pSaveLoadGame) {
             if (pSaveLoadGame->GetSaveGameLoading()) {
-                abDeleteIfUnreferenced = 0;
-                bHasDelayedFree = 1;
+                abDeleteIfUnreferenced = false;
+                bHasDelayedFree = true;
             }
         }
         if (abDeleteIfUnreferenced && !v4->GetRefCount()) {
@@ -3201,7 +3203,7 @@ void ModelLoader::QueueAnimations(
 ) {
     char cPath[0x104];
     BSstrcpy(cPath, 0x104, apModel->GetModel());
-    char* pSlash = const_cast<char*>(std::strrchr(cPath, '\\'));
+    char* pSlash = std::strrchr(cPath, '\\');
     if (apQueuedForRef && apQueuedForRef->IsDead(true)) {
         if (pSlash && !_strnicmp(pSlash + 1, "Skeleton", 8)) {
             char cFileName[0x104];
@@ -3210,7 +3212,7 @@ void ModelLoader::QueueAnimations(
                 BSstrcat(cFileName, 0x104, "Meshes\\");
             }
             BSstrcat(cFileName, 0x104, cPath);
-            char* pFileSlash = const_cast<char*>(std::strrchr(cFileName, '\\'));
+            char* pFileSlash = std::strrchr(cFileName, '\\');
             BSstrcpy(pFileSlash, 0x104 - (pFileSlash - cFileName), "\\MTIdle.KF");
             BSSimpleList<const char*>* pList = BuildFileList(cFileName, cPath, nullptr);
             QueueKFList(pList, aePriority, apParent, nullptr);
@@ -3261,7 +3263,7 @@ void ModelLoader::QueueAnimations(
     else if (apQueuedForRef->IsNpc()) {
         char cIdlePath[0x104];
         BSstrcpy(cIdlePath, 0x104, cPath);
-        char* pIdleSlash = const_cast<char*>(std::strrchr(cIdlePath, '\\'));
+        char* pIdleSlash = std::strrchr(cIdlePath, '\\');
         if (apQueuedForRef->IsChild(true)) {
             BSstrcpy(pIdleSlash, 0x104 - (pIdleSlash - cIdlePath) - 1, "\\Locomotion\\Child\\IdleAnims");
         }
@@ -3293,7 +3295,7 @@ void ModelLoader::QueueAnimations(
         }
         char cSpecialPath[0x104];
         BSstrcpy(cSpecialPath, 0x104, apModel->GetModel());
-        char* pSpecialSlash = const_cast<char*>(std::strrchr(cSpecialPath, '\\'));
+        char* pSpecialSlash = std::strrchr(cSpecialPath, '\\');
         if (pSpecialSlash) {
             BSstrcpy(pSpecialSlash, 0x104 - (pSpecialSlash - cSpecialPath), "\\SpecialAnims\\");
         }
@@ -3848,9 +3850,9 @@ void ModelLoader::LoadAddons(NiNode* apNode) {
             BGSAddonNode* paddonNode = pDataHandler->GetAddonNode(pvalueNode->QValue());
             if (paddonNode) {
                 if (!paddonNode->IsMasterParticleSystem()) {
-                    pcurrent = 0;
+                    pcurrent = nullptr;
                     if (!pModelMap->GetAt(paddonNode->GetModel(), pcurrent)) {
-                        if (LoadFile(paddonNode->GetModel(), LOD_MULT_NONE, 1, 0, 0, 0)) {
+                        if (LoadFile(paddonNode->GetModel(), LOD_MULT_NONE, true, false, false, false)) {
                             if (pModelMap->GetAt(paddonNode->GetModel(), pcurrent)) {
                                 pcurrent->DecManualRefCount();
                             }
@@ -3948,10 +3950,10 @@ void ModelLoader::QueueReplacementKFList(
             BSSimpleList<const char*>* pfileList = apKFList;
             if (pfileList && pfileList->GetItem()) {
                 AutoMemContext tempMemContext(
-                    MEM_CONTEXT_ANIMATION, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp",
-                    3743
+                    MEM_CONTEXT_ANIMATION, true,
+                    "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 3743
                 );
-                ::new (&spreplacementKFList) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
+                ::new (&spreplacementKFList) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
                 while (pfileList) {
                     const char* pfileName = pfileList->GetItem();
                     if (pfileName) {
@@ -3962,7 +3964,7 @@ void ModelLoader::QueueReplacementKFList(
                             BSstrcat(Dst, 0x104, pfileName);
                             pfileNameCopy = Dst;
                         }
-                        KFModel* pkfModel = 0;
+                        KFModel* pkfModel = nullptr;
                         if (pKFModelMap->GetAt(pfileNameCopy, pkfModel)) {
                             apAnim->QueueReplacementAnimation(pkfModel);
                         }
@@ -3977,7 +3979,7 @@ void ModelLoader::QueueReplacementKFList(
                                     v10 = ::new (v13) QueuedReplacementKFList(apAnim, aePriority);
                                 }
                                 else {
-                                    v10 = 0;
+                                    v10 = nullptr;
                                 }
                                 spreplacementKFList.operator=(v10);
                             }
@@ -3988,7 +3990,7 @@ void ModelLoader::QueueReplacementKFList(
                                 v9 = ::new (v12) QueuedReplacementKF(pfileNameCopy, aePriority, apAnim, v6);
                             }
                             else {
-                                v9 = 0;
+                                v9 = nullptr;
                             }
                             ::new (static_cast<void*>(&spqueuedKF)) NiPointer<QueuedFile>(static_cast<QueuedFile*>(v9));
                             spqueuedKF.m_pObject->SetParent(spreplacementKFList.m_pObject);
@@ -4005,13 +4007,13 @@ void ModelLoader::QueueReplacementKFList(
                 }
                 if (spreplacementKFList.m_pObject && spreplacementKFList.m_pObject->GetChildCount()) {
                     spreplacementKFList.m_pObject->SetParent(apParent);
-                    pQueuedReplacementKFListMap->SetAt(apAnim, spreplacementKFList, 1);
+                    pQueuedReplacementKFListMap->SetAt(apAnim, spreplacementKFList, true);
                     spreplacementKFList.m_pObject->SetCompleted();
                     QueuedReplacementKFList* v7 = spreplacementKFList.m_pObject;
                     v7->CheckFinished();
                 }
                 else {
-                    spreplacementKFList.operator=(static_cast<QueuedReplacementKFList*>(0));
+                    spreplacementKFList.operator=(static_cast<QueuedReplacementKFList*>(nullptr));
                 }
                 spreplacementKFList.~NiPointer<QueuedReplacementKFList>();
             }
@@ -4048,8 +4050,8 @@ void ModelLoader::OutputModelMapContents(BSFile* apFile, bool abShowZeroCountMod
     if (pModelMap->GetCount()) {
         LockFreeStringMap<Model*>::LockFreeStringMapIterator iterator;
         while (!iterator.GetFinished()) {
-            pfileName = 0;
-            pmodel = 0;
+            pfileName = nullptr;
+            pmodel = nullptr;
             if (pModelMap->GetNext(iterator, pfileName, pmodel, true) &&
                 (pmodel->GetRefCount() > 0 || abShowZeroCountModels)) {
                 char acBuffer[1024];
@@ -4070,8 +4072,8 @@ void ModelLoader::OutputModelMapContents(BSFile* apFile, bool abShowZeroCountMod
     if (pKFModelMap->GetCount()) {
         LockFreeStringMap<KFModel*>::LockFreeStringMapIterator v15;
         while (!v15.GetFinished()) {
-            pfileName_2 = 0;
-            pkfModel = 0;
+            pfileName_2 = nullptr;
+            pkfModel = nullptr;
             if (pKFModelMap->GetNext(v15, pfileName_2, pkfModel, true) && pkfModel->GetRefCount() > 0) {
                 BSStringT<char> textline;
                 const char* v9 = pfileName_2;
@@ -4080,7 +4082,7 @@ void ModelLoader::OutputModelMapContents(BSFile* apFile, bool abShowZeroCountMod
                 textline.SPrintF("ANIMATION:\t%3d\t%3d\t%3d\t%s\r\n", pkfModel->GetRefCount(), CastingType, v7, v9);
                 Warning(textline.pString);
                 if (apFile) {
-                    apFile->Write(textline, 1);
+                    apFile->Write(textline, true);
                 }
             }
         }
@@ -4101,7 +4103,7 @@ void ModelLoader::QueueMagicItem(
                 v5 = ::new (apMemory) QueuedMagicItem(apMagicItem, apAVEffectSetting, aePriority);
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             ::new (static_cast<void*>(&spqueuedMagicItem)) NiPointer<QueuedFile>(static_cast<QueuedFile*>(v5));
             QueuedMagicItem* v4 = spqueuedMagicItem.m_pObject;
@@ -4113,20 +4115,20 @@ void ModelLoader::QueueMagicItem(
 
 void ModelLoader::CancelReplacementKFList(Animation* apAnim) {
     FNVD_INLINED_LOCAL(NiPointer<QueuedReplacementKFList>, spqueuedReplacementKFList, std::nullopt, std::nullopt);
-    ::new (&spqueuedReplacementKFList) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
+    ::new (&spqueuedReplacementKFList) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
     if (pQueuedReplacementKFListMap->GetAt(apAnim, spqueuedReplacementKFList)) {
         QueuedReplacementKFList* v2 = spqueuedReplacementKFList.m_pObject;
-        pIOManager->CancelTask(v2, 0);
+        pIOManager->CancelTask(v2, nullptr);
     }
     spqueuedReplacementKFList.~NiPointer<QueuedReplacementKFList>();
 }
 
 void ModelLoader::CancelAnimIdle(AnimIdle* apAnimIdle) {
     FNVD_INLINED_LOCAL(NiPointer<QueuedAnimIdle>, spqueuedAnimIdle, std::nullopt, std::nullopt);
-    ::new (&spqueuedAnimIdle) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
+    ::new (&spqueuedAnimIdle) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
     if (pQueuedAnimIdleMap->GetAt(apAnimIdle, spqueuedAnimIdle)) {
         QueuedAnimIdle* v2 = spqueuedAnimIdle.m_pObject;
-        pIOManager->CancelTask(v2, 0);
+        pIOManager->CancelTask(v2, nullptr);
     }
     spqueuedAnimIdle.~NiPointer<QueuedAnimIdle>();
 }
@@ -4138,9 +4140,9 @@ void ModelLoader::CancelReferencesForCell(TESObjectCELL* apCell) {
         if (apCell->iQueuedRefCount) {
             iterator_t iterator;
             while (!iterator.GetFinished()) {
-                TESObjectREFR* pref = 0;
-                ::new (&spqueuedReference) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
-                if (pQueuedReferencesMap->GetNext(iterator, pref, spqueuedReference, 1) &&
+                TESObjectREFR* pref = nullptr;
+                ::new (&spqueuedReference) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
+                if (pQueuedReferencesMap->GetNext(iterator, pref, spqueuedReference, true) &&
                     pref->GetParentCell() == apCell) {
                     CancelReference(pref);
                 }
@@ -4171,13 +4173,13 @@ void ModelLoader::QueueCreatureParts(
         QueueModelList(pModels, v6, aePriority, apParent, cPath);
         if (apQueuedForRef) {
             InventoryChanges* InventoryChanges_ = InventoryChanges::GetInventoryChanges(apQueuedForRef);
-            ItemChange* BestWeapon = InventoryChanges_->GetBestWeapon(v17, afvalue, COMBAT_WEAPON_TYPE_COUNT, 0);
+            ItemChange* BestWeapon = InventoryChanges_->GetBestWeapon(v17, afvalue, COMBAT_WEAPON_TYPE_COUNT, false);
             if (BestWeapon) {
                 TESBoundObject* FormFlags = BestWeapon->pContainerObj;
                 QueueBoundObject(FormFlags, aePriority, apParent, apQueuedForRef);
                 delete BestWeapon;
             }
-            ItemChange* BestAmmo = InventoryChanges_->GetBestAmmo(v17, 0);
+            ItemChange* BestAmmo = InventoryChanges_->GetBestAmmo(v17, false);
             if (BestAmmo) {
                 TESBoundObject* v8 = BestAmmo->pContainerObj;
                 QueueBoundObject(v8, aePriority, apParent, apQueuedForRef);
@@ -4195,7 +4197,7 @@ void ModelLoader::QueueTreeBillboard(const char* apFilename, TREE_BILLBOARD_DATA
         v4 = ::new (apMemory) QueuedTreeBillboard(apFilename, IO_TASK_PRIORITY_LOW, apBillboardData);
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     ::new (static_cast<void*>(&spqueuedTreeBillboard)) NiPointer<QueuedFile>(static_cast<QueuedFile*>(v4));
     QueuedTreeBillboard* v3 = spqueuedTreeBillboard.m_pObject;
@@ -4213,31 +4215,31 @@ void ModelLoader::CancelAllFiles() {
     pIOManager->Pause();
     iterator1_t iterator1;
     while (!iterator1.GetFinished()) {
-        TESObjectREFR* pref = 0;
-        NiPointer<QueuedReference> spqueuedReference(static_cast<QueuedReference*>(0));
-        if (pQueuedReferencesMap->GetNext(iterator1, pref, spqueuedReference, 1)) {
+        TESObjectREFR* pref = nullptr;
+        NiPointer<QueuedReference> spqueuedReference(static_cast<QueuedReference*>(nullptr));
+        if (pQueuedReferencesMap->GetNext(iterator1, pref, spqueuedReference, true)) {
             QueuedReference* v1 = spqueuedReference.m_pObject;
-            pIOManager->CancelTask(v1, 0);
+            pIOManager->CancelTask(v1, nullptr);
         }
     }
     pReferencesToQueueMap->RemoveAll(false);
     iterator2_t iterator2;
     while (!iterator2.GetFinished()) {
-        panimIdle = 0;
-        ::new (&spqueuedAnimIdle) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
-        if (pQueuedAnimIdleMap->GetNext(iterator2, panimIdle, spqueuedAnimIdle, 1)) {
+        panimIdle = nullptr;
+        ::new (&spqueuedAnimIdle) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
+        if (pQueuedAnimIdleMap->GetNext(iterator2, panimIdle, spqueuedAnimIdle, true)) {
             QueuedAnimIdle* v2 = spqueuedAnimIdle.m_pObject;
-            pIOManager->CancelTask(v2, 0);
+            pIOManager->CancelTask(v2, nullptr);
         }
         spqueuedAnimIdle.~NiPointer<QueuedAnimIdle>();
     }
     iterator3_t iterator3;
     while (!iterator3.GetFinished()) {
-        TESObjectREFR* pref_2 = 0;
-        ::new (&spqueuedHelmet) NiPointer<QueuedFile>(static_cast<QueuedFile*>(0));
-        if (pQueuedHelmetMap->GetNext(iterator3, pref_2, spqueuedHelmet, 1)) {
+        TESObjectREFR* pref_2 = nullptr;
+        ::new (&spqueuedHelmet) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
+        if (pQueuedHelmetMap->GetNext(iterator3, pref_2, spqueuedHelmet, true)) {
             QueuedHelmet* v3 = spqueuedHelmet.m_pObject;
-            pIOManager->CancelTask(v3, 0);
+            pIOManager->CancelTask(v3, nullptr);
         }
         spqueuedHelmet.~NiPointer<QueuedHelmet>();
     }
@@ -4339,10 +4341,7 @@ uint8_t IOTask::GetPriority() {
 
 void IOTask::SetPriority(uint8_t acPriority) {
     Key = (static_cast<uint64_t>(acPriority) << 16) +
-        static_cast<uint64_t>(
-              (static_cast<uint64_t>(static_cast<uint32_t>(static_cast<uint32_t>(Key >> 32))) << 32) |
-              static_cast<uint32_t>((Key & 0xFF00FFFFu))
-        );
+        ((static_cast<uint64_t>(static_cast<uint32_t>(Key >> 32)) << 32) | static_cast<uint32_t>((Key & 0xFF00FFFFu)));
 }
 
 void QueuedFile::NotifyChildFinished(QueuedFile* apChild) {
@@ -4655,12 +4654,12 @@ QueuedTreeBillboard::~QueuedTreeBillboard() {
 }
 
 void QueuedTreeBillboard::CreateBillboard() {
-    NiBillboardNode* v3 = static_cast<NiBillboardNode*>(pBillboardData->pTree->BuildDistant3D(1));
+    NiBillboardNode* v3 = static_cast<NiBillboardNode*>(pBillboardData->pTree->BuildDistant3D(true));
     if (v3) {
         DistantLODShaderProperty::DistantLODParam apParam;
         apParam.iBaseObjectID = pBillboardData->pTree->iFormID;
         apParam.p3DData = v3;
-        apParam.pcGeomFilename = 0;
+        apParam.pcGeomFilename = nullptr;
         DistantLODShaderProperty::AddDistantLOD(
             pBillboardData->iCellChunk, pBillboardData->iCellKey, pBillboardData->pInstancedNode, &apParam,
             pBillboardData->pLocArray, pBillboardData->pColorArray, pBillboardData->iArraySize
@@ -4684,7 +4683,7 @@ QueuedTreeModel::QueuedTreeModel(
 
 void QueuedTreeModel::Run() {
     AutoMemContext apMemory(
-        MEM_CONTEXT_TREEART, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 1142
+        MEM_CONTEXT_TREEART, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 1142
     );
     BSTreeNode* a3 = pTreeManager->CreateTreeForReference(pRef, pTree);
     pTreeManager->AddBackgroundLoadedTree(pRef, a3);

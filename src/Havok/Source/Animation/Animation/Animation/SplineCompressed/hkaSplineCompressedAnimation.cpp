@@ -1730,17 +1730,17 @@ void hkaSplineCompressedAnimation::evaluateSimple2(
     *reinterpret_cast<float*>(&v15) = time - a3[1];
     __m128 v6 = _mm_set_ss(std::bit_cast<float>(v15));
     float v16 = a3[2] - time;
-    float v8 = 1.0f / static_cast<float>(v16 + v6[0]);
+    float v8 = 1.0f / (v16 + v6[0]);
     *reinterpret_cast<float*>(&v17) = time - *a3;
     __m128 v10 = _mm_set_ss(std::bit_cast<float>(v17));
-    float v11 = static_cast<float>(v16 * v8) + 0.0f;
+    float v11 = (v16 * v8) + 0.0f;
     float v12 = v16 + *reinterpret_cast<float*>(&v17);
     float v18 = a3[3] - time;
     float v13 = v11 / v12;
-    v5[0] = static_cast<float>(v16 * v13) + 0.0f;
-    float v14 = static_cast<float>(v6[0] * v8) / static_cast<float>(v18 + v6[0]);
+    v5[0] = (v16 * v13) + 0.0f;
+    float v14 = (v6[0] * v8) / (v18 + v6[0]);
     v6[0] = v6[0] * v14;
-    v10[0] = static_cast<float>(v10[0] * v13) + static_cast<float>(v18 * v14);
+    v10[0] = (v10[0] * v13) + (v18 * v14);
     a5.m_quad = _mm_add_ps(
         _mm_add_ps(
             _mm_mul_ps(_mm_shuffle_ps(v10, v10, 0), a4[1].m_quad), _mm_mul_ps(_mm_shuffle_ps(v5, v5, 0), a4->m_quad)
@@ -1763,7 +1763,7 @@ void hkaSplineCompressedAnimation::evaluateSimple3(
     *reinterpret_cast<float*>(&v20) = time - a3[2];
     __m128 v6 = _mm_set_ss(std::bit_cast<float>(v20));
     float v21 = a3[3] - time;
-    float v8 = 1.0f / static_cast<float>(v21 + v6[0]);
+    float v8 = 1.0f / (v21 + v6[0]);
     float v9 = v21 * v8;
     *reinterpret_cast<float*>(&v22) = time - a3[1];
     __m128 v10 = _mm_set_ss(std::bit_cast<float>(v22));
@@ -1774,16 +1774,15 @@ void hkaSplineCompressedAnimation::evaluateSimple3(
     float v14 = v23 + v6[0];
     *reinterpret_cast<float*>(&v24) = time - *a3;
     __m128 v27 = _mm_set_ss(std::bit_cast<float>(v24));
-    float v15 = static_cast<float>(v6[0] * v8) / v14;
+    float v15 = (v6[0] * v8) / v14;
     float v25 = a3[5] - time;
-    float v16 = static_cast<float>(static_cast<float>(v21 * v26) + 0.0f) / static_cast<float>(v21 + v27[0]);
-    v5[0] = static_cast<float>(v21 * v16) + 0.0f;
-    float v17 = static_cast<float>(static_cast<float>(v10[0] * v26) + static_cast<float>(v23 * v15)) /
-        static_cast<float>(v23 + v10[0]);
-    v27[0] = static_cast<float>(v27[0] * v16) + static_cast<float>(v23 * v17);
-    float v19 = static_cast<float>(v6[0] * v15) / static_cast<float>(v25 + v6[0]);
+    float v16 = ((v21 * v26) + 0.0f) / (v21 + v27[0]);
+    v5[0] = (v21 * v16) + 0.0f;
+    float v17 = ((v10[0] * v26) + (v23 * v15)) / (v23 + v10[0]);
+    v27[0] = (v27[0] * v16) + (v23 * v17);
+    float v19 = (v6[0] * v15) / (v25 + v6[0]);
     v6[0] = v6[0] * v19;
-    v10[0] = static_cast<float>(v10[0] * v17) + static_cast<float>(v25 * v19);
+    v10[0] = (v10[0] * v17) + (v25 * v19);
     a5.m_quad = _mm_add_ps(
         _mm_add_ps(
             _mm_add_ps(
@@ -1800,7 +1799,7 @@ void hkaSplineCompressedAnimation::evaluateSimple1(float u, int32_t p, float* U,
     *reinterpret_cast<float*>(&v8) = u - *U;
     __m128 v5 = _mm_set_ss(std::bit_cast<float>(v8));
     float v9 = U[1] - u;
-    v5[0] = v5[0] / static_cast<float>(v9 + v5[0]);
+    v5[0] = v5[0] / (v9 + v5[0]);
     __m128 v6 = _mm_shuffle_ps(v5, v5, 0);
     out.m_quad = _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, v6), P->m_quad), _mm_mul_ps(P[1].m_quad, v6));
 }
@@ -1812,7 +1811,7 @@ int32_t hkaSplineCompressedAnimation::findSpan(int32_t a1, int32_t a2, uint8_t a
             int32_t v5 = a1 + 1;
             int32_t v6 = a2;
             int32_t v7 = a1 + 1 + a2;
-            while (1) {
+            while (true) {
                 result = v7 / 2;
                 uint8_t v8 = a4[result];
                 if (a3 < v8) {

@@ -33,7 +33,7 @@ NiObject* NiBlendColorInterpolator::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject) NiBlendColorInterpolator;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_kColorValue = m_kColorValue;
@@ -160,7 +160,7 @@ NiObject* NiBlendColorInterpolator::CreateObject() {
     NiBlendColorInterpolator* pkObject =
         static_cast<NiBlendColorInterpolator*>(NiMemObject::operator new(sizeof(NiBlendColorInterpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     ::new (pkObject) NiBlendColorInterpolator;
     return pkObject;

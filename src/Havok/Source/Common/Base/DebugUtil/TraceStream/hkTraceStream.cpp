@@ -14,7 +14,7 @@
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
 #include "Havok/Source/Common/SceneData/Attributes/hkxAttributeGroupClass.h"
 
-#include <stdarg.h>
+#include <cstdarg>
 
 // Havok SDK signature (hkBase.lib, tied by bytes).
 static hkReferencedObject* hkTraceStreamcreate();

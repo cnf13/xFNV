@@ -188,8 +188,7 @@ uint16_t hkpSimpleConstraintContactMgr::addContactPointImpl(
     cpi->m_impulseApplied = 0.0f;
     __m128 dot = _mm_mul_ps(deltaVel, cp.m_separatingNormal.m_quad);
     cpi->m_userData = 0;
-    float projectedVel =
-        _mm_shuffle_ps(dot, dot, 170)[0] + static_cast<float>(_mm_shuffle_ps(dot, dot, 85)[0] + dot[0]);
+    float projectedVel = _mm_shuffle_ps(dot, dot, 170)[0] + (_mm_shuffle_ps(dot, dot, 85)[0] + dot[0]);
     hkpManifoldPointAddedEvent event(id, this, &input, &output, &a, &b, &cp, contactCache, cpi, projectedVel);
     hkpWorldCallbackUtil::fireContactPointAdded(m_world, event);
     if (rbA->m_contactListeners.m_size) {
@@ -239,7 +238,7 @@ void hkpSimpleConstraintContactMgr::removeContactPointImpl(uint16_t cpId, hkpCon
     hkpEntity* v4 = m_constraint.m_entities[1];
     hkpEntity* v5 = m_constraint.m_entities[0];
     if (m_contactConstraintData.m_idMgrA.m_values.m_data[cpId] == 255) {
-        v6 = 0;
+        v6 = nullptr;
     }
     else {
         // EXE-INLINED none: hkpSimpleContactConstraintAtom::getContactPointPropertiesStream(i). The contact points
@@ -402,7 +401,7 @@ void hkpSimpleConstraintContactMgr::removeToiImpl(
 
 hkpContactPointProperties* hkpSimpleConstraintContactMgr::getContactPointProperties(uint16_t id) {
     if (m_contactConstraintData.m_idMgrA.m_values.m_data[id] == 255) {
-        return 0;
+        return nullptr;
     }
     else {
         hkpSimpleContactConstraintAtom* pAtom = m_contactConstraintData.m_atom;

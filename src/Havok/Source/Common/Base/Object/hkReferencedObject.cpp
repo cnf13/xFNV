@@ -241,7 +241,7 @@ void hkReferencedObject::unlockAll() {
     hkReferencedObjectLock* v0 = hkReferencedObjectLock::s_instance;
     --hkReferencedObjectLock::s_instance->m_lockCount;
     if (v0->m_lockCount <= 0) {
-        TlsSetValue(s_intLockCount.m_slotID, 0);
+        TlsSetValue(s_intLockCount.m_slotID, nullptr);
         LeaveCriticalSection(&v0->m_criticalSection.m_section);
     }
 }

@@ -94,10 +94,10 @@ BGSDistantObjectBlock::~BGSDistantObjectBlock() {
         pNode->pManager->GetLODObjectRoot()->DetachChild(spNodeStinger.m_pObject);
     }
     if (spLoadTask.m_pObject) {
-        pIOManager->CancelTask(spLoadTask.m_pObject, 0);
+        pIOManager->CancelTask(spLoadTask.m_pObject, nullptr);
     }
     if (spLoadTaskStinger.m_pObject) {
-        pIOManager->CancelTask(spLoadTaskStinger.m_pObject, 0);
+        pIOManager->CancelTask(spLoadTaskStinger.m_pObject, nullptr);
     }
     NiObjectGarbage::Add(spNode.m_pObject);
     NiObjectGarbage::Add(spNodeStinger.m_pObject);
@@ -186,10 +186,10 @@ bool BGSDistantObjectBlock::IsInList() {
     for (ecx0 = &BGSDistantObjectBlock::BlocksLoaded; ecx0; ecx0 = ecx0->m_pkNext) {
         v3 = ecx0->m_item;
         if (v3 && (v3 == this)) {
-            return (bool)1;
+            return true;
         }
     }
-    return (bool)0;
+    return false;
 }
 
 void BGSDistantObjectBlock::EnableAllStingerVisibility(NiAVObject* apGeomNode) {
@@ -198,12 +198,12 @@ void BGSDistantObjectBlock::EnableAllStingerVisibility(NiAVObject* apGeomNode) {
     uint32_t v5;
     NiNode* pNode;
     if (apGeomNode) {
-        apGeomNode->NiAVObject::SetAppCulled(0);
+        apGeomNode->NiAVObject::SetAppCulled(false);
     }
     if (apGeomNode->IsNode()) {
         pNode = apGeomNode->IsNode();
         v5 = 0;
-        for (i = (uint32_t)pNode->GetChildCount(); v5 < i; i = (uint32_t)pNode->GetChildCount()) {
+        for (i = pNode->GetChildCount(); v5 < i; i = pNode->GetChildCount()) {
             v3 = static_cast<NiNode*>(pNode->GetAtChecked(v5));
             EnableAllStingerVisibility(v3);
             ++v5;
@@ -236,7 +236,7 @@ bool BGSDistantObjectBlock::GetHighPriority() {
 }
 
 void BGSDistantObjectBlock::FlagDetach() {
-    bDetachFlag = (bool)1;
+    bDetachFlag = true;
 }
 
 void BGSDistantObjectBlock::UpdateStingerVisibility(
@@ -259,11 +259,11 @@ void BGSDistantObjectBlock::UpdateStingerVisibility(
         pos = apGeomNode->GetWorldTranslate();
         TESWorldSpace* WorldSpace = TES::pInstance->GetWorldSpace();
         TESObjectCELL* cell = WorldSpace->GetCellFromWorldCoord(pos);
-        if (TES::pInstance->IsCellLoaded(cell, 1) && cell->All3DWithVisibleDistantFadingIn()) {
-            BGSDistantObjectBlock::EnableStingerRenderAll(apGeomNode, 0);
+        if (TES::pInstance->IsCellLoaded(cell, true) && cell->All3DWithVisibleDistantFadingIn()) {
+            BGSDistantObjectBlock::EnableStingerRenderAll(apGeomNode, false);
         }
         else {
-            BGSDistantObjectBlock::EnableStingerRenderAll(apGeomNode, 1);
+            BGSDistantObjectBlock::EnableStingerRenderAll(apGeomNode, true);
         }
     }
 }
@@ -290,10 +290,10 @@ void BGSDistantObjectBlock::Prepare() {
                 palpha = ::new (apMemory) NiAlphaProperty;
             }
             else {
-                palpha = 0;
+                palpha = nullptr;
             }
-            palpha->SetAlphaTesting(1);
-            palpha->SetAlphaBlending(0);
+            palpha->SetAlphaTesting(true);
+            palpha->SetAlphaBlending(false);
             palpha->SetTestRef(128);
             palpha->SetTestMode(NiAlphaProperty::TEST_GREATER);
             spMesh.m_pObject->AttachProperty(palpha);
@@ -302,7 +302,7 @@ void BGSDistantObjectBlock::Prepare() {
             pshadeProp->SetFlag(34u, 1);
             pshadeProp->SetFlag(33u, 0);
             pshadeProp->SetFlag(0, 0);
-            BSShaderProperty* pshadeProp_2 = pshadeProp->ClarifyShader(spMesh.m_pObject, 0, 1);
+            BSShaderProperty* pshadeProp_2 = pshadeProp->ClarifyShader(spMesh.m_pObject, false, true);
             if (pshadeProp_2) {
                 spMesh.m_pObject->RemoveProperty(3);
                 pshadeProp = pshadeProp_2;
@@ -311,10 +311,10 @@ void BGSDistantObjectBlock::Prepare() {
             int32_t NumberOfItemsActivated = pshadeProp->iShader;
             BSShader* Shader = BSShaderManager::GetShader(NumberOfItemsActivated);
             spMesh.m_pObject->SetShader(Shader);
-            NiUpdateData foo(0.0f, 0, 0);
+            NiUpdateData foo(0.0f, false, false);
             spMesh.m_pObject->UpdateProperties();
             spMesh.m_pObject->Update(foo);
-            pNode->UpdateBlockVisibility(0);
+            pNode->UpdateBlockVisibility(false);
             spMesh.m_pObject->GetModelData()->m_ucKeepFlags = 0;
             spMesh.m_pObject->GetModelData()->SetConsistency(NiGeometryData::STATIC);
             spMesh.m_pObject->GetModelData()->SetCompressFlags(1u);
@@ -325,7 +325,7 @@ void BGSDistantObjectBlock::Prepare() {
             pRenderer->PrecacheGeometry(spMesh.m_pObject, 0, 0, v4);
             NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
             Renderer_->PerformPrecache();
-            bPrepared = 1;
+            bPrepared = true;
         }
     }
     if (bUseStinger) {
@@ -333,7 +333,7 @@ void BGSDistantObjectBlock::Prepare() {
             PrepareStingerObject(spNodeStinger.m_pObject);
             NiDX9Renderer* v6 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
             v6->PerformPrecache();
-            bPrepared = 1;
+            bPrepared = true;
         }
     }
 }
@@ -361,16 +361,16 @@ void BGSDistantObjectBlock::PrepareStingerObject(NiAVObject* apGeom) {
                 palpha = ::new (apMemory) NiAlphaProperty;
             }
             else {
-                palpha = 0;
+                palpha = nullptr;
             }
-            palpha->SetAlphaTesting(1);
-            palpha->SetAlphaBlending(0);
+            palpha->SetAlphaTesting(true);
+            palpha->SetAlphaBlending(false);
             palpha->SetTestRef(128);
             palpha->SetTestMode(NiAlphaProperty::TEST_GREATER);
             pGeom->AttachProperty(palpha);
             pshadeProp->SetFlag(34u, 1);
             pshadeProp->SetFlag(55u, 1);
-            BSShaderProperty* pshadeProp_2 = pshadeProp->ClarifyShader(pGeom, 0, 1);
+            BSShaderProperty* pshadeProp_2 = pshadeProp->ClarifyShader(pGeom, false, true);
             if (pshadeProp_2) {
                 pGeom->RemoveProperty(3);
                 pshadeProp = pshadeProp_2;
@@ -378,10 +378,10 @@ void BGSDistantObjectBlock::PrepareStingerObject(NiAVObject* apGeom) {
             }
             int32_t NumberOfItemsActivated = pshadeProp->iShader;
             pGeom->SetShader(BSShaderManager::GetShader(NumberOfItemsActivated));
-            NiUpdateData foo(0.0f, 0, 0);
+            NiUpdateData foo(0.0f, false, false);
             pGeom->UpdateProperties();
             pGeom->Update(foo);
-            this->pNode->UpdateBlockVisibility(0);
+            this->pNode->UpdateBlockVisibility(false);
             pGeom->GetModelData()->m_ucKeepFlags = 0;
             pGeom->GetModelData()->SetConsistency(NiGeometryData::STATIC);
             pGeom->GetModelData()->SetCompressFlags(1u);
@@ -411,21 +411,21 @@ void BGSDistantObjectBlock::Detach() {
         NiNode* v10 = v5->GetLODObjectRoot();
         NiAVObject* v6 = spOldMesh.m_pObject;
         v10->DetachChild(v6);
-        spNode.operator=(static_cast<BSMultiBoundNode*>(0));
-        spMesh.operator=(static_cast<NiGeometry*>(0));
-        spOldMesh.operator=(static_cast<NiGeometry*>(0));
-        spLoadTask.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(0));
+        spNode.operator=(static_cast<BSMultiBoundNode*>(nullptr));
+        spMesh.operator=(static_cast<NiGeometry*>(nullptr));
+        spOldMesh.operator=(static_cast<NiGeometry*>(nullptr));
+        spLoadTask.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
     }
     if (spNodeStinger.m_pObject) {
         BGSTerrainManager* v7 = pNode->GetManager();
         NiNode* v9 = v7->GetLODObjectRoot();
         NiAVObject* v8 = spNodeStinger.m_pObject;
         v9->DetachChild(v8);
-        spNodeStinger.operator=(static_cast<BSMultiBoundNode*>(0));
-        spNodeStingerOld.operator=(static_cast<BSMultiBoundNode*>(0));
-        spLoadTaskStinger.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(0));
+        spNodeStinger.operator=(static_cast<BSMultiBoundNode*>(nullptr));
+        spNodeStingerOld.operator=(static_cast<BSMultiBoundNode*>(nullptr));
+        spLoadTaskStinger.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
     }
-    bDetachFlag = 0;
+    bDetachFlag = false;
 }
 
 void BGSDistantObjectBlock::Attach() {
@@ -519,9 +519,9 @@ void BGSDistantObjectBlock::Attach() {
         if ((spMesh.m_pObject || spNodeStinger.m_pObject) && !IsInList()) {
             AddToList();
         }
-        spOldMesh.operator=(static_cast<NiGeometry*>(0));
-        spNodeStingerOld.operator=(static_cast<BSMultiBoundNode*>(0));
-        bAttached = 1;
+        spOldMesh.operator=(static_cast<NiGeometry*>(nullptr));
+        spNodeStingerOld.operator=(static_cast<BSMultiBoundNode*>(nullptr));
+        bAttached = true;
     }
 }
 
@@ -533,39 +533,39 @@ void BGSDistantObjectBlock::SwitchToLow(
 ) {
     BGSDistantObjectBlockLoadTask* Task;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LODBUILDINGS, 1,
+        MEM_CONTEXT_LODBUILDINGS, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Distant Terrain System\\BGSDistantObjectBlock.cpp", 592
     );
     spOldMesh = spMesh;
     spNodeStingerOld = spNodeStinger;
     if (spLoadTask.m_pObject) {
         BGSDistantObjectBlockLoadTask* v6 = spLoadTask.m_pObject;
-        pIOManager->CancelTask(v6, 0);
-        spLoadTask.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(0));
+        pIOManager->CancelTask(v6, nullptr);
+        spLoadTask.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
     }
     if (spLoadTaskStinger.m_pObject) {
         BGSDistantObjectBlockLoadTask* v7 = spLoadTaskStinger.m_pObject;
-        pIOManager->CancelTask(v7, 0);
-        spLoadTaskStinger.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(0));
+        pIOManager->CancelTask(v7, nullptr);
+        spLoadTaskStinger.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
     }
     BGSDistantObjectBlockLoadTask* v11 =
         static_cast<BGSDistantObjectBlockLoadTask*>(ourMalloc(sizeof(BGSDistantObjectBlockLoadTask)));
     if (v11) {
         bool MegatonDestroyed = pPlayer->GetMegatonDestroyed();
-        Task =
-            ::new (v11) BGSDistantObjectBlockLoadTask(this, apWorld, asCellX, asCellY, aiLevel, MegatonDestroyed, 0, 0);
+        Task = ::new (v11)
+            BGSDistantObjectBlockLoadTask(this, apWorld, asCellX, asCellY, aiLevel, MegatonDestroyed, false, false);
     }
     else {
-        Task = 0;
+        Task = nullptr;
     }
     spLoadTask.operator=(Task);
     nDetachCount = 0;
     BGSDistantObjectBlockLoadTask* v8 = spLoadTask.m_pObject;
     v8->QueueMe();
-    bDoneLoading = 0;
-    bAttached = 0;
-    bHighPriority = 0;
-    bPrepared = 0;
+    bDoneLoading = false;
+    bAttached = false;
+    bHighPriority = false;
+    bPrepared = false;
 }
 
 void BGSDistantObjectBlock::LoadFromTask(eBool abLoadData) {
@@ -575,9 +575,9 @@ void BGSDistantObjectBlock::LoadFromTask(eBool abLoadData) {
                 spLoadTask.m_pObject->GetMesh(spMesh);
                 spLoadTask.m_pObject->GetNode(spNode);
             }
-            spLoadTask.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(0));
+            spLoadTask.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
             if (!spLoadTaskStinger.m_pObject) {
-                bDoneLoading = 1;
+                bDoneLoading = true;
             }
         }
     }
@@ -586,9 +586,9 @@ void BGSDistantObjectBlock::LoadFromTask(eBool abLoadData) {
             if (abLoadData) {
                 spLoadTaskStinger.m_pObject->GetNode(spNodeStinger);
             }
-            spLoadTaskStinger.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(0));
+            spLoadTaskStinger.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
             if (!spLoadTask.m_pObject) {
-                bDoneLoading = 1;
+                bDoneLoading = true;
             }
         }
     }
@@ -605,7 +605,7 @@ void BGSDistantObjectBlock::EnableStingerRenderAll(NiAVObject* apGeom, bool abEn
     if (apGeom->IsNode()) {
         v5 = apGeom->IsNode();
         v4 = 0;
-        for (i = (uint32_t)v5->GetChildCount(); v4 < i; i = (uint32_t)v5->GetChildCount()) {
+        for (i = v5->GetChildCount(); v4 < i; i = v5->GetChildCount()) {
             v3 = static_cast<NiNode*>(v5->GetAtChecked(v4));
             BGSDistantObjectBlock::EnableStingerRenderAll(v3, abEnable);
             ++v4;
@@ -686,11 +686,11 @@ void BGSDistantObjectBlock::ResetCullResults() {
     for (BGSDistantObjectBlock* m_item : BGSDistantObjectBlock::BlocksLoaded) {
         if (m_item) {
             if (!m_item->CheckDetach()) {
-                BSMultiBoundNode* Node = m_item->GetNode(0);
+                BSMultiBoundNode* Node = m_item->GetNode(false);
                 if (Node) {
                     Node->QMultiBound()->QShape()->ResetCullResult();
                 }
-                BSMultiBoundNode* v1 = m_item->GetNode(1);
+                BSMultiBoundNode* v1 = m_item->GetNode(true);
                 if (v1) {
                     v1->QMultiBound()->QShape()->ResetCullResult();
                 }
@@ -729,7 +729,7 @@ BGSDistantObjectBlockLoadTask::BGSDistantObjectBlockLoadTask(
     else {
         // The post-apocalypse mesh, or the normal one where the world has none.
         BGSDistantObjectBlock::BuildBlockFileNamePA(path, pWorldSpace, aiLevel, aiX, aiY);
-        if (!FileFinder::Locate(path, 0, 0, 0xFFFFFFFFu)) {
+        if (!FileFinder::Locate(path, nullptr, 0, 0xFFFFFFFFu)) {
             BGSDistantObjectBlock::BuildBlockFileName(path, pWorldSpace, aiLevel, aiX, aiY);
         }
     }
@@ -741,13 +741,13 @@ BGSDistantObjectBlockLoadTask::~BGSDistantObjectBlockLoadTask() {}
 
 void BGSDistantObjectBlockLoadTask::Run() {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_LODBUILDINGS, 1,
+        MEM_CONTEXT_LODBUILDINGS, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Distant Terrain System\\BGSDistantObjectBlock.cpp", 922
     );
     BSFile* pfile = GetFile(ARCHIVE_TYPE_INDEX_MESHES, ARCHIVE_TYPE_MESHES);
     uint32_t iload = 1;
     if (!pfile) {
-        iload = FileFinder::Locate(pFileName, 0, 6u, 1u) != 0;
+        iload = FileFinder::Locate(pFileName, nullptr, 6u, 1u) != 0;
     }
     BSStream stream;
     if (iload && stream.BSStream::Load(pFileName, pfile)) {
@@ -770,12 +770,12 @@ void BGSDistantObjectBlockLoadTask::Run() {
 void BGSDistantObjectBlockLoadTask::Finish() {
     if (spMesh.m_pObject) {
         if (bCanceled) {
-            spMesh.operator=(static_cast<NiGeometry*>(0));
-            spNode.operator=(static_cast<BSMultiBoundNode*>(0));
+            spMesh.operator=(static_cast<NiGeometry*>(nullptr));
+            spNode.operator=(static_cast<BSMultiBoundNode*>(nullptr));
         }
         else {
             pBlock->LoadFromTask(eTrue);
-            pBlock->pNode->pManager->SetNeedsImmediateUpdate(1);
+            pBlock->pNode->pManager->SetNeedsImmediateUpdate(true);
             NiGeometry* v1 = spMesh.m_pObject;
             if (!v1->IsSegmentedTriShape()) {
                 Warning("MODELS: Found a distant object block for %i:%i,%i but it is not segmented.", iLevel, iX, iY);
@@ -793,7 +793,7 @@ void BGSDistantObjectBlockLoadTask::Finish() {
 
 void BGSDistantObjectBlockLoadTask::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
     if (!bCanceled) {
-        bCanceled = (bool)1;
+        bCanceled = true;
         QueuedFile::Cancel(aePreviousState, apTaskOwner);
     }
 }
@@ -827,7 +827,7 @@ void BGSDistantObjectBlockLoadTask::QueueMe() {
             this
         );
     }
-    bFinishedQueuing = (bool)1;
+    bFinishedQueuing = true;
     CheckFinished();
 }
 

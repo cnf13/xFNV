@@ -197,7 +197,7 @@ void TESCombatStyle::Save() {
 
 void TESCombatStyle::InitItem() {
     if (!TESForm::GetInitialized()) {
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 
@@ -214,18 +214,18 @@ void TESCombatStyle::Copy(TESForm* apCopy) {
 bool TESCombatStyle::Compare(TESForm* apCompare) {
     TESCombatStyle* pcomp = dynamic_cast<TESCombatStyle*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     if (std::memcmp(&Data, &pcomp->Data, sizeof(Data))) {
-        return 1;
+        return true;
     }
     if (!std::memcmp(&GetAdvancedData(), &pcomp->GetAdvancedData(), sizeof(AdvancedCombatStyleData))) {
         return std::memcmp(&SimpleData, &pcomp->SimpleData, sizeof(SimpleData)) != 0;
     }
-    return 1;
+    return true;
 }
 
 float TESCombatStyle::GetAttackSkillModBase() {

@@ -15,7 +15,7 @@ NiGlobalConstantEntry::~NiGlobalConstantEntry() {
 void NiGlobalConstantEntry::SetData(uint32_t uiDataSize, const void* pvDataSource) {
     if (m_uiDataSize < uiDataSize) {
         _NiFree(m_pvDataSource);
-        m_pvDataSource = 0;
+        m_pvDataSource = nullptr;
         m_uiDataSize = uiDataSize;
     }
     if (!m_pvDataSource) {

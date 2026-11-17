@@ -12,8 +12,8 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
+#include <cstdint>
 #include <memory>
-#include <stdint.h>
 #include <vector>
 
 // The standalone build's one instantiation of the matrix's generic members.

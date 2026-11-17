@@ -37,7 +37,7 @@
 #include "Fallout/Interface/Menus/StatsMenu.h"
 #include "Fallout/Misc/Main.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 TraitMenu::PerkEffectList_t TraitMenu::PerkEffectList;
 
@@ -58,7 +58,7 @@ void UpdatePerkTextAlpha(Tile* a1, BGSPerk* a2) {
     else {
         v3 = 0x1p+7f;
     }
-    a1->Set(TraitMenu::iUT_TextAlpha, v3, (bool)1);
+    a1->Set(TraitMenu::iUT_TextAlpha, v3, true);
 }
 
 TraitMenu::TraitMenu() : Menu(), lbPerksList(), AvailablePerks() {
@@ -118,9 +118,9 @@ void TraitMenu::DoClick(int32_t a1, Tile* a2) {
 void TraitMenu::DoEnter(int32_t a1, Tile* a2) {
     if (a1 == 10) {
         char Src[516];
-        pTiles[2]->Set(4044, lbPerksList.GetDataFor(a2)->GetTextureName(), 1);
+        pTiles[2]->Set(4044, lbPerksList.GetDataFor(a2)->GetTextureName(), true);
         lbPerksList.GetDataFor(a2)->BuildDescriptionString(Src, 512u);
-        pTiles[3]->Set(4036, Src, 1);
+        pTiles[3]->Set(4036, Src, true);
         const char* String = pTiles[2]->GetString(4044);
         if (BSstrlen(String) <= 1) {
             pTiles[2]->Set(4003, 0);
@@ -133,7 +133,7 @@ void TraitMenu::DoEnter(int32_t a1, Tile* a2) {
         Interface::PlayMenuSound(4);
         Tile* pscrollbar = pTiles[8];
         int32_t iUT_CurrentValue = Tile::TextToTrait("_current_value");
-        pscrollbar->Set(iUT_CurrentValue, 0.0f, 0);
+        pscrollbar->Set(iUT_CurrentValue, 0.0f, false);
         int32_t v4 = Tile::TextToTrait("_SetInCode");
         pscrollbar->Poke(v4, 1.0f);
     }
@@ -141,7 +141,7 @@ void TraitMenu::DoEnter(int32_t a1, Tile* a2) {
 
 void TraitMenu::DoIdle() {
     if ((xFadeState == 4) && (!(&pVATS)->IsInVats())) {
-        Menu::PrepForVisibility(0);
+        Menu::PrepForVisibility(false);
     }
 }
 
@@ -151,14 +151,14 @@ int32_t TraitMenu::GetClass() {
 
 bool TraitMenu::DoGamepad(int32_t a1, float a2) {
     static int32_t inext;
-    bool bhandled = 0;
+    bool bhandled = false;
     if (a1 == 9) {
         if (lbPerksList.GetHighlightedItem()) {
             Tile* v3 = static_cast<Tile*>(lbPerksList.GetHighlightedItem());
             v3->PlayTileSound(4043);
             Tile* v4 = static_cast<Tile*>(lbPerksList.GetHighlightedItem());
             DoClick(10, v4);
-            bhandled = 1;
+            bhandled = true;
         }
     }
     if (Interface::Has360Controller() && pTiles[8]->IsTrue(4003)) {
@@ -175,7 +175,7 @@ bool TraitMenu::DoGamepad(int32_t a1, float a2) {
             Tile* pscrollbar = pTiles[8];
             int32_t iUT_CurrentValue = Tile::TextToTrait("_current_value");
             int32_t icurrScrollbarValue = static_cast<int32_t>(pscrollbar->GetFloat(iUT_CurrentValue));
-            pscrollbar->Set(iUT_CurrentValue, static_cast<float>(iscrollDelta + icurrScrollbarValue), 0);
+            pscrollbar->Set(iUT_CurrentValue, static_cast<float>(iscrollDelta + icurrScrollbarValue), false);
             if (static_cast<double>(icurrScrollbarValue) != pscrollbar->GetFloat(iUT_CurrentValue)) {
                 int32_t v6 = Tile::TextToTrait("_SetInCode");
                 pscrollbar->Poke(v6, 1.0f);
@@ -192,11 +192,11 @@ bool TraitMenu::DoGamepad(int32_t a1, float a2) {
 }
 
 bool TraitMenu::DoGamepadUpEvent(int32_t a1, float a2) {
-    bool v5 = 0;
+    bool v5 = false;
     if (a1 == 11 && pTiles[6]->IsTrue(4015)) {
         Interface::PlayMenuSound(1);
-        DoClick(6, 0);
-        return 1;
+        DoClick(6, nullptr);
+        return true;
     }
     return v5;
 }
@@ -204,10 +204,10 @@ bool TraitMenu::DoGamepadUpEvent(int32_t a1, float a2) {
 bool TraitMenu::IsWellFormedMenu() {
     for (int32_t i = 0; i < 9; ++i) {
         if (!pTiles[i]) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 void TraitMenu::ApplyPerkEffects(Tile* apTile) {
@@ -232,7 +232,7 @@ void TraitMenu::ApplyPerkEffects(Tile* apTile) {
         else {
             pprevRankEffectList = nullptr;
         }
-        TraitMenu::PerkEffectList.Clear(1);
+        TraitMenu::PerkEffectList.Clear(true);
         // The effect list is the spell's BSSimpleList<EffectItem*> base; the conversion keeps the null test, as the
         // game does.
         for (BSSimpleList<EffectItem*>* peffectObj = peffectList; peffectObj && peffectObj->m_item;
@@ -266,7 +266,7 @@ void TraitMenu::InitLists() {
     for (BSSimpleList<BGSPerk*>* pcurrentPerk = &AvailablePerks; pcurrentPerk && pcurrentPerk->m_item;
          pcurrentPerk = pcurrentPerk->m_pkNext) {
         char Dst[64];
-        int32_t icurrRank = pPlayer->GetPerkRank(pcurrentPerk->m_item, 0);
+        int32_t icurrRank = pPlayer->GetPerkRank(pcurrentPerk->m_item, false);
         BSstrcpy(Dst, 64, pcurrentPerk->m_item->TESFullName::GetFullName());
         if (!BSstrlen(Dst)) {
             BSstrcpy(Dst, 64, sMissingName.String());
@@ -274,7 +274,7 @@ void TraitMenu::InitLists() {
         if (pcurrentPerk->m_item->GetNumRanks() > 1u && icurrRank > 0) {
             BSsprintf(Dst, 64, "%s (%d)", Dst, icurrRank + 1);
         }
-        Tile* pnew = lbPerksList.AddItem(pcurrentPerk->m_item, Dst, 0, 0);
+        Tile* pnew = lbPerksList.AddItem(pcurrentPerk->m_item, Dst, nullptr, nullptr);
         pnew->Set(Tile::kTileValue_ID, 10);
         pnew->Set(g_traitMenuRank, icurrRank + 1);
     }
@@ -289,7 +289,7 @@ void TraitMenu::UpdatePointCounter() {
     else {
         BSsprintf(Src, 64, sTraitMenuCounter.String(), v2);
     }
-    pTiles[4]->Set(4036, Src, 1);
+    pTiles[4]->Set(4036, Src, true);
     pTiles[4]->Set(4003, 1);
 }
 
@@ -305,13 +305,13 @@ Tile* TraitMenu::Create() {
     Tile* ptile = pin->GetMenusRoot()->ReadFile("Data\\Menus\\trait_menu.xml");
     TraitMenu::pMe = static_cast<TraitMenu*>(ptile->GetMenu());
     if (TraitMenu::pMe && (v0 = TraitMenu::pMe->GetClass(), v0 == TraitMenu::GetClassStatic())) {
-        TraitMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), 0);
+        TraitMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
         if (TraitMenu::pMe->IsWellFormedMenu()) {
             char Src[64];
             if (ptile->GetFloat(Tile::kTileValue_StackingType) == 6006.0 ||
                 ptile->GetFloat(Tile::kTileValue_StackingType) == 102.0) {
                 float afValue = Tile::GetMaximumDepth();
-                ptile->Set(Tile::kTileValue_Depth, afValue, 1);
+                ptile->Set(Tile::kTileValue_Depth, afValue, true);
             }
             int32_t nTraitPoints = iTraitMenuMaxNumTraits.Int();
             TraitMenu::pMe->iCurrPoints = 0;
@@ -322,17 +322,17 @@ Tile* TraitMenu::Create() {
             else {
                 BSsprintf(Src, 64, sTraitMenuTitleText.String(), nTraitPoints);
             }
-            TraitMenu::pMe->pTiles[0]->Set(Tile::kTileValue_String, Src, 1);
+            TraitMenu::pMe->pTiles[0]->Set(Tile::kTileValue_String, Src, true);
             const char* v2 = sReset.String();
-            TraitMenu::pMe->pTiles[5]->Set(Tile::kTileValue_String, v2, 1);
+            TraitMenu::pMe->pTiles[5]->Set(Tile::kTileValue_String, v2, true);
             const char* afValuea = sDone.String();
             int32_t v3 = Tile::TextToTrait("_Title");
-            TraitMenu::pMe->pTiles[6]->Set(v3, afValuea, 1);
+            TraitMenu::pMe->pTiles[6]->Set(v3, afValuea, true);
             for (BSSimpleList<BGSPerk*>* pIter = pDataHandler->GetPerkList(); pIter && pIter->m_item;
                  pIter = pIter->GetNext()) {
                 pPerk = pIter->m_item;
                 if (pPerk->GetLevel() > 0) {
-                    int32_t v4 = pPlayer->GetPerkRank(pPerk, 0);
+                    int32_t v4 = pPlayer->GetPerkRank(pPerk, false);
                     if (v4 < pPerk->GetNumRanks() && pPerk->GetIsTrait() && pPerk->IsPerkAttainable(pPlayer) &&
                         pPerk->GetIsPlayable()) {
                         char v8 = 1;
@@ -358,12 +358,12 @@ Tile* TraitMenu::Create() {
             // devirtualised.
             ListBox<BGSPerk*>* plbPerks = &TraitMenu::pMe->lbPerksList;
             plbPerks->Sort(&TraitMenu::SortPerksFunc);
-            TraitMenu::pMe->lbPerksList.RestoreListState(1);
+            TraitMenu::pMe->lbPerksList.RestoreListState(true);
             return ptile;
         }
         else {
             Warning("MENUS: Trait Menu Creation Failed... Are your menu and art resources up to date?");
-            return 0;
+            return nullptr;
         }
     }
     else {
@@ -374,7 +374,7 @@ Tile* TraitMenu::Create() {
                 }
             }
         }
-        return 0;
+        return nullptr;
     }
 }
 
@@ -384,13 +384,13 @@ void TraitMenu::Close() {
         TraitMenu::pMe->lbPerksList.Traverse(&TraitMenu::IncreaseSelectedTraitRank, 0, 0x7FFFFFFF);
         CharacterProgression* CharacterProgressionInfo = pPlayer->GetCharacterProgressionInfo();
         if (CharacterProgressionInfo->GetReadyToLevelUp()) {
-            pPlayer->UpdateMagic(1, 0);
+            pPlayer->UpdateMagic(true, false);
         }
         StatsMenu::UpdatePlayerName();
         StatsMenu::UpdatePlayerTitle();
         TraitMenu::pMe->pMenu->Set(Tile::kTileValue_DeleteOnFade, 1);
         TraitMenu::pMe->StartFadeOut();
-        TraitMenu::pMe = 0;
+        TraitMenu::pMe = nullptr;
     }
 }
 
@@ -400,7 +400,7 @@ int32_t TraitMenu::GetClassStatic() {
 
 void TraitMenu::IncreaseSelectedTraitRank(Tile* a1, BGSPerk* a2) {
     if (a1->IsTrue(g_traitMenuSelected)) {
-        uint8_t v2 = pPlayer->GetPerkRank(a2, 0);
+        uint8_t v2 = pPlayer->GetPerkRank(a2, false);
         pPlayer->AddPerk(a2, v2 + 1, false);
     }
 }

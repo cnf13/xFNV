@@ -29,8 +29,8 @@
 MenuTopic::MenuTopic()
   : cTopicText(), lResponses(), pQuest(nullptr), pInfo(nullptr), pCurrentResponse(nullptr), pTopic(nullptr) {
     cTopicText.Set("", 0);
-    bInfoRefusal = 0;
-    bPersuasion = 0;
+    bInfoRefusal = false;
+    bPersuasion = false;
 }
 
 MenuTopic::MenuTopic(
@@ -43,14 +43,14 @@ MenuTopic::MenuTopic(
   : cTopicText(), lResponses(), pQuest(nullptr), pInfo(nullptr), pOrigTopic(apTopic), pCurrentResponse(nullptr),
     pTopic(nullptr) {
     if (apTopic->IsRemappedRumors()) {
-        bGeneralTopic = 1;
-        bTopicIsChoice = 0;
+        bGeneralTopic = true;
+        bTopicIsChoice = false;
     }
     else {
-        bGeneralTopic = 0;
+        bGeneralTopic = false;
     }
-    bInfoRefusal = 0;
-    bPersuasion = 0;
+    bInfoRefusal = false;
+    bPersuasion = false;
     TESQuest* pResponseQuest = apQuest;
     TESTopic* pResponseTopic = apTopic;
     if (apTopic && apInfo) {
@@ -67,7 +67,7 @@ MenuTopic::MenuTopic(
                 pResponseTopic = pRefusalTopic;
                 pResponseQuest = pRefusalTopic->GetOwnerQuest(pInfoRefusal);
             }
-            bInfoRefusal = 1;
+            bInfoRefusal = true;
         }
         int32_t iIntelligence = pPlayer->GetActorValue(ActorValue::INTELLIGENCE);
         if (iIntelligence <= iDialogueDummySpeakThisIntOrBelow.Int() && apTopic->HasLowIntDialog()) {
@@ -85,7 +85,7 @@ MenuTopic::MenuTopic(
             bTopicIsChoice = pInfo->GetConversationData() && !pInfo->GetConversationData()->m_listLinkTo.IsEmpty();
         }
         if (apTopic->IsPersuasion()) {
-            bPersuasion = 1;
+            bPersuasion = true;
         }
         TESQuest* pOwnerQuest = pInfo->pOwnerQuest;
         TESTopic* pOwnerTopic = TESTopic::GetOwnerTopic(pInfo);
@@ -128,7 +128,7 @@ void MenuTopic::FillResponseList(TESQuest* apQuest, TESTopic* apTopic, TESTopicI
                     pMenuResponse = ::new (apMemory) DialogueResponse(apQuest, apTopic, apInfo, apSpeaker, presponse);
                 }
                 else {
-                    pMenuResponse = 0;
+                    pMenuResponse = nullptr;
                 }
                 DialogueResponse* pMenuResponse_2 = pMenuResponse;
                 lResponses.AddTail(pMenuResponse_2);
@@ -296,9 +296,9 @@ void MenuTopic::SaveGame() {
     uint32_t iinfoID;
     uint32_t iquestID;
     v11[0] = 0;
-    uint16_t* pblockSize = 0;
+    uint16_t* pblockSize = nullptr;
     // The same position as pblockSize, as the save buffer's bytes, so it can be added and subtracted as an address.
-    uint8_t* pblockStart = 0;
+    uint8_t* pblockStart = nullptr;
     uint8_t* itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -461,7 +461,7 @@ void MenuTopicManager::PushTopicList(BSSimpleList<MenuTopic*>* apList) {
 }
 
 void MenuTopicManager::ClearData() {
-    pSpeaker = 0;
+    pSpeaker = nullptr;
     while (!listTopicLists.IsEmpty()) {
         BSSimpleList<MenuTopic*>* plist = listTopicLists.m_item;
         listTopicLists.RemoveHead();
@@ -487,7 +487,7 @@ bool MenuTopicManager::GoToTopic(int32_t aiIndex) {
     if (currentTopicList) {
         pCurrentTopic = currentTopicList;
         if (pCurrentTopic->m_item) {
-            return (bool)1;
+            return true;
         }
     }
     return (bool)v3;
@@ -506,7 +506,7 @@ bool MenuTopicManager::NextTopic() {
 }
 
 void MenuTopicManager::ClearTopicList(BSSimpleList<MenuTopic*>* apList, bool abClearGreeting) {
-    pCurrentTopic = 0;
+    pCurrentTopic = nullptr;
     BSSimpleList<MenuTopic*>* pList = apList;
     if (!abClearGreeting) {
         if (apList) {
@@ -533,18 +533,18 @@ bool MenuTopicManager::Initialize(TESObjectREFR* apSpeaker, TESTopic* apForceGre
         v6 = ::new (v9) BSSimpleList<MenuTopic*>;
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     BSSimpleList<MenuTopic*>* a2 = v6;
     listTopicLists.AddHead(a2);
     pSpeaker = apSpeaker;
-    bSpeechChallengeLoss = 0;
+    bSpeechChallengeLoss = false;
     iLastDialogXP = 0;
     TESTopic* pGreetTopic = apForceGreeting;
     if (!apForceGreeting) {
         pGreetTopic = TESTopic::GetTopic(DT_TOPIC, 0);
     }
-    MenuTopic* pGreeting = 0;
+    MenuTopic* pGreeting = nullptr;
     if (pGreetTopic) {
         TESTopicInfo* pInfo = pGreetTopic->GetMatchingInfo(bdummyBool, pSpeaker, pPlayer);
         if (pInfo) {
@@ -552,10 +552,10 @@ bool MenuTopicManager::Initialize(TESObjectREFR* apSpeaker, TESTopic* apForceGre
             TESQuest* pQuest = pGreetTopic->GetOwnerQuest(pInfo);
             MenuTopic* apMemory = static_cast<MenuTopic*>(ourMalloc(sizeof(MenuTopic)));
             if (apMemory) {
-                pGreeting_2 = ::new (apMemory) MenuTopic(pQuest, pGreetTopic, pInfo, pSpeaker, 0);
+                pGreeting_2 = ::new (apMemory) MenuTopic(pQuest, pGreetTopic, pInfo, pSpeaker, false);
             }
             else {
-                pGreeting_2 = 0;
+                pGreeting_2 = nullptr;
             }
             pGreeting = pGreeting_2;
             pGreeting_2->pTopic->SetPriority(2.1474836e+09f);
@@ -572,7 +572,7 @@ bool MenuTopicManager::Initialize(TESObjectREFR* apSpeaker, TESTopic* apForceGre
             WARN_DIALOGUE, "No GREETING topic was found for %s. Selecting stock GREETING.", pSpeaker->GetFullName()
         );
     }
-    FirstTopic(0);
+    FirstTopic(false);
     return pGreeting && (pGreeting->pInfo && pGreeting->pInfo->IsGoodbye());
 }
 
@@ -582,7 +582,7 @@ bool MenuTopicManager::DoSpeechChallengeCheck(MenuTopic* pSpeechTopic) {
         if (pSpeechTopic->pInfo->IsSpeechChallenge()) {
             float fDisposition;
             if (pSpeaker->IsActor()) {
-                fDisposition = static_cast<float>(static_cast<Actor*>(pSpeaker)->GetDisposition(pPlayer, 0));
+                fDisposition = static_cast<float>(static_cast<Actor*>(pSpeaker)->GetDisposition(pPlayer, nullptr));
             }
             else {
                 fDisposition = fSpeechChallengeDispositionBase.Float();
@@ -598,12 +598,12 @@ bool MenuTopicManager::DoSpeechChallengeCheck(MenuTopic* pSpeechTopic) {
                     ExperiencePoints::GetExperiencePoints(ExperiencePoints::ACTIVITY_SPEECH_CHALLENGE, State - 1);
             }
             else {
-                bSpeechChallengeLoss = 1;
+                bSpeechChallengeLoss = true;
                 MiscStatManager::Increment(MiscStatManager::MS_SPEECH_FAILURES);
                 TESTopic* pspeechFailTopic = TESTopic::GetTopic(DT_TOPIC, 11);
                 TESTopic* afDisposition = pSpeechTopic->pTopic;
                 TESTopicInfo* pspeechFailInfo =
-                    pspeechFailTopic->GetMatchingInfo(bdummy, pSpeaker, pPlayer, 0, afDisposition, 0);
+                    pspeechFailTopic->GetMatchingInfo(bdummy, pSpeaker, pPlayer, false, afDisposition, nullptr);
                 if (pspeechFailInfo) {
                     MenuTopic* pnewTopic;
                     BSSimpleList<MenuTopic*>* pnewList;
@@ -613,17 +613,17 @@ bool MenuTopicManager::DoSpeechChallengeCheck(MenuTopic* pSpeechTopic) {
                         pnewList = ::new (v18) BSSimpleList<MenuTopic*>;
                     }
                     else {
-                        pnewList = 0;
+                        pnewList = nullptr;
                     }
                     MenuTopic* apMemory = static_cast<MenuTopic*>(ourMalloc(sizeof(MenuTopic)));
                     if (apMemory) {
                         TESObjectREFR* afDispositiona = pSpeaker;
                         TESQuest* OwnerQuest = pspeechFailTopic->GetOwnerQuest(pspeechFailInfo);
                         pnewTopic = ::new (apMemory)
-                            MenuTopic(OwnerQuest, pspeechFailTopic, pspeechFailInfo, afDispositiona, 0);
+                            MenuTopic(OwnerQuest, pspeechFailTopic, pspeechFailInfo, afDispositiona, false);
                     }
                     else {
-                        pnewTopic = 0;
+                        pnewTopic = nullptr;
                     }
                     MenuTopic* pnewTopic_2 = pnewTopic;
                     pnewTopic->FirstResponse();
@@ -639,7 +639,7 @@ bool MenuTopicManager::DoSpeechChallengeCheck(MenuTopic* pSpeechTopic) {
                     pnewList->AddTail(pnewTopic_3);
                     pnewList->AddTail(pnewTopic_2);
                     PushTopicList(pnewList);
-                    FirstTopic(1);
+                    FirstTopic(true);
                 }
                 else {
                     Warning(
@@ -667,7 +667,7 @@ void MenuTopicManager::Update() {
     }
     if (bSpeechChallengeLoss && (CurrentTopic && !CurrentTopic->bTopicIsChoice)) {
         PopTopicList();
-        bSpeechChallengeLoss = 0;
+        bSpeechChallengeLoss = false;
     }
     else {
         if (CurrentTopic) {
@@ -683,11 +683,11 @@ void MenuTopicManager::Update() {
                 TESTopic* apPreviousTopic = CurrentTopic->pTopic;
                 if (pTopics) {
                     BSSimpleList<MenuTopic*>* CurrentTopicList = GetCurrentTopicList();
-                    ClearTopicList(CurrentTopicList, 0);
+                    ClearTopicList(CurrentTopicList, false);
                     FillTopicList(pTopics, false, EntryPoint, apPreviousTopic);
                 }
                 if (bSpeechChallengeLoss) {
-                    bSpeechChallengeLoss = 0;
+                    bSpeechChallengeLoss = false;
                 }
             }
         }
@@ -701,7 +701,7 @@ void MenuTopicManager::FillTopicList(
     TESTopic* apPreviousTopic
 ) {
     bool bDispositionFailure;
-    bool bgeneral = 0;
+    bool bgeneral = false;
     Actor* pactor = dynamic_cast<Actor*>(pSpeaker);
     while (apList && apList->m_item) {
         TESTopic* pTopic = apList->m_item;
@@ -718,7 +718,7 @@ void MenuTopicManager::FillTopicList(
                 if (DummyFlag != DUM_NON_DUMMY_ONLY) {
                 LABEL_12:;
                     if (pTopic->IsRemappedRumors() && !pactor->HasNoRumors()) {
-                        MenuTopic* apitem = 0;
+                        MenuTopic* apitem = nullptr;
                         MenuTopic* pMenuTopic = (&pSpeaker->m_Extra)->GetInfoGeneralTopic(pSpeaker);
                         if (pMenuTopic) {
                             if (!bgeneral) {
@@ -726,26 +726,27 @@ void MenuTopicManager::FillTopicList(
                                     !GetCurrentTopicList()->IsInList(pMenuTopic)) {
                                     GetCurrentTopicList()->AddTail(pMenuTopic);
                                 }
-                                bgeneral = 1;
+                                bgeneral = true;
                             }
                         }
                     }
-                    bDispositionFailure = 0;
-                    TESTopicInfo* pInfo =
-                        pTopic->GetMatchingInfo(bDispositionFailure, pSpeaker, pPlayer, 0, apPreviousTopic, 0);
+                    bDispositionFailure = false;
+                    TESTopicInfo* pInfo = pTopic->GetMatchingInfo(
+                        bDispositionFailure, pSpeaker, pPlayer, false, apPreviousTopic, nullptr
+                    );
                     if (pInfo) {
                         TESQuest* pQuest = pTopic->GetOwnerQuest(pInfo);
-                        bool bSetTopic = 0;
-                        bool badd = 1;
+                        bool bSetTopic = false;
+                        bool badd = true;
                         if (pTopic->IsRemappedRumors()) {
                             if (bgeneral || pactor->HasNoRumors()) {
-                                badd = 0;
+                                badd = false;
                             }
                             else {
-                                bSetTopic = 1;
+                                bSetTopic = true;
                             }
                         }
-                        MenuTopic* pMenuTopic_2 = 0;
+                        MenuTopic* pMenuTopic_2 = nullptr;
                         if (badd) {
                             MenuTopic* pMenuTopic_3;
                             MenuTopic* apMemory = static_cast<MenuTopic*>(ourMalloc(sizeof(MenuTopic)));
@@ -754,7 +755,7 @@ void MenuTopicManager::FillTopicList(
                                     ::new (apMemory) MenuTopic(pQuest, pTopic, pInfo, pSpeaker, bDispositionFailure);
                             }
                             else {
-                                pMenuTopic_3 = 0;
+                                pMenuTopic_3 = nullptr;
                             }
                             pMenuTopic_2 = pMenuTopic_3;
                         }
@@ -764,7 +765,7 @@ void MenuTopicManager::FillTopicList(
                         else {
                             if (pMenuTopic_2) {
                                 delete pMenuTopic_2;
-                                pMenuTopic_2 = 0;
+                                pMenuTopic_2 = nullptr;
                             }
                         }
                         if (bSetTopic) {
@@ -790,7 +791,7 @@ void* MenuTopicManager::PopTopicList() {
         BSSimpleList<MenuTopic*>* pList = listTopicLists.m_item;
         if (pList) {
             listTopicLists.RemoveHead();
-            ClearTopicList(pList, 0);
+            ClearTopicList(pList, false);
             pList->RemoveAllPointerList();
             delete pList;
         }

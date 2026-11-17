@@ -323,8 +323,8 @@ BSRenderedTexture* BSTextureManager::CreateRenderedTexture(
     NiTexture::FormatPrefs pformat;
     FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
     Ni2DBuffer::MultiSamplePreference emultiSamplePreference = Ni2DBuffer::MULTISAMPLE_NONE;
-    NiDepthStencilBuffer* psharedDepthBuffer = 0;
-    BSRenderedTexture* prenTexture = 0;
+    NiDepthStencilBuffer* psharedDepthBuffer = nullptr;
+    BSRenderedTexture* prenTexture = nullptr;
     pformat.m_eMipMapped = NiTexture::FormatPrefs::MIP_DEFAULT;
     if (BSShaderManager::bNonPower2Textures) {
         uisafeWidth = auiWidth;
@@ -345,13 +345,13 @@ BSRenderedTexture* BSTextureManager::CreateRenderedTexture(
     pformat.m_ePixelLayout = NiTexture::FormatPrefs::TRUE_COLOR_32;
     pformat.m_eAlphaFmt = NiTexture::FormatPrefs::SMOOTH;
     if (aiD3DFormat) {
-        NiRenderedTexture::bStaticForceD3DFormat = 1;
+        NiRenderedTexture::bStaticForceD3DFormat = true;
         NiRenderedTexture::iStaticForcedD3DFormat = aiD3DFormat;
     }
     int16_t v17 = auFlags;
     auFlags &= 8u;
     if (auFlags) {
-        NiRenderedTexture::bStaticRenderedTexture = 0;
+        NiRenderedTexture::bStaticRenderedTexture = false;
     }
     int32_t bDiscardDepth = v17 & 128;
     if ((v17 & 128) != 0) {
@@ -381,8 +381,7 @@ BSRenderedTexture* BSTextureManager::CreateRenderedTexture(
         }
     }
     auiHeight = static_cast<uint32_t>(
-        (static_cast<uint32_t>(auiHeight) & 0xFFFFFF00u) |
-        (static_cast<uint32_t>(static_cast<uint8_t>(((v17 & 4) == 0))))
+        (auiHeight & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(((v17 & 4) == 0))))
     );
     if ((v17 & 16) != 0) {
         NiRenderedCubeMap* pcm = NiRenderedCubeMap::Create(uisafeWidth, BSShaderManager::pRenderer.m_pObject, pformat);
@@ -393,7 +392,7 @@ BSRenderedTexture* BSTextureManager::CreateRenderedTexture(
                 prenTexture = ::new (v19) BSRenderedTexture(pcm, 1, psharedDepthBuffer);
             }
             else {
-                prenTexture = 0;
+                prenTexture = nullptr;
             }
         }
     }
@@ -409,10 +408,10 @@ BSRenderedTexture* BSTextureManager::CreateRenderedTexture(
         NiGlobalStringTable::ReleaseHandle(kName.m_kHandle);
     }
     if (aiD3DFormat) {
-        NiRenderedTexture::bStaticForceD3DFormat = 0;
+        NiRenderedTexture::bStaticForceD3DFormat = false;
     }
     if (auFlags) {
-        NiRenderedTexture::bStaticRenderedTexture = 1;
+        NiRenderedTexture::bStaticRenderedTexture = true;
     }
     if (bDiscardDepth) {
         bCreateDiscardable = 1;

@@ -132,7 +132,7 @@ hkpStorageSampledHeightFieldShape::~hkpStorageSampledHeightFieldShape() {
 }
 
 int32_t hkpStorageSampledHeightFieldShape::calcSizeForSpu(const CalcSizeForSpuInput& a1, int32_t a2) const {
-    return (a2 >= 128) ? 128 : ((-1));
+    return (a2 >= 128) ? 128 : (-1);
 }
 
 // hkSampledHeightFieldShape_collideSpheres for this class: the heights and the flip come from the virtual
@@ -276,7 +276,7 @@ void hkpStorageSampledHeightFieldShape::collideSpheres(
 }
 
 float hkpStorageSampledHeightFieldShape::getHeightAtImpl(int32_t x, int32_t z) const {
-    return (float)(m_storage[((3 * x) + 2) + (3 * (m_xRes * (invZRes - z)))] + fOffset);
+    return (m_storage[((3 * x) + 2) + (3 * (m_xRes * (invZRes - z)))] + fOffset);
 }
 
 // The shape never flips its triangles: the result is false whatever m_triangleFlip holds, as the game does.

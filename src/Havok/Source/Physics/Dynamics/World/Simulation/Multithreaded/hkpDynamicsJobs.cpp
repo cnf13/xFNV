@@ -43,7 +43,7 @@ hkpBroadPhaseJob::popJobTask(hkArray<hkpSimulationIsland*, hkContainerHeapAlloca
                 )
             );
         }
-        m_taskHeader->m_newSplitIslands.m_data = 0;
+        m_taskHeader->m_newSplitIslands.m_data = nullptr;
         m_taskHeader->m_newSplitIslands.m_capacityAndFlags = hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG;
         return hkJobQueue::DO_NOT_POP_QUEUE_ENTRY;
     }

@@ -52,7 +52,7 @@ bool NiShaderFactory::RegisterGlobalShaderConstant(
     FNVD_INLINED_LOCAL(NiFixedString, kGlobalKey, std::nullopt, std::nullopt);
     NiShaderFactory* pkFactory = NiShaderFactory::ms_pkShaderFactory;
     if (!pkFactory) {
-        return 0;
+        return false;
     }
     const char* pcHandle = kKey.GetHandle();
     // NiTFixedStringMap hashes the shared string's address.
@@ -71,21 +71,21 @@ bool NiShaderFactory::RegisterGlobalShaderConstant(
         if (m_val) {
             if (m_val->m_eType == eType) {
                 NiIncRefCount(m_val);
-                return 1;
+                return true;
             }
-            return 0;
+            return false;
         }
     }
 LABEL_6:;
     NiGlobalConstantEntry* v6 =
         static_cast<NiGlobalConstantEntry*>(NiMemObject::operator new(sizeof(NiGlobalConstantEntry)));
     if (!v6) {
-        return 0;
+        return false;
     }
     NiGlobalConstantEntry* pkEntry =
         ::new (v6) NiGlobalConstantEntry(kKey.GetHandle(), eType, uiDataSize, pvInitialData);
     if (!pkEntry) {
-        return 0;
+        return false;
     }
     // The map holds a raw pointer: the factory takes its reference by hand.
     NiIncRefCount(pkEntry);
@@ -96,14 +96,14 @@ LABEL_6:;
     NiShaderFactory::ms_pkShaderFactory->m_kGlobalConstantMap.SetAt(kGlobalKey, pkEntry);
     // Destructor of kGlobalKey.
     NiGlobalStringTable::ReleaseHandle(m_kHandle);
-    return 1;
+    return true;
 }
 
 bool NiShaderFactory::ReleaseGlobalShaderConstant(const NiFixedString& kKey) {
     FNVD_INLINED_LOCAL(NiFixedString, kRemoveKey, std::nullopt, std::nullopt);
     NiShaderFactory* v1 = NiShaderFactory::ms_pkShaderFactory;
     if (!NiShaderFactory::ms_pkShaderFactory) {
-        return 0;
+        return false;
     }
     const char* m_kHandle = kKey.GetHandle();
     // NiTFixedStringMap hashes the shared string's address.
@@ -112,17 +112,17 @@ bool NiShaderFactory::ReleaseGlobalShaderConstant(const NiFixedString& kKey) {
             reinterpret_cast<uintptr_t>(m_kHandle) % v1->m_kGlobalConstantMap.m_uiHashSize
         )];
     if (!v4) {
-        return 0;
+        return false;
     }
     while (m_kHandle != v4->m_key.GetHandle()) {
         v4 = v4->m_pkNext;
         if (!v4) {
-            return 0;
+            return false;
         }
     }
     NiGlobalConstantEntry* m_pObject = v4->m_val;
     if (!m_pObject) {
-        return 0;
+        return false;
     }
     // The copy of akKey into kRemoveKey takes its reference through the first load of the handle and stores a second
     // load; the factory is reloaded only on the path that takes the reference.
@@ -139,7 +139,7 @@ bool NiShaderFactory::ReleaseGlobalShaderConstant(const NiFixedString& kKey) {
     }
     NiDecRefCount(m_pObject);
     NiGlobalStringTable::ReleaseHandle(v7);
-    return 1;
+    return true;
 }
 
 // Formats the message and hands it to the factory's error callback; the factory is read again after formatting.

@@ -81,10 +81,10 @@ MagicFogProjectile::MagicFogProjectile(
   : MagicProjectile(apCaster, apSpell, apDominantEffect, apAVEffect, aOrigin, aRotation), fAge(0.0f),
     eState(MagicFogProjectile::FOG_STATE_SHOOTING), fScale(1.0f), pTargetList(nullptr), pLight(nullptr) {
     float fDurationMin = fMagicCloudDurationMin.Float();
-    int32_t iDuration = static_cast<int32_t>(GetDominantEffect()->GetDuration());
+    int32_t iDuration = GetDominantEffect()->GetDuration();
     fProjectileDuration = BSMAX(static_cast<float>(iDuration), fDurationMin);
     float fAreaMin = fMagicCloudAreaMin.Float();
-    int32_t iArea = static_cast<int32_t>(GetDominantEffect()->GetArea());
+    int32_t iArea = GetDominantEffect()->GetArea();
     fProjectileArea = BSMAX(static_cast<float>(iArea), fAreaMin);
     double dProjectileSpeed = GetAVEffect()->GetProjectileSpeed();
     fSpeed = static_cast<float>(fMagicProjectileBaseSpeed.Float() * dProjectileSpeed);
@@ -136,7 +136,7 @@ MagicFogProjectile::~MagicFogProjectile() {
         Sound.Release();
     }
     delete pLight;
-    pLight = 0;
+    pLight = nullptr;
 }
 
 uint16_t MagicFogProjectile::GetSaveSize(uint32_t aiFlags) {
@@ -231,7 +231,7 @@ void MagicFogProjectile::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
                 );
             }
             else {
-                pnewEntry = 0;
+                pnewEntry = nullptr;
             }
             pTargetList = pnewEntry;
         }
@@ -243,7 +243,7 @@ void MagicFogProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
     float ffadeTimer;
     MagicProjectile::InitLoadGame(aiFlags, aiOldFlags);
     Init3D();
-    GetParentCell()->AddReference(this, 0);
+    GetParentCell()->AddReference(this, false);
     if (eState != MagicFogProjectile::FOG_STATE_PERSISTANT) {
         if (pAVEffect->GetBoltSound()) {
             uint32_t isoundFileID = pAVEffect->GetBoltSound()->iFormID;
@@ -251,16 +251,16 @@ void MagicFogProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
                 Sound.Release();
             }
             BSSoundHandle* arHandle = PlaySound(
-                &a2, isoundFileID, 1,
+                &a2, isoundFileID, true,
                 BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                     BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
-                1
+                true
             );
             Sound.operator=(*arHandle);
         }
     }
     ourMemcpy(&ffadeTimer, &pLight, sizeof(ffadeTimer));
-    pLight = 0;
+    pLight = nullptr;
     if (Get3D()) {
         if (pAVEffect->data.pLight) {
             MagicLight* v8;
@@ -271,11 +271,11 @@ void MagicFogProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
                 v8 = ::new (v11) MagicLight(CastingType, a3);
             }
             else {
-                v8 = 0;
+                v8 = nullptr;
             }
             pLight = v8;
             if (pLight) {
-                pLight->Fade(0, fProjectileDuration);
+                pLight->Fade(false, fProjectileDuration);
                 pLight->SetFadeTimer(ffadeTimer);
             }
         }
@@ -328,7 +328,7 @@ void MagicFogProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlag
                     prb = pcol->GetRigidBody();
                 }
                 else {
-                    prb = 0;
+                    prb = nullptr;
                 }
                 if (prb) {
                     CFilter* v5 = prb->GetCollisionFilter(&apResult);
@@ -349,7 +349,7 @@ void MagicFogProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlag
                 prb_2 = pcol_2->GetRigidBody();
             }
             else {
-                prb_2 = 0;
+                prb_2 = nullptr;
             }
             if (prb_2) {
                 CFilter* v7 = prb_2->GetCollisionFilter(&v18);
@@ -370,7 +370,7 @@ void MagicFogProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlag
         pcaster = v10->GetCasterStatsObject();
     }
     else {
-        pcaster = 0;
+        pcaster = nullptr;
     }
     if (pcaster != pPlayer) {
         float* v8 = &fMagicTrackingMultFog.Float();
@@ -541,7 +541,7 @@ float MagicFogProjectile::GetAcrobatics() {
 
 void MagicFogProjectile::Update(float afDelta) {
     if (afDelta >= 60.0) {
-        SetDelete(1);
+        SetDelete(true);
     }
     if (afDelta >= 0.0) {
         if (!eState) {
@@ -553,7 +553,7 @@ void MagicFogProjectile::Update(float afDelta) {
             double v15 = HK2NI(y);
             if (GetLocationOnReference().z <= v15) {
                 NiPoint3 v26 = GetLocationOnReference();
-                Collide(v26, 0, 0, 1);
+                Collide(v26, nullptr, nullptr, true);
             }
             float v14 = fSpeed * afDelta;
             NiPoint3 rdeltaMove(0.0f, v14, 0.0f);
@@ -569,10 +569,10 @@ void MagicFogProjectile::Update(float afDelta) {
                 float fdistance = (newLoc - oldLoc).Length();
                 fDistanceMoved = fDistanceMoved + fdistance;
                 if (fMagicProjectileMaxDistance.Float() < static_cast<double>(fDistanceMoved)) {
-                    SetDelete(1);
+                    SetDelete(true);
                 }
                 if (fdistance / afDelta < 5.0) {
-                    Collide(NiPoint3_ZERO, 0, 0, 0);
+                    Collide(NiPoint3_ZERO, nullptr, nullptr, false);
                 }
             }
         }
@@ -597,12 +597,12 @@ void MagicFogProjectile::Update(float afDelta) {
                 float fpower = (fProjectileDuration - MagicFogProjectile::fAge) / fProjectileDuration;
                 if (fpower > 0.0) {
                     NiPoint3 fY = GetLocationOnReference();
-                    GetCaster()->FindTargets_0(pSpell, GetParentCell(), fY, this, 0, 0, fpower, 1.0f);
+                    GetCaster()->FindTargets_0(pSpell, GetParentCell(), fY, this, nullptr, false, fpower, 1.0f);
                 }
             }
         }
         else {
-            SetDelete(1);
+            SetDelete(true);
         }
     }
 }
@@ -624,7 +624,7 @@ void MagicFogProjectile::Collide(
     float fpower = (fProjectileDuration - MagicFogProjectile::fAge) / fProjectileDuration;
     if (!abFizzle && fpower > 0.0) {
         NiPoint3 v17 = GetLocationOnReference();
-        GetCaster()->FindTargets_0(pSpell, GetParentCell(), v17, this, apCollidee, 0, fpower, 1.0f);
+        GetCaster()->FindTargets_0(pSpell, GetParentCell(), v17, this, apCollidee, false, fpower, 1.0f);
     }
     if (pAVEffect->data.pAreaSound) {
         if (!abFizzle) {
@@ -634,7 +634,7 @@ void MagicFogProjectile::Collide(
             v8->GetSoundHandleByNumericID(&soundHand, a3, 258u);
             NiPoint3 v13 = GetLocationOnReference();
             soundHand.SetPosition(v13.x, v13.y, v13.z);
-            soundHand.Play(0);
+            soundHand.Play(false);
         }
     }
 }
@@ -667,7 +667,7 @@ void MagicFogProjectile::BuildAreaEffectGeometry() {
             double Area = static_cast<double>(GetDominantEffect()->GetArea());
             double v4 = fMagicUnitsPerFoot.Float() * Area;
             float farea = v4 / pav->m_kLocal.m_fScale;
-            NiAVObject* pdebugSphere = BSTestObjects::CreateSphere(farea, 10, 10, 0);
+            NiAVObject* pdebugSphere = BSTestObjects::CreateSphere(farea, 10, 10, nullptr);
             NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString("MagicAreaDisplay");
             pdebugSphere->SetName(*a2);
             apString.~NiFixedString();
@@ -681,7 +681,7 @@ void MagicFogProjectile::BuildAreaEffectGeometry() {
                 pmat = ::new (apMemory) NiMaterialProperty;
             }
             else {
-                pmat = 0;
+                pmat = nullptr;
             }
             pmat->SetEmittance(clr);
             pdebugSphere->AttachProperty(pmat);
@@ -694,17 +694,17 @@ void MagicFogProjectile::BuildAreaEffectGeometry() {
 bool MagicFogProjectile::CheckAddTarget(MagicTarget* apSpellTarget, ActiveEffect* apEffect) {
     MagicFogProjectile::SpellTarget* pnewEntry;
     if (!apSpellTarget || !apEffect) {
-        return 0;
+        return false;
     }
     MagicItem* Spell = apEffect->pSpell;
     if (Spell != pSpell) {
-        return 1;
+        return true;
     }
     TESObjectREFR* ptarget = apSpellTarget->GetTargetStatsObject();
     EffectItem* peffect = apEffect->pEffect;
     for (MagicFogProjectile::SpellTarget* plist = pTargetList; plist; plist = plist->pNext) {
         if (plist->pTarget == ptarget && plist->pEffect == peffect) {
-            return 0;
+            return false;
         }
     }
     MagicFogProjectile::SpellTarget* apMemory =
@@ -713,10 +713,10 @@ bool MagicFogProjectile::CheckAddTarget(MagicTarget* apSpellTarget, ActiveEffect
         pnewEntry = ::new (apMemory) MagicFogProjectile::SpellTarget(ptarget, peffect, pTargetList);
     }
     else {
-        pnewEntry = 0;
+        pnewEntry = nullptr;
     }
     pTargetList = pnewEntry;
-    return 1;
+    return true;
 }
 
 void MagicFogProjectile::ClearTargetList() {
@@ -757,11 +757,11 @@ void MagicFogProjectile::Init3D() {
             v7.~NiFixedString();
             if (pseq) {
                 pmanager->DeactivateAll(0.0f);
-                pmanager->ActivateSequence(pseq, 0, 0, 1.0f, 0.0f, 0);
-                pmanager->SetActive(1);
+                pmanager->ActivateSequence(pseq, 0, false, 1.0f, 0.0f, nullptr);
+                pmanager->SetActive(true);
                 pseq->SetOffset(-3.4028235e+38f);
                 float v3 = fCellAppTime - 0.10000000149011612;
-                NiUpdateData UpdateData(v3, 1, 0);
+                NiUpdateData UpdateData(v3, true, false);
                 pn->Update(UpdateData);
             }
         }

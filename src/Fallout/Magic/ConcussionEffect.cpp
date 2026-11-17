@@ -32,7 +32,7 @@
 #include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 static char bConcussionEffectInitialized =
     EffectArchetypes::RegisterActiveEffect(EffectArchetypes::CONCUSSION, &ConcussionEffect::Instantiate);
@@ -76,7 +76,7 @@ void ConcussionEffect::Update(float afSecondsElapsed) {
         ptarget = pTarget->GetTargetAsActor();
     }
     else {
-        ptarget = 0;
+        ptarget = nullptr;
     }
     if (ptarget) {
         UpdateSound(ptarget);
@@ -99,7 +99,7 @@ bool ConcussionEffect::CheckTarget(MagicTarget* apTarget) {
     else {
         targetAsActor = nullptr;
     }
-    return (bool)((uint8_t)(targetAsActor && ((!targetAsActor->IsDead((bool)0)) && (!targetAsActor->IsDying()))));
+    return (bool)((uint8_t)(targetAsActor && ((!targetAsActor->IsDead(false)) && (!targetAsActor->IsDying()))));
 }
 
 void ConcussionEffect::Start() {
@@ -119,13 +119,13 @@ void ConcussionEffect::UpdateSound(Actor* a2) {
             if (a2->IsPc() && !pPlayer->IsSleepingorResting()) {
                 float afStrength = fGetHitPainMult.Float();
                 TESImageSpaceModifier* ConcussionIMOD = GetConcussionIMOD();
-                ImageSpaceModifierInstanceForm::Trigger(ConcussionIMOD, afStrength, 0);
+                ImageSpaceModifierInstanceForm::Trigger(ConcussionIMOD, afStrength, nullptr);
                 BSAudio* v3 = &BSAudio::QInstance();
                 BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "FXCrippleHead", 257u);
-                SoundHandleByName->Play(0);
+                SoundHandleByName->Play(false);
             }
             BaseProcess* CurrentAIProcess = a2->pCurrentProcess;
-            CurrentAIProcess->SetupSpecialIdle(a2, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
+            CurrentAIProcess->SetupSpecialIdle(a2, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
             bConcussion_11DBE50 = 0;
         }
     }

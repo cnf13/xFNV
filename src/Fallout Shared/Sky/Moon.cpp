@@ -65,7 +65,7 @@ Moon::~Moon() {
 
 void Moon::Update(Sky* apSky, float afSecondsPassed) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_SKY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Moon.cpp", 292
+        MEM_CONTEXT_SKY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Moon.cpp", 292
     );
     SkyObject::Update(apSky, afSecondsPassed);
     if (fLastPosUpdate == 3.4028234663852886e+38) {
@@ -94,20 +94,20 @@ void Moon::Update(Sky* apSky, float afSecondsPassed) {
     if (eUpdateMoonTexture == Moon::US_INITIALIZE ||
         (eUpdateMoonTexture == Moon::US_WHEN_CULLED && (fvisMoon <= 0.0 && fvisShadow <= 0.0))) {
         SkyShaderProperty* pprop = static_cast<SkyShaderProperty*>(spMoonMesh.m_pObject->GetProperty(3));
-        NiPointer<NiTexture> spTex(static_cast<NiTexture*>(0));
-        BSShaderManager::GetTexture(strTextures[Moon::eCurrentPhase].pString, 1, spTex, 1, 0);
+        NiPointer<NiTexture> spTex(static_cast<NiTexture*>(nullptr));
+        BSShaderManager::GetTexture(strTextures[Moon::eCurrentPhase].pString, true, spTex, true, false);
         NiTexture* ptex = spTex.m_pObject;
         if (ptex) {
             pprop->SetTexture(static_cast<NiSourceTexture*>(ptex));
         }
-        spMoonMesh.m_pObject->SetDisplayObject(ptex != 0);
+        spMoonMesh.m_pObject->SetDisplayObject(ptex != nullptr);
         eUpdateMoonTexture = Moon::US_NOT_REQUIRED;
     }
     if (apSky->eMode == Sky::SM_FULL || apSky->eMode == Sky::SM_FAKEEXTERIOR) {
         NiMatrix3 matrixMoonZ;
         NiMatrix3 matrixMoonX;
         if (!spRoot.m_pObject->GetDisplayObject()) {
-            spRoot.m_pObject->SetAppCulled(1);
+            spRoot.m_pObject->SetAppCulled(true);
             return;
         }
         float v12 = -fPos * 0.01745329238474369;
@@ -116,11 +116,11 @@ void Moon::Update(Sky* apSky, float afSecondsPassed) {
         matrixMoonZ.MakeZRotation(v11);
         spRoot.m_pObject->SetRotate(matrixMoonX * matrixMoonZ);
         if (!(fvisMoon <= 0.0) || !(fvisShadow <= 0.0)) {
-            spRoot.m_pObject->SetAppCulled(0);
+            spRoot.m_pObject->SetAppCulled(false);
             if (!(fvisMoon <= 0.0) && spMoonMesh.m_pObject->GetDisplayObject()) {
                 SkyShaderProperty* pshadeProperty;
                 int32_t v10;
-                spMoonNode.m_pObject->SetAppCulled(0);
+                spMoonNode.m_pObject->SetAppCulled(false);
                 if (spMoonMesh.m_pObject->GetProperty(3)) {
                     NiProperty* Property = spMoonMesh.m_pObject->GetProperty(3);
                     v10 = static_cast<NiShadeProperty*>(Property)->iShaderPropertyType ==
@@ -133,19 +133,19 @@ void Moon::Update(Sky* apSky, float afSecondsPassed) {
                     pshadeProperty = static_cast<SkyShaderProperty*>(spMoonMesh.m_pObject->GetProperty(3));
                 }
                 else {
-                    pshadeProperty = 0;
+                    pshadeProperty = nullptr;
                 }
                 if (pshadeProperty) {
                     pshadeProperty->VertexColor.a = fvisMoon;
                 }
             }
             else {
-                spMoonNode.m_pObject->SetAppCulled(1);
+                spMoonNode.m_pObject->SetAppCulled(true);
             }
             if (!(fvisShadow <= 0.0) && spShadowMesh.m_pObject->GetDisplayObject()) {
                 SkyShaderProperty* pshadeProperty_2;
                 int32_t bIsSkyShader;
-                spShadowNode.m_pObject->SetAppCulled(0);
+                spShadowNode.m_pObject->SetAppCulled(false);
                 if (spShadowMesh.m_pObject->GetProperty(3)) {
                     NiProperty* v5 = spShadowMesh.m_pObject->GetProperty(3);
                     bIsSkyShader = static_cast<NiShadeProperty*>(v5)->iShaderPropertyType ==
@@ -158,7 +158,7 @@ void Moon::Update(Sky* apSky, float afSecondsPassed) {
                     pshadeProperty_2 = static_cast<SkyShaderProperty*>(spShadowMesh.m_pObject->GetProperty(3));
                 }
                 else {
-                    pshadeProperty_2 = 0;
+                    pshadeProperty_2 = nullptr;
                 }
                 if (pshadeProperty_2) {
                     NiColorA v14(
@@ -169,11 +169,11 @@ void Moon::Update(Sky* apSky, float afSecondsPassed) {
                 }
             }
             else {
-                spShadowNode.m_pObject->SetAppCulled(1);
+                spShadowNode.m_pObject->SetAppCulled(true);
             }
         }
         else {
-            spRoot.m_pObject->SetAppCulled(1);
+            spRoot.m_pObject->SetAppCulled(true);
         }
     }
 }
@@ -211,7 +211,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
     NiPoint3 dst;
     NiMatrix3 matrixMoon;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_SKY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Moon.cpp", 102
+        MEM_CONTEXT_SKY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Moon.cpp", 102
     );
     SkyObject::Initialize(apSkyRoot);
     void* ptr = ourMalloc(4 * sizeof(NiPoint3));
@@ -220,7 +220,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         pNormalsMoon = static_cast<NiPoint3*>(ptr);
     }
     else {
-        pNormalsMoon = 0;
+        pNormalsMoon = nullptr;
     }
     void* v119 = ourMalloc(4 * sizeof(NiPoint3));
     if (v119) {
@@ -228,7 +228,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         pVerticesMoon = static_cast<NiPoint3*>(v119);
     }
     else {
-        pVerticesMoon = 0;
+        pVerticesMoon = nullptr;
     }
     void* v117 = ourMalloc(4 * sizeof(NiPoint3));
     if (v117) {
@@ -236,7 +236,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         pNormalsShadow = static_cast<NiPoint3*>(v117);
     }
     else {
-        pNormalsShadow = 0;
+        pNormalsShadow = nullptr;
     }
     void* v115 = ourMalloc(4 * sizeof(NiPoint3));
     if (v115) {
@@ -244,7 +244,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         pVerticesShadow = static_cast<NiPoint3*>(v115);
     }
     else {
-        pVerticesShadow = 0;
+        pVerticesShadow = nullptr;
     }
     float a4 = static_cast<float>(iSize);
     float v82 = static_cast<double>(iSize) * -1.0;
@@ -278,7 +278,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         pTexturesMoon = static_cast<NiPoint2*>(v105);
     }
     else {
-        pTexturesMoon = 0;
+        pTexturesMoon = nullptr;
     }
     void* v103 = ourMalloc(4 * sizeof(NiPoint2));
     if (v103) {
@@ -286,7 +286,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         pTexturesShadow = static_cast<NiPoint2*>(v103);
     }
     else {
-        pTexturesShadow = 0;
+        pTexturesShadow = nullptr;
     }
     NiPoint2* v11 = ::new (&v102) NiPoint2(0.0f, 0.0f);
     float x = v11->x;
@@ -334,7 +334,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         pColorsMoon = v94;
     }
     else {
-        pColorsMoon = 0;
+        pColorsMoon = nullptr;
     }
     NiColorA* v93 = static_cast<NiColorA*>(ourMalloc(4 * sizeof(NiColorA)));
     if (v93) {
@@ -342,7 +342,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         pColorsShadow = v93;
     }
     else {
-        pColorsShadow = 0;
+        pColorsShadow = nullptr;
     }
     // Copies the colour into all eight entries.
     NiColorA defaultColor(1.0f, 0.0f, 0.0f, 1.0f);
@@ -376,10 +376,10 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         );
     }
     else {
-        v72 = 0;
+        v72 = nullptr;
     }
     spMoonMesh.operator=(v72);
-    spMoonMesh.m_pObject->SetSelectiveUpdate(1);
+    spMoonMesh.m_pObject->SetSelectiveUpdate(true);
     NiTriShape* v91 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
     if (v91) {
         NiTriShape_ = ::new (v91) NiTriShape(
@@ -388,25 +388,25 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         );
     }
     else {
-        NiTriShape_ = 0;
+        NiTriShape_ = nullptr;
     }
     spShadowMesh.operator=(NiTriShape_);
-    spShadowMesh.m_pObject->SetSelectiveUpdate(1);
+    spShadowMesh.m_pObject->SetSelectiveUpdate(true);
     NiAlphaProperty* v90 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
     if (v90) {
         NiAlphaProperty_ = ::new (v90) NiAlphaProperty;
     }
     else {
-        NiAlphaProperty_ = 0;
+        NiAlphaProperty_ = nullptr;
     }
     {
         NiPointer<NiAlphaProperty> spAlpha(NiAlphaProperty_);
         spAlpha.m_pObject->SetAlphaBlending(true);
         spAlpha.m_pObject->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
         spAlpha.m_pObject->SetDestBlendMode(NiAlphaProperty::ALPHA_ONE);
-        spAlpha.m_pObject->SetNoSorter(1);
+        spAlpha.m_pObject->SetNoSorter(true);
         spMoonMesh.m_pObject->AttachProperty(spAlpha.m_pObject);
-        spAlpha.operator=(static_cast<NiAlphaProperty*>(0));
+        spAlpha.operator=(static_cast<NiAlphaProperty*>(nullptr));
     }
     BSShaderData bsshaderdata;
     bsshaderdata.eLightingShader = BSShaderData::LS_SKY;
@@ -417,13 +417,13 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
     Sky* Instance = Sky::GetInstance();
     if (Instance->eMode == Sky::SM_FULL || (v57 = Sky::GetInstance(), v57->eMode == Sky::SM_FAKEEXTERIOR)) {
         SkyShaderProperty* pprop = static_cast<SkyShaderProperty*>(spShadowMesh.m_pObject->GetProperty(3));
-        NiPointer<NiTexture> spTex(static_cast<NiTexture*>(0));
-        BSShaderManager::GetTexture("Textures\\Sky\\MoonShadow.dds", 1, spTex, 1, 0);
+        NiPointer<NiTexture> spTex(static_cast<NiTexture*>(nullptr));
+        BSShaderManager::GetTexture("Textures\\Sky\\MoonShadow.dds", true, spTex, true, false);
         NiTexture* ptex = spTex.m_pObject;
         if (ptex) {
             pprop->SetTexture(static_cast<NiSourceTexture*>(ptex));
         }
-        spShadowMesh.m_pObject->SetDisplayObject(ptex != 0);
+        spShadowMesh.m_pObject->SetDisplayObject(ptex != nullptr);
         eUpdateMoonTexture = Moon::US_INITIALIZE;
     }
     NiNode* v89 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
@@ -431,7 +431,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         v69 = ::new (v89) NiNode(0);
     }
     else {
-        v69 = 0;
+        v69 = nullptr;
     }
     spMoonNode.operator=(v69);
     NiNode* v88 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
@@ -439,11 +439,11 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         v68 = ::new (v88) NiNode(0);
     }
     else {
-        v68 = 0;
+        v68 = nullptr;
     }
     spShadowNode.operator=(v68);
-    spMoonNode.m_pObject->SetSelectiveUpdate(1);
-    spShadowNode.m_pObject->SetSelectiveUpdate(1);
+    spMoonNode.m_pObject->SetSelectiveUpdate(true);
+    spShadowNode.m_pObject->SetSelectiveUpdate(true);
     NiNode* v67 = spMoonNode.m_pObject;
     v67->AttachChild(spMoonMesh.m_pObject, 1);
     NiNode* v66 = spShadowNode.m_pObject;
@@ -495,11 +495,11 @@ float Moon::GetMoonVisibility() const {
             }
         }
         else {
-            return (float)((v5 - fPos) / (v5 - v4));
+            return ((v5 - fPos) / (v5 - v4));
         }
     }
     else {
-        return (float)((fPos - fAngleFadeEnd) / (fAngleFadeStart - fAngleFadeEnd));
+        return ((fPos - fAngleFadeEnd) / (fAngleFadeStart - fAngleFadeEnd));
     }
 }
 
@@ -522,11 +522,11 @@ float Moon::GetMoonShadowVisibility() const {
             }
         }
         else {
-            return (float)((v7 - fPos) / (v7 - v5));
+            return ((v7 - fPos) / (v7 - v5));
         }
     }
     else {
-        return (float)((fPos - v6) / (fAngleFadeEnd - v6));
+        return ((fPos - v6) / (fAngleFadeEnd - v6));
     }
 }
 

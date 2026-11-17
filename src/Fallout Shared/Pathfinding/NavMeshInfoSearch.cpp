@@ -19,7 +19,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NavMeshInfoSearch::NavMeshInfoSearch() : pStartMesh(nullptr), pGoalMesh(nullptr), pActorLockData(nullptr) {}
 
@@ -128,7 +128,7 @@ bool NavMeshInfoSearch::GetNodeConnections(
         isize = pparentInfo->ConnectedDoors.iSize;
         for (uint32_t i_3 = 0;; ++i_3) {
             if (i_3 >= isize) {
-                return 1;
+                return true;
             }
             TESObjectREFR* pdoor = pparentInfo->ConnectedDoors.GetAt(static_cast<int32_t>(i_3));
             if (pdoor && !pdoor->GetDisabled()) {
@@ -211,7 +211,7 @@ bool NavMeshInfoSearch::GetNodeConnections(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool NavMeshInfoSearch::IsGoalNode(const AStarNode<const NavMeshInfo*, TESObjectREFR*>* apNode) {
@@ -234,11 +234,11 @@ bool NavMeshInfoSearch::Pathfind(
     pGoalMesh = apGoalMesh;
     pActorLockData = apActorLockData;
     DoorLockDisposition = aeDoorLockDisposition;
-    bSameSpace = 0;
+    bSameSpace = false;
     if (apStartMesh->GetWorldSpace()) {
         TESWorldSpace* WorldSpace = apStartMesh->GetWorldSpace();
         if (WorldSpace == apGoalMesh->GetWorldSpace()) {
-            bSameSpace = 1;
+            bSameSpace = true;
         }
     }
     float fstartheuristic = 3.4028235e+38f;
@@ -251,7 +251,7 @@ bool NavMeshInfoSearch::Pathfind(
     // The search keys a NavMeshInfo's node by the info's address. The key is pointer-sized (AStarNode::iKey), as
     // GetNodeConnections passes it.
     AddStartNode(reinterpret_cast<uintptr_t>(apStartMesh), apStartMesh, fstartheuristic);
-    return Search(apReturnNodes, apReturnLinks, 1);
+    return Search(apReturnNodes, apReturnLinks, true);
 }
 
 void NavMeshInfoSearch::operator delete(void* apMemory) {

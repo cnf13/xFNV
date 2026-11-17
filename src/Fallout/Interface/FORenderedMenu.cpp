@@ -87,10 +87,11 @@ SettingT<INISettingCollection>
 FORenderedMenu::FORenderedMenu()
   : spScreenTriShape(nullptr), spScreenParent(nullptr), spPartialScreenGeometry(nullptr), spDefaultTex(nullptr),
     spMenuRoot(nullptr), pMenuTile(nullptr), spLight(nullptr), pLightShadowSceneNode(nullptr), spCamera(nullptr),
-    bInitialized(0), bScaledTexCoords(0), bUsePartialScreenGeometry(0), ScreenLightColor(0.0f, 0.0f, 0.0f),
-    bBurstActive(0), bVertHoldActive(0), bShudderActive(0), fPulseCurrentBrighten(0.0f), fPulseCurrentRadius(0.0f),
-    bPulseAffectsLight(0), bDistortActive(0), BackgroundColor(0.0f, 0.0f, 0.0f, 0.0f), bMenuOpen(0), bMenuRendering(0),
-    spScanlinesTexture(nullptr), TintColor(0.0f, 0.0f, 0.0f, 0.0f), spAccumulator(nullptr) {
+    bInitialized(false), bScaledTexCoords(false), bUsePartialScreenGeometry(false), ScreenLightColor(0.0f, 0.0f, 0.0f),
+    bBurstActive(false), bVertHoldActive(false), bShudderActive(false), fPulseCurrentBrighten(0.0f),
+    fPulseCurrentRadius(0.0f), bPulseAffectsLight(0), bDistortActive(false), BackgroundColor(0.0f, 0.0f, 0.0f, 0.0f),
+    bMenuOpen(false), bMenuRendering(0), spScanlinesTexture(nullptr), TintColor(0.0f, 0.0f, 0.0f, 0.0f),
+    spAccumulator(nullptr) {
     double fTime = static_cast<double>(appTimer.iLastTime);
     fNextDistortTime = static_cast<double>(rt::rand() % gs_iDistortMaxInterval_InterfaceFX.Int()) + fTime;
     fDistortDuration = gs_fDistortDuration_InterfaceFX.Float();
@@ -114,7 +115,7 @@ void FORenderedMenu::Draw(
             NiRenderer* pr = NiRenderer::GetRenderer();
             InterfaceManager* pim = InterfaceManager::Instance();
             if (pim->IsDebugTextVisible()) {
-                pim->GetDebugTextRoot()->SetAppCulled(1);
+                pim->GetDebugTextRoot()->SetAppCulled(true);
             }
             SceneGraph* pscene_graph = pim->GetSceneGraph();
             BSCullingProcess* pculler = pscene_graph->pCuller;
@@ -123,16 +124,16 @@ void FORenderedMenu::Draw(
             pr->GetBackgroundColor(prevcolor);
             pr->SetBackgroundColor(BackgroundColor);
             NiCamera* pcamera = pscene_graph->GetCamera();
-            NiPointer<BSRenderedTexture> sptempRenderTarget(static_cast<BSRenderedTexture*>(0));
+            NiPointer<BSRenderedTexture> sptempRenderTarget(static_cast<BSRenderedTexture*>(nullptr));
             if (apSwapTarget) {
                 sptempRenderTarget.operator=(apSwapTarget);
             }
             else {
                 NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
                 BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
-                sptempRenderTarget.operator=(
-                    TextureManager->BorrowRenderedTexture(Renderer_, BSTextureManager::TEX_INTERFACE_TEMP, 0, 0, 0)
-                );
+                sptempRenderTarget.operator=(TextureManager->BorrowRenderedTexture(
+                    Renderer_, BSTextureManager::TEX_INTERFACE_TEMP, 0, nullptr, 0
+                ));
             }
             if (BSRenderedTexture::QOutsideFrame()) {
                 NiRenderTargetGroup* Group = sptempRenderTarget.m_pObject->GetGroup();
@@ -143,7 +144,7 @@ void FORenderedMenu::Draw(
             }
             frust = pcamera->GetViewFrustum();
             oldfrust = frust;
-            frust.m_bOrtho = 1;
+            frust.m_bOrtho = true;
             frust.m_fLeft = 0.0f;
             frust.m_fRight = 1280.0f;
             frust.m_fTop = 960.0f;
@@ -153,40 +154,40 @@ void FORenderedMenu::Draw(
             pcamera->SetViewFrustum(frust);
             pr->SetCameraData(pcamera);
             Tile* pcursor = (Tile*)pim->pCursor;
-            bool bcullcursor = 0;
+            bool bcullcursor = false;
             if (pcursor) {
                 bcullcursor = pcursor->GetModel()->GetAppCulled();
-                pcursor->GetModel()->SetAppCulled(1);
+                pcursor->GetModel()->SetAppCulled(true);
             }
             NiAVObject* pconsoleRoot = (NiAVObject*)Interface::GetDebugTextRoot();
             if (pconsoleRoot) {
                 bconsoleCulled = pconsoleRoot->GetAppCulled();
             }
             else {
-                bconsoleCulled = 0;
+                bconsoleCulled = false;
             }
             if (pconsoleRoot) {
-                pconsoleRoot->SetAppCulled(1);
+                pconsoleRoot->SetAppCulled(true);
             }
             Tile* pHUD = (Tile*)HUDMainMenu::pme->pMenu;
             Tile* MenuTile = pHUD->GetMenuTile();
             bool bHUDCulled = MenuTile->GetModel()->GetAppCulled();
             Tile* v8 = pHUD->GetMenuTile();
-            v8->GetModel()->SetAppCulled(1);
+            v8->GetModel()->SetAppCulled(true);
             if (this != Interface::GetPipboy()) {
-                static_cast<NiAVObject*>(spMenuRoot.m_pObject)->NiAVObject::SetAppCulled(0);
+                static_cast<NiAVObject*>(spMenuRoot.m_pObject)->NiAVObject::SetAppCulled(false);
             }
             HideMessageQuantityTutorialMenus();
             pculler->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
             NiAVObject* fB = static_cast<NiAVObject*>(spMenuRoot.m_pObject);
             BSShaderUtil::AccumulateScene(pscene_graph->GetCamera(), fB, *pculler);
             BSShaderAccumulator* fBa = static_cast<BSShaderAccumulator*>(spAccumulator.m_pObject);
-            BSShaderUtil::RenderScene(pscene_graph->GetCamera(), fBa, 0);
+            BSShaderUtil::RenderScene(pscene_graph->GetCamera(), fBa, false);
             pculler->PopCullMode();
             UnhideMessageQuantityTutorialMenus();
-            pculler->SetAccumulator(0);
+            pculler->SetAccumulator(nullptr);
             if (this != Interface::GetPipboy()) {
-                static_cast<NiAVObject*>(spMenuRoot.m_pObject)->NiAVObject::SetAppCulled(1);
+                static_cast<NiAVObject*>(spMenuRoot.m_pObject)->NiAVObject::SetAppCulled(true);
             }
             Tile* v9 = pHUD->GetMenuTile();
             v9->GetModel()->SetAppCulled(bHUDCulled);
@@ -207,11 +208,11 @@ void FORenderedMenu::Draw(
             pcamera->SetViewFrustum(oldfrust);
             if (bUsePartialScreenGeometry) {
                 ImageSpaceManager* ImageSpaceManager_ = BSShaderManager::GetImageSpaceManager();
-                ImageSpaceManager_->EnablePartialRender(0, 0);
+                ImageSpaceManager_->EnablePartialRender(false, nullptr);
             }
             PostDraw();
             if (pim->IsDebugTextVisible()) {
-                pim->GetDebugTextRoot()->SetAppCulled(0);
+                pim->GetDebugTextRoot()->SetAppCulled(false);
             }
         }
     }
@@ -223,7 +224,7 @@ bool FORenderedMenu::OnIdle() {
     InterfaceManager* v1 = InterfaceManager::Instance();
     this->bMenuOpen = v1->IsInRenderedMenu();
     if (!this->bMenuOpen && !bMenuOpen) {
-        return 0;
+        return false;
     }
     UpdateLight(Time);
     if (bBurstActive) {
@@ -244,7 +245,7 @@ bool FORenderedMenu::OnIdle() {
             SetScanlineVisible();
         }
     }
-    return 1;
+    return true;
 }
 
 bool FORenderedMenu::Pick(bool abPressed, float* apX, float* apY) {
@@ -252,10 +253,10 @@ bool FORenderedMenu::Pick(bool abPressed, float* apX, float* apY) {
     NiPoint3 a1;
     NiCamera* Camera;
     char v22 = 0;
-    static_cast<NiAVObject*>(spMenuRoot.m_pObject)->NiAVObject::SetAppCulled(0);
+    static_cast<NiAVObject*>(spMenuRoot.m_pObject)->NiAVObject::SetAppCulled(false);
     InterfaceManager* v23 = InterfaceManager::Instance();
     if (!spScreenTriShape.m_pObject) {
-        return 0;
+        return false;
     }
     NiPick kPick(0, 8u);
     if (GetCamera()) {
@@ -264,14 +265,14 @@ bool FORenderedMenu::Pick(bool abPressed, float* apX, float* apY) {
     else {
         Camera = Main::GetWorldSceneGraph()->GetCamera();
     }
-    kPick.SetObserveAppCullFlag(1);
+    kPick.SetObserveAppCullFlag(true);
     kPick.SetTarget(spScreenTriShape.m_pObject);
     kPick.m_eSortType = NiPick::SORT;
-    kPick.SetIsReturnTexture(1);
+    kPick.SetIsReturnTexture(true);
     int32_t ScriptProcessingDelay = static_cast<int32_t>(v23->sRealCursorPos.z);
     double DataClipDist = v23->sRealCursorPos.x;
-    Camera->WindowPointToRay(static_cast<int32_t>(DataClipDist), ScriptProcessingDelay, a1, a2, 0);
-    if (kPick.PickObjects(a1, a2, 0)) {
+    Camera->WindowPointToRay(static_cast<int32_t>(DataClipDist), ScriptProcessingDelay, a1, a2, nullptr);
+    if (kPick.PickObjects(a1, a2, false)) {
         NiPick::Record* pPickResult = (&kPick.m_pickResults)->GetAt(0);
         if (pPickResult) {
             if (pPickResult->GetAVObject() == spScreenTriShape.m_pObject) {
@@ -305,13 +306,13 @@ void FORenderedMenu::Initialize() {
         v2 = ::new (apMemory) BSShaderAccumulator(100, 1u, 759u);
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     spAccumulator.operator=(static_cast<NiRefObject*>(v2));
     static_cast<BSShaderAccumulator*>(spAccumulator.m_pObject)
         ->BSShaderAccumulator::SetRenderMode(BSShaderManager::BSSM_RENDER_INTERFACE);
-    NiPointer<NiTexture> spDefaultTex(static_cast<NiTexture*>(0));
-    BSShaderManager::GetTexture("Data\\Textures\\Pipboy3000\\screen.dds", 1, spDefaultTex, 1, 0);
+    NiPointer<NiTexture> spDefaultTex(static_cast<NiTexture*>(nullptr));
+    BSShaderManager::GetTexture("Data\\Textures\\Pipboy3000\\screen.dds", true, spDefaultTex, true, false);
     NiTexture* pdefaultTex = spDefaultTex.m_pObject;
     if (!pdefaultTex) {
         Warning("MENUS: Default renderedmenu texture NOT FOUND.  Rendered menu may not work.");
@@ -320,8 +321,8 @@ void FORenderedMenu::Initialize() {
     fBlurRadius = fDefaultBlurRadius.Float();
     fBlurIntensity = fDefaultBlurIntensity.Float();
     const char* v1 = gs_sScanlineTexture_InterfaceFX.String();
-    BSShaderManager::GetTexture(v1, 1, spScanlinesTexture, 0, 0);
-    bInitialized = 1;
+    BSShaderManager::GetTexture(v1, true, spScanlinesTexture, false, false);
+    bInitialized = true;
 }
 
 void FORenderedMenu::Shutdown() {
@@ -346,7 +347,7 @@ void FORenderedMenu::OnMenuOpen() {
     MenusRoot->UpdateClipwindows();
     if (spLight.operator->()) {
         NiAVObject* v4 = static_cast<NiAVObject*>(spLight.operator->());
-        v4->SetAppCulled(0);
+        v4->SetAppCulled(false);
     }
     bMenuRendering = 1;
 }
@@ -354,11 +355,11 @@ void FORenderedMenu::OnMenuOpen() {
 void FORenderedMenu::OnMenuClose() {
     NiRefObject* v1;
     bMenuRendering = (uint8_t)0;
-    bBurstActive = (bool)0;
-    bVertHoldActive = (bool)0;
+    bBurstActive = false;
+    bVertHoldActive = false;
     if ((&spLight)->operator->()) {
         v1 = (&spLight)->operator->();
-        static_cast<NiAVObject*>(v1)->SetAppCulled(1);
+        static_cast<NiAVObject*>(v1)->SetAppCulled(true);
     }
     SetScreenTexture(nullptr);
 }
@@ -368,23 +369,23 @@ void FORenderedMenu::UpdateBurst(float afTime) {
     float v3 = afTime - fBurstStartTime;
     if (!(fBurstDuration < ((double)v3))) {
         v2 = (float)(1.0 - (v3 / fBurstDuration));
-        fBurstCurrentIntensity = (float)(fBurstMaximumIntensity * v2);
+        fBurstCurrentIntensity = (fBurstMaximumIntensity * v2);
     }
     else {
-        bBurstActive = (bool)0;
+        bBurstActive = false;
     }
 }
 
 void FORenderedMenu::UpdateVertHold(float afTime) {
     float v2 = afTime - fVertHoldStartTime;
     if (!(fVertHoldDuration < ((double)v2))) {
-        fVertHoldCurrentPosition = (float)(v2 * fVertHoldSpeed);
+        fVertHoldCurrentPosition = (v2 * fVertHoldSpeed);
         if ((fVertHoldCurrentPosition >= 1.0) || (fVertHoldCurrentPosition < 0.0)) {
-            fVertHoldCurrentPosition = (float)(fVertHoldCurrentPosition - FloatFloor(fVertHoldCurrentPosition));
+            fVertHoldCurrentPosition = (fVertHoldCurrentPosition - FloatFloor(fVertHoldCurrentPosition));
         }
     }
     else {
-        bVertHoldActive = (bool)0;
+        bVertHoldActive = false;
         static_cast<FOPipboyManager*>(this)->SetShudderHoldParams(250.0f, 0.05000000074505806f, 0.05000000074505806f);
     }
 }
@@ -396,19 +397,19 @@ void FORenderedMenu::UpdateShudder(float afTime) {
     if (!(fShudderDuration < ((double)v4))) {
         v3 = (float)(1.0 - (v4 / fShudderDuration));
         v2 = v4 * fShudderFrequency;
-        fShudderCurrentPosition = (float)((std::sinf(v2) * fShudderIntensity) * v3);
+        fShudderCurrentPosition = ((std::sinf(v2) * fShudderIntensity) * v3);
     }
     else {
-        bShudderActive = (bool)0;
+        bShudderActive = false;
     }
 }
 
 void FORenderedMenu::UpdatePulse(float afTime) {
-    float a1 = afTime * ((&gs_fPulseRate_InterfaceFX)->Float());
+    float a1 = afTime * (&gs_fPulseRate_InterfaceFX)->Float();
     double v2 = (double)BSNoise1D::Noise(a1);
     float v5 = (float)(v2 + v2);
-    fPulseCurrentBrighten = (float)(v5 * ((&::fPulseBrightenIntensity)->Float()));
-    fPulseCurrentRadius = (float)(v5 * ((&::fPulseRadiusIntensity)->Float()));
+    fPulseCurrentBrighten = (v5 * (&::fPulseBrightenIntensity)->Float());
+    fPulseCurrentRadius = (v5 * (&::fPulseRadiusIntensity)->Float());
 }
 
 void FORenderedMenu::UpdateLight(float afTime) {
@@ -441,7 +442,7 @@ void FORenderedMenu::UpdateLight(float afTime) {
         }
         (ScreenLightColor * fScreenLightBaseIntensity).Add(&finalColor, &flightAdd);
         static_cast<NiLight*>(spLight.m_pObject)->NiLight::SetDiffuseColor(finalColor);
-        NiUpdateData UpdateData(0.0f, 0, 0);
+        NiUpdateData UpdateData(0.0f, false, false);
         static_cast<NiAVObject*>(spLight.m_pObject)->NiAVObject::Update(UpdateData);
     }
 }
@@ -450,7 +451,7 @@ void FORenderedMenu::UpdateDistort(float afTime) {
     float fdelta = afTime - fDistortStartTime;
     fDistortPosition = fdelta / fDistortDuration;
     if (fDistortPosition > gs_fDistortVerticalScale_InterfaceFX.Float() + 1.0) {
-        bDistortActive = 0;
+        bDistortActive = false;
         int32_t v2 = rt::rand();
         fNextDistortTime = static_cast<double>(v2 % gs_iDistortMaxInterval_InterfaceFX.Int()) + afTime;
     }
@@ -493,7 +494,7 @@ void FORenderedMenu::DoEffect(
         ImageSpaceEffectInterface::fDistortVerticalScale = gs_fDistortVerticalScale_InterfaceFX.Float();
         ImageSpaceEffectInterface::fDistortHorizontalScale = gs_fDistortHorizontalScale_InterfaceFX.Float();
         ImageSpaceEffectInterface::fDistortVerticalPosition = fDistortPosition;
-        ImageSpaceEffectInterface::bDistortEverywhere = 1;
+        ImageSpaceEffectInterface::bDistortEverywhere = true;
     }
     else {
         ImageSpaceEffectInterface::fDistortVerticalScale = 0.0f;
@@ -510,13 +511,13 @@ void FORenderedMenu::DoEffect(
     if (bUsePartialScreenGeometry) {
         NiScreenElements* v10 = spPartialScreenGeometry.m_pObject;
         ImageSpaceManager* v5 = BSShaderManager::GetImageSpaceManager();
-        v5->EnablePartialRender(1, v10);
+        v5->EnablePartialRender(true, v10);
     }
     ImageSpaceEffectInterface::eClearFlag = aeClearMode;
     NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
     ImageSpaceManager* v6 = BSShaderManager::GetImageSpaceManager();
-    v6->RenderEffect(ImageSpaceManager::EFFECT_INTERFACE, Renderer_, apSource, apDest, 0, 1);
-    ImageSpaceEffectInterface::spMaskTexture.operator=(static_cast<NiTexture*>(0));
+    v6->RenderEffect(ImageSpaceManager::EFFECT_INTERFACE, Renderer_, apSource, apDest, nullptr, 1);
+    ImageSpaceEffectInterface::spMaskTexture.operator=(static_cast<NiTexture*>(nullptr));
 }
 
 bool FORenderedMenu::GetInitialized() {
@@ -663,7 +664,7 @@ bool FORenderedMenu::CreateMenuLight(const char* apLightNodeName, ShadowSceneNod
     ShadowSceneNode* pSSnode;
     FNVD_INLINED_LOCAL(NiFixedString, strRenderedMenuLight, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    bool bsuccess = 0;
+    bool bsuccess = false;
     if (apShadowSceneNode) {
         pSSnode = apShadowSceneNode;
     }
@@ -676,7 +677,7 @@ bool FORenderedMenu::CreateMenuLight(const char* apLightNodeName, ShadowSceneNod
         NiFixedString* v10 = ::new (static_cast<void*>(&apString)) NiFixedString(apLightNodeName);
         NiAVObject* plightObject = pSceneRoot->GetObjectByName(*v10);
         apString.~NiFixedString();
-        NiNode* plightNode = 0;
+        NiNode* plightNode = nullptr;
         if (plightObject) {
             plightNode = plightObject->IsNode();
         }
@@ -687,23 +688,23 @@ bool FORenderedMenu::CreateMenuLight(const char* apLightNodeName, ShadowSceneNod
                 v9 = ::new (apMemory) NiPointLight;
             }
             else {
-                v9 = 0;
+                v9 = nullptr;
             }
             spLight.operator=(static_cast<NiRefObject*>(v9));
             NiPoint3 lightpos = plightNode->GetTranslate();
             static_cast<NiAVObject*>(spLight.m_pObject)->NiAVObject::SetTranslate(lightpos);
             NiLight* v4 = static_cast<NiLight*>(spLight.m_pObject);
-            pSSnode->AddLight(v4, 1);
+            pSSnode->AddLight(v4, true);
             pLightShadowSceneNode = pSSnode;
             NiNode* pPipBoyNode = plightNode->m_pkParent;
             pPipBoyNode->AttachChild(static_cast<NiAVObject*>(spLight.m_pObject), 1);
-            NiUpdateData foo(0.0f, 0, 0);
+            NiUpdateData foo(0.0f, false, false);
             spScreenTriShape.m_pObject->Update(foo);
-            static_cast<NiAVObject*>(spLight.m_pObject)->NiAVObject::SetAppCulled(1);
+            static_cast<NiAVObject*>(spLight.m_pObject)->NiAVObject::SetAppCulled(true);
             NiFixedString v15("RenderedMenuLight");
             NiFixedString* kName = &v15;
             static_cast<NiAVObject*>(spLight.m_pObject)->SetName(*kName);
-            return 1;
+            return true;
         }
         else {
             NiAVObject* pMenuNode = FORenderedMenu::GetParentNodeToRender();
@@ -716,7 +717,7 @@ bool FORenderedMenu::CreateMenuLight(const char* apLightNodeName, ShadowSceneNod
                     static_cast<NiRefObject*>(NiObject::DynamicCastStatic(&NiPointLight::ms_RTTI, plight))
                 );
                 if (spLight.m_pObject) {
-                    return 1;
+                    return true;
                 }
             }
             else {
@@ -736,8 +737,8 @@ NiPointLight* FORenderedMenu::GetMenuLight() {
 }
 
 void FORenderedMenu::SetScanlineVisible() {
-    bDistortActive = (bool)1;
-    fDistortStartTime = (float)((float)(&appTimer)->BSTimer::GetTime());
+    bDistortActive = true;
+    fDistortStartTime = ((float)(&appTimer)->BSTimer::GetTime());
     fDistortPosition = (float)0.0;
 }
 
@@ -750,15 +751,15 @@ void FORenderedMenu::UnhideMessageQuantityTutorialMenus() {
     TileMenu* v7 = static_cast<TileMenu*>(Menu::GetMenuByClass(1059));
     if (bHidMessage) {
         node = menuByClass->Tile::GetModel();
-        node->NiAVObject::SetAppCulled(0);
+        node->NiAVObject::SetAppCulled(false);
     }
     if (bHidQuantity) {
         v2 = v5->Tile::GetModel();
-        v2->NiAVObject::SetAppCulled(0);
+        v2->NiAVObject::SetAppCulled(false);
     }
     if (bHidTutorial) {
         v3 = v7->Tile::GetModel();
-        v3->NiAVObject::SetAppCulled(0);
+        v3->NiAVObject::SetAppCulled(false);
     }
 }
 
@@ -778,7 +779,7 @@ void FORenderedMenu::HideMessageQuantityTutorialMenus() {
         v9 = !Model_->GetAppCulled();
     }
     else {
-        v9 = 0;
+        v9 = false;
     }
     bHidMessage = v9;
     if (v11) {
@@ -786,7 +787,7 @@ void FORenderedMenu::HideMessageQuantityTutorialMenus() {
         v8 = !v2->GetAppCulled();
     }
     else {
-        v8 = 0;
+        v8 = false;
     }
     bHidQuantity = v8;
     if (v13) {
@@ -794,20 +795,20 @@ void FORenderedMenu::HideMessageQuantityTutorialMenus() {
         v7 = !v3->GetAppCulled();
     }
     else {
-        v7 = 0;
+        v7 = false;
     }
     bHidTutorial = v7;
     if (bHidMessage) {
         NiAVObject* v4 = MenuByClass->GetModel();
-        v4->SetAppCulled(1);
+        v4->SetAppCulled(true);
     }
     if (bHidQuantity) {
         NiAVObject* v5 = v11->GetModel();
-        v5->SetAppCulled(1);
+        v5->SetAppCulled(true);
     }
     if (bHidTutorial) {
         NiAVObject* v6 = v13->GetModel();
-        v6->SetAppCulled(1);
+        v6->SetAppCulled(true);
     }
 }
 
@@ -832,7 +833,7 @@ void FORenderedMenu::CreateLight() {
             SetScreenLightColor(kScreenColor);
             SetScreenLightBaseIntensity(1.0f);
             SetScreenLightFlickerIntensity(1.0f);
-            NiUpdateData a2(0.0f, 0, 0);
+            NiUpdateData a2(0.0f, false, false);
             MenuLight->Update(a2);
         }
     }

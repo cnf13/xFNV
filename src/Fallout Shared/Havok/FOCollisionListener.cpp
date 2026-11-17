@@ -45,7 +45,7 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 static SettingT<INISettingCollection> fMinSoundVel("fMinSoundVel:Audio", 10.0f);
@@ -190,35 +190,35 @@ void FOCollisionListener::DealObjectDamage() {
                     pcol = bhkCollisionObject::Getbhk(pbody);
                 }
                 else {
-                    pcol = 0;
+                    pcol = nullptr;
                 }
                 if (pcol) {
                     pav = pcol->m_pkSceneObject;
                 }
                 else {
-                    pav = 0;
+                    pav = nullptr;
                 }
                 if (pav) {
                     pref = TESObjectREFR::FindReferenceFor3D(pav);
                 }
                 else {
-                    pref = 0;
+                    pref = nullptr;
                 }
                 if (pref) {
                     pref->SetActorCause(pdata->spCause.m_pObject);
                     if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
                         float afDamage = pdata->fDamage;
                         TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
-                        Instance->QueueUpdateDestructibleObject(pref, afDamage, 0);
+                        Instance->QueueUpdateDestructibleObject(pref, afDamage, false);
                     }
                     else {
-                        pref->DamageObject(pdata->fDamage, 0);
+                        pref->DamageObject(pdata->fDamage, false);
                     }
                     if (pref->GetDestroyed()) {
                         if (pdata->spCause.m_pObject) {
                             PlayerCharacter* Actor_ = static_cast<PlayerCharacter*>(pdata->spCause.m_pObject->pActor);
                             if (Actor_ == pPlayer) {
-                                pPlayer->AddPlayerAction(PLAYER_ACTION_DESTROY_OBJECT, 8.0f, 0);
+                                pPlayer->AddPlayerAction(PLAYER_ACTION_DESTROY_OBJECT, 8.0f, nullptr);
                             }
                         }
                     }
@@ -243,7 +243,7 @@ void FOCollisionListener::ReportProjectileImpact(TESObjectREFR* apCollidingRef, 
 void FOCollisionListener::ClearDamageImpacts() {
     int32_t result;
     FOCollisionListener::ObjectDamageImpactData* v3;
-    while (1) {
+    while (true) {
         result = (int32_t)(&DamageImpacts)->IsEmpty();
         if (result) {
             break;
@@ -283,7 +283,7 @@ void FOCollisionListener::StoreObjectDamage(
                         pdata = ::new (apMemory) FOCollisionListener::ObjectDamageImpactData;
                     }
                     else {
-                        pdata = 0;
+                        pdata = nullptr;
                     }
                     FOCollisionListener::ObjectDamageImpactData* pdata_2 = pdata;
                     pdata->spBody.operator=(static_cast<bhkRigidBody*>(bhkEntity::Getbhk(apBodyA)));
@@ -293,7 +293,7 @@ void FOCollisionListener::StoreObjectDamage(
                         pdata_2->spCause.operator=(apObject);
                     }
                     else {
-                        pdata_2->spCause.operator=(static_cast<ActorCause*>(0));
+                        pdata_2->spCause.operator=(static_cast<ActorCause*>(nullptr));
                     }
                     DamageImpacts.AddHead(pdata_2);
                 }
@@ -317,7 +317,7 @@ void FOCollisionListener::StoreObjectDamage(
                         pdata_3 = ::new (v11) FOCollisionListener::ObjectDamageImpactData;
                     }
                     else {
-                        pdata_3 = 0;
+                        pdata_3 = nullptr;
                     }
                     FOCollisionListener::ObjectDamageImpactData* pdata_4 = pdata_3;
                     pdata_3->spBody.operator=(static_cast<bhkRigidBody*>(bhkEntity::Getbhk(apBodyB)));
@@ -327,7 +327,7 @@ void FOCollisionListener::StoreObjectDamage(
                         pdata_4->spCause.operator=(v6);
                     }
                     else {
-                        pdata_4->spCause.operator=(static_cast<ActorCause*>(0));
+                        pdata_4->spCause.operator=(static_cast<ActorCause*>(nullptr));
                     }
                     DamageImpacts.AddHead(pdata_4);
                 }

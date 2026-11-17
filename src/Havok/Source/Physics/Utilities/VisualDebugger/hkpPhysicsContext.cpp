@@ -202,7 +202,7 @@ void hkpPhysicsContext::addWorld(hkpWorld* newWorld) {
             v7 = static_cast<hkpWorldDeletionListener*>(this);
         }
         else {
-            v7 = 0;
+            v7 = nullptr;
         }
         newWorld->addWorldDeletionListener(v7);
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
@@ -298,7 +298,7 @@ void hkpPhysicsContext::removeWorld(hkpWorld* oldWorld) {
                 v6 = static_cast<hkpWorldDeletionListener*>(this);
             }
             else {
-                v6 = 0;
+                v6 = nullptr;
             }
             oldWorld->removeWorldDeletionListener(v6);
             for (int32_t j = 0; j < m_addListeners.m_size; ++j) {

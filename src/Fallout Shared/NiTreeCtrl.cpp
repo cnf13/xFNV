@@ -55,16 +55,16 @@ int32_t TreeCtrlCallback(NiObject* apObj, int32_t iMessage, uint32_t uiParam1, u
                 NiNode* v9 = static_cast<NiNode*>(apObj);
                 switch (uiParam1) {
                     case 112u: {
-                        v9->SetAppCulled(1);
+                        v9->SetAppCulled(true);
                         return 1;
                     }
                     case 113u: {
-                        v9->SetAppCulled(0);
+                        v9->SetAppCulled(false);
                         return 1;
                     }
                     case 114u: {
                         v9->UpdateProperties();
-                        NiUpdateData a2(0.0f, 0, 0);
+                        NiUpdateData a2(0.0f, false, false);
                         v9->Update(a2);
                         return 1;
                     }

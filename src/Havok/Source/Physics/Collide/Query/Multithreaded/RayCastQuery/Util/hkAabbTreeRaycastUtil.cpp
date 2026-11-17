@@ -64,12 +64,12 @@ void setCollector(hkCpuWorldRayCastCollector* a1, hkpWorldRayCastCommand* a2, co
     uint32_t m_filterInfo = a2->m_rayInput.m_filterInfo;
     a1->m_command = a2;
     a1->m_workInput.m_filterInfo = m_filterInfo;
-    const hkpCollisionFilter* v5 = a2->m_rayInput.m_enableShapeCollectionFilter.m_bool != 0 ? a3 : 0;
+    const hkpCollisionFilter* v5 = a2->m_rayInput.m_enableShapeCollectionFilter.m_bool != 0 ? a3 : nullptr;
     if (v5) {
         a1->m_workInput.m_rayShapeCollectionFilter = static_cast<const hkpRayShapeCollectionFilter*>(v5);
     }
     else {
-        a1->m_workInput.m_rayShapeCollectionFilter = 0;
+        a1->m_workInput.m_rayShapeCollectionFilter = nullptr;
     }
 }
 

@@ -41,13 +41,13 @@ NiObject* NiLookAtInterpolator::CreateClone(NiCloningProcess& kCloning) {
     NiLookAtInterpolator* v3 =
         static_cast<NiLookAtInterpolator*>(NiMemObject::operator new(sizeof(NiLookAtInterpolator)));
     if (v3) {
-        NiLookAtInterpolator* pkObject = ::new (v3) NiLookAtInterpolator(nullptr, NiLookAtInterpolator::X, 0);
+        NiLookAtInterpolator* pkObject = ::new (v3) NiLookAtInterpolator(nullptr, NiLookAtInterpolator::X, false);
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -499,9 +499,9 @@ NiObject* NiLookAtInterpolator::CreateObject() {
     NiLookAtInterpolator* v0 =
         static_cast<NiLookAtInterpolator*>(NiMemObject::operator new(sizeof(NiLookAtInterpolator)));
     if (v0) {
-        return ::new (v0) NiLookAtInterpolator(nullptr, NiLookAtInterpolator::X, 0);
+        return ::new (v0) NiLookAtInterpolator(nullptr, NiLookAtInterpolator::X, false);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

@@ -20,7 +20,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // After AddRenderNormalsPass_1x the game stores 6 to absolute address 6 (the hint of a null pass), which faults; this
 // code deliberately leaves that store out. abUpdateList is passed on to every pass helper as this function's own
@@ -92,8 +92,8 @@ void BSShaderPPLightingProperty::GetRenderPasses_1x(NiGeometry* apGeom, int32_t 
 			AddRenderNormalsClearPass_1x(apGeom, asCount, abUpdateList, bfirst, bskinned);
 		ppass->eAccumulationHint = BSSP_HINT_GROUP_1STPERSONNOREFRACT;
 	}
-	uint16_t inumlights = static_cast<uint16_t>(GetNumberofActiveNonShadowLights());
-	void* pLightIter;
+    uint16_t inumlights = GetNumberofActiveNonShadowLights();
+    void* pLightIter;
 	ShadowSceneLight* plight;
 	if (!bdrawHideSecret)
 		goto ExplicitPasses;
@@ -299,20 +299,20 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddZOnlyPass_1x(NiGeom
 	const bool abUpdateList = static_cast<uint8_t>(aiUpdateList) == 1;
 	if (abSkinned) {
 		if (abUpdateList) {
-			pRenderPassList->Add(apGeom, 3u, abFirst, 0, 0, 0, 0, 0);
-			abFirst = 0;
-			return 0;
-		}
+            pRenderPassList->Add(apGeom, 3u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+            abFirst = false;
+            return nullptr;
+        }
 	} else {
 		if (abUpdateList) {
-			pRenderPassList->Add(apGeom, abAlphaTest + 1, abFirst, 0, 0, 0, 0, 0);
-			abFirst = 0;
-			return 0;
-		}
+            pRenderPassList->Add(apGeom, abAlphaTest + 1, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+            abFirst = false;
+            return nullptr;
+        }
 	}
 	++asCount;
-	abFirst = 0;
-	return 0;
+    abFirst = false;
+    return nullptr;
 }
 
 // Each test compares the update flag's low byte with 1.
@@ -321,21 +321,21 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddZOnlyTextureEffectP
 	const bool abUpdateList = static_cast<uint8_t>(aiUpdateList) == 1;
 	if (abSkinned) {
 		if (abUpdateList) {
-			pRenderPassList->Add(apGeom, 5u, abFirst, 0, 0, 0, 0, 0);
-		} else {
+            pRenderPassList->Add(apGeom, 5u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+        } else {
 			++asCount;
 		}
-		abFirst = 0;
-		return 0;
-	} else {
+        abFirst = false;
+        return nullptr;
+    } else {
 		if (abUpdateList) {
-			pRenderPassList->Add(apGeom, 4u, abFirst, 0, 0, 0, 0, 0);
-		} else {
+            pRenderPassList->Add(apGeom, 4u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+        } else {
 			++asCount;
 		}
-		abFirst = 0;
-		return 0;
-	}
+        abFirst = false;
+        return nullptr;
+    }
 }
 
 // Compares the update flag's low byte with 1 at each test, and always queues the pass as a first pass with one light,
@@ -348,28 +348,28 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbientPass_1x(NiGe
 		if (abAlphaTest) {
 			if (abGlowMap) {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 0x5Fu, 1, 1u, apSunlight, 0, 0, 0);
-					abFirst = false;
+                    pRenderPassList->Add(apGeom, 0x5Fu, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                    abFirst = false;
 					return nullptr;
 				}
 			} else {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 0x5Eu, 1, 1u, apSunlight, 0, 0, 0);
-					abFirst = false;
+                    pRenderPassList->Add(apGeom, 0x5Eu, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                    abFirst = false;
 					return nullptr;
 				}
 			}
 		} else {
 			if (abGlowMap) {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 0x5Du, 1, 1u, apSunlight, 0, 0, 0);
-					abFirst = false;
+                    pRenderPassList->Add(apGeom, 0x5Du, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                    abFirst = false;
 					return nullptr;
 				}
 			} else {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 0x5Cu, 1, 1u, apSunlight, 0, 0, 0);
-					abFirst = false;
+                    pRenderPassList->Add(apGeom, 0x5Cu, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                    abFirst = false;
 					return nullptr;
 				}
 			}
@@ -378,35 +378,35 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbientPass_1x(NiGe
 		if (abAlphaTest) {
 			if (abGlowMap) {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 0x5Bu, 1, 1u, apSunlight, 0, 0, 0);
-					abFirst = false;
+                    pRenderPassList->Add(apGeom, 0x5Bu, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                    abFirst = false;
 					return nullptr;
 				}
 			} else {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 0x5Au, 1, 1u, apSunlight, 0, 0, 0);
-					abFirst = false;
+                    pRenderPassList->Add(apGeom, 0x5Au, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                    abFirst = false;
 					return nullptr;
 				}
 			}
 		} else {
 			if (abGlowMap) {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 0x59u, 1, 1u, apSunlight, 0, 0, 0);
-					abFirst = false;
+                    pRenderPassList->Add(apGeom, 0x59u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                    abFirst = false;
 					return nullptr;
 				}
 			} else {
 				if (abTreeBranch) {
 					if (abUpdateList) {
-						pRenderPassList->Add(apGeom, 0x60u, 1, 1u, apSunlight, 0, 0, 0);
-						abFirst = false;
+                        pRenderPassList->Add(apGeom, 0x60u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                        abFirst = false;
 						return nullptr;
 					}
 				} else {
 					if (abUpdateList) {
-						pRenderPassList->Add(apGeom, 0x58u, 1, 1u, apSunlight, 0, 0, 0);
-						abFirst = false;
+                        pRenderPassList->Add(apGeom, 0x58u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                        abFirst = false;
 						return nullptr;
 					}
 				}
@@ -431,38 +431,38 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexPass_1x(N
 						goto LABEL_147;
 					}
 					if (abUpdateList) {
-						pRenderPassList->Add(apGeom, 120u, 1, 1u, apSunlight, 0, 0, 0);
-						abFirst = 0;
-						return 0;
-					}
+                        pRenderPassList->Add(apGeom, 120u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                        abFirst = false;
+                        return nullptr;
+                    }
 				} else {
 					if (abFog) {
 						if (abVertexColors) {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 142u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 142u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						} else {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 141u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 141u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						}
 					} else {
 						if (abVertexColors) {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 117u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 117u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						} else {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 116u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 116u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						}
 					}
 				}
@@ -472,30 +472,30 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexPass_1x(N
 				if (abFog) {
 					if (abVertexColors) {
 						if (abUpdateList) {
-							pRenderPassList->Add(apGeom, 145u, 1, 1u, apSunlight, 0, 0, 0);
-							abFirst = 0;
-							return 0;
-						}
+                            pRenderPassList->Add(apGeom, 145u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                            abFirst = false;
+                            return nullptr;
+                        }
 					} else {
 						if (abUpdateList) {
-							pRenderPassList->Add(apGeom, 144u, 1, 1u, apSunlight, 0, 0, 0);
-							abFirst = 0;
-							return 0;
-						}
+                            pRenderPassList->Add(apGeom, 144u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                            abFirst = false;
+                            return nullptr;
+                        }
 					}
 				} else {
 					if (abVertexColors) {
 						if (abUpdateList) {
-							pRenderPassList->Add(apGeom, 119u, 1, 1u, apSunlight, 0, 0, 0);
-							abFirst = 0;
-							return 0;
-						}
+                            pRenderPassList->Add(apGeom, 119u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                            abFirst = false;
+                            return nullptr;
+                        }
 					} else {
 						if (abUpdateList) {
-							pRenderPassList->Add(apGeom, 118u, 1, 1u, apSunlight, 0, 0, 0);
-							abFirst = 0;
-							return 0;
-						}
+                            pRenderPassList->Add(apGeom, 118u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                            abFirst = false;
+                            return nullptr;
+                        }
 					}
 				}
 				goto LABEL_146;
@@ -503,19 +503,19 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexPass_1x(N
 			if (abFog) {
 				if (!abVertexColors) {
 					if (abUpdateList) {
-						pRenderPassList->Add(apGeom, 146u, 1, 1u, apSunlight, 0, 0, 0);
-						abFirst = 0;
-						return 0;
-					}
+                        pRenderPassList->Add(apGeom, 146u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                        abFirst = false;
+                        return nullptr;
+                    }
 					goto LABEL_146;
 				}
 			} else {
 				if (!abVertexColors) {
 					if (abUpdateList) {
-						pRenderPassList->Add(apGeom, 121u, 1, 1u, apSunlight, 0, 0, 0);
-						abFirst = 0;
-						return 0;
-					}
+                        pRenderPassList->Add(apGeom, 121u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                        abFirst = false;
+                        return nullptr;
+                    }
 					goto LABEL_146;
 				}
 			}
@@ -525,30 +525,30 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexPass_1x(N
 					if (abFog) {
 						if (abVertexColors) {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 140u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 140u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						} else {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 139u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 139u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						}
 					} else {
 						if (abVertexColors) {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 114u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 114u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						} else {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 113u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 113u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						}
 					}
 					goto LABEL_146;
@@ -558,30 +558,30 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexPass_1x(N
 					if (abFog) {
 						if (abVertexColors) {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 138u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 138u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						} else {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 137u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 137u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						}
 					} else {
 						if (abVertexColors) {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 112u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 112u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						} else {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 111u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 111u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						}
 					}
 					goto LABEL_146;
@@ -589,19 +589,19 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexPass_1x(N
 				if (abFog) {
 					if (!abVertexColors) {
 						if (abUpdateList) {
-							pRenderPassList->Add(apGeom, 143u, 1, 1u, apSunlight, 0, 0, 0);
-							abFirst = 0;
-							return 0;
-						}
+                            pRenderPassList->Add(apGeom, 143u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                            abFirst = false;
+                            return nullptr;
+                        }
 						goto LABEL_146;
 					}
 				} else {
 					if (!abVertexColors) {
 						if (abUpdateList) {
-							pRenderPassList->Add(apGeom, 115u, 1, 1u, apSunlight, 0, 0, 0);
-							abFirst = 0;
-							return 0;
-						}
+                            pRenderPassList->Add(apGeom, 115u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                            abFirst = false;
+                            return nullptr;
+                        }
 						goto LABEL_146;
 					}
 				}
@@ -615,38 +615,38 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexPass_1x(N
 						goto LABEL_147;
 					}
 					if (abUpdateList) {
-						pRenderPassList->Add(apGeom, 109u, 1, 1u, apSunlight, 0, 0, 0);
-						abFirst = 0;
-						return 0;
-					}
+                        pRenderPassList->Add(apGeom, 109u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                        abFirst = false;
+                        return nullptr;
+                    }
 				} else {
 					if (abFog) {
 						if (abVertexColors) {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 132u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 132u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						} else {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 131u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 131u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						}
 					} else {
 						if (abVertexColors) {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 106u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 106u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						} else {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 105u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 105u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						}
 					}
 				}
@@ -656,30 +656,30 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexPass_1x(N
 				if (abFog) {
 					if (abVertexColors) {
 						if (abUpdateList) {
-							pRenderPassList->Add(apGeom, 135u, 1, 1u, apSunlight, 0, 0, 0);
-							abFirst = 0;
-							return 0;
-						}
+                            pRenderPassList->Add(apGeom, 135u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                            abFirst = false;
+                            return nullptr;
+                        }
 					} else {
 						if (abUpdateList) {
-							pRenderPassList->Add(apGeom, 134u, 1, 1u, apSunlight, 0, 0, 0);
-							abFirst = 0;
-							return 0;
-						}
+                            pRenderPassList->Add(apGeom, 134u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                            abFirst = false;
+                            return nullptr;
+                        }
 					}
 				} else {
 					if (abVertexColors) {
 						if (abUpdateList) {
-							pRenderPassList->Add(apGeom, 108u, 1, 1u, apSunlight, 0, 0, 0);
-							abFirst = 0;
-							return 0;
-						}
+                            pRenderPassList->Add(apGeom, 108u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                            abFirst = false;
+                            return nullptr;
+                        }
 					} else {
 						if (abUpdateList) {
-							pRenderPassList->Add(apGeom, 107u, 1, 1u, apSunlight, 0, 0, 0);
-							abFirst = 0;
-							return 0;
-						}
+                            pRenderPassList->Add(apGeom, 107u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                            abFirst = false;
+                            return nullptr;
+                        }
 					}
 				}
 				goto LABEL_146;
@@ -687,20 +687,20 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexPass_1x(N
 			if (abFog) {
 				if (!abVertexColors) {
 					if (abUpdateList) {
-						pRenderPassList->Add(apGeom, 136u, 1, 1u, apSunlight, 0, 0, 0);
-						abFirst = 0;
-						return 0;
-					}
+                        pRenderPassList->Add(apGeom, 136u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                        abFirst = false;
+                        return nullptr;
+                    }
 				LABEL_146:;
 					++asCount;
 				}
 			} else {
 				if (!abVertexColors) {
 					if (abUpdateList) {
-						pRenderPassList->Add(apGeom, 110u, 1, 1u, apSunlight, 0, 0, 0);
-						abFirst = 0;
-						return 0;
-					}
+                        pRenderPassList->Add(apGeom, 110u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                        abFirst = false;
+                        return nullptr;
+                    }
 					goto LABEL_146;
 				}
 			}
@@ -710,30 +710,30 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexPass_1x(N
 					if (abFog) {
 						if (abVertexColors) {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 130u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 130u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						} else {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 129u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 129u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						}
 					} else {
 						if (abVertexColors) {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 103u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 103u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						} else {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 102u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 102u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						}
 					}
 					goto LABEL_146;
@@ -744,45 +744,45 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexPass_1x(N
 						if (abVertexColors) {
 							if (abTreeBranch) {
 								if (abUpdateList) {
-									pRenderPassList->Add(apGeom, 123u, 1, 1u, apSunlight, 0, 0, 0);
-									abFirst = 0;
-									return 0;
-								}
+                                    pRenderPassList->Add(apGeom, 123u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                    abFirst = false;
+                                    return nullptr;
+                                }
 							} else {
 								if (abUpdateList) {
-									pRenderPassList->Add(apGeom, 128u, 1, 1u, apSunlight, 0, 0, 0);
-									abFirst = 0;
-									return 0;
-								}
+                                    pRenderPassList->Add(apGeom, 128u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                    abFirst = false;
+                                    return nullptr;
+                                }
 							}
 						} else {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 127u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 127u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						}
 					} else {
 						if (abVertexColors) {
 							if (abTreeBranch) {
 								if (abUpdateList) {
-									pRenderPassList->Add(apGeom, 122u, 1, 1u, apSunlight, 0, 0, 0);
-									abFirst = 0;
-									return 0;
-								}
+                                    pRenderPassList->Add(apGeom, 122u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                    abFirst = false;
+                                    return nullptr;
+                                }
 							} else {
 								if (abUpdateList) {
-									pRenderPassList->Add(apGeom, 101u, 1, 1u, apSunlight, 0, 0, 0);
-									abFirst = 0;
-									return 0;
-								}
+                                    pRenderPassList->Add(apGeom, 101u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                    abFirst = false;
+                                    return nullptr;
+                                }
 							}
 						} else {
 							if (abUpdateList) {
-								pRenderPassList->Add(apGeom, 100u, 1, 1u, apSunlight, 0, 0, 0);
-								abFirst = 0;
-								return 0;
-							}
+                                pRenderPassList->Add(apGeom, 100u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                                abFirst = false;
+                                return nullptr;
+                            }
 						}
 					}
 					goto LABEL_146;
@@ -790,19 +790,19 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexPass_1x(N
 				if (abFog) {
 					if (!abVertexColors) {
 						if (abUpdateList) {
-							pRenderPassList->Add(apGeom, 133u, 1, 1u, apSunlight, 0, 0, 0);
-							abFirst = 0;
-							return 0;
-						}
+                            pRenderPassList->Add(apGeom, 133u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                            abFirst = false;
+                            return nullptr;
+                        }
 						goto LABEL_146;
 					}
 				} else {
 					if (!abVertexColors) {
 						if (abUpdateList) {
-							pRenderPassList->Add(apGeom, 104u, 1, 1u, apSunlight, 0, 0, 0);
-							abFirst = 0;
-							return 0;
-						}
+                            pRenderPassList->Add(apGeom, 104u, 1, 1u, apSunlight, nullptr, nullptr, nullptr);
+                            abFirst = false;
+                            return nullptr;
+                        }
 						goto LABEL_146;
 					}
 				}
@@ -810,8 +810,8 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddAmbDiffTexPass_1x(N
 		}
 	}
 LABEL_147:;
-	abFirst = 0;
-	return 0;
+    abFirst = false;
+    return nullptr;
 }
 
 // Each test compares the update flag's low byte with 1.
@@ -822,51 +822,51 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddDiffusePass_1x(NiGe
 	if (abSkinned) {
 		if (abPointLight) {
 			if (abUpdateList) {
-				pRenderPassList->Add(apGeom, 303u, abFirst, 1u, apLight, 0, 0, 0);
-				abFirst = 0;
-				return 0;
-			}
+                pRenderPassList->Add(apGeom, 303u, abFirst, 1u, apLight, nullptr, nullptr, nullptr);
+                abFirst = false;
+                return nullptr;
+            }
 		} else {
 			if (abUpdateList) {
-				pRenderPassList->Add(apGeom, 302u, abFirst, 1u, apLight, 0, 0, 0);
-				abFirst = 0;
-				return 0;
-			}
+                pRenderPassList->Add(apGeom, 302u, abFirst, 1u, apLight, nullptr, nullptr, nullptr);
+                abFirst = false;
+                return nullptr;
+            }
 		}
 	} else {
 		if (abPointLight) {
 			if (abTreeBranch) {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 305u, abFirst, 1u, apLight, 0, 0, 0);
-					abFirst = 0;
-					return 0;
-				}
+                    pRenderPassList->Add(apGeom, 305u, abFirst, 1u, apLight, nullptr, nullptr, nullptr);
+                    abFirst = false;
+                    return nullptr;
+                }
 			} else {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 301u, abFirst, 1u, apLight, 0, 0, 0);
-					abFirst = 0;
-					return 0;
-				}
+                    pRenderPassList->Add(apGeom, 301u, abFirst, 1u, apLight, nullptr, nullptr, nullptr);
+                    abFirst = false;
+                    return nullptr;
+                }
 			}
 		} else {
 			if (abTreeBranch) {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 304u, abFirst, 1u, apLight, 0, 0, 0);
-					abFirst = 0;
-					return 0;
-				}
+                    pRenderPassList->Add(apGeom, 304u, abFirst, 1u, apLight, nullptr, nullptr, nullptr);
+                    abFirst = false;
+                    return nullptr;
+                }
 			} else {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 300u, abFirst, 1u, apLight, 0, 0, 0);
-					abFirst = 0;
-					return 0;
-				}
+                    pRenderPassList->Add(apGeom, 300u, abFirst, 1u, apLight, nullptr, nullptr, nullptr);
+                    abFirst = false;
+                    return nullptr;
+                }
 			}
 		}
 	}
 	++asCount;
-	abFirst = 0;
-	return 0;
+    abFirst = false;
+    return nullptr;
 }
 
 BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddTexturePass_1x(NiGeometry* apGeom,
@@ -881,27 +881,27 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddTexturePass_1x(NiGe
 			if (abVertexColors) {
 				if (abHair) {
 					if (static_cast<uint8_t>(abUpdateList) == 1) {
-						pRenderPassList->Add(apGeom, 338, abFirst, 0, 0, 0, 0, 0);
-						goto LABEL_39;
+                        pRenderPassList->Add(apGeom, 338, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                        goto LABEL_39;
 					}
 				} else {
 					if (static_cast<uint8_t>(abUpdateList) == 1) {
-						pRenderPassList->Add(apGeom, 335, abFirst, 0, 0, 0, 0, 0);
-						goto LABEL_39;
+                        pRenderPassList->Add(apGeom, 335, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                        goto LABEL_39;
 					}
 				}
 			} else {
 				if (static_cast<uint8_t>(abUpdateList) == 1) {
-					pRenderPassList->Add(apGeom, 333, abFirst, 0, 0, 0, 0, 0);
-					goto LABEL_39;
+                    pRenderPassList->Add(apGeom, 333, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                    goto LABEL_39;
 				}
 			}
 			goto LABEL_28;
 		}
 		if (!abVertexColors) {
 			if (static_cast<uint8_t>(abUpdateList) == 1) {
-				pRenderPassList->Add(apGeom, 336, abFirst, 0, 0, 0, 0, 0);
-				goto LABEL_39;
+                pRenderPassList->Add(apGeom, 336, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                goto LABEL_39;
 			}
 			goto LABEL_28;
 		}
@@ -938,29 +938,29 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddTexturePass_1x(NiGe
 	}
 	if (abTreeBranch) {
 		if (static_cast<uint8_t>(abUpdateList) == 1) {
-			pRenderPassList->Add(apGeom, 337, abFirst, 0, 0, 0, 0, 0);
-			goto LABEL_39;
+            pRenderPassList->Add(apGeom, 337, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+            goto LABEL_39;
 		}
 		goto LABEL_28;
 	}
 	if (abVertexColors) {
 		if (abHair) {
 			if (static_cast<uint8_t>(abUpdateList) == 1) {
-				pRenderPassList->Add(apGeom, 332, abFirst, 0, 0, 0, 0, 0);
-				goto LABEL_39;
+                pRenderPassList->Add(apGeom, 332, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                goto LABEL_39;
 			}
 		} else {
 			if (static_cast<uint8_t>(abUpdateList) == 1) {
-				pRenderPassList->Add(apGeom, 334, abFirst, 0, 0, 0, 0, 0);
-				goto LABEL_39;
+                pRenderPassList->Add(apGeom, 334, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                goto LABEL_39;
 			}
 		}
 		goto LABEL_28;
 	}
 	if (abFacegenBlend) {
 		if (static_cast<uint8_t>(abUpdateList) == 1) {
-			pRenderPassList->Add(apGeom, 331, abFirst, 0, 0, 0, 0, 0);
-			goto LABEL_39;
+            pRenderPassList->Add(apGeom, 331, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+            goto LABEL_39;
 		}
 	LABEL_28:;
 		++asCount;
@@ -969,10 +969,10 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddTexturePass_1x(NiGe
 	if (static_cast<uint8_t>(abUpdateList) != 1) {
 		goto LABEL_28;
 	}
-	pRenderPassList->Add(apGeom, 330, abFirst, 0, 0, 0, 0, 0);
+    pRenderPassList->Add(apGeom, 330, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
 LABEL_39:;
-	abFirst = 0;
-	return 0;
+    abFirst = false;
+    return nullptr;
 }
 
 // Each test compares the update flag's low byte with 1.
@@ -983,35 +983,35 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddSpecularPass_1x(NiG
 	if (abSkinned) {
 		if (abPointLight) {
 			if (abUpdateList) {
-				pRenderPassList->Add(apGeom, 343u, abFirst, 1u, apLight, 0, 0, 0);
-				abFirst = 0;
-				return 0;
-			}
+                pRenderPassList->Add(apGeom, 343u, abFirst, 1u, apLight, nullptr, nullptr, nullptr);
+                abFirst = false;
+                return nullptr;
+            }
 		} else {
 			if (abUpdateList) {
-				pRenderPassList->Add(apGeom, 342u, abFirst, 1u, apLight, 0, 0, 0);
-				abFirst = 0;
-				return 0;
-			}
+                pRenderPassList->Add(apGeom, 342u, abFirst, 1u, apLight, nullptr, nullptr, nullptr);
+                abFirst = false;
+                return nullptr;
+            }
 		}
 	} else {
 		if (abPointLight) {
 			if (abUpdateList) {
-				pRenderPassList->Add(apGeom, 341u, abFirst, 1u, apLight, 0, 0, 0);
-				abFirst = 0;
-				return 0;
-			}
+                pRenderPassList->Add(apGeom, 341u, abFirst, 1u, apLight, nullptr, nullptr, nullptr);
+                abFirst = false;
+                return nullptr;
+            }
 		} else {
 			if (abUpdateList) {
-				pRenderPassList->Add(apGeom, 340u, abFirst, 1u, apLight, 0, 0, 0);
-				abFirst = 0;
-				return 0;
-			}
+                pRenderPassList->Add(apGeom, 340u, abFirst, 1u, apLight, nullptr, nullptr, nullptr);
+                abFirst = false;
+                return nullptr;
+            }
 		}
 	}
 	++asCount;
-	abFirst = 0;
-	return 0;
+    abFirst = false;
+    return nullptr;
 }
 
 // Each test compares the update flag's low byte with 1.
@@ -1021,35 +1021,35 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddEnvmapPass_1x(NiGeo
 	if (abSkinned) {
 		if (abVertexColors) {
 			if (abUpdateList) {
-				pRenderPassList->Add(apGeom, 583u, abFirst, 0, 0, 0, 0, 0);
-				abFirst = 0;
-				return 0;
-			}
+                pRenderPassList->Add(apGeom, 583u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                abFirst = false;
+                return nullptr;
+            }
 		} else {
 			if (abUpdateList) {
-				pRenderPassList->Add(apGeom, 582u, abFirst, 0, 0, 0, 0, 0);
-				abFirst = 0;
-				return 0;
-			}
+                pRenderPassList->Add(apGeom, 582u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                abFirst = false;
+                return nullptr;
+            }
 		}
 	} else {
 		if (abVertexColors) {
 			if (abUpdateList) {
-				pRenderPassList->Add(apGeom, 581u, abFirst, 0, 0, 0, 0, 0);
-				abFirst = 0;
-				return 0;
-			}
+                pRenderPassList->Add(apGeom, 581u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                abFirst = false;
+                return nullptr;
+            }
 		} else {
 			if (abUpdateList) {
-				pRenderPassList->Add(apGeom, 580u, abFirst, 0, 0, 0, 0, 0);
-				abFirst = 0;
-				return 0;
-			}
+                pRenderPassList->Add(apGeom, 580u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                abFirst = false;
+                return nullptr;
+            }
 		}
 	}
 	++asCount;
-	abFirst = 0;
-	return 0;
+    abFirst = false;
+    return nullptr;
 }
 
 // Each test compares the update flag's low byte with 1.
@@ -1058,44 +1058,44 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddFogPass_1x(NiGeomet
 	const bool abUpdateList = static_cast<uint8_t>(aiUpdateList) == 1;
 	if (abTreeBranch) {
 		if (abUpdateList) {
-			pRenderPassList->Add(apGeom, 598u, abFirst, 0, 0, 0, 0, 0);
-			abFirst = 0;
-			return 0;
-		}
+            pRenderPassList->Add(apGeom, 598u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+            abFirst = false;
+            return nullptr;
+        }
 	} else {
 		if (abSkinned) {
 			if (abAlphaBlend) {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 597u, abFirst, 0, 0, 0, 0, 0);
-					abFirst = 0;
-					return 0;
-				}
+                    pRenderPassList->Add(apGeom, 597u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                    abFirst = false;
+                    return nullptr;
+                }
 			} else {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 596u, abFirst, 0, 0, 0, 0, 0);
-					abFirst = 0;
-					return 0;
-				}
+                    pRenderPassList->Add(apGeom, 596u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                    abFirst = false;
+                    return nullptr;
+                }
 			}
 		} else {
 			if (abAlphaBlend) {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 595u, abFirst, 0, 0, 0, 0, 0);
-					abFirst = 0;
-					return 0;
-				}
+                    pRenderPassList->Add(apGeom, 595u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                    abFirst = false;
+                    return nullptr;
+                }
 			} else {
 				if (abUpdateList) {
-					pRenderPassList->Add(apGeom, 594u, abFirst, 0, 0, 0, 0, 0);
-					abFirst = 0;
-					return 0;
-				}
+                    pRenderPassList->Add(apGeom, 594u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                    abFirst = false;
+                    return nullptr;
+                }
 			}
 		}
 	}
 	++asCount;
-	abFirst = 0;
-	return 0;
+    abFirst = false;
+    return nullptr;
 }
 
 // The light iterators are locals, which GetFirstActiveNonShadowLight writes before any read.
@@ -1213,21 +1213,21 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddTextureEffectPass_1
 	const bool abUpdateList = static_cast<uint8_t>(aiUpdateList) == 1;
 	if (abSkinned) {
 		if (abUpdateList) {
-			pRenderPassList->Add(apGeom, 591u, abFirst, 0, 0, 0, 0, 0);
-		} else {
+            pRenderPassList->Add(apGeom, 591u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+        } else {
 			++asCount;
 		}
-		abFirst = 0;
-		return 0;
-	} else {
+        abFirst = false;
+        return nullptr;
+    } else {
 		if (abUpdateList) {
-			pRenderPassList->Add(apGeom, 590u, abFirst, 0, 0, 0, 0, 0);
-		} else {
+            pRenderPassList->Add(apGeom, 590u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+        } else {
 			++asCount;
 		}
-		abFirst = 0;
-		return 0;
-	}
+        abFirst = false;
+        return nullptr;
+    }
 }
 
 // Each test compares the update flag's low byte with 1.
@@ -1236,28 +1236,28 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddRenderNormalsPass_1
 	const bool abUpdateList = static_cast<uint8_t>(aiUpdateList) == 1;
 	if (abRefractionFire) {
 		if (abUpdateList) {
-			pRenderPassList->Add(apGeom, 484u, abFirst, 0, 0, 0, 0, 0);
-			abFirst = 0;
-			return 0;
-		}
+            pRenderPassList->Add(apGeom, 484u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+            abFirst = false;
+            return nullptr;
+        }
 	} else {
 		if (abSkinned) {
 			if (abUpdateList) {
-				pRenderPassList->Add(apGeom, 483u, abFirst, 0, 0, 0, 0, 0);
-				abFirst = 0;
-				return 0;
-			}
+                pRenderPassList->Add(apGeom, 483u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                abFirst = false;
+                return nullptr;
+            }
 		} else {
 			if (abUpdateList) {
-				pRenderPassList->Add(apGeom, 482u, abFirst, 0, 0, 0, 0, 0);
-				abFirst = 0;
-				return 0;
-			}
+                pRenderPassList->Add(apGeom, 482u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+                abFirst = false;
+                return nullptr;
+            }
 		}
 	}
 	++asCount;
-	abFirst = 0;
-	return 0;
+    abFirst = false;
+    return nullptr;
 }
 
 // Each test compares the update flag's low byte with 1.
@@ -1266,19 +1266,19 @@ BSShaderProperty::RenderPass* BSShaderPPLightingProperty::AddRenderNormalsClearP
 	const bool abUpdateList = static_cast<uint8_t>(aiUpdateList) == 1;
 	if (abSkinned) {
 		if (abUpdateList) {
-			pRenderPassList->Add(apGeom, 486u, abFirst, 0, 0, 0, 0, 0);
-		} else {
+            pRenderPassList->Add(apGeom, 486u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+        } else {
 			++asCount;
 		}
-		abFirst = 0;
-		return 0;
-	} else {
+        abFirst = false;
+        return nullptr;
+    } else {
 		if (abUpdateList) {
-			pRenderPassList->Add(apGeom, 485u, abFirst, 0, 0, 0, 0, 0);
-		} else {
+            pRenderPassList->Add(apGeom, 485u, abFirst, 0, nullptr, nullptr, nullptr, nullptr);
+        } else {
 			++asCount;
 		}
-		abFirst = 0;
-		return 0;
-	}
+        abFirst = false;
+        return nullptr;
+    }
 }

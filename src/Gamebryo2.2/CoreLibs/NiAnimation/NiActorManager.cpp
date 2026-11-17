@@ -32,12 +32,12 @@ void NiActorManager::_SDMInit() {
 void NiActorManager::_SDMShutdown() {
     const char* m_kHandle = NiActorManager::ms_kEndTextKey.GetHandle();
     if (NiActorManager::ms_kEndTextKey.GetHandle()) {
-        NiActorManager::ms_kEndTextKey.m_kHandle = NiGlobalStringTable::AddString(0);
+        NiActorManager::ms_kEndTextKey.m_kHandle = NiGlobalStringTable::AddString(nullptr);
         NiGlobalStringTable::ReleaseHandle(m_kHandle);
     }
     const char* v1 = NiActorManager::ms_kStartTextKey.GetHandle();
     if (NiActorManager::ms_kStartTextKey.GetHandle()) {
-        NiActorManager::ms_kStartTextKey.m_kHandle = NiGlobalStringTable::AddString(0);
+        NiActorManager::ms_kStartTextKey.m_kHandle = NiGlobalStringTable::AddString(nullptr);
         NiGlobalStringTable::ReleaseHandle(v1);
     }
 }

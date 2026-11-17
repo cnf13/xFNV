@@ -29,11 +29,11 @@ float NiSqrDistance::Compute(
     float fAbsNormalDotDir = __builtin_fabsf(fNormalDotDir);
     // EXE-INLINED 0x457990
     float fNormalSqrLength = kNormal.x * kNormal.x + kNormal.y * kNormal.y + kNormal.z * kNormal.z;
-    float fNormalLength = static_cast<float>(std::sqrt(fNormalSqrLength));
+    float fNormalLength = std::sqrt(fNormalSqrLength);
     // EXE-INLINED 0x457990
     float fDirSqrLength = kSeg.m_kDirection.x * kSeg.m_kDirection.x + kSeg.m_kDirection.y * kSeg.m_kDirection.y +
         kSeg.m_kDirection.z * kSeg.m_kDirection.z;
-    float fDirLength = static_cast<float>(std::sqrt(fDirSqrLength));
+    float fDirLength = std::sqrt(fDirSqrLength);
     float fParallelTolerance = fDirLength * fNormalLength * 9.999999747378752e-06;
 
     NiSegment kSegPgm;

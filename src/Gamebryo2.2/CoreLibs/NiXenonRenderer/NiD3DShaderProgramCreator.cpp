@@ -23,7 +23,7 @@ IDirect3DVertexShader9* NiD3DShaderProgramCreator::CreateVertexShader(
         return pkShader;
     }
     NiShaderFactory::ReportError(1u, 0, "Failed to create vertex shader\nError 0x%08x\n", v7);
-    return 0;
+    return nullptr;
 }
 
 IDirect3DPixelShader9* NiD3DShaderProgramCreator::CreatePixelShader(void* pvCode) {
@@ -35,7 +35,7 @@ IDirect3DPixelShader9* NiD3DShaderProgramCreator::CreatePixelShader(void* pvCode
         return pkShader;
     }
     NiShaderFactory::ReportError(1u, 0, "Failed to create pixel shader\nError 0x%08x\n", v2);
-    return 0;
+    return nullptr;
 }
 
 void NiD3DShaderProgramCreator::SetD3DRenderer(NiDX9Renderer* pkD3DRenderer) {

@@ -752,7 +752,7 @@ static int32_t queryAabb(
     hkAabbTreeQueryUtils<hkAabbTreeData::hkAabbTreeAabb, uint32_t>::Collector* a3
 ) {
     if (a1) {
-        return queryAabbInternal(a1, a2, a3, 0, 0, 0);
+        return queryAabbInternal(a1, a2, a3, nullptr, nullptr, 0);
     }
     return 0;
 }
@@ -1315,7 +1315,7 @@ static int32_t checkTriangle(hkGsk* apThis, const hkVector4* apPoint, hkVector4*
         __m128 v21 =
             _mm_mul_ps(_mm_sub_ps(apThis->m_verticesA[0u].m_quad, apThis->m_verticesBinA[0u].m_quad), v10.m_quad);
         __m128 v22 = _mm_shuffle_ps(v21, v21, 170);
-        v22[0] = v22[0] + static_cast<float>(_mm_shuffle_ps(v21, v21, 85)[0] + v21[0]);
+        v22[0] = v22[0] + (_mm_shuffle_ps(v21, v21, 85)[0] + v21[0]);
         if ((_mm_movemask_ps(v22) & 1) != 0) {
             // Flip the triangle: swap its first two vertices and their B copies (at 4 and 5), negate the normal and
             // swap the first two weights.
@@ -1976,9 +1976,9 @@ void hkgpMesh::TriangleShape::getSupportingVertex(const hkVector4& a1, hkVector4
     float v6 = _mm_shuffle_ps(v4, v4, 170)[0];
     __m128 v7 = _mm_mul_ps(m_triangle->m_vertices[1]->m_position.m_quad, a1.m_quad);
     float v8 = v6 + v5;
-    float v9 = _mm_shuffle_ps(v7, v7, 170)[0] + static_cast<float>(_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+    float v9 = _mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
     __m128 v10 = _mm_mul_ps(m_triangle->m_vertices[2]->m_position.m_quad, a1.m_quad);
-    float v12 = _mm_shuffle_ps(v10, v10, 170)[0] + static_cast<float>(_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
+    float v12 = _mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
     if (!(v9 < static_cast<double>(v8))) {
         v11 = 1;
         if (v12 < static_cast<double>(v9)) {
@@ -2111,7 +2111,7 @@ float hkgpMesh::CollideShapeTriangle::addLeaf(const hkAabbTree<hkAabbTreeData::h
     if (!(m_minDist > distance)) {
         return 1.0f;
     }
-    m_overlapping = 1;
+    m_overlapping = true;
     return 0.0f;
 }
 
@@ -2128,9 +2128,7 @@ float hkgpMesh::WeldingPolicy::addLeaf(const hkAabbTree<hkAabbTreeData::hkAabbTr
     __m128 v3 = _mm_mul_ps(v2, v2);
     double v4 = 1.0;
     if (m_weldingRadiusSquared >=
-        static_cast<double>(static_cast<float>(
-            _mm_shuffle_ps(v3, v3, 170)[0] + static_cast<float>(_mm_shuffle_ps(v3, v3, 85)[0] + v3[0])
-        ))) {
+        static_cast<double>((_mm_shuffle_ps(v3, v3, 170)[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0])))) {
         // The mesh's tree keeps each leaf's vertex in the leaf's user data.
         m_match = static_cast<hkgpMeshBase::Vertex*>(leaf->m_leafData.m_userData);
     }
@@ -2934,9 +2932,9 @@ void hkgpMesh::appendFromConvexHull(const hkgpConvexHull* hull) {
     hkGeometry indices;
     indices.m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
     indices.m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;
-    indices.m_vertices.m_data = 0;
+    indices.m_vertices.m_data = nullptr;
     indices.m_vertices.m_size = 0;
-    indices.m_triangles.m_data = 0;
+    indices.m_triangles.m_data = nullptr;
     indices.m_triangles.m_size = 0;
     hull->generateGeometry(hkgpConvexHull::SOURCE_VERTICES, indices);
     appendFromGeometry(indices, hkTransformIdentity, -1);
@@ -3163,7 +3161,7 @@ void hkgpMesh::generateConcaveEdges(float offset, hkArray<hkVector4>& edgesOut) 
                 hkArrayUtil::_reserveMore(kHeap, &vertices, sizeof(hkVector4));
             }
             vertices.m_data[vertices.m_size].m_quad = kSample.m_quad;
-            pVertex->m_tag = static_cast<int32_t>(vertices.m_size++);
+            pVertex->m_tag = (vertices.m_size++);
         }
         else {
             pVertex->m_tag = -1;
@@ -3314,7 +3312,7 @@ float hkgpMesh::projectPointOnSurface(
     int32_t v5 = iterations;
     float v15 = maxDistance * 0.5;
     v18.m_quad = hkVector4Zero.m_quad;
-    inside = 0;
+    inside = false;
     if (iterations <= 0) {
         return v14;
     }
@@ -3533,7 +3531,7 @@ void hkgpMesh::generateSurfaceSamples(const SurfaceSamplingConfig& config, hkArr
             if (0.0f == fLengthSq) {
                 continue;
             }
-            const float fLength = static_cast<float>(std::sqrt(fLengthSq));
+            const float fLength = std::sqrt(fLengthSq);
             const float fInvLength = 1.0f / fLength;
             kNormal.m_quad[0] = fInvLength * kNormal.m_quad[0];
             kNormal.m_quad[1] = fInvLength * kNormal.m_quad[1];
@@ -3677,7 +3675,7 @@ void hkgpMesh::invalidateConvexHull() {
     if (m_convexHull) {
         delete m_convexHull;
     }
-    this->m_convexHull = 0;
+    this->m_convexHull = nullptr;
 }
 
 bool hkgpMesh::rebuildConvexHull() {
@@ -3685,7 +3683,7 @@ bool hkgpMesh::rebuildConvexHull() {
     FNVD_INLINED_LOCAL(points_t, points, std::nullopt, std::nullopt);
     invalidateConvexHull();
     if (m_vertices.m_numUsed <= 3) {
-        return 1;
+        return true;
     }
     hkgpConvexHull::BuildConfig apMemory;
     apMemory.m_buildIndices.m_bool = 0;
@@ -3694,7 +3692,7 @@ bool hkgpMesh::rebuildConvexHull() {
     hkgpConvexHull* v3 = static_cast<hkgpConvexHull*>(Instance->m_heap->blockAlloc(sizeof(hkgpConvexHull)));
     v3->m_memSizeAndFlags = sizeof(hkgpConvexHull);
     this->m_convexHull = ::new (v3) hkgpConvexHull;
-    points.m_data = 0;
+    points.m_data = nullptr;
     points.m_size = 0;
     points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
     fetchPositions(points);
@@ -3705,19 +3703,19 @@ bool hkgpMesh::rebuildConvexHull() {
         if (points.m_capacityAndFlags >= 0) {
             m_heap->bufFree(points.begin(), sizeof(hkVector4) * points.m_capacityAndFlags);
         }
-        return 1;
+        return true;
     }
     hkgpConvexHull* m_convexHull = this->m_convexHull;
     if (m_convexHull) {
         delete m_convexHull;
     }
-    this->m_convexHull = 0;
+    this->m_convexHull = nullptr;
     hkMemoryAllocator* v5 = (&hkMemoryRouter::getInstance())->m_heap;
     points.m_size = 0;
     if (points.m_capacityAndFlags >= 0) {
         v5->bufFree(points.begin(), sizeof(hkVector4) * points.m_capacityAndFlags);
     }
-    return 0;
+    return false;
 }
 
 // A new mesh with copies of the vertices and triangles: each copied triangle's vertices are looked up in a map from old
@@ -4284,9 +4282,7 @@ int32_t hkgpMesh::setDistanceToPlane(const hkVector4& plane, int32_t data_index)
     char v4 = 0;
     for (i = 0; m_used; m_used = m_used->m_next) {
         __m128 v5 = _mm_mul_ps(m_used->m_position.m_quad, plane.m_quad);
-        float v8 = static_cast<float>(
-                       _mm_shuffle_ps(v5, v5, 170)[0] + static_cast<float>(_mm_shuffle_ps(v5, v5, 85)[0] + v5[0])
-                   ) +
+        float v8 = (_mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0])) +
             _mm_shuffle_ps(plane.m_quad, plane.m_quad, 255)[0];
         float v9 = v8 * v8;
         if (m_epsMinEdgeSqLength >= static_cast<double>(v9)) {
@@ -5157,10 +5153,10 @@ bool hkgpMesh::updatePlane(hkgpMeshBase::Triangle* triangle) {
             &triangle->m_vertices[0]->m_position.m_quad, &triangle->m_vertices[1]->m_position.m_quad,
             &triangle->m_vertices[2]->m_position.m_quad, &a4, 1
         )) {
-        return 0;
+        return false;
     }
     triangle->m_plane.m_quad = a4;
-    return 1;
+    return true;
 }
 
 // A link is a tagged pointer treated as an integer: the neighbour triangle's pointer with the neighbour edge's index in
@@ -5477,7 +5473,7 @@ void hkgpMesh::generateEmptySpaceSamples(
         if (fHalfDiagonalSq < fSquaredDistance) {
             if (!bSkip && ch.isPointInside(center, false, 0.0f)) {
                 hkVector4 sample = center;
-                const float fDistance = static_cast<float>(std::sqrt(fSquaredDistance));
+                const float fDistance = std::sqrt(fSquaredDistance);
                 sample.m_quad[3] = fDistance * scaling;
                 // EXE-INLINED none: hkArray<hkVector4>::pushBack
                 hkMemoryRouter& router = hkMemoryRouter::getInstance();
@@ -6043,7 +6039,7 @@ void hkgpMesh::simplify(const hkgpMesh::SimplifyConfig& config) {
                     continue;
                 }
                 const float fDelta = fAreaBefore - fAreaAfter;
-                const float fAbsDelta = static_cast<float>(std::fabs(fDelta));
+                const float fAbsDelta = std::fabs(fDelta);
                 if (!(config.m_minArea >= fAbsDelta)) {
                     continue;
                 }
@@ -6273,11 +6269,11 @@ hkVector4* hkgpMesh::getCenter(hkVector4* triangle) {
     int32_t v2 = std::bit_cast<int32_t>(hkVector4Zero.m_quad[1]);
     triangle->m_quad[0] = std::bit_cast<float>(static_cast<int32_t>(std::bit_cast<int32_t>(hkVector4Zero.m_quad[0])));
     int32_t v3 = std::bit_cast<int32_t>(hkVector4Zero.m_quad[2]);
-    triangle->m_quad[1] = std::bit_cast<float>(static_cast<int32_t>(v2));
+    triangle->m_quad[1] = std::bit_cast<float>(v2);
     int32_t v4 = std::bit_cast<int32_t>(hkVector4Zero.m_quad[3]);
-    triangle->m_quad[2] = std::bit_cast<float>(static_cast<int32_t>(v3));
+    triangle->m_quad[2] = std::bit_cast<float>(v3);
     int32_t m_numUsed = m_vertices.m_numUsed;
-    triangle->m_quad[3] = std::bit_cast<float>(static_cast<int32_t>(v4));
+    triangle->m_quad[3] = std::bit_cast<float>(v4);
     int32_t v12 = m_numUsed;
     if (m_numUsed <= 0) {
         hkgpConvexHull* m_convexHull = this->m_convexHull;
@@ -7037,9 +7033,9 @@ double hkgpMesh::evaluatePlanarSymmetry(__m128* a1, float a2) {
         __m128 v6 = _mm_mul_ps(*a1, m_quad);
         float v7 = _mm_shuffle_ps(v6, v6, 85)[0] + v6[0];
         __m128 v8 = _mm_shuffle_ps(v6, v6, 170);
-        v8[0] = static_cast<float>(v8[0] + v7) * -2.0f;
+        v8[0] = (v8[0] + v7) * -2.0f;
         point.m_quad = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v8, v8, 0), *a1), m_quad);
-        float v16 = std::sqrt((double)squaredDistanceToPoint(point, normal, 0));
+        float v16 = std::sqrt((double)squaredDistanceToPoint(point, normal, nullptr));
         v15 = v16 + v15;
         if (a2 <= static_cast<double>(v15)) {
             break;
@@ -7062,9 +7058,9 @@ double hkgpMesh::evaluatePlanarSymmetry(__m128* a1, float a2) {
         __m128 v12 = _mm_mul_ps(*a1, v11);
         float v13 = _mm_shuffle_ps(v12, v12, 85)[0] + v12[0];
         __m128 v14 = _mm_shuffle_ps(v12, v12, 170);
-        v14[0] = static_cast<float>(v14[0] + v13) * -2.0f;
+        v14[0] = (v14[0] + v13) * -2.0f;
         point.m_quad = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v14, v14, 0), *a1), v11);
-        float v17 = std::sqrt((double)squaredDistanceToPoint(point, normal, 0));
+        float v17 = std::sqrt((double)squaredDistanceToPoint(point, normal, nullptr));
         v15 = v17 + v15;
         result = v15;
         if (a2 <= static_cast<double>(v15)) {
@@ -8420,7 +8416,7 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(
         }
         // EXE-INLINED none: hkArray<hkgpMesh*>::~hkArray
         hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacityAndFlags = static_cast<int32_t>(newParts.m_capacityAndFlags);
+        const int32_t capacityAndFlags = newParts.m_capacityAndFlags;
         newParts.m_size = 0;
         if (capacityAndFlags >= 0) {
             heap.bufFree(
@@ -9391,7 +9387,7 @@ int32_t hkgpMesh::buildPlaneIndices(float minCosAngle, float minDistance, bool s
             }
             // The difference and its absolute value are rounded to float before the compare.
             const float difference = plane.m_quad[3] - pOther->m_plane.m_quad[3];
-            const float distance = static_cast<float>(std::fabs(difference));
+            const float distance = std::fabs(difference);
             if (!(minDistance >= distance)) {
                 continue;
             }
@@ -9404,7 +9400,7 @@ int32_t hkgpMesh::buildPlaneIndices(float minCosAngle, float minDistance, bool s
     {
         // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::~hkArray
         hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacityAndFlags = static_cast<int32_t>(stack.m_capacityAndFlags);
+        const int32_t capacityAndFlags = stack.m_capacityAndFlags;
         stack.m_size = 0;
         if (capacityAndFlags >= 0) {
             heap.bufFree(
@@ -9419,7 +9415,7 @@ int32_t hkgpMesh::buildPlaneIndices(float minCosAngle, float minDistance, bool s
     {
         // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::~hkArray
         hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacityAndFlags = static_cast<int32_t>(triangles.m_capacityAndFlags);
+        const int32_t capacityAndFlags = triangles.m_capacityAndFlags;
         triangles.m_size = 0;
         if (capacityAndFlags >= 0) {
             heap.bufFree(
@@ -9479,12 +9475,12 @@ void hkgpMesh::bindEdgeList(hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator
 bool hkgpMesh::isClosedManifold() const {
     hkgpMeshBase::Triangle* m_used = m_triangles.m_used;
     if (m_used) {
-        while (2) {
+        while (true) {
             int32_t v2 = 0;
             uintptr_t* m_links = m_used->m_links;
             do {
                 if ((*m_links & 0xFFFFFFFCu) == 0) {
-                    return 0;
+                    return false;
                 }
                 ++v2;
                 ++m_links;
@@ -9497,7 +9493,7 @@ bool hkgpMesh::isClosedManifold() const {
             break;
         }
     }
-    return 1;
+    return true;
 }
 
 // The edge e shared by its triangle and the opposite one becomes the quad's other diagonal; the four outer links are
@@ -9704,10 +9700,10 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
             // normal across n1, n3 n1 across n2; the rotation's rows are n1 (negated for part 1), n2 and n3.
             hkVector4 vMax = hkVector4Zero;
             hkVector4 vMin = hkVector4Zero;
-            const float fAbsX = static_cast<float>(std::fabs(cutplane.m_quad[0]));
+            const float fAbsX = std::fabs(cutplane.m_quad[0]);
             float fSmallest = fAbsX;
-            const float fAbsY = static_cast<float>(std::fabs(cutplane.m_quad[1]));
-            const float fAbsZ = static_cast<float>(std::fabs(cutplane.m_quad[2]));
+            const float fAbsY = std::fabs(cutplane.m_quad[1]);
+            const float fAbsZ = std::fabs(cutplane.m_quad[2]);
             int32_t iA = 0;
             int32_t iB = 1;
             int32_t iC = 2;
@@ -10187,7 +10183,7 @@ bool hkgpMesh::clipTriangles(
             const float fDot0 = _mm_cvtss_f32(
                 _mm_add_ss(_mm_add_ss(_mm_shuffle_ps(m, m, 0xAA), _mm_add_ss(_mm_shuffle_ps(m, m, 0x55), m)), w)
             );
-            const float fAbs0 = static_cast<float>(std::fabs(fDot0));
+            const float fAbs0 = std::fabs(fDot0);
             hkVector4 kP1 = pOther->m_vertices[(9 >> (2 * e)) & 3]->m_position;
             // A side within epsilon of the plane counts as on it.
             const float fSide0 = fAbs0 <= minDist ? 0.0f : fDot0;
@@ -10195,7 +10191,7 @@ bool hkgpMesh::clipTriangles(
             const float fDot1 = _mm_cvtss_f32(
                 _mm_add_ss(_mm_add_ss(_mm_shuffle_ps(m, m, 0xAA), _mm_add_ss(_mm_shuffle_ps(m, m, 0x55), m)), w)
             );
-            const float fAbs1 = static_cast<float>(std::fabs(fDot1));
+            const float fAbs1 = std::fabs(fDot1);
             const float fSide1 = fAbs1 <= minDist ? 0.0f : fDot1;
             if (!(fSide1 * fSide0 < 0.0)) {
                 continue;
@@ -10246,10 +10242,10 @@ bool hkgpMesh::hasPosition(const hkgpMeshBase::Triangle* t, const hkVector4& pos
          (position.m_quad[1] != (*i)->m_position.m_quad[1] || position.m_quad[2] != (*i)->m_position.m_quad[2]);
          ++i) {
         if (++v2 >= 3) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 // The link of edge packs the triangle across it with that triangle's edge index (hkgpTopology's Uid); the far corners
@@ -10316,15 +10312,15 @@ float hkgpMeshInternals::RayCaster::addLeaf(const hkAabbTree<hkAabbTreeData::hkA
     hkgpMeshBase::Triangle* v2 = static_cast<hkgpMeshBase::Triangle*>(leaf->m_leafData.m_userData);
     v4.m_quad = m_rayDir.m_quad;
     __m128 v5 = _mm_mul_ps(v2->m_plane.m_quad, v4.m_quad);
-    float v6 = _mm_shuffle_ps(v5, v5, 170)[0] + static_cast<float>(_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
-    if (static_cast<float>(v6 * v6) > 1.1920929e-07f) {
+    float v6 = _mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
+    if ((v6 * v6) > 1.1920929e-07f) {
         hkVector4 v7;
         v7.m_quad = m_rayFrom.m_quad;
         __m128 v8 = _mm_mul_ps(v2->m_plane.m_quad, v7.m_quad);
         float v9 = _mm_shuffle_ps(v8, v8, 170)[0] + _mm_shuffle_ps(v2->m_plane.m_quad, v2->m_plane.m_quad, 255)[0];
         float v10 = _mm_shuffle_ps(v8, v8, 85)[0] + v8[0];
         __m128 m_quad = hkQuadReal0000;
-        m_quad[0] = static_cast<float>(0.0f - static_cast<float>(v9 + v10)) / v6;
+        m_quad[0] = (0.0f - (v9 + v10)) / v6;
         a1 = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(m_quad, m_quad, 0), v4.m_quad), v7.m_quad);
         if (m_quad[0] > 0.0f && m_fraction > static_cast<double>(m_quad[0]) &&
             isPointInsideTriangle(
@@ -10409,7 +10405,7 @@ hkgpMeshInternals::Ring* hkgpMeshInternals::createRing(hkgpMeshBase::Edge edge) 
     {
         // EXE-INLINED none: hkArray<hkgpMeshInternals::Ring::Segment>::~hkArray
         hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacityAndFlags = static_cast<int32_t>(segments.m_capacityAndFlags);
+        const int32_t capacityAndFlags = segments.m_capacityAndFlags;
         segments.m_size = 0;
         if (capacityAndFlags >= 0) {
             heap.bufFree(
@@ -10550,7 +10546,7 @@ float IConvexOverlapImpl::distance(
     apInput_.m_maximumDistance.m_real = _mm_set_ss(3.40282e+38f);
     apGsk_.m_doNotHandlePenetration.m_storage = !allowPenetration;
     if (hkGskGetClosestPoint(
-            &apGsk_, static_cast<int32_t>(apGsk_.m_doNotHandlePenetration.m_storage), &apInput_, 0, &apOut_
+            &apGsk_, static_cast<int32_t>(apGsk_.m_doNotHandlePenetration.m_storage), &apInput_, nullptr, &apOut_
         )) {
         return -3.40282e+38f;
     }
@@ -10564,7 +10560,7 @@ bool IConvexOverlapImpl::checkOverlap(
     const hkgpMesh::IConvexOverlap::IConvexShape* shapeB,
     float minDist
 ) const {
-    return static_cast<double>(minDist) >= distance(shapeA, shapeB, 1);
+    return static_cast<double>(minDist) >= distance(shapeA, shapeB, true);
 }
 
 // The list links (m_next, m_prev) are not copied: the list sets them.

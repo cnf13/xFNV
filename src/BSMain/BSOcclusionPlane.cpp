@@ -46,7 +46,7 @@ NiObject* BSOcclusionPlane::CreateClone(NiCloningProcess& a1) {
         pobj = ::new (apMemory) BSOcclusionPlane;
     }
     else {
-        pobj = 0;
+        pobj = nullptr;
     }
     CopyMembers(pobj, a1);
     return pobj;
@@ -97,7 +97,7 @@ void BSOcclusionPlane::GetVertices(NiPoint3* apPoints) {
         v5 = &(v9 = (&kCenter)->operator+(kPoint0));
         *apPoints = *&(v8 = v5->operator+(kPoint1));
         rt::memcpy(kCachedVertices, apPoints, sizeof(kCachedVertices));
-        bDirtyVertices = (bool)0;
+        bDirtyVertices = false;
     }
     else {
         rt::memcpy(apPoints, kCachedVertices, sizeof(NiPoint3) * 4);
@@ -163,7 +163,7 @@ void BSOcclusionPlane::GetFrustumPlanes(NiPoint3 akViewPoint, NiFrustumPlanes& a
         }
         kCachedViewPoint = akViewPoint;
         kCachedPlanes = akPlanes;
-        bDirtyPlanes = 0;
+        bDirtyPlanes = false;
     }
     else {
         akPlanes = kCachedPlanes;
@@ -196,7 +196,7 @@ bool BSOcclusionPlane::WithinFrustum(const NiFrustumPlanes& aPlanes, bool abView
                 }
             }
             if (v26) {
-                return 0;
+                return false;
             }
         }
     }
@@ -269,12 +269,12 @@ bool BSOcclusionPlane::WithinFrustum(const NiFrustumPlanes& aPlanes, bool abView
         }
     }
     if (!v32) {
-        return 1;
+        return true;
     }
     for (int32_t kk = 2; kk < 6; ++kk) {
         if (TestLineSegmentAllPlanes(kPoint, v30, aPlanes.m_akCullingPlanes[kk], aPlanes) ||
             TestLineSegmentAllPlanes(akPoint1, akPoint0, aPlanes.m_akCullingPlanes[kk], aPlanes)) {
-            return 1;
+            return true;
         }
     }
     bool v4 = false;
@@ -302,7 +302,7 @@ bool BSOcclusionPlane::WithinFrustum(const NiFrustumPlanes& aPlanes, bool abView
 // GetVertices fills one array of four corners; the plane is built from the first three.
 bool BSOcclusionPlane::ViewerOnCorrectSide(NiPoint3 akViewPoint) {
     if (bTwoSided) {
-        return 1;
+        return true;
     }
     NiPoint3 akVertices[4];
     NiFrustumPlanes a5;
@@ -366,14 +366,14 @@ void BSOcclusionPlane::SetHalfExtents(const NiPoint2& arHalfExtents) {
     y = (&arHalfExtents)->y;
     kHalfExtents.x = (&arHalfExtents)->x;
     kHalfExtents.y = y;
-    bDirtyVertices = (bool)1;
-    bDirtyPlanes = (bool)1;
+    bDirtyVertices = true;
+    bDirtyPlanes = true;
 }
 
 void BSOcclusionPlane::SetRotation(const NiMatrix3& arRotation) {
     __builtin_memcpy(&kRotation, &arRotation, sizeof(kRotation));
-    bDirtyVertices = (bool)1;
-    bDirtyPlanes = (bool)1;
+    bDirtyVertices = true;
+    bDirtyPlanes = true;
 }
 
 bool BSOcclusionPlane::TestIntersection(const NiBound& aBound) {
@@ -402,7 +402,7 @@ bool BSOcclusionPlane::TestIntersection(const NiBound& aBound) {
     float v19 = v14;
     float v20 = v15;
     if ((!(kHalfExtents.x >= ((double)v13))) || ((!(kHalfExtents.y >= ((double)v20))) || (!(v19 <= 0.0)))) {
-        return (bool)0;
+        return false;
     }
     float v8 = (float)std::fabs((double)v19);
     float v7 = v8 / m_fRadius;
@@ -433,15 +433,15 @@ bool BSOcclusionPlane::TestLineSegmentAllPlanes(
     NiPoint3 v15;
     (v15 = (&akPoint1)->operator-(akPoint0));
     NiPoint3 kNormal = (&akPlane0)->m_kNormal;
-    float v16 = (float)(&kNormal)->Dot(v15);
+    float v16 = (&kNormal)->Dot(v15);
     if (v16 == 0.0) {
-        return (bool)0;
+        return false;
     }
     m_fConstant = (&akPlane0)->m_fConstant;
     double v6 = (double)(&kNormal)->Dot(akPoint0);
     float v14 = (float)((m_fConstant - v6) / v16);
     if ((!(v14 >= 0.0)) || (!(v14 <= 1.0))) {
-        return (bool)0;
+        return false;
     }
     NiPoint3* v7 = &(v10 = (&v15)->operator*(v14));
     (v12 = (&akPoint0)->operator+(*v7));
@@ -449,25 +449,25 @@ bool BSOcclusionPlane::TestLineSegmentAllPlanes(
         if (((&akPlanes)->m_uiActivePlanes & (1 << i)) != 0) {
             v8 = (&akPlanes)->m_akCullingPlanes[i].m_fConstant;
             if (((&(&akPlanes)->m_akCullingPlanes[i].m_kNormal)->Dot(v12) - v8) <= (-0.0001)) {
-                return (bool)0;
+                return false;
             }
         }
     }
-    return (bool)1;
+    return true;
 }
 
 void BSOcclusionPlane::CopyMembers(BSOcclusionPlane* pDest, NiCloningProcess& arCloneData) {
     pDest->kCenter = kCenter;
-    pDest->bDirtyVertices = 1;
-    pDest->bDirtyPlanes = 1;
+    pDest->bDirtyVertices = true;
+    pDest->bDirtyPlanes = true;
     float y = kHalfExtents.y;
     pDest->kHalfExtents.x = kHalfExtents.x;
     pDest->kHalfExtents.y = y;
-    pDest->bDirtyVertices = 1;
-    pDest->bDirtyPlanes = 1;
+    pDest->bDirtyVertices = true;
+    pDest->bDirtyPlanes = true;
     pDest->kRotation = kRotation;
-    pDest->bDirtyVertices = 1;
-    pDest->bDirtyPlanes = 1;
+    pDest->bDirtyVertices = true;
+    pDest->bDirtyPlanes = true;
     pDest->kCullResult = kCullResult;
 }
 
@@ -480,7 +480,7 @@ bool BSOcclusionPlane::WithinFrustumFullTest(const NiFrustumPlanes& aPlanes) {
     GetVertices(kPoint);
     // Per vertex, the planes it is on the outside of.
     int32_t aiOutside[4] = {0, 0, 0, 0};
-    bool v10 = 1;
+    bool v10 = true;
     for (int32_t j = 0; j < 6; ++j) {
         if (((&aPlanes)->GetActivePlaneState() & 1 << j) != 0) {
             char v7 = 1;
@@ -493,7 +493,7 @@ bool BSOcclusionPlane::WithinFrustumFullTest(const NiFrustumPlanes& aPlanes) {
                 }
             }
             if (v7) {
-                v10 = 0;
+                v10 = false;
             }
         }
     }
@@ -515,12 +515,12 @@ bool BSOcclusionPlane::CompletelyWithinFrustum(const NiFrustumPlanes& aPlanes) {
         if (((&aPlanes)->GetActivePlaneState() & 1 << j) != 0) {
             for (int32_t k = 0; k < 4; ++k) {
                 if (aPlanes.m_akCullingPlanes[j].WhichSide(kVerts[k]) == 2) {
-                    return 0;
+                    return false;
                 }
             }
         }
     }
-    return 1;
+    return true;
 }
 
 // The eight corners are one array: GetVertices fills the plane's four, and the far four are pushed 2500 units away
@@ -637,7 +637,7 @@ void BSOcclusionPlane::MakeDebugGeom(
         v39 = GetRTTI() == &BSPortal::ms_RTTI;
     }
     else {
-        v39 = 0;
+        v39 = false;
     }
     if (v39) {
         NiPoint3 ktangent = NiPoint3_ZERO;
@@ -718,12 +718,12 @@ bool BSOcclusionPlane::TestLineSegment(NiPoint3* a1, NiPoint3* a2, float* a3, Ni
     NiPoint3 v13;
     NiPoint3 v15;
     (v15 = a2->operator-(*a1));
-    v13.x = (float)(*a3);
+    v13.x = (*a3);
     v13.y = a3[1];
     v13.z = a3[2];
-    float v16 = (float)(&v13)->Dot(v15);
+    float v16 = (&v13)->Dot(v15);
     if (v16 == 0.0) {
-        return (bool)0;
+        return false;
     }
     float v10 = a3[3];
     double v6 = (double)(&v13)->Dot(*a1);
@@ -736,7 +736,7 @@ bool BSOcclusionPlane::TestLineSegment(NiPoint3* a1, NiPoint3* a2, float* a3, Ni
         if ((a4->Dot(v12) - x) >= (-0.0001)) {
             v8 = a5[1].x;
             if ((a5->Dot(v12) - v8) >= (-0.0001)) {
-                return (bool)1;
+                return true;
             }
         }
     }

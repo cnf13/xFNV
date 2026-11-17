@@ -16,7 +16,7 @@ void SoundMessageList::AddTail_0(BSSoundMessage** apMsg) {
 }
 
 void SoundMessageList::AddNodeTail(NiTListItem<BSSoundMessage*>* apNode) {
-    apNode->m_pkNext = 0;
+    apNode->m_pkNext = nullptr;
     apNode->m_pkPrev = pTail;
     if (pTail) {
         pTail->m_pkNext = apNode;
@@ -32,10 +32,10 @@ BSSoundMessage* SoundMessageList::RemoveHead() {
     NiTListItem<BSSoundMessage*>* pkNode = pHead;
     pHead = pHead->m_pkNext;
     if (pHead) {
-        pHead->m_pkPrev = 0;
+        pHead->m_pkPrev = nullptr;
     }
     else {
-        pTail = 0;
+        pTail = nullptr;
     }
     BSSoundMessage* pMsg = pkNode->m_element;
     pkNode->m_element = 0;
@@ -53,6 +53,6 @@ void SoundMessageList::RemoveAll() {
         pkNode = pkNext;
     }
     uiCount = 0;
-    pHead = 0;
-    pTail = 0;
+    pHead = nullptr;
+    pTail = nullptr;
 }

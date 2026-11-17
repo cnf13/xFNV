@@ -31,8 +31,7 @@ void hkpAgent3CalcRootMotion(const hkMotionState* apMotionState, hkpAgent3RootMo
     len2 = _mm_add_ps(_mm_shuffle_ps(len2, len2, 0xB1), len2);
     float r = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(len2[0])));
     __m128 scale = _mm_setzero_ps();
-    scale[0] = static_cast<float>(0.5f * r) *
-        static_cast<float>(3.0f - static_cast<float>(static_cast<float>(len2[0] * r) * r));
+    scale[0] = (0.5f * r) * (3.0f - ((len2[0] * r) * r));
     scale = _mm_andnot_ps(_mm_cmpeq_ss(len2, zero), scale);
     q.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(scale, scale, 0), rot);
     arOut.m_transform.m_rotation.set(q);
@@ -89,8 +88,7 @@ void hkpAgent3CalcRootMotion(const hkMotionState* apMotionState, hkpAgent3RootMo
         len2 = _mm_add_ps(_mm_shuffle_ps(len2, len2, 0xB1), len2);
         r = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(len2[0])));
         scale = _mm_setzero_ps();
-        scale[0] = static_cast<float>(0.5f * r) *
-            static_cast<float>(3.0f - static_cast<float>(static_cast<float>(len2[0] * r) * r));
+        scale[0] = (0.5f * r) * (3.0f - ((len2[0] * r) * r));
         scale = _mm_andnot_ps(_mm_cmpeq_ss(len2, zero), scale);
         q.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(scale, scale, 0), rot);
         hkTransform& sample = arOut.m_samples[0];
@@ -146,8 +144,7 @@ void hkpAgent3CalcRootMotion(const hkMotionState* apMotionState, hkpAgent3RootMo
         len2 = _mm_add_ps(_mm_shuffle_ps(len2, len2, 0xB1), len2);
         r = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(len2[0])));
         scale = _mm_setzero_ps();
-        scale[0] = static_cast<float>(0.5f * r) *
-            static_cast<float>(3.0f - static_cast<float>(static_cast<float>(len2[0] * r) * r));
+        scale[0] = (0.5f * r) * (3.0f - ((len2[0] * r) * r));
         scale = _mm_andnot_ps(_mm_cmpeq_ss(len2, zero), scale);
         q.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(scale, scale, 0), rot);
         sample.m_rotation.set(q);

@@ -34,7 +34,7 @@ SettingT<GameSettingCollection> gs_sFloraFailureMessage("sFloraFailureMessage", 
 
 TESFlora::TESFlora() : TESProduceForm(), TESObjectACTI() {
     SetFormType(FLOR_ID);
-    SetInitialized(1);
+    SetInitialized(true);
 }
 
 TESFlora::~TESFlora() {}
@@ -124,13 +124,13 @@ void TESFlora::InitItem() {
         TESObjectACTI* a2;
         static_cast<TESObjectACTI*>(this)->TESObjectACTI::InitItem();
         if (this == nullptr) {
-            a2 = 0;
+            a2 = nullptr;
         }
         else {
             a2 = static_cast<TESObjectACTI*>(this);
         }
         TESProduceForm::InitItem(a2);
-        static_cast<TESObjectACTI*>(this)->SetInitialized(1);
+        static_cast<TESObjectACTI*>(this)->SetInitialized(true);
     }
 }
 
@@ -156,7 +156,7 @@ bool TESFlora::Activate(
     Actor* pactor = dynamic_cast<Actor*>(apActionRef);
     if (apItemActivated) {
         if (pactor) {
-            bool bsuccess = 0;
+            bool bsuccess = false;
             if (!apItemActivated->GetEmpty()) {
                 if (pFormIngredient) {
                     SEASON Season = appCalendar.GetSeason();
@@ -171,13 +171,13 @@ bool TESFlora::Activate(
                 Script* pScript = TESScriptableForm::GetFormScript(pingr);
                 if (pScript) {
                     ExtraDataList* pExtra;
-                    BaseExtraList* v25 = 0;
+                    BaseExtraList* v25 = nullptr;
                     ExtraDataList* pExtraList = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
                     if (pExtraList) {
                         pExtra = ::new (pExtraList) ExtraDataList;
                     }
                     else {
-                        pExtra = 0;
+                        pExtra = nullptr;
                     }
                     pExtra->SetCount(1);
                     if (pExtra) {
@@ -192,39 +192,39 @@ bool TESFlora::Activate(
                                 pref = ::new (apMemory) TESObjectREFR;
                             }
                             else {
-                                pref = 0;
+                                pref = nullptr;
                             }
                             ScriptLocals* ScriptLocals_ = pExtra->GetScriptLocals();
-                            pScript->Run(pref, ScriptLocals_, 0, 0);
+                            pScript->Run(pref, ScriptLocals_, nullptr, false);
                         }
                     }
                     pactor->AddObjecttoContainer(pingr, pExtra, 1);
                 }
                 else {
-                    pactor->AddBoundObjectItem(pingr, 0, 1);
+                    pactor->AddBoundObjectItem(pingr, nullptr, 1);
                 }
                 if (pactor == pPlayer) {
                     BSStringT<char> v23;
                     v23.SPrintF(gs_sFloraSuccessMessage.String(), pingr->GetFullName());
-                    Interface::ShowMessage(v23.pString, 0, 0, 0, 2.0f, 0);
+                    Interface::ShowMessage(v23.pString, 0, nullptr, nullptr, 2.0f, false);
                     BSSoundHandle soundHand;
                     BSAudio* v10 = &BSAudio::QInstance();
                     BSSoundHandle* arHandle = v10->GetSoundHandleByName(&a1, "ITMPickupOrganic", 288u);
                     soundHand.operator=(*arHandle);
-                    soundHand.Play(0);
+                    soundHand.Play(false);
                 }
             }
             else {
                 if (pactor == pPlayer) {
                     const char* v11 = gs_sFloraFailureMessage.String();
-                    Interface::ShowMessage(v11, 0, 0, 0, 2.0f, 0);
+                    Interface::ShowMessage(v11, 0, nullptr, nullptr, 2.0f, false);
                     Interface::PlayMenuSound(29);
                 }
             }
-            apItemActivated->SetEmpty(1);
+            apItemActivated->SetEmpty(true);
         }
     }
-    return 1;
+    return true;
 }
 
 // Whether form flag 0x2000 (a harvested form) is set.

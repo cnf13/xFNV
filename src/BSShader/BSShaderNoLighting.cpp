@@ -141,7 +141,7 @@ uint32_t BSShaderNoLighting::SetupBoneMatrices(
     const NiBound& a8
 ) {
     if (a3) {
-        BSShaderManager::pRenderer.m_pObject->CalculateBoneMatrices(a2, a7, 0, 3u, 1);
+        BSShaderManager::pRenderer.m_pObject->CalculateBoneMatrices(a2, a7, false, 3u, true);
         NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject->SetShaderConstantArray(
             pBonesEntry, a2->m_pvBoneMatrices, a3->m_usBones, a2->m_uiNumRegisters, a3->m_pusBones
         );
@@ -158,7 +158,7 @@ void BSShaderNoLighting::SetupGeometryTextures(const NiPropertyState* apState) {
             pstage->m_spTexture = ptex;
             NiTexturingProperty::ClampMode v5 = pprop->GetClampNI();
             pstage->SetClampMode(v5);
-            pstage->ConfigureStage(0);
+            pstage->ConfigureStage(false);
         }
     }
 }
@@ -184,7 +184,7 @@ void BSShaderNoLighting::SetupGeometryConstants(const NiPropertyState* apState) 
         xform.m_Translate = NiRenderer::PosAdjust;
         worldTransform = &xform;
     }
-    m_pkD3DRenderer->SetModelTransform(*worldTransform, 0);
+    m_pkD3DRenderer->SetModelTransform(*worldTransform, false);
     if (uiPassType >= BSShaderManager::BSSM_NOLIGHTING_PSYS &&
         uiPassType <= BSShaderManager::BSSM_NOLIGHTING_STRIP_PSYS_SUBTEX) {
         SetupGeometryConstants_Particles(pgeometry, pgeometry->m_kWorld);
@@ -213,7 +213,8 @@ void BSShaderNoLighting::SetupGeometryConstants(const NiPropertyState* apState) 
         NiD3DVertexShader* pVertexShader = NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject;
         if (pVertexShader) {
             pVertexMap->SetShaderConstants(
-                pVertexShader, pgeometry, pskin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *pBound, 0, 1
+                pVertexShader, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *pBound,
+                0, true
             );
         }
     }
@@ -234,15 +235,16 @@ void BSShaderNoLighting::SetupGeometryConstants(const NiPropertyState* apState) 
         NiD3DPixelShader* pPixelShader = NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject;
         if (pPixelShader) {
             pPixelMap->SetShaderConstants(
-                pPixelShader, pgeometry, pskin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *pBound, 0, 1
+                pPixelShader, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *pBound, 0,
+                true
             );
         }
     }
     if ((pprop->ulFlags[1] & BSS2_ZBuffer_Write) == 0) {
-        BSRenderState::SetZWriteEnable(0, BSRS_NOLOCK);
+        BSRenderState::SetZWriteEnable(false, BSRS_NOLOCK);
     }
     if ((pprop->ulFlags[0] & BSS1_ZBuffer_Test) == 0) {
-        BSRenderState::SetZEnable(0, BSRS_NOLOCK);
+        BSRenderState::SetZEnable(false, BSRS_NOLOCK);
     }
     NiStencilProperty* pStencil = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
     if (pStencil) {
@@ -261,7 +263,7 @@ void BSShaderNoLighting::SetupGeometryAlphaBlending(const NiPropertyState* apSta
         BSShader::SetupGeometryAlphaBlending(apState);
     }
     else {
-        BSRenderState::SetAlphaBlendEnable(1, BSRS_NOLOCK);
+        BSRenderState::SetAlphaBlendEnable(true, BSRS_NOLOCK);
         BSRenderState::SetAlphaBlendFunc(
             NiAlphaProperty::ALPHA_SRCALPHA, NiAlphaProperty::ALPHA_INVSRCALPHA, BSRS_NOLOCK
         );
@@ -272,21 +274,21 @@ void BSShaderNoLighting::PostGeometry(const NiPropertyState* apState) {
     BSShaderProperty* pShaderProp = static_cast<BSShaderProperty*>(apState->m_aspProps[3].m_pObject);
     if (pShaderProp) {
         if ((pShaderProp->ulFlags[1] & BSS2_Wireframe) != 0) {
-            BSRenderState::SetWireframeEnable(0, BSRS_NOLOCK);
+            BSRenderState::SetWireframeEnable(false, BSRS_NOLOCK);
         }
     }
     // The property is tested for null only around the wireframe flag, and its flags below are read unguarded, as the
     // game does.
     if ((pShaderProp->ulFlags[1] & BSS2_ZBuffer_Write) == 0) {
-        BSRenderState::SetZWriteEnable(1, BSRS_NOLOCK);
+        BSRenderState::SetZWriteEnable(true, BSRS_NOLOCK);
     }
     if ((pShaderProp->ulFlags[0] & BSS1_ZBuffer_Test) == 0) {
-        BSRenderState::SetZEnable(1, BSRS_NOLOCK);
+        BSRenderState::SetZEnable(true, BSRS_NOLOCK);
     }
     NiStencilProperty* pStencil = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
     if (pStencil) {
         if ((pStencil->m_uFlags & NiStencilProperty::ENABLE_MASK) != 0) {
-            BSRenderState::SetStencilEnable(0, BSRS_NOLOCK);
+            BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
         }
     }
 }
@@ -464,7 +466,7 @@ void BSShaderNoLighting::InitPass(uint32_t auiCurrentPass) {
                     }
                 LABEL_31:;
                     m_pObject->DeleteThis();
-                    m_spShaderDecl.m_pObject = 0;
+                    m_spShaderDecl.m_pObject = nullptr;
                     break;
                 }
                 case 87u: {
@@ -478,7 +480,7 @@ void BSShaderNoLighting::InitPass(uint32_t auiCurrentPass) {
                     }
                     NiDecRefCount(v6);
                 LABEL_27:;
-                    m_spShaderDecl.m_pObject = 0;
+                    m_spShaderDecl.m_pObject = nullptr;
                     break;
                 }
                 default: {
@@ -651,14 +653,14 @@ bool BSShaderNoLighting::LoadStagesAndPasses() {
     NiD3DPass::CreateNewPass(spPass[0]);
     NiPointer<NiD3DTextureStage> spStage;
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[0]->SetStage(spPass[0]->m_uiCurrentStage, spStage.m_pObject);
     spPass[0]->m_spVertexShader = spVertexShader[0];
     spPass[0]->m_spPixelShader = spPixelShader[0];
 
     NiD3DPass::CreateNewPass(spPass[1]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[1]->SetStage(spPass[1]->m_uiCurrentStage, spStage.m_pObject);
     spPass[1]->m_spVertexShader = spVertexShader[2];
     spPass[1]->m_spPixelShader = spPixelShader[2];
@@ -673,14 +675,14 @@ bool BSShaderNoLighting::LoadStagesAndPasses() {
 
     NiD3DPass::CreateNewPass(spPass[4]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[4]->SetStage(spPass[4]->m_uiCurrentStage, spStage.m_pObject);
     spPass[4]->m_spVertexShader = spVertexShader[4];
     spPass[4]->m_spPixelShader = spPixelShader[0];
 
     NiD3DPass::CreateNewPass(spPass[5]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[5]->SetStage(spPass[5]->m_uiCurrentStage, spStage.m_pObject);
     spPass[5]->m_spVertexShader = spVertexShader[6];
     spPass[5]->m_spPixelShader = spPixelShader[2];
@@ -695,14 +697,14 @@ bool BSShaderNoLighting::LoadStagesAndPasses() {
 
     NiD3DPass::CreateNewPass(spPass[8]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[8]->SetStage(spPass[8]->m_uiCurrentStage, spStage.m_pObject);
     spPass[8]->m_spVertexShader = spVertexShader[8];
     spPass[8]->m_spPixelShader = spPixelShader[0];
 
     NiD3DPass::CreateNewPass(spPass[9]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[9]->SetStage(spPass[9]->m_uiCurrentStage, spStage.m_pObject);
     spPass[9]->m_spVertexShader = spVertexShader[10];
     spPass[9]->m_spPixelShader = spPixelShader[2];
@@ -717,14 +719,14 @@ bool BSShaderNoLighting::LoadStagesAndPasses() {
 
     NiD3DPass::CreateNewPass(spPass[12]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[12]->SetStage(spPass[12]->m_uiCurrentStage, spStage.m_pObject);
     spPass[12]->m_spVertexShader = spVertexShader[12];
     spPass[12]->m_spPixelShader = spPixelShader[0];
 
     NiD3DPass::CreateNewPass(spPass[13]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[13]->SetStage(spPass[13]->m_uiCurrentStage, spStage.m_pObject);
     spPass[13]->m_spVertexShader = spVertexShader[14];
     spPass[13]->m_spPixelShader = spPixelShader[2];
@@ -739,42 +741,42 @@ bool BSShaderNoLighting::LoadStagesAndPasses() {
 
     NiD3DPass::CreateNewPass(spPass[16]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[16]->SetStage(spPass[16]->m_uiCurrentStage, spStage.m_pObject);
     spPass[16]->m_spVertexShader = spVertexShader[16];
     spPass[16]->m_spPixelShader = spPixelShader[2];
 
     NiD3DPass::CreateNewPass(spPass[17]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[17]->SetStage(spPass[17]->m_uiCurrentStage, spStage.m_pObject);
     spPass[17]->m_spVertexShader = spVertexShader[17];
     spPass[17]->m_spPixelShader = spPixelShader[2];
 
     NiD3DPass::CreateNewPass(spPass[18]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[18]->SetStage(spPass[18]->m_uiCurrentStage, spStage.m_pObject);
     spPass[18]->m_spVertexShader = spVertexShader[16];
     spPass[18]->m_spPixelShader = spPixelShader[3];
 
     NiD3DPass::CreateNewPass(spPass[19]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[19]->SetStage(spPass[19]->m_uiCurrentStage, spStage.m_pObject);
     spPass[19]->m_spVertexShader = spVertexShader[17];
     spPass[19]->m_spPixelShader = spPixelShader[3];
 
     NiD3DPass::CreateNewPass(spPass[20]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[20]->SetStage(spPass[20]->m_uiCurrentStage, spStage.m_pObject);
     spPass[20]->m_spVertexShader = spVertexShader[18];
     spPass[20]->m_spPixelShader = spPixelShader[2];
 
     NiD3DPass::CreateNewPass(spPass[21]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[21]->SetStage(spPass[21]->m_uiCurrentStage, spStage.m_pObject);
     spPass[21]->m_spVertexShader = spVertexShader[19];
     spPass[21]->m_spPixelShader = spPixelShader[2];
@@ -786,7 +788,7 @@ bool BSShaderNoLighting::LoadStagesAndPasses() {
 
     NiD3DPass::CreateNewPass(spPass[23]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[23]->SetStage(spPass[23]->m_uiCurrentStage, spStage.m_pObject);
     spPass[23]->m_spVertexShader = spVertexShader[21];
     spPass[23]->m_spPixelShader = spPixelShader[6];
@@ -799,7 +801,7 @@ bool BSShaderNoLighting::LoadStagesAndPasses() {
 
     NiD3DPass::CreateNewPass(spPass[25]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[25]->SetStage(spPass[25]->m_uiCurrentStage, spStage.m_pObject);
     spPass[25]->m_spVertexShader = spVertexShader[23];
     spPass[25]->m_spPixelShader = spPixelShader[6];
@@ -812,7 +814,7 @@ bool BSShaderNoLighting::LoadStagesAndPasses() {
 
     NiD3DPass::CreateNewPass(spPass[27]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[27]->SetStage(spPass[27]->m_uiCurrentStage, spStage.m_pObject);
     spPass[27]->m_spVertexShader = spVertexShader[25];
     spPass[27]->m_spPixelShader = spPixelShader[6];
@@ -825,7 +827,7 @@ bool BSShaderNoLighting::LoadStagesAndPasses() {
 
     NiD3DPass::CreateNewPass(spPass[29]);
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     spPass[29]->SetStage(spPass[29]->m_uiCurrentStage, spStage.m_pObject);
     spPass[29]->m_spVertexShader = spVertexShader[27];
     spPass[29]->m_spPixelShader = spPixelShader[6];
@@ -851,14 +853,14 @@ void BSShaderNoLighting::LoadShaders() {
     v36[0].strPath = "lighting\\1x\\v\\NoLighting.v.hlsl";
     v36[0].kMacros[0].Name = "TEX";
     v36[0].kMacros[0].Definition = "";
-    v36[0].kMacros[1].Name = 0;
+    v36[0].kMacros[1].Name = nullptr;
     std::memset(
         &v36[0].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     v36[1].strPath = "lighting\\1x\\v\\NoLighting.v.hlsl";
     v36[1].kMacros[0].Name = "VC";
     v36[1].kMacros[0].Definition = "";
-    v36[1].kMacros[1].Name = 0;
+    v36[1].kMacros[1].Name = nullptr;
     std::memset(
         &v36[1].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -867,12 +869,12 @@ void BSShaderNoLighting::LoadShaders() {
     v36[2].kMacros[0].Definition = "";
     v36[2].kMacros[1].Name = "VC";
     v36[2].kMacros[1].Definition = "";
-    v36[2].kMacros[2].Name = 0;
+    v36[2].kMacros[2].Name = nullptr;
     std::memset(
         &v36[2].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     v36[3].strPath = "lighting\\1x\\v\\NoLighting.v.hlsl";
-    v36[3].kMacros[0].Name = 0;
+    v36[3].kMacros[0].Name = nullptr;
     std::memset(
         &v36[3].kMacros[0].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
@@ -881,7 +883,7 @@ void BSShaderNoLighting::LoadShaders() {
     v36[4].kMacros[0].Definition = "";
     v36[4].kMacros[1].Name = "FALLOFF";
     v36[4].kMacros[1].Definition = "";
-    v36[4].kMacros[2].Name = 0;
+    v36[4].kMacros[2].Name = nullptr;
     std::memset(
         &v36[4].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -890,7 +892,7 @@ void BSShaderNoLighting::LoadShaders() {
     v36[5].kMacros[0].Definition = "";
     v36[5].kMacros[1].Name = "FALLOFF";
     v36[5].kMacros[1].Definition = "";
-    v36[5].kMacros[2].Name = 0;
+    v36[5].kMacros[2].Name = nullptr;
     std::memset(
         &v36[5].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -901,14 +903,14 @@ void BSShaderNoLighting::LoadShaders() {
     v36[6].kMacros[1].Definition = "";
     v36[6].kMacros[2].Name = "FALLOFF";
     v36[6].kMacros[2].Definition = "";
-    v36[6].kMacros[3].Name = 0;
+    v36[6].kMacros[3].Name = nullptr;
     std::memset(
         &v36[6].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
     v36[7].strPath = "lighting\\1x\\v\\NoLighting.v.hlsl";
     v36[7].kMacros[0].Name = "FALLOFF";
     v36[7].kMacros[0].Definition = "";
-    v36[7].kMacros[1].Name = 0;
+    v36[7].kMacros[1].Name = nullptr;
     std::memset(
         &v36[7].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -917,7 +919,7 @@ void BSShaderNoLighting::LoadShaders() {
     v36[8].kMacros[0].Definition = "";
     v36[8].kMacros[1].Name = "SKIN";
     v36[8].kMacros[1].Definition = "";
-    v36[8].kMacros[2].Name = 0;
+    v36[8].kMacros[2].Name = nullptr;
     std::memset(
         &v36[8].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -926,7 +928,7 @@ void BSShaderNoLighting::LoadShaders() {
     v36[9].kMacros[0].Definition = "";
     v36[9].kMacros[1].Name = "SKIN";
     v36[9].kMacros[1].Definition = "";
-    v36[9].kMacros[2].Name = 0;
+    v36[9].kMacros[2].Name = nullptr;
     std::memset(
         &v36[9].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -937,14 +939,14 @@ void BSShaderNoLighting::LoadShaders() {
     v36[10].kMacros[1].Definition = "";
     v36[10].kMacros[2].Name = "SKIN";
     v36[10].kMacros[2].Definition = "";
-    v36[10].kMacros[3].Name = 0;
+    v36[10].kMacros[3].Name = nullptr;
     std::memset(
         &v36[10].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
     v36[11].strPath = "lighting\\1x\\v\\NoLighting.v.hlsl";
     v36[11].kMacros[0].Name = "SKIN";
     v36[11].kMacros[0].Definition = "";
-    v36[11].kMacros[1].Name = 0;
+    v36[11].kMacros[1].Name = nullptr;
     std::memset(
         &v36[11].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -955,7 +957,7 @@ void BSShaderNoLighting::LoadShaders() {
     v36[12].kMacros[1].Definition = "";
     v36[12].kMacros[2].Name = "SKIN";
     v36[12].kMacros[2].Definition = "";
-    v36[12].kMacros[3].Name = 0;
+    v36[12].kMacros[3].Name = nullptr;
     std::memset(
         &v36[12].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -966,7 +968,7 @@ void BSShaderNoLighting::LoadShaders() {
     v36[13].kMacros[1].Definition = "";
     v36[13].kMacros[2].Name = "SKIN";
     v36[13].kMacros[2].Definition = "";
-    v36[13].kMacros[3].Name = 0;
+    v36[13].kMacros[3].Name = nullptr;
     std::memset(
         &v36[13].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -979,41 +981,41 @@ void BSShaderNoLighting::LoadShaders() {
     v36[14].kMacros[2].Definition = "";
     v36[14].kMacros[3].Name = "SKIN";
     v36[14].kMacros[3].Definition = "";
-    v36[14].kMacros[4].Name = 0;
-    v36[14].kMacros[4].Definition = 0;
-    v36[14].kMacros[5].Name = 0;
-    v36[14].kMacros[5].Definition = 0;
-    v36[14].kMacros[6].Name = 0;
-    v36[14].kMacros[6].Definition = 0;
-    v36[14].kMacros[7].Name = 0;
-    v36[14].kMacros[7].Definition = 0;
-    v36[14].kMacros[8].Name = 0;
-    v36[14].kMacros[8].Definition = 0;
+    v36[14].kMacros[4].Name = nullptr;
+    v36[14].kMacros[4].Definition = nullptr;
+    v36[14].kMacros[5].Name = nullptr;
+    v36[14].kMacros[5].Definition = nullptr;
+    v36[14].kMacros[6].Name = nullptr;
+    v36[14].kMacros[6].Definition = nullptr;
+    v36[14].kMacros[7].Name = nullptr;
+    v36[14].kMacros[7].Definition = nullptr;
+    v36[14].kMacros[8].Name = nullptr;
+    v36[14].kMacros[8].Definition = nullptr;
     v36[15].strPath = "lighting\\1x\\v\\NoLighting.v.hlsl";
     v36[15].kMacros[0].Name = "FALLOFF";
     v36[15].kMacros[0].Definition = "";
     v36[15].kMacros[1].Name = "SKIN";
     v36[15].kMacros[1].Definition = "";
-    v36[15].kMacros[2].Name = 0;
+    v36[15].kMacros[2].Name = nullptr;
     std::memset(
         &v36[15].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     v37[0].strPath = "lighting\\1x\\v\\particlesystem.v.hlsl";
-    v37[0].kMacros[0].Name = 0;
+    v37[0].kMacros[0].Name = nullptr;
     std::memset(
         &v37[0].kMacros[0].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     v37[1].strPath = "lighting\\1x\\v\\particlesystem.v.hlsl";
     v37[1].kMacros[0].Name = "PSYS_SUBTEX";
     v37[1].kMacros[0].Definition = "";
-    v37[1].kMacros[1].Name = 0;
+    v37[1].kMacros[1].Name = nullptr;
     std::memset(
         &v37[1].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     v37[2].strPath = "lighting\\1x\\v\\particlesystem.v.hlsl";
     v37[2].kMacros[0].Name = "PSYS_STRIP";
     v37[2].kMacros[0].Definition = "";
-    v37[2].kMacros[1].Name = 0;
+    v37[2].kMacros[1].Name = nullptr;
     std::memset(
         &v37[2].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -1022,26 +1024,26 @@ void BSShaderNoLighting::LoadShaders() {
     v37[3].kMacros[0].Definition = "";
     v37[3].kMacros[1].Name = "PSYS_SUBTEX";
     v37[3].kMacros[1].Definition = "";
-    v37[3].kMacros[2].Name = 0;
+    v37[3].kMacros[2].Name = nullptr;
     std::memset(
         &v37[3].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     v38[0].strPath = "lighting\\2x\\v\\waterfog.v.hlsl";
-    v38[0].kMacros[0].Name = 0;
+    v38[0].kMacros[0].Name = nullptr;
     std::memset(
         &v38[0].kMacros[0].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[0].Definition)
     );
     v38[1].strPath = "lighting\\2x\\v\\waterfog.v.hlsl";
     v38[1].kMacros[0].Name = "TEXCOORD";
     v38[1].kMacros[0].Definition = "";
-    v38[1].kMacros[1].Name = 0;
+    v38[1].kMacros[1].Name = nullptr;
     std::memset(
         &v38[1].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
     v38[2].strPath = "lighting\\2x\\v\\waterfog.v.hlsl";
     v38[2].kMacros[0].Name = "VC";
     v38[2].kMacros[0].Definition = "";
-    v38[2].kMacros[1].Name = 0;
+    v38[2].kMacros[1].Name = nullptr;
     std::memset(
         &v38[2].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -1050,14 +1052,14 @@ void BSShaderNoLighting::LoadShaders() {
     v38[3].kMacros[0].Definition = "";
     v38[3].kMacros[1].Name = "TEXCOORD";
     v38[3].kMacros[1].Definition = "";
-    v38[3].kMacros[2].Name = 0;
+    v38[3].kMacros[2].Name = nullptr;
     std::memset(
         &v38[3].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
     v38[4].strPath = "lighting\\2x\\v\\waterfog.v.hlsl";
     v38[4].kMacros[0].Name = "SKIN";
     v38[4].kMacros[0].Definition = "";
-    v38[4].kMacros[1].Name = 0;
+    v38[4].kMacros[1].Name = nullptr;
     std::memset(
         &v38[4].kMacros[1].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[1].Definition)
     );
@@ -1066,7 +1068,7 @@ void BSShaderNoLighting::LoadShaders() {
     v38[5].kMacros[0].Definition = "";
     v38[5].kMacros[1].Name = "SKIN";
     v38[5].kMacros[1].Definition = "";
-    v38[5].kMacros[2].Name = 0;
+    v38[5].kMacros[2].Name = nullptr;
     std::memset(
         &v38[5].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1075,7 +1077,7 @@ void BSShaderNoLighting::LoadShaders() {
     v38[6].kMacros[0].Definition = "";
     v38[6].kMacros[1].Name = "SKIN";
     v38[6].kMacros[1].Definition = "";
-    v38[6].kMacros[2].Name = 0;
+    v38[6].kMacros[2].Name = nullptr;
     std::memset(
         &v38[6].kMacros[2].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[2].Definition)
     );
@@ -1086,7 +1088,7 @@ void BSShaderNoLighting::LoadShaders() {
     v38[7].kMacros[1].Definition = "";
     v38[7].kMacros[2].Name = "SKIN";
     v38[7].kMacros[2].Definition = "";
-    v38[7].kMacros[3].Name = 0;
+    v38[7].kMacros[3].Name = nullptr;
     std::memset(
         &v38[7].kMacros[3].Definition, 0, sizeof(BSShaderMacro) - offsetof(BSShaderMacro, kMacros[3].Definition)
     );
@@ -1323,7 +1325,7 @@ void BSShaderNoLighting::SetupGeometryConstants_Particles(NiGeometry* pgeometry,
 void BSShaderNoLighting::SetupGeometryConstants_WaterFog() {
     if (static_cast<uint32_t>(BSShaderManager::eCurrentPass - BSShaderManager::BSSM_WATER_DEPTH) <=
         BSShaderManager::BSSM_NLWATER_DEPTH_AtVc_S - BSShaderManager::BSSM_WATER_DEPTH) {
-        pWorldEntry->m_bEnabled = 1;
+        pWorldEntry->m_bEnabled = true;
         BSShaderNoLighting::pFogPropA[0].r = BSShaderManager::kWaterFogDistances.y;
         BSShaderNoLighting::pFogPropA[0].g = 0.0f;
         BSShaderNoLighting::pFogPropA[0].b = 0.0f;
@@ -1492,7 +1494,7 @@ BSShader* BSShaderNoLighting::CreateShader() {
         );
     }
     else {
-        pshader = 0;
+        pshader = nullptr;
     }
     pshader->Initialize();
     pshader->LoadShaders();

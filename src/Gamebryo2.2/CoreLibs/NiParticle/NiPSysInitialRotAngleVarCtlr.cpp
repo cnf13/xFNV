@@ -27,7 +27,7 @@ NiObject* NiPSysInitialRotAngleVarCtlr::CreateClone(NiCloningProcess& kCloning) 
     }
     else {
         NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-        return 0;
+        return nullptr;
     }
 }
 
@@ -77,7 +77,7 @@ NiObject* NiPSysInitialRotAngleVarCtlr::CreateObject() {
     NiPSysInitialRotAngleVarCtlr* v0 =
         static_cast<NiPSysInitialRotAngleVarCtlr*>(NiMemObject::operator new(sizeof(NiPSysInitialRotAngleVarCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysInitialRotAngleVarCtlr;
 }

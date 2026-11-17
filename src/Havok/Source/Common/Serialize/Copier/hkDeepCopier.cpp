@@ -25,7 +25,7 @@ namespace {
 // The class version's loop over the records, which have no destructor: empty. hkArrayUtil's class version has no
 // generic body, so both builds need this one.
 template <>
-void hkArrayUtil::destruct<Copy>(Copy*, int32_t, hkTraitBool<0>) {}
+void hkArrayUtil::destruct<Copy>(Copy*, int32_t, hkTraitBool<false>) {}
 
 void sub_E4B560() {
     ;

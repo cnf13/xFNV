@@ -31,8 +31,8 @@ NiObject* NiPSysRadialFieldModifier::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -116,7 +116,7 @@ void NiPSysRadialFieldModifier::Update(float fTime, NiPSysData* pkData) {
         }
         else {
             // The CRT's __CIpow, both arguments on the x87 stack.
-            float fPow = static_cast<float>(std::pow(fDistSqr, fHalfAttenuation));
+            float fPow = std::pow(fDistSqr, fHalfAttenuation);
             float fFalloff = fPow * m_fRadialType;
             fScale = fDeltaT * m_fMagnitude / BSMAX(1.0f, fFalloff);
         }
@@ -165,7 +165,7 @@ NiObject* NiPSysRadialFieldModifier::CreateObject() {
     NiPSysRadialFieldModifier* pkObject =
         static_cast<NiPSysRadialFieldModifier*>(NiMemObject::operator new(sizeof(NiPSysRadialFieldModifier)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysRadialFieldModifier;
 }

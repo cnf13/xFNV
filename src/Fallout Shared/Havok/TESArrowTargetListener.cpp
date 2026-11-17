@@ -36,7 +36,7 @@ void TESArrowTargetListener::entityRemovedCallback(hkpEntity* apEntity) {
                 pav = pcol->m_pkSceneObject;
             }
             else {
-                pav = 0;
+                pav = nullptr;
             }
             TESObjectREFR::FindReferenceFor3D(pav);
             ProcessArray* pMobArray = &ReferenceProcessLists.MobProcessArray;
@@ -72,7 +72,7 @@ void TESArrowTargetListener::entityDeletedCallback(hkpEntity* apEntity) {
                 pav = pcol->m_pkSceneObject;
             }
             else {
-                pav = 0;
+                pav = nullptr;
             }
             TESObjectREFR::FindReferenceFor3D(pav);
             ProcessArray* pMobArray = &ReferenceProcessLists.MobProcessArray;

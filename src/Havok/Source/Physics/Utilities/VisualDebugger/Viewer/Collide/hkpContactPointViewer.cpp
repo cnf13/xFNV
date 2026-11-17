@@ -149,7 +149,7 @@ void hkpContactPointViewer::postSimulationCallback(hkpWorld* world) {
 
 void hkpContactPointViewer::worldAddedCallback(hkpWorld* w) {
     if (this == nullptr) {
-        w->addWorldPostSimulationListener(0);
+        w->addWorldPostSimulationListener(nullptr);
     }
     else {
         w->addWorldPostSimulationListener(this);
@@ -158,7 +158,7 @@ void hkpContactPointViewer::worldAddedCallback(hkpWorld* w) {
 
 void hkpContactPointViewer::worldRemovedCallback(hkpWorld* w) {
     if (this == nullptr) {
-        w->removeWorldPostSimulationListener(0);
+        w->removeWorldPostSimulationListener(nullptr);
     }
     else {
         w->removeWorldPostSimulationListener(this);

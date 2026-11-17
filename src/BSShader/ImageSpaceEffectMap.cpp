@@ -56,7 +56,7 @@ bool ImageSpaceEffectMap::UpdateParams(ImageSpaceEffectParam* apParam) {
     }
     float fInvWidth = 1.0 / dWidth;
     pParam->SetPixelConstant(0, fInvWidth, fInvHeight, 0.0f, 0.0f);
-    return 1;
+    return true;
 }
 
 // The first shader parameter is the effect's: it is deleted and its slot emptied.

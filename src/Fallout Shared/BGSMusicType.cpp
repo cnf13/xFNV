@@ -103,7 +103,7 @@ void BGSMusicType::InitItem() {
             v1 = RandomInt(0, pMusicFileList.ItemsInList() - 1);
         }
         iLastSelection = v1;
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -118,12 +118,12 @@ void BGSMusicType::Copy(TESForm* apCopy) {
 bool BGSMusicType::Compare(TESForm* apCompare) {
     BGSMusicType* v4 = dynamic_cast<BGSMusicType*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (v4->fAttenuation == fAttenuation) {
         return (((int8_t)TESForm::CompareAllComponents(v4)) != 0);
     }
-    return (bool)1;
+    return true;
 }
 
 bool BGSMusicType::GetLooping() {
@@ -135,7 +135,7 @@ float BGSMusicType::GetAttenuation() {
         return fAttenuation;
     }
     else {
-        return (float)(-fAttenuation);
+        return (-fAttenuation);
     }
 }
 
@@ -144,12 +144,12 @@ void BGSMusicType::BuildFileList() {
     char apString1[264];
     BSSystemDir FindDir;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_AUDIO, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BGSMusicType.cpp", 352
+        MEM_CONTEXT_AUDIO, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BGSMusicType.cpp", 352
     );
     const char* SoundFile = GetSoundFile();
     BSsprintf(apDest, 260, "%s\\%s", "Data\\Music", SoundFile);
     const char* TestExt = ".mp3";
-    bool bDone = 0;
+    bool bDone = false;
     FindDir.~BSSystemDir();
     ::new (&FindDir) BSSystemDir(apDest);
     for (BSSystemFile::ErrorCode Err = FindDir.NextEntry(bDone); !bDone && Err == BSSystemFile::EC_NONE;
@@ -158,7 +158,7 @@ void BGSMusicType::BuildFileList() {
             // This address (&FindDir.FindData_.cFileName) is never null.
             char apExt[264];
             void* MBRoomAccumList = &FindDir.FindData_.cFileName;
-            BSsplitpath(static_cast<char*>(MBRoomAccumList), 0, 0, 0, 0, 0, 0, apExt, 260);
+            BSsplitpath(static_cast<char*>(MBRoomAccumList), nullptr, 0, nullptr, 0, nullptr, 0, apExt, 260);
             if (!BSstricmp(apExt, TestExt)) {
                 BGSMusicType::MusicFileEntry* v2;
                 BSsprintf(apString1, 260, "%s%s", apDest, &FindDir.FindData_.cFileName);
@@ -168,7 +168,7 @@ void BGSMusicType::BuildFileList() {
                     v2 = ::new (v4) BGSMusicType::MusicFileEntry(apString1);
                 }
                 else {
-                    v2 = 0;
+                    v2 = nullptr;
                 }
                 char* a2 = v2->cFilename;
                 pMusicFileList.AddHead(a2);
@@ -233,14 +233,14 @@ void TESSoundFile::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESSoundFile::CompareComponent(BaseFormComponent* apCompareFC) {
     TESSoundFile* pcompare = dynamic_cast<TESSoundFile*>(apCompareFC);
     if (!pcompare) {
-        return 1;
+        return true;
     }
     if (!GetSoundFileLength() && !pcompare->GetSoundFileLength()) {
-        return 0;
+        return false;
     }
     uint32_t SoundFileLength = GetSoundFileLength();
     if (SoundFileLength != pcompare->GetSoundFileLength()) {
-        return 1;
+        return true;
     }
     return BSstricmp(GetSoundFile(), pcompare->GetSoundFile()) != 0;
 }

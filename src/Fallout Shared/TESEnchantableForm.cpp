@@ -32,11 +32,11 @@ void TESEnchantableForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESEnchantableForm::CompareComponent(BaseFormComponent* apCompareFC) {
     TESEnchantableForm* v6 = dynamic_cast<TESEnchantableForm*>(apCompareFC);
     if (!v6) {
-        return (bool)1;
+        return true;
     }
     EnchantmentItem* v3 = TESEnchantableForm::GetFormEnchanting();
     if (v3 != v6->TESEnchantableForm::GetFormEnchanting()) {
-        return (bool)1;
+        return true;
     }
     int32_t fatigue = (int32_t)iAmountofEnchantment;
     return (bool)((uint8_t)(((uint32_t)fatigue) != ((uint32_t)v6->iAmountofEnchantment)));
@@ -79,7 +79,7 @@ void TESEnchantableForm::InitItem(TESForm* apOwner) {
                         "(%08X) '%s'.",
                         pFormEnchanting->iFormID, v4, v5, v8
                     );
-                    pFormEnchanting = 0;
+                    pFormEnchanting = nullptr;
                 }
             }
         }

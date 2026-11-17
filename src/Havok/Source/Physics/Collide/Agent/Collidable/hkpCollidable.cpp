@@ -256,7 +256,7 @@ void hkpCollidable::BoundingVolumeData::deallocate() {
     hkMemoryRouter* v7 = &hkMemoryRouter::getInstance();
     v7->m_heap->blockFree(m_childShapeKeys, (int32_t)(4 * v6));
     this->m_childShapeAabbs = nullptr;
-    this->m_childShapeKeys = (uint32_t*)0;
+    this->m_childShapeKeys = (uint32_t*)nullptr;
     m_numChildShapeAabbs = (uint16_t)0;
     this->m_capacityChildShapeAabbs = (uint16_t)0;
 }

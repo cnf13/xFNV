@@ -55,25 +55,25 @@ void TESSpellList::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESSpellList::CompareComponent(BaseFormComponent* apCompareFC) {
     TESSpellList* pCompare = dynamic_cast<TESSpellList*>(apCompareFC);
     if (!pCompare) {
-        return 1;
+        return true;
     }
     uint32_t iCount = 0;
     for (SpellItem* pspell : *&spellList) {
         if (pspell) {
             if (!pCompare->HasSpell(pspell)) {
-                return 1;
+                return true;
             }
             ++iCount;
         }
     }
     if ((&pCompare->spellList)->ItemsInList() != iCount) {
-        return 1;
+        return true;
     }
     uint32_t iCount_2 = 0;
     for (TESLevSpell*& rpItem : *&leveledSpellList) {
         if (rpItem) {
             if (!pCompare->HasLeveledSpell(rpItem)) {
-                return 1;
+                return true;
             }
             ++iCount_2;
         }
@@ -232,7 +232,7 @@ void TESSpellList::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
             }
             else {
                 if (pleveledSpell) {
-                    bool badd = 1;
+                    bool badd = true;
                     if (pSaveLoadGameOLD->GetCurrentVersion() < 71u) {
                         badd = !leveledSpellList.IsInList(pleveledSpell);
                     }
@@ -308,10 +308,10 @@ void TESSpellList::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
 bool TESSpellList::AddSpell(SpellItem* apSpell) {
     TESSpellList* v3;
     if (!apSpell) {
-        return 0;
+        return false;
     }
     if ((&spellList)->IsInList(apSpell)) {
-        return 0;
+        return false;
     }
     (&spellList)->AddHead(apSpell);
     TESActorBase* ActorBase = pPlayer->GetActorBase();
@@ -319,18 +319,18 @@ bool TESSpellList::AddSpell(SpellItem* apSpell) {
         v3 = static_cast<TESSpellList*>(ActorBase);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     if (this == v3 && !pDataHandler->GetSaveLoad()) {
         pPlayer->SpellLearned(apSpell);
     }
-    return 1;
+    return true;
 }
 
 bool TESSpellList::AddSpell(TESForm* apSpellIn) {
     if (pDataHandler->GetSaveLoad()) {
         AddSpell(static_cast<SpellItem*>(apSpellIn));
-        return 1;
+        return true;
     }
     else {
         SpellItem* pspell = dynamic_cast<SpellItem*>(apSpellIn);
@@ -347,23 +347,23 @@ bool TESSpellList::AddSpell(TESForm* apSpellIn) {
 bool TESSpellList::AddSpell(TESLevSpell* apSpellIn) {
     TESSpellList* v3;
     if (!apSpellIn) {
-        return 0;
+        return false;
     }
     TESActorBase* ActorBase = pPlayer->GetActorBase();
     if (ActorBase) {
         v3 = static_cast<TESSpellList*>(ActorBase);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     if (this == v3) {
-        return 0;
+        return false;
     }
     if ((&leveledSpellList)->IsInList(apSpellIn)) {
-        return 0;
+        return false;
     }
     (&leveledSpellList)->AddHead(apSpellIn);
-    return 1;
+    return true;
 }
 
 void TESSpellList::FreeSpellList() {
@@ -431,13 +431,13 @@ void TESSpellList::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 
 void TESSpellList::InitItem(TESForm* apOwner) {
     TESFile* pownerFile;
-    BSSimpleList<SpellItem*>* pLastList = 0;
+    BSSimpleList<SpellItem*>* pLastList = nullptr;
     BSSimpleList<SpellItem*>* pList = &spellList;
     if (apOwner) {
         pownerFile = apOwner->GetFile(-1);
     }
     else {
-        pownerFile = 0;
+        pownerFile = nullptr;
     }
     while (pList && pList->m_item) {
         uint32_t tempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pList->m_item));
@@ -532,8 +532,8 @@ void TESSpellList::SaveGameBGS(BGSSaveFormBuffer* apSaveGameBuffer) {
 bool TESSpellList::HasLeveledSpell(TESLevSpell* apSpell) {
     for (TESLevSpell*& rpItem : *&leveledSpellList) {
         if (rpItem == apSpell) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }

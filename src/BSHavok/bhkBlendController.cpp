@@ -156,12 +156,12 @@ void bhkBlendController::ClearKeys() {
 bool bhkBlendController::CalculateGain(float afTime, float& arGain, float& arVelGain) {
     uint32_t m_uiESize = pBlendKeyA.m_uiESize;
     if (!m_uiESize) {
-        return 0;
+        return false;
     }
     if (m_uiESize == 1) {
         arGain = pBlendKeyA.m_pBase->fGain;
         arVelGain = pBlendKeyA.m_pBase->fVelGain;
-        return 1;
+        return true;
     }
     else {
         double v12;
@@ -194,7 +194,7 @@ bool bhkBlendController::CalculateGain(float afTime, float& arGain, float& arVel
         }
         else {
             float* p_fTime = &m_pBase[v10 + 2].fTime;
-            while (1) {
+            while (true) {
                 v12 = *(p_fTime - 6);
                 if (v12 >= v9) {
                     break;
@@ -250,7 +250,7 @@ bool bhkBlendController::CalculateGain(float afTime, float& arGain, float& arVel
             arGain = NiInterpScalar::Linear(afTimee, fP, v16[v10].fGain);
             arVelGain = NiInterpScalar::Linear(afTimee, fVelGain, pBlendKeyA.m_pBase[v10].fVelGain);
         }
-        return 1;
+        return true;
     }
 }
 

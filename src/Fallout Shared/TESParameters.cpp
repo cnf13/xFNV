@@ -87,7 +87,7 @@ uint32_t TESParameters::GetParamCount(FunctionData* apFuncData) {
 }
 
 bool TESParameters::GetParamIsTESForm(FunctionData* apFuncData, uint32_t aiParam) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apFuncData && apFuncData->usFunction == 408) {
         return FOScriptFunctions::GetParamIsTESForm(apFuncData, aiParam);
     }
@@ -101,12 +101,12 @@ bool TESParameters::GetParamIsTESForm(FunctionData* apFuncData, uint32_t aiParam
 }
 
 bool TESParameters::GetParamIsReference(FunctionData* apFuncData, uint32_t aiParam) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apFuncData) {
         if (aiParam < TESParameters::GetParamCount(apFuncData)) {
             SCRIPT_PARAM_TYPE eParamType = scriptFunctions[apFuncData->usFunction].pParameters[aiParam].eParamType;
             if (eParamType == SCRIPT_PARAM_OBJECTREF || eParamType == SCRIPT_PARAM_ACTOR) {
-                return 1;
+                return true;
             }
         }
     }
@@ -114,7 +114,7 @@ bool TESParameters::GetParamIsReference(FunctionData* apFuncData, uint32_t aiPar
 }
 
 bool TESParameters::GetParamIsScriptVariable(FunctionData* apFuncData, uint32_t aiParam) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apFuncData) {
         if (aiParam < TESParameters::GetParamCount(apFuncData)) {
             return scriptFunctions[apFuncData->usFunction].pParameters[aiParam].eParamType == SCRIPT_PARAM_SCRIPT_VAR;
@@ -124,7 +124,7 @@ bool TESParameters::GetParamIsScriptVariable(FunctionData* apFuncData, uint32_t 
 }
 
 Script* TESParameters::GetScriptFromParam(uint32_t aiParam, FunctionData* apFuncData) {
-    Script* pScript = 0;
+    Script* pScript = nullptr;
     if (TESParameters::GetParamIsTESForm(apFuncData, aiParam)) {
         TESForm* pform = static_cast<TESForm*>(apFuncData->uParam[aiParam].pPointer);
         TESScriptableForm* pscriptableform = dynamic_cast<TESScriptableForm*>(pform);

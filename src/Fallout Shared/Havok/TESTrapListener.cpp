@@ -41,7 +41,7 @@
 #include "Havok/Source/Physics/Dynamics/Phantom/hkpSimpleShapePhantom.h"
 #include "Reconstruction.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 TrapTargetEntry::TrapTargetEntry(TESObjectREFR* apRefr, const hkpCollidable* apCollidable)
@@ -64,7 +64,7 @@ ZoneEntry* TESTrapListener::CreateZoneEntry(TESObjectREFR* apRef, const hkpColli
         return ::new (v5) TrapEntry(apRef, apCol);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -125,7 +125,7 @@ void TESTrapListener::phantomAddedCallback(hkpPhantom* apPhantom) {
                 pentry = ::new (apMemory) TriggerEntry(pref, pcol);
             }
             else {
-                pentry = 0;
+                pentry = nullptr;
             }
             pentry->pNext = pTriggers;
             pTriggers = pentry;
@@ -134,13 +134,13 @@ void TESTrapListener::phantomAddedCallback(hkpPhantom* apPhantom) {
 }
 
 bool TESTrapListener::contactPointAddedCallback(hkpRootCdPoint& arPoint) {
-    bool bres = 0;
+    bool bres = false;
     TESObjectREFR* ptrapRef = TESHavokUtilities::FindCollidableRef(arPoint.m_rootCollidableB);
     TESObjectREFR* pTargetRef = TESHavokUtilities::FindCollidableRef(arPoint.m_rootCollidableA);
     if (ptrapRef) {
         if (pTargetRef) {
             if (pTargetRef->IsActor()) {
-                return AddZoneTargetPair(arPoint, ptrapRef, pTargetRef, 0, 1) != 0;
+                return AddZoneTargetPair(arPoint, ptrapRef, pTargetRef, 0, true) != nullptr;
             }
         }
     }
@@ -148,14 +148,14 @@ bool TESTrapListener::contactPointAddedCallback(hkpRootCdPoint& arPoint) {
 }
 
 bool TESTrapListener::contactPointRemovedCallback(hkpRootCdPoint& arPoint) {
-    bool bres = 0;
+    bool bres = false;
     TESObjectREFR* ptrapRef = TESHavokUtilities::FindCollidableRef(arPoint.m_rootCollidableB);
     TESObjectREFR* pTargetRef = TESHavokUtilities::FindCollidableRef(arPoint.m_rootCollidableA);
     if (ptrapRef) {
         if (pTargetRef) {
             if (pTargetRef->IsActor()) {
                 RemoveTargetFromZone_00620680(arPoint.m_rootCollidableB, pTargetRef);
-                return 1;
+                return true;
             }
         }
     }
@@ -184,10 +184,10 @@ bool TESTrapListener::IsRefInTrigger(TESObjectREFR* apRef, TESObjectREFR* apTrig
 bool TESTrapListener::IsCurrentTrigger(TESObjectREFR* apRef) {
     for (TriggerEntry* i = pTriggers; i; i = i->QNextEntry()) {
         if (i->pRef == apRef) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 // Reads each entry's next before deleting it, and null-tests the entry again before the delete.
@@ -225,10 +225,10 @@ bool TriggerEntry::RefList::Add(TESObjectREFR* apRef) {
     for (int32_t irefIdx = 0; irefIdx < iArraySize; ++irefIdx) {
         if (newID == pRefArray[irefIdx].RefID) {
             if (pRefArray[irefIdx].bInsideTrigger) {
-                return 0;
+                return false;
             }
-            pRefArray[irefIdx].bInsideTrigger = 1;
-            return 1;
+            pRefArray[irefIdx].bInsideTrigger = true;
+            return true;
         }
     }
     if (iArraySize == iArrayMaxSize) {
@@ -250,18 +250,18 @@ bool TriggerEntry::RefList::Add(TESObjectREFR* apRef) {
         pRefArray = pnewArray;
     }
     pRefArray[iArraySize].RefID = newID;
-    pRefArray[iArraySize++].bInsideTrigger = 1;
+    pRefArray[iArraySize++].bInsideTrigger = true;
     TriggerEntry::TriggerEvent* pnewEvent =
         static_cast<TriggerEntry::TriggerEvent*>(ourMalloc(sizeof(TriggerEntry::TriggerEvent)));
     pnewEvent->eStatus = TriggerEntry::TRIGGER_STATUS_ENTER;
     pnewEvent->RefID = newID;
     EventList.AddTail(pnewEvent);
-    return 0;
+    return false;
 }
 
 TriggerEntry::TriggerEvent* TriggerEntry::RefList::GetNewEvent() {
     if (EventList.IsEmpty()) {
-        return 0;
+        return nullptr;
     }
     else {
         return EventList.RemoveHead();
@@ -272,7 +272,7 @@ void TriggerEntry::RefList::UpdateExitList() {
     int32_t irefIdx = 0;
     while (irefIdx < iArraySize) {
         if (pRefArray[irefIdx].bInsideTrigger) {
-            pRefArray[irefIdx++].bInsideTrigger = 0;
+            pRefArray[irefIdx++].bInsideTrigger = false;
         }
         else {
             TriggerEntry::TriggerEvent* pnewEvent =
@@ -338,7 +338,7 @@ bool TriggerEntry::Update(float afDelta) {
                         TESObjectREFR* ptriggeredRef = TESHavokUtilities::FindCollidableRef(pcol);
                         if (ptriggeredRef) {
                             bool bactorLimb = ptriggeredRef->IsActor() && hkpGetRigidBody(pcol);
-                            bool bactorRagdollin = ptriggeredRef->IsDead(0) || ptriggeredRef->IsKnockedOut();
+                            bool bactorRagdollin = ptriggeredRef->IsDead(false) || ptriggeredRef->IsKnockedOut();
                             if ((!bactorLimb || bactorRagdollin) && CurrentRefs.Add(ptriggeredRef)) {
                                 ExtraDataList* pextraList = pRef->GetExtra();
                                 bool bwas = btriggered;
@@ -362,7 +362,7 @@ bool TriggerEntry::Update(float afDelta) {
                     TESObjectREFR* ptriggeredRef = TESHavokUtilities::FindCollidableRef(pcol);
                     if (ptriggeredRef) {
                         bool bactorLimb = ptriggeredRef->IsActor() && hkpGetRigidBody(pcol);
-                        bool bactorRagdollin = ptriggeredRef->IsDead(0) || ptriggeredRef->IsKnockedOut();
+                        bool bactorRagdollin = ptriggeredRef->IsDead(false) || ptriggeredRef->IsKnockedOut();
                         if ((!bactorLimb || bactorRagdollin) && CurrentRefs.Add(ptriggeredRef)) {
                             ExtraDataList* pextraList = pRef->GetExtra();
                             bool bwas = btriggered;

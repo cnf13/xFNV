@@ -31,7 +31,7 @@ public:
 
     class RenderPassDescriptor;
     // Gamebryo's fallback callback: tries another set of passes after pass uiFailedPass failed with eFailedRC.
-    typedef bool (*SHADERFALLBACKFUNC)(
+    using SHADERFALLBACKFUNC = bool (*)(
         NiMaterialDescriptor* pkMaterialDescriptor,
         ReturnCode eFailedRC,
         uint32_t uiFailedPass,

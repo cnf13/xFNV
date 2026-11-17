@@ -179,7 +179,7 @@ void* hkRootLevelContainer::findObjectByName(const char* objectName, const void*
     while (v6->m_variant.m_pntr != prevObject);
     int32_t v7 = v4;
     if (v4 >= m_namedVariants.m_size) {
-        return 0;
+        return nullptr;
     }
     for (int32_t i = v4;; ++i) {
         const char* m_stringAndFlag = m_namedVariants.m_data[i].m_name.m_stringAndFlag;
@@ -190,7 +190,7 @@ void* hkRootLevelContainer::findObjectByName(const char* objectName, const void*
             break;
         }
         if (++v7 >= m_namedVariants.m_size) {
-            return 0;
+            return nullptr;
         }
     }
     return m_namedVariants.m_data[v7].m_variant.m_pntr;

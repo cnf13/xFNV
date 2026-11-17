@@ -26,7 +26,7 @@
 #include "Reconstruction.hpp"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiPixelFormat NiPixelFormat::RGBA8888{
     {},
@@ -78,9 +78,9 @@ bool NiDevImageConverter::ReadImageFileInfo(
     NiPath::Standardize(pcDest);
     NiFilename kFileName(pcDest);
     if (!m_pkHead) {
-        return 0;
+        return false;
     }
-    while (1) {
+    while (true) {
         NiFile* pkIstr;
         bool v11;
         NiImageReader* pkReader = m_pkHead->m_element;
@@ -91,7 +91,7 @@ bool NiDevImageConverter::ReadImageFileInfo(
         pkIstr = NiFile::GetFile(pcDest, NiFile::READ_ONLY, 0x8000u);
         pkIstr_2 = pkIstr;
         if (!pkIstr) {
-            return 0;
+            return false;
         }
         if (!pkIstr->operator bool()) {
             break;
@@ -99,18 +99,18 @@ bool NiDevImageConverter::ReadImageFileInfo(
         v11 = !pkReader->ReadHeader(*pkIstr_2, uiWidth, uiHeight, kFmt, bMipmap, uiNumFaces);
         if (!v11) {
             delete pkIstr_2;
-            return 1;
+            return true;
         }
         delete pkIstr_2;
     LABEL_7:;
         if (!m_pkHead) {
-            return 0;
+            return false;
         }
     }
     if (pkIstr_2) {
         delete pkIstr_2;
     }
-    return 0;
+    return false;
 }
 
 NiPixelData* NiDevImageConverter::ReadImageFile(const char* pcFilename, NiPixelData* pkOptDest, NiFile* apFile) {
@@ -133,11 +133,11 @@ NiPixelData* NiDevImageConverter::ReadImageFile(const char* pcFilename, NiPixelD
                 pkIstr = NiFile::GetFile(pcDest, NiFile::READ_ONLY, 32768u);
             }
             if (!pkIstr) {
-                return 0;
+                return nullptr;
             }
             if (!pkIstr->operator bool()) {
                 delete pkIstr;
-                return 0;
+                return nullptr;
             }
             NiPixelData* pkDest = pkReader->ReadFile(*pkIstr, pkOptDest);
             if (pkDest) {
@@ -152,7 +152,7 @@ NiPixelData* NiDevImageConverter::ReadImageFile(const char* pcFilename, NiPixelD
     if (apFile) {
         delete apFile;
     }
-    return 0;
+    return nullptr;
 }
 
 bool NiDevImageConverter::CanConvertPixelData(const NiPixelFormat& kSrcFmt, const NiPixelFormat& kDestFmt) const {
@@ -163,28 +163,28 @@ bool NiDevImageConverter::CanConvertPixelData(const NiPixelFormat& kSrcFmt, cons
     kDestBits.~PixelBits();
     ::new (&kDestBits) NiDevImageConverter::PixelBits(kDestFmt);
     if (kSrcFmt.operator==(kDestFmt)) {
-        return 1;
+        return true;
     }
     if ((kSrcFmt.m_uFlags & 1) == 0) {
-        return 0;
+        return false;
     }
     if ((kDestFmt.m_uFlags & 1) == 0) {
-        return 0;
+        return false;
     }
     NiPixelFormat::Format v5 = kDestFmt.m_eFormat;
     if (v5 >= NiPixelFormat::FORMAT_DXT1 && v5 <= NiPixelFormat::FORMAT_DXT5) {
-        return 0;
+        return false;
     }
     if (m_ucBitsPerPixel == 24 &&
         (kDestBits.m_uiGM != 0x00FF00 || (kDestBits.m_uiRM != 0x0000FF && kDestBits.m_uiRM != 0xFF0000))) {
-        return 0;
+        return false;
     }
     if (kSrcFmt.operator==(NiPixelFormat_PAL4) || kSrcFmt.operator==(NiPixelFormat_PALA4)) {
         if (m_eFormat == NiPixelFormat::FORMAT_RGB || m_eFormat == NiPixelFormat::FORMAT_RGBA) {
             return m_ucBitsPerPixel == 24 || m_ucBitsPerPixel == 32;
         }
         if (!kDestFmt.operator!=(NiPixelFormat_PAL4)) {
-            return 1;
+            return true;
         }
         v7 = kDestFmt.operator!=(NiPixelFormat_PALA4);
     }
@@ -194,7 +194,7 @@ bool NiDevImageConverter::CanConvertPixelData(const NiPixelFormat& kSrcFmt, cons
                 (!kSrcFmt.operator==(NiPixelFormat_RGBA32) && !static_cast<uint8_t>(kSrcFmt.GetCompressed()))) {
                 if (!kSrcFmt.operator==(NiPixelFormat_BUMP16) && !kSrcFmt.operator==(NiPixelFormat_BUMPLUMA32)) {
                     if (!kSrcFmt.operator==(NiPixelFormat_RGBA16) && !kSrcFmt.operator==(NiPixelFormat_BGRA16)) {
-                        return 0;
+                        return false;
                     }
                     return m_ucBitsPerPixel == 16;
                 }
@@ -203,12 +203,12 @@ bool NiDevImageConverter::CanConvertPixelData(const NiPixelFormat& kSrcFmt, cons
             if (m_eFormat != NiPixelFormat::FORMAT_RGB && m_eFormat != NiPixelFormat::FORMAT_RGBA) {
             LABEL_22:;
                 if (m_eFormat != NiPixelFormat::FORMAT_BUMP && m_eFormat != NiPixelFormat::FORMAT_BUMPLUMA) {
-                    return 0;
+                    return false;
                 }
             }
         LABEL_24:;
             if (m_ucBitsPerPixel == 16 || m_ucBitsPerPixel == 24) {
-                return 1;
+                return true;
             }
             return m_ucBitsPerPixel == 32;
         }
@@ -216,7 +216,7 @@ bool NiDevImageConverter::CanConvertPixelData(const NiPixelFormat& kSrcFmt, cons
             goto LABEL_24;
         }
         if (!kDestFmt.operator!=(NiPixelFormat_PAL8)) {
-            return 1;
+            return true;
         }
         v7 = kDestFmt.operator!=(NiPixelFormat_PALA8);
     }
@@ -322,14 +322,14 @@ bool NiDevImageConverter::CanReadImageFile(const char* pcFilename) {
     NiPath::Standardize(pcDest);
     NiFilename kFileName(pcDest);
     if (m_pkHead) {
-        while (1) {
+        while (true) {
             NiImageReader* pkReader = m_pkHead->m_element;
             m_pkHead = m_pkHead->m_pkNext;
             if (pkReader->CanReadFile(kFileName.m_acExt)) {
                 break;
             }
             if (!m_pkHead) {
-                return 0;
+                return false;
             }
         }
         NiFile* pkIstr = NiFile::GetFile(pcDest, NiFile::READ_ONLY, 0x8000u);
@@ -337,12 +337,12 @@ bool NiDevImageConverter::CanReadImageFile(const char* pcFilename) {
             bool v6 = !pkIstr->operator bool();
             if (!v6) {
                 delete pkIstr;
-                return 1;
+                return true;
             }
             delete pkIstr;
         }
     }
-    return 0;
+    return false;
 }
 
 bool NiDevImageConverter::IsASupportedMipmapGenerationFormat(const NiPixelFormat& kSrcFmt) {
@@ -378,7 +378,7 @@ NiPixelData* NiDevImageConverter::GenerateMipmapLevels(const NiPixelData* pkSrc,
     }
     else {
         if (!IsAnAlphaSupportedMipmapGenerationFormat(pkSrc->m_kPixelFormat)) {
-            return 0;
+            return nullptr;
         }
         v5 = &NiPixelFormat_RGBA32;
     }
@@ -392,17 +392,17 @@ NiPixelData* NiDevImageConverter::GenerateMipmapLevels(const NiPixelData* pkSrc,
             pkDest = ::new (v7) NiPixelData(*pkSrc->m_puiWidth, *pkSrc->m_puiHeight, kDestFmt, 0, pkSrc->m_uiFaces);
         }
         else {
-            pkDest = 0;
+            pkDest = nullptr;
         }
     }
     uint32_t m_uiMipmapLevels = pkDest->m_uiMipmapLevels;
     uint32_t v52 = m_uiMipmapLevels;
     if (pkSrc != pkDest && !ConvertPixelDataFormat(*pkDest, *pkSrc, 0)) {
-        return 0;
+        return nullptr;
     }
     uint32_t apkOptDesta = 0;
     if (pkSrc->m_uiFaces) {
-        while (1) {
+        while (true) {
             if (kDestFmt.operator==(NiPixelFormat_RGB24)) {
                 uint32_t v10 = 1;
                 int32_t v61 = 1;
@@ -1208,7 +1208,7 @@ NiPixelData* NiDevImageConverter::ConvertForPlatform(
     else {
         v11 = nullptr;
     }
-    return ConvertPixelDataFormat(*v11, *pkSrc, (-1)) ? v11 : (nullptr);
+    return ConvertPixelDataFormat(*v11, *pkSrc, (-1)) ? v11 : nullptr;
 }
 
 NiTPointerList<NiImageReader*>& NiDevImageConverter::GetImageReaderList() {
@@ -1309,7 +1309,7 @@ const NiPixelFormat* NiDevImageConverter::FindClosestPixelFormatDX9(
                 v9 = kDesiredFmt.GetBits(NiPixelFormat::COMP_ALPHA) != 0;
             }
             if (static_cast<uint8_t>(kDesiredFmt.GetCompressed())) {
-                v9 = 1;
+                v9 = true;
             }
             NiTexture::FormatPrefs::AlphaFormat v10 = kFmtPrefs.m_eAlphaFmt;
             if (v10 == NiTexture::FormatPrefs::BINARY) {
@@ -1383,7 +1383,7 @@ const NiPixelFormat* NiDevImageConverter::FindClosestPixelFormatXenon(
         v5 = m_ucBitsPerComponent != 0;
     }
     if (m_eFormat >= NiPixelFormat::FORMAT_DXT1 && m_eFormat <= NiPixelFormat::FORMAT_DXT5) {
-        v5 = 1;
+        v5 = true;
     }
     NiTexture::FormatPrefs::PixelLayout m_ePixelLayout = kFmtPrefs.m_ePixelLayout;
     if (kFmtPrefs.m_ePixelLayout == NiTexture::FormatPrefs::FLOAT_COLOR_128) {
@@ -1485,7 +1485,7 @@ const NiPixelFormat* NiDevImageConverter::FindClosestPixelFormatPS3(
         v5 = m_ucBitsPerComponent != 0;
     }
     if (m_eFormat >= NiPixelFormat::FORMAT_DXT1 && m_eFormat <= NiPixelFormat::FORMAT_DXT5) {
-        v5 = 1;
+        v5 = true;
     }
     NiTexture::FormatPrefs::PixelLayout m_ePixelLayout = kFmtPrefs.m_ePixelLayout;
     if (kFmtPrefs.m_ePixelLayout == NiTexture::FormatPrefs::FLOAT_COLOR_128) {
@@ -1552,7 +1552,7 @@ const NiPixelFormat* NiDevImageConverter::FindClosestPixelFormatPS3(
         v13 = kDesiredFmt.GetBits(NiPixelFormat::COMP_ALPHA) != 0;
     }
     if (static_cast<uint8_t>(kDesiredFmt.GetCompressed())) {
-        v13 = 1;
+        v13 = true;
     }
     NiTexture::FormatPrefs::AlphaFormat m_eAlphaFmt = kFmtPrefs.m_eAlphaFmt;
     if (m_eAlphaFmt == NiTexture::FormatPrefs::BINARY ||

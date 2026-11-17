@@ -295,7 +295,7 @@ void hkPoweredChain_ScanAndEnableMotors(
                 continue;
             }
             const float difference = velocity - target;
-            const float absDifference = static_cast<float>(std::fabs(difference));
+            const float absDifference = std::fabs(difference);
             if (maxDifference < absDifference) {
                 maxDifference = absDifference;
                 constraintIndex = i;

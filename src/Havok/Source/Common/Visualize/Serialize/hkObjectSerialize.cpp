@@ -123,7 +123,7 @@ uint64_t hkObjectSerialize::readObject(
     }
     // EXE-INLINED none: hkArray<hkObjectSerialize::LocalFixup, hkContainerHeapAllocator>::hkArray
     FNVD_INLINED_LOCAL(LocalFixupArray, localFixups, std::nullopt, std::nullopt);
-    localFixups.m_data = 0;
+    localFixups.m_data = nullptr;
     localFixups.m_size = 0;
     localFixups.m_capacityAndFlags = LocalFixupArray::DONT_DEALLOCATE_FLAG;
     s->read(&numLocalFixups, 4);
@@ -239,23 +239,23 @@ int32_t hkObjectSerialize::writeObject(
     FNVD_INLINED_LOCAL(hkArrayStreamWriter, apThis, std::nullopt, std::nullopt);
     hkRelocationInfo arReloc_;
     hkPlatformObjectWriter apMemory(destLayout);
-    buffer.m_data = 0;
+    buffer.m_data = nullptr;
     buffer.m_size = 0;
     buffer.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
     ::new (&apThis) hkArrayStreamWriter(&buffer, hkArrayStreamWriter::ARRAY_BORROW);
-    arReloc_.m_local.m_data = 0;
+    arReloc_.m_local.m_data = nullptr;
     arReloc_.m_local.m_size = 0;
     arReloc_.m_local.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Local>::DONT_DEALLOCATE_FLAG;
-    arReloc_.m_global.m_data = 0;
+    arReloc_.m_global.m_data = nullptr;
     arReloc_.m_global.m_size = 0;
     arReloc_.m_global.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Global>::DONT_DEALLOCATE_FLAG;
-    arReloc_.m_finish.m_data = 0;
+    arReloc_.m_finish.m_data = nullptr;
     arReloc_.m_finish.m_size = 0;
     arReloc_.m_finish.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Finish>::DONT_DEALLOCATE_FLAG;
-    arReloc_.m_imports.m_data = 0;
+    arReloc_.m_imports.m_data = nullptr;
     arReloc_.m_imports.m_size = 0;
     arReloc_.m_imports.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Import>::DONT_DEALLOCATE_FLAG;
-    arReloc_.m_pool = 0;
+    arReloc_.m_pool = nullptr;
     apMemory.hkPlatformObjectWriter::writeObject(&apThis, data, klass, arReloc_);
     int32_t aiReqElem = arReloc_.m_global.m_size + globalFixups.m_size;
     hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
@@ -299,7 +299,7 @@ int32_t hkObjectSerialize::writeObject(
     if (buffer.m_capacityAndFlags >= 0) {
         m_heap_1->bufFree(buffer.begin(), buffer.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
     }
-    buffer.m_data = 0;
+    buffer.m_data = nullptr;
     buffer.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
     return v16;
 }

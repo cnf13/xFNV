@@ -55,12 +55,12 @@ bool NiSearchPath::GetNextSearchPath(char* pcPath, uint32_t uiStringLen) {
             Dst.GetFullPath(pcPath, uiStringLen);
             NiPath::Standardize(pcPath);
             ++m_uiNextPath;
-            result = 1;
+            result = true;
             break;
         }
         default: {
         LABEL_8:;
-            result = 0;
+            result = false;
             break;
         }
     }

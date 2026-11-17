@@ -174,7 +174,7 @@ void TESCasinoChips::InitItem() {
         static_cast<BGSDestructibleObjectForm*>(this)->InitItem(this);
         static_cast<TESModelTextureSwap*>(this)->InitItem(this);
         static_cast<BGSPickupPutdownSounds*>(this)->InitItem(this);
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 
@@ -191,12 +191,12 @@ void TESCasinoChips::Copy(TESForm* apCopy) {
 bool TESCasinoChips::Compare(TESForm* apCompare) {
     TESCasinoChips* pComp = dynamic_cast<TESCasinoChips*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
-    return cDesc.StrCmp(pComp->cDesc, 1) != 0;
+    return cDesc.StrCmp(pComp->cDesc, true) != 0;
 }
 
 NiAVObject* TESCasinoChips::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
@@ -384,15 +384,15 @@ void TESCasino::Copy(TESForm* apCopy) {
 bool TESCasino::Compare(TESForm* apCompare) {
     TESCasino* pComp = dynamic_cast<TESCasino*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
     for (int32_t i = 0; i < 11; ++i) {
         TESTexture* Texture = pComp->GetTexture(i);
         if (BSstrcmp(textureArrayList[i].GetTextureName(), Texture->GetTextureName())) {
-            return 1;
+            return true;
         }
     }
     for (int32_t i_2 = 0; i_2 < 10; ++i_2) {
@@ -400,7 +400,7 @@ bool TESCasino::Compare(TESForm* apCompare) {
         const char* v6 = Model_->GetModel();
         const char* v4 = modelArrayList[i_2].GetModel();
         if (BSstrcmp(v4, v6)) {
-            return 1;
+            return true;
         }
     }
     TESQuest* FormByNumericID = static_cast<TESQuest*>(TESForm::GetFormByNumericID(data.questID));

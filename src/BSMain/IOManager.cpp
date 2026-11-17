@@ -165,18 +165,18 @@ uint32_t IOTask::GetNextOffset() {
 
 bool IOManager::DoSleep() {
     uint32_t i;
-    BSTaskThread::sDoPauseSleep = (bool)0;
+    BSTaskThread::sDoPauseSleep = false;
     if (InterlockedIncrementInt32(&iPauseCount) != 1) {
-        return (bool)0;
+        return false;
     }
     while (iNumThreadsPaused) {
         Sleep(1u);
     }
-    for (i = 0; i < ((uint32_t)iNumTaskThreads); ++i) {
+    for (i = 0; i < iNumTaskThreads; ++i) {
         pThreads[i]->Sleep();
         InterlockedIncrementInt32(&iNumThreadsPaused);
     }
-    return (bool)1;
+    return true;
 }
 
 // Until the manager exits: waits for a task signal, then walks the manager's tasks, running and finishing each queued
@@ -224,7 +224,7 @@ void BSTaskManagerThread::ThreadUpdate() {
     }
 }
 bool IOManager::TryCancelTask(IOTask* apTask, void* apTaskOwner) {
-    while (2) {
+    while (true) {
         bool result;
         BS_TASK_STATE eState = apTask->eState;
         switch (eState) {
@@ -242,7 +242,7 @@ bool IOManager::TryCancelTask(IOTask* apTask, void* apTaskOwner) {
                 RemoveTask(apTask);
                 apTask->Cancel(eState, apTaskOwner);
                 apTask->DecRefCount();
-                return 1;
+                return true;
             }
             case BS_TASK_STATE_MOVING: {
                 while (apTask->eState == BS_TASK_STATE_RUNNING) {
@@ -252,7 +252,7 @@ bool IOManager::TryCancelTask(IOTask* apTask, void* apTaskOwner) {
             }
             case BS_TASK_STATE_RUNNING:
             case BS_TASK_STATE_FINISHED: {
-                return 0;
+                return false;
             }
             case BS_TASK_STATE_COMPLETED: {
                 if (!apTask->SwitchState(eState, BS_TASK_STATE_CANCELED)) {
@@ -260,15 +260,15 @@ bool IOManager::TryCancelTask(IOTask* apTask, void* apTaskOwner) {
                 }
             LABEL_3:;
                 apTask->Cancel(eState, apTaskOwner);
-                result = 1;
+                result = true;
                 break;
             }
             case BS_TASK_STATE_CANCELED: {
-                result = 1;
+                result = true;
                 break;
             }
             default: {
-                result = 1;
+                result = true;
                 break;
             }
         }
@@ -283,21 +283,17 @@ uint32_t IOManager::GetTaskThreadID(int32_t a2) {
 bool IOManager::AddTask(BSTask<int64_t>* apTask) {
     if (eLoadingQueuedPriority != IO_TASK_PRIORITY_COUNT &&
         static_cast<uint8_t>(static_cast<uint32_t>(apTask->Key) >> 16) <= eLoadingQueuedPriority) {
-        apTask->Key = static_cast<uint64_t>(
-            (static_cast<uint64_t>(static_cast<uint32_t>(static_cast<uint32_t>(apTask->Key >> 32))) << 32) |
-            static_cast<uint32_t>((apTask->Key & 0xFF00FFFFu))
-        );
+        apTask->Key =
+            ((static_cast<uint64_t>(static_cast<uint32_t>(apTask->Key >> 32)) << 32) |
+             static_cast<uint32_t>((apTask->Key & 0xFF00FFFFu)));
     }
     static_cast<IOTask*>(apTask)->GenerateKey();
     while (!BSTaskManager<int64_t>::AddTask(apTask)) {
-        apTask->Key =
-            static_cast<uint16_t>(InterlockedIncrementInt32(&IOTask::iStaticCounter)) +
-            static_cast<uint64_t>(
-                (static_cast<uint64_t>(static_cast<uint32_t>(static_cast<uint32_t>(apTask->Key >> 32))) << 32) |
-                static_cast<uint32_t>((apTask->Key & 0xFFFF0000u))
-            );
+        apTask->Key = static_cast<uint16_t>(InterlockedIncrementInt32(&IOTask::iStaticCounter)) +
+            ((static_cast<uint64_t>(static_cast<uint32_t>(apTask->Key >> 32)) << 32) |
+             static_cast<uint32_t>((apTask->Key & 0xFFFF0000u)));
     }
-    return 1;
+    return true;
 }
 // One queue per priority, allocated under the task-overhead memory context.
 template <class T>
@@ -406,10 +402,10 @@ bool IOManager::UpdateQueue() {
     LARGE_INTEGER llStartTime;
     uint32_t imaxTime;
     if (IOManager::bUpdating) {
-        return 1;
+        return true;
     }
-    bool bqueueResult = 1;
-    IOManager::bUpdating = 1;
+    bool bqueueResult = true;
+    IOManager::bUpdating = true;
     if (eLoadingQueuedPriority == IO_TASK_PRIORITY_COUNT) {
         Setting::Info* iPostProcessMilliseconds;
         // The setting's address is never null.
@@ -443,7 +439,7 @@ bool IOManager::UpdateQueue() {
             pPostProcessQueue->Pop(sptask);
         }
     }
-    IOManager::bUpdating = 0;
+    IOManager::bUpdating = false;
     // ~NiPointer.
     if (sptask.m_pObject) {
         sptask.m_pObject->DecRefCount();
@@ -460,7 +456,7 @@ void IOManager::RequeuePrioritiesToNewPriority(IO_TASK_PRIORITY aeOldPriority, I
         while (!kIterator.GetFinished()) {
             int64_t ikey = 0;
             NiPointer<BSTask<int64_t>> sptask;
-            if (GetNext(kIterator, ikey, sptask, 1)) {
+            if (GetNext(kIterator, ikey, sptask, true)) {
                 // The key's priority byte, compared signed with the int-sized enum.
                 if (static_cast<uint8_t>(ikey >> 16) > aeOldPriority) {
                     break;
@@ -484,9 +480,7 @@ bool IOManager::RequeueTask(IOTask* apTask, IO_TASK_PRIORITY aeNewPriority) {
     return BSTaskManager<int64_t>::RequeueTask(
         apTask,
         (static_cast<int64_t>(aeNewPriority) << 16) +
-            static_cast<uint64_t>(
-                (static_cast<uint64_t>(static_cast<uint32_t>(static_cast<uint32_t>(apTask->Key >> 32))) << 32) |
-                static_cast<uint32_t>((apTask->Key & 0xFF00FFFFu))
-            )
+            ((static_cast<uint64_t>(static_cast<uint32_t>(apTask->Key >> 32)) << 32) |
+             static_cast<uint32_t>((apTask->Key & 0xFF00FFFFu)))
     );
 }

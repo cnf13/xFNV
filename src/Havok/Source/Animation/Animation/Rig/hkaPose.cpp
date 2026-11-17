@@ -110,7 +110,7 @@ void hkaPose::syncLocalSpace() {
                         __m128 m_quad = v8->m_rotation.m_vec.m_quad;
                         __m128 v10 = _mm_mul_ps(v8->m_translation.m_quad, m_quad);
                         __m128 v11 = _mm_shuffle_ps(v10, v10, 170);
-                        v11[0] = v11[0] + static_cast<float>(_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
+                        v11[0] = v11[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
                         __m128 v12 = _mm_shuffle_ps(m_quad, m_quad, 255);
                         __m128 v13 = _mm_add_ps(
                             _mm_mul_ps(
@@ -147,7 +147,7 @@ void hkaPose::syncLocalSpace() {
                         __m128 v31 = v19;
                         __m128 v21 = _mm_mul_ps(m_quad_1, m_quad_2);
                         __m128 v22 = _mm_shuffle_ps(v21, v21, 170);
-                        v22[0] = v22[0] + static_cast<float>(_mm_shuffle_ps(v21, v21, 85)[0] + v21[0]);
+                        v22[0] = v22[0] + (_mm_shuffle_ps(v21, v21, 85)[0] + v21[0]);
                         __m128 v23 = _mm_shuffle_ps(m_quad_2, m_quad_2, 255);
                         hkQsTransform* v24 = &m_data_2[v4];
                         q0_.m_vec.m_quad = m_quad_2;
@@ -258,7 +258,7 @@ hkQsTransform& hkaPose::accessBoneModelSpace(int32_t boneIdx, hkaPose::Propagate
                             __m128 m_quad = v13->m_rotation.m_vec.m_quad;
                             __m128 v15 = _mm_mul_ps(v13->m_translation.m_quad, m_quad);
                             __m128 v16 = _mm_shuffle_ps(v15, v15, 170);
-                            v16[0] = v16[0] + static_cast<float>(_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]);
+                            v16[0] = v16[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]);
                             __m128 v17 = _mm_shuffle_ps(m_quad, m_quad, 255);
                             __m128 v18 = _mm_add_ps(
                                 _mm_mul_ps(
@@ -295,7 +295,7 @@ hkQsTransform& hkaPose::accessBoneModelSpace(int32_t boneIdx, hkaPose::Propagate
                             __m128 v41 = v24;
                             __m128 v26 = _mm_mul_ps(v25, v21);
                             __m128 v27 = _mm_shuffle_ps(v26, v26, 170);
-                            v27[0] = v27[0] + static_cast<float>(_mm_shuffle_ps(v26, v26, 85)[0] + v26[0]);
+                            v27[0] = v27[0] + (_mm_shuffle_ps(v26, v26, 85)[0] + v26[0]);
                             hkQsTransform* v28 = &v19[v36];
                             result.m_vec.m_quad = v21;
                             __m128 v29 = _mm_shuffle_ps(v21, v21, 255);
@@ -459,7 +459,7 @@ hkQsTransform& hkaPose::accessBoneLocalSpace(int32_t a1) {
                         __m128 m_quad = v9->m_rotation.m_vec.m_quad;
                         __m128 v11 = _mm_mul_ps(v9->m_translation.m_quad, m_quad);
                         __m128 v12 = _mm_shuffle_ps(v11, v11, 170);
-                        v12[0] = v12[0] + static_cast<float>(_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
+                        v12[0] = v12[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
                         __m128 v13 = _mm_shuffle_ps(m_quad, m_quad, 255);
                         __m128 v14 = _mm_add_ps(
                             _mm_mul_ps(
@@ -496,7 +496,7 @@ hkQsTransform& hkaPose::accessBoneLocalSpace(int32_t a1) {
                         v60 = v20;
                         __m128 v22 = _mm_mul_ps(m_quad_2, m_quad_1);
                         __m128 v23 = _mm_shuffle_ps(v22, v22, 170);
-                        v23[0] = v23[0] + static_cast<float>(_mm_shuffle_ps(v22, v22, 85)[0] + v22[0]);
+                        v23[0] = v23[0] + (_mm_shuffle_ps(v22, v22, 85)[0] + v22[0]);
                         hkQsTransform* v24 = &m_data_2[m_size_3];
                         q0_.m_vec.m_quad = m_quad_2;
                         __m128 v25 = _mm_shuffle_ps(m_quad_2, m_quad_2, 255);
@@ -565,7 +565,7 @@ hkQsTransform& hkaPose::accessBoneLocalSpace(int32_t a1) {
             __m128 m_quad_3 = v36->m_rotation.m_vec.m_quad;
             __m128 v38 = _mm_mul_ps(v36->m_translation.m_quad, m_quad_3);
             __m128 v39 = _mm_shuffle_ps(v38, v38, 170);
-            v39[0] = v39[0] + static_cast<float>(_mm_shuffle_ps(v38, v38, 85)[0] + v38[0]);
+            v39[0] = v39[0] + (_mm_shuffle_ps(v38, v38, 85)[0] + v38[0]);
             __m128 v40 = _mm_shuffle_ps(m_quad_3, m_quad_3, 255);
             __m128 v41 = _mm_add_ps(
                 _mm_mul_ps(
@@ -597,7 +597,7 @@ hkQsTransform& hkaPose::accessBoneLocalSpace(int32_t a1) {
             v60 = v47;
             __m128 v49 = _mm_mul_ps(m_quad_5, m_quad_4);
             __m128 v50 = _mm_shuffle_ps(v49, v49, 170);
-            v50[0] = v50[0] + static_cast<float>(_mm_shuffle_ps(v49, v49, 85)[0] + v49[0]);
+            v50[0] = v50[0] + (_mm_shuffle_ps(v49, v49, 85)[0] + v49[0]);
             __m128* p_m_quad = &m_data_6[v35].m_translation.m_quad;
             q0_.m_vec.m_quad = m_quad_5;
             __m128 v51 = _mm_shuffle_ps(m_quad_5, m_quad_5, 255);
@@ -646,7 +646,7 @@ void hkaPose::enforceSkeletonConstraintsModelSpace() {
                     __m128 m_quad = m_data[v8].m_rotation.m_vec.m_quad;
                     __m128 v10 = _mm_mul_ps(v6->m_translation.m_quad, m_quad);
                     __m128 v11 = _mm_shuffle_ps(v10, v10, 170);
-                    v11[0] = v11[0] + static_cast<float>(_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
+                    v11[0] = v11[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
                     __m128 v12 = _mm_shuffle_ps(m_quad, m_quad, 255);
                     __m128 v13 = _mm_add_ps(
                         _mm_mul_ps(
@@ -789,7 +789,7 @@ uint8_t* hkaPose::checkPoseTransformsValidity(uint8_t* a1) {
     }
     else {
         int32_t v5 = 0;
-        while (1) {
+        while (true) {
             uint32_t v6 = m_boneFlags.m_data[v4];
             if ((v6 & 2) != 0 && (v6 & 1) != 0) {
                 break;

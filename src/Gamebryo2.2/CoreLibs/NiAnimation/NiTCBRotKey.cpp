@@ -22,7 +22,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 void NiTCBRotKey::CalculateDVals(const NiTCBRotKey* pPrev, const NiTCBRotKey* pNext) {
     NiQuaternion v32;

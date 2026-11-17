@@ -26,7 +26,7 @@ BSTempEffect::~BSTempEffect() {
 }
 
 bool BSTempEffect::Update(float afTimeDelta) {
-    fAge = (float)(fAge + afTimeDelta);
+    fAge = (fAge + afTimeDelta);
     return (bool)((uint8_t)(!(fLifetime < ((double)fAge))));
 }
 
@@ -57,14 +57,14 @@ void BSTempEffect::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
 
 bool BSTempEffect::LoadGame() {
     uint32_t apFormID;
-    bool v4 = 1;
+    bool v4 = true;
     pSaveLoadGameOLD->LoadGameDataOLD(&fLifetime, 4u);
     pSaveLoadGameOLD->LoadGameDataOLD(&fAge, 4u);
     pSaveLoadGameOLD->LoadNumericID(&apFormID, 4u);
     TESForm* FormByNumericID = TESForm::GetFormByNumericID(apFormID);
     pCell = dynamic_cast<TESObjectCELL*>(FormByNumericID);
     if (!pCell || !pCell->Get3D()) {
-        return 0;
+        return false;
     }
     return v4;
 }

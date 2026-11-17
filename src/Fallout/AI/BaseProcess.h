@@ -654,7 +654,7 @@ public:
     }
     // the greeting flag
     virtual bool GetGreetingFlag() {
-        return 0;
+        return false;
     }
     virtual void SetGreetingFlag(bool) {}
     // delay of the sound
@@ -789,7 +789,7 @@ public:
     virtual void SetDesiredTarget(MagicTarget*) {}
     // the magic node has to be checked
     virtual bool GetShouldCheckMagicNode() {
-        return 0;
+        return false;
     }
     virtual void SetShouldCheckMagicNode(bool) {}
     virtual void Move(MobileObject*, NiPoint3) {}
@@ -804,7 +804,7 @@ public:
     virtual void SetAnimAction(ANIMATION_ACTION, BSAnimGroupSequence*) {}
     // an automatic weapon fires at least once
     virtual bool GetAutomaticFireAtLeastOnce() {
-        return 0;
+        return false;
     }
     virtual void SetAutomaticFireAtLeastOnce(bool) {}
     virtual bool CanAttack() {
@@ -1008,7 +1008,7 @@ public:
     virtual void SetWeaponEnchantmentVisuals(TESEffectShader*) {}
     // the magic shader effects have to be refreshed
     virtual bool GetShouldRefreshMagicShadersEffects() {
-        return 0;
+        return false;
     }
     // flags the magic shader effects for a refresh
     virtual void SetShouldRefreshMagicShadersEffects(bool, bool, bool) {}

@@ -10,7 +10,7 @@ class BSParallelTaskThread;
 class BSParallelTaskManager {
 public:
     // The task function the worker threads call with pData.
-    typedef void (*TaskFunc)(void*);
+    using TaskFunc = void (*)(void*);
 
     BSParallelTaskManager();
     ~BSParallelTaskManager();

@@ -49,7 +49,7 @@ void bhkThreadMemoryRouter::Quit(HavokThreadMemoryStruct* apData) {
         EnterCriticalSection(&bhkThreadMemoryRouter::kCriticalSection.CriticalSection);
         hkMemoryRouter* pHavokThreadRouter = apData->pHavokThreadRouter;
         apData->pHavokThreadRouter->m_heap->blockFree(apData->pHavokThreadStackBuffer, 0x5000);
-        apData->pHavokThreadStackBuffer = 0;
+        apData->pHavokThreadStackBuffer = nullptr;
         if (GetCurrentThreadId() == apData->iThreadID) {
             hkBaseSystem::quitThread();
         }
@@ -58,7 +58,7 @@ void bhkThreadMemoryRouter::Quit(HavokThreadMemoryStruct* apData) {
         pHavokThreadRouter->m_stack.m_start.m_storage = nullptr;
         pHavokThreadRouter->m_stack.m_next.m_storage = 0;
         pHavokThreadRouter->m_stack.m_end.m_storage = nullptr;
-        apData->pHavokThreadRouter = 0;
+        apData->pHavokThreadRouter = nullptr;
         LeaveCriticalSection(&bhkThreadMemoryRouter::kCriticalSection.CriticalSection);
     }
 }

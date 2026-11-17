@@ -17,7 +17,7 @@
 #include "Havok/Source/Physics/Collide/Query/Collector/PointCollector/hkpRootCdPoint.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 void ourMemalignFree(void* apPtr) {
     MemoryManager* singleton;
@@ -43,7 +43,7 @@ TargetEntry* ZoneEntry::AddTarget(TESObjectREFR* apTarget, const hkpCollidable* 
         pa = GetTargetEntry(apTarget);
     }
     else {
-        pa = 0;
+        pa = nullptr;
     }
     if (!pa) {
         void* apMemory = bhkRagdollController::operator new(sizeof(TargetEntry));
@@ -51,9 +51,9 @@ TargetEntry* ZoneEntry::AddTarget(TESObjectREFR* apTarget, const hkpCollidable* 
             pa = ::new (apMemory) TargetEntry(apTarget, apCol);
         }
         else {
-            pa = 0;
+            pa = nullptr;
         }
-        pa->SetFlags(aiFlags, 1);
+        pa->SetFlags(aiFlags, true);
         // The node base sits at +0x10: a null head stays null.
         pa->pNext = static_cast<bhkTTNode<TESObjectREFR>*>(this->pTargets);
         this->pTargets = pa;
@@ -67,7 +67,7 @@ ZoneEntry* ZoneEntry::GetZoneEntry(const hkpCollidable* apCollidable) {
         return static_cast<ZoneEntry*>(Entry);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -87,7 +87,7 @@ TargetEntry* ZoneEntry::AddTrapTarget(TESObjectREFR* apTarget, const hkpCollidab
         pa = GetTargetEntry(apTarget);
     }
     else {
-        pa = 0;
+        pa = nullptr;
     }
     if (!pa) {
         void* apMemory = bhkRagdollController::operator new(sizeof(TrapTargetEntry));
@@ -95,9 +95,9 @@ TargetEntry* ZoneEntry::AddTrapTarget(TESObjectREFR* apTarget, const hkpCollidab
             pa = ::new (apMemory) TrapTargetEntry(apTarget, apCol);
         }
         else {
-            pa = 0;
+            pa = nullptr;
         }
-        pa->SetFlags(aiFlags, 1);
+        pa->SetFlags(aiFlags, true);
         // The node base sits at +0x10: a null head stays null.
         pa->pNext = static_cast<bhkTTNode<TESObjectREFR>*>(this->pTargets);
         this->pTargets = pa;
@@ -111,7 +111,7 @@ ZoneEntry* ZoneEntry::GetZoneEntry(TESObjectREFR* apZone) {
         return static_cast<ZoneEntry*>(Entry);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -139,7 +139,7 @@ void ZoneEntry::EmptyList() {
         NextEntry = i->GetNextEntry();
         TargetEntry::operator delete(i);
     }
-    pTargets = 0;
+    pTargets = nullptr;
 }
 
 void ZoneEntry::operator delete(void* apMemory) {
@@ -244,7 +244,7 @@ void BGSZoneTargetListener::EmptyList() {
         v2 = i->QNextEntry();
         delete i;
     }
-    pZones = 0;
+    pZones = nullptr;
 }
 
 ZoneEntry* BGSZoneTargetListener::AddZone(TESObjectREFR* apZone, const hkpCollidable* apCol) {
@@ -253,7 +253,7 @@ ZoneEntry* BGSZoneTargetListener::AddZone(TESObjectREFR* apZone, const hkpCollid
         pt = pZones->GetZoneEntry(apCol);
     }
     else {
-        pt = 0;
+        pt = nullptr;
     }
     ZoneEntry* pt_2 = pt;
     if (!pt) {
@@ -263,7 +263,7 @@ ZoneEntry* BGSZoneTargetListener::AddZone(TESObjectREFR* apZone, const hkpCollid
             pt_2->pNext = static_cast<bhkTTNode<TESObjectREFR>*>(pHead);
         }
         else {
-            pt_2->pNext = 0;
+            pt_2->pNext = nullptr;
         }
         pZones = pt_2;
     }
@@ -326,7 +326,7 @@ ZoneEntry* BGSZoneTargetListener::AddZoneTargetPair(
             pTarget->SetMaterialAtHit(pCollection->QSubMaterial(arPoint.m_shapeKeyB));
         }
         else if (pShape) {
-            pTarget->SetMaterialAtHit(static_cast<HavokMaterialType>(pShape->GetMaterial()));
+            pTarget->SetMaterialAtHit(pShape->GetMaterial());
         }
     }
     else {
@@ -338,11 +338,11 @@ ZoneEntry* BGSZoneTargetListener::AddZoneTargetPair(
 
 ZoneEntry* BGSZoneTargetListener::RemoveTargetFromZone_00620680(const hkpCollidable* apZone, TESObjectREFR* apTarget) {
     if (!pZones) {
-        return 0;
+        return nullptr;
     }
     ZoneEntry* pZone = pZones->GetZoneEntry(apZone);
     if (!pZone) {
-        return 0;
+        return nullptr;
     }
     RemoveTargetFromZone(pZone, apTarget);
     return pZone;

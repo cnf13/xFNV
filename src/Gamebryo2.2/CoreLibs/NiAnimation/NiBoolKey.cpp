@@ -10,7 +10,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // ucBool starts as the low byte of the stream's address, so a read that fills nothing leaves that value, as the game
 // does.

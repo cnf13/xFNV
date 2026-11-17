@@ -118,7 +118,7 @@ int32_t hkStackTracer::CallTree::insertCallStack(const hkUlong* addrs, int32_t n
                 m_nodes.m_data[v13].m_firstChild = v16;
             }
             else {
-                while (1) {
+                while (true) {
                     hkStackTracer::CallTree::Node* v15 = &m_nodes.m_data[m_firstChild];
                     if (v15->m_value == v12) {
                         break;

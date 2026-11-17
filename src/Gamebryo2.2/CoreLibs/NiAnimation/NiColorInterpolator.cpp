@@ -235,7 +235,7 @@ NiObject* NiColorInterpolator::CreateObject() {
     NiColorInterpolator* pkObject =
         static_cast<NiColorInterpolator*>(NiMemObject::operator new(sizeof(NiColorInterpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiColorInterpolator(static_cast<NiColorData*>(nullptr));
 }

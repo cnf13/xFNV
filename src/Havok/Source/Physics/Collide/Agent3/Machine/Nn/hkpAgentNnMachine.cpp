@@ -81,12 +81,12 @@ hkpAgentNnEntry* hkAgentNnMachine_FindAgent(const hkpLinkedCollidable* collA, co
     int32_t m_size = v2->m_collisionEntries.m_size;
     int32_t v5 = 0;
     if (m_size <= 0) {
-        return 0;
+        return nullptr;
     }
     hkpLinkedCollidable::CollisionEntry* m_data = v2->m_collisionEntries.m_data;
     for (hkpLinkedCollidable** i = &m_data->m_partner; *i != v3; i += 2) {
         if (++v5 >= m_size) {
-            return 0;
+            return nullptr;
         }
     }
     return m_data[v5].m_agentEntry;

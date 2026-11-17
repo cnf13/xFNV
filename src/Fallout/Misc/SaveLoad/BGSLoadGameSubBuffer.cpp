@@ -141,7 +141,7 @@ void BGSLoadGameSubBuffer::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
     uiSize = 0;
     char* apBuffera = &apBuffer[LoadVariableSizedValueFromBuffer(apBuffer, uiSize)];
     apSaveGameBuffer->SaveVariableSizedValue(uiSize);
-    apSaveGameBuffer->SaveDataToBuffer(apBuffera, uiSize, 1);
+    apSaveGameBuffer->SaveDataToBuffer(apBuffera, uiSize, true);
 }
 
 BGSLoadGameSubBuffer::operator char*() {
@@ -160,7 +160,7 @@ BGSLoadFormBuffer* BGSLoadGameSubBuffer::Create(TESForm* apForm) {
         ploadFormBuffer = ::new (apMemory) BGSLoadFormBuffer;
     }
     else {
-        ploadFormBuffer = 0;
+        ploadFormBuffer = nullptr;
     }
     char* pheader = pBuffer;
     ploadFormBuffer->pForm = apForm;
@@ -171,7 +171,7 @@ BGSLoadFormBuffer* BGSLoadGameSubBuffer::Create(TESForm* apForm) {
     uint32_t v2 = LoadVariableSizedValueFromBuffer(padvancedBuffer, isize);
     iposition += v2;
     ploadFormBuffer->SetBuffer(pBuffer, iposition + isize, iposition);
-    pBuffer = 0;
+    pBuffer = nullptr;
     return ploadFormBuffer;
 }
 
@@ -259,16 +259,16 @@ void BGSSaveLoadQueuedSubBufferMap::LoadQueuedSubBuffers(QUEUED_SUB_BUFFER_TYPE 
     BGSLoadGameSubBuffer subBuffer;
     NiTMapItem<TESForm*, BGSLoadGameSubBuffer>* it = QueuedSubBuffers[aeType].GetFirstPos();
     while (it) {
-        TESForm* pref_2 = 0;
+        TESForm* pref_2 = nullptr;
         subBuffer.~BGSLoadGameSubBuffer();
         ::new (&subBuffer) BGSLoadGameSubBuffer;
         QueuedSubBuffers[aeType].GetNext(it, pref_2, subBuffer);
-        bool bLoaded3D = 1;
-        TESObjectREFR* pref = 0;
-        TESObjectREFR* v4 = 0;
+        bool bLoaded3D = true;
+        TESObjectREFR* pref = nullptr;
+        TESObjectREFR* v4 = nullptr;
         if (pref_2->IsReference()) {
             pref = static_cast<TESObjectREFR*>(pref_2);
-            bLoaded3D = static_cast<TESObjectREFR*>(pref_2)->TESObjectREFR::Get3D() != 0;
+            bLoaded3D = static_cast<TESObjectREFR*>(pref_2)->TESObjectREFR::Get3D() != nullptr;
             if (pref->IsActor()) {
                 v4 = pref;
             }

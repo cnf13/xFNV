@@ -23,7 +23,7 @@ bool TESObjectANIO::Load(TESFile* apFile) {
     }
     LoadForm(apFile);
     do {
-        const CHUNK_ID eChunk = static_cast<CHUNK_ID>(apFile->GetTESChunk());
+        const CHUNK_ID eChunk = apFile->GetTESChunk();
         if (eChunk == NO_CHUNK) {
             break;
         }
@@ -86,7 +86,7 @@ void TESObjectANIO::InitItem() {
             TESForm* FormByNumericID = TESForm::GetFormByNumericID(itempint);
             pIdleAnim = dynamic_cast<TESIdleForm*>(FormByNumericID);
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -101,10 +101,10 @@ void TESObjectANIO::Copy(TESForm* apCopy) {
 bool TESObjectANIO::Compare(TESForm* apCompare) {
     TESObjectANIO* v4 = dynamic_cast<TESObjectANIO*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v4)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(pIdleAnim != v4->pIdleAnim));
 }

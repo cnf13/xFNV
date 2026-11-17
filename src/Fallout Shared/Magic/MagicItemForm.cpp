@@ -71,7 +71,7 @@ void MagicItemForm::Save() {
 void MagicItemForm::InitItem() {
     if (!GetInitialized()) {
         MagicItemInitItem(this);
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -91,13 +91,13 @@ void MagicItemForm::Copy(TESForm* apCopy) {
 bool MagicItemForm::Compare(TESForm* apCompare) {
     MagicItemForm* pmagicItem = dynamic_cast<MagicItemForm*>(apCompare);
     if (!pmagicItem) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(apCompare)) {
-        return 1;
+        return true;
     }
     if (CompareMagicItemData(pmagicItem)) {
-        return 1;
+        return true;
     }
     return EffectItemList::Compare(&static_cast<EffectItemList&>(static_cast<MagicItem&>(*pmagicItem)));
 }

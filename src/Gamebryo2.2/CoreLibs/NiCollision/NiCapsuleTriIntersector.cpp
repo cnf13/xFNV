@@ -75,9 +75,9 @@ void NiCapsuleTriIntersector::ComputeContactInformation(const NiPoint3& kV0, con
     float v16 = m_kTri.m_kEdge0.x * m_fParameter0;
     float v18 = m_kTri.m_kEdge0.y * m_fParameter0;
     float v20 = m_fParameter0 * m_kTri.m_kEdge0.z;
-    v22.x = (float)(p_m_kTri->m_kOrigin.x + v16);
-    v22.y = (float)(p_m_kTri->m_kOrigin.y + v18);
-    v22.z = (float)(p_m_kTri->m_kOrigin.z + v20);
+    v22.x = (p_m_kTri->m_kOrigin.x + v16);
+    v22.y = (p_m_kTri->m_kOrigin.y + v18);
+    v22.z = (p_m_kTri->m_kOrigin.z + v20);
     float v17 = v22.x + v23;
     y = (double)v22.y;
     m_kContactPoint.x = v17;
@@ -102,8 +102,8 @@ void NiCapsuleTriIntersector::ComputeContactInformation(const NiPoint3& kV0, con
         v23 = (float)((&kV1)->x * m_fContactTime);
         v24 = (float)((&kV1)->y * m_fContactTime);
         v25 = (float)(m_fContactTime * (&kV1)->z);
-        m_kContactPoint.x = (float)(m_kContactPoint.x + v23);
-        m_kContactPoint.y = (float)(m_kContactPoint.y + v24);
-        m_kContactPoint.z = (float)(v25 + m_kContactPoint.z);
+        m_kContactPoint.x = (m_kContactPoint.x + v23);
+        m_kContactPoint.y = (m_kContactPoint.y + v24);
+        m_kContactPoint.z = (v25 + m_kContactPoint.z);
     }
 }

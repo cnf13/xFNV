@@ -79,7 +79,7 @@ void DarknessEffect::Start() {
         ptargetActor = pTarget->GetTargetAsActor();
     }
     else {
-        ptargetActor = 0;
+        ptargetActor = nullptr;
     }
     ValueModifierEffect::Start();
     if (ptargetActor) {
@@ -104,7 +104,7 @@ void DarknessEffect::Finish() {
         ptargetActor = pTarget->GetTargetAsActor();
     }
     else {
-        ptargetActor = 0;
+        ptargetActor = nullptr;
     }
     if (ptargetActor) {
         if (ptargetActor->Get3D()) {
@@ -127,6 +127,6 @@ ActiveEffect* DarknessEffect::Instantiate(MagicCaster* apCaster, MagicItem* apSp
         return ::new (apMemory) DarknessEffect(apCaster, apSpell, apEffect);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

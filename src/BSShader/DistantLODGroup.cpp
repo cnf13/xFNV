@@ -116,10 +116,10 @@ DistantLODGroup::~DistantLODGroup() {
     BD6150();
     if (pInstanceData) {
         MemoryManager_Singleton.Deallocate(pInstanceData);
-        pInstanceData = 0;
+        pInstanceData = nullptr;
     }
     MemoryManager_Singleton.Deallocate(piCellKeys);
-    piCellKeys = 0;
+    piCellKeys = nullptr;
 }
 
 void DistantLODGroup::UpdateGroupBound() {
@@ -208,7 +208,7 @@ void DistantLODGroup::UpdateGroupBound() {
             LABEL_24:;
                 v11 = 0;
             }
-            TallGrassTriShape* ptrishape = v11 != 0 ? static_cast<TallGrassTriShape*>(v6) : 0;
+            TallGrassTriShape* ptrishape = v11 != 0 ? static_cast<TallGrassTriShape*>(v6) : nullptr;
             if (ptrishape) {
                 NiBound v15;
                 v15.m_kCenter = kCenter;
@@ -260,11 +260,11 @@ bool DistantLODGroup::Add(DistantLODGroup::DistantLODInstanceData* apInstanceDat
     uint16_t iInstanceCount;
     iInstanceCount = this->iInstanceCount;
     if ((iInstanceCount == iMaxInstanceCount) || (!apInstanceData)) {
-        return (bool)0;
+        return false;
     }
     pInstanceData[iInstanceCount] = *apInstanceData;
     piCellKeys[this->iInstanceCount++] = aiCellKey;
-    return (bool)1;
+    return true;
 }
 
 void DistantLODGroup::BD6150() {

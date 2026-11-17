@@ -64,8 +64,8 @@
 #include "Reconstruction.hpp"
 
 #include <cmath>
+#include <cstdint>
 #include <new>
-#include <stdint.h>
 
 static SettingT<INISettingCollection> fAvoidanceDefaultWaitTime("fAvoidanceDefaultWaitTime:Pathfinding", 5.0f);
 static SettingT<INISettingCollection> fAvoidanceIgnoreTime("fAvoidanceIgnoreTime:Pathfinding", 5.0f);
@@ -153,9 +153,9 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Init(float afPer
         fWaitTime = 0.0f;
     }
     MoveDelta = NiPoint3_ZERO;
-    bRotateMode = 0;
-    bDeltaComputedThisFrame = 0;
-    bMovementBlocked = 0;
+    bRotateMode = false;
+    bDeltaComputedThisFrame = false;
+    bMovementBlocked = false;
     fBlockTime = 0.0f;
     iUnblockDirection = 0;
     fAlternateFacingAngle = 0.0f;
@@ -180,19 +180,19 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Init(float afPer
         }
         PathingNode* v5 = spPath.m_pObject->GetLastNode();
         if (v5->IsTransitionNode()) {
-            bEndUpdatePath = 1;
+            bEndUpdatePath = true;
         }
         ComputeMinTetherDistance();
         bool bpathTransition = bWaitingForUpdate;
         FindPathStartingLocation(afPercentTraveled);
-        bIgnoreInitialRotation = 0;
-        bIgnoreInitialRotationKeepActorHeading = 0;
+        bIgnoreInitialRotation = false;
+        bIgnoreInitialRotationKeepActorHeading = false;
         fIgnoreInitialRotationTetherParam = 0.0f;
         if (!pActor->IsInCombat() &&
             static_cast<double>(fTetherDistFromActor) > spPath.m_pObject->ComputeDetailedPathLength() &&
             !pActorMover->HasLookAtTarget()) {
-            bIgnoreInitialRotation = 1;
-            bIgnoreInitialRotationKeepActorHeading = 1;
+            bIgnoreInitialRotation = true;
+            bIgnoreInitialRotationKeepActorHeading = true;
             fIgnoreInitialRotationTetherParam = static_cast<float>(spPath.m_pObject->GetNodeCount());
         }
         if (CheckGoalReached() == ActorPathHandler::PATH_HANDLER_RESULT_OK) {
@@ -208,11 +208,11 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Init(float afPer
                 fgoalAngle = GetZAngleFromVector(dirVec);
             }
             else {
-                fgoalAngle = pActor->GetHeading(0);
+                fgoalAngle = pActor->GetHeading(false);
             }
             if (!bpathTransition) {
                 if (afPercentTraveled == 0.0) {
-                    InitRotationMode(fgoalAngle, 0, bpathTransition);
+                    InitRotationMode(fgoalAngle, false, bpathTransition);
                 }
                 else {
                     pActor->SetHeading(fgoalAngle);
@@ -229,7 +229,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Init(float afPer
     }
     else {
         ResetMoveModeAndDelta();
-        bWaitingForUpdate = 0;
+        bWaitingForUpdate = false;
         TetherTargetPoint = pActor->GetLocationOnReference();
         LastTetherPoint.x = TetherTargetPoint.x;
         LastTetherPoint.y = TetherTargetPoint.y;
@@ -240,25 +240,25 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Init(float afPer
 }
 
 bool DetailedActorPathHandler::InitRotationOnly(float afTargetAngle, bool abForceTurn) {
-    bWaitingForUpdate = 0;
+    bWaitingForUpdate = false;
     eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
     eBlendRunning = DetailedActorPathHandler::PATH_RUNNING_BLEND_DONE;
     eAvoidState = PATH_AVOID_OK;
     fAvoidanceDetectionValue = 0.0;
     fDistanceTraveled = 0.0;
     fPathLength = 0.0;
-    spPath.operator=(static_cast<PathingSolution*>(0));
-    spRequest.operator=(static_cast<PathingRequest*>(0));
-    bIgnoreInitialRotation = 0;
-    bIgnoreInitialRotationKeepActorHeading = 0;
+    spPath.operator=(static_cast<PathingSolution*>(nullptr));
+    spRequest.operator=(static_cast<PathingRequest*>(nullptr));
+    bIgnoreInitialRotation = false;
+    bIgnoreInitialRotationKeepActorHeading = false;
     fIgnoreInitialRotationTetherParam = 0.0;
-    if (InitRotationMode(afTargetAngle, abForceTurn, 0)) {
+    if (InitRotationMode(afTargetAngle, abForceTurn, false)) {
         eState = DetailedActorPathHandler::DAP_ROTATING_WITHOUT_PATH;
-        return 1;
+        return true;
     }
     else {
         eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
-        return 0;
+        return false;
     }
 }
 
@@ -281,7 +281,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
         eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
         return eresult;
     }
-    bDeltaComputedThisFrame = 1;
+    bDeltaComputedThisFrame = true;
     bhkCharacterController* pcon = pActor->GetCharController();
     if (afDeltaT == 0.0 || !pcon) {
     LABEL_52:;
@@ -318,8 +318,8 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
         UpdateTether(afDeltaT);
     }
     if (bIgnoreInitialRotation && fIgnoreInitialRotationTetherParam <= static_cast<double>(fCurrentSplineT)) {
-        bIgnoreInitialRotation = 0;
-        bIgnoreInitialRotationKeepActorHeading = 0;
+        bIgnoreInitialRotation = false;
+        bIgnoreInitialRotationKeepActorHeading = false;
         fIgnoreInitialRotationTetherParam = 0.0f;
     }
     if (bRotateMode) {
@@ -398,7 +398,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
                             v13 = (void*)::new (apMemory) PathingRequest;
                         }
                         else {
-                            v13 = 0;
+                            v13 = nullptr;
                         }
                         NiRefObject* v20 = static_cast<NiRefObject*>(v13);
                         NiPointer<PathingRequest> spnewRequest(static_cast<PathingRequest*>(v13));
@@ -420,11 +420,11 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
                         pActorMover->BackGroundBuildPath(spnewRequest.m_pObject);
                         if (pActorMover->eState == ACTOR_MOVER_STATE_FINISHED) {
                             ResetMoveModeAndDelta();
-                            bWaitingForUpdate = 0;
+                            bWaitingForUpdate = false;
                             eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
                         }
                         if (bWaitingForUpdate) {
-                            spPath.operator=(static_cast<PathingSolution*>(0));
+                            spPath.operator=(static_cast<PathingSolution*>(nullptr));
                             if (eState == DetailedActorPathHandler::DAP_WAITING_FOR_UPDATED_PATH) {
                                 ResetMoveModeAndDelta();
                                 return ActorPathHandler::PATH_HANDLER_RESULT_OK;
@@ -458,7 +458,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
     }
     RotateMoveDelta(afDeltaT);
     fLastFrameMinMoveDelta = MoveDelta.XYLength();
-    MoveModeRot.MakeZRotationQ(pActor->GetHeading(0));
+    MoveModeRot.MakeZRotationQ(pActor->GetHeading(false));
     LastFrameMinMoveDelta = MoveModeRot * MoveDelta;
     if (eState == DetailedActorPathHandler::DAP_MOVING_WHILE_WAITING) {
         NiPoint3 tetherDir = TetherTargetPoint - LastTetherPoint;
@@ -513,8 +513,8 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::NoPathUpdate(flo
                 break;
             }
             case DetailedActorPathHandler::DAP_GOAL_REACHED: {
-                spPath.operator=(static_cast<PathingSolution*>(0));
-                spRequest.operator=(static_cast<PathingRequest*>(0));
+                spPath.operator=(static_cast<PathingSolution*>(nullptr));
+                spRequest.operator=(static_cast<PathingRequest*>(nullptr));
             LABEL_11:;
                 if (!pActorMover->HasLookAtTarget()) {
                     MoveMode = pActorMover->GetPreferredMoveModeType();
@@ -528,7 +528,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::NoPathUpdate(flo
                 MoveDelta = NiPoint3_ZERO;
                 fLastFrameMinMoveDelta = 0.0f;
                 LastFrameMinMoveDelta = NiPoint3_ZERO;
-                bDeltaComputedThisFrame = 1;
+                bDeltaComputedThisFrame = true;
                 pActorMover->DebugOnEvent();
                 if (!bRotateMode) {
                     eState = DetailedActorPathHandler::UNK_7;
@@ -552,14 +552,14 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::NoPathUpdate(flo
         if (bIgnoreLookAtPoint) {
             fIgnoreLookAtPointTimer = fIgnoreLookAtPointTimer - afDeltaT;
             if (fIgnoreLookAtPointTimer < 0.0) {
-                bIgnoreLookAtPoint = 0;
+                bIgnoreLookAtPoint = false;
                 eresult = ActorPathHandler::PATH_HANDLER_RESULT_OK;
             }
         }
         if (eresult == ActorPathHandler::PATH_HANDLER_RESULT_NONE) {
             NiPoint3 lookatPoint;
             if (pActorMover->GetLookAtPoint(lookatPoint) && !pActor->IsInDialoguewithPlayer()) {
-                float a1b = pActor->GetHeading(0);
+                float a1b = pActor->GetHeading(false);
                 float factangle = ClampAngle(a1b);
                 NiPoint3 firingLocation = CombatUtilities::GetAttackerFiringLocation(pActor);
                 // The squared length is kept in double precision for the compare below.
@@ -662,7 +662,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::UpdateWhilePlaye
     NiPoint3 rot;
     ResetStaticAvoidance();
     ResetActorAvoidance();
-    bRotateMode = 0;
+    bRotateMode = false;
     eState = DetailedActorPathHandler::DAP_MOVING;
     eBlendRunning = DetailedActorPathHandler::PATH_RUNNING_BLEND_DONE;
     fFallTime = 0.0f;
@@ -697,7 +697,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::UpdateWhilePlaye
                 else {
                     uint32_t inodeCount = spPath.m_pObject->GetNodeCount();
                     if (inodeCount <= 1) {
-                        fgoalAngle = pActor->GetHeading(0);
+                        fgoalAngle = pActor->GetHeading(false);
                     }
                     else {
                         PathingNode* Node = spPath.m_pObject->GetNode(inodeCount - 2);
@@ -710,7 +710,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::UpdateWhilePlaye
                 }
             }
         }
-        pActor->MoveActorAndFollowers(goalPoint, fgoalAngle, pgoalCell, pgoalWS, 1, 0);
+        pActor->MoveActorAndFollowers(goalPoint, fgoalAngle, pgoalCell, pgoalWS, true, false);
         ActorPathHandler::PATH_HANDLER_RESULT eresult = ActorPathHandler::PATH_HANDLER_RESULT_DONE;
         ResetMoveModeAndDelta();
         eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
@@ -763,17 +763,17 @@ NiPoint3 DetailedActorPathHandler::GetNextNodeLocation() {
 bool DetailedActorPathHandler::GetNodeLocation(uint32_t aiIndex, NiPoint3& arLocation) {
     NiPoint3 v9;
     if (!(&spPath)->operator->()) {
-        return (bool)0;
+        return false;
     }
     PathingSolution* v3 = (&spPath)->operator->();
     if (aiIndex >= v3->GetNodeCount()) {
-        return (bool)0;
+        return false;
     }
     PathingSolution* v4 = (&spPath)->operator->();
     PathingNode* node = v4->GetNode(aiIndex);
     PathingLocation* v6 = &node->PathingNode::GetLocation();
     arLocation = *&(v9 = v6->GetLocation());
-    return (bool)1;
+    return true;
 }
 
 // The path length left to walk, never below 0.
@@ -831,7 +831,7 @@ void DetailedActorPathHandler::SetWaitForUpdatedPath(PathingRequest* apRequest) 
         }
         else {
             if (eState == DetailedActorPathHandler::DAP_MOVING) {
-                bWaitingForUpdate = 1;
+                bWaitingForUpdate = true;
                 NiPoint3 actorCurrent = pActor->GetLocationOnReference();
                 if (bMovementBlocked || (IsWaitingForAvoidance() || bRotateMode)) {
                     TetherTargetPoint = actorCurrent;
@@ -861,15 +861,15 @@ void DetailedActorPathHandler::SetWaitForUpdatedPath(PathingRequest* apRequest) 
                         float fupdateLen = fwaitDist - fdiff;
                         UpdateTetherPosition(fupdateLen);
                     }
-                    bool bfixupTether = 1;
+                    bool bfixupTether = true;
                     if (pActor->GetParentCell() && pActor->GetParentCell()->GetInterior()) {
-                        bfixupTether = 0;
+                        bfixupTether = false;
                     }
                     else {
                         if (pActor->GetWorldSpace()) {
                             TESWorldSpace* WorldSpace = pActor->GetWorldSpace();
                             if (WorldSpace->GetCellFromWorldCoord(TetherTargetPoint)) {
-                                bfixupTether = 0;
+                                bfixupTether = false;
                             }
                         }
                     }
@@ -883,7 +883,7 @@ void DetailedActorPathHandler::SetWaitForUpdatedPath(PathingRequest* apRequest) 
                         LastTetherPoint = actorCurrent;
                         eState = DetailedActorPathHandler::DAP_MOVING_WHILE_WAITING;
                         newPathOrigin = TetherTargetPoint;
-                        bool bSetInitialTangent = 1;
+                        bool bSetInitialTangent = true;
                         float v13 = fCurrentSplineT + 0.10000000149011612;
                         spPath.m_pObject->ComputeLocationFromParameter(v13, tetherTangent);
                         tetherTangent.operator-=(TetherTargetPoint);
@@ -900,7 +900,7 @@ void DetailedActorPathHandler::SetWaitForUpdatedPath(PathingRequest* apRequest) 
                                         *v7, TetherTargetPoint, *afCurrentSplineParameter, a2b
                                     )) {
                                     newPathOrigin = pActor->GetLocationOnReference();
-                                    bSetInitialTangent = 0;
+                                    bSetInitialTangent = false;
                                     break;
                                 }
                             }
@@ -935,26 +935,26 @@ bool DetailedActorPathHandler::IsMovementBlocked() {
 
 bool DetailedActorPathHandler::ComputePathPassesThroughPlayersArea() {
     if (!spPath.operator->()) {
-        return 0;
+        return false;
     }
     PathingSolution* v1 = spPath.operator->();
     if (!v1->IsValid()) {
-        return 0;
+        return false;
     }
     PathingSolution* v3 = spPath.operator->();
     uint32_t NodeCount = v3->GetNodeCount();
     uint32_t aiIndex = iCurrentNodeIndex + 1;
-    bool v12 = 1;
+    bool v12 = true;
     TESObjectCELL* pParentCell = pPlayer->GetParentCell();
     TESWorldSpace* pParentWorldspace = pPlayer->GetWorldSpace();
     if (!pParentCell) {
         pParentCell = TES::pInstance->GetInterior();
-        v12 = pParentCell != 0;
+        v12 = pParentCell != nullptr;
     }
     if (!v12 && !pParentWorldspace) {
         pParentWorldspace = TES::pInstance->GetWorldSpace();
         if (!pParentWorldspace) {
-            return 0;
+            return false;
         }
     }
     while (aiIndex < NodeCount) {
@@ -964,12 +964,12 @@ bool DetailedActorPathHandler::ComputePathPassesThroughPlayersArea() {
             PathingLocation* ActorPackageThatIsRunning = static_cast<PathingLocation*>(&Node->GetLocation());
             if (v12) {
                 if (pParentCell == ActorPackageThatIsRunning->GetCell()) {
-                    return 1;
+                    return true;
                 }
             }
             else {
                 if (pParentWorldspace == ActorPackageThatIsRunning->GetWorldspaceSimple()) {
-                    return 1;
+                    return true;
                 }
             }
             if (Node->IsTeleportDoorNode()) {
@@ -981,12 +981,12 @@ bool DetailedActorPathHandler::ComputePathPassesThroughPlayersArea() {
                         if (v7) {
                             if (v12) {
                                 if (pParentCell == v7->GetParentCell()) {
-                                    return 1;
+                                    return true;
                                 }
                             }
                             else {
                                 if (pParentWorldspace == v7->GetWorldSpace()) {
-                                    return 1;
+                                    return true;
                                 }
                             }
                         }
@@ -996,7 +996,7 @@ bool DetailedActorPathHandler::ComputePathPassesThroughPlayersArea() {
         }
         ++aiIndex;
     }
-    return 0;
+    return false;
 }
 
 uint32_t DetailedActorPathHandler::GetMoveMode() {
@@ -1005,19 +1005,19 @@ uint32_t DetailedActorPathHandler::GetMoveMode() {
 
 bool DetailedActorPathHandler::GetMoveDelta(NiPoint3& aDelta) {
     if (bDeltaComputedThisFrame) {
-        bDeltaComputedThisFrame = 0;
+        bDeltaComputedThisFrame = false;
         aDelta = MoveDelta;
-        return 1;
+        return true;
     }
     else {
         aDelta = NiPoint3_ZERO;
-        return 0;
+        return false;
     }
 }
 
 bool DetailedActorPathHandler::GetNextTetherPoint(NiPoint3& arPoint) {
     arPoint = TetherTargetPoint;
-    return (bool)1;
+    return true;
 }
 
 void DetailedActorPathHandler::ForceMoveMode(uint32_t aiMoveMode) {
@@ -1053,7 +1053,7 @@ void DetailedActorPathHandler::HandlePreviousPathTransition(ActorPathHandler* ap
     bIgnoreLookAtPoint = pold->bIgnoreLookAtPoint;
     fIgnoreLookAtPointTimer = pold->fIgnoreLookAtPointTimer;
     if (pold->bWaitingForUpdate) {
-        bWaitingForUpdate = 1;
+        bWaitingForUpdate = true;
         LastTetherPoint = pold->LastTetherPoint;
         TetherTargetPoint = pold->TetherTargetPoint;
     }
@@ -1062,7 +1062,7 @@ void DetailedActorPathHandler::HandlePreviousPathTransition(ActorPathHandler* ap
 void DetailedActorPathHandler::HandleDeletedReference(TESObjectREFR* apRef) {
     if (apRef == pCurrentDoor) {
         eDoorState = DetailedActorPathHandler::PATH_HANDLER_DOOR_STATE_NONE;
-        pCurrentDoor = 0;
+        pCurrentDoor = nullptr;
     }
     if (apRef->IsActor()) {
         for (uint32_t i = 0; i < DetailedActorPathHandler::uiAvoidanceCandidatesSize; ++i) {
@@ -1179,7 +1179,7 @@ void DetailedActorPathHandler::ClearMovement() {
     fDistanceTraveled = (float)0.0;
     (&spPath)->operator=(nullptr);
     (&spRequest)->operator=(nullptr);
-    bWaitingForUpdate = (bool)0;
+    bWaitingForUpdate = false;
     eDoorState = PATH_HANDLER_DOOR_STATE_NONE;
     pCurrentDoor = nullptr;
     eAvoidState = PATH_AVOID_OK;
@@ -1191,7 +1191,7 @@ bool DetailedActorPathHandler::WarpToNextNode() {
     // The filter is never destroyed, as the game does.
     uint16_t ustri;
     if (spRequest.m_pObject && spRequest.m_pObject->fActorRadius > 100.0) {
-        return 0;
+        return false;
     }
     float fMinPathLength = 64.0f;
     float fMinPathLengthSqr = 64.0f * 64.0f;
@@ -1204,7 +1204,7 @@ bool DetailedActorPathHandler::WarpToNextNode() {
         fdistanceFromGoalThresold = pActor->GetLength() * 0.6000000238418579;
     }
     if (!spPath.m_pObject->GetNodeCount()) {
-        return 0;
+        return false;
     }
     if (fMaxWarpDistance > static_cast<double>(fdistToTether)) {
         float v8 = fMaxWarpDistance - fdistToTether;
@@ -1216,11 +1216,11 @@ bool DetailedActorPathHandler::WarpToNextNode() {
     float fdistFromGoal = ((&LastNode->Location)->GetLocation() - TetherTargetPoint).XYLength();
     if (fMinPathLength > static_cast<double>(fdistToTether) ||
         fdistanceFromGoalThresold > static_cast<double>(fdistFromGoal)) {
-        return 0;
+        return false;
     }
     DoorInPathFilter filter(0);
     PathingLocation actorLoc(pActor);
-    actorLoc.ResolveNavMeshInfo(0);
+    actorLoc.ResolveNavMeshInfo(nullptr);
     NavMeshPtr spmesh;
     if (actorLoc.GetNavMeshAndTriangle(spmesh, ustri)) {
         NavMeshTriangle* ptri = spmesh.m_pObject->GetTriangle(ustri);
@@ -1228,13 +1228,13 @@ bool DetailedActorPathHandler::WarpToNextNode() {
             filter.bEntirePathInDoor = ptri->GetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR);
         }
     }
-    Pathing::CheckLineOfSight(actorLoc, TetherTargetPoint, 0, &filter);
+    Pathing::CheckLineOfSight(actorLoc, TetherTargetPoint, nullptr, &filter);
     if (filter.bEnterTriWithDoor || (filter.bLeaveTriWithDoor || filter.bEntirePathInDoor)) {
-        return 0;
+        return false;
     }
     else {
         pActorMover->MoveActorToLocation(TetherTargetPoint);
-        return 1;
+        return true;
     }
 }
 
@@ -1348,7 +1348,7 @@ void DetailedActorPathHandler::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     apLoadGameBuffer->LoadFormID(pCurrentDoor);
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     for (uint32_t iloop = 0; iloop < isaveGameCount; ++iloop) {
-        pForm = 0;
+        pForm = nullptr;
         apLoadGameBuffer->LoadFormID(pForm);
         ActorAvoidList.AddHead(pForm);
     }
@@ -1362,14 +1362,14 @@ void DetailedActorPathHandler::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer)
         v5 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     pCurrentDoor = v5;
     BSSimpleList<Actor*>* plist = &ActorAvoidList;
-    BSSimpleList<Actor*>* plastList = 0;
+    BSSimpleList<Actor*>* plastList = nullptr;
     while (plist && !plist->IsEmpty()) {
         Actor* pForm = plist->m_item;
-        bool bremove = 0;
+        bool bremove = false;
         if (pForm) {
             TESForm* v3 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pForm)));
             pForm = dynamic_cast<Actor*>(v3);
@@ -1377,11 +1377,11 @@ void DetailedActorPathHandler::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer)
                 plist->SetItem(pForm);
             }
             else {
-                bremove = 1;
+                bremove = true;
             }
         }
         else {
-            bremove = 1;
+            bremove = true;
         }
         if (bremove) {
             if (plastList) {
@@ -1399,7 +1399,7 @@ void DetailedActorPathHandler::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer)
         }
     }
     if (pCurrentDoor) {
-        pCurrentDoor->SetTargeted(1);
+        pCurrentDoor->SetTargeted(true);
     }
 }
 
@@ -1411,7 +1411,7 @@ bool DetailedActorPathHandler::IsDoorInPath(uint32_t aDoorID) {
     uint16_t ustri;
     if (spPath.m_pObject) {
         if (spPath.m_pObject->IsDoorInPath(aDoorID)) {
-            return 1;
+            return true;
         }
         else {
             for (float fparam = 0.0f;; fparam = fparam + 0.5) {
@@ -1424,7 +1424,7 @@ bool DetailedActorPathHandler::IsDoorInPath(uint32_t aDoorID) {
                 spPath.m_pObject->ComputeLocationFromParameter(fnextParam, nextPoint);
                 DoorInPathFilter filter_2(aDoorID);
                 PathingLocation start(thisPoint, pActor);
-                start.ResolveNavMeshInfo(0);
+                start.ResolveNavMeshInfo(nullptr);
                 NavMeshPtr spmesh_2;
                 if (start.GetNavMeshAndTriangle(spmesh_2, ustri_2)) {
                     NavMeshTriangle* ptri_2 = spmesh_2.m_pObject->GetTriangle(ustri_2);
@@ -1432,18 +1432,18 @@ bool DetailedActorPathHandler::IsDoorInPath(uint32_t aDoorID) {
                         filter_2.bEntirePathInDoor = ptri_2->GetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR);
                     }
                 }
-                Pathing::CheckLineOfSight(start, nextPoint, static_cast<PathingLocation*>(0), &filter_2);
+                Pathing::CheckLineOfSight(start, nextPoint, static_cast<PathingLocation*>(nullptr), &filter_2);
                 if (filter_2.bEnterTriWithDoor || (filter_2.bLeaveTriWithDoor || filter_2.bEntirePathInDoor)) {
-                    return 1;
+                    return true;
                 }
             }
-            return 0;
+            return false;
         }
     }
     else {
         DoorInPathFilter filter(aDoorID);
         PathingLocation actorLoc(pActor);
-        actorLoc.ResolveNavMeshInfo(0);
+        actorLoc.ResolveNavMeshInfo(nullptr);
         NavMeshPtr spmesh;
         if (actorLoc.GetNavMeshAndTriangle(spmesh, ustri)) {
             NavMeshTriangle* ptri = spmesh.m_pObject->GetTriangle(ustri);
@@ -1451,12 +1451,12 @@ bool DetailedActorPathHandler::IsDoorInPath(uint32_t aDoorID) {
                 filter.bEntirePathInDoor = ptri->GetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR);
             }
         }
-        Pathing::CheckLineOfSight(actorLoc, TetherTargetPoint, static_cast<PathingLocation*>(0), &filter);
+        Pathing::CheckLineOfSight(actorLoc, TetherTargetPoint, static_cast<PathingLocation*>(nullptr), &filter);
         if (filter.bEnterTriWithDoor || (filter.bLeaveTriWithDoor || filter.bEntirePathInDoor)) {
-            return 1;
+            return true;
         }
         else {
-            return 0;
+            return false;
         }
     }
 }
@@ -1464,7 +1464,7 @@ bool DetailedActorPathHandler::IsDoorInPath(uint32_t aDoorID) {
 bool DetailedActorPathHandler::InitRotationMode(float afGoalAngle, bool abForceTurn, bool abPathTransition) {
     float fdir;
     if (bIgnoreInitialRotation) {
-        return 0;
+        return false;
     }
     if (!(afGoalAngle < 0.0)) {
         if (afGoalAngle >= 6.2831854820251465) {
@@ -1475,7 +1475,7 @@ bool DetailedActorPathHandler::InitRotationMode(float afGoalAngle, bool abForceT
         float v6 = afGoalAngle + 6.2831854820251465;
         afGoalAngle = std::fmod(v6, 6.2831855f);
     }
-    float afStartAngle = pActor->GetHeading(0);
+    float afStartAngle = pActor->GetHeading(false);
     float fangledelta = GetAngleDelta(afStartAngle, afGoalAngle, fdir);
     float fabsoluteDelta = std::fabs(fangledelta);
     float fepsilon = 0.017453292f;
@@ -1488,17 +1488,17 @@ bool DetailedActorPathHandler::InitRotationMode(float afGoalAngle, bool abForceT
         }
     }
     if (!(fepsilon < static_cast<double>(fabsoluteDelta))) {
-        return 0;
+        return false;
     }
     bRotateCCW = fdir > 0.0;
-    bRotateMode = 1;
+    bRotateMode = true;
     fRotateGoal = afGoalAngle;
     BSWrap(fRotateGoal, -3.1415927f, 3.1415927f);
     if (!pActor->GetTurretBehavior()) {
         fMinRotateTime = fActorTurnAnimMinTime.Float();
     }
     pActorMover->DebugOnEvent();
-    return 1;
+    return true;
 }
 
 // The turn is limited to afDeltaT times 1.3089969158172607 (a double constant, 75 degrees in radians). The smaller turn
@@ -1518,12 +1518,12 @@ void DetailedActorPathHandler::UpdateLooking(float afDeltaT, float afLookingAngl
 
 void DetailedActorPathHandler::ComputeSimpleMoveDelta(float afDeltaT) {
     if (!pActor->GetAnimationMoveDelta(MoveDelta)) {
-        MoveDelta.y = (float)(pActor->GetCurrentSpeed() * afDeltaT);
+        MoveDelta.y = (pActor->GetCurrentSpeed() * afDeltaT);
     }
 }
 
 void DetailedActorPathHandler::ResetStaticAvoidance() {
-    bMovementBlocked = (bool)0;
+    bMovementBlocked = false;
     fBlockTime = (float)0.0;
 }
 
@@ -1841,7 +1841,7 @@ DetailedActorPathHandler::PATH_HANDLER_DOOR_STATE DetailedActorPathHandler::Hand
 }
 
 float DetailedActorPathHandler::UpdateRotation(float afDeltaT) {
-    float factangle = pActor->GetHeading(0);
+    float factangle = pActor->GetHeading(false);
     if (pActor->CanMove()) {
         BSWrap(factangle, -3.1415927f, 3.1415927f);
         float fangleDelta = fRotateGoal - factangle;
@@ -1849,7 +1849,7 @@ float DetailedActorPathHandler::UpdateRotation(float afDeltaT) {
         if (!(std::fabs(fangleDelta) > 0.01745329238474369)) {
             factangle = fRotateGoal;
             if (fMinRotateTime <= 0.0) {
-                bRotateMode = 0;
+                bRotateMode = false;
                 pActorMover->DebugOnEvent();
             }
         }
@@ -1889,7 +1889,7 @@ float DetailedActorPathHandler::UpdateRotation(float afDeltaT) {
             else {
                 factangle = fRotateGoal;
                 if (fMinRotateTime <= 0.0) {
-                    bRotateMode = 0;
+                    bRotateMode = false;
                     pActorMover->DebugOnEvent();
                 }
             }
@@ -1907,13 +1907,13 @@ bool DetailedActorPathHandler::ComputeMoveMode(float afDeltaT) {
     NiPoint3 ecx0;
     if (pActor->IsRestrained() || pActor->IsUnConscious()) {
         this->MoveMode = 0;
-        return 1;
+        return true;
     }
     uint32_t MoveMode = this->MoveMode;
     if (bIgnoreLookAtPoint) {
         fIgnoreLookAtPointTimer = fIgnoreLookAtPointTimer - afDeltaT;
         if (fIgnoreLookAtPointTimer < 0.0) {
-            bIgnoreLookAtPoint = 0;
+            bIgnoreLookAtPoint = false;
             fTimeInAnim = 1.0;
         }
     }
@@ -1921,7 +1921,7 @@ bool DetailedActorPathHandler::ComputeMoveMode(float afDeltaT) {
     uint32_t v23 = this->MoveMode & 63;
     if (pActor->IsSwimming() && pActor->IsCreature()) {
         this->MoveMode = PreferredMoveModeType | 1;
-        return 1;
+        return true;
     }
     if (!bIgnoreLookAtPoint && (pActorMover->HasLookAtTarget() || bIgnoreInitialRotation)) {
         double v6;
@@ -1937,7 +1937,7 @@ bool DetailedActorPathHandler::ComputeMoveMode(float afDeltaT) {
         else {
             if (bIgnoreInitialRotationKeepActorHeading || !spPath.operator->()) {
                 ecx0 = NiPoint3_ZERO;
-                ZAngleFromVector = pActor->GetHeading(0);
+                ZAngleFromVector = pActor->GetHeading(false);
             }
             else {
                 float X_4 = fIgnoreInitialRotationTetherParam;
@@ -1987,7 +1987,7 @@ bool DetailedActorPathHandler::ComputeMoveMode(float afDeltaT) {
                             }
                             else {
                                 v23 = 1;
-                                bIgnoreLookAtPoint = 1;
+                                bIgnoreLookAtPoint = true;
                                 fIgnoreLookAtPointTimer = 1.0;
                             }
                         }
@@ -1998,7 +1998,7 @@ bool DetailedActorPathHandler::ComputeMoveMode(float afDeltaT) {
                             }
                             else {
                                 v23 = 1;
-                                bIgnoreLookAtPoint = 1;
+                                bIgnoreLookAtPoint = true;
                                 fIgnoreLookAtPointTimer = 1.0;
                             }
                         }
@@ -2038,7 +2038,7 @@ bool DetailedActorPathHandler::ComputeMoveMode(float afDeltaT) {
     this->eBlendRunning = DetailedActorPathHandler::PATH_RUNNING_BLEND_DONE;
 LABEL_57:;
     this->MoveMode = PreferredMoveModeType | v23;
-    return 1;
+    return true;
 }
 
 void DetailedActorPathHandler::RotateMoveDelta(float afDeltaT) {
@@ -2126,7 +2126,7 @@ void DetailedActorPathHandler::RotateMoveDelta(float afDeltaT) {
                 break;
             }
         }
-        double v5 = pActor->GetHeading(0);
+        double v5 = pActor->GetHeading(false);
         float v21 = v5 + v24;
         float v22 = ZAngleFromVector - v21;
         v25.MakeZRotationQ(v22);
@@ -2153,12 +2153,12 @@ void DetailedActorPathHandler::UpdateTetherPosition(float afDist) {
                 float afDista = -afDist;
                 float afCurrentParametera = fCurrentSplineT;
                 PathingSolution* v7 = spPath.operator->();
-                v7->FindPointOnPath(afCurrentParametera, afDista, 0, &arfNewSplineT, &ecx0);
+                v7->FindPointOnPath(afCurrentParametera, afDista, false, &arfNewSplineT, &ecx0);
             }
             else {
                 float afCurrentParameter = fCurrentSplineT;
                 PathingSolution* v6 = spPath.operator->();
-                v6->FindPointOnPath(afCurrentParameter, afDist, 1, &arfNewSplineT, &ecx0);
+                v6->FindPointOnPath(afCurrentParameter, afDist, true, &arfNewSplineT, &ecx0);
             }
             fCurrentSplineT = arfNewSplineT;
             TetherTargetPoint = ecx0;
@@ -2184,7 +2184,7 @@ void DetailedActorPathHandler::UpdateTether(float afDeltaT) {
                 ((MoveMode & ActorMover::MF_RIGHT) == 0 || !(MoveDelta.x < 0.0))) {
                 NiPoint3 nextTetherDelta;
                 NiMatrix3 rot;
-                float a2 = pActor->GetHeading(0);
+                float a2 = pActor->GetHeading(false);
                 rot.MakeZRotationQ(a2);
                 NiPoint3 worldSpaceMoveDir = rot * MoveDelta;
                 const NiPoint3* v4 = &pActor->GetLocationOnReference();
@@ -2274,7 +2274,7 @@ void DetailedActorPathHandler::ComputeHeadingAndLooking(float& arfHeading, float
     else {
         if (bIgnoreInitialRotation) {
             if (bIgnoreInitialRotationKeepActorHeading || !spPath.m_pObject) {
-                fangle = pActor->GetHeading(0);
+                fangle = pActor->GetHeading(false);
             }
             else {
                 NiPoint3 targetPoint;
@@ -2300,7 +2300,7 @@ void DetailedActorPathHandler::ComputeHeadingAndLooking(float& arfHeading, float
                 NiPoint3 deltaToTargetPoint = lookatPoint_2 - *v6;
                 if (pActor->IsSwimming() &&
                     (v7 = deltaToTargetPoint.Length() * 0.949999988079071, std::fabs(deltaToTargetPoint.z) >= v7)) {
-                    fangle = pActor->GetHeading(0);
+                    fangle = pActor->GetHeading(false);
                 }
                 else {
                     fangle = GetZAngleFromVector(deltaToTargetPoint);
@@ -2332,7 +2332,7 @@ void DetailedActorPathHandler::ComputeHeadingAndLooking(float& arfHeading, float
                     }
                 }
                 else {
-                    fangle = pActor->GetHeading(0);
+                    fangle = pActor->GetHeading(false);
                 }
             }
         }
@@ -2351,7 +2351,7 @@ float DetailedActorPathHandler::UpdateHeading(float fdeltaT, float& afSlowDown) 
     float fangle = 0.0f;
     float flookingAngle = 0.0f;
     ComputeHeadingAndLooking(fangle, flookingAngle);
-    float factangle = pActor->GetHeading(0);
+    float factangle = pActor->GetHeading(false);
     BSWrap(factangle, -3.1415927f, 3.1415927f);
     BSWrap(fangle, -3.1415927f, 3.1415927f);
     fangledelta = fangle - factangle;
@@ -2372,9 +2372,9 @@ float DetailedActorPathHandler::UpdateHeading(float fdeltaT, float& afSlowDown) 
                 furtherTetherLoc = TetherTargetPoint;
                 if (fspeed > static_cast<double>(fdistToTether)) {
                     float afDist = fspeed - fdistToTether;
-                    spPath.m_pObject->FindPointOnPath(fCurrentSplineT, afDist, 1, &fnewT, &furtherTetherLoc);
+                    spPath.m_pObject->FindPointOnPath(fCurrentSplineT, afDist, true, &fnewT, &furtherTetherLoc);
                 }
-                float factorAngle = pActor->GetHeading(0);
+                float factorAngle = pActor->GetHeading(false);
                 const NiPoint3* v5 = &pActor->GetLocationOnReference();
                 NiPoint3 deltaToFurtherTether = furtherTetherLoc - *v5;
                 float ffurtherTetherAngle = GetZAngleFromVector(deltaToFurtherTether);
@@ -2427,17 +2427,17 @@ float DetailedActorPathHandler::UpdateHeading(float fdeltaT, float& afSlowDown) 
 }
 
 bool DetailedActorPathHandler::UpdateStaticAvoidance(float afDeltaT) {
-    bool breturnBlocked = 0;
+    bool breturnBlocked = false;
     if (eAvoidState == DetailedActorPathHandler::PATH_AVOID_REPATH ||
         eAvoidState == DetailedActorPathHandler::PATH_AVOID_REPATH_IGNORE) {
-        return 1;
+        return true;
     }
     NiPoint3 currentLoc = pActor->GetLocationOnReference();
     NiPoint3 lastDeltaToTether = TetherTargetPoint - LastLocation;
     NiPoint3 deltaToTether = TetherTargetPoint - currentLoc;
     NiPoint3 lastFrameDelta = currentLoc - LastLocation;
-    bool bblockedThisFrame = 0;
-    bool bblockedbyActor = 0;
+    bool bblockedThisFrame = false;
+    bool bblockedbyActor = false;
     if (pActor->IsSwimming()) {
         float fFudge_2 = 20.0f;
         float lastSqr = lastDeltaToTether.SqrLength();
@@ -2451,13 +2451,13 @@ bool DetailedActorPathHandler::UpdateStaticAvoidance(float afDeltaT) {
             if (pcon_2) {
                 TESObjectREFR* pref_4;
                 NiAVObject* pav_2;
-                TESObjectREFR* pact_2 = 0;
+                TESObjectREFR* pact_2 = nullptr;
                 bhkCharacterController* pcc_2 = pcon_2->GetBumpedCharacterController();
                 if (pcc_2) {
                     pav_2 = pcc_2->GetNiObject();
                 }
                 else {
-                    pav_2 = 0;
+                    pav_2 = nullptr;
                 }
                 NiAVObject* pbumped3D = pav_2;
                 TESObjectREFR* pref_3 = TESObjectREFR::FindReferenceFor3D(pav_2);
@@ -2465,14 +2465,14 @@ bool DetailedActorPathHandler::UpdateStaticAvoidance(float afDeltaT) {
                     pref_4 = pref_3;
                 }
                 else {
-                    pref_4 = 0;
+                    pref_4 = nullptr;
                 }
                 pact_2 = pref_4;
                 if (pref_4) {
-                    bblockedbyActor = 1;
+                    bblockedbyActor = true;
                 }
             }
-            bblockedThisFrame = 1;
+            bblockedThisFrame = true;
         }
     }
     else {
@@ -2487,13 +2487,13 @@ bool DetailedActorPathHandler::UpdateStaticAvoidance(float afDeltaT) {
             if (pcon) {
                 TESObjectREFR* pref_2;
                 NiAVObject* pav;
-                TESObjectREFR* pact = 0;
+                TESObjectREFR* pact = nullptr;
                 bhkCharacterController* pcc = pcon->GetBumpedCharacterController();
                 if (pcc) {
                     pav = pcc->GetNiObject();
                 }
                 else {
-                    pav = 0;
+                    pav = nullptr;
                 }
                 NiNode* a1 = static_cast<NiNode*>(pav);
                 TESObjectREFR* pref = TESObjectREFR::FindReferenceFor3D(pav);
@@ -2501,14 +2501,14 @@ bool DetailedActorPathHandler::UpdateStaticAvoidance(float afDeltaT) {
                     pref_2 = pref;
                 }
                 else {
-                    pref_2 = 0;
+                    pref_2 = nullptr;
                 }
                 pact = pref_2;
                 if (pref_2) {
-                    bblockedbyActor = 1;
+                    bblockedbyActor = true;
                 }
             }
-            bblockedThisFrame = 1;
+            bblockedThisFrame = true;
         }
     }
     LastLocation = currentLoc;
@@ -2523,32 +2523,32 @@ bool DetailedActorPathHandler::UpdateStaticAvoidance(float afDeltaT) {
         fBlockTime = v5;
         if (eState == DetailedActorPathHandler::DAP_MOVING_WHILE_WAITING) {
             eState = DetailedActorPathHandler::DAP_WAITING_FOR_UPDATED_PATH;
-            return 0;
+            return false;
         }
     }
     else {
         if (!bMovementBlocked) {
             fBlockTime = 0.0f;
-            return 1;
+            return true;
         }
     }
     if (fBlockTime > 1.5) {
         if (pActor->GetAnimation()) {
             Animation* v6 = pActor->GetAnimation();
             if (v6->ShouldBeMoving()) {
-                bMovementBlocked = 1;
+                bMovementBlocked = true;
             }
         }
     }
     if (bMovementBlocked) {
-        breturnBlocked = 1;
+        breturnBlocked = true;
         // Tests the three states for equality, not a range.
         if (eAvoidState == DetailedActorPathHandler::PATH_AVOID_INVALID ||
             eAvoidState == DetailedActorPathHandler::PATH_AVOID_OK ||
             eAvoidState == DetailedActorPathHandler::PATH_AVOID_FAILED) {
             TESWorldSpace* WorldSpace = pActor->GetWorldSpace();
             PathingLocation apMemory_24(&TetherTargetPoint, pActor->GetParentCell(), WorldSpace);
-            if (apMemory_24.ResolveNavMeshInfo(0)) {
+            if (apMemory_24.ResolveNavMeshInfo(nullptr)) {
                 uint16_t apMemory_20;
                 NavMeshPtr apMemory_16;
                 if (apMemory_24.GetNavMeshAndTriangle(apMemory_16, apMemory_20)) {
@@ -2599,14 +2599,14 @@ void DetailedActorPathHandler::FindPathStartingLocation(float afPercentTraveled)
     fCurrentSplineT =
         spPath.m_pObject->GetSplineParametersFromPercentage(afPercentTraveled, fPathLength, iCurrentNodeIndex);
     if (bWaitingForUpdate) {
-        bWaitingForUpdate = 0;
+        bWaitingForUpdate = false;
         if (fPathLength == 0.0) {
             iCurrentNodeIndex = spPath.m_pObject->GetNodeCount() - 1;
             fCurrentSplineT = static_cast<float>(iCurrentNodeIndex);
             PathingNode* LastNode = spPath.m_pObject->GetLastNode();
             TetherTargetPoint = (&LastNode->Location)->GetLocation();
             LastTetherPoint = pActor->GetLocationOnReference();
-            bWaitingForUpdate = 0;
+            bWaitingForUpdate = false;
         }
         else {
             NiPoint3 oldDirVec = TetherTargetPoint - LastTetherPoint;
@@ -2620,7 +2620,7 @@ void DetailedActorPathHandler::FindPathStartingLocation(float afPercentTraveled)
             float fbestSqrTetherDist = 3.4028235e+38f;
             float fbestSplineT = 0.0f;
             uint32_t ibestNode = 0;
-            bool botherSide = 0;
+            bool botherSide = false;
             for (int32_t i = 0; i < 4; ++i) {
                 NiPoint3 actorToTetherDir;
                 NiPoint3 newTetherLoc;
@@ -2651,7 +2651,7 @@ void DetailedActorPathHandler::FindPathStartingLocation(float afPercentTraveled)
                         }
                     }
                     else {
-                        botherSide = 1;
+                        botherSide = true;
                         ibestNode = itempNode;
                         fbestSplineT = ftempSplineT;
                         fbestSqrTetherDist = fsqrDist;
@@ -2673,9 +2673,9 @@ void DetailedActorPathHandler::FindPathStartingLocation(float afPercentTraveled)
             PathingLocation tetherNavMeshLoc(TetherTargetPoint, pActor);
             NiPoint3 snapLocation = TetherTargetPoint;
             Pathing::GetNavMeshZForLocation(tetherNavMeshLoc, snapLocation.z);
-            float fheading = pActor->GetHeading(0);
+            float fheading = pActor->GetHeading(false);
             TESWorldSpace* WorldSpace = pActor->GetWorldSpace();
-            pActor->MoveActorAndFollowers(snapLocation, fheading, pActor->GetParentCell(), WorldSpace, 1, 1);
+            pActor->MoveActorAndFollowers(snapLocation, fheading, pActor->GetParentCell(), WorldSpace, true, true);
         }
         UpdateTetherPosition(0.0f);
     }
@@ -2721,12 +2721,12 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::CheckGoalReached
                     pActorMover->iNextNode = spPath.m_pObject->iLastLoadedVirtualNodeIndex;
                     return ActorPathHandler::PATH_HANDLER_RESULT_OK;
                 }
-                bEndUpdatePath = 0;
+                bEndUpdatePath = false;
             }
         }
         return ActorPathHandler::PATH_HANDLER_RESULT_OK;
     }
-    bool bgoalReached = 0;
+    bool bgoalReached = false;
     float fdistanceSqr = 3.4028235e+38f;
     if (spPath.m_pObject->IsIncomplete() ||
         (v10 = spPath.m_pObject->iLastLoadedVirtualNodeIndex, v10 != spPath.m_pObject->GetVirtualNodeCount() - 1)) {
@@ -2746,7 +2746,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::CheckGoalReached
     if (!bgoalReached) {
         return ActorPathHandler::PATH_HANDLER_RESULT_OK;
     }
-    bool bvalidCheck = 1;
+    bool bvalidCheck = true;
     if (spRequest.m_pObject->GetSoftGoalRadius() && fInnerGoalRadiusSqr < static_cast<double>(fGoalRadiusSqr) &&
         fInnerGoalRadiusSqr < static_cast<double>(fdistanceSqr)) {
         NiPoint3 tetherDir = TetherTargetPoint - LastTetherPoint;
@@ -2756,7 +2756,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::CheckGoalReached
         actorToTetherDir.z = 0.0;
         float fdot = tetherDir.Dot(actorToTetherDir);
         if (fdot >= 0.0 && fAvoidanceDetectionValue == 0.0 && fBlockTime == 0.0) {
-            bvalidCheck = 0;
+            bvalidCheck = false;
         }
     }
     if (!bvalidCheck) {
@@ -2805,7 +2805,7 @@ void DetailedActorPathHandler::BuildAvoidanceList(
     DetailedActorPathHandler::ActorAvoidanceData apMemory;
     float fdetection;
     NiMatrix3 rot;
-    float fAngle = apActor->GetHeading(0);
+    float fAngle = apActor->GetHeading(false);
     rot.MakeZRotationQ(fAngle);
     NiPoint3 worldSpaceMoveDir = rot * aMoveDelta;
     NiPoint3 unitWorldSpaceMoveDir = worldSpaceMoveDir;
@@ -2839,7 +2839,7 @@ void DetailedActorPathHandler::BuildAvoidanceList(
                     NiPoint3 relativeMoveDir = worldSpaceMoveDir;
                     if (pact->IsMoving()) {
                         NiMatrix3 targetRot;
-                        float fAnglea = pact->GetHeading(0);
+                        float fAnglea = pact->GetHeading(false);
                         targetRot.MakeZRotationQ(fAnglea);
                         NiPoint3* ActorMoverOverrideMovement = pact->GetActorMoverOverrideMovement();
                         NiPoint3 targetWorldSpaceMoveDir = targetRot * *ActorMoverOverrideMovement;
@@ -2862,7 +2862,7 @@ void DetailedActorPathHandler::BuildAvoidanceList(
                         }
                         if (DetailedActorPathHandler::CheckDetection(
                                 apActor, apHandler, pact, currentPos, relativeMoveDir, fcheckDistance, favoidConeAngle,
-                                fdetection, 0
+                                fdetection, false
                             )) {
                             DetailedActorPathHandler::ActorAvoidanceData* v11 =
                                 FNVD_RECONSTRUCT_AS(Construct_009E5AB0, DetailedActorPathHandler::ActorAvoidanceData)(
@@ -2877,7 +2877,7 @@ void DetailedActorPathHandler::BuildAvoidanceList(
     }
     if (DetailedActorPathHandler::CheckDetection(
             apActor, apHandler, pPlayer, currentPos, worldSpaceMoveDir, fabsoluteAvoidDistance, favoidConeAngle,
-            fdetection, 0
+            fdetection, false
         )) {
         DetailedActorPathHandler::ActorAvoidanceData* v12 =
             FNVD_RECONSTRUCT_AS(Construct_009E5AB0, DetailedActorPathHandler::ActorAvoidanceData)(
@@ -2898,7 +2898,7 @@ Actor* DetailedActorPathHandler::GetFollowLeader(Actor* apActor) {
         return reinterpret_cast<Actor*>(static_cast<uintptr_t>(v5));
     }
     PACKAGE_PROCEDURE_TYPE parent = v4->TESPackage::GetProcedureType();
-    if (Procedure_Action[(uint32_t)parent][(int32_t)baseProcess->GetProcedureIndexRunning()] != 6) {
+    if (Procedure_Action[(uint32_t)parent][baseProcess->GetProcedureIndexRunning()] != 6) {
         return reinterpret_cast<Actor*>(static_cast<uintptr_t>(v5));
     }
     Actor* v3 = static_cast<Actor*>(baseProcess->GetTarget());
@@ -2937,7 +2937,7 @@ void DetailedActorPathHandler::UpdateAvoidNodesForPath(
                     pavoidNodes_2 = ::new (v33) PathingAvoidNodeArray;
                 }
                 else {
-                    pavoidNodes_2 = 0;
+                    pavoidNodes_2 = nullptr;
                 }
                 pavoidNodes = pavoidNodes_2;
                 apRequest->SetAvoidNodeArray(pavoidNodes_2);
@@ -2965,7 +2965,7 @@ void DetailedActorPathHandler::UpdateAvoidNodesForPath(
                     fnodeRadius_2 = v5 * v38;
                     nodeType = PathingAvoidNode::AVOID_NODE_SPHERE_ACTOR;
                 }
-                float fAngle = pavoidActor->GetHeading(0);
+                float fAngle = pavoidActor->GetHeading(false);
                 targetRot.MakeZRotationQ(fAngle);
                 NiPoint3* ActorMoverOverrideMovement = pavoidActor->GetActorMoverOverrideMovement();
                 alignas(16) NiPoint3 targetWorldSpaceMoveDir = targetRot * *ActorMoverOverrideMovement;
@@ -3006,7 +3006,7 @@ void DetailedActorPathHandler::UpdateAvoidNodesForPath(
 bool DetailedActorPathHandler::UpdateAvoidanceCandidateList() {
     uint32_t inow = appTimer.iLastTime;
     if (DetailedActorPathHandler::uiAvoidanceCandidatesTimestamp == inow) {
-        return 0;
+        return false;
     }
     const BSSimpleList<Actor*>* plist = ReferenceProcessLists.GetAliveActorList();
     DetailedActorPathHandler::uiAvoidanceCandidatesTimestamp = inow;
@@ -3035,7 +3035,7 @@ bool DetailedActorPathHandler::UpdateAvoidanceCandidateList() {
         }
         plist = plist->m_pkNext;
     }
-    return 1;
+    return true;
 }
 
 bool DetailedActorPathHandler::CheckDetection(
@@ -3056,7 +3056,7 @@ bool DetailedActorPathHandler::CheckDetection(
         ((apHandler->eAvoidState == DetailedActorPathHandler::PATH_AVOID_REPATH_IGNORE ||
           apHandler->eAvoidState == DetailedActorPathHandler::PATH_AVOID_REPATH) &&
          apHandler->ActorAvoidList.IsInList(apOtherActor))) {
-        return 0;
+        return false;
     }
     const NiPoint3* a2 = &aLocation;
     const NiPoint3* v10 = &apOtherActor->GetLocationOnReference();
@@ -3067,15 +3067,15 @@ bool DetailedActorPathHandler::CheckDetection(
     float fdistanceCheckSqr = fdistanceCheck * fdistanceCheck;
     float fsqrXYLength = actorToOtherDir.SqrXYLength();
     if (!(fdistanceCheckSqr > fsqrXYLength)) {
-        return 0;
+        return false;
     }
     if (!(std::fabs(actorToOtherDir.z) < 180.0)) {
-        return 0;
+        return false;
     }
     if (apActor->IsInCombat()) {
         Actor* v13 = apActor->GetCombatTarget();
         if (apOtherActor == v13) {
-            return 0;
+            return false;
         }
     }
     if (apActor->pCurrentProcess) {
@@ -3083,29 +3083,29 @@ bool DetailedActorPathHandler::CheckDetection(
         pactorPackage = CurrentAIProcess->GetActorPackageThatIsRunning();
     }
     else {
-        pactorPackage = 0;
+        pactorPackage = nullptr;
     }
     if (pactorPackage) {
         Actor* Target = static_cast<Actor*>(pactorPackage->pTarget);
         if (Target == apOtherActor && pactorPackage->pPackage->GetPackType() != PACKAGE_TYPE_FOLLOW) {
-            return 0;
+            return false;
         }
     }
     actorToOtherDir.z = 0.0f;
     float fdist = actorToOtherDir.UnitizeGetLength();
-    bool bignoreCone = 0;
+    bool bignoreCone = false;
     float* v15 = &gs_fAvoidanceAvoidAllRadius_Pathfinding.Float();
     if (*v15 > static_cast<double>(fdist)) {
-        bignoreCone = 1;
+        bignoreCone = true;
     }
     fdist = fdist - factorForwardLength;
     fdist = BSMAX(fdist, 0.0f);
     float fdot = actorToOtherDir.Dot(aVelocityDir);
     if (!(afAvoidAngleCone <= static_cast<double>(fdot)) && !bignoreCone) {
-        return 0;
+        return false;
     }
     if (abCheckOnly) {
-        return 1;
+        return true;
     }
     flen = fdist / fdistanceCheck;
     BSClamp(flen, 0.0f, 1.0f);
@@ -3132,7 +3132,7 @@ bool DetailedActorPathHandler::CheckDetection(
         }
     }
     afOutDetection = fdetection;
-    return 1;
+    return true;
 }
 
 // Runs the base filter's constructor first, then stores the vtable, the door ID and the three flags: both triangle
@@ -3165,22 +3165,22 @@ bool DoorInPathFilter::CanCrossEdge(FastNavMeshEdgeHandle hEdge, FastNavMeshEdge
         }
     }
     if (!v10) {
-        bEntirePathInDoor = (bool)0;
+        bEntirePathInDoor = false;
     }
     if (!v9) {
-        bEntirePathInDoor = (bool)0;
+        bEntirePathInDoor = false;
     }
     if (v10) {
         if (!v9) {
-            bLeaveTriWithDoor = (bool)1;
+            bLeaveTriWithDoor = true;
         }
     }
     if (!v10) {
         if (v9) {
-            bEnterTriWithDoor = (bool)1;
+            bEnterTriWithDoor = true;
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool PathingRequest::GetFailIfGoalOccupied() {

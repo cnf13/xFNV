@@ -210,13 +210,13 @@ void TESObjectBOOK::InitItem() {
         static_cast<BGSDestructibleObjectForm*>(this)->InitItem(this);
         static_cast<TESModelTextureSwap*>(this)->InitItem(this);
         static_cast<BGSPickupPutdownSounds*>(this)->InitItem(this);
-        if (((int8_t)Data.eTeaches) != ((-1))) {
+        if (((int8_t)Data.eTeaches) != (-1)) {
             v2 = ActorValue::ToActorValue(ActorValue::SKILL, Data.eTeaches);
             if ((v2 < 32) || (v2 > 46)) {
-                Data.eTeaches = (uint8_t)((-1));
+                Data.eTeaches = (uint8_t)(-1);
             }
         }
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 
@@ -231,10 +231,10 @@ void TESObjectBOOK::Copy(TESForm* apCopy) {
 bool TESObjectBOOK::Compare(TESForm* apCompare) {
     TESObjectBOOK* v5 = dynamic_cast<TESObjectBOOK*>(apCompare);
     if (!v5) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v5)) {
-        return (bool)1;
+        return true;
     }
     return (std::memcmp(&Data.cFlags, &v5->Data, 2u) != 0);
 }
@@ -269,7 +269,7 @@ ActorValue::Index TESObjectBOOK::GetTeaches() {
 
 bool TESObjectBOOK::Read(TESObjectREFR* apActionRef) {
     float fskillPoints;
-    bool bresult = 0;
+    bool bresult = false;
     Actor* pactor = dynamic_cast<Actor*>(apActionRef);
     if (!pactor->IsPc()) {
         return bresult;
@@ -280,19 +280,19 @@ bool TESObjectBOOK::Read(TESObjectREFR* apActionRef) {
             fskillPoints = fBookPerkBonus.Float();
             BSStringT<char> strtemp;
             BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::ADJUST_BOOK_SKILL_POINTS, pPlayer, &fskillPoints);
-            pPlayer->PermanentModActorValue(eteaches, fskillPoints, static_cast<Actor*>(0));
+            pPlayer->PermanentModActorValue(eteaches, fskillPoints, static_cast<Actor*>(nullptr));
             MiscStatManager::Increment(MiscStatManager::MS_BOOKS_READ);
             int32_t v5 = static_cast<int32_t>(fskillPoints);
             const char* time = ActorValue::GetActorValueName(eteaches);
             strtemp.SPrintF(sSkillIncreasedNum.String(), time, v5);
-            Interface::ShowMessage(strtemp.pString, 1, 0, 0, 2.0f, 0);
-            bresult = 1;
+            Interface::ShowMessage(strtemp.pString, 1, nullptr, nullptr, 2.0f, false);
+            bresult = true;
         }
         return bresult;
     }
     else {
         const char* v3 = sCanNotReadBook.String();
-        Interface::ShowMessage(v3, 0, 0, 0, 2.0f, 0);
+        Interface::ShowMessage(v3, 0, nullptr, nullptr, 2.0f, false);
         return bresult;
     }
 }

@@ -89,11 +89,11 @@ float LipSynchAnim::GetPuppetValue(int32_t aiFrame) {
 
 bool LipSynchAnim::ApplyToNode(BSFaceGenAnimationData* apData, float afEmptyAtEnd) {
     if (!apData) {
-        return 0;
+        return false;
     }
     float afB = GetStartingDelay();
     float afBa = BSMIN(0.2f, afB);
-    apData->ResetSpeechCurrentMorphs(afBa, 0, 1, 1, 1, 0);
+    apData->ResetSpeechCurrentMorphs(afBa, false, true, true, true, false);
     for (uint32_t i = 0; i < iNumFrames; ++i) {
         float v8[18];
         float apDest[16];
@@ -103,10 +103,10 @@ bool LipSynchAnim::ApplyToNode(BSFaceGenAnimationData* apData, float afEmptyAtEn
         apData->AddModifiersKeyframe(v8, 0.033333335f);
     }
     if (afEmptyAtEnd > 0.0) {
-        apData->AddSpeechEmptyKeyframe(BS_FG_MORPH_PHONEME, afEmptyAtEnd, 1);
-        apData->AddSpeechEmptyKeyframe(BS_FG_MORPH_MODIFIER, afEmptyAtEnd, 1);
+        apData->AddSpeechEmptyKeyframe(BS_FG_MORPH_PHONEME, afEmptyAtEnd, true);
+        apData->AddSpeechEmptyKeyframe(BS_FG_MORPH_MODIFIER, afEmptyAtEnd, true);
     }
-    return 1;
+    return true;
 }
 
 void LipSynchAnim::operator delete(void* apMemory) {
@@ -129,7 +129,7 @@ LipSynchAnim* LipSynchAnim::LoadFromFile(const BSStringT<char>& aFilename) {
 // version byte and run-length data (a nonzero byte is one byte; a zero byte is followed by a 16-bit run length, read
 // from the raw, untyped buffer), scanned once to count its unpacked size.
 LipSynchAnim* LipSynchAnim::LoadFromFile(BSFile* apFile) {
-    if (!apFile || !apFile->Open(1, false)) {
+    if (!apFile || !apFile->Open(true, false)) {
         delete apFile;
         return nullptr;
     }
@@ -184,17 +184,17 @@ LipSynchAnim* LipSynchAnim::LoadFromFile(BSFile* apFile) {
 LipSynchAnim* LipSynchAnim::Scatter(const char* pBuffer, uint32_t nBufferSize) {
     LipSynchAnim* pRet;
     if (!pBuffer || !nBufferSize) {
-        return 0;
+        return nullptr;
     }
     if (nBufferSize < 4) {
-        return 0;
+        return nullptr;
     }
     uint32_t nNumFrames = *reinterpret_cast<const uint32_t*>(pBuffer);
     if (*reinterpret_cast<const uint32_t*>(pBuffer) > 1000000u) {
-        return 0;
+        return nullptr;
     }
     if (nBufferSize < 8) {
-        return 0;
+        return nullptr;
     }
     int32_t nStartingFrame = reinterpret_cast<const int32_t*>(pBuffer)[1];
     uint32_t nIndex = 8;
@@ -203,7 +203,7 @@ LipSynchAnim* LipSynchAnim::Scatter(const char* pBuffer, uint32_t nBufferSize) {
         pRet = ::new (apMemory) LipSynchAnim(nNumFrames, nStartingFrame);
     }
     else {
-        pRet = 0;
+        pRet = nullptr;
     }
     for (uint32_t nFrame = 0; nFrame < nNumFrames; ++nFrame) {
         for (uint32_t nPhon = 0; nPhon < 16; ++nPhon) {
@@ -211,7 +211,7 @@ LipSynchAnim* LipSynchAnim::Scatter(const char* pBuffer, uint32_t nBufferSize) {
                 if (pRet) {
                     delete pRet;
                 }
-                return 0;
+                return nullptr;
             }
             pRet->ppPhonemes[nFrame][nPhon] = *reinterpret_cast<const float*>(&pBuffer[nIndex]);
             nIndex += 4;
@@ -221,7 +221,7 @@ LipSynchAnim* LipSynchAnim::Scatter(const char* pBuffer, uint32_t nBufferSize) {
                 if (pRet) {
                     delete pRet;
                 }
-                return 0;
+                return nullptr;
             }
             pRet->ppModifiers[nFrame][nMod] = *reinterpret_cast<const float*>(&pBuffer[nIndex]);
             nIndex += 4;
@@ -238,13 +238,13 @@ LipSynchAnim* LipSynchAnim::Scatter(const char* pBuffer, uint32_t nBufferSize) {
 
 bool LipSynchAnim::Decompress(BSFile* apFile, char* apDest, uint32_t aiBufferSize, uint32_t aiDecompSize) {
     char c;
-    bool bok = 1;
+    bool bok = true;
     uint32_t iprocessed = aiBufferSize;
     while (iprocessed) {
         c = 0;
         if (!apFile->NiBinaryStream::Read(&c, 1u)) {
             iprocessed = 0;
-            return 0;
+            return false;
         }
         if (c) {
             *apDest++ = c;
@@ -267,9 +267,9 @@ bool LipSynchAnim::ChangeFilenameToLipSynch(BSStringT<char>& aFilename) {
     BSstrcpy(Dst, 260, aFilename.pString);
     char* pext = std::strrchr(Dst, 46);
     if (!pext) {
-        return 0;
+        return false;
     }
     *pext = 0;
     aFilename.SPrintF("%s.lip", Dst);
-    return 1;
+    return true;
 }

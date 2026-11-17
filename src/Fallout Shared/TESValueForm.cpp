@@ -30,7 +30,7 @@ void TESValueForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool TESValueForm::CompareComponent(BaseFormComponent* apCompareFC) {
     TESValueForm* v5 = dynamic_cast<TESValueForm*>(apCompareFC);
     if (!v5) {
-        return (bool)1;
+        return true;
     }
     uint32_t v3 = TESValueForm::GetFormValue();
     return (bool)((uint8_t)(v3 != v5->TESValueForm::GetFormValue()));
@@ -81,7 +81,7 @@ void TESValueForm::SetFormValue(int32_t aiValue) {
 int32_t TESValueForm::GetFormValue(TESForm* apForm) {
     TESValueForm* pValueForm = dynamic_cast<TESValueForm*>(apForm);
     if (pValueForm) {
-        return static_cast<int32_t>(pValueForm->GetFormValue());
+        return pValueForm->GetFormValue();
     }
     MagicItem* pMagicItem = dynamic_cast<MagicItem*>(apForm);
     if (pMagicItem) {

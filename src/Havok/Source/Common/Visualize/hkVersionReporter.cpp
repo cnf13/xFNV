@@ -14,7 +14,7 @@
 hkResult hkVersionReporter::sendVersionInformation(hkStreamWriter* connection) {
     using rawData_t = hkArray<char, hkContainerHeapAllocator>;
     FNVD_INLINED_LOCAL(rawData_t, rawData, std::nullopt, std::nullopt);
-    rawData.m_data = 0;
+    rawData.m_data = nullptr;
     rawData.m_size = 0;
     rawData.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
     FNVD_INLINED_LOCAL(hkDisplaySerializeOStream, commandStream, std::nullopt, std::nullopt);
@@ -51,7 +51,7 @@ hkResult hkVersionReporter::sendVersionInformation(hkStreamWriter* connection) {
             compiler.m_string.m_data, compiler.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK
         );
     }
-    compiler.m_string.m_data = 0;
+    compiler.m_string.m_data = nullptr;
     compiler.m_string.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
     FNVD_DESTRUCT(hkOArchive)(&commandStream);
     // EXE-INLINED none: hkArray<char>::~hkArray()

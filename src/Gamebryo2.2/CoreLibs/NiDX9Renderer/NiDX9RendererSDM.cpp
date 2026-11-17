@@ -29,22 +29,22 @@ void NiDX9RendererSDM::Shutdown() {
                 delete NiD3DShaderProgramCreatorHLSL::ms_pkCreator;
             }
         }
-        NiD3DShaderProgramCreatorHLSL::ms_pkCreator = 0;
+        NiD3DShaderProgramCreatorHLSL::ms_pkCreator = nullptr;
         if (NiD3DShaderProgramCreatorObj_126FA54) {
             NiD3DShaderProgramFactory::UnregisterShaderCreator(NiD3DShaderProgramCreatorObj_126FA54);
             if (NiD3DShaderProgramCreatorObj_126FA54) {
                 delete NiD3DShaderProgramCreatorObj_126FA54;
             }
         }
-        NiD3DShaderProgramCreatorObj_126FA54 = 0;
+        NiD3DShaderProgramCreatorObj_126FA54 = nullptr;
         if (NiD3DShaderProgramCreatorAsm::ms_pkCreator) {
             NiD3DShaderProgramFactory::UnregisterShaderCreator(NiD3DShaderProgramCreatorAsm::ms_pkCreator);
             if (NiD3DShaderProgramCreatorAsm::ms_pkCreator) {
                 delete NiD3DShaderProgramCreatorAsm::ms_pkCreator;
             }
         }
-        NiD3DShaderProgramCreatorAsm::ms_pkCreator = 0;
-        NiD3DShaderProgramCreator::SetD3DRenderer(0);
+        NiD3DShaderProgramCreatorAsm::ms_pkCreator = nullptr;
+        NiD3DShaderProgramCreator::SetD3DRenderer(nullptr);
         NiD3DShaderProgramFactory::_SDMShutdown();
         NiD3DShaderFactory::_SDMShutdown();
         NiD3DShaderDeclaration::_SDMShutdown();

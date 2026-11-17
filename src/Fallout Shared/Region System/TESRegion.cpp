@@ -47,7 +47,7 @@ void TESRegion::ClearData() {
         pDataList->Clear();
     }
     if (pPointLists) {
-        while (1) {
+        while (true) {
             v2 = pPointLists->m_item;
             if (!v2) {
                 break;
@@ -181,7 +181,7 @@ void TESRegion::InitItem() {
         if (pworld) {
             SetWorldSpace(pworld);
         }
-        SetInitialized(1);
+        SetInitialized(true);
         for (BSSimpleList<TESRegionData*>* pList = pDataList; pList && pList->m_item; pList = pList->m_pkNext) {
             TESRegionData* m_item = pList->m_item;
             m_item->InitItem(this);
@@ -201,7 +201,7 @@ TESRegion* TESRegion::Copy(TESRegion* apCopyInto) {
             pcopy_2 = ::new (apMemory) TESRegion;
         }
         else {
-            pcopy_2 = 0;
+            pcopy_2 = nullptr;
         }
         pcopy = pcopy_2;
     }
@@ -209,7 +209,7 @@ TESRegion* TESRegion::Copy(TESRegion* apCopyInto) {
     TESForm::Copy(pcopy);
     pDataList->Copy(pcopy->pDataList);
     while (pcurrent && pcurrent->m_item) {
-        TESRegionPointList* a2 = pcurrent->m_item->Copy(0);
+        TESRegionPointList* a2 = pcurrent->m_item->Copy(nullptr);
         pcopy->pPointLists->AddHead(a2);
         pcurrent = pcurrent->m_pkNext;
     }
@@ -219,25 +219,25 @@ TESRegion* TESRegion::Copy(TESRegion* apCopyInto) {
 bool TESRegion::Validate() {
     BSSimpleList<TESRegionPointList*>* pcheck = pPointLists;
     if (!pcheck || !pDataList) {
-        return 0;
+        return false;
     }
     if (!pDataList->Validate()) {
-        return 0;
+        return false;
     }
     while (pcheck && pcheck->m_item) {
-        if (!pcheck->m_item->Validate(1)) {
-            return 0;
+        if (!pcheck->m_item->Validate(true)) {
+            return false;
         }
         pcheck = pcheck->m_pkNext;
     }
-    return 1;
+    return true;
 }
 
 void TESRegion::SetWorldSpace(TESWorldSpace* apWorldSpace) {
     pWorldSpace = apWorldSpace;
     if (pWorldSpace) {
         if (TESForm::GetHasSpokenFlag() && (!pDataHandler->GetLoadingFiles())) {
-            pWorldSpace->SetHasBorderRegion(1);
+            pWorldSpace->SetHasBorderRegion(true);
         }
     }
 }
@@ -276,7 +276,7 @@ void TESRegion::UpdateHUDRegionIndicator(const HUDMainMenu::HUDRegionData& aRegi
                     HUDMainMenu::pme->pTiles[16]->GetFadeFinished(4009)) {
                     int32_t v2 = Tile::TextToTrait("_Hold");
                     HUDMainMenu::pme->pTiles[15]->Set(v2, 0);
-                    HUDMainMenu::pme->pTiles[15]->Set(4036, aRegionData.strDisplayText, 1);
+                    HUDMainMenu::pme->pTiles[15]->Set(4036, aRegionData.strDisplayText, true);
                     if (!v5) {
                         float afEnd = fHudOpacity.Float() * 255.0;
                         HUDMainMenu::pme->pTiles[15]->AddFadeControl(4009, 0.0f, afEnd, 2.0f, Tile::TFCT_STANDARD);

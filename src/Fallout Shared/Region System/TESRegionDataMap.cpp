@@ -124,9 +124,9 @@ void TESRegionDataMap::GetMapName(BSStringT<char>* a2) const {
 }
 
 bool TESRegionDataMap::SetMapName(const char* apMapName) {
-    if (!(&MapName)->StrCmp(apMapName, 1)) {
-        return (bool)0;
+    if (!(&MapName)->StrCmp(apMapName, true)) {
+        return false;
     }
     (&MapName)->Set(apMapName, (uint32_t)0);
-    return (bool)1;
+    return true;
 }

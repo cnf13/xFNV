@@ -63,7 +63,7 @@ bool NiStringPalette::IsEqual(NiObject* pkObject) {
 NiObject* NiStringPalette::CreateObject() {
     NiStringPalette* pkObject = static_cast<NiStringPalette*>(NiMemObject::operator new(sizeof(NiStringPalette)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiStringPalette;
 }

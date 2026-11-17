@@ -9,7 +9,7 @@ class NiBSplineBasisData;
 class NiBSplineData : public NiObject {
 public:
     // Offset of a channel's first control point in the control point arrays.
-    typedef uint32_t Handle;
+    using Handle = uint32_t;
 
     enum {
         INVALID_HANDLE = 0xFFFF,

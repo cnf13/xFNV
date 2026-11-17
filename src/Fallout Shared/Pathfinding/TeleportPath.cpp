@@ -10,8 +10,8 @@ TeleportPath::TeleportPath() : Spaces(), Doors() {}
 TeleportPath::~TeleportPath() {}
 
 void TeleportPath::Clear() {
-    (&Spaces)->Clear(1);
-    (&Doors)->Clear(1);
+    (&Spaces)->Clear(true);
+    (&Doors)->Clear(true);
 }
 
 // The running length is a float local that is rounded to float after every addition.

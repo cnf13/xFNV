@@ -581,21 +581,21 @@ void hkpShapeDisplayBuilder::buildShapeDisplay(
 }
 
 void hkpShapeDisplayBuilder::resetCurrentRawGeometry() {
-    m_currentGeometry = 0;
+    m_currentGeometry = nullptr;
 }
 
 hkDisplayGeometry* hkpShapeDisplayBuilder::getCurrentRawGeometry(
     hkArray<hkDisplayGeometry*, hkContainerHeapAllocator>& displayGeometries
 ) {
-    hkGeometry* v3 = 0;
+    hkGeometry* v3 = nullptr;
     if (!m_currentGeometry) {
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
         hkGeometry* v5 = static_cast<hkGeometry*>(Instance->m_heap->blockAlloc(sizeof(hkGeometry)));
         if (v5) {
-            v5->m_vertices.m_data = 0;
+            v5->m_vertices.m_data = nullptr;
             v5->m_vertices.m_size = 0;
             v5->m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-            v5->m_triangles.m_data = 0;
+            v5->m_triangles.m_data = nullptr;
             v5->m_triangles.m_size = 0;
             v5->m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;
             v3 = v5;

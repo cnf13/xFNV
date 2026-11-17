@@ -84,9 +84,9 @@ void NiOBBox::Transform(const NiTransform& xform) {
     float v11 = (float)(v8 * m_fScale);
     float v13 = (float)(v9 * m_fScale);
     float v15 = (float)(m_fScale * v10);
-    v17.x = (float)((&xform)->m_Translate.x + v11);
-    v17.y = (float)((&xform)->m_Translate.y + v13);
-    v17.z = (float)((&xform)->m_Translate.z + v15);
+    v17.x = ((&xform)->m_Translate.x + v11);
+    v17.y = ((&xform)->m_Translate.y + v13);
+    v17.z = ((&xform)->m_Translate.z + v15);
     m_wCenter = v17;
     float v12 =
         (((&xform)->m_Rotate.m_pEntry[0][0] * m_basis[0].x) + (m_basis[0].y * (&xform)->m_Rotate.m_pEntry[0][1])) +
@@ -101,22 +101,22 @@ void NiOBBox::Transform(const NiTransform& xform) {
     float v16 = (float)v4;
     m_wBasis[0].y = v14;
     m_wBasis[0].z = v16;
-    v18.x = (float)(((m_basis[1].y * (&xform)->m_Rotate.m_pEntry[0][1]) +
-                     (m_basis[1].x * (&xform)->m_Rotate.m_pEntry[0][0])) +
-                    (m_basis[1].z * (&xform)->m_Rotate.m_pEntry[0][2]));
-    v18.y = (float)(((m_basis[1].y * (&xform)->m_Rotate.m_pEntry[1][1]) +
-                     (m_basis[1].x * (&xform)->m_Rotate.m_pEntry[1][0])) +
-                    ((&xform)->m_Rotate.m_pEntry[1][2] * m_basis[1].z));
-    v18.z = (float)(((m_basis[1].y * (&xform)->m_Rotate.m_pEntry[2][1]) +
-                     ((&xform)->m_Rotate.m_pEntry[2][0] * m_basis[1].x)) +
-                    (m_basis[1].z * (&xform)->m_Rotate.m_pEntry[2][2]));
+    v18.x =
+        (((m_basis[1].y * (&xform)->m_Rotate.m_pEntry[0][1]) + (m_basis[1].x * (&xform)->m_Rotate.m_pEntry[0][0])) +
+         (m_basis[1].z * (&xform)->m_Rotate.m_pEntry[0][2]));
+    v18.y =
+        (((m_basis[1].y * (&xform)->m_Rotate.m_pEntry[1][1]) + (m_basis[1].x * (&xform)->m_Rotate.m_pEntry[1][0])) +
+         ((&xform)->m_Rotate.m_pEntry[1][2] * m_basis[1].z));
+    v18.z =
+        (((m_basis[1].y * (&xform)->m_Rotate.m_pEntry[2][1]) + ((&xform)->m_Rotate.m_pEntry[2][0] * m_basis[1].x)) +
+         (m_basis[1].z * (&xform)->m_Rotate.m_pEntry[2][2]));
     m_wBasis[1] = v18;
-    v18.x = (float)(((m_basis[2].x * (&xform)->m_Rotate.m_pEntry[0][0]) +
-                     (m_basis[2].y * (&xform)->m_Rotate.m_pEntry[0][1])) +
-                    (m_basis[2].z * (&xform)->m_Rotate.m_pEntry[0][2]));
-    v18.y = (float)(((m_basis[2].x * (&xform)->m_Rotate.m_pEntry[1][0]) +
-                     (m_basis[2].y * (&xform)->m_Rotate.m_pEntry[1][1])) +
-                    ((&xform)->m_Rotate.m_pEntry[1][2] * m_basis[2].z));
+    v18.x =
+        (((m_basis[2].x * (&xform)->m_Rotate.m_pEntry[0][0]) + (m_basis[2].y * (&xform)->m_Rotate.m_pEntry[0][1])) +
+         (m_basis[2].z * (&xform)->m_Rotate.m_pEntry[0][2]));
+    v18.y =
+        (((m_basis[2].x * (&xform)->m_Rotate.m_pEntry[1][0]) + (m_basis[2].y * (&xform)->m_Rotate.m_pEntry[1][1])) +
+         ((&xform)->m_Rotate.m_pEntry[1][2] * m_basis[2].z));
     double v5 = (double)(((&xform)->m_Rotate.m_pEntry[2][1] * m_basis[2].y) +
                          ((&xform)->m_Rotate.m_pEntry[2][0] * m_basis[2].x));
     double v6 = (double)(m_basis[2].z * (&xform)->m_Rotate.m_pEntry[2][2]);
@@ -126,8 +126,8 @@ void NiOBBox::Transform(const NiTransform& xform) {
     double v7 = (double)m_extent[0];
     m_wBasis[2].z = v18.z;
     m_wExtent[0] = (float)(v7 * (&xform)->m_fScale);
-    m_wExtent[1] = (float)(m_extent[1] * (&xform)->m_fScale);
-    m_wExtent[2] = (float)(m_extent[2] * (&xform)->m_fScale);
+    m_wExtent[1] = (m_extent[1] * (&xform)->m_fScale);
+    m_wExtent[2] = (m_extent[2] * (&xform)->m_fScale);
 }
 
 void NiOBBox::ComputeNormal(const NiPoint3& p, NiPoint3& normal) const {

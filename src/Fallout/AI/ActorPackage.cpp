@@ -41,7 +41,7 @@ void ActorPackage::InitLoadGameTES(int32_t aiFlags, int32_t aiOldFlags) {
     if (pPackage) {
         parent = pPackage->TESPackage::GetProcedureType();
         procedureCount = Procedure::GetProcedureCount(static_cast<PACKAGE_PROCEDURE_TYPE>((int32_t)parent));
-        if (((int32_t)iCurrentProcedureIndex) >= procedureCount) {
+        if (iCurrentProcedureIndex >= procedureCount) {
             iCurrentProcedureIndex = (uint32_t)(procedureCount - 1);
         }
     }
@@ -66,7 +66,7 @@ void ActorPackage::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
                 apData = (-1);
             }
             apSaveGameBuffer->SaveDataEndian(static_cast<char*>(static_cast<void*>(&apData)), 1u, 0);
-            if (apData != ((-1))) {
+            if (apData != (-1)) {
                 pPackage->SaveGame(apSaveGameBuffer);
             }
         }
@@ -78,7 +78,7 @@ void ActorPackage::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
         }
         v6 = v3;
         apSaveGameBuffer->SaveDataEndian(static_cast<char*>(static_cast<void*>(&v6)), 1u, 0);
-        if (v6 != ((-1))) {
+        if (v6 != (-1)) {
             pData->SaveGame(apSaveGameBuffer);
         }
         apSaveGameBuffer->SaveDataEndian(static_cast<char*>(static_cast<void*>(&iCurrentProcedureIndex)), 4u, 0);
@@ -113,13 +113,13 @@ void ActorPackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     uint32_t ipackageID = 0;
     bool bforcedToZero = apLoadGameBuffer->LoadFormID(ipackageID);
     if (ipackageID || bforcedToZero) {
-        bool bshared = 0;
+        bool bshared = false;
         if (pDataHandler->IsFormIDCreated(ipackageID)) {
             cpackType = 0;
             apLoadGameBuffer->LoadData(&cpackType, 1u);
             if (cpackType == -1) {
                 pPackage = reinterpret_cast<TESPackage*>(static_cast<uintptr_t>(ipackageID));
-                bshared = 1;
+                bshared = true;
             }
             else {
                 pPackage = TESPackage::CreatePackage(static_cast<PACKAGE_TYPE>(cpackType));
@@ -135,7 +135,7 @@ void ActorPackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 v4 = dynamic_cast<TESPackage*>(FormByNumericID);
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             pPackage = v4;
         }
@@ -146,7 +146,7 @@ void ActorPackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             if (pData) {
                 delete pData;
             }
-            this->pData = 0;
+            this->pData = nullptr;
         }
         else {
             this->pData = ActorPackageData::CreateActorPackageData(static_cast<PACKAGE_TYPE>(cpackDataType));
@@ -157,7 +157,7 @@ void ActorPackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         apLoadGameBuffer->LoadData(&iFlags, 4u);
         apLoadGameBuffer->LoadFormID(pTarget);
         if (bshared) {
-            SetFlag(ActorPackage::SAVELOAD_SHARED_PACKAGE, 1);
+            SetFlag(ActorPackage::SAVELOAD_SHARED_PACKAGE, true);
         }
     }
     if (bforcedToZero) {
@@ -176,7 +176,7 @@ void ActorPackage::InitLoadGameBGS(BGSLoadFormBuffer* apBuffer) {
             v7 = dynamic_cast<TESPackage*>(FormByNumericID);
         }
         else {
-            v7 = 0;
+            v7 = nullptr;
         }
         pPackage = v7;
     }
@@ -190,7 +190,7 @@ void ActorPackage::InitLoadGameBGS(BGSLoadFormBuffer* apBuffer) {
     }
     if (pPackage) {
         if (pPackage->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_NONE) {
-            pPackage->CalculateProcedureType(0);
+            pPackage->CalculateProcedureType(nullptr);
         }
         pPackage->IncRefCount();
         PACKAGE_PROCEDURE_TYPE Count = pPackage->ePROCEDURE_TYPE;
@@ -207,11 +207,11 @@ void ActorPackage::InitLoadGameBGS(BGSLoadFormBuffer* apBuffer) {
         v6 = dynamic_cast<TESObjectREFR*>(v5);
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     pTarget = v6;
     if (pTarget) {
-        pTarget->SetTargeted(1);
+        pTarget->SetTargeted(true);
     }
 }
 
@@ -248,14 +248,14 @@ void ActorPackage::InitFromPackage(TESPackage* apPackage, TESObjectREFR* apTarge
 void ActorPackage::Clear() {
     if (pPackage) {
         if (pPackage == pPlayer->pClosestConversation) {
-            pPlayer->pClosestConversation = 0;
+            pPlayer->pClosestConversation = nullptr;
         }
         if (pPackage->DecRefCount() || !pPackage->GetIsCreated()) {
-            pPackage = 0;
+            pPackage = nullptr;
         }
         else {
             TESPackage* apForm = pPackage;
-            pPackage = 0;
+            pPackage = nullptr;
             if (apForm) {
                 delete apForm;
             }
@@ -266,12 +266,12 @@ void ActorPackage::Clear() {
         if (pData) {
             delete pData;
         }
-        this->pData = 0;
+        this->pData = nullptr;
     }
     fPackageStartTime = -1.0f;
     iCurrentProcedureIndex = -1;
     iFlags = 0;
-    pTarget = 0;
+    pTarget = nullptr;
 }
 
 void ActorPackage::SetFlag(ACTOR_PACKAGE_FLAG aeFlag, bool abValue) {
@@ -297,7 +297,7 @@ void ActorPackage::NullInstanceData() {
 
 void ActorPackage::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (GetFlag(ActorPackage::SAVELOAD_SHARED_PACKAGE)) {
-        SetFlag(ActorPackage::SAVELOAD_SHARED_PACKAGE, 0);
+        SetFlag(ActorPackage::SAVELOAD_SHARED_PACKAGE, false);
     }
     else {
         if (pPackage) {
@@ -347,7 +347,7 @@ void ActorPackage::LoadGameTES(uint32_t a2, uint32_t a3) {
     uint32_t ipackageID;
     bool bforcedToZero = pSaveLoadGameOLD->LoadNumericID(&ipackageID, 4u);
     Clear();
-    bool bnewPackageNeeded = 0;
+    bool bnewPackageNeeded = false;
     if (ipackageID) {
         TESForm* pForm = TESForm::GetFormByNumericID(ipackageID);
         TESPackage* pNewPackage = dynamic_cast<TESPackage*>(pForm);
@@ -356,7 +356,7 @@ void ActorPackage::LoadGameTES(uint32_t a2, uint32_t a3) {
             pPackage->CalculateProcedureType(pTarget);
         }
         else {
-            bnewPackageNeeded = 1;
+            bnewPackageNeeded = true;
         }
         pSaveLoadGameOLD->LoadGameDataOLD(&iCurrentProcedureIndex, 4u);
     }
@@ -364,7 +364,7 @@ void ActorPackage::LoadGameTES(uint32_t a2, uint32_t a3) {
         if (bforcedToZero) {
             pSaveLoadGameOLD->AdvanceBuffer(4u);
             iCurrentProcedureIndex = 0;
-            bnewPackageNeeded = 1;
+            bnewPackageNeeded = true;
         }
     }
     if (bnewPackageNeeded) {

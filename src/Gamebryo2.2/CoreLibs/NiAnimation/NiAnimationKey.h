@@ -30,22 +30,18 @@ public:
         NUMKEYTYPES,
     };
 
-    typedef void (*InterpFunction)(
-        float fTime,
-        const NiAnimationKey* pkKey0,
-        const NiAnimationKey* pkKey1,
-        void* pvResult
-    );
-    typedef NiAnimationKey* (*CreateFunction)(NiStream& kStream, uint32_t uiNumKeys);
-    typedef void (*SaveFunction)(NiStream& kStream, NiAnimationKey* pkKeys, uint32_t uiNumKeys);
-    typedef float (*CurvatureFunction)(NiAnimationKey* pkKeys, uint32_t uiNumKeys);
-    typedef bool (*EqualFunction)(const NiAnimationKey& kKey0, const NiAnimationKey& kKey1);
-    typedef void (*FillDerivedValsFunction)(NiAnimationKey* pkKeys, uint32_t uiNumKeys, uint8_t ucSize);
-    typedef void (*DeleteFunction)(NiAnimationKey* pkKeyArray);
+    using InterpFunction =
+        void (*)(float fTime, const NiAnimationKey* pkKey0, const NiAnimationKey* pkKey1, void* pvResult);
+    using CreateFunction = NiAnimationKey* (*)(NiStream& kStream, uint32_t uiNumKeys);
+    using SaveFunction = void (*)(NiStream& kStream, NiAnimationKey* pkKeys, uint32_t uiNumKeys);
+    using CurvatureFunction = float (*)(NiAnimationKey* pkKeys, uint32_t uiNumKeys);
+    using EqualFunction = bool (*)(const NiAnimationKey& kKey0, const NiAnimationKey& kKey1);
+    using FillDerivedValsFunction = void (*)(NiAnimationKey* pkKeys, uint32_t uiNumKeys, uint8_t ucSize);
+    using DeleteFunction = void (*)(NiAnimationKey* pkKeyArray);
     // Insert takes the key array and its count by reference and returns false when the time is already taken.
-    typedef bool (*InsertFunction)(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNumKeys);
-    typedef NiAnimationKey* (*ArrayFunction)(uint32_t uiNumKeys);
-    typedef void (*CopyFunction)(NiAnimationKey* pkNewKey, const NiAnimationKey* pkOrigKey);
+    using InsertFunction = bool (*)(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNumKeys);
+    using ArrayFunction = NiAnimationKey* (*)(uint32_t uiNumKeys);
+    using CopyFunction = void (*)(NiAnimationKey* pkNewKey, const NiAnimationKey* pkOrigKey);
 
     // Each table is indexed by content * NUMKEYTYPES + type and filled at startup.
     static constexpr uint32_t NUMKEYSLOTS = static_cast<uint32_t>(NUMKEYCONTENTS) * NUMKEYTYPES;

@@ -63,7 +63,7 @@ void ImageSpaceEffectDepthRadialBlur::Setup(ImageSpaceManager* apManager, ImageS
         pparam = ::new (v4) ImageSpaceShaderParam;
     }
     else {
-        pparam = 0;
+        pparam = nullptr;
     }
     pparam->InitConstantMap(0, 2);
     pparam->SetPixelConstant(0, 0.1f, 0.0f, 0.0f, 0.0f);
@@ -81,11 +81,11 @@ void ImageSpaceEffectDepthRadialBlur::Setup(ImageSpaceManager* apManager, ImageS
         pparam_2 = ::new (v7) ImageSpaceShaderParam;
     }
     else {
-        pparam_2 = 0;
+        pparam_2 = nullptr;
     }
     pparam_2->InitConstantMap(0, 3);
     pparam_2->SetPixelConstant(0, 1.0f, 1000.0f, 500.0f, fRenderDepthMaxDepth.uValue.f);
-    pparam_2->bUseTexOffset[2] = 0;
+    pparam_2->bUseTexOffset[2] = false;
     spParam.m_pObject = pparam_2;
     pEffectParamList.SetAt(1u, spParam);
     SetEffectInputs(
@@ -130,7 +130,7 @@ bool ImageSpaceEffectDepthRadialBlur::UpdateParams(ImageSpaceEffectParam* apPara
     ImageSpaceShaderParam* pparam_2 = pEffectParamList.m_pBase->m_pObject;
     pparam_2->SetPixelConstant(0, RadialParams.r, RadialParams.g, RadialParams.b, 0.0f);
     pparam_2->SetPixelConstant(1, 0.5f, 0.5f, 0.0f, 0.0f);
-    return 1;
+    return true;
 }
 
 ImageSpaceEffectRadialBlur::ImageSpaceEffectRadialBlur() : Center(0.5f, 0.5f) {
@@ -156,7 +156,7 @@ void ImageSpaceEffectRadialBlur::Setup(ImageSpaceManager* apManager, ImageSpaceE
         pparam = ::new (v4) ImageSpaceShaderParam;
     }
     else {
-        pparam = 0;
+        pparam = nullptr;
     }
     pparam->InitConstantMap(0, 2);
     pparam->SetPixelConstant(0, 0.1f, 0.0f, 0.0f, 0.0f);
@@ -178,7 +178,7 @@ bool ImageSpaceEffectRadialBlur::UpdateParams(ImageSpaceEffectParam* apParam) {
     ImageSpaceShaderParam* v3 = pEffectParamList.m_pBase->m_pObject;
     v3->SetPixelConstant(0, fStrength, fRampup, fStart, fRampdown);
     v3->SetPixelConstant(1, Center.x, Center.y, fDownstart, 0.0);
-    return (bool)1;
+    return true;
 }
 
 void ImageSpaceEffectRadialBlur::GetBoundParams(const NiBound& aBound, NiPoint2& aCenter, float& afStartBias) {

@@ -344,7 +344,7 @@ void PackageLocation::InitItem(TESForm* apOwner) {
                             CastingType
                         );
                     }
-                    SetLocCell(0);
+                    SetLocCell(nullptr);
                 }
             }
             else {
@@ -368,7 +368,7 @@ void PackageLocation::InitItem(TESForm* apOwner) {
                                 tempint, v8
                             );
                         }
-                        SetLocObject(0);
+                        SetLocObject(nullptr);
                     }
                 }
             }
@@ -394,7 +394,7 @@ void PackageLocation::InitItem(TESForm* apOwner) {
                         v10
                     );
                 }
-                SetLocReference(0);
+                SetLocReference(nullptr);
             }
         }
     }
@@ -433,7 +433,7 @@ void PackageLocation::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             FormByNumericID = TESForm::GetFormByNumericID(uObject.iFormID);
         }
         else {
-            FormByNumericID = 0;
+            FormByNumericID = nullptr;
         }
         uObject.pObject = FormByNumericID;
     }
@@ -470,27 +470,27 @@ void PackageLocation::Save(CHUNK_ID aeChunk) {
 
 bool PackageLocation::Compare(PackageLocation* apCompare) {
     if (!apCompare) {
-        return (bool)1;
+        return true;
     }
     int32_t locType = (int32_t)GetLocType();
     if (locType != ((int32_t)apCompare->GetLocType())) {
-        return (bool)1;
+        return true;
     }
     uint32_t radius = GetRadius();
     if (radius != apCompare->GetRadius()) {
-        return (bool)1;
+        return true;
     }
     TESObjectREFR* locReference = GetLocReference();
     if (locReference != apCompare->GetLocReference()) {
-        return (bool)1;
+        return true;
     }
     TESObjectCELL* locCell = GetLocCell();
     if (locCell != apCompare->GetLocCell()) {
-        return (bool)1;
+        return true;
     }
     TESForm* locObject = GetLocObject();
     if (locObject != apCompare->GetLocObject()) {
-        return (bool)1;
+        return true;
     }
     uint32_t objectType = (uint32_t)GetLocObjectType();
     return (bool)((uint8_t)(objectType != ((uint32_t)apCompare->GetLocObjectType())));

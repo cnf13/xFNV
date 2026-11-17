@@ -2255,7 +2255,7 @@ void hkpContinuousSimulation::collideEntitiesBroadPhaseContinuousFindPairs(
     hkMemoryRouter::getInstance().m_stack.m_next.m_storage = handlesBuffer;
     // EXE-INLINED none: hkStackMemory::shrinkAllocatedStack
     hkMemoryRouter::getInstance().m_stack.m_next.m_storage = aabbsBuffer;
-    if (static_cast<int32_t>(delPairs.m_size + newPairs.m_size) > 0) {
+    if ((delPairs.m_size + newPairs.m_size) > 0) {
         HK_TIMER_SPLIT_LIST("RemoveDup");
         hkpTypedBroadPhaseDispatcher::removeDuplicates(newPairs, delPairs);
     }

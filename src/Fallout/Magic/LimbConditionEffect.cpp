@@ -83,15 +83,15 @@ void LimbConditionEffect::ModifyActorValue(Actor* apActor, float afModifier, Act
     int32_t i;
     float v6;
     float v7;
-    if (eTargetBodyPart == ((-1))) {
-        v6 = afModifier * ((&fMagicVACNoPartTargetedMult)->Float());
+    if (eTargetBodyPart == (-1)) {
+        v6 = afModifier * (&fMagicVACNoPartTargetedMult)->Float();
         for (i = 25; i < 32; ++i) {
             ValueModifierEffect::ModifyActorValue(apActor, v6, static_cast<ActorValue::Index>(i));
         }
     }
     else {
-        v7 = afModifier * ((&fMagicVACPartTargetedMult)->Float());
-        ValueModifierEffect::ModifyActorValue(apActor, afModifier, static_cast<ActorValue::Index>(eTargetBodyPart));
+        v7 = afModifier * (&fMagicVACPartTargetedMult)->Float();
+        ValueModifierEffect::ModifyActorValue(apActor, afModifier, eTargetBodyPart);
     }
 }
 

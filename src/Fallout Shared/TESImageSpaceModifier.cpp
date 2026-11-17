@@ -104,7 +104,7 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 TESImageSpaceModifier TESImageSpaceModifier::Default;
 
@@ -946,7 +946,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pendiandataM, pBlurFloatKey, sizeof(uint32_t) * v45);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < v45; ++i) {
-            ENDIAN<uint32_t>(pendiandataM[i], 0);
+            ENDIAN<uint32_t>(pendiandataM[i], false);
         }
     }
     TESForm::__AddChunkData(BNAM_ID, pendiandataM, 4 * v45);
@@ -957,7 +957,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pendiandataM_2, pDoubleFloatKey, sizeof(uint32_t) * v42);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t j = 0; j < v42; ++j) {
-            ENDIAN<uint32_t>(pendiandataM_2[j], 0);
+            ENDIAN<uint32_t>(pendiandataM_2[j], false);
         }
     }
     TESForm::__AddChunkData(VNAM_ID, pendiandataM_2, 4 * v42);
@@ -968,7 +968,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pendiandataM_3, pTintColorKey, sizeof(uint32_t) * v39);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t k = 0; k < v39; ++k) {
-            ENDIAN<uint32_t>(pendiandataM_3[k], 0);
+            ENDIAN<uint32_t>(pendiandataM_3[k], false);
         }
     }
     TESForm::__AddChunkData(TNAM_ID, pendiandataM_3, 4 * v39);
@@ -979,7 +979,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pendiandataM_4, pFadeColorKey, sizeof(uint32_t) * v36);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t m = 0; m < v36; ++m) {
-            ENDIAN<uint32_t>(pendiandataM_4[m], 0);
+            ENDIAN<uint32_t>(pendiandataM_4[m], false);
         }
     }
     TESForm::__AddChunkData(NAM3_ID, pendiandataM_4, 4 * v36);
@@ -990,7 +990,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pendiandataM_5, pRadialBlurStrengthFloatKey, sizeof(uint32_t) * v33);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t n = 0; n < v33; ++n) {
-            ENDIAN<uint32_t>(pendiandataM_5[n], 0);
+            ENDIAN<uint32_t>(pendiandataM_5[n], false);
         }
     }
     TESForm::__AddChunkData(RNAM_ID, pendiandataM_5, 4 * v33);
@@ -1001,7 +1001,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pendiandataM_6, pRadialBlurRampupFloatKey, sizeof(uint32_t) * v30);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t ii = 0; ii < v30; ++ii) {
-            ENDIAN<uint32_t>(pendiandataM_6[ii], 0);
+            ENDIAN<uint32_t>(pendiandataM_6[ii], false);
         }
     }
     TESForm::__AddChunkData(SNAM_ID, pendiandataM_6, 4 * v30);
@@ -1012,7 +1012,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pendiandataM_7, pRadialBlurStartFloatKey, sizeof(uint32_t) * v27);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t jj = 0; jj < v27; ++jj) {
-            ENDIAN<uint32_t>(pendiandataM_7[jj], 0);
+            ENDIAN<uint32_t>(pendiandataM_7[jj], false);
         }
     }
     TESForm::__AddChunkData(UNAM_ID, pendiandataM_7, 4 * v27);
@@ -1023,7 +1023,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pendiandataM_8, pRadialBlurRampDownFloatKey, sizeof(uint32_t) * v24);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t kk = 0; kk < v24; ++kk) {
-            ENDIAN<uint32_t>(pendiandataM_8[kk], 0);
+            ENDIAN<uint32_t>(pendiandataM_8[kk], false);
         }
     }
     TESForm::__AddChunkData(NAM1_ID, pendiandataM_8, 4 * v24);
@@ -1034,7 +1034,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pendiandataM_9, pRadialBlurDownStartFloatKey, sizeof(uint32_t) * v21);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t mm = 0; mm < v21; ++mm) {
-            ENDIAN<uint32_t>(pendiandataM_9[mm], 0);
+            ENDIAN<uint32_t>(pendiandataM_9[mm], false);
         }
     }
     TESForm::__AddChunkData(NAM2_ID, pendiandataM_9, 4 * v21);
@@ -1045,7 +1045,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pendiandataM_10, pDepthOfFieldStrengthFloatKey, sizeof(uint32_t) * v18);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t nn = 0; nn < v18; ++nn) {
-            ENDIAN<uint32_t>(pendiandataM_10[nn], 0);
+            ENDIAN<uint32_t>(pendiandataM_10[nn], false);
         }
     }
     TESForm::__AddChunkData(WNAM_ID, pendiandataM_10, 4 * v18);
@@ -1056,7 +1056,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pendiandataM_11, pDepthOfFieldDistanceFloatKey, sizeof(uint32_t) * v15);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i1 = 0; i1 < v15; ++i1) {
-            ENDIAN<uint32_t>(pendiandataM_11[i1], 0);
+            ENDIAN<uint32_t>(pendiandataM_11[i1], false);
         }
     }
     TESForm::__AddChunkData(XNAM_ID, pendiandataM_11, 4 * v15);
@@ -1067,7 +1067,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pendiandataM_12, pDepthOfFieldRangeFloatKey, sizeof(uint32_t) * v12);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i2 = 0; i2 < v12; ++i2) {
-            ENDIAN<uint32_t>(pendiandataM_12[i2], 0);
+            ENDIAN<uint32_t>(pendiandataM_12[i2], false);
         }
     }
     TESForm::__AddChunkData(YNAM_ID, pendiandataM_12, 4 * v12);
@@ -1078,7 +1078,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pendiandataM_13, pMotionBlurStrengthFloatKey, sizeof(uint32_t) * v9);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i3 = 0; i3 < v9; ++i3) {
-            ENDIAN<uint32_t>(pendiandataM_13[i3], 0);
+            ENDIAN<uint32_t>(pendiandataM_13[i3], false);
         }
     }
     TESForm::__AddChunkData(NAM4_ID, pendiandataM_13, 4 * v9);
@@ -1091,7 +1091,7 @@ void TESImageSpaceModifier::Save() {
             ourMemcpy(pendiandataM_14, pppFloatKey[i4][i5], sizeof(uint32_t) * v4);
             if (TESForm::QEndianSwapOnSave()) {
                 for (uint32_t iM = 0; iM < v4; ++iM) {
-                    ENDIAN<uint32_t>(pendiandataM_14[iM], 0);
+                    ENDIAN<uint32_t>(pendiandataM_14[iM], false);
                 }
             }
             // The key arrays' chunk IDs are computed: 'DAI' with the key index in the low byte, +0x40 for the second
@@ -1407,96 +1407,96 @@ bool TESImageSpaceModifier::Compare(TESForm* apCompare) {
     int32_t i;
     TESImageSpaceModifier* v6 = dynamic_cast<TESImageSpaceModifier*>(apCompare);
     if (!v6) {
-        return (bool)1;
+        return true;
     }
     this->FlushData_0052ED90();
     v6->FlushData_0052ED90();
     if (pIntroSound != v6->pIntroSound) {
-        return (bool)1;
+        return true;
     }
     if (pOutroSound != v6->pOutroSound) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v6)) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(&Data, &v6->Data, sizeof(Data))) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(pBlurFloatKey, v6->pBlurFloatKey, sizeof(NiLinFloatKey) * Data.uiBlurKeySize)) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(pDoubleFloatKey, v6->pDoubleFloatKey, sizeof(NiLinFloatKey) * Data.uiDoubleKeySize)) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(pTintColorKey, v6->pTintColorKey, sizeof(NiLinColorKey) * Data.uiTintColorKeySize)) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(pFadeColorKey, v6->pFadeColorKey, sizeof(NiLinColorKey) * Data.uiFadeColorKeySize)) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(
             pRadialBlurStrengthFloatKey, v6->pRadialBlurStrengthFloatKey,
             sizeof(NiLinFloatKey) * Data.uiRadialBlurStrengthKeySize
         )) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(
             pRadialBlurRampupFloatKey, v6->pRadialBlurRampupFloatKey,
             sizeof(NiLinFloatKey) * Data.uiRadialBlurRampupKeySize
         )) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(
             pRadialBlurStartFloatKey, v6->pRadialBlurStartFloatKey,
             sizeof(NiLinFloatKey) * Data.uiRadialBlurStartKeySize
         )) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(
             pRadialBlurRampDownFloatKey, v6->pRadialBlurRampDownFloatKey,
             sizeof(NiLinFloatKey) * Data.uiRadialBlurRampDownKeySize
         )) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(
             pRadialBlurDownStartFloatKey, v6->pRadialBlurDownStartFloatKey,
             sizeof(NiLinFloatKey) * Data.uiRadialBlurDownStartKeySize
         )) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(
             pDepthOfFieldStrengthFloatKey, v6->pDepthOfFieldStrengthFloatKey,
             sizeof(NiLinFloatKey) * Data.uiDepthOfFieldStrengthKeySize
         )) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(
             pDepthOfFieldDistanceFloatKey, v6->pDepthOfFieldDistanceFloatKey,
             sizeof(NiLinFloatKey) * Data.uiDepthOfFieldDistanceKeySize
         )) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(
             pDepthOfFieldRangeFloatKey, v6->pDepthOfFieldRangeFloatKey,
             sizeof(NiLinFloatKey) * Data.uiDepthOfFieldRangeKeySize
         )) {
-        return (bool)1;
+        return true;
     }
     if (std::memcmp(
             pMotionBlurStrengthFloatKey, v6->pMotionBlurStrengthFloatKey,
             sizeof(NiLinFloatKey) * Data.uiMotionBlurStrengthKeySize
         )) {
-        return (bool)1;
+        return true;
     }
     for (i = 0; i < 21; ++i) {
         for (j = 0; j < 2; ++j) {
             if (std::memcmp(pppFloatKey[i][j], v6->pppFloatKey[i][j], sizeof(NiLinFloatKey) * Data.ppuiKeySize[i][j])) {
-                return (bool)1;
+                return true;
             }
         }
     }
-    return (bool)0;
+    return false;
 }
 
 void TESImageSpaceModifier::MakeDefault() {
@@ -1530,7 +1530,7 @@ void TESImageSpaceModifier::Apply(float afStartTime, float afStrength, NiAVObjec
     for (int32_t i = 0; i < 21; ++i) {
         float fval[2];
         for (int32_t j = 0; j < 2; ++j) {
-            ppInterpolator[i][j].Update(ftime, 0, fval[j]);
+            ppInterpolator[i][j].Update(ftime, nullptr, fval[j]);
         }
         if (i >= 0 && i <= 13) {
             pmanager->ApplyParamModifier(ImageSpaceManager::EFFECT_HDR, i, fval, afStrength);
@@ -1543,25 +1543,25 @@ void TESImageSpaceModifier::Apply(float afStartTime, float afStrength, NiAVObjec
         }
     }
     NiColorA colval(0.0f, 0.0f, 0.0f, 0.0f);
-    TintColorInterpolator.Update(ftime, 0, colval);
+    TintColorInterpolator.Update(ftime, nullptr, colval);
     colval.a = colval.a * afStrength;
     BSClamp(colval.a, 0.0f, 1.0f);
     pmanager->ApplyTintColorParamModifier(colval);
-    FadeColorInterpolator.Update(ftime, 0, colval);
+    FadeColorInterpolator.Update(ftime, nullptr, colval);
     colval.a = colval.a * afStrength;
     BSClamp(colval.a, 0.0f, 1.0f);
     pmanager->ApplyFadeColorParamModifier(colval);
-    BlurInterpolator.Update(ftime, 0, fblurval);
-    DoubleInterpolator.Update(ftime, 0, fdoubleval);
-    RadialBlurStrengthInterpolator.Update(ftime, 0, v26);
-    RadialBlurRampupInterpolator.Update(ftime, 0, fradialblurrampup);
-    RadialBlurStartInterpolator.Update(ftime, 0, fradialblurstart);
-    RadialBlurRampDownInterpolator.Update(ftime, 0, fradialblurrampdown);
-    RadialBlurDownStartInterpolator.Update(ftime, 0, fradialblurdownstart);
-    DepthOfFieldStrengthInterpolator.Update(ftime, 0, fdofstrength);
-    DepthOfFieldDistanceInterpolator.Update(ftime, 0, fdofdistance);
-    DepthOfFieldRangeInterpolator.Update(ftime, 0, fdofrange);
-    MotionBlurStrengthInterpolator.Update(ftime, 0, fmbstr);
+    BlurInterpolator.Update(ftime, nullptr, fblurval);
+    DoubleInterpolator.Update(ftime, nullptr, fdoubleval);
+    RadialBlurStrengthInterpolator.Update(ftime, nullptr, v26);
+    RadialBlurRampupInterpolator.Update(ftime, nullptr, fradialblurrampup);
+    RadialBlurStartInterpolator.Update(ftime, nullptr, fradialblurstart);
+    RadialBlurRampDownInterpolator.Update(ftime, nullptr, fradialblurrampdown);
+    RadialBlurDownStartInterpolator.Update(ftime, nullptr, fradialblurdownstart);
+    DepthOfFieldStrengthInterpolator.Update(ftime, nullptr, fdofstrength);
+    DepthOfFieldDistanceInterpolator.Update(ftime, nullptr, fdofdistance);
+    DepthOfFieldRangeInterpolator.Update(ftime, nullptr, fdofrange);
+    MotionBlurStrengthInterpolator.Update(ftime, nullptr, fmbstr);
     fblurval = fblurval * afStrength;
     BSClamp(fblurval, 0.0f, 7.0f);
     pmanager->ApplyBlurRadiusParamModifier(fblurval);
@@ -1633,7 +1633,7 @@ void TESImageSpaceModifier::ApplyWeather(float afStartTime, float afStrength) {
     for (int32_t i = 0; i < 21; ++i) {
         float fval[2];
         for (int32_t j = 0; j < 2; ++j) {
-            ppInterpolator[i][j].Update(ftime, 0, fval[j]);
+            ppInterpolator[i][j].Update(ftime, nullptr, fval[j]);
         }
         if (i >= 0 && i <= 13) {
             pmanager->ApplyParamModifierWeather(ImageSpaceManager::EFFECT_HDR, i, fval, afStrength);
@@ -1646,23 +1646,23 @@ void TESImageSpaceModifier::ApplyWeather(float afStartTime, float afStrength) {
         }
     }
     NiColorA colval(0.0f, 0.0f, 0.0f, 0.0f);
-    TintColorInterpolator.Update(ftime, 0, colval);
+    TintColorInterpolator.Update(ftime, nullptr, colval);
     colval.Scale(afStrength);
     pmanager->ApplyTintColorParamModifierWeather(colval);
-    FadeColorInterpolator.Update(ftime, 0, colval);
+    FadeColorInterpolator.Update(ftime, nullptr, colval);
     colval.Scale(afStrength);
     pmanager->ModFadeColor(colval);
-    BlurInterpolator.Update(ftime, 0, fblurval);
-    DoubleInterpolator.Update(ftime, 0, fdoubleval);
-    RadialBlurStrengthInterpolator.Update(ftime, 0, fradialblurstr);
-    RadialBlurRampupInterpolator.Update(ftime, 0, fradialblurrampup);
-    RadialBlurStartInterpolator.Update(ftime, 0, fradialblurstart);
-    RadialBlurRampDownInterpolator.Update(ftime, 0, fradialblurrampdown);
-    RadialBlurDownStartInterpolator.Update(ftime, 0, fradialblurdownstart);
-    DepthOfFieldStrengthInterpolator.Update(ftime, 0, fdofstrength);
-    DepthOfFieldDistanceInterpolator.Update(ftime, 0, fdofdistance);
-    DepthOfFieldRangeInterpolator.Update(ftime, 0, fdofrange);
-    MotionBlurStrengthInterpolator.Update(ftime, 0, fmbstr);
+    BlurInterpolator.Update(ftime, nullptr, fblurval);
+    DoubleInterpolator.Update(ftime, nullptr, fdoubleval);
+    RadialBlurStrengthInterpolator.Update(ftime, nullptr, fradialblurstr);
+    RadialBlurRampupInterpolator.Update(ftime, nullptr, fradialblurrampup);
+    RadialBlurStartInterpolator.Update(ftime, nullptr, fradialblurstart);
+    RadialBlurRampDownInterpolator.Update(ftime, nullptr, fradialblurrampdown);
+    RadialBlurDownStartInterpolator.Update(ftime, nullptr, fradialblurdownstart);
+    DepthOfFieldStrengthInterpolator.Update(ftime, nullptr, fdofstrength);
+    DepthOfFieldDistanceInterpolator.Update(ftime, nullptr, fdofdistance);
+    DepthOfFieldRangeInterpolator.Update(ftime, nullptr, fdofrange);
+    MotionBlurStrengthInterpolator.Update(ftime, nullptr, fmbstr);
     float v14 = fblurval * afStrength;
     pmanager->ModBlurRadius(v14);
     float v13 = fdoubleval * afStrength;
@@ -1791,8 +1791,8 @@ void TESImageSpaceModifier::BlendApply(
         for (int32_t j = 0; j < 2; ++j) {
             float fval1;
             float fval2;
-            apMod1->ppInterpolator[i][j].Update(fTime, 0, fval1);
-            apMod2->ppInterpolator[i][j].Update(fTime, 0, fval2);
+            apMod1->ppInterpolator[i][j].Update(fTime, nullptr, fval1);
+            apMod2->ppInterpolator[i][j].Update(fTime, nullptr, fval2);
             a2_8[j] = (fval2 - fval1) * afPercent + fval1;
         }
         if (i >= 0 && i <= 13) {
@@ -1808,8 +1808,8 @@ void TESImageSpaceModifier::BlendApply(
     NiColorA colval(0.0f, 0.0f, 0.0f, 0.0f);
     NiColorA colval1(0.0f, 0.0f, 0.0f, 0.0f);
     NiColorA colval2(0.0f, 0.0f, 0.0f, 0.0f);
-    apMod1->TintColorInterpolator.Update(fTime, 0, colval1);
-    apMod2->TintColorInterpolator.Update(fTime, 0, colval2);
+    apMod1->TintColorInterpolator.Update(fTime, nullptr, colval1);
+    apMod2->TintColorInterpolator.Update(fTime, nullptr, colval2);
     NiColorA v48(colval2 - colval1);
     NiColorA* v7 = &v48;
     NiColorA* v8 = NiColorA::Multiply(&v47, afPercent, v7);
@@ -1817,8 +1817,8 @@ void TESImageSpaceModifier::BlendApply(
     colval.a = colval.a * fStrength;
     BSClamp(colval.a, 0.0f, 1.0f);
     pmanager->ApplyTintColorParamModifier(colval);
-    apMod1->FadeColorInterpolator.Update(fTime, 0, colval1);
-    apMod2->FadeColorInterpolator.Update(fTime, 0, colval2);
+    apMod1->FadeColorInterpolator.Update(fTime, nullptr, colval1);
+    apMod2->FadeColorInterpolator.Update(fTime, nullptr, colval2);
     NiColorA v45(colval2 - colval1);
     NiColorA* v9 = &v45;
     NiColorA* v10 = NiColorA::Multiply(&v44, afPercent, v9);
@@ -1826,36 +1826,36 @@ void TESImageSpaceModifier::BlendApply(
     colval.a = colval.a * fStrength;
     BSClamp(colval.a, 0.0f, 1.0f);
     pmanager->ApplyFadeColorParamModifier(colval);
-    apMod1->BlurInterpolator.Update(fTime, 0, fval1_2);
-    apMod2->BlurInterpolator.Update(fTime, 0, fval2_2);
+    apMod1->BlurInterpolator.Update(fTime, nullptr, fval1_2);
+    apMod2->BlurInterpolator.Update(fTime, nullptr, fval2_2);
     float afValue = (fval2_2 - fval1_2) * afPercent + fval1_2;
-    apMod1->DoubleInterpolator.Update(fTime, 0, fval1_2);
-    apMod2->DoubleInterpolator.Update(fTime, 0, fval2_2);
+    apMod1->DoubleInterpolator.Update(fTime, nullptr, fval1_2);
+    apMod2->DoubleInterpolator.Update(fTime, nullptr, fval2_2);
     float fdoubleval = (fval2_2 - fval1_2) * afPercent + fval1_2;
-    apMod1->RadialBlurStrengthInterpolator.Update(fTime, 0, fval1_2);
-    apMod2->RadialBlurStrengthInterpolator.Update(fTime, 0, fval2_2);
+    apMod1->RadialBlurStrengthInterpolator.Update(fTime, nullptr, fval1_2);
+    apMod2->RadialBlurStrengthInterpolator.Update(fTime, nullptr, fval2_2);
     float fradialblurstr = (fval2_2 - fval1_2) * afPercent + fval1_2;
-    apMod1->RadialBlurRampupInterpolator.Update(fTime, 0, fval1_2);
-    apMod2->RadialBlurRampupInterpolator.Update(fTime, 0, fval2_2);
+    apMod1->RadialBlurRampupInterpolator.Update(fTime, nullptr, fval1_2);
+    apMod2->RadialBlurRampupInterpolator.Update(fTime, nullptr, fval2_2);
     float fradialblurrampup = (fval2_2 - fval1_2) * afPercent + fval1_2;
-    apMod1->RadialBlurStartInterpolator.Update(fTime, 0, fval1_2);
-    apMod2->RadialBlurStartInterpolator.Update(fTime, 0, fval2_2);
+    apMod1->RadialBlurStartInterpolator.Update(fTime, nullptr, fval1_2);
+    apMod2->RadialBlurStartInterpolator.Update(fTime, nullptr, fval2_2);
     float fradialblurstart = (fval2_2 - fval1_2) * afPercent + fval1_2;
-    apMod1->RadialBlurRampDownInterpolator.Update(fTime, 0, fval1_2);
-    apMod2->RadialBlurRampDownInterpolator.Update(fTime, 0, fval2_2);
+    apMod1->RadialBlurRampDownInterpolator.Update(fTime, nullptr, fval1_2);
+    apMod2->RadialBlurRampDownInterpolator.Update(fTime, nullptr, fval2_2);
     float fradialblurrampdown = (fval2_2 - fval1_2) * afPercent + fval1_2;
-    apMod1->RadialBlurDownStartInterpolator.Update(fTime, 0, fval1_2);
-    apMod2->RadialBlurDownStartInterpolator.Update(fTime, 0, fval2_2);
+    apMod1->RadialBlurDownStartInterpolator.Update(fTime, nullptr, fval1_2);
+    apMod2->RadialBlurDownStartInterpolator.Update(fTime, nullptr, fval2_2);
     float fradialblurdownstart = (fval2_2 - fval1_2) * afPercent + fval1_2;
-    apMod1->DepthOfFieldStrengthInterpolator.Update(fTime, 0, fval1_2);
-    apMod2->DepthOfFieldStrengthInterpolator.Update(fTime, 0, fval2_2);
+    apMod1->DepthOfFieldStrengthInterpolator.Update(fTime, nullptr, fval1_2);
+    apMod2->DepthOfFieldStrengthInterpolator.Update(fTime, nullptr, fval2_2);
     float fdofstrength = (fval2_2 - fval1_2) * afPercent + fval1_2;
-    apMod1->DepthOfFieldDistanceInterpolator.Update(fTime, 0, fdofdistance1);
-    apMod2->DepthOfFieldDistanceInterpolator.Update(fTime, 0, fdofdistance2);
-    apMod1->DepthOfFieldRangeInterpolator.Update(fTime, 0, fdofrange1);
-    apMod2->DepthOfFieldRangeInterpolator.Update(fTime, 0, fdofrange2);
-    apMod1->MotionBlurStrengthInterpolator.Update(fTime, 0, fval1_2);
-    apMod2->MotionBlurStrengthInterpolator.Update(fTime, 0, fval2_2);
+    apMod1->DepthOfFieldDistanceInterpolator.Update(fTime, nullptr, fdofdistance1);
+    apMod2->DepthOfFieldDistanceInterpolator.Update(fTime, nullptr, fdofdistance2);
+    apMod1->DepthOfFieldRangeInterpolator.Update(fTime, nullptr, fdofrange1);
+    apMod2->DepthOfFieldRangeInterpolator.Update(fTime, nullptr, fdofrange2);
+    apMod1->MotionBlurStrengthInterpolator.Update(fTime, nullptr, fval1_2);
+    apMod2->MotionBlurStrengthInterpolator.Update(fTime, nullptr, fval2_2);
     float fmotionblurstr = (fval2_2 - fval1_2) * afPercent + fval1_2;
     fblurval = afValue * fStrength;
     BSClamp(fblurval, 0.0f, 7.0f);
@@ -1952,22 +1952,18 @@ void TESImageSpaceModifier::AllowGetHit(bool abEnable) {
 }
 
 void TESImageSpaceModifier::AdvanceCurrentTime(float afAmount) {
-    TESImageSpaceModifier::fCurrentTime = (float)(TESImageSpaceModifier::fCurrentTime + afAmount);
+    TESImageSpaceModifier::fCurrentTime = (TESImageSpaceModifier::fCurrentTime + afAmount);
 }
 
 TESImageSpaceModifier* TESImageSpaceModifier::GetExplosionInFace() {
     if (g_explosionInFaceIMOD) {
-        return reinterpret_cast<TESImageSpaceModifier*>(
-            static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(g_explosionInFaceIMOD))
-        );
+        return reinterpret_cast<TESImageSpaceModifier*>(reinterpret_cast<uintptr_t>(g_explosionInFaceIMOD));
     }
     TESForm* formByNumericID = TESForm::GetFormByNumericID(358);
     g_explosionInFaceIMOD = reinterpret_cast<TESImageSpaceModifier*>(
-        static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(dynamic_cast<TESImageSpaceModifier*>(formByNumericID)))
+        reinterpret_cast<uintptr_t>(dynamic_cast<TESImageSpaceModifier*>(formByNumericID))
     );
-    return reinterpret_cast<TESImageSpaceModifier*>(
-        static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(g_explosionInFaceIMOD))
-    );
+    return reinterpret_cast<TESImageSpaceModifier*>(reinterpret_cast<uintptr_t>(g_explosionInFaceIMOD));
 }
 
 // Hands the keys to the color data, creating it on first use.

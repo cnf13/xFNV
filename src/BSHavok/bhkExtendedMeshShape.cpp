@@ -342,7 +342,7 @@ void bhkExtendedMeshShape::SaveBinary(NiStream& arStream) {
     bhkShape::SaveBinary(arStream);
     float fRadius = pShape->m_triangleRadius;
     uint32_t uiRadiusComponentSize = 4;
-    arStream.m_pkOstr->BinaryWrite(const_cast<float*>(&fRadius), 4, &uiRadiusComponentSize, 1);
+    arStream.m_pkOstr->BinaryWrite((&fRadius), 4, &uiRadiusComponentSize, 1);
     uint32_t uiScaleComponentSize = 0x10;
     arStream.m_pkOstr->BinaryWrite(&pShape->m_scaling, 0x10, &uiScaleComponentSize, 1);
     arStream.SaveLinkID(spData.m_pObject);
@@ -525,7 +525,7 @@ HavokMaterialType bhkExtendedMeshShape::QSubMaterial(uint32_t aiKey) {
         phkObject = static_cast<hkpExtendedMeshShape*>(this->phkObject);
     }
     else {
-        phkObject = 0;
+        phkObject = nullptr;
     }
     if (aiKey != -1) {
         return static_cast<HavokMaterialType>(phkObject->getMeshMaterial(aiKey)[1].m_filterInfo);
@@ -692,7 +692,7 @@ void bhkExtendedMeshShape::CCBCE0(hkExtendedMeshShapeCinfo* apInfo) {
         phkObject = static_cast<hkpExtendedMeshShape*>(this->phkObject);
     }
     else {
-        phkObject = 0;
+        phkObject = nullptr;
     }
     bhkExtendedMeshShapeData* spData = apInfo->spData;
     if (spData != this->spData.m_pObject) {

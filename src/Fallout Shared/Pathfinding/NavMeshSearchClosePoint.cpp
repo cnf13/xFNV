@@ -25,7 +25,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NavMeshSearchClosePoint::NavMeshSearchClosePoint() : pCurrentRequest(nullptr) {}
 
@@ -104,7 +104,7 @@ bool NavMeshSearchClosePoint::GetNodeConnections(
         ++count;
         i = (istep + i) % 3;
     }
-    return 1;
+    return true;
 }
 
 bool NavMeshSearchClosePoint::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) {
@@ -113,13 +113,13 @@ bool NavMeshSearchClosePoint::IsGoalNode(const AStarNode<NavMeshSearchNode, NavM
     // The horizontal length is stored to a float local before the compare.
     float flength = (pCurrentRequest->Origin.GetLocation() - nodeCenter).XYLength();
     if (fMinDistance > static_cast<double>(flength)) {
-        return 0;
+        return false;
     }
     NavMeshInfo* NavMeshInfo_ = apNode->tNodeData.pNavMesh->GetNavMeshInfo();
     PathingLocation TempLoc(&nodeCenter, NavMeshInfo_);
     float afRadius = pCurrentRequest->fActorRadius;
     if (!Pathing::CheckSphere(TempLoc, afRadius)) {
-        return 0;
+        return false;
     }
     float fscore = 0.0f;
     if (pCurrentRequest->GetAvoidNodeArray()) {

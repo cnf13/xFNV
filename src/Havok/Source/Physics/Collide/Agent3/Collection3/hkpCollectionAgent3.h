@@ -7,7 +7,7 @@ struct hkpAgentEntry;
 class hkpProcessCollisionOutput;
 
 // The SDK's hkpAgentData is void: the bytes of an agent's data, in front of its entry.
-typedef void hkpAgentData;
+using hkpAgentData = void;
 
 // The stream agent between a convex shape and a shape collection: it wraps the single child the body's shape names
 // in a one-element list shape and hands the pair to the collection-collection agent.

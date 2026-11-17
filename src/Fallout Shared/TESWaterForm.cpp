@@ -126,7 +126,7 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 SettingT<INISettingCollection> TESWaterForm::iWaterNoiseResolution("iWaterNoiseResolution:Water", 256);
 
@@ -350,7 +350,7 @@ void TESWaterForm::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 
 void TESWaterForm::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_WATER_REMAPPED)) {
-        pRemappedWaterForm = 0;
+        pRemappedWaterForm = nullptr;
     }
 }
 
@@ -391,11 +391,11 @@ void TESWaterForm::InitItem() {
                         );
                     }
                     else {
-                        plist = 0;
+                        plist = nullptr;
                     }
                     EffectItemList* plist_3 = plist;
-                    EffectItem* v21 = 0;
-                    EffectItem* v22 = 0;
+                    EffectItem* v21 = nullptr;
+                    EffectItem* v22 = nullptr;
                     while (plist_3 && (!v21 || !v22)) {
                         EffectItemList* plist_2;
                         EffectItem* pdamageRadiationEffect__prestoreHealthEffect = plist_3->m_item;
@@ -439,7 +439,7 @@ void TESWaterForm::InitItem() {
                 }
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -466,32 +466,32 @@ void TESWaterForm::Copy(TESForm* apCopy) {
 bool TESWaterForm::Compare(TESForm* apCompare) {
     TESWaterForm* pcomp = dynamic_cast<TESWaterForm*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     if (cFlags != pcomp->cFlags) {
-        return 1;
+        return true;
     }
     if (cAlpha != pcomp->cAlpha) {
-        return 1;
+        return true;
     }
     WaterShaderData* Data = pcomp->GetData();
     WaterShaderData* v3 = GetData();
     if (std::memcmp(v3, Data, sizeof(WaterShaderData))) {
-        return 1;
+        return true;
     }
     if (NoiseTexture.CompareComponent(&pcomp->NoiseTexture)) {
-        return 1;
+        return true;
     }
     TESSound* WaterSound = pWaterSound;
     if (WaterSound != pcomp->pWaterSound) {
-        return 1;
+        return true;
     }
     const char* MaterialName = GetMaterialName();
     if (MaterialName != pcomp->GetMaterialName()) {
-        return 1;
+        return true;
     }
     SpellItem* SpellItem_ = GetSpellItem();
     return SpellItem_ != pcomp->GetSpellItem() ||
@@ -521,7 +521,7 @@ bool TESWaterForm::Activate(
         );
     }
     MagicItem* pMagicItem = pSpellItem ? static_cast<MagicItem*>(pSpellItem) : nullptr;
-    pCaster->CastSpellImmediate(pMagicItem, 0, nullptr, fEffectivenessMult, 1);
+    pCaster->CastSpellImmediate(pMagicItem, false, nullptr, fEffectivenessMult, true);
     return true;
 }
 
@@ -586,7 +586,7 @@ double TESWaterForm::GetDepthY() {
 }
 
 SpellItem* TESWaterForm::GetSpellItem() {
-    return reinterpret_cast<SpellItem*>(static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(pSpellItem)));
+    return reinterpret_cast<SpellItem*>(reinterpret_cast<uintptr_t>(pSpellItem));
 }
 
 void TESWaterForm::SetMaterialName(const char* apMaterial) {
@@ -622,15 +622,15 @@ BGSPlaceableWater* TESWaterForm::GetPlaceableAutoWater() {
             v2 = ::new (apMemory) BGSPlaceableWater;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         pPlaceableAutoWater = v2;
         pPlaceableAutoWater->SetTemporary();
-        pPlaceableAutoWater->SetAutomaticWater(1);
-        pPlaceableAutoWater->SetRefractsActors(1);
-        pPlaceableAutoWater->SetReflectsLODLand(1);
-        pPlaceableAutoWater->SetReflectsLODBuildings(1);
-        pPlaceableAutoWater->SetReflectsLODTrees(1);
+        pPlaceableAutoWater->SetAutomaticWater(true);
+        pPlaceableAutoWater->SetRefractsActors(true);
+        pPlaceableAutoWater->SetReflectsLODLand(true);
+        pPlaceableAutoWater->SetReflectsLODBuildings(true);
+        pPlaceableAutoWater->SetReflectsLODTrees(true);
         BSsprintf(apDest, 260, "PlaceableAutoWater");
         pPlaceableAutoWater->SetFormEditorID(apDest);
         pPlaceableAutoWater->Data.pWaterType = this;
@@ -647,21 +647,21 @@ BGSPlaceableWater* TESWaterForm::GetPlaceableLODWater() {
             pWater = ::new (apMemory) BGSPlaceableWater;
         }
         else {
-            pWater = 0;
+            pWater = nullptr;
         }
         pPlaceableLODWater = pWater;
         pPlaceableLODWater->SetTemporary();
-        pPlaceableLODWater->SetLODWater(1);
-        pPlaceableLODWater->SetReflectionEnabled(1);
-        pPlaceableLODWater->SetRefractionEnabled(0);
-        pPlaceableLODWater->SetReflectsActors(0);
-        pPlaceableLODWater->SetReflectsLand(0);
-        pPlaceableLODWater->SetReflectsLODLand(1);
-        pPlaceableLODWater->SetReflectsLODBuildings(1);
-        pPlaceableLODWater->SetReflectsLODTrees(0);
-        pPlaceableLODWater->SetReflectsSky(1);
-        pPlaceableLODWater->SetReflectsNoReference(0);
-        pPlaceableLODWater->SetReflectsDeadActors(0);
+        pPlaceableLODWater->SetLODWater(true);
+        pPlaceableLODWater->SetReflectionEnabled(true);
+        pPlaceableLODWater->SetRefractionEnabled(false);
+        pPlaceableLODWater->SetReflectsActors(false);
+        pPlaceableLODWater->SetReflectsLand(false);
+        pPlaceableLODWater->SetReflectsLODLand(true);
+        pPlaceableLODWater->SetReflectsLODBuildings(true);
+        pPlaceableLODWater->SetReflectsLODTrees(false);
+        pPlaceableLODWater->SetReflectsSky(true);
+        pPlaceableLODWater->SetReflectsNoReference(false);
+        pPlaceableLODWater->SetReflectsDeadActors(false);
         BSsprintf(apDest, 260, "PlaceableLODWater");
         pPlaceableLODWater->SetFormEditorID(apDest);
         pPlaceableLODWater->Data.pWaterType = this;

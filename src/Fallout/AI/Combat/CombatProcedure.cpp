@@ -125,8 +125,8 @@ ANIM_GROUP_ENUM CombatProcedure::SelectPowerAttack(
     NiPoint3 movedelta;
     ANIM_GROUP_ENUM einRangeAttacks[5];
     uint8_t apDest[8];
-    bool bcanDo = 0;
-    bool buseInRangeAttacks = 0;
+    bool bcanDo = false;
+    bool buseInRangeAttacks = false;
     int32_t result = 255;
     ANIM_GROUP_ENUM echosenAttack = ANIM_GROUP_NONE;
     int32_t iinRangeAttackCount = 0;
@@ -254,7 +254,7 @@ ANIM_GROUP_ENUM CombatProcedure::SelectPowerAttack(
         FullName = pattacker->GetFullName();
         Warning("Melee Attacker %s (%0X) is using %d attack for power attack\n", FullName, a1, a2);
     }
-    bcanDo = 1;
+    bcanDo = true;
     if (CombatController::GetShowVerboseMessages() && bcanDo) {
         const char* v15;
         if (echosenAttack == ANIM_GROUP_ATTACK_NORMAL_POWER) {
@@ -307,7 +307,7 @@ CombatProcedure* CombatProcedure::CreateProcedure(uint32_t aiType) {
                 v14 = ::new (v27) CombatProcedureAttackRanged;
             }
             else {
-                v14 = 0;
+                v14 = nullptr;
             }
             result = (CombatProcedure*)v14;
             break;
@@ -320,7 +320,7 @@ CombatProcedure* CombatProcedure::CreateProcedure(uint32_t aiType) {
                 v13 = ::new (v26) CombatProcedureAttackMelee;
             }
             else {
-                v13 = 0;
+                v13 = nullptr;
             }
             result = (CombatProcedure*)v13;
             break;
@@ -333,7 +333,7 @@ CombatProcedure* CombatProcedure::CreateProcedure(uint32_t aiType) {
                 v12 = ::new (v25) CombatProcedureAttackGrenade;
             }
             else {
-                v12 = 0;
+                v12 = nullptr;
             }
             result = (CombatProcedure*)v12;
             break;
@@ -346,7 +346,7 @@ CombatProcedure* CombatProcedure::CreateProcedure(uint32_t aiType) {
                 v11 = ::new (apMemory) CombatProcedureAttackLow;
             }
             else {
-                v11 = 0;
+                v11 = nullptr;
             }
             result = (CombatProcedure*)v11;
             break;
@@ -358,7 +358,7 @@ CombatProcedure* CombatProcedure::CreateProcedure(uint32_t aiType) {
                 v10 = ::new (v23) CombatProcedureEvade(0);
             }
             else {
-                v10 = 0;
+                v10 = nullptr;
             }
             result = (CombatProcedure*)v10;
             break;
@@ -371,7 +371,7 @@ CombatProcedure* CombatProcedure::CreateProcedure(uint32_t aiType) {
                 v9 = ::new (v22) CombatProcedureSwitchWeapon(nullptr);
             }
             else {
-                v9 = 0;
+                v9 = nullptr;
             }
             result = (CombatProcedure*)v9;
             break;
@@ -383,7 +383,7 @@ CombatProcedure* CombatProcedure::CreateProcedure(uint32_t aiType) {
                 v8 = ::new (v21) CombatProcedureMove(nullptr, 0.0f, 0);
             }
             else {
-                v8 = 0;
+                v8 = nullptr;
             }
             result = (CombatProcedure*)v8;
             break;
@@ -396,7 +396,7 @@ CombatProcedure* CombatProcedure::CreateProcedure(uint32_t aiType) {
                 v7 = ::new (v20) CombatProcedureBeInCover(nullptr);
             }
             else {
-                v7 = 0;
+                v7 = nullptr;
             }
             result = (CombatProcedure*)v7;
             break;
@@ -409,7 +409,7 @@ CombatProcedure* CombatProcedure::CreateProcedure(uint32_t aiType) {
                 v6 = ::new (v19) CombatProcedureActivateObject(nullptr, nullptr);
             }
             else {
-                v6 = 0;
+                v6 = nullptr;
             }
             result = (CombatProcedure*)v6;
             break;
@@ -422,7 +422,7 @@ CombatProcedure* CombatProcedure::CreateProcedure(uint32_t aiType) {
                 v5 = ::new (v18) CombatProcedureHideFromTarget(nullptr, 0.0f, false, false);
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             result = (CombatProcedure*)v5;
             break;
@@ -434,7 +434,7 @@ CombatProcedure* CombatProcedure::CreateProcedure(uint32_t aiType) {
                 v4 = ::new (v17) CombatProcedureSearch;
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             result = (CombatProcedure*)v4;
             break;
@@ -447,7 +447,7 @@ CombatProcedure* CombatProcedure::CreateProcedure(uint32_t aiType) {
                 v3 = ::new (v16) CombatProcedureUseCombatItem(nullptr);
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             result = (CombatProcedure*)v3;
             break;
@@ -460,14 +460,14 @@ CombatProcedure* CombatProcedure::CreateProcedure(uint32_t aiType) {
                 v2 = ::new (v15) CombatProcedureEngageTarget;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             result = (CombatProcedure*)v2;
             break;
         }
         default: {
             Warning(WARN_COMBAT, "COMBAT: Could not create combat procedure of type %i", aiType);
-            result = 0;
+            result = nullptr;
             break;
         }
     }

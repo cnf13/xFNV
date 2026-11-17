@@ -72,8 +72,8 @@ void NiControllerSequence::InterpArrayItem::ClearValues() {
     }
     m_spInterpCtlr = nullptr;
     m_pkBlendInterp = nullptr;
-    m_ucBlendIdx = (uint8_t)((-1));
-    m_ucPriority = (uint8_t)((-1));
+    m_ucBlendIdx = (uint8_t)(-1);
+    m_ucPriority = (uint8_t)(-1);
 }
 
 // Vector deleting destructor of InterpArrayItem: with flag 2 the items of the new[] block this starts are released last
@@ -1257,7 +1257,7 @@ float NiControllerSequence::ComputeScaledTime(float fTime, bool bStoreLastTime) 
             // float), the operand it passes to __CIfmod.
             float fOffset = fScaledTime - m_fBeginKeyTime;
             if (fSpan != fOffset) {
-                float fMod = static_cast<float>(std::fmod(fOffset, fSpan));
+                float fMod = std::fmod(fOffset, fSpan);
                 fScaledTime = fMod + m_fBeginKeyTime;
             }
             else {
@@ -1933,7 +1933,7 @@ void NiControllerSequence::Update(float fTime, bool bUpdateInterpolators) {
             }
             case NiControllerSequence::kEaseOut: {
                 if (!(pThis->m_fEndTime > v6)) {
-                    pThis->Deactivate(0.0f, 0);
+                    pThis->Deactivate(0.0f, false);
                     return;
                 }
                 if (pThis->m_fStartTime > v6) {
@@ -1997,7 +1997,7 @@ void NiControllerSequence::Update(float fTime, bool bUpdateInterpolators) {
                 }
             LABEL_27:;
                 if (!(pThis->m_fEndTime > v6)) {
-                    pThis->Deactivate(0.0f, 1);
+                    pThis->Deactivate(0.0f, true);
                 }
                 else {
                     if (pThis->m_fStartTime > v6) {
@@ -2015,7 +2015,7 @@ void NiControllerSequence::Update(float fTime, bool bUpdateInterpolators) {
                             NiControllerSequence* v15 = pThis->m_pkPartnerSequence;
                             if (v15) {
                                 if (v15->m_fOffset + v6 != v15->m_fLastTime) {
-                                    v15->Update(v6, 0);
+                                    v15->Update(v6, false);
                                     v13 = fTime;
                                 }
                                 float thisa = v13 + pThis->m_pkPartnerSequence->m_fOffset;
@@ -2032,7 +2032,7 @@ void NiControllerSequence::Update(float fTime, bool bUpdateInterpolators) {
                             fUpdateTime = pThis->m_fDestFrame;
                         }
                         float fUpdateTime_3 = fUpdateTime;
-                        float fTimea = pThis->ComputeScaledTime(fUpdateTime_3, 1);
+                        float fTimea = pThis->ComputeScaledTime(fUpdateTime_3, true);
                         float fWeight = pThis->m_fSeqWeight * fStartFrame;
                         pThis->SetInterpsWeightAndTime(fWeight, fEaseSpinner, fTimea);
                         if (pThis->spAnimNotesA) {
@@ -2382,15 +2382,15 @@ void NiControllerSequence::SetSequenceWeight(float fWeight) {
 }
 
 void NiControllerSequence::ResetSequence() {
-    m_fOffset = (float)(-0x1.fffffe0000000p+127f);
+    m_fOffset = (-0x1.fffffe0000000p+127f);
 }
 
 bool NiControllerSequence::SetCycleType(NiTimeController::CycleType eCycleType) {
     if ((((int32_t)eCycleType) != 2) && eCycleType) {
-        return (bool)0;
+        return false;
     }
     m_eCycleType = static_cast<NiControllerSequence::CycleType>((int32_t)eCycleType);
-    return (bool)1;
+    return true;
 }
 
 NiControllerSequence::IDTag* NiControllerSequence::GetIDTag(uint32_t uiTagIndex) {

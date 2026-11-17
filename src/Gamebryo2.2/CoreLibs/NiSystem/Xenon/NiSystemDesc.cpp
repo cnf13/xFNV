@@ -22,6 +22,6 @@ void NiSystemDesc::InitSystemDesc() {
 		v0->m_fPCCyclesPerSecond = static_cast<float>(ticksPerSec.QuadPart);
 		NiSystemDesc::ms_pkSystemDesc = v0;
 	} else {
-		NiSystemDesc::ms_pkSystemDesc = 0;
-	}
+        NiSystemDesc::ms_pkSystemDesc = nullptr;
+    }
 }

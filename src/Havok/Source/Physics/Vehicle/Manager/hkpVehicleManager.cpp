@@ -166,7 +166,7 @@ void hkpVehicleManager::addToWorld(hkpWorld* a1) {
     int32_t m_size;
     int32_t i;
     hkpVehicleInstance* v5;
-    m_size = (int32_t)m_registeredVehicles.m_size;
+    m_size = m_registeredVehicles.m_size;
     for (i = 0; i < m_size; ++i) {
         v5 = m_registeredVehicles.m_data[i];
         v5->addToWorld(a1);

@@ -138,7 +138,7 @@ void hkpSimpleShapePhantom::calcContentStatistics(hkStatisticsCollector* collect
         );
         collector->addChunk(
             hkStatisticsCollector::MEM_ARRAY, "OverlapPtr", m_collisionDetails.m_data,
-            (int32_t)(static_cast<int32_t>(sizeof(*m_collisionDetails.m_data)) * m_collisionDetails.m_size), v5
+            (static_cast<int32_t>(sizeof(*m_collisionDetails.m_data)) * m_collisionDetails.m_size), v5
         );
         return;
     }
@@ -254,7 +254,7 @@ void hkpSimpleShapePhantom::deallocateInternalArrays() {
     int32_t m_capacityAndFlags;
     if (!m_collisionDetails.m_size) {
         m_heap = (&hkMemoryRouter::getInstance())->m_heap;
-        m_capacityAndFlags = (int32_t)m_collisionDetails.m_capacityAndFlags;
+        m_capacityAndFlags = m_collisionDetails.m_capacityAndFlags;
         m_collisionDetails.m_size = (uint32_t)0;
         if (m_capacityAndFlags >= 0) {
             m_heap->bufFree(
@@ -381,7 +381,7 @@ void hkpSimpleShapePhantom::getPenetrations(hkpCdBodyPairCollector& collector, c
     hkpCollisionDispatcher* m_dispatcher = input->m_dispatcher;
     if (v3 >= 0) {
         hkpLinkedCollidable* p_m_collidable = &pThis->m_collidable;
-        while (1) {
+        while (true) {
             hkpCollidable* m_collidable = pThis->m_collisionDetails.m_data[v3].m_collidable;
             m_dispatcher
                 ->m_agent2Func[m_dispatcher

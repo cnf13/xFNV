@@ -379,8 +379,8 @@ bhkRagdollController::bhkRagdollController(NiAVObject* apObject, NiAVObject* apP
         rBone.ssParentIdx = -1;
         rBone.FwdLS.m_quad = _mm_setzero_ps();
         rBone.FwdParentMS.m_quad = _mm_setzero_ps();
-        rBone.bActive = 0;
-        rBone.bLimitBoneRot = 1;
+        rBone.bActive = false;
+        rBone.bLimitBoneRot = true;
         rBone.fDeadHeading = 0.0f;
         rBone.fDeadPitch = 0.0f;
         rBone.PrevRotLS.m_vec.m_quad = hkQuadReal0001;
@@ -388,8 +388,8 @@ bhkRagdollController::bhkRagdollController(NiAVObject* apObject, NiAVObject* apP
     CurrentTargetWS.m_quad = _mm_setzero_ps();
     EyeOffset.m_quad = _mm_setzero_ps();
     CurrentHeadRotOffset.m_vec.m_quad = hkQuadReal0001;
-    GrabIKState[0].bEaseOutGrabIK = 0;
-    GrabIKState[1].bEaseOutGrabIK = 0;
+    GrabIKState[0].bEaseOutGrabIK = false;
+    GrabIKState[1].bEaseOutGrabIK = false;
     // padding198[0] is bTargetOutsideHeadLimit, which is cleared here.
     padding198[0] = 0;
     WorldFromModel.m_translation.m_quad = _mm_setzero_ps();
@@ -591,7 +591,7 @@ hkBool bhkRagdollController::castRay(
 
 void bhkRagdollController::ForceHeadTrack() {
     if (eCurrentBone == bhkRagdollController::EYE_BONE) {
-        BoneParamA[1].bActive = 1;
+        BoneParamA[1].bActive = true;
         eCurrentBone = bhkRagdollController::HEAD_BONE;
     }
 }
@@ -608,8 +608,8 @@ void bhkRagdollController::SetLookIKActive(bool abActive) {
     if (!abActive) {
         BoneParamA[0].PrevRotLS.m_vec.m_quad = hkQuadReal0001;
         BoneParamA[1].PrevRotLS.m_vec.m_quad = hkQuadReal0001;
-        BoneParamA[1].bLimitBoneRot = 1;
-        BoneParamA[0].bLimitBoneRot = 1;
+        BoneParamA[1].bLimitBoneRot = true;
+        BoneParamA[0].bLimitBoneRot = true;
     }
 }
 
@@ -627,7 +627,7 @@ void bhkRagdollController::SyncRagdollTo3D() {
     GetSGPoseLocalSpace();
     RAGDOLL_UPDATE_TYPE eRBUpdateMethod = this->eRBUpdateMethod;
     this->eRBUpdateMethod = WARP;
-    UpdateRagdollRigidBodies(0);
+    UpdateRagdollRigidBodies(nullptr);
     hkaRagdollRigidBodyController* pRagdollRBController = this->pRagdollRBController;
     this->eRBUpdateMethod = eRBUpdateMethod;
     if (pRagdollRBController) {
@@ -973,7 +973,7 @@ void bhkRagdollController::InitPoseMatching(
 
 void bhkRagdollController::SetFeedbackData(RagdollFeedbackData& arFeedbackData) {
     spRagdollSharedData.m_pObject->pFeedbackData = &arFeedbackData;
-    bInitRagdollFeedback = 1;
+    bInitRagdollFeedback = true;
     bEnableRagdollFeedback = arFeedbackData.bEnabled;
     hkaKeyFrameHierarchyUtility::ControlData* rcontrolData = pRagdollRBController->m_controlDataPalette.begin();
     rcontrolData->m_hierarchyGain = arFeedbackData.SystemData.fHeirGain;
@@ -1108,18 +1108,18 @@ void bhkRagdollController::SetRagdollFeedbackActive(int32_t abActive) {
 void bhkRagdollController::DisableRagdollAnim(bool abUpdateConstraints) {
     if (bInitRagdollAnim) {
         bool bActiveFootIK = this->bActiveFootIK;
-        bEnableRagdollAnim = 0;
-        bEaseOutRagdollAnim = 0;
-        this->bActiveFootIK = 0;
+        bEnableRagdollAnim = false;
+        bEaseOutRagdollAnim = false;
+        this->bActiveFootIK = false;
         if (bActiveFootIK) {
-            bResetSolverWeight = 1;
+            bResetSolverWeight = true;
         }
-        bActiveGrabIK = 0;
-        bActiveLookIK = 0;
+        bActiveGrabIK = false;
+        bActiveLookIK = false;
         BoneParamA[0].PrevRotLS.m_vec.m_quad = hkQuadReal0001;
         BoneParamA[1].PrevRotLS.m_vec.m_quad = hkQuadReal0001;
-        BoneParamA[1].bLimitBoneRot = 1;
-        BoneParamA[0].bLimitBoneRot = 1;
+        BoneParamA[1].bLimitBoneRot = true;
+        BoneParamA[0].bLimitBoneRot = true;
         if (bEnableRagdollFeedback) {
             SetRagdollFeedbackActive(0);
         }
@@ -1131,20 +1131,20 @@ void bhkRagdollController::DisableRagdollAnim(bool abUpdateConstraints) {
                 if (pcol) {
                     bhkBlendCollisionObject* pblendCol = pcol->IsBhkBlendCollisionObject();
                     if (pblendCol) {
-                        pblendCol->bRagdollUpdated = 0;
+                        pblendCol->bRagdollUpdated = false;
                     }
                 }
             }
         }
-        bEaseOutLookIK = 0;
+        bEaseOutLookIK = false;
         GrabIKState[1].fReachWeight = 0.0f;
-        GrabIKState[1].bEnabled = 0;
+        GrabIKState[1].bEnabled = false;
         GrabIKState[0].fReachWeight = 0.0f;
-        GrabIKState[0].bEnabled = 0;
-        bEaseOutFootIK = 0;
+        GrabIKState[0].bEnabled = false;
+        bEaseOutFootIK = false;
         fCurrFeedbackInterp = 1.0f;
         iCurrFootEase = 0;
-        bEaseOutFeedback = 0;
+        bEaseOutFeedback = false;
         uiFeedbackTimeoutCount = 0;
         if (abUpdateConstraints) {
             hkpConstraintOwner* m_owner;
@@ -1154,7 +1154,7 @@ void bhkRagdollController::DisableRagdollAnim(bool abUpdateConstraints) {
                 m_owner = (*m_data)->getOwner();
             }
             else {
-                m_owner = 0;
+                m_owner = nullptr;
             }
             hkpRigidBody** v12 = pRagdollInstance->m_rigidBodies.begin();
             if (*v12) {
@@ -1221,9 +1221,9 @@ void bhkRagdollController::SetLookAtTarget(NiPoint3* apTarget, bool abEnable) {
     NI2HK(CurrentTargetWS, *apTarget);
     CurrentTargetWS.operator()(3) = 0.0;
     if (abEnable) {
-        SetLookIKActive(1);
-        bEaseOutLookIK = 0;
-        bEaseOutRagdollAnim = 0;
+        SetLookIKActive(true);
+        bEaseOutLookIK = false;
+        bEaseOutRagdollAnim = false;
     }
 }
 
@@ -1254,8 +1254,8 @@ bhkWorld* bhkRagdollController::GetWorld() const {
     ahkpWorld* m_world;
     pRagdollInstance = this->pRagdollInstance;
     if (pRagdollInstance &&
-        (((v2 = *pRagdollInstance->m_rigidBodies.m_data) != 0) &&
-         ((m_world = static_cast<ahkpWorld*>(v2->m_world)) != 0))) {
+        (((v2 = *pRagdollInstance->m_rigidBodies.m_data) != nullptr) &&
+         ((m_world = static_cast<ahkpWorld*>(v2->m_world)) != nullptr))) {
         return static_cast<bhkWorld*>(m_world->m_userData);
     }
     else {
@@ -1274,7 +1274,7 @@ void bhkRagdollController::SetFootIKActive(bool abActive) {
     }
     bActiveFootIK = (bool)v3;
     if (bFootIKActive && (!v3)) {
-        bResetSolverWeight = (bool)1;
+        bResetSolverWeight = true;
     }
 }
 
@@ -2372,17 +2372,17 @@ bool bhkRagdollController::InitGrabIK() {
     if (bret) {
         const hkaSkeleton* pskel = spRagdollSharedData.m_pObject->pHighSkel;
         if (pskel) {
-            GrabSetup[0].usShoulderIdx = hkaSkeletonUtils::findBoneWithName(*pskel, "Bip01 L UpperArm", 0);
-            GrabSetup[0].usElbowIdx = hkaSkeletonUtils::findBoneWithName(*pskel, "Bip01 L ForeArm", 0);
-            GrabSetup[0].usHandIdx = hkaSkeletonUtils::findBoneWithName(*pskel, "Bip01 L Hand", 0);
-            GrabSetup[1].usShoulderIdx = hkaSkeletonUtils::findBoneWithName(*pskel, "Bip01 R UpperArm", 0);
-            GrabSetup[1].usElbowIdx = hkaSkeletonUtils::findBoneWithName(*pskel, "Bip01 R ForeArm", 0);
-            GrabSetup[1].usHandIdx = hkaSkeletonUtils::findBoneWithName(*pskel, "Bip01 R Hand", 0);
+            GrabSetup[0].usShoulderIdx = hkaSkeletonUtils::findBoneWithName(*pskel, "Bip01 L UpperArm", nullptr);
+            GrabSetup[0].usElbowIdx = hkaSkeletonUtils::findBoneWithName(*pskel, "Bip01 L ForeArm", nullptr);
+            GrabSetup[0].usHandIdx = hkaSkeletonUtils::findBoneWithName(*pskel, "Bip01 L Hand", nullptr);
+            GrabSetup[1].usShoulderIdx = hkaSkeletonUtils::findBoneWithName(*pskel, "Bip01 R UpperArm", nullptr);
+            GrabSetup[1].usElbowIdx = hkaSkeletonUtils::findBoneWithName(*pskel, "Bip01 R ForeArm", nullptr);
+            GrabSetup[1].usHandIdx = hkaSkeletonUtils::findBoneWithName(*pskel, "Bip01 R Hand", nullptr);
             if (GrabSetup[0].usShoulderIdx == -1 || (GrabSetup[0].usElbowIdx == -1 || GrabSetup[0].usHandIdx == -1)) {
-                bret = 0;
+                bret = false;
             }
             if (GrabSetup[1].usShoulderIdx == -1 || (GrabSetup[1].usElbowIdx == -1 || GrabSetup[1].usHandIdx == -1)) {
-                bret = 0;
+                bret = false;
             }
         }
     }
@@ -2437,11 +2437,11 @@ bool bhkRagdollController::IsPoweredRagdoll() {
     if (pRagdollInstance) {
         int32_t v3 = 0;
         if (pRagdollInstance->m_constraints.m_size > 0) {
-            while (1) {
+            while (true) {
                 int32_t v5;
                 bool v6;
                 if (!v2) {
-                    return 0;
+                    return false;
                 }
                 hkpRagdollConstraintData* m_data =
                     static_cast<hkpRagdollConstraintData*>(pRagdollInstance->m_constraints.m_data[v3]->getDataRw());
@@ -2458,7 +2458,7 @@ bool bhkRagdollController::IsPoweredRagdoll() {
                     if (!m_data->getTwistMotor() || !m_data->getConeMotor()) {
                         goto LABEL_13;
                     }
-                    v6 = m_data->getPlaneMotor() == 0;
+                    v6 = m_data->getPlaneMotor() == nullptr;
                 }
                 else {
                     v6 = std::bit_cast<int32_t>(m_data->m_atoms.m_ragdollMotors.m_target_bRca.m_col0.m_quad[0]) == 0;
@@ -2469,15 +2469,15 @@ bool bhkRagdollController::IsPoweredRagdoll() {
             LABEL_14:;
                 if (++v3 >= pRagdollInstance->m_constraints.m_size) {
                     if (!v2) {
-                        return 0;
+                        return false;
                     }
                     pThis = v8;
-                    return pThis->pRagdollInstance != 0;
+                    return pThis->pRagdollInstance != nullptr;
                 }
             }
         }
     }
-    return pThis->pRagdollInstance != 0;
+    return pThis->pRagdollInstance != nullptr;
 }
 
 void bhkRagdollController::DampenDriveGains() {
@@ -2514,7 +2514,7 @@ void bhkRagdollController::ResetDriveGains() {
 
 bool bhkRagdollController::Leg3DSelectiveUpdate() {
     int32_t v1 = 0;
-    bool bret = 0;
+    bool bret = false;
     for (int32_t i = 0; i < LegInfoA.m_size; ++i) {
         if (bret) {
             break;
@@ -2907,10 +2907,10 @@ void bhkRagdollController::EnableRagdollAnim() {
     bool bInitRagdollAnim = this->bInitRagdollAnim;
     bool v5 = !bEnableFootIK;
     bEnableRagdollAnim = bInitRagdollAnim;
-    bEaseOutRagdollAnim = 0;
+    bEaseOutRagdollAnim = false;
     this->bActiveFootIK = !v5;
     if (bActiveFootIK && v5) {
-        bResetSolverWeight = 1;
+        bResetSolverWeight = true;
     }
     v5 = !bActiveRagdollFeedback;
     bActiveGrabIK = bEnableGrabIK;
@@ -2922,7 +2922,7 @@ void bhkRagdollController::EnableRagdollAnim() {
             m_owner = (*m_data)->getOwner();
         }
         else {
-            m_owner = 0;
+            m_owner = nullptr;
         }
         hkpRigidBody** v9 = pRagdollInstance->m_rigidBodies.begin();
         if (*v9) {
@@ -3206,7 +3206,7 @@ void bhkRagdollController::Init(NiAVObject* apObject, const char* apScaledSkelet
 }
 
 bool bhkRagdollController::GetEyeOffset(NiPoint3& arOffset) {
-    bool bret = 0;
+    bool bret = false;
     if (bTargetOutsideHeadLimit) {
         hkVector4 eyePosWS;
         const hkQsTransform* v7;
@@ -3224,7 +3224,7 @@ bool bhkRagdollController::GetEyeOffset(NiPoint3& arOffset) {
         eyePosWS_2.setTransformedPos(*v7, eyePosWS_2);
         eyePosWS_2.setTransformedPos(WorldFromModel, eyePosWS_2);
         HK2NI(arOffset, eyePosWS_2);
-        return 1;
+        return true;
     }
     return bret;
 }
@@ -3434,7 +3434,7 @@ void bhkRagdollController::UpdateConstraintsWorld(int32_t abAdd) {
         m_owner = (*m_data)->getOwner();
     }
     else {
-        m_owner = 0;
+        m_owner = nullptr;
     }
     hkpRigidBody** v5 = pRagdollInstance->m_rigidBodies.begin();
     if (*v5) {
@@ -3612,7 +3612,7 @@ void bhkRagdollController::ResetPose(
     data.bSceneGraphChange = false;
     apSkeleton->Update(data);
     if (aePrevMotion != hkpMotion::MOTION_KEYFRAMED && aePrevMotion != hkpMotion::MOTION_INVALID) {
-        bhkWorld::SetMotion(apSkeleton, aePrevMotion, 1, 0, 1);
+        bhkWorld::SetMotion(apSkeleton, aePrevMotion, true, false, true);
     }
     if (abPrevUseVel) {
         bhkUtilFunctions::SetUseVelocityRecurse(abPrevUseVel, apSkeleton);
@@ -3674,12 +3674,12 @@ void bhkRagdollController::CopyPoseTo3D(
     }
     arbPrevUseVel = bUseVel;
     if (bUseVel) {
-        bhkUtilFunctions::SetUseVelocityRecurse(0, apSkeleton);
+        bhkUtilFunctions::SetUseVelocityRecurse(false, apSkeleton);
     }
     if (pcolObj) {
         bhkRigidBody* pbody = pcolObj->spWorldObject;
         hkpRigidBody* phkBody;
-        if (pbody && (phkBody = static_cast<hkpRigidBody*>(pbody->phkObject)) != 0) {
+        if (pbody && (phkBody = static_cast<hkpRigidBody*>(pbody->phkObject)) != nullptr) {
             arePrevMotion = static_cast<hkpMotion::MotionType>(phkBody->m_motion.m_type.m_storage);
         }
         else {
@@ -3687,18 +3687,18 @@ void bhkRagdollController::CopyPoseTo3D(
         }
     }
     if (arePrevMotion != hkpMotion::MOTION_KEYFRAMED) {
-        bhkWorld::SetMotion(apSkeleton, hkpMotion::MOTION_KEYFRAMED, 1, 0, 1);
+        bhkWorld::SetMotion(apSkeleton, hkpMotion::MOTION_KEYFRAMED, true, false, true);
     }
     if (apSkeleton) {
         if (apPose) {
             NiUpdateData data;
             CopyPoseTo3DRec(apSkeleton, apPose, arPoseA);
             data.fTime = 0.0f;
-            data.bUpdateControllers = 0;
-            data.bParallelUpdate = 0;
-            data.bFoundParticles = 0;
-            data.bFoundMorphController = 0;
-            data.bSceneGraphChange = 0;
+            data.bUpdateControllers = false;
+            data.bParallelUpdate = false;
+            data.bFoundParticles = false;
+            data.bFoundMorphController = false;
+            data.bSceneGraphChange = false;
             apSkeleton->Update(data);
         }
     }
@@ -3967,7 +3967,7 @@ void hkaSkeletonMapperUtils::Params::Free() {
     if (m_capacityAndFlags >= 0) {
         m_heap->bufFree(m_userMappingsBtoA.begin(), sizeof(hkaSkeletonMapperUtils::UserMapping) * m_capacityAndFlags);
     }
-    m_userMappingsBtoA.m_data = 0;
+    m_userMappingsBtoA.m_data = nullptr;
     m_userMappingsBtoA.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserMapping>::DONT_DEALLOCATE_FLAG;
     hkMemoryAllocator* v4 = (&hkMemoryRouter::getInstance())->m_heap;
     int32_t v5 = m_userMappingsAtoB.m_capacityAndFlags;
@@ -3975,7 +3975,7 @@ void hkaSkeletonMapperUtils::Params::Free() {
     if ((v5 & 0x80000000u) == 0) {
         v4->bufFree(m_userMappingsAtoB.begin(), sizeof(hkaSkeletonMapperUtils::UserMapping) * v5);
     }
-    m_userMappingsAtoB.m_data = 0;
+    m_userMappingsAtoB.m_data = nullptr;
     m_userMappingsAtoB.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserMapping>::DONT_DEALLOCATE_FLAG;
     hkMemoryAllocator* v6 = (&hkMemoryRouter::getInstance())->m_heap;
     int32_t v7 = m_userChains.m_capacityAndFlags;
@@ -3984,7 +3984,7 @@ void hkaSkeletonMapperUtils::Params::Free() {
         v6->bufFree(m_userChains.begin(), sizeof(hkaSkeletonMapperUtils::UserChain) * v7);
     }
     m_userChains.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserChain>::DONT_DEALLOCATE_FLAG;
-    m_userChains.m_data = 0;
+    m_userChains.m_data = nullptr;
 }
 
 void hkaPose::operator delete(void* apMemory) {

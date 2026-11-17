@@ -404,7 +404,7 @@ void hkpCollisionDispatcher::initCollisionQualityInfo(hkpCollisionDispatcher::In
     v4->m_minExtraSeparation = -5e+19f;
     v4->m_toiSeparation = -1e+19f;
     v4->m_toiExtraSeparation = -1e+19f;
-    float inputb = std::fabs((double)-4.999999990253224e+18);
+    float inputb = std::fabs((-4.999999990253224e+18));
     v4->m_toiAccuracy = inputb;
     v4->m_minSafeDeltaTime = 1.0f;
     v4->m_minAbsoluteSafeDeltaTime = 1.0f;
@@ -748,10 +748,10 @@ void hkpCollisionDispatcher::disableDebugging() {
         hkpCollisionDispatcher::DebugEntry* v8 = (*m_debugAgent3TablePred)[0];
         hkMemoryRouter* v9 = &hkMemoryRouter::getInstance();
         v9->m_debug->blockFree(v8, sizeof(DebugTable));
-        m_debugAgent2Table = 0;
-        m_debugAgent2TablePred = 0;
-        m_debugAgent3Table = 0;
-        m_debugAgent3TablePred = 0;
+        m_debugAgent2Table = nullptr;
+        m_debugAgent2TablePred = nullptr;
+        m_debugAgent3Table = nullptr;
+        m_debugAgent3TablePred = nullptr;
     }
 }
 

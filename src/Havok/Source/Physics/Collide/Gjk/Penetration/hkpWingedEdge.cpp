@@ -28,16 +28,15 @@ __m128* hkpWingedEdge::Triangle::calculateTriangleData() {
     float v9 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v8[0])));
     v10[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v11 = _mm_cmpeq_ss(v8, v10);
-    v10[0] = 3.0f - static_cast<float>(static_cast<float>(v8[0] * v9) * v9);
+    v10[0] = 3.0f - ((v8[0] * v9) * v9);
     __m128 v12 = _mm_setzero_ps();
-    v12[0] = static_cast<float>(0.5f * v9) * v10[0];
+    v12[0] = (0.5f * v9) * v10[0];
     __m128 v13 = _mm_andnot_ps(v11, v12);
     v14.m_quad = _mm_mul_ps(_mm_shuffle_ps(v13, v13, 0), v5.m_quad);
     m_normal.m_quad = v5.m_quad;
     m_normal.m_quad = v14.m_quad;
     __m128 v15 = _mm_mul_ps(v14.m_quad, *result);
-    m_distanceToOrigin =
-        _mm_shuffle_ps(v15, v15, 170)[0] + static_cast<float>(_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]);
+    m_distanceToOrigin = _mm_shuffle_ps(v15, v15, 170)[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]);
     return result;
 }
 
@@ -61,8 +60,8 @@ hkpWingedEdge::Triangle* hkpWingedEdge::findTriangleNearestOrigin(Triangle* tria
             const __m128 kStart = pEdge->m_vertex->m_position.m_quad;
             const __m128 kEdge = _mm_sub_ps(pEdge->m_next->m_vertex->m_position.m_quad, kStart);
             const __m128 kLen2 = _mm_mul_ps(kEdge, kEdge);
-            const float fLength2 = _mm_shuffle_ps(kLen2, kLen2, 170)[0] +
-                static_cast<float>(_mm_shuffle_ps(kLen2, kLen2, 85)[0] + kLen2[0]);
+            const float fLength2 =
+                _mm_shuffle_ps(kLen2, kLen2, 170)[0] + (_mm_shuffle_ps(kLen2, kLen2, 85)[0] + kLen2[0]);
             const __m128 kNormal = pTriangle->m_normal.m_quad;
             const __m128 kDot = _mm_mul_ps(
                 _mm_sub_ps(
@@ -71,8 +70,7 @@ hkpWingedEdge::Triangle* hkpWingedEdge::findTriangleNearestOrigin(Triangle* tria
                 ),
                 kStart
             );
-            const float fDist =
-                _mm_shuffle_ps(kDot, kDot, 170)[0] + static_cast<float>(_mm_shuffle_ps(kDot, kDot, 85)[0] + kDot[0]);
+            const float fDist = _mm_shuffle_ps(kDot, kDot, 170)[0] + (_mm_shuffle_ps(kDot, kDot, 85)[0] + kDot[0]);
             const float fAbsDist = std::fabs(static_cast<double>(fDist));
             const float fTolerance = fLength2 * -9.99999949475751e-11;
             if (!(fTolerance > fDist * fAbsDist)) {
@@ -117,7 +115,7 @@ hkpWingedEdge::WingedEdgeStatus hkpWingedEdge::findVisibleTriangles(
     hkpWingedEdge::WingedEdgeStatus VisibleTriangles = hkpWingedEdge::HK_WINGED_EDGE_OK;
     int32_t v13 = 0;
     hkpWingedEdge::Edge** p_m_neighbour = &initialTriangle->m_edge[0].m_neighbour;
-    while (1) {
+    while (true) {
         hkpWingedEdge::Edge* v7 = *p_m_neighbour;
         hkpWingedEdge::Triangle* m_triangle = (*p_m_neighbour)->m_triangle;
         hkpWingedEdge::Triangle::TriangleState m_state = m_triangle->m_state;
@@ -228,14 +226,14 @@ hkpWingedEdge::patchInBoundaryToPointOfViewExpansion(int32_t chainLength, Edge* 
         }
         float fRsqrt = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(vLengthSq[0])));
         __m128 vIsZero = _mm_cmpeq_ss(vLengthSq, _mm_setzero_ps());
-        float fThree = 3.0f - static_cast<float>(static_cast<float>(vLengthSq[0] * fRsqrt) * fRsqrt);
+        float fThree = 3.0f - ((vLengthSq[0] * fRsqrt) * fRsqrt);
         __m128 vScale = _mm_setzero_ps();
-        vScale[0] = static_cast<float>(0.5f * fRsqrt) * fThree;
+        vScale[0] = (0.5f * fRsqrt) * fThree;
         vScale = _mm_andnot_ps(vIsZero, vScale);
         __m128 vUnit = _mm_mul_ps(_mm_shuffle_ps(vScale, vScale, 0), vNormal);
         __m128 vProducts = _mm_mul_ps(vEnd, vUnit);
         pTriangle->m_distanceToOrigin = _mm_shuffle_ps(vProducts, vProducts, 0xAA)[0] +
-            static_cast<float>(_mm_shuffle_ps(vProducts, vProducts, 0x55)[0] + vProducts[0]);
+            (_mm_shuffle_ps(vProducts, vProducts, 0x55)[0] + vProducts[0]);
         pTriangle->m_normal.m_quad = vUnit;
         Vertex* pEndVertex = pEdge->m_next->m_vertex;
         pEdge = pEndVertex->m_referee.m_storage;
@@ -273,8 +271,8 @@ void hkpWingedEdge::addTetrahedron() {
     __m128 vProducts = _mm_mul_ps(
         _mm_sub_ps(m_vertex[0].m_position.m_quad, m_vertex[1].m_position.m_quad), m_triangles[3].m_normal.m_quad
     );
-    float fDistance = _mm_shuffle_ps(vProducts, vProducts, 0xAA)[0] +
-        static_cast<float>(_mm_shuffle_ps(vProducts, vProducts, 0x55)[0] + vProducts[0]);
+    float fDistance =
+        _mm_shuffle_ps(vProducts, vProducts, 0xAA)[0] + (_mm_shuffle_ps(vProducts, vProducts, 0x55)[0] + vProducts[0]);
     if (fDistance > 0.0f) {
         m_triangles[2].m_edge[0].m_vertex = &m_vertex[1];
         m_triangles[1].m_edge[0].m_vertex = &m_vertex[1];

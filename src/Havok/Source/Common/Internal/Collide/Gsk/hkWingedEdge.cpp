@@ -24,16 +24,16 @@ __m128* hkWingedEdge::Triangle::calculateTriangleData() {
     float fRsqrt = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(vLengthSq[0])));
     __m128 vZero = _mm_setzero_ps();
     __m128 vIsZero = _mm_cmpeq_ss(vLengthSq, vZero);
-    float fThree = 3.0f - static_cast<float>(static_cast<float>(vLengthSq[0] * fRsqrt) * fRsqrt);
+    float fThree = 3.0f - ((vLengthSq[0] * fRsqrt) * fRsqrt);
     __m128 vScale = _mm_setzero_ps();
-    vScale[0] = static_cast<float>(0.5f * fRsqrt) * fThree;
+    vScale[0] = (0.5f * fRsqrt) * fThree;
     vScale = _mm_andnot_ps(vIsZero, vScale);
     __m128 vUnit = _mm_mul_ps(_mm_shuffle_ps(vScale, vScale, 0), vNormal);
     m_normal.m_quad = vNormal;
     m_normal.m_quad = vUnit;
     __m128 vProducts = _mm_mul_ps(vUnit, *pA);
-    m_distanceToOrigin = _mm_shuffle_ps(vProducts, vProducts, 0xAA)[0] +
-        static_cast<float>(_mm_shuffle_ps(vProducts, vProducts, 0x55)[0] + vProducts[0]);
+    m_distanceToOrigin =
+        _mm_shuffle_ps(vProducts, vProducts, 0xAA)[0] + (_mm_shuffle_ps(vProducts, vProducts, 0x55)[0] + vProducts[0]);
     return pA;
 }
 
@@ -57,8 +57,8 @@ hkWingedEdge::Triangle* hkWingedEdge::findTriangleNearestOrigin(Triangle* triang
             const __m128 kStart = pEdge->m_vertex->m_position.m_quad;
             const __m128 kEdge = _mm_sub_ps(pEdge->m_next->m_vertex->m_position.m_quad, kStart);
             const __m128 kLen2 = _mm_mul_ps(kEdge, kEdge);
-            const float fLength2 = _mm_shuffle_ps(kLen2, kLen2, 170)[0] +
-                static_cast<float>(_mm_shuffle_ps(kLen2, kLen2, 85)[0] + kLen2[0]);
+            const float fLength2 =
+                _mm_shuffle_ps(kLen2, kLen2, 170)[0] + (_mm_shuffle_ps(kLen2, kLen2, 85)[0] + kLen2[0]);
             const __m128 kNormal = pTriangle->m_normal.m_quad;
             const __m128 kDot = _mm_mul_ps(
                 _mm_sub_ps(
@@ -67,8 +67,7 @@ hkWingedEdge::Triangle* hkWingedEdge::findTriangleNearestOrigin(Triangle* triang
                 ),
                 kStart
             );
-            const float fDist =
-                _mm_shuffle_ps(kDot, kDot, 170)[0] + static_cast<float>(_mm_shuffle_ps(kDot, kDot, 85)[0] + kDot[0]);
+            const float fDist = _mm_shuffle_ps(kDot, kDot, 170)[0] + (_mm_shuffle_ps(kDot, kDot, 85)[0] + kDot[0]);
             const float fAbsDist = std::fabs(static_cast<double>(fDist));
             const float fTolerance = fLength2 * -9.99999949475751e-11;
             if (!(fTolerance > fDist * fAbsDist)) {
@@ -162,14 +161,14 @@ int32_t hkWingedEdge::patchInBoundaryToPointOfViewExpansion(
         }
         float fRsqrt = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(vLengthSq[0])));
         __m128 vIsZero = _mm_cmpeq_ss(vLengthSq, _mm_setzero_ps());
-        float fThree = 3.0f - static_cast<float>(static_cast<float>(vLengthSq[0] * fRsqrt) * fRsqrt);
+        float fThree = 3.0f - ((vLengthSq[0] * fRsqrt) * fRsqrt);
         __m128 vScale = _mm_setzero_ps();
-        vScale[0] = static_cast<float>(0.5f * fRsqrt) * fThree;
+        vScale[0] = (0.5f * fRsqrt) * fThree;
         vScale = _mm_andnot_ps(vIsZero, vScale);
         __m128 vUnit = _mm_mul_ps(_mm_shuffle_ps(vScale, vScale, 0), vNormal);
         __m128 vProducts = _mm_mul_ps(vEnd, vUnit);
         pTriangle->m_distanceToOrigin = _mm_shuffle_ps(vProducts, vProducts, 0xAA)[0] +
-            static_cast<float>(_mm_shuffle_ps(vProducts, vProducts, 0x55)[0] + vProducts[0]);
+            (_mm_shuffle_ps(vProducts, vProducts, 0x55)[0] + vProducts[0]);
         pTriangle->m_normal.m_quad = vUnit;
         Vertex* pEndVertex = pEdge->m_next->m_vertex;
         pEdge = pEndVertex->m_referee.m_storage;
@@ -194,7 +193,7 @@ int32_t hkWingedEdge::findVisibleTriangles(
     int32_t VisibleTriangles_E67660 = 0;
     int32_t v13 = 0;
     hkWingedEdge::Edge** p_m_neighbour = &initialTriangle->m_edge[0].m_neighbour;
-    while (1) {
+    while (true) {
         hkWingedEdge::Edge* v7 = *p_m_neighbour;
         hkWingedEdge::Triangle* m_triangle = (*p_m_neighbour)->m_triangle;
         hkWingedEdge::Triangle::TriangleState m_state = m_triangle->m_state;
@@ -297,8 +296,8 @@ void hkWingedEdge::addTetrahedron() {
     __m128 vProducts = _mm_mul_ps(
         _mm_sub_ps(m_vertex[0].m_position.m_quad, m_vertex[1].m_position.m_quad), m_triangles[3].m_normal.m_quad
     );
-    float fDistance = _mm_shuffle_ps(vProducts, vProducts, 0xAA)[0] +
-        static_cast<float>(_mm_shuffle_ps(vProducts, vProducts, 0x55)[0] + vProducts[0]);
+    float fDistance =
+        _mm_shuffle_ps(vProducts, vProducts, 0xAA)[0] + (_mm_shuffle_ps(vProducts, vProducts, 0x55)[0] + vProducts[0]);
     if (fDistance > 0.0f) {
         m_triangles[2].m_edge[0].m_vertex = &m_vertex[1];
         m_triangles[1].m_edge[0].m_vertex = &m_vertex[1];
@@ -342,7 +341,7 @@ void hkWingedEdge::find2ClosestMultiTriangles(
             }
             __m128 vProducts = _mm_mul_ps(pTriangle1->m_normal.m_quad, pTriangle0->m_normal.m_quad);
             float fCos = _mm_shuffle_ps(vProducts, vProducts, 0xAA)[0] +
-                static_cast<float>(_mm_shuffle_ps(vProducts, vProducts, 0x55)[0] + vProducts[0]);
+                (_mm_shuffle_ps(vProducts, vProducts, 0x55)[0] + vProducts[0]);
             if (fCos < -0.5f) {
                 continue;
             }
@@ -412,14 +411,14 @@ void hkWingedEdge::find2ClosestMultiTriangles(
     float fRsqrt = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(vLengthSq[0])));
     __m128 vZero = _mm_setzero_ps();
     __m128 vIsZero = _mm_cmpeq_ss(vLengthSq, vZero);
-    float fThree = 3.0f - static_cast<float>(static_cast<float>(vLengthSq[0] * fRsqrt) * fRsqrt);
+    float fThree = 3.0f - ((vLengthSq[0] * fRsqrt) * fRsqrt);
     __m128 vScale = _mm_setzero_ps();
-    vScale[0] = static_cast<float>(0.5f * fRsqrt) * fThree;
+    vScale[0] = (0.5f * fRsqrt) * fThree;
     vScale = _mm_andnot_ps(vIsZero, vScale);
     directionOut.m_quad = _mm_mul_ps(_mm_shuffle_ps(vScale, vScale, 0), vNormal);
     // Compares with the double 0.0.
     float fClamped = fBestDistance < 0.0 ? 0.0f : fBestDistance;
-    directionOut.m_quad[3] = static_cast<float>(std::sqrt(fClamped));
+    directionOut.m_quad[3] = std::sqrt(fClamped);
 }
 
 void hkWingedEdge::codeBegin() {}

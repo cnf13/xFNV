@@ -44,7 +44,7 @@
 #include "Fallout/Interface/Menus/TraitMenu.h"
 #include "Reconstruction.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 
 // IsTileSelected's guarded static and its guard word.
 static int32_t iUT_Selected;
@@ -75,7 +75,7 @@ LevelUpMenu::LevelUpMenu() {
 }
 
 LevelUpMenu::~LevelUpMenu() {
-    LevelUpMenu::pMe = 0;
+    LevelUpMenu::pMe = nullptr;
 }
 
 void LevelUpMenu::AttachTileByID(int32_t a1, Tile* a2) {
@@ -106,12 +106,12 @@ void LevelUpMenu::DoClick(int32_t a1, Tile* a2) {
         }
         case 7: {
             SetCurrentPage(static_cast<LevelUpMenu::PageIndex>(this->eCurrentPage + 1));
-            pTiles[7]->Set(4035, 0.0f, 1);
+            pTiles[7]->Set(4035, 0.0f, true);
             break;
         }
         case 8: {
             SetCurrentPage(static_cast<LevelUpMenu::PageIndex>(this->eCurrentPage - 1));
-            pTiles[8]->Set(4035, 0.0f, 1);
+            pTiles[8]->Set(4035, 0.0f, true);
             break;
         }
         case 12: {
@@ -121,7 +121,7 @@ void LevelUpMenu::DoClick(int32_t a1, Tile* a2) {
             }
             else {
                 if (a2->GetFloat(g_levelUpMenu_Trait_TextAlpha) == 255.0) {
-                    lbPerksList.DeselectAll(1);
+                    lbPerksList.DeselectAll(true);
                     lbPerksList.Select(a2);
                     ApplyPerkEffects(a2);
                 }
@@ -143,8 +143,8 @@ void LevelUpMenu::DoClick(int32_t a1, Tile* a2) {
                     v8 *= iSkillPointsTagSkillMult.Int();
                 }
                 float afValue = a2->pParent->GetFloat(LevelUpMenu::iUT_AddedValue) + static_cast<double>(v8);
-                a2->pParent->Set(LevelUpMenu::iUT_AddedValue, afValue, 1);
-                bool v9 = 0;
+                a2->pParent->Set(LevelUpMenu::iUT_AddedValue, afValue, true);
+                bool v9 = false;
                 float v5 = pPlayer->GetBaseValueOverride(eindex, v9) + static_cast<double>(v8);
                 pPlayer->SetActorValue(eindex, v5);
                 SetDisplayString(a2->pParent);
@@ -162,15 +162,15 @@ void LevelUpMenu::DoEnter(int32_t a1, Tile* a2) {
     switch (a1) {
         case 11: {
             const char* ActorValueIcon = ActorValue::GetActorValueIcon(lbSkillsList.GetDataFor(a2));
-            pTiles[3]->Set(4044, ActorValueIcon, 1);
+            pTiles[3]->Set(4044, ActorValueIcon, true);
             const char* ActorValueDesc = ActorValue::GetActorValueDesc(lbSkillsList.GetDataFor(a2));
-            pTiles[4]->Set(4036, ActorValueDesc, 1);
+            pTiles[4]->Set(4036, ActorValueDesc, true);
             pTiles[3]->Set(4003, 1);
             pTiles[4]->Set(4003, 1);
             if (ActorValue::GetItemWeaponTypeBadge(lbSkillsList.GetDataFor(a2))) {
                 pTiles[9]->Set(4003, 1);
                 const char* ItemWeaponTypeBadge = ActorValue::GetItemWeaponTypeBadge(lbSkillsList.GetDataFor(a2));
-                pTiles[9]->Set(4044, ItemWeaponTypeBadge, 1);
+                pTiles[9]->Set(4044, ItemWeaponTypeBadge, true);
             }
             else {
                 pTiles[9]->Set(4003, 0);
@@ -180,9 +180,9 @@ void LevelUpMenu::DoEnter(int32_t a1, Tile* a2) {
         }
         case 12: {
             char Src[516];
-            pTiles[3]->Set(4044, lbPerksList.GetDataFor(a2)->GetTextureName(), 1);
+            pTiles[3]->Set(4044, lbPerksList.GetDataFor(a2)->GetTextureName(), true);
             lbPerksList.GetDataFor(a2)->BuildDescriptionString(Src, 512u);
-            pTiles[4]->Set(4036, Src, 1);
+            pTiles[4]->Set(4036, Src, true);
             const char* String = pTiles[3]->GetString(4044);
             if (BSstrlen(String) <= 1) {
                 pTiles[3]->Set(4003, 0);
@@ -212,8 +212,8 @@ void LevelUpMenu::DoIdle() {
     if (xFadeState == 4 && !pVATS.IsInVats() && !StartMenu::PauseMenuIsActive()) {
         BSAudio* v1 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v1->GetSoundHandleByName(&a1, "MUSSuccess", 2305u);
-        SoundHandleByName->Play(0);
-        PrepForVisibility(0);
+        SoundHandleByName->Play(false);
+        PrepForVisibility(false);
     }
 }
 
@@ -222,7 +222,7 @@ int32_t LevelUpMenu::GetClass() {
 }
 
 bool LevelUpMenu::DoGamepad(int32_t a1, float a2) {
-    bool bhandled = 0;
+    bool bhandled = false;
     switch (a1) {
         case 3: {
             if (eCurrentPage == LevelUpMenu::PI_SKILLS_PAGE) {
@@ -233,7 +233,7 @@ bool LevelUpMenu::DoGamepad(int32_t a1, float a2) {
                         parrowTile_2->PlayTileSound(4043);
                         DoClick(14, parrowTile_2);
                     }
-                    bhandled = 1;
+                    bhandled = true;
                 }
             }
             break;
@@ -247,7 +247,7 @@ bool LevelUpMenu::DoGamepad(int32_t a1, float a2) {
                         parrowTile->PlayTileSound(4043);
                         DoClick(13, parrowTile);
                     }
-                    bhandled = 1;
+                    bhandled = true;
                 }
             }
             break;
@@ -258,7 +258,7 @@ bool LevelUpMenu::DoGamepad(int32_t a1, float a2) {
                 v5->PlayTileSound(4043);
                 Tile* v6 = static_cast<Tile*>(lbPerksList.GetHighlightedItem());
                 DoClick(12, v6);
-                bhandled = 1;
+                bhandled = true;
             }
             else {
                 if (eCurrentPage == LevelUpMenu::PI_SKILLS_PAGE) {
@@ -270,8 +270,8 @@ bool LevelUpMenu::DoGamepad(int32_t a1, float a2) {
         case 10: {
             if (eCurrentPage == LevelUpMenu::PI_PERKS_PAGE) {
                 pTiles[8]->PlayTileSound(4043);
-                DoClick(8, 0);
-                bhandled = 1;
+                DoClick(8, nullptr);
+                bhandled = true;
             }
             else {
                 if (eCurrentPage == LevelUpMenu::PI_SKILLS_PAGE) {
@@ -288,11 +288,11 @@ bool LevelUpMenu::DoGamepad(int32_t a1, float a2) {
 }
 
 bool LevelUpMenu::DoGamepadUpEvent(int32_t a1, float a2) {
-    bool v5 = 0;
+    bool v5 = false;
     if (a1 == 11 && pTiles[7]->IsTrue(4015)) {
         Interface::PlayMenuSound(1);
-        DoClick(7, 0);
-        return 1;
+        DoClick(7, nullptr);
+        return true;
     }
     return v5;
 }
@@ -301,10 +301,10 @@ bool LevelUpMenu::IsWellFormedMenu() {
     int32_t i;
     for (i = 0; i < 10; ++i) {
         if (!pTiles[i]) {
-            return (bool)0;
+            return false;
         }
     }
-    return (bool)1;
+    return true;
 }
 
 void LevelUpMenu::SetDisplayString(Tile* apTile) {
@@ -315,7 +315,7 @@ void LevelUpMenu::SetDisplayString(Tile* apTile) {
     int32_t v3 = BSMAX(static_cast<int32_t>(v2), 0);
     BSsprintf(Src, 16u, "%d", BSMIN(v3, 100));
     int32_t v4 = Tile::AddUserTrait("_DisplayString", -1);
-    apTile->Set(v4, Src, static_cast<bool>(1));
+    apTile->Set(v4, Src, true);
 }
 
 void LevelUpMenu::ApplyPerkEffects(Tile* apTile) {
@@ -324,7 +324,7 @@ void LevelUpMenu::ApplyPerkEffects(Tile* apTile) {
     uint8_t uccurrPerkRank = static_cast<int32_t>(apTile->GetFloat(g_levelUpMenu_Trait_Rank));
     BGSPerkEntry* pcurrPerkEntry = pcurrPerk->GetPerkEntryByRank(uccurrPerkRank);
     if (uccurrPerkRank <= 1u) {
-        pprevRankEntry = 0;
+        pprevRankEntry = nullptr;
     }
     else {
         pprevRankEntry = pcurrPerk->GetPerkEntryByRank(uccurrPerkRank - 1);
@@ -334,7 +334,7 @@ void LevelUpMenu::ApplyPerkEffects(Tile* apTile) {
             SpellItem* pAbility = static_cast<BGSAbilityPerkEntry*>(pcurrPerkEntry)->pAbility;
             SpellItem* pprevAbility =
                 pprevRankEntry ? static_cast<BGSAbilityPerkEntry*>(pprevRankEntry)->pAbility : nullptr;
-            LevelUpMenu::PerkEffectList.Clear(1);
+            LevelUpMenu::PerkEffectList.Clear(true);
             // The upcast to the spell's effect list tests the spell for null, as the game does.
             BSSimpleList<EffectItem*>* peffectObj = pAbility;
             for (EffectItem*& rpItem : peffectObj->ItemsUntilNull()) {
@@ -381,13 +381,13 @@ void LevelUpMenu::SetCurrentPage(LevelUpMenu::PageIndex aePage) {
                 ListBox<BGSPerk*>* pPerksList = &lbPerksList;
                 pPerksList->Sort(&BGSPerk::CompareForSorting);
                 lbSkillsList.SaveListState();
-                lbPerksList.RestoreListState(1);
+                lbPerksList.RestoreListState(true);
             }
         }
         else {
             lbSkillsList.Traverse(&LevelUpMenu::UpdateSkillsFunc, 0, 0x7FFFFFFF);
             lbPerksList.SaveListState();
-            lbSkillsList.RestoreListState(1);
+            lbSkillsList.RestoreListState(true);
         }
     }
     else {
@@ -403,11 +403,11 @@ void LevelUpMenu::InitLists() {
         ActorValue::Index currValue = ActorValue::ToActorValue(ActorValue::SKILL, ivalueCt);
         if (!ActorValue::IsFlagSet(currValue, ActorValue::DEPRECATED)) {
             const char* ActorValueName = ActorValue::GetActorValueName(currValue);
-            Tile* pnew = lbSkillsList.AddItem(currValue, ActorValueName, 0, 0);
+            Tile* pnew = lbSkillsList.AddItem(currValue, ActorValueName, nullptr, nullptr);
             const char* v2 = ActorValue::GetActorValueName(currValue);
             pnew->SetName(v2);
             pnew->Set(4010, 11);
-            pnew->Set(LevelUpMenu::iUT_AddedValue, 0.0f, 1);
+            pnew->Set(LevelUpMenu::iUT_AddedValue, 0.0f, true);
             int32_t v3 = pPlayer->GetPermanentActorValue(currValue);
             pnew->Set(g_levelUpMenu_Trait_BaseValue, v3);
             itotalSkillPoints += pPlayer->GetPermanentActorValue(currValue);
@@ -425,7 +425,7 @@ void LevelUpMenu::InitLists() {
          pcurrentPerk = pcurrentPerk->m_pkNext) {
         char Dst[68];
         BGSPerk* afValue = pcurrentPerk->m_item;
-        int32_t icurrRank = pPlayer->GetPerkRank(afValue, 0);
+        int32_t icurrRank = pPlayer->GetPerkRank(afValue, false);
         BSstrcpy(Dst, 64, pcurrentPerk->m_item->GetFullName());
         if (!BSstrlen(Dst)) {
             const char* v5 = sMissingName.String();
@@ -434,7 +434,7 @@ void LevelUpMenu::InitLists() {
         if (pcurrentPerk->m_item->GetNumRanks() > 1u && icurrRank > 0) {
             BSsprintf(Dst, 64, "%s (%d)", Dst, icurrRank + 1);
         }
-        Tile* pnew_2 = lbPerksList.AddItem(pcurrentPerk->m_item, Dst, 0, 0);
+        Tile* pnew_2 = lbPerksList.AddItem(pcurrentPerk->m_item, Dst, nullptr, nullptr);
         pnew_2->Set(4010, 12);
         pnew_2->Set(g_levelUpMenu_Trait_Rank, icurrRank + 1);
     }
@@ -454,13 +454,13 @@ void LevelUpMenu::UpdatePointCounter() {
             else {
                 Src = sLevelUpSkillCounter.String();
             }
-            pTiles[5]->Set(4036, Src, static_cast<bool>(1));
+            pTiles[5]->Set(4036, Src, true);
             pTiles[5]->Set(4003, 1);
         }
         else {
             char apDest[68];
             BSsprintf(apDest, 64u, apFormat[eCurrentPage], v4);
-            pTiles[5]->Set(4036, apDest, static_cast<bool>(1));
+            pTiles[5]->Set(4036, apDest, true);
             pTiles[5]->Set(4003, 1);
         }
     }
@@ -492,39 +492,39 @@ Tile* LevelUpMenu::CreateMenu() {
     Tile* th_s = v22->pMenusRoot->ReadFile("Data\\Menus\\levelup_menu.xml");
     LevelUpMenu::pMe = static_cast<LevelUpMenu*>(th_s->GetMenu());
     if (LevelUpMenu::pMe && (v0 = LevelUpMenu::pMe->GetClass(), v0 == LevelUpMenu::GetClassStatic())) {
-        LevelUpMenu::pMe->SetMenuTile(static_cast<TileMenu*>(th_s), 0);
+        LevelUpMenu::pMe->SetMenuTile(static_cast<TileMenu*>(th_s), false);
         if (LevelUpMenu::pMe->IsWellFormedMenu()) {
             int32_t LevelUpSkillPoints_0;
             char Src[64];
             if (th_s->GetFloat(4007) == 6006.0 || th_s->GetFloat(4007) == 102.0) {
                 float MaximumDepth = Tile::GetMaximumDepth();
-                th_s->Set(4013, MaximumDepth, 1);
+                th_s->Set(4013, MaximumDepth, true);
             }
             int32_t ClassStatic = LevelUpMenu::GetClassStatic();
             InterfaceManager* v2 = InterfaceManager::Instance();
             v2->xTutorialManager.ShowMessage(Interface::TUT_LEVELING, ClassStatic, 512u);
             int32_t afValue = pPlayer->GetLevel();
             BSsprintf(Src, 64, sLevelUpTitleText.String(), afValue);
-            LevelUpMenu::pMe->pTiles[0]->Set(4036, Src, 1);
+            LevelUpMenu::pMe->pTiles[0]->Set(4036, Src, true);
             const char* v3 = sReset.String();
-            LevelUpMenu::pMe->pTiles[6]->Set(4036, v3, 1);
+            LevelUpMenu::pMe->pTiles[6]->Set(4036, v3, true);
             const char* v15 = sContinue.String();
             int32_t v4 = Tile::TextToTrait("_Title_0");
-            LevelUpMenu::pMe->pTiles[7]->Set(v4, v15, 1);
+            LevelUpMenu::pMe->pTiles[7]->Set(v4, v15, true);
             const char* v16 = sDone.String();
             int32_t v5 = Tile::TextToTrait("_Title_1");
-            LevelUpMenu::pMe->pTiles[7]->Set(v5, v16, 1);
+            LevelUpMenu::pMe->pTiles[7]->Set(v5, v16, true);
             int32_t v6 = Tile::TextToTrait("_CurrentPage");
             th_s->Poke(v6, 1.0f);
             const char* v7 = sBack.String();
-            LevelUpMenu::pMe->pTiles[8]->Set(4036, v7, 1);
+            LevelUpMenu::pMe->pTiles[8]->Set(4036, v7, true);
             if (pPlayer) {
                 LevelUpSkillPoints_0 = GamePlayFormulas::GetLevelUpSkillPoints_0(
                     &static_cast<ActorValueOwner&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer)))
                 );
             }
             else {
-                LevelUpSkillPoints_0 = GamePlayFormulas::GetLevelUpSkillPoints_0(0);
+                LevelUpSkillPoints_0 = GamePlayFormulas::GetLevelUpSkillPoints_0(nullptr);
             }
             fSkillPoints = static_cast<float>(LevelUpSkillPoints_0);
             BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::ADJUST_GAINED_SKILL_POINTS, pPlayer, &fSkillPoints);
@@ -536,7 +536,7 @@ Tile* LevelUpMenu::CreateMenu() {
                      pIter = pIter->GetNext()) {
                     BGSPerk* pPerk = pIter->m_item;
                     if (pPerk->GetLevel() > 0) {
-                        int32_t v10 = pPlayer->GetPerkRank(pPerk, 0);
+                        int32_t v10 = pPlayer->GetPerkRank(pPerk, false);
                         if (v10 < pPerk->GetNumRanks() && !pPerk->Data.bTrait && pPerk->IsPerkAttainable(pPlayer) &&
                             pPerk->GetIsPlayable()) {
                             char v18 = 1;
@@ -566,7 +566,7 @@ Tile* LevelUpMenu::CreateMenu() {
         }
         else {
             Warning("MENUS: Level Up Menu Creation Failed... Are your menu and art resources up to date?");
-            return 0;
+            return nullptr;
         }
     }
     else {
@@ -577,7 +577,7 @@ Tile* LevelUpMenu::CreateMenu() {
                 }
             }
         }
-        return 0;
+        return nullptr;
     }
 }
 
@@ -591,7 +591,7 @@ void LevelUpMenu::SetPerkAlphaIfRequirementsNotMet(Tile* a1, BGSPerk* a2) {
     else {
         v3 = 0x1p+7f;
     }
-    a1->Set(g_levelUpMenu_Trait_TextAlpha, v3, (bool)1);
+    a1->Set(g_levelUpMenu_Trait_TextAlpha, v3, true);
 }
 
 // HandleClick's reset traverses the perks list with it (and the skills list with ResetSkillsFunc).
@@ -616,22 +616,22 @@ void LevelUpMenu::Close() {
         LevelUpMenu::pMe->lbPerksList.Traverse(&LevelUpMenu::IncreaseSelectedPerkRank, 0, 0x7FFFFFFF);
         CharacterProgression* v1 = pPlayer->GetCharacterProgressionInfo();
         if (v1->GetReadyToLevelUp()) {
-            pPlayer->UpdateMagic(1, 0);
+            pPlayer->UpdateMagic(true, false);
         }
         StatsMenu::UpdatePlayerName();
         StatsMenu::UpdatePlayerTitle();
         LevelUpMenu::pMe->pMenu->Set(Tile::kTileValue_DeleteOnFade, 1);
         LevelUpMenu::pMe->StartFadeOut();
-        LevelUpMenu::pMe = 0;
+        LevelUpMenu::pMe = nullptr;
     }
 }
 
 void LevelUpMenu::ResetSkillsFunc(Tile* apTile, ActorValue::Index a2) {
-    bool v4 = 0;
+    bool v4 = false;
     double v3 = pPlayer->GetBaseValueOverride(a2, v4);
     float v2 = v3 - apTile->GetFloat(LevelUpMenu::iUT_AddedValue);
     pPlayer->SetActorValue(a2, v2);
-    apTile->Set(LevelUpMenu::iUT_AddedValue, static_cast<float>(0.0), static_cast<bool>(1));
+    apTile->Set(LevelUpMenu::iUT_AddedValue, static_cast<float>(0.0), true);
     LevelUpMenu::pMe->SetDisplayString(apTile);
 }
 
@@ -645,7 +645,7 @@ void LevelUpMenu::PerkUpdateFunc(Tile* apTile, ActorValue::Index aeIndex) {
             if (apTile->GetFloat(iUT_Overflow) != 0.0) {
                 EffectItemData* v16 = &LevelUpMenu::PerkEffectList.GetAt(ieffectCt);
                 v16->iMagnitude += static_cast<int32_t>(apTile->GetFloat(iUT_Overflow));
-                apTile->Set(iUT_Overflow, 0.0f, 1);
+                apTile->Set(iUT_Overflow, 0.0f, true);
             }
             double v15 = static_cast<double>((&LevelUpMenu::PerkEffectList.GetAt(ieffectCt))->iMagnitude + itotalValue);
             int32_t v2 = Tile::TextToTrait("_MaxValue");
@@ -676,14 +676,14 @@ void LevelUpMenu::PerkUpdateFunc(Tile* apTile, ActorValue::Index aeIndex) {
             }
             double v8 = apTile->GetFloat(g_levelUpMenu_Trait_ExtraValue);
             float afValue = static_cast<double>((&LevelUpMenu::PerkEffectList.GetAt(ieffectCt))->iMagnitude) + v8;
-            apTile->Set(g_levelUpMenu_Trait_ExtraValue, afValue, 1);
+            apTile->Set(g_levelUpMenu_Trait_ExtraValue, afValue, true);
         }
     }
 }
 
 void LevelUpMenu::IncreaseSelectedPerkRank(Tile* a1, BGSPerk* a2) {
     if (a1->IsTrue(LevelUpMenu::iUT_Selected)) {
-        uint8_t v2 = pPlayer->GetPerkRank(a2, 0);
+        uint8_t v2 = pPlayer->GetPerkRank(a2, false);
         pPlayer->AddPerk(a2, v2 + 1, false);
     }
 }

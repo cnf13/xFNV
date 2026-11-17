@@ -72,39 +72,44 @@ void SpeedTreeFrondShader::CreateConstantMaps() {
             v3 = ::new (v2) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         }
         else {
-            v3 = 0;
+            v3 = nullptr;
         }
         m_spVertexConstantMap = v3;
-        m_spVertexConstantMap.m_pObject->AddEntry("WorldViewProjTranspose", 0x20000009u, 0, 0, 4u, 0, 0, 0, 0, 0);
         m_spVertexConstantMap.m_pObject->AddEntry(
-            "Ambient Color", 0x10000007u, 0, 5u, 1u, "", 16u, 4u, BSShaderLightingProperty::pShaderLightConstants, 0
+            "WorldViewProjTranspose", 0x20000009u, 0, 0, 4u, nullptr, 0, 0, nullptr, false
         );
         m_spVertexConstantMap.m_pObject->AddEntry(
-            "Diff Color 0", 0x10000007u, 0, 6u, 1u, "", 16u, 4u, &BSShaderLightingProperty::pShaderLightConstants[1], 0
+            "Ambient Color", 0x10000007u, 0, 5u, 1u, "", 16u, 4u, BSShaderLightingProperty::pShaderLightConstants, false
         );
         m_spVertexConstantMap.m_pObject->AddEntry(
-            "Diff Color 1", 0x10000007u, 0, 7u, 1u, "", 16u, 4u, &BSShaderLightingProperty::pShaderLightConstants[2], 0
+            "Diff Color 0", 0x10000007u, 0, 6u, 1u, "", 16u, 4u, &BSShaderLightingProperty::pShaderLightConstants[1],
+            false
         );
         m_spVertexConstantMap.m_pObject->AddEntry(
-            "DirectronalLightDir", 0x10000007u, 0, 8u, 1u, "", 16u, 4u, &pLightDirection, 0
+            "Diff Color 1", 0x10000007u, 0, 7u, 1u, "", 16u, 4u, &BSShaderLightingProperty::pShaderLightConstants[2],
+            false
         );
         m_spVertexConstantMap.m_pObject->AddEntry(
-            "PointLightPos", 0x10000007u, 0, 9u, 1u, "", 16u, 4u, &pLightPosition, 0
+            "DirectronalLightDir", 0x10000007u, 0, 8u, 1u, "", 16u, 4u, &pLightDirection, false
         );
         m_spVertexConstantMap.m_pObject->AddEntry(
-            "LightRadius", 0x10000007u, 0, 10u, 1u, "", 16u, 4u, &BSShaderLightingProperty::pShaderLightConstants[19], 0
+            "PointLightPos", 0x10000007u, 0, 9u, 1u, "", 16u, 4u, &pLightPosition, false
+        );
+        m_spVertexConstantMap.m_pObject->AddEntry(
+            "LightRadius", 0x10000007u, 0, 10u, 1u, "", 16u, 4u, &BSShaderLightingProperty::pShaderLightConstants[19],
+            false
         );
         m_spVertexConstantMap.m_pObject->AddEntry(
             "FogParam | ShadowVolumeFatness", 0x10000007u, 0, 14u, 1u, "", 16u, 4u,
-            &BSShaderLightingProperty::pShaderLightConstants[28], 0
+            &BSShaderLightingProperty::pShaderLightConstants[28], false
         );
         m_spVertexConstantMap.m_pObject->AddEntry(
             "FogColor | ShadowVolumeExtrudeDistance", 0x10000007u, 0, 15u, 1u, "", 16u, 4u,
-            &BSShaderLightingProperty::pShaderLightConstants[29], 0
+            &BSShaderLightingProperty::pShaderLightConstants[29], false
         );
         if (BSShaderManager::bHDR) {
             m_spVertexConstantMap.m_pObject->AddEntry(
-                "Tree Dimmer", 0x10000004u, 0, 16u, 1u, "", 4u, 4u, &BSShaderManager::fTreeDimmer, 0
+                "Tree Dimmer", 0x10000004u, 0, 16u, 1u, "", 4u, 4u, &BSShaderManager::fTreeDimmer, false
             );
         }
         sub_BB2F50(m_spVertexConstantMap.m_pObject, 17u);
@@ -127,38 +132,38 @@ void SpeedTreeFrondShader::LoadShaders() {
     char apDest[260];
     int32_t v1 = 0;
     kMacroArray_VS[0].strPath = "speedtree\\frond.v.hlsl";
-    kMacroArray_VS[0].kMacros[0].Name = 0;
-    kMacroArray_VS[0].kMacros[0].Definition = 0;
+    kMacroArray_VS[0].kMacros[0].Name = nullptr;
+    kMacroArray_VS[0].kMacros[0].Definition = nullptr;
     std::memset(&kMacroArray_VS[0].kMacros[1], 0, sizeof(_D3DXMACRO) * 8);
     kMacroArray_VS[1].strPath = "speedtree\\frond.v.hlsl";
     kMacroArray_VS[1].kMacros[0].Name = "FOG";
     kMacroArray_VS[1].kMacros[0].Definition = "";
-    kMacroArray_VS[1].kMacros[1].Name = 0;
-    kMacroArray_VS[1].kMacros[1].Definition = 0;
+    kMacroArray_VS[1].kMacros[1].Name = nullptr;
+    kMacroArray_VS[1].kMacros[1].Definition = nullptr;
     std::memset(&kMacroArray_VS[1].kMacros[2], 0, sizeof(_D3DXMACRO) * 7);
     kMacroArray_VS[2].strPath = "speedtree\\frond.v.hlsl";
     kMacroArray_VS[2].kMacros[0].Name = "PT";
     kMacroArray_VS[2].kMacros[0].Definition = "";
-    kMacroArray_VS[2].kMacros[1].Name = 0;
-    kMacroArray_VS[2].kMacros[1].Definition = 0;
+    kMacroArray_VS[2].kMacros[1].Name = nullptr;
+    kMacroArray_VS[2].kMacros[1].Definition = nullptr;
     std::memset(&kMacroArray_VS[2].kMacros[2], 0, sizeof(_D3DXMACRO) * 7);
     kMacroArray_VS[3].strPath = "speedtree\\frond.v.hlsl";
     kMacroArray_VS[3].kMacros[0].Name = "PT";
     kMacroArray_VS[3].kMacros[0].Definition = "";
     kMacroArray_VS[3].kMacros[1].Name = "FOG";
     kMacroArray_VS[3].kMacros[1].Definition = "";
-    kMacroArray_VS[3].kMacros[2].Name = 0;
-    kMacroArray_VS[3].kMacros[2].Definition = 0;
+    kMacroArray_VS[3].kMacros[2].Name = nullptr;
+    kMacroArray_VS[3].kMacros[2].Definition = nullptr;
     std::memset(&kMacroArray_VS[3].kMacros[3], 0, sizeof(_D3DXMACRO) * 6);
     kMacroArray_PS[0].strPath = "speedtree\\frond.p.hlsl";
-    kMacroArray_PS[0].kMacros[0].Name = 0;
-    kMacroArray_PS[0].kMacros[0].Definition = 0;
+    kMacroArray_PS[0].kMacros[0].Name = nullptr;
+    kMacroArray_PS[0].kMacros[0].Definition = nullptr;
     std::memset(&kMacroArray_PS[0].kMacros[1], 0, sizeof(_D3DXMACRO) * 8);
     kMacroArray_PS[1].strPath = "speedtree\\frond.p.hlsl";
     kMacroArray_PS[1].kMacros[0].Name = "FOG";
     kMacroArray_PS[1].kMacros[0].Definition = "";
-    kMacroArray_PS[1].kMacros[1].Name = 0;
-    kMacroArray_PS[1].kMacros[1].Definition = 0;
+    kMacroArray_PS[1].kMacros[1].Name = nullptr;
+    kMacroArray_PS[1].kMacros[1].Definition = nullptr;
     std::memset(&kMacroArray_PS[1].kMacros[2], 0, sizeof(_D3DXMACRO) * 7);
     BSShaderMacro* v3 = kMacroArray_VS;
     BSShaderMacro* v20 = kMacroArray_VS;
@@ -191,7 +196,7 @@ void SpeedTreeFrondShader::LoadShaders() {
     while (v1 < 4);
     int32_t v9 = 0;
     NiPointer<NiD3DPixelShader>* pPixelShader = this->pPixelShader;
-    const char* ptarget = BSShaderManager::GetPSTarget(1);
+    const char* ptarget = BSShaderManager::GetPSTarget(true);
     BSShaderMacro* v11 = kMacroArray_PS;
     if (BSShaderManager::eShaderLevel < 2) {
         BSShaderMacro* v22 = kMacroArray_PS;
@@ -258,7 +263,7 @@ void SpeedTreeFrondShader::LoadStagesAndPasses() {
     NiD3DPass::CreateNewPass(sp1StagePass);
     NiPointer<NiD3DTextureStage> spStage;
     NiD3DTextureStage::CreateNewStage(spStage);
-    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+    BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
     p_sp1StagePass->m_pObject->SetStage(p_sp1StagePass->m_pObject->m_uiCurrentStage, spStage.m_pObject);
     NiD3DVertexShader* m_pObject = pVertexShader[0].m_pObject;
     p_sp1StagePass->m_pObject->m_spVertexShader = m_pObject;
@@ -271,7 +276,7 @@ BSShader* SpeedTreeFrondShader::CreateShader() {
     TLSData* v0 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v0->eMemContext;
     v0->eMemContext = MEM_CONTEXT_TREESYSTEM;
-    SpeedTreeFrondShader* pshader = 0;
+    SpeedTreeFrondShader* pshader = nullptr;
     NiDX9ShaderDeclaration* spShaderDecl = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 5u, 1u);
     spShaderDecl->SetEntry(0, 0, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
     spShaderDecl->SetEntry(1u, 3u, NiShaderDeclaration::SHADERPARAM_NI_NORMAL, NiShaderDeclaration::SPTYPE_FLOAT3, 0);

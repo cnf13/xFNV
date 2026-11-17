@@ -101,7 +101,7 @@ void BSBound::KillSDM() {
         NiGlobalStringTable::ReleaseHandle(BSBound::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }
-    BSBound::pTag = 0;
+    BSBound::pTag = nullptr;
 }
 
 // The name is cleared on the failed allocation's path too, as the game does.
@@ -112,7 +112,7 @@ NiObject* BSBound::CreateObject() {
         pb_2 = ::new (pb) BSBound;
     }
     else {
-        pb_2 = 0;
+        pb_2 = nullptr;
     }
     pb_2->SetName(EmptyFS);
     return pb_2;

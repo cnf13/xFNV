@@ -28,7 +28,7 @@ void ImageSpaceShaderFFTHorizontalButterfly::ReloadShaders() {
     kPixel.strPath = "water\\2_ab\\p\\waterhmap.p.hlsl";
     kPixel.kMacros[0].Name = "HORIZONTAL_BUTTERFLY";
     std::memset(&kPixel.kMacros[0].Definition, 0, sizeof(kPixel) - offsetof(BSShaderMacro, kMacros[0].Definition));
-    const char* PSTarget = BSShaderManager::GetPSTarget(1);
+    const char* PSTarget = BSShaderManager::GetPSTarget(true);
     LoadShaders(kVertex, kPixel, "FFTHORIZONTALBUTTERFLY", ShaderTarget_vs_1_1, PSTarget);
     LoadStagesAndPasses();
 }
@@ -40,10 +40,10 @@ bool ImageSpaceShaderFFTHorizontalButterfly::LoadStagesAndPasses() {
     for (uint32_t i = 0; i < pTextures.m_usMaxSize; ++i) {
         NiD3DTextureStage::CreateNewStage(a1);
         if (i >= static_cast<uint32_t>(pTextures.m_usMaxSize) - 1) {
-            BSShader::SetupDefaultStage(a1.m_pObject, i, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, i, 1u, 2u, true);
         }
         else {
-            BSShader::SetupDefaultStage(a1.m_pObject, i, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, i, 3u, 2u, true);
         }
         p_spPass->m_pObject->SetStage(p_spPass->m_pObject->m_uiCurrentStage, a1.m_pObject);
     }
@@ -51,31 +51,31 @@ bool ImageSpaceShaderFFTHorizontalButterfly::LoadStagesAndPasses() {
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 0, 1);
+    m_pObject->m_pkRenderStateGroup->SetRenderState(7u, 0, true);
     NiD3DPass* v5 = p_spPass->m_pObject;
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         v5->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v5->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+    v5->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
     NiD3DPass* v6 = p_spPass->m_pObject;
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         v6->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v6->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
+    v6->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
     NiD3DPass* v7 = p_spPass->m_pObject;
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         v7->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v7->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+    v7->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
     NiD3DPass* v8 = p_spPass->m_pObject;
     if (!p_spPass->m_pObject->m_pkRenderStateGroup) {
         v8->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
     }
-    v8->m_pkRenderStateGroup->SetRenderState(168u, 15u, 1);
+    v8->m_pkRenderStateGroup->SetRenderState(168u, 15u, true);
     SetState();
     p_spPass->m_pObject->m_spVertexShader = spVertexShader.m_pObject;
     NiD3DPass* v11 = p_spPass->m_pObject;
     NiD3DPixelShader* v12 = spPixelShader.m_pObject;
     v11->m_spPixelShader = v12;
-    return 1;
+    return true;
 }

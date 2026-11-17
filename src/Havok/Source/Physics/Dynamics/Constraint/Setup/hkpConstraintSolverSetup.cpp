@@ -234,7 +234,7 @@ hkpJacobianSchema* hkpConstraintSolverSetup::internalAddJacobianSchemas(
         hkpConstraintAtom* pAtoms = pInternal->m_atoms;
         const int32_t iAtomsSize = pInternal->m_atomsSize;
         if (pAtoms->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {
-            hkBool contact = {1};
+            hkBool contact = {true};
             hkSimpleContactConstraintDataBuildJacobian(
                 static_cast<hkpSimpleContactConstraintAtom*>(pAtoms), *pQueryIn, contact, out
             );
@@ -500,7 +500,7 @@ int32_t hkpConstraintSolverSetup::solve(
                 constraintQueryIn.m_constraintRuntime.m_storage;
             hkpConstraintAtom* pAtoms = ci->m_atoms;
             if (pAtoms->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {
-                hkBool writeHeaderSchema = {1};
+                hkBool writeHeaderSchema = {true};
                 hkSimpleContactConstraintDataBuildJacobian(
                     static_cast<hkpSimpleContactConstraintAtom*>(pAtoms), constraintQueryIn, writeHeaderSchema, out
                 );
@@ -556,7 +556,7 @@ int32_t hkpConstraintSolverSetup::solve(
         constraintQueryIn.m_constraintRuntimeInMainMemory.m_storage = ci->m_runtime;
         hkpConstraintAtom* pAtoms = ci->m_atoms;
         if (pAtoms->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {
-            hkBool writeHeaderSchema = {1};
+            hkBool writeHeaderSchema = {true};
             hkSimpleContactConstraintDataBuildJacobian(
                 static_cast<hkpSimpleContactConstraintAtom*>(pAtoms), constraintQueryIn, writeHeaderSchema, out
             );

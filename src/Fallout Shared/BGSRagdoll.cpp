@@ -59,7 +59,7 @@ RagdollFeedbackData::RagdollFeedbackData() : bEnabled(false) {}
 RagdollFeedbackData::~RagdollFeedbackData() {}
 
 void RagdollFeedbackData::Init() {
-    bEnabled = 0;
+    bEnabled = false;
     SystemData.~RagdollFeedbackSystemData();
     ::new (&SystemData) RagdollFeedbackData::RagdollFeedbackSystemData;
     DynamicBoneIdxA.~BSSimpleArray<int16_t, 1024>();
@@ -68,9 +68,9 @@ void RagdollFeedbackData::Init() {
 
 bool RagdollFeedbackData::Compare(RagdollFeedbackData* a1) {
     uint32_t iSize = DynamicBoneIdxA.iSize;
-    bool v3 = 0;
+    bool v3 = false;
     if (iSize != a1->DynamicBoneIdxA.iSize) {
-        return 1;
+        return true;
     }
     int32_t v4 = 0;
     if (iSize) {
@@ -78,12 +78,12 @@ bool RagdollFeedbackData::Compare(RagdollFeedbackData* a1) {
             v3 = DynamicBoneIdxA.pBuffer[v4] != a1->DynamicBoneIdxA.pBuffer[v4];
             if (++v4 >= iSize) {
                 if (v3) {
-                    return 1;
+                    return true;
                 }
                 goto LABEL_6;
             }
         }
-        return 1;
+        return true;
     }
 LABEL_6:;
     if (bEnabled != a1->bEnabled ||
@@ -102,7 +102,7 @@ LABEL_6:;
                     (SystemData.uiImpulseMult1 != a1->SystemData.uiImpulseMult1 ||
                      (SystemData.uiImpulseMult2 != a1->SystemData.uiImpulseMult2 ||
                       a1->SystemData.fPosMaxAngVel != SystemData.fPosMaxAngVel))))))))))))))) {
-        return 1;
+        return true;
     }
     return v3;
 }
@@ -127,7 +127,7 @@ PoseMatching_DATA::PoseMatching_DATA() : bEnabled(false) {}
 PoseMatching_DATA::~PoseMatching_DATA() {}
 
 bool PoseMatching_DATA::Compare(PoseMatching_DATA* a1) {
-    bool bret = PSAFilename.StrCmp(a1->PSAFilename, 1) != 0;
+    bool bret = PSAFilename.StrCmp(a1->PSAFilename, true) != 0;
     if (bret ||
         (bEnabled != a1->bEnabled ||
          (SystemData.sRootMatchingBone != a1->SystemData.sRootMatchingBone ||
@@ -138,13 +138,13 @@ bool PoseMatching_DATA::Compare(PoseMatching_DATA* a1) {
               (SystemData.bDisableOnActivate != a1->SystemData.bDisableOnActivate ||
                (a1->SystemData.fDisableDisplacement != SystemData.fDisableDisplacement ||
                 a1->SystemData.fDelayTime != SystemData.fDelayTime))))))))) {
-        return 1;
+        return true;
     }
     return bret;
 }
 
 void PoseMatching_DATA::Init() {
-    bEnabled = 0;
+    bEnabled = false;
     PSAFilename.~BSStringT<char>();
     ::new (&PSAFilename) BSStringT<char>;
     SystemData.~PoseMatching_System_DATA();
@@ -168,7 +168,7 @@ LookIK_DATA::LookIK_Head_DATA::LookIK_Head_DATA()
   : sNeckIdx(-1), sHeadIdx(-1), fLimitConeAngle(0.0f), fLookAtTargetGain(0.0f), fLookAtGain(0.0f) {}
 
 bool LookIK_DATA::LookIK_Head_DATA::operator==(const LookIK_DATA::LookIK_Head_DATA& arData) const {
-    bool v3 = 0;
+    bool v3 = false;
     if (sNeckIdx == arData.sNeckIdx && sHeadIdx == arData.sHeadIdx && arData.fLimitConeAngle == fLimitConeAngle &&
         arData.fLookAtTargetGain == fLookAtTargetGain && arData.fLookAtGain == fLookAtGain &&
         arData.fForwardNeckMS[0u] == fForwardNeckMS[0u] && arData.fForwardNeckMS[1] == fForwardNeckMS[1] &&
@@ -196,7 +196,7 @@ char LookIK_DATA::Compare(LookIK_DATA* a1) {
     }
     uint32_t v3 = HeadSystemsNameA.iSize;
     if (v3 != a1->HeadSystemsNameA.iSize) {
-        bret = 1;
+        bret = true;
     }
     if (!bret) {
         for (uint32_t uiIndex = 0; uiIndex < HeadSystemsNameA.iSize && !bret; ++uiIndex) {
@@ -213,15 +213,15 @@ char LookIK_DATA::Compare(LookIK_DATA* a1) {
 }
 
 void LookIK_DATA::Copy(const LookIK_DATA& arData) {
-    HeadSystemsA.Clear(1);
+    HeadSystemsA.Clear(true);
     // The names are const, so the const is cast away to free each one.
     for (uint32_t uiIndex = 0; uiIndex < HeadSystemsNameA.iSize; ++uiIndex) {
         ourFree(const_cast<char*>(HeadSystemsNameA.GetAt(static_cast<int32_t>(uiIndex))));
     }
-    HeadSystemsNameA.Clear(1);
+    HeadSystemsNameA.Clear(true);
     uint32_t FormFlags = arData.HeadSystemsA.iSize;
-    HeadSystemsA.SetSize(FormFlags, 1);
-    HeadSystemsNameA.SetSize(arData.HeadSystemsNameA.iSize, 1);
+    HeadSystemsA.SetSize(FormFlags, true);
+    HeadSystemsNameA.SetSize(arData.HeadSystemsNameA.iSize, true);
     for (uint32_t auiIndex = 0; auiIndex < arData.HeadSystemsA.iSize; ++auiIndex) {
         // The source's element is read first (C++17 sequences the right operand of = first).
         HeadSystemsA.GetAt(static_cast<int32_t>(auiIndex)) = arData.HeadSystemsA.GetAt(static_cast<int32_t>(auiIndex));
@@ -238,7 +238,7 @@ void LookIK_DATA::Copy(const LookIK_DATA& arData) {
 GrabIK_DATA::GrabIK_Arm_DATA::GrabIK_Arm_DATA() : sShoulderIndex(-1), sElbowIndex(-1), sHandIndex(-1) {}
 
 bool GrabIK_DATA::GrabIK_Arm_DATA::operator==(const GrabIK_DATA::GrabIK_Arm_DATA& arData) {
-    bool v3 = 0;
+    bool v3 = false;
     if (sShoulderIndex == arData.sShoulderIndex && sElbowIndex == arData.sElbowIndex) {
         return sHandIndex == arData.sHandIndex;
     }
@@ -263,7 +263,7 @@ char GrabIK_DATA::Compare(GrabIK_DATA* a1) {
     }
     uint32_t v4 = ArmSystemsNameA.iSize;
     if (v4 != a1->ArmSystemsNameA.iSize) {
-        bret = 1;
+        bret = true;
     }
     if (!bret) {
         for (uint32_t uiIndex = 0; uiIndex < ArmSystemsNameA.iSize && !bret; ++uiIndex) {
@@ -280,15 +280,15 @@ char GrabIK_DATA::Compare(GrabIK_DATA* a1) {
 }
 
 void GrabIK_DATA::Copy(const GrabIK_DATA& arData) {
-    ArmSystemsA.Clear(1);
+    ArmSystemsA.Clear(true);
     // The names are const, so the const is cast away to free each one.
     for (uint32_t uiIndex = 0; uiIndex < ArmSystemsNameA.iSize; ++uiIndex) {
         ourFree(const_cast<char*>(ArmSystemsNameA.GetAt(static_cast<int32_t>(uiIndex))));
     }
-    ArmSystemsNameA.Clear(1);
+    ArmSystemsNameA.Clear(true);
     uint32_t FormFlags = arData.ArmSystemsA.iSize;
-    ArmSystemsA.SetSize(FormFlags, 1);
-    ArmSystemsNameA.SetSize(arData.ArmSystemsNameA.iSize, 1);
+    ArmSystemsA.SetSize(FormFlags, true);
+    ArmSystemsNameA.SetSize(arData.ArmSystemsNameA.iSize, true);
     for (uint32_t auiIndex = 0; auiIndex < arData.ArmSystemsA.iSize; ++auiIndex) {
         const GrabIK_DATA::GrabIK_Arm_DATA* pArm = &arData.ArmSystemsA.GetAt(static_cast<int32_t>(auiIndex));
         ArmSystemsA.GetAt(static_cast<int32_t>(auiIndex)) = *pArm;
@@ -312,7 +312,7 @@ FootIK_DATA::FootIK_Leg_DATA::FootIK_Leg_DATA()
     fCosMinKneeAngle(0.0f) {}
 
 bool FootIK_DATA::FootIK_Leg_DATA::operator==(const FootIK_DATA::FootIK_Leg_DATA& arData) {
-    bool v3 = 0;
+    bool v3 = false;
     if (sHipIndex == arData.sHipIndex && sKneeIndex == arData.sKneeIndex && sAnkleIndex == arData.sAnkleIndex &&
         bAlignFootToTerrain == arData.bAlignFootToTerrain && arData.fMinAnkleHeightMS == fMinAnkleHeightMS &&
         arData.fMaxAnkleHeightMS == fMaxAnkleHeightMS &&
@@ -346,7 +346,7 @@ char FootIK_DATA::Compare(FootIK_DATA* a1) {
     }
     uint32_t v4 = LegSystemsNameA.iSize;
     if (v4 != a1->LegSystemsNameA.iSize) {
-        bret = 1;
+        bret = true;
     }
     if (!bret) {
         for (uint32_t uiIndex = 0; uiIndex < LegSystemsNameA.iSize && !bret; ++uiIndex) {
@@ -371,15 +371,15 @@ char FootIK_DATA::Compare(FootIK_DATA* a1) {
 }
 
 void FootIK_DATA::Copy(const FootIK_DATA& arData) {
-    LegSystemsA.Clear(1);
+    LegSystemsA.Clear(true);
     // The names are const, so the const is cast away to free each one.
     for (uint32_t uiIndex = 0; uiIndex < LegSystemsNameA.iSize; ++uiIndex) {
         ourFree(const_cast<char*>(LegSystemsNameA.GetAt(static_cast<int32_t>(uiIndex))));
     }
-    LegSystemsNameA.Clear(1);
+    LegSystemsNameA.Clear(true);
     uint32_t FormFlags = arData.LegSystemsA.iSize;
-    LegSystemsA.SetSize(FormFlags, 1);
-    LegSystemsNameA.SetSize(arData.LegSystemsNameA.iSize, 1);
+    LegSystemsA.SetSize(FormFlags, true);
+    LegSystemsNameA.SetSize(arData.LegSystemsNameA.iSize, true);
     for (uint32_t auiIndex = 0; auiIndex < arData.LegSystemsA.iSize; ++auiIndex) {
         const FootIK_DATA::FootIK_Leg_DATA* pLeg = &arData.LegSystemsA.GetAt(static_cast<int32_t>(auiIndex));
         LegSystemsA.GetAt(static_cast<int32_t>(auiIndex)) = *pLeg;
@@ -417,13 +417,13 @@ void BGSRagdoll::InitializeData() {
     FeedbackData.SystemData.fSnapMaxAngDist = 3.0f;
     FeedbackData.SystemData.fPosMaxLinVel = 14.0f;
     FeedbackData.SystemData.fPosMaxAngVel = 18.0f;
-    FeedbackData.DynamicBoneIdxA.Clear(1);
+    FeedbackData.DynamicBoneIdxA.Clear(true);
     // The names are const, so the const is cast away to free each one.
     for (uint32_t uiIndex = 0; uiIndex < FootIKData.LegSystemsNameA.iSize; ++uiIndex) {
         ourFree(const_cast<char*>(FootIKData.LegSystemsNameA.GetAt(static_cast<int32_t>(uiIndex))));
     }
-    FootIKData.LegSystemsA.Clear(1);
-    FootIKData.LegSystemsNameA.Clear(1);
+    FootIKData.LegSystemsA.Clear(true);
+    FootIKData.LegSystemsNameA.Clear(true);
     FootIKData.SystemData.fOnOffGain = 0.0f;
     FootIKData.SystemData.fGroundAscendingGain = 0.0f;
     FootIKData.SystemData.fGroundDescendingGain = 0.0f;
@@ -433,43 +433,43 @@ void BGSRagdoll::InitializeData() {
     for (uint32_t i = 0; i < LookIKData.HeadSystemsNameA.iSize; ++i) {
         ourFree(const_cast<char*>(LookIKData.HeadSystemsNameA.GetAt(static_cast<int32_t>(i))));
     }
-    LookIKData.HeadSystemsA.Clear(1);
-    LookIKData.HeadSystemsNameA.Clear(1);
+    LookIKData.HeadSystemsA.Clear(true);
+    LookIKData.HeadSystemsNameA.Clear(true);
     for (uint32_t j = 0; j < GrabIKData.ArmSystemsNameA.iSize; ++j) {
         ourFree(const_cast<char*>(GrabIKData.ArmSystemsNameA.GetAt(static_cast<int32_t>(j))));
     }
-    GrabIKData.ArmSystemsA.Clear(1);
-    GrabIKData.ArmSystemsNameA.Clear(1);
+    GrabIKData.ArmSystemsA.Clear(true);
+    GrabIKData.ArmSystemsNameA.Clear(true);
     PoseMatchingData.SystemData.sRootMatchingBone = -1;
     PoseMatchingData.SystemData.sMatchingBone2 = -1;
     PoseMatchingData.SystemData.sMatchingBone3 = -1;
-    FeedbackData.bEnabled = 0;
-    FootIKData.bEnabled = 0;
-    LookIKData.bEnabled = 0;
-    GrabIKData.bEnabled = 0;
-    PoseMatchingData.bEnabled = 0;
-    pPreviewActor = 0;
-    pBodyPartData = 0;
+    FeedbackData.bEnabled = false;
+    FootIKData.bEnabled = false;
+    LookIKData.bEnabled = false;
+    GrabIKData.bEnabled = false;
+    PoseMatchingData.bEnabled = false;
+    pPreviewActor = nullptr;
+    pBodyPartData = nullptr;
 }
 
 void BGSRagdoll::ClearData() {
-    FeedbackData.DynamicBoneIdxA.Clear(1);
+    FeedbackData.DynamicBoneIdxA.Clear(true);
     // The names are const, so the const is cast away to free each one.
     for (uint32_t uiIndex = 0; uiIndex < FootIKData.LegSystemsNameA.iSize; ++uiIndex) {
         ourFree(const_cast<char*>(FootIKData.LegSystemsNameA.GetAt(static_cast<int32_t>(uiIndex))));
     }
-    FootIKData.LegSystemsA.Clear(1);
-    FootIKData.LegSystemsNameA.Clear(1);
+    FootIKData.LegSystemsA.Clear(true);
+    FootIKData.LegSystemsNameA.Clear(true);
     for (uint32_t i = 0; i < LookIKData.HeadSystemsNameA.iSize; ++i) {
         ourFree(const_cast<char*>(LookIKData.HeadSystemsNameA.GetAt(static_cast<int32_t>(i))));
     }
-    LookIKData.HeadSystemsA.Clear(1);
-    LookIKData.HeadSystemsNameA.Clear(1);
+    LookIKData.HeadSystemsA.Clear(true);
+    LookIKData.HeadSystemsNameA.Clear(true);
     for (uint32_t j = 0; j < GrabIKData.ArmSystemsNameA.iSize; ++j) {
         ourFree(const_cast<char*>(GrabIKData.ArmSystemsNameA.GetAt(static_cast<int32_t>(j))));
     }
-    GrabIKData.ArmSystemsA.Clear(1);
-    GrabIKData.ArmSystemsNameA.Clear(1);
+    GrabIKData.ArmSystemsA.Clear(true);
+    GrabIKData.ArmSystemsNameA.Clear(true);
 }
 
 // Reads the ragdoll's chunks. DATA sizes the bone and IK system arrays and sets which systems are enabled; the counts
@@ -656,7 +656,7 @@ void BGSRagdoll::InitItem() {
                 Warning("MASTERFILE: Could not find preview actor (%08X) for ragdoll '%s' (%08X).", uitemp, v6, v8);
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -678,28 +678,28 @@ void BGSRagdoll::Copy(TESForm* apCopy) {
 bool BGSRagdoll::Compare(TESForm* apCompare) {
     BGSRagdoll* pcomp = dynamic_cast<BGSRagdoll*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     if (iSkeletonID != pcomp->iSkeletonID) {
-        return 1;
+        return true;
     }
     if (FeedbackData.Compare(&pcomp->FeedbackData)) {
-        return 1;
+        return true;
     }
     if (FootIKData.Compare(&pcomp->FootIKData)) {
-        return 1;
+        return true;
     }
     if (LookIKData.Compare(&pcomp->LookIKData)) {
-        return 1;
+        return true;
     }
     if (GrabIKData.Compare(&pcomp->GrabIKData)) {
-        return 1;
+        return true;
     }
     if (PoseMatchingData.Compare(&pcomp->PoseMatchingData)) {
-        return 1;
+        return true;
     }
     return pBodyPartData != pcomp->pBodyPartData;
 }

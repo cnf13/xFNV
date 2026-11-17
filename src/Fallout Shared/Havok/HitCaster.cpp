@@ -30,7 +30,7 @@
 #include "Havok/Source/Physics/Collide/Query/Collector/PointCollector/hkpRootCdPoint.h"
 #include "Reconstruction.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 // The game settings this file defines, with the game's values, in its initialization order.
@@ -133,11 +133,11 @@ void HitCaster::Init(float afRadius, uint32_t aiGroup) {
         pPhantom = nullptr;
     }
     spShapePhantom.operator=(pPhantom);
-    bInit = 1;
+    bInit = true;
 }
 
 HitCaster* HitCaster::GetInstance(HitCaster::HitCasterSize eSize, bool abCreate) {
-    HitCaster* presult = 0;
+    HitCaster* presult = nullptr;
     if (eSize) {
         if (eSize == HitCaster::SIZE_LARGE) {
             if (!HitCaster::pLargeHitCaster && abCreate) {
@@ -149,7 +149,7 @@ HitCaster* HitCaster::GetInstance(HitCaster::HitCasterSize eSize, bool abCreate)
                     v7 = ::new (v9) HitCaster(*v3, NewSystemGroup);
                 }
                 else {
-                    v7 = 0;
+                    v7 = nullptr;
                 }
                 HitCaster::pLargeHitCaster = v7;
             }
@@ -166,7 +166,7 @@ HitCaster* HitCaster::GetInstance(HitCaster::HitCasterSize eSize, bool abCreate)
                 v8 = ::new (apMemory) HitCaster(*v2, v5);
             }
             else {
-                v8 = 0;
+                v8 = nullptr;
             }
             HitCaster::pSmallHitCaster = v8;
         }
@@ -183,11 +183,11 @@ void HitCaster::ClearInstance() {
     if (HitCaster::pLargeHitCaster) {
         delete HitCaster::pLargeHitCaster;
     }
-    HitCaster::pLargeHitCaster = 0;
+    HitCaster::pLargeHitCaster = nullptr;
     if (HitCaster::pSmallHitCaster) {
         delete HitCaster::pSmallHitCaster;
     }
-    HitCaster::pSmallHitCaster = 0;
+    HitCaster::pSmallHitCaster = nullptr;
 }
 
 void bhkWorldObject::SetCollisionFilter(CFilter aiFilter) {

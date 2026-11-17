@@ -218,7 +218,7 @@ void BGSProjectile::Save() {
         CastingType = reinterpret_cast<TESObjectLIGH*>(static_cast<uintptr_t>(Data.pLight->iFormID));
     }
     else {
-        CastingType = 0;
+        CastingType = nullptr;
     }
     Data.pLight = CastingType;
     TESObjectLIGH* pMuzzleFlashLight = Data.pMuzzleFlashLight;
@@ -227,7 +227,7 @@ void BGSProjectile::Save() {
         v8 = reinterpret_cast<TESObjectLIGH*>(static_cast<uintptr_t>(Data.pMuzzleFlashLight->iFormID));
     }
     else {
-        v8 = 0;
+        v8 = nullptr;
     }
     Data.pMuzzleFlashLight = v8;
     BGSExplosion* psaveMuzzleLight = Data.pExplosionType;
@@ -236,7 +236,7 @@ void BGSProjectile::Save() {
         v7 = reinterpret_cast<BGSExplosion*>(static_cast<uintptr_t>(Data.pExplosionType->iFormID));
     }
     else {
-        v7 = 0;
+        v7 = nullptr;
     }
     Data.pExplosionType = v7;
     TESSound* pActiveSoundLoop = Data.pActiveSoundLoop;
@@ -245,7 +245,7 @@ void BGSProjectile::Save() {
         v6 = reinterpret_cast<TESSound*>(static_cast<uintptr_t>(Data.pActiveSoundLoop->iFormID));
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     Data.pActiveSoundLoop = v6;
     TESSound* psaveActiveSound = Data.pCountdownSound;
@@ -254,7 +254,7 @@ void BGSProjectile::Save() {
         v5 = reinterpret_cast<TESSound*>(static_cast<uintptr_t>(Data.pCountdownSound->iFormID));
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     Data.pCountdownSound = v5;
     TESSound* pDeactivateSound = Data.pDeactivateSound;
@@ -263,7 +263,7 @@ void BGSProjectile::Save() {
         v4 = reinterpret_cast<TESSound*>(static_cast<uintptr_t>(Data.pDeactivateSound->iFormID));
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     Data.pDeactivateSound = v4;
     TESObjectWEAP* pDefaultWeaponSource = Data.pDefaultWeaponSource;
@@ -272,7 +272,7 @@ void BGSProjectile::Save() {
         v3 = reinterpret_cast<TESObjectWEAP*>(static_cast<uintptr_t>(Data.pDefaultWeaponSource->iFormID));
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     Data.pDefaultWeaponSource = v3;
     if (TESForm::QEndianSwapOnSave()) {
@@ -355,9 +355,9 @@ void BGSProjectile::InitItem() {
             Data.pDefaultWeaponSource = dynamic_cast<TESObjectWEAP*>(v16);
         }
         if (!GetHasExplosion()) {
-            Data.pExplosionType = 0;
+            Data.pExplosionType = nullptr;
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -374,16 +374,16 @@ void BGSProjectile::Copy(TESForm* apCopy) {
 bool BGSProjectile::Compare(TESForm* apCompare) {
     BGSProjectile* pcomp = dynamic_cast<BGSProjectile*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     if (std::memcmp(&Data, &pcomp->Data, sizeof(Data))) {
-        return 1;
+        return true;
     }
     if (MuzzleFlashModel.CompareComponent(&pcomp->MuzzleFlashModel)) {
-        return 1;
+        return true;
     }
     return eSoundLevel != pcomp->eSoundLevel;
 }
@@ -398,14 +398,13 @@ bool BGSProjectile::Activate(
     Actor* v10 = dynamic_cast<Actor*>(apActionRef);
     Projectile* v11 = dynamic_cast<Projectile*>(apItemActivated);
     if ((!v10) || (!v11)) {
-        return (bool)0;
+        return false;
     }
     BGSProjectile* actorBase = v11->GetProjectileBase();
     bool vCondition1;
-    vCondition1 =
-        actorBase->GetCanTurnOff() && ((!v11->IsFlagSet(Projectile::TURNED_OFF)) && v11->TurnOff(v10, (bool)0));
+    vCondition1 = actorBase->GetCanTurnOff() && ((!v11->IsFlagSet(Projectile::TURNED_OFF)) && v11->TurnOff(v10, false));
     if (vCondition1) {
-        return (bool)1;
+        return true;
     }
     BGSProjectile* v8 = v11->GetProjectileBase();
     return (bool)((uint8_t)(v8->GetCanPickup() &&
@@ -413,17 +412,17 @@ bool BGSProjectile::Activate(
 }
 
 NiAVObject* BGSProjectile::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
-    NiAVObject* pav = 0;
+    NiAVObject* pav = nullptr;
     if (pRequester) {
         int32_t MotionType = GetMotionType();
         if (MotionType == MOTION_BEAM || MotionType == MOTION_CONTINUOUS_BEAM) {
-            pav = TESBoundObject::Clone3D(pRequester, 1);
+            pav = TESBoundObject::Clone3D(pRequester, true);
         }
         else {
             Projectile* pprojectile = static_cast<Projectile*>(pRequester);
             if (pprojectile->pSecondaryItemChange && pprojectile->GetSecondaryItemChange()->pContainerObj) {
                 TESBoundObject* FormFlags = pprojectile->GetSecondaryItemChange()->pContainerObj;
-                NiAVObject* ploadedArt = FormFlags->LoadGraphics(0);
+                NiAVObject* ploadedArt = FormFlags->LoadGraphics(nullptr);
                 BSCloningProcess cloneData(1.0f);
                 if (ploadedArt) {
                     pav = static_cast<NiAVObject*>(ploadedArt->Clone(cloneData));
@@ -434,7 +433,7 @@ NiAVObject* BGSProjectile::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
                 if (ploadedArt_2) {
                     uint32_t CastingType = pRequester->iFormID;
                     if (pDataHandler->IsFormIDCreated(CastingType) && !pSaveLoadGame->GetSaveGameLoading()) {
-                        BSClonePools* Singleton = BSClonePools::GetInstance(1);
+                        BSClonePools* Singleton = BSClonePools::GetInstance(true);
                         pav = Singleton->RequestClone(ploadedArt_2);
                     }
                 }
@@ -450,7 +449,7 @@ NiAVObject* BGSProjectile::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
     if (pav) {
         if (pav->IsFadeNode()) {
             BSFadeNode* v5 = pav->IsFadeNode();
-            v5->SetIgnoreFade(1);
+            v5->SetIgnoreFade(true);
         }
     }
     return pav;
@@ -484,16 +483,16 @@ void BGSProjectile::QueueFiles(IO_TASK_PRIORITY aePriority, QueuedFile* apParent
     if (GetModelLength()) {
         TESModel* apModel;
         if (this == nullptr) {
-            apModel = 0;
+            apModel = nullptr;
         }
         else {
             apModel = static_cast<TESModel*>(this);
         }
         ENUM_LOD_MULT LODMult = TES::GetLODMult(this);
-        pModelLoader->QueueModel(apModel, aePriority, apParent, LODMult, 1, 0, 0);
+        pModelLoader->QueueModel(apModel, aePriority, apParent, LODMult, true, false, false);
     }
     if (MuzzleFlashModel.GetModelLength()) {
-        pModelLoader->QueueModel(&MuzzleFlashModel, aePriority, apParent, LOD_MULT_ACTORS, 1, 0, 0);
+        pModelLoader->QueueModel(&MuzzleFlashModel, aePriority, apParent, LOD_MULT_ACTORS, true, false, false);
     }
     if (GetExplosion()) {
         BGSPreloadable* v4 = static_cast<BGSPreloadable*>(GetExplosion());
@@ -635,7 +634,7 @@ GrenadeProjectile* BGSProjectile::InitLiveGrenade(
     TESObjectREFR* apTarget,
     TESObjectWEAP* apGrenade
 ) {
-    GrenadeProjectile* v10 = 0;
+    GrenadeProjectile* v10 = nullptr;
     if (apProjectile) {
         if (apProjectile->GetMotionType() == BGSProjectile::MOTION_GRENADE) {
             GrenadeProjectile* v7;
@@ -646,7 +645,7 @@ GrenadeProjectile* BGSProjectile::InitLiveGrenade(
                     GrenadeProjectile(apProjectile, apSource, apGrenade, NiPoint3_ZERO, 0.0f, 0.0f);
             }
             else {
-                v7 = 0;
+                v7 = nullptr;
             }
             v10 = v7;
         }
@@ -660,12 +659,12 @@ GrenadeProjectile* BGSProjectile::InitLiveGrenade(
                     v6 = ::new (pActorCause) ActorCause(apSource);
                 }
                 else {
-                    v6 = 0;
+                    v6 = nullptr;
                 }
                 v10->SetActorCause(v6);
             }
         }
-        v10->SetFlag(Projectile::ACTIVE_IN_INVENTORY, 1);
+        v10->SetFlag(Projectile::ACTIVE_IN_INVENTORY, true);
         v10->pDesiredTarget = apTarget;
         v10->Initialize();
         float* v4 = &fProjectileInventoryGrenadeTimer.Float();

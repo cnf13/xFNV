@@ -47,8 +47,8 @@ NiObject* BSTreadTransfInterpolator::CreateClone(NiCloningProcess& kCloning) {
         return pkObject_2;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -79,7 +79,7 @@ void BSTreadTransfInterpolator::LoadBinary(NiStream& arStream) {
         );
     }
     else {
-        pLinks = 0;
+        pLinks = nullptr;
     }
     Links = pLinks;
     for (uint32_t i = 0; i < uiNumLinks; ++i) {
@@ -228,7 +228,7 @@ void BSTreadTransfInterpolator::CopyMembers(BSTreadTransfInterpolator* pkDest, N
         );
     }
     else {
-        pNewLinks = 0;
+        pNewLinks = nullptr;
     }
     pkDest->Links = pNewLinks;
     for (uint32_t i = 0; i < this->uiNumLinks; ++i) {
@@ -247,7 +247,7 @@ NiObject* BSTreadTransfInterpolator::CreateObject() {
     BSTreadTransfInterpolator* pkObject =
         static_cast<BSTreadTransfInterpolator*>(NiMemObject::operator new(sizeof(BSTreadTransfInterpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) BSTreadTransfInterpolator;
 }

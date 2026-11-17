@@ -74,18 +74,16 @@ bool TESClass::Load(TESFile* apFile) {
                 break;
             }
             case DATA_ID:
-                if (apFile->GetChunkSize() == (uint32_t)(GetDataSizeAdded() + 0x1C)) {
+                if (apFile->GetChunkSize() == (GetDataSizeAdded() + 0x1C)) {
                     LoadData(apFile, reinterpret_cast<char*>(&data), 0x1C);
                     if (apFile->QEndian()) {
                         data.Endian();
                     }
                 }
-                else if (
-                    apFile->GetChunkSize() == 0x18 || apFile->GetChunkSize() == (uint32_t)(GetDataSizeAdded() + 0x18)
-                ) {
+                else if (apFile->GetChunkSize() == 0x18 || apFile->GetChunkSize() == (GetDataSizeAdded() + 0x18)) {
                     // The older, three-tag-skill layout: read it into an OLD_CLASS_DATA and copy the fields across.
                     OLD_CLASS_DATA oldData;
-                    if (apFile->GetChunkSize() == (uint32_t)(GetDataSizeAdded() + 0x18)) {
+                    if (apFile->GetChunkSize() == (GetDataSizeAdded() + 0x18)) {
                         LoadData(apFile, reinterpret_cast<char*>(&oldData), 0x18);
                     }
                     else {
@@ -187,10 +185,10 @@ void TESClass::Copy(TESForm* apCopy) {
 bool TESClass::Compare(TESForm* apCompare) {
     TESClass* pComp = dynamic_cast<TESClass*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
     void* Extra = &pComp->data;
     return std::memcmp(&data, Extra, sizeof(data)) != 0;
@@ -231,7 +229,7 @@ bool TESClass::CheckData() {
         return (bool)v4;
     }
     SetTrainingSkill(ActorValue::BARTER);
-    return (bool)0;
+    return false;
 }
 
 void TESClass::SaveGameTES() {

@@ -76,7 +76,7 @@ SpellItem* MagicSystem::GetPipBoyLightSpell() {
 
 void MagicSystem::GenerateDefaultObjects() {
     AutoMemContext apMemory(
-        MEM_CONTEXT_TES_DEFAULT_OBJECTS, 1,
+        MEM_CONTEXT_TES_DEFAULT_OBJECTS, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Magic\\MagicSystem.cpp", 302
     );
     TESForm* FormByNumericID = TESForm::GetFormByNumericID(300u);
@@ -88,12 +88,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v65 = ::new (v87) TESSound;
         }
         else {
-            v65 = 0;
+            v65 = nullptr;
         }
         MagicSystem::pAlterationFailureSound = v65;
-        v65->SetFormID(300u, 1);
+        v65->SetFormID(300u, true);
         MagicSystem::pAlterationFailureSound->SetFormEditorID("MagicFailureSoundAlteration");
-        MagicSystem::pAlterationFailureSound->SetAltered(0);
+        MagicSystem::pAlterationFailureSound->SetAltered(false);
         BSSimpleList<TESSound*>* SoundList = pDataHandler->GetSoundList();
         SoundList->AddHead(MagicSystem::pAlterationFailureSound);
     }
@@ -106,12 +106,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v64 = ::new (v86) TESSound;
         }
         else {
-            v64 = 0;
+            v64 = nullptr;
         }
         MagicSystem::pConjurationFailureSound = v64;
-        v64->SetFormID(301u, 1);
+        v64->SetFormID(301u, true);
         MagicSystem::pConjurationFailureSound->SetFormEditorID("MagicFailureSoundConjuration");
-        MagicSystem::pConjurationFailureSound->SetAltered(0);
+        MagicSystem::pConjurationFailureSound->SetAltered(false);
         BSSimpleList<TESSound*>* v3 = pDataHandler->GetSoundList();
         v3->AddHead(MagicSystem::pConjurationFailureSound);
     }
@@ -124,12 +124,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v63 = ::new (v85) TESSound;
         }
         else {
-            v63 = 0;
+            v63 = nullptr;
         }
         MagicSystem::pDestructionFailureSound = v63;
-        v63->SetFormID(302u, 1);
+        v63->SetFormID(302u, true);
         MagicSystem::pDestructionFailureSound->SetFormEditorID("MagicFailureSoundDestruction");
-        MagicSystem::pDestructionFailureSound->SetAltered(0);
+        MagicSystem::pDestructionFailureSound->SetAltered(false);
         BSSimpleList<TESSound*>* v5 = pDataHandler->GetSoundList();
         v5->AddHead(MagicSystem::pDestructionFailureSound);
     }
@@ -142,12 +142,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v62 = ::new (v84) TESSound;
         }
         else {
-            v62 = 0;
+            v62 = nullptr;
         }
         MagicSystem::pIllusionFailureSound = v62;
-        v62->SetFormID(303u, 1);
+        v62->SetFormID(303u, true);
         MagicSystem::pIllusionFailureSound->SetFormEditorID("MagicFailureSoundIllusion");
-        MagicSystem::pIllusionFailureSound->SetAltered(0);
+        MagicSystem::pIllusionFailureSound->SetAltered(false);
         BSSimpleList<TESSound*>* v7 = pDataHandler->GetSoundList();
         v7->AddHead(MagicSystem::pIllusionFailureSound);
     }
@@ -160,12 +160,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v61 = ::new (v83) TESSound;
         }
         else {
-            v61 = 0;
+            v61 = nullptr;
         }
         MagicSystem::pMysticismFailureSound = v61;
-        v61->SetFormID(304u, 1);
+        v61->SetFormID(304u, true);
         MagicSystem::pMysticismFailureSound->SetFormEditorID("MagicFailureSoundMysticism");
-        MagicSystem::pMysticismFailureSound->SetAltered(0);
+        MagicSystem::pMysticismFailureSound->SetAltered(false);
         BSSimpleList<TESSound*>* v9 = pDataHandler->GetSoundList();
         v9->AddHead(MagicSystem::pMysticismFailureSound);
     }
@@ -178,12 +178,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v60 = ::new (v82) TESSound;
         }
         else {
-            v60 = 0;
+            v60 = nullptr;
         }
         MagicSystem::pRestorationFailureSound = v60;
-        v60->SetFormID(305u, 1);
+        v60->SetFormID(305u, true);
         MagicSystem::pRestorationFailureSound->SetFormEditorID("MagicFailureSoundRestoration");
-        MagicSystem::pRestorationFailureSound->SetAltered(0);
+        MagicSystem::pRestorationFailureSound->SetAltered(false);
         BSSimpleList<TESSound*>* v11 = pDataHandler->GetSoundList();
         v11->AddHead(MagicSystem::pRestorationFailureSound);
     }
@@ -196,12 +196,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v59 = ::new (v81) TESSound;
         }
         else {
-            v59 = 0;
+            v59 = nullptr;
         }
         MagicSystem::pAlterationEnchantDrawSound = v59;
-        v59->SetFormID(312u, 1);
+        v59->SetFormID(312u, true);
         MagicSystem::pAlterationEnchantDrawSound->SetFormEditorID("MagicEnchantDrawSoundAlteration");
-        MagicSystem::pAlterationEnchantDrawSound->SetAltered(0);
+        MagicSystem::pAlterationEnchantDrawSound->SetAltered(false);
         BSSimpleList<TESSound*>* v13 = pDataHandler->GetSoundList();
         v13->AddHead(MagicSystem::pAlterationEnchantDrawSound);
     }
@@ -214,12 +214,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v58 = ::new (v80) TESSound;
         }
         else {
-            v58 = 0;
+            v58 = nullptr;
         }
         MagicSystem::pConjurationEnchantDrawSound = v58;
-        v58->SetFormID(313u, 1);
+        v58->SetFormID(313u, true);
         MagicSystem::pConjurationEnchantDrawSound->SetFormEditorID("MagicEnchantDrawSoundConjuration");
-        MagicSystem::pConjurationEnchantDrawSound->SetAltered(0);
+        MagicSystem::pConjurationEnchantDrawSound->SetAltered(false);
         BSSimpleList<TESSound*>* v15 = pDataHandler->GetSoundList();
         v15->AddHead(MagicSystem::pConjurationEnchantDrawSound);
     }
@@ -232,12 +232,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v57 = ::new (v79) TESSound;
         }
         else {
-            v57 = 0;
+            v57 = nullptr;
         }
         MagicSystem::pDestructionEnchantDrawSound = v57;
-        v57->SetFormID(314u, 1);
+        v57->SetFormID(314u, true);
         MagicSystem::pDestructionEnchantDrawSound->SetFormEditorID("MagicEnchantDrawSoundDestruction");
-        MagicSystem::pDestructionEnchantDrawSound->SetAltered(0);
+        MagicSystem::pDestructionEnchantDrawSound->SetAltered(false);
         BSSimpleList<TESSound*>* v17 = pDataHandler->GetSoundList();
         v17->AddHead(MagicSystem::pDestructionEnchantDrawSound);
     }
@@ -250,12 +250,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v56 = ::new (v78) TESSound;
         }
         else {
-            v56 = 0;
+            v56 = nullptr;
         }
         MagicSystem::pIllusionEnchantDrawSound = v56;
-        v56->SetFormID(315u, 1);
+        v56->SetFormID(315u, true);
         MagicSystem::pIllusionEnchantDrawSound->SetFormEditorID("MagicEnchantDrawSoundIllusion");
-        MagicSystem::pIllusionEnchantDrawSound->SetAltered(0);
+        MagicSystem::pIllusionEnchantDrawSound->SetAltered(false);
         BSSimpleList<TESSound*>* v19 = pDataHandler->GetSoundList();
         v19->AddHead(MagicSystem::pIllusionEnchantDrawSound);
     }
@@ -268,12 +268,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v55 = ::new (v77) TESSound;
         }
         else {
-            v55 = 0;
+            v55 = nullptr;
         }
         MagicSystem::pMysticismEnchantDrawSound = v55;
-        v55->SetFormID(316u, 1);
+        v55->SetFormID(316u, true);
         MagicSystem::pMysticismEnchantDrawSound->SetFormEditorID("MagicEnchantDrawSoundMysticism");
-        MagicSystem::pMysticismEnchantDrawSound->SetAltered(0);
+        MagicSystem::pMysticismEnchantDrawSound->SetAltered(false);
         BSSimpleList<TESSound*>* v21 = pDataHandler->GetSoundList();
         v21->AddHead(MagicSystem::pMysticismEnchantDrawSound);
     }
@@ -286,12 +286,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v54 = ::new (v76) TESSound;
         }
         else {
-            v54 = 0;
+            v54 = nullptr;
         }
         MagicSystem::pRestorationEnchantDrawSound = v54;
-        v54->SetFormID(317u, 1);
+        v54->SetFormID(317u, true);
         MagicSystem::pRestorationEnchantDrawSound->SetFormEditorID("MagicEnchantDrawSoundRestoration");
-        MagicSystem::pRestorationEnchantDrawSound->SetAltered(0);
+        MagicSystem::pRestorationEnchantDrawSound->SetAltered(false);
         BSSimpleList<TESSound*>* v23 = pDataHandler->GetSoundList();
         v23->AddHead(MagicSystem::pRestorationEnchantDrawSound);
     }
@@ -304,12 +304,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v53 = ::new (v75) TESSound;
         }
         else {
-            v53 = 0;
+            v53 = nullptr;
         }
         MagicSystem::pAlterationEnchantHitSound = v53;
-        v53->SetFormID(318u, 1);
+        v53->SetFormID(318u, true);
         MagicSystem::pAlterationEnchantHitSound->SetFormEditorID("MagicEnchantHitSoundAlteration");
-        MagicSystem::pAlterationEnchantHitSound->SetAltered(0);
+        MagicSystem::pAlterationEnchantHitSound->SetAltered(false);
         BSSimpleList<TESSound*>* v25 = pDataHandler->GetSoundList();
         v25->AddHead(MagicSystem::pAlterationEnchantHitSound);
     }
@@ -322,12 +322,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v52 = ::new (v74) TESSound;
         }
         else {
-            v52 = 0;
+            v52 = nullptr;
         }
         MagicSystem::pConjurationEnchantHitSound = v52;
-        v52->SetFormID(319u, 1);
+        v52->SetFormID(319u, true);
         MagicSystem::pConjurationEnchantHitSound->SetFormEditorID("MagicEnchantHitSoundConjuration");
-        MagicSystem::pConjurationEnchantHitSound->SetAltered(0);
+        MagicSystem::pConjurationEnchantHitSound->SetAltered(false);
         BSSimpleList<TESSound*>* v27 = pDataHandler->GetSoundList();
         v27->AddHead(MagicSystem::pConjurationEnchantHitSound);
     }
@@ -340,12 +340,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v51 = ::new (v73) TESSound;
         }
         else {
-            v51 = 0;
+            v51 = nullptr;
         }
         MagicSystem::pDestructionEnchantHitSound = v51;
-        v51->SetFormID(320u, 1);
+        v51->SetFormID(320u, true);
         MagicSystem::pDestructionEnchantHitSound->SetFormEditorID("MagicEnchantHitSoundDestruction");
-        MagicSystem::pDestructionEnchantHitSound->SetAltered(0);
+        MagicSystem::pDestructionEnchantHitSound->SetAltered(false);
         BSSimpleList<TESSound*>* v29 = pDataHandler->GetSoundList();
         v29->AddHead(MagicSystem::pDestructionEnchantHitSound);
     }
@@ -358,12 +358,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v50 = ::new (v72) TESSound;
         }
         else {
-            v50 = 0;
+            v50 = nullptr;
         }
         MagicSystem::pIllusionEnchantHitSound = v50;
-        v50->SetFormID(321u, 1);
+        v50->SetFormID(321u, true);
         MagicSystem::pIllusionEnchantHitSound->SetFormEditorID("MagicEnchantHitSoundIllusion");
-        MagicSystem::pIllusionEnchantHitSound->SetAltered(0);
+        MagicSystem::pIllusionEnchantHitSound->SetAltered(false);
         BSSimpleList<TESSound*>* v31 = pDataHandler->GetSoundList();
         v31->AddHead(MagicSystem::pIllusionEnchantHitSound);
     }
@@ -376,12 +376,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v49 = ::new (v71) TESSound;
         }
         else {
-            v49 = 0;
+            v49 = nullptr;
         }
         MagicSystem::pMysticismEnchantHitSound = v49;
-        v49->SetFormID(322u, 1);
+        v49->SetFormID(322u, true);
         MagicSystem::pMysticismEnchantHitSound->SetFormEditorID("MagicEnchantHitSoundMysticism");
-        MagicSystem::pMysticismEnchantHitSound->SetAltered(0);
+        MagicSystem::pMysticismEnchantHitSound->SetAltered(false);
         BSSimpleList<TESSound*>* v33 = pDataHandler->GetSoundList();
         v33->AddHead(MagicSystem::pMysticismEnchantHitSound);
     }
@@ -394,12 +394,12 @@ void MagicSystem::GenerateDefaultObjects() {
             v48 = ::new (v70) TESSound;
         }
         else {
-            v48 = 0;
+            v48 = nullptr;
         }
         MagicSystem::pRestorationEnchantHitSound = v48;
-        v48->SetFormID(323u, 1);
+        v48->SetFormID(323u, true);
         MagicSystem::pRestorationEnchantHitSound->SetFormEditorID("MagicEnchantHitSoundRestoration");
-        MagicSystem::pRestorationEnchantHitSound->SetAltered(0);
+        MagicSystem::pRestorationEnchantHitSound->SetAltered(false);
         BSSimpleList<TESSound*>* v35 = pDataHandler->GetSoundList();
         v35->AddHead(MagicSystem::pRestorationEnchantHitSound);
     }
@@ -412,13 +412,13 @@ void MagicSystem::GenerateDefaultObjects() {
             v47 = ::new (v69) TESEffectShader;
         }
         else {
-            v47 = 0;
+            v47 = nullptr;
         }
         MagicSystem::pAbsorbShaderEffect = v47;
         if (v47) {
-            MagicSystem::pAbsorbShaderEffect->SetFormID(324u, 1);
+            MagicSystem::pAbsorbShaderEffect->SetFormID(324u, true);
             MagicSystem::pAbsorbShaderEffect->SetFormEditorID("effectAbsorb");
-            MagicSystem::pAbsorbShaderEffect->SetAltered(0);
+            MagicSystem::pAbsorbShaderEffect->SetAltered(false);
             BSSimpleList<TESEffectShader*>* EffectShaderList = pDataHandler->GetEffectShaderList();
             EffectShaderList->AddHead(MagicSystem::pAbsorbShaderEffect);
         }
@@ -432,13 +432,13 @@ void MagicSystem::GenerateDefaultObjects() {
             v46 = ::new (v68) TESEffectShader;
         }
         else {
-            v46 = 0;
+            v46 = nullptr;
         }
         MagicSystem::pReflectShaderEffect = v46;
         if (v46) {
-            MagicSystem::pReflectShaderEffect->SetFormID(325u, 1);
+            MagicSystem::pReflectShaderEffect->SetFormID(325u, true);
             MagicSystem::pReflectShaderEffect->SetFormEditorID("effectReflect");
-            MagicSystem::pReflectShaderEffect->SetAltered(0);
+            MagicSystem::pReflectShaderEffect->SetAltered(false);
             BSSimpleList<TESEffectShader*>* v39 = pDataHandler->GetEffectShaderList();
             v39->AddHead(MagicSystem::pReflectShaderEffect);
         }
@@ -452,13 +452,13 @@ void MagicSystem::GenerateDefaultObjects() {
             v45 = ::new (v67) TESEffectShader;
         }
         else {
-            v45 = 0;
+            v45 = nullptr;
         }
         MagicSystem::pDetectLifeShaderEffect = v45;
         if (v45) {
-            MagicSystem::pDetectLifeShaderEffect->SetFormID(326u, 1);
+            MagicSystem::pDetectLifeShaderEffect->SetFormID(326u, true);
             MagicSystem::pDetectLifeShaderEffect->SetFormEditorID("LifeDetected");
-            MagicSystem::pDetectLifeShaderEffect->SetAltered(0);
+            MagicSystem::pDetectLifeShaderEffect->SetAltered(false);
             BSSimpleList<TESEffectShader*>* v41 = pDataHandler->GetEffectShaderList();
             v41->AddHead(MagicSystem::pDetectLifeShaderEffect);
         }
@@ -472,13 +472,13 @@ void MagicSystem::GenerateDefaultObjects() {
             v44 = ::new (v66) SpellItem;
         }
         else {
-            v44 = 0;
+            v44 = nullptr;
         }
         MagicSystem::pPipBoyLightSpell = v44;
         if (v44) {
-            MagicSystem::pPipBoyLightSpell->SetFormID(327u, 1);
+            MagicSystem::pPipBoyLightSpell->SetFormID(327u, true);
             MagicSystem::pPipBoyLightSpell->SetFormEditorID("spPipBoyLight");
-            MagicSystem::pPipBoyLightSpell->SetAltered(0);
+            MagicSystem::pPipBoyLightSpell->SetAltered(false);
             TESDataHandler::FormList* Conditions = pDataHandler->GetSpellItemList();
             Conditions->AddHead(MagicSystem::pPipBoyLightSpell);
         }
@@ -558,7 +558,7 @@ TESSound* MagicSystem::GetMagicFailureSound(MagicSystem::School aeSchool) {
             break;
         }
         default: {
-            result = 0;
+            result = nullptr;
             break;
         }
     }

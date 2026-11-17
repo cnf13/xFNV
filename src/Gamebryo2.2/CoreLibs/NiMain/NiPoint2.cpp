@@ -40,7 +40,7 @@ bool NiPoint2::operator==(const NiPoint2& pt) const {
 }
 
 float NiPoint2::Dot(const NiPoint2& pt) const {
-    return (float)((x * (&pt)->x) + (y * (&pt)->y));
+    return ((x * (&pt)->x) + (y * (&pt)->y));
 }
 
 NiPoint2 NiPoint2::operator*(float fScalar) const {

@@ -87,7 +87,7 @@ void hkpEndOfStepCallbackUtil::sortNewCollisions(
     int32_t v3 = high;
     int32_t v4 = low;
     hkpEndOfStepCallbackUtil::NewCollision* v5 = first;
-    while (1) {
+    while (true) {
         int32_t v15;
         int32_t v6 = v4;
         int32_t v7 = (v3 + v4) >> 1;
@@ -99,33 +99,24 @@ void hkpEndOfStepCallbackUtil::sortNewCollisions(
         hkpSimpleConstraintContactMgr* v29 = v9->m_mgr;
         hkpCollisionEvent::CallbackSource m_source = v9->m_source;
         int32_t m_sequenceNumber = v9->m_sequenceNumber;
-        while (1) {
+        while (true) {
             uint32_t m_uid = m_mgr->m_constraint.m_entities[0]->getUid();
             uint32_t v11 = m_mgr->m_constraint.m_entities[1]->getUid();
             for (hkpEndOfStepCallbackUtil::NewCollision* i = &v5[v6];; ++i) {
                 uint32_t v13 = i->m_mgr->m_constraint.m_entities[0]->getUid();
                 uint32_t v14 = i->m_mgr->m_constraint.m_entities[1]->getUid();
-                if (static_cast<uint64_t>(
-                        (static_cast<uint64_t>(static_cast<uint32_t>(v13)) << 32) | static_cast<uint32_t>(v14)
-                    ) >=
-                        static_cast<uint64_t>(
-                            (static_cast<uint64_t>(static_cast<uint32_t>(m_uid)) << 32) | static_cast<uint32_t>(v11)
-                        ) &&
+                if (((static_cast<uint64_t>(v13) << 32) | v14) >= ((static_cast<uint64_t>(m_uid) << 32) | v11) &&
                     (v14 != v11 || (v13 != m_uid || i->m_sequenceNumber >= m_sequenceNumber))) {
                     break;
                 }
                 ++v21;
             }
-            uint64_t v23 = static_cast<uint64_t>(
-                (static_cast<uint64_t>(static_cast<uint32_t>(m_uid)) << 32) | static_cast<uint32_t>(v11)
-            );
+            uint64_t v23 = ((static_cast<uint64_t>(m_uid) << 32) | v11);
             v15 = v22;
             for (hkpEndOfStepCallbackUtil::NewCollision* j = &first[v22];; --j) {
                 uint32_t v17 = j->m_mgr->m_constraint.m_entities[0]->getUid();
                 uint32_t v18 = j->m_mgr->m_constraint.m_entities[1]->getUid();
-                if (v23 >= static_cast<uint64_t>(
-                               (static_cast<uint64_t>(static_cast<uint32_t>(v17)) << 32) | static_cast<uint32_t>(v18)
-                           ) &&
+                if (v23 >= ((static_cast<uint64_t>(v17) << 32) | v18) &&
                     (static_cast<uint32_t>(v23) != v18 || (m_uid != v17 || m_sequenceNumber >= j->m_sequenceNumber))) {
                     break;
                 }
@@ -382,7 +373,7 @@ void hkpEndOfStepCallbackUtil::addToWorld(hkpWorld* world) {
         world->addWorldPostSimulationListener(this);
     }
     else {
-        world->addWorldPostSimulationListener(0);
+        world->addWorldPostSimulationListener(nullptr);
     }
 }
 
@@ -391,7 +382,7 @@ void hkpEndOfStepCallbackUtil::removeFromWorld(hkpWorld* world) {
         world->removeWorldPostSimulationListener(this);
     }
     else {
-        world->removeWorldPostSimulationListener(0);
+        world->removeWorldPostSimulationListener(nullptr);
     }
 }
 

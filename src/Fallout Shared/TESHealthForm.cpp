@@ -46,7 +46,7 @@ uint32_t TESHealthForm::GetFormHealth(TESForm* apForm) {
 
 // The health component of apForm when its type has one (armor, weapon, NPC or creature), else null.
 TESHealthForm* TESHealthForm::GetFormAsHealthForm(TESForm* apForm) {
-    TESHealthForm* pretval = 0;
+    TESHealthForm* pretval = nullptr;
     if (apForm) {
         switch (apForm->GetFormType()) {
             case ARMO_ID: {

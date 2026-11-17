@@ -87,7 +87,7 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
     FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     AutoMemContext kContext(
-        MEM_CONTEXT_AUDIO, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 941
+        MEM_CONTEXT_AUDIO, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 941
     );
     if (Interface::IsInMenuMode()) {
         return;
@@ -95,8 +95,8 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
     NiPoint3 kRefPos = apRef->GetLocationOnReference();
     BSSoundHandle kSound;
     BSSoundHandle th_s;
-    TESSound* a5 = 0;
-    TESSound* pArmorSound = 0;
+    TESSound* a5 = nullptr;
+    TESSound* pArmorSound = nullptr;
     char bUse2DSound = 0;
     float fMaxFootstepDistance = gs_fMaxFootstepDistance_Audio.Float();
     if (Main::GetSceneIsComplex()) {
@@ -116,7 +116,7 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
     if (apRef->IsActor()) {
         Actor* pActor;
         pActor = dynamic_cast<Actor*>(apRef);
-        if (pActor->IsDead(0)) {
+        if (pActor->IsDead(false)) {
         LABEL_7:;
             return;
         }
@@ -144,18 +144,18 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
                 kSound.SetObjectToFollow(p3D);
             }
             kSound.SetVolume(0.98f);
-            kSound.Play(0);
+            kSound.Play(false);
         }
         else {
             HavokMaterialType eMaterialType = BHK_MATERIAL_STONE;
             TESObjectCELL* pInterior = TES::pInstance->pInteriorCell;
             if (!pInterior) {
                 TESWorldSpace* pSoundName_8a = TES::pInstance->pWorldSpace;
-                pInterior = pDataHandler->GetCellFromWorldCoord(kRefPos.x, kRefPos.y, pSoundName_8a, 0);
+                pInterior = pDataHandler->GetCellFromWorldCoord(kRefPos.x, kRefPos.y, pSoundName_8a, false);
             }
             char bUnderwater = 0;
             // The stairs flag is set as PlayFootstep does, but is never read here, as the game does.
-            [[maybe_unused]] bool bStairs = 0;
+            [[maybe_unused]] bool bStairs = false;
             if (!pActor->IsSwimming()) {
                 if (pInterior) {
                     double RelevantWaterHeight = pActor->GetRelevantWaterHeight();
@@ -168,12 +168,12 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
             MobileObject* v59 = (MobileObject*)pActor;
             bhkCharacterController* CharController = pActor->GetCharController();
             if (static_cast<uint8_t>(CharController->GetOnStairs())) {
-                bStairs = 1;
+                bStairs = true;
             }
             if (!TES::pInstance->pInteriorCell && (pInterior && pInterior->GetLand())) {
                 COORD_DATA coordData;
                 TESObjectLAND* Land = pInterior->GetLand();
-                Land->GetCoordData(&coordData, kRefPos, 1);
+                Land->GetCoordData(&coordData, kRefPos, true);
                 uint16_t iCoordVertex = coordData.iVertidx;
                 uint8_t pSoundName_8b = coordData.iBlock;
                 TESObjectLAND* v9 = pInterior->GetLand();
@@ -242,7 +242,7 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
                     kSound.operator=(*arHandle);
                     float* v11 = &gs_fPlayerFootVolume_Audio.Float();
                     kSound.SetVolume(*v11);
-                    kSound.Play(0);
+                    kSound.Play(false);
                 }
                 if (pArmorSound) {
                     const char* pSoundName_4a = pArmorSound->GetFilename();
@@ -252,7 +252,7 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
                     th_s.operator=(*pSoud);
                     float* v13 = &gs_fPlayerFootVolume_Audio.Float();
                     th_s.SetVolume(*v13);
-                    th_s.Play(0);
+                    th_s.Play(false);
                 }
             }
             else {
@@ -278,7 +278,7 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
                         }
                         float iCoordVertexd = RandomFloat(0.9f, 1.0f);
                         kSound.SetVolume(iCoordVertexd);
-                        kSound.Play(0);
+                        kSound.Play(false);
                     }
                 }
                 if (pArmorSound) {
@@ -297,7 +297,7 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
                         }
                         float v37 = 1.0 - RandomFloat(0.0f, 0.1f);
                         th_s.SetVolume(v37);
-                        th_s.Play(0);
+                        th_s.Play(false);
                     }
                 }
             }
@@ -318,16 +318,16 @@ void ImpactMixer::PlayGunshot(
         BSSoundHandle handl;
         BSSoundHandle handl2;
         NiPoint3 origin = NiPoint3_ZERO;
-        bool b2DAttackSound = 0;
+        bool b2DAttackSound = false;
         uint32_t iflags = 0;
         bool bin1stPerson = !pPlayer->IsActually3rdPerson();
-        bool bUseModSound = 0;
+        bool bUseModSound = false;
         float sqrDist = 3.4028235e+38f;
-        WeaponNearFarSound* pcurrImpactHandle = 0;
-        WeaponNearFarSound* poldest = 0;
-        WeaponNearFarSound* pfurthest = 0;
-        WeaponNearFarSound* psameSource = 0;
-        bool boldestIsValid = 1;
+        WeaponNearFarSound* pcurrImpactHandle = nullptr;
+        WeaponNearFarSound* poldest = nullptr;
+        WeaponNearFarSound* pfurthest = nullptr;
+        WeaponNearFarSound* psameSource = nullptr;
+        bool boldestIsValid = true;
         float fModNV = 1.0f;
         float fModNA = 1.0f;
         float fModFV = 1.0f;
@@ -353,7 +353,7 @@ void ImpactMixer::PlayGunshot(
                     ItemChange* pweap = v22->GetCurrentWeapon();
                     if (pweap) {
                         if (pweap->HasModEffectActive(11) || pweap->HasModEffectActive(16)) {
-                            bUseModSound = 1;
+                            bUseModSound = true;
                         }
                     }
                 }
@@ -361,8 +361,8 @@ void ImpactMixer::PlayGunshot(
         }
         if (apWeapon) {
             if (abPlayer) {
-                if (apWeapon->GetAttackSound2D(0)) {
-                    b2DAttackSound = 1;
+                if (apWeapon->GetAttackSound2D(false)) {
+                    b2DAttackSound = true;
                 }
             }
             if (b2DAttackSound) {
@@ -392,8 +392,8 @@ void ImpactMixer::PlayGunshot(
                 origin = aOriginNode->GetWorldTranslate();
             }
             if (apWeapon->GetAttackSound(bUseModSound)) {
-                TESSound* psound = 0;
-                TESSound* psound2 = 0;
+                TESSound* psound = nullptr;
+                TESSound* psound2 = nullptr;
                 if (b2DAttackSound) {
                     psound = apWeapon->GetAttackSound2D(bUseModSound);
                 }
@@ -407,10 +407,10 @@ void ImpactMixer::PlayGunshot(
                     return;
                 }
                 if (!bs1d) {
-                    psound = 0;
+                    psound = nullptr;
                 }
                 if (!bs2d) {
-                    psound2 = 0;
+                    psound2 = nullptr;
                 }
                 BSAudio* v4 = &BSAudio::QInstance();
                 NiPoint3* ListenerPosition = v4->GetListenerPosition(&v27);
@@ -509,13 +509,13 @@ void ImpactMixer::PlayGunshot(
                         pcurrImpactHandle->soundNear.SetPriority(1u);
                         pcurrImpactHandle->soundNear.SetPosition(origin.x, origin.y, origin.z);
                         pcurrImpactHandle->soundNear.SetVolume(fModNV);
-                        pcurrImpactHandle->soundNear.Play(0);
+                        pcurrImpactHandle->soundNear.Play(false);
                     }
                     if (psound2) {
                         pcurrImpactHandle->soundFar.SetPriority(1u);
                         pcurrImpactHandle->soundFar.SetPosition(origin.x, origin.y, origin.z);
                         pcurrImpactHandle->soundFar.SetVolume(fModFV);
-                        pcurrImpactHandle->soundFar.Play(0);
+                        pcurrImpactHandle->soundFar.Play(false);
                     }
                     if (!b2DAttackSound) {
                         float v19 = static_cast<double>(ucMaxN) * fModNA * 100.0;
@@ -544,7 +544,7 @@ const char* ImpactMixer::GetMaterialSoundName(int32_t aiMat) {
 
 void ImpactMixer::InitFootsteps() {
     if (!ImpactMixer::bFootStepInitialized) {
-        ImpactMixer::bFootStepInitialized = 1;
+        ImpactMixer::bFootStepInitialized = true;
         for (int32_t iMat = 0; iMat < 13; ++iMat) {
             for (int32_t i = 0; i < 10; ++i) {
                 char apDest[268];
@@ -581,9 +581,9 @@ void ImpactMixer::InitFootsteps() {
 
 void ImpactMixer::InitGunshots() {
     if (!ImpactMixer::GetGunshotsInitialized()) {
-        ImpactMixer::SetGunshotsInitialized(1);
+        ImpactMixer::SetGunshotsInitialized(true);
         for (int32_t i = 0; i < 20; ++i) {
-            ImpactMixer::GunshotHandles[i].uiIdentifier = 0;
+            ImpactMixer::GunshotHandles[i].uiIdentifier = nullptr;
             ImpactMixer::GunshotHandles[i].uiTimestamp = 0;
             ImpactMixer::GunshotHandles[i].fRelativeDistance = 3.4028235e+38f;
         }
@@ -591,7 +591,7 @@ void ImpactMixer::InitGunshots() {
 }
 
 void ImpactMixer::ReInitFootsteps() {
-    ImpactMixer::bFootStepInitialized = (bool)0;
+    ImpactMixer::bFootStepInitialized = false;
     ImpactMixer::InitFootsteps();
 }
 
@@ -622,7 +622,7 @@ void ImpactMixer::PlayCollisionSound(ImpactMixer::COLLISION_SOUND& arDataIn) {
     uint32_t val;
     uint32_t uiSinceLastPlayed;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_AUDIO, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 564
+        MEM_CONTEXT_AUDIO, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 564
     );
     if (arDataIn.pBody1 == arDataIn.pBody2 && arDataIn.pBody1) {}
     else {
@@ -654,14 +654,14 @@ void ImpactMixer::PlayCollisionSound(ImpactMixer::COLLISION_SOUND& arDataIn) {
         else {
             fmass2 = 5.0f;
         }
-        bool bshellCasing = 0;
-        TESSound* info = 0;
-        TESSound* info2 = 0;
+        bool bshellCasing = false;
+        TESSound* info = nullptr;
+        TESSound* info2 = nullptr;
         if ((arDataIn.pBody1 &&
              (CollisionFilter = arDataIn.pBody1->GetCollisionFilter(&apResult),
               CollisionFilter->GetLayer() == L_SHELLCASING)) ||
             (arDataIn.pBody2 && (v2 = arDataIn.pBody2->GetCollisionFilter(&v19), v2->GetLayer() == L_SHELLCASING))) {
-            bshellCasing = 1;
+            bshellCasing = true;
         }
         if (bshellCasing) {
             float fcasingMass;
@@ -683,7 +683,7 @@ void ImpactMixer::PlayCollisionSound(ImpactMixer::COLLISION_SOUND& arDataIn) {
             else {
                 info = pDataHandler->GetSound("PHYCasingShotgun");
             }
-            info2 = 0;
+            info2 = nullptr;
         }
         else {
             info = ImpactMixer::GetSoundForType(arDataIn.cMaterialType1, fmass1, arDataIn.fVelocity);
@@ -746,14 +746,14 @@ void ImpactMixer::PlayCollisionSound(ImpactMixer::COLLISION_SOUND& arDataIn) {
                     SoundHand.SetPosition(arDataIn.Location.x, arDataIn.Location.y, arDataIn.Location.z);
                     SoundHand.SetStaticAttenuation(velVol);
                     SoundHand.SetModFrequency(velFreq_2);
-                    SoundHand.Play(0);
+                    SoundHand.Play(false);
                 }
                 if (info2) {
                     SoundHand2.SetPriority(255u);
                     SoundHand2.SetPosition(arDataIn.Location.x, arDataIn.Location.y, arDataIn.Location.z);
                     SoundHand2.SetStaticAttenuation(velVol);
                     SoundHand2.SetModFrequency(velFreq_2);
-                    SoundHand2.Play(0);
+                    SoundHand2.Play(false);
                 }
                 ImpactMixer::lastloc = arDataIn.Location;
                 int32_t itimeOut = 4 * ImpactMixer::iCollisionSoundTimeDelta.Int();
@@ -771,7 +771,7 @@ void ImpactMixer::PlayCollisionSound(ImpactMixer::COLLISION_SOUND& arDataIn) {
                     }
                     if (iloopcount > 256) {
                         ImpactMixer::pImpactMap.RemoveAll_1();
-                        pos = 0;
+                        pos = nullptr;
                     }
                 }
                 kcriticalSection.Leave();
@@ -809,7 +809,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
     FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_AUDIO, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 735
+        MEM_CONTEXT_AUDIO, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 735
     );
     if (Interface::IsInMenuMode()) {
         return;
@@ -817,9 +817,9 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
     NiPoint3 loc = apRef->GetLocationOnReference();
     BSSoundHandle SoundHand;
     BSSoundHandle SoundHand2;
-    TESSound* infoGround = 0;
-    TESSound* infoShoe_3 = 0;
-    bool b1stPersonPlayerFoot = 0;
+    TESSound* infoGround = nullptr;
+    TESSound* infoShoe_3 = nullptr;
+    bool b1stPersonPlayerFoot = false;
     float ftestDistance = gs_fMaxFootstepDistance_Audio.Float();
     if (Main::GetSceneIsComplex()) {
         ftestDistance = ftestDistance / 2.0;
@@ -838,7 +838,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
     if (apRef->IsActor()) {
         MobileObject* pmob;
         pmob = static_cast<MobileObject*>(FNVD_DYNAMIC_CAST_VOID(Actor)(apRef, RTTI_TESObjectREFR, RTTI_Actor));
-        if (pmob->IsDead(0)) {
+        if (pmob->IsDead(false)) {
         LABEL_7:;
             return;
         }
@@ -866,34 +866,34 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
                 SoundHand.SetObjectToFollow(p3D);
             }
             SoundHand.SetVolume(0.98f);
-            SoundHand.Play(0);
+            SoundHand.Play(false);
         }
         else {
             HavokMaterialType groundType = BHK_MATERIAL_STONE;
             TESObjectCELL* pcell = TES::pInstance->pInteriorCell;
             if (!pcell) {
                 TESWorldSpace* aPosition_8a = TES::pInstance->pWorldSpace;
-                pcell = pDataHandler->GetCellFromWorldCoord(loc.x, loc.y, aPosition_8a, 0);
+                pcell = pDataHandler->GetCellFromWorldCoord(loc.x, loc.y, aPosition_8a, false);
             }
-            bool bWaterStep = 0;
-            bool bStairs = 0;
+            bool bWaterStep = false;
+            bool bStairs = false;
             if (!static_cast<Actor*>(pmob)->Actor::IsSwimming()) {
                 if (pcell) {
                     double RelevantWaterHeight = pmob->GetRelevantWaterHeight();
                     if (loc.z < RelevantWaterHeight &&
                         ((pcell->GetInterior() && pcell->HasWater()) || !pcell->GetInterior())) {
-                        bWaterStep = 1;
+                        bWaterStep = true;
                     }
                 }
             }
             bhkCharacterController* CharController = pmob->GetCharController();
             if (static_cast<uint8_t>(CharController->GetOnStairs())) {
-                bStairs = 1;
+                bStairs = true;
             }
             if (!TES::pInstance->pInteriorCell && (pcell && pcell->GetLand())) {
                 COORD_DATA cdata;
                 TESObjectLAND* Land = pcell->GetLand();
-                Land->GetCoordData(&cdata, loc, 1);
+                Land->GetCoordData(&cdata, loc, true);
                 uint16_t afZ = cdata.iVertidx;
                 uint8_t aPosition_8b = cdata.iBlock;
                 TESObjectLAND* v9 = pcell->GetLand();
@@ -983,7 +983,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
                 }
             }
             if (apRef == pPlayer && !pPlayer->IsActually3rdPerson()) {
-                b1stPersonPlayerFoot = 1;
+                b1stPersonPlayerFoot = true;
             }
             if (b1stPersonPlayerFoot) {
                 uint32_t iflags = BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_FOOTSTEPS |
@@ -996,7 +996,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
                     SoundHand.operator=(*SoundHandleByFilename);
                     float* v11 = &gs_fPlayerFootVolume_Audio.Float();
                     SoundHand.SetVolume(*v11);
-                    SoundHand.Play(0);
+                    SoundHand.Play(false);
                 }
                 if (infoShoe_3) {
                     const char* aPosition_4a = infoShoe_3->GetFilename();
@@ -1005,7 +1005,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
                     SoundHand2.operator=(*v42);
                     float* v13 = &gs_fPlayerFootVolume_Audio.Float();
                     SoundHand2.SetVolume(*v13);
-                    SoundHand2.Play(0);
+                    SoundHand2.Play(false);
                 }
             }
             else {
@@ -1026,7 +1026,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
                         }
                         float afZd = RandomFloat(0.9f, 1.0f);
                         SoundHand.SetVolume(afZd);
-                        SoundHand.Play(0);
+                        SoundHand.Play(false);
                     }
                 }
                 if (infoShoe_3) {
@@ -1044,7 +1044,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
                         }
                         float v37 = 1.0 - RandomFloat(0.0f, 0.1f);
                         SoundHand2.SetVolume(v37);
-                        SoundHand2.Play(0);
+                        SoundHand2.Play(false);
                     }
                 }
             }
@@ -1100,11 +1100,11 @@ void ImpactMixer::PlayWeaponBlock(
     double v11 = BSMAX(aAttacker.z, aDefender.z);
     float v27 = (v11 - BSMIN(aAttacker.z, aDefender.z)) / 2.0 + v12;
     SoundHand.SetPosition(ecx0, v26, v27);
-    SoundHand.Play(0);
+    SoundHand.Play(false);
 }
 
 TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVelocity) {
-    TESSound* info = 0;
+    TESSound* info = nullptr;
     switch (aiType) {
         case 0:
         case 15: {
@@ -1339,7 +1339,7 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 19: {
-            info = 0;
+            info = nullptr;
             break;
         }
         case 20: {
@@ -1476,11 +1476,11 @@ void ImpactMixer::PlayEquipSound(TESObjectREFR* apRef, int32_t aiType) {
     FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_AUDIO, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 1699
+        MEM_CONTEXT_AUDIO, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 1699
     );
     NiPoint3 loc = apRef->GetLocationOnReference();
     float ftestDistance = gs_fMaxFootstepDistance_Audio.Float();
-    bool b2Handed = 0;
+    bool b2Handed = false;
     Actor* pactor = dynamic_cast<Actor*>(apRef);
     if (pactor && pactor->pCurrentProcess) {
         TESObjectWEAP* pweap;
@@ -1492,16 +1492,16 @@ void ImpactMixer::PlayEquipSound(TESObjectREFR* apRef, int32_t aiType) {
             pbobj = pweapdata->pContainerObj;
         }
         else {
-            pbobj = 0;
+            pbobj = nullptr;
         }
         if (pbobj) {
             pweap = dynamic_cast<TESObjectWEAP*>(pbobj);
         }
         else {
-            pweap = 0;
+            pweap = nullptr;
         }
         if (pweap) {
-            TESSound* pactionSound = 0;
+            TESSound* pactionSound = nullptr;
             if (aiType == 9) {
                 pactionSound = pweap->GetEquipSound();
             }
@@ -1544,7 +1544,7 @@ void ImpactMixer::PlayEquipSound(TESObjectREFR* apRef, int32_t aiType) {
             else {
                 SoundHand.SetVolume(1.0f);
             }
-            SoundHand.Play(0);
+            SoundHand.Play(false);
         }
     }
 }

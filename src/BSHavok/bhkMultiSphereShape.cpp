@@ -237,12 +237,12 @@ void bhkMultiSphereShape::KillCinfo(bool abCreated) {
             if (m_capacityAndFlags >= 0) {
                 m_heap->bufFree(pi->m_spheres.begin(), sizeof(hkVector4) * m_capacityAndFlags);
             }
-            pi->m_spheres.m_data = 0;
+            pi->m_spheres.m_data = nullptr;
             pi->m_spheres.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
             MemoryManager_Singleton.Deallocate(pi);
             eMemContext = v8;
         }
-        pInfo = 0;
+        pInfo = nullptr;
     }
     v3->eMemContext = eMemContext;
 }

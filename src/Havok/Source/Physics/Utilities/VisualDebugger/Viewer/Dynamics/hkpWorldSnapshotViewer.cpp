@@ -93,12 +93,12 @@ hkProcess* hkpWorldSnapshotViewer::createNative(const hkArray<hkProcessContext*,
     hkpWorldSnapshotViewer* v2 =
         static_cast<hkpWorldSnapshotViewer*>(Instance->m_heap->blockAlloc(sizeof(hkpWorldSnapshotViewer)));
     v2->m_memSizeAndFlags = sizeof(hkpWorldSnapshotViewer);
-    hkpWorldSnapshotViewer* v3 = ::new (v2) hkpWorldSnapshotViewer(contexts, 0);
+    hkpWorldSnapshotViewer* v3 = ::new (v2) hkpWorldSnapshotViewer(contexts, false);
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -107,12 +107,12 @@ hkProcess* hkpWorldSnapshotViewer::createPC(const hkArray<hkProcessContext*, hkC
     hkpWorldSnapshotViewer* v2 =
         static_cast<hkpWorldSnapshotViewer*>(Instance->m_heap->blockAlloc(sizeof(hkpWorldSnapshotViewer)));
     v2->m_memSizeAndFlags = sizeof(hkpWorldSnapshotViewer);
-    hkpWorldSnapshotViewer* v3 = ::new (v2) hkpWorldSnapshotViewer(contexts, 1);
+    hkpWorldSnapshotViewer* v3 = ::new (v2) hkpWorldSnapshotViewer(contexts, true);
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

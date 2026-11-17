@@ -61,7 +61,7 @@ void DetectLifeEffect::Finish() {
 }
 
 void DetectLifeEffect::CheckPlayerRunningDetectLife() {
-    DetectLifeEffect::bPlayerDetectingLife = (bool)0;
+    DetectLifeEffect::bPlayerDetectingLife = false;
 }
 
 char DetectLifeEffect::GetPlayerDetectingLife() {

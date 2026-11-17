@@ -41,24 +41,24 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadGame.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 void CharacterProgressionData::Initialize() {
-    bReadyToLevelUp = (bool)0;
+    bReadyToLevelUp = false;
     iNextThreshold = (int32_t)((uint32_t)GamePlayFormulas::GetRequiredExperiencePoints(2));
-    bIgnoreCallback = (bool)0;
+    bIgnoreCallback = false;
 }
 
 bool CharacterProgressionData::CheckCanLevelUp(int32_t aiLevel) {
-    bool v5 = 0;
+    bool v5 = false;
     uint16_t Level = pPlayer->GetLevel();
     if (Level >= iMaxCharacterLevel.Int()) {
-        return 0;
+        return false;
     }
     int32_t RequiredExperiencePoints = GamePlayFormulas::GetRequiredExperiencePoints(aiLevel);
     if (pPlayer->GetActorValue(ActorValue::EXPERIENCE_POINTS) >= RequiredExperiencePoints) {
-        bReadyToLevelUp = 1;
-        return 1;
+        bReadyToLevelUp = true;
+        return true;
     }
     return v5;
 }
@@ -74,7 +74,7 @@ void CharacterProgressionData::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 }
 
 void CharacterProgressionData::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
-    bReadyToLevelUp = 0;
+    bReadyToLevelUp = false;
     iNextThreshold = GamePlayFormulas::GetRequiredExperiencePoints(2);
 }
 
@@ -99,7 +99,7 @@ void CharacterProgression::RewardExperience(int32_t aiAmount) {
         if (inew > imax) {
             iamount -= inew - imax;
         }
-        pPlayer->PermanentModActorValue(ActorValue::EXPERIENCE_POINTS, iamount, 0);
+        pPlayer->PermanentModActorValue(ActorValue::EXPERIENCE_POINTS, iamount, nullptr);
     }
 }
 
@@ -149,7 +149,7 @@ void CharacterProgression::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
 void CharacterProgression::FinishLevelUp() {
     uint16_t Level = pPlayer->GetLevel();
     if (!pData->CheckCanLevelUp(Level + 1)) {
-        pData->bReadyToLevelUp = 0;
+        pData->bReadyToLevelUp = false;
         pDataHandler->UpdateAutoCalcNPCs();
         ReferenceProcessLists.InitActorLeveledItems();
         if (XGamerProfile::Instance()) {
@@ -167,10 +167,10 @@ void CharacterProgression::ForceLevel(int32_t aiLevel) {
         CharacterProgressionData* pdata = pPlayer->GetCharacterProgressionInfo()->pData;
         int32_t icurrentXP = pPlayer->GetActorValue(ActorValue::EXPERIENCE_POINTS);
         int32_t idelta = GamePlayFormulas::GetRequiredExperiencePoints(aiLevel - 1) - icurrentXP;
-        pdata->bIgnoreCallback = 1;
-        pPlayer->PermanentModActorValue(ActorValue::EXPERIENCE_POINTS, idelta, static_cast<Actor*>(0));
-        pdata->bIgnoreCallback = 0;
-        pdata->bReadyToLevelUp = 0;
+        pdata->bIgnoreCallback = true;
+        pPlayer->PermanentModActorValue(ActorValue::EXPERIENCE_POINTS, idelta, static_cast<Actor*>(nullptr));
+        pdata->bIgnoreCallback = false;
+        pdata->bReadyToLevelUp = false;
         pdata->iNextThreshold = GamePlayFormulas::GetRequiredExperiencePoints(aiLevel + 1);
         pPlayer->GetActorBase()->SetLevel(aiLevel);
         FinishLevelUp();

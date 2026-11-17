@@ -34,8 +34,8 @@ void CombatProcedureUseCombatItem::Update() {
     LABEL_8:;
         pCombatState->UsedCombatItem(pItem);
         if (pItem->GetFormType() == 47) {
-            pActor->DrinkPotion(static_cast<AlchemyItem*>(pItem), 0, 1);
-            pCombatState->SetInventoryDirty(1);
+            pActor->DrinkPotion(static_cast<AlchemyItem*>(pItem), nullptr, true);
+            pCombatState->SetInventoryDirty(true);
         }
         else {
             const char* FormTypeString = pItem->GetFormTypeString();
@@ -45,11 +45,11 @@ void CombatProcedureUseCombatItem::Update() {
         return;
     }
     Animation* pAnimation = pActor->GetAnimation();
-    if (!pAnimation || (pAnimation->SpecialIdleDonePlaying() && !pAnimation->IsIdleNotLoaded(0))) {
+    if (!pAnimation || (pAnimation->SpecialIdleDonePlaying() && !pAnimation->IsIdleNotLoaded(nullptr))) {
         if (!bAnimating) {
             pProcess = static_cast<LowProcess*>(pActor->GetCurrentAIProcess());
-            static_cast<HighProcess*>(pProcess)->HighProcess::FindSpecialIdletoPlay(pActor, pItem, 0);
-            bAnimating = 1;
+            static_cast<HighProcess*>(pProcess)->HighProcess::FindSpecialIdletoPlay(pActor, pItem, nullptr);
+            bAnimating = true;
             return;
         }
         goto LABEL_8;

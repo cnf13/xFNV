@@ -86,11 +86,11 @@ void bhkMultithreadedSystem::QuitMTSystem() {
             Instance->m_heap->blockFree(pJobQueue, sizeof(hkJobQueue));
         }
         hkJobThreadPool* pJobThreadPool = this->pJobThreadPool;
-        this->pJobQueue = 0;
+        this->pJobQueue = nullptr;
         if (pJobThreadPool) {
             pJobThreadPool->removeReference();
         }
-        this->pJobThreadPool = 0;
+        this->pJobThreadPool = nullptr;
         uiMTResourceOwner = 0;
         v2->eMemContext = eMemContext;
     }

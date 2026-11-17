@@ -12,7 +12,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiSingleShaderMaterial.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiSingleShaderMaterialLibrary::NiSingleShaderMaterialLibrary()
   : NiMaterialLibrary(NiFixedString("NiSingleShaderMaterialLibrary")), m_pkLastLibrary(nullptr), m_uiLastDesc(0) {}
@@ -122,5 +122,5 @@ void NiSingleShaderMaterialLibrary::_SDMShutdown() {
     if (NiSingleShaderMaterialLibrary::ms_pkThis) {
         delete NiSingleShaderMaterialLibrary::ms_pkThis;
     }
-    NiSingleShaderMaterialLibrary::ms_pkThis = 0;
+    NiSingleShaderMaterialLibrary::ms_pkThis = nullptr;
 }

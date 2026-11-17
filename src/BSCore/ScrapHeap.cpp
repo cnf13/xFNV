@@ -136,7 +136,7 @@ void ScrapHeap::Clean(bool abCheck) {
     }
 #endif
     pCurrentStackLoc = pMemHeap;
-    pLastBlock = 0;
+    pLastBlock = nullptr;
 }
 
 // Hands the buffer back to the manager.
@@ -226,7 +226,7 @@ char* ScrapHeapManager::RequestBuffer(uint32_t& ariRequestedInitialSize) {
         uiLargestBufferIndex = 0;
         uiLargestAvailableSize = 0;
         for (auiBuffer = 0; auiBuffer < iBufferCount; ++auiBuffer) {
-            if (Buffers[auiBuffer].uiCommittedSize >= (ariRequestedInitialSize)) {
+            if (Buffers[auiBuffer].uiCommittedSize >= ariRequestedInitialSize) {
                 ariRequestedInitialSize = Buffers[auiBuffer].uiCommittedSize;
                 pMemory = static_cast<int8_t*>(static_cast<void*>(Buffers[auiBuffer].pBuffer));
                 RemoveBuffer(auiBuffer);
@@ -244,7 +244,7 @@ char* ScrapHeapManager::RequestBuffer(uint32_t& ariRequestedInitialSize) {
         RemoveBuffer(uiLargestBufferIndex);
         ExpandBuffer(
             static_cast<char*>(static_cast<void*>(a1)), uiLargestAvailableSize,
-            (ariRequestedInitialSize)-uiLargestAvailableSize
+            ariRequestedInitialSize - uiLargestAvailableSize
         );
         if (!(--BufferLock.uiLockCount)) {
             BufferLock.uiOwningThread = (uint32_t)0;
@@ -341,8 +341,8 @@ void ScrapHeapManager::ExpandBuffer(char* apBuffer, uint32_t aiBufferSize, uint3
     bool ballowSystemAlloc;
     int32_t imemoryPass = 0;
     while (!platform::Commit(&apBuffer[aiBufferSize], aiAdditionalSize)) {
-        ballowSystemAlloc = 1;
-        imemoryPass = MemoryManager_Singleton.ProcessMemoryProblem(0, imemoryPass, &ballowSystemAlloc);
+        ballowSystemAlloc = true;
+        imemoryPass = MemoryManager_Singleton.ProcessMemoryProblem(nullptr, imemoryPass, &ballowSystemAlloc);
     }
 }
 

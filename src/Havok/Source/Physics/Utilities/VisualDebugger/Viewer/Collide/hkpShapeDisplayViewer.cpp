@@ -86,7 +86,7 @@ const hkpShape* getUserShape(char a1, uint8_t* arg4, hkpEntity* r_eax) {
             }
             else {
                 *arg4 = 1;
-                return 0;
+                return nullptr;
             }
         }
         else {
@@ -103,7 +103,7 @@ const hkpShape* getUserShape(char a1, uint8_t* arg4, hkpEntity* r_eax) {
             }
             else {
                 *arg4 = 1;
-                return 0;
+                return nullptr;
             }
         }
     }
@@ -434,26 +434,26 @@ void hkpShapeDisplayViewer::setAutoGeometryCreation(bool on) {
 void hkpShapeDisplayViewer::addWorld(hkpWorld* world) {
     hkpEntityListener* entityListener;
     hkpWorldPostSimulationListener* postSimListener;
-    WorldToEntityData* wed = 0;
+    WorldToEntityData* wed = nullptr;
     if (this) {
         entityListener = static_cast<hkpEntityListener*>(this);
     }
     else {
-        entityListener = 0;
+        entityListener = nullptr;
     }
     world->addEntityListener(entityListener);
     if (this) {
         postSimListener = static_cast<hkpWorldPostSimulationListener*>(this);
     }
     else {
-        postSimListener = 0;
+        postSimListener = nullptr;
     }
     world->addWorldPostSimulationListener(postSimListener);
     hkMemoryRouter* router = &hkMemoryRouter::getInstance();
     WorldToEntityData* mem = static_cast<WorldToEntityData*>(router->m_heap->blockAlloc(sizeof(WorldToEntityData)));
     if (mem) {
         // EXE-INLINED none: hkpShapeDisplayViewer::WorldToEntityData::WorldToEntityData
-        mem->entitiesCreated.m_data = 0;
+        mem->entitiesCreated.m_data = nullptr;
         mem->entitiesCreated.m_size = 0;
         mem->entitiesCreated.m_capacityAndFlags = hkArrayBase<hkUlong>::DONT_DEALLOCATE_FLAG;
         wed = mem;
@@ -511,7 +511,7 @@ void hkpShapeDisplayViewer::removeWorld(int32_t i) {
         v3 = static_cast<hkpEntityListener*>(this);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     m_worldEntities.m_data[i]->world->removeEntityListener(v3);
     m_worldEntities.m_data[i]->world->removeWorldPostSimulationListener(this);
@@ -524,7 +524,7 @@ void hkpShapeDisplayViewer::removeWorld(int32_t i) {
         if (m_capacityAndFlags >= 0) {
             m_heap->bufFree(v4->entitiesCreated.begin(), static_cast<int32_t>(sizeof(hkUlong)) * m_capacityAndFlags);
         }
-        v4->entitiesCreated.m_data = 0;
+        v4->entitiesCreated.m_data = nullptr;
         v4->entitiesCreated.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
         Instance->m_heap->blockFree(v4, sizeof(hkpShapeDisplayViewer::WorldToEntityData));
@@ -560,7 +560,7 @@ hkProcess* hkpShapeDisplayViewer::create(const hkArray<hkProcessContext*, hkCont
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

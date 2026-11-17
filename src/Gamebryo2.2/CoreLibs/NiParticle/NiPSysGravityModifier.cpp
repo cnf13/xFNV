@@ -246,7 +246,7 @@ void NiPSysGravityModifier::Update(float fTime, NiPSysData* pkData) {
                     else {
                         fExponent = fDist * -m_fDecay;
                     }
-                    float fDecay = static_cast<float>(std::exp(fExponent));
+                    float fDecay = std::exp(fExponent);
                     float fScale = fDecay * fStrength * (fTime - pkInfo->m_fLastUpdate);
                     float fAddX = kDir.x * fScale;
                     float fAddY = kDir.y * fScale;
@@ -278,7 +278,7 @@ void NiPSysGravityModifier::Update(float fTime, NiPSysData* pkData) {
                     else {
                         fExponent = fDist * -m_fDecay;
                     }
-                    float fDecay = static_cast<float>(std::exp(fExponent));
+                    float fDecay = std::exp(fExponent);
                     float fDecayX = fGravX * fDecay;
                     float fDecayY = fGravY * fDecay;
                     float fDecayZ = fGravZ * fDecay;
@@ -351,7 +351,7 @@ void NiPSysGravityModifier::Update(float fTime, NiPSysData* pkData) {
                     kToCenter.y = kGravityToPSys.m_Translate.y - pkPosition->y;
                     kToCenter.z = kGravityToPSys.m_Translate.z - pkPosition->z;
                     float fExponent = kToCenter.UnitizeGetLength() * -m_fDecay;
-                    float fDecay = static_cast<float>(std::exp(fExponent));
+                    float fDecay = std::exp(fExponent);
                     float fScale = fDecay * fStrength * (fTime - pkInfo->m_fLastUpdate);
                     float fAddX = kToCenter.x * fScale;
                     float fAddY = kToCenter.y * fScale;
@@ -377,7 +377,7 @@ void NiPSysGravityModifier::Update(float fTime, NiPSysData* pkData) {
                     kToCenter.y = kGravityToPSys.m_Translate.y - pkPosition->y;
                     kToCenter.z = kGravityToPSys.m_Translate.z - pkPosition->z;
                     float fExponent = kToCenter.UnitizeGetLength() * -m_fDecay;
-                    float fDecay = static_cast<float>(std::exp(fExponent));
+                    float fDecay = std::exp(fExponent);
                     float fDecayX = fGravX * fDecay;
                     float fDecayY = fGravY * fDecay;
                     float fDecayZ = fGravZ * fDecay;

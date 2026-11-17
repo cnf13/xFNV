@@ -31,18 +31,18 @@ void BGSMoviePlayer::MuteAudio() {
     BSAudio* singleton = &BSAudio::QInstance();
     if (!singleton->bMultiThread) {
         v1 = static_cast<BSWin32Audio*>(&BSAudio::QInstance());
-        v1->SetMultiThreaded(1);
-        BGSMoviePlayer::bAudioThreading = (bool)1;
+        v1->SetMultiThreaded(true);
+        BGSMoviePlayer::bAudioThreading = true;
     }
     BSWin32Audio* v2 = static_cast<BSWin32Audio*>(&BSAudio::QInstance());
     v2->PauseWorldSounds();
     BSAudio* v3 = &BSAudio::QInstance();
     if (!v3->bMultiThread) {
-        BGSMoviePlayer::bAudioThreading = (bool)0;
+        BGSMoviePlayer::bAudioThreading = false;
         v4 = &BSAudio::QInstance();
-        v4->Update(1);
+        v4->Update(true);
         v5 = &BSAudio::QInstance();
-        v5->Update(1);
+        v5->Update(true);
     }
 }
 
@@ -53,8 +53,8 @@ void BGSMoviePlayer::UnmuteAudio() {
         singleton = &BSAudio::QInstance();
         if (singleton->bMultiThread) {
             v1 = static_cast<BSWin32Audio*>(&BSAudio::QInstance());
-            v1->SetMultiThreaded(0);
-            BGSMoviePlayer::bAudioThreading = (bool)0;
+            v1->SetMultiThreaded(false);
+            BGSMoviePlayer::bAudioThreading = false;
         }
     }
     BSWin32Audio* v2 = static_cast<BSWin32Audio*>(&BSAudio::QInstance());
@@ -117,26 +117,26 @@ uint32_t BGSMoviePlayer::GetMainThreadID() {
 
 bool BGSMoviePlayer::CheckContinuePlaying(bool abAllowInterruption) {
     if (!MoviePlayer::CheckContinuePlaying(abAllowInterruption)) {
-        return 0;
+        return false;
     }
     NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
     IDirect3DDevice9* D3DDevice = Renderer_->GetD3DDevice();
     if (D3DDevice->TestCooperativeLevel() < 0) {
-        return 0;
+        return false;
     }
     if (!abAllowInterruption && !bWaitingForSequenceToEnd) {
-        return 1;
+        return true;
     }
     Controls* Controls_ = appMain->GetControls();
     Controls_->UpdateValues();
     if (!Controls_->GetUserAction(Controls::UACTN_ACTIVATE, 1) && !Controls_->GetUserAction(Controls::UACTN_UP, 1)) {
-        return 1;
+        return true;
     }
     if (GetPlayingSequence()) {
         StopSequence();
     }
     Controls_->UpdateValues();
-    return 0;
+    return false;
 }
 
 bool BGSMoviePlayer::IsPlaying() {
@@ -144,7 +144,7 @@ bool BGSMoviePlayer::IsPlaying() {
 }
 
 char BGSMoviePlayer::GetMoviePath(const char* apMovieName, char* pcDest) {
-    char* ppath = 0;
+    char* ppath = nullptr;
     if (!BinkPaths.GetAt(apMovieName, ppath)) {
         return 0;
     }
@@ -159,14 +159,14 @@ void BGSMoviePlayer::operator delete(void* apMemory) {
 void BGSMoviePlayer::Create() {
     BGSMoviePlayer* v0;
     AutoMemContext apMemory(
-        MEM_CONTEXT_MOVIEPLAYER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\BGSMoviePlayer.cpp", 28
+        MEM_CONTEXT_MOVIEPLAYER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\BGSMoviePlayer.cpp", 28
     );
     BGSMoviePlayer* v1 = static_cast<BGSMoviePlayer*>(ourMalloc(sizeof(BGSMoviePlayer)));
     if (v1) {
         v0 = ::new (v1) BGSMoviePlayer;
     }
     else {
-        v0 = 0;
+        v0 = nullptr;
     }
     pMoviePlayer = v0;
 }
@@ -175,5 +175,5 @@ void BGSMoviePlayer::Destroy() {
     if (pMoviePlayer) {
         delete pMoviePlayer;
     }
-    pMoviePlayer = 0;
+    pMoviePlayer = nullptr;
 }

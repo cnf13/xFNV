@@ -164,14 +164,10 @@ void hkpSphereMotion::getProjectedPointVelocity(
     __m128 v9 = _mm_sub_ps(v6, v7);
     __m128 v10 = _mm_mul_ps(m_angularVelocity.m_quad, v9);
     __m128 v11 = _mm_mul_ps(v9, v9);
-    velOut = static_cast<float>(
-                 _mm_shuffle_ps(v10, v10, 170)[0] + static_cast<float>(_mm_shuffle_ps(v10, v10, 85)[0] + v10[0])
-             ) +
-        static_cast<float>(_mm_shuffle_ps(v8, v8, 170)[0] + static_cast<float>(_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]));
+    velOut = (_mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0])) +
+        (_mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]));
     invVirtMassOut = m_inertiaAndMassInv.m_quad[0] *
-            static_cast<float>(
-                         _mm_shuffle_ps(v11, v11, 170)[0] + static_cast<float>(_mm_shuffle_ps(v11, v11, 85)[0] + v11[0])
-            ) +
+            (_mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0])) +
         m_inertiaAndMassInv.m_quad[3];
 }
 

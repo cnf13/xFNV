@@ -79,7 +79,7 @@ void BGSSaveLoadFile::SetSaveFileName(const char* apFileName) {
 }
 
 bool BGSSaveLoadFile::Open() {
-    return pSaveLoadManager->GetSimulatedMode() || pFile->Open(0, 0);
+    return pSaveLoadManager->GetSimulatedMode() || pFile->Open(false, false);
 }
 
 int32_t BGSSaveLoadFile::SaveGlobalDataRange(BGSSaveLoadFile* apFile, uint32_t aiStart, uint32_t aiEnd) {
@@ -154,12 +154,12 @@ void BGSSaveLoadFileEntry::DeleteGame() {
 }
 
 bool BGSSaveLoadFileEntry::LoadGame() {
-    return (bool)((uint8_t)pSaveLoadManager->LoadGame(pFileName, iDeviceID, 0, 0));
+    return (bool)((uint8_t)pSaveLoadManager->LoadGame(pFileName, iDeviceID, false, false));
 }
 
 bool BGSSaveLoadFileEntry::IsCorrupt() {
     if (bCorrupt) {
-        return (bool)1;
+        return true;
     }
     LoadData();
     return (bool)((uint8_t)bCorrupt);
@@ -203,7 +203,7 @@ bool BGSSaveLoadFileEntry::IsAutosave() {
 void BGSSaveLoadFileEntry::CalculateFileTime() {
     if (!FileTime.dwHighDateTime && !FileTime.dwLowDateTime) {
         char FileName[264];
-        pSaveLoadManager->GetFullPath(pFileName, FileName, 0);
+        pSaveLoadManager->GetFullPath(pFileName, FileName, false);
         std::vector<platform::FileEntry> kFound = platform::FindFiles(FileName);
         if (!kFound.empty()) {
             FileTime.dwLowDateTime = static_cast<uint32_t>(kFound.front().writeTime);

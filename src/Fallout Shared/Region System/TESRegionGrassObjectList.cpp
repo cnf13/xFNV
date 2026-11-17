@@ -30,10 +30,10 @@ void TESRegionGrassObjectList::Clear() {
 
 bool TESRegionGrassObjectList::Add(TESRegionGrassObject* apObject) {
     if (!apObject || IsInList(apObject)) {
-        return 0;
+        return false;
     }
     AddTailSimple(apObject);
-    return 1;
+    return true;
 }
 
 TESRegionGrassObjectList* TESRegionGrassObjectList::Copy(TESRegionGrassObjectList* apCopyInto) {
@@ -43,7 +43,7 @@ TESRegionGrassObjectList* TESRegionGrassObjectList::Copy(TESRegionGrassObjectLis
         pcurrent = static_cast<BSSimpleList<TESRegionGrassObject*>*>(this);
     }
     else {
-        pcurrent = 0;
+        pcurrent = nullptr;
     }
     BSSimpleList<TESRegionGrassObject*>* pcurrent_2 = pcurrent;
     if (apCopyInto) {
@@ -57,14 +57,14 @@ TESRegionGrassObjectList* TESRegionGrassObjectList::Copy(TESRegionGrassObjectLis
             pcopy_2 = ::new (apMemory) TESRegionGrassObjectList(bOwnsTESRegionGrassObjectMemory);
         }
         else {
-            pcopy_2 = 0;
+            pcopy_2 = nullptr;
         }
         pcopy = pcopy_2;
     }
     while (pcurrent_2 && pcurrent_2->m_item) {
         if (pcopy->bOwnsTESRegionGrassObjectMemory) {
             TESRegionGrassObject** v2 = &pcurrent_2->m_item;
-            TESRegionGrassObject* pobjCopy = (*v2)->Copy(0);
+            TESRegionGrassObject* pobjCopy = (*v2)->Copy(nullptr);
             if (!pcopy->Add(pobjCopy)) {
                 if (pobjCopy) {
                     delete pobjCopy;
@@ -106,7 +106,7 @@ void TESRegionGrassObjectList::MergeLists(
                  pcurrent && pcurrent->m_item; pcurrent = pcurrent->m_pkNext) {
                 TESRegionGrassObject* m_item = pcurrent->m_item;
                 if (m_item->GetObject()) {
-                    TESRegionGrassObject* pobjCopy = pcurrent->m_item->Copy(0);
+                    TESRegionGrassObject* pobjCopy = pcurrent->m_item->Copy(nullptr);
                     Add(pobjCopy);
                 }
             }
@@ -120,10 +120,10 @@ TESRegionGrassObject* TESRegionGrassObjectList::Find(uint32_t aiFind, int32_t ai
         v7 = static_cast<BSSimpleList<TESRegionGrassObject*>*>(this);
     }
     else {
-        v7 = 0;
+        v7 = nullptr;
     }
     BSSimpleList<TESRegionGrassObject*>* ecx0 = v7;
-    TESRegionGrassObject* v9 = 0;
+    TESRegionGrassObject* v9 = nullptr;
     while (ecx0 && ecx0->m_item) {
         TESRegionGrassObject** v3 = &ecx0->m_item;
         TESRegionGrassObject* v10 = *v3;

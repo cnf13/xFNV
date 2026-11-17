@@ -37,7 +37,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Reconstruction.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiPointer<NiNode> PathSmootherPOVSearch::spRootDrawNode;
 
@@ -173,7 +173,7 @@ bool PathSmootherPOVSearch::GetNodeConnections(
     for (uint32_t kk = 0; kk < v29; ++kk) {
         CheckAndAddNodeConnection(apNode, AvoidNodePOVs.GetAt(kk), apRetNodes);
     }
-    return 1;
+    return true;
 }
 
 // The search ends at the goal's point of view.
@@ -199,7 +199,7 @@ void PathSmootherPOVSearch::CheckAddPOVForVert(
         uint16_t usPrev = aVerts.GetAt(aiIndex - 1).Vert.usVertex;
         kToPrev = aVerts.GetAt(aiIndex - 1).Vert.pNavMesh->GetVertex(usPrev)->Location - kVertex;
     }
-    if (aiIndex == static_cast<uint32_t>(aVerts.GetSize() - 1)) {
+    if (aiIndex == (aVerts.GetSize() - 1)) {
         kToNext = GoalLocation - kVertex;
     }
     else {
@@ -213,7 +213,7 @@ void PathSmootherPOVSearch::CheckAddPOVForVert(
     NiPoint3 kCross = abLeft ? kToPrev.Cross(kToNext) : kToNext.Cross(kToPrev);
     float fDot = kToNext.Dot(kToPrev);
     bool bAdd = false;
-    if (aiIndex == 0 || aiIndex == static_cast<uint32_t>(aVerts.GetSize() - 1)) {
+    if (aiIndex == 0 || aiIndex == (aVerts.GetSize() - 1)) {
         bAdd = true;
     }
     else if (fDot > 0.0) {
@@ -559,7 +559,7 @@ bool PathSmootherPOVSearch::CheckSegmentAgainstNavMesh(
             FastNavMeshEdgeLocation* v6 = FNVD_RECONSTRUCT(FastNavMeshEdgeLocation)(&apMemory, currentEdge, end);
             apReturnLocation->Copy(*v6);
             afRetPercentPreferred = static_cast<double>(ipreferredCount) / static_cast<double>(icount);
-            return 1;
+            return true;
         }
         FastNavMeshEdgeHandle thisEdge(currentEdge.pNavMesh, currentEdge.usTriangle, newEdge);
         ::new (&otherEdge) NiBound;
@@ -568,14 +568,14 @@ bool PathSmootherPOVSearch::CheckSegmentAgainstNavMesh(
             EdgeExtraInfo* pextra = thisEdge.pNavMesh->GetEdgeExtraInfo(thisEdge.usTriangle, thisEdge.iEdgeIndex);
             if (pextra) {
                 if (pextra->eType == EIT_LEDGE_UP) {
-                    bfoundMatchingEdge = 0;
+                    bfoundMatchingEdge = false;
                 }
             }
             double Speed = pRequest->fActorRadius;
             if (fPathingLargeActorRadius.Float() < Speed) {
                 NavMeshTriangle* v8 = otherEdge.pNavMesh->GetTriangle(otherEdge.usTriangle);
                 if (v8->IsNoLargeCreature()) {
-                    bfoundMatchingEdge = 0;
+                    bfoundMatchingEdge = false;
                 }
             }
         }
@@ -587,7 +587,7 @@ bool PathSmootherPOVSearch::CheckSegmentAgainstNavMesh(
             FastNavMeshEdgeLocation* v11 = FNVD_RECONSTRUCT(FastNavMeshEdgeLocation)(&v16, thisEdge, intersection);
             apReturnLocation->Copy(*v11);
             afRetPercentPreferred = static_cast<double>(ipreferredCount) / static_cast<double>(icount);
-            return 0;
+            return false;
         }
         if (currentEdge.pNavMesh != otherEdge.pNavMesh) {
             NiPoint3 v17;
@@ -609,7 +609,7 @@ bool PathSmootherPOVSearch::CheckSegmentAgainstNavMesh(
     else {
         afRetPercentPreferred = static_cast<double>(ipreferredCount) / static_cast<double>(icount);
     }
-    return 0;
+    return false;
 }
 
 bool PathSmootherPOVSearch::DoubleCheckArcAgainstNavMesh(
@@ -909,9 +909,9 @@ bool PathSmootherPOVSearch::SmoothPath(
     aNodeData.Direction = AD_CCW;
     float v25 = (GoalLocation - StartLocation).Length() * 0.75;
     AddStartNode(GetKeyForNode(pStartPov, AD_CCW), aNodeData, v25);
-    Nodes.Clear(0);
-    Links.Clear(0);
-    bool bres = Search(&Nodes, &Links, 1);
+    Nodes.Clear(false);
+    Links.Clear(false);
+    bool bres = Search(&Nodes, &Links, true);
     if (!bres) {
         CheckForLastNode();
         if (apBadNodeArray) {
@@ -970,7 +970,7 @@ void PathSmootherPOVSearch::BuildPOVList() {
             protateNode = ::new (apMemory) PathSmootherPOV;
         }
         else {
-            protateNode = 0;
+            protateNode = nullptr;
         }
         PathSmootherPOV* a2 = protateNode;
         protateNode->eType = PathSmootherPOV::POV_TYPE_AVOIDNODE;
@@ -988,7 +988,7 @@ void PathSmootherPOVSearch::BuildPOVList() {
             protateNode2 = ::new (v33) PathSmootherPOV;
         }
         else {
-            protateNode2 = 0;
+            protateNode2 = nullptr;
         }
         PathSmootherPOV* aItem = protateNode2;
         protateNode2->eType = PathSmootherPOV::POV_TYPE_AVOIDNODE;
@@ -1005,7 +1005,7 @@ void PathSmootherPOVSearch::BuildPOVList() {
             protateNode3 = ::new (v26) PathSmootherPOV;
         }
         else {
-            protateNode3 = 0;
+            protateNode3 = nullptr;
         }
         PathSmootherPOV* v43 = protateNode3;
         protateNode3->eType = PathSmootherPOV::POV_TYPE_AVOIDNODE;
@@ -1038,7 +1038,7 @@ void PathSmootherPOVSearch::AddPOVsFromStaticAvoidNodes() {
                 psmallerPov = ::new (apMemory) PathSmootherPOV;
             }
             else {
-                psmallerPov = 0;
+                psmallerPov = nullptr;
             }
             PathSmootherPOV* pPov = psmallerPov;
             pPov->eType = PathSmootherPOV::POV_TYPE_AVOIDNODE;
@@ -1065,7 +1065,7 @@ void PathSmootherPOVSearch::CreatePathingNodes(bool abFailed) {
         NiPoint3* pExitPoint = &Links.GetAt(static_cast<int32_t>(i)).ExitLocation.Location;
         NiPoint3 delta = Links.GetAt(static_cast<int32_t>(i)).EntryLocation.Location - *pExitPoint;
         float flength = delta.Length();
-        bool baddExitNode = 1;
+        bool baddExitNode = true;
         if (i) {
             AngleSinCos* pPrevEntryAngle = &Links.GetAt(static_cast<int32_t>(i - 1)).EntryAngle;
             AngleSinCos angleDiff = Links.GetAt(static_cast<int32_t>(i)).ExitAngle - *pPrevEntryAngle;
@@ -1075,7 +1075,7 @@ void PathSmootherPOVSearch::CreatePathingNodes(bool abFailed) {
             double Angle = angleDiff.GetAngle();
             if (Nodes.GetAt(static_cast<int32_t>(i)).pPOV->fRadius * Angle < 50.0 &&
                 toleranceArc.WithinRange(angleDiff)) {
-                baddExitNode = 0;
+                baddExitNode = false;
             }
             if (bUnderWaterPath) {
                 TESObjectCELL* pCell = Links.GetAt(static_cast<int32_t>(i)).ExitLocation.pNavMesh->pParentCell;
@@ -1199,7 +1199,7 @@ void PathSmootherPOVSearch::AddStartPOV() {
         v2 = ::new (apMemory) PathSmootherPOV;
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     pStartPov = v2;
     pStartPov->eType = PathSmootherPOV::POV_TYPE_START;
@@ -1219,7 +1219,7 @@ void PathSmootherPOVSearch::AddGoalPOV() {
         v2 = ::new (apMemory) PathSmootherPOV;
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     pGoalPov = v2;
     pGoalPov->eType = PathSmootherPOV::POV_TYPE_GOAL;
@@ -1237,8 +1237,8 @@ void PathSmootherPOVSearch::AddGoalPOV() {
 // previous triangle's matching edge when it shares neither). Then the POVs are taken and each side's POV is linked to
 // the next POV on the other side.
 void PathSmootherPOVSearch::AddPOVsFromTrianglePath() {
-    LeftVerts.Clear(0);
-    RightVerts.Clear(0);
+    LeftVerts.Clear(false);
+    RightVerts.Clear(false);
     for (uint32_t i = 0; i < Edges->iSize; ++i) {
         int32_t iEdgeIndex = (*Edges)[i].iEdgeIndex;
         uint16_t sTriangle = (*Edges)[i].sTriangle;
@@ -1310,10 +1310,10 @@ void PathSmootherPOVSearch::AddPOVsFromTrianglePath() {
         }
     }
     for (uint32_t i_2 = 0; i_2 < LeftVerts.iSize; ++i_2) {
-        CheckAddPOVForVert(LeftVerts, i_2, 1);
+        CheckAddPOVForVert(LeftVerts, i_2, true);
     }
     for (uint32_t i_3 = 0; i_3 < RightVerts.iSize; ++i_3) {
-        CheckAddPOVForVert(RightVerts, i_3, 0);
+        CheckAddPOVForVert(RightVerts, i_3, false);
     }
     for (uint32_t j = 0; j < LeftVerts.iSize; ++j) {
         if ((&LeftVerts.GetAt(static_cast<int32_t>(j)))->iPOVIndex != -1) {
@@ -1383,7 +1383,7 @@ void PathSmootherPOVSearch::AddGoalPOVsForGoalsOnNavMeshEdge() {
             ppov = ::new (apMemory) PathSmootherPOV;
         }
         else {
-            ppov = 0;
+            ppov = nullptr;
         }
         PathSmootherPOV* ppov_2 = ppov;
         ppov->eType = PathSmootherPOV::POV_TYPE_AVOIDNODE;
@@ -1402,7 +1402,7 @@ void PathSmootherPOVSearch::AddGoalPOVsForGoalsOnNavMeshEdge() {
             ppov2 = ::new (v45) PathSmootherPOV;
         }
         else {
-            ppov2 = 0;
+            ppov2 = nullptr;
         }
         PathSmootherPOV* ppov2_2 = ppov2;
         ppov2->eType = PathSmootherPOV::POV_TYPE_AVOIDNODE;
@@ -1432,7 +1432,7 @@ void PathSmootherPOVSearch::AddGoalPOVsForGoalsOnNavMeshEdge() {
             ppov_3 = ::new (v40) PathSmootherPOV;
         }
         else {
-            ppov_3 = 0;
+            ppov_3 = nullptr;
         }
         PathSmootherPOV* ppov_4 = ppov_3;
         ppov_3->eType = PathSmootherPOV::POV_TYPE_AVOIDNODE;
@@ -1451,7 +1451,7 @@ void PathSmootherPOVSearch::AddGoalPOVsForGoalsOnNavMeshEdge() {
             ppov2_3 = ::new (v35) PathSmootherPOV;
         }
         else {
-            ppov2_3 = 0;
+            ppov2_3 = nullptr;
         }
         PathSmootherPOV* ppov2_4 = ppov2_3;
         ppov2_3->eType = PathSmootherPOV::POV_TYPE_AVOIDNODE;
@@ -1706,7 +1706,7 @@ Sphere::Sphere(const NiPoint3& a1, float a2) : Center(a1), fRadius(a2) {}
 
 PathingNode* PathingSolution::GetLastNode() {
     if (CurrentPathingNodes.IsEmpty()) {
-        return 0;
+        return nullptr;
     }
     else {
         return static_cast<PathingNode*>(CurrentPathingNodes.GetTail());

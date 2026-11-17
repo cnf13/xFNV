@@ -29,8 +29,8 @@ NiObject* NiAmbientLight::CreateClone(NiCloningProcess& kCloning) {
         return v3;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -67,7 +67,7 @@ void NiAmbientLight::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
 NiObject* NiAmbientLight::CreateObject() {
     NiAmbientLight* v0 = static_cast<NiAmbientLight*>(NiMemObject::operator new(sizeof(NiAmbientLight)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiAmbientLight;
 }

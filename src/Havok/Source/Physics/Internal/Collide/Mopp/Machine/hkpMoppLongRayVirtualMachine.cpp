@@ -41,7 +41,7 @@ void hkpMoppLongRayVirtualMachine::queryLongRay(
     m_collection = collection;
     m_collector = &collector;
     m_body = &body;
-    m_rayResultPtr = 0;
+    m_rayResultPtr = nullptr;
     m_earlyOutHitFraction = collector.m_earlyOutHitFraction;
     m_code = code;
     uint8_t* m_data = code->m_data.m_data;

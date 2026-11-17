@@ -231,7 +231,7 @@ void hkpBvAgent::cleanup(hkpConstraintOwner& constraintOwner) {
     hkpCollisionAgent* m_childAgent = this->m_childAgent;
     if (m_childAgent) {
         m_childAgent->cleanup(constraintOwner);
-        this->m_childAgent = 0;
+        this->m_childAgent = nullptr;
     }
     delete this;
 }

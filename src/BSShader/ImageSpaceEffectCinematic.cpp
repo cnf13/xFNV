@@ -92,7 +92,7 @@ bool ImageSpaceEffectCinematic::UpdateParams(ImageSpaceEffectParam* pParam) {
     m_pObject->SetPixelConstants(1, &v14);
     m_pObject->SetPixelConstants(2, &v16);
     m_pObject->SetPixelConstants(3, &v15);
-    return 0;
+    return false;
 }
 
 // Night eye: the brightness is the larger of the two (pfData's when unordered), the night-eye colour replaces

@@ -253,7 +253,7 @@ bool TESTopic::Save(TESFile* apFile) {
     while (pList && pList->m_item) {
         QUEST_INFO* pQuestInfo = pList->m_item;
         pList = pList->m_pkNext;
-        TopicInfoArray* pArray = static_cast<TopicInfoArray*>(&pQuestInfo->infoArray);
+        TopicInfoArray* pArray = (&pQuestInfo->infoArray);
         uint32_t maxSize = pArray->m_uiSize;
         for (uint32_t i = 0; i < maxSize; ++i) {
             TESTopicInfo* info = pArray->GetAt(i);
@@ -263,7 +263,7 @@ bool TESTopic::Save(TESFile* apFile) {
             }
         }
     }
-    return 1;
+    return true;
 }
 
 [[clang::disable_tail_calls]] bool TESTopic::SaveEdit(TESFile* apFile) {
@@ -271,7 +271,7 @@ bool TESTopic::Save(TESFile* apFile) {
 }
 
 bool TESTopic::SavesBefore(TESForm* apForm) {
-    bool bretval = 0;
+    bool bretval = false;
     int32_t FormType = apForm->GetFormType();
     if (FormType == 69) {
         TESTopic* pothertopic = dynamic_cast<TESTopic*>(apForm);
@@ -298,7 +298,7 @@ bool TESTopic::SavesBefore(TESForm* apForm) {
 }
 
 bool TESTopic::SavesBefore(FORM* apGroupFORM) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apGroupFORM) {
         if (apGroupFORM->form == formEnumString[2].uiFormString) {
             uint32_t form = apGroupFORM->form;
@@ -313,7 +313,7 @@ bool TESTopic::SavesBefore(FORM* apGroupFORM) {
                 case 4u:
                 case 5u:
                 case 6u: {
-                    bretval = 0;
+                    bretval = false;
                     break;
                 }
                 case 7u: {
@@ -484,7 +484,7 @@ TESTopicInfo* TESTopic::GetMatchingInfo(
 
 TESQuest* TESTopic::GetOwnerQuest(TESTopicInfo* apInfo) {
     if (!apInfo) {
-        return 0;
+        return nullptr;
     }
     if (IsRemappedRumors()) {
         TESTopic* Topic = TESTopic::GetTopic(DT_CONVERSATION, 5);
@@ -504,19 +504,19 @@ TESQuest* TESTopic::GetOwnerQuest(TESTopicInfo* apInfo) {
                 }
             }
         }
-        return 0;
+        return nullptr;
     }
 }
 
 bool TESTopic::HasQuest(TESQuest* apQuest, bool bRequireInfos) {
     QUEST_INFO* v6;
     if (!apQuest) {
-        return 0;
+        return false;
     }
     BSSimpleList<QUEST_INFO*>* pIter = GetQuestInfoList();
     do {
         if (!pIter || !pIter->m_item) {
-            return 0;
+            return false;
         }
         v6 = pIter->m_item;
         pIter = pIter->m_pkNext;
@@ -562,10 +562,10 @@ TopicInfoArray* TESTopic::GetInfoArray(TESQuest* apQuest) {
         QUEST_INFO* pQuestInfo = pList->m_item;
         pList = pList->m_pkNext;
         if (pQuestInfo->pQuest == apQuest && (apQuest || !pQuestInfo->pRemovedQuest)) {
-            return static_cast<TopicInfoArray*>(&pQuestInfo->infoArray);
+            return (&pQuestInfo->infoArray);
         }
     }
-    return 0;
+    return nullptr;
 }
 
 QUEST_INFO* TESTopic::GetQuestInfoElement(TESTopicInfo* apInfo) {
@@ -650,9 +650,9 @@ DialogueItem* TESTopic::CreateDialogueItem(
     DialogueItem* v12;
     bool abDispositionFailure;
     TESTopicInfo* apTopicInfo =
-        GetMatchingInfo(abDispositionFailure, apSpeaker, apTarget, 1, apPreviousTopic, apConversationList);
+        GetMatchingInfo(abDispositionFailure, apSpeaker, apTarget, true, apPreviousTopic, apConversationList);
     if (!apTopicInfo) {
-        return 0;
+        return nullptr;
     }
     DialogueItem* apMemory = static_cast<DialogueItem*>(ourMalloc(sizeof(DialogueItem)));
     if (apMemory) {
@@ -660,7 +660,7 @@ DialogueItem* TESTopic::CreateDialogueItem(
         v12 = ::new (apMemory) DialogueItem(CombatStyle, this, apTopicInfo, apSpeaker);
     }
     else {
-        v12 = 0;
+        v12 = nullptr;
     }
     if (abRunImmediate) {
         if (v12) {
@@ -731,12 +731,12 @@ bool TESTopic::IsRemappedRumors() const {
 
 bool TESTopic::InsertInfo(TESQuest* apQuest, TESTopicInfo* apInfo, uint32_t auiPrevInfoID) {
     if (!apQuest || !apInfo) {
-        return 0;
+        return false;
     }
-    QUEST_INFO* pQuestInfo = InsertQuest(apQuest, 0);
+    QUEST_INFO* pQuestInfo = InsertQuest(apQuest, false);
     if (auiPrevInfoID) {
         if (auiPrevInfoID != -1 && apInfo->GetInfoIndex() != 0xFFFF) {
-            TESTopicInfo* pNoInfo = 0;
+            TESTopicInfo* pNoInfo = nullptr;
             pQuestInfo->infoArray.SetAt(apInfo->GetInfoIndex(), pNoInfo);
         }
         if (auiPrevInfoID == -1) {
@@ -752,7 +752,7 @@ bool TESTopic::InsertInfo(TESQuest* apQuest, TESTopicInfo* apInfo, uint32_t auiP
             }
         }
         else {
-            TESTopicInfo* pPrevInfo = GetInfoByID(auiPrevInfoID, 1);
+            TESTopicInfo* pPrevInfo = GetInfoByID(auiPrevInfoID, true);
             if (pPrevInfo && auiPrevInfoID) {
                 int32_t iinsertindex = -1;
                 if (pPrevInfo->GetInfoIndex() == 0xFFFF) {
@@ -785,7 +785,7 @@ bool TESTopic::InsertInfo(TESQuest* apQuest, TESTopicInfo* apInfo, uint32_t auiP
     }
     pQuestInfo->infoArray.Compact();
     TESTopic::SetTopicIndices(&pQuestInfo->infoArray);
-    return 1;
+    return true;
 }
 
 void TESTopic::ClearSaidOnceInfosForQuest(TESQuest* apQuest) {
@@ -803,12 +803,12 @@ void TESTopic::ClearSaidOnceInfosForQuest(TESQuest* apQuest) {
 
 TESTopic* TESTopic::GetTopic(DIALOGUE_TYPE type, int32_t index) {
     if (index < 0) {
-        return 0;
+        return nullptr;
     }
-    if (index < static_cast<int32_t>(TESTopic::uiNumHardcodedTopicsPerCategory[type])) {
+    if (index < TESTopic::uiNumHardcodedTopicsPerCategory[type]) {
         return TESTopic::pDefaultTopics[type][index].pTopic;
     }
-    return 0;
+    return nullptr;
 }
 
 bool TESTopic::SortQuestsOnAllTopics(TESQuest* apQuest) {
@@ -827,11 +827,11 @@ TESTopic* TESTopic::GetOwnerTopic(TESTopicInfo* pInfo) {
         TESTopic* th_s = ecx0->m_item;
         ecx0 = ecx0->m_pkNext;
         uint32_t CastingType = pInfo->GetFormID();
-        if (th_s->GetInfoByID(CastingType, 0) == pInfo) {
+        if (th_s->GetInfoByID(CastingType, false) == pInfo) {
             return th_s;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 void TESTopic::SortTopics(bool abSortByPriority, BSSimpleList<TESTopic*>* apTopicList) {
@@ -841,9 +841,9 @@ void TESTopic::SortTopics(bool abSortByPriority, BSSimpleList<TESTopic*>* apTopi
     }
     BSSimpleList<TESTopic*> sortlist;
     BSSimpleList<TESTopic*>* plist = pBaseList;
-    BSSimpleList<TESTopic*>* plastlist = 0;
+    BSSimpleList<TESTopic*>* plastlist = nullptr;
     while (plist && plist->m_item) {
-        bool badvanced = 0;
+        bool badvanced = false;
         if (plist->m_pkNext) {
             TESTopic* ptopic1 = plist->m_item;
             TESTopic* apTopic2 = plist->m_pkNext->m_item;
@@ -856,7 +856,7 @@ void TESTopic::SortTopics(bool abSortByPriority, BSSimpleList<TESTopic*>* apTopi
                     plist->RemoveHead();
                 }
                 sortlist.AddHead(ptopic1);
-                badvanced = 1;
+                badvanced = true;
             }
         }
         if (!badvanced) {
@@ -873,7 +873,7 @@ void TESTopic::SortTopics(bool abSortByPriority, BSSimpleList<TESTopic*>* apTopi
 
 void TESTopic::AddDefaultTopics() {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_DIALOGUE, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESTopic.cpp", 0x1573
+        MEM_CONTEXT_DIALOGUE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESTopic.cpp", 0x1573
     );
     for (DIALOGUE_TYPE topic = DT_TOPIC; topic < DIALOGUE_TYPE_COUNT; topic = static_cast<DIALOGUE_TYPE>(topic + 1)) {
         for (int32_t n = 0; n < TESTopic::uiNumHardcodedTopicsPerCategory[topic]; ++n) {
@@ -884,10 +884,10 @@ void TESTopic::AddDefaultTopics() {
                     v0 = ::new (v1) TESTopic(topic);
                 }
                 else {
-                    v0 = 0;
+                    v0 = nullptr;
                 }
                 TESTopic::pDefaultTopics[topic][n].pTopic = v0;
-                TESTopic::pDefaultTopics[topic][n].pTopic->SetFormID(TESTopic::pDefaultTopics[topic][n].iID, 1);
+                TESTopic::pDefaultTopics[topic][n].pTopic->SetFormID(TESTopic::pDefaultTopics[topic][n].iID, true);
                 TESTopic::pDefaultTopics[topic][n].pTopic->SetFormEditorID(TESTopic::pDefaultTopics[topic][n].pEdID);
                 TESTopic::pDefaultTopics[topic][n].pTopic->SetFullName(TESTopic::pDefaultTopics[topic][n].pEdID);
                 pDataHandler->AddTopic(TESTopic::pDefaultTopics[topic][n].pTopic);
@@ -996,8 +996,8 @@ void TESTopic::SetTopicIndices(NiTLargePrimitiveArray<TESTopicInfo*>* apInfoArra
 
 void TESTopic::RemoveDefaultTopics() {
     for (int32_t i = 0; i < 8; ++i) {
-        for (int32_t j = 0; j < static_cast<int32_t>(TESTopic::uiNumHardcodedTopicsPerCategory[i]); ++j) {
-            TESTopic::pDefaultTopics[i][j].pTopic = 0;
+        for (int32_t j = 0; j < TESTopic::uiNumHardcodedTopicsPerCategory[i]; ++j) {
+            TESTopic::pDefaultTopics[i][j].pTopic = nullptr;
         }
     }
 }
@@ -1017,16 +1017,16 @@ TESTopicInfo* TESTopic::GetMatchingInfo(
             pchecktopic = TESTopic::GetTopic(DT_CONVERSATION, 5);
         }
     }
-    abDispositionFailure = 0;
+    abDispositionFailure = false;
     if (!pchecktopic || pchecktopic->GetDelete()) {
-        return 0;
+        return nullptr;
     }
-    TESTopicInfo* pUsedInfo = 0;
+    TESTopicInfo* pUsedInfo = nullptr;
     BSSimpleList<TESTopicInfo*> matchinginfolist;
     uint32_t iinfocount = 0;
-    bool bFinished = 0;
+    bool bFinished = false;
     const BSSimpleList<QUEST_INFO*>* pList = &pchecktopic->m_listQuestInfo;
-    TESTopicInfo* pInfoRefusal = 0;
+    TESTopicInfo* pInfoRefusal = nullptr;
     while (pList && (pList->m_item && !bFinished)) {
         QUEST_INFO* pQuestInfo = pList->m_item;
         TESQuest* pquest = pQuestInfo->pQuest;
@@ -1051,53 +1051,54 @@ TESTopicInfo* TESTopic::GetMatchingInfo(
                 }
             }
             uint32_t iter = 0;
-            TESTopicInfo* info = 0;
+            TESTopicInfo* info = nullptr;
             uint32_t v9 = BuiltArray.m_uiSize;
             if (v9 > iter) {
             LABEL_26:;
                 info = BuiltArray.GetAt(iter);
             }
             while (info) {
-                bool bDispositionInfoFailure = 0;
-                bool bNotSaidOnce = 1;
+                bool bDispositionInfoFailure = false;
+                bool bNotSaidOnce = true;
                 if (info->IsSayOnceADay() && apSpeaker->IsMobileObject()) {
                     bNotSaidOnce = !apSpeaker->HasSaidTopicInfo(info);
                 }
-                if (info && (bNotSaidOnce && info->CheckCondition(bDispositionInfoFailure, 0, apSpeaker, apTarget))) {
-                    abDispositionFailure = 0;
-                    bool bOK = 1;
+                if (info &&
+                    (bNotSaidOnce && info->CheckCondition(bDispositionInfoFailure, nullptr, apSpeaker, apTarget))) {
+                    abDispositionFailure = false;
+                    bool bOK = true;
                     if (abIsConversation || (apPreviousTopic && apPreviousTopic->GetDialogueType() == DT_TOPIC)) {
                         TESConversationData* pconvdata = info->GetConversationData();
                         if (pconvdata) {
                             if (apPreviousTopic) {
                                 BSSimpleList<TESTopic*>* pLinkFromList;
-                                bOK = 0;
+                                bOK = false;
                                 for (pLinkFromList = &pconvdata->m_listLinkFrom;
                                      pLinkFromList && !pLinkFromList->IsEmpty();
                                      pLinkFromList = pLinkFromList->m_pkNext) {
                                     if (pLinkFromList->m_item == apPreviousTopic ||
                                         pLinkFromList->m_item->iFormID == 211) {
-                                        bOK = 1;
+                                        bOK = true;
                                         break;
                                     }
                                 }
                                 if (!abIsConversation) {
                                     if (pLinkFromList) {
                                         if (pLinkFromList->IsEmpty()) {
-                                            bOK = 1;
+                                            bOK = true;
                                         }
                                     }
                                 }
                             }
                             else {
                                 if (!pconvdata->m_listLinkFrom.IsEmpty() && apTarget != pPlayer) {
-                                    bOK = 0;
+                                    bOK = false;
                                 }
                             }
                         }
                         if (bOK) {
                             if (info->IsRandomEnd()) {
-                                bFinished = 1;
+                                bFinished = true;
                             }
                             for (BSSimpleList<DialogueItem*>* pList_2 = apConversationList;
                                  pList_2 && !pList_2->IsEmpty(); pList_2 = pList_2->m_pkNext) {
@@ -1105,14 +1106,14 @@ TESTopicInfo* TESTopic::GetMatchingInfo(
                                 TESTopicInfo* v10 = pItem->pInfo;
                                 if (v10 == info) {
                                     pUsedInfo = info;
-                                    bOK = 0;
+                                    bOK = false;
                                     break;
                                 }
                                 if (!pQuestInfo->pQuest->GetAllowRepeats()) {
                                     TESQuest* Time = pItem->pQuest;
                                     if (Time == pQuestInfo->pQuest && pItem->pTopic == apTopic) {
                                         pUsedInfo = info;
-                                        bOK = 0;
+                                        bOK = false;
                                         break;
                                     }
                                 }
@@ -1121,14 +1122,14 @@ TESTopicInfo* TESTopic::GetMatchingInfo(
                     }
                     if (bOK) {
                         if (info->IsRandomEnd()) {
-                            bFinished = 1;
+                            bFinished = true;
                         }
                         if (matchinginfolist.IsEmpty() && !info->IsRandom()) {
                             TESTopicInfo* v16 = info;
                             return v16;
                         }
                         if (!info->IsRandom()) {
-                            bFinished = 1;
+                            bFinished = true;
                             break;
                         }
                         matchinginfolist.AddHead(info);
@@ -1137,7 +1138,7 @@ TESTopicInfo* TESTopic::GetMatchingInfo(
                 }
                 if (!abIsConversation && bDispositionInfoFailure) {
                     pInfoRefusal = info;
-                    abDispositionFailure = 1;
+                    abDispositionFailure = true;
                 }
                 if (bFinished) {
                     break;
@@ -1147,13 +1148,13 @@ TESTopicInfo* TESTopic::GetMatchingInfo(
                 if (iter < v12) {
                     goto LABEL_26;
                 }
-                info = 0;
+                info = nullptr;
             }
         }
     }
     if (matchinginfolist.IsEmpty()) {
         if (abIsConversation) {
-            return 0;
+            return nullptr;
         }
         else {
             return pInfoRefusal;
@@ -1169,7 +1170,7 @@ TESTopicInfo* TESTopic::GetMatchingInfo(
         }
         int32_t count = 0;
         BSSimpleList<TESTopicInfo*>* pRandomList = &matchinginfolist;
-        TESTopicInfo* v17 = 0;
+        TESTopicInfo* v17 = nullptr;
         while (count < v14 && pRandomList) {
             TESTopicInfo* m_item = pRandomList->m_item;
             if (m_item) {
@@ -1191,57 +1192,58 @@ TESTopicInfo* TESTopic::GetMatchingFollowUpInfo(
     bool abIsConversation,
     BSSimpleList<DialogueItem*>* apConversationList
 ) {
-    abDispositionFailure = 0;
+    abDispositionFailure = false;
     if (!apTopicInfo || apTopicInfo->GetDelete()) {
-        return 0;
+        return nullptr;
     }
-    TESTopicInfo* pUsedInfo = 0;
+    TESTopicInfo* pUsedInfo = nullptr;
     BSSimpleList<TESTopicInfo*> matchinginfolist;
     uint32_t iinfocount = 0;
-    bool bFinished = 0;
-    const BSSimpleList<TESTopicInfo*>* pList = 0;
+    bool bFinished = false;
+    const BSSimpleList<TESTopicInfo*>* pList = nullptr;
     if (apTopicInfo->GetConversationData()) {
         pList = apTopicInfo->GetConversationData()->GetFollowUpInfoList();
     }
-    TESTopicInfo* pInfoRefusal = 0;
+    TESTopicInfo* pInfoRefusal = nullptr;
     while (pList && (pList->m_item && !bFinished)) {
         TESTopicInfo* pinfo = pList->m_item;
         TESQuest* pquest = pinfo->pOwnerQuest;
         pList = pList->m_pkNext;
         if (pquest) {
             if (pquest->GetEnabled() && (&pquest->objConditions)->IsTrue(apSpeaker, apTarget)) {
-                bool bDispositionInfoFailure = 0;
-                bool bNotSaidOnce = 1;
+                bool bDispositionInfoFailure = false;
+                bool bNotSaidOnce = true;
                 if (pinfo) {
                     if (pinfo->IsSayOnceADay() && apSpeaker->IsMobileObject()) {
                         bNotSaidOnce = !apSpeaker->HasSaidTopicInfo(pinfo);
                     }
                 }
-                if (pinfo && (bNotSaidOnce && pinfo->CheckCondition(bDispositionInfoFailure, 0, apSpeaker, apTarget))) {
-                    abDispositionFailure = 0;
-                    bool bOK = 1;
+                if (pinfo &&
+                    (bNotSaidOnce && pinfo->CheckCondition(bDispositionInfoFailure, nullptr, apSpeaker, apTarget))) {
+                    abDispositionFailure = false;
+                    bool bOK = true;
                     if (pinfo->IsRandomEnd()) {
-                        bFinished = 1;
+                        bFinished = true;
                     }
                     for (BSSimpleList<DialogueItem*>* pList_2 = apConversationList; pList_2 && !pList_2->IsEmpty();
                          pList_2 = pList_2->m_pkNext) {
                         TESTopicInfo* Info = pList_2->m_item->pInfo;
                         if (Info == pinfo) {
                             pUsedInfo = pinfo;
-                            bOK = 0;
+                            bOK = false;
                             break;
                         }
                     }
                     if (bOK) {
                         if (pinfo->IsRandomEnd()) {
-                            bFinished = 1;
+                            bFinished = true;
                         }
                         if (matchinginfolist.IsEmpty() && !pinfo->IsRandom()) {
                             TESTopicInfo* v10 = pinfo;
                             return v10;
                         }
                         if (!pinfo->IsRandom()) {
-                            bFinished = 1;
+                            bFinished = true;
                             break;
                         }
                         matchinginfolist.AddHead(pinfo);
@@ -1249,7 +1251,7 @@ TESTopicInfo* TESTopic::GetMatchingFollowUpInfo(
                     }
                     if (!abIsConversation && bDispositionInfoFailure) {
                         pInfoRefusal = pinfo;
-                        abDispositionFailure = 1;
+                        abDispositionFailure = true;
                     }
                     if (bFinished) {
                         break;
@@ -1260,7 +1262,7 @@ TESTopicInfo* TESTopic::GetMatchingFollowUpInfo(
     }
     if (matchinginfolist.IsEmpty()) {
         if (abIsConversation) {
-            return 0;
+            return nullptr;
         }
         else {
             return pInfoRefusal;
@@ -1276,7 +1278,7 @@ TESTopicInfo* TESTopic::GetMatchingFollowUpInfo(
         }
         int32_t count = 0;
         BSSimpleList<TESTopicInfo*>* pRandomList = &matchinginfolist;
-        TESTopicInfo* v11 = 0;
+        TESTopicInfo* v11 = nullptr;
         while (count < dieRoll && pRandomList) {
             TESTopicInfo* v13 = pRandomList->m_item;
             if (v13) {
@@ -1311,7 +1313,7 @@ uint32_t TESTopic::CreateConversation(
     }
     TESObjectREFR* pCurrentSpeaker = apSpeaker;
     TESObjectREFR* pCurrentTarget = apTarget;
-    TESTopic* pLastTopic = 0;
+    TESTopic* pLastTopic = nullptr;
     TESForm* pspeakerForm = apSpeaker->GetObjectReference();
     if (pspeakerForm) {
         if (pspeakerForm->GetFormType() == CREA_ID) {
@@ -1326,7 +1328,7 @@ uint32_t TESTopic::CreateConversation(
     if (!apStartingTopic) {
         pNextTopic = pDataHandler->GetGlobalTopic(kTopicHELLO);
     }
-    rt::srand(static_cast<uint32_t>(std::time(0)));
+    rt::srand(static_cast<uint32_t>(std::time(nullptr)));
     while (pNextTopic) {
         int32_t apDest[500];
         // The count is compared unsigned.
@@ -1334,13 +1336,14 @@ uint32_t TESTopic::CreateConversation(
             break;
         }
         DialogueItem* pConvItem =
-            pNextTopic->CreateDialogueItem(pCurrentSpeaker, pCurrentTarget, pLastTopic, apConversationList, 0);
+            pNextTopic->CreateDialogueItem(pCurrentSpeaker, pCurrentTarget, pLastTopic, apConversationList, false);
         if (!pConvItem) {
             if (!apStartingTopic || apStartingTopic->GetDialogueType() == DT_CONVERSATION) {
                 // The goodbye topic replaces pNextTopic: it becomes pLastTopic below.
                 pNextTopic = pDataHandler->GetGlobalTopic(kTopicGOODBYE);
-                pConvItem =
-                    pNextTopic->CreateDialogueItem(pCurrentSpeaker, pCurrentTarget, pLastTopic, apConversationList, 0);
+                pConvItem = pNextTopic->CreateDialogueItem(
+                    pCurrentSpeaker, pCurrentTarget, pLastTopic, apConversationList, false
+                );
             }
             if (!pConvItem) {
                 break;
@@ -1355,9 +1358,9 @@ uint32_t TESTopic::CreateConversation(
         }
         apConversationList->AddTail(pConvItem);
         pLastTopic = pNextTopic;
-        pNextTopic = 0;
-        DialogueItem* pValidDiagItem = 0;
-        bool bAllTried = 0;
+        pNextTopic = nullptr;
+        DialogueItem* pValidDiagItem = nullptr;
+        bool bAllTried = false;
         ourMemset(apDest, 0, sizeof(apDest));
         int32_t iNextTopic = -1;
         while (!pValidDiagItem && !bAllTried) {
@@ -1387,17 +1390,18 @@ uint32_t TESTopic::CreateConversation(
                     pCurrentSpeaker = pCurrentTarget;
                     pCurrentTarget = pOldSpeaker;
                 }
-                bAllTried = 1;
+                bAllTried = true;
                 for (uint32_t i = 0; i < static_cast<uint32_t>(iTotal) && bAllTried; ++i) {
                     if (!apDest[i]) {
-                        bAllTried = 0;
+                        bAllTried = false;
                     }
                 }
-                pValidDiagItem =
-                    pNextTopic->CreateDialogueItem(pCurrentSpeaker, pCurrentTarget, pLastTopic, apConversationList, 0);
+                pValidDiagItem = pNextTopic->CreateDialogueItem(
+                    pCurrentSpeaker, pCurrentTarget, pLastTopic, apConversationList, false
+                );
             }
             else {
-                bAllTried = 1;
+                bAllTried = true;
             }
         }
     }

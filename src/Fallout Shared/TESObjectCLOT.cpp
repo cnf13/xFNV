@@ -256,7 +256,7 @@ void TESObjectCLOT::InitItem() {
         static_cast<TESEnchantableForm*>(this)->InitItem(this);
         static_cast<BGSDestructibleObjectForm*>(this)->InitItem(this);
         static_cast<TESBipedModelForm*>(this)->InitItem(this);
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 

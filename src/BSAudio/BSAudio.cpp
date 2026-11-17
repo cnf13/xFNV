@@ -90,7 +90,7 @@ void BSAudio::Shutdown() {
             singleton = &BSAudioManager::QInstance();
             singleton->StopAudioThread();
         }
-        bInitialized = (bool)0;
+        bInitialized = false;
         v2 = &BSAudioManager::QInstance();
         v2->Shutdown();
     }
@@ -199,7 +199,7 @@ BSSoundHandle* BSAudio::PlaySound(
     BSAudioManager* v6 = &BSAudioManager::QInstance();
     v6->GetSoundHandleByNumericID(&apHandle, auiFormID, aeAudioFlags);
     apHandle.SetPosition(akPosition.x, akPosition.y, akPosition.z);
-    apHandle.Play(1);
+    apHandle.Play(true);
     // Copies the handle's three fields into the caller's buffer, leaving the padding after bAssumeSuccess alone.
     apResult->iSoundID = apHandle.iSoundID;
     apResult->bAssumeSuccess = apHandle.bAssumeSuccess;
@@ -272,7 +272,7 @@ void BSAudio::MuteType(uint32_t aiType, uint32_t aiFadeTimeMS, uint32_t aiMillib
 }
 
 float BSAudio::GetMasterSecondaryVolume() {
-    return (float)(BSAudioManager::QInstance().fVolumes[6]);
+    return BSAudioManager::QInstance().fVolumes[6];
 }
 
 // The volume setters take the audio manager, store the volume in its slot of fVolumes and call VolumeChanged.
@@ -323,7 +323,7 @@ void BSAudio::VolumeChanged() {
 }
 
 void BSAudio::UnPauseWorldSounds() {
-    UnPauseAllOfType(static_cast<BSGameSound::SoundFlags>(0x3002u), 0);
+    UnPauseAllOfType(static_cast<BSGameSound::SoundFlags>(0x3002u), false);
 }
 
 void BSAudio::ClearSecondaryVolumes() {
@@ -337,7 +337,7 @@ void BSAudio::KillAllOfType(uint32_t aiType, uint32_t aiFadeTimeMS) {
 }
 
 void BSAudio::PauseWorldSounds() {
-    PauseAllOfType(static_cast<BSGameSound::SoundFlags>(0x3002u), 0);
+    PauseAllOfType(static_cast<BSGameSound::SoundFlags>(0x3002u), false);
 }
 
 float BSAudio::GetFootSecondaryVolume() {

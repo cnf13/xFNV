@@ -67,7 +67,7 @@ void hkStdioStreamWriter::close() {
             std::fclose(m_handle);
         }
     }
-    m_handle = 0;
+    m_handle = nullptr;
 }
 
 void hkStdioStreamWriter::open(const char* nameIn, const char* mode) {

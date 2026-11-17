@@ -184,7 +184,7 @@ void hkpVehicleDefaultBrake::calcBreakingInfo(
     v13 = 1.0 / deltaTime;
     v21 = 0;
     v14 = m_brakePedalInput;
-    while (1u) {
+    while (true) {
         breakingInfo.m_isFixed.m_data[v9].m_bool =
             vehiclea && v8->m_wheelBrakingProperties.m_data[v11].m_isConnectedToHandbrake.m_bool != 0;
         float* p_m_maxBreakingTorque = &v8->m_wheelBrakingProperties.m_data[v11].m_maxBreakingTorque;

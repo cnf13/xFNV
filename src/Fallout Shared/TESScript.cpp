@@ -233,7 +233,7 @@ void ScriptLocals::AddActionObject(TESForm* apActionForm) {
 
 double ScriptLocals::GetVariable(uint32_t auiID, Script* apScript) {
     const char* v4;
-    SCRIPT_LOCAL* plocalvar = 0;
+    SCRIPT_LOCAL* plocalvar = nullptr;
     if (GetThreadTLSData()->pLastScriptEventList == this && GetThreadTLSData()->uiLastScriptVarID == auiID) {
         plocalvar = GetThreadTLSData()->pLastScriptVariable;
     }
@@ -286,7 +286,7 @@ void ScriptLocals::SaveGame() {
     uint16_t iblockSize;
     bool bhasScriptEffectData;
     iblockSize = 0;
-    uint16_t* pblockSize = 0;
+    uint16_t* pblockSize = nullptr;
     uint8_t* itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -319,7 +319,7 @@ void ScriptLocals::SaveGame() {
         }
     }
     *pcount = icount;
-    bhasScriptEffectData = m_pScriptEffectData != 0;
+    bhasScriptEffectData = m_pScriptEffectData != nullptr;
     pSaveLoadGameOLD->SaveGameDataOLD(&bhasScriptEffectData, 1u);
     if (bhasScriptEffectData) {
         pSaveLoadGameOLD->SaveGameDataOLD(m_pScriptEffectData, 8u);
@@ -368,7 +368,7 @@ void ScriptLocals::LoadGame() {
     uint16_t iblockSize;
     bool bhasScriptEffectData;
     iblockSize = 0;
-    uint8_t* istartBufferPosition = 0;
+    uint8_t* istartBufferPosition = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockHeader, 4u);
         if (iblockHeader != 0x424C4F4B) {
@@ -501,12 +501,12 @@ void ScriptLocals::SaveGame(BGSSaveFormBuffer* apBuffer) {
         }
     }
     apBuffer->SaveVariableSizedValue(icount, isaveGameBufferPos);
-    bhasScriptEffectData = m_pScriptEffectData != 0;
+    bhasScriptEffectData = m_pScriptEffectData != nullptr;
     apBuffer->SaveDataEndian(&bhasScriptEffectData, 1u, 0);
     if (bhasScriptEffectData) {
         apBuffer->SaveDataEndian(m_pScriptEffectData, 8u, 0);
     }
-    bonLoadFlagSet = CheckActionFlag(0, SCRIPT_ACTION_ONLOAD);
+    bonLoadFlagSet = CheckActionFlag(nullptr, SCRIPT_ACTION_ONLOAD);
     apBuffer->SaveDataEndian(&bonLoadFlagSet, 1u, 0);
 }
 
@@ -520,13 +520,13 @@ void ScriptLocals::SetVariable(uint32_t auiID, double value) {
             return;
         }
     }
-    bool bshowGenericWarning = 1;
+    bool bshowGenericWarning = true;
     if (m_pMasterScript) {
         Warning(
             "SCRIPTS: Trying to set variableID %d in script '%s' -- variable not found.", auiID,
             m_pMasterScript->GetFormEditorID()
         );
-        bshowGenericWarning = 0;
+        bshowGenericWarning = false;
     }
     else {
         if (pSaveLoadGameOLD->GetLoading()) {
@@ -564,7 +564,7 @@ void ScriptLocals::SetVariable(uint32_t auiID, double value) {
                         pSaveLoadGameOLD->GetMostRecentSaveGame(), auiID, ploadHeader->iFormID
                     );
                 }
-                bshowGenericWarning = 0;
+                bshowGenericWarning = false;
             }
         }
     }
@@ -575,14 +575,14 @@ void ScriptLocals::SetVariable(uint32_t auiID, double value) {
 
 bool ScriptLocals::IsReferenceVariable(uint32_t auiID) {
     if (!m_pMasterScript) {
-        return 0;
+        return false;
     }
     for (Script::RefVariable*& rpItem : (&m_pMasterScript->listRefObjects)->ItemsUntilNull()) {
         if (rpItem->varIdx == auiID) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 // Replaces the actions with copies of apCopy's.
@@ -626,7 +626,7 @@ void ScriptLocals::Revert_0() {
     if (m_pScriptEffectData) {
         ourFree(m_pScriptEffectData);
     }
-    m_pScriptEffectData = 0;
+    m_pScriptEffectData = nullptr;
 }
 
 void ScriptLocals::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
@@ -651,13 +651,13 @@ void ScriptLocals::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         }
         SetVariable(ivarID, fvalue);
     }
-    bhasScriptEffectData = 0;
+    bhasScriptEffectData = false;
     apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&bhasScriptEffectData), 1u);
     if (bhasScriptEffectData) {
         m_pScriptEffectData = static_cast<SCRIPT_EFFECT_DATA*>(ourMalloc(sizeof(SCRIPT_EFFECT_DATA)));
         apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&m_pScriptEffectData->m_bScriptEffectStart), 8u);
     }
-    bonLoadFlagSet = 0;
+    bonLoadFlagSet = false;
     if (apLoadGameBuffer->GetVersion() >= 21u) {
         apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&bonLoadFlagSet), 1u);
     }
@@ -671,7 +671,7 @@ void ScriptLocals::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v2->InitActionList(m_pMasterScript, value, this);
     }
     if (bonLoadFlagSet) {
-        SetActionFlag(0, SCRIPT_ACTION_ONLOAD);
+        SetActionFlag(nullptr, SCRIPT_ACTION_ONLOAD);
     }
 }
 
@@ -1072,32 +1072,32 @@ bool Script::NeedsUpdate(ScriptCompileData* apCompileData) {
             char* v6 = apCompileData->cScriptName.pString;
             const char* v2 = GetFormEditorID();
             if (BSstricmp(v2, v6)) {
-                return 1;
+                return true;
             }
         }
     }
     if (m_header.dataSize != apCompileData->header.dataSize) {
-        return 1;
+        return true;
     }
     if (m_header.refObjectCount != apCompileData->header.refObjectCount) {
-        return 1;
+        return true;
     }
     for (uint32_t n = 0; n < m_header.dataSize; ++n) {
         if (m_data[n] != apCompileData->pOutput[n]) {
-            return 1;
+            return true;
         }
     }
     BSSimpleList<ScriptVariable*>* pNewList = &apCompileData->listVariables;
     BSSimpleList<ScriptVariable*>* pOldList = GetVariableList();
     int32_t v4 = pNewList->ItemsInList();
     if (v4 != pOldList->ItemsInList()) {
-        return 1;
+        return true;
     }
     while (pNewList && pOldList) {
         ScriptVariable* pold = pOldList->m_item;
         ScriptVariable* pnew = pNewList->m_item;
         if (pnew && (pold && pnew->Compare(pold))) {
-            return 1;
+            return true;
         }
         pNewList = pNewList->m_pkNext;
         pOldList = pOldList->m_pkNext;
@@ -1106,18 +1106,18 @@ bool Script::NeedsUpdate(ScriptCompileData* apCompileData) {
     BSSimpleList<RefVariable*>* pOldList_2 = &listRefObjects;
     int32_t v5 = pNewList_2->ItemsInList();
     if (v5 != pOldList_2->ItemsInList()) {
-        return 1;
+        return true;
     }
     while (pNewList_2 && pOldList_2) {
         RefVariable* pold_2 = pOldList_2->m_item;
         RefVariable* pnew_2 = pNewList_2->m_item;
         if (pnew_2 && (pold_2 && pnew_2->form != pold_2->form)) {
-            return 1;
+            return true;
         }
         pNewList_2 = pNewList_2->m_pkNext;
         pOldList_2 = pOldList_2->m_pkNext;
     }
-    return 0;
+    return false;
 }
 
 // AutoMemContext as in InitItem.
@@ -1189,17 +1189,17 @@ void Script::CompileAndRun(ScriptCompiler* compiler, COMPILER_NAME compilerIndex
 
 void Script::RunScriptEffectStart(TESObjectREFR* apTargetRef, ScriptLocals* apEffectLocals) {
     ScriptRunManager* singleton = ScriptRunManager::Instance();
-    singleton->Run(this, apTargetRef, apEffectLocals, 0, 0, 1, 0, 0.0);
+    singleton->Run(this, apTargetRef, apEffectLocals, nullptr, false, true, false, 0.0);
 }
 
 void Script::RunScriptEffectFinish(TESObjectREFR* apTargetRef, ScriptLocals* apEffectLocals) {
     ScriptRunManager* singleton = ScriptRunManager::Instance();
-    singleton->Run(this, apTargetRef, apEffectLocals, 0, 0, 0, 1, 0.0);
+    singleton->Run(this, apTargetRef, apEffectLocals, nullptr, false, false, true, 0.0);
 }
 
 void Script::RunScriptEffectUpdate(TESObjectREFR* apTargetRef, ScriptLocals* apEffectLocals, float afSecondsElapsed) {
     ScriptRunManager* singleton = ScriptRunManager::Instance();
-    singleton->Run(this, apTargetRef, apEffectLocals, 0, 0, 0, 0, afSecondsElapsed);
+    singleton->Run(this, apTargetRef, apEffectLocals, nullptr, false, false, false, afSecondsElapsed);
 }
 
 void Script::SaveResultScript() {
@@ -1214,36 +1214,36 @@ void Script::SaveResultScript() {
 
 bool Script::CompareResultScripts(Script* apCompare) {
     if (!apCompare) {
-        return 1;
+        return true;
     }
     SCRIPT_HEADER* compiledHeader = &apCompare->m_header;
     if (m_header.dataSize != compiledHeader->dataSize) {
-        return 1;
+        return true;
     }
     if (m_header.refObjectCount != compiledHeader->refObjectCount) {
-        return 1;
+        return true;
     }
     if (m_header.bIsCompiled != compiledHeader->bIsCompiled) {
-        return 1;
+        return true;
     }
     const char* compiledScript = apCompare->GetCompiledData();
     for (uint32_t n = 0; n < m_header.dataSize; ++n) {
         if (m_data[n] != compiledScript[n]) {
-            return 1;
+            return true;
         }
     }
     if (m_text && apCompare->m_text) {
         size_t v3 = std::strlen(m_text);
         if (v3 != std::strlen(apCompare->m_text)) {
-            return 1;
+            return true;
         }
         if (_tcscmp(m_text, apCompare->m_text)) {
-            return 1;
+            return true;
         }
     }
     else {
         if (m_text || apCompare->m_text) {
-            return 1;
+            return true;
         }
     }
     BSSimpleList<RefVariable*>* pNewList = &apCompare->listRefObjects;
@@ -1251,11 +1251,11 @@ bool Script::CompareResultScripts(Script* apCompare) {
         RefVariable* pold = pOldList->m_item;
         RefVariable* pnew = pNewList->m_item;
         if (pnew && (pold && pnew->form != pold->form)) {
-            return 1;
+            return true;
         }
         pNewList = pNewList->m_pkNext;
     }
-    return 0;
+    return false;
 }
 
 bool Script::GetValue(
@@ -1277,7 +1277,7 @@ bool Script::GetValue(
     if (abEndian && apScript->GetInitialized()) {
         abEndian = false;
     }
-    char cCode = apCompiledData[(auiDataOffset)++];
+    char cCode = apCompiledData[auiDataOffset++];
     switch (cCode) {
         // a referenced global, a referenced form's ID, or a variable or function of a referenced quest or reference
         case 'G':
@@ -1306,7 +1306,7 @@ bool Script::GetValue(
                 PutNumericIDInDouble(uiFormID, adValue);
                 return true;
             }
-            cCode = apCompiledData[(auiDataOffset)++];
+            cCode = apCompiledData[auiDataOffset++];
             if (cCode == 'X') {
                 break;
             }
@@ -1415,8 +1415,8 @@ void Script::GetNumericIDFromDouble(uint32_t& aiID, const double& adVal) {
 }
 
 bool Script::IsPendingEnabledReference(TESObjectREFR* apRef) {
-    bool v2 = 0;
-    Script::ScriptRefListCrit.Enter(0);
+    bool v2 = false;
+    Script::ScriptRefListCrit.Enter(nullptr);
     if (apRef) {
         v2 = Script::ReferencesToEnable.IsInList(apRef);
     }
@@ -1425,8 +1425,8 @@ bool Script::IsPendingEnabledReference(TESObjectREFR* apRef) {
 }
 
 bool Script::IsPendingFadeDisabledReference(TESObjectREFR* apRef) {
-    bool v2 = 0;
-    Script::ScriptRefListCrit.Enter(0);
+    bool v2 = false;
+    Script::ScriptRefListCrit.Enter(nullptr);
     if (apRef) {
         v2 = Script::ReferencesToFadeDisable.IsInList(apRef);
     }
@@ -2100,7 +2100,7 @@ void Script::CopyVariableList(
 
 bool Script::IsPendingDisabledReference(TESObjectREFR* apRef) {
     bool bResult = false;
-    ScriptRefListCrit.Enter(0);
+    ScriptRefListCrit.Enter(nullptr);
     if (apRef != nullptr && ReferencesToDisable.IsInList(apRef)) {
         bResult = true;
     }
@@ -2120,7 +2120,7 @@ void Script::SetProcessScripts(bool abProcessScripts) {
 }
 
 void Script::RunDelayedScriptActionsOnReferences() {
-    ScriptRefListCrit.Enter(0);
+    ScriptRefListCrit.Enter(nullptr);
     while (!ReferencesToEnable.IsEmpty()) {
         TESObjectREFR* pRef = ReferencesToEnable.GetItem();
         ReferencesToEnable.RemoveHead();

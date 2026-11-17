@@ -218,7 +218,7 @@ void hkpWheelConstraintData::getConstraintInfo(hkpConstraintData::ConstraintInfo
 // cross(axis, axle) * sin + axle * cos as its first row and cross(first row, axis) as its third, and keeps its second
 // (the axis itself). The cosine is the square root of 1 - sin^2, taken in double and rounded to float.
 void hkpWheelConstraintData::setSteeringAngle(float angle) {
-    const float fSin = static_cast<float>(std::sin(angle));
+    const float fSin = std::sin(angle);
     const float fCos = std::sqrt(static_cast<float>(1.0 - static_cast<double>(fSin) * fSin));
     const hkVector4& rAxis = m_initialSteeringAxisInB;
     const hkVector4& rAxle = m_initialAxleInB;
@@ -390,8 +390,8 @@ void hkpWheelConstraintData::setInBodySpace(
     __m128 v17 = _mm_setzero_ps();
     v17[0] = 0.5f;
     __m128 v18 = _mm_cmpeq_ss(v14, v16);
-    float v19 = 3.0f - static_cast<float>(static_cast<float>(v14[0] * v15) * v15);
-    v17[0] = static_cast<float>(0.5f * v15) * v19;
+    float v19 = 3.0f - ((v14[0] * v15) * v15);
+    v17[0] = (0.5f * v15) * v19;
     __m128 v21 = _mm_andnot_ps(v18, v17);
     m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col1.m_quad =
         _mm_mul_ps(_mm_shuffle_ps(v21, v21, 0), v11.m_quad);
@@ -422,8 +422,8 @@ void hkpWheelConstraintData::setInBodySpace(
     __m128 v23 = _mm_shuffle_ps(v22, v22, 170);
     v23[0] = v23[0] + v21[0];
     float v24 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v23[0])));
-    float v26 = 3.0f - static_cast<float>(static_cast<float>(v23[0] * v24) * v24);
-    v17[0] = static_cast<float>(0.5f * v24) * v26;
+    float v26 = 3.0f - ((v23[0] * v24) * v24);
+    v17[0] = (0.5f * v24) * v26;
     __m128 v28 = _mm_andnot_ps(_mm_cmpeq_ss(v23, v16), v17);
     m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(v28, v28, 0), axleA.m_quad);
     __m128 m_quad = axleB.m_quad;
@@ -432,8 +432,8 @@ void hkpWheelConstraintData::setInBodySpace(
     __m128 v31 = _mm_shuffle_ps(v30, v30, 170);
     v31[0] = v31[0] + v28[0];
     float v32 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v31[0])));
-    float v34 = 3.0f - static_cast<float>(static_cast<float>(v31[0] * v32) * v32);
-    v17[0] = static_cast<float>(0.5f * v32) * v34;
+    float v34 = 3.0f - ((v31[0] * v32) * v32);
+    v17[0] = (0.5f * v32) * v34;
     m_atoms.m_steeringBase.m_rotationB.m_col0.m_quad = axleB.m_quad;
     __m128 v36 = _mm_andnot_ps(_mm_cmpeq_ss(v31, v16), v17);
     v37.m_quad = _mm_mul_ps(_mm_shuffle_ps(v36, v36, 0), m_quad);
@@ -463,9 +463,9 @@ void hkpWheelConstraintData::setInBodySpace(
     __m128 v45 = _mm_shuffle_ps(v43, v43, 170);
     v45[0] = v45[0] + v44;
     float v46 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v45[0])));
-    float v47 = 3.0f - static_cast<float>(static_cast<float>(v45[0] * v46) * v46);
+    float v47 = 3.0f - ((v45[0] * v46) * v46);
     __m128 v48 = _mm_cmpeq_ss(v45, v16);
-    v17[0] = static_cast<float>(0.5f * v46) * v47;
+    v17[0] = (0.5f * v46) * v47;
     __m128 v50 = _mm_andnot_ps(v48, v17);
     m_atoms.m_steeringBase.m_rotationA.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v50, v50, 0), v42.m_quad);
     m_atoms.m_steeringBase.m_rotationB.m_col1.m_quad = steeringAxisB.m_quad;
@@ -475,8 +475,7 @@ void hkpWheelConstraintData::setInBodySpace(
     __m128 v53 = _mm_shuffle_ps(v52, v52, 170);
     v53[0] = v53[0] + v50[0];
     v50[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v53[0])));
-    v17[0] = static_cast<float>(0.5f * v50[0]) *
-        static_cast<float>(3.0f - static_cast<float>(static_cast<float>(v53[0] * v50[0]) * v50[0]));
+    v17[0] = (0.5f * v50[0]) * (3.0f - ((v53[0] * v50[0]) * v50[0]));
     __m128 v54 = _mm_andnot_ps(_mm_cmpeq_ss(v53, v16), v17);
     m_atoms.m_steeringBase.m_rotationB.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v54, v54, 0), v51.m_quad);
     m_initialSteeringAxisInB = m_atoms.m_steeringBase.m_rotationB.m_col1;

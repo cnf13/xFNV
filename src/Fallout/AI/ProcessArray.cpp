@@ -101,7 +101,7 @@ void ProcessArray::GrowArraySize(int32_t aSize) {
         if (i >= static_cast<uint32_t>(lastsize_2)) {
             break;
         }
-        MobileObject* a3 = 0;
+        MobileObject* a3 = nullptr;
         AIProcessArray.SetAt(i, a3);
     }
 }

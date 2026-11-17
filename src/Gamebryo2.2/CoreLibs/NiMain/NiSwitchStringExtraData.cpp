@@ -34,8 +34,8 @@ NiObject* NiSwitchStringExtraData::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -150,7 +150,7 @@ NiObject* NiSwitchStringExtraData::CreateObject() {
     NiSwitchStringExtraData* pkObject =
         static_cast<NiSwitchStringExtraData*>(NiMemObject::operator new(sizeof(NiSwitchStringExtraData)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiSwitchStringExtraData;
 }

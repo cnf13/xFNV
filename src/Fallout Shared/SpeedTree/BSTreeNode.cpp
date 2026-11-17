@@ -146,7 +146,8 @@ void BSTreeNode::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
 void BSTreeNode::UpdateDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) {
     NiCamera* Camera;
     AutoMemContext apMemory(
-        MEM_CONTEXT_TREEART, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeNode.cpp", 525
+        MEM_CONTEXT_TREEART, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeNode.cpp",
+        525
     );
     if (BSTreeManager::GetTreesEnabled() &&
         (!(UpdateData.fTime > 0.0) || (Camera = BSTreeManager::GetCamera(), NodeInFrustum(this, Camera)))) {
@@ -159,7 +160,8 @@ void BSTreeNode::UpdateDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) {
 void BSTreeNode::UpdateSelectedDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) {
     NiCamera* Camera;
     AutoMemContext apMemory(
-        MEM_CONTEXT_TREEART, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeNode.cpp", 547
+        MEM_CONTEXT_TREEART, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeNode.cpp",
+        547
     );
     if (BSTreeManager::GetTreesEnabled() &&
         (!(UpdateData.fTime > 0.0) || (Camera = BSTreeManager::GetCamera(), NodeInFrustum(this, Camera)))) {
@@ -442,7 +444,7 @@ void BSTreeNode::UpdateBSTreeNode(float afTime) {
                                     (&collArray->operator[]<hkpRootCdBodyPair>(i))->m_rootCollidableB;
                                 point.m_shapeKeyB = 0;
                                 point.m_shapeKeyA = 0;
-                                pc->contactPointAddedCallback(0, point);
+                                pc->contactPointAddedCallback(nullptr, point);
                                 ::new (&csdata) NiBound;
                                 csdata.cMaterialType1 = 4;
                                 csdata.cMaterialType2 = 7;
@@ -454,8 +456,8 @@ void BSTreeNode::UpdateBSTreeNode(float afTime) {
                                     reinterpret_cast<uintptr_t>(phkpPhantom) + reinterpret_cast<uintptr_t>(pTree)
                                 );
                                 csdata.Location = HK2NI(dum, vLocation);
-                                csdata.pBody1 = 0;
-                                csdata.pBody2 = 0;
+                                csdata.pBody1 = nullptr;
+                                csdata.pBody2 = nullptr;
                                 ImpactMixer::PlayCollisionSound(csdata);
                             }
                         }
@@ -516,7 +518,7 @@ void BSTreeNode::UpdateBSTreeNode(float afTime) {
                                 const hkTransform* Transform = &pRigidBody->getTransform();
                                 csdata_2.Location = HK2NI(dum_2, Transform->m_translation);
                                 csdata_2.pBody1 = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(pRigidBody));
-                                csdata_2.pBody2 = 0;
+                                csdata_2.pBody2 = nullptr;
                                 ImpactMixer::PlayCollisionSound(csdata_2);
                             }
                         }
@@ -532,25 +534,25 @@ bool BSTreeNode::CheckForCollision(float afTime) {
     double v4;
     int8_t v6;
     if (afTime == 0.0) {
-        return (bool)1;
+        return true;
     }
     if (fNextCollisionCheck == 0.0) {
-        v4 = (double)(afTime + ((&fUpdateInterval)->Float()));
+        v4 = (double)(afTime + (&fUpdateInterval)->Float());
         v3 = &(&fUpdateInterval)->Float();
         fNextCollisionCheck =
-            (float)((((*v3) / ((double)((&gs_iUpdateGroups)->Int()))) * ((double)BSTreeNode::ucNextGroup)) + v4);
+            (float)((((*v3) / ((double)(&gs_iUpdateGroups)->Int())) * ((double)BSTreeNode::ucNextGroup)) + v4);
         ++BSTreeNode::ucNextGroup;
         BSTreeNode::ucNextGroup =
-            (uint8_t)(((int32_t)BSTreeNode::ucNextGroup) % ((int32_t)((&gs_iUpdateGroups)->UInt())));
-        return (bool)1;
+            (uint8_t)(((int32_t)BSTreeNode::ucNextGroup) % ((int32_t)(&gs_iUpdateGroups)->UInt()));
+        return true;
     }
     else {
         v6 = 0;
         if (!(fNextCollisionCheck < ((double)afTime))) {
             return (bool)v6;
         }
-        fNextCollisionCheck = (float)(afTime + ((&fUpdateInterval)->Float()));
-        return (bool)1;
+        fNextCollisionCheck = (afTime + (&fUpdateInterval)->Float());
+        return true;
     }
 }
 
@@ -662,7 +664,7 @@ void BSTreeNode::MakeHavokLeaves(CSpeedTreeRT* apST, float afScale) {
 }
 
 bhkSimpleShapePhantom* BSTreeNode::GetLeafObject() {
-    bhkSimpleShapePhantom* pp = 0;
+    bhkSimpleShapePhantom* pp = nullptr;
     NiNode* pln = GetLeafNode();
     if (pln) {
         NiPointer<bhkNiCollisionObject> pnico(static_cast<bhkNiCollisionObject*>(pln->GetCollisionObject()));

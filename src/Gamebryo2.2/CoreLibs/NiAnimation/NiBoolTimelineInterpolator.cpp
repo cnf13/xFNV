@@ -31,8 +31,8 @@ NiObject* NiBoolTimelineInterpolator::CreateClone(NiCloningProcess& kCloning) {
         return pkObject;
     }
     else {
-        CopyMembers(0, kCloning);
-        return 0;
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
 }
 
@@ -133,7 +133,7 @@ NiObject* NiBoolTimelineInterpolator::CreateObject() {
     NiBoolTimelineInterpolator* pkObject =
         static_cast<NiBoolTimelineInterpolator*>(NiMemObject::operator new(sizeof(NiBoolTimelineInterpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiBoolTimelineInterpolator(static_cast<NiBoolData*>(nullptr));
 }

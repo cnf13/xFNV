@@ -63,7 +63,7 @@
 #include "Havok/Source/Physics/Utilities/Serialize/hkpDisplayBindingData.h"
 
 #include <bit>
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 
 namespace bhkConvert {} // namespace bhkConvert
@@ -139,7 +139,7 @@ void bhkBlendCollisionObject::LinkObject(NiStream& arStream) {
     bhkCollisionObject::LinkObject(arStream);
     usFlags |= 40u;
     hkpRigidBody* phkObject = static_cast<hkpRigidBody*>(spWorldObject->phkObject);
-    if (phkObject && (pCollidable = &phkObject->m_collidable) != 0) {
+    if (phkObject && (pCollidable = &phkObject->m_collidable) != nullptr) {
         v5 = pCollidable->m_broadPhaseHandle.m_collisionFilterInfo;
     }
     else {
@@ -271,7 +271,7 @@ void bhkBlendCollisionObject::hktoNiTransform() {
         pHavokSyncMode = p_eHavokSyncMode;
     }
     hkpMotion::MotionType ePrevType = this->ePrevType;
-    bool bAddToWorld = 0;
+    bool bAddToWorld = false;
     if (ePrevType != emt) {
         if (ePrevType == hkpMotion::MOTION_KEYFRAMED) {
             NitohkTransform();
@@ -282,13 +282,13 @@ void bhkBlendCollisionObject::hktoNiTransform() {
                 prb->SetAngularVelocity(hkVector4Zero);
             }
         }
-        bhkNiCollisionObject::kKeyframeLock.Lock(0);
-        bhkCollisionObject::SetMotionType(emt, prb, 0);
+        bhkNiCollisionObject::kKeyframeLock.Lock(nullptr);
+        bhkCollisionObject::SetMotionType(emt, prb, false);
         if (!--bhkNiCollisionObject::kKeyframeLock.uiLockCount) {
             bhkNiCollisionObject::kKeyframeLock.uiOwningThread = 0;
         }
         this->ePrevType = emt;
-        bAddToWorld = 1;
+        bAddToWorld = true;
     }
     if (v23) {
         if (v23 == 1) {
@@ -394,7 +394,7 @@ void bhkBlendCollisionObject::SetMotionType(
         hkpLinkedCollidable* p_m_collidable;
         uint32_t m_collisionFilterInfo;
         hkpRigidBody* phkObject = static_cast<hkpRigidBody*>(prb->phkObject);
-        if (phkObject && (p_m_collidable = &phkObject->m_collidable) != 0) {
+        if (phkObject && (p_m_collidable = &phkObject->m_collidable) != nullptr) {
             m_collisionFilterInfo = p_m_collidable->m_broadPhaseHandle.m_collisionFilterInfo;
         }
         else {
@@ -449,7 +449,7 @@ void bhkBlendCollisionObject::SetMotionType(
         hkpLinkedCollidable* v18;
         uint32_t v19;
         hkpRigidBody* v17 = static_cast<hkpRigidBody*>(spWorldObject->phkObject);
-        if (v17 && (v18 = &v17->m_collidable) != 0) {
+        if (v17 && (v18 = &v17->m_collidable) != nullptr) {
             v19 = v18->m_broadPhaseHandle.m_collisionFilterInfo;
         }
         else {
@@ -474,13 +474,12 @@ void bhkBlendCollisionObject::UpdateAddedToWorld() {
         hkpLinkedCollidable* p_m_collidable;
         uint32_t m_collisionFilterInfo;
         hkpRigidBody* phkObject = static_cast<hkpRigidBody*>(pbody->phkObject);
-        if (phkObject && (p_m_collidable = &phkObject->m_collidable) != 0) {
+        if (phkObject && (p_m_collidable = &phkObject->m_collidable) != nullptr) {
             m_collisionFilterInfo = p_m_collidable->m_broadPhaseHandle.m_collisionFilterInfo;
         }
         else {
             m_collisionFilterInfo = static_cast<uint32_t>(
-                (static_cast<uint32_t>(m_collisionFilterInfo) & 0xFFFFFF00u) |
-                (static_cast<uint32_t>(static_cast<uint8_t>(0)))
+                (m_collisionFilterInfo & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(0)))
             );
         }
         int32_t v6 = m_collisionFilterInfo & 127;
@@ -524,10 +523,10 @@ void bhkBlendCollisionObject::SynchronizeMotionType() {
         int32_t m_type;
         hkpMotion::MotionType ePrevType = this->ePrevType;
         if ((ePrevType == hkpMotion::MOTION_KEYFRAMED &&
-             ((phkObject = static_cast<hkpRigidBody*>(prb->phkObject)) == 0 ||
+             ((phkObject = static_cast<hkpRigidBody*>(prb->phkObject)) == nullptr ||
               phkObject->m_motion.m_type.m_storage != 4)) ||
             (ePrevType == hkpMotion::MOTION_DYNAMIC &&
-             ((v4 = static_cast<hkpRigidBody*>(prb->phkObject)) == 0 ||
+             ((v4 = static_cast<hkpRigidBody*>(prb->phkObject)) == nullptr ||
               ((m_type = v4->m_motion.m_type.m_storage, m_type == 4) || m_type == 5)))) {
             prb->SetMotionType(ePrevType);
         }

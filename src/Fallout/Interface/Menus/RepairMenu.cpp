@@ -55,7 +55,7 @@ RepairMenu::RepairMenu() {
 
 RepairMenu::~RepairMenu() {
     pTiles[8]->RemoveFadeControl(4009);
-    RepairMenu::pMe = 0;
+    RepairMenu::pMe = nullptr;
 }
 
 void RepairMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
@@ -72,7 +72,7 @@ void RepairMenu::DoClick(int32_t a1, Tile* a2) {
     }
     if (a1 == 12) {
         InterfaceManager::PlayMenuSound(MENU_SOUND_MODE);
-        Interface::SetInventoryMenuVisible(1, 0, 0);
+        Interface::SetInventoryMenuVisible(true, false, false);
     }
     else {
         if (a1 == 14 && !(a2->xChildren.GetTail()->GetFloat(4009) < 255.0)) {
@@ -84,23 +84,23 @@ void RepairMenu::DoClick(int32_t a1, Tile* a2) {
                     pspareExtra = psparePart->pExtraObjectList->m_item;
                 }
                 else {
-                    pspareExtra = 0;
+                    pspareExtra = nullptr;
                 }
                 RepairItem(psparePart);
                 TESBoundObject* FormFlags = psparePart->pContainerObj;
-                pPlayer->RemoveItem(FormFlags, pspareExtra, 1, 0, 0, 0, 0, 0, 1, 0);
+                pPlayer->RemoveItem(FormFlags, pspareExtra, 1, false, false, nullptr, nullptr, nullptr, true, false);
                 BSAudio* v4 = &BSAudio::QInstance();
                 BSSoundHandle* SoundHandleByName = v4->GetSoundHandleByName(&a12, "UIRepairWeapon", 289u);
-                SoundHandleByName->Play(0);
+                SoundHandleByName->Play(false);
                 Tile* v5 = static_cast<Tile*>(lbRepairList.GetHighlightedItem());
                 lbRepairList.RemoveItem(v5);
-                if (lbRepairList.NumUnfiltered() == 1 || RepairMenu::pBrokenItem->GetItemHealth(1) >= 99.0) {
-                    DoClick(12, 0);
+                if (lbRepairList.NumUnfiltered() == 1 || RepairMenu::pBrokenItem->GetItemHealth(true) >= 99.0) {
+                    DoClick(12, nullptr);
                 }
                 else {
-                    RepairMenu::InitRepairMenu(0);
+                    RepairMenu::InitRepairMenu(nullptr);
                 }
-                if (psparePart->GetWorn(0)) {
+                if (psparePart->GetWorn(false)) {
                     pPlayer->ResetArmorRating();
                     InventoryMenu::UpdateList();
                 }
@@ -132,7 +132,7 @@ void RepairMenu::DoEnter(int32_t a1, Tile* a2) {
             float afLeft_4 = fScrollKnobRate.Float();
             InterfaceManager* v4 = InterfaceManager::Instance();
             FOPipboyManager* Pipboy = v4->GetPipboy();
-            Pipboy->MoveKnob(FOPipboyManager::KNOB_SCROLL, v29, afLeft_4, 1);
+            Pipboy->MoveKnob(FOPipboyManager::KNOB_SCROLL, v29, afLeft_4, true);
             iprevHighlightIndex = inewHighlightIndex;
         }
         if (pcurrItem) {
@@ -142,20 +142,20 @@ void RepairMenu::DoEnter(int32_t a1, Tile* a2) {
                 if (pcurrItem->pContainerObj->GetFormType() == ARMO_ID) {
                     fMaintainValue = 50.0f;
                 }
-                if (!(static_cast<double>(fMaintainValue) <= pcurrItem->GetItemHealth(1))) {
+                if (!(static_cast<double>(fMaintainValue) <= pcurrItem->GetItemHealth(true))) {
                     v6 = sRepairItem.String();
                 }
                 else {
                     v6 = sMaintainItem.String();
                 }
-                RepairMenu::pMe->pTiles[11]->Set(4036, v6, 1);
+                RepairMenu::pMe->pTiles[11]->Set(4036, v6, true);
                 if (pcurrItem == RepairMenu::pBrokenItem) {
                     if (lbRepairList.NumUnfiltered() > 1) {
                         const char* v7 = sSelectItemToRepair.String();
                         ShowErrorMessage(v7);
                     }
                     int32_t v8 = Tile::TextToTrait("_line_alpha");
-                    pTiles[11]->Set(v8, 128.0f, 1);
+                    pTiles[11]->Set(v8, 128.0f, true);
                 }
                 else {
                     char Src[68];
@@ -164,16 +164,16 @@ void RepairMenu::DoEnter(int32_t a1, Tile* a2) {
                     if (iminSkillNeeded <= 100) {
                         if (iminSkillNeeded <= 0) {
                             int32_t v11 = Tile::TextToTrait("_line_alpha");
-                            pTiles[11]->Set(v11, 255.0f, 1);
-                            pTiles[9]->Set(Tile::kTileValue_User0, fnewHealthPercent, 1);
+                            pTiles[11]->Set(v11, 255.0f, true);
+                            pTiles[9]->Set(Tile::kTileValue_User0, fnewHealthPercent, true);
                             pTiles[9]->Set(4003, 1);
                             pTiles[8]->Set(4003, 0);
                             if (RepairMenu::pBrokenItem->pContainerObj->GetFormType() == WEAP_ID) {
                                 const char* v12 = sInventoryDamage.String();
-                                pTiles[10]->Set(RepairMenu::iUT_Title, v12, 1);
+                                pTiles[10]->Set(RepairMenu::iUT_Title, v12, true);
                                 float afLeft_4a = CombatFormulas::CalcWeaponDamageForDisplay(
                                     static_cast<TESObjectWEAP*>(RepairMenu::pBrokenItem->pContainerObj),
-                                    fnewHealthPercent, RepairMenu::pBrokenItem, 0
+                                    fnewHealthPercent, RepairMenu::pBrokenItem, nullptr
                                 );
                                 double v13 = BSRoundToNearest(afLeft_4a, 1.0f);
                                 pTiles[10]->Set(RepairMenu::iUT_Value, static_cast<int32_t>(v13));
@@ -183,7 +183,7 @@ void RepairMenu::DoEnter(int32_t a1, Tile* a2) {
                                     char Dst[132];
                                     TESObjectARMO* pBrokenArmor =
                                         static_cast<TESObjectARMO*>(RepairMenu::pBrokenItem->pContainerObj);
-                                    float foldHealthPercent = RepairMenu::pBrokenItem->GetItemHealth(1) / 100.0;
+                                    float foldHealthPercent = RepairMenu::pBrokenItem->GetItemHealth(true) / 100.0;
                                     double ArmorRating = pBrokenArmor->GetArmorRating();
                                     float fBrokenDR = CombatFormulas::CalcArmorRating(
                                         static_cast<int32_t>(ArmorRating), foldHealthPercent
@@ -202,17 +202,17 @@ void RepairMenu::DoEnter(int32_t a1, Tile* a2) {
                                     if (!(fRepairedDT > 0.0)) {
                                         if (!(fRepairedDR > 0.0)) {
                                             const char* v22 = sInventoryDamageResistance.String();
-                                            RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v22, 1);
-                                            RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Value, Dst, 1);
+                                            RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v22, true);
+                                            RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Value, Dst, true);
                                             const char* v23 = sInventoryDamageResistance.String();
-                                            RepairMenu::pMe->pTiles[10]->Set(RepairMenu::iUT_Title, v23, 1);
-                                            RepairMenu::pMe->pTiles[10]->Set(RepairMenu::iUT_Value, Dst, 1);
+                                            RepairMenu::pMe->pTiles[10]->Set(RepairMenu::iUT_Title, v23, true);
+                                            RepairMenu::pMe->pTiles[10]->Set(RepairMenu::iUT_Value, Dst, true);
                                         }
                                         else {
                                             const char* v20 = sInventoryDamageResistance.String();
-                                            RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v20, 1);
+                                            RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v20, true);
                                             if (!(fBrokenDR > 0.0)) {
-                                                RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Value, Dst, 1);
+                                                RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Value, Dst, true);
                                             }
                                             else {
                                                 RepairMenu::pMe->pTiles[5]->Set(
@@ -220,7 +220,7 @@ void RepairMenu::DoEnter(int32_t a1, Tile* a2) {
                                                 );
                                             }
                                             const char* v21 = sInventoryDamageResistance.String();
-                                            RepairMenu::pMe->pTiles[10]->Set(RepairMenu::iUT_Title, v21, 1);
+                                            RepairMenu::pMe->pTiles[10]->Set(RepairMenu::iUT_Title, v21, true);
                                             RepairMenu::pMe->pTiles[10]->Set(
                                                 RepairMenu::iUT_Value, static_cast<int32_t>(fRepairedDR)
                                             );
@@ -228,9 +228,9 @@ void RepairMenu::DoEnter(int32_t a1, Tile* a2) {
                                     }
                                     else {
                                         const char* v18 = sInventoryDamageThreshold.String();
-                                        RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v18, 1);
+                                        RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v18, true);
                                         if (!(fBrokenDT > 0.0)) {
-                                            RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Value, Dst, 1);
+                                            RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Value, Dst, true);
                                         }
                                         else {
                                             RepairMenu::pMe->pTiles[5]->Set(
@@ -238,7 +238,7 @@ void RepairMenu::DoEnter(int32_t a1, Tile* a2) {
                                             );
                                         }
                                         const char* v19 = sInventoryDamageThreshold.String();
-                                        RepairMenu::pMe->pTiles[10]->Set(RepairMenu::iUT_Title, v19, 1);
+                                        RepairMenu::pMe->pTiles[10]->Set(RepairMenu::iUT_Title, v19, true);
                                         RepairMenu::pMe->pTiles[10]->Set(
                                             RepairMenu::iUT_Value, static_cast<int32_t>(fRepairedDT)
                                         );
@@ -253,15 +253,15 @@ void RepairMenu::DoEnter(int32_t a1, Tile* a2) {
                             fstatImprovement = BSMAX(0.0f, fstatImprovement);
                             BSsprintf(Src, 64, "+%i", static_cast<int32_t>(fhealthImprovement + 0.5));
                             BSstrcat(Src, 64, "%");
-                            pTiles[6]->Set(4036, Src, 1);
+                            pTiles[6]->Set(4036, Src, true);
                             BSsprintf(Src, 64, "+%i", static_cast<int32_t>(fstatImprovement + 0.5));
-                            pTiles[7]->Set(4036, Src, 1);
+                            pTiles[7]->Set(4036, Src, true);
                         }
                         else {
                             BSsprintf(Src, 64, sRepairSkillTooLow.String(), iminSkillNeeded, "%");
                             ShowErrorMessage(Src);
                             int32_t v10 = Tile::TextToTrait("_line_alpha");
-                            pTiles[11]->Set(v10, 128.0f, 1);
+                            pTiles[11]->Set(v10, 128.0f, true);
                         }
                     }
                     else {
@@ -269,7 +269,7 @@ void RepairMenu::DoEnter(int32_t a1, Tile* a2) {
                         BSsprintf(Src, 64, sCantRepairPastMax.String(), afLeft, "%");
                         ShowErrorMessage(Src);
                         int32_t v9 = Tile::TextToTrait("_line_alpha");
-                        pTiles[11]->Set(v9, 128.0f, 1);
+                        pTiles[11]->Set(v9, 128.0f, true);
                     }
                 }
             }
@@ -296,11 +296,11 @@ bool RepairMenu::DoGamepadUpEvent(int32_t a2, float a3) {
         Interface::PlayMenuSound(3);
         DoClick(12, nullptr);
     }
-    return (bool)0;
+    return false;
 }
 
 void RepairMenu::ShowErrorMessage(const char* astrMessage) {
-    pTiles[8]->Set(4036, astrMessage, (bool)1);
+    pTiles[8]->Set(4036, astrMessage, true);
     pTiles[9]->Set(4003, 0);
     pTiles[8]->Set(4003, 1);
     if (!pTiles[8]->HasFadeControl(4009)) {
@@ -312,19 +312,20 @@ bool RepairMenu::IsWellFormedMenu() {
     int32_t i;
     for (i = 0; i < 13; ++i) {
         if (!pTiles[i]) {
-            return (bool)0;
+            return false;
         }
     }
-    return (bool)1;
+    return true;
 }
 
 void RepairMenu::RepairItem(ItemChange* apSparePart) {
     ExtraDataList* prepairedExtra;
     ExtraDataList* pbrokenExtra;
-    float afCondition2 = apSparePart->GetItemHealth(1);
-    float afCondition1 = RepairMenu::pBrokenItem->GetItemHealth(1);
+    float afCondition2 = apSparePart->GetItemHealth(true);
+    float afCondition1 = RepairMenu::pBrokenItem->GetItemHealth(true);
     int32_t ClampedActorValue = pPlayer->GetClampedActorValue(ActorValue::REPAIR);
-    float fnewHealth = GamePlayFormulas::GetRepairedCondition(ClampedActorValue, afCondition1, afCondition2, 0) / 100.0;
+    float fnewHealth =
+        GamePlayFormulas::GetRepairedCondition(ClampedActorValue, afCondition1, afCondition2, nullptr) / 100.0;
     fnewHealth = BSMIN(fnewHealth, 1.0f);
     TESObjectWEAP* pWeap = dynamic_cast<TESObjectWEAP*>(RepairMenu::pBrokenItem->pContainerObj);
     if (pWeap) {
@@ -337,12 +338,12 @@ void RepairMenu::RepairItem(ItemChange* apSparePart) {
     }
     TESBoundObject* afCondition1a = RepairMenu::pBrokenItem->pContainerObj;
     InventoryChanges* InventoryChanges_ = InventoryChanges::GetInventoryChanges(pPlayer);
-    ItemChange* pitemGroup = InventoryChanges_->GetObjectInList(afCondition1a, 1, 0);
+    ItemChange* pitemGroup = InventoryChanges_->GetObjectInList(afCondition1a, true, 0);
     if (RepairMenu::pBrokenItem->pExtraObjectList) {
         pbrokenExtra = RepairMenu::pBrokenItem->pExtraObjectList->m_item;
     }
     else {
-        pbrokenExtra = 0;
+        pbrokenExtra = nullptr;
     }
     ExtraDataList* pbrokenExtra_2 = pbrokenExtra;
     ExtraDataList* apMemory = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
@@ -350,10 +351,10 @@ void RepairMenu::RepairItem(ItemChange* apSparePart) {
         prepairedExtra = ::new (apMemory) ExtraDataList;
     }
     else {
-        prepairedExtra = 0;
+        prepairedExtra = nullptr;
     }
     ExtraDataList* prepairedExtra_2 = prepairedExtra;
-    bool bfoundMatchingExtra = 0;
+    bool bfoundMatchingExtra = false;
     int32_t iorigStackCount = pbrokenExtra_2->GetCount();
     prepairedExtra->DuplicateExtraListForContainer(pbrokenExtra_2);
     prepairedExtra->SetCount(1);
@@ -365,13 +366,13 @@ void RepairMenu::RepairItem(ItemChange* apSparePart) {
     }
     for (BSSimpleList<ExtraDataList*>* pcurrExtraObj = pitemGroup->pExtraObjectList;
          pcurrExtraObj && pcurrExtraObj->m_item; pcurrExtraObj = pcurrExtraObj->m_pkNext) {
-        if (!pcurrExtraObj->m_item->CompareListForContainer(prepairedExtra_2, 1, 0) &&
-            !prepairedExtra_2->CompareListForContainer(pcurrExtraObj->m_item, 1, 0)) {
+        if (!pcurrExtraObj->m_item->CompareListForContainer(prepairedExtra_2, true, false) &&
+            !prepairedExtra_2->CompareListForContainer(pcurrExtraObj->m_item, true, false)) {
             int16_t Count = pcurrExtraObj->m_item->GetCount();
             pcurrExtraObj->m_item->SetCount(Count + 1);
             BSSimpleList<ExtraDataList*>* afHealth = pcurrExtraObj;
             RepairMenu::pBrokenItem->pExtraObjectList->AddHead(afHealth->m_item);
-            bfoundMatchingExtra = 1;
+            bfoundMatchingExtra = true;
         }
     }
     if (bfoundMatchingExtra) {
@@ -390,7 +391,7 @@ void RepairMenu::RepairItem(ItemChange* apSparePart) {
         }
     }
     if (bfoundMatchingExtra || iorigStackCount == 1) {
-        prepairedExtra_2->SetScriptLocals(0);
+        prepairedExtra_2->SetScriptLocals(nullptr);
         if (prepairedExtra_2) {
             delete prepairedExtra_2;
         }
@@ -408,24 +409,24 @@ Tile* RepairMenu::Create() {
     TileMenu* th_s = static_cast<TileMenu*>(v4->pMenusRoot->ReadFile("Data\\Menus\\repair_menu.xml"));
     RepairMenu::pMe = static_cast<RepairMenu*>(th_s->GetMenu());
     if (RepairMenu::pMe && (v1 = RepairMenu::pMe->GetClass(), v1 == RepairMenu::GetClassStatic())) {
-        RepairMenu::pMe->SetMenuTile(th_s, 0);
+        RepairMenu::pMe->SetMenuTile(th_s, false);
         RepairMenu::pMe->SetRenderedMenu();
         if (RepairMenu::pMe->IsWellFormedMenu()) {
             if (th_s->GetFloat(Tile::kTileValue_StackingType) == 6006.0 ||
                 th_s->GetFloat(Tile::kTileValue_StackingType) == 102.0) {
                 float MaximumDepth = Tile::GetMaximumDepth();
-                th_s->Set(Tile::kTileValue_Depth, MaximumDepth, 1);
+                th_s->Set(Tile::kTileValue_Depth, MaximumDepth, true);
             }
             RepairMenu::pMe->lbRepairList.Initialize(RepairMenu::pMe->pTiles[1], "RM_RepairListTemplate");
-            RepairMenu::pMe->lbRepairList.SetAutoUpdate(0);
+            RepairMenu::pMe->lbRepairList.SetAutoUpdate(false);
             RepairMenu::pMe->pTiles[5]->Poke(RepairMenu::iUT_Value, 1.0f);
             RepairMenu::pMe->pTiles[10]->Poke(RepairMenu::iUT_Value, 1.0f);
-            RepairMenu::pMe->PrepForVisibility(1);
+            RepairMenu::pMe->PrepForVisibility(true);
             return th_s;
         }
         else {
             Warning("MENUS: Repair Menu Creation Failed... Are your menu and art resources up to date?");
-            return 0;
+            return nullptr;
         }
     }
     else {
@@ -436,7 +437,7 @@ Tile* RepairMenu::Create() {
                 }
             }
         }
-        return 0;
+        return nullptr;
     }
 }
 
@@ -449,16 +450,16 @@ void RepairMenu::InitRepairMenu(ItemChange* apBrokenItem) {
         if (apBrokenItem) {
             RepairMenu::pBrokenItem = apBrokenItem;
         }
-        float fcondition = RepairMenu::pBrokenItem->GetItemHealth(1) / 100.0;
-        RepairMenu::pMe->pTiles[4]->Set(Tile::kTileValue_User0, fcondition, 1);
+        float fcondition = RepairMenu::pBrokenItem->GetItemHealth(true) / 100.0;
+        RepairMenu::pMe->pTiles[4]->Set(Tile::kTileValue_User0, fcondition, true);
         RepairMenu::pMe->pTiles[4]->Set(4003, 1);
         TESForm* pBrokenArmor = RepairMenu::pBrokenItem->pContainerObj;
         int32_t FormType = pBrokenArmor->GetFormType();
         if (FormType == 40) {
             const char* v1 = sInventoryDamage.String();
-            RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v1, 1);
+            RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v1, true);
             float afVal = CombatFormulas::CalcWeaponDamageForDisplay(
-                static_cast<TESObjectWEAP*>(pBrokenArmor), fcondition, apBrokenItem, 0
+                static_cast<TESObjectWEAP*>(pBrokenArmor), fcondition, apBrokenItem, nullptr
             );
             double v2 = BSRoundToNearest(afVal, 1.0f);
             RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Value, static_cast<int32_t>(v2));
@@ -475,18 +476,18 @@ void RepairMenu::InitRepairMenu(ItemChange* apBrokenItem) {
                         char Dst[132];
                         BSstrcpy(Dst, 128, "--");
                         const char* v7 = sInventoryDamageResistance.String();
-                        RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v7, 1);
-                        RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Value, Dst, 1);
+                        RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v7, true);
+                        RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Value, Dst, true);
                     }
                     else {
                         const char* v6 = sInventoryDamageResistance.String();
-                        RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v6, 1);
+                        RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v6, true);
                         RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Value, static_cast<int32_t>(fBrokenDR));
                     }
                 }
                 else {
                     const char* v5 = sInventoryDamageThreshold.String();
-                    RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v5, 1);
+                    RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v5, true);
                     RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Value, static_cast<int32_t>(fBrokenDT));
                 }
             }
@@ -494,13 +495,13 @@ void RepairMenu::InitRepairMenu(ItemChange* apBrokenItem) {
                 char Src[128];
                 BSstrcpy(Src, 128, "--");
                 const char* v8 = sInventoryDamageResistance.String();
-                RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v8, 1);
-                RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Value, Src, 1);
+                RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Title, v8, true);
+                RepairMenu::pMe->pTiles[5]->Set(RepairMenu::iUT_Value, Src, true);
             }
         }
         if (apBrokenItem) {
-            const char* IconOne = RepairMenu::pBrokenItem->GetIconOne(0);
-            RepairMenu::pMe->pTiles[3]->Set(4044, IconOne, 1);
+            const char* IconOne = RepairMenu::pBrokenItem->GetIconOne(nullptr);
+            RepairMenu::pMe->pTiles[3]->Set(4044, IconOne, true);
             RepairMenu::Update();
         }
         RepairMenu::pMe->lbRepairList.Traverse(&RepairMenu::InitFunc, 0, 0x7FFFFFFF);
@@ -509,15 +510,15 @@ void RepairMenu::InitRepairMenu(ItemChange* apBrokenItem) {
         RepairMenu::pMe->pTiles[0]->Set(RepairMenu::iUT_Value, ClampedActorValue);
         if (apBrokenItem) {
             if (InterfaceManager::Has360Controller()) {
-                Tile* v14 = static_cast<ListBoxBase*>(&RepairMenu::pMe->lbRepairList)->GetTileAt(1u, 0);
+                Tile* v14 = static_cast<ListBoxBase*>(&RepairMenu::pMe->lbRepairList)->GetTileAt(1u, false);
                 InterfaceManager* v11 = InterfaceManager::Instance();
-                v11->SetCurrentFocusTarget(v14, 4035, 1);
+                v11->SetCurrentFocusTarget(v14, 4035, true);
             }
         }
         Tile* v12 = static_cast<Tile*>(static_cast<ListBoxBase*>(&RepairMenu::pMe->lbRepairList)->GetHighlightedItem());
         RepairMenu::pMe->DoEnter(14, v12);
         if (apBrokenItem) {
-            Interface::SetRepairMenuVisible(1, 0, 0);
+            Interface::SetRepairMenuVisible(true, false, false);
             int32_t afVala = RepairMenu::GetClassStatic();
             InterfaceManager* v13 = InterfaceManager::Instance();
             v13->xTutorialManager.ShowMessage(Interface::TUT_PIPBOY_REPAIR, afVala, 500u);
@@ -528,8 +529,8 @@ void RepairMenu::InitRepairMenu(ItemChange* apBrokenItem) {
 // RemoveAll is virtual and is called through a pointer so that the call stays indirect.
 void RepairMenu::ResetMenu() {
     (&RepairMenu::pMe->lbRepairList)->RemoveAll();
-    RepairMenu::pBrokenItem = 0;
-    RepairMenu::pMe->DoLeave(14, 0);
+    RepairMenu::pBrokenItem = nullptr;
+    RepairMenu::pMe->DoLeave(14, nullptr);
     RepairMenu::pMe->pTiles[8]->RemoveFadeControl(4009);
     RepairMenu::pMe->pTiles[8]->Set(4003, 0);
 }
@@ -538,24 +539,24 @@ void RepairMenu::InitFunc(Tile* a1, ItemChange* a2) {
     int32_t apiMinSkillNeeded;
     if (a1) {
         if (a2) {
-            float ItemHealth = a2->GetItemHealth(1);
+            float ItemHealth = a2->GetItemHealth(true);
             a1->Set(4010, 14);
             int32_t a3 = a1->GetFloat(4012) >= 0.0;
             a1->Set(4003, a3);
             float v6 = ItemHealth * 0.6000000238418579;
             Tile* ChildByID = a1->GetChildByID(15);
-            ChildByID->Set(4017, v6, static_cast<bool>(1));
-            if (a2->GetWorn(0)) {
+            ChildByID->Set(4017, v6, true);
+            if (a2->GetWorn(false)) {
                 a1->xChildren.Get(a1->xChildren.m_pkHead)->Set(4003, 1);
             }
-            float v11 = RepairMenu::pBrokenItem->GetItemHealth(1);
+            float v11 = RepairMenu::pBrokenItem->GetItemHealth(true);
             float v10 = 0.0f;
             apiMinSkillNeeded = -1;
             int32_t ClampedActorValue = pPlayer->GetClampedActorValue(ActorValue::REPAIR);
             v10 =
                 GamePlayFormulas::GetRepairedCondition(ClampedActorValue, v11, ItemHealth, &apiMinSkillNeeded) / 100.0;
             v10 = BSMIN(v10, 1.0f);
-            a1->Set(Tile::kTileValue_User0, v10, static_cast<bool>(1));
+            a1->Set(Tile::kTileValue_User0, v10, true);
         }
     }
 }
@@ -578,11 +579,11 @@ int32_t RepairMenu::SortFunc(ListBoxItem<ItemChange*>* apItem1, ListBoxItem<Item
     if (!bisGreyedOut1 && bisGreyedOut2) {
         return -1;
     }
-    double ItemHealth = apItem1->data->GetItemHealth(1);
-    if (!(apItem2->data->GetItemHealth(1) > ItemHealth)) {
+    double ItemHealth = apItem1->data->GetItemHealth(true);
+    if (!(apItem2->data->GetItemHealth(true) > ItemHealth)) {
         int32_t v3;
-        double v4 = apItem1->data->GetItemHealth(1);
-        if (!(apItem2->data->GetItemHealth(1) < v4)) {
+        double v4 = apItem1->data->GetItemHealth(true);
+        if (!(apItem2->data->GetItemHealth(true) < v4)) {
             v3 = 0;
         }
         else {
@@ -598,11 +599,11 @@ int32_t RepairMenu::SortFunc(ListBoxItem<ItemChange*>* apItem1, ListBoxItem<Item
         iresult_2 = -iresult;
     }
     if (!iresult_2) {
-        if (apItem1->data->GetWorn(0)) {
+        if (apItem1->data->GetWorn(false)) {
             return -1;
         }
         else {
-            return apItem2->data->GetWorn(0);
+            return apItem2->data->GetWorn(false);
         }
     }
     return iresult_2;
@@ -617,14 +618,14 @@ void RepairMenu::Update() {
         for (ItemChange*& rpItem : pnewItemGroup.ItemsUntilNull()) {
             for (int32_t iitemCt = 0; iitemCt < rpItem->iNumber; ++iitemCt) {
                 ExtraDataList* m_item;
-                float fcondition = rpItem->GetItemHealth(1);
+                float fcondition = rpItem->GetItemHealth(true);
                 float fCeilcondition = FloatCeil(fcondition);
                 char v21 = 0;
                 if (rpItem->pExtraObjectList) {
                     m_item = rpItem->pExtraObjectList->m_item;
                 }
                 else {
-                    m_item = 0;
+                    m_item = nullptr;
                 }
                 if (m_item) {
                     if (m_item->HasWeaponMods()) {
@@ -644,18 +645,18 @@ void RepairMenu::Update() {
                         pnewItem_2 = ::new (v17) ItemChange(rpItem->pContainerObj, 1);
                     }
                     else {
-                        pnewItem_2 = 0;
+                        pnewItem_2 = nullptr;
                     }
                     for (ExtraDataList*& rpItem_2 : rpItem->pExtraObjectList->ItemsUntilNull()) {
                         pnewItem_2->pExtraObjectList->AddHead(rpItem_2);
                     }
                     const char* FullName = pnewItem_2->GetFullName();
-                    RepairMenu::pMe->lbRepairList.AddItem(pnewItem_2, FullName, 0, 0);
+                    RepairMenu::pMe->lbRepairList.AddItem(pnewItem_2, FullName, nullptr, nullptr);
                 }
                 else {
                     ItemChange* pnewItem = rpItem;
                     const char* v2 = pnewItem->GetFullName();
-                    Tile* pnewTile = RepairMenu::pMe->lbRepairList.AddItem(pnewItem, v2, 0, 0);
+                    Tile* pnewTile = RepairMenu::pMe->lbRepairList.AddItem(pnewItem, v2, nullptr, nullptr);
                     if (pnewTile) {
                         TESBoundObject* v3 = pnewItem->pContainerObj;
                         if (v3 == RepairMenu::pBrokenItem->pContainerObj) {
@@ -665,13 +666,13 @@ void RepairMenu::Update() {
                                 v15 = pnewItem->pExtraObjectList->m_item;
                             }
                             else {
-                                v15 = 0;
+                                v15 = nullptr;
                             }
                             if (RepairMenu::pBrokenItem->pExtraObjectList) {
                                 v14 = RepairMenu::pBrokenItem->pExtraObjectList->m_item;
                             }
                             else {
-                                v14 = 0;
+                                v14 = nullptr;
                             }
                             if (v15 == v14) {
                                 RepairMenu::pBrokenItem = pnewItem;
@@ -681,13 +682,13 @@ void RepairMenu::Update() {
                                 pheight->ClearActions();
                                 pheight->AddAction(2000, pnewTile, 4016);
                                 pheight->AddAction(2002, 1.0f);
-                                pheight->CalculateValue(0);
+                                pheight->CalculateValue(false);
                                 py->ClearActions();
                                 py->AddAction(2000, pnewTile, 4002);
-                                py->CalculateValue(0);
+                                py->CalculateValue(false);
                             }
                             else {
-                                if (v21 || pnewItem->GetWorn(0)) {
+                                if (v21 || pnewItem->GetWorn(false)) {
                                     RepairMenu::pMe->lbRepairList.RemoveItem(pnewTile);
                                 }
                             }
@@ -700,17 +701,17 @@ void RepairMenu::Update() {
         if (BSstrcmp(v5, "ENGLISH")) {
             const char* v12 = sInventoryItems.String();
             Tile* ChildByName = RepairMenu::pMe->pMenu->GetChildByName("RM_Headline_Title");
-            ChildByName->Set(4036, v12, 1);
+            ChildByName->Set(4036, v12, true);
             const char* v7 = sRepairSkill.String();
-            RepairMenu::pMe->pTiles[0]->Set(RepairMenu::iUT_Title, v7, 1);
+            RepairMenu::pMe->pTiles[0]->Set(RepairMenu::iUT_Title, v7, true);
             const char* v8 = sInventoryCondition.String();
-            RepairMenu::pMe->pTiles[4]->Set(RepairMenu::iUT_Title, v8, 1);
+            RepairMenu::pMe->pTiles[4]->Set(RepairMenu::iUT_Title, v8, true);
             const char* v9 = sInventoryCondition.String();
-            RepairMenu::pMe->pTiles[9]->Set(RepairMenu::iUT_Title, v9, 1);
+            RepairMenu::pMe->pTiles[9]->Set(RepairMenu::iUT_Title, v9, true);
             const char* v10 = sRepairItem.String();
-            RepairMenu::pMe->pTiles[11]->Set(4036, v10, 1);
+            RepairMenu::pMe->pTiles[11]->Set(4036, v10, true);
             const char* v11 = sCancel.String();
-            RepairMenu::pMe->pTiles[12]->Set(4036, v11, 1);
+            RepairMenu::pMe->pTiles[12]->Set(4036, v11, true);
         }
         pnewItemGroup.~BSSimpleList<ItemChange*>();
     }

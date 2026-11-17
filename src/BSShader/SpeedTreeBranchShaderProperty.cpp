@@ -30,7 +30,7 @@ NiObject* SpeedTreeBranchShaderProperty::CreateClone(NiCloningProcess& arCloneDa
         ::new (pprop) SpeedTreeBranchShaderProperty(v4);
     }
     else {
-        pprop = 0;
+        pprop = nullptr;
     }
     CopyMembers(pprop, arCloneData);
     return pprop;
@@ -43,11 +43,11 @@ void SpeedTreeBranchShaderProperty::GetViewerStrings(NiTPrimitiveArray<char*>* a
 NiAdditionalGeometryData* SpeedTreeBranchShaderProperty::CreateRendererSpecificProperty(NiGeometry* apGeometry) {
     NiAdditionalGeometryData* pdata;
     if (!apGeometry) {
-        return 0;
+        return nullptr;
     }
     uint16_t m_usVertices = apGeometry->m_spModelData.m_pObject->m_usVertices;
     if (m_usVertices > GetVertexCount()) {
-        return 0;
+        return nullptr;
     }
     uint16_t usverts = apGeometry->m_spModelData.m_pObject->m_usVertices;
     NiAdditionalGeometryData* v5 =
@@ -56,13 +56,13 @@ NiAdditionalGeometryData* SpeedTreeBranchShaderProperty::CreateRendererSpecificP
         pdata = ::new (v5) NiAdditionalGeometryData(usverts, 1u);
     }
     else {
-        pdata = 0;
+        pdata = nullptr;
     }
     pdata->SetDataBlockCount(1u);
     // SetDataBlock takes untyped bytes: the wind vectors are handed over as raw memory (as SpeedTreeLeafShaderProperty
     // does).
     uint8_t* v7 = reinterpret_cast<uint8_t*>(GetWindInfo());
-    pdata->SetDataBlock(0, v7, 16 * usverts, 0);
+    pdata->SetDataBlock(0, v7, 16 * usverts, false);
     pdata->SetDataStream(0, 0, 0, 4u, usverts, 16u, 16u);
     return pdata;
 }
@@ -70,7 +70,7 @@ NiAdditionalGeometryData* SpeedTreeBranchShaderProperty::CreateRendererSpecificP
 SpeedTreeBranchShaderProperty* SpeedTreeBranchShaderProperty::CreateCopy() {
     SpeedTreeBranchShaderProperty* v2 =
         static_cast<SpeedTreeBranchShaderProperty*>(NiMemObject::operator new(sizeof(SpeedTreeBranchShaderProperty)));
-    SpeedTreeBranchShaderProperty* result = 0;
+    SpeedTreeBranchShaderProperty* result = nullptr;
     if (v2) {
         STSPData* v4 = GetData();
         return ::new (v2) SpeedTreeBranchShaderProperty(v4);

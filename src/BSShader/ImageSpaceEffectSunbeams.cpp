@@ -42,7 +42,7 @@ void ImageSpaceEffectSunbeams::Setup(ImageSpaceManager* apManager, ImageSpaceEff
         pparam = ::new (pMemory) ImageSpaceShaderParam;
     }
     else {
-        pparam = 0;
+        pparam = nullptr;
     }
     pparam->InitConstantMap(0, 1);
     spParam.m_pObject = pparam;
@@ -55,7 +55,7 @@ void ImageSpaceEffectSunbeams::Setup(ImageSpaceManager* apManager, ImageSpaceEff
         pparam_2 = ::new (pMemory) ImageSpaceShaderParam;
     }
     else {
-        pparam_2 = 0;
+        pparam_2 = nullptr;
     }
     pparam_2->InitConstantMap(0, 1);
     spParam2.m_pObject = pparam_2;
@@ -85,5 +85,5 @@ bool ImageSpaceEffectSunbeams::UpdateParams(ImageSpaceEffectParam* apParam) {
         0, ImageSpaceEffectSunbeams::kSunPos.x, ImageSpaceEffectSunbeams::kSunPos.y, 0.0, 0.0
     );
     ImageSpaceShaderStencilCopy::uiStencilRef = 128;
-    return 0;
+    return false;
 }

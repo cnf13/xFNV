@@ -65,12 +65,12 @@ void SpecificItemCollector::operator delete(void* apMemory) {
 void bhkCollisionFilter::SetCollisionFlags(COL_LAYER aeLayer, uint64_t aiFlags) {
     if (aeLayer >= L_CAMERA) {
         bhkCollisionFilter::ulLayerFlagA[aeLayer] = static_cast<uint64_t>(
-            (static_cast<uint64_t>(bhkCollisionFilter::ulLayerFlagA[aeLayer]) & 0xFFFFFFFF00000000ull) |
+            (bhkCollisionFilter::ulLayerFlagA[aeLayer] & 0xFFFFFFFF00000000ull) |
             (static_cast<uint64_t>(static_cast<uint32_t>(aiFlags)))
         );
         bhkCollisionFilter::ulLayerFlagA[aeLayer] = static_cast<uint64_t>(
-            (static_cast<uint64_t>(bhkCollisionFilter::ulLayerFlagA[aeLayer]) & 0xFFFFFFFFull) |
-            (static_cast<uint64_t>(static_cast<uint32_t>(static_cast<uint32_t>(aiFlags >> 32))) << 32)
+            (bhkCollisionFilter::ulLayerFlagA[aeLayer] & 0xFFFFFFFFull) |
+            (static_cast<uint64_t>(static_cast<uint32_t>(aiFlags >> 32)) << 32)
         );
     }
 }

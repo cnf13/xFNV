@@ -52,10 +52,10 @@ public:
     };
 
     // Makes an empty object of a registered class; NiStream calls it with the class name it reads.
-    typedef NiObject* (*CreateFunction)();
+    using CreateFunction = NiObject* (*)();
     // Runs over each loaded top-level object once loading is done.
-    typedef void (*PostProcessFunction)(NiStream&, NiObject*);
-    typedef NiTPrimitiveArray<PostProcessFunction> PostProcessFunctionArray;
+    using PostProcessFunction = void (*)(NiStream&, NiObject*);
+    using PostProcessFunctionArray = NiTPrimitiveArray<PostProcessFunction>;
 
     // The procedure the background load thread runs, nested in NiStream as Gamebryo's NiStream.h has it. Holds the
     // stream pointer.

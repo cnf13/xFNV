@@ -177,7 +177,7 @@ void TESCaravanCard::InitItem() {
         static_cast<TESModelTextureSwap*>(this)->InitItem(this);
         static_cast<TESScriptableForm*>(this)->InitItem(this);
         static_cast<BGSPickupPutdownSounds*>(this)->InitItem(this);
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 
@@ -199,16 +199,16 @@ void TESCaravanCard::Copy(TESForm* apCopy) {
 bool TESCaravanCard::Compare(TESForm* apCompare) {
     TESCaravanCard* pComp = dynamic_cast<TESCaravanCard*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
     if (BSstrcmp(faceTexture.GetTextureName(), (&pComp->faceTexture)->GetTextureName())) {
-        return 1;
+        return true;
     }
     if (BSstrcmp(backTexture.GetTextureName(), (&pComp->backTexture)->GetTextureName())) {
-        return 1;
+        return true;
     }
     return std::memcmp(&data, &pComp->data, sizeof(data)) != 0;
 }
@@ -374,7 +374,7 @@ void TESCaravanMoney::InitItem() {
     if (!TESForm::GetInitialized()) {
         static_cast<TESModelTextureSwap*>(this)->InitItem(this);
         static_cast<BGSPickupPutdownSounds*>(this)->InitItem(this);
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 
@@ -401,16 +401,16 @@ void TESCaravanMoney::Copy(TESForm* apCopy) {
 bool TESCaravanMoney::Compare(TESForm* apCompare) {
     TESCaravanMoney* v10 = dynamic_cast<TESCaravanMoney*>(apCompare);
     if (!v10) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v10)) {
-        return (bool)1;
+        return true;
     }
     TESModelTextureSwap* anteModel = v10->GetAnteModel(0);
     const char* v5 = anteModel->GetModel();
     const char* v3 = anteModels->GetModel();
     if (BSstrcmp(v3, v5)) {
-        return (bool)1;
+        return true;
     }
     TESModelTextureSwap* v7 = v10->GetAnteModel(1);
     const char* v6 = v7->GetModel();
@@ -443,7 +443,7 @@ void TESCaravanDeck::InitializeData() {
         v1 = ::new (v3) BSSimpleList<TESCaravanCard*>;
     }
     else {
-        v1 = 0;
+        v1 = nullptr;
     }
     pDeck = v1;
     data.uiValue = 0;
@@ -548,19 +548,19 @@ void TESCaravanDeck::Copy(TESForm* apCopy) {
 bool TESCaravanDeck::Compare(TESForm* apCompare) {
     TESCaravanDeck* pComp = dynamic_cast<TESCaravanDeck*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
     int32_t v3 = pDeck->ItemsInList();
     if (v3 != pComp->pDeck->ItemsInList()) {
-        return 1;
+        return true;
     }
     for (BSSimpleList<TESCaravanCard*>* cardList = pComp->pDeck; cardList && cardList->m_item;
          cardList = cardList->m_pkNext) {
         if (!pDeck->IsInList(cardList->m_item)) {
-            return 1;
+            return true;
         }
     }
     void* Extra = &pComp->data;

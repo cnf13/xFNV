@@ -60,9 +60,9 @@ void hkStackTracer::dumpStackTrace(
         }
         hkStackTracerLine line;
         line.m_sizeOfStruct = 0;
-        line.m_key = 0;
+        line.m_key = nullptr;
         line.m_lineNumber = 0;
-        line.m_fileName = 0;
+        line.m_fileName = nullptr;
         line.m_address = 0;
         line.m_sizeOfStruct = sizeof(hkStackTracerLine);
         pImpl->m_getLine(pProcess, apAddresses[i], &iDisplacement, &line);

@@ -31,11 +31,11 @@ void BGSTouchSpellForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool BGSTouchSpellForm::CompareComponent(BaseFormComponent* apCompareFC) {
     BGSTouchSpellForm* pCompare = dynamic_cast<BGSTouchSpellForm*>(apCompareFC);
     if (!pCompare) {
-        return 1;
+        return true;
     }
     MagicItemForm* FormTouchSpell = pFormTouchSpell;
     if (FormTouchSpell != pCompare->pFormTouchSpell) {
-        return 1;
+        return true;
     }
     int32_t Fatigue = iTouchSpellAnimation;
     return Fatigue != pCompare->iTouchSpellAnimation;
@@ -74,12 +74,12 @@ void BGSTouchSpellForm::InitItem(TESForm* apOwner) {
                 penchantment = pFormTouchSpell;
             }
             else {
-                penchantment = 0;
+                penchantment = nullptr;
             }
             penchantment_2 = static_cast<EnchantmentItem*>(penchantment);
         }
         else {
-            penchantment_2 = 0;
+            penchantment_2 = nullptr;
         }
         if (penchantment_2) {
             if (apOwner) {
@@ -92,7 +92,7 @@ void BGSTouchSpellForm::InitItem(TESForm* apOwner) {
                         "(%08X) '%s'.",
                         pFormTouchSpell->iFormID, v4, v5, v8
                     );
-                    pFormTouchSpell = 0;
+                    pFormTouchSpell = nullptr;
                 }
             }
         }

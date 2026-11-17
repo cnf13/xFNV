@@ -75,7 +75,7 @@ void DisintegrateWeaponEffect::Start() {
         v9 = currentAIProcess->GetCurrentWeapon();
         if (v9) {
             flt1C = fMagnitude;
-            targetAsActor->DamageEquipment(v9, flt1C, (bool)0);
+            targetAsActor->DamageEquipment(v9, flt1C, false);
         }
         if (CombatController::GetShowVerboseMessages()) {
             v5 = (double)fMagnitude;

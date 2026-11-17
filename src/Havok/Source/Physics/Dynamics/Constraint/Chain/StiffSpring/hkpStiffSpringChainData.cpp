@@ -239,7 +239,7 @@ void hkpStiffSpringChainData::buildJacobian(const hkpConstraintQueryIn& inNotVal
             info.m_constrainedDofW.m_quad = _mm_mul_ps(inv, sep);
         }
 
-        const float rhs = static_cast<float>(m_infos.m_data[i].m_springLength - length);
+        const float rhs = (m_infos.m_data[i].m_springLength - length);
         hk1dLinearBilateralConstraintBuildJacobianWithCustomRhs_noSchema(info, in2, pJac, rhs);
         ++pJac;
     }

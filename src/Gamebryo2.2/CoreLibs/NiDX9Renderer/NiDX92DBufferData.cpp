@@ -218,8 +218,8 @@ NiDX92DBufferData* NiDX92DBufferData::DynamicCast(Ni2DBuffer::RendererData* apDa
 void NiDX92DBufferData::ClearRenderTarget(IDirect3DDevice9* apD3DDevice9, uint32_t auiTarget) {
     if (auiTarget) {
         if (NiDX92DBufferData::ms_apkCurrentBuffer[auiTarget]) {
-            apD3DDevice9->SetRenderTarget(auiTarget, 0);
-            NiDX92DBufferData::ms_apkCurrentBuffer[auiTarget] = 0;
+            apD3DDevice9->SetRenderTarget(auiTarget, nullptr);
+            NiDX92DBufferData::ms_apkCurrentBuffer[auiTarget] = nullptr;
         }
     }
 }
@@ -244,7 +244,7 @@ bool NiDX9ImplicitBufferData::CanDisplayFrame() {
 }
 
 bool NiDX9ImplicitBufferData::DisplayFrame() {
-    return m_pkD3DDevice9->Present(0, 0, 0, 0) >= 0;
+    return m_pkD3DDevice9->Present(nullptr, nullptr, nullptr, nullptr) >= 0;
 }
 
 // Releases the surface and takes the device's current render target as the back buffer, re-binding the device; the
@@ -371,12 +371,12 @@ bool NiDX9DepthStencilBufferData::HasValidStencilBuffer() {
 
 bool NiDX9DepthStencilBufferData::SetNULLDepthStencilTarget(IDirect3DDevice9* apD3DDevice9) {
     if (NiDX92DBufferData::ms_pkCurrentDepthStencil) {
-        if (apD3DDevice9->SetDepthStencilSurface(0) < 0) {
-            return 0;
+        if (apD3DDevice9->SetDepthStencilSurface(nullptr) < 0) {
+            return false;
         }
-        NiDX92DBufferData::ms_pkCurrentDepthStencil = 0;
+        NiDX92DBufferData::ms_pkCurrentDepthStencil = nullptr;
     }
-    return 1;
+    return true;
 }
 
 NiDX9ImplicitDepthStencilBufferData::NiDX9ImplicitDepthStencilBufferData() : NiDX9DepthStencilBufferData() {}
@@ -392,12 +392,12 @@ bool NiDX9ImplicitDepthStencilBufferData::Recreate(IDirect3DDevice9* apD3DDevice
         Shutdown();
     }
     if (apD3DDevice9->GetDepthStencilSurface(p_m_pkSurface) < 0) {
-        return 0;
+        return false;
     }
     if ((*p_m_pkSurface)->GetDesc(&kSurfDesc) < 0) {
         (*p_m_pkSurface)->Release();
-        *p_m_pkSurface = 0;
-        return 0;
+        *p_m_pkSurface = nullptr;
+        return false;
     }
     NiPixelFormat* v5 = NiDX9PixelFormat::CreateFromD3DFormat(kSurfDesc.Format);
     uint32_t Height = kSurfDesc.Height;
@@ -405,7 +405,7 @@ bool NiDX9ImplicitDepthStencilBufferData::Recreate(IDirect3DDevice9* apD3DDevice
     uint32_t Width = kSurfDesc.Width;
     m_pkPixelFormat = v5;
     m_pkBuffer->ResetDimensions(Width, Height);
-    return 1;
+    return true;
 }
 
 // Width and height of a new buffer come from the surface's descriptor.

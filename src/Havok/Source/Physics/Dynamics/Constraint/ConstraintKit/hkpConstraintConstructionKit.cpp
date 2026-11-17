@@ -250,7 +250,7 @@ int32_t hkpConstraintConstructionKit::setConeLimit(int32_t axis, float angle) {
     m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = static_cast<uint8_t>(axis);
     m_scheme->m_commands.m_size += 1;
     // The CRT's cosine, rounded to float.
-    const float fCos = static_cast<float>(std::cos(angle));
+    const float fCos = std::cos(angle);
     const int32_t iDataIndex = m_scheme->m_data.m_size;
     hkVector4 kData;
     kData.m_quad[0] = fCos;
@@ -298,8 +298,8 @@ int32_t hkpConstraintConstructionKit::setTwistLimit(int32_t twistAxis, int32_t p
     m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = static_cast<uint8_t>(planeAxis);
     m_scheme->m_commands.m_size += 1;
     // The upper angle's sine is computed first; both come from the CRT's std::sin, rounded to float.
-    const float fSinMax = static_cast<float>(std::sin(max));
-    const float fSinMin = static_cast<float>(std::sin(min));
+    const float fSinMax = std::sin(max);
+    const float fSinMin = std::sin(min);
     const int32_t iDataIndex = m_scheme->m_data.m_size;
     hkVector4 kData;
     kData.m_quad[0] = fSinMin;
@@ -752,7 +752,7 @@ void hkpConstraintConstructionKit::computeConstraintInfo(
     int32_t* m_data = commands.m_data;
     int32_t* a1 = &commands.m_data[commands.m_size];
     if (m_data < a1) {
-        while (2) {
+        while (true) {
             switch (*m_data) {
                 case 0: {
                     return;

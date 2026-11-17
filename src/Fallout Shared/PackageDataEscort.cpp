@@ -23,7 +23,7 @@ void TESEscortPackageData::Copy(TESPackageData* apCopy) {
     if (pcopy) {
         if (pSearchLocation) {
             delete pSearchLocation;
-            pSearchLocation = 0;
+            pSearchLocation = nullptr;
         }
         if (pcopy->pSearchLocation) {
             PackageLocation* v2;
@@ -32,10 +32,10 @@ void TESEscortPackageData::Copy(TESPackageData* apCopy) {
                 v2 = ::new (v4) PackageLocation;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pSearchLocation = v2;
-            pSearchLocation->Copy(pcopy->pSearchLocation, 0);
+            pSearchLocation->Copy(pcopy->pSearchLocation, false);
         }
         iFollowPackRadius = pcopy->iFollowPackRadius;
     }
@@ -44,16 +44,16 @@ void TESEscortPackageData::Copy(TESPackageData* apCopy) {
 bool TESEscortPackageData::Compare(TESPackageData* apCompare) {
     TESEscortPackageData* v4 = dynamic_cast<TESEscortPackageData*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (pSearchLocation) {
         if (pSearchLocation->Compare(v4->pSearchLocation)) {
-            return (bool)1;
+            return true;
         }
     }
     else {
         if (v4->pSearchLocation) {
-            return (bool)1;
+            return true;
         }
     }
     return (bool)((uint8_t)(iFollowPackRadius != v4->iFollowPackRadius));
@@ -88,7 +88,7 @@ void TESEscortPackageData::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
 void TESEscortPackageData::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     bool bhasLocation;
     apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&iFollowPackRadius), 4u);
-    bhasLocation = 0;
+    bhasLocation = false;
     apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&bhasLocation), 1u);
     if (bhasLocation) {
         PackageLocation* v2;
@@ -97,7 +97,7 @@ void TESEscortPackageData::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             v2 = ::new (v4) PackageLocation;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         pSearchLocation = v2;
         pSearchLocation->LoadGame(apLoadGameBuffer);

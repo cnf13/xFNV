@@ -341,7 +341,7 @@ NiObject* NiDefaultAVObjectPalette::CreateObject() {
     NiDefaultAVObjectPalette* pkObject =
         static_cast<NiDefaultAVObjectPalette*>(NiMemObject::operator new(sizeof(NiDefaultAVObjectPalette)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiDefaultAVObjectPalette;
 }
@@ -370,7 +370,7 @@ void RecurseAndRemoveObjectsFromPalette(NiAVObject* apObj3D, NiDefaultAVObjectPa
     if (apObj3D) {
         if (apPalette) {
             if (apObj3D->m_kName.GetHandle()) {
-                apPalette->SetAVObject(apObj3D->m_kName, 0);
+                apPalette->SetAVObject(apObj3D->m_kName, nullptr);
             }
             NiNode* v2 = apObj3D->IsNode();
             if (v2) {

@@ -86,7 +86,7 @@
 #include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 WornBodyParts_t WornBodyParts{BO_HEAD, BO_HAIR, BO_UPPER_BODY, BO_LEFT_HAND, BO_RIGHT_HAND};
 
@@ -114,7 +114,7 @@ void Actor::StartCast() {
     MagicItem::CannotCastReason eReason;
     MagicCaster* pCaster = static_cast<MagicCaster*>(this);
     if (pCaster->CheckCast(pCaster->GetCurrentSpell(), nullptr, &eReason, false)) {
-        SetShouldCheckMagicNode(1);
+        SetShouldCheckMagicNode(true);
     }
     else {
         if (this == pPlayer) {
@@ -123,7 +123,7 @@ void Actor::StartCast() {
             MagicSystem::School eSchool = MagicSystem::MagicSkillToSchool(eSkill);
             pPlayer->PlayMagicFailureSound(eSchool);
             BSStringT<char>* pMessage = pCaster->GetCurrentSpell()->GetCannotCastString(&sMessage, eReason);
-            Interface::ShowMessage(pMessage->pString, 0, 0, 0, 2.0f, 0);
+            Interface::ShowMessage(pMessage->pString, 0, nullptr, nullptr, 2.0f, false);
             sMessage.~BSStringT<char>();
         }
     }
@@ -169,7 +169,7 @@ void Actor::SetCurrentSpell(MagicItem* apCurrentSpell) {
 
 MagicTarget* Actor::GetDesiredTarget() {
     if (!pCurrentProcess) {
-        return 0;
+        return nullptr;
     }
     BaseProcess* CurrentAIProcess = pCurrentProcess;
     return CurrentAIProcess->GetDesiredTarget();
@@ -286,7 +286,7 @@ void Actor::EffectReflected(MagicCaster* apCaster, ActiveEffect* apEffect) {
         peffect = ::new (pAbsorbEffect) MagicShaderHitEffect(this, pabsorbEffect, 0.0f);
     }
     else {
-        peffect = 0;
+        peffect = nullptr;
     }
     if (peffect->Init()) {
         ReferenceProcessLists.AddTempEffect(peffect);
@@ -307,7 +307,7 @@ void Actor::EffectAbsorbed(MagicCaster* apCaster, ActiveEffect* apEffect) {
         peffect = ::new (apMemory) MagicShaderHitEffect(this, preflectEffect, 0.0f);
     }
     else {
-        peffect = 0;
+        peffect = nullptr;
     }
     if (peffect->Init()) {
         ReferenceProcessLists.AddTempEffect(peffect);
@@ -357,7 +357,7 @@ float Actor::CheckResistance(MagicCaster* apCaster, MagicItem* apSpell, ActiveEf
             fEffectResistance = fPlayerMaxResistance.Float();
         }
     }
-    return static_cast<float>(MagicFormulas::GetMagicTargetResistance(fMagicTypeResistance, fEffectResistance));
+    return MagicFormulas::GetMagicTargetResistance(fMagicTypeResistance, fEffectResistance);
 }
 
 void Actor::SetRefraction(bool abEnable, float afRefractionPower) {
@@ -366,7 +366,7 @@ void Actor::SetRefraction(bool abEnable, float afRefractionPower) {
     if (abEnable && (afRefractionPower <= 0.0)) {
         if (MobileObject::GetCurrentAIProcess()) {
             currentAIProcess = MobileObject::GetCurrentAIProcess();
-            v8 = (float)currentAIProcess->GetScriptRefractionPower();
+            v8 = currentAIProcess->GetScriptRefractionPower();
         }
     }
     uint8_t v7 = (uint8_t)abEnable;
@@ -406,12 +406,12 @@ bool Actor::CheckCastWhenStrikesEnchantment(
     bool& abInsufficientCharge
 ) {
     TESBoundObject* penchantmentSource_2;
-    abInsufficientCharge = 0;
-    MagicItem* v22 = 0;
-    EnchantmentItem* FormEnchanting = 0;
-    AlchemyItem* ppoison = 0;
+    abInsufficientCharge = false;
+    MagicItem* v22 = nullptr;
+    EnchantmentItem* FormEnchanting = nullptr;
+    AlchemyItem* ppoison = nullptr;
     if (apProjectile && apProjectile->GetProjectileType() == Projectile::PROJECTILE_TYPE_GRENADE) {
-        return 0;
+        return false;
     }
     if (!apWeapon) {
         MagicItem* v14;
@@ -420,15 +420,15 @@ bool Actor::CheckCastWhenStrikesEnchantment(
             v14 = static_cast<MagicItem*>(FormTouchSpell);
         }
         else {
-            v14 = 0;
+            v14 = nullptr;
         }
         v22 = v14;
     }
     if (!v22 && (!apWeapon && !apProjectile)) {
-        return 0;
+        return false;
     }
     if (!v22) {
-        TESObjectWEAP* FormFlags = 0;
+        TESObjectWEAP* FormFlags = nullptr;
         if (apWeapon) {
             if (apWeapon->pContainerObj) {
                 if (apWeapon->pContainerObj->GetFormType() == WEAP_ID) {
@@ -455,7 +455,7 @@ bool Actor::CheckCastWhenStrikesEnchantment(
                         Explosion_ = apProjectile->GetProjectileBase()->GetExplosion();
                     }
                     else {
-                        Explosion_ = 0;
+                        Explosion_ = nullptr;
                     }
                     if (Explosion_) {
                         FormEnchanting = Explosion_->pFormEnchanting;
@@ -465,7 +465,7 @@ bool Actor::CheckCastWhenStrikesEnchantment(
         }
     }
     if (!v22 && (!FormEnchanting && !ppoison)) {
-        return 0;
+        return false;
     }
     if (v22) {
         penchantmentSource_2 = GetActorBase();
@@ -481,10 +481,10 @@ bool Actor::CheckCastWhenStrikesEnchantment(
         penchantmentSource_2 = WeaponSource;
     }
     if (v22) {
-        bool v17 = 0;
+        bool v17 = false;
         ANIM_GROUP_ENUM egroup = static_cast<ANIM_GROUP_ENUM>(GetActorBase()->iTouchSpellAnimation);
         if (egroup == ANIM_GROUP_NONE) {
-            v17 = 1;
+            v17 = true;
         }
         else {
             if (pCurrentProcess) {
@@ -506,7 +506,7 @@ bool Actor::CheckCastWhenStrikesEnchantment(
                 SetDesiredTarget(apTarget);
             }
             else {
-                SetDesiredTarget(0);
+                SetDesiredTarget(nullptr);
             }
             ReleaseCast(penchantmentSource_2);
         }
@@ -517,7 +517,7 @@ bool Actor::CheckCastWhenStrikesEnchantment(
             SetDesiredTarget(apTarget);
         }
         else {
-            SetDesiredTarget(0);
+            SetDesiredTarget(nullptr);
         }
         ReleaseCast(penchantmentSource_2);
     }
@@ -527,23 +527,23 @@ bool Actor::CheckCastWhenStrikesEnchantment(
             SetDesiredTarget(apTarget);
         }
         else {
-            SetDesiredTarget(0);
+            SetDesiredTarget(nullptr);
         }
         ReleaseCast(penchantmentSource_2);
         if (apWeapon) {
             apWeapon->RemovePoison();
         }
     }
-    return 1;
+    return true;
 }
 
 bool Actor::RemoveSpell(SpellItem* apSpellIn) {
-    bool bremoved = 0;
+    bool bremoved = false;
     if (GetActorBase()->HasSpell(apSpellIn)) {
         GetActorBase()->RemoveSpell(apSpellIn);
         TESActorBase* ActorBase = GetActorBase();
         ActorBase->AddChange(16);
-        bremoved = 1;
+        bremoved = true;
     }
     MagicSystem::SpellType v2 = apSpellIn->GetSpellType();
     if (MagicSystem::IsSpellTypePermanent(v2)) {
@@ -552,23 +552,23 @@ bool Actor::RemoveSpell(SpellItem* apSpellIn) {
             a2 = &static_cast<MagicItem&>(static_cast<MagicItemForm&>(*apSpellIn));
         }
         else {
-            a2 = 0;
+            a2 = nullptr;
         }
-        if (IsSpellTarget(a2, 1)) {
+        if (IsSpellTarget(a2, true)) {
             MagicItem* v4;
             if (apSpellIn) {
                 v4 = &static_cast<MagicItem&>(static_cast<MagicItemForm&>(*apSpellIn));
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
-            Dispel(v4, static_cast<MagicCaster*>(0), static_cast<ActiveEffect*>(0));
-            bremoved = 1;
+            Dispel(v4, static_cast<MagicCaster*>(nullptr), static_cast<ActiveEffect*>(nullptr));
+            bremoved = true;
         }
     }
     if (apSpellIn->GetSpellType() == MagicSystem::POWER && IsInCastPowerList(apSpellIn)) {
         RemoveCastPower(apSpellIn);
-        return 1;
+        return true;
     }
     return bremoved;
 }
@@ -691,7 +691,7 @@ void Actor::CheckMagicNode() {
         goto LABEL_33;
     }
     pspell = GetCurrentSpell();
-    battach = 0;
+    battach = false;
     panim = GetAnimation();
     if (panim) {
         if (pspell) {
@@ -726,21 +726,21 @@ void Actor::CheckMagicNode() {
                 po = pav->GetControllers();
             }
             else {
-                po = 0;
+                po = nullptr;
             }
             if (po) {
                 pmanager =
                     static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, po));
             }
             else {
-                pmanager = 0;
+                pmanager = nullptr;
             }
             if (pmanager) {
                 NiFixedString* g_SpecialIdle_Cast = get_g_SpecialIdle_Cast();
                 pseq_3 = pmanager->GetSequenceByName(*g_SpecialIdle_Cast);
             }
             else {
-                pseq_3 = 0;
+                pseq_3 = nullptr;
             }
             if (pseq_3) {
                 double v2 = pseq_3->m_fLastTime;
@@ -752,7 +752,7 @@ void Actor::CheckMagicNode() {
     }
     if (!pnode->GetChildCount()) {
     LABEL_33:;
-        SetShouldCheckMagicNode(0);
+        SetShouldCheckMagicNode(false);
     }
 }
 
@@ -781,7 +781,7 @@ void Actor::UpdateAlpha() {
 }
 
 CastPowerItem* Actor::GetCastPowerItem(SpellItem* apPower) {
-    CastPowerItem* pitem = 0;
+    CastPowerItem* pitem = nullptr;
     if (apPower) {
         if ((&CastPowers)->m_item) {
             for (BSSimpleList<void*>* plist = &CastPowers; plist && !pitem; plist = plist->m_pkNext) {
@@ -923,7 +923,7 @@ void Actor::UnloadPermanentMagic() {
         if (pspell) {
             MagicSystem::SpellType v1 = pspell->GetSpellType();
             if (MagicSystem::IsSpellTypePermanent(v1)) {
-                pspell->Unload(1);
+                pspell->Unload(true);
             }
         }
     }
@@ -931,13 +931,13 @@ void Actor::UnloadPermanentMagic() {
         pspells = &GetRace()->spellList;
     }
     else {
-        pspells = 0;
+        pspells = nullptr;
     }
     for (SpellItem* pspell_2 : *pspells) {
         if (pspell_2) {
             MagicSystem::SpellType v2 = pspell_2->GetSpellType();
             if (MagicSystem::IsSpellTypePermanent(v2)) {
-                pspell_2->Unload(1);
+                pspell_2->Unload(true);
             }
         }
     }
@@ -945,21 +945,21 @@ void Actor::UnloadPermanentMagic() {
     for (uint32_t i = 0; i < 5; ++i) {
         EnchantmentItem* FormEnchanting;
         TESEnchantableForm* penchantable;
-        ItemChange* pitem = pinventory->GetWornItem(WornBodyParts[i], 0);
+        ItemChange* pitem = pinventory->GetWornItem(WornBodyParts[i], false);
         if (pitem) {
             penchantable = dynamic_cast<TESEnchantableForm*>(pitem->pContainerObj);
         }
         else {
-            penchantable = 0;
+            penchantable = nullptr;
         }
         if (penchantable) {
             FormEnchanting = penchantable->pFormEnchanting;
         }
         else {
-            FormEnchanting = 0;
+            FormEnchanting = nullptr;
         }
         if (FormEnchanting) {
-            FormEnchanting->Unload(1);
+            FormEnchanting->Unload(true);
         }
         if (pitem) {
             delete pitem;
@@ -971,14 +971,14 @@ void Actor::UnloadPermanentMagic() {
         if (pspell_3) {
             MagicSystem::SpellType v3 = pspell_3->GetSpellType();
             if (MagicSystem::IsSpellTypePermanent(v3)) {
-                pspell_3->Unload(0);
+                pspell_3->Unload(false);
             }
         }
     }
 }
 
 bool Actor::IsInCastPowerList(SpellItem* apPower) {
-    return (GetCastPowerItem(apPower) != 0);
+    return (GetCastPowerItem(apPower) != nullptr);
 }
 
 void Actor::DeleteCastPowers() {
@@ -999,7 +999,7 @@ void Actor::Eat(TESBoundObject* apfood, ExtraDataList* pextra, bool abNow) {
             if (this == pPlayer) {
                 const char* v4 = sNoEatQuestItem.String();
                 Interface::ShowMessage(
-                    v4, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                    v4, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
                 );
             }
         }
@@ -1008,20 +1008,20 @@ void Actor::Eat(TESBoundObject* apfood, ExtraDataList* pextra, bool abNow) {
                 Script::SetActionFlag(this, pextra, SCRIPT_ACTION_ONEQUIP);
                 Script::SetActionFlag(apfood, &m_Extra, SCRIPT_ACTION_ONEQUIP);
             }
-            MagicItem* peatspell = 0;
+            MagicItem* peatspell = nullptr;
             if (apfood->IsMagicItem()) {
                 peatspell = static_cast<MagicItemObject*>(apfood);
             }
             if (this == pPlayer && !abNow) {
                 if (pPlayer->AddEatDrinkItem(peatspell)) {
-                    RemoveItem(apfood, pextra, 1, 0, 0, 0, 0, 0, 1, 0);
+                    RemoveItem(apfood, pextra, 1, false, false, nullptr, nullptr, nullptr, true, false);
                 }
             }
             else {
                 SetCurrentSpell(peatspell);
-                ReleaseCast(0);
+                ReleaseCast(nullptr);
                 if (this != pPlayer) {
-                    RemoveItem(apfood, pextra, 1, 0, 0, 0, 0, 0, 1, 0);
+                    RemoveItem(apfood, pextra, 1, false, false, nullptr, nullptr, nullptr, true, false);
                 }
             }
         }
@@ -1037,20 +1037,20 @@ void Actor::SetShouldCheckMagicNode(bool abCheck) {
 
 bool Actor::DrinkPotion(AlchemyItem* apPotion, ExtraDataList* pextra, bool abNow) {
     if (!apPotion) {
-        return 0;
+        return false;
     }
-    bool bconsumed = 1;
+    bool bconsumed = true;
     if (this == pPlayer && !abNow) {
         bconsumed = pPlayer->AddEatDrinkItem(&static_cast<MagicItem&>(static_cast<MagicItemObject&>(*apPotion)));
         if (bconsumed) {
-            RemoveItem(apPotion, pextra, 1, 0, 0, 0, 0, 0, 1, 0);
+            RemoveItem(apPotion, pextra, 1, false, false, nullptr, nullptr, nullptr, true, false);
         }
     }
     else {
         SetCurrentSpell(&static_cast<MagicItem&>(static_cast<MagicItemObject&>(*apPotion)));
-        ReleaseCast(0);
+        ReleaseCast(nullptr);
         if (this != pPlayer) {
-            RemoveItem(apPotion, pextra, 1, 0, 0, 0, 0, 0, 1, 0);
+            RemoveItem(apPotion, pextra, 1, false, false, nullptr, nullptr, nullptr, true, false);
         }
     }
     return bconsumed;
@@ -1063,16 +1063,16 @@ void Actor::CastAlchemy(MagicItem* apPotionIngredient, bool abLast) {
         if (abLast) {
             if (apPotionIngredient->GetSpellType() == MagicSystem::POTION) {
                 AlchemyItem* ppotion = dynamic_cast<AlchemyItem*>(apPotionIngredient);
-                DrinkPotion(ppotion, 0, 1);
+                DrinkPotion(ppotion, nullptr, true);
             }
             else {
-                Eat(pobject, 0, 1);
+                Eat(pobject, nullptr, true);
             }
         }
         else {
             SetCurrentSpell(apPotionIngredient);
-            ReleaseCast(0);
-            RemoveItem(pobject, 0, 1, 0, 0, 0, 0, 0, 1, 0);
+            ReleaseCast(nullptr);
+            RemoveItem(pobject, nullptr, 1, false, false, nullptr, nullptr, nullptr, true, false);
         }
     }
 }
@@ -1090,8 +1090,8 @@ void Actor::CheckEquipWornEnchantment(TESBoundObject* apObject, ExtraDataList* a
 }
 
 void Actor::AttachCastingArt(MagicItem* apSpell) {
-    NiAVObject* pdata3D = 0;
-    EffectSetting* pavEffect = 0;
+    NiAVObject* pdata3D = nullptr;
+    EffectSetting* pavEffect = nullptr;
     if (apSpell) {
         pavEffect = apSpell->GetAVEffect(MagicSystem::SELF);
         if (pavEffect) {
@@ -1115,13 +1115,13 @@ void Actor::AttachCastingArt(MagicItem* apSpell) {
                             delete apThis;
                         }
                     }
-                    pLight = 0;
+                    pLight = nullptr;
                     MagicLight* v10 = static_cast<MagicLight*>(ourMalloc(sizeof(MagicLight)));
                     if (v10) {
                         plight = ::new (v10) MagicLight(pavEffect->data.pLight->iFormID, pnode);
                     }
                     else {
-                        plight = 0;
+                        plight = nullptr;
                     }
                     pLight = plight;
                 }
@@ -1134,16 +1134,16 @@ void Actor::AttachCastingArt(MagicItem* apSpell) {
                 pseq = pmanager->GetSequenceByName(*g_SpecialIdle_Cast);
             }
             else {
-                pseq = 0;
+                pseq = nullptr;
             }
             if (pseq) {
                 pmanager->DeactivateAll(0.0f);
-                pmanager->ActivateSequence(pseq, 0, 0, 1.0f, 0.0f, 0);
-                pmanager->SetActive(1);
+                pmanager->ActivateSequence(pseq, 0, false, 1.0f, 0.0f, nullptr);
+                pmanager->SetActive(true);
                 pseq->SetOffset(-3.4028235e+38f);
                 if (pLight) {
                     float v6 = pseq->m_fEndKeyTime * 0.75;
-                    pLight->Fade(1, v6);
+                    pLight->Fade(true, v6);
                 }
             }
             if (pLight) {

@@ -29,7 +29,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 static uint32_t data_11DFED0;
 
@@ -70,7 +70,7 @@ void ShakeCamera(float afMult, const NiPoint3& arPos) {
                     int32_t v5 = static_cast<int32_t>(fRumbleShakeTimeMult.Float() * v8);
                     float v7 = fCameraShakeMult * fRumbleShakeRadiusMult.Float();
                     float v6 = fCameraShakeMult * fRumbleShakeRadiusMult.Float();
-                    pcontrols->Rumble(v6, v7, v5, 0, CONSTANT, 0, 0);
+                    pcontrols->Rumble(v6, v7, v5, 0, CONSTANT, false, false);
                 }
             }
         }
@@ -90,10 +90,10 @@ float GetCameraShake(float afTime, NiMatrix3& apReturnShake) {
     }
     NiTimeController* pcontroller = ShakeData_pModel->GetControllers();
     float fstartTime = pcontroller->m_fLoKeyTime;
-    NiUpdateData UpdateData1(fstartTime, 1, 0);
+    NiUpdateData UpdateData1(fstartTime, true, false);
     ShakeData_pModel->Update(UpdateData1);
     startRot = (*&ShakeData_pModel->m_kLocal).m_Rotate;
-    NiUpdateData UpdateData2(afTime, 1, 0);
+    NiUpdateData UpdateData2(afTime, true, false);
     ShakeData_pModel->Update(UpdateData2);
     NiTransform* LocalTransform = &ShakeData_pModel->m_kLocal;
     NiMatrix3* v2 = startRot.Inverse(&apResult);

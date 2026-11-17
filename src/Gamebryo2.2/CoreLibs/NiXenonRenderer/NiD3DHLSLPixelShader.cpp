@@ -41,7 +41,7 @@ uint32_t NiD3DHLSLPixelShader::GetVariableCount() {
 const char* NiD3DHLSLPixelShader::GetVariableName(uint32_t uiIndex) {
     ID3DXConstantTable* m_pkConstantTable;
     _D3DXCONSTANT_DESC kDesc;
-    D3DXHANDLE v3 = this->m_pkConstantTable->GetConstant(0, uiIndex);
+    D3DXHANDLE v3 = this->m_pkConstantTable->GetConstant(nullptr, uiIndex);
     if (v3 &&
         ((m_pkConstantTable = this->m_pkConstantTable,
           (uiIndex = 1, m_pkConstantTable->GetConstantDesc(v3, &kDesc, &uiIndex) >= 0)) &&
@@ -49,7 +49,7 @@ const char* NiD3DHLSLPixelShader::GetVariableName(uint32_t uiIndex) {
         return kDesc.Name;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

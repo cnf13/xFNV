@@ -74,7 +74,7 @@ void hkpCachingShapePhantom::calcContentStatistics(hkStatisticsCollector* collec
     }
     collector->pushDir("agents");
     for (int32_t i = 0; i < m_collisionDetails.m_size; ++i) {
-        collector->addReferencedObject(0, m_collisionDetails.m_data[i].m_agent, 0);
+        collector->addReferencedObject(nullptr, m_collisionDetails.m_data[i].m_agent, 0);
     }
     collector->popDir();
 }
@@ -181,7 +181,7 @@ void hkpCachingShapePhantom::removeOverlappingCollidable(hkpCollidable* collidab
 // Sorts the cached collision details once a query has changed them, then clears the dirty flag.
 void hkpCachingShapePhantom::ensureDeterministicOrder() {
     if (m_orderDirty.m_bool) {
-        int32_t size = (int32_t)m_collisionDetails.m_size;
+        int32_t size = m_collisionDetails.m_size;
         if (size > 1) {
             quickSortRecursive(m_collisionDetails.m_data, 0, size - 1, 0);
         }
@@ -233,7 +233,7 @@ void hkpCachingShapePhantom::deallocateInternalArrays() {
     int32_t capacityAndFlags;
     if (!m_collisionDetails.m_size) {
         m_heap = (&hkMemoryRouter::getInstance())->m_heap;
-        capacityAndFlags = (int32_t)m_collisionDetails.m_capacityAndFlags;
+        capacityAndFlags = m_collisionDetails.m_capacityAndFlags;
         m_collisionDetails.m_size = (uint32_t)0;
         if (capacityAndFlags >= 0) {
             m_heap->bufFree(

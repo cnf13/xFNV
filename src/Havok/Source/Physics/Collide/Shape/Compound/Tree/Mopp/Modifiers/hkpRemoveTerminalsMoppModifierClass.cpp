@@ -162,7 +162,7 @@ const void* getVtablehkpTriSampledHeightFieldCollection() {
 }
 
 void finishLoadedObjecthkpTriSampledHeightFieldCollection(void* p, int32_t finishing) {
-    void* apMemory = static_cast<void*>(p);
+    void* apMemory = p;
     hkFinishLoadedObjectFlag aFlag;
     aFlag.m_finishing = finishing;
     if (!apMemory) {
@@ -248,7 +248,7 @@ const void* getVtablehkpNullCollisionFilter() {
 }
 
 void finishLoadedObjecthkpNullCollisionFilter(void* p, int32_t finishing) {
-    void* apMemory = static_cast<void*>(p);
+    void* apMemory = p;
     hkFinishLoadedObjectFlag aFlag;
     aFlag.m_finishing = finishing;
     if (!apMemory) {
@@ -268,7 +268,7 @@ const void* getVtablehkpGroupFilter() {
 }
 
 void finishLoadedObjecthkpGroupFilter(void* p, int32_t finishing) {
-    void* apMemory = static_cast<void*>(p);
+    void* apMemory = p;
     hkFinishLoadedObjectFlag aFlag;
     aFlag.m_finishing = finishing;
     if (!apMemory) {
@@ -298,7 +298,7 @@ void cleanupLoadedObjecthkpTriSampledHeightFieldBvTreeShape(void* p) {
 }
 
 void finishLoadedObjecthkpTriSampledHeightFieldBvTreeShape(void* p, int32_t finishing) {
-    void* apMemory = static_cast<void*>(p);
+    void* apMemory = p;
     hkFinishLoadedObjectFlag aFlag;
     aFlag.m_finishing = finishing;
     if (!apMemory) {
@@ -343,7 +343,7 @@ const void* getVtablehkpAabbPhantom() {
 
 // The class registry's finish-loaded-object callback: the null check, then the class's finish constructor.
 void finishLoadedObjecthkpAabbPhantom(void* p, int32_t finishing) {
-    void* apMemory = static_cast<void*>(p);
+    void* apMemory = p;
     hkFinishLoadedObjectFlag aFlag;
     aFlag.m_finishing = finishing;
     if (!apMemory) {

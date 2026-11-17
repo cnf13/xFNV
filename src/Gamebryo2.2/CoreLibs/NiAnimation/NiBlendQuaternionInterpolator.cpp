@@ -25,7 +25,7 @@ NiObject* NiBlendQuaternionInterpolator::CreateClone(NiCloningProcess& kCloning)
         pkObject_2 = ::new (pkObject) NiBlendQuaternionInterpolator;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_kQuaternionValue = m_kQuaternionValue;
@@ -143,7 +143,7 @@ NiObject* NiBlendQuaternionInterpolator::CreateObject() {
     NiBlendQuaternionInterpolator* pkObject =
         static_cast<NiBlendQuaternionInterpolator*>(NiMemObject::operator new(sizeof(NiBlendQuaternionInterpolator)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiBlendQuaternionInterpolator;
 }

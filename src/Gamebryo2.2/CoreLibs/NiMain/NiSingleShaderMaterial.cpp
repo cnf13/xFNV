@@ -57,7 +57,7 @@ NiShader* NiSingleShaderMaterial::GetCurrentShader(
         }
         if (a5 == -1) {
             if (!pkShaderFactory) {
-                return 0;
+                return nullptr;
             }
             if (pkShaderFactory->IsDefaultImplementation(m_spCachedShader.m_pObject)) {
                 return m_spCachedShader.m_pObject;
@@ -65,14 +65,14 @@ NiShader* NiSingleShaderMaterial::GetCurrentShader(
         }
     }
     if (pkShaderFactory) {
-        NiShader* pkShader = pkShaderFactory->RetrieveShader(m_kShaderName.GetHandle(), a5, 1);
+        NiShader* pkShader = pkShaderFactory->RetrieveShader(m_kShaderName.GetHandle(), a5, true);
         if (pkShader) {
             if (pkShader->IsInitialized() || pkShader->Initialize()) {
                 return pkShader;
             }
         }
     }
-    return 0;
+    return nullptr;
 }
 
 void NiSingleShaderMaterial::UnloadShaders() {

@@ -33,7 +33,7 @@ NiObject* NiPSysBombModifier::CreateClone(NiCloningProcess& kCloning) {
         ::new (pkObject) NiPSysBombModifier;
     }
     else {
-        pkObject_2 = 0;
+        pkObject_2 = nullptr;
     }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_kBombAxis = m_kBombAxis;
@@ -241,7 +241,7 @@ NiObject* NiPSysBombModifier::CreateObject() {
     NiPSysBombModifier* pkObject =
         static_cast<NiPSysBombModifier*>(NiMemObject::operator new(sizeof(NiPSysBombModifier)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiPSysBombModifier;
 }

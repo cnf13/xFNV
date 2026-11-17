@@ -87,7 +87,7 @@ void BGSDehydrationStage::Save() {
         pSicknessID = reinterpret_cast<SpellItem*>(static_cast<uintptr_t>(GetSickness()->GetFormID()));
     }
     else {
-        pSicknessID = 0;
+        pSicknessID = nullptr;
     }
     data.pSickness = pSicknessID;
     if (TESForm::QEndianSwapOnSave()) {
@@ -111,7 +111,7 @@ void BGSDehydrationStage::InitItem() {
             TESForm* FormByNumericID = TESForm::GetFormByNumericID(itempInt);
             data.pSickness = dynamic_cast<SpellItem*>(FormByNumericID);
         }
-        SetInitialized(1);
+        SetInitialized(true);
         BGSDehydrationStage::AddStage(this);
     }
 }
@@ -152,7 +152,7 @@ BGSDehydrationStageData* BGSDehydrationStage::GetData() {
 
 void BGSDehydrationStage::RemoveStage(BGSDehydrationStage* apStage) {
     if (BGSDehydrationStage::iNumStages) {
-        bool binArray = 0;
+        bool binArray = false;
         for (uint32_t i = 0; !binArray && i < BGSDehydrationStage::iNumStages; ++i) {
             binArray = BGSDehydrationStage::pStagesArray[i] == apStage;
         }
@@ -175,7 +175,7 @@ void BGSDehydrationStage::RemoveStage(BGSDehydrationStage* apStage) {
 }
 
 BGSDehydrationStage* BGSDehydrationStage::FindStageForRadLevel(float afRads) {
-    BGSDehydrationStage* pstage = 0;
+    BGSDehydrationStage* pstage = nullptr;
     for (uint32_t i = 0; i < BGSDehydrationStage::iNumStages && !pstage; ++i) {
         BGSDehydrationStage* pcurrentStage = BGSDehydrationStage::GetStage(i);
         if (pcurrentStage) {
@@ -212,7 +212,7 @@ int32_t BGSDehydrationStage::AddStage(BGSDehydrationStage* apNewStage) {
 
 BGSDehydrationStage* BGSDehydrationStage::GetStage(uint32_t auiIndex) {
     if (auiIndex >= BGSDehydrationStage::iNumStages) {
-        return 0;
+        return nullptr;
     }
     else {
         return BGSDehydrationStage::pStagesArray[auiIndex];

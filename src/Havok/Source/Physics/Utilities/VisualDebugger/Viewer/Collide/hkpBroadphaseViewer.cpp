@@ -105,7 +105,7 @@ void hkpBroadphaseViewer::postSimulationCallback(hkpWorld* world) {
 
 void hkpBroadphaseViewer::worldAddedCallback(hkpWorld* world) {
     if (this == nullptr) {
-        world->addWorldPostSimulationListener(0);
+        world->addWorldPostSimulationListener(nullptr);
     }
     else {
         world->addWorldPostSimulationListener(this);
@@ -114,7 +114,7 @@ void hkpBroadphaseViewer::worldAddedCallback(hkpWorld* world) {
 
 void hkpBroadphaseViewer::worldRemovedCallback(hkpWorld* world) {
     if (this == nullptr) {
-        world->removeWorldPostSimulationListener(0);
+        world->removeWorldPostSimulationListener(nullptr);
     }
     else {
         world->removeWorldPostSimulationListener(this);
@@ -131,7 +131,7 @@ hkProcess* hkpBroadphaseViewer::create(const hkArray<hkProcessContext*, hkContai
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

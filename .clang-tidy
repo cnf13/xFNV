@@ -1,0 +1,15 @@
+# Only checks that do not change behaviour, layout, mangling or the decompiled control flow.
+Checks: >
+  -*,
+  modernize-use-nullptr,
+  modernize-use-bool-literals,
+  modernize-redundant-void-arg,
+  modernize-use-using,
+  modernize-deprecated-headers,
+  readability-redundant-casting,
+  readability-redundant-parentheses,
+  readability-redundant-access-specifiers,
+  readability-redundant-control-flow
+HeaderFilterRegex: '.*/src/.*'
+ExcludeHeaderFilterRegex: '.*/(src/SDK|external)/.*'
+FormatStyle: file

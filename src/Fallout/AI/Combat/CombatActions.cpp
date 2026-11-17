@@ -149,7 +149,7 @@ void CombatActionActivateCombatItem::Execute(CombatController* apCombatControlle
             );
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         apCombatController->SetActionProcedure(v4);
     }
@@ -187,7 +187,7 @@ void CombatActionAttackGrenade::Execute(CombatController* apCombatController, in
         v4 = ::new (v6) CombatProcedureAttackGrenade;
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     apCombatController->SetActionProcedure(v4);
     CombatProcedureEngageTarget* apMemory =
@@ -196,7 +196,7 @@ void CombatActionAttackGrenade::Execute(CombatController* apCombatController, in
         v3 = ::new (apMemory) CombatProcedureEngageTarget;
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     apCombatController->SetMovementProcedure(v3);
 }
@@ -224,7 +224,7 @@ bool CombatActionAttackGrenadeFlushTarget::CanExecute(
     int32_t aiActionValue
 ) {
     if (!CombatAction::CanExecute(apCombatController, apWorldStateArray, aiActionValue)) {
-        return 0;
+        return false;
     }
     CombatState* MusicType = apCombatController->pCombatState;
     return MusicType->FindCombatLocation(11);
@@ -243,7 +243,7 @@ void CombatActionAttackGrenadeFlushTarget::Execute(CombatController* apCombatCon
         v6 = ::new (apMemory) CombatProcedureAttackGrenade(*Pos, v5);
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     apCombatController->SetActionProcedure(v6);
 }
@@ -281,7 +281,7 @@ void CombatActionAttackGrenadeFromCover::Execute(CombatController* apCombatContr
         v6 = ::new (apMemory) CombatProcedureAttackGrenade;
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     apCombatController->SetActionProcedure(v6);
     CombatProcedureBeInCover* v7 = static_cast<CombatProcedureBeInCover*>(ourMalloc(sizeof(CombatProcedureBeInCover)));
@@ -291,7 +291,7 @@ void CombatActionAttackGrenadeFromCover::Execute(CombatController* apCombatContr
         v5 = ::new (v7) CombatProcedureBeInCover(CoverLocation);
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     apCombatController->SetMovementProcedure(v5);
 }
@@ -474,7 +474,7 @@ void CombatActionAttackRangedExplosiveFromCover::Execute(CombatController* apCom
         pAttack = ::new (pAttackMemory) CombatProcedureAttackRanged;
     }
     else {
-        pAttack = 0;
+        pAttack = nullptr;
     }
     apCombatController->SetActionProcedure(pAttack);
     CombatProcedureBeInCover* pCover;
@@ -486,7 +486,7 @@ void CombatActionAttackRangedExplosiveFromCover::Execute(CombatController* apCom
         pCover = ::new (pCoverMemory) CombatProcedureBeInCover(pCoverLocation);
     }
     else {
-        pCover = 0;
+        pCover = nullptr;
     }
     apCombatController->SetMovementProcedure(pCover);
 }
@@ -521,7 +521,7 @@ void CombatActionAttackRangedFromCover::Execute(CombatController* apCombatContro
         v6 = ::new (apMemory) CombatProcedureAttackRanged;
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     apCombatController->SetActionProcedure(v6);
     CombatProcedureBeInCover* v7 = static_cast<CombatProcedureBeInCover*>(ourMalloc(sizeof(CombatProcedureBeInCover)));
@@ -531,7 +531,7 @@ void CombatActionAttackRangedFromCover::Execute(CombatController* apCombatContro
         v5 = ::new (v7) CombatProcedureBeInCover(CoverLocation);
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     apCombatController->SetMovementProcedure(v5);
 }
@@ -564,7 +564,7 @@ CombatActionDrawWeapon::CombatActionDrawWeapon(CombatAction::COMBAT_ACTION aeTyp
 
 void CombatActionDrawWeapon::Execute(CombatController* apCombatController, int32_t aiActionValue) {
     CombatProcedureSwitchWeapon* v3;
-    TESObjectWEAP* a2 = 0;
+    TESObjectWEAP* a2 = nullptr;
     // The action value is the weapon type, 6 for none.
     if (aiActionValue != 6) {
         a2 = apCombatController->pCombatState->GetWeaponByCombatType(static_cast<COMBAT_WEAPON_TYPE>(aiActionValue));
@@ -575,7 +575,7 @@ void CombatActionDrawWeapon::Execute(CombatController* apCombatController, int32
         v3 = ::new (apMemory) CombatProcedureSwitchWeapon(a2);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     apCombatController->AddBackgroundProcedure(v3);
     apCombatController->pCurrentWeapon = a2;
@@ -600,10 +600,10 @@ void CombatActionFlee::Execute(CombatController* apCombatController, int32_t aiA
     if (apMemory) {
         float afNumSeconds = fCombatFleeWaitTime.Float();
         CombatCoverLocation* CoverLocation = apCombatController->pCombatState->GetCoverLocation();
-        v5 = ::new (apMemory) CombatProcedureHideFromTarget(CoverLocation, afNumSeconds, 1, 1);
+        v5 = ::new (apMemory) CombatProcedureHideFromTarget(CoverLocation, afNumSeconds, true, true);
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     apCombatController->SetMovementProcedure(v5);
 }
@@ -621,10 +621,10 @@ void CombatActionHide::Execute(CombatController* apCombatController, int32_t aiA
         float afNumSeconds = static_cast<float>(aiActionValue);
         CombatState* MusicType = apCombatController->pCombatState;
         CombatCoverLocation* CoverLocation = MusicType->GetCoverLocation();
-        v6 = ::new (apMemory) CombatProcedureHideFromTarget(CoverLocation, afNumSeconds, 0, 0);
+        v6 = ::new (apMemory) CombatProcedureHideFromTarget(CoverLocation, afNumSeconds, false, false);
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     apCombatController->SetMovementProcedure(v6);
 }
@@ -641,7 +641,7 @@ CombatActionIgnoreBlockedTarget::CombatActionIgnoreBlockedTarget(CombatAction::C
 
 void CombatActionIgnoreBlockedTarget::Execute(CombatController* apCombatController, int32_t aiActionValue) {
     CombatState* MusicType = apCombatController->pCombatState;
-    MusicType->SetTargetBlocked(0);
+    MusicType->SetTargetBlocked(false);
 }
 
 CombatActionInvestigate::CombatActionInvestigate(CombatAction::COMBAT_ACTION aeType) : CombatAction(aeType) {
@@ -697,7 +697,7 @@ void CombatActionMove::StartMovementProcedure(CombatController* apCombatControll
             pmovementProcedure = ::new (apMemory) CombatProcedureEvade(aiLocation);
         }
         else {
-            pmovementProcedure = 0;
+            pmovementProcedure = nullptr;
         }
         pmovementProcedure_2 = pmovementProcedure;
     }
@@ -709,7 +709,7 @@ void CombatActionMove::StartMovementProcedure(CombatController* apCombatControll
             pmovementProcedure_3 = ::new (v5) CombatProcedureMove(pcombatLocation, afTargetRadius, aiLocation);
         }
         else {
-            pmovementProcedure_3 = 0;
+            pmovementProcedure_3 = nullptr;
         }
         pmovementProcedure_2 = pmovementProcedure_3;
     }
@@ -720,47 +720,47 @@ bool CombatActionMove::CheckLocationIdentical(CombatController* apCombatControll
     NiPoint3 a1;
     CombatProcedure* pmovementProcedure = apCombatController->pMovementProcedure;
     if (!pmovementProcedure) {
-        return 0;
+        return false;
     }
     CombatLocation* pcombatLocation = apCombatController->pCombatState->pCombatLocation;
     if (!pcombatLocation || pcombatLocation->iLocation != aiLocation) {
-        return 0;
+        return false;
     }
     CombatProcedure::COMBAT_PROCEDURES etype = pmovementProcedure->GetType();
     if (etype == CombatProcedure::MOVE_TO_LOCATION) {
         CombatProcedureMove* pmoveProcedure = static_cast<CombatProcedureMove*>(pmovementProcedure);
         if (static_cast<uint32_t>(pcombatLocation->iLocation) != pmoveProcedure->iLocation) {
-            return 0;
+            return false;
         }
         if (pcombatLocation->pRef) {
             TESObjectREFR* Ref = pcombatLocation->pRef;
             if (Ref != pmoveProcedure->pTargetRef) {
-                return 0;
+                return false;
             }
         }
         else {
             NiPoint3* DestinationPos = pmoveProcedure->GetDestinationPos(&a1);
             if (pcombatLocation->GetPoint() != *DestinationPos) {
-                return 0;
+                return false;
             }
         }
         if (pcombatLocation->GetFlag(1u)) {
-            return 0;
+            return false;
         }
     }
     else {
         if (etype != CombatProcedure::EVADE) {
-            return 0;
+            return false;
         }
         CombatProcedureEvade* pevadeProcedure = static_cast<CombatProcedureEvade*>(pmovementProcedure);
         if (!pcombatLocation->GetFlag(1u)) {
-            return 0;
+            return false;
         }
         if (pcombatLocation->iLocation != pevadeProcedure->iLocation) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 // apWorldStateArray is unused.
@@ -802,7 +802,7 @@ void CombatActionMoveAndAttackGrenade::Execute(CombatController* apCombatControl
         v3 = ::new (apMemory) CombatProcedureAttackGrenade;
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     apCombatController->SetActionProcedure(v3);
     CombatActionMove::StartMovementProcedure(apCombatController, aiActionValue);
@@ -859,7 +859,7 @@ void CombatActionMoveAndAttackRanged::Execute(CombatController* apCombatControll
         v3 = ::new (apMemory) CombatProcedureAttackRanged;
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     apCombatController->SetActionProcedure(v3);
     CombatActionMove::StartMovementProcedure(apCombatController, aiActionValue);
@@ -976,7 +976,7 @@ void CombatActionMoveAndSwitchToMelee::Execute(CombatController* apCombatControl
         v3 = ::new (apMemory) CombatProcedureSwitchWeapon(pweapon);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     apCombatController->AddBackgroundProcedure(v3);
     apCombatController->pCurrentWeapon = pweapon;
@@ -995,7 +995,7 @@ void CombatActionSearch::Execute(CombatController* apCombatController, int32_t a
         v3 = ::new (apMemory) CombatProcedureSearch;
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     apCombatController->SetMovementProcedure(v3);
 }
@@ -1037,7 +1037,7 @@ float CombatActionSwitchWeapon::GetCost(CombatController* apCombatController, in
     if (v4->GetLocalVariableOnActor("CombatStyleMelee") != 1.0) {
         return CombatAction::GetCost(apCombatController, aiActionValue);
     }
-    TESObjectWEAP* WeaponByCombatType = 0;
+    TESObjectWEAP* WeaponByCombatType = nullptr;
     if (aiActionValue != 6) {
         CombatState* MusicType = apCombatController->pCombatState;
         WeaponByCombatType = MusicType->GetWeaponByCombatType(static_cast<COMBAT_WEAPON_TYPE>(aiActionValue));
@@ -1072,7 +1072,7 @@ void CombatActionUseCombatItem::Execute(CombatController* apCombatController, in
             v4 = ::new (apMemory) CombatProcedureUseCombatItem(apItem);
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         apCombatController->SetActionProcedure(v4);
     }

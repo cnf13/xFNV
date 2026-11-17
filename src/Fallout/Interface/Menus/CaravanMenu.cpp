@@ -83,7 +83,7 @@ CaravanMenu::CaravanMenu()
     CaravanMenu::iUT_Value = Tile::AddUserTrait("_Value", -1);
     CaravanMenu::iUT_X = Tile::AddUserTrait("_x", -1);
     ZeroFlags();
-    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
     pListOfBillAnimations = new BSSimpleList<NiControllerSequence*>();
     pListOfCoinAnimations = new BSSimpleList<NiControllerSequence*>();
 }
@@ -222,10 +222,10 @@ void CaravanMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void CaravanMenu::DoDownClick(int32_t aiID, Tile* apTarget) {
-    bScrolling = (bool)0;
+    bScrolling = false;
     if (((eActiveMenu == 1) && (aiID == 15)) && (!eGameState)) {
         iPrevValue = (int32_t)pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue);
-        bScrolling = (bool)1;
+        bScrolling = true;
         iPrevXLocation = g_caravanMenu_InterfaceManager->GetCursorX();
     }
 }
@@ -309,14 +309,14 @@ void CaravanMenu::DoIdle() {
         if (!v2->xTutorialManager.HasBeenShown(static_cast<Interface::TutorialMessageID>(X))) {
             return;
         }
-        bTutorial = 0;
+        bTutorial = false;
     }
     if (uiPrevIdleTick) {
         if (!bisMenuOnTop) {
-            SetFlag(CaravanMenu::CAF_ISONTOP, 0);
+            SetFlag(CaravanMenu::CAF_ISONTOP, false);
             return;
         }
-        SetFlag(CaravanMenu::CAF_ISONTOP, 1);
+        SetFlag(CaravanMenu::CAF_ISONTOP, true);
         ielaspedMillis = appTimer.iLastTime - uiPrevIdleTick;
         if (ePrevGameState == eGameState) {
             CaravanMenu::fTimeDelta = static_cast<double>(ielaspedMillis) / 1000.0 + CaravanMenu::fTimeDelta;
@@ -355,18 +355,18 @@ void CaravanMenu::DoIdle() {
     ePrevGameState = eGameState;
     if (!bisMenuOnTop || eActiveMenu == CaravanMenu::CA_DECK_MENU) {
         InterfaceManager* v5 = InterfaceManager::Instance();
-        v5->pCursor->Set(4009, 255.0f, 1);
+        v5->pCursor->Set(4009, 255.0f, true);
     }
     if (this->IsFlagSet(CaravanMenu::CAF_MARKFORCLOSE)) {
         if (bisMenuOnTop) {
-            SetFlag(CaravanMenu::CAF_MARKFORCLOSE, 0);
+            SetFlag(CaravanMenu::CAF_MARKFORCLOSE, false);
             eGameState = CaravanMenu::CA_GAME_GAMEOVER;
         }
         return;
     }
     if (eActiveMenu == CaravanMenu::CA_RESULTS_MENU && eGameState == CaravanMenu::CA_IDLE &&
         CaravanMenu::fTimeDelta > 1.0) {
-        SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 0);
+        SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
     }
     switch (eGameState) {
         case CaravanMenu::CA_IDLE: {
@@ -378,7 +378,7 @@ void CaravanMenu::DoIdle() {
                         if (iValue >= 0 && iValue < iTotalCards) {
                             CaravanMenu::CaravanState v89;
                             iNumSteps = 1;
-                            pTiles[15]->Set(CaravanMenu::iUT_CurrentValue, static_cast<float>(iValue), 0);
+                            pTiles[15]->Set(CaravanMenu::iUT_CurrentValue, static_cast<float>(iValue), false);
                             int32_t v68 = Tile::TextToTrait("_SetInCode");
                             pTiles[15]->Poke(v68, 1.0f);
                             if (!(fxAxis > 0.0)) {
@@ -394,7 +394,7 @@ void CaravanMenu::DoIdle() {
                         if (g_caravanMenu_InterfaceManager->fMouseHeldTime == 0.0 &&
                             (bScrolling && eActiveMenu == CaravanMenu::CA_DECK_MENU)) {
                             iNumSteps = 0;
-                            bScrolling = 0;
+                            bScrolling = false;
                             int32_t v139 = static_cast<int32_t>(pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue));
                             int32_t Number = v139 - iPrevValue;
                             if (Number > -1) {
@@ -422,7 +422,7 @@ void CaravanMenu::DoIdle() {
                         else {
                             if (!bScrolling && g_caravanMenu_InterfaceManager->fMouseHeldTime > 0.0) {
                                 iPrevValue = static_cast<int32_t>(pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue));
-                                bScrolling = 1;
+                                bScrolling = true;
                                 iPrevXLocation = g_caravanMenu_InterfaceManager->GetCursorX();
                             }
                         }
@@ -459,7 +459,7 @@ void CaravanMenu::DoIdle() {
                                         );
                                         if (iValue_2 >= 0 && iValue_2 < iTotalCards) {
                                             pTiles[15]->Set(
-                                                CaravanMenu::iUT_CurrentValue, static_cast<float>(iValue_2), 0
+                                                CaravanMenu::iUT_CurrentValue, static_cast<float>(iValue_2), false
                                             );
                                             int32_t v69 = Tile::TextToTrait("_SetInCode");
                                             pTiles[15]->Poke(v69, 1.0f);
@@ -530,7 +530,7 @@ void CaravanMenu::DoIdle() {
                                     BSAudio* v72 = &BSAudio::QInstance();
                                     BSSoundHandle* SoundHandleByName =
                                         v72->GetSoundHandleByName(&v113, "GAMECaravanToggleTrack", 289u);
-                                    SoundHandleByName->Play(0);
+                                    SoundHandleByName->Play(false);
                                     SelectWholeTrack(iSelectedTrack);
                                 }
                                 else {
@@ -553,14 +553,14 @@ void CaravanMenu::DoIdle() {
                             }
                             BSAudio* v70 = &BSAudio::QInstance();
                             BSSoundHandle* v88 = v70->GetSoundHandleByName(&v114, "GAMECaravanSwitchCard", 289u);
-                            v88->Play(0);
-                            SelectDeckCard(0);
+                            v88->Play(false);
+                            SelectDeckCard(false);
                             if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) &&
                                 pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue > 10) {
-                                SetFlag(CaravanMenu::CAF_DISABLE_A, 1);
+                                SetFlag(CaravanMenu::CAF_DISABLE_A, true);
                             }
                             else {
-                                SetFlag(CaravanMenu::CAF_DISABLE_A, 0);
+                                SetFlag(CaravanMenu::CAF_DISABLE_A, false);
                             }
                             UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                         }
@@ -583,24 +583,24 @@ void CaravanMenu::DoIdle() {
         case CaravanMenu::CA_CAMERA_TO_DECK_ANIM: {
             if (pCameraAnimations[0]) {
                 if (CaravanMenu::fTimeDelta == 0.0) {
-                    pCameraAnimManager->ActivateSequence(pCameraAnimations[0], 0, 0, 1.0f, 0.0f, 0);
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                    pCameraAnimManager->ActivateSequence(pCameraAnimations[0], 0, false, 1.0f, 0.0f, nullptr);
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                 }
-                NiUpdateData UpdateData1(CaravanMenu::fTimeDelta, 1, 0);
+                NiUpdateData UpdateData1(CaravanMenu::fTimeDelta, true, false);
                 NiAVObject* v7 = CaravanMenu::spModel.m_pObject->GetAt(0);
                 v7->Update(UpdateData1);
                 if (static_cast<double>(CaravanMenu::fTimeDelta) >= pCameraAnimations[0]->m_fEndKeyTime) {
                     eGameState = CaravanMenu::CA_IDLE;
                     pCameraAnimManager->DeactivateSequence(pCameraAnimations[0], 0.0f);
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 0);
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     InterfaceManager* v8 = InterfaceManager::Instance();
                     if (!v8->xTutorialManager.HasBeenShown(Interface::TUT_CARAVAN_DECK)) {
                         TESForm* FormByEditorID = TESForm::GetFormByEditorID("HelpCaravanDeckBuilding");
                         BGSMessage* helpForm = dynamic_cast<BGSMessage*>(FormByEditorID);
                         if (helpForm) {
-                            bTutorial = TutorialMenu::Create(helpForm, 0);
+                            bTutorial = TutorialMenu::Create(helpForm, false);
                             InterfaceManager* v10 = InterfaceManager::Instance();
                             v10->xTutorialManager.FlagAsShown(Interface::TUT_CARAVAN_DECK);
                             iTutorial = 31;
@@ -615,20 +615,20 @@ void CaravanMenu::DoIdle() {
                 if (pHandAnimations[0][0]) {
                     if (pHandAnimations[1][0]) {
                         if (CaravanMenu::fTimeDelta == 0.0) {
-                            pCameraAnimManager->ActivateSequence(pCameraAnimations[1], 0, 0, 1.0f, 0.0f, 0);
+                            pCameraAnimManager->ActivateSequence(pCameraAnimations[1], 0, false, 1.0f, 0.0f, nullptr);
                             ZeroFlags();
-                            SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
-                            pHandAnimManager[0]->ActivateSequence(pHandAnimations[0][0], 0, 0, 1.0f, 0.0f, 0);
-                            pHandAnimManager[1]->ActivateSequence(pHandAnimations[1][0], 0, 0, 1.0f, 0.0f, 0);
+                            SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
+                            pHandAnimManager[0]->ActivateSequence(pHandAnimations[0][0], 0, false, 1.0f, 0.0f, nullptr);
+                            pHandAnimManager[1]->ActivateSequence(pHandAnimations[1][0], 0, false, 1.0f, 0.0f, nullptr);
                             fSelectionDelay = 0.0f;
                             BSAudio* v11 = &BSAudio::QInstance();
                             BSSoundHandle* v111 = v11->GetSoundHandleByName(&a1, "GAMECaravanStartMatch", 289u);
-                            v111->Play(0);
+                            v111->Play(false);
                             UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                         }
-                        NiUpdateData UpdateData1_2(CaravanMenu::fTimeDelta, 1, 0);
-                        NiUpdateData UpdateData2(CaravanMenu::fTimeDelta, 1, 0);
-                        NiUpdateData UpdateData3(CaravanMenu::fTimeDelta, 1, 0);
+                        NiUpdateData UpdateData1_2(CaravanMenu::fTimeDelta, true, false);
+                        NiUpdateData UpdateData2(CaravanMenu::fTimeDelta, true, false);
+                        NiUpdateData UpdateData3(CaravanMenu::fTimeDelta, true, false);
                         pHandGeometry[0]->Update(UpdateData2);
                         pHandGeometry[1]->Update(UpdateData3);
                         NiAVObject* v12 = CaravanMenu::spModel.m_pObject->GetAt(0);
@@ -639,7 +639,7 @@ void CaravanMenu::DoIdle() {
                             pCameraAnimManager->DeactivateSequence(pCameraAnimations[1], 0.0f);
                             pHandAnimManager[0]->DeactivateSequence(pHandAnimations[0][0], 0.0f);
                             pHandAnimManager[1]->DeactivateSequence(pHandAnimations[1][0], 0.0f);
-                            SetFlag(CaravanMenu::CAF_TRACK_SETUP, 1);
+                            SetFlag(CaravanMenu::CAF_TRACK_SETUP, true);
                             float x = 0.0f;
                             float y = 0.0f;
                             int32_t iSafeZoneWidth = static_cast<int32_t>(pTiles[2]->GetFloat(4017));
@@ -648,14 +648,14 @@ void CaravanMenu::DoIdle() {
                                 obj->GetWorldTranslate(), x, y, 1e-05f
                             );
                             x = static_cast<double>(iSafeZoneWidth) * x - 120.0;
-                            pTiles[23]->Set(4001, x, 1);
-                            pTiles[28]->Set(4001, x, 1);
+                            pTiles[23]->Set(4001, x, true);
+                            pTiles[28]->Set(4001, x, true);
                             x = x + 265.0;
-                            pTiles[24]->Set(4001, x, 1);
-                            pTiles[27]->Set(4001, x, 1);
+                            pTiles[24]->Set(4001, x, true);
+                            pTiles[27]->Set(4001, x, true);
                             x = x + 265.0;
-                            pTiles[25]->Set(4001, x, 1);
-                            pTiles[26]->Set(4001, x, 1);
+                            pTiles[25]->Set(4001, x, true);
+                            pTiles[26]->Set(4001, x, true);
                             Tile* TileByName = Tile::GetTileByName(pTiles[2], "CGM_NPCTrackRect");
                             TileByName->Set(4003, 1);
                             Tile* v14 = Tile::GetTileByName(pTiles[2], "CGM_PlayerTrackRect");
@@ -668,7 +668,7 @@ void CaravanMenu::DoIdle() {
                                 TESForm* v16 = TESForm::GetFormByEditorID("HelpCaravanStartingCaravans");
                                 BGSMessage* helpForm_2 = dynamic_cast<BGSMessage*>(v16);
                                 if (helpForm_2) {
-                                    bTutorial = TutorialMenu::Create(helpForm_2, 0);
+                                    bTutorial = TutorialMenu::Create(helpForm_2, false);
                                     InterfaceManager* v17 = InterfaceManager::Instance();
                                     v17->xTutorialManager.FlagAsShown(Interface::TUT_CARAVAN_TRACK);
                                     iTutorial = 32;
@@ -683,20 +683,20 @@ void CaravanMenu::DoIdle() {
         case CaravanMenu::CA_CAMERA_TO_RESULTS_ANIM: {
             if (pCameraAnimations[2]) {
                 if (CaravanMenu::fTimeDelta == 0.0) {
-                    pCameraAnimManager->ActivateSequence(pCameraAnimations[2], 0, 0, 1.0f, 0.0f, 0);
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                    pCameraAnimManager->ActivateSequence(pCameraAnimations[2], 0, false, 1.0f, 0.0f, nullptr);
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                 }
-                NiUpdateData UpdateData1_3(CaravanMenu::fTimeDelta, 1, 0);
+                NiUpdateData UpdateData1_3(CaravanMenu::fTimeDelta, true, false);
                 NiAVObject* v18 = CaravanMenu::spModel.m_pObject->GetAt(0);
                 v18->Update(UpdateData1_3);
                 if (static_cast<double>(CaravanMenu::fTimeDelta) >= pCameraAnimations[2]->m_fEndKeyTime) {
                     eGameState = CaravanMenu::CA_IDLE;
                     eActiveMenu = CaravanMenu::CA_RESULTS_MENU;
                     pCameraAnimManager->DeactivateSequence(pCameraAnimations[2], 0.0f);
-                    SetFlag(CaravanMenu::CAF_AI, 0);
+                    SetFlag(CaravanMenu::CAF_AI, false);
                     const char* v19 = sCaravanPressAnyKeyText.String();
-                    pTiles[35]->Set(4036, v19, 1);
+                    pTiles[35]->Set(4036, v19, true);
                     UpdateCaravanFlags();
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                 }
@@ -705,10 +705,10 @@ void CaravanMenu::DoIdle() {
         }
         case CaravanMenu::CA_ANTE_MONEYIN_ANIM: {
             if (CaravanMenu::fTimeDelta == 0.0) {
-                SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                 BSAudio* v20 = &BSAudio::QInstance();
                 BSSoundHandle* v110 = v20->GetSoundHandleByName(&arHandle, "GAMECaravanFundsDrop", 289u);
-                v110->Play(0);
+                v110->Play(false);
             }
             for (int32_t i = iBillIndexToAnim;; ++i) {
                 uint32_t FormFlags = pListOfBills.iSize;
@@ -727,7 +727,7 @@ void CaravanMenu::DoIdle() {
                 pListOfCoins.operator[](i_2)->Update(*v24);
             }
             if (CaravanMenu::fTimeDelta > 1.0) {
-                SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 0);
+                SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
                 iBillIndexToAnim = pListOfBills.iSize;
                 iCoinIndexToAnim = pListOfCoins.iSize;
                 eGameState = CaravanMenu::CA_IDLE;
@@ -737,28 +737,30 @@ void CaravanMenu::DoIdle() {
         case CaravanMenu::CA_DECK_FORWARD_ANIM: {
             if (pActiveDeckAnimations[0] || pInactiveDeckAnimations[0]) {
                 if (CaravanMenu::fTimeDelta == 0.0) {
-                    pActiveDeckAnimManager->ActivateSequence(pActiveDeckAnimations[0], 0, 0, 1.0f, 0.0f, 0);
-                    pInactiveDeckAnimManager->ActivateSequence(pInactiveDeckAnimations[0], 0, 0, 1.0f, 0.0f, 0);
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                    pActiveDeckAnimManager->ActivateSequence(pActiveDeckAnimations[0], 0, false, 1.0f, 0.0f, nullptr);
+                    pInactiveDeckAnimManager->ActivateSequence(
+                        pInactiveDeckAnimations[0], 0, false, 1.0f, 0.0f, nullptr
+                    );
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     --iNumSteps;
                     BSAudio* v25 = &BSAudio::QInstance();
                     BSSoundHandle* v109 = v25->GetSoundHandleByName(&th_s, "GAMECaravanNavigate", 289u);
-                    v109->Play(0);
+                    v109->Play(false);
                 }
-                NiUpdateData UpdateData1_4(CaravanMenu::fTimeDelta, 1, 0);
-                NiUpdateData UpdateData2_2(CaravanMenu::fTimeDelta, 1, 0);
-                NiUpdateData UpdateData3_2(CaravanMenu::fTimeDelta, 1, 0);
+                NiUpdateData UpdateData1_4(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData2_2(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData3_2(CaravanMenu::fTimeDelta, true, false);
                 NiAVObject* v26 = CaravanMenu::spModel.m_pObject->GetAt(0);
                 v26->Update(UpdateData1_4);
                 pActiveDeckGeometry->Update(UpdateData2_2);
                 pInactiveDeckGeometry->Update(UpdateData3_2);
                 if (static_cast<double>(CaravanMenu::fTimeDelta) >= pActiveDeckAnimations[0]->m_fEndKeyTime) {
                     double v27 = pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue) - static_cast<double>(iNumSteps);
-                    SwapDeckBuildingTextures(static_cast<int32_t>(v27), 0);
-                    NiUpdateData UpdateData1_5(0.0f, 1, 0);
-                    NiUpdateData UpdateData2_3(0.0f, 1, 0);
-                    NiUpdateData UpdateData3_3(0.0f, 1, 0);
+                    SwapDeckBuildingTextures(static_cast<int32_t>(v27), false);
+                    NiUpdateData UpdateData1_5(0.0f, true, false);
+                    NiUpdateData UpdateData2_3(0.0f, true, false);
+                    NiUpdateData UpdateData3_3(0.0f, true, false);
                     NiAVObject* v28 = CaravanMenu::spModel.m_pObject->GetAt(0);
                     v28->Update(UpdateData1_5);
                     pActiveDeckGeometry->Update(UpdateData2_3);
@@ -771,7 +773,7 @@ void CaravanMenu::DoIdle() {
                         eGameState = CaravanMenu::CA_IDLE;
                         pActiveDeckAnimManager->DeactivateSequence(pActiveDeckAnimations[0], 0.0f);
                         pInactiveDeckAnimManager->DeactivateSequence(pInactiveDeckAnimations[0], 0.0f);
-                        SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 0);
+                        SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
                         UpdateCaravanFlags();
                         UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     }
@@ -783,20 +785,22 @@ void CaravanMenu::DoIdle() {
         case CaravanMenu::CA_DECK_BACK_ANIM: {
             if (pActiveDeckAnimations[1] || pInactiveDeckAnimations[1]) {
                 if (CaravanMenu::fTimeDelta == 0.0) {
-                    pActiveDeckAnimManager->ActivateSequence(pActiveDeckAnimations[1], 0, 0, 1.0f, 0.0f, 0);
-                    pInactiveDeckAnimManager->ActivateSequence(pInactiveDeckAnimations[1], 0, 0, 1.0f, 0.0f, 0);
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                    pActiveDeckAnimManager->ActivateSequence(pActiveDeckAnimations[1], 0, false, 1.0f, 0.0f, nullptr);
+                    pInactiveDeckAnimManager->ActivateSequence(
+                        pInactiveDeckAnimations[1], 0, false, 1.0f, 0.0f, nullptr
+                    );
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     --iNumSteps;
                     double v29 = pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue) + static_cast<double>(iNumSteps);
-                    SwapDeckBuildingTextures(static_cast<int32_t>(v29), 0);
+                    SwapDeckBuildingTextures(static_cast<int32_t>(v29), false);
                     BSAudio* v30 = &BSAudio::QInstance();
                     BSSoundHandle* v108 = v30->GetSoundHandleByName(&apResult, "GAMECaravanNavigate", 289u);
-                    v108->Play(0);
+                    v108->Play(false);
                 }
-                NiUpdateData UpdateData1_6(CaravanMenu::fTimeDelta, 1, 0);
-                NiUpdateData UpdateData2_4(CaravanMenu::fTimeDelta, 1, 0);
-                NiUpdateData UpdateData3_4(CaravanMenu::fTimeDelta, 1, 0);
+                NiUpdateData UpdateData1_6(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData2_4(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData3_4(CaravanMenu::fTimeDelta, true, false);
                 NiAVObject* v31 = CaravanMenu::spModel.m_pObject->GetAt(0);
                 v31->Update(UpdateData1_6);
                 pActiveDeckGeometry->Update(UpdateData2_4);
@@ -812,7 +816,7 @@ void CaravanMenu::DoIdle() {
                             eGameState = CaravanMenu::CA_IDLE;
                             pActiveDeckAnimManager->DeactivateSequence(pActiveDeckAnimations[0], 0.0f);
                             pInactiveDeckAnimManager->DeactivateSequence(pInactiveDeckAnimations[0], 0.0f);
-                            SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 0);
+                            SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
                             UpdateCaravanFlags();
                             UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                         }
@@ -821,7 +825,7 @@ void CaravanMenu::DoIdle() {
                         eGameState = CaravanMenu::CA_IDLE;
                         pActiveDeckAnimManager->DeactivateSequence(pActiveDeckAnimations[1], 0.0f);
                         pInactiveDeckAnimManager->DeactivateSequence(pInactiveDeckAnimations[1], 0.0f);
-                        SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 0);
+                        SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
                         UpdateCaravanFlags();
                         UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     }
@@ -833,17 +837,19 @@ void CaravanMenu::DoIdle() {
         case CaravanMenu::CA_DECK_FLIP_ANIM: {
             if (pActiveDeckAnimations[2] || pInactiveDeckAnimations[2]) {
                 if (CaravanMenu::fTimeDelta == 0.0) {
-                    pActiveDeckAnimManager->ActivateSequence(pActiveDeckAnimations[2], 0, 0, 1.0f, 0.0f, 0);
-                    pInactiveDeckAnimManager->ActivateSequence(pInactiveDeckAnimations[2], 0, 0, 1.0f, 0.0f, 0);
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                    pActiveDeckAnimManager->ActivateSequence(pActiveDeckAnimations[2], 0, false, 1.0f, 0.0f, nullptr);
+                    pInactiveDeckAnimManager->ActivateSequence(
+                        pInactiveDeckAnimations[2], 0, false, 1.0f, 0.0f, nullptr
+                    );
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     BSAudio* v38 = &BSAudio::QInstance();
                     BSSoundHandle* v105 = v38->GetSoundHandleByName(&v125, "GAMECaravanAddRemove", 289u);
-                    v105->Play(0);
+                    v105->Play(false);
                 }
-                NiUpdateData UpdateData1_9(CaravanMenu::fTimeDelta, 1, 0);
-                NiUpdateData UpdateData2_7(CaravanMenu::fTimeDelta, 1, 0);
-                NiUpdateData UpdateData3_7(CaravanMenu::fTimeDelta, 1, 0);
+                NiUpdateData UpdateData1_9(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData2_7(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData3_7(CaravanMenu::fTimeDelta, true, false);
                 NiAVObject* v39 = CaravanMenu::spModel.m_pObject->GetAt(0);
                 v39->Update(UpdateData1_9);
                 pActiveDeckGeometry->Update(UpdateData2_7);
@@ -851,16 +857,16 @@ void CaravanMenu::DoIdle() {
                 if (static_cast<double>(CaravanMenu::fTimeDelta) >= pActiveDeckAnimations[2]->m_fEndKeyTime) {
                     eGameState = CaravanMenu::CA_IDLE;
                     FlipSelectedCardTextures(11);
-                    NiUpdateData UpdateData1_10(0.0f, 1, 0);
-                    NiUpdateData UpdateData2_8(0.0f, 1, 0);
-                    NiUpdateData UpdateData3_8(0.0f, 1, 0);
+                    NiUpdateData UpdateData1_10(0.0f, true, false);
+                    NiUpdateData UpdateData2_8(0.0f, true, false);
+                    NiUpdateData UpdateData3_8(0.0f, true, false);
                     NiAVObject* v40 = CaravanMenu::spModel.m_pObject->GetAt(0);
                     v40->Update(UpdateData1_10);
                     pActiveDeckGeometry->Update(UpdateData2_8);
                     pInactiveDeckGeometry->Update(UpdateData3_8);
                     pActiveDeckAnimManager->DeactivateSequence(pActiveDeckAnimations[2], 0.0f);
                     pInactiveDeckAnimManager->DeactivateSequence(pInactiveDeckAnimations[2], 0.0f);
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 0);
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
                     UpdateCaravanFlags();
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                 }
@@ -871,18 +877,20 @@ void CaravanMenu::DoIdle() {
             if (pActiveDeckAnimations[3] || pInactiveDeckAnimations[3]) {
                 if (CaravanMenu::fTimeDelta == 0.0) {
                     double v32 = pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue);
-                    SwapDeckBuildingTextures(static_cast<int32_t>(v32), 0);
-                    pActiveDeckAnimManager->ActivateSequence(pActiveDeckAnimations[3], 0, 0, 1.0f, 0.0f, 0);
-                    pInactiveDeckAnimManager->ActivateSequence(pInactiveDeckAnimations[3], 0, 0, 1.0f, 0.0f, 0);
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                    SwapDeckBuildingTextures(static_cast<int32_t>(v32), false);
+                    pActiveDeckAnimManager->ActivateSequence(pActiveDeckAnimations[3], 0, false, 1.0f, 0.0f, nullptr);
+                    pInactiveDeckAnimManager->ActivateSequence(
+                        pInactiveDeckAnimations[3], 0, false, 1.0f, 0.0f, nullptr
+                    );
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     BSAudio* v33 = &BSAudio::QInstance();
                     BSSoundHandle* v107 = v33->GetSoundHandleByName(&v127, "GAMECaravanChangeDeck", 289u);
-                    v107->Play(0);
+                    v107->Play(false);
                 }
-                NiUpdateData UpdateData1_7(CaravanMenu::fTimeDelta, 1, 0);
-                NiUpdateData UpdateData2_5(CaravanMenu::fTimeDelta, 1, 0);
-                NiUpdateData UpdateData3_5(CaravanMenu::fTimeDelta, 1, 0);
+                NiUpdateData UpdateData1_7(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData2_5(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData3_5(CaravanMenu::fTimeDelta, true, false);
                 NiAVObject* v34 = CaravanMenu::spModel.m_pObject->GetAt(0);
                 v34->Update(UpdateData1_7);
                 pActiveDeckGeometry->Update(UpdateData2_5);
@@ -891,7 +899,7 @@ void CaravanMenu::DoIdle() {
                     eGameState = CaravanMenu::CA_IDLE;
                     pActiveDeckAnimManager->DeactivateSequence(pActiveDeckAnimations[3], 0.0f);
                     pInactiveDeckAnimManager->DeactivateSequence(pInactiveDeckAnimations[3], 0.0f);
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 0);
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
                     UpdateCaravanFlags();
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     unkE80 = 0;
@@ -902,17 +910,19 @@ void CaravanMenu::DoIdle() {
         case CaravanMenu::CA_DECK_REWIND_ANIM: {
             if (pActiveDeckAnimations[4] || pInactiveDeckAnimations[4]) {
                 if (CaravanMenu::fTimeDelta == 0.0) {
-                    pActiveDeckAnimManager->ActivateSequence(pActiveDeckAnimations[4], 0, 0, 1.0f, 0.0f, 0);
-                    pInactiveDeckAnimManager->ActivateSequence(pInactiveDeckAnimations[4], 0, 0, 1.0f, 0.0f, 0);
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                    pActiveDeckAnimManager->ActivateSequence(pActiveDeckAnimations[4], 0, false, 1.0f, 0.0f, nullptr);
+                    pInactiveDeckAnimManager->ActivateSequence(
+                        pInactiveDeckAnimations[4], 0, false, 1.0f, 0.0f, nullptr
+                    );
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     BSAudio* v35 = &BSAudio::QInstance();
                     BSSoundHandle* v106 = v35->GetSoundHandleByName(&v126, "GAMECaravanChangeDeck", 289u);
-                    v106->Play(0);
+                    v106->Play(false);
                 }
-                NiUpdateData UpdateData1_8(CaravanMenu::fTimeDelta, 1, 0);
-                NiUpdateData UpdateData2_6(CaravanMenu::fTimeDelta, 1, 0);
-                NiUpdateData UpdateData3_6(CaravanMenu::fTimeDelta, 1, 0);
+                NiUpdateData UpdateData1_8(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData2_6(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData3_6(CaravanMenu::fTimeDelta, true, false);
                 NiAVObject* v36 = CaravanMenu::spModel.m_pObject->GetAt(0);
                 v36->Update(UpdateData1_8);
                 pActiveDeckGeometry->Update(UpdateData2_6);
@@ -920,10 +930,10 @@ void CaravanMenu::DoIdle() {
                 if (static_cast<double>(CaravanMenu::fTimeDelta) >= pActiveDeckAnimations[4]->m_fEndKeyTime) {
                     eGameState = CaravanMenu::CA_IDLE;
                     double v37 = pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue);
-                    SwapDeckBuildingTextures(static_cast<int32_t>(v37), 0);
+                    SwapDeckBuildingTextures(static_cast<int32_t>(v37), false);
                     pActiveDeckAnimManager->DeactivateSequence(pActiveDeckAnimations[4], 0.0f);
                     pInactiveDeckAnimManager->DeactivateSequence(pInactiveDeckAnimations[4], 0.0f);
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 0);
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
                     UpdateCaravanFlags();
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     unkE80 = 0;
@@ -934,17 +944,19 @@ void CaravanMenu::DoIdle() {
         case CaravanMenu::CA_DECK_WIPE_ANIM: {
             if (pActiveDeckAnimations[5] || pInactiveDeckAnimations[5]) {
                 if (CaravanMenu::fTimeDelta == 0.0) {
-                    pActiveDeckAnimManager->ActivateSequence(pActiveDeckAnimations[5], 0, 0, 1.0f, 0.0f, 0);
-                    pInactiveDeckAnimManager->ActivateSequence(pInactiveDeckAnimations[5], 0, 0, 1.0f, 0.0f, 0);
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                    pActiveDeckAnimManager->ActivateSequence(pActiveDeckAnimations[5], 0, false, 1.0f, 0.0f, nullptr);
+                    pInactiveDeckAnimManager->ActivateSequence(
+                        pInactiveDeckAnimations[5], 0, false, 1.0f, 0.0f, nullptr
+                    );
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     BSAudio* v41 = &BSAudio::QInstance();
                     BSSoundHandle* v104 = v41->GetSoundHandleByName(&v124, "GAMECaravanChangeDeck", 289u);
-                    v104->Play(0);
+                    v104->Play(false);
                 }
-                NiUpdateData UpdateData1_11(CaravanMenu::fTimeDelta, 1, 0);
-                NiUpdateData UpdateData2_9(CaravanMenu::fTimeDelta, 1, 0);
-                NiUpdateData UpdateData3_9(CaravanMenu::fTimeDelta, 1, 0);
+                NiUpdateData UpdateData1_11(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData2_9(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData3_9(CaravanMenu::fTimeDelta, true, false);
                 NiAVObject* v42 = CaravanMenu::spModel.m_pObject->GetAt(0);
                 v42->Update(UpdateData1_11);
                 pActiveDeckGeometry->Update(UpdateData2_9);
@@ -952,17 +964,17 @@ void CaravanMenu::DoIdle() {
                 if (static_cast<double>(CaravanMenu::fTimeDelta) >= pActiveDeckAnimations[5]->m_fEndKeyTime) {
                     eGameState = CaravanMenu::CA_IDLE;
                     FlipSelectedCardTextures(11);
-                    NiUpdateData UpdateData1_12(CaravanMenu::fTimeDelta, 1, 0);
-                    NiUpdateData UpdateData2_10(CaravanMenu::fTimeDelta, 1, 0);
-                    NiUpdateData UpdateData3_10(CaravanMenu::fTimeDelta, 1, 0);
+                    NiUpdateData UpdateData1_12(CaravanMenu::fTimeDelta, true, false);
+                    NiUpdateData UpdateData2_10(CaravanMenu::fTimeDelta, true, false);
+                    NiUpdateData UpdateData3_10(CaravanMenu::fTimeDelta, true, false);
                     NiAVObject* v43 = CaravanMenu::spModel.m_pObject->GetAt(0);
                     v43->Update(UpdateData1_12);
                     pActiveDeckGeometry->Update(UpdateData2_10);
                     pInactiveDeckGeometry->Update(UpdateData3_10);
                     pActiveDeckAnimManager->DeactivateSequence(pActiveDeckAnimations[5], 0.0f);
                     pInactiveDeckAnimManager->DeactivateSequence(pInactiveDeckAnimations[5], 0.0f);
-                    bContinueProcessing = 1;
-                    SetFlag(CaravanMenu::CAF_AI, 1);
+                    bContinueProcessing = true;
+                    SetFlag(CaravanMenu::CAF_AI, true);
                     UpdateCaravanFlags();
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     PrepareGameMenu();
@@ -977,23 +989,24 @@ void CaravanMenu::DoIdle() {
                     if (CaravanMenu::fTimeDelta == 0.0) {
                         UpdateSelectedTrackCardTexture();
                         pHandAnimManager[isAI]->ActivateSequence(
-                            pStartAnimations[isAI][iSelectedDeckCard], 0, 0, 1.0f, 0.0f, 0
+                            pStartAnimations[isAI][iSelectedDeckCard], 0, false, 1.0f, 0.0f, nullptr
                         );
                         pTrackAnimManager[iSelectedTrack][iSelectedRow]->ActivateSequence(
-                            pTrackAnimations[iSelectedTrack][iSelectedRow][iSelectedColumn][0], 0, 0, 1.0f, 0.0f, 0
+                            pTrackAnimations[iSelectedTrack][iSelectedRow][iSelectedColumn][0], 0, false, 1.0f, 0.0f,
+                            nullptr
                         );
                         if (!isAI) {
-                            SelectDeckCard(1);
+                            SelectDeckCard(true);
                         }
-                        SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                        SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                         fSelectionDelay = 0.0f;
                         BSAudio* v44 = &BSAudio::QInstance();
                         BSSoundHandle* v103 = v44->GetSoundHandleByName(&v123, "GAMECaravanConfirmAddtoDeck", 289u);
-                        v103->Play(0);
+                        v103->Play(false);
                     }
-                    NiUpdateData UpdateData1_13(CaravanMenu::fTimeDelta, 1, 0);
+                    NiUpdateData UpdateData1_13(CaravanMenu::fTimeDelta, true, false);
                     pHandGeometry[isAI]->Update(UpdateData1_13);
-                    NiUpdateData UpdateData2_11(CaravanMenu::fTimeDelta, 1, 0);
+                    NiUpdateData UpdateData2_11(CaravanMenu::fTimeDelta, true, false);
                     pTrackGeometry[iSelectedTrack][iSelectedRow]->Update(UpdateData2_11);
                     if (static_cast<double>(CaravanMenu::fTimeDelta) >=
                             pStartAnimations[isAI][iSelectedDeckCard]->m_fEndKeyTime &&
@@ -1009,20 +1022,22 @@ void CaravanMenu::DoIdle() {
                             bool Xa = this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP);
                             bool IsFlagSet = this->IsFlagSet(CaravanMenu::CAF_AI);
                             UpdateGameHandTextures(!IsFlagSet, Xa);
-                            pHandAnimManager[isAI]->ActivateSequence(pHandAnimations[isAI][1], 0, 0, 1.0f, 0.0f, 0);
-                            NiUpdateData UpdateData1_14(0.0f, 1, 0);
+                            pHandAnimManager[isAI]->ActivateSequence(
+                                pHandAnimations[isAI][1], 0, false, 1.0f, 0.0f, nullptr
+                            );
+                            NiUpdateData UpdateData1_14(0.0f, true, false);
                             pHandGeometry[isAI]->Update(UpdateData1_14);
                             pHandAnimManager[isAI]->DeactivateSequence(pHandAnimations[isAI][1], 0.0f);
                             if (!this->IsFlagSet(CaravanMenu::CAF_AI)) {
                                 if (pCardTracks[2]->iSize) {
                                     if (pCardTracks[3]->iSize) {
-                                        SetFlag(CaravanMenu::CAF_TRACK_SETUP, 0);
+                                        SetFlag(CaravanMenu::CAF_TRACK_SETUP, false);
                                         InterfaceManager* v46 = InterfaceManager::Instance();
                                         if (!v46->xTutorialManager.HasBeenShown(Interface::TUT_CARAVAN_GAME)) {
                                             TESForm* v47 = TESForm::GetFormByEditorID("HelpCaravanContractWar");
                                             BGSMessage* helpForm_3 = dynamic_cast<BGSMessage*>(v47);
                                             if (helpForm_3) {
-                                                bTutorial = TutorialMenu::Create(helpForm_3, 0);
+                                                bTutorial = TutorialMenu::Create(helpForm_3, false);
                                                 InterfaceManager* v48 = InterfaceManager::Instance();
                                                 v48->xTutorialManager.FlagAsShown(Interface::TUT_CARAVAN_GAME);
                                                 iTutorial = 33;
@@ -1034,19 +1049,21 @@ void CaravanMenu::DoIdle() {
                         }
                         else {
                             bool v49 = this->IsFlagSet(CaravanMenu::CAF_AI);
-                            UpdateGameHandTextures(!v49, 1);
-                            pHandAnimManager[isAI]->ActivateSequence(pStartAnimations[isAI][0], 0, 0, 1.0f, 0.0f, 0);
-                            NiUpdateData UpdateData1_15(0.0f, 1, 0);
+                            UpdateGameHandTextures(!v49, true);
+                            pHandAnimManager[isAI]->ActivateSequence(
+                                pStartAnimations[isAI][0], 0, false, 1.0f, 0.0f, nullptr
+                            );
+                            NiUpdateData UpdateData1_15(0.0f, true, false);
                             pHandGeometry[isAI]->Update(UpdateData1_15);
                             pHandAnimManager[isAI]->DeactivateSequence(pStartAnimations[isAI][0], 0.0f);
                         }
                         pHandAnimManager[isAI]->DeactivateAll(0.0f);
                         if (isAI == 1) {
                             iSelectedDeckCard = pPlayerHand.iSize - 1;
-                            SelectDeckCard(0);
+                            SelectDeckCard(false);
                             if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) &&
                                 pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue > 10) {
-                                SetFlag(CaravanMenu::CAF_DISABLE_A, 1);
+                                SetFlag(CaravanMenu::CAF_DISABLE_A, true);
                             }
                         }
                         pTiles[isAI + 29]->Poke(CaravanMenu::iUT_Value, 1.0f);
@@ -1070,18 +1087,18 @@ void CaravanMenu::DoIdle() {
             if (pStartAnimations[isAI_2][iSelectedDeckCard]) {
                 if (CaravanMenu::fTimeDelta == 0.0) {
                     pHandAnimManager[isAI_2]->ActivateSequence(
-                        pStartAnimations[isAI_2][iSelectedDeckCard], 0, 0, 1.0f, 0.0f, 0
+                        pStartAnimations[isAI_2][iSelectedDeckCard], 0, false, 1.0f, 0.0f, nullptr
                     );
                     if (!isAI_2) {
-                        SelectDeckCard(1);
+                        SelectDeckCard(true);
                     }
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     fSelectionDelay = 0.0f;
                     BSAudio* v50 = &BSAudio::QInstance();
                     BSSoundHandle* v101 = v50->GetSoundHandleByName(&v122, "GAMECaravanRemoveCard", 289u);
-                    v101->Play(0);
+                    v101->Play(false);
                 }
-                NiUpdateData UpdateData1_16(CaravanMenu::fTimeDelta, 1, 0);
+                NiUpdateData UpdateData1_16(CaravanMenu::fTimeDelta, true, false);
                 pHandGeometry[isAI_2]->Update(UpdateData1_16);
                 if (static_cast<double>(CaravanMenu::fTimeDelta) >=
                     pStartAnimations[isAI_2][iSelectedDeckCard]->m_fEndKeyTime) {
@@ -1092,26 +1109,30 @@ void CaravanMenu::DoIdle() {
                         bool Xb = this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP);
                         bool v51 = this->IsFlagSet(CaravanMenu::CAF_AI);
                         UpdateGameHandTextures(!v51, Xb);
-                        pHandAnimManager[isAI_2]->ActivateSequence(pHandAnimations[isAI_2][1], 0, 0, 1.0f, 0.0f, 0);
-                        NiUpdateData UpdateData1_17(0.0f, 1, 0);
+                        pHandAnimManager[isAI_2]->ActivateSequence(
+                            pHandAnimations[isAI_2][1], 0, false, 1.0f, 0.0f, nullptr
+                        );
+                        NiUpdateData UpdateData1_17(0.0f, true, false);
                         pHandGeometry[isAI_2]->Update(UpdateData1_17);
                         pHandAnimManager[isAI_2]->DeactivateSequence(pHandAnimations[isAI_2][1], 0.0f);
                     }
                     else {
                         bool v52 = this->IsFlagSet(CaravanMenu::CAF_AI);
-                        UpdateGameHandTextures(!v52, 1);
-                        pHandAnimManager[isAI_2]->ActivateSequence(pStartAnimations[isAI_2][0], 0, 0, 1.0f, 0.0f, 0);
-                        NiUpdateData UpdateData1_18(0.0f, 1, 0);
+                        UpdateGameHandTextures(!v52, true);
+                        pHandAnimManager[isAI_2]->ActivateSequence(
+                            pStartAnimations[isAI_2][0], 0, false, 1.0f, 0.0f, nullptr
+                        );
+                        NiUpdateData UpdateData1_18(0.0f, true, false);
                         pHandGeometry[isAI_2]->Update(UpdateData1_18);
                         pHandAnimManager[isAI_2]->DeactivateSequence(pStartAnimations[isAI_2][0], 0.0f);
                     }
                     pHandAnimManager[isAI_2]->DeactivateAll(0.0f);
                     if (!isAI_2) {
                         iSelectedDeckCard = pPlayerHand.iSize - 1;
-                        SelectDeckCard(0);
+                        SelectDeckCard(false);
                         if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) &&
                             pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue > 10) {
-                            SetFlag(CaravanMenu::CAF_DISABLE_A, 1);
+                            SetFlag(CaravanMenu::CAF_DISABLE_A, true);
                         }
                     }
                     pTiles[isAI_2 + 29]->Poke(CaravanMenu::iUT_Value, 1.0f);
@@ -1129,7 +1150,7 @@ void CaravanMenu::DoIdle() {
                     }
                     else {
                         eGameState = CaravanMenu::CA_IDLE;
-                        SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 0);
+                        SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
                     }
                 }
             }
@@ -1155,29 +1176,29 @@ void CaravanMenu::DoIdle() {
                 }
                 if (iNextNPCCard == -1) {
                     pHandAnimManager[isAI_3]->ActivateSequence(
-                        pStartAnimations[isAI_3][iSelectedDeckCard], 0, 0, 1.0f, 0.0f, 0
+                        pStartAnimations[isAI_3][iSelectedDeckCard], 0, false, 1.0f, 0.0f, nullptr
                     );
                 }
                 else {
                     pHandAnimManager[isAI_3]->ActivateSequence(
-                        pHandAnimations[isAI_3][iSelectedDeckCard + 1], 0, 0, 1.0f, 0.0f, 0
+                        pHandAnimations[isAI_3][iSelectedDeckCard + 1], 0, false, 1.0f, 0.0f, nullptr
                     );
                 }
                 pTrackAnimManager[iSelectedTrack][iSelectedRow]->ActivateSequence(
-                    pTrackAnimations[iSelectedTrack][iSelectedRow][iSelectedColumn][0], 0, 0, 1.0f, 0.0f, 0
+                    pTrackAnimations[iSelectedTrack][iSelectedRow][iSelectedColumn][0], 0, false, 1.0f, 0.0f, nullptr
                 );
                 if (!isAI_3) {
-                    SelectDeckCard(1);
+                    SelectDeckCard(true);
                 }
-                SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                 fSelectionDelay = 0.0f;
                 BSAudio* v53 = &BSAudio::QInstance();
                 BSSoundHandle* v98 = v53->GetSoundHandleByName(&v121, "GAMECaravanConfirmAddToTrack", 289u);
-                v98->Play(0);
+                v98->Play(false);
             }
-            NiUpdateData UpdateData1_19(CaravanMenu::fTimeDelta, 1, 0);
+            NiUpdateData UpdateData1_19(CaravanMenu::fTimeDelta, true, false);
             pHandGeometry[isAI_3]->Update(UpdateData1_19);
-            NiUpdateData UpdateData2_12(CaravanMenu::fTimeDelta, 1, 0);
+            NiUpdateData UpdateData2_12(CaravanMenu::fTimeDelta, true, false);
             pTrackGeometry[iSelectedTrack][iSelectedRow]->Update(UpdateData2_12);
             if (!(static_cast<double>(CaravanMenu::fTimeDelta) >=
                   pHandAnimations[isAI_3][iSelectedDeckCard]->m_fEndKeyTime) ||
@@ -1192,17 +1213,17 @@ void CaravanMenu::DoIdle() {
             bool Xc = this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP);
             bool v54 = this->IsFlagSet(CaravanMenu::CAF_AI);
             UpdateGameHandTextures(!v54, Xc);
-            pHandAnimManager[isAI_3]->ActivateSequence(pHandAnimations[isAI_3][1], 0, 0, 1.0f, 0.0f, 0);
-            NiUpdateData UpdateData1_20(0.0f, 1, 0);
+            pHandAnimManager[isAI_3]->ActivateSequence(pHandAnimations[isAI_3][1], 0, false, 1.0f, 0.0f, nullptr);
+            NiUpdateData UpdateData1_20(0.0f, true, false);
             pHandGeometry[isAI_3]->Update(UpdateData1_20);
             pHandAnimManager[isAI_3]->DeactivateSequence(pHandAnimations[isAI_3][1], 0.0f);
             if (isAI_3 == 1 && (pSelectedCard->data.iFaceValue != 12 && pSelectedCard->data.iFaceValue != 15)) {
                 uint32_t v96;
                 iSelectedDeckCard = pPlayerHand.iSize - 1;
-                SelectDeckCard(0);
+                SelectDeckCard(false);
                 if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) &&
                     pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue > 10) {
-                    SetFlag(CaravanMenu::CAF_DISABLE_A, 1);
+                    SetFlag(CaravanMenu::CAF_DISABLE_A, true);
                 }
             LABEL_225:;
                 pTiles[isAI_3 + 29]->Poke(CaravanMenu::iUT_Value, 1.0f);
@@ -1267,35 +1288,37 @@ void CaravanMenu::DoIdle() {
                     }
                     if (iNextPlayerCard == -1) {
                         pHandAnimManager[isAI_4]->ActivateSequence(
-                            pStartAnimations[isAI_4][iSelectedDeckCard], 0, 0, 1.0f, 0.0f, 0
+                            pStartAnimations[isAI_4][iSelectedDeckCard], 0, false, 1.0f, 0.0f, nullptr
                         );
                         BSAudio* v57 = &BSAudio::QInstance();
                         BSSoundHandle* v94 = v57->GetSoundHandleByName(&v120, "GAMECaravanRemoveCard", 289u);
-                        v94->Play(0);
+                        v94->Play(false);
                     }
                     else {
                         pHandAnimManager[isAI_4]->ActivateSequence(
-                            pHandAnimations[isAI_4][iSelectedDeckCard + 1], 0, 0, 1.0f, 0.0f, 0
+                            pHandAnimations[isAI_4][iSelectedDeckCard + 1], 0, false, 1.0f, 0.0f, nullptr
                         );
                         BSAudio* v58 = &BSAudio::QInstance();
                         BSSoundHandle* v93 = v58->GetSoundHandleByName(&v119, "GAMECaravanAddRemoveCard", 289u);
-                        v93->Play(0);
+                        v93->Play(false);
                     }
                     if (!isAI_4) {
-                        SelectDeckCard(1);
+                        SelectDeckCard(true);
                     }
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     fSelectionDelay = 0.0f;
                 }
-                NiUpdateData UpdateData1_21(CaravanMenu::fTimeDelta, 1, 0);
+                NiUpdateData UpdateData1_21(CaravanMenu::fTimeDelta, true, false);
                 pHandGeometry[isAI_4]->Update(UpdateData1_21);
                 if (static_cast<double>(CaravanMenu::fTimeDelta) >=
                     pHandAnimations[isAI_4][iSelectedDeckCard]->m_fEndKeyTime) {
                     uint32_t v92;
-                    UpdateGameHandTextures(isAI_4 == 0, 0);
+                    UpdateGameHandTextures(isAI_4 == 0, false);
                     pHandAnimManager[isAI_4]->DeactivateSequence(pHandAnimations[isAI_4][iSelectedDeckCard + 1], 0.0f);
-                    pHandAnimManager[isAI_4]->ActivateSequence(pHandAnimations[isAI_4][1], 0, 0, 1.0f, 0.0f, 0);
-                    NiUpdateData UpdateData1_22(0.0f, 1, 0);
+                    pHandAnimManager[isAI_4]->ActivateSequence(
+                        pHandAnimations[isAI_4][1], 0, false, 1.0f, 0.0f, nullptr
+                    );
+                    NiUpdateData UpdateData1_22(0.0f, true, false);
                     pHandGeometry[isAI_4]->Update(UpdateData1_22);
                     pHandAnimManager[isAI_4]->DeactivateSequence(pHandAnimations[isAI_4][1], 0.0f);
                     UpdateCaravanFlags();
@@ -1312,11 +1335,11 @@ void CaravanMenu::DoIdle() {
                     iSelectedDeckCard = pPlayerHand.iSize - 1;
                     if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) &&
                         pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue > 10) {
-                        SetFlag(CaravanMenu::CAF_DISABLE_A, 1);
+                        SetFlag(CaravanMenu::CAF_DISABLE_A, true);
                     }
                     if ((isAI_4 == 1 && !this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP)) ||
                         (!isAI_4 && this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP))) {
-                        SelectDeckCard(0);
+                        SelectDeckCard(false);
                     }
                 }
             }
@@ -1333,17 +1356,18 @@ void CaravanMenu::DoIdle() {
                             int32_t isize = pCardTracks[iSelectedTrack][i_3].iSize;
                             if (isize > iSelectedColumn) {
                                 pTrackAnimManager[iSelectedTrack][i_3]->ActivateSequence(
-                                    pTrackAnimations[iSelectedTrack][i_3][iSelectedColumn][1], 0, 0, 1.0f, 0.0f, 0
+                                    pTrackAnimations[iSelectedTrack][i_3][iSelectedColumn][1], 0, false, 1.0f, 0.0f,
+                                    nullptr
                                 );
                                 ++cnt;
                             }
                         }
                     }
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     fSelectionDelay = 0.0f;
                     BSAudio* v59 = &BSAudio::QInstance();
                     BSSoundHandle* v91 = v59->GetSoundHandleByName(&v118, "GAMECaravanRemoveCard", 289u);
-                    v91->Play(0);
+                    v91->Play(false);
                 }
                 for (int32_t i_4 = 0; i_4 < 7 && pCardTracks[iSelectedTrack][i_4].iSize; ++i_4) {
                     NiUpdateData* v60 = FNVD_RECONSTRUCT(NiUpdateData)(&v117, CaravanMenu::fTimeDelta, 1, 0);
@@ -1362,7 +1386,8 @@ void CaravanMenu::DoIdle() {
                             int32_t isize_2 = pCardTracks[iSelectedTrack][i_6].iSize;
                             if (isize_2 > iSelectedColumn) {
                                 pTrackAnimManager[iSelectedTrack][i_6]->ActivateSequence(
-                                    pTrackAnimations[iSelectedTrack][i_6][iSelectedColumn][1], 0, 0, 1.0f, 0.0f, 0
+                                    pTrackAnimations[iSelectedTrack][i_6][iSelectedColumn][1], 0, false, 1.0f, 0.0f,
+                                    nullptr
                                 );
                                 ++cnt;
                             }
@@ -1373,16 +1398,16 @@ void CaravanMenu::DoIdle() {
                     }
                     else {
                         for (int32_t i_7 = 0; i_7 < 7; ++i_7) {
-                            pCardTracks[iSelectedTrack][i_7].Clear(1);
+                            pCardTracks[iSelectedTrack][i_7].Clear(true);
                         }
                         eGameState = CaravanMenu::CA_GAME_PROCESS_AI;
                         if (this->IsFlagSet(CaravanMenu::CAF_AI)) {
                             iSelectedDeckCard = pPlayerHand.iSize - 1;
-                            SelectDeckCard(0);
+                            SelectDeckCard(false);
                         }
                         UpdateTrackValue(iSelectedTrack);
-                        SetFlag(CaravanMenu::CAF_DESTROY_TRACK, 0);
-                        SetFlag(CaravanMenu::CAF_SELECT_TRACK, 0);
+                        SetFlag(CaravanMenu::CAF_DESTROY_TRACK, false);
+                        SetFlag(CaravanMenu::CAF_SELECT_TRACK, false);
                     }
                 }
             }
@@ -1399,13 +1424,14 @@ void CaravanMenu::DoIdle() {
                             int32_t isize_3 = pCardTracks[iSelectedTrack][i_8].iSize;
                             if (isize_3 > iSelectedColumn) {
                                 pTrackAnimManager[iSelectedTrack][i_8]->ActivateSequence(
-                                    pTrackAnimations[iSelectedTrack][i_8][iSelectedColumn][1], 0, 0, 1.0f, 0.0f, 0
+                                    pTrackAnimations[iSelectedTrack][i_8][iSelectedColumn][1], 0, false, 1.0f, 0.0f,
+                                    nullptr
                                 );
                                 ++cnt_2;
                             }
                         }
                     }
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                 }
                 for (int32_t i_9 = iSelectedRow; i_9 < 7 && pCardTracks[iSelectedTrack][i_9].iSize; ++i_9) {
                     NiUpdateData* v61 = FNVD_RECONSTRUCT(NiUpdateData)(&v116, CaravanMenu::fTimeDelta, 1, 0);
@@ -1424,7 +1450,8 @@ void CaravanMenu::DoIdle() {
                             int32_t isize_4 = pCardTracks[iSelectedTrack][i_11].iSize;
                             if (isize_4 > iSelectedColumn) {
                                 pTrackAnimManager[iSelectedTrack][i_11]->ActivateSequence(
-                                    pTrackAnimations[iSelectedTrack][i_11][iSelectedColumn][1], 0, 0, 1.0f, 0.0f, 0
+                                    pTrackAnimations[iSelectedTrack][i_11][iSelectedColumn][1], 0, false, 1.0f, 0.0f,
+                                    nullptr
                                 );
                                 ++cnt_2;
                             }
@@ -1435,11 +1462,11 @@ void CaravanMenu::DoIdle() {
                     }
                     else {
                         if (this->IsFlagSet(CaravanMenu::CAF_PROCESS_JOKER)) {
-                            bool bContinue = 1;
+                            bool bContinue = true;
                             int32_t iSelRowTmp = iSelectedRow;
                             while (bContinue) {
                                 for (int32_t i_13 = iSelRowTmp; i_13 < 6; ++i_13) {
-                                    pCardTracks[iSelectedTrack][i_13].Clear(1);
+                                    pCardTracks[iSelectedTrack][i_13].Clear(true);
                                     BSSimpleArray<TESCaravanCard*, 1024>* pCardArray_2 =
                                         &pCardTracks[iSelectedTrack][i_13 + 1];
                                     for (int32_t j_2 = 0;; ++j_2) {
@@ -1452,7 +1479,7 @@ void CaravanMenu::DoIdle() {
                                         UpdateTrackCardTexture(iSelectedTrack, i_13, j_2);
                                     }
                                 }
-                                jokerLocations[iSelectedTrack].Remove(0, 1);
+                                jokerLocations[iSelectedTrack].Remove(0, true);
                                 if (jokerLocations[iSelectedTrack].iSize) {
                                     int32_t iTmp = iSelRowTmp;
                                     iSelRowTmp = jokerLocations[iSelectedTrack].operator[](0);
@@ -1461,13 +1488,13 @@ void CaravanMenu::DoIdle() {
                                     }
                                 }
                                 else {
-                                    bContinue = 0;
+                                    bContinue = false;
                                 }
                             }
                         }
                         else {
                             for (int32_t i_12 = iSelectedRow; i_12 < 6; ++i_12) {
-                                pCardTracks[iSelectedTrack][i_12].Clear(1);
+                                pCardTracks[iSelectedTrack][i_12].Clear(true);
                                 BSSimpleArray<TESCaravanCard*, 1024>* pCardArray =
                                     &pCardTracks[iSelectedTrack][i_12 + 1];
                                 for (int32_t j = 0;; ++j) {
@@ -1480,7 +1507,7 @@ void CaravanMenu::DoIdle() {
                                     UpdateTrackCardTexture(iSelectedTrack, i_12, j);
                                 }
                             }
-                            pCardTracks[iSelectedTrack][6].Clear(1);
+                            pCardTracks[iSelectedTrack][6].Clear(true);
                         }
                         eGameState = CaravanMenu::CA_GAME_JACK_FINISH_ANIM;
                     }
@@ -1491,7 +1518,7 @@ void CaravanMenu::DoIdle() {
         case CaravanMenu::CA_GAME_JACK_FINISH_ANIM: {
             if (pTrackAnimations[iSelectedTrack][iSelectedRow][0][0]) {
                 int32_t cnt_3 = 0;
-                bool bexit = 0;
+                bool bexit = false;
                 if (CaravanMenu::fTimeDelta == 0.0) {
                     iSelectedColumn = -1;
                     while (!cnt_3 && iSelectedColumn < 4) {
@@ -1500,16 +1527,17 @@ void CaravanMenu::DoIdle() {
                             int32_t isize_5 = pCardTracks[iSelectedTrack][i_14].iSize;
                             if (isize_5 > iSelectedColumn) {
                                 pTrackAnimManager[iSelectedTrack][i_14]->ActivateSequence(
-                                    pTrackAnimations[iSelectedTrack][i_14][iSelectedColumn][0], 0, 0, 1.0f, 0.0f, 0
+                                    pTrackAnimations[iSelectedTrack][i_14][iSelectedColumn][0], 0, false, 1.0f, 0.0f,
+                                    nullptr
                                 );
                                 ++cnt_3;
                             }
                         }
                     }
                     if (!cnt_3) {
-                        bexit = 1;
+                        bexit = true;
                     }
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                 }
                 if (!bexit) {
                     for (int32_t i_15 = iSelectedRow; i_15 < 7 && pCardTracks[iSelectedTrack][i_15].iSize; ++i_15) {
@@ -1532,7 +1560,8 @@ void CaravanMenu::DoIdle() {
                                 int32_t isize_6 = pCardTracks[iSelectedTrack][i_17].iSize;
                                 if (isize_6 > iSelectedColumn) {
                                     pTrackAnimManager[iSelectedTrack][i_17]->ActivateSequence(
-                                        pTrackAnimations[iSelectedTrack][i_17][iSelectedColumn][0], 0, 0, 1.0f, 0.0f, 0
+                                        pTrackAnimations[iSelectedTrack][i_17][iSelectedColumn][0], 0, false, 1.0f,
+                                        0.0f, nullptr
                                     );
                                     ++cnt_3;
                                 }
@@ -1557,7 +1586,7 @@ void CaravanMenu::DoIdle() {
             return;
         }
         case CaravanMenu::CA_GAME_JOKER_CLEAR_ANIM: {
-            SetFlag(CaravanMenu::CAF_PROCESS_JOKER, 1);
+            SetFlag(CaravanMenu::CAF_PROCESS_JOKER, true);
             while (iSelectedTrack < 6 && !jokerLocations[iSelectedTrack].iSize) {
                 ++iSelectedTrack;
             }
@@ -1567,18 +1596,18 @@ void CaravanMenu::DoIdle() {
             }
             else {
                 eGameState = CaravanMenu::CA_GAME_PROCESS_AI;
-                SetFlag(CaravanMenu::CAF_PROCESS_JOKER, 0);
+                SetFlag(CaravanMenu::CAF_PROCESS_JOKER, false);
             }
             return;
         }
         case CaravanMenu::CA_GAME_PROCESS_AI: {
-            SetFlag(CaravanMenu::CAF_AI, 1);
+            SetFlag(CaravanMenu::CAF_AI, true);
             if (IsGameOver()) {
                 eGameState = CaravanMenu::CA_GAME_GAMEOVER;
             }
             else {
                 if (bContinueProcessing) {
-                    bContinueProcessing = 0;
+                    bContinueProcessing = false;
                     ProcessAI(&aiPackage);
                     if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP)) {
                         if (aiPackage.iActionType == 6) {
@@ -1588,13 +1617,13 @@ void CaravanMenu::DoIdle() {
                             TESCaravanCard* pDeckCard = pNPCDeck.operator[](this->iNextNPCCard);
                             TESCaravanCard* pHandCard = pNPCHand.operator[](iSelectedDeckCard);
                             (void)pHandCard;
-                            pNPCHand.Remove(iSelectedDeckCard, 1);
+                            pNPCHand.Remove(iSelectedDeckCard, true);
                             pNPCHand.Add(pDeckCard);
-                            pNPCDeck.Remove(this->iNextNPCCard, 1);
+                            pNPCDeck.Remove(this->iNextNPCCard, true);
                             uint32_t v65 = pNPCDeck.iSize;
                             this->iNextNPCCard = RandomInt(0, v65);
-                            UpdateDealCardTexture(0);
-                            bContinueProcessing = 1;
+                            UpdateDealCardTexture(false);
+                            bContinueProcessing = true;
                             eGameState = CaravanMenu::CA_GAME_INTRO_DISCARD_ANIM;
                         }
                         else {
@@ -1613,7 +1642,7 @@ void CaravanMenu::DoIdle() {
                                 aiPackage.Print_WhatIsHeThinking(&pNPCHand);
                             }
                             TESCaravanCard* pTrackCard = pNPCHand.operator[](iSelectedDeckCard);
-                            pNPCHand.Remove(iSelectedDeckCard, 1);
+                            pNPCHand.Remove(iSelectedDeckCard, true);
                             pCardTracks[iTrack_2][iSelectedRow].Add(pTrackCard);
                             eGameState = CaravanMenu::CA_GAME_INTRO_DEAL_ANIM;
                         }
@@ -1626,17 +1655,17 @@ void CaravanMenu::DoIdle() {
                                 // The discarded card is kept in a local that is never read again, as the game does.
                                 pHandCard = pNPCHand.operator[](iSelectedDeckCard);
                                 (void)pHandCard;
-                                pNPCHand.Remove(iSelectedDeckCard, 1);
-                                UpdateDealCardTexture(0);
+                                pNPCHand.Remove(iSelectedDeckCard, true);
+                                UpdateDealCardTexture(false);
                             }
                             else {
                                 iSelectedDeckCard = aiPackage.iDeckCard;
                                 TESCaravanCard* pDeckCard = pNPCDeck.operator[](this->iNextNPCCard);
                                 TESCaravanCard* pDiscardCard = pNPCHand.operator[](iSelectedDeckCard);
                                 (void)pDiscardCard;
-                                pNPCHand.Remove(iSelectedDeckCard, 1);
+                                pNPCHand.Remove(iSelectedDeckCard, true);
                                 pNPCHand.Add(pDeckCard);
-                                pNPCDeck.Remove(this->iNextNPCCard, 1);
+                                pNPCDeck.Remove(this->iNextNPCCard, true);
                                 if (pNPCDeck.iSize) {
                                     uint32_t v66 = pNPCDeck.iSize;
                                     this->iNextNPCCard = RandomInt(0, v66);
@@ -1644,7 +1673,7 @@ void CaravanMenu::DoIdle() {
                                 else {
                                     this->iNextNPCCard = -1;
                                 }
-                                UpdateDealCardTexture(0);
+                                UpdateDealCardTexture(false);
                             }
                             eGameState = CaravanMenu::CA_GAME_DISCARDCARD_ANIM;
                         }
@@ -1659,27 +1688,27 @@ void CaravanMenu::DoIdle() {
                                     NiAVObject* deck =
                                         BSUtilities::GetObjectByName(pHandGeometry[1], "Opponent-Deck_06:5");
                                     if (deck) {
-                                        deck->SetAppCulled(1);
-                                        NiUpdateData update1(0.0f, 0, 0);
+                                        deck->SetAppCulled(true);
+                                        NiUpdateData update1(0.0f, false, false);
                                         deck->Update(update1);
                                     }
                                     deck = BSUtilities::GetObjectByName(pHandGeometry[1], "Opponent-Deck_Back:0");
                                     if (deck) {
-                                        deck->SetAppCulled(1);
-                                        NiUpdateData update2(0.0f, 0, 0);
+                                        deck->SetAppCulled(true);
+                                        NiUpdateData update2(0.0f, false, false);
                                         deck->Update(update2);
                                     }
                                     deck = BSUtilities::GetObjectByName(pHandGeometry[1], "Opponent-Deck_06_Shadow:0");
                                     if (deck) {
-                                        deck->SetAppCulled(1);
-                                        NiUpdateData update2_2(0.0f, 0, 0);
+                                        deck->SetAppCulled(true);
+                                        NiUpdateData update2_2(0.0f, false, false);
                                         deck->Update(update2_2);
                                     }
                                     deck =
                                         BSUtilities::GetObjectByName(pHandGeometry[1], "Opponent-Deck_Back_Shadow:0");
                                     if (deck) {
-                                        deck->SetAppCulled(1);
-                                        NiUpdateData update2_3(0.0f, 0, 0);
+                                        deck->SetAppCulled(true);
+                                        NiUpdateData update2_3(0.0f, false, false);
                                         deck->Update(update2_3);
                                     }
                                     iSelectedTrack = aiPackage.iTrack;
@@ -1688,7 +1717,7 @@ void CaravanMenu::DoIdle() {
                                     iSelectedDeckCard = aiPackage.iDeckCard;
                                     pSelectedCard = pNPCHand.operator[](iSelectedDeckCard);
                                     TESCaravanCard* pTrackCard_2 = pNPCHand.operator[](iSelectedDeckCard);
-                                    pNPCHand.Remove(iSelectedDeckCard, 1);
+                                    pNPCHand.Remove(iSelectedDeckCard, true);
                                     if (CaravanMenu::bDebugAI) {
                                         aiPackage.Print_WhatIsHeThinking(&pNPCHand);
                                     }
@@ -1702,12 +1731,12 @@ void CaravanMenu::DoIdle() {
                                     pSelectedCard = pNPCHand.operator[](iSelectedDeckCard);
                                     TESCaravanCard* pDeckCard = pNPCDeck.operator[](this->iNextNPCCard);
                                     pHandCard = pNPCHand.operator[](iSelectedDeckCard);
-                                    pNPCHand.Remove(iSelectedDeckCard, 1);
+                                    pNPCHand.Remove(iSelectedDeckCard, true);
                                     pNPCHand.Add(pDeckCard);
                                     if (CaravanMenu::bDebugAI) {
                                         aiPackage.Print_WhatIsHeThinking(&pNPCHand);
                                     }
-                                    pNPCDeck.Remove(this->iNextNPCCard, 1);
+                                    pNPCDeck.Remove(this->iNextNPCCard, true);
                                     if (pNPCDeck.iSize) {
                                         uint32_t v67 = pNPCDeck.iSize;
                                         this->iNextNPCCard = RandomInt(0, v67);
@@ -1716,7 +1745,7 @@ void CaravanMenu::DoIdle() {
                                         this->iNextNPCCard = -1;
                                     }
                                     pCardTracks[iSelectedTrack][iSelectedRow].Add(pHandCard);
-                                    UpdateDealCardTexture(0);
+                                    UpdateDealCardTexture(false);
                                 }
                                 eGameState = CaravanMenu::CA_GAME_PLACECARD_ANIM;
                             }
@@ -1726,21 +1755,21 @@ void CaravanMenu::DoIdle() {
                 else {
                     iSelectedDeckCard = pPlayerHand.iSize - 1;
                     iSelectedTrack = 0;
-                    pSelectedCard = 0;
-                    pSelectedObject = 0;
-                    SelectDeckCard(0);
+                    pSelectedCard = nullptr;
+                    pSelectedObject = nullptr;
+                    SelectDeckCard(false);
                     bContinueProcessing = !bContinueProcessing;
                     eGameState = CaravanMenu::CA_IDLE;
-                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 0);
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
                     UpdateCaravanFlags();
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
-                    SetFlag(CaravanMenu::CAF_AI, 0);
+                    SetFlag(CaravanMenu::CAF_AI, false);
                 }
             }
             return;
         }
         case CaravanMenu::CA_GAME_GAMEOVER: {
-            SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+            SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
             PrepareResultsMenu();
             eGameState = CaravanMenu::CA_CAMERA_TO_RESULTS_ANIM;
             return;
@@ -1748,10 +1777,10 @@ void CaravanMenu::DoIdle() {
         case CaravanMenu::CA_CLOSING_MENU: {
             if (xFadeState != Interface::FADING_OUT) {
                 InterfaceManager* v6 = InterfaceManager::Instance();
-                v6->pCursor->Set(4009, 255.0f, 1);
+                v6->pCursor->Set(4009, 255.0f, true);
                 pMenu->Set(Tile::kTileValue_DeleteOnFade, 1);
                 StartFadeOut();
-                CaravanMenu::pMe = 0;
+                CaravanMenu::pMe = nullptr;
                 if (bStarted) {
                     InstantFadeOut();
                 }
@@ -1767,13 +1796,13 @@ void CaravanMenu::DoIdle() {
 
 bool CaravanMenu::DoKey(int32_t a1) {
     unkE80 = 0;
-    bool v5 = 0;
+    bool v5 = false;
     if (!InterfaceManager::Has360Controller()) {
         if (eActiveMenu == 3) {
             Interface::enumMenus v2 = static_cast<Interface::enumMenus>(GetClass());
             if (Interface::IsTopMenuID(v2)) {
                 CaravanMenu::Close();
-                return 1;
+                return true;
             }
         }
         if (a1 > 65) {
@@ -1841,12 +1870,12 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
     FNVD_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     int32_t i;
     using randomints_t = BSSimpleArray<int32_t, 1024>;
-    bool bhandled = 0;
+    bool bhandled = false;
     if (IsFlagSet(CaravanMenu::CAF_DISABLE_ALLCONTROLS) || (bTutorial || !IsFlagSet(CaravanMenu::CAF_ISONTOP))) {
         return eGameState == CaravanMenu::CA_CAMERA_TO_RESULTS_ANIM;
     }
     if (IsFlagSet(CaravanMenu::CAF_AI) || eGameState) {
-        return 0;
+        return false;
     }
     switch (a1) {
         case 5:
@@ -1854,7 +1883,7 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
         case 17:
         case 18: {
             if (eActiveMenu == CaravanMenu::CA_RESULTS_MENU) {
-                bhandled = 1;
+                bhandled = true;
                 Interface::enumMenus v19 = static_cast<Interface::enumMenus>(GetClass());
                 if (Interface::IsTopMenuID(v19)) {
                     CaravanMenu::Close();
@@ -1864,10 +1893,10 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
         }
         case 9: {
             if (IsFlagSet(CaravanMenu::CAF_DISABLE_A)) {
-                return 0;
+                return false;
             }
             if (eActiveMenu == CaravanMenu::CA_RESULTS_MENU) {
-                bhandled = 1;
+                bhandled = true;
                 Interface::enumMenus v4 = static_cast<Interface::enumMenus>(GetClass());
                 if (Interface::IsTopMenuID(v4)) {
                     CaravanMenu::Close();
@@ -1878,7 +1907,7 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                 iPlayerAnte = BSMIN(iNPCAnte, iTotalFunds);
                 pTiles[5]->Poke(CaravanMenu::iUT_Value, 1.0f);
                 pTiles[5]->Set(CaravanMenu::iUT_Value, CaravanMenu::pMe->iPlayerAnte);
-                bhandled = 1;
+                bhandled = true;
                 double fBaseBet =
                     static_cast<double>(CaravanMenu::pMe->iNPCTotalFunds) * CaravanMenu::pMe->fBetPercentage;
                 int32_t maxbet = static_cast<int32_t>(
@@ -1894,8 +1923,8 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                 pTiles[8]->Poke(CaravanMenu::iUT_Value, 1.0f);
                 pTiles[8]->Set(CaravanMenu::iUT_Value, iCardsInDeck);
                 int32_t index = static_cast<int32_t>(pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue));
-                pDeckArray.operator[](index)->bIsActive = 1;
-                bhandled = 1;
+                pDeckArray.operator[](index)->bIsActive = true;
+                bhandled = true;
                 eGameState = CaravanMenu::CA_DECK_FLIP_ANIM;
                 goto LABEL_135;
             }
@@ -1907,77 +1936,77 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                     BSAudio* v7 = &BSAudio::QInstance();
                     BSSoundHandle* SoundHandleByName =
                         v7->GetSoundHandleByName(&arHandle, "GAMECaravanAddToTrack", 289u);
-                    SoundHandleByName->Play(0);
-                    SetFlag(CaravanMenu::CAF_SELECT_TRACK, 1);
+                    SoundHandleByName->Play(false);
+                    SetFlag(CaravanMenu::CAF_SELECT_TRACK, true);
                     iSelectedTrack = 0;
                     iSelectedRow = 0;
                     iSelectedColumn = 0;
                     HandleTrackSelection(0, 0);
-                    bhandled = 1;
+                    bhandled = true;
                     goto LABEL_135;
                 }
                 if (IsFlagSet(CaravanMenu::CAF_DESTROY_TRACK)) {
                     DeselectWholeTrack(iSelectedTrack);
                     trackInfo[iSelectedTrack].iValue = 0;
                     eGameState = CaravanMenu::CA_GAME_DISCARDTRACK_ANIM;
-                    return 1;
+                    return true;
                 }
                 if (IsFlagSet(CaravanMenu::CAF_SELECT_TRACK)) {
                     if (IsFlagSet(CaravanMenu::CAF_TRACK_SETUP)) {
-                        SetFlag(CaravanMenu::CAF_SELECT_TRACK, 0);
+                        SetFlag(CaravanMenu::CAF_SELECT_TRACK, false);
                         DeselectTrackCard();
                         eGameState = CaravanMenu::CA_GAME_INTRO_DEAL_ANIM;
                         TESCaravanCard* pTrackCard = pPlayerHand.operator[](iSelectedDeckCard);
-                        pPlayerHand.Remove(iSelectedDeckCard, 1);
+                        pPlayerHand.Remove(iSelectedDeckCard, true);
                         pCardTracks[iSelectedTrack][iSelectedRow].Add(pTrackCard);
                     }
                     else {
-                        SetFlag(CaravanMenu::CAF_SELECT_TRACK, 0);
+                        SetFlag(CaravanMenu::CAF_SELECT_TRACK, false);
                         DeselectTrackCard();
                         eGameState = CaravanMenu::CA_GAME_PLACECARD_ANIM;
                         if (iNextPlayerCard == -1) {
                             NiAVObject* deck = BSUtilities::GetObjectByName(pHandGeometry[0], "Player-Deck_06_Back:0");
                             if (deck) {
-                                deck->SetAppCulled(1);
-                                NiUpdateData update1(0.0f, 0, 0);
+                                deck->SetAppCulled(true);
+                                NiUpdateData update1(0.0f, false, false);
                                 deck->Update(update1);
                             }
                             deck = BSUtilities::GetObjectByName(pHandGeometry[0], "Player-Deck_06:5");
                             if (deck) {
-                                deck->SetAppCulled(1);
-                                NiUpdateData update1_2(0.0f, 0, 0);
+                                deck->SetAppCulled(true);
+                                NiUpdateData update1_2(0.0f, false, false);
                                 deck->Update(update1_2);
                             }
                             deck = BSUtilities::GetObjectByName(pHandGeometry[0], "Player-Deck_06:5");
                             if (deck) {
-                                deck->SetAppCulled(1);
-                                NiUpdateData update1_3(0.0f, 0, 0);
+                                deck->SetAppCulled(true);
+                                NiUpdateData update1_3(0.0f, false, false);
                                 deck->Update(update1_3);
                             }
                             deck = BSUtilities::GetObjectByName(pHandGeometry[0], "Player-Deck_Back:0");
                             if (deck) {
-                                deck->SetAppCulled(1);
-                                NiUpdateData update1_4(0.0f, 0, 0);
+                                deck->SetAppCulled(true);
+                                NiUpdateData update1_4(0.0f, false, false);
                                 deck->Update(update1_4);
                             }
                             deck = BSUtilities::GetObjectByName(pHandGeometry[0], "Player-Deck_Back_Shadow:0");
                             if (deck) {
-                                deck->SetAppCulled(1);
-                                NiUpdateData update1_5(0.0f, 0, 0);
+                                deck->SetAppCulled(true);
+                                NiUpdateData update1_5(0.0f, false, false);
                                 deck->Update(update1_5);
                             }
                         }
                         if (iNextPlayerCard == -1) {
                             TESCaravanCard* pTrackCard_3 = pPlayerHand.operator[](iSelectedDeckCard);
-                            pPlayerHand.Remove(iSelectedDeckCard, 1);
+                            pPlayerHand.Remove(iSelectedDeckCard, true);
                             pCardTracks[iSelectedTrack][iSelectedRow].Add(pTrackCard_3);
                         }
                         else {
                             TESCaravanCard* pDeckCard = pPlayerDeck.operator[](iNextPlayerCard);
                             TESCaravanCard* pTrackCard_2 = pPlayerHand.operator[](iSelectedDeckCard);
-                            pPlayerHand.Remove(iSelectedDeckCard, 1);
+                            pPlayerHand.Remove(iSelectedDeckCard, true);
                             pPlayerHand.Add(pDeckCard);
-                            pPlayerDeck.Remove(iNextPlayerCard, 1);
+                            pPlayerDeck.Remove(iNextPlayerCard, true);
                             pCardTracks[iSelectedTrack][iSelectedRow].Add(pTrackCard_2);
                             if (pPlayerDeck.iSize) {
                                 uint32_t FormFlags = pPlayerDeck.iSize;
@@ -1986,10 +2015,10 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                             else {
                                 iNextPlayerCard = -1;
                             }
-                            UpdateDealCardTexture(1);
+                            UpdateDealCardTexture(true);
                         }
                     }
-                    bhandled = 1;
+                    bhandled = true;
                 }
             }
             else {
@@ -2002,22 +2031,22 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                 if (iSelectedTrack < 3) {
                     SelectTrackCard(iSelectedTrack, iSelectedRow);
                 }
-                SelectDeckCard(1);
+                SelectDeckCard(true);
                 BSAudio* v6 = &BSAudio::QInstance();
                 BSSoundHandle* v24 = v6->GetSoundHandleByName(&a12, "GAMECaravanAddToTrack", 289u);
-                v24->Play(0);
+                v24->Play(false);
                 UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
-                SetFlag(CaravanMenu::CAF_SELECT_TRACK, 1);
-                bhandled = 1;
+                SetFlag(CaravanMenu::CAF_SELECT_TRACK, true);
+                bhandled = true;
             }
             goto LABEL_135;
         }
         case 11: {
             if (IsFlagSet(CaravanMenu::CAF_DISABLE_X)) {
-                return 0;
+                return false;
             }
             if (eActiveMenu == CaravanMenu::CA_RESULTS_MENU) {
-                bhandled = 1;
+                bhandled = true;
                 Interface::enumMenus v9 = static_cast<Interface::enumMenus>(GetClass());
                 if (Interface::IsTopMenuID(v9)) {
                     CaravanMenu::Close();
@@ -2029,28 +2058,28 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                     pTiles[8]->Poke(CaravanMenu::iUT_Value, 1.0f);
                     pTiles[8]->Set(CaravanMenu::iUT_Value, iCardsInDeck);
                     uint32_t Float = static_cast<int32_t>(pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue));
-                    pDeckArray.operator[](Float)->bIsActive = 0;
-                    bhandled = 1;
+                    pDeckArray.operator[](Float)->bIsActive = false;
+                    bhandled = true;
                     eGameState = CaravanMenu::CA_DECK_FLIP_ANIM;
                 }
             }
             else {
-                SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                 UpdateCaravanFlags();
                 UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                 if (iTotalFunds - iPlayerAnte > 0) {
                     QuantityMenu::Create(iTotalFunds - iPlayerAnte, &CaravanMenu::ItemSelectCallback, 0x7FFFFFFF);
                 }
-                bhandled = 1;
+                bhandled = true;
             }
             goto LABEL_135;
         }
         case 12: {
             if (IsFlagSet(CaravanMenu::CAF_DISABLE_Y)) {
-                return 0;
+                return false;
             }
             if (eActiveMenu == CaravanMenu::CA_RESULTS_MENU) {
-                bhandled = 1;
+                bhandled = true;
                 Interface::enumMenus v10 = static_cast<Interface::enumMenus>(GetClass());
                 if (Interface::IsTopMenuID(v10)) {
                     CaravanMenu::Close();
@@ -2061,7 +2090,7 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                     if (iCardsInDeck >= 30) {
                         eGameState = CaravanMenu::CA_DECK_WIPE_ANIM;
                     }
-                    bhandled = 1;
+                    bhandled = true;
                 }
             }
             else {
@@ -2069,22 +2098,22 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                     LoadNifs();
                     BSAudio* v11 = &BSAudio::QInstance();
                     BSSoundHandle* v22 = v11->GetSoundHandleByName(&th_s, "UIMenuOK", 289u);
-                    v22->Play(0);
+                    v22->Play(false);
                 }
-                bhandled = 1;
+                bhandled = true;
             }
             goto LABEL_135;
         }
         case 13: {
             if (eActiveMenu == CaravanMenu::CA_RESULTS_MENU) {
-                bhandled = 1;
+                bhandled = true;
                 Interface::enumMenus v16 = static_cast<Interface::enumMenus>(GetClass());
                 if (Interface::IsTopMenuID(v16)) {
                     CaravanMenu::Close();
                 }
             }
             if (IsFlagSet(CaravanMenu::CAF_DISABLE_LT)) {
-                return 0;
+                return false;
             }
             if (eActiveMenu == CaravanMenu::CA_GAME_MENU && !IsFlagSet(CaravanMenu::CAF_SELECT_TRACK)) {
                 if (pPlayerDeck.iSize) {
@@ -2094,14 +2123,14 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                     );
                     if (iNextPlayerCard == -1) {
                         TESCaravanCard* pTrackCard_4 = pPlayerHand.operator[](iSelectedDeckCard);
-                        pPlayerHand.Remove(iSelectedDeckCard, 1);
+                        pPlayerHand.Remove(iSelectedDeckCard, true);
                     }
                     else {
                         TESCaravanCard* pDeckCard_2 = pPlayerDeck.operator[](iNextPlayerCard);
                         TESCaravanCard* pTrackCard_5 = pPlayerHand.operator[](iSelectedDeckCard);
-                        pPlayerHand.Remove(iSelectedDeckCard, 1);
+                        pPlayerHand.Remove(iSelectedDeckCard, true);
                         pPlayerHand.Add(pDeckCard_2);
-                        pPlayerDeck.Remove(iNextPlayerCard, 1);
+                        pPlayerDeck.Remove(iNextPlayerCard, true);
                         if (pPlayerDeck.iSize) {
                             uint32_t v17 = pPlayerDeck.iSize;
                             iNextPlayerCard = RandomInt(0, v17);
@@ -2109,7 +2138,7 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                         else {
                             iNextPlayerCard = -1;
                         }
-                        UpdateDealCardTexture(1);
+                        UpdateDealCardTexture(true);
                     }
                 }
             }
@@ -2117,19 +2146,19 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
         }
         case 14: {
             if (eActiveMenu == CaravanMenu::CA_RESULTS_MENU) {
-                bhandled = 1;
+                bhandled = true;
                 Interface::enumMenus v18 = static_cast<Interface::enumMenus>(GetClass());
                 if (Interface::IsTopMenuID(v18)) {
                     CaravanMenu::Close();
                 }
             }
             if (IsFlagSet(CaravanMenu::CAF_DISABLE_RT)) {
-                return 0;
+                return false;
             }
             if (eActiveMenu == CaravanMenu::CA_GAME_MENU && !IsFlagSet(CaravanMenu::CAF_SELECT_TRACK) &&
                 !IsFlagSet(CaravanMenu::CAF_TRACK_SETUP)) {
-                SetFlag(CaravanMenu::CAF_DESTROY_TRACK, 1);
-                SetFlag(CaravanMenu::CAF_SELECT_TRACK, 1);
+                SetFlag(CaravanMenu::CAF_DESTROY_TRACK, true);
+                SetFlag(CaravanMenu::CAF_SELECT_TRACK, true);
                 iSelectedTrack = 0;
                 SelectWholeTrack(iSelectedTrack);
             }
@@ -2137,30 +2166,30 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
         }
         case 15: {
             if (eActiveMenu == CaravanMenu::CA_RESULTS_MENU) {
-                bhandled = 1;
+                bhandled = true;
                 Interface::enumMenus v12 = static_cast<Interface::enumMenus>(GetClass());
                 if (Interface::IsTopMenuID(v12)) {
                     CaravanMenu::Close();
                 }
             }
             if (IsFlagSet(CaravanMenu::CAF_DISABLE_LB)) {
-                return 0;
+                return false;
             }
             if (eActiveMenu == CaravanMenu::CA_DECK_MENU) {
-                bhandled = 1;
+                bhandled = true;
             }
             goto LABEL_135;
         }
         case 16: {
             if (eActiveMenu == CaravanMenu::CA_RESULTS_MENU) {
-                bhandled = 1;
+                bhandled = true;
                 Interface::enumMenus v13 = static_cast<Interface::enumMenus>(GetClass());
                 if (Interface::IsTopMenuID(v13)) {
                     CaravanMenu::Close();
                 }
             }
             if (IsFlagSet(CaravanMenu::CAF_DISABLE_RB)) {
-                bhandled_2 = 0;
+                bhandled_2 = false;
             }
             else {
                 if (eActiveMenu == CaravanMenu::CA_DECK_MENU) {
@@ -2169,7 +2198,7 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                     int32_t isize = pDeckArray.iSize;
                     for (i = 0; i < isize; ++i) {
                         randomints.Add(i);
-                        pDeckArray.operator[](i)->bIsActive = 0;
+                        pDeckArray.operator[](i)->bIsActive = false;
                         iCardsInDeck = 0;
                     }
                     if (isize <= 30) {
@@ -2182,20 +2211,20 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                         uint32_t v14 = randomints.iSize;
                         int32_t j = RandomInt(0, v14);
                         int32_t k = randomints.operator[](j);
-                        randomints.Remove(j, 1);
+                        randomints.Remove(j, true);
                         if (!pDeckArray.operator[](k)->bIsActive) {
                             ++iCardsInDeck;
-                            pDeckArray.operator[](k)->bIsActive = 1;
+                            pDeckArray.operator[](k)->bIsActive = true;
                         }
                     }
-                    randomints.Clear(1);
+                    randomints.Clear(true);
                     pTiles[8]->Poke(CaravanMenu::iUT_Value, 1.0f);
                     pTiles[8]->Set(CaravanMenu::iUT_Value, iCardsInDeck);
                     UpdateCaravanFlags();
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     double v15 = pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue);
-                    SwapDeckBuildingTextures(static_cast<int32_t>(v15), 0);
-                    bhandled = 1;
+                    SwapDeckBuildingTextures(static_cast<int32_t>(v15), false);
+                    bhandled = true;
                 }
             LABEL_135:;
                 UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
@@ -2213,7 +2242,7 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
 bool CaravanMenu::DoGamepadUpEvent(int32_t a1, float a2) {
     Controls* Controls_;
     if (IsFlagSet(CaravanMenu::CAF_DISABLE_ALLCONTROLS) || a1 != 10) {
-        return 0;
+        return false;
     }
     if (eActiveMenu == CaravanMenu::CA_RESULTS_MENU) {
         Interface::enumMenus v4 = static_cast<Interface::enumMenus>(GetClass());
@@ -2231,10 +2260,10 @@ bool CaravanMenu::DoGamepadUpEvent(int32_t a1, float a2) {
                     else {
                         DeselectTrackCard();
                     }
-                    SetFlag(CaravanMenu::CAF_DESTROY_TRACK, 0);
-                    SetFlag(CaravanMenu::CAF_SELECT_TRACK, 0);
-                    SetFlag(CaravanMenu::CAF_DISABLE_A, 0);
-                    SetFlag(CaravanMenu::CAF_DISABLE_X, 1);
+                    SetFlag(CaravanMenu::CAF_DESTROY_TRACK, false);
+                    SetFlag(CaravanMenu::CAF_SELECT_TRACK, false);
+                    SetFlag(CaravanMenu::CAF_DISABLE_A, false);
+                    SetFlag(CaravanMenu::CAF_DISABLE_X, true);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                 }
                 else {
@@ -2243,10 +2272,11 @@ bool CaravanMenu::DoGamepadUpEvent(int32_t a1, float a2) {
                         const char* v10 = sNo.String();
                         const char* v9 = sYes.String();
                         Interface::CreateMessageMenu(
-                            sQuitCaravanText.String(), static_cast<const char*>(0), static_cast<const char*>(0),
-                            &CaravanMenu::CancelConfirmFunc, 0, 23, 0.0f, 0.0f, v9, v10, nullptr
+                            sQuitCaravanText.String(), static_cast<const char*>(nullptr),
+                            static_cast<const char*>(nullptr), &CaravanMenu::CancelConfirmFunc, 0, 23, 0.0f, 0.0f, v9,
+                            v10, nullptr
                         );
-                        SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+                        SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     }
                 }
             }
@@ -2268,7 +2298,7 @@ bool CaravanMenu::DoGamepadUpEvent(int32_t a1, float a2) {
 LABEL_23:;
     InterfaceManager::Instance();
     InterfaceManager::ClearMenuButton(Interface::eButtonB);
-    return 1;
+    return true;
 }
 
 bool CaravanMenu::IsFlagSet(enumFlags aeFlag) {
@@ -2379,10 +2409,10 @@ void CaravanMenu::SetFlag(enumFlags aeFlag, bool abValue) {
             }
             SetTileTextAlpha(eTile, 255.0f);
             if (iCardsInDeck >= 30) {
-                pTiles[eTile]->xChildren.GetHead()->Set(4009, 255.0f, 1);
+                pTiles[eTile]->xChildren.GetHead()->Set(4009, 255.0f, true);
             }
             else {
-                pTiles[eTile]->xChildren.GetHead()->Set(4009, 128.0f, 1);
+                pTiles[eTile]->xChildren.GetHead()->Set(4009, 128.0f, true);
             }
             break;
         }
@@ -2481,74 +2511,74 @@ void CaravanMenu::UpdateCaravanFlags() {
             // bIsActive is tested as a whole byte: read it as a byte, or clang merges the branches and passes a non-0/1
             // bool on to SetFlag.
             if (pDeckArray.operator[](Float)->bIsActive != 0) {
-                SetFlag(CaravanMenu::CAF_DISABLE_A, 1);
-                SetFlag(CaravanMenu::CAF_DISABLE_X, 0);
+                SetFlag(CaravanMenu::CAF_DISABLE_A, true);
+                SetFlag(CaravanMenu::CAF_DISABLE_X, false);
             }
             else {
-                SetFlag(CaravanMenu::CAF_DISABLE_A, 0);
-                SetFlag(CaravanMenu::CAF_DISABLE_X, 1);
+                SetFlag(CaravanMenu::CAF_DISABLE_A, false);
+                SetFlag(CaravanMenu::CAF_DISABLE_X, true);
             }
             if (iCardsInDeck >= 30) {
-                SetFlag(CaravanMenu::CAF_DISABLE_Y, 0);
-                pTiles[8]->Set(4009, 255.0f, 1);
+                SetFlag(CaravanMenu::CAF_DISABLE_Y, false);
+                pTiles[8]->Set(4009, 255.0f, true);
             }
             else {
-                SetFlag(CaravanMenu::CAF_DISABLE_Y, 1);
-                pTiles[8]->Set(4009, 128.0f, 1);
+                SetFlag(CaravanMenu::CAF_DISABLE_Y, true);
+                pTiles[8]->Set(4009, 128.0f, true);
             }
             if (!iCardsInDeck) {
-                SetFlag(CaravanMenu::CAF_DISABLE_X, 1);
+                SetFlag(CaravanMenu::CAF_DISABLE_X, true);
             }
             if (iCardsInDeck >= 108) {
-                SetFlag(CaravanMenu::CAF_DISABLE_A, 1);
+                SetFlag(CaravanMenu::CAF_DISABLE_A, true);
             }
-            SetFlag(CaravanMenu::CAF_DISABLE_LB, 1);
+            SetFlag(CaravanMenu::CAF_DISABLE_LB, true);
         }
         else {
             if (eActiveMenu == CaravanMenu::CA_GAME_MENU) {
                 if (!pPlayerDeck.iSize) {
                     iNextPlayerCard = -1;
-                    SetFlag(CaravanMenu::CAF_DISABLE_LT, 1);
+                    SetFlag(CaravanMenu::CAF_DISABLE_LT, true);
                 }
                 if (!pNPCDeck.iSize) {
                     iNextNPCCard = -1;
                 }
                 if ((pCardTracks[0][0].iSize || (pCardTracks[1][0].iSize || pCardTracks[2][0].iSize)) &&
                     !IsFlagSet(CaravanMenu::CAF_TRACK_SETUP)) {
-                    SetFlag(CaravanMenu::CAF_DISABLE_RT, 0);
+                    SetFlag(CaravanMenu::CAF_DISABLE_RT, false);
                 }
                 else {
-                    SetFlag(CaravanMenu::CAF_DISABLE_RT, 1);
+                    SetFlag(CaravanMenu::CAF_DISABLE_RT, true);
                 }
             }
         }
     }
     else {
         if (iPlayerAnte <= 0 && iNPCAnte) {
-            SetFlag(CaravanMenu::CAF_DISABLE_Y, 1);
+            SetFlag(CaravanMenu::CAF_DISABLE_Y, true);
         }
         else {
-            SetFlag(CaravanMenu::CAF_DISABLE_Y, 0);
+            SetFlag(CaravanMenu::CAF_DISABLE_Y, false);
         }
         if (iTotalFunds) {
             if (iPlayerAnte <= 0) {
-                SetFlag(CaravanMenu::CAF_DISABLE_A, 0);
-                SetFlag(CaravanMenu::CAF_DISABLE_X, 0);
+                SetFlag(CaravanMenu::CAF_DISABLE_A, false);
+                SetFlag(CaravanMenu::CAF_DISABLE_X, false);
             }
             else {
-                SetFlag(CaravanMenu::CAF_DISABLE_A, 0);
-                SetFlag(CaravanMenu::CAF_DISABLE_X, 0);
+                SetFlag(CaravanMenu::CAF_DISABLE_A, false);
+                SetFlag(CaravanMenu::CAF_DISABLE_X, false);
                 if (iPlayerAnte >= iNPCAnte || (iPlayerAnte >= iTotalFunds && iPlayerAnte < iNPCAnte)) {
-                    SetFlag(CaravanMenu::CAF_DISABLE_A, 1);
+                    SetFlag(CaravanMenu::CAF_DISABLE_A, true);
                 }
                 if (iPlayerAnte >= iTotalFunds) {
-                    SetFlag(CaravanMenu::CAF_DISABLE_X, 1);
+                    SetFlag(CaravanMenu::CAF_DISABLE_X, true);
                 }
             }
         }
         else {
-            SetFlag(CaravanMenu::CAF_DISABLE_A, 1);
-            SetFlag(CaravanMenu::CAF_DISABLE_X, 1);
+            SetFlag(CaravanMenu::CAF_DISABLE_A, true);
+            SetFlag(CaravanMenu::CAF_DISABLE_X, true);
         }
     }
 }
@@ -2808,7 +2838,7 @@ void CaravanMenu::UpdateBettingUI(int32_t maxraise, int32_t raise) {
     if (BSMAX(icoins, ibills) > 0) {
         eGameState = CaravanMenu::CA_ANTE_MONEYIN_ANIM;
     }
-    NiUpdateData update2_3(0.0f, 0, 0);
+    NiUpdateData update2_3(0.0f, false, false);
     CaravanMenu::spModel.m_pObject->Update(update2_3);
     const NiBound* v11 = &CaravanMenu::spModel.m_pObject->GetWorldBound();
     float v14 = v11->m_fRadius * 2.5;
@@ -2876,7 +2906,7 @@ void CaravanMenu::UpdateTrackValue(int32_t aiTrack) {
     pTiles[aiTrack + 23]->Set(CaravanMenu::iUT_Value, trackInfo[aiTrack].iValue);
     if (trackInfo[aiTrack].iValue < 21) {
         pTiles[aiTrack + 23]->Set(4084, 4084);
-        pTiles[aiTrack + 23]->Set(4009, 126.0f, 1);
+        pTiles[aiTrack + 23]->Set(4009, 126.0f, true);
     }
     if (trackInfo[aiTrack].iValue <= 26) {
         pTiles[aiTrack + 23]->Set(4084, 1);
@@ -2884,17 +2914,17 @@ void CaravanMenu::UpdateTrackValue(int32_t aiTrack) {
     else {
         pTiles[aiTrack + 23]->Set(4084, 2);
     }
-    pTiles[aiTrack + 23]->Set(4009, 255.0f, 1);
+    pTiles[aiTrack + 23]->Set(4009, 255.0f, true);
 }
 
 bool CaravanMenu::IsWellFormedMenu() {
     int32_t i;
     for (i = 0; i < 51; ++i) {
         if (!pTiles[i]) {
-            return (bool)0;
+            return false;
         }
     }
-    return (bool)1;
+    return true;
 }
 
 void CaravanMenu::LoadNifs() {
@@ -2913,17 +2943,17 @@ void CaravanMenu::LoadNifs() {
     NiUpdateData apMemory;
     char Src[268];
     pActiveDeckGeometry = (NiAVObject*)pModelLoader->LoadFile(
-        "Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Deck.NIF", LOD_MULT_NONE, 1, 0, 0, 0
+        "Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Deck.NIF", LOD_MULT_NONE, true, false, false, false
     );
     pInactiveDeckGeometry = (NiAVObject*)pModelLoader->LoadFile(
-        "Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Available.NIF", LOD_MULT_NONE, 1, 0, 0, 0
+        "Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Available.NIF", LOD_MULT_NONE, true, false, false, false
     );
     NiNode* v68 = CaravanMenu::spModel.m_pObject;
     v68->AttachChild(pInactiveDeckGeometry, 1);
     NiNode* v67 = CaravanMenu::spModel.m_pObject;
     v67->AttachChild(pActiveDeckGeometry, 1);
-    intlistbills.Clear(1);
-    intlistcoins.Clear(1);
+    intlistbills.Clear(true);
+    intlistcoins.Clear(true);
     NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
     CaravanMenu::spModel.m_pObject->Update(*updated);
     iAnte = BSMIN(iPlayerAnte, iNPCAnte);
@@ -2977,7 +3007,7 @@ void CaravanMenu::LoadNifs() {
         NiTimeController::StartAnimations(pInactiveDeckGeometry);
     }
     for (int32_t i = 0; i < 96; ++i) {
-        deckFaceShaders[i] = 0;
+        deckFaceShaders[i] = nullptr;
     }
     for (int32_t j = 0; j < 24; ++j) {
         if (j >= 9) {
@@ -2997,7 +3027,7 @@ void CaravanMenu::LoadNifs() {
             BSsprintf(v85, 25, "Deck_%i_Back:0", j + 1);
             BSsprintf(v86, 25, "Available_%i:%i", j + 1, j);
             BSsprintf(v87, 25, "Available_%i_Back:0", j + 1);
-            NiNode* ObjectByName = 0;
+            NiNode* ObjectByName = nullptr;
             ObjectByName =
                 static_cast<NiNode*>(BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(v84)));
             if (ObjectByName->GetProperty(3)) {
@@ -3018,7 +3048,7 @@ void CaravanMenu::LoadNifs() {
                 v40 = static_cast<BSShaderPPLightingProperty*>(ObjectByName->GetProperty(3));
             }
             else {
-                v40 = 0;
+                v40 = nullptr;
             }
             deckFaceShaders[j] = v40;
             ObjectByName =
@@ -3041,7 +3071,7 @@ void CaravanMenu::LoadNifs() {
                 v37 = static_cast<BSShaderPPLightingProperty*>(ObjectByName->GetProperty(3));
             }
             else {
-                v37 = 0;
+                v37 = nullptr;
             }
             deckFaceShaders[j + 24] = v37;
             ObjectByName = static_cast<NiNode*>(
@@ -3065,7 +3095,7 @@ void CaravanMenu::LoadNifs() {
                 v34 = static_cast<BSShaderPPLightingProperty*>(ObjectByName->GetProperty(3));
             }
             else {
-                v34 = 0;
+                v34 = nullptr;
             }
             deckFaceShaders[j + 48] = v34;
             ObjectByName = static_cast<NiNode*>(
@@ -3089,7 +3119,7 @@ void CaravanMenu::LoadNifs() {
                 v31 = static_cast<BSShaderPPLightingProperty*>(ObjectByName->GetProperty(3));
             }
             else {
-                v31 = 0;
+                v31 = nullptr;
             }
             deckFaceShaders[j + 72] = v31;
         }
@@ -3110,7 +3140,7 @@ void CaravanMenu::LoadNifs() {
             BSsprintf(apDest, 25, "Deck_0%i_Back:0", j + 1);
             BSsprintf(apName, 25, "Available_0%i:%i", j + 1, j);
             BSsprintf(apString1, 25, "Available_0%i_Back:0", j + 1);
-            NiNode* v88 = 0;
+            NiNode* v88 = nullptr;
             v88 = static_cast<NiNode*>(
                 BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(blockName))
             );
@@ -3132,7 +3162,7 @@ void CaravanMenu::LoadNifs() {
                 v52 = static_cast<BSShaderPPLightingProperty*>(v88->GetProperty(3));
             }
             else {
-                v52 = 0;
+                v52 = nullptr;
             }
             deckFaceShaders[j] = v52;
             v88 = static_cast<NiNode*>(
@@ -3156,7 +3186,7 @@ void CaravanMenu::LoadNifs() {
                 v49 = static_cast<BSShaderPPLightingProperty*>(v88->GetProperty(3));
             }
             else {
-                v49 = 0;
+                v49 = nullptr;
             }
             deckFaceShaders[j + 24] = v49;
             v88 = static_cast<NiNode*>(
@@ -3180,7 +3210,7 @@ void CaravanMenu::LoadNifs() {
                 v46 = static_cast<BSShaderPPLightingProperty*>(v88->GetProperty(3));
             }
             else {
-                v46 = 0;
+                v46 = nullptr;
             }
             deckFaceShaders[j + 48] = v46;
             v88 = static_cast<NiNode*>(
@@ -3204,12 +3234,12 @@ void CaravanMenu::LoadNifs() {
                 v43 = static_cast<BSShaderPPLightingProperty*>(v88->GetProperty(3));
             }
             else {
-                v43 = 0;
+                v43 = nullptr;
             }
             deckFaceShaders[j + 72] = v43;
         }
     }
-    SwapDeckBuildingTextures(12, 0);
+    SwapDeckBuildingTextures(12, false);
     eActiveMenu = CaravanMenu::CA_DECK_MENU;
     eGameState = CaravanMenu::CA_CAMERA_TO_DECK_ANIM;
     pTiles[9]->Poke(CaravanMenu::iUT_Value, 1.0f);
@@ -3220,35 +3250,35 @@ void CaravanMenu::LoadNifs() {
     const char* fEaseOutTimea = sCaravanDeckText.String();
     const char* v18 = sRSMRandomize.String();
     BSsprintf(Src, 260, "%s %s", v18, fEaseOutTimea);
-    pTiles[10]->Set(4036, Src, 1);
+    pTiles[10]->Set(4036, Src, true);
     float afValue = pTiles[10]->GetFloat(4001) - 150.0;
-    pTiles[10]->Set(4001, afValue, 1);
+    pTiles[10]->Set(4001, afValue, true);
     pTiles[10]->AddNeedsUpdate(1);
     if (!InterfaceManager::Has360Controller()) {
         int32_t v19 = Tile::TextToTrait("_PCButtonText");
-        pTiles[10]->Set(v19, "S)", 1);
+        pTiles[10]->Set(v19, "S)", true);
     }
     float v29 = pTiles[11]->GetFloat(4001) - 150.0;
-    pTiles[11]->Set(4001, v29, 1);
+    pTiles[11]->Set(4001, v29, true);
     pTiles[11]->AddNeedsUpdate(1);
     pTiles[0]->Set(4003, 0);
     pTiles[1]->Set(4003, 1);
     pTiles[2]->Set(4003, 0);
     pTiles[3]->Set(4003, 0);
     const char* v20 = sCaravanDeckText.String();
-    pTiles[42]->Set(4036, v20, 1);
+    pTiles[42]->Set(4036, v20, true);
     const char* v21 = sTotalCardsText.String();
-    pTiles[43]->Set(4036, v21, 1);
+    pTiles[43]->Set(4036, v21, true);
     const char* v22 = sAllCardsText.String();
-    pTiles[11]->Set(4036, v22, 1);
+    pTiles[11]->Set(4036, v22, true);
     const char* v23 = sNavigateText.String();
-    pTiles[39]->Set(4036, v23, 1);
+    pTiles[39]->Set(4036, v23, true);
     const char* v24 = sAddText.String();
-    pTiles[12]->Set(4036, v24, 1);
+    pTiles[12]->Set(4036, v24, true);
     const char* v25 = sRemoveText.String();
-    pTiles[13]->Set(4036, v25, 1);
+    pTiles[13]->Set(4036, v25, true);
     const char* v26 = sPlayCaravanText.String();
-    pTiles[14]->Set(4036, v26, 1);
+    pTiles[14]->Set(4036, v26, true);
     pTiles[39]->Set(4003, 0);
     pTiles[39]->AddNeedsUpdate(4);
     UpdateCaravanFlags();
@@ -3349,20 +3379,20 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                                 );
                                 pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
                             }
-                            NiUpdateData v33(0.0f, 0, 0);
+                            NiUpdateData v33(0.0f, false, false);
                             pInactiveDeckGeometry->Update(v33);
-                            NiUpdateData v32(0.0f, 0, 0);
+                            NiUpdateData v32(0.0f, false, false);
                             pActiveDeckGeometry->Update(v32);
                             // The value is read and never used, as the game does.
                             [[maybe_unused]] float DataFogFarPlane = deckFaceShaders[i]->fAlpha;
                             if (pDeckArray.operator[](auiIndex)->bIsActive) {
-                                NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(0));
+                                NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
                                 BSsprintf(
                                     apInPath, 260, "%s%s", "Textures\\",
                                     (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
                                 );
                                 SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                TES::pInstance->CreateTextureImage(acPath, textptr, 0, 0);
+                                TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
                                 if (textptr.m_pObject) {
                                     NiSourceTexture* a4n = textptr.m_pObject;
                                     deckFaceShaders[i]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4n);
@@ -3372,7 +3402,7 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                                     (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
                                 );
                                 SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                TES::pInstance->CreateTextureImage(acPath, textptr, 0, 0);
+                                TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
                                 if (textptr.m_pObject) {
                                     NiSourceTexture* a4o = textptr.m_pObject;
                                     deckFaceShaders[i + 24]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4o);
@@ -3382,7 +3412,7 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                                     (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
                                 );
                                 SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                TES::pInstance->CreateTextureImage(acPath, textptr, 0, 0);
+                                TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
                                 if (textptr.m_pObject) {
                                     NiSourceTexture* a4p = textptr.m_pObject;
                                     deckFaceShaders[i + 48]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4p);
@@ -3392,7 +3422,7 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                                     (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
                                 );
                                 SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                TES::pInstance->CreateTextureImage(acPath, textptr, 0, 0);
+                                TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
                                 if (textptr.m_pObject) {
                                     NiSourceTexture* a4q = textptr.m_pObject;
                                     deckFaceShaders[i + 72]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4q);
@@ -3402,13 +3432,13 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                                 // Only the call is kept: the card's faceTexture address tested after it is never null.
                                 pDeckArray.operator[](auiIndex);
                                 {
-                                    NiPointer<NiSourceTexture> textptr_2(static_cast<NiSourceTexture*>(0));
+                                    NiPointer<NiSourceTexture> textptr_2(static_cast<NiSourceTexture*>(nullptr));
                                     BSsprintf(
                                         apInPath, 260, "%s%s", "Textures\\",
                                         (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
                                     );
                                     SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                    TES::pInstance->CreateTextureImage(acPath, textptr_2, 0, 0);
+                                    TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
                                     if (textptr_2.m_pObject) {
                                         NiSourceTexture* a4r = textptr_2.m_pObject;
                                         deckFaceShaders[i + 48]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4r);
@@ -3418,7 +3448,7 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                                         (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
                                     );
                                     SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                    TES::pInstance->CreateTextureImage(acPath, textptr_2, 0, 0);
+                                    TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
                                     if (textptr_2.m_pObject) {
                                         NiSourceTexture* a4s = textptr_2.m_pObject;
                                         deckFaceShaders[i + 72]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4s);
@@ -3428,7 +3458,7 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                                         (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
                                     );
                                     SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                    TES::pInstance->CreateTextureImage(acPath, textptr_2, 0, 0);
+                                    TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
                                     if (textptr_2.m_pObject) {
                                         NiSourceTexture* a4t = textptr_2.m_pObject;
                                         deckFaceShaders[i]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4t);
@@ -3438,7 +3468,7 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                                         (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
                                     );
                                     SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                    TES::pInstance->CreateTextureImage(acPath, textptr_2, 0, 0);
+                                    TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
                                     if (textptr_2.m_pObject) {
                                         NiSourceTexture* a4u = textptr_2.m_pObject;
                                         deckFaceShaders[i + 24]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4u);
@@ -3545,9 +3575,9 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                                 float a4e = static_cast<float>(iZ);
                                 pFace->SetTranslate(0.0f, 0.0f, a4e);
                             }
-                            NiUpdateData apMemory(0.0f, 0, 0);
+                            NiUpdateData apMemory(0.0f, false, false);
                             pInactiveDeckGeometry->Update(apMemory);
-                            NiUpdateData v34(0.0f, 0, 0);
+                            NiUpdateData v34(0.0f, false, false);
                             pActiveDeckGeometry->Update(v34);
                         }
                     }
@@ -3597,10 +3627,10 @@ void CaravanMenu::UpdateDealCardTexture(bool abPlayer) {
         faceshader = static_cast<BSShaderPPLightingProperty*>(face->GetProperty(3));
     }
     else {
-        faceshader = 0;
+        faceshader = nullptr;
     }
     BSShaderPPLightingProperty* faceshader_2 = faceshader;
-    NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(0));
+    NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
     if (faceshader) {
         uint32_t FormFlags;
         if (abPlayer) {
@@ -3619,7 +3649,7 @@ void CaravanMenu::UpdateDealCardTexture(bool abPlayer) {
             }
             BSsprintf(blockName, 260, "%s%s", "Textures\\", TextureName);
             SwapPlatformLanguageTexturePath(blockName, acPath, 260u);
-            TES::pInstance->CreateTextureImage(acPath, textptr, 0, 0);
+            TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
             if (textptr.m_pObject) {
                 faceshader_2->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject);
             }
@@ -3650,10 +3680,10 @@ void CaravanMenu::UpdateDealCardTexture(bool abPlayer) {
         faceshader_3 = static_cast<BSShaderPPLightingProperty*>(face->GetProperty(3));
     }
     else {
-        faceshader_3 = 0;
+        faceshader_3 = nullptr;
     }
     faceshader_2 = faceshader_3;
-    textptr.operator=(static_cast<NiSourceTexture*>(0));
+    textptr.operator=(static_cast<NiSourceTexture*>(nullptr));
     if (faceshader_3 && (!abPlayer ? v7 = pNPCDeck.iSize != 0 : v7 = pPlayerDeck.iSize != 0, v7)) {
         if (abPlayer) {
             BSsprintf(
@@ -3667,14 +3697,14 @@ void CaravanMenu::UpdateDealCardTexture(bool abPlayer) {
             );
         }
         SwapPlatformLanguageTexturePath(blockName, acPath, 260u);
-        TES::pInstance->CreateTextureImage(acPath, textptr, 0, 0);
+        TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
         if (textptr.m_pObject) {
             faceshader_2->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject);
         }
     }
     else {
-        face->SetAppCulled(1);
-        NiUpdateData updatedata(0.0f, 0, 0);
+        face->SetAppCulled(true);
+        NiUpdateData updatedata(0.0f, false, false);
         face->Update(updatedata);
     }
 }
@@ -3683,10 +3713,10 @@ void CaravanMenu::SelectDeckCard(bool abUnselectOnly) {
     if (pSelectedObject) {
         if ((&pSelectedObject->GetTranslate())->z > 0.0) {
             pSelectedObject->SetTranslate(0.0f, (&pSelectedObject->GetTranslate())->y, 0.0f);
-            NiUpdateData kUpdate1(0.0f, 0, 0);
+            NiUpdateData kUpdate1(0.0f, false, false);
             pSelectedObject->Update(kUpdate1);
             pSelectedShadow->SetTranslate(0.0f, (&pSelectedObject->GetTranslate())->y, 0.0f);
-            NiUpdateData kUpdate2(0.0f, 0, 0);
+            NiUpdateData kUpdate2(0.0f, false, false);
             pSelectedShadow->Update(kUpdate2);
         }
     }
@@ -3698,10 +3728,10 @@ void CaravanMenu::SelectDeckCard(bool abUnselectOnly) {
         pSelectedShadow = BSUtilities::GetObjectByName(pHandGeometry[0], static_cast<const char*>(blockName));
         pSelectedCard = pPlayerHand.operator[](iSelectedDeckCard);
         pSelectedObject->SetTranslate(0.0f, (&pSelectedObject->GetTranslate())->y, 1.0f);
-        NiUpdateData kUpdate3(0.0f, 0, 0);
+        NiUpdateData kUpdate3(0.0f, false, false);
         pSelectedObject->Update(kUpdate3);
         pSelectedShadow->SetTranslate(0.0f, (&pSelectedObject->GetTranslate())->y, 1.0f);
-        NiUpdateData kUpdate4(0.0f, 0, 0);
+        NiUpdateData kUpdate4(0.0f, false, false);
         pSelectedShadow->Update(kUpdate4);
     }
 }
@@ -3718,7 +3748,7 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
     char texturename[260];
     char blockName[268];
     NiMatrix3 cardrot;
-    bool bIsValidPlacement = IsValidCardPlacement(aiTrack, aiRow, iSelectedDeckCard, 0);
+    bool bIsValidPlacement = IsValidCardPlacement(aiTrack, aiRow, iSelectedDeckCard, false);
     int32_t iColumn = pCardTracks[aiTrack][aiRow].iSize;
     if (iColumn > 3) {
         iColumn = 3;
@@ -3734,7 +3764,7 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
             NiMatrix3 matrot_90;
             BSAudio* v3 = &BSAudio::QInstance();
             BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "GAMECaravanToggleTrack", 289u);
-            SoundHandleByName->Play(0);
+            SoundHandleByName->Play(false);
             cursorface = pCursors[0];
             pCursors[1]->SetTranslate(0.0f, 0.0f, -50.0f);
             NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
@@ -3753,7 +3783,7 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
             NiMatrix3 matrot_90_3;
             BSAudio* v6 = &BSAudio::QInstance();
             BSSoundHandle* v15 = v6->GetSoundHandleByName(&arHandle, "GAMECaravanInvalidStackLocation", 289u);
-            v15->Play(0);
+            v15->Play(false);
             cursorface = pCursors[1];
             pCursors[0]->SetTranslate(0.0f, 0.0f, -50.0f);
             NiUpdateData* v7 = FNVD_RECONSTRUCT(NiUpdateData)(&v20, 0.0f, 0, 0);
@@ -3788,13 +3818,13 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
             faceshader_3 = static_cast<BSShaderPPLightingProperty*>(cursorface->GetProperty(3));
         }
         else {
-            faceshader_3 = 0;
+            faceshader_3 = nullptr;
         }
-        NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(0));
+        NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
         if (faceshader_3) {
             BSsprintf(blockName, 260, "%s%s", "Textures\\", (&pSelectedCard->faceTexture)->GetTextureName());
             SwapPlatformLanguageTexturePath(blockName, texturename, 260u);
-            TES::pInstance->CreateTextureImage(texturename, textptr, 0, 0);
+            TES::pInstance->CreateTextureImage(texturename, textptr, false, false);
             if (textptr.m_pObject) {
                 NiSourceTexture* a4 = textptr.m_pObject;
                 faceshader_3->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4);
@@ -3874,11 +3904,11 @@ void CaravanMenu::HandleTrackSelection(int32_t aiXShift, int32_t aiYShift) {
     }
     iSelectedColumn = pCardTracks[this->iSelectedTrack][this->iSelectedRow].iSize;
     SelectTrackCard(this->iSelectedTrack, this->iSelectedRow);
-    if (IsValidCardPlacement(this->iSelectedTrack, this->iSelectedRow, iSelectedDeckCard, 0)) {
-        SetFlag(CaravanMenu::CAF_DISABLE_A, 0);
+    if (IsValidCardPlacement(this->iSelectedTrack, this->iSelectedRow, iSelectedDeckCard, false)) {
+        SetFlag(CaravanMenu::CAF_DISABLE_A, false);
     }
     else {
-        SetFlag(CaravanMenu::CAF_DISABLE_A, 1);
+        SetFlag(CaravanMenu::CAF_DISABLE_A, true);
     }
     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
 }
@@ -3899,7 +3929,7 @@ void CaravanMenu::LoadNewBill(int32_t a1) {
                 NiFixedString* v4 = ::new (static_cast<void*>(&v8)) NiFixedString("Bottom_Place");
                 a2 = Controller->GetSequenceByName(*v4);
                 v8.~NiFixedString();
-                Controller->ActivateSequence(a2, 0, 0, 1.0f, 0.0f, 0);
+                Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
                 NiTimeController::StartAnimations(a1a);
             }
         }
@@ -3909,7 +3939,7 @@ void CaravanMenu::LoadNewBill(int32_t a1) {
                     NiFixedString* v3 = ::new (static_cast<void*>(&v7)) NiFixedString("Alt_Place");
                     a2 = Controller->GetSequenceByName(*v3);
                     v7.~NiFixedString();
-                    Controller->ActivateSequence(a2, 0, 0, 1.0f, 0.0f, 0);
+                    Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
                     NiTimeController::StartAnimations(a1a);
                 }
             }
@@ -3920,7 +3950,7 @@ void CaravanMenu::LoadNewBill(int32_t a1) {
             NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString("Top_Place");
             a2 = Controller->GetSequenceByName(*kName);
             apString.~NiFixedString();
-            Controller->ActivateSequence(a2, 0, 0, 1.0f, 0.0f, 0);
+            Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
             NiTimeController::StartAnimations(a1a);
         }
     }
@@ -3945,7 +3975,7 @@ void CaravanMenu::LoadNewCoin(int32_t a1) {
                 NiFixedString* v3 = ::new (static_cast<void*>(&v6)) NiFixedString("Bottom_Place");
                 a2 = Controller->GetSequenceByName(*v3);
                 v6.~NiFixedString();
-                Controller->ActivateSequence(a2, 0, 0, 1.0f, 0.0f, 0);
+                Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
                 NiTimeController::StartAnimations(a1a);
             }
         }
@@ -3955,7 +3985,7 @@ void CaravanMenu::LoadNewCoin(int32_t a1) {
             NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString("Top_Place");
             a2 = Controller->GetSequenceByName(*kName);
             apString.~NiFixedString();
-            Controller->ActivateSequence(a2, 0, 0, 1.0f, 0.0f, 0);
+            Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
             NiTimeController::StartAnimations(a1a);
         }
     }
@@ -3995,20 +4025,20 @@ uint32_t CaravanMenu::LoadNifs2() {
     FNVD_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     pTableGeometry = (NiAVObject*)pModelLoader->LoadFile(
-        "Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Table.NIF", LOD_MULT_NONE, 1, 0, 0, 0
+        "Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Table.NIF", LOD_MULT_NONE, true, false, false, false
     );
     void* apMemory = NiMemObject::operator new(sizeof(NiNode));
     if (apMemory) {
         v11 = ::new (apMemory) NiNode(0);
     }
     else {
-        v11 = 0;
+        v11 = nullptr;
     }
     NiRefObject* v17 = (NiRefObject*)v11;
     CaravanMenu::spModel.operator=(v11);
     NiNode* v10 = CaravanMenu::spModel.m_pObject;
     v10->AttachChild(pTableGeometry, 1);
-    NiUpdateData arData(0.0f, 0, 0);
+    NiUpdateData arData(0.0f, false, false);
     CaravanMenu::spModel.m_pObject->Update(arData);
     NiControllerManager* Controller =
         static_cast<NiControllerManager*>(pTableGeometry->GetController(&NiControllerManager::ms_RTTI));
@@ -4051,11 +4081,11 @@ NiCamera* CaravanMenu::Create3DCamera() {
         v10 = ::new (apMemory) NiCamera;
     }
     else {
-        v10 = 0;
+        v10 = nullptr;
     }
     ::new (&a2) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     v10->SetViewPort(a2);
-    NiFrustum kFrustum(0);
+    NiFrustum kFrustum(false);
     SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
     kFrustum.m_fFar = WorldSceneGraph->GetFarDistance();
     kFrustum.m_fNear = BSSceneGraph::fNearDistance.Float();
@@ -4076,13 +4106,13 @@ NiCamera* CaravanMenu::Create3DCamera() {
     kFrustum.m_fBottom = -v1 * aspectRatio * 0.75f;
     double v2 = std::tan(v16);
     kFrustum.m_fTop = v2 * aspectRatio * 0.75f;
-    kFrustum.m_bOrtho = 0;
+    kFrustum.m_bOrtho = false;
     v10->SetViewFrustum(kFrustum);
     NiPoint3* z = ::new (&dst) NiPoint3(0.0f, 0.0f, 1.0f);
     NiPoint3* v3 = ::new (&v12) NiPoint3(0.0f, 0.0f, 1.0f);
     v10->LookAtWorldPoint(*v3, *z);
     v10->SetMinNearPlaneDist(1.0f);
-    NiUpdateData arData(0.0f, 0, 0);
+    NiUpdateData arData(0.0f, false, false);
     v10->Update(arData);
     NiFixedString apString("Surgery3DCamera");
     NiFixedString* kName = &apString;
@@ -4121,14 +4151,14 @@ char CaravanMenu::PrepareCaravanData() {
 void CaravanMenu::SetupCurrency() {
     char modelPath[264];
     BSsprintf(modelPath, 260, "%sCurrency-Bill_Grid.NIF", "Meshes\\Terminals\\NV_Caravan\\");
-    pBillsGrid = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+    pBillsGrid = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
     BSsprintf(modelPath, 260, "%sCurrency-Coin_Grid.NIF", "Meshes\\Terminals\\NV_Caravan\\");
-    pCoinsGrid = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+    pCoinsGrid = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
     for (int32_t i = 0; i < 3; ++i) {
         BSsprintf(modelPath, 260, "%sCurrency-Bill_%i.NIF", "Meshes\\Terminals\\NV_Caravan\\", i + 1);
-        pBillGeometry[i] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+        pBillGeometry[i] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
         BSsprintf(modelPath, 260, "%sCurrency-Coin_%i.NIF", "Meshes\\Terminals\\NV_Caravan\\", i + 1);
-        pCoinGeometry[i] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+        pCoinGeometry[i] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
     }
     eActiveMenu = CaravanMenu::CA_ANTE_MENU;
     eGameState = CaravanMenu::CA_IDLE;
@@ -4139,17 +4169,17 @@ void CaravanMenu::SetupCurrency() {
     pTiles[2]->Set(4003, 0);
     pTiles[3]->Set(4003, 0);
     const char* v1 = sCurrentAnteText.String();
-    pTiles[40]->Set(4036, v1, 1);
+    pTiles[40]->Set(4036, v1, true);
     const char* v2 = sTotalFundsText.String();
-    pTiles[41]->Set(4036, v2, 1);
+    pTiles[41]->Set(4036, v2, true);
     const char* v3 = sAutoMatchText.String();
-    pTiles[37]->Set(4036, v3, 1);
+    pTiles[37]->Set(4036, v3, true);
     const char* v4 = sRaiseText.String();
-    pTiles[36]->Set(4036, v4, 1);
+    pTiles[36]->Set(4036, v4, true);
     const char* v5 = sAcceptText.String();
-    pTiles[7]->Set(4036, v5, 1);
+    pTiles[7]->Set(4036, v5, true);
     const char* v6 = sExit.String();
-    pTiles[38]->Set(4036, v6, 1);
+    pTiles[38]->Set(4036, v6, true);
     PrepareBettingCurrency();
     iNPCAnte = static_cast<int32_t>(static_cast<double>(iNPCTotalFunds) * fBetPercentage);
     const char* FullName = pChallenger->GetFullName();
@@ -4158,16 +4188,16 @@ void CaravanMenu::SetupCurrency() {
         int32_t v18 = 15 * (BSstrlen(v8) - 17);
         Tile* th_s = Tile::GetTileByName(pTiles[4], "CBM_NPCBetValue");
         float v13 = th_s->GetFloat(4001) + static_cast<double>(v18);
-        th_s->Set(4001, v13, 1);
+        th_s->Set(4001, v13, true);
     }
     Tile* ChildByName = pTiles[0]->GetChildByName("CBM_InfoRect");
     if (ChildByName) {
         float v12 = ChildByName->GetFloat(4017) + 150.0;
-        ChildByName->Set(4017, v12, 1);
+        ChildByName->Set(4017, v12, true);
         ChildByName->AddNeedsUpdate(16);
     }
     const char* v9 = pChallenger->GetFullName();
-    pTiles[4]->Set(4036, v9, 1);
+    pTiles[4]->Set(4036, v9, true);
     pTiles[4]->Poke(CaravanMenu::iUT_Value, 1.0f);
     pTiles[4]->Set(CaravanMenu::iUT_Value, iNPCAnte);
     pTiles[5]->Poke(CaravanMenu::iUT_Value, 1.0f);
@@ -4285,24 +4315,24 @@ void CaravanMenu::PrepareGameMenu() {
     iNextPlayerCard = RandomInt(0, v3);
     uint32_t v4 = pNPCDeck.iSize;
     iNextNPCCard = RandomInt(0, v4);
-    pDeckParam = 0;
-    activeList = 0;
-    inactiveList = 0;
+    pDeckParam = nullptr;
+    activeList = nullptr;
+    inactiveList = nullptr;
     if (pDeckArray.iSize) {
-        pDeckArray.Clear(1);
+        pDeckArray.Clear(true);
     }
     for (int32_t i_3 = 0; i_3 < 96; ++i_3) {
-        deckFaceShaders[i_3] = 0;
+        deckFaceShaders[i_3] = nullptr;
     }
-    pDeckArray.Clear(1);
-    pInactiveDeckAnimManager = 0;
-    pActiveDeckAnimManager = 0;
+    pDeckArray.Clear(true);
+    pInactiveDeckAnimManager = nullptr;
+    pActiveDeckAnimManager = nullptr;
     for (int32_t i_4 = 0; i_4 < 6; ++i_4) {
-        pInactiveDeckAnimations[i_4] = 0;
-        pActiveDeckAnimations[i_4] = 0;
+        pInactiveDeckAnimations[i_4] = nullptr;
+        pActiveDeckAnimations[i_4] = nullptr;
     }
     for (int32_t i_5 = 0; i_5 < 96; ++i_5) {
-        deckFaceShaders[i_5] = 0;
+        deckFaceShaders[i_5] = nullptr;
     }
     NiNode* v79 = CaravanMenu::spModel.m_pObject;
     uint32_t ChildCount = CaravanMenu::spModel.m_pObject->GetChildCount();
@@ -4312,44 +4342,46 @@ void CaravanMenu::PrepareGameMenu() {
     v78->DetachChildAt(v6 - 1);
     pModelLoader->ReleaseFile("Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Deck.NIF");
     pModelLoader->ReleaseFile("Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Available.NIF");
-    pInactiveDeckGeometry = 0;
-    pActiveDeckGeometry = 0;
+    pInactiveDeckGeometry = nullptr;
+    pActiveDeckGeometry = nullptr;
     for (int32_t i_6 = 0; i_6 < 3; ++i_6) {
         for (int32_t j = 0; j < 7; ++j) {
             BSsprintf(modelPath, 260, "%sPlayer_%i_0%i.NIF", "Meshes\\Terminals\\NV_Caravan\\", i_6 + 1, j + 1);
-            pTrackGeometry[i_6][j] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+            pTrackGeometry[i_6][j] =
+                (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
             NiNode* v77 = CaravanMenu::spModel.m_pObject;
             v77->AttachChild(pTrackGeometry[i_6][j], 1);
             BSsprintf(modelPath, 260, "%sOpponent_%i_0%i.NIF", "Meshes\\Terminals\\NV_Caravan\\", i_6 + 1, j + 1);
-            pTrackGeometry[i_6 + 3][j] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+            pTrackGeometry[i_6 + 3][j] =
+                (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
             NiNode* v76 = CaravanMenu::spModel.m_pObject;
             v76->AttachChild(pTrackGeometry[i_6 + 3][j], 1);
         }
     }
     for (int32_t i_7 = 0; i_7 < 3; ++i_7) {
         BSsprintf(modelPath, 260, "%sPlayerGrid_%i.NIF", "Meshes\\Terminals\\NV_Caravan\\", i_7 + 1);
-        pTrackGrids[i_7] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+        pTrackGrids[i_7] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
         BSsprintf(modelPath, 260, "%sOppGrid_%i.NIF", "Meshes\\Terminals\\NV_Caravan\\", i_7 + 1);
-        pTrackGrids[i_7 + 3] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+        pTrackGrids[i_7 + 3] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
     }
     BSsprintf(modelPath, 260, "%sSelect_Add.NIF", "Meshes\\Terminals\\NV_Caravan\\");
-    pCursors[0] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+    pCursors[0] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
     NiNode* v75 = CaravanMenu::spModel.m_pObject;
     v75->AttachChild(pCursors[0], 1);
     BSsprintf(modelPath, 260, "%sSelect_Remove.NIF", "Meshes\\Terminals\\NV_Caravan\\");
-    pCursors[1] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+    pCursors[1] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
     NiNode* v74 = CaravanMenu::spModel.m_pObject;
     v74->AttachChild(pCursors[1], 1);
     BSsprintf(modelPath, 260, "%s%s", "Meshes\\Terminals\\NV_Caravan\\", "Player_Deck.NIF");
-    pHandGeometry[0] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+    pHandGeometry[0] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
     BSsprintf(modelPath, 260, "%s%s", "Meshes\\Terminals\\NV_Caravan\\", "Opponent_Deck.NIF");
-    pHandGeometry[1] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, 1, 0, 0, 0);
+    pHandGeometry[1] = (NiAVObject*)pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
     NiNode* v73 = CaravanMenu::spModel.m_pObject;
     v73->AttachChild(pHandGeometry[0], 1);
     NiNode* v72 = CaravanMenu::spModel.m_pObject;
     v72->AttachChild(pHandGeometry[1], 1);
     for (int32_t i_8 = 0; i_8 < 6; ++i_8) {
-        pTrackGrids[i_8]->SetAppCulled(1);
+        pTrackGrids[i_8]->SetAppCulled(true);
         NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
         pTrackGrids[i_8]->Update(*updated);
     }
@@ -4470,7 +4502,7 @@ void CaravanMenu::PrepareGameMenu() {
                     pTrackAnimations[i_10][j_2][k][1]->SetCycleType(NiTimeController::CLAMP);
                 }
                 NiTimeController::StartAnimations(pTrackGeometry[i_10][j_2]);
-                pCardTracks[i_10][j_2].Clear(1);
+                pCardTracks[i_10][j_2].Clear(true);
             }
         }
     }
@@ -4482,15 +4514,15 @@ void CaravanMenu::PrepareGameMenu() {
         trackInfo[i_11].eDirection = 0;
         UpdateTrackValue(i_11);
     }
-    SetFlag(CaravanMenu::CAF_TRACK_SETUP, 1);
-    UpdateGameHandTextures(1, 1);
-    UpdateGameHandTextures(0, 1);
-    pSelectedCard = 0;
-    pSelectedObject = 0;
-    pSelectedShadow = 0;
+    SetFlag(CaravanMenu::CAF_TRACK_SETUP, true);
+    UpdateGameHandTextures(true, true);
+    UpdateGameHandTextures(false, true);
+    pSelectedCard = nullptr;
+    pSelectedObject = nullptr;
+    pSelectedShadow = nullptr;
     ZeroFlags();
-    SetFlag(CaravanMenu::CAF_AI, 1);
-    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 1);
+    SetFlag(CaravanMenu::CAF_AI, true);
+    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
     uint32_t activeList_2 = pPlayer->GetCaravanLosses();
     uint32_t inactiveList_2 = pPlayer->GetCaravanWinnings();
     BSsprintf(Src, 260, "%i/%i", inactiveList_2, activeList_2);
@@ -4501,7 +4533,7 @@ void CaravanMenu::PrepareGameMenu() {
     int32_t ivalue = CaravanCapWinnings - pPlayer->GetCaravanCapLosses();
     pTiles[17]->Set(CaravanMenu::iUT_Value, ivalue);
     pTiles[18]->Poke(CaravanMenu::iUT_Value, 1.0f);
-    pTiles[18]->Set(CaravanMenu::iUT_Value, Src, 1);
+    pTiles[18]->Set(CaravanMenu::iUT_Value, Src, true);
     pTiles[26]->Poke(CaravanMenu::iUT_Value, 1.0f);
     pTiles[26]->Set(CaravanMenu::iUT_Value, 0);
     pTiles[27]->Poke(CaravanMenu::iUT_Value, 1.0f);
@@ -4525,31 +4557,31 @@ void CaravanMenu::PrepareGameMenu() {
     Tile* th_s = pTiles[2]->GetChildByName("CGM_InfoRect");
     if (th_s) {
         float v49 = th_s->GetFloat(4017) + 150.0;
-        th_s->Set(4017, v49, 1);
+        th_s->Set(4017, v49, true);
         float v48 = th_s->GetFloat(4001) - 150.0;
-        th_s->Set(4001, v48, 1);
+        th_s->Set(4001, v48, true);
         th_s->AddNeedsUpdate(17);
     }
     const char* v39 = sBack.String();
-    pTiles[22]->Set(4036, v39, 1);
+    pTiles[22]->Set(4036, v39, true);
     pTiles[0]->Set(4003, 0);
     pTiles[1]->Set(4003, 0);
     pTiles[2]->Set(4003, 1);
     pTiles[3]->Set(4003, 0);
     const char* v40 = sAntePotText.String();
-    pTiles[44]->Set(4036, v40, 1);
+    pTiles[44]->Set(4036, v40, true);
     const char* v41 = sNetTotalText.String();
-    pTiles[45]->Set(4036, v41, 1);
+    pTiles[45]->Set(4036, v41, true);
     const char* v42 = sWinLossText.String();
-    pTiles[46]->Set(4036, v42, 1);
+    pTiles[46]->Set(4036, v42, true);
     const char* v43 = sSelectCardText.String();
-    pTiles[19]->Set(4036, v43, 1);
+    pTiles[19]->Set(4036, v43, true);
     const char* v44 = sDiscardCardText.String();
-    pTiles[20]->Set(4036, v44, 1);
+    pTiles[20]->Set(4036, v44, true);
     const char* v45 = sDiscardTrackText.String();
-    pTiles[21]->Set(4036, v45, 1);
+    pTiles[21]->Set(4036, v45, true);
     const char* v46 = sCancel.String();
-    pTiles[22]->Set(4036, v46, 1);
+    pTiles[22]->Set(4036, v46, true);
     UpdateCaravanFlags();
 }
 
@@ -4570,7 +4602,7 @@ void CaravanMenu::PrepareResultsMenu() {
         MiscStatManager::Increment(MiscStatManager::MS_CARAVAN_GAMES_WON);
         BSAudio* v3 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "GAMECaravanWin", 289u);
-        SoundHandleByName->Play(0);
+        SoundHandleByName->Play(false);
     }
     else {
         uint32_t CaravanCapLosses = pPlayer->GetCaravanCapLosses();
@@ -4580,12 +4612,12 @@ void CaravanMenu::PrepareResultsMenu() {
         MiscStatManager::Increment(MiscStatManager::MS_CARAVAN_GAMES_LOST);
         BSAudio* v6 = &BSAudio::QInstance();
         BSSoundHandle* v18 = v6->GetSoundHandleByName(&arHandle, "GAMECaravanLose", 289u);
-        v18->Play(0);
+        v18->Play(false);
     }
     Tile* th_s = pTiles[3]->GetChildByName("CRM_InfoRect");
     if (th_s) {
         float v17 = th_s->GetFloat(4017) + 150.0;
-        th_s->Set(4017, v17, 1);
+        th_s->Set(4017, v17, true);
         th_s->AddNeedsUpdate(16);
     }
     uint32_t afValue = pPlayer->GetCaravanLosses();
@@ -4597,7 +4629,7 @@ void CaravanMenu::PrepareResultsMenu() {
     uint32_t v8 = pPlayer->GetCaravanCapLosses();
     pTiles[32]->Set(CaravanMenu::iUT_Value, v8);
     pTiles[33]->Poke(CaravanMenu::iUT_Value, 1.0f);
-    pTiles[33]->Set(CaravanMenu::iUT_Value, Src, 1);
+    pTiles[33]->Set(CaravanMenu::iUT_Value, Src, true);
     pTiles[34]->Poke(CaravanMenu::iUT_Value, 1.0f);
     uint32_t CaravanLargestWinning = pPlayer->GetCaravanLargestWinning();
     pTiles[34]->Set(CaravanMenu::iUT_Value, CaravanLargestWinning);
@@ -4607,19 +4639,19 @@ void CaravanMenu::PrepareResultsMenu() {
     else {
         apString = sCaravanYouLoseText.String();
     }
-    pTiles[35]->Set(4036, apString, 1);
+    pTiles[35]->Set(4036, apString, true);
     pTiles[0]->Set(4003, 0);
     pTiles[1]->Set(4003, 0);
     pTiles[2]->Set(4003, 0);
     pTiles[3]->Set(4003, 1);
     const char* v10 = sCaravanWinningsText.String();
-    pTiles[47]->Set(4036, v10, 1);
+    pTiles[47]->Set(4036, v10, true);
     const char* v11 = sCaravanLossesText.String();
-    pTiles[48]->Set(4036, v11, 1);
+    pTiles[48]->Set(4036, v11, true);
     const char* v12 = sCaravanWinLossText.String();
-    pTiles[49]->Set(4036, v12, 1);
+    pTiles[49]->Set(4036, v12, true);
     const char* v13 = sCaravanBiggestAnteText.String();
-    pTiles[50]->Set(4036, v13, 1);
+    pTiles[50]->Set(4036, v13, true);
     char IsFlagSet = this->IsFlagSet(CaravanMenu::CAF_PLAYERWIN);
     RewardOrChargePlayer(IsFlagSet);
 }
@@ -4634,13 +4666,13 @@ void CaravanMenu::FlipSelectedCardTextures(int32_t aiTarget) {
                     char acPath[268];
                     int32_t index = static_cast<int32_t>(pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue));
                     if (pDeckArray.operator[](index)->bIsActive) {
-                        NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(0));
+                        NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
                         BSsprintf(
                             apDest, 260, "%s%s", "Textures\\",
                             (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
                         );
                         SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                        TES::pInstance->CreateTextureImage(acPath, textptr, 0, 0);
+                        TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
                         if (textptr.m_pObject) {
                             deckFaceShaders[aiTarget]->SetTexture(
                                 BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject
@@ -4651,7 +4683,7 @@ void CaravanMenu::FlipSelectedCardTextures(int32_t aiTarget) {
                             (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
                         );
                         SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                        TES::pInstance->CreateTextureImage(acPath, textptr, 0, 0);
+                        TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
                         if (textptr.m_pObject) {
                             deckFaceShaders[aiTarget + 24]->SetTexture(
                                 BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject
@@ -4662,7 +4694,7 @@ void CaravanMenu::FlipSelectedCardTextures(int32_t aiTarget) {
                             (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
                         );
                         SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                        TES::pInstance->CreateTextureImage(acPath, textptr, 0, 0);
+                        TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
                         if (textptr.m_pObject) {
                             deckFaceShaders[aiTarget + 48]->SetTexture(
                                 BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject
@@ -4673,7 +4705,7 @@ void CaravanMenu::FlipSelectedCardTextures(int32_t aiTarget) {
                             (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
                         );
                         SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                        TES::pInstance->CreateTextureImage(acPath, textptr, 0, 0);
+                        TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
                         if (textptr.m_pObject) {
                             deckFaceShaders[aiTarget + 72]->SetTexture(
                                 BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject
@@ -4684,13 +4716,13 @@ void CaravanMenu::FlipSelectedCardTextures(int32_t aiTarget) {
                         // Only the call is kept: the card's faceTexture address tested after it is never null.
                         pDeckArray.operator[](index);
                         {
-                            NiPointer<NiSourceTexture> textptr_2(static_cast<NiSourceTexture*>(0));
+                            NiPointer<NiSourceTexture> textptr_2(static_cast<NiSourceTexture*>(nullptr));
                             BSsprintf(
                                 apDest, 260, "%s%s", "Textures\\",
                                 (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
                             );
                             SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                            TES::pInstance->CreateTextureImage(acPath, textptr_2, 0, 0);
+                            TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
                             if (textptr_2.m_pObject) {
                                 deckFaceShaders[aiTarget + 48]->SetTexture(
                                     BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject
@@ -4701,7 +4733,7 @@ void CaravanMenu::FlipSelectedCardTextures(int32_t aiTarget) {
                                 (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
                             );
                             SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                            TES::pInstance->CreateTextureImage(acPath, textptr_2, 0, 0);
+                            TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
                             if (textptr_2.m_pObject) {
                                 deckFaceShaders[aiTarget + 72]->SetTexture(
                                     BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject
@@ -4712,7 +4744,7 @@ void CaravanMenu::FlipSelectedCardTextures(int32_t aiTarget) {
                                 (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
                             );
                             SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                            TES::pInstance->CreateTextureImage(acPath, textptr_2, 0, 0);
+                            TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
                             if (textptr_2.m_pObject) {
                                 deckFaceShaders[aiTarget]->SetTexture(
                                     BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject
@@ -4723,7 +4755,7 @@ void CaravanMenu::FlipSelectedCardTextures(int32_t aiTarget) {
                                 (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
                             );
                             SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                            TES::pInstance->CreateTextureImage(acPath, textptr_2, 0, 0);
+                            TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
                             if (textptr_2.m_pObject) {
                                 deckFaceShaders[aiTarget + 24]->SetTexture(
                                     BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject
@@ -4760,7 +4792,7 @@ void CaravanMenu::RewardOrChargePlayer(char abReward) {
                     if (iCount > 0) {
                         TESContainer kContainer;
                         kContainer.AddObject(pObject, iCount, nullptr);
-                        kContainer.AddContainerToReference(pPlayer, 0);
+                        kContainer.AddContainerToReference(pPlayer, false);
                         TESObjectREFR* pVendor =
                             static_cast<TESObjectREFR*>(static_cast<TESForm*>(pChallenger->GetObjectReference()));
                         pDataHandler->RemoveItemBarterContainer(pNode->GetItem(), iCount, pVendor);
@@ -4775,7 +4807,7 @@ void CaravanMenu::RewardOrChargePlayer(char abReward) {
         if (iNumber) {
             TESContainer kGoldContainer;
             kGoldContainer.AddObject(static_cast<TESObject*>(TESForm::GetFormByNumericID(15u)), iNumber, nullptr);
-            kGoldContainer.AddContainerToReference(pPlayer, 0);
+            kGoldContainer.AddContainerToReference(pPlayer, false);
             ItemChange kGold(static_cast<TESBoundObject*>(TESForm::GetFormByNumericID(15u)), 0);
             if (pChanges->GetGoldAmount() > iNumber) {
                 TESObjectREFR* pVendor =
@@ -4789,7 +4821,7 @@ void CaravanMenu::RewardOrChargePlayer(char abReward) {
                 pDataHandler->RemoveItemBarterContainer(&kGold, iGold, pVendor);
                 int32_t iRest = iNumber - pChanges->GetGoldAmount();
                 TESBoundObject* pGold = static_cast<TESBoundObject*>(TESForm::GetFormByNumericID(15u));
-                pChallenger->RemoveItem(pGold, nullptr, iRest, 0, 0, nullptr, nullptr, nullptr, 1, 0);
+                pChallenger->RemoveItem(pGold, nullptr, iRest, false, false, nullptr, nullptr, nullptr, true, false);
             }
         }
     }
@@ -4811,8 +4843,10 @@ void CaravanMenu::RewardOrChargePlayer(char abReward) {
                     if (iCount > 0) {
                         TESContainer kContainer;
                         kContainer.AddObject(pObject, iCount, nullptr);
-                        kContainer.AddContainerToReference(pChallenger, 0);
-                        pPlayer->RemoveItem(pObject, nullptr, iCount, 0, 0, nullptr, nullptr, nullptr, 1, 0);
+                        kContainer.AddContainerToReference(pChallenger, false);
+                        pPlayer->RemoveItem(
+                            pObject, nullptr, iCount, false, false, nullptr, nullptr, nullptr, true, false
+                        );
                         iNumber -= iCount * iValue;
                     }
                 }
@@ -4824,15 +4858,15 @@ void CaravanMenu::RewardOrChargePlayer(char abReward) {
         if (iNumber) {
             TESContainer kGoldContainer;
             kGoldContainer.AddObject(static_cast<TESObject*>(TESForm::GetFormByNumericID(15u)), iNumber, nullptr);
-            kGoldContainer.AddContainerToReference(pChallenger, 0);
+            kGoldContainer.AddContainerToReference(pChallenger, false);
             if (pPlayer->GetGoldAmount() > iNumber) {
                 TESBoundObject* pGold = static_cast<TESBoundObject*>(TESForm::GetFormByNumericID(15u));
-                pPlayer->RemoveItem(pGold, nullptr, iNumber, 0, 0, nullptr, nullptr, nullptr, 1, 0);
+                pPlayer->RemoveItem(pGold, nullptr, iNumber, false, false, nullptr, nullptr, nullptr, true, false);
             }
             else {
                 int32_t iGold = pPlayer->GetGoldAmount();
                 TESBoundObject* pGold = static_cast<TESBoundObject*>(TESForm::GetFormByNumericID(15u));
-                pPlayer->RemoveItem(pGold, nullptr, iGold, 0, 0, nullptr, nullptr, nullptr, 1, 0);
+                pPlayer->RemoveItem(pGold, nullptr, iGold, false, false, nullptr, nullptr, nullptr, true, false);
             }
         }
     }
@@ -4869,8 +4903,8 @@ void CaravanMenu::UpdateGameHandTextures(bool abPlayer, bool bStartup) {
         if (i >= v26) {
             if (!IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) || i == 5) {
                 if (!IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) && v26 < 5) {
-                    face->SetAppCulled(1);
-                    NiUpdateData update1_2(0.0f, 0, 0);
+                    face->SetAppCulled(true);
+                    NiUpdateData update1_2(0.0f, false, false);
                     face->Update(update1_2);
                     if (abPlayer) {
                         BSsprintf(blockName, 260, "Player-Deck_0%i_Shadow:0", i + 1);
@@ -4879,14 +4913,14 @@ void CaravanMenu::UpdateGameHandTextures(bool abPlayer, bool bStartup) {
                         BSsprintf(blockName, 260, "Opponent-Deck_0%i_Shadow:0", i + 1);
                     }
                     face = BSUtilities::GetObjectByName(pHand, static_cast<const char*>(blockName));
-                    face->SetAppCulled(1);
-                    NiUpdateData update2_2(0.0f, 0, 0);
+                    face->SetAppCulled(true);
+                    NiUpdateData update2_2(0.0f, false, false);
                     face->Update(update2_2);
                 }
             }
             else {
-                face->SetAppCulled(1);
-                NiUpdateData update1(0.0f, 0, 0);
+                face->SetAppCulled(true);
+                NiUpdateData update1(0.0f, false, false);
                 face->Update(update1);
                 if (abPlayer) {
                     BSsprintf(blockName, 260, "Player-Deck_0%i_Shadow:0", i + 1);
@@ -4895,8 +4929,8 @@ void CaravanMenu::UpdateGameHandTextures(bool abPlayer, bool bStartup) {
                     BSsprintf(blockName, 260, "Opponent-Deck_0%i_Shadow:0", i + 1);
                 }
                 face = BSUtilities::GetObjectByName(pHand, static_cast<const char*>(blockName));
-                face->SetAppCulled(1);
-                NiUpdateData update2(0.0f, 0, 0);
+                face->SetAppCulled(true);
+                NiUpdateData update2(0.0f, false, false);
                 face->Update(update2);
             }
         }
@@ -4921,10 +4955,10 @@ void CaravanMenu::UpdateGameHandTextures(bool abPlayer, bool bStartup) {
                 faceshader = static_cast<BSShaderPPLightingProperty*>(face->GetProperty(3));
             }
             else {
-                faceshader = 0;
+                faceshader = nullptr;
             }
             faceshader_2 = faceshader;
-            NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(0));
+            NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
             if (faceshader_2) {
                 if (abPlayer) {
                     BSsprintf(
@@ -4944,7 +4978,7 @@ void CaravanMenu::UpdateGameHandTextures(bool abPlayer, bool bStartup) {
                     }
                 }
                 SwapPlatformLanguageTexturePath(blockName, acPath, 260u);
-                TES::pInstance->CreateTextureImage(acPath, textptr, 0, 0);
+                TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
                 if (textptr.m_pObject) {
                     NiSourceTexture* v7 = textptr.m_pObject;
                     faceshader_2->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, v7);
@@ -4980,10 +5014,10 @@ void CaravanMenu::UpdateGameHandTextures(bool abPlayer, bool bStartup) {
             faceshader_3 = static_cast<BSShaderPPLightingProperty*>(face->GetProperty(3));
         }
         else {
-            faceshader_3 = 0;
+            faceshader_3 = nullptr;
         }
         faceshader_2 = faceshader_3;
-        NiPointer<NiSourceTexture> textptr_2(static_cast<NiSourceTexture*>(0));
+        NiPointer<NiSourceTexture> textptr_2(static_cast<NiSourceTexture*>(nullptr));
         if (faceshader_2) {
             int32_t v9;
             if (abPlayer) {
@@ -5006,7 +5040,7 @@ void CaravanMenu::UpdateGameHandTextures(bool abPlayer, bool bStartup) {
                     );
                 }
                 SwapPlatformLanguageTexturePath(blockName, acPath, 260u);
-                TES::pInstance->CreateTextureImage(acPath, textptr_2, 0, 0);
+                TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
                 if (textptr_2.m_pObject) {
                     NiSourceTexture* v8 = textptr_2.m_pObject;
                     faceshader_2->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, v8);
@@ -5049,13 +5083,13 @@ void CaravanMenu::UpdateSelectedTrackCardTexture() {
         faceshader_3 = static_cast<BSShaderPPLightingProperty*>(face->GetProperty(3));
     }
     else {
-        faceshader_3 = 0;
+        faceshader_3 = nullptr;
     }
-    NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(0));
+    NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
     if (faceshader_3) {
         BSsprintf(blockName, 260, "%s%s", "Textures\\", (&pSelectedCard->faceTexture)->GetTextureName());
         SwapPlatformLanguageTexturePath(blockName, acPath, 260u);
-        TES::pInstance->CreateTextureImage(acPath, textptr, 0, 0);
+        TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
         if (textptr.m_pObject) {
             faceshader_3->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject);
         }
@@ -5093,16 +5127,16 @@ void CaravanMenu::UpdateTrackCardTexture(int32_t aiTrack, int32_t aiRow, int32_t
         faceshader_3 = static_cast<BSShaderPPLightingProperty*>(face->GetProperty(3));
     }
     else {
-        faceshader_3 = 0;
+        faceshader_3 = nullptr;
     }
-    NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(0));
+    NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
     if (faceshader_3) {
         BSsprintf(
             blockName, 260, "%s%s", "Textures\\",
             (&pCardTracks[aiTrack][aiRow].operator[](aiColumn)->faceTexture)->GetTextureName()
         );
         SwapPlatformLanguageTexturePath(blockName, acPath, 260u);
-        TES::pInstance->CreateTextureImage(acPath, textptr, 0, 0);
+        TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
         if (textptr.m_pObject) {
             faceshader_3->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject);
         }
@@ -5895,10 +5929,10 @@ void CaravanMenu::Close() {
 void CaravanMenu::CancelConfirmFunc() {
     Controls* controls;
     if (Interface::GetMessageMenuResult()) {
-        CaravanMenu::pMe->SetFlag(CAF_DISABLE_ALLCONTROLS, 0);
+        CaravanMenu::pMe->SetFlag(CAF_DISABLE_ALLCONTROLS, false);
     }
     else {
-        CaravanMenu::pMe->SetFlag(static_cast<enumFlags>(131072), 1);
+        CaravanMenu::pMe->SetFlag(static_cast<enumFlags>(131072), true);
         controls = appMain->GetControls();
         controls->ClearUserActions();
     }
@@ -5907,7 +5941,7 @@ void CaravanMenu::CancelConfirmFunc() {
 void CaravanMenu::Draw3DElements() {
     NiCamera* v6;
     NiRenderer* Renderer_ = NiRenderer::GetRenderer();
-    Renderer_->ClearBuffer(0, 4u);
+    Renderer_->ClearBuffer(nullptr, 4u);
     SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
     BSCullingProcess* a1 = WorldSceneGraph->pCuller;
     a1->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
@@ -5926,9 +5960,9 @@ void CaravanMenu::Draw3DElements() {
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
     BSShaderUtil::AccumulateScene(v6, ShadowSceneNode_, *a1);
     BSShaderAccumulator* v3 = static_cast<BSShaderAccumulator*>(apMemory.m_pObject);
-    BSShaderUtil::RenderScene(v6, v3, 0);
-    a1->SetAccumulator(0);
-    apMemory.operator=(static_cast<NiRefObject*>(0));
+    BSShaderUtil::RenderScene(v6, v3, false);
+    a1->SetAccumulator(nullptr);
+    apMemory.operator=(static_cast<NiRefObject*>(nullptr));
     a1->PopCullMode();
 }
 
@@ -5957,30 +5991,30 @@ Tile* CaravanMenu::Create(
             CaravanMenu::pMe->pDeckParam = Target;
             CaravanMenu::pMe->iDiffLevel = aiDiffLevel;
             CaravanMenu::pMe->fBetPercentage = afBetPercentage;
-            CaravanMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), 0);
+            CaravanMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
             if (CaravanMenu::pMe->IsWellFormedMenu()) {
                 if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
                     float time = Tile::GetMaximumDepth();
-                    ptile->Set(4013, time, 1);
+                    ptile->Set(4013, time, true);
                 }
                 CaravanMenu::pMe->PrepareCaravanData();
                 CaravanMenu::pMe->pTiles[15]->Set(
-                    Tile::kTileValue_User0, static_cast<float>(CaravanMenu::pMe->iTotalCards), 0
+                    Tile::kTileValue_User0, static_cast<float>(CaravanMenu::pMe->iTotalCards), false
                 );
-                CaravanMenu::pMe->pTiles[15]->Set(CaravanMenu::iUT_CurrentValue, 12.0f, 0);
+                CaravanMenu::pMe->pTiles[15]->Set(CaravanMenu::iUT_CurrentValue, 12.0f, false);
                 int32_t v10 = Tile::TextToTrait("_SetInCode");
                 CaravanMenu::pMe->pTiles[15]->Poke(v10, 1.0f);
-                CaravanMenu::bDebugAI = 0;
+                CaravanMenu::bDebugAI = false;
                 CaravanMenu::pMe->LoadNifs2();
                 CaravanMenu::pMe->SetupCurrency();
-                CaravanMenu::pMe->SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, 0);
-                CaravanMenu::pMe->PrepForVisibility(0);
+                CaravanMenu::pMe->SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
+                CaravanMenu::pMe->PrepForVisibility(false);
                 InterfaceManager* v11 = InterfaceManager::Instance();
                 if (!v11->xTutorialManager.HasBeenShown(Interface::TUT_CARAVAN_BET)) {
                     TESForm* FormByEditorID = TESForm::GetFormByEditorID("HelpCaravanBetting");
                     BGSMessage* helpForm = dynamic_cast<BGSMessage*>(FormByEditorID);
                     if (helpForm) {
-                        CaravanMenu::pMe->bTutorial = TutorialMenu::Create(helpForm, 0);
+                        CaravanMenu::pMe->bTutorial = TutorialMenu::Create(helpForm, false);
                         InterfaceManager* v13 = InterfaceManager::Instance();
                         v13->xTutorialManager.FlagAsShown(Interface::TUT_CARAVAN_BET);
                         CaravanMenu::pMe->iTutorial = 30;
@@ -5991,7 +6025,7 @@ Tile* CaravanMenu::Create(
             else {
                 Warning("MENUS: Caravan Menu Creation Failed... Are your menu and art resources up to date?");
                 CaravanMenu::Close();
-                return 0;
+                return nullptr;
             }
         }
         else {
@@ -6002,19 +6036,19 @@ Tile* CaravanMenu::Create(
                     }
                 }
             }
-            return 0;
+            return nullptr;
         }
     }
     else {
         char msg[264];
         BSsprintf(msg, 260, sCardCountText.operator const char*());
         Interface::ShowMessage(
-            msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", 0, 2.0f, 0
+            msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
         );
         BSAudio* v6 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-        SoundHandleByName->Play(0);
-        return 0;
+        SoundHandleByName->Play(false);
+        return nullptr;
     }
 }
 

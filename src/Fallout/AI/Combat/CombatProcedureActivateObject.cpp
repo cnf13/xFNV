@@ -23,7 +23,7 @@
 CombatProcedureActivateObject::CombatProcedureActivateObject(TESObjectREFR* apTargetRef, TESBoundObject* apBoundObject)
   : pTargetRef(apTargetRef), pBoundObject(apBoundObject), cAnimating(0) {
     if (pTargetRef) {
-        pTargetRef->SetTargeted(1);
+        pTargetRef->SetTargeted(true);
     }
 }
 
@@ -41,7 +41,7 @@ void CombatProcedureActivateObject::Update() {
     }
     if (!cAnimating) {
         HighProcess* phighProcess_2;
-        if (!panim->SpecialIdleDonePlaying() || panim->IsIdleNotLoaded(0)) {
+        if (!panim->SpecialIdleDonePlaying() || panim->IsIdleNotLoaded(nullptr)) {
             return;
         }
         phighProcess_2 = static_cast<HighProcess*>(pattacker->pCurrentProcess);
@@ -55,7 +55,7 @@ void CombatProcedureActivateObject::Update() {
             CombatState* pcombatState = pCombatController->pCombatState;
             if (pTargetRef->GetObjectReference() == pBoundObject) {
                 pcombatState->PreActivateReference(pTargetRef);
-                pTargetRef->Activate(pattacker, 1, 0, 1);
+                pTargetRef->Activate(pattacker, true, nullptr, 1);
             }
             else {
                 TESBoundObject* pboundObjects[5];
@@ -76,7 +76,7 @@ void CombatProcedureActivateObject::Update() {
                         if (icount_2 < 0) {
                             icount_2 = -icount_2;
                         }
-                        pTargetRef->Activate(pattacker, 1, pboundObjects[i_2], icount_2);
+                        pTargetRef->Activate(pattacker, true, pboundObjects[i_2], icount_2);
                     }
                 }
             }
@@ -125,7 +125,7 @@ void CombatProcedureActivateObject::Update() {
 
 void CombatProcedureActivateObject::ClearReferencePointers(TESObjectREFR* apRef) {
     if (pTargetRef == apRef) {
-        pTargetRef = 0;
+        pTargetRef = nullptr;
         SetFailed("Targeted reference pointer was cleared");
     }
 }
@@ -201,11 +201,11 @@ void CombatProcedureActivateObject::InitLoadGame(BGSLoadFormBuffer* apLoadGameBu
         v3 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     pTargetRef = v3;
     if (pTargetRef) {
-        pTargetRef->SetTargeted(1);
+        pTargetRef->SetTargeted(true);
     }
 }
 

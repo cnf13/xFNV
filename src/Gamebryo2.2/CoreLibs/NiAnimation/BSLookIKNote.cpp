@@ -28,7 +28,7 @@ NiObject* BSLookIKNote::CreateClone(NiCloningProcess& arCloneData) {
         ::new (pkCtlr) BSLookIKNote;
     }
     else {
-        pkCtlr_2 = 0;
+        pkCtlr_2 = nullptr;
     }
     CopyMembers(pkCtlr_2, arCloneData);
     pkCtlr_2->fGain = fGain;
@@ -115,7 +115,7 @@ bool BSLookIKNote::ParseTextKey(const NiTextKey* apTextKey) {
 NiObject* BSLookIKNote::CreateObject() {
     BSLookIKNote* pkObject = static_cast<BSLookIKNote*>(NiMemObject::operator new(sizeof(BSLookIKNote)));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) BSLookIKNote;
 }

@@ -176,8 +176,8 @@
 
 #include <cctype>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
-#include <stdint.h>
 #include <string>
 
 namespace bhkConvert {} // namespace bhkConvert
@@ -213,13 +213,13 @@ float GetZAngleFromVector(const NiPoint3& aDirection) {
         if ((&aDirection)->y < 0.0) {
             v5 = (float)(v5 + 3.1415927410125732);
         }
-        return (float)(ClampAngle(v5));
+        return ClampAngle(v5);
     }
     if ((&aDirection)->x > 0.0) {
-        return (float)(ClampAngle(1.5707963705062866f));
+        return ClampAngle(1.5707963705062866f);
     }
     v5 = 4.71238899230957f;
-    return (float)(ClampAngle(v5));
+    return ClampAngle(v5);
 }
 
 // The larger of two ints: aiB unless aiA is above it. The compare is signed.
@@ -251,7 +251,7 @@ const char* BSstristr(const char* apString1, const char* apString2) {
             return &apString1[i];
         }
     }
-    return 0;
+    return nullptr;
 }
 
 // Wraps afAngle into [0, 2pi) with fmod; a negative angle gets 2pi (a double constant) added first, rounded to a float
@@ -344,7 +344,7 @@ NiLines* MakeLine(
         pverts_2 = pverts;
     }
     else {
-        pverts_2 = 0;
+        pverts_2 = nullptr;
     }
     *pverts_2 = aStart;
     pverts_2[1] = aEnd;
@@ -354,7 +354,7 @@ NiLines* MakeLine(
         pcolors_2 = pcolors;
     }
     else {
-        pcolors_2 = 0;
+        pcolors_2 = nullptr;
     }
     *pcolors_2 = aStartColor;
     pcolors_2[1] = aEndColor;
@@ -366,7 +366,7 @@ NiLines* MakeLine(
         plines = ::new (v11) NiLines(2, pverts_2, pcolors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, pbools);
     }
     else {
-        plines = 0;
+        plines = nullptr;
     }
     if (abWithNoLightingProp) {
         BSShaderNoLightingProperty* pshprop;
@@ -376,7 +376,7 @@ NiLines* MakeLine(
             pshprop = ::new (apMemory) BSShaderNoLightingProperty;
         }
         else {
-            pshprop = 0;
+            pshprop = nullptr;
         }
         plines->AttachProperty(pshprop);
         BSShaderManager::PrepareObject(plines, 0, 0);
@@ -400,7 +400,7 @@ NiTriShape* MakeTriPoint(float afDrawSize, const NiColorA& aColor, bool abWithNo
         pverts = static_cast<NiPoint3*>(ptr);
     }
     else {
-        pverts = 0;
+        pverts = nullptr;
     }
     float v17 = afDrawSize * 1.4142135381698608;
     NiPoint3* v3 = ::new (&dst) NiPoint3(0.0f, 0.0f, v17);
@@ -423,7 +423,7 @@ NiTriShape* MakeTriPoint(float afDrawSize, const NiColorA& aColor, bool abWithNo
         pcolors_2 = pcolors;
     }
     else {
-        pcolors_2 = 0;
+        pcolors_2 = nullptr;
     }
     *pcolors_2 = aColor;
     pcolors_2[1] = aColor;
@@ -462,7 +462,7 @@ NiTriShape* MakeTriPoint(float afDrawSize, const NiColorA& aColor, bool abWithNo
             NiTriShape(6, pverts, nullptr, pcolors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 8, ptrilist);
     }
     else {
-        ptri = 0;
+        ptri = nullptr;
     }
     if (abWithNoLightingProp) {
         BSShaderNoLightingProperty* pshprop;
@@ -472,7 +472,7 @@ NiTriShape* MakeTriPoint(float afDrawSize, const NiColorA& aColor, bool abWithNo
             pshprop = ::new (apMemory) BSShaderNoLightingProperty;
         }
         else {
-            pshprop = 0;
+            pshprop = nullptr;
         }
         NiProperty* pkProperty = pshprop;
         ptri->AttachProperty(pshprop);
@@ -484,7 +484,7 @@ NiTriShape* MakeTriPoint(float afDrawSize, const NiColorA& aColor, bool abWithNo
 NiPoint3* CreateWorldVertices(NiGeometry* apGeom) {
     NiPoint3* preturn_2;
     if (!apGeom || !apGeom->GetVertexCount()) {
-        return 0;
+        return nullptr;
     }
     uint16_t VertexCount = apGeom->GetVertexCount();
     int32_t numObjs = VertexCount;
@@ -496,7 +496,7 @@ NiPoint3* CreateWorldVertices(NiGeometry* apGeom) {
         preturn_2 = preturn;
     }
     else {
-        preturn_2 = 0;
+        preturn_2 = nullptr;
     }
     const NiTransform* WorldTransform = &apGeom->GetWorldTransform();
     NiPoint3* Vertices = apGeom->GetVertices();
@@ -644,7 +644,7 @@ int32_t GetCollisionObjectCountInSceneGraph(
 ) {
     bhkWorldNS::ObjectRecData recData;
     recData.eAction = bhkWorldNS::OA_TOTAL;
-    recData.bRecurse = 1;
+    recData.bRecurse = true;
     recData.uDataA[0].i = 0;
     recData.uDataA[3].i = 0;
     if (abIgnoreWeaponBone) {
@@ -664,8 +664,9 @@ void SetReferenceIDOnScenegraph(NiAVObject* apObject, uint32_t auiID) {
     if (apObject) {
         if (apObject->IsGeometry()) {
             NiShadeProperty* Property = static_cast<NiShadeProperty*>(apObject->GetProperty(3));
-            BSShaderLightingProperty* pShaderProp =
-                BSSM_ShaderPropertyIsLighting(Property) != 0 ? static_cast<BSShaderLightingProperty*>(Property) : 0;
+            BSShaderLightingProperty* pShaderProp = BSSM_ShaderPropertyIsLighting(Property) != 0
+                ? static_cast<BSShaderLightingProperty*>(Property)
+                : nullptr;
             if (pShaderProp) {
                 pShaderProp->uiReferenceID = auiID;
             }
@@ -688,7 +689,7 @@ void UnTintScenegraph(NiAVObject* apRoot) {
         NiObject::DynamicCastStatic(&BSShaderPPLightingProperty::ms_RTTI, Property)
     );
     if (v5) {
-        v5->SetTexEffectData(0);
+        v5->SetTexEffectData(nullptr);
     }
     NiNode* v4 = apRoot->IsNode();
     if (v4) {
@@ -703,7 +704,7 @@ void UnTintScenegraph(NiAVObject* apRoot) {
 
 BSShaderPPLightingProperty* FindPerPixelLighting(NiNode* apNode) {
     if (!apNode->GetArrayCount()) {
-        return 0;
+        return nullptr;
     }
     for (uint32_t n = apNode->GetArrayCount() - 1;; --n) {
         NiAVObject* pobj = apNode->GetAt(n);
@@ -718,7 +719,7 @@ BSShaderPPLightingProperty* FindPerPixelLighting(NiNode* apNode) {
                         // Tests the per-pixel lighting pointer for null, then computes it again to return it.
                         int32_t v3 = pproperty->iShaderPropertyType >= 8 && pproperty->iShaderPropertyType <= 12;
                         if (v3 ? pproperty : nullptr) {
-                            return v3 ? static_cast<BSShaderPPLightingProperty*>(pproperty) : 0;
+                            return v3 ? static_cast<BSShaderPPLightingProperty*>(pproperty) : nullptr;
                         }
                     }
                 }
@@ -742,7 +743,7 @@ bhkCollisionObject* FindFirstCollisionObject(NiAVObject* ap3D) {
         if (!pCollisionObject) {
             v5 = ap3D->IsNode();
             if (v5) {
-                arrayCount = (uint32_t)v5->GetArrayCount();
+                arrayCount = v5->GetArrayCount();
                 for (a1 = 0; a1 < arrayCount; ++a1) {
                     v1 = v5->GetAt(a1);
                     pCollisionObject = FindFirstCollisionObject(v1);
@@ -767,7 +768,7 @@ bool HasParticleSystem(NiObjectNET* apObj) {
     }
     NiNode* pNode = apObj->IsNode();
     if (pNode) {
-        for (uint32_t i = 0; i < static_cast<uint32_t>(pNode->GetArrayCount()); ++i) {
+        for (uint32_t i = 0; i < pNode->GetArrayCount(); ++i) {
             if (HasParticleSystem(pNode->GetAt(i))) {
                 return true;
             }
@@ -778,7 +779,7 @@ bool HasParticleSystem(NiObjectNET* apObj) {
 
 bool NodeInFrustum(NiAVObject* apObject, NiCamera* apCamera) {
     if (!apObject) {
-        return (bool)0;
+        return false;
     }
     const NiBound& worldBound = apObject->GetWorldBound();
     return (bool)((int8_t)BoundInFrustum(worldBound, apCamera));
@@ -786,7 +787,7 @@ bool NodeInFrustum(NiAVObject* apObject, NiCamera* apCamera) {
 
 bool PointInFrustum(NiPoint3 aTestLocation, NiCamera* apCamera, float afDistance) {
     if (!apCamera) {
-        return 0;
+        return false;
     }
     NiBound bound;
     bound.SetCenter(aTestLocation);
@@ -955,21 +956,21 @@ bool LineVsRect(
 
 bool HasMorpherController(NiObjectNET* apObj) {
     if (!apObj) {
-        return 0;
+        return false;
     }
     if (apObj->GetController(&NiGeomMorpherController::ms_RTTI)) {
-        return 1;
+        return true;
     }
     NiNode* v4 = apObj->IsNode();
     if (v4) {
         for (uint32_t a1 = 0; a1 < v4->GetArrayCount(); ++a1) {
             NiNode* apObja = static_cast<NiNode*>(v4->GetAt(a1));
             if (HasMorpherController(apObja)) {
-                return 1;
+                return true;
             }
         }
     }
-    return 0;
+    return false;
 }
 
 hkpWorldObject* hkGetWorldObject(const hkpCollidable* collidable) {
@@ -984,13 +985,13 @@ bool PickDistance(
     NiAVObject* apTarget,
     bool abClearResults
 ) {
-    bool v7 = 0;
+    bool v7 = false;
     if (apPick) {
         if (apTarget) {
             if (afDistance != 0.0) {
                 if (abClearResults) {
-                    apPick->SetTarget(0);
-                    apPick->PickObjects(NiPoint3_ZERO, NiPoint3_ZERO, 0);
+                    apPick->SetTarget(nullptr);
+                    apPick->PickObjects(NiPoint3_ZERO, NiPoint3_ZERO, false);
                 }
                 return PickDistanceRecursive(apPick, aOrigin, aDir, afDistance, apTarget);
             }
@@ -1006,10 +1007,10 @@ bool PickDistanceRecursive(
     float afDistance,
     NiAVObject* apTarget
 ) {
-    bool bhitsomething = 0;
+    bool bhitsomething = false;
     if (apPick && (apTarget && (!apPick->m_bObserveAppCullFlag || !apTarget->GetAppCulled()))) {
         if (!apTarget->IsVisualObject()) {
-            return 0;
+            return false;
         }
         NiBound targetbound = apTarget->GetWorldBound();
         NiPoint3 ptdiff = targetbound.m_kCenter - aOrigin;
@@ -1021,14 +1022,14 @@ bool PickDistanceRecursive(
                 for (int32_t i = 0; i < ichildcount; ++i) {
                     NiAVObject* v6 = ptargetnode->GetAt(static_cast<uint32_t>(i));
                     if (PickDistanceRecursive(apPick, aOrigin, aDir, afDistance, v6)) {
-                        bhitsomething = 1;
+                        bhitsomething = true;
                     }
                 }
             }
             else {
                 apPick->SetTarget(apTarget);
-                if (apPick->PickObjects(aOrigin, aDir, 1)) {
-                    return 1;
+                if (apPick->PickObjects(aOrigin, aDir, true)) {
+                    return true;
                 }
             }
         }
@@ -1038,7 +1039,7 @@ bool PickDistanceRecursive(
 
 bool BoundInFrustum(const NiBound& aBound, NiCamera* apCamera) {
     if (!apCamera) {
-        return 0;
+        return false;
     }
     static NiFrustumPlanes cullPlanes;
     if (pLastCamera != apCamera || uiLastTime != appTimer.iLastTime) {
@@ -1050,10 +1051,10 @@ bool BoundInFrustum(const NiBound& aBound, NiCamera* apCamera) {
         FNVD_INLINED_LOCAL(NiPlane, plane, std::nullopt, std::nullopt);
         plane = cullPlanes.GetPlane(uiplane);
         if (aBound.WhichSide(plane) == 2) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 bool ReturnTrue() {
@@ -1088,12 +1089,12 @@ hkpRigidBody* hkpGetRigidBody(const hkpCollidable* collidable) {
 
 NiAVObject* GetAVObjectForCollidable(const hkpCollidable* aphkCol) {
     NiPoint3 location;
-    NiAVObject* p3D = 0;
+    NiAVObject* p3D = nullptr;
     if (aphkCol) {
         hkpPhantom* pphantom;
         hkpRigidBody* pbody = hkpGetRigidBody(aphkCol);
         if (pbody) {
-            pphantom = 0;
+            pphantom = nullptr;
         }
         else {
             pphantom = hkpGetPhantom(aphkCol);
@@ -1141,9 +1142,9 @@ void BSmemcpy(void* apDest, int32_t aiDestSize, const void* apSrc, int32_t aiCou
 
 bool SwapPlatformLanguageTexturePath(const char* apInPath, char* apOutPath, uint32_t aiOutPathSize) {
     if (!apInPath || (!apOutPath || !aiOutPathSize)) {
-        return 0;
+        return false;
     }
-    bool bretval = 0;
+    bool bretval = false;
     *apOutPath = 0;
     uint32_t ioutlen = 0;
     int32_t eplatform = GetIsControllerConnected();
@@ -1174,7 +1175,7 @@ bool SwapPlatformLanguageTexturePath(const char* apInPath, char* apOutPath, uint
             ioutlen = v16 + 1;
             apOutPath[ioutlen] = 0;
             psearch = &pfind[std::strlen(PipBoyPlatforms[i]) + 1];
-            bretval = 1;
+            bretval = true;
             break;
         }
     }
@@ -1206,7 +1207,7 @@ bool SwapPlatformLanguageTexturePath(const char* apInPath, char* apOutPath, uint
             apOutPath[v17] = cslash_2;
             apOutPath[v17 + 1] = 0;
             psearch = &pfind_2[std::strlen(PipBoyLanguages[i_2]) + 1];
-            bretval = 1;
+            bretval = true;
             break;
         }
     }
@@ -1275,7 +1276,7 @@ bool SwapPlatformLanguageTextures(NiAVObject* ap3D) {
 
 bool RemoveScabard(NiNode* apNode) {
     if (!apNode) {
-        return 0;
+        return false;
     }
     for (uint32_t n = 0; n < apNode->GetArrayCount(); ++n) {
         NiAVObject* pobj = apNode->GetAt(n);
@@ -1284,7 +1285,7 @@ bool RemoveScabard(NiNode* apNode) {
             if (pname) {
                 if (!BSstricmp(pname, "Scb")) {
                     apNode->DetachChildAt(n);
-                    return 1;
+                    return true;
                 }
                 if (!_strnicmp(pname, "FadeNode ", 9u)) {
                     NiNode* v2 = pobj->IsNode();
@@ -1293,7 +1294,7 @@ bool RemoveScabard(NiNode* apNode) {
             }
         }
     }
-    return 0;
+    return false;
 }
 
 void SetPhase(NiNode* apNode, float afPhase) {
@@ -1303,7 +1304,7 @@ void SetPhase(NiNode* apNode, float afPhase) {
     for (NiTimeController* pController = apNode->GetControllers(); pController; pController = pController->GetNext()) {
         pController->SetPhase(afPhase);
     }
-    for (uint32_t i = 0; i < static_cast<uint32_t>(apNode->GetArrayCount()); ++i) {
+    for (uint32_t i = 0; i < apNode->GetArrayCount(); ++i) {
         NiAVObject* pChild = apNode->GetAt(i);
         if (pChild) {
             bool bNode;
@@ -1346,7 +1347,7 @@ void AddNoLightingPropertyRecurse(NiAVObject* apObject) {
                 v1 = ::new (apMemory) BSShaderNoLightingProperty;
             }
             else {
-                v1 = 0;
+                v1 = nullptr;
             }
             apObject->AttachProperty(v1);
         }
@@ -1384,7 +1385,7 @@ void PrepareObjectWithNoLightingRecurse(NiAVObject* apObject) {
             v1 = ::new (apMemory) BSShaderNoLightingProperty;
         }
         else {
-            v1 = 0;
+            v1 = nullptr;
         }
         v1->SetFlag(48u, 1);
         apObject->AttachProperty(v1);
@@ -1398,10 +1399,10 @@ float GetUnclampedZAngleFromVector(const NiPoint3& aDirection) {
     float v3;
     if ((&aDirection)->y == 0.0) {
         if (!((&aDirection)->x > 0.0)) {
-            return (float)4.71238899230957f;
+            return 4.71238899230957f;
         }
         else {
-            return (float)1.5707963705062866f;
+            return 1.5707963705062866f;
         }
     }
     else {
@@ -1415,7 +1416,7 @@ float GetUnclampedZAngleFromVector(const NiPoint3& aDirection) {
 }
 
 LANGUAGE GetCurrentTexLanguage() {
-    return static_cast<LANGUAGE>(GetCurrentLanguage());
+    return GetCurrentLanguage();
 }
 
 OBJECT_TYPE FormIDToObjectType(uint8_t acFormID) {
@@ -1949,7 +1950,7 @@ NiTriShape* MakeQuadBox(
         pverts_2 = pverts;
     }
     else {
-        pverts_2 = 0;
+        pverts_2 = nullptr;
     }
     *pverts_2 = aPoint1;
     pverts_2[1] = aPoint2;
@@ -1965,7 +1966,7 @@ NiTriShape* MakeQuadBox(
         pcolors_2 = pcolors;
     }
     else {
-        pcolors_2 = 0;
+        pcolors_2 = nullptr;
     }
     *pcolors_2 = aColor;
     pcolors_2[1] = aColor;
@@ -2054,7 +2055,7 @@ NiTriShape* MakeQuadBox(
             NiTriShape(8, pverts_2, nullptr, pcolors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 24, ptrilist);
     }
     else {
-        ptri = 0;
+        ptri = nullptr;
     }
     if (abWithNoLightingProp) {
         BSShaderNoLightingProperty* pshprop;
@@ -2064,7 +2065,7 @@ NiTriShape* MakeQuadBox(
             pshprop = ::new (pShader) BSShaderNoLightingProperty;
         }
         else {
-            pshprop = 0;
+            pshprop = nullptr;
         }
         ptri->AttachProperty(pshprop);
         BSShaderManager::PrepareObject(ptri, 0, 0);
@@ -2083,7 +2084,7 @@ MakeTriangle(NiPoint3 aPt1, NiPoint3 aPt2, NiPoint3 aPt3, const NiColorA& aColor
         pverts_2 = pverts;
     }
     else {
-        pverts_2 = 0;
+        pverts_2 = nullptr;
     }
     *pverts_2 = aPt1;
     pverts_2[1] = aPt2;
@@ -2094,7 +2095,7 @@ MakeTriangle(NiPoint3 aPt1, NiPoint3 aPt2, NiPoint3 aPt3, const NiColorA& aColor
         pcolors_2 = pcolors;
     }
     else {
-        pcolors_2 = 0;
+        pcolors_2 = nullptr;
     }
     *pcolors_2 = aColor;
     pcolors_2[1] = aColor;
@@ -2112,7 +2113,7 @@ MakeTriangle(NiPoint3 aPt1, NiPoint3 aPt2, NiPoint3 aPt3, const NiColorA& aColor
             NiTriShape(3, pverts_2, nullptr, pcolors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 2, ptrilist);
     }
     else {
-        ptri = 0;
+        ptri = nullptr;
     }
     if (abWithNoLightingProp) {
         BSShaderNoLightingProperty* pshprop;
@@ -2122,7 +2123,7 @@ MakeTriangle(NiPoint3 aPt1, NiPoint3 aPt2, NiPoint3 aPt3, const NiColorA& aColor
             pshprop = ::new (apMemory) BSShaderNoLightingProperty;
         }
         else {
-            pshprop = 0;
+            pshprop = nullptr;
         }
         ptri->AttachProperty(pshprop);
         BSShaderManager::PrepareObject(ptri, 0, 0);
@@ -2131,9 +2132,9 @@ MakeTriangle(NiPoint3 aPt1, NiPoint3 aPt2, NiPoint3 aPt3, const NiColorA& aColor
 }
 
 BSShaderPPLightingProperty* FindPerPixelLighting_Recurse(NiNode* apNode) {
-    BSShaderPPLightingProperty* pretprop = 0;
+    BSShaderPPLightingProperty* pretprop = nullptr;
     if (!apNode->GetArrayCount()) {
-        return 0;
+        return nullptr;
     }
     uint32_t icount = apNode->GetArrayCount();
     for (uint32_t iindex = 0; iindex < icount; ++iindex) {
@@ -2154,7 +2155,7 @@ BSShaderPPLightingProperty* FindPerPixelLighting_Recurse(NiNode* apNode) {
                         BSShaderPPLightingProperty* plighting =
                             pproperty->iShaderPropertyType >= 8 && pproperty->iShaderPropertyType <= 12
                             ? static_cast<BSShaderPPLightingProperty*>(pproperty)
-                            : 0;
+                            : nullptr;
                         if (plighting) {
                             return plighting;
                         }
@@ -2168,9 +2169,9 @@ BSShaderPPLightingProperty* FindPerPixelLighting_Recurse(NiNode* apNode) {
 
 bool RemoveEditorMarkers(NiNode* apNode) {
     const char* HandleString;
-    bool bretVal = 0;
+    bool bretVal = false;
     if (!apNode) {
-        return 0;
+        return false;
     }
     if (!kMarkerRemover.pRoot) {
         const NiFixedString* v2 = &BSXFlags::Tag();
@@ -2187,7 +2188,7 @@ bool RemoveEditorMarkers(NiNode* apNode) {
         }
     }
     if (!kMarkerRemover.pRoot) {
-        return 0;
+        return false;
     }
     if (!(&apNode->m_kName)->GetHandleString() ||
         (HandleString = (&apNode->m_kName)->GetHandleString(), BSstricmp(HandleString, "EditorMarker"))) {
@@ -2199,8 +2200,8 @@ bool RemoveEditorMarkers(NiNode* apNode) {
                     bretVal = RemoveEditorMarkers(pnode);
                     if (bretVal) {
                         if (kMarkerRemover.pRoot == apNode) {
-                            kMarkerRemover.pRoot = 0;
-                            kMarkerRemover.pPalette = 0;
+                            kMarkerRemover.pRoot = nullptr;
+                            kMarkerRemover.pPalette = nullptr;
                         }
                         return bretVal;
                     }
@@ -2208,31 +2209,31 @@ bool RemoveEditorMarkers(NiNode* apNode) {
             }
         }
         if (kMarkerRemover.pRoot == apNode) {
-            kMarkerRemover.pRoot = 0;
-            kMarkerRemover.pPalette = 0;
+            kMarkerRemover.pRoot = nullptr;
+            kMarkerRemover.pPalette = nullptr;
         }
         return bretVal;
     }
     else {
         if (kMarkerRemover.pPalette) {
             NiFixedString* g_EditorMarker = get_g_EditorMarker();
-            kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker, 0);
+            kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker, nullptr);
             NiFixedString* g_EditorMarker0 = get_g_EditorMarker0();
-            kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker0, 0);
+            kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker0, nullptr);
             NiFixedString* g_EditorMarker1 = get_g_EditorMarker1();
-            kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker1, 0);
+            kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker1, nullptr);
             NiFixedString* g_EditorMarker2 = get_g_EditorMarker2();
-            kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker2, 0);
+            kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker2, nullptr);
         }
         if (apNode->m_pkParent) {
             NiNode* Parent = apNode->m_pkParent;
             Parent->DetachChild(apNode);
         }
         if (kMarkerRemover.pRoot == apNode) {
-            kMarkerRemover.pRoot = 0;
-            kMarkerRemover.pPalette = 0;
+            kMarkerRemover.pRoot = nullptr;
+            kMarkerRemover.pPalette = nullptr;
         }
-        return 1;
+        return true;
     }
 }
 
@@ -2280,7 +2281,7 @@ void TintScenegraph(NiAVObject* apRoot, NiColor& aColor, void* apTextureEffectDa
             v11 = ::new (apMemory) BSShaderPPLightingProperty::TextureEffectData;
         }
         else {
-            v11 = 0;
+            v11 = nullptr;
         }
         spdata.operator=(v11);
         apTextureEffectData = (void*)spdata.m_pObject;
@@ -2347,7 +2348,7 @@ int32_t GetCollisionObjectIndexInSceneGraph(
 ) {
     bhkWorldNS::ObjectRecData recData;
     recData.eAction = bhkWorldNS::OA_TOTAL;
-    recData.bRecurse = 1;
+    recData.bRecurse = true;
     recData.uDataA[0].i = 0;
     recData.uDataA[1].p = apCollision;
     recData.uDataA[2].i = -1;
@@ -2396,7 +2397,7 @@ bhkNiCollisionObject* GetCollisionObjectByIndexInSceneGraph(
 ) {
     bhkWorldNS::ObjectRecData recData;
     recData.eAction = bhkWorldNS::OA_TOTAL;
-    recData.bRecurse = 1;
+    recData.bRecurse = true;
     recData.uDataA[0].i = 0;
     recData.uDataA[1].i = 0;
     recData.uDataA[2].i = aiIndex;
@@ -2417,7 +2418,7 @@ bhkNiCollisionObject* GetCollisionObjectByIndexInSceneGraph(
 int32_t GetHavokWorldObjectCountInSceneGraph(NiAVObject* apRoot) {
     bhkWorldNS::ObjectRecData recData;
     recData.eAction = bhkWorldNS::OA_TOTAL;
-    recData.bRecurse = 1;
+    recData.bRecurse = true;
     recData.uDataA[0].i = 0;
     bhkWorld::DoObjectRec(apRoot, recData, &GetHavokWorldObjectCount);
     return recData.uDataA[0].i;
@@ -2435,7 +2436,7 @@ void GetHavokWorldObjectCount(bhkNiCollisionObject* apCollision, bhkWorldNS::Obj
 int32_t GetHavokWorldObjectIndexInSceneGraph(NiAVObject* apRoot, hkpWorldObject* apWorldObject) {
     bhkWorldNS::ObjectRecData recData;
     recData.eAction = bhkWorldNS::OA_TOTAL;
-    recData.bRecurse = 1;
+    recData.bRecurse = true;
     recData.uDataA[0].i = 0;
     recData.uDataA[1].p = apWorldObject;
     recData.uDataA[2].i = -1;
@@ -2464,7 +2465,7 @@ void GetHavokWorldObjectIndex(bhkNiCollisionObject* apCollision, bhkWorldNS::Obj
 hkpWorldObject* GetHavokWorldObjectByIndexInSceneGraph(NiAVObject* apRoot, int32_t aiIndex) {
     bhkWorldNS::ObjectRecData recData;
     recData.eAction = bhkWorldNS::OA_TOTAL;
-    recData.bRecurse = 1;
+    recData.bRecurse = true;
     recData.uDataA[0].i = 0;
     recData.uDataA[1].i = 0;
     recData.uDataA[2].i = aiIndex;
@@ -2726,7 +2727,7 @@ void FixedStrings::InitSDM() {
         v53 = ::new (static_cast<void*>(v107)) NiFixedString("Bip01");
     }
     else {
-        v53 = 0;
+        v53 = nullptr;
     }
     FixedStrings::pBip01 = v53;
     NiFixedString* v106 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2734,7 +2735,7 @@ void FixedStrings::InitSDM() {
         v52 = ::new (static_cast<void*>(v106)) NiFixedString("Bip");
     }
     else {
-        v52 = 0;
+        v52 = nullptr;
     }
     FixedStrings::pBip = v52;
     NiFixedString* v105 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2742,7 +2743,7 @@ void FixedStrings::InitSDM() {
         v51 = ::new (static_cast<void*>(v105)) NiFixedString("Bip01 Head");
     }
     else {
-        v51 = 0;
+        v51 = nullptr;
     }
     FixedStrings::pBip01_Head = v51;
     NiFixedString* v104 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2750,7 +2751,7 @@ void FixedStrings::InitSDM() {
         v50 = ::new (static_cast<void*>(v104)) NiFixedString("Bip01 Neck");
     }
     else {
-        v50 = 0;
+        v50 = nullptr;
     }
     FixedStrings::pBip01_Neck = v50;
     NiFixedString* v103 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2758,7 +2759,7 @@ void FixedStrings::InitSDM() {
         v49 = ::new (static_cast<void*>(v103)) NiFixedString("Bip01 Spine");
     }
     else {
-        v49 = 0;
+        v49 = nullptr;
     }
     FixedStrings::Bip01_Spine = v49;
     NiFixedString* v102 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2766,7 +2767,7 @@ void FixedStrings::InitSDM() {
         v48 = ::new (static_cast<void*>(v102)) NiFixedString("Bip01 Spine1");
     }
     else {
-        v48 = 0;
+        v48 = nullptr;
     }
     FixedStrings::Bip01_Spine1 = v48;
     NiFixedString* v101 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2774,7 +2775,7 @@ void FixedStrings::InitSDM() {
         v47 = ::new (static_cast<void*>(v101)) NiFixedString("magicNode");
     }
     else {
-        v47 = 0;
+        v47 = nullptr;
     }
     FixedStrings::pMagicNode = v47;
     NiFixedString* v100 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2782,7 +2783,7 @@ void FixedStrings::InitSDM() {
         v46 = ::new (static_cast<void*>(v100)) NiFixedString("SpecialIdle_Cast");
     }
     else {
-        v46 = 0;
+        v46 = nullptr;
     }
     FixedStrings::SpecialIdle_Cast = v46;
     NiFixedString* v99 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2790,7 +2791,7 @@ void FixedStrings::InitSDM() {
         v45 = ::new (static_cast<void*>(v99)) NiFixedString("SpecialIdle_AreaEffect");
     }
     else {
-        v45 = 0;
+        v45 = nullptr;
     }
     FixedStrings::SpecialIdle_AreaEffect = v45;
     NiFixedString* v98 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2798,7 +2799,7 @@ void FixedStrings::InitSDM() {
         v44 = ::new (static_cast<void*>(v98)) NiFixedString("AttachSound");
     }
     else {
-        v44 = 0;
+        v44 = nullptr;
     }
     FixedStrings::AttachSound = v44;
     NiFixedString* v97 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2806,7 +2807,7 @@ void FixedStrings::InitSDM() {
         v43 = ::new (static_cast<void*>(v97)) NiFixedString("Sound Marker");
     }
     else {
-        v43 = 0;
+        v43 = nullptr;
     }
     FixedStrings::Sound_Marker = v43;
     NiFixedString* v96 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2814,7 +2815,7 @@ void FixedStrings::InitSDM() {
         v42 = ::new (static_cast<void*>(v96)) NiFixedString("Skinned Decal Node");
     }
     else {
-        v42 = 0;
+        v42 = nullptr;
     }
     FixedStrings::Skinned_Decal_Node = v42;
     NiFixedString* v95 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2822,7 +2823,7 @@ void FixedStrings::InitSDM() {
         v41 = ::new (static_cast<void*>(v95)) NiFixedString("Decal Node");
     }
     else {
-        v41 = 0;
+        v41 = nullptr;
     }
     FixedStrings::Decal_Node = v41;
     NiFixedString* v94 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2830,7 +2831,7 @@ void FixedStrings::InitSDM() {
         v40 = ::new (static_cast<void*>(v94)) NiFixedString("ModelSwapNode");
     }
     else {
-        v40 = 0;
+        v40 = nullptr;
     }
     FixedStrings::ModelSwapNode = v40;
     NiFixedString* v93 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2838,7 +2839,7 @@ void FixedStrings::InitSDM() {
         v39 = ::new (static_cast<void*>(v93)) NiFixedString("Open");
     }
     else {
-        v39 = 0;
+        v39 = nullptr;
     }
     FixedStrings::Open = v39;
     NiFixedString* v92 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2846,7 +2847,7 @@ void FixedStrings::InitSDM() {
         v38 = ::new (static_cast<void*>(v92)) NiFixedString("Close");
     }
     else {
-        v38 = 0;
+        v38 = nullptr;
     }
     FixedStrings::Close = v38;
     NiFixedString* v91 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2854,7 +2855,7 @@ void FixedStrings::InitSDM() {
         v37 = ::new (static_cast<void*>(v91)) NiFixedString("DVPG");
     }
     else {
-        v37 = 0;
+        v37 = nullptr;
     }
     BSDecalPlacementVectorExtraData::pTag = v37;
     NiFixedString* v90 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2862,7 +2863,7 @@ void FixedStrings::InitSDM() {
         v36 = ::new (static_cast<void*>(v90)) NiFixedString("Prn");
     }
     else {
-        v36 = 0;
+        v36 = nullptr;
     }
     FixedStrings::pPrn = v36;
     NiFixedString* v89 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2870,7 +2871,7 @@ void FixedStrings::InitSDM() {
         v35 = ::new (static_cast<void*>(v89)) NiFixedString("Weapon");
     }
     else {
-        v35 = 0;
+        v35 = nullptr;
     }
     FixedStrings::Weapon = v35;
     NiFixedString* v88 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2878,7 +2879,7 @@ void FixedStrings::InitSDM() {
         v34 = ::new (static_cast<void*>(v88)) NiFixedString("EditorMarker");
     }
     else {
-        v34 = 0;
+        v34 = nullptr;
     }
     FixedStrings::EditorMarker = v34;
     NiFixedString* v87 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2886,7 +2887,7 @@ void FixedStrings::InitSDM() {
         v33 = ::new (static_cast<void*>(v87)) NiFixedString("EditorMarker:0");
     }
     else {
-        v33 = 0;
+        v33 = nullptr;
     }
     FixedStrings::EditorMarker0 = v33;
     NiFixedString* v86 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2894,7 +2895,7 @@ void FixedStrings::InitSDM() {
         v32 = ::new (static_cast<void*>(v86)) NiFixedString("EditorMarker:1");
     }
     else {
-        v32 = 0;
+        v32 = nullptr;
     }
     FixedStrings::EditorMarker1 = v32;
     NiFixedString* v85 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2902,7 +2903,7 @@ void FixedStrings::InitSDM() {
         v31 = ::new (static_cast<void*>(v85)) NiFixedString("EditorMarker:2");
     }
     else {
-        v31 = 0;
+        v31 = nullptr;
     }
     FixedStrings::EditorMarker2 = v31;
     NiFixedString* v84 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2910,7 +2911,7 @@ void FixedStrings::InitSDM() {
         v30 = ::new (static_cast<void*>(v84)) NiFixedString("ArrowQuiver");
     }
     else {
-        v30 = 0;
+        v30 = nullptr;
     }
     FixedStrings::ArrowQuiver = v30;
     NiFixedString* v83 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2918,7 +2919,7 @@ void FixedStrings::InitSDM() {
         v29 = ::new (static_cast<void*>(v83)) NiFixedString("MarkerSource");
     }
     else {
-        v29 = 0;
+        v29 = nullptr;
     }
     FixedStrings::MarkerSource = v29;
     NiFixedString* v82 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2926,7 +2927,7 @@ void FixedStrings::InitSDM() {
         v28 = ::new (static_cast<void*>(v82)) NiFixedString("MarkerTarget");
     }
     else {
-        v28 = 0;
+        v28 = nullptr;
     }
     FixedStrings::MarkerTarget = v28;
     NiFixedString* v81 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2934,7 +2935,7 @@ void FixedStrings::InitSDM() {
         v27 = ::new (static_cast<void*>(v81)) NiFixedString("AttachLight");
     }
     else {
-        v27 = 0;
+        v27 = nullptr;
     }
     FixedStrings::pAttachLight = v27;
     NiFixedString* v80 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2942,7 +2943,7 @@ void FixedStrings::InitSDM() {
         v26 = ::new (static_cast<void*>(v80)) NiFixedString("skin");
     }
     else {
-        v26 = 0;
+        v26 = nullptr;
     }
     FixedStrings::pSkin = v26;
     NiFixedString* v79 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2950,7 +2951,7 @@ void FixedStrings::InitSDM() {
         v25 = ::new (static_cast<void*>(v79)) NiFixedString("FaceGenEars");
     }
     else {
-        v25 = 0;
+        v25 = nullptr;
     }
     FixedStrings::pFaceGenEars = v25;
     NiFixedString* v78 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2958,7 +2959,7 @@ void FixedStrings::InitSDM() {
         v24 = ::new (static_cast<void*>(v78)) NiFixedString("Unequip");
     }
     else {
-        v24 = 0;
+        v24 = nullptr;
     }
     FixedStrings::pUnequip = v24;
     NiFixedString* v77 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2966,7 +2967,7 @@ void FixedStrings::InitSDM() {
         v23 = ::new (static_cast<void*>(v77)) NiFixedString("LaserSight");
     }
     else {
-        v23 = 0;
+        v23 = nullptr;
     }
     FixedStrings::pLaserSight = v23;
     NiFixedString* v76 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2974,7 +2975,7 @@ void FixedStrings::InitSDM() {
         v22 = ::new (static_cast<void*>(v76)) NiFixedString("AimSight");
     }
     else {
-        v22 = 0;
+        v22 = nullptr;
     }
     FixedStrings::pAimSight = v22;
     NiFixedString* v75 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2982,7 +2983,7 @@ void FixedStrings::InitSDM() {
         v21 = ::new (static_cast<void*>(v75)) NiFixedString("Grass");
     }
     else {
-        v21 = 0;
+        v21 = nullptr;
     }
     FixedStrings::pGrass = v21;
     NiFixedString* v74 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2990,7 +2991,7 @@ void FixedStrings::InitSDM() {
         v20 = ::new (static_cast<void*>(v74)) NiFixedString(pcString);
     }
     else {
-        v20 = 0;
+        v20 = nullptr;
     }
     FixedStrings::pDecal = v20;
     NiFixedString* v73 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -2998,7 +2999,7 @@ void FixedStrings::InitSDM() {
         v19 = ::new (static_cast<void*>(v73)) NiFixedString("Permanent Decal");
     }
     else {
-        v19 = 0;
+        v19 = nullptr;
     }
     FixedStrings::pPermanentDecal = v19;
     NiFixedString* v72 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3006,7 +3007,7 @@ void FixedStrings::InitSDM() {
         v18 = ::new (static_cast<void*>(v72)) NiFixedString("grabLeft");
     }
     else {
-        v18 = 0;
+        v18 = nullptr;
     }
     FixedStrings::pGrabLeft = v18;
     NiFixedString* v71 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3014,7 +3015,7 @@ void FixedStrings::InitSDM() {
         v17 = ::new (static_cast<void*>(v71)) NiFixedString("grabRight");
     }
     else {
-        v17 = 0;
+        v17 = nullptr;
     }
     FixedStrings::pGrabRight = v17;
     NiFixedString* v70 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3022,7 +3023,7 @@ void FixedStrings::InitSDM() {
         v16 = ::new (static_cast<void*>(v70)) NiFixedString("Arrow:0");
     }
     else {
-        v16 = 0;
+        v16 = nullptr;
     }
     FixedStrings::pArrow0 = v16;
     NiFixedString* v69 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3030,7 +3031,7 @@ void FixedStrings::InitSDM() {
         v15 = ::new (static_cast<void*>(v69)) NiFixedString("ArrowBone");
     }
     else {
-        v15 = 0;
+        v15 = nullptr;
     }
     FixedStrings::pArrowBone = v15;
     NiFixedString* v68 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3038,7 +3039,7 @@ void FixedStrings::InitSDM() {
         v14 = ::new (static_cast<void*>(v68)) NiFixedString("BSFaceGenNiNodeBiped");
     }
     else {
-        v14 = 0;
+        v14 = nullptr;
     }
     FixedStrings::pRaceHeadBiped = v14;
     NiFixedString* v67 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3046,7 +3047,7 @@ void FixedStrings::InitSDM() {
         v13 = ::new (static_cast<void*>(v67)) NiFixedString("BSFaceGenNiNodeSkinned");
     }
     else {
-        v13 = 0;
+        v13 = nullptr;
     }
     FixedStrings::pRaceHeadSkinned = v13;
     NiFixedString* v66 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3054,7 +3055,7 @@ void FixedStrings::InitSDM() {
         v12 = ::new (static_cast<void*>(v66)) NiFixedString("HeadAnims:0");
     }
     else {
-        v12 = 0;
+        v12 = nullptr;
     }
     FixedStrings::pHeadAnims = v12;
     NiFixedString* v65 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3062,7 +3063,7 @@ void FixedStrings::InitSDM() {
         v11 = ::new (static_cast<void*>(v65)) NiFixedString("EntryPoint");
     }
     else {
-        v11 = 0;
+        v11 = nullptr;
     }
     FixedStrings::pEntryPoint = v11;
     NiFixedString* v64 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3070,7 +3071,7 @@ void FixedStrings::InitSDM() {
         v10 = ::new (static_cast<void*>(v64)) NiFixedString("Bip01 L UpperArm");
     }
     else {
-        v10 = 0;
+        v10 = nullptr;
     }
     FixedStrings::pBip01LUpperArm = v10;
     NiFixedString* v63 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3078,7 +3079,7 @@ void FixedStrings::InitSDM() {
         v9 = ::new (static_cast<void*>(v63)) NiFixedString("Bip01 L Forearm");
     }
     else {
-        v9 = 0;
+        v9 = nullptr;
     }
     FixedStrings::pBip01LForearm = v9;
     NiFixedString* v62 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3086,7 +3087,7 @@ void FixedStrings::InitSDM() {
         v8 = ::new (static_cast<void*>(v62)) NiFixedString("Bip01 R UpperArm");
     }
     else {
-        v8 = 0;
+        v8 = nullptr;
     }
     FixedStrings::pBip01RUpperArm = v8;
     NiFixedString* v61 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3094,7 +3095,7 @@ void FixedStrings::InitSDM() {
         v7 = ::new (static_cast<void*>(v61)) NiFixedString("Bip01 Yaw");
     }
     else {
-        v7 = 0;
+        v7 = nullptr;
     }
     FixedStrings::pBip01Yaw = v7;
     NiFixedString* v60 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3102,7 +3103,7 @@ void FixedStrings::InitSDM() {
         v6 = ::new (static_cast<void*>(v60)) NiFixedString("Bip01 Pitch");
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     FixedStrings::pBip01Pitch = v6;
     NiFixedString* v59 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3110,7 +3111,7 @@ void FixedStrings::InitSDM() {
         v5 = ::new (static_cast<void*>(v59)) NiFixedString("Bip01 Looking");
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     FixedStrings::pBip01Looking = v5;
     NiFixedString* v58 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3118,7 +3119,7 @@ void FixedStrings::InitSDM() {
         v4 = ::new (static_cast<void*>(v58)) NiFixedString("Talking");
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     FixedStrings::pTalking = v4;
     NiFixedString* v57 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3126,7 +3127,7 @@ void FixedStrings::InitSDM() {
         v3 = ::new (static_cast<void*>(v57)) NiFixedString("Camera1st");
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     FixedStrings::pCamera1st = v3;
     NiFixedString* v56 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3134,7 +3135,7 @@ void FixedStrings::InitSDM() {
         v2 = ::new (static_cast<void*>(v56)) NiFixedString("Camera3rd");
     }
     else {
-        v2 = 0;
+        v2 = nullptr;
     }
     FixedStrings::pCamera3rd = v2;
     NiFixedString* v55 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3142,7 +3143,7 @@ void FixedStrings::InitSDM() {
         v1 = ::new (static_cast<void*>(v55)) NiFixedString("HeadMeshForExport_FaceGenAndMorphs:0");
     }
     else {
-        v1 = 0;
+        v1 = nullptr;
     }
     FixedStrings::pHeadMeshExp = v1;
     NiFixedString* v54 = static_cast<NiFixedString*>(ourMalloc(sizeof(NiFixedString)));
@@ -3150,7 +3151,7 @@ void FixedStrings::InitSDM() {
         v0 = ::new (static_cast<void*>(v54)) NiFixedString("PinnedLimb");
     }
     else {
-        v0 = 0;
+        v0 = nullptr;
     }
     FixedStrings::pPinnedLimb = v0;
 }

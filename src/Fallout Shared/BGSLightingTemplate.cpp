@@ -69,7 +69,7 @@ void BGSLightingTemplate::Save() {
 void BGSLightingTemplate::InitItem() {
     if (!TESForm::GetInitialized()) {
         TESForm::InitializeDataComponent();
-        TESForm::SetInitialized(1);
+        TESForm::SetInitialized(true);
     }
 }
 
@@ -86,12 +86,12 @@ bool BGSLightingTemplate::Compare(TESForm* apCompare) {
         FNVD_DYNAMIC_CAST_VOID(BGSLightingTemplate)(apCompare, RTTI_TESForm, RTTI_BGSLightingTemplate)
     );
     if (!v4) {
-        return 1;
+        return true;
     }
     if (!std::memcmp(&Data, &v4[1], sizeof(Data))) {
         return CompareAllComponents(v4);
     }
-    return 1;
+    return true;
 }
 
 float BGSLightingTemplate::GetDataFogFarPlane() {

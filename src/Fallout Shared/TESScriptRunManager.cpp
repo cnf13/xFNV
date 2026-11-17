@@ -311,7 +311,7 @@ bool ScriptRunner::EvaluateLine(
                 "Invalid script block for BEGIN on line %i of script '%s' (%08X).", auiCurrentLine,
                 apScript->GetFormEditorID(), afValue
             );
-            return 0;
+            return false;
         }
         uint32_t ibeginEndJumpDelta = *reinterpret_cast<uint32_t*>(&pCompiledData[uiCurrentOffset]);
         uiCurrentOffset += 4;
@@ -333,7 +333,7 @@ bool ScriptRunner::EvaluateLine(
                     "SCRIPTS: Script '%s', line %d: Null for a required ref pointer.", apScript->GetFormEditorID(),
                     auiCurrentLine
                 );
-                return 0;
+                return false;
             }
             if (!pExecute ||
                 !pExecute(
@@ -345,7 +345,7 @@ bool ScriptRunner::EvaluateLine(
                 Warning(
                     "SCRIPTS: Script '%s', line %d: Error Executing line (Offset %d).", v11, auiCurrentLine, afValuea
                 );
-                return 0;
+                return false;
             }
             if (0.0 == fVal || abActionInit) {
                 aiLineSize += ibeginEndJumpDelta;
@@ -358,7 +358,7 @@ bool ScriptRunner::EvaluateLine(
                 case FLOW_END:
                 case FLOW_REFERENCE_FUNCTION:
                 case FLOW_SCRIPTNAME: {
-                    return 1;
+                    return true;
                 }
                 case FLOW_SET: {
                     TESObjectREFR* pRefForm;
@@ -367,7 +367,7 @@ bool ScriptRunner::EvaluateLine(
                     int16_t sVariableID = 0;
                     // One variable holds the running script's locals unless the SET names another object's.
                     ScriptLocals* pScriptLocals = m_currentVars;
-                    Script::RefVariable* pRefObj = 0;
+                    Script::RefVariable* pRefObj = nullptr;
                     if (cType != 71 && cType != 114) {
                         goto LABEL_37;
                     }
@@ -386,7 +386,7 @@ bool ScriptRunner::EvaluateLine(
                             "Missing ref object in SET on line %i of script '%s' (%08X).", auiCurrentLine,
                             apScript->GetFormEditorID(), afValuec
                         );
-                        return 0;
+                        return false;
                     }
                     pRefForm = dynamic_cast<TESObjectREFR*>(pRefObj->form);
                     if (pRefForm) {
@@ -404,7 +404,7 @@ bool ScriptRunner::EvaluateLine(
                             "Missing script variables on object for SET on line %i of script '%s' (%08X).",
                             auiCurrentLine, apScript->GetFormEditorID(), afValueb
                         );
-                        return 0;
+                        return false;
                     }
                 LABEL_37:;
                     if (cType != 71) {
@@ -425,7 +425,7 @@ bool ScriptRunner::EvaluateLine(
                             apScript->GetFormEditorID(), auiCurrentLine, expressionErrors[ce.m_ExpressionError]
                         );
                         (&apScript->m_header)->dataSize = 0;
-                        return 0;
+                        return false;
                     }
                     if (abEndian) {
                         goto LABEL_74;
@@ -437,7 +437,7 @@ bool ScriptRunner::EvaluateLine(
                                 "Invalid variable type for SET on line %i of script '%s' (%08X).", auiCurrentLine,
                                 apScript->GetFormEditorID(), afValued
                             );
-                            return 0;
+                            return false;
                         }
                         float val_2 = val;
                         static_cast<TESGlobal*>(pRefObj->form)->TESGlobal::SetValue(val_2);
@@ -453,7 +453,7 @@ bool ScriptRunner::EvaluateLine(
                                 "Missing scriptvariables for object in SET on line %i of script '%s' (%08X).",
                                 auiCurrentLine, apScript->GetFormEditorID(), afValuee
                             );
-                            return 0;
+                            return false;
                         }
                         if (cType == 102) {
                             pScriptLocals->SetVariable(sVariableID, val);
@@ -475,7 +475,7 @@ bool ScriptRunner::EvaluateLine(
                             }
                         }
                         if ((pRefObj && pRefObj->form) || apFunctionOwner) {
-                            TESObjectREFR* pref = 0;
+                            TESObjectREFR* pref = nullptr;
                             if (pRefObj) {
                                 if (pRefObj->form) {
                                     if (pRefObj->form->IsReference()) {
@@ -495,7 +495,7 @@ bool ScriptRunner::EvaluateLine(
                         }
                     }
                 LABEL_74:;
-                    return 1;
+                    return true;
                 }
                 case FLOW_IF: {
                     if (m_ifFlags[m_ifNested]) {
@@ -515,7 +515,7 @@ bool ScriptRunner::EvaluateLine(
                     else {
                         m_ifFlags[m_ifNested] |= 2;
                     }
-                    return 1;
+                    return true;
                 }
                 case FLOW_ELSEIF: {
                 LABEL_78:;
@@ -535,7 +535,7 @@ bool ScriptRunner::EvaluateLine(
                         if ((m_ifFlags[m_ifNested] & 2) != 0 ||
                             ce_2.Eval(
                                 &pCompiledData[uiCurrentOffset], apFunctionOwner, m_currentContainer, apScript,
-                                m_currentVars, uiSize, 0
+                                m_currentVars, uiSize, false
                             ) == 0.0) {
                             aiSkipLines += iBlockLines;
                         }
@@ -551,21 +551,21 @@ bool ScriptRunner::EvaluateLine(
                         );
                         (&apScript->m_header)->dataSize = 0;
                         m_expError = ce_2.m_ExpressionError;
-                        return 0;
+                        return false;
                     }
                     uiCurrentOffset += uiSize;
-                    return 1;
+                    return true;
                 }
                 case FLOW_ENDIF: {
                     m_ifFlags[m_ifNested] = 0;
                     if (m_ifNested) {
                         --m_ifNested;
                     }
-                    return 1;
+                    return true;
                 }
                 case FLOW_RETURN: {
                     if (abEndian) {
-                        return 1;
+                        return true;
                     }
                     goto LABEL_96;
                 }
@@ -584,7 +584,7 @@ bool ScriptRunner::EvaluateLine(
                         else {
                             Warning(message.pString);
                         }
-                        return 0;
+                        return false;
                     }
                     SCRIPT_PARAMETER* pParameterDef_2 = pFunctionDef->pParameters;
                     if (pFunctionDef->bReferenceFunction && (!apFunctionOwner && !abEndian)) {
@@ -599,7 +599,7 @@ bool ScriptRunner::EvaluateLine(
                         else {
                             Warning(message_2.pString);
                         }
-                        return 0;
+                        return false;
                     }
                     if (abEndian) {
                         if (pParameterDef_2) {
@@ -615,7 +615,7 @@ bool ScriptRunner::EvaluateLine(
                                         double dtmp;
                                         Script::GetValue(
                                             dtmp, pCompiledData, uiCurrentOffset, apFunctionOwner, m_currentContainer,
-                                            apScript, m_currentVars, 1
+                                            apScript, m_currentVars, true
                                         );
                                     }
                                     uiCurrentOffset += 4;
@@ -626,7 +626,7 @@ bool ScriptRunner::EvaluateLine(
                     else {
                         auto pExecute_2 = pFunctionDef->pExecuteFunction;
                         if (pFunctionDef->bInvalidatesCellList) {
-                            m_bStopObjectScriptExecution = 1;
+                            m_bStopObjectScriptExecution = true;
                         }
                         if (!pExecute_2 ||
                             !pExecute_2(
@@ -639,7 +639,7 @@ bool ScriptRunner::EvaluateLine(
                                 "Failed to execute function '%s' on line %i of script '%s' (%08X).",
                                 pFunctionDef->pFunctionName, auiCurrentLine, v12, afValuef
                             );
-                            return 0;
+                            return false;
                         }
                     }
                     break;
@@ -647,7 +647,7 @@ bool ScriptRunner::EvaluateLine(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 void ScriptRunner::ScriptError(Script* apScript, const char* text, ...) {
@@ -700,7 +700,7 @@ bool ScriptRunManager::Run(
                 v11 = ::new (v14) ScriptRunner();
             }
             else {
-                v11 = 0;
+                v11 = nullptr;
             }
             m_pScriptRunner = v11;
         }
@@ -709,7 +709,7 @@ bool ScriptRunManager::Run(
             apScript, apOwnerObject, apOwnerVars, apOwnerContainer, abIsPartialScript, abScriptEffectStart,
             abScriptEffectFinish, afSecondsElapsed
         );
-        pCurrentRunner = 0;
+        pCurrentRunner = nullptr;
     }
     else {
         ScriptRunner* pNewRunner;
@@ -718,7 +718,7 @@ bool ScriptRunManager::Run(
             pNewRunner = ::new (v13) ScriptRunner();
         }
         else {
-            pNewRunner = 0;
+            pNewRunner = nullptr;
         }
         ScriptRunner* pOldRunner = pCurrentRunner;
         pCurrentRunner = pNewRunner;

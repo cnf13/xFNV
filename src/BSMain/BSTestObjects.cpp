@@ -70,7 +70,7 @@ NiAVObject* BSTestObjects::CreateDirArrow(const NiPoint3& arDir, const NiColorA*
         vertex = v53;
     }
     else {
-        vertex = 0;
+        vertex = nullptr;
     }
     float v50 = 0.0f;
     float v51 = 0.0f;
@@ -117,7 +117,7 @@ NiAVObject* BSTestObjects::CreateDirArrow(const NiPoint3& arDir, const NiColorA*
         color_2 = color;
     }
     else {
-        color_2 = 0;
+        color_2 = nullptr;
     }
     *color_2 = *apColor;
     color_2[1] = *apColor;
@@ -159,7 +159,7 @@ NiAVObject* BSTestObjects::CreateDirArrow(const NiPoint3& arDir, const NiColorA*
         lines = ::new (v23) NiLines(5, vertex, color_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, flag);
     }
     else {
-        lines = 0;
+        lines = nullptr;
     }
     lines->m_kLocal.m_Translate = NiPoint3_ZERO;
     lines->m_kLocal.m_Rotate = NiMatrix3_IDENTITY;
@@ -202,7 +202,7 @@ NiAVObject* BSTestObjects::CreateCylinder(
         vertices = v64;
     }
     else {
-        vertices = 0;
+        vertices = nullptr;
     }
     NiPoint3* v61 = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(
         arraySize <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * arraySize : SIZE_MAX
@@ -215,7 +215,7 @@ NiAVObject* BSTestObjects::CreateCylinder(
         normals = v61;
     }
     else {
-        normals = 0;
+        normals = nullptr;
     }
     if (apColor) {
         NiColorA* v23;
@@ -233,12 +233,12 @@ NiAVObject* BSTestObjects::CreateCylinder(
             v23 = v58;
         }
         else {
-            v23 = 0;
+            v23 = nullptr;
         }
         colors = v23;
     }
     else {
-        colors = 0;
+        colors = nullptr;
     }
     NiPoint2* v55 = static_cast<NiPoint2*>(MemoryManager_Singleton.Allocate(
         arraySize <= SIZE_MAX / sizeof(NiPoint2) ? sizeof(NiPoint2) * arraySize : SIZE_MAX
@@ -251,7 +251,7 @@ NiAVObject* BSTestObjects::CreateCylinder(
         textures = v55;
     }
     else {
-        textures = 0;
+        textures = nullptr;
     }
     uint16_t* stripLengths = static_cast<uint16_t*>(MemoryManager_Singleton.Allocate(
         aiStacks <= SIZE_MAX / sizeof(uint16_t) ? sizeof(uint16_t) * aiStacks : SIZE_MAX
@@ -351,7 +351,7 @@ NiAVObject* BSTestObjects::CreateCylinder(
         );
     }
     else {
-        cylinder = 0;
+        cylinder = nullptr;
     }
     if ("BSTestObjects Cylinder") {
         v34.m_kHandle = NiGlobalStringTable::AddString("BSTestObjects Cylinder");
@@ -552,7 +552,7 @@ NiAVObject* BSTestObjects::CreateBox(
         vertices = v119;
     }
     else {
-        vertices = 0;
+        vertices = nullptr;
     }
     NiPoint3 horizontalVector = arLeftCorner - arRightCorner;
     verticalVector.x = 0.0f;
@@ -649,7 +649,7 @@ NiAVObject* BSTestObjects::CreateBox(
     v76.y = v20;
     v76.z = v21;
     vertices[7] = v76 + downwardHeightVector;
-    NiColorA* colors_2 = 0;
+    NiColorA* colors_2 = nullptr;
     if (apLeftColor || apRightColor) {
         NiColorA* colors;
         void* ptr = MemoryManager_Singleton.Allocate(8 * sizeof(NiColorA));
@@ -658,7 +658,7 @@ NiAVObject* BSTestObjects::CreateBox(
             colors = static_cast<NiColorA*>(ptr);
         }
         else {
-            colors = 0;
+            colors = nullptr;
         }
         colors_2 = colors;
         if (!apLeftColor || apRightColor) {
@@ -686,7 +686,7 @@ NiAVObject* BSTestObjects::CreateBox(
             NiTriShape(8, vertices, nullptr, colors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 12, indices);
     }
     else {
-        shape = 0;
+        shape = nullptr;
     }
     shape->CalculateNormals();
     return shape;
@@ -715,7 +715,7 @@ NiAVObject* BSTestObjects::CreateCoordinateJack(float afScale) {
         vertex = v38;
     }
     else {
-        vertex = 0;
+        vertex = nullptr;
     }
     float v35 = 0.0f;
     float v36 = 0.0f;
@@ -767,7 +767,7 @@ NiAVObject* BSTestObjects::CreateCoordinateJack(float afScale) {
         color = v18;
     }
     else {
-        color = 0;
+        color = nullptr;
     }
     *color = BSTestObjects::RED;
     color[1] = BSTestObjects::RED;
@@ -787,7 +787,7 @@ NiAVObject* BSTestObjects::CreateCoordinateJack(float afScale) {
         lines = ::new (v15) NiLines(6, vertex, color, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, flag);
     }
     else {
-        lines = 0;
+        lines = nullptr;
     }
     lines->m_kLocal.m_Translate = NiPoint3_ZERO;
     lines->m_kLocal.m_Rotate = NiMatrix3_IDENTITY;
@@ -829,7 +829,7 @@ NiAVObject* BSTestObjects::Create3DArrow(
         parrow = ::new (apMemory) NiNode(0);
     }
     else {
-        parrow = 0;
+        parrow = nullptr;
     }
     NiPoint3 arrowVector = arFinish - arStart;
     float flength = arrowVector.UnitizeGetLength();
@@ -862,7 +862,7 @@ NiAVObject* BSTestObjects::Create3DArrow(
         vertices = v28;
     }
     else {
-        vertices = 0;
+        vertices = nullptr;
     }
     verticalVector.x = 0.0f;
     verticalVector.y = 0.0f;
@@ -920,12 +920,12 @@ NiAVObject* BSTestObjects::Create3DArrow(
             v9 = v27;
         }
         else {
-            v9 = 0;
+            v9 = nullptr;
         }
         colors = v9;
     }
     else {
-        colors = 0;
+        colors = nullptr;
     }
     if (colors) {
         for (uint32_t i_2 = 0; i_2 < 6; ++i_2) {
@@ -940,7 +940,7 @@ NiAVObject* BSTestObjects::Create3DArrow(
             NiTriShape(6, vertices, nullptr, colors, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 8, indices);
     }
     else {
-        phead = 0;
+        phead = nullptr;
     }
     phead->CalculateNormals();
     parrow->AttachChild(phead, 1);
@@ -972,7 +972,7 @@ NiTriShape* BSTestObjects::MakeTexturedSquare(float afRadius, NiPoint3* apCenter
         v9 = v31;
     }
     else {
-        v9 = 0;
+        v9 = nullptr;
     }
     NiPoint3* v30 = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(4 * sizeof(NiPoint3)));
     if (v30) {
@@ -983,7 +983,7 @@ NiTriShape* BSTestObjects::MakeTexturedSquare(float afRadius, NiPoint3* apCenter
         v8 = v30;
     }
     else {
-        v8 = 0;
+        v8 = nullptr;
     }
     if (apColor) {
         NiColorA* v7;
@@ -999,12 +999,12 @@ NiTriShape* BSTestObjects::MakeTexturedSquare(float afRadius, NiPoint3* apCenter
             v7 = v29;
         }
         else {
-            v7 = 0;
+            v7 = nullptr;
         }
         v6 = v7;
     }
     else {
-        v6 = 0;
+        v6 = nullptr;
     }
     NiPoint2* v28 = static_cast<NiPoint2*>(MemoryManager_Singleton.Allocate(4 * sizeof(NiPoint2)));
     if (v28) {
@@ -1015,7 +1015,7 @@ NiTriShape* BSTestObjects::MakeTexturedSquare(float afRadius, NiPoint3* apCenter
         v5 = v28;
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     uint16_t* pusTriList = static_cast<uint16_t*>(MemoryManager_Singleton.Allocate(6 * sizeof(uint16_t)));
     float v26 = x - afRadius;
@@ -1073,7 +1073,7 @@ NiTriShape* BSTestObjects::MakeTexturedSquare(float afRadius, NiPoint3* apCenter
         v4 = ::new (apMemory) NiTriShape(4, v9, v8, v6, v5, 0, NiGeometryData::NBT_METHOD_NONE, 2, pusTriList);
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     v4->CalculateNormals();
     return v4;
@@ -1119,7 +1119,7 @@ NiAVObject* BSTestObjects::CreateBox(const NiPoint3& arExtents, const NiColorA* 
         vertices_2 = vertices;
     }
     else {
-        vertices_2 = 0;
+        vertices_2 = nullptr;
     }
     for (int32_t j = 0; j < 8; ++j) {
         float v8 = BoxPoints[j].x * arExtents.x;
@@ -1143,12 +1143,12 @@ NiAVObject* BSTestObjects::CreateBox(const NiPoint3& arExtents, const NiColorA* 
             colors = v15;
         }
         else {
-            colors = 0;
+            colors = nullptr;
         }
         colors_2 = colors;
     }
     else {
-        colors_2 = 0;
+        colors_2 = nullptr;
     }
     if (colors_2) {
         for (uint32_t i_2 = 0; i_2 < 8; ++i_2) {
@@ -1163,7 +1163,7 @@ NiAVObject* BSTestObjects::CreateBox(const NiPoint3& arExtents, const NiColorA* 
             NiTriShape(8, vertices_2, nullptr, colors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 12, pusTriList);
     }
     else {
-        shape = 0;
+        shape = nullptr;
     }
     shape->CalculateNormals();
     return shape;
@@ -1187,7 +1187,7 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
         sphere = ::new (apMemory) NiNode(0);
     }
     else {
-        sphere = 0;
+        sphere = nullptr;
     }
     if ("BSTestObjects Sphere") {
         v131.m_kHandle = NiGlobalStringTable::AddString("BSTestObjects Sphere");
@@ -1215,7 +1215,7 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
         vertices = v130;
     }
     else {
-        vertices = 0;
+        vertices = nullptr;
     }
     NiPoint3* vertices_3 = vertices;
     NiPoint3* v129 = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(
@@ -1230,7 +1230,7 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
         normals = v129;
     }
     else {
-        normals = 0;
+        normals = nullptr;
     }
     NiPoint3* normals_3 = normals;
     if (apColor) {
@@ -1251,12 +1251,12 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
             v70 = v128;
         }
         else {
-            v70 = 0;
+            v70 = nullptr;
         }
         colors = v70;
     }
     else {
-        colors = 0;
+        colors = nullptr;
     }
     NiColorA* colors_3 = colors;
     NiPoint2* v127 = static_cast<NiPoint2*>(MemoryManager_Singleton.Allocate(
@@ -1271,7 +1271,7 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
         textures = v127;
     }
     else {
-        textures = 0;
+        textures = nullptr;
     }
     NiPoint2* textures_3 = textures;
     uint16_t* indices = static_cast<uint16_t*>(MemoryManager_Singleton.Allocate(
@@ -1425,7 +1425,7 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
         );
     }
     else {
-        caps = 0;
+        caps = nullptr;
     }
     caps->CalculateNormals();
     sphere->AttachChild(caps, 1);
@@ -1444,7 +1444,7 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
         vertices_2 = v110;
     }
     else {
-        vertices_2 = 0;
+        vertices_2 = nullptr;
     }
     vertices_3 = vertices_2;
     NiPoint3* v108 = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(
@@ -1458,7 +1458,7 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
         normals_2 = v108;
     }
     else {
-        normals_2 = 0;
+        normals_2 = nullptr;
     }
     normals_3 = normals_2;
     if (apColor) {
@@ -1477,12 +1477,12 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
             v51 = v106;
         }
         else {
-            v51 = 0;
+            v51 = nullptr;
         }
         colors_2 = v51;
     }
     else {
-        colors_2 = 0;
+        colors_2 = nullptr;
     }
     colors_3 = colors_2;
     NiPoint2* v104 = static_cast<NiPoint2*>(MemoryManager_Singleton.Allocate(
@@ -1496,7 +1496,7 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
         textures_2 = v104;
     }
     else {
-        textures_2 = 0;
+        textures_2 = nullptr;
     }
     textures_3 = textures_2;
     uint16_t* stripLengths = static_cast<uint16_t*>(MemoryManager_Singleton.Allocate(
@@ -1598,7 +1598,7 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
         );
     }
     else {
-        strips = 0;
+        strips = nullptr;
     }
     strips->CalculateNormals();
     sphere->AttachChild(strips, 1);
@@ -1619,7 +1619,7 @@ NiAVObject* BSTestObjects::CreateCircle(float afRadius, uint16_t asSegments, con
         pvertices_2 = pvertices;
     }
     else {
-        pvertices_2 = 0;
+        pvertices_2 = nullptr;
     }
     uint8_t* pflags = static_cast<uint8_t*>(MemoryManager_Singleton.Allocate(asSegments));
     if (apColor) {
@@ -1638,12 +1638,12 @@ NiAVObject* BSTestObjects::CreateCircle(float afRadius, uint16_t asSegments, con
             pcolors = v19;
         }
         else {
-            pcolors = 0;
+            pcolors = nullptr;
         }
         pcolors_2 = pcolors;
     }
     else {
-        pcolors_2 = 0;
+        pcolors_2 = nullptr;
     }
     for (uint32_t i_2 = 0; i_2 < asSegments; ++i_2) {
         if (pcolors_2) {
@@ -1667,7 +1667,7 @@ NiAVObject* BSTestObjects::CreateCircle(float afRadius, uint16_t asSegments, con
             NiLines(asSegments, pvertices_2, pcolors_2, nullptr, 1, NiGeometryData::NBT_METHOD_NONE, pflags);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -1687,7 +1687,7 @@ NiAVObject* BSTestObjects::CreateArrow(float afLength, const NiColorA* apColor) 
         vertex = v32;
     }
     else {
-        vertex = 0;
+        vertex = nullptr;
     }
     float v29 = 0.0f;
     float v30 = 0.0f;
@@ -1732,7 +1732,7 @@ NiAVObject* BSTestObjects::CreateArrow(float afLength, const NiColorA* apColor) 
         color_2 = color;
     }
     else {
-        color_2 = 0;
+        color_2 = nullptr;
     }
     *color_2 = *apColor;
     color_2[1] = *apColor;
@@ -1750,7 +1750,7 @@ NiAVObject* BSTestObjects::CreateArrow(float afLength, const NiColorA* apColor) 
         lines = ::new (v14) NiLines(5, vertex, color_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, flag);
     }
     else {
-        lines = 0;
+        lines = nullptr;
     }
     lines->m_kLocal.m_Translate = NiPoint3_ZERO;
     lines->m_kLocal.m_Rotate = NiMatrix3_IDENTITY;

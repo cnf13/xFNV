@@ -77,7 +77,7 @@
 
 #include <cmath>
 #include <cstdarg>
-#include <stdint.h>
+#include <cstdint>
 
 NiPointer<NiCamera> SPECIALBookMenu::sp3DCamera;
 
@@ -90,7 +90,7 @@ void SPECIALBookDoneCallback() {
     else {
         BSAudio* v0 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v0->GetSoundHandleByName(&a1, "UIActivateNothing", 289u);
-        SoundHandleByName->Play(0);
+        SoundHandleByName->Play(false);
     }
 }
 
@@ -171,16 +171,16 @@ void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
     FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
-    bool bPageTurned = 0;
+    bool bPageTurned = false;
     switch (a1) {
         case 0:
         case 1: {
             if (bAnimFinished) {
                 if (a1) {
-                    bPageTurned = TurnPage(0);
+                    bPageTurned = TurnPage(false);
                 }
                 else {
-                    bPageTurned = TurnPage(1);
+                    bPageTurned = TurnPage(true);
                 }
                 CallPageCallbacks();
             }
@@ -230,7 +230,7 @@ void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
                 BSAudio* v11 = &BSAudio::QInstance();
                 BSSoundHandle* SoundHandleByName = v11->GetSoundHandleByName(&arHandle, "OBJBookSpecialNumber", 289u);
                 psoundHand.operator=(*SoundHandleByName);
-                psoundHand.Play(0);
+                psoundHand.Play(false);
             }
             CallPageCallbacks();
             break;
@@ -242,7 +242,7 @@ void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
             else {
                 BSAudio* v4 = &BSAudio::QInstance();
                 BSSoundHandle* v23 = v4->GetSoundHandleByName(&a12, "UIActivateNothing", 289u);
-                v23->Play(0);
+                v23->Play(false);
             }
             break;
         }
@@ -268,12 +268,12 @@ void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
                         break;
                     }
                     NiPick activatePick(0, 8u);
-                    activatePick.SetObserveAppCullFlag(1);
+                    activatePick.SetObserveAppCullFlag(true);
                     activatePick.SetTarget(Pages[eState].Buttons.operator[](iindex)->spButton.m_pObject);
                     activatePick.m_eSortType = NiPick::SORT;
-                    activatePick.SetIsReturnTexture(1);
-                    SPECIALBookMenu::sp3DCamera.m_pObject->WindowPointToRay(cx, cy, origin, dir, 0);
-                    if (activatePick.PickObjects(origin, dir, 0)) {
+                    activatePick.SetIsReturnTexture(true);
+                    SPECIALBookMenu::sp3DCamera.m_pObject->WindowPointToRay(cx, cy, origin, dir, nullptr);
+                    if (activatePick.PickObjects(origin, dir, false)) {
                         uint32_t uiIndex = 0;
                         if ((&activatePick.m_pickResults)->GetAt(0)) {
                             // The button is fetched once for the argument and again for the callback, as the game does.
@@ -291,7 +291,7 @@ void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
                 eXBoxIndexState = static_cast<SPECIALBookMenu::SPECIAL_BOOK_MENU_STATE>(eXBoxIndexState - 1);
                 BSAudio* v13 = &BSAudio::QInstance();
                 BSSoundHandle* v19 = v13->GetSoundHandleByName(&apResult, "OBJBookSpecialFocus", 289u);
-                v19->Play(0);
+                v19->Play(false);
             }
             CallPageCallbacks();
             break;
@@ -301,7 +301,7 @@ void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
                 eXBoxIndexState = static_cast<SPECIALBookMenu::SPECIAL_BOOK_MENU_STATE>(eXBoxIndexState + 1);
                 BSAudio* v14 = &BSAudio::QInstance();
                 BSSoundHandle* v18 = v14->GetSoundHandleByName(&v25, "OBJBookSpecialFocus", 289u);
-                v18->Play(0);
+                v18->Play(false);
             }
             CallPageCallbacks();
             break;
@@ -321,14 +321,14 @@ void SPECIALBookMenu::DoIdle() {
             key = 16;
         }
         if (Controls_->GetKeyboardButton(key, 1)) {
-            DoClick(4, 0);
+            DoClick(4, nullptr);
         }
         else {
             NiTimeController* pspecialBookGeomController = pBookGeometry->GetControllers();
             if (pspecialBookGeomController) {
                 NiControllerManager* pspecialBookGeomControllerManager =
                     static_cast<NiControllerManager*>(pspecialBookGeomController);
-                NiControllerSequence* pseq = 0;
+                NiControllerSequence* pseq = nullptr;
                 if (!bAnimForward || eState > SPECIALBookMenu::SBMS_START) {
                     char* pcString;
                     if (bAnimForward) {
@@ -343,25 +343,25 @@ void SPECIALBookMenu::DoIdle() {
                 }
                 fFrameAnimTimer = appTimer.fDelta + fFrameAnimTimer;
                 if (pseq) {
-                    pseq->Update(fFrameAnimTimer, 1);
+                    pseq->Update(fFrameAnimTimer, true);
                     double v2 = pseq->m_fLastTime;
                     bAnimFinished = !(pseq->m_fEndKeyTime > v2) || eState <= SPECIALBookMenu::SBMS_START;
                 }
                 else {
-                    bAnimFinished = 1;
+                    bAnimFinished = true;
                 }
                 while (pspecialBookGeomController) {
                     if (NiObject::DynamicCastStatic(
                             &NiMultiTargetTransformController::ms_RTTI, pspecialBookGeomController
                         )) {
-                        NiUpdateData UpdateData(fFrameAnimTimer, 0, 0);
+                        NiUpdateData UpdateData(fFrameAnimTimer, false, false);
                         pspecialBookGeomController->Update(UpdateData);
                         break;
                     }
                     pspecialBookGeomController = pspecialBookGeomController->GetNext();
                 }
             }
-            NiUpdateData update(0.0f, 0, 0);
+            NiUpdateData update(0.0f, false, false);
             pBookGeometry->Update(update);
         }
     }
@@ -369,13 +369,13 @@ void SPECIALBookMenu::DoIdle() {
 
 bool SPECIALBookMenu::DoKey(int32_t a2) {
     int8_t v4 = 0;
-    if ((a2 == ((-2147483647))) || (a2 == ((-2147483646)))) {
-        DoClick((int32_t)(a2 == ((-2147483647))), nullptr);
+    if ((a2 == (-2147483647)) || (a2 == (-2147483646))) {
+        DoClick((int32_t)(a2 == (-2147483647)), nullptr);
         v4 = 1;
     }
-    if ((a2 == ((-2147483645))) || (a2 == ((-2147483644)))) {
-        DoGamepad(((uint8_t)(a2 != ((-2147483645)))) + 3, (float)1.0);
-        return (bool)1;
+    if ((a2 == (-2147483645)) || (a2 == (-2147483644))) {
+        DoGamepad(((uint8_t)(a2 != (-2147483645))) + 3, (float)1.0);
+        return true;
     }
     return (bool)v4;
 }
@@ -387,29 +387,29 @@ int32_t SPECIALBookMenu::GetClass() {
 bool SPECIALBookMenu::DoGamepad(int32_t a1, float a2) {
     bool result;
     if (!Interface::IsTopMenuID(Interface::eSPECIALBookMenu)) {
-        return 0;
+        return false;
     }
-    ActorValue::Index eav = static_cast<ActorValue::Index>(GetSelectedSPECIAL());
+    ActorValue::Index eav = GetSelectedSPECIAL();
     switch (a1) {
         case 3:
         case 9: {
             if (eav != ActorValue::VALUE_NONE && PlayerCharacter::GetSumOfSPECIALStats() < iAvailablePoints &&
                 pPlayer->GetPermanentActorValue(eav) < 10) {
-                DoClick(2, 0);
+                DoClick(2, nullptr);
             }
-            result = 1;
+            result = true;
             break;
         }
         case 4:
         case 10: {
             if (eav != ActorValue::VALUE_NONE && pPlayer->GetPermanentActorValue(eav) > 1) {
-                DoClick(3, 0);
+                DoClick(3, nullptr);
             }
-            result = 1;
+            result = true;
             break;
         }
         default: {
-            return 0;
+            return false;
         }
     }
     return result;
@@ -425,11 +425,11 @@ void SPECIALBookMenu::Exit() {
         ShadowSceneNode_->RemoveAllChildren();
         ShadowSceneNode* v3 = BSShaderManager::GetShadowSceneNode(1);
         v3->RemoveAllLights();
-        SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry = 0;
-        SPECIALBookMenu::sp3DCamera.operator=(static_cast<NiCamera*>(0));
+        SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry = nullptr;
+        SPECIALBookMenu::sp3DCamera.operator=(static_cast<NiCamera*>(nullptr));
         for (int32_t i = 0; i < 9; ++i) {
-            SPECIALBookMenu::pSPECIALBookMenu->Pages[i].Buttons.Clear(1);
-            SPECIALBookMenu::pSPECIALBookMenu->Pages[i].TextItems.Clear(1);
+            SPECIALBookMenu::pSPECIALBookMenu->Pages[i].Buttons.Clear(true);
+            SPECIALBookMenu::pSPECIALBookMenu->Pages[i].TextItems.Clear(true);
         }
         if (SPECIALBookMenu::pSPECIALBookMenu) {
             MenuByClass->Set(Tile::kTileValue_DeleteOnFade, 1);
@@ -451,32 +451,32 @@ ActorValue::Index SPECIALBookMenu::GetSelectedSPECIAL() {
 bool SPECIALBookMenu::TurnPage(bool bForward) {
     FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
-    bool brunAnim = 0;
+    bool brunAnim = false;
     if (bForward) {
         bAnimForward = 1;
         if (eState >= SPECIALBookMenu::SBMS_CLOSED) {
-            return 0;
+            return false;
         }
         eState = static_cast<SPECIALBookMenu::SPECIAL_BOOK_MENU_STATE>(eState + 1);
-        brunAnim = 1;
+        brunAnim = true;
         BSSoundHandle psoundHand;
         BSAudio* v2 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v2->GetSoundHandleByName(&a1, "OBJBookSpecialPageTurn", 289u);
         psoundHand.operator=(*SoundHandleByName);
-        psoundHand.Play(0);
+        psoundHand.Play(false);
     }
     else {
         bAnimForward = 0;
         if (eState < SPECIALBookMenu::SBMS_STRENGTH) {
-            return 0;
+            return false;
         }
         eState = static_cast<SPECIALBookMenu::SPECIAL_BOOK_MENU_STATE>(eState - 1);
-        brunAnim = 1;
+        brunAnim = true;
         BSSoundHandle psoundHand_2;
         BSAudio* v4 = &BSAudio::QInstance();
         BSSoundHandle* v7 = v4->GetSoundHandleByName(&arHandle, "OBJBookSpecialPageTurn", 289u);
         psoundHand_2.operator=(*v7);
-        psoundHand_2.Play(0);
+        psoundHand_2.Play(false);
     }
     if (brunAnim) {
         NiTimeController* pSPECIALBookGeomController =
@@ -484,7 +484,7 @@ bool SPECIALBookMenu::TurnPage(bool bForward) {
         if (pSPECIALBookGeomController) {
             NiControllerManager* pSPECIALBookGeomControllerManager =
                 static_cast<NiControllerManager*>(pSPECIALBookGeomController);
-            NiControllerSequence* pseq = 0;
+            NiControllerSequence* pseq = nullptr;
             if (!bAnimForward || eState > SPECIALBookMenu::SBMS_START) {
                 char* pcString;
                 if (bAnimForward) {
@@ -499,13 +499,13 @@ bool SPECIALBookMenu::TurnPage(bool bForward) {
             }
             if (pseq) {
                 pSPECIALBookGeomControllerManager->DeactivateAll(0.0f);
-                pSPECIALBookGeomControllerManager->ActivateSequence(pseq, 0, 1, 1.0f, 0.0f, 0);
-                pSPECIALBookGeomControllerManager->SetActive(1);
+                pSPECIALBookGeomControllerManager->ActivateSequence(pseq, 0, true, 1.0f, 0.0f, nullptr);
+                pSPECIALBookGeomControllerManager->SetActive(true);
                 pseq->ResetSequence();
             }
         }
     }
-    return 1;
+    return true;
 }
 
 void SPECIALBookMenu::CallPageCallbacks() {
@@ -527,13 +527,14 @@ void SPECIALBookMenu::CallPageCallbacks() {
 // buttons on them, the page arrows) and the index page, and runs every page's refresh callbacks once.
 void SPECIALBookMenu::InitBook() {
     FNVD_INLINED_LOCAL(NiFixedString, kForward, std::nullopt, std::nullopt);
-    SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry =
-        (NiAVObject*)pModelLoader->LoadFile("Meshes\\Terminals\\Babybook02.NIF", LOD_MULT_NONE, 1, 0, 0, 0);
+    SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry = (NiAVObject*)pModelLoader->LoadFile(
+        "Meshes\\Terminals\\Babybook02.NIF", LOD_MULT_NONE, true, false, false, false
+    );
     SwapPlatformLanguageTextures(SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry);
     SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry->SetScale(0.05f);
     SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry->SetTranslate(0.0f, 0.0f, -60.0f);
     SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry->SetRotate(1.5707964f, 1.0f, 0.0f, 0.0f);
-    NiUpdateData arData(0.0f, 0, 0);
+    NiUpdateData arData(0.0f, false, false);
     SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry->Update(arData);
     SPECIALBookMenu::pSPECIALBookMenu->fFrameAnimTimer =
         appTimer.fDelta + SPECIALBookMenu::pSPECIALBookMenu->fFrameAnimTimer;
@@ -546,21 +547,21 @@ void SPECIALBookMenu::InitBook() {
         kForward.~NiFixedString();
         if (pkSequence) {
             pManager->DeactivateAll(0.0f);
-            pManager->ActivateSequence(pkSequence, 0, 1, 1.0f, 0.0f, 0);
-            pManager->SetActive(1);
+            pManager->ActivateSequence(pkSequence, 0, true, 1.0f, 0.0f, nullptr);
+            pManager->SetActive(true);
             pkSequence->ResetSequence();
         }
     }
     NiTimeController::StartAnimations(pBookGeometry);
     while (pController) {
         if (NiObject::DynamicCastStatic(&NiMultiTargetTransformController::ms_RTTI, pController)) {
-            NiUpdateData kControllerData(0.0f, 0, 0);
+            NiUpdateData kControllerData(0.0f, false, false);
             pController->Update(kControllerData);
             break;
         }
         pController = pController->GetNext();
     }
-    NiUpdateData arUpdateData(0.0f, 0, 0);
+    NiUpdateData arUpdateData(0.0f, false, false);
     pBookGeometry->Update(arUpdateData);
     const NiBound* pWorldBound = &SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry->GetWorldBound();
     float fLightRadius = pWorldBound->m_fRadius * 20.0;
@@ -573,7 +574,7 @@ void SPECIALBookMenu::InitBook() {
             pLight = ::new (pLightMemory) NiPointLight;
         }
         else {
-            pLight = 0;
+            pLight = nullptr;
         }
         NiPoint3 kTranslate;
         pLight->SetTranslate(*::new (&kTranslate) NiPoint3(0.0f, 0.0f, 0.0f));
@@ -583,10 +584,10 @@ void SPECIALBookMenu::InitBook() {
         NiColor kSpecular;
         pLight->SetSpecularColor(*FNVD_RECONSTRUCT(NiColor)(&kSpecular, fLightRadius, 0.0f, 0.0f));
         pLight->SetDimmer(1.0f);
-        NiUpdateData kLightData(0.0f, 0, 0);
+        NiUpdateData kLightData(0.0f, false, false);
         pLight->Update(kLightData);
         BSShaderManager::GetShadowSceneNode(1)->AttachChild(pLight, 1);
-        BSShaderManager::GetShadowSceneNode(1)->AddLight(pLight, 0);
+        BSShaderManager::GetShadowSceneNode(1)->AddLight(pLight, false);
     }
     BSShaderManager::GetShadowSceneNode(1)->AttachChild(SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry, 1);
 
@@ -1172,13 +1173,13 @@ void SPECIALBookMenu::LoadBBTextures() {
     for (int32_t i = 0; i < 11; ++i) {
         BSsprintf(apDest, 260, "%s%s%i.dds", "Textures\\Terminals\\", "BBNumber", i);
         SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-        TES::pInstance->CreateTextureImage(acPath, spAVValues[i], 0, 0);
+        TES::pInstance->CreateTextureImage(acPath, spAVValues[i], false, false);
     }
     // Entries 1 to 4 land in spPointsText[0] to [3].
     for (int32_t j = 1; j < 5; ++j) {
         BSsprintf(apDest, 260, "%s%s%i.dds", "Textures\\Terminals\\ENGLISH\\", "BBMessage0", j);
         SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-        TES::pInstance->CreateTextureImage(acPath, spPointsText[j - 1], 0, 0);
+        TES::pInstance->CreateTextureImage(acPath, spPointsText[j - 1], false, false);
     }
     if (Interface::Has360Controller()) {
         BSstrcpy(Dst, 5, "XBOX");
@@ -1187,31 +1188,31 @@ void SPECIALBookMenu::LoadBBTextures() {
         BSstrcpy(Dst, 5, "PC");
     }
     BSsprintf(acPath, 260, "%s\\%s\\%s.dds", "Textures\\Terminals\\", Dst, "BBRTOff");
-    TES::pInstance->CreateTextureImage(acPath, spNextPageButtonImage[1], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spNextPageButtonImage[1], false, false);
     BSsprintf(apDest, 260, "%s%s.dds", "Textures\\Terminals\\", "BBRTOn");
     SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spNextPageButtonImage[0], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spNextPageButtonImage[0], false, false);
     BSsprintf(acPath, 260, "%s\\%s\\%s.dds", "Textures\\Terminals\\", Dst, "BBLTOff");
-    TES::pInstance->CreateTextureImage(acPath, spPreviousPageButtonImage[0], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spPreviousPageButtonImage[0], false, false);
     BSsprintf(apDest, 260, "%s%s.dds", "Textures\\Terminals\\", "BBLTOn");
     SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spPreviousPageButtonImage[1], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spPreviousPageButtonImage[1], false, false);
     BSsprintf(acPath, 260, "%s\\%s\\%s.dds", "Textures\\Terminals\\", Dst, "BBXOff");
-    TES::pInstance->CreateTextureImage(acPath, spOpenCloseBookButtonImage[0], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spOpenCloseBookButtonImage[0], false, false);
     BSsprintf(acPath, 260, "%s\\%s\\%s.dds", "Textures\\Terminals\\", Dst, "BBXOn");
-    TES::pInstance->CreateTextureImage(acPath, spOpenCloseBookButtonImage[1], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spOpenCloseBookButtonImage[1], false, false);
     BSsprintf(apDest, 260, "%s%s.dds", "Textures\\Terminals\\", "BBDecreaseOff");
     SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spAVLeftArrowButtonImage[0], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spAVLeftArrowButtonImage[0], false, false);
     BSsprintf(apDest, 260, "%s%s.dds", "Textures\\Terminals\\", "BBDecreaseOn");
     SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spAVLeftArrowButtonImage[1], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spAVLeftArrowButtonImage[1], false, false);
     BSsprintf(apDest, 260, "%s%s.dds", "Textures\\Terminals\\", "BBIncreaseOff");
     SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spAVRightArrowButtonImage[0], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spAVRightArrowButtonImage[0], false, false);
     BSsprintf(apDest, 260, "%s%s.dds", "Textures\\Terminals\\", "BBIncreaseOn");
     SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-    TES::pInstance->CreateTextureImage(acPath, spAVRightArrowButtonImage[1], 0, 0);
+    TES::pInstance->CreateTextureImage(acPath, spAVRightArrowButtonImage[1], false, false);
 }
 
 NiCamera* SPECIALBookMenu::InitCamera() {
@@ -1225,14 +1226,14 @@ NiCamera* SPECIALBookMenu::InitCamera() {
         pcam = ::new (apMemory) NiCamera;
     }
     else {
-        pcam = 0;
+        pcam = nullptr;
     }
     ::new (&port) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     if (BSShaderManager::bLetterbox) {
         port = BSShaderManager::kFramebufferViewport;
     }
     pcam->SetViewPort(port);
-    NiFrustum fr(0);
+    NiFrustum fr(false);
     SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
     fr.m_fFar = WorldSceneGraph->GetFarDistance();
     fr.m_fNear = BSSceneGraph::fNearDistance.Float();
@@ -1253,10 +1254,10 @@ NiCamera* SPECIALBookMenu::InitCamera() {
     fr.m_fBottom = -v1 * fHeightByWidth * 0.75f;
     double v2 = std::tan(theta);
     fr.m_fTop = v2 * fHeightByWidth * 0.75f;
-    fr.m_bOrtho = 0;
+    fr.m_bOrtho = false;
     pcam->SetViewFrustum(fr);
     pcam->SetTranslate(0.0f, 0.0f, 1.0f);
-    NiUpdateData UpdateData2(0.0f, 0, 0);
+    NiUpdateData UpdateData2(0.0f, false, false);
     pcam->Update(UpdateData2);
     NiPoint3* a4 = ::new (&dst) NiPoint3(0.0f, 1.0f, 0.0f);
     NiPoint3* v3 = ::new (&v12) NiPoint3(0.0f, 0.0f, 0.0f);
@@ -1275,14 +1276,14 @@ void SPECIALBookMenu::Create(int32_t aiTotalPoints) {
     Tile* ptile = v1->GetMenusRoot()->ReadFile("Data\\Menus\\CharGen\\SPECIALBookMenu.xml");
     Menu* pmenu = ptile->GetMenu();
     if (pmenu && (v2 = pmenu->GetClass(), v2 == SPECIALBookMenu::GetClassStatic())) {
-        pmenu->SetMenuTile(static_cast<TileMenu*>(ptile), 0);
+        pmenu->SetMenuTile(static_cast<TileMenu*>(ptile), false);
         SPECIALBookMenu::pSPECIALBookMenu = static_cast<SPECIALBookMenu*>(pmenu);
         if (static_cast<LoveTesterMenu*>(pmenu)->LoveTesterMenu::CheckTilesExist(&imissingIndex)) {
             SPECIALBookMenu::pSPECIALBookMenu->iAvailablePoints = aiTotalPoints;
             SPECIALBookMenu::pSPECIALBookMenu->InitBook();
             SPECIALBookMenu::sp3DCamera.operator=(SPECIALBookMenu::pSPECIALBookMenu->InitCamera());
-            HUDMainMenu::ForceObjectiveReminders(1);
-            pmenu->PrepForVisibility(0);
+            HUDMainMenu::ForceObjectiveReminders(true);
+            pmenu->PrepForVisibility(false);
         }
         else {
             Warning("MENUS:  Special book menu creation failed... Missing index = #%d", imissingIndex);
@@ -1309,7 +1310,7 @@ void SPECIALBookMenu::Draw3DElements() {
     if (SPECIALBookMenu::pSPECIALBookMenu) {
         if (SPECIALBookMenu::sp3DCamera.m_pObject) {
             NiRenderer* Renderer_ = NiRenderer::GetRenderer();
-            Renderer_->ClearBuffer(0, 4u);
+            Renderer_->ClearBuffer(nullptr, 4u);
             SceneGraph* apSceneGraph = Main::GetWorldSceneGraph();
             BSCullingProcess* apCuller = apSceneGraph->pCuller;
             apCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
@@ -1322,8 +1323,8 @@ void SPECIALBookMenu::Draw3DElements() {
             ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
             BSShaderUtil::AccumulateScene(pcam, ShadowSceneNode_, *apCuller);
             BSShaderAccumulator* v3 = spaccum.m_pObject;
-            BSShaderUtil::RenderScene(pcam, v3, 0);
-            apCuller->SetAccumulator(0);
+            BSShaderUtil::RenderScene(pcam, v3, false);
+            apCuller->SetAccumulator(nullptr);
             apCuller->PopCullMode();
         }
     }
@@ -1351,9 +1352,7 @@ void SPECIALBookMenu::PreviousPage(SpecialBookButton* apButton) {
 // field's actor value picks the digit texture, set as the field's first text property's texture 0 of type 0.
 void SPECIALBookMenu::RefreshActorValue(SpecialBookTextItem* apTextItem) {
     // The player is cast to ActorValueOwner through a reference, without a null check, as the game does.
-    int32_t iValue = static_cast<ActorValueOwner&>(*pPlayer).GetPermanentActorValue(
-        static_cast<ActorValue::Index>(apTextItem->eActorValue)
-    );
+    int32_t iValue = static_cast<ActorValueOwner&>(*pPlayer).GetPermanentActorValue(apTextItem->eActorValue);
     NiSourceTexture* pTexture = pSPECIALBookMenu->spAVValues[iValue].operator->();
     static_cast<BSShaderPPLightingProperty*>(apTextItem->pText[0])
         ->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, pTexture);
@@ -1386,24 +1385,24 @@ void SPECIALBookMenu::RefreshTotalPointsValue(SPECIALBookMenu::SpecialBookTextIt
             int32_t v1 = SPECIALBookMenu::pSPECIALBookMenu->iAvailablePoints - PlayerCharacter::GetSumOfSPECIALStats();
             if (v1) {
                 if (v1 / 10 <= 0) {
-                    apTextItem->pTextObj[0u]->SetAppCulled(1);
+                    apTextItem->pTextObj[0u]->SetAppCulled(true);
                 }
                 else {
-                    apTextItem->pTextObj[0u]->SetAppCulled(0);
+                    apTextItem->pTextObj[0u]->SetAppCulled(false);
                     apTextItem->pText[0u]->SetTexture(
                         BSShaderProperty::TEXTYPE_DIFFUSE, 0,
                         SPECIALBookMenu::pSPECIALBookMenu->spAVValues[v1 / 10].m_pObject
                     );
                 }
-                apTextItem->pTextObj[1]->SetAppCulled(0);
+                apTextItem->pTextObj[1]->SetAppCulled(false);
                 apTextItem->pText[1]->SetTexture(
                     BSShaderProperty::TEXTYPE_DIFFUSE, 0,
                     SPECIALBookMenu::pSPECIALBookMenu->spAVValues[v1 % 10].m_pObject
                 );
             }
             else {
-                apTextItem->pTextObj[0u]->SetAppCulled(1);
-                apTextItem->pTextObj[1]->SetAppCulled(1);
+                apTextItem->pTextObj[0u]->SetAppCulled(true);
+                apTextItem->pTextObj[1]->SetAppCulled(true);
             }
         }
     }
@@ -1412,15 +1411,15 @@ void SPECIALBookMenu::RefreshTotalPointsValue(SPECIALBookMenu::SpecialBookTextIt
 void SPECIALBookMenu::RefreshLeftAVButton(SPECIALBookMenu::ActorValueButton* apButton) {
     ActorValue::Index eActorValue = apButton->eActorValue;
     if (pPlayer->GetPermanentActorValue(eActorValue) <= 1) {
-        apButton->spButton.m_pObject->SetAppCulled(1);
+        apButton->spButton.m_pObject->SetAppCulled(true);
     }
     else {
-        apButton->spButton.m_pObject->SetAppCulled(0);
+        apButton->spButton.m_pObject->SetAppCulled(false);
     }
     if (InterfaceManager::Has360Controller() &&
         SPECIALBookMenu::pSPECIALBookMenu->eState == SPECIALBookMenu::SBMS_SPECIAL &&
         eActorValue != SPECIALBookMenu::pSPECIALBookMenu->eXBoxIndexState + 4) {
-        apButton->spButton.m_pObject->SetAppCulled(1);
+        apButton->spButton.m_pObject->SetAppCulled(true);
     }
 }
 
@@ -1429,15 +1428,15 @@ void SPECIALBookMenu::RefreshRightAVButton(SPECIALBookMenu::ActorValueButton* ap
     if (pPlayer->GetPermanentActorValue(eActorValue) >= 10 ||
         (SPECIALBookMenu::pSPECIALBookMenu &&
          PlayerCharacter::GetSumOfSPECIALStats() >= SPECIALBookMenu::pSPECIALBookMenu->iAvailablePoints)) {
-        apButton->spButton.m_pObject->SetAppCulled(1);
+        apButton->spButton.m_pObject->SetAppCulled(true);
     }
     else {
-        apButton->spButton.m_pObject->SetAppCulled(0);
+        apButton->spButton.m_pObject->SetAppCulled(false);
     }
     if (InterfaceManager::Has360Controller() &&
         SPECIALBookMenu::pSPECIALBookMenu->eState == SPECIALBookMenu::SBMS_SPECIAL &&
         eActorValue != SPECIALBookMenu::pSPECIALBookMenu->eXBoxIndexState + 4) {
-        apButton->spButton.m_pObject->SetAppCulled(1);
+        apButton->spButton.m_pObject->SetAppCulled(true);
     }
 }
 
@@ -1482,7 +1481,7 @@ void SPECIALBookMenu::IncreaseActorValue(SPECIALBookMenu::ActorValueButton* apBu
                 BSAudio* v1 = &BSAudio::QInstance();
                 BSSoundHandle* arHandle = v1->GetSoundHandleByName(&a1, "OBJBookSpecialNumber", 289u);
                 th_s.operator=(*arHandle);
-                th_s.Play(0);
+                th_s.Play(false);
             }
             if (PlayerCharacter::GetSumOfSPECIALStats() < SPECIALBookMenu::pSPECIALBookMenu->iAvailablePoints) {
                 int32_t v2 = BSMIN(v6 + 1, 10);
@@ -1504,7 +1503,7 @@ void SPECIALBookMenu::DecreaseActorValue(SPECIALBookMenu::ActorValueButton* apBu
                 BSAudio* v1 = &BSAudio::QInstance();
                 BSSoundHandle* arHandle = v1->GetSoundHandleByName(&a1, "OBJBookSpecialNumber", 289u);
                 th_s.operator=(*arHandle);
-                th_s.Play(0);
+                th_s.Play(false);
             }
             int32_t v2 = BSMAX(v6 - 1, 1);
             pPlayer->SetActorBaseValue(eActorValue, v2);

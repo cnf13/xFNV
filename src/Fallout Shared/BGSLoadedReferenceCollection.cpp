@@ -36,11 +36,11 @@ LoadedReferenceMap* BGSLoadedReferenceCollection::GetFormTypeMap(ENUM_FORM_ID ae
 
 void BGSLoadedReferenceCollection::AddReference(TESObjectREFR* apRef) {
     AutoMemContext apMemory(
-        MEM_CONTEXT_GLOBAL_LISTS, 1,
+        MEM_CONTEXT_GLOBAL_LISTS, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BGSLoadedReferenceCollection.cpp", 104
     );
     TESBoundObject* ObjectReference = apRef->GetObjectReference();
-    ENUM_FORM_ID aeFormType = static_cast<ENUM_FORM_ID>(ObjectReference->GetFormType());
+    ENUM_FORM_ID aeFormType = ObjectReference->GetFormType();
     if (TESContainer::ContainerCanHoldType(aeFormType)) {
         ItemsMap.AddReference(apRef);
         LoadedReferenceMap* FormTypeMap = GetFormTypeMap(aeFormType);
@@ -71,7 +71,7 @@ void BGSLoadedReferenceCollection::AddReference(TESObjectREFR* apRef) {
 
 void BGSLoadedReferenceCollection::RemoveReference(TESObjectREFR* apRef) {
     TESBoundObject* ObjectReference = apRef->GetObjectReference();
-    ENUM_FORM_ID aeFormType = static_cast<ENUM_FORM_ID>(ObjectReference->GetFormType());
+    ENUM_FORM_ID aeFormType = ObjectReference->GetFormType();
     if (TESContainer::ContainerCanHoldType(aeFormType)) {
         ItemsMap.RemoveReference(apRef);
         LoadedReferenceMap* FormTypeMap = GetFormTypeMap(aeFormType);
@@ -110,7 +110,7 @@ LABEL_1:;
         if (!arIterator.pCurrentRef) {
             goto LABEL_12;
         }
-        pitemChange = 0;
+        pitemChange = nullptr;
         while (arIterator.pCurrentInventory->GetNextItem(arIterator.InvIterator, pitemChange, 1u)) {
             if (arIterator.pBoundObject) {
                 if (pitemChange->pContainerObj == arIterator.pBoundObject) {
@@ -123,14 +123,14 @@ LABEL_1:;
                     if (pitemChange->iNumber) {
                         arpRef = arIterator.pCurrentRef;
                         arpItemChange = pitemChange;
-                        return 1;
+                        return true;
                     }
                 }
             }
         }
         arIterator.InvIterator.Reset();
-        arIterator.pCurrentInventory = 0;
-        arIterator.pCurrentRef = 0;
+        arIterator.pCurrentInventory = nullptr;
+        arIterator.pCurrentRef = nullptr;
     LABEL_12:;
         while (!arIterator.MapIterator) {
             uint8_t cMapIndex = arIterator.cMapIndex;
@@ -142,8 +142,8 @@ LABEL_1:;
                 }
                 else {
                     if (cMapIndex == 2) {
-                        arIterator.pCurrentMap = 0;
-                        return 0;
+                        arIterator.pCurrentMap = nullptr;
+                        return false;
                     }
                 }
             }
@@ -161,7 +161,7 @@ LABEL_1:;
         bool bspecificMap = arIterator.pCurrentMap != &ItemsMap;
         while (arIterator.MapIterator) {
             uint32_t iformID = 0;
-            TESObjectREFR* pref = 0;
+            TESObjectREFR* pref = nullptr;
             arIterator.pCurrentMap->GetNext(arIterator.MapIterator, iformID, pref);
             if (!pref->GetDisabled() && !pref->GetDelete() && !pref->IsQuestObject()) {
                 TESBoundObject* pBaseForm = pref->GetObjectReference();
@@ -169,7 +169,7 @@ LABEL_1:;
                     if (bcontainerMap) {
                         if (arIterator.pCurrentMap == &ActorsMap) {
                             if ((aiFindFlags & 2) != 0 == ((aiFindFlags & 4) != 0) ||
-                                pref->IsDead(0) != ((aiFindFlags & 2) == 0)) {
+                                pref->IsDead(false) != ((aiFindFlags & 2) == 0)) {
                                 goto LABEL_50;
                             }
                         }
@@ -177,7 +177,7 @@ LABEL_1:;
                             TESObjectCONT* pcontainer;
                             if (pref->GetObjectReference()->GetFormType() != CONT_ID ||
                                 (pcontainer = static_cast<TESObjectCONT*>(pref->GetObjectReference()),
-                                 pcontainer->CanActivate(pref, arIterator.pActivatingRef, 0))) {
+                                 pcontainer->CanActivate(pref, arIterator.pActivatingRef, false))) {
                             LABEL_50:;
                                 arIterator.pCurrentInventory = (&pref->m_Extra)->GetContainerChanges();
                                 if (arIterator.pCurrentInventory) {
@@ -197,8 +197,8 @@ LABEL_1:;
                             if (bspecificMap || arIterator.eFormType == pref->GetObjectReference()->GetFormType()) {
                             LABEL_43:;
                                 arpRef = pref;
-                                arpItemChange = 0;
-                                return 1;
+                                arpItemChange = nullptr;
+                                return true;
                             }
                         }
                     }
@@ -206,7 +206,7 @@ LABEL_1:;
             }
         }
     }
-    return 0;
+    return false;
 }
 
 void BGSLoadedReferenceCollection::Destroy() {
@@ -219,7 +219,7 @@ void BGSLoadedReferenceCollection::Destroy() {
 void BGSLoadedReferenceCollection::Create() {
     BGSLoadedReferenceCollection* v0;
     AutoMemContext apMemory(
-        MEM_CONTEXT_GLOBAL_LISTS, 1,
+        MEM_CONTEXT_GLOBAL_LISTS, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BGSLoadedReferenceCollection.cpp", 88
     );
     BGSLoadedReferenceCollection* v1 =
@@ -228,7 +228,7 @@ void BGSLoadedReferenceCollection::Create() {
         v0 = ::new (v1) BGSLoadedReferenceCollection;
     }
     else {
-        v0 = 0;
+        v0 = nullptr;
     }
     pLoadedReferenceCollection = v0;
 }
@@ -239,16 +239,15 @@ FindObjectIterator::FindObjectIterator(ENUM_FORM_ID aeFormType, TESObjectREFR* a
 }
 
 FindObjectIterator::FindObjectIterator(TESForm* apForm, TESObjectREFR* apRef)
-  : eFormType(static_cast<ENUM_FORM_ID>(apForm->GetFormType())), pBoundObject(static_cast<TESBoundObject*>(apForm)),
-    pActivatingRef(apRef) {
+  : eFormType(apForm->GetFormType()), pBoundObject(static_cast<TESBoundObject*>(apForm)), pActivatingRef(apRef) {
     Reset();
 }
 
 FindObjectIterator::~FindObjectIterator() {}
 
 void FindObjectIterator::Reset() {
-    pCurrentRef = 0;
-    pCurrentInventory = 0;
+    pCurrentRef = nullptr;
+    pCurrentInventory = nullptr;
     cMapIndex = 0;
     pCurrentMap = pLoadedReferenceCollection->GetFormTypeMap(eFormType);
     if (!pCurrentMap) {
@@ -266,9 +265,9 @@ InventoryIterator::~InventoryIterator() {
 }
 
 void InventoryIterator::Reset() {
-    pContainerObjectList = (BSSimpleList<ContainerObject*>*)0;
-    pInventoryChangeList = (BSSimpleList<ItemChange*>*)0;
-    bFinished = (bool)0;
+    pContainerObjectList = (BSSimpleList<ContainerObject*>*)nullptr;
+    pInventoryChangeList = (BSSimpleList<ItemChange*>*)nullptr;
+    bFinished = false;
 }
 
 LoadedReferenceMap::LoadedReferenceMap()

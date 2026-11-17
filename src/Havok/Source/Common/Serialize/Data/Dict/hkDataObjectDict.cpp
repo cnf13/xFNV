@@ -467,7 +467,7 @@ void hkDataWorldDict::renameClass(hkDataClass& klass, const char* newName) {
         this->m_tracker->retrackRenamedClass(v7, newName);
     }
     else {
-        this->m_tracker->retrackRenamedClass(0, newName);
+        this->m_tracker->retrackRenamedClass(nullptr, newName);
     }
 }
 
@@ -817,9 +817,9 @@ const hkDataClassDict::MemberInfo* hkDataClassDict::getMemberInfoByName(Interned
     int32_t m_size;
     int32_t v3;
     if (!pThis) {
-        return 0;
+        return nullptr;
     }
-    while (1) {
+    while (true) {
         m_size = pThis->m_memberInfo.m_size;
         v3 = 0;
         if (m_size > 0) {
@@ -828,7 +828,7 @@ const hkDataClassDict::MemberInfo* hkDataClassDict::getMemberInfoByName(Interned
     LABEL_6:;
         pThis = pThis->m_parent;
         if (!pThis) {
-            return 0;
+            return nullptr;
         }
     }
     hkDataClassDict::MemberInfo* m_data = pThis->m_memberInfo.m_data;
@@ -886,7 +886,7 @@ const char** hkDataClassDict::intern(const char** result, const char* name) cons
         return result;
     }
     else {
-        *result = 0;
+        *result = nullptr;
         return result;
     }
 }
@@ -953,7 +953,7 @@ void hkDataClassDict::selfDestruct() {
             if (m_capacityAndFlags >= 0) {
                 m_heap->bufFree(v7->m_items.begin(), sizeof(hkDataClassDict::Enum::Item) * m_capacityAndFlags);
             }
-            v7->m_items.m_data = 0;
+            v7->m_items.m_data = nullptr;
             v7->m_items.m_capacityAndFlags = hkArrayBase<hkDataClassDict::Enum::Item>::DONT_DEALLOCATE_FLAG;
             hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
             Instance->m_heap->blockFree(v7, sizeof(hkDataClassDict::Enum));
@@ -1243,7 +1243,7 @@ char** hkDataWorldDict::ObjectTracker::intern(char** a1, const char* src) {
         return a1;
     }
     else {
-        *a1 = 0;
+        *a1 = nullptr;
         return a1;
     }
 }
@@ -2022,7 +2022,7 @@ const char* StructArrayImplementation::Object::asString(const char* name) {
 }
 
 int64_t StructArrayImplementation::Object::asInt(const char* name) {
-    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[(m_impl->_find(name))].m_values;
+    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[m_impl->_find(name)].m_values;
     return m_values->asInt(m_index);
 }
 
@@ -2033,7 +2033,7 @@ hkDataObjectImpl* StructArrayImplementation::Object::asObject(const char* name) 
 }
 
 const float* StructArrayImplementation::Object::asVec(const char* nameIn, int32_t n) {
-    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[(m_impl->_find(nameIn))].m_values;
+    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[m_impl->_find(nameIn)].m_values;
     return m_values->asVec(m_index);
 }
 
@@ -2051,23 +2051,23 @@ void StructArrayImplementation::Object::selfDestruct() {}
 
 hkHalf StructArrayImplementation::Object::asHalf(const char* name) {
     hkHalf result;
-    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[(m_impl->_find(name))].m_values;
+    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[m_impl->_find(name)].m_values;
     result = m_values->asHalf(m_index);
     return result;
 }
 
 void StructArrayImplementation::Object::assign(const char* name, int8_t value) {
-    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[(m_impl->_findOrAdd(name))].m_values;
+    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[m_impl->_findOrAdd(name)].m_values;
     m_values->setInt(m_index, value);
 }
 
 void StructArrayImplementation::Object::assign(const char* name, int16_t value) {
-    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[(m_impl->_findOrAdd(name))].m_values;
+    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[m_impl->_findOrAdd(name)].m_values;
     m_values->setInt(m_index, value);
 }
 
 void StructArrayImplementation::Object::assign(const char* name, int32_t value) {
-    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[(m_impl->_findOrAdd(name))].m_values;
+    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[m_impl->_findOrAdd(name)].m_values;
     m_values->setInt(m_index, value);
 }
 
@@ -2077,37 +2077,37 @@ void StructArrayImplementation::Object::assign(const char* handle, const hkDataO
 }
 
 void StructArrayImplementation::Object::assign(const char* handle, hkDataObjectImpl* value) {
-    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[(m_impl->_findOrAdd(handle))].m_values;
+    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[m_impl->_findOrAdd(handle)].m_values;
     m_values->setObject(m_index, value);
 }
 
 void StructArrayImplementation::Object::assign(const char* handle, hkDataArrayImpl* value) {
-    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[(m_impl->_findOrAdd(handle))].m_values;
+    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[m_impl->_findOrAdd(handle)].m_values;
     m_values->setArray(m_index, value);
 }
 
 void StructArrayImplementation::Object::assign(const char* handle, const char* value) {
-    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[(m_impl->_findOrAdd(handle))].m_values;
+    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[m_impl->_findOrAdd(handle)].m_values;
     m_values->setString(m_index, value);
 }
 
 void StructArrayImplementation::Object::assign(const char* handle, float value) {
-    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[(m_impl->_findOrAdd(handle))].m_values;
+    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[m_impl->_findOrAdd(handle)].m_values;
     m_values->setReal(m_index, value);
 }
 
 void StructArrayImplementation::Object::assign(const char* handle, hkHalf value) {
-    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[(m_impl->_findOrAdd(handle))].m_values;
+    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[m_impl->_findOrAdd(handle)].m_values;
     m_values->setHalf(m_index, value);
 }
 
 void StructArrayImplementation::Object::assign(const char* handle, const float* value, int32_t nreal) {
-    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[(m_impl->_findOrAdd(handle))].m_values;
+    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[m_impl->_findOrAdd(handle)].m_values;
     m_values->setVec(m_index, value);
 }
 
 void StructArrayImplementation::Object::assign(const char* handle, int64_t value) {
-    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[(m_impl->_findOrAdd(handle))].m_values;
+    hkDataArrayImpl* m_values = m_impl->m_memberData.m_data[m_impl->_findOrAdd(handle)].m_values;
     m_values->setInt64(m_index, value);
 }
 
@@ -2169,7 +2169,7 @@ hkDataObjectImpl* StructArrayImplementation::asObject(int32_t i) const {
 // Each member's value of val goes into that member's array at index. The member array and the object's accessor are
 // reloaded each pass, and the member count is compared signed.
 void StructArrayImplementation::setObject(int32_t index, hkDataObjectImpl* val) {
-    for (int32_t i = 0; i < (int32_t)m_memberData.m_size; ++i) {
+    for (int32_t i = 0; i < m_memberData.m_size; ++i) {
         hkDataObject::Value kValue = val->accessByName(m_memberData.m_data[i].m_memberName);
         m_memberData.m_data[i].m_values->set(index, kValue);
     }
@@ -2177,14 +2177,14 @@ void StructArrayImplementation::setObject(int32_t index, hkDataObjectImpl* val) 
 
 // The member count is compared signed and reloaded each pass.
 void StructArrayImplementation::clear() {
-    for (int32_t i = 0; i < (int32_t)m_memberData.m_size; ++i) {
+    for (int32_t i = 0; i < m_memberData.m_size; ++i) {
         m_memberData.m_data[i].m_values->clear();
     }
     m_size = 0;
 }
 
 void StructArrayImplementation::reserve(int32_t n) {
-    for (int32_t i = 0; i < (int32_t)m_memberData.m_size; ++i) {
+    for (int32_t i = 0; i < m_memberData.m_size; ++i) {
         m_memberData.m_data[i].m_values->reserve(n);
     }
 }
@@ -2192,7 +2192,7 @@ void StructArrayImplementation::reserve(int32_t n) {
 // Stores the size before resizing the member arrays.
 void StructArrayImplementation::setSize(int32_t n) {
     m_size = n;
-    for (int32_t i = 0; i < (int32_t)m_memberData.m_size; ++i) {
+    for (int32_t i = 0; i < m_memberData.m_size; ++i) {
         m_memberData.m_data[i].m_values->setSize(n);
     }
 }
@@ -2213,7 +2213,7 @@ int32_t StructArrayImplementation::_find(const char* name) const {
         }
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     int32_t m_size = m_memberData.m_size;
     int32_t result = 0;
@@ -2264,7 +2264,7 @@ int32_t StructArrayImplementation::_addMember(const hkDataClassDict::MemberInfo&
     StructArrayImplementation::MemberData* m_data = p_m_memberData->begin();
     StructArrayImplementation::MemberData* v7 = &m_memberData.m_data[m_memberData.m_size];
     if (v7) {
-        v7->m_memberName = 0;
+        v7->m_memberName = nullptr;
     }
     int32_t m_size = m_memberData.m_size;
     StructArrayImplementation::MemberData* v9 = &p_m_memberData->m_data[m_size];
@@ -2276,7 +2276,7 @@ int32_t StructArrayImplementation::_addMember(const hkDataClassDict::MemberInfo&
         v12 = m_tracker->m_classes.getWithDefault(m_cachedString, 0);
     }
     else {
-        v12 = 0;
+        v12 = nullptr;
     }
     hkDataArrayImpl* Array = hkDataWorldDict::createArray(a1.m_type, v12, a1.m_tupleCount);
     v9->m_values = Array;
@@ -2296,7 +2296,7 @@ int32_t StructArrayImplementation::_findOrAdd(const char* src) {
         }
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     int32_t m_size = m_memberData.m_size;
     int32_t result = 0;
@@ -2375,7 +2375,7 @@ hkDataObject::Value hkDataObjectDict::accessByName(const char* name) {
         return result;
     }
     else {
-        result.m_name = 0;
+        result.m_name = nullptr;
         result.m_impl = this;
         return result;
     }
@@ -2444,7 +2444,7 @@ hkDataObjectImpl* hkDataObjectDict::asObject(const char* nameIn) {
 // Returns the pointer a vector member's value holds, read with the vector type for nreal reals.
 const float* hkDataObjectDict::asVec(const char* nameIn, int32_t nreal) {
     MemberAccess kAccess;
-    _readAccess(kAccess, nameIn, static_cast<hkDataObject::Type>(getVecTypeFromNumReals(nreal)));
+    _readAccess(kAccess, nameIn, getVecTypeFromNumReals(nreal));
     // The vector's reals: only the pointer is loaded.
     return m_memberData.m_data[kAccess.index].m_value.ra;
 }
@@ -2502,7 +2502,7 @@ void hkDataObjectDict::assign(const char* handle, const char* value) {
         v4 = hkString::strDup(value);
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     m_memberData.m_data[access.index].m_value.p = v4;
 }
@@ -2523,7 +2523,7 @@ void hkDataObjectDict::assign(const char* handle, hkHalf r) {
 // 4*nreal bytes copied into it.
 void hkDataObjectDict::assign(const char* handle, const float* r, int32_t nreal) {
     MemberAccess kAccess;
-    _writeAccess(kAccess, handle, static_cast<hkDataObject::Type>(getVecTypeFromNumReals(nreal)));
+    _writeAccess(kAccess, handle, getVecTypeFromNumReals(nreal));
     hkMemoryAllocator& kAlloc = hkMemoryRouter::getInstance().heap();
     void* pBlock = kAlloc.blockAlloc(sizeof(float) * nreal);
     hkString::memCpy(pBlock, r, sizeof(float) * nreal);
@@ -2672,12 +2672,12 @@ void hkDataObjectDict::_writeAccess(
             }
             hkDataObjectDict::MemberData* v10 = &m_memberData.m_data[m_memberData.m_size];
             if (v10) {
-                v10->m_memberName.m_cachedString = 0;
+                v10->m_memberName.m_cachedString = nullptr;
             }
             InternedString* p_m_memberName = &m_memberData.m_data[m_memberData.m_size++].m_memberName;
             p_m_memberName->m_cachedString = handle.getString();
-            p_m_memberName[2].m_cachedString = 0;
-            p_m_memberName[3].m_cachedString = 0;
+            p_m_memberName[2].m_cachedString = nullptr;
+            p_m_memberName[3].m_cachedString = nullptr;
             access.index = m_size;
             access.info = MemberInfoByName;
         }
@@ -2696,7 +2696,7 @@ void hkDataObjectDict::_writeAccess(
         }
     }
     else {
-        access.info = 0;
+        access.info = nullptr;
         access.index = -1;
     }
 }

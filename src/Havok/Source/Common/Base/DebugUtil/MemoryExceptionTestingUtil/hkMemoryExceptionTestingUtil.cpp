@@ -13,7 +13,7 @@ hkMemoryExceptionTestingUtil::~hkMemoryExceptionTestingUtil() {}
 
 void hkMemoryExceptionTestingUtil::startFrameImpl() {
     ++m_frameCounter;
-    m_outOfMemory = (bool)0;
+    m_outOfMemory = false;
 }
 
 void hkMemoryExceptionTestingUtil::startNewDemoImpl() {
@@ -31,17 +31,17 @@ void hkMemoryExceptionTestingUtil::allowMemoryExceptionsImpl(bool allowMemExcept
 
 bool hkMemoryExceptionTestingUtil::isMemoryAvailableImpl(int32_t id) {
     if (m_outOfMemory && m_allowMemoryExceptions) {
-        return 0;
+        return false;
     }
     int32_t m_frameCounter = this->m_frameCounter;
     if (m_frameCounter > 50 &&
         (!(m_frameCounter % 3) &&
          (m_allowMemoryExceptions && m_wasCheckIdThrown[id] == static_cast<uint8_t>(m_frameCounter % 3)))) {
-        m_wasCheckIdThrown[id] = 1;
-        m_outOfMemory = 1;
-        return 0;
+        m_wasCheckIdThrown[id] = true;
+        m_outOfMemory = true;
+        return false;
     }
-    return 1;
+    return true;
 }
 
 void hkMemoryExceptionTestingUtil::destroy() {
@@ -50,7 +50,7 @@ void hkMemoryExceptionTestingUtil::destroy() {
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
         Instance->m_heap->blockFree(v0, sizeof(hkMemoryExceptionTestingUtil));
     }
-    s_instance = 0;
+    s_instance = nullptr;
 }
 
 hkMemoryExceptionTestingUtil& hkMemoryExceptionTestingUtil::getInstance() {
@@ -70,6 +70,6 @@ void hkMemoryExceptionTestingUtil::create() {
         s_instance = ::new (v3) hkMemoryExceptionTestingUtil;
     }
     else {
-        s_instance = 0;
+        s_instance = nullptr;
     }
 }

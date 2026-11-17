@@ -88,7 +88,7 @@ void CFilter::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
         apStrings->Add(pcString);
     }
     else if ((uiFilter >> 15) & 1) {
-        pcString = NiGetViewerString("-PART", static_cast<uint32_t>((uiFilter >> 8) & 0x1F));
+        pcString = NiGetViewerString("-PART", ((uiFilter >> 8) & 0x1F));
         apStrings->Add(pcString);
     }
 

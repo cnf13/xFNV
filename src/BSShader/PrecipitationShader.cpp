@@ -182,7 +182,7 @@ void PrecipitationShader::LoadPixelShaders() {
         char HLSLFile[260];
         BSShader::MakePath(aMacros[i].strPath, HLSLFile);
         BSsprintf(PSOFile, 260, "PRECIP%03i.pso", i);
-        const char* PSTarget = BSShaderManager::GetPSTarget(0);
+        const char* PSTarget = BSShaderManager::GetPSTarget(false);
         NiD3DPixelShader* pShader = CompilePixelShaderHLSL(HLSLFile, aMacros[i].kMacros, PSTarget, PSOFile);
         PrecipitationShader::spPixelShader[i] = pShader;
         ++i;
@@ -212,7 +212,7 @@ bool PrecipitationShader::LoadStagesAndPasses() {
 }
 
 BSShader* PrecipitationShader::CreateShader() {
-    PrecipitationShader* pshader = 0;
+    PrecipitationShader* pshader = nullptr;
     NiDX9ShaderDeclaration* pshaderDecl = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 3u, 2u);
     pshaderDecl->SetEntry(0, 0, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
     pshaderDecl->SetEntry(1u, 7u, NiShaderDeclaration::SHADERPARAM_NI_TEXCOORD0, NiShaderDeclaration::SPTYPE_FLOAT2, 0);

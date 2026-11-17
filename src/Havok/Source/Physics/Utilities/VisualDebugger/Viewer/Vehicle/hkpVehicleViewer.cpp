@@ -72,7 +72,7 @@ void hkpVehicleViewer::worldAddedCallback(hkpWorld* w) {
     hkpWorldPostSimulationListener* v5;
     hkpVehicleViewer* v3 = this;
     if (this == nullptr) {
-        v4 = 0;
+        v4 = nullptr;
     }
     else {
         v4 = static_cast<hkpActionListener*>(this);
@@ -82,7 +82,7 @@ void hkpVehicleViewer::worldAddedCallback(hkpWorld* w) {
         v5 = static_cast<hkpWorldPostSimulationListener*>(this);
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     w->addWorldPostSimulationListener(v5);
     hkpPhysicsSystem* WorldAsOneSystem = w->getWorldAsOneSystem();
@@ -101,7 +101,7 @@ void hkpVehicleViewer::worldRemovedCallback(hkpWorld* w) {
     hkpActionListener* v4;
     hkpVehicleViewer* v3 = this;
     if (this == nullptr) {
-        v4 = 0;
+        v4 = nullptr;
     }
     else {
         v4 = static_cast<hkpActionListener*>(this);
@@ -111,7 +111,7 @@ void hkpVehicleViewer::worldRemovedCallback(hkpWorld* w) {
         w->removeWorldPostSimulationListener(this);
     }
     else {
-        w->removeWorldPostSimulationListener(0);
+        w->removeWorldPostSimulationListener(nullptr);
     }
 }
 
@@ -295,7 +295,7 @@ hkProcess* hkpVehicleViewer::create(const hkArray<hkProcessContext*, hkContainer
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

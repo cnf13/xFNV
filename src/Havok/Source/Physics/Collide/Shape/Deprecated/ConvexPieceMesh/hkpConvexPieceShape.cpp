@@ -63,7 +63,7 @@ const hkpShapeContainer* hkpConvexPieceShape::getContainer() const {
         return static_cast<const hkpShapeContainer*>(this);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

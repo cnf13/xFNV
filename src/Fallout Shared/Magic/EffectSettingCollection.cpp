@@ -59,16 +59,16 @@ EffectSetting* EffectSettingCollection::CreateDefaultEffect(
 ) {
     EffectSetting* psettings;
     if (TESForm::GetFormByNumericID(aiFormID)) {
-        return 0;
+        return nullptr;
     }
     EffectSetting* apMemory = static_cast<EffectSetting*>(ourMalloc(sizeof(EffectSetting)));
     if (apMemory) {
         psettings = ::new (apMemory) EffectSetting;
     }
     else {
-        psettings = 0;
+        psettings = nullptr;
     }
-    psettings->SetFormID(aiFormID, 1);
+    psettings->SetFormID(aiFormID, true);
     psettings->SetFormEditorID(acEditorID);
     psettings->data.iFlags = aiFlags;
     psettings->SetEffectName(apEffectName);

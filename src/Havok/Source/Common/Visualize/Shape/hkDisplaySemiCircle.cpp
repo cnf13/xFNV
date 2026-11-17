@@ -41,7 +41,7 @@ hkDisplaySemiCircle::hkDisplaySemiCircle(
 void hkDisplaySemiCircle::getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryAllocator& a) {
     using points_t = hkArray<hkVector4, hkContainerHeapAllocator>;
     FNVD_INLINED_LOCAL(points_t, points, std::nullopt, std::nullopt);
-    points.m_data = 0;
+    points.m_data = nullptr;
     points.m_size = 0;
     points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
     generatePoints(points);
@@ -73,15 +73,15 @@ void hkDisplaySemiCircle::buildGeometry() {
     hkGeometry* v3 = static_cast<hkGeometry*>(Instance->m_heap->blockAlloc(sizeof(hkGeometry)));
     int32_t v4 = 0;
     if (v3) {
-        v3->m_vertices.m_data = 0;
+        v3->m_vertices.m_data = nullptr;
         v3->m_vertices.m_size = 0;
         v3->m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-        v3->m_triangles.m_data = 0;
+        v3->m_triangles.m_data = nullptr;
         v3->m_triangles.m_size = 0;
         v3->m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     this->m_geometry = v3;
     generatePoints(v3->m_vertices);

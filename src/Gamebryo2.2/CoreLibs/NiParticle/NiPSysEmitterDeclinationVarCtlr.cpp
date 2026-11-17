@@ -28,7 +28,7 @@ NiObject* NiPSysEmitterDeclinationVarCtlr::CreateClone(NiCloningProcess& kClonin
     }
     else {
         NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-        return 0;
+        return nullptr;
     }
 }
 
@@ -81,7 +81,7 @@ NiObject* NiPSysEmitterDeclinationVarCtlr::CreateObject() {
         NiMemObject::operator new(sizeof(NiPSysEmitterDeclinationVarCtlr))
     );
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysEmitterDeclinationVarCtlr;
 }

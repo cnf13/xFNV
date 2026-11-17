@@ -64,7 +64,7 @@ DebugText::DebugText() : iFontHeight(0) {
         pDebugTextList[a].fY = 0.0f;
         pDebugTextList[a].iJustify = 0;
         pDebugTextList[a].spNode = nullptr;
-        pDebugTextList[a].pText.Set(0, 0);
+        pDebugTextList[a].pText.Set(nullptr, 0);
         pDebugTextList[a].fDie = -1.0f;
     }
     for (int32_t i = 0; i < 3; ++i) {
@@ -223,7 +223,7 @@ int32_t DebugText::PrintLineC(
 }
 
 int32_t DebugText::GetCurrentLine(DEBUGTEXT_LOCATION aeLocation) {
-    return (int32_t)iHeight[(int32_t)aeLocation];
+    return iHeight[(int32_t)aeLocation];
 }
 
 void DebugText::SetCurrentLine(DEBUGTEXT_LOCATION aeLoc, int32_t aiLine) {
@@ -246,9 +246,9 @@ void DebugText::HandleQueuedPrints() {
                     GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
                     return;
                 }
-                bool btext_is_the_same_2 = 0;
+                bool btext_is_the_same_2 = false;
                 uint32_t ichars_remaining = 0;
-                bool bempty_text = 0;
+                bool bempty_text = false;
                 int32_t ifont = xPrintData.pBuffer[i]->iFont;
                 if (!ifont) {
                     Setting::Info* p_uValue;
@@ -257,7 +257,7 @@ void DebugText::HandleQueuedPrints() {
                     ifont = p_uValue->uint;
                 }
                 // MAYBE-INLINED 0xA0EC5D: a write opening BSStringT<char>'s uses: may be its inlined constructor
-                string.pString = 0;
+                string.pString = nullptr;
                 // MAYBE-INLINED 0xA0EC8C: a write opening BSStringT<char>'s uses: may be its inlined constructor
                 string.sLen = 0;
                 // MAYBE-INLINED 0xA0ECB7: a write opening BSStringT<char>'s uses: may be its inlined constructor
@@ -273,10 +273,10 @@ void DebugText::HandleQueuedPrints() {
                     if (Renderer::bWidescreen) {
                         iwidth = static_cast<int32_t>(static_cast<double>(iwidth) * 1.3333300352096558);
                     }
-                    FontManager::pInstance->pFont[ifont - 1]->LineBreakText(string, iwidth, iheight, 0, 10);
+                    FontManager::pInstance->pFont[ifont - 1]->LineBreakText(string, iwidth, iheight, false, 10);
                 }
                 else {
-                    bempty_text = 1;
+                    bempty_text = true;
                     xPrintData.pBuffer[i]->iLineNumber = 0;
                 }
                 if (xPrintData.pBuffer[i]->iLineNumber > 0) {
@@ -291,27 +291,28 @@ void DebugText::HandleQueuedPrints() {
                     }
                     uint32_t ilen = v6;
                     for (a = 0; a < ilen && iline_count < xPrintData.pBuffer[i]->iLineNumber - 1; ++a) {
-                        if (string.pString[string.pString != 0 ? a : 0] == 10) {
+                        if (string.pString[string.pString != nullptr ? a : 0] == 10) {
                             ++iline_count;
                         }
                     }
                     if (a == ilen) {
-                        string.Set(0, 0);
+                        string.Set(nullptr, 0);
                         GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
                         return;
                     }
                     uint32_t b = 0;
-                    while (string.pString[string.pString != 0 ? a : 0] != 10 &&
-                           string.pString[string.pString != 0 ? a : 0]) {
-                        string.pString[string.pString != 0 ? b++ : 0] = string.pString[string.pString != 0 ? a++ : 0];
+                    while (string.pString[string.pString != nullptr ? a : 0] != 10 &&
+                           string.pString[string.pString != nullptr ? a : 0]) {
+                        string.pString[string.pString != nullptr ? b++ : 0] =
+                            string.pString[string.pString != nullptr ? a++ : 0];
                     }
-                    if (string.pString[string.pString != 0 ? a : 0]) {
-                        for (ichars_remaining = b; string.pString[string.pString != 0 ? ichars_remaining : 0];
+                    if (string.pString[string.pString != nullptr ? a : 0]) {
+                        for (ichars_remaining = b; string.pString[string.pString != nullptr ? ichars_remaining : 0];
                              ++ichars_remaining) {
                             ;
                         }
                     }
-                    string.pString[string.pString != 0 ? b : 0] = 0;
+                    string.pString[string.pString != nullptr ? b : 0] = 0;
                 }
                 for (a_2 = 0; a_2 < 200 &&
                      (xPrintData.pBuffer[i]->pTextData->fX != pDebugTextList[a_2].fX ||
@@ -326,23 +327,23 @@ void DebugText::HandleQueuedPrints() {
                     }
                     if (a_2 == 200) {
                         Warning("DEFAULT: Too many unique debug text items. \n");
-                        string.Set(0, 0);
+                        string.Set(nullptr, 0);
                         GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
                         return;
                     }
                 }
                 else {
                     if (bempty_text) {
-                        btext_is_the_same_2 = 0;
+                        btext_is_the_same_2 = false;
                     }
                     else {
                         if (pDebugTextList[a_2].spNode.m_pObject) {
-                            if (!pDebugTextList[a_2].pText.StrCmp(static_cast<const char*>(string.pString), 1) &&
+                            if (!pDebugTextList[a_2].pText.StrCmp(static_cast<const char*>(string.pString), true) &&
                                 (xPrintData.pBuffer[i]->pTextData->Color.r == pDebugTextList[a_2].Color.r &&
                                  (xPrintData.pBuffer[i]->pTextData->Color.g == pDebugTextList[a_2].Color.g &&
                                   (xPrintData.pBuffer[i]->pTextData->Color.b == pDebugTextList[a_2].Color.b &&
                                    xPrintData.pBuffer[i]->pTextData->Color.a == pDebugTextList[a_2].Color.a)))) {
-                                btext_is_the_same_2 = 1;
+                                btext_is_the_same_2 = true;
                             }
                         }
                     }
@@ -351,7 +352,7 @@ void DebugText::HandleQueuedPrints() {
                             DebugText::Lock();
                             NiNode* DebugTextRoot = Interface::GetDebugTextRoot();
                             DebugTextRoot->DetachChild(pDebugTextList[a_2].spNode.m_pObject);
-                            pDebugTextList[a_2].spNode.operator=(static_cast<NiNode*>(0));
+                            pDebugTextList[a_2].spNode.operator=(static_cast<NiNode*>(nullptr));
                             DebugText::Unlock();
                         }
                     }
@@ -359,7 +360,7 @@ void DebugText::HandleQueuedPrints() {
                 if (!btext_is_the_same_2) {
                     DebugText::Lock();
                     if (bempty_text) {
-                        pDebugTextList[a_2].spNode.operator=(static_cast<NiNode*>(0));
+                        pDebugTextList[a_2].spNode.operator=(static_cast<NiNode*>(nullptr));
                     }
                     else {
                         NiNode* DebugText_ = CreateDebugText(
@@ -400,7 +401,7 @@ void DebugText::HandleQueuedPrints() {
                     }
                     DebugText::Unlock();
                 }
-                string.Set(0, 0);
+                string.Set(nullptr, 0);
                 GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
             }
         }
@@ -409,15 +410,15 @@ void DebugText::HandleQueuedPrints() {
                 DebugText::Lock();
                 NiNode* v9 = Interface::GetDebugTextRoot();
                 v9->DetachChild(pDebugTextList[xPrintData.pBuffer[i]->iIndex].spNode.m_pObject);
-                pDebugTextList[xPrintData.pBuffer[i]->iIndex].spNode.operator=(static_cast<NiNode*>(0));
+                pDebugTextList[xPrintData.pBuffer[i]->iIndex].spNode.operator=(static_cast<NiNode*>(nullptr));
                 pDebugTextList[xPrintData.pBuffer[i]->iIndex].iJustify = 0;
                 pDebugTextList[xPrintData.pBuffer[i]->iIndex].fX = 0.0f;
                 pDebugTextList[xPrintData.pBuffer[i]->iIndex].fY = 0.0f;
-                pDebugTextList[xPrintData.pBuffer[i]->iIndex].pText.Set(0, 0);
+                pDebugTextList[xPrintData.pBuffer[i]->iIndex].pText.Set(nullptr, 0);
                 pDebugTextList[xPrintData.pBuffer[i]->iIndex].fDie = -1.0f;
                 DebugText::Unlock();
             }
-            bool btext_is_the_same = 0;
+            bool btext_is_the_same = false;
             if (pDebugTextList[xPrintData.pBuffer[i]->iIndex].spNode.m_pObject) {
                 btext_is_the_same = std::strcmp(
                                         pDebugTextList[xPrintData.pBuffer[i]->iIndex].pText.pString,
@@ -429,7 +430,7 @@ void DebugText::HandleQueuedPrints() {
                 pDebugTextList[xPrintData.pBuffer[i]->iIndex].spNode.operator=(CreateDebugText(
                     xPrintData.pBuffer[i]->pTextData->pText.pString, pDebugTextList[xPrintData.pBuffer[i]->iIndex].fX,
                     pDebugTextList[xPrintData.pBuffer[i]->iIndex].fY,
-                    pDebugTextList[xPrintData.pBuffer[i]->iIndex].iJustify, 0, 0
+                    pDebugTextList[xPrintData.pBuffer[i]->iIndex].iJustify, 0, nullptr
                 ));
                 DebugText::Unlock();
             }
@@ -443,7 +444,7 @@ void DebugText::HandleQueuedPrints() {
         }
         MemoryManager_Singleton.Deallocate(xPrintData.pBuffer[iprintCt]);
     }
-    xPrintData.Clear(1);
+    xPrintData.Clear(true);
 }
 
 int32_t DebugText::Print(
@@ -494,7 +495,7 @@ int32_t DebugText::Print(
             v12 = ::new (v24) DebugLine;
         }
         else {
-            v12 = 0;
+            v12 = nullptr;
         }
         v12->pText.Set(apText, 0);
         v12->fX = afX;
@@ -598,14 +599,14 @@ NiNode* DebugText::CreateDebugText(
                 istr_justify = 2;
             }
         }
-        NiNode* v25 = 0;
+        NiNode* v25 = nullptr;
         iwidth = 0;
         NiNode* apMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
         if (apMemory) {
             pnode = ::new (apMemory) NiNode(0);
         }
         else {
-            pnode = 0;
+            pnode = nullptr;
         }
         // MAYBE-INLINED 0xA0FFEE: a write opening NiColorA's uses: may be its inlined constructor
         xcolor_2.r = 0.0f;
@@ -642,7 +643,7 @@ NiNode* DebugText::CreateDebugText(
             ifont = v11->uint;
         }
         NiAVObject* ptri = FontManager::pInstance->pFont[ifont - 1]->MakeString(
-            0.0f, 0.0f, 0.0f, string, iwidth, static_cast<int32_t>(istr_justify), xcolor_2, 1, 1
+            0.0f, 0.0f, 0.0f, string, iwidth, static_cast<int32_t>(istr_justify), xcolor_2, true, true
         );
         ptri->m_kLocal.m_Translate.x = 0.0f;
         ptri->m_kLocal.m_Translate.y = 0.0f;
@@ -664,25 +665,25 @@ NiNode* DebugText::CreateDebugText(
         p_m_Translate->z = afYa;
         pnode->UpdateProperties();
         UpdateData.fTime = 0.0f;
-        UpdateData.bUpdateControllers = 0;
-        UpdateData.bParallelUpdate = 0;
-        UpdateData.bFoundParticles = 0;
-        UpdateData.bFoundMorphController = 0;
-        UpdateData.bSceneGraphChange = 0;
+        UpdateData.bUpdateControllers = false;
+        UpdateData.bParallelUpdate = false;
+        UpdateData.bFoundParticles = false;
+        UpdateData.bFoundMorphController = false;
+        UpdateData.bSceneGraphChange = false;
         pnode->Update(UpdateData);
         DebugText::Unlock();
-        string.Set(0, 0);
+        string.Set(nullptr, 0);
         GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
         return pnode;
     }
     else {
         GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
-        return 0;
+        return nullptr;
     }
 }
 
 bool DebugText::GetDebugText_0(char* apBuf, float afX, float afY, int32_t aiJustify) {
-    bool bfoundText = 0;
+    bool bfoundText = false;
     *apBuf = 0;
     for (uint32_t iprintItemCt = 0; !bfoundText && iprintItemCt < xPrintData.iSize; ++iprintItemCt) {
         if (afX == xPrintData.pBuffer[iprintItemCt]->pTextData->fX &&
@@ -700,7 +701,7 @@ bool DebugText::GetDebugText_0(char* apBuf, float afX, float afY, int32_t aiJust
                     std::strncpy(apBuf, xPrintData.pBuffer[iprintItemCt]->pTextData->pText.pString, 2046u);
                 }
             }
-            bfoundText = 1;
+            bfoundText = true;
         }
     }
     for (int32_t a = 0; !bfoundText && a < 200; ++a) {
@@ -717,7 +718,7 @@ bool DebugText::GetDebugText_0(char* apBuf, float afX, float afY, int32_t aiJust
                     std::strncpy(apBuf, pDebugTextList[a].pText.pString, 2046u);
                 }
             }
-            bfoundText = 1;
+            bfoundText = true;
         }
     }
     return bfoundText;
@@ -739,7 +740,7 @@ int32_t DebugText::PrintByIndex(char* apString, int32_t a2) {
             v4 = ::new (v6) DebugLine;
         }
         else {
-            v4 = 0;
+            v4 = nullptr;
         }
         v4->pText.Set(apString, 0);
         DebugText::sPrintData* aItem =
@@ -775,7 +776,7 @@ DebugText* DebugText::Instance(bool abCreate) {
 void DebugText::Idle() {
     DebugText::DebugTextData* pitem;
     if (!Interface::IsInMenuMode()) {
-        DebugText* pme = DebugText::Instance(1);
+        DebugText* pme = DebugText::Instance(true);
         for (int32_t a = 0; a < 200; ++a) {
             if (pme->pDebugTextList[a].fDie > 0.0) {
                 pme->pDebugTextList[a].fDie = pme->pDebugTextList[a].fDie - appTimer.fDelta;
@@ -784,11 +785,11 @@ void DebugText::Idle() {
                         DebugText::Lock();
                         NiNode* DebugTextRoot = Interface::GetDebugTextRoot();
                         DebugTextRoot->DetachChild(pme->pDebugTextList[a].spNode.m_pObject);
-                        pme->pDebugTextList[a].spNode.operator=(static_cast<NiNode*>(0));
+                        pme->pDebugTextList[a].spNode.operator=(static_cast<NiNode*>(nullptr));
                         pme->pDebugTextList[a].iJustify = 0;
                         pme->pDebugTextList[a].fX = 0.0f;
                         pme->pDebugTextList[a].fY = 0.0f;
-                        pme->pDebugTextList[a].pText.Set(0, 0);
+                        pme->pDebugTextList[a].pText.Set(nullptr, 0);
                         pme->pDebugTextList[a].fDie = -1.0f;
                         DebugText::Unlock();
                     }
@@ -806,7 +807,7 @@ void DebugText::Idle() {
                     if (pitem->fDie < 0.0) {
                         DebugText::Lock();
                         pitem->spNode.m_pObject->m_pkParent->DetachChild(pitem->spNode.m_pObject);
-                        pitem->spNode.operator=(static_cast<NiNode*>(0));
+                        pitem->spNode.operator=(static_cast<NiNode*>(nullptr));
                         DebugText::Unlock();
                         DebugText::DebugTextData* apThis = pme->xFloatingTextList.Remove(pitem);
                         if (apThis) {
@@ -1023,10 +1024,10 @@ bool DebugText::AddFloatingText(NiAVObject* apObject, const char* apText, int32_
         }
         v8 = 0;
     LABEL_9:;
-        arg0 = v8 != 0 ? static_cast<NiNode*>(apObject) : 0;
+        arg0 = v8 != 0 ? static_cast<NiNode*>(apObject) : nullptr;
     }
     else {
-        arg0 = 0;
+        arg0 = nullptr;
     }
     if (!arg0 && apObject) {
         NiNode* m_pkParent = apObject->m_pkParent;
@@ -1040,10 +1041,10 @@ bool DebugText::AddFloatingText(NiAVObject* apObject, const char* apText, int32_
             }
             v5 = 0;
         LABEL_20:;
-            arg0 = v5 != 0 ? m_pkParent : 0;
+            arg0 = v5 != 0 ? m_pkParent : nullptr;
         }
         else {
-            arg0 = 0;
+            arg0 = nullptr;
         }
     }
     return arg0 && DebugText::AddFloatingText(arg0, apText, aiHeight, afDie);
@@ -1061,10 +1062,10 @@ void DebugText::ClearFloatingText(NiAVObject* apTarget, int32_t aiHeight) {
         }
         v5 = 0;
     LABEL_9:;
-        pnode = v5 != 0 ? static_cast<NiNode*>(apTarget) : 0;
+        pnode = v5 != 0 ? static_cast<NiNode*>(apTarget) : nullptr;
     }
     else {
-        pnode = 0;
+        pnode = nullptr;
     }
     if (!pnode && apTarget) {
         NiNode* m_pkParent = apTarget->m_pkParent;
@@ -1078,10 +1079,10 @@ void DebugText::ClearFloatingText(NiAVObject* apTarget, int32_t aiHeight) {
             }
             v2 = 0;
         LABEL_20:;
-            pnode = v2 != 0 ? m_pkParent : 0;
+            pnode = v2 != 0 ? m_pkParent : nullptr;
         }
         else {
-            pnode = 0;
+            pnode = nullptr;
         }
     }
     if (pnode) {
@@ -1245,7 +1246,7 @@ void DebugText::Free() {
         DebugText* Block = pInstance;
         pInstance->~DebugText();
         MemoryManager_Singleton.Deallocate(Block);
-        pInstance = 0;
+        pInstance = nullptr;
     }
 }
 

@@ -354,7 +354,7 @@ void NiAdditionalGeometryData::NiAGDDataStream::GetViewerStrings(NiTPrimitiveArr
 }
 
 void NiAdditionalGeometryData::NiAGDDataStream::SetConsistency(int32_t eConsistency) {
-    m_uFlags = (uint8_t)(((uint8_t)ConvertFromConsistency(eConsistency)) | (m_uFlags & 249));
+    m_uFlags = (uint8_t)(ConvertFromConsistency(eConsistency) | (m_uFlags & 249));
 }
 
 uint8_t NiAdditionalGeometryData::NiAGDDataStream::ConvertFromConsistency(int32_t eConsistency) {
@@ -498,7 +498,7 @@ void NiAdditionalGeometryData::NiAGDDataBlock::LoadBinary(
     uint32_t m_uiDataBlockSize = this->m_uiDataBlockSize;
     m_bBSHeap = usVertexCount < 64u;
     m_pucDataBlock = AllocateBuffer(m_uiDataBlockSize);
-    m_bOwnData = 1;
+    m_bOwnData = true;
     NiBinaryStream* v10 = (&kStream)->Istr();
     NiBinaryStream::NIBINARYSTREAMREADFN v11 = v10->m_pfnRead;
     v25 = 4;
@@ -548,7 +548,7 @@ void NiAdditionalGeometryData::NiAGDDataBlock::LoadBinary(
         }
         while (v25 < v28);
     }
-    ProtectBuffer(0, 0);
+    ProtectBuffer(nullptr, 0);
 }
 
 void NiAdditionalGeometryData::NiAGDDataBlock::SaveBinary(
@@ -631,7 +631,7 @@ void NiAdditionalGeometryData::NiAGDDataBlock::SaveBinary(
     v42 = 0;
     if (v43) {
         int32_t v46 = usVertexCount;
-        while (1) {
+        while (true) {
             uint32_t pauiDataArray[32];
             uint32_t v27 = v49[v26];
             uint32_t v28 = v49[v26 + 1];
@@ -878,7 +878,7 @@ NiAdditionalGeometryData::NiAGDDataBlock* NiAdditionalGeometryData::CreateAGDDat
         MemoryManager_Singleton.Allocate(sizeof(NiAdditionalGeometryData::NiAGDDataBlock))
     );
     if (!result) {
-        return 0;
+        return nullptr;
     }
     return ::new (result) NiAdditionalGeometryData::NiAGDDataBlock;
 }
@@ -901,7 +901,7 @@ void NiAdditionalGeometryData::SetDataStreamCount(uint32_t uiCount) {
         );
     }
     else {
-        v5 = 0;
+        v5 = nullptr;
     }
     this->m_pkDataStreamEntries = v5;
     if (m_pkDataStreamEntries) {
@@ -914,17 +914,17 @@ void NiAdditionalGeometryData::SetDataStreamCount(uint32_t uiCount) {
 bool NiAdditionalGeometryData::SetDataBlock(uint32_t uiIndex, uint8_t* pucData, uint32_t uiTotalSize, bool bCopyData) {
     NiAdditionalGeometryData::NiAGDDataBlock* v7;
     NiAdditionalGeometryData::NiAGDDataBlock* v11;
-    if (uiIndex < m_aDataBlocks.m_usSize && (v7 = m_aDataBlocks.m_pBase[uiIndex], (v11 = v7) != 0)) {
+    if (uiIndex < m_aDataBlocks.m_usSize && (v7 = m_aDataBlocks.m_pBase[uiIndex], (v11 = v7) != nullptr)) {
         if (v7->m_uiDataBlockSize != uiTotalSize) {
-            v7->FreeBuffer(0);
-            v7->m_pucDataBlock = 0;
+            v7->FreeBuffer(nullptr);
+            v7->m_pucDataBlock = nullptr;
         }
     }
     else {
         v7 = CreateAGDDataBlock();
         v11 = v7;
         if (!v7) {
-            return 0;
+            return false;
         }
     }
     if (!v7->m_pucDataBlock) {
@@ -949,7 +949,7 @@ bool NiAdditionalGeometryData::SetDataBlock(uint32_t uiIndex, uint8_t* pucData, 
     }
     p_m_aDataBlocks->SetAt(uiIndex, v11);
     v7->m_bOwnData = bCopyData;
-    return 1;
+    return true;
 }
 
 bool NiAdditionalGeometryData::SetDataStream(
@@ -964,26 +964,26 @@ bool NiAdditionalGeometryData::SetDataStream(
     uint16_t usCount = static_cast<uint16_t>(aiCount);
     NiAdditionalGeometryData::NiAGDDataStream* m_pkDataStreamEntries;
     if (usCount != m_usVertexCount) {
-        return (bool)0;
+        return false;
     }
     if (uiStreamIndex >= m_uiDataStreamCount) {
-        return (bool)0;
+        return false;
     }
     m_pkDataStreamEntries = this->m_pkDataStreamEntries;
     if (!m_pkDataStreamEntries) {
-        return (bool)0;
+        return false;
     }
     if (uiBlockIndex > ((uint32_t)((int32_t)m_aDataBlocks.m_usSize))) {
-        return (bool)0;
+        return false;
     }
     NiAdditionalGeometryData::NiAGDDataStream* v10 = &m_pkDataStreamEntries[uiStreamIndex];
-    v10->m_uiType = (uint32_t)uiType;
+    v10->m_uiType = uiType;
     v10->m_uiBlockIndex = uiBlockIndex;
     v10->m_uiBlockOffset = uiBlockOffset;
     v10->m_uiStride = uiStride;
     v10->m_uiUnitSize = uiUnitSize;
     v10->m_uiTotalSize = uiUnitSize * usCount;
-    return (bool)1;
+    return true;
 }
 
 // The block's buffer, or null; uiBlockSize gets its size (0 without a block).
@@ -1025,17 +1025,17 @@ bool NiAdditionalGeometryData::GetDataStream(
     uint32_t m_uiBlockIndex;
     uint32_t m_uiBlockOffset;
     if (uiStreamIndex >= m_uiDataStreamCount) {
-        return (bool)0;
+        return false;
     }
     m_pkDataStreamEntries = this->m_pkDataStreamEntries;
     if (!m_pkDataStreamEntries) {
-        return (bool)0;
+        return false;
     }
     m_uiType = m_pkDataStreamEntries[uiStreamIndex].m_uiType;
     NiAdditionalGeometryData::NiAGDDataStream* v11 = &m_pkDataStreamEntries[uiStreamIndex];
     uiType = m_uiType;
     if (!m_uiType) {
-        return (bool)0;
+        return false;
     }
     usCount = m_usVertexCount;
     uiTotalSize = v11->m_uiTotalSize;
@@ -1043,18 +1043,18 @@ bool NiAdditionalGeometryData::GetDataStream(
     uiStride = v11->m_uiStride;
     m_uiBlockIndex = v11->m_uiBlockIndex;
     if (m_uiBlockIndex > ((uint32_t)((int32_t)m_aDataBlocks.m_usSize))) {
-        return (bool)0;
+        return false;
     }
     NiAdditionalGeometryData::NiAGDDataBlock* v13 = m_aDataBlocks.m_pBase[m_uiBlockIndex];
     if (!v13) {
-        return (bool)0;
+        return false;
     }
     m_uiBlockOffset = v11->m_uiBlockOffset;
     if (v13->m_uiDataBlockSize < m_uiBlockOffset) {
-        return (bool)0;
+        return false;
     }
     pucData = &v13->m_pucDataBlock[m_uiBlockOffset];
-    return (bool)1;
+    return true;
 }
 
 uint32_t NiAdditionalGeometryData::GetSize() const {

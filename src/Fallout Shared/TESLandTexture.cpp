@@ -15,7 +15,7 @@
 
 TESLandTexture::TESLandTexture() : TESForm(), TextureGrassList() {
     SetFormType(0x12u);
-    SetInitialized(1);
+    SetInitialized(true);
     TESLandTexture::InitializeData();
 }
 
@@ -101,7 +101,7 @@ void TESLandTexture::Save() {
 void TESLandTexture::InitItem() {
     if (!GetInitialized()) {
         BSSimpleList<TESGrass*>* plist = &TextureGrassList;
-        BSSimpleList<TESGrass*>* plastlist = 0;
+        BSSimpleList<TESGrass*>* plastlist = nullptr;
         while (plist && !plist->IsEmpty()) {
             uint32_t tempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(plist->m_item));
             TESFile* File = GetFile(-1);
@@ -160,17 +160,17 @@ void TESLandTexture::InitItem() {
                         pTextureSet->GetFormEditorID(), v10
                     );
                 }
-                pTextureSet->SetHasSpecular(0);
+                pTextureSet->SetHasSpecular(false);
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
 void TESLandTexture::Copy(TESForm* apCopy) {
     TESLandTexture* pcopy = dynamic_cast<TESLandTexture*>(apCopy);
     if (pcopy) {
-        BSSimpleList<TESGrass*>* piter = 0;
+        BSSimpleList<TESGrass*>* piter = nullptr;
         TextureGrassList.RemoveAll();
         CopyAllComponents(pcopy);
         ourMemcpy(&HavokData, &pcopy->HavokData, sizeof(HavokData));
@@ -186,26 +186,26 @@ void TESLandTexture::Copy(TESForm* apCopy) {
 bool TESLandTexture::Compare(TESForm* apCompare) {
     TESLandTexture* pcomp = dynamic_cast<TESLandTexture*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     if (std::memcmp(&HavokData, &pcomp->HavokData, sizeof(HavokData))) {
-        return 1;
+        return true;
     }
     if (cSpecularExponent != pcomp->cSpecularExponent) {
-        return 1;
+        return true;
     }
     if (pTextureSet != pcomp->pTextureSet) {
-        return 1;
+        return true;
     }
     BSSimpleList<TESGrass*>* plist = &TextureGrassList;
     BSSimpleList<TESGrass*>* pcomplist = &pcomp->TextureGrassList;
     while (plist && pcomplist) {
         BSSimpleList<TESGrass*>* v3 = plist;
         if (v3->m_item != pcomplist->m_item) {
-            return 1;
+            return true;
         }
         pcomplist = pcomplist->m_pkNext;
         plist = plist->m_pkNext;
@@ -223,7 +223,7 @@ uint8_t TESLandTexture::GetSpecularExponent() {
 
 void TESLandTexture::QueueTexture(IO_TASK_PRIORITY aePriority, QueuedFile* apParent) {
     if (pTextureSet) {
-        pTextureSet->QueueTextureSet(aePriority, apParent, 1);
+        pTextureSet->QueueTextureSet(aePriority, apParent, true);
     }
 }
 

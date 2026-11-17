@@ -99,7 +99,7 @@ bool ExperiencePoints::CheckDamageThreshold(float afPCDamage, float afOriginalHe
     else {
         v3 = (int32_t)((afPCDamage / afOriginalHealth) * 100.0);
     }
-    return (bool)((uint8_t)(v3 > ((int32_t)((&iXPDeathRewardHealthThreshold)->UInt()))));
+    return (bool)((uint8_t)(v3 > ((int32_t)(&iXPDeathRewardHealthThreshold)->UInt())));
 }
 
 // The experience the activity awards at aiDifficulty: the reward of the first (difficulty, reward) setting pair whose
@@ -130,11 +130,11 @@ int32_t ExperiencePoints::GetExperiencePoints(
     int32_t v7 = (-1);
     uint32_t v6 = 0;
     for (i = 0; (i < aiPairCount) && (v7 < 0); ++i) {
-        if (aiDifficulty > ((int32_t)(apDifficultyRewardList[i][0]->UInt()))) {
+        if (aiDifficulty > ((int32_t)apDifficultyRewardList[i][0]->UInt())) {
             v6 = apDifficultyRewardList[i][1]->UInt();
         }
         else {
-            v7 = (int32_t)(apDifficultyRewardList[i][1]->UInt());
+            v7 = (int32_t)apDifficultyRewardList[i][1]->UInt();
         }
     }
     if (v7 >= 0) {

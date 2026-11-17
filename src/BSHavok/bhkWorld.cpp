@@ -423,7 +423,7 @@ void bhkWorld::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
         apStrings->SetSize(v9 + apStrings->m_usGrowBy);
     }
     apStrings->SetAt(v9, v35);
-    char* v10 = NiGetViewerString("Vis Debug", pDebugger != 0);
+    char* v10 = NiGetViewerString("Vis Debug", pDebugger != nullptr);
     uint32_t v11 = apStrings->m_usSize;
     uint32_t v12 = apStrings->m_usMaxSize;
     v35 = v10;
@@ -558,7 +558,7 @@ hkSerializableCinfo& bhkWorld::CreateCinfo(bool& arCreated) {
     TLSData* pTLSData = GetThreadTLSData();
     MEM_CONTEXT eMemContext = pTLSData->eMemContext;
     pTLSData->eMemContext = MEM_CONTEXT_HAVOK;
-    bool bCreate = pInfo == 0;
+    bool bCreate = pInfo == nullptr;
     arCreated = bCreate;
     if (bCreate) {
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
@@ -567,7 +567,7 @@ hkSerializableCinfo& bhkWorld::CreateCinfo(bool& arCreated) {
         bhkWorldCinfo* pCinfo = ::new (pNewInfo) bhkWorldCinfo;
         // The serializable tag base sits after the Havok cinfo (+0xF0); a null cinfo stays null.
         hkSerializableCinfo* pSerializableInfo = static_cast<hkSerializableCinfo*>(pCinfo);
-        bool bNoObject = phkObject == 0;
+        bool bNoObject = phkObject == nullptr;
         pInfo = pSerializableInfo;
         if (!bNoObject) {
             bhkWorldCinfo* pWorldInfo = static_cast<bhkWorldCinfo*>(pSerializableInfo);
@@ -655,12 +655,12 @@ bool bhkWorld::PickObject(bhkPickData& arPickData) {
         // EXE-INLINED 0x9C8EF0
         float fMaxTime = bhkWorld::bVatsReplay ? bhkWorld::fMaxPickTimeVATS : bhkWorld::fMaxPickTime;
         if (fMaxTime < bhkWorld::fCurrentPickTime) {
-            arPickData.bPickFailed = 1;
+            arPickData.bPickFailed = true;
             // EXE-INLINED 0x62A2B0
             arPickData.m_hitFraction = 1.0f;
             arPickData.m_extraInfo = -1;
             arPickData.m_shapeKeys[0] = -1;
-            arPickData.m_rootCollidable = 0;
+            arPickData.m_rootCollidable = nullptr;
             arPickData.m_shapeKeyIndex = 0;
             return false;
         }
@@ -672,7 +672,7 @@ bool bhkWorld::PickObject(bhkPickData& arPickData) {
         arPickData.CalcTo();
         // EXE-INLINED 0x62A2B0
         arPickData.m_hitFraction = 1.0f;
-        arPickData.m_rootCollidable = 0;
+        arPickData.m_rootCollidable = nullptr;
         arPickData.m_extraInfo = -1;
         arPickData.m_shapeKeyIndex = 0;
         arPickData.m_shapeKeys[0] = -1;
@@ -684,7 +684,7 @@ bool bhkWorld::PickObject(bhkPickData& arPickData) {
             if (pCache) {
                 FNVD_INLINED_LOCAL(hkpWorldRayCaster, kCaster, hkpWorldRayCaster_vftable, std::nullopt);
                 kCaster.m_shapeInput.m_filterInfo = 0;
-                kCaster.m_shapeInput.m_rayShapeCollectionFilter = 0;
+                kCaster.m_shapeInput.m_rayShapeCollectionFilter = nullptr;
                 kCaster.castRay(*pWorld->m_broadPhase, arPickData, pWorld->m_collisionFilter, pCache, *pAllCollector);
             }
             else {
@@ -704,7 +704,7 @@ bool bhkWorld::PickObject(bhkPickData& arPickData) {
                 // EXE-INLINED 0x62A290
                 // EXE-INLINED 0x62A2B0
                 pClosestCollector->m_rayHit.m_hitFraction = 1.0f;
-                pClosestCollector->m_rayHit.m_rootCollidable = 0;
+                pClosestCollector->m_rayHit.m_rootCollidable = nullptr;
                 pClosestCollector->m_rayHit.m_extraInfo = -1;
                 pClosestCollector->m_rayHit.m_shapeKeyIndex = 0;
                 pClosestCollector->m_rayHit.m_shapeKeys[0] = -1;
@@ -715,7 +715,7 @@ bool bhkWorld::PickObject(bhkPickData& arPickData) {
                     // As above: the caster's constructor and destructor are inline.
                     FNVD_INLINED_LOCAL(hkpWorldRayCaster, kCaster, hkpWorldRayCaster_vftable, std::nullopt);
                     kCaster.m_shapeInput.m_filterInfo = 0;
-                    kCaster.m_shapeInput.m_rayShapeCollectionFilter = 0;
+                    kCaster.m_shapeInput.m_rayShapeCollectionFilter = nullptr;
                     kCaster.castRay(
                         *pWorld->m_broadPhase, arPickData, pWorld->m_collisionFilter, pCache, *pClosestCollector
                     );
@@ -730,7 +730,7 @@ bool bhkWorld::PickObject(bhkPickData& arPickData) {
             }
             else {
                 pWorld->castRay(arPickData, rOutput);
-                bres = arPickData.m_rootCollidable != 0;
+                bres = arPickData.m_rootCollidable != nullptr;
             }
         }
     }
@@ -893,7 +893,7 @@ void bhkWorld::SetDebugDisplay(NiAVObject* apRoot, bool abTF) {
     if (apRoot) {
         v3 = (uint8_t)(!bDebugDisplay);
         v4.pWorld = nullptr;
-        v4.bRecurse = (bool)1;
+        v4.bRecurse = true;
         v4.eAction = bhkWorld::OA_DEBUGDISPLAY;
         v4.uDataA[0].i = (int32_t)((uint8_t)(!v3));
         if (bhkWorld::pRecFunctionA[6]) {
@@ -1070,9 +1070,8 @@ void bhkWorld::ScaleSolverInfo() {
     ahkpWorld* phkWorld = this ? static_cast<ahkpWorld*>(const_cast<hkpWorld*>(GethkWorld())) : nullptr;
     hkpSolverInfo& kSolverInfo = phkWorld->m_dynamicsStepInfo.m_solverInfo;
     if (iUpdateType == 2) {
-        float numSubsteps = static_cast<float>(
-            std::ceil(static_cast<double>(static_cast<float>(fBSDeltaTime / fTimePerSubStep.uValue.f)))
-        );
+        float numSubsteps =
+            static_cast<float>(std::ceil(static_cast<double>((fBSDeltaTime / fTimePerSubStep.uValue.f))));
         float timePerSubstep = fTimePerSubStep.uValue.f;
         if (iMinNumSubSteps.uValue.f > numSubsteps) {
             numSubsteps = iMinNumSubSteps.uValue.f;
@@ -1406,7 +1405,7 @@ void bhkWorld::SetVisualDebugger(bool abTF) {
 // destroyed when it goes out of scope, after the result is read.
 bool bhkWorld::SaveSnapshot(const char* apFileName) {
     hkOstream kStream(apFileName);
-    hkBool bBinary = {0};
+    hkBool bBinary = {false};
     bhkSerializable* pSerializable = this;
     hkBool bResult;
     hkpHavokSnapshot::save(&bResult, pSerializable->GethkWorld(), kStream.m_writer, bBinary, nullptr, false);
@@ -1713,7 +1712,7 @@ ahkpWorld* bhkWorld::operator*() const {
         return GetahkpWorld();
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -2091,7 +2090,7 @@ bool bhkWorld::Activate(NiAVObject* apObject, bool abActivate, bool abRecurse, b
     bhkWorld::ObjectRecData arData;
     uint8_t v4 = 0;
     if (apObject) {
-        if (abForce || (((v5 = BSXFlags::Find(apObject)) != 0) && ((v5->m_iValue & 2) != 0))) {
+        if (abForce || (((v5 = BSXFlags::Find(apObject)) != nullptr) && ((v5->m_iValue & 2) != 0))) {
             arData.bRecurse = (bool)((uint8_t)abRecurse);
             v4 = 1;
             arData.pWorld = nullptr;
@@ -2110,7 +2109,7 @@ bool bhkWorld::RemoveObjects(NiAVObject* apObject, bool abRecurse, bool abForce)
     bhkWorld::ObjectRecData arData;
     uint8_t result = 0;
     if (apObject) {
-        if (abForce || (((v4 = BSXFlags::Find(apObject)) != 0) && ((v4->m_iValue & 2) != 0))) {
+        if (abForce || (((v4 = BSXFlags::Find(apObject)) != nullptr) && ((v4->m_iValue & 2) != 0))) {
             arData.bRecurse = (bool)((uint8_t)abRecurse);
             arData.pWorld = nullptr;
             arData.eAction = bhkWorld::OA_REMOVE;
@@ -2120,7 +2119,7 @@ bool bhkWorld::RemoveObjects(NiAVObject* apObject, bool abRecurse, bool abForce)
             return (bool)((uint8_t)abForce);
         }
         else {
-            return (bool)0;
+            return false;
         }
     }
     return (bool)result;
@@ -2351,14 +2350,14 @@ void bhkWorld::DoDisable(bhkNiCollisionObject* apCollision, bhkWorldNS::ObjectRe
 }
 
 bool bhkWorld::AdjustForceAddCount(NiAVObject* apObject, bool abIncrement, bool abRecurse, bool abForce) {
-    bool v4 = 0;
+    bool v4 = false;
     if (apObject) {
         BSXFlags* v5;
-        if (abForce || ((v5 = BSXFlags::Find(apObject)) != 0 && (v5->m_iValue & 2) != 0)) {
+        if (abForce || ((v5 = BSXFlags::Find(apObject)) != nullptr && (v5->m_iValue & 2) != 0)) {
             bhkWorld::ObjectRecData arData;
             arData.bRecurse = abRecurse;
-            v4 = 1;
-            arData.pWorld = 0;
+            v4 = true;
+            arData.pWorld = nullptr;
             arData.eAction = bhkWorld::OA_FORCEADD;
             arData.uDataA[0].i = abIncrement;
             if (bhkWorld::pRecFunctionA[13]) {
@@ -2461,7 +2460,7 @@ bool bhkWorld::Enable(NiAVObject* apObject, bool abEnable, bool abRecurse, bool 
     if (!apObject) {
         return (bool)v4;
     }
-    if ((((uint8_t)abForce) == 0) && (((v5 = BSXFlags::Find(apObject)) == 0) || ((v5->m_iValue & 2) == 0))) {
+    if ((((uint8_t)abForce) == 0) && (((v5 = BSXFlags::Find(apObject)) == nullptr) || ((v5->m_iValue & 2) == 0))) {
         return (bool)v4;
     }
     v7.bRecurse = (bool)((uint8_t)abRecurse);
@@ -2482,7 +2481,7 @@ bool bhkWorld::EnableCollision(NiAVObject* apObject, bool abEnable, bool abRecur
     if (!apObject) {
         return (bool)v4;
     }
-    if ((((uint8_t)abForce) == 0) && (((v5 = BSXFlags::Find(apObject)) == 0) || ((v5->m_iValue & 2) == 0))) {
+    if ((((uint8_t)abForce) == 0) && (((v5 = BSXFlags::Find(apObject)) == nullptr) || ((v5->m_iValue & 2) == 0))) {
         return (bool)v4;
     }
     v7.bRecurse = (bool)((uint8_t)abRecurse);
@@ -2503,7 +2502,7 @@ bool bhkWorld::SetDisabled(NiAVObject* apObject, bool abDisabled, bool abRecurse
     if (!apObject) {
         return (bool)v4;
     }
-    if ((((uint8_t)abForce) == 0) && (((v5 = BSXFlags::Find(apObject)) == 0) || ((v5->m_iValue & 2) == 0))) {
+    if ((((uint8_t)abForce) == 0) && (((v5 = BSXFlags::Find(apObject)) == nullptr) || ((v5->m_iValue & 2) == 0))) {
         return (bool)v4;
     }
     v7.bRecurse = (bool)((uint8_t)abRecurse);
@@ -2522,7 +2521,7 @@ bool bhkWorld::SetGroup(NiAVObject* apObject, uint32_t aiGroup, bool abRecurse, 
     bhkWorld::ObjectRecData kData;
     uint8_t bResult = 0;
     if (apObject) {
-        if (abForce || (((v5 = BSXFlags::Find(apObject)) != 0) && ((v5->m_iValue & 2) != 0))) {
+        if (abForce || (((v5 = BSXFlags::Find(apObject)) != nullptr) && ((v5->m_iValue & 2) != 0))) {
             kData.bRecurse = (bool)((uint8_t)abRecurse);
             bResult = 1;
             kData.pWorld = nullptr;
@@ -2540,12 +2539,12 @@ bool bhkWorld::IsActive(NiAVObject* apObject, bool abRecurse, bool abForce) {
     BSXFlags* v3;
     bhkWorld::ObjectRecData v5;
     if (!apObject) {
-        return (bool)0;
+        return false;
     }
     if (!abForce) {
         v3 = BSXFlags::Find(apObject);
         if ((!v3) || ((v3->m_iValue & 2) == 0)) {
-            return (bool)0;
+            return false;
         }
     }
     v5.bRecurse = (bool)((uint8_t)abRecurse);
@@ -2568,7 +2567,7 @@ bool bhkWorld::ChangeLayer(NiAVObject* apObject, COL_LAYER aeTo, COL_LAYER aeFro
     bhkWorld::ObjectRecData v8;
     int8_t v5 = 0;
     if (apObject) {
-        if (abForce || (((v6 = BSXFlags::Find(apObject)) != 0) && ((v6->m_iValue & 2) != 0))) {
+        if (abForce || (((v6 = BSXFlags::Find(apObject)) != nullptr) && ((v6->m_iValue & 2) != 0))) {
             v8.bRecurse = (bool)((uint8_t)abRecurse);
             v5 = 1;
             v8.pWorld = nullptr;
@@ -2584,15 +2583,15 @@ bool bhkWorld::ChangeLayer(NiAVObject* apObject, COL_LAYER aeTo, COL_LAYER aeFro
 }
 
 bool bhkWorld::SetRestitution(NiAVObject* apObject, float afRestitution, bool abRecurse, bool abForce) {
-    bool bres = 0;
+    bool bres = false;
     if (apObject) {
         BSXFlags* v5;
-        if (abForce || ((v5 = BSXFlags::Find(apObject)) != 0 && (v5->m_iValue & 2) != 0)) {
+        if (abForce || ((v5 = BSXFlags::Find(apObject)) != nullptr && (v5->m_iValue & 2) != 0)) {
             bhkWorldNS::ObjectRecData recData;
             recData.bRecurse = abRecurse;
             recData.uDataA[0].f = afRestitution;
-            bres = 1;
-            recData.pWorld = 0;
+            bres = true;
+            recData.pWorld = nullptr;
             recData.eAction = bhkWorldNS::OA_SETRESTITUTION;
             if (bhkWorld::pRecFunctionA[15]) {
                 bhkWorld::DoObjectRec(apObject, recData, bhkWorld::pRecFunctionA[15]);
@@ -2603,15 +2602,15 @@ bool bhkWorld::SetRestitution(NiAVObject* apObject, float afRestitution, bool ab
 }
 
 bool bhkWorld::SetFriction(NiAVObject* apObject, float afFriction, bool abRecurse, bool abForce) {
-    bool bres = 0;
+    bool bres = false;
     if (apObject) {
         BSXFlags* v5;
-        if (abForce || ((v5 = BSXFlags::Find(apObject)) != 0 && (v5->m_iValue & 2) != 0)) {
+        if (abForce || ((v5 = BSXFlags::Find(apObject)) != nullptr && (v5->m_iValue & 2) != 0)) {
             bhkWorldNS::ObjectRecData recData;
             recData.bRecurse = abRecurse;
             recData.uDataA[0].f = afFriction;
-            bres = 1;
-            recData.pWorld = 0;
+            bres = true;
+            recData.pWorld = nullptr;
             recData.eAction = bhkWorldNS::OA_SETFRICTION;
             if (bhkWorld::pRecFunctionA[16]) {
                 bhkWorld::DoObjectRec(apObject, recData, bhkWorld::pRecFunctionA[16]);
@@ -2625,8 +2624,8 @@ bool bhkWorld::SetCollisionGroup(bhkWorldObject* apObject, bhkWorldNS::ObjectRec
     hkpLinkedCollidable* p_m_collidable;
     uint32_t m_collisionFilterInfo;
     hkpRigidBody* phkObject = static_cast<hkpRigidBody*>(apObject->phkObject);
-    bool bres = 0;
-    if (phkObject && (p_m_collidable = &phkObject->m_collidable) != 0) {
+    bool bres = false;
+    if (phkObject && (p_m_collidable = &phkObject->m_collidable) != nullptr) {
         m_collisionFilterInfo = p_m_collidable->m_broadPhaseHandle.m_collisionFilterInfo;
     }
     else {
@@ -2635,7 +2634,7 @@ bool bhkWorld::SetCollisionGroup(bhkWorldObject* apObject, bhkWorldNS::ObjectRec
     uint32_t igroup = static_cast<uint16_t>(m_collisionFilterInfo >> 16);
     if (arData.uDataA[1].i) {
         apObject->SetCollisionGroup(arData.uDataA[1].i);
-        return 1;
+        return true;
     }
     else {
         if (!igroup) {
@@ -2648,7 +2647,7 @@ bool bhkWorld::SetCollisionGroup(bhkWorldObject* apObject, bhkWorldNS::ObjectRec
                     bhkCollisionFilter::uiNextGroup = 10;
                 }
             }
-            bres = 1;
+            bres = true;
         }
         arData.uDataA[1].i = igroup;
         if (bres) {

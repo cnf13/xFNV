@@ -88,7 +88,7 @@ void bhkCharacterListenerArrow::ProcessCollision(
     hkpPhantom* pph = hkpGetPhantom(apCollidee);
     if (!pph ||
         (pactor &&
-         (!pactor->IsDead(0) &&
+         (!pactor->IsDead(false) &&
           ((!pactor->pCurrentProcess ||
             ((CurrentAIProcess = pactor->pCurrentProcess, CurrentAIProcess->GetKnockState() == KNOCK_STATE_NORMAL) ||
              (v8 = pactor->pCurrentProcess, v8->GetKnockState() == KNOCK_STATE_GET_UP))) &&

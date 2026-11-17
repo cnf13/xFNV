@@ -44,7 +44,7 @@ void hkpPrimitiveDrawer::displayArrow(
     v24.setAxisAngle(perpDirection, -1.5707964f);
     __m128 v10 = _mm_mul_ps(v23.m_vec.m_quad, arrowDirection.m_quad);
     __m128 v11 = _mm_shuffle_ps(v10, v10, 170);
-    v11[0] = v11[0] + static_cast<float>(_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
+    v11[0] = v11[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
     __m128 v12 = _mm_shuffle_ps(v23.m_vec.m_quad, v23.m_vec.m_quad, 255);
     __m128 v13 = _mm_add_ps(
         _mm_mul_ps(
@@ -78,7 +78,7 @@ void hkpPrimitiveDrawer::displayArrow(
     hkDebugDisplayHandler* v15 = this->m_displayHandler;
     __m128 v16 = _mm_mul_ps(v24.m_vec.m_quad, v25);
     __m128 v17 = _mm_shuffle_ps(v16, v16, 170);
-    v17[0] = v17[0] + static_cast<float>(_mm_shuffle_ps(v16, v16, 85)[0] + v16[0]);
+    v17[0] = v17[0] + (_mm_shuffle_ps(v16, v16, 85)[0] + v16[0]);
     __m128 v18 = _mm_shuffle_ps(v24.m_vec.m_quad, v24.m_vec.m_quad, 255);
     __m128 v19 = _mm_add_ps(
         _mm_mul_ps(
@@ -207,7 +207,7 @@ void hkpPrimitiveDrawer::displayCone(
     v31.setAxisAngle(coneAxis, afAngle);
     __m128 v12 = _mm_mul_ps(coneAxis.m_quad, v30.m_vec.m_quad);
     __m128 v13 = _mm_shuffle_ps(v12, v12, 170);
-    v13[0] = v13[0] + static_cast<float>(_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]);
+    v13[0] = v13[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]);
     __m128 v14 = _mm_shuffle_ps(v30.m_vec.m_quad, v30.m_vec.m_quad, 255);
     __m128 v15 = _mm_add_ps(
         _mm_mul_ps(
@@ -239,7 +239,7 @@ void hkpPrimitiveDrawer::displayCone(
             *p_m_quad = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(m_quad, m_quad, 0), v16), *p_m_quad);
             __m128 v20 = _mm_mul_ps(v31.m_vec.m_quad, v16);
             __m128 v21 = _mm_shuffle_ps(v20, v20, 170);
-            v21[0] = v21[0] + static_cast<float>(_mm_shuffle_ps(v20, v20, 85)[0] + v20[0]);
+            v21[0] = v21[0] + (_mm_shuffle_ps(v20, v20, 85)[0] + v20[0]);
             __m128 v22 = _mm_shuffle_ps(v31.m_vec.m_quad, v31.m_vec.m_quad, 255);
             __m128 v23 = _mm_add_ps(
                 _mm_mul_ps(

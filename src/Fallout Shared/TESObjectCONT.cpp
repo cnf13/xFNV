@@ -232,7 +232,7 @@ void TESObjectCONT::InitItem() {
                 );
             }
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -250,22 +250,22 @@ void TESObjectCONT::Copy(TESForm* apCopy) {
 bool TESObjectCONT::Compare(TESForm* apCompare) {
     TESObjectCONT* pComp = dynamic_cast<TESObjectCONT*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
     int32_t cContFlags = Data.cContFlags;
     if (cContFlags != (&pComp->Data)->cContFlags) {
-        return 1;
+        return true;
     }
     TESSound* OpenSound = GetOpenSound();
     if (OpenSound != pComp->GetOpenSound()) {
-        return 1;
+        return true;
     }
     TESSound* CloseSound = GetCloseSound();
     if (CloseSound != pComp->GetCloseSound()) {
-        return 1;
+        return true;
     }
     TESSound* LoopingSound = GetLoopingSound();
     return LoopingSound != pComp->GetLoopingSound();
@@ -282,14 +282,14 @@ bool TESObjectCONT::Activate(
     FNVD_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     int32_t fdoPunishment;
     Actor* pActionActor = dynamic_cast<Actor*>(apActionRef);
-    TESForm* pownership = 0;
+    TESForm* pownership = nullptr;
     PACKAGE_OBJECT_TYPE eUseItem = POTYPE_NONE;
     if (!pActionActor) {
-        return 0;
+        return false;
     }
-    bool bignorelock = 0;
+    bool bignorelock = false;
     if (apActionRef != pPlayer) {
-        bignorelock = apItemActivated->IsAnOwner(pActionActor, 1);
+        bignorelock = apItemActivated->IsAnOwner(pActionActor, true);
     }
     LockData* pLock = apItemActivated->GetLock();
     if (pLock && (pLock->IsLocked() && !bignorelock)) {
@@ -305,12 +305,14 @@ bool TESObjectCONT::Activate(
                 }
                 BSAudio* v6 = &BSAudio::QInstance();
                 BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&a1, "UILockpickingUnlock", 289u);
-                SoundHandleByName->Play(0);
+                SoundHandleByName->Play(false);
                 BSsprintf(msg, 255u, sOpenWithKey.String(), pLock->pKey->GetFullName());
-                Interface::ShowMessage(msg, 0, "Interface\\Icons\\Message Icons\\glow_message_key.dds", 0, 2.0f, 0);
-                pstaticcontainer->Activate(pPlayer, 0, 0, 1);
-                pstaticcontainer = 0;
-                return 1;
+                Interface::ShowMessage(
+                    msg, 0, "Interface\\Icons\\Message Icons\\glow_message_key.dds", nullptr, 2.0f, false
+                );
+                pstaticcontainer->Activate(pPlayer, false, nullptr, 1);
+                pstaticcontainer = nullptr;
+                return true;
             }
         }
         else {
@@ -323,25 +325,27 @@ bool TESObjectCONT::Activate(
                         (pextralock_2->pLock->GetLockLevel(apItemActivated) == 5 || pextralock_2->pLock->IsBroken())) {
                         const char* v8 = sImpossibleLock.String();
                         Interface::ShowMessage(
-                            v8, 0, "Interface\\Icons\\Message Icons\\glow_message_padlock.dds", 0, 2.0f, 0
+                            v8, 0, "Interface\\Icons\\Message Icons\\glow_message_padlock.dds", nullptr, 2.0f, false
                         );
                     }
                     else {
-                        _ShowLockPickMenu(apItemActivated, 0, 0);
+                        _ShowLockPickMenu(apItemActivated, 0, false);
                     }
                 }
                 else {
                     Animation* panim = pActionActor->GetAnimation();
                     if (panim) {
-                        panim->SpecialIdleFree(1, 0);
+                        panim->SpecialIdleFree(true, false);
                     }
                     TESIdleManager::SetUsedItem(pLockpick);
-                    TESIdleManager::SetUsedItemActivate(1);
+                    TESIdleManager::SetUsedItemActivate(true);
                     TESIdleManager::SetUsedItemLevel(1);
                     BaseProcess* CurrentAIProcess = pActionActor->pCurrentProcess;
-                    CurrentAIProcess->SetupSpecialIdle(pActionActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
-                    TESIdleManager::SetUsedItem(0);
-                    TESIdleManager::SetUsedItemActivate(0);
+                    CurrentAIProcess->SetupSpecialIdle(
+                        pActionActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true
+                    );
+                    TESIdleManager::SetUsedItem(nullptr);
+                    TESIdleManager::SetUsedItemActivate(false);
                     TESIdleManager::SetUsedItemLevel(-1);
                     ExtraLock* pextralock_3 = apItemActivated->GetExtraLock();
                     if (pextralock_3) {
@@ -351,7 +355,7 @@ bool TESObjectCONT::Activate(
                 }
             }
         }
-        return 0;
+        return false;
     }
     if (pActionActor != pPlayer) {
         if (GetOpenSound()) {
@@ -363,7 +367,7 @@ bool TESObjectCONT::Activate(
                     v10->GetSoundHandleByNumericID(&soundHand, time, 258u);
                     NiPoint3 v17 = apItemActivated->GetLocationOnReference();
                     soundHand.SetPosition(v17.x, v17.y, v17.z);
-                    soundHand.Play(0);
+                    soundHand.Play(false);
                 }
             }
         }
@@ -373,20 +377,22 @@ bool TESObjectCONT::Activate(
             HandleOpenFinish(apItemActivated, pActionActor);
         }
         else {
-            BGSOpenCloseForm::HandleActivate(apItemActivated, pActionActor, 0);
+            BGSOpenCloseForm::HandleActivate(apItemActivated, pActionActor, nullptr);
         }
-        return 1;
+        return true;
     }
     else {
         if (apObjecttoGet) {
-            apItemActivated->RemoveItem(apObjecttoGet, 0, aicount, 0, 0, pActionActor, 0, 0, 1, 0);
+            apItemActivated->RemoveItem(
+                apObjecttoGet, nullptr, aicount, false, false, pActionActor, nullptr, nullptr, true, false
+            );
         }
-        if (pActionActor->IsNpc() && !apItemActivated->IsAnOwner(pActionActor, 1)) {
+        if (pActionActor->IsNpc() && !apItemActivated->IsAnOwner(pActionActor, true)) {
             if (apItemActivated->GetOwner()) {
                 pActionActor->StealAlarm(apItemActivated, apObjecttoGet, aicount, 1, pownership);
             }
         }
-        return 1;
+        return true;
     }
 }
 
@@ -418,18 +424,18 @@ void TESObjectCONT::SetLoopingSound(TESSound* apSound) {
 
 bool TESObjectCONT::CanActivate(TESObjectREFR* apItemActivated, TESObjectREFR* apActionRef, bool abAllowLockpicking) {
     if (!apActionRef || !apActionRef->IsActor()) {
-        return 0;
+        return false;
     }
     LockData* Lock = apItemActivated->GetLock();
     if (!Lock || !Lock->IsLocked()) {
-        return 1;
+        return true;
     }
-    if (apActionRef != pPlayer && apItemActivated->IsAnOwner(static_cast<Actor*>(apActionRef), 1)) {
-        return 1;
+    if (apActionRef != pPlayer && apItemActivated->IsAnOwner(static_cast<Actor*>(apActionRef), true)) {
+        return true;
     }
     PACKAGE_OBJECT_TYPE aeMatchId = POTYPE_NONE;
     if (Lock->pKey && static_cast<Actor*>(apActionRef)->Actor::HasObjects(Lock->pKey, POTYPE_NONE, 1, 0, aeMatchId)) {
-        return 1;
+        return true;
     }
     return abAllowLockpicking &&
         static_cast<Actor*>(apActionRef)->Actor::HasObjects(pLockpick, POTYPE_NONE, 1, 0, aeMatchId);

@@ -28,7 +28,7 @@ using IdleRootStringMap = NiTStringTemplateMap<NiTMap<const char*, IDLE_ANIM_ROO
 using data_11CB720_t = uint32_t[2];
 static data_11CB720_t data_11CB720{};
 
-TESIdleManager::TESIdleManager() : IdleArrayMap(0x25u, 1), bInitialized(false), LoadedIdleArray(0, 1) {}
+TESIdleManager::TESIdleManager() : IdleArrayMap(0x25u, true), bInitialized(false), LoadedIdleArray(0, 1) {}
 
 TESIdleManager::~TESIdleManager() {
     DestroyRootIdleArrays();
@@ -42,7 +42,7 @@ void TESIdleManager::InitLoadedIdles() {
     for (uint32_t i = 0; i < isize; ++i) {
         TESIdleForm* pidle = LoadedIdleArray.operator[](i);
         if (!pidle || pidle->GetInitialized()) {
-            TESIdleForm* pignore = 0;
+            TESIdleForm* pignore = nullptr;
             LoadedIdleArray.SetAt(i, pignore);
         }
         else {
@@ -53,22 +53,22 @@ void TESIdleManager::InitLoadedIdles() {
         TESIdleForm* pidle_2 = LoadedIdleArray.operator[](i_2);
         if (pidle_2) {
             if (pidle_2->InitParents()) {
-                TESIdleForm* proot = 0;
+                TESIdleForm* proot = nullptr;
                 LoadedIdleArray.SetAt(i_2, proot);
             }
         }
     }
     LoadedIdleArray.Compact();
-    bInitialized = 1;
+    bInitialized = true;
 }
 
 BSSimpleList<const char*>*
 TESIdleManager::GetRootFilenameList(const char* apIdleDir, ANIM_GROUP_WEAPON_ENUM aeWeaponGroup) {
-    BSSimpleList<const char*>* pret = 0;
+    BSSimpleList<const char*>* pret = nullptr;
     if (apIdleDir) {
         if (*apIdleDir) {
             char Dst[132];
-            IDLE_ANIM_ROOT* proot = 0;
+            IDLE_ANIM_ROOT* proot = nullptr;
             BSstrcpy(Dst, 128, apIdleDir);
             char* plastSlash = std::strrchr(Dst, 92);
             BSstrcpy(plastSlash + 1, 128 - (plastSlash - Dst) - 1, "IdleAnims");
@@ -86,7 +86,7 @@ NiFormArray*
 TESIdleManager::AddRootIdleArray(const char* apIdleDir, BSSimpleList<const char*>* apList, bool abForceList) {
     IDLE_ANIM_ROOT* proot;
     char Dst[128];
-    NiFormArray* pretarray = 0;
+    NiFormArray* pretarray = nullptr;
     if (bCreatedByThisFunction && !abForceList) {
         return pretarray;
     }
@@ -107,12 +107,12 @@ TESIdleManager::AddRootIdleArray(const char* apIdleDir, BSSimpleList<const char*
             proot_2 = ::new (v10) IDLE_ANIM_ROOT(apIdleDir);
         }
         else {
-            proot_2 = 0;
+            proot_2 = nullptr;
         }
-        bCreatedByThisFunction = 1;
-        BSSimpleList<const char*>* v6 = pModelLoader->BuildKFFileList(apIdleDir, 1, 0, AGW_NONE);
+        bCreatedByThisFunction = true;
+        BSSimpleList<const char*>* v6 = pModelLoader->BuildKFFileList(apIdleDir, true, false, AGW_NONE);
         proot_2->AddRootFilenameList(v6);
-        bCreatedByThisFunction = 0;
+        bCreatedByThisFunction = false;
         IdleArrayMap.SetAt(apIdleDir, proot_2);
         return &proot_2->IdleArray;
     }
@@ -124,9 +124,9 @@ TESIdleManager::AddRootIdleArray(const char* apIdleDir, BSSimpleList<const char*
         proot = ::new (apMemory) IDLE_ANIM_ROOT(apIdleDir);
     }
     else {
-        proot = 0;
+        proot = nullptr;
     }
-    BSSimpleList<const char*>* v4 = pModelLoader->CopyFilenameList(apList, 0);
+    BSSimpleList<const char*>* v4 = pModelLoader->CopyFilenameList(apList, nullptr);
     proot->AddRootFilenameList(v4);
     IdleArrayMap.SetAt(Dst, proot);
     return &proot->IdleArray;
@@ -137,7 +137,7 @@ bool TESIdleManager::GetInitialized() {
 }
 
 TESIdleForm* TESIdleManager::GetIdleToPlay(TESObjectREFR* apActionRef, TESObjectREFR* apTargetRef) {
-    TESIdleForm* pretidle = 0;
+    TESIdleForm* pretidle = nullptr;
     if (apActionRef) {
         char Dst[268];
         const char* Model_ = apActionRef->GetModel();
@@ -154,7 +154,7 @@ TESIdleForm* TESIdleManager::GetIdleToPlay(TESObjectREFR* apActionRef, TESObject
                         apReplayDelayList = &pactionAnim->replayDelayList;
                     }
                     else {
-                        apReplayDelayList = 0;
+                        apReplayDelayList = nullptr;
                     }
                     pretidle = pidle->GetIdleToPlay(apActionRef, apTargetRef, apReplayDelayList);
                 }
@@ -166,7 +166,7 @@ TESIdleForm* TESIdleManager::GetIdleToPlay(TESObjectREFR* apActionRef, TESObject
     }
     if (pretidle) {
         if (pretidle->GetAllowNoFile() && !pretidle->CheckIdleFile()) {
-            return 0;
+            return nullptr;
         }
     }
     return pretidle;
@@ -179,10 +179,10 @@ void TESIdleManager::AddLoadedIdle(TESIdleForm* apIdle) {
 }
 
 NiFormArray* TESIdleManager::GetLooseIdleArray(const char* apIdleDir) {
-    NiFormArray* pretarray = 0;
+    NiFormArray* pretarray = nullptr;
     if (apIdleDir) {
         if (*apIdleDir) {
-            IDLE_ANIM_ROOT* proot = 0;
+            IDLE_ANIM_ROOT* proot = nullptr;
             if (IdleArrayMap.GetAt(apIdleDir, proot)) {
                 if (proot) {
                     return &proot->LooseIdleArray;
@@ -215,10 +215,10 @@ NiFormArray* TESIdleManager::GetRootIdleArray(TESForm* apForm) {
 }
 
 IDLE_ANIM_ROOT* TESIdleManager::GetIdleAnimRoot(const char* apIdleDir) {
-    IDLE_ANIM_ROOT* v4 = 0;
+    IDLE_ANIM_ROOT* v4 = nullptr;
     if (apIdleDir) {
         if (*apIdleDir) {
-            IDLE_ANIM_ROOT* proot = 0;
+            IDLE_ANIM_ROOT* proot = nullptr;
             if (IdleArrayMap.GetAt(apIdleDir, proot)) {
                 if (proot) {
                     return proot;
@@ -245,8 +245,8 @@ void TESIdleManager::DestroyRootIdleArrays() {
     const char* pignore;
     NiTMapItem<const char*, IDLE_ANIM_ROOT*>* iter = IdleArrayMap.GetFirstPos();
     while (iter) {
-        proot = 0;
-        pignore = 0;
+        proot = nullptr;
+        pignore = nullptr;
         IdleArrayMap.GetNext(iter, pignore, proot);
         if (proot) {
             uint32_t icount = proot->IdleArray.m_uiSize;
@@ -297,8 +297,8 @@ void TESIdleManager::DestroyRootIdleArrayForms() {
     const char* pignore;
     NiTMapItem<const char*, IDLE_ANIM_ROOT*>* iter = IdleArrayMap.GetFirstPos();
     while (iter) {
-        proot = 0;
-        pignore = 0;
+        proot = nullptr;
+        pignore = nullptr;
         IdleArrayMap.GetNext(iter, pignore, proot);
         if (proot) {
             uint32_t icount = proot->IdleArray.m_uiSize;
@@ -326,8 +326,8 @@ void TESIdleManager::InitRootIdleArrays() {
     IDLE_ANIM_ROOT* proot;
     NiTMapItem<const char*, IDLE_ANIM_ROOT*>* iter = IdleArrayMap.GetFirstPos();
     while (iter) {
-        proot = 0;
-        pidleDir = 0;
+        proot = nullptr;
+        pidleDir = nullptr;
         IdleArrayMap.GetNext(iter, pidleDir, proot);
         if (proot) {
             for (uint32_t i = 0; i < 12; ++i) {
@@ -341,10 +341,10 @@ void TESIdleManager::InitRootIdleArrays() {
                     if (plist) {
                         delete plist;
                     }
-                    proot->pKFFileList[i] = 0;
+                    proot->pKFFileList[i] = nullptr;
                 }
             }
-            BSSimpleList<const char*>* pfileList = pModelLoader->BuildKFFileList(pidleDir, 1, 0, AGW_NONE);
+            BSSimpleList<const char*>* pfileList = pModelLoader->BuildKFFileList(pidleDir, true, false, AGW_NONE);
             proot->AddRootFilenameList(pfileList);
         }
     }
@@ -440,7 +440,7 @@ void IDLE_ANIM_ROOT::AddRootFilenameList(BSSimpleList<const char*>* apList) {
                     v2 = ::new (v4) BSSimpleList<const char*>;
                 }
                 else {
-                    v2 = 0;
+                    v2 = nullptr;
                 }
                 pKFFileList[eanimWeapon] = v2;
             }

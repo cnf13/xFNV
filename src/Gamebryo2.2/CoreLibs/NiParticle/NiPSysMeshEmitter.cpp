@@ -36,7 +36,7 @@
 
 #include <bit>
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 static uint32_t NiTArray_NiSkinnedEmitterDataPtr_SetAt_tcmp_guard;
 
@@ -101,17 +101,17 @@ NiPSysMeshEmitter::NiSkinnedEmitterData::~NiSkinnedEmitterData() {}
 
 bool NiPSysMeshEmitter::NiSkinnedEmitterData::CreatePartition(NiGeometry* pkGeom) {
     if (!pkGeom || !pkGeom->IsTriBasedGeom()) {
-        return 0;
+        return false;
     }
     NiSkinInstance* m_pObject = pkGeom->m_spSkinInstance.m_pObject;
     if (!m_pObject) {
-        return 0;
+        return false;
     }
     NiSkinPartition* pkPartition = m_pObject->m_spSkinPartition.m_pObject;
     if (!pkPartition) {
         NiSkinData* v4 = m_pObject->m_spSkinData.m_pObject;
         if (!v4) {
-            return 0;
+            return false;
         }
         // Passes the whole m_uiBones value on, at least 4.
         uint32_t uiMaxNumMatrices = v4->m_uiBones;
@@ -119,16 +119,16 @@ bool NiPSysMeshEmitter::NiSkinnedEmitterData::CreatePartition(NiGeometry* pkGeom
             uiMaxNumMatrices = 4;
         }
         NiSkinPartition* v6 = static_cast<NiSkinPartition*>(NiMemObject::operator new(sizeof(NiSkinPartition)));
-        pkPartition = v6 ? ::new (v6) NiSkinPartition : 0;
+        pkPartition = v6 ? ::new (v6) NiSkinPartition : nullptr;
         if (!pkPartition->MakePartitions(
                 static_cast<NiTriBasedGeomData*>(pkGeom->m_spModelData.m_pObject), m_pObject->m_spSkinData.m_pObject,
-                uiMaxNumMatrices, 4, 0, 0, 0, 0
+                uiMaxNumMatrices, 4, 0, nullptr, nullptr, nullptr
             )) {
-            return 0;
+            return false;
         }
     }
     m_spSkinPartition.operator=(pkPartition);
-    return 1;
+    return true;
 }
 
 NiPSysMeshEmitter::NiPSysMeshEmitter()
@@ -145,7 +145,7 @@ NiObject* NiPSysMeshEmitter::CreateClone(NiCloningProcess& kCloning) {
         pkObject = ::new (v3) NiPSysMeshEmitter;
     }
     else {
-        pkObject = 0;
+        pkObject = nullptr;
     }
     CopyMembers(pkObject, kCloning);
     pkObject->m_kGeomEmitterArray.SetSize(m_kGeomEmitterArray.m_usSize);
@@ -383,7 +383,7 @@ bool NiPSysMeshEmitter::EmitFromVertex(NiGeometry* pkGeomEmitter, NiPoint3& kPos
     NiPoint3* m_pkVertex = m_pObject->m_pkVertex;
     NiPoint3* m_pkNormal = m_pObject->m_pkNormal;
     if (!m_pkVertex) {
-        return 0;
+        return false;
     }
     kPosition = m_pkVertex[v8];
     if (m_eInitVelocityType == NiPSysMeshEmitter::NI_VELOCITY_USE_NORMALS) {
@@ -398,7 +398,7 @@ bool NiPSysMeshEmitter::EmitFromVertex(NiGeometry* pkGeomEmitter, NiPoint3& kPos
         }
     }
     TransformIntoCoordinateSpace(pkGeomEmitter, kPosition, kVelocity);
-    return 1;
+    return true;
 }
 
 // Emits from the centre of a random triangle of a triangle mesh (after up to six tries for a triangle with three
@@ -930,7 +930,7 @@ void NiPSysMeshEmitter::DeformBySkin(
     uint32_t m_usBonesPerVertex = pkPart->m_usBonesPerVertex;
     uint32_t v19 = 0;
     if (m_usBonesPerVertex) {
-        while (1) {
+        while (true) {
             uint8_t* m_pucBonePalette = pkPart->m_pucBonePalette;
             uint16_t v21 = m_pucBonePalette ? pkPart->m_pusBones[m_pucBonePalette[v9 * m_usBonesPerVertex + v19]]
                                             : pkPart->m_pusBones[v19];
@@ -1062,6 +1062,6 @@ NiObject* NiPSysMeshEmitter::CreateObject() {
         return ::new (v0) NiPSysMeshEmitter;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }

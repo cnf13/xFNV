@@ -111,9 +111,9 @@ void BSDistantTreeShaderProperty::SetInstanceData(uint32_t auiInstanceID, NiPoin
     pInstancesA[auiInstanceID].fy = arPos.y;
     pInstancesA[auiInstanceID].fz = arPos.z;
     pInstancesA[auiInstanceID].fScale = fScale;
-    float fCos = static_cast<float>(std::cos(fRotZ));
+    float fCos = std::cos(fRotZ);
     pInstancesA[auiInstanceID].fzrot1 = fCos;
-    float fSin = static_cast<float>(std::sin(fRotZ));
+    float fSin = std::sin(fRotZ);
     pInstancesA[auiInstanceID].fzrot2 = fSin;
 }
 

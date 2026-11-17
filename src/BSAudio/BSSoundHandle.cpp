@@ -11,7 +11,7 @@ bool BSAudioManager_SetPosition(BSAudioManager* apManager, uint32_t aiID, float 
     v7.y = afY;
     v7.z = afZ;
     apManager->ComposeMessage(MSET_POS, aiID, 0, nullptr, NiPointer<NiAVObject>{}, v7);
-    return 0;
+    return false;
 }
 
 BSSoundHandle::BSSoundHandle() {
@@ -50,7 +50,7 @@ bool BSSoundHandle::operator!=(uint32_t aiSoundID) const {
 
 bool BSSoundHandle::Pause() {
     if (this->iSoundID == -1) {
-        return 0;
+        return false;
     }
     eState = ASSUMED_STATE_PAUSED;
     uint32_t iSoundID = this->iSoundID;
@@ -60,8 +60,8 @@ bool BSSoundHandle::Pause() {
 
 bool BSSoundHandle::SetBeamEnd(float afX, float afY, float afZ) {
     int32_t iSoundID;
-    if (this->iSoundID == ((-1))) {
-        return (bool)0;
+    if (this->iSoundID == (-1)) {
+        return false;
     }
     iSoundID = this->iSoundID;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
@@ -70,8 +70,8 @@ bool BSSoundHandle::SetBeamEnd(float afX, float afY, float afZ) {
 
 bool BSSoundHandle::SetVolume(float aiNewVolume) {
     uint32_t iSoundID;
-    if (this->iSoundID == ((-1))) {
-        return (bool)0;
+    if (this->iSoundID == (-1)) {
+        return false;
     }
     iSoundID = (uint32_t)this->iSoundID;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
@@ -149,7 +149,7 @@ void BSSoundHandle::SetObjectToFollow(NiAVObject* apObj) {
 void BSSoundHandle::SetCompletionCallback(void (*apfnCallback)(void*, bool), void* apContext) {
     if (!BSAudio::pAudioInstance->bAudioEnabled) {
         if (apfnCallback) {
-            apfnCallback(apContext, 0);
+            apfnCallback(apContext, false);
         }
     }
     if (this->iSoundID != -1) {
@@ -173,7 +173,7 @@ bool BSSoundHandle::FadeOutAndRelease(uint32_t aiMilliseconds) {
 }
 
 float BSSoundHandle::GetVolume() {
-    if (iSoundID == ((-1))) {
+    if (iSoundID == (-1)) {
         return 0.0;
     }
     int32_t uiSoundID = iSoundID;
@@ -182,18 +182,18 @@ float BSSoundHandle::GetVolume() {
 }
 
 int32_t BSSoundHandle::GetDuration() {
-    if (iSoundID == ((-1))) {
+    if (iSoundID == (-1)) {
         return 0;
     }
     int32_t uiSoundID = iSoundID;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
-    return (int32_t)singleton->GetDuration(uiSoundID);
+    return singleton->GetDuration(uiSoundID);
 }
 
 bool BSSoundHandle::SetStaticAttenuation(uint16_t aiStaticAttenutation) {
     uint32_t iSoundID;
-    if (this->iSoundID == ((-1))) {
-        return (bool)0;
+    if (this->iSoundID == (-1)) {
+        return false;
     }
     iSoundID = (uint32_t)this->iSoundID;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
@@ -209,7 +209,7 @@ void BSSoundHandle::SetAttenuationCurve(
 ) {
     BSAudioManager* singleton;
     uint32_t iSoundID;
-    if (this->iSoundID != ((-1))) {
+    if (this->iSoundID != (-1)) {
         iSoundID = (uint32_t)this->iSoundID;
         singleton = &BSAudioManager::QInstance();
         singleton->SetAttenuationCurve(iSoundID, aiPt1, aiPt2, aiPt3, aiPt4, aiPt5);
@@ -218,20 +218,20 @@ void BSSoundHandle::SetAttenuationCurve(
 
 bool BSSoundHandle::FadeInPlay(uint32_t aiMilliseconds) {
     uint32_t iSoundID;
-    if (this->iSoundID == ((-1))) {
-        return (bool)0;
+    if (this->iSoundID == (-1)) {
+        return false;
     }
     eState = ASSUMED_STATE_PLAYING;
     iSoundID = (uint32_t)this->iSoundID;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
     singleton->FadeInPlay(iSoundID, aiMilliseconds);
-    return (bool)1;
+    return true;
 }
 
 void BSSoundHandle::SetPriority(uint32_t aiPriority) {
     BSAudioManager* singleton;
     uint32_t iSoundID;
-    if (this->iSoundID != ((-1))) {
+    if (this->iSoundID != (-1)) {
         iSoundID = (uint32_t)this->iSoundID;
         singleton = &BSAudioManager::QInstance();
         singleton->SetPriority(iSoundID, aiPriority);
@@ -239,18 +239,18 @@ void BSSoundHandle::SetPriority(uint32_t aiPriority) {
 }
 
 bool BSSoundHandle::FadeOut(uint32_t aiMilliseconds) {
-    if (iSoundID == ((-1))) {
-        return (bool)0;
+    if (iSoundID == (-1)) {
+        return false;
     }
     eState = ASSUMED_STATE_STOPPED;
     int32_t uiSoundID = iSoundID;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
     singleton->FadeOut(uiSoundID, aiMilliseconds, MINVALID_MSG);
-    return (bool)1;
+    return true;
 }
 
 int32_t BSSoundHandle::GetSoundType() {
-    if (iSoundID == ((-1))) {
+    if (iSoundID == (-1)) {
         return 0;
     }
     int32_t v3 = iSoundID;
@@ -259,8 +259,8 @@ int32_t BSSoundHandle::GetSoundType() {
 }
 
 bool BSSoundHandle::SetOrientation(float afX, float afY, float afZ) {
-    if (((uint32_t)iSoundID) == ((-1))) {
-        return (bool)0;
+    if (((uint32_t)iSoundID) == (-1)) {
+        return false;
     }
     uint32_t v6 = (uint32_t)iSoundID;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
@@ -270,7 +270,7 @@ bool BSSoundHandle::SetOrientation(float afX, float afY, float afZ) {
 void BSSoundHandle::ClearSynchStartTime() {
     BSAudioManager* singleton;
     uint32_t iSoundID;
-    if (this->iSoundID != ((-1))) {
+    if (this->iSoundID != (-1)) {
         iSoundID = (uint32_t)this->iSoundID;
         singleton = &BSAudioManager::QInstance();
         singleton->ClearSynchStartTime(iSoundID);
@@ -280,7 +280,7 @@ void BSSoundHandle::ClearSynchStartTime() {
 void BSSoundHandle::SetMinMax(float afMin, float afMax) {
     BSAudioManager* singleton;
     uint32_t iSoundID;
-    if (this->iSoundID != ((-1))) {
+    if (this->iSoundID != (-1)) {
         iSoundID = (uint32_t)this->iSoundID;
         singleton = &BSAudioManager::QInstance();
         singleton->SetMinMax(iSoundID, afMin, afMax);
@@ -290,7 +290,7 @@ void BSSoundHandle::SetMinMax(float afMin, float afMax) {
 void BSSoundHandle::SetTimeConstraints(uint8_t aiStart, uint8_t aiStop) {
     BSAudioManager* singleton;
     uint32_t iSoundID;
-    if (this->iSoundID != ((-1))) {
+    if (this->iSoundID != (-1)) {
         iSoundID = (uint32_t)this->iSoundID;
         singleton = &BSAudioManager::QInstance();
         singleton->SetTimeConstraints(iSoundID, aiStart, aiStop);
@@ -300,7 +300,7 @@ void BSSoundHandle::SetTimeConstraints(uint8_t aiStart, uint8_t aiStop) {
 void BSSoundHandle::SetFollowsListener(bool abFollowsListener) {
     BSAudioManager* singleton;
     uint32_t iSoundID;
-    if (this->iSoundID != ((-1))) {
+    if (this->iSoundID != (-1)) {
         iSoundID = (uint32_t)this->iSoundID;
         singleton = &BSAudioManager::QInstance();
         singleton->SetAtListener(iSoundID, abFollowsListener);
@@ -309,8 +309,8 @@ void BSSoundHandle::SetFollowsListener(bool abFollowsListener) {
 
 bool BSSoundHandle::SetFrequency(float afNewFrequency) {
     uint32_t iSoundID;
-    if (this->iSoundID == ((-1))) {
-        return (bool)0;
+    if (this->iSoundID == (-1)) {
+        return false;
     }
     iSoundID = (uint32_t)this->iSoundID;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
@@ -319,7 +319,7 @@ bool BSSoundHandle::SetFrequency(float afNewFrequency) {
 
 bool BSSoundHandle::PlayAfter(uint32_t aiDelay, int32_t aiPlayFlags) {
     if (this->iSoundID == -1) {
-        return 0;
+        return false;
     }
     eState = ASSUMED_STATE_PLAYING;
     uint32_t iSoundID = this->iSoundID;
@@ -329,7 +329,7 @@ bool BSSoundHandle::PlayAfter(uint32_t aiDelay, int32_t aiPlayFlags) {
 
 bool BSSoundHandle::SetModFrequency(float afNewFrequency) {
     if (this->iSoundID == -1) {
-        return 0;
+        return false;
     }
     uint32_t iSoundID = this->iSoundID;
     BSAudioManager* v3 = &BSAudioManager::QInstance();
@@ -338,7 +338,7 @@ bool BSSoundHandle::SetModFrequency(float afNewFrequency) {
 
 bool BSSoundHandle::SetFrequencyVariance(uint8_t aiFreqVariance) {
     if (this->iSoundID == -1) {
-        return 0;
+        return false;
     }
     uint32_t iSoundID = this->iSoundID;
     BSAudioManager* v3 = &BSAudioManager::QInstance();
@@ -347,7 +347,7 @@ bool BSSoundHandle::SetFrequencyVariance(uint8_t aiFreqVariance) {
 
 bool BSSoundHandle::SetBalance(int32_t aiNewBalance) {
     if (this->iSoundID == -1) {
-        return 0;
+        return false;
     }
     uint32_t iSoundID = this->iSoundID;
     BSAudioManager* v3 = &BSAudioManager::QInstance();

@@ -6,12 +6,12 @@
 #include "Platform.h"
 
 #include <atomic>
+#include <cstdarg>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <mutex>
-#include <stdarg.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 namespace fnvd::debugheap {
     namespace {

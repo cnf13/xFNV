@@ -191,13 +191,13 @@ TESForm* TESIdleForm::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap<T
     TESForm* a2[2];
     TESForm* DuplicateForm = TESForm::CreateDuplicateForm(abCreateEditorID, apCopyMap);
     TESIdleForm* pdupidle = dynamic_cast<TESIdleForm*>(DuplicateForm);
-    a2[0] = 0;
+    a2[0] = nullptr;
     if (!apCopyMap->GetAt(pParentIdle, *a2) || !a2[0]) {
         a2[0] = pParentIdle;
     }
     void* aeDifficulty = a2[0];
     pdupidle->SetParentIdle(static_cast<TESIdleForm*>(a2[0]));
-    a2[0] = 0;
+    a2[0] = nullptr;
     if (!apCopyMap->GetAt(pPrevIdle, *a2) || !a2[0]) {
         a2[0] = pPrevIdle;
     }
@@ -208,7 +208,7 @@ TESForm* TESIdleForm::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap<T
         uint32_t icount = pChildIdles->m_uiSize;
         NiFormArray* pduparray = pdupidle->CreateChildArray();
         pduparray->SetSize(icount);
-        TESIdleForm* pdupchild = 0;
+        TESIdleForm* pdupchild = nullptr;
         for (uint32_t i = 0; i < icount; ++i) {
             TESIdleForm* pchildidle = static_cast<TESIdleForm*>(pChildIdles->GetAt(i));
             TESIdleForm* pdupchild_2 =
@@ -265,7 +265,7 @@ void TESIdleForm::Copy(TESForm* apCopy) {
     TESIdleForm* pcopy = dynamic_cast<TESIdleForm*>(apCopy);
     if (pcopy) {
         CopyAllComponents(pcopy);
-        (&Conditions)->Copy(&pcopy->Conditions, 0);
+        (&Conditions)->Copy(&pcopy->Conditions, nullptr);
         bool bloose = GetLooseIdle();
         // Copies the 8-byte record whole.
         data = pcopy->data;
@@ -278,27 +278,27 @@ void TESIdleForm::Copy(TESForm* apCopy) {
 bool TESIdleForm::Compare(TESForm* apCompare) {
     TESIdleForm* pcomp = dynamic_cast<TESIdleForm*>(apCompare);
     if (!pcomp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pcomp)) {
-        return 1;
+        return true;
     }
     if ((&Conditions)->Compare(&pcomp->Conditions)) {
-        return 1;
+        return true;
     }
     if (data.cAnimData != pcomp->data.cAnimData) {
-        return 1;
+        return true;
     }
     if (data.cLoopMin != pcomp->data.cLoopMin) {
-        return 1;
+        return true;
     }
     if (data.cLoopMax != pcomp->data.cLoopMax) {
-        return 1;
+        return true;
     }
     if (data.sReplayDelay == pcomp->data.sReplayDelay) {
         return data.cFlagsEx != pcomp->data.cFlagsEx;
     }
-    return 1;
+    return true;
 }
 
 // The editor ID, or the shared empty string when it has none.
@@ -321,7 +321,7 @@ bool TESIdleForm::SetFormEditorID(const char* apEditorID) {
 }
 
 bool TESIdleForm::CheckConditions(TESObjectREFR* apActionRef, TESObjectREFR* apTargetRef, bool abRecurseUp) {
-    bool v8 = 0;
+    bool v8 = false;
     TESCondition* MBRoomAccumList = GetConditions();
     if (MBRoomAccumList->IsTrue(apActionRef, apTargetRef)) {
         if (abRecurseUp && GetParentIdle()) {
@@ -329,7 +329,7 @@ bool TESIdleForm::CheckConditions(TESObjectREFR* apActionRef, TESObjectREFR* apT
             return State->CheckConditions(apActionRef, apTargetRef, abRecurseUp);
         }
         else {
-            return 1;
+            return true;
         }
     }
     return v8;
@@ -343,7 +343,7 @@ void TESIdleForm::RemoveFromManager() {
             pLooseArray->RemoveAt(uiIndex);
             pLooseArray->Compact();
         }
-        SetLooseIdle(0);
+        SetLooseIdle(false);
     }
     else {
         NiFormArray* pArray;
@@ -358,7 +358,7 @@ void TESIdleForm::RemoveFromManager() {
             if (uiIndex != -1) {
                 pArray->RemoveAt(uiIndex);
                 pArray->Compact();
-                pParentIdle = 0;
+                pParentIdle = nullptr;
                 // The idle that followed this one now sits at its index.
                 TESIdleForm* pNextIdleForm = static_cast<TESIdleForm*>(pArray->GetAt(uiIndex));
                 if (pNextIdleForm) {
@@ -371,7 +371,7 @@ void TESIdleForm::RemoveFromManager() {
                         pNextIdleForm->pPrevIdle =
                             reinterpret_cast<TESIdleForm*>(static_cast<uintptr_t>(pPrev ? pPrev->GetFormID() : 0));
                     }
-                    pPrevIdle = 0;
+                    pPrevIdle = nullptr;
                 }
             }
         }
@@ -548,7 +548,7 @@ TESIdleForm* TESIdleForm::GetChildByIndex(uint32_t aiIndex) {
 }
 
 uint32_t TESIdleForm::GetIndexForChild(TESIdleForm* apChild) {
-    uint32_t v3 = (uint32_t)((-1));
+    uint32_t v3 = (uint32_t)(-1);
     if (pChildIdles) {
         return pChildIdles->GetIndexForForm(apChild);
     }
@@ -619,11 +619,11 @@ TESIdleForm* TESIdleForm::GetIdleToPlay(
     TESObjectREFR* apTargetRef,
     BSSimpleList<IDLE_REPLAY_DELAY*>* apReplayDelayList
 ) {
-    TESIdleForm* pretidle = 0;
+    TESIdleForm* pretidle = nullptr;
     if (!GetDelete() && (&Conditions)->IsTrue(apActionRef, apTargetRef)) {
         if (CheckIdleFile()) {
             BSSimpleList<IDLE_REPLAY_DELAY*>* pdelayList = apReplayDelayList;
-            bool bdelay = 0;
+            bool bdelay = false;
             while (pdelayList && (!bdelay && !pdelayList->IsEmpty())) {
                 bdelay = pdelayList->m_item->pIdleForm == this;
                 pdelayList = pdelayList->m_pkNext;
@@ -639,7 +639,7 @@ TESIdleForm* TESIdleForm::GetIdleToPlay(
         }
         uint32_t icount = GetChildCount();
         if (icount) {
-            TESIdleForm* pgoodchild = 0;
+            TESIdleForm* pgoodchild = nullptr;
             for (uint32_t i = 0; i < icount; ++i) {
                 TESIdleForm* pchildidle = GetChildByIndex(i);
                 if (pchildidle) {

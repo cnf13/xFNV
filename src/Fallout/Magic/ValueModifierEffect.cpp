@@ -68,7 +68,7 @@ void ValueModifierEffect::Finalize() {
         TargetAsActor = Unk24->GetTargetAsActor();
     }
     else {
-        TargetAsActor = 0;
+        TargetAsActor = nullptr;
     }
     ActorValue::Index v5 = GetActorValue();
     EffectSetting* Time = pEffect->GetEffectSetting();
@@ -84,7 +84,7 @@ void ValueModifierEffect::Finalize() {
                         CasterAsActor = ProcessLevel->GetCasterAsActor();
                     }
                     else {
-                        CasterAsActor = 0;
+                        CasterAsActor = nullptr;
                     }
                     fMagnitude = TargetAsActor->DifficultyLevelAdjustHealthModifier(fMagnitude, CasterAsActor);
                 }
@@ -101,7 +101,7 @@ void ValueModifierEffect::Update(float afSecondsElapsed) {
             pActor = pTarget->GetTargetAsActor();
         }
         else {
-            pActor = 0;
+            pActor = nullptr;
         }
         if (FromWornEnchantment() ||
             (fDuration > 0.0 || (eSpellType == MagicSystem::ABILITY || eSpellType == MagicSystem::DISEASE))) {
@@ -125,7 +125,7 @@ void ValueModifierEffect::Update(float afSecondsElapsed) {
                     pcasterActor = pCaster->GetCasterAsActor();
                 }
                 else {
-                    pcasterActor = 0;
+                    pcasterActor = nullptr;
                 }
                 pActor->Kill(pcasterActor, 0.0f);
             }
@@ -161,9 +161,9 @@ void ValueModifierEffect::FinishInitLoadGame(Actor* apActor) {
     }
     Actor* pCasterActor = GetCaster() ? GetCaster()->GetCasterAsActor() : nullptr;
     float fBaseChange = -GetMagnitude();
-    pActor->ModActorBaseValue(static_cast<ActorValue::Index>(GetActorValue()), fBaseChange);
+    pActor->ModActorBaseValue(GetActorValue(), fBaseChange);
     float fTempChange = GetMagnitude();
-    pActor->TempModActorValue(static_cast<ActorValue::Index>(GetActorValue()), fTempChange, pCasterActor);
+    pActor->TempModActorValue(GetActorValue(), fTempChange, pCasterActor);
 }
 
 bool ValueModifierEffect::IsCausingDamage() {
@@ -174,7 +174,7 @@ bool ValueModifierEffect::IsCausingDamage() {
         if (pEffectSetting->IsFlagSet(EffectSetting::DETRIMENTAL)) {
             pEffectSetting = ActiveEffect::GetEffectSetting();
             if (!pEffectSetting->IsFlagSet(EffectSetting::RECOVER)) {
-                return (bool)1;
+                return true;
             }
         }
     }
@@ -211,7 +211,7 @@ void ValueModifierEffect::Start() {
         pActor = pTarget->GetTargetAsActor();
     }
     else {
-        pActor = 0;
+        pActor = nullptr;
     }
     if (!pEffect->pEffectSetting->IsFlagSet(EffectSetting::RECOVER) &&
         (pEffect->GetDuration() ||
@@ -225,7 +225,7 @@ void ValueModifierEffect::Start() {
                 ppotion_2 = dynamic_cast<AlchemyItem*>(pspell_2);
             }
             else {
-                ppotion_2 = 0;
+                ppotion_2 = nullptr;
             }
             if (ppotion_2) {
                 if (ppotion_2->IsFlagSet(AlchemyItem::FOOD_ITEM)) {
@@ -254,7 +254,7 @@ void ValueModifierEffect::Start() {
                 ppotion = dynamic_cast<AlchemyItem*>(pspell);
             }
             else {
-                ppotion = 0;
+                ppotion = nullptr;
             }
             if (ppotion) {
                 if (ppotion->IsFlagSet(AlchemyItem::FOOD_ITEM)) {
@@ -276,7 +276,7 @@ void ValueModifierEffect::Start() {
                 pcasterActor = pCaster->GetCasterAsActor();
             }
             else {
-                pcasterActor = 0;
+                pcasterActor = nullptr;
             }
             pActor->Kill(pcasterActor, 0.0f);
         }
@@ -341,7 +341,7 @@ void ValueModifierEffect::Finish() {
         pActor = pTarget->GetTargetAsActor();
     }
     else {
-        pActor = 0;
+        pActor = nullptr;
     }
     if (pEffect->pEffectSetting->IsFlagSet(EffectSetting::RECOVER)) {
         if (pActor) {
@@ -356,18 +356,18 @@ void ValueModifierEffect::Finish() {
                         pActor->DamageModActorValue(eWhichActorValue, fadjust, CasterAsActor);
                     }
                     else {
-                        pActor->DamageModActorValue(eWhichActorValue, fadjust, 0);
+                        pActor->DamageModActorValue(eWhichActorValue, fadjust, nullptr);
                     }
                 }
             }
         }
         ModifyActorValue(pActor, -fMagnitude, ActorValue::VALUE_NONE);
         if (pActor) {
-            if (pActor->IsDead(0) &&
+            if (pActor->IsDead(false) &&
                 (eWhichActorValue == ActorValue::HEALTH || eWhichActorValue == ActorValue::ENDURANCE)) {
                 float v9 = static_cast<float>(pActor->GetActorValue(ActorValue::HEALTH));
                 if (v9 > 0.0) {
-                    pActor->DamageModActorValue(ActorValue::HEALTH, static_cast<float>(-v9), static_cast<Actor*>(0));
+                    pActor->DamageModActorValue(ActorValue::HEALTH, (-v9), static_cast<Actor*>(nullptr));
                 }
             }
         }
@@ -407,7 +407,7 @@ void ValueModifierEffect::ModifyActorValue(Actor* apActor, float afValue, ActorV
         else {
             bool babilityCheck = eSpellType == MagicSystem::ABILITY && !HasConditions();
             if (apActor->IsPc() && (babilityCheck && pEffect->pEffectSetting->IsFlagSet(EffectSetting::RECOVER))) {
-                apActor->PermanentModActorValue(eactorValue, afValue, 0);
+                apActor->PermanentModActorValue(eactorValue, afValue, nullptr);
             }
             else {
                 Actor* pcasterActor;
@@ -415,11 +415,11 @@ void ValueModifierEffect::ModifyActorValue(Actor* apActor, float afValue, ActorV
                     pcasterActor = pCaster->GetCasterAsActor();
                 }
                 else {
-                    pcasterActor = 0;
+                    pcasterActor = nullptr;
                 }
                 Actor* v10 = pcasterActor;
                 if (!pEffect->data.iRange || !pEffect->IsHostile()) {
-                    v10 = 0;
+                    v10 = nullptr;
                 }
                 if (pEffect->pEffectSetting->IsFlagSet(EffectSetting::RECOVER)) {
                     apActor->TempModActorValue(eactorValue, afValue, v10);
@@ -451,7 +451,7 @@ void ValueModifierEffect::ShowAttributeReductionMessage() {
         v9 = &static_cast<MagicTarget&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer)));
     }
     else {
-        v9 = 0;
+        v9 = nullptr;
     }
     if (pTarget == v9) {
         ActorValue::Index v2;
@@ -475,7 +475,7 @@ void ValueModifierEffect::ShowAttributeReductionMessage() {
                     const char* time = ActorValue::GetActorValueName(v3);
                     const char* v4 = sYour.String();
                     std::sprintf(msg, "%s %s %s", v4, time, v6);
-                    Interface::ShowMessage(msg, 0, 0, 0, 2.0f, 0);
+                    Interface::ShowMessage(msg, 0, nullptr, nullptr, 2.0f, false);
                 }
             }
         }
@@ -499,7 +499,7 @@ float ValueModifierEffect::CheckAdjustNoNegativeMagnitude(float afMagnitude) {
                     TargetAsActor = pTarget->GetTargetAsActor();
                 }
                 else {
-                    TargetAsActor = 0;
+                    TargetAsActor = nullptr;
                 }
                 ActorValue::Index v6 = GetActorValue();
                 float v10 = TargetAsActor->GetActorFloatValue(v6) + afMagnitude;

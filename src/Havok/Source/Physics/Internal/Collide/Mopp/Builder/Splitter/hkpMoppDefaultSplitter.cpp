@@ -776,7 +776,7 @@ void hkpMoppDefaultSplitter::hkpMoppMaxList::addElement(hkpMoppCompilerPrimitive
     if (m_currentNumElements < 4) {
     LABEL_11:;
         if (v2 >= 0) {
-            while (1) {
+            while (true) {
                 hkpMoppCompilerPrimitive** v11 = &this->buffer[v2];
                 if (!*v11 || !((*v11)->m_extent.m_max < m_max)) {
                     break;
@@ -792,7 +792,7 @@ void hkpMoppDefaultSplitter::hkpMoppMaxList::addElement(hkpMoppCompilerPrimitive
         }
     }
     else {
-        while (1) {
+        while (true) {
             hkpMoppCompilerPrimitive* v6;
             hkpMoppCompilerPrimitive* v8;
             hkpMoppCompilerPrimitive* v10;
@@ -845,13 +845,13 @@ void hkpMoppDefaultSplitter::hkpMoppMaxList::removeElementsLessThan(float positi
                 break;
             }
             lastRemovedElement = *v11;
-            *v11 = 0;
+            *v11 = nullptr;
             --m_currentNumElements;
             --v3;
         }
     }
     else {
-        while (1) {
+        while (true) {
             hkpMoppCompilerPrimitive** v4 = &this->buffer[v3];
             if (!*v4) {
                 break;
@@ -860,7 +860,7 @@ void hkpMoppDefaultSplitter::hkpMoppMaxList::removeElementsLessThan(float positi
                 break;
             }
             lastRemovedElement = *v4;
-            *v4 = 0;
+            *v4 = nullptr;
             hkpMoppCompilerPrimitive** buffer = this->buffer;
             --m_currentNumElements;
             hkpMoppCompilerPrimitive** v6 = &buffer[v3 - 1];
@@ -871,7 +871,7 @@ void hkpMoppDefaultSplitter::hkpMoppMaxList::removeElementsLessThan(float positi
                 break;
             }
             lastRemovedElement = *v6;
-            *v6 = 0;
+            *v6 = nullptr;
             hkpMoppCompilerPrimitive** v7 = this->buffer;
             --m_currentNumElements;
             hkpMoppCompilerPrimitive** v8 = &v7[v3 - 2];
@@ -882,7 +882,7 @@ void hkpMoppDefaultSplitter::hkpMoppMaxList::removeElementsLessThan(float positi
                 break;
             }
             lastRemovedElement = *v8;
-            *v8 = 0;
+            *v8 = nullptr;
             hkpMoppCompilerPrimitive** v9 = this->buffer;
             --m_currentNumElements;
             hkpMoppCompilerPrimitive** v10 = &v9[v3 - 3];
@@ -890,7 +890,7 @@ void hkpMoppDefaultSplitter::hkpMoppMaxList::removeElementsLessThan(float positi
                 break;
             }
             lastRemovedElement = *v10;
-            *v10 = 0;
+            *v10 = nullptr;
             --m_currentNumElements;
             v3 -= 4;
             if (v3 < 3) {

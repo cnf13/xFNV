@@ -72,7 +72,7 @@ void* hkObjectResource::getContentsPointer(const char* typeName, const hkTypeInf
         return m_topLevelObject.m_object;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -82,8 +82,8 @@ const char* hkObjectResource::getContentsTypeName() const {
 
 void* hkObjectResource::stealContentsPointer(const char* typeName, const hkTypeInfoRegistry* typeRegistry) {
     void* result = getContentsPointer(typeName, typeRegistry);
-    m_topLevelObject.m_object = 0;
-    m_topLevelObject.m_class = 0;
+    m_topLevelObject.m_object = nullptr;
+    m_topLevelObject.m_class = nullptr;
     return result;
 }
 

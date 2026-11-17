@@ -17,13 +17,13 @@ void BGSCameraPathManager::InitLoadedPaths() {
     for (uint32_t i = 0; i < isize; ++i) {
         BGSCameraPath* ppath = LoadedPathArray.operator[](i);
         if (!ppath || ppath->GetInitialized()) {
-            BGSCameraPath* ppath_2 = 0;
+            BGSCameraPath* ppath_2 = nullptr;
             LoadedPathArray.SetAt(i, ppath_2);
         }
         else {
             ppath->InitItem();
             if (ppath->InitParents()) {
-                BGSCameraPath* pnull = 0;
+                BGSCameraPath* pnull = nullptr;
                 LoadedPathArray.SetAt(i, pnull);
             }
         }
@@ -42,10 +42,10 @@ void BGSCameraPathManager::CreateDefaultPath() {
                 v4 = ::new (apMemory) BGSCameraPath;
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             BGSCameraPathManager::pDefaultPath = v4;
-            v4->SetFormID(22u, 1);
+            v4->SetFormID(22u, true);
             BGSCameraPathManager::pDefaultPath->SetFormEditorID("DefaultCameraPath");
             BGSCameraPath* v3 = BGSCameraPathManager::pDefaultPath;
             uint32_t CastingType = PathArray.m_uiSize;
@@ -61,7 +61,7 @@ void BGSCameraPathManager::AddLoadedPath(BGSCameraPath* apPath) {
 }
 
 BGSCameraPath* BGSCameraPathManager::GetCameraPathToPlay(TESObjectREFR* apActionRef, TESObjectREFR* apTargetRef) {
-    BGSCameraPath* pretpath = 0;
+    BGSCameraPath* pretpath = nullptr;
     if (apActionRef) {
         uint32_t icount = PathArray.GetSize();
         for (uint32_t i = 0; i < icount; ++i) {
@@ -76,7 +76,7 @@ BGSCameraPath* BGSCameraPathManager::GetCameraPathToPlay(TESObjectREFR* apAction
     }
     if (pretpath) {
         if (pretpath->GetAllowNoShots() && !(&pretpath->ShotList)->IsEmpty()) {
-            return 0;
+            return nullptr;
         }
     }
     return pretpath;
@@ -99,7 +99,7 @@ void BGSCameraPathManager::DestroyRootPathArrayForms() {
         }
     }
     LoadedPathArray.RemoveAll();
-    BGSCameraPathManager::pDefaultPath = 0;
+    BGSCameraPathManager::pDefaultPath = nullptr;
     PathArray.RemoveAll();
 }
 

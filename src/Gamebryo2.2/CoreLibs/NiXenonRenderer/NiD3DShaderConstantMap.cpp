@@ -1200,7 +1200,7 @@ uint32_t NiD3DShaderConstantMap::SetDefinedConstant(
                     afVector[3] = fTime;
                     break;
                 case SCM_DEF_CONSTS_SINTIME: {
-                    float fSin = static_cast<float>(std::sin(fTime));
+                    float fSin = std::sin(fTime);
                     afVector[0] = fSin;
                     afVector[1] = fSin;
                     afVector[2] = fSin;
@@ -1208,7 +1208,7 @@ uint32_t NiD3DShaderConstantMap::SetDefinedConstant(
                     break;
                 }
                 case SCM_DEF_CONSTS_COSTIME: {
-                    float fCos = static_cast<float>(std::cos(fTime));
+                    float fCos = std::cos(fTime);
                     afVector[0] = fCos;
                     afVector[1] = fCos;
                     afVector[2] = fCos;
@@ -1216,7 +1216,7 @@ uint32_t NiD3DShaderConstantMap::SetDefinedConstant(
                     break;
                 }
                 case SCM_DEF_CONSTS_TANTIME: {
-                    float fTan = static_cast<float>(std::tan(fTime));
+                    float fTan = std::tan(fTime);
                     afVector[0] = fTan;
                     afVector[1] = fTan;
                     afVector[2] = fTan;
@@ -1225,9 +1225,9 @@ uint32_t NiD3DShaderConstantMap::SetDefinedConstant(
                 }
                 default:
                     afVector[0] = fTime;
-                    afVector[1] = static_cast<float>(std::sin(fTime));
-                    afVector[2] = static_cast<float>(std::cos(fTime));
-                    afVector[3] = static_cast<float>(std::tan(fTime));
+                    afVector[1] = std::sin(fTime);
+                    afVector[2] = std::cos(fTime);
+                    afVector[3] = std::tan(fTime);
                     break;
             }
             pvData = afVector;
@@ -2264,7 +2264,7 @@ uint32_t NiD3DShaderConstantMap::SetupDefinedConstantValue(
                     ms_kD3DVector4[uiOperatorNum].w = fTime;
                     break;
                 case SCM_DEF_CONSTS_SINTIME: {
-                    float fSin = static_cast<float>(std::sin(fTime));
+                    float fSin = std::sin(fTime);
                     ms_kD3DVector4[uiOperatorNum].x = fSin;
                     ms_kD3DVector4[uiOperatorNum].y = fSin;
                     ms_kD3DVector4[uiOperatorNum].z = fSin;
@@ -2272,7 +2272,7 @@ uint32_t NiD3DShaderConstantMap::SetupDefinedConstantValue(
                     break;
                 }
                 case SCM_DEF_CONSTS_COSTIME: {
-                    float fCos = static_cast<float>(std::cos(fTime));
+                    float fCos = std::cos(fTime);
                     ms_kD3DVector4[uiOperatorNum].x = fCos;
                     ms_kD3DVector4[uiOperatorNum].y = fCos;
                     ms_kD3DVector4[uiOperatorNum].z = fCos;
@@ -2280,7 +2280,7 @@ uint32_t NiD3DShaderConstantMap::SetupDefinedConstantValue(
                     break;
                 }
                 case SCM_DEF_CONSTS_TANTIME: {
-                    float fTan = static_cast<float>(std::tan(fTime));
+                    float fTan = std::tan(fTime);
                     ms_kD3DVector4[uiOperatorNum].x = fTan;
                     ms_kD3DVector4[uiOperatorNum].y = fTan;
                     ms_kD3DVector4[uiOperatorNum].z = fTan;
@@ -2289,9 +2289,9 @@ uint32_t NiD3DShaderConstantMap::SetupDefinedConstantValue(
                 }
                 case SCM_DEF_CONSTS_TIME_SINTIME_COSTIME_TANTIME:
                     ms_kD3DVector4[uiOperatorNum].x = fTime;
-                    ms_kD3DVector4[uiOperatorNum].y = static_cast<float>(std::sin(fTime));
-                    ms_kD3DVector4[uiOperatorNum].z = static_cast<float>(std::cos(fTime));
-                    ms_kD3DVector4[uiOperatorNum].w = static_cast<float>(std::tan(fTime));
+                    ms_kD3DVector4[uiOperatorNum].y = std::sin(fTime);
+                    ms_kD3DVector4[uiOperatorNum].z = std::cos(fTime);
+                    ms_kD3DVector4[uiOperatorNum].w = std::tan(fTime);
                     break;
                 default: return NiShaderAttributeDesc::ATTRIB_TYPE_UNDEFINED;
             }
@@ -2667,7 +2667,7 @@ uint32_t NiD3DShaderConstantMap::PerformOperatorDivide(
     rt::memcpy(&NiD3DShaderConstantMap::ms_kD3DMatResult, v9, sizeof(NiD3DShaderConstantMap::ms_kD3DMatResult));
     if (bInverse) {
         D3DXMatrixInverse_Thunk(
-            &NiD3DShaderConstantMap::ms_kD3DMatResult, 0, &NiD3DShaderConstantMap::ms_kD3DMatResult
+            &NiD3DShaderConstantMap::ms_kD3DMatResult, nullptr, &NiD3DShaderConstantMap::ms_kD3DMatResult
         );
     }
     if (bTranspose) {

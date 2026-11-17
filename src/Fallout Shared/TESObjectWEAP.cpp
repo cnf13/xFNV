@@ -762,7 +762,7 @@ void TESObjectWEAP::InitializeData() {
     data.cReloadAnim = 0;
     data.cAttackAnim = -1;
     data.cHandGripAnim = -1;
-    data.pProjectile = 0;
+    data.pProjectile = nullptr;
     data.cNumProjectiles = 1;
     data.fMinRange = 500.0f;
     data.fMaxRange = 2000.0f;
@@ -788,46 +788,45 @@ void TESObjectWEAP::InitializeData() {
     data.fModActionThreeValueTwo = 0.0f;
     data.fKillImpulse = 1.0f;
     data.cPowerAttackOverrideAnim = static_cast<uint32_t>(
-        (static_cast<uint32_t>(data.cPowerAttackOverrideAnim) & 0xFFFFFF00u) |
-        (static_cast<uint32_t>(static_cast<uint8_t>((-1))))
+        (data.cPowerAttackOverrideAnim & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>((-1))))
     );
     data.iModReloadClipAnimation = -1;
     data.iModFireAnimation = -1;
     criticalData.sCriticalDamage = 0;
     criticalData.fCriticalChanceMult = 1.0f;
     criticalData.bEffectOnDeath = 1;
-    criticalData.pEffect = 0;
+    criticalData.pEffect = nullptr;
     specialVATSData.fVATSSpecialAP = 0.0f;
     specialVATSData.fVATSSpecialMultiplier = 0.0f;
-    specialVATSData.pVATSSpecialEffect = 0;
+    specialVATSData.pVATSSpecialEffect = nullptr;
     specialVATSData.fVATSSkillRequired = 0.0f;
     specialVATSData.bSilent = 1;
     specialVATSData.bModRequired = 0;
-    pScopeEffect = 0;
-    pAttackSound = 0;
-    pAttackSound2 = 0;
-    pAttackSound2D = 0;
-    pAttackLoop = 0;
-    pAttackFailSound = 0;
-    pMeleeBlockSound = 0;
-    pIdleSound = 0;
-    pEquipSound = 0;
-    pUnEquipSound = 0;
-    pModSilencedSound = 0;
-    pModSilencedSound2 = 0;
-    pModSilencedSound2D = 0;
-    pImpactDataSet = 0;
-    p1stPersonObject = 0;
-    p1stPersonMod1Object = 0;
-    p1stPersonMod2Object = 0;
-    p1stPersonMod3Object = 0;
-    p1stPersonMod12Object = 0;
-    p1stPersonMod13Object = 0;
-    p1stPersonMod23Object = 0;
-    p1stPersonMod123Object = 0;
-    pModObjectOne = 0;
-    pModObjectTwo = 0;
-    pModObjectThree = 0;
+    pScopeEffect = nullptr;
+    pAttackSound = nullptr;
+    pAttackSound2 = nullptr;
+    pAttackSound2D = nullptr;
+    pAttackLoop = nullptr;
+    pAttackFailSound = nullptr;
+    pMeleeBlockSound = nullptr;
+    pIdleSound = nullptr;
+    pEquipSound = nullptr;
+    pUnEquipSound = nullptr;
+    pModSilencedSound = nullptr;
+    pModSilencedSound2 = nullptr;
+    pModSilencedSound2D = nullptr;
+    pImpactDataSet = nullptr;
+    p1stPersonObject = nullptr;
+    p1stPersonMod1Object = nullptr;
+    p1stPersonMod2Object = nullptr;
+    p1stPersonMod3Object = nullptr;
+    p1stPersonMod12Object = nullptr;
+    p1stPersonMod13Object = nullptr;
+    p1stPersonMod23Object = nullptr;
+    p1stPersonMod123Object = nullptr;
+    pModObjectOne = nullptr;
+    pModObjectTwo = nullptr;
+    pModObjectThree = nullptr;
     ShellCasingModel.InitializeDataComponent();
     ScopeModel.InitializeDataComponent();
     WorldModel.InitializeDataComponent();
@@ -841,7 +840,7 @@ void TESObjectWEAP::InitializeData() {
     SetCastingType(MagicSystem::WHEN_STRIKES);
     eSoundLevel = SOUND_LEVEL_NORMAL;
     bIsLoopingReload = 0;
-    if (GetReloadAnim(0) >= ANIM_GROUP_RELOAD_W) {
+    if (GetReloadAnim(false) >= ANIM_GROUP_RELOAD_W) {
         bIsLoopingReload = 1;
     }
 }
@@ -990,7 +989,7 @@ void TESObjectWEAP::Save() {
         CastingType = reinterpret_cast<BGSProjectile*>(static_cast<uintptr_t>(data.pProjectile->iFormID));
     }
     else {
-        CastingType = 0;
+        CastingType = nullptr;
     }
     data.pProjectile = CastingType;
     if (TESForm::QEndianSwapOnSave()) {
@@ -1005,7 +1004,7 @@ void TESObjectWEAP::Save() {
         v4 = reinterpret_cast<SpellItem*>(static_cast<uintptr_t>(criticalData.pEffect->iFormID));
     }
     else {
-        v4 = 0;
+        v4 = nullptr;
     }
     criticalData.pEffect = v4;
     if (TESForm::QEndianSwapOnSave()) {
@@ -1020,7 +1019,7 @@ void TESObjectWEAP::Save() {
         v3 = reinterpret_cast<SpellItem*>(static_cast<uintptr_t>(specialVATSData.pVATSSpecialEffect->iFormID));
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     specialVATSData.pVATSSpecialEffect = v3;
     if (TESForm::QEndianSwapOnSave()) {
@@ -1072,13 +1071,13 @@ void TESObjectWEAP::InitItem() {
         TESModelTextureSwap::InitItem(this);
         BGSRepairItemList::InitItem(this);
         BGSPickupPutdownSounds::InitItem(this);
-        uint32_t itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(GetProjectile(0)));
+        uint32_t itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(GetProjectile(nullptr)));
         if (itempInt) {
             TESFile* File = GetFile(-1);
             TESForm::AddCompileIndex(itempInt, File);
             TESForm* FormByNumericID = TESForm::GetFormByNumericID(itempInt);
             data.pProjectile = dynamic_cast<BGSProjectile*>(FormByNumericID);
-            if (!GetProjectile(0)) {
+            if (!GetProjectile(nullptr)) {
                 int32_t CastingType = iFormID;
                 const char* v61 = GetFormEditorID();
                 Warning(
@@ -1446,13 +1445,13 @@ void TESObjectWEAP::InitItem() {
             data.fAttackMult = 1.0f;
         }
         if (bForceNPCsUseAmmo.Bool()) {
-            SetNPCsUseAmmo(1);
+            SetNPCsUseAmmo(true);
         }
         bIsLoopingReload = 0;
         if (data.cReloadAnim >= 19u) {
             bIsLoopingReload = 1;
         }
-        SetInitialized(1);
+        SetInitialized(true);
     }
 }
 
@@ -1499,11 +1498,11 @@ void TESObjectWEAP::Copy(TESForm* apCopy) {
         ourMemcpy(&data, &weap->data, sizeof(data));
         ourMemcpy(&criticalData, &weap->criticalData, sizeof(criticalData));
         ourMemcpy(&specialVATSData, &weap->specialVATSData, sizeof(specialVATSData));
-        TESSound* AttackSound = weap->GetAttackSound(0);
+        TESSound* AttackSound = weap->GetAttackSound(false);
         SetAttackSound(AttackSound);
-        TESSound* AttackSound2 = weap->GetAttackSound2(0);
+        TESSound* AttackSound2 = weap->GetAttackSound2(false);
         SetAttackSound2(AttackSound2);
-        pAttackSound2D = weap->GetAttackSound2D(0);
+        pAttackSound2D = weap->GetAttackSound2D(false);
         TESSound* v15 = weap->Get3DLoopingShotSound();
         SetAttackLoopSound(v15);
         TESSound* BlockSound = weap->GetBlockSound();
@@ -1527,161 +1526,161 @@ void TESObjectWEAP::Copy(TESForm* apCopy) {
 bool TESObjectWEAP::Compare(TESForm* apCompare) {
     TESObjectWEAP* pComp = dynamic_cast<TESObjectWEAP*>(apCompare);
     if (!pComp) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(pComp)) {
-        return 1;
+        return true;
     }
     // Each model's CompareComponent is called through a base pointer so the call stays virtual; a call on the member
     // itself would be devirtualised.
     BaseFormComponent* pModel = &ShellCasingModel;
     if (pModel->CompareComponent(&pComp->ShellCasingModel)) {
-        return 1;
+        return true;
     }
     pModel = &WorldModel;
     if (pModel->CompareComponent(&pComp->WorldModel)) {
-        return 1;
+        return true;
     }
     pModel = &WorldModelMod1;
     if (pModel->CompareComponent(&pComp->WorldModelMod1)) {
-        return 1;
+        return true;
     }
     pModel = &WorldModelMod2;
     if (pModel->CompareComponent(&pComp->WorldModelMod2)) {
-        return 1;
+        return true;
     }
     pModel = &WorldModelMod3;
     if (pModel->CompareComponent(&pComp->WorldModelMod3)) {
-        return 1;
+        return true;
     }
     pModel = &WorldModelMod12;
     if (pModel->CompareComponent(&pComp->WorldModelMod12)) {
-        return 1;
+        return true;
     }
     pModel = &WorldModelMod13;
     if (pModel->CompareComponent(&pComp->WorldModelMod13)) {
-        return 1;
+        return true;
     }
     pModel = &WorldModelMod23;
     if (pModel->CompareComponent(&pComp->WorldModelMod23)) {
-        return 1;
+        return true;
     }
     pModel = &WorldModelMod123;
     if (pModel->CompareComponent(&pComp->WorldModelMod123)) {
-        return 1;
+        return true;
     }
     pModel = &ScopeModel;
     if (pModel->CompareComponent(&pComp->ScopeModel)) {
-        return 1;
+        return true;
     }
     if (pScopeEffect != pComp->pScopeEffect) {
-        return 1;
+        return true;
     }
     BGSImpactDataSet* ImpactDataSet = pImpactDataSet;
     if (ImpactDataSet != pComp->pImpactDataSet) {
-        return 1;
+        return true;
     }
     TESObjectSTAT* v5 = p1stPersonObject;
     if (v5 != pComp->p1stPersonObject) {
-        return 1;
+        return true;
     }
     TESObjectSTAT* v6 = Get1stPersonModObject(1);
     if (v6 != pComp->Get1stPersonModObject(1)) {
-        return 1;
+        return true;
     }
     TESObjectSTAT* v7 = Get1stPersonModObject(2);
     if (v7 != pComp->Get1stPersonModObject(2)) {
-        return 1;
+        return true;
     }
     TESObjectSTAT* v8 = Get1stPersonModObject(3);
     if (v8 != pComp->Get1stPersonModObject(3)) {
-        return 1;
+        return true;
     }
     TESObjectSTAT* v9 = Get1stPersonModObject(4);
     if (v9 != pComp->Get1stPersonModObject(4)) {
-        return 1;
+        return true;
     }
     TESObjectSTAT* v10 = Get1stPersonModObject(5);
     if (v10 != pComp->Get1stPersonModObject(5)) {
-        return 1;
+        return true;
     }
     TESObjectSTAT* v11 = Get1stPersonModObject(6);
     if (v11 != pComp->Get1stPersonModObject(6)) {
-        return 1;
+        return true;
     }
     TESObjectSTAT* v12 = Get1stPersonModObject(7);
     if (v12 != pComp->Get1stPersonModObject(7)) {
-        return 1;
+        return true;
     }
     TESObjectIMOD* ModItem = GetModItem(1u);
     if (ModItem != pComp->GetModItem(1u)) {
-        return 1;
+        return true;
     }
     TESObjectIMOD* v14 = GetModItem(2u);
     if (v14 != pComp->GetModItem(2u)) {
-        return 1;
+        return true;
     }
     TESObjectIMOD* v15 = GetModItem(4u);
     if (v15 != pComp->GetModItem(4u)) {
-        return 1;
+        return true;
     }
-    if (EmbeddedWeaponNode.StrCmp(pComp->EmbeddedWeaponNode, 1)) {
-        return 1;
+    if (EmbeddedWeaponNode.StrCmp(pComp->EmbeddedWeaponNode, true)) {
+        return true;
     }
-    if (VATSAttackName.StrCmp(pComp->VATSAttackName, 1)) {
-        return 1;
+    if (VATSAttackName.StrCmp(pComp->VATSAttackName, true)) {
+        return true;
     }
     const void* TargetLocations = (const void*)&pComp->data;
     if (std::memcmp(&data, TargetLocations, sizeof(data))) {
-        return 1;
+        return true;
     }
     if (std::memcmp(&criticalData, &pComp->criticalData, sizeof(criticalData))) {
-        return 1;
+        return true;
     }
     if (std::memcmp(&specialVATSData, &pComp->specialVATSData, sizeof(specialVATSData))) {
-        return 1;
+        return true;
     }
-    TESSound* AttackSound = GetAttackSound(0);
-    if (AttackSound != pComp->GetAttackSound(0)) {
-        return 1;
+    TESSound* AttackSound = GetAttackSound(false);
+    if (AttackSound != pComp->GetAttackSound(false)) {
+        return true;
     }
-    TESSound* AttackSound2 = GetAttackSound2(0);
-    if (AttackSound2 != pComp->GetAttackSound2(0)) {
-        return 1;
+    TESSound* AttackSound2 = GetAttackSound2(false);
+    if (AttackSound2 != pComp->GetAttackSound2(false)) {
+        return true;
     }
-    TESSound* AttackSound2D = GetAttackSound2D(0);
-    if (AttackSound2D != pComp->GetAttackSound2D(0)) {
-        return 1;
+    TESSound* AttackSound2D = GetAttackSound2D(false);
+    if (AttackSound2D != pComp->GetAttackSound2D(false)) {
+        return true;
     }
     TESSound* v20 = Get3DLoopingShotSound();
     if (v20 != pComp->Get3DLoopingShotSound()) {
-        return 1;
+        return true;
     }
     TESSound* AttackFailSound = GetAttackFailSound();
     if (AttackFailSound != pComp->GetAttackFailSound()) {
-        return 1;
+        return true;
     }
     TESSound* BlockSound = GetBlockSound();
     if (BlockSound != pComp->GetBlockSound()) {
-        return 1;
+        return true;
     }
     TESSound* IdleSound = GetIdleSound();
     if (IdleSound != pComp->GetIdleSound()) {
-        return 1;
+        return true;
     }
     TESSound* EquipSound = GetEquipSound();
     if (EquipSound != pComp->GetEquipSound()) {
-        return 1;
+        return true;
     }
     TESSound* UnequipSound = GetUnequipSound();
     if (UnequipSound != pComp->GetUnequipSound()) {
-        return 1;
+        return true;
     }
     if (pModSilencedSound != pComp->pModSilencedSound) {
-        return 1;
+        return true;
     }
     if (pModSilencedSound2 != pComp->pModSilencedSound2) {
-        return 1;
+        return true;
     }
     return pModSilencedSound2D != pComp->pModSilencedSound2D || eSoundLevel != pComp->GetSoundLevel(0);
 }
@@ -2817,9 +2816,8 @@ TESAmmo* TESObjectWEAP::GetCurrentAmmo(Actor* apWeaponHolder) {
 // mod value is added and truncated to an int whose low byte is kept.
 uint8_t TESObjectWEAP::GetNumProjectiles(bool bUseModValue, bool bIgnoreAmmo, Actor* apWeaponHolder) {
     uint8_t cNumProjectiles = data.cNumProjectiles;
-    if (!bIgnoreAmmo && GetCurrentAmmo(apWeaponHolder) &&
-        static_cast<TESAmmo*>(GetCurrentAmmo(apWeaponHolder))->GetNumProjectiles() > 0) {
-        uint8_t cAmmoProjectiles = static_cast<TESAmmo*>(GetCurrentAmmo(apWeaponHolder))->GetNumProjectiles();
+    if (!bIgnoreAmmo && GetCurrentAmmo(apWeaponHolder) && GetCurrentAmmo(apWeaponHolder)->GetNumProjectiles() > 0) {
+        uint8_t cAmmoProjectiles = GetCurrentAmmo(apWeaponHolder)->GetNumProjectiles();
         cNumProjectiles = uint8_t(cAmmoProjectiles * GetAmmoPerShot());
     }
     if (bUseModValue) {
@@ -2852,10 +2850,10 @@ float TESObjectWEAP::GetSpreadDegrees(bool bModValue) {
 
 float TESObjectWEAP::GetAmmoRegenRate(bool bModValue) {
     if (bModValue) {
-        return (float)(GetModEffectValue(static_cast<WEAPON_MOD_EFFECT>(6), 0) + data.fAmmoRegenRate);
+        return (GetModEffectValue(static_cast<WEAPON_MOD_EFFECT>(6), 0) + data.fAmmoRegenRate);
     }
     else {
-        return (float)(data.fAmmoRegenRate);
+        return data.fAmmoRegenRate;
     }
 }
 
@@ -3040,7 +3038,7 @@ BGSImpactDataSet* TESObjectWEAP::GetImpactDataSet() {
 }
 
 void TESObjectWEAP::SetCriticalEffect(SpellItem* apVal) {
-    criticalData.pEffect = reinterpret_cast<SpellItem*>(static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(apVal)));
+    criticalData.pEffect = reinterpret_cast<SpellItem*>(reinterpret_cast<uintptr_t>(apVal));
 }
 
 int32_t TESObjectWEAP::GetPowerAttackAnimOverride() {

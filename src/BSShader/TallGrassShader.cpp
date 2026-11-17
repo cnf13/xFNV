@@ -127,7 +127,7 @@ bool TallGrassShader::Initialize() {
         CreateShaders();
         CreateTextures();
         CreateStagesAndPasses();
-        result = 1;
+        result = true;
     }
     v2->eMemContext = eMemContext;
     return result;
@@ -238,7 +238,7 @@ uint32_t TallGrassShader::SetupTransformations(
         }
         else if (TallGrassShaderProperty::bPointLighting) {
             // Tests only the count's low 16 bits.
-            if (static_cast<uint16_t>(pTGSProp->GetNumberofActiveNonShadowLights())) {
+            if (pTGSProp->GetNumberofActiveNonShadowLights()) {
                 UpdatePointLights(
                     pTGSProp, kInvWorld, aWorld.m_fScale, static_cast<BSShaderManager::eBSSMPassEnum>(uiPass)
                 );
@@ -1015,7 +1015,7 @@ bool TallGrassShader::LoadStagesAndPasses() {
     while (v4);
     PresetStages();
     v2->eMemContext = eMemContext;
-    return 1;
+    return true;
 }
 
 // Gives each pass its stages, render states and shaders under the grass heap context: passes 0-19 (stage 0, and stages
@@ -1034,7 +1034,7 @@ void TallGrassShader::PresetStages() {
             if (!pPass->m_uiStageCount) {
                 NiD3DTextureStage::CreateNewStage(spStage);
                 NiD3DTextureStage* pStage = spStage.m_pObject;
-                BSShader::SetupDefaultStage(pStage, 0, 3u, 2u, 0);
+                BSShader::SetupDefaultStage(pStage, 0, 3u, 2u, false);
                 pPass->SetStage(pPass->m_uiCurrentStage, pStage);
             }
             if (i < 8 || i > 15) {
@@ -1044,11 +1044,11 @@ void TallGrassShader::PresetStages() {
                 if (pPass->m_uiStageCount < 3) {
                     NiD3DTextureStage::CreateNewStage(spStage);
                     NiD3DTextureStage* pStage = spStage.m_pObject;
-                    BSShader::SetupDefaultStage(pStage, 1u, 1u, 2u, 0);
+                    BSShader::SetupDefaultStage(pStage, 1u, 1u, 2u, false);
                     pPass->SetStage(pPass->m_uiCurrentStage, pStage);
                     NiD3DTextureStage::CreateNewStage(spStage);
                     pStage = spStage.m_pObject;
-                    BSShader::SetupDefaultStage(pStage, 2u, 1u, 2u, 0);
+                    BSShader::SetupDefaultStage(pStage, 2u, 1u, 2u, false);
                     pPass->SetStage(pPass->m_uiCurrentStage, pStage);
                 }
                 iPixelShader = 2;
@@ -1056,33 +1056,33 @@ void TallGrassShader::PresetStages() {
             if (!pPass->m_pkRenderStateGroup) {
                 pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            pPass->m_pkRenderStateGroup->SetRenderState(27u, 0, 1);
-            if (BSShaderManager::GetShaderLevel(0) >= BSShaderManager::BSSM_SV_2_0) {
+            pPass->m_pkRenderStateGroup->SetRenderState(27u, 0, true);
+            if (BSShaderManager::GetShaderLevel(false) >= BSShaderManager::BSSM_SV_2_0) {
                 if (!pPass->m_pkRenderStateGroup) {
                     pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                pPass->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+                pPass->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
                 if (!pPass->m_pkRenderStateGroup) {
                     pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                pPass->m_pkRenderStateGroup->SetRenderState(25u, 5u, 1);
+                pPass->m_pkRenderStateGroup->SetRenderState(25u, 5u, true);
                 if (!pPass->m_pkRenderStateGroup) {
                     pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                pPass->m_pkRenderStateGroup->SetRenderState(24u, 10u, 1);
+                pPass->m_pkRenderStateGroup->SetRenderState(24u, 10u, true);
                 if (BSShaderManager::bHDR && !BSShaderManager::bTransparencyMultisampling) {
                     if (!pPass->m_pkRenderStateGroup) {
                         pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                     }
-                    pPass->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+                    pPass->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
                     if (!pPass->m_pkRenderStateGroup) {
                         pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                     }
-                    pPass->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+                    pPass->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
                     if (!pPass->m_pkRenderStateGroup) {
                         pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                     }
-                    pPass->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+                    pPass->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
                 }
             }
             pPass->m_spVertexShader = spVertexShaders[i].m_pObject;
@@ -1094,11 +1094,11 @@ void TallGrassShader::PresetStages() {
             if (pPass->m_uiStageCount < 2) {
                 NiD3DTextureStage::CreateNewStage(spStage);
                 NiD3DTextureStage* pStage = spStage.m_pObject;
-                BSShader::SetupDefaultStage(pStage, 0, 3u, 2u, 0);
+                BSShader::SetupDefaultStage(pStage, 0, 3u, 2u, false);
                 pPass->SetStage(pPass->m_uiCurrentStage, pStage);
                 NiD3DTextureStage::CreateNewStage(spStage);
                 pStage = spStage.m_pObject;
-                BSShader::SetupDefaultStage(pStage, 1u, 3u, 2u, 0);
+                BSShader::SetupDefaultStage(pStage, 1u, 3u, 2u, false);
                 pStage->m_spTexture = BSShaderManager::pAttenuationXY;
                 pStage->m_uiTextureFlags = 1;
                 pPass->SetStage(pPass->m_uiCurrentStage, pStage);
@@ -1110,47 +1110,47 @@ void TallGrassShader::PresetStages() {
                 if (pPass->m_uiStageCount < 4) {
                     NiD3DTextureStage::CreateNewStage(spStage);
                     NiD3DTextureStage* pStage = spStage.m_pObject;
-                    BSShader::SetupDefaultStage(pStage, 2u, 1u, 2u, 0);
+                    BSShader::SetupDefaultStage(pStage, 2u, 1u, 2u, false);
                     pPass->SetStage(pPass->m_uiCurrentStage, pStage);
                     NiD3DTextureStage::CreateNewStage(spStage);
                     pStage = spStage.m_pObject;
-                    BSShader::SetupDefaultStage(pStage, 3u, 1u, 2u, 0);
+                    BSShader::SetupDefaultStage(pStage, 3u, 1u, 2u, false);
                     pPass->SetStage(pPass->m_uiCurrentStage, pStage);
                 }
                 iPixelShader = 3;
             }
-            if (BSShaderManager::GetShaderLevel(0) < BSShaderManager::BSSM_SV_2_0) {
+            if (BSShaderManager::GetShaderLevel(false) < BSShaderManager::BSSM_SV_2_0) {
                 if (!pPass->m_pkRenderStateGroup) {
                     pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                pPass->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+                pPass->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
             }
             else {
                 if (!pPass->m_pkRenderStateGroup) {
                     pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                pPass->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+                pPass->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
                 if (!pPass->m_pkRenderStateGroup) {
                     pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                pPass->m_pkRenderStateGroup->SetRenderState(25u, 5u, 1);
+                pPass->m_pkRenderStateGroup->SetRenderState(25u, 5u, true);
                 if (!pPass->m_pkRenderStateGroup) {
                     pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                pPass->m_pkRenderStateGroup->SetRenderState(24u, 10u, 1);
+                pPass->m_pkRenderStateGroup->SetRenderState(24u, 10u, true);
                 if (BSShaderManager::bHDR && !BSShaderManager::bTransparencyMultisampling) {
                     if (!pPass->m_pkRenderStateGroup) {
                         pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                     }
-                    pPass->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+                    pPass->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
                     if (!pPass->m_pkRenderStateGroup) {
                         pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                     }
-                    pPass->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+                    pPass->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
                     if (!pPass->m_pkRenderStateGroup) {
                         pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                     }
-                    pPass->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+                    pPass->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
                 }
             }
             pPass->m_spVertexShader = spVertexShaders[i - 20].m_pObject;
@@ -1161,39 +1161,39 @@ void TallGrassShader::PresetStages() {
             if (pPass->m_uiStageCount < 2) {
                 NiD3DTextureStage::CreateNewStage(spStage);
                 NiD3DTextureStage* pStage = spStage.m_pObject;
-                BSShader::SetupDefaultStage(pStage, 0, 3u, 2u, 0);
+                BSShader::SetupDefaultStage(pStage, 0, 3u, 2u, false);
                 pPass->SetStage(pPass->m_uiCurrentStage, pStage);
                 NiD3DTextureStage::CreateNewStage(spStage);
                 pStage = spStage.m_pObject;
-                BSShader::SetupDefaultStage(pStage, 1u, 3u, 2u, 0);
+                BSShader::SetupDefaultStage(pStage, 1u, 3u, 2u, false);
                 pPass->SetStage(pPass->m_uiCurrentStage, pStage);
             }
             if (!pPass->m_pkRenderStateGroup) {
                 pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            pPass->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+            pPass->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
             if (!pPass->m_pkRenderStateGroup) {
                 pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            pPass->m_pkRenderStateGroup->SetRenderState(19u, 9u, 1);
+            pPass->m_pkRenderStateGroup->SetRenderState(19u, 9u, true);
             if (!pPass->m_pkRenderStateGroup) {
                 pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            pPass->m_pkRenderStateGroup->SetRenderState(20u, 1u, 1);
+            pPass->m_pkRenderStateGroup->SetRenderState(20u, 1u, true);
             if (!pPass->m_pkRenderStateGroup) {
                 pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            pPass->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+            pPass->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
             // The depth bias is passed as the float's bits and is read before the group's null test.
             uint32_t uiDepthBias = std::bit_cast<uint32_t>(BSShaderProperty::fDepthBiasUnit);
             if (!pPass->m_pkRenderStateGroup) {
                 pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            pPass->m_pkRenderStateGroup->SetRenderState(195u, uiDepthBias, 1);
+            pPass->m_pkRenderStateGroup->SetRenderState(195u, uiDepthBias, true);
             if (!pPass->m_pkRenderStateGroup) {
                 pPass->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            pPass->m_pkRenderStateGroup->SetRenderState(152u, 63u, 1);
+            pPass->m_pkRenderStateGroup->SetRenderState(152u, 63u, true);
             pPass->m_spVertexShader = spVertexShaders[i - 20].m_pObject;
             pPass->m_spPixelShader = spPixelShaders[BSShaderManager::iShadowFilter + 4].m_pObject;
         }
@@ -1209,7 +1209,7 @@ void TallGrassShader::UpdatePointLights(
 ) {
     _D3DVECTOR vLightPos;
     _D3DVECTOR vLightObjectPos;
-    void* kiter = 0;
+    void* kiter = nullptr;
     NiLight* m_pObject = apTGSProp->GetFirstActiveNonShadowLight(kiter)->spLight.m_pObject;
     float g = m_pObject->m_kDiff.g;
     float b = m_pObject->m_kDiff.b;
@@ -1331,7 +1331,7 @@ BSShader* TallGrassShader::CreateShader() {
     TLSData* v0 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v0->eMemContext;
     v0->eMemContext = MEM_CONTEXT_GRASS;
-    TallGrassShader* pshader = 0;
+    TallGrassShader* pshader = nullptr;
     NiDX9ShaderDeclaration* spShaderDecl = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 5u, 1u);
     spShaderDecl->SetEntry(0, 0, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
     spShaderDecl->SetEntry(1u, 3u, NiShaderDeclaration::SHADERPARAM_NI_NORMAL, NiShaderDeclaration::SPTYPE_FLOAT3, 0);

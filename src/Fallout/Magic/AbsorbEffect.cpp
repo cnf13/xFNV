@@ -78,20 +78,20 @@ void AbsorbEffect::Update(float a1) {
         pcaster = pCaster->GetCasterAsActor();
     }
     else {
-        pcaster = 0;
+        pcaster = nullptr;
     }
     if (pTarget) {
         ptarget = pTarget->GetTargetAsActor();
     }
     else {
-        ptarget = 0;
+        ptarget = nullptr;
     }
     if (!pEffect->pEffectSetting->IsFlagSet(EffectSetting::RECOVER) && fDuration > 0.0) {
         GetActorValue();
         if (ptarget) {
             ActorValue::Index evalue = GetActorValue();
             if (static_cast<double>(ptarget->GetActorValue(evalue)) <= 0.0) {
-                Dispel(0);
+                Dispel(false);
             }
         }
         if (!bDone) {
@@ -102,11 +102,11 @@ void AbsorbEffect::Update(float a1) {
     if (!bDone &&
         (ptarget &&
          (ptarget->Get3D() &&
-          (!ptarget->IsDead(0) &&
+          (!ptarget->IsDead(false) &&
            (pcaster &&
             (pcaster->Get3D() &&
-             (!pcaster->IsDead(0) &&
-              (fdistance = pcaster->GetDistanceFromReference(ptarget, 0, 0),
+             (!pcaster->IsDead(false) &&
+              (fdistance = pcaster->GetDistanceFromReference(ptarget, false, false),
                (v3 = &fMagicAbsorbDistanceReachMult.Float(),
                 !(static_cast<double>(fdistance) > CombatFormulas::CalcWeaponReach(*v3))))))))))) {
         if (pcaster->pCurrentProcess) {
@@ -114,13 +114,13 @@ void AbsorbEffect::Update(float a1) {
             DetectionState* v9 = CurrentAIProcess->GetDetectionState(ptarget, 0);
             if (v9) {
                 if (!v9->bLineofSight) {
-                    Dispel(0);
+                    Dispel(false);
                 }
             }
         }
     }
     else {
-        Dispel(0);
+        Dispel(false);
     }
     if (!bDone) {
         Update3D(a1);
@@ -152,7 +152,7 @@ void AbsorbEffect::Start() {
             pActor = pCaster->GetCasterAsActor();
         }
         else {
-            pActor = 0;
+            pActor = nullptr;
         }
         float v1 = -fMagnitude;
         ModifyActorValue(pActor, v1, ActorValue::VALUE_NONE);
@@ -169,7 +169,7 @@ void AbsorbEffect::Finish() {
             pActor = pCaster->GetCasterAsActor();
         }
         else {
-            pActor = 0;
+            pActor = nullptr;
         }
         float afMagnitude = fMagnitude;
         float v5 = CheckAdjustNoNegativeMagnitude(afMagnitude);
@@ -181,7 +181,7 @@ void AbsorbEffect::Finish() {
         if (pparent) {
             pparent->DetachChild(spBoltNode.m_pObject);
         }
-        spBoltNode.operator=(static_cast<NiNode*>(0));
+        spBoltNode.operator=(static_cast<NiNode*>(nullptr));
     }
 }
 
@@ -196,7 +196,7 @@ void AbsorbEffect::Start3D() {
         v29 = ::new (apMemory) NiNode(0);
     }
     else {
-        v29 = 0;
+        v29 = nullptr;
     }
     spBoltNode.operator=(v29);
     const NiFixedString* v1 = &BSXFlags::Tag();
@@ -208,33 +208,33 @@ void AbsorbEffect::Start3D() {
             pextra_2 = ::new (v35) BSXFlags;
         }
         else {
-            pextra_2 = 0;
+            pextra_2 = nullptr;
         }
         pextra = pextra_2;
         const NiFixedString* v2 = &BSXFlags::Tag();
         spBoltNode.m_pObject->AddExtraData(*v2, pextra_2);
     }
-    pextra->SetFlags(1u, 1);
+    pextra->SetFlags(1u, true);
     if (this->pTarget) {
         MagicTarget* pTarget = this->pTarget;
         ptarget = pTarget->GetTargetStatsObject();
     }
     else {
-        ptarget = 0;
+        ptarget = nullptr;
     }
     if (this->pCaster) {
         MagicCaster* pCaster = this->pCaster;
         pcaster = pCaster->GetCasterStatsObject();
     }
     else {
-        pcaster = 0;
+        pcaster = nullptr;
     }
     if (ptarget) {
         if (pcaster) {
             NiNode* pparentNode = static_cast<NiNode*>(ptarget->GetParentCell()->GetDynamicNode());
             pparentNode->AttachChild(spBoltNode.m_pObject, 1);
-            spBoltProperty.operator=(static_cast<BSShaderProperty*>(0));
-            spBoltProperty.operator=(static_cast<BSShaderProperty*>(BoltShader::Start(spBoltNode.m_pObject, 1)));
+            spBoltProperty.operator=(static_cast<BSShaderProperty*>(nullptr));
+            spBoltProperty.operator=(static_cast<BSShaderProperty*>(BoltShader::Start(spBoltNode.m_pObject, true)));
             Animation* panim = pcaster->GetAnimation();
             if (panim) {
                 NiControllerManager* ControllerManager = panim->GetControllerManager();
@@ -242,7 +242,7 @@ void AbsorbEffect::Start3D() {
                 NiFixedString* v22 = ::new (static_cast<void*>(&apString)) NiFixedString("Bip01 Spine1");
                 spSource.operator=(static_cast<NiNode*>(ObjectPalette->GetAVObject(*v22)));
                 apString.~NiFixedString();
-                if (spSource.operator==(static_cast<NiNode*>(0))) {
+                if (spSource.operator==(static_cast<NiNode*>(nullptr))) {
                     spSource.operator=(ptarget->Get3D());
                 }
             }
@@ -253,7 +253,7 @@ void AbsorbEffect::Start3D() {
                 NiFixedString* v20 = ::new (static_cast<void*>(&v33)) NiFixedString("Bip01 Spine1");
                 spTarget.operator=(static_cast<NiNode*>(v21->GetAVObject(*v20)));
                 v33.~NiFixedString();
-                if (spTarget.operator==(static_cast<NiNode*>(0))) {
+                if (spTarget.operator==(static_cast<NiNode*>(nullptr))) {
                     spTarget.operator=(pcaster->Get3D());
                 }
             }
@@ -286,8 +286,8 @@ void AbsorbEffect::Start3D() {
                 NiColorA kGlowColor(fAbsorbGlowColorR.Float(), fGlowG, fGlowB, 1.0f);
                 static_cast<BoltShaderProperty*>(spBoltProperty.m_pObject)
                     ->SetAbsorbGlowColor(kGlowColor.r, kGlowColor.g, kGlowColor.b, kGlowColor.a);
-                static_cast<BoltShaderProperty*>(spBoltProperty.m_pObject)->SetMoving(0);
-                static_cast<BoltShaderProperty*>(spBoltProperty.m_pObject)->SetStartFromPoint(1);
+                static_cast<BoltShaderProperty*>(spBoltProperty.m_pObject)->SetMoving(false);
+                static_cast<BoltShaderProperty*>(spBoltProperty.m_pObject)->SetStartFromPoint(true);
                 static_cast<BoltShaderProperty*>(spBoltProperty.m_pObject)->InitSegmentData();
             }
         }
@@ -317,7 +317,7 @@ void AbsorbEffect::Update3D(float afDelta) {
                         float X = fAbsorbMoveSpeed.Float();
                         float fZAnglea = toTarget.Length();
                         static_cast<BoltShaderProperty*>(spBoltProperty.m_pObject)
-                            ->BoltShaderProperty::UpdateAndMoveBolt(afDelta, fZAnglea, X, 0);
+                            ->BoltShaderProperty::UpdateAndMoveBolt(afDelta, fZAnglea, X, false);
                     }
                 }
             }

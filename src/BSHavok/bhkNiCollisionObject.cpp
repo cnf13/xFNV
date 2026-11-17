@@ -532,7 +532,7 @@ void bhkNiCollisionObject::ResetSim(NiAVObject* apObject, bool abRecurse) {
                 if (pnode->m_kChildren.m_usSize) {
                     do {
                         NiAVObject* v7 = pnode->m_kChildren.m_pBase[--m_usSize].m_pObject;
-                        bhkNiCollisionObject::ResetSim(v7, 1);
+                        bhkNiCollisionObject::ResetSim(v7, true);
                     }
                     while (m_usSize);
                 }

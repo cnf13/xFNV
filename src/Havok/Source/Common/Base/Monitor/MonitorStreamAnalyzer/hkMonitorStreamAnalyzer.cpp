@@ -283,7 +283,7 @@ static hkMonitorStreamAnalyzer::Node* findChildNode(hkMonitorStreamAnalyzer::Nod
     }
     int32_t v6 = v4;
     if (v4 >= m_size) {
-        return 0;
+        return nullptr;
     }
     for (i = &a1->m_children.m_data[v4];; ++i) {
         v8 = *i;
@@ -291,11 +291,11 @@ static hkMonitorStreamAnalyzer::Node* findChildNode(hkMonitorStreamAnalyzer::Nod
             break;
         }
         if (++v6 >= m_size) {
-            return 0;
+            return nullptr;
         }
     }
     if (!(a2 >= v8->m_absoluteStartTime)) {
-        return 0;
+        return nullptr;
     }
     else {
         return *i;
@@ -764,7 +764,7 @@ char* hkMonitorStreamAnalyzer::getStreamBegin() {
         return static_cast<hkArrayBase<char>&>(m_data).begin();
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -1513,7 +1513,7 @@ void hkMonitorStreamAnalyzer::writeStatisticsDetails(
         for (int32_t i = 0; i < pFrames->m_size; ++i) {
             hkMakeSumRecursive(&sum, pFrames->m_data[i]);
         }
-        Node* pChild = hkFindChildByName(&sum, nodeIdForFrameOverview, static_cast<hkBool>(1));
+        Node* pChild = hkFindChildByName(&sum, nodeIdForFrameOverview, static_cast<hkBool>(true));
         if (pChild) {
             do {
                 fFrameTime = pChild->m_value[0] * fInvNumFrames + fFrameTime;
@@ -1554,7 +1554,7 @@ void hkMonitorStreamAnalyzer::writeStatisticsDetails(
             }
             float fSum = 0.0f;
             const char* pName = "Unknown";
-            for (Node* pChild = hkFindChildByName(pFrame, nodeIdForFrameOverview, static_cast<hkBool>(1)); pChild;
+            for (Node* pChild = hkFindChildByName(pFrame, nodeIdForFrameOverview, static_cast<hkBool>(true)); pChild;
                  pChild = hkFindNextChildByName(pChild, nodeIdForFrameOverview, pFrame)) {
                 fSum = pChild->m_value[0] + fSum;
                 pName = pChild->m_name;
@@ -2242,7 +2242,7 @@ void hkMonitorStreamAnalyzer::writeStatisticsDetailsToTga(
     hkOstream& outStream,
     hkMonitorStreamAnalyzer::SampleInfo* sampleInfo
 ) {
-    int32_t* apPtr = 0;
+    int32_t* apPtr = nullptr;
     int32_t height = 0;
     hkMonitorStreamAnalyzer::writeStatisticsDetailsToTexture(nodeList, input, frameInfos, apPtr, height, sampleInfo);
     int32_t* v5 = apPtr;
@@ -2272,7 +2272,7 @@ hkFindChildByName(hkMonitorStreamAnalyzer::Node* node, const char* childName, hk
             return *node->m_children.begin();
         }
         else {
-            return 0;
+            return nullptr;
         }
     }
     else {
@@ -2293,19 +2293,19 @@ uint32_t hkRoundUpPow2(uint32_t n) {
 bool hkFindChildIndexByName(hkMonitorStreamAnalyzer::Node* apNode, const char* apcName, int32_t* apIndexInOut) {
     if (apNode->m_children.m_size > *apIndexInOut &&
         !hkString::strCmp(apNode->m_children.m_data[*apIndexInOut]->m_name, apcName)) {
-        return 1;
+        return true;
     }
     int32_t v4 = 0;
     if (apNode->m_children.m_size <= 0) {
-        return 0;
+        return false;
     }
     while (hkString::strCmp(apNode->m_children.m_data[v4]->m_name, apcName)) {
         if (++v4 >= apNode->m_children.m_size) {
-            return 0;
+            return false;
         }
     }
     *apIndexInOut = v4;
-    return 1;
+    return true;
 }
 
 void hkScaleTimersRecursive(hkMonitorStreamAnalyzer::Node* apNode, int32_t aiTimerId, float afFactor) {
@@ -2538,7 +2538,7 @@ hkMonitorStreamAnalyzer::Node* getNodeAtSample(
         v4 = currentNode;
     }
     if (v4) {
-        while (1) {
+        while (true) {
             hkMonitorStreamAnalyzer::Node* ChildNode = findChildNode(v4, sampleTime, absoluteTimeIndex);
             if (!ChildNode) {
                 break;
@@ -2950,7 +2950,7 @@ hkMonitorStreamAnalyzer::Node* createNewNode(
         return ::new (v8) hkMonitorStreamAnalyzer::Node(parent, name, type);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -2974,11 +2974,11 @@ hkMonitorStreamAnalyzer::Node* hkFindNextChildByName(
     }
     int32_t v6 = v4 + 1;
     if (v6 >= m_size) {
-        return 0;
+        return nullptr;
     }
     while (hkString::strCmp(childName, node->m_children.m_data[v6]->m_name)) {
         if (++v6 >= node->m_children.m_size) {
-            return 0;
+            return nullptr;
         }
     }
     return node->m_children.m_data[v6];

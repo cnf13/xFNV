@@ -18,7 +18,7 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 
 #include <cfloat>
-#include <stdint.h>
+#include <cstdint>
 
 void NiFloatKey::SetValue(float fValue) {
     m_fValue = fValue;

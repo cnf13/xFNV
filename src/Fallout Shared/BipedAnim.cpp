@@ -190,7 +190,7 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // The slots of a race's naked body parts that BipedAnim::InitNaked fills.
 using NakedPartArray = BIPED_OBJECT[3];
@@ -236,8 +236,8 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
     FaceGenDatas fgcoord;
     BSCloningProcess cloneData;
     float fzoom;
-    bool bfirstPerson = 0;
-    bool bpipboy = object[6].pParent != 0;
+    bool bfirstPerson = false;
+    bool bpipboy = object[6].pParent != nullptr;
     if (m_pRequester == pPlayer) {
         bfirstPerson = pPlayer->Is1stPersonBiped(this);
     }
@@ -249,13 +249,13 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
             (object[n].pPart != bufferedObjects[n].pPart ||
              (object[n].pParent != bufferedObjects[n].pParent || !bufferedObjects[n].pPartClone))) {
             if (bufferedObjects[n].pPartClone) {
-                RemovePart(&bufferedObjects[n], 1, 0);
+                RemovePart(&bufferedObjects[n], true, 0);
             }
             else {
                 ourMemset(&bufferedObjects[n], 0, sizeof(bufferedObjects[n]));
             }
         LABEL_30:;
-            bool bModScopeOn = 0;
+            bool bModScopeOn = false;
             uint8_t iModSlot = 0;
             if (n == BO_WEAPON && object[5].pParent) {
                 if (m_pRequester == pPlayer) {
@@ -266,7 +266,7 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                     fzoom = 0.0f;
                     bModScopeOn = ichange->HasModEffectActive(WEAPON_MOD_IRON_SITES, fzoom);
                     AttachBipedWeapon(pweapon, iModSlot);
-                    if (pweapon->HasScope() && this == pPlayer->GetBiped(0) &&
+                    if (pweapon->HasScope() && this == pPlayer->GetBiped(false) &&
                         (!pweapon->HasModScope() || bModScopeOn)) {
                         Interface::InitGunScope(&pweapon->ScopeModel);
                     }
@@ -285,7 +285,7 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                               (bLoadHelmetsInBackground.Bool() &&
                                (BSFaceGenManager::GetUseFaceGenHeads() &&
                                 BSFaceGenManager::GetUseMultiThreading()))))) {
-                            QueueHelmetLoad(IO_TASK_PRIORITY_CRITICAL, 0, n);
+                            QueueHelmetLoad(IO_TASK_PRIORITY_CRITICAL, nullptr, n);
                         }
                         else {
                             if (object[n].pPart->GetModelLength()) {
@@ -293,10 +293,11 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                 BIPED_BONE boneIndex = objToBone[n];
                                 bool IsFaceGenObject = this->IsFaceGenObject(n);
                                 const char* v6 = object[n].pPart->GetModel();
-                                NiNode* pNode = pModelLoader->LoadFile(v6, LOD_MULT_ACTORS, 1, 0, IsFaceGenObject, 0);
+                                NiNode* pNode =
+                                    pModelLoader->LoadFile(v6, LOD_MULT_ACTORS, true, false, IsFaceGenObject, false);
                                 cloneData.~BSCloningProcess();
                                 ::new (&cloneData) BSCloningProcess(1.0f);
-                                NiPointer<NiObject> spdeepCopy(static_cast<NiObject*>(0));
+                                NiPointer<NiObject> spdeepCopy(static_cast<NiObject*>(nullptr));
                                 if (HasMorpherController(pNode)) {
                                     spdeepCopy.operator=(static_cast<NiObject*>(
                                         TES::pInstance->CreateDeepCopySameTextures(pNode, cloneData)
@@ -307,14 +308,14 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                     pClone = pNode->Clone(cloneData);
                                 }
                                 NiNode* pcloneNode = pClone->IsNode();
-                                NiAVObject* ppartClone = 0;
+                                NiAVObject* ppartClone = nullptr;
                                 if (pcloneNode) {
                                     TESModelTextureSwap* pmodelswap;
                                     if (object[n].pPart) {
                                         pmodelswap = object[n].pPart->GetAsModelTextureSwap();
                                     }
                                     else {
-                                        pmodelswap = 0;
+                                        pmodelswap = nullptr;
                                     }
                                     TESModelTextureSwap* pmodelswap_2 = pmodelswap;
                                     if (pmodelswap) {
@@ -331,7 +332,7 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                     }
                                     pcloneNode->SetTranslate(NiPoint3_ZERO);
                                     pcloneNode->SetRotate(NiMatrix3_IDENTITY);
-                                    ppartClone = ApplySkinnedObjects(pcloneNode, n, bfirstPerson, bpipboy, 0);
+                                    ppartClone = ApplySkinnedObjects(pcloneNode, n, bfirstPerson, bpipboy, nullptr);
                                     if (!ppartClone) {
                                         ppartClone = (NiAVObject*)pcloneNode;
                                         if (this) {
@@ -373,10 +374,10 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                                                                     FR2MatrixVTC<float>>
                                                                             );
                                                                             ::new (&spTempObject) NiPointer<NiObject>(
-                                                                                static_cast<NiObject*>(0)
+                                                                                static_cast<NiObject*>(nullptr)
                                                                             );
                                                                             ::new (&spdata) NiPointer<NiGeometryData>(
-                                                                                static_cast<NiGeometryData*>(0)
+                                                                                static_cast<NiGeometryData*>(nullptr)
                                                                             );
                                                                             ptri->GetModelData()->CreateDeepCopy(
                                                                                 spTempObject
@@ -392,7 +393,7 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                                                             if (!BSFaceGenManager::
                                                                                     GetUseFaceGenHeads() ||
                                                                                 pfgmodel->ApplyCoordinateToExistingMesh(
-                                                                                    &(&fgcoord)->kFaceGens, ptri, 0
+                                                                                    &(&fgcoord)->kFaceGens, ptri, false
                                                                                 )) {
                                                                                 NiMatrix3 matrot;
                                                                                 matrot.MakeYRotation(-1.5707964f);
@@ -417,14 +418,14 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                                 }
                                             }
                                         }
-                                        BipedAnim::AttachToParent(root, pcloneNode, 0, this, n, 0);
+                                        BipedAnim::AttachToParent(root, pcloneNode, nullptr, this, n, nullptr);
                                         if (!pSaveLoadGameOLD->GetLoading() && n == BO_WEAPON) {
                                             Actor* pactor = static_cast<Actor*>(m_pRequester);
                                             if (pactor->pCurrentProcess) {
-                                                if (m_pRequester == pPlayer && this == pPlayer->GetBiped(1)) {
+                                                if (m_pRequester == pPlayer && this == pPlayer->GetBiped(true)) {
                                                     BaseProcess* v23 = pactor->pCurrentProcess;
                                                     Actor* fScalea = pactor;
-                                                    Animation* Animation_0 = pPlayer->GetAnimation(1);
+                                                    Animation* Animation_0 = pPlayer->GetAnimation(true);
                                                     bool IsWeaponDrawn = pactor->IsWeaponDrawn();
                                                     v23->ForceWeaponDrawnSheathed(
                                                         IsWeaponDrawn, this, Animation_0, fScalea
@@ -466,7 +467,7 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                                 else {
                                                     NiPointer<NiAVObject> spdeleter(ppartClone);
                                                 }
-                                                ppartClone = 0;
+                                                ppartClone = nullptr;
                                             }
                                             else {
                                                 if (bone[boneIndex].pParent) {
@@ -496,7 +497,7 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                             if (static_cast<TESObjectWEAP*>(object[5].pParent)
                                                     ->TESObjectWEAP::GetHideBackpack()) {
                                                 if (ppartClone) {
-                                                    ppartClone->SetAppCulled(1);
+                                                    ppartClone->SetAppCulled(true);
                                                 }
                                             }
                                         }
@@ -510,7 +511,7 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
             }
             continue;
         }
-        bool bcreateClone = 0;
+        bool bcreateClone = false;
         BIPOBJECT* v2 = &bufferedObjects[n];
         BIPOBJECT* v3 = &object[n];
         v3->pParent = v2->pParent;
@@ -528,11 +529,11 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                             break;
                         }
                         NiAVObject* v5 = pnode->GetAt(static_cast<uint32_t>(i));
-                        AdjustSkinComplexion(v5, 0);
+                        AdjustSkinComplexion(v5, false);
                     }
                 }
                 else {
-                    AdjustSkinComplexion(object[n].pPartClone, 0);
+                    AdjustSkinComplexion(object[n].pPartClone, false);
                 }
             }
         }
@@ -540,7 +541,7 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
             if (object[5].pParent) {
                 if (static_cast<TESObjectWEAP*>(object[5].pParent)->TESObjectWEAP::GetHideBackpack()) {
                     if (object[n].pPartClone) {
-                        object[n].pPartClone->SetAppCulled(1);
+                        object[n].pPartClone->SetAppCulled(true);
                     }
                 }
             }
@@ -573,7 +574,7 @@ void BipedAnim::InitRoot(NiNode* apNode) {
 
 void BipedAnim::RemoveAllParts() {
     pModelLoader->EnterModelMapCS();
-    sPartsCriticalSection.Enter(0);
+    sPartsCriticalSection.Enter(nullptr);
     for (int32_t i = 0; i < BIPED_OBJECT_COUNT; ++i) {
         this->RemovePart(static_cast<BIPED_OBJECT>(i), true, 0);
         this->RemovePart(&this->bufferedObjects[i], true, 0);
@@ -586,7 +587,7 @@ void BipedAnim::RemoveBipedWeapon() {
     if (object[5].pParent) {
         if (static_cast<TESObjectWEAP*>(object[5].pParent)->TESObjectWEAP::GetHideBackpack()) {
             if (object[7].pPartClone) {
-                object[7].pPartClone->SetAppCulled(0);
+                object[7].pPartClone->SetAppCulled(false);
             }
         }
     }
@@ -594,16 +595,16 @@ void BipedAnim::RemoveBipedWeapon() {
         TESForm* pParent = bufferedObjects[5].pParent;
         for (int32_t i = 0; i < 20; ++i) {
             if (bufferedObjects[i].pParent == pParent) {
-                RemovePart(&bufferedObjects[i], static_cast<bool>(1), 0);
+                RemovePart(&bufferedObjects[i], true, 0);
             }
         }
     }
-    RemovePart(BO_WEAPON, static_cast<bool>(1), 0);
+    RemovePart(BO_WEAPON, true, 0);
     if (this->m_pRequester->IsActor()) {
         Actor* m_pRequester = static_cast<Actor*>(this->m_pRequester);
         if (m_pRequester->GetCurrentAIProcess()) {
-            if (!pDataHandler->GetClearingData() && this != pPlayer->GetBiped(static_cast<bool>(1))) {
-                m_pRequester->ReloadTargets(0);
+            if (!pDataHandler->GetClearingData() && this != pPlayer->GetBiped(true)) {
+                m_pRequester->ReloadTargets(false);
             }
         }
         NiNode* pBackPack = static_cast<NiNode*>(BSUtilities::GetObjectByName(root, "Backpack"));
@@ -627,8 +628,9 @@ void BipedAnim::AttachBipedWeapon(TESObjectWEAP* apWeapon, uint8_t iModSlots) {
                     BipedAnim::LoadAndAttachAddOn(object[5].pParent, object[5].pPart, ebipedObject, m_pRequester, v4);
             }
             else {
-                object[5].pPartClone =
-                    BipedAnim::LoadAndAttachAddOn(object[5].pParent, object[5].pPart, ebipedObject, m_pRequester, 0);
+                object[5].pPartClone = BipedAnim::LoadAndAttachAddOn(
+                    object[5].pParent, object[5].pPart, ebipedObject, m_pRequester, nullptr
+                );
             }
             if (object[5].pPartClone) {
                 BSStringT<char> newName;
@@ -640,7 +642,7 @@ void BipedAnim::AttachBipedWeapon(TESObjectWEAP* apWeapon, uint8_t iModSlots) {
                 apString.~NiFixedString();
                 if (apWeapon->GetHideBackpack()) {
                     if (object[7].pPartClone) {
-                        object[7].pPartClone->SetAppCulled(1);
+                        object[7].pPartClone->SetAppCulled(true);
                     }
                 }
                 if (m_pRequester->IsActor()) {
@@ -648,25 +650,25 @@ void BipedAnim::AttachBipedWeapon(TESObjectWEAP* apWeapon, uint8_t iModSlots) {
                     BaseProcess* pprocess = pactor->pCurrentProcess;
                     if (pprocess) {
                         if (!pDataHandler->GetClearingData() && !pSaveLoadGameOLD->GetLoading() &&
-                            this != pPlayer->GetBiped(1)) {
-                            pactor->ReloadTargets(1);
+                            this != pPlayer->GetBiped(true)) {
+                            pactor->ReloadTargets(true);
                         }
                     }
                     if (pprocess) {
                         if (!pSaveLoadGame->GetSaveGameLoading()) {
-                            Animation* panim = 0;
-                            if (m_pRequester == pPlayer && this == pPlayer->GetBiped(1)) {
-                                panim = pPlayer->GetAnimation(1);
+                            Animation* panim = nullptr;
+                            if (m_pRequester == pPlayer && this == pPlayer->GetBiped(true)) {
+                                panim = pPlayer->GetAnimation(true);
                             }
                             else {
                                 panim = pactor->Actor::GetAnimation();
                             }
                             if (panim) {
-                                panim->BlendOut(AGS_WEAPON, 0);
+                                panim->BlendOut(AGS_WEAPON, false);
                             }
-                            if (m_pRequester == pPlayer && this == pPlayer->GetBiped(1)) {
+                            if (m_pRequester == pPlayer && this == pPlayer->GetBiped(true)) {
                                 BaseProcess* pprocess_2 = pactor->pCurrentProcess;
-                                Animation* Animation_0 = pPlayer->GetAnimation(1);
+                                Animation* Animation_0 = pPlayer->GetAnimation(true);
                                 bool IsWeaponDrawn = pactor->IsWeaponDrawn();
                                 pprocess_2->ForceWeaponDrawnSheathed(IsWeaponDrawn, this, Animation_0, pactor);
                             }
@@ -740,7 +742,7 @@ void BipedAnim::RecursivelyRemoveAllDecalPlacementVectorDataFromWeaponBone(NiAVO
     else {
         NiNode* pNode = apRoot->IsNode();
         if (pNode) {
-            for (uint32_t i = 0; i < static_cast<uint32_t>(pNode->GetArrayCount()); ++i) {
+            for (uint32_t i = 0; i < pNode->GetArrayCount(); ++i) {
                 this->RecursivelyRemoveAllDecalPlacementVectorDataFromWeaponBone(pNode->GetAt(i));
             }
         }
@@ -927,9 +929,7 @@ void BipedAnim::QueueBipedParts(
             if (pBipedModel) {
                 const char* pConstraint = pBipedModel->GetBipedConstraint();
                 if (*pConstraint) {
-                    pModelLoader->QueueModel(
-                        static_cast<const char*>(pConstraint), aePriority, apParent, LOD_MULT_ACTORS, true, false, false
-                    );
+                    pModelLoader->QueueModel(pConstraint, aePriority, apParent, LOD_MULT_ACTORS, true, false, false);
                 }
             }
         }
@@ -1019,7 +1019,7 @@ NiAVObject* BipedAnim::ApplySkinnedObjects(
     pResult = nullptr;
     if (pFadeNode) {
         // The index compare is unsigned.
-        for (uint32_t i = 0; i < static_cast<uint32_t>(pFadeNode->GetArrayCount()); ++i) {
+        for (uint32_t i = 0; i < pFadeNode->GetArrayCount(); ++i) {
             pResult = this->AttachSkinnedObject(
                 static_cast<NiNode*>(pFadeNode->GetAt(i)), nullptr, aeBipedObject, abFirstPerson, abPipboy, apfgModel
             );
@@ -1052,7 +1052,7 @@ NiAVObject* BipedAnim::AttachSkinnedObject(
     bool abPipboy,
     BSFaceGenModel* apfgModel
 ) {
-    NiNode* pNode = static_cast<NiNode*>(apNode);
+    NiNode* pNode = apNode;
     NiAVObject* pResult = nullptr;
     NiNode* pParent = apParentNode;
     NiPointer<NiObject> spCopy = nullptr;
@@ -1062,7 +1062,7 @@ NiAVObject* BipedAnim::AttachSkinnedObject(
         pFaceGenModel = LoadFaceGenModel(aeBipedObject);
     }
     apNode->SetTranslate(NiPoint3_ZERO);
-    if (apParentNode && static_cast<uint32_t>(pNode->GetArrayCount()) >= 2 && pNode->GetAt(1)) {
+    if (apParentNode && pNode->GetArrayCount() >= 2 && pNode->GetAt(1)) {
         NiAVObject* pSecond = pNode->GetAt(1);
         if (pSecond->IsGeometry()) {
             void* pMemory = NiMemObject::operator new(sizeof(NiNode));
@@ -1080,7 +1080,7 @@ NiAVObject* BipedAnim::AttachSkinnedObject(
             pWeaponBone->RemoveExtraData(*BSDecalPlacementVectorExtraData::GetTag());
         }
         pWeaponBone->AddExtraData(*BSDecalPlacementVectorExtraData::GetTag(), pDecalData);
-        for (uint32_t i = 0; i < static_cast<uint32_t>(pNode->GetArrayCount()); ++i) {
+        for (uint32_t i = 0; i < pNode->GetArrayCount(); ++i) {
             NiAVObject* pChild = pNode->GetAt(i);
             if (pChild->IsGeometry() && pChild->IsGeometry()->GetSkinInstance()) {
                 NiAVObject* pSkinned = pNode->GetAt(i);
@@ -1095,7 +1095,7 @@ NiAVObject* BipedAnim::AttachSkinnedObject(
     NiTObjectArray<NiPointer<NiAVObject>>* pDetached =
         reinterpret_cast<NiTObjectArray<NiPointer<NiAVObject>>*>(acDetachedMemory);
     ::new (acDetachedMemory) NiTObjectArray<NiPointer<NiAVObject>>(0, 1);
-    for (uint32_t i = 0; i < static_cast<uint32_t>(pNode->GetArrayCount()); ++i) {
+    for (uint32_t i = 0; i < pNode->GetArrayCount(); ++i) {
         NiAVObject* pChild = pNode->GetAt(i);
         if (pChild && !pChild->IsGeometry()) {
             {
@@ -1364,10 +1364,10 @@ NiNode* BipedAnim::CloneHelmet(BSFaceGenModel* apfgModel, NiNode* apNode, BIPED_
     BSCloningProcess cloneData;
     NiObject* pClone;
     if (object[aeBipedObject].pPartClone) {
-        return 0;
+        return nullptr;
     }
     if (!apfgModel || !apNode) {
-        return 0;
+        return nullptr;
     }
     BIPED_BONE boneIndex = objToBone[aeBipedObject];
     cloneData.~BSCloningProcess();
@@ -1383,7 +1383,7 @@ NiNode* BipedAnim::CloneHelmet(BSFaceGenModel* apfgModel, NiNode* apNode, BIPED_
     BSFadeNode* pfadeNode = static_cast<BSFadeNode*>(pClone);
     int32_t ppartClone = 0;
     if (!pClone) {
-        return 0;
+        return nullptr;
     }
     if (NiObject::IsKindOf_0(&BSFadeNode::ms_RTTI, pfadeNode)) {
         pfadeNode->SetLODMultType(LOD_MULT_ACTOR_BODY_PART);
@@ -1407,23 +1407,23 @@ NiNode* BipedAnim::CloneHelmet(BSFaceGenModel* apfgModel, NiNode* apNode, BIPED_
 
 void BipedAnim::AttachHelmet(BSFaceGenModel* apfgModel, NiNode* apNode, BIPED_OBJECT aeBipedObject) {
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    NiNode* arg4 = 0;
+    NiNode* arg4 = nullptr;
     if (apfgModel) {
         if (apNode) {
             BIPED_BONE boneIndex = objToBone[aeBipedObject];
-            bool b1st = 0;
+            bool b1st = false;
             if (m_pRequester == pPlayer) {
                 b1st = pPlayer->Is1stPersonBiped(this);
             }
-            bool bfirstPerson = 0;
-            bool bpipboy = object[6].pParent != 0;
+            bool bfirstPerson = false;
+            bool bpipboy = object[6].pParent != nullptr;
             if (m_pRequester == pPlayer) {
                 bfirstPerson = pPlayer->Is1stPersonBiped(this);
             }
             NiAVObject* ppartClone = ApplySkinnedObjects(apNode, aeBipedObject, bfirstPerson, bpipboy, apfgModel);
             if (!ppartClone) {
                 ppartClone = apNode;
-                BipedAnim::AttachToParent(root, apNode, 0, this, aeBipedObject, apfgModel);
+                BipedAnim::AttachToParent(root, apNode, nullptr, this, aeBipedObject, apfgModel);
             }
             BSStringT<char> newName;
             int32_t CastingType = object[aeBipedObject].pParent->iFormID;
@@ -1473,21 +1473,21 @@ NiAVObject* BipedAnim::LoadAndAttachAddOn(
     BSCloningProcess cloneData;
     NiObject* pClone;
     if (!apModel || !apRequester) {
-        return 0;
+        return nullptr;
     }
     const char* pmodelfilename = apModel->GetModel();
     if (!pmodelfilename || !*pmodelfilename) {
-        return 0;
+        return nullptr;
     }
     NiAVObject* pobj3D = apObj3D;
     if (!apObj3D) {
         pobj3D = apRequester->TESObjectREFR::Get3D();
     }
     if (!pobj3D) {
-        return 0;
+        return nullptr;
     }
     NiNode* pobjNode = static_cast<NiNode*>(pobj3D);
-    NiNode* pparentNode = pModelLoader->LoadFile(pmodelfilename, LOD_MULT_ACTORS, 1, 0, 0, 0);
+    NiNode* pparentNode = pModelLoader->LoadFile(pmodelfilename, LOD_MULT_ACTORS, true, false, false, false);
     cloneData.~BSCloningProcess();
     ::new (&cloneData) BSCloningProcess(1.0f);
     NiPointer<NiObject> spdeepCopy(nullptr);
@@ -1501,7 +1501,7 @@ NiAVObject* BipedAnim::LoadAndAttachAddOn(
         pClone = pparentNode->Clone(cloneData);
     }
     BSFadeNode* pfadeNode = static_cast<BSFadeNode*>(pClone);
-    bool bskinned = 0;
+    bool bskinned = false;
     TESModelTextureSwap* pmodelswap = apModel->GetAsModelTextureSwap();
     if (pmodelswap) {
         pmodelswap->SwapTextures(pfadeNode);
@@ -1520,7 +1520,7 @@ NiAVObject* BipedAnim::LoadAndAttachAddOn(
         NiExtraData* a2a = pextra.m_pObject;
         const NiFixedString* TagKey = BSDecalPlacementVectorExtraData::GetTag();
         pfadeNode->AddExtraData(*TagKey, a2a);
-        pextra.operator=(static_cast<NiExtraData*>(0));
+        pextra.operator=(static_cast<NiExtraData*>(nullptr));
     }
     if (pfadeNode) {
         if (NiObject::IsKindOf_0(&BSFadeNode::ms_RTTI, pfadeNode)) {
@@ -1529,7 +1529,7 @@ NiAVObject* BipedAnim::LoadAndAttachAddOn(
         pfadeNode->SetTranslate(NiPoint3_ZERO);
         pfadeNode->SetRotate(NiMatrix3_IDENTITY);
         if (Animation::FindSkinnedNode(pfadeNode)) {
-            bskinned = 1;
+            bskinned = true;
         }
         if (bskinned) {
             Warning(
@@ -1538,16 +1538,15 @@ NiAVObject* BipedAnim::LoadAndAttachAddOn(
             );
         }
         else {
-            BipedAnim::AttachToParent(pobjNode, pfadeNode, pparentNode, 0, aeAttachmentType, 0);
+            BipedAnim::AttachToParent(pobjNode, pfadeNode, pparentNode, nullptr, aeAttachmentType, nullptr);
         }
         if (!bskinned) {
             if (pfadeNode->IsNode()) {
-                NiNode* pdefaultParent = 0;
+                NiNode* pdefaultParent = nullptr;
                 if (!pfadeNode->m_pkParent) {
                     if (aeAttachmentType != BO_NONE && objToBone[aeAttachmentType] != BIPED_BONE_NONE) {
                         pdefaultParent = static_cast<NiNode*>(BSUtilities::GetObjectByName(
-                            static_cast<NiAVObject*>(pobjNode),
-                            static_cast<const char*>(bipedBoneName[objToBone[aeAttachmentType]])
+                            static_cast<NiAVObject*>(pobjNode), bipedBoneName[objToBone[aeAttachmentType]]
                         ));
                     }
                     if (pdefaultParent) {
@@ -1573,7 +1572,7 @@ void BipedAnim::RunBiped3DDetach(NiAVObject* ap3D) {
         pSSN = BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD);
         pSSN->RemoveObject(ap3D);
         if (ap3D->NiAVObject::GetParent()) {
-            bhkWorld::RemoveObjects(static_cast<NiNode*>(ap3D), 1, 0);
+            bhkWorld::RemoveObjects(static_cast<NiNode*>(ap3D), true, false);
             pParent = ap3D->NiAVObject::GetParent();
             pParent->DetachChild(ap3D);
         }
@@ -1655,11 +1654,11 @@ void BipedAnim::AttachToSkeleton(NiNode* apSkeleton, NiAVObject* apSkin, NiNode*
                     break;
                 }
                 NiAVObject* pobj = pnode->GetAt(static_cast<uint32_t>(i));
-                NiNode* ptemp = 0;
+                NiNode* ptemp = nullptr;
                 if (pobj) {
                     ptemp = pobj->IsNode();
                     if (NiObject::IsKindOf_0(&BSFadeNode::ms_RTTI, pnode) && ptemp) {
-                        BipedAnim::AttachToSkeleton(apSkeleton, pobj, apParentNode, 1);
+                        BipedAnim::AttachToSkeleton(apSkeleton, pobj, apParentNode, true);
                     }
                     else {
                         if (pobj->IsGeometry()) {
@@ -1704,9 +1703,9 @@ void BipedAnim::AttachToParent(
 ) {
     CFilter a2;
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    NiExtraData* pextraData = 0;
-    NiStringExtraData* pparentName = 0;
-    NiNode* pparentNode = 0;
+    NiExtraData* pextraData = nullptr;
+    NiStringExtraData* pparentName = nullptr;
+    NiNode* pparentNode = nullptr;
     if (apClonedFromNode) {
         NiFixedString* v6 = &FixedStrings::QPrn();
         pextraData = apClonedFromNode->GetExtraData(*v6);
@@ -1748,22 +1747,22 @@ void BipedAnim::AttachToParent(
         fbackpackScale = pparentNode->GetLocalScale();
         pparentNode->AttachChild(apNode, 1);
         float afTime = static_cast<float>(appTimer.iLastTime);
-        NiUpdateData updatedate(afTime, 0, 0);
+        NiUpdateData updatedate(afTime, false, false);
         apNode->UpdateDownwardPass(updatedate, 0);
         ShadowSceneNode* pshadowNode = BSShaderManager::GetShadowSceneNode(0);
         pshadowNode->AddObject(apNode);
         NiAVObject* pscabardObj = BSUtilities::GetObjectByName(apNode, "Scb");
         if (pscabardObj) {
             pparentNode->AttachChild(pscabardObj, 1);
-            bhkNiCollisionObject::EnableCollision(pparentNode, 1);
+            bhkNiCollisionObject::EnableCollision(pparentNode, true);
             pscabardObj->UpdateProperties();
             apNode->CompactChildArray();
         }
     }
     NiAVObject* pbackpackObj = BSUtilities::GetObjectByName(apNode, "Backpack");
     if (pbackpackObj) {
-        if (apSkeleton == pPlayer->Get3D(1)) {
-            pbackpackObj->SetAppCulled(1);
+        if (apSkeleton == pPlayer->Get3D(true)) {
+            pbackpackObj->SetAppCulled(true);
         }
         else {
             pbackpackObj->SetScale(fbackpackScale);
@@ -1785,8 +1784,8 @@ void BipedAnim::AttachToParent(
             }
         }
     }
-    if (apBipedAnim && apBipedAnim == pPlayer->GetBiped(1)) {
-        bhkWorld::KillHavok(apNode, 1, 1);
+    if (apBipedAnim && apBipedAnim == pPlayer->GetBiped(true)) {
+        bhkWorld::KillHavok(apNode, true, true);
     }
     else {
         if (aeBipedObject == BO_WEAPON) {
@@ -1798,7 +1797,7 @@ void BipedAnim::AttachToParent(
                     pshape = prb->GetShape();
                 }
                 else {
-                    pshape = 0;
+                    pshape = nullptr;
                 }
                 if (!pshape) {
                     Warning(
@@ -1820,7 +1819,7 @@ void BipedAnim::AttachToParent(
                 Warning("HAVOK: Weapon '%s' doesn't have any Havok data on it.", (&apNode->m_kName)->GetHandleString());
             }
         }
-        bhkWorld::SetMotion(apNode, hkpMotion::MOTION_KEYFRAMED, 1, 1, 1);
+        bhkWorld::SetMotion(apNode, hkpMotion::MOTION_KEYFRAMED, true, true, true);
     }
 }
 

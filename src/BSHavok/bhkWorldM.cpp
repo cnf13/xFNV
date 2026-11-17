@@ -97,7 +97,7 @@ bool bhkWorldM::CheckForMove(const hkVector4& arPos) {
     delta.setSub4(arPos, oldPos);
     bool bnew = false;
     for (uint32_t ui = 0; ui < 3 && !bnew; ++ui) {
-        float fdist = static_cast<float>(std::fabs(delta(static_cast<int32_t>(ui))));
+        float fdist = std::fabs(delta(static_cast<int32_t>(ui)));
         bnew = BorderSize(static_cast<int32_t>(ui)) <= fdist;
     }
     if (!bnew) {

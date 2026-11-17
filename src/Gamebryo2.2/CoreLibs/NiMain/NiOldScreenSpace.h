@@ -56,7 +56,7 @@ public:
     };
 
     // The pool the screen elements come from; _SDMInit makes it and _SDMShutdown frees it.
-    typedef NiTObjectPool<ScreenElement> ScreenElementPool;
+    using ScreenElementPool = NiTObjectPool<ScreenElement>;
 
     NiScreenGeometryData();
     ~NiScreenGeometryData() override;

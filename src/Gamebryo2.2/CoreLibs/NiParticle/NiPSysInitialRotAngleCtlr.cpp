@@ -78,7 +78,7 @@ NiObject* NiPSysInitialRotAngleCtlr::CreateObject() {
     NiPSysInitialRotAngleCtlr* v0 =
         static_cast<NiPSysInitialRotAngleCtlr*>(NiMemObject::operator new(sizeof(NiPSysInitialRotAngleCtlr)));
     if (!v0) {
-        return 0;
+        return nullptr;
     }
     return ::new (v0) NiPSysInitialRotAngleCtlr;
 }

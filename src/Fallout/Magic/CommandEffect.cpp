@@ -54,8 +54,8 @@ void CommandEffect::Update(float afSecondsElapsed) {
     }
     if (targetAsActor) {
         if (casterAsActor) {
-            if (targetAsActor->IsDead((bool)0) || targetAsActor->IsDying()) {
-                ActiveEffect::Dispel(0);
+            if (targetAsActor->IsDead(false) || targetAsActor->IsDying()) {
+                ActiveEffect::Dispel(false);
             }
             else {
                 CommandEffect::UpdateCommandedActor(targetAsActor, casterAsActor);
@@ -110,18 +110,18 @@ void CommandEffect::Finish() {
         TargetAsActor = Unk24->GetTargetAsActor();
     }
     else {
-        TargetAsActor = 0;
+        TargetAsActor = nullptr;
     }
     if (GetCaster()) {
         MagicCaster* ProcessLevel = GetCaster();
         CasterAsActor = ProcessLevel->GetCasterAsActor();
     }
     else {
-        CasterAsActor = 0;
+        CasterAsActor = nullptr;
     }
     if (TargetAsActor) {
         if (CasterAsActor) {
-            CommandEffect::CleanupCommandedActor(TargetAsActor, CasterAsActor, 1);
+            CommandEffect::CleanupCommandedActor(TargetAsActor, CasterAsActor, true);
         }
     }
 }
@@ -150,7 +150,7 @@ void CommandEffect::UpdateCommandedActor(Actor* apTarget, Actor* apCaster) {
             v4->SetCommandingActor(apCaster);
         }
         if (!apTarget->IsInCombat()) {
-            TESPackage* pCommanderPackage = 0;
+            TESPackage* pCommanderPackage = nullptr;
             if (apCaster != pPlayer) {
                 BaseProcess* v3 = apCaster->pCurrentProcess;
                 pCommanderPackage = v3->GetPackageThatIsRunning();

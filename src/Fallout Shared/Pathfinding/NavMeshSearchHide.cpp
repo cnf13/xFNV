@@ -22,7 +22,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NavMeshSearchHide::NavMeshSearchHide() : pCurrentHideRequest(nullptr) {}
 
@@ -121,7 +121,7 @@ bool NavMeshSearchHide::GetNodeConnections(
             }
         }
     }
-    return 1;
+    return true;
 }
 
 bool NavMeshSearchHide::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) {
@@ -132,19 +132,19 @@ bool NavMeshSearchHide::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSea
     const NavMeshSearchNode* parentNodeData = &apNode->GetNodeData();
     const NavMeshTriangle* ptriangle = parentNodeData->GetTriangle();
     if (!ptriangle->HasCover()) {
-        return 0;
+        return false;
     }
     apNode->tNodeData.GetCenter(&nodeCenter);
     // The horizontal length is stored to a float before the compare.
     float flength = (ThreatLocation - nodeCenter).XYLength();
     double fminDistance = pCurrentHideRequest->fMinHideDistance;
     if (flength < fminDistance) {
-        return 0;
+        return false;
     }
     NavMesh* pmesh = parentNodeData->pNavMesh;
     ptriangle->GetVerts(usVert0, usVert1, usVert2);
     NiPoint3 barycentricCoords;
-    bool bproperSide = 0;
+    bool bproperSide = false;
     NavMeshVertex* pvert2 = pmesh->GetVertex(usVert2);
     NavMeshVertex* pvert1 = pmesh->GetVertex(usVert1);
     NavMeshVertex* pvert0 = pmesh->GetVertex(usVert0);
@@ -152,17 +152,17 @@ bool NavMeshSearchHide::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSea
         pvert0->Location, pvert1->Location, pvert2->Location, ThreatLocation, barycentricCoords
     );
     if (barycentricCoords.x < 0.0 && ptriangle->GetEdgeCover(1)) {
-        bproperSide = 1;
+        bproperSide = true;
     }
     else {
         if (barycentricCoords.z < 0.0) {
             if (ptriangle->GetEdgeCover(0)) {
-                bproperSide = 1;
+                bproperSide = true;
             }
         }
     }
     if (!bproperSide) {
-        return 0;
+        return false;
     }
     float fscore = 0.0f;
     if (pCurrentHideRequest->GetAvoidNodeArray()) {

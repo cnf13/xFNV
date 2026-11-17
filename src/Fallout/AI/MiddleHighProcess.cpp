@@ -158,7 +158,7 @@
 #include "SDK/MSVC/rtti.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 BSSimpleList<TESObjectREFR*> MiddleHighTempRefListChairBed;
@@ -205,22 +205,25 @@ MiddleHighProcess::DeferredHideLimb::DeferredHideLimb() : spDismemberedLimbRoot(
 MiddleHighProcess::DeferredHideLimb::~DeferredHideLimb() {}
 
 MiddleHighProcess::MiddleHighProcess()
-  : fPursueTimer(0.0f), fEquippedWeight(0.0f), bDoneOnce(0), bAimingTarget(0), bNeedReparentWeapon(0), bDrawn(0),
-    eUseItem(POTYPE_NONE), pLastIdlePlayed(0), bPickPackIdle(0), pWeapon(0), pAmmo(0), bWeaponGrenade(0),
-    bWeaponMine(0), bWeaponThrown(0), bHeavyArmorWorn(0), bPowerArmorWorn(0), bPowerArmorHelmet(0), bHasBackPackWorn(0),
-    pWeaponBone(0), pFireNode(0), bWantWeaponDrawn(0), bWeaponDrawn(0), cKnockState(0), cSitSleepState(0),
-    pCurrentFurniture(0), cCurrentFurnitureIndex(127), FurnitureMarker(255u), pCommandingActor(0), pLastBoundWeapon(0),
-    pCurrentPackageSpell(0), bCheckMagicNode(0), pCurrentWeaponEffect(0), fAlphaMult(1.0f), fScriptRefractPower(0.0f),
-    m_pFaceAnimationData(0), bRefreshMagicShaderEffects(0), bRefreshMagicShaderEffectBody(0),
-    bRefreshMagicShaderEffectWeapon(0), bRefreshMagicShaderEffectLoading(0), bRefreshFlareFlags(0), uiFlareFlags(0),
-    bPickPocketed(0), bDoneClothesChange(0), bDetectLifeDetected(0), bSummonedCreature(0), cUpdate3DModel(0),
-    bForceNextUpdate(0), iPackageIdleNumber(-1), pCurrentIdle(0), fPackageIdleTimer(-1.0f), bPlayedBeginIdles(0),
-    bPlayedEndIdles(0), pCreatureLipsynchAnim(0), iCreatureLipsynchStartTime(0), iReservationSlot(-1),
-    pAttachedArrowList(0), pAnimation(0), fAimLooking(0.0f), fAutomaticShotDelay(0.0f), cShotsToFire(1),
-    bBeenAttacked(0), pHeadNode(0), pTorsoNode(0), pBSBound(0), bIronSights(0), iAnimActionSuccess(2),
-    iMovementAnimations(0), pListItemstoEquipUnequip(0), fRadiationDelta(0.0f), fRadiationMagicDelta(0.0f),
-    fRadiationWaterDelta(0.0f), pLastHitData(0), iWeaponConditionStage(-1), pFaceNode(0), pFaceNodeSkinned(0),
-    pAnimFace(0), pLastAttackHitData(0), nFurnitureListTimer(0) {
+  : fPursueTimer(0.0f), fEquippedWeight(0.0f), bDoneOnce(false), bAimingTarget(false), bNeedReparentWeapon(false),
+    bDrawn(false), eUseItem(POTYPE_NONE), pLastIdlePlayed(nullptr), bPickPackIdle(false), pWeapon(nullptr),
+    pAmmo(nullptr), bWeaponGrenade(false), bWeaponMine(false), bWeaponThrown(false), bHeavyArmorWorn(false),
+    bPowerArmorWorn(false), bPowerArmorHelmet(false), bHasBackPackWorn(false), pWeaponBone(nullptr), pFireNode(nullptr),
+    bWantWeaponDrawn(false), bWeaponDrawn(false), cKnockState(0), cSitSleepState(0), pCurrentFurniture(nullptr),
+    cCurrentFurnitureIndex(127), FurnitureMarker(255u), pCommandingActor(nullptr), pLastBoundWeapon(nullptr),
+    pCurrentPackageSpell(nullptr), bCheckMagicNode(false), pCurrentWeaponEffect(nullptr), fAlphaMult(1.0f),
+    fScriptRefractPower(0.0f), m_pFaceAnimationData(nullptr), bRefreshMagicShaderEffects(false),
+    bRefreshMagicShaderEffectBody(false), bRefreshMagicShaderEffectWeapon(false), bRefreshMagicShaderEffectLoading(0),
+    bRefreshFlareFlags(false), uiFlareFlags(0), bPickPocketed(false), bDoneClothesChange(false),
+    bDetectLifeDetected(false), bSummonedCreature(false), cUpdate3DModel(0), bForceNextUpdate(false),
+    iPackageIdleNumber(-1), pCurrentIdle(nullptr), fPackageIdleTimer(-1.0f), bPlayedBeginIdles(false),
+    bPlayedEndIdles(false), pCreatureLipsynchAnim(nullptr), iCreatureLipsynchStartTime(0), iReservationSlot(-1),
+    pAttachedArrowList(nullptr), pAnimation(nullptr), fAimLooking(0.0f), fAutomaticShotDelay(0.0f), cShotsToFire(1),
+    bBeenAttacked(false), pHeadNode(nullptr), pTorsoNode(nullptr), pBSBound(nullptr), bIronSights(false),
+    iAnimActionSuccess(2), iMovementAnimations(0), pListItemstoEquipUnequip(nullptr), fRadiationDelta(0.0f),
+    fRadiationMagicDelta(0.0f), fRadiationWaterDelta(0.0f), pLastHitData(nullptr), iWeaponConditionStage(-1),
+    pFaceNode(nullptr), pFaceNodeSkinned(nullptr), pAnimFace(nullptr), pLastAttackHitData(nullptr),
+    nFurnitureListTimer(0) {
     pCachedValues = new CachedValues();
     MiddleHighProcess::SetCurrentSpell(nullptr);
     MiddleHighProcess::SetDesiredTarget(nullptr);
@@ -321,10 +324,10 @@ void MiddleHighProcess::HandleDeletedReference(TESObjectREFR* apRef) {
 void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
     if (apRef) {
         Actor* apActor_2 = dynamic_cast<Actor*>(apRef);
-        bool bevalflag = 1;
+        bool bevalflag = true;
         if (apActor_2) {
             if (apActor_2->GetRefPersists()) {
-                CheckforNewPackage(apActor_2, 0);
+                CheckforNewPackage(apActor_2, false);
                 TESPackage* pPack = GetPackageThatIsRunning();
                 ResetTarget();
                 if (pPack) {
@@ -335,7 +338,7 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                 case PROCEDURE_TRAVEL: {
                                     TESPackage* v4;
                                     TESPackage* v14;
-                                    TESObjectREFR* pRef = 0;
+                                    TESObjectREFR* pRef = nullptr;
                                     if (pPack->pPackLoc) {
                                         pRef = pPack->pPackLoc->GetLocReference();
                                     }
@@ -346,23 +349,23 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                     }
                                     if (apActor_2->GetSitSleepState()) {
                                         TESPackage* CurrentPackage = apActor_2->GetCurrentPackage();
-                                        if (!CurrentPackage->IsActorAtLocation(apActor_2, 0, -1.0f, 0)) {
+                                        if (!CurrentPackage->IsActorAtLocation(apActor_2, false, -1.0f, false)) {
                                             ProcessGetUpOneHour(apActor_2);
                                         }
                                     }
-                                    ProcessTravel(apActor_2, 1, 1, 257, 0);
+                                    ProcessTravel(apActor_2, true, true, 257, false);
                                     bevalflag = apActor_2->GetSitSleepState() == SIT_SLEEP_NORMAL &&
                                         (apActor_2->GetCurrentPackage() &&
                                          ((v4 = apActor_2->GetCurrentPackage(),
                                            v4->GetPackType() != PACKAGE_TYPE_TRAVEL) &&
                                           ((v14 = apActor_2->GetCurrentPackage(),
-                                            v14->IsActorAtLocation(apActor_2, 0, -1.0f, 0)) &&
+                                            v14->IsActorAtLocation(apActor_2, false, -1.0f, false)) &&
                                            (apActor_2->pCurrentProcess->eLevel == PROCESS_TYPE_MIDDLE_HIGH &&
                                             (!pRef || !pRef->IsFurniture())))));
                                     break;
                                 }
                                 case PROCEDURE_WANDER: {
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_ACTIVATE: {
@@ -370,7 +373,7 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                     break;
                                 }
                                 case PROCEDURE_SLEEP: {
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_EAT: {
@@ -381,7 +384,7 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                     if (apActor_2->GetSitSleepState()) {
                                         ProcessGetUpOneHour(apActor_2);
                                     }
-                                    bevalflag = ProcessFollowOneHour(apActor_2, 3600.0f, 1);
+                                    bevalflag = ProcessFollowOneHour(apActor_2, 3600.0f, true);
                                     break;
                                 }
                                 case PROCEDURE_ESCORT: {
@@ -396,7 +399,7 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                         ProcessGetUpOneHour(apActor_2);
                                     }
                                     ProcessAlarm(apActor_2);
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_COMBAT: {
@@ -408,12 +411,12 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                         ProcessGetUpOneHour(apActor_2);
                                     }
                                     ProcessFlee(apActor_2);
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_DIALOGUE: {
                                     ProcessDialogue(apActor_2);
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_WAIT: {
@@ -429,7 +432,7 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                            pPack->IsActorAtRefTarget(apActor_2, ipadding))))) {
                                         AddToProcedureIndexRunning(apActor_2, 1);
                                     }
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_TRAVEL_TARGET: {
@@ -458,8 +461,8 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                     if (apActor_2->GetSitSleepState()) {
                                         ProcessGetUpOneHour(apActor_2);
                                     }
-                                    ProcessPursue(apActor_2, 0, 1, 257);
-                                    bevalflag = 0;
+                                    ProcessPursue(apActor_2, false, true, 257);
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_OBSERVE_COMBAT: {
@@ -473,36 +476,36 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                 }
                                 case PROCEDURE_MOUNT_HORSE: {
                                     AddToProcedureIndexRunning(apActor_2, 1);
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_NOTIFY: {
                                     ProcessNotify(apActor_2);
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_ACCOMPANY: {
                                     ProcessAccompanyOneHour(apActor_2);
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_USE_ITEM_AT: {
                                     ProcessUseItemAt(apActor_2);
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_CHOOSE_CAST: {
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_REMOVE_WORN_ITEMS: {
-                                    ProcessRemoveWorn(apActor_2, 1, 0);
-                                    bevalflag = 0;
+                                    ProcessRemoveWorn(apActor_2, true, false);
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_AVOID_RADIATION: {
                                     ProcessAvoidArea(apActor_2);
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_TAKE_BACK_ITEM: {
@@ -510,21 +513,21 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                     break;
                                 }
                                 case PROCEDURE_GUARD: {
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_USE_WEAPON: {
                                     ProcessUseWeapon(apActor_2);
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 case PROCEDURE_DONE: {
                                 LABEL_81:;
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                                 default: {
-                                    bevalflag = 0;
+                                    bevalflag = false;
                                     break;
                                 }
                             }
@@ -544,7 +547,7 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                                 }
                                             }
                                             else {
-                                                if (!pPack_2->IsActorAtLocation(apActor_2, 0, -1.0f, 0)) {
+                                                if (!pPack_2->IsActorAtLocation(apActor_2, false, -1.0f, false)) {
                                                     goto LABEL_89;
                                                 }
                                             }
@@ -556,7 +559,7 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                                 }
                                             }
                                             if (!pPack_2->GetPackageSchedule()->PSData.iDuration) {
-                                                SetTarget(0);
+                                                SetTarget(nullptr);
                                                 if (!GetRunOncePackage() || ContinuingPackageforPC()) {
                                                     TESPackage* v9 = GetCurrentPackage();
                                                     if (v9->GetIsCreated()) {
@@ -581,8 +584,8 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                                 if (pAcquireObject) {
                                                     pAcquireObject->Delete(1u);
                                                 }
-                                                pAcquireObject = 0;
-                                                pItemBeingUsed = 0;
+                                                pAcquireObject = nullptr;
+                                                pItemBeingUsed = nullptr;
                                                 while (!ObjectList.IsEmpty()) {
                                                     ObjectstoAcquire* pObject = ObjectList.m_item;
                                                     if (pObject) {
@@ -590,7 +593,7 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                                                     }
                                                     ObjectList.Remove(pObject);
                                                 }
-                                                pGenericLocation = 0;
+                                                pGenericLocation = nullptr;
                                                 GenericLocationsList.RemoveAll();
                                             }
                                         }
@@ -612,7 +615,7 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
 
 void MiddleHighProcess::Update(MobileObject* apRef) {
     AIProcessing_MiddleHighUpdate.Start();
-    TESPackage* pPack = 0;
+    TESPackage* pPack = nullptr;
     if (apRef) {
         if (!apRef->Get3D() ||
             (apRef->GetDelete() ||
@@ -620,12 +623,12 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
             ComputeLastTimeProcessed();
             return;
         }
-        Actor* apActor = apRef->IsActor() ? static_cast<Actor*>(apRef) : 0;
+        Actor* apActor = apRef->IsActor() ? static_cast<Actor*>(apRef) : nullptr;
         if (apActor) {
             if (bDetectLifeDetected) {
                 bDetectLifeDetected = DetectLifeEffect::CheckActorDetected(apActor, bDetectLifeDetected);
             }
-            bool bNewPackage = CheckforNewPackage(apActor, 0);
+            bool bNewPackage = CheckforNewPackage(apActor, false);
             pPack = GetPackageThatIsRunning();
             if (bNewPackage || (!pPack && !apActor->IsPathingComplete())) {
                 ClearCurrentDataforProcess(apActor);
@@ -634,17 +637,17 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
             ResetTarget();
             if (bNewPackage) {
                 apActor->AlertAccompanyToPackageChange();
-                SetLocationForPackage(apActor, 0);
+                SetLocationForPackage(apActor, false);
             }
             if (pPack && (pPack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_NONE && !pPack->GetWaiting())) {
                 uint32_t Count = pPack->ePROCEDURE_TYPE;
                 switch (Procedure_Action[Count][GetProcedureIndexRunning()]) {
                     case PROCEDURE_TRAVEL: {
-                        ProcessTravel(apActor, bNewPackage, 1, 257, 0);
+                        ProcessTravel(apActor, bNewPackage, true, 257, false);
                         goto LABEL_114;
                     }
                     case PROCEDURE_ACTIVATE: {
-                        ProcessActivate(apActor, 1);
+                        ProcessActivate(apActor, true);
                         goto LABEL_114;
                     }
                     case PROCEDURE_ACQUIRE: {
@@ -656,11 +659,11 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                         goto LABEL_114;
                     }
                     case PROCEDURE_EAT: {
-                        ProcessEat(apActor, 0);
+                        ProcessEat(apActor, nullptr);
                         goto LABEL_114;
                     }
                     case PROCEDURE_FOLLOW: {
-                        ProcessFollow(apActor, 1, 257, 0);
+                        ProcessFollow(apActor, true, 257, false);
                         goto LABEL_114;
                     }
                     case PROCEDURE_ESCORT: {
@@ -690,7 +693,7 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                             if (!pPlayer->IsPlayerFollower(apActor)) {
                                 int32_t NumberOfFollowers = pPlayer->GetNumberOfFollowers();
                                 if (NumberOfFollowers < iNumberActorsAllowedToFollowPlayer.Int()) {
-                                    pPack->SetWaiting(0);
+                                    pPack->SetWaiting(false);
                                 }
                             }
                         }
@@ -700,7 +703,7 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                                 TESPackage* pPack_2 = GetCurrentPackage();
                                 float fwaitdistance = static_cast<float>(pPack_2->GetPackageTarget()->iValue);
                                 if (static_cast<double>(fwaitdistance) >=
-                                    apActor->GetDistanceFromReference(pTarget, 0, 0)) {
+                                    apActor->GetDistanceFromReference(pTarget, false, false)) {
                                     AddToProcedureIndexRunning(apActor, 1);
                                 }
                             }
@@ -719,7 +722,7 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                                             fAIEscortWaitDistanceExterior.Float() * static_cast<double>(idistpack);
                                     }
                                 }
-                                if (fwaitdistance_2 / 2.0 >= apActor->GetDistanceFromReference(pTarget, 0, 0)) {
+                                if (fwaitdistance_2 / 2.0 >= apActor->GetDistanceFromReference(pTarget, false, false)) {
                                     AddToProcedureIndexRunning(apActor, 1);
                                 }
                             }
@@ -727,11 +730,11 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                         goto LABEL_114;
                     }
                     case PROCEDURE_TRAVEL_TARGET: {
-                        ProcessActivate(apActor, 0);
+                        ProcessActivate(apActor, false);
                         goto LABEL_114;
                     }
                     case PROCEDURE_PURSUE: {
-                        ProcessPursue(apActor, 0, 1, 257);
+                        ProcessPursue(apActor, false, true, 257);
                         goto LABEL_114;
                     }
                     case PROCEDURE_CREATE_FOLLOW: {
@@ -745,7 +748,7 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                             }
                         }
                         if (pTarget != pPlayer) {
-                            CreateFollowforEscort(apActor, pPack, 1);
+                            CreateFollowforEscort(apActor, pPack, true);
                         }
                         AddToProcedureIndexRunning(apActor, 1);
                         goto LABEL_114;
@@ -782,7 +785,7 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                         goto LABEL_114;
                     }
                     case PROCEDURE_REMOVE_WORN_ITEMS: {
-                        ProcessRemoveWorn(apActor, 1, 0);
+                        ProcessRemoveWorn(apActor, true, false);
                         goto LABEL_114;
                     }
                     case PROCEDURE_SUMMON_CREATURE_DEFEND: {
@@ -819,7 +822,7 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                 if (!IsPackageDoneOnce() && !pPack->GetIsCreated() && pPack->IsInterruptPackage()) {
                     Script::SetActionFlag(pPack, &apActor->m_Extra, SCRIPT_ACTION_ONPACKAGEEND);
                     PackageDone(apActor, pPack);
-                    SetPackageDoneOnce(1);
+                    SetPackageDoneOnce(true);
                 }
                 if (pPack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_PATROL) {
                     PackageSchedule* psched = pPack->GetPackageSchedule();
@@ -827,10 +830,10 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                         const TESPatrolPackageData* ppatrolData = pPack->GetPatrolPackageData();
                         if (ppatrolData) {
                             if (!ppatrolData->bRepeatable) {
-                                SetCurrentActionComplete(1);
+                                SetCurrentActionComplete(true);
                                 ClearCurrentDataforProcess(apActor);
                                 ClearCurrentPackage();
-                                CheckforNewPackage(apActor, 1);
+                                CheckforNewPackage(apActor, true);
                             }
                         }
                     }
@@ -839,7 +842,7 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                 if (pPack->GetPackType() == PACKAGE_TYPE_EAT ||
                     (pPack->GetPackType() == PACKAGE_TYPE_SLEEP ||
                      (pPack->GetPackType() == PACKAGE_TYPE_TRAVEL &&
-                      !pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)))) {
+                      !pPack->IsActorAtLocation(apActor, false, -1.0f, false)))) {
                     AddToProcedureIndexRunning(apActor, -1);
                     return;
                 }
@@ -849,7 +852,7 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                 }
                 Interface::GetConsoleSelection();
                 if (!pPack->GetPackageSchedule()->PSData.iDuration) {
-                    SetTarget(0);
+                    SetTarget(nullptr);
                     if (GetRunOncePackage()) {
                         ClearRunOncePackage();
                     }
@@ -866,7 +869,7 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                     if (apThis) {
                         apThis->Delete(1u);
                     }
-                    pAcquireObject = 0;
+                    pAcquireObject = nullptr;
                     while (!ObjectList.IsEmpty()) {
                         ObjectstoAcquire* pobj = ObjectList.m_item;
                         if (pobj) {
@@ -874,7 +877,7 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                         }
                         ObjectList.Remove(pobj);
                     }
-                    pGenericLocation = 0;
+                    pGenericLocation = nullptr;
                     GenericLocationsList.RemoveAll();
                 }
             }
@@ -894,22 +897,22 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
 
 bool MiddleHighProcess::CheckforNewPackage(Actor* apActor, bool abFlag) {
     if (apActor->IsInCombat() || (apActor->IsinDialogue() || (apActor->IsAlarmed() || apActor->IsRunningRunOnce()))) {
-        return 0;
+        return false;
     }
     SIT_SLEEP_STATE v4 = apActor->GetSitSleepState();
     if (v4 && (v4 != SIT_SLEEP_IS_SITTING && v4 != SIT_SLEEP_IS_SLEEPING)) {
-        return 0;
+        return false;
     }
     if (GetRunOncePackage()) {
         ClearRunOncePackage();
     }
     float fhour = appCalendar.GetHour();
-    bool bnewPackage = 0;
+    bool bnewPackage = false;
     TESPackage* prev = apActor->GetCurrentPackage();
-    bool bRedress = 0;
+    bool bRedress = false;
     if (prev) {
         if (prev->GetPackType() == PACKAGE_TYPE_SLEEP || prev->GetForceUnequipWeapon()) {
-            bRedress = 1;
+            bRedress = true;
         }
     }
     if (abFlag || (!GetCurrentPackage() || iHourPackageEvaluated != static_cast<int32_t>(fhour))) {
@@ -918,10 +921,10 @@ bool MiddleHighProcess::CheckforNewPackage(Actor* apActor, bool abFlag) {
     }
     if (bnewPackage) {
         iAnimActionSuccess = 2;
-        SetContinuingPackage(0);
-        SetCurrentActionComplete(0);
-        SetPackageIdleDone(0);
-        SetTargetActivated(0);
+        SetContinuingPackage(false);
+        SetCurrentActionComplete(false);
+        SetPackageIdleDone(false);
+        SetTargetActivated(false);
         while (!ObjectList.IsEmpty()) {
             ObjectstoAcquire* pobj = ObjectList.m_item;
             if (pobj) {
@@ -933,16 +936,16 @@ bool MiddleHighProcess::CheckforNewPackage(Actor* apActor, bool abFlag) {
             TESNPC* pnpc = dynamic_cast<TESNPC*>(apActor->GetObjectReference());
             TESCreature* pcreature = dynamic_cast<TESCreature*>(apActor->GetObjectReference());
             TESPackage* pPack = GetCurrentPackage();
-            bool abwearweapon = 1;
+            bool abwearweapon = true;
             if (pPack) {
                 abwearweapon = !pPack->GetForceUnequipWeapon();
             }
             if (pnpc) {
-                pnpc->InitDefaultWorn(apActor, 1, abwearweapon, 0, 1);
+                pnpc->InitDefaultWorn(apActor, true, abwearweapon, false, true);
             }
             else {
                 if (pcreature) {
-                    pcreature->InitDefaultWorn(apActor, 1, abwearweapon, 1);
+                    pcreature->InitDefaultWorn(apActor, true, abwearweapon, true);
                 }
             }
         }
@@ -973,10 +976,10 @@ void MiddleHighProcess::SetIdleDoneOnce(bool abflag) {
 void MiddleHighProcess::ClearFurniture(Actor* apActor) {
     Animation* v2;
     if (pCurrentFurniture) {
-        pCurrentFurniture->SetMarkerUsed(cCurrentFurnitureIndex, 0);
+        pCurrentFurniture->SetMarkerUsed(cCurrentFurnitureIndex, false);
         if (apActor->GetAnimation()) {
             v2 = apActor->GetAnimation();
-            v2->SpecialIdleFree(1, 0);
+            v2->SpecialIdleFree(true, false);
         }
     }
     SetSitSleepState(apActor, SIT_SLEEP_NORMAL, nullptr, (uint8_t)0x7Fu);
@@ -994,16 +997,16 @@ bool MiddleHighProcess::SetTargetForPackage(Actor* apActor) {
     TESPackage* v8 = GetPackageThatIsRunning();
     if ((!v8) ||
         ((!v8->GetPackageTarget()) && ((((int32_t)v8->GetPackType()) != 12) && (((int32_t)v8->GetPackType()) != 13)))) {
-        return (bool)0;
+        return false;
     }
     TESObjectREFR* v3 = GetTargetForPackage(apActor, v8);
     SetTarget(v3);
     if (!pTarget) {
-        return (bool)0;
+        return false;
     }
     if (pTarget->IsStillLoading()) {
         SetTarget(nullptr);
-        return (bool)0;
+        return false;
     }
     else {
         if (pTarget->GetDelete()) {
@@ -1015,15 +1018,15 @@ bool MiddleHighProcess::SetTargetForPackage(Actor* apActor) {
             }
         }
         lastSeenPostion = pTarget->GetLocationOnReference();
-        pTarget->SetTargeted(1);
-        return (bool)1;
+        pTarget->SetTargeted(true);
+        return true;
     }
 }
 
 TESObjectREFR* MiddleHighProcess::SetLocationForPackage(Actor* apActor, bool bSecondLoc) {
     TESPackage* v6 = GetCurrentPackage();
     if (!v6) {
-        return 0;
+        return nullptr;
     }
     TESObjectREFR* v5 = GetLocationForPackage(apActor, v6, bSecondLoc);
     if (bSecondLoc) {
@@ -1315,7 +1318,7 @@ void MiddleHighProcess::ResolveEquipmentQueue(Actor* apActor) {
 }
 
 bool MiddleHighProcess::IsItemQueued(TESBoundObject* apObject, ExtraDataList* apExtra, bool abEquipped) {
-    bool bflag = 0;
+    bool bflag = false;
     for (BSSimpleList<QueuedItem*>* plist = pListItemstoEquipUnequip; plist && (plist->m_item && !bflag);
          plist = plist->m_pkNext) {
         QueuedItem* pitem = plist->m_item;
@@ -1342,7 +1345,7 @@ void MiddleHighProcess::AddQueuedItem(
     bool abPlayPickUpSounds
 ) {
     AutoMemContext apMemory(
-        MEM_CONTEXT_TES_ACTOR, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\ai\\MiddleHighProcess.cpp", 835
+        MEM_CONTEXT_TES_ACTOR, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\ai\\MiddleHighProcess.cpp", 835
     );
     if (!IsItemQueued(apObject, apExtra, abEquip)) {
         QueuedItem* v16 = static_cast<QueuedItem*>(ourMalloc(sizeof(QueuedItem)));
@@ -1350,7 +1353,7 @@ void MiddleHighProcess::AddQueuedItem(
             v16 = ::new (v16) QueuedItem;
         }
         else {
-            v16 = 0;
+            v16 = nullptr;
         }
         v16->pObject = apObject;
         v16->bEquip = abEquip;
@@ -1370,7 +1373,7 @@ void MiddleHighProcess::AddQueuedItem(
                 v12 = ::new (v15) BSSimpleList<QueuedItem*>;
             }
             else {
-                v12 = 0;
+                v12 = nullptr;
             }
             pListItemstoEquipUnequip = v12;
         }
@@ -1382,7 +1385,7 @@ void MiddleHighProcess::RemoveQueuedItem(TESBoundObject* apObject, ExtraDataList
     for (QueuedItem* pitem : pListItemstoEquipUnequip->ItemsUntilNull()) {
         if (pitem && (pitem->pObject == apObject && apExtra == pitem->pExtra)) {
             if (pitem->spQueuedFiles) {
-                pIOManager->TryCancelTask(pitem->spQueuedFiles, 0);
+                pIOManager->TryCancelTask(pitem->spQueuedFiles, nullptr);
             }
             delete pitem;
             pListItemstoEquipUnequip->Remove(pitem);
@@ -1396,7 +1399,7 @@ void MiddleHighProcess::RemoveAllQueuedItems() {
         QueuedItem* pitem = plist->m_item;
         if (pitem) {
             if (pitem->spQueuedFiles) {
-                pIOManager->TryCancelTask(pitem->spQueuedFiles, 0);
+                pIOManager->TryCancelTask(pitem->spQueuedFiles, nullptr);
             }
             delete pitem;
         }
@@ -1404,7 +1407,7 @@ void MiddleHighProcess::RemoveAllQueuedItems() {
     if (pListItemstoEquipUnequip) {
         delete pListItemstoEquipUnequip;
     }
-    pListItemstoEquipUnequip = 0;
+    pListItemstoEquipUnequip = nullptr;
 }
 
 void MiddleHighProcess::SetFireNode(NiAVObject* apFireNode) {
@@ -1413,36 +1416,36 @@ void MiddleHighProcess::SetFireNode(NiAVObject* apFireNode) {
 
 void MiddleHighProcess::StoreBonePointers(NiControllerManager* apManager, NiNode* ap3D) {
     int32_t v12 = 1;
-    bool b3rdPerson = 0;
+    bool b3rdPerson = false;
     if (apManager) {
         Animation* Animation_0;
-        if (pPlayer->GetAnimation(1) &&
-            (Animation_0 = pPlayer->GetAnimation(1), apManager == Animation_0->GetControllerManager())) {
-            b3rdPerson = 1;
+        if (pPlayer->GetAnimation(true) &&
+            (Animation_0 = pPlayer->GetAnimation(true), apManager == Animation_0->GetControllerManager())) {
+            b3rdPerson = true;
             NiAVObjectPalette* ObjectPalette = apManager->GetObjectPalette();
-            NiFixedString v10(static_cast<const char*>(bipedBoneName[1]));
+            NiFixedString v10(bipedBoneName[1]);
             NiFixedString* v6 = &v10;
             MiddleHighProcess::pThirdPersonPlayerWeaponNode = static_cast<NiNode*>(ObjectPalette->GetAVObject(*v6));
         }
         else {
             NiAVObjectPalette* v5 = apManager->GetObjectPalette();
-            NiFixedString apString(static_cast<const char*>(bipedBoneName[1]));
+            NiFixedString apString(bipedBoneName[1]);
             NiFixedString* v4 = &apString;
             pWeaponBone = static_cast<NiNode*>(v5->GetAVObject(*v4));
         }
     }
     else {
         if (ap3D) {
-            if (pPlayer->GetAnimation(1) && ap3D == pPlayer->GetAnimation(1)->GetSceneRoot()) {
-                b3rdPerson = 1;
-                MiddleHighProcess::pThirdPersonPlayerWeaponNode = static_cast<NiNode*>(BSUtilities::GetObjectByName(
-                    static_cast<NiAVObject*>(ap3D), static_cast<const char*>(bipedBoneName[1])
-                ));
+            if (pPlayer->GetAnimation(true) && ap3D == pPlayer->GetAnimation(true)->GetSceneRoot()) {
+                b3rdPerson = true;
+                MiddleHighProcess::pThirdPersonPlayerWeaponNode = static_cast<NiNode*>(
+                    BSUtilities::GetObjectByName(static_cast<NiAVObject*>(ap3D), bipedBoneName[1])
+                );
             }
             else {
-                pWeaponBone = static_cast<NiNode*>(BSUtilities::GetObjectByName(
-                    static_cast<NiAVObject*>(ap3D), static_cast<const char*>(bipedBoneName[1])
-                ));
+                pWeaponBone = static_cast<NiNode*>(
+                    BSUtilities::GetObjectByName(static_cast<NiAVObject*>(ap3D), bipedBoneName[1])
+                );
             }
         }
     }
@@ -1493,7 +1496,7 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
     ForceBoneScale();
     NiNode* pweaponBone = GetWeaponBone(apBiped);
     // The biped's root, else the actor's 3D.
-    NiNode* p3d = 0;
+    NiNode* p3d = nullptr;
     if (apBiped) {
         p3d = apBiped->root;
     }
@@ -1504,7 +1507,7 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
         NiAVObject* pobj = pweaponBone->GetAtChecked(0);
         if (pobj) {
             if (abDrawn) {
-                pobj->SetAppCulled(0);
+                pobj->SetAppCulled(false);
             }
         }
         if (apActor == pPlayer) {
@@ -1512,20 +1515,20 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
         }
         else {
             if (GetWantWeaponDrawn() || (GetCurrentWeapon() || GetWeaponDrawn())) {
-                bNeedReparentWeapon = 1;
+                bNeedReparentWeapon = true;
                 bDrawn = abDrawn;
             }
             else {
                 if (bDrawn != abDrawn && !pSaveLoadGame->GetSaveGameLoading()) {
                     // pweap is tested but never set, because the weapon's form goes to a second local, so the reparent
                     // below never runs, as the game does.
-                    TESObjectWEAP* pweap = 0;
+                    TESObjectWEAP* pweap = nullptr;
                     if (this->pWeapon) {
                         TESObjectWEAP* pformWeapon = static_cast<TESObjectWEAP*>(this->pWeapon->pContainerObj);
                         (void)pformWeapon;
                     }
                     if (pweap && !pweap->IsEmbeddedWeapon()) {
-                        bNeedReparentWeapon = 1;
+                        bNeedReparentWeapon = true;
                         bDrawn = abDrawn;
                     }
                 }
@@ -1535,15 +1538,15 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
             NiAVObject* pobj_2 = BSUtilities::GetObjectByName(p3d, "##NifRound");
             if (pobj_2) {
                 if (pAmmo && pAmmo->iNumber) {
-                    pobj_2->SetAppCulled(0);
+                    pobj_2->SetAppCulled(false);
                 }
                 else {
-                    pobj_2->SetAppCulled(1);
+                    pobj_2->SetAppCulled(true);
                 }
             }
             NiAVObject* pobj_3 = BSUtilities::GetObjectByName(p3d, "##LightOn");
             if (pobj_3) {
-                pobj_3->SetAppCulled(1);
+                pobj_3->SetAppCulled(true);
             }
         }
     }
@@ -1552,7 +1555,7 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
             TESObjectWEAP* pWeapon = static_cast<TESObjectWEAP*>(this->pWeapon->pContainerObj);
             if (pWeapon) {
                 if (!pWeapon->IsEmbeddedWeapon()) {
-                    bNeedReparentWeapon = 1;
+                    bNeedReparentWeapon = true;
                     bDrawn = abDrawn;
                 }
             }
@@ -1562,7 +1565,7 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
                 TESObjectWEAP* v32 = static_cast<TESObjectWEAP*>(this->pWeapon->pContainerObj);
                 if (v32) {
                     if (!v32->IsEmbeddedWeapon()) {
-                        bNeedReparentWeapon = 1;
+                        bNeedReparentWeapon = true;
                         bDrawn = abDrawn;
                     }
                 }
@@ -1574,7 +1577,7 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
             if (!Interface::IsInPipboyMenu() && apAnim->GetGroup(AGS_IDLE) != 1) {
                 if (apActor == pPlayer) {
                     ItemChange* apWeaponItem;
-                    bool v24 = abDrawn && this->pWeapon == 0;
+                    bool v24 = abDrawn && this->pWeapon == nullptr;
                     if (abDrawn) {
                         apWeaponItem = this->pWeapon;
                     }
@@ -1593,14 +1596,15 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
     }
     if (abDrawn &&
         (GetCurrentWeapon() &&
-         (apAnim && (apAnim->pAccumRoot && (!Interface::IsInPipboyMenu() || apAnim == pPlayer->GetAnimation(0)))))) {
+         (apAnim &&
+          (apAnim->pAccumRoot && (!Interface::IsInPipboyMenu() || apAnim == pPlayer->GetAnimation(false)))))) {
         ItemChange* v6 = GetCurrentWeapon();
         ANIM_GROUP_ENUM ehandGripAnim = static_cast<ANIM_GROUP_ENUM>(
             static_cast<TESObjectWEAP*>(v6->pContainerObj)->TESObjectWEAP::GetHandGripAnim()
         );
         if (ehandGripAnim != ANIM_GROUP_NONE) {
             if (apActor == pPlayer) {
-                uint16_t v8 = apActor->GetAnimGroup(ehandGripAnim, this->pWeapon, 0, apAnim);
+                uint16_t v8 = apActor->GetAnimGroup(ehandGripAnim, this->pWeapon, false, apAnim);
                 apAnim->PlayGroup(v8, ACTION_START, -1, AGS_NONE);
             }
             else {
@@ -1615,7 +1619,7 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
                     BSAnimGroupSequence* CurrentSequence = apAnim->GetCurrentSequence(AGS_LEFT_ARM);
                     ANIM_GROUP_ENUM Type = CurrentSequence->GetAnimGroup()->GetType();
                     if (Type >= ANIM_GROUP_HAND_GRIP_1 && Type <= ANIM_GROUP_HAND_GRIP_6) {
-                        apAnim->BlendOut(AGS_LEFT_ARM, 0);
+                        apAnim->BlendOut(AGS_LEFT_ARM, false);
                     }
                 }
             }
@@ -1627,7 +1631,7 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
     else {
         AddPostAnimationAction(BaseProcess::POSTANIM_ACTION_HAVOKWEAPON);
     }
-    TESObjectWEAP* pweapon = 0;
+    TESObjectWEAP* pweapon = nullptr;
     if (this->pWeapon) {
         pweapon = static_cast<TESObjectWEAP*>(this->pWeapon->pContainerObj);
     }
@@ -1654,7 +1658,7 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
                     BSAudio* v15 = &BSAudio::QInstance();
                     BSSoundHandle* arHandle = v15->GetSoundHandleByFilename(&out, Filename, v19, v20);
                     hweapIdle.operator=(*arHandle);
-                    hweapIdle.bAssumeSuccess = 1;
+                    hweapIdle.bAssumeSuccess = true;
                     NiNode* v16 = apActor->Get3D();
                     hweapIdle.SetObjectToFollow(v16);
                     const NiPoint3* v17 = &apActor->GetLocationOnReference();
@@ -1666,7 +1670,7 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
                     }
                 }
                 else {
-                    hweapIdle.Play(0);
+                    hweapIdle.Play(false);
                 }
                 (&apActor->m_Extra)->SetWeaponIdleSound(hweapIdle);
             }
@@ -1692,12 +1696,13 @@ void MiddleHighProcess::UpdateReparentWeapon(Actor* apActor) {
                     if (!pAnimation->GetAnimsLoading()) {
                         if (pAnimation->GetControllerManager()) {
                             v2 = TESAnimGroup::AnimGroup(
-                                AGM_NONE, static_cast<ANIM_GROUP_WEAPON_ENUM>(a5), ANIM_GROUP_WEAPONS_START, 0
+                                AGM_NONE, static_cast<ANIM_GROUP_WEAPON_ENUM>(a5), ANIM_GROUP_WEAPONS_START, false
                             );
-                            if ((!pAnimation->GroupLoaded(v2)) && (!apActor->IsDead((bool)1))) {
+                            if ((!pAnimation->GroupLoaded(v2)) && (!apActor->IsDead(true))) {
                                 model = apActor->GetModel();
-                                apFileList =
-                                    pModelLoader->BuildKFFileList(model, 1, 0, static_cast<ANIM_GROUP_WEAPON_ENUM>(a5));
+                                apFileList = pModelLoader->BuildKFFileList(
+                                    model, true, false, static_cast<ANIM_GROUP_WEAPON_ENUM>(a5)
+                                );
                                 pAnimation->AddAnimationsFromList(apFileList);
                             }
                         }
@@ -1705,7 +1710,7 @@ void MiddleHighProcess::UpdateReparentWeapon(Actor* apActor) {
                 }
             }
             if ((!pAnimation) || (!pAnimation->GetAnimsLoading())) {
-                if (apActor->TESObjectREFR::IsDead(0)) {
+                if (apActor->TESObjectREFR::IsDead(false)) {
                     apActor->RemoveWeapon();
                 }
                 else {
@@ -1713,8 +1718,8 @@ void MiddleHighProcess::UpdateReparentWeapon(Actor* apActor) {
                     v4 = apActor->GetBiped();
                     ReparentWeapon(bWeaponDrawn, v4, v5, apActor);
                 }
-                bNeedReparentWeapon = (bool)0;
-                bDrawn = (bool)0;
+                bNeedReparentWeapon = false;
+                bDrawn = false;
             }
         }
     }
@@ -1738,7 +1743,7 @@ void MiddleHighProcess::SetRunOncePackage(TESPackage* apPack, MobileObject* apAc
 }
 
 void MiddleHighProcess::ClearRunOncePackage() {
-    uint8_t v2 = (uint8_t)(GetRunOncePackage() != 0);
+    uint8_t v2 = (uint8_t)(GetRunOncePackage() != nullptr);
     (&RunOncePackage)->Clear();
     if (v2) {
         SetupNewPackage();
@@ -1776,10 +1781,10 @@ void MiddleHighProcess::SetupNewPackage() {
     MiddleHighProcess::ForceBoneScale();
     pItemBeingUsed = nullptr;
     iAnimActionSuccess = (uint16_t)2;
-    SetContinuingPackage((bool)0);
+    SetContinuingPackage(false);
     SetCurrentActionComplete((uint8_t)0);
     SetTargetActivated((uint8_t)0);
-    LowProcess::SetPackageIdleDone(0);
+    LowProcess::SetPackageIdleDone(false);
     SetPackageDoneOnce((uint8_t)0);
     SetTarget(nullptr);
     ClearAcquireList();
@@ -1843,7 +1848,7 @@ void MiddleHighProcess::SetProcedureIndexRunning(int32_t ainumb) {
 
 void MiddleHighProcess::AddToProcedureIndexRunning(MobileObject* apActor, int32_t ainumb) {
     TESPackage* pPack = GetPackageThatIsRunning();
-    SetAnimationActiveFlag(0);
+    SetAnimationActiveFlag(false);
     if (GetRunOncePackage()) {
         AddToRunOnceProcedureIndex(ainumb);
     }
@@ -1864,7 +1869,7 @@ void MiddleHighProcess::AddToProcedureIndexRunning(MobileObject* apActor, int32_
             if (Procedure_Action[v4][GetProcedureIndexRunning()] == PROCEDURE_DONE && !IsPackageDoneOnce()) {
                 Script::SetActionFlag(pPack, &apActor->m_Extra, SCRIPT_ACTION_ONPACKAGEEND);
                 PackageDone(static_cast<Actor*>(apActor), pPack);
-                SetPackageDoneOnce(1);
+                SetPackageDoneOnce(true);
             }
         }
     }
@@ -1882,7 +1887,7 @@ void MiddleHighProcess::EndMoveMessage(Actor* apActor) {
 
 void MiddleHighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t emovemode, bool abpursuit) {
     MiddleHighProcess* v13 = this;
-    TESPackage* v21 = 0;
+    TESPackage* v21 = nullptr;
     TESPackage* pPack = GetPackageThatIsRunning();
     if (pPack && pPack->GetWaiting()) {
         if (pPlayer->IsPlayerFollower(apActor)) {
@@ -1892,9 +1897,9 @@ void MiddleHighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t emove
         if (NumberOfFollowers >= iNumberActorsAllowedToFollowPlayer.Int()) {
             return;
         }
-        pPack->SetWaiting(0);
+        pPack->SetWaiting(false);
     }
-    TESObjectREFR* apRef = 0;
+    TESObjectREFR* apRef = nullptr;
     if (!v13->pTarget || v13->pTarget->GetDelete()) {
         v13->SetTargetForPackage(apActor);
         if (v13->pTarget) {
@@ -1907,15 +1912,15 @@ void MiddleHighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t emove
         }
         return;
     }
-    float fcurrentdistance = apActor->GetDistanceFromReference(v13->pTarget, 0, 0);
+    float fcurrentdistance = apActor->GetDistanceFromReference(v13->pTarget, false, false);
     apActor->GetWorldSpace();
     v13->pTarget->GetWorldSpace();
-    float fdistance = pPack->GetPackageRadiusActorToRefTarget(apActor, 0);
+    float fdistance = pPack->GetPackageRadiusActorToRefTarget(apActor, false);
     TESObjectREFR* ptarg = v13->pTarget;
     if (!v13->pTarget ||
         (pPack->GetPackType() == PACKAGE_TYPE_FOLLOW &&
          (pPack->pPackLoc &&
-          (pPack->pPackLoc->GetLocType() < PLT_CURRLOC && pPack->IsActorAtLocation(apActor, 0, -1.0f, 0))))) {
+          (pPack->pPackLoc->GetLocType() < PLT_CURRLOC && pPack->IsActorAtLocation(apActor, false, -1.0f, false))))) {
         if (abflag) {
             v13->AddToProcedureIndexRunning(apActor, 1);
             if (pPack->GetIsCreated()) {
@@ -1925,7 +1930,7 @@ void MiddleHighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t emove
                 else {
                     v13->ClearCurrentPackage();
                 }
-                v13->CheckforNewPackage(apActor, 0);
+                v13->CheckforNewPackage(apActor, false);
                 return;
             }
             if (!apActor->IsPathingComplete()) {
@@ -1961,7 +1966,7 @@ void MiddleHighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t emove
             (void)ftimedelta;
         }
     }
-    fcurrentdistance = apActor->GetDistanceFromReference(ptarg, 0, 0);
+    fcurrentdistance = apActor->GetDistanceFromReference(ptarg, false, false);
     if (fdistance > static_cast<double>(fcurrentdistance) && !apActor->IsPathingComplete()) {
         apActor->EndMovement();
     }
@@ -1982,8 +1987,8 @@ void MiddleHighProcess::ProcessPursue(Actor* apActor, bool abNewpackage, bool ab
         AddToProcedureIndexRunning(apact, 2);
         return;
     }
-    if (apActor->GetDistanceFromReference(pTarget, 0, 0) > 200.0) {
-        ProcessFollow(apActor, 0, emovemode, 1);
+    if (apActor->GetDistanceFromReference(pTarget, false, false) > 200.0) {
+        ProcessFollow(apActor, false, emovemode, true);
         return;
     }
     if (!apActor->IsPathingComplete()) {
@@ -1995,7 +2000,7 @@ void MiddleHighProcess::ProcessPursue(Actor* apActor, bool abNewpackage, bool ab
                 BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
                 if (CurrentAIProcess->GetSitSleepState() == SIT_SLEEP_NORMAL) {
                     NiPoint3 v17 = pTarget->GetLocationOnReference();
-                    apActor->RequestRotate(v17, 0);
+                    apActor->RequestRotate(v17, false);
                 }
             }
         }
@@ -2011,7 +2016,7 @@ void MiddleHighProcess::ProcessPursue(Actor* apActor, bool abNewpackage, bool ab
             ((iwarning = pTresPack->iwarning, iwarning > pTresPack->iwarninglevel) &&
              pTresPack->fwarningtimer <= 0.0)) {
             if (apact) {
-                apact->TrespassAlarm(apActor, 0, -1);
+                apact->TrespassAlarm(apActor, nullptr, -1);
                 return;
             }
         }
@@ -2033,16 +2038,19 @@ void MiddleHighProcess::ProcessPursue(Actor* apActor, bool abNewpackage, bool ab
         if (ptargetactor) {
             if (pchar == pPlayer) {
                 if (pTarget == pPlayer && (pPlayer->IsSleepingorResting() && !pPlayer->btransporting)) {
-                    pPlayer->SetSleeping(0, 1);
+                    pPlayer->SetSleeping(0, true);
                 }
                 else {
                     if (GetTalkingtoPC() || pPlayer->IsPlayerResistingArrest()) {
                         if (pPlayer->IsPlayerResistingArrest()) {
-                            EnterCombat(apActor, pPlayer, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                            EnterCombat(
+                                apActor, pPlayer, false, false, nullptr, false, false, false, 0, false, false, true,
+                                nullptr
+                            );
                         }
                     }
                     else {
-                        if (pPlayer->Activate(apActor, 0, 0, 1)) {
+                        if (pPlayer->Activate(apActor, false, nullptr, 1)) {
                             AddToProcedureIndexRunning(apActor, 1);
                         }
                     }
@@ -2050,7 +2058,9 @@ void MiddleHighProcess::ProcessPursue(Actor* apActor, bool abNewpackage, bool ab
             }
             else {
                 AddToProcedureIndexRunning(apActor, 2);
-                EnterCombat(apActor, ptargetactor, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                EnterCombat(
+                    apActor, ptargetactor, false, false, nullptr, false, false, false, 0, false, false, true, nullptr
+                );
             }
         }
     }
@@ -2196,13 +2206,13 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
     TESPackage* ppack = GetPackageThatIsRunning();
     if ((!pCurrentFurniture || !pCurrentFurniture->Get3D()) &&
         (!ppack || ppack->GetPackType() != PACKAGE_TYPE_SANDMAN)) {
-        return 0;
+        return false;
     }
     if (GetWeaponDrawn() && !GetAlert()) {
-        apActor->SetWantWeaponDrawn(0);
-        return 1;
+        apActor->SetWantWeaponDrawn(false);
+        return true;
     }
-    pGenericLocation = 0;
+    pGenericLocation = nullptr;
     Animation* panim = apActor->GetAnimation();
     switch (apActor->GetAnimAction()) {
         case ANIM_ACTION_EQUIP_WEAPON:
@@ -2213,10 +2223,10 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
         case ANIM_ACTION_RECOIL:
         case ANIM_ACTION_STAGGER:
         case ANIM_ACTION_DODGE: {
-            return 1;
+            return true;
         }
         default: {
-            bsleeping = 0;
+            bsleeping = false;
             if (pCurrentFurniture) {
                 uint32_t Type = FurnitureMarker.GetType();
                 bsleeping = TESFurniture::IsSleepMarker(Type);
@@ -2228,16 +2238,16 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
             if (phigh) {
                 if (phigh->GetCurrentProcessIdle() ||
                     (apActor->IsAnimIdleQuequed() || (panim->SpecialIdleWorking() || panim->SpecialIdlePlaying()))) {
-                    phigh->SetCurrentProcessIdle(0);
+                    phigh->SetCurrentProcessIdle(nullptr);
                     phigh->ClearPostAnimationActions();
-                    panim->SpecialIdleFree(1, 1);
+                    panim->SpecialIdleFree(true, true);
                 }
             }
             if (apActor->IsPc()) {
                 HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_SIT_SLEEP_ANIM);
             }
             if (bsleeping && !GetCurrentPackage()) {
-                ProcessRemoveWorn(apActor, 0, 0);
+                ProcessRemoveWorn(apActor, false, false);
             }
             if (apActor->IsSneaking()) {
                 apActor->SetWalkRunFlagDirty();
@@ -2246,10 +2256,10 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
             if (apActor != pPlayer) {
                 EndMoveMessage(apActor);
             }
-            if (pCurrentFurniture->GetMarkerUsed(cCurrentFurnitureIndex, 1) &&
+            if (pCurrentFurniture->GetMarkerUsed(cCurrentFurnitureIndex, true) &&
                 (ppack && ppack->GetPackType() != PACKAGE_TYPE_SANDMAN)) {
-                SetSitSleepState(apActor, SIT_SLEEP_NORMAL, 0, 127);
-                return 1;
+                SetSitSleepState(apActor, SIT_SLEEP_NORMAL, nullptr, 127);
+                return true;
             }
             if (ppack) {
                 if (ppack->GetPackType() != PACKAGE_TYPE_SANDMAN) {
@@ -2273,7 +2283,7 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
                     }
                 }
             }
-            SetCurrentProcessAnimIdleLoaded(0, 0);
+            SetCurrentProcessAnimIdleLoaded(nullptr, nullptr);
             RemovePostAnimationAction(BaseProcess::POSTANIM_ACTION_IDLE_LOADED);
             RemovePostAnimationAction(BaseProcess::POSTANIM_ACTION_PLAY_IDLE);
             if (bsleeping) {
@@ -2291,13 +2301,13 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
                     FurnitureMarker.GetType(), afWalkSpeeda, a2a
                 );
                 cSitSleepState = 0;
-                return 0;
+                return false;
             }
             ANIM_GROUP_SECTION IdleAnimGroupSection = pidle->GetIdleAnimGroupSection();
             panim->SpecialIdleQueue(pidle, IdleAnimGroupSection);
             apActor->SetPosition(FurnitureMarker.Position);
             panim->ClearDelta();
-            pCurrentFurniture->SetMarkerUsed(cCurrentFurnitureIndex, 1);
+            pCurrentFurniture->SetMarkerUsed(cCurrentFurnitureIndex, true);
             break;
         }
     }
@@ -2315,7 +2325,7 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
             else {
                 SetSitSleepState(apActor, SIT_SLEEP_WAITING_FOR_SIT_ANIM, pCurrentFurniture, cCurrentFurnitureIndex);
             }
-            return 1;
+            return true;
         }
         case 3:
         case 8: {
@@ -2328,7 +2338,7 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
                     apActor->SetPosition(FurnitureMarker.Position);
                     panim->SpecialIdlePlay(apActor);
                     apActor->PickAnimations(1.0f, 1.0f);
-                    return 1;
+                    return true;
                 }
             }
             if (!panim->SpecialIdleDonePlaying()) {
@@ -2336,15 +2346,15 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
                     if (panim->spAnimIdle.m_pObject) {
                         if (panim->spAnimIdle.m_pObject->eFlags == AnimIdle::ANIM_IDLE_DONE_PLAYING) {
                             apActor->GetOutofFurnitureQuick();
-                            panim->SpecialIdleFree(1, 0);
+                            panim->SpecialIdleFree(true, false);
                         }
                     }
                 }
-                return 1;
+                return true;
             }
             if (!apActor->GetSandman()) {
                 if (GetFurnitureMarkerID() <= 20) {
-                    pCurrentFurniture->SetMarkerReserved(cCurrentFurnitureIndex, 0);
+                    pCurrentFurniture->SetMarkerReserved(cCurrentFurnitureIndex, false);
                     uint32_t v8 = FurnitureMarker.GetType();
                     float a2b = static_cast<TESFurniture*>(pCurrentFurniture->GetObjectReference())
                                     ->TESFurniture::GetMarkerHeadingOffset(v8);
@@ -2352,12 +2362,12 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
                     panim->SkipNextBlend();
                     if (panim->spAnimIdle.m_pObject) {
                         ANIM_GROUP_SECTION Time = panim->spAnimIdle.m_pObject->eSection;
-                        panim->BlendOut(Time, 0);
+                        panim->BlendOut(Time, false);
                     }
                     if (bsleeping) {
                         BSFaceGenAnimationData* panimData = apActor->GetFaceAnimationData();
                         if (panimData) {
-                            panimData->SetDead(1, 0);
+                            panimData->SetDead(true, false);
                         }
                         SetSitSleepState(apActor, SIT_SLEEP_IS_SLEEPING, pCurrentFurniture, cCurrentFurnitureIndex);
                     }
@@ -2369,15 +2379,15 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
                     }
                 }
                 else {
-                    pCurrentFurniture->SetMarkerUsed(cCurrentFurnitureIndex, 0);
-                    pCurrentFurniture->SetMarkerReserved(cCurrentFurnitureIndex, 0);
-                    SetSitSleepState(apActor, SIT_SLEEP_NORMAL, 0, 127);
+                    pCurrentFurniture->SetMarkerUsed(cCurrentFurnitureIndex, false);
+                    pCurrentFurniture->SetMarkerReserved(cCurrentFurnitureIndex, false);
+                    SetSitSleepState(apActor, SIT_SLEEP_NORMAL, nullptr, 127);
                     FurnitureMarker.SetHeading(0.0f);
                     FurnitureMarker.SetType(0);
                     FurnitureMarker.SetPosition(NiPoint3_ZERO);
-                    pCurrentFurniture = 0;
-                    apActor->SetChaseBip(0);
-                    apActor->SetAnimAction(ANIM_ACTION_NONE, 0);
+                    pCurrentFurniture = nullptr;
+                    apActor->SetChaseBip(false);
+                    apActor->SetAnimAction(ANIM_ACTION_NONE, nullptr);
                     if (ppack) {
                         uint32_t Count = ppack->ePROCEDURE_TYPE;
                         if (Procedure_Action[Count][GetProcedureIndexRunning()] != PROCEDURE_PATROL) {
@@ -2388,20 +2398,20 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
                         HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_RUN_AND_GUN);
                     }
                 }
-                panim->SpecialIdleFree(1, 0);
-                return 1;
+                panim->SpecialIdleFree(true, false);
+                return true;
             }
-            SetSitSleepState(apActor, SIT_SLEEP_NORMAL, 0, 127);
-            apActor->SetChaseBip(0);
-            apActor->SetAnimAction(ANIM_ACTION_NONE, 0);
-            panim->SpecialIdleFree(1, 0);
+            SetSitSleepState(apActor, SIT_SLEEP_NORMAL, nullptr, 127);
+            apActor->SetChaseBip(false);
+            apActor->SetAnimAction(ANIM_ACTION_NONE, nullptr);
+            panim->SpecialIdleFree(true, false);
             if (apActor == pPlayer) {
                 HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_RUN_AND_GUN);
             }
-            return 0;
+            return false;
         }
         default: {
-            return 1;
+            return true;
         }
     }
 }
@@ -2429,16 +2439,16 @@ bool MiddleHighProcess::ProcessGetUp(Actor* apActor) {
     bool result;
     Animation* panim = apActor->GetAnimation();
     if (!panim) {
-        return 0;
+        return false;
     }
     if (pPlayer->IsPipboyActive()) {
-        return 0;
+        return false;
     }
     if (pCurrentFurniture) {
         uint32_t Type = FurnitureMarker.GetType();
         bool bsleeping = TESFurniture::IsSleepMarker(Type);
         if (cSitSleepState == 4 && bsleeping) {
-            return 0;
+            return false;
         }
         else {
             if (cSitSleepState != 9 || bsleeping) {
@@ -2449,7 +2459,7 @@ bool MiddleHighProcess::ProcessGetUp(Actor* apActor) {
                             if (GetCurrentFurniture()) {
                                 uint32_t afWalkSpeed = GetCurrentFurnitureIndex();
                                 TESObjectREFR* v4 = GetCurrentFurniture();
-                                v4->SetMarkerUsed(afWalkSpeed, 0);
+                                v4->SetMarkerUsed(afWalkSpeed, false);
                             }
                             SetSitSleepState(
                                 apActor, SIT_SLEEP_WANT_TO_STAND, pCurrentFurniture, cCurrentFurnitureIndex
@@ -2463,14 +2473,14 @@ bool MiddleHighProcess::ProcessGetUp(Actor* apActor) {
                             HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_SIT_SLEEP_ANIM);
                         }
                         if (panim->SpecialIdleWorking()) {
-                            result = 1;
+                            result = true;
                         }
                         else {
                             TESIdleForm* pidle;
                             if (bsleeping) {
                                 BSFaceGenAnimationData* panimData = apActor->GetFaceAnimationData();
                                 if (panimData) {
-                                    panimData->SetDead(0, 0);
+                                    panimData->SetDead(false, false);
                                 }
                                 SetSitSleepState(
                                     apActor, SIT_SLEEP_WANT_TO_WAKE, pCurrentFurniture, cCurrentFurnitureIndex
@@ -2487,7 +2497,7 @@ bool MiddleHighProcess::ProcessGetUp(Actor* apActor) {
                                 IdleAnimGroupSection = pidle->GetIdleAnimGroupSection();
                                 panim->SpecialIdleQueue(pidle, IdleAnimGroupSection);
                             LABEL_63:;
-                                result = 1;
+                                result = true;
                             }
                             else {
                                 int32_t blendAmount = cCurrentFurnitureIndex;
@@ -2497,7 +2507,7 @@ bool MiddleHighProcess::ProcessGetUp(Actor* apActor) {
                                     "idle manager. '%s' index %d.",
                                     cCurrentFurnitureIndex, FurnitureMarker.GetType(), afWalkSpeeda, blendAmount
                                 );
-                                pCurrentFurniture->SetMarkerUsed(cCurrentFurnitureIndex, 0);
+                                pCurrentFurniture->SetMarkerUsed(cCurrentFurnitureIndex, false);
                                 panim->SkipNextBlend();
                                 panim->ClearGroup(AGS_IDLE, 0.0f);
                                 SetSitSleepState(apActor, SIT_SLEEP_NORMAL, pCurrentFurniture, 127);
@@ -2506,12 +2516,12 @@ bool MiddleHighProcess::ProcessGetUp(Actor* apActor) {
                                     -static_cast<TESFurniture*>(pCurrentFurniture->GetObjectReference())
                                          ->TESFurniture::GetMarkerHeadingOffset(v5);
                                 apActor->ModHeading(blendAmounta);
-                                float fHeading = apActor->GetHeading(0) + 3.1415927410125732;
+                                float fHeading = apActor->GetHeading(false) + 3.1415927410125732;
                                 apActor->SetHeading(fHeading);
                                 ClearFurniture(apActor);
-                                apActor->SetChaseBip(0);
+                                apActor->SetChaseBip(false);
                                 if (bsleeping) {
-                                    bool abwearweapon = 1;
+                                    bool abwearweapon = true;
                                     TESPackage* ppack = GetPackageThatIsRunning();
                                     if (ppack) {
                                         abwearweapon = !ppack->GetForceUnequipWeapon();
@@ -2519,23 +2529,25 @@ bool MiddleHighProcess::ProcessGetUp(Actor* apActor) {
                                     if (apActor->IsNpc()) {
                                         TESNPC* pnpc = dynamic_cast<TESNPC*>(apActor->GetObjectReference());
                                         if (pnpc) {
-                                            pnpc->InitDefaultWorn(apActor, 1, abwearweapon, 0, 1);
+                                            pnpc->InitDefaultWorn(apActor, true, abwearweapon, false, true);
                                         }
                                     }
                                     else {
                                         TESCreature* pcrea = dynamic_cast<TESCreature*>(apActor->GetObjectReference());
                                         if (pcrea) {
-                                            pcrea->InitDefaultWorn(apActor, 1, abwearweapon, 1);
+                                            pcrea->InitDefaultWorn(apActor, true, abwearweapon, true);
                                         }
                                     }
                                 }
                                 float v15 = (apActor->GetFatigue() + 10.0) * -1.0;
-                                apActor->DamageModActorValue(ActorValue::FATIGUE, v15, 0);
+                                apActor->DamageModActorValue(ActorValue::FATIGUE, v15, nullptr);
                                 AddToProcedureIndexRunning(apActor, 1);
                                 if (GetNeedTalkPlayer()) {
-                                    apActor->InitiateDialogue(pPlayer, 0, 0, 1, 0, 0, 0, 0, 0);
+                                    apActor->InitiateDialogue(
+                                        pPlayer, nullptr, nullptr, true, false, false, nullptr, false, false
+                                    );
                                 }
-                                result = 0;
+                                result = false;
                             }
                         }
                         break;
@@ -2568,17 +2580,19 @@ bool MiddleHighProcess::ProcessGetUp(Actor* apActor) {
                                     HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_RUN_AND_GUN);
                                 }
                                 if (imarkerID <= 20) {
-                                    float v14 = apActor->GetHeading(0) + 3.1415927410125732;
+                                    float v14 = apActor->GetHeading(false) + 3.1415927410125732;
                                     apActor->SetHeading(v14);
                                 }
                                 apActor->PickAnimations(1.0f, 1.0f);
-                                apActor->SetChaseBip(0);
+                                apActor->SetChaseBip(false);
                                 bhkCharacterController* pcon = GetCharController();
                                 if (pcon) {
                                     pcon->SetPosition(*apActor->QLocationOnReference());
                                 }
                                 if (GetNeedTalkPlayer()) {
-                                    apActor->InitiateDialogue(pPlayer, 0, 0, 1, 0, 0, 0, 0, 0);
+                                    apActor->InitiateDialogue(
+                                        pPlayer, nullptr, nullptr, true, false, false, nullptr, false, false
+                                    );
                                 }
                             }
                         }
@@ -2596,17 +2610,17 @@ bool MiddleHighProcess::ProcessGetUp(Actor* apActor) {
                 }
             }
             else {
-                return 0;
+                return false;
             }
         }
     }
     else {
-        SetSitSleepState(apActor, SIT_SLEEP_NORMAL, 0, 127);
+        SetSitSleepState(apActor, SIT_SLEEP_NORMAL, nullptr, 127);
         AddToProcedureIndexRunning(apActor, 1);
         if (GetNeedTalkPlayer()) {
-            apActor->InitiateDialogue(pPlayer, 0, 0, 1, 0, 0, 0, 0, 0);
+            apActor->InitiateDialogue(pPlayer, nullptr, nullptr, true, false, false, nullptr, false, false);
         }
-        return 0;
+        return false;
     }
     return result;
 }
@@ -2621,19 +2635,19 @@ void MiddleHighProcess::ProcessTravel(
     TESObjectCELL* v24;
     TESWorldSpace* a2;
     NiPoint3 afRadius1;
-    TESPackage* pPack = 0;
+    TESPackage* pPack = nullptr;
     pPack = GetPackageThatIsRunning();
-    if (((!abNewpackage || pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)) &&
+    if (((!abNewpackage || pPack->IsActorAtLocation(apActor, false, -1.0f, false)) &&
          (!apActor->IsPathingComplete() ||
-          (pPack->IsActorAtLocation(apActor, 0, -1.0f, 0) || DidPathingFail(apActor)))) ||
+          (pPack->IsActorAtLocation(apActor, false, -1.0f, false) || DidPathingFail(apActor)))) ||
         (apActor->SetMoveMode(static_cast<uint32_t>(aemovemode)),
          (a2 = pPack->GetLocationWorld(apActor),
           (v24 = pPack->GetLocationCell(apActor),
            (afRadius1 = pPack->GetLocationCoord(apActor), SetupPathFinding(apActor, afRadius1, v24, a2)))))) {
         float fcurrentdistance = apActor->GetDistanceFromPoint(pPack->GetLocationCoord(apActor));
-        float fdistance = pPack->GetPackageRadiusActorToLocation(apActor, 0);
-        bool batRef = 0;
-        TESObjectREFR* pRef = 0;
+        float fdistance = pPack->GetPackageRadiusActorToLocation(apActor, false);
+        bool batRef = false;
+        TESObjectREFR* pRef = nullptr;
         if (pPack->pPackLoc) {
             pRef = pPack->pPackLoc->GetLocReference();
         }
@@ -2651,7 +2665,7 @@ void MiddleHighProcess::ProcessTravel(
                 ClearFurnitureMarker();
             }
             if (apActor->GetSitSleepState()) {
-                batRef = 1;
+                batRef = true;
             LABEL_26:;
                 if (batRef || DidPathingFail(apActor)) {
                     if (!GetLockedLocation()) {
@@ -2663,7 +2677,7 @@ void MiddleHighProcess::ProcessTravel(
                                 ParentCell, *v20, 5000.0f, *v22, 5000.0f, &LowProcess::LockDoorsatLocation, apActor
                             );
                         }
-                        SetLockedLocation(1);
+                        SetLockedLocation(true);
                     }
                     if (pPack->GetUnlockDoorsAtLocation()) {
                         const NiPoint3* v23 = &apActor->GetLocationOnReference();
@@ -2675,10 +2689,10 @@ void MiddleHighProcess::ProcessTravel(
                     }
                     if (pPack) {
                         if (!bDoneClothesChange && pPack->GetForceUnequipWeapon()) {
-                            bDoneClothesChange = 1;
+                            bDoneClothesChange = true;
                             ItemChange* pweapon = GetCurrentWeapon();
                             if (pweapon) {
-                                apActor->QueueUnEquipObject(pweapon->pContainerObj, 1, 0, 0, 0, 1);
+                                apActor->QueueUnEquipObject(pweapon->pContainerObj, 1, nullptr, false, false, true);
                             }
                         }
                     }
@@ -2703,7 +2717,7 @@ void MiddleHighProcess::ProcessTravel(
                                 float a2c = pmarker->GetHeading();
                                 rot.MakeZRotation(a2c);
                                 markerOffset_2 = rot * markerOffset_2;
-                                pRef->SetMarkerUsed(cCurrentFurnitureIndex, 1);
+                                pRef->SetMarkerUsed(cCurrentFurnitureIndex, true);
                                 apActor->SetPosition(pmarker->Position + markerOffset_2);
                                 uint32_t v9 = pmarker->GetType();
                                 float a2d = pFurniture->GetMarkerHeadingOffset(v9);
@@ -2716,7 +2730,7 @@ void MiddleHighProcess::ProcessTravel(
                                     BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
                                     CurrentAIProcess->SetProcedureIndexRunning(1);
                                     BaseProcess* v32 = apActor->pCurrentProcess;
-                                    v32->ProcessRemoveWorn(apActor, 0);
+                                    v32->ProcessRemoveWorn(apActor, false);
                                 }
                                 else {
                                     SetSitSleepState(
@@ -2727,7 +2741,7 @@ void MiddleHighProcess::ProcessTravel(
                                     if (absleep) {
                                         BSFaceGenAnimationData* panimData = apActor->GetFaceAnimationData();
                                         if (panimData) {
-                                            panimData->SetDead(1, 0);
+                                            panimData->SetDead(true, false);
                                         }
                                         SetSitSleepState(
                                             apActor, SIT_SLEEP_IS_SLEEPING, pCurrentFurniture, cCurrentFurnitureIndex
@@ -2775,7 +2789,7 @@ void MiddleHighProcess::ProcessTravel(
                         }
                         else {
                             float v44 = 0.0f;
-                            Actor* plocactor = 0;
+                            Actor* plocactor = nullptr;
                             if (pRef && pRef->IsFurniture()) {
                                 NiPoint3 point = apActor->GetLocationOnReference();
                                 uint32_t inum = 0;
@@ -2783,7 +2797,9 @@ void MiddleHighProcess::ProcessTravel(
                                     pCurrentFurniture = pRef;
                                     ClearFurnitureMarker();
                                 }
-                                if (pCurrentFurniture->GetClosestFreeMarker(point, 1, 1, FurnitureMarker, inum, 1)) {
+                                if (pCurrentFurniture->GetClosestFreeMarker(
+                                        point, true, true, FurnitureMarker, inum, true
+                                    )) {
                                     TESWorldSpace* a2e = pPack->GetLocationWorld(apActor);
                                     TESObjectCELL* LocationCell = pPack->GetLocationCell(apActor);
                                     if (SetupPathFinding(apActor, FurnitureMarker.Position, LocationCell, a2e)) {
@@ -2828,13 +2844,13 @@ void MiddleHighProcess::ProcessTravel(
                 return;
             }
             if (apActor->GetSitSleepState() == SIT_SLEEP_NORMAL &&
-                (pCurrentFurniture->GetMarkerUsed(cCurrentFurnitureIndex, 1) && !apActor->IsPathingComplete())) {
+                (pCurrentFurniture->GetMarkerUsed(cCurrentFurnitureIndex, true) && !apActor->IsPathingComplete())) {
                 ClearFurniture(apActor);
                 AddToProcedureIndexRunning(apActor, 1);
                 return;
             }
         }
-        batRef = pPack->IsActorAtLocation(apActor, 0, -1.0f, 0);
+        batRef = pPack->IsActorAtLocation(apActor, false, -1.0f, false);
         goto LABEL_26;
     }
 }
@@ -2855,30 +2871,30 @@ bool MiddleHighProcess::EnterCombat(
     TESPackage* apPackage
 ) {
     if (GetFinishingCombatPackage()) {
-        return 0;
+        return false;
     }
     TESPackage* ppack = GetCurrentPackage();
     if (!abDontCheckForAmbush &&
         (ppack &&
          (ppack->GetPackType() == PACKAGE_TYPE_AMBUSH &&
-          !ppack->IsActorAtSecondLocation(apTarget, apActor, 0, -1.0f, 0)))) {
-        return 0;
+          !ppack->IsActorAtSecondLocation(apTarget, apActor, false, -1.0f, false)))) {
+        return false;
     }
     if (!apTarget && !apGroup) {
-        apActor->StartCombat(0, 0, 0, 0, 0, 0, 0, apPackage);
-        return 1;
+        apActor->StartCombat(nullptr, nullptr, false, false, false, 0, false, apPackage);
+        return true;
     }
     if (apTarget) {
         PROCESS_TYPE CurrentProcessType = apTarget->GetCurrentProcessType();
         if (CurrentProcessType != apActor->GetCurrentProcessType() && !apActor->Get3D()) {
             LowProcess::EnterCombat(
                 apActor, apTarget, abDontCheckForAmbush, absendalarm, apGroup, abfleeing, abForceFlee, abIsAggressor,
-                acTeam, bIgnoreDefensivePackage, 0, 1, 0
+                acTeam, bIgnoreDefensivePackage, false, true, nullptr
             );
         }
     }
     if (apActor->IsRestrained() || apActor->IsUnConscious()) {
-        return 0;
+        return false;
     }
     if (!apTarget ||
         (apActor->GetCombatController() || (bforcecombat || !pCombatManager->CheckShouldFlee(apActor, apTarget)))) {
@@ -2887,7 +2903,7 @@ bool MiddleHighProcess::EnterCombat(
                 if (!apGroup) {
                     CombatController* v16 = apActor->GetCombatController();
                     if (v16->IsActoraCombatTarget(apTarget)) {
-                        return 0;
+                        return false;
                     }
                 }
             }
@@ -2895,16 +2911,16 @@ bool MiddleHighProcess::EnterCombat(
         if (apTarget == pPlayer && !bforcecombat) {
             int32_t NumberActorsInCombat = pPlayer->GetNumberActorsInCombat();
             if (NumberActorsInCombat >= iNumberActorsInCombatPlayer.Int()) {
-                return 0;
+                return false;
             }
         }
         if (apTarget) {
             bool btargetSwimming = apTarget->IsSwimming();
             if (!apActor->FightsInWater() && btargetSwimming) {
-                return 0;
+                return false;
             }
             if (apActor->SwimsOnly() && !btargetSwimming) {
-                return 0;
+                return false;
             }
         }
         ClearMovementStoped();
@@ -2917,7 +2933,7 @@ bool MiddleHighProcess::EnterCombat(
         if (apTarget) {
             if (pPack) {
                 if (pPack->GetDefensive() && !bforcecombat && !bIgnoreDefensivePackage) {
-                    NiPoint3 dest = GetCurrentDestinationCoordinate(apActor, 0);
+                    NiPoint3 dest = GetCurrentDestinationCoordinate(apActor, false);
                     // The package's radius, 600 when below 1.
                     float fdistancepack = static_cast<float>(pPack->GetLocationRadius(apActor));
                     if (fdistancepack < 1.0) {
@@ -2928,8 +2944,8 @@ bool MiddleHighProcess::EnterCombat(
                         if (apTarget->GetCombatController()) {
                             CombatController* v19 = apTarget->GetCombatController();
                             if (!v19->IsActoraCombatTarget(apActor)) {
-                                SetDetectAlert(1);
-                                return 0;
+                                SetDetectAlert(true);
+                                return false;
                             }
                         }
                     }
@@ -2937,21 +2953,21 @@ bool MiddleHighProcess::EnterCombat(
             }
         }
         if (!apActor->GetCombatController()) {
-            SetDetectAlert(0);
+            SetDetectAlert(false);
             apActor->EndDialogue();
             pSavedAcquireObject = pAcquireObject;
-            pAcquireObject = 0;
+            pAcquireObject = nullptr;
         }
         bool baggressor = abIsAggressor;
         if (apActor->IsActoraGuard()) {
-            baggressor = 0;
+            baggressor = false;
         }
         if (apTarget) {
             if (apTarget->IsInCombat()) {
                 if (apTarget->GetCombatController()) {
                     CombatController* v20 = apTarget->GetCombatController();
                     if (v20->IsActoraCombatTarget(apActor)) {
-                        baggressor = 0;
+                        baggressor = false;
                     }
                 }
             }
@@ -2965,13 +2981,13 @@ bool MiddleHighProcess::EnterCombat(
         if (apTarget == pPlayer && apActor->IsInCombat() && pPlayer->GetDetectionLevel(apActor) > 0) {
             pPlayer->AddActorToPlayerCombatList(apActor);
         }
-        return 1;
+        return true;
     }
-    apActor->InitiateFlee(apTarget, 1, 1, 1, 0, 0, -1.0f, -1.0f);
+    apActor->InitiateFlee(apTarget, true, true, true, nullptr, nullptr, -1.0f, -1.0f);
     if (apTarget == pPlayer && pPlayer->GetDetectionLevel(apActor) > 0) {
         pPlayer->AddActorToPlayerCombatList(apActor);
     }
-    return 1;
+    return true;
 }
 
 // The weapon's condition stage: a tenth of its health (an embedded weapon's is the body-part condition actor value),
@@ -3057,18 +3073,18 @@ bool MiddleHighProcess::GetIronSights() {
 
 bool MiddleHighProcess::HasMovementAnim(ANIM_GROUP_ENUM aeMovementAnim) {
     if ((!pAnimation) || pAnimation->GetAnimsLoading()) {
-        return (bool)1;
+        return true;
     }
     uint32_t uiBit = (uint32_t)((2 * aeMovementAnim) - 6);
     if (uiBit > 32) {
-        return (bool)1;
+        return true;
     }
     uint32_t uiFlags = iMovementAnimations >> uiBit;
     if ((uiFlags & 1) != 0) {
-        return (bool)1;
+        return true;
     }
     if ((uiFlags & 2) != 0) {
-        return (bool)0;
+        return false;
     }
     uint8_t result = (uint8_t)pAnimation->GroupLoaded(aeMovementAnim);
     iMovementAnimations |= ((int32_t)((2 - result) << uiBit));
@@ -3148,9 +3164,9 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
     NiPoint3 dr;
     Animation* panim = apActor->GetAnimation();
     if (panim) {
-        if (apActor != pPlayer || panim != pPlayer->GetAnimation(static_cast<bool>(1))) {
+        if (apActor != pPlayer || panim != pPlayer->GetAnimation(true)) {
             if (apActor->CanKnockDown()) {
-                bool bunconscious = 0;
+                bool bunconscious = false;
                 if (GetCachedFlag(CachedValues::CVF_FATIGUE_DAMAGED)) {
                     bunconscious = apActor->GetFatigue() < 0.0;
                 }
@@ -3168,12 +3184,12 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
                     if (apActor->IsParalyzed()) {
                         cKnockState = 3;
                         if (apActor->pRagdollController) {
-                            apActor->pRagdollController->EnableRagdollFeedback(0);
+                            apActor->pRagdollController->EnableRagdollFeedback(false);
                             apActor->pRagdollController->SyncRagdollTo3D();
-                            apActor->pRagdollController->DisableRagdollAnim(0);
+                            apActor->pRagdollController->DisableRagdollAnim(false);
                         }
                         NiNode* v2 = apActor->TESObjectREFR::Get3D();
-                        bhkWorld::SetMotion(v2, hkpMotion::MOTION_DYNAMIC, 1, 0, 1);
+                        bhkWorld::SetMotion(v2, hkpMotion::MOTION_DYNAMIC, true, false, true);
                         NiAVObject* pav = apActor->TESObjectREFR::Get3D();
                         bhkRigidBody::SetFixed(pav, 1, 1);
                         panim->ClearGroup(AGS_WHOLE_BODY, 0.0f);
@@ -3185,12 +3201,12 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
                             FollowerBarks::TriggerFollowerBark(apActor, FollowerBarks::BARK_KNOCKED_OUT);
                         }
                         cKnockState = 4;
-                        panim->GetDelta(&dr, apActor, 1, 0);
+                        panim->GetDelta(&dr, apActor, true, false);
                         float v20 = appTimer.fDelta * 50.0;
                         dr = -dr / v20;
                         if (apActor->pRagdollController) {
-                            apActor->pRagdollController->EnableRagdollFeedback(0);
-                            apActor->pRagdollController->DisableRagdollAnim(1);
+                            apActor->pRagdollController->EnableRagdollFeedback(false);
+                            apActor->pRagdollController->DisableRagdollAnim(true);
                         }
                         apActor->SetHavokWeapon();
                         NiNode* v5 = apActor->TESObjectREFR::Get3D();
@@ -3220,11 +3236,11 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
                             (bmax || apActor->IsNonAccumNearController(16.0f))) {
                             char cKnockStateSave = cKnockState;
                             cKnockState = 3;
-                            TESIdleForm* pidle_2 = pIdleManager->GetIdleToPlay(apActor, 0);
+                            TESIdleForm* pidle_2 = pIdleManager->GetIdleToPlay(apActor, nullptr);
                             cKnockState = cKnockStateSave;
                             BSFaceGenAnimationData* panimData_4 = apActor->GetFaceAnimationData();
                             if (panimData_4) {
-                                panimData_4->SetDead(0, 0);
+                                panimData_4->SetDead(false, false);
                             }
                             cKnockState = 5;
                             if (pidle_2) {
@@ -3243,7 +3259,7 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
                         if (!proot || bhkUtilFunctions::GetHeirGain(proot) <= 0.0) {
                             apActor->StopCurrentDialogue();
                             if (apActor == pPlayer && pPlayer->GetIronSights()) {
-                                pPlayer->SetIronSights(0, 0, 0);
+                                pPlayer->SetIronSights(false, false, false);
                             }
                             if (cKnockState == 4) {
                                 cKnockState = 3;
@@ -3253,7 +3269,7 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
                             }
                             BSFaceGenAnimationData* panimData = apActor->GetFaceAnimationData();
                             if (panimData) {
-                                panimData->SetDead(1, 0);
+                                panimData->SetDead(true, false);
                             }
                             panim->ClearGroup(AGS_WHOLE_BODY, 0.0f);
                             panim->ZeroGlobalTransform();
@@ -3265,12 +3281,12 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
                         if (!(apActor->GetFatigue() >= 0.0) ||
                             (apActor->IsParalyzed() || apActor->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN)) {}
                         else {
-                            TESIdleForm* pidle = pIdleManager->GetIdleToPlay(apActor, 0);
+                            TESIdleForm* pidle = pIdleManager->GetIdleToPlay(apActor, nullptr);
                             if (pidle) {
                                 panim->SpecialIdleQueue(pidle, AGS_WHOLE_BODY);
                                 BSFaceGenAnimationData* panimData_2 = apActor->GetFaceAnimationData();
                                 if (panimData_2) {
-                                    panimData_2->SetDead(0, 0);
+                                    panimData_2->SetDead(false, false);
                                 }
                                 cKnockState = 5;
                             }
@@ -3288,7 +3304,7 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
                              (CurrentSequence = panim->GetCurrentSequence(AGS_MOVEMENT),
                               CurrentSequence->GetState() == NiControllerSequence::kAnimating))) {
                             if (apActor->IsSwimming() || !panim->SpecialIdlePlay(apActor)) {
-                                panim->SpecialIdleFree(1, 0);
+                                panim->SpecialIdleFree(true, false);
                             }
                             NiAVObject* pav_3 = apActor->TESObjectREFR::Get3D();
                             NiAVObject* pspine = panim->pAccumRoot;
@@ -3313,7 +3329,9 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
                                         NiFixedString* Bip01_Spine = FixedStrings::GetBip01_Spine();
                                         NiAVObject* p180Test = apActor->GetActorBone(pav_3, *Bip01_Spine);
                                         if (p180Test) {
-                                            if (bhkNiCollisionObject::GetFaceUp(static_cast<NiNode*>(p180Test), 0)) {
+                                            if (bhkNiCollisionObject::GetFaceUp(
+                                                    static_cast<NiNode*>(p180Test), nullptr
+                                                )) {
                                                 movedir.operator*=(-1.0f);
                                             }
                                         }
@@ -3326,7 +3344,7 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
                             bhkRigidBody::SetFixed(pav_3, 0, 0);
                             bhkBlendController::DoGetUp(pav_3, 0.0f);
                             apActor->RemoveChange(4);
-                            (&apActor->m_Extra)->SetRagDollData(0);
+                            (&apActor->m_Extra)->SetRagDollData(nullptr);
                             cKnockState = 6;
                         }
                         else {
@@ -3339,9 +3357,9 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
                     case 6: {
                         if (panim->SpecialIdleDonePlaying()) {
                             cKnockState = 0;
-                            panim->SpecialIdleFree(1, 0);
+                            panim->SpecialIdleFree(true, false);
                             if (apActor->pRagdollController) {
-                                apActor->pRagdollController->EnableRagdollFeedback(1);
+                                apActor->pRagdollController->EnableRagdollFeedback(true);
                                 apActor->pRagdollController->EnableRagdollAnim();
                             }
                             apActor->SetHavokWeapon();
@@ -3350,7 +3368,7 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
                                     if (bWeaponGrenade || bWeaponThrown) {
                                         if (pWeaponBone->GetAtChecked(0)) {
                                             NiAVObject* v17 = pWeaponBone->GetAt(0);
-                                            v17->SetAppCulled(0);
+                                            v17->SetAppCulled(false);
                                             if (apActor == pPlayer) {
                                                 if (MiddleHighProcess::pThirdPersonPlayerWeaponNode) {
                                                     if (MiddleHighProcess::pThirdPersonPlayerWeaponNode->GetAtChecked(
@@ -3358,7 +3376,7 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
                                                         )) {
                                                         NiAVObject* v18 =
                                                             MiddleHighProcess::pThirdPersonPlayerWeaponNode->GetAt(0);
-                                                        v18->SetAppCulled(0);
+                                                        v18->SetAppCulled(false);
                                                     }
                                                 }
                                             }
@@ -3388,11 +3406,11 @@ void MiddleHighProcess::ClearKnockState(Actor* apActor) {
             bhkRigidBody::SetFixed(apObject, 0, 1);
             bhkBlendController::DoGetUp(apObject, 1.0);
             ExtraDataList* Extra = apActor->GetExtra();
-            Extra->SetRagDollData(0);
+            Extra->SetRagDollData(nullptr);
             apActor->RemoveChange(4);
             BSFaceGenAnimationData* FaceAnimationData = apActor->GetFaceAnimationData();
             if (FaceAnimationData) {
-                FaceAnimationData->SetDead(0, 0);
+                FaceAnimationData->SetDead(false, false);
             }
             cKnockState = 0;
             if (pWeapon) {
@@ -3400,12 +3418,12 @@ void MiddleHighProcess::ClearKnockState(Actor* apActor) {
                     if (bWeaponGrenade || bWeaponThrown) {
                         if (pWeaponBone->GetAtChecked(0)) {
                             NiAVObject* v3 = pWeaponBone->GetAt(0);
-                            v3->SetAppCulled(0);
+                            v3->SetAppCulled(false);
                             if (apActor == pPlayer) {
                                 if (MiddleHighProcess::pThirdPersonPlayerWeaponNode) {
                                     if (MiddleHighProcess::pThirdPersonPlayerWeaponNode->GetAtChecked(0)) {
                                         NiAVObject* v4 = MiddleHighProcess::pThirdPersonPlayerWeaponNode->GetAt(0);
-                                        v4->SetAppCulled(0);
+                                        v4->SetAppCulled(false);
                                     }
                                 }
                             }
@@ -3698,7 +3716,7 @@ TESObjectREFR* MiddleHighProcess::GetCurrentFurniture() {
 void MiddleHighProcess::RemoveFurnitureRef(TESObjectREFR* apFurnitureRef) {
     RefListChairBed.Remove(*reinterpret_cast<void**>(&apFurnitureRef));
     if (pCurrentFurniture == apFurnitureRef) {
-        pCurrentFurniture = 0;
+        pCurrentFurniture = nullptr;
     }
 }
 
@@ -3771,8 +3789,8 @@ void MiddleHighProcess::LoadSitSleepIdle(Actor* apActor, Animation* apAnimation)
             }
             apActor->SetCachedSitSleepState(static_cast<SIT_SLEEP_STATE>(cSitSleepState));
             if (cSitSleepState) {
-                pCurrentFurniture->SetMarkerUsed(this->cCurrentFurnitureIndex, 1);
-                bool b3rdPerson = 0;
+                pCurrentFurniture->SetMarkerUsed(this->cCurrentFurnitureIndex, true);
+                bool b3rdPerson = false;
                 if (apActor == pPlayer) {
                     b3rdPerson = pPlayer->Is3rdPerson();
                     if (apAnimation != pPlayer->GetAnimation(!b3rdPerson)) {
@@ -3794,16 +3812,16 @@ void MiddleHighProcess::LoadSitSleepIdle(Actor* apActor, Animation* apAnimation)
             bhkCharacterController* pcon = GetCharController();
             if (bdisableCharController && cSitSleepState) {
                 apActor->SetSize(0.1f);
-                apActor->SetChaseBip(1);
+                apActor->SetChaseBip(true);
                 if (pcon) {
-                    pcon->SetFlag(bhkCharacterController::NO_CHARACTER_COLLISIONS, 1);
+                    pcon->SetFlag(bhkCharacterController::NO_CHARACTER_COLLISIONS, true);
                 }
             }
             else {
                 apActor->SetSize(0.0f);
-                apActor->SetChaseBip(0);
+                apActor->SetChaseBip(false);
                 if (pcon) {
-                    pcon->SetFlag(bhkCharacterController::NO_CHARACTER_COLLISIONS, 0);
+                    pcon->SetFlag(bhkCharacterController::NO_CHARACTER_COLLISIONS, false);
                 }
             }
             apActor->SetCachedSitSleepState(static_cast<SIT_SLEEP_STATE>(cSitSleepState));
@@ -3840,7 +3858,7 @@ void MiddleHighProcess::CalculateLightValue(Actor* apActor, bool abIgnoreTorch) 
     }
     else {
         if (pLightingProperty.m_pObject) {
-            NiPointer<NiLight> plight(static_cast<NiLight*>(0));
+            NiPointer<NiLight> plight(static_cast<NiLight*>(nullptr));
             float flightpoint = 0.0f;
             float fambientpoint = 0.0f;
             float fdirpoint = 0.0f;
@@ -3915,21 +3933,21 @@ void MiddleHighProcess::CalculateLightValue(Actor* apActor, bool abIgnoreTorch) 
 
 void MiddleHighProcess::ClearCurrentDataforProcess(Actor* apActor) {
     iAnimActionSuccess = 2;
-    SetCurrentActionComplete(0);
-    SetCurrentMovementComplete(1);
-    SetTarget(0);
+    SetCurrentActionComplete(false);
+    SetCurrentMovementComplete(true);
+    SetTarget(nullptr);
     ClearMovementStoped();
     ClearReservation();
-    SetPackageIdleDone(0);
-    pCurrentPackageSpell = 0;
+    SetPackageIdleDone(false);
+    pCurrentPackageSpell = nullptr;
     if (pAcquireObject) {
         pAcquireObject->Delete(1u);
     }
-    pAcquireObject = 0;
+    pAcquireObject = nullptr;
     apActor->ClearLookAtTarget();
-    apActor->SetForceSneak(0);
-    ClearAutomaticShotsToFire(0);
-    bDoneClothesChange = 0;
+    apActor->SetForceSneak(false);
+    ClearAutomaticShotsToFire(false);
+    bDoneClothesChange = false;
     while (!ObjectList.IsEmpty()) {
         ObjectstoAcquire* pobj = ObjectList.m_item;
         if (pobj) {
@@ -3937,18 +3955,18 @@ void MiddleHighProcess::ClearCurrentDataforProcess(Actor* apActor) {
         }
         ObjectList.Remove(pobj);
     }
-    pCurrentIdle = 0;
-    bPlayedBeginIdles = 0;
-    bPlayedEndIdles = 0;
+    pCurrentIdle = nullptr;
+    bPlayedBeginIdles = false;
+    bPlayedEndIdles = false;
     RefListChairBed.RemoveAll();
     GenericLocationsList.RemoveAll();
-    pGenericLocation = 0;
+    pGenericLocation = nullptr;
     if (apActor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
         if (GetCurrentFurniture()) {
             ClearFurniture(apActor);
         }
     }
-    ClearUseWeaponHeadTrackTarget(1);
+    ClearUseWeaponHeadTrackTarget(true);
 }
 
 void MiddleHighProcess::SetCommandingActor(Actor* apActor) {
@@ -3974,7 +3992,7 @@ void MiddleHighProcess::SetFurniture(TESObjectREFR* pref, uint8_t aiindex, Furni
         FurnitureMarker.sHeading = apMarker->sHeading;
         if (pCurrentFurniture) {
             if (!pSaveLoadGame->GetSaveGameLoading()) {
-                pCurrentFurniture->SetMarkerReserved(aiindex, 1);
+                pCurrentFurniture->SetMarkerReserved(aiindex, true);
             }
         }
     }
@@ -4175,7 +4193,7 @@ void MiddleHighProcess::SaveGame(uint32_t aiFlags, MobileObject* pmob) {
     MiddleLowProcess::SaveGame(aiFlags, pmob);
     iblockSize = 0;
     // The block's size placeholder in the save buffer, patched at the end.
-    void* pblockSize = 0;
+    void* pblockSize = nullptr;
     uint8_t* itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -4460,7 +4478,7 @@ void MiddleHighProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, Mobi
     Actor* pactor = dynamic_cast<Actor*>(pmob);
     MiddleLowProcess::LoadGame(aiFlags, aiCurrentFlags, pmob);
     iblockSize = 0;
-    uint8_t* istartBufferPosition = 0;
+    uint8_t* istartBufferPosition = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockHeader, 4u);
         if (iblockHeader != 0x424C4F4B) {
@@ -4497,7 +4515,7 @@ void MiddleHighProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, Mobi
     }
     if ((aiFlags & 32) != 0 || (aiCurrentFlags & 32) != 0) {
         RemoveAndAttachItems(pmob);
-        pactor->ReloadTargets(0);
+        pactor->ReloadTargets(false);
         NiAVObject* pobj = (NiAVObject*)pmob->TESObjectREFR::Get3D();
         if (pobj) {
             NiNode* pnode = static_cast<NiNode*>(pobj);
@@ -4538,7 +4556,7 @@ void MiddleHighProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, Mobi
                     pragdoll = ::new (apMemory) RagDollData;
                 }
                 else {
-                    pragdoll = 0;
+                    pragdoll = nullptr;
                 }
                 pragdoll->LoadGame();
                 if (pragdoll) {
@@ -4661,7 +4679,7 @@ void MiddleHighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v11 = dynamic_cast<Actor*>(FormByNumericID);
     }
     else {
-        v11 = 0;
+        v11 = nullptr;
     }
     pCommandingActor = v11;
     if (pCurrentFurniture) {
@@ -4670,15 +4688,15 @@ void MiddleHighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         v10 = dynamic_cast<TESObjectREFR*>(v3);
     }
     else {
-        v10 = 0;
+        v10 = nullptr;
     }
     pCurrentFurniture = v10;
     // The dead-detect list holds form IDs since LoadGame: each becomes its reference, or its node is removed.
     BSSimpleList<void*>* plist = &DeadDetectList;
-    BSSimpleList<void*>* plastList = 0;
+    BSSimpleList<void*>* plastList = nullptr;
     while (plist && !plist->IsEmpty()) {
         void* pForm = plist->m_item;
-        bool bremove = 0;
+        bool bremove = false;
         if (pForm) {
             TESForm* v4 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pForm)));
             pForm = dynamic_cast<TESObjectREFR*>(v4);
@@ -4686,11 +4704,11 @@ void MiddleHighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 plist->SetItem(pForm);
             }
             else {
-                bremove = 1;
+                bremove = true;
             }
         }
         else {
-            bremove = 1;
+            bremove = true;
         }
         if (bremove) {
             if (plastList) {
@@ -4713,7 +4731,7 @@ void MiddleHighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         if (pCurrentFurniture->GetObjectReference()->GetFormType() == FURN_ID) {
             if (pactor) {
                 TESObjectCELL* ParentCell;
-                if (pactor->IsDead(0) ||
+                if (pactor->IsDead(false) ||
                     (ParentCell = pactor->GetParentCell(), ParentCell != pCurrentFurniture->GetParentCell())) {
                     ClearFurniture(pactor);
                 }
@@ -4733,7 +4751,7 @@ void MiddleHighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     }
     if ((iReservationSlot & 0x80000000u) == 0) {
         if (pTarget) {
-            pTarget->SetMarkerReserved(iReservationSlot, 1);
+            pTarget->SetMarkerReserved(iReservationSlot, true);
         }
     }
     if (pactor) {
@@ -4749,14 +4767,14 @@ void MiddleHighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         );
     }
     else {
-        MagicItemByNumericID = 0;
+        MagicItemByNumericID = nullptr;
     }
     pCurrentPackageSpell = MagicItemByNumericID;
     if (pCurrentSpell) {
         v8 = MagicItem::GetMagicItemByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pCurrentSpell)));
     }
     else {
-        v8 = 0;
+        v8 = nullptr;
     }
     pCurrentSpell = v8;
     if (pDesiredTarget) {
@@ -4764,26 +4782,26 @@ void MiddleHighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             MagicTarget::GetMagicTargetByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pDesiredTarget)));
     }
     else {
-        MagicTargetByNumericID = 0;
+        MagicTargetByNumericID = nullptr;
     }
     pDesiredTarget = MagicTargetByNumericID;
     if (apLoadGameBuffer->GetVersion() >= 15u) {
         BSSimpleList<QueuedItem*>* plist_2 = pListItemstoEquipUnequip;
-        BSSimpleList<QueuedItem*>* plastList_2 = 0;
+        BSSimpleList<QueuedItem*>* plastList_2 = nullptr;
         while (plist_2 && !plist_2->IsEmpty()) {
             QueuedItem* pqueuedItem = plist_2->m_item;
-            bool bremove_2 = 0;
+            bool bremove_2 = false;
             if (pqueuedItem) {
                 if (pqueuedItem->pObject) {
                     pqueuedItem->InitLoadGame(apLoadGameBuffer);
                 }
                 else {
                     delete pqueuedItem;
-                    bremove_2 = 1;
+                    bremove_2 = true;
                 }
             }
             else {
-                bremove_2 = 1;
+                bremove_2 = true;
             }
             if (bremove_2) {
                 if (plastList_2) {
@@ -5060,7 +5078,7 @@ void MiddleHighProcess::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     bBeenAttacked = false;
     eUseItem = POTYPE_NONE;
     fEquippedWeight = 0.0f;
-    bCheckMagicNode = 0;
+    bCheckMagicNode = false;
     pCurrentWeaponEffect = nullptr;
     fAlphaMult = 1.0f;
     fScriptRefractPower = 0.0f;
@@ -5069,7 +5087,7 @@ void MiddleHighProcess::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     bDoneOnce = false;
     bPickPocketed = false;
     bDoneClothesChange = false;
-    bRefreshMagicShaderEffects = 0;
+    bRefreshMagicShaderEffects = false;
     bRefreshMagicShaderEffectBody = false;
     bRefreshMagicShaderEffectWeapon = false;
     bRefreshMagicShaderEffectLoading = 0;
@@ -5082,14 +5100,14 @@ void MiddleHighProcess::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     bAimingTarget = false;
     iPackageIdleNumber = 0xFFFFFFFF;
     fPackageIdleTimer = -1.0f;
-    bPlayedBeginIdles = 0;
+    bPlayedBeginIdles = false;
     bPlayedEndIdles = false;
     iCreatureLipsynchStartTime = 0;
     fRadiationDelta = 0.0f;
     fRadiationMagicDelta = 0.0f;
     fRadiationWaterDelta = 0.0f;
     iWeaponConditionStage = 0xFFFFFFFF;
-    bPickPackIdle = 0;
+    bPickPackIdle = false;
     pFaceNode = nullptr;
     pFaceNodeSkinned = nullptr;
     pAnimFace = nullptr;
@@ -5166,7 +5184,7 @@ void MiddleHighProcess::Revert(uint32_t aiFlags, MobileObject* pmob) {
         bBeenAttacked = false;
         eUseItem = POTYPE_NONE;
         fEquippedWeight = 0.0f;
-        bCheckMagicNode = 0;
+        bCheckMagicNode = false;
         pCurrentWeaponEffect = nullptr;
         fAlphaMult = 1.0f;
         fScriptRefractPower = 0.0f;
@@ -5176,7 +5194,7 @@ void MiddleHighProcess::Revert(uint32_t aiFlags, MobileObject* pmob) {
         fEssentialDownTimer = 0.0f;
         bPickPocketed = false;
         bDoneClothesChange = false;
-        bRefreshMagicShaderEffects = 0;
+        bRefreshMagicShaderEffects = false;
         bRefreshMagicShaderEffectBody = false;
         bRefreshMagicShaderEffectWeapon = false;
         bRefreshMagicShaderEffectLoading = 0;
@@ -5279,7 +5297,7 @@ void MiddleHighProcess::RefreshMagicShaderEffects(Actor* apActor) {
         }
     }
     if (bRefreshMagicShaderEffectWeapon) {
-        SetWeaponEnchantmentVisuals(0);
+        SetWeaponEnchantmentVisuals(nullptr);
         if (apActor->pCurrentProcess) {
             BaseProcess* pProcess = apActor->pCurrentProcess;
             if (pProcess->GetCurrentWeapon()) {
@@ -5301,7 +5319,7 @@ void MiddleHighProcess::RefreshMagicShaderEffects(Actor* apActor) {
                 }
             }
         }
-        bool bcreated = 0;
+        bool bcreated = false;
         TESEffectShader* v4 = GetWeaponEnchantmentVisuals();
         MagicShaderHitEffect* pweapEffect = ReferenceProcessLists.FindAndCleanupWeaponShaderHitEffect(apActor, v4);
         if (pweapEffect) {
@@ -5317,16 +5335,16 @@ void MiddleHighProcess::RefreshMagicShaderEffects(Actor* apActor) {
                     pweapEffect_2 = ::new (apMemory) MagicShaderHitEffect(apActor, v5, -1.0f);
                 }
                 else {
-                    pweapEffect_2 = 0;
+                    pweapEffect_2 = nullptr;
                 }
-                pweapEffect_2->bWeaponEnchantment = 1;
+                pweapEffect_2->bWeaponEnchantment = true;
                 if (bRefreshMagicShaderEffectLoading) {
                     pweapEffect_2->SetLifeTime(100.0f);
                 }
                 if (pweapEffect_2->Init()) {
                     ReferenceProcessLists.AddTempEffect(pweapEffect_2);
                     if (!bRefreshMagicShaderEffectLoading) {
-                        bcreated = 1;
+                        bcreated = true;
                     }
                 }
             }
@@ -5339,7 +5357,7 @@ void MiddleHighProcess::RefreshMagicShaderEffects(Actor* apActor) {
                     if (pinventory) {
                         if (pinventory->pEffectData != peffect_3) {
                             delete pinventory;
-                            pinventory = 0;
+                            pinventory = nullptr;
                         }
                     }
                     if (!pinventory) {
@@ -5350,10 +5368,10 @@ void MiddleHighProcess::RefreshMagicShaderEffects(Actor* apActor) {
                             pinventory_2 = ::new (v12) MagicShaderHitEffect(pPlayer, peffect_3, -1.0f);
                         }
                         else {
-                            pinventory_2 = 0;
+                            pinventory_2 = nullptr;
                         }
                         pinventory = pinventory_2;
-                        pinventory_2->bWeaponEnchantment = 1;
+                        pinventory_2->bWeaponEnchantment = true;
                         pPlayer->SetInventoryWeaponEffect(pinventory_2);
                         if (!bcreated) {
                             pinventory_2->SetLifeTime(100.0f);
@@ -5363,22 +5381,22 @@ void MiddleHighProcess::RefreshMagicShaderEffects(Actor* apActor) {
                 else {
                     if (pinventory) {
                         delete pinventory;
-                        pinventory = 0;
-                        pPlayer->SetInventoryWeaponEffect(0);
+                        pinventory = nullptr;
+                        pPlayer->SetInventoryWeaponEffect(nullptr);
                     }
                 }
                 if (pinventory) {
                     if (!pinventory->Init()) {
                         delete pinventory;
-                        pPlayer->SetInventoryWeaponEffect(0);
+                        pPlayer->SetInventoryWeaponEffect(nullptr);
                     }
                 }
             }
         }
     }
-    bRefreshMagicShaderEffects = 0;
-    bRefreshMagicShaderEffectBody = 0;
-    bRefreshMagicShaderEffectWeapon = 0;
+    bRefreshMagicShaderEffects = false;
+    bRefreshMagicShaderEffectBody = false;
+    bRefreshMagicShaderEffectWeapon = false;
     bRefreshMagicShaderEffectLoading = 0;
 }
 
@@ -5414,7 +5432,7 @@ bool MiddleHighProcess::ShouldCheckFlare(BSSimpleList<ActiveEffect*>* apList, Ma
             uiFlareFlags |= MagicSystem::CheckEffectFlares(apList->m_item->GetEffectSetting());
             apList = apList->m_pkNext;
         }
-        bRefreshFlareFlags = 0;
+        bRefreshFlareFlags = false;
     }
     return MagicSystem::CheckFlareFlag(aeFlareType, uiFlareFlags);
 }
@@ -5449,7 +5467,7 @@ void MiddleHighProcess::AddAttachedArrow(ArrowProjectile* apArrow) {
                 v2 = ::new (v4) BSSimpleList<ArrowProjectile*>;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pAttachedArrowList = v2;
         }
@@ -5497,7 +5515,7 @@ void MiddleHighProcess::StoreDamageNodes(NiNode* apNode, BGSBodyPartData* apBody
                 plimbRoot = static_cast<NiNode*>(BSUtilities::GetObjectByName(apNode, pname));
             }
             else {
-                plimbRoot = 0;
+                plimbRoot = nullptr;
             }
             pDamageRootNode[pbp->GetPartType()] = plimbRoot;
         }
@@ -5506,7 +5524,7 @@ void MiddleHighProcess::StoreDamageNodes(NiNode* apNode, BGSBodyPartData* apBody
         pheadPart = apBodyPartData->GetBodyPart(BGSBodyPart::LIMB_HEAD_1);
     }
     else {
-        pheadPart = 0;
+        pheadPart = nullptr;
     }
     if (pheadPart) {
         if (pheadPart->GetTargetName()) {
@@ -5517,7 +5535,7 @@ void MiddleHighProcess::StoreDamageNodes(NiNode* apNode, BGSBodyPartData* apBody
         ptorsoPart = apBodyPartData->GetBodyPart(BGSBodyPart::LIMB_TORSO);
     }
     else {
-        ptorsoPart = 0;
+        ptorsoPart = nullptr;
     }
     if (ptorsoPart) {
         if (ptorsoPart->GetTargetName()) {
@@ -5555,35 +5573,36 @@ void MiddleHighProcess::SetSustainedFire(bool abValue) {
 void MiddleHighProcess::UpdateArmorWorn(Actor* apActor) {
     bool bwasWearingPA = bPowerArmorWorn;
     bool bwasWearingBP = bHasBackPackWorn;
-    bHeavyArmorWorn = 0;
-    bPowerArmorWorn = 0;
-    bPowerArmorHelmet = 0;
-    bHasBackPackWorn = 0;
+    bHeavyArmorWorn = false;
+    bPowerArmorWorn = false;
+    bPowerArmorHelmet = false;
+    bHasBackPackWorn = false;
     for (BSSimpleList<ItemChange*>* plist__pinventory = InventoryChanges::GetInventoryChanges(apActor)->pListofChanges;
          plist__pinventory &&
          (!plist__pinventory->IsEmpty() && (!bPowerArmorWorn || (!bPowerArmorHelmet || !bHasBackPackWorn)));
          plist__pinventory = plist__pinventory->m_pkNext) {
         ItemChange* pitem = plist__pinventory->m_item;
         TESBoundObject* pobj = pitem->pContainerObj;
-        if (pitem->GetWorn(0) && pobj->GetFormType() == ARMO_ID) {
+        if (pitem->GetWorn(false) && pobj->GetFormType() == ARMO_ID) {
             // The armor's TESBipedModelForm base, taken through a reference: there is deliberately no null test, as the
             // game does.
             TESBipedModelForm& rBiped = static_cast<TESObjectARMO&>(*pobj);
             if (rBiped.TESBipedModelForm::HasBackPack()) {
-                bHasBackPackWorn = 1;
+                bHasBackPackWorn = true;
             }
             if (rBiped.TESBipedModelForm::IsPowerArmor()) {
-                if (rBiped.TESBipedModelForm::FillsBipedSlot(BO_HAIR, 0, 0) ||
-                    rBiped.TESBipedModelForm::FillsBipedSlot(BO_HEAD, 0, 0)) {
-                    bPowerArmorHelmet = 1;
+                if (rBiped.TESBipedModelForm::FillsBipedSlot(BO_HAIR, false, nullptr) ||
+                    rBiped.TESBipedModelForm::FillsBipedSlot(BO_HEAD, false, nullptr)) {
+                    bPowerArmorHelmet = true;
                 }
                 else {
-                    bPowerArmorWorn = 1;
+                    bPowerArmorWorn = true;
                 }
             }
-            if (rBiped.TESBipedModelForm::IsHeavy() && !rBiped.TESBipedModelForm::FillsBipedSlot(BO_HAIR, 0, 0) &&
-                !rBiped.TESBipedModelForm::FillsBipedSlot(BO_HEAD, 0, 0)) {
-                bHeavyArmorWorn = 1;
+            if (rBiped.TESBipedModelForm::IsHeavy() &&
+                !rBiped.TESBipedModelForm::FillsBipedSlot(BO_HAIR, false, nullptr) &&
+                !rBiped.TESBipedModelForm::FillsBipedSlot(BO_HEAD, false, nullptr)) {
+                bHeavyArmorWorn = true;
             }
         }
     }
@@ -5594,7 +5613,7 @@ void MiddleHighProcess::UpdateArmorWorn(Actor* apActor) {
                 Animation* Animation_ = apActor->Actor::GetAnimation();
                 // Calls Character's biped getter directly on the actor, not through the virtual.
                 ForceWeaponDrawnSheathed(
-                    0, static_cast<Character*>(apActor)->Character::GetBiped(), Animation_, apActor
+                    false, static_cast<Character*>(apActor)->Character::GetBiped(), Animation_, apActor
                 );
             }
         }
@@ -5630,13 +5649,13 @@ void MiddleHighProcess::TryReserveProjectileClones(Actor* apActor) {
                     pcurrentWeapon = static_cast<TESObjectWEAP*>(GetCurrentWeapon()->pContainerObj);
                 }
                 else {
-                    pcurrentWeapon = 0;
+                    pcurrentWeapon = nullptr;
                 }
                 if (pammo) {
                     FormFlags = GetCurrentAmmo()->pContainerObj;
                 }
                 else {
-                    FormFlags = 0;
+                    FormFlags = nullptr;
                 }
                 if (pcurrentWeapon) {
                     if (FormFlags) {
@@ -5644,7 +5663,7 @@ void MiddleHighProcess::TryReserveProjectileClones(Actor* apActor) {
                             BGSProjectile* Projectile_ = pcurrentWeapon->GetProjectile(apActor);
                             int32_t icloneCount = Projectile_->GetPreCloneCount(pcurrentWeapon);
                             if (icloneCount > 0) {
-                                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(0));
+                                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
                                 TESModel* v5 = static_cast<TESModel*>(pcurrentWeapon->GetProjectile(apActor));
                                 const char* v3 = v5->GetModel();
                                 pModelLoader->FindModel(v3, spmodel);
@@ -5657,7 +5676,7 @@ void MiddleHighProcess::TryReserveProjectileClones(Actor* apActor) {
                                             v4 = ::new (v9) BSCloneReserver(spmodel.m_pObject->GetModel(), icloneCount);
                                         }
                                         else {
-                                            v4 = 0;
+                                            v4 = nullptr;
                                         }
                                         spReserveProjectileClones.operator=(v4);
                                     }
@@ -5690,7 +5709,7 @@ void MiddleHighProcess::DeferHideDismemberedLimb(
         plimb = ::new (apMemory) MiddleHighProcess::DeferredHideLimb;
     }
     else {
-        plimb = 0;
+        plimb = nullptr;
     }
     plimb_2 = plimb;
     plimb->fDismemberTimer = 0.0f;
@@ -5710,23 +5729,23 @@ void MiddleHighProcess::UpdateDeferredHideDismemberedLimbs(Actor* apActor, float
         ftimer = fExplodeLimbRemovalDelay.Float();
     }
     BSSimpleList<void*>* plist = &DeferredHideLimbList;
-    BSSimpleList<void*>* plastlist = 0;
+    BSSimpleList<void*>* plastlist = nullptr;
     while (plist && !plist->IsEmpty()) {
         MiddleHighProcess::DeferredHideLimb* plimb = static_cast<MiddleHighProcess::DeferredHideLimb*>(plist->m_item);
-        bool bremove = 0;
+        bool bremove = false;
         if (!plimb->spDismemberedLimbRoot.m_pObject ||
             (plimb->spDismemberedLimbRoot.m_pObject->m_uiRefCount <= 1 ||
              (plimb->spReplacementLimb.m_pObject && plimb->spReplacementLimb.m_pObject->m_uiRefCount <= 1))) {
-            bremove = 1;
+            bremove = true;
         }
         plimb->fDismemberTimer = plimb->fDismemberTimer + afDeltaTime;
         if (!bremove && ftimer < static_cast<double>(plimb->fDismemberTimer)) {
-            apActor->FillBoneArray(plimb->spDismemberedLimbRoot.m_pObject, 0);
+            apActor->FillBoneArray(plimb->spDismemberedLimbRoot.m_pObject, false);
             bool bExplosion = plimb->bExplosion;
             NiNode* v4 = plimb->spReplacementLimb.m_pObject;
             NiNode* v3 = plimb->spDismemberedLimbRoot.m_pObject;
             apActor->HideDismemberedLimb(plimb->eLimbIndex, v3, v4, bExplosion);
-            bremove = 1;
+            bremove = true;
         }
         if (bremove) {
             if (plimb) {
@@ -5896,7 +5915,7 @@ void MiddleHighProcess::CheckCachedValueFlags(Actor* apActor) {
 void MiddleHighProcess::ProcessEscort(Actor* apActor) {
     NiPoint3 v38;
     NiPoint3 v40;
-    Script* v65 = 0;
+    Script* v65 = nullptr;
     TESPackage* pPack = GetPackageThatIsRunning();
     if (!pTarget) {
         SetTargetForPackage(apActor);
@@ -5911,10 +5930,10 @@ void MiddleHighProcess::ProcessEscort(Actor* apActor) {
             return;
         }
     }
-    bool bIsActor = 0;
+    bool bIsActor = false;
     if (pTarget) {
         if (pTarget->IsActor() && pTarget != apActor) {
-            bIsActor = 1;
+            bIsActor = true;
             Actor* pact = dynamic_cast<Actor*>(pTarget);
             BaseProcess* CurrentAIProcess = pact->pCurrentProcess;
             TESPackage* prun = CurrentAIProcess->GetCurrentPackage();
@@ -5929,7 +5948,7 @@ void MiddleHighProcess::ProcessEscort(Actor* apActor) {
     const NiPoint3* v3 = &apActor->GetLocationOnReference();
     NiPoint3 distance = *v3 - *v21;
     float fwaitdistance = 0.0f;
-    Actor* ptarg = 0;
+    Actor* ptarg = nullptr;
     if (bIsActor) {
         const NiPoint3* v22 = &pTarget->GetLocationOnReference();
         const NiPoint3* v4 = &apActor->GetLocationOnReference();
@@ -5955,12 +5974,12 @@ void MiddleHighProcess::ProcessEscort(Actor* apActor) {
             }
         }
     }
-    if (pPack->pPackLoc && pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+    if (pPack->pPackLoc && pPack->IsActorAtLocation(apActor, false, -1.0f, false)) {
         if (!bIsActor) {
             ItemChange* pitem;
             pitem = apActor->GetItemBeingEscorted();
             if (pitem) {
-                ExtraDataList* plist = 0;
+                ExtraDataList* plist = nullptr;
                 if (pitem->pExtraObjectList) {
                     plist = pitem->pExtraObjectList->m_item;
                 }
@@ -5983,7 +6002,7 @@ void MiddleHighProcess::ProcessEscort(Actor* apActor) {
                     if (pitem->pExtraObjectList) {
                         plist = pitem->pExtraObjectList->m_item;
                     }
-                    const NiPoint3* ppoint = 0;
+                    const NiPoint3* ppoint = nullptr;
                     PackageLocation* ppackloc = pPack->pPackLoc;
                     if (ppackloc) {
                         TESObjectREFR* pref = ppackloc->GetLocReference();
@@ -6000,7 +6019,7 @@ void MiddleHighProcess::ProcessEscort(Actor* apActor) {
                         }
                     }
                     int32_t v9 = pPack->GetInitialTargetCount();
-                    apActor->DropObject(pitem->pContainerObj, plist, v9, ppoint, 0);
+                    apActor->DropObject(pitem->pContainerObj, plist, v9, ppoint, nullptr);
                 }
             }
             if (pitem) {
@@ -6040,7 +6059,7 @@ void MiddleHighProcess::ProcessEscort(Actor* apActor) {
         if (ptarg_2->IsPathingComplete()) {
             ptarg_2->EndMovement();
         }
-        CheckforNewPackage(apActor, 0);
+        CheckforNewPackage(apActor, false);
     }
     else {
         const NiPoint3* v12;
@@ -6064,7 +6083,7 @@ void MiddleHighProcess::ProcessEscort(Actor* apActor) {
                (ptarg->GetCurrentPackage() &&
                 (CurrentPackage = ptarg->GetCurrentPackage(), CurrentPackage->IsInterruptPackage())))) &&
              !apActor->IsPathingComplete())) {
-            SetCurrentMovementComplete(1);
+            SetCurrentMovementComplete(true);
             AddToProcedureIndexRunning(apActor, -1);
         }
         else {
@@ -6097,7 +6116,7 @@ void MiddleHighProcess::ProcessEscort(Actor* apActor) {
 void MiddleHighProcess::ProcessSleep(Actor* apActor) {
     if (apActor->IsNpc() && apActor->GetSitSleepState() == SIT_SLEEP_NORMAL && !pCurrentFurniture &&
         RefListChairBed.IsEmpty()) {
-        FindBedChairs(apActor, 0, 0);
+        FindBedChairs(apActor, false, nullptr);
     }
     if (apActor->GetSitSleepState() != SIT_SLEEP_IS_SLEEPING && apActor->IsNpc()) {
         if (!pCurrentFurniture) {
@@ -6128,31 +6147,31 @@ void MiddleHighProcess::ProcessSleep(Actor* apActor) {
         }
         SetTarget(pCurrentFurniture);
         if (pCurrentFurniture) {
-            ProcessActivate(apActor, 0);
+            ProcessActivate(apActor, false);
         }
         if (DidPathingFail(apActor)) {
-            pCurrentFurniture = 0;
+            pCurrentFurniture = nullptr;
             ClearFurnitureMarker();
         }
     }
     if ((apActor->IsNpc() && apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) ||
         (!pCurrentFurniture && RefListChairBed.IsEmpty())) {
-        SetCurrentActionComplete(1);
+        SetCurrentActionComplete(true);
         RefListChairBed.RemoveAll();
     }
-    SetupSpecialIdle(apActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
+    SetupSpecialIdle(apActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
 }
 
 void MiddleHighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
     GetPackageThatIsRunning();
     ItemChange* pfood = apActor->GetBestFoodItem();
     if (GetCurrentActionComplete()) {
-        SetupSpecialIdle(apActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
+        SetupSpecialIdle(apActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
     }
     else {
         if (apActor->IsNpc() && apActor->GetSitSleepState() == SIT_SLEEP_NORMAL && !pCurrentFurniture &&
             RefListChairBed.IsEmpty()) {
-            FindBedChairs(apActor, 1, apLocRef);
+            FindBedChairs(apActor, true, apLocRef);
         }
         if (apActor->IsNpc() && apActor->GetSitSleepState() != SIT_SLEEP_IS_SITTING) {
             if (!pCurrentFurniture) {
@@ -6184,7 +6203,7 @@ void MiddleHighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
             }
             SetTarget(pCurrentFurniture);
             if (pCurrentFurniture) {
-                ProcessActivate(apActor, 0);
+                ProcessActivate(apActor, false);
             }
             if (DidPathingFail(apActor)) {
                 ClearFurniture(apActor);
@@ -6192,17 +6211,17 @@ void MiddleHighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
         }
         if ((apActor->IsNpc() && apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING) ||
             (!pCurrentFurniture && RefListChairBed.IsEmpty())) {
-            ExtraDataList* pextra = 0;
+            ExtraDataList* pextra = nullptr;
             if (pfood) {
                 if (pfood->pExtraObjectList) {
                     pextra = pfood->pExtraObjectList->m_item;
                 }
-                apActor->Eat(pfood->pContainerObj, pextra, 1);
+                apActor->Eat(pfood->pContainerObj, pextra, true);
             }
-            SetCurrentActionComplete(1);
+            SetCurrentActionComplete(true);
             RefListChairBed.RemoveAll();
         }
-        SetupSpecialIdle(apActor, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
+        SetupSpecialIdle(apActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
         if ((apActor->GetMoveMode() & 1024) != 0) {
             apActor->SetWalkRunFlagDirty();
             apActor->ClearMoveMode(1024u);
@@ -6213,24 +6232,24 @@ void MiddleHighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
 void MiddleHighProcess::ProcessCombat(Actor* apActor) {
     int32_t iRoundAmound = static_cast<int32_t>(fCombatRoundAmount.Float());
     Actor* pTargetActor = dynamic_cast<Actor*>(pTarget);
-    bool bRoundDone = 0;
+    bool bRoundDone = false;
     if (pTargetActor && !pTargetActor->GetDisabled()) {
         void* pCell;
         BaseProcess* pProcess;
         if (((apActor->GetParentCell() && (pCell = apActor->GetParentCell(), pCell == pTargetActor->GetParentCell())) ||
-             apActor->GetDistanceFromReference(pTargetActor, 0, 0) < 300.0) &&
+             apActor->GetDistanceFromReference(pTargetActor, false, false) < 300.0) &&
             (pTargetActor->GetCurrentAIProcess() &&
              (pProcess = pTargetActor->GetCurrentAIProcess(),
               pProcess->GetProcessLevel() == PROCESS_TYPE_MIDDLE_HIGH))) {
-            while (iRoundAmound && !apActor->IsDead(0)) {
+            while (iRoundAmound && !apActor->IsDead(false)) {
                 apActor->PerformOneRoundofCombat();
                 pTargetActor = dynamic_cast<Actor*>(pTarget);
                 if (pTargetActor) {
-                    if (!pTargetActor->IsDead(0)) {
+                    if (!pTargetActor->IsDead(false)) {
                         BaseProcess* CurrentAIProcess = pTargetActor->GetCurrentAIProcess();
                         if (CurrentAIProcess->GetProcessLevel() == PROCESS_TYPE_MIDDLE_HIGH) {
                             pTargetActor->PerformOneRoundofCombat();
-                            bRoundDone = 1;
+                            bRoundDone = true;
                         }
                     }
                 }
@@ -6244,7 +6263,7 @@ void MiddleHighProcess::ProcessCombat(Actor* apActor) {
             }
         }
         else {
-            ProcessFollow(apActor, 1, 257, 0);
+            ProcessFollow(apActor, true, 257, false);
         }
     }
     else {
@@ -6255,7 +6274,7 @@ void MiddleHighProcess::ProcessCombat(Actor* apActor) {
 void MiddleHighProcess::ProcessAlarm(Actor* apActor) {
     AlarmPackage* ppack = static_cast<AlarmPackage*>(GetCurrentPackage());
     Actor* pactor = static_cast<Actor*>(ppack->GetPackageTarget()->GetTargReference());
-    bool bcombatflag = 0;
+    bool bcombatflag = false;
     if (ppack) {
         TESClass* Class = apActor->GetClass();
         if (Class->IsGuard()) {
@@ -6263,8 +6282,8 @@ void MiddleHighProcess::ProcessAlarm(Actor* apActor) {
         }
         else {
             for (Crime* pcrime : (&ppack->Crimes)->ItemsUntilNull()) {
-                uint32_t* v12 = 0;
-                Actor* pcrimeAct = 0;
+                uint32_t* v12 = nullptr;
+                Actor* pcrimeAct = nullptr;
                 TESObjectREFR* pcrimeRef = pcrime->pcrimetarget;
                 if (pcrimeRef) {
                     if (pcrimeRef->IsActor()) {
@@ -6285,21 +6304,23 @@ void MiddleHighProcess::ProcessAlarm(Actor* apActor) {
                 if (!bcombatflag) {
                     FIGHT_REACTION ereaction = FIGHT_REACTION_NEUTRAL;
                     if (pcrime->ecrime <= PackageNS::CRIME_TYPE_TRESPASS) {
-                        if (apActor->GetShouldAttackActor(pactor, 0, ereaction, 0)) {
-                            bcombatflag = 1;
+                        if (apActor->GetShouldAttackActor(pactor, false, ereaction, false)) {
+                            bcombatflag = true;
                         }
                     }
                     else {
                         if (pcrimeAct) {
-                            if (apActor->GetShouldAttackActor(pactor, 0, ereaction, 0)) {
-                                bcombatflag = 1;
+                            if (apActor->GetShouldAttackActor(pactor, false, ereaction, false)) {
+                                bcombatflag = true;
                             }
                         }
                     }
                 }
             }
             if (bcombatflag) {
-                EnterCombat(apActor, pactor, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);
+                EnterCombat(
+                    apActor, pactor, false, false, nullptr, false, false, false, 0, false, false, true, nullptr
+                );
             }
             else {
                 AddToProcedureIndexRunning(apActor, 3);
@@ -6309,14 +6330,14 @@ void MiddleHighProcess::ProcessAlarm(Actor* apActor) {
 }
 
 bool MiddleHighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
-    TESPackage* pPack = 0;
+    TESPackage* pPack = nullptr;
     pPack = GetPackageThatIsRunning();
     if (!pTarget || pTarget->GetDelete()) {
         SetTargetForPackage(apActor);
     }
     if (!pTarget) {
         AddToProcedureIndexRunning(apActor, 1);
-        return 0;
+        return false;
     }
     TESObjectREFR* pref = pPack->GetLocationReference(apActor);
     if (pref) {
@@ -6325,7 +6346,7 @@ bool MiddleHighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
             TESBoundObject* ObjectReference = pTarget->GetObjectReference();
             if (ObjectReference == pXMarkerHeading || (v4 = pTarget->GetObjectReference(), v4 == pXMarker)) {
                 SetActionHeadTrackTarget(pref);
-                return 1;
+                return true;
             }
         }
     }
@@ -6333,28 +6354,28 @@ bool MiddleHighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
         AddToProcedureIndexRunning(apActor, -1);
     }
     DoorTeleportData* pTel = pTarget->GetTeleport();
-    bool batRef = 0;
+    bool batRef = false;
     if (pTel) {
         const NiPoint3* v9 = &apActor->GetLocationOnReference();
         const NiPoint3* LinkedDoorTeleportPosition = &pTarget->GetLinkedDoorTeleportPosition();
         NiPoint3 dist = *LinkedDoorTeleportPosition - *v9;
         double flength = dist.Length();
         if (static_cast<double>(iAIDistanceRadiusMinLocation.Int()) >= flength) {
-            batRef = 1;
+            batRef = true;
         }
     }
     else {
         if (pTarget->IsFurniture() && apActor->GetSitSleepState()) {
-            batRef = 1;
+            batRef = true;
         }
         else {
             if (pTarget->IsFurniture() &&
                 (apActor->GetSitSleepState() == SIT_SLEEP_NORMAL &&
-                 (pTarget->GetMarkerUsed(cCurrentFurnitureIndex, 1) && !apActor->IsPathingComplete()))) {
+                 (pTarget->GetMarkerUsed(cCurrentFurnitureIndex, true) && !apActor->IsPathingComplete()))) {
                 ClearFurniture(apActor);
                 EndMoveMessage(apActor);
-                SetTarget(0);
-                return 0;
+                SetTarget(nullptr);
+                return false;
             }
             batRef = pPack->IsActorAtRefTarget(apActor, 0);
         }
@@ -6363,22 +6384,22 @@ bool MiddleHighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
         if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
             apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
             apActor->InitiateGetUpPackage();
-            return 1;
+            return true;
         }
         if (apActor->IsPathingComplete()) {
             if (pTarget->GetTeleport()) {
                 if (pTarget->IsFurniture()) {
                     NiPoint3 point = apActor->GetLocationOnReference();
                     uint32_t iindex = 0;
-                    if (!pTarget->GetClosestFreeMarker(point, 1, 1, FurnitureMarker, iindex, 1)) {
+                    if (!pTarget->GetClosestFreeMarker(point, true, true, FurnitureMarker, iindex, true)) {
                         ClearFurniture(apActor);
                         EndMoveMessage(apActor);
-                        SetTarget(0);
-                        return 0;
+                        SetTarget(nullptr);
+                        return false;
                     }
                     TESWorldSpace* WorldSpace = pTarget->GetWorldSpace();
                     if (!SetupPathFinding(apActor, FurnitureMarker.Position, pTarget->GetParentCell(), WorldSpace)) {
-                        return 0;
+                        return false;
                     }
                     cCurrentFurnitureIndex = iindex;
                 }
@@ -6387,7 +6408,7 @@ bool MiddleHighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                     TESObjectCELL* ParentCell = pTarget->GetParentCell();
                     NiPoint3 v27 = pTarget->GetLinkedDoorTeleportPosition();
                     if (!SetupPathFinding(apActor, v27, ParentCell, v11)) {
-                        return 0;
+                        return false;
                     }
                 }
             }
@@ -6395,7 +6416,7 @@ bool MiddleHighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                 TESWorldSpace* pworld = pTarget->GetWorldSpace();
                 TESObjectCELL* pcell = pTarget->GetParentCell();
                 if (!SetupPathFinding(apActor, pTarget->GetLocationOnReference(), pcell, pworld)) {
-                    return 0;
+                    return false;
                 }
             }
         }
@@ -6411,13 +6432,13 @@ bool MiddleHighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
             (void)ftimedelta;
             if (apActor->GetCurrentProcessType() != PROCESS_TYPE_MIDDLE_HIGH ||
                 apActor->GetDesiredProcessLevel() != PROCESS_TYPE_MIDDLE_HIGH) {
-                return 0;
+                return false;
             }
             batRef = pPack->IsActorAtRefTarget(apActor, 0);
         }
     }
     if (!batRef && !DidPathingFail(apActor)) {
-        return 0;
+        return false;
     }
     if (!apActor->IsPathingComplete()) {
         EndMoveMessage(apActor);
@@ -6425,7 +6446,7 @@ bool MiddleHighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
     TESPackage* v7 = GetCurrentPackage();
     if (v7->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE && DidPathingFail(apActor)) {
         apActor->EndDialogue();
-        return 0;
+        return false;
     }
     if (abInterateindex) {
         TESObjectREFR* pobj = pTarget;
@@ -6437,8 +6458,8 @@ bool MiddleHighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
                 if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
                     apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
                     AddToProcedureIndexRunning(apActor, 1);
-                    SetTargetActivated(1);
-                    return 1;
+                    SetTargetActivated(true);
+                    return true;
                 }
                 if (!iAnimActionSuccess) {
                     goto LABEL_66;
@@ -6447,10 +6468,11 @@ bool MiddleHighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
             }
             else {
                 if (pAcquireObject) {
-                    pTarget->Activate(apActor, 1, pAcquireObject->pObject, 1);
+                    pTarget->Activate(apActor, true, pAcquireObject->pObject, 1);
                 }
                 else {
-                    if (!pTarget->IsActor() && !pTarget->Activate(apActor, 1, 0, 1) && pPack->GetMustComplete()) {
+                    if (!pTarget->IsActor() && !pTarget->Activate(apActor, true, nullptr, 1) &&
+                        pPack->GetMustComplete()) {
                         AddToProcedureIndexRunning(apActor, -1);
                     }
                 }
@@ -6467,25 +6489,25 @@ bool MiddleHighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
             if (pTarget->IsFurniture()) {
                 if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
                     apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
-                    SetTargetActivated(1);
-                    return 1;
+                    SetTargetActivated(true);
+                    return true;
                 }
                 if (!iAnimActionSuccess) {
                 LABEL_66:;
                     AddToProcedureIndexRunning(apActor, 1);
-                    pGenericLocation = 0;
+                    pGenericLocation = nullptr;
                     EndMoveMessage(apActor);
                     iAnimActionSuccess = 1;
-                    return 1;
+                    return true;
                 }
                 AlignToFurnitureAndAddPostAnimSitSleep(apActor);
             }
             else {
                 if (pAcquireObject) {
-                    pTarget->Activate(apActor, 0, pAcquireObject->pObject, 1);
+                    pTarget->Activate(apActor, false, pAcquireObject->pObject, 1);
                 }
                 else {
-                    pTarget->Activate(apActor, 0, 0, 1);
+                    pTarget->Activate(apActor, false, nullptr, 1);
                 }
             }
         }
@@ -6497,8 +6519,8 @@ bool MiddleHighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
     if (apThis) {
         apThis->Delete(1u);
     }
-    pAcquireObject = 0;
-    SetTarget(0);
+    pAcquireObject = nullptr;
+    SetTarget(nullptr);
     return DidPathingFail(apActor) == 0;
 }
 
@@ -6512,20 +6534,20 @@ void MiddleHighProcess::ProcessAcquire(Actor* apActor) {
         PackageTarget* ptarg = pPack->GetPackageTarget();
         if (pPack->GetPackType() == PACKAGE_TYPE_EXPLORE &&
             (ptarg && (ptarg->GetTargObjectType() == POTYPE_COMBATWEAR || ptarg->GetTargObjectType() == POTYPE_WEAR))) {
-            ProcessActivate(apActor, 1);
+            ProcessActivate(apActor, true);
             if (GetProcedureIndexRunning() > 1) {
                 if (ObjectList.IsEmpty()) {
                     AddToProcedureIndexRunning(apActor, 1);
                     if (apActor->IsNpc()) {
                         TESNPC* pnpc = dynamic_cast<TESNPC*>(apActor->GetObjectReference());
                         if (pnpc) {
-                            pnpc->InitDefaultWorn(apActor, 1, 1, 0, 1);
+                            pnpc->InitDefaultWorn(apActor, true, true, false, true);
                         }
                     }
                     else {
                         TESCreature* pcrea = dynamic_cast<TESCreature*>(apActor->GetObjectReference());
                         if (pcrea) {
-                            pcrea->InitDefaultWorn(apActor, 1, 1, 1);
+                            pcrea->InitDefaultWorn(apActor, true, true, true);
                         }
                     }
                 }
@@ -6548,7 +6570,7 @@ void MiddleHighProcess::ProcessAcquire(Actor* apActor) {
                 AddToProcedureIndexRunning(apActor, 1);
                 return;
             }
-            if (pPack->IsActorAtLocation(apActor, 0, -1.0f, 0) || pPack->GetPackType() == PACKAGE_TYPE_ESCORT) {
+            if (pPack->IsActorAtLocation(apActor, false, -1.0f, false) || pPack->GetPackType() == PACKAGE_TYPE_ESCORT) {
                 if (pPack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_EXPLORE_ACQUIRE_GENERIC) {
                     goto LABEL_57;
                 }
@@ -6582,14 +6604,14 @@ void MiddleHighProcess::ProcessAcquire(Actor* apActor) {
                     ProcessSteal(apActor);
                 }
                 else {
-                    ProcessActivate(apActor, 0);
+                    ProcessActivate(apActor, false);
                 }
             }
             else {
                 if (!pPack->GetPackageTarget() || pPack->GetPackageTarget()->GetTargReference() != pTarget) {
                     goto LABEL_22;
                 }
-                ProcessActivate(apActor, 1);
+                ProcessActivate(apActor, true);
             }
         }
         if (apActor->GetCurrentProcessType() == PROCESS_TYPE_MIDDLE_HIGH &&
@@ -6601,7 +6623,8 @@ void MiddleHighProcess::ProcessAcquire(Actor* apActor) {
                 }
             }
             else {
-                if (!pPack->IsActorAtLocation(apActor, 0, -1.0f, 0) && pPack->GetPackType() != PACKAGE_TYPE_ESCORT) {
+                if (!pPack->IsActorAtLocation(apActor, false, -1.0f, false) &&
+                    pPack->GetPackType() != PACKAGE_TYPE_ESCORT) {
                     goto LABEL_59;
                 }
                 if (pPack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_EXPLORE_ACQUIRE_GENERIC) {
@@ -6619,7 +6642,7 @@ void MiddleHighProcess::ProcessFleeNonCombat(Actor* apActor) {
     if (!pTarget) {
         SetTargetForPackage(apActor);
     }
-    SetLocationForPackage(apActor, 0);
+    SetLocationForPackage(apActor, false);
     float fradius = 0.0f;
     if (ppackage->GetPackageTarget()) {
         fradius = static_cast<float>(ppackage->GetPackageTarget()->iValue);
@@ -6627,9 +6650,9 @@ void MiddleHighProcess::ProcessFleeNonCombat(Actor* apActor) {
     else {
         fradius = static_cast<float>(ppackage->GetLocationRadius(apActor));
     }
-    if (pTarget && static_cast<double>(fradius) < apActor->GetDistanceFromReference(pTarget, 0, 0)) {
-        apActor->InitiateFlee(apActor, 1, 1, 1, 0, 0, -1.0f, -1.0f);
-        FleePackage* v8 = 0;
+    if (pTarget && static_cast<double>(fradius) < apActor->GetDistanceFromReference(pTarget, false, false)) {
+        apActor->InitiateFlee(apActor, true, true, true, nullptr, nullptr, -1.0f, -1.0f);
+        FleePackage* v8 = nullptr;
         TESPackage* ppackage_2 = GetPackageThatIsRunning();
         FleePackage* pPack = dynamic_cast<FleePackage*>(ppackage_2);
         Actor* pact = dynamic_cast<Actor*>(pTarget);
@@ -6640,7 +6663,7 @@ void MiddleHighProcess::ProcessFleeNonCombat(Actor* apActor) {
         }
     }
     else {
-        if (pTarget || ppackage->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+        if (pTarget || ppackage->IsActorAtLocation(apActor, false, -1.0f, false)) {
             if (!apActor->IsPathingComplete()) {
                 EndMoveMessage(apActor);
             }
@@ -6654,7 +6677,7 @@ void MiddleHighProcess::ProcessFleeNonCombat(Actor* apActor) {
                 SetupPathFinding(apActor, point, pcell, WorldSpace);
             }
             else {
-                SetActorsAnimation(apActor, 513, 1);
+                SetActorsAnimation(apActor, 513, true);
             }
         }
     }
@@ -6669,10 +6692,10 @@ void MiddleHighProcess::ProcessSandBox(Actor* apActor) {
         bool batloc = pdata->UpdateIsActorAtLocation(apActor, fradius);
         TESObjectREFR* ploc = pdata->pLocation;
         float farbitraryRadiusPadding = 150.0f;
-        bool bneedToRepath = 0;
+        bool bneedToRepath = false;
         if (ploc && pdata->pCurrentTargetObject) {
-            bneedToRepath =
-                fradius + farbitraryRadiusPadding < ploc->GetDistanceFromReference(pdata->pCurrentTargetObject, 0, 0);
+            bneedToRepath = fradius + farbitraryRadiusPadding <
+                ploc->GetDistanceFromReference(pdata->pCurrentTargetObject, false, false);
             if (bneedToRepath) {
                 pdata->ForgetTargetAndPickProcedure(apActor, ppack);
             }
@@ -6687,20 +6710,20 @@ void MiddleHighProcess::ProcessSandBox(Actor* apActor) {
                         TESObjectCELL* plocintcell = pathLoc->GetCell();
                         if (plocintcell) {
                             if (!plocintcell->GetInterior()) {
-                                plocintcell = 0;
+                                plocintcell = nullptr;
                             }
                         }
                         TESWorldSpace* psandboxWorld = ploc->GetWorldSpace();
                         TESObjectCELL* psandboxIntCell = ploc->GetParentCell();
                         if (psandboxIntCell) {
                             if (!psandboxIntCell->GetInterior()) {
-                                psandboxIntCell = 0;
+                                psandboxIntCell = nullptr;
                             }
                         }
-                        bool bsamespace = 0;
+                        bool bsamespace = false;
                         if (psandboxIntCell || plocintcell) {
                             if (psandboxIntCell == plocintcell) {
-                                bsamespace = 1;
+                                bsamespace = true;
                             }
                         }
                         else {
@@ -6731,16 +6754,16 @@ void MiddleHighProcess::ProcessSandBox(Actor* apActor) {
                 TESWorldSpace* WorldSpace = ploc->GetWorldSpace();
                 TESObjectCELL* ParentCell = ploc->GetParentCell();
                 const NiPoint3* v5 = &ploc->GetLocationOnReference();
-                apActor->BuildRequest(&request, *v5, ParentCell, WorldSpace, fradius_4, 0);
+                apActor->BuildRequest(&request, *v5, ParentCell, WorldSpace, fradius_4, nullptr);
             }
             else {
                 TESWorldSpace* LocationWorld = ppack->GetLocationWorld(apActor);
                 TESObjectCELL* LocationCell = ppack->GetLocationCell(apActor);
                 apActor->BuildRequest(
-                    &request, ppack->GetLocationCoord(apActor), LocationCell, LocationWorld, fradius_4, 0
+                    &request, ppack->GetLocationCoord(apActor), LocationCell, LocationWorld, fradius_4, nullptr
                 );
             }
-            request.SetSoftGoalRadius(0);
+            request.SetSoftGoalRadius(false);
             apActor->SetPathfindingGoal(&request);
             pdata->eState = SandBoxActorPackageData::SANDBOX_STATE_GETTING_UP;
         }
@@ -6759,7 +6782,7 @@ void MiddleHighProcess::ProcessSandBox(Actor* apActor) {
                         apActor->InitiateGetUpPackage();
                     }
                     else {
-                        if (pdata->IsDoneWithIdleAnims(apActor, 1)) {
+                        if (pdata->IsDoneWithIdleAnims(apActor, true)) {
                             pdata->eState = SandBoxActorPackageData::SANDBOX_STATE_MOVING;
                         }
                     }
@@ -6820,8 +6843,8 @@ void MiddleHighProcess::ProcessSandBox(Actor* apActor) {
                                 TESWorldSpace* v16 = ploc_2->GetWorldSpace();
                                 TESObjectCELL* v13 = ploc_2->GetParentCell();
                                 const NiPoint3* v8 = &ploc_2->GetLocationOnReference();
-                                apActor->BuildRequest(&request_2, *v8, v13, v16, fradius_6, 0);
-                                request_2.SetSoftGoalRadius(0);
+                                apActor->BuildRequest(&request_2, *v8, v13, v16, fradius_6, nullptr);
+                                request_2.SetSoftGoalRadius(false);
                                 apActor->SetPathfindingGoal(&request_2);
                                 pdata->eState = SandBoxActorPackageData::SANDBOX_STATE_GETTING_UP;
                             }
@@ -6853,7 +6876,7 @@ void MiddleHighProcess::ProcessSandBox(Actor* apActor) {
                                 break;
                             }
                             case SANDBOX_PROCEDURE_WANDER: {
-                                ProcessWander(apActor, 0, -1.0f);
+                                ProcessWander(apActor, nullptr, -1.0f);
                                 break;
                             }
                             case SANDBOX_PROCEDURE_USE_IDLE_MARKER: {
@@ -6869,7 +6892,7 @@ void MiddleHighProcess::ProcessSandBox(Actor* apActor) {
                                 break;
                             }
                             default: {
-                                bprocedureValid = 0;
+                                bprocedureValid = false;
                                 break;
                             }
                         }
@@ -6881,7 +6904,7 @@ void MiddleHighProcess::ProcessSandBox(Actor* apActor) {
                         pdata->eState = SandBoxActorPackageData::SANDBOX_STATE_GETTING_UP;
                     }
                     if (apActor->IsPathing()) {
-                        SetActorsAnimation(apActor, 257, 1);
+                        SetActorsAnimation(apActor, 257, true);
                     }
                     break;
                 }
@@ -6913,7 +6936,7 @@ void MiddleHighProcess::ProcessMovementBlocked(Actor* apActor) {
     else {
         AddToProcedureIndexRunning(apActor, 1);
         TESPackage* pCurrPackage = CurrentPackage.pPackage;
-        pCurrPackage->SetIsCreated(1);
+        pCurrPackage->SetIsCreated(true);
     }
 }
 
@@ -6958,10 +6981,10 @@ void MiddleHighProcess::ProcessNotify(Actor* apActor) {
 bool MiddleHighProcess::CheckIfHasObject(Actor* apActor, int32_t ainumb) {
     PackageTarget* ptarg = GetPackageThatIsRunning()->GetPackageTarget();
     if (!ptarg) {
-        return 0;
+        return false;
     }
     PACK_TARG_TYPE etype = ptarg->GetTargType();
-    bool bdone = 0;
+    bool bdone = false;
     if (ptarg->GetTargType() && ptarg->GetTargType() != PTT_LINKEDREF) {
         if (etype == PTT_OBJECT) {
             TESBoundObject* TargObject = static_cast<TESBoundObject*>(ptarg->GetTargObject());
@@ -6969,7 +6992,7 @@ bool MiddleHighProcess::CheckIfHasObject(Actor* apActor, int32_t ainumb) {
         }
         else {
             PACKAGE_OBJECT_TYPE TargObjectType = ptarg->GetTargObjectType();
-            return apActor->HasObjects(0, TargObjectType, ainumb, 0, eUseItem);
+            return apActor->HasObjects(nullptr, TargObjectType, ainumb, 0, eUseItem);
         }
     }
     else {
@@ -6986,14 +7009,14 @@ bool MiddleHighProcess::CheckIfHasObject(Actor* apActor, int32_t ainumb) {
 }
 
 TESObjectREFR* MiddleHighProcess::GetTargetForPackage(Actor* apActor, TESPackage* apPackage) {
-    TESObjectREFR* preturntarget = 0;
+    TESObjectREFR* preturntarget = nullptr;
     bool v7 = apPackage == GetCurrentPackage();
     switch (apPackage->GetPackType()) {
         case PACKAGE_TYPE_FOLLOW:
         case PACKAGE_TYPE_ESCORT:
         case PACKAGE_TYPE_ACCOMPANY: {
             if (apPackage->IsTargetAnActor(apActor)) {
-                preturntarget = apPackage->GetEscortTargetForPackage(apActor, 0);
+                preturntarget = apPackage->GetEscortTargetForPackage(apActor, false);
             }
             break;
         }
@@ -7032,10 +7055,10 @@ TESObjectREFR* MiddleHighProcess::GetTargetForPackage(Actor* apActor, TESPackage
 
 TESObjectREFR* MiddleHighProcess::GetLocationForPackage(Actor* apActor, TESPackage* apPackage, bool bSecondLoc) {
     if (!apPackage) {
-        return 0;
+        return nullptr;
     }
-    PackageLocation* pLoc = 0;
-    TESObjectREFR* preturnlocationref = 0;
+    PackageLocation* pLoc = nullptr;
+    TESObjectREFR* preturnlocationref = nullptr;
     if (bSecondLoc) {
         pLoc = apPackage->GetPackageSecondLocation();
     }
@@ -7061,7 +7084,7 @@ TESObjectREFR* MiddleHighProcess::GetLocationForPackage(Actor* apActor, TESPacka
                     }
                     else {
                         if (etype == PLT_TYPE) {
-                            pObjectForLocation = 0;
+                            pObjectForLocation = nullptr;
                             eFormType = pLoc->GetLocObjectType();
                         }
                     }
@@ -7075,7 +7098,7 @@ TESObjectREFR* MiddleHighProcess::GetLocationForPackage(Actor* apActor, TESPacka
                         pCell, pointB, facquireDist, *v5, afRadius2, &EvaluateGenericLocation, apActor
                     );
                     eFormType = POTYPE_NONE;
-                    pObjectForLocation = 0;
+                    pObjectForLocation = nullptr;
                     for (BSSimpleList<TESObjectREFR*>* plist = &TempLocList; plist->m_item; plist->RemoveHead()) {
                         GenericLocationsList.AddHead(plist->m_item);
                     }
@@ -7101,41 +7124,41 @@ void MiddleHighProcess::EvaluateOrderAcquireList(Actor* apActor) {
         ballowBuying = ppack->SearchGetAllowBuying();
     }
     else {
-        ballowBuying = 0;
+        ballowBuying = false;
     }
     if (ppack) {
         ballowStealing = ppack->SearchGetAllowStealing();
     }
     else {
-        ballowStealing = 0;
+        ballowStealing = false;
     }
     if (ppack) {
         ballowKilling = ppack->SearchGetAllowKilling();
     }
     else {
-        ballowKilling = 0;
+        ballowKilling = false;
     }
     while (pRefItem && pRefItem->m_item) {
         ObjectstoAcquire* pObject = pRefItem->m_item;
         TESObjectREFR* pRef = pObject->pRef;
-        TESObjectREFR* pactor = 0;
+        TESObjectREFR* pactor = nullptr;
         bool v2 = pRef->IsActor();
-        Actor* bbuyit = v2 ? static_cast<Actor*>(pRef) : 0;
+        Actor* bbuyit = v2 ? static_cast<Actor*>(pRef) : nullptr;
         TESBoundObject* pObj = pObject->pObject;
         char v26 = 0;
-        bool badd = 1;
+        bool badd = true;
         if (bbuyit) {
             badd = !bbuyit->IsPlayerTeammate();
         }
         if (pRef->GetOwner() || pRef->IsActor()) {
-            bool bsteal = 0;
-            bool bkill = 0;
+            bool bsteal = false;
+            bool bkill = false;
             int32_t ivalue = TESValueForm::GetFormValue(pObj);
-            TESNPC* pnpc = 0;
-            if (!pRef->IsDead(0)) {
+            TESNPC* pnpc = nullptr;
+            if (!pRef->IsDead(false)) {
                 int32_t GoldAmount = apActor->GetGoldAmount();
                 if (GoldAmount >= ivalue) {
-                    Actor* pbuyactor = 0;
+                    Actor* pbuyactor = nullptr;
                     if (pRef->IsNpc()) {
                         pbuyactor = static_cast<Actor*>(pRef);
                     }
@@ -7143,7 +7166,7 @@ void MiddleHighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                         TESForm* Owner = pRef->GetOwner();
                         pnpc = dynamic_cast<TESNPC*>(Owner);
                         if (pnpc) {
-                            pbuyactor = ReferenceProcessLists.GetActorRefInHigh(pnpc, 0);
+                            pbuyactor = ReferenceProcessLists.GetActorRefInHigh(pnpc, false);
                         }
                     }
                     if (pbuyactor) {
@@ -7151,12 +7174,12 @@ void MiddleHighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                             int32_t v5 = apActor->GetGoldAmount();
                             if (v5 >= TESValueForm::GetFormValue(pObject->pObject)) {
                                 if (apActor->IsInCombat()) {
-                                    badd = 0;
+                                    badd = false;
                                 }
                                 else {
                                     pObject->eType = ACQUIRE_TYPE_BUY_NPC;
                                     uint32_t DistanceFromReference =
-                                        static_cast<int32_t>(apActor->GetDistanceFromReference(pRef, 0, 0));
+                                        static_cast<int32_t>(apActor->GetDistanceFromReference(pRef, false, false));
                                     pObject->iWantValue = DistanceFromReference;
                                     v26 = 1;
                                 }
@@ -7167,29 +7190,29 @@ void MiddleHighProcess::EvaluateOrderAcquireList(Actor* apActor) {
             }
             if (!v26 && (!bbuyit || !bbuyit->IsPlayerTeammate())) {
                 if (pRef->IsActor()) {
-                    if (pRef->IsDead(0)) {
-                        badd = 1;
+                    if (pRef->IsDead(false)) {
+                        badd = true;
                     }
                     else {
                         if (pRef->IsNpc()) {
                             pactor = pRef;
                             if (ballowStealing) {
-                                bsteal = 1;
+                                bsteal = true;
                             }
                             if (ballowKilling) {
-                                bkill = 1;
+                                bkill = true;
                             }
                         }
                     }
                 }
                 else {
                     if (ballowStealing) {
-                        bsteal = 1;
+                        bsteal = true;
                     }
                 }
                 if ((!bsteal && !bkill) || (bbuyit && bbuyit->IsPlayerTeammate())) {
                     if (apActor->IsCreature()) {
-                        badd = 0;
+                        badd = false;
                     }
                     else {
                         TESBoundObject* v7;
@@ -7198,13 +7221,13 @@ void MiddleHighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                              ((v7 = static_cast<TESBoundObject*>(pRef->GetOwner()),
                                v7 == apActor->GetObjectReference()) ||
                               apActor->bPlayerTeammate))) {
-                            badd = 0;
+                            badd = false;
                         }
                         else {
                             if (bbuyit) {
                                 if (!bbuyit->IsPlayerTeammate()) {
                                     pObject->eType = ACQUIRE_TYPE_KILL;
-                                    badd = 1;
+                                    badd = true;
                                 }
                             }
                         }
@@ -7214,7 +7237,7 @@ void MiddleHighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                     if (pRef->IsActor()) {
                         if (bsteal) {
                             if (apActor->IsInCombat()) {
-                                badd = 0;
+                                badd = false;
                             }
                             else {
                                 pObject->eType = ACQUIRE_TYPE_PICKPOCKET;
@@ -7223,7 +7246,7 @@ void MiddleHighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                         else {
                             if (bkill) {
                                 if (apActor->IsInCombat() || apActor->bPlayerTeammate) {
-                                    badd = 0;
+                                    badd = false;
                                 }
                                 else {
                                     if (!bbuyit || !bbuyit->IsPlayerTeammate()) {
@@ -7239,7 +7262,7 @@ void MiddleHighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                             pObject->eType = ACQUIRE_TYPE_PICKPOCKET;
                             if (!apActor->HasObjects(pLockpick, POTYPE_NONE, 1, 0, eUseItem)) {
                                 if (pRef->GetLock()) {
-                                    badd = 0;
+                                    badd = false;
                                 }
                             }
                         }
@@ -7253,11 +7276,11 @@ void MiddleHighProcess::EvaluateOrderAcquireList(Actor* apActor) {
             }
         }
         else {
-            double v8 = apActor->GetDistanceFromReference(pRef, 0, 0);
+            double v8 = apActor->GetDistanceFromReference(pRef, false, false);
             pObject->iWantValue = static_cast<int32_t>(v8);
         }
         if (badd) {
-            pObject->pRef->SetTargeted(1);
+            pObject->pRef->SetTargeted(true);
             ObjectList.AddTail(pObject);
         }
         else {
@@ -7279,30 +7302,30 @@ bool MiddleHighProcess::ProcessCombatOneHour(Actor* apActor, float afTimeDelta) 
     }
     Actor* ptarget = dynamic_cast<Actor*>(pTarget);
     if (pTarget && !pTarget->GetDisabled()) {
-        if (ptarget && (apActor->GetDistanceFromReference(ptarget, 0, 0) < 250.0 && ptarget->pCurrentProcess)) {
-            while (inumber && !apActor->IsDead(0)) {
+        if (ptarget && (apActor->GetDistanceFromReference(ptarget, false, false) < 250.0 && ptarget->pCurrentProcess)) {
+            while (inumber && !apActor->IsDead(false)) {
                 apActor->PerformOneRoundofCombat();
-                if (!ptarget->IsDead(0)) {
+                if (!ptarget->IsDead(false)) {
                     ptarget->PerformOneRoundofCombat();
                 }
                 --inumber;
             }
         }
         else {
-            ProcessFollowOneHour(apActor, 3600.0f, 0);
+            ProcessFollowOneHour(apActor, 3600.0f, false);
         }
         if (ptarget) {
-            if (!ptarget->IsDead(0)) {
+            if (!ptarget->IsDead(false)) {
                 BaseProcess* CurrentAIProcess = ptarget->pCurrentProcess;
                 CurrentAIProcess->ComputeLastTimeProcessed();
             }
         }
-        return 0;
+        return false;
     }
     else {
         apActor->StopCombat(ptarget);
-        apActor->EndInterruptPackage(0);
-        return 0;
+        apActor->EndInterruptPackage(false);
+        return false;
     }
 }
 
@@ -7328,7 +7351,7 @@ bool MiddleHighProcess::SetupPathFinding(
                           apActor->SetPathfindingGoal(aDestPoint, apDestIntCell, apDestWorld, (-0x1p+0f), nullptr));
     }
     apActor->InitiateGetUpPackage();
-    return (bool)0;
+    return false;
 }
 
 void MiddleHighProcess::ResetTarget() {
@@ -7423,7 +7446,7 @@ void MiddleHighProcess::ProcessBuyObject(Actor* apActor) {
         }
         if (pSeller) {
             int32_t iValue = TESValueForm::GetFormValue(pAcquireObject->pObject);
-            apActor->PayGoldToActor(apActor, static_cast<int32_t>(pAcquireObject->iamount * iValue));
+            apActor->PayGoldToActor(apActor, (pAcquireObject->iamount * iValue));
         }
         ExtraDataList* pExtra = nullptr;
         pExtra = pAcquireObject->pExtra;
@@ -7437,11 +7460,11 @@ void MiddleHighProcess::ProcessBuyObject(Actor* apActor) {
 }
 
 void MiddleHighProcess::ProcessSteal(Actor* apActor) {
-    ProcessActivate(apActor, (bool)0);
+    ProcessActivate(apActor, false);
 }
 
 void MiddleHighProcess::ProcessPickPocket(Actor* apActor) {
-    ProcessActivate(apActor, (bool)0);
+    ProcessActivate(apActor, false);
 }
 
 void MiddleHighProcess::ProcessDialogue(MobileObject* apActor) {
@@ -7458,10 +7481,10 @@ void MiddleHighProcess::ProcessDialogue(MobileObject* apActor) {
             if (CurrentPackage == apActor->GetCurrentPackage()) {
                 ActorStartedConversation->EndDialogue();
             }
-            SetCurrentActionComplete(0);
+            SetCurrentActionComplete(false);
         }
         else {
-            v5->Speak(0);
+            v5->Speak(false);
         }
     }
     else {
@@ -7481,15 +7504,15 @@ bool MiddleHighProcess::ProcessDialogueActivate(Actor* apActor) {
                     AddToProcedureIndexRunning(apActor, 1);
                 }
                 else {
-                    ProcessActivate(apActor, 1);
+                    ProcessActivate(apActor, true);
                 }
-                return 1;
+                return true;
             }
             else {
-                if (th_s->IsActorAtLocation(ActorStartedConversation, 0, -1.0f, 1) &&
-                    th_s->IsActorAtSecondLocation(a2, apActor, 0, -1.0f, 1)) {
+                if (th_s->IsActorAtLocation(ActorStartedConversation, false, -1.0f, true) &&
+                    th_s->IsActorAtSecondLocation(a2, apActor, false, -1.0f, true)) {
                     if (a2 == pPlayer) {
-                        apActor->Activate(a2, 0, 0, 1);
+                        apActor->Activate(a2, false, nullptr, 1);
                     }
                     else {
                         AddToProcedureIndexRunning(apActor, 2);
@@ -7499,26 +7522,26 @@ bool MiddleHighProcess::ProcessDialogueActivate(Actor* apActor) {
                     if (a2 == apActor && a2->IsActor()) {
                         if (a2 != pPlayer && !th_s->GetDialogueDoNotControlTarget()) {
                             BaseProcess* CurrentAIProcess = a2->pCurrentProcess;
-                            CurrentAIProcess->ProcessTravel(a2, 0, 0, -1, 1);
+                            CurrentAIProcess->ProcessTravel(a2, false, false, -1, true);
                         }
                     }
                     else {
-                        ProcessTravel(apActor, 0, 0, 257, 0);
+                        ProcessTravel(apActor, false, false, 257, false);
                     }
                 }
-                return 1;
+                return true;
             }
         }
         else {
             AddToProcedureIndexRunning(apActor, 3);
-            return 0;
+            return false;
         }
     }
     else {
         SetTargetForPackage(apActor);
         AddToProcedureIndexRunning(apActor, 3);
         apActor->InitiateDialogue(pPackage);
-        return 1;
+        return true;
     }
 }
 
@@ -7526,14 +7549,14 @@ bool MiddleHighProcess::ProcessUseFurniture(Actor* apActor, TESObjectREFR* apFur
     BSFaceGenAnimationData* faceAnimationData;
     GetPackageThatIsRunning();
     if ((!apFurniture) || (!apFurniture->IsFurniture())) {
-        return (bool)0;
+        return false;
     }
     if (pCurrentFurniture != apFurniture) {
         if (apActor->GetSitSleepState()) {
             if ((((int32_t)apActor->GetSitSleepState()) == 4) || (((int32_t)apActor->GetSitSleepState()) == 9)) {
                 apActor->InitiateGetUpPackage();
             }
-            return (bool)1;
+            return true;
         }
         pCurrentFurniture = apFurniture;
         ClearFurnitureMarker();
@@ -7547,10 +7570,10 @@ bool MiddleHighProcess::ProcessUseFurniture(Actor* apActor, TESObjectREFR* apFur
         if (!pTarget) {
             SetTarget(pCurrentFurniture);
         }
-        ProcessActivate(apActor, (bool)0);
+        ProcessActivate(apActor, false);
     }
     if (((int32_t)apActor->GetSitSleepState()) == v6) {
-        SetCurrentActionComplete((bool)1u);
+        SetCurrentActionComplete(true);
     }
     if (DidPathingFail(apActor)) {
         pCurrentFurniture = nullptr;
@@ -7559,18 +7582,18 @@ bool MiddleHighProcess::ProcessUseFurniture(Actor* apActor, TESObjectREFR* apFur
         (&FurnitureMarker)->SetPosition(NiPoint3_ZERO);
         EndMoveMessage(apActor);
         AddToProcedureIndexRunning(apActor, (int32_t)1u);
-        return (bool)0;
+        return false;
     }
     else {
         if (((int32_t)apActor->GetSitSleepState()) == 9) {
             faceAnimationData = apActor->GetFaceAnimationData();
             if (faceAnimationData) {
                 if (!faceAnimationData->GetDead()) {
-                    faceAnimationData->SetDead((bool)1, (bool)0);
+                    faceAnimationData->SetDead(true, false);
                 }
             }
         }
-        return (bool)1;
+        return true;
     }
 }
 
@@ -7585,7 +7608,7 @@ void MiddleHighProcess::ProcessRemoveWorn(Actor* apActor, bool bInterateindex, b
     uint8_t v10 = 1;
     if (pPackage) {
         if (((int32_t)pPackage->GetPackType()) == 4) {
-            bOnlyifClothes = (bool)1;
+            bOnlyifClothes = true;
             v12 = 0;
             v10 = 0;
         }
@@ -7594,11 +7617,11 @@ void MiddleHighProcess::ProcessRemoveWorn(Actor* apActor, bool bInterateindex, b
         }
     }
     if (bIsNPC) {
-        bIsNPC->InitDefaultWorn(apActor, v12, v10, bOnlyifClothes, 1);
+        bIsNPC->InitDefaultWorn(apActor, v12, v10, bOnlyifClothes, true);
     }
     else {
         if (bIsCreature) {
-            bIsCreature->InitDefaultWorn(apActor, v12, v10, 1);
+            bIsCreature->InitDefaultWorn(apActor, v12, v10, true);
         }
     }
     if (apActor) {
@@ -7643,8 +7666,8 @@ void MiddleHighProcess::ProcessPatrolStartTravelToNextRef(Actor* apActor, Patrol
         TESWorldSpace* WorldSpace = pref->GetWorldSpace();
         TESObjectCELL* ParentCell = pref->GetParentCell();
         const NiPoint3* v4 = &pref->GetLocationOnReference();
-        apActor->BuildRequest(&request, *v4, ParentCell, WorldSpace, fradius, 0);
-        request.SetSoftGoalRadius(0);
+        apActor->BuildRequest(&request, *v4, ParentCell, WorldSpace, fradius, nullptr);
+        request.SetSoftGoalRadius(false);
         if (bisIdleMarker || plocBound == pXMarkerHeading) {
             request.SetGoalAngleToFace((&pref->GetAngleOnReference())->z);
         }
@@ -7669,15 +7692,15 @@ void MiddleHighProcess::ProcessPatrolTravelingToNextRef(Actor* apActor, PatrolAc
         int32_t emoveMode = 257;
         TESPackage* pPack = GetPackageThatIsRunning();
         bool balwaysRun = pPack->GetAlwaysRun();
-        bool bcouldRun = 0;
+        bool bcouldRun = false;
         if (balwaysRun) {
-            float fcurrentDistance = apActor->GetDistanceFromReference(pref, 0, 0);
+            float fcurrentDistance = apActor->GetDistanceFromReference(pref, false, false);
             float ftooCloseToRun = 64.0f;
             bcouldRun = 64.0f < static_cast<double>(fcurrentDistance);
             if (64.0f < static_cast<double>(fcurrentDistance)) {
-                float fdistance = pPack->GetPackageRadiusActorToLocation(apActor, 0);
+                float fdistance = pPack->GetPackageRadiusActorToLocation(apActor, false);
                 float v9 = fdistance + fdistance;
-                emoveMode = CalculateMoveMode(apActor, fcurrentDistance, fdistance, v9, 0, 0);
+                emoveMode = CalculateMoveMode(apActor, fcurrentDistance, fdistance, v9, false, false);
             }
         }
         SetActorsAnimation(apActor, emoveMode, bcouldRun);
@@ -7691,7 +7714,7 @@ void MiddleHighProcess::ProcessPatrolTravelingToNextRef(Actor* apActor, PatrolAc
         }
         return;
     }
-    bool bpauseAtWaypoint = 0;
+    bool bpauseAtWaypoint = false;
     TESPackage* pPack_2 = GetPackageThatIsRunning();
     if (pPack_2) {
         BGSIdleCollection* pidleCollection = pPack_2->pIdleCollection;
@@ -7725,7 +7748,7 @@ void MiddleHighProcess::ProcessPatrolTravelingToNextRef(Actor* apActor, PatrolAc
             }
         }
         float fradiusSrq = fradius * fradius;
-        bool bgoToNext = 0;
+        bool bgoToNext = false;
         if (bfinished) {
             goto LABEL_35;
         }
@@ -7739,7 +7762,7 @@ void MiddleHighProcess::ProcessPatrolTravelingToNextRef(Actor* apActor, PatrolAc
                 ftimeAtRef = PatrolRefData_->fTimeAtRef;
             }
             if (ftimeAtRef == 0.0) {
-                bgoToNext = 1;
+                bgoToNext = true;
             LABEL_35:;
                 if (bgoToNext || (!(fradiusSrq < static_cast<double>(fsqrLength)) || !(diff.z * diff.z < 32400.0))) {
                     ProcessPatrolStartAtRefBehavior(apActor, apData);
@@ -7765,12 +7788,12 @@ void MiddleHighProcess::ProcessPatrolStartAtRefBehavior(Actor* apActor, PatrolAc
         if (ptopic) {
             BaseProcess* pProcess = apActor->pCurrentProcess;
             if (!pProcess->GetGreetingFlag()) {
-                ProcessGreet(apActor, ptopic, 0, 0, 1, 0);
+                ProcessGreet(apActor, ptopic, false, false, true, false);
             }
         }
         Script* pscript = ppatrolRefData->GetOnPatrolScript();
         if (pscript) {
-            pscript->Run(apActor, 0, 0, 0);
+            pscript->Run(apActor, nullptr, nullptr, false);
         }
     }
 }
@@ -7779,7 +7802,7 @@ void MiddleHighProcess::ProcessPatrolAtRef(Actor* apActor, PatrolActorPackageDat
     NiPoint3 result;
     TESObjectREFR* CurrentReference = apData->GetCurrentReference();
     if (!CurrentReference) {
-        if (apData->SetNextReferenceForPatrol(1)) {
+        if (apData->SetNextReferenceForPatrol(true)) {
             ProcessPatrolStartTravelToNextRef(apActor, apData);
         }
         else {
@@ -7835,7 +7858,7 @@ void MiddleHighProcess::ProcessPatrolAtRef(Actor* apActor, PatrolActorPackageDat
     apData->fCurrentTimeAtReference = appTimer.GetSeconds() + apData->fCurrentTimeAtReference;
     if (DecalMinWidth <= static_cast<double>(apData->fCurrentTimeAtReference) &&
         !apActor->IsPlayingLowerBodySpecialIdle()) {
-        if (!apData->SetNextReferenceForPatrol(1)) {
+        if (!apData->SetNextReferenceForPatrol(true)) {
             AddToProcedureIndexRunning(apActor, 1);
             return;
         }
@@ -7931,18 +7954,18 @@ void MiddleHighProcess::LoadCharController(MobileObject* pmob) {
     NiPoint3 linearVelocity;
     bhkCharacterController* pcon = GetCharController();
     if (pcon) {
-        if (!pmob->IsDead(0)) {
+        if (!pmob->IsDead(false)) {
             pSaveLoadGameOLD->LoadGameDataOLD(&charState, 4u);
             pcon->SetTrueState(charState);
             pSaveLoadGameOLD->LoadGameDataOLD(&pcon->eWantState, 4u);
             pSaveLoadGameOLD->LoadGameDataOLD(&iflags, 4u);
             pcon->ClearFlag(0xFFFFFFFFu);
-            pcon->SetFlag(iflags, 1);
+            pcon->SetFlag(iflags, true);
             if ((iflags & 2048) != 0 && pSaveLoadGameOLD->GetCurrentVersion() >= 35u) {
                 pSaveLoadGameOLD->LoadGameDataOLD(&pos, 12u);
                 if (GetSitSleepState()) {
                     if (GetFurnitureMarker()) {
-                        MobileObject* pactor = 0;
+                        MobileObject* pactor = nullptr;
                         if (pmob->IsActor()) {
                             pactor = pmob;
                         }
@@ -7954,7 +7977,7 @@ void MiddleHighProcess::LoadCharController(MobileObject* pmob) {
                 pcon->SetPosition(pos);
             }
             if (GetSitSleepState() == SIT_SLEEP_NORMAL) {
-                pmob->SetChaseBip(0);
+                pmob->SetChaseBip(false);
             }
             pSaveLoadGameOLD->LoadGameDataOLD(&pcon->OutVelocity, 16u);
             pSaveLoadGameOLD->LoadGameDataOLD(&pcon->VelocityMod, 16u);
@@ -7989,7 +8012,7 @@ void MiddleHighProcess::SaveCharController(MobileObject* pmob) {
     NiPoint3 linearVelocity;
     bhkCharacterController* pcon = GetCharController();
     if (pcon) {
-        if (!pmob->IsDead(0)) {
+        if (!pmob->IsDead(false)) {
             charState = pcon->getState();
             pSaveLoadGameOLD->SaveGameDataOLD(&charState, 4u);
             pSaveLoadGameOLD->SaveGameDataOLD(&pcon->eWantState, 4u);
@@ -8027,13 +8050,13 @@ bool MiddleHighProcess::ReloadDynamicIdleOn1stPerson(Actor* apActor) {
     uint8_t bThirdPerson = (uint8_t)pPlayer->Is3rdPerson();
     if (static_cast<const void*>(apActor) == static_cast<const void*>(pPlayer)) {
         if (bThirdPerson) {
-            pPlayer->Force3rdPerson(0);
+            pPlayer->Force3rdPerson(false);
         }
         SetSitSleepState(apActor, SIT_SLEEP_LOAD_SIT_IDLE, pCurrentFurniture, cCurrentFurnitureIndex);
         apIdleForm = pIdleManager->GetIdleToPlay(apActor, pCurrentFurniture);
         SetSitSleepState(apActor, SIT_SLEEP_IS_SITTING, pCurrentFurniture, cCurrentFurnitureIndex);
         if (apIdleForm) {
-            animation = pPlayer->GetAnimation((bool)1);
+            animation = pPlayer->GetAnimation(true);
             if (animation) {
                 idleAnimGroupSection = apIdleForm->GetIdleAnimGroupSection();
                 animation->SpecialIdleReplace(
@@ -8042,7 +8065,7 @@ bool MiddleHighProcess::ReloadDynamicIdleOn1stPerson(Actor* apActor) {
             }
         }
         if (bThirdPerson) {
-            pPlayer->Force3rdPerson(1);
+            pPlayer->Force3rdPerson(true);
         }
     }
     return true;
@@ -8054,13 +8077,13 @@ void MiddleHighProcess::ClearReservation() {
     if (!pDataHandler->GetClearingData()) {
         if (pTarget) {
             if (((int32_t)iReservationSlot) >= 0) {
-                pTarget->SetMarkerReserved(iReservationSlot, 0);
-                iReservationSlot = (uint32_t)((-1));
+                pTarget->SetMarkerReserved(iReservationSlot, false);
+                iReservationSlot = (uint32_t)(-1);
             }
         }
         if (pCurrentFurniture) {
             if (!pSaveLoadGame->GetSaveGameLoading()) {
-                pCurrentFurniture->SetMarkerReserved(cCurrentFurnitureIndex, 0);
+                pCurrentFurniture->SetMarkerReserved(cCurrentFurnitureIndex, false);
             }
         }
     }
@@ -8076,7 +8099,7 @@ void MiddleHighProcess::MiddleHighCopy(MiddleHighProcess* apProcess) {
     apProcess->RunOncePackage.Copy(&RunOncePackage);
     lastSeenPostion = apProcess->lastSeenPostion;
     pAnimation = apProcess->pAnimation;
-    apProcess->pAnimation = 0;
+    apProcess->pAnimation = nullptr;
     if (pAnimation) {
         pAnimation->ClearGroup(AGS_MOVEMENT, 0.0f);
     }
@@ -8098,17 +8121,17 @@ void MiddleHighProcess::MiddleHighCopy(MiddleHighProcess* apProcess) {
     pWeaponBone = apProcess->pWeaponBone;
     bPickPocketed = apProcess->bPickPocketed;
     bDoneClothesChange = apProcess->bDoneClothesChange;
-    apProcess->pFireNode = 0;
-    apProcess->pWeapon = 0;
-    apProcess->pAmmo = 0;
-    apProcess->bWeaponGrenade = 0;
-    apProcess->bWeaponThrown = 0;
-    apProcess->bWeaponMine = 0;
+    apProcess->pFireNode = nullptr;
+    apProcess->pWeapon = nullptr;
+    apProcess->pAmmo = nullptr;
+    apProcess->bWeaponGrenade = false;
+    apProcess->bWeaponThrown = false;
+    apProcess->bWeaponMine = false;
     eUseItem = apProcess->eUseItem;
     fEquippedWeight = apProcess->fEquippedWeight;
     pLastIdlePlayed = apProcess->pLastIdlePlayed;
     for (void*& rpItem : apProcess->DeadDetectList.ItemsUntilNull()) {
-        DeadDetectList.AddHead(*reinterpret_cast<void**>(&rpItem));
+        DeadDetectList.AddHead(*(&rpItem));
     }
     for (QueuedItem*& rpItem : apProcess->pListItemstoEquipUnequip->ItemsUntilNull()) {
         QueuedItem* pitem_2;
@@ -8120,7 +8143,7 @@ void MiddleHighProcess::MiddleHighCopy(MiddleHighProcess* apProcess) {
                 v4 = ::new (v9) BSSimpleList<QueuedItem*>;
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             BSSimpleList<QueuedItem*>* v10 = v4;
             pListItemstoEquipUnequip = v4;
@@ -8131,7 +8154,7 @@ void MiddleHighProcess::MiddleHighCopy(MiddleHighProcess* apProcess) {
             pitem_2 = ::new (apMemory) QueuedItem;
         }
         else {
-            pitem_2 = 0;
+            pitem_2 = nullptr;
         }
         QueuedItem* v8 = pitem_2;
         QueuedItem* pitem_3 = pitem_2;
@@ -8151,7 +8174,7 @@ void MiddleHighProcess::MiddleHighCopy(MiddleHighProcess* apProcess) {
     cSitSleepState = apProcess->cSitSleepState;
     pCurrentFurniture = apProcess->pCurrentFurniture;
     if (pCurrentFurniture) {
-        pCurrentFurniture->SetTargeted(1);
+        pCurrentFurniture->SetTargeted(true);
     }
     cCurrentFurnitureIndex = apProcess->cCurrentFurnitureIndex;
     ourMemcpy(&FurnitureMarker, &apProcess->FurnitureMarker, sizeof(FurnitureMarker));
@@ -8181,7 +8204,7 @@ void MiddleHighProcess::MiddleHighCopy(MiddleHighProcess* apProcess) {
     pCurrentIdle = apProcess->pCurrentIdle;
     fPackageIdleTimer = apProcess->fPackageIdleTimer;
     pAttachedArrowList = apProcess->pAttachedArrowList;
-    apProcess->pAttachedArrowList = 0;
+    apProcess->pAttachedArrowList = nullptr;
     spWeaponPreload.operator=(apProcess->spWeaponPreload);
     spReserveProjectileClones.SetPointer_(&apProcess->spReserveProjectileClones);
     bIronSights = apProcess->bIronSights;
@@ -8208,7 +8231,7 @@ void MiddleHighProcess::ReparentWeapon(bool abDrawn, BipedAnim* apBiped, Animati
                 if (!pseq ||
                     (pseq->GetAnimGroup()->GetType() != ANIM_GROUP_EQUIP &&
                      pseq->GetAnimGroup()->GetType() != ANIM_GROUP_UNEQUIP)) {
-                    uint16_t sgroup = apActor->GetAnimGroup(egroup, pWeapon, pWeapon == 0, apAnim);
+                    uint16_t sgroup = apActor->GetAnimGroup(egroup, pWeapon, pWeapon == nullptr, apAnim);
                     if (TESAnimGroup::GetType(sgroup) == egroup) {
                         pseq = apAnim->PlayGroup(sgroup, ACTION_START, -1, AGS_NONE);
                         if (abDrawn) {
@@ -8218,7 +8241,7 @@ void MiddleHighProcess::ReparentWeapon(bool abDrawn, BipedAnim* apBiped, Animati
                 }
                 if (pseq) {
                     NiNode* p3d;
-                    if (apActor->TESObjectREFR::IsDead(0)) {
+                    if (apActor->TESObjectREFR::IsDead(false)) {
                         float a2 = pseq->m_fEndKeyTime;
                         pseq->SetOffset(a2);
                         float a2a = pseq->m_fEndKeyTime;
@@ -8229,7 +8252,7 @@ void MiddleHighProcess::ReparentWeapon(bool abDrawn, BipedAnim* apBiped, Animati
                         p3d = apBiped->root;
                     }
                     else {
-                        p3d = 0;
+                        p3d = nullptr;
                     }
                     NiNode* p3d_2 = p3d;
                     if (!p3d) {
@@ -8238,7 +8261,7 @@ void MiddleHighProcess::ReparentWeapon(bool abDrawn, BipedAnim* apBiped, Animati
                     if (p3d_2) {
                         if (!pweaponBone) {
                             if (pWeapon) {
-                                SetCurrentWeapon(pWeapon, p3d_2, 0);
+                                SetCurrentWeapon(pWeapon, p3d_2, false);
                                 pweaponBone = GetWeaponBone(apBiped);
                             }
                         }
@@ -8287,7 +8310,7 @@ void MiddleHighProcess::ClearFurnitureMarker() {
     if (!pSaveLoadGame->GetSaveGameLoading()) {
         if (pCurrentFurniture) {
             if (!pDataHandler->GetClearingData()) {
-                pCurrentFurniture->SetMarkerReserved(cCurrentFurnitureIndex, 0);
+                pCurrentFurniture->SetMarkerReserved(cCurrentFurnitureIndex, false);
             }
         }
     }
@@ -8304,7 +8327,7 @@ uint16_t MiddleHighProcess::GetCharControllerSaveSize(MobileObject* pmob) {
     int16_t v3 = 0;
     bhkCharacterController* v7 = GetCharController();
     if (v7) {
-        if (!pmob->IsDead((bool)0)) {
+        if (!pmob->IsDead(false)) {
             v4 = 12;
             if ((static_cast<bhkCharacterListener*>(v7)->GetFlag(0xFFFFFFFFu) & 2048) != 0) {
                 v4 = 24;
@@ -8327,13 +8350,13 @@ uint16_t MiddleHighProcess::GetCharControllerSaveSize(MobileObject* pmob) {
 
 bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
     float v59;
-    Script* v54 = 0;
+    Script* v54 = nullptr;
     TESPackage* pPack = GetPackageThatIsRunning();
     if (!pPack) {
-        return 0;
+        return false;
     }
     ItemChange* pitem = apActor->GetItemBeingEscorted();
-    bool bManyflag = 0;
+    bool bManyflag = false;
     if (!pitem) {
         uint32_t v3;
         if (!pTarget || (!pTarget->IsActor() && (v3 = pTarget->iFormID, !apActor->HasObjectId(v3)))) {
@@ -8345,7 +8368,7 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
                 if (!apActor->IsPathingComplete()) {
                     EndMoveMessage(apActor);
                 }
-                return 0;
+                return false;
             }
         }
     }
@@ -8353,21 +8376,21 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
         if (this->pAcquireObject) {
             if (this->pAcquireObject->pRef == apActor) {
                 pitem = apActor->GetInventoryItem(this->pAcquireObject->pObject, 0);
-                bManyflag = 1;
+                bManyflag = true;
             }
         }
     }
-    bool bIsActor = 0;
+    bool bIsActor = false;
     if (pTarget) {
         if (pTarget->IsActor() && pTarget != apActor) {
-            bIsActor = 1;
+            bIsActor = true;
             Actor* pact = dynamic_cast<Actor*>(pTarget);
             BaseProcess* CurrentAIProcess = pact->pCurrentProcess;
             TESPackage* prun = CurrentAIProcess->GetCurrentPackage();
             if (pTarget != pPlayer &&
                 (!prun || (prun->GetPackType() != PACKAGE_TYPE_FOLLOW && !prun->GetIsCreated()))) {
                 SetProcedureIndexRunning(0);
-                return 0;
+                return false;
             }
         }
     }
@@ -8378,7 +8401,7 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
         distance = *v5 - *v17;
     }
     float fwaitdistance = 0.0f;
-    TESObjectREFR* ptarg = 0;
+    TESObjectREFR* ptarg = nullptr;
     if (bIsActor) {
         ptarg = pTarget;
         fwaitdistance = 0.0f;
@@ -8401,7 +8424,7 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
             }
         }
     }
-    if (pPack->pPackLoc && pPack->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
+    if (pPack->pPackLoc && pPack->IsActorAtLocation(apActor, false, -1.0f, false)) {
         NiPoint3 ftargdistance;
         NiPoint3 fMydistance;
         if (!bIsActor) {
@@ -8410,7 +8433,7 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
             ppackloc = pPack->pPackLoc;
             ppacktarg_2 = pPack->GetPackageTarget();
             if (pitem) {
-                ExtraDataList* plist = 0;
+                ExtraDataList* plist = nullptr;
                 if (pitem->pExtraObjectList) {
                     plist = pitem->pExtraObjectList->m_item;
                 }
@@ -8433,7 +8456,7 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
                     if (pitem->pExtraObjectList) {
                         plist = pitem->pExtraObjectList->m_item;
                     }
-                    const NiPoint3* ppoint = 0;
+                    const NiPoint3* ppoint = nullptr;
                     if (ppackloc) {
                         TESObjectREFR* pref = ppackloc->GetLocReference();
                         if (!pref) {
@@ -8452,7 +8475,7 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
                     if (!ppacktarg_2->GetTargReference()) {
                         inumber = pPack->GetInitialTargetCount();
                     }
-                    apActor->DropObject(pitem->pContainerObj, plist, inumber, ppoint, 0);
+                    apActor->DropObject(pitem->pContainerObj, plist, inumber, ppoint, nullptr);
                 }
                 if (pitem) {
                     delete pitem;
@@ -8469,7 +8492,7 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
                         if (pAcquireObject) {
                             pAcquireObject->Delete(1u);
                         }
-                        this->pAcquireObject = 0;
+                        this->pAcquireObject = nullptr;
                         if (pcont && pcont->HasContainer()) {
                             int32_t v10 = pPack->GetInitialTargetCount();
                             apActor->PutItemInReference(pitem->pContainerObj, plist, pcont, v10, id);
@@ -8478,7 +8501,7 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
                             if (pitem->pExtraObjectList) {
                                 plist = pitem->pExtraObjectList->m_item;
                             }
-                            const NiPoint3* ppoint_2 = 0;
+                            const NiPoint3* ppoint_2 = nullptr;
                             if (ppackloc) {
                                 TESObjectREFR* pref_2 = ppackloc->GetLocReference();
                                 if (!pref_2) {
@@ -8497,42 +8520,42 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
                             if (!ppacktarg_2->GetTargReference()) {
                                 inumber_2 = pPack->GetInitialTargetCount();
                             }
-                            apActor->DropObject(pitem->pContainerObj, plist, inumber_2, ppoint_2, 0);
+                            apActor->DropObject(pitem->pContainerObj, plist, inumber_2, ppoint_2, nullptr);
                         }
                         if (pitem) {
                             delete pitem;
                         }
-                        pitem = 0;
+                        pitem = nullptr;
                     }
-                    bool abweararmor = 1;
-                    bool abwearweapon = 1;
+                    bool abweararmor = true;
+                    bool abwearweapon = true;
                     if (GetCurrentPackage()) {
                         TESPackage* v13 = GetCurrentPackage();
                         if (v13->GetForceUnequipWeapon()) {
-                            abwearweapon = 0;
+                            abwearweapon = false;
                         }
                     }
                     if (apActor->IsNpc()) {
                         TESNPC* pnpc = dynamic_cast<TESNPC*>(apActor->GetObjectReference());
                         if (pnpc) {
-                            pnpc->InitDefaultWorn(apActor, abweararmor, abwearweapon, 0, 1);
+                            pnpc->InitDefaultWorn(apActor, abweararmor, abwearweapon, false, true);
                         }
                     }
                     else {
                         TESCreature* pcrea = dynamic_cast<TESCreature*>(apActor->GetObjectReference());
                         if (pcrea) {
-                            pcrea->InitDefaultWorn(apActor, abweararmor, abwearweapon, 1);
+                            pcrea->InitDefaultWorn(apActor, abweararmor, abwearweapon, true);
                         }
                     }
                 }
-                SetCurrentActionComplete(1);
+                SetCurrentActionComplete(true);
             }
             AddToProcedureIndexRunning(apActor, 1);
         LABEL_108:;
             if (!apActor->IsPathingComplete()) {
                 EndMoveMessage(apActor);
             }
-            return 0;
+            return false;
         }
         double v14 = distance.Length();
         if (!(v59 >= v14)) {
@@ -8560,35 +8583,35 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
         if (ptarg_2->IsPathingComplete()) {
             ptarg_2->EndMovement();
         }
-        SetCurrentActionComplete(1);
-        CheckforNewPackage(apActor, 0);
-        return 0;
+        SetCurrentActionComplete(true);
+        CheckforNewPackage(apActor, false);
+        return false;
     }
     else {
         TESPackage* v16 = GetCurrentPackage();
-        int32_t idistance = static_cast<int32_t>(v16->GetPackageRadiusActorToRefTarget(apActor, 0));
+        int32_t idistance = static_cast<int32_t>(v16->GetPackageRadiusActorToRefTarget(apActor, false));
         if (pTarget) {
             if (pTarget->IsActor()) {
-                apActor->GetDistanceFromReference(pTarget, 0, 0);
+                apActor->GetDistanceFromReference(pTarget, false, false);
             }
         }
-        return 0;
+        return false;
     }
 }
 
 bool MiddleHighProcess::ProcessEatOneHour(Actor* apActor) {
     ItemChange* BestFoodItem = apActor->GetBestFoodItem();
     if (BestFoodItem) {
-        ExtraDataList* apExtraList = 0;
+        ExtraDataList* apExtraList = nullptr;
         if (BestFoodItem->GetExtraDataList()) {
             BSSimpleList<ExtraDataList*>* v2 = BestFoodItem->GetExtraDataList();
             apExtraList = v2->m_item;
         }
         TESBoundObject* FormFlags = BestFoodItem->pContainerObj;
-        apActor->Eat(FormFlags, apExtraList, 1);
+        apActor->Eat(FormFlags, apExtraList, true);
         AddToProcedureIndexRunning(apActor, 1);
     }
-    return 0;
+    return false;
 }
 
 bool MiddleHighProcess::ProcessActivateOneHour(Actor* apActor) {
@@ -8598,20 +8621,20 @@ bool MiddleHighProcess::ProcessActivateOneHour(Actor* apActor) {
     }
     if (!pTarget || pTarget->GetDelete()) {
         AddToProcedureIndexRunning(apActor, 1);
-        return 0;
+        return false;
     }
     if (ppack->GetPackType() == PACKAGE_TYPE_AMBUSH && !ppack->IsTargetAtLocation(apActor, 300)) {
         AddToProcedureIndexRunning(apActor, -1);
     }
     DoorTeleportData* pTel = pTarget->GetTeleport();
-    bool batRef = 0;
+    bool batRef = false;
     if (pTel) {
         NiPoint3 dist;
         const NiPoint3* v5 = &apActor->GetLocationOnReference();
         const NiPoint3* LinkedDoorTeleportPosition = &pTarget->GetLinkedDoorTeleportPosition();
         dist = *LinkedDoorTeleportPosition - *v5;
         if (dist.Length() <= 128.0) {
-            batRef = 1;
+            batRef = true;
         }
     }
     else {
@@ -8630,31 +8653,31 @@ bool MiddleHighProcess::ProcessActivateOneHour(Actor* apActor) {
             v3 = &pTarget->GetLocationOnReference();
         }
         NiPoint3 dest = *v3;
-        return 0;
+        return false;
     }
     if (pTarget == pPlayer && (pPlayer->IsSleepingorResting() && !pPlayer->btransporting)) {
-        pPlayer->SetSleeping(0, 1);
+        pPlayer->SetSleeping(0, true);
         AddToProcedureIndexRunning(apActor, -2);
-        return 0;
+        return false;
     }
     else {
         if (pTarget->IsActor()) {
             if (pTarget == pPlayer && (pPlayer->IsSleepingorResting() && !pPlayer->btransporting)) {
-                pPlayer->SetSleeping(0, 1);
+                pPlayer->SetSleeping(0, true);
                 AddToProcedureIndexRunning(apActor, -1);
-                return 0;
+                return false;
             }
             else {
-                SetTargetActivated(1);
+                SetTargetActivated(true);
                 AddToProcedureIndexRunning(apActor, 1);
-                return 1;
+                return true;
             }
         }
         else {
-            SetTargetActivated(1);
-            pTarget->Activate(apActor, 0, 0, 1);
+            SetTargetActivated(true);
+            pTarget->Activate(apActor, false, nullptr, 1);
             AddToProcedureIndexRunning(apActor, 1);
-            return 1;
+            return true;
         }
     }
 }
@@ -8663,12 +8686,12 @@ void MiddleHighProcess::AlignToFurnitureAndAddPostAnimSitSleep(Actor* apActor) {
     bool v5;
     if (apActor->CanMove()) {
         float afTargetAngle = FurnitureMarker.GetHeading();
-        v5 = !apActor->RequestRotate(afTargetAngle, 0);
+        v5 = !apActor->RequestRotate(afTargetAngle, false);
     }
     else {
         float Heading = FurnitureMarker.GetHeading();
         apActor->SetHeading(Heading);
-        v5 = 1;
+        v5 = true;
     }
     if (v5) {
         AddPostAnimationAction(POSTANIM_ACTION_SIT_SLEEP);
@@ -8677,10 +8700,10 @@ void MiddleHighProcess::AlignToFurnitureAndAddPostAnimSitSleep(Actor* apActor) {
 
 bool MiddleHighProcess::ShouldPickPackIdle(Actor* apActor) {
     if (GetPackageIdleDone()) {
-        return 0;
+        return false;
     }
     TESPackage* pPackage = GetPackageThatIsRunning();
-    bool v6 = 0;
+    bool v6 = false;
     uint32_t Count = pPackage->ePROCEDURE_TYPE;
     PROCEDURE Procedure_ = Procedure_Action[Count][GetProcedureIndexRunning()];
     if (Procedure_ == PROCEDURE_SANDBOX) {
@@ -8706,12 +8729,12 @@ bool MiddleHighProcess::ShouldPickPackIdle(Actor* apActor) {
         case PROCEDURE_DONE: {
             if (pPackage->ePROCEDURE_TYPE) {
                 if (apActor->IsPathingComplete()) {
-                    v6 = 1;
+                    v6 = true;
                 }
             }
             else {
-                if (pPackage->IsActorAtLocation(apActor, 0, -1.0f, 0)) {
-                    v6 = 1;
+                if (pPackage->IsActorAtLocation(apActor, false, -1.0f, false)) {
+                    v6 = true;
                 }
             }
             break;
@@ -8736,7 +8759,7 @@ void MiddleHighProcess::PickPackageIdles(Actor* apActor, bool abForceIdle) {
     Animation* pAnimData = apActor->GetAnimation();
     if (pPackage) {
         if (bPickPackIdle) {
-            abForceIdle = 1;
+            abForceIdle = true;
             fPackageIdleTimer = 0.0f;
         }
         if (ShouldPickPackIdle(apActor)) {
@@ -8748,9 +8771,9 @@ void MiddleHighProcess::PickPackageIdles(Actor* apActor, bool abForceIdle) {
                             fPackageIdleTimer = fPackageIdleTimer - appTimer.fDelta;
                         }
                         else {
-                            bPickPackIdle = 0;
+                            bPickPackIdle = false;
                             TESIdleForm* pLastIdle = pCurrentIdle;
-                            pCurrentIdle = 0;
+                            pCurrentIdle = nullptr;
                             BGSIdleCollection::PICK_TYPE ePick = pIdleCollection->GetPickType();
                             kArray_t kArray(10u);
                             uint32_t uiIdleCount = pIdleCollection->GetIdlesForActor(apActor, pTarget, &kArray);
@@ -8765,10 +8788,10 @@ void MiddleHighProcess::PickPackageIdles(Actor* apActor, bool abForceIdle) {
                                         }
                                         pCurrentIdle = kArray.GetAt(static_cast<int32_t>(iPackageIdleNumber));
                                         if (pPackage->GetOnBeginIdle() == pCurrentIdle) {
-                                            pCurrentIdle = 0;
+                                            pCurrentIdle = nullptr;
                                         }
                                         if (iPackageIdleNumber + 1 >= uiIdleCount && pIdleCollection->GetDoOnce()) {
-                                            SetPackageIdleDone(1);
+                                            SetPackageIdleDone(true);
                                         }
                                         fPackageIdleTimer = -1.0f;
                                     }
@@ -8788,17 +8811,19 @@ void MiddleHighProcess::PickPackageIdles(Actor* apActor, bool abForceIdle) {
                                         iPackageIdleNumber = uiIndex;
                                     }
                                     if (pPackage->GetOnBeginIdle() == pCurrentIdle) {
-                                        pCurrentIdle = 0;
+                                        pCurrentIdle = nullptr;
                                     }
                                     if (pCurrentIdle) {
                                         fPackageIdleTimer = 0.8f;
                                         if (pIdleCollection->GetDoOnce()) {
-                                            SetPackageIdleDone(1);
+                                            SetPackageIdleDone(true);
                                         }
                                     }
                                 }
                                 if (pCurrentIdle) {
-                                    SetupSpecialIdle(apActor, pCurrentIdle, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
+                                    SetupSpecialIdle(
+                                        apActor, pCurrentIdle, AnimIdle::PLAY_TYPE_AUTO, true, false, true
+                                    );
                                 }
                             }
                         }
@@ -8888,9 +8913,9 @@ uint8_t MiddleHighProcess::DidPathingFail(Actor* apActor) {
 TESObjectREFR* MiddleHighProcess::SetTargetData(Actor* apActor, TESPackage* apPackage, PackageTarget* ptarg) {
     NiPoint3 apResult;
     if (!apPackage || !ptarg) {
-        return 0;
+        return nullptr;
     }
-    TESObjectREFR* pLocationRef = 0;
+    TESObjectREFR* pLocationRef = nullptr;
     if (apPackage->GetPackType() != PACKAGE_TYPE_ESCORT && apPackage->pPackLoc) {
         pLocationRef = apPackage->pPackLoc->GetLocReference();
     }
@@ -8899,18 +8924,18 @@ TESObjectREFR* MiddleHighProcess::SetTargetData(Actor* apActor, TESPackage* apPa
     }
     if (ptarg->GetTargType() == PTT_REFERENCE) {
         TESObjectREFR* pref = ptarg->GetTargReference();
-        if (!pref || (!pref->IsDead(1) || apPackage->GetIsCreated())) {
+        if (!pref || (!pref->IsDead(true) || apPackage->GetIsCreated())) {
             return pref;
         }
-        apPackage->SetNeverRun(pref, 1);
-        return 0;
+        apPackage->SetNeverRun(pref, true);
+        return nullptr;
     }
     if (ptarg->GetTargType() != PTT_LINKEDREF) {
-        bool brebuiltList = 0;
-        while (1) {
+        bool brebuiltList = false;
+        while (true) {
             if (ObjectList.IsEmpty()) {
-                brebuiltList = 1;
-                bool bevalflag = 1;
+                brebuiltList = true;
+                bool bevalflag = true;
                 TESObjectCELL* pCell = apActor->GetParentCell();
                 NiPoint3 pointB = apActor->GetLocationOnReference();
                 PACK_TARG_TYPE etype = ptarg->GetTargType();
@@ -8954,7 +8979,7 @@ TESObjectREFR* MiddleHighProcess::SetTargetData(Actor* apActor, TESPackage* apPa
                 }
                 else {
                     if (etype == PTT_TYPE) {
-                        pObjecttoAcquire = 0;
+                        pObjecttoAcquire = nullptr;
                         eFormType = ptarg->GetTargObjectType();
                         eUseItem = eFormType;
                     }
@@ -8967,7 +8992,7 @@ TESObjectREFR* MiddleHighProcess::SetTargetData(Actor* apActor, TESPackage* apPa
                             if (pSpell) {
                                 pCurrentPackageSpell = pSpell;
                             }
-                            bevalflag = 0;
+                            bevalflag = false;
                             break;
                         }
                         case POTYPE_WEAP:
@@ -8978,7 +9003,7 @@ TESObjectREFR* MiddleHighProcess::SetTargetData(Actor* apActor, TESPackage* apPa
                             if (!apActor->IsInCombat()) {
                                 BuildMulitTargetObjectList(apActor, pLocationRef, eFormType);
                                 eUseItem = eFormType;
-                                bevalflag = 0;
+                                bevalflag = false;
                             }
                             break;
                         }
@@ -8987,7 +9012,7 @@ TESObjectREFR* MiddleHighProcess::SetTargetData(Actor* apActor, TESPackage* apPa
                         case POTYPE_SPELL_TOUCH:
                         case POTYPE_SPELL_SELF: {
                             eUseItem = eFormType;
-                            bevalflag = 0;
+                            bevalflag = false;
                             break;
                         }
                         default: {
@@ -9043,8 +9068,8 @@ TESObjectREFR* MiddleHighProcess::SetTargetData(Actor* apActor, TESPackage* apPa
                         );
                     }
                     eFormType = POTYPE_NONE;
-                    pObjecttoAcquire = 0;
-                    pFactiontoAquire = 0;
+                    pObjecttoAcquire = nullptr;
+                    pFactiontoAquire = nullptr;
                     EvaluateOrderAcquireList(apActor);
                 }
                 iNumberItemsActivate = apPackage->GetInitialTargetCount();
@@ -9061,14 +9086,14 @@ TESObjectREFR* MiddleHighProcess::SetTargetData(Actor* apActor, TESPackage* apPa
                     goto LABEL_84;
                 }
                 pownerform = pAcquireObject->pRef->GetOwner();
-                pnpc = 0;
+                pnpc = nullptr;
                 if (pownerform) {
                     if (pownerform->GetFormType() == NPC__ID) {
                         pnpc = static_cast<TESNPC*>(pownerform);
                     }
                 }
                 if (pnpc) {
-                    pacquireReference = (TESObjectREFR*)ReferenceProcessLists.GetActorRefInHigh(pnpc, 0);
+                    pacquireReference = (TESObjectREFR*)ReferenceProcessLists.GetActorRefInHigh(pnpc, false);
                 LABEL_84:;
                     if (!breserveRef) {
                         return pacquireReference;
@@ -9089,23 +9114,23 @@ TESObjectREFR* MiddleHighProcess::SetTargetData(Actor* apActor, TESPackage* apPa
                     if (pTarget == pacquireReference) {
                         return pacquireReference;
                     }
-                    int32_t ifreeMarker = pacquireReference->GetFirstFreeMarkerIndex(0);
+                    int32_t ifreeMarker = pacquireReference->GetFirstFreeMarkerIndex(false);
                     if (ifreeMarker >= 0) {
                         return pacquireReference;
                     }
                 }
             }
             if (pTarget || brebuiltList) {
-                return 0;
+                return nullptr;
             }
         }
     }
     TESObjectREFR* pref_2 = apActor->GetLinkedRef();
-    if (!pref_2 || (!pref_2->IsDead(1) || apPackage->GetIsCreated())) {
+    if (!pref_2 || (!pref_2->IsDead(true) || apPackage->GetIsCreated())) {
         return pref_2;
     }
-    apPackage->SetNeverRun(pref_2, 1);
-    return 0;
+    apPackage->SetNeverRun(pref_2, true);
+    return nullptr;
 }
 
 void MiddleHighProcess::FindBedChairs(Actor* apActor, bool abSit, TESObjectREFR* apRefLoc) {
@@ -9163,11 +9188,11 @@ void MiddleHighProcess::FindBedChairs(Actor* apActor, bool abSit, TESObjectREFR*
             }
             MiddleHighTempRefListChairBed.RemoveAll();
             BSSimpleList<void*>* pFirst = &RefListChairBed;
-            NiPlane* v24 = 0;
+            NiPlane* v24 = nullptr;
             int32_t iCount = pFirst->ItemsInList();
-            bool bSwappedItems = 1;
+            bool bSwappedItems = true;
             while (iCount && bSwappedItems) {
-                bSwappedItems = 0;
+                bSwappedItems = false;
                 for (BSSimpleList<void*>* pSecond = pFirst; pSecond; pSecond = pSecond->m_pkNext) {
                     void* pFirstData = pFirst->m_item;
                     void* pSecondData = pSecond->m_item;
@@ -9175,7 +9200,7 @@ void MiddleHighProcess::FindBedChairs(Actor* apActor, bool abSit, TESObjectREFR*
                         if (static_cast<TESObjectREFR*>(pSecondData)->GetOwner()) {
                             pFirst->SetItem(pSecondData);
                             pSecond->SetItem(pFirstData);
-                            bSwappedItems = 1;
+                            bSwappedItems = true;
                         }
                     }
                 }
@@ -9190,33 +9215,33 @@ void MiddleHighProcess::FindBedChairs(Actor* apActor, bool abSit, TESObjectREFR*
 bool MiddleHighProcess::EvaluateReferenceforSitSleep(TESObjectREFR* apRef, void* aiFilterData) {
     Actor* pActor = static_cast<Actor*>(aiFilterData);
     if (!aiFilterData) {
-        return 0;
+        return false;
     }
     if (!apRef ||
         (apRef->GetDelete() ||
          (apRef->GetTemporary() ||
-          (apRef->GetDisabled() || (pActor->IsChild(0) && !pActor->CanChildUseObject(apRef)))))) {
-        return 0;
+          (apRef->GetDisabled() || (pActor->IsChild(false) && !pActor->CanChildUseObject(apRef)))))) {
+        return false;
     }
     if (MiddleHighTempRefListChairBed.IsInList(apRef)) {
-        return 0;
+        return false;
     }
-    if (!apRef->IsFurniture() || !apRef->HasFreeMarker(0)) {
-        return 0;
+    if (!apRef->IsFurniture() || !apRef->HasFreeMarker(false)) {
+        return false;
     }
-    if (apRef->GetOwner() && !apRef->IsAnOwner(pActor, 1)) {
-        return 0;
+    if (apRef->GetOwner() && !apRef->IsAnOwner(pActor, true)) {
+        return false;
     }
     TESForm* Space = apRef->GetSpace();
     if (Space != pActor->GetSpace()) {
-        return 0;
+        return false;
     }
     TESFurniture* pFurniture = static_cast<TESFurniture*>(apRef->GetObjectReference());
     if ((HighProcess::bWantsToSit && pFurniture->CanSitOn()) ||
         (!HighProcess::bWantsToSit && pFurniture->CanSleepOn())) {
         MiddleHighTempRefListChairBed.AddHead(apRef);
     }
-    return 0;
+    return false;
 }
 
 void bhkCharacterController::SetSupportNormal(const hkVector4& arNormal) {
@@ -9252,7 +9277,7 @@ void QueuedItem::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
             ContainerChanges = pActor->m_Extra.GetContainerChanges();
         }
         else {
-            ContainerChanges = 0;
+            ContainerChanges = nullptr;
         }
         if (ContainerChanges) {
             apData = ContainerChanges->GetExtraDataListIndexForItem(pObject, pExtra);
@@ -9282,7 +9307,7 @@ void QueuedItem::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             pinventory = (&pactor->m_Extra)->GetContainerChanges();
         }
         else {
-            pinventory = 0;
+            pinventory = nullptr;
         }
         if (pinventory) {
             pExtra = pinventory->GetExtraDataListFromIndexForItem(pObject, apData);
@@ -9300,7 +9325,7 @@ void QueuedItem::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 bool QueuedItem::QueueFiles(Actor* apActor) {
     QueuedFile* v15;
     if (!apActor || !pObject) {
-        return 0;
+        return false;
     }
     if (!bEquip) {
         if (apActor->IsCreature() && pObject->GetFormType() == WEAP_ID) {
@@ -9309,7 +9334,7 @@ bool QueuedItem::QueueFiles(Actor* apActor) {
             Animation* panim_2 = CurrentAIProcess->GetAnimation();
             if (!panim_2 ||
                 (!panim_2->GetControllerManager() ||
-                 (v8 = TESAnimGroup::AnimGroup(AGM_NONE, AGW_HAND_TO_HAND, ANIM_GROUP_EQUIP, 0),
+                 (v8 = TESAnimGroup::AnimGroup(AGM_NONE, AGW_HAND_TO_HAND, ANIM_GROUP_EQUIP, false),
                   !panim_2->GroupLoaded(v8)))) {
                 QueuedFile* v12;
                 QueuedFile* v17 = static_cast<QueuedFile*>(ourMalloc(sizeof(QueuedFile)));
@@ -9317,31 +9342,31 @@ bool QueuedItem::QueueFiles(Actor* apActor) {
                     v12 = ::new (v17) QueuedFile(IO_TASK_PRIORITY_VERY_HIGH);
                 }
                 else {
-                    v12 = 0;
+                    v12 = nullptr;
                 }
                 spQueuedFiles = v12;
                 const char* Model_ = apActor->GetModel();
-                void* pfileList_2 = (void*)pModelLoader->BuildKFFileList(Model_, 1, 0, AGW_HAND_TO_HAND);
+                void* pfileList_2 = (void*)pModelLoader->BuildKFFileList(Model_, true, false, AGW_HAND_TO_HAND);
                 QueuedFile* v10 = spQueuedFiles.m_pObject;
                 pModelLoader->QueueKFList(
-                    static_cast<BSSimpleList<const char*>*>(pfileList_2), IO_TASK_PRIORITY_VERY_HIGH, v10, 0
+                    static_cast<BSSimpleList<const char*>*>(pfileList_2), IO_TASK_PRIORITY_VERY_HIGH, v10, nullptr
                 );
                 if (pfileList_2) {
                     delete static_cast<BSSimpleList<ActiveEffect*>*>(pfileList_2);
                 }
             }
         }
-        return 0;
+        return false;
     }
     if (pObject->GetFormType() != WEAP_ID && pObject->GetFormType() != ARMO_ID) {
-        return 0;
+        return false;
     }
     QueuedFile* apMemory = static_cast<QueuedFile*>(ourMalloc(sizeof(QueuedFile)));
     if (apMemory) {
         v15 = ::new (apMemory) QueuedFile(IO_TASK_PRIORITY_VERY_HIGH);
     }
     else {
-        v15 = 0;
+        v15 = nullptr;
     }
     spQueuedFiles = v15;
     QueuedFile* v3 = spQueuedFiles.m_pObject;
@@ -9355,21 +9380,21 @@ bool QueuedItem::QueueFiles(Actor* apActor) {
         if (!panim ||
             (!panim->GetControllerManager() ||
              (WeaponType = pweapon->GetWeaponType(),
-              (v5 = TESAnimGroup::AnimGroup(AGM_NONE, weaponToAnimGroupWeapon[WeaponType], ANIM_GROUP_EQUIP, 0),
+              (v5 = TESAnimGroup::AnimGroup(AGM_NONE, weaponToAnimGroupWeapon[WeaponType], ANIM_GROUP_EQUIP, false),
                !panim->GroupLoaded(v5))))) {
             ANIM_GROUP_WEAPON_ENUM v11 = weaponToAnimGroupWeapon[pweapon->GetWeaponType()];
             const char* v6 = apActor->GetModel();
-            void* pfileList = (void*)pModelLoader->BuildKFFileList(v6, 1, 0, v11);
+            void* pfileList = (void*)pModelLoader->BuildKFFileList(v6, true, false, v11);
             QueuedFile* v7 = spQueuedFiles.m_pObject;
             pModelLoader->QueueKFList(
-                static_cast<BSSimpleList<const char*>*>(pfileList), IO_TASK_PRIORITY_VERY_HIGH, v7, 0
+                static_cast<BSSimpleList<const char*>*>(pfileList), IO_TASK_PRIORITY_VERY_HIGH, v7, nullptr
             );
             if (pfileList) {
                 delete static_cast<BSSimpleList<ActiveEffect*>*>(pfileList);
             }
         }
     }
-    return 1;
+    return true;
 }
 
 void QueuedItem::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {

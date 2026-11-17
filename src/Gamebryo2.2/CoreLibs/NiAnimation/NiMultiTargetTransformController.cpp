@@ -265,7 +265,7 @@ bool NiMultiTargetTransformController::InterpolatorIsCorrectType(NiInterpolator*
 void NiMultiTargetTransformController::SetInterpolatorTarget(uint16_t usIndex, NiAVObject* pkTarget) {
     m_ppkTargets[usIndex] = pkTarget;
     if (pkTarget) {
-        pkTarget->NiAVObject::SetSelectiveUpdateTransformsOverride(1);
+        pkTarget->NiAVObject::SetSelectiveUpdateTransformsOverride(true);
     }
 }
 
@@ -273,7 +273,7 @@ void NiMultiTargetTransformController::RemoveNodeRecurse(NiAVObject* apNode) {
     if (apNode) {
         uint16_t InterpolatorTargetIndex = GetInterpolatorTargetIndex(apNode);
         if (InterpolatorTargetIndex != NiInterpController::INVALID_INDEX) {
-            SetInterpolatorTarget(InterpolatorTargetIndex, 0);
+            SetInterpolatorTarget(InterpolatorTargetIndex, nullptr);
         }
     }
     NiNode* v6 = apNode->IsNode();
@@ -300,7 +300,7 @@ uint16_t NiMultiTargetTransformController::GetInterpolatorTargetIndex(NiAVObject
             return i;
         }
     }
-    return (uint16_t)((-1));
+    return (uint16_t)(-1);
 }
 
 // Deletes m_pkBlendInterps and allocates a new array of m_usNumInterps NiBlendTransformInterpolator, holding a
@@ -368,7 +368,7 @@ void NiMultiTargetTransformController::CopyMembers(
 NiObject* NiMultiTargetTransformController::CreateObject() {
     void* pkObject = NiMemObject::operator new(sizeof(NiMultiTargetTransformController));
     if (!pkObject) {
-        return 0;
+        return nullptr;
     }
     return ::new (pkObject) NiMultiTargetTransformController;
 }

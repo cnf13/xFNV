@@ -107,7 +107,7 @@
 #include "SDK/MSVC/ehvec.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 // No code reads or writes these values.
 static bool data_1189626 = false;
@@ -279,7 +279,7 @@ PlaceableWaterGroup::PlaceableWaterGroup()
 PlaceableWaterGroup::~PlaceableWaterGroup() {
     spGroupReflectionSorter = static_cast<BSShaderAccumulator*>(nullptr);
     spDepthSorter = static_cast<BSShaderAccumulator*>(nullptr);
-    TES::pInstance->GetWaterSystem()->ClearReflectionTexturePointers(this, 1, 0);
+    TES::pInstance->GetWaterSystem()->ClearReflectionTexturePointers(this, true, false);
     if (pWaterType) {
         if (pWaterType->spNoiseNormalMap.m_pObject) {
             if (pWaterType->spNoiseNormalMap.m_pObject->m_uiRefCount == 2) {
@@ -309,7 +309,7 @@ TESWaterSystem::TESWaterSystem()
     spWaterNormalMap(nullptr), fBlendTimer(0.0f), ReflectionRefMap(37u), DepthRefMap(37u), WaterTypeUpdateMap(37u),
     WadingWaterMap(37u) {
     WaterShader::bDepth = TESWaterSystem::bUseWaterDepth.Bool();
-    WaterShaderProperty::bEnabled = 0;
+    WaterShaderProperty::bEnabled = false;
     if (!TESWaterSystem::GetWaterRoot()) {
         TESWaterSystem::spWaterRoot = new NiNode(0);
         NiNode* pObjectLODRoot = TES::pInstance->pObjRoot;
@@ -334,7 +334,7 @@ TESWaterSystem::TESWaterSystem()
 }
 
 TESWaterSystem::~TESWaterSystem() {
-    DisableWaterSystem(1, 1);
+    DisableWaterSystem(true, true);
     PlaceableWaterGroup::spSkyReflectionSorter = static_cast<BSShaderAccumulator*>(nullptr);
     TESWaterSystem::spWaterHeightShaderAccumulator = static_cast<BSShaderAccumulator*>(nullptr);
     if (PlaceableWaterGroup::spSkyReflectionMap.m_pObject) {
@@ -479,10 +479,10 @@ TESWaterSystem::FindWaterGroup(TESObjectREFR* apWaterRef, TESObjectREFR* apObjec
     NiPoint3 v12;
     NiPoint3 n(0.0f, 0.0f, 1.0f);
     NiPoint3 p = NiPoint3_ZERO;
-    TESWaterForm* pwatertype = 0;
+    TESWaterForm* pwatertype = nullptr;
     if (apWaterRef) {
         if (!apWaterRef->Get3D()) {
-            return 0;
+            return nullptr;
         }
         NiNode* v5 = apWaterRef->Get3D();
         n = (&v5->GetWorldTransform())->m_Rotate * n;
@@ -497,7 +497,7 @@ TESWaterSystem::FindWaterGroup(TESObjectREFR* apWaterRef, TESObjectREFR* apObjec
     }
     NiPlane reflplane(n, p);
     void* iter = (void*)PlaceableWaterGroupList.m_pkHead;
-    NiTListItem<PlaceableWaterGroup*>* next = 0;
+    NiTListItem<PlaceableWaterGroup*>* next = nullptr;
     while (iter) {
         next = PlaceableWaterGroupList.GetNextPos(static_cast<NiTListItem<PlaceableWaterGroup*>*>(iter));
         if (iter) {
@@ -529,7 +529,7 @@ TESWaterSystem::FindWaterGroup(TESObjectREFR* apWaterRef, TESObjectREFR* apObjec
         }
         iter = (void*)next;
     }
-    return 0;
+    return nullptr;
 }
 
 NiTriShapeData* TESWaterSystem::CreateQuadData(
@@ -550,7 +550,7 @@ NiTriShapeData* TESWaterSystem::CreateQuadData(
     NiPoint3 v66;
     NiPoint3 dst;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_WATER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 2988
+        MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 2988
     );
     void* ptr = ourMalloc(4 * sizeof(NiPoint3));
     if (ptr) {
@@ -558,7 +558,7 @@ NiTriShapeData* TESWaterSystem::CreateQuadData(
         vertices = static_cast<NiPoint3*>(ptr);
     }
     else {
-        vertices = 0;
+        vertices = nullptr;
     }
     if (vertices) {
         NiPoint2* textures;
@@ -581,7 +581,7 @@ NiTriShapeData* TESWaterSystem::CreateQuadData(
             textures = static_cast<NiPoint2*>(v62);
         }
         else {
-            textures = 0;
+            textures = nullptr;
         }
         if (textures) {
             uint16_t* indices = static_cast<uint16_t*>(_NiMalloc(6 * sizeof(uint16_t)));
@@ -593,7 +593,7 @@ NiTriShapeData* TESWaterSystem::CreateQuadData(
                 indices[3] = 0;
                 indices[4] = 2;
                 indices[5] = 3;
-                NiPoint3* normals_2 = 0;
+                NiPoint3* normals_2 = nullptr;
                 if (abNormals) {
                     NiPoint3* normals;
                     void* v57 = ourMalloc(4 * sizeof(NiPoint3));
@@ -602,7 +602,7 @@ NiTriShapeData* TESWaterSystem::CreateQuadData(
                         normals = static_cast<NiPoint3*>(v57);
                     }
                     else {
-                        normals = 0;
+                        normals = nullptr;
                     }
                     normals_2 = normals;
                     if (normals) {
@@ -612,7 +612,7 @@ NiTriShapeData* TESWaterSystem::CreateQuadData(
                         normals_2[3] = waterNormal;
                     }
                 }
-                NiColorA* pcolors_2 = 0;
+                NiColorA* pcolors_2 = nullptr;
                 if (abColors) {
                     NiColorA* pcolors;
                     void* v55 = ourMalloc(4 * sizeof(NiColorA));
@@ -621,7 +621,7 @@ NiTriShapeData* TESWaterSystem::CreateQuadData(
                         pcolors = static_cast<NiColorA*>(v55);
                     }
                     else {
-                        pcolors = 0;
+                        pcolors = nullptr;
                     }
                     pcolors_2 = pcolors;
                     if (pcolors) {
@@ -684,7 +684,7 @@ NiTriShapeData* TESWaterSystem::CreateQuadData(
                     );
                 }
                 else {
-                    data_2 = 0;
+                    data_2 = nullptr;
                 }
                 if (!data_2) {
                     ourFree(vertices);
@@ -698,16 +698,16 @@ NiTriShapeData* TESWaterSystem::CreateQuadData(
             else {
                 ourFree(vertices);
                 ourFree(textures);
-                return 0;
+                return nullptr;
             }
         }
         else {
             ourFree(vertices);
-            return 0;
+            return nullptr;
         }
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -837,7 +837,7 @@ void TESWaterSystem::UpdateLODWater(NiCamera* apCamera, bool abForceUpdate) {
         }
         else {
             NiTListItem<TESObjectREFR*>* pNextPos;
-            pLODWaterGroup->bRenderGroup = 0;
+            pLODWaterGroup->bRenderGroup = false;
             for (NiTListItem<TESObjectREFR*>* pPos = pLODWaterGroup->PlaceableWaterList.m_pkHead; pPos;
                  pPos = pNextPos) {
                 NiNode* p3D;
@@ -846,20 +846,20 @@ void TESWaterSystem::UpdateLODWater(NiCamera* apCamera, bool abForceUpdate) {
                 if ((pRef->Get3D() &&
                      ((p3D = pRef->Get3D(), !p3D->GetAppCulled()) && IsWaterNodeVisible(pRef, apCamera))) ||
                     abForceUpdate) {
-                    pLODWaterGroup->bRenderGroup = 1;
+                    pLODWaterGroup->bRenderGroup = true;
                     NiAVObject* pGeometry = GetWaterGeometry(pRef);
                     if (pGeometry) {
                         WaterShaderProperty* pWaterProp =
                             static_cast<WaterShaderProperty*>(pGeometry->GetProperty(NiProperty::SHADE));
                         if (TESWaterSystem::GetPlayerUnderwater()) {
-                            ClearReflectionTexturePointers(pLODWaterGroup, 0, 0);
+                            ClearReflectionTexturePointers(pLODWaterGroup, false, false);
                         }
                         else if (pWaterProp->bFullReflections) {
-                            PlaceableWaterGroup::bRenderWorldReflections = 1;
+                            PlaceableWaterGroup::bRenderWorldReflections = true;
                             pWaterProp->spReflectionMap = PlaceableWaterGroup::spWorldReflectionMap;
                         }
                         else {
-                            PlaceableWaterGroup::bRenderSkyReflections = 1;
+                            PlaceableWaterGroup::bRenderSkyReflections = true;
                             pWaterProp->spReflectionMap = PlaceableWaterGroup::spSkyReflectionMap;
                         }
                     }
@@ -1241,19 +1241,19 @@ bool TESWaterSystem::CheckUpdateActorsInWater() {
              iter = static_cast<NiTListItem<PlaceableWaterGroup*>*>(next)) {
             next = PlaceableWaterGroupList.GetNextPos(iter);
             if (ActorWithinRangeOfWadingWater(PlaceableWaterGroupList.Get(iter))) {
-                return 1;
+                return true;
             }
         }
     }
-    return 0;
+    return false;
 }
 
 void TESWaterSystem::UpdateActorsInWater() {
     TESObjectCELL* pCell = TES::pInstance->pInteriorCell;
     if (!pCell || pCell->HasWater()) {
-        bool bfoundActorInWater = 0;
+        bool bfoundActorInWater = false;
         void* iter = (void*)PlaceableWaterGroupList.m_pkHead;
-        void* v24 = 0;
+        void* v24 = nullptr;
         while (iter) {
             void* next =
                 (void*)PlaceableWaterGroupList.GetNextPos(static_cast<NiTListItem<PlaceableWaterGroup*>*>(iter));
@@ -1263,17 +1263,17 @@ void TESWaterSystem::UpdateActorsInWater() {
                 if (pgroup->bRenderGroup && !pgroup->ActorsInWaterList.IsEmpty() &&
                     ActorWithinRangeOfWadingWater(pgroup)) {
                     NiTListItem<Actor*>* actoriter = pgroup->ActorsInWaterList.m_pkHead;
-                    NiTListItem<Actor*>* actornext = 0;
+                    NiTListItem<Actor*>* actornext = nullptr;
                     while (actoriter) {
                         actornext = pgroup->ActorsInWaterList.GetNextPos(actoriter);
                         if (actoriter) {
-                            bfoundActorInWater = 1;
+                            bfoundActorInWater = true;
                             Actor* pActor = pgroup->ActorsInWaterList.Get(actoriter);
                             TESObjectCELL* pParentCell = pActor->pParentCell;
                             bool bDeep =
                                 pActor->IsPointDeepUnderWater(pActor->GetLocationOnReference(), pParentCell, 1.0f);
                             if (bDeep || !pActor->IsMoving()) {
-                                WadingWaterData* pdata_3 = 0;
+                                WadingWaterData* pdata_3 = nullptr;
                                 if (WadingWaterMap.GetAt(pActor, pdata_3)) {
                                     WadingWaterMap.RemoveAt(pActor);
                                 }
@@ -1291,7 +1291,7 @@ void TESWaterSystem::UpdateActorsInWater() {
                                 NiPoint3 v18 = pPlayer->GetLocationOnReference();
                                 NiPoint3 kPosition = pActor->GetLocationOnReference();
                                 kPosition.z = pgroup->ReflectWaterPlane.m_fConstant;
-                                WadingWaterData* pdata = 0;
+                                WadingWaterData* pdata = nullptr;
                                 if (!WadingWaterMap.GetAt(pActor, pdata)) {
                                     WadingWaterData* pdata_2;
                                     WadingWaterData* apMemory =
@@ -1300,7 +1300,7 @@ void TESWaterSystem::UpdateActorsInWater() {
                                         pdata_2 = ::new (apMemory) WadingWaterData;
                                     }
                                     else {
-                                        pdata_2 = 0;
+                                        pdata_2 = nullptr;
                                     }
                                     pdata = pdata_2;
                                     pdata->fLastPosition = kPosition;
@@ -1340,16 +1340,16 @@ void TESWaterSystem::UpdateWaterDisplacementSimulation() {
             if (pgroup_3->spWadingWaterGeometry.m_pObject) {
                 NiNode* WaterRoot = TESWaterSystem::GetWaterRoot();
                 WaterRoot->DetachChild(static_cast<NiAVObject*>(pgroup_3->spWadingWaterGeometry.m_pObject));
-                pgroup_3->spWadingWaterGeometry.operator=(static_cast<NiRefObject*>(0));
+                pgroup_3->spWadingWaterGeometry.operator=(static_cast<NiRefObject*>(nullptr));
             }
         }
         if (PlaceableWaterGroup::spWadingWaterHeightMap.m_pObject) {
             BSRenderedTexture* a1 = PlaceableWaterGroup::spWadingWaterHeightMap.m_pObject;
             BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
             TextureManager->ReturnRenderedTexture(a1);
-            PlaceableWaterGroup::spWadingWaterHeightMap.operator=(static_cast<BSRenderedTexture*>(0));
+            PlaceableWaterGroup::spWadingWaterHeightMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
         }
-        ImageSpaceEffectWaterDisplacement::bRanSimulationThisFrame = 0;
+        ImageSpaceEffectWaterDisplacement::bRanSimulationThisFrame = false;
     }
     else {
         NiPoint3 oldmeshpos;
@@ -1358,7 +1358,7 @@ void TESWaterSystem::UpdateWaterDisplacementSimulation() {
         }
         if (!PlaceableWaterGroup::spWadingWaterHeightMap.m_pObject) {
             PlaceableWaterGroup::spWadingWaterHeightMap.operator=(InitializeGreyTexture());
-            ImageSpaceEffectWaterDisplacement::bClearSimulation = 1;
+            ImageSpaceEffectWaterDisplacement::bClearSimulation = true;
         }
         NiRenderTargetGroup* Group = PlaceableWaterGroup::spWadingWaterHeightMap.m_pObject->GetGroup();
         BSRenderedTexture::StartOffscreen(6u, Group);
@@ -1369,7 +1369,7 @@ void TESWaterSystem::UpdateWaterDisplacementSimulation() {
             BSRenderedTexture::StopOffscreen();
         }
         NiTListItem<PlaceableWaterGroup*>* iter = PlaceableWaterGroupList.m_pkHead;
-        NiTListItem<PlaceableWaterGroup*>* next = 0;
+        NiTListItem<PlaceableWaterGroup*>* next = nullptr;
         PlaceableWaterGroup* pgroup = PlaceableWaterGroupList.Get(iter);
         while (iter && !pgroup->spWadingWaterGeometry.m_pObject) {
             next = PlaceableWaterGroupList.GetNextPos(iter);
@@ -1388,16 +1388,16 @@ void TESWaterSystem::UpdateWaterDisplacementSimulation() {
         NiPoint2 dir;
         dir.x = playerpos.x - oldmeshpos.x;
         dir.y = playerpos.y - oldmeshpos.y;
-        bool bupdate = 0;
+        bool bupdate = false;
         if (std::fabs(dir.x) > 4.0 || std::fabs(dir.y) > 4.0) {
-            bupdate = 1;
+            bupdate = true;
             float fX = playerpos.x / 4.0;
             playerpos.x = std::floor(fX) * 4.0;
             float fY = playerpos.y / 4.0;
             playerpos.y = std::floor(fY) * 4.0;
         }
         NiTListItem<PlaceableWaterGroup*>* iter_2 = PlaceableWaterGroupList.m_pkHead;
-        next = 0;
+        next = nullptr;
         while (iter_2) {
             next = PlaceableWaterGroupList.GetNextPos(iter_2);
             if (iter_2) {
@@ -1409,7 +1409,7 @@ void TESWaterSystem::UpdateWaterDisplacementSimulation() {
                     if (bupdate) {
                         pGeometry->NiAVObject::SetTranslate(playerpos);
                         UpdateData.~NiUpdateData();
-                        ::new (&UpdateData) NiUpdateData(0.0f, 0, 0);
+                        ::new (&UpdateData) NiUpdateData(0.0f, false, false);
                         pGeometry->NiAVObject::Update(UpdateData);
                     }
                     NiProperty* pprop = pGeometry->NiAVObject::GetProperty(3);
@@ -1437,16 +1437,16 @@ void TESWaterSystem::UpdateWaterDisplacementSimulation() {
             ImageSpaceEffectWaterDisplacement::fTextureOffset.x = 0.0f;
             ImageSpaceEffectWaterDisplacement::fTextureOffset.y = 0.0f;
         }
-        if (BSShaderManager::GetShaderLevel(0) >= BSShaderManager::BSSM_SV_2_0) {
-            ImageSpaceEffectWaterDisplacement::bWadingWater = 1;
+        if (BSShaderManager::GetShaderLevel(false) >= BSShaderManager::BSSM_SV_2_0) {
+            ImageSpaceEffectWaterDisplacement::bWadingWater = true;
             ImageSpaceEffectWaterDisplacement::WadingVariables.r = 0.4f;
             ImageSpaceEffectWaterDisplacement::WadingVariables.g = 0.6f;
             ImageSpaceEffectWaterDisplacement::WadingVariables.b = 0.985f;
             ImageSpaceEffectWaterDisplacement::WadingVariables.a = 0.01f;
             NiTMapItem<TESObjectREFR*, WadingWaterData*>* pos = WadingWaterMap.GetFirstPos();
             while (pos) {
-                WadingWaterData* pdata = 0;
-                TESObjectREFR* pref = 0;
+                WadingWaterData* pdata = nullptr;
+                TESObjectREFR* pref = nullptr;
                 WadingWaterMap.GetNext(pos, pref, pdata);
                 ImageSpaceEffectWaterDisplacement::fDisplaceOffset.Add(pdata->fDisplaceOffset);
                 ImageSpaceEffectWaterDisplacement::fLastDisplaceOffset.Add(pdata->fLastDisplaceOffset);
@@ -1455,16 +1455,16 @@ void TESWaterSystem::UpdateWaterDisplacementSimulation() {
                 fTimeSinceLastRipplePlaced = 0.0f;
             }
             else {
-                fTimeSinceLastRipplePlaced = BSShaderManager::GetTimer(1) + fTimeSinceLastRipplePlaced;
+                fTimeSinceLastRipplePlaced = BSShaderManager::GetTimer(true) + fTimeSinceLastRipplePlaced;
             }
             BSRenderedTexture* pTexture0 = PlaceableWaterGroup::spWadingWaterHeightMap.m_pObject;
             BSRenderedTexture* pTexture1 = PlaceableWaterGroup::spWadingWaterHeightMap.m_pObject;
             NiDX9Renderer* pRenderer = BSShaderManager::GetRenderer();
             ImageSpaceManager* ImageSpaceManager_ = BSShaderManager::GetImageSpaceManager();
             ImageSpaceManager_->RenderEffect(
-                ImageSpaceManager::EFFECT_WATER_DISPLACEMENT, pRenderer, pTexture1, pTexture0, 0, 1
+                ImageSpaceManager::EFFECT_WATER_DISPLACEMENT, pRenderer, pTexture1, pTexture0, nullptr, 1
             );
-            ImageSpaceEffectWaterDisplacement::bWadingWater = 0;
+            ImageSpaceEffectWaterDisplacement::bWadingWater = false;
         }
     }
 }
@@ -1523,7 +1523,7 @@ void TESWaterSystem::UpdateWaterSounds() {
             float tmpVal = nearRadius * 2.0 / (numPoints - 1.0);
             NiPoint3 testPt = NiPoint3_ZERO;
             NiPoint3 v64 = *pPlayer->QLocationOnReference();
-            TESObjectCELL* pcell = 0;
+            TESObjectCELL* pcell = nullptr;
             for (i = 0; numPoints > static_cast<double>(i); ++i) {
                 for (j = 0; numPoints > static_cast<double>(j); ++j) {
                     NiPoint3* v1;
@@ -1550,7 +1550,7 @@ void TESWaterSystem::UpdateWaterSounds() {
                         waterDirection.y = waterDirection.y + testPt.y;
                         if (TESWaterSystem::bDisplayWaterSoundPlacement) {
                             NiTriShape* ppoint =
-                                MakeTriPoint(10.0f, *::new (&apMemory) NiColorA(0.0f, 1.0f, 0.0f, 0.0f), 1);
+                                MakeTriPoint(10.0f, *::new (&apMemory) NiColorA(0.0f, 1.0f, 0.0f, 0.0f), true);
                             float uNearWaterRadiusa = afHeight;
                             float exteriorWaterHeight = currentCell->GetWaterHeight();
                             float v34 = BSMAX(exteriorWaterHeight, uNearWaterRadiusa) + 10.0;
@@ -1562,7 +1562,7 @@ void TESWaterSystem::UpdateWaterSounds() {
                     else {
                         if (TESWaterSystem::bDisplayWaterSoundPlacement) {
                             NiTriShape* ppoint_2 =
-                                MakeTriPoint(10.0f, *::new (&v47) NiColorA(0.0f, 0.0f, 1.0f, 0.0f), 1);
+                                MakeTriPoint(10.0f, *::new (&v47) NiColorA(0.0f, 0.0f, 1.0f, 0.0f), true);
                             float uNearWaterRadiusb = afHeight;
                             float exteriorWaterHeighta = currentCell->GetWaterHeight();
                             float v33 = BSMAX(exteriorWaterHeighta, uNearWaterRadiusb) + 10.0;
@@ -1617,12 +1617,12 @@ void TESWaterSystem::UpdateWaterSounds() {
                 playerloc.y = v13->y;
                 playerloc.z = v13->z + 10.0;
                 NiPoint3 soundloc(waterDirection.x, waterDirection.y, playerloc.z);
-                NiTriShape* ppoint_3 = MakeTriPoint(10.0f, *::new (&v44) NiColorA(1.0f, 0.0f, 0.0f, 0.0f), 1);
+                NiTriShape* ppoint_3 = MakeTriPoint(10.0f, *::new (&v44) NiColorA(1.0f, 0.0f, 0.0f, 0.0f), true);
                 ppoint_3->SetTranslate(soundloc);
                 TES::pInstance->AddTempDebugObject(ppoint_3, 10.0f);
                 NiLines* plines = MakeLine(
                     playerloc, *::new (&v42) NiColorA(1.0f, 1.0f, 0.0f, 0.0f), soundloc,
-                    *::new (&v43) NiColorA(1.0f, 1.0f, 0.0f, 0.0f), 1
+                    *::new (&v43) NiColorA(1.0f, 1.0f, 0.0f, 0.0f), true
                 );
                 TES::pInstance->AddTempDebugObject(plines, 10.0f);
             }
@@ -1636,7 +1636,7 @@ void TESWaterSystem::UpdateWaterSounds() {
             else {
                 if (!WaterSound.IsPlaying() && underwaterRatio > 0.0) {
                     bWaterSoundPlaying = 1;
-                    WaterSound.Play(1);
+                    WaterSound.Play(true);
                 }
             }
         }
@@ -1672,7 +1672,7 @@ void TESWaterSystem::UpdateWaterSounds() {
             }
         }
     }
-    TESWaterSystem::bDisplayWaterSoundPlacement = 0;
+    TESWaterSystem::bDisplayWaterSoundPlacement = false;
 }
 
 uint32_t TESWaterSystem::GetNearWaterRadius() {
@@ -1784,7 +1784,7 @@ void TESWaterSystem::RemoveTESObjectFromAllAutoWaterGroups(TESObjectREFR* apObje
             }
             if (bFound && pFoundPos) {
                 while (apObjectRef->QUnderwater()) {
-                    apObjectRef->SetUnderwater(0);
+                    apObjectRef->SetUnderwater(false);
                 }
                 if (apObjectRef->IsActor()) {
                     NiTListItem<Actor*>* pActorPos = static_cast<NiTListItem<Actor*>*>(pFoundPos);
@@ -1808,7 +1808,7 @@ bool TESWaterSystem::AddWaterRef(TESObjectREFR* apRef, NiPoint3* apPos, NiMatrix
     PlaceableWaterGroup* pNewGroup;
     // Tests the whole byte Setting::Bool returns, read here as the byte it is.
     if (!static_cast<uint8_t>(TESWaterSystem::bUseWater.Bool())) {
-        return 0;
+        return false;
     }
     NiPoint3 dst(0.0f, 0.0f, 1.0f);
     NiPoint3 kInvNormal(0.0f, 0.0f, -1.0f);
@@ -1820,9 +1820,9 @@ bool TESWaterSystem::AddWaterRef(TESObjectREFR* apRef, NiPoint3* apPos, NiMatrix
     NiPlane kInvPlane(kInvNormal, *apPos);
     TESBoundObject* pPlaceableWater = apRef->GetObjectReference();
     NiTListItem<PlaceableWaterGroup*>* kIter = PlaceableWaterGroupList.m_pkHead;
-    NiTListItem<PlaceableWaterGroup*>* pNextPos = 0;
-    NiTListItem<PlaceableWaterGroup*>* kLastIter = 0;
-    bool bAddedToGroup = 0;
+    NiTListItem<PlaceableWaterGroup*>* pNextPos = nullptr;
+    NiTListItem<PlaceableWaterGroup*>* kLastIter = nullptr;
+    bool bAddedToGroup = false;
     while (kIter) {
         pNextPos = PlaceableWaterGroupList.GetNextPos(kIter);
         if (kIter) {
@@ -1847,7 +1847,7 @@ bool TESWaterSystem::AddWaterRef(TESObjectREFR* apRef, NiPoint3* apPos, NiMatrix
                             NiNode* v5 = apRef->Get3D();
                             v5->SetTranslate(a2);
                             apRef->SetLocationOnReference(a2);
-                            NiUpdateData apMemory(0.0f, 0, 0);
+                            NiUpdateData apMemory(0.0f, false, false);
                             NiNode* v20 = apRef->Get3D();
                             v20->UpdateWorldData(apMemory);
                             if (apRef->GetParentCell()) {
@@ -1863,7 +1863,7 @@ bool TESWaterSystem::AddWaterRef(TESObjectREFR* apRef, NiPoint3* apPos, NiMatrix
                             );
                         }
                     }
-                    bAddedToGroup = 1;
+                    bAddedToGroup = true;
                     UpdateWaterShaderProperties(pGroup, apRef);
                     pGroup->PlaceableWaterList.AddHead(apRef);
                 }
@@ -1885,7 +1885,7 @@ bool TESWaterSystem::AddWaterRef(TESObjectREFR* apRef, NiPoint3* apPos, NiMatrix
             v18 = ::new (pGroupMemory) PlaceableWaterGroup;
         }
         else {
-            v18 = 0;
+            v18 = nullptr;
         }
         pNewGroup = v18;
         v18->ReflectWaterPlane = kPlane;
@@ -1905,14 +1905,14 @@ bool TESWaterSystem::AddWaterRef(TESObjectREFR* apRef, NiPoint3* apPos, NiMatrix
                 float x_4d = pNewGroup->ReflectWaterPlane.m_fConstant;
                 float xb = TES::pInstance->pWorldSpace->fLODWaterHeight;
                 if (BSUtilities::CompareFloat(xb, x_4d, 0.01f)) {
-                    pNewGroup->bGroupAtWorldSpaceWaterHeight = 1;
+                    pNewGroup->bGroupAtWorldSpaceWaterHeight = true;
                 }
             }
         }
     }
     EnableWaterSystem();
     ResetStencilBitRefs();
-    return 1;
+    return true;
 }
 
 // Adds placeable water apWaterRef to the water groups at its world position and rotation.
@@ -1926,18 +1926,18 @@ bool TESWaterSystem::AddPlaceableWater(TESObjectREFR* apWaterRef) {
 }
 
 bool TESWaterSystem::EnableWaterSystem() {
-    WaterShaderProperty::bEnabled = (bool)1;
-    if (TESWaterSystem::bWaterEnabled || (!((&TESWaterSystem::bUseWater)->Bool()))) {
-        return (bool)0;
+    WaterShaderProperty::bEnabled = true;
+    if (TESWaterSystem::bWaterEnabled || (!(&TESWaterSystem::bUseWater)->Bool())) {
+        return false;
     }
-    TESWaterSystem::bWaterEnabled = (bool)1;
-    DisplayWater(1, 0, 0);
-    return (bool)1;
+    TESWaterSystem::bWaterEnabled = true;
+    DisplayWater(true, false, false);
+    return true;
 }
 
 bool TESWaterSystem::DisableWaterSystem(bool abFreeMemory, bool abFinal) {
-    TESWaterSystem::bWaterEnabled = 0;
-    WaterShaderProperty::bEnabled = 0;
+    TESWaterSystem::bWaterEnabled = false;
+    WaterShaderProperty::bEnabled = false;
     if (abFreeMemory) {
         NiTListItem<PlaceableWaterGroup*>* next;
         for (NiTListItem<PlaceableWaterGroup*>* iter = PlaceableWaterGroupList.m_pkHead; iter; iter = next) {
@@ -1947,10 +1947,10 @@ bool TESWaterSystem::DisableWaterSystem(bool abFreeMemory, bool abFinal) {
             if (pgroup->spWadingWaterGeometry.m_pObject) {
                 NiAVObject* pobj = static_cast<NiAVObject*>(pgroup->spWadingWaterGeometry.m_pObject);
                 WaterShaderProperty* pprop = static_cast<WaterShaderProperty*>(pobj->GetProperty(3));
-                pprop->spReflectionMap.operator=(static_cast<BSRenderedTexture*>(0));
-                pprop->spRefractionMap.operator=(static_cast<BSRenderedTexture*>(0));
-                pprop->spNoiseNormalMap.operator=(static_cast<BSRenderedTexture*>(0));
-                pprop->spDepthMap.operator=(static_cast<BSRenderedTexture*>(0));
+                pprop->spReflectionMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
+                pprop->spRefractionMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
+                pprop->spNoiseNormalMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
+                pprop->spDepthMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
             }
             for (NiTListItem<TESObjectREFR*>* wateriter = pgroup->PlaceableWaterList.m_pkHead; wateriter;
                  wateriter = waternext) {
@@ -1963,10 +1963,10 @@ bool TESWaterSystem::DisableWaterSystem(bool abFreeMemory, bool abFinal) {
                         if (pshader) {
                             if (pshader->iShaderType == 13) {
                                 WaterShaderProperty* pprop_2 = static_cast<WaterShaderProperty*>(pgeom->GetProperty(3));
-                                pprop_2->spReflectionMap.operator=(static_cast<BSRenderedTexture*>(0));
-                                pprop_2->spRefractionMap.operator=(static_cast<BSRenderedTexture*>(0));
-                                pprop_2->spNoiseNormalMap.operator=(static_cast<BSRenderedTexture*>(0));
-                                pprop_2->spDepthMap.operator=(static_cast<BSRenderedTexture*>(0));
+                                pprop_2->spReflectionMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
+                                pprop_2->spRefractionMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
+                                pprop_2->spNoiseNormalMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
+                                pprop_2->spDepthMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
                             }
                         }
                     }
@@ -1993,24 +1993,24 @@ bool TESWaterSystem::DisableWaterSystem(bool abFreeMemory, bool abFinal) {
             BSTextureManager* v7 = BSShaderManager::TextureManagerPtr();
             v7->ReturnRenderedTexture(v19);
         }
-        spWaterHeightMapTexture.operator=(static_cast<BSRenderedTexture*>(0));
-        spWaterNormalMapTexture.operator=(static_cast<BSRenderedTexture*>(0));
-        spRainHeightMapTexture.operator=(static_cast<BSRenderedTexture*>(0));
-        spRefractionDepthStencilBuffer.operator=(static_cast<NiSourceTexture*>(0));
-        PlaceableWaterGroup::spDepthMap.operator=(static_cast<BSRenderedTexture*>(0));
+        spWaterHeightMapTexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
+        spWaterNormalMapTexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
+        spRainHeightMapTexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
+        spRefractionDepthStencilBuffer.operator=(static_cast<NiSourceTexture*>(nullptr));
+        PlaceableWaterGroup::spDepthMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
         if (PlaceableWaterGroup::spWadingWaterHeightMap.m_pObject) {
             BSRenderedTexture* v20 = PlaceableWaterGroup::spWadingWaterHeightMap.m_pObject;
             BSTextureManager* v8 = BSShaderManager::TextureManagerPtr();
             v8->ReturnRenderedTexture(v20);
         }
-        PlaceableWaterGroup::spWadingWaterHeightMap.operator=(static_cast<BSRenderedTexture*>(0));
+        PlaceableWaterGroup::spWadingWaterHeightMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
         if (WaterShader::GetInstance()) {
             WaterShader* Instance = WaterShader::GetInstance();
-            Instance->SetWaterShaderNormalMapTexture(0);
+            Instance->SetWaterShaderNormalMapTexture(nullptr);
             WaterShader* v10 = WaterShader::GetInstance();
-            v10->SetWaterShaderReflectionTexture(0);
+            v10->SetWaterShaderReflectionTexture(nullptr);
             WaterShader* v11 = WaterShader::GetInstance();
-            v11->SetWaterShaderDetailTexture(0);
+            v11->SetWaterShaderDetailTexture(nullptr);
         }
         if (ImageSpaceEffectWaterFFT::GetInstance()) {
             ImageSpaceEffectWaterFFT* v12 = ImageSpaceEffectWaterFFT::GetInstance();
@@ -2025,20 +2025,20 @@ bool TESWaterSystem::DisableWaterSystem(bool abFreeMemory, bool abFinal) {
         }
         if (WaterShader::GetInstance()) {
             WaterShader* v14 = WaterShader::GetInstance();
-            v14->SetWaterShaderNoiseMap(0);
+            v14->SetWaterShaderNoiseMap(nullptr);
         }
     }
     TESWaterSystem::iActiveWaterGroups = 0;
     if (!abFinal) {
-        DisplayWater(0, 0, 0);
+        DisplayWater(false, false, false);
     }
-    return 1;
+    return true;
 }
 
 bool TESWaterSystem::IsWaterNodeVisible(TESObjectREFR* apWaterRef, NiCamera* apCamera) {
     NiNode* pNode = apWaterRef->Get3D();
     if (!pNode) {
-        return (bool)0;
+        return false;
     }
     NiAVObject* pChildNode = pNode->GetAt(0);
     if (!NiObject::IsExactKindOf(&BSMultiBoundNode::ms_RTTI, pChildNode)) {
@@ -2059,7 +2059,7 @@ bool TESWaterSystem::RemovePlaceableWater(TESObjectREFR* apRef, NiPoint3* apPos,
         kPos = *apPos;
         NiPlane kPlane(kNormal, kPos);
         NiTListItem<PlaceableWaterGroup*>* kIter = PlaceableWaterGroupList.m_pkHead;
-        NiTListItem<PlaceableWaterGroup*>* kNextIter = 0;
+        NiTListItem<PlaceableWaterGroup*>* kNextIter = nullptr;
         while (kIter) {
             kNextIter = PlaceableWaterGroupList.GetNextPos(kIter);
             if (kIter) {
@@ -2069,7 +2069,7 @@ bool TESWaterSystem::RemovePlaceableWater(TESObjectREFR* apRef, NiPoint3* apPos,
                     float fGroupConstant = pGroup->ReflectWaterPlane.m_fConstant;
                     if (BSUtilities::CompareFloat(fGroupConstant, fPlaneConstant, 0.01f)) {
                         NiTListItem<TESObjectREFR*>* kWaterIter = pGroup->PlaceableWaterList.m_pkHead;
-                        NiTListItem<TESObjectREFR*>* kNextWater = 0;
+                        NiTListItem<TESObjectREFR*>* kNextWater = nullptr;
                         while (kWaterIter) {
                             kNextWater = pGroup->PlaceableWaterList.GetNextPos(kWaterIter);
                             if (kWaterIter) {
@@ -2080,20 +2080,20 @@ bool TESWaterSystem::RemovePlaceableWater(TESObjectREFR* apRef, NiPoint3* apPos,
                                     if (pWaterGeometry) {
                                         WaterShaderProperty* pProperty =
                                             static_cast<WaterShaderProperty*>(pWaterGeometry->GetProperty(3));
-                                        pProperty->spReflectionMap.operator=(static_cast<BSRenderedTexture*>(0));
-                                        pProperty->spRefractionMap.operator=(static_cast<BSRenderedTexture*>(0));
-                                        pProperty->spNoiseNormalMap.operator=(static_cast<BSRenderedTexture*>(0));
-                                        pProperty->spDepthMap.operator=(static_cast<BSRenderedTexture*>(0));
+                                        pProperty->spReflectionMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
+                                        pProperty->spRefractionMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
+                                        pProperty->spNoiseNormalMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
+                                        pProperty->spDepthMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
                                     }
                                     if (!pGroup->PlaceableWaterList.m_uiCount) {
                                         PlaceableWaterGroupList.RemovePos(kIter);
                                         if (pGroup) {
                                             delete pGroup;
                                         }
-                                        pGroup = 0;
+                                        pGroup = nullptr;
                                     }
                                     if (PlaceableWaterGroupList.IsEmpty()) {
-                                        DisableWaterSystem(1, 0);
+                                        DisableWaterSystem(true, false);
                                     }
                                     ResetStencilBitRefs();
                                     return true;
@@ -2161,7 +2161,7 @@ void TESWaterSystem::UpdateWaterNoise(PlaceableWaterGroup* apWaterGroup) {
                             }
                             else {
                                 if (!pProp->spNoiseHeightMap.m_pObject || pType->ShouldResetNoiseTextures()) {
-                                    NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(0));
+                                    NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(nullptr));
                                     pType->GetNoiseTexture(spTempTexture);
                                     if (spTempTexture.m_pObject) {
                                         pType->GetNoiseTexture(pProp->spNoiseHeightMap);
@@ -2169,10 +2169,11 @@ void TESWaterSystem::UpdateWaterNoise(PlaceableWaterGroup* apWaterGroup) {
                                     else {
                                         TES::pInstance->CreateTextureImage(
                                             pType->GetNoiseTextureName(),
-                                            reinterpret_cast<NiPointer<NiSourceTexture>&>(pProp->spNoiseHeightMap), 1, 0
+                                            reinterpret_cast<NiPointer<NiSourceTexture>&>(pProp->spNoiseHeightMap),
+                                            true, false
                                         );
                                     }
-                                    pType->bResetNoiseTexture = 0;
+                                    pType->bResetNoiseTexture = false;
                                 }
                             }
                             if (pProp->spNoiseHeightMap.m_pObject) {
@@ -2184,17 +2185,17 @@ void TESWaterSystem::UpdateWaterNoise(PlaceableWaterGroup* apWaterGroup) {
                                     NiDX9Renderer* pRenderer = BSShaderManager::GetRenderer();
                                     BSTextureManager* pTextureManager = BSShaderManager::TextureManagerPtr();
                                     BSRenderedTexture* pNormalMap = pTextureManager->BorrowRenderedTexture(
-                                        pRenderer, BSTextureManager::TEX_TESWATER_NOISE_NORMALMAP, 0, 0, 0
+                                        pRenderer, BSTextureManager::TEX_TESWATER_NOISE_NORMALMAP, 0, nullptr, 0
                                     );
                                     pType->spNoiseNormalMap.operator=(pNormalMap);
                                 }
                             }
                             pProp->spNoiseNormalMap = pType->spNoiseNormalMap;
-                            bool bfound = 0;
+                            bool bfound = false;
                             if (!WaterTypeUpdateMap.GetAt(pType, bfound)) {
                                 if (pProp->spNoiseHeightMap.m_pObject) {
                                     ImageSpaceEffectNoise::fNoiseScale = pProp->fNoiseScale;
-                                    float ftime = BSShaderManager::GetTimer(1);
+                                    float ftime = BSShaderManager::GetTimer(true);
                                     float dir0 = pType->Data.fNoiseWindDirection0;
                                     float dir1 = pType->Data.fNoiseWindDirection1;
                                     float dir2 = pType->Data.fNoiseWindDirection2;
@@ -2255,10 +2256,10 @@ void TESWaterSystem::UpdateWaterNoise(PlaceableWaterGroup* apWaterGroup) {
                                     NiDX9Renderer* pRenderer = BSShaderManager::GetRenderer();
                                     ImageSpaceManager* pImageSpaceManager = BSShaderManager::GetImageSpaceManager();
                                     pImageSpaceManager->RenderEffect(
-                                        ImageSpaceManager::EFFECT_NOISE, pRenderer, pHeightMap, pNormalMap, 0, 1
+                                        ImageSpaceManager::EFFECT_NOISE, pRenderer, pHeightMap, pNormalMap, nullptr, 1
                                     );
                                 }
-                                WaterTypeUpdateMap.SetAt(pType, 1);
+                                WaterTypeUpdateMap.SetAt(pType, true);
                             }
                         }
                     }
@@ -2370,7 +2371,7 @@ void TESWaterSystem::MTSetupSelectiveReflectionTexture(
     bool abLOD
 ) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_WATER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 3835
+        MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 3835
     );
     if (!TESWaterSystem::GetUseWaterShader() || !apCamera) {
         return;
@@ -2562,7 +2563,7 @@ void TESWaterSystem::MTSetupSelectiveReflectionTexture(
 
 void TESWaterSystem::MTSetupWorldReflectionTexture(NiCamera* apCamera) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_WATER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4067
+        MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4067
     );
     if (TESWaterSystem::GetUseWaterShader() && apCamera) {
         NiCamera* camera;
@@ -2571,7 +2572,7 @@ void TESWaterSystem::MTSetupWorldReflectionTexture(NiCamera* apCamera) {
             camera = ::new (pCameraMemory) NiCamera;
         }
         else {
-            camera = 0;
+            camera = nullptr;
         }
         TESWaterSystem::spWaterHeightCamera.operator=(camera);
         NiPoint3 n(0.0f, 0.0f, 1.0f);
@@ -2589,16 +2590,16 @@ void TESWaterSystem::MTSetupWorldReflectionTexture(NiCamera* apCamera) {
                 pAccumulator = ::new (pAccumulatorMemory) BSShaderAccumulator(99, 1u, 759u);
             }
             else {
-                pAccumulator = 0;
+                pAccumulator = nullptr;
             }
             TESWaterSystem::spWaterHeightShaderAccumulator.operator=(pAccumulator);
         }
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
         TESWaterSystem::spWaterHeightShaderAccumulator.m_pObject->SetShadowSceneNode(ShadowSceneNode_);
-        TESWaterSystem::spWaterHeightShaderAccumulator.m_pObject->SetWaterReflection(1);
+        TESWaterSystem::spWaterHeightShaderAccumulator.m_pObject->SetWaterReflection(true);
         BSShaderAccumulator* v10 = TESWaterSystem::spWaterHeightShaderAccumulator.m_pObject;
         v10->StartAccumulating(TESWaterSystem::spWaterHeightCamera.m_pObject);
-        TESWaterSystem::spWaterHeightShaderAccumulator.m_pObject->SetAccumulate(1);
+        TESWaterSystem::spWaterHeightShaderAccumulator.m_pObject->SetAccumulate(true);
         if (TESWaterSystem::bAutoWaterSilhouetteReflections.Bool() ||
             TESWaterSystem::bForceLowDetailReflections.Bool()) {
             TESWaterSystem::spWaterHeightShaderAccumulator.m_pObject->SetRenderMode(
@@ -2618,9 +2619,9 @@ void TESWaterSystem::MTSetupWorldReflectionTexture(NiCamera* apCamera) {
         TESWaterSystem::WaterLevelReflect_Empty.RemoveAll();
         if (TESWaterSystem::bForceHighDetailReflections.Bool()) {
             if (!pPlayer->Is3rdPerson()) {
-                bCull3rdPerson = 1;
+                bCull3rdPerson = true;
                 NiNode* v5 = pPlayer->Get3D();
-                v5->SetAppCulled(1);
+                v5->SetAppCulled(true);
             }
             if (TES::pInstance->pWorldSpace) {
                 NiAVObjectList_AddHead(&TESWaterSystem::WaterLevelReflect_Nodes, Main::GetWorldSceneGraph());
@@ -2667,7 +2668,7 @@ void TESWaterSystem::MTSetupWorldReflectionTexture(NiCamera* apCamera) {
             }
         }
         MTRenderingSystem::QInstance()->AddAccumTask(
-            TESWaterSystem::spWaterHeightCamera.m_pObject, 0, 0, &TESWaterSystem::WaterLevelReflect_Nodes,
+            TESWaterSystem::spWaterHeightCamera.m_pObject, nullptr, nullptr, &TESWaterSystem::WaterLevelReflect_Nodes,
             &TESWaterSystem::WaterLevelReflect_Empty, TESWaterSystem::spWaterHeightShaderAccumulator.m_pObject,
             BSCullingProcess::BSCP_CULL_FORCEMULTIBOUNDSNOUPDATE,
             static_cast<int32_t>(PlaceableWaterGroup::iWorldReflectionThreadStage + 1), 0
@@ -2680,7 +2681,7 @@ void TESWaterSystem::MTSetupWorldReflectionTexture(NiCamera* apCamera) {
 
 void TESWaterSystem::MTSetupSkyReflectionTexture(NiCamera* apCamera) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_WATER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4180
+        MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4180
     );
     if (TESWaterSystem::GetUseWaterShader() && apCamera) {
         NiCamera* camera;
@@ -2689,7 +2690,7 @@ void TESWaterSystem::MTSetupSkyReflectionTexture(NiCamera* apCamera) {
             camera = ::new (pCameraMemory) NiCamera;
         }
         else {
-            camera = 0;
+            camera = nullptr;
         }
         PlaceableWaterGroup::spSkyReflectionCamera.operator=(camera);
         NiPoint3 n(0.0f, 0.0f, 1.0f);
@@ -2707,21 +2708,21 @@ void TESWaterSystem::MTSetupSkyReflectionTexture(NiCamera* apCamera) {
                 pAccumulator = ::new (pAccumulatorMemory) BSShaderAccumulator(99, 1u, 759u);
             }
             else {
-                pAccumulator = 0;
+                pAccumulator = nullptr;
             }
             PlaceableWaterGroup::spSkyReflectionSorter.operator=(pAccumulator);
         }
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
         PlaceableWaterGroup::spSkyReflectionSorter.m_pObject->SetShadowSceneNode(ShadowSceneNode_);
-        PlaceableWaterGroup::spSkyReflectionSorter.m_pObject->SetWaterReflection(1);
+        PlaceableWaterGroup::spSkyReflectionSorter.m_pObject->SetWaterReflection(true);
         BSShaderAccumulator* v4 = PlaceableWaterGroup::spSkyReflectionSorter.m_pObject;
         v4->StartAccumulating(PlaceableWaterGroup::spSkyReflectionCamera.m_pObject);
-        PlaceableWaterGroup::spSkyReflectionSorter.m_pObject->SetAccumulate(1);
+        PlaceableWaterGroup::spSkyReflectionSorter.m_pObject->SetAccumulate(true);
         PlaceableWaterGroup::StaticSkyReflectiveObjects.RemoveAll();
         PlaceableWaterGroup::DynamicSkyReflectiveObjects.RemoveAll();
         NiAVObjectList_AddHead(&PlaceableWaterGroup::StaticSkyReflectiveObjects, TES::pInstance->pSky->GetRoot());
         MTRenderingSystem::QInstance()->AddAccumTask(
-            PlaceableWaterGroup::spSkyReflectionCamera.m_pObject, 0, 0,
+            PlaceableWaterGroup::spSkyReflectionCamera.m_pObject, nullptr, nullptr,
             &PlaceableWaterGroup::StaticSkyReflectiveObjects, &PlaceableWaterGroup::DynamicSkyReflectiveObjects,
             PlaceableWaterGroup::spSkyReflectionSorter.m_pObject, BSCullingProcess::BSCP_CULL_FORCEMULTIBOUNDSNOUPDATE,
             static_cast<int32_t>(PlaceableWaterGroup::iSkyReflectionThreadStage + 1), 0
@@ -2734,7 +2735,7 @@ void TESWaterSystem::MTSetupSkyReflectionTexture(NiCamera* apCamera) {
 
 void TESWaterSystem::MTRenderSelectiveReflectionTexture(PlaceableWaterGroup* apWaterGroup) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_WATER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4226
+        MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4226
     );
     if (TESWaterSystem::GetUseWaterShader() && apWaterGroup->spReflectionCamera.m_pObject) {
         FNVD_INLINED_LOCAL(NiColorA, newClearColor, std::nullopt, std::nullopt);
@@ -2751,7 +2752,7 @@ void TESWaterSystem::MTRenderSelectiveReflectionTexture(PlaceableWaterGroup* apW
             NiDX9Renderer* pTextureRenderer = BSShaderManager::GetRenderer();
             BSTextureManager* pTextureManager = BSShaderManager::TextureManagerPtr();
             BSRenderedTexture* pTexture = pTextureManager->BorrowRenderedTexture(
-                pTextureRenderer, BSTextureManager::TEX_TESWATER_REFLECTION, 0, 0, 0
+                pTextureRenderer, BSTextureManager::TEX_TESWATER_REFLECTION, 0, nullptr, 0
             );
             apWaterGroup->spGroupReflectionMap.operator=(pTexture);
         }
@@ -2770,10 +2771,10 @@ void TESWaterSystem::MTRenderSelectiveReflectionTexture(PlaceableWaterGroup* apW
         NiPlane* pPlane = &apWaterGroup->ReflectWaterPlane;
         NiColorA kClipPlane(pPlane->m_kNormal.x, pPlane->m_kNormal.y, pPlane->m_kNormal.z, -pPlane->m_fConstant);
         SetClipPlane(kClipPlane, 0);
-        BSRenderState::SetUserClipPlaneEnables(1, 0, 0, 0, 0, 0, BSRS_NOLOCK);
+        BSRenderState::SetUserClipPlaneEnables(true, false, false, false, false, false, BSRS_NOLOCK);
         BSShaderAccumulator* pSorter = apWaterGroup->spGroupReflectionSorter.m_pObject;
         NiCamera* pCamera = apWaterGroup->spReflectionCamera.m_pObject;
-        BSShaderUtil::RenderScene(pCamera, pSorter, 0);
+        BSShaderUtil::RenderScene(pCamera, pSorter, false);
         BSRenderState::RestoreUserClipPlaneEnables(BSRS_NOLOCK);
         BSRenderedTexture::StopOffscreen();
         if (!TES::pInstance->pInteriorCell && bLOD) {
@@ -2787,7 +2788,7 @@ void TESWaterSystem::MTRenderSelectiveReflectionTexture(PlaceableWaterGroup* apW
 
 void TESWaterSystem::MTRenderWorldReflectionTexture() {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_WATER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4280
+        MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4280
     );
     if (TESWaterSystem::GetUseWaterShader() && TESWaterSystem::spWaterHeightCamera.m_pObject) {
         FNVD_INLINED_LOCAL(NiColorA, newClearColor, std::nullopt, std::nullopt);
@@ -2803,9 +2804,9 @@ void TESWaterSystem::MTRenderWorldReflectionTexture() {
         if (!PlaceableWaterGroup::spWorldReflectionMap.m_pObject) {
             NiDX9Renderer* pRenderer = BSShaderManager::GetRenderer();
             BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
-            PlaceableWaterGroup::spWorldReflectionMap.operator=(
-                TextureManager->BorrowRenderedTexture(pRenderer, BSTextureManager::TEX_TESWATER_REFLECTION, 0, 0, 0)
-            );
+            PlaceableWaterGroup::spWorldReflectionMap.operator=(TextureManager->BorrowRenderedTexture(
+                pRenderer, BSTextureManager::TEX_TESWATER_REFLECTION, 0, nullptr, 0
+            ));
         }
         // Tests the whole byte Setting::Bool returns, read here as the byte it is.
         bool bHasWater = BGSTerrainManager::GetCurrentWorldHasLOD() &&
@@ -2824,7 +2825,7 @@ void TESWaterSystem::MTRenderWorldReflectionTexture() {
         );
         if (bCull3rdPerson && pPlayer->Is3rdPerson()) {
             NiNode* v4 = pPlayer->Get3D();
-            v4->SetAppCulled(0);
+            v4->SetAppCulled(false);
         }
         NiPoint3 n(0.0f, 0.0f, 1.0f);
         float fWaterHeight = TES::pInstance->pWorldSpace->fLODWaterHeight;
@@ -2838,9 +2839,10 @@ void TESWaterSystem::MTRenderWorldReflectionTexture() {
         float fNegConstant = -waterplane.m_fConstant;
         NiColorA kClipPlane(waterplane.m_kNormal.x, waterplane.m_kNormal.y, waterplane.m_kNormal.z, fNegConstant);
         SetClipPlane(kClipPlane, 0);
-        BSRenderState::SetUserClipPlaneEnables(1, 0, 0, 0, 0, 0, BSRS_NOLOCK);
+        BSRenderState::SetUserClipPlaneEnables(true, false, false, false, false, false, BSRS_NOLOCK);
         BSShaderUtil::RenderScene(
-            TESWaterSystem::spWaterHeightCamera.m_pObject, TESWaterSystem::spWaterHeightShaderAccumulator.m_pObject, 0
+            TESWaterSystem::spWaterHeightCamera.m_pObject, TESWaterSystem::spWaterHeightShaderAccumulator.m_pObject,
+            false
         );
         BSRenderState::RestoreUserClipPlaneEnables(BSRS_NOLOCK);
         BSRenderedTexture::StopOffscreen();
@@ -2849,13 +2851,13 @@ void TESWaterSystem::MTRenderWorldReflectionTexture() {
         }
         NiDX9Renderer* v23 = BSShaderManager::GetRenderer();
         v23->SetBackgroundColorAlpha(oldClearColor);
-        TESWaterSystem::spWaterHeightCamera.operator=(static_cast<NiCamera*>(0));
+        TESWaterSystem::spWaterHeightCamera.operator=(static_cast<NiCamera*>(nullptr));
         // Tests the whole byte Setting::Bool returns, read here as the byte it is.
         if (static_cast<uint8_t>(gs_bUseWaterReflectionBlur_Water.Bool())) {
             NiDX9Renderer* pBlurRenderer = BSShaderManager::GetRenderer();
             BSTextureManager* v6 = BSShaderManager::TextureManagerPtr();
             BSRenderedTexture* pblur =
-                v6->BorrowRenderedTexture(pBlurRenderer, BSTextureManager::TEX_TESWATER_BLUR, 0, 0, 0);
+                v6->BorrowRenderedTexture(pBlurRenderer, BSTextureManager::TEX_TESWATER_BLUR, 0, nullptr, 0);
             ImageSpaceTexture kblurtexture;
             kblurtexture.SetTexture(pblur);
             ImageSpaceEffectParam kparam;
@@ -2884,7 +2886,7 @@ void TESWaterSystem::MTRenderWorldReflectionTexture() {
 // next position is taken from PlaceableWaterList's GetNextPos; both lists share the node type.
 void TESWaterSystem::MTSetupSelectiveDepthTexture(NiCamera* apCamera, PlaceableWaterGroup* apWaterGroup) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_WATER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4431
+        MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4431
     );
     if (!TESWaterSystem::GetUseWaterShader() || !apCamera) {
         return;
@@ -2907,7 +2909,7 @@ void TESWaterSystem::MTSetupSelectiveDepthTexture(NiCamera* apCamera, PlaceableW
     apWaterGroup->spDepthCamera.m_pObject->SetMaxFarNearRatio(fMaxFarNearRatio);
     const NiFrustum* pFrustum = &apCamera->GetViewFrustum();
     apWaterGroup->spDepthCamera.m_pObject->SetViewFrustum(*pFrustum);
-    NiUpdateData UpdateData(0.0f, 0, 0);
+    NiUpdateData UpdateData(0.0f, false, false);
     apWaterGroup->spDepthCamera.m_pObject->Update(UpdateData);
     if (!apWaterGroup->spDepthSorter.m_pObject) {
         BSShaderAccumulator* pNewSorter =
@@ -2931,7 +2933,7 @@ void TESWaterSystem::MTSetupSelectiveDepthTexture(NiCamera* apCamera, PlaceableW
         NiDX9Renderer* pRenderer = BSShaderManager::GetRenderer();
         BSTextureManager* pTextureManager = BSShaderManager::TextureManagerPtr();
         PlaceableWaterGroup::spDepthMap.operator=(
-            pTextureManager->BorrowRenderedTexture(pRenderer, BSTextureManager::TEX_TESWATER_DEPTH, 0, 0, 0)
+            pTextureManager->BorrowRenderedTexture(pRenderer, BSTextureManager::TEX_TESWATER_DEPTH, 0, nullptr, 0)
         );
     }
     bool bRenderLand = false;
@@ -3048,7 +3050,7 @@ void TESWaterSystem::MTRenderSelectiveDepthTexture(PlaceableWaterGroup* apWaterG
     FNVD_INLINED_LOCAL(NiColorA, kPlaneTemp, std::nullopt, std::nullopt);
     NiPoint2 v27;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_WATER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4617
+        MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4617
     );
     if (TESWaterSystem::GetUseWaterShader() && apWaterGroup->spDepthCamera.m_pObject) {
         FNVD_INLINED_LOCAL(NiColorA, a2, std::nullopt, std::nullopt);
@@ -3070,7 +3072,7 @@ void TESWaterSystem::MTRenderSelectiveDepthTexture(PlaceableWaterGroup* apWaterG
         BSShaderManager::kWaterFogDistances.y = y;
         BSShaderAccumulator* v9 = apWaterGroup->spDepthSorter.m_pObject;
         v9->SetRenderMode(BSShaderManager::BSSM_RENDER_WATER_DEPTH);
-        BSRenderState::SetStencilEnable(1, BSRS_LOCK);
+        BSRenderState::SetStencilEnable(true, BSRS_LOCK);
         BSRenderState::SetStencilFunc(NiStencilProperty::TEST_EQUAL, 255u, auReadMask, BSRS_LOCK);
         BSRenderState::SetStencilAction(
             NiStencilProperty::ACTION_KEEP, NiStencilProperty::ACTION_KEEP, NiStencilProperty::ACTION_KEEP, BSRS_LOCK
@@ -3087,19 +3089,19 @@ void TESWaterSystem::MTRenderSelectiveDepthTexture(PlaceableWaterGroup* apWaterG
         float* v11 = &apWaterGroup->RefractWaterPlane.m_kNormal.x;
         a2 = *::new (&kPlaneTemp) NiColorA(*v11, normal_y, normal_z, refractionPlaneBias);
         SetClipPlane(a2, 0);
-        BSRenderState::SetUserClipPlaneEnables(1, 0, 0, 0, 0, 0, BSRS_NOLOCK);
+        BSRenderState::SetUserClipPlaneEnables(true, false, false, false, false, false, BSRS_NOLOCK);
         BSShaderAccumulator* fFogNeara = apWaterGroup->spDepthSorter.m_pObject;
         NiCamera* v12 = apWaterGroup->spDepthCamera.m_pObject;
-        BSShaderUtil::RenderScene(v12, fFogNeara, 0);
+        BSShaderUtil::RenderScene(v12, fFogNeara, false);
         BSRenderState::RestoreUserClipPlaneEnables(BSRS_NOLOCK);
         NiDX9Renderer* v13 = BSShaderManager::GetRenderer();
         NiDX9RenderState* pRenderState = v13->GetRenderState();
-        pRenderState->SetRenderState(D3DRS_CLIPPLANEENABLE, 0, 0, 0);
+        pRenderState->SetRenderState(D3DRS_CLIPPLANEENABLE, 0, 0, false);
         BSRenderState::RestoreStencilEnable(BSRS_LOCK);
         BSRenderState::UnlockRenderState(BSRS_STENCILFAILZFAILPASS);
         BSRenderState::UnlockRenderState(BSRS_STENCILFUNCREFMASK);
         BSRenderState::UnlockRenderState(BSRS_STENCILWRITEMASK);
-        apWaterGroup->spDepthCamera.operator=(static_cast<NiCamera*>(0));
+        apWaterGroup->spDepthCamera.operator=(static_cast<NiCamera*>(nullptr));
     }
 }
 
@@ -3111,7 +3113,7 @@ void TESWaterSystem::RenderWaterGroupStencil(
 ) {
     if (TESWaterSystem::GetUseWaterShader()) {
         if (apCamera) {
-            TESWaterSystem::bIsRendering = 1;
+            TESWaterSystem::bIsRendering = true;
             BSRenderState::SetColorWriteEnable(0, BSRS_LOCK);
             NiCamera refractionCamera;
             refractionCamera.SetTranslate(apCamera->GetWorldTranslate());
@@ -3125,7 +3127,7 @@ void TESWaterSystem::RenderWaterGroupStencil(
             refractionCamera.SetMaxFarNearRatio(fCamScaleb);
             const NiFrustum* ViewFrustum = &apCamera->GetViewFrustum();
             refractionCamera.SetViewFrustum(*ViewFrustum);
-            NiUpdateData UpdateData(0.0f, 0, 0);
+            NiUpdateData UpdateData(0.0f, false, false);
             refractionCamera.Update(UpdateData);
             BSCullingProcess myCullingProcess(nullptr);
             myCullingProcess.m_pkCamera = &refractionCamera;
@@ -3171,9 +3173,9 @@ void TESWaterSystem::RenderWaterGroupStencil(
                 }
                 iter = next;
             }
-            myCullingProcess.m_pkCamera = 0;
+            myCullingProcess.m_pkCamera = nullptr;
             BSRenderState::RestoreColorWriteEnable(BSRS_LOCK);
-            TESWaterSystem::bIsRendering = 0;
+            TESWaterSystem::bIsRendering = false;
         }
     }
 }
@@ -3237,7 +3239,7 @@ void TESWaterSystem::AddRipple(NiPoint3 arPosition, float afSize) {
         float* v4 = &gs_fWadingWaterQuadSize_Water.Float();
         if (*v4 >= static_cast<double>(dist)) {
             void* iter = (void*)PlaceableWaterGroupList.m_pkHead;
-            NiTListItem<PlaceableWaterGroup*>* WaterGroup_Next = 0;
+            NiTListItem<PlaceableWaterGroup*>* WaterGroup_Next = nullptr;
             while (iter) {
                 void* next =
                     (void*)PlaceableWaterGroupList.GetNextPos(static_cast<NiTListItem<PlaceableWaterGroup*>*>(iter));
@@ -3250,7 +3252,7 @@ void TESWaterSystem::AddRipple(NiPoint3 arPosition, float afSize) {
                         !pgroup->spWadingWaterGeometry.m_pObject) {
                         if (!PlaceableWaterGroup::spWadingWaterHeightMap.m_pObject) {
                             PlaceableWaterGroup::spWadingWaterHeightMap.operator=(InitializeGreyTexture());
-                            ImageSpaceEffectWaterDisplacement::bClearSimulation = 1;
+                            ImageSpaceEffectWaterDisplacement::bClearSimulation = true;
                         }
                         float fWaterGroupHeightRangea = gs_fWadingWaterQuadSize_Water.Float();
                         NiNode* WaterRoot = TESWaterSystem::GetWaterRoot();
@@ -3261,7 +3263,7 @@ void TESWaterSystem::AddRipple(NiPoint3 arPosition, float afSize) {
                         playerpos_2.z = pgroup->ReflectWaterPlane.m_fConstant;
                         static_cast<NiAVObject*>(pgroup->spWadingWaterGeometry.m_pObject)
                             ->NiAVObject::SetTranslate(playerpos_2);
-                        NiUpdateData UpdateData(0.0f, 0, 0);
+                        NiUpdateData UpdateData(0.0f, false, false);
                         static_cast<NiAVObject*>(pgroup->spWadingWaterGeometry.m_pObject)
                             ->NiAVObject::Update(UpdateData);
                     }
@@ -3481,7 +3483,7 @@ void TESWaterSystem::UpdateWaterShaderProperties(PlaceableWaterGroup* apWaterGro
                                             static_cast<NiAVObject*>(apWaterGroup->spWadingWaterGeometry.m_pObject);
                                         WaterShaderProperty* pkWadingWaterProp =
                                             static_cast<WaterShaderProperty*>(pWading->GetProperty(NiProperty::SHADE));
-                                        if (pkWadingWaterProp->GetNumberofPasses(0)) {
+                                        if (pkWadingWaterProp->GetNumberofPasses(nullptr)) {
                                             pkWadingWaterProp->ClearRenderPasses();
                                         }
                                     }
@@ -3523,14 +3525,14 @@ TESObjectREFR* TESWaterSystem::AddLODWater(
     TESObjectREFR* pwaterRef_2;
     NiMatrix3 rot;
     if (TES::pInstance->pWorldSpace->GetNoLODWater() || apWorldSpace->GetNoLODWater()) {
-        return 0;
+        return nullptr;
     }
     void* apMemory = ourMalloc(sizeof(TESObjectREFR));
     if (apMemory) {
         pwaterRef = ::new (apMemory) TESObjectREFR;
     }
     else {
-        pwaterRef = 0;
+        pwaterRef = nullptr;
     }
     pwaterRef_2 = pwaterRef;
     pwaterRef->SetTemporary();
@@ -3540,11 +3542,11 @@ TESObjectREFR* TESWaterSystem::AddLODWater(
         pwaterProp = ::new (v26) WaterShaderProperty;
     }
     else {
-        pwaterProp = 0;
+        pwaterProp = nullptr;
     }
-    pwaterProp->bLOD = 1;
+    pwaterProp->bLOD = true;
     if (abLODWaterHeight) {
-        pwaterProp->bFullReflections = 1;
+        pwaterProp->bFullReflections = true;
     }
     int32_t Type = NiShadeProperty::GetType();
     apLODWater->RemoveProperty(Type);
@@ -3556,7 +3558,7 @@ TESObjectREFR* TESWaterSystem::AddLODWater(
         pstencilprop = ::new (v24) NiStencilProperty;
     }
     else {
-        pstencilprop = 0;
+        pstencilprop = nullptr;
     }
     pstencilprop->SetDrawMode(NiStencilProperty::DRAW_BOTH);
     int32_t TagSkillCount = TESClass::GetTagSkillCount();
@@ -3570,7 +3572,7 @@ TESObjectREFR* TESWaterSystem::AddLODWater(
         pfadenode = ::new (v22) BSFadeNode;
     }
     else {
-        pfadenode = 0;
+        pfadenode = nullptr;
     }
     NiNode* pnode = pfadenode;
     if (apBound) {
@@ -3581,8 +3583,8 @@ TESObjectREFR* TESWaterSystem::AddLODWater(
     else {
         pfadenode->AttachChild(apLODWater, 1);
     }
-    pwaterRef_2->Set3D(pfadenode, 1);
-    NiUpdateData foo(0.0f, 0, 0);
+    pwaterRef_2->Set3D(pfadenode, true);
+    NiUpdateData foo(0.0f, false, false);
     apLODWater->Update(foo);
     pfadenode->Update(foo);
     pnode->Update(foo);
@@ -3600,7 +3602,7 @@ TESObjectREFR* TESWaterSystem::AddLODWater(
             pnewgroup = ::new (pGroupMemory) PlaceableWaterGroup;
         }
         else {
-            pnewgroup = 0;
+            pnewgroup = nullptr;
         }
         NiPoint3 n1_2(0.0f, 0.0f, 1.0f);
         n1_2 = rot * n1_2;
@@ -3612,7 +3614,7 @@ TESObjectREFR* TESWaterSystem::AddLODWater(
         pnewgroup->pWaterType = v10;
         pnewgroup->PlaceableWaterList.AddHead(pwaterRef_2);
         if (!TESWaterSystem::bForceHighDetailReflections.Bool()) {
-            pnewgroup->bRenderSilhouetteReflections = 1;
+            pnewgroup->bRenderSilhouetteReflections = true;
         }
         pLODWaterGroup = pnewgroup;
     }
@@ -3636,16 +3638,16 @@ void TESWaterSystem::RemoveLODWater(TESObjectREFR* apLODWaterRef, TESWorldSpace*
                     NiAVObject* pobj = GetWaterGeometry(pwaterRef);
                     if (pobj) {
                         WaterShaderProperty* pprop = static_cast<WaterShaderProperty*>(pobj->GetProperty(3));
-                        pprop->spReflectionMap.operator=(static_cast<BSRenderedTexture*>(0));
+                        pprop->spReflectionMap.operator=(static_cast<BSRenderedTexture*>(nullptr));
                     }
                     if (!pLODWaterGroup->PlaceableWaterList.m_uiCount) {
                         if (pLODWaterGroup) {
                             delete pLODWaterGroup;
                         }
-                        pLODWaterGroup = 0;
+                        pLODWaterGroup = nullptr;
                     }
                     if (PlaceableWaterGroupList.IsEmpty() && !pLODWaterGroup) {
-                        DisableWaterSystem(1, 0);
+                        DisableWaterSystem(true, false);
                     }
                 }
                 iterWater = nextWater;
@@ -3666,14 +3668,14 @@ void TESWaterSystem::ResetStencilBitRefs() {
 NiTriShape* TESWaterSystem::CreateQuadShape(NiTriShapeData* data) {
     NiTriShape* v3;
     AutoMemContext apMemory(
-        MEM_CONTEXT_WATER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 2961
+        MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 2961
     );
     NiTriShape* v4 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
     if (v4) {
         v3 = ::new (v4) NiTriShape(data);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
     return v3;
 }
@@ -3681,7 +3683,7 @@ NiTriShape* TESWaterSystem::CreateQuadShape(NiTriShapeData* data) {
 NiAVObject*
 TESWaterSystem::CreateWadingWaterGeometry(PlaceableWaterGroup* apGroup, NiNode* pParentNode, float fMeshSize) {
     WaterShaderProperty* pkWadingWaterProp;
-    NiTriShapeData* data = CreateQuadData(fMeshSize, 512u, 1u, 1, 1);
+    NiTriShapeData* data = CreateQuadData(fMeshSize, 512u, 1u, true, true);
     NiAVObject* pgeom = (NiAVObject*)CreateQuadShape(data);
     NiPoint3 tmp(0.0f, 0.0f, 0.0f);
     if (pPlayer) {
@@ -3699,7 +3701,7 @@ TESWaterSystem::CreateWadingWaterGeometry(PlaceableWaterGroup* apGroup, NiNode* 
         pkWadingWaterProp = ::new (apMemory) WaterShaderProperty;
     }
     else {
-        pkWadingWaterProp = 0;
+        pkWadingWaterProp = nullptr;
     }
     pgeom->AttachProperty(pkWadingWaterProp);
     BSShaderManager::PrepareObject(pgeom, 0, 0);
@@ -3733,7 +3735,7 @@ TESWaterSystem::CreateWadingWaterGeometry(PlaceableWaterGroup* apGroup, NiNode* 
     pkWadingWaterProp->spDisplacementNormalMap.operator=(
         PlaceableWaterGroup::spWadingWaterHeightMap.m_pObject->GetTexture(0)
     );
-    pkWadingWaterProp->bDisplacement = 1;
+    pkWadingWaterProp->bDisplacement = true;
     pkWadingWaterProp->fBlendRadius = 1.0f;
     pkWadingWaterProp->iStencilMask = apGroup->iStencilBitMask;
     fTimeSinceLastRipplePlaced = 0.0f;
@@ -3742,15 +3744,15 @@ TESWaterSystem::CreateWadingWaterGeometry(PlaceableWaterGroup* apGroup, NiNode* 
 
 bool TESWaterSystem::ActorWithinRangeOfWadingWater(PlaceableWaterGroup* apGroup) {
     void* actoriter = apGroup->ActorsInWaterList.m_pkHead;
-    void* actornext = 0;
+    void* actornext = nullptr;
     while (actoriter) {
         actornext = apGroup->ActorsInWaterList.GetNextPos(static_cast<NiTListItem<Actor*>*>(actoriter));
         if (actoriter) {
             TESObjectREFR* pactor = apGroup->ActorsInWaterList.Get(static_cast<NiTListItem<Actor*>*>(actoriter));
             if (pPlayer == pactor) {
-                return 1;
+                return true;
             }
-            if (!pactor->IsDead(0)) {
+            if (!pactor->IsDead(false)) {
                 NiPoint3 actorpos;
                 NiPoint3 playerpos = pPlayer->GetLocationOnReference();
                 const NiPoint3* v3 = &pactor->GetLocationOnReference();
@@ -3762,13 +3764,13 @@ bool TESWaterSystem::ActorWithinRangeOfWadingWater(PlaceableWaterGroup* apGroup)
                 float dist = (playerpos - actorpos).Length();
                 float* v6 = &gs_fWadingWaterQuadSize_Water.Float();
                 if (*v6 >= static_cast<double>(dist)) {
-                    return 1;
+                    return true;
                 }
             }
         }
         actoriter = actornext;
     }
-    return 0;
+    return false;
 }
 
 void TESWaterSystem::RenderDisplacementWaterStencil() {
@@ -3778,7 +3780,7 @@ void TESWaterSystem::RenderDisplacementWaterStencil() {
     float v35 = 3.4028235e+38f;
     float v29 = 3.4028235e+38f;
     NiTListItem<PlaceableWaterGroup*>* iter = PlaceableWaterGroupList.m_pkHead;
-    NiTListItem<PlaceableWaterGroup*>* NextPos = 0;
+    NiTListItem<PlaceableWaterGroup*>* NextPos = nullptr;
     while (iter) {
         NextPos = PlaceableWaterGroupList.GetNextPos(iter);
         if (iter) {
@@ -3793,8 +3795,8 @@ void TESWaterSystem::RenderDisplacementWaterStencil() {
         }
         iter = NextPos;
     }
-    NiFrustum newFrustum(0);
-    newFrustum.m_bOrtho = 1;
+    NiFrustum newFrustum(false);
+    newFrustum.m_bOrtho = true;
     newFrustum.m_fNear = 0.1f;
     newFrustum.m_fLeft = -(gs_fWadingWaterQuadSize_Water.Float() / 2.0);
     newFrustum.m_fRight = gs_fWadingWaterQuadSize_Water.Float() / 2.0;
@@ -3808,7 +3810,7 @@ void TESWaterSystem::RenderDisplacementWaterStencil() {
     NiPoint3* v2 = ::new (&dst) NiPoint3(v1->x, playerY, v12);
     cullingCamera.SetTranslate(*v2);
     cullingCamera.SetViewFrustum(newFrustum);
-    NiUpdateData arData(0.0f, 0, 0);
+    NiUpdateData arData(0.0f, false, false);
     cullingCamera.Update(arData);
     float playerYa = (&pPlayer->GetLocationOnReference())->y;
     const NiPoint3* v3 = &pPlayer->GetLocationOnReference();
@@ -3817,7 +3819,7 @@ void TESWaterSystem::RenderDisplacementWaterStencil() {
     const NiRect<float>* a1a = &cullingCamera.GetViewPort();
     NiRenderer* Renderer_ = NiRenderer::GetRenderer();
     Renderer_->SetScreenSpaceCameraData(a1a);
-    TESWaterSystem::bIsRendering = 1;
+    TESWaterSystem::bIsRendering = true;
     BSCullingProcess cullingProcess(nullptr);
     cullingProcess.m_pkCamera = &cullingCamera;
     NiRenderer* v5 = NiRenderer::GetRenderer();
@@ -3825,13 +3827,13 @@ void TESWaterSystem::RenderDisplacementWaterStencil() {
     const NiFrustum* ViewFrustum = &cullingCamera.GetViewFrustum();
     cullingProcess.SetFrustum(*ViewFrustum);
     iter = PlaceableWaterGroupList.m_pkHead;
-    NextPos = 0;
+    NextPos = nullptr;
     while (iter) {
         NextPos = PlaceableWaterGroupList.GetNextPos(iter);
         if (iter) {
             PlaceableWaterGroup* v24 = PlaceableWaterGroupList.Get(iter);
             NiTListItem<TESObjectREFR*>* v26 = v24->PlaceableWaterList.m_pkHead;
-            NiTListItem<TESObjectREFR*>* v25 = 0;
+            NiTListItem<TESObjectREFR*>* v25 = nullptr;
             while (v26) {
                 v25 = v24->PlaceableWaterList.GetNextPos(v26);
                 if (v26) {
@@ -3875,21 +3877,21 @@ void TESWaterSystem::RenderDisplacementWaterStencil() {
         }
         iter = NextPos;
     }
-    cullingProcess.m_pkCamera = 0;
-    BSShaderManager::SetRenderFlag(0, 0);
-    TESWaterSystem::bIsRendering = 0;
+    cullingProcess.m_pkCamera = nullptr;
+    BSShaderManager::SetRenderFlag(0, false);
+    TESWaterSystem::bIsRendering = false;
 }
 
 BSRenderedTexture* TESWaterSystem::InitializeGreyTexture() {
     FNVD_INLINED_LOCAL(NiColorA, v9, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_WATER, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 0x138A
+        MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 0x138A
     );
     NiColorA tmpcolor(0.0f, 0.0f, 0.0f, 0.0f);
     NiDX9Renderer* Renderer_ = BSShaderManager::GetRenderer();
     BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
     BSRenderedTexture* apTextureToInit =
-        TextureManager->BorrowRenderedTexture(Renderer_, BSTextureManager::TEX_TESWATER_GREY, 0, 0, 0);
+        TextureManager->BorrowRenderedTexture(Renderer_, BSTextureManager::TEX_TESWATER_GREY, 0, nullptr, 0);
     NiDX9Renderer* NiDX9Renderer_ = BSShaderManager::GetRenderer();
     NiDX9Renderer_->GetBackgroundColor(tmpcolor);
     NiDX9Renderer* v2 = BSShaderManager::GetRenderer();
@@ -3963,7 +3965,7 @@ void TESWaterSystem::SetCameraInPlaceableWater(bool abVal) {
 }
 
 bool TESWaterSystem::GetUseWaterDisplacements() {
-    return (bool)((&TESWaterSystem::bUseWaterDisplacements)->Bool());
+    return (&TESWaterSystem::bUseWaterDisplacements)->Bool();
 }
 
 WadingWaterData::WadingWaterData()

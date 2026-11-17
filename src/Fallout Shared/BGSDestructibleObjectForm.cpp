@@ -138,7 +138,7 @@ void DestructibleObjectStage::Copy(DestructibleObjectStage* apCopy) {
         iDebrisCount = apCopy->iDebrisCount;
         if (pReplacementModel) {
             delete pReplacementModel;
-            pReplacementModel = 0;
+            pReplacementModel = nullptr;
         }
         if (apCopy->pReplacementModel) {
             TESModelTextureSwap* v2;
@@ -147,7 +147,7 @@ void DestructibleObjectStage::Copy(DestructibleObjectStage* apCopy) {
                 v2 = ::new (apMemory) TESModelTextureSwap;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pReplacementModel = v2;
             pReplacementModel->CopyComponent(apCopy->pReplacementModel);
@@ -243,52 +243,52 @@ void BGSDestructibleObjectForm::CopyComponent(BaseFormComponent* apCopyFC) {
 bool BGSDestructibleObjectForm::CompareComponent(BaseFormComponent* apCompareFC) {
     BGSDestructibleObjectForm* pcompare = dynamic_cast<BGSDestructibleObjectForm*>(apCompareFC);
     if (!pcompare) {
-        return 1;
+        return true;
     }
     DestructibleObjectData* pdata = pcompare->pData;
     if (!pdata || !pData) {
         return pdata || pData;
     }
     if (pData->iHealth != pdata->iHealth) {
-        return 1;
+        return true;
     }
     if (pData->cFlags != pdata->cFlags) {
-        return 1;
+        return true;
     }
     if (pData->cNumStages != pdata->cNumStages) {
-        return 1;
+        return true;
     }
     for (uint32_t i = 0; i < pData->cNumStages; ++i) {
         if (pData->pStagesArray[i]->cHealthPercentage != pdata->pStagesArray[i]->cHealthPercentage) {
-            return 1;
+            return true;
         }
         if (pData->pStagesArray[i]->iSelfDamagePerSecond != pdata->pStagesArray[i]->iSelfDamagePerSecond) {
-            return 1;
+            return true;
         }
         if (pData->pStagesArray[i]->cModelDamageStage != pdata->pStagesArray[i]->cModelDamageStage) {
-            return 1;
+            return true;
         }
         if (pData->pStagesArray[i]->cFlags != pdata->pStagesArray[i]->cFlags) {
-            return 1;
+            return true;
         }
         if (pData->pStagesArray[i]->pExplosion != pdata->pStagesArray[i]->pExplosion) {
-            return 1;
+            return true;
         }
         if (pData->pStagesArray[i]->pDebris != pdata->pStagesArray[i]->pDebris) {
-            return 1;
+            return true;
         }
         // The game's check compares one form's iDebrisCount with itself (a bug in the original), which is always equal.
         if ((pData->pStagesArray[i]->pReplacementModel && !pdata->pStagesArray[i]->pReplacementModel) ||
             (!pData->pStagesArray[i]->pReplacementModel && pdata->pStagesArray[i]->pReplacementModel)) {
-            return 1;
+            return true;
         }
         if (pData->pStagesArray[i]->pReplacementModel &&
             (pdata->pStagesArray[i]->pReplacementModel &&
              pData->pStagesArray[i]->pReplacementModel->CompareComponent(pdata->pStagesArray[i]->pReplacementModel))) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void BGSDestructibleObjectForm::FindModelSwapNodes(NiAVObject* apRoot, BSSimpleArray<NiNode*, 1024>& arNodeArray) {
@@ -311,14 +311,14 @@ void BGSDestructibleObjectForm::FindModelSwapNodes(NiAVObject* apRoot, BSSimpleA
 
 bool BGSDestructibleObjectForm::UpdateCurrentDamageStage(TESObjectREFR* apRef, bool abForceUpdate) {
     if (!apRef->Get3D()) {
-        return 0;
+        return false;
     }
     ExtraDataList* Extra = apRef->GetExtra();
     float ObjectHealth = Extra->GetObjectHealth();
     uint32_t uiDamageStage = 0;
     if (ObjectHealth == -1.0) {
         if (!abForceUpdate) {
-            return 0;
+            return false;
         }
     }
     else {
@@ -335,11 +335,11 @@ bool BGSDestructibleObjectForm::UpdateCurrentDamageStage(TESObjectREFR* apRef, b
         }
     }
     if (!uiDamageStage && !abForceUpdate) {
-        return 0;
+        return false;
     }
     NiNode* v5 = apRef->Get3D();
     BGSDestructibleObjectForm::UpdateDamageStageNodes(v5, uiDamageStage);
-    return 1;
+    return true;
 }
 
 // Applies afDamage to apRef (an actor takes its health actor value instead) and runs every destruction stage the health
@@ -664,11 +664,10 @@ uint32_t BGSDestructibleObjectForm::SpawnDebrisAtDebrisNodes(
     }
     NiNode* pNode = apRoot->IsNode();
     if (pNode) {
-        for (a1 = 0; a1 < ((uint32_t)pNode->GetArrayCount()); ++a1) {
+        for (a1 = 0; a1 < pNode->GetArrayCount(); ++a1) {
             v8 = pNode->GetAt(a1);
-            uiCount += ((uint32_t)SpawnDebrisAtDebrisNodes(
-                static_cast<NiNode*>(v8), apDebris, aiStageIndex, apRef, aiNumParticles
-            ));
+            uiCount +=
+                SpawnDebrisAtDebrisNodes(static_cast<NiNode*>(v8), apDebris, aiStageIndex, apRef, aiNumParticles);
         }
     }
     return (int32_t)uiCount;
@@ -877,7 +876,7 @@ DestructibleObjectData* BGSDestructibleObjectForm::GetData() {
 
 DestructibleObjectStage** BGSDestructibleObjectForm::AllocateStages(uint8_t acStagesCount) {
     if (!acStagesCount) {
-        return 0;
+        return nullptr;
     }
     // new DestructibleObjectStage*[n]: -1 (SIZE_MAX) when the size overflows.
     DestructibleObjectStage** pstages = static_cast<DestructibleObjectStage**>(ourMalloc(
@@ -892,7 +891,7 @@ DestructibleObjectStage** BGSDestructibleObjectForm::AllocateStages(uint8_t acSt
             v3 = ::new (apMemory) DestructibleObjectStage;
         }
         else {
-            v3 = 0;
+            v3 = nullptr;
         }
         pstages[i] = v3;
     }
@@ -906,7 +905,7 @@ void BGSDestructibleObjectForm::ApplyTerminalDamage(TESObjectREFR* apRef) {
         uint8_t ccurrentHealthPercentage = static_cast<int32_t>(FloatCeil(aIn));
         uint32_t ilastStageSelfDPS = 0;
         uint8_t clastStageHealthPercent = 100;
-        TESModelTextureSwap* plastReplacementModel = 0;
+        TESModelTextureSwap* plastReplacementModel = nullptr;
         for (uint32_t i = 0; i < pData->cNumStages; ++i) {
             DestructibleObjectStage* pstage = pData->pStagesArray[i];
             if (pstage->cHealthPercentage < static_cast<int32_t>(ccurrentHealthPercentage)) {
@@ -928,10 +927,10 @@ void BGSDestructibleObjectForm::ApplyTerminalDamage(TESObjectREFR* apRef) {
                 static_cast<double>(clastStageHealthPercent) / 100.0 * static_cast<double>(pData->iHealth);
             (&apRef->m_Extra)->SetObjectHealth(fnewHealth);
             if (plastReplacementModel) {
-                apRef->Set3D(0, 1);
+                apRef->Set3D(nullptr, true);
                 (&apRef->m_Extra)->SetModelSwap(plastReplacementModel, apRef->GetObjectReference());
             }
-            UpdateCurrentDamageStage(apRef, 0);
+            UpdateCurrentDamageStage(apRef, false);
         }
     }
 }
@@ -941,7 +940,7 @@ void BGSDestructibleObjectForm::UnloadReplacementModels() {
         if (pData->spPreloadedReplacementModels.m_pObject) {
             NiAtomicDecrement(pData->iReplacementModelRefCount);
             if (pData->iReplacementModelRefCount <= 0) {
-                pData->spPreloadedReplacementModels.operator=(static_cast<QueuedFile*>(0));
+                pData->spPreloadedReplacementModels.operator=(static_cast<QueuedFile*>(nullptr));
             }
         }
     }
@@ -956,12 +955,12 @@ void BGSDestructibleObjectForm::PreloadReplacementModels(TESBoundObject* apObjec
                 v2 = ::new (apMemory) QueuedFile(IO_TASK_PRIORITY_VERY_LOW);
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pData->spPreloadedReplacementModels.operator=(v2);
             QueueFiles(apObject, IO_TASK_PRIORITY_VERY_LOW, pData->spPreloadedReplacementModels.m_pObject);
             if (!pData->spPreloadedReplacementModels.m_pObject->GetChildCount()) {
-                pData->spPreloadedReplacementModels.operator=(static_cast<QueuedFile*>(0));
+                pData->spPreloadedReplacementModels.operator=(static_cast<QueuedFile*>(nullptr));
             }
         }
         if (pData->spPreloadedReplacementModels.m_pObject) {
@@ -1026,22 +1025,22 @@ bool BGSDestructibleObjectForm::GetTargetableInVATS() {
 
 bool BGSDestructibleObjectForm::HideSmallDebris(NiAVObject* ap3D) {
     CFilter a2;
-    bool bhidSomething = 0;
+    bool bhidSomething = false;
     if (ap3D) {
-        bool bcull = 0;
+        bool bcull = false;
         bhkCollisionObject* pcol = bhkCollisionObject::GetbhkCollisionObject(ap3D);
         if (pcol) {
             bhkRigidBody* prb = pcol->GetRigidBody();
             if (prb) {
                 CFilter* CollisionFilter = prb->GetCollisionFilter(&a2);
                 if (CollisionFilter->GetLayer() == L_DEBRIS_SMALL) {
-                    bcull = 1;
+                    bcull = true;
                 }
             }
         }
         if (bcull) {
-            bhidSomething = 1;
-            ap3D->SetAppCulled(1);
+            bhidSomething = true;
+            ap3D->SetAppCulled(true);
         }
         else {
             NiNode* pnode = ap3D->IsNode();
@@ -1050,7 +1049,7 @@ bool BGSDestructibleObjectForm::HideSmallDebris(NiAVObject* ap3D) {
                 for (int32_t i = 0; i < icount; ++i) {
                     NiAVObject* v2 = pnode->GetAt(i);
                     if (BGSDestructibleObjectForm::HideSmallDebris(v2)) {
-                        bhidSomething = 1;
+                        bhidSomething = true;
                     }
                 }
             }
@@ -1063,7 +1062,7 @@ void BGSDestructibleObjectForm::UpdateDestructibleObjects() {
     float fsecondsPassed = appTimer.fDelta;
     NiTMapItem<TESObjectREFR*, uint32_t>* it = BGSDestructibleObjectForm::DestructibleObjects.GetFirstPos();
     while (it) {
-        TESObjectREFR* pref = 0;
+        TESObjectREFR* pref = nullptr;
         uint32_t idamagePerSecond = 0;
         BGSDestructibleObjectForm::DestructibleObjects.GetNext(it, pref, idamagePerSecond);
         if (pref) {
@@ -1075,13 +1074,13 @@ void BGSDestructibleObjectForm::UpdateDestructibleObjects() {
                         static_cast<Actor*>(pref)->DoDamage(fdamage, 0.0f, nullptr);
                     }
                     else {
-                        pref->DamageObject(fdamage, 1);
+                        pref->DamageObject(fdamage, true);
                     }
                 }
                 else {
                     TESObjectREFR* v1 = pref;
                     TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
-                    Instance->QueueUpdateDestructibleObject(v1, fdamage, 1);
+                    Instance->QueueUpdateDestructibleObject(v1, fdamage, true);
                 }
             }
         }
@@ -1098,7 +1097,7 @@ void BGSDestructibleObjectForm::UpdateDamageStageNodes(NiAVObject* apRoot, uint3
         }
         v4 = apRoot->IsNode();
         if (v4) {
-            for (a1 = 0; a1 < ((uint32_t)v4->GetArrayCount()); ++a1) {
+            for (a1 = 0; a1 < v4->GetArrayCount(); ++a1) {
                 v2 = v4->GetAt(a1);
                 BGSDestructibleObjectForm::UpdateDamageStageNodes(v2, aiStageIndex);
             }
@@ -1111,7 +1110,7 @@ int32_t BGSDestructibleObjectForm::CalcDestructionStage(TESObjectREFR* apRef) {
     if (apRef) {
         BGSDestructibleObjectForm* DestructionForm =
             BGSDestructibleObjectForm::GetDestructionForm(apRef->GetObjectReference());
-        DestructibleObjectData* v3 = DestructionForm ? DestructionForm->pData : 0;
+        DestructibleObjectData* v3 = DestructionForm ? DestructionForm->pData : nullptr;
         if (v3) {
             float ObjectHealth = (&apRef->m_Extra)->GetObjectHealth();
             if (ObjectHealth != -1.0) {
@@ -1139,18 +1138,18 @@ void BGSDestructibleObjectForm::ClearDestruction(TESObjectREFR* apRef) {
             ExtraDataList* v3 = &apRef->m_Extra;
             v3->RemoveObjectHealth();
             if (apRef->GetDestroyed()) {
-                apRef->SetDestroyed(0);
+                apRef->SetDestroyed(false);
             }
             ExtraDataList* v4 = &apRef->m_Extra;
             if (v4->GetModelSwap()) {
                 ExtraDataList* v5 = &apRef->m_Extra;
                 v5->RemoveModelSwap();
                 if (apRef->Get3D()) {
-                    bool v12 = pSaveLoadGame->SetThreadAllowChanges(0);
-                    apRef->Set3D(0, 1);
+                    bool v12 = pSaveLoadGame->SetThreadAllowChanges(false);
+                    apRef->Set3D(nullptr, true);
                     pSaveLoadGame->SetThreadAllowChanges(v12);
                     TESObjectCELL* ParentCell = apRef->GetParentCell();
-                    TES::pInstance->AttachModel(apRef, ParentCell, 0, 0);
+                    TES::pInstance->AttachModel(apRef, ParentCell, nullptr, false);
                     if (apRef->Get3D()) {
                         BSFadeNode* v9;
                         NiNode* v10;
@@ -1159,18 +1158,18 @@ void BGSDestructibleObjectForm::ClearDestruction(TESObjectREFR* apRef) {
                             v10 = apObject->IsNode();
                         }
                         else {
-                            v10 = 0;
+                            v10 = nullptr;
                         }
                         if (v10) {
                             v9 = v10->IsFadeNode();
                         }
                         else {
-                            v9 = 0;
+                            v9 = nullptr;
                         }
                         if (v9) {
                             v9->TurnFadeNodeOn();
                         }
-                        bhkWorld::Activate(apObject, 1, 1, 0);
+                        bhkWorld::Activate(apObject, true, true, false);
                     }
                 }
             }
@@ -1348,7 +1347,7 @@ int32_t BGSDestructibleObjectForm::GetModelSwapIndex(TESForm* apForm, TESModel* 
 
 TESModel* BGSDestructibleObjectForm::GetModelSwap(TESForm* apForm, int32_t aiModelSwapIndex) {
     BGSDestructibleObjectForm* destructionForm = BGSDestructibleObjectForm::GetDestructionForm(apForm);
-    if ((!destructionForm) || (aiModelSwapIndex == ((-1)))) {
+    if ((!destructionForm) || (aiModelSwapIndex == (-1))) {
         return nullptr;
     }
     DestructibleObjectData* v3 = destructionForm->BGSDestructibleObjectForm::GetData();

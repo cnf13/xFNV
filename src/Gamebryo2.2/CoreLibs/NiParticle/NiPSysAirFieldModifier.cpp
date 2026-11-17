@@ -41,7 +41,7 @@ NiObject* NiPSysAirFieldModifier::CreateClone(NiCloningProcess& kCloning) {
         pkObject = ::new (v3) NiPSysAirFieldModifier;
     }
     else {
-        pkObject = 0;
+        pkObject = nullptr;
     }
     CopyMembers(pkObject, kCloning);
     pkObject->SetDirection(m_kDirection);
@@ -237,7 +237,7 @@ void NiPSysAirFieldModifier::Update(float fTime, NiPSysData* pkData) {
             if (m_bUseMaxDistance && m_fAttenuation != 0.0f) {
                 float fDist = std::sqrt(fSqrDist);
                 float fBase = 1.0f - fDist / m_fMaxDistance;
-                float fFalloff = static_cast<float>(std::pow(fBase, m_fAttenuation));
+                float fFalloff = std::pow(fBase, m_fAttenuation);
                 fScale = fFalloff * fDeltaT;
             }
             float fAirFriction = m_fAirFriction;

@@ -5,7 +5,7 @@
 class hkVector4;
 
 // hkVector4.h's hkQuadReal (the SDK's SSE form); hkVector4.h includes this header.
-typedef __m128 hkQuadReal;
+using hkQuadReal = __m128;
 
 class alignas(16) hkSimdReal {
 public:

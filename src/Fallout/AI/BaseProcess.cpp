@@ -169,7 +169,7 @@ void BaseProcess::SetProcedureIndexRunning(int32_t aiNewIndex) {
 }
 
 void BaseProcess::AddToProcedureIndexRunning(MobileObject* apActor, int32_t ainumb) {
-    AddToCurrentProcedureIndex((int32_t)ainumb);
+    AddToCurrentProcedureIndex(ainumb);
 }
 
 // the base process keeps no controller; the by-value pointer's destructor releases it
@@ -236,7 +236,7 @@ void BaseProcess::SaveGame(uint32_t aiFlags, MobileObject* pmob) {
     uint16_t iblockSize;
     iblockSize = 0;
     // The reserved size slot in the save buffer (untyped bytes there).
-    void* pblockSize = 0;
+    void* pblockSize = nullptr;
     uint8_t* itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -297,7 +297,7 @@ void BaseProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, MobileObje
     uint32_t iblockHeader;
     uint16_t iblockSize;
     iblockSize = 0;
-    uint8_t* istartBufferPosition = 0;
+    uint8_t* istartBufferPosition = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockHeader, 4u);
         if (iblockHeader != 0x424C4F4B) {
@@ -405,9 +405,9 @@ void BaseProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 void BaseProcess::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags, MobileObject* pmob) {
     PlayerCharacter* v5 = static_cast<PlayerCharacter*>(dynamic_cast<Actor*>(pmob));
     if (v5) {
-        if (((v5 != pPlayer) && (!GetCurrentPackage())) && (((uint32_t)GetProcedureIndexRunning()) == ((-1)))) {
+        if (((v5 != pPlayer) && (!GetCurrentPackage())) && (((uint32_t)GetProcedureIndexRunning()) == (-1))) {
             SetProcedureIndexRunning(0);
-            v5->EvaluatePackage(1, 1);
+            v5->EvaluatePackage(true, true);
         }
     }
 }

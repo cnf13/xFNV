@@ -208,7 +208,7 @@ hkpPrismaticConstraintData::hkpPrismaticConstraintData() {
     m_atoms.m_friction.m_maxFrictionForce = 0.0f;
     m_atoms.m_motor.m_isEnabled.m_bool = 0;
     m_atoms.m_motor.m_targetPosition = 0.0f;
-    m_atoms.m_motor.m_motor = 0;
+    m_atoms.m_motor.m_motor = nullptr;
     m_atoms.m_motor.m_motorAxis = 0;
     m_atoms.m_ang.m_firstConstrainedAxis = 0;
     m_atoms.m_motor.m_initializedOffset = 64;
@@ -392,8 +392,8 @@ void hkpPrismaticConstraintData::setInBodySpace(
     __m128 v12 = _mm_setzero_ps();
     v12[0] = 0.5f;
     __m128 v13 = _mm_cmpeq_ss(v9, v11);
-    float v14 = 3.0f - static_cast<float>(static_cast<float>(v9[0] * v10) * v10);
-    v12[0] = static_cast<float>(0.5f * v10) * v14;
+    float v14 = 3.0f - ((v9[0] * v10) * v10);
+    v12[0] = (0.5f * v10) * v14;
     __m128 v16 = _mm_andnot_ps(v13, v12);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(v16, v16, 0), axisA.m_quad);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad = axisAPerp.m_quad;
@@ -403,8 +403,8 @@ void hkpPrismaticConstraintData::setInBodySpace(
     __m128 v19 = _mm_shuffle_ps(v18, v18, 170);
     v19[0] = v19[0] + v16[0];
     float v20 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v19[0])));
-    float v22 = 3.0f - static_cast<float>(static_cast<float>(v19[0] * v20) * v20);
-    v12[0] = static_cast<float>(0.5f * v20) * v22;
+    float v22 = 3.0f - ((v19[0] * v20) * v20);
+    v12[0] = (0.5f * v20) * v22;
     __m128 v24 = _mm_andnot_ps(_mm_cmpeq_ss(v19, v11), v12);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v24, v24, 0), v17.m_quad);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad = _mm_sub_ps(
@@ -435,8 +435,8 @@ void hkpPrismaticConstraintData::setInBodySpace(
     v26[0] = v26[0] + v24[0];
     float v27 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v26[0])));
     __m128 v28 = _mm_cmpeq_ss(v26, v11);
-    float v29 = 3.0f - static_cast<float>(static_cast<float>(v26[0] * v27) * v27);
-    v12[0] = static_cast<float>(0.5f * v27) * v29;
+    float v29 = 3.0f - ((v26[0] * v27) * v27);
+    v12[0] = (0.5f * v27) * v29;
     __m128 v31 = _mm_andnot_ps(v28, v12);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(v31, v31, 0), axisB.m_quad);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad = axisBPerp.m_quad;
@@ -446,8 +446,7 @@ void hkpPrismaticConstraintData::setInBodySpace(
     __m128 v34 = _mm_shuffle_ps(v33, v33, 170);
     v34[0] = v34[0] + v31[0];
     v31[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v34[0])));
-    v12[0] = static_cast<float>(0.5f * v31[0]) *
-        static_cast<float>(3.0f - static_cast<float>(static_cast<float>(v34[0] * v31[0]) * v31[0]));
+    v12[0] = (0.5f * v31[0]) * (3.0f - ((v34[0] * v31[0]) * v31[0]));
     __m128 v35 = _mm_andnot_ps(_mm_cmpeq_ss(v34, v11), v12);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v35, v35, 0), v32.m_quad);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col2.m_quad = _mm_sub_ps(

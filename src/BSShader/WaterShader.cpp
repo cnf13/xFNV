@@ -44,17 +44,17 @@ NiRTTI WaterShader::ms_RTTI("WaterShader", &NiD3DDefaultShader::ms_RTTI);
 // The shader becomes the instance and resets the shared water state and constant enables.
 WaterShader::WaterShader() {
     iShaderType = 13;
-    m_bUsesNiRenderState = 1;
+    m_bUsesNiRenderState = true;
     WaterShader::pInstance = this;
     WaterShader::kNormalOffset.x = 0.0f;
-    WaterShader::bUnderWater = 0;
-    WaterShader::bNoReflections = 0;
-    WaterShader::bNoRefractions = 0;
+    WaterShader::bUnderWater = false;
+    WaterShader::bNoReflections = false;
+    WaterShader::bNoRefractions = false;
     WaterShader::kNormalOffset.y = 0.0f;
     WaterShader::kNormalOffset.z = 0.0f;
     WaterShader::kNormalOffset.w = 0.0f;
     if (BSShaderManager::eShaderLevel <= 2) {
-        WaterShader::bDepth = 0;
+        WaterShader::bDepth = false;
     }
     WaterShader::bVSConstantEnable[0] = 0;
     WaterShader::bVSConstantEnable[1] = 0;
@@ -118,11 +118,11 @@ void WaterShader::SetupGeometryTextures(const NiPropertyState* apState) {
     BSShaderManager::eBSSMPassEnum v2 = BSShaderManager::eCurrentPass;
     NiD3DPass* v3 = NiD3DShader::m_spCurrentPass;
     WaterShaderProperty* m_pObject = static_cast<WaterShaderProperty*>(apState->m_aspProps[3].m_pObject);
-    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase->m_pObject->m_spTexture = 0;
-    v3->m_kStages.m_pBase[1].m_pObject->m_spTexture = 0;
-    v3->m_kStages.m_pBase[2].m_pObject->m_spTexture = 0;
-    v3->m_kStages.m_pBase[3].m_pObject->m_spTexture = 0;
-    v3->m_kStages.m_pBase[4].m_pObject->m_spTexture = 0;
+    NiD3DShader::m_spCurrentPass->m_kStages.m_pBase->m_pObject->m_spTexture = nullptr;
+    v3->m_kStages.m_pBase[1].m_pObject->m_spTexture = nullptr;
+    v3->m_kStages.m_pBase[2].m_pObject->m_spTexture = nullptr;
+    v3->m_kStages.m_pBase[3].m_pObject->m_spTexture = nullptr;
+    v3->m_kStages.m_pBase[4].m_pObject->m_spTexture = nullptr;
     if (v2 != BSShaderManager::BSSM_WATER_STENCIL && v2 != BSShaderManager::BSSM_WATER_STENCIL_Vc) {
         BSRenderedTexture* v5 = m_pObject->spReflectionMap.m_pObject;
         if (v5 && m_pObject->bReflections) {
@@ -172,7 +172,7 @@ void WaterShader::SetupGeometryConstants(const NiPropertyState* apState) {
     }
     NiGeometryBufferData* pbufferData = pgeometry->m_spModelData.m_pObject->m_pkBuffData;
     const NiSkinInstance* pskin = pgeometry->m_spSkinInstance.m_pObject;
-    m_pkD3DRenderer->SetModelTransform(pgeometry->m_kWorld, 0);
+    m_pkD3DRenderer->SetModelTransform(pgeometry->m_kWorld, false);
     float eyePos = BSShaderLightingProperty::pShaderLightConstants[30].X() - NiRenderer::PosAdjust.x;
     float eyePos_4 = BSShaderLightingProperty::pShaderLightConstants[30].Y() - NiRenderer::PosAdjust.y;
     float eyePos_8 = BSShaderLightingProperty::pShaderLightConstants[30].Z() - NiRenderer::PosAdjust.z;
@@ -242,7 +242,7 @@ void WaterShader::SetupGeometryConstants(const NiPropertyState* apState) {
         if (pProperty->bDisplacement) {
             if (v2 == BSShaderManager::BSSM_WATER_WADING_SPECULAR_LIGHTING ||
                 v2 == BSShaderManager::BSSM_WATER_WADING_SPECULAR_LIGHTING_Vc) {
-                BSRenderState::SetStencilEnable(1, BSRS_NOLOCK);
+                BSRenderState::SetStencilEnable(true, BSRS_NOLOCK);
                 BSRenderState::SetStencilFunc(
                     NiStencilProperty::TEST_EQUAL, 255u, pProperty->iStencilMask, BSRS_NOLOCK
                 );
@@ -252,7 +252,7 @@ void WaterShader::SetupGeometryConstants(const NiPropertyState* apState) {
                 );
             }
             else {
-                BSRenderState::SetStencilEnable(1, BSRS_NOLOCK);
+                BSRenderState::SetStencilEnable(true, BSRS_NOLOCK);
                 BSRenderState::SetStencilFunc(
                     NiStencilProperty::TEST_EQUAL, 255u, pProperty->iStencilMask, BSRS_NOLOCK
                 );
@@ -302,7 +302,7 @@ void WaterShader::SetupGeometryConstants(const NiPropertyState* apState) {
         NiD3DPixelShader* v14 = NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject;
         if (v14) {
             v13->SetShaderConstants(
-                v14, pgeometry, pskin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *worldBound, 0, 1
+                v14, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *worldBound, 0, true
             );
         }
     }
@@ -311,7 +311,7 @@ void WaterShader::SetupGeometryConstants(const NiPropertyState* apState) {
         NiD3DVertexShader* v16 = NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject;
         if (v16) {
             v15->SetShaderConstants(
-                v16, pgeometry, pskin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *worldBound, 0, 1
+                v16, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *worldBound, 0, true
             );
         }
     }
@@ -322,12 +322,12 @@ void WaterShader::PostGeometry(const NiPropertyState* apState) {
     BSShaderManager::eBSSMPassEnum v3 = BSShaderManager::eCurrentPass;
     if (pProperty) {
         if ((pProperty->ulFlags[1] & BSS2_Wireframe) != 0) {
-            BSRenderState::SetWireframeEnable(0, BSRS_NOLOCK);
+            BSRenderState::SetWireframeEnable(false, BSRS_NOLOCK);
         }
     }
     if (v3 != BSShaderManager::BSSM_WATER_STENCIL && v3 != BSShaderManager::BSSM_WATER_STENCIL_Vc) {
         if (pProperty->bDisplacement) {
-            BSRenderState::SetStencilEnable(0, BSRS_NOLOCK);
+            BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
         }
     }
 }
@@ -636,223 +636,223 @@ void WaterShader::SetupPassConstants(uint32_t auiCurrentPass) {
     uint32_t v2 = 0;
     switch (auiCurrentPass) {
         case 575u: {
-            WaterShader::EnableConstantsForPass(33u, 0);
+            WaterShader::EnableConstantsForPass(33u, false);
             break;
         }
         case 576u: {
-            WaterShader::EnableConstantsForPass(34u, 0);
+            WaterShader::EnableConstantsForPass(34u, false);
             break;
         }
         case 648u: {
-            WaterShader::EnableConstantsForPass(35u, 0);
+            WaterShader::EnableConstantsForPass(35u, false);
             break;
         }
         case 649u: {
-            WaterShader::EnableConstantsForPass(71u, 0);
+            WaterShader::EnableConstantsForPass(71u, false);
             break;
         }
         case 650u: {
-            WaterShader::EnableConstantsForPass(17u, 0);
+            WaterShader::EnableConstantsForPass(17u, false);
             break;
         }
         case 651u: {
-            WaterShader::EnableConstantsForPass(20u, 0);
+            WaterShader::EnableConstantsForPass(20u, false);
             break;
         }
         case 652u: {
-            WaterShader::EnableConstantsForPass(19u, 0);
+            WaterShader::EnableConstantsForPass(19u, false);
             break;
         }
         case 653u: {
-            WaterShader::EnableConstantsForPass(18u, 0);
+            WaterShader::EnableConstantsForPass(18u, false);
             break;
         }
         case 654u: {
-            WaterShader::EnableConstantsForPass(21u, 0);
+            WaterShader::EnableConstantsForPass(21u, false);
             break;
         }
         case 655u: {
-            WaterShader::EnableConstantsForPass(24u, 0);
+            WaterShader::EnableConstantsForPass(24u, false);
             break;
         }
         case 656u: {
-            WaterShader::EnableConstantsForPass(23u, 0);
+            WaterShader::EnableConstantsForPass(23u, false);
             break;
         }
         case 657u: {
-            WaterShader::EnableConstantsForPass(22u, 0);
+            WaterShader::EnableConstantsForPass(22u, false);
             break;
         }
         case 658u: {
-            WaterShader::EnableConstantsForPass(25u, 0);
+            WaterShader::EnableConstantsForPass(25u, false);
             break;
         }
         case 659u: {
-            WaterShader::EnableConstantsForPass(28u, 0);
+            WaterShader::EnableConstantsForPass(28u, false);
             break;
         }
         case 660u: {
-            WaterShader::EnableConstantsForPass(27u, 0);
+            WaterShader::EnableConstantsForPass(27u, false);
             break;
         }
         case 661u: {
-            WaterShader::EnableConstantsForPass(26u, 0);
+            WaterShader::EnableConstantsForPass(26u, false);
             break;
         }
         case 662u: {
-            WaterShader::EnableConstantsForPass(29u, 0);
+            WaterShader::EnableConstantsForPass(29u, false);
             break;
         }
         case 663u: {
-            WaterShader::EnableConstantsForPass(32u, 0);
+            WaterShader::EnableConstantsForPass(32u, false);
             break;
         }
         case 664u: {
-            WaterShader::EnableConstantsForPass(31u, 0);
+            WaterShader::EnableConstantsForPass(31u, false);
             break;
         }
         case 665u: {
-            WaterShader::EnableConstantsForPass(30u, 0);
+            WaterShader::EnableConstantsForPass(30u, false);
             break;
         }
         case 666u: {
-            WaterShader::EnableConstantsForPass(37u, 0);
+            WaterShader::EnableConstantsForPass(37u, false);
             break;
         }
         case 667u: {
-            WaterShader::EnableConstantsForPass(55u, 0);
+            WaterShader::EnableConstantsForPass(55u, false);
             break;
         }
         case 668u: {
-            WaterShader::EnableConstantsForPass(56u, 0);
+            WaterShader::EnableConstantsForPass(56u, false);
             break;
         }
         case 669u: {
-            WaterShader::EnableConstantsForPass(57u, 0);
+            WaterShader::EnableConstantsForPass(57u, false);
             break;
         }
         case 670u: {
-            WaterShader::EnableConstantsForPass(58u, 0);
+            WaterShader::EnableConstantsForPass(58u, false);
             break;
         }
         case 671u: {
-            WaterShader::EnableConstantsForPass(59u, 0);
+            WaterShader::EnableConstantsForPass(59u, false);
             break;
         }
         case 672u: {
-            WaterShader::EnableConstantsForPass(60u, 0);
+            WaterShader::EnableConstantsForPass(60u, false);
             break;
         }
         case 673u: {
-            WaterShader::EnableConstantsForPass(61u, 0);
+            WaterShader::EnableConstantsForPass(61u, false);
             break;
         }
         case 674u: {
-            WaterShader::EnableConstantsForPass(62u, 0);
+            WaterShader::EnableConstantsForPass(62u, false);
             break;
         }
         case 675u: {
-            WaterShader::EnableConstantsForPass(63u, 0);
+            WaterShader::EnableConstantsForPass(63u, false);
             break;
         }
         case 676u: {
-            WaterShader::EnableConstantsForPass(64u, 0);
+            WaterShader::EnableConstantsForPass(64u, false);
             break;
         }
         case 677u: {
-            WaterShader::EnableConstantsForPass(65u, 0);
+            WaterShader::EnableConstantsForPass(65u, false);
             break;
         }
         case 678u: {
-            WaterShader::EnableConstantsForPass(66u, 0);
+            WaterShader::EnableConstantsForPass(66u, false);
             break;
         }
         case 679u: {
-            WaterShader::EnableConstantsForPass(67u, 0);
+            WaterShader::EnableConstantsForPass(67u, false);
             break;
         }
         case 680u: {
-            WaterShader::EnableConstantsForPass(68u, 0);
+            WaterShader::EnableConstantsForPass(68u, false);
             break;
         }
         case 681u: {
-            WaterShader::EnableConstantsForPass(69u, 0);
+            WaterShader::EnableConstantsForPass(69u, false);
             break;
         }
         case 682u: {
-            WaterShader::EnableConstantsForPass(70u, 0);
+            WaterShader::EnableConstantsForPass(70u, false);
             break;
         }
         case 683u: {
-            WaterShader::EnableConstantsForPass(73u, 0);
+            WaterShader::EnableConstantsForPass(73u, false);
             break;
         }
         case 684u: {
-            WaterShader::EnableConstantsForPass(0, 0);
+            WaterShader::EnableConstantsForPass(0, false);
             break;
         }
         case 685u: {
-            WaterShader::EnableConstantsForPass(3u, 0);
+            WaterShader::EnableConstantsForPass(3u, false);
             break;
         }
         case 686u: {
-            WaterShader::EnableConstantsForPass(2u, 0);
+            WaterShader::EnableConstantsForPass(2u, false);
             break;
         }
         case 687u: {
-            WaterShader::EnableConstantsForPass(1u, 0);
+            WaterShader::EnableConstantsForPass(1u, false);
             break;
         }
         case 688u: {
-            WaterShader::EnableConstantsForPass(8u, 0);
+            WaterShader::EnableConstantsForPass(8u, false);
             break;
         }
         case 689u: {
-            WaterShader::EnableConstantsForPass(11u, 0);
+            WaterShader::EnableConstantsForPass(11u, false);
             break;
         }
         case 690u: {
-            WaterShader::EnableConstantsForPass(10u, 0);
+            WaterShader::EnableConstantsForPass(10u, false);
             break;
         }
         case 691u: {
-            WaterShader::EnableConstantsForPass(9u, 0);
+            WaterShader::EnableConstantsForPass(9u, false);
             break;
         }
         case 692u: {
-            WaterShader::EnableConstantsForPass(4u, 0);
+            WaterShader::EnableConstantsForPass(4u, false);
             break;
         }
         case 693u: {
-            WaterShader::EnableConstantsForPass(5u, 0);
+            WaterShader::EnableConstantsForPass(5u, false);
             break;
         }
         case 694u: {
-            WaterShader::EnableConstantsForPass(6u, 0);
+            WaterShader::EnableConstantsForPass(6u, false);
             break;
         }
         case 695u: {
-            WaterShader::EnableConstantsForPass(7u, 0);
+            WaterShader::EnableConstantsForPass(7u, false);
             break;
         }
         case 696u: {
-            WaterShader::EnableConstantsForPass(12u, 0);
+            WaterShader::EnableConstantsForPass(12u, false);
             break;
         }
         case 697u: {
-            WaterShader::EnableConstantsForPass(15u, 0);
+            WaterShader::EnableConstantsForPass(15u, false);
             break;
         }
         case 698u: {
-            WaterShader::EnableConstantsForPass(14u, 0);
+            WaterShader::EnableConstantsForPass(14u, false);
             break;
         }
         case 699u: {
-            WaterShader::EnableConstantsForPass(13u, 0);
+            WaterShader::EnableConstantsForPass(13u, false);
             break;
         }
         case 700u: {
-            WaterShader::EnableConstantsForPass(36u, 0);
+            WaterShader::EnableConstantsForPass(36u, false);
             break;
         }
         case 701u: {
@@ -860,76 +860,76 @@ void WaterShader::SetupPassConstants(uint32_t auiCurrentPass) {
             goto LABEL_75;
         }
         case 702u: {
-            WaterShader::EnableConstantsForPass(38u, 0);
+            WaterShader::EnableConstantsForPass(38u, false);
             break;
         }
         case 703u: {
-            WaterShader::EnableConstantsForPass(41u, 0);
+            WaterShader::EnableConstantsForPass(41u, false);
             break;
         }
         case 704u: {
-            WaterShader::EnableConstantsForPass(40u, 0);
+            WaterShader::EnableConstantsForPass(40u, false);
             break;
         }
         case 705u: {
-            WaterShader::EnableConstantsForPass(39u, 0);
+            WaterShader::EnableConstantsForPass(39u, false);
             break;
         }
         case 706u: {
-            WaterShader::EnableConstantsForPass(46u, 0);
+            WaterShader::EnableConstantsForPass(46u, false);
             break;
         }
         case 707u: {
-            WaterShader::EnableConstantsForPass(49u, 0);
+            WaterShader::EnableConstantsForPass(49u, false);
             break;
         }
         case 708u: {
-            WaterShader::EnableConstantsForPass(48u, 0);
+            WaterShader::EnableConstantsForPass(48u, false);
             break;
         }
         case 709u: {
-            WaterShader::EnableConstantsForPass(47u, 0);
+            WaterShader::EnableConstantsForPass(47u, false);
             break;
         }
         case 710u: {
-            WaterShader::EnableConstantsForPass(42u, 0);
+            WaterShader::EnableConstantsForPass(42u, false);
             break;
         }
         case 711u: {
-            WaterShader::EnableConstantsForPass(43u, 0);
+            WaterShader::EnableConstantsForPass(43u, false);
             break;
         }
         case 712u: {
-            WaterShader::EnableConstantsForPass(44u, 0);
+            WaterShader::EnableConstantsForPass(44u, false);
             break;
         }
         case 713u: {
-            WaterShader::EnableConstantsForPass(45u, 0);
+            WaterShader::EnableConstantsForPass(45u, false);
             break;
         }
         case 714u: {
-            WaterShader::EnableConstantsForPass(50u, 0);
+            WaterShader::EnableConstantsForPass(50u, false);
             break;
         }
         case 715u: {
-            WaterShader::EnableConstantsForPass(53u, 0);
+            WaterShader::EnableConstantsForPass(53u, false);
             break;
         }
         case 716u: {
-            WaterShader::EnableConstantsForPass(52u, 0);
+            WaterShader::EnableConstantsForPass(52u, false);
             break;
         }
         case 717u: {
-            WaterShader::EnableConstantsForPass(51u, 0);
+            WaterShader::EnableConstantsForPass(51u, false);
             break;
         }
         case 718u: {
-            WaterShader::EnableConstantsForPass(72u, 0);
+            WaterShader::EnableConstantsForPass(72u, false);
             break;
         }
         default: {
         LABEL_75:;
-            WaterShader::EnableConstantsForPass(v2, 0);
+            WaterShader::EnableConstantsForPass(v2, false);
             break;
         }
     }
@@ -1126,64 +1126,64 @@ bool WaterShader::LoadStagesAndPasses() {
         {
             NiPointer<NiD3DTextureStage> spStage;
             NiD3DTextureStage::CreateNewStage(spStage);
-            BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(spStage.m_pObject, 0, 3u, 2u, true);
             spStage.m_pObject->SetFilterMode(NiTexturingProperty::FILTER_BILERP);
             spPass->m_pObject->SetStage(spPass->m_pObject->m_uiCurrentStage, spStage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spStage);
-            BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(spStage.m_pObject, 1u, 3u, 2u, true);
             spStage.m_pObject->SetFilterMode(NiTexturingProperty::FILTER_BILERP);
             spPass->m_pObject->SetStage(spPass->m_pObject->m_uiCurrentStage, spStage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spStage);
-            BSShader::SetupDefaultStage(spStage.m_pObject, 2u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spStage.m_pObject, 2u, 1u, 2u, true);
             spStage.m_pObject->SetFilterMode(NiTexturingProperty::FILTER_BILERP);
             spPass->m_pObject->SetStage(spPass->m_pObject->m_uiCurrentStage, spStage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spStage);
-            BSShader::SetupDefaultStage(spStage.m_pObject, 3u, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(spStage.m_pObject, 3u, 1u, 2u, true);
             spStage.m_pObject->SetFilterMode(NiTexturingProperty::FILTER_BILERP);
             spPass->m_pObject->SetStage(spPass->m_pObject->m_uiCurrentStage, spStage.m_pObject);
             NiD3DTextureStage::CreateNewStage(spStage);
-            BSShader::SetupDefaultStage(spStage.m_pObject, 4u, 3u, 2u, 1);
+            BSShader::SetupDefaultStage(spStage.m_pObject, 4u, 3u, 2u, true);
             spStage.m_pObject->SetFilterMode(NiTexturingProperty::FILTER_BILERP);
             spPass->m_pObject->SetStage(spPass->m_pObject->m_uiCurrentStage, spStage.m_pObject);
             m_pObject = spPass->m_pObject;
             if (!spPass->m_pObject->m_pkRenderStateGroup) {
                 m_pObject->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, 1);
+            m_pObject->m_pkRenderStateGroup->SetRenderState(15u, 1u, true);
             v4 = spPass->m_pObject;
             if (!spPass->m_pObject->m_pkRenderStateGroup) {
                 v4->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v4->m_pkRenderStateGroup->SetRenderState(24u, 0, 1);
+            v4->m_pkRenderStateGroup->SetRenderState(24u, 0, true);
             v5 = spPass->m_pObject;
             if (!spPass->m_pObject->m_pkRenderStateGroup) {
                 v5->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
             }
-            v5->m_pkRenderStateGroup->SetRenderState(25u, 5u, 1);
+            v5->m_pkRenderStateGroup->SetRenderState(25u, 5u, true);
             if (i != 33) {
                 if (i == 36 || (i == 72 || (i == 37 || i == 73))) {
                     NiD3DPass* v7 = spPass->m_pObject;
                     if (!spPass->m_pObject->m_pkRenderStateGroup) {
                         v7->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                     }
-                    v7->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+                    v7->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
                     NiD3DPass* v8 = spPass->m_pObject;
                     if (!spPass->m_pObject->m_pkRenderStateGroup) {
                         v8->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                     }
-                    v8->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+                    v8->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
                     if (!v8->m_pkRenderStateGroup) {
                         v8->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                     }
-                    v8->m_pkRenderStateGroup->SetRenderState(20u, 2u, 1);
+                    v8->m_pkRenderStateGroup->SetRenderState(20u, 2u, true);
                 }
                 else {
                     NiD3DPass* v6 = spPass->m_pObject;
                     if (!spPass->m_pObject->m_pkRenderStateGroup) {
                         v6->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                     }
-                    v6->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
-                    spPass->m_pObject->SetSrcDestBlendRenderState(5u, 6u, 0);
+                    v6->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
+                    spPass->m_pObject->SetSrcDestBlendRenderState(5u, 6u, false);
                 }
             }
             v9 = i;
@@ -1195,34 +1195,34 @@ bool WaterShader::LoadStagesAndPasses() {
                 if (!spPass->m_pObject->m_pkRenderStateGroup) {
                     v11->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v11->m_pkRenderStateGroup->SetRenderState(52u, 1u, 1);
+                v11->m_pkRenderStateGroup->SetRenderState(52u, 1u, true);
                 NiD3DPass* v12 = spPass->m_pObject;
                 if (!spPass->m_pObject->m_pkRenderStateGroup) {
                     v12->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v12->m_pkRenderStateGroup->SetRenderState(56u, 6u, 1);
+                v12->m_pkRenderStateGroup->SetRenderState(56u, 6u, true);
                 NiD3DPass* v13 = spPass->m_pObject;
                 if (!spPass->m_pObject->m_pkRenderStateGroup) {
                     v13->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v13->m_pkRenderStateGroup->SetRenderState(57u, 1u, 1);
+                v13->m_pkRenderStateGroup->SetRenderState(57u, 1u, true);
                 NiD3DPass* v14 = spPass->m_pObject;
                 if (!spPass->m_pObject->m_pkRenderStateGroup) {
                     v14->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v14->m_pkRenderStateGroup->SetRenderState(58u, 1u, 1);
+                v14->m_pkRenderStateGroup->SetRenderState(58u, 1u, true);
                 NiD3DPass* v15 = spPass->m_pObject;
                 if (!spPass->m_pObject->m_pkRenderStateGroup) {
                     v15->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v15->m_pkRenderStateGroup->SetRenderState(55u, 1u, 1);
+                v15->m_pkRenderStateGroup->SetRenderState(55u, 1u, true);
             }
             else {
                 NiD3DPass* v10 = spPass->m_pObject;
                 if (!spPass->m_pObject->m_pkRenderStateGroup) {
                     v10->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v10->m_pkRenderStateGroup->SetRenderState(52u, 1u, 1);
+                v10->m_pkRenderStateGroup->SetRenderState(52u, 1u, true);
             }
             v9 = i;
         LABEL_47:;
@@ -1231,37 +1231,37 @@ bool WaterShader::LoadStagesAndPasses() {
                 if (!spPass->m_pObject->m_pkRenderStateGroup) {
                     v16->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v16->m_pkRenderStateGroup->SetRenderState(168u, 0, 1);
+                v16->m_pkRenderStateGroup->SetRenderState(168u, 0, true);
                 NiD3DPass* v17 = spPass->m_pObject;
                 if (!spPass->m_pObject->m_pkRenderStateGroup) {
                     v17->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v17->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+                v17->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
                 NiD3DPass* v18 = spPass->m_pObject;
                 if (!spPass->m_pObject->m_pkRenderStateGroup) {
                     v18->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v18->m_pkRenderStateGroup->SetRenderState(52u, 1u, 1);
+                v18->m_pkRenderStateGroup->SetRenderState(52u, 1u, true);
                 NiD3DPass* v19 = spPass->m_pObject;
                 if (!spPass->m_pObject->m_pkRenderStateGroup) {
                     v19->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v19->m_pkRenderStateGroup->SetRenderState(56u, 3u, 1);
+                v19->m_pkRenderStateGroup->SetRenderState(56u, 3u, true);
                 NiD3DPass* v20 = spPass->m_pObject;
                 if (!spPass->m_pObject->m_pkRenderStateGroup) {
                     v20->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v20->m_pkRenderStateGroup->SetRenderState(57u, 255u, 1);
+                v20->m_pkRenderStateGroup->SetRenderState(57u, 255u, true);
                 NiD3DPass* v21 = spPass->m_pObject;
                 if (!spPass->m_pObject->m_pkRenderStateGroup) {
                     v21->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v21->m_pkRenderStateGroup->SetRenderState(55u, 3u, 1);
+                v21->m_pkRenderStateGroup->SetRenderState(55u, 3u, true);
                 NiD3DPass* v22 = spPass->m_pObject;
                 if (!spPass->m_pObject->m_pkRenderStateGroup) {
                     v22->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
                 }
-                v22->m_pkRenderStateGroup->SetRenderState(58u, 0, 1);
+                v22->m_pkRenderStateGroup->SetRenderState(58u, 0, true);
             }
         }
     LABEL_67:;
@@ -1644,7 +1644,7 @@ bool WaterShader::LoadStagesAndPasses() {
     this->WaterShader::spPass[73].m_pObject->SetVertexShader(spWaterVertexShader_Lighting.m_pObject);
     this->WaterShader::spPass[73].m_pObject->SetPixelShader(spWaterPixelShader[37].m_pObject);
     WaterShader::ulPixelConstantFlags[73] = 78;
-    return 1;
+    return true;
 }
 
 // Each shader is a BSShaderMacro: its HLSL file and up to nine macros, the rest zeroed.
@@ -2094,15 +2094,15 @@ WaterShader* WaterShader::GetInstance() {
 
 void WaterShader::EnableConstantsForPass(uint32_t auiPassEnum, bool abAlphaPass) {
     if (WaterShader::pVertexConstantMapEntry[0]) {
-        WaterShader::pVertexConstantMapEntry[0]->m_bEnabled = 1;
+        WaterShader::pVertexConstantMapEntry[0]->m_bEnabled = true;
     }
     WaterShader::bVSConstantEnable[0] = (WaterShader::ulVertexConstantFlags[auiPassEnum] & 2) != 0;
     if (WaterShader::pVertexConstantMapEntry[1]) {
-        WaterShader::pVertexConstantMapEntry[1]->m_bEnabled = 1;
+        WaterShader::pVertexConstantMapEntry[1]->m_bEnabled = true;
     }
     WaterShader::bVSConstantEnable[1] = (WaterShader::ulVertexConstantFlags[auiPassEnum] & 4) != 0;
     if (WaterShader::pVertexConstantMapEntry[2]) {
-        WaterShader::pVertexConstantMapEntry[2]->m_bEnabled = 1;
+        WaterShader::pVertexConstantMapEntry[2]->m_bEnabled = true;
     }
     WaterShader::bVSConstantEnable[2] = (WaterShader::ulVertexConstantFlags[auiPassEnum] & 8) != 0;
     if (WaterShader::pPixelConstantMapEntry[0]) {
@@ -2141,7 +2141,7 @@ BSShader* WaterShader::CreateShader() {
     TLSData* v0 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v0->eMemContext;
     v0->eMemContext = MEM_CONTEXT_WATER;
-    WaterShader* v2 = 0;
+    WaterShader* v2 = nullptr;
     NiDX9ShaderDeclaration* v3 = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 4u, 1u);
     v3->SetEntry(0u, 0u, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0u);
     v3->SetEntry(1u, 3u, NiShaderDeclaration::SHADERPARAM_NI_NORMAL, NiShaderDeclaration::SPTYPE_FLOAT3, 0u);

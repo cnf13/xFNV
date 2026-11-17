@@ -95,7 +95,7 @@ void bhkSPCollisionObject::NitohkTransform() {
         if (psp) {
             if (psp->phkObject) {
                 nit = m_pkSceneObject->m_kWorld;
-                bhkNiCollisionObject::kKeyframeLock.Lock(0);
+                bhkNiCollisionObject::kKeyframeLock.Lock(nullptr);
                 psp->SetTransform(nit);
                 if (!--bhkNiCollisionObject::kKeyframeLock.uiLockCount) {
                     bhkNiCollisionObject::kKeyframeLock.uiOwningThread = 0;

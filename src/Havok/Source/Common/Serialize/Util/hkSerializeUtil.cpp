@@ -698,32 +698,28 @@ uint8_t* hkBinaryTagfile::isBinaryMagic(uint8_t* a1, int32_t a2, int32_t a3) {
     int32_t a2b;
     if ((a2 == -0x354FF2E2 && a3 == -0x2FEE0532) ||
         ((a2a = static_cast<int32_t>(
-              (static_cast<uint32_t>(a2a) & 0xFFFFFF00u) |
-              (static_cast<uint32_t>(static_cast<uint8_t>(static_cast<uint8_t>(a2 >> 24))))
+              (static_cast<uint32_t>(a2a) & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(a2 >> 24)))
           ),
           (a2a = static_cast<int32_t>(
-               (static_cast<uint32_t>(a2a) & 0xFFFF00FFu) |
-               (static_cast<uint32_t>(static_cast<uint8_t>(static_cast<uint8_t>(a2 >> 16))) << 8)
+               (static_cast<uint32_t>(a2a) & 0xFFFF00FFu) | (static_cast<uint32_t>(static_cast<uint8_t>(a2 >> 16)) << 8)
            ),
            (a2a = static_cast<int32_t>(
                 (static_cast<uint32_t>(a2a) & 0xFF00FFFFu) |
-                (static_cast<uint32_t>(static_cast<uint8_t>(static_cast<uint8_t>(a2 >> 8))) << 16)
+                (static_cast<uint32_t>(static_cast<uint8_t>(a2 >> 8)) << 16)
             ),
             (a2a = static_cast<int32_t>(
                  (static_cast<uint32_t>(a2a) & 0xFFFFFFu) | (static_cast<uint32_t>(static_cast<uint8_t>(a2)) << 24)
              ),
              a2a == -0x354FF2E2)))) &&
          (a2b = static_cast<int32_t>(
-              (static_cast<uint32_t>(a2b) & 0xFFFFFF00u) |
-              (static_cast<uint32_t>(static_cast<uint8_t>(static_cast<uint8_t>(a3 >> 24))))
+              (static_cast<uint32_t>(a2b) & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(a3 >> 24)))
           ),
           (a2b = static_cast<int32_t>(
-               (static_cast<uint32_t>(a2b) & 0xFFFF00FFu) |
-               (static_cast<uint32_t>(static_cast<uint8_t>(static_cast<uint8_t>(a3 >> 16))) << 8)
+               (static_cast<uint32_t>(a2b) & 0xFFFF00FFu) | (static_cast<uint32_t>(static_cast<uint8_t>(a3 >> 16)) << 8)
            ),
            (a2b = static_cast<int32_t>(
                 (static_cast<uint32_t>(a2b) & 0xFF00FFFFu) |
-                (static_cast<uint32_t>(static_cast<uint8_t>(static_cast<uint8_t>(a3 >> 8))) << 16)
+                (static_cast<uint32_t>(static_cast<uint8_t>(a3 >> 8)) << 16)
             ),
             (a2b = static_cast<int32_t>(
                  (static_cast<uint32_t>(a2b) & 0xFFFFFFu) | (static_cast<uint32_t>(static_cast<uint8_t>(a3)) << 24)

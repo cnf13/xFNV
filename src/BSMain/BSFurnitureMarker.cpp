@@ -17,7 +17,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiRTTI BSFurnitureMarker::ms_RTTI("BSFurnitureMarker", &NiExtraData::ms_RTTI);
 
@@ -221,5 +221,5 @@ void BSFurnitureMarker::KillSDM() {
         NiGlobalStringTable::ReleaseHandle(BSFurnitureMarker::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }
-    BSFurnitureMarker::pTag = 0;
+    BSFurnitureMarker::pTag = nullptr;
 }

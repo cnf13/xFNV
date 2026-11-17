@@ -11,9 +11,9 @@
 class hkTypeInfo {
 public:
     // Builds a loaded object in place with the finish flag.
-    typedef void (*FinishLoadedObjectFunction)(void* obj, int32_t finishFlag);
+    using FinishLoadedObjectFunction = void (*)(void* obj, int32_t finishFlag);
     // Destroys a loaded object in place.
-    typedef void (*CleanupLoadedObjectFunction)(void* obj);
+    using CleanupLoadedObjectFunction = void (*)(void* obj);
 
     const char* m_typeName;
     FinishLoadedObjectFunction m_finishLoadedObjectFunction;

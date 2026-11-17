@@ -28,7 +28,7 @@ void ImageSpaceShaderFFTNormals::ReloadShaders() {
     kPixel.strPath = "water\\2_ab\\p\\waterhmap.p.hlsl";
     kPixel.kMacros[0].Name = "NORMALS";
     std::memset(&kPixel.kMacros[0].Definition, 0, sizeof(kPixel) - offsetof(BSShaderMacro, kMacros[0].Definition));
-    const char* PSTarget = BSShaderManager::GetPSTarget(1);
+    const char* PSTarget = BSShaderManager::GetPSTarget(true);
     LoadShaders(kVertex, kPixel, "FFTNORMALS", ShaderTarget_vs_1_1, PSTarget);
     LoadStagesAndPasses();
 }

@@ -74,10 +74,10 @@ void TESHair::Copy(TESForm* apCopy) {
 bool TESHair::Compare(TESForm* apCompare) {
     TESHair* v4 = dynamic_cast<TESHair*>(apCompare);
     if (!v4) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v4)) {
-        return (bool)1;
+        return true;
     }
     return (bool)((uint8_t)(((int8_t)v4->cFlags) != ((int8_t)cFlags)));
 }
@@ -95,7 +95,7 @@ bool TESHair::CanBeFemale() {
 }
 
 bool TESHair::CanBeHairForNPC(TESNPC* apNPC) {
-    bool bretval = 0;
+    bool bretval = false;
     if (apNPC) {
         if (apNPC->GetRace()) {
             TESHair* item = this;
@@ -103,12 +103,12 @@ bool TESHair::CanBeHairForNPC(TESNPC* apNPC) {
                 TESActorBase::SEX Sex = apNPC->GetSex();
                 if (Sex) {
                     if (Sex == TESActorBase::SEX_FEMALE && CanBeFemale()) {
-                        return 1;
+                        return true;
                     }
                 }
                 else {
                     if (CanBeMale()) {
-                        return 1;
+                        return true;
                     }
                 }
             }

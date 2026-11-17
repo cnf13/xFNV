@@ -69,7 +69,7 @@ bool BSGameSound::Prepare() {
         Seek(pos);
     }
     iStateFlags |= BSGameSound::STATE_READY;
-    return 1;
+    return true;
 }
 
 // Copies apToCopy's file, attenuation, timing and callback state and takes a new sound ID from the audio manager.
@@ -123,16 +123,16 @@ bool BSGameSound::Update(uint32_t adwTimeDelta) {
     else {
         if ((((iStateFlags & 131072) != 0) && (!IsPaused())) && (fMaxDist > ((double)fDistanceToListener))) {
             SetInaudible((uint8_t)0);
-            Play((bool)1);
+            Play(true);
         }
     }
-    return (bool)1;
+    return true;
 }
 
 bool BSGameSound::CanPlayNow(uint32_t aiConditions, float afGamehour) {
     double v4;
     if (((aiConditions & ((int32_t)iWeatherFlags)) == 0) && (iWeatherFlags && aiConditions)) {
-        return (bool)0;
+        return false;
     }
     float v5 = fEndTime - fBeginTime;
     if (!(v5 < 0.0)) {
@@ -176,9 +176,9 @@ bool BSGameSound::Is2DRadiusSound() const {
 // Tests the byte before the terminator (the last character of the path) for a separator; v7 - 1 is that byte,
 // pFilename[-1] when the path is empty.
 bool BSGameSound::SetupPath(char* apSrc, bool abSetID) {
-    bool v6 = 1;
+    bool v6 = true;
     if (!apSrc) {
-        return 0;
+        return false;
     }
     if (pFilename != apSrc) {
         strcpy_s(pFilename, 260, apSrc);
@@ -196,7 +196,7 @@ bool BSGameSound::SetupPath(char* apSrc, bool abSetID) {
     }
     else {
         if (bFolder && !abSetID) {
-            v6 = 0;
+            v6 = false;
         }
     }
     if (bFolder && !abSetID) {
@@ -255,10 +255,10 @@ void BSGameSound::Init() {
     iModSamplesPerSecond = 0;
     iLoopStart = 0;
     iLoopEnd = 0;
-    fnCompletionCallback = 0;
-    fnPlayedCallback = 0;
-    pSoundCompletionContext = 0;
-    pSoundPlayContext = 0;
+    fnCompletionCallback = nullptr;
+    fnPlayedCallback = nullptr;
+    pSoundCompletionContext = nullptr;
+    pSoundPlayContext = nullptr;
     iStateFlags &= ~BSGameSound::STATE_IS_VALID_BEAM;
 }
 
@@ -266,8 +266,8 @@ void BSGameSound::Init() {
 void BSGameSound::HandlePlayCallback() {
     if (fnPlayedCallback) {
         fnPlayedCallback(pSoundPlayContext, static_cast<int32_t>(iDurationInMS));
-        pSoundPlayContext = 0;
-        fnPlayedCallback = 0;
+        pSoundPlayContext = nullptr;
+        fnPlayedCallback = nullptr;
     }
 }
 

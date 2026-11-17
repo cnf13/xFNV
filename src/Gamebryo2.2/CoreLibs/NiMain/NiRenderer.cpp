@@ -82,7 +82,7 @@ void NiRenderer::SetCameraData(
     const NiFrustum& kFrustum,
     const NiRect<float>& kPort
 ) {
-    if (Check_RenderTargetGroupActive("SetCameraData", 1)) {
+    if (Check_RenderTargetGroupActive("SetCameraData", true)) {
         Do_SetCameraData(kWorldLoc, kWorldDir, kWorldUp, kWorldRight, kFrustum, kPort);
     }
 }
@@ -214,7 +214,7 @@ uint32_t NiRenderer::GetScreenHeight() {
 }
 
 void NiRenderer::ClearBuffer(const NiRect<float>* pkR, uint32_t uiMode) {
-    if (Check_RenderTargetGroupActive("ClearBuffer", 1)) {
+    if (Check_RenderTargetGroupActive("ClearBuffer", true)) {
         Do_ClearBuffer(pkR, uiMode);
     }
 }
@@ -311,7 +311,7 @@ bool NiRenderer::PackParticleStripUtil_GetVerts(
             fAngle = 0.0f;
         }
         else {
-            fAngle = static_cast<float>(std::acos(fDot));
+            fAngle = std::acos(fDot);
         }
         kRot.MakeRotation(fAngle, kSide.x, kSide.y, kSide.z);
         // EXE-INLINED 0x4B4500

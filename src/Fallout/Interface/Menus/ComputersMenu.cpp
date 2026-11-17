@@ -43,7 +43,7 @@
 #include "SDK/MSVC/rtti.h"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 ComputersMenu::AnimatingTextManager::AnimatingTextManager() {}
 
@@ -53,14 +53,14 @@ ComputersMenu::AnimatingTextManager::~AnimatingTextManager() {
 
 void ComputersMenu::AnimatingTextManager::Update() {
     FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    bool btextwraps = 0;
+    bool btextwraps = false;
     while (!xAnimatingText.IsEmpty() && BSGetTickCount() > g_computersNextMainMenuTextDisplayTime) {
         if (!xAnimatingText.GetHead()->bIsTextRemaining) {
             int32_t v28 = 0;
             int32_t v26 = 0;
             if (ComputersMenu::pMe->eMode || *xAnimatingText.GetHead()->GetFullText() != "> "[0]) {
                 xAnimatingText.GetHead()->Update();
-                ComputersMenu::pMe->Sounds[1].Play(0);
+                ComputersMenu::pMe->Sounds[1].Play(false);
             }
             else {
                 uint32_t ioldlen = BSstrlen(xAnimatingText.GetHead()->pCurrentlyDisplayedText);
@@ -78,7 +78,7 @@ void ComputersMenu::AnimatingTextManager::Update() {
             int32_t ix = 0;
             int32_t iy = 0;
             Tile* pcurrent = xAnimatingText.GetHead()->GetParent();
-            btextwraps = pcurrent->GetValueQ(4026) != 0;
+            btextwraps = pcurrent->GetValueQ(4026) != nullptr;
             for (Tile* ptile = pcurrent; ptile; ptile = ptile->pParent) {
                 Tile* Parent = ComputersMenu::pMe->pTiles[6]->pParent;
                 if (ptile == Parent) {
@@ -89,23 +89,23 @@ void ComputersMenu::AnimatingTextManager::Update() {
                 int32_t v5 = static_cast<int32_t>(ptile->GetFloat(4002));
                 iy += v5;
             }
-            pcurrent->UpdateTile(0);
+            pcurrent->UpdateTile(false);
             if (ComputersMenu::pMe->lbMenuItems.IsListItem(pcurrent)) {
-                pcurrent->UpdateChildren(0);
+                pcurrent->UpdateChildren(false);
                 double v17 = static_cast<double>(ix);
                 int32_t v6 = Tile::AddUserTrait("_text_width", -1);
                 float v16 = pcurrent->GetFloat(v6) + v17;
-                ComputersMenu::pMe->pTiles[6]->Set(4001, v16, 1);
+                ComputersMenu::pMe->pTiles[6]->Set(4001, v16, true);
                 double v15 = static_cast<double>(iy);
                 int32_t v7 = Tile::AddUserTrait("_text_y", -1);
                 float v14 = pcurrent->GetFloat(v7) + v15;
-                ComputersMenu::pMe->pTiles[6]->Set(4002, v14, 1);
+                ComputersMenu::pMe->pTiles[6]->Set(4002, v14, true);
             }
             else {
                 if (!btextwraps) {
                     double v13 = static_cast<double>(ix);
                     float v12 = pcurrent->GetFloat(4017) + v13;
-                    ComputersMenu::pMe->pTiles[6]->Set(4001, v12, 1);
+                    ComputersMenu::pMe->pTiles[6]->Set(4001, v12, true);
                     ComputersMenu::pMe->pTiles[6]->Set(4002, iy);
                 }
             }
@@ -122,7 +122,7 @@ void ComputersMenu::AnimatingTextManager::Update() {
         else {
             if (pold) {
                 if (*pold->GetFullText() == "> "[0]) {
-                    ComputersMenu::pMe->Sounds[2].Play(0);
+                    ComputersMenu::pMe->Sounds[2].Play(false);
                 }
             }
             g_computersNextMainMenuTextDisplayTime = BSGetTickCount() + 500;
@@ -142,9 +142,9 @@ void ComputersMenu::AnimatingTextManager::Update() {
             v11 = 0.0f;
         }
         float v10 = ComputersMenu::pMe->pTiles[5]->GetFloat(4001) + v11;
-        ComputersMenu::pMe->pTiles[6]->Set(4001, v10, 1);
+        ComputersMenu::pMe->pTiles[6]->Set(4001, v10, true);
         float afValuea = ComputersMenu::pMe->pTiles[5]->GetFloat(4002);
-        ComputersMenu::pMe->pTiles[6]->Set(4002, afValuea, 1);
+        ComputersMenu::pMe->pTiles[6]->Set(4002, afValuea, true);
     }
 }
 
@@ -173,7 +173,7 @@ void ComputersMenu::AnimatingTextManager::AddItem(
         pText = ::new (apMemory) HackingText(apString);
     }
     else {
-        pText = 0;
+        pText = nullptr;
     }
     pText->SetTraits(apStringTrait, apVisTrait);
     if (aiWhere == -1) {
@@ -191,7 +191,7 @@ void ComputersMenu::AnimatingTextManager::AddItem(
             xAnimatingText.AddTail(pText);
         }
     }
-    pText->SetVisibility(0);
+    pText->SetVisibility(false);
 }
 
 void ComputersMenu::AnimatingTextManager::ForceFinish() {
@@ -217,7 +217,7 @@ ComputersMenu::AnimatingTextManager* ComputersMenu::AnimatingTextManager::GetIns
             v1 = ::new (apMemory) ComputersMenu::AnimatingTextManager;
         }
         else {
-            v1 = 0;
+            v1 = nullptr;
         }
         ComputersMenu::AnimatingTextManager::pInstance = v1;
     }
@@ -258,12 +258,12 @@ void ComputersMenu::DoClick(int32_t a1, Tile* a2) {
     if (!a2 && a1 >= 0 && a1 < 16) {
         a2 = pTiles[a1];
     }
-    bool bretainReloadTerminal = 0;
+    bool bretainReloadTerminal = false;
     if (a1 == 2) {
         pATManager->ForceFinish();
         if (pNoteText) {
-            DisplayNoteText(0);
-            bretainReloadTerminal = 1;
+            DisplayNoteText(nullptr);
+            bretainReloadTerminal = true;
         }
         else {
             pTiles[2]->Set(4003, 0);
@@ -279,10 +279,10 @@ void ComputersMenu::DoClick(int32_t a1, Tile* a2) {
                     pATManager->AddItem(pstringval->strValue, pstringval, Value, -1);
                 }
                 lbMenuItems.Traverse(&ComputersMenu::Redisplay, 0, 0x7FFFFFFF);
-                bDisplayFlag = 1;
+                bDisplayFlag = true;
             }
         }
-        Sounds[2].Play(0);
+        Sounds[2].Play(false);
     }
     else {
         if (a1 == 13 && eMode < ComputersMenu::CMM_NORMAL) {
@@ -290,17 +290,17 @@ void ComputersMenu::DoClick(int32_t a1, Tile* a2) {
         }
         else {
             if (lbMenuItems.IsListItem(a2)) {
-                Sounds[2].Play(0);
+                Sounds[2].Play(false);
                 TERMINAL_MENU_ITEM* pmenuitem = lbMenuItems.GetDataFor(a2);
                 if (pmenuitem) {
                     if (pmenuitem->pSubMenu) {
-                        pmenuitem->SetSelected(1);
+                        pmenuitem->SetSelected(true);
                         pmenuitem->RunResultScript(pTerminalRef);
                         pTerminal = pmenuitem->pSubMenu;
                         DisplayTerminal(1);
                     }
                     else {
-                        pmenuitem->SetSelected(1);
+                        pmenuitem->SetSelected(true);
                         pmenuitem->RunResultScript(pTerminalRef);
                         if (pmenuitem->ResultText.String()) {
                             Tile::Value* time = pTiles[5]->GetValue(4003);
@@ -312,12 +312,12 @@ void ComputersMenu::DoClick(int32_t a1, Tile* a2) {
                         }
                         if (pmenuitem->pDisplayNote) {
                             if (pmenuitem->IsAutoAdd() && !pPlayer->HasNote(pmenuitem->pDisplayNote)) {
-                                pPlayer->AddNote(pmenuitem->pDisplayNote, 0);
+                                pPlayer->AddNote(pmenuitem->pDisplayNote, false);
                                 BSStringT<char> strtmp;
                                 strtmp.SPrintF(sComputersAddedNote.String(), pmenuitem->pDisplayNote->GetFullName());
                                 Interface::ShowMessage(
-                                    strtmp.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_giftbox.dds", 0,
-                                    2.0f, 0
+                                    strtmp.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_giftbox.dds",
+                                    nullptr, 2.0f, false
                                 );
                             }
                             if (NoteActivationFn[pmenuitem->pDisplayNote->GetNoteType()]) {
@@ -326,7 +326,7 @@ void ComputersMenu::DoClick(int32_t a1, Tile* a2) {
                                 NoteActivationFn[NoteType](this, pDisplayNote);
                             }
                             g_bCurrentMenuEntryHasFlags2 = pmenuitem->ForcesRedraw();
-                            bretainReloadTerminal = 1;
+                            bretainReloadTerminal = true;
                         }
                         else {
                             if (pmenuitem->ForcesRedraw()) {
@@ -383,7 +383,7 @@ int32_t ComputersMenu::GetClass() {
 
 bool ComputersMenu::DoGamepadUpEvent(int32_t aiButton, float afValue) {
     if ((!Interface::IsTopMenuID(Interface::eComputersMenu)) || (aiButton != 10)) {
-        return (bool)0;
+        return false;
     }
     if (pTiles[2]->IsVisible()) {
         pNoteText = nullptr;
@@ -392,7 +392,7 @@ bool ComputersMenu::DoGamepadUpEvent(int32_t aiButton, float afValue) {
     else {
         DisplayPreviousTerminal();
     }
-    return (bool)1;
+    return true;
 }
 
 void ComputersMenu::DisplayPreviousTerminal() {
@@ -413,10 +413,10 @@ void ComputersMenu::FlashCursor() {
     }();
     if (BSGetTickCount() > g_computersNextCursorBlinkTime && pCursorVis) {
         if (pCursorVis->QFloat() == 1.0) {
-            pCursorVis->SetFloat(0.0, 1);
+            pCursorVis->SetFloat(0.0, true);
         }
         else {
-            pCursorVis->SetFloat(1.0, 1);
+            pCursorVis->SetFloat(1.0, true);
         }
         g_computersNextCursorBlinkTime =
             static_cast<int64_t>(static_cast<double>(BSGetTickCount()) + g_computersCursorBlinkInterval);
@@ -443,7 +443,7 @@ void ComputersMenu::FinishIntro() {
     double Float = pTiles[3]->pParent->GetFloat(4017);
     const char* v2 = sComputersHeader1.String();
     float v19 = (Float - static_cast<double>(17 * BSstrlen(v2))) / 2.0;
-    pTiles[3]->Set(4001, v19, 1);
+    pTiles[3]->Set(4001, v19, true);
     Tile::Value* afValuea = pTiles[4]->GetValue(4003);
     Tile::Value* v9 = pTiles[4]->GetValueQ(4036);
     const char* v3 = sComputersHeader2.operator const char*();
@@ -451,7 +451,7 @@ void ComputersMenu::FinishIntro() {
     double v18 = pTiles[4]->pParent->GetFloat(4017);
     const char* v4 = sComputersHeader2.String();
     float v17 = (v18 - static_cast<double>(17 * BSstrlen(v4))) / 2.0;
-    pTiles[4]->Set(4001, v17, 1);
+    pTiles[4]->Set(4001, v17, true);
     Tile::Value* afValueb = pTiles[0]->GetValue(4003);
     Tile::Value* v10 = pTiles[0]->GetValueQ(4036);
     const char* ServerText = pTerminal->GetServerText();
@@ -459,7 +459,7 @@ void ComputersMenu::FinishIntro() {
     double v16 = pTiles[0]->pParent->GetFloat(4017);
     const char* v6 = pTerminal->GetServerText();
     float v15 = (v16 - static_cast<double>(17 * BSstrlen(v6))) / 2.0;
-    pTiles[0]->Set(4001, v15, 1);
+    pTiles[0]->Set(4001, v15, true);
     Tile::Value* afValuec = pTiles[8]->GetValue(4003);
     Tile::Value* v7 = pTiles[8]->GetValueQ(4036);
     pATManager->AddItem("> ", v7, afValuec, -1);
@@ -496,8 +496,8 @@ void ComputersMenu::DisplayTerminal(char a1) {
             }
         }
         for (TERMINAL_MENU_ITEM*& rpItem : pTerminal->GetMenuItemList()->ItemsUntilNull()) {
-            if (rpItem->Conditions.IsTrue(pTerminalRef, 0)) {
-                Tile* pnew = lbMenuItems.AddItem(rpItem, 0, 0, 0);
+            if (rpItem->Conditions.IsTrue(pTerminalRef, nullptr)) {
+                Tile* pnew = lbMenuItems.AddItem(rpItem, nullptr, nullptr, nullptr);
                 int32_t v3 = Tile::AddUserTrait("_enabled", -1);
                 pnew->Set(v3, 0);
                 bool IsSelected = rpItem->IsSelected();
@@ -507,10 +507,10 @@ void ComputersMenu::DisplayTerminal(char a1) {
                 Tile::Value* v5 = pnew->GetValueQ(Tile::kTileValue_User0);
                 pATManager->AddItem(strtmp.pString, v5, ValueQ, -1);
             }
-            rpItem->SetSelected(0);
+            rpItem->SetSelected(false);
         }
         if (TerminalStack.m_pkNext) {
-            Tile* pback = lbMenuItems.AddItem(0, 0, 0, 0);
+            Tile* pback = lbMenuItems.AddItem(0, nullptr, nullptr, nullptr);
             int32_t v6 = Tile::AddUserTrait("_enabled", -1);
             pback->Set(v6, 0);
             strtmp.SPrintF("%s%s", "> ", sComputersBack.String());
@@ -518,17 +518,17 @@ void ComputersMenu::DisplayTerminal(char a1) {
             Tile::Value* v7 = pback->GetValueQ(Tile::kTileValue_User0);
             pATManager->AddItem(strtmp.pString, v7, v9, -1);
         }
-        bDisplayFlag = 1;
+        bDisplayFlag = true;
     }
 }
 
 bool ComputersMenu::IsWellFormedMenu(int32_t& ai) {
     for (ai = 0; ai < 16; ++ai) {
         if (!pTiles[ai]) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 void ComputersMenu::DisplayIntro() {
@@ -580,7 +580,7 @@ void ComputersMenu::PlayNoteSound(BGSNote* apNote) {
     uint32_t CastingType = NoteSound->iFormID;
     BSAudio* v3 = &BSAudio::QInstance();
     BSSoundHandle* SoundHandleByNumericID = v3->GetSoundHandleByNumericID(&a1, CastingType, 257u);
-    SoundHandleByNumericID->Play(0);
+    SoundHandleByNumericID->Play(false);
 }
 
 void ComputersMenu::DisplayNoteText(BGSNote* apNote) {
@@ -620,7 +620,7 @@ void ComputersMenu::DisplayNoteText(BGSNote* apNote) {
     // Takes the unsigned minimum of the character count and Length.
     this->pNoteText += BSMIN(static_cast<uint32_t>(a2.GetCharCount()), Length);
     if (!*this->pNoteText) {
-        this->pNoteText = 0;
+        this->pNoteText = nullptr;
     }
 }
 
@@ -635,7 +635,7 @@ void ComputersMenu::ShowImage(BGSNote* a1) {
         pTiles[15]->Set(4003, 0);
     }
     const char* TextureName = a1->GetNoteImage()->GetTextureName();
-    pTiles[2]->Set(4044, TextureName, 1);
+    pTiles[2]->Set(4044, TextureName, true);
 }
 
 Tile* ComputersMenu::Create(TESObjectREFR* apTerminalRef) {
@@ -660,12 +660,12 @@ Tile* ComputersMenu::Create(TESObjectREFR* apTerminalRef) {
     Menu* pmenu = ptile->GetMenu();
     if (pmenu && (v5 = pmenu->GetClass(), v5 == ComputersMenu::GetClassStatic())) {
         int32_t imissingIndex;
-        pmenu->SetMenuTile(static_cast<TileMenu*>(ptile), 0);
+        pmenu->SetMenuTile(static_cast<TileMenu*>(ptile), false);
         ComputersMenu::pMe = static_cast<ComputersMenu*>(pmenu);
         if (static_cast<ComputersMenu*>(pmenu)->ComputersMenu::IsWellFormedMenu(imissingIndex)) {
             if (apTerminalRef) {
                 if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
-                    ptile->Set(4013, ftop_depth, 1);
+                    ptile->Set(4013, ftop_depth, true);
                 }
                 int32_t fB = ComputersMenu::GetClassStatic();
                 InterfaceManager* v7 = InterfaceManager::Instance();
@@ -673,24 +673,24 @@ Tile* ComputersMenu::Create(TESObjectREFR* apTerminalRef) {
                 ComputersMenu::pMe->pTerminalRef = apTerminalRef;
                 ComputersMenu::pMe->pTerminal = pterminal;
                 ComputersMenu::pMe->lbMenuItems.Initialize(ComputersMenu::pMe->pTiles[1], "computers_file_template");
-                ComputersMenu::pMe->Sounds->Play(0);
+                ComputersMenu::pMe->Sounds->Play(false);
                 if (ComputersMenu::pMe->pTerminal->IsUnlocked(ComputersMenu::pMe->pTerminalRef)) {
                     ComputersMenu::pMe->FinishIntro();
                 }
                 else {
                     ComputersMenu::pMe->DisplayIntro();
                 }
-                pmenu->PrepForVisibility(0);
+                pmenu->PrepForVisibility(false);
                 return ptile;
             }
             else {
                 Warning("MENUS: Computers Menu Creation Failed... Missing terminal data ");
-                return 0;
+                return nullptr;
             }
         }
         else {
             Warning("MENUS: Computers Menu Creation Failed... Missing index = #%d", imissingIndex);
-            return 0;
+            return nullptr;
         }
     }
     else {
@@ -701,7 +701,7 @@ Tile* ComputersMenu::Create(TESObjectREFR* apTerminalRef) {
                 }
             }
         }
-        return 0;
+        return nullptr;
     }
 }
 
@@ -718,7 +718,7 @@ void ComputersMenu::PostDisplay(Tile* apTile, TERMINAL_MENU_ITEM* apMenuItem) {
 void ComputersMenu::Close() {
     if (ComputersMenu::pMe) {
         PlayTerminalShutdownSound();
-        ComputersMenu::pMe->pMenu->Set(4033, 0.75f, static_cast<bool>(1));
+        ComputersMenu::pMe->pMenu->Set(4033, 0.75f, true);
         InterfaceManager* v0 = InterfaceManager::Instance();
         if (v0->GetCurrentRenderedMenu()) {
             InterfaceManager* v1 = InterfaceManager::Instance();
@@ -739,22 +739,22 @@ void ComputersMenu::Redisplay(Tile* apTile, TERMINAL_MENU_ITEM* apMenuItem) {
     if (apTile) {
         BSStringT<char> strtmp("> ");
         int32_t idefault = 1;
-        bool bgo = 1;
+        bool bgo = true;
         int32_t v2 = Tile::AddUserTrait("_enabled", -1);
         apTile->Set(v2, 0);
-        if (apMenuItem && apMenuItem->Conditions.IsTrue(0, 0)) {
+        if (apMenuItem && apMenuItem->Conditions.IsTrue(nullptr, nullptr)) {
             if (apMenuItem->IsSelected()) {
                 idefault = 2;
-                apMenuItem->SetSelected(0);
+                apMenuItem->SetSelected(false);
             }
             strtmp.operator+=(static_cast<const char*>(apMenuItem->ResponseText.pString));
         }
         else {
             if (apMenuItem) {
-                bgo = 0;
+                bgo = false;
             }
             else {
-                strtmp.operator+=(static_cast<const char*>(sComputersBack.String()));
+                strtmp.operator+=(sComputersBack.String());
             }
         }
         apTile->Set(4054, idefault);

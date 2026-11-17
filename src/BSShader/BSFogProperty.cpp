@@ -114,6 +114,6 @@ int32_t BSFogProperty::SetColor(float* a1) {
     p_m_kColor->r = *a1;
     p_m_kColor->g = a1[1];
     int32_t result = *(reinterpret_cast<uint32_t*>(a1) + 2);
-    p_m_kColor->b = std::bit_cast<float>(static_cast<uint32_t>(static_cast<uint32_t>(result)));
+    p_m_kColor->b = std::bit_cast<float>(static_cast<uint32_t>(result));
     return result;
 }

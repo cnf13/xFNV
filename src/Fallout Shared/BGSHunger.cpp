@@ -96,7 +96,7 @@ void BGSHungerStage::Save() {
         pSicknessID = reinterpret_cast<SpellItem*>(static_cast<uintptr_t>(GetSickness()->GetFormID()));
     }
     else {
-        pSicknessID = 0;
+        pSicknessID = nullptr;
     }
     data.pSickness = pSicknessID;
     if (TESForm::QEndianSwapOnSave()) {
@@ -121,7 +121,7 @@ void BGSHungerStage::InitItem() {
             TESForm* pForm = TESForm::GetFormByNumericID(uiFormID);
             data.pSickness = dynamic_cast<SpellItem*>(pForm);
         }
-        SetInitialized(1);
+        SetInitialized(true);
         BGSHungerStage::AddStage(this);
     }
 }
@@ -137,10 +137,10 @@ void BGSHungerStage::Copy(TESForm* apCopy) {
 bool BGSHungerStage::Compare(TESForm* apCompare) {
     BGSHungerStage* v6 = dynamic_cast<BGSHungerStage*>(apCompare);
     if (!v6) {
-        return (bool)1;
+        return true;
     }
     if (TESForm::CompareAllComponents(v6)) {
-        return (bool)1;
+        return true;
     }
     BGSHungerStageData* formList = v6->GetData();
     BGSHungerStageData* v3 = GetData();
@@ -203,7 +203,7 @@ void BGSHungerStage::RemoveStage(BGSHungerStage* apStage) {
 }
 
 BGSHungerStage* BGSHungerStage::FindStageForRadLevel(float afRads) {
-    BGSHungerStage* pstage = 0;
+    BGSHungerStage* pstage = nullptr;
     for (uint32_t i = 0; i < BGSHungerStage::iNumStages && !pstage; ++i) {
         BGSHungerStage* pcurrentStage = BGSHungerStage::GetStage(i);
         if (pcurrentStage) {
@@ -228,14 +228,14 @@ BGSHungerStage* BGSHungerStage::GetStage(uint32_t aiIndex) {
 
 BGSHungerStage** BGSHungerStage::AllocateStages(uint32_t aiStagesCount) {
     if (!aiStagesCount) {
-        return 0;
+        return nullptr;
     }
     // new BGSHungerStage*[n]: the size requested is SIZE_MAX when it would overflow.
     BGSHungerStage** v3 = static_cast<BGSHungerStage**>(ourMalloc(
         aiStagesCount <= SIZE_MAX / sizeof(BGSHungerStage*) ? sizeof(BGSHungerStage*) * aiStagesCount : SIZE_MAX
     ));
     for (uint32_t i = 0; i < aiStagesCount; ++i) {
-        v3[i] = 0;
+        v3[i] = nullptr;
     }
     return v3;
 }

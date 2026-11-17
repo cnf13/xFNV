@@ -186,7 +186,7 @@ const char* hkPackfileData::getContentsTypeName() const {
         return m_trackedObjects.getWithDefault(m_topLevelObject, 0);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

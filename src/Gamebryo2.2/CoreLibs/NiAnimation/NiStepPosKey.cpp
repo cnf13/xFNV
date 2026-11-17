@@ -12,7 +12,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 void NiStepPosKey::DeleteArray(NiAnimationKey* pkKeyArray) {
     if (pkKeyArray) {

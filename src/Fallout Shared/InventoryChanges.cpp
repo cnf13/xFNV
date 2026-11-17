@@ -110,7 +110,7 @@ ItemChange::~ItemChange() {
 uint8_t ItemChange::GetModSlots() {
     ExtraDataList* v2;
     BSSimpleList<ExtraDataList*>* ecx0 = pExtraObjectList;
-    if (pExtraObjectList && (ecx0->m_item && ((v2 = ecx0->m_item) != 0 && v2->HasWeaponMods()))) {
+    if (pExtraObjectList && (ecx0->m_item && ((v2 = ecx0->m_item) != nullptr && v2->HasWeaponMods()))) {
         return v2->GetWeaponModFlags();
     }
     else {
@@ -122,7 +122,7 @@ void ItemChange::DeleteAllExtra() {
     for (BSSimpleList<ExtraDataList*>* pkFirst = pExtraObjectList; pkFirst && pkFirst->m_item;
          pkFirst = pkFirst->m_pkNext) {
         ExtraDataList* pExtra = pkFirst->m_item;
-        pExtra->RemoveAll(1);
+        pExtra->RemoveAll(true);
         pkFirst->Remove(pExtra);
         if (pExtra) {
             delete pExtra;
@@ -133,7 +133,7 @@ void ItemChange::DeleteAllExtra() {
 TESForm* ItemChange::GetItemOwnership() {
     ExtraDataList* v2;
     BSSimpleList<ExtraDataList*>* ecx0 = pExtraObjectList;
-    if (pExtraObjectList && (ecx0->m_item && (((v2 = ecx0->m_item) != 0) && v2->GetOwner()))) {
+    if (pExtraObjectList && (ecx0->m_item && (((v2 = ecx0->m_item) != nullptr) && v2->GetOwner()))) {
         return v2->GetOwner();
     }
     else {
@@ -167,10 +167,10 @@ void ItemChange::SetWorn(bool abflag, bool ableft, bool abdelete) {
             pworn = ::new (apMemory) ExtraDataList;
         }
         else {
-            pworn = 0;
+            pworn = nullptr;
         }
         ExtraDataList* pworn_2 = pworn;
-        pworn->SetWorn(1, ableft);
+        pworn->SetWorn(true, ableft);
         if (!pExtraObjectList) {
             BSSimpleList<ExtraDataList*>* v4;
             BSSimpleList<ExtraDataList*>* v7 =
@@ -179,7 +179,7 @@ void ItemChange::SetWorn(bool abflag, bool ableft, bool abdelete) {
                 v4 = ::new (v7) BSSimpleList<ExtraDataList*>;
             }
             else {
-                v4 = 0;
+                v4 = nullptr;
             }
             pExtraObjectList = v4;
         }
@@ -323,7 +323,7 @@ float ItemChange::GetItemCharge() {
     TESEnchantableForm* v6 = dynamic_cast<TESEnchantableForm*>(pContainerObj);
     if (v6) {
         ecx0 = pExtraObjectList;
-        if (pExtraObjectList && (ecx0->m_item && (((v4 = ecx0->m_item) != 0) && (v4->GetCharge() != (-1.0))))) {
+        if (pExtraObjectList && (ecx0->m_item && (((v4 = ecx0->m_item) != nullptr) && (v4->GetCharge() != (-1.0))))) {
             return v4->GetCharge();
         }
         else {
@@ -354,7 +354,7 @@ int32_t ItemChange::GetHotKey() {
 
 // Each mod's value is read through TESValueForm's getter and converted as a signed value.
 float ItemChange::GetItemValue() {
-    float afNearest = GetItemHealth(1);
+    float afNearest = GetItemHealth(true);
     float afVal = static_cast<float>(TESValueForm::GetFormValue(pContainerObj));
     float fvalue = GamePlayFormulas::CalcItemHealthValue(afVal, afNearest);
     TESObjectWEAP* pWeap = dynamic_cast<TESObjectWEAP*>(pContainerObj);
@@ -383,7 +383,7 @@ int32_t ItemChange::GetExtraTotalCount(bool abWornIgnore) {
     int32_t v4 = 0;
     while (ecx0 && ecx0->m_item) {
         ExtraDataList* v3 = ecx0->m_item;
-        if (!v3->IsExtraDefaultforContainer(0) && (abWornIgnore || !v3->GetWorn(0))) {
+        if (!v3->IsExtraDefaultforContainer(false) && (abWornIgnore || !v3->GetWorn(false))) {
             v4 += v3->GetCount();
         }
         ecx0 = ecx0->m_pkNext;
@@ -396,7 +396,7 @@ int32_t ItemChange::GetExtraTotalDefaultCount() {
     int32_t icount = 0;
     while (pkFirst && pkFirst->m_item) {
         ExtraDataList* pExtra = pkFirst->m_item;
-        if (pExtra->IsExtraDefaultforContainer(0)) {
+        if (pExtra->IsExtraDefaultforContainer(false)) {
             int16_t Count = pExtra->GetCount();
             icount += Count;
         }
@@ -431,11 +431,11 @@ ScriptLocals* ItemChange::GetScriptLocals() {
             return v2->GetScriptLocals();
         }
     }
-    return 0;
+    return nullptr;
 }
 
 const char* ItemChange::GetIconOne(TESObjectREFR* apRef) {
-    const char* Icon = 0;
+    const char* Icon = nullptr;
     TESForm* ExtraOwnership_ = GetItemOwnership();
     TESBipedModelForm* v7 = dynamic_cast<TESBipedModelForm*>(pContainerObj);
     if (ExtraOwnership_) {
@@ -472,21 +472,21 @@ const char* ItemChange::GetFullName() {
 bool ItemChange::HasModEffectActive(uint8_t eEffect) {
     BSSimpleList<ExtraDataList*>* ecx0 = pExtraObjectList;
     if (!pExtraObjectList) {
-        return 0;
+        return false;
     }
     if (!ecx0->m_item) {
-        return 0;
+        return false;
     }
     ExtraDataList* v5 = ecx0->m_item;
     if (!v5) {
-        return 0;
+        return false;
     }
     TESObjectWEAP* pContainerObj = static_cast<TESObjectWEAP*>(this->pContainerObj);
     if (v5->GetWeaponModSlotActive(1u) && pContainerObj->GetModEffect(1u) == eEffect) {
-        return 1;
+        return true;
     }
     if (v5->GetWeaponModSlotActive(2u) && pContainerObj->GetModEffect(2u) == eEffect) {
-        return 1;
+        return true;
     }
     return v5->GetWeaponModSlotActive(4u) && pContainerObj->GetModEffect(4u) == eEffect;
 }
@@ -495,30 +495,30 @@ bool ItemChange::HasModEffectActive(uint8_t eEffect, float& fValue) {
     TESObjectWEAP* pContainerObj;
     BSSimpleList<ExtraDataList*>* ecx0 = pExtraObjectList;
     if (!pExtraObjectList) {
-        return (bool)0;
+        return false;
     }
     if (!ecx0->m_item) {
-        return (bool)0;
+        return false;
     }
     ExtraDataList* xDataList = ecx0->m_item;
     if (!xDataList) {
-        return (bool)0;
+        return false;
     }
     pContainerObj = static_cast<TESObjectWEAP*>(this->pContainerObj);
     if (xDataList->GetWeaponModSlotActive(1u) && (((uint32_t)pContainerObj->GetModEffect(1)) == ((uint32_t)eEffect))) {
         fValue = (float)pContainerObj->GetModValue(1, 0);
-        return (bool)1;
+        return true;
     }
     if (xDataList->GetWeaponModSlotActive(2u) && (((uint32_t)pContainerObj->GetModEffect(2)) == ((uint32_t)eEffect))) {
         fValue = (float)pContainerObj->GetModValue(2, 0);
-        return (bool)1;
+        return true;
     }
     if ((!xDataList->GetWeaponModSlotActive(4u)) ||
         (((uint32_t)pContainerObj->GetModEffect(4)) != ((uint32_t)eEffect))) {
-        return (bool)0;
+        return false;
     }
     fValue = (float)pContainerObj->GetModValue(4, 0);
-    return (bool)1;
+    return true;
 }
 
 // The item's health (-1 when it has no health form): its extra list's health, else the form's (a weapon's with its
@@ -560,10 +560,10 @@ double ItemChange::GetItemHealth(bool abPercentage) {
 float ItemChange::GetModifiedAttackDamage(ActorValueOwner* apActor, float afDamageMultiplier, bool abIgnoreExplosion) {
     if (pContainerObj->GetFormType() == 40) {
         TESObjectWEAP* apWeapon = static_cast<TESObjectWEAP*>(pContainerObj);
-        double ItemHealth = GetItemHealth(0);
+        double ItemHealth = GetItemHealth(false);
         float afCondition = ItemHealth / static_cast<double>(TESHealthForm::GetFormHealth(apWeapon));
         return CombatFormulas::CalcWeaponDamage(
-            apActor, apWeapon, afCondition, afDamageMultiplier, 0, abIgnoreExplosion, this, 1
+            apActor, apWeapon, afCondition, afDamageMultiplier, false, abIgnoreExplosion, this, true
         );
     }
     else {
@@ -596,7 +596,7 @@ void ItemChange::LoadGame() {
     uint16_t iblockSize;
     uint32_t iboundID;
     iblockSize = 0;
-    uint8_t* istartBufferPosition = 0;
+    uint8_t* istartBufferPosition = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockHeader, 4u);
         if (iblockHeader != 0x424C4F4B) {
@@ -629,7 +629,7 @@ void ItemChange::LoadGame() {
     pSaveLoadGameOLD->LoadGameDataOLD(&iNumber, 4u);
     TESForm* FormByNumericID = TESForm::GetFormByNumericID(iboundID);
     pContainerObj = dynamic_cast<TESBoundObject*>(FormByNumericID);
-    pExtraObjectList = 0;
+    pExtraObjectList = nullptr;
     pSaveLoadGameOLD->LoadGameDataOLD(&icount, 4u);
     if (icount) {
         BSSimpleList<ExtraDataList*>* v14;
@@ -639,7 +639,7 @@ void ItemChange::LoadGame() {
             v14 = ::new (v17) BSSimpleList<ExtraDataList*>;
         }
         else {
-            v14 = 0;
+            v14 = nullptr;
         }
         pExtraObjectList = v14;
         for (int32_t i = 0; i < icount; ++i) {
@@ -649,9 +649,9 @@ void ItemChange::LoadGame() {
                 pextraDataList = ::new (apMemory) ExtraDataList;
             }
             else {
-                pextraDataList = 0;
+                pextraDataList = nullptr;
             }
-            pextraDataList->LoadGame(0, 0, 0);
+            pextraDataList->LoadGame(0, 0, nullptr);
             pExtraObjectList->AddTail(pextraDataList);
         }
     }
@@ -728,7 +728,7 @@ void ItemChange::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 v5 = ::new (v8) BSSimpleList<ExtraDataList*>;
             }
             else {
-                v5 = 0;
+                v5 = nullptr;
             }
             pExtraObjectList = v5;
         }
@@ -739,7 +739,7 @@ void ItemChange::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 pextraDataList = ::new (apMemory) ExtraDataList;
             }
             else {
-                pextraDataList = 0;
+                pextraDataList = nullptr;
             }
             pextraDataList->LoadGameBGS(apLoadGameBuffer);
             pExtraObjectList->AddTail(pextraDataList);
@@ -759,7 +759,7 @@ void ItemChange::SetItemOwnership(TESForm* apowner) {
                 pextra = ::new (apMemory) ExtraDataList;
             }
             else {
-                pextra = 0;
+                pextra = nullptr;
             }
             ExtraDataList* pextra_2 = pextra;
             pextra->SetOwnership(apowner);
@@ -771,7 +771,7 @@ void ItemChange::SetItemOwnership(TESForm* apowner) {
                     v2 = ::new (v5) BSSimpleList<ExtraDataList*>;
                 }
                 else {
-                    v2 = 0;
+                    v2 = nullptr;
                 }
                 pExtraObjectList = v2;
             }
@@ -800,7 +800,7 @@ void ItemChange::SaveGameTES() {
     uint32_t iboundID;
     iblockSize = 0;
     // The reserved size slot in the save buffer (untyped bytes there).
-    void* pblockSize = 0;
+    void* pblockSize = nullptr;
     uint8_t* itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     if (bDebugSaveBuffer.Bool()) {
         itempStartPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -818,7 +818,7 @@ void ItemChange::SaveGameTES() {
     int32_t* pcount = static_cast<int32_t*>(pSaveLoadGameOLD->m_pBuffer);
     pSaveLoadGameOLD->SaveGameDataOLD(&icount, 4u);
     for (BSSimpleList<ExtraDataList*>* plist = pExtraObjectList; plist && !plist->IsEmpty(); plist = plist->m_pkNext) {
-        plist->m_item->SaveGame(0, 0);
+        plist->m_item->SaveGame(0, nullptr);
         ++icount;
     }
     *pcount = icount;
@@ -865,7 +865,7 @@ void ItemChange::Copy(ItemChange* apCopy) {
             v2 = ::new (v4) BSSimpleList<ExtraDataList*>;
         }
         else {
-            v2 = 0;
+            v2 = nullptr;
         }
         pExtraObjectList = v2;
         BSSimpleList<ExtraDataList*>* pkFirst = apCopy->pExtraObjectList;
@@ -881,7 +881,7 @@ int32_t ItemChange::GetAmountNonDefaultExtra() {
     while (pkFirst && pkFirst->m_item) {
         ExtraDataList* pExtra = pkFirst->m_item;
         int16_t Count = pExtra->GetCount();
-        if (!pExtra->IsExtraDefaultforContainer(0) && Count > 0) {
+        if (!pExtra->IsExtraDefaultforContainer(false) && Count > 0) {
             ++icount;
         }
         pkFirst = pkFirst->m_pkNext;
@@ -925,13 +925,13 @@ int32_t ItemChange::CountLeveledItems() {
 
 ExtraLeveledItem* ItemChange::RemoveLeveledItemExtra() {
     BSSimpleList<ExtraDataList*>* pkFirst = pExtraObjectList;
-    ExtraLeveledItem* pextralevel = 0;
+    ExtraLeveledItem* pextralevel = nullptr;
     while (pkFirst && pkFirst->m_item) {
         ExtraDataList* pExtra = pkFirst->m_item;
         if (pExtra) {
             if (pExtra->GetLeveledItem()) {
                 pextralevel = pExtra->GetLeveledItem();
-                pExtra->RemoveExtra(pextralevel, 0);
+                pExtra->RemoveExtra(pextralevel, false);
                 if (pExtra->IsExtraListEmpty()) {
                     pExtraObjectList->Remove(pExtra);
                 }
@@ -946,7 +946,7 @@ ExtraLeveledItem* ItemChange::RemoveLeveledItemExtra() {
 void ItemChange::SetItemHealth(float afHealth, InventoryChanges* pchange, ExtraDataList* apextra, bool abdelete) {
     TESHealthForm* phealth = dynamic_cast<TESHealthForm*>(pContainerObj);
     int32_t iMaxHealth = TESHealthForm::GetFormHealth(pContainerObj);
-    int32_t ihealth = static_cast<int32_t>(GetItemHealth(0));
+    int32_t ihealth = static_cast<int32_t>(GetItemHealth(false));
     if (pchange->pRef) {
         TESObjectREFR* Ref = pchange->pRef;
         Ref->AddChange(32);
@@ -957,7 +957,7 @@ void ItemChange::SetItemHealth(float afHealth, InventoryChanges* pchange, ExtraD
                 if (pextra_6 && pextra_6 == apextra) {
                     pextra_6->RemoveHealth();
                     if (pextra_6->IsExtraListEmpty() && abdelete) {
-                        pchange->GetObjectInList(pContainerObj, 1, 0)->pExtraObjectList->Remove(pextra_6);
+                        pchange->GetObjectInList(pContainerObj, true, 0)->pExtraObjectList->Remove(pextra_6);
                         if (pextra_6) {
                             delete pextra_6;
                         }
@@ -984,7 +984,7 @@ void ItemChange::SetItemHealth(float afHealth, InventoryChanges* pchange, ExtraD
                     pextra_4 = ::new (v10) ExtraDataList;
                 }
                 else {
-                    pextra_4 = 0;
+                    pextra_4 = nullptr;
                 }
                 ExtraDataList* pextra_5 = pextra_4;
                 pextra_4->SetHealth(afHealth);
@@ -998,7 +998,7 @@ void ItemChange::SetItemHealth(float afHealth, InventoryChanges* pchange, ExtraD
                     pextra = ::new (apMemory) ExtraDataList;
                 }
                 else {
-                    pextra = 0;
+                    pextra = nullptr;
                 }
                 ExtraDataList* pextra_2 = pextra;
                 BSSimpleList<ExtraDataList*>* v11 =
@@ -1007,7 +1007,7 @@ void ItemChange::SetItemHealth(float afHealth, InventoryChanges* pchange, ExtraD
                     pkFirst_2 = ::new (v11) BSSimpleList<ExtraDataList*>;
                 }
                 else {
-                    pkFirst_2 = 0;
+                    pkFirst_2 = nullptr;
                 }
                 pextra_2->SetCharge(afHealth);
                 pkFirst_2->AddHead(pextra_2);
@@ -1026,7 +1026,7 @@ void ItemChange::SetIsModding() {
             pkFirst_2 = ::new (v5) BSSimpleList<ExtraDataList*>;
         }
         else {
-            pkFirst_2 = 0;
+            pkFirst_2 = nullptr;
         }
         pkFirst = pkFirst_2;
         pExtraObjectList = pkFirst_2;
@@ -1036,7 +1036,7 @@ void ItemChange::SetIsModding() {
             if (pkFirst->m_item) {
                 ExtraDataList* pextra_3 = pkFirst->m_item;
                 if (pextra_3) {
-                    pextra_3->SetIsModding(1);
+                    pextra_3->SetIsModding(true);
                 }
             }
         }
@@ -1048,10 +1048,10 @@ void ItemChange::SetIsModding() {
             pextra = ::new (apMemory) ExtraDataList;
         }
         else {
-            pextra = 0;
+            pextra = nullptr;
         }
         ExtraDataList* pextra_2 = pextra;
-        pextra->SetIsModding(1);
+        pextra->SetIsModding(true);
         pExtraObjectList->AddHead(pextra_2);
     }
 }
@@ -1077,7 +1077,7 @@ float ItemChange::GetConditionScaledDR(ActorValueOwner* apActor) {
             v5 = 0.0;
         }
         else {
-            v5 = GetItemHealth(0) / FormHealth;
+            v5 = GetItemHealth(false) / FormHealth;
         }
         float afcondition = v5;
         int32_t ArmorRating = static_cast<int32_t>(pContainerObj->GetArmorRating());
@@ -1105,7 +1105,7 @@ uint16_t ItemChange::GetSaveSize() {
     uint16_t isize = v7 + 12;
     for (BSSimpleList<ExtraDataList*>* plist = pExtraObjectList; plist && !plist->IsEmpty(); plist = plist->m_pkNext) {
         ExtraDataList** v1 = &plist->m_item;
-        isize += (*v1)->GetSaveSize(0, 0);
+        isize += (*v1)->GetSaveSize(0, nullptr);
     }
     if (bDebugSaveBuffer.Bool()) {
         SaveFormHeader* pheader = pSaveLoadGameOLD->m_pCurrentlySavingFormHeader;
@@ -1131,7 +1131,7 @@ void ItemChange::InitLoadGame_0() {
     for (BSSimpleList<ExtraDataList*>* ecx0 = pExtraObjectList; ecx0 && !ecx0->IsEmpty(); ecx0 = ecx0->m_pkNext) {
         ExtraDataList* v2 = ecx0->m_item;
         if (v2) {
-            v2->InitLoadGameTES(0, 0, 0, pContainerObj);
+            v2->InitLoadGameTES(0, 0, nullptr, pContainerObj);
         }
     }
 }
@@ -1192,7 +1192,7 @@ bool InventoryChanges::ContainerHasObjects(
     if (aId) {
         return HasObjectId(aId);
     }
-    Actor* pactor = 0;
+    Actor* pactor = nullptr;
     if (apRef) {
         if (apRef->IsActor()) {
             pactor = static_cast<Actor*>(apRef);
@@ -1204,7 +1204,7 @@ bool InventoryChanges::ContainerHasObjects(
         if (pObj &&
             ((apObj && pObj == apObj) ||
              (!apObj && (aeObjectType && TESPackage::FormMatchesPackageObjectType(pObj, aeObjectType))))) {
-            ItemChange* pitem = GetObjectInList(pObj, 1, 0);
+            ItemChange* pitem = GetObjectInList(pObj, true, 0);
             if (!pitem) {
                 if (pactor) {
                     if (pactor->pCurrentProcess) {
@@ -1213,10 +1213,10 @@ bool InventoryChanges::ContainerHasObjects(
                     }
                 }
                 aeMatchId = TESPackage::GetObjectTypeFromForm(pObj);
-                return 1;
+                return true;
             }
             if (pList->m_item->i_count < 0) {
-                return 1;
+                return true;
             }
             uint32_t FormHealth_0 = pitem->iNumber;
             iamount += pList->m_item->i_count + FormHealth_0;
@@ -1230,7 +1230,7 @@ bool InventoryChanges::ContainerHasObjects(
         }
     }
     if (iamount >= ainumber) {
-        return 1;
+        return true;
     }
     if (!apObj) {
         for (BSSimpleList<ItemChange*>* pInvList = pListofChanges;
@@ -1247,14 +1247,14 @@ bool InventoryChanges::ContainerHasObjects(
                     }
                 }
                 aeMatchId = TESPackage::GetObjectTypeFromForm(pInvList->m_item->pContainerObj);
-                return 1;
+                return true;
             }
         }
-        return 0;
+        return false;
     }
-    ItemChange* pitem_2 = GetObjectInList(apObj, 1, 0);
+    ItemChange* pitem_2 = GetObjectInList(apObj, true, 0);
     if (!pitem_2 || pitem_2->iNumber < ainumber) {
-        return 0;
+        return false;
     }
     if (pactor) {
         if (pactor->pCurrentProcess) {
@@ -1263,7 +1263,7 @@ bool InventoryChanges::ContainerHasObjects(
         }
     }
     aeMatchId = TESPackage::GetObjectTypeFromForm(pitem_2->pContainerObj);
-    return 1;
+    return true;
 }
 
 void InventoryChanges::RemoveGold(TESObjectREFR* apRef, int32_t aiamount, TESObjectREFR* apCont) {
@@ -1275,13 +1275,13 @@ void InventoryChanges::RemoveGold(TESObjectREFR* apRef, int32_t aiamount, TESObj
         pList = &porigContainer->objectList;
     }
     else {
-        pList = 0;
+        pList = nullptr;
     }
     for (pList_2 = pList; pList_2 && !pList_2->IsEmpty(); pList_2 = pList_2->m_pkNext) {
         pObj = pList_2->m_item->pObj;
         if (pObj && TESContainer::IsGold(pObj)) {
         LABEL_9:;
-            RemoveItem(apRef, pObj, 0, aiamount, 0, 0, apCont, 0, 0, 1, 0, 0);
+            RemoveItem(apRef, pObj, false, aiamount, nullptr, false, apCont, nullptr, nullptr, true, false, nullptr);
             return;
         }
     }
@@ -1302,13 +1302,13 @@ int32_t InventoryChanges::GetGoldAmount() {
         pList = &porigContainer->objectList;
     }
     else {
-        pList = 0;
+        pList = nullptr;
     }
     for (BSSimpleList<ContainerObject*>* pList_2 = pList; pList_2 && !pList_2->IsEmpty(); pList_2 = pList_2->m_pkNext) {
         TESBoundObject* pObj = pList_2->m_item->pObj;
         if (pObj) {
             if (TESContainer::IsGold(pObj)) {
-                ItemChange* pitem = GetObjectInList(pObj, 1, 0);
+                ItemChange* pitem = GetObjectInList(pObj, true, 0);
                 if (pitem) {
                     uint32_t FormHealth_0 = pitem->iNumber;
                     iamount += pList_2->m_item->i_count + FormHealth_0;
@@ -1340,7 +1340,7 @@ int32_t InventoryChanges::GetCount(bool abcountplayable) {
     if (GetOriginalContainer()) {
         for (ContainerObject* pobject : (&GetOriginalContainer()->objectList)->ItemsUntilNull()) {
             TESLevItem* pObj = dynamic_cast<TESLevItem*>(pobject->pObj);
-            TESBipedModelForm* pbipedForm = 0;
+            TESBipedModelForm* pbipedForm = nullptr;
             TESBoundObject* v10 = pobject->pObj;
             TESContainer* OriginalContainer = GetOriginalContainer();
             int32_t ioriginalcount = OriginalContainer->GetObjectCount(v10);
@@ -1348,20 +1348,20 @@ int32_t InventoryChanges::GetCount(bool abcountplayable) {
                 int32_t FormType = pobject->pObj->GetFormType();
                 if (FormType == 40) {
                     if (!static_cast<TESObjectWEAP*>(pobject->pObj)->TESObjectWEAP::GetIsPlayable()) {
-                        pobject = 0;
+                        pobject = nullptr;
                     }
                 }
                 else {
                     if (FormType == 41) {
                         if (!static_cast<TESAmmo*>(pobject->pObj)->TESAmmo::GetIsPlayable()) {
-                            pobject = 0;
+                            pobject = nullptr;
                         }
                     }
                     else {
                         pbipedForm = TESBipedModelForm::GetFormAsBipedModel(pobject->pObj);
                         if (pbipedForm) {
                             if (!pbipedForm->GetPlayable()) {
-                                pobject = 0;
+                                pobject = nullptr;
                             }
                         }
                     }
@@ -1369,7 +1369,7 @@ int32_t InventoryChanges::GetCount(bool abcountplayable) {
             }
             if (pobject) {
                 if (!pObj) {
-                    ItemChange* pitem = GetObjectInList(pobject->pObj, 1, 0);
+                    ItemChange* pitem = GetObjectInList(pobject->pObj, true, 0);
                     int32_t iorgCount = ioriginalcount;
                     if (ioriginalcount < 0) {
                         iorgCount = -iorgCount;
@@ -1381,9 +1381,9 @@ int32_t InventoryChanges::GetCount(bool abcountplayable) {
                             if (pitem->HasStolenData()) {
                                 ++icount;
                             }
-                            if (pitem->GetExtraTotalCount(0) < pitem->iNumber + ioriginalcount) {
+                            if (pitem->GetExtraTotalCount(false) < pitem->iNumber + ioriginalcount) {
                                 if (pitem->pExtraObjectList->m_item) {
-                                    if (!pitem->GetWorn(0)) {
+                                    if (!pitem->GetWorn(false)) {
                                         ExtraDataList** v3 = &pitem->pExtraObjectList->m_item;
                                         if (!(*v3)->HasLeveledItem()) {
                                             ++icount;
@@ -1407,24 +1407,24 @@ int32_t InventoryChanges::GetCount(bool abcountplayable) {
     }
     BSSimpleList<ItemChange*>* pkFirst = pListofChanges;
     int32_t itempcount = icount;
-    bool bflag = 1;
+    bool bflag = true;
     while (pkFirst && pkFirst->m_item) {
         ItemChange* pitem_2 = pkFirst->m_item;
-        bflag = 1;
-        bool bcontinue = 1;
+        bflag = true;
+        bool bcontinue = true;
         if (pitem_2) {
             ExtraDataList** v4;
             if (pitem_2->pExtraObjectList &&
                 (pitem_2->pExtraObjectList->m_item &&
                  (v4 = &pitem_2->pExtraObjectList->m_item, (*v4)->HasLeveledItem()))) {
-                bcontinue = 1;
+                bcontinue = true;
             }
             else {
                 if (GetOriginalContainer()) {
                     TESBoundObject* pContainerObj = pitem_2->pContainerObj;
                     TESContainer* v5 = GetOriginalContainer();
                     if (v5->HasObject(pContainerObj)) {
-                        bcontinue = 0;
+                        bcontinue = false;
                     }
                 }
             }
@@ -1432,13 +1432,13 @@ int32_t InventoryChanges::GetCount(bool abcountplayable) {
                 int32_t v12 = pitem_2->pContainerObj->GetFormType();
                 if (v12 == 40) {
                     if (!static_cast<TESObjectWEAP*>(pitem_2->pContainerObj)->TESObjectWEAP::GetIsPlayable()) {
-                        bcontinue = 0;
+                        bcontinue = false;
                     }
                 }
                 else {
                     if (v12 == 41) {
                         if (!static_cast<TESAmmo*>(pitem_2->pContainerObj)->TESAmmo::GetIsPlayable()) {
-                            bcontinue = 0;
+                            bcontinue = false;
                         }
                     }
                     else {
@@ -1458,7 +1458,7 @@ int32_t InventoryChanges::GetCount(bool abcountplayable) {
                 if (pitem_2->HasStolenData()) {
                     ++icount;
                 }
-                int32_t ExtraTotalCount = pitem_2->GetExtraTotalCount(0);
+                int32_t ExtraTotalCount = pitem_2->GetExtraTotalCount(false);
                 if (ExtraTotalCount < pitem_2->iNumber) {
                     ++icount;
                 }
@@ -1478,9 +1478,9 @@ int32_t InventoryChanges::GetCount(bool abcountplayable) {
                             pitem_2 = pkFirst->m_item;
                         }
                         else {
-                            pitem_2 = 0;
+                            pitem_2 = nullptr;
                         }
-                        bflag = 0;
+                        bflag = false;
                     }
                 }
             }
@@ -1493,7 +1493,7 @@ int32_t InventoryChanges::GetCount(bool abcountplayable) {
 }
 
 bool InventoryChanges::WearingVoiceModulateItem() {
-    bool bmodulate = 0;
+    bool bmodulate = false;
     for (ItemChange* pitem : pListofChanges->ItemsUntilNull()) {
         if (pitem) {
             if (pitem->pContainerObj->GetFormType() == ARMO_ID && !bmodulate) {
@@ -1502,7 +1502,7 @@ bool InventoryChanges::WearingVoiceModulateItem() {
                      pkFirst && (pkFirst->m_item && !bmodulate); pkFirst = pkFirst->m_pkNext) {
                     ExtraDataList* pExtra = pkFirst->m_item;
                     if (pExtra) {
-                        if (pExtra->GetWorn(0)) {
+                        if (pExtra->GetWorn(false)) {
                             bmodulate = parmor->ModulatesVoice();
                         }
                     }
@@ -1524,12 +1524,13 @@ void InventoryChanges::CreateExtraDataList(
     bool bCreateNew;
     ExtraDataList* pExtra;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_INVENTORY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp", 2947
+        MEM_CONTEXT_INVENTORY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp",
+        2947
     );
     if (pRef) {
         pRef->AddChange(32);
     }
-    pItem = GetObjectInList(apObject, 1, 0);
+    pItem = GetObjectInList(apObject, true, 0);
     TESContainer* OriginalContainer = GetOriginalContainer();
     int32_t iorgCount = OriginalContainer->GetObjectCount(apObject);
     int32_t iorgCount_2 = iorgCount;
@@ -1539,7 +1540,7 @@ void InventoryChanges::CreateExtraDataList(
     int32_t v34 = 0;
     if (pItem) {
         if (pItem->pExtraObjectList) {
-            int32_t ExtraTotalCount = pItem->GetExtraTotalCount(0);
+            int32_t ExtraTotalCount = pItem->GetExtraTotalCount(false);
             v34 = pItem->GetExtraTotalDefaultCount() + ExtraTotalCount;
         }
     }
@@ -1551,27 +1552,27 @@ void InventoryChanges::CreateExtraDataList(
                     idefaultcount = iorgCount - v34;
                 }
             }
-            bool bresetflag = 0;
+            bool bresetflag = false;
             if (apExtra) {
                 if (!pItem->pExtraObjectList->IsInList(apExtra)) {
                     for (ExtraDataList* pextra : pItem->pExtraObjectList->ItemsUntilNull()) {
                         if (pextra && !pextra->CompareList(apExtra)) {
                             apExtra = pextra;
-                            bresetflag = 1;
+                            bresetflag = true;
                             break;
                         }
                     }
                     if (!bresetflag) {
-                        apExtra = 0;
+                        apExtra = nullptr;
                     }
                 }
             }
         }
     }
-    bCreateNew = 1;
-    pExtra = 0;
+    bCreateNew = true;
+    pExtra = nullptr;
     if ((apExtra || idefaultcount <= 0) && pItem) {
-        if (pItem->GetWorn(0)) {
+        if (pItem->GetWorn(false)) {
             return;
         }
         BSSimpleList<ExtraDataList*>* pkFirst = pItem->pExtraObjectList;
@@ -1590,7 +1591,7 @@ void InventoryChanges::CreateExtraDataList(
                         v18 = ::new (v27) ExtraDataList;
                     }
                     else {
-                        v18 = 0;
+                        v18 = nullptr;
                     }
                     apExtra = v18;
                     v18->CopyList(pExtra);
@@ -1601,7 +1602,7 @@ void InventoryChanges::CreateExtraDataList(
                         pExtra->RemoveHotKey();
                     }
                 }
-                bCreateNew = 0;
+                bCreateNew = false;
             }
             else {
                 if (!pExtra || apExtra) {
@@ -1624,7 +1625,7 @@ void InventoryChanges::CreateExtraDataList(
                                 v16 = ::new (v26) ExtraDataList;
                             }
                             else {
-                                v16 = 0;
+                                v16 = nullptr;
                             }
                             apExtra = v16;
                             v16->CopyList(pExtra);
@@ -1636,7 +1637,7 @@ void InventoryChanges::CreateExtraDataList(
                             }
                         }
                     }
-                    bCreateNew = 0;
+                    bCreateNew = false;
                 }
             }
         }
@@ -1649,17 +1650,17 @@ void InventoryChanges::CreateExtraDataList(
                 pitem = ::new (v28) ItemChange(apObject, 0);
             }
             else {
-                pitem = 0;
+                pitem = nullptr;
             }
             pItem = pitem;
-            bCreateNew = 1;
+            bCreateNew = true;
             pListofChanges->AddTail(pItem);
-            apExtra = 0;
+            apExtra = nullptr;
         }
     }
     if (apExtra) {
         apExtra->SetCount(aiNumber);
-        bCreateNew = 0;
+        bCreateNew = false;
         if (!pItem->pExtraObjectList) {
             BSSimpleList<ExtraDataList*>* v15;
             BSSimpleList<ExtraDataList*>* v25 =
@@ -1668,7 +1669,7 @@ void InventoryChanges::CreateExtraDataList(
                 v15 = ::new (v25) BSSimpleList<ExtraDataList*>;
             }
             else {
-                v15 = 0;
+                v15 = nullptr;
             }
             pItem->pExtraObjectList = v15;
         }
@@ -1689,7 +1690,7 @@ void InventoryChanges::CreateExtraDataList(
             pExtra_2 = ::new (v24) ExtraDataList;
         }
         else {
-            pExtra_2 = 0;
+            pExtra_2 = nullptr;
         }
         pExtra = pExtra_2;
         if (aiNumber > 1) {
@@ -1703,7 +1704,7 @@ void InventoryChanges::CreateExtraDataList(
                 v13 = ::new (v23) BSSimpleList<ExtraDataList*>;
             }
             else {
-                v13 = 0;
+                v13 = nullptr;
             }
             pItem->pExtraObjectList = v13;
         }
@@ -1719,7 +1720,7 @@ void InventoryChanges::CreateExtraDataList(
                     v12 = ::new (v22) BSSimpleList<ExtraDataList*>;
                 }
                 else {
-                    v12 = 0;
+                    v12 = nullptr;
                 }
                 pChange->pExtraObjectList = v12;
             }
@@ -1744,11 +1745,11 @@ uint32_t InventoryChanges::IterateInventory(
         ContainerObject* pContainerObject = pContIter->m_item;
         pContIter = pContIter->m_pkNext;
         if (pContainerObject) {
-            if (!GetObjectInList(pContainerObject->pObj, 1, 0)) {
+            if (!GetObjectInList(pContainerObject->pObj, true, 0)) {
                 TESBipedModelForm* pbipedform;
                 if ((aiIterateFlags & 1) == 0 ||
                     (!pContainerObject->pObj->GetQuestObject() &&
-                     (((pbipedform = TESBipedModelForm::GetFormAsBipedModel(pContainerObject->pObj)) == 0 ||
+                     (((pbipedform = TESBipedModelForm::GetFormAsBipedModel(pContainerObject->pObj)) == nullptr ||
                        pbipedform->GetPlayable()) &&
                       (pContainerObject->pObj->GetFormType() != WEAP_ID ||
                        !static_cast<TESObjectWEAP*>(pContainerObject->pObj)->IsEmbeddedWeapon())))) {
@@ -1772,7 +1773,7 @@ uint32_t InventoryChanges::IterateInventory(
             TESObjectWEAP* pweapon_2 = static_cast<TESObjectWEAP*>(pitemChange->pContainerObj);
             if ((aiIterateFlags & 1) == 0 ||
                 (!pweapon_2->GetQuestObject() &&
-                 (((pbipedform_2 = TESBipedModelForm::GetFormAsBipedModel(pweapon_2)) == 0 ||
+                 (((pbipedform_2 = TESBipedModelForm::GetFormAsBipedModel(pweapon_2)) == nullptr ||
                    pbipedform_2->GetPlayable()) &&
                   (pweapon_2->GetFormType() != WEAP_ID || !pweapon_2->IsEmbeddedWeapon())))) {
                 uint32_t FormHealth_0 = pitemChange->iNumber;
@@ -1788,10 +1789,10 @@ uint32_t InventoryChanges::IterateInventory(
                     // The temporary shares the change's extra data lists, so they are cleared before the destructor
                     // runs.
                     if (apCallback(&kItemChange, apData)) {
-                        kItemChange.pExtraObjectList = 0;
+                        kItemChange.pExtraObjectList = nullptr;
                         return uiCalls;
                     }
-                    kItemChange.pExtraObjectList = 0;
+                    kItemChange.pExtraObjectList = nullptr;
                 }
             }
         }
@@ -1810,7 +1811,7 @@ uint32_t InventoryChanges::GetInventoryValue(bool abCountQuest, bool abCountGold
                 ival = 0;
             }
             if (ival) {
-                ItemChange* pitem = GetObjectInList(pObj, 1, 0);
+                ItemChange* pitem = GetObjectInList(pObj, true, 0);
                 if (pitem) {
                     uint32_t FormHealth_0 = pitem->iNumber;
                     if (pList->m_item->i_count + FormHealth_0) {
@@ -1852,9 +1853,9 @@ uint32_t InventoryChanges::GetInventoryValue(bool abCountQuest, bool abCountGold
 void InventoryChanges::GetItemGroup(TESBoundObject* apObj, BSSimpleList<ItemChange*>* apReturnList) {
     if (apObj && apReturnList) {
         IterData* pIter = GetIterator();
-        ItemChange* a2 = 0;
+        ItemChange* a2 = nullptr;
         char v4 = 0;
-        while (1) {
+        while (true) {
             a2 = Iterate(pIter);
             if (a2) {
                 if (a2->pContainerObj == apObj) {
@@ -1883,12 +1884,12 @@ void InventoryChanges::GetItemGroup(TESBoundObject* apObj, BSSimpleList<ItemChan
 
 TESBoundObject* InventoryChanges::GetObjectbyType(ENUM_FORM_ID aeFormID, int32_t& ainumb) {
     BSSimpleList<ContainerObject*>* pList = &GetOriginalContainer()->objectList;
-    TESBoundObject* pObj = 0;
+    TESBoundObject* pObj = nullptr;
     while (pList && (!pObj && pList->m_item)) {
         pObj = pList->m_item->pObj;
         if (pObj && pObj->GetFormType() == aeFormID) {
             uint32_t v3;
-            ItemChange* pitem = GetObjectInList(pObj, 1, 0);
+            ItemChange* pitem = GetObjectInList(pObj, true, 0);
             if (!pitem || (v3 = pitem->iNumber, pList->m_item->i_count + v3)) {
                 if (pitem) {
                     uint32_t FormHealth_0 = pitem->iNumber;
@@ -1900,7 +1901,7 @@ TESBoundObject* InventoryChanges::GetObjectbyType(ENUM_FORM_ID aeFormID, int32_t
             }
         }
         else {
-            pObj = 0;
+            pObj = nullptr;
         }
         pList = pList->m_pkNext;
     }
@@ -1914,7 +1915,7 @@ TESBoundObject* InventoryChanges::GetObjectbyType(ENUM_FORM_ID aeFormID, int32_t
             }
         }
         else {
-            pObj = 0;
+            pObj = nullptr;
         }
     }
     return pObj;
@@ -1999,7 +2000,7 @@ void InventoryChanges::LoadGame() {
     uint16_t icount;
     uint16_t iblockSize;
     iblockSize = 0;
-    uint8_t* istartBufferPosition = 0;
+    uint8_t* istartBufferPosition = nullptr;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockHeader, 4u);
         if (iblockHeader != 0x424C4F4B) {
@@ -2033,7 +2034,7 @@ void InventoryChanges::LoadGame() {
             pchange = ::new (apMemory) ItemChange;
         }
         else {
-            pchange = 0;
+            pchange = nullptr;
         }
         ItemChange* pchange_2 = pchange;
         pchange->LoadGame();
@@ -2170,10 +2171,11 @@ uint16_t InventoryChanges::GetSaveSize() {
 ItemChange* InventoryChanges::GetHotKeyItem(int32_t aiKey) {
     ItemChange* photkey;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_INVENTORY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp", 1898
+        MEM_CONTEXT_INVENTORY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp",
+        1898
     );
     InventoryChanges::IterData* i = GetIterator();
-    while (1) {
+    while (true) {
         photkey = Iterate(i);
         if (photkey) {
             break;
@@ -2183,7 +2185,7 @@ ItemChange* InventoryChanges::GetHotKeyItem(int32_t aiKey) {
             if (i) {
                 delete i;
             }
-            return 0;
+            return nullptr;
         }
     }
     for (BSSimpleList<ExtraDataList*>* pextraList = photkey->pExtraObjectList;; pextraList = pextraList->m_pkNext) {
@@ -2252,52 +2254,54 @@ ItemChange** InventoryChanges::GetHotKeyItem(int32_t aiFirst, int32_t aiLast) {
 InventoryChanges::IterData* InventoryChanges::GetIterator() {
     InventoryChanges::IterData* v3;
     AutoMemContext apMemory(
-        MEM_CONTEXT_INVENTORY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp", 0x19B2
+        MEM_CONTEXT_INVENTORY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp",
+        0x19B2
     );
     void* ecx0 = ourMalloc(sizeof(InventoryChanges::IterData));
     if (ecx0) {
         v3 = static_cast<InventoryChanges::IterData*>(ecx0);
     }
     else {
-        v3 = 0;
+        v3 = nullptr;
     }
-    v3->pFilteredList = 0;
-    v3->pItemList = 0;
+    v3->pFilteredList = nullptr;
+    v3->pItemList = nullptr;
     if (GetOriginalContainer()) {
         TESContainer* OriginalContainer = GetOriginalContainer();
         v3->pFilteredList = OriginalContainer->GetFilteredList();
     }
     v3->dword8 = 0;
-    v3->pCurrentItem = 0;
+    v3->pCurrentItem = nullptr;
     v3->pContainer = GetOriginalContainer();
     v3->pItemList = v3->pFilteredList;
     v3->uiPhase = 0;
-    v3->pExtraLists = 0;
-    v3->pAddExtraLists = 0;
-    v3->pCountExtraLists = 0;
+    v3->pExtraLists = nullptr;
+    v3->pAddExtraLists = nullptr;
+    v3->pCountExtraLists = nullptr;
     return v3;
 }
 
 // The next change of the iterator, or null at the end.
 ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_INVENTORY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp", 0x19C9
+        MEM_CONTEXT_INVENTORY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp",
+        0x19C9
     );
-    apIterator->pCurrentItem = 0;
+    apIterator->pCurrentItem = nullptr;
     if (!apIterator->uiPhase) {
         while (apIterator->pItemList && (apIterator->pItemList->m_item && !apIterator->pCurrentItem)) {
             ContainerObject* pobject = apIterator->pItemList->m_item;
-            TESLevItem* pObj = 0;
+            TESLevItem* pObj = nullptr;
             char v57 = 1;
             if (pobject->pObj->GetFormType() == LVLI_ID) {
                 pObj = static_cast<TESLevItem*>(pobject->pObj);
             }
             if (pobject) {
                 if (!pObj) {
-                    ItemChange* pitem = GetObjectInList(pobject->pObj, 1, 0);
+                    ItemChange* pitem = GetObjectInList(pobject->pObj, true, 0);
                     int32_t iorgCount = apIterator->pContainer->GetObjectCount(pobject->pObj);
                     if (pobject && (pitem && iorgCount <= 0)) {
-                        apIterator->pCurrentItem = 0;
+                        apIterator->pCurrentItem = nullptr;
                     }
                     else {
                         int32_t v2;
@@ -2307,7 +2311,7 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                               (pitem->pExtraObjectList &&
                                (pitem->pExtraObjectList->m_item &&
                                 pitem->pExtraObjectList->m_item->HasLeveledItem()))))) {
-                            apIterator->pCurrentItem = 0;
+                            apIterator->pCurrentItem = nullptr;
                         }
                         else {
                             if (!pobject || (pitem && pitem->GetAmountNonDefaultExtra())) {
@@ -2322,7 +2326,7 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                                     while (apIterator->pExtraLists &&
                                            (apIterator->pExtraLists->m_item && !apIterator->pCurrentItem)) {
                                         ExtraDataList* pcurextra = apIterator->pExtraLists->m_item;
-                                        if (!pcurextra->IsExtraDefaultforContainer(0)) {
+                                        if (!pcurextra->IsExtraDefaultforContainer(false)) {
                                             ItemChange* preturnitem_2;
                                             int32_t icount = pcurextra->GetCount();
                                             int32_t FormHealth_0 = pitem->iNumber;
@@ -2335,7 +2339,7 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                                                 preturnitem_2 = ::new (v32) ItemChange(pitem->pContainerObj, icount);
                                             }
                                             else {
-                                                preturnitem_2 = 0;
+                                                preturnitem_2 = nullptr;
                                             }
                                             apIterator->pCurrentItem = preturnitem_2;
                                             apIterator->pCurrentItem->pExtraObjectList->AddHead(pcurextra);
@@ -2349,22 +2353,22 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                                     // Reached only with a null pobject, so pitem is null too: this calls it on null
                                     // deliberately, as the game does.
                                     pitem->GetAmountNonDefaultExtra();
-                                    bool bflag = 0;
-                                    TESObjectWEAP* pweap = 0;
+                                    bool bflag = false;
+                                    TESObjectWEAP* pweap = nullptr;
                                     if (pitem->pContainerObj->GetFormType() == WEAP_ID) {
                                         pweap = static_cast<TESObjectWEAP*>(pitem->pContainerObj);
                                     }
-                                    if (!pitem->GetExtraTotalCount(0) && pitem->GetWorn(0) &&
+                                    if (!pitem->GetExtraTotalCount(false) && pitem->GetWorn(false) &&
                                         (pitem->iNumber <= 0 ||
                                          (pitem->pContainerObj->GetFormType() == AMMO_ID ||
                                           (pweap &&
                                            (pweap->GetWeaponType() == WEAPON_ONE_HAND_GRENADE ||
                                             (pweap->GetWeaponType() == WEAPON_ONE_HAND_MINE ||
                                              pweap->GetWeaponType() == WEAPON_ONE_HAND_THROWN)))))) {
-                                        bflag = 1;
+                                        bflag = true;
                                     }
                                     if (!bflag) {
-                                        int32_t ExtraTotalCount = pitem->GetExtraTotalCount(1);
+                                        int32_t ExtraTotalCount = pitem->GetExtraTotalCount(true);
                                         if (ExtraTotalCount < pitem->iNumber + iorgCount) {
                                             int32_t v8;
                                             if (!pitem->HasLeveledExtra() || (v8 = pitem->iNumber, v8 <= iorgCount)) {
@@ -2375,13 +2379,13 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                                                     preturnitem_3 = ::new (v31) ItemChange;
                                                 }
                                                 else {
-                                                    preturnitem_3 = 0;
+                                                    preturnitem_3 = nullptr;
                                                 }
                                                 apIterator->pCurrentItem = preturnitem_3;
                                                 if (pitem) {
                                                     int32_t v9 = pitem->iNumber + iorgCount;
                                                     apIterator->pCurrentItem->iNumber =
-                                                        v9 - pitem->GetExtraTotalCount(0);
+                                                        v9 - pitem->GetExtraTotalCount(false);
                                                 }
                                                 else {
                                                     apIterator->pCurrentItem->iNumber = iorgCount;
@@ -2403,7 +2407,7 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                                                                         v20 = ::new (v30) BSSimpleList<ExtraDataList*>;
                                                                     }
                                                                     else {
-                                                                        v20 = 0;
+                                                                        v20 = nullptr;
                                                                     }
                                                                     apIterator->pCurrentItem->pExtraObjectList = v20;
                                                                 }
@@ -2429,13 +2433,13 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                                     preturnitem = ::new (v34) ItemChange;
                                 }
                                 else {
-                                    preturnitem = 0;
+                                    preturnitem = nullptr;
                                 }
                                 apIterator->pCurrentItem = preturnitem;
                                 if (pitem) {
                                     if (iorgCount >= 0) {
                                         int32_t v3 = pitem->iNumber + iorgCount;
-                                        apIterator->pCurrentItem->iNumber = v3 - pitem->GetExtraTotalCount(0);
+                                        apIterator->pCurrentItem->iNumber = v3 - pitem->GetExtraTotalCount(false);
                                     }
                                     else {
                                         apIterator->pCurrentItem->iNumber = pitem->iNumber + iorgCount;
@@ -2468,7 +2472,7 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                                                         v24 = ::new (v33) BSSimpleList<ExtraDataList*>;
                                                     }
                                                     else {
-                                                        v24 = 0;
+                                                        v24 = nullptr;
                                                     }
                                                     apIterator->pCurrentItem->pExtraObjectList = v24;
                                                 }
@@ -2506,7 +2510,7 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                     ioriginalcount = pcontainer->GetObjectCount(pContainerObj);
                 }
             }
-            if (ioriginalcount < 0 && pitem_2->GetWorn(0)) {
+            if (ioriginalcount < 0 && pitem_2->GetWorn(false)) {
                 pitem_2->pExtraObjectList->m_item->SetCount(-static_cast<int16_t>(ioriginalcount));
             }
             if (pitem_2) {
@@ -2525,7 +2529,7 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                         }
                         while (apIterator->pCountExtraLists && apIterator->pCountExtraLists->m_item) {
                             ExtraDataList* pkFirst = apIterator->pCountExtraLists->m_item;
-                            if (!pkFirst->IsExtraDefaultforContainer(0)) {
+                            if (!pkFirst->IsExtraDefaultforContainer(false)) {
                                 int16_t Count = pkFirst->GetCount();
                                 if (Count > 0) {
                                     itotalNonDefaultCount += Count;
@@ -2533,7 +2537,7 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                             }
                             apIterator->pCountExtraLists = apIterator->pCountExtraLists->m_pkNext;
                         }
-                        apIterator->pCountExtraLists = 0;
+                        apIterator->pCountExtraLists = nullptr;
                         if (pitem_2->pExtraObjectList && pitem_2->pExtraObjectList->m_item) {
                             pitem_2->GetAmountNonDefaultExtra();
                             if (!apIterator->pAddExtraLists) {
@@ -2542,7 +2546,7 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                             while (apIterator->pAddExtraLists &&
                                    (apIterator->pAddExtraLists->m_item && !apIterator->pCurrentItem)) {
                                 ExtraDataList* pcurextra_2 = apIterator->pAddExtraLists->m_item;
-                                if (!pcurextra_2->IsExtraDefaultforContainer(0)) {
+                                if (!pcurextra_2->IsExtraDefaultforContainer(false)) {
                                     int16_t v38 = pcurextra_2->GetCount();
                                     if (v38 > 0) {
                                         ItemChange* preturnitem_4;
@@ -2551,7 +2555,7 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                                             preturnitem_4 = ::new (v29) ItemChange(pitem_2->pContainerObj, v38);
                                         }
                                         else {
-                                            preturnitem_4 = 0;
+                                            preturnitem_4 = nullptr;
                                         }
                                         apIterator->pCurrentItem = preturnitem_4;
                                         apIterator->pCurrentItem->pExtraObjectList->AddHead(pcurextra_2);
@@ -2576,20 +2580,20 @@ ItemChange* InventoryChanges::Iterate(InventoryChanges::IterData* apIterator) {
                             }
                             if (!apIterator->pCurrentItem && pitem_2->iNumber - itotalNonDefaultCount > 0) {
                                 ItemChange* preturnitem_5;
-                                ExtraDataList* pextra = 0;
+                                ExtraDataList* pextra = nullptr;
                                 ItemChange* v28 = static_cast<ItemChange*>(ourMalloc(sizeof(ItemChange)));
                                 if (v28) {
                                     preturnitem_5 = ::new (v28) ItemChange(pitem_2->pContainerObj, 0);
                                 }
                                 else {
-                                    preturnitem_5 = 0;
+                                    preturnitem_5 = nullptr;
                                 }
                                 apIterator->pCurrentItem = preturnitem_5;
                                 apIterator->pCurrentItem->iNumber = pitem_2->iNumber - itotalNonDefaultCount;
                                 if (pitem_2->pExtraObjectList) {
                                     for (ExtraDataList*& rpItem : pitem_2->pExtraObjectList->ItemsUntilNull()) {
                                         pextra = rpItem;
-                                        if (!pextra->GetWorn(0) && pextra->IsExtraDefaultforContainer(1)) {
+                                        if (!pextra->GetWorn(false) && pextra->IsExtraDefaultforContainer(true)) {
                                             apIterator->pCurrentItem->pExtraObjectList->AddTail(pextra);
                                         }
                                     }
@@ -2615,9 +2619,9 @@ bool InventoryChanges::HasObjectId(uint32_t aId) {
         TESBoundObject* pObj = pList->m_item->pObj;
         if (pObj && pObj->iFormID == aId) {
             uint32_t v3;
-            ItemChange* pitem = GetObjectInList(pObj, 1, 0);
+            ItemChange* pitem = GetObjectInList(pObj, true, 0);
             if (pList->m_item->i_count < 0) {
-                return 1;
+                return true;
             }
             if (pitem && (v3 = pitem->iNumber, pList->m_item->i_count + v3)) {
                 uint32_t FormHealth_0 = pitem->iNumber;
@@ -2627,7 +2631,7 @@ bool InventoryChanges::HasObjectId(uint32_t aId) {
                 iamount += pList->m_item->i_count;
             }
             if (iamount > 0) {
-                return 1;
+                return true;
             }
         }
     }
@@ -2638,13 +2642,13 @@ bool InventoryChanges::HasObjectId(uint32_t aId) {
                 if (pextra->GetReferencePointer()) {
                     TESObjectREFR* ReferencePointer = pextra->GetReferencePointer();
                     if (ReferencePointer->iFormID == aId) {
-                        return 1;
+                        return true;
                     }
                 }
             }
         }
     }
-    return 0;
+    return false;
 }
 
 // The base container's count of the object (made positive) plus the change's count. A change with a zero count
@@ -2989,7 +2993,7 @@ TESAmmo* InventoryChanges::GetBestAmmoForWeapon(TESObjectWEAP* pWeapon, bool& bN
 // biped forms and embedded weapons are skipped.
 bool InventoryChanges::GetNextItem(InventoryIterator& arIterator, ItemChange*& arpItemChange, uint32_t aiIterateFlags) {
     if (arIterator.bFinished) {
-        return 0;
+        return false;
     }
     if (!arIterator.pContainerObjectList && !arIterator.pInventoryChangeList) {
         arIterator.pContainerObjectList = &GetOriginalContainer()->objectList;
@@ -3003,23 +3007,23 @@ bool InventoryChanges::GetNextItem(InventoryIterator& arIterator, ItemChange*& a
                     arIterator.pInventoryChangeList = pListofChanges;
                 }
                 else {
-                    arIterator.bFinished = 1;
+                    arIterator.bFinished = true;
                 }
             }
             if (pcontainerObject) {
                 TESBipedModelForm* pbipedform;
-                if (!GetObjectInList(pcontainerObject->pObj, 1, 0) &&
+                if (!GetObjectInList(pcontainerObject->pObj, true, 0) &&
                     ((aiIterateFlags & 1) == 0 ||
                      (!pcontainerObject->pObj->GetQuestObject() &&
-                      (((pbipedform = TESBipedModelForm::GetFormAsBipedModel(pcontainerObject->pObj)) == 0 ||
+                      (((pbipedform = TESBipedModelForm::GetFormAsBipedModel(pcontainerObject->pObj)) == nullptr ||
                         pbipedform->GetPlayable()) &&
                        (pcontainerObject->pObj->GetFormType() != WEAP_ID ||
                         !static_cast<TESObjectWEAP*>(pcontainerObject->pObj)->TESObjectWEAP::IsEmbeddedWeapon()))))) {
-                    arIterator.TempItemChange.pExtraObjectList = 0;
+                    arIterator.TempItemChange.pExtraObjectList = nullptr;
                     arIterator.TempItemChange.iNumber = pcontainerObject->i_count;
                     arIterator.TempItemChange.pContainerObj = pcontainerObject->pObj;
                     arpItemChange = &arIterator.TempItemChange;
-                    return 1;
+                    return true;
                 }
             }
         }
@@ -3029,14 +3033,14 @@ bool InventoryChanges::GetNextItem(InventoryIterator& arIterator, ItemChange*& a
             ItemChange* pitemChange = arIterator.pInventoryChangeList->m_item;
             arIterator.pInventoryChangeList = arIterator.pInventoryChangeList->m_pkNext;
             if (!arIterator.pInventoryChangeList) {
-                arIterator.bFinished = 1;
+                arIterator.bFinished = true;
             }
             if (pitemChange) {
                 TESBipedModelForm* pbipedform_2;
                 TESObjectWEAP* pweapon = static_cast<TESObjectWEAP*>(pitemChange->pContainerObj);
                 if ((aiIterateFlags & 1) == 0 ||
                     (!pweapon->GetQuestObject() &&
-                     (((pbipedform_2 = TESBipedModelForm::GetFormAsBipedModel(pweapon)) == 0 ||
+                     (((pbipedform_2 = TESBipedModelForm::GetFormAsBipedModel(pweapon)) == nullptr ||
                        pbipedform_2->GetPlayable()) &&
                       (pweapon->GetFormType() != WEAP_ID || !pweapon->IsEmbeddedWeapon())))) {
                     uint32_t FormHealth_0 = pitemChange->iNumber;
@@ -3048,13 +3052,13 @@ bool InventoryChanges::GetNextItem(InventoryIterator& arIterator, ItemChange*& a
                         arIterator.TempItemChange.iNumber = icount;
                         arIterator.TempItemChange.pContainerObj = pweapon;
                         arpItemChange = &arIterator.TempItemChange;
-                        return 1;
+                        return true;
                     }
                 }
             }
         }
     }
-    return 0;
+    return false;
 }
 
 bool InventoryChanges::RemoveWorn(
@@ -3070,30 +3074,30 @@ bool InventoryChanges::RemoveWorn(
 ) {
     uint32_t v21;
     ItemChange* pitem;
-    pRestackedList = 0;
+    pRestackedList = nullptr;
     ResetCachedWeights();
     if (apItemChange) {
         pitem = apItemChange;
     }
     else {
-        pitem = GetObjectInList(apObject, 1, 0);
+        pitem = GetObjectInList(apObject, true, 0);
     }
     ItemChange* pitem_2 = pitem;
     if (!pitem) {
-        return 1;
+        return true;
     }
-    *abRemoved = 1;
+    *abRemoved = true;
     BSSimpleList<ExtraDataList*>* pkFirst = pitem_2->pExtraObjectList;
-    bool bExtraGood = 1;
-    bool bremovedPowerArmor = 0;
-    bool bIsThrown = 0;
+    bool bExtraGood = true;
+    bool bremovedPowerArmor = false;
+    bool bIsThrown = false;
     while (pkFirst && pkFirst->m_item) {
         ExtraDataList* pExtra = pkFirst->m_item;
         if (pExtra->GetWorn(ableft) && (!apExtra || apExtra == pExtra)) {
-            ItemChange* pchangeItem = 0;
+            ItemChange* pchangeItem = nullptr;
             TESBipedModelForm* pmodel = TESBipedModelForm::GetFormAsBipedModel(apObject);
-            if (pExtra->GetCanNotWear() && !apActor->IsDead(0)) {
-                *abRemoved = 0;
+            if (pExtra->GetCanNotWear() && !apActor->IsDead(false)) {
+                *abRemoved = false;
                 return bExtraGood;
             }
             if (apActor) {
@@ -3103,7 +3107,7 @@ bool InventoryChanges::RemoveWorn(
                         case ARMO_ID: {
                             TESObjectARMO* pArmor = static_cast<TESObjectARMO*>(apObject);
                             if (pArmor->TESBipedModelForm::IsPowerArmor() || pArmor->TESBipedModelForm::IsHeavy()) {
-                                bremovedPowerArmor = 1;
+                                bremovedPowerArmor = true;
                             }
                             ExtraDismemberedLimbs* DismembermentExtra = (&apActor->m_Extra)->GetDismembermentExtra();
                             if (DismembermentExtra) {
@@ -3157,11 +3161,11 @@ bool InventoryChanges::RemoveWorn(
                                 BSSimpleList<ExtraDataList*>* v12 = pchangeItem->pExtraObjectList;
                                 if (v12->m_item == pExtra || !apExtra) {
                                     if (apActor == pPlayer) {
-                                        pPlayer->pQueuedWeaponAttach = 0;
+                                        pPlayer->pQueuedWeaponAttach = nullptr;
                                     }
                                     TESObjectWEAP* v40 = static_cast<TESObjectWEAP*>(apObject);
                                     if (static_cast<TESObjectWEAP*>(apObject)->TESObjectWEAP::IsThrownWeapon()) {
-                                        bIsThrown = 1;
+                                        bIsThrown = true;
                                     }
                                     if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
                                         TESBoundObject* v23 = pchangeItem->pContainerObj;
@@ -3171,9 +3175,9 @@ bool InventoryChanges::RemoveWorn(
                                     else {
                                         apActor->RemoveWeapon();
                                         BaseProcess* v29 = apActor->pCurrentProcess;
-                                        v29->SetCurrentWeapon(0, 0, 0);
+                                        v29->SetCurrentWeapon(nullptr, nullptr, false);
                                         BaseProcess* v28 = apActor->pCurrentProcess;
-                                        v28->SetCurrentAmmo(0);
+                                        v28->SetCurrentAmmo(nullptr);
                                     }
                                 }
                             }
@@ -3186,7 +3190,7 @@ bool InventoryChanges::RemoveWorn(
                                 BSSimpleList<ExtraDataList*>* v15 = pchangeItem->pExtraObjectList;
                                 if (v15->m_item == pExtra) {
                                     BaseProcess* v26 = apActor->pCurrentProcess;
-                                    v26->SetCurrentAmmo(0);
+                                    v26->SetCurrentAmmo(nullptr);
                                 }
                             }
                             break;
@@ -3197,14 +3201,14 @@ bool InventoryChanges::RemoveWorn(
                     }
                 }
             }
-            pExtra->SetWorn(0, ableft);
+            pExtra->SetWorn(false, ableft);
             if (pExtra->ItemsInList() <= 1) {
                 if (pExtra->GetHotKey() < 0) {
                     pExtra->SetCount(0);
                 }
                 else {
                     int16_t FormHealth_0 = pitem_2->iNumber;
-                    int16_t ExtraTotalCount = pitem_2->GetExtraTotalCount(0);
+                    int16_t ExtraTotalCount = pitem_2->GetExtraTotalCount(false);
                     pExtra->SetCount(FormHealth_0 - ExtraTotalCount);
                 }
             }
@@ -3215,21 +3219,21 @@ bool InventoryChanges::RemoveWorn(
                 }
                 if (pExtra == apExtra) {
                     if (apbExtraDeleted) {
-                        *apbExtraDeleted = 1;
+                        *apbExtraDeleted = true;
                     }
                 }
-                pExtra = 0;
-                bExtraGood = 0;
+                pExtra = nullptr;
+                bExtraGood = false;
                 break;
             }
             BSSimpleList<ExtraDataList*>* pkFirst_2 = pitem_2->pExtraObjectList;
             while (pkFirst_2 && (pkFirst_2->m_item && bExtraGood)) {
                 ExtraDataList* pCurrent = pkFirst_2->m_item;
                 ExtraDataList* pcompare = pExtra;
-                bool bcomp = 1;
+                bool bcomp = true;
                 if (pExtra) {
-                    bool v25 = pcompare->CompareListForContainer(pCurrent, 0, bIsThrown) ||
-                        pCurrent->CompareListForContainer(pcompare, 0, bIsThrown);
+                    bool v25 = pcompare->CompareListForContainer(pCurrent, false, bIsThrown) ||
+                        pCurrent->CompareListForContainer(pcompare, false, bIsThrown);
                     bcomp = v25;
                 }
                 if (bcomp || pExtra == pCurrent) {
@@ -3257,11 +3261,11 @@ bool InventoryChanges::RemoveWorn(
                     if (pExtra) {
                         delete pExtra;
                     }
-                    pExtra = 0;
-                    bExtraGood = 0;
+                    pExtra = nullptr;
+                    bExtraGood = false;
                 }
             }
-            pkFirst = 0;
+            pkFirst = nullptr;
         }
         else {
             pkFirst = pkFirst->m_pkNext;
@@ -3287,7 +3291,7 @@ bool InventoryChanges::RemoveWorn(
         if (pitem_2) {
             delete pitem_2;
         }
-        return 0;
+        return false;
     }
     else {
         if (pitem_2->iNumber < 0) {
@@ -4403,14 +4407,14 @@ ItemChange* InventoryChanges::GetBestFood() {
 void InventoryChanges::ClearAllChangeItems() {
     BSSimpleList<ItemChange*>* pkFirst = pListofChanges;
     BSSimpleList<ItemChange*>* pkHead = pListofChanges;
-    ItemChange* pitem = 0;
+    ItemChange* pitem = nullptr;
     while (pkFirst && pkFirst->m_item) {
         pitem = pkFirst->m_item;
-        ExtraDataList* pextra = 0;
+        ExtraDataList* pextra = nullptr;
         while (pitem->pExtraObjectList && pitem->pExtraObjectList->m_item) {
             pextra = pitem->pExtraObjectList->m_item;
             pitem->pExtraObjectList->RemoveHead();
-            TESObjectREFR* pref = 0;
+            TESObjectREFR* pref = nullptr;
             if (pextra) {
                 pref = pextra->GetOriginalReference();
             }
@@ -4424,16 +4428,16 @@ void InventoryChanges::ClearAllChangeItems() {
                     }
                     pitem->pExtraObjectList->Remove(pextra);
                     InventoryChanges* pchangeref = (&pref->m_Extra)->GetContainerChanges();
-                    bool bdelete = 1;
+                    bool bdelete = true;
                     if (pchangeref) {
-                        ItemChange* ptempitem = pchangeref->GetObjectInList(pitem->pContainerObj, 1, 0);
+                        ItemChange* ptempitem = pchangeref->GetObjectInList(pitem->pContainerObj, true, 0);
                         if (ptempitem) {
                             if (ptempitem->pExtraObjectList) {
                                 BSSimpleList<ExtraDataList*>* ptempObj = ptempitem->pExtraObjectList;
                                 while (ptempObj && (ptempObj->m_item && bdelete)) {
                                     BSSimpleList<ExtraDataList*>* v1 = ptempObj;
                                     if (v1->m_item == pextra) {
-                                        bdelete = 0;
+                                        bdelete = false;
                                     }
                                     else {
                                         ptempObj = ptempObj->m_pkNext;
@@ -4444,14 +4448,14 @@ void InventoryChanges::ClearAllChangeItems() {
                     }
                     InventoryChanges* pchangeref_2 = (&pPlayer->m_Extra)->GetContainerChanges();
                     if (pchangeref_2) {
-                        ItemChange* ptempitem_2 = pchangeref_2->GetObjectInList(pitem->pContainerObj, 1, 0);
+                        ItemChange* ptempitem_2 = pchangeref_2->GetObjectInList(pitem->pContainerObj, true, 0);
                         if (ptempitem_2) {
                             if (ptempitem_2->pExtraObjectList) {
                                 BSSimpleList<ExtraDataList*>* ptempObj_2 = ptempitem_2->pExtraObjectList;
                                 while (ptempObj_2 && (ptempObj_2->m_item && bdelete)) {
                                     ExtraDataList* m_item = ptempObj_2->m_item;
                                     if (m_item == pextra) {
-                                        bdelete = 0;
+                                        bdelete = false;
                                     }
                                     else {
                                         ptempObj_2 = ptempObj_2->m_pkNext;
@@ -4466,7 +4470,7 @@ void InventoryChanges::ClearAllChangeItems() {
                         }
                     }
                     else {
-                        pextra = 0;
+                        pextra = nullptr;
                     }
                 }
                 else {
@@ -4476,18 +4480,18 @@ void InventoryChanges::ClearAllChangeItems() {
                             delete pextra;
                         }
                     }
-                    pextra = 0;
+                    pextra = nullptr;
                 }
             }
             else {
-                pextra = 0;
+                pextra = nullptr;
             }
         }
         pkFirst->Remove(pitem);
         if (pitem) {
             delete pitem;
         }
-        pitem = 0;
+        pitem = nullptr;
         pkFirst = pkHead;
     }
 }
@@ -4497,17 +4501,17 @@ float InventoryChanges::GetInventoryWeight(bool abIsHardcore) {
     int32_t v21;
     int32_t v25;
     int32_t fPackRat;
-    Actor* pactor = 0;
+    Actor* pactor = nullptr;
     if (pRef->IsActor()) {
         pactor = static_cast<Actor*>(pRef);
     }
-    bool bHasLightItemsReduced = 0;
+    bool bHasLightItemsReduced = false;
     *reinterpret_cast<float*>(&fPackRat) = 0.0;
     BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::HAS_LIGHT_ITEMS_WEIGH_NOTHING, pactor, &fPackRat);
     float fPackRatMod = fPackRatModifier.Float();
     float fPackRatThresh = fPackRatThreshold.Float();
     if (*reinterpret_cast<float*>(&fPackRat) > 0.0) {
-        bHasLightItemsReduced = 1;
+        bHasLightItemsReduced = true;
     }
     if (fcontainerweight == -1.0) {
         float famount = 0.0f;
@@ -4516,7 +4520,7 @@ float InventoryChanges::GetInventoryWeight(bool abIsHardcore) {
         for (BSSimpleList<ContainerObject*>* pList = &GetOriginalContainer()->objectList; pList && !pList->IsEmpty();
              pList = pList->m_pkNext) {
             TESBoundObject* pObj = pList->m_item->pObj;
-            ItemChange* pitem = GetObjectInList(pObj, 1, 0);
+            ItemChange* pitem = GetObjectInList(pObj, true, 0);
             if (!pObj->GetQuestObject()) {
                 if (pObj->GetFormType() == WEAP_ID && pitem) {
                     TESBoundObject* pObj_2 = pObj;
@@ -4553,7 +4557,7 @@ float InventoryChanges::GetInventoryWeight(bool abIsHardcore) {
         }
         for (BSSimpleList<ItemChange*>* pInvList = pListofChanges;
              pInvList && (!pInvList->IsEmpty() && pInvList->m_item); pInvList = pInvList->m_pkNext) {
-            bool bIsWeapon = 0;
+            bool bIsWeapon = false;
             ItemChange* pitem_2 = pInvList->m_item;
             TESBoundObject* pObj_3 = pitem_2->pContainerObj;
             if (pObj_3) {
@@ -4563,7 +4567,7 @@ float InventoryChanges::GetInventoryWeight(bool abIsHardcore) {
                     (v10 = pObj_3, (OriginalContainer = GetOriginalContainer(), !OriginalContainer->HasObject(v10)))) {
                     if (!pObj_3->GetQuestObject()) {
                         if (pObj_3->GetFormType() == WEAP_ID) {
-                            bIsWeapon = 1;
+                            bIsWeapon = true;
                             bool v7 = pitem_2->HasModEffectActive(4);
                             fModWeight = static_cast<TESObjectWEAP*>(pObj_3)->TESObjectWEAP::GetFormWeight(v7);
                             fweight = TESWeightForm::GetFormWeight(pObj_3, abIsHardcore);
@@ -4588,14 +4592,14 @@ float InventoryChanges::GetInventoryWeight(bool abIsHardcore) {
                             if (bHasLightItemsReduced && fPackRatThresh >= static_cast<double>(fModWeight)) {
                                 fModWeight = fModWeight * fPackRatMod;
                             }
-                            TESBoundObject* v18 = 0;
+                            TESBoundObject* v18 = nullptr;
                             if (pObj_3) {
                                 if (pObj_3->GetFormType() == ARMO_ID) {
                                     v18 = pObj_3;
                                 }
                             }
                             int32_t count = pitem_2->iNumber;
-                            if (pitem_2->pExtraObjectList && (bIsWeapon && pitem_2->GetExtraTotalCount(1) > 0)) {
+                            if (pitem_2->pExtraObjectList && (bIsWeapon && pitem_2->GetExtraTotalCount(true) > 0)) {
                                 TESObjectWEAP* pweap = static_cast<TESObjectWEAP*>(pitem_2->pContainerObj);
                                 int32_t modCount = 0;
                                 for (ExtraDataList* pExtra : *pitem_2->pExtraObjectList) {
@@ -4626,7 +4630,7 @@ float InventoryChanges::GetInventoryWeight(bool abIsHardcore) {
                             }
                             if (pactor) {
                                 if (v18) {
-                                    if (pitem_2->GetWorn(0) && count > 0) {
+                                    if (pitem_2->GetWorn(false) && count > 0) {
                                         famount = famount + fweight;
                                         --count;
                                     }
@@ -4648,7 +4652,7 @@ float InventoryChanges::GetInventoryWeight(bool abIsHardcore) {
         fcontainerweight = famount;
         if (pactor) {
             float a4 = fcontainerweight - fpreviousContainerWeight;
-            Actor::HandleChange_008BA2F0(pactor, ActorValue::INVENTORY_WEIGHT, fpreviousContainerWeight, a4, 0);
+            Actor::HandleChange_008BA2F0(pactor, ActorValue::INVENTORY_WEIGHT, fpreviousContainerWeight, a4, nullptr);
         }
     }
     return fcontainerweight;
@@ -4669,12 +4673,12 @@ float InventoryChanges::RemoveAllItems(
     bool abRemoved;
     bool a10;
     bool bremoved;
-    TESBoundObject* pObj = 0;
+    TESBoundObject* pObj = nullptr;
     float fvalue = 0.0f;
-    bool bquest = 0;
-    bool busefilteredlist = apDoNotRemoveList != 0;
+    bool bquest = false;
+    bool busefilteredlist = apDoNotRemoveList != nullptr;
     BSSimpleList<ContainerObject*>* pList = &GetOriginalContainer()->objectList;
-    TESLevItem* v134 = 0;
+    TESLevItem* v134 = nullptr;
     while (pList && !pList->IsEmpty()) {
         TESForm* item;
         pObj = pList->m_item->pObj;
@@ -4683,17 +4687,18 @@ float InventoryChanges::RemoveAllItems(
         if (!busefilteredlist || (item = (TESForm*)pObj, !(&apDoNotRemoveList->ListOfForms)->IsInList(item))) {
             if (aiFormType <= -1 || (!pObj || pObj->GetFormType() == aiFormType)) {
                 if (pObj->GetQuestObject() && apRef == pPlayer) {
-                    ItemChange* pitem = GetObjectInList(pObj, 1, 0);
+                    ItemChange* pitem = GetObjectInList(pObj, true, 0);
                     if (pitem) {
-                        if (pitem->GetWorn(0)) {
+                        if (pitem->GetWorn(false)) {
                             TESBoundObject* v44 = pList->m_item->pObj;
                             TESContainer* OriginalContainer = GetOriginalContainer();
                             int32_t iorigcount = OriginalContainer->GetObjectCount(v44);
                             uint32_t FormHealth_0 = pitem->iNumber;
                             int32_t iamount = iorigcount + FormHealth_0;
-                            bremoved = 0;
+                            bremoved = false;
                             RemoveWorn(
-                                &bremoved, pObj, iorigcount + FormHealth_0, static_cast<Actor*>(apRef), 0, 0, 0, 0, 0
+                                &bremoved, pObj, iorigcount + FormHealth_0, static_cast<Actor*>(apRef), nullptr, false,
+                                false, nullptr, nullptr
                             );
                         }
                     }
@@ -4701,7 +4706,7 @@ float InventoryChanges::RemoveAllItems(
                 else {
                     if (pObj) {
                         if (!pleveled && (!pbipedform || pbipedform->GetPlayable())) {
-                            ItemChange* pitem_2 = GetObjectInList(pObj, 1, 0);
+                            ItemChange* pitem_2 = GetObjectInList(pObj, true, 0);
                             if (!pitem_2 || !pitem_2->HasLeveledExtra()) {
                                 int32_t iamount_2 = 0;
                                 TESBoundObject* v45 = pList->m_item->pObj;
@@ -4727,7 +4732,7 @@ float InventoryChanges::RemoveAllItems(
                                                 BSSimpleList<ExtraDataList*>* plistextra = pitem_2->pExtraObjectList;
                                                 if (plistextra) {
                                                     if (plistextra->m_item) {
-                                                        bool bflag = 0;
+                                                        bool bflag = false;
                                                         while (plistextra && (plistextra->m_item && !bflag)) {
                                                             ExtraDataList* pextra = plistextra->m_item;
                                                             if (pextra->ItemsInList()) {
@@ -4735,18 +4740,18 @@ float InventoryChanges::RemoveAllItems(
                                                                 Actor* v31;
                                                                 ExtraDataList* v32;
                                                                 ItemChange* time;
-                                                                bool bextrabad = 0;
+                                                                bool bextrabad = false;
                                                                 if (static_cast<uint32_t>(
                                                                         pitem_2->pExtraObjectList->ItemsInList()
                                                                     ) > 1) {
-                                                                    bextrabad = 1;
+                                                                    bextrabad = true;
                                                                 }
                                                                 else {
-                                                                    bflag = 1;
+                                                                    bflag = true;
                                                                 }
-                                                                TESForm* powner = 0;
+                                                                TESForm* powner = nullptr;
                                                                 if (apRef->IsActor()) {
-                                                                    TESBoundObject* v116 = 0;
+                                                                    TESBoundObject* v116 = nullptr;
                                                                     TESBoundObject* pcompobj =
                                                                         (TESBoundObject*)(&apRef->m_Extra)
                                                                             ->GetLevCreaOriginalBase();
@@ -4771,7 +4776,7 @@ float InventoryChanges::RemoveAllItems(
                                                                             ((pextra->GetCount() > 1 && inumb <= 2) ||
                                                                              inumb <= 1)) {
                                                                             pextra->RemoveOwnership();
-                                                                            pextra = 0;
+                                                                            pextra = nullptr;
                                                                         }
                                                                         else {
                                                                             pextra->RemoveOwnership();
@@ -4780,32 +4785,33 @@ float InventoryChanges::RemoveAllItems(
                                                                 }
                                                                 int16_t Count = pextra->GetCount();
                                                                 iamount_2 -= Count;
-                                                                if (!pitem_2->GetWorn(0) ||
-                                                                    (abRemoved = 0,
-                                                                     (a10 = 0,
+                                                                if (!pitem_2->GetWorn(false) ||
+                                                                    (abRemoved = false,
+                                                                     (a10 = false,
                                                                       (time = pitem_2,
                                                                        (v32 = pextra,
                                                                         (v31 = apRef->IsActor()
                                                                              ? static_cast<Actor*>(apRef)
-                                                                             : 0,
+                                                                             : nullptr,
                                                                          (v15 = pitem_2->iNumber,
                                                                           (RemoveWorn(
-                                                                               &abRemoved, pObj, v15, v31, v32, 0, 0,
-                                                                               time, &a10
+                                                                               &abRemoved, pObj, v15, v31, v32, false,
+                                                                               false, time, &a10
                                                                            ),
                                                                            !a10)))))))) {
                                                                     ItemChange* v46 = pitem_2;
                                                                     ExtraDataList* v27 = pextra;
                                                                     int16_t v16 = pextra->GetCount();
                                                                     RemoveItem(
-                                                                        apRef, pObj, abStealing, v16, v27, 0,
-                                                                        apStolenContainer, 0, 0, 1, 0, v46
+                                                                        apRef, pObj, abStealing, v16, v27, false,
+                                                                        apStolenContainer, nullptr, nullptr, true,
+                                                                        false, v46
                                                                     );
                                                                 }
                                                                 v123 = 1;
                                                                 if (bflag) {
-                                                                    pitem_2 = 0;
-                                                                    plistextra = 0;
+                                                                    pitem_2 = nullptr;
+                                                                    plistextra = nullptr;
                                                                 }
                                                                 else {
                                                                     BSSimpleList<ExtraDataList*>* ExtraDataList_;
@@ -4828,8 +4834,8 @@ float InventoryChanges::RemoveAllItems(
                                                                     if (plistextra) {
                                                                         delete plistextra_2;
                                                                     }
-                                                                    plistextra = 0;
-                                                                    pitem_2->pExtraObjectList = 0;
+                                                                    plistextra = nullptr;
+                                                                    pitem_2->pExtraObjectList = nullptr;
                                                                 }
                                                                 else {
                                                                     plistextra = pitem_2->pExtraObjectList;
@@ -4849,11 +4855,11 @@ float InventoryChanges::RemoveAllItems(
                                                 pitem_3 = ::new (apMemory) ItemChange(pObj, iamount_2);
                                             }
                                             else {
-                                                pitem_3 = 0;
+                                                pitem_3 = nullptr;
                                             }
                                             ItemChange* v80 = pitem_3;
                                             pitem_2 = pitem_3;
-                                            TESForm* apowner = 0;
+                                            TESForm* apowner = nullptr;
                                             TESBoundObject* pcompobj_2 =
                                                 (TESBoundObject*)(&apRef->m_Extra)->GetLevCreaOriginalBase();
                                             if (!pcompobj_2) {
@@ -4865,12 +4871,14 @@ float InventoryChanges::RemoveAllItems(
                                             ExtraDataList* v28 = pextra_2;
                                             int32_t v25 = pextra_2->GetCount();
                                             RemoveItem(
-                                                apRef, pObj, abStealing, v25, v28, 0, apStolenContainer, 0, 0, 1, 0, 0
+                                                apRef, pObj, abStealing, v25, v28, false, apStolenContainer, nullptr,
+                                                nullptr, true, false, nullptr
                                             );
                                         }
                                         else {
                                             RemoveItem(
-                                                apRef, pObj, 0, iamount_2, 0, 0, apStolenContainer, 0, 0, 1, 0, 0
+                                                apRef, pObj, false, iamount_2, nullptr, false, apStolenContainer,
+                                                nullptr, nullptr, true, false, nullptr
                                             );
                                         }
                                         if (apStolenContainer == pPlayer) {
@@ -4890,12 +4898,12 @@ float InventoryChanges::RemoveAllItems(
                                                     switch (pObj->GetFormType()) {
                                                         case ARMO_ID: {
                                                             const char* apSoundName =
-                                                                pPlayer->GetPickUpSoundName(pObj, 1, 0);
+                                                                pPlayer->GetPickUpSoundName(pObj, true, false);
                                                             Interface::ShowMessage(
                                                                 pstring.pString, 0,
                                                                 "Interface\\Icons\\Message "
                                                                 "Icons\\glow_message_vaultboy_neutral.dds",
-                                                                apSoundName, 2.0f, 0
+                                                                apSoundName, 2.0f, false
                                                             );
                                                             break;
                                                         }
@@ -4912,12 +4920,12 @@ float InventoryChanges::RemoveAllItems(
                                                         case CCRD_ID:
                                                         case CMNY_ID: {
                                                             const char* soundName =
-                                                                pPlayer->GetPickUpSoundName(pObj, 1, 0);
+                                                                pPlayer->GetPickUpSoundName(pObj, true, false);
                                                             Interface::ShowMessage(
                                                                 pstring.pString, 0,
                                                                 "Interface\\Icons\\Message "
                                                                 "Icons\\glow_message_vaultboy_neutral.dds",
-                                                                soundName, 2.0f, 0
+                                                                soundName, 2.0f, false
                                                             );
                                                             break;
                                                         }
@@ -4939,7 +4947,7 @@ float InventoryChanges::RemoveAllItems(
         }
         pList = pList->m_pkNext;
     }
-    ItemChange* v132 = 0;
+    ItemChange* v132 = nullptr;
     BSSimpleList<ItemChange*>* pListInv = pListofChanges;
 LABEL_96:;
     while (pListInv && !pListInv->IsEmpty()) {
@@ -4953,7 +4961,7 @@ LABEL_96:;
               (&apDoNotRemoveList->ListOfForms)->IsInList(pcontainerForm))) ||
             ((aiFormType > -1 && (pInventoryItem && pInventoryItem->pContainerObj->GetFormType() != aiFormType)) ||
              (!pInventoryItem ||
-              (((pbipedform_2 = TESBipedModelForm::GetFormAsBipedModel(pInventoryItem->pContainerObj)) != 0 &&
+              (((pbipedform_2 = TESBipedModelForm::GetFormAsBipedModel(pInventoryItem->pContainerObj)) != nullptr &&
                 !pbipedform_2->GetPlayable()) ||
                (!pInventoryItem->HasLeveledExtra() &&
                 (GetOriginalContainer() &&
@@ -4966,14 +4974,14 @@ LABEL_96:;
             TESBoundObject* FormFlags = pInventoryItem->pContainerObj;
             if (FormFlags->GetQuestObject() && apRef == pPlayer) {
                 if (pInventoryItem) {
-                    if (pInventoryItem->GetWorn(0)) {
+                    if (pInventoryItem->GetWorn(false)) {
                         uint32_t v105 = pInventoryItem->iNumber;
-                        v106 = 0;
+                        v106 = false;
                         char v103 = 0;
-                        bool bleft = pInventoryItem->GetWorn(1);
+                        bool bleft = pInventoryItem->GetWorn(true);
                         RemoveWorn(
-                            &v106, pInventoryItem->pContainerObj, v105, static_cast<Actor*>(apRef), 0, bleft,
-                            pInventoryItem != 0, 0, 0
+                            &v106, pInventoryItem->pContainerObj, v105, static_cast<Actor*>(apRef), nullptr, bleft,
+                            pInventoryItem != nullptr, nullptr, nullptr
                         );
                     }
                 }
@@ -4987,7 +4995,7 @@ LABEL_96:;
                         int32_t v19 = TESValueForm::GetFormValue(pObj);
                         int32_t v70 = pInventoryItem->iNumber * v19;
                         fvalue = static_cast<double>(v70) + fvalue;
-                        bool bflag_2 = 0;
+                        bool bflag_2 = false;
                         int32_t ioriginalcount = 0;
                         if (GetOriginalContainer()) {
                             if (pInventoryItem) {
@@ -4999,10 +5007,10 @@ LABEL_96:;
                         int32_t inumberremove = pInventoryItem->iNumber + ioriginalcount;
                         BSSimpleList<ExtraDataList*>* plistextra_3 = pInventoryItem->pExtraObjectList;
                         if (!plistextra_3 || !plistextra_3->m_item) {
-                            ExtraDataList* v89 = 0;
-                            TESForm* powner_3 = 0;
+                            ExtraDataList* v89 = nullptr;
+                            TESForm* powner_3 = nullptr;
                             if (apRef->IsActor()) {
-                                TESBoundObject* v85 = 0;
+                                TESBoundObject* v85 = nullptr;
                                 TESBoundObject* pcompobj_4 =
                                     (TESBoundObject*)(&apRef->m_Extra)->GetLevCreaOriginalBase();
                                 if (!pcompobj_4) {
@@ -5020,16 +5028,19 @@ LABEL_96:;
                                     pextra_4 = ::new (v77) ExtraDataList;
                                 }
                                 else {
-                                    pextra_4 = 0;
+                                    pextra_4 = nullptr;
                                 }
                                 v89 = pextra_4;
                                 pextra_4->SetOwnership(powner_3);
                             }
                             int32_t v87 = pInventoryItem->iNumber;
-                            ItemChange* v58 = v108 == 0 ? pInventoryItem : 0;
+                            ItemChange* v58 = v108 == 0 ? pInventoryItem : nullptr;
                             ExtraDataList* v30 = v89;
                             uint32_t v22 = pInventoryItem->iNumber;
-                            RemoveItem(apRef, pObj, abStealing, v22, v30, 0, apStolenContainer, 0, 0, 1, 0, v58);
+                            RemoveItem(
+                                apRef, pObj, abStealing, v22, v30, false, apStolenContainer, nullptr, nullptr, true,
+                                false, v58
+                            );
                             if (apStolenContainer == pPlayer) {
                                 if (pObj) {
                                     if (!abSilent) {
@@ -5046,12 +5057,13 @@ LABEL_96:;
                                         }
                                         switch (pObj->GetFormType()) {
                                             case ARMO_ID: {
-                                                const char* PickUpSoundName = pPlayer->GetPickUpSoundName(pObj, 1, 0);
+                                                const char* PickUpSoundName =
+                                                    pPlayer->GetPickUpSoundName(pObj, true, false);
                                                 Interface::ShowMessage(
                                                     pstring_3.pString, 0,
                                                     "Interface\\Icons\\Message "
                                                     "Icons\\glow_message_vaultboy_neutral.dds",
-                                                    PickUpSoundName, 2.0f, 0
+                                                    PickUpSoundName, 2.0f, false
                                                 );
                                                 break;
                                             }
@@ -5067,12 +5079,12 @@ LABEL_96:;
                                             case CHIP_ID:
                                             case CCRD_ID:
                                             case CMNY_ID: {
-                                                const char* v62 = pPlayer->GetPickUpSoundName(pObj, 1, 0);
+                                                const char* v62 = pPlayer->GetPickUpSoundName(pObj, true, false);
                                                 Interface::ShowMessage(
                                                     pstring_3.pString, 0,
                                                     "Interface\\Icons\\Message "
                                                     "Icons\\glow_message_vaultboy_neutral.dds",
-                                                    v62, 2.0f, 0
+                                                    v62, 2.0f, false
                                                 );
                                                 break;
                                             }
@@ -5087,17 +5099,17 @@ LABEL_96:;
                             pListInv = pListofChanges;
                             continue;
                         }
-                        while (1) {
+                        while (true) {
                             bool bextrabad_2;
                             ExtraDataList* pextra_3;
-                            while (1) {
+                            while (true) {
                             LABEL_125:;
                                 if (!plistextra_3 || (!plistextra_3->m_item || bflag_2)) {
                                 LABEL_192:;
                                     if (inumberremove > 0) {
                                         RemoveItem(
-                                            apRef, pObj, abStealing, inumberremove, 0, 0, apStolenContainer, 0, 0, 1, 0,
-                                            v108 == 0 ? pInventoryItem : 0
+                                            apRef, pObj, abStealing, inumberremove, nullptr, false, apStolenContainer,
+                                            nullptr, nullptr, true, false, v108 == 0 ? pInventoryItem : nullptr
                                         );
                                         pListInv = pListofChanges;
                                         if (apStolenContainer == pPlayer) {
@@ -5116,12 +5128,13 @@ LABEL_96:;
                                                     }
                                                     switch (pObj->GetFormType()) {
                                                         case ARMO_ID: {
-                                                            const char* v64 = pPlayer->GetPickUpSoundName(pObj, 1, 0);
+                                                            const char* v64 =
+                                                                pPlayer->GetPickUpSoundName(pObj, true, false);
                                                             Interface::ShowMessage(
                                                                 v90.pString, 0,
                                                                 "Interface\\Icons\\Message "
                                                                 "Icons\\glow_message_vaultboy_neutral.dds",
-                                                                v64, 2.0f, 0
+                                                                v64, 2.0f, false
                                                             );
                                                             break;
                                                         }
@@ -5137,12 +5150,13 @@ LABEL_96:;
                                                         case CHIP_ID:
                                                         case CCRD_ID:
                                                         case CMNY_ID: {
-                                                            const char* v65 = pPlayer->GetPickUpSoundName(pObj, 1, 0);
+                                                            const char* v65 =
+                                                                pPlayer->GetPickUpSoundName(pObj, true, false);
                                                             Interface::ShowMessage(
                                                                 v90.pString, 0,
                                                                 "Interface\\Icons\\Message "
                                                                 "Icons\\glow_message_vaultboy_neutral.dds",
-                                                                v65, 2.0f, 0
+                                                                v65, 2.0f, false
                                                             );
                                                             break;
                                                         }
@@ -5158,15 +5172,15 @@ LABEL_96:;
                                     goto LABEL_96;
                                 }
                                 pextra_3 = plistextra_3->m_item;
-                                bextrabad_2 = 0;
+                                bextrabad_2 = false;
                                 if (pextra_3->GetCount() >= 1) {
                                     break;
                                 }
                                 plistextra_3 = plistextra_3->m_pkNext;
                                 if (!plistextra_3) {
                                     RemoveItem(
-                                        apRef, pObj, abStealing, pInventoryItem->iNumber, 0, 0, apStolenContainer, 0, 0,
-                                        1, 0, pInventoryItem
+                                        apRef, pObj, abStealing, pInventoryItem->iNumber, nullptr, false,
+                                        apStolenContainer, nullptr, nullptr, true, false, pInventoryItem
                                     );
                                     v108 = 1;
                                     if (apStolenContainer == pPlayer) {
@@ -5187,12 +5201,13 @@ LABEL_96:;
                                                 }
                                                 switch (pObj->GetFormType()) {
                                                     case ARMO_ID: {
-                                                        const char* v68 = pPlayer->GetPickUpSoundName(pObj, 1, 0);
+                                                        const char* v68 =
+                                                            pPlayer->GetPickUpSoundName(pObj, true, false);
                                                         Interface::ShowMessage(
                                                             pstring_2.pString, 0,
                                                             "Interface\\Icons\\Message "
                                                             "Icons\\glow_message_vaultboy_neutral.dds",
-                                                            v68, 2.0f, 0
+                                                            v68, 2.0f, false
                                                         );
                                                         break;
                                                     }
@@ -5208,12 +5223,13 @@ LABEL_96:;
                                                     case CHIP_ID:
                                                     case CCRD_ID:
                                                     case CMNY_ID: {
-                                                        const char* v69 = pPlayer->GetPickUpSoundName(pObj, 1, 0);
+                                                        const char* v69 =
+                                                            pPlayer->GetPickUpSoundName(pObj, true, false);
                                                         Interface::ShowMessage(
                                                             pstring_2.pString, 0,
                                                             "Interface\\Icons\\Message "
                                                             "Icons\\glow_message_vaultboy_neutral.dds",
-                                                            v69, 2.0f, 0
+                                                            v69, 2.0f, false
                                                         );
                                                         break;
                                                     }
@@ -5232,14 +5248,14 @@ LABEL_96:;
                             }
                             if (pextra_3->ItemsInList()) {
                                 if (static_cast<uint32_t>(plistextra_3->ItemsInList()) > 1) {
-                                    bextrabad_2 = 1;
+                                    bextrabad_2 = true;
                                 }
                                 else {
-                                    bflag_2 = 1;
+                                    bflag_2 = true;
                                 }
-                                TESForm* powner_2 = 0;
+                                TESForm* powner_2 = nullptr;
                                 if (apRef->IsActor()) {
-                                    TESBoundObject* v93 = 0;
+                                    TESBoundObject* v93 = nullptr;
                                     TESBoundObject* pcompobj_3 =
                                         (TESBoundObject*)(&apRef->m_Extra)->GetLevCreaOriginalBase();
                                     if (!pcompobj_3) {
@@ -5261,7 +5277,7 @@ LABEL_96:;
                                         if (pextra_3->GetOwner() &&
                                             ((pextra_3->GetCount() > 1 && inumb_2 <= 2) || inumb_2 <= 1)) {
                                             pextra_3->RemoveOwnership();
-                                            pextra_3 = 0;
+                                            pextra_3 = nullptr;
                                         }
                                         else {
                                             pextra_3->RemoveOwnership();
@@ -5275,7 +5291,8 @@ LABEL_96:;
                                     ExtraDataList* v29 = pextra_3;
                                     int32_t v26 = pextra_3->GetCount();
                                     RemoveItem(
-                                        apRef, pObj, abStealing, v26, v29, 0, apStolenContainer, 0, 0, 1, 0, v53
+                                        apRef, pObj, abStealing, v26, v29, false, apStolenContainer, nullptr, nullptr,
+                                        true, false, v53
                                     );
                                     v108 = 1;
                                     if (apStolenContainer == pPlayer) {
@@ -5294,12 +5311,13 @@ LABEL_96:;
                                                 }
                                                 switch (pObj->GetFormType()) {
                                                     case ARMO_ID: {
-                                                        const char* v66 = pPlayer->GetPickUpSoundName(pObj, 1, 0);
+                                                        const char* v66 =
+                                                            pPlayer->GetPickUpSoundName(pObj, true, false);
                                                         Interface::ShowMessage(
                                                             v91.pString, 0,
                                                             "Interface\\Icons\\Message "
                                                             "Icons\\glow_message_vaultboy_neutral.dds",
-                                                            v66, 2.0f, 0
+                                                            v66, 2.0f, false
                                                         );
                                                         break;
                                                     }
@@ -5315,12 +5333,13 @@ LABEL_96:;
                                                     case CHIP_ID:
                                                     case CCRD_ID:
                                                     case CMNY_ID: {
-                                                        const char* v67 = pPlayer->GetPickUpSoundName(pObj, 1, 0);
+                                                        const char* v67 =
+                                                            pPlayer->GetPickUpSoundName(pObj, true, false);
                                                         Interface::ShowMessage(
                                                             v91.pString, 0,
                                                             "Interface\\Icons\\Message "
                                                             "Icons\\glow_message_vaultboy_neutral.dds",
-                                                            v67, 2.0f, 0
+                                                            v67, 2.0f, false
                                                         );
                                                         break;
                                                     }
@@ -5333,7 +5352,7 @@ LABEL_96:;
                                         Interface::UpdateInventory();
                                     }
                                 }
-                                pInventoryItem = GetObjectInList(pObj, 1, 0);
+                                pInventoryItem = GetObjectInList(pObj, true, 0);
                                 if (inumberremove > 0 || pInventoryItem) {
                                     if (inumberremove <= 0) {
                                         if (pInventoryItem) {
@@ -5345,7 +5364,7 @@ LABEL_96:;
                                     pListInv = pListofChanges;
                                 }
                                 if (!pInventoryItem || inumberremove <= 0) {
-                                    plistextra_3 = 0;
+                                    plistextra_3 = nullptr;
                                     goto LABEL_125;
                                 }
                             }
@@ -5356,8 +5375,8 @@ LABEL_96:;
                                     if (plistextra_3) {
                                         delete plistextra_3;
                                     }
-                                    plistextra_3 = 0;
-                                    pInventoryItem->pExtraObjectList = 0;
+                                    plistextra_3 = nullptr;
+                                    pInventoryItem->pExtraObjectList = nullptr;
                                     goto LABEL_125;
                                 }
                             }
@@ -5382,7 +5401,7 @@ void InventoryChanges::RemoveItemType(ENUM_FORM_ID aeType, bool abStealing, int3
         if (inum > ainumber) {
             inum = ainumber;
         }
-        RemoveItem(0, pobject, abStealing, inum, 0, 0, 0, 0, 0, 1, 0, 0);
+        RemoveItem(nullptr, pobject, abStealing, inum, nullptr, false, nullptr, nullptr, nullptr, true, false, nullptr);
         ainumber -= inum;
     }
 }
@@ -5403,12 +5422,13 @@ TESObjectREFR* InventoryChanges::RemoveItem(
 ) {
     ItemChange* pitem;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_INVENTORY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp", 3700
+        MEM_CONTEXT_INVENTORY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp",
+        3700
     );
-    bcountdirty = 1;
+    bcountdirty = true;
     fpreviousContainerWeight = fcontainerweight;
     fcontainerweight = -1.0f;
-    TESObjectREFR* pdroppedref = 0;
+    TESObjectREFR* pdroppedref = nullptr;
     if (pRef) {
         pRef->AddChange(32);
     }
@@ -5420,12 +5440,12 @@ TESObjectREFR* InventoryChanges::RemoveItem(
         pitem = apItemChange;
     }
     else {
-        pitem = GetObjectInList(apObject, 1, 0);
+        pitem = GetObjectInList(apObject, true, 0);
     }
     ItemChange* pitem_2 = pitem;
-    ItemChange* pnewitem = 0;
-    bool breload = 0;
-    Actor* pact = 0;
+    ItemChange* pnewitem = nullptr;
+    bool breload = false;
+    Actor* pact = nullptr;
     if (apRef->IsActor() && apRef == pPlayer) {
         pact = static_cast<Actor*>(apRef);
     }
@@ -5435,7 +5455,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
             if (CurrentAIProcess->GetCurrentAmmo()) {
                 BaseProcess* v78 = pact->pCurrentProcess;
                 if (v78->GetCurrentAmmo()->pContainerObj == apObject) {
-                    breload = 1;
+                    breload = true;
                 }
             }
         }
@@ -5459,7 +5479,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
             if (apExtra) {
                 delete apExtra;
             }
-            apExtra = 0;
+            apExtra = nullptr;
         }
     }
     int32_t iorgCount = 0;
@@ -5473,10 +5493,10 @@ TESObjectREFR* InventoryChanges::RemoveItem(
         }
         iorgCount = iorgCount_2;
         if (pitem_2) {
-            if (!pitem_2->GetWorn(0)) {
+            if (!pitem_2->GetWorn(false)) {
                 int32_t v13 = pitem_2->iNumber + iorgCount;
                 int32_t ExtraTotalDefaultCount = pitem_2->GetExtraTotalDefaultCount();
-                if (v13 > pitem_2->GetExtraTotalCount(0) + ExtraTotalDefaultCount) {
+                if (v13 > pitem_2->GetExtraTotalCount(false) + ExtraTotalDefaultCount) {
                     if (pitem_2->GetScript()) {
                         iorgCount = 0;
                     }
@@ -5490,15 +5510,15 @@ TESObjectREFR* InventoryChanges::RemoveItem(
         iorgCount = -iorgCount;
     }
     if (iorgCount < 0 && apOtherContainer != pPlayer) {
-        return 0;
+        return nullptr;
     }
     if ((pitem_2 && (pitem_2->iNumber && !(iorgCount + pitem_2->iNumber))) || (!pitem_2 && !iorgCount)) {
         TESObjectREFR* v104 = pdroppedref;
         return v104;
     }
-    ExtraLeveledItem* plevelextra = 0;
-    bool busebase = 0;
-    ItemChange* pcleareditem = 0;
+    ExtraLeveledItem* plevelextra = nullptr;
+    bool busebase = false;
+    ItemChange* pcleareditem = nullptr;
     while (pitem_2) {
         ItemChange* pnewitem_2;
         if (ainumber <= 0) {
@@ -5516,29 +5536,29 @@ TESObjectREFR* InventoryChanges::RemoveItem(
             pnewitem_2 = ::new (v103) ItemChange;
         }
         else {
-            pnewitem_2 = 0;
+            pnewitem_2 = nullptr;
         }
         pnewitem = pnewitem_2;
         TESBoundObject* FormFlags = pitem_2->pContainerObj;
         pnewitem->pContainerObj = FormFlags;
         BSSimpleList<ExtraDataList*>* pkFirst = pitem_2->pExtraObjectList;
-        bool bflag = 1;
+        bool bflag = true;
         if (((apExtra && apExtra->ItemsInList()) || abPreferStolen) && (pkFirst && pkFirst->m_item)) {
             while (pkFirst && (pkFirst->m_item && bflag)) {
                 ExtraDataList* pCurrent = pkFirst->m_item;
-                ExtraDataList* pNewExtra = 0;
+                ExtraDataList* pNewExtra = nullptr;
                 if (apExtra == pCurrent || (!apExtra && (abPreferStolen && pCurrent->GetOwner()))) {
-                    apExtra = 0;
-                    bflag = 0;
+                    apExtra = nullptr;
+                    bflag = false;
                     int32_t icount = pCurrent->GetCount();
-                    if (pCurrent->GetWorn(0) && pCurrent->GetCount() <= ainumber) {
-                        bool bextraflag = 0;
+                    if (pCurrent->GetWorn(false) && pCurrent->GetCount() <= ainumber) {
+                        bool bextraflag = false;
                         if (pCurrent->ItemsInList() <= 1 ||
                             ((pCurrent->ItemsInList() == 2 && pCurrent->GetCount() > 1) ||
                              (pCurrent->HasLeveledItem() && pCurrent->ItemsInList() == 2))) {
-                            bextraflag = 1;
+                            bextraflag = true;
                         }
-                        bool abflag = 0;
+                        bool abflag = false;
                         if (!apRef->IsActor() || apRef->GetDisabled()) {
                             ExtraDataList* v59 = pCurrent;
                             int16_t Count = pCurrent->GetCount();
@@ -5550,30 +5570,30 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 ExtraDataList* v41 = pCurrent;
                                 int32_t v38 = pCurrent->GetCount();
                                 TESBoundObject* afTime = pitem_2->pContainerObj;
-                                abflag = ptemp->UnEquipObject(afTime, v38, v41, 0, 0, 1);
+                                abflag = ptemp->UnEquipObject(afTime, v38, v41, false, false, true);
                             }
                         }
                         if (!abflag || bextraflag) {
-                            pCurrent = 0;
+                            pCurrent = nullptr;
                         }
-                        pitem_2 = GetObjectInList(apObject, 1, 0);
-                        if (!pitem_2 || !pitem_2->GetWorn(0)) {
+                        pitem_2 = GetObjectInList(apObject, true, 0);
+                        if (!pitem_2 || !pitem_2->GetWorn(false)) {
                             pdroppedref = RemoveItem(
                                 apRef, apObject, abstealing, ainumber, pCurrent, abDropWorld, apOtherContainer, apPoint,
-                                apRotate, 1, 0, 0
+                                apRotate, true, false, nullptr
                             );
                         }
                         if (pitem_2) {
                             if (icount > 1 && icount - ainumber > 0 && pRef->IsActor()) {
                                 static_cast<Actor*>(pRef)->Actor::EquipObject(
-                                    pitem_2->pContainerObj, icount - ainumber, pCurrent, 1, 0, 0
+                                    pitem_2->pContainerObj, icount - ainumber, pCurrent, true, false, false
                                 );
                             }
                         }
                         if (pnewitem) {
                             delete pnewitem;
                         }
-                        pnewitem = 0;
+                        pnewitem = nullptr;
                         TESObjectREFR* v102 = pdroppedref;
                         return v102;
                     }
@@ -5596,10 +5616,10 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 pNewExtra_2 = ::new (v100) ExtraDataList;
                             }
                             else {
-                                pNewExtra_2 = 0;
+                                pNewExtra_2 = nullptr;
                             }
                             pNewExtra = pNewExtra_2;
-                            pNewExtra_2->CopyListForReference(pCurrent, 0);
+                            pNewExtra_2->CopyListForReference(pCurrent, false);
                             pNewExtra->RemoveLeveledItem();
                             pNewExtra->SetCount(ainumber);
                             if ((pNewExtra->ItemsInList() == 1 && pNewExtra->GetCount() > 1) ||
@@ -5607,7 +5627,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 if (pNewExtra) {
                                     delete pNewExtra;
                                 }
-                                pNewExtra = 0;
+                                pNewExtra = nullptr;
                             }
                         }
                         else {
@@ -5622,7 +5642,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 plevel = ::new (v101) ExtraDataList;
                             }
                             else {
-                                plevel = 0;
+                                plevel = nullptr;
                             }
                             ExtraDataList* plevel_2 = plevel;
                             ExtraLeveledItem* plevelextra_2 = pCurrent->GetLeveledItem();
@@ -5650,32 +5670,32 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                     apExtraa = pitem_2->pExtraObjectList->m_item;
                                 }
                                 else {
-                                    apExtraa = 0;
+                                    apExtraa = nullptr;
                                 }
                                 char HotKey = pCurrent->GetHotKey();
                                 SetHotKeyItem(pitem_2, apExtraa, HotKey);
                             }
                         }
-                        pCurrent = 0;
+                        pCurrent = nullptr;
                         Script::SetActionFlag(apRef, pNewExtra, SCRIPT_ACTION_ONDROP);
                         if (pNewExtra->IsExtraListEmpty()) {
                             if (pNewExtra) {
                                 delete pNewExtra;
                             }
-                            pNewExtra = 0;
+                            pNewExtra = nullptr;
                         }
                         if (!pitem_2->iNumber) {
                             pcleareditem = pitem_2;
                         }
                     }
                     if (pNewExtra) {
-                        if (pNewExtra->GetWorn(0)) {
-                            pNewExtra->RemoveWorn(0);
+                        if (pNewExtra->GetWorn(false)) {
+                            pNewExtra->RemoveWorn(false);
                             if (pNewExtra->IsExtraListEmpty()) {
                                 if (pNewExtra) {
                                     delete pNewExtra;
                                 }
-                                pNewExtra = 0;
+                                pNewExtra = nullptr;
                             }
                         }
                     }
@@ -5690,7 +5710,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                     v72 = ::new (v99) BSSimpleList<ExtraDataList*>;
                                 }
                                 else {
-                                    v72 = 0;
+                                    v72 = nullptr;
                                 }
                                 pnewitem->pExtraObjectList = v72;
                             }
@@ -5708,9 +5728,9 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 }
                             }
                             if (pdroppedref) {
-                                pdroppedref->SetDelete(0);
+                                pdroppedref->SetDelete(false);
                                 pNewExtra->RemoveReferencePointer();
-                                bool abdelete_3 = pCurrent == 0;
+                                bool abdelete_3 = pCurrent == nullptr;
                                 float newscaleb = pNewExtra->GetScale();
                                 pdroppedref->SetScale(newscaleb);
                                 (&pdroppedref->m_Extra)->CopyListForReference(pNewExtra, abdelete_3);
@@ -5726,18 +5746,18 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 if (pnewitem) {
                                     delete pnewitem;
                                 }
-                                pnewitem = 0;
+                                pnewitem = nullptr;
                                 if (pNewExtra) {
                                     delete pNewExtra;
                                 }
-                                pNewExtra = 0;
-                                bool baddOwnership_2 = 0;
+                                pNewExtra = nullptr;
+                                bool baddOwnership_2 = false;
                                 TESObjectCELL* pcell_2 = apRef->GetParentCell();
                                 if (!pdroppedref->GetMyOwner()) {
                                     if (pcell_2) {
                                         if (pcell_2->GetOwner()) {
                                             if (!pcell_2->IsActorCellOwner(static_cast<Actor*>(apRef))) {
-                                                baddOwnership_2 = 1;
+                                                baddOwnership_2 = true;
                                             }
                                         }
                                     }
@@ -5752,7 +5772,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                             pbipedModel_2->GetWorldTESModel(TESActorBase::SEX_FEMALE);
                                         if (WorldTESModel_0 !=
                                             pbipedModel_2->GetWorldTESModel(TESActorBase::SEX_MALE)) {
-                                            baddOwnership_2 = 1;
+                                            baddOwnership_2 = true;
                                         }
                                     }
                                 }
@@ -5764,24 +5784,24 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                         }
                         else {
                             pdroppedref =
-                                DropItemIntoWorld(apRef, pitem_2->pContainerObj, icount, 0, apPoint, apRotate);
+                                DropItemIntoWorld(apRef, pitem_2->pContainerObj, icount, nullptr, apPoint, apRotate);
                             pdroppedref->AddChange(1024);
                             if (pNewExtra) {
                                 if (pNewExtra->ItemsInList()) {
-                                    bool abdelete_2 = pCurrent == 0;
+                                    bool abdelete_2 = pCurrent == nullptr;
                                     float newscale = pNewExtra->GetScale();
                                     pdroppedref->SetScale(newscale);
-                                    (&pdroppedref->m_Extra)->CopyListForReference(pNewExtra, 1);
+                                    (&pdroppedref->m_Extra)->CopyListForReference(pNewExtra, true);
                                     (&pdroppedref->m_Extra)->RemoveScale();
                                 }
                             }
-                            bool baddOwnership = 0;
+                            bool baddOwnership = false;
                             TESObjectCELL* pcell = apRef->GetParentCell();
                             if (!pdroppedref->GetMyOwner()) {
                                 if (pcell) {
                                     if (pcell->GetOwner()) {
                                         if (!pcell->IsActorCellOwner(static_cast<Actor*>(apRef))) {
-                                            baddOwnership = 1;
+                                            baddOwnership = true;
                                         }
                                     }
                                 }
@@ -5794,7 +5814,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 if (pbipedModel) {
                                     TESModelTextureSwap* v23 = pbipedModel->GetWorldTESModel(TESActorBase::SEX_FEMALE);
                                     if (v23 != pbipedModel->GetWorldTESModel(TESActorBase::SEX_MALE)) {
-                                        baddOwnership = 1;
+                                        baddOwnership = true;
                                     }
                                 }
                             }
@@ -5805,23 +5825,23 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                             if (pnewitem) {
                                 delete pnewitem;
                             }
-                            pnewitem = 0;
+                            pnewitem = nullptr;
                             if (pNewExtra) {
                                 delete pNewExtra;
                             }
-                            pNewExtra = 0;
+                            pNewExtra = nullptr;
                         }
                     }
                     else {
                         if (apOtherContainer) {
-                            ExtraDataList* pextra = 0;
+                            ExtraDataList* pextra = nullptr;
                             if (pnewitem->pExtraObjectList) {
                                 for (ExtraDataList*& rpItem : pnewitem->pExtraObjectList->ItemsUntilNull()) {
-                                    TESForm* powner = 0;
+                                    TESForm* powner = nullptr;
                                     pextra = rpItem;
                                     if (!pextra->GetOwner()) {
                                         if (apRef->IsActor()) {
-                                            TESBoundObject* v148 = 0;
+                                            TESBoundObject* v148 = nullptr;
                                             TESBoundObject* pcompobj =
                                                 (TESBoundObject*)(&apRef->m_Extra)->GetLevCreaOriginalBase();
                                             if (!pcompobj) {
@@ -5844,12 +5864,12 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 if (pnewitem) {
                                     delete pnewitem;
                                 }
-                                pnewitem = 0;
+                                pnewitem = nullptr;
                             }
                             else {
-                                TESForm* powner_2 = 0;
+                                TESForm* powner_2 = nullptr;
                                 if (apRef->IsActor()) {
-                                    TESBoundObject* v145 = 0;
+                                    TESBoundObject* v145 = nullptr;
                                     TESBoundObject* pcompobj_2 =
                                         (TESBoundObject*)(&apRef->m_Extra)->GetLevCreaOriginalBase();
                                     if (!pcompobj_2) {
@@ -5867,7 +5887,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                         pextra_2 = ::new (v98) ExtraDataList;
                                     }
                                     else {
-                                        pextra_2 = 0;
+                                        pextra_2 = nullptr;
                                     }
                                     pextra = pextra_2;
                                     pextra_2->SetOwnership(powner_2);
@@ -5880,9 +5900,9 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 if (pnewitem) {
                                     delete pnewitem;
                                 }
-                                pnewitem = 0;
+                                pnewitem = nullptr;
                             }
-                            bflag = 0;
+                            bflag = false;
                         }
                         else {
                             if (!Interface::ContainerIsBarter() && !Interface::ContainerIsRecipe() &&
@@ -5893,7 +5913,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                             if (pnewitem) {
                                 delete pnewitem;
                             }
-                            pnewitem = 0;
+                            pnewitem = nullptr;
                         }
                     }
                 }
@@ -5902,8 +5922,8 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                 }
                 if (ainumber > 0 && abPreferStolen) {
                     TESObjectREFR* v97 = RemoveItem(
-                        apRef, apObject, abstealing, ainumber, 0, abDropWorld, apOtherContainer, apPoint, apRotate, 1,
-                        0, 0
+                        apRef, apObject, abstealing, ainumber, nullptr, abDropWorld, apOtherContainer, apPoint,
+                        apRotate, true, false, nullptr
                     );
                     return v97;
                 }
@@ -5912,7 +5932,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                     return v96;
                 }
                 if (ainumber > 0 && !pkFirst) {
-                    apExtra = 0;
+                    apExtra = nullptr;
                     break;
                 }
             }
@@ -5931,32 +5951,32 @@ TESObjectREFR* InventoryChanges::RemoveItem(
             }
             int32_t iextracount = 0;
             if (pitem_2->pExtraObjectList) {
-                int32_t ExtraTotalCount = pitem_2->GetExtraTotalCount(0);
-                iextracount = pitem_2->GetWorn(0) + ExtraTotalCount;
+                int32_t ExtraTotalCount = pitem_2->GetExtraTotalCount(false);
+                iextracount = pitem_2->GetWorn(false) + ExtraTotalCount;
             }
             int32_t idefaultcount = icount_2 - iextracount;
             if (icount_2 - iextracount < 0) {
                 idefaultcount = 0;
             }
-            ExtraDataList* pCurrent_2 = 0;
-            ExtraDataList* pNewExtra_3 = 0;
+            ExtraDataList* pCurrent_2 = nullptr;
+            ExtraDataList* pNewExtra_3 = nullptr;
             BSSimpleList<ExtraDataList*>* pkFirst_2 = pitem_2->pExtraObjectList;
             if (idefaultcount > 0) {
-                if (pitem_2->GetWorn(0)) {
-                    ExtraDataList* pCurrent_3 = 0;
+                if (pitem_2->GetWorn(false)) {
+                    ExtraDataList* pCurrent_3 = nullptr;
                     int32_t pNewExtra_4 = 0;
                     for (BSSimpleList<ExtraDataList*>* pkFirst_3 = pitem_2->pExtraObjectList;
                          pkFirst_3 && pkFirst_3->m_item; pkFirst_3 = pkFirst_3->GetNext()) {
                         pCurrent_3 = pkFirst_3->m_item;
                         int16_t scount = pCurrent_3->GetCount();
-                        if (pCurrent_3->GetWorn(0) && scount > 1) {
+                        if (pCurrent_3->GetWorn(false) && scount > 1) {
                             pCurrent_3->SetCount(scount - ainumber);
                         }
                     }
                 }
                 else {
                     if (pitem_2->HasLeveledExtra()) {
-                        ExtraDataList* pCurrent_4 = 0;
+                        ExtraDataList* pCurrent_4 = nullptr;
                         int32_t pNewExtra_5 = 0;
                         for (BSSimpleList<ExtraDataList*>* pkFirst_4 = pitem_2->pExtraObjectList;
                              pkFirst_4 && pkFirst_4->m_item; pkFirst_4 = pkFirst_4->GetNext()) {
@@ -5996,14 +6016,14 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                     ainumber = 0;
                 }
                 if (abDropWorld) {
-                    pdroppedref = DropItemIntoWorld(apRef, apObject, icount_2, 0, apPoint, apRotate);
+                    pdroppedref = DropItemIntoWorld(apRef, apObject, icount_2, nullptr, apPoint, apRotate);
                     TESObjectCELL* pcell_3 = apRef->GetParentCell();
-                    bool baddOwnership_3 = 0;
+                    bool baddOwnership_3 = false;
                     if (!pdroppedref->GetMyOwner()) {
                         if (pcell_3) {
                             if (pcell_3->GetOwner()) {
                                 if (!pcell_3->IsActorCellOwner(static_cast<Actor*>(apRef))) {
-                                    baddOwnership_3 = 1;
+                                    baddOwnership_3 = true;
                                 }
                             }
                         }
@@ -6016,7 +6036,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                         if (pbipedModel_3) {
                             TESModelTextureSwap* v26 = pbipedModel_3->GetWorldTESModel(TESActorBase::SEX_FEMALE);
                             if (v26 != pbipedModel_3->GetWorldTESModel(TESActorBase::SEX_MALE)) {
-                                baddOwnership_3 = 1;
+                                baddOwnership_3 = true;
                             }
                         }
                     }
@@ -6027,17 +6047,17 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                     if (pnewitem) {
                         delete pnewitem;
                     }
-                    pnewitem = 0;
+                    pnewitem = nullptr;
                     if (pNewExtra_3) {
                         delete pNewExtra_3;
                     }
-                    pNewExtra_3 = 0;
+                    pNewExtra_3 = nullptr;
                 }
                 else {
                     if (apOtherContainer) {
-                        TESForm* powner_3 = 0;
+                        TESForm* powner_3 = nullptr;
                         if (apRef->IsActor()) {
-                            TESBoundObject* v125 = 0;
+                            TESBoundObject* v125 = nullptr;
                             TESBoundObject* pcompobj_3 = (TESBoundObject*)(&apRef->m_Extra)->GetLevCreaOriginalBase();
                             if (!pcompobj_3) {
                                 pcompobj_3 = apRef->GetObjectReference();
@@ -6056,7 +6076,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                     v70 = ::new (v94) ExtraDataList;
                                 }
                                 else {
-                                    v70 = 0;
+                                    v70 = nullptr;
                                 }
                                 apExtra = v70;
                             }
@@ -6072,19 +6092,19 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                         if (pnewitem) {
                             delete pnewitem;
                         }
-                        pnewitem = 0;
+                        pnewitem = nullptr;
                     }
                 }
                 if (pnewitem) {
                     delete pnewitem;
                 }
-                pnewitem = 0;
+                pnewitem = nullptr;
             }
             if (ainumber > 0 && (pitem_2 && (pitem_2->pExtraObjectList && !pitem_2->pExtraObjectList->IsEmpty()))) {
                 pkFirst_2 = pitem_2->pExtraObjectList;
                 while (pkFirst_2 && (pkFirst_2->m_item && ainumber > 0)) {
                     ItemChange* pnewitem_3;
-                    bool bextraflag_2 = 1;
+                    bool bextraflag_2 = true;
                     pCurrent_2 = pkFirst_2->m_item;
                     if (pnewitem) {
                         delete pnewitem;
@@ -6094,7 +6114,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                         pnewitem_3 = ::new (v93) ItemChange;
                     }
                     else {
-                        pnewitem_3 = 0;
+                        pnewitem_3 = nullptr;
                     }
                     pnewitem = pnewitem_3;
                     if (pitem_2) {
@@ -6102,31 +6122,32 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                         pnewitem->pContainerObj = v27;
                     }
                     if (pCurrent_2->GetCount() >= 0) {
-                        if (pCurrent_2->GetWorn(0) && pCurrent_2->GetCount() <= 1) {
-                            bool abflag_2 = 0;
+                        if (pCurrent_2->GetWorn(false) && pCurrent_2->GetCount() <= 1) {
+                            bool abflag_2 = false;
                             if (pCurrent_2->ItemsInList() <= 1 ||
                                 (pCurrent_2->ItemsInList() == 2 && pCurrent_2->GetCount() > 1)) {
-                                apExtra = 0;
-                                abflag_2 = 1;
+                                apExtra = nullptr;
+                                abflag_2 = true;
                             }
                             ExtraDataList* afKarmab = pCurrent_2;
                             int16_t v28 = pCurrent_2->GetCount();
                             if (apRef->RemoveWornItem(pitem_2->pContainerObj, v28, afKarmab)) {
                                 pdroppedref = RemoveItem(
                                     apRef, apObject, abstealing, ainumber, apExtra, abDropWorld, apOtherContainer,
-                                    apPoint, apRotate, 1, 0, 0
+                                    apPoint, apRotate, true, false, nullptr
                                 );
                             }
                             else {
                                 const char* v29 = sCantRemoveWornItem.operator const char*();
                                 Interface::ShowMessage(
-                                    v29, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                                    v29, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr,
+                                    2.0f, false
                                 );
                             }
                             if (pnewitem) {
                                 delete pnewitem;
                             }
-                            pnewitem = 0;
+                            pnewitem = nullptr;
                             TESObjectREFR* v92 = pdroppedref;
                             return v92;
                         }
@@ -6147,10 +6168,10 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 pNewExtra_6 = ::new (v91) ExtraDataList;
                             }
                             else {
-                                pNewExtra_6 = 0;
+                                pNewExtra_6 = nullptr;
                             }
                             pNewExtra_3 = pNewExtra_6;
-                            pNewExtra_6->CopyListForReference(pCurrent_2, 0);
+                            pNewExtra_6->CopyListForReference(pCurrent_2, false);
                             pNewExtra_3->RemoveLeveledItem();
                             if (icount_2 >= ainumber) {
                                 pNewExtra_3->SetCount(ainumber);
@@ -6166,7 +6187,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 if (pNewExtra_3) {
                                     delete pNewExtra_3;
                                 }
-                                pNewExtra_3 = 0;
+                                pNewExtra_3 = nullptr;
                                 goto LABEL_404;
                             }
                             if (!pnewitem->pExtraObjectList) {
@@ -6178,7 +6199,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                     v67 = ::new (v90) BSSimpleList<ExtraDataList*>;
                                 }
                                 else {
-                                    v67 = 0;
+                                    v67 = nullptr;
                                 }
                                 pnewitem->pExtraObjectList = v67;
                             }
@@ -6190,12 +6211,12 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                             pNewExtra_3 = pCurrent_2;
                             ainumber -= icount_2;
                             pitem_2->pExtraObjectList->Remove(pNewExtra_3);
-                            pCurrent_2 = 0;
+                            pCurrent_2 = nullptr;
                             if (pNewExtra_3->IsExtraListEmpty()) {
                                 if (pNewExtra_3) {
                                     delete pNewExtra_3;
                                 }
-                                pNewExtra_3 = 0;
+                                pNewExtra_3 = nullptr;
                                 goto LABEL_404;
                             }
                             if (!pnewitem->pExtraObjectList) {
@@ -6207,7 +6228,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                     v66 = ::new (v89) BSSimpleList<ExtraDataList*>;
                                 }
                                 else {
-                                    v66 = 0;
+                                    v66 = nullptr;
                                 }
                                 pnewitem->pExtraObjectList = v66;
                             }
@@ -6215,7 +6236,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                         pnewitem->pExtraObjectList->AddHead(pNewExtra_3);
                     }
                     else {
-                        bextraflag_2 = 0;
+                        bextraflag_2 = false;
                         pkFirst_2 = pkFirst_2->GetNext();
                     }
                 LABEL_404:;
@@ -6231,9 +6252,9 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                     }
                                 }
                                 if (pdroppedref) {
-                                    pdroppedref->SetDelete(0);
+                                    pdroppedref->SetDelete(false);
                                     pNewExtra_3->RemoveReferencePointer();
-                                    bool abdelete_4 = pCurrent_2 == 0;
+                                    bool abdelete_4 = pCurrent_2 == nullptr;
                                     float newscalee = pNewExtra_3->GetScale();
                                     pdroppedref->SetScale(newscalee);
                                     (&pdroppedref->m_Extra)->CopyListForReference(pNewExtra_3, abdelete_4);
@@ -6249,18 +6270,18 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                     if (pnewitem) {
                                         delete pnewitem;
                                     }
-                                    pnewitem = 0;
+                                    pnewitem = nullptr;
                                     if (pNewExtra_3) {
                                         delete pNewExtra_3;
                                     }
-                                    pNewExtra_3 = 0;
-                                    bool baddOwnership_5 = 0;
+                                    pNewExtra_3 = nullptr;
+                                    bool baddOwnership_5 = false;
                                     TESObjectCELL* pcell_5 = apRef->GetParentCell();
                                     if (!pdroppedref->GetMyOwner()) {
                                         if (pcell_5) {
                                             if (pcell_5->GetOwner()) {
                                                 if (!pcell_5->IsActorCellOwner(static_cast<Actor*>(apRef))) {
-                                                    baddOwnership_5 = 1;
+                                                    baddOwnership_5 = true;
                                                 }
                                             }
                                         }
@@ -6274,7 +6295,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                             TESModelTextureSwap* v32 =
                                                 pbipedModel_5->GetWorldTESModel(TESActorBase::SEX_FEMALE);
                                             if (v32 != pbipedModel_5->GetWorldTESModel(TESActorBase::SEX_MALE)) {
-                                                baddOwnership_5 = 1;
+                                                baddOwnership_5 = true;
                                             }
                                         }
                                     }
@@ -6285,15 +6306,16 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 }
                             }
                             else {
-                                pdroppedref =
-                                    DropItemIntoWorld(apRef, pitem_2->pContainerObj, icount_2, 0, apPoint, apRotate);
+                                pdroppedref = DropItemIntoWorld(
+                                    apRef, pitem_2->pContainerObj, icount_2, nullptr, apPoint, apRotate
+                                );
                                 TESObjectCELL* pcell_4 = apRef->GetParentCell();
-                                bool baddOwnership_4 = 0;
+                                bool baddOwnership_4 = false;
                                 if (!pdroppedref->GetMyOwner()) {
                                     if (pcell_4) {
                                         if (pcell_4->GetOwner()) {
                                             if (!pcell_4->IsActorCellOwner(static_cast<Actor*>(apRef))) {
-                                                baddOwnership_4 = 1;
+                                                baddOwnership_4 = true;
                                             }
                                         }
                                     }
@@ -6307,7 +6329,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                         TESModelTextureSwap* v31 =
                                             pbipedModel_4->GetWorldTESModel(TESActorBase::SEX_FEMALE);
                                         if (v31 != pbipedModel_4->GetWorldTESModel(TESActorBase::SEX_MALE)) {
-                                            baddOwnership_4 = 1;
+                                            baddOwnership_4 = true;
                                         }
                                     }
                                 }
@@ -6319,28 +6341,28 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                     if (pNewExtra_3->ItemsInList()) {
                                         float afKarmad = pNewExtra_3->GetScale();
                                         pdroppedref->SetScale(afKarmad);
-                                        (&pdroppedref->m_Extra)->CopyListForReference(pNewExtra_3, 1);
+                                        (&pdroppedref->m_Extra)->CopyListForReference(pNewExtra_3, true);
                                         (&pdroppedref->m_Extra)->RemoveScale();
                                     }
                                 }
                                 if (pnewitem) {
                                     delete pnewitem;
                                 }
-                                pnewitem = 0;
+                                pnewitem = nullptr;
                                 if (pNewExtra_3) {
                                     delete pNewExtra_3;
                                 }
-                                pNewExtra_3 = 0;
+                                pNewExtra_3 = nullptr;
                             }
                             if (pnewitem) {
                                 delete pnewitem;
                             }
-                            pnewitem = 0;
+                            pnewitem = nullptr;
                         }
                         else {
                             if (apOtherContainer) {
                                 TESForm* powner_4;
-                                ExtraDataList* pextra_3 = 0;
+                                ExtraDataList* pextra_3 = nullptr;
                                 if (pnewitem->pExtraObjectList) {
                                     pextra_3 = pnewitem->pExtraObjectList->m_item;
                                 }
@@ -6352,7 +6374,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                         pextra_4 = ::new (v88) ExtraDataList;
                                     }
                                     else {
-                                        pextra_4 = 0;
+                                        pextra_4 = nullptr;
                                     }
                                     pextra_3 = pextra_4;
                                     BSSimpleList<ExtraDataList*>* v87 = static_cast<BSSimpleList<ExtraDataList*>*>(
@@ -6362,7 +6384,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                         v64 = ::new (v87) BSSimpleList<ExtraDataList*>;
                                     }
                                     else {
-                                        v64 = 0;
+                                        v64 = nullptr;
                                     }
                                     pnewitem->pExtraObjectList = v64;
                                     pnewitem->pExtraObjectList->AddHead(pextra_3);
@@ -6392,7 +6414,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 if (pnewitem) {
                                     delete pnewitem;
                                 }
-                                pnewitem = 0;
+                                pnewitem = nullptr;
                             }
                             else {
                                 if (abdelete) {
@@ -6401,35 +6423,35 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                                 if (pnewitem) {
                                     delete pnewitem;
                                 }
-                                pnewitem = 0;
+                                pnewitem = nullptr;
                             }
                         }
                         if (pCurrent_2) {
                             pkFirst_2 = pkFirst_2->GetNext();
                         }
                         if (ainumber) {
-                            busebase = 1;
+                            busebase = true;
                         }
                     }
                     else {
                         if (pnewitem) {
                             delete pnewitem;
                         }
-                        pnewitem = 0;
+                        pnewitem = nullptr;
                         if (pNewExtra_3) {
                             delete pNewExtra_3;
                         }
-                        pNewExtra_3 = 0;
+                        pNewExtra_3 = nullptr;
                     }
-                    continue;
                 }
             }
         }
-        pitem_2 = GetObjectInList(apObject, 1, 0);
+        pitem_2 = GetObjectInList(apObject, true, 0);
     }
     if (abPreferStolen && ainumber > 0) {
         TESObjectREFR* v86 = RemoveItem(
-            apRef, apObject, abstealing, ainumber, apExtra, abDropWorld, apOtherContainer, apPoint, apRotate, 1, 0, 0
+            apRef, apObject, abstealing, ainumber, apExtra, abDropWorld, apOtherContainer, apPoint, apRotate, true,
+            false, nullptr
         );
         return v86;
     }
@@ -6443,9 +6465,9 @@ TESObjectREFR* InventoryChanges::RemoveItem(
             return v85;
         }
         if (abDropWorld) {
-            pdroppedref = DropItemIntoWorld(apRef, apObject, ainumber, 0, apPoint, apRotate);
+            pdroppedref = DropItemIntoWorld(apRef, apObject, ainumber, nullptr, apPoint, apRotate);
             TESObjectCELL* pcell_6 = apRef->GetParentCell();
-            bool baddOwnership_6 = 0;
+            bool baddOwnership_6 = false;
             if (!pdroppedref->GetMyOwner()) {
                 if (pcell_6) {
                     if (pcell_6->GetOwner()) {
@@ -6493,7 +6515,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                             v63 = ::new (v84) ExtraDataList;
                         }
                         else {
-                            v63 = 0;
+                            v63 = nullptr;
                         }
                         apExtra = v63;
                     }
@@ -6502,7 +6524,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                 }
                 if (ainumber > 0) {
                     if (apObject->GetFormType() == NOTE_ID && apOtherContainer == pPlayer) {
-                        bool v106 = 0;
+                        bool v106 = false;
                         if (abstealing) {
                             if (powner_5) {
                                 if (powner_5->GetFormType() == FACT_ID) {
@@ -6526,7 +6548,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                             double v34 = fKarmaModStealing.Float();
                             pPlayer->RewardKarma(static_cast<int32_t>(v34));
                         }
-                        pPlayer->AddNote(static_cast<BGSNote*>(apObject), 1);
+                        pPlayer->AddNote(static_cast<BGSNote*>(apObject), true);
                     }
                     else {
                         apOtherContainer->AddObjecttoContainer(apObject, apExtra, ainumber);
@@ -6537,7 +6559,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
         if (pnewitem) {
             delete pnewitem;
         }
-        pnewitem = 0;
+        pnewitem = nullptr;
         if (pitem_2) {
             pitem_2->iNumber -= ainumber;
         }
@@ -6548,20 +6570,20 @@ TESObjectREFR* InventoryChanges::RemoveItem(
                 pitem_3 = ::new (v83) ItemChange(apObject, -ainumber);
             }
             else {
-                pitem_3 = 0;
+                pitem_3 = nullptr;
             }
             pitem_2 = pitem_3;
             pListofChanges->AddTail(pitem_2);
         }
     }
-    pitem_2 = GetObjectInList(apObject, 1, 0);
+    pitem_2 = GetObjectInList(apObject, true, 0);
     if (!pitem_2 ||
         ((plevelextra && !apRef->IsActor()) ||
          ((pitem_2->iNumber || iorgCount) &&
           (!pitem_2->pExtraObjectList || (!pitem_2->pExtraObjectList->IsEmpty() || pitem_2->iNumber))))) {
         if (pitem_2) {
             int32_t v35 = pitem_2->iNumber;
-            if (iorgCount + v35 < 0 && !pitem_2->GetWorn(0)) {
+            if (iorgCount + v35 < 0 && !pitem_2->GetWorn(false)) {
                 if (pitem_2->pExtraObjectList) {
                     if (!plevelextra) {
                         pitem_2->pExtraObjectList->RemoveAll();
@@ -6584,7 +6606,7 @@ TESObjectREFR* InventoryChanges::RemoveItem(
     if (breload) {
         if (pact->GetCurrentWeapon()) {
             TESObjectWEAP* CurrentWeapon = pact->GetCurrentWeapon();
-            pact->ReloadWeaponNV(CurrentWeapon, 0, 0, 0);
+            pact->ReloadWeaponNV(CurrentWeapon, 0, false, false);
         }
     }
     return pdroppedref;
@@ -6972,7 +6994,7 @@ void InventoryChanges::RemoveStolenItems(TESObjectREFR* apRef, TESObjectREFR* ap
         TESBoundObject* FormFlags;
         BSSimpleList<ItemChange*>* pnext = pListInv->m_pkNext;
         ItemChange* pInventoryItem = pListInv->m_item;
-        bool bflag = 0;
+        bool bflag = false;
         if (!pInventoryItem ||
             (pInventoryItem->iNumber <= 0 ||
              (FormFlags = pInventoryItem->pContainerObj, FormFlags->GetQuestObject()))) {
@@ -6987,7 +7009,7 @@ void InventoryChanges::RemoveStolenItems(TESObjectREFR* apRef, TESObjectREFR* ap
         else {
             BSSimpleList<ExtraDataList*>* plistextra = pInventoryItem->pExtraObjectList;
             TESBoundObject* pObj = pInventoryItem->pContainerObj;
-            Actor* pactor = 0;
+            Actor* pactor = nullptr;
             if (apStolenContainer->IsActor()) {
                 pactor = static_cast<Actor*>(apStolenContainer);
             }
@@ -6997,8 +7019,8 @@ void InventoryChanges::RemoveStolenItems(TESObjectREFR* apRef, TESObjectREFR* ap
                     ExtraDataList* pextra = plistextra->m_item;
                     char v21 = 0;
                     TESForm* pform = pextra->GetOwner();
-                    TESForm* pform_2 = 0;
-                    TESFaction* pfac = 0;
+                    TESForm* pform_2 = nullptr;
+                    TESFaction* pfac = nullptr;
                     if (pform) {
                         if (pform->GetFormType() == FACT_ID) {
                             pfac = static_cast<TESFaction*>(pform);
@@ -7024,7 +7046,7 @@ void InventoryChanges::RemoveStolenItems(TESObjectREFR* apRef, TESObjectREFR* ap
                                         v21 = 1;
                                     }
                                     else {
-                                        bflag = 1;
+                                        bflag = true;
                                     }
                                     if (apOwner) {
                                         char apDest[264];
@@ -7044,16 +7066,19 @@ void InventoryChanges::RemoveStolenItems(TESObjectREFR* apRef, TESObjectREFR* ap
                                             apDest, 260, "%s\\%s", "Interface\\Icons",
                                             TESTexture::GetTextureName(pObj, pPlayer)
                                         );
-                                        const char* PickUpSoundName = pPlayer->GetPickUpSoundName(pObj, 0, 0);
+                                        const char* PickUpSoundName = pPlayer->GetPickUpSoundName(pObj, false, false);
                                         Interface::ShowMessage(
                                             v18.pString, 0,
                                             "Interface\\Icons\\Message Icons\\glow_message_vaultboy_neutral.dds",
-                                            PickUpSoundName, 2.0f, 0
+                                            PickUpSoundName, 2.0f, false
                                         );
                                     }
                                     ExtraDataList* v11 = pextra;
                                     int16_t Count = pextra->GetCount();
-                                    RemoveItem(apRef, pObj, 0, Count, v11, 0, apStolenContainer, 0, 0, 1, 0, 0);
+                                    RemoveItem(
+                                        apRef, pObj, false, Count, v11, false, apStolenContainer, nullptr, nullptr,
+                                        true, false, nullptr
+                                    );
                                     pListInv = pListofChanges;
                                 }
                             }
@@ -7061,7 +7086,7 @@ void InventoryChanges::RemoveStolenItems(TESObjectREFR* apRef, TESObjectREFR* ap
                     }
                     if (bflag) {
                         pListInv = pListofChanges;
-                        plistextra = 0;
+                        plistextra = nullptr;
                     }
                     else {
                         if (v21) {
@@ -7147,30 +7172,31 @@ void InventoryChanges::LoadGame_ObjectsList(BGSLoadFormBuffer* a1) {
 ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
     ExtraDataList* pcurextra;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_INVENTORY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp", 0x187F
+        MEM_CONTEXT_INVENTORY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp",
+        0x187F
     );
-    BSSimpleList<ContainerObject*>* pOriginalList = 0;
-    void* ecx0 = 0;
+    BSSimpleList<ContainerObject*>* pOriginalList = nullptr;
+    void* ecx0 = nullptr;
     if (GetOriginalContainer()) {
         TESContainer* OriginalContainer = GetOriginalContainer();
         pOriginalList = OriginalContainer->GetFilteredList();
     }
     int32_t inumber = 0;
-    ItemChange* preturnitem = 0;
+    ItemChange* preturnitem = nullptr;
     TESContainer* pcontainer = GetOriginalContainer();
     for (BSSimpleList<ContainerObject*>* plist = pOriginalList; plist && (plist->m_item && !preturnitem);
          plist = plist->m_pkNext) {
         ContainerObject* pobject = plist->m_item;
-        TESLevItem* pObj = 0;
+        TESLevItem* pObj = nullptr;
         if (pobject->pObj->GetFormType() == LVLI_ID) {
             pObj = static_cast<TESLevItem*>(pobject->pObj);
         }
         if (pobject) {
             if (!pObj) {
-                ItemChange* pitem = GetObjectInList(pobject->pObj, 1, 0);
+                ItemChange* pitem = GetObjectInList(pobject->pObj, true, 0);
                 int32_t iorgCount = pcontainer->GetObjectCount(pobject->pObj);
                 if (pobject && (pitem && iorgCount <= 0)) {
-                    preturnitem = 0;
+                    preturnitem = nullptr;
                 }
                 else {
                     int32_t v3;
@@ -7179,7 +7205,7 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                          (pitem &&
                           (pitem->pExtraObjectList &&
                            (pitem->pExtraObjectList->m_item && pitem->pExtraObjectList->m_item->HasLeveledItem()))))) {
-                        preturnitem = 0;
+                        preturnitem = nullptr;
                     }
                     else {
                         if (!pobject || (inumber != aiIndex || (pitem && pitem->GetAmountNonDefaultExtra()))) {
@@ -7191,22 +7217,22 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                                 if (aiIndex >= inumber + inumb) {
                                     int32_t AmountNonDefaultExtra = pitem->GetAmountNonDefaultExtra();
                                     inumber += AmountNonDefaultExtra;
-                                    bool bflag = 0;
-                                    TESObjectWEAP* pweap = 0;
+                                    bool bflag = false;
+                                    TESObjectWEAP* pweap = nullptr;
                                     if (pitem->pContainerObj->GetFormType() == WEAP_ID) {
                                         pweap = static_cast<TESObjectWEAP*>(pitem->pContainerObj);
                                     }
-                                    if (!pitem->GetExtraTotalCount(0) && pitem->GetWorn(0) &&
+                                    if (!pitem->GetExtraTotalCount(false) && pitem->GetWorn(false) &&
                                         (pitem->iNumber <= 0 ||
                                          (pitem->pContainerObj->GetFormType() == AMMO_ID ||
                                           (pweap &&
                                            (pweap->GetWeaponType() == WEAPON_ONE_HAND_GRENADE ||
                                             (pweap->GetWeaponType() == WEAPON_ONE_HAND_MINE ||
                                              pweap->GetWeaponType() == WEAPON_ONE_HAND_THROWN)))))) {
-                                        bflag = 1;
+                                        bflag = true;
                                     }
                                     if (!bflag) {
-                                        int32_t ExtraTotalCount = pitem->GetExtraTotalCount(1);
+                                        int32_t ExtraTotalCount = pitem->GetExtraTotalCount(true);
                                         if (ExtraTotalCount < pitem->iNumber + iorgCount) {
                                             int32_t FormHealth_0;
                                             if (!pitem->HasLeveledExtra() ||
@@ -7219,12 +7245,12 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                                                         preturnitem_4 = ::new (v37) ItemChange;
                                                     }
                                                     else {
-                                                        preturnitem_4 = 0;
+                                                        preturnitem_4 = nullptr;
                                                     }
                                                     preturnitem = preturnitem_4;
                                                     if (pitem) {
                                                         int32_t v12 = pitem->iNumber + iorgCount;
-                                                        int32_t v13 = pitem->GetExtraTotalCount(0);
+                                                        int32_t v13 = pitem->GetExtraTotalCount(false);
                                                         preturnitem->iNumber = v12 - v13;
                                                     }
                                                     else {
@@ -7248,7 +7274,7 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                                                                                 BSSimpleList<ExtraDataList*>;
                                                                         }
                                                                         else {
-                                                                            v27 = 0;
+                                                                            v27 = nullptr;
                                                                         }
                                                                         preturnitem->pExtraObjectList = v27;
                                                                     }
@@ -7278,7 +7304,7 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                                          pitem__pextralist && (pitem__pextralist->m_item && !preturnitem);
                                          pitem__pextralist = pitem__pextralist->GetNext()) {
                                         pcurextra = pitem__pextralist->m_item;
-                                        if (!pcurextra->IsExtraDefaultforContainer(0)) {
+                                        if (!pcurextra->IsExtraDefaultforContainer(false)) {
                                             if (inumber == aiIndex) {
                                                 ItemChange* preturnitem_3;
                                                 int32_t icount = pcurextra->GetCount();
@@ -7294,7 +7320,7 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                                                         ::new (v38) ItemChange(pitem->pContainerObj, icount);
                                                 }
                                                 else {
-                                                    preturnitem_3 = 0;
+                                                    preturnitem_3 = nullptr;
                                                 }
                                                 preturnitem = preturnitem_3;
                                                 preturnitem_3->pExtraObjectList->AddHead(pcurextra);
@@ -7315,13 +7341,13 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                                 preturnitem_2 = ::new (v40) ItemChange;
                             }
                             else {
-                                preturnitem_2 = 0;
+                                preturnitem_2 = nullptr;
                             }
                             preturnitem = preturnitem_2;
                             if (pitem) {
                                 if (iorgCount >= 0) {
                                     int32_t v4 = pitem->iNumber + iorgCount;
-                                    int32_t v5 = pitem->GetExtraTotalCount(0);
+                                    int32_t v5 = pitem->GetExtraTotalCount(false);
                                     preturnitem->iNumber = v4 - v5;
                                 }
                                 else {
@@ -7355,7 +7381,7 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                                                     v30 = ::new (v39) BSSimpleList<ExtraDataList*>;
                                                 }
                                                 else {
-                                                    v30 = 0;
+                                                    v30 = nullptr;
                                                 }
                                                 preturnitem->pExtraObjectList = v30;
                                             }
@@ -7392,7 +7418,7 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                     ioriginalcount = pcontainer_2->GetObjectCount(pContainerObj);
                 }
             }
-            if (ioriginalcount < 0 && pitem_2->GetWorn(0)) {
+            if (ioriginalcount < 0 && pitem_2->GetWorn(false)) {
                 pitem_2->pExtraObjectList->m_item->SetCount(-static_cast<int16_t>(ioriginalcount));
             }
             if (pitem_2) {
@@ -7407,7 +7433,7 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                         int32_t inumb_2;
                         int32_t itotalNonDefaultCount = 0;
                         for (ExtraDataList* pExtra : pitem_2->pExtraObjectList->ItemsUntilNull()) {
-                            if (!pExtra->IsExtraDefaultforContainer(0)) {
+                            if (!pExtra->IsExtraDefaultforContainer(false)) {
                                 int16_t Count = pExtra->GetCount();
                                 if (Count > 0) {
                                     itotalNonDefaultCount += Count;
@@ -7422,7 +7448,7 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                                  pextralist = pextralist->m_pkNext) {
                                 ExtraDataList* pcurextra_2 = pextralist->m_item;
                                 if (inumber == aiIndex) {
-                                    if (!pcurextra_2->IsExtraDefaultforContainer(0)) {
+                                    if (!pcurextra_2->IsExtraDefaultforContainer(false)) {
                                         int16_t v44 = pcurextra_2->GetCount();
                                         if (v44 > 0) {
                                             ItemChange* preturnitem_5;
@@ -7431,7 +7457,7 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                                                 preturnitem_5 = ::new (v35) ItemChange(pitem_2->pContainerObj, v44);
                                             }
                                             else {
-                                                preturnitem_5 = 0;
+                                                preturnitem_5 = nullptr;
                                             }
                                             preturnitem = preturnitem_5;
                                             preturnitem_5->pExtraObjectList->AddHead(pcurextra_2);
@@ -7439,7 +7465,8 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                                     }
                                 }
                                 else {
-                                    if (!pcurextra_2->IsExtraDefaultforContainer(0) && pcurextra_2->GetCount() > 0) {
+                                    if (!pcurextra_2->IsExtraDefaultforContainer(false) &&
+                                        pcurextra_2->GetCount() > 0) {
                                         ++inumber;
                                     }
                                 }
@@ -7466,20 +7493,20 @@ ItemChange* InventoryChanges::GetItembyIndex(int32_t aiIndex) {
                                 }
                                 else {
                                     ItemChange* preturnitem_6;
-                                    ExtraDataList* pextra = 0;
+                                    ExtraDataList* pextra = nullptr;
                                     ItemChange* v34 = static_cast<ItemChange*>(ourMalloc(sizeof(ItemChange)));
                                     if (v34) {
                                         preturnitem_6 = ::new (v34) ItemChange(pitem_2->pContainerObj, 0);
                                     }
                                     else {
-                                        preturnitem_6 = 0;
+                                        preturnitem_6 = nullptr;
                                     }
                                     preturnitem = preturnitem_6;
                                     preturnitem_6->iNumber = pitem_2->iNumber - itotalNonDefaultCount;
                                     if (pitem_2->pExtraObjectList) {
                                         for (ExtraDataList*& rpItem : pitem_2->pExtraObjectList->ItemsUntilNull()) {
                                             pextra = rpItem;
-                                            if (!pextra->GetWorn(0) && pextra->IsExtraDefaultforContainer(1)) {
+                                            if (!pextra->GetWorn(false) && pextra->IsExtraDefaultforContainer(true)) {
                                                 preturnitem->pExtraObjectList->AddTail(pextra);
                                             }
                                         }
@@ -7500,8 +7527,8 @@ void InventoryChanges::GetItemModGroup(TESBoundObject* apObj, BSSimpleList<ItemC
         if (apReturnList) {
             if (apObj->GetFormType() == WEAP_ID) {
                 InventoryChanges::IterData* icurrIndex = GetIterator();
-                ItemChange* pcurrItem = 0;
-                TESBoundObject* itemmod = 0;
+                ItemChange* pcurrItem = nullptr;
+                TESBoundObject* itemmod = nullptr;
                 do {
                     pcurrItem = Iterate(icurrIndex);
                     if (pcurrItem) {
@@ -7538,7 +7565,7 @@ void InventoryChanges::GetItemModGroup(TESBoundObject* apObj, BSSimpleList<ItemC
 }
 
 void InventoryChanges::RemoveHotKeyItem(ItemChange* apItem, int32_t aiHotkey) {
-    ItemChange* pItemGroup = GetObjectInList(apItem->pContainerObj, 1, 0);
+    ItemChange* pItemGroup = GetObjectInList(apItem->pContainerObj, true, 0);
     if (pItemGroup) {
         BSSimpleList<ExtraDataList*>* pNode = pItemGroup->pExtraObjectList;
         while (pNode) {
@@ -7560,7 +7587,7 @@ void InventoryChanges::RemoveHotKeyItem(ItemChange* apItem, int32_t aiHotkey) {
                 if (pItemGroup->pExtraObjectList) {
                     delete pItemGroup->pExtraObjectList;
                 }
-                pItemGroup->pExtraObjectList = 0;
+                pItemGroup->pExtraObjectList = nullptr;
                 if (!pItemGroup->iNumber) {
                     pListofChanges->Remove(pItemGroup);
                     if (pItemGroup) {
@@ -7574,16 +7601,17 @@ void InventoryChanges::RemoveHotKeyItem(ItemChange* apItem, int32_t aiHotkey) {
 
 void InventoryChanges::SetHotKeyItem(ItemChange* apItem, ExtraDataList* apExtra, int32_t aiKey) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_INVENTORY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp", 1974
+        MEM_CONTEXT_INVENTORY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp",
+        1974
     );
     if (apItem && aiKey >= 0 && aiKey <= 7) {
         if (pPlayer->GetAmmoForHotKey(aiKey)) {
-            pPlayer->SetAmmoForHotKey(aiKey, 0);
+            pPlayer->SetAmmoForHotKey(aiKey, nullptr);
         }
         RemoveHotKeyItem(apItem, -1);
-        ItemChange* pitemGroup = GetObjectInList(apItem->pContainerObj, 1, 0);
+        ItemChange* pitemGroup = GetObjectInList(apItem->pContainerObj, true, 0);
         if (pitemGroup) {
-            ExtraDataList* pfoundExtra = 0;
+            ExtraDataList* pfoundExtra = nullptr;
             if (!pitemGroup->pExtraObjectList) {
                 BSSimpleList<ExtraDataList*>* v13;
                 BSSimpleList<ExtraDataList*>* v19 =
@@ -7592,14 +7620,14 @@ void InventoryChanges::SetHotKeyItem(ItemChange* apItem, ExtraDataList* apExtra,
                     v13 = ::new (v19) BSSimpleList<ExtraDataList*>;
                 }
                 else {
-                    v13 = 0;
+                    v13 = nullptr;
                 }
                 pitemGroup->pExtraObjectList = v13;
             }
             BSSimpleList<ExtraDataList*>* pNode = pitemGroup->pExtraObjectList;
             while (pNode && pNode->m_item) {
                 if (!pfoundExtra) {
-                    if (pNode->m_item->IsExtraDefaultforContainer(0)) {
+                    if (pNode->m_item->IsExtraDefaultforContainer(false)) {
                         pfoundExtra = pNode->m_item;
                     }
                 }
@@ -7618,13 +7646,13 @@ void InventoryChanges::SetHotKeyItem(ItemChange* apItem, ExtraDataList* apExtra,
                     pnewExtra = ::new (v18) ExtraDataList;
                 }
                 else {
-                    pnewExtra = 0;
+                    pnewExtra = nullptr;
                 }
                 ExtraDataList* pnewExtra_2 = pnewExtra;
                 pnewExtra->SetHotKey(aiKey);
                 int16_t v5 = pitemGroup->iNumber;
-                int16_t v6 = v5 - pitemGroup->GetExtraTotalCount(0);
-                bool Worn = pitemGroup->GetWorn(0);
+                int16_t v6 = v5 - pitemGroup->GetExtraTotalCount(false);
+                bool Worn = pitemGroup->GetWorn(false);
                 pnewExtra->SetCount(v6 - Worn);
                 pitemGroup->pExtraObjectList->AddHead(pnewExtra_2);
             }
@@ -7639,7 +7667,7 @@ void InventoryChanges::SetHotKeyItem(ItemChange* apItem, ExtraDataList* apExtra,
                 pnewChange = ::new (v17) ItemChange(apItem->pContainerObj, v8);
             }
             else {
-                pnewChange = 0;
+                pnewChange = nullptr;
             }
             ItemChange* pnewChange_2 = pnewChange;
             ExtraDataList* v16 = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
@@ -7647,7 +7675,7 @@ void InventoryChanges::SetHotKeyItem(ItemChange* apItem, ExtraDataList* apExtra,
                 pnewChangeExtra = ::new (v16) ExtraDataList;
             }
             else {
-                pnewChangeExtra = 0;
+                pnewChangeExtra = nullptr;
             }
             ExtraDataList* pnewChangeExtra_2 = pnewChangeExtra;
             BSSimpleList<ExtraDataList*>* v15 =
@@ -7656,7 +7684,7 @@ void InventoryChanges::SetHotKeyItem(ItemChange* apItem, ExtraDataList* apExtra,
                 v9 = ::new (v15) BSSimpleList<ExtraDataList*>;
             }
             else {
-                v9 = 0;
+                v9 = nullptr;
             }
             pnewChange_2->pExtraObjectList = v9;
             pnewChangeExtra_2->SetHotKey(aiKey);
@@ -7670,9 +7698,10 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
     ExtraDataList* pExtra;
     ExtraDataList* pExtra_2;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_INVENTORY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp", 3131
+        MEM_CONTEXT_INVENTORY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp",
+        3131
     );
-    bcountdirty = 1;
+    bcountdirty = true;
     fpreviousContainerWeight = fcontainerweight;
     fcontainerweight = -1.0f;
     if (apObject->GetObjectReference()->GetFormType() == WEAP_ID) {
@@ -7731,31 +7760,31 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
     ExtraAmmo* pammo = (&apObject->m_Extra)->GetAmmoExtra();
     if (pammo) {
         iammocount = pammo->iCount;
-        (&apObject->m_Extra)->SetAmmoExtra(0, 0);
+        (&apObject->m_Extra)->SetAmmoExtra(nullptr, 0);
         apObject->AddChange(2048);
     }
     iammocount *= ainumber;
     if (pRef) {
         pRef->AddChange(32);
     }
-    ItemChange* pitem = GetObjectInList(apObject->GetObjectReference(), 1, 0);
+    ItemChange* pitem = GetObjectInList(apObject->GetObjectReference(), true, 0);
     (&apObject->m_Extra)->RemoveCount();
     ExtraDataList* v37 = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
     if (v37) {
         pExtra = ::new (v37) ExtraDataList;
     }
     else {
-        pExtra = 0;
+        pExtra = nullptr;
     }
     pExtra_2 = pExtra;
-    bool bIsThrown = 0;
+    bool bIsThrown = false;
     if (!(&apObject->m_Extra)->IsExtraListEmpty()) {
-        TESObjectWEAP* ObjectReference = 0;
+        TESObjectWEAP* ObjectReference = nullptr;
         if (apObject->GetObjectReference()->GetFormType() == WEAP_ID) {
             ObjectReference = static_cast<TESObjectWEAP*>(apObject->GetObjectReference());
             bIsThrown = ObjectReference->IsThrownWeapon();
         }
-        pExtra_2->CopyListForContainer(&apObject->m_Extra, 0);
+        pExtra_2->CopyListForContainer(&apObject->m_Extra, false);
         if (apObject->GetObjectReference()->GetFormType() != AMMO_ID &&
             (!ObjectReference || !ObjectReference->IsThrownWeapon())) {
             float afScalef = apObject->fRefScale;
@@ -7766,7 +7795,7 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
         }
     }
     if (abWearit) {
-        pExtra_2->SetWorn(1, 0);
+        pExtra_2->SetWorn(true, false);
     }
     if (!pitem) {
         ItemChange* pnewItem;
@@ -7775,7 +7804,7 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
             pnewItem = ::new (v34) ItemChange(apObject->GetObjectReference(), ainumber);
         }
         else {
-            pnewItem = 0;
+            pnewItem = nullptr;
         }
         ItemChange* pnewItem_2 = pnewItem;
         if (ainumber > 1) {
@@ -7791,7 +7820,7 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
                     v25 = ::new (v33) BSSimpleList<ExtraDataList*>;
                 }
                 else {
-                    v25 = 0;
+                    v25 = nullptr;
                 }
                 pnewItem_2->pExtraObjectList = v25;
             }
@@ -7800,7 +7829,7 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
         else if (pExtra_2) {
             if (pExtra_2->IsExtraListEmpty()) {
                 delete pExtra_2;
-                pExtra_2 = 0;
+                pExtra_2 = nullptr;
             }
             else {
                 if (!pnewItem_2->pExtraObjectList) {
@@ -7811,7 +7840,7 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
                         v24 = ::new (v32) BSSimpleList<ExtraDataList*>;
                     }
                     else {
-                        v24 = 0;
+                        v24 = nullptr;
                     }
                     pnewItem_2->pExtraObjectList = v24;
                 }
@@ -7835,7 +7864,7 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
                     v29 = ::new (v36) BSSimpleList<ExtraDataList*>;
                 }
                 else {
-                    v29 = 0;
+                    v29 = nullptr;
                 }
                 pitem->pExtraObjectList = v29;
             }
@@ -7843,14 +7872,14 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
         }
         else {
             BSSimpleList<ExtraDataList*>* pNode = pitem->pExtraObjectList;
-            bool bAddNew = 1;
+            bool bAddNew = true;
             while (pNode && pNode->m_item && bAddNew) {
                 ExtraDataList* pCurrent = pNode->m_item;
                 ExtraDataList* pcompare = pExtra_2;
-                bool bDiffers = 1;
+                bool bDiffers = true;
                 if (pcompare) {
-                    bDiffers = pcompare->CompareListForContainer(pCurrent, 0, bIsThrown) ||
-                        pCurrent->CompareListForContainer(pcompare, 0, bIsThrown);
+                    bDiffers = pcompare->CompareListForContainer(pCurrent, false, bIsThrown) ||
+                        pCurrent->CompareListForContainer(pcompare, false, bIsThrown);
                 }
                 if (bDiffers) {
                     pNode = pNode->m_pkNext;
@@ -7864,7 +7893,7 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
                             delete pCurrent;
                         }
                     }
-                    bAddNew = 0;
+                    bAddNew = false;
                 }
             }
             if (bAddNew) {
@@ -7872,7 +7901,7 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
                     if (pExtra_2) {
                         delete pExtra_2;
                     }
-                    pExtra_2 = 0;
+                    pExtra_2 = nullptr;
                 }
                 else {
                     if (!pitem->pExtraObjectList) {
@@ -7883,7 +7912,7 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
                             v27 = ::new (v35) BSSimpleList<ExtraDataList*>;
                         }
                         else {
-                            v27 = 0;
+                            v27 = nullptr;
                         }
                         pitem->pExtraObjectList = v27;
                     }
@@ -7894,7 +7923,7 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
                 if (pExtra_2) {
                     delete pExtra_2;
                 }
-                pExtra_2 = 0;
+                pExtra_2 = nullptr;
             }
         }
         if (pitem->pExtraObjectList) {
@@ -7903,7 +7932,7 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
                 if (pExtra_2) {
                     delete pExtra_2;
                 }
-                pExtra_2 = 0;
+                pExtra_2 = nullptr;
                 if (pitem) {
                     delete pitem;
                 }
@@ -7920,22 +7949,22 @@ void InventoryChanges::AddItem(TESObjectREFR* apObject, int32_t ainumber, bool a
     if (iammocount > 0) {
         TESObjectWEAP* pweapon = static_cast<TESObjectWEAP*>(apObject->GetObjectReference());
         // Computes the holder and passes 0 to GetCurrentAmmo all the same, as the game does.
-        [[maybe_unused]] Actor* pActor = pRef->IsActor() ? static_cast<Actor*>(pRef) : 0;
-        TESBoundObject* pammoObj = pweapon->GetCurrentAmmo(0);
+        [[maybe_unused]] Actor* pActor = pRef->IsActor() ? static_cast<Actor*>(pRef) : nullptr;
+        TESBoundObject* pammoObj = pweapon->GetCurrentAmmo(nullptr);
         if (pammoObj) {
-            AddItem(pammoObj, 0, iammocount);
+            AddItem(pammoObj, nullptr, iammocount);
         }
     }
 }
 
 TESBoundObject* InventoryChanges::GetObjectbyPackObjType(PACKAGE_OBJECT_TYPE aeObjectType, int32_t& ainumb) {
     BSSimpleList<ContainerObject*>* pList = &GetOriginalContainer()->objectList;
-    TESBoundObject* pObj = 0;
+    TESBoundObject* pObj = nullptr;
     while (pList && !pObj) {
         pObj = pList->m_item->pObj;
         if (pObj && TESPackage::GetObjectTypeFromForm(pObj) == aeObjectType) {
             uint32_t v3;
-            ItemChange* pitem = GetObjectInList(pObj, 1, 0);
+            ItemChange* pitem = GetObjectInList(pObj, true, 0);
             if (!pitem || (v3 = pitem->iNumber, pList->m_item->i_count + v3)) {
                 if (pitem) {
                     uint32_t FormHealth_0 = pitem->iNumber;
@@ -7947,7 +7976,7 @@ TESBoundObject* InventoryChanges::GetObjectbyPackObjType(PACKAGE_OBJECT_TYPE aeO
             }
         }
         else {
-            pObj = 0;
+            pObj = nullptr;
         }
         pList = pList->m_pkNext;
     }
@@ -7960,7 +7989,7 @@ TESBoundObject* InventoryChanges::GetObjectbyPackObjType(PACKAGE_OBJECT_TYPE aeO
             }
         }
         else {
-            pObj = 0;
+            pObj = nullptr;
         }
     }
     return pObj;
@@ -8008,7 +8037,7 @@ TESObjectREFR* InventoryChanges::DropItemIntoWorld(
     TESWorldSpace* WorldSpace = a1->GetWorldSpace();
     TESObjectCELL* ParentCell = a1->GetParentCell();
     TESObjectREFR* pObjectRef =
-        pDataHandler->CreateReferenceAtLocation(a2, point, angle, ParentCell, WorldSpace, a4, 0, 0);
+        pDataHandler->CreateReferenceAtLocation(a2, point, angle, ParentCell, WorldSpace, a4, nullptr, nullptr);
     if (a3 > 1) {
         (&pObjectRef->m_Extra)->SetCount(a3);
     }
@@ -8017,7 +8046,7 @@ TESObjectREFR* InventoryChanges::DropItemIntoWorld(
 }
 
 TESBoundObject* InventoryChanges::GetLeveledCalculatedBaseObject(TESLevItem* apLevelItem) {
-    TESBoundObject* pObject = 0;
+    TESBoundObject* pObject = nullptr;
     if (apLevelItem) {
         BSSimpleList<ContainerObject*>* pList = &GetOriginalContainer()->objectList;
         int32_t index = 0;
@@ -8053,14 +8082,14 @@ TESBoundObject* InventoryChanges::GetLeveledCalculatedBaseObject(TESLevItem* apL
 }
 
 void InventoryChanges::CleanUpBadData() {
-    TESBoundObject* pObj = 0;
+    TESBoundObject* pObj = nullptr;
     BSSimpleList<ContainerObject*>* pList = &GetOriginalContainer()->objectList;
     while (pList && !pList->IsEmpty()) {
         pObj = pList->m_item->pObj;
         TESLevItem* pleveled = dynamic_cast<TESLevItem*>(pList->m_item->pObj);
         TESBipedModelForm* pbipedform = TESBipedModelForm::GetFormAsBipedModel(pObj);
         if (pObj && (!pleveled && (!pbipedform || pbipedform->GetPlayable()))) {
-            ItemChange* pitem = GetObjectInList(pObj, 1, 0);
+            ItemChange* pitem = GetObjectInList(pObj, true, 0);
             if (pitem) {
                 TESHealthForm* phealth = dynamic_cast<TESHealthForm*>(pitem->pContainerObj);
                 if (phealth) {
@@ -8127,7 +8156,7 @@ void InventoryChanges::CleanUpBadData() {
                                             pextra = ::new (apMemory) ExtraDataList;
                                         }
                                         else {
-                                            pextra = 0;
+                                            pextra = nullptr;
                                         }
                                         ExtraDataList* pextra_2 = pextra;
                                         Script* Script_ = pext->GetScript();
@@ -8141,12 +8170,12 @@ void InventoryChanges::CleanUpBadData() {
                                             pref = ::new (v70) TESObjectREFR;
                                         }
                                         else {
-                                            pref = 0;
+                                            pref = nullptr;
                                         }
                                         pref->SetTemporary();
                                         ScriptLocals* ScriptLocals_ = pextra_2->GetScriptLocals();
                                         Script* v4 = pext->GetScript();
-                                        v4->Run(pref, ScriptLocals_, 0, 0);
+                                        v4->Run(pref, ScriptLocals_, nullptr, false);
                                         plist2->AddTail(pextra_2);
                                         plist2 = plist->m_pkNext;
                                     }
@@ -8182,13 +8211,13 @@ void InventoryChanges::CleanUpBadData() {
                                     pref_2 = ::new (v69) TESObjectREFR;
                                 }
                                 else {
-                                    pref_2 = 0;
+                                    pref_2 = nullptr;
                                 }
                                 TESObjectREFR* pref_3 = pref_2;
                                 pref_2->SetTemporary();
                                 ScriptLocals* v44 = pext->GetScriptLocals();
                                 Script* v8 = pitem->GetScript();
-                                v8->Run(pref_3, v44, 0, 0);
+                                v8->Run(pref_3, v44, nullptr, false);
                                 if (pref_3) {
                                     delete pref_3;
                                 }
@@ -8205,7 +8234,7 @@ void InventoryChanges::CleanUpBadData() {
                             pextra_3 = ::new (v68) ExtraDataList;
                         }
                         else {
-                            pextra_3 = 0;
+                            pextra_3 = nullptr;
                         }
                         ExtraDataList* pextra_4 = pextra_3;
                         Script* v9 = pitem->GetScript();
@@ -8218,12 +8247,12 @@ void InventoryChanges::CleanUpBadData() {
                             pref_4 = ::new (v67) TESObjectREFR;
                         }
                         else {
-                            pref_4 = 0;
+                            pref_4 = nullptr;
                         }
                         TESObjectREFR* pref_5 = pref_4;
                         pref_4->SetTemporary();
                         ScriptLocals* v12 = pextra_4->GetScriptLocals();
-                        pScript->Run(pref_5, v12, 0, 0);
+                        pScript->Run(pref_5, v12, nullptr, false);
                         if (pref_5) {
                             delete pref_5;
                         }
@@ -8238,7 +8267,7 @@ void InventoryChanges::CleanUpBadData() {
             if (pitem) {
                 if (pObj->GetFormType() == AMMO_ID) {
                     // One stack slot: the worn list kept below starts as the last item the ownership loop visited.
-                    ExtraDataList* pwornextra = 0;
+                    ExtraDataList* pwornextra = nullptr;
                     if (pRef == pPlayer) {
                         BSSimpleList<ExtraDataList*>* plistextra = pitem->pExtraObjectList;
                         while (plistextra && plistextra->m_item) {
@@ -8247,10 +8276,10 @@ void InventoryChanges::CleanUpBadData() {
                             pwornextra->RemoveOwnership();
                         }
                     }
-                    if (!pitem->GetWorn(0) || pitem->HasLeveledExtra()) {
-                        if (pitem->GetWorn(0) && pitem->HasLeveledExtra()) {
+                    if (!pitem->GetWorn(false) || pitem->HasLeveledExtra()) {
+                        if (pitem->GetWorn(false) && pitem->HasLeveledExtra()) {
                             if (pitem->iNumber < 0) {
-                                pitem->SetWorn(0, 0, 1);
+                                pitem->SetWorn(false, false, true);
                             }
                             int32_t iCount = pitem->GetAmountNonDefaultExtra();
                             if (iCount > 1) {
@@ -8258,38 +8287,38 @@ void InventoryChanges::CleanUpBadData() {
                                 while (plistextra_2 && plistextra_2->m_item) {
                                     ExtraDataList* pextraDataList = plistextra_2->m_item;
                                     plistextra_2 = plistextra_2->m_pkNext;
-                                    if (pextraDataList && (pextraDataList->GetWorn(0) && pwornextra == 0)) {
+                                    if (pextraDataList && (pextraDataList->GetWorn(false) && pwornextra == nullptr)) {
                                         pwornextra = pextraDataList;
                                     }
                                     else {
-                                        if (pwornextra != 0) {
-                                            pwornextra->RemoveAll(1);
+                                        if (pwornextra != nullptr) {
+                                            pwornextra->RemoveAll(true);
                                             pwornextra->DuplicateExtraListForContainer(pextraDataList);
-                                            pwornextra->SetWorn(1, 0);
+                                            pwornextra->SetWorn(true, false);
                                             pitem->pExtraObjectList->RemoveAll();
                                             pitem->pExtraObjectList->AddHead(pwornextra);
                                         }
                                     }
                                 }
                             }
-                            int32_t ExtraTotalCount = pitem->GetExtraTotalCount(0);
+                            int32_t ExtraTotalCount = pitem->GetExtraTotalCount(false);
                             if (pitem->iNumber < ExtraTotalCount) {
-                                int32_t v15 = pitem->GetExtraTotalCount(0);
+                                int32_t v15 = pitem->GetExtraTotalCount(false);
                                 pitem->iNumber = v15;
                             }
                         }
                         else {
-                            if (pitem->GetWorn(0)) {
-                                int32_t v16 = pitem->GetExtraTotalCount(0);
+                            if (pitem->GetWorn(false)) {
+                                int32_t v16 = pitem->GetExtraTotalCount(false);
                                 if (pitem->iNumber >= v16) {
-                                    int32_t v18 = pitem->GetExtraTotalCount(0);
+                                    int32_t v18 = pitem->GetExtraTotalCount(false);
                                     if (pitem->iNumber > v18) {
                                         BSSimpleList<ExtraDataList*>* plistextra_3 = pitem->pExtraObjectList;
                                         while (plistextra_3 && plistextra_3->m_item) {
                                             ExtraDataList* pextraDataList_2 = plistextra_3->m_item;
                                             plistextra_3 = plistextra_3->m_pkNext;
                                             if (pextraDataList_2) {
-                                                if (pextraDataList_2->GetWorn(0)) {
+                                                if (pextraDataList_2->GetWorn(false)) {
                                                     pextraDataList_2->SetCount(pitem->iNumber);
                                                 }
                                             }
@@ -8297,7 +8326,7 @@ void InventoryChanges::CleanUpBadData() {
                                     }
                                 }
                                 else {
-                                    int32_t v17 = pitem->GetExtraTotalCount(0);
+                                    int32_t v17 = pitem->GetExtraTotalCount(false);
                                     pitem->iNumber = v17;
                                 }
                             }
@@ -8330,7 +8359,7 @@ void InventoryChanges::CleanUpBadData() {
                     if (pitem->pExtraObjectList) {
                         if (pitem->pExtraObjectList->ItemsInList()) {
                             BSSimpleList<ExtraDataList*>* plistextra_4 = pitem->pExtraObjectList;
-                            while (1) {
+                            while (true) {
                                 // The compare is unsigned.
                                 uint32_t v20 = plistextra_4->ItemsInList();
                                 if (static_cast<uint32_t>(iamount) >= v20) {
@@ -8341,17 +8370,17 @@ void InventoryChanges::CleanUpBadData() {
                                 if (pextraDataList_3) {
                                     ExtraDataList* pnextExtraDataList = plistextra_4->m_item;
                                     if (pnextExtraDataList) {
-                                        while (1) {
+                                        while (true) {
                                             BSExtraData* pextra_6 = pextraDataList_3->pHead;
                                             if (!pextra_6) {
                                                 break;
                                             }
                                             uint8_t ExtraType = pextra_6->cEtype;
                                             if (pnextExtraDataList->GetExtraData(ExtraType)) {
-                                                pextraDataList_3->RemoveExtra(pextra_6, 1);
+                                                pextraDataList_3->RemoveExtra(pextra_6, true);
                                             }
                                             else {
-                                                pextraDataList_3->RemoveExtra(pextra_6, 0);
+                                                pextraDataList_3->RemoveExtra(pextra_6, false);
                                                 pnextExtraDataList->AddExtra(pextra_6);
                                             }
                                         }
@@ -8363,7 +8392,7 @@ void InventoryChanges::CleanUpBadData() {
                                 if (pitem->pExtraObjectList) {
                                     delete pitem->pExtraObjectList;
                                 }
-                                pitem->pExtraObjectList = 0;
+                                pitem->pExtraObjectList = nullptr;
                             }
                             else {
                                 plistextra_4 = pitem->pExtraObjectList;
@@ -8380,8 +8409,8 @@ void InventoryChanges::CleanUpBadData() {
                                             if (pitem->pExtraObjectList->IsEmpty()) {
                                                 plistextra_4->RemoveAll();
                                                 delete plistextra_4;
-                                                plistextra_4 = 0;
-                                                pitem->pExtraObjectList = 0;
+                                                plistextra_4 = nullptr;
+                                                pitem->pExtraObjectList = nullptr;
                                             }
                                             else {
                                                 plistextra_4 = pitem->pExtraObjectList;
@@ -8443,7 +8472,7 @@ void InventoryChanges::CleanUpBadData() {
                 }
             }
         }
-        int32_t iextracount = pInventoryItem->GetExtraTotalCount(0);
+        int32_t iextracount = pInventoryItem->GetExtraTotalCount(false);
         pObj = pInventoryItem->pContainerObj;
         if (pInventoryItem) {
             if (pInventoryItem->GetScript()) {
@@ -8464,7 +8493,7 @@ void InventoryChanges::CleanUpBadData() {
                                         pextra_8 = ::new (v66) ExtraDataList;
                                     }
                                     else {
-                                        pextra_8 = 0;
+                                        pextra_8 = nullptr;
                                     }
                                     ExtraDataList* pnewextra = pextra_8;
                                     Script* v24 = pext_6->GetScript();
@@ -8477,13 +8506,13 @@ void InventoryChanges::CleanUpBadData() {
                                         pref_6 = ::new (v65) TESObjectREFR;
                                     }
                                     else {
-                                        pref_6 = 0;
+                                        pref_6 = nullptr;
                                     }
                                     TESObjectREFR* pnewref = pref_6;
                                     pref_6->SetTemporary();
                                     ScriptLocals* v45 = pnewextra->GetScriptLocals();
                                     Script* v27 = pext_6->GetScript();
-                                    v27->Run(pnewref, v45, 0, 0);
+                                    v27->Run(pnewref, v45, nullptr, false);
                                     plist2_2->AddTail(pnewextra);
                                     plist2_2 = plist_2->m_pkNext;
                                 }
@@ -8518,12 +8547,12 @@ void InventoryChanges::CleanUpBadData() {
                                         pref_7 = ::new (v64) TESObjectREFR;
                                     }
                                     else {
-                                        pref_7 = 0;
+                                        pref_7 = nullptr;
                                     }
                                     pref_7->SetTemporary();
                                     ScriptLocals* v46 = pext_7->GetScriptLocals();
                                     Script* v31 = pInventoryItem->GetScript();
-                                    v31->Run(pref_7, v46, 0, 0);
+                                    v31->Run(pref_7, v46, nullptr, false);
                                 }
                             }
                             plist_3 = plist_3->m_pkNext;
@@ -8537,7 +8566,7 @@ void InventoryChanges::CleanUpBadData() {
                                 pextra_9 = ::new (v63) ExtraDataList;
                             }
                             else {
-                                pextra_9 = 0;
+                                pextra_9 = nullptr;
                             }
                             ExtraDataList* pextra_10 = pextra_9;
                             Script* v32 = pInventoryItem->GetScript();
@@ -8550,12 +8579,12 @@ void InventoryChanges::CleanUpBadData() {
                                 pref_8 = ::new (v62) TESObjectREFR;
                             }
                             else {
-                                pref_8 = 0;
+                                pref_8 = nullptr;
                             }
                             TESObjectREFR* pref_9 = pref_8;
                             pref_8->SetTemporary();
                             ScriptLocals* v35 = pextra_10->GetScriptLocals();
-                            pScript_2->Run(pref_9, v35, 0, 0);
+                            pScript_2->Run(pref_9, v35, nullptr, false);
                             if (pref_9) {
                                 delete pref_9;
                             }
@@ -8586,7 +8615,7 @@ void InventoryChanges::CleanUpBadData() {
                         pextra_11->RemoveOwnership();
                     }
                 }
-                if (pInventoryItem->GetWorn(0)) {
+                if (pInventoryItem->GetWorn(false)) {
                     BSSimpleList<ExtraDataList*>* plistextra_6 = pInventoryItem->pExtraObjectList;
                     int32_t icount_3 = 0;
                     while (plistextra_6 && plistextra_6->m_item) {
@@ -8600,7 +8629,7 @@ void InventoryChanges::CleanUpBadData() {
                                 ExtraDataList* pextraDataList_4 = plistextra_7->m_item;
                                 plistextra_7 = plistextra_7->m_pkNext;
                                 if (pextraDataList_4) {
-                                    if (pextraDataList_4->GetWorn(0)) {
+                                    if (pextraDataList_4->GetWorn(false)) {
                                         pextraDataList_4->SetCount(pInventoryItem->iNumber);
                                     }
                                 }
@@ -8654,7 +8683,7 @@ void InventoryChanges::CleanUpBadData() {
                 BSSimpleList<ExtraDataList*>* plistextra_8 = pInventoryItem->pExtraObjectList;
                 if (plistextra_8) {
                     if (plistextra_8->m_item) {
-                        while (1) {
+                        while (true) {
                             // The compare is unsigned.
                             uint32_t v37 = plistextra_8->ItemsInList();
                             if (static_cast<uint32_t>(iamount_2) >= v37) {
@@ -8665,17 +8694,17 @@ void InventoryChanges::CleanUpBadData() {
                             if (pextraDataList_5) {
                                 ExtraDataList* pnextExtraDataList_2 = plistextra_8->m_item;
                                 if (pnextExtraDataList_2) {
-                                    while (1) {
+                                    while (true) {
                                         BSExtraData* pextra_12 = pextraDataList_5->pHead;
                                         if (!pextra_12) {
                                             break;
                                         }
                                         uint8_t v38 = pextra_12->cEtype;
                                         if (pnextExtraDataList_2->GetExtraData(v38)) {
-                                            pextraDataList_5->RemoveExtra(pextra_12, 1);
+                                            pextraDataList_5->RemoveExtra(pextra_12, true);
                                         }
                                         else {
-                                            pextraDataList_5->RemoveExtra(pextra_12, 0);
+                                            pextraDataList_5->RemoveExtra(pextra_12, false);
                                             pnextExtraDataList_2->AddExtra(pextra_12);
                                         }
                                     }
@@ -8687,7 +8716,7 @@ void InventoryChanges::CleanUpBadData() {
                             if (pInventoryItem->pExtraObjectList) {
                                 delete pInventoryItem->pExtraObjectList;
                             }
-                            pInventoryItem->pExtraObjectList = 0;
+                            pInventoryItem->pExtraObjectList = nullptr;
                             goto LABEL_296;
                         }
                     LABEL_295:;
@@ -8704,8 +8733,8 @@ void InventoryChanges::CleanUpBadData() {
                                 }
                                 plistextra_8->RemoveAll();
                                 delete plistextra_8;
-                                plistextra_8 = 0;
-                                pInventoryItem->pExtraObjectList = 0;
+                                plistextra_8 = nullptr;
+                                pInventoryItem->pExtraObjectList = nullptr;
                             }
                         }
                     }
@@ -8719,12 +8748,12 @@ void InventoryChanges::CleanUpBadData() {
 void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* apDupContainer) {
     if (apDupContainer) {
         if (apRef) {
-            TESBoundObject* pObj = 0;
-            ItemChange* pNewItem = 0;
+            TESBoundObject* pObj = nullptr;
+            ItemChange* pNewItem = nullptr;
             InventoryChanges* pdupchange = InventoryChanges::GetInventoryChanges(apDupContainer);
             if (pdupchange) {
                 BSSimpleList<ContainerObject*>* pList = &GetOriginalContainer()->objectList;
-                TESLevItem* pleveled = 0;
+                TESLevItem* pleveled = nullptr;
                 while (pList && !pList->IsEmpty()) {
                     pObj = pList->m_item->pObj;
                     pleveled = dynamic_cast<TESLevItem*>(pList->m_item->pObj);
@@ -8732,7 +8761,7 @@ void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* ap
                         TESBoundObject* v14 = pObj;
                         TESContainer* OriginalContainer = GetOriginalContainer();
                         int32_t ioriginalcount = OriginalContainer->GetObjectCount(v14);
-                        ItemChange* pitem = GetObjectInList(pObj, 1, 0);
+                        ItemChange* pitem = GetObjectInList(pObj, true, 0);
                         int32_t iamount = 0;
                         int32_t iorigcount = ioriginalcount;
                         if (ioriginalcount < 0) {
@@ -8746,13 +8775,13 @@ void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* ap
                             iamount += iorigcount;
                         }
                         if (iamount > 0) {
-                            TESForm* pNewForm = 0;
+                            TESForm* pNewForm = nullptr;
                             if (TESScriptableForm::GetFormScript(pObj)) {
                                 ItemChange* pNewItem_2;
                                 uint8_t FormType = pObj->GetFormType();
                                 pNewForm = TESDataHandler::CreateFormOfType(FormType);
                                 pNewForm->Copy(pObj);
-                                TESScriptableForm::SetFormScript(pNewForm, 0);
+                                TESScriptableForm::SetFormScript(pNewForm, nullptr);
                                 pDataHandler->AddFormToDataHandler(pNewForm);
                                 pSaveLoadGameOLD->AddCreatedBaseObject(pNewForm);
                                 int32_t icount = ioriginalcount;
@@ -8766,7 +8795,7 @@ void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* ap
                                         ::new (apMemory) ItemChange(static_cast<TESBoundObject*>(pNewForm), icount);
                                 }
                                 else {
-                                    pNewItem_2 = 0;
+                                    pNewItem_2 = nullptr;
                                 }
                                 pNewItem = pNewItem_2;
                                 if (pitem) {
@@ -8784,16 +8813,16 @@ void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* ap
                                                             pextra = ::new (v31) ExtraDataList;
                                                         }
                                                         else {
-                                                            pextra = 0;
+                                                            pextra = nullptr;
                                                         }
                                                         BSExtraData* apExtra =
                                                             static_cast<BaseExtraList*>(pnode->m_item)
                                                                 ->GetExtraData(EXTRA_SCRIPT);
                                                         if (apExtra) {
                                                             static_cast<BaseExtraList*>(pnode->m_item)
-                                                                ->RemoveExtra(apExtra, 0);
+                                                                ->RemoveExtra(apExtra, false);
                                                         }
-                                                        pextra->CopyListForContainer(pnode->m_item, 1);
+                                                        pextra->CopyListForContainer(pnode->m_item, true);
                                                         pNewItem->pExtraObjectList->AddTail(pextra);
                                                         if (apExtra) {
                                                             static_cast<BaseExtraList*>(pnode->m_item)
@@ -8814,7 +8843,7 @@ void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* ap
                                     pNewItem_3 = ::new (v30) ItemChange(pObj, iamount);
                                 }
                                 else {
-                                    pNewItem_3 = 0;
+                                    pNewItem_3 = nullptr;
                                 }
                                 pNewItem = pNewItem_3;
                                 if (pitem) {
@@ -8832,9 +8861,9 @@ void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* ap
                                                             pextra_2 = ::new (v29) ExtraDataList;
                                                         }
                                                         else {
-                                                            pextra_2 = 0;
+                                                            pextra_2 = nullptr;
                                                         }
-                                                        pextra_2->CopyListForContainer(pnode->m_item, 1);
+                                                        pextra_2->CopyListForContainer(pnode->m_item, true);
                                                         pNewItem->pExtraObjectList->AddTail(pextra_2);
                                                         pnode = pnode->m_pkNext;
                                                     }
@@ -8844,7 +8873,7 @@ void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* ap
                                     }
                                 }
                             }
-                            pdupchange->AddChangeItem(pNewItem, 1);
+                            pdupchange->AddChangeItem(pNewItem, true);
                         }
                     }
                     pList = pList->m_pkNext;
@@ -8856,14 +8885,14 @@ void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* ap
                         if (pInventoryItem->iNumber > 0) {
                             pObj = pInventoryItem->pContainerObj;
                             pInventoryItem->RemoveLeveledItemExtra();
-                            TESForm* pNewForm_2 = 0;
+                            TESForm* pNewForm_2 = nullptr;
                             if (pInventoryItem->GetScript()) {
                                 ItemChange* pNewItem_4;
                                 uint8_t v7 = pInventoryItem->pContainerObj->GetFormType();
                                 pNewForm_2 = TESDataHandler::CreateFormOfType(v7);
                                 TESBoundObject* FormFlags = pInventoryItem->pContainerObj;
                                 pNewForm_2->Copy(FormFlags);
-                                TESScriptableForm::SetFormScript(pNewForm_2, 0);
+                                TESScriptableForm::SetFormScript(pNewForm_2, nullptr);
                                 pDataHandler->AddFormToDataHandler(pNewForm_2);
                                 pSaveLoadGameOLD->AddCreatedBaseObject(pNewForm_2);
                                 ItemChange* v28 = static_cast<ItemChange*>(ourMalloc(sizeof(ItemChange)));
@@ -8872,7 +8901,7 @@ void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* ap
                                     pNewItem_4 = ::new (v28) ItemChange(static_cast<TESBoundObject*>(pNewForm_2), v8);
                                 }
                                 else {
-                                    pNewItem_4 = 0;
+                                    pNewItem_4 = nullptr;
                                 }
                                 pNewItem = pNewItem_4;
                                 if (pInventoryItem) {
@@ -8890,16 +8919,16 @@ void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* ap
                                                             pextra_3 = ::new (v27) ExtraDataList;
                                                         }
                                                         else {
-                                                            pextra_3 = 0;
+                                                            pextra_3 = nullptr;
                                                         }
                                                         BSExtraData* ExtraData =
                                                             static_cast<BaseExtraList*>(pnode->m_item)
                                                                 ->GetExtraData(EXTRA_SCRIPT);
                                                         if (ExtraData) {
                                                             static_cast<BaseExtraList*>(pnode->m_item)
-                                                                ->RemoveExtra(ExtraData, 0);
+                                                                ->RemoveExtra(ExtraData, false);
                                                         }
-                                                        pextra_3->CopyListForContainer(pnode->m_item, 1);
+                                                        pextra_3->CopyListForContainer(pnode->m_item, true);
                                                         pNewItem->pExtraObjectList->AddTail(pextra_3);
                                                         if (ExtraData) {
                                                             static_cast<BaseExtraList*>(pnode->m_item)
@@ -8921,7 +8950,7 @@ void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* ap
                                     pNewItem_5 = ::new (v26) ItemChange(pInventoryItem->pContainerObj, v9);
                                 }
                                 else {
-                                    pNewItem_5 = 0;
+                                    pNewItem_5 = nullptr;
                                 }
                                 pNewItem = pNewItem_5;
                                 if (pInventoryItem) {
@@ -8939,9 +8968,9 @@ void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* ap
                                                             pextra_4 = ::new (v25) ExtraDataList;
                                                         }
                                                         else {
-                                                            pextra_4 = 0;
+                                                            pextra_4 = nullptr;
                                                         }
-                                                        pextra_4->CopyListForContainer(pnode->m_item, 1);
+                                                        pextra_4->CopyListForContainer(pnode->m_item, true);
                                                         pNewItem->pExtraObjectList->AddTail(pextra_4);
                                                         pnode = pnode->m_pkNext;
                                                     }
@@ -8951,8 +8980,8 @@ void InventoryChanges::DuplicateAllItems(TESObjectREFR* apRef, TESObjectREFR* ap
                                     }
                                 }
                             }
-                            pdupchange->AddChangeItem(pNewItem, 1);
-                            pNewItem = 0;
+                            pdupchange->AddChangeItem(pNewItem, true);
+                            pNewItem = nullptr;
                         }
                     }
                 }
@@ -8984,7 +9013,7 @@ float InventoryChanges::GetEquippedWeight(Actor* apOwner) {
          pInvList = pInvList->m_pkNext) {
         ItemChange* pitem = pInvList->m_item;
         TESObject* pObj = pitem->pContainerObj;
-        if (pitem->GetWorn(0) && pObj->GetFormType() != AMMO_ID) {
+        if (pitem->GetWorn(false) && pObj->GetFormType() != AMMO_ID) {
             float fweight;
             if (pObj->GetFormType() == WEAP_ID) {
                 bool HasModEffectActive_0 = pitem->HasModEffectActive(4);
@@ -9029,10 +9058,11 @@ float InventoryChanges::GetEquippedWeight(Actor* apOwner) {
 void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR* apRef, bool bdontcopyquestitems) {
     ExtraDataList* pcurextra_3;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_INVENTORY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp", 9911
+        MEM_CONTEXT_INVENTORY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\InventoryChanges.cpp",
+        9911
     );
     BSSimpleList<ContainerObject*>* plist = &GetOriginalContainer()->objectList;
-    ItemChange* preturnitem = 0;
+    ItemChange* preturnitem = nullptr;
     while (plist && plist->m_item) {
         ItemChange* preturnitem_2;
         ContainerObject* pobject = plist->m_item;
@@ -9042,7 +9072,7 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
             preturnitem_2 = ::new (v57) ItemChange;
         }
         else {
-            preturnitem_2 = 0;
+            preturnitem_2 = nullptr;
         }
         preturnitem = preturnitem_2;
         TESBoundObject* v25 = pobject->pObj;
@@ -9056,7 +9086,7 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                 v42 = ::new (v56) BSSimpleList<ExtraDataList*>;
             }
             else {
-                v42 = 0;
+                v42 = nullptr;
             }
             preturnitem->pExtraObjectList = v42;
         }
@@ -9064,11 +9094,11 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
             if (preturnitem) {
                 delete preturnitem;
             }
-            preturnitem = 0;
+            preturnitem = nullptr;
         }
         else {
             TESBoundObject* FormFlags;
-            ItemChange* pitem = GetObjectInList(pobject->pObj, 1, 0);
+            ItemChange* pitem = GetObjectInList(pobject->pObj, true, 0);
             if (pitem) {
                 pitem->RemoveOriginalChanges();
             }
@@ -9077,18 +9107,18 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                  (((!pitem->HasLeveledExtra() || pitem->CountLeveledItems() < 1) &&
                    !(iOriginalcount + pitem->iNumber)) ||
                   (((FormFlags = pitem->pContainerObj, FormFlags->GetQuestObject()) && bdontcopyquestitems) ||
-                   pitem->GetWorn(0))))) {
+                   pitem->GetWorn(false))))) {
                 if (preturnitem) {
                     delete preturnitem;
                 }
-                preturnitem = 0;
+                preturnitem = nullptr;
             }
             else {
-                if (!pobject || (pitem && pitem->GetExtraTotalCount(0))) {
+                if (!pobject || (pitem && pitem->GetExtraTotalCount(false))) {
                     if (pitem) {
                         int32_t inumb = 0;
                         if (pitem->pExtraObjectList) {
-                            inumb = pitem->GetExtraTotalCount(0);
+                            inumb = pitem->GetExtraTotalCount(false);
                         }
                         // The loop runs only while preturnitem is null, and then uses it, as the game does.
                         for (BSSimpleList<ExtraDataList*>* pextralist = pitem->pExtraObjectList;
@@ -9106,17 +9136,17 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                                     v39 = ::new (v54) BSSimpleList<ExtraDataList*>;
                                 }
                                 else {
-                                    v39 = 0;
+                                    v39 = nullptr;
                                 }
                                 preturnitem->pExtraObjectList = v39;
                             }
                             pcurextra_3->SetOriginalReferenceExtra(apRef);
                             preturnitem->pExtraObjectList->AddHead(pcurextra_3);
-                            if (!preturnitem->GetWorn(0)) {
-                                apCopy->AddChangeItem(preturnitem, 1);
+                            if (!preturnitem->GetWorn(false)) {
+                                apCopy->AddChangeItem(preturnitem, true);
                             }
                         }
-                        int32_t ExtraTotalCount = pitem->GetExtraTotalCount(0);
+                        int32_t ExtraTotalCount = pitem->GetExtraTotalCount(false);
                         if (ExtraTotalCount < pitem->iNumber + iOriginalcount) {
                             if (!preturnitem->pExtraObjectList) {
                                 BSSimpleList<ExtraDataList*>* v38;
@@ -9127,24 +9157,24 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                                     v38 = ::new (v53) BSSimpleList<ExtraDataList*>;
                                 }
                                 else {
-                                    v38 = 0;
+                                    v38 = nullptr;
                                 }
                                 preturnitem->pExtraObjectList = v38;
                             }
                             if (pitem) {
                                 int32_t v9 = pitem->iNumber + iOriginalcount;
-                                int32_t v10 = pitem->GetExtraTotalCount(0);
+                                int32_t v10 = pitem->GetExtraTotalCount(false);
                                 preturnitem->iNumber = v9 - v10;
                             }
                             else {
                                 preturnitem->iNumber = iOriginalcount;
                             }
                             preturnitem->pContainerObj = pobject->pObj;
-                            if (preturnitem->GetWorn(0)) {
+                            if (preturnitem->GetWorn(false)) {
                                 if (preturnitem) {
                                     delete preturnitem;
                                 }
-                                preturnitem = 0;
+                                preturnitem = nullptr;
                             }
                             else {
                                 ExtraDataList* pcurextra_4;
@@ -9153,14 +9183,14 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                                     pcurextra_4 = ::new (v52) ExtraDataList;
                                 }
                                 else {
-                                    pcurextra_4 = 0;
+                                    pcurextra_4 = nullptr;
                                 }
                                 ExtraDataList* pcurextra_5 = pcurextra_4;
                                 pcurextra_4->SetOriginalReferenceExtra(apRef);
                                 int16_t FormHealth_0 = preturnitem->iNumber;
                                 pcurextra_5->SetCount(FormHealth_0);
                                 preturnitem->pExtraObjectList->AddHead(pcurextra_5);
-                                apCopy->AddChangeItem(preturnitem, 1);
+                                apCopy->AddChangeItem(preturnitem, true);
                             }
                         }
                     }
@@ -9168,7 +9198,7 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                         if (preturnitem) {
                             delete preturnitem;
                         }
-                        preturnitem = 0;
+                        preturnitem = nullptr;
                     }
                 }
                 else {
@@ -9178,7 +9208,7 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                     }
                     if (pitem) {
                         int32_t v5 = pitem->iNumber + icount;
-                        int32_t v6 = pitem->GetExtraTotalCount(0);
+                        int32_t v6 = pitem->GetExtraTotalCount(false);
                         preturnitem->iNumber = v5 - v6;
                     }
                     else {
@@ -9192,14 +9222,14 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                             BSSimpleList<ExtraDataList*>* v26 = pextlist;
                             preturnitem->pExtraObjectList->AddTail(v26->m_item);
                         }
-                        apCopy->AddChangeItem(preturnitem, 1);
+                        apCopy->AddChangeItem(preturnitem, true);
                     }
                     else {
-                        if (preturnitem->GetWorn(0)) {
+                        if (preturnitem->GetWorn(false)) {
                             if (preturnitem) {
                                 delete preturnitem;
                             }
-                            preturnitem = 0;
+                            preturnitem = nullptr;
                         }
                         else {
                             ExtraDataList* pcurextra;
@@ -9208,14 +9238,14 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                                 pcurextra = ::new (v55) ExtraDataList;
                             }
                             else {
-                                pcurextra = 0;
+                                pcurextra = nullptr;
                             }
                             ExtraDataList* pcurextra_2 = pcurextra;
                             pcurextra->SetOriginalReferenceExtra(apRef);
                             int16_t v7 = preturnitem->iNumber;
                             pcurextra_2->SetCount(v7);
                             preturnitem->pExtraObjectList->AddHead(pcurextra_2);
-                            apCopy->AddChangeItem(preturnitem, 1);
+                            apCopy->AddChangeItem(preturnitem, true);
                         }
                     }
                 }
@@ -9232,7 +9262,7 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
             preturnitem_3 = ::new (v51) ItemChange;
         }
         else {
-            preturnitem_3 = 0;
+            preturnitem_3 = nullptr;
         }
         preturnitem = preturnitem_3;
         if (!preturnitem_3->pExtraObjectList) {
@@ -9243,7 +9273,7 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                 v35 = ::new (v50) BSSimpleList<ExtraDataList*>;
             }
             else {
-                v35 = 0;
+                v35 = nullptr;
             }
             preturnitem->pExtraObjectList = v35;
         }
@@ -9256,16 +9286,16 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
             if (preturnitem) {
                 delete preturnitem;
             }
-            preturnitem = 0;
+            preturnitem = nullptr;
         }
         else {
-            if (pitem_2->GetExtraTotalCount(0) || pitem_2->GetScript()) {
+            if (pitem_2->GetExtraTotalCount(false) || pitem_2->GetScript()) {
                 BSSimpleList<ExtraDataList*>* pextralist = pitem_2->pExtraObjectList;
                 int32_t icount_2 = 0;
-                bool leveledlist = 0;
+                bool leveledlist = false;
                 while (pextralist && pextralist->m_item) {
                     if (pextralist->m_item->GetExtraData(47)) {
-                        leveledlist = 1;
+                        leveledlist = true;
                     }
                     pextralist = pextralist->m_pkNext;
                 }
@@ -9298,7 +9328,7 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                 preturnitem->pContainerObj = pitem_2->pContainerObj;
                 uint32_t v14 = pitem_2->iNumber;
                 preturnitem->iNumber = v14;
-                if (!preturnitem->GetWorn(0)) {
+                if (!preturnitem->GetWorn(false)) {
                     int32_t v15 = pitem_2->iNumber;
                     if (icount_2 < v15) {
                         ExtraDataList* pcurextra_8;
@@ -9307,7 +9337,7 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                             pcurextra_8 = ::new (v49) ExtraDataList;
                         }
                         else {
-                            pcurextra_8 = 0;
+                            pcurextra_8 = nullptr;
                         }
                         ExtraDataList* pcurextra_9 = pcurextra_8;
                         pcurextra_8->SetOriginalReferenceExtra(apRef);
@@ -9316,21 +9346,21 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                         preturnitem->pExtraObjectList->AddHead(pcurextra_9);
                     }
                 }
-                if (preturnitem->GetWorn(0)) {
+                if (preturnitem->GetWorn(false)) {
                     if (preturnitem->pExtraObjectList->m_item) {
                         preturnitem->pExtraObjectList->m_item->RemoveOriginalReferenceExtra();
                     }
                     if (preturnitem) {
                         delete preturnitem;
                     }
-                    preturnitem = 0;
+                    preturnitem = nullptr;
                 }
                 else {
-                    apCopy->AddChangeItem(preturnitem, 1);
+                    apCopy->AddChangeItem(preturnitem, true);
                 }
             }
             else {
-                ExtraDataList* pcurextra_10 = 0;
+                ExtraDataList* pcurextra_10 = nullptr;
                 if (pitem_2->pExtraObjectList) {
                     BSSimpleList<ExtraDataList*>* pextralist_2 = pitem_2->pExtraObjectList;
                     int32_t icount_3 = 0;
@@ -9338,8 +9368,8 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                         pcurextra_10 = pextralist_2->m_item;
                         int16_t v17 = pcurextra_10->GetCount();
                         icount_3 += v17;
-                        if (pcurextra_10->IsExtraDefaultforContainer(0)) {
-                            pcurextra_10 = 0;
+                        if (pcurextra_10->IsExtraDefaultforContainer(false)) {
+                            pcurextra_10 = nullptr;
                         }
                         pextralist_2 = pextralist_2->m_pkNext;
                     }
@@ -9353,13 +9383,13 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                                 v33 = ::new (v48) BSSimpleList<ExtraDataList*>;
                             }
                             else {
-                                v33 = 0;
+                                v33 = nullptr;
                             }
                             preturnitem->pExtraObjectList = v33;
                         }
                         pcurextra_10->SetOriginalReferenceExtra(apRef);
                         preturnitem->pExtraObjectList->AddHead(pcurextra_10);
-                        if (!preturnitem->GetWorn(0)) {
+                        if (!preturnitem->GetWorn(false)) {
                             int32_t v18 = pitem_2->iNumber;
                             if (icount_3 < v18) {
                                 ExtraDataList* pcurextra_11;
@@ -9368,7 +9398,7 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                                     pcurextra_11 = ::new (v47) ExtraDataList;
                                 }
                                 else {
-                                    pcurextra_11 = 0;
+                                    pcurextra_11 = nullptr;
                                 }
                                 ExtraDataList* pcurextra_12 = pcurextra_11;
                                 pcurextra_11->SetOriginalReferenceExtra(apRef);
@@ -9385,7 +9415,7 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                             pcurextra_13 = ::new (v46) ExtraDataList;
                         }
                         else {
-                            pcurextra_13 = 0;
+                            pcurextra_13 = nullptr;
                         }
                         ExtraDataList* pcurextra_14 = pcurextra_13;
                         pcurextra_13->SetOriginalReferenceExtra(apRef);
@@ -9396,19 +9426,19 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                     preturnitem->pContainerObj = pitem_2->pContainerObj;
                     uint32_t v21 = pitem_2->iNumber;
                     preturnitem->iNumber = v21;
-                    if (preturnitem->GetWorn(0)) {
+                    if (preturnitem->GetWorn(false)) {
                         if (preturnitem->pExtraObjectList->m_item) {
                             preturnitem->pExtraObjectList->m_item->RemoveOriginalReferenceExtra();
                         }
                         if (preturnitem) {
                             delete preturnitem;
                         }
-                        preturnitem = 0;
+                        preturnitem = nullptr;
                     }
                     else {
                         uint32_t v22 = pitem_2->iNumber;
                         preturnitem->iNumber = v22;
-                        apCopy->AddChangeItem(preturnitem, 1);
+                        apCopy->AddChangeItem(preturnitem, true);
                     }
                 }
                 else {
@@ -9422,14 +9452,14 @@ void InventoryChanges::CreateCopyofList(InventoryChanges* apCopy, TESObjectREFR*
                         pcurextra_15 = ::new (v45) ExtraDataList;
                     }
                     else {
-                        pcurextra_15 = 0;
+                        pcurextra_15 = nullptr;
                     }
                     pcurextra_10 = pcurextra_15;
                     pcurextra_15->SetOriginalReferenceExtra(apRef);
                     int16_t v24 = preturnitem->iNumber;
                     pcurextra_10->SetCount(v24);
                     preturnitem->pExtraObjectList->AddHead(pcurextra_10);
-                    apCopy->AddChangeItem(preturnitem, 1);
+                    apCopy->AddChangeItem(preturnitem, true);
                 }
             }
         }
@@ -9440,7 +9470,7 @@ void InventoryChanges::GetRepairItemGroup(TESBoundObject* apObj, BSSimpleList<It
     if (apObj) {
         if (apReturnList) {
             IterData* apIterator = GetIterator();
-            ItemChange* a2 = 0;
+            ItemChange* a2 = nullptr;
             do {
                 a2 = Iterate(apIterator);
                 if (a2) {
@@ -9490,7 +9520,7 @@ int32_t InventoryChanges::GetExtraDataListIndexForItem(TESBoundObject* apObject,
 
 ExtraDataList* InventoryChanges::GetExtraDataListFromIndexForItem(TESBoundObject* apObject, int32_t aiExtraIndex) {
     if (!apObject || aiExtraIndex == -1) {
-        return 0;
+        return nullptr;
     }
     BSSimpleList<ItemChange*>* pchangeList = pListofChanges;
     while (pchangeList) {
@@ -9504,10 +9534,10 @@ ExtraDataList* InventoryChanges::GetExtraDataListFromIndexForItem(TESBoundObject
                 }
                 ++icount;
             }
-            return 0;
+            return nullptr;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 // Only references that are not mobile objects, or are actors, get changes.
@@ -9543,7 +9573,7 @@ void InventoryChanges::KillTempRef() {
     if (InventoryChanges::pTempRef) {
         delete InventoryChanges::pTempRef;
     }
-    InventoryChanges::pTempRef = 0;
+    InventoryChanges::pTempRef = nullptr;
 }
 
 // Whether the ammo is playable: the non-playable flag (2) of data.cFlags is clear.

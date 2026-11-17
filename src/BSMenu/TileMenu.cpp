@@ -13,10 +13,10 @@ TileMenu::~TileMenu() {
     if (pMenu) {
         int32_t v3 = pMenu->GetClass();
         if (v3 >= 1001 && v3 <= 1084) {
-            Menu::pMenusVisible[v3 - 1001] = 0;
+            Menu::pMenusVisible[v3 - 1001] = false;
         }
-        Menu::SetMenuByClass(pMenu->GetClass(), 0);
-        pMenu->SetMenuTile(0, 0);
+        Menu::SetMenuByClass(pMenu->GetClass(), nullptr);
+        pMenu->SetMenuTile(nullptr, false);
         delete pMenu;
     }
     if ((uiFlags & RELEASED) == 0) {

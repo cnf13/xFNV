@@ -61,7 +61,7 @@ void BSCullingProcess::Process(const NiCamera* pkCamera, NiAVObject* pkScene, Ni
             // cast away here, as in NiCullingProcess::Process.
             m_pkCamera = const_cast<NiCamera*>(pkCamera);
             SetFrustum(m_pkCamera->m_kViewFrustum);
-            NiVisibleArray* pOrgVisibleSet = 0;
+            NiVisibleArray* pOrgVisibleSet = nullptr;
             if (pkVisibleSet) {
                 pOrgVisibleSet = m_pkVisibleSet;
                 m_pkVisibleSet = pkVisibleSet;
@@ -85,7 +85,7 @@ void BSCullingProcess::Process(const NiCamera* pkCamera, NiAVObject* pkScene, Ni
 }
 
 void BSCullingProcess::AppendVirtual(NiGeometry& kVisible) {
-    bool bRegistered = 0;
+    bool bRegistered = false;
     if (spAccumulator.m_pObject) {
         bRegistered = spAccumulator.m_pObject->RegisterObject(&kVisible);
     }

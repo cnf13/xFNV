@@ -107,7 +107,7 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 static NiCollisionSDM NiCollisionSDMObject;
 SettingT<GameSettingCollection> TESRace::fRaceGeneticVariation("fRaceGeneticVariation", 0.5f);
@@ -838,9 +838,11 @@ void TESRace::Copy(TESForm* apCopy) {
             peyeslist = peyeslist->m_pkNext;
         }
         FR2MatrixVTC<float>(*pMaleCoord)[2][2] = GetMeanFaceCoord(TESActorBase::SEX_MALE);
-        BSFaceGenManager::CopyFaceGenCoord(prace->GetMeanFaceCoord(TESActorBase::SEX_MALE), pMaleCoord, 0, 0);
+        BSFaceGenManager::CopyFaceGenCoord(prace->GetMeanFaceCoord(TESActorBase::SEX_MALE), pMaleCoord, false, false);
         FR2MatrixVTC<float>(*pFemaleCoord)[2][2] = GetMeanFaceCoord(TESActorBase::SEX_FEMALE);
-        BSFaceGenManager::CopyFaceGenCoord(prace->GetMeanFaceCoord(TESActorBase::SEX_FEMALE), pFemaleCoord, 0, 0);
+        BSFaceGenManager::CopyFaceGenCoord(
+            prace->GetMeanFaceCoord(TESActorBase::SEX_FEMALE), pFemaleCoord, false, false
+        );
         sFaceCoordNum = prace->GetFaceCoordNum();
     }
 }
@@ -850,61 +852,61 @@ bool TESRace::Compare(TESForm* apCompare) {
     FR2MatrixVTC<float>(*v22)[2][2];
     TESRace* prace = dynamic_cast<TESRace*>(apCompare);
     if (!prace) {
-        return 1;
+        return true;
     }
     if (CompareAllComponents(prace)) {
-        return 1;
+        return true;
     }
     if (std::memcmp(&Data, &prace->Data, sizeof(Data))) {
-        return 1;
+        return true;
     }
     if (this->GetOlderRace() != prace->GetOlderRace()) {
-        return 1;
+        return true;
     }
     if (this->GetYoungerRace() != prace->GetYoungerRace()) {
-        return 1;
+        return true;
     }
     BGSVoiceType* DefaultVoiceType = GetDefaultVoiceType(TESActorBase::SEX_MALE);
     if (DefaultVoiceType != prace->GetDefaultVoiceType(TESActorBase::SEX_MALE)) {
-        return 1;
+        return true;
     }
     BGSVoiceType* v4 = GetDefaultVoiceType(TESActorBase::SEX_FEMALE);
     if (v4 != prace->GetDefaultVoiceType(TESActorBase::SEX_FEMALE)) {
-        return 1;
+        return true;
     }
     TESHair* DefaultHair = GetDefaultHair(TESActorBase::SEX_MALE);
     if (DefaultHair != prace->GetDefaultHair(TESActorBase::SEX_MALE)) {
-        return 1;
+        return true;
     }
     TESHair* v6 = GetDefaultHair(TESActorBase::SEX_FEMALE);
     if (v6 != prace->GetDefaultHair(TESActorBase::SEX_FEMALE)) {
-        return 1;
+        return true;
     }
     int32_t DefaultHairColor = GetDefaultHairColor(TESActorBase::SEX_MALE);
     if (DefaultHairColor != prace->GetDefaultHairColor(TESActorBase::SEX_MALE)) {
-        return 1;
+        return true;
     }
     int32_t v8 = GetDefaultHairColor(TESActorBase::SEX_FEMALE);
     if (v8 != prace->GetDefaultHairColor(TESActorBase::SEX_FEMALE)) {
-        return 1;
+        return true;
     }
     double ClampFaceGeoValue = GetClampFaceGeoValue();
     if (ClampFaceGeoValue != prace->GetClampFaceGeoValue()) {
-        return 1;
+        return true;
     }
     double ClampFaceGeoValue2 = GetClampFaceGeoValue2();
     if (ClampFaceGeoValue2 != prace->GetClampFaceGeoValue2()) {
-        return 1;
+        return true;
     }
     // Every component is compared through the virtual CompareComponent of the member, called through a
     // BaseFormComponent pointer; a call on the member itself would be devirtualised.
     BaseFormComponent* pComponent = &MaleAttributes;
     if (pComponent->CompareComponent(&prace->MaleAttributes)) {
-        return 1;
+        return true;
     }
     pComponent = &FemaleAttributes;
     if (pComponent->CompareComponent(&prace->FemaleAttributes)) {
-        return 1;
+        return true;
     }
     // The sex and part counters are unsigned, passed as the callees' enums.
     for (uint32_t isex = 0; isex < 2; ++isex) {
@@ -920,46 +922,46 @@ bool TESRace::Compare(TESForm* apCompare) {
                     continue;
                 }
             }
-            return 1;
+            return true;
         }
     }
     for (uint32_t isex_2 = 0; isex_2 < 2; ++isex_2) {
         for (uint32_t j = 0; j < 3; ++j) {
             pComponent = &ppBodyTextureFiles[isex_2][j];
             if (pComponent->CompareComponent(&prace->ppBodyTextureFiles[isex_2][j])) {
-                return 1;
+                return true;
             }
             pComponent = &ppBodyModelFiles[isex_2][j];
             if (pComponent->CompareComponent(&prace->ppBodyModelFiles[isex_2][j])) {
-                return 1;
+                return true;
             }
         }
         pComponent = &pBodyTextureModels[isex_2];
         if (pComponent->CompareComponent(&prace->pBodyTextureModels[isex_2])) {
-            return 1;
+            return true;
         }
     }
     BSSimpleList<TESHair*>* potherList = &prace->HairList;
     int32_t v14 = (&HairList)->ItemsInList();
     if (v14 != potherList->ItemsInList()) {
-        return 1;
+        return true;
     }
     while (potherList && potherList->m_item) {
         uint32_t CastingType = potherList->m_item->iFormID;
         if (!GetRaceHair(CastingType)) {
-            return 1;
+            return true;
         }
         potherList = potherList->m_pkNext;
     }
     BSSimpleList<TESEyes*>* potherList_2 = prace->GetEyeColorList();
     int32_t v16 = GetEyeColorList()->ItemsInList();
     if (v16 != potherList_2->ItemsInList()) {
-        return 1;
+        return true;
     }
     while (potherList_2 && potherList_2->m_item) {
         uint32_t v17 = potherList_2->m_item->iFormID;
         if (!GetRaceEyeColor(v17)) {
-            return 1;
+            return true;
         }
         potherList_2 = potherList_2->m_pkNext;
     }
@@ -969,7 +971,7 @@ bool TESRace::Compare(TESForm* apCompare) {
         (v22 = GetMeanFaceCoord(TESActorBase::SEX_FEMALE),
          (v19 = prace->GetMeanFaceCoord(TESActorBase::SEX_FEMALE), BSFaceGenManager::CompareFaceGenCoord(v19, v22)))) {
         sFaceCoordNum = Random();
-        return 1;
+        return true;
     }
     else {
         int32_t FaceCoordNum = GetFaceCoordNum();
@@ -1172,7 +1174,7 @@ bool TESRace::GetBodyTextureFileName(TESNPC* apNPC, BIPED_OBJECT aePart, char* a
     BSstrcat(apFileName, 0x104, ppBodyTextureFiles[esex][epart].GetTextureName());
     if (apNPC && apNPC == pPlayer->GetObjectReference() && (epart == RBP_LEFT_HAND || epart == RBP_RIGHT_HAND)) {
         const char* porigext = std::strrchr(ppBodyTextureFiles[esex][epart].GetTextureName(), '.');
-        char* pext = const_cast<char*>(std::strrchr(apFileName, '.'));
+        char* pext = std::strrchr(apFileName, '.');
         if (pext && porigext) {
             *pext = '\0';
             BSstrcat(apFileName, 0x104, "_1st");
@@ -1199,10 +1201,10 @@ bool TESRace::GetBodyTexture(
     char path[264];
     char pcString[264];
     char Path[268];
-    NiPointer<BSFaceGenModel> pmodelFG(static_cast<BSFaceGenModel*>(0));
-    NiPointer<NiTriBasedGeom> spshape(static_cast<NiTriBasedGeom*>(0));
-    NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(0));
-    NiPointer<NiTexture> sptexBaseMod(static_cast<NiTexture*>(0));
+    NiPointer<BSFaceGenModel> pmodelFG(static_cast<BSFaceGenModel*>(nullptr));
+    NiPointer<NiTriBasedGeom> spshape(static_cast<NiTriBasedGeom*>(nullptr));
+    NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(nullptr));
+    NiPointer<NiTexture> sptexBaseMod(static_cast<NiTexture*>(nullptr));
     rt::eh_vector_constructor_iterator(
         facecoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
         &fnvd::destructElement<FR2MatrixVTC<float>>
@@ -1214,7 +1216,7 @@ bool TESRace::GetBodyTexture(
         esex = TESActorBase::SEX_MALE;
     }
     ::new (&fileEGT) BSStringT<char>;
-    aspOutBaseTexture.operator=(static_cast<NiTexture*>(0));
+    aspOutBaseTexture.operator=(static_cast<NiTexture*>(nullptr));
     if (!abForceCreate && apNPC != pPlayer->GetObjectReference()) {
         aspOutModTexture.operator=(static_cast<NiTexture*>(BSFaceGenManager::GetBaseTexture()));
     }
@@ -1223,7 +1225,9 @@ bool TESRace::GetBodyTexture(
         goto done;
     }
     // The texture is a NiPointer<NiTexture> here, but CreateTextureImage takes a NiPointer<NiSourceTexture>.
-    TES::pInstance->CreateTextureImage(path, reinterpret_cast<NiPointer<NiSourceTexture>&>(aspOutBaseTexture), 0, 0);
+    TES::pInstance->CreateTextureImage(
+        path, reinterpret_cast<NiPointer<NiSourceTexture>&>(aspOutBaseTexture), false, false
+    );
     if (!aspOutBaseTexture.m_pObject) {
         goto done;
     }
@@ -1234,10 +1238,10 @@ bool TESRace::GetBodyTexture(
     GetBodyModTextureName(apNPC, Path);
     if (GetBodyModTextureFileName(apNPC, Path, pcString) && !abForceCreate) {
         TES::pInstance->CreateTextureImage(
-            pcString, reinterpret_cast<NiPointer<NiSourceTexture>&>(aspOutModTexture), 1, 0
+            pcString, reinterpret_cast<NiPointer<NiSourceTexture>&>(aspOutModTexture), true, false
         );
     }
-    if (aspOutModTexture.operator==(static_cast<NiTexture*>(0)) || abForceCreate) {
+    if (aspOutModTexture.operator==(static_cast<NiTexture*>(nullptr)) || abForceCreate) {
         if (!abForceCreate && apNPC != pPlayer->GetObjectReference()) {
             Warning(
                 "Failed to find body mod texture '%s' for '%s' (%08X). Creating from scratch.", Path, GetFormEditorID(),
@@ -1259,20 +1263,24 @@ bool TESRace::GetBodyTexture(
         BSstrcpy(acModelPath, 260, "Meshes\\");
         BSstrcat(acModelPath, 260, pmodel->GetModel());
         const char* pEGTFile = BSFaceGenManager::GetAsEGTFile(fileEGT, acModelPath);
-        pmodelFG.operator=(BSFaceGenManager::GetFaceGenModel(0, 0, 0, pEGTFile, 1, HAIR_PART_NONE, 0));
+        pmodelFG.operator=(
+            BSFaceGenManager::GetFaceGenModel(nullptr, nullptr, nullptr, pEGTFile, true, HAIR_PART_NONE, false)
+        );
         if (!pmodelFG.m_pObject) {
             goto done;
         }
         if (apNPC) {
             FR2MatrixVTC<float>(*pOffsetCoord)[2][2] = apNPC->GetOffsetFaceCoord();
-            BSFaceGenManager::MergeFaceGenCoord(GetMeanFaceCoord(apNPC->GetSex()), pOffsetCoord, &facecoord, 0, 0.0f);
+            BSFaceGenManager::MergeFaceGenCoord(
+                GetMeanFaceCoord(apNPC->GetSex()), pOffsetCoord, &facecoord, false, 0.0f
+            );
         }
         else {
             FR2MatrixVTC<float>(*pcoord)[2][2] = GetMeanFaceCoord(esex);
             if (!pcoord) {
                 pcoord = BSFaceGenManager::GetFaceGenCoord();
             }
-            BSFaceGenManager::CopyFaceGenCoord(pcoord, &facecoord, 0, 0);
+            BSFaceGenManager::CopyFaceGenCoord(pcoord, &facecoord, false, false);
         }
         if (abForceCreate) {
             BSTexturePalette::RemoveTexture_0(pcString);
@@ -1286,7 +1294,7 @@ bool TESRace::GetBodyTexture(
             ::new (static_cast<void*>(&kFilename)) NiFixedString(static_cast<const char*>(pcString));
         static_cast<NiSourceTexture*>(aspOutModTexture.m_pObject)->NiSourceTexture::SetFilename(*pFilename);
         kFilename.~NiFixedString();
-        BSTexturePalette::SetTexture(aspOutModTexture.m_pObject, 0);
+        BSTexturePalette::SetTexture(aspOutModTexture.m_pObject, nullptr);
     }
     bResult = true;
 done:
@@ -1353,14 +1361,14 @@ char TESRace::GetDefaultHairColor(TESActorBase::SEX aeSex) {
 }
 
 void TESRace::GetFaceGenData(TESNPC* apNPC, FaceGenNpcData& arNpcData, TESActorBase::SEX aeSex, bool abNoModTextures) {
-    bool byoungplayer = 0;
+    bool byoungplayer = false;
     if (apNPC) {
         apNPC->GetFaceCoord((&arNpcData)->FaceCoord);
         aeSex = apNPC->GetSex();
         if (apNPC == pPlayer->GetObjectReference()) {
-            arNpcData.bPlayer = 1;
+            arNpcData.bPlayer = true;
             if (pPlayer->IsPCYoung()) {
-                byoungplayer = 1;
+                byoungplayer = true;
             }
         }
     }
@@ -1369,7 +1377,7 @@ void TESRace::GetFaceGenData(TESNPC* apNPC, FaceGenNpcData& arNpcData, TESActorB
         if (!pcoord) {
             pcoord = BSFaceGenManager::GetFaceGenCoord();
         }
-        BSFaceGenManager::CopyFaceGenCoord(pcoord, &arNpcData.FaceCoord, 0, 0);
+        BSFaceGenManager::CopyFaceGenCoord(pcoord, &arNpcData.FaceCoord, false, false);
     }
     if (apNPC) {
         TESHair* Hair;
@@ -1399,7 +1407,7 @@ void TESRace::GetFaceGenData(TESNPC* apNPC, FaceGenNpcData& arNpcData, TESActorB
         arNpcData.pHeadPartNodeName.Add(pNodeName);
         if (apNPC) {
             if (TESRace::bFaceGenTexturing.Bool() && !abNoModTextures) {
-                NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(0));
+                NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(nullptr));
                 apNPC->GetHeadPartModTexture(epart, spTempTexture);
                 arNpcData.spTexBaseMod.Add(spTempTexture);
             }
@@ -1458,7 +1466,7 @@ TESTexture* TESRace::GetBodyPartTexture(TESActorBase::SEX aeSex, RACE_BODY_PART 
         return &ppBodyTextureFiles[aeSex][aePart];
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -1514,48 +1522,48 @@ bool TESRace::CreateHead(
     FNVD_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_FACEGEN_SYSTEM, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESRace.cpp", 1571
+        MEM_CONTEXT_FACEGEN_SYSTEM, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESRace.cpp", 1571
     );
-    apOutNodeBiped = 0;
-    apOutNodeSkinned = 0;
+    apOutNodeBiped = nullptr;
+    apOutNodeSkinned = nullptr;
     BSFaceGenAnimationData* v20 =
         static_cast<BSFaceGenAnimationData*>(NiMemObject::operator new(sizeof(BSFaceGenAnimationData)));
     if (v20) {
         panimData = ::new (v20) BSFaceGenAnimationData;
     }
     else {
-        panimData = 0;
+        panimData = nullptr;
     }
     BSFaceGenNiNode* v18 = static_cast<BSFaceGenNiNode*>(NiMemObject::operator new(sizeof(BSFaceGenNiNode)));
     if (v18) {
         v11 = ::new (v18) BSFaceGenNiNode;
     }
     else {
-        v11 = 0;
+        v11 = nullptr;
     }
     apOutNodeBiped = v11;
     NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString("BSFaceGenNiNodeBiped");
     apOutNodeBiped->SetName(*a2);
     apString.~NiFixedString();
     apOutNodeBiped->SetAnimationData(panimData);
-    apOutNodeBiped->SetAnimationUpdate(1);
-    apOutNodeBiped->SetApplyRotToParent(1);
+    apOutNodeBiped->SetAnimationUpdate(true);
+    apOutNodeBiped->SetApplyRotToParent(true);
     BSFaceGenNiNode* v15 = static_cast<BSFaceGenNiNode*>(NiMemObject::operator new(sizeof(BSFaceGenNiNode)));
     if (v15) {
         v9 = ::new (v15) BSFaceGenNiNode;
     }
     else {
-        v9 = 0;
+        v9 = nullptr;
     }
     apOutNodeSkinned = v9;
     NiFixedString* kName = ::new (static_cast<void*>(&v14)) NiFixedString("BSFaceGenNiNodeSkinned");
     apOutNodeSkinned->SetName(*kName);
     v14.~NiFixedString();
     apOutNodeSkinned->SetAnimationData(panimData);
-    apOutNodeSkinned->SetAnimationUpdate(0);
-    apOutNodeSkinned->SetApplyRotToParent(0);
+    apOutNodeSkinned->SetAnimationUpdate(false);
+    apOutNodeSkinned->SetApplyRotToParent(false);
     FaceGenNpcData npcData;
-    GetFaceGenData(apNPC, npcData, aeSex, 0);
+    GetFaceGenData(apNPC, npcData, aeSex, false);
     BSFaceGenManager::CreateFaceGenHead(apOutNodeBiped, apOutNodeSkinned, npcData, abForceNoSkinning);
     if (abPrepareObjects) {
         BSFaceGenManager::PrepareHeadForShaders(apOutNodeBiped, npcData);
@@ -1563,11 +1571,11 @@ bool TESRace::CreateHead(
     }
     if (apNPC) {
         if (apNPC->iFormID == 7) {
-            apOutNodeBiped->SetIAmPlayerCharacter(1);
-            apOutNodeSkinned->SetIAmPlayerCharacter(1);
+            apOutNodeBiped->SetIAmPlayerCharacter(true);
+            apOutNodeSkinned->SetIAmPlayerCharacter(true);
         }
     }
-    return 1;
+    return true;
 }
 
 RACE_BODY_PART TESRace::BodyPartToRaceBodyPart(BIPED_OBJECT aePart) {
@@ -1575,7 +1583,7 @@ RACE_BODY_PART TESRace::BodyPartToRaceBodyPart(BIPED_OBJECT aePart) {
         return (RACE_BODY_PART)(((int32_t)aePart) - 2);
     }
     else {
-        return (RACE_BODY_PART)((-1));
+        return (RACE_BODY_PART)(-1);
     }
 }
 

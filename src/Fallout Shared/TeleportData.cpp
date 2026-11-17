@@ -164,13 +164,13 @@ BGSWorldLocation* DoorTeleportData::GetTeleportWorldLocation(BGSWorldLocation* a
 bool DoorTeleportData::Compare(DoorTeleportData* apCompare) {
     TESObjectREFR* LinkedDoor = pLinkedDoor;
     if (LinkedDoor != apCompare->pLinkedDoor) {
-        return 1;
+        return true;
     }
     if ((&position)->operator!=(*&apCompare->position)) {
-        return 1;
+        return true;
     }
     if ((&rotation)->operator!=(*&apCompare->rotation)) {
-        return 1;
+        return true;
     }
     return cFlags != apCompare->cFlags;
 }

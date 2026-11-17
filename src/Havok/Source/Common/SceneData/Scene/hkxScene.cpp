@@ -40,11 +40,11 @@ hkxScene::~hkxScene() {}
 
 hkxNode* hkxScene::findNodeByName(const char* name) const {
     if (!name) {
-        return 0;
+        return nullptr;
     }
     hkxNode* m_pntr = m_rootNode.val();
     if (!m_pntr) {
-        return 0;
+        return nullptr;
     }
     const char* m_stringAndFlag = m_pntr->m_name.m_stringAndFlag;
     if ((reinterpret_cast<uintptr_t>(m_stringAndFlag) & ~uintptr_t(1)) == 0 ||

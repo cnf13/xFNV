@@ -84,7 +84,7 @@ void BSFaceGenBaseMorphExtraData::InitSDM() {
         FOD = ::new (static_cast<void*>(v1)) NiFixedString("FOD");
     }
     else {
-        FOD = 0;
+        FOD = nullptr;
     }
     BSFaceGenBaseMorphExtraData::pTag = FOD;
 }
@@ -127,7 +127,7 @@ void BSFaceGenMorphDataHead::ApplyMorph(
     BSFaceGenBaseMorphExtraData* apBaseMorph,
     float afModifier
 ) {
-    BSFaceGenMorph* pMorph = 0;
+    BSFaceGenMorph* pMorph = nullptr;
     switch (aeType) {
         case BS_FG_MORPH_PHONEME: {
             pMorph = GetPhonemeMorph(static_cast<BS_FACEGEN_PHONEME>(aiIndex));

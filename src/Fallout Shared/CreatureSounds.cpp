@@ -26,7 +26,7 @@ void CreatureSounds::FreeCreatureSoundList(CREATURE_SOUND_TYPE aeType) {
     if (v3) {
         delete static_cast<BSSimpleList<ActiveEffect*>*>(v3);
     }
-    pSoundListArray[aeType] = 0;
+    pSoundListArray[aeType] = nullptr;
 }
 
 void CreatureSounds::Copy(CreatureSounds* apCopy) {
@@ -125,12 +125,12 @@ void CreatureSounds::AddCreatureSound(CREATURE_SOUND* apSound, CREATURE_SOUND_TY
                     v4 = ::new (v6) BSSimpleList<CREATURE_SOUND*>;
                 }
                 else {
-                    v4 = 0;
+                    v4 = nullptr;
                 }
                 pSoundListArray[aeType] = v4;
             }
             BSSimpleList<CREATURE_SOUND*>* plist = GetCreatureSoundList(aeType);
-            BSSimpleList<CREATURE_SOUND*>* plastlist = 0;
+            BSSimpleList<CREATURE_SOUND*>* plastlist = nullptr;
             while (plist) {
                 if (plist->IsEmpty()) {
                     break;
@@ -155,7 +155,7 @@ void CreatureSounds::AddCreatureSound(CREATURE_SOUND* apSound, CREATURE_SOUND_TY
 }
 
 BSSimpleList<CREATURE_SOUND*>* CreatureSounds::GetCreatureSoundList(CREATURE_SOUND_TYPE aeType) {
-    BSSimpleList<CREATURE_SOUND*>* v3 = 0;
+    BSSimpleList<CREATURE_SOUND*>* v3 = nullptr;
     if (aeType >= CREA_SOUND_LEFT && aeType < CREA_SOUND_COUNT) {
         v3 = pSoundListArray[aeType];
     }
@@ -186,7 +186,7 @@ void CreatureSounds::Save() {
 
 bool CreatureSounds::Compare(CreatureSounds* apCompare) {
     if (!apCompare) {
-        return 1;
+        return true;
     }
     for (char i = 0; i < 22; ++i) {
         BSSimpleList<CREATURE_SOUND*>* pcomplist;
@@ -196,18 +196,18 @@ bool CreatureSounds::Compare(CreatureSounds* apCompare) {
             CREATURE_SOUND* m_item = plist->m_item;
             CREATURE_SOUND* v5 = pcomplist->m_item;
             if (m_item->iChance != v5->iChance) {
-                return 1;
+                return true;
             }
             if (m_item->pSound != v5->pSound) {
-                return 1;
+                return true;
             }
             plist = plist->m_pkNext;
         }
         if (plist || pcomplist) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void CreatureSounds::operator delete(void* apMemory) {

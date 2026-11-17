@@ -93,22 +93,22 @@ void BSTreeModel::Update(BSTreeNode* apNode) {
             flod = pSpeedTree->GetLodLevel();
         }
         pSpeedTree->GetBSGeometryLODData(geom, flod);
-        bool bdrawnode = 0;
+        bool bdrawnode = false;
         if (geom.m_sBillboard0.m_bIsActive) {
-            bdrawnode = 1;
+            bdrawnode = true;
             apNode->SetVisibilityOnBillboard(static_cast<int32_t>(geom.m_sBillboard0.m_fAlphaTestValue));
         }
         apNode->SetVisibilityForBillboards(bdrawnode);
         if (!(flod <= 0.0)) {
             int16_t slevel;
-            bdrawnode = 0;
+            bdrawnode = false;
             int16_t slevels = GetNumBranchLODLevels();
             if (slevels > 0) {
                 float a4 = pSpeedTree->GetLodLevel();
                 int16_t slevelVisible = pSpeedTree->GetDiscreteBranchLodLevel(a4);
                 for (slevel = 0; slevel < slevels; ++slevel) {
                     if (slevelVisible == slevel) {
-                        bdrawnode = 1;
+                        bdrawnode = true;
                         apNode->SetVisibilityOnBranch(slevel, static_cast<int32_t>(geom.m_fBranchAlphaTestValue));
                     }
                     else {
@@ -118,20 +118,20 @@ void BSTreeModel::Update(BSTreeNode* apNode) {
             }
             apNode->SetVisibilityForBranches(bdrawnode);
             if (BSTreeManager::AreLeavesVisible()) {
-                bdrawnode = 0;
+                bdrawnode = false;
                 int16_t slevels_2 = GetNumLeafLODLevels();
                 if (slevels_2 > 0) {
                     if (geom.m_sLeaves0.m_bIsActive || geom.m_sLeaves1.m_bIsActive) {
                         for (slevel = 0; slevel < slevels_2; ++slevel) {
                             if (geom.m_sLeaves0.m_bIsActive && geom.m_sLeaves0.m_nDiscreteLodLevel == slevel) {
-                                bdrawnode = 1;
+                                bdrawnode = true;
                                 apNode->SetVisibilityOnLeaf(
                                     slevel, static_cast<int32_t>(geom.m_sLeaves0.m_fAlphaTestValue)
                                 );
                             }
                             else {
                                 if (geom.m_sLeaves1.m_bIsActive && geom.m_sLeaves1.m_nDiscreteLodLevel == slevel) {
-                                    bdrawnode = 1;
+                                    bdrawnode = true;
                                     apNode->SetVisibilityOnLeaf(
                                         slevel, static_cast<int32_t>(geom.m_sLeaves1.m_fAlphaTestValue)
                                     );
@@ -158,13 +158,13 @@ void BSTreeModel::Update(BSTreeNode* apNode) {
                 geom.Destroy();
             }
             else {
-                apNode->SetVisibilityForLeaves(0);
+                apNode->SetVisibilityForLeaves(false);
                 geom.Destroy();
             }
         }
         else {
-            apNode->SetVisibilityForBranches(0);
-            apNode->SetVisibilityForLeaves(0);
+            apNode->SetVisibilityForBranches(false);
+            apNode->SetVisibilityForLeaves(false);
             geom.Destroy();
         }
     }
@@ -175,13 +175,13 @@ void BSTreeModel::Update(BSTreeNode* apNode) {
 
 BSTreeNode* BSTreeModel::CreateArt(float afScale) {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_TREEART, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeModel.cpp",
+        MEM_CONTEXT_TREEART, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeModel.cpp",
         901
     );
-    BSTreeNode* v26 = 0;
+    BSTreeNode* v26 = nullptr;
     // Holds the branch and billboard nodes and is never read, as the game does.
-    [[maybe_unused]] NiNode* pnode = 0;
-    NiPointer<bhkRigidBody> sprigid(static_cast<bhkRigidBody*>(0));
+    [[maybe_unused]] NiNode* pnode = nullptr;
+    NiPointer<bhkRigidBody> sprigid(static_cast<bhkRigidBody*>(nullptr));
     if (pSpeedTree) {
         BSTreeNode* pretval;
         uint16_t slevels;
@@ -190,7 +190,7 @@ BSTreeNode* BSTreeModel::CreateArt(float afScale) {
         NiTriBasedGeom* pgeom_2;
         NiAlphaProperty* ppropAlpha;
         if (!(fTrunkHeight > 64.0)) {
-            sprigid.operator=(static_cast<bhkRigidBody*>(0));
+            sprigid.operator=(static_cast<bhkRigidBody*>(nullptr));
         }
         else {
             if (afScale == 1.0) {
@@ -207,7 +207,7 @@ BSTreeNode* BSTreeModel::CreateArt(float afScale) {
             pretval = ::new (v21) BSTreeNode(this, sprigid.m_pObject);
         }
         else {
-            pretval = 0;
+            pretval = nullptr;
         }
         if (pspBranchData) {
             if (pspBranchShaderProperties) {
@@ -222,12 +222,12 @@ BSTreeNode* BSTreeModel::CreateArt(float afScale) {
                             pgeom = (NiTriBasedGeom*)::new (v20) NiTriStrips(pspBranchData[slevel].m_pObject);
                         }
                         else {
-                            pgeom = 0;
+                            pgeom = nullptr;
                         }
                         pgeom_2 = pgeom;
                         ppropAlpha = BSTreeModel::CreateAlphaProperty();
                         if (ppropAlpha) {
-                            ppropAlpha->SetAlphaTesting(0);
+                            ppropAlpha->SetAlphaTesting(false);
                             pgeom_2->AttachProperty(ppropAlpha);
                         }
                         if (pspBranchShaderProperties[slevel].m_pObject) {
@@ -277,7 +277,7 @@ BSTreeNode* BSTreeModel::CreateArt(float afScale) {
                             pgeom_3 = (NiTriBasedGeom*)::new (v19) NiTriShape(pspLeafData[slevel].m_pObject);
                         }
                         else {
-                            pgeom_3 = 0;
+                            pgeom_3 = nullptr;
                         }
                         pgeom_2 = pgeom_3;
                         ppropAlpha = BSTreeModel::CreateAlphaProperty();
@@ -303,18 +303,18 @@ BSTreeNode* BSTreeModel::CreateArt(float afScale) {
             pretval->SetBillboard(a5c);
         }
         pretval->UpdateProperties();
-        NiUpdateData UpdateData(0.0f, 0, 0);
+        NiUpdateData UpdateData(0.0f, false, false);
         pretval->UpdateSelected(UpdateData);
         pretval->MakeHavokLeaves(pSpeedTree, afScale);
         return pretval;
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 
 void BSTreeModel::ApplyBaseObject(TESObjectTREE* apTreeObj) {
-    NiPointer<NiSourceTexture> sptex(0);
+    NiPointer<NiSourceTexture> sptex(nullptr);
     if (apTreeObj && (pSpeedTree && !IsInstance())) {
         float fTreeForceBranchDimming = SpeedTree::fTreeForceBranchDimming::Get();
         if (fTreeForceBranchDimming < 0.0 || fTreeForceBranchDimming > 1.0) {
@@ -348,7 +348,7 @@ void BSTreeModel::ApplyBaseObject(TESObjectTREE* apTreeObj) {
             pSpeedTree->SetBudAngleMax(fmax);
         }
         AutoMemContext tempMemContext(
-            MEM_CONTEXT_TREEART, 1,
+            MEM_CONTEXT_TREEART, true,
             "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeModel.cpp", 145
         );
         if (!spBranchTextureSet.m_pObject) {
@@ -364,14 +364,14 @@ void BSTreeModel::ApplyBaseObject(TESObjectTREE* apTreeObj) {
             Src[itemp - 3] = 100;
             Src[itemp - 2] = 100;
             Src[itemp - 1] = 115;
-            BSShaderManager::GetModifiedTextureFilename(a1, Src, "_n", 1);
+            BSShaderManager::GetModifiedTextureFilename(a1, Src, "_n", true);
             BSShaderTextureSet* v9 =
                 static_cast<BSShaderTextureSet*>(NiMemObject::operator new(sizeof(BSShaderTextureSet)));
             if (v9) {
                 v6 = ::new (v9) BSShaderTextureSet;
             }
             else {
-                v6 = 0;
+                v6 = nullptr;
             }
             spBranchTextureSet.operator=(v6);
             BSShaderTextureSet* v5 = spBranchTextureSet.m_pObject;
@@ -384,7 +384,7 @@ void BSTreeModel::ApplyBaseObject(TESObjectTREE* apTreeObj) {
                 char Dst[268];
                 BSstrcpy(Dst, 260, "Textures\\Trees\\Leaves\\");
                 BSstrcat(Dst, 260, apTreeObj->GetTextureName());
-                TES::pInstance->CreateTextureImage(Dst, spLeafFrondTexture, 1, 0);
+                TES::pInstance->CreateTextureImage(Dst, spLeafFrondTexture, true, false);
             }
         }
         if (!spBillboardTextureSet.m_pObject) {
@@ -397,7 +397,7 @@ void BSTreeModel::ApplyBaseObject(TESObjectTREE* apTreeObj) {
                 v3 = ::new (v8) BSShaderTextureSet;
             }
             else {
-                v3 = 0;
+                v3 = nullptr;
             }
             spBillboardTextureSet.operator=(v3);
             BSShaderTextureSet* v2 = spBillboardTextureSet.m_pObject;
@@ -413,26 +413,26 @@ void BSTreeModel::ClearModel() {
         if (pspBranchData) {
             delete[] pspBranchData;
         }
-        pspBranchData = 0;
+        pspBranchData = nullptr;
     }
     if (pspLeafData) {
         delete[] pspLeafData;
-        pspLeafData = 0;
+        pspLeafData = nullptr;
     }
-    spBillboard.operator=(static_cast<NiTriShape*>(0));
-    spLeafShaderData.operator=(static_cast<STLSPData*>(0));
+    spBillboard.operator=(static_cast<NiTriShape*>(nullptr));
+    spLeafShaderData.operator=(static_cast<STLSPData*>(nullptr));
     if (pspBranchShaderProperties) {
         delete[] pspBranchShaderProperties;
-        pspBranchShaderProperties = 0;
+        pspBranchShaderProperties = nullptr;
     }
     if (pspLeafShaderProperties) {
         delete[] pspLeafShaderProperties;
-        pspLeafShaderProperties = 0;
+        pspLeafShaderProperties = nullptr;
     }
-    spBranchTextureSet.operator=(static_cast<BSShaderTextureSet*>(0));
-    spLeafFrondTexture.operator=(static_cast<NiSourceTexture*>(0));
-    spBillboardTextureSet.operator=(static_cast<BSShaderTextureSet*>(0));
-    spRigidBody.operator=(static_cast<bhkRigidBody*>(0));
+    spBranchTextureSet.operator=(static_cast<BSShaderTextureSet*>(nullptr));
+    spLeafFrondTexture.operator=(static_cast<NiSourceTexture*>(nullptr));
+    spBillboardTextureSet.operator=(static_cast<BSShaderTextureSet*>(nullptr));
+    spRigidBody.operator=(static_cast<bhkRigidBody*>(nullptr));
 }
 
 void BSTreeModel::CreateGeometry(TESObjectTREE* apTreeObj) {
@@ -445,7 +445,7 @@ void BSTreeModel::CreateGeometry(TESObjectTREE* apTreeObj) {
             if (apTreeObj->IsLargeEnoughForDistantLOD()) {
                 CreateBillboardGeometry(apTreeObj);
             }
-            spRigidBody.operator=(static_cast<bhkRigidBody*>(0));
+            spRigidBody.operator=(static_cast<bhkRigidBody*>(nullptr));
             const char* v2 = apTreeObj->GetModel();
             BSstrcpy(Dst, 260, v2);
             int32_t ilen = BSstrlen(Dst);
@@ -456,8 +456,8 @@ void BSTreeModel::CreateGeometry(TESObjectTREE* apTreeObj) {
             BSstrcpy(pcSrc, 260, "Data\\Meshes\\Trees");
             BSstrcat(pcSrc, 260, Dst);
             BSstrcat(pcSrc, 260, ".NIF");
-            if (FileFinder::Locate(pcSrc, 0, 6u, 1u)) {
-                if (stream.BSStream::Load(pcSrc, static_cast<NiFile*>(0)) && stream.GetObjectCount() == 1) {
+            if (FileFinder::Locate(pcSrc, nullptr, 6u, 1u)) {
+                if (stream.BSStream::Load(pcSrc, static_cast<NiFile*>(nullptr)) && stream.GetObjectCount() == 1) {
                     bhkRigidBody* WorldObject;
                     NiObject* pniObj = stream.GetObjectAt(0);
                     NiAVObject* pniAVObj =
@@ -467,7 +467,7 @@ void BSTreeModel::CreateGeometry(TESObjectTREE* apTreeObj) {
                         WorldObject = static_cast<bhkRigidBody*>(pcol->GetWorldObject());
                     }
                     else {
-                        WorldObject = 0;
+                        WorldObject = nullptr;
                     }
                     if (WorldObject) {
                         spRigidBody.operator=(WorldObject);
@@ -484,7 +484,7 @@ void BSTreeModel::CreateGeometry(TESObjectTREE* apTreeObj) {
 
 uint16_t BSTreeModel::GetNumBranchLODLevels() {
     if (pSpeedTree) {
-        return (uint16_t)pSpeedTree->GetNumBranchLodLevels();
+        return pSpeedTree->GetNumBranchLodLevels();
     }
     else {
         return (uint16_t)0;
@@ -525,14 +525,14 @@ void BSTreeModel::CreateBranchGeometry() {
         if (pspOldBranchData) {
             delete[] pspOldBranchData;
         }
-        this->pspBranchData = 0;
+        this->pspBranchData = nullptr;
     }
     if (this->pspBranchShaderProperties) {
         NiPointer<SpeedTreeBranchShaderProperty>* pspOldProperties = this->pspBranchShaderProperties;
         if (pspOldProperties) {
             delete[] pspOldProperties;
         }
-        this->pspBranchShaderProperties = 0;
+        this->pspBranchShaderProperties = nullptr;
     }
     slevels = GetNumBranchLODLevels();
     if (slevels &&
@@ -546,8 +546,8 @@ void BSTreeModel::CreateBranchGeometry() {
         this->pspBranchData = new NiPointer<NiTriStripsData>[slevels];
         this->pspBranchShaderProperties = new NiPointer<SpeedTreeBranchShaderProperty>[slevels];
         for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
-            this->pspBranchData[slevel].operator=(static_cast<NiTriStripsData*>(0));
-            this->pspBranchShaderProperties[slevel].operator=(static_cast<SpeedTreeBranchShaderProperty*>(0));
+            this->pspBranchData[slevel].operator=(static_cast<NiTriStripsData*>(nullptr));
+            this->pspBranchShaderProperties[slevel].operator=(static_cast<SpeedTreeBranchShaderProperty*>(nullptr));
         }
         if (geom.m_sBranches.m_pTangents) {
             if (geom.m_sBranches.m_pBinormals) {
@@ -586,7 +586,7 @@ void BSTreeModel::CreateBranchGeometry() {
                         bool* vertFlags = static_cast<bool*>(ourMalloc(geom.m_sBranches.m_usVertexCount));
                         ourMemset(vertFlags, 0, geom.m_sBranches.m_usVertexCount);
                         for (index = 0; index < *pcompositeStripLength; ++index) {
-                            vertFlags[pcompositeStrip[index]] = 1;
+                            vertFlags[pcompositeStrip[index]] = true;
                         }
                         NiTPrimitiveArray<uint32_t> vertsUsed(0, 1u);
                         for (svert = 0; svert < static_cast<int32_t>(geom.m_sBranches.m_usVertexCount); ++svert) {
@@ -626,9 +626,9 @@ void BSTreeModel::CreateBranchGeometry() {
                         if (ptex) {
                             rt::eh_vector_constructor_iterator(ptex, sizeof(NiPoint2), count, &emptyPointConstructor);
                         }
-                        NiPoint3* pnormals_2 = 0;
-                        NiPoint3* ptangents = 0;
-                        NiPoint3* pbinormals = 0;
+                        NiPoint3* pnormals_2 = nullptr;
+                        NiPoint3* ptangents = nullptr;
+                        NiPoint3* pbinormals = nullptr;
                         if (geom.m_sBranches.m_pTangents && geom.m_sBranches.m_pBinormals) {
                             // One array holds the normals, then the binormals, then the tangents.
                             uint32_t aiCount = 3 * vertsUsed.m_usSize;
@@ -644,7 +644,7 @@ void BSTreeModel::CreateBranchGeometry() {
                             pbinormals = &pnormals_2[v6];
                             uint32_t v7 = vertsUsed.m_usSize;
                             ptangents = &pnormals_2[2 * v7];
-                            btangentSpace = 1;
+                            btangentSpace = true;
                         }
                         else {
                             uint32_t aiCount_1 = vertsUsed.m_usSize;
@@ -656,7 +656,7 @@ void BSTreeModel::CreateBranchGeometry() {
                                     pnormals_2, sizeof(NiPoint3), aiCount_1, &emptyPointConstructor
                                 );
                             }
-                            btangentSpace = 0;
+                            btangentSpace = false;
                         }
                         for (svert = 0;; ++svert) {
                             uint32_t svert_2 = svert;
@@ -722,7 +722,7 @@ void BSTreeModel::CreateBranchGeometry() {
                             STSPData_ = ::new (v43) STSPData;
                         }
                         else {
-                            STSPData_ = 0;
+                            STSPData_ = nullptr;
                         }
                         NiPointer<STSPData> spshaderData(STSPData_);
                         uint16_t asVertexCount = vertsUsed.m_usSize;
@@ -740,7 +740,7 @@ void BSTreeModel::CreateBranchGeometry() {
                             );
                         }
                         else {
-                            NiTriStripsData_ = 0;
+                            NiTriStripsData_ = nullptr;
                         }
                         this->pspBranchData[slevel].operator=(NiTriStripsData_);
                         this->pspBranchData[slevel].m_pObject->SetConsistency(NiGeometryData::STATIC);
@@ -754,7 +754,7 @@ void BSTreeModel::CreateBranchGeometry() {
                                 ::new (apMemory) SpeedTreeBranchShaderProperty(spshaderData.m_pObject);
                         }
                         else {
-                            SpeedTreeBranchShaderProperty_ = 0;
+                            SpeedTreeBranchShaderProperty_ = nullptr;
                         }
                         this->pspBranchShaderProperties[slevel].operator=(SpeedTreeBranchShaderProperty_);
                     }
@@ -762,10 +762,10 @@ void BSTreeModel::CreateBranchGeometry() {
             }
         }
         pSpeedTree->FreeBranchColors();
-        geom.m_sBranches.m_pColors = 0;
+        geom.m_sBranches.m_pColors = nullptr;
         pSpeedTree->FreeBranchWindData();
-        geom.m_sBranches.m_pWindWeights = 0;
-        geom.m_sBranches.m_pWindMatrixIndices = 0;
+        geom.m_sBranches.m_pWindWeights = nullptr;
+        geom.m_sBranches.m_pWindMatrixIndices = nullptr;
         geom.Destroy();
     }
     else {
@@ -783,10 +783,10 @@ void BSTreeModel::CreateLeafGeometry(TESObjectTREE* apTreeObj) {
     geom.Init_00B029F0();
     textures.~STextures();
     ::new (&textures) CSpeedTreeRT::STextures;
-    const NiPoint3* pcoords = 0;
-    const NiPoint3* pnormals = 0;
-    ::new (&spshaderData) NiPointer<STSPData>(static_cast<STSPData*>(0));
-    bool bflip = 0;
+    const NiPoint3* pcoords = nullptr;
+    const NiPoint3* pnormals = nullptr;
+    ::new (&spshaderData) NiPointer<STSPData>(static_cast<STSPData*>(nullptr));
+    bool bflip = false;
     if (!pSpeedTree) {
         goto LABEL_15;
     }
@@ -801,14 +801,14 @@ void BSTreeModel::CreateLeafGeometry(TESObjectTREE* apTreeObj) {
         if (pspOldLeafData) {
             delete[] pspOldLeafData;
         }
-        this->pspLeafData = 0;
+        this->pspLeafData = nullptr;
     }
     if (this->pspLeafShaderProperties) {
         NiPointer<SpeedTreeLeafShaderProperty>* pspOldProperties = this->pspLeafShaderProperties;
         if (pspOldProperties) {
             delete[] pspOldProperties;
         }
-        this->pspLeafShaderProperties = 0;
+        this->pspLeafShaderProperties = nullptr;
     }
     slevels = GetNumLeafLODLevels();
     if (slevels && (pSpeedTree->GetTextures(textures), (smaps = textures.m_uiLeafTextureCount) != 0)) {
@@ -817,22 +817,22 @@ void BSTreeModel::CreateLeafGeometry(TESObjectTREE* apTreeObj) {
         for (uint16_t smap = 0; smap < static_cast<int32_t>(smaps); ++smap) {
             for (uint16_t smap2 = smap + 1; smap2 < static_cast<int32_t>(smaps); ++smap2) {
                 if (BSstrcmp(textures.m_pLeafTextureFilenames[smap], textures.m_pLeafTextureFilenames[smap2])) {
-                    bflip = 1;
+                    bflip = true;
                 }
             }
         }
         this->pspLeafData = new NiPointer<NiTriShapeData>[slevels];
         this->pspLeafShaderProperties = new NiPointer<SpeedTreeLeafShaderProperty>[slevels];
         for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
-            this->pspLeafData[slevel].operator=(static_cast<NiTriShapeData*>(0));
-            this->pspLeafShaderProperties[slevel].operator=(static_cast<SpeedTreeLeafShaderProperty*>(0));
+            this->pspLeafData[slevel].operator=(static_cast<NiTriShapeData*>(nullptr));
+            this->pspLeafShaderProperties[slevel].operator=(static_cast<SpeedTreeLeafShaderProperty*>(nullptr));
         }
         STLSPData* v71 = static_cast<STLSPData*>(NiMemObject::operator new(sizeof(STLSPData)));
         if (v71) {
             STLSPData_ = ::new (v71) STLSPData;
         }
         else {
-            STLSPData_ = 0;
+            STLSPData_ = nullptr;
         }
         spLeafShaderData.operator=(STLSPData_);
         spLeafShaderData.m_pObject->SetCurveScalar(fCurveScalar);
@@ -969,7 +969,7 @@ void BSTreeModel::CreateLeafGeometry(TESObjectTREE* apTreeObj) {
                     );
                 }
                 else {
-                    NiTriShapeData_ = 0;
+                    NiTriShapeData_ = nullptr;
                 }
                 this->pspLeafData[slevel].operator=(NiTriShapeData_);
                 STSPData* v54 = static_cast<STSPData*>(NiMemObject::operator new(sizeof(STSPData)));
@@ -977,7 +977,7 @@ void BSTreeModel::CreateLeafGeometry(TESObjectTREE* apTreeObj) {
                     STSPData_ = ::new (v54) STSPData;
                 }
                 else {
-                    STSPData_ = 0;
+                    STSPData_ = nullptr;
                 }
                 spshaderData.operator=(STSPData_);
                 spshaderData.m_pObject->SetData(pwindinfo, sverts);
@@ -991,13 +991,13 @@ void BSTreeModel::CreateLeafGeometry(TESObjectTREE* apTreeObj) {
                         ::new (v53) SpeedTreeLeafShaderProperty(slevel, pShaderData, pLeafData);
                 }
                 else {
-                    SpeedTreeLeafShaderProperty_ = 0;
+                    SpeedTreeLeafShaderProperty_ = nullptr;
                 }
                 this->pspLeafShaderProperties[slevel].operator=(SpeedTreeLeafShaderProperty_);
                 SpeedTreeLeafShaderProperty* v41 = this->pspLeafShaderProperties[slevel].m_pObject;
                 v41->SetBaseTexture(spLeafFrondTexture.m_pObject);
                 SpeedTreeLeafShaderProperty* v40 = this->pspLeafShaderProperties[slevel].m_pObject;
-                NiAdditionalGeometryData* apAdditionalGeomData = v40->CreateRendererSpecificProperty(0);
+                NiAdditionalGeometryData* apAdditionalGeomData = v40->CreateRendererSpecificProperty(nullptr);
                 this->pspLeafData[slevel].m_pObject->SetAdditionalGeometryData(apAdditionalGeomData);
                 this->pspLeafData[slevel].m_pObject->SetConsistency(NiGeometryData::STATIC);
                 this->pspLeafData[slevel].m_pObject->m_ucKeepFlags = 17u;
@@ -1038,8 +1038,8 @@ void BSTreeModel::CreateBillboardGeometry(TESObjectTREE* apTreeObj) {
         CSpeedTreeRT::GetCamera(fcameraPosOld, fcameraDirOld);
         CSpeedTreeRT::SetCamera(fcameraPos, pDirection);
         pSpeedTree->SetLodLevel(0.0f);
-        ::new (&spBillboardData) NiPointer<NiTriShapeData>(static_cast<NiTriShapeData*>(0));
-        apTreeObj->CreateBillboardGeomData(0, spBillboardData);
+        ::new (&spBillboardData) NiPointer<NiTriShapeData>(static_cast<NiTriShapeData*>(nullptr));
+        apTreeObj->CreateBillboardGeomData(false, spBillboardData);
         spBillboardData.m_pObject->SetConsistency(NiGeometryData::STATIC);
         spBillboardData.m_pObject->m_ucKeepFlags = 17u;
         spBillboardData.m_pObject->SetCompressFlags(1u);
@@ -1048,7 +1048,7 @@ void BSTreeModel::CreateBillboardGeometry(TESObjectTREE* apTreeObj) {
             v10 = ::new (apMemory) NiTriShape(spBillboardData.m_pObject);
         }
         else {
-            v10 = 0;
+            v10 = nullptr;
         }
         spBillboard.operator=(v10);
         ::new (&ppropAlpha) NiPointer<NiAlphaProperty>(BSTreeModel::CreateAlphaProperty());
@@ -1062,7 +1062,7 @@ void BSTreeModel::CreateBillboardGeometry(TESObjectTREE* apTreeObj) {
             pbillboardProp = ::new (v12) SpeedTreeBillboardShaderProperty;
         }
         else {
-            pbillboardProp = 0;
+            pbillboardProp = nullptr;
         }
         spBillboard.m_pObject->AttachProperty(pbillboardProp);
         BSShaderTextureSet* a2 = spBillboardTextureSet.m_pObject;
@@ -1078,14 +1078,14 @@ void BSTreeModel::CreateBillboardGeometry(TESObjectTREE* apTreeObj) {
             // Shader types 1 to 5 are the ShadowLightShader family; the type getter is called twice.
             if (pshade->GetShaderType() < BSShaderManager::BSSM_SHADERTYPE_SHADOWLIGHT_FIRST ||
                 pshade->GetShaderType() > BSShaderManager::BSSM_SHADERTYPE_SHADOWLIGHT_LAST) {
-                pslshader = 0;
+                pslshader = nullptr;
             }
             else {
                 pslshader = static_cast<ShadowLightShader*>(pshade);
             }
         }
         else {
-            pslshader = 0;
+            pslshader = nullptr;
         }
         if (pslshader) {
             NiRenderer* Renderer_ = NiRenderer::GetRenderer();
@@ -1105,15 +1105,15 @@ void BSTreeModel::CreateBillboardGeometry(TESObjectTREE* apTreeObj) {
 }
 
 bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
-    BSTreeModel::kCloneLock.Enter(0);
+    BSTreeModel::kCloneLock.Enter(nullptr);
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_TREESYSTEM, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeModel.cpp",
-        1041
+        MEM_CONTEXT_TREESYSTEM, true,
+        "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeModel.cpp", 1041
     );
     if (apInstanceFrom &&
         (apInstanceFrom->pSpeedTree &&
          (!apInstanceFrom->IsInstance() &&
-          (eType == BSTreeModel::BTMT_NONE && (pSpeedTree = apInstanceFrom->pSpeedTree->MakeInstance()) != 0)))) {
+          (eType == BSTreeModel::BTMT_NONE && (pSpeedTree = apInstanceFrom->pSpeedTree->MakeInstance()) != nullptr)))) {
         uint16_t slevel;
         spTreeParent.operator=(apInstanceFrom);
         eType = BSTreeModel::BTMT_INSTANCE;
@@ -1130,7 +1130,7 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
             spRigidBody.operator=(static_cast<bhkRigidBody*>(apInstanceFrom->spRigidBody.m_pObject->Clone(cloneData)));
         }
         else {
-            spRigidBody.operator=(static_cast<bhkRigidBody*>(0));
+            spRigidBody.operator=(static_cast<bhkRigidBody*>(nullptr));
         }
         uint16_t slevels = GetNumBranchLODLevels();
         if (slevels) {
@@ -1177,7 +1177,9 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
                             pspBranchShaderProperties[slevel].operator=(a2);
                         }
                         else {
-                            pspBranchShaderProperties[slevel].operator=(static_cast<SpeedTreeBranchShaderProperty*>(0));
+                            pspBranchShaderProperties[slevel].operator=(
+                                static_cast<SpeedTreeBranchShaderProperty*>(nullptr)
+                            );
                         }
                     }
                 }
@@ -1227,7 +1229,9 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
                             pspLeafShaderProperties[slevel].operator=(a2a);
                         }
                         else {
-                            pspLeafShaderProperties[slevel].operator=(static_cast<SpeedTreeLeafShaderProperty*>(0));
+                            pspLeafShaderProperties[slevel].operator=(
+                                static_cast<SpeedTreeLeafShaderProperty*>(nullptr)
+                            );
                         }
                     }
                 }
@@ -1239,11 +1243,11 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
             NiAlphaProperty::abCloneUnique = 0;
         }
         BSTreeModel::kCloneLock.Leave();
-        return 1;
+        return true;
     }
     else {
         BSTreeModel::kCloneLock.Leave();
-        return 0;
+        return false;
     }
 }
 
@@ -1252,11 +1256,11 @@ bool BSTreeModel::InitFromBase(TESObjectTREE* apTreeObj, uint32_t aiSeed) {
     CSpeedTreeRT::STextures textures;
     char pFilename[268];
     if (!apTreeObj || !apTreeObj->GetModel() || !*apTreeObj->GetModel() || eType) {
-        return 1;
+        return true;
     }
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_TREESYSTEM, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeModel.cpp",
-        1139
+        MEM_CONTEXT_TREESYSTEM, true,
+        "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeModel.cpp", 1139
     );
     BSstrcpy(pFilename, 260, "Trees");
     const char* v3 = apTreeObj->GetModel();
@@ -1266,7 +1270,7 @@ bool BSTreeModel::InitFromBase(TESObjectTREE* apTreeObj, uint32_t aiSeed) {
         pspeedtree = ::new (v11) CSpeedTreeRT;
     }
     else {
-        pspeedtree = 0;
+        pspeedtree = nullptr;
     }
     if (pspeedtree->LoadTree(pFilename)) {
         float fsizeVar;
@@ -1286,7 +1290,7 @@ bool BSTreeModel::InitFromBase(TESObjectTREE* apTreeObj, uint32_t aiSeed) {
         else {
             pspeedtree->SetNumLeafRockingGroups(2u);
         }
-        pspeedtree->SetLeafRockingState(1);
+        pspeedtree->SetLeafRockingState(true);
         pspeedtree->GetTreeSize(fsize, fsizeVar);
         float fNewVariance = GameSetting::fTreeSizeConversion::Get() * fsizeVar;
         float fNewSize = GameSetting::fTreeSizeConversion::Get() * fsize;
@@ -1306,8 +1310,8 @@ bool BSTreeModel::InitFromBase(TESObjectTREE* apTreeObj, uint32_t aiSeed) {
         eType = BSTreeModel::BTMT_ORIGINAL;
         pSpeedTree = pspeedtree;
         ApplyBaseObject(apTreeObj);
-        if (!pspeedtree->Compute(0, aiSeed, 1)) {
-            return 0;
+        if (!pspeedtree->Compute(nullptr, aiSeed, true)) {
+            return false;
         }
         pspeedtree->FreeProjectedShadowData();
         iSeed = pspeedtree->GetSeed();
@@ -1317,12 +1321,12 @@ bool BSTreeModel::InitFromBase(TESObjectTREE* apTreeObj, uint32_t aiSeed) {
         pspeedtree->DeleteTransientData();
         pspeedtree->DeleteBranchGeometry();
         pspeedtree->DeleteFrondGeometry();
-        return 1;
+        return true;
     }
     if (pspeedtree) {
         delete pspeedtree;
     }
-    return 0;
+    return false;
 }
 
 bool BSTreeModel::IsInstance() {
@@ -1338,8 +1342,8 @@ NiAlphaProperty* BSTreeModel::CreateAlphaProperty() {
     else {
         v1 = nullptr;
     }
-    v1->SetAlphaBlending(0);
-    v1->SetAlphaTesting(1);
+    v1->SetAlphaBlending(false);
+    v1->SetAlphaTesting(true);
     v1->SetTestMode(NiAlphaProperty::TEST_GREATER);
     v1->SetTestRef(0x54u);
     return v1;

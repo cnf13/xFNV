@@ -135,7 +135,7 @@ float hkpTransformShape::getMaximumProjection(const hkVector4& direction) const 
         ),
         direction.m_quad
     );
-    return _mm_shuffle_ps(v10, v10, 170)[0] + static_cast<float>(_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
+    return _mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
 }
 
 const hkpShapeContainer* hkpTransformShape::getContainer() const {

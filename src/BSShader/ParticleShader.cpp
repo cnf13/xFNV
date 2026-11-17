@@ -48,7 +48,7 @@
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DVertexShader.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiPointer<NiTriShape> ParticleShader::spBaseGeometry;
 NiRTTI ParticleShader::ms_RTTI("ParticleShader", &NiD3DDefaultShader::ms_RTTI);
@@ -58,7 +58,7 @@ ParticleShader::ParticleShader(NiDX9ShaderDeclaration* apShaderDecl)
     Acceleration(0.0f, 0.0f, 0.0f), Color1(0.0f, 0.0f, 0.0f, 0.0f), Color2(0.0f, 0.0f, 0.0f, 0.0f),
     Color3(0.0f, 0.0f, 0.0f, 0.0f) {
     iShaderType = 14;
-    m_bUsesNiRenderState = 1;
+    m_bUsesNiRenderState = true;
     m_spShaderDecl = apShaderDecl;
     Wind.x = 0.0f;
     Wind.y = 0.0f;
@@ -94,7 +94,7 @@ void ParticleShader::SetupGeometryTextures(const NiPropertyState* apState) {
         NiD3DTextureStage* pstage = NiD3DShader::m_spCurrentPass->m_kStages.m_pBase->m_pObject;
         pstage->m_spTexture = pProperty->spBaseTexture.m_pObject;
         pstage->SetClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
-        pstage->ConfigureStage(0);
+        pstage->ConfigureStage(false);
     }
 }
 
@@ -102,7 +102,7 @@ void ParticleShader::SetupGeometryConstants(const NiPropertyState* apState) {
     int32_t v5;
     NiPoint3 windPoint_2;
     NiGeometry* pgeometry = BSShaderManager::pCurrentRenderPass->pGeometry;
-    m_pkD3DRenderer->SetModelTransform(BSShaderManager::pCurrentRenderPass->pGeometry->m_kWorld, 0);
+    m_pkD3DRenderer->SetModelTransform(BSShaderManager::pCurrentRenderPass->pGeometry->m_kWorld, false);
     NiProperty* m_pObject = apState->m_aspProps[3].m_pObject;
     if (m_pObject) {
         v5 = static_cast<NiShadeProperty*>(m_pObject)->iShaderPropertyType ==
@@ -111,7 +111,7 @@ void ParticleShader::SetupGeometryConstants(const NiPropertyState* apState) {
     else {
         v5 = 0;
     }
-    ParticleShaderProperty* v6 = v5 ? static_cast<ParticleShaderProperty*>(m_pObject) : 0;
+    ParticleShaderProperty* v6 = v5 ? static_cast<ParticleShaderProperty*>(m_pObject) : nullptr;
     if (v6) {
         double v14;
         NiPoint3 windPoint;
@@ -197,7 +197,8 @@ void ParticleShader::SetupGeometryConstants(const NiPropertyState* apState) {
         NiD3DPixelShader* v22 = NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject;
         if (v22) {
             v17->SetShaderConstants(
-                v22, pgeometry, pskin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *m_kWorldBound, 0, 1
+                v22, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *m_kWorldBound, 0,
+                true
             );
         }
     }
@@ -206,7 +207,8 @@ void ParticleShader::SetupGeometryConstants(const NiPropertyState* apState) {
         NiD3DVertexShader* v20 = NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject;
         if (v20) {
             v19->SetShaderConstants(
-                v20, pgeometry, pskin, 0, pbufferData, apState, 0, pgeometry->m_kWorld, *m_kWorldBound, 0, 1
+                v20, pgeometry, pskin, nullptr, pbufferData, apState, nullptr, pgeometry->m_kWorld, *m_kWorldBound, 0,
+                true
             );
         }
     }
@@ -218,7 +220,7 @@ void ParticleShader::SetupGeometryAlphaBlending(const NiPropertyState* apState) 
         pShadeProp && pShadeProp->iShaderPropertyType == BSShaderManager::BSSM_PROPERTYTYPE_PARTICLE
         ? static_cast<ParticleShaderProperty*>(pShadeProp)
         : nullptr;
-    BSRenderState::SetAlphaBlendEnable(1, BSRS_NOLOCK);
+    BSRenderState::SetAlphaBlendEnable(true, BSRS_NOLOCK);
     if (pProp) {
         NiAlphaProperty::AlphaFunction eDest = NiAlphaProperty::GetNiAlphaFunctionFromD3D(pProp->eDestBlendMode);
         NiAlphaProperty::AlphaFunction eSrc = NiAlphaProperty::GetNiAlphaFunctionFromD3D(pProp->eSrcBlendMode);
@@ -362,16 +364,16 @@ void ParticleShader::LoadShaders() {
     char PSOFile[260];
     char Str1[260];
     const char* apFile = "particle\\v\\particle.v.hlsl";
-    Size.Name = 0;
-    Size.Definition = 0;
+    Size.Name = nullptr;
+    Size.Definition = nullptr;
     std::memset(v13, 0, sizeof(v13));
     BSShader::MakePath("particle\\v\\particle.v.hlsl", Str1);
     BSsprintf(PSOFile, 260, "PARTICLE.vso");
     NiD3DVertexShader* v2 = CompileVertexShaderHLSL(Str1, &Size, ShaderTarget_vs_2_0, PSOFile);
     spParticleVertexShader = v2;
-    const char* ptarget = BSShaderManager::GetPSTarget(1);
-    v9.Name = 0;
-    v9.Definition = 0;
+    const char* ptarget = BSShaderManager::GetPSTarget(true);
+    v9.Name = nullptr;
+    v9.Definition = nullptr;
     std::memset(v10, 0, sizeof(v10));
     BSShader::MakePath("particle\\p\\particle.p.hlsl", Str1);
     BSsprintf(PSOFile, 260, "PARTICLE.pso");
@@ -391,8 +393,8 @@ bool ParticleShader::LoadStagesAndPasses() {
 }
 
 void ParticleShader::PresetStages() {
-    NiD3DPass* v2 = 0;
-    NiD3DPass* v15 = 0;
+    NiD3DPass* v2 = nullptr;
+    NiD3DPass* v15 = nullptr;
     {
         NiPointer<NiD3DTextureStage> a1;
         NiD3DPass* m_pObject = spParticlePass.m_pObject;
@@ -403,7 +405,7 @@ void ParticleShader::PresetStages() {
         }
         if (!v2->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             v2->SetStage(v2->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v4 = spParticleVertexShader.m_pObject;
@@ -413,39 +415,39 @@ void ParticleShader::PresetStages() {
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(168u, 15u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(168u, 15u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(52u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(52u, 0, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
         if (v2 != spParticlePrePass.m_pObject) {
             v2->DecRefCount();
             v2 = spParticlePrePass.m_pObject;
@@ -456,7 +458,7 @@ void ParticleShader::PresetStages() {
         }
         if (!v2->m_uiStageCount) {
             NiD3DTextureStage::CreateNewStage(a1);
-            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, 1);
+            BSShader::SetupDefaultStage(a1.m_pObject, 0, 1u, 2u, true);
             v2->SetStage(v2->m_uiCurrentStage, a1.m_pObject);
         }
         NiD3DVertexShader* v9 = spParticleVertexShader.m_pObject;
@@ -466,39 +468,39 @@ void ParticleShader::PresetStages() {
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(168u, 15u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(168u, 15u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(27u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(27u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(19u, 5u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(19u, 5u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(20u, 6u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(20u, 6u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(15u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(15u, 0, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(52u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(52u, 0, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(7u, 1u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(7u, 1u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(23u, 4u, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(23u, 4u, true);
         if (!v2->m_pkRenderStateGroup) {
             v2->m_pkRenderStateGroup = NiD3DRenderStateGroup::GetFreeRenderStateGroup();
         }
-        v2->m_pkRenderStateGroup->SetRenderState(14u, 0, 1);
+        v2->m_pkRenderStateGroup->SetRenderState(14u, 0, true);
     }
     v2->DecRefCount();
 }
@@ -515,11 +517,11 @@ uint32_t ParticleShader::GetMaxInstanceSize() {
 ParticleShaderProperty* ParticleShader::Start(NiAVObject* apRoot, NiAVObject* apObject) {
     NiUpdateData UpdateData;
     if (!apRoot) {
-        return 0;
+        return nullptr;
     }
     NiNode* pnode = apRoot->IsNode();
     if (!pnode) {
-        return 0;
+        return nullptr;
     }
     NiGeometry* pparticleGeometry = ParticleShader::GetParticleGeometry();
     NiGeometry* pclone = static_cast<NiGeometry*>(pparticleGeometry->Clone());
@@ -544,11 +546,11 @@ ParticleShaderProperty* ParticleShader::Start(NiAVObject* apRoot, NiAVObject* ap
     m_pObject->m_kBound.m_kCenter.z = z;
     pnode->AttachChild(pclone, 1);
     UpdateData.fTime = 0.0f;
-    UpdateData.bUpdateControllers = 0;
-    UpdateData.bParallelUpdate = 0;
-    UpdateData.bFoundParticles = 0;
-    UpdateData.bFoundMorphController = 0;
-    UpdateData.bSceneGraphChange = 0;
+    UpdateData.bUpdateControllers = false;
+    UpdateData.bParallelUpdate = false;
+    UpdateData.bFoundParticles = false;
+    UpdateData.bFoundMorphController = false;
+    UpdateData.bSceneGraphChange = false;
     pnode->Update(UpdateData);
     BSShaderManager::PrepareObject(pclone, 0, 0);
     NiShadeProperty* pprop = static_cast<NiShadeProperty*>(pclone->GetProperty(3));
@@ -559,7 +561,7 @@ ParticleShaderProperty* ParticleShader::Start(NiAVObject* apRoot, NiAVObject* ap
             (static_cast<uint32_t>(static_cast<uint8_t>((pprop->iShaderPropertyType == 17))))
         );
     }
-    ParticleShaderProperty* ppsProp = v12 != 0 ? static_cast<ParticleShaderProperty*>(pprop) : 0;
+    ParticleShaderProperty* ppsProp = v12 != 0 ? static_cast<ParticleShaderProperty*>(pprop) : nullptr;
     if (ppsProp) {
         ppsProp->SetupGeometry(pclone);
         ParticleShader::GetParticleGeometry();
@@ -595,7 +597,7 @@ void ParticleShader::Stop(NiAVObject* apObject, ParticleShaderProperty* apProp) 
                         property = nullptr;
                         v6 = 0;
                     }
-                    v7 = v6 ? static_cast<ParticleShaderProperty*>(property) : (nullptr);
+                    v7 = v6 ? static_cast<ParticleShaderProperty*>(property) : nullptr;
                     if (v7) {
                         if (v7 == apProp) {
                             v2->DetachChildAt(i);
@@ -642,7 +644,7 @@ void ParticleShader::UpdateFov() {
 
 NiGeometry* ParticleShader::GetParticleGeometry() {
     if (!BSShaderManager::eShaderLevel) {
-        return 0;
+        return nullptr;
     }
     NiGeometry* result = ParticleShader::spBaseGeometry.m_pObject;
     if (!ParticleShader::spBaseGeometry.m_pObject) {
@@ -711,7 +713,7 @@ NiGeometry* ParticleShader::GetParticleGeometry() {
             inumVertices_2 = inumVertices;
         }
         NiTriShapeData* v10 = static_cast<NiTriShapeData*>(NiMemObject::operator new(sizeof(NiTriShapeData)));
-        NiTriShapeData* pnewShapeData = 0;
+        NiTriShapeData* pnewShapeData = nullptr;
         if (v10) {
             pnewShapeData = ::new (v10) NiTriShapeData(
                 inumVertices_2, pvertex, nullptr, nullptr, ptex, 1, NiGeometryData::NBT_METHOD_NONE, usTriangles,
@@ -724,11 +726,11 @@ NiGeometry* ParticleShader::GetParticleGeometry() {
             pdata = ::new (v12) NiAdditionalGeometryData(inumVertices_2, 1u);
         }
         else {
-            pdata = 0;
+            pdata = nullptr;
         }
         pdata->SetDataBlockCount(1u);
         uint8_t* v14 = ParticleShaderProperty::GetInstanceIndex();
-        pdata->SetDataBlock(0, v14, 4 * inumVertices_2, 1);
+        pdata->SetDataBlock(0, v14, 4 * inumVertices_2, true);
         pdata->SetDataStream(0, 0, 0, 1u, inumVertices_2, 4u, 4u);
         pnewShapeData->SetAdditionalGeometryData(pdata);
         NiTriShape* v15 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
@@ -736,7 +738,7 @@ NiGeometry* ParticleShader::GetParticleGeometry() {
             pnewGeometry = ::new (v15) NiTriShape(pnewShapeData);
         }
         else {
-            pnewGeometry = 0;
+            pnewGeometry = nullptr;
         }
         NiGeometryData* m_pObject = pnewGeometry->m_spModelData.m_pObject;
         float x = m_pObject->m_kBound.m_kCenter.x;
@@ -753,7 +755,7 @@ NiGeometry* ParticleShader::GetParticleGeometry() {
             pprop = ::new (v22) ParticleShaderProperty;
         }
         else {
-            pprop = 0;
+            pprop = nullptr;
         }
         pnewGeometry->AttachProperty(pprop);
         result = ParticleShader::spBaseGeometry.m_pObject;
@@ -770,7 +772,7 @@ NiGeometry* ParticleShader::GetParticleGeometry() {
 }
 
 BSShader* ParticleShader::CreateShader() {
-    ParticleShader* pshader = 0;
+    ParticleShader* pshader = nullptr;
     NiDX9ShaderDeclaration* spShaderDecl = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 5u, 1u);
     spShaderDecl->SetEntry(0, 0, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
     spShaderDecl->SetEntry(1u, 3u, NiShaderDeclaration::SHADERPARAM_NI_NORMAL, NiShaderDeclaration::SPTYPE_FLOAT3, 0);

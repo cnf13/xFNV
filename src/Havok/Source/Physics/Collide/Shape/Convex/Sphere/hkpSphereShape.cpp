@@ -272,13 +272,13 @@ hkBool hkpSphereUtil::castRayUtil(float radius, const hkpShapeRayCastInput& inpu
     float v21 = radius * radius;
     __m128 v4 = _mm_sub_ps(input.m_to.m_quad, input.m_from.m_quad);
     __m128 v5 = _mm_mul_ps(input.m_from.m_quad, v4);
-    float v29 = _mm_shuffle_ps(v5, v5, 170)[0] + static_cast<float>(_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
+    float v29 = _mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
     float v26 = v29;
     if (v29 >= 0.0f) {
         goto LABEL_9;
     }
     v6 = _mm_mul_ps(v4, v4);
-    v7 = _mm_shuffle_ps(v6, v6, 170)[0] + static_cast<float>(_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]);
+    v7 = _mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]);
     v8 = v21;
     v22 = v7 * v21 * 100.0;
     if (!(v22 < v29 * v29)) {
@@ -305,10 +305,7 @@ hkBool hkpSphereUtil::castRayUtil(float radius, const hkpShapeRayCastInput& inpu
         );
     }
     v15 = _mm_mul_ps(v14, v14);
-    v30 = static_cast<float>(
-              _mm_shuffle_ps(v15, v15, 170)[0] + static_cast<float>(_mm_shuffle_ps(v15, v15, 85)[0] + v15[0])
-          ) -
-        v11;
+    v30 = (_mm_shuffle_ps(v15, v15, 170)[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0])) - v11;
     v31 = v26 * v26 - v9 * v30;
     if (v31 <= v10 ||
         ((v28 = -v26,

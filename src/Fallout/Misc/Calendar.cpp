@@ -50,15 +50,15 @@ void Calendar::InitGlobals() {
 
 float Calendar::GetHour() {
     if (pGameHour) {
-        return (float)((float)pGameHour->TESGlobal::GetValue());
+        return pGameHour->TESGlobal::GetValue();
     }
     else {
-        return (float)(12.0f);
+        return 12.0f;
     }
 }
 
 DAYS_OF_THE_WEEK Calendar::GetDayOfTheWeek() {
-    return static_cast<DAYS_OF_THE_WEEK>(static_cast<uint32_t>(GetDaysPassed()) % 7u);
+    return static_cast<DAYS_OF_THE_WEEK>(GetDaysPassed() % 7u);
 }
 
 // Rounds the days and the hours to float, floors them and truncates through a 64-bit integer.
@@ -71,10 +71,10 @@ uint32_t Calendar::GetHoursPassed() {
 // The global's value is stored as a float and truncated to an integer.
 uint32_t Calendar::GetYear() {
     if (pGameYear) {
-        return (uint32_t)((int32_t)((float)pGameYear->TESGlobal::GetValue()));
+        return (uint32_t)((int32_t)pGameYear->TESGlobal::GetValue());
     }
     else {
-        return (uint32_t)((int32_t)((float)77.0f));
+        return (uint32_t)((int32_t)77.0f);
     }
 }
 
@@ -90,10 +90,10 @@ CALENDAR_MONTH Calendar::GetMonth() {
 
 char Calendar::GetDay() {
     if (pGameDay) {
-        return (int8_t)((int32_t)((float)pGameDay->TESGlobal::GetValue()));
+        return (int8_t)((int32_t)pGameDay->TESGlobal::GetValue());
     }
     else {
-        return (int8_t)((int32_t)((float)17.0f));
+        return (int8_t)((int32_t)17.0f);
     }
 }
 
@@ -204,7 +204,7 @@ SEASON Calendar::GetSeason() {
 float Calendar::GetMinutesPassed() {
     float fDaysPassed;
     if (pGameDaysPassed) {
-        fDaysPassed = (float)pGameDaysPassed->TESGlobal::GetValue();
+        fDaysPassed = pGameDaysPassed->TESGlobal::GetValue();
     }
     else {
         fDaysPassed = (float)1.0;

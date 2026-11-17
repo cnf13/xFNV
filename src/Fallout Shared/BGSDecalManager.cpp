@@ -138,7 +138,7 @@ void BGSDecalManager::UpdateSimpleDecals() {
         NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
         Renderer_->LockRenderer();
         iter = PendingSimpleDecalList.m_pkHead;
-        while (1) {
+        while (true) {
             BSTempEffectSimpleDecal* pdecal;
             do {
                 if (!iter) {
@@ -152,7 +152,7 @@ void BGSDecalManager::UpdateSimpleDecals() {
             while (!pdecal);
             if (pdecal->bOcclusionQuery) {
                 IssueDecalOcclusionQuery(pdecal);
-                pdecal->bOcclusionQuery = 0;
+                pdecal->bOcclusionQuery = false;
             }
             if (!pdecal->pOcclusionQuery) {
                 goto LABEL_17;
@@ -173,7 +173,7 @@ void BGSDecalManager::UpdateSimpleDecals() {
                     NiAVObject* v3 = pdecal->GetDecalParent();
                     Warning("DECAL: Decal Failed Occlusion Query : %s", (&v3->m_kName)->GetHandleString());
                 }
-                pdecal->bFinished = 1;
+                pdecal->bFinished = true;
             }
         LABEL_18:;
             if (pdecal->bFinalize && !pdecal->bFinished) {
@@ -191,22 +191,22 @@ void BGSDecalManager::UpdateSimpleDecals() {
                     }
                     if ((BGSDecalManager::iDecalDebugFlags & 1) != 0) {
                         NiColorA color(0.0f, 1.0f, 0.0f, 1.0f);
-                        pdecal->CreateDebugBox(color, 1);
+                        pdecal->CreateDebugBox(color, true);
                     }
                     if ((BGSDecalManager::iDecalDebugFlags & 2) != 0) {
                         NiColorA color_2(0.0f, 1.0f, 0.0f, 0.25f);
-                        pdecal->CreateDebugBox(color_2, 0);
+                        pdecal->CreateDebugBox(color_2, false);
                     }
                 }
                 else {
                     if ((BGSDecalManager::iDecalDebugFlags & 16) != 0) {
                         if ((BGSDecalManager::iDecalDebugFlags & 1) != 0) {
                             NiColorA color_3(1.0f, 0.0f, 0.0f, 1.0f);
-                            pdecal->CreateDebugBox(color_3, 1);
+                            pdecal->CreateDebugBox(color_3, true);
                         }
                         if ((BGSDecalManager::iDecalDebugFlags & 2) != 0) {
                             NiColorA color_4(1.0f, 0.0f, 0.0f, 0.25f);
-                            pdecal->CreateDebugBox(color_4, 0);
+                            pdecal->CreateDebugBox(color_4, false);
                         }
                     }
                 }
@@ -249,10 +249,10 @@ void BGSDecalManager::AddDecal(
     _LARGE_INTEGER TicksPerSecond;
     _LARGE_INTEGER Start;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_EFFECTS_OVERHEAD, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BGSDecalManager.cpp",
-        440
+        MEM_CONTEXT_EFFECTS_OVERHEAD, true,
+        "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BGSDecalManager.cpp", 440
     );
-    bClearQueryTexture = 1;
+    bClearQueryTexture = true;
     if (aeDecalType == BGSDecalManager::DECAL_TYPE_SIMPLE) {
         if (gs_bDecals_Decals.Bool()) {
             if (arDecalData.pAVObj) {
@@ -278,8 +278,8 @@ void BGSDecalManager::AddDecal(
                         QueryPerformanceCounter(&End);
                         int64_t iTicks = End.QuadPart - Start.QuadPart;
                         BSsprintf(
-                            acBuffer, 255, "AddGeometryDecalRecurse: Ticks: %lld, Microseconds: %f",
-                            static_cast<int64_t>(iTicks), static_cast<double>(iTicks) / fTicksPerMicrosecond
+                            acBuffer, 255, "AddGeometryDecalRecurse: Ticks: %lld, Microseconds: %f", iTicks,
+                            static_cast<double>(iTicks) / fTicksPerMicrosecond
                         );
                         InitializationFlow(acBuffer, 0);
                     }
@@ -319,7 +319,7 @@ void BGSDecalManager::AddDecal(
                         pnode = pavobject->IsNode();
                     }
                     else {
-                        pnode = 0;
+                        pnode = nullptr;
                     }
                     if (pnode) {
                         if (!pavobject->GetNoDecals()) {
@@ -345,10 +345,10 @@ void BGSDecalManager::AddDecal(
                         arDecalData.pDirection.Unitize();
                         if (!BGSDecalManager::pDecalCaster) {
                             float a2 = BSMAX(arDecalData.fDecalHeight, arDecalData.fDecalWidth);
-                            BGSDecalManager::pDecalCaster = DecalCaster::GetInstance(a2, 1);
+                            BGSDecalManager::pDecalCaster = DecalCaster::GetInstance(a2, true);
                         }
-                        BGSDecalManager::pDecalCaster->SetCollision(L_BIPED, 0);
-                        BGSDecalManager::pDecalCaster->SetCollision(L_DEADBIP, 0);
+                        BGSDecalManager::pDecalCaster->SetCollision(L_BIPED, false);
+                        BGSDecalManager::pDecalCaster->SetCollision(L_DEADBIP, false);
                         bhkWorld* v14 = arDecalData.pParentCell->GetbhkWorld();
                         BGSDecalManager::pDecalCaster->Add(v14);
                         int32_t icount = BGSDecalManager::pDecalCaster->Pick(
@@ -378,7 +378,7 @@ void BGSDecalManager::AddDecal(
                                         if (BGSDecalManager::IsValidDecalImpact(
                                                 pref, BGSDecalManager::DECAL_TYPE_SIMPLE
                                             ) &&
-                                            !listavobj.FindPos(pavobj, 0)) {
+                                            !listavobj.FindPos(pavobj, nullptr)) {
                                             arDecalData.pOrigin = havokpos;
                                             arDecalData.pDirection = havoknormal;
                                             arDecalData.pAVObj = pavobj;
@@ -398,7 +398,7 @@ void BGSDecalManager::AddDecal(
             if (aeDecalType == BGSDecalManager::DECAL_TYPE_PERMENANT_SIMPLE && gs_bDecals_Decals.Bool()) {
                 if (arDecalData.pAVObj) {
                     if (!arDecalData.pAVObj->GetNoDecals()) {
-                        arDecalData.bPermanent = 1;
+                        arDecalData.bPermanent = true;
                         AddGeometryDecalRecurse(arDecalData);
                     }
                 }
@@ -419,14 +419,14 @@ bool BGSDecalManager::AddGeometryDecalRecurse(DECAL_CREATION_DATA& arDecalData) 
                   (!std::strncmp(pname, "FaceGen", 7u) ||
                    (!std::strncmp(pname, "BSFaceGen", 9u) ||
                     (!std::strncmp(pname, "Bip01", 5u) || !std::strncmp(pname, "Debug Decal Box", 15u))))))) {
-                return 1;
+                return true;
             }
             if (!NiObject::IsKindOf_0(&NiTriStrips::ms_RTTI, arDecalData.pAVObj) ||
                 arDecalData.pAVObj->GetAppCulled()) {
                 if (arDecalData.pAVObj->IsNode()) {
                     NiNode* pnode_2 = static_cast<NiNode*>(arDecalData.pAVObj);
                     if (pnode_2 && pnode_2->GetAppCulled()) {
-                        return 1;
+                        return true;
                     }
                     for (uint32_t i_2 = 0; i_2 < pnode_2->GetArrayCount(); ++i_2) {
                         NiAVObject* child = pnode_2->GetAt(i_2);
@@ -445,20 +445,20 @@ bool BGSDecalManager::AddGeometryDecalRecurse(DECAL_CREATION_DATA& arDecalData) 
                         static_cast<BSShaderPPLightingProperty*>(pgeom->m_PropertyState.GetShade());
                     if (pshade) {
                         if (pshade->GetFlag(26u)) {
-                            return 1;
+                            return true;
                         }
                     }
                 }
                 NiNode* pnode = arDecalData.pAVObj->m_pkParent;
-                BGSDecalNode* pdecalnode = 0;
-                bool bfoundnode = 0;
+                BGSDecalNode* pdecalnode = nullptr;
+                bool bfoundnode = false;
                 if (!pnode) {
-                    return 0;
+                    return false;
                 }
                 for (int32_t i = 0; i < pnode->GetArrayCount(); ++i) {
                     NiNode* pchild = static_cast<NiNode*>(pnode->GetAt(i));
                     if (pchild && NiObject::IsExactKindOf(&BGSDecalNode::ms_RTTI, pchild)) {
-                        bfoundnode = 1;
+                        bfoundnode = true;
                         pdecalnode = static_cast<BGSDecalNode*>(pchild);
                         break;
                     }
@@ -485,7 +485,7 @@ bool BGSDecalManager::AddGeometryDecalRecurse(DECAL_CREATION_DATA& arDecalData) 
                         sumRadiiSquared = sumRadiiSquared * sumRadiiSquared;
                         if (sumRadiiSquared / arDecalData.fPlacementRadius >=
                             deltaSquared.x + deltaSquared.y + deltaSquared.z) {
-                            return 0;
+                            return false;
                         }
                     }
                 }
@@ -499,14 +499,14 @@ bool BGSDecalManager::AddGeometryDecalRecurse(DECAL_CREATION_DATA& arDecalData) 
                     pdecal = ::new (apMemory) BSTempEffectSimpleDecal(pdecalnode, afLifetime, arDecalData);
                 }
                 else {
-                    pdecal = 0;
+                    pdecal = nullptr;
                 }
                 NiTriStrips* ptristrips = static_cast<NiTriStrips*>(arDecalData.pAVObj);
                 if (ptristrips->GetActiveTriangleCount() > 1000u && gs_bDecalOcclusionQuery_Decals.Bool() &&
                     arDecalData.bUseOcclusionQuery) {
-                    pdecal->bOcclusionQuery = 1;
+                    pdecal->bOcclusionQuery = true;
                     pdecal->bClearQueryTexture = bClearQueryTexture;
-                    bClearQueryTexture = 0;
+                    bClearQueryTexture = false;
                 }
                 if (arDecalData.pParentCell) {
                     NiPointer<BSTempEffectSimpleDecal> spdecal(pdecal);
@@ -514,13 +514,13 @@ bool BGSDecalManager::AddGeometryDecalRecurse(DECAL_CREATION_DATA& arDecalData) 
                 }
             }
         }
-        return 1;
+        return true;
     }
     else {
         if (BGSDecalManager::bDebugDecals.Bool()) {
             Warning("DECAL: Reached max non-skinned decals per frame. Ignoring decal.");
         }
-        return 0;
+        return false;
     }
 }
 
@@ -567,7 +567,7 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
             return true;
         }
         NiNode* pNode = static_cast<NiNode*>(arDecalData.pAVObj);
-        for (uint32_t i = 0; i < (uint32_t)pNode->GetArrayCount(); ++i) {
+        for (uint32_t i = 0; i < pNode->GetArrayCount(); ++i) {
             NiAVObject* pChild = pNode->GetAt(i);
             if (!pChild) {
                 continue;
@@ -579,7 +579,7 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
             if (arDecalData.pSkinnedDecalNode) {
                 NiNode* pParent = arDecalData.pAVObj->GetParent();
                 NiAVObject* pDecalNode = nullptr;
-                for (uint32_t j = 0; j < (uint32_t)pParent->GetArrayCount(); ++j) {
+                for (uint32_t j = 0; j < pParent->GetArrayCount(); ++j) {
                     NiAVObject* pSibling = pParent->GetAt(j);
                     if (pSibling && NiObject::IsExactKindOf(&BGSDecalNode::ms_RTTI, pSibling)) {
                         pDecalNode = pSibling;
@@ -608,7 +608,7 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
         if (pGeometry->GetSkinInstance()) {
             NiNode* pParent = arDecalData.pAVObj->GetParent();
             BGSDecalNode* pDecalNode = nullptr;
-            for (uint32_t i = 0; i < (uint32_t)pParent->GetArrayCount(); ++i) {
+            for (uint32_t i = 0; i < pParent->GetArrayCount(); ++i) {
                 NiAVObject* pChild = pParent->GetAt(i);
                 if (pChild && NiObject::IsExactKindOf(&BGSDecalNode::ms_RTTI, pChild)) {
                     pDecalNode = static_cast<BGSDecalNode*>(pChild);
@@ -619,7 +619,7 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
                 void* pMemory = NiMemObject::operator new(sizeof(BGSDecalNode));
                 pDecalNode = pMemory ? ::new (pMemory) BGSDecalNode(pParent, true) : nullptr;
             }
-            else if ((uint32_t)pDecalNode->GetChildCount() >= iMaxSkinDecalPerActor.UInt()) {
+            else if (pDecalNode->GetChildCount() >= iMaxSkinDecalPerActor.UInt()) {
                 // The compare is unsigned.
                 return true;
             }
@@ -673,7 +673,7 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
         }
         if (arDecalData.pClone) {
             NiAVObject* pCloneGeometry = nullptr;
-            for (uint32_t i = 0; i < (uint32_t)arDecalData.pClone->GetArrayCount() && !pCloneGeometry; ++i) {
+            for (uint32_t i = 0; i < arDecalData.pClone->GetArrayCount() && !pCloneGeometry; ++i) {
                 NiAVObject* pChild = arDecalData.pClone->GetAt(i);
                 if (!pChild) {
                     continue;
@@ -683,7 +683,7 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
                 }
                 else if (pChild->IsNode()) {
                     NiNode* pChildNode = static_cast<NiNode*>(pChild);
-                    for (uint32_t j = 0; j < (uint32_t)pChildNode->GetArrayCount() && !pCloneGeometry; ++j) {
+                    for (uint32_t j = 0; j < pChildNode->GetArrayCount() && !pCloneGeometry; ++j) {
                         NiAVObject* pGrandChild = pChildNode->GetAt(j);
                         if (pGrandChild && pGrandChild->IsTriBasedGeom()) {
                             pCloneGeometry = pGrandChild;
@@ -762,8 +762,8 @@ void BGSDecalManager::IssueDecalOcclusionQuery(BSTempEffectSimpleDecal* apDecal)
     NiAVObject* v4 = apDecal->GetDecalParent();
     float fheight = 1.0 / v4->m_kWorld.m_fScale * v19;
     float frustumNear = apDecal->fDepth + 50.0;
-    NiFrustum frustum(0);
-    frustum.m_bOrtho = 1;
+    NiFrustum frustum(false);
+    frustum.m_bOrtho = true;
     frustum.m_fNear = 0.1f;
     frustum.m_fLeft = -fwidth;
     frustum.m_fRight = fwidth;
@@ -773,14 +773,14 @@ void BGSDecalManager::IssueDecalOcclusionQuery(BSTempEffectSimpleDecal* apDecal)
     spQueryCamera.m_pObject->SetTranslate(pos);
     spQueryCamera.m_pObject->SetRotate(adjustedrot);
     spQueryCamera.m_pObject->SetViewFrustum(frustum);
-    NiUpdateData UpdateData(0.0f, 0, 0);
+    NiUpdateData UpdateData(0.0f, false, false);
     spQueryCamera.m_pObject->Update(UpdateData);
     if ((BGSDecalManager::iDecalDebugFlags & 4) != 0) {
         start = pos;
         end = pos + spQueryCamera.m_pObject->GetWorldDirection() * frustumNear;
         NiLines* plines = MakeLine(
             start, *::new (&v23) NiColorA(0.0f, 0.0f, 1.0f, 1.0f), end,
-            *::new (&apMemory) NiColorA(1.0f, 0.0f, 0.0f, 1.0f), 1
+            *::new (&apMemory) NiColorA(1.0f, 0.0f, 0.0f, 1.0f), true
         );
         TES::pInstance->AddTempDebugObject(plines, 30.0f);
     }
@@ -799,7 +799,7 @@ void BGSDecalManager::IssueDecalOcclusionQuery(BSTempEffectSimpleDecal* apDecal)
         NiDX9Renderer* fR_4 = BSShaderManager::GetRenderer();
         BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
         spQueryTexture.operator=(
-            TextureManager->BorrowRenderedTexture(fR_4, BSTextureManager::TEX_DECAL_OCCLUSION, 0, 0, 0)
+            TextureManager->BorrowRenderedTexture(fR_4, BSTextureManager::TEX_DECAL_OCCLUSION, 0, nullptr, 0)
         );
     }
     if (apDecal->bClearQueryTexture) {
@@ -815,22 +815,22 @@ void BGSDecalManager::IssueDecalOcclusionQuery(BSTempEffectSimpleDecal* apDecal)
         v18 = ::new (v22) BSOcclusionQuery;
     }
     else {
-        v18 = 0;
+        v18 = nullptr;
     }
     apDecal->pOcclusionQuery = v18;
     apDecal->pOcclusionQuery->Begin();
     const NiRect<float>* angle_4b = &spQueryCamera.m_pObject->GetViewPort();
     NiRenderer* Renderer_ = NiRenderer::GetRenderer();
     Renderer_->SetScreenSpaceCameraData(angle_4b);
-    BSCullingProcess culler(0);
+    BSCullingProcess culler(nullptr);
     culler.SetAccumulator(spQueryAccum.m_pObject);
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
     spQueryAccum.m_pObject->SetShadowSceneNode(ShadowSceneNode_);
     spQueryAccum.m_pObject->SetRenderMode(BSShaderManager::BSSM_RENDER_SILHOUETTE);
     NiAVObject* v13 = apDecal->GetDecalParent();
     BSShaderUtil::AccumulateScene(spQueryCamera.m_pObject, v13, culler);
-    BSShaderUtil::RenderScene(spQueryCamera.m_pObject, spQueryAccum.m_pObject, 0);
-    culler.SetAccumulator(0);
+    BSShaderUtil::RenderScene(spQueryCamera.m_pObject, spQueryAccum.m_pObject, false);
+    culler.SetAccumulator(nullptr);
     apDecal->pOcclusionQuery->End();
     BSRenderedTexture::StopOffscreen();
 }
@@ -847,11 +847,11 @@ void BGSDecalManager::ClearPendingQueries() {
             if (pdecal) {
                 if (pdecal->pOcclusionQuery) {
                     iresult = 0;
-                    pdecal->pOcclusionQuery->GetResult(&iresult, 1);
+                    pdecal->pOcclusionQuery->GetResult(&iresult, true);
                     if (pdecal->pOcclusionQuery) {
                         delete pdecal->pOcclusionQuery;
                     }
-                    pdecal->pOcclusionQuery = 0;
+                    pdecal->pOcclusionQuery = nullptr;
                 }
             }
         }
@@ -889,11 +889,11 @@ bool BGSDecalManager::IsValidDecalImpact(TESObjectREFR* apCollidee, BGSDecalMana
         case 42u:
         case 43u:
         case 51u: {
-            result = 0;
+            result = false;
             break;
         }
         default: {
-            result = 1;
+            result = true;
             break;
         }
     }
@@ -928,7 +928,7 @@ BGSDecalManager* BGSDecalManager::Destroy_() {
     if (BGSDecalManager::pSingleton) {
         result = FNVD_DELETE(BGSDecalManager)(BGSDecalManager::pSingleton, 1u);
     }
-    BGSDecalManager::pSingleton = 0;
+    BGSDecalManager::pSingleton = nullptr;
     return result;
 }
 
@@ -1033,7 +1033,7 @@ void BGSDecalEmitter::Update() {
     spParticleData.operator->()->GetParticleObject()->GetLocalTransform().m_Rotate.GetRow(2, kDirection);
     kDirection.Unitize();
     NiPoint3 kFrom = spParticleData.operator->()->GetParticleObject()->GetTranslate();
-    float fMaxWidth = (float)pDecalImpactData->GetDecalMaxWidth();
+    float fMaxWidth = pDecalImpactData->GetDecalMaxWidth();
     float fMinWidth = (float)pDecalImpactData->GetMinWidth();
     float fWidth = RandomFloat(fMinWidth, fMaxWidth);
     DecalCaster* pCaster = DecalCaster::GetInstance(fWidth, true);

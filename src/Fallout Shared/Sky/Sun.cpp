@@ -259,7 +259,7 @@ void Sun::Update(Sky* apSky, float afSecondsPassed) {
     NiMatrix3 lightDir_2;
     NiMatrix3 lightDir;
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_SKY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Sun.cpp", 300
+        MEM_CONTEXT_SKY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Sun.cpp", 300
     );
     NiPoint3 newLoc = NiPoint3_ZERO;
     float fhour = apSky->GetCurrentGameHour();
@@ -272,7 +272,7 @@ void Sun::Update(Sky* apSky, float afSecondsPassed) {
                 pcell_3 = TES::pInstance->pInteriorCell;
             }
             else {
-                pcell_3 = 0;
+                pcell_3 = nullptr;
             }
             if (pcell_3) {
                 NiMatrix3 rotmat_3;
@@ -357,7 +357,7 @@ void Sun::Update(Sky* apSky, float afSecondsPassed) {
                     pshadeProperty = static_cast<SkyShaderProperty*>(spSunBase.m_pObject->GetProperty(3));
                 }
                 else {
-                    pshadeProperty = 0;
+                    pshadeProperty = nullptr;
                 }
                 SkyShaderProperty* v66 = pshadeProperty;
                 if (pshadeProperty) {
@@ -378,7 +378,7 @@ void Sun::Update(Sky* apSky, float afSecondsPassed) {
                     pshadeProperty_2 = static_cast<SkyShaderProperty*>(spSunGlare.m_pObject->GetProperty(3));
                 }
                 else {
-                    pshadeProperty_2 = 0;
+                    pshadeProperty_2 = nullptr;
                 }
                 v66 = pshadeProperty_2;
                 if (pshadeProperty_2) {
@@ -443,12 +443,12 @@ void Sun::Update(Sky* apSky, float afSecondsPassed) {
                         if (v28 || (v16 = &Sun::fSunMinimumGlareScale.Float(), *v16 > static_cast<double>(fscale))) {
                             double v26 = fGlareScale - fscaleChange;
                             if (!(Sun::fSunMinimumGlareScale.Float() > v26)) {
-                                spSunGlareNode.m_pObject->SetAppCulled(0);
+                                spSunGlareNode.m_pObject->SetAppCulled(false);
                                 fGlareScale = fGlareScale - fscaleChange;
                                 spSunGlareNode.m_pObject->SetScale(fGlareScale);
                             }
                             else {
-                                spSunGlareNode.m_pObject->SetAppCulled(1);
+                                spSunGlareNode.m_pObject->SetAppCulled(true);
                                 fGlareScale = 0.0f;
                             }
                         }
@@ -460,19 +460,19 @@ void Sun::Update(Sky* apSky, float afSecondsPassed) {
                             else {
                                 fGlareScale = fscale;
                             }
-                            spSunGlareNode.m_pObject->SetAppCulled(0);
+                            spSunGlareNode.m_pObject->SetAppCulled(false);
                             spSunGlareNode.m_pObject->SetScale(fGlareScale);
                         }
                         if (!spSunGlareNode.m_pObject->GetDisplayObject()) {
-                            spSunGlareNode.m_pObject->SetAppCulled(1);
+                            spSunGlareNode.m_pObject->SetAppCulled(true);
                         }
                     }
                 }
                 if (apSky->IsUnderwater()) {
-                    GetSunBaseNode()->SetAppCulled(1);
+                    GetSunBaseNode()->SetAppCulled(true);
                 }
                 else {
-                    GetSunBaseNode()->SetAppCulled(0);
+                    GetSunBaseNode()->SetAppCulled(false);
                 }
             }
         }
@@ -484,7 +484,7 @@ void Sun::Update(Sky* apSky, float afSecondsPassed) {
             pcell = TES::pInstance->pInteriorCell;
         }
         else {
-            pcell = 0;
+            pcell = nullptr;
         }
         if (pcell) {
             NiMatrix3 rotmat;
@@ -572,7 +572,7 @@ void Sun::RemoveTextures() {
 }
 
 void Sun::StartSunOcclusion() {
-    bDoOcclusionTests = (bool)1;
+    bDoOcclusionTests = true;
     BSShaderAccumulator* v1 = (&spSunAccumulator)->operator->();
     if (v1) {
         v1->ResetSunOcclusion();
@@ -580,12 +580,12 @@ void Sun::StartSunOcclusion() {
 }
 
 void Sun::StopSunOcclusion() {
-    bDoOcclusionTests = (bool)0;
+    bDoOcclusionTests = false;
 }
 
 void Sun::CalculateSunGlare(uint32_t aiTestNumber, BSShaderAccumulator* apAccumulator, NiCamera* apCamera) {
     AutoMemContext apMemory(
-        MEM_CONTEXT_SKY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Sun.cpp", 546
+        MEM_CONTEXT_SKY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Sun.cpp", 546
     );
     if (GetBase()) {
         if (bDoOcclusionTests) {
@@ -604,7 +604,7 @@ void Sun::CalculateSunGlare(uint32_t aiTestNumber, BSShaderAccumulator* apAccumu
 
 float Sun::GetSunOcclusionPercent() {
     AutoMemContext tempMemContext(
-        MEM_CONTEXT_SKY, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Sun.cpp", 565
+        MEM_CONTEXT_SKY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Sun.cpp", 565
     );
     BSShaderAccumulator* paccum = spSunAccumulator.m_pObject;
     if (paccum) {

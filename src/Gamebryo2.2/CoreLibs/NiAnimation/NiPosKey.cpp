@@ -11,7 +11,7 @@
 #include "Reconstruction.hpp"
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 // The division is done in double precision and rounded to float only on the store.
 float NiPosKey::ms_fSampleDelta = 1.0 / NiPosKey::ms_iSampleSize;
@@ -155,7 +155,7 @@ void NiPosKey::CoordinateFrame(
     curvature = fCurvature;
 
     const float epsilon = 1e-06f;
-    if (static_cast<float>(std::fabs(fCurvature)) > epsilon) {
+    if (std::fabs(fCurvature) > epsilon) {
         // EXE-INLINED none: NiPoint3::Dot, operator*(float, const NiPoint3&), NiPoint3::operator-
         float fDot = d1.x * d2.x + d1.y * d2.y + d1.z * d2.z;
         NiPoint3 kDotD1;
@@ -172,7 +172,7 @@ void NiPosKey::CoordinateFrame(
     }
     else {
         curvature = 0.0f;
-        if (static_cast<float>(std::fabs(tangent.x)) > epsilon || static_cast<float>(std::fabs(tangent.y)) > epsilon) {
+        if (std::fabs(tangent.x) > epsilon || std::fabs(tangent.y) > epsilon) {
             normal.x = tangent.y;
             normal.y = -tangent.x;
             normal.z = 0.0f;

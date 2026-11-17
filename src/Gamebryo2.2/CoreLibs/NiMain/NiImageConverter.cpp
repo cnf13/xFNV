@@ -91,7 +91,7 @@ NiPixelData* NiImageConverter::ConvertPixelData(
     bool bMipmap
 ) {
     if (kSrc.m_kPixelFormat.operator!=(kDestFmt)) {
-        return 0;
+        return nullptr;
     }
     if (pkOptDest) {
         if (pkOptDest == &kSrc) {
@@ -117,7 +117,7 @@ NiPixelData* NiImageConverter::ConvertPixelData(
                             pkOptDest->SetPalette(v10);
                         }
                         else {
-                            pkOptDest->SetPalette(0);
+                            pkOptDest->SetPalette(nullptr);
                         }
                         return pkOptDest;
                     }
@@ -132,7 +132,7 @@ NiPixelData* NiImageConverter::ConvertPixelData(
         return ::new (v11) NiPixelData(kSrc);
     }
     else {
-        return 0;
+        return nullptr;
     }
 }
 

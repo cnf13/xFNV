@@ -16,7 +16,7 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 void NiTCBFloatKey::LoadBinary(NiStream& stream) {
     uint32_t v10;
@@ -198,13 +198,12 @@ NiAnimationKey* NiTCBFloatKey::CreateFromStream(NiStream& stream, uint32_t uiNum
 NiAnimationKey* NiTCBFloatKey::CreateArray(uint32_t uiNumKeys) {
     size_t v1 = uiNumKeys <= SIZE_MAX / sizeof(NiTCBFloatKey) ? sizeof(NiTCBFloatKey) * uiNumKeys : SIZE_MAX;
     size_t* v2 = static_cast<size_t*>(MemoryManager_Singleton.Allocate(
-        (static_cast<uint32_t>(static_cast<uint32_t>(v1) + static_cast<uint32_t>(sizeof(size_t))) <
-         static_cast<uint32_t>(v1))
+        ((static_cast<uint32_t>(v1) + static_cast<uint32_t>(sizeof(size_t))) < static_cast<uint32_t>(v1))
             ? -1
             : v1 + sizeof(size_t)
     ));
     if (!v2) {
-        return 0;
+        return nullptr;
     }
     *v2 = uiNumKeys;
     return reinterpret_cast<NiAnimationKey*>(v2 + 1);

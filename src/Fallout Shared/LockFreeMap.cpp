@@ -32,7 +32,7 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 // The per-thread table (an empty entry per thread) and the thread-local storage index.
 ThreadSpecificInterfaceManager::ThreadSpecificInterfaceManager(uint32_t auiMaxThreads)

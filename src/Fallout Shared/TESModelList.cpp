@@ -22,7 +22,7 @@ void TESTextureListArray::ClearData() {
             }
         }
         ourFree(pTextureLists);
-        pTextureLists = (TESTextureList**)0;
+        pTextureLists = (TESTextureList**)nullptr;
     }
     iTextureListCount = (uint32_t)0;
 }
@@ -100,7 +100,7 @@ void TESTextureListArray::Copy(TESTextureListArray* apTextureListArray) {
                 v2 = ::new (v4) TESTextureList;
             }
             else {
-                v2 = 0;
+                v2 = nullptr;
             }
             pTextureLists[i] = v2;
             pTextureLists[i]->Copy(apTextureListArray->pTextureLists[i]);
@@ -149,7 +149,7 @@ bool TESModelList::CompareComponent(BaseFormComponent* apCompareFC) {
     BSSimpleList<const char*>* pnifFileListCompare;
     TESModelList* pcompare = dynamic_cast<TESModelList*>(apCompareFC);
     if (!pcompare) {
-        return 1;
+        return true;
     }
     BSSimpleList<const char*>* pnifFileList = &nifFilenames;
     for (pnifFileListCompare = &pcompare->nifFilenames; pnifFileList && pnifFileListCompare;
@@ -157,10 +157,10 @@ bool TESModelList::CompareComponent(BaseFormComponent* apCompareFC) {
         const char* pnifFilename = pnifFileList->m_item;
         const char* pnifFilenameCompare = pnifFileListCompare->m_item;
         if ((!pnifFilename && pnifFilenameCompare) || (pnifFilename && !pnifFilenameCompare)) {
-            return 1;
+            return true;
         }
         if (pnifFilename && (pnifFilenameCompare && BSstricmp(pnifFilename, pnifFilenameCompare))) {
-            return 1;
+            return true;
         }
         pnifFileList = pnifFileList->m_pkNext;
     }
@@ -230,12 +230,12 @@ void TESModelList::Save(CHUNK_ID aeModelListID, CHUNK_ID aeTextureListID) {
 
 bool TESModelList::IsNIFFileInList(const char* apFilename) {
     if (nifFilenames.IsEmpty() || !apFilename) {
-        return 0;
+        return false;
     }
     for (const char* pnifFilename : nifFilenames) {
         if (pnifFilename && !BSstricmp(pnifFilename, apFilename)) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }

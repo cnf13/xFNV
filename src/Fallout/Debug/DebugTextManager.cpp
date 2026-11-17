@@ -64,7 +64,7 @@ void DebugTextManager::CreateSingleton() {
             v0 = ::new (apMemory) DebugTextManager;
         }
         else {
-            v0 = 0;
+            v0 = nullptr;
         }
         DebugTextManager::s_pInstance = v0;
     }

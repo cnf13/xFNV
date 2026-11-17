@@ -339,7 +339,7 @@ hkBool* hkaNURBS::WithinTolerance(
     }
     else {
         int32_t v13 = 0;
-        while (1) {
+        while (true) {
             hkaNURBS::Point v16;
             hkaNURBS::Point* apPoint = &Q.m_data[v13];
             float v9 = apPoint->point[1];
@@ -466,7 +466,7 @@ void hkaNURBS::GlobalCurveApproxErrBnd(
     pHeap = hkMemoryRouter::getInstance().m_heap;
     P._reserve(*pHeap, iPoints);
     hkaNURBS::Point* pPoint = P.m_data + P.m_size;
-    for (int32_t i = iPoints - static_cast<int32_t>(P.m_size); i > 0; --i, ++pPoint) {
+    for (int32_t i = iPoints - P.m_size; i > 0; --i, ++pPoint) {
         if (pPoint) {
             ::new (pPoint) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
         }
@@ -520,7 +520,7 @@ void hkaNURBS::GlobalCurveApproxErrBnd(
             pHeap = hkMemoryRouter::getInstance().m_heap;
             P._reserve(*pHeap, iPoints);
             pPoint = P.m_data + P.m_size;
-            for (int32_t i = iPoints - static_cast<int32_t>(P.m_size); i > 0; --i, ++pPoint) {
+            for (int32_t i = iPoints - P.m_size; i > 0; --i, ++pPoint) {
                 if (pPoint) {
                     ::new (pPoint) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
                 }
@@ -536,7 +536,7 @@ void hkaNURBS::GlobalCurveApproxErrBnd(
                 pHeap = hkMemoryRouter::getInstance().m_heap;
                 P._reserve(*pHeap, iPoints);
                 pPoint = P.m_data + P.m_size;
-                for (int32_t i = iPoints - static_cast<int32_t>(P.m_size); i > 0; --i, ++pPoint) {
+                for (int32_t i = iPoints - P.m_size; i > 0; --i, ++pPoint) {
                     if (pPoint) {
                         ::new (pPoint) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
                     }
@@ -638,7 +638,7 @@ int32_t hkaNURBS::FindSpan(int32_t a1, int32_t a2, float a3, const hkArray<float
         int32_t v7 = a1 + 1;
         int32_t v8 = a2;
         int32_t v9 = a1 + 1 + a2;
-        while (1) {
+        while (true) {
             v5 = v9 / 2;
             if (!(m_data[v9 / 2] > v4) && !(m_data[v5 + 1] <= v4)) {
                 break;

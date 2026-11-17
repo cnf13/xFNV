@@ -93,11 +93,9 @@ void hkpKdTreeWorldLinearCaster::linearCast(
     m_shapeInput.m_path.m_quad = v11.m_quad;
     __m128 m_quad = v11.m_quad;
     __m128 v12 = _mm_mul_ps(v11.m_quad, v11.m_quad);
-    float m_cachedPathLength = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
-        static_cast<float>(
-            (_mm_shuffle_ps(v12, v12, 170)[0] + static_cast<float>(_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]))
-        )
-    )));
+    float m_cachedPathLength = _mm_cvtss_f32(
+        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v12, v12, 170)[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]))))
+    );
     m_shapeInput.m_cachedPathLength = m_cachedPathLength;
     m_shapeInput.m_tolerance = m_startPointTolerance;
     collA->m_shape->getAabbImpl(collA->m_motion.pState->m_transform, input.m_startPointTolerance, out_);

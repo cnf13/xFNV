@@ -118,7 +118,7 @@ void BGSSaveLoadManager::UpdateQueuedSaves() {
             if (cQueuedForceSave <= 1u) {
                 if (!pFaderManager->IsFaderVisible(FADER_TO_BLACK) && !pFaderManager->IsFaderVisible(FADER_TO_WHITE) &&
                     !Interface::IsInGameLoadingMenuOpen()) {
-                    pSaveLoadManager->SaveGame(0, -1, 0);
+                    pSaveLoadManager->SaveGame(nullptr, -1, false);
                     cQueuedForceSave = 0;
                 }
             }
@@ -144,7 +144,7 @@ void BGSSaveLoadManager::UpdateQueuedSaves() {
 
 bool BGSSaveLoadManager::LoadMostRecentSaveGame() {
     return (bool)((uint8_t)(HasMostRecentSaveGame() &&
-                            LoadGame(pMostRecentSaveGame, iMostRecentSaveGameDeviceID, 0, 1)));
+                            LoadGame(pMostRecentSaveGame, iMostRecentSaveGameDeviceID, false, true)));
 }
 
 void BGSSaveLoadManager::Autosave() {
@@ -153,7 +153,7 @@ void BGSSaveLoadManager::Autosave() {
     float afSecondsPassed = Main::QFrameAnimTime();
     Sky* CurrentAIProcess = TES::pInstance->GetSky();
     CurrentAIProcess->Update(afSecondsPassed);
-    SaveGame("autosave", -1, 0);
+    SaveGame("autosave", -1, false);
 }
 
 int8_t BGSSaveLoadManager::SystemSave() {
@@ -167,7 +167,7 @@ int8_t BGSSaveLoadManager::SystemSave() {
     if (!pSaveName.GetLength()) {
         pSaveName.Set(Src, 0u);
     }
-    return SaveGame(Src, -1, 0);
+    return SaveGame(Src, -1, false);
 }
 
 void BGSSaveLoadManager::ScrubFileName(char* apFileName) {
@@ -243,7 +243,7 @@ BGSSaveLoadManager::OpenSaveFile(const char* apFileName, bool abWrite, SAVEFILE_
     else {
         uiBufferSize = 65536;
     }
-    if (abWrite && (rt::_access(static_cast<const char*>(static_cast<const void*>(fileName)), 0) != ((-1)))) {
+    if (abWrite && (rt::_access(static_cast<const char*>(static_cast<const void*>(fileName)), 0) != (-1))) {
         std::error_code kError;
         std::filesystem::remove(
             platform::NativePath(static_cast<const char*>(static_cast<const void*>(fileName))), kError
@@ -315,16 +315,16 @@ bool BGSSaveLoadManager::IsSaveFileNameSystemSave(const char* apSaveFileName) {
 }
 
 bool BGSSaveLoadManager::HasMostRecentSaveGame() {
-    return (pMostRecentSaveGame != 0);
+    return (pMostRecentSaveGame != nullptr);
 }
 
 bool BGSSaveLoadManager::SaveGame(const char* apFileName, int32_t aiDeviceID, bool abOutputStats) {
     bool bIsAutoSave = IsSaveFileNameAutosave(apFileName);
     bool bIsQuickSave = IsSaveFileNameQuicksave(apFileName);
     bool bIsSystemSave = IsSaveFileNameSystemSave(apFileName);
-    bool v13 = 0;
+    bool v13 = false;
     if (bIsAutoSave || (cQueuedForceSave || bIsSystemSave)) {
-        v13 = 1;
+        v13 = true;
     }
     if (IsSavingAllowed(bIsAutoSave)) {
         char Dst[268];
@@ -335,14 +335,14 @@ bool BGSSaveLoadManager::SaveGame(const char* apFileName, int32_t aiDeviceID, bo
             DeleteSaveGameList();
         }
         if (!apFileName) {
-            GenerateSaveFileName(apSaveFileName, 0, 0);
+            GenerateSaveFileName(apSaveFileName, false, false);
             apFileName = apSaveFileName;
         }
         BSstrcpy(Dst, 260, apFileName);
         pSaveLoadGame->CleanupExpiredData();
         uint32_t aiCount = pSaveLoadGame->pHistory->GetCount();
         StartSaveGame();
-        BGSSaveLoadFile* apSaveFile = 0;
+        BGSSaveLoadFile* apSaveFile = nullptr;
         if (pSaveLoadFile) {
             apSaveFile = pSaveLoadFile;
         }
@@ -351,31 +351,31 @@ bool BGSSaveLoadManager::SaveGame(const char* apFileName, int32_t aiDeviceID, bo
         }
         if (apSaveFile) {
             if (v13) {
-                bAutosaveDisabledForDiskspace = 0;
+                bAutosaveDisabledForDiskspace = false;
                 const char* v6 = sMenuDisplayShortXBoxSaveMessage.operator const char*();
                 Interface::ShowMessage(
-                    v6, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_neutral.dds", 0, 2.0f, 1
+                    v6, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_neutral.dds", nullptr, 2.0f, true
                 );
             }
             SaveGameHeader(apSaveFile);
             pSaveLoadGame->SaveGame(apSaveFile);
             if (pSaveLoadGame->GetSaveGameSaving()) {
-                pSaveLoadGame->SetSaveGameSaving(0);
+                pSaveLoadGame->SetSaveGameSaving(false);
                 const char* v7 = sSaveFailed.operator const char*();
                 Interface::ShowMessage(
-                    v7, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                    v7, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
                 );
                 EndSaveGame();
-                return 0;
+                return false;
             }
             else {
                 EndSaveGame();
                 if (apSaveFile != pSaveLoadFile) {
-                    CloseSaveFile(apSaveFile, 1);
+                    CloseSaveFile(apSaveFile, true);
                 }
                 if (abOutputStats) {
                     char apFullPath[270];
-                    GetFullPath(apFileName, apFullPath, 0);
+                    GetFullPath(apFileName, apFullPath, false);
                     BGSSaveLoadStatsMap::OutputSaveLoadStats(apFullPath);
                 }
                 pSaveLoadGame->pHistory->Rewind(aiCount);
@@ -388,20 +388,22 @@ bool BGSSaveLoadManager::SaveGame(const char* apFileName, int32_t aiDeviceID, bo
                     ++iCurrentSaveGameNumber;
                 }
                 SetMostRecentSaveGame(Dst, aiDeviceID);
-                return 1;
+                return true;
             }
         }
         else {
             EndSaveGame();
-            return 0;
+            return false;
         }
     }
     else {
         if (!v13) {
             const char* v4 = sCantSaveNow.String();
-            Interface::ShowMessage(v4, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0);
+            Interface::ShowMessage(
+                v4, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+            );
         }
-        return 0;
+        return false;
     }
 }
 
@@ -499,23 +501,23 @@ void BGSSaveLoadManager::StartLoadGame() {
     BSAudio* v2 = &BSAudio::QInstance();
     bool bmultiThreadedAudio = v2->bMultiThread;
     BSAudio* v3 = &BSAudio::QInstance();
-    v3->SetMultiThreaded(0);
+    v3->SetMultiThreaded(false);
     for (uint32_t i = 0; i < 10; ++i) {
         BSAudio* v4 = &BSAudio::QInstance();
-        v4->Update(0);
+        v4->Update(false);
     }
     BSAudio* v5 = &BSAudio::QInstance();
     v5->SetMultiThreaded(bmultiThreadedAudio);
     if (pVATS.IsInVats()) {
-        pVATS.QuitVATSPlayback(1, 0);
-        pVATS.SetMode(VATS::VATS_MODE_NONE, 0);
+        pVATS.QuitVATSPlayback(true, false);
+        pVATS.SetMode(VATS::VATS_MODE_NONE, false);
     }
-    appTimer.SetGlobalTimeMultiplier(1.0f, 1);
+    appTimer.SetGlobalTimeMultiplier(1.0f, true);
     if (pPlayer) {
-        pPlayer->ResetKillCam(KILL_CAM_VATS, 1);
+        pPlayer->ResetKillCam(KILL_CAM_VATS, true);
     }
-    TES::pInstance->ShowLoadingMenu(1, 0, 0);
-    while (1) {
+    TES::pInstance->ShowLoadingMenu(true, nullptr, false);
+    while (true) {
         PathManager* v6 = PathManager::QInstance();
         if (v6->QIdle()) {
             break;
@@ -565,7 +567,7 @@ bool BGSSaveLoadManager::LoadGame(
         pFile = pSaveLoadFile;
     }
     else {
-        pFile = OpenSaveFile(apFileName, 0, BGSSaveLoadManager::SAVEFILE_LOAD, aiDeviceID);
+        pFile = OpenSaveFile(apFileName, false, BGSSaveLoadManager::SAVEFILE_LOAD, aiDeviceID);
     }
     bool bResult = false;
     if (pFile) {
@@ -575,9 +577,9 @@ bool BGSSaveLoadManager::LoadGame(
         }
         if (pFile->Open()) {
             if (LoadGameHeader(pFile)) {
-                bStartMenuLoading = 1;
+                bStartMenuLoading = true;
                 bResult = pSaveLoadGame->LoadGame(pFile, abIgnoreMissingContent);
-                bStartMenuLoading = 0;
+                bStartMenuLoading = false;
                 if (bResult) {
                     EndLoadGame();
                 }
@@ -588,8 +590,9 @@ bool BGSSaveLoadManager::LoadGame(
                     const char* pNo = sNo.String();
                     const char* pYes = sYes.String();
                     Interface::CreateMessageMenu(
-                        sSaveGameContentIsMissing.String(), static_cast<const char*>(0), static_cast<const char*>(0),
-                        &LoadGameMissingContentCallBack, 1, 23, 0.0f, 0.0f, pYes, pNo, nullptr
+                        sSaveGameContentIsMissing.String(), static_cast<const char*>(nullptr),
+                        static_cast<const char*>(nullptr), &LoadGameMissingContentCallBack, 1, 23, 0.0f, 0.0f, pYes,
+                        pNo, nullptr
                     );
                 }
             }
@@ -598,12 +601,12 @@ bool BGSSaveLoadManager::LoadGame(
             }
         }
         if (pFile != pSaveLoadFile) {
-            CloseSaveFile(pFile, 0);
+            CloseSaveFile(pFile, false);
         }
         if (bResult) {
             if (abOutputStats) {
                 char acFullPath[271];
-                GetFullPath(apFileName, acFullPath, 0);
+                GetFullPath(apFileName, acFullPath, false);
                 BGSSaveLoadStatsMap::OutputSaveLoadStats(acFullPath);
             }
         }
@@ -650,7 +653,7 @@ bool BGSSaveLoadManager::IsSaveFileNameCustom(const char* apSaveFileName) {
 
 void BGSSaveLoadManager::DeleteSaveFile(const char* apFileName, int32_t aiDeviceID) {
     int8_t fileName[268];
-    GetFullPath(apFileName, static_cast<char*>(static_cast<void*>(fileName)), 0);
+    GetFullPath(apFileName, static_cast<char*>(static_cast<void*>(fileName)), false);
     std::error_code kError;
     std::filesystem::remove(platform::NativePath(static_cast<const char*>(static_cast<const void*>(fileName))), kError);
 }
@@ -676,7 +679,7 @@ void BGSSaveLoadManager::DeleteSaveGameList() {
         if (pSaveGameList) {
             delete pSaveGameList;
         }
-        pSaveGameList = 0;
+        pSaveGameList = nullptr;
     }
     iSaveGameCount = 0;
 }
@@ -709,7 +712,7 @@ void BGSSaveLoadManager::GetFullPath(const char* apFileName, char* apFullPath, b
 bool BGSSaveLoadManager::LoadGameHeader(BGSSaveLoadFile* apFile) {
     int32_t imajorVersion = BGSSaveLoadHeader::LoadHeader(apFile);
     if (imajorVersion <= 48 && imajorVersion >= 47) {
-        return 1;
+        return true;
     }
     if (imajorVersion > 0) {
         char apDest[264];
@@ -730,18 +733,18 @@ bool BGSSaveLoadManager::LoadGameHeader(BGSSaveLoadFile* apFile) {
             );
         }
         Interface::CreateMessageMenu(
-            apDest, static_cast<const char*>(0), static_cast<const char*>(0), static_cast<void (*)()>(0), 0, 23, 0.0f,
-            0.0f, sOk.String(), nullptr
+            apDest, static_cast<const char*>(nullptr), static_cast<const char*>(nullptr),
+            static_cast<void (*)()>(nullptr), 0, 23, 0.0f, 0.0f, sOk.String(), nullptr
         );
     }
     else {
         const char* v3 = sOk.String();
         Interface::CreateMessageMenu(
-            sXBoxLoadNoDeviceMessage.operator const char*(), static_cast<const char*>(0), static_cast<const char*>(0),
-            static_cast<void (*)()>(0), 0, 23, 0.0f, 0.0f, v3, nullptr
+            sXBoxLoadNoDeviceMessage.operator const char*(), static_cast<const char*>(nullptr),
+            static_cast<const char*>(nullptr), static_cast<void (*)()>(nullptr), 0, 23, 0.0f, 0.0f, v3, nullptr
         );
     }
-    return 0;
+    return false;
 }
 
 void BGSSaveLoadManager::SetupSavesList() {
@@ -798,7 +801,7 @@ void BGSSaveLoadManager::AddSaveGame(const char* apFileName, int32_t aiDeviceID,
         pfileEntry = ::new (apMemory) BGSSaveLoadFileEntry(Dst, aiDeviceID);
     }
     else {
-        pfileEntry = 0;
+        pfileEntry = nullptr;
     }
     BGSSaveLoadFileEntry* pfileEntry_2 = pfileEntry;
     pfileEntry->CalculateFileTime();
@@ -834,7 +837,7 @@ void BGSSaveLoadManager::StartSaveGame() {
     PathManager* singleton = PathManager::QInstance();
     singleton->Pause();
     pIOManager->Pause();
-    while (1) {
+    while (true) {
         v2 = PathManager::QInstance();
         if (v2->QPaused()) {
             break;
@@ -858,7 +861,7 @@ void BGSSaveLoadManager::EndLoadGame() {
     TESChallengeManager::LoadChallenges();
     appMain->UpdateNonRenderSafeAITasks();
     appMain->RunScripts();
-    pModelLoader->ClearUnusedModels(0);
+    pModelLoader->ClearUnusedModels(false);
     TES::pInstance->UpdateFadeNodesForAttachedCells();
     appMain->ForceUpdateTextures();
     GridCellArray* FormFlags = TES::pInstance->GetGridCellA();
@@ -872,19 +875,19 @@ void BGSSaveLoadManager::EndLoadGame() {
     }
     if (XGamerProfile::Instance()) {
         XGamerProfile* v3 = XGamerProfile::Instance();
-        v3->SetPlayingFlag(1);
+        v3->SetPlayingFlag(true);
         XGamerProfile* v4 = XGamerProfile::Instance();
         v4->ForcePresenceUpdate();
     }
     float* v5 = &fFadeToBlackFadeSeconds.Float();
-    pFaderManager->CreateFader(FADER_TO_BLACK, *v5, 1);
+    pFaderManager->CreateFader(FADER_TO_BLACK, *v5, true);
     LoadingMenu::SuspendBackgroundThread();
-    TES::pInstance->ShowLoadingMenu(0, 0, 0);
+    TES::pInstance->ShowLoadingMenu(false, nullptr, false);
     BSAudio* v6 = &BSAudio::QInstance();
     v6->UnPauseSynchTimer();
     FalloutAudioMedia::MediaMenuUnPause();
     ReferenceProcessLists.RebuildActorsCloseToPlayer();
-    pSaveLoadGame->SetPlayerLocationInvalid(0);
+    pSaveLoadGame->SetPlayerLocationInvalid(false);
     NavMeshObstacleManager* Instance = NavMeshObstacleManager::GetInstance();
     Instance->ForceUpdateAllObstacles();
     PathManager* v8 = PathManager::QInstance();
@@ -901,7 +904,7 @@ void BGSSaveLoadManager::CopySaveGames(bool bFromMemoryStick) {
     BSstrcat(cpath, 260, "Saves");
     BSstrcat(cpath, 260, "/");
     BSSystemDir systemDir(cpath);
-    bool bisComplete = 0;
+    bool bisComplete = false;
     systemDir.NextEntry(bisComplete);
     while (!bisComplete) {
         if (systemDir.QRegular()) {
@@ -909,7 +912,7 @@ void BGSSaveLoadManager::CopySaveGames(bool bFromMemoryStick) {
             if (!BSstrnicmp(systemDir.FindData_.cFileName + (uilength - 4), ".fos", 4u)) {
                 char cfileName[260];
                 BSsprintf(cfileName, 260, "%s%s", cpath, systemDir.FindData_.cFileName);
-                BSSystemFile systemFile(cfileName, 0, 0, 0);
+                BSSystemFile systemFile(cfileName, 0, 0, false);
                 if (systemFile.eLastError) {
                     BSprintf(
                         "BGSSaveLoadManager::CopySaveGamesFromHost failed to open the save game file %s.\n", cfileName
@@ -921,10 +924,10 @@ void BGSSaveLoadManager::CopySaveGames(bool bFromMemoryStick) {
                     systemFile.GetSize(uifileSize);
                     BGSSaveLoadFile* pMemory = static_cast<BGSSaveLoadFile*>(ourMalloc(sizeof(BGSSaveLoadFile)));
                     if (pMemory) {
-                        psaveFile = ::new (pMemory) BGSSaveLoadFile("SaveData", 0, uifileSize);
+                        psaveFile = ::new (pMemory) BGSSaveLoadFile("SaveData", false, uifileSize);
                     }
                     else {
-                        psaveFile = 0;
+                        psaveFile = nullptr;
                     }
                     // The save file's BSFile is the save data utility's file (BGSSaveLoadFile::pFile, +0x104).
                     BSSaveDataSystemUtilityFile* psaveDataFile =
@@ -956,7 +959,7 @@ void BGSSaveLoadManager::CopySaveGames(bool bFromMemoryStick) {
                             pentry = ::new (pEntryMemory) BGSSaveLoadFileEntry(cfileName, 0);
                         }
                         else {
-                            pentry = 0;
+                            pentry = nullptr;
                         }
                         BGSSaveLoadFileEntry* pentry_2 = pentry;
                         BGSSaveLoadHeader::LoadHeaderData(psaveFile, pentry);
@@ -1008,7 +1011,7 @@ void BGSSaveLoadManager::CopySaveGames(bool bFromMemoryStick) {
                         BSSystemUtility* v12 = &BSSystemUtility::QInstance();
                         BSSaveDataSystemUtility* SaveDataUtility = v12->GetSaveDataUtility();
                         SaveDataUtility->AutoSaveData(psaveDataFile);
-                        while (1) {
+                        while (true) {
                             BSSystemUtility* v13 = &BSSystemUtility::QInstance();
                             BSSaveDataSystemUtility* v14 = v13->GetSaveDataUtility();
                             if (v14->bIsActive != 1) {
@@ -1059,11 +1062,11 @@ void BGSSaveLoadManager::Create() {
         Manager = ::new (apMemory) BGSSaveLoadManager;
     }
     else {
-        Manager = 0;
+        Manager = nullptr;
     }
     pSaveLoadManager = Manager;
     BSSaveDataSystemUtility* Singleton = BSSaveDataSystemUtility::GetSingleton();
-    pSaveLoadManager->bSysUtilHasSaveData = Singleton->GetSaveDataEntries("-SAVE-", 0, 0) != 0;
+    pSaveLoadManager->bSysUtilHasSaveData = Singleton->GetSaveDataEntries("-SAVE-", nullptr, 0) != 0;
     BSSaveDataSystemUtility::GetSingleton()->pDeleteCompleteCallback =
         &BGSSaveLoadManager::SysUtilDeleteCompleteCallback;
 }
@@ -1073,14 +1076,14 @@ void BGSSaveLoadManager::SysUtilSaveCompleteCallback(
     BSSaveDataSystemUtilityFile*& apSaveDataFile
 ) {
     if (pSaveLoadManager) {
-        pSaveLoadManager->bReturnedFromSysUtil = 1;
+        pSaveLoadManager->bReturnedFromSysUtil = true;
     }
     if (pSaveLoadManager->pSaveLoadFile) {
         BGSSaveLoadFile* apThis = pSaveLoadManager->pSaveLoadFile;
         if (apThis) {
             delete apThis;
         }
-        pSaveLoadManager->pSaveLoadFile = 0;
+        pSaveLoadManager->pSaveLoadFile = nullptr;
     }
     if (pSaveLoadManager) {
         if (pSaveLoadManager->pSysUtilSaveCompleteCallback) {
@@ -1091,7 +1094,7 @@ void BGSSaveLoadManager::SysUtilSaveCompleteCallback(
 
 void BGSSaveLoadManager::SysUtilDeleteCompleteCallback(BSSaveDataSystemUtility::RESULT aeResult) {
     BSSaveDataSystemUtility* Singleton = BSSaveDataSystemUtility::GetSingleton();
-    pSaveLoadManager->bSysUtilHasSaveData = Singleton->GetSaveDataEntries("-SAVE-", 0, 0) != 0;
+    pSaveLoadManager->bSysUtilHasSaveData = Singleton->GetSaveDataEntries("-SAVE-", nullptr, 0) != 0;
 }
 
 BSSystemFile::ErrorCode BSSystemFile::Read(void* apvBuffer, uint64_t auiBytes, uint64_t& auiRead) {

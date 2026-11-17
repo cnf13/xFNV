@@ -13,7 +13,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 void NiStepBoolKey::Copy(NiAnimationKey* pkNewKey, const NiAnimationKey* pkOrigKey) {
     pkNewKey->m_fTime = pkOrigKey->m_fTime;

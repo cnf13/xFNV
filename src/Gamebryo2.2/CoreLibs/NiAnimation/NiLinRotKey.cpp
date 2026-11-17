@@ -11,7 +11,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 NiAnimationKey* NiLinRotKey::CreateArray(uint32_t uiNumKeys) {
     // EXE-INLINED none: NiNew NiLinRotKey[uiNumKeys] (the overflow-clamped size, the count cookie,

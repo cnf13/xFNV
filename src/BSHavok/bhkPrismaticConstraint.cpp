@@ -185,9 +185,10 @@ void hkPrismaticConstraintCinfo::LoadBinary(NiStream& arStream) {
     hkConstraintCinfo::LoadBinary(arStream);
     hkpPrismaticConstraintData* pd = static_cast<hkpPrismaticConstraintData*>(pData);
     NiBinaryStream* m_pkIstr = v2->Istr();
-    m_pkIstr->m_uiAbsoluteCurrentPos += m_pkIstr->m_pfnRead(m_pkIstr, &pd->m_atoms.m_transforms.m_transformA, 64, 0, 0);
+    m_pkIstr->m_uiAbsoluteCurrentPos +=
+        m_pkIstr->m_pfnRead(m_pkIstr, &pd->m_atoms.m_transforms.m_transformA, 64, nullptr, 0);
     NiBinaryStream* v6 = v2->Istr();
-    v6->m_uiAbsoluteCurrentPos += v6->m_pfnRead(v6, &pd->m_atoms.m_transforms.m_transformB, 64, 0, 0);
+    v6->m_uiAbsoluteCurrentPos += v6->m_pfnRead(v6, &pd->m_atoms.m_transforms.m_transformB, 64, nullptr, 0);
     NiBinaryStream* v7 = v2->Istr();
     uint32_t (*m_pfnRead)(NiBinaryStream*, void*, uint32_t, uint32_t*, uint32_t) = v7->m_pfnRead;
     v16 = 4;
