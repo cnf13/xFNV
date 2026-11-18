@@ -187,7 +187,6 @@ bool SleepWaitMenu::UpdateSleeping() {
 
 void SleepWaitMenu::SetCurrentTime() {
     const char* pAMPM;
-    XFNV_INLINED_LOCAL(BSStringT<char>, apResult, std::nullopt, std::nullopt);
     char Src[268];
     float fHour = appCalendar.GetHour();
     int32_t v9 = static_cast<int32_t>(fHour);
@@ -206,11 +205,10 @@ void SleepWaitMenu::SetCurrentTime() {
     else {
         pAMPM = sAMTime.String();
     }
-    BSStringT<char>* DateString = appCalendar.GetDateString(&apResult);
     BSsprintf(
-        Src, 260, "%s, %s, %d:%02d %s", appCalendar.GetDayOfWeekString(), DateString->String(), v9, iMinutes, pAMPM
+        Src, 260, "%s, %s, %d:%02d %s", appCalendar.GetDayOfWeekString(), appCalendar.GetDateString().String(), v9,
+        iMinutes, pAMPM
     );
-    apResult.~BSStringT<char>();
     pTiles[3]->Set(4036, Src, true);
 }
 

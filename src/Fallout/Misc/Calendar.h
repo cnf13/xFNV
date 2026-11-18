@@ -72,7 +72,7 @@ public:
     // The whole days passed (1 without the global).
     uint32_t GetDaysPassed();
     // The date as "MM.DD.YY", returned by value through apResult.
-    BSStringT<char>* GetDateString(BSStringT<char>* apResult);
+    BSStringT<char> GetDateString();
     // The game time scale.
     float GetTimeScale();
     // Advances the calendar by afSeconds of game time.

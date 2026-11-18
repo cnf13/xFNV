@@ -967,7 +967,7 @@ public:
     void AddToPlayerCrimeList(Crime* apCrime, float afTimeStamp);
     void AddActivateParent(TESObjectREFR* apRef);
     void SetActivateDelay(TESObjectREFR* apRef, float afVal);
-    BSStringT<char>* GetActivateTextOverride(BSStringT<char>* apResult);
+    BSStringT<char> GetActivateTextOverride();
     void Revert_0042DAE0(BGSLoadFormBuffer* apLoadGameBuffer);
     MenuTopic* GetInfoGeneralTopic(TESObjectREFR* apSpeaker);
     void RemoveExtraSayTopicInfoOnceADayExtra();

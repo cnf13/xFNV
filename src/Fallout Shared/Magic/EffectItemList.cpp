@@ -62,7 +62,6 @@ float EffectItemList::GetCost(Actor* apActor) {
 }
 
 void EffectItemList::GetEffectsString(char* apBuffer, uint32_t auiSize) {
-    XFNV_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
     bool bDispositionFailure = false;
     StatsMenu::StatusDataList kStatusList;
     bool bMedicine = IsMedicine();
@@ -76,9 +75,7 @@ void EffectItemList::GetEffectsString(char* apBuffer, uint32_t auiSize) {
         if ((!pEffectNode->m_item->IsUsageMonitorEffect()) &&
             (pEffectNode->m_item->Conditions.IsTrueFull(pPlayer, nullptr, &bDispositionFailure, false))) {
             if (pEffectNode->m_item->pEffectSetting->IsFlagSet(EffectSetting::DISPLAY_EFFECT_NAME)) {
-                BSStringT<char>* EffectName = pEffectNode->m_item->GetEffectName(&apString);
-                BSstrcpy(Dst, 128, EffectName->pString);
-                apString.~BSStringT<char>();
+                BSstrcpy(Dst, 128, pEffectNode->m_item->GetEffectName().pString);
                 if (bAppended) {
                     BSstrcat(apBuffer, static_cast<int32_t>(auiSize), "\n");
                     BSstrcat(apBuffer, static_cast<int32_t>(auiSize), Dst);
@@ -259,7 +256,6 @@ void EffectItemList::Save() {
 // The effect ID is set to 0 before the EFID chunk is read: GetChunkData writes at most the chunk's bytes, so a
 // zero-size chunk would otherwise leave it unwritten.
 void EffectItemList::Load(TESFile* apFile, const char* apSpellName) {
-    XFNV_INLINED_LOCAL(BSStringT<char>, kEffectName, std::nullopt, std::nullopt);
     CHUNK_ID eChunk = apFile->GetTESChunk();
     if (eChunk == CIDA_ID) {
         if (pLastEffect) {
@@ -313,11 +309,10 @@ void EffectItemList::Load(TESFile* apFile, const char* apSpellName) {
                     else {
                         pName = "{unknown}";
                     }
-                    BSStringT<char>* pEffectName = pEffectSetting->GetEffectName(&kEffectName);
                     Warning(
-                        "MASTERFILE: Unable to load EffectItem '%s' in Actor Effect '%s'", pEffectName->String(), pName
+                        "MASTERFILE: Unable to load EffectItem '%s' in Actor Effect '%s'",
+                        pEffectSetting->GetEffectName().String(), pName
                     );
-                    kEffectName.~BSStringT<char>();
                     if (pEffect) {
                         delete pEffect;
                     }

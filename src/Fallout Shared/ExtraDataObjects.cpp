@@ -2409,16 +2409,14 @@ void ExtraSecuritronFace::SetMood(const char* asMood) {
 
 void ExtraSecuritronFace::ApplyFace(NiAVObject* apMesh) {
     XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSStringT<char>, Personality, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSStringT<char>, Mood, std::nullopt, std::nullopt);
     if (apMesh) {
         NiFixedString* v4 = ::new (static_cast<void*>(&apString)) NiFixedString("Screen01:0");
         NiAVObject* pFace = apMesh->GetObjectByName(*v4);
         apString.~NiFixedString();
         if (pFace) {
             NiPointer<NiSourceTexture> TexPtr(static_cast<NiSourceTexture*>(nullptr));
-            GetPersonality(&Personality);
-            GetMood(&Mood);
+            BSStringT<char> Personality = GetPersonality();
+            BSStringT<char> Mood = GetMood();
             if ((Personality.GetLength()) && (Mood.GetLength())) {
                 char apDest[268];
                 char path[268];
@@ -2436,8 +2434,6 @@ void ExtraSecuritronFace::ApplyFace(NiAVObject* apMesh) {
                 NiSourceTexture* v3 = TexPtr.m_pObject;
                 pFaceShader->SetBaseMap(v3);
             }
-            Mood.~BSStringT<char>();
-            Personality.~BSStringT<char>();
         }
     }
 }

@@ -637,10 +637,7 @@ void EffectSetting::SetEffectArchetype(int32_t a2) {
 }
 
 void EffectSetting::SetEffectName(const char* apEffectName) {
-    XFNV_INLINED_LOCAL(BSStringT<char>, apResult, std::nullopt, std::nullopt);
-    BSStringT<char>* EffectName = GetEffectName(&apResult);
-    int32_t v5 = EffectName->StrCmp(apEffectName, true);
-    apResult.~BSStringT<char>();
+    int32_t v5 = GetEffectName().StrCmp(apEffectName, true);
     if (v5) {
         SetFullName(apEffectName);
     }

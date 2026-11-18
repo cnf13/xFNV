@@ -1060,8 +1060,8 @@ void StatsMenu::UpdateAllMiscStats() {
     lbGeneral.Traverse(&StatsMenu::MiscStatsUpdateFn, 0, 0x7FFFFFFF);
 }
 
-// Each effect name is built by GetEffectName in uninitialised storage and destroyed right after its text is read, as
-// the game does; the first one only tests the text for null after the string is gone, deliberately.
+// Each effect name is a temporary destroyed right after its text is read, as the game does; the first one only tests
+// the text for null after the string is gone, deliberately.
 void StatsMenu::UpdateActiveEffects() {
     if (this->bActiveEffectsUpdatedThisFrame) {
         return;
@@ -1281,15 +1281,9 @@ void StatsMenu::UpdateActiveEffects() {
         BSStringT<char> effects;
         for (BSSimpleList<EffectSetting*>* named = &node->GetItem()->xNamedEffects; named && named->GetItem();
              named = named->GetNext()) {
-            alignas(BSStringT<char>) uint8_t nameStorage[sizeof(BSStringT<char>)];
-            BSStringT<char>* nameTemp = reinterpret_cast<BSStringT<char>*>(nameStorage);
-            const char* nameText = named->GetItem()->GetEffectName(nameTemp)->pString;
-            nameTemp->Set(nullptr, 0);
+            const char* nameText = named->GetItem()->GetEffectName().pString;
             if (nameText) {
-                alignas(BSStringT<char>) uint8_t shownStorage[sizeof(BSStringT<char>)];
-                BSStringT<char>* shownTemp = reinterpret_cast<BSStringT<char>*>(shownStorage);
-                text.SPrintF("%s", named->GetItem()->GetEffectName(shownTemp)->pString);
-                shownTemp->Set(nullptr, 0);
+                text.SPrintF("%s", named->GetItem()->GetEffectName().pString);
                 effects += text;
                 if (named->GetNext()) {
                     effects += ", ";
@@ -2215,14 +2209,9 @@ StatsMenu::BodyPartController::BodyPartIndex& operator++(StatsMenu::BodyPartCont
 }
 
 int32_t StatsMenu_sortingFunction(EffectSetting* a1, EffectSetting* a2) {
-    XFNV_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSStringT<char>, apResult, std::nullopt, std::nullopt);
-    BSStringT<char>* EffectName = a2->GetEffectName(&apResult);
-    char* v3 = EffectName->pString;
-    BSStringT<char>* v4 = a1->GetEffectName(&apString);
-    int32_t v8 = BSstricmp(v4->pString, v3);
-    apString.~BSStringT<char>();
-    apResult.~BSStringT<char>();
+    BSStringT<char> apResult = a2->GetEffectName();
+    char* v3 = apResult.pString;
+    int32_t v8 = BSstricmp(a1->GetEffectName().pString, v3);
     return v8;
 }
 

@@ -1611,8 +1611,8 @@ public:
     void SetMood(const char* asMood);
     // Applies the personality and mood to the face of apMesh.
     void ApplyFace(NiAVObject* apMesh);
-    BSStringT<char>* GetPersonality(BSStringT<char>* apResult);
-    BSStringT<char>* GetMood(BSStringT<char>* apResult);
+    BSStringT<char> GetPersonality();
+    BSStringT<char> GetMood();
 
     BSStringT<char> msPersonality;
     BSStringT<char> msMood;

@@ -707,18 +707,14 @@ bool MagicTarget::CheckAddEffect(MagicCaster* apCaster, MagicItem* apSpell, Acti
         else {
             pTargetName = "{NULL}";
         }
-        // GetEffectName fills kName; the local is destroyed, not the pointer returned.
-        XFNV_INLINED_LOCAL(BSStringT<char>, kName, std::nullopt, std::nullopt);
-        BSStringT<char>* pName = apActiveEffect->GetEffectItem()->GetEffectName(&kName);
-        const char* pEffectName = pName->String();
+        BSStringT<char> kName = apActiveEffect->GetEffectItem()->GetEffectName();
+        const char* pEffectName = kName.String();
         const char* pSpellName = apSpell->GetFullName();
         // The resistance is also passed, although the format does not print it.
         Interface::PrintLine(
             "Target: %s FULLY RESISTED Spell: %s Effect: %s", pTargetName, pSpellName, pEffectName,
             static_cast<double>(fResistance)
         );
-        // SWEEP-INLINE 0x4037D0
-        kName.~BSStringT<char>();
         return false;
     }
 
@@ -736,13 +732,10 @@ bool MagicTarget::CheckAddEffect(MagicCaster* apCaster, MagicItem* apSpell, Acti
         else {
             pTargetName = "{NULL}";
         }
-        XFNV_INLINED_LOCAL(BSStringT<char>, kName, std::nullopt, std::nullopt);
-        BSStringT<char>* pName = apActiveEffect->GetEffectItem()->GetEffectName(&kName);
-        const char* pEffectName = pName->String();
+        BSStringT<char> kName = apActiveEffect->GetEffectItem()->GetEffectName();
+        const char* pEffectName = kName.String();
         const char* pSpellName = apSpell->GetFullName();
         Interface::PrintLine("Invalid Target: Target: %s Spell: %s Effect: %s", pTargetName, pSpellName, pEffectName);
-        // SWEEP-INLINE 0x4037D0
-        kName.~BSStringT<char>();
         return false;
     }
 
@@ -909,15 +902,12 @@ bool MagicTarget::CheckAddEffect(MagicCaster* apCaster, MagicItem* apSpell, Acti
     int32_t iItemMagnitude = pNewEffect->GetEffectItem()->GetMagnitude();
     double dMagnitude = pNewEffect->GetMagnitude();
     const char* pSpellName = apSpell->GetFullName();
-    XFNV_INLINED_LOCAL(BSStringT<char>, kName, std::nullopt, std::nullopt);
-    BSStringT<char>* pName = pNewEffect->GetEffectItem()->GetEffectName(&kName);
-    const char* pEffectName = pName->String();
+    BSStringT<char> kName = pNewEffect->GetEffectItem()->GetEffectName();
+    const char* pEffectName = kName.String();
     Interface::PrintLine(
         "Effect %s from spell %s added to %s. Mag: %.2f/%d Dur: %.2f/%d", pEffectName, pSpellName, pTargetName,
         dMagnitude, iItemMagnitude, dDuration, uiItemDuration
     );
-    // SWEEP-INLINE 0x4037D0
-    kName.~BSStringT<char>();
     return true;
 }
 
@@ -1059,8 +1049,6 @@ int32_t MagicTarget::ActiveEffectListCompareFn(ActiveEffect* apCompare1, ActiveE
     float v5;
     float SequenceWeight;
     float LastTimeProcessed;
-    XFNV_INLINED_LOCAL(BSStringT<char>, v9, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
     char _String1[260];
     char _String2[260];
     EffectItem* pitem = apCompare1->pEffect;
@@ -1076,12 +1064,10 @@ int32_t MagicTarget::ActiveEffectListCompareFn(ActiveEffect* apCompare1, ActiveE
     else {
         SequenceWeight = apCompare1->fMagnitude;
     }
-    BSStringT<char>* EffectName = pitem->GetEffectName(&apString);
     std::sprintf(
-        _String1, "%c%.30s%.1f%.1f", 65, EffectName->String(), static_cast<double>(SequenceWeight),
+        _String1, "%c%.30s%.1f%.1f", 65, pitem->GetEffectName().String(), static_cast<double>(SequenceWeight),
         static_cast<double>(LastTimeProcessed)
     );
-    apString.~BSStringT<char>();
     pitem = apCompare2->pEffect;
     if (pitem->pEffectSetting->IsFlagSet(EffectSetting::NO_DURATION)) {
         v5 = 1000.0f;
@@ -1095,9 +1081,10 @@ int32_t MagicTarget::ActiveEffectListCompareFn(ActiveEffect* apCompare1, ActiveE
     else {
         v4 = apCompare2->fMagnitude;
     }
-    BSStringT<char>* v3 = pitem->GetEffectName(&v9);
-    std::sprintf(_String2, "%c%.30s%.1f%.1f", 65, v3->String(), static_cast<double>(v4), static_cast<double>(v5));
-    v9.~BSStringT<char>();
+    std::sprintf(
+        _String2, "%c%.30s%.1f%.1f", 65, pitem->GetEffectName().String(), static_cast<double>(v4),
+        static_cast<double>(v5)
+    );
     return _tcsicmp(_String1, _String2);
 }
 

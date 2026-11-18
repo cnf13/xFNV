@@ -62,7 +62,7 @@ public:
     void SetContinuousBroadcast(bool abVal);
     bool GetNonPipboyRadio();
     // A copy of ActivateTextOverride, returned by value through apResult.
-    BSStringT<char>* GetActivationString(BSStringT<char>* apResult);
+    BSStringT<char> GetActivationString();
 
     TESSound* pSoundLoop;
     TESSound* pSoundActivate;

@@ -67,7 +67,7 @@ public:
     bool IsScriptEffect();
     Script* GetScript();
     // Builds the effect's name in apString; returns apString.
-    BSStringT<char>* GetEffectName(BSStringT<char>* apString);
+    BSStringT<char> GetEffectName();
     void Initialize(EffectSetting* apEffectSetting);
     void InitItem(TESForm* a2);
     // Saves the effect's numbers (EFIT) and its conditions.

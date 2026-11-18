@@ -101,7 +101,7 @@ public:
     // True when the effect's archetype runs a script.
     bool IsScriptEffect();
     // Constructs a copy of the effect's name in apResult; returns apResult.
-    BSStringT<char>* GetEffectName(BSStringT<char>* apResult);
+    BSStringT<char> GetEffectName();
     // The actor value that resists the effect, or -1 for none.
     ActorValue::Index GetResistanceVariable();
     bool IsAssociatedActorValueUsed();

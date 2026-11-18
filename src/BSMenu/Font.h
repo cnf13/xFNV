@@ -319,8 +319,7 @@ public:
     float GetLinePadding(int32_t aiFont);
     int32_t GetCharType(char acchar);
     // Collects the text of apSource from *aiIndex up to a stop character into apResult.
-    BSStringT<char>* CollectTo(
-        BSStringT<char>* apResult,
+    BSStringT<char> CollectTo(
         const char* apSource,
         int32_t& aiIndex,
         int32_t aebfMatches,

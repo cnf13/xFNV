@@ -907,20 +907,16 @@ bool MagicCaster::ReleaseCast(TESBoundObject* apSource) {
     }
     Actor* pCaster = GetCasterAsActor();
     GetCurrentSpell()->GetAVEffect(MagicSystem::SELF);
-    // GetCannotCastString is handed uninitialised storage; the callee constructs the string.
-    alignas(BSStringT<char>) uint8_t aCannotCastStorage[sizeof(BSStringT<char>)];
-    BSStringT<char>* pCannotCast = reinterpret_cast<BSStringT<char>*>(aCannotCastStorage);
-    GetCurrentSpell()->GetCannotCastString(pCannotCast, eReason);
+    BSStringT<char> kCannotCast = GetCurrentSpell()->GetCannotCastString(eReason);
     if ((pCaster) && (pCaster->IsPc() && (!pIngredient || static_cast<EffectItemList*>(pIngredient)->IsFood()))) {
-        Interface::ShowMessage(pCannotCast->String(), 0, nullptr, nullptr, 2.0f, false);
+        Interface::ShowMessage(kCannotCast.String(), 0, nullptr, nullptr, 2.0f, false);
     }
 
     // SetState takes the message as char* while String() returns const char*, hence the const_cast.
-    SetState(ERR_CANNOT_CAST, const_cast<char*>(pCannotCast->String()));
+    SetState(ERR_CANNOT_CAST, const_cast<char*>(kCannotCast.String()));
     SpellCast(GetCurrentSpell(), false);
     SetCurrentSpell(nullptr);
     SetDesiredTarget(nullptr);
-    pCannotCast->~BSStringT<char>();
     return false;
 }
 

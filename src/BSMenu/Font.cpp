@@ -2200,14 +2200,13 @@ int32_t FontManager::GetCharType(char acchar) {
     return result;
 }
 
-// Collects the text of apSource from character *aiIndex on into apResult, up to the first character whose type has a
+// Collects the text of apSource from character *aiIndex on, up to the first character whose type has a
 // bit of aebfMatches (a space ends it with type 0x20 written to *aeResultMatch) or of aebfInvMatches (consumed, its
 // type written), or lacks every bit of aeResultMatch when that is set. Line breaks are skipped; other characters are
 // kept only with bKeep, where an HTML entity ("&...;") is replaced by its text replacement or text icon. The character
 // that ended the run is left in *acResultChar. Every other character is dropped when bKeep is clear, as the game does.
 // The local buffer is appended to the string once it holds more than 2000 characters, without clearing its tail.
-BSStringT<char>* FontManager::CollectTo(
-    BSStringT<char>* apResult,
+BSStringT<char> FontManager::CollectTo(
     const char* apSource,
     int32_t& aiIndex,
     int32_t aebfMatches,
@@ -2216,11 +2215,7 @@ BSStringT<char>* FontManager::CollectTo(
     char& acResultChar,
     bool bKeep
 ) {
-    XFNV_INLINED_LOCAL(BSStringT<char>, xString, std::nullopt, std::nullopt);
-    // EXE-INLINED none: BSStringT<char>::Init
-    xString.pString = nullptr;
-    xString.sLen = 0;
-    xString.sMaxLen = 0;
+    BSStringT<char> xString;
     int32_t iLength = 0;
     char acBuffer[0x800];
     std::memset(acBuffer, 0, 0x800);
@@ -2292,11 +2287,7 @@ BSStringT<char>* FontManager::CollectTo(
         ++aiIndex;
     }
     xString += acBuffer;
-    // SWEEP-INLINE 0x4047F0
-    ::new (apResult) BSStringT<char>(xString);
-    // The local's destructor.
-    xString.Set(nullptr, 0);
-    return apResult;
+    return xString;
 }
 
 // Parses the hypertext of axTextString into a new TextDoc, one CharData per character. Only a text whose first
@@ -2356,18 +2347,7 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
     TextDoc* pDoc = nullptr;
     int32_t iIcon = 0;
 
-    // Each CollectTo result is released right after use. Each call site has its own result temporary, which CollectTo
-    // fills.
-    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected0, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected1, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected3, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected4, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected5, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected6, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected7, std::nullopt, std::nullopt);
-    CollectTo(&kCollected0, pcText, iIndex, 0, 4, eMatch, cMatch, false);
-    kCollected0.Set(nullptr, 0);
+    CollectTo(pcText, iIndex, 0, 4, eMatch, cMatch, false);
     if (eMatch == 1) {
         void* pDocMemory = MemoryManager_Singleton.Allocate(sizeof(TextDoc));
         TextDoc* pNewDoc;
@@ -2388,10 +2368,8 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
         pDoc = pNewDoc;
         iIndex = 0;
         while (true) {
-            // The text up to the next '<'. Copies from the pointer CollectTo returns.
-            BSStringT<char>* pResult = CollectTo(&kCollected1, pcText, iIndex, 1, 0, eMatch, cMatch, true);
-            kText.Set(*pResult);
-            kCollected1.Set(nullptr, 0);
+            // The text up to the next '<'.
+            kText.Set(CollectTo(pcText, iIndex, 1, 0, eMatch, cMatch, true));
             if (kText.pString) {
                 if (bImage) {
                     // The pending image goes in first.
@@ -2422,9 +2400,7 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
                 break;
             }
             // The tag name, upper-cased.
-            pResult = CollectTo(&kCollected2, pcText, iIndex, 6, 0, eMatch, cMatch, true);
-            kTag.Set(*pResult);
-            kCollected2.Set(nullptr, 0);
+            kTag.Set(CollectTo(pcText, iIndex, 6, 0, eMatch, cMatch, true));
             // EXE-INLINED none: BSStringT<char>::Length
             for (uint32_t i = 0; i < (kTag.sLen == 0xFFFF ? std::strlen(kTag.pString) : kTag.sLen); ++i) {
                 kTag.pString[kTag.pString ? i : 0] =
@@ -2436,14 +2412,11 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
             if (eMatch & 4) {
                 // The attributes, up to the '>'.
                 while (true) {
-                    CollectTo(&kCollected3, pcText, iIndex, 0, 4, eMatch, cMatch, false);
-                    kCollected3.Set(nullptr, 0);
+                    CollectTo(pcText, iIndex, 0, 4, eMatch, cMatch, false);
                     if ((eMatch & 0x20) || (eMatch & 2)) {
                         break;
                     }
-                    pResult = CollectTo(&kCollected4, pcText, iIndex, 0x16, 0, eMatch, cMatch, true);
-                    kAttribute.Set(*pResult);
-                    kCollected4.Set(nullptr, 0);
+                    kAttribute.Set(CollectTo(pcText, iIndex, 0x16, 0, eMatch, cMatch, true));
                     // EXE-INLINED none: BSStringT<char>::Length
                     for (uint32_t i = 0;
                          i < (kAttribute.sLen == 0xFFFF ? std::strlen(kAttribute.pString) : kAttribute.sLen); ++i) {
@@ -2458,25 +2431,20 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
                         kValue.Set("true", 0);
                     }
                     else {
-                        CollectTo(&kCollected5, pcText, iIndex, 0, 4, eMatch, cMatch, false);
-                        kCollected5.Set(nullptr, 0);
+                        CollectTo(pcText, iIndex, 0, 4, eMatch, cMatch, false);
                         if ((eMatch & 0x20) || (eMatch & 2)) {
                             break;
                         }
                         if (eMatch == 8) {
                             // A quoted value keeps its case.
                             ++iIndex;
-                            pResult = CollectTo(&kCollected6, pcText, iIndex, 10, 0, eMatch, cMatch, true);
-                            kValue.Set(*pResult);
-                            kCollected6.Set(nullptr, 0);
+                            kValue.Set(CollectTo(pcText, iIndex, 10, 0, eMatch, cMatch, true));
                             cMatch = pcText[iIndex];
                             ++iIndex;
                             eMatch = GetCharType(cMatch);
                         }
                         else {
-                            pResult = CollectTo(&kCollected7, pcText, iIndex, 6, 0, eMatch, cMatch, true);
-                            kValue.Set(*pResult);
-                            kCollected7.Set(nullptr, 0);
+                            kValue.Set(CollectTo(pcText, iIndex, 6, 0, eMatch, cMatch, true));
                             // EXE-INLINED none: BSStringT<char>::Length
                             for (uint32_t i = 0;
                                  i < (kValue.sLen == 0xFFFF ? std::strlen(kValue.pString) : kValue.sLen); ++i) {

@@ -99,18 +99,13 @@ uint32_t Calendar::GetDaysPassed() {
     return static_cast<uint32_t>(static_cast<int64_t>(fDaysPassed));
 }
 
-BSStringT<char>* Calendar::GetDateString(BSStringT<char>* apResult) {
-    alignas(BSStringT<char>) uint8_t aTextMemory[sizeof(BSStringT<char>)];
-    BSStringT<char>* pText = ::new (aTextMemory) BSStringT<char>;
+BSStringT<char> Calendar::GetDateString() {
+    BSStringT<char> kText;
     uint32_t uiYear = GetYear() % 100;
     char cDay = GetDay();
     CALENDAR_MONTH eMonth = GetMonth();
-    pText->SPrintF("%02d.%02d.%02d", eMonth + 1, static_cast<int32_t>(cDay), uiYear);
-    // SWEEP-INLINE 0x4047f0
-    ::new (apResult) BSStringT<char>(*pText);
-    // SWEEP-INLINE 0x4037d0
-    pText->~BSStringT<char>();
-    return apResult;
+    kText.SPrintF("%02d.%02d.%02d", eMonth + 1, static_cast<int32_t>(cDay), uiYear);
+    return kText;
 }
 
 float Calendar::GetTimeScale() {

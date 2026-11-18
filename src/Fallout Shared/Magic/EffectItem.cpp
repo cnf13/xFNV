@@ -238,9 +238,8 @@ Script* EffectItem::GetScript() {
     return pscript;
 }
 
-BSStringT<char>* EffectItem::GetEffectName(BSStringT<char>* apString) {
-    pEffectSetting->GetEffectName(apString);
-    return apString;
+BSStringT<char> EffectItem::GetEffectName() {
+    return pEffectSetting->GetEffectName();
 }
 
 void EffectItem::Initialize(EffectSetting* apEffectSetting) {
@@ -491,9 +490,8 @@ float EffectSetting::GetBaseCost() {
     return data.fBaseCost;
 }
 
-BSStringT<char>* EffectSetting::GetEffectName(BSStringT<char>* apResult) {
-    ::new (apResult) BSStringT<char>(*&cFullName);
-    return apResult;
+BSStringT<char> EffectSetting::GetEffectName() {
+    return cFullName;
 }
 
 ActorValue::Index EffectSetting::GetAssociatedActorValue() {

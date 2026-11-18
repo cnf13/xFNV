@@ -187,14 +187,10 @@ void TESObjectACTI::Save() {
         TESForm::AddChunk(RNAM_ID, pRadioStation->GetFormID());
     }
     if (ActivateTextOverride.GetLength()) {
-        alignas(BSStringT<char>) uint8_t aLengthStorage[sizeof(BSStringT<char>)];
-        BSStringT<char>* pLengthCopy = GetActivationString(reinterpret_cast<BSStringT<char>*>(aLengthStorage));
-        uint32_t uiSize = pLengthCopy->GetLength() + 1;
-        alignas(BSStringT<char>) uint8_t aTextStorage[sizeof(BSStringT<char>)];
-        BSStringT<char>* pTextCopy = GetActivationString(reinterpret_cast<BSStringT<char>*>(aTextStorage));
-        TESForm::AddChunkArray(XATO_ID, const_cast<char*>(pTextCopy->String()), uiSize);
-        reinterpret_cast<BSStringT<char>*>(aTextStorage)->~BSStringT<char>();
-        reinterpret_cast<BSStringT<char>*>(aLengthStorage)->~BSStringT<char>();
+        BSStringT<char> kLengthCopy = GetActivationString();
+        uint32_t uiSize = kLengthCopy.GetLength() + 1;
+        BSStringT<char> kTextCopy = GetActivationString();
+        TESForm::AddChunkArray(XATO_ID, const_cast<char*>(kTextCopy.String()), uiSize);
     }
     CloseForm();
 }
@@ -312,19 +308,15 @@ void TESObjectACTI::Copy(TESForm* apCopy) {
         pSoundActivate = acti->pSoundActivate;
         pWaterForm = acti->GetWaterType();
         pRadioStation = acti->pRadioStation;
-        XFNV_INLINED_LOCAL(BSStringT<char>, sActivation, std::nullopt, std::nullopt);
-        acti->GetActivationString(&sActivation);
-        SetActivationString(sActivation);
-        // SetActivationString releases its argument; natively C++ passes it a copy of this raw-storage local, so the
-        // local is destroyed here.
-        sActivation.~BSStringT<char>();
+        {
+            BSStringT<char> sActivation = acti->GetActivationString();
+            SetActivationString(sActivation);
+        }
         CopyAllComponents(apCopy);
     }
 }
 
 bool TESObjectACTI::Compare(TESForm* apCompare) {
-    XFNV_INLINED_LOCAL(BSStringT<char>, v11, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
     TESObjectACTI* pComp = dynamic_cast<TESObjectACTI*>(apCompare);
     if (!pComp) {
         return true;
@@ -349,11 +341,12 @@ bool TESObjectACTI::Compare(TESForm* apCompare) {
     if (RadioStation != pComp->pRadioStation) {
         return true;
     }
-    BSStringT<char>* arString = pComp->GetActivationString(&v11);
-    BSStringT<char>* ActivationString = GetActivationString(&apString);
-    int32_t v13 = ActivationString->StrCmp(*arString, true);
-    apString.~BSStringT<char>();
-    v11.~BSStringT<char>();
+    int32_t v13;
+    {
+        BSStringT<char> v11 = pComp->GetActivationString();
+        BSStringT<char> apString = GetActivationString();
+        v13 = apString.StrCmp(v11, true);
+    }
     return v13 || CompareAllComponents(pComp);
 }
 
@@ -504,9 +497,8 @@ bool TESObjectACTI::GetNonPipboyRadio() {
     return ((((int32_t)TESForm::GetFormFlags()) & 268435456) != 0);
 }
 
-BSStringT<char>* TESObjectACTI::GetActivationString(BSStringT<char>* apResult) {
-    ::new (apResult) BSStringT<char>(ActivateTextOverride);
-    return apResult;
+BSStringT<char> TESObjectACTI::GetActivationString() {
+    return ActivateTextOverride;
 }
 
 BGSOpenCloseForm::BGSOpenCloseForm() {}

@@ -2085,15 +2085,8 @@ void ExtraDataList::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
                     break;
                 case EXTRA_SECURITRON_FACE: {
                     auto* pFaceExtra = static_cast<ExtraSecuritronFace*>(pExtra);
-                    // Each string GetPersonality and GetMood return is destroyed right after it is saved.
-                    XFNV_INLINED_LOCAL(BSStringT<char>, kPersonality, std::nullopt, std::nullopt);
-                    BSStringT<char>* pPersonality = pFaceExtra->GetPersonality(&kPersonality);
-                    apSaveGameBuffer->SaveString(pPersonality->pString, 0);
-                    kPersonality.~BSStringT<char>();
-                    XFNV_INLINED_LOCAL(BSStringT<char>, kMood, std::nullopt, std::nullopt);
-                    BSStringT<char>* pMood = pFaceExtra->GetMood(&kMood);
-                    apSaveGameBuffer->SaveString(pMood->pString, 0);
-                    kMood.~BSStringT<char>();
+                    apSaveGameBuffer->SaveString(pFaceExtra->GetPersonality().pString, 0);
+                    apSaveGameBuffer->SaveString(pFaceExtra->GetMood().pString, 0);
                     break;
                 }
                 case EXTRA_SPECIAL_RENDER_FLAGS: {
@@ -2422,14 +2415,10 @@ void ExtraDataList::Save() {
                 }
                 if (pActivate->ActivateTextOverride.GetLength()) {
                     // Two copies of the text: the length is taken from the first, the characters from the second.
-                    XFNV_INLINED_LOCAL(BSStringT<char>, kLengthText, std::nullopt, std::nullopt);
-                    XFNV_INLINED_LOCAL(BSStringT<char>, kText, std::nullopt, std::nullopt);
-                    BSStringT<char>* pLengthText = GetActivateTextOverride(&kLengthText);
-                    uint32_t iLength = pLengthText->GetLength() + 1;
-                    BSStringT<char>* pText = GetActivateTextOverride(&kText);
-                    TESForm::AddChunkArray(XATO_ID, pText->pString, iLength);
-                    kText.~BSStringT<char>();
-                    kLengthText.~BSStringT<char>();
+                    BSStringT<char> kLengthText = GetActivateTextOverride();
+                    uint32_t iLength = kLengthText.GetLength() + 1;
+                    BSStringT<char> kText = GetActivateTextOverride();
+                    TESForm::AddChunkArray(XATO_ID, kText.pString, iLength);
                 }
                 break;
             }
@@ -11284,15 +11273,12 @@ void ExtraDataList::SetActivateDelay(TESObjectREFR* apRef, float afVal) {
     }
 }
 
-BSStringT<char>* ExtraDataList::GetActivateTextOverride(BSStringT<char>* apResult) {
+BSStringT<char> ExtraDataList::GetActivateTextOverride() {
     ExtraActivateRef* pextra = static_cast<ExtraActivateRef*>(GetExtraData(83));
     if (pextra) {
-        ::new (apResult) BSStringT<char>(pextra->ActivateTextOverride);
+        return pextra->ActivateTextOverride;
     }
-    else {
-        ::new (apResult) BSStringT<char>("");
-    }
-    return apResult;
+    return "";
 }
 
 void ExtraDataList::Revert_0042DAE0(BGSLoadFormBuffer* apLoadGameBuffer) {
@@ -11604,14 +11590,12 @@ ExtraSecuritronFace::ExtraSecuritronFace() : BSExtraData(143) {}
 
 ExtraSecuritronFace::~ExtraSecuritronFace() {}
 
-BSStringT<char>* ExtraSecuritronFace::GetPersonality(BSStringT<char>* apResult) {
-    ::new (apResult) BSStringT<char>(msPersonality);
-    return apResult;
+BSStringT<char> ExtraSecuritronFace::GetPersonality() {
+    return msPersonality;
 }
 
-BSStringT<char>* ExtraSecuritronFace::GetMood(BSStringT<char>* apResult) {
-    ::new (apResult) BSStringT<char>(msMood);
-    return apResult;
+BSStringT<char> ExtraSecuritronFace::GetMood() {
+    return msMood;
 }
 
 ExtraTimeLeft::ExtraTimeLeft() : BSExtraData(EXTRA_TIMELEFT), fTime((float)0.0) {}

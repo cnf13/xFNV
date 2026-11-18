@@ -3079,8 +3079,8 @@ int32_t MapMenu::GetClassStatic() {
     return 1023;
 }
 
-// The strings are destroyed with Set(nullptr, 0). The date string is constructed by GetDateString in uninitialised
-// storage. Each label's setting text and trait are fetched before pMe is read, as the game does.
+// The strings are destroyed with Set(nullptr, 0). Each label's setting text and trait are fetched before pMe is read,
+// as the game does.
 void MapMenu::UpdateMenu() {
     using enum Tile::eTileValue;
 
@@ -3093,10 +3093,7 @@ void MapMenu::UpdateMenu() {
     const float fHour = appCalendar.GetHour();
     const int32_t iMinutes = static_cast<int32_t>((fHour - static_cast<int32_t>(fHour)) * 60.0);
     const int32_t iHour = static_cast<int32_t>(fHour);
-    alignas(BSStringT<char>) uint8_t strDateStorage[sizeof(BSStringT<char>)];
-    BSStringT<char>* pDate = appCalendar.GetDateString(reinterpret_cast<BSStringT<char>*>(strDateStorage));
-    text.SPrintF("%s, %d:%02d", pDate->String(), iHour, iMinutes);
-    pDate->Set(nullptr, 0);
+    text.SPrintF("%s, %d:%02d", appCalendar.GetDateString().String(), iHour, iMinutes);
     MapMenu::pMe->pTiles[TI_PLAYER_TIME]->Set(kTileValue_String, text.String(), true);
     pPlayer->GetMapNameForLocation(text);
     MapMenu::pMe->pTiles[TI_PLAYER_LOCATION]->Set(kTileValue_String, text.String(), true);

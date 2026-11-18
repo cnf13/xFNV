@@ -57,7 +57,7 @@ public:
     // The effect setting of the item's costliest effect of range aeRange.
     EffectSetting* GetAVEffect(MagicSystem::Range aeRange);
     // Fills apString with the message for aeReason.
-    BSStringT<char>* GetCannotCastString(BSStringT<char>* apString, CannotCastReason aeReason);
+    BSStringT<char> GetCannotCastString(CannotCastReason aeReason);
 
 protected:
     // Resolves the form IDs of the item's effects and counts the hostile ones.

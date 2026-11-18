@@ -3312,11 +3312,7 @@ bool HUDMainMenu::SetInfoForRef(TESObjectREFR* apObject, bool abTelekinesis, boo
         if (!pPrompt->GetLength()) {
             auto* pActivator = dynamic_cast<TESObjectACTI*>(apObject->GetObjectReference());
             if (pActivator) {
-                // GetActivationString constructs its result in kActivation.
-                XFNV_INLINED_LOCAL(BSStringT<char>, kActivation, std::nullopt, std::nullopt);
-                BSStringT<char>* pActivation = pActivator->GetActivationString(&kActivation);
-                pPrompt->Copy(*pActivation);
-                kActivation.~BSStringT<char>();
+                pPrompt->Copy(pActivator->GetActivationString());
             }
         }
         if (pPrompt->GetLength()) {

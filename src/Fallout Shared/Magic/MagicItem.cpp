@@ -609,46 +609,16 @@ EffectSetting* MagicItem::GetAVEffect(MagicSystem::Range aeRange) {
     return nullptr;
 }
 
-BSStringT<char>* MagicItem::GetCannotCastString(BSStringT<char>* apString, CannotCastReason aeReason) {
-    BSStringT<char>* result;
+BSStringT<char> MagicItem::GetCannotCastString(CannotCastReason aeReason) {
     switch (aeReason) {
-        case 1: {
-            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastInsufficientMagicka.String());
-            result = apString;
-            break;
-        }
-        case 2: {
-            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastSilenced.String());
-            result = apString;
-            break;
-        }
-        case 3: {
-            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastInsufficientSkill.String());
-            result = apString;
-            break;
-        }
-        case 4: {
-            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastPowerUsed.String());
-            result = apString;
-            break;
-        }
-        case 5: {
-            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastMultipleBoundEffects.String());
-            result = apString;
-            break;
-        }
-        case 6: {
-            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastRangedUnderwater.String());
-            result = apString;
-            break;
-        }
-        default: {
-            ::new (static_cast<void*>(apString)) BSStringT<char>(gs_sMagicCastOKText.String());
-            result = apString;
-            break;
-        }
+        case 1: return gs_sMagicCastInsufficientMagicka.String();
+        case 2: return gs_sMagicCastSilenced.String();
+        case 3: return gs_sMagicCastInsufficientSkill.String();
+        case 4: return gs_sMagicCastPowerUsed.String();
+        case 5: return gs_sMagicCastMultipleBoundEffects.String();
+        case 6: return gs_sMagicCastRangedUnderwater.String();
+        default: return gs_sMagicCastOKText.String();
     }
-    return result;
 }
 
 void MagicItem::MagicItemInitItem(TESForm* apForm) {
