@@ -12,35 +12,35 @@ public:
         Point() = default;
         Point(float x, float y, float z, float w);
 
-        hkaNURBS::Point* abs(hkaNURBS::Point* apResult);
-        hkaNURBS::Point* floor(hkaNURBS::Point* apResult);
-        hkaNURBS::Point* ceil(hkaNURBS::Point* apResult);
+        hkaNURBS::Point abs();
+        hkaNURBS::Point floor();
+        hkaNURBS::Point ceil();
         // Returns the address of component u.
         float& operator[](int32_t u);
         // The length of the point as a 4-vector.
         float mag() const;
-        hkaNURBS::Point* normalize(hkaNURBS::Point* apResult);
+        hkaNURBS::Point normalize();
         hkaNURBS::Point& operator-=(const hkaNURBS::Point& a);
         hkaNURBS::Point& operator*=(float d);
         hkaNURBS::Point& operator/=(float d);
         float mag2() const;
-        // Computes a copy of this times d (operator*=), built in apResult, and returns apResult.
-        hkaNURBS::Point* Mul(hkaNURBS::Point* apResult, float d) const;
-        // Subtraction: writes a copy of this minus a (operator-=) into apResult and returns apResult.
-        hkaNURBS::Point* Sub(hkaNURBS::Point* apResult, const hkaNURBS::Point& a) const;
+        // A copy of this times d (operator*=).
+        hkaNURBS::Point Mul(float d) const;
+        // A copy of this minus a (operator-=).
+        hkaNURBS::Point Sub(const hkaNURBS::Point& a) const;
         hkaNURBS::Point& operator+=(const hkaNURBS::Point& a);
         // Copies a's four floats.
         hkaNURBS::Point& operator=(const hkaNURBS::Point& a);
-        // Builds a copy of this plus a (operator+=) in apResult.
-        hkaNURBS::Point* Add(hkaNURBS::Point* apResult, const hkaNURBS::Point& a) const;
-        // Writes a copy of this divided by d (as operator/= does) into apResult and returns it.
-        hkaNURBS::Point* Div(hkaNURBS::Point* apResult, float d) const;
+        // A copy of this plus a (operator+=).
+        hkaNURBS::Point Add(const hkaNURBS::Point& a) const;
+        // A copy of this divided by d (as operator/= does).
+        hkaNURBS::Point Div(float d) const;
         float operator[](int32_t i) const;
 
         // The 4-component dot product of P and Q.
         static float Dot(const hkaNURBS::Point& P, const hkaNURBS::Point& Q);
-        static hkaNURBS::Point* Max(hkaNURBS::Point* apResult, const hkaNURBS::Point& P, const hkaNURBS::Point& Q);
-        static hkaNURBS::Point* Min(hkaNURBS::Point* apResult, const hkaNURBS::Point& P, const hkaNURBS::Point& Q);
+        static hkaNURBS::Point Max(const hkaNURBS::Point& P, const hkaNURBS::Point& Q);
+        static hkaNURBS::Point Min(const hkaNURBS::Point& P, const hkaNURBS::Point& Q);
         // Havok SDK signature (hkaInternal.lib, tied by bytes,reloc).
         static float Dist(const hkaNURBS::Point& a1, const hkaNURBS::Point& a2);
         // Havok SDK signature (hkaInternal.lib, tied by bytes,reloc).
@@ -140,8 +140,7 @@ public:
     );
     // CurvePoint(n, p, U, P, u): the curve's point at u, built in apResult; its body is FindSpan, BasisFuns and the
     // weighted sum of the p + 1 control points.
-    static hkaNURBS::Point* CurvePoint(
-        hkaNURBS::Point* apResult,
+    static hkaNURBS::Point CurvePoint(
         int32_t n,
         int32_t p,
         const hkArray<float, hkContainerHeapAllocator>& U,
@@ -248,10 +247,10 @@ public:
     static int32_t DegreeLowerKnotVector(hkArray<float, hkContainerHeapAllocator>& U, int32_t m);
 };
 
-// The free operator*(float, const hkaNURBS::Point&): d times a (Point::Mul), built in apResult, which is returned.
-hkaNURBS::Point* mulScalarPoint(hkaNURBS::Point* apResult, float d, const hkaNURBS::Point* a);
-// Computes a divided by d (Point::Div) into apResult and returns apResult.
-hkaNURBS::Point* divScalarPoint(hkaNURBS::Point* apResult, float d, const hkaNURBS::Point* a);
+// The free operator*(float, const hkaNURBS::Point&): d times a (Point::Mul).
+hkaNURBS::Point mulScalarPoint(float d, const hkaNURBS::Point* a);
+// a divided by d (Point::Div).
+hkaNURBS::Point divScalarPoint(float d, const hkaNURBS::Point* a);
 // Whether a3's float element a2 is the last one (a2 == a4) or differs from the next; the result byte is written through
 // a1. Used by UniqueKnot, ComputeBounds and IsWellPosed. a3 is the knot vector, indexed as floats.
 uint8_t* isKnotDistinct(uint8_t* a1, int32_t a2, const hkArray<float, hkContainerHeapAllocator>* a3, int32_t a4);

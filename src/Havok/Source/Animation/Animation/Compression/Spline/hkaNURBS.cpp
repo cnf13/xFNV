@@ -31,34 +31,31 @@ using hkaNURBSPointArray = hkArray<hkaNURBS::Point, hkContainerHeapAllocator>;
 
 hkaNURBS::Point::Point(float x, float y, float z, float w) : point{x, y, z, w} {}
 
-// The componentwise absolute value, built in apResult (the x87 fabs of each component, last one first).
-hkaNURBS::Point* hkaNURBS::Point::abs(hkaNURBS::Point* apResult) {
+// The componentwise absolute value (the x87 fabs of each component, last one first).
+hkaNURBS::Point hkaNURBS::Point::abs() {
     const float w = std::fabs(point[3]);
     const float z = std::fabs(point[2]);
     const float y = std::fabs(point[1]);
     const float x = std::fabs(point[0]);
-    ::new (apResult) hkaNURBS::Point(x, y, z, w);
-    return apResult;
+    return hkaNURBS::Point(x, y, z, w);
 }
 
-// The componentwise floor, built in apResult (the CRT's _floor on each component, last one first).
-hkaNURBS::Point* hkaNURBS::Point::floor(hkaNURBS::Point* apResult) {
+// The componentwise floor (the CRT's _floor on each component, last one first).
+hkaNURBS::Point hkaNURBS::Point::floor() {
     const float w = std::floor(static_cast<double>(point[3]));
     const float z = std::floor(static_cast<double>(point[2]));
     const float y = std::floor(static_cast<double>(point[1]));
     const float x = std::floor(static_cast<double>(point[0]));
-    ::new (apResult) hkaNURBS::Point(x, y, z, w);
-    return apResult;
+    return hkaNURBS::Point(x, y, z, w);
 }
 
-// The componentwise ceiling, built in apResult (the CRT's _ceil on each component, last one first).
-hkaNURBS::Point* hkaNURBS::Point::ceil(hkaNURBS::Point* apResult) {
+// The componentwise ceiling (the CRT's _ceil on each component, last one first).
+hkaNURBS::Point hkaNURBS::Point::ceil() {
     const float w = std::ceil(static_cast<double>(point[3]));
     const float z = std::ceil(static_cast<double>(point[2]));
     const float y = std::ceil(static_cast<double>(point[1]));
     const float x = std::ceil(static_cast<double>(point[0]));
-    ::new (apResult) hkaNURBS::Point(x, y, z, w);
-    return apResult;
+    return hkaNURBS::Point(x, y, z, w);
 }
 
 // KEEP: the exe's callers keep ecx and edx live across the call, which the exe body leaves intact and clang does
@@ -72,10 +69,9 @@ float hkaNURBS::Point::mag() const {
     return std::sqrt((double)mag2());
 }
 
-hkaNURBS::Point* hkaNURBS::Point::normalize(hkaNURBS::Point* apResult) {
+hkaNURBS::Point hkaNURBS::Point::normalize() {
     float d = mag();
-    Div(apResult, d);
-    return apResult;
+    return Div(d);
 }
 
 hkaNURBS::Point& hkaNURBS::Point::operator-=(const hkaNURBS::Point& a) {
@@ -106,7 +102,7 @@ float hkaNURBS::Point::mag2() const {
     return Point::Dot(*this, *this);
 }
 
-hkaNURBS::Point* hkaNURBS::Point::Mul(hkaNURBS::Point* apResult, float d) const {
+hkaNURBS::Point hkaNURBS::Point::Mul(float d) const {
     hkaNURBS::Point v9;
     float v3 = point[1];
     v9.point[0] = point[0];
@@ -114,17 +110,10 @@ hkaNURBS::Point* hkaNURBS::Point::Mul(hkaNURBS::Point* apResult, float d) const 
     v9.point[3] = point[3];
     v9.point[1] = v3;
     v9.point[2] = v4;
-    hkaNURBS::Point* v5 = &v9.operator*=(d);
-    apResult->point[0] = v5->point[0];
-    apResult->point[1] = v5->point[1];
-    float v6 = v5->point[2];
-    float v7 = v5->point[3];
-    apResult->point[2] = v6;
-    apResult->point[3] = v7;
-    return apResult;
+    return v9.operator*=(d);
 }
 
-hkaNURBS::Point* hkaNURBS::Point::Sub(hkaNURBS::Point* apResult, const hkaNURBS::Point& a) const {
+hkaNURBS::Point hkaNURBS::Point::Sub(const hkaNURBS::Point& a) const {
     hkaNURBS::Point v10;
     float v3 = point[1];
     v10.point[0] = point[0];
@@ -133,14 +122,7 @@ hkaNURBS::Point* hkaNURBS::Point::Sub(hkaNURBS::Point* apResult, const hkaNURBS:
     v10.point[1] = v3;
     v10.point[3] = v5;
     v10.point[2] = v4;
-    hkaNURBS::Point* v6 = &v10.operator-=(a);
-    apResult->point[0] = v6->point[0];
-    apResult->point[1] = v6->point[1];
-    float v7 = v6->point[2];
-    float v8 = v6->point[3];
-    apResult->point[2] = v7;
-    apResult->point[3] = v8;
-    return apResult;
+    return v10.operator-=(a);
 }
 
 hkaNURBS::Point& hkaNURBS::Point::operator+=(const hkaNURBS::Point& a) {
@@ -161,7 +143,7 @@ hkaNURBS::Point& hkaNURBS::Point::operator=(const hkaNURBS::Point& a) {
     return *this;
 }
 
-hkaNURBS::Point* hkaNURBS::Point::Add(hkaNURBS::Point* apResult, const hkaNURBS::Point& a) const {
+hkaNURBS::Point hkaNURBS::Point::Add(const hkaNURBS::Point& a) const {
     hkaNURBS::Point v10;
     float v3 = point[1];
     v10.point[0] = point[0];
@@ -170,17 +152,10 @@ hkaNURBS::Point* hkaNURBS::Point::Add(hkaNURBS::Point* apResult, const hkaNURBS:
     v10.point[1] = v3;
     v10.point[3] = v5;
     v10.point[2] = v4;
-    hkaNURBS::Point* v6 = &v10.operator+=(a);
-    apResult->point[0] = v6->point[0];
-    apResult->point[1] = v6->point[1];
-    float v7 = v6->point[2];
-    float v8 = v6->point[3];
-    apResult->point[2] = v7;
-    apResult->point[3] = v8;
-    return apResult;
+    return v10.operator+=(a);
 }
 
-hkaNURBS::Point* hkaNURBS::Point::Div(hkaNURBS::Point* apResult, float d) const {
+hkaNURBS::Point hkaNURBS::Point::Div(float d) const {
     hkaNURBS::Point v9;
     float v3 = point[1];
     v9.point[0] = point[0];
@@ -188,14 +163,7 @@ hkaNURBS::Point* hkaNURBS::Point::Div(hkaNURBS::Point* apResult, float d) const 
     v9.point[3] = point[3];
     v9.point[1] = v3;
     v9.point[2] = v4;
-    hkaNURBS::Point* v5 = &v9.operator/=(d);
-    apResult->point[0] = v5->point[0];
-    apResult->point[1] = v5->point[1];
-    float v6 = v5->point[2];
-    float v7 = v5->point[3];
-    apResult->point[2] = v6;
-    apResult->point[3] = v7;
-    return apResult;
+    return v9.operator/=(d);
 }
 
 // KEEP: the exe's body never writes edx, and its callers keep edx live across the call (hkaNURBS::Dot 0xE535A0
@@ -215,37 +183,35 @@ float hkaNURBS::Point::Dot(const hkaNURBS::Point& P, const hkaNURBS::Point& Q) {
     return v9 + v11 * Q[3];
 }
 
-// The componentwise maximum of P and Q, built in apResult. Each component is read through operator[]: P's, then Q's,
+// The componentwise maximum of P and Q. Each component is read through operator[]: P's, then Q's,
 // then the larger one's again; an unordered pair takes Q's.
-hkaNURBS::Point* hkaNURBS::Point::Max(hkaNURBS::Point* apResult, const hkaNURBS::Point& P, const hkaNURBS::Point& Q) {
-    ::new (apResult) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
+hkaNURBS::Point hkaNURBS::Point::Max(const hkaNURBS::Point& P, const hkaNURBS::Point& Q) {
+    hkaNURBS::Point result(0.0f, 0.0f, 0.0f, 0.0f);
     for (int32_t i = 0; i < 4; ++i) {
         const float fP = P.operator[](i);
         const float fQ = Q.operator[](i);
         const hkaNURBS::Point& rPick = (fQ < fP) ? P : Q;
         const float fValue = rPick.operator[](i);
-        apResult->operator[](i) = fValue;
+        result.operator[](i) = fValue;
     }
-    return apResult;
+    return result;
 }
 
-// The componentwise minimum of P and Q, built in apResult, as Max; an unordered pair takes Q's.
-hkaNURBS::Point* hkaNURBS::Point::Min(hkaNURBS::Point* apResult, const hkaNURBS::Point& P, const hkaNURBS::Point& Q) {
-    ::new (apResult) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
+// The componentwise minimum of P and Q, as Max; an unordered pair takes Q's.
+hkaNURBS::Point hkaNURBS::Point::Min(const hkaNURBS::Point& P, const hkaNURBS::Point& Q) {
+    hkaNURBS::Point result(0.0f, 0.0f, 0.0f, 0.0f);
     for (int32_t i = 0; i < 4; ++i) {
         const float fP = P.operator[](i);
         const float fQ = Q.operator[](i);
         const hkaNURBS::Point& rPick = (fQ > fP) ? P : Q;
         const float fValue = rPick.operator[](i);
-        apResult->operator[](i) = fValue;
+        result.operator[](i) = fValue;
     }
-    return apResult;
+    return result;
 }
 
 float hkaNURBS::Point::Dist(const hkaNURBS::Point& a1, const hkaNURBS::Point& a2) {
-    hkaNURBS::Point result;
-    hkaNURBS::Point* v2 = a1.Sub(&result, a2);
-    return v2->mag();
+    return a1.Sub(a2).mag();
 }
 
 // The cosine of the angle between a1 and a2. The dot product and a1's length are kept as doubles and only the quotient
@@ -329,7 +295,6 @@ hkBool hkaNURBS::WithinTolerance(
     const hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& Q,
     float E
 ) {
-    hkaNURBS::Point apResult_;
     int32_t v14 = 0;
     if (m < 0) {
     LABEL_5:;
@@ -348,7 +313,7 @@ hkBool hkaNURBS::WithinTolerance(
         v16.point[2] = v10;
         v16.point[3] = v11;
         float u = projectPointToCurve(n, p, &U, &P, apPoint, 100, 10, 0.0001f, 0.0001f);
-        hkaNURBS::CurvePoint(&apResult_, n, p, U, P, u);
+        hkaNURBS::Point apResult_ = hkaNURBS::CurvePoint(n, p, U, P, u);
         if (static_cast<double>(E) < hkaNURBS::Point::Dist(v16, apResult_)) {
             break;
         }
@@ -377,8 +342,7 @@ hkBool hkaNURBS::WithinTolerance(
         const hkaNURBS::Point* pQ = Q.m_data;
         for (int32_t i = 0; i <= m; ++i) {
             hkaNURBS::Point kPoint = pQ[i];
-            hkaNURBS::Point kCurve;
-            hkaNURBS::CurvePoint(&kCurve, n, p, U, P, pUb[i]);
+            hkaNURBS::Point kCurve = hkaNURBS::CurvePoint(n, p, U, P, pUb[i]);
             const double dDist = hkaNURBS::Point::Dist(kPoint, kCurve);
             // Adds the double 0.001 and rounds the sum to a float.
             float fTol = pE[i] + 0.0010000000474974513;
@@ -607,13 +571,11 @@ void hkaNURBS::CurvePoint(
     const hkArray<float, hkContainerHeapAllocator>& ub,
     hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& Cb
 ) {
-    hkaNURBS::Point apResult_;
     int32_t mb_1 = 0;
     if (mb >= 0) {
         int32_t v8 = 0;
         do {
-            hkaNURBS::Point* v9 = hkaNURBS::CurvePoint(&apResult_, n, p, U, P, ub.m_data[mb_1]);
-            Cb.m_data[v8].operator=(*v9);
+            Cb.m_data[v8].operator=(hkaNURBS::CurvePoint(n, p, U, P, ub.m_data[mb_1]));
             ++mb_1;
             ++v8;
         }
@@ -799,7 +761,6 @@ void hkaNURBS::CurveDerivs(
     hkaNURBS::Point* CK
 ) {
     hkaNURBS::Point kZero;
-    hkaNURBS::Point kTerm;
     float nders[4][4];
     int32_t du = d < p ? d : p;
     for (int32_t k = p + 1; k <= d; ++k) {
@@ -810,13 +771,12 @@ void hkaNURBS::CurveDerivs(
     for (int32_t k = 0; k <= du; ++k) {
         CK[k] = *XFNV_RECONSTRUCT(hkaNURBS::Point)(&kZero, 0.0f, 0.0f, 0.0f, 0.0f);
         for (int32_t j = 0; j <= p; ++j) {
-            CK[k] += *mulScalarPoint(&kTerm, nders[k][j], &P.m_data[span - p + j]);
+            CK[k] += mulScalarPoint(nders[k][j], &P.m_data[span - p + j]);
         }
     }
 }
 
-hkaNURBS::Point* hkaNURBS::CurvePoint(
-    hkaNURBS::Point* apResult,
+hkaNURBS::Point hkaNURBS::CurvePoint(
     int32_t n,
     int32_t p,
     const hkArray<float, hkContainerHeapAllocator>& U,
@@ -824,16 +784,14 @@ hkaNURBS::Point* hkaNURBS::CurvePoint(
     float u
 ) {
     float N[4];
-    hkaNURBS::Point x0;
     int32_t Span = hkaNURBS::FindSpan(n, p, u, U);
     hkaNURBS::BasisFuns(Span, u, p, U, N);
     int32_t v7 = Span - p;
-    mulScalarPoint(apResult, N[0], &P.m_data[v7]);
+    hkaNURBS::Point C = mulScalarPoint(N[0], &P.m_data[v7]);
     for (int32_t i = 1; i <= p; ++i) {
-        hkaNURBS::Point* pTerm = mulScalarPoint(&x0, N[i], &P.m_data[v7 + i]);
-        apResult->operator+=(*pTerm);
+        C.operator+=(mulScalarPoint(N[i], &P.m_data[v7 + i]));
     }
-    return apResult;
+    return C;
 }
 
 int32_t hkaNURBS::Find(float a1, const hkArray<float, hkContainerHeapAllocator>& arr, int32_t a3) {
@@ -999,9 +957,7 @@ int32_t hkaNURBS::DegreeElevateKnotVector(hkArray<float, hkContainerHeapAllocato
 }
 
 float hkaNURBS::Distance3D(const hkaNURBS::Point& a1, const hkaNURBS::Point& a2) {
-    hkaNURBS::Point result;
-    hkaNURBS::Point* v2 = a2.Sub(&result, a1);
-    return v2->mag();
+    return a2.Sub(a1).mag();
 }
 
 // The NURBS Book's GetRemovalBndCurve: A5.8's knot removal test for one knot (t = 0), returning the distance instead
@@ -1017,11 +973,7 @@ float hkaNURBS::GetRemovalBoundCurve(
 ) {
     hkaNURBS::Point temp[7];
     hkaNURBS::Point mulI;
-    hkaNURBS::Point subI;
-    hkaNURBS::Point divI;
     hkaNURBS::Point mulJ;
-    hkaNURBS::Point subJ;
-    hkaNURBS::Point divJ;
     hkaNURBS::Point* pTemp = temp;
     int32_t iLeft = 6;
     do {
@@ -1046,11 +998,11 @@ float hkaNURBS::GetRemovalBoundCurve(
             float alfi = (u - pLoopKnots[i]) / (pLoopKnots[i + p + 1] - pLoopKnots[i]);
             float alfj = (u - pLoopKnots[j]) / (pLoopKnots[j + p + 1] - pLoopKnots[j]);
             float oneMinusAlfi = 1.0f - alfi;
-            mulScalarPoint(&mulI, oneMinusAlfi, &temp[ii - 1]);
-            temp[ii] = *pPoints[i].Sub(&subI, mulI)->Div(&divI, alfi);
+            mulI = mulScalarPoint(oneMinusAlfi, &temp[ii - 1]);
+            temp[ii] = pPoints[i].Sub(mulI).Div(alfi);
             float oneMinusAlfj = 1.0f - alfj;
-            mulScalarPoint(&mulJ, alfj, &temp[jj + 1]);
-            temp[jj] = *pPoints[j].Sub(&subJ, mulJ)->Div(&divJ, oneMinusAlfj);
+            mulJ = mulScalarPoint(alfj, &temp[jj + 1]);
+            temp[jj] = pPoints[j].Sub(mulJ).Div(oneMinusAlfj);
             ++i;
             ++ii;
             --j;
@@ -1064,8 +1016,8 @@ float hkaNURBS::GetRemovalBoundCurve(
     const float* pKnots = U.m_data;
     float alfi = (u - pKnots[i]) / (pKnots[i + p + 1] - pKnots[i]);
     float oneMinusAlfi = 1.0f - alfi;
-    mulScalarPoint(&mulI, oneMinusAlfi, &temp[ii - 1]);
-    return hkaNURBS::Distance3D(pPoints[i], *mulScalarPoint(&mulJ, alfi, &temp[ii + 1])->Add(&subI, mulI));
+    mulI = mulScalarPoint(oneMinusAlfi, &temp[ii - 1]);
+    return hkaNURBS::Distance3D(pPoints[i], mulScalarPoint(alfi, &temp[ii + 1]).Add(mulI));
 }
 
 // The NURBS Book's RemoveCurveKnot (A5.8). temp holds the control points solved from both ends; first and last move
@@ -1084,12 +1036,7 @@ int32_t hkaNURBS::RemoveCurveKnot(
 ) {
     hkaNURBS::Point temp[7];
     hkaNURBS::Point mulI;
-    hkaNURBS::Point subI;
-    hkaNURBS::Point divI;
     hkaNURBS::Point mulJ;
-    hkaNURBS::Point subJ;
-    hkaNURBS::Point divJ;
-    hkaNURBS::Point sum;
     int32_t m = n + p + 1;
     int32_t ord = p + 1;
     int32_t fout = (2 * r - p - s) / 2;
@@ -1119,11 +1066,11 @@ int32_t hkaNURBS::RemoveCurveKnot(
                 float alfi = (u - pLoopKnots[i]) / (pLoopKnots[i + ord + t] - pLoopKnots[i]);
                 float alfj = (u - pLoopKnots[j - t]) / (pLoopKnots[j + ord] - pLoopKnots[j - t]);
                 float oneMinusAlfi = 1.0f - alfi;
-                mulScalarPoint(&mulI, oneMinusAlfi, &temp[ii - 1]);
-                temp[ii] = *pPoints[i].Sub(&subI, mulI)->Div(&divI, alfi);
+                mulI = mulScalarPoint(oneMinusAlfi, &temp[ii - 1]);
+                temp[ii] = pPoints[i].Sub(mulI).Div(alfi);
                 float oneMinusAlfj = 1.0f - alfj;
-                mulScalarPoint(&mulJ, alfj, &temp[jj + 1]);
-                temp[jj] = *pPoints[j].Sub(&subJ, mulJ)->Div(&divJ, oneMinusAlfj);
+                mulJ = mulScalarPoint(alfj, &temp[jj + 1]);
+                temp[jj] = pPoints[j].Sub(mulJ).Div(oneMinusAlfj);
                 ++i;
                 ++ii;
                 --j;
@@ -1140,10 +1087,8 @@ int32_t hkaNURBS::RemoveCurveKnot(
             const float* pKnots = U.m_data;
             float alfi = (u - pKnots[i]) / (pKnots[i + ord + t] - pKnots[i]);
             float oneMinusAlfi = 1.0f - alfi;
-            mulScalarPoint(&mulI, oneMinusAlfi, &temp[ii - 1]);
-            if (!(TOL >= hkaNURBS::Distance3D(
-                             Pw.m_data[i], *mulScalarPoint(&mulJ, alfi, &temp[ii + t + 1])->Add(&sum, mulI)
-                         ))) {
+            mulI = mulScalarPoint(oneMinusAlfi, &temp[ii - 1]);
+            if (!(TOL >= hkaNURBS::Distance3D(Pw.m_data[i], mulScalarPoint(alfi, &temp[ii + t + 1]).Add(mulI)))) {
                 break;
             }
         }
@@ -1541,18 +1486,13 @@ hkBool hkaNURBS::LeastSquaresFit(
     hkaNURBS::Point& rLastR = pR[m] = *pZero;
     pR[0] = rLastR;
     for (int32_t k = 1; k < m; ++k) {
-        hkaNURBS::Point kFirst;
-        hkaNURBS::Point kDiff;
-        hkaNURBS::Point kRk;
         const hkaNURBS::Point* pQ = Q.m_data;
         const float* pu = &ub.m_data[k];
         float fLastBasis = OneBasisFun(p, iLast, U, n, *pu);
-        hkaNURBS::Point* pLast = mulScalarPoint(&kSum, fLastBasis, &pQ[m]);
+        hkaNURBS::Point kLast = mulScalarPoint(fLastBasis, &pQ[m]);
         float fFirstBasis = OneBasisFun(p, iLast, U, 0, *pu);
-        hkaNURBS::Point* pFirst = mulScalarPoint(&kFirst, fFirstBasis, pQ);
-        hkaNURBS::Point* pDiff = pQ[k].Sub(&kDiff, *pFirst);
-        hkaNURBS::Point* pRk = pDiff->Sub(&kRk, *pLast);
-        pR[k] = *pRk;
+        hkaNURBS::Point kFirst = mulScalarPoint(fFirstBasis, pQ);
+        pR[k] = pQ[k].Sub(kFirst).Sub(kLast);
     }
 
     // Row j - 1 of Rm: the sum over k of N(j, p)(ub[k]) R[k].
@@ -1563,10 +1503,8 @@ hkBool hkaNURBS::LeastSquaresFit(
             const float* pu = ub.m_data + 1;
             const hkaNURBS::Point* pRk = pR + 1;
             for (int32_t k = m - 1; k != 0; --k) {
-                hkaNURBS::Point kTerm;
                 float fBasis = OneBasisFun(p, iLast, U, j, *pu);
-                hkaNURBS::Point* pTerm = mulScalarPoint(&kTerm, fBasis, pRk);
-                kSum += *pTerm;
+                kSum += mulScalarPoint(fBasis, pRk);
                 ++pRk;
                 ++pu;
             }
@@ -1715,9 +1653,7 @@ void hkaNURBS::DegreeElevateCurve(
     hkaNURBS::Point ebpts[4];
     hkaNURBS::Point Nextbpts[4];
     hkaNURBS::Point kZero;
-    hkaNURBS::Point kMul;
     hkaNURBS::Point kMulPrev;
-    hkaNURBS::Point kSum;
     float bezalfs[4][4];
     float alfs[4];
     for (int32_t i = 0; i < 4; ++i) {
@@ -1831,8 +1767,8 @@ void hkaNURBS::DegreeElevateCurve(
                 int32_t save = r - j;
                 int32_t s = mul + j;
                 for (int32_t k = p; k >= s; --k) {
-                    mulScalarPoint(&kMulPrev, 1.0f - alfs[k - s], &bpts[k - 1]);
-                    bpts[k] = *mulScalarPoint(&kMul, alfs[k - s], &bpts[k])->Add(&kSum, kMulPrev);
+                    kMulPrev = mulScalarPoint(1.0f - alfs[k - s], &bpts[k - 1]);
+                    bpts[k] = mulScalarPoint(alfs[k - s], &bpts[k]).Add(kMulPrev);
                 }
                 Nextbpts[save] = bpts[p];
             }
@@ -1842,7 +1778,7 @@ void hkaNURBS::DegreeElevateCurve(
             ebpts[iE] = *XFNV_RECONSTRUCT(hkaNURBS::Point)(&kZero, 0.0f, 0.0f, 0.0f, 0.0f);
             int32_t mpi = p < iE ? p : iE;
             for (int32_t j = iE - t < 0 ? 0 : iE - t; j <= mpi; ++j) {
-                ebpts[iE] = *ebpts[iE].Add(&kSum, *mulScalarPoint(&kMul, bezalfs[iE][j], &bpts[j]));
+                ebpts[iE] = ebpts[iE].Add(mulScalarPoint(bezalfs[iE][j], &bpts[j]));
             }
         }
         // Remove knot ua oldr times.
@@ -1858,18 +1794,18 @@ void hkaNURBS::DegreeElevateCurve(
                 while (j - iR > tr) {
                     if (iR < cind) {
                         float alf = (ub - Uh.m_data[iR]) / (ua - Uh.m_data[iR]);
-                        mulScalarPoint(&kMulPrev, 1.0f - alf, &Qw.m_data[iR - 1]);
-                        Qw.m_data[iR] = *mulScalarPoint(&kMul, alf, &Qw.m_data[iR])->Add(&kSum, kMulPrev);
+                        kMulPrev = mulScalarPoint(1.0f - alf, &Qw.m_data[iR - 1]);
+                        Qw.m_data[iR] = mulScalarPoint(alf, &Qw.m_data[iR]).Add(kMulPrev);
                     }
                     if (j >= lbz) {
                         if (j - tr <= kind - ph + oldr) {
                             float gam = (ub - Uh.m_data[j - tr]) / den;
-                            mulScalarPoint(&kMulPrev, 1.0f - gam, &ebpts[kj + 1]);
-                            ebpts[kj] = *mulScalarPoint(&kMul, gam, &ebpts[kj])->Add(&kSum, kMulPrev);
+                            kMulPrev = mulScalarPoint(1.0f - gam, &ebpts[kj + 1]);
+                            ebpts[kj] = mulScalarPoint(gam, &ebpts[kj]).Add(kMulPrev);
                         }
                         else {
-                            mulScalarPoint(&kMulPrev, 1.0f - bet, &ebpts[kj + 1]);
-                            ebpts[kj] = *mulScalarPoint(&kMul, bet, &ebpts[kj])->Add(&kSum, kMulPrev);
+                            kMulPrev = mulScalarPoint(1.0f - bet, &ebpts[kj + 1]);
+                            ebpts[kj] = mulScalarPoint(bet, &ebpts[kj]).Add(kMulPrev);
                         }
                     }
                     ++iR;
@@ -1944,14 +1880,12 @@ int32_t hkaNURBS::DegreeLowerKnotVector(hkArray<float, hkContainerHeapAllocator>
     return m - j - 1;
 }
 
-hkaNURBS::Point* mulScalarPoint(hkaNURBS::Point* apResult, float d, const hkaNURBS::Point* a) {
-    a->Mul(apResult, d);
-    return apResult;
+hkaNURBS::Point mulScalarPoint(float d, const hkaNURBS::Point* a) {
+    return a->Mul(d);
 }
 
-hkaNURBS::Point* divScalarPoint(hkaNURBS::Point* apResult, float d, const hkaNURBS::Point* a) {
-    a->Div(apResult, d);
-    return apResult;
+hkaNURBS::Point divScalarPoint(float d, const hkaNURBS::Point* a) {
+    return a->Div(d);
 }
 
 uint8_t* isKnotDistinct(uint8_t* a1, int32_t a2, const hkArray<float, hkContainerHeapAllocator>* a3, int32_t a4) {
@@ -1989,8 +1923,7 @@ float projectPointToCurve(
         int32_t i = 0;
         do {
             float t = static_cast<double>(i) / fSamples * dRange + *pKnots;
-            hkaNURBS::Point kPoint;
-            hkaNURBS::CurvePoint(&kPoint, n, p, *U, *P, t);
+            hkaNURBS::Point kPoint = hkaNURBS::CurvePoint(n, p, *U, *P, t);
             float fDist = hkaNURBS::Point::Dist(kPoint, *apPoint);
             if (fMinDist > fDist) {
                 fMinDist = fDist;
@@ -2075,11 +2008,9 @@ void computeProjectionErrors(
         else {
             u = pParams->m_data[i];
         }
-        hkaNURBS::Point kPoint;
-        hkaNURBS::CurvePoint(&kPoint, n, p, *U, *P, u);
+        hkaNURBS::Point kPoint = hkaNURBS::CurvePoint(n, p, *U, *P, u);
         pParams->m_data[i] = u;
-        hkaNURBS::Point kDifference;
-        pErrors->m_data[i] = Q->m_data[i].Sub(&kDifference, kPoint)->mag();
+        pErrors->m_data[i] = Q->m_data[i].Sub(kPoint).mag();
     }
 }
 
@@ -2103,7 +2034,6 @@ hkBool isWithinErrorBound(
     int32_t v11 = a6 + 1;
     do {
         hkaNURBS::Point v17;
-        hkaNURBS::Point v18;
         float v12 = v9->point[0];
         float v13 = v9->point[2];
         float v16 = *v10;
@@ -2112,7 +2042,7 @@ hkBool isWithinErrorBound(
         float v14 = v9->point[3];
         v17.point[2] = v13;
         v17.point[3] = v14;
-        hkaNURBS::CurvePoint(&v18, a2, a3, *a5, *a4, v16);
+        hkaNURBS::Point v18 = hkaNURBS::CurvePoint(a2, a3, *a5, *a4, v16);
         if (hkaNURBS::Point::Dist(v17, v18) > a9 * 1.100000023841858) {
             result.m_bool = 0;
         }
@@ -2131,7 +2061,6 @@ int32_t ChordLengthParameterization(
     hkArray<float, hkContainerHeapAllocator>* a3
 ) {
     double v15;
-    hkaNURBS::Point result;
     int32_t v4 = a1 + 1;
     hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
     int32_t v7 = a3->m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK;
@@ -2151,8 +2080,7 @@ int32_t ChordLengthParameterization(
         const hkaNURBS::Point* a2 = arg4->begin();
         do {
             float* v11 = &a3->m_data[v10];
-            hkaNURBS::Point* v12 = a1a++->Sub(&result, *a2++);
-            *v11 = v12->mag() + *(v11 - 1);
+            *v11 = a1a++->Sub(*a2++).mag() + *(v11 - 1);
             ++v10;
         }
         while (v10 <= a1);
