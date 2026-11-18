@@ -932,7 +932,6 @@ NiAVObject* Font::MakeString(
     size_t sLen;
     uint32_t itext_count;
     NiPoint3 xpos;
-    XFNV_INLINED_LOCAL(NiColorA, pspecial_color, std::nullopt, std::nullopt);
     float afY[2];
     if (apTextString.sLen == 0xFFFF) {
         sLen = std::strlen(apTextString.pString);
@@ -969,14 +968,7 @@ NiAVObject* Font::MakeString(
     pflat->m_kLocal.m_Translate.y = y;
     pflat->m_kLocal.m_Translate.z = z;
     NiColorA* pcurrent_color = nullptr;
-    // MAYBE-INLINED 0xA125F6: a write opening NiColorA's uses: may be its inlined constructor
-    pspecial_color.r = 0.0f;
-    // MAYBE-INLINED 0xA125FB: a write opening NiColorA's uses: may be its inlined constructor
-    pspecial_color.g = 0.0f;
-    // MAYBE-INLINED 0xA12600: a write opening NiColorA's uses: may be its inlined constructor
-    pspecial_color.b = 1.0f;
-    // MAYBE-INLINED 0xA12605: a write opening NiColorA's uses: may be its inlined constructor
-    pspecial_color.a = 1.0f;
+    NiColorA pspecial_color(0.0f, 0.0f, 1.0f, 1.0f);
     aiWidth = 0;
     float fstart_x = xpos.x;
     int32_t iverts = 0;
@@ -1583,15 +1575,7 @@ FontManager::TextLine* FontManager::TextLine::AddChar(FontManager::CharData* apC
                     MemoryManager_Singleton.Allocate(sizeof(FontManager::CharData))
                 );
                 if (v20) {
-                    XFNV_INLINED_LOCAL(NiColorA, v5, std::nullopt, std::nullopt);
-                    // MAYBE-INLINED 0xA1A20F: a write opening NiColorA's uses: may be its inlined constructor
-                    v5.r = 0.4588f;
-                    // MAYBE-INLINED 0xA1A214: a write opening NiColorA's uses: may be its inlined constructor
-                    v5.g = 0.2314f;
-                    // MAYBE-INLINED 0xA1A21A: a write opening NiColorA's uses: may be its inlined constructor
-                    v5.b = 0.1294f;
-                    // MAYBE-INLINED 0xA1A220: a write opening NiColorA's uses: may be its inlined constructor
-                    v5.a = 1.0f;
+                    NiColorA v5(0.4588f, 0.2314f, 0.1294f, 1.0f);
                     phyphen = ::new (v20) FontManager::CharData(0, 45, v5, 1);
                 }
                 else {
@@ -1792,7 +1776,6 @@ FontManager::TextPage* FontManager::TextDoc::CurrentPage() {
 
 void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apData) {
     XFNV_INLINED_LOCAL(BSStringT<char>, v6, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, axColor, std::nullopt, std::nullopt);
     NiTriShape* ptri_2;
     NiTListItem<FontManager::TextPage*>* i;
     NiTList<NiTriShape*> ximages;
@@ -1816,14 +1799,7 @@ void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apDat
             pflats[a_2] = nullptr;
             int32_t ichar_count = ppage->GetCharCountForFont(a_2);
             if (ichar_count > 0) {
-                // MAYBE-INLINED 0xA19152: a write opening NiColorA's uses: may be its inlined constructor
-                axColor.r = 0.45882353f;
-                // MAYBE-INLINED 0xA1915E: a write opening NiColorA's uses: may be its inlined constructor
-                axColor.g = 0.23137255f;
-                // MAYBE-INLINED 0xA1916A: a write opening NiColorA's uses: may be its inlined constructor
-                axColor.b = 0.12941177f;
-                // MAYBE-INLINED 0xA19172: a write opening NiColorA's uses: may be its inlined constructor
-                axColor.a = 1.0f;
+                NiColorA axColor(0.45882353f, 0.23137255f, 0.12941177f, 1.0f);
                 FontManager* v54 = FontManager::pInstance;
                 Font* v53 = FontManager::pInstance->pFont[a_2];
                 NiTriShape* TriShape = v53->MakeTriShape(ichar_count, axColor, true);
@@ -2588,7 +2564,6 @@ void FontManager::SetNewFonts(bool a2) {
 }
 
 FontManager::TextDoc* FontManager::PrepText(BSStringT<char>& axTextString, FontManager::TextData& axData) {
-    XFNV_INLINED_LOCAL(NiColorA, v5, std::nullopt, std::nullopt);
     size_t sLen;
     FontManager::TextDoc* pdocument;
     XFNV_INLINED_LOCAL(FontManager::CharData, xchar, std::nullopt, std::nullopt);
@@ -2621,14 +2596,7 @@ FontManager::TextDoc* FontManager::PrepText(BSStringT<char>& axTextString, FontM
         pdocument = nullptr;
     }
     pdocument_2 = pdocument;
-    // MAYBE-INLINED 0xA18BA3: a write opening NiColorA's uses: may be its inlined constructor
-    v5.r = 0.4588f;
-    // MAYBE-INLINED 0xA18BA8: a write opening NiColorA's uses: may be its inlined constructor
-    v5.g = 0.2314f;
-    // MAYBE-INLINED 0xA18BAE: a write opening NiColorA's uses: may be its inlined constructor
-    v5.b = 0.1294f;
-    // MAYBE-INLINED 0xA18BB4: a write opening NiColorA's uses: may be its inlined constructor
-    v5.a = 1.0f;
+    NiColorA v5(0.4588f, 0.2314f, 0.1294f, 1.0f);
     ::new (&xchar) FontManager::CharData(0, 32, v5, 1);
     xchar.RevertToDefault();
     xchar.iFontIndex = axData.iDefaultFont;

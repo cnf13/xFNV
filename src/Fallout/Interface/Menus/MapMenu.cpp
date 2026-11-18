@@ -2617,7 +2617,6 @@ void MapMenu::RenderLocalMapGrid(bool abSaveToDisk) {
     NiPoint3 v88;
     NiPoint3 dst;
     if ((MapMenu::pMe) && (MapMenu::pMe->pTiles[2]->GetModel()) && (MapMenu::ShouldRenderLocalMap())) {
-        XFNV_INLINED_LOCAL(NiColorA, oldSunColor, std::nullopt, std::nullopt);
         NiPoint3 playerLoc;
         const NiPoint3* v1 = &pPlayer->GetLocationOnReference();
         playerLoc.x = v1->x;
@@ -2634,7 +2633,7 @@ void MapMenu::RenderLocalMapGrid(bool abSaveToDisk) {
         int32_t inumTiles = itilesPerSide * itilesPerSide;
         int32_t imapSize = itilesPerSide * igridSize;
         float fpossize = SeenData::GetSeenPosSize();
-        oldSunColor = WaterShader::pSunColor;
+        NiColorA oldSunColor = WaterShader::pSunColor;
         WaterShader::pSunColor = NiColorA_BLACK;
         bool boldReflection = WaterShader::bNoReflections;
         WaterShader::bNoReflections = true;

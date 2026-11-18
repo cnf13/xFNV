@@ -810,8 +810,7 @@ bool CombatGroup::AddMember(Actor* apActor) {
     MemberArray.Add(*v3);
     pCombatManager->NotifyCombatGroupAddedMember(this, apActor);
     if ((bDebugCombatGroups.Bool()) && (apActor->Get3D())) {
-        XFNV_INLINED_LOCAL(NiColorA, v8, std::nullopt, std::nullopt);
-        v8 = BSTestObjects::GetColor(iGroupNum);
+        NiColorA v8 = BSTestObjects::GetColor(iGroupNum);
         NiColor color(v8.r, v8.g, v8.b);
         NiNode* v4 = apActor->Get3D();
         TintScenegraph(v4, color, nullptr);
@@ -3158,8 +3157,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
         for (uint32_t i = 0; i < uiNumSearchLocations; ++i) {
             CombatSearchLocation* pSearchLocation = &GetSearchLocation(i);
             if (pSearchLocation->WorldLoc.pSpace == pSpace) {
-                // GetColor fills the whole colour.
-                XFNV_INLINED_LOCAL(NiColorA, kColor, std::nullopt, std::nullopt);
+                NiColorA kColor;
                 pSearchLocation->GetColor(&kColor);
                 NiAVObject* pSphere = BSTestObjects::CreateSphere(32.0f, 10, 10, &kColor);
                 pSphere->SetTranslate(pSearchLocation->WorldLoc.Point);

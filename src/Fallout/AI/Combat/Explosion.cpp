@@ -1670,9 +1670,6 @@ void Explosion::UpdateRadiation() {
 }
 
 bool Explosion::RunLOSPick(NiPoint3 aLocation, TESObjectREFR* apTarget) {
-    XFNV_INLINED_LOCAL(NiColorA, v35, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v37, std::nullopt, std::nullopt);
-    alignas(16) XFNV_INLINED_LOCAL(NiColorA, v39, std::nullopt, std::nullopt);
     NiPoint3 v47;
     CFilter fltr;
     NiPoint3 targetLocation[7];
@@ -1785,14 +1782,7 @@ bool Explosion::RunLOSPick(NiPoint3 aLocation, TESObjectREFR* apTarget) {
         }
     }
     if (iExplosionDebug.Int() > 0) {
-        NiColorA* v23;
-        if (bIsBlocked) {
-            v23 = ::new (&v39) NiColorA(1.0f, 0.0f, 0.0f, 1.0f);
-        }
-        else {
-            v23 = ::new (&v37) NiColorA(0.0f, 1.0f, 0.0f, 1.0f);
-        }
-        v35 = *v23;
+        NiColorA v35 = bIsBlocked ? NiColorA(1.0f, 0.0f, 0.0f, 1.0f) : NiColorA(0.0f, 1.0f, 0.0f, 1.0f);
         NiAVObject* pdebug = (NiAVObject*)MakeLine(aLocation, v35, *targetLocation, v35, true);
         TES::pInstance->AddTempDebugObject(pdebug, 25.0f);
     }

@@ -939,7 +939,6 @@ void LockPickMenu::RotateLockpickModel(float a2) {
 }
 
 void LockPickMenu::SetupLockLevelSweetSpots() {
-    XFNV_INLINED_LOCAL(NiColorA, v32, std::nullopt, std::nullopt);
     int32_t v28 = LockLevelMaxVeryEasy[eLockLevel + 1] - LockLevelMaxVeryEasy[eLockLevel];
     float v19 = static_cast<double>(iLockpickSkill - LockLevelMaxVeryEasy[eLockLevel]) /
         (static_cast<double>(v28) + static_cast<double>(v28));
@@ -949,7 +948,7 @@ void LockPickMenu::SetupLockLevelSweetSpots() {
     int32_t aiValue = 6;
     NiColorA apMemory(0.0f, 1.0f, 0.0f, 1.0f);
     NiColorA v31(1.0f, 0.0f, 0.0f, 1.0f);
-    v32 = apMemory;
+    NiColorA v32 = apMemory;
     pTiles[14]->DeleteChildren();
     BSStringT<char> v33;
     double v18 = static_cast<double>(g_iSweetSpotLengthMinArray[eLockLevel]->Int());

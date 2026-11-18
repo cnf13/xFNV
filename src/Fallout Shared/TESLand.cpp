@@ -1134,8 +1134,6 @@ int8_t TESObjectLAND::CreateLandscape(TESObjectLAND* apFrom) {
 
 void TESObjectLAND::DrawLandBorder(bool bShow) {
     NiPoint3 dst;
-    XFNV_INLINED_LOCAL(NiColorA, v28, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v29, std::nullopt, std::nullopt);
     int32_t tcount = 32;
     int32_t vcount = 128;
     int32_t lineidx = 0;
@@ -1175,6 +1173,8 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
                 for (int32_t x_2 = 0; x_2 < 33; ++x_2) {
                     for (int32_t y_2 = 0; y_2 < 33; ++y_2) {
                         if (!x_2 || (!y_2 || (x_2 == 32 || y_2 == 32))) {
+                            NiColorA v29;
+                            NiColorA v28;
                             NiColorA* v2;
                             float tmphgt;
                             if (y_2) {
@@ -1199,13 +1199,15 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
                                 float v19 = static_cast<double>(gs_iLandBorder1B_Landscape.Int()) / 255.0;
                                 float v18 = static_cast<double>(gs_iLandBorder1G_Landscape.Int()) / 255.0;
                                 float fR = static_cast<double>(gs_iLandBorder1R_Landscape.Int()) / 255.0;
-                                v2 = ::new (&v29) NiColorA(fR, v18, v19, 1.0f);
+                                v29 = NiColorA(fR, v18, v19, 1.0f);
+                                v2 = &v29;
                             }
                             else {
                                 float v16 = static_cast<double>(gs_iLandBorder2B_Landscape.Int()) / 255.0;
                                 float v15 = static_cast<double>(gs_iLandBorder2G_Landscape.Int()) / 255.0;
                                 float v14 = static_cast<double>(gs_iLandBorder2R_Landscape.Int()) / 255.0;
-                                v2 = ::new (&v28) NiColorA(v14, v15, v16, 1.0f);
+                                v28 = NiColorA(v14, v15, v16, 1.0f);
+                                v2 = &v28;
                             }
                             NiColorA* v3 = &lineclr[lineidx];
                             v3->r = v2->r;
@@ -1635,18 +1637,6 @@ bool TESObjectLAND::GetLandNormal(const COORD_DATA& cdata, NiPoint3& aNormal, Ni
 }
 
 bool TESObjectLAND::GetLandColor(const NiPoint3& aCoord, NiColorA& aColor) {
-    XFNV_INLINED_LOCAL(NiColorA, v36, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v39, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v40, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v42, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v45, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v46, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v48, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v51, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v52, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v57, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v58, std::nullopt, std::nullopt);
     COORD_DATA cdata;
     cdata.~COORD_DATA();
     ::new (&cdata) COORD_DATA;
@@ -1662,36 +1652,24 @@ bool TESObjectLAND::GetLandColor(const NiPoint3& aCoord, NiColorA& aColor) {
     GetColorA(cdata.iBlock, cdata.iTrivertidx[1], c1);
     GetColorA(cdata.iBlock, cdata.iTrivertidx[2], c2);
     if (!cdata.bTriright && !cdata.bTriupper) {
-        NiColorA* Y = NiColorA::Multiply(&apResult, fpy, &c2);
         float v33 = 1.0 - fpy;
-        NiColorA* v16 = NiColorA::Multiply(&v57, fpx, &c0);
         float v32 = 1.0 - fpx;
-        NiColorA* v4 = NiColorA::Multiply(&v58, v32, &c1);
-        aColor = (*v4 + *v16) * v33 + *Y;
+        aColor = (NiColorA::Multiply(v32, &c1) + NiColorA::Multiply(fpx, &c0)) * v33 + NiColorA::Multiply(fpy, &c2);
     }
     if (!cdata.bTriright && cdata.bTriupper) {
         float v31 = 1.0 - fpy;
-        NiColorA* Ya = NiColorA::Multiply(&v48, v31, &c1);
-        NiColorA* v17 = NiColorA::Multiply(&v51, fpx, &c2);
         float v30 = 1.0 - fpx;
-        NiColorA* v7 = NiColorA::Multiply(&v52, v30, &c0);
-        aColor = (*v7 + *v17) * fpy + *Ya;
+        aColor = (NiColorA::Multiply(v30, &c0) + NiColorA::Multiply(fpx, &c2)) * fpy + NiColorA::Multiply(v31, &c1);
     }
     if (cdata.bTriright && !cdata.bTriupper) {
-        NiColorA* Yb = NiColorA::Multiply(&v42, fpy, &c2);
         float v29 = 1.0 - fpy;
-        NiColorA* v18 = NiColorA::Multiply(&v45, fpx, &c1);
         float v28 = 1.0 - fpx;
-        NiColorA* v10 = NiColorA::Multiply(&v46, v28, &c0);
-        aColor = (*v10 + *v18) * v29 + *Yb;
+        aColor = (NiColorA::Multiply(v28, &c0) + NiColorA::Multiply(fpx, &c1)) * v29 + NiColorA::Multiply(fpy, &c2);
     }
     if (cdata.bTriright && cdata.bTriupper) {
         float v27 = 1.0 - fpy;
-        NiColorA* Yc = NiColorA::Multiply(&v36, v27, &c1);
-        NiColorA* v19 = NiColorA::Multiply(&v39, fpx, &c0);
         float v26 = 1.0 - fpx;
-        NiColorA* v13 = NiColorA::Multiply(&v40, v26, &c2);
-        aColor = (*v13 + *v19) * fpy + *Yc;
+        aColor = (NiColorA::Multiply(v26, &c2) + NiColorA::Multiply(fpx, &c0)) * fpy + NiColorA::Multiply(v27, &c1);
     }
     return true;
 }
@@ -1734,12 +1712,11 @@ void TESObjectLAND::InitDistantTextureBlending() {
             }
             BSShaderPPLightingProperty* pshprop = v13 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
             if ((pshprop) && (!pshprop->GetDiffuseTextures(9) || !pshprop->GetNormalTexture(9u))) {
-                XFNV_INLINED_LOCAL(NiColorA, kbaseCoord, std::nullopt, std::nullopt);
                 NiTexture* pdiffuse = pterrainManager->GetDiffuseTextureForPoint(kcellcenter);
                 NiTexture* pnormal = pterrainManager->GetNormalTextureForPoint(kcellcenter);
                 pshprop->SetDiffuseTexture(9u, pdiffuse);
                 pshprop->SetNormalTexture(9u, pnormal);
-                kbaseCoord = NiColorA_BLACK;
+                NiColorA kbaseCoord = NiColorA_BLACK;
                 switch (i) {
                     case 0: {
                         NiPoint2* v2 = ::new (&v19) NiPoint2(0.0f, 0.0f);

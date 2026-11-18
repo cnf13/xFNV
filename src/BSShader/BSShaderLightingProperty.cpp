@@ -432,9 +432,6 @@ void BSShaderLightingProperty::SetDirectionalLight3x(
     if (apLight) {
         int32_t iShaderPropertyType;
         double v9;
-        XFNV_INLINED_LOCAL(NiColorA, pambientColor, std::nullopt, std::nullopt);
-        XFNV_INLINED_LOCAL(NiColorA, kdata, std::nullopt, std::nullopt);
-        XFNV_INLINED_LOCAL(NiColorA, kcolor, std::nullopt, std::nullopt);
         BSShaderPPLightingProperty* m_pObject = static_cast<BSShaderPPLightingProperty*>(
             BSShaderManager::pCurrentRenderPass->pGeometry->m_PropertyState.m_aspProps[3].m_pObject
         );
@@ -446,20 +443,14 @@ void BSShaderLightingProperty::SetDirectionalLight3x(
         }
         float y = v5->m_kWorldDir.y;
         float z = v5->m_kWorldDir.z;
-        // MAYBE-INLINED 0xB70E69: a write opening NiColorA's uses: may be its inlined constructor
-        kdata.r = v5->m_kWorldDir.x;
-        // MAYBE-INLINED 0xB70E75: a write opening NiColorA's uses: may be its inlined constructor
-        kdata.g = y;
-        // MAYBE-INLINED 0xB70E81: a write opening NiColorA's uses: may be its inlined constructor
-        kdata.b = z;
         if (m_pObject) {
             v9 = m_pObject->GetSpecularLODFade();
         }
         else {
             v9 = 1.0;
         }
-        kdata.a = v9;
-        pambientColor = NiColorA_BLACK;
+        NiColorA kdata(v5->m_kWorldDir.x, y, z, v9);
+        NiColorA pambientColor = NiColorA_BLACK;
         float pkLight = v5->m_fDimmer;
         bool bmodambient = false;
         double v10 = pkLight;
@@ -513,14 +504,7 @@ void BSShaderLightingProperty::SetDirectionalLight3x(
         }
         float g = v5->m_kDiff.g;
         float b = v5->m_kDiff.b;
-        // MAYBE-INLINED 0xB710C4: a write opening NiColorA's uses: may be its inlined constructor
-        kcolor.r = v5->m_kDiff.r * pkLighta;
-        // MAYBE-INLINED 0xB710D4: a write opening NiColorA's uses: may be its inlined constructor
-        kcolor.g = g * pkLighta;
-        // MAYBE-INLINED 0xB710E3: a write opening NiColorA's uses: may be its inlined constructor
-        kcolor.b = pkLighta * b;
-        // MAYBE-INLINED 0xB710F8: a write opening NiColorA's uses: may be its inlined constructor
-        kcolor.a = apLight->fShadowLODDimmer;
+        NiColorA kcolor(v5->m_kDiff.r * pkLighta, g * pkLighta, pkLighta * b, apLight->fShadowLODDimmer);
         Lighting30Shader::SetLight(auiLightIndex, kdata, kcolor);
     }
     else {
@@ -555,11 +539,9 @@ void BSShaderLightingProperty::SetLight1x2x(uint32_t auiLightIndex, ShadowSceneL
     if (bPointLight) {
         if (pLight) {
             // The light's position.
-            XFNV_INLINED_LOCAL(NiColorA, kPosition, std::nullopt, std::nullopt);
-            kPosition.r = pLight->m_kWorld.m_Translate.x;
-            kPosition.g = pLight->m_kWorld.m_Translate.y;
-            kPosition.b = pLight->m_kWorld.m_Translate.z;
-            kPosition.a = 1.0f;
+            NiColorA kPosition(
+                pLight->m_kWorld.m_Translate.x, pLight->m_kWorld.m_Translate.y, pLight->m_kWorld.m_Translate.z, 1.0f
+            );
             SetShaderConstant(static_cast<int32_t>(auiLightIndex + 11), kPosition);
         }
     }
@@ -575,11 +557,7 @@ void BSShaderLightingProperty::SetLight1x2x(uint32_t auiLightIndex, ShadowSceneL
             else {
                 fSpecularFade = 1.0f;
             }
-            XFNV_INLINED_LOCAL(NiColorA, kDirection, std::nullopt, std::nullopt);
-            kDirection.r = kDir.x;
-            kDirection.g = kDir.y;
-            kDirection.b = kDir.z;
-            kDirection.a = fSpecularFade;
+            NiColorA kDirection(kDir.x, kDir.y, kDir.z, fSpecularFade);
             SetShaderConstant(static_cast<int32_t>(auiLightIndex + 19), kDirection);
         }
         if (!BSShaderManager::bSeparateAmbientLight || bAmbientLight) {
@@ -688,17 +666,11 @@ void BSShaderLightingProperty::SetPointLight3x(
             float r;
             float v6;
             float v7;
-            XFNV_INLINED_LOCAL(NiColorA, v8, std::nullopt, std::nullopt);
-            XFNV_INLINED_LOCAL(NiColorA, kdata, std::nullopt, std::nullopt);
             NiLight* m_pObject = apLight->spLight.m_pObject;
-            // MAYBE-INLINED 0xB711A9: a write opening NiColorA's uses: may be its inlined constructor
-            kdata.r = m_pObject->m_kWorld.m_Translate.x;
-            // MAYBE-INLINED 0xB711BB: a write opening NiColorA's uses: may be its inlined constructor
-            kdata.g = m_pObject->m_kWorld.m_Translate.y;
-            // MAYBE-INLINED 0xB711CD: a write opening NiColorA's uses: may be its inlined constructor
-            kdata.b = m_pObject->m_kWorld.m_Translate.z;
-            // MAYBE-INLINED 0xB711D9: a write opening NiColorA's uses: may be its inlined constructor
-            kdata.a = m_pObject->m_kSpec.r;
+            NiColorA kdata(
+                m_pObject->m_kWorld.m_Translate.x, m_pObject->m_kWorld.m_Translate.y, m_pObject->m_kWorld.m_Translate.z,
+                m_pObject->m_kSpec.r
+            );
             float g = m_pObject->m_kSpec.g;
             float b = m_pObject->m_kSpec.b;
             if (!(afForcedDarkness < 1.0f)) {
@@ -722,10 +694,7 @@ void BSShaderLightingProperty::SetPointLight3x(
                 v6 = NiColorA_BLACK.g;
                 v7 = NiColorA_BLACK.b;
             }
-            v8.r = r;
-            v8.g = v6;
-            v8.b = v7;
-            v8.a = apLight->fShadowLODDimmer;
+            NiColorA v8(r, v6, v7, apLight->fShadowLODDimmer);
             Lighting30Shader::SetLight(static_cast<int32_t>(auiLightIndex), kdata, v8);
         }
         else {

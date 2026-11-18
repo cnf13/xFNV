@@ -393,42 +393,20 @@ bool NiCollisionTraversals::FindIntersectionsTriBasedGeom(
                 kColorIter.m_bCompressed = false;
                 pkData->GetColorsIterator(kColorIter);
                 if (kColorIter.m_pvCurrentPosition) {
-                    XFNV_INLINED_LOCAL(NiColorA, kC0, std::nullopt, std::nullopt);
-                    XFNV_INLINED_LOCAL(NiColorA, kC1, std::nullopt, std::nullopt);
-                    XFNV_INLINED_LOCAL(NiColorA, kC2, std::nullopt, std::nullopt);
-                    kC0.r = 0.0f;
-                    kC0.g = 0.0f;
-                    kC0.b = 0.0f;
-                    kC0.a = 0.0f;
-                    kC1.r = 0.0f;
-                    kC1.g = 0.0f;
-                    kC1.b = 0.0f;
-                    kC1.a = 0.0f;
-                    kC2.r = 0.0f;
-                    kC2.g = 0.0f;
-                    kC2.b = 0.0f;
-                    kC2.a = 0.0f;
+                    NiColorA kC0;
+                    NiColorA kC1;
+                    NiColorA kC2;
                     kColorIter.Get(i0, kC0);
                     kColorIter.Get(i1, kC1);
                     kColorIter.Get(i2, kC2);
-                    XFNV_INLINED_LOCAL(NiColorA, kScaled2, std::nullopt, std::nullopt);
-                    XFNV_INLINED_LOCAL(NiColorA, kScaled1, std::nullopt, std::nullopt);
-                    XFNV_INLINED_LOCAL(NiColorA, kScaled0, std::nullopt, std::nullopt);
-                    NiColorA* pkScaled2 = NiColorA::Multiply(&kScaled2, fTriParam2, &kC2);
-                    NiColorA* pkScaled1 = NiColorA::Multiply(&kScaled1, fTriParam1, &kC1);
-                    NiColorA* pkScaled0 = NiColorA::Multiply(&kScaled0, fTriParam0, &kC0);
-                    pkRecord->m_color = *pkScaled0 + *pkScaled1 + *pkScaled2;
+                    pkRecord->m_color = NiColorA::Multiply(fTriParam0, &kC0) + NiColorA::Multiply(fTriParam1, &kC1) +
+                        NiColorA::Multiply(fTriParam2, &kC2);
                 }
                 else {
                     NiColorA* pkColor = pkTBG->m_spModelData.m_pObject->m_pkColor;
                     if (pkColor) {
-                        XFNV_INLINED_LOCAL(NiColorA, kScaled2, std::nullopt, std::nullopt);
-                        XFNV_INLINED_LOCAL(NiColorA, kScaled1, std::nullopt, std::nullopt);
-                        XFNV_INLINED_LOCAL(NiColorA, kScaled0, std::nullopt, std::nullopt);
-                        NiColorA* pkScaled2 = NiColorA::Multiply(&kScaled2, fTriParam2, &pkColor[i2]);
-                        NiColorA* pkScaled1 = NiColorA::Multiply(&kScaled1, fTriParam1, &pkColor[i1]);
-                        NiColorA* pkScaled0 = NiColorA::Multiply(&kScaled0, fTriParam0, &pkColor[i0]);
-                        pkRecord->m_color = *pkScaled0 + *pkScaled1 + *pkScaled2;
+                        pkRecord->m_color = NiColorA::Multiply(fTriParam0, &pkColor[i0]) +
+                            NiColorA::Multiply(fTriParam1, &pkColor[i1]) + NiColorA::Multiply(fTriParam2, &pkColor[i2]);
                     }
                 }
             }
@@ -744,24 +722,14 @@ bool NiCollisionTraversals::FindIntersectionsOneStripFastPath(
                 kColorIter.Get(i0, kC0);
                 kColorIter.Get(i1, kC1);
                 kColorIter.Get(i2, kC2);
-                XFNV_INLINED_LOCAL(NiColorA, kScaled2, std::nullopt, std::nullopt);
-                XFNV_INLINED_LOCAL(NiColorA, kScaled1, std::nullopt, std::nullopt);
-                XFNV_INLINED_LOCAL(NiColorA, kScaled0, std::nullopt, std::nullopt);
-                NiColorA* pkScaled2 = NiColorA::Multiply(&kScaled2, fTriParam2, &kC2);
-                NiColorA* pkScaled1 = NiColorA::Multiply(&kScaled1, fTriParam1, &kC1);
-                NiColorA* pkScaled0 = NiColorA::Multiply(&kScaled0, fTriParam0, &kC0);
-                pkRecord->m_color = *pkScaled0 + *pkScaled1 + *pkScaled2;
+                pkRecord->m_color = NiColorA::Multiply(fTriParam0, &kC0) + NiColorA::Multiply(fTriParam1, &kC1) +
+                    NiColorA::Multiply(fTriParam2, &kC2);
             }
             else {
                 NiColorA* pkColor = apGeom->m_spModelData.m_pObject->m_pkColor;
                 if (pkColor) {
-                    XFNV_INLINED_LOCAL(NiColorA, kScaled2, std::nullopt, std::nullopt);
-                    XFNV_INLINED_LOCAL(NiColorA, kScaled1, std::nullopt, std::nullopt);
-                    XFNV_INLINED_LOCAL(NiColorA, kScaled0, std::nullopt, std::nullopt);
-                    NiColorA* pkScaled2 = NiColorA::Multiply(&kScaled2, fTriParam2, &pkColor[i2]);
-                    NiColorA* pkScaled1 = NiColorA::Multiply(&kScaled1, fTriParam1, &pkColor[i1]);
-                    NiColorA* pkScaled0 = NiColorA::Multiply(&kScaled0, fTriParam0, &pkColor[i0]);
-                    pkRecord->m_color = *pkScaled0 + *pkScaled1 + *pkScaled2;
+                    pkRecord->m_color = NiColorA::Multiply(fTriParam0, &pkColor[i0]) +
+                        NiColorA::Multiply(fTriParam1, &pkColor[i1]) + NiColorA::Multiply(fTriParam2, &pkColor[i2]);
                 }
                 else {
                     pkRecord->m_color = NiColorA_WHITE;
@@ -1039,21 +1007,9 @@ bool NiCollisionTraversals::FindIntersectionsTriShapeFastPath(
             kColorIter.m_bCompressed = false;
             pkData->GetColorsIterator(kColorIter);
             if (kColorIter.m_pvCurrentPosition) {
-                XFNV_INLINED_LOCAL(NiColorA, kC0, std::nullopt, std::nullopt);
-                XFNV_INLINED_LOCAL(NiColorA, kC1, std::nullopt, std::nullopt);
-                XFNV_INLINED_LOCAL(NiColorA, kC2, std::nullopt, std::nullopt);
-                kC0.r = 0.0f;
-                kC0.g = 0.0f;
-                kC0.b = 0.0f;
-                kC0.a = 0.0f;
-                kC1.r = 0.0f;
-                kC1.g = 0.0f;
-                kC1.b = 0.0f;
-                kC1.a = 0.0f;
-                kC2.r = 0.0f;
-                kC2.g = 0.0f;
-                kC2.b = 0.0f;
-                kC2.a = 0.0f;
+                NiColorA kC0;
+                NiColorA kC1;
+                NiColorA kC2;
                 kColorIter.Get(i0, kC0);
                 kColorIter.Get(i1, kC1);
                 kColorIter.Get(i2, kC2);
@@ -1081,14 +1037,9 @@ bool NiCollisionTraversals::FindIntersectionsTriShapeFastPath(
             else {
                 NiColorA* pkColors = pkTBG->m_spModelData.m_pObject->m_pkColor;
                 if (pkColors) {
-                    XFNV_INLINED_LOCAL(NiColorA, kScaled2, std::nullopt, std::nullopt);
-                    XFNV_INLINED_LOCAL(NiColorA, kScaled1, std::nullopt, std::nullopt);
-                    XFNV_INLINED_LOCAL(NiColorA, kScaled0, std::nullopt, std::nullopt);
-                    // Scales i2's colour first, then i1's and i0's, and sums (c0 + c1) + c2.
-                    const NiColorA* pkScaled2 = NiColorA::Multiply(&kScaled2, fTriParam2, &pkColors[i2]);
-                    const NiColorA* pkScaled1 = NiColorA::Multiply(&kScaled1, fTriParam1, &pkColors[i1]);
-                    const NiColorA* pkScaled0 = NiColorA::Multiply(&kScaled0, fTriParam0, &pkColors[i0]);
-                    pkRecord->m_color = *pkScaled0 + *pkScaled1 + *pkScaled2;
+                    // The three colours scaled by their weights, summed as (c0 + c1) + c2.
+                    pkRecord->m_color = NiColorA::Multiply(fTriParam0, &pkColors[i0]) +
+                        NiColorA::Multiply(fTriParam1, &pkColors[i1]) + NiColorA::Multiply(fTriParam2, &pkColors[i2]);
                 }
                 else {
                     pkRecord->m_color = NiColorA_WHITE;

@@ -70,31 +70,27 @@ BGSPrimitive* BGSPrimitive::CreateAbstract(PRIMITIVE_TYPE eType, NiPoint3& aRadi
 BGSPrimitive* BGSPrimitive::Copy(BGSPrimitive* apCopy) {
     NiPoint3 v10;
     NiPoint3 v11;
-    XFNV_INLINED_LOCAL(NiColorA, color_3, std::nullopt, std::nullopt);
     NiPoint3 radii_2;
-    XFNV_INLINED_LOCAL(NiColorA, color_2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, colorTmp, std::nullopt, std::nullopt);
     BGSPrimitive* pprimitive = nullptr;
     if (apCopy->eType == BGSPrimitive::PRIMITIVE_PLANE) {
         NiPoint3 radii;
-        XFNV_INLINED_LOCAL(NiColorA, color, std::nullopt, std::nullopt);
         radii = apCopy->GetRadii() * 2.0f;
-        color = apCopy->GetColor();
+        NiColorA color = apCopy->GetColor();
         NiPoint3* v2 = &(v11 = apCopy->GetRadii());
         float v8 = v2->z + v2->z;
         NiPoint3* v3 = &(v10 = apCopy->GetRadii());
         float v7 = v3->x + v3->x;
         NiPoint2 pt2Tmp(v7, v8);
-        colorTmp = apCopy->GetColor();
+        NiColorA colorTmp = apCopy->GetColor();
         pprimitive = BGSPrimitive::CreatePlane(pt2Tmp, colorTmp);
     }
     if (apCopy->eType == BGSPrimitive::PRIMITIVE_BOX) {
         radii_2 = apCopy->GetRadii() * 2.0f;
-        color_2 = apCopy->GetColor();
+        NiColorA color_2 = apCopy->GetColor();
         pprimitive = BGSPrimitive::CreateBox(radii_2, color_2);
     }
     if (apCopy->eType == BGSPrimitive::PRIMITIVE_SPHERE) {
-        color_3 = apCopy->GetColor();
+        NiColorA color_3 = apCopy->GetColor();
         float afRadius = apCopy->Radii.x;
         return BGSPrimitive::CreateSphere(afRadius, color_3);
     }

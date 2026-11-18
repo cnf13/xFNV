@@ -93,9 +93,9 @@ public:
 
     // Multiplies all four channels by fScalar and returns the new colour.
     NiColorA operator*(float fScalar) const;
-    NiColorA* Divide(NiColorA* a2, float a3);
+    NiColorA Divide(float a3);
 
-    static NiColorA* Multiply(NiColorA* apResult, float afScalar, const NiColorA* apColor);
+    static NiColorA Multiply(float afScalar, const NiColorA* apColor);
 
     float r;
     float g;

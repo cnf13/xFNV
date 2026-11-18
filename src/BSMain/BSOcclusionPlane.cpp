@@ -533,15 +533,8 @@ void BSOcclusionPlane::MakeDebugGeom(
     bool abWithinFrustum
 ) {
     bool v39;
-    XFNV_INLINED_LOCAL(NiColorA, v50, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v51, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v52, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v55, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v56, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v57, std::nullopt, std::nullopt);
     NiPoint3 akPoints[8];
     uint16_t j;
-    XFNV_INLINED_LOCAL(NiColorA, kcolor, std::nullopt, std::nullopt);
     int32_t v103 = 4;
     int32_t v73 = 2;
     GetVertices(akPoints);
@@ -559,7 +552,7 @@ void BSOcclusionPlane::MakeDebugGeom(
     akPoints[7] = akPoints[3] + ktemp * 2500.0f;
     uint16_t ausLines[16] = {0, 1, 3, 2, 0, 3, 2, 1, 0, 4, 1, 5, 2, 6, 3, 7};
     uint16_t ausTris[30] = {0, 1, 2, 2, 3, 0, 5, 0, 4, 5, 1, 0, 5, 2, 1, 6, 2, 5, 6, 7, 2, 7, 3, 2, 0, 3, 7, 7, 4, 0};
-    kcolor = akBaseColor;
+    NiColorA kcolor = akBaseColor;
     float a = NiColorA_WHITE.a;
     float v82 = akBaseColor.a;
     float v83 = akBaseColor.a;
@@ -572,64 +565,18 @@ void BSOcclusionPlane::MakeDebugGeom(
     NiColorA* m_pkColor = apLines->m_spModelData.m_pObject->m_pkColor;
     uint8_t* pkFlags = static_cast<NiLinesData*>(apLines->m_spModelData.m_pObject)->m_pkFlags;
     for (j = 0; j < v103; ++j) {
-        NiColorA* v34;
-        NiColorA* v36;
         NiPoint3* v10 = &akPoints[ausLines[2 * j]];
         m_pkVertex[2 * j] = *v10;
-        if (kCullResult == BSMultiBoundShape::BS_CULL_VISIBLE) {
-            NiColorA* v37;
-            if (bDisabledPlanes[j]) {
-                v57.r = 1.0f;
-                v57.g = 1.0f;
-                v57.b = 0.1f;
-                v57.a = akBaseColor.a;
-                v37 = &v57;
-            }
-            else {
-                v56.r = 0.1f;
-                v56.g = 1.0f;
-                v56.b = 0.1f;
-                v56.a = akBaseColor.a;
-                v37 = &v56;
-            }
-            v36 = v37;
-        }
-        else {
-            v55.r = 0.7f;
-            v55.g = 0.15f;
-            v55.b = 0.15f;
-            v55.a = akBaseColor.a;
-            v36 = &v55;
-        }
-        m_pkColor[2 * j] = *v36;
+        m_pkColor[2 * j] = kCullResult == BSMultiBoundShape::BS_CULL_VISIBLE
+            ? (bDisabledPlanes[j] ? NiColorA(1.0f, 1.0f, 0.1f, akBaseColor.a)
+                                  : NiColorA(0.1f, 1.0f, 0.1f, akBaseColor.a))
+            : NiColorA(0.7f, 0.15f, 0.15f, akBaseColor.a);
         NiPoint3* v13 = &akPoints[ausLines[2 * j + 1]];
         m_pkVertex[2 * j + 1] = *v13;
-        if (kCullResult == BSMultiBoundShape::BS_CULL_VISIBLE) {
-            NiColorA* v35;
-            if (bDisabledPlanes[j]) {
-                v52.r = 1.0f;
-                v52.g = 1.0f;
-                v52.b = 0.1f;
-                v52.a = akBaseColor.a;
-                v35 = &v52;
-            }
-            else {
-                v51.r = 0.1f;
-                v51.g = 1.0f;
-                v51.b = 0.1f;
-                v51.a = akBaseColor.a;
-                v35 = &v51;
-            }
-            v34 = v35;
-        }
-        else {
-            v50.r = 0.7f;
-            v50.g = 0.15f;
-            v50.b = 0.15f;
-            v50.a = akBaseColor.a;
-            v34 = &v50;
-        }
-        m_pkColor[2 * j + 1] = *v34;
+        m_pkColor[2 * j + 1] = kCullResult == BSMultiBoundShape::BS_CULL_VISIBLE
+            ? (bDisabledPlanes[j] ? NiColorA(1.0f, 1.0f, 0.1f, akBaseColor.a)
+                                  : NiColorA(0.1f, 1.0f, 0.1f, akBaseColor.a))
+            : NiColorA(0.7f, 0.15f, 0.15f, akBaseColor.a);
         pkFlags[2 * j] = 1;
         pkFlags[2 * j + 1] = 0;
     }

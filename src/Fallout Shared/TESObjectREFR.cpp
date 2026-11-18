@@ -5052,8 +5052,6 @@ void TESObjectREFR::SetLinkLine(bool abShow) {
 }
 
 void TESObjectREFR::SetActivateLine(bool abShow) {
-    XFNV_INLINED_LOCAL(NiColorA, v13, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v14, std::nullopt, std::nullopt);
     NiPoint3 aStart;
     NiMatrix3 apResult;
     NiPoint3 result;
@@ -5095,8 +5093,7 @@ void TESObjectREFR::SetActivateLine(bool abShow) {
                     float v6 = 1.0 / GetScale();
                     result = result * v6;
                     NiLines* Line = MakeLine(
-                        aStart, *::new (&v13) NiColorA(1.0f, 1.0f, 1.0f, 1.0f), result,
-                        *::new (&v14) NiColorA(0.0f, 0.0f, 0.0f, 1.0f), true
+                        aStart, NiColorA(1.0f, 1.0f, 1.0f, 1.0f), result, NiColorA(0.0f, 0.0f, 0.0f, 1.0f), true
                     );
                     if (!v29) {
                         NiNode* v5;
@@ -10556,8 +10553,7 @@ void TESObjectREFR::ShowPrimitive(bool abShow) {
     BGSPrimitive* pprim = (&m_Extra)->GetPrimitive();
     if ((pprim) && (pprim->GetNode())) {
         float fAlpha;
-        XFNV_INLINED_LOCAL(NiColorA, clr, std::nullopt, std::nullopt);
-        clr = pprim->GetColor();
+        NiColorA clr = pprim->GetColor();
         if (abShow) {
             fAlpha = 0.2f;
         }

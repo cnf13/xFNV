@@ -261,15 +261,11 @@ void BSShaderAccumulator::DoSunOcclusionQuery(NiTriShape* apSunGeometry, uint32_
 bool BSShaderAccumulator::RenderVolumetricFog(NiCamera* apCamera, BSRenderedTexture* apCurRenderTarget) {
     uint32_t uiFogCount = pVolumetricFogGeometry.m_uiCount;
     if (uiFogCount) {
-        XFNV_INLINED_LOCAL(NiColorA, kOrgColor, std::nullopt, std::nullopt);
         if (NiRenderer::ms_pkRenderer->m_eFrameState) {
             BSRenderedTexture::StopOffscreen();
         }
         NiDX9Renderer* pRenderer = static_cast<NiDX9Renderer*>(NiRenderer::ms_pkRenderer);
-        kOrgColor.r = 0.0f;
-        kOrgColor.g = 0.0f;
-        kOrgColor.b = 0.0f;
-        kOrgColor.a = 0.0f;
+        NiColorA kOrgColor(0.0f, 0.0f, 0.0f, 0.0f);
         ImageSpaceShaderVolumetricFog* pFogShader = static_cast<ImageSpaceShaderVolumetricFog*>(
             BSShaderManager::pImageSpaceManager->pEffectList.m_pBase[ImageSpaceManager::EFFECT_SHADER_VOLUMETRIC_FOG]
         );
@@ -279,11 +275,7 @@ bool BSShaderAccumulator::RenderVolumetricFog(NiCamera* apCamera, BSRenderedText
         NiCamera* pOldCamera = this->m_pkCamera;
         this->m_pkCamera = apCamera;
         pRenderer->GetBackgroundColor(kOrgColor);
-        XFNV_INLINED_LOCAL(NiColorA, kClearColor, std::nullopt, std::nullopt);
-        kClearColor.r = 0.0f;
-        kClearColor.g = 0.0f;
-        kClearColor.b = 0.0f;
-        kClearColor.a = 1.0f;
+        NiColorA kClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         pRenderer->SetBackgroundColorAlpha(kClearColor);
         m_kItemsToSortAndRender = &pVolumetricFogGeometry;
         this->Sort();

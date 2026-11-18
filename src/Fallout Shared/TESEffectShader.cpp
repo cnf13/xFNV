@@ -223,12 +223,6 @@ bool TESEffectShader::Compare(TESForm* apCompare) {
 }
 
 void TESEffectShader::SetupParticleShader(ParticleShaderProperty* apProperty, NiSourceTexture* apTex) {
-    XFNV_INLINED_LOCAL(NiColorA, v15, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v16, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, apMemory, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, color3, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, color1, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, color2, std::nullopt, std::nullopt);
     apProperty->SetTexture(apTex);
     apProperty->SetLifetime(Data.fParticleLifetime);
     apProperty->SetLifetimeVar(Data.fParticleLifeVar);
@@ -247,15 +241,15 @@ void TESEffectShader::SetupParticleShader(ParticleShaderProperty* apProperty, Ni
     float aColor = static_cast<float>(static_cast<uint8_t>(Data.iParticleColor1 >> 16));
     float fG = static_cast<float>(static_cast<uint8_t>(static_cast<uint16_t>(Data.iParticleColor1) >> 8));
     float fR = static_cast<float>(static_cast<uint8_t>(Data.iParticleColor1));
-    (::new (&apMemory) NiColorA(fR, fG, aColor, 0.0f))->Divide(&color1, 255.0f);
+    NiColorA color1 = NiColorA(fR, fG, aColor, 0.0f).Divide(255.0f);
     float aColora = static_cast<float>(static_cast<uint8_t>(Data.iParticleColor2 >> 16));
     float fGa = static_cast<float>(static_cast<uint8_t>(static_cast<uint16_t>(Data.iParticleColor2) >> 8));
     float fRa = static_cast<float>(static_cast<uint8_t>(Data.iParticleColor2));
-    (::new (&v16) NiColorA(fRa, fGa, aColora, 0.0f))->Divide(&color2, 255.0f);
+    NiColorA color2 = NiColorA(fRa, fGa, aColora, 0.0f).Divide(255.0f);
     float aColorb = static_cast<float>(static_cast<uint8_t>(Data.iParticleColor3 >> 16));
     float fGb = static_cast<float>(static_cast<uint8_t>(static_cast<uint16_t>(Data.iParticleColor3) >> 8));
     float fRb = static_cast<float>(static_cast<uint8_t>(Data.iParticleColor3));
-    (::new (&v15) NiColorA(fRb, fGb, aColorb, 0.0f))->Divide(&color3, 255.0f);
+    NiColorA color3 = NiColorA(fRb, fGb, aColorb, 0.0f).Divide(255.0f);
     color1.a = Data.fParticleColor1Alpha;
     color2.a = Data.fParticleColor2Alpha;
     color3.a = Data.fParticleColor3Alpha;
@@ -513,10 +507,6 @@ float TESEffectShader::AnimateFillEffectAlpha(float afCurrentAlpha, float afTime
 BSShaderPPLightingProperty::TextureEffectData*
 TESEffectShader::CreateTextureShaderData(NiAVObject* apObject, NiSourceTexture* apTex, NiSourceTexture* apBlockOutTex) {
     BSShaderPPLightingProperty::TextureEffectData* pData;
-    XFNV_INLINED_LOCAL(NiColorA, v23, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v24, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, a2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v26, std::nullopt, std::nullopt);
     void* apMemory = NiMemObject::operator new(sizeof(BSShaderPPLightingProperty::TextureEffectData));
     if (apMemory) {
         pData = ::new (apMemory) BSShaderPPLightingProperty::TextureEffectData;
@@ -530,13 +520,11 @@ TESEffectShader::CreateTextureShaderData(NiAVObject* apObject, NiSourceTexture* 
     float fB = static_cast<float>(static_cast<uint8_t>(fillTextureRGB >> 16));
     float fG = static_cast<float>(static_cast<uint8_t>(fillTextureRGB >> 8));
     float fR = static_cast<float>(static_cast<uint8_t>(fillTextureRGB));
-    NiColorA* v4 = (::new (&v26) NiColorA(fR, fG, fB, 0.0f))->Divide(&a2, 255.0f);
-    pData->FillColor = *v4;
+    pData->FillColor = NiColorA(fR, fG, fB, 0.0f).Divide(255.0f);
     float fBa = static_cast<float>(static_cast<uint8_t>(UnderwaterState >> 16));
     float fGa = static_cast<float>(static_cast<uint8_t>(UnderwaterState >> 8));
     float fRa = static_cast<float>(static_cast<uint8_t>(UnderwaterState));
-    NiColorA* v5 = (::new (&v24) NiColorA(fRa, fGa, fBa, 0.0f))->Divide(&v23, 255.0f);
-    pData->RimColor = *v5;
+    pData->RimColor = NiColorA(fRa, fGa, fBa, 0.0f).Divide(255.0f);
     pData->fTextureUOffset = 0.0f;
     pData->fTextureVOffset = 0.0f;
     double TargetTimeMult = Data.fEdgeExponentValue;

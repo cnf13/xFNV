@@ -564,7 +564,6 @@ NiNode* DebugText::CreateDebugText(
 ) {
     int32_t iwidth;
     XFNV_INLINED_LOCAL(AutoMemContext, tempMemContext, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, xcolor_2, std::nullopt, std::nullopt);
     tempMemContext.iOldMemContext = GetThreadTLSData()->eMemContext;
     GetThreadTLSData()->eMemContext = MEM_CONTEXT_INTERFACE;
     if (*apText && (Interface::IsConsoleVisible() || Interface::IsDebugTextVisible())) {
@@ -595,30 +594,20 @@ NiNode* DebugText::CreateDebugText(
         else {
             pnode = nullptr;
         }
-        // MAYBE-INLINED 0xA0FFEE: a write opening NiColorA's uses: may be its inlined constructor
-        xcolor_2.r = 0.0f;
-        // MAYBE-INLINED 0xA0FFF3: a write opening NiColorA's uses: may be its inlined constructor
-        xcolor_2.g = 0.0f;
-        // MAYBE-INLINED 0xA0FFF8: a write opening NiColorA's uses: may be its inlined constructor
-        xcolor_2.b = 0.0f;
-        // MAYBE-INLINED 0xA0FFFD: a write opening NiColorA's uses: may be its inlined constructor
-        xcolor_2.a = 0.0f;
+        NiColorA xcolor_2;
         if (apColor) {
             xcolor_2 = *apColor;
         }
         else {
             Setting::Info* p_uValue;
-            XFNV_INLINED_LOCAL(NiColorA, v32, std::nullopt, std::nullopt);
             // The setting's address is never null.
             p_uValue = &xDebugTextColor.uValue;
-            // MAYBE-INLINED 0xA100CB: a write opening NiColorA's uses: may be its inlined constructor
-            v32.r = static_cast<double>(static_cast<uint8_t>(p_uValue->uint >> 24)) / 255.0;
-            // MAYBE-INLINED 0xA100F0: a write opening NiColorA's uses: may be its inlined constructor
-            v32.g = static_cast<double>(static_cast<uint8_t>(p_uValue->uint >> 16)) / 255.0;
-            // MAYBE-INLINED 0xA10115: a write opening NiColorA's uses: may be its inlined constructor
-            v32.b = static_cast<double>(static_cast<uint8_t>(p_uValue->uint >> 8)) / 255.0;
-            // MAYBE-INLINED 0xA1013A: a write opening NiColorA's uses: may be its inlined constructor
-            v32.a = static_cast<double>(static_cast<uint8_t>(p_uValue->uint)) / 255.0;
+            NiColorA v32(
+                static_cast<double>(static_cast<uint8_t>(p_uValue->uint >> 24)) / 255.0,
+                static_cast<double>(static_cast<uint8_t>(p_uValue->uint >> 16)) / 255.0,
+                static_cast<double>(static_cast<uint8_t>(p_uValue->uint >> 8)) / 255.0,
+                static_cast<double>(static_cast<uint8_t>(p_uValue->uint)) / 255.0
+            );
             xcolor_2 = v32;
         }
         BSStringT<char> string(apText);

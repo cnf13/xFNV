@@ -1462,14 +1462,9 @@ void TESWaterSystem::UpdateWaterDisplacementSimulation() {
 
 void TESWaterSystem::UpdateWaterSounds() {
     static char bWaterSoundPlaying;
-    XFNV_INLINED_LOCAL(NiColorA, v42, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v43, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v44, std::nullopt, std::nullopt);
     NiPoint2 v45;
     NiPoint3 v46;
-    XFNV_INLINED_LOCAL(NiColorA, v47, std::nullopt, std::nullopt);
     NiPoint3 v48;
-    XFNV_INLINED_LOCAL(NiColorA, apMemory, std::nullopt, std::nullopt);
     NiPoint3 v50;
     NiPoint3 dst;
     NiPoint3 playerloc;
@@ -1539,8 +1534,7 @@ void TESWaterSystem::UpdateWaterSounds() {
                         waterDirection.x = waterDirection.x + testPt.x;
                         waterDirection.y = waterDirection.y + testPt.y;
                         if (TESWaterSystem::bDisplayWaterSoundPlacement) {
-                            NiTriShape* ppoint =
-                                MakeTriPoint(10.0f, *::new (&apMemory) NiColorA(0.0f, 1.0f, 0.0f, 0.0f), true);
+                            NiTriShape* ppoint = MakeTriPoint(10.0f, NiColorA(0.0f, 1.0f, 0.0f, 0.0f), true);
                             float uNearWaterRadiusa = afHeight;
                             float exteriorWaterHeight = currentCell->GetWaterHeight();
                             float v34 = BSMAX(exteriorWaterHeight, uNearWaterRadiusa) + 10.0;
@@ -1551,8 +1545,7 @@ void TESWaterSystem::UpdateWaterSounds() {
                     }
                     else {
                         if (TESWaterSystem::bDisplayWaterSoundPlacement) {
-                            NiTriShape* ppoint_2 =
-                                MakeTriPoint(10.0f, *::new (&v47) NiColorA(0.0f, 0.0f, 1.0f, 0.0f), true);
+                            NiTriShape* ppoint_2 = MakeTriPoint(10.0f, NiColorA(0.0f, 0.0f, 1.0f, 0.0f), true);
                             float uNearWaterRadiusb = afHeight;
                             float exteriorWaterHeighta = currentCell->GetWaterHeight();
                             float v33 = BSMAX(exteriorWaterHeighta, uNearWaterRadiusb) + 10.0;
@@ -1607,12 +1600,11 @@ void TESWaterSystem::UpdateWaterSounds() {
                 playerloc.y = v13->y;
                 playerloc.z = v13->z + 10.0;
                 NiPoint3 soundloc(waterDirection.x, waterDirection.y, playerloc.z);
-                NiTriShape* ppoint_3 = MakeTriPoint(10.0f, *::new (&v44) NiColorA(1.0f, 0.0f, 0.0f, 0.0f), true);
+                NiTriShape* ppoint_3 = MakeTriPoint(10.0f, NiColorA(1.0f, 0.0f, 0.0f, 0.0f), true);
                 ppoint_3->SetTranslate(soundloc);
                 TES::pInstance->AddTempDebugObject(ppoint_3, 10.0f);
                 NiLines* plines = MakeLine(
-                    playerloc, *::new (&v42) NiColorA(1.0f, 1.0f, 0.0f, 0.0f), soundloc,
-                    *::new (&v43) NiColorA(1.0f, 1.0f, 0.0f, 0.0f), true
+                    playerloc, NiColorA(1.0f, 1.0f, 0.0f, 0.0f), soundloc, NiColorA(1.0f, 1.0f, 0.0f, 0.0f), true
                 );
                 TES::pInstance->AddTempDebugObject(plines, 10.0f);
             }
@@ -2695,14 +2687,10 @@ void TESWaterSystem::MTRenderSelectiveReflectionTexture(PlaceableWaterGroup* apW
         MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4226
     );
     if (TESWaterSystem::GetUseWaterShader() && apWaterGroup->spReflectionCamera.m_pObject) {
-        XFNV_INLINED_LOCAL(NiColorA, newClearColor, std::nullopt, std::nullopt);
         NiColorA oldClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         NiDX9Renderer* pRenderer = BSShaderManager::GetRenderer();
         pRenderer->GetBackgroundColor(oldClearColor);
-        newClearColor.r = oldClearColor.r;
-        newClearColor.g = oldClearColor.g;
-        newClearColor.b = oldClearColor.b;
-        newClearColor.a = 0.0f;
+        NiColorA newClearColor(oldClearColor.r, oldClearColor.g, oldClearColor.b, 0.0f);
         NiDX9Renderer* pAlphaRenderer = BSShaderManager::GetRenderer();
         pAlphaRenderer->SetBackgroundColorAlpha(newClearColor);
         if (!apWaterGroup->spGroupReflectionMap.m_pObject) {
@@ -2748,14 +2736,10 @@ void TESWaterSystem::MTRenderWorldReflectionTexture() {
         MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4280
     );
     if (TESWaterSystem::GetUseWaterShader() && TESWaterSystem::spWaterHeightCamera.m_pObject) {
-        XFNV_INLINED_LOCAL(NiColorA, newClearColor, std::nullopt, std::nullopt);
         NiColorA oldClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         NiDX9Renderer* Renderer_ = BSShaderManager::GetRenderer();
         Renderer_->GetBackgroundColor(oldClearColor);
-        newClearColor.r = oldClearColor.r;
-        newClearColor.g = oldClearColor.g;
-        newClearColor.b = oldClearColor.b;
-        newClearColor.a = 0.0f;
+        NiColorA newClearColor(oldClearColor.r, oldClearColor.g, oldClearColor.b, 0.0f);
         NiDX9Renderer* v25 = BSShaderManager::GetRenderer();
         v25->SetBackgroundColorAlpha(newClearColor);
         if (!PlaceableWaterGroup::spWorldReflectionMap.m_pObject) {
@@ -2996,13 +2980,11 @@ void TESWaterSystem::MTSetupSelectiveDepthTexture(NiCamera* apCamera, PlaceableW
 }
 
 void TESWaterSystem::MTRenderSelectiveDepthTexture(PlaceableWaterGroup* apWaterGroup, uint16_t auReadMask) {
-    XFNV_INLINED_LOCAL(NiColorA, kPlaneTemp, std::nullopt, std::nullopt);
     NiPoint2 v27;
     AutoMemContext tempMemContext(
         MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4617
     );
     if (TESWaterSystem::GetUseWaterShader() && apWaterGroup->spDepthCamera.m_pObject) {
-        XFNV_INLINED_LOCAL(NiColorA, a2, std::nullopt, std::nullopt);
         const NiRect<float>* pViewport = &apWaterGroup->spDepthCamera.m_pObject->m_kPort;
         NiRenderer* Renderer_ = NiRenderer::GetRenderer();
         Renderer_->SetScreenSpaceCameraData(pViewport);
@@ -3036,7 +3018,7 @@ void TESWaterSystem::MTRenderSelectiveDepthTexture(PlaceableWaterGroup* apWaterG
         float normal_z = apWaterGroup->RefractWaterPlane.m_kNormal.z;
         float normal_y = apWaterGroup->RefractWaterPlane.m_kNormal.y;
         float* v11 = &apWaterGroup->RefractWaterPlane.m_kNormal.x;
-        a2 = *::new (&kPlaneTemp) NiColorA(*v11, normal_y, normal_z, refractionPlaneBias);
+        NiColorA a2(*v11, normal_y, normal_z, refractionPlaneBias);
         SetClipPlane(a2, 0);
         BSRenderState::SetUserClipPlaneEnables(true, false, false, false, false, false, BSRS_NOLOCK);
         BSShaderAccumulator* fFogNeara = apWaterGroup->spDepthSorter.m_pObject;
@@ -3794,7 +3776,6 @@ void TESWaterSystem::RenderDisplacementWaterStencil() {
 }
 
 BSRenderedTexture* TESWaterSystem::InitializeGreyTexture() {
-    XFNV_INLINED_LOCAL(NiColorA, v9, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 0x138A
     );
@@ -3806,7 +3787,7 @@ BSRenderedTexture* TESWaterSystem::InitializeGreyTexture() {
     NiDX9Renderer* NiDX9Renderer_ = BSShaderManager::GetRenderer();
     NiDX9Renderer_->GetBackgroundColor(tmpcolor);
     NiDX9Renderer* v2 = BSShaderManager::GetRenderer();
-    v2->SetBackgroundColorAlpha(*::new (&v9) NiColorA(0.5f, 0.5f, 0.5f, 0.5f));
+    v2->SetBackgroundColorAlpha(NiColorA(0.5f, 0.5f, 0.5f, 0.5f));
     NiRenderTargetGroup* Group = apTextureToInit->GetGroup();
     BSRenderedTexture::StartOffscreen(7u, Group);
     BSRenderedTexture::StopOffscreen();

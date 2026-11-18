@@ -706,8 +706,6 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
 
 void BGSDecalManager::IssueDecalOcclusionQuery(BSTempEffectSimpleDecal* apDecal) {
     BSOcclusionQuery* v18;
-    XFNV_INLINED_LOCAL(NiColorA, v23, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, apMemory, std::nullopt, std::nullopt);
     NiMatrix3 rot_2;
     NiPoint3 normal;
     NiPoint3 tangent;
@@ -755,10 +753,8 @@ void BGSDecalManager::IssueDecalOcclusionQuery(BSTempEffectSimpleDecal* apDecal)
     if ((BGSDecalManager::iDecalDebugFlags & 4) != 0) {
         start = pos;
         end = pos + spQueryCamera.m_pObject->GetWorldDirection() * frustumNear;
-        NiLines* plines = MakeLine(
-            start, *::new (&v23) NiColorA(0.0f, 0.0f, 1.0f, 1.0f), end,
-            *::new (&apMemory) NiColorA(1.0f, 0.0f, 0.0f, 1.0f), true
-        );
+        NiLines* plines =
+            MakeLine(start, NiColorA(0.0f, 0.0f, 1.0f, 1.0f), end, NiColorA(1.0f, 0.0f, 0.0f, 1.0f), true);
         TES::pInstance->AddTempDebugObject(plines, 30.0f);
     }
     if (BGSDecalManager::bDebugDecals.Bool()) {

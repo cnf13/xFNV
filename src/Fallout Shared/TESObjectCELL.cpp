@@ -6972,7 +6972,6 @@ uint32_t TESObjectCELL::FindTeleportDoorsForLocation(
 }
 
 void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRenderedTexture>& aspRenderedTexture) {
-    XFNV_INLINED_LOCAL(NiColorA, blackAlpha, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_LOCALMAP, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp", 0x2251
     );
@@ -6995,7 +6994,7 @@ void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRendered
         NiDX9Renderer* v22 = BSShaderManager::GetRenderer();
         v22->GetBackgroundColor(oldColor);
         NiDX9Renderer* v5 = BSShaderManager::GetRenderer();
-        v5->SetBackgroundColorAlpha(*::new (&blackAlpha) NiColorA(0.0f, 0.0f, 0.0f, 1.0f));
+        v5->SetBackgroundColorAlpha(NiColorA(0.0f, 0.0f, 0.0f, 1.0f));
         ShadowSceneNode* pscene = BSShaderManager::GetShadowSceneNode(0);
         bool bwasLightUpdateDisabled = pscene->bDisableLightUpdate;
         pscene->bDisableLightUpdate = true;

@@ -118,12 +118,11 @@ NiColorA& NiColorA::Scale(float afScale) {
     return *this;
 }
 
-NiColorA* NiColorA::Divide(NiColorA* a2, float a3) {
+NiColorA NiColorA::Divide(float a3) {
     NiColorA v4;
     v4.r = (r / a3);
     v4.g = (g / a3);
     v4.b = (b / a3);
     v4.a = (a / a3);
-    *a2 = v4;
-    return a2;
+    return v4;
 }

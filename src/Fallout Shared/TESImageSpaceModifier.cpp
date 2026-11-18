@@ -1766,8 +1766,6 @@ void TESImageSpaceModifier::BlendApply(
     NiPoint2 v40;
     NiPoint2 apResult;
     NiPoint2 result;
-    XFNV_INLINED_LOCAL(NiColorA, v44, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiColorA, v47, std::nullopt, std::nullopt);
     float fdofrange2;
     float fval1_2;
     NiPoint2 radialBlurCenter;
@@ -1812,8 +1810,7 @@ void TESImageSpaceModifier::BlendApply(
     apMod2->TintColorInterpolator.Update(fTime, nullptr, colval2);
     NiColorA v48(colval2 - colval1);
     NiColorA* v7 = &v48;
-    NiColorA* v8 = NiColorA::Multiply(&v47, afPercent, v7);
-    colval = colval1 + *v8;
+    colval = colval1 + NiColorA::Multiply(afPercent, v7);
     colval.a = colval.a * fStrength;
     BSClamp(colval.a, 0.0f, 1.0f);
     pmanager->ApplyTintColorParamModifier(colval);
@@ -1821,8 +1818,7 @@ void TESImageSpaceModifier::BlendApply(
     apMod2->FadeColorInterpolator.Update(fTime, nullptr, colval2);
     NiColorA v45(colval2 - colval1);
     NiColorA* v9 = &v45;
-    NiColorA* v10 = NiColorA::Multiply(&v44, afPercent, v9);
-    colval = colval1 + *v10;
+    colval = colval1 + NiColorA::Multiply(afPercent, v9);
     colval.a = colval.a * fStrength;
     BSClamp(colval.a, 0.0f, 1.0f);
     pmanager->ApplyFadeColorParamModifier(colval);
@@ -2015,7 +2011,6 @@ NiColorA NiColorA::operator*(float fScalar) const {
     return kResult;
 }
 
-NiColorA* NiColorA::Multiply(NiColorA* apResult, float afScalar, const NiColorA* apColor) {
-    *apResult = apColor->operator*(afScalar);
-    return apResult;
+NiColorA NiColorA::Multiply(float afScalar, const NiColorA* apColor) {
+    return apColor->operator*(afScalar);
 }

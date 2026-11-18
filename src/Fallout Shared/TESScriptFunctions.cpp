@@ -2779,7 +2779,6 @@ bool Cmd_WaterReflectionColor(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    XFNV_INLINED_LOCAL(NiColorA, v16, std::nullopt, std::nullopt);
     int32_t a8;
     int32_t v22;
     int32_t v23;
@@ -2809,7 +2808,7 @@ bool Cmd_WaterReflectionColor(
             float v12 = static_cast<double>(v23) / 255.0;
             float v11 = static_cast<double>(v22) / 255.0;
             float v10 = static_cast<double>(a8) / 255.0;
-            WaterShader::kReflectionColor = *::new (&v16) NiColorA(v10, v11, v12, 1.0f);
+            WaterShader::kReflectionColor = NiColorA(v10, v11, v12, 1.0f);
         }
     }
     return true;
@@ -19405,8 +19404,7 @@ bool Script::HairTint(
     float fB = static_cast<double>(iB) / 256.0;
     float fG = static_cast<double>(iG) / 256.0;
     float fR = static_cast<double>(iR) / 256.0;
-    XFNV_INLINED_LOCAL(NiColorA, kTint, std::nullopt, std::nullopt);
-    BSShaderLightingProperty::kHairTint = *::new (&kTint) NiColorA(fR, fG, fB, 1.0f);
+    BSShaderLightingProperty::kHairTint = NiColorA(fR, fG, fB, 1.0f);
     return true;
 }
 
