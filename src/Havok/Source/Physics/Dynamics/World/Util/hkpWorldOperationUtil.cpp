@@ -590,21 +590,7 @@ void hkpWorldOperationUtil::removeEntityBP(hkpWorld* world, hkpEntity* entity) {
     world->m_simulation->resetCollisionInformationForEntities(&entity, 1, world, hkpSimulation::RESET_TOI);
 
     const int32_t iCapacity = world->m_broadPhaseQuerySize;
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, delPairs, std::nullopt, std::nullopt);
-    delPairs.m_data = nullptr;
-    delPairs.m_size = 0;
-    delPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkAllocateStack<hkpBroadPhaseHandlePair>
-    hkStackMemory& rStack = hkMemoryRouter::getInstance().m_stack;
-    void* pBlock = rStack.m_next.m_storage;
-    rStack.m_next.m_storage =
-        static_cast<char*>(pBlock) + ((iCapacity * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-    hkpBroadPhaseHandlePair* pLocal = static_cast<hkpBroadPhaseHandlePair*>(pBlock);
-    delPairs.m_data = pLocal;
-    delPairs.m_localMemory = pLocal;
-    delPairs.m_capacityAndFlags = static_cast<int32_t>(
-        static_cast<uint32_t>(iCapacity) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG
-    );
+    hkLocalArray<hkpBroadPhaseHandlePair> delPairs(iCapacity);
 
     world->getBroadPhase()->removeObject(pCollidable->getBroadPhaseHandle(), delPairs);
     if (delPairs.m_size > 0) {
@@ -612,8 +598,6 @@ void hkpWorldOperationUtil::removeEntityBP(hkpWorld* world, hkpEntity* entity) {
             static_cast<hkpTypedBroadPhaseHandlePair*>(delPairs.m_data), delPairs.m_size
         );
     }
-
-    delPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
 }
 
 void hkpWorldOperationUtil::removeEntitySI(hkpWorld* world, hkpEntity* entity) {
@@ -636,21 +620,7 @@ void hkpWorldOperationUtil::addEntityBP(hkpWorld* world, hkpEntity* entity) {
         return;
     }
     const int32_t iCapacity = world->m_broadPhaseQuerySize;
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);
-    newPairs.m_data = nullptr;
-    newPairs.m_size = 0;
-    newPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkAllocateStack<hkpBroadPhaseHandlePair>
-    hkStackMemory& rStack = hkMemoryRouter::getInstance().m_stack;
-    void* pBlock = rStack.m_next.m_storage;
-    rStack.m_next.m_storage =
-        static_cast<char*>(pBlock) + ((iCapacity * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-    hkpBroadPhaseHandlePair* pLocal = static_cast<hkpBroadPhaseHandlePair*>(pBlock);
-    newPairs.m_data = pLocal;
-    newPairs.m_localMemory = pLocal;
-    newPairs.m_capacityAndFlags = static_cast<int32_t>(
-        static_cast<uint32_t>(iCapacity) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG
-    );
+    hkLocalArray<hkpBroadPhaseHandlePair> newPairs(iCapacity);
 
     hkpEntityAabbUtil::entityBatchRecalcAabb(world->m_collisionInput, &entity, 1);
     // Copies the bounding volume data's box, laid out as an hkAabbUint32, field by field.
@@ -678,8 +648,6 @@ void hkpWorldOperationUtil::addEntityBP(hkpWorld* world, hkpEntity* entity) {
             static_cast<hkpTypedBroadPhaseHandlePair*>(newPairs.m_data), newPairs.m_size, pFilter
         );
     }
-
-    newPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
 }
 
 // The phantom's box goes into the broad phase, the phantom takes it as its bounding volume data, and the pairs the
@@ -721,21 +689,7 @@ void hkpWorldOperationUtil::addPhantomBP(hkpWorld* world, hkpPhantom* phantom) {
 // stack-allocated hkLocalArray of m_broadPhaseQuerySize pairs.
 void hkpWorldOperationUtil::removePhantomBP(hkpWorld* world, hkpPhantom* phantom) {
     const int32_t iCapacity = world->m_broadPhaseQuerySize;
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, delPairs, std::nullopt, std::nullopt);
-    delPairs.m_data = nullptr;
-    delPairs.m_size = 0;
-    delPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkAllocateStack<hkpBroadPhaseHandlePair>
-    hkStackMemory& rStack = hkMemoryRouter::getInstance().m_stack;
-    void* pBlock = rStack.m_next.m_storage;
-    rStack.m_next.m_storage =
-        static_cast<char*>(pBlock) + ((iCapacity * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-    hkpBroadPhaseHandlePair* pLocal = static_cast<hkpBroadPhaseHandlePair*>(pBlock);
-    delPairs.m_data = pLocal;
-    delPairs.m_localMemory = pLocal;
-    delPairs.m_capacityAndFlags = static_cast<int32_t>(
-        static_cast<uint32_t>(iCapacity) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG
-    );
+    hkLocalArray<hkpBroadPhaseHandlePair> delPairs(iCapacity);
 
     world->getBroadPhase()->removeObject(phantom->m_collidable.getBroadPhaseHandle(), delPairs);
     if (delPairs.m_size != 0) {
@@ -743,8 +697,6 @@ void hkpWorldOperationUtil::removePhantomBP(hkpWorld* world, hkpPhantom* phantom
             static_cast<hkpTypedBroadPhaseHandlePair*>(delPairs.m_data), delPairs.m_size
         );
     }
-
-    delPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
 }
 
 // Sorts the dirty islands, then takes them off the list from the end one at a time: the island drops its removed
@@ -983,11 +935,7 @@ void hkpWorldOperationUtil::removeAttachedActionsFromDynamicIsland(
     hkArray<hkpAction*>& actionsToBeMoved
 ) {
     hkpSimulationIsland* island = entity->m_simulationIsland;
-    using entities_t = hkInplaceArray<hkpEntity*, 16>;
-    XFNV_INLINED_LOCAL(entities_t, entities, std::nullopt, std::nullopt);
-    entities.m_data = entities.m_storage;
-    entities.m_size = 0;
-    entities.m_capacityAndFlags = 16 | hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<hkpEntity*, 16> entities;
     for (int32_t i = 0; i < entity->m_actions.m_size; ++i) {
         hkpAction* action = entity->m_actions.m_data[i];
         action->getEntities(entities);
@@ -1027,13 +975,6 @@ void hkpWorldOperationUtil::removeAttachedActionsFromDynamicIsland(
             world->m_dirtySimulationIslands.m_size++;
         }
     }
-
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = entities.m_capacityAndFlags;
-    entities.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(entities.m_data, (capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) * sizeof(hkpEntity*));
-    }
 }
 
 // The island is the entity's at entry. An action landing on the fixed island is only added back; otherwise each of
@@ -1045,11 +986,7 @@ void hkpWorldOperationUtil::addActionsToEntitysIsland(
     hkArray<hkpAction*>& actionsToBeMoved
 ) {
     hkpSimulationIsland* island = entity->m_simulationIsland;
-    using entities_t = hkInplaceArray<hkpEntity*, 16>;
-    XFNV_INLINED_LOCAL(entities_t, entities, std::nullopt, std::nullopt);
-    entities.m_data = entities.m_storage;
-    entities.m_size = 0;
-    entities.m_capacityAndFlags = 16 | hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<hkpEntity*, 16> entities;
     for (int32_t i = 0; i < actionsToBeMoved.m_size; ++i) {
         hkpAction* action = actionsToBeMoved.m_data[i];
         if (island == world->m_fixedIsland) {
@@ -1069,13 +1006,6 @@ void hkpWorldOperationUtil::addActionsToEntitysIsland(
                 mergeIslands(other->m_world, other, entity);
             }
         }
-    }
-
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = entities.m_capacityAndFlags;
-    entities.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(entities.m_data, (capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) * sizeof(hkpEntity*));
     }
 }
 
@@ -1160,38 +1090,10 @@ void hkpWorldOperationUtil::updateEntityBP(hkpWorld* world, hkpEntity* entity) {
     hkpLinkedCollidable* pCollidable = &entity->m_collidable;
     if (pCollidable->m_shape) {
         const int32_t iNewCapacity = world->m_broadPhaseQuerySize;
-        alignas(16) XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);
-        newPairs.m_data = nullptr;
-        newPairs.m_size = 0;
-        newPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-        // EXE-INLINED none: hkAllocateStack<hkpBroadPhaseHandlePair>
-        hkStackMemory& rNewStack = hkMemoryRouter::getInstance().m_stack;
-        void* pNewBlock = rNewStack.m_next.m_storage;
-        rNewStack.m_next.m_storage = static_cast<char*>(pNewBlock) +
-            ((iNewCapacity * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-        hkpBroadPhaseHandlePair* pNewLocal = static_cast<hkpBroadPhaseHandlePair*>(pNewBlock);
-        newPairs.m_capacityAndFlags = static_cast<int32_t>(
-            static_cast<uint32_t>(iNewCapacity) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG
-        );
-        newPairs.m_data = pNewLocal;
-        newPairs.m_localMemory = pNewLocal;
+        alignas(16) hkLocalArray<hkpBroadPhaseHandlePair> newPairs(iNewCapacity);
 
         const int32_t iDelCapacity = world->m_broadPhaseQuerySize;
-        alignas(16) XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, delPairs, std::nullopt, std::nullopt);
-        delPairs.m_data = nullptr;
-        delPairs.m_size = 0;
-        delPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-        // EXE-INLINED none: hkAllocateStack<hkpBroadPhaseHandlePair>
-        hkStackMemory& rDelStack = hkMemoryRouter::getInstance().m_stack;
-        void* pDelBlock = rDelStack.m_next.m_storage;
-        rDelStack.m_next.m_storage = static_cast<char*>(pDelBlock) +
-            ((iDelCapacity * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-        hkpBroadPhaseHandlePair* pDelLocal = static_cast<hkpBroadPhaseHandlePair*>(pDelBlock);
-        delPairs.m_data = pDelLocal;
-        delPairs.m_capacityAndFlags = static_cast<int32_t>(
-            static_cast<uint32_t>(iDelCapacity) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG
-        );
-        delPairs.m_localMemory = pDelLocal;
+        alignas(16) hkLocalArray<hkpBroadPhaseHandlePair> delPairs(iDelCapacity);
 
         if (!pCollidable->m_boundingVolumeData.isValid()) {
             hkpEntityAabbUtil::entityBatchRecalcAabb(world->m_collisionInput, &entity, 1);
@@ -1221,9 +1123,6 @@ void hkpWorldOperationUtil::updateEntityBP(hkpWorld* world, hkpEntity* entity) {
                 static_cast<hkpTypedBroadPhaseHandlePair*>(newPairs.m_data), newPairs.m_size, pFilter
             );
         }
-
-        delPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
-        newPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
     }
     // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
     --world->m_criticalOperationsLockCount;
@@ -1514,12 +1413,7 @@ void hkpWorldOperationUtil::splitSimulationIsland(
         return;
     }
 
-    // EXE-INLINED none: hkInplaceArray<int, 32>::hkInplaceArray
-    using GroupSizeArray = hkInplaceArray<int32_t, 32, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(GroupSizeArray, elementsPerGroup, std::nullopt, std::nullopt);
-    elementsPerGroup.m_data = elementsPerGroup.m_storage;
-    elementsPerGroup.m_size = 0;
-    elementsPerGroup.m_capacityAndFlags = 32 | hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<int32_t, 32, hkContainerHeapAllocator> elementsPerGroup;
     checkConnectivity.assignGroups(elementsPerGroup);
 
     // Per group, whether its island is sparse; one byte more than there are groups.
@@ -1788,12 +1682,7 @@ void hkpWorldOperationUtil::splitSimulationIsland(
                 if (!action) {
                     continue;
                 }
-                // EXE-INLINED none: hkInplaceArray<hkpEntity*, 16>::hkInplaceArray
-                using EntityArray = hkInplaceArray<hkpEntity*, 16, hkContainerHeapAllocator>;
-                XFNV_INLINED_LOCAL(EntityArray, entities, std::nullopt, std::nullopt);
-                entities.m_data = entities.m_storage;
-                entities.m_size = 0;
-                entities.m_capacityAndFlags = 16 | hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+                hkInplaceArray<hkpEntity*, 16, hkContainerHeapAllocator> entities;
                 action->getEntities(entities);
                 hkpSimulationIsland* actionIsland = nullptr;
                 for (int32_t i = 0; i < entities.m_size; ++i) {
@@ -1802,8 +1691,6 @@ void hkpWorldOperationUtil::splitSimulationIsland(
                         break;
                     }
                 }
-                // EXE-INLINED none: hkInplaceArray<hkpEntity*, 16>'s destructor
-                entities.clearAndDeallocate();
                 action->m_island = actionIsland;
                 // EXE-INLINED 0x6299C0
                 hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
@@ -1822,11 +1709,7 @@ void hkpWorldOperationUtil::splitSimulationIsland(
             world->lockForIslandSplit(currentIsland);
             hkpAgentNnTrack& track = currentIsland->m_agentTrack;
             if ((numEntities - numEntitiesStaying) * 8 >= numEntities) {
-                // EXE-INLINED none: hkpAgentNnTrack::hkpAgentNnTrack
-                XFNV_INLINED_LOCAL(hkpAgentNnTrack, oldTrack, std::nullopt, std::nullopt);
-                oldTrack.m_sectors.m_data = oldTrack.m_sectors.m_storage;
-                oldTrack.m_sectors.m_size = 0;
-                oldTrack.m_sectors.m_capacityAndFlags = 1 | hkArrayBase<hkpAgentNnSector*>::DONT_DEALLOCATE_FLAG;
+                hkpAgentNnTrack oldTrack;
                 oldTrack.m_bytesUsedInLastSector = sizeof(hkpAgentNnSector);
                 // Takes the island's sectors: a single one is copied into the inline storage, more are swapped in
                 // after the local array is moved to the heap.
@@ -1862,8 +1745,6 @@ void hkpWorldOperationUtil::splitSimulationIsland(
                     }
                     hkMemoryRouter::getInstance().m_heap->blockFree(sector, sizeof(hkpAgentNnSector));
                 }
-                // EXE-INLINED none: hkpAgentNnTrack's destructor (the sector array's)
-                oldTrack.m_sectors.clearAndDeallocate();
             }
             else {
                 for (int32_t s = 0; s < track.m_sectors.m_size; ++s) {
@@ -1938,8 +1819,6 @@ void hkpWorldOperationUtil::splitSimulationIsland(
         hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(static_cast<void*>(isSparse));
     }
 
-    // EXE-INLINED none: hkInplaceArray<int, 32>'s destructor
-    elementsPerGroup.clearAndDeallocate();
     // EXE-INLINED none: hkLocalBuffer<int>'s destructor (hkDeallocateStack)
     hkMemoryRouter::getInstance().m_stack.m_next.m_storage =
         static_cast<char*>(static_cast<void*>(entityStatus.m_data.m_storage));
@@ -1984,25 +1863,11 @@ void hkpWorldOperationUtil::setRigidBodyMotionType(
         return;
     }
 
-    // EXE-INLINED none: hkInplaceArray<hkpConstraintInstance*, 16>::hkInplaceArray
-    using removedConstraints_t = hkInplaceArray<hkpConstraintInstance*, 16>;
-    XFNV_INLINED_LOCAL(removedConstraints_t, removedConstraints, std::nullopt, std::nullopt);
-    removedConstraints.m_data = removedConstraints.m_storage;
-    removedConstraints.m_capacityAndFlags = 16 | hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkInplaceArray<hkpAction*, 16>::hkInplaceArray
-    using actionsToBeMoved_t = hkInplaceArray<hkpAction*, 16>;
-    XFNV_INLINED_LOCAL(actionsToBeMoved_t, actionsToBeMoved, std::nullopt, std::nullopt);
-    actionsToBeMoved.m_capacityAndFlags = 16 | hkArrayBase<hkpAction*>::DONT_DEALLOCATE_FLAG;
-    actionsToBeMoved.m_data = actionsToBeMoved.m_storage;
+    hkInplaceArray<hkpConstraintInstance*, 16> removedConstraints;
+    hkInplaceArray<hkpAction*, 16> actionsToBeMoved;
     world->m_blockExecutingPendingOperations.m_bool = 1;
     world->m_criticalOperationsAllowed.m_bool = 0;
-    removedConstraints.m_size = 0;
-    actionsToBeMoved.m_size = 0;
-    // EXE-INLINED none: hkpAgentNnTrack::hkpAgentNnTrack
-    XFNV_INLINED_LOCAL(hkpAgentNnTrack, agentsRemoved, std::nullopt, std::nullopt);
-    agentsRemoved.m_sectors.m_data = agentsRemoved.m_sectors.m_storage;
-    agentsRemoved.m_sectors.m_size = 0;
-    agentsRemoved.m_sectors.m_capacityAndFlags = 1 | hkArrayBase<hkpAgentNnSector*>::DONT_DEALLOCATE_FLAG;
+    hkpAgentNnTrack agentsRemoved;
     agentsRemoved.m_bytesUsedInLastSector = HK_AGENT3_SECTOR_SIZE;
 
     removeAttachedConstraints(body, removedConstraints);
@@ -2027,11 +1892,7 @@ void hkpWorldOperationUtil::setRigidBodyMotionType(
     addActionsToEntitysIsland(world, body, actionsToBeMoved);
     world->m_criticalOperationsAllowed.m_bool = 1;
 
-    // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, entries, std::nullopt, std::nullopt);
-    entries.m_data = nullptr;
-    entries.m_size = 0;
-    entries.m_capacityAndFlags = hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkpLinkedCollidable::CollisionEntry> entries;
     for (int32_t i = 0; i < removedConstraints.m_size; ++i) {
         hkpConstraintInstance* constraint = removedConstraints.m_data[i];
         addConstraintImmediately(world, constraint, DO_NOT_FIRE_CALLBACKS_AND_SUPPRESS_EXECUTION_OF_PENDING_OPERATIONS);
@@ -2067,52 +1928,6 @@ void hkpWorldOperationUtil::setRigidBodyMotionType(
     world->m_blockExecutingPendingOperations.m_bool = 0;
     world->attemptToExecutePendingOperations();
 
-    // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::~hkArray
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    entries.m_size = 0;
-    if ((entries.m_capacityAndFlags & hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG) == 0) {
-        heap->bufFree(
-            entries.m_data,
-            (entries.m_capacityAndFlags & hkArrayBase<hkpLinkedCollidable::CollisionEntry>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpLinkedCollidable::CollisionEntry))
-        );
-    }
-    entries.m_data = nullptr;
-    entries.m_capacityAndFlags = hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkInplaceArray<hkpAgentNnSector*, 1>::~hkInplaceArray
-    heap = hkMemoryRouter::getInstance().m_heap;
-    agentsRemoved.m_sectors.m_size = 0;
-    if ((agentsRemoved.m_sectors.m_capacityAndFlags & hkArrayBase<hkpAgentNnSector*>::DONT_DEALLOCATE_FLAG) == 0) {
-        heap->bufFree(
-            agentsRemoved.m_sectors.m_data,
-            (agentsRemoved.m_sectors.m_capacityAndFlags & hkArrayBase<hkpAgentNnSector*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpAgentNnSector*))
-        );
-    }
-    agentsRemoved.m_sectors.m_data = nullptr;
-    agentsRemoved.m_sectors.m_capacityAndFlags = hkArrayBase<hkpAgentNnSector*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkInplaceArray<hkpAction*, 16>::~hkInplaceArray
-    heap = hkMemoryRouter::getInstance().m_heap;
-    actionsToBeMoved.m_size = 0;
-    if ((actionsToBeMoved.m_capacityAndFlags & hkArrayBase<hkpAction*>::DONT_DEALLOCATE_FLAG) == 0) {
-        heap->bufFree(
-            actionsToBeMoved.m_data,
-            (actionsToBeMoved.m_capacityAndFlags & hkArrayBase<hkpAction*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpAction*))
-        );
-    }
-    actionsToBeMoved.m_data = nullptr;
-    actionsToBeMoved.m_capacityAndFlags = hkArrayBase<hkpAction*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkInplaceArray<hkpConstraintInstance*, 16>::~hkInplaceArray
-    heap = hkMemoryRouter::getInstance().m_heap;
-    removedConstraints.m_size = 0;
-    if ((removedConstraints.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG) == 0) {
-        heap->bufFree(
-            removedConstraints.m_data,
-            (removedConstraints.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpConstraintInstance*))
-        );
-    }
     body->removeReference();
 }
 

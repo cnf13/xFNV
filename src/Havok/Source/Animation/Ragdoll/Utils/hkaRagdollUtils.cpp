@@ -165,8 +165,8 @@ void hkaRagdollUtils::splitRagdollInstanceShallow(
     hkaRagdollInstance** ppOut[2] = {&trunk, &branch};
     bool bValues[2] = {false, true};
     const int32_t iNumBones = original->m_skeleton->m_bones.m_size;
+    hkArray<bool> descendants;
     // EXE-INLINED none: hkArray<bool>::hkArray(int)
-    XFNV_INLINED_LOCAL(hkArray<bool>, descendants, std::nullopt, std::nullopt);
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     descendants.m_size = static_cast<uint32_t>(iNumBones);
     if (iNumBones == 0) {
@@ -185,18 +185,9 @@ void hkaRagdollUtils::splitRagdollInstanceShallow(
     }
     hkaSkeletonUtils::markDescendants(original->m_skeleton, splitBone, descendants.m_data, true);
     for (int32_t i = 0; i < 2; ++i) {
-        XFNV_INLINED_LOCAL(hkArray<hkpRigidBody*>, rigidBodies, std::nullopt, std::nullopt);
-        rigidBodies.m_data = nullptr;
-        rigidBodies.m_size = 0;
-        rigidBodies.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
-        XFNV_INLINED_LOCAL(hkArray<hkpConstraintInstance*>, constraints, std::nullopt, std::nullopt);
-        constraints.m_data = nullptr;
-        constraints.m_size = 0;
-        constraints.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-        XFNV_INLINED_LOCAL(hkArray<int32_t>, boneToRigidBody, std::nullopt, std::nullopt);
-        boneToRigidBody.m_data = nullptr;
-        boneToRigidBody.m_size = 0;
-        boneToRigidBody.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkpRigidBody*> rigidBodies;
+        hkArray<hkpConstraintInstance*> constraints;
+        hkArray<int32_t> boneToRigidBody;
         const bool bValue = bValues[i];
         for (int32_t b = 0; b < original->m_skeleton->m_bones.m_size; ++b) {
             hkpRigidBody* pBody = nullptr;
@@ -257,53 +248,6 @@ void hkaRagdollUtils::splitRagdollInstanceShallow(
         void* pMemory = hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkaRagdollInstance));
         static_cast<hkReferencedObject*>(pMemory)->m_memSizeAndFlags = sizeof(hkaRagdollInstance);
         *ppOut[i] = ::new (pMemory) hkaRagdollInstance(rigidBodies, constraints, original->m_skeleton, boneToRigidBody);
-        // EXE-INLINED none: hkArray<int>::clearAndDeallocate
-        hkMemoryAllocator* pMapHeap = hkMemoryRouter::getInstance().m_heap;
-        boneToRigidBody.m_size = 0;
-        if (!(boneToRigidBody.m_capacityAndFlags & hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG)) {
-            pMapHeap->bufFree(
-                boneToRigidBody.m_data,
-                static_cast<int32_t>(
-                    (boneToRigidBody.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK) * sizeof(int32_t)
-                )
-            );
-        }
-        boneToRigidBody.m_data = nullptr;
-        boneToRigidBody.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-        // EXE-INLINED none: hkArray<hkpConstraintInstance*>::clearAndDeallocate
-        hkMemoryAllocator* pConstraintHeap = hkMemoryRouter::getInstance().m_heap;
-        constraints.m_size = 0;
-        if (!(constraints.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG)) {
-            pConstraintHeap->bufFree(
-                constraints.m_data,
-                static_cast<int32_t>(
-                    (constraints.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK) *
-                    sizeof(hkpConstraintInstance*)
-                )
-            );
-        }
-        constraints.m_data = nullptr;
-        constraints.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-        // EXE-INLINED none: hkArray<hkpRigidBody*>::clearAndDeallocate
-        hkMemoryAllocator* pBodyHeap = hkMemoryRouter::getInstance().m_heap;
-        rigidBodies.m_size = 0;
-        if (!(rigidBodies.m_capacityAndFlags & hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG)) {
-            pBodyHeap->bufFree(
-                rigidBodies.m_data,
-                static_cast<int32_t>(
-                    (rigidBodies.m_capacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK) * sizeof(hkpRigidBody*)
-                )
-            );
-        }
-        rigidBodies.m_data = nullptr;
-        rigidBodies.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
-    }
-    // EXE-INLINED none: hkArray<bool>::~hkArray
-    hkMemoryAllocator* pFreeHeap = hkMemoryRouter::getInstance().m_heap;
-    if (!(descendants.m_capacityAndFlags & hkArrayBase<bool>::DONT_DEALLOCATE_FLAG)) {
-        pFreeHeap->bufFree(
-            descendants.m_data, static_cast<int32_t>(descendants.m_capacityAndFlags & hkArrayBase<bool>::CAPACITY_MASK)
-        );
     }
 }
 
@@ -343,8 +287,8 @@ bool hkaRagdollUtils::isConstraintSupported(const hkpConstraintInstance* apConst
 // With one constraint fewer than rigid bodies, records for each body the constraint whose first entity it is and that
 // constraint's second body (its parent), failing where a body is missing or has a second such constraint; sorts the
 // bodies by their depth in that hierarchy (a selection sort, swapping the order with the depths) and rewrites both
-// arrays in that order, each body but the first followed by the constraint into it. The six hkLocalArrays
-// (hkAllocateStack, setSize, hkDeallocateStack and the hkArray copy) are written out here.
+// arrays in that order, each body but the first followed by the constraint into it. The hkLocalArrays' setSize and the
+// hkArray copies are written out here.
 hkResult hkaRagdollUtils::reorderForRagdoll(
     hkArray<hkpRigidBody*, hkContainerHeapAllocator>& rigidBodies,
     hkArray<hkpConstraintInstance*, hkContainerHeapAllocator>& constraints
@@ -361,21 +305,7 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
         );
         return HK_FAILURE;
     }
-    const int32_t iBodyBlockBytes = (numBodies * 4 + 127) & ~127;
-    const int32_t iBodyCapacityAndFlags =
-        static_cast<int32_t>(static_cast<uint32_t>(numBodies) | hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG);
-
-    // EXE-INLINED none: hkLocalArray<int>::hkLocalArray
-    XFNV_INLINED_LOCAL(hkLocalArray<int32_t>, constraintOfBody, std::nullopt, std::nullopt);
-    constraintOfBody.m_data = nullptr;
-    constraintOfBody.m_size = 0;
-    constraintOfBody.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-    hkStackMemory& rStack0 = hkMemoryRouter::getInstance().m_stack;
-    int32_t* pConstraintOfBodyMemory = static_cast<int32_t*>(static_cast<void*>(rStack0.m_next.m_storage));
-    rStack0.m_next.m_storage += iBodyBlockBytes;
-    constraintOfBody.m_data = pConstraintOfBodyMemory;
-    constraintOfBody.m_capacityAndFlags = iBodyCapacityAndFlags;
-    constraintOfBody.m_localMemory = pConstraintOfBodyMemory;
+    hkLocalArray<int32_t> constraintOfBody(numBodies);
     // EXE-INLINED none: hkArray<int>::setSize(numBodies, 0)
     hkMemoryAllocator* pHeap0 = hkMemoryRouter::getInstance().m_heap;
     const int32_t iCapacity0 =
@@ -392,30 +322,10 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
     }
     constraintOfBody.m_size = numBodies;
 
-    // EXE-INLINED none: hkLocalArray<int>::hkLocalArray
-    XFNV_INLINED_LOCAL(hkLocalArray<int32_t>, order, std::nullopt, std::nullopt);
-    order.m_data = nullptr;
-    order.m_size = 0;
-    order.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-    hkStackMemory& rStack1 = hkMemoryRouter::getInstance().m_stack;
-    int32_t* pOrderMemory = static_cast<int32_t*>(static_cast<void*>(rStack1.m_next.m_storage));
-    rStack1.m_next.m_storage += iBodyBlockBytes;
-    order.m_data = pOrderMemory;
-    order.m_capacityAndFlags = iBodyCapacityAndFlags;
-    order.m_localMemory = pOrderMemory;
+    hkLocalArray<int32_t> order(numBodies);
     order.m_size = numBodies;
 
-    // EXE-INLINED none: hkLocalArray<int>::hkLocalArray
-    XFNV_INLINED_LOCAL(hkLocalArray<int32_t>, parent, std::nullopt, std::nullopt);
-    parent.m_data = nullptr;
-    parent.m_size = 0;
-    parent.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-    hkStackMemory& rStack2 = hkMemoryRouter::getInstance().m_stack;
-    int32_t* pParentMemory = static_cast<int32_t*>(static_cast<void*>(rStack2.m_next.m_storage));
-    rStack2.m_next.m_storage += iBodyBlockBytes;
-    parent.m_data = pParentMemory;
-    parent.m_capacityAndFlags = iBodyCapacityAndFlags;
-    parent.m_localMemory = pParentMemory;
+    hkLocalArray<int32_t> parent(numBodies);
     // EXE-INLINED none: hkArray<int>::setSize(numBodies, -1)
     hkMemoryAllocator* pHeap2 = hkMemoryRouter::getInstance().m_heap;
     const int32_t iCapacity2 = static_cast<int32_t>(parent.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK);
@@ -461,24 +371,11 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
         parent.m_data[iChild] = iParent;
     }
     if (!bValid) {
-        parent.~hkLocalArray<int32_t>();
-        order.~hkLocalArray<int32_t>();
-        constraintOfBody.~hkLocalArray<int32_t>();
         return HK_FAILURE;
     }
 
     {
-        // EXE-INLINED none: hkLocalArray<int>::hkLocalArray
-        XFNV_INLINED_LOCAL(hkLocalArray<int32_t>, depth, std::nullopt, std::nullopt);
-        depth.m_data = nullptr;
-        depth.m_size = 0;
-        depth.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& rStack3 = hkMemoryRouter::getInstance().m_stack;
-        int32_t* pDepthMemory = static_cast<int32_t*>(static_cast<void*>(rStack3.m_next.m_storage));
-        rStack3.m_next.m_storage += iBodyBlockBytes;
-        depth.m_data = pDepthMemory;
-        depth.m_capacityAndFlags = iBodyCapacityAndFlags;
-        depth.m_localMemory = pDepthMemory;
+        hkLocalArray<int32_t> depth(numBodies);
         // EXE-INLINED none: hkArray<int>::setSize(numBodies, 0)
         hkMemoryAllocator* pHeap3 = hkMemoryRouter::getInstance().m_heap;
         const int32_t iCapacity3 = static_cast<int32_t>(depth.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK);
@@ -514,37 +411,12 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
                 }
             }
         }
-
-        depth.~hkLocalArray<int32_t>();
     }
 
-    // EXE-INLINED none: hkLocalArray<hkpRigidBody*>::hkLocalArray
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, newBodies, std::nullopt, std::nullopt);
-    newBodies.m_data = nullptr;
-    newBodies.m_size = 0;
-    newBodies.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
-    hkStackMemory& rStack4 = hkMemoryRouter::getInstance().m_stack;
-    hkpRigidBody** pNewBodiesMemory = static_cast<hkpRigidBody**>(static_cast<void*>(rStack4.m_next.m_storage));
-    rStack4.m_next.m_storage += (numBodies * static_cast<int32_t>(sizeof(hkpRigidBody*)) + 127) & ~127;
-    newBodies.m_data = pNewBodiesMemory;
-    newBodies.m_capacityAndFlags = iBodyCapacityAndFlags;
-    newBodies.m_localMemory = pNewBodiesMemory;
+    hkLocalArray<hkpRigidBody*> newBodies(numBodies);
     newBodies.m_size = numBodies;
 
-    // EXE-INLINED none: hkLocalArray<hkpConstraintInstance*>::hkLocalArray
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, newConstraints, std::nullopt, std::nullopt);
-    newConstraints.m_data = nullptr;
-    newConstraints.m_size = 0;
-    newConstraints.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-    hkStackMemory& rStack5 = hkMemoryRouter::getInstance().m_stack;
-    hkpConstraintInstance** pNewConstraintsMemory =
-        static_cast<hkpConstraintInstance**>(static_cast<void*>(rStack5.m_next.m_storage));
-    rStack5.m_next.m_storage += (numConstraints * static_cast<int32_t>(sizeof(hkpConstraintInstance*)) + 127) & ~127;
-    newConstraints.m_data = pNewConstraintsMemory;
-    newConstraints.m_capacityAndFlags = static_cast<int32_t>(
-        static_cast<uint32_t>(numConstraints) | hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG
-    );
-    newConstraints.m_localMemory = pNewConstraintsMemory;
+    hkLocalArray<hkpConstraintInstance*> newConstraints(numConstraints);
     newConstraints.m_size = numConstraints;
 
     for (int32_t i = 0; i < numBodies; ++i) {
@@ -605,11 +477,6 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
         constraints.m_data[i] = newConstraints.m_data[i];
     }
 
-    newConstraints.~hkLocalArray<hkpConstraintInstance*>();
-    newBodies.~hkLocalArray<hkpRigidBody*>();
-    parent.~hkLocalArray<int32_t>();
-    order.~hkLocalArray<int32_t>();
-    constraintOfBody.~hkLocalArray<int32_t>();
     return HK_SUCCESS;
 }
 
@@ -635,48 +502,11 @@ hkaRagdollInstance* hkaRagdollUtils::createRagdollInstanceFromSkeleton(
     const hkArrayBase<hkpConstraintInstance*>& candidateConstraints
 ) {
     const int32_t numBones = skeleton->m_bones.m_size;
-    const int32_t iBoneBlockBytes = (numBones * 4 + 127) & ~127;
-    const int32_t iBoneCapacityAndFlags =
-        static_cast<int32_t>(static_cast<uint32_t>(numBones) | hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG);
+    hkLocalArray<hkpRigidBody*> rigidBodies(numBones);
 
-    // EXE-INLINED none: hkLocalArray<hkpRigidBody*>::hkLocalArray
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, rigidBodies, std::nullopt, std::nullopt);
-    rigidBodies.m_data = nullptr;
-    rigidBodies.m_size = 0;
-    rigidBodies.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
-    hkStackMemory& rStack0 = hkMemoryRouter::getInstance().m_stack;
-    hkpRigidBody** pBodiesMemory = static_cast<hkpRigidBody**>(static_cast<void*>(rStack0.m_next.m_storage));
-    rStack0.m_next.m_storage += (numBones * static_cast<int32_t>(sizeof(hkpRigidBody*)) + 127) & ~127;
-    rigidBodies.m_data = pBodiesMemory;
-    rigidBodies.m_capacityAndFlags = iBoneCapacityAndFlags;
-    rigidBodies.m_localMemory = pBodiesMemory;
+    hkLocalArray<hkpConstraintInstance*> constraints(numBones - 1);
 
-    // EXE-INLINED none: hkLocalArray<hkpConstraintInstance*>::hkLocalArray
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, constraints, std::nullopt, std::nullopt);
-    constraints.m_data = nullptr;
-    constraints.m_size = 0;
-    constraints.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-    hkStackMemory& rStack1 = hkMemoryRouter::getInstance().m_stack;
-    hkpConstraintInstance** pConstraintsMemory =
-        static_cast<hkpConstraintInstance**>(static_cast<void*>(rStack1.m_next.m_storage));
-    rStack1.m_next.m_storage += ((numBones - 1) * static_cast<int32_t>(sizeof(hkpConstraintInstance*)) + 127) & ~127;
-    constraints.m_capacityAndFlags = static_cast<int32_t>(
-        static_cast<uint32_t>(numBones - 1) | hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG
-    );
-    constraints.m_data = pConstraintsMemory;
-    constraints.m_localMemory = pConstraintsMemory;
-
-    // EXE-INLINED none: hkLocalArray<int>::hkLocalArray
-    XFNV_INLINED_LOCAL(hkLocalArray<int32_t>, boneToRigidBody, std::nullopt, std::nullopt);
-    boneToRigidBody.m_data = nullptr;
-    boneToRigidBody.m_size = 0;
-    boneToRigidBody.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-    hkStackMemory& rStack2 = hkMemoryRouter::getInstance().m_stack;
-    int32_t* pMapMemory = static_cast<int32_t*>(static_cast<void*>(rStack2.m_next.m_storage));
-    rStack2.m_next.m_storage += iBoneBlockBytes;
-    boneToRigidBody.m_data = pMapMemory;
-    boneToRigidBody.m_localMemory = pMapMemory;
-    boneToRigidBody.m_capacityAndFlags = iBoneCapacityAndFlags;
+    hkLocalArray<int32_t> boneToRigidBody(numBones);
 
     char buf[512];
     bool bFailed = false;
@@ -799,9 +629,6 @@ hkaRagdollInstance* hkaRagdollUtils::createRagdollInstanceFromSkeleton(
         }
     }
 
-    boneToRigidBody.~hkLocalArray<int32_t>();
-    constraints.~hkLocalArray<hkpConstraintInstance*>();
-    rigidBodies.~hkLocalArray<hkpRigidBody*>();
     return pInstance;
 }
 

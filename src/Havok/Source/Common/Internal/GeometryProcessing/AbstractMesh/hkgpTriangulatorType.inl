@@ -731,14 +731,13 @@ void XFNV_TRIANGULATOR_TYP::extractEdgeDataValues(Edge edge, EdgeDataValue* cons
 // edge forced in by flips, constrained, given data, conformed and set as its triangle's root.
 XFNV_TRIANGULATOR_HDR
 auto XFNV_TRIANGULATOR_TYP::insertEdge(
-    Insertion* apResult,
     int32_t x0,
     int32_t y0,
     int32_t x1,
     int32_t y1,
     bool conform,
     const EDGE_DATA* data
-) -> Insertion* {
+) -> Insertion {
     // The SDK's cfgBoundary: the domain's far coordinate.
     const int32_t iBoundary = 0x7FFF;
     const auto linkOf = [](const Edge& e) {
@@ -840,9 +839,7 @@ auto XFNV_TRIANGULATOR_TYP::insertEdge(
         t->m_root = 1;
     };
     // Insertion(eType, const Edge&).
-    const auto result = [apResult](Insertion::eType eType, const Edge& e) {
-        return ::new (apResult) Insertion(eType, e);
-    };
+    const auto result = [](Insertion::eType eType, const Edge& e) { return Insertion(eType, e); };
     // Insertion(eType, Edge::null()).
     const auto nullResult = [&](Insertion::eType eType) { return result(eType, makeEdge(nullptr, 0)); };
 
@@ -1050,14 +1047,8 @@ auto XFNV_TRIANGULATOR_TYP::insertEdge(
 // edge's triangle and its twin into two each, edgeSplit carrying the edge's constraint and data over to both halves;
 // ON_VERTEX marks the vertex there constrained; any other kind is FAILED with Edge::null().
 XFNV_TRIANGULATOR_HDR
-auto XFNV_TRIANGULATOR_TYP::insertVertex(
-    Insertion* apResult,
-    int32_t x,
-    int32_t y,
-    bool conform,
-    const Location& location,
-    bool edgeSplit
-) -> Insertion* {
+auto XFNV_TRIANGULATOR_TYP::insertVertex(int32_t x, int32_t y, bool conform, const Location& location, bool edgeSplit)
+    -> Insertion {
     const auto linkOf = [](const Edge& e) {
         const uintptr_t uid = e.m_triangle->m_links[e.m_index];
         Edge l;
@@ -1156,9 +1147,7 @@ auto XFNV_TRIANGULATOR_TYP::insertVertex(
         to->m_sets = from->m_sets;
     };
     // Insertion(eType, const Edge&).
-    const auto result = [apResult](Insertion::eType eType, const Edge& e) {
-        return ::new (apResult) Insertion(eType, e);
-    };
+    const auto result = [](Insertion::eType eType, const Edge& e) { return Insertion(eType, e); };
 
     Edge edge = location.m_edge;
     switch (location.m_type.m_storage) {

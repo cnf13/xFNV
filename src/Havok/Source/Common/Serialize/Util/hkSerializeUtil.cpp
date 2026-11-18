@@ -124,36 +124,24 @@ int32_t hkSerializeUtil::isLoadable(hkStreamReader* sr) {
     if (hkTagfileReader::detectFormat(&tagfileFormat, sr)->m_storage > hkTagfileReader::FORMAT_UNKNOWN) {
         return 1;
     }
-    // EXE-INLINED none: hkSerializeUtil::FormatDetails::FormatDetails
-    XFNV_INLINED_LOCAL(hkSerializeUtil::FormatDetails, details, std::nullopt, std::nullopt);
-    ::new (&details.m_version) hkStringPtr;
+    hkSerializeUtil::FormatDetails details;
     detectFormat(sr, details);
     if (details.m_formatType.m_storage == FORMAT_PACKFILE_BINARY) {
         if (hkString::memCmp(
                 &details.m_layoutRules, &hkStructureLayout::HostLayoutRules, sizeof(hkStructureLayout::LayoutRules)
             )) {
-            // EXE-INLINED none: hkSerializeUtil::FormatDetails::~FormatDetails
-            details.m_version.~hkStringPtr();
             return 0;
         }
         if (details.m_version == hkVersionUtil::getCurrentVersion()) {
-            // EXE-INLINED none: hkSerializeUtil::FormatDetails::~FormatDetails
-            details.m_version.~hkStringPtr();
             return 1;
         }
     }
     else if (details.m_formatType.m_storage != FORMAT_PACKFILE_XML) {
-        // EXE-INLINED none: hkSerializeUtil::FormatDetails::~FormatDetails
-        details.m_version.~hkStringPtr();
         return 0;
     }
     if (hkSerializeDeprecated::s_instance->isLoadable(details)) {
-        // EXE-INLINED none: hkSerializeUtil::FormatDetails::~FormatDetails
-        details.m_version.~hkStringPtr();
         return 1;
     }
-    // EXE-INLINED none: hkSerializeUtil::FormatDetails::~FormatDetails
-    details.m_version.~hkStringPtr();
     return 0;
 }
 
@@ -182,12 +170,10 @@ hkResult hkSerializeUtil::saveTagfile(
 
 hkResult
 _saveTagfile(const hkDataObject& obj, hkStreamWriter* stream, hkTagfileWriter::AddDataObjectListener* listener) {
-    XFNV_INLINED_LOCAL(hkBinaryTagfileWriter, v4, hkBinaryTagfileWriter_vftable, std::nullopt);
     if (!stream) {
         return HK_FAILURE;
     }
-    // MAYBE-INLINED 0xD48572: before the vptr store of hkBinaryTagfileWriter's inlined constructor
-    v4.m_referenceCount = 1;
+    hkBinaryTagfileWriter v4;
     return v4.hkBinaryTagfileWriter::save(obj, stream, listener);
 }
 
@@ -275,19 +261,9 @@ hkResource* loadPackfile(
         }
         if (details->m_version == hkVersionUtil::getCurrentVersion()) {
             using TempCharArray = hkArray<char, hkContainerTempAllocator>;
-            // EXE-INLINED none: hkArray<char, hkContainerTempAllocator>::hkArray
-            XFNV_INLINED_LOCAL(TempCharArray, buf, std::nullopt, std::nullopt);
-            buf.m_data = nullptr;
-            buf.m_size = 0;
-            buf.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
+            TempCharArray buf;
             readStreamToBuffer(stream, &buf);
             hkResource* resource = hkNativePackfileUtils::load(buf.m_data, buf.m_size, typeReg);
-            // EXE-INLINED none: hkArray<char, hkContainerTempAllocator>::~hkArray
-            hkMemoryAllocator* temp = hkMemoryRouter::getInstance().m_temp;
-            buf.m_size = 0;
-            if (buf.m_capacityAndFlags >= 0) {
-                temp->bufFree(buf.m_data, buf.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
-            }
             return resource;
         }
     }
@@ -301,28 +277,23 @@ hkObjectResource* loadNewPackfileOnHeap(
     const hkTypeInfoRegistry* typeReg,
     const hkClassNameRegistry* classReg
 ) {
-    // EXE-INLINED none: hkTypeInfoRegistry::hkTypeInfoRegistry
-    XFNV_INLINED_LOCAL(hkTypeInfoRegistry, registry, hkTypeInfoRegistry_vftable, std::nullopt);
-    registry.m_referenceCount = 1;
-    ::new (&registry.m_map.m_map) hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>(0u);
+    hkTypeInfoRegistry registry;
     registry.m_finishFlag.m_finishing = 0;
     registry.hkTypeInfoRegistry::merge(*typeReg);
     hkResource* resource = loadPackfile(details, stream, &registry, errorOut);
-    XFNV_INLINED_LOCAL(hkDataWorldNative, world, std::nullopt, std::nullopt);
-    ::new (&world) hkDataWorldNative;
-    world.setClassRegistry(classReg);
-    const hkClass* klass = classReg->getClassByName(resource->getContentsTypeName());
     hkObjectResource* result = nullptr;
-    if (klass) {
-        void* contents = resource->getContentsPointer(nullptr, typeReg);
-        hkDataObjectImpl* impl = world.wrapObject(contents, *klass);
-        hkDataObject obj(impl);
-        result = hkDataObjectUtil::toObjectWithRegistry(obj, classReg, typeReg);
+    {
+        hkDataWorldNative world;
+        world.setClassRegistry(classReg);
+        const hkClass* klass = classReg->getClassByName(resource->getContentsTypeName());
+        if (klass) {
+            void* contents = resource->getContentsPointer(nullptr, typeReg);
+            hkDataObjectImpl* impl = world.wrapObject(contents, *klass);
+            hkDataObject obj(impl);
+            result = hkDataObjectUtil::toObjectWithRegistry(obj, classReg, typeReg);
+        }
     }
-    world.~hkDataWorldNative();
     resource->removeReference();
-    // EXE-INLINED none: hkTypeInfoRegistry::~hkTypeInfoRegistry
-    registry.m_map.m_map.clearAndDeallocate();
     return result;
 }
 
@@ -333,11 +304,7 @@ int32_t checkTagfileWorld(
     hkDataWorldDict* world
 ) {
     manager->recomputePatchDependencies();
-    // EXE-INLINED none: hkArray<hkDataClassImpl*>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkDataClassImpl*>, classes, std::nullopt, std::nullopt);
-    classes.m_data = nullptr;
-    classes.m_size = 0;
-    classes.m_capacityAndFlags = hkArrayBase<hkDataClassImpl*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkDataClassImpl*> classes;
     world->findAllClasses(classes);
     int32_t ok = 1;
     for (int32_t i = 0; i < classes.m_size; ++i) {
@@ -357,29 +324,17 @@ int32_t checkTagfileWorld(
             }
         }
     }
-    // EXE-INLINED none: hkArray<hkDataClassImpl*>::~hkArray
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    classes.m_size = 0;
-    if (classes.m_capacityAndFlags >= 0) {
-        heap->bufFree(
-            classes.m_data,
-            (classes.m_capacityAndFlags & hkArrayBase<hkDataClassImpl*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkDataClassImpl*))
-        );
-    }
     return ok;
 }
 
-// The reader's constructor is called and its destructor, which is empty, is not; the loaded contents are released at
-// once.
+// The loaded contents are released at once.
 hkResult loadTagfileIntoWorld(
     hkStreamReader* stream,
     hkSerializeUtil::ErrorDetails* errorOut,
     hkDataWorldDict* world,
     const hkClassNameRegistry* classReg
 ) {
-    XFNV_INLINED_LOCAL(hkBinaryTagfileReader, reader, std::nullopt, std::nullopt);
-    ::new (&reader) hkBinaryTagfileReader;
+    hkBinaryTagfileReader reader;
     hkDataObject contents = reader.hkBinaryTagfileReader::load(stream, *world);
     if (errorOut && !checkTagfileWorld(errorOut, hkVersionPatchManager::s_instance, classReg, world)) {
         return HK_FAILURE;
@@ -479,34 +434,23 @@ hkResource* hkSerializeUtil::load(
     if (!classReg) {
         classReg = hkBuiltinTypeRegistry::s_instance->getClassNameRegistry();
     }
-    // EXE-INLINED none: hkSerializeUtil::FormatDetails::FormatDetails
-    XFNV_INLINED_LOCAL(hkSerializeUtil::FormatDetails, details, std::nullopt, std::nullopt);
-    ::new (&details.m_version) hkStringPtr;
+    hkSerializeUtil::FormatDetails details;
     detectFormat(stream, details);
     int32_t format = details.m_formatType.m_storage;
     if (format >= FORMAT_PACKFILE_BINARY) {
         if (format <= FORMAT_PACKFILE_XML) {
             hkResource* resource =
                 loadPackfile(&details, stream, hkBuiltinTypeRegistry::s_instance->getTypeInfoRegistry(), detailsOut);
-            // EXE-INLINED none: hkSerializeUtil::FormatDetails::~FormatDetails
-            details.m_version.~hkStringPtr();
             return resource;
         }
         if (format == FORMAT_TAGFILE_BINARY) {
-            XFNV_INLINED_LOCAL(hkDataWorldDict, world, std::nullopt, std::nullopt);
-            ::new (&world) hkDataWorldDict;
+            hkDataWorldDict world;
             if (loadTagfileIntoWorld(stream, detailsOut, &world, classReg) != HK_SUCCESS) {
-                world.~hkDataWorldDict();
-                // EXE-INLINED none: hkSerializeUtil::FormatDetails::~FormatDetails
-                details.m_version.~hkStringPtr();
                 return nullptr;
             }
             // getContents is called directly.
             hkDataObject contents = world.hkDataWorldDict::getContents();
             hkResource* resource = hkDataObjectUtil::toResourceWithRegistry(contents, classReg);
-            world.~hkDataWorldDict();
-            // EXE-INLINED none: hkSerializeUtil::FormatDetails::~FormatDetails
-            details.m_version.~hkStringPtr();
             return resource;
         }
     }
@@ -515,8 +459,6 @@ hkResource* hkSerializeUtil::load(
         detailsOut->id.m_storage = ErrorDetails::ERRORID_UNSUPPORTED_FORMAT;
         detailsOut->defaultMessage = "Unable to detect format from stream";
     }
-    // EXE-INLINED none: hkSerializeUtil::FormatDetails::~FormatDetails
-    details.m_version.~hkStringPtr();
     return nullptr;
 }
 
@@ -548,9 +490,7 @@ hkObjectResource* hkSerializeUtil::loadOnHeap(
     if (!typeReg) {
         typeReg = hkBuiltinTypeRegistry::s_instance->getTypeInfoRegistry();
     }
-    // EXE-INLINED none: hkSerializeUtil::FormatDetails::FormatDetails
-    XFNV_INLINED_LOCAL(hkSerializeUtil::FormatDetails, details, std::nullopt, std::nullopt);
-    ::new (&details.m_version) hkStringPtr;
+    hkSerializeUtil::FormatDetails details;
     detectFormat(stream, details);
     hkObjectResource* resource = nullptr;
     switch (details.m_formatType.m_storage) {
@@ -583,8 +523,6 @@ hkObjectResource* hkSerializeUtil::loadOnHeap(
             }
             break;
     }
-    // EXE-INLINED none: hkSerializeUtil::FormatDetails::~FormatDetails
-    details.m_version.~hkStringPtr();
     return resource;
 }
 
@@ -616,13 +554,9 @@ hkObjectResource* hkSerializeUtil::loadOnHeap(
 // Returns the format type found by the full detection.
 hkEnum<hkSerializeUtil::FormatType, int32_t>*
 hkSerializeUtil::detectFormat(hkEnum<hkSerializeUtil::FormatType, int32_t>* apResult, hkStreamReader* reader) {
-    // EXE-INLINED none: hkSerializeUtil::FormatDetails::FormatDetails
-    XFNV_INLINED_LOCAL(hkSerializeUtil::FormatDetails, details, std::nullopt, std::nullopt);
-    ::new (&details.m_version) hkStringPtr;
+    hkSerializeUtil::FormatDetails details;
     detectFormat(reader, details);
     apResult->m_storage = details.m_formatType.m_storage;
-    // EXE-INLINED none: hkSerializeUtil::FormatDetails::~FormatDetails
-    details.m_version.~hkStringPtr();
     return apResult;
 }
 
@@ -664,10 +598,8 @@ void hkSerializeUtil::detectFormat(hkStreamReader* reader, hkSerializeUtil::Form
     }
     // EXE-INLINED none: hkEnum<hkSerializeUtil::FormatType, int32_t>::operator=
     details.m_formatType.m_storage = FORMAT_PACKFILE_XML;
-    XFNV_INLINED_LOCAL(hkStringBuf, tag, std::nullopt, std::nullopt);
-    ::new (&tag) hkStringBuf(hkString::strStr(buf, "<hkpackfile"));
-    XFNV_INLINED_LOCAL(hkStringPtr, classVersion, std::nullopt, std::nullopt);
-    ::new (&classVersion) hkStringPtr;
+    hkStringBuf tag(hkString::strStr(buf, "<hkpackfile"));
+    hkStringPtr classVersion;
     int32_t version;
     if (!findTextValue(&classVersion, tag.m_string.m_data, "classversion") ||
         (version = hkString::atoi(classVersion.cString(), 0)) == 1) {
@@ -678,13 +610,6 @@ void hkSerializeUtil::detectFormat(hkStreamReader* reader, hkSerializeUtil::Form
     }
     else if (!findTextValue(&details.m_version, tag.m_string.m_data, "contentsversion")) {
         details.m_version = "Havok-3.1.0";
-    }
-    classVersion.~hkStringPtr();
-    // EXE-INLINED 0xCBBD40
-    hkMemoryAllocator* temp = hkMemoryRouter::getInstance().m_temp;
-    tag.m_string.m_size = 0;
-    if (tag.m_string.m_capacityAndFlags >= 0) {
-        temp->bufFree(tag.m_string.m_data, tag.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
     }
 }
 

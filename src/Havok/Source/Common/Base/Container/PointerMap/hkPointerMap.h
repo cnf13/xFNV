@@ -13,6 +13,9 @@
 template <typename K, typename V, typename Allocator = hkContainerHeapAllocator>
 class hkPointerMap {
 public:
+    // The SDK's hkPointerMap(int numElements = 0): the map's own constructor, grown to hold numElements.
+    explicit hkPointerMap(int32_t numElements = 0) : m_map(numElements) {}
+
     // The map's integer: 64-bit for an 8-byte key, else pointer-sized.
     using Storage = std::conditional_t<sizeof(K) == 8, uint64_t, uintptr_t>;
 

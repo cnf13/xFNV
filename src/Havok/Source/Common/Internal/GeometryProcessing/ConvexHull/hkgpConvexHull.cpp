@@ -197,7 +197,6 @@ void hkgpConvexHull::simplify(const hkgpConvexHull::SimplifyConfig& config) {
 }
 
 float hkgpConvexHull::getVolume() const {
-    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     hkgpConvexHullImpl* m_data = this->m_data;
     if (m_data->m_hasMassProperties.m_bool) {
         hkgpConvexHullImpl* v6 = this->m_data;
@@ -205,22 +204,22 @@ float hkgpConvexHull::getVolume() const {
     }
 
     char buf[512];
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t m_uid = m_data->m_uid;
-    hkOstream* v3 = &apThis.operator<<("No mass properties available (");
-    hkOstream* v4 = &v3->operator<<(m_uid);
-    v4->operator<<(")");
-    if (hkError::s_instance->message(
-            hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
-        )) {
-        __builtin_debugtrap();
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t m_uid = m_data->m_uid;
+        hkOstream* v3 = &apThis.operator<<("No mass properties available (");
+        hkOstream* v4 = &v3->operator<<(m_uid);
+        v4->operator<<(")");
+        if (hkError::s_instance->message(
+                hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
+            )) {
+            __builtin_debugtrap();
+        }
     }
-    apThis.~hkErrStream();
     return this->m_data->m_volume;
 }
 
 float hkgpConvexHull::getSurfaceArea() const {
-    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     hkgpConvexHullImpl* m_data = this->m_data;
     if (m_data->m_hasMassProperties.m_bool) {
         hkgpConvexHullImpl* v6 = this->m_data;
@@ -228,17 +227,18 @@ float hkgpConvexHull::getSurfaceArea() const {
     }
 
     char buf[512];
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t m_uid = m_data->m_uid;
-    hkOstream* v3 = &apThis.operator<<("No mass properties available (");
-    hkOstream* v4 = &v3->operator<<(m_uid);
-    v4->operator<<(")");
-    if (hkError::s_instance->message(
-            hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
-        )) {
-        __builtin_debugtrap();
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t m_uid = m_data->m_uid;
+        hkOstream* v3 = &apThis.operator<<("No mass properties available (");
+        hkOstream* v4 = &v3->operator<<(m_uid);
+        v4->operator<<(")");
+        if (hkError::s_instance->message(
+                hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
+            )) {
+            __builtin_debugtrap();
+        }
     }
-    apThis.~hkErrStream();
     return this->m_data->m_surface;
 }
 
@@ -252,7 +252,6 @@ float hkgpConvexHull::getSphericity() const {
 }
 
 int32_t hkgpConvexHull::getNumPlanes() const {
-    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     hkgpConvexHullImpl* m_data = this->m_data;
     if (m_data->m_hasIndexing.m_bool) {
         hkgpConvexHullImpl* v6 = this->m_data;
@@ -260,17 +259,18 @@ int32_t hkgpConvexHull::getNumPlanes() const {
     }
 
     char buf[512];
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t m_uid = m_data->m_uid;
-    hkOstream* v3 = &apThis.operator<<("No index available (");
-    hkOstream* v4 = &v3->operator<<(m_uid);
-    v4->operator<<(")");
-    if (hkError::s_instance->message(
-            hkError::MESSAGE_ERROR, 0x79F9D886, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
-        )) {
-        __builtin_debugtrap();
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t m_uid = m_data->m_uid;
+        hkOstream* v3 = &apThis.operator<<("No index available (");
+        hkOstream* v4 = &v3->operator<<(m_uid);
+        v4->operator<<(")");
+        if (hkError::s_instance->message(
+                hkError::MESSAGE_ERROR, 0x79F9D886, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
+            )) {
+            __builtin_debugtrap();
+        }
     }
-    apThis.~hkErrStream();
     return this->m_data->m_planes.m_size;
 }
 
@@ -381,10 +381,7 @@ int32_t hkgpConvexHull::build(const hkStridedVertices& vertices, const BuildConf
     if (vertices.m_striding == 16) {
         return build(reinterpret_cast<const hkVector4*>(vertices.m_vertices), vertices.m_numVertices, config);
     }
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, points, std::nullopt, std::nullopt);
-    points.m_data = nullptr;
-    points.m_size = 0;
-    points.m_capacityAndFlags = 0x80000000u;
+    hkArray<hkVector4> points;
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     if (vertices.m_numVertices > 0) {
         int32_t iCapacity = 2 * (points.m_capacityAndFlags & 0x3FFFFFFF);
@@ -406,11 +403,6 @@ int32_t hkgpConvexHull::build(const hkStridedVertices& vertices, const BuildConf
         pVertex += vertices.m_striding;
     }
     int32_t iResult = build(points.m_size != 0 ? points.m_data : nullptr, points.m_size, config);
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    points.m_size = 0;
-    if (points.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(points.m_data, sizeof(hkVector4) * static_cast<int32_t>(points.m_capacityAndFlags & 0x3FFFFFFF));
-    }
     return iResult;
 }
 
@@ -430,10 +422,7 @@ int32_t hkgpConvexHull::buildPlanar(
     }
     const char* pVertex = reinterpret_cast<const char*>(vertices.m_vertices);
     const int32_t iNumVertices = vertices.m_numVertices;
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, points, std::nullopt, std::nullopt);
-    points.m_data = nullptr;
-    points.m_size = 0;
-    points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> points;
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     int32_t iCapacity = points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
     if (iCapacity < iNumVertices) {
@@ -450,15 +439,6 @@ int32_t hkgpConvexHull::buildPlanar(
         pVertex += vertices.m_striding;
     }
     const int32_t iResult = buildPlanar_0(points.m_size != 0 ? points.m_data : nullptr, points.m_size, plane, config);
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    points.m_size = 0;
-    if (points.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            points.m_data,
-            static_cast<int32_t>(sizeof(hkVector4)) *
-                static_cast<int32_t>(points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-        );
-    }
     return iResult;
 }
 
@@ -467,10 +447,7 @@ int32_t hkgpConvexHull::buildPlanar(
 int32_t
 hkgpConvexHull::buildFromPlanes(const hkVector4* planes, int32_t numPlanes, const hkgpConvexHull::BuildConfig& config) {
     using points_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    alignas(16) XFNV_INLINED_LOCAL(points_t, points, std::nullopt, std::nullopt);
-    points.m_data = nullptr;
-    points.m_size = 0;
-    points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    alignas(16) points_t points;
     HK_TIMER_BEGIN("VertexEnumeration", nullptr);
     points.reserve(3 * numPlanes);
     for (int32_t i = 0; i < numPlanes; ++i) {
@@ -529,13 +506,6 @@ hkgpConvexHull::buildFromPlanes(const hkVector4* planes, int32_t numPlanes, cons
     else {
         result = -1;
     }
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    points.m_size = 0;
-    if (points.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            points.m_data, sizeof(hkVector4) * (points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-        );
-    }
     return result;
 }
 
@@ -549,10 +519,7 @@ int32_t hkgpConvexHull::buildFromPlanes(
     const hkgpConvexHull::BuildConfig& config
 ) {
     using points_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(points_t, points, std::nullopt, std::nullopt);
-    points.m_data = nullptr;
-    points.m_size = 0;
-    points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    points_t points;
     HK_TIMER_BEGIN("VertexEnumeration", nullptr);
     points.reserve(3 * numPlanes);
     for (int32_t i = 0; i < numPlanes; ++i) {
@@ -612,13 +579,6 @@ int32_t hkgpConvexHull::buildFromPlanes(
         vertices.m_striding = sizeof(hkVector4);
         result = buildPlanar(vertices, projectionPlane, config);
     }
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    points.m_size = 0;
-    if (points.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            points.m_data, sizeof(hkVector4) * (points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-        );
-    }
     return result;
 }
 
@@ -661,10 +621,7 @@ void hkgpConvexHull::absoluteScale(float offset, const AbsoluteScaleConfig& conf
         return;
     }
     const __m128 kCenter = _mm_load_ps(&reinterpret_cast<float*>(&center.m_quad)[0]);
-    alignas(16) XFNV_INLINED_LOCAL(hkArray<hkVector4>, points, std::nullopt, std::nullopt);
-    points.m_data = nullptr;
-    points.m_size = 0;
-    points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    alignas(16) hkArray<hkVector4> points;
     if (iMethod == AbsoluteScaleConfig::SKM_VERTICES) {
         const int32_t iNumVertices = getNumVertices();
         hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
@@ -758,15 +715,6 @@ void hkgpConvexHull::absoluteScale(float offset, const AbsoluteScaleConfig& conf
         else {
             buildFromPlanes(points.m_data, points.m_size, getConfiguration());
         }
-    }
-    // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    points.m_size = 0;
-    if (points.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            points.m_data,
-            sizeof(hkVector4) * static_cast<int32_t>(points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-        );
     }
     buildMassProperties();
     buildIndices(0.9999f, false);
@@ -893,10 +841,7 @@ char hkgpConvexHull::expandByPlanarMargin(float margin) {
     alignas(16) BuildConfig config = pImpl->m_config;
     const hkBool hasMassProperties = pImpl->m_hasMassProperties;
     const hkBool hasIndexing = pImpl->m_hasIndexing;
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, points, std::nullopt, std::nullopt);
-    points.m_data = nullptr;
-    points.m_size = 0;
-    points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> points;
     // The strided view reads the vectors as floats from their first float on.
     alignas(16) hkStridedVertices vertices;
     switch (getDimensions()) {
@@ -1057,16 +1002,6 @@ char hkgpConvexHull::expandByPlanarMargin(float margin) {
             vertices.m_striding = sizeof(hkVector4);
             build(vertices, config);
             const char cResult = expandByPlanarMargin(margin);
-            // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-            hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-            points.m_size = 0;
-            if (points.m_capacityAndFlags >= 0) {
-                pHeap->bufFree(
-                    points.m_data,
-                    static_cast<int32_t>(sizeof(hkVector4)) *
-                        static_cast<int32_t>(points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-                );
-            }
             return cResult;
         }
         case 3: {
@@ -1111,18 +1046,6 @@ char hkgpConvexHull::expandByPlanarMargin(float margin) {
             goto rebuildIndices;
         }
     }
-    {
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        points.m_size = 0;
-        if (points.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                points.m_data,
-                static_cast<int32_t>(sizeof(hkVector4)) *
-                    static_cast<int32_t>(points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-            );
-        }
-    }
 rebuildIndices:
     if (getDimensions() != 3) {
         return 0;
@@ -1164,13 +1087,10 @@ const hkMatrix3& hkgpConvexHull::getWorldInertia() const {
 
 void hkgpConvexHull::getSupportingVertex(const hkVector4& direction, hkVector4& vertexOut) const {
     using a2a_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(a2a_t, a2a, std::nullopt, std::nullopt);
     hkgpConvexHullImpl* m_data = this->m_data;
     if (!m_data->m_supportCache.m_size) {
         int32_t m_numUsed = m_data->m_mesh.m_vertices.m_numUsed;
-        a2a.m_data = nullptr;
-        a2a.m_size = 0;
-        a2a.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+        a2a_t a2a;
         hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
         int32_t v6 = m_numUsed;
         if (m_numUsed > 0) {
@@ -1186,11 +1106,6 @@ void hkgpConvexHull::getSupportingVertex(const hkVector4& direction, hkVector4& 
             m_used = m_used->m_next;
         }
         hkGeometryProcessing::buildTransposedArray(a2a, m_data->m_supportCache);
-        hkMemoryAllocator* v9 = (&hkMemoryRouter::getInstance())->m_heap;
-        a2a.m_size = 0;
-        if (a2a.m_capacityAndFlags >= 0) {
-            v9->bufFree(a2a.begin(), sizeof(hkVector4) * a2a.m_capacityAndFlags);
-        }
     }
     hkGeometryProcessing::getSupportingVertex(m_data->m_supportCache, direction, vertexOut);
 }
@@ -1280,10 +1195,7 @@ void hkgpConvexHull::generateGeometry(hkgpConvexHull::Inputs inputs, hkGeometry&
     if (pData->m_dimensions == 2) {
         const int32_t vertexBase = geometry.m_vertices.m_size;
         using indices_t = hkArray<int32_t, hkContainerHeapAllocator>;
-        XFNV_INLINED_LOCAL(indices_t, indices, std::nullopt, std::nullopt);
-        indices.m_data = nullptr;
-        indices.m_size = 0;
-        indices.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
+        indices_t indices;
         hkVector4* pVertex = geometry.m_vertices.expandBy(pData->m_mesh.m_vertices.m_numUsed);
         hkGeometry::Triangle* pTriangle = geometry.m_triangles.expandBy(2 * m_data->m_mesh.m_vertices.m_numUsed - 4);
         indices.reserve(m_data->m_mesh.m_vertices.m_numUsed);
@@ -1312,25 +1224,13 @@ void hkgpConvexHull::generateGeometry(hkgpConvexHull::Inputs inputs, hkGeometry&
             pTriangle->m_c = indices.m_data[i];
             ++pTriangle;
         }
-        // EXE-INLINED none: hkArray<int>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        indices.m_size = 0;
-        if (indices.m_capacityAndFlags >= 0) {
-            heap.bufFree(
-                indices.m_data, sizeof(int32_t) * (indices.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)
-            );
-        }
     }
     else if (pData->m_dimensions == 3) {
         using MapBase = hkUlongMapBase;
         const int32_t vertexBase = geometry.m_vertices.m_size;
         using vertexIndices_t = hkPointerMap<const hkgpConvexHullImpl::Vertex*, int32_t>;
-        XFNV_INLINED_LOCAL(vertexIndices_t, vertexIndices, std::nullopt, std::nullopt);
+        vertexIndices_t vertexIndices;
         MapBase& map = vertexIndices.m_map;
-        map.m_elem = nullptr;
-        map.m_numElems = 0;
-        map.m_hashMod = -1;
-        map.reserve(hkMemoryRouter::getInstance().heap(), 0);
         hkVector4* pVertex = geometry.m_vertices.expandBy(m_data->m_mesh.m_vertices.m_numUsed);
         hkGeometry::Triangle* pTriangle = geometry.m_triangles.expandBy(m_data->m_mesh.m_triangles.m_numUsed);
         const int32_t numVertices = m_data->m_mesh.m_vertices.m_numUsed;
@@ -1354,8 +1254,6 @@ void hkgpConvexHull::generateGeometry(hkgpConvexHull::Inputs inputs, hkGeometry&
             pTriangle->m_material = -1;
             ++pTriangle;
         }
-        map.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-        map.destructOperations();
     }
 }
 
@@ -1474,72 +1372,72 @@ bool hkgpConvexHull::clipLine(const hkVector4& a, const hkVector4& b, float& t0,
 // The vertex's index (the implementation's vertex m_index, +0x34), after an error report when the hull has no
 // indexing.
 int32_t hkgpConvexHull::getIndex(const hkgpConvexHull::Vertex* a1) const {
-    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     char buf[512];
     hkgpConvexHullImpl* pData = m_data;
     if (pData->m_hasIndexing.m_bool) {
         return static_cast<const hkgpConvexHullImpl::Vertex*>(a1)->m_index;
     }
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t uiUid = pData->m_uid;
-    hkOstream* v3 = &apThis.operator<<("No index available (");
-    hkOstream* v4 = &v3->operator<<(uiUid);
-    v4->operator<<(")");
-    if (hkError::s_instance->message(
-            hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D886u), buf,
-            ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
-        )) {
-        __builtin_debugtrap();
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t uiUid = pData->m_uid;
+        hkOstream* v3 = &apThis.operator<<("No index available (");
+        hkOstream* v4 = &v3->operator<<(uiUid);
+        v4->operator<<(")");
+        if (hkError::s_instance->message(
+                hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D886u), buf,
+                ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
+            )) {
+            __builtin_debugtrap();
+        }
     }
-    apThis.~hkErrStream();
     return static_cast<const hkgpConvexHullImpl::Vertex*>(a1)->m_index;
 }
 
 // The triangle's index (the implementation's triangle m_index, +0x44), after an error report when the hull has no
 // indexing.
 int32_t hkgpConvexHull::getIndex(const hkgpConvexHull::Triangle* a1) const {
-    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     char buf[512];
     hkgpConvexHullImpl* pData = m_data;
     if (pData->m_hasIndexing.m_bool) {
         return static_cast<const hkgpConvexHullImpl::Triangle*>(a1)->m_index;
     }
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t uiUid = pData->m_uid;
-    hkOstream* v3 = &apThis.operator<<("No index available (");
-    hkOstream* v4 = &v3->operator<<(uiUid);
-    v4->operator<<(")");
-    if (hkError::s_instance->message(
-            hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D886u), buf,
-            ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
-        )) {
-        __builtin_debugtrap();
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t uiUid = pData->m_uid;
+        hkOstream* v3 = &apThis.operator<<("No index available (");
+        hkOstream* v4 = &v3->operator<<(uiUid);
+        v4->operator<<(")");
+        if (hkError::s_instance->message(
+                hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D886u), buf,
+                ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
+            )) {
+            __builtin_debugtrap();
+        }
     }
-    apThis.~hkErrStream();
     return static_cast<const hkgpConvexHullImpl::Triangle*>(a1)->m_index;
 }
 
 // The index of the triangle's plane (its quantized plane's m_index, +0x38), after an error report when the hull has
 // no indexing.
 int32_t hkgpConvexHull::getPlaneIndex(const hkgpConvexHull::Triangle* triangle) const {
-    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     char buf[512];
     hkgpConvexHullImpl* pData = m_data;
     if (pData->m_hasIndexing.m_bool) {
         return static_cast<const hkgpConvexHullImpl::Triangle*>(triangle)->m_plane.m_index;
     }
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t uiUid = pData->m_uid;
-    hkOstream* v3 = &apThis.operator<<("No index available (");
-    hkOstream* v4 = &v3->operator<<(uiUid);
-    v4->operator<<(")");
-    if (hkError::s_instance->message(
-            hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D886u), buf,
-            ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
-        )) {
-        __builtin_debugtrap();
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t uiUid = pData->m_uid;
+        hkOstream* v3 = &apThis.operator<<("No index available (");
+        hkOstream* v4 = &v3->operator<<(uiUid);
+        v4->operator<<(")");
+        if (hkError::s_instance->message(
+                hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D886u), buf,
+                ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
+            )) {
+            __builtin_debugtrap();
+        }
     }
-    apThis.~hkErrStream();
     return static_cast<const hkgpConvexHullImpl::Triangle*>(triangle)->m_plane.m_index;
 }
 
@@ -1924,10 +1822,7 @@ void hkgpConvexHull::booleanSplit(
 ) {
     hkgpConvexHull* pCurrent = operand->clone();
     hkgpConvexHullImpl* pModel = model->m_data;
-    XFNV_INLINED_LOCAL(hkArray<int32_t>, planeIndices, std::nullopt, std::nullopt);
-    planeIndices.m_data = nullptr;
-    planeIndices.m_size = 0;
-    planeIndices.m_capacityAndFlags = 0x80000000u;
+    hkArray<int32_t> planeIndices;
     if (inside) {
         *inside = nullptr;
     }
@@ -2011,16 +1906,6 @@ void hkgpConvexHull::booleanSplit(
     else if (pCurrent) {
         delete pCurrent;
     }
-    // EXE-INLINED none: hkArray<int>::~hkArray
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    planeIndices.m_size = 0;
-    if (planeIndices.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            planeIndices.m_data,
-            sizeof(int32_t) *
-                static_cast<int32_t>(planeIndices.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)
-        );
-    }
 }
 
 // Only the inside part is asked for.
@@ -2071,18 +1956,9 @@ bool hkgpConvexHull::booleanSubtraction(
     hkArray<hkgpConvexHull*>& output,
     float thickness
 ) {
-    XFNV_INLINED_LOCAL(hkArray<hkgpConvexHull*>, remaining, std::nullopt, std::nullopt);
-    remaining.m_data = nullptr;
-    remaining.m_size = 0;
-    remaining.m_capacityAndFlags = 0x80000000u;
-    XFNV_INLINED_LOCAL(hkArray<hkgpConvexHull*>, pieces, std::nullopt, std::nullopt);
-    pieces.m_data = nullptr;
-    pieces.m_size = 0;
-    pieces.m_capacityAndFlags = 0x80000000u;
-    XFNV_INLINED_LOCAL(hkArray<hkgpConvexHull*>, parts, std::nullopt, std::nullopt);
-    parts.m_data = nullptr;
-    parts.m_size = 0;
-    parts.m_capacityAndFlags = 0x80000000u;
+    hkArray<hkgpConvexHull*> remaining;
+    hkArray<hkgpConvexHull*> pieces;
+    hkArray<hkgpConvexHull*> parts;
     hkgpConvexHull* pClone = operandA->clone();
     // EXE-INLINED none: hkArray<hkgpConvexHull*>::pushBack
     hkMemoryRouter& router = hkMemoryRouter::getInstance();
@@ -2134,40 +2010,6 @@ bool hkgpConvexHull::booleanSubtraction(
         output.m_data[output.m_size] = pPiece;
         output.m_size++;
     }
-    // EXE-INLINED none: hkArray<hkgpConvexHull*>::~hkArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    parts.m_size = 0;
-    if (parts.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            parts.m_data,
-            sizeof(hkgpConvexHull*) *
-                static_cast<int32_t>(parts.m_capacityAndFlags & hkArrayBase<hkgpConvexHull*>::CAPACITY_MASK)
-        );
-    }
-    parts.m_data = nullptr;
-    parts.m_capacityAndFlags = 0x80000000u;
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    pieces.m_size = 0;
-    if (pieces.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            pieces.m_data,
-            sizeof(hkgpConvexHull*) *
-                static_cast<int32_t>(pieces.m_capacityAndFlags & hkArrayBase<hkgpConvexHull*>::CAPACITY_MASK)
-        );
-    }
-    pieces.m_data = nullptr;
-    pieces.m_capacityAndFlags = 0x80000000u;
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    remaining.m_size = 0;
-    if (remaining.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            remaining.m_data,
-            sizeof(hkgpConvexHull*) *
-                static_cast<int32_t>(remaining.m_capacityAndFlags & hkArrayBase<hkgpConvexHull*>::CAPACITY_MASK)
-        );
-    }
-    remaining.m_data = nullptr;
-    remaining.m_capacityAndFlags = 0x80000000u;
     return iNumRemaining > 0;
 }
 
@@ -2179,10 +2021,7 @@ hkgpConvexHull* hkgpConvexHull::createCompound(Inputs source, const hkgpConvexHu
     if (numHulls <= 0) {
         return nullptr;
     }
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, points, std::nullopt, std::nullopt);
-    points.m_data = nullptr;
-    points.m_size = 0;
-    points.m_capacityAndFlags = 0x80000000u;
+    hkArray<hkVector4> points;
     BuildConfig config = hulls[0]->getConfiguration();
     int32_t iNumPoints = 0;
     IUserObject* pFirstObject = nullptr;
@@ -2226,19 +2065,7 @@ hkgpConvexHull* hkgpConvexHull::createCompound(Inputs source, const hkgpConvexHu
     pHull->build(points.m_data, points.m_size, config);
     if (pHull->getDimensions() == -1) {
         delete pHull;
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        points.m_size = 0;
-        if (points.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                points.m_data, sizeof(hkVector4) * static_cast<int32_t>(points.m_capacityAndFlags & 0x3FFFFFFF)
-            );
-        }
         return nullptr;
-    }
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    points.m_size = 0;
-    if (points.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(points.m_data, sizeof(hkVector4) * static_cast<int32_t>(points.m_capacityAndFlags & 0x3FFFFFFF));
     }
     return pHull;
 }
@@ -2384,10 +2211,7 @@ hkgpConvexHull*
 hkgpConvexHull::computeMinkowski(const hkStridedVertices& a, const hkStridedVertices& b, const hkSimdReal& bScale) {
     const int32_t numVertices = b.m_numVertices * a.m_numVertices;
     using vertices_t = hkArray<hkVector4, hkContainerTempAllocator>;
-    XFNV_INLINED_LOCAL(vertices_t, vertices, std::nullopt, std::nullopt);
-    vertices.m_data = nullptr;
-    vertices.m_size = 0;
-    vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    vertices_t vertices;
     // EXE-INLINED none: hkArray<hkVector4, hkContainerTempAllocator>::reserve
     hkMemoryAllocator& reserveTemp = hkMemoryRouter::getInstance().temp();
     if (vertices.getCapacity() < numVertices) {
@@ -2437,12 +2261,6 @@ hkgpConvexHull::computeMinkowski(const hkStridedVertices& a, const hkStridedVert
             delete pHull;
         }
         pHull = nullptr;
-    }
-    // EXE-INLINED none: hkArray<hkVector4, hkContainerTempAllocator>::~hkArray
-    hkMemoryAllocator& freeTemp = hkMemoryRouter::getInstance().temp();
-    vertices.m_size = 0;
-    if (vertices.m_capacityAndFlags >= 0) {
-        freeTemp.bufFree(vertices.m_data, static_cast<int32_t>(sizeof(hkVector4)) * vertices.getCapacity());
     }
     return pHull;
 }
@@ -2508,14 +2326,8 @@ void hkgpConvexHull::createVoronoiCells(
     const float fRadiusSquared = fRadius * fRadius;
     const float fHalfRadius = -fRadius * 0.5;
     using VectorArray = hkArray<hkVector4, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(VectorArray, sites, std::nullopt, std::nullopt);
-    alignas(16) XFNV_INLINED_LOCAL(VectorArray, sorted, std::nullopt, std::nullopt);
-    sites.m_data = nullptr;
-    sites.m_size = 0;
-    sites.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG);
-    sorted.m_data = nullptr;
-    sorted.m_size = 0;
-    sorted.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG);
+    VectorArray sites;
+    alignas(16) VectorArray sorted;
     // The plane offset's terms, kept as vectors.
     const __m128 kHalfRadius = _mm_set_ss(fHalfRadius);
     const __m128 kHalf = _mm_set_ss(0.5f);
@@ -2639,28 +2451,6 @@ void hkgpConvexHull::createVoronoiCells(
             cells.m_size++;
         }
     }
-    // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    sorted.m_size = 0;
-    if (sorted.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            sorted.m_data,
-            static_cast<int32_t>(
-                (sorted.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4)
-            )
-        );
-    }
-    sorted.m_data = nullptr;
-    sorted.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG);
-    // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::~hkArray
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    sites.m_size = 0;
-    if (sites.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            sites.m_data,
-            static_cast<int32_t>((sites.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4))
-        );
-    }
 }
 
 void hkgpConvexHull::createVoronoiEdges(
@@ -2670,21 +2460,13 @@ void hkgpConvexHull::createVoronoiEdges(
     float margin
 ) {
     using pieces_t = hkArray<hkgpConvexHull*, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(pieces_t, pieces, std::nullopt, std::nullopt);
-    pieces.m_data = nullptr;
-    pieces.m_size = 0;
-    pieces.m_capacityAndFlags = hkArrayBase<hkgpConvexHull*>::DONT_DEALLOCATE_FLAG;
+    pieces_t pieces;
     hkgpConvexHull::createVoronoiFeatures(domain, points, pieces, edges, margin);
     for (int32_t i = 0; i < pieces.m_size; ++i) {
         hkgpConvexHull* v5 = pieces.m_data[i];
         if (v5) {
             delete v5;
         }
-    }
-    hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
-    pieces.m_size = 0;
-    if (pieces.m_capacityAndFlags >= 0) {
-        m_heap->bufFree(pieces.begin(), sizeof(hkgpConvexHull*) * pieces.m_capacityAndFlags);
     }
 }
 
@@ -2804,21 +2586,12 @@ int32_t hkgpConvexHullImpl::build(
     // The points' address is tested as an integer for 16-byte alignment.
     if (numPoints && (reinterpret_cast<uintptr_t>(points) & 15) != 0) {
         using aligned_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-        XFNV_INLINED_LOCAL(aligned_t, aligned, std::nullopt, std::nullopt);
-        aligned.m_data = nullptr;
-        aligned.m_size = 0;
-        aligned.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+        aligned_t aligned;
         aligned.setSize(numPoints);
         for (int32_t i = 0; i < numPoints; ++i) {
             aligned.m_data[i].set(points[i].m_quad[0], points[i].m_quad[1], points[i].m_quad[2], points[i].m_quad[3]);
         }
         const int32_t result = build(aligned.m_data, numPoints, forcePlanar, domain);
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-        hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-        aligned.m_size = 0;
-        if (aligned.m_capacityAndFlags >= 0) {
-            heap->bufFree(aligned.m_data, static_cast<int32_t>(sizeof(hkVector4)) * aligned.getCapacity());
-        }
         return result;
     }
     reset(forcePlanar);
@@ -3693,11 +3466,7 @@ void hkgpConvexHullImpl::simplify(const hkgpConvexHull::SimplifyConfig& config) 
             }
             // The hull again, from the vertices still indexed.
             const int32_t iNumVertices = m_mesh.m_vertices.m_numUsed;
-            XFNV_INLINED_LOCAL(hkArray<hkVector4>, points, std::nullopt, std::nullopt);
-            // EXE-INLINED none: hkArray<hkVector4>::hkArray
-            points.m_data = nullptr;
-            points.m_size = 0;
-            points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+            hkArray<hkVector4> points;
             // EXE-INLINED none: hkArray<hkVector4>::reserve
             hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
             int32_t iCapacity = points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
@@ -3723,16 +3492,6 @@ void hkgpConvexHullImpl::simplify(const hkgpConvexHull::SimplifyConfig& config) 
                 buildIndices();
             }
             changed = true;
-            // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-            pHeap = hkMemoryRouter::getInstance().m_heap;
-            points.m_size = 0;
-            if (points.m_capacityAndFlags >= 0) {
-                pHeap->bufFree(
-                    points.m_data,
-                    static_cast<int32_t>(sizeof(hkVector4)) *
-                        (points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-                );
-            }
         }
         while (m_dimensions == 3);
     }
@@ -3750,16 +3509,9 @@ void hkgpConvexHullImpl::simplify(const hkgpConvexHull::SimplifyConfig& config) 
             }
         }
         using IntArray = hkArray<int32_t, hkContainerHeapAllocator>;
-        // EXE-INLINED none: hkArray<int>::hkArray
-        XFNV_INLINED_LOCAL(IntArray, verticesPerFace, std::nullopt, std::nullopt);
-        verticesPerFace.m_data = nullptr;
-        verticesPerFace.m_capacityAndFlags = IntArray::DONT_DEALLOCATE_FLAG;
-        XFNV_INLINED_LOCAL(IntArray, indices, std::nullopt, std::nullopt);
-        indices.m_data = nullptr;
-        indices.m_capacityAndFlags = IntArray::DONT_DEALLOCATE_FLAG;
-        XFNV_INLINED_LOCAL(IntArray, used, std::nullopt, std::nullopt);
-        used.m_data = nullptr;
-        used.m_capacityAndFlags = IntArray::DONT_DEALLOCATE_FLAG;
+        IntArray verticesPerFace;
+        IntArray indices;
+        IntArray used;
         do {
             // EXE-INLINED none: hkArray<int>::clear
             verticesPerFace.m_size = 0;
@@ -3791,14 +3543,8 @@ void hkgpConvexHullImpl::simplify(const hkgpConvexHull::SimplifyConfig& config) 
                 break;
             }
             changed = true;
-            XFNV_INLINED_LOCAL(hkArray<hkVector4>, positions, std::nullopt, std::nullopt);
-            positions.m_data = nullptr;
-            positions.m_size = 0;
-            positions.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-            XFNV_INLINED_LOCAL(hkArray<hkVector4>, points, std::nullopt, std::nullopt);
-            points.m_data = nullptr;
-            points.m_size = 0;
-            points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+            hkArray<hkVector4> positions;
+            hkArray<hkVector4> points;
             // Every vertex's position.
             hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
             const int32_t iOldSize = positions.m_size;
@@ -3835,61 +3581,13 @@ void hkgpConvexHullImpl::simplify(const hkgpConvexHull::SimplifyConfig& config) 
             if (build(points.m_data, points.m_size, 0, nullptr) == 3) {
                 buildIndices();
             }
-            // EXE-INLINED none: hkArray<hkVector4>::clearAndDeallocate
-            pHeap = hkMemoryRouter::getInstance().m_heap;
-            points.m_size = 0;
-            if ((points.m_capacityAndFlags & hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG) == 0) {
-                pHeap->bufFree(
-                    points.m_data,
-                    static_cast<int32_t>(sizeof(hkVector4)) *
-                        (points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-                );
-            }
-            points.m_data = nullptr;
-            points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-            pHeap = hkMemoryRouter::getInstance().m_heap;
-            positions.m_size = 0;
-            if ((positions.m_capacityAndFlags & hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG) == 0) {
-                pHeap->bufFree(
-                    positions.m_data,
-                    static_cast<int32_t>(sizeof(hkVector4)) *
-                        (positions.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-                );
-            }
         }
         while (m_dimensions == 3);
-        // EXE-INLINED none: hkArray<int>::clearAndDeallocate
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        used.m_size = 0;
-        if ((used.m_capacityAndFlags & IntArray::DONT_DEALLOCATE_FLAG) == 0) {
-            pHeap->bufFree(
-                used.m_data, static_cast<int32_t>(sizeof(int32_t)) * (used.m_capacityAndFlags & IntArray::CAPACITY_MASK)
-            );
-        }
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        indices.m_size = 0;
-        if ((indices.m_capacityAndFlags & IntArray::DONT_DEALLOCATE_FLAG) == 0) {
-            pHeap->bufFree(
-                indices.m_data,
-                static_cast<int32_t>(sizeof(int32_t)) * (indices.m_capacityAndFlags & IntArray::CAPACITY_MASK)
-            );
-        }
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        verticesPerFace.m_size = 0;
-        if ((verticesPerFace.m_capacityAndFlags & IntArray::DONT_DEALLOCATE_FLAG) == 0) {
-            pHeap->bufFree(
-                verticesPerFace.m_data,
-                static_cast<int32_t>(sizeof(int32_t)) * (verticesPerFace.m_capacityAndFlags & IntArray::CAPACITY_MASK)
-            );
-        }
     }
     if (changed && m_dimensions == 3) {
         // The last rebuild, from every vertex.
         const int32_t iNumVertices = m_mesh.m_vertices.m_numUsed;
-        XFNV_INLINED_LOCAL(hkArray<hkVector4>, points, std::nullopt, std::nullopt);
-        points.m_data = nullptr;
-        points.m_size = 0;
-        points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkVector4> points;
         // EXE-INLINED none: hkArray<hkVector4>::expandBy
         hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
         const int32_t iOldSize = points.m_size;
@@ -3914,16 +3612,6 @@ void hkgpConvexHullImpl::simplify(const hkgpConvexHull::SimplifyConfig& config) 
         }
         if (hadMassProperties.m_bool) {
             buildMassProperties();
-        }
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        points.m_size = 0;
-        if (points.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                points.m_data,
-                static_cast<int32_t>(sizeof(hkVector4)) *
-                    (points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-            );
         }
     }
 }
@@ -3981,10 +3669,7 @@ int32_t hkgpConvexHullImpl::generateIndexedFaces(
     }
     if (m_dimensions == 3) {
         using triangles_t = hkArray<Triangle*, hkContainerHeapAllocator>;
-        XFNV_INLINED_LOCAL(triangles_t, triangles, std::nullopt, std::nullopt);
-        triangles.m_data = nullptr;
-        triangles.m_size = 0;
-        triangles.m_capacityAndFlags = hkArrayBase<Triangle*>::DONT_DEALLOCATE_FLAG;
+        triangles_t triangles;
         {
             // EXE-INLINED none: hkArray<Triangle*, hkContainerHeapAllocator>::reserve
             const int32_t numTriangles = m_mesh.m_triangles.m_numUsed;
@@ -4077,12 +3762,6 @@ int32_t hkgpConvexHullImpl::generateIndexedFaces(
             vpf.m_size += 1;
             numFaces += 1;
         }
-        // EXE-INLINED none: hkArray<Triangle*, hkContainerHeapAllocator>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        triangles.m_size = 0;
-        if (triangles.m_capacityAndFlags >= 0) {
-            heap.bufFree(triangles.m_data, static_cast<int32_t>(sizeof(Triangle*)) * triangles.getCapacity());
-        }
     }
     else if (m_dimensions == 2) {
         const int32_t numVertices = m_mesh.m_vertices.m_numUsed;
@@ -4123,10 +3802,7 @@ int32_t hkgpConvexHullImpl::generateIndexedFaces(
     if (maximizeArea && numFaces != 0) {
         IDX* pFace = vi.m_data;
         using vertices_t = hkArray<Vertex*, hkContainerHeapAllocator>;
-        XFNV_INLINED_LOCAL(vertices_t, vertices, std::nullopt, std::nullopt);
-        vertices.m_data = nullptr;
-        vertices.m_size = 0;
-        vertices.m_capacityAndFlags = hkArrayBase<Vertex*>::DONT_DEALLOCATE_FLAG;
+        vertices_t vertices;
         {
             // EXE-INLINED none: hkArray<Vertex*, hkContainerHeapAllocator>::reserve
             const int32_t numVertices = m_mesh.m_vertices.m_numUsed;
@@ -4177,11 +3853,7 @@ int32_t hkgpConvexHullImpl::generateIndexedFaces(
                 }
                 if (bestIndex > 0) {
                     using rotated_t = hkInplaceArray<IDX, 32>;
-                    XFNV_INLINED_LOCAL(rotated_t, head, std::nullopt, std::nullopt);
-                    // EXE-INLINED none: hkInplaceArray<IDX, 32>::hkInplaceArray
-                    head.m_data = head.m_storage;
-                    head.m_size = 0;
-                    head.m_capacityAndFlags = 32 | hkArrayBase<IDX>::DONT_DEALLOCATE_FLAG;
+                    rotated_t head;
                     IDX* pDst = pFace;
                     {
                         // EXE-INLINED none: hkArray<IDX, hkContainerHeapAllocator>::reserve
@@ -4206,21 +3878,9 @@ int32_t hkgpConvexHullImpl::generateIndexedFaces(
                     for (int32_t k = 0; k < bestIndex; ++k) {
                         *pDst++ = head.m_data[k];
                     }
-                    // EXE-INLINED none: hkInplaceArray<IDX, 32>::~hkInplaceArray
-                    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                    head.m_size = 0;
-                    if (head.m_capacityAndFlags >= 0) {
-                        heap.bufFree(head.m_data, static_cast<int32_t>(sizeof(IDX)) * head.getCapacity());
-                    }
                 }
             }
             pFace += n;
-        }
-        // EXE-INLINED none: hkArray<Vertex*, hkContainerHeapAllocator>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        vertices.m_size = 0;
-        if (vertices.m_capacityAndFlags >= 0) {
-            heap.bufFree(vertices.m_data, static_cast<int32_t>(sizeof(Vertex*)) * vertices.getCapacity());
         }
     }
     return numFaces;
@@ -4243,7 +3903,6 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
     alignas(16) uint32_t v58;
     alignas(16) uint32_t v60;
     using apArray_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(apArray_t, apArray, std::nullopt, std::nullopt);
     uint32_t v65;
     hkMatrix3 m_inertiaMatrix;
     float v67;
@@ -4262,11 +3921,8 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
         if (m_dimensions == 2) {
             float v62 = 0.0f;
             int32_t m_numUsed = m_mesh.m_vertices.m_numUsed;
-            // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>'s constructor
-            apArray.m_data = nullptr;
-            apArray.m_size = 0;
+            apArray_t apArray;
             a1.m_quad = hkVector4Zero.m_quad;
-            apArray.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
             hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
             int32_t m_numUsed_1 = m_numUsed;
             if (m_numUsed > 0) {
@@ -4352,15 +4008,6 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
                 ),
                 v39->m_quad
             );
-            hkMemoryAllocator* m_heap_1 = (&hkMemoryRouter::getInstance())->m_heap;
-            apArray.m_size = 0;
-            if (apArray.m_capacityAndFlags >= 0) {
-                m_heap_1->bufFree(
-                    apArray.m_data,
-                    sizeof(hkVector4) * (apArray.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-                );
-                return static_cast<hkResult>(m_hasMassProperties.m_bool == 0);
-            }
         }
         else {
             m_surface = 0.0f;
@@ -4636,25 +4283,15 @@ void hkgpConvexHullImpl::buildIndices() {
     using MapBase = hkUlongMapBase;
     // The SDK's hkArray<SortedTriangle, hkContainerTempAllocator>: each triangle with twice its area.
     using sorted_t = hkArray<SortedTriangle, hkContainerTempAllocator>;
-    XFNV_INLINED_LOCAL(sorted_t, sorted, std::nullopt, std::nullopt);
-    sorted.m_data = nullptr;
-    sorted.m_size = 0;
-    sorted.m_capacityAndFlags = hkArrayBase<SortedTriangle>::DONT_DEALLOCATE_FLAG;
+    sorted_t sorted;
     // Maps each triangle to its index in trianglePlanes.
     using triangleIndices_t = hkPointerMap<Triangle*, int32_t>;
-    XFNV_INLINED_LOCAL(triangleIndices_t, triangleIndices, std::nullopt, std::nullopt);
+    triangleIndices_t triangleIndices;
     MapBase& map = triangleIndices.m_map;
-    map.m_elem = nullptr;
-    map.m_numElems = 0;
-    map.m_hashMod = -1;
-    map.reserve(hkMemoryRouter::getInstance().heap(), 0);
     const int32_t numTriangles = m_mesh.m_triangles.m_numUsed;
     // Each triangle's plane, by its index.
     using trianglePlanes_t = hkArray<hkVector4, hkContainerTempAllocator>;
-    XFNV_INLINED_LOCAL(trianglePlanes_t, trianglePlanes, std::nullopt, std::nullopt);
-    trianglePlanes.m_data = nullptr;
-    trianglePlanes.m_size = 0;
-    trianglePlanes.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    trianglePlanes_t trianglePlanes;
     if (numTriangles != 0) {
         // EXE-INLINED none: hkArray<SortedTriangle, hkContainerTempAllocator>::reserve
         hkMemoryAllocator& sortedTemp = hkMemoryRouter::getInstance().temp();
@@ -4808,10 +4445,7 @@ void hkgpConvexHullImpl::buildIndices() {
         case 3: {
             // The SDK's hkArray<Edge, hkContainerTempAllocator>: the edges still to cross while flooding a plane.
             using edges_t = hkArray<Edge, hkContainerTempAllocator>;
-            XFNV_INLINED_LOCAL(edges_t, edges, std::nullopt, std::nullopt);
-            edges.m_data = nullptr;
-            edges.m_size = 0;
-            edges.m_capacityAndFlags = hkArrayBase<Edge>::DONT_DEALLOCATE_FLAG;
+            edges_t edges;
             for (int32_t i = 0; i < sorted.m_size; ++i) {
                 Triangle* seed = sorted.m_data[i].m_data;
                 if (seed->m_plane.m_index != -1) {
@@ -4885,12 +4519,6 @@ void hkgpConvexHullImpl::buildIndices() {
                         edges.m_size++;
                     }
                 }
-            }
-            // EXE-INLINED none: hkArray<Edge, hkContainerTempAllocator>::~hkArray
-            hkMemoryAllocator& edgesTemp = hkMemoryRouter::getInstance().temp();
-            edges.m_size = 0;
-            if (edges.m_capacityAndFlags >= 0) {
-                edgesTemp.bufFree(edges.m_data, static_cast<int32_t>(sizeof(Edge)) * edges.getCapacity());
             }
             break;
         }
@@ -5055,24 +4683,6 @@ void hkgpConvexHullImpl::buildIndices() {
         m_planes.optimizeCapacity(0, 1);
     }
     m_hasIndexing = true;
-    // EXE-INLINED none: hkArray<hkVector4, hkContainerTempAllocator>::clearAndDeallocate
-    hkMemoryAllocator& planesTemp = hkMemoryRouter::getInstance().temp();
-    trianglePlanes.m_size = 0;
-    if (trianglePlanes.m_capacityAndFlags >= 0) {
-        planesTemp.bufFree(
-            trianglePlanes.m_data, static_cast<int32_t>(sizeof(hkVector4)) * trianglePlanes.getCapacity()
-        );
-    }
-    trianglePlanes.m_data = nullptr;
-    trianglePlanes.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    map.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-    map.destructOperations();
-    // EXE-INLINED none: hkArray<SortedTriangle, hkContainerTempAllocator>::~hkArray
-    hkMemoryAllocator& sortedTemp = hkMemoryRouter::getInstance().temp();
-    sorted.m_size = 0;
-    if (sorted.m_capacityAndFlags >= 0) {
-        sortedTemp.bufFree(sorted.m_data, static_cast<int32_t>(sizeof(SortedTriangle)) * sorted.getCapacity());
-    }
 }
 
 // Appends the bevel planes of a 3D hull: for each edge between two triangles on different planes of m_planes whose
@@ -5282,16 +4892,9 @@ hkgpConvexHullImpl::splitByPlane(const hkVector4& plane, hkgpConvexHull** pos, h
         if (!iNumAbove) {
             return hkgpConvexHull::NEGATIVE;
         }
-        // EXE-INLINED none: hkArray<hkVector4>::hkArray
         // The exe's below array is 16-aligned ([esp+0x40]), its above array not ([esp+0x4C]).
-        alignas(16) XFNV_INLINED_LOCAL(PointArray, belowPoints, std::nullopt, std::nullopt);
-        belowPoints.m_data = nullptr;
-        belowPoints.m_size = 0;
-        belowPoints.m_capacityAndFlags = PointArray::DONT_DEALLOCATE_FLAG;
-        XFNV_INLINED_LOCAL(PointArray, abovePoints, std::nullopt, std::nullopt);
-        abovePoints.m_data = nullptr;
-        abovePoints.m_size = 0;
-        abovePoints.m_capacityAndFlags = PointArray::DONT_DEALLOCATE_FLAG;
+        alignas(16) PointArray belowPoints;
+        PointArray abovePoints;
         Vertex* pPrev = m_mesh.m_vertices.m_used;
         if (pPrev) {
             while (pPrev->m_next) {
@@ -5372,23 +4975,6 @@ hkgpConvexHullImpl::splitByPlane(const hkVector4& plane, hkgpConvexHull** pos, h
                 *pos = nullptr;
             }
         }
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        abovePoints.m_size = 0;
-        if (abovePoints.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                abovePoints.m_data,
-                static_cast<int32_t>(sizeof(hkVector4)) * (abovePoints.m_capacityAndFlags & PointArray::CAPACITY_MASK)
-            );
-        }
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        belowPoints.m_size = 0;
-        if (belowPoints.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                belowPoints.m_data,
-                static_cast<int32_t>(sizeof(hkVector4)) * (belowPoints.m_capacityAndFlags & PointArray::CAPACITY_MASK)
-            );
-        }
         return hkgpConvexHull::CROSSING;
     }
     if (m_dimensions == 3) {
@@ -5403,16 +4989,9 @@ hkgpConvexHullImpl::splitByPlane(const hkVector4& plane, hkgpConvexHull** pos, h
             }
             return static_cast<hkgpConvexHull::Side>(aiCounts[0] != 0);
         }
-        // EXE-INLINED none: hkArray<hkVector4>::hkArray
         // Both 16-aligned as the exe's slots ([esp+0x20], [esp+0x10]).
-        alignas(16) XFNV_INLINED_LOCAL(PointArray, abovePoints, std::nullopt, std::nullopt);
-        abovePoints.m_data = nullptr;
-        abovePoints.m_size = 0;
-        abovePoints.m_capacityAndFlags = PointArray::DONT_DEALLOCATE_FLAG;
-        alignas(16) XFNV_INLINED_LOCAL(PointArray, belowPoints, std::nullopt, std::nullopt);
-        belowPoints.m_data = nullptr;
-        belowPoints.m_size = 0;
-        belowPoints.m_capacityAndFlags = PointArray::DONT_DEALLOCATE_FLAG;
+        alignas(16) PointArray abovePoints;
+        alignas(16) PointArray belowPoints;
         const float fMin = afRange[0];
         const float fMax = afRange[1];
         const float fWidth = fMax - fMin;
@@ -5536,47 +5115,11 @@ hkgpConvexHullImpl::splitByPlane(const hkVector4& plane, hkgpConvexHull** pos, h
                 }
                 *neg = nullptr;
             }
-            // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-            pHeap = hkMemoryRouter::getInstance().m_heap;
-            belowPoints.m_size = 0;
-            if (belowPoints.m_capacityAndFlags >= 0) {
-                pHeap->bufFree(
-                    belowPoints.m_data,
-                    static_cast<int32_t>(sizeof(hkVector4)) *
-                        (belowPoints.m_capacityAndFlags & PointArray::CAPACITY_MASK)
-                );
-            }
-            pHeap = hkMemoryRouter::getInstance().m_heap;
-            abovePoints.m_size = 0;
-            if (abovePoints.m_capacityAndFlags >= 0) {
-                pHeap->bufFree(
-                    abovePoints.m_data,
-                    static_cast<int32_t>(sizeof(hkVector4)) *
-                        (abovePoints.m_capacityAndFlags & PointArray::CAPACITY_MASK)
-                );
-            }
             return hkgpConvexHull::CROSSING;
         }
         // One side: that of the range's middle.
         const hkgpConvexHull::Side side =
             (static_cast<double>(fMax) + fMin) * 0.5 >= 0.0 ? hkgpConvexHull::POSITIVE : hkgpConvexHull::NEGATIVE;
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        belowPoints.m_size = 0;
-        if ((belowPoints.m_capacityAndFlags & PointArray::DONT_DEALLOCATE_FLAG) == 0) {
-            pHeap->bufFree(
-                belowPoints.m_data,
-                static_cast<int32_t>(sizeof(hkVector4)) * (belowPoints.m_capacityAndFlags & PointArray::CAPACITY_MASK)
-            );
-        }
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        abovePoints.m_size = 0;
-        if ((abovePoints.m_capacityAndFlags & PointArray::DONT_DEALLOCATE_FLAG) == 0) {
-            pHeap->bufFree(
-                abovePoints.m_data,
-                static_cast<int32_t>(sizeof(hkVector4)) * (abovePoints.m_capacityAndFlags & PointArray::CAPACITY_MASK)
-            );
-        }
         return side;
     }
     alignas(16) char acBuffer[512];
@@ -5599,7 +5142,7 @@ hkgpConvexHullImpl::splitByPlane(const hkVector4& plane, hkgpConvexHull** pos, h
 hkgpConvexHullImpl* hkgpConvexHullImpl::clone() const {
     // Keys and values are untyped pointer-sized words (hkUlong), so vertices and edge uids go in and out through
     // reinterpret_cast.
-    using PointerMap = hkMapBase<hkUlong, hkUlong, hkMapOperations<hkUlong>>;
+    using PointerMap = hkMap<hkUlong, hkUlong>;
     void* pMemory = hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(hkgpConvexHullImpl));
     hkgpConvexHullImpl* pClone = pMemory ? ::new (pMemory) hkgpConvexHullImpl : nullptr;
     pClone->m_config = m_config;
@@ -5672,15 +5215,10 @@ hkgpConvexHullImpl* hkgpConvexHullImpl::clone() const {
     for (int32_t i = 0; i < m_planes.m_size; ++i) {
         pClone->m_planes.m_data[i] = m_planes.m_data[i];
     }
-    XFNV_INLINED_LOCAL(PointerMap, vertexMap, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkMap<hkUlong, hkUlong, hkMapOperations<hkUlong>, hkContainerHeapAllocator>::hkMap
-    vertexMap.m_elem = nullptr;
-    vertexMap.m_numElems = 0;
-    vertexMap.m_hashMod = -1;
-    vertexMap.reserve(hkMemoryRouter::getInstance().heap(), 0);
+    PointerMap vertexMap;
     const int32_t numVertices = m_mesh.m_vertices.m_numUsed;
     if (numVertices) {
-        vertexMap.reserve(hkMemoryRouter::getInstance().heap(), numVertices);
+        vertexMap.reserve(numVertices);
         Vertex* v = m_mesh.m_vertices.m_used;
         if (v) {
             while (v->m_next) {
@@ -5695,14 +5233,9 @@ hkgpConvexHullImpl* hkgpConvexHullImpl::clone() const {
         }
     }
     if (m_mesh.m_triangles.m_numUsed) {
-        XFNV_INLINED_LOCAL(PointerMap, edgeMap, std::nullopt, std::nullopt);
-        // EXE-INLINED none: hkMap<hkUlong, hkUlong, hkMapOperations<hkUlong>, hkContainerHeapAllocator>::hkMap
-        edgeMap.m_elem = nullptr;
-        edgeMap.m_numElems = 0;
-        edgeMap.m_hashMod = -1;
-        edgeMap.reserve(hkMemoryRouter::getInstance().heap(), 0);
+        PointerMap edgeMap;
         const int32_t numTriangles = m_mesh.m_triangles.m_numUsed;
-        edgeMap.reserve(hkMemoryRouter::getInstance().heap(), numTriangles);
+        edgeMap.reserve(numTriangles);
         Triangle* t = m_mesh.m_triangles.m_used;
         if (t) {
             while (t->m_next) {
@@ -5736,9 +5269,7 @@ hkgpConvexHullImpl* hkgpConvexHullImpl::clone() const {
                 }
             }
         }
-        edgeMap.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
     }
-    vertexMap.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
     return pClone;
 }
 
@@ -5763,11 +5294,7 @@ void hkgpConvexHullImpl::generateVertexAdjacencyGraph(
         }
     }
     const int32_t numVertices = m_mesh.m_vertices.m_numUsed;
-    XFNV_INLINED_LOCAL(adjacency_t, adjacency, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkArray<int, hkContainerHeapAllocator>, hkContainerHeapAllocator>::hkArray
-    adjacency.m_data = nullptr;
-    adjacency.m_size = 0;
-    adjacency.m_capacityAndFlags = hkArrayBase<vertexEdges_t>::DONT_DEALLOCATE_FLAG;
+    adjacency_t adjacency;
     {
         // EXE-INLINED none: hkArray<hkArray<int, hkContainerHeapAllocator>, hkContainerHeapAllocator>::setSize
         hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
@@ -5867,23 +5394,6 @@ void hkgpConvexHullImpl::generateVertexAdjacencyGraph(
         }
         vertexOffsets.m_data[i] = offset;
         offset += adjacency.m_data[i].m_size + 1;
-    }
-    // EXE-INLINED none: hkArray<hkArray<int, hkContainerHeapAllocator>, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    vertexEdges_t* pElement = adjacency.m_data;
-    for (int32_t n = adjacency.m_size; n > 0; --n, ++pElement) {
-        // EXE-INLINED none: hkArray<int, hkContainerHeapAllocator>::~hkArray
-        hkMemoryAllocator& elementHeap = hkMemoryRouter::getInstance().heap();
-        pElement->m_size = 0;
-        if (pElement->m_capacityAndFlags >= 0) {
-            elementHeap.bufFree(pElement->m_data, static_cast<int32_t>(sizeof(int32_t)) * pElement->getCapacity());
-        }
-        pElement->m_data = nullptr;
-        pElement->m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-    }
-    adjacency.m_size = 0;
-    if (adjacency.m_capacityAndFlags >= 0) {
-        heap.bufFree(adjacency.m_data, static_cast<int32_t>(sizeof(vertexEdges_t)) * adjacency.getCapacity());
     }
 }
 
@@ -6057,16 +5567,13 @@ double hkgpConvexHullImpl::maxDistanceToTransformedPlanes(
 // The support cache is built where empty, both times it is looked up.
 double hkgpConvexHullImpl::getSpan(const hkVector4& direction, float* apMin, float* apMax) const {
     using apArray__t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(apArray__t, apArray_, std::nullopt, std::nullopt);
     hkVector4 direction_;
     hkVector4 vertexOut;
     hkVector4 vertexOut_;
     direction_.m_quad = _mm_xor_ps(direction.m_quad, hkQuadRealNegateMask);
     if (!m_supportCache.m_size) {
         int32_t m_numUsed = m_mesh.m_vertices.m_numUsed;
-        apArray_.m_data = nullptr;
-        apArray_.m_size = 0;
-        apArray_.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+        apArray__t apArray_;
         hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
         int32_t m_numUsed_1 = m_numUsed;
         if (m_numUsed > 0) {
@@ -6082,47 +5589,29 @@ double hkgpConvexHullImpl::getSpan(const hkVector4& direction, float* apMin, flo
             m_used = m_used->m_next;
         }
         hkGeometryProcessing::buildTransposedArray(apArray_, m_supportCache);
-        hkMemoryAllocator* m_heap_1 = (&hkMemoryRouter::getInstance())->m_heap;
-        apArray_.m_size = 0;
-        if (apArray_.m_capacityAndFlags >= 0) {
-            m_heap_1->bufFree(
-                apArray_.begin(),
-                sizeof(hkVector4) * (apArray_.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-            );
-        }
     }
     hkArray<hkGeometryProcessing::TransposedVectors, hkContainerHeapAllocator>* vertices = &m_supportCache;
     hkGeometryProcessing::getSupportingVertex(m_supportCache, direction, vertexOut);
     if (!m_supportCache.m_size) {
         int32_t m_numUsed_2 = m_mesh.m_vertices.m_numUsed;
-        apArray_.m_data = nullptr;
-        apArray_.m_size = 0;
-        apArray_.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+        apArray__t apArray_2;
         hkMemoryAllocator* m_heap_2 = (&hkMemoryRouter::getInstance())->m_heap;
-        int32_t m_size = apArray_.m_size;
-        int32_t aiReqElem = m_numUsed_2 + apArray_.m_size;
+        int32_t m_size = apArray_2.m_size;
+        int32_t aiReqElem = m_numUsed_2 + apArray_2.m_size;
         // The capacity compare is signed, so a negative count reserves nothing.
-        if (apArray_.getCapacity() < m_numUsed_2 + apArray_.m_size) {
-            if (aiReqElem < 2 * apArray_.getCapacity()) {
-                aiReqElem = 2 * apArray_.getCapacity();
+        if (apArray_2.getCapacity() < m_numUsed_2 + apArray_2.m_size) {
+            if (aiReqElem < 2 * apArray_2.getCapacity()) {
+                aiReqElem = 2 * apArray_2.getCapacity();
             }
-            hkArrayUtil::_reserve(*m_heap_2, &apArray_, aiReqElem, sizeof(hkVector4));
+            hkArrayUtil::_reserve(*m_heap_2, &apArray_2, aiReqElem, sizeof(hkVector4));
         }
         hkgpConvexHullImpl::Vertex* m_next = m_mesh.m_vertices.m_used;
-        apArray_.m_size += m_numUsed_2;
-        for (hkVector4* j = &apArray_.m_data[m_size]; m_next; ++j) {
+        apArray_2.m_size += m_numUsed_2;
+        for (hkVector4* j = &apArray_2.m_data[m_size]; m_next; ++j) {
             *j = m_next->m_source;
             m_next = m_next->m_next;
         }
-        hkGeometryProcessing::buildTransposedArray(apArray_, *vertices);
-        hkMemoryAllocator* m_heap_3 = (&hkMemoryRouter::getInstance())->m_heap;
-        apArray_.m_size = 0;
-        if (apArray_.m_capacityAndFlags >= 0) {
-            m_heap_3->bufFree(
-                apArray_.begin(),
-                sizeof(hkVector4) * (apArray_.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-            );
-        }
+        hkGeometryProcessing::buildTransposedArray(apArray_2, *vertices);
     }
     hkGeometryProcessing::getSupportingVertex(*vertices, direction_, vertexOut_);
     // Each dot is summed as (y + x) + z in the low lane, and the difference is rounded to a float.
@@ -6156,11 +5645,8 @@ double hkgpConvexHullImpl::getEdgeLengthSum() {
         }
         case 2: {
             using VectorArray = hkArray<hkVector4, hkContainerHeapAllocator>;
-            XFNV_INLINED_LOCAL(VectorArray, positions, std::nullopt, std::nullopt);
             const int32_t iNumVertices = m_mesh.m_vertices.m_numUsed;
-            positions.m_data = nullptr;
-            positions.m_size = 0;
-            positions.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG);
+            VectorArray positions;
             // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::expandBy
             hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
             const int32_t iOldSize = positions.m_size;
@@ -6177,17 +5663,6 @@ double hkgpConvexHullImpl::getEdgeLengthSum() {
             }
             for (int32_t i = 0, iPrevious = positions.m_size - 1; i < positions.m_size; iPrevious = i++) {
                 fSum = length(positions.m_data[iPrevious].m_quad, positions.m_data[i].m_quad) + fSum;
-            }
-            // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::~hkArray
-            hkMemoryAllocator* pFreeHeap = hkMemoryRouter::getInstance().m_heap;
-            positions.m_size = 0;
-            if (positions.m_capacityAndFlags >= 0) {
-                pFreeHeap->bufFree(
-                    positions.m_data,
-                    static_cast<int32_t>(
-                        (positions.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4)
-                    )
-                );
             }
             return fSum;
         }
@@ -6257,11 +5732,8 @@ void hkgpConvexHullImpl::ensureContainment(const hkArray<hkVector4, hkContainerH
         return;
     }
     using VectorArray = hkArray<hkVector4, hkContainerHeapAllocator>;
-    alignas(16) XFNV_INLINED_LOCAL(VectorArray, vertices, std::nullopt, std::nullopt);
     const int32_t iNumVertices = m_mesh.m_vertices.m_numUsed;
-    vertices.m_data = nullptr;
-    vertices.m_size = 0;
-    vertices.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG);
+    alignas(16) VectorArray vertices;
     // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::expandBy
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     const int32_t iOldSize = vertices.m_size;
@@ -6295,17 +5767,6 @@ void hkgpConvexHullImpl::ensureContainment(const hkArray<hkVector4, hkContainerH
     }
     if (bHadMassProperties) {
         buildMassProperties();
-    }
-    // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator* pFreeHeap = hkMemoryRouter::getInstance().m_heap;
-    vertices.m_size = 0;
-    if (vertices.m_capacityAndFlags >= 0) {
-        pFreeHeap->bufFree(
-            vertices.m_data,
-            static_cast<int32_t>(
-                (vertices.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4)
-            )
-        );
     }
 }
 
@@ -6536,16 +5997,8 @@ bool hkgpConvexHullImpl::decimateVertices(int32_t numVerticesToKeep, bool contai
     const hkBool hadMassProperties = m_hasMassProperties;
     using SourceArray = hkArray<hkVector4, hkContainerHeapAllocator>;
     using EdgeArray = hkArray<SortedEdge, hkContainerHeapAllocator>;
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    XFNV_INLINED_LOCAL(SourceArray, sources, std::nullopt, std::nullopt);
-    sources.m_data = nullptr;
-    sources.m_size = 0;
-    sources.m_capacityAndFlags = SourceArray::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<SortedEdge>::hkArray
-    XFNV_INLINED_LOCAL(EdgeArray, edges, std::nullopt, std::nullopt);
-    edges.m_data = nullptr;
-    edges.m_size = 0;
-    edges.m_capacityAndFlags = EdgeArray::DONT_DEALLOCATE_FLAG;
+    SourceArray sources;
+    EdgeArray edges;
     if (m_dimensions != 3) {
         alignas(16) char acBuffer[512];
         alignas(16) hkErrStream kStream(acBuffer, 512);
@@ -6787,10 +6240,7 @@ bool hkgpConvexHullImpl::decimateVertices(int32_t numVerticesToKeep, bool contai
         }
         // The hull again, from the remaining vertices.
         const int32_t iNumVertices = m_mesh.m_vertices.m_numUsed;
-        alignas(16) XFNV_INLINED_LOCAL(SourceArray, points, std::nullopt, std::nullopt);
-        points.m_data = nullptr;
-        points.m_size = 0;
-        points.m_capacityAndFlags = SourceArray::DONT_DEALLOCATE_FLAG;
+        alignas(16) SourceArray points;
         // EXE-INLINED none: hkArray<hkVector4>::expandBy
         hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
         const int32_t iOldSize = points.m_size;
@@ -6809,41 +6259,7 @@ bool hkgpConvexHullImpl::decimateVertices(int32_t numVerticesToKeep, bool contai
             pPoint++;
         }
         if (build(points.m_data, points.m_size, 0, nullptr) == -1) {
-            // EXE-INLINED none: hkArray::~hkArray
-            pHeap = hkMemoryRouter::getInstance().m_heap;
-            points.m_size = 0;
-            if ((points.m_capacityAndFlags & SourceArray::DONT_DEALLOCATE_FLAG) == 0) {
-                pHeap->bufFree(
-                    points.m_data,
-                    static_cast<int32_t>(sizeof(hkVector4)) * (points.m_capacityAndFlags & SourceArray::CAPACITY_MASK)
-                );
-            }
-            pHeap = hkMemoryRouter::getInstance().m_heap;
-            edges.m_size = 0;
-            if ((edges.m_capacityAndFlags & EdgeArray::DONT_DEALLOCATE_FLAG) == 0) {
-                pHeap->bufFree(
-                    edges.m_data,
-                    static_cast<int32_t>(sizeof(SortedEdge)) * (edges.m_capacityAndFlags & EdgeArray::CAPACITY_MASK)
-                );
-            }
-            pHeap = hkMemoryRouter::getInstance().m_heap;
-            sources.m_size = 0;
-            if ((sources.m_capacityAndFlags & SourceArray::DONT_DEALLOCATE_FLAG) == 0) {
-                pHeap->bufFree(
-                    sources.m_data,
-                    static_cast<int32_t>(sizeof(hkVector4)) * (sources.m_capacityAndFlags & SourceArray::CAPACITY_MASK)
-                );
-            }
             return false;
-        }
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        points.m_size = 0;
-        if (points.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                points.m_data,
-                static_cast<int32_t>(sizeof(hkVector4)) * (points.m_capacityAndFlags & SourceArray::CAPACITY_MASK)
-            );
         }
     }
     if (containment) {
@@ -6854,23 +6270,6 @@ bool hkgpConvexHullImpl::decimateVertices(int32_t numVerticesToKeep, bool contai
     }
     if (hadMassProperties.m_bool) {
         buildMassProperties();
-    }
-    // EXE-INLINED none: hkArray::~hkArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    edges.m_size = 0;
-    if (edges.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            edges.m_data,
-            static_cast<int32_t>(sizeof(SortedEdge)) * (edges.m_capacityAndFlags & EdgeArray::CAPACITY_MASK)
-        );
-    }
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    sources.m_size = 0;
-    if (sources.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            sources.m_data,
-            static_cast<int32_t>(sizeof(hkVector4)) * (sources.m_capacityAndFlags & SourceArray::CAPACITY_MASK)
-        );
     }
     return true;
 }

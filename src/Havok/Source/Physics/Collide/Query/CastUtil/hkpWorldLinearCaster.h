@@ -16,6 +16,12 @@ class hkpLinearCastInput;
 // Sweeps a collidable against broadphase candidates and dispatches narrowphase casts.
 class hkpWorldLinearCaster : public hkpBroadPhaseCastCollector {
 public:
+    // Initialises m_shapeInput's members here, since hkpLinearCastCollisionInput has no constructor.
+    hkpWorldLinearCaster() {
+        m_shapeInput.m_maxExtraPenetration = 1.1920929e-07f;
+        m_shapeInput.m_weldClosestPoints.m_storage = 0;
+    }
+
     ~hkpWorldLinearCaster() override;
 
     float addBroadPhaseHandle(const hkpBroadPhaseHandle* broadPhaseHandle, int32_t castIndex) override;

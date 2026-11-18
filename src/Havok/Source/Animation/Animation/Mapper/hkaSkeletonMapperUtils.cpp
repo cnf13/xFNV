@@ -112,8 +112,7 @@ void hkaSkeletonMapperUtils::ExtractedMotionParams::getPoseMinMax(
 
 // For a ragdoll mapping, mapOut = inverse(a) * b; for a retargeting mapping, the scale is the ratio of the bones'
 // lengths (defaultScale when either is within tolerance), the rotation b * a^-1 and the translation b - scale * a. Each
-// warning goes through one hkErrStream local over a 512-byte buffer, built and torn down around each message as the
-// game does.
+// warning goes through its own hkErrStream over a shared 512-byte buffer.
 void hkaSkeletonMapperUtils::computeMappingTransform(
     hkaSkeletonMapperData::MappingType type,
     const hkQsTransform& a,
@@ -122,7 +121,6 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
     float tolerance,
     float defaultScale
 ) {
-    alignas(16) XFNV_INLINED_LOCAL(hkErrStream, kErrStream, std::nullopt, std::nullopt);
     alignas(16) char buf[512];
     if (type == hkaSkeletonMapperData::HK_RAGDOLL_MAPPING) {
         hkQuaternion v6;
@@ -182,13 +180,12 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
     }
     else if (type == hkaSkeletonMapperData::HK_RETARGETING_MAPPING) {
         if (tolerance < 0.0f) {
-            ::new (&kErrStream) hkErrStream(buf, 512);
+            alignas(16) hkErrStream kErrStream(buf, 512);
             kErrStream.operator<<("Tolerance must be positive");
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA39C3u), buf,
                 ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 846
             );
-            kErrStream.~hkErrStream();
         }
         __m128 lengthSqA = _mm_mul_ps(a.m_translation.m_quad, a.m_translation.m_quad);
         const float fLengthA = _mm_cvtss_f32(_mm_sqrt_ss(_mm_add_ss(
@@ -205,14 +202,13 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
         float fScale;
         if (bZeroA || bZeroB) {
             if (bZeroA != bZeroB) {
-                ::new (&kErrStream) hkErrStream(buf, 512);
+                alignas(16) hkErrStream kErrStream(buf, 512);
                 kErrStream.operator<<("Attempt to map a zero length bone to a non-zero length bone.  This may result "
                                       "in poor accuracy.");
                 hkError::s_instance->message(
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA2B94u), buf,
                     ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 860
                 );
-                kErrStream.~hkErrStream();
             }
             fScale = defaultScale;
         }
@@ -229,22 +225,20 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
         );
     }
     else {
-        ::new (&kErrStream) hkErrStream(buf, 512);
+        alignas(16) hkErrStream kErrStream(buf, 512);
         kErrStream.operator<<("Unsupported mapping type");
         hkError::s_instance->message(
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBAEF91u), buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp",
             876
         );
-        kErrStream.~hkErrStream();
     }
     if (!mapOut.isOk().m_bool) {
-        ::new (&kErrStream) hkErrStream(buf, 512);
+        alignas(16) hkErrStream kErrStream(buf, 512);
         kErrStream.operator<<("Mapping is invalid");
         hkError::s_instance->message(
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA10FCu), buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp",
             881
         );
-        kErrStream.~hkErrStream();
     }
 }
 
@@ -255,7 +249,6 @@ void hkaSkeletonMapperUtils::createMapping(
     hkaSkeletonMapperData& originalAToB,
     hkaSkeletonMapperData& originalBToA
 ) {
-    XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
     char buf[512];
     hkError::s_instance->sectionBegin(0x54E4323E, "hkaSkeletonMapperUtils::createMapping");
     hkaSkeletonMapperUtils::Params params(originalParams);
@@ -309,38 +302,13 @@ void hkaSkeletonMapperUtils::createMapping(
     {
         const int32_t numBonesA = params.m_skeletonA->m_bones.m_size;
         const int32_t numBonesB = params.m_skeletonB->m_bones.m_size;
-        // The stack allocator's bytes are untyped memory; each local array keeps its elements there.
-        XFNV_INLINED_LOCAL(hkLocalArray<hkQsTransform>, modelPoseA, std::nullopt, std::nullopt);
-        {
-            // EXE-INLINED none: hkLocalArray<hkQsTransform>::hkLocalArray(numBonesA) (hkAllocateStack)
-            modelPoseA.m_data = nullptr;
-            modelPoseA.m_size = 0;
-            modelPoseA.m_capacityAndFlags = hkArrayBase<hkQsTransform>::DONT_DEALLOCATE_FLAG;
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            char* pBlock = stack.m_next.m_storage;
-            stack.m_next.m_storage = pBlock + ((numBonesA * static_cast<int32_t>(sizeof(hkQsTransform)) + 127) & ~127);
-            modelPoseA.m_data = reinterpret_cast<hkQsTransform*>(pBlock);
-            modelPoseA.m_capacityAndFlags = numBonesA | hkArrayBase<hkQsTransform>::DONT_DEALLOCATE_FLAG;
-            modelPoseA.m_localMemory = modelPoseA.m_data;
-        }
+        hkLocalArray<hkQsTransform> modelPoseA(numBonesA);
         modelPoseA.setSizeUnchecked(numBonesA);
         hkaSkeletonUtils::transformLocalPoseToModelPose(
             numBonesA, params.m_skeletonA->m_parentIndices.m_data, params.m_skeletonA->m_referencePose.m_data,
             modelPoseA.m_data
         );
-        XFNV_INLINED_LOCAL(hkLocalArray<hkQsTransform>, modelPoseB, std::nullopt, std::nullopt);
-        {
-            // EXE-INLINED none: hkLocalArray<hkQsTransform>::hkLocalArray(numBonesB) (hkAllocateStack)
-            modelPoseB.m_data = nullptr;
-            modelPoseB.m_size = 0;
-            modelPoseB.m_capacityAndFlags = hkArrayBase<hkQsTransform>::DONT_DEALLOCATE_FLAG;
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            char* pBlock = stack.m_next.m_storage;
-            stack.m_next.m_storage = pBlock + ((numBonesB * static_cast<int32_t>(sizeof(hkQsTransform)) + 127) & ~127);
-            modelPoseB.m_data = reinterpret_cast<hkQsTransform*>(pBlock);
-            modelPoseB.m_capacityAndFlags = numBonesB | hkArrayBase<hkQsTransform>::DONT_DEALLOCATE_FLAG;
-            modelPoseB.m_localMemory = modelPoseB.m_data;
-        }
+        hkLocalArray<hkQsTransform> modelPoseB(numBonesB);
         modelPoseB.setSizeUnchecked(numBonesB);
         hkaSkeletonUtils::transformLocalPoseToModelPose(
             numBonesB, params.m_skeletonB->m_parentIndices.m_data, params.m_skeletonB->m_referencePose.m_data,
@@ -356,19 +324,7 @@ void hkaSkeletonMapperUtils::createMapping(
             ? params.m_skeletonB->m_referencePose.m_data
             : modelPoseB.m_data;
         // Per bone, the bone of the other skeleton it is mapped to: -1 unmapped, -2 inside a chain.
-        XFNV_INLINED_LOCAL(hkLocalArray<int16_t>, bonesAMapped, std::nullopt, std::nullopt);
-        {
-            // EXE-INLINED none: hkLocalArray<hkInt16>::hkLocalArray(numBonesA) (hkAllocateStack)
-            bonesAMapped.m_data = nullptr;
-            bonesAMapped.m_size = 0;
-            bonesAMapped.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            char* pBlock = stack.m_next.m_storage;
-            stack.m_next.m_storage = pBlock + ((numBonesA * static_cast<int32_t>(sizeof(int16_t)) + 127) & ~127);
-            bonesAMapped.m_data = reinterpret_cast<int16_t*>(pBlock);
-            bonesAMapped.m_capacityAndFlags = numBonesA | hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
-            bonesAMapped.m_localMemory = bonesAMapped.m_data;
-        }
+        hkLocalArray<int16_t> bonesAMapped(numBonesA);
         {
             // EXE-INLINED none: hkArray<hkInt16>::setSize(numBonesA, -1)
             hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&bonesAMapped);
@@ -378,19 +334,7 @@ void hkaSkeletonMapperUtils::createMapping(
             }
             bonesAMapped.m_size = numBonesA;
         }
-        XFNV_INLINED_LOCAL(hkLocalArray<int16_t>, bonesBMapped, std::nullopt, std::nullopt);
-        {
-            // EXE-INLINED none: hkLocalArray<hkInt16>::hkLocalArray(numBonesB) (hkAllocateStack)
-            bonesBMapped.m_data = nullptr;
-            bonesBMapped.m_size = 0;
-            bonesBMapped.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            char* pBlock = stack.m_next.m_storage;
-            stack.m_next.m_storage = pBlock + ((numBonesB * static_cast<int32_t>(sizeof(int16_t)) + 127) & ~127);
-            bonesBMapped.m_data = reinterpret_cast<int16_t*>(pBlock);
-            bonesBMapped.m_capacityAndFlags = numBonesB | hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
-            bonesBMapped.m_localMemory = bonesBMapped.m_data;
-        }
+        hkLocalArray<int16_t> bonesBMapped(numBonesB);
         {
             // EXE-INLINED none: hkArray<hkInt16>::setSize(numBonesB, -1)
             hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&bonesBMapped);
@@ -452,13 +396,12 @@ void hkaSkeletonMapperUtils::createMapping(
             const int16_t boneB =
                 hkaSkeletonUtils::findBoneWithName(*params.m_skeletonB, kUser.m_boneOut, params.m_compareNames);
             if (boneA == -1 || boneB == -1) {
-                ::new (&kStream) hkErrStream(buf, 512);
+                hkErrStream kStream(buf, 512);
                 kStream << "Couldn't find bones for mapping (" << kUser.m_boneIn << " - " << kUser.m_boneOut << ")";
                 hkError::s_instance->message(
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C64u), buf,
                     ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 127
                 );
-                kStream.~hkErrStream();
                 continue;
             }
             hkaSkeletonMapperData::SimpleMapping kMapping;
@@ -500,13 +443,12 @@ void hkaSkeletonMapperUtils::createMapping(
             const int16_t boneA =
                 hkaSkeletonUtils::findBoneWithName(*params.m_skeletonA, kUser.m_boneOut, params.m_compareNames);
             if (boneB == -1 || boneA == -1) {
-                ::new (&kStream) hkErrStream(buf, 512);
+                hkErrStream kStream(buf, 512);
                 kStream << "Couldn't find bones for mapping (" << kUser.m_boneIn << " - " << kUser.m_boneOut << ")";
                 hkError::s_instance->message(
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C64u), buf,
                     ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 158
                 );
-                kStream.~hkErrStream();
                 continue;
             }
             hkaSkeletonMapperData::SimpleMapping kMapping;
@@ -552,105 +494,92 @@ void hkaSkeletonMapperUtils::createMapping(
                 const int16_t endB =
                     hkaSkeletonUtils::findBoneWithName(*params.m_skeletonB, kChainB.m_end, params.m_compareNames);
                 if (startA < 0 || endA < 0) {
-                    ::new (&kStream) hkErrStream(buf, 512);
+                    hkErrStream kStream(buf, 512);
                     kStream << "Couldn't make a chain (" << kChainA.m_start << " - " << kChainA.m_end
                             << "). Start or end bone not found.";
                     hkError::s_instance->message(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBAA938u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 325
                     );
-                    kStream.~hkErrStream();
                     continue;
                 }
                 if (startB < 0 || endB < 0) {
-                    ::new (&kStream) hkErrStream(buf, 512);
+                    hkErrStream kStream(buf, 512);
                     kStream << "Couldn't make a chain (" << kChainB.m_start << " - " << kChainB.m_end
                             << "). Start or end bone not found.";
                     hkError::s_instance->message(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBAA938u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 331
                     );
-                    kStream.~hkErrStream();
                     continue;
                 }
-                XFNV_INLINED_LOCAL(hkArray<int16_t>, chainA, std::nullopt, std::nullopt);
-                chainA.m_data = nullptr;
-                chainA.m_size = 0;
-                chainA.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
-                XFNV_INLINED_LOCAL(hkArray<int16_t>, chainB, std::nullopt, std::nullopt);
-                chainB.m_data = nullptr;
-                chainB.m_size = 0;
-                chainB.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
+                hkArray<int16_t> chainA;
+                hkArray<int16_t> chainB;
                 hkBool foundA = hkaSkeletonUtils::getBoneChain(*params.m_skeletonA, startA, endA, chainA);
                 hkBool foundB = hkaSkeletonUtils::getBoneChain(*params.m_skeletonB, startB, endB, chainB);
                 if (!foundA.m_bool) {
-                    ::new (&kStream) hkErrStream(buf, 512);
+                    hkErrStream kStream(buf, 512);
                     kStream << "Couldn't make a chain (" << kChainA.m_start << " - " << kChainA.m_end << ")";
                     hkError::s_instance->message(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C63u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 343
                     );
-                    kStream.~hkErrStream();
                 }
                 else if (!foundB.m_bool) {
-                    ::new (&kStream) hkErrStream(buf, 512);
+                    hkErrStream kStream(buf, 512);
                     kStream << "Couldn't make a chain (" << kChainB.m_start << " - " << kChainB.m_end << ")";
                     hkError::s_instance->message(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C63u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 349
                     );
-                    kStream.~hkErrStream();
                 }
                 else if (chainA.m_size < 2) {
-                    ::new (&kStream) hkErrStream(buf, 512);
+                    hkErrStream kStream(buf, 512);
                     kStream << "Couldn't make a chain (" << kChainA.m_start << " - " << kChainA.m_end << ")";
                     hkError::s_instance->message(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1D64u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 359
                     );
-                    kStream.~hkErrStream();
                 }
                 else if (chainB.m_size < 2) {
-                    ::new (&kStream) hkErrStream(buf, 512);
+                    hkErrStream kStream(buf, 512);
                     kStream << "Couldn't make a chain (" << kChainB.m_start << " - " << kChainB.m_end << ")";
                     hkError::s_instance->message(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1D64u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 366
                     );
-                    kStream.~hkErrStream();
                 }
                 else {
                     for (int32_t i = 0; i < chainA.m_size; ++i) {
                         if (bonesAMapped.m_data[chainA.m_data[i]] != -1) {
-                            ::new (&kStream) hkErrStream(buf, 512);
+                            hkErrStream kStream(buf, 512);
                             kStream << "Couldn't make a chain (" << kChainA.m_start << " - " << kChainA.m_end
                                     << ")  Perhaps a bone is mapped twice?";
                             hkError::s_instance->message(
                                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1D65u), buf,
                                 ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 376
                             );
-                            kStream.~hkErrStream();
                         }
                     }
                     for (int32_t i = 0; i < chainB.m_size; ++i) {
                         if (bonesBMapped.m_data[chainB.m_data[i]] != -1) {
-                            ::new (&kStream) hkErrStream(buf, 512);
+                            hkErrStream kStream(buf, 512);
                             kStream << "Couldn't make a chain (" << kChainB.m_start << " - " << kChainB.m_end
                                     << ")  Perhaps a bone is mapped twice?";
                             hkError::s_instance->message(
                                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1D66u), buf,
                                 ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 385
                             );
-                            kStream.~hkErrStream();
                         }
                     }
-                    ::new (&kStream) hkErrStream(buf, 512);
-                    kStream << "Creating chains: " << "( " << kChainA.m_start << ", " << kChainA.m_end << " )   ( "
-                            << kChainB.m_start << ", " << kChainB.m_end << " )";
-                    hkError::s_instance->message(
-                        hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 397
-                    );
-                    kStream.~hkErrStream();
+                    {
+                        hkErrStream kStream(buf, 512);
+                        kStream << "Creating chains: " << "( " << kChainA.m_start << ", " << kChainA.m_end << " )   ( "
+                                << kChainB.m_start << ", " << kChainB.m_end << " )";
+                        hkError::s_instance->message(
+                            hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 397
+                        );
+                    }
                     hkaSkeletonMapperData::ChainMapping kChainAToB;
                     kChainAToB.~ChainMapping();
                     ::new (&kChainAToB) hkaSkeletonMapperData::ChainMapping;
@@ -698,8 +627,6 @@ void hkaSkeletonMapperUtils::createMapping(
                         bonesBMapped.m_data[chainB.m_data[i]] = -2;
                     }
                 }
-                chainB.clearAndDeallocate();
-                chainA.clearAndDeallocate();
             }
         }
         else {
@@ -716,23 +643,21 @@ void hkaSkeletonMapperUtils::createMapping(
                 int16_t endB =
                     hkaSkeletonUtils::findBoneWithName(*params.m_skeletonB, kChain.m_end, params.m_compareNames);
                 if (startA < 0 && startB < 0) {
-                    ::new (&kStream) hkErrStream(buf, 512);
+                    hkErrStream kStream(buf, 512);
                     kStream << "Couldn't make a chain (" << kChain.m_start << " - " << kChain.m_end
                             << "). Start bone not found in either skeleton.";
                     hkError::s_instance->message(
                         hkError::MESSAGE_WARNING, 0x38521C64, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 185
                     );
-                    kStream.~hkErrStream();
                     continue;
                 }
                 if (endA < 0 && endB < 0) {
-                    ::new (&kStream) hkErrStream(buf, 512);
+                    hkErrStream kStream(buf, 512);
                     kStream << "Couldn't make a chain (" << kChain.m_start << " - " << kChain.m_end
                             << "). End bone not found in either skeleton.";
                     hkError::s_instance->message(
                         hkError::MESSAGE_WARNING, 0x38521C64, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 191
                     );
-                    kStream.~hkErrStream();
                     continue;
                 }
                 if (startA < 0) {
@@ -747,64 +672,55 @@ void hkaSkeletonMapperUtils::createMapping(
                 if (endB < 0) {
                     endB = bonesAMapped.m_data[endA];
                 }
-                XFNV_INLINED_LOCAL(hkArray<int16_t>, chainA, std::nullopt, std::nullopt);
-                chainA.m_data = nullptr;
-                chainA.m_size = 0;
-                chainA.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
-                XFNV_INLINED_LOCAL(hkArray<int16_t>, chainB, std::nullopt, std::nullopt);
-                chainB.m_data = nullptr;
-                chainB.m_size = 0;
-                chainB.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
+                hkArray<int16_t> chainA;
+                hkArray<int16_t> chainB;
                 hkBool foundA = hkaSkeletonUtils::getBoneChain(*params.m_skeletonA, startA, endA, chainA);
                 hkBool foundB = hkaSkeletonUtils::getBoneChain(*params.m_skeletonB, startB, endB, chainB);
                 if (!foundA.m_bool || !foundB.m_bool) {
-                    ::new (&kStream) hkErrStream(buf, 512);
+                    hkErrStream kStream(buf, 512);
                     kStream << "Couldn't make a chain (" << kChain.m_start << " - " << kChain.m_end << ")";
                     hkError::s_instance->message(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C63u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 210
                     );
-                    kStream.~hkErrStream();
                 }
                 else if (chainA.m_size < 2 || chainB.m_size < 2) {
-                    ::new (&kStream) hkErrStream(buf, 512);
+                    hkErrStream kStream(buf, 512);
                     kStream << "Couldn't make a chain (" << kChain.m_start << " - " << kChain.m_end << ")";
                     hkError::s_instance->message(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C64u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 220
                     );
-                    kStream.~hkErrStream();
                 }
                 else {
                     for (int32_t i = 1; i < chainA.m_size - 1; ++i) {
                         if (bonesAMapped.m_data[chainA.m_data[i]] != -1) {
-                            ::new (&kStream) hkErrStream(buf, 512);
+                            hkErrStream kStream(buf, 512);
                             kStream << "Couldn't make a chain (" << kChain.m_start << " - " << kChain.m_end << ")";
                             hkError::s_instance->message(
                                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C65u), buf,
                                 ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 230
                             );
-                            kStream.~hkErrStream();
                         }
                     }
                     for (int32_t i = 1; i < chainB.m_size - 1; ++i) {
                         if (bonesBMapped.m_data[chainB.m_data[i]] != -1) {
-                            ::new (&kStream) hkErrStream(buf, 512);
+                            hkErrStream kStream(buf, 512);
                             kStream << "Couldn't make a chain (" << kChain.m_start << " - " << kChain.m_end << ")";
                             hkError::s_instance->message(
                                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C66u), buf,
                                 ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 239
                             );
-                            kStream.~hkErrStream();
                         }
                     }
-                    ::new (&kStream) hkErrStream(buf, 512);
-                    kStream << "Creating chain " << params.m_skeletonA->m_bones.m_data[startA].m_name << " - "
-                            << params.m_skeletonA->m_bones.m_data[endA].m_name;
-                    hkError::s_instance->message(
-                        hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 249
-                    );
-                    kStream.~hkErrStream();
+                    {
+                        hkErrStream kStream(buf, 512);
+                        kStream << "Creating chain " << params.m_skeletonA->m_bones.m_data[startA].m_name << " - "
+                                << params.m_skeletonA->m_bones.m_data[endA].m_name;
+                        hkError::s_instance->message(
+                            hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 249
+                        );
+                    }
                     hkaSkeletonMapperData::ChainMapping kChainMapping;
                     kChainMapping.m_startBoneA = startA;
                     kChainMapping.m_endBoneA = endA;
@@ -859,8 +775,6 @@ void hkaSkeletonMapperUtils::createMapping(
                         bonesBMapped.m_data[chainB.m_data[i]] = -2;
                     }
                 }
-                chainB.clearAndDeallocate();
-                chainA.clearAndDeallocate();
             }
         }
 
@@ -872,10 +786,7 @@ void hkaSkeletonMapperUtils::createMapping(
                 int32_t m_boneA;
                 int32_t m_boneB;
             };
-            XFNV_INLINED_LOCAL(hkArray<BonePair>, pairs, std::nullopt, std::nullopt);
-            pairs.m_data = nullptr;
-            pairs.m_size = 0;
-            pairs.m_capacityAndFlags = hkArrayBase<BonePair>::DONT_DEALLOCATE_FLAG;
+            hkArray<BonePair> pairs;
             // Bones match by name, or for a ragdoll mapping with a position tolerance and no compare function by
             // position.
             int32_t (*compareNames)(const char*, const char*) = params.m_compareNames;
@@ -992,14 +903,12 @@ void hkaSkeletonMapperUtils::createMapping(
                 }
                 bonesAMapped.m_data[boneA] = boneB;
                 bonesBMapped.m_data[boneB] = boneA;
-                ::new (&kStream) hkErrStream(buf, 512);
+                hkErrStream kStream(buf, 512);
                 kStream << "Matching " << params.m_skeletonA->m_bones.m_data[boneA].m_name;
                 hkError::s_instance->message(
                     hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 561
                 );
-                kStream.~hkErrStream();
             }
-            pairs.clearAndDeallocate();
         }
 
         if (params.m_autodetectChains.m_bool) {
@@ -1028,14 +937,8 @@ void hkaSkeletonMapperUtils::createMapping(
                 if (parentB == -2) {
                     continue;
                 }
-                XFNV_INLINED_LOCAL(hkArray<int16_t>, chainA, std::nullopt, std::nullopt);
-                chainA.m_data = nullptr;
-                chainA.m_size = 0;
-                chainA.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
-                XFNV_INLINED_LOCAL(hkArray<int16_t>, chainB, std::nullopt, std::nullopt);
-                chainB.m_data = nullptr;
-                chainB.m_size = 0;
-                chainB.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
+                hkArray<int16_t> chainA;
+                hkArray<int16_t> chainB;
                 hkBool foundA =
                     hkaSkeletonUtils::getBoneChain(*params.m_skeletonA, parentA, static_cast<int16_t>(a), chainA);
                 hkBool foundB = hkaSkeletonUtils::getBoneChain(*params.m_skeletonB, parentB, b, chainB);
@@ -1047,13 +950,14 @@ void hkaSkeletonMapperUtils::createMapping(
                         }
                     }
                     if (bFree) {
-                        ::new (&kStream) hkErrStream(buf, 512);
-                        kStream << "Creating chain " << params.m_skeletonA->m_bones.m_data[parentA].m_name << " - "
-                                << params.m_skeletonA->m_bones.m_data[a].m_name;
-                        hkError::s_instance->message(
-                            hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 637
-                        );
-                        kStream.~hkErrStream();
+                        {
+                            hkErrStream kStream(buf, 512);
+                            kStream << "Creating chain " << params.m_skeletonA->m_bones.m_data[parentA].m_name << " - "
+                                    << params.m_skeletonA->m_bones.m_data[a].m_name;
+                            hkError::s_instance->message(
+                                hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 637
+                            );
+                        }
                         hkaSkeletonMapperData::ChainMapping kChainMapping;
                         kChainMapping.~ChainMapping();
                         ::new (&kChainMapping) hkaSkeletonMapperData::ChainMapping;
@@ -1109,8 +1013,6 @@ void hkaSkeletonMapperUtils::createMapping(
                         }
                     }
                 }
-                chainB.clearAndDeallocate();
-                chainA.clearAndDeallocate();
             }
         }
 
@@ -1153,11 +1055,6 @@ void hkaSkeletonMapperUtils::createMapping(
             );
         }
         hkError::s_instance->sectionEnd();
-        // The four local arrays are destroyed, the last constructed first.
-        bonesBMapped.~hkLocalArray<int16_t>();
-        bonesAMapped.~hkLocalArray<int16_t>();
-        modelPoseB.~hkLocalArray<hkQsTransform>();
-        modelPoseA.~hkLocalArray<hkQsTransform>();
     }
     params.Free();
 }
@@ -1284,7 +1181,6 @@ bool hkaSkeletonMapperUtils::checkRotation(
 // root (by index) gets its translation locked, the roots and the bones before them unlocked. HK_FAILURE with a
 // warning when no mapping gives a root or its bone B lies outside skeleton B.
 hkResult hkaSkeletonMapperUtils::lockTranslationsAutomatically(const hkaSkeletonMapperData& mapperData) {
-    XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
     char buf[512];
     hkaSkeleton* pSkeletonA = mapperData.m_skeletonA;
     hkaSkeleton* pSkeletonB = mapperData.m_skeletonB;
@@ -1296,13 +1192,12 @@ hkResult hkaSkeletonMapperUtils::lockTranslationsAutomatically(const hkaSkeleton
         if (rSimple.m_boneA < rootA) {
             rootB = rSimple.m_boneB;
             if (rootB >= numBonesB) {
-                ::new (&kStream) hkErrStream(buf, 512);
+                hkErrStream kStream(buf, 512);
                 kStream << "Invalid mapping - cannot lock translation based on it";
                 hkError::s_instance->message(
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabba782a), buf,
                     ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 767
                 );
-                kStream.~hkErrStream();
                 return HK_FAILURE;
             }
             rootA = rSimple.m_boneA;
@@ -1310,30 +1205,31 @@ hkResult hkaSkeletonMapperUtils::lockTranslationsAutomatically(const hkaSkeleton
         }
     }
     if (rootA == pSkeletonA->m_bones.m_size) {
-        ::new (&kStream) hkErrStream(buf, 512);
+        hkErrStream kStream(buf, 512);
         kStream << "Invalid mapping - cannot lock translations based on it";
         hkError::s_instance->message(
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabba782a), buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp",
             776
         );
-        kStream.~hkErrStream();
         return HK_FAILURE;
     }
 
     hkError::s_instance->sectionBegin(static_cast<int32_t>(0x87e5654e), "lockTranslationsAutomatically");
-    ::new (&kStream) hkErrStream(buf, 512);
-    kStream << "Locking translations in skeleton " << pSkeletonA->m_name << " from bone "
-            << pSkeletonA->m_bones.m_data[rootA].m_name;
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 784);
-    kStream.~hkErrStream();
+    {
+        hkErrStream kStream(buf, 512);
+        kStream << "Locking translations in skeleton " << pSkeletonA->m_name << " from bone "
+                << pSkeletonA->m_bones.m_data[rootA].m_name;
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 784);
+    }
     for (int32_t i = 0; i < pSkeletonA->m_bones.m_size; ++i) {
         pSkeletonA->m_bones.m_data[i].m_lockTranslation.m_bool = i > rootA;
     }
-    ::new (&kStream) hkErrStream(buf, 512);
-    kStream << "Locking translations in skeleton " << pSkeletonB->m_name << " from bone "
-            << pSkeletonB->m_bones.m_data[rootB].m_name;
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 793);
-    kStream.~hkErrStream();
+    {
+        hkErrStream kStream(buf, 512);
+        kStream << "Locking translations in skeleton " << pSkeletonB->m_name << " from bone "
+                << pSkeletonB->m_bones.m_data[rootB].m_name;
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 793);
+    }
     for (int32_t i = 0; i < pSkeletonB->m_bones.m_size; ++i) {
         pSkeletonB->m_bones.m_data[i].m_lockTranslation.m_bool = i > rootB;
     }

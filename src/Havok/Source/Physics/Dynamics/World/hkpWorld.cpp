@@ -1837,34 +1837,8 @@ void hkpWorld::addPhantomBatch(hkpPhantom* const* phantomBatch, int32_t numPhant
         return;
     }
     m_criticalOperationsLockCount = m_criticalOperationsLockCount + 1;
-    // The stack allocator's bytes are untyped memory; each local array keeps its elements there.
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandle*>, addObjectList, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkpBroadPhaseHandle*>::hkLocalArray(numPhantoms) (hkAllocateStack)
-        addObjectList.m_data = nullptr;
-        addObjectList.m_size = 0;
-        addObjectList.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandle*>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((numPhantoms * static_cast<int32_t>(sizeof(hkpBroadPhaseHandle*)) + 127) & ~127);
-        addObjectList.m_data = reinterpret_cast<hkpBroadPhaseHandle**>(pBlock);
-        addObjectList.m_capacityAndFlags = numPhantoms | hkArrayBase<hkpBroadPhaseHandle*>::DONT_DEALLOCATE_FLAG;
-        addObjectList.m_localMemory = addObjectList.m_data;
-    }
-    XFNV_INLINED_LOCAL(hkLocalArray<hkAabb>, addAabbList, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkAabb>::hkLocalArray(numPhantoms) (hkAllocateStack)
-        addAabbList.m_data = nullptr;
-        addAabbList.m_size = 0;
-        addAabbList.m_capacityAndFlags = hkArrayBase<hkAabb>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((numPhantoms * static_cast<int32_t>(sizeof(hkAabb)) + 127) & ~127);
-        addAabbList.m_data = reinterpret_cast<hkAabb*>(pBlock);
-        addAabbList.m_capacityAndFlags = numPhantoms | hkArrayBase<hkAabb>::DONT_DEALLOCATE_FLAG;
-        addAabbList.m_localMemory = addAabbList.m_data;
-    }
+    hkLocalArray<hkpBroadPhaseHandle*> addObjectList(numPhantoms);
+    hkLocalArray<hkAabb> addAabbList(numPhantoms);
     addAabbList.setSizeUnchecked(numPhantoms);
     addObjectList.setSizeUnchecked(numPhantoms);
     for (int32_t i = 0; i < numPhantoms; ++i) {
@@ -1887,22 +1861,7 @@ void hkpWorld::addPhantomBatch(hkpPhantom* const* phantomBatch, int32_t numPhant
         hkpWorldCallbackUtil::firePhantomAdded(this, phantom);
         phantom->firePhantomAdded();
     }
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkpBroadPhaseHandlePair>::hkLocalArray(m_broadPhaseQuerySize)
-        // (hkAllocateStack)
-        const int32_t querySize = m_broadPhaseQuerySize;
-        newPairs.m_data = nullptr;
-        newPairs.m_size = 0;
-        newPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((querySize * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-        newPairs.m_data = reinterpret_cast<hkpBroadPhaseHandlePair*>(pBlock);
-        newPairs.m_localMemory = newPairs.m_data;
-        newPairs.m_capacityAndFlags = querySize | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-    }
+    hkLocalArray<hkpBroadPhaseHandlePair> newPairs(m_broadPhaseQuerySize);
     getBroadPhase()->addObjectBatch(addObjectList, addAabbList, newPairs);
     m_broadPhaseDispatcher->addPairs(
         static_cast<hkpTypedBroadPhaseHandlePair*>(newPairs.begin()), newPairs.m_size,
@@ -1917,10 +1876,6 @@ void hkpWorld::addPhantomBatch(hkpPhantom* const* phantomBatch, int32_t numPhant
             internal_executePendingBodyOperations();
         }
     }
-    // The three local arrays are destroyed in reverse order of construction.
-    newPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
-    addAabbList.~hkLocalArray<hkAabb>();
-    addObjectList.~hkLocalArray<hkpBroadPhaseHandle*>();
 }
 
 // KEEP (partcopy): hkpWorldOperationQueue::queueOperation (0xCF7690, through hkpWorld::queueOperation 0xC91160)
@@ -2114,13 +2069,7 @@ void hkpWorld::updateCollisionFilterOnWorld(
         hkArray<hkpSimulationIsland*>* islandArrays[2] = {&m_activeSimulationIslands, &m_inactiveSimulationIslands};
         for (int32_t arrayIndex = 0; arrayIndex < 2; ++arrayIndex) {
             hkArray<hkpSimulationIsland*>* islands = islandArrays[arrayIndex];
-            // EXE-INLINED none: hkInplaceArray<hkpAgentNnEntry*, 32>::hkInplaceArray
-            using agentsToRemove_t = hkInplaceArray<hkpAgentNnEntry*, 32>;
-            XFNV_INLINED_LOCAL(agentsToRemove_t, agentsToRemove, std::nullopt, std::nullopt);
-            agentsToRemove.m_data = agentsToRemove.m_storage;
-            agentsToRemove.m_size = 0;
-            agentsToRemove.m_capacityAndFlags =
-                static_cast<int32_t>(32u | hkArrayBase<hkpAgentNnEntry*>::DONT_DEALLOCATE_FLAG);
+            hkInplaceArray<hkpAgentNnEntry*, 32> agentsToRemove;
             for (int32_t i = 0; i < islands->m_size; ++i) {
                 hkpSimulationIsland* island = islands->m_data[i];
                 agentsToRemove.m_size = 0;
@@ -2171,16 +2120,6 @@ void hkpWorld::updateCollisionFilterOnWorld(
                     hkpWorldAgentUtil::removeAgentAndItsToiEvents(agent);
                 }
             }
-            // EXE-INLINED none: hkInplaceArray<hkpAgentNnEntry*, 32>::~hkInplaceArray
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            agentsToRemove.m_size = 0;
-            if (agentsToRemove.m_capacityAndFlags >= 0) {
-                heap.bufFree(
-                    agentsToRemove.m_data,
-                    (agentsToRemove.m_capacityAndFlags & hkArrayBase<hkpAgentNnEntry*>::CAPACITY_MASK) *
-                        static_cast<int32_t>(sizeof(hkpAgentNnEntry*))
-                );
-            }
         }
         --m_criticalOperationsLockCount;
     }
@@ -2217,24 +2156,7 @@ void hkpWorld::updateCollisionFilterOnPhantom(
     m_criticalOperationsLockCount = 1;
     HK_TIMER_BEGIN_LIST("UpdateFilterOnPhantom", "broadphase");
 
-    const int32_t querySize = m_broadPhaseQuerySize;
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, pairsOut, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkpBroadPhaseHandlePair>::hkLocalArray(m_broadPhaseQuerySize)
-        // (hkAllocateStack)
-        pairsOut.m_data = nullptr;
-        pairsOut.m_size = 0;
-        pairsOut.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((querySize * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-        pairsOut.m_data = static_cast<hkpBroadPhaseHandlePair*>(static_cast<void*>(pBlock));
-        pairsOut.m_localMemory = pairsOut.m_data;
-        pairsOut.m_capacityAndFlags = static_cast<int32_t>(
-            static_cast<uint32_t>(querySize) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG
-        );
-    }
+    hkLocalArray<hkpBroadPhaseHandlePair> pairsOut(m_broadPhaseQuerySize);
     hkpTypedBroadPhaseHandle* pPhantomHandle = phantom->m_collidable.getBroadPhaseHandle();
     m_broadPhase->reQuerySingleObject(pPhantomHandle, pairsOut);
 
@@ -2267,8 +2189,6 @@ void hkpWorld::updateCollisionFilterOnPhantom(
         }
     }
     HK_TIMER_END_LIST();
-
-    pairsOut.~hkLocalArray<hkpBroadPhaseHandlePair>();
 }
 
 // Re-runs the collision filter on everything the entity touches: with a full check, the pairs its broad-phase handle
@@ -2298,12 +2218,7 @@ void hkpWorld::updateCollisionFilterOnEntity(
         entity->m_collidable.sortEntries();
     }
 
-    // EXE-INLINED 0x9B2E30
-    using newPairs_t = hkInplaceArray<hkpBroadPhaseHandlePair, 128>;
-    XFNV_INLINED_LOCAL(newPairs_t, newPairs, std::nullopt, std::nullopt);
-    newPairs.m_data = newPairs.m_storage;
-    newPairs.m_size = 0;
-    newPairs.m_capacityAndFlags = 128 | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<hkpBroadPhaseHandlePair, 128> newPairs;
 
     if (updateMode == HK_UPDATE_FILTER_ON_ENTITY_FULL_CHECK) {
         HK_TIMER_SPLIT_LIST("broadphase");
@@ -2341,12 +2256,7 @@ void hkpWorld::updateCollisionFilterOnEntity(
         {
             hkArray<hkpLinkedCollidable::CollisionEntry>& entries =
                 entity->m_collidable.getCollisionEntriesDeterministicUnchecked();
-            // EXE-INLINED 0x9B2E30
-            using existingPairs_t = hkInplaceArray<hkpBroadPhaseHandlePair, 128>;
-            XFNV_INLINED_LOCAL(existingPairs_t, existingPairs, std::nullopt, std::nullopt);
-            existingPairs.m_data = existingPairs.m_storage;
-            existingPairs.m_size = 0;
-            existingPairs.m_capacityAndFlags = 128 | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
+            hkInplaceArray<hkpBroadPhaseHandlePair, 128> existingPairs;
             for (int32_t i = 0; i < entries.m_size; ++i) {
                 // EXE-INLINED none: hkArray<hkpBroadPhaseHandlePair>::expandOne
                 hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
@@ -2361,16 +2271,6 @@ void hkpWorld::updateCollisionFilterOnEntity(
                 pair.m_b = entries.m_data[i].m_agentEntry->m_collidable[1]->getBroadPhaseHandle();
             }
             hkpTypedBroadPhaseDispatcher::removeDuplicates(existingPairs, newPairs);
-            // EXE-INLINED 0x9B2DB0
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            existingPairs.m_size = 0;
-            if (existingPairs.m_capacityAndFlags >= 0) {
-                heap.bufFree(
-                    existingPairs.m_data,
-                    (existingPairs.m_capacityAndFlags & hkArrayBase<hkpBroadPhaseHandlePair>::CAPACITY_MASK) *
-                        static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair))
-                );
-            }
         }
     }
 
@@ -2492,11 +2392,7 @@ void hkpWorld::shiftBroadPhase(
     hkpWorld::CachedAabbUpdate updateAabbs
 ) {
     HK_TIMER_BEGIN("Broadphase Shift", nullptr);
-    // EXE-INLINED none: hkArray<hkpBroadPhaseHandlePair>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);
-    newPairs.m_data = nullptr;
-    newPairs.m_size = 0;
-    newPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkpBroadPhaseHandlePair> newPairs;
     getBroadPhase()->shiftBroadPhase(shiftDistance, effectiveShiftDistanceOut, newPairs);
     getBroadPhase()->getOffsetLowHigh32bit(
         m_collisionInput->m_aabb32Info.m_bitOffsetLow, m_collisionInput->m_aabb32Info.m_bitOffsetHigh
@@ -2533,19 +2429,13 @@ void hkpWorld::shiftBroadPhase(
         }
     }
     if (updateAabbs == hkpWorld::SHIFT_BROADPHASE_UPDATE_ENTITY_AABBS) {
-        // EXE-INLINED none: hkArray<hkpEntity*>::hkArray
-        XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, entities, std::nullopt, std::nullopt);
-        entities.m_data = nullptr;
-        entities.m_size = 0;
-        entities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkpEntity*> entities;
         // Every island: the fixed one (when there is one), then the active and the inactive ones.
         hkpSimulationIsland* fixedIsland = getFixedIsland();
         const int32_t numIslands = m_inactiveSimulationIslands.m_size + m_activeSimulationIslands.m_size + 1;
-        // EXE-INLINED none: hkArray<hkpSimulationIsland*>::hkArray(int)
-        XFNV_INLINED_LOCAL(hkArray<hkpSimulationIsland*>, islands, std::nullopt, std::nullopt);
-        islands.m_data = nullptr;
+        // The SDK's hkArray(int): the array sized to numIslands, its storage allocated here.
+        hkArray<hkpSimulationIsland*> islands;
         islands.m_size = numIslands;
-        islands.m_capacityAndFlags = hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG;
         hkMemoryAllocator& islandsHeap = hkMemoryRouter::getInstance().heap();
         if (numIslands) {
             int32_t numAllocated = numIslands;
@@ -2581,20 +2471,6 @@ void hkpWorld::shiftBroadPhase(
             }
         }
         hkpEntityAabbUtil::entityBatchRecalcAabb(m_collisionInput, entities.m_data, entities.m_size);
-        // EXE-INLINED none: ~hkArray<hkpSimulationIsland*>, then ~hkArray<hkpEntity*>
-        {
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            if ((islands.m_capacityAndFlags & hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG) == 0) {
-                heap._bufFree<hkpSimulationIsland*>(islands.m_data, islands.getCapacity());
-            }
-        }
-        {
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            entities.m_size = 0;
-            if ((entities.m_capacityAndFlags & hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG) == 0) {
-                heap._bufFree<hkpEntity*>(entities.m_data, entities.getCapacity());
-            }
-        }
     }
     // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
     if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
@@ -2606,12 +2482,6 @@ void hkpWorld::shiftBroadPhase(
         }
     }
     HK_TIMER_END();
-    // EXE-INLINED none: ~hkArray<hkpBroadPhaseHandlePair>
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    newPairs.m_size = 0;
-    if ((newPairs.m_capacityAndFlags & hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG) == 0) {
-        heap._bufFree<hkpBroadPhaseHandlePair>(newPairs.m_data, newPairs.getCapacity());
-    }
 }
 
 // KEEP (partcopy:): on the locked path the queued AddEntityBatch (12 bytes at esp+0x38, 0xC94BFA) has bytes 0, 4-7,
@@ -2726,23 +2596,7 @@ void hkpWorld::addEntityBatch(
             delete pIsland;
         }
     }
-    // The stack allocator's bytes are untyped memory; the local array keeps its pairs there.
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkpBroadPhaseHandlePair>::hkLocalArray(m_broadPhaseQuerySize)
-        // (hkAllocateStack)
-        const int32_t querySize = m_broadPhaseQuerySize;
-        newPairs.m_data = nullptr;
-        newPairs.m_size = 0;
-        newPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((querySize * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-        newPairs.m_data = reinterpret_cast<hkpBroadPhaseHandlePair*>(pBlock);
-        newPairs.m_localMemory = newPairs.m_data;
-        newPairs.m_capacityAndFlags = querySize | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-    }
+    hkLocalArray<hkpBroadPhaseHandlePair> newPairs(m_broadPhaseQuerySize);
     HK_TIMER_SPLIT_LIST("Broadphase");
     getBroadPhase()->addObjectBatch(addObjectList, addAabbList, newPairs);
     HK_TIMER_SPLIT_LIST("CreateAgents");
@@ -2766,8 +2620,7 @@ void hkpWorld::addEntityBatch(
         }
     }
     HK_TIMER_END_LIST();
-    // The local array, then the two temp lists' ~hkArray, in reverse order of construction.
-    newPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
+    // The two temp lists' ~hkArray, in reverse order of construction.
     {
         hkMemoryAllocator& temp = *hkMemoryRouter::getInstance().m_temp;
         addAabbList.m_size = 0;
@@ -2856,12 +2709,7 @@ void hkpWorld::removeEntityBatch(hkpEntity* const* entityBatch, int32_t numEntit
     hkpEntity* const* const entityBatchEnd = entityBatch + numEntities;
     {
         // The broad-phase handles of the entities that have a shape, from the thread's temp allocator.
-        using removeList_t = hkArray<hkpBroadPhaseHandle*, hkContainerTempAllocator>;
-        XFNV_INLINED_LOCAL(removeList_t, removeList, std::nullopt, std::nullopt);
-        // EXE-INLINED none: hkArray::hkArray
-        removeList.m_data = nullptr;
-        removeList.m_size = 0;
-        removeList.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandle*>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkpBroadPhaseHandle*, hkContainerTempAllocator> removeList;
         // EXE-INLINED none: hkArray<hkpBroadPhaseHandle*, hkContainerTempAllocator>::reserveExactly
         removeList._reserveExactly(hkMemoryRouter::getInstance().temp(), numEntities);
         for (hkpEntity* const* pEntity = entityBatch; pEntity != entityBatchEnd; ++pEntity) {
@@ -2872,35 +2720,12 @@ void hkpWorld::removeEntityBatch(hkpEntity* const* entityBatch, int32_t numEntit
         }
         if (removeList.m_size) {
             HK_TIMER_SPLIT_LIST("BroadPhase");
-            // The stack allocator's bytes are untyped memory; the local array keeps its pairs there.
-            XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, delPairs, std::nullopt, std::nullopt);
-            {
-                // EXE-INLINED none: hkLocalArray<hkpBroadPhaseHandlePair>::hkLocalArray(m_broadPhaseQuerySize)
-                // (hkAllocateStack)
-                const int32_t querySize = m_broadPhaseQuerySize;
-                delPairs.m_data = nullptr;
-                delPairs.m_size = 0;
-                delPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-                hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-                char* pBlock = stack.m_next.m_storage;
-                stack.m_next.m_storage =
-                    pBlock + ((querySize * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-                delPairs.m_data = reinterpret_cast<hkpBroadPhaseHandlePair*>(pBlock);
-                delPairs.m_localMemory = delPairs.m_data;
-                delPairs.m_capacityAndFlags = querySize | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-            }
+            hkLocalArray<hkpBroadPhaseHandlePair> delPairs(m_broadPhaseQuerySize);
             getBroadPhase()->removeObjectBatch(removeList, delPairs);
             HK_TIMER_SPLIT_LIST("DelAgents");
             m_broadPhaseDispatcher->removePairs(
                 static_cast<hkpTypedBroadPhaseHandlePair*>(delPairs.begin()), delPairs.m_size
             );
-            delPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
-        }
-        // EXE-INLINED none: ~hkArray<hkpBroadPhaseHandle*, hkContainerTempAllocator> (clearAndDeallocate)
-        hkMemoryAllocator& temp = hkMemoryRouter::getInstance().temp();
-        removeList.m_size = 0;
-        if ((removeList.m_capacityAndFlags & hkArrayBase<hkpBroadPhaseHandle*>::DONT_DEALLOCATE_FLAG) == 0) {
-            temp._bufFree<hkpBroadPhaseHandle*>(removeList.m_data, removeList.getCapacity());
         }
     }
     HK_TIMER_SPLIT_LIST("RemoveCb");
@@ -2942,21 +2767,7 @@ void hkpWorld::removePhantomBatch(hkpPhantom* const* phantomBatch, int32_t numPh
         return;
     }
     m_criticalOperationsLockCount = m_criticalOperationsLockCount + 1;
-    // The stack allocator's bytes are untyped memory; each local array keeps its elements there.
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandle*>, removeObjectList, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkpBroadPhaseHandle*>::hkLocalArray(numPhantoms) (hkAllocateStack)
-        removeObjectList.m_data = nullptr;
-        removeObjectList.m_size = 0;
-        removeObjectList.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandle*>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((numPhantoms * static_cast<int32_t>(sizeof(hkpBroadPhaseHandle*)) + 127) & ~127);
-        removeObjectList.m_data = reinterpret_cast<hkpBroadPhaseHandle**>(pBlock);
-        removeObjectList.m_capacityAndFlags = numPhantoms | hkArrayBase<hkpBroadPhaseHandle*>::DONT_DEALLOCATE_FLAG;
-        removeObjectList.m_localMemory = removeObjectList.m_data;
-    }
+    hkLocalArray<hkpBroadPhaseHandle*> removeObjectList(numPhantoms);
     for (int32_t i = 0; i < numPhantoms; ++i) {
         hkpPhantom* phantom = phantomBatch[i];
         // EXE-INLINED none: hkArray<hkpBroadPhaseHandle*>::pushBackUnchecked
@@ -2965,27 +2776,11 @@ void hkpWorld::removePhantomBatch(hkpPhantom* const* phantomBatch, int32_t numPh
         phantom->firePhantomRemoved();
     }
     if (removeObjectList.m_size) {
-        XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, delPairs, std::nullopt, std::nullopt);
-        {
-            // EXE-INLINED none: hkLocalArray<hkpBroadPhaseHandlePair>::hkLocalArray(m_broadPhaseQuerySize)
-            // (hkAllocateStack)
-            const int32_t querySize = m_broadPhaseQuerySize;
-            delPairs.m_data = nullptr;
-            delPairs.m_size = 0;
-            delPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            char* pBlock = stack.m_next.m_storage;
-            stack.m_next.m_storage =
-                pBlock + ((querySize * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-            delPairs.m_data = reinterpret_cast<hkpBroadPhaseHandlePair*>(pBlock);
-            delPairs.m_localMemory = delPairs.m_data;
-            delPairs.m_capacityAndFlags = querySize | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-        }
+        hkLocalArray<hkpBroadPhaseHandlePair> delPairs(m_broadPhaseQuerySize);
         getBroadPhase()->removeObjectBatch(removeObjectList, delPairs);
         m_broadPhaseDispatcher->removePairs(
             static_cast<hkpTypedBroadPhaseHandlePair*>(delPairs.begin()), delPairs.m_size
         );
-        delPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
     }
     for (int32_t i = 0; i < numPhantoms; ++i) {
         hkpPhantom* phantom = phantomBatch[i];
@@ -3017,7 +2812,6 @@ void hkpWorld::removePhantomBatch(hkpPhantom* const* phantomBatch, int32_t numPh
             internal_executePendingBodyOperations();
         }
     }
-    removeObjectList.~hkLocalArray<hkpBroadPhaseHandle*>();
 }
 
 // KEEP (partcopy:): on the locked path the queued AddAction (8 bytes at esp+0x8, 0xC97385) has bytes 0 and 4-7
@@ -3034,12 +2828,7 @@ hkpAction* hkpWorld::addAction(hkpAction* action) {
     }
     action->addReference();
     ++m_criticalOperationsLockCount;
-    // EXE-INLINED none: hkInplaceArray<hkpEntity*, 4>::hkInplaceArray
-    using entities_t = hkInplaceArray<hkpEntity*, 4>;
-    XFNV_INLINED_LOCAL(entities_t, entities, std::nullopt, std::nullopt);
-    entities.m_data = entities.m_storage;
-    entities.m_size = 0;
-    entities.m_capacityAndFlags = 4 | hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<hkpEntity*, 4> entities;
     action->getEntities(entities);
     action->m_world = this;
     // The first entity on a movable island: the action goes to its island, and every other movable island is merged
@@ -3077,16 +2866,6 @@ hkpAction* hkpWorld::addAction(hkpAction* action) {
         }
     }
     hkpWorldCallbackUtil::fireActionAdded(this, action);
-    // EXE-INLINED none: hkInplaceArray<hkpEntity*, 4>::~hkInplaceArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    entities.m_size = 0;
-    if (entities.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            entities.m_data,
-            (entities.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpEntity*))
-        );
-    }
     return action;
 }
 
@@ -3108,12 +2887,7 @@ void hkpWorld::removeActionImmediately(hkpAction* action) {
     action->addReference();
     ++m_criticalOperationsLockCount;
     hkpWorldCallbackUtil::fireActionRemoved(this, action);
-    // EXE-INLINED none: hkInplaceArray<hkpEntity*, 4>::hkInplaceArray
-    using entities_t = hkInplaceArray<hkpEntity*, 4>;
-    XFNV_INLINED_LOCAL(entities_t, entities, std::nullopt, std::nullopt);
-    entities.m_data = entities.m_storage;
-    entities.m_size = 0;
-    entities.m_capacityAndFlags = 4 | hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<hkpEntity*, 4> entities;
     action->getEntities(entities);
     for (int32_t i = 0; i < entities.m_size; ++i) {
         hkpEntity* entity = entities.m_data[i];
@@ -3143,16 +2917,6 @@ void hkpWorld::removeActionImmediately(hkpAction* action) {
             hkArrayUtil::_reserveMore(router.heap(), &dirtyIslands, static_cast<int32_t>(sizeof(hkpSimulationIsland*)));
         }
         dirtyIslands.m_data[dirtyIslands.m_size++] = island;
-    }
-    // EXE-INLINED none: hkInplaceArray<hkpEntity*, 4>::~hkInplaceArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    entities.m_size = 0;
-    if (entities.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            entities.m_data,
-            (entities.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpEntity*))
-        );
     }
     // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
     if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
@@ -3184,11 +2948,7 @@ void hkpWorld::detachActionFromEntity(hkpAction* action, hkpEntity* entity) {
     hkpSimulationIsland* entityIsland = entity->m_simulationIsland;
     entityIsland->m_splitCheckRequested = 1;
 
-    using entities_t = hkInplaceArray<hkpEntity*, 4>;
-    XFNV_INLINED_LOCAL(entities_t, entities, std::nullopt, std::nullopt);
-    entities.m_data = entities.m_storage;
-    entities.m_size = 0;
-    entities.m_capacityAndFlags = 4 | hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<hkpEntity*, 4> entities;
     action->getEntities(entities);
     hkpSimulationIsland* newIsland = nullptr;
     for (int32_t i = 0; i < entities.m_size; ++i) {
@@ -3204,13 +2964,6 @@ void hkpWorld::detachActionFromEntity(hkpAction* action, hkpEntity* entity) {
     if (newIsland != oldIsland) {
         oldIsland->removeAction(action);
         newIsland->addAction(action);
-    }
-
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = entities.m_capacityAndFlags;
-    entities.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(entities.m_data, (capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) * sizeof(hkpEntity*));
     }
 }
 
@@ -3493,10 +3246,7 @@ void hkpWorld::castRay(const hkpWorldRayCastInput& input, hkpRayHitCollector& co
     else {
         hkpCollisionFilter* filter = m_collisionFilter;
         hkpBroadPhase* broadPhase = m_broadPhase;
-        XFNV_INLINED_LOCAL(hkpWorldRayCaster, rayCaster, hkpWorldRayCaster_vftable, std::nullopt);
-        // EXE-INLINED none: hkpWorldRayCaster::hkpWorldRayCaster
-        rayCaster.m_shapeInput.m_filterInfo = 0;
-        rayCaster.m_shapeInput.m_rayShapeCollectionFilter = nullptr;
+        hkpWorldRayCaster rayCaster;
         rayCaster.castRay(*broadPhase, input, filter, nullptr, collector);
     }
     HK_TIMER_END();
@@ -3510,10 +3260,7 @@ void hkpWorld::castRay(const hkpWorldRayCastInput& input, hkpWorldRayCastOutput&
     else {
         hkpCollisionFilter* filter = m_collisionFilter;
         hkpBroadPhase* broadPhase = m_broadPhase;
-        XFNV_INLINED_LOCAL(hkpSimpleWorldRayCaster, rayCaster, hkpSimpleWorldRayCaster_vftable, std::nullopt);
-        // EXE-INLINED none: hkpSimpleWorldRayCaster::hkpSimpleWorldRayCaster
-        rayCaster.m_shapeInput.m_filterInfo = 0;
-        rayCaster.m_shapeInput.m_rayShapeCollectionFilter = nullptr;
+        hkpSimpleWorldRayCaster rayCaster;
         rayCaster.castRay(*broadPhase, input, filter, nullptr, output);
     }
     HK_TIMER_END();
@@ -3533,11 +3280,8 @@ void hkpWorld::linearCast(
         );
     }
     else {
-        XFNV_INLINED_LOCAL(hkpWorldLinearCaster, caster, hkpWorldLinearCaster_vftable, std::nullopt);
+        hkpWorldLinearCaster caster;
         hkpCollisionFilter* collisionFilter = m_collisionFilter;
-        // EXE-INLINED none: hkpWorldLinearCaster::hkpWorldLinearCaster
-        caster.m_shapeInput.m_maxExtraPenetration = 1.1920929e-07f;
-        caster.m_shapeInput.m_weldClosestPoints.m_storage = 0;
         const hkpCollidableCollidableFilter* filter = static_cast<hkpCollidableCollidableFilter*>(collisionFilter);
         caster.linearCast(
             *m_broadPhase, collA, input, filter, *m_collisionInput, m_collisionInput->m_config, nullptr, castCollector,
@@ -3575,12 +3319,7 @@ void hkpWorld::activateRegion(const hkAabb& aabb) {
         queueOperation(operation);
         return;
     }
-    // EXE-INLINED none: hkArray::hkArray
-    using pairsOut_t = hkArray<hkpBroadPhaseHandlePair, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(pairsOut_t, pairsOut, std::nullopt, std::nullopt);
-    pairsOut.m_data = nullptr;
-    pairsOut.m_size = 0;
-    pairsOut.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkpBroadPhaseHandlePair, hkContainerHeapAllocator> pairsOut;
     m_broadPhase->querySingleAabb(aabb, pairsOut);
     for (int32_t i = 0; i < pairsOut.m_size; ++i) {
         // EXE-INLINED 0x9B2C90
@@ -3595,16 +3334,6 @@ void hkpWorld::activateRegion(const hkAabb& aabb) {
                 entity->activate();
             }
         }
-    }
-    // EXE-INLINED none: hkArray::~hkArray
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    pairsOut.m_size = 0;
-    if (pairsOut.m_capacityAndFlags >= 0) {
-        heap->bufFree(
-            pairsOut.m_data,
-            static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) *
-                (pairsOut.m_capacityAndFlags & hkArrayBase<hkpBroadPhaseHandlePair>::CAPACITY_MASK)
-        );
     }
 }
 
@@ -3622,12 +3351,7 @@ void hkpWorld::getPenetrations(
     }
     collA->m_shape->getAabbImpl(collA->m_motion.pState->m_transform, tolerance, aabb);
 
-    // EXE-INLINED 0x9B2E30
-    using hits_t = hkInplaceArray<hkpBroadPhaseHandlePair, 128>;
-    alignas(16) XFNV_INLINED_LOCAL(hits_t, hits, std::nullopt, std::nullopt);
-    hits.m_data = hits.m_storage;
-    hits.m_size = 0;
-    hits.m_capacityAndFlags = 128 | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
+    alignas(16) hkInplaceArray<hkpBroadPhaseHandlePair, 128> hits;
     m_broadPhase->querySingleAabb(aabb, hits);
 
     hkpShapeType typeA = static_cast<hkpShapeType>(collA->m_shape->m_type.m_storage);
@@ -3659,17 +3383,6 @@ void hkpWorld::getPenetrations(
         }
     }
     HK_TIMER_END_LIST();
-
-    // EXE-INLINED 0x9B2DB0
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    hits.m_size = 0;
-    if (hits.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            hits.m_data,
-            (hits.m_capacityAndFlags & hkArrayBase<hkpBroadPhaseHandlePair>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair))
-        );
-    }
 }
 
 void hkpWorld::setBroadPhaseBorder(hkpBroadPhaseBorder* b) {
@@ -4149,12 +3862,7 @@ void hkpWorld::getClosestPoints(
         const hkAabbTree<hkAabbTreeData::hkAabbTreeAabb16, uint16_t>* inactiveTree = treeManager->m_inactiveTree;
         const hkKdTree* kdTree = treeManager->m_kdTree;
         if (inactiveTree) {
-            // EXE-INLINED none: hkInplaceArray<void*, 128>::hkInplaceArray
-            using treeHits_t = hkInplaceArray<void*, 128>;
-            XFNV_INLINED_LOCAL(treeHits_t, hits, std::nullopt, std::nullopt);
-            hits.m_data = hits.m_storage;
-            hits.m_size = 0;
-            hits.m_capacityAndFlags = 128 | hkArrayBase<void*>::DONT_DEALLOCATE_FLAG;
+            hkInplaceArray<void*, 128> hits;
             queryAabbToArray(inactiveTree, aabb, &hits);
             HK_TIMER_SPLIT_LIST("AabbTreeNp");
             const hkpShapeType typeA = collA->getShape()->m_type;
@@ -4172,24 +3880,10 @@ void hkpWorld::getClosestPoints(
                 }
                 input.m_dispatcher->getGetClosestPointsFunc(typeA, shapeB->m_type)(*collA, *collB, input, collector);
             }
-            // EXE-INLINED none: hkInplaceArray<void*, 128>::~hkInplaceArray
-            hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-            hits.m_size = 0;
-            if (hits.m_capacityAndFlags >= 0) {
-                heap.bufFree(
-                    hits.m_data,
-                    (hits.m_capacityAndFlags & hkArrayBase<void*>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(void*))
-                );
-            }
         }
         if (kdTree) {
             HK_TIMER_SPLIT_LIST("KdTreeBp");
-            // EXE-INLINED none: hkArray<hkUlong, hkContainerTempAllocator>::hkArray
-            using kdHits_t = hkArray<hkUlong, hkContainerTempAllocator>;
-            XFNV_INLINED_LOCAL(kdHits_t, hits, std::nullopt, std::nullopt);
-            hits.m_data = nullptr;
-            hits.m_size = 0;
-            hits.m_capacityAndFlags = hkArrayBase<hkUlong>::DONT_DEALLOCATE_FLAG;
+            hkArray<hkUlong, hkContainerTempAllocator> hits;
             hkKdTreeAabbQueryUtils::queryAabbIterative(kdTree, aabb, hits);
             HK_TIMER_SPLIT_LIST("KdTreeNp");
             const hkpShapeType typeA = collA->getShape()->m_type;
@@ -4208,27 +3902,12 @@ void hkpWorld::getClosestPoints(
                 }
                 input.m_dispatcher->getGetClosestPointsFunc(typeA, shapeB->m_type)(*collA, *collB, input, collector);
             }
-            // EXE-INLINED none: hkArray<hkUlong, hkContainerTempAllocator>::~hkArray
-            hkMemoryAllocator& temp = *hkMemoryRouter::getInstance().m_temp;
-            hits.m_size = 0;
-            if (hits.m_capacityAndFlags >= 0) {
-                temp.bufFree(
-                    hits.m_data,
-                    (hits.m_capacityAndFlags & hkArrayBase<hkUlong>::CAPACITY_MASK) *
-                        static_cast<int32_t>(sizeof(hkUlong))
-                );
-            }
         }
         HK_TIMER_END_LIST();
     }
     else {
         HK_TIMER_BEGIN_LIST("hkpWorld::getClosestPoints(Broadphase)", "3AxisBp");
-        // EXE-INLINED 0x9B2E30
-        using pairs_t = hkInplaceArray<hkpBroadPhaseHandlePair, 128>;
-        XFNV_INLINED_LOCAL(pairs_t, hits, std::nullopt, std::nullopt);
-        hits.m_data = hits.m_storage;
-        hits.m_size = 0;
-        hits.m_capacityAndFlags = 128 | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
+        hkInplaceArray<hkpBroadPhaseHandlePair, 128> hits;
         m_broadPhase->querySingleAabb(aabb, hits);
         hkpBroadPhaseHandlePair* pair = hits.m_data;
         const hkpShapeType typeA = collA->getShape()->m_type;
@@ -4253,16 +3932,6 @@ void hkpWorld::getClosestPoints(
             input.m_dispatcher->getGetClosestPointsFunc(typeA, shapeB->m_type)(*collA, *collB, input, collector);
         }
         HK_TIMER_END_LIST();
-        // EXE-INLINED none: hkInplaceArray<hkpBroadPhaseHandlePair, 128>::~hkInplaceArray
-        hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-        hits.m_size = 0;
-        if (hits.m_capacityAndFlags >= 0) {
-            heap.bufFree(
-                hits.m_data,
-                (hits.m_capacityAndFlags & hkArrayBase<hkpBroadPhaseHandlePair>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair))
-            );
-        }
     }
 }
 

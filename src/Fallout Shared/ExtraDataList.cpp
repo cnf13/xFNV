@@ -7470,23 +7470,19 @@ uint8_t ExtraDataList::GetTerminalState() {
 }
 
 void ExtraDataList::SetCreatureAwakeSound(const BSSoundHandle& afSound) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, kNone, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, kEmpty, std::nullopt, std::nullopt);
     auto* pExtra = static_cast<ExtraCreatureAwakeSound*>(GetExtraData(EXTRA_CREATURE_AWAKE_SOUND));
     if (pExtra) {
-        if (afSound == *::new (&kEmpty) BSSoundHandle) {
+        if (afSound == BSSoundHandle()) {
             RemoveExtra(pExtra, true);
         }
         else {
             pExtra->pHandle = afSound;
         }
     }
-    else if (afSound != *::new (&kNone) BSSoundHandle) {
+    else if (afSound != BSSoundHandle()) {
         void* pMemory = ourMalloc(sizeof(ExtraCreatureAwakeSound));
         if (pMemory) {
-            kArgument = afSound;
-            pExtra = ::new (pMemory) ExtraCreatureAwakeSound(kArgument);
+            pExtra = ::new (pMemory) ExtraCreatureAwakeSound(afSound);
         }
         else {
             pExtra = nullptr;
@@ -7497,7 +7493,6 @@ void ExtraDataList::SetCreatureAwakeSound(const BSSoundHandle& afSound) {
 
 // As SetCreatureAwakeSound, for the sound extra.
 void ExtraDataList::SetSound(const BSSoundHandle& afSound) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
     auto* pExtra = static_cast<ExtraSound*>(GetExtraData(EXTRA_SOUND));
     if (pExtra) {
         if (afSound == BSSoundHandle()) {
@@ -7510,8 +7505,7 @@ void ExtraDataList::SetSound(const BSSoundHandle& afSound) {
     else if (afSound != BSSoundHandle()) {
         void* pMemory = ourMalloc(sizeof(ExtraSound));
         if (pMemory) {
-            kArgument = afSound;
-            pExtra = ::new (pMemory) ExtraSound(kArgument);
+            pExtra = ::new (pMemory) ExtraSound(afSound);
         }
         else {
             pExtra = nullptr;
@@ -8249,23 +8243,19 @@ void ExtraDataList::GetWeaponAttackSound(BSSoundHandle& result) {
 
 // As SetCreatureAwakeSound, for the weapon attack sound extra.
 void ExtraDataList::SetWeaponAttackSound(const BSSoundHandle& afSound) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, kNone, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, kEmpty, std::nullopt, std::nullopt);
     auto* pSound = static_cast<ExtraWeaponAttackSound*>(GetExtraData(EXTRA_WEAPON_ATTACK_SOUND));
     if (pSound) {
-        if (afSound == *::new (&kEmpty) BSSoundHandle) {
+        if (afSound == BSSoundHandle()) {
             RemoveExtra(pSound, true);
         }
         else {
             pSound->pHandle = afSound;
         }
     }
-    else if (afSound != *::new (&kNone) BSSoundHandle) {
+    else if (afSound != BSSoundHandle()) {
         void* pMemory = ourMalloc(sizeof(ExtraWeaponAttackSound));
         if (pMemory) {
-            kArgument = afSound;
-            pSound = ::new (pMemory) ExtraWeaponAttackSound(kArgument);
+            pSound = ::new (pMemory) ExtraWeaponAttackSound(afSound);
         }
         else {
             pSound = nullptr;
@@ -8505,23 +8495,19 @@ void ExtraDataList::GetCreatureMovementSound(BSSoundHandle& result) {
 
 // As SetCreatureAwakeSound, for the creature movement sound extra.
 void ExtraDataList::SetCreatureMovementSound(const BSSoundHandle& afSound) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, kNone, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, kEmpty, std::nullopt, std::nullopt);
     auto* pSound = static_cast<ExtraCreatureMovementSound*>(GetExtraData(EXTRA_CREATURE_MOVEMENT_SOUND));
     if (pSound) {
-        if (afSound == *::new (&kEmpty) BSSoundHandle) {
+        if (afSound == BSSoundHandle()) {
             RemoveExtra(pSound, true);
         }
         else {
             pSound->pHandle = afSound;
         }
     }
-    else if (afSound != *::new (&kNone) BSSoundHandle) {
+    else if (afSound != BSSoundHandle()) {
         void* pMemory = ourMalloc(sizeof(ExtraCreatureMovementSound));
         if (pMemory) {
-            kArgument = afSound;
-            pSound = ::new (pMemory) ExtraCreatureMovementSound(kArgument);
+            pSound = ::new (pMemory) ExtraCreatureMovementSound(afSound);
         }
         else {
             pSound = nullptr;
@@ -11106,23 +11092,19 @@ void ExtraDataList::GetWeaponIdleSound(BSSoundHandle& result) {
 
 // As SetCreatureAwakeSound, for the weapon idle sound extra.
 void ExtraDataList::SetWeaponIdleSound(const BSSoundHandle& afSound) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, kNone, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, kEmpty, std::nullopt, std::nullopt);
     auto* pSound = static_cast<ExtraWeaponIdleSound*>(GetExtraData(EXTRA_WEAPON_IDLE_SOUND));
     if (pSound) {
-        if (afSound == *::new (&kEmpty) BSSoundHandle) {
+        if (afSound == BSSoundHandle()) {
             RemoveExtra(pSound, true);
         }
         else {
             pSound->pHandle = afSound;
         }
     }
-    else if (afSound != *::new (&kNone) BSSoundHandle) {
+    else if (afSound != BSSoundHandle()) {
         void* pMemory = ourMalloc(sizeof(ExtraWeaponIdleSound));
         if (pMemory) {
-            kArgument = afSound;
-            pSound = ::new (pMemory) ExtraWeaponIdleSound(kArgument);
+            pSound = ::new (pMemory) ExtraWeaponIdleSound(afSound);
         }
         else {
             pSound = nullptr;
@@ -11143,7 +11125,6 @@ void ExtraDataList::GetActivateLoopSound(BSSoundHandle& result) {
 
 // As SetSound, for the activate loop sound extra.
 void ExtraDataList::SetActivateLoopSound(const BSSoundHandle& afSound) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
     auto* pExtra = static_cast<ExtraActivateLoopSound*>(GetExtraData(EXTRA_ACTIVATE_LOOP_SOUND));
     if (pExtra) {
         if (afSound == BSSoundHandle()) {
@@ -11156,8 +11137,7 @@ void ExtraDataList::SetActivateLoopSound(const BSSoundHandle& afSound) {
     else if (afSound != BSSoundHandle()) {
         void* pMemory = ourMalloc(sizeof(ExtraActivateLoopSound));
         if (pMemory) {
-            kArgument = afSound;
-            pExtra = ::new (pMemory) ExtraActivateLoopSound(kArgument);
+            pExtra = ::new (pMemory) ExtraActivateLoopSound(afSound);
         }
         else {
             pExtra = nullptr;

@@ -86,18 +86,8 @@ static int32_t walkDependencies(
                 hkArrayUtil::_reserveMore(*cycleRouter.m_heap, &pending, sizeof(int32_t));
             }
             pending.m_data[pending.m_size++] = value;
-            XFNV_INLINED_LOCAL(hkStringBuf, kMessage, std::nullopt, std::nullopt);
-            ::new (&kMessage) hkStringBuf;
+            hkStringBuf kMessage;
             --pending.m_size;
-            // EXE-INLINED none: hkStringBuf::~hkStringBuf
-            hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
-            kMessage.m_string.m_size = 0;
-            if (kMessage.m_string.m_capacityAndFlags >= 0) {
-                pTemp->bufFree(
-                    kMessage.m_string.m_data,
-                    sizeof(char) * (kMessage.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK)
-                );
-            }
         }
         else if (state == -1) {
             a4 = walkDependencies(value, a2, a3, a4, pending, a6);
@@ -122,28 +112,13 @@ applyPatchesToWorld(hkArrayBase<const hkVersionPatchManager::PatchInfo*>* patche
         const hkVersionPatchManager::PatchInfo* pPatch = patches->m_data[i];
         const char* pClassName = pPatch->oldName ? pPatch->oldName : pPatch->newName;
         if (pPatch->oldVersion == -1) {
-            XFNV_INLINED_LOCAL(hkDataClass::Cinfo, cinfo, std::nullopt, std::nullopt);
+            hkDataClass::Cinfo cinfo;
             cinfo.version = pPatch->newVersion;
-            // EXE-INLINED none: hkArray<hkDataClass::Cinfo::Member>'s constructor
-            cinfo.members.m_data = nullptr;
-            cinfo.members.m_size = 0;
-            cinfo.members.m_capacityAndFlags = hkArrayBase<hkDataClass::Cinfo::Member>::DONT_DEALLOCATE_FLAG;
             cinfo.name = pClassName;
             cinfo.parent = nullptr;
             bool bExists = pFindWorld->findClass(pClassName) != nullptr;
             if (!bExists) {
                 pNewWorld->newClass(cinfo);
-            }
-            // EXE-INLINED 0xDBA490
-            hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-            int32_t iFlags = cinfo.members.m_capacityAndFlags;
-            cinfo.members.m_size = 0;
-            if (!(iFlags & hkArrayBase<hkDataClass::Cinfo::Member>::DONT_DEALLOCATE_FLAG)) {
-                rHeap.bufFree(
-                    cinfo.members.m_data,
-                    (iFlags & hkArrayBase<hkDataClass::Cinfo::Member>::CAPACITY_MASK) *
-                        static_cast<int32_t>(sizeof(hkDataClass::Cinfo::Member))
-                );
             }
             if (bExists) {
                 return HK_FAILURE;
@@ -177,58 +152,24 @@ applyPatchesToWorld(hkArrayBase<const hkVersionPatchManager::PatchInfo*>* patche
                 case hkVersionPatchManager::PATCH_FUNCTION: {
                     hkVersionPatchManager::Function pFunction =
                         static_cast<const hkVersionPatchManager::FunctionPatch*>(rComponent.patch)->function;
-                    XFNV_INLINED_LOCAL(ObjectArray, objects, std::nullopt, std::nullopt);
-                    // EXE-INLINED none: hkArray<hkDataObjectImpl*, hkContainerHeapAllocator>'s constructor
-                    objects.m_data = nullptr;
-                    objects.m_size = 0;
-                    objects.m_capacityAndFlags = hkArrayBase<hkDataObjectImpl*>::DONT_DEALLOCATE_FLAG;
+                    ObjectArray objects;
                     world->findObjectsByBaseClass(pClassName, objects);
                     for (int32_t j = 0; j < objects.m_size; ++j) {
                         hkDataObject object(objects.m_data[j]);
                         pFunction(object);
                     }
-                    // EXE-INLINED none: hkArray<hkDataObjectImpl*, hkContainerHeapAllocator>::~hkArray
-                    hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-                    int32_t iFlags = objects.m_capacityAndFlags;
-                    objects.m_size = 0;
-                    if (!(iFlags & hkArrayBase<hkDataObjectImpl*>::DONT_DEALLOCATE_FLAG)) {
-                        rHeap.bufFree(
-                            objects.m_data,
-                            (iFlags & hkArrayBase<hkDataObjectImpl*>::CAPACITY_MASK) *
-                                static_cast<int32_t>(sizeof(hkDataObjectImpl*))
-                        );
-                    }
-                    objects.m_data = nullptr;
-                    objects.m_capacityAndFlags = hkArrayBase<hkDataObjectImpl*>::DONT_DEALLOCATE_FLAG;
                     break;
                 }
                 case hkVersionPatchManager::PATCH_CAST: {
                     const hkVersionPatchManager::CastPatch* pCast =
                         static_cast<const hkVersionPatchManager::CastPatch*>(rComponent.patch);
                     hkDataClass castClass(pFindWorld->findClass(pCast->name));
-                    XFNV_INLINED_LOCAL(ObjectArray, objects, std::nullopt, std::nullopt);
-                    // EXE-INLINED none: hkArray<hkDataObjectImpl*, hkContainerHeapAllocator>'s constructor
-                    objects.m_data = nullptr;
-                    objects.m_size = 0;
-                    objects.m_capacityAndFlags = hkArrayBase<hkDataObjectImpl*>::DONT_DEALLOCATE_FLAG;
+                    ObjectArray objects;
                     world->findObjectsByExactClass(pClassName, objects);
                     for (int32_t j = 0; j < objects.m_size; ++j) {
                         hkDataObject object(objects.m_data[j]);
                         world->castObject(object, castClass);
                     }
-                    // EXE-INLINED none: hkArray<hkDataObjectImpl*, hkContainerHeapAllocator>::~hkArray
-                    hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-                    int32_t iFlags = objects.m_capacityAndFlags;
-                    objects.m_size = 0;
-                    if (!(iFlags & hkArrayBase<hkDataObjectImpl*>::DONT_DEALLOCATE_FLAG)) {
-                        rHeap.bufFree(
-                            objects.m_data,
-                            (iFlags & hkArrayBase<hkDataObjectImpl*>::CAPACITY_MASK) *
-                                static_cast<int32_t>(sizeof(hkDataObjectImpl*))
-                        );
-                    }
-                    objects.m_data = nullptr;
-                    objects.m_capacityAndFlags = hkArrayBase<hkDataObjectImpl*>::DONT_DEALLOCATE_FLAG;
                     break;
                 }
                 case hkVersionPatchManager::PATCH_PARENT_SET: {
@@ -505,23 +446,10 @@ hkResult hkVersionPatchManager::preparePatches(
     using VersionArray = hkArray<ClassVersion>;
     using UidMap = hkPointerMap<hkUint64, int32_t>;
     using NameMap = hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(ClassArray, origClasses, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(VersionArray, origVersions, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(hkDataWorldDict, tempWorld, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(UidMap, uidState, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(UidMap, addedClassPatch, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(HeapArray<UidItem>, toDo, std::nullopt, std::nullopt);
-
-    // EXE-INLINED none: hkArray<hkDataClassImpl*, hkContainerHeapAllocator>::hkArray
-    origClasses.m_data = nullptr;
-    origClasses.m_size = 0;
-    origClasses.m_capacityAndFlags = hkArrayBase<hkDataClassImpl*>::DONT_DEALLOCATE_FLAG;
+    ClassArray origClasses;
     worldToUpdate.findAllClasses(origClasses);
 
-    // EXE-INLINED none: hkArray<ClassVersion, hkContainerHeapAllocator>::hkArray
-    origVersions.m_capacityAndFlags = hkArrayBase<ClassVersion>::DONT_DEALLOCATE_FLAG;
-    origVersions.m_data = nullptr;
-    origVersions.m_size = 0;
+    VersionArray origVersions;
     {
         int32_t numClasses = origClasses.m_size;
         hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
@@ -542,21 +470,9 @@ hkResult hkVersionPatchManager::preparePatches(
         ++origVersions.m_size;
     }
 
-    ::new (&tempWorld) hkDataWorldDict;
-    // EXE-INLINED none: hkPointerMap<hkUint64, int32_t>::hkPointerMap
-    uidState.m_map.m_elem = nullptr;
-    uidState.m_map.m_numElems = 0;
-    uidState.m_map.m_hashMod = -1;
-    uidState.m_map.hkMapBase<uint64_t, uint64_t, hkMapOperations<uint64_t>>::reserve(
-        *hkMemoryRouter::getInstance().m_heap, 0
-    );
-    // EXE-INLINED none: hkPointerMap<hkUint64, int32_t>::hkPointerMap
-    addedClassPatch.m_map.m_elem = nullptr;
-    addedClassPatch.m_map.m_numElems = 0;
-    addedClassPatch.m_map.m_hashMod = -1;
-    addedClassPatch.m_map.hkMapBase<uint64_t, uint64_t, hkMapOperations<uint64_t>>::reserve(
-        *hkMemoryRouter::getInstance().m_heap, 0
-    );
+    hkDataWorldDict tempWorld;
+    UidMap uidState;
+    UidMap addedClassPatch;
 
     // Each patch must be valid; the patches that add a class are indexed by the uid of the class they add.
     bool failed = false;
@@ -576,151 +492,81 @@ hkResult hkVersionPatchManager::preparePatches(
         }
     }
     if (failed) {
-        addedClassPatch.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
-        uidState.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
-        tempWorld.~hkDataWorldDict();
-        // EXE-INLINED none: hkArray<ClassVersion, hkContainerHeapAllocator>::~hkArray
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        origVersions.m_size = 0;
-        if (origVersions.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                origVersions.m_data,
-                (origVersions.m_capacityAndFlags & hkArrayBase<ClassVersion>::CAPACITY_MASK) * sizeof(ClassVersion)
-            );
-        }
-        origVersions.m_data = nullptr;
-        origVersions.m_capacityAndFlags = hkArrayBase<ClassVersion>::DONT_DEALLOCATE_FLAG;
-        // EXE-INLINED none: hkArray<hkDataClassImpl*, hkContainerHeapAllocator>::~hkArray
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        origClasses.m_size = 0;
-        if (origClasses.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                origClasses.m_data,
-                (origClasses.m_capacityAndFlags & hkArrayBase<hkDataClassImpl*>::CAPACITY_MASK) *
-                    sizeof(hkDataClassImpl*)
-            );
-        }
         return HK_FAILURE;
     }
 
     // Queue the patches each class of the world needs, then work through the queue in patch order.
     patchInfosOut.m_size = 0;
-    // EXE-INLINED none: hkArray<UidItem, hkContainerHeapAllocator>::hkArray
-    toDo.m_elems.m_data = nullptr;
-    toDo.m_elems.m_size = 0;
-    toDo.m_elems.m_capacityAndFlags = hkArrayBase<UidItem>::DONT_DEALLOCATE_FLAG;
-    for (int32_t i = 0; i < origVersions.m_size; ++i) {
-        setAllDependeciesToDo(
-            toDo, origVersions.m_data[i].name, origVersions.m_data[i].version, worldToUpdate, *this, addedClassPatch,
-            uidState
-        );
-    }
-    while (toDo.m_elems.m_size != 0) {
-        UidItem item = toDo.m_elems.m_data[0];
-        // EXE-INLINED none: hkArrayBase<UidItem>::removeAtAndCopy
-        --toDo.m_elems.m_size;
-        for (int32_t k = 0; k < toDo.m_elems.m_size; ++k) {
-            toDo.m_elems.m_data[k] = toDo.m_elems.m_data[k + 1];
+    {
+        HeapArray<UidItem> toDo;
+        for (int32_t i = 0; i < origVersions.m_size; ++i) {
+            setAllDependeciesToDo(
+                toDo, origVersions.m_data[i].name, origVersions.m_data[i].version, worldToUpdate, *this,
+                addedClassPatch, uidState
+            );
         }
-        int32_t patchIndex = item.patchIndex;
-        if (patchIndex != -1 && m_patchInfos.m_data[patchIndex]->oldVersion == -1) {
-            uidState.insert(item.uid, 1);
-        }
-        else {
-            uidState.insert(item.uid, 2);
-        }
-        if (patchIndex >= 0) {
-            const PatchInfo* p = m_patchInfos.m_data[patchIndex];
-            hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-            // EXE-INLINED none: hkArray<const hkVersionPatchManager::PatchInfo*, hkContainerHeapAllocator>::pushBack
-            if (patchInfosOut.m_size ==
-                (patchInfosOut.m_capacityAndFlags & hkArrayBase<const PatchInfo*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(heap, &patchInfosOut, sizeof(const PatchInfo*));
+        while (toDo.m_elems.m_size != 0) {
+            UidItem item = toDo.m_elems.m_data[0];
+            // EXE-INLINED none: hkArrayBase<UidItem>::removeAtAndCopy
+            --toDo.m_elems.m_size;
+            for (int32_t k = 0; k < toDo.m_elems.m_size; ++k) {
+                toDo.m_elems.m_data[k] = toDo.m_elems.m_data[k + 1];
             }
-            patchInfosOut.m_data[patchInfosOut.m_size] = p;
-            ++patchInfosOut.m_size;
-            const PatchInfo* patch = m_patchInfos.m_data[patchIndex];
-            const char* name = patch->newName;
-            if (!name) {
-                name = patch->oldName;
+            int32_t patchIndex = item.patchIndex;
+            if (patchIndex != -1 && m_patchInfos.m_data[patchIndex]->oldVersion == -1) {
+                uidState.insert(item.uid, 1);
             }
-            setAllDependeciesToDo(toDo, name, patch->newVersion, worldToUpdate, *this, addedClassPatch, uidState);
-            continue;
-        }
-        // No patch: the class must be registered at the version the world has.
-        const char* className = getClassName(item.uid);
-        int32_t classVersion = getClassVersion(item.uid);
-        if (classVersion == -1) {
-            continue;
-        }
-        const hkClass* klass = finalClassesReg.getClassByName(className);
-        if (klass) {
-            if (klass->getDescribedVersion() == classVersion) {
-                if (!tempWorld.hkDataWorldDict::findClass(klass->getName())) {
-                    tempWorld.wrapClass(*klass);
+            else {
+                uidState.insert(item.uid, 2);
+            }
+            if (patchIndex >= 0) {
+                const PatchInfo* p = m_patchInfos.m_data[patchIndex];
+                hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
+                // EXE-INLINED none: hkArray<const hkVersionPatchManager::PatchInfo*,
+                // hkContainerHeapAllocator>::pushBack
+                if (patchInfosOut.m_size ==
+                    (patchInfosOut.m_capacityAndFlags & hkArrayBase<const PatchInfo*>::CAPACITY_MASK)) {
+                    hkArrayUtil::_reserveMore(heap, &patchInfosOut, sizeof(const PatchInfo*));
                 }
+                patchInfosOut.m_data[patchInfosOut.m_size] = p;
+                ++patchInfosOut.m_size;
+                const PatchInfo* patch = m_patchInfos.m_data[patchIndex];
+                const char* name = patch->newName;
+                if (!name) {
+                    name = patch->oldName;
+                }
+                setAllDependeciesToDo(toDo, name, patch->newVersion, worldToUpdate, *this, addedClassPatch, uidState);
                 continue;
             }
-            // HK_WARN: the described version for the message is read twice, before any of it is written.
-            char buf[512];
-            hkErrStream kStream(buf, 512);
-            int32_t describedVersion = klass->getDescribedVersion();
-            int32_t foundVersion = klass->getDescribedVersion();
-            kStream << "Found class " << className << " of version " << foundVersion << ", but expected version "
-                    << classVersion << ".\nMake sure required patches are registered to update the class " << className
-                    << " from version " << classVersion << " to " << describedVersion
-                    << ",\nor update the class definition with the //+version(" << classVersion << ") annotation.";
-            hkError::s_instance->message(
-                hkError::MESSAGE_WARNING, 0x3f79ddb1, buf, ".\\Version\\hkVersionPatchManager.cpp", 766
-            );
-        }
-        // A class neither patched nor registered at its version.
-        // EXE-INLINED none: hkArray<UidItem, hkContainerHeapAllocator>::~hkArray
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        toDo.m_elems.m_size = 0;
-        if (toDo.m_elems.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                toDo.m_elems.m_data,
-                (toDo.m_elems.m_capacityAndFlags & hkArrayBase<UidItem>::CAPACITY_MASK) * sizeof(UidItem)
-            );
-        }
-        toDo.m_elems.m_data = nullptr;
-        toDo.m_elems.m_capacityAndFlags = hkArrayBase<UidItem>::DONT_DEALLOCATE_FLAG;
-        addedClassPatch.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
-        uidState.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
-        tempWorld.~hkDataWorldDict();
-        // EXE-INLINED none: hkArray<ClassVersion, hkContainerHeapAllocator>::~hkArray
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        origVersions.m_size = 0;
-        if (origVersions.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                origVersions.m_data,
-                (origVersions.m_capacityAndFlags & hkArrayBase<ClassVersion>::CAPACITY_MASK) * sizeof(ClassVersion)
-            );
-        }
-        origVersions.m_data = nullptr;
-        origVersions.m_capacityAndFlags = hkArrayBase<ClassVersion>::DONT_DEALLOCATE_FLAG;
-        // EXE-INLINED none: hkArray<hkDataClassImpl*, hkContainerHeapAllocator>::~hkArray
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        origClasses.m_size = 0;
-        if (origClasses.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                origClasses.m_data,
-                (origClasses.m_capacityAndFlags & hkArrayBase<hkDataClassImpl*>::CAPACITY_MASK) *
-                    sizeof(hkDataClassImpl*)
-            );
-        }
-        return HK_FAILURE;
-    }
-    {
-        // EXE-INLINED none: hkArray<UidItem, hkContainerHeapAllocator>::~hkArray
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        toDo.m_elems.m_size = 0;
-        if (toDo.m_elems.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                toDo.m_elems.m_data,
-                (toDo.m_elems.m_capacityAndFlags & hkArrayBase<UidItem>::CAPACITY_MASK) * sizeof(UidItem)
-            );
+            // No patch: the class must be registered at the version the world has.
+            const char* className = getClassName(item.uid);
+            int32_t classVersion = getClassVersion(item.uid);
+            if (classVersion == -1) {
+                continue;
+            }
+            const hkClass* klass = finalClassesReg.getClassByName(className);
+            if (klass) {
+                if (klass->getDescribedVersion() == classVersion) {
+                    if (!tempWorld.hkDataWorldDict::findClass(klass->getName())) {
+                        tempWorld.wrapClass(*klass);
+                    }
+                    continue;
+                }
+                // HK_WARN: the described version for the message is read twice, before any of it is written.
+                char buf[512];
+                hkErrStream kStream(buf, 512);
+                int32_t describedVersion = klass->getDescribedVersion();
+                int32_t foundVersion = klass->getDescribedVersion();
+                kStream << "Found class " << className << " of version " << foundVersion << ", but expected version "
+                        << classVersion << ".\nMake sure required patches are registered to update the class "
+                        << className << " from version " << classVersion << " to " << describedVersion
+                        << ",\nor update the class definition with the //+version(" << classVersion << ") annotation.";
+                hkError::s_instance->message(
+                    hkError::MESSAGE_WARNING, 0x3f79ddb1, buf, ".\\Version\\hkVersionPatchManager.cpp", 766
+                );
+            }
+            // A class neither patched nor registered at its version.
+            return HK_FAILURE;
         }
     }
 
@@ -733,27 +579,13 @@ hkResult hkVersionPatchManager::preparePatches(
         hkDataClass klass(tempWorld.hkDataWorldDict::findClass(newName));
         if (klass.isNull()) {
             // The class as the patch leaves it, still at the version the patch starts from (oldVersion is passed).
-            XFNV_INLINED_LOCAL(hkDataClass::Cinfo, cinfo, std::nullopt, std::nullopt);
-            // EXE-INLINED none: hkArray<hkDataClass::Cinfo::Member, hkContainerHeapAllocator>::hkArray
-            cinfo.members.m_data = nullptr;
-            cinfo.members.m_size = 0;
-            cinfo.members.m_capacityAndFlags = hkArrayBase<hkDataClass::Cinfo::Member>::DONT_DEALLOCATE_FLAG;
+            hkDataClass::Cinfo cinfo;
             cinfo.name = newName;
             cinfo.version = p->oldVersion;
             cinfo.parent = nullptr;
             hkDataClass created(tempWorld.hkDataWorldDict::newClass(cinfo));
             // EXE-INLINED none: hkDataClass::operator=
             klass.m_impl = created.m_impl;
-            // EXE-INLINED 0xDBA490: hkDataClass::Cinfo::~Cinfo
-            hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-            cinfo.members.m_size = 0;
-            if (cinfo.members.m_capacityAndFlags >= 0) {
-                pHeap->bufFree(
-                    cinfo.members.m_data,
-                    (cinfo.members.m_capacityAndFlags & hkArrayBase<hkDataClass::Cinfo::Member>::CAPACITY_MASK) *
-                        sizeof(hkDataClass::Cinfo::Member)
-                );
-            }
         }
         for (int32_t j = p->numComponent - 1; j >= 0; --j) {
             const PatchInfo::Component& component = p->component[j];
@@ -808,16 +640,10 @@ hkResult hkVersionPatchManager::preparePatches(
 
     // Copy into worldToUpdate the classes of the temporary world it does not have. The name map holds the names and
     // classes as hkUlong integers (the SDK's casts).
-    XFNV_INLINED_LOCAL(ClassArray, tempClasses, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkDataClassImpl*, hkContainerHeapAllocator>::hkArray
-    tempClasses.m_data = nullptr;
-    tempClasses.m_size = 0;
-    tempClasses.m_capacityAndFlags = hkArrayBase<hkDataClassImpl*>::DONT_DEALLOCATE_FLAG;
+    ClassArray tempClasses;
     tempWorld.hkDataWorldDict::findAllClasses(tempClasses);
-    XFNV_INLINED_LOCAL(NameMap, classFromName, std::nullopt, std::nullopt);
-    ::new (&classFromName) NameMap(0);
-    XFNV_INLINED_LOCAL(NameMap, unusedMap, std::nullopt, std::nullopt);
-    ::new (&unusedMap) NameMap(0);
+    NameMap classFromName(0);
+    NameMap unusedMap(0);
     for (int32_t i = 0; i < tempClasses.m_size; ++i) {
         hkDataClassImpl* pClass = tempClasses.m_data[i];
         classFromName.insert(reinterpret_cast<hkUlong>(pClass->getName()), reinterpret_cast<hkUlong>(pClass));
@@ -835,41 +661,6 @@ hkResult hkVersionPatchManager::preparePatches(
             worldToUpdate.copyClassFromWorld(pClass->getName(), tempWorld);
             it = classFromName.getNext(it);
         }
-    }
-    unusedMap.clearAndDeallocate();
-    classFromName.clearAndDeallocate();
-
-    // EXE-INLINED none: hkArray<hkDataClassImpl*, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    tempClasses.m_size = 0;
-    if (tempClasses.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            tempClasses.m_data,
-            (tempClasses.m_capacityAndFlags & hkArrayBase<hkDataClassImpl*>::CAPACITY_MASK) * sizeof(hkDataClassImpl*)
-        );
-    }
-    addedClassPatch.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
-    uidState.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
-    tempWorld.~hkDataWorldDict();
-    // EXE-INLINED none: hkArray<ClassVersion, hkContainerHeapAllocator>::~hkArray
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    origVersions.m_size = 0;
-    if (origVersions.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            origVersions.m_data,
-            (origVersions.m_capacityAndFlags & hkArrayBase<ClassVersion>::CAPACITY_MASK) * sizeof(ClassVersion)
-        );
-    }
-    origVersions.m_data = nullptr;
-    origVersions.m_capacityAndFlags = hkArrayBase<ClassVersion>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<hkDataClassImpl*, hkContainerHeapAllocator>::~hkArray
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    origClasses.m_size = 0;
-    if (origClasses.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            origClasses.m_data,
-            (origClasses.m_capacityAndFlags & hkArrayBase<hkDataClassImpl*>::CAPACITY_MASK) * sizeof(hkDataClassImpl*)
-        );
     }
     return HK_SUCCESS;
 }
@@ -908,49 +699,15 @@ hkResult hkVersionPatchManager::recomputePatchDependencies() const {
     using NameMap = hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>;
     using PatchArray = hkArray<const PatchInfo*>;
     using IndexArray = hkArray<int32_t>;
-    XFNV_INLINED_LOCAL(UidIndexMap, addedPatchIndex, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(UidMultiMap, newUidPatches, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NameMultiMap, removedNames, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NameMap, addedNames, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(IndexMultiMap, dependencies, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(IndexMultiMap, laterDependencies, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(PatchArray, patchInfos, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(IndexArray, order, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(IndexArray, done, std::nullopt, std::nullopt);
     hkResult result = HK_FAILURE;
-    hkMemoryAllocator* pHeap;
     int32_t numPatches;
     int32_t index;
     UidFromClassVersion* pUids;
 
-    // EXE-INLINED none: hkPointerMap<hkUint64, int32_t>::hkPointerMap
-    addedPatchIndex.m_map.m_elem = nullptr;
-    addedPatchIndex.m_map.m_numElems = 0;
-    addedPatchIndex.m_map.m_hashMod = -1;
-    addedPatchIndex.m_map.hkMapBase<uint64_t, uint64_t, hkMapOperations<uint64_t>>::reserve(
-        *hkMemoryRouter::getInstance().m_heap, 0
-    );
-    // EXE-INLINED none: hkSerializeMultiMap<uint64_t, int>::hkSerializeMultiMap
-    newUidPatches.m_valueChain.m_data = nullptr;
-    newUidPatches.m_valueChain.m_size = 0;
-    newUidPatches.m_valueChain.m_capacityAndFlags = hkArrayBase<UidMultiMap::Value>::DONT_DEALLOCATE_FLAG;
-    newUidPatches.m_indexMap.m_map.m_elem = nullptr;
-    newUidPatches.m_indexMap.m_map.m_numElems = 0;
-    newUidPatches.m_indexMap.m_map.m_hashMod = -1;
-    newUidPatches.m_indexMap.m_map.hkMapBase<uint64_t, uint64_t, hkMapOperations<uint64_t>>::reserve(
-        *hkMemoryRouter::getInstance().m_heap, 0
-    );
-    newUidPatches.m_freeChainStart = -1;
+    UidIndexMap addedPatchIndex;
+    UidMultiMap newUidPatches;
     pUids = m_uidFromClassVersion;
-    // EXE-INLINED 0xDC9E70: hkSerializeMultiMap<const void*, int32_t>::hkSerializeMultiMap
-    removedNames.m_valueChain.m_data = nullptr;
-    removedNames.m_valueChain.m_size = 0;
-    removedNames.m_valueChain.m_capacityAndFlags = hkArrayBase<NameMultiMap::Value>::DONT_DEALLOCATE_FLAG;
-    removedNames.m_indexMap.m_map.m_elem = nullptr;
-    removedNames.m_indexMap.m_map.m_numElems = 0;
-    removedNames.m_indexMap.m_map.m_hashMod = -1;
-    removedNames.m_indexMap.m_map.hkUlongMapBase::reserve(*hkMemoryRouter::getInstance().m_heap, 0);
-    removedNames.m_freeChainStart = -1;
+    NameMultiMap removedNames;
     m_patchIndexFromUid.m_map.clear();
 
     // Index each patch by the uid of the class it starts from (or, for one adding a class, the class it adds) and by
@@ -958,12 +715,12 @@ hkResult hkVersionPatchManager::recomputePatchDependencies() const {
     for (int32_t i = 0; i < m_patchInfos.m_size; ++i) {
         const PatchInfo* p = m_patchInfos.m_data[i];
         if (!isValidPatch(p)) {
-            goto destroyRemovedNames;
+            return HK_FAILURE;
         }
         if (p->oldVersion != -1) {
             hkUint64 uid = m_uidFromClassVersion->get(p->oldName, p->oldVersion);
             if (m_patchIndexFromUid.isValid(m_patchIndexFromUid.findKey(uid))) {
-                goto destroyCalled;
+                return HK_FAILURE;
             }
             m_patchIndexFromUid.insert(uid, i);
             if (p->newVersion == -1 || (p->newName && hkString::strCmp(p->oldName, p->newName) != 0)) {
@@ -973,7 +730,7 @@ hkResult hkVersionPatchManager::recomputePatchDependencies() const {
         else {
             hkUint64 uid = m_uidFromClassVersion->get(p->newName, p->newVersion);
             if (addedPatchIndex.isValid(addedPatchIndex.findKey(uid))) {
-                goto destroyCalled;
+                return HK_FAILURE;
             }
             addedPatchIndex.insert(uid, i);
         }
@@ -984,25 +741,9 @@ hkResult hkVersionPatchManager::recomputePatchDependencies() const {
         }
     }
 
-    ::new (&addedNames) NameMap(0);
-    // EXE-INLINED none: hkSerializeMultiMap<int32_t, int32_t>::hkSerializeMultiMap
-    dependencies.m_valueChain.m_data = nullptr;
-    dependencies.m_valueChain.m_size = 0;
-    dependencies.m_valueChain.m_capacityAndFlags = hkArrayBase<IndexMultiMap::Value>::DONT_DEALLOCATE_FLAG;
-    dependencies.m_indexMap.m_map.m_elem = nullptr;
-    dependencies.m_indexMap.m_map.m_numElems = 0;
-    dependencies.m_indexMap.m_map.m_hashMod = -1;
-    dependencies.m_indexMap.m_map.hkUlongMapBase::reserve(*hkMemoryRouter::getInstance().m_heap, 0);
-    dependencies.m_freeChainStart = -1;
-    // EXE-INLINED none: hkSerializeMultiMap<int32_t, int32_t>::hkSerializeMultiMap
-    laterDependencies.m_valueChain.m_data = nullptr;
-    laterDependencies.m_valueChain.m_size = 0;
-    laterDependencies.m_valueChain.m_capacityAndFlags = hkArrayBase<IndexMultiMap::Value>::DONT_DEALLOCATE_FLAG;
-    laterDependencies.m_indexMap.m_map.m_elem = nullptr;
-    laterDependencies.m_indexMap.m_map.m_numElems = 0;
-    laterDependencies.m_indexMap.m_map.m_hashMod = -1;
-    laterDependencies.m_indexMap.m_map.hkUlongMapBase::reserve(*hkMemoryRouter::getInstance().m_heap, 0);
-    laterDependencies.m_freeChainStart = -1;
+    NameMap addedNames(0);
+    IndexMultiMap dependencies;
+    IndexMultiMap laterDependencies;
 
     // Each patch depends on the patches that make the class it starts from and on its PATCH_DEPENDS classes'
     // patches; a patch adding a class depends on the patches removing or renaming a class of that name.
@@ -1014,7 +755,7 @@ hkResult hkVersionPatchManager::recomputePatchDependencies() const {
             name = p->newName;
             version = p->newVersion;
             if (!name || version == -1) {
-                goto destroyDependencies;
+                return HK_FAILURE;
             }
         }
         hkUint64 uid = pUids->get(name, version);
@@ -1053,7 +794,7 @@ hkResult hkVersionPatchManager::recomputePatchDependencies() const {
                     // The SDK's map holds the names and patch indices as hkUlong integers.
                     if (addedNames.getWithDefault(reinterpret_cast<hkUlong>(name), static_cast<hkUlong>(last)) !=
                         static_cast<hkUlong>(last)) {
-                        goto destroyDependencies;
+                        return HK_FAILURE;
                     }
                     addedNames.insert(reinterpret_cast<hkUlong>(name), static_cast<hkUlong>(i));
                     pTarget = &dependencies;
@@ -1076,31 +817,19 @@ hkResult hkVersionPatchManager::recomputePatchDependencies() const {
          it = laterDependencies.m_indexMap.getNext(it)) {
         int32_t key = laterDependencies.m_indexMap.getKey(it);
         for (int32_t j = laterDependencies.find(key); j != -1; j = laterDependencies.m_valueChain.m_data[j].next) {
-            XFNV_INLINED_LOCAL(IndexMap, visited, std::nullopt, std::nullopt);
-            // EXE-INLINED none: hkPointerMap<int32_t, int32_t>::hkPointerMap
-            visited.m_map.m_elem = nullptr;
-            visited.m_map.m_numElems = 0;
-            visited.m_map.m_hashMod = -1;
-            visited.m_map.hkUlongMapBase::reserve(*hkMemoryRouter::getInstance().m_heap, 0);
+            IndexMap visited;
             int32_t value = laterDependencies.m_valueChain.m_data[j].value;
             if (!findPatchIndexInDependencies(key, value, dependencies, visited)) {
                 dependencies.insert(key, value);
             }
-            visited.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
         }
     }
 
     // Sort the patches: walkDependencies numbers each patch after those it depends on.
-    // EXE-INLINED none: hkArray<const hkVersionPatchManager::PatchInfo*, hkContainerHeapAllocator>::hkArray
-    patchInfos.m_data = nullptr;
-    patchInfos.m_size = 0;
-    patchInfos.m_capacityAndFlags = hkArrayBase<const PatchInfo*>::DONT_DEALLOCATE_FLAG;
+    PatchArray patchInfos;
     patchInfos.swap(m_patchInfos);
     numPatches = patchInfos.m_size;
-    // EXE-INLINED none: hkArray<int32_t, hkContainerHeapAllocator>::hkArray
-    order.m_data = nullptr;
-    order.m_size = 0;
-    order.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
+    IndexArray order;
     {
         hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
         // EXE-INLINED none: hkArray<int32_t, hkContainerHeapAllocator>::setSize
@@ -1117,10 +846,7 @@ hkResult hkVersionPatchManager::recomputePatchDependencies() const {
         }
         order.m_size = numPatches;
     }
-    // EXE-INLINED none: hkArray<int32_t, hkContainerHeapAllocator>::hkArray
-    done.m_data = nullptr;
-    done.m_size = 0;
-    done.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
+    IndexArray done;
     index = 0;
     for (int32_t i = 0; i < patchInfos.m_size; ++i) {
         index = walkDependencies(i, order, dependencies, index, done, patchInfos);
@@ -1144,7 +870,7 @@ hkResult hkVersionPatchManager::recomputePatchDependencies() const {
         if (position < 0) {
             // A dependency cycle: the patches go back as they were.
             m_patchInfos.swap(patchInfos);
-            goto destroyArrays;
+            return HK_FAILURE;
         }
         m_patchInfos.m_data[position] = patchInfos.m_data[i];
     }
@@ -1157,110 +883,12 @@ hkResult hkVersionPatchManager::recomputePatchDependencies() const {
         }
     }
     result = HK_SUCCESS;
-
-destroyArrays:
-    // EXE-INLINED none: hkArray<int32_t, hkContainerHeapAllocator>::~hkArray
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    done.m_size = 0;
-    if (done.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(done.m_data, (done.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK) * sizeof(int32_t));
-    }
-    done.m_data = nullptr;
-    done.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<int32_t, hkContainerHeapAllocator>::~hkArray
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    order.m_size = 0;
-    if (order.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            order.m_data, (order.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK) * sizeof(int32_t)
-        );
-    }
-    order.m_data = nullptr;
-    order.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<const hkVersionPatchManager::PatchInfo*, hkContainerHeapAllocator>::~hkArray
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    patchInfos.m_size = 0;
-    if (patchInfos.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            patchInfos.m_data,
-            (patchInfos.m_capacityAndFlags & hkArrayBase<const PatchInfo*>::CAPACITY_MASK) * sizeof(const PatchInfo*)
-        );
-    }
-    patchInfos.m_data = nullptr;
-    patchInfos.m_capacityAndFlags = hkArrayBase<const PatchInfo*>::DONT_DEALLOCATE_FLAG;
-
-destroyDependencies:
-    // EXE-INLINED none: hkSerializeMultiMap<int32_t, int32_t>::~hkSerializeMultiMap
-    laterDependencies.m_indexMap.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    laterDependencies.m_valueChain.m_size = 0;
-    if (laterDependencies.m_valueChain.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            laterDependencies.m_valueChain.m_data,
-            (laterDependencies.m_valueChain.m_capacityAndFlags & hkArrayBase<IndexMultiMap::Value>::CAPACITY_MASK) *
-                sizeof(IndexMultiMap::Value)
-        );
-    }
-    laterDependencies.m_valueChain.m_data = nullptr;
-    laterDependencies.m_valueChain.m_capacityAndFlags = hkArrayBase<IndexMultiMap::Value>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkSerializeMultiMap<int32_t, int32_t>::~hkSerializeMultiMap
-    dependencies.m_indexMap.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    dependencies.m_valueChain.m_size = 0;
-    if (dependencies.m_valueChain.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            dependencies.m_valueChain.m_data,
-            (dependencies.m_valueChain.m_capacityAndFlags & hkArrayBase<IndexMultiMap::Value>::CAPACITY_MASK) *
-                sizeof(IndexMultiMap::Value)
-        );
-    }
-    dependencies.m_valueChain.m_data = nullptr;
-    dependencies.m_valueChain.m_capacityAndFlags = hkArrayBase<IndexMultiMap::Value>::DONT_DEALLOCATE_FLAG;
-    addedNames.clearAndDeallocate();
-
-destroyRemovedNames:
-    // EXE-INLINED 0xDBA430: hkSerializeMultiMap<const void*, int32_t>::~hkSerializeMultiMap
-    removedNames.m_indexMap.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    removedNames.m_valueChain.m_size = 0;
-    if (removedNames.m_valueChain.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            removedNames.m_valueChain.m_data,
-            (removedNames.m_valueChain.m_capacityAndFlags & hkArrayBase<NameMultiMap::Value>::CAPACITY_MASK) *
-                sizeof(NameMultiMap::Value)
-        );
-    }
-    removedNames.m_valueChain.m_data = nullptr;
-    removedNames.m_valueChain.m_capacityAndFlags = hkArrayBase<NameMultiMap::Value>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED 0xDBA3D0: hkSerializeMultiMap<uint64_t, int>::~hkSerializeMultiMap
-    newUidPatches.m_indexMap.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    newUidPatches.m_valueChain.m_size = 0;
-    if (newUidPatches.m_valueChain.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            newUidPatches.m_valueChain.m_data,
-            (newUidPatches.m_valueChain.m_capacityAndFlags & hkArrayBase<UidMultiMap::Value>::CAPACITY_MASK) *
-                sizeof(UidMultiMap::Value)
-        );
-    }
-    newUidPatches.m_valueChain.m_data = nullptr;
-    newUidPatches.m_valueChain.m_capacityAndFlags = hkArrayBase<UidMultiMap::Value>::DONT_DEALLOCATE_FLAG;
-    addedPatchIndex.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
     return result;
-
-destroyCalled:
-    // A class patched twice from one version, or added twice: the multimaps are destroyed here before failing.
-    removedNames.~NameMultiMap();
-    newUidPatches.~UidMultiMap();
-    addedPatchIndex.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
-    return HK_FAILURE;
 }
 
 hkResult
 hkVersionPatchManager::applyPatches(hkDataWorldDict& worldToUpdate, const hkClassNameRegistry* finalClassesReg) {
     hkResult result;
-    using apArray_t = hkArray<const hkVersionPatchManager::PatchInfo*, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(apArray_t, apArray, std::nullopt, std::nullopt);
     const hkClassNameRegistry* v3 = finalClassesReg;
     if (!finalClassesReg) {
         v3 = hkBuiltinTypeRegistry::s_instance->getClassNameRegistry();
@@ -1269,19 +897,12 @@ hkVersionPatchManager::applyPatches(hkDataWorldDict& worldToUpdate, const hkClas
     if ((m_patchIndexFromUid.m_map.m_numElems &
          hkMapBase<uint64_t, uint64_t, hkMapOperations<uint64_t>>::NUM_ELEMS_MASK) != 0 ||
         (!m_patchInfos.m_size || (result = recomputePatchDependencies(), result != HK_FAILURE))) {
-        apArray.m_data = nullptr;
-        apArray.m_size = 0;
-        apArray.m_capacityAndFlags = hkArrayBase<const hkVersionPatchManager::PatchInfo*>::DONT_DEALLOCATE_FLAG;
+        hkArray<const hkVersionPatchManager::PatchInfo*, hkContainerHeapAllocator> apArray;
         hkResult v6 = preparePatches(worldToUpdate, *v3, apArray);
         if (v6 == HK_SUCCESS) {
             v6 = applyPatchesToWorld(&apArray, &worldToUpdate);
         }
         v3->removeReference();
-        hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
-        apArray.m_size = 0;
-        if (apArray.m_capacityAndFlags >= 0) {
-            m_heap->bufFree(apArray.m_data, sizeof(hkVersionPatchManager::PatchInfo*) * apArray.m_capacityAndFlags);
-        }
         return v6;
     }
     return result;

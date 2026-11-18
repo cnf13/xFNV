@@ -1744,12 +1744,8 @@ float getLoopSurfaceArea(const hkArray<hkgpMeshBase::Edge, hkContainerHeapAlloca
     if (a1.m_size == 0) {
         return 0.0f;
     }
-    // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::hkArray
-    XFNV_INLINED_LOCAL(PointArray, points, std::nullopt, std::nullopt);
+    PointArray points;
     hkAabb aabb;
-    points.m_data = nullptr;
-    points.m_size = 0;
-    points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
     const int32_t numPoints = 2 * a1.m_size;
     // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::reserve
     hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
@@ -1786,16 +1782,6 @@ float getLoopSurfaceArea(const hkArray<hkgpMeshBase::Edge, hkContainerHeapAlloca
     const __m128 extent = _mm_sub_ps(aabb.m_max.m_quad, aabb.m_min.m_quad);
     const __m128 sumXY = _mm_add_ss(_mm_shuffle_ps(extent, extent, 0x55), extent);
     const float area = _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(extent, extent, 0xAA), sumXY));
-    // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator* freeHeap = hkMemoryRouter::getInstance().m_heap;
-    points.m_size = 0;
-    if (points.m_capacityAndFlags >= 0) {
-        freeHeap->bufFree(
-            points.m_data,
-            (points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkVector4))
-        );
-    }
     return area;
 }
 
@@ -1824,10 +1810,7 @@ int32_t getStartingPoint(
 ) {
     using Pair_t = hkPlaneEquationUtil::hkpPlaneEqnIndexPair;
     using Pairs_t = hkInplaceArray<Pair_t, 32, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(Pairs_t, tried, std::nullopt, std::nullopt);
-    tried.m_data = tried.m_storage;
-    tried.m_size = 0;
-    tried.m_capacityAndFlags = hkArrayBase<Pair_t>::DONT_DEALLOCATE_FLAG | 32;
+    Pairs_t tried;
     int32_t result = 1;
     for (;;) {
         int32_t bestA = -1;
@@ -1887,15 +1870,6 @@ int32_t getStartingPoint(
             result = 0;
             break;
         }
-    }
-    // EXE-INLINED none: hkInplaceArray<hkPlaneEquationUtil::hkpPlaneEqnIndexPair, 32>::~hkInplaceArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    tried.m_size = 0;
-    if (tried.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            tried.m_data,
-            (tried.m_capacityAndFlags & hkArrayBase<Pair_t>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(Pair_t))
-        );
     }
     return result;
 }
@@ -2054,8 +2028,8 @@ bool hkgpMesh::PrismPolicy::addHit(
     }
     ++m_numConvexChecks;
     const hkgpMesh::IConvexOverlap* overlap = m_iconvexoverlap;
-    XFNV_INLINED_LOCAL(hkgpMesh::PrismShape<1>, shapeA, hkgpMesh_PrismShape_1_vftable, std::nullopt);
-    XFNV_INLINED_LOCAL(hkgpMesh::PrismShape<1>, shapeB, hkgpMesh_PrismShape_1_vftable, std::nullopt);
+    hkgpMesh::PrismShape<1> shapeA;
+    hkgpMesh::PrismShape<1> shapeB;
     shapeA.m_triangle = triangleA;
     shapeB.m_triangle = triangleB;
     if (overlap->checkOverlap(&shapeA, &shapeB, 0.0f)) {
@@ -2106,7 +2080,7 @@ float hkgpMesh::CollideShapeTriangle::addLeaf(const hkAabbTree<hkAabbTreeData::h
     if (negMargin < dot1) {
         return 1.0f;
     }
-    XFNV_INLINED_LOCAL(hkgpMesh::TriangleShape, shape, hkgpMesh_TriangleShape_vftable, std::nullopt);
+    hkgpMesh::TriangleShape shape;
     shape.m_triangle = triangle;
     const float distance = m_ioverlap->distance(m_shape, &shape, m_allowPenetration);
     if (!(m_minDist > distance)) {
@@ -2142,20 +2116,7 @@ float hkgpMesh::WeldingPolicy::addLeaf(const hkAabbTree<hkAabbTreeData::hkAabbTr
 int32_t hkgpMesh::Location::Region::hasCommonSuperset(const hkgpMesh::Location::Region* const* a1, int32_t a2) {
     using TriangleArray = hkLocalArray<hkgpMeshBase::Triangle*>;
     const uintptr_t kTriangleMask = ~static_cast<uintptr_t>(3);
-    XFNV_INLINED_LOCAL(TriangleArray, triangles, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkgpMeshBase::Triangle*>::hkLocalArray(64) (hkAllocateStack)
-        triangles.m_data = nullptr;
-        triangles.m_size = 0;
-        triangles.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((64 * static_cast<int32_t>(sizeof(hkgpMeshBase::Triangle*)) + 127) & ~127);
-        // The stack allocator's bytes are untyped memory; the array keeps its triangle pointers there.
-        triangles.m_data = reinterpret_cast<hkgpMeshBase::Triangle**>(pBlock);
-        triangles.m_capacityAndFlags = 64 | hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
-        triangles.m_localMemory = triangles.m_data;
-    }
+    TriangleArray triangles(64);
     // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::pushBack
     const auto pushBack = [&triangles](hkgpMeshBase::Triangle* pTriangle) __attribute__((always_inline)) {
         hkMemoryRouter& router = hkMemoryRouter::getInstance();
@@ -2209,7 +2170,6 @@ int32_t hkgpMesh::Location::Region::hasCommonSuperset(const hkgpMesh::Location::
             break;
         }
     }
-    triangles.~TriangleArray();
     return result;
 }
 
@@ -2255,10 +2215,7 @@ void hkgpMesh::reset() {
 // neighbour edge's index in its low two bits. from is unlinked from the vertex list (List::release) and handed back to
 // the vertex pools. The compares are signed.
 void hkgpMesh::replaceVertex(hkgpMeshBase::Vertex* src, hkgpMeshBase::Vertex* dst) {
-    XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Triangle*>, toGlue, std::nullopt, std::nullopt);
-    toGlue.m_data = nullptr;
-    toGlue.m_size = 0;
-    toGlue.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkgpMeshBase::Triangle*> toGlue;
     for (hkgpMeshBase::Triangle* t = static_cast<hkgpMeshBase::Triangle*>(m_triangles.m_used); t; t = t->m_next) {
         for (int32_t i = 0; i < 3; ++i) {
             hkgpMeshBase::Vertex* pVertex = t->m_vertices[i];
@@ -2321,18 +2278,6 @@ void hkgpMesh::replaceVertex(hkgpMeshBase::Vertex* src, hkgpMeshBase::Vertex* ds
     }
     --m_vertices.m_numUsed;
     m_vertices.m_allocator.release(src);
-
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = toGlue.m_capacityAndFlags;
-    toGlue.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            toGlue.m_data,
-            (capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkgpMeshBase::Triangle*))
-        );
-    }
 }
 
 // The open edges (a link whose pointer bits are clear) are collected in a local hkArray reserved for 1024 edges and
@@ -2342,10 +2287,7 @@ void hkgpMesh::replaceVertex(hkgpMeshBase::Vertex* src, hkgpMeshBase::Vertex* ds
 // triangle's pointer with the neighbour edge's index in its low two bits. The report goes through a local hkErrStream.
 // The compares are signed.
 void hkgpMesh::fixBindings() {
-    XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Edge>, nakedEdges, std::nullopt, std::nullopt);
-    nakedEdges.m_data = nullptr;
-    nakedEdges.m_size = 0;
-    nakedEdges.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkgpMeshBase::Edge> nakedEdges;
     int32_t numFixed = 0;
     // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::reserve(1024)
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
@@ -2434,18 +2376,6 @@ void hkgpMesh::fixBindings() {
         pStream->~hkErrStream();
     }
     m_hasPerVertexNormals.m_bool = 0;
-
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = nakedEdges.m_capacityAndFlags;
-    nakedEdges.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            nakedEdges.m_data,
-            (capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkgpMeshBase::Edge))
-        );
-    }
 }
 
 // Recounts every vertex's references from the triangles, then walks the ring of edges around each triangle corner
@@ -2472,10 +2402,7 @@ int32_t hkgpMesh::removeButterflies(int32_t tag) {
         for (uint32_t i = 0; i < 3; ++i) {
             hkgpMeshBase::Vertex* pVertex = pTriangle->m_vertices[i];
             using ring_t = hkInplaceArray<hkgpMeshBase::Edge, 16>;
-            XFNV_INLINED_LOCAL(ring_t, ring, std::nullopt, std::nullopt);
-            ring.m_data = ring.m_storage;
-            ring.m_size = 0;
-            ring.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG | 16;
+            ring_t ring;
             hkgpMeshBase::Triangle* pEdgeTriangle = pTriangle;
             uint32_t uiEdgeIndex = i;
             for (;;) {
@@ -2548,17 +2475,6 @@ int32_t hkgpMesh::removeButterflies(int32_t tag) {
                 }
                 ++iNumFound;
             }
-            hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-            ring.m_size = 0;
-            if (!(ring.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG)) {
-                kHeap.bufFree(
-                    ring.m_data,
-                    static_cast<int32_t>(
-                        (ring.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                        sizeof(hkgpMeshBase::Edge)
-                    )
-                );
-            }
         }
     }
     if (iNumFound) {
@@ -2586,10 +2502,7 @@ int32_t hkgpMesh::removeButterflies(int32_t tag) {
 // copies them into the new vertex.
 void hkgpMesh::splitPartIntersections(int32_t partA, int32_t partB) {
     using QueryUtils = hkAabbTreeQueryUtils<hkAabbTreeData::hkAabbTreeAabb, uint32_t>;
-    XFNV_INLINED_LOCAL(hkArray<QueryUtils::IdxPair>, pairs, std::nullopt, std::nullopt);
-    pairs.m_data = nullptr;
-    pairs.m_size = 0;
-    pairs.m_capacityAndFlags = hkArrayBase<QueryUtils::IdxPair>::DONT_DEALLOCATE_FLAG;
+    hkArray<QueryUtils::IdxPair> pairs;
     const float fEpsilon = 0.0001f;
     for (int32_t iPass = 0; iPass < 1; ++iPass) {
         rebuildTrianglesTree();
@@ -2803,17 +2716,6 @@ void hkgpMesh::splitPartIntersections(int32_t partA, int32_t partB) {
         }
     }
     m_hasPerVertexNormals.m_bool = 0;
-    hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-    pairs.m_size = 0;
-    if (!(pairs.m_capacityAndFlags & hkArrayBase<QueryUtils::IdxPair>::DONT_DEALLOCATE_FLAG)) {
-        kHeap.bufFree(
-            pairs.m_data,
-            static_cast<int32_t>(
-                (pairs.m_capacityAndFlags & hkArrayBase<QueryUtils::IdxPair>::CAPACITY_MASK) *
-                sizeof(QueryUtils::IdxPair)
-            )
-        );
-    }
 }
 
 // The leaf boxes are each normalized triangle's box grown by a hundredth of its half diagonal (both x87 steps
@@ -2824,15 +2726,8 @@ void hkgpMesh::rebuildTrianglesTree() {
     using IndexArray = hkArray<uint32_t, hkContainerHeapAllocator>;
     m_trianglesTree.clear();
     int32_t numLeaves = 0;
-    // EXE-INLINED none: hkArray<hkAabb, hkContainerHeapAllocator>::hkArray, hkArray<void*, ...>::hkArray
-    XFNV_INLINED_LOCAL(AabbArray, aabbs, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(LeafArray, leaves, std::nullopt, std::nullopt);
-    aabbs.m_data = nullptr;
-    aabbs.m_size = 0;
-    aabbs.m_capacityAndFlags = hkArrayBase<hkAabb>::DONT_DEALLOCATE_FLAG;
-    leaves.m_data = nullptr;
-    leaves.m_size = 0;
-    leaves.m_capacityAndFlags = hkArrayBase<void*>::DONT_DEALLOCATE_FLAG;
+    AabbArray aabbs;
+    LeafArray leaves;
     for (hkgpMeshBase::Triangle* pTriangle = m_triangles.m_used; pTriangle; pTriangle = pTriangle->m_next) {
         const hkVector4* apPositions[3] = {
             &pTriangle->m_vertices[0]->m_position, &pTriangle->m_vertices[1]->m_position,
@@ -2878,53 +2773,11 @@ void hkgpMesh::rebuildTrianglesTree() {
             ++leaves.m_size;
         }
     }
-    // EXE-INLINED none: hkArray<uint32_t, hkContainerHeapAllocator>::hkArray
-    XFNV_INLINED_LOCAL(IndexArray, leafIdxOut, std::nullopt, std::nullopt);
-    leafIdxOut.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
-    leafIdxOut.m_data = nullptr;
-    leafIdxOut.m_size = 0;
+    IndexArray leafIdxOut;
     m_trianglesTree.build(aabbs.m_data, leaves.m_data, aabbs.m_size, leafIdxOut);
     for (hkgpMeshBase::Triangle* pTriangle = m_triangles.m_used; pTriangle; pTriangle = pTriangle->m_next) {
         if (pTriangle->m_leafIdx != 0x7FFFFFFF) {
             pTriangle->m_leafIdx = leafIdxOut.m_data[pTriangle->m_leafIdx];
-        }
-    }
-    {
-        // EXE-INLINED none: hkArray<uint32_t, hkContainerHeapAllocator>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        leafIdxOut.m_size = 0;
-        if (!(leafIdxOut.m_capacityAndFlags & hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG)) {
-            heap.bufFree(
-                leafIdxOut.m_data,
-                (leafIdxOut.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(uint32_t))
-            );
-        }
-        leafIdxOut.m_data = nullptr;
-        leafIdxOut.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
-    }
-    {
-        // EXE-INLINED none: hkArray<void*, hkContainerHeapAllocator>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        leaves.m_size = 0;
-        if (!(leaves.m_capacityAndFlags & hkArrayBase<void*>::DONT_DEALLOCATE_FLAG)) {
-            heap.bufFree(
-                leaves.m_data,
-                (leaves.m_capacityAndFlags & hkArrayBase<void*>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(void*))
-            );
-        }
-        leaves.m_data = nullptr;
-        leaves.m_capacityAndFlags = hkArrayBase<void*>::DONT_DEALLOCATE_FLAG;
-    }
-    {
-        // EXE-INLINED none: hkArray<hkAabb, hkContainerHeapAllocator>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        aabbs.m_size = 0;
-        if (!(aabbs.m_capacityAndFlags & hkArrayBase<hkAabb>::DONT_DEALLOCATE_FLAG)) {
-            heap.bufFree(
-                aabbs.m_data,
-                (aabbs.m_capacityAndFlags & hkArrayBase<hkAabb>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(hkAabb))
-            );
         }
     }
 }
@@ -2968,15 +2821,12 @@ hkgpMesh* hkgpMesh::clipByConvexHull(const hkgpConvexHull& hull) {
         pStream->~hkErrStream();
     }
 
-    XFNV_INLINED_LOCAL(hkArray<QueryUtils::NodePair>, pairs, std::nullopt, std::nullopt);
     bool bClipped;
     do {
         bClipped = false;
         pMesh->rebuildTrianglesTree();
         rebuildTrianglesTree();
-        pairs.m_data = nullptr;
-        pairs.m_size = 0;
-        pairs.m_capacityAndFlags = hkArrayBase<QueryUtils::NodePair>::DONT_DEALLOCATE_FLAG;
+        hkArray<QueryUtils::NodePair> pairs;
         {
             QueryUtils::TreeTreeNodePairCollector kCollector(&pairs);
             QueryUtils::queryTreeCollision(&pMesh->m_trianglesTree, &pMesh->m_trianglesTree, &kCollector);
@@ -2992,19 +2842,6 @@ hkgpMesh* hkgpMesh::clipByConvexHull(const hkgpConvexHull& hull) {
                 bAnyClipped = true;
             }
         }
-        // EXE-INLINED none: hkArray<NodePair>::clearAndDeallocate
-        hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-        const int32_t iCapacityAndFlags = pairs.m_capacityAndFlags;
-        pairs.m_size = 0;
-        if (iCapacityAndFlags >= 0) {
-            rHeap.bufFree(
-                pairs.m_data,
-                (iCapacityAndFlags & hkArrayBase<QueryUtils::NodePair>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(QueryUtils::NodePair))
-            );
-        }
-        pairs.m_data = nullptr;
-        pairs.m_capacityAndFlags = hkArrayBase<QueryUtils::NodePair>::DONT_DEALLOCATE_FLAG;
     }
     while (bClipped);
     if (!bAnyClipped) {
@@ -3021,14 +2858,8 @@ hkgpMesh* hkgpMesh::clipByConvexHull(const hkgpConvexHull& hull) {
         );
         pStream->~hkErrStream();
     }
-    XFNV_INLINED_LOCAL(hkArray<QueryUtils::NodePair>, overlaps, std::nullopt, std::nullopt);
-    overlaps.m_data = nullptr;
-    overlaps.m_size = 0;
-    overlaps.m_capacityAndFlags = hkArrayBase<QueryUtils::NodePair>::DONT_DEALLOCATE_FLAG;
-    XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Triangle*>, removed, std::nullopt, std::nullopt);
-    removed.m_data = nullptr;
-    removed.m_size = 0;
-    removed.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
+    hkArray<QueryUtils::NodePair> overlaps;
+    hkArray<hkgpMeshBase::Triangle*> removed;
     pMesh->rebuildTrianglesTree();
     rebuildTrianglesTree();
     QueryUtils::TreeTreeNodePairCollector kCollector(&overlaps);
@@ -3081,30 +2912,6 @@ hkgpMesh* hkgpMesh::clipByConvexHull(const hkgpConvexHull& hull) {
             pMesh->removeTriangle(pB);
         }
     }
-    // EXE-INLINED none: hkArray<Triangle*>::clearAndDeallocate
-    hkMemoryAllocator& rRemovedHeap = hkMemoryRouter::getInstance().heap();
-    const int32_t iRemovedCapacity = removed.m_capacityAndFlags;
-    removed.m_size = 0;
-    if (iRemovedCapacity >= 0) {
-        rRemovedHeap.bufFree(
-            removed.m_data,
-            (iRemovedCapacity & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkgpMeshBase::Triangle*))
-        );
-    }
-    removed.m_data = nullptr;
-    removed.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<NodePair>::~hkArray
-    hkMemoryAllocator& rOverlapsHeap = hkMemoryRouter::getInstance().heap();
-    const int32_t iOverlapsCapacity = overlaps.m_capacityAndFlags;
-    overlaps.m_size = 0;
-    if (iOverlapsCapacity >= 0) {
-        rOverlapsHeap.bufFree(
-            overlaps.m_data,
-            (iOverlapsCapacity & hkArrayBase<QueryUtils::NodePair>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(QueryUtils::NodePair))
-        );
-    }
     {
         alignas(4) uint8_t kStreamStorage[sizeof(hkErrStream)];
         hkErrStream* pStream = ::new (kStreamStorage) hkErrStream(acBuffer, 0x200);
@@ -3137,10 +2944,7 @@ hkgpMesh::splitEdge(hkgpMeshBase::Edge* arResult, hkgpMeshBase::Edge edge, const
 void hkgpMesh::generateConcaveEdges(float offset, hkArray<hkVector4>& edgesOut) {
     // Multiplies in double precision by (double)0.1f, then narrows the result to float.
     const float offsetWarmup = static_cast<float>(offset * 0.10000000149011612);
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, vertices, std::nullopt, std::nullopt);
-    vertices.m_data = nullptr;
-    vertices.m_size = 0;
-    vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> vertices;
     for (hkgpMeshBase::Vertex* pVertex = static_cast<hkgpMeshBase::Vertex*>(m_vertices.m_used); pVertex;
          pVertex = pVertex->m_next) {
         // mulps by the broadcast offset, then addps: all four lanes.
@@ -3287,17 +3091,6 @@ void hkgpMesh::generateConcaveEdges(float offset, hkArray<hkVector4>& edgesOut) 
             }
         }
     }
-
-    hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-    vertices.m_size = 0;
-    if (vertices.getCapacityAndFlags() >= 0) {
-        kHeap.bufFree(
-            vertices.m_data,
-            static_cast<int32_t>(
-                (vertices.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4)
-            )
-        );
-    }
 }
 
 float hkgpMesh::projectPointOnSurface(
@@ -3355,11 +3148,7 @@ float hkgpMesh::projectPointOnSurface(float maxDistance, hkVector4& point, int32
     using SampleArray = hkInplaceArray<hkVector4, 32, hkContainerHeapAllocator>;
     bool inside = false;
     hkVector4 normal;
-    // EXE-INLINED none: hkInplaceArray<hkVector4, 32>::hkInplaceArray
-    XFNV_INLINED_LOCAL(SampleArray, samples, std::nullopt, std::nullopt);
-    samples.m_data = samples.m_storage;
-    samples.m_size = 0;
-    samples.m_capacityAndFlags = 32 | hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    SampleArray samples;
     {
         // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::reserve
         hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
@@ -3392,18 +3181,6 @@ float hkgpMesh::projectPointOnSurface(float maxDistance, hkVector4& point, int32
     distance = std::sqrt(squaredDistanceToPoint(point, normal, &inside));
     if (inside) {
         distance = -distance;
-    }
-    {
-        // EXE-INLINED none: hkInplaceArray<hkVector4, 32>::~hkInplaceArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        samples.m_size = 0;
-        if (samples.m_capacityAndFlags >= 0) {
-            heap.bufFree(
-                samples.m_data,
-                (samples.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkVector4))
-            );
-        }
     }
     return distance;
 }
@@ -3608,8 +3385,7 @@ void hkgpMesh::generateSurfaceSamples(const SurfaceSamplingConfig& config, hkArr
 // sets m_overlapping when shape comes within minDistance of a triangle.
 bool hkgpMesh::checkOverlap(hkgpMesh::IConvexOverlap::IConvexShape* ishape, float minDist, bool allowPenetration) {
     hkAabb aabb;
-    // EXE-INLINED none: hkgpMesh::CollideShapeTriangle::CollideShapeTriangle
-    XFNV_INLINED_LOCAL(hkgpMesh::CollideShapeTriangle, collector, hkgpMesh_CollideShapeTriangle_vftable, std::nullopt);
+    hkgpMesh::CollideShapeTriangle collector;
     float fMinDist = minDist;
     collector.m_minDist = fMinDist;
     collector.m_ioverlap = m_iconvexoverlap;
@@ -3681,7 +3457,6 @@ void hkgpMesh::invalidateConvexHull() {
 
 bool hkgpMesh::rebuildConvexHull() {
     using points_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(points_t, points, std::nullopt, std::nullopt);
     invalidateConvexHull();
     if (m_vertices.m_numUsed <= 3) {
         return true;
@@ -3693,17 +3468,10 @@ bool hkgpMesh::rebuildConvexHull() {
     hkgpConvexHull* v3 = static_cast<hkgpConvexHull*>(Instance->m_heap->blockAlloc(sizeof(hkgpConvexHull)));
     v3->m_memSizeAndFlags = sizeof(hkgpConvexHull);
     this->m_convexHull = ::new (v3) hkgpConvexHull;
-    points.m_data = nullptr;
-    points.m_size = 0;
-    points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    points_t points;
     fetchPositions(points);
     this->m_convexHull->build(points.begin(), points.m_size, apMemory);
     if (this->m_convexHull->getDimensions() == 3) {
-        hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
-        points.m_size = 0;
-        if (points.m_capacityAndFlags >= 0) {
-            m_heap->bufFree(points.begin(), sizeof(hkVector4) * points.m_capacityAndFlags);
-        }
         return true;
     }
     hkgpConvexHull* m_convexHull = this->m_convexHull;
@@ -3711,11 +3479,6 @@ bool hkgpMesh::rebuildConvexHull() {
         delete m_convexHull;
     }
     this->m_convexHull = nullptr;
-    hkMemoryAllocator* v5 = (&hkMemoryRouter::getInstance())->m_heap;
-    points.m_size = 0;
-    if (points.m_capacityAndFlags >= 0) {
-        v5->bufFree(points.begin(), sizeof(hkVector4) * points.m_capacityAndFlags);
-    }
     return false;
 }
 
@@ -3728,17 +3491,10 @@ hkgpMesh* hkgpMesh::clone() const {
     using TrianglePool = hkgpMeshBaseAbstractMesh::TrianglePoolAllocator;
     using VertexMap = hkPointerMap<const hkgpMeshBase::Vertex*, hkgpMeshBase::Vertex*, hkContainerHeapAllocator>;
     using EdgeMap = hkPointerMap<uintptr_t, uintptr_t, hkContainerHeapAllocator>;
-    using MapBase = hkUlongMapBase;
     void* pMemory = hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkgpMesh));
     static_cast<hkReferencedObject*>(pMemory)->m_memSizeAndFlags = sizeof(hkgpMesh);
     hkgpMesh* pClone = ::new (pMemory) hkgpMesh;
-    // EXE-INLINED none: hkPointerMap<const hkgpMeshBase::Vertex*, hkgpMeshBase::Vertex*>::hkPointerMap
-    XFNV_INLINED_LOCAL(VertexMap, vertexMap, std::nullopt, std::nullopt);
-    MapBase& rVertexMap = vertexMap.m_map;
-    rVertexMap.m_elem = nullptr;
-    rVertexMap.m_numElems = 0;
-    rVertexMap.m_hashMod = -1;
-    rVertexMap.reserve(hkMemoryRouter::getInstance().heap(), 0);
+    VertexMap vertexMap;
     pClone->m_iconvexoverlap = m_iconvexoverlap;
     for (hkgpMeshBase::Vertex* pVertex = m_vertices.m_used; pVertex; pVertex = pVertex->m_next) {
         // EXE-INLINED none: hkgpAbstractMeshDefinitions::List<hkgpMeshBase::Vertex, ...>::allocate
@@ -3766,13 +3522,7 @@ hkgpMesh* hkgpMesh::clone() const {
         pClone->m_vertices.m_used = pNew;
         vertexMap.insert(pVertex, pNew);
     }
-    // EXE-INLINED none: hkPointerMap<hkUlong, hkUlong>::hkPointerMap
-    XFNV_INLINED_LOCAL(EdgeMap, edgeMap, std::nullopt, std::nullopt);
-    hkUlongMapBase& rEdgeMap = edgeMap.m_map;
-    rEdgeMap.m_elem = nullptr;
-    rEdgeMap.m_numElems = 0;
-    rEdgeMap.m_hashMod = -1;
-    rEdgeMap.reserve(hkMemoryRouter::getInstance().heap(), 0);
+    EdgeMap edgeMap;
     for (hkgpMeshBase::Triangle* pTriangle = m_triangles.m_used; pTriangle; pTriangle = pTriangle->m_next) {
         // EXE-INLINED none: hkgpAbstractMeshDefinitions::List<hkgpMeshBase::Triangle, ...>::allocate
         TrianglePool& rAllocator = pClone->m_triangles.m_allocator;
@@ -3839,9 +3589,6 @@ hkgpMesh* hkgpMesh::clone() const {
             }
         }
     }
-    // EXE-INLINED none: the two maps' destructors (clearAndDeallocate, then the base's empty destructor)
-    rEdgeMap.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-    rVertexMap.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
     return pClone;
 }
 
@@ -3933,14 +3680,8 @@ hkgpMesh* hkgpMesh::createOffset(float offset, int32_t numIterations) const {
     hkAabbTreeAabbTree32 kTree;
     hkAabbTreeAabbTree32* pTree = &kTree;
     if (kPolicy.m_iconvexoverlap) {
-        XFNV_INLINED_LOCAL(hkArray<hkAabb>, aabbs, std::nullopt, std::nullopt);
-        aabbs.m_data = nullptr;
-        aabbs.m_size = 0;
-        XFNV_INLINED_LOCAL(hkArray<void*>, leaves, std::nullopt, std::nullopt);
-        leaves.m_data = nullptr;
-        leaves.m_size = 0;
-        aabbs.m_capacityAndFlags = hkArrayBase<hkAabb>::DONT_DEALLOCATE_FLAG;
-        leaves.m_capacityAndFlags = hkArrayBase<void*>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkAabb> aabbs;
+        hkArray<void*> leaves;
         for (hkgpMeshBase::Triangle* pTriangle = static_cast<hkgpMeshBase::Triangle*>(pMesh->m_triangles.m_used);
              pTriangle; pTriangle = pTriangle->m_next) {
             alignas(16) hkVector4 akPrism[6];
@@ -3973,37 +3714,8 @@ hkgpMesh* hkgpMesh::createOffset(float offset, int32_t numIterations) const {
             leaves.m_data[leaves.m_size] = pTriangle;
             leaves.m_size += 1;
         }
-        XFNV_INLINED_LOCAL(hkArray<uint32_t>, leafIdx, std::nullopt, std::nullopt);
-        leafIdx.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
-        leafIdx.m_data = nullptr;
-        leafIdx.m_size = 0;
+        hkArray<uint32_t> leafIdx;
         pTree->build(aabbs.m_data, leaves.m_data, aabbs.m_size, leafIdx);
-        hkMemoryAllocator& kIdxHeap = hkMemoryRouter::getInstance().heap();
-        leafIdx.m_size = 0;
-        if (!(leafIdx.m_capacityAndFlags & hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG)) {
-            kIdxHeap.bufFree(
-                leafIdx.m_data,
-                static_cast<int32_t>(
-                    (leafIdx.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK) * sizeof(uint32_t)
-                )
-            );
-        }
-        hkMemoryAllocator& kLeafHeap = hkMemoryRouter::getInstance().heap();
-        leaves.m_size = 0;
-        if (!(leaves.m_capacityAndFlags & hkArrayBase<void*>::DONT_DEALLOCATE_FLAG)) {
-            kLeafHeap.bufFree(
-                leaves.m_data,
-                static_cast<int32_t>((leaves.m_capacityAndFlags & hkArrayBase<void*>::CAPACITY_MASK) * sizeof(void*))
-            );
-        }
-        hkMemoryAllocator& kAabbHeap = hkMemoryRouter::getInstance().heap();
-        aabbs.m_size = 0;
-        if (!(aabbs.m_capacityAndFlags & hkArrayBase<hkAabb>::DONT_DEALLOCATE_FLAG)) {
-            kAabbHeap.bufFree(
-                aabbs.m_data,
-                static_cast<int32_t>((aabbs.m_capacityAndFlags & hkArrayBase<hkAabb>::CAPACITY_MASK) * sizeof(hkAabb))
-            );
-        }
     }
     if (numIterations > 0) {
         int32_t iLeft = numIterations;
@@ -4057,14 +3769,8 @@ hkgpMesh* hkgpMesh::createOffset(float offset, int32_t numIterations) const {
 // one scales them (division by the float maximum). Each new triangle (newA, newB, newA) has all three links bound to
 // the null edge, its guard tested before each.
 void hkgpMesh::appendConcaveEdges(float minConcavity, float extrusion, const hkgpMesh* mesh) {
-    XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Edge>, edges, std::nullopt, std::nullopt);
-    edges.m_data = nullptr;
-    edges.m_size = 0;
-    XFNV_INLINED_LOCAL(hkArray<float>, values, std::nullopt, std::nullopt);
-    values.m_data = nullptr;
-    values.m_size = 0;
-    edges.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
-    values.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkgpMeshBase::Edge> edges;
+    hkArray<float> values;
     const int32_t iNumEdges = 3 * mesh->m_triangles.m_numUsed;
     hkMemoryAllocator* pEdgesHeap = hkMemoryRouter::getInstance().m_heap;
     const int32_t iEdgesCapacity =
@@ -4257,24 +3963,6 @@ void hkgpMesh::appendConcaveEdges(float minConcavity, float extrusion, const hkg
             }
         }
     }
-    hkMemoryAllocator& kValuesHeap = hkMemoryRouter::getInstance().heap();
-    values.m_size = 0;
-    if (values.getCapacityAndFlags() >= 0) {
-        kValuesHeap.bufFree(
-            values.m_data,
-            static_cast<int32_t>((values.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK) * sizeof(float))
-        );
-    }
-    hkMemoryAllocator& kEdgesHeap = hkMemoryRouter::getInstance().heap();
-    edges.m_size = 0;
-    if (edges.getCapacityAndFlags() >= 0) {
-        kEdgesHeap.bufFree(
-            edges.m_data,
-            static_cast<int32_t>(
-                (edges.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) * sizeof(hkgpMeshBase::Edge)
-            )
-        );
-    }
 }
 
 int32_t hkgpMesh::setDistanceToPlane(const hkVector4& plane, int32_t data_index) {
@@ -4354,11 +4042,7 @@ int32_t hkgpMesh::floodFillDetachedParts() {
         pTriangle->m_partId = -1;
     }
     int32_t numParts = 0;
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>::hkArray
-    XFNV_INLINED_LOCAL(EdgeArray, stack, std::nullopt, std::nullopt);
-    stack.m_data = nullptr;
-    stack.m_size = 0;
-    stack.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
+    EdgeArray stack;
     for (hkgpMeshBase::Triangle* pTriangle = m_triangles.m_used; pTriangle; pTriangle = pTriangle->m_next) {
         if (pTriangle->m_partId != -1) {
             continue;
@@ -4408,16 +4092,6 @@ int32_t hkgpMesh::floodFillDetachedParts() {
         }
         while (stack.m_size);
     }
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    stack.m_size = 0;
-    if (stack.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            stack.m_data,
-            (stack.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkgpMeshBase::Edge))
-        );
-    }
     return numParts;
 }
 
@@ -4430,14 +4104,7 @@ int32_t hkgpMesh::segregateVerticesBasedOnPartId() {
     using VertexMap = hkPointerMap<hkgpMeshBase::Vertex*, VertexArray*>;
     const int32_t numParts = countParts();
     int32_t numAdded = 0;
-    // EXE-INLINED none: hkPointerMap<hkgpMeshBase::Vertex*, VertexArray*>::hkPointerMap
-    XFNV_INLINED_LOCAL(VertexMap, map, std::nullopt, std::nullopt);
-    map.m_map.m_elem = nullptr;
-    map.m_map.m_numElems = 0;
-    map.m_map.m_hashMod = -1;
-    // The base's reserve with the thread's heap.
-    using MapBase = hkUlongMapBase;
-    map.m_map.MapBase::reserve(*hkMemoryRouter::getInstance().m_heap, 0);
+    VertexMap map;
     for (hkgpMeshBase::Triangle* t = m_triangles.m_used; t; t = t->m_next) {
         for (int32_t k = 0; k < 3; ++k) {
             VertexArray* pCopies = map.getWithDefault(t->m_vertices[k], nullptr);
@@ -4535,7 +4202,6 @@ int32_t hkgpMesh::segregateVerticesBasedOnPartId() {
             hkMemoryRouter::getInstance().m_heap->blockFree(pCopies, static_cast<int32_t>(sizeof(VertexArray)));
         }
     }
-    map.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
     return numAdded;
 }
 
@@ -4547,11 +4213,7 @@ int32_t hkgpMesh::floodFillDetachedOrMaterialBoundariesParts() {
         pTriangle->m_partId = -1;
     }
     int32_t numParts = 0;
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>::hkArray
-    XFNV_INLINED_LOCAL(EdgeArray, stack, std::nullopt, std::nullopt);
-    stack.m_data = nullptr;
-    stack.m_size = 0;
-    stack.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
+    EdgeArray stack;
     for (hkgpMeshBase::Triangle* pTriangle = m_triangles.m_used; pTriangle; pTriangle = pTriangle->m_next) {
         if (pTriangle->m_partId != -1) {
             continue;
@@ -4608,16 +4270,6 @@ int32_t hkgpMesh::floodFillDetachedOrMaterialBoundariesParts() {
             }
         }
         while (stack.m_size);
-    }
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    stack.m_size = 0;
-    if (stack.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            stack.m_data,
-            (stack.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkgpMeshBase::Edge))
-        );
     }
     return numParts;
 }
@@ -4818,10 +4470,7 @@ hkgpMesh::sResult* hkgpMesh::cut(sResult* arResult, const hkVector4& plane, bool
         while (pTriangle);
     }
     while (bSplit);
-    XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Triangle*>, toDelete, std::nullopt, std::nullopt);
-    toDelete.m_data = nullptr;
-    toDelete.m_size = 0;
-    toDelete.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkgpMeshBase::Triangle*> toDelete;
     for (hkgpMeshBase::Triangle* pTriangle = static_cast<hkgpMeshBase::Triangle*>(m_triangles.m_used); pTriangle;
          pTriangle = pTriangle->m_next) {
         // (d1 + d0) + d2 is summed in extended precision and rounded to float once.
@@ -4889,17 +4538,6 @@ hkgpMesh::sResult* hkgpMesh::cut(sResult* arResult, const hkVector4& plane, bool
         segregateVerticesBasedOnPartId();
     }
     arResult->m_value = SUCCESS;
-    hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-    toDelete.m_size = 0;
-    if (toDelete.getCapacityAndFlags() >= 0) {
-        kHeap.bufFree(
-            toDelete.m_data,
-            static_cast<int32_t>(
-                (toDelete.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK) *
-                sizeof(hkgpMeshBase::Triangle*)
-            )
-        );
-    }
     return arResult;
 }
 
@@ -4953,10 +4591,8 @@ hkAabb* hkgpMesh::getBoundingBox(hkAabb& aabbOut) const {
 // unless it is zero), the projection is the coordinates' blend of the triangle's vertices, and the coordinates that are
 // nonzero pick the region: one, a vertex (its normal as the pseudo normal); two, the edge between them (the triangle's
 // plane plus the neighbour's across it); three, the triangle (its plane). The point is inside when the pseudo normal
-// points away from the normal. Each branch copies a default location field by field before overwriting it, as the game
-// does.
+// points away from the normal. Each branch assigns a default location before overwriting it, as the game does.
 void hkgpMesh::locate(const hkVector4& x, hkgpMesh::Location& location) const {
-    XFNV_INLINED_LOCAL(hkgpMesh::Location, defaultLocation, std::nullopt, std::nullopt);
     if (!m_hasPerVertexNormals.m_bool) {
         alignas(16) char buf[512];
         hkErrStream errStream(buf, 512);
@@ -4967,23 +4603,14 @@ void hkgpMesh::locate(const hkVector4& x, hkgpMesh::Location& location) const {
             __builtin_debugtrap();
         }
     }
-    XFNV_INLINED_LOCAL(hkgpMesh::NearestFeaturePolicy, nfp, hkgpMesh_NearestFeaturePolicy_vftable, std::nullopt);
+    hkgpMesh::NearestFeaturePolicy nfp;
     nfp.m_distanceSquared = rdata_104DA48;
     nfp.m_point.m_quad = x.m_quad;
     nfp.m_nearestTriangle = nullptr;
     nfp.m_normal.m_quad = hkVector4Zero.m_quad;
     queryClosestPoint(&m_trianglesTree, x, &nfp);
     if (nfp.m_nearestTriangle) {
-        const hkgpMesh::Location* pDefault = ::new (&defaultLocation) hkgpMesh::Location;
-        location.m_normal.m_quad = pDefault->m_normal.m_quad;
-        location.m_pseudoNormal.m_quad = pDefault->m_pseudoNormal.m_quad;
-        location.m_coordinates.m_quad = pDefault->m_coordinates.m_quad;
-        location.m_projection.m_quad = pDefault->m_projection.m_quad;
-        location.m_squaredDistance = pDefault->m_squaredDistance;
-        location.m_inside.m_bool = pDefault->m_inside.m_bool;
-        location.m_region.m_type = pDefault->m_region.m_type;
-        location.m_region.m_feature.m_triangle = pDefault->m_region.m_feature.m_triangle;
-        location.m_region.m_feature.m_index = pDefault->m_region.m_feature.m_index;
+        location = hkgpMesh::Location();
         location.m_squaredDistance = nfp.m_distanceSquared;
         location.m_coordinates.m_quad = nfp.m_coordinates.m_quad;
         location.m_normal.m_quad = nfp.m_normal.m_quad;
@@ -5095,16 +4722,7 @@ void hkgpMesh::locate(const hkVector4& x, hkgpMesh::Location& location) const {
         location.m_inside.m_bool = 0.0f > side;
     }
     else {
-        const hkgpMesh::Location* pDefault = ::new (&defaultLocation) hkgpMesh::Location;
-        location.m_normal.m_quad = pDefault->m_normal.m_quad;
-        location.m_pseudoNormal.m_quad = pDefault->m_pseudoNormal.m_quad;
-        location.m_coordinates.m_quad = pDefault->m_coordinates.m_quad;
-        location.m_projection.m_quad = pDefault->m_projection.m_quad;
-        location.m_squaredDistance = pDefault->m_squaredDistance;
-        location.m_inside.m_bool = pDefault->m_inside.m_bool;
-        location.m_region.m_type = pDefault->m_region.m_type;
-        location.m_region.m_feature.m_triangle = pDefault->m_region.m_feature.m_triangle;
-        location.m_region.m_feature.m_index = pDefault->m_region.m_feature.m_index;
+        location = hkgpMesh::Location();
         location.m_normal.m_quad = hkVector4Zero.m_quad;
         location.m_squaredDistance = rdata_104DA48;
         location.m_coordinates.m_quad = hkVector4Zero.m_quad;
@@ -5400,10 +5018,7 @@ void hkgpMesh::generateEmptySpaceSamples(
 ) const {
     alignas(16) uint8_t chStorage[sizeof(hkgpConvexHull)];
     hkgpConvexHull& ch = *::new (chStorage) hkgpConvexHull;
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, vertices, std::nullopt, std::nullopt);
-    vertices.m_data = nullptr;
-    vertices.m_size = 0;
-    vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> vertices;
     fetchPositions(vertices);
     hkStridedVertices stridedVertices;
     // The strided view is untyped float data: the array's data pointer is stored as it is.
@@ -5412,27 +5027,12 @@ void hkgpMesh::generateEmptySpaceSamples(
     stridedVertices.m_striding = sizeof(hkVector4);
     alignas(4) uint8_t configStorage[sizeof(hkgpConvexHull::BuildConfig)];
     const bool bIs3D = ch.build(stridedVertices, *::new (configStorage) hkgpConvexHull::BuildConfig) == 3;
-    {
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacityAndFlags = vertices.m_capacityAndFlags;
-        vertices.m_size = 0;
-        if (capacityAndFlags >= 0) {
-            heap.bufFree(
-                vertices.m_data,
-                (capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(hkVector4))
-            );
-        }
-    }
     if (!bIs3D) {
         ch.~hkgpConvexHull();
         return;
     }
 
-    XFNV_INLINED_LOCAL(hkArray<hkAabb>, stack, std::nullopt, std::nullopt);
-    stack.m_data = nullptr;
-    stack.m_size = 0;
-    stack.m_capacityAndFlags = hkArrayBase<hkAabb>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkAabb> stack;
     // The local box is raw stack memory that is never constructed; getBoundingBox fills it.
     alignas(16) uint8_t boxStorage[sizeof(hkAabb)];
     hkAabb& box = *reinterpret_cast<hkAabb*>(boxStorage);
@@ -5538,15 +5138,6 @@ void hkgpMesh::generateEmptySpaceSamples(
     }
     while (stack.m_size != 0);
 
-    // EXE-INLINED none: hkArray<hkAabb>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = stack.m_capacityAndFlags;
-    stack.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            stack.m_data, (capacityAndFlags & hkArrayBase<hkAabb>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(hkAabb))
-        );
-    }
     ch.~hkgpConvexHull();
 }
 
@@ -5569,17 +5160,10 @@ bool hkgpMesh::setPlane(const hkgpMeshBase::Triangle* a1, hkVector4& a2, int32_t
 void hkgpMesh::appendFromGeometry(const hkGeometry& geom, const hkTransform& xform, int32_t partId) {
     using EdgeBucket = hkArray<hkgpMesh::SingleEdge, hkContainerHeapAllocator>;
     using EdgeTable = hkGeometryProcessing::HashTable<hkgpMesh::SingleEdge, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Vertex*>, vertexMap, std::nullopt, std::nullopt);
-    vertexMap.m_data = nullptr;
-    vertexMap.m_size = 0;
-    vertexMap.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Vertex*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkgpMeshBase::Vertex*> vertexMap;
     hkAabbTreeAabbTree32 kTree;
-    XFNV_INLINED_LOCAL(EdgeTable, edges, std::nullopt, std::nullopt);
-    edges.m_buckets.m_capacityAndFlags = hkArrayBase<EdgeBucket>::DONT_DEALLOCATE_FLAG;
+    EdgeTable edges;
     const int32_t iNumVertices = geom.m_vertices.m_size;
-    edges.m_buckets.m_data = nullptr;
-    edges.m_buckets.m_size = 0;
-    edges.m_numItems = 0;
     // EXE-INLINED none: hkArray<hkgpMeshBase::Vertex*>::setSize (with the zero fill of the new elements)
     hkMemoryAllocator& rMapHeap = hkMemoryRouter::getInstance().heap();
     if ((vertexMap.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Vertex*>::CAPACITY_MASK) < iNumVertices) {
@@ -5635,8 +5219,7 @@ void hkgpMesh::appendFromGeometry(const hkGeometry& geom, const hkTransform& xfo
     for (int32_t i = 0; i < iNumVertices; ++i) {
         position.setTransformedPos(xform, geom.m_vertices.m_data[i]);
         const float fRadius = m_epsVertexWeldingRadius;
-        // EXE-INLINED none: hkgpMesh::WeldingPolicy::WeldingPolicy
-        XFNV_INLINED_LOCAL(hkgpMesh::WeldingPolicy, policy, hkgpMesh_WeldingPolicy_vftable, std::nullopt);
+        hkgpMesh::WeldingPolicy policy;
         policy.m_position = position;
         policy.m_weldingRadiusSquared = fRadius * fRadius;
         hkAabb aabb;
@@ -5811,10 +5394,7 @@ void hkgpMesh::appendFromGeometry(const hkGeometry& geom, const hkTransform& xfo
             }
         }
     }
-    XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Triangle*>, invalid, std::nullopt, std::nullopt);
-    invalid.m_data = nullptr;
-    invalid.m_size = 0;
-    invalid.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkgpMeshBase::Triangle*> invalid;
     hkgpMeshBase::Triangle* pTriangle = static_cast<hkgpMeshBase::Triangle*>(m_triangles.m_used);
     if (pTriangle) {
         for (; pTriangle; pTriangle = pTriangle->m_next) {
@@ -5869,55 +5449,6 @@ void hkgpMesh::appendFromGeometry(const hkGeometry& geom, const hkTransform& xfo
     }
     removeOrphanVertices();
     invalidateConvexHull();
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::~hkArray
-    hkMemoryAllocator& rInvalidHeap = hkMemoryRouter::getInstance().heap();
-    invalid.m_size = 0;
-    if (invalid.m_capacityAndFlags >= 0) {
-        rInvalidHeap.bufFree(
-            invalid.m_data,
-            (invalid.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkgpMeshBase::Triangle*))
-        );
-    }
-    invalid.m_data = nullptr;
-    invalid.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: HashTable<SingleEdge>::~HashTable
-    hkMemoryAllocator& rTableHeap = hkMemoryRouter::getInstance().heap();
-    for (int32_t i = 0; i < edges.m_buckets.m_size; ++i) {
-        EdgeBucket& rBucket = edges.m_buckets.m_data[i];
-        hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-        rBucket.m_size = 0;
-        if (rBucket.m_capacityAndFlags >= 0) {
-            rHeap.bufFree(
-                rBucket.m_data,
-                (rBucket.m_capacityAndFlags & hkArrayBase<hkgpMesh::SingleEdge>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkgpMesh::SingleEdge))
-            );
-        }
-        rBucket.m_data = nullptr;
-        rBucket.m_capacityAndFlags = hkArrayBase<hkgpMesh::SingleEdge>::DONT_DEALLOCATE_FLAG;
-    }
-    edges.m_buckets.m_size = 0;
-    if (edges.m_buckets.m_capacityAndFlags >= 0) {
-        rTableHeap.bufFree(
-            edges.m_buckets.m_data,
-            (edges.m_buckets.m_capacityAndFlags & hkArrayBase<EdgeBucket>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(EdgeBucket))
-        );
-    }
-    edges.m_buckets.m_data = nullptr;
-    edges.m_buckets.m_capacityAndFlags = hkArrayBase<EdgeBucket>::DONT_DEALLOCATE_FLAG;
-    // The tree's destructor runs where kTree's scope ends, before the vertex map is freed.
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Vertex*>::~hkArray
-    hkMemoryAllocator& rMapFreeHeap = hkMemoryRouter::getInstance().heap();
-    vertexMap.m_size = 0;
-    if (vertexMap.m_capacityAndFlags >= 0) {
-        rMapFreeHeap.bufFree(
-            vertexMap.m_data,
-            (vertexMap.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Vertex*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkgpMeshBase::Vertex*))
-        );
-    }
 }
 
 void hkgpMesh::reportBadAreaTriangle(const __m128* a1, const __m128* a2, const __m128* a3) {
@@ -6046,10 +5577,7 @@ void hkgpMesh::simplify(const hkgpMesh::SimplifyConfig& config) {
                 }
 
                 // The ring of edges around the edge's start vertex, walked as above.
-                alignas(16) XFNV_INLINED_LOCAL(ring_t, ring, std::nullopt, std::nullopt);
-                ring.m_data = ring.m_storage;
-                ring.m_size = 0;
-                ring.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG | 16;
+                alignas(16) ring_t ring;
                 pFan = pTriangle;
                 uiCorner = uiEdge;
                 bForward = false;
@@ -6097,27 +5625,11 @@ void hkgpMesh::simplify(const hkgpMesh::SimplifyConfig& config) {
                     }
                 }
                 if (bOpen) {
-                    hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-                    ring.m_size = 0;
-                    if (!(ring.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG)) {
-                        kHeap.bufFree(
-                            ring.m_data,
-                            static_cast<int32_t>(
-                                (ring.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                                sizeof(hkgpMeshBase::Edge)
-                            )
-                        );
-                    }
-                    ring.m_data = nullptr;
-                    ring.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
                     continue;
                 }
 
                 // The ring around the edge's end vertex, walked from the twin edge.
-                alignas(16) XFNV_INLINED_LOCAL(ring_t, twinRing, std::nullopt, std::nullopt);
-                twinRing.m_data = twinRing.m_storage;
-                twinRing.m_size = 0;
-                twinRing.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG | 16;
+                alignas(16) ring_t twinRing;
                 pFan = pTwin;
                 uiCorner = uiTwinIndex;
                 bForward = false;
@@ -6193,32 +5705,6 @@ void hkgpMesh::simplify(const hkgpMesh::SimplifyConfig& config) {
                     collapseEdge(kEdge, false);
                     bCollapsed = true;
                 }
-                hkMemoryAllocator& kTwinHeap = hkMemoryRouter::getInstance().heap();
-                twinRing.m_size = 0;
-                if (!(twinRing.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG)) {
-                    kTwinHeap.bufFree(
-                        twinRing.m_data,
-                        static_cast<int32_t>(
-                            (twinRing.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                            sizeof(hkgpMeshBase::Edge)
-                        )
-                    );
-                }
-                twinRing.m_data = nullptr;
-                twinRing.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
-                hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-                ring.m_size = 0;
-                if (!(ring.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG)) {
-                    kHeap.bufFree(
-                        ring.m_data,
-                        static_cast<int32_t>(
-                            (ring.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                            sizeof(hkgpMeshBase::Edge)
-                        )
-                    );
-                }
-                ring.m_data = nullptr;
-                ring.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
                 if (bCollapse) {
                     break;
                 }
@@ -6407,8 +5893,7 @@ void hkgpMesh::setPartIdsAsPlaneIndices() {
 // The SDK's rayCast: casts the ray from `from` to `to` through m_trianglesTree with a RayCaster collector; returns
 // the hit fraction (1 for none) and the hit triangle through triangleOut.
 float hkgpMesh::rayCast(const hkVector4& from, const hkVector4& to, hkgpMeshBase::Triangle** triangleOut) {
-    // EXE-INLINED none: hkgpMeshInternals::RayCaster::RayCaster
-    XFNV_INLINED_LOCAL(hkgpMeshInternals::RayCaster, caster, hkgpMeshInternals_RayCaster_vftable, std::nullopt);
+    hkgpMeshInternals::RayCaster caster;
     caster.m_fraction = 1.0f;
     caster.m_triangle = nullptr;
     caster.m_rayFrom.m_quad = from.m_quad;
@@ -6453,15 +5938,9 @@ void hkgpMesh::retriangulateFromPlanes() {
     if (!numPlanes) {
         return;
     }
-    // EXE-INLINED none: hkArray::hkArray (the boundary edges per plane and the material per plane, both empty)
-    XFNV_INLINED_LOCAL(EdgeArrays, boundaries, std::nullopt, std::nullopt);
-    boundaries.m_data = nullptr;
-    boundaries.m_size = 0;
-    boundaries.m_capacityAndFlags = hkArrayBase<EdgeArray>::DONT_DEALLOCATE_FLAG;
-    XFNV_INLINED_LOCAL(hkArray<int32_t>, materials, std::nullopt, std::nullopt);
-    materials.m_data = nullptr;
-    materials.m_size = 0;
-    materials.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
+    // The boundary edges per plane and the material per plane.
+    EdgeArrays boundaries;
+    hkArray<int32_t> materials;
     // EXE-INLINED none: hkArray<EdgeArray>::setSize (numPlanes empty arrays)
     {
         hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
@@ -6550,11 +6029,9 @@ void hkgpMesh::retriangulateFromPlanes() {
     points.m_striding = static_cast<int32_t>(sizeof(hkVector4));
     for (int32_t plane = 0; plane < boundaries.m_size; ++plane) {
         EdgeArray& boundary = boundaries.m_data[plane];
-        // EXE-INLINED none: hkArray<hkVector4>::hkArray, setSize (the start of each boundary edge)
-        XFNV_INLINED_LOCAL(hkArray<hkVector4>, positions, std::nullopt, std::nullopt);
-        positions.m_data = nullptr;
-        positions.m_size = 0;
-        positions.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+        // The start of each boundary edge.
+        hkArray<hkVector4> positions;
+        // EXE-INLINED none: hkArray<hkVector4>::setSize
         {
             const int32_t iNumEdges = boundary.m_size;
             hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
@@ -6572,9 +6049,7 @@ void hkgpMesh::retriangulateFromPlanes() {
             const hkgpMeshBase::Edge& edge = boundary.m_data[i];
             positions.m_data[i] = edge.m_triangle->m_vertices[edge.m_index]->m_position;
         }
-        // EXE-INLINED none: hkgpTriangulatorType::hkgpTriangulatorType
-        XFNV_INLINED_LOCAL(hkgpDefaultTriangulatorType, triangulator, std::nullopt, std::nullopt);
-        ::new (&triangulator) hkgpDefaultTriangulatorType;
+        hkgpDefaultTriangulatorType triangulator;
         triangulator.setDomain(domainMin, domainMax, 0.0f, true);
         points.m_vertices = &(*positions.m_data)(0);
         points.m_numVertices = positions.m_size;
@@ -6606,8 +6081,7 @@ void hkgpMesh::retriangulateFromPlanes() {
             }
             hkgpDefaultTriangulatorType::Location location;
             triangulator.locateVertex(&location, xy[0], xy[1]);
-            XFNV_INLINED_LOCAL(Insertion, insertion, std::nullopt, std::nullopt);
-            triangulator.insertVertex(&insertion, xy[0], xy[1], true, location, false);
+            Insertion insertion = triangulator.insertVertex(xy[0], xy[1], true, location, false);
             if (insertion.m_type.m_storage == Insertion::SUCCESS) {
                 insertion.m_edge.m_triangle->m_vertices[insertion.m_edge.m_index]->m_data = static_cast<uint32_t>(i);
             }
@@ -6643,11 +6117,7 @@ void hkgpMesh::retriangulateFromPlanes() {
                     xy[e][c] = r < iMargin ? iMargin : (r > iMaxCoord ? iMaxCoord : r);
                 }
             }
-            // EXE-INLINED none: DefaultEdgeData::DefaultEdgeData (the tag list on its four inline tags)
-            XFNV_INLINED_LOCAL(EdgeData, edgeData, std::nullopt, std::nullopt);
-            edgeData.m_tags.m_data = edgeData.m_tags.m_storage;
-            edgeData.m_tags.m_size = 0;
-            edgeData.m_tags.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG | 4;
+            EdgeData edgeData;
             // EXE-INLINED none: hkArray<uint32_t>::pushBack
             hkMemoryRouter& router = hkMemoryRouter::getInstance();
             if (edgeData.m_tags.m_size == (edgeData.m_tags.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)) {
@@ -6656,18 +6126,7 @@ void hkgpMesh::retriangulateFromPlanes() {
             // Tags the edge with its address.
             edgeData.m_tags.m_data[edgeData.m_tags.m_size] = reinterpret_cast<hkUlong>(&edge);
             ++edgeData.m_tags.m_size;
-            XFNV_INLINED_LOCAL(Insertion, edgeInsertion, std::nullopt, std::nullopt);
-            triangulator.insertEdge(&edgeInsertion, xy[0][0], xy[0][1], xy[1][0], xy[1][1], true, &edgeData);
-            // EXE-INLINED none: hkInplaceArray<hkUlong, 4>::~hkInplaceArray
-            hkMemoryAllocator& tagsHeap = hkMemoryRouter::getInstance().heap();
-            edgeData.m_tags.m_size = 0;
-            if (edgeData.m_tags.m_capacityAndFlags >= 0) {
-                tagsHeap.bufFree(
-                    edgeData.m_tags.m_data,
-                    (edgeData.m_tags.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK) *
-                        static_cast<int32_t>(sizeof(hkUlong))
-                );
-            }
+            triangulator.insertEdge(xy[0][0], xy[0][1], xy[1][0], xy[1][1], true, &edgeData);
         }
         if (triangulator.partition() > 1) {
             triangulator.conformEdges();
@@ -6731,70 +6190,18 @@ void hkgpMesh::retriangulateFromPlanes() {
             // Leftover heap lookup of a destructor with nothing to free, kept deliberately as the game does.
             hkMemoryRouter::getInstance();
         }
-        // EXE-INLINED none: hkgpTriangulatorType::~hkgpTriangulatorType
-        triangulator.~hkgpDefaultTriangulatorType();
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-        hkMemoryAllocator& positionsHeap = hkMemoryRouter::getInstance().heap();
-        positions.m_size = 0;
-        if (!(positions.m_capacityAndFlags & hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG)) {
-            positionsHeap.bufFree(
-                positions.m_data,
-                (positions.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkVector4))
-            );
-        }
-        positions.m_data = nullptr;
-        positions.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
     }
     removePlaneTriangles(numPlanes);
     removeOrphanVertices();
     rebuildTrianglesTree();
     m_hasPerVertexNormals.m_bool = false;
-    // EXE-INLINED none: hkArray<int32_t>::~hkArray
-    hkMemoryAllocator& materialsHeap = hkMemoryRouter::getInstance().heap();
-    materials.m_size = 0;
-    if (materials.m_capacityAndFlags >= 0) {
-        materialsHeap.bufFree(
-            materials.m_data,
-            (materials.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(int32_t))
-        );
-    }
-    materials.m_data = nullptr;
-    materials.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<EdgeArray>::~hkArray
-    hkMemoryAllocator& boundariesHeap = hkMemoryRouter::getInstance().heap();
-    EdgeArray* pBoundary = boundaries.m_data;
-    for (int32_t i = boundaries.m_size; i > 0; --i, ++pBoundary) {
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        pBoundary->m_size = 0;
-        if (pBoundary->m_capacityAndFlags >= 0) {
-            heap.bufFree(
-                pBoundary->m_data,
-                (pBoundary->m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkgpMeshBase::Edge))
-            );
-        }
-        pBoundary->m_data = nullptr;
-        pBoundary->m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
-    }
-    boundaries.m_size = 0;
-    if (boundaries.m_capacityAndFlags >= 0) {
-        boundariesHeap.bufFree(
-            boundaries.m_data,
-            (boundaries.m_capacityAndFlags & hkArrayBase<EdgeArray>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(EdgeArray))
-        );
-    }
 }
 
 // The SDK's checkTriangleOverlap: queries m_trianglesTree with the box of the triangle (a, b, c) and a
 // TriangleOverlap collector holding it; returns the collector's m_found.
 int32_t hkgpMesh::checkTriangleOverlap(const hkVector4& a, const hkVector4& b, const hkVector4& c) {
     hkAabb aabb;
-    // EXE-INLINED none: hkgpMeshInternals::TriangleOverlap::TriangleOverlap
-    XFNV_INLINED_LOCAL(
-        hkgpMeshInternals::TriangleOverlap, overlap, hkgpMeshInternals_TriangleOverlap_vftable, std::nullopt
-    );
+    hkgpMeshInternals::TriangleOverlap overlap;
     overlap.m_vertices[0].m_quad = a.m_quad;
     overlap.m_vertices[1].m_quad = b.m_quad;
     overlap.m_vertices[2].m_quad = c.m_quad;
@@ -6919,14 +6326,8 @@ void hkgpMesh::appendToGeometry(hkGeometry& geometry, bool flip) {
         geometry.m_triangles.m_size += numNew;
         pTriangleOut = geometry.m_triangles.m_data + oldSize;
     }
-    // EXE-INLINED none: hkPointerMap<const hkgpMeshBase::Vertex*, int>::hkPointerMap (the base's fields, then its
-    // reserve with the thread's heap)
-    XFNV_INLINED_LOCAL(VertexIndexMap, vertexIndices, std::nullopt, std::nullopt);
+    VertexIndexMap vertexIndices;
     hkUlongMapBase& rMap = vertexIndices.m_map;
-    rMap.m_elem = nullptr;
-    rMap.m_numElems = 0;
-    rMap.m_hashMod = -1;
-    rMap.reserve(hkMemoryRouter::getInstance().heap(), 0);
     rMap.reserve(hkMemoryRouter::getInstance().heap(), m_vertices.m_numUsed + 1);
     for (hkgpMeshBase::Vertex* pVertex = m_vertices.m_used; pVertex; pVertex = pVertex->m_next) {
         vertexIndices.insert(pVertex, firstVertex + (rMap.m_numElems & hkUlongMapBase::NUM_ELEMS_MASK));
@@ -6945,9 +6346,6 @@ void hkgpMesh::appendToGeometry(hkGeometry& geometry, bool flip) {
         }
         ++pTriangleOut;
     }
-    // EXE-INLINED none: hkPointerMap<const hkgpMeshBase::Vertex*, int>::~hkPointerMap (the map's clearAndDeallocate,
-    // then the base's empty destructor)
-    rMap.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
 }
 
 // a1 and a2 are the facing edges of two triangles that close a void. Three times (a1 turning forward, a2 backward round
@@ -7200,10 +6598,7 @@ bool hkgpMesh::bindEdge(hkgpMeshBase::Edge a1, bool a2, bool a3) {
 // triangle's address with the neighbour edge's index in its low two bits: a tagged pointer treated as an integer.
 void hkgpMesh::flipPartOrientation(int32_t a1) {
     const uintptr_t kTriangleMask = ~static_cast<uintptr_t>(3);
-    XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Edge>, edges, std::nullopt, std::nullopt);
-    edges.m_data = nullptr;
-    edges.m_size = 0;
-    edges.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkgpMeshBase::Edge> edges;
     for (hkgpMeshBase::Triangle* pTriangle = m_triangles.m_used; pTriangle; pTriangle = pTriangle->m_next) {
         if (pTriangle->m_partId != a1) {
             continue;
@@ -7237,17 +6632,6 @@ void hkgpMesh::flipPartOrientation(int32_t a1) {
     }
     bindEdgeList(edges);
     m_hasPerVertexNormals.m_bool = 0;
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = edges.m_capacityAndFlags;
-    edges.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            edges.m_data,
-            (capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkgpMeshBase::Edge))
-        );
-    }
 }
 
 // The SDK's enumerateTriangleOverlaps: collects the triangles of m_trianglesTree whose boxes overlap the box of the
@@ -7264,13 +6648,7 @@ void hkgpMesh::enumerateTriangleOverlaps(
     vertices[0] = a1;
     vertices[1] = a2;
     vertices[2] = a3;
-    // EXE-INLINED none: hkgpMeshInternals::SimpleCollector::SimpleCollector
-    alignas(16) XFNV_INLINED_LOCAL(
-        hkgpMeshInternals::SimpleCollector, collector, hkgpMeshInternals_SimpleCollector_vftable, std::nullopt
-    );
-    collector.m_triangles.m_data = nullptr;
-    collector.m_triangles.m_size = 0;
-    collector.m_triangles.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
+    alignas(16) hkgpMeshInternals::SimpleCollector collector;
     hkAabbUtil::calcAabb(vertices, 3, aabb);
     queryAabb(&m_trianglesTree, &aabb.m_min.m_quad, &collector);
     for (int32_t i = 0; i < collector.m_triangles.m_size; ++i) {
@@ -7288,17 +6666,6 @@ void hkgpMesh::enumerateTriangleOverlaps(
             triangles.m_data[triangles.m_size] = rFound;
             ++triangles.m_size;
         }
-    }
-    // EXE-INLINED none: hkgpMeshInternals::SimpleCollector::~SimpleCollector
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = collector.m_triangles.m_capacityAndFlags;
-    collector.m_triangles.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            collector.m_triangles.m_data,
-            (capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkgpMeshBase::Triangle*))
-        );
     }
 }
 
@@ -7436,22 +6803,9 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
         ++rArray.m_size;
     };
     const float fEpsilon = 1e-05f;
-    XFNV_INLINED_LOCAL(RawTriangleArray, cuts, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(RawTriangleArray, pieces, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkgpMeshInternals::SimpleCollector::SimpleCollector
-    XFNV_INLINED_LOCAL(
-        hkgpMeshInternals::SimpleCollector, collector, hkgpMeshInternals_SimpleCollector_vftable,
-        hkAabbTreeQueryUtils_hkAabbTreeData_hkAabbTreeAabb_unsigned_int_Collector_vftable
-    );
-    cuts.m_data = nullptr;
-    cuts.m_size = 0;
-    cuts.m_capacityAndFlags = hkArrayBase<RawTriangle>::DONT_DEALLOCATE_FLAG;
-    pieces.m_data = nullptr;
-    pieces.m_size = 0;
-    pieces.m_capacityAndFlags = hkArrayBase<RawTriangle>::DONT_DEALLOCATE_FLAG;
-    collector.m_triangles.m_data = nullptr;
-    collector.m_triangles.m_size = 0;
-    collector.m_triangles.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
+    RawTriangleArray cuts;
+    RawTriangleArray pieces;
+    hkgpMeshInternals::SimpleCollector collector;
     for (int32_t iSource = 0; iSource < a2.m_triangles.m_size; ++iSource) {
         cuts.m_size = 0;
         collector.m_triangles.m_size = 0;
@@ -7638,40 +6992,6 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
             pTriangle->m_material = -1;
         }
     }
-    // EXE-INLINED none: hkgpMeshInternals::SimpleCollector::~SimpleCollector
-    hkMemoryAllocator& rCollectorHeap = hkMemoryRouter::getInstance().heap();
-    collector.m_triangles.m_size = 0;
-    if ((collector.m_triangles.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG) == 0) {
-        rCollectorHeap.bufFree(
-            collector.m_triangles.m_data,
-            (collector.m_triangles.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkgpMeshBase::Triangle*))
-        );
-    }
-    collector.m_triangles.m_data = nullptr;
-    collector.m_triangles.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<hkgpMeshInternals::RawTriangle>::~hkArray
-    hkMemoryAllocator& rPiecesHeap = hkMemoryRouter::getInstance().heap();
-    pieces.m_size = 0;
-    if ((pieces.m_capacityAndFlags & hkArrayBase<RawTriangle>::DONT_DEALLOCATE_FLAG) == 0) {
-        rPiecesHeap.bufFree(
-            pieces.m_data,
-            (pieces.m_capacityAndFlags & hkArrayBase<RawTriangle>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(RawTriangle))
-        );
-    }
-    pieces.m_data = nullptr;
-    pieces.m_capacityAndFlags = hkArrayBase<RawTriangle>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<hkgpMeshInternals::RawTriangle>::~hkArray
-    hkMemoryAllocator& rCutsHeap = hkMemoryRouter::getInstance().heap();
-    cuts.m_size = 0;
-    if ((cuts.m_capacityAndFlags & hkArrayBase<RawTriangle>::DONT_DEALLOCATE_FLAG) == 0) {
-        rCutsHeap.bufFree(
-            cuts.m_data,
-            (cuts.m_capacityAndFlags & hkArrayBase<RawTriangle>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(RawTriangle))
-        );
-    }
 }
 
 // The SDK's extractAllLoops: one loop per naked edge of the triangles of part a2 (all for -1), merged while one
@@ -7683,11 +7003,7 @@ int32_t hkgpMesh::extractAllLoops(
 ) const {
     using EdgeArray = hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>;
     using LoopArray = hkArray<EdgeArray*, hkContainerHeapAllocator>;
-    // EXE-INLINED none: hkArray<EdgeArray*, hkContainerHeapAllocator>::hkArray
-    XFNV_INLINED_LOCAL(LoopArray, loops, std::nullopt, std::nullopt);
-    loops.m_data = nullptr;
-    loops.m_size = 0;
-    loops.m_capacityAndFlags = hkArrayBase<EdgeArray*>::DONT_DEALLOCATE_FLAG;
+    LoopArray loops;
     for (hkgpMeshBase::Triangle* t = m_triangles.m_used; t; t = t->m_next) {
         if (a2 != -1 && t->m_partId != a2) {
             continue;
@@ -7728,16 +7044,6 @@ int32_t hkgpMesh::extractAllLoops(
         }
     }
     if (loops.m_size == 0) {
-        // EXE-INLINED none: hkArray<EdgeArray*, hkContainerHeapAllocator>::~hkArray
-        hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-        loops.m_size = 0;
-        if (loops.m_capacityAndFlags >= 0) {
-            heap->bufFree(
-                loops.m_data,
-                (loops.m_capacityAndFlags & hkArrayBase<EdgeArray*>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(EdgeArray*))
-            );
-        }
         return 0;
     }
     for (int32_t pass = 0; pass < 1; ++pass) {
@@ -7822,16 +7128,6 @@ int32_t hkgpMesh::extractAllLoops(
     }
     a1._append(*hkMemoryRouter::getInstance().m_heap, loops.m_data, loops.m_size);
     const int32_t numLoops = loops.m_size;
-    // EXE-INLINED none: hkArray<EdgeArray*, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    loops.m_size = 0;
-    if (loops.m_capacityAndFlags >= 0) {
-        heap->bufFree(
-            loops.m_data,
-            (loops.m_capacityAndFlags & hkArrayBase<EdgeArray*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(EdgeArray*))
-        );
-    }
     return numLoops;
 }
 
@@ -7899,7 +7195,6 @@ hkgpMesh::createTriangle(hkgpMeshBase::Vertex* a1, hkgpMeshBase::Vertex* a2, hkg
 // parameter are kept as floats.
 void hkgpMesh::fixTJunctions(float a1, bool a2) {
     const uintptr_t kTriangleMask = ~static_cast<uintptr_t>(3);
-    XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
     const float fToleranceSquared = a1 * a1;
     int32_t numFixed = 0;
     rebuildTrianglesTree();
@@ -7911,14 +7206,7 @@ void hkgpMesh::fixTJunctions(float a1, bool a2) {
                 if (pTriangle->m_links[k] & kTriangleMask) {
                     continue;
                 }
-                // EXE-INLINED none: hkgpMeshInternals::SimpleCollector::SimpleCollector
-                XFNV_INLINED_LOCAL(
-                    hkgpMeshInternals::SimpleCollector, collector, hkgpMeshInternals_SimpleCollector_vftable,
-                    hkAabbTreeQueryUtils_hkAabbTreeData_hkAabbTreeAabb_unsigned_int_Collector_vftable
-                );
-                collector.m_triangles.m_data = nullptr;
-                collector.m_triangles.m_size = 0;
-                collector.m_triangles.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
+                hkgpMeshInternals::SimpleCollector collector;
                 const float fRadius = a1 + a1;
                 const __m128 kStart = pTriangle->m_vertices[k]->m_position.m_quad;
                 const __m128 kEnd = pTriangle->m_vertices[(9 >> (k * 2)) & 3]->m_position.m_quad;
@@ -7982,31 +7270,19 @@ void hkgpMesh::fixTJunctions(float a1, bool a2) {
                         break;
                     }
                 }
-                // EXE-INLINED none: hkgpMeshInternals::SimpleCollector::~SimpleCollector
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                const int32_t capacityAndFlags = collector.m_triangles.m_capacityAndFlags;
-                collector.m_triangles.m_size = 0;
-                if (capacityAndFlags >= 0) {
-                    heap.bufFree(
-                        collector.m_triangles.m_data,
-                        (capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK) *
-                            static_cast<int32_t>(sizeof(hkgpMeshBase::Triangle*))
-                    );
-                }
-                collector.m_triangles.m_data = nullptr;
-                collector.m_triangles.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
             }
         }
     }
     while (bChanged);
     if (a2 && numFixed) {
         alignas(16) char buf[512];
-        ::new (&kStream) hkErrStream(buf, 512);
-        kStream << "T-Jonctions fixed: " << numFixed;
-        hkError::s_instance->message(
-            hkError::MESSAGE_REPORT, -1, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 3232
-        );
-        kStream.~hkErrStream();
+        {
+            hkErrStream kStream(buf, 512);
+            kStream << "T-Jonctions fixed: " << numFixed;
+            hkError::s_instance->message(
+                hkError::MESSAGE_REPORT, -1, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 3232
+            );
+        }
         fixBindings();
         m_hasPerVertexNormals.m_bool = 0;
     }
@@ -8027,18 +7303,9 @@ int32_t hkgpMesh::explodeParts(hkArray<hkgpMesh*, hkContainerHeapAllocator>& a1,
     if (numParts == 0) {
         return 0;
     }
-    // EXE-INLINED none: hkArray<VertexMap*, hkContainerHeapAllocator>::hkArray
-    XFNV_INLINED_LOCAL(VertexMapArray, vertexMaps, std::nullopt, std::nullopt);
-    vertexMaps.m_data = nullptr;
-    vertexMaps.m_size = 0;
-    vertexMaps.m_capacityAndFlags = hkArrayBase<VertexMap*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkPointerMap<hkUlong, hkUlong>::hkPointerMap
-    XFNV_INLINED_LOCAL(EdgeMap, edgeMap, std::nullopt, std::nullopt);
+    VertexMapArray vertexMaps;
+    EdgeMap edgeMap;
     hkUlongMapBase& rEdgeMap = edgeMap.m_map;
-    rEdgeMap.m_elem = nullptr;
-    rEdgeMap.m_numElems = 0;
-    rEdgeMap.m_hashMod = -1;
-    rEdgeMap.reserve(hkMemoryRouter::getInstance().heap(), 0);
     // EXE-INLINED none: hkArray<hkgpMesh*, hkContainerHeapAllocator>::expandBy
     hkMemoryAllocator* pOutHeap = hkMemoryRouter::getInstance().m_heap;
     const int32_t firstPart = a1.m_size;
@@ -8200,21 +7467,6 @@ int32_t hkgpMesh::explodeParts(hkArray<hkgpMesh*, hkContainerHeapAllocator>& a1,
             parts[i]->rebuildConvexHull();
         }
     }
-    // The map destructor asks for the router three times before clearAndDeallocate, as the game does.
-    hkMemoryRouter::getInstance();
-    hkMemoryRouter::getInstance();
-    // EXE-INLINED none: the edge map's destructor (clearAndDeallocate, then the base's empty destructor)
-    rEdgeMap.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-    // EXE-INLINED none: hkArray<VertexMap*, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator* pFreeHeap = hkMemoryRouter::getInstance().m_heap;
-    vertexMaps.m_size = 0;
-    if (vertexMaps.m_capacityAndFlags >= 0) {
-        pFreeHeap->bufFree(
-            vertexMaps.m_data,
-            (vertexMaps.m_capacityAndFlags & hkArrayBase<VertexMap*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(VertexMap*))
-        );
-    }
     return numParts;
 }
 
@@ -8259,21 +7511,8 @@ void hkgpMesh::append(hkgpMesh* other) {
     using TrianglePool = hkgpMeshBaseAbstractMesh::TrianglePoolAllocator;
     using VertexMap = hkPointerMap<const hkgpMeshBase::Vertex*, hkgpMeshBase::Vertex*, hkContainerHeapAllocator>;
     using EdgeMap = hkPointerMap<uintptr_t, uintptr_t, hkContainerHeapAllocator>;
-    using MapBase = hkUlongMapBase;
-    // EXE-INLINED none: hkPointerMap<const hkgpMeshBase::Vertex*, hkgpMeshBase::Vertex*>::hkPointerMap
-    XFNV_INLINED_LOCAL(VertexMap, vertexMap, std::nullopt, std::nullopt);
-    MapBase& rVertexMap = vertexMap.m_map;
-    rVertexMap.m_elem = nullptr;
-    rVertexMap.m_numElems = 0;
-    rVertexMap.m_hashMod = -1;
-    rVertexMap.reserve(hkMemoryRouter::getInstance().heap(), 0);
-    // EXE-INLINED none: hkPointerMap<hkUlong, hkUlong>::hkPointerMap
-    XFNV_INLINED_LOCAL(EdgeMap, edgeMap, std::nullopt, std::nullopt);
-    hkUlongMapBase& rEdgeMap = edgeMap.m_map;
-    rEdgeMap.m_elem = nullptr;
-    rEdgeMap.m_numElems = 0;
-    rEdgeMap.m_hashMod = -1;
-    rEdgeMap.reserve(hkMemoryRouter::getInstance().heap(), 0);
+    VertexMap vertexMap;
+    EdgeMap edgeMap;
     for (hkgpMeshBase::Vertex* pVertex = other->m_vertices.m_used; pVertex; pVertex = pVertex->m_next) {
         // EXE-INLINED none: hkgpAbstractMeshDefinitions::List<hkgpMeshBase::Vertex, ...>::allocate
         VertexPool& rAllocator = m_vertices.m_allocator;
@@ -8354,9 +7593,6 @@ void hkgpMesh::append(hkgpMesh* other) {
         }
     }
     invalidateConvexHull();
-    // EXE-INLINED none: the two maps' destructors (clearAndDeallocate, then the base's empty destructor)
-    rEdgeMap.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-    rVertexMap.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
 }
 
 // Const cutAndCap overload: cuts and caps a clone of the mesh by the plane; on success the clone's parts are exploded,
@@ -8375,11 +7611,7 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(
     sResult cutResult;
     apResult->m_value = pClone->cutAndCap(&cutResult, plane)->m_value;
     if (apResult->m_value == SUCCESS) {
-        XFNV_INLINED_LOCAL(hkArray<hkgpMesh*>, newParts, std::nullopt, std::nullopt);
-        // EXE-INLINED none: hkArray<hkgpMesh*>::hkArray
-        newParts.m_data = nullptr;
-        newParts.m_size = 0;
-        newParts.m_capacityAndFlags = hkArrayBase<hkgpMesh*>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkgpMesh*> newParts;
         pClone->floodFillDetachedParts();
         pClone->explodeParts(newParts, true, true);
         for (int32_t i = 0; i < newParts.m_size; ++i) {
@@ -8410,16 +7642,6 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(
                 parts.m_data[parts.m_size] = newParts.m_data[i];
                 parts.m_size++;
             }
-        }
-        // EXE-INLINED none: hkArray<hkgpMesh*>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacityAndFlags = newParts.m_capacityAndFlags;
-        newParts.m_size = 0;
-        if (capacityAndFlags >= 0) {
-            heap.bufFree(
-                newParts.m_data,
-                (capacityAndFlags & hkArrayBase<hkgpMesh*>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(hkgpMesh*))
-            );
         }
     }
     if (pClone) {
@@ -8474,11 +7696,7 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
     const int32_t numVertices = m_vertices.m_numUsed;
     int32_t ringsFilled = 0;
     int32_t afmTriangles = 0;
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, normals, std::nullopt, std::nullopt);
-    normals.m_data = nullptr;
-    normals.m_size = 0;
-    normals.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> normals;
     hkVector4 zero;
     zero.m_quad = _mm_setzero_ps();
     for (int32_t i = 0; i < 8; ++i) {
@@ -8496,11 +7714,7 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
         }
     }
     if (config.m_fillRings) {
-        // EXE-INLINED none: hkArray<hkgpMeshBase::Vertex*>::hkArray
-        XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Vertex*>, ringVertices, std::nullopt, std::nullopt);
-        ringVertices.m_data = nullptr;
-        ringVertices.m_size = 0;
-        ringVertices.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Vertex*>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkgpMeshBase::Vertex*> ringVertices;
         bool bFilled = false;
         hkgpMeshBase::Triangle* pSeed = m_triangles.m_used;
         while (pSeed) {
@@ -8534,11 +7748,9 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                     ++ringVertices.m_size;
                 }
                 hkgpConvexHull hull;
-                // EXE-INLINED none: hkArray<hkVector4>::hkArray, setSize (the ring vertices' positions)
-                XFNV_INLINED_LOCAL(hkArray<hkVector4>, points, std::nullopt, std::nullopt);
-                points.m_data = nullptr;
-                points.m_size = 0;
-                points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+                // The ring vertices' positions.
+                hkArray<hkVector4> points;
+                // EXE-INLINED none: hkArray<hkVector4>::setSize
                 {
                     const int32_t iNumPoints = ringVertices.m_size;
                     hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
@@ -8616,8 +7828,7 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                             quantize(ringVertices.m_data[k]->m_position, x, y);
                             alignas(16) hkgpDefaultTriangulatorType::Location location;
                             triangulator.locateVertex(&location, x, y);
-                            alignas(16) XFNV_INLINED_LOCAL(Insertion, insertion, std::nullopt, std::nullopt);
-                            triangulator.insertVertex(&insertion, x, y, true, location, false);
+                            alignas(16) Insertion insertion = triangulator.insertVertex(x, y, true, location, false);
                             if (insertion.m_type.m_storage == Insertion::SUCCESS) {
                                 insertion.m_edge.m_triangle->m_vertices[insertion.m_edge.m_index]->m_data =
                                     static_cast<uint32_t>(k);
@@ -8628,11 +7839,7 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                         }
                         // Each ring edge and the other two edges of its triangle; the ring edge is constrained, tagged
                         // with its segment's index.
-                        // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::hkArray
-                        XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Edge>, edges, std::nullopt, std::nullopt);
-                        edges.m_data = nullptr;
-                        edges.m_size = 0;
-                        edges.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
+                        hkArray<hkgpMeshBase::Edge> edges;
                         for (int32_t k = 0; k < pRing->m_segments.m_size; ++k) {
                             for (int32_t iSide = 0; iSide < 3; ++iSide) {
                                 const Segment& segment = pRing->m_segments.m_data[k];
@@ -8656,11 +7863,7 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                                 }
                                 ++edges.m_size;
                             }
-                            // EXE-INLINED none: DefaultEdgeData::DefaultEdgeData (the tag list on its four inline tags)
-                            XFNV_INLINED_LOCAL(EdgeData, edgeData, std::nullopt, std::nullopt);
-                            edgeData.m_tags.m_data = edgeData.m_tags.m_storage;
-                            edgeData.m_tags.m_size = 0;
-                            edgeData.m_tags.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG | 4;
+                            EdgeData edgeData;
                             // EXE-INLINED none: hkArray<uint32_t>::pushBack
                             hkMemoryRouter& router = hkMemoryRouter::getInstance();
                             if (edgeData.m_tags.m_size ==
@@ -8680,20 +7883,10 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                             int32_t x0;
                             int32_t y0;
                             quantize(segment.m_edge.m_triangle->m_vertices[segment.m_edge.m_index]->m_position, x0, y0);
-                            alignas(16) XFNV_INLINED_LOCAL(Insertion, edgeInsertion, std::nullopt, std::nullopt);
-                            triangulator.insertEdge(&edgeInsertion, x0, y0, x1, y1, true, &edgeData);
+                            alignas(16) Insertion edgeInsertion =
+                                triangulator.insertEdge(x0, y0, x1, y1, true, &edgeData);
                             if (edgeInsertion.m_type.m_storage != Insertion::SUCCESS) {
                                 bOk = false;
-                            }
-                            // EXE-INLINED none: hkInplaceArray<hkUlong, 4>::~hkInplaceArray
-                            hkMemoryAllocator& tagsHeap = hkMemoryRouter::getInstance().heap();
-                            edgeData.m_tags.m_size = 0;
-                            if (edgeData.m_tags.m_capacityAndFlags >= 0) {
-                                tagsHeap.bufFree(
-                                    edgeData.m_tags.m_data,
-                                    (edgeData.m_tags.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK) *
-                                        static_cast<int32_t>(sizeof(hkUlong))
-                                );
                             }
                         }
                         if (triangulator.partition() < 2) {
@@ -8821,14 +8014,8 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                             // The inner triangles become mesh triangles, bound to the ring's triangles through the
                             // tags of their edges.
                             const int32_t iFirstNew = ringVertices.m_size;
-                            XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Edge>, openEdges, std::nullopt, std::nullopt);
-                            openEdges.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
-                            XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Triangle*>, created, std::nullopt, std::nullopt);
-                            created.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
-                            openEdges.m_data = nullptr;
-                            openEdges.m_size = 0;
-                            created.m_data = nullptr;
-                            created.m_size = 0;
+                            hkArray<hkgpMeshBase::Edge> openEdges;
+                            hkArray<hkgpMeshBase::Triangle*> created;
                             for (Tri* pInner = triangulator.m_mesh.m_triangles.m_used; pInner;
                                  pInner = pInner->m_next) {
                                 if (pInner->m_region != 1) {
@@ -8939,50 +8126,12 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                                 }
                                 ringVertices.m_size = iFirstNew;
                             }
-                            // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::~hkArray,
-                            // hkArray<hkgpMeshBase::Edge>::~hkArray
-                            hkMemoryAllocator& createdHeap = hkMemoryRouter::getInstance().heap();
-                            created.m_size = 0;
-                            if (!(created.m_capacityAndFlags &
-                                  hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG)) {
-                                createdHeap.bufFree(
-                                    created.m_data,
-                                    (created.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK) *
-                                        static_cast<int32_t>(sizeof(hkgpMeshBase::Triangle*))
-                                );
-                            }
-                            created.m_data = nullptr;
-                            created.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
-                            hkMemoryAllocator& openHeap = hkMemoryRouter::getInstance().heap();
-                            openEdges.m_size = 0;
-                            if (!(openEdges.m_capacityAndFlags &
-                                  hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG)) {
-                                openHeap.bufFree(
-                                    openEdges.m_data,
-                                    (openEdges.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                                        static_cast<int32_t>(sizeof(hkgpMeshBase::Edge))
-                                );
-                            }
-                            openEdges.m_data = nullptr;
-                            openEdges.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
                         }
                         if (!bOk) {
                             // The next sample normal (for sample 0 this deliberately reads the one before the first
                             // too, as the game does).
                             plane = normals.m_data[iSample - 1];
                         }
-                        // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::~hkArray
-                        hkMemoryAllocator& edgesHeap = hkMemoryRouter::getInstance().heap();
-                        edges.m_size = 0;
-                        if (!(edges.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG)) {
-                            edgesHeap.bufFree(
-                                edges.m_data,
-                                (edges.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                                    static_cast<int32_t>(sizeof(hkgpMeshBase::Edge))
-                            );
-                        }
-                        edges.m_data = nullptr;
-                        edges.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
                         // EXE-INLINED none: hkgpTriangulatorType::~hkgpTriangulatorType (without the base vptr stores)
                         if (bFilled) {
                             break;
@@ -8990,18 +8139,6 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                     }
                 }
                 delete pRing;
-                // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-                hkMemoryAllocator& pointsHeap = hkMemoryRouter::getInstance().heap();
-                points.m_size = 0;
-                if (points.m_capacityAndFlags >= 0) {
-                    pointsHeap.bufFree(
-                        points.m_data,
-                        (points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                            static_cast<int32_t>(sizeof(hkVector4))
-                    );
-                }
-                points.m_data = nullptr;
-                points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
                 if (bFilled) {
                     bRestart = true;
                     break;
@@ -9014,16 +8151,6 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                 continue;
             }
             pSeed = pSeed->m_next;
-        }
-        // EXE-INLINED none: hkArray<hkgpMeshBase::Vertex*>::~hkArray
-        hkMemoryAllocator& ringHeap = hkMemoryRouter::getInstance().heap();
-        ringVertices.m_size = 0;
-        if (ringVertices.m_capacityAndFlags >= 0) {
-            ringHeap.bufFree(
-                ringVertices.m_data,
-                (ringVertices.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Vertex*>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkgpMeshBase::Vertex*))
-            );
         }
     }
     if (config.m_fillAFM) {
@@ -9144,29 +8271,27 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
     }
     m_hasPerVertexNormals.m_bool = false;
     // HK_REPORT, three times.
-    alignas(16) XFNV_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
     alignas(16) char buf[512];
-    ::new (&stream) hkErrStream(buf, 512);
-    stream << "HOLE FILLING STATS:";
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 3170);
-    stream.~hkErrStream();
-    ::new (&stream) hkErrStream(buf, 512);
-    stream << "\tCreated: " << m_triangles.m_numUsed - numTriangles << " triangles and "
-           << m_vertices.m_numUsed - numVertices << " vertices";
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 3171);
-    stream.~hkErrStream();
-    ::new (&stream) hkErrStream(buf, 512);
-    stream << "\tRings: " << ringsFilled << " AFM: " << afmTriangles;
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 3172);
-    stream.~hkErrStream();
-    // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-    hkMemoryAllocator& normalsHeap = hkMemoryRouter::getInstance().heap();
-    normals.m_size = 0;
-    if (normals.m_capacityAndFlags >= 0) {
-        normalsHeap.bufFree(
-            normals.m_data,
-            (normals.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkVector4))
+    {
+        alignas(16) hkErrStream stream(buf, 512);
+        stream << "HOLE FILLING STATS:";
+        hkError::s_instance->message(
+            hkError::MESSAGE_REPORT, -1, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 3170
+        );
+    }
+    {
+        alignas(16) hkErrStream stream2(buf, 512);
+        stream2 << "\tCreated: " << m_triangles.m_numUsed - numTriangles << " triangles and "
+                << m_vertices.m_numUsed - numVertices << " vertices";
+        hkError::s_instance->message(
+            hkError::MESSAGE_REPORT, -1, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 3171
+        );
+    }
+    {
+        alignas(16) hkErrStream stream3(buf, 512);
+        stream3 << "\tRings: " << ringsFilled << " AFM: " << afmTriangles;
+        hkError::s_instance->message(
+            hkError::MESSAGE_REPORT, -1, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 3172
         );
     }
 }
@@ -9181,26 +8306,9 @@ int32_t hkgpMesh::checkTopology(char a1) const {
     using VertexSet = hkPointerMap<const hkgpMeshBase::Vertex*, hkgpMeshBase::Vertex*, hkContainerHeapAllocator>;
     using TriangleSet = hkPointerMap<const hkgpMeshBase::Triangle*, hkgpMeshBase::Triangle*, hkContainerHeapAllocator>;
     using MapBase = hkUlongMapBase;
-    // EXE-INLINED none: hkPointerMap<const hkgpMeshBase::Vertex*, hkgpMeshBase::Vertex*>::hkPointerMap
-    XFNV_INLINED_LOCAL(VertexSet, vertices, std::nullopt, std::nullopt);
+    VertexSet vertices;
     MapBase& rVertices = vertices.m_map;
-    rVertices.m_elem = nullptr;
-    rVertices.m_numElems = 0;
-    rVertices.m_hashMod = -1;
-    rVertices.reserve(hkMemoryRouter::getInstance().heap(), 0);
-    // EXE-INLINED none: hkPointerMap<const hkgpMeshBase::Triangle*, hkgpMeshBase::Triangle*>::hkPointerMap
-    XFNV_INLINED_LOCAL(TriangleSet, triangles, std::nullopt, std::nullopt);
-    MapBase& rTriangles = triangles.m_map;
-    rTriangles.m_elem = nullptr;
-    rTriangles.m_numElems = 0;
-    rTriangles.m_hashMod = -1;
-    rTriangles.reserve(hkMemoryRouter::getInstance().heap(), 0);
-    // EXE-INLINED none: the two maps' destructors (clearAndDeallocate, then the base's empty destructor) at each return
-    const auto finish = [&rVertices, &rTriangles](int32_t result) __attribute__((always_inline)) -> int32_t {
-        rTriangles.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-        rVertices.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-        return result;
-    };
+    TriangleSet triangles;
     for (const hkgpMeshBase::Triangle* pTriangle = m_triangles.m_used; pTriangle; pTriangle = pTriangle->m_next) {
         for (uint32_t k = 0; k < 3; ++k) {
             const uintptr_t link = pTriangle->m_links[k];
@@ -9214,19 +8322,19 @@ int32_t hkgpMesh::checkTopology(char a1) const {
                     pListed = pListed->m_next;
                 }
                 if (!pListed) {
-                    return finish(2);
+                    return 2;
                 }
                 vertices.insert(pVertex, pVertex);
             }
             hkgpMeshBase::Vertex* const* const ppNext = &pTriangle->m_vertices[(9 >> (k * 2)) & 3];
             if (pTriangle->m_vertices[k] == *ppNext) {
-                return finish(7);
+                return 7;
             }
             if (!pOpposite) {
                 continue;
             }
             if (pTriangle == pOpposite) {
-                return finish(6);
+                return 6;
             }
             if (!triangles.isValid(triangles.findKey(pOpposite))) {
                 const hkgpMeshBase::Triangle* pListed = m_triangles.m_used;
@@ -9234,23 +8342,23 @@ int32_t hkgpMesh::checkTopology(char a1) const {
                     pListed = pListed->m_next;
                 }
                 if (!pListed) {
-                    return finish(3);
+                    return 3;
                 }
                 triangles.insert(pOpposite, pOpposite);
             }
             if (pTriangle->m_vertices[k] != pOpposite->m_vertices[(9 >> (j * 2)) & 3] ||
                 pOpposite->m_vertices[j] != *ppNext) {
-                return finish(5);
+                return 5;
             }
             if (pTriangle->m_vertices[(18 >> (k * 2)) & 3] == pOpposite->m_vertices[(18 >> (j * 2)) & 3]) {
-                return finish(4);
+                return 4;
             }
         }
     }
     if (a1 && (rVertices.m_numElems & MapBase::NUM_ELEMS_MASK) != m_vertices.m_numUsed) {
-        return finish(1);
+        return 1;
     }
-    return finish(0);
+    return 0;
 }
 
 void hkgpMesh::applyRotation(const hkQuaternion& rotation) {
@@ -9298,17 +8406,9 @@ int32_t hkgpMesh::buildPlaneIndices(float minCosAngle, float minDistance, bool s
     if (!m_triangles.m_numUsed) {
         return 0;
     }
-    XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Triangle*>, triangles, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::hkArray
-    triangles.m_data = nullptr;
-    triangles.m_size = 0;
-    triangles.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Triangle*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkgpMeshBase::Triangle*> triangles;
     fetchAreaSortedTriangles(triangles, true);
-    XFNV_INLINED_LOCAL(hkArray<hkgpMeshBase::Edge>, stack, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::hkArray
-    stack.m_data = nullptr;
-    stack.m_size = 0;
-    stack.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkgpMeshBase::Edge> stack;
     // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::pushBack (a null-tested placement copy)
     const auto pushEdge = [&stack](hkgpMeshBase::Triangle* pTriangle, uint32_t index) __attribute__((always_inline)) {
         hkMemoryRouter& router = hkMemoryRouter::getInstance();
@@ -9393,34 +8493,6 @@ int32_t hkgpMesh::buildPlaneIndices(float minCosAngle, float minDistance, bool s
         }
     }
     const int32_t numPlanes = m_planes.m_size;
-    {
-        // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacityAndFlags = stack.m_capacityAndFlags;
-        stack.m_size = 0;
-        if (capacityAndFlags >= 0) {
-            heap.bufFree(
-                stack.m_data,
-                (capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkgpMeshBase::Edge))
-            );
-        }
-        stack.m_data = nullptr;
-        stack.m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
-    }
-    {
-        // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacityAndFlags = triangles.m_capacityAndFlags;
-        triangles.m_size = 0;
-        if (capacityAndFlags >= 0) {
-            heap.bufFree(
-                triangles.m_data,
-                (capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkgpMeshBase::Triangle*))
-            );
-        }
-    }
     return numPlanes;
 }
 
@@ -9573,7 +8645,6 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
     using Insertion = hkgpDefaultTriangulatorType::Insertion;
     using VertexMap = hkPointerMap<const Vtx*, uintptr_t, hkContainerHeapAllocator>;
     using EdgeMap = hkPointerMap<uintptr_t, uintptr_t, hkContainerHeapAllocator>;
-    using MapBase = hkUlongMapBase;
     // The next and previous edge index of a triangle.
     const auto next = [](uint32_t e) -> uint32_t { return (9u >> (2 * e)) & 3; };
     const auto prev = [](uint32_t e) -> uint32_t { return (0x12u >> (2 * e)) & 3; };
@@ -9599,11 +8670,7 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
         hkMemoryRouter::getInstance().heap().blockFree(pRing, static_cast<int32_t>(sizeof(Ring)));
     };
 
-    // EXE-INLINED none: hkArray<hkgpMeshInternals::Ring*>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<Ring*>, rings, std::nullopt, std::nullopt);
-    rings.m_data = nullptr;
-    rings.m_size = 0;
-    rings.m_capacityAndFlags = hkArrayBase<Ring*>::DONT_DEALLOCATE_FLAG;
+    hkArray<Ring*> rings;
     const bool bClosed = isClosedManifold();
     cut(apResult, cutplane, true);
     if (apResult->m_value == SUCCESS) {
@@ -9763,15 +8830,8 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
             domainMin.set(-1.0f, -1.0f, 0.0f, 0.0f);
             hkVector4 domainMax;
             domainMax.set(1.0f, 1.0f, 0.0f, 0.0f);
-            // EXE-INLINED none: hkgpTriangulatorType::hkgpTriangulatorType
-            XFNV_INLINED_LOCAL(hkgpDefaultTriangulatorType, triangulator, std::nullopt, std::nullopt);
-            ::new (&triangulator) hkgpDefaultTriangulatorType;
+            hkgpDefaultTriangulatorType triangulator;
             triangulator.setDomain(domainMin, domainMax, 0.0f, true);
-            // EXE-INLINED none: hkgpTriangulatorType::~hkgpTriangulatorType, then the exe's leftover heap lookup
-            const auto destroyTriangulator = [&triangulator] {
-                triangulator.~hkgpDefaultTriangulatorType();
-                hkMemoryRouter::getInstance();
-            };
             triangulator.setDomain(vMin, vMax, 0.0f, true);
             const hkMatrix4& worldToLocal = triangulator.m_worldToLocal;
             // EXE-INLINED none: the triangulator's transform to its quantized frame (m_worldToLocal; the x and y
@@ -9826,7 +8886,6 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
             }
             if (pCollapse) {
                 collapseEdge(pCollapse->m_edge, false);
-                destroyTriangulator();
                 continue;
             }
             // Segments of one point, in any ring, share the first one's vertex.
@@ -9852,13 +8911,7 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
                 }
             }
             // The segments' points, each triangulator vertex mapped to its segment's edge.
-            // EXE-INLINED none: hkPointerMap<const Vtx*, hkUlong>::hkPointerMap
-            XFNV_INLINED_LOCAL(VertexMap, vertexMap, std::nullopt, std::nullopt);
-            MapBase& rVertexMap = vertexMap.m_map;
-            rVertexMap.m_elem = nullptr;
-            rVertexMap.m_numElems = 0;
-            rVertexMap.m_hashMod = -1;
-            rVertexMap.reserve(hkMemoryRouter::getInstance().heap(), 0);
+            VertexMap vertexMap;
             bool bFailed = false;
             for (int32_t k = 0; !bFailed && k < rings.m_size; ++k) {
                 const Ring* pRing = rings.m_data[k];
@@ -9868,8 +8921,7 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
                     const int32_t y = segment.m_projection.m_y;
                     hkgpDefaultTriangulatorType::Location location;
                     triangulator.locateVertex(&location, x, y);
-                    XFNV_INLINED_LOCAL(Insertion, insertion, std::nullopt, std::nullopt);
-                    triangulator.insertVertex(&insertion, x, y, true, location, false);
+                    Insertion insertion = triangulator.insertVertex(x, y, true, location, false);
                     const int32_t iType = insertion.m_type.m_storage;
                     if (iType < Insertion::SUCCESS || iType > Insertion::ALREADY_PRESENT) {
                         bFailed = true;
@@ -9882,9 +8934,6 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
             }
             if (bFailed) {
                 apResult->m_value = CANNOT_INSERT_VERTEX;
-                // EXE-INLINED none: hkPointerMap::~hkPointerMap (clearAndDeallocate, then the base's empty destructor)
-                rVertexMap.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-                destroyTriangulator();
                 break;
             }
             // The ring edges, each from its segment's point to the next one's.
@@ -9894,10 +8943,8 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
                     const Segment* pSegments = pRing->m_segments.m_data;
                     const Segment& b = pSegments[(s + 1) % pRing->m_segments.m_size];
                     const Segment& a = pSegments[s];
-                    alignas(16) XFNV_INLINED_LOCAL(Insertion, insertion, std::nullopt, std::nullopt);
-                    triangulator.insertEdge(
-                        &insertion, a.m_projection.m_x, a.m_projection.m_y, b.m_projection.m_x, b.m_projection.m_y,
-                        true, nullptr
+                    alignas(16) Insertion insertion = triangulator.insertEdge(
+                        a.m_projection.m_x, a.m_projection.m_y, b.m_projection.m_x, b.m_projection.m_y, true, nullptr
                     );
                     if (insertion.m_type.m_storage != Insertion::SUCCESS) {
                         bFailed = true;
@@ -9907,20 +8954,11 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
             }
             if (bFailed) {
                 apResult->m_value = CANNOT_INSERT_EDGE;
-                // EXE-INLINED none: hkPointerMap::~hkPointerMap (clearAndDeallocate, then the base's empty destructor)
-                rVertexMap.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-                destroyTriangulator();
                 break;
             }
             triangulator.partition();
             // Each triangulator ring edge mapped to its segment's edge.
-            // EXE-INLINED none: hkPointerMap<hkUlong, hkUlong>::hkPointerMap
-            XFNV_INLINED_LOCAL(EdgeMap, edgeMap, std::nullopt, std::nullopt);
-            hkUlongMapBase& rEdgeMap = edgeMap.m_map;
-            rEdgeMap.m_elem = nullptr;
-            rEdgeMap.m_numElems = 0;
-            rEdgeMap.m_hashMod = -1;
-            rEdgeMap.reserve(hkMemoryRouter::getInstance().heap(), 0);
+            EdgeMap edgeMap;
             for (int32_t k = 0; k < rings.m_size; ++k) {
                 const Ring* pRing = rings.m_data[k];
                 for (int32_t s = 0; s < pRing->m_segments.m_size; ++s) {
@@ -9970,10 +9008,6 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
                     }
                 }
             }
-            // EXE-INLINED none: the two maps' destructors (clearAndDeallocate, then the base's empty destructor)
-            rEdgeMap.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-            rVertexMap.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-            destroyTriangulator();
             ++i;
         }
         if (apResult->m_value == SUCCESS) {
@@ -10004,15 +9038,6 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
     }
     rings.m_size = 0;
     removeOrphanVertices();
-    // EXE-INLINED none: hkArray<hkgpMeshInternals::Ring*>::~hkArray
-    hkMemoryAllocator& ringsHeap = hkMemoryRouter::getInstance().heap();
-    rings.m_size = 0;
-    if (rings.m_capacityAndFlags >= 0) {
-        ringsHeap.bufFree(
-            rings.m_data,
-            (rings.m_capacityAndFlags & hkArrayBase<Ring*>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(Ring*))
-        );
-    }
     return apResult;
 }
 
@@ -10527,13 +9552,13 @@ float IConvexOverlapImpl::distance(
     bool allowPenetration
 ) const {
     static int32_t callid;
-    XFNV_INLINED_LOCAL(IConvexOverlapImpl::ShapeBridge, v7, IConvexOverlapImpl_ShapeBridge_vftable, std::nullopt);
+    IConvexOverlapImpl::ShapeBridge v7;
     hkGsk::GetClosesetPointInput apInput_;
     hkGskOut apOut_;
     hkGsk apGsk_;
     ++callid;
     v7.m_shape = shapeB;
-    XFNV_INLINED_LOCAL(IConvexOverlapImpl::ShapeBridge, v6, IConvexOverlapImpl_ShapeBridge_vftable, std::nullopt);
+    IConvexOverlapImpl::ShapeBridge v6;
     apInput_.m_aTb = hkTransformIdentity;
     v6.m_shape = shapeA;
     apInput_.m_shapeA.m_storage = &v6;

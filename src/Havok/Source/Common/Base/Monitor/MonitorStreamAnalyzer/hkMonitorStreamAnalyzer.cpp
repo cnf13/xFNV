@@ -446,22 +446,9 @@ static void drawStatistics(
     hkPointerMap<const char*, uint32_t>* apUnknownColors,
     const hkMonitorStreamFrameInfo* apInfo
 ) {
-    using ColorMap_t = hkPointerMap<const char*, uint32_t>;
-    using MapBase_t = hkUlongMapBase;
-    using Samples_t = hkArray<hkMonitorStreamAnalyzer::Node*, hkContainerHeapAllocator>;
-    // EXE-INLINED none: hkPointerMap<const char*, hkUint32>::hkPointerMap
-    XFNV_INLINED_LOCAL(ColorMap_t, knownColors, std::nullopt, std::nullopt);
-    knownColors.m_map.m_elem = nullptr;
-    knownColors.m_map.m_numElems = 0;
-    knownColors.m_map.m_hashMod = -1;
-    // The base's reserve with the heap, which hkMap's own reserve hides.
-    knownColors.m_map.MapBase_t::reserve(*hkMemoryRouter::getInstance().m_heap, 0);
+    hkPointerMap<const char*, uint32_t> knownColors;
     const float sampleWidth = afFrameTime / static_cast<double>(aiWidth);
-    // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzer::Node*>::hkArray
-    XFNV_INLINED_LOCAL(Samples_t, samples, std::nullopt, std::nullopt);
-    samples.m_data = nullptr;
-    samples.m_size = 0;
-    samples.m_capacityAndFlags = hkArrayBase<hkMonitorStreamAnalyzer::Node*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkMonitorStreamAnalyzer::Node*, hkContainerHeapAllocator> samples;
     // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzer::Node*>::reserve
     hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
     if (static_cast<int32_t>(samples.m_capacityAndFlags & hkArrayBase<hkMonitorStreamAnalyzer::Node*>::CAPACITY_MASK) <
@@ -513,21 +500,6 @@ static void drawStatistics(
             }
         }
     }
-    // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzer::Node*>::~hkArray
-    hkMemoryAllocator& freeHeap = *hkMemoryRouter::getInstance().m_heap;
-    samples.m_size = 0;
-    if (samples.m_capacityAndFlags >= 0) {
-        freeHeap.bufFree(
-            samples.m_data,
-            (samples.m_capacityAndFlags & hkArrayBase<hkMonitorStreamAnalyzer::Node*>::CAPACITY_MASK) *
-                sizeof(hkMonitorStreamAnalyzer::Node*)
-        );
-    }
-    samples.m_data = nullptr;
-    samples.m_capacityAndFlags = hkArrayBase<hkMonitorStreamAnalyzer::Node*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkPointerMap<const char*, hkUint32>::~hkPointerMap
-    knownColors.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
-    knownColors.m_map.destructOperations();
 }
 
 // Draws digit r_eax (an 8 by 7 pixel bitmap of digitBitmaps) into the image at a2, a1 pixels wide, bottom row
@@ -716,12 +688,8 @@ void hkMonitorStreamAnalyzer::drawThreadsToTga(
     hkOstream& outStream
 ) {
     using NodeArray = hkInplaceArray<Node*, 6, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(NodeArray, nodes, std::nullopt, std::nullopt);
     const int32_t numThreads = m_frameInfos.m_size;
-    // EXE-INLINED none: hkInplaceArray<hkMonitorStreamAnalyzer::Node*, 6, hkContainerHeapAllocator>::hkInplaceArray
-    nodes.m_data = nodes.m_storage;
-    nodes.m_size = 0;
-    nodes.m_capacityAndFlags = 6 | hkArrayBase<Node*>::DONT_DEALLOCATE_FLAG;
+    NodeArray nodes;
     // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzer::Node*, hkContainerHeapAllocator>::setSize
     hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
     const int32_t capacity = nodes.m_capacityAndFlags & hkArrayBase<Node*>::CAPACITY_MASK;
@@ -742,12 +710,6 @@ void hkMonitorStreamAnalyzer::drawThreadsToTga(
             node->~Node();
             hkMemoryRouter::getInstance().m_heap->blockFree(node, sizeof(Node));
         }
-    }
-    // EXE-INLINED none: hkInplaceArray<hkMonitorStreamAnalyzer::Node*, 6, hkContainerHeapAllocator>::~hkInplaceArray
-    hkMemoryAllocator& freeHeap = *hkMemoryRouter::getInstance().m_heap;
-    nodes.m_size = 0;
-    if (nodes.m_capacityAndFlags >= 0) {
-        freeHeap.bufFree(nodes.m_data, (nodes.m_capacityAndFlags & hkArrayBase<Node*>::CAPACITY_MASK) * sizeof(Node*));
     }
 }
 
@@ -798,7 +760,7 @@ hkBool hkMonitorStreamAnalyzer::captureFrameDetails(
 // command ends the dump.
 void hkMonitorStreamAnalyzer::writeRawStatistics(hkOstream& os) {
     using PrefixArray = hkArray<char, hkContainerDebugAllocator>;
-    XFNV_INLINED_LOCAL(PrefixArray, prefix, std::nullopt, std::nullopt);
+    PrefixArray prefix;
     hkInitIndentString(&prefix);
     // EXE-INLINED none: hkArray<char, hkContainerDebugAllocator>::pushBack
     auto pushBack = [&prefix](char c) {
@@ -912,17 +874,10 @@ void hkMonitorStreamAnalyzer::writeRawStatistics(hkOstream& os) {
                         current += sizeof(hkMonitorStream::MemoryCommand);
                         break;
                     }
-                    default: goto done;
+                    default: return;
                 }
             }
         }
-    }
-done:
-    // EXE-INLINED none: hkArray<char, hkContainerDebugAllocator>::~hkArray
-    hkMemoryAllocator& debug = *hkMemoryRouter::getInstance().m_debug;
-    prefix.m_size = 0;
-    if (prefix.m_capacityAndFlags >= 0) {
-        debug.bufFree(prefix.m_data, prefix.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
     }
 }
 
@@ -954,10 +909,7 @@ hkMonitorStreamAnalyzer::makeStatisticsTreeForMultipleFrames(int32_t threadId, h
 // multithreaded summary, then freed.
 void hkMonitorStreamAnalyzer::writeStatistics(hkOstream& outStream, int32_t reportLevel) {
     using NodeArray = hkArray<Node*, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(NodeArray, nodes, std::nullopt, std::nullopt);
-    nodes.m_data = nullptr;
-    nodes.m_size = 0;
-    nodes.m_capacityAndFlags = hkArrayBase<Node*>::DONT_DEALLOCATE_FLAG;
+    NodeArray nodes;
     for (int32_t i = 0; i < m_frameInfos.m_size; ++i) {
         hkBool reuse;
         reuse.m_bool = false;
@@ -977,12 +929,6 @@ void hkMonitorStreamAnalyzer::writeStatistics(hkOstream& outStream, int32_t repo
             node->~Node();
             hkMemoryRouter::getInstance().m_heap->blockFree(node, sizeof(Node));
         }
-    }
-    // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzer::Node*, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-    nodes.m_size = 0;
-    if (nodes.m_capacityAndFlags >= 0) {
-        heap.bufFree(nodes.m_data, (nodes.m_capacityAndFlags & hkArrayBase<Node*>::CAPACITY_MASK) * sizeof(Node*));
     }
 }
 
@@ -1056,10 +1002,7 @@ void hkMonitorStreamAnalyzer::showCombinedThreadSummaryRec(
     int32_t numSpus,
     const CombinedThreadSummaryOptions& options
 ) {
-    XFNV_INLINED_LOCAL(hkArray<char>, textLine, std::nullopt, std::nullopt);
-    textLine.m_data = nullptr;
-    textLine.m_size = 0;
-    textLine.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
+    hkArray<char> textLine;
     alignas(4) uint8_t lineOsStorage[sizeof(hkOstream)];
     hkOstream& lineOs = *::new (lineOsStorage) hkOstream(textLine);
 
@@ -1155,13 +1098,6 @@ void hkMonitorStreamAnalyzer::showCombinedThreadSummaryRec(
     }
 
     lineOs.~hkOstream();
-    // EXE-INLINED none: hkArray<char>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = textLine.m_capacityAndFlags;
-    textLine.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(textLine.m_data, capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
-    }
 }
 
 void hkMonitorStreamAnalyzer::mergeTreesForCombinedThreadSummary(
@@ -1187,16 +1123,12 @@ void hkMonitorStreamAnalyzer::showCombinedThreadSummaryForSingleFrame(
     hkMonitorStreamAnalyzer::CombinedThreadSummaryOptions& options
 ) {
     using CharArray = hkArray<char, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(hkOstream, lineOs, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(CharArray, textLine, std::nullopt, std::nullopt);
     // The hkBool is zero-extended into the integer parameter findMaxTimerNameIndent takes.
     options.m_indentationToFirstTimerValue = findMaxTimerNameIndent(
         node, 0, options.m_tabSpacingForTimerNames, static_cast<uint8_t>(options.m_displayPartialTree.m_bool)
     );
-    textLine.m_data = nullptr;
-    textLine.m_size = 0;
-    textLine.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
-    ::new (&lineOs) hkOstream(textLine);
+    CharArray textLine;
+    hkOstream lineOs(textLine);
     // Pads the line with spaces to the given column, or adds a tab.
     auto padToColumn = [&](int32_t column) {
         if (options.m_useTabsNotSpacesForColumns.m_bool) {
@@ -1234,13 +1166,6 @@ void hkMonitorStreamAnalyzer::showCombinedThreadSummaryForSingleFrame(
     os << textLine.m_data;
     os.printf("\n\n");
     showCombinedThreadSummaryRec(os, node, 0, numThreads, numSpus, options);
-    lineOs.~hkOstream();
-    // EXE-INLINED none: hkArray<char, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-    textLine.m_size = 0;
-    if (textLine.m_capacityAndFlags >= 0) {
-        heap.bufFree(textLine.m_data, textLine.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
-    }
 }
 
 // The command's first 32-bit value, swapped when endianSwap, is a padding value below 10 (skipped as 4 bytes; with
@@ -1456,25 +1381,14 @@ hkMonitorStreamAnalyzer::Node* hkMonitorStreamAnalyzer::reverseLookupNodeAtTgaSa
     }
     float maxFrameTime = -1.0f;
     using FloatArray = hkArray<float, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(FloatArray, startTimes, std::nullopt, std::nullopt);
-    startTimes.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
+    FloatArray startTimes;
     const int32_t frame = (height - y - 1) / frameHeight;
     const int32_t thread = (height - y - 1) % frameHeight / threadHeight;
-    startTimes.m_data = nullptr;
-    startTimes.m_size = 0;
     getTimerLimits(nodeList, input, frameInfos, maxFrameTime, startTimes);
     Node* node = getNodeSampledAtTick(
         frame, x - startX, &nodeList.m_data[thread]->m_children, width, maxFrameTime, startTimes.m_data[frame],
         frameInfos.m_data[thread].m_data
     );
-    // EXE-INLINED none: hkArray<float, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-    startTimes.m_size = 0;
-    if (startTimes.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            startTimes.m_data, (startTimes.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK) * sizeof(float)
-        );
-    }
     return node;
 }
 
@@ -1599,21 +1513,8 @@ void hkMonitorStreamAnalyzer::writeStatisticsDetails(
                 outstream.printf("****** Summary Frame:%i ******\n", frame);
                 outstream.printf("****************************************\n");
 
-                XFNV_INLINED_LOCAL(hkLocalArray<Node*>, trees, std::nullopt, std::nullopt);
-                const int32_t iNumThreads = nodes.m_size;
-                trees.m_data = nullptr;
-                trees.m_size = 0;
-                trees.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<Node*>::DONT_DEALLOCATE_FLAG);
-                // EXE-INLINED none: hkAllocateStack<Node*> (untyped stack memory, as the exe treats it)
-                hkStackMemory& rStack = hkMemoryRouter::getInstance().m_stack;
-                void* pTrees = rStack.m_next.m_storage;
-                rStack.m_next.m_storage =
-                    static_cast<char*>(pTrees) + ((static_cast<int32_t>(sizeof(Node*)) * iNumThreads + 127) & ~127);
-                trees.m_capacityAndFlags =
-                    static_cast<int32_t>(static_cast<uint32_t>(iNumThreads) | hkArrayBase<Node*>::DONT_DEALLOCATE_FLAG);
+                hkLocalArray<Node*> trees(nodes.m_size);
                 const int32_t iSize = nodes.m_size;
-                trees.m_data = static_cast<Node**>(pTrees);
-                trees.m_localMemory = static_cast<Node**>(pTrees);
                 // EXE-INLINED none: hkArray<Node*>::setSize
                 hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
                 const int32_t iCap = trees.m_capacityAndFlags & hkArrayBase<Node*>::CAPACITY_MASK;
@@ -1662,25 +1563,6 @@ void hkMonitorStreamAnalyzer::writeStatisticsDetails(
                         hkMemoryRouter::getInstance().m_heap->blockFree(pTree, sizeof(Node));
                     }
                 }
-
-                // EXE-INLINED none: hkLocalArray<Node*>::~hkLocalArray
-                Node** pTreeMemory = trees.m_localMemory;
-                if (pTreeMemory == trees.m_data) {
-                    trees.m_size = 0;
-                }
-                hkMemoryRouter::getInstance().m_stack.m_next.m_storage =
-                    static_cast<char*>(static_cast<void*>(pTreeMemory));
-                hkMemoryAllocator* pHeap2 = hkMemoryRouter::getInstance().m_heap;
-                const int32_t iCapFlags = trees.m_capacityAndFlags;
-                trees.m_size = 0;
-                if (iCapFlags >= 0) {
-                    pHeap2->bufFree(
-                        trees.m_data,
-                        (iCapFlags & hkArrayBase<Node*>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(Node*))
-                    );
-                }
-                trees.m_data = nullptr;
-                trees.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<Node*>::DONT_DEALLOCATE_FLAG);
             }
         }
         else {
@@ -1901,16 +1783,8 @@ hkMonitorStreamAnalyzer::Node* hkMonitorStreamAnalyzer::makeStatisticsTreeForSin
     void* memory = hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(Node));
     Node* currentNode = memory ? ::new (memory) Node(nullptr, rootNodeName, Node::NODE_TYPE_DIRECTORY) : nullptr;
     Node* const rootNode = currentNode;
-    // EXE-INLINED none: hkInplaceArray<hkMonitorStream::TimerCommand, 16, hkContainerHeapAllocator>::hkInplaceArray
-    XFNV_INLINED_LOCAL(TimerStack, timerStack, std::nullopt, std::nullopt);
-    timerStack.m_data = timerStack.m_storage;
-    timerStack.m_size = 0;
-    timerStack.m_capacityAndFlags = 16 | hkArrayBase<TimerCommand>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkInplaceArray<hkMonitorStream::TimerCommand, 16, hkContainerHeapAllocator>::hkInplaceArray
-    XFNV_INLINED_LOCAL(TimerStack, timerStackCopy, std::nullopt, std::nullopt);
-    timerStackCopy.m_data = timerStackCopy.m_storage;
-    timerStackCopy.m_size = 0;
-    timerStackCopy.m_capacityAndFlags = 16 | hkArrayBase<TimerCommand>::DONT_DEALLOCATE_FLAG;
+    TimerStack timerStack;
+    TimerStack timerStackCopy;
 
     // EXE-INLINED none: hkArray<hkMonitorStream::TimerCommand, hkContainerHeapAllocator>::pushBack
     auto pushBack = [](TimerStack& stack, const TimerCommand& command) {
@@ -2069,26 +1943,6 @@ hkMonitorStreamAnalyzer::Node* hkMonitorStreamAnalyzer::makeStatisticsTreeForSin
         }
     }
 finish:
-    // EXE-INLINED none: hkArray<hkMonitorStream::TimerCommand, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator& copyHeap = *hkMemoryRouter::getInstance().m_heap;
-    timerStackCopy.m_size = 0;
-    if (timerStackCopy.m_capacityAndFlags >= 0) {
-        copyHeap.bufFree(
-            timerStackCopy.m_data,
-            (timerStackCopy.m_capacityAndFlags & hkArrayBase<TimerCommand>::CAPACITY_MASK) * sizeof(TimerCommand)
-        );
-    }
-    timerStackCopy.m_data = nullptr;
-    timerStackCopy.m_capacityAndFlags = hkArrayBase<TimerCommand>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<hkMonitorStream::TimerCommand, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-    timerStack.m_size = 0;
-    if (timerStack.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            timerStack.m_data,
-            (timerStack.m_capacityAndFlags & hkArrayBase<TimerCommand>::CAPACITY_MASK) * sizeof(TimerCommand)
-        );
-    }
     return rootNode;
 }
 
@@ -2127,19 +1981,12 @@ void hkMonitorStreamAnalyzer::writeStatisticsDetailsToTexture(
     int32_t& height,
     hkMonitorStreamAnalyzer::SampleInfo* sampleInfo
 ) {
-    using StartTimes_t = hkArray<float, hkContainerHeapAllocator>;
-    using ColorMap_t = hkPointerMap<const char*, uint32_t>;
-    using MapBase_t = hkUlongMapBase;
     const int32_t iNumThreads = nodeList.m_size;
     if (iNumThreads < 1) {
         return;
     }
     float fMaxFrameTime = -1.0f;
-    // EXE-INLINED none: hkArray<float>::hkArray
-    XFNV_INLINED_LOCAL(StartTimes_t, startTimes, std::nullopt, std::nullopt);
-    startTimes.m_data = nullptr;
-    startTimes.m_size = 0;
-    startTimes.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
+    hkArray<float, hkContainerHeapAllocator> startTimes;
     getTimerLimits(nodeList, input, frameInfos, fMaxFrameTime, startTimes);
     const int32_t iAvailable = frameInfos.m_data[0].m_size - input.m_frameStart;
     const int32_t iNumFrames = input.m_numFrames > iAvailable ? iAvailable : input.m_numFrames;
@@ -2156,13 +2003,7 @@ void hkMonitorStreamAnalyzer::writeStatisticsDetailsToTexture(
         float fMax = fMaxFrameTime;
         sampleInfo->m_maxSampleTime = fMax;
     }
-    // EXE-INLINED none: hkPointerMap<const char*, hkUint32>::hkPointerMap
-    XFNV_INLINED_LOCAL(ColorMap_t, unknownColors, std::nullopt, std::nullopt);
-    unknownColors.m_map.m_elem = nullptr;
-    unknownColors.m_map.m_numElems = 0;
-    unknownColors.m_map.m_hashMod = -1;
-    // The base's reserve with the heap, which hkMap's own reserve hides.
-    unknownColors.m_map.MapBase_t::reserve(*hkMemoryRouter::getInstance().m_heap, 0);
+    hkPointerMap<const char*, uint32_t> unknownColors;
     int32_t iY = iHeight;
     for (int32_t iFrame = input.m_frameStart; iFrame < iFrameEnd; ++iFrame) {
         iY -= input.m_gapBetweenFrames;
@@ -2207,18 +2048,6 @@ void hkMonitorStreamAnalyzer::writeStatisticsDetailsToTexture(
                 }
             }
         }
-    }
-    // EXE-INLINED none: hkPointerMap<const char*, hkUint32>::~hkPointerMap
-    unknownColors.m_map.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
-    unknownColors.m_map.destructOperations();
-    // EXE-INLINED none: hkArray<float>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    startTimes.m_size = 0;
-    if (startTimes.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            startTimes.m_data,
-            (startTimes.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(float))
-        );
     }
 }
 
@@ -2547,43 +2376,37 @@ void printStatisticsByType(hkOstream& outstream, hkMonitorStreamAnalyzer::Node* 
     using Map_t = hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>;
     using StringMap_t = hkStringMap<Info_t*, hkContainerHeapAllocator>;
     using Sorted_t = hkArray<Info_t*, hkContainerTempAllocator>;
-    XFNV_INLINED_LOCAL(Sorted_t, sortedInfos, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzerPrintByTypeInfo*, hkContainerTempAllocator>::hkArray
-    sortedInfos.m_data = nullptr;
-    sortedInfos.m_size = 0;
-    sortedInfos.m_capacityAndFlags = hkArrayBase<Info_t*>::DONT_DEALLOCATE_FLAG;
-    XFNV_INLINED_LOCAL(StringMap_t, nameToInfoMap, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkStringMap<hkMonitorStreamAnalyzerPrintByTypeInfo*>::hkStringMap
-    ::new (&nameToInfoMap.m_map) hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>(0u);
-    hkBuildSizePerName(rootNode, nameToInfoMap);
-    // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzerPrintByTypeInfo*, hkContainerTempAllocator>::reserve
-    const int32_t numInfos = nameToInfoMap.m_map.m_numElems;
-    hkMemoryAllocator& temp = hkMemoryRouter::getInstance().temp();
-    const int32_t capacity = sortedInfos.m_capacityAndFlags & hkArrayBase<Info_t*>::CAPACITY_MASK;
-    if (capacity < numInfos) {
-        const int32_t doubled = 2 * capacity;
-        hkArrayUtil::_reserve(
-            temp, &sortedInfos, numInfos < doubled ? doubled : numInfos, static_cast<int32_t>(sizeof(Info_t*))
-        );
-    }
-    Map_t::Iterator it = nameToInfoMap.m_map.getIterator();
-    hkBool valid;
-    valid = nameToInfoMap.m_map.isValid(it);
-    while (valid) {
-        // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzerPrintByTypeInfo*>::pushBackUnchecked
-        sortedInfos.m_data[sortedInfos.m_size] = nameToInfoMap.getValue(it);
-        ++sortedInfos.m_size;
-        it = nameToInfoMap.m_map.getNext(it);
+    Sorted_t sortedInfos;
+    {
+        StringMap_t nameToInfoMap;
+        hkBuildSizePerName(rootNode, nameToInfoMap);
+        // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzerPrintByTypeInfo*, hkContainerTempAllocator>::reserve
+        const int32_t numInfos = nameToInfoMap.m_map.m_numElems;
+        hkMemoryAllocator& temp = hkMemoryRouter::getInstance().temp();
+        const int32_t capacity = sortedInfos.m_capacityAndFlags & hkArrayBase<Info_t*>::CAPACITY_MASK;
+        if (capacity < numInfos) {
+            const int32_t doubled = 2 * capacity;
+            hkArrayUtil::_reserve(
+                temp, &sortedInfos, numInfos < doubled ? doubled : numInfos, static_cast<int32_t>(sizeof(Info_t*))
+            );
+        }
+        Map_t::Iterator it = nameToInfoMap.m_map.getIterator();
+        hkBool valid;
         valid = nameToInfoMap.m_map.isValid(it);
+        while (valid) {
+            // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzerPrintByTypeInfo*>::pushBackUnchecked
+            sortedInfos.m_data[sortedInfos.m_size] = nameToInfoMap.getValue(it);
+            ++sortedInfos.m_size;
+            it = nameToInfoMap.m_map.getNext(it);
+            valid = nameToInfoMap.m_map.isValid(it);
+        }
+        if (sortedInfos.m_size > 1) {
+            // EXE-INLINED none: hkAlgorithm::quickSort
+            hkAlgorithm::quickSortRecursive<Info_t*, bool (*)(const Info_t*, const Info_t*)>(
+                sortedInfos.m_data, 0, sortedInfos.m_size - 1, &hkCompareInfosBySize
+            );
+        }
     }
-    if (sortedInfos.m_size > 1) {
-        // EXE-INLINED none: hkAlgorithm::quickSort
-        hkAlgorithm::quickSortRecursive<Info_t*, bool (*)(const Info_t*, const Info_t*)>(
-            sortedInfos.m_data, 0, sortedInfos.m_size - 1, &hkCompareInfosBySize
-        );
-    }
-    // EXE-INLINED none: hkStringMap<hkMonitorStreamAnalyzerPrintByTypeInfo*>::~hkStringMap
-    nameToInfoMap.m_map.clearAndDeallocate();
 
     float total = sortedInfos.m_data[sortedInfos.m_size - 1]->m_this.m_value[1];
     outstream.printf("\n\n");
@@ -2612,16 +2435,6 @@ void printStatisticsByType(hkOstream& outstream, hkMonitorStreamAnalyzer::Node* 
             hkMemoryRouter::getInstance().debug().blockFree(pInfo, sizeof(Info_t));
         }
         while (--i >= 0);
-    }
-    // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzerPrintByTypeInfo*, hkContainerTempAllocator>::~hkArray
-    hkMemoryAllocator& freeTemp = hkMemoryRouter::getInstance().temp();
-    sortedInfos.m_size = 0;
-    if (sortedInfos.m_capacityAndFlags >= 0) {
-        freeTemp.bufFree(
-            sortedInfos.m_data,
-            (sortedInfos.m_capacityAndFlags & hkArrayBase<Info_t*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(Info_t*))
-        );
     }
 }
 
@@ -2852,11 +2665,8 @@ hkMonitorStreamAnalyzer::Node* getNodeSampledAtTick(
     const hkMonitorStreamFrameInfo* apInfo
 ) {
     using NodeArray = hkArray<hkMonitorStreamAnalyzer::Node*, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(NodeArray, samples, std::nullopt, std::nullopt);
     const float sampleWidth = static_cast<float>(afMaxFrameTime / static_cast<double>(aiWidth));
-    samples.m_data = nullptr;
-    samples.m_size = 0;
-    samples.m_capacityAndFlags = hkArrayBase<hkMonitorStreamAnalyzer::Node*>::DONT_DEALLOCATE_FLAG;
+    NodeArray samples;
     // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzer::Node*, hkContainerHeapAllocator>::reserve
     hkMemoryRouter& router = hkMemoryRouter::getInstance();
     const int32_t capacity = samples.m_capacityAndFlags & hkArrayBase<hkMonitorStreamAnalyzer::Node*>::CAPACITY_MASK;
@@ -2873,16 +2683,6 @@ hkMonitorStreamAnalyzer::Node* getNodeSampledAtTick(
         if (aiX < samples.m_size) {
             result = samples.m_data[aiX];
         }
-    }
-    // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzer::Node*, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-    samples.m_size = 0;
-    if (samples.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            samples.m_data,
-            (samples.m_capacityAndFlags & hkArrayBase<hkMonitorStreamAnalyzer::Node*>::CAPACITY_MASK) *
-                sizeof(hkMonitorStreamAnalyzer::Node*)
-        );
     }
     return result;
 }

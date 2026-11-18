@@ -1244,7 +1244,6 @@ void QueuedHelmet::QueueMe() {
 }
 
 void QueuedHelmet::CheckFinished() {
-    XFNV_INLINED_LOCAL(NiPointer<NiGeometryData>, spdata, std::nullopt, std::nullopt);
     if (GetFinishedQueuing()) {
         if (GetAllChildrenFinished() && IsPending()) {
             pIOManager->AddTask(this);
@@ -1306,19 +1305,11 @@ void QueuedHelmet::CheckFinished() {
                                                 (pBipedAnim->GetRequester()->GetObjectReference())) {
                                                 TESObjectREFR* Requester = pBipedAnim->GetRequester();
                                                 if (Requester->GetObjectReference()->GetFormType() == NPC__ID) {
-                                                    XFNV_INLINED_LOCAL(
-                                                        std::type_identity_t<FR2MatrixVTC<float>[2][2]>, fgcoord,
-                                                        std::nullopt, std::nullopt
-                                                    );
                                                     TESNPC* pnpc_2 = static_cast<TESNPC*>(
                                                         pBipedAnim->GetRequester()->GetObjectReference()
                                                     );
-                                                    rt::eh_vector_constructor_iterator(
-                                                        fgcoord, sizeof(FR2MatrixVTC<float>), 4,
-                                                        &xfnv::constructElement<FR2MatrixVTC<float>>,
-                                                        &xfnv::destructElement<FR2MatrixVTC<float>>
-                                                    );
-                                                    ::new (&spdata) NiPointer<NiGeometryData>(
+                                                    FR2MatrixVTC<float> fgcoord[2][2];
+                                                    NiPointer<NiGeometryData> spdata(
                                                         static_cast<NiGeometryData*>(nullptr)
                                                     );
                                                     ptri_2->GetModelData()->CreateDeepCopy(spTempObject);
@@ -1336,11 +1327,6 @@ void QueuedHelmet::CheckFinished() {
                                                         matrot.MakeYRotation(-1.5707964f);
                                                         ptri_2->SetRotate((&ptri_2->m_kLocal)->m_Rotate * matrot);
                                                     }
-                                                    spdata.~NiPointer<NiGeometryData>();
-                                                    rt::eh_vector_destructor_iterator(
-                                                        fgcoord, sizeof(FR2MatrixVTC<float>), 4,
-                                                        &xfnv::destructElement<FR2MatrixVTC<float>>
-                                                    );
                                                 }
                                             }
                                         }
@@ -1694,10 +1680,9 @@ void QueuedReference::QueueModels() {
 
 void QueuedReference::UseDistant3D() {
     char cPath[264];
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     NiNode* ptempnode = nullptr;
     TESModel::GetDistantModelName_(cPath, pRef->GetObjectReference());
-    ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
+    NiPointer<Model> spmodel(static_cast<Model*>(nullptr));
     pModelLoader->FindModel(cPath, spmodel);
     if ((spmodel.m_pObject) && (spmodel.m_pObject->GetModel())) {
         NiObject* pclone = spmodel.m_pObject->GetModel()->Clone();
@@ -1718,7 +1703,6 @@ void QueuedReference::UseDistant3D() {
     if (ptempnode) {
         AttachDistant3D(ptempnode);
     }
-    NiPointer<Model>::Destroy(&spmodel);
 }
 
 void QueuedReference::AttachDistant3D(NiNode* apNode) {
@@ -2342,10 +2326,7 @@ void BackgroundCloneThread::ThreadUpdate() {
 }
 
 void BackgroundCloneThread::AddQueuedReference(QueuedReference* apQueuedReference) {
-    XFNV_INLINED_LOCAL(NiPointer<QueuedReference>, spPtr, std::nullopt, std::nullopt);
-    ::new (static_cast<void*>(&spPtr)) NiPointer<QueuedReference>(apQueuedReference);
-    pCloneReferencesQueue->Push(spPtr);
-    spPtr.~NiPointer<QueuedReference>();
+    pCloneReferencesQueue->Push(NiPointer<QueuedReference>(apQueuedReference));
     SignalTask();
 }
 
@@ -2471,10 +2452,8 @@ void ModelLoader::QueueTreeModel(
     QueuedFile* apCounter,
     ENUM_LOD_MULT aeLODMult
 ) {
-    XFNV_INLINED_LOCAL(NiPointer<QueuedModel>, spqueuedModel, std::nullopt, std::nullopt);
-    ::new (&spqueuedModel) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
+    NiPointer<QueuedModel> spqueuedModel(static_cast<QueuedModel*>(nullptr));
     QueueTreeModel(apRef, apTree, spqueuedModel, aePriority, apCounter, aeLODMult);
-    spqueuedModel.~NiPointer<QueuedModel>();
 }
 
 void ModelLoader::QueueTreeModel(
@@ -2486,7 +2465,6 @@ void ModelLoader::QueueTreeModel(
     ENUM_LOD_MULT aeLODMult
 ) {
     QueuedTreeModel* v8;
-    XFNV_INLINED_LOCAL(NiPointer<QueuedModel>, spqueuedTreeModel, std::nullopt, std::nullopt);
     QueuedTreeModel* v9 = static_cast<QueuedTreeModel*>(ourMalloc(sizeof(QueuedTreeModel)));
     if (v9) {
         v8 = ::new (v9) QueuedTreeModel(apRef, apTree, aePriority, aeLODMult);
@@ -2494,13 +2472,12 @@ void ModelLoader::QueueTreeModel(
     else {
         v8 = nullptr;
     }
-    ::new (static_cast<void*>(&spqueuedTreeModel)) NiPointer<QueuedFile>(static_cast<QueuedFile*>(v8));
+    NiPointer<QueuedModel> spqueuedTreeModel(v8);
     spqueuedTreeModel.m_pObject->SetParent(apCounter);
     QueuedModel* v7 = spqueuedTreeModel.m_pObject;
     v7->QueueMe();
     NiPointer<QueuedModel>* p_spqueuedTreeModel = &spqueuedTreeModel;
     aspQueuedModel.operator=(spqueuedTreeModel);
-    spqueuedTreeModel.~NiPointer<QueuedModel>();
 }
 
 void ModelLoader::QueueBoundObject(
@@ -2509,10 +2486,8 @@ void ModelLoader::QueueBoundObject(
     QueuedFile* apParent,
     TESObjectREFR* apRefr
 ) {
-    XFNV_INLINED_LOCAL(NiPointer<QueuedModel>, spqueuedModel, std::nullopt, std::nullopt);
-    ::new (&spqueuedModel) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
+    NiPointer<QueuedModel> spqueuedModel(static_cast<QueuedModel*>(nullptr));
     QueueBoundObject(apObj, spqueuedModel, aePriority, apParent, apRefr);
-    spqueuedModel.~NiPointer<QueuedModel>();
 }
 
 void ModelLoader::RemoveReplacementKFListFromMap(Animation* apAnim) {
@@ -3892,8 +3867,6 @@ void ModelLoader::QueueReplacementKFList(
     QueuedFile* apParent,
     const char* apBasePath
 ) {
-    XFNV_INLINED_LOCAL(NiPointer<QueuedReplacementKF>, spqueuedKF, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<QueuedReplacementKFList>, spreplacementKFList, std::nullopt, std::nullopt);
     if ((apKFList) && (apAnim)) {
         BSSimpleList<const char*>* pfileList = apKFList;
         if (pfileList && pfileList->GetItem()) {
@@ -3901,7 +3874,7 @@ void ModelLoader::QueueReplacementKFList(
                 MEM_CONTEXT_ANIMATION, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp",
                 3743
             );
-            ::new (&spreplacementKFList) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
+            NiPointer<QueuedReplacementKFList> spreplacementKFList(static_cast<QueuedReplacementKFList*>(nullptr));
             while (pfileList) {
                 const char* pfileName = pfileList->GetItem();
                 if (pfileName) {
@@ -3940,11 +3913,10 @@ void ModelLoader::QueueReplacementKFList(
                         else {
                             v9 = nullptr;
                         }
-                        ::new (static_cast<void*>(&spqueuedKF)) NiPointer<QueuedFile>(static_cast<QueuedFile*>(v9));
+                        NiPointer<QueuedReplacementKF> spqueuedKF(v9);
                         spqueuedKF.m_pObject->SetParent(spreplacementKFList.m_pObject);
                         QueuedReplacementKF* v8 = spqueuedKF.m_pObject;
                         v8->QueueMe();
-                        spqueuedKF.~NiPointer<QueuedReplacementKF>();
                     }
                     ourFree(const_cast<char*>(pfileName));
                     pfileList->RemoveHead();
@@ -3963,7 +3935,6 @@ void ModelLoader::QueueReplacementKFList(
             else {
                 spreplacementKFList.operator=(static_cast<QueuedReplacementKFList*>(nullptr));
             }
-            spreplacementKFList.~NiPointer<QueuedReplacementKFList>();
         }
     }
 }
@@ -4041,7 +4012,6 @@ void ModelLoader::QueueMagicItem(
     EffectSetting* apAVEffectSetting,
     IO_TASK_PRIORITY aePriority
 ) {
-    XFNV_INLINED_LOCAL(NiPointer<QueuedMagicItem>, spqueuedMagicItem, std::nullopt, std::nullopt);
     if ((apMagicItem) && (apAVEffectSetting)) {
         QueuedMagicItem* v5;
         QueuedMagicItem* apMemory = static_cast<QueuedMagicItem*>(ourMalloc(sizeof(QueuedMagicItem)));
@@ -4051,46 +4021,39 @@ void ModelLoader::QueueMagicItem(
         else {
             v5 = nullptr;
         }
-        ::new (static_cast<void*>(&spqueuedMagicItem)) NiPointer<QueuedFile>(static_cast<QueuedFile*>(v5));
+        NiPointer<QueuedMagicItem> spqueuedMagicItem(v5);
         QueuedMagicItem* v4 = spqueuedMagicItem.m_pObject;
         v4->QueueMe();
-        spqueuedMagicItem.~NiPointer<QueuedMagicItem>();
     }
 }
 
 void ModelLoader::CancelReplacementKFList(Animation* apAnim) {
-    XFNV_INLINED_LOCAL(NiPointer<QueuedReplacementKFList>, spqueuedReplacementKFList, std::nullopt, std::nullopt);
-    ::new (&spqueuedReplacementKFList) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
+    NiPointer<QueuedReplacementKFList> spqueuedReplacementKFList(static_cast<QueuedReplacementKFList*>(nullptr));
     if (pQueuedReplacementKFListMap->GetAt(apAnim, spqueuedReplacementKFList)) {
         QueuedReplacementKFList* v2 = spqueuedReplacementKFList.m_pObject;
         pIOManager->CancelTask(v2, nullptr);
     }
-    spqueuedReplacementKFList.~NiPointer<QueuedReplacementKFList>();
 }
 
 void ModelLoader::CancelAnimIdle(AnimIdle* apAnimIdle) {
-    XFNV_INLINED_LOCAL(NiPointer<QueuedAnimIdle>, spqueuedAnimIdle, std::nullopt, std::nullopt);
-    ::new (&spqueuedAnimIdle) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
+    NiPointer<QueuedAnimIdle> spqueuedAnimIdle(static_cast<QueuedAnimIdle*>(nullptr));
     if (pQueuedAnimIdleMap->GetAt(apAnimIdle, spqueuedAnimIdle)) {
         QueuedAnimIdle* v2 = spqueuedAnimIdle.m_pObject;
         pIOManager->CancelTask(v2, nullptr);
     }
-    spqueuedAnimIdle.~NiPointer<QueuedAnimIdle>();
 }
 
 void ModelLoader::CancelReferencesForCell(TESObjectCELL* apCell) {
-    XFNV_INLINED_LOCAL(NiPointer<QueuedReference>, spqueuedReference, std::nullopt, std::nullopt);
     using iterator_t = LockFreeMap<TESObjectREFR*, NiPointer<QueuedReference>>::LockFreeMapIterator;
     if ((apCell) && (apCell->iQueuedRefCount)) {
         iterator_t iterator;
         while (!iterator.GetFinished()) {
             TESObjectREFR* pref = nullptr;
-            ::new (&spqueuedReference) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
+            NiPointer<QueuedReference> spqueuedReference(static_cast<QueuedReference*>(nullptr));
             if (pQueuedReferencesMap->GetNext(iterator, pref, spqueuedReference, true) &&
                 pref->GetParentCell() == apCell) {
                 CancelReference(pref);
             }
-            spqueuedReference.~NiPointer<QueuedReference>();
         }
     }
 }
@@ -4134,7 +4097,6 @@ void ModelLoader::QueueCreatureParts(
 
 void ModelLoader::QueueTreeBillboard(const char* apFilename, TREE_BILLBOARD_DATA* apBillboardData) {
     QueuedTreeBillboard* v4;
-    XFNV_INLINED_LOCAL(NiPointer<QueuedTreeBillboard>, spqueuedTreeBillboard, std::nullopt, std::nullopt);
     QueuedTreeBillboard* apMemory = static_cast<QueuedTreeBillboard*>(ourMalloc(sizeof(QueuedTreeBillboard)));
     if (apMemory) {
         v4 = ::new (apMemory) QueuedTreeBillboard(apFilename, IO_TASK_PRIORITY_LOW, apBillboardData);
@@ -4142,15 +4104,12 @@ void ModelLoader::QueueTreeBillboard(const char* apFilename, TREE_BILLBOARD_DATA
     else {
         v4 = nullptr;
     }
-    ::new (static_cast<void*>(&spqueuedTreeBillboard)) NiPointer<QueuedFile>(static_cast<QueuedFile*>(v4));
+    NiPointer<QueuedTreeBillboard> spqueuedTreeBillboard(v4);
     QueuedTreeBillboard* v3 = spqueuedTreeBillboard.m_pObject;
     v3->QueueMe();
-    spqueuedTreeBillboard.~NiPointer<QueuedTreeBillboard>();
 }
 
 void ModelLoader::CancelAllFiles() {
-    XFNV_INLINED_LOCAL(NiPointer<QueuedHelmet>, spqueuedHelmet, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<QueuedAnimIdle>, spqueuedAnimIdle, std::nullopt, std::nullopt);
     AnimIdle* panimIdle;
     using iterator2_t = LockFreeMap<AnimIdle*, NiPointer<QueuedAnimIdle>>::LockFreeMapIterator;
     using iterator1_t = LockFreeMap<TESObjectREFR*, NiPointer<QueuedReference>>::LockFreeMapIterator;
@@ -4169,22 +4128,20 @@ void ModelLoader::CancelAllFiles() {
     iterator2_t iterator2;
     while (!iterator2.GetFinished()) {
         panimIdle = nullptr;
-        ::new (&spqueuedAnimIdle) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
+        NiPointer<QueuedAnimIdle> spqueuedAnimIdle(static_cast<QueuedAnimIdle*>(nullptr));
         if (pQueuedAnimIdleMap->GetNext(iterator2, panimIdle, spqueuedAnimIdle, true)) {
             QueuedAnimIdle* v2 = spqueuedAnimIdle.m_pObject;
             pIOManager->CancelTask(v2, nullptr);
         }
-        spqueuedAnimIdle.~NiPointer<QueuedAnimIdle>();
     }
     iterator3_t iterator3;
     while (!iterator3.GetFinished()) {
         TESObjectREFR* pref_2 = nullptr;
-        ::new (&spqueuedHelmet) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
+        NiPointer<QueuedHelmet> spqueuedHelmet(static_cast<QueuedHelmet*>(nullptr));
         if (pQueuedHelmetMap->GetNext(iterator3, pref_2, spqueuedHelmet, true)) {
             QueuedHelmet* v3 = spqueuedHelmet.m_pObject;
             pIOManager->CancelTask(v3, nullptr);
         }
-        spqueuedHelmet.~NiPointer<QueuedHelmet>();
     }
     pIOManager->CancelAllTasks();
     pIOManager->Resume();

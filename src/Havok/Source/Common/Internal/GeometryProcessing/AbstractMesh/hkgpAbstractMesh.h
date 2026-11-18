@@ -431,18 +431,9 @@ public:
     // The edge from v0 to v1, turning round v0 from locateExistingVertex's edge.
     Edge* locateExistingEdge(Edge* apResult, Edge root, const Vertex* v0, const Vertex* v1) const;
     // insertEdge returns EDGE_IS_VERTEX when both ends are the same point.
-    Insertion* insertEdge(
-        Insertion* apResult,
-        int32_t x0,
-        int32_t y0,
-        int32_t x1,
-        int32_t y1,
-        bool conform,
-        const EDGE_DATA* data
-    );
+    Insertion insertEdge(int32_t x0, int32_t y0, int32_t x1, int32_t y1, bool conform, const EDGE_DATA* data);
     // Switches on the location's type and returns FAILED for an unknown one.
-    Insertion*
-    insertVertex(Insertion* apResult, int32_t x, int32_t y, bool conform, const Location& location, bool edgeSplit);
+    Insertion insertVertex(int32_t x, int32_t y, bool conform, const Location& location, bool edgeSplit);
 
     // hkReferencedObject (vtable and the reference count) fills 0x0-0x8.
     hkgpAbstractMesh<Edge, Vertex, Triangle, ALLOCATOR> m_mesh;
