@@ -30,8 +30,8 @@ public:
         const hkVector4& coneAxis,
         const hkVector4& startPos
     );
-    hkVector4* getPosition(hkVector4* apResult);
-    hkVector4* getAxis(hkVector4* apResult);
+    hkVector4 getPosition();
+    hkVector4 getAxis();
     float getHeight();
     float getAngle();
     int32_t getNumSegments();

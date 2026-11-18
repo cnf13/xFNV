@@ -1800,13 +1800,14 @@ float getLoopSurfaceArea(const hkArray<hkgpMeshBase::Edge, hkContainerHeapAlloca
 }
 
 // The centroid of the triangle's three positions: (v1 + v0 + v2) times the float 1/3.
-hkVector4* getTriangleCentroid(hkVector4* apResult, const hkgpMeshBase::Triangle* apTriangle) {
+hkVector4 getTriangleCentroid(const hkgpMeshBase::Triangle* apTriangle) {
+    hkVector4 centroid;
     const __m128 sum = _mm_add_ps(
         _mm_add_ps(apTriangle->m_vertices[1]->m_position.m_quad, apTriangle->m_vertices[0]->m_position.m_quad),
         apTriangle->m_vertices[2]->m_position.m_quad
     );
-    apResult->m_quad = _mm_mul_ps(sum, _mm_set1_ps(0.33333334f));
-    return apResult;
+    centroid.m_quad = _mm_mul_ps(sum, _mm_set1_ps(0.33333334f));
+    return centroid;
 }
 
 // Picks the pair of planes not tried yet whose normals are least parallel but under 0.9 (the largest dot product below
@@ -6243,11 +6244,12 @@ float hkgpMesh::getConvexHullVolume() {
 
 // The first vertex's position, then each vertex (the first again included) whose dot with direction is above the
 // best so far (an x87 compare of the float-rounded dots), with its index in w (setInt24W).
-hkVector4* hkgpMesh::getSupportingVertex(hkVector4* apResult, const hkVector4& direction) {
+hkVector4 hkgpMesh::getSupportingVertex(const hkVector4& direction) {
+    hkVector4 support;
     hkgpMeshBase::Vertex* pVertex = m_vertices.m_used;
-    *apResult = pVertex->m_position;
+    support = pVertex->m_position;
     const __m128 dir = direction.m_quad;
-    __m128 dot = _mm_mul_ps(apResult->m_quad, dir);
+    __m128 dot = _mm_mul_ps(support.m_quad, dir);
     float bestDot =
         _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(dot, dot, 0xAA), _mm_add_ss(_mm_shuffle_ps(dot, dot, 0x55), dot)));
     for (int32_t i = 0; pVertex; pVertex = pVertex->m_next, ++i) {
@@ -6257,36 +6259,37 @@ hkVector4* hkgpMesh::getSupportingVertex(hkVector4* apResult, const hkVector4& d
             _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(dot, dot, 0xAA), _mm_add_ss(_mm_shuffle_ps(dot, dot, 0x55), dot)));
         if (bestDot < vertexDot) {
             bestDot = vertexDot;
-            apResult->m_quad = position;
-            apResult->setInt24W(i);
+            support.m_quad = position;
+            support.setInt24W(i);
         }
     }
-    return apResult;
+    return support;
 }
 
-hkVector4* hkgpMesh::getCenter(hkVector4* triangle) {
+hkVector4 hkgpMesh::getCenter() {
+    hkVector4 center;
     uint32_t v13;
     int32_t v2 = std::bit_cast<int32_t>(hkVector4Zero.m_quad[1]);
-    triangle->m_quad[0] = std::bit_cast<float>(static_cast<int32_t>(std::bit_cast<int32_t>(hkVector4Zero.m_quad[0])));
+    center.m_quad[0] = std::bit_cast<float>(static_cast<int32_t>(std::bit_cast<int32_t>(hkVector4Zero.m_quad[0])));
     int32_t v3 = std::bit_cast<int32_t>(hkVector4Zero.m_quad[2]);
-    triangle->m_quad[1] = std::bit_cast<float>(v2);
+    center.m_quad[1] = std::bit_cast<float>(v2);
     int32_t v4 = std::bit_cast<int32_t>(hkVector4Zero.m_quad[3]);
-    triangle->m_quad[2] = std::bit_cast<float>(v3);
+    center.m_quad[2] = std::bit_cast<float>(v3);
     int32_t m_numUsed = m_vertices.m_numUsed;
-    triangle->m_quad[3] = std::bit_cast<float>(v4);
+    center.m_quad[3] = std::bit_cast<float>(v4);
     int32_t v12 = m_numUsed;
     if (m_numUsed <= 0) {
         hkgpConvexHull* m_convexHull = this->m_convexHull;
         if (m_convexHull) {
-            (*triangle).m_quad = (&m_convexHull->D752D0())->m_quad;
+            center.m_quad = (&m_convexHull->D752D0())->m_quad;
         }
-        return triangle;
+        return center;
     }
 
     hkgpMeshBase::Vertex* m_used = m_vertices.m_used;
     if (m_used) {
         hkVector4 v9;
-        __m128 m_quad = triangle->m_quad;
+        __m128 m_quad = center.m_quad;
         do {
             __m128 v8 = m_used->m_position.m_quad;
             m_used = m_used->m_next;
@@ -6294,14 +6297,13 @@ hkVector4* hkgpMesh::getCenter(hkVector4* triangle) {
             m_quad = v9.m_quad;
         }
         while (m_used);
-        (*triangle).m_quad = v9.m_quad;
+        center.m_quad = v9.m_quad;
     }
     *reinterpret_cast<float*>(&v13) = 1.0 / static_cast<double>(v12);
-    triangle->m_quad = _mm_mul_ps(
-        _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v13)), _mm_set_ss(std::bit_cast<float>(v13)), 0),
-        triangle->m_quad
+    center.m_quad = _mm_mul_ps(
+        _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v13)), _mm_set_ss(std::bit_cast<float>(v13)), 0), center.m_quad
     );
-    return triangle;
+    return center;
 }
 
 // The plane through a1, a2 and a3 into a4 (the cross product normalized, w the negated distance); with a5, each
@@ -8564,8 +8566,7 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                 hullPoints.m_striding = static_cast<int32_t>(sizeof(hkVector4));
                 hull.build(hullPoints, buildConfig);
                 if (hull.getDimensions() >= 2) {
-                    hkVector4 plane;
-                    hull.getBestProjectionPlane(&plane);
+                    hkVector4 plane = hull.getBestProjectionPlane();
                     // The hull's plane first, then each sample normal, until the ring is filled.
                     for (int32_t iSample = 0; iSample < normals.m_size + 1; ++iSample) {
                         hkVector4 domainMin;

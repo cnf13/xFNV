@@ -148,24 +148,12 @@ void hkDisplaySemiCircle::generatePoints(hkArray<hkVector4, hkContainerHeapAlloc
     }
 }
 
-hkVector4* hkDisplaySemiCircle::getNormal(hkVector4* apResult) {
-    apResult->m_quad[0] = m_normal.m_quad[0];
-    apResult->m_quad[1] = m_normal.m_quad[1];
-    float z = m_normal.m_quad[2];
-    float w = m_normal.m_quad[3];
-    apResult->m_quad[2] = z;
-    apResult->m_quad[3] = w;
-    return apResult;
+hkVector4 hkDisplaySemiCircle::getNormal() {
+    return m_normal;
 }
 
-hkVector4* hkDisplaySemiCircle::getPerp(hkVector4* apResult) {
-    apResult->m_quad[0] = m_perp.m_quad[0];
-    apResult->m_quad[1] = m_perp.m_quad[1];
-    float z = m_perp.m_quad[2];
-    float w = m_perp.m_quad[3];
-    apResult->m_quad[2] = z;
-    apResult->m_quad[3] = w;
-    return apResult;
+hkVector4 hkDisplaySemiCircle::getPerp() {
+    return m_perp;
 }
 
 float hkDisplaySemiCircle::getThetaMin() {
@@ -184,14 +172,8 @@ int32_t hkDisplaySemiCircle::getNumSegments() {
     return m_numSegments;
 }
 
-hkVector4* hkDisplaySemiCircle::getCenter(hkVector4* apResult) {
-    apResult->m_quad[0] = m_center.m_quad[0];
-    apResult->m_quad[1] = m_center.m_quad[1];
-    float z = m_center.m_quad[2];
-    float w = m_center.m_quad[3];
-    apResult->m_quad[2] = z;
-    apResult->m_quad[3] = w;
-    return apResult;
+hkVector4 hkDisplaySemiCircle::getCenter() {
+    return m_center;
 }
 
 void hkDisplaySemiCircle::setParameters(

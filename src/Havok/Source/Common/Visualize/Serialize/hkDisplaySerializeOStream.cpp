@@ -85,11 +85,6 @@ void hkDisplaySerializeOStream::writeGeometry(const hkGeometry& g) {
 }
 
 void hkDisplaySerializeOStream::writeDisplayGeometry(hkDisplayGeometry* dg) {
-    hkVector4 apResult;
-    hkVector4 apResult_;
-    hkVector4 apResult__1;
-    hkVector4 apResult__2;
-    hkVector4 apResult__3;
     hkDisplayGeometryType m_type = dg->m_type;
     write8(m_type);
     switch (m_type) {
@@ -117,10 +112,8 @@ void hkDisplaySerializeOStream::writeDisplayGeometry(hkDisplayGeometry* dg) {
             break;
         }
         case HK_DISPLAY_CONE: {
-            hkVector4* Position = static_cast<hkDisplayCone*>(dg)->hkDisplayCone::getPosition(&apResult);
-            writeQuadVector4(*Position);
-            hkVector4* Axis = static_cast<hkDisplayCone*>(dg)->hkDisplayCone::getAxis(&apResult_);
-            writeQuadVector4(*Axis);
+            writeQuadVector4(static_cast<hkDisplayCone*>(dg)->hkDisplayCone::getPosition());
+            writeQuadVector4(static_cast<hkDisplayCone*>(dg)->hkDisplayCone::getAxis());
             float Angle = static_cast<hkDisplayCone*>(dg)->hkDisplayCone::getAngle();
             writeFloat32(Angle);
             float Height = static_cast<hkDisplayCone*>(dg)->hkDisplayCone::getHeight();
@@ -130,12 +123,9 @@ void hkDisplaySerializeOStream::writeDisplayGeometry(hkDisplayGeometry* dg) {
             break;
         }
         case HK_DISPLAY_SEMICIRCLE: {
-            hkVector4* Center = static_cast<hkDisplaySemiCircle*>(dg)->hkDisplaySemiCircle::getCenter(&apResult__1);
-            writeQuadVector4(*Center);
-            hkVector4* Normal_ = static_cast<hkDisplaySemiCircle*>(dg)->hkDisplaySemiCircle::getNormal(&apResult__2);
-            writeQuadVector4(*Normal_);
-            hkVector4* Perp = static_cast<hkDisplaySemiCircle*>(dg)->hkDisplaySemiCircle::getPerp(&apResult__3);
-            writeQuadVector4(*Perp);
+            writeQuadVector4(static_cast<hkDisplaySemiCircle*>(dg)->hkDisplaySemiCircle::getCenter());
+            writeQuadVector4(static_cast<hkDisplaySemiCircle*>(dg)->hkDisplaySemiCircle::getNormal());
+            writeQuadVector4(static_cast<hkDisplaySemiCircle*>(dg)->hkDisplaySemiCircle::getPerp());
             float a1b = static_cast<hkDisplaySemiCircle*>(dg)->hkDisplaySemiCircle::getRadius();
             writeFloat32(a1b);
             float a1c = static_cast<hkDisplaySemiCircle*>(dg)->hkDisplaySemiCircle::getThetaMin();

@@ -327,13 +327,12 @@ hkAabb* hkgpConvexHull::getBoundingBox(hkAabb* apResult, Inputs source, float sc
             }
         }
         else {
-            hkVector4 position;
-            pBox->m_min.m_quad = D74E80(&position, pVertex)->m_quad;
-            pBox->m_max.m_quad = D74E80(&position, pVertex)->m_quad;
+            pBox->m_min.m_quad = D74E80(pVertex).m_quad;
+            pBox->m_max.m_quad = D74E80(pVertex).m_quad;
             for (pVertex = hkgpConvexHull::D75120(pVertex); pVertex; pVertex = hkgpConvexHull::D75120(pVertex)) {
-                const hkVector4* pPosition = D74E80(&position, pVertex);
-                pBox->m_min.m_quad = _mm_min_ps(pBox->m_min.m_quad, pPosition->m_quad);
-                pBox->m_max.m_quad = _mm_max_ps(pBox->m_max.m_quad, pPosition->m_quad);
+                hkVector4 position = D74E80(pVertex);
+                pBox->m_min.m_quad = _mm_min_ps(pBox->m_min.m_quad, position.m_quad);
+                pBox->m_max.m_quad = _mm_max_ps(pBox->m_max.m_quad, position.m_quad);
             }
         }
     }
@@ -713,8 +712,7 @@ void hkgpConvexHull::absoluteScale(float offset, const AbsoluteScaleConfig& conf
         vertices.m_striding = 16;
         if (iDimensions == 2) {
             const BuildConfig& buildConfig = getConfiguration();
-            hkVector4 plane;
-            getProjectionPlane(&plane);
+            hkVector4 plane = getProjectionPlane();
             buildPlanar(vertices, plane, buildConfig);
         }
         else {
@@ -754,8 +752,7 @@ void hkgpConvexHull::absoluteScale(float offset, const AbsoluteScaleConfig& conf
         const int32_t iDimensions = getDimensions();
         if (iDimensions == 2) {
             const BuildConfig& buildConfig = getConfiguration();
-            hkVector4 plane;
-            getProjectionPlane(&plane);
+            hkVector4 plane = getProjectionPlane();
             buildFromPlanes(points.m_data, points.m_size, plane, buildConfig);
         }
         else {
@@ -797,9 +794,8 @@ const hkVector4& hkgpConvexHull::D752D0() const {
     return m_data->getCentroid<hkgpConvexHullImpl::PositionAsSource>();
 }
 
-hkVector4* hkgpConvexHull::getProjectionPlane(hkVector4* apOut) const {
-    *apOut = m_data->m_projectionPlane;
-    return apOut;
+hkVector4 hkgpConvexHull::getProjectionPlane() const {
+    return m_data->m_projectionPlane;
 }
 
 // The count (getNumPlanes) is read once to size the array and once more to walk it, and the heap allocator is fetched
@@ -831,7 +827,8 @@ void hkgpConvexHull::appendVertices(hkArray<hkVector4>& arVertices) {
 // across the calls (`mov ecx, edx` right after the call at 0xD759EA), which clang does not guarantee.
 // The integer coordinates of the implementation's vertex (the public vertex is its base) converted to floats, w the
 // exe's 0.0f at 0x1011D78, scaled back by m_scaleInv and moved by m_origin.
-hkVector4* hkgpConvexHull::D74E80(hkVector4* apOut, hkgpConvexHull::Vertex* apVertex) const {
+hkVector4 hkgpConvexHull::D74E80(hkgpConvexHull::Vertex* apVertex) const {
+    hkVector4 out;
     const hkgpConvexHullImpl* pData = m_data;
     const hkgpConvexHullImpl::Vertex* pVertex = static_cast<hkgpConvexHullImpl::Vertex*>(apVertex);
     const __m128 x = _mm_set_ss(static_cast<float>(pVertex->m_x[0]));
@@ -839,8 +836,8 @@ hkVector4* hkgpConvexHull::D74E80(hkVector4* apOut, hkgpConvexHull::Vertex* apVe
     const __m128 z = _mm_set_ss(static_cast<float>(pVertex->m_x[2]));
     const __m128 w = _mm_set_ss(0.0f);
     const __m128 xyzw = _mm_unpacklo_ps(_mm_unpacklo_ps(x, z), _mm_unpacklo_ps(y, w));
-    apOut->m_quad = _mm_add_ps(_mm_mul_ps(xyzw, pData->m_scaleInv.m_quad), pData->m_origin.m_quad);
-    return apOut;
+    out.m_quad = _mm_add_ps(_mm_mul_ps(xyzw, pData->m_scaleInv.m_quad), pData->m_origin.m_quad);
+    return out;
 }
 
 // KEEP: unregistered. The exe body touches only eax, and a caller keeps edx live across the call (getBoundingBox holds
@@ -1011,8 +1008,7 @@ char hkgpConvexHull::expandByPlanarMargin(float margin) {
         }
         case 2: {
             const hkVector4 center = D752D0();
-            hkVector4 plane;
-            getProjectionPlane(&plane);
+            hkVector4 plane = getProjectionPlane();
             const int32_t iNumPoints = 3 * getNumVertices();
             points._reserve(*hkMemoryRouter::getInstance().m_heap, iNumPoints);
             fetchPositions(SOURCE_VERTICES, points);
@@ -1415,10 +1411,8 @@ void hkgpConvexHull::subdivide(
             pHull->buildMassProperties();
             hkgpConvexHull* above;
             hkgpConvexHull* below;
-            hkVector4 plane;
             const float fThickness = thickness;
-            const hkVector4* pPlane = pHull->getMajorPlane(&plane);
-            if (pHull->splitByPlane(*pPlane, &above, &below, fThickness) != CROSSING) {
+            if (pHull->splitByPlane(pHull->getMajorPlane(), &above, &below, fThickness) != CROSSING) {
                 continue;
             }
             if (above && below) {
@@ -1469,9 +1463,8 @@ uint32_t hkgpConvexHull::uid() {
 }
 
 // A copy of m_data->m_projectionAxis.
-hkVector4* hkgpConvexHull::getProjectionAxis(hkVector4* apResult) {
-    *apResult = m_data->m_projectionAxis;
-    return apResult;
+hkVector4 hkgpConvexHull::getProjectionAxis() {
+    return m_data->m_projectionAxis;
 }
 
 bool hkgpConvexHull::clipLine(const hkVector4& a, const hkVector4& b, float& t0, float& t1, float epsilon) const {
@@ -1571,7 +1564,8 @@ hkgpConvexHull::Triangle* hkgpConvexHull::getNeighbour(hkgpConvexHull::Triangle*
 // The plane through the inertia space's origin whose normal is the inertia axis of the largest reciprocal diagonal
 // entry (the smallest moment), after an error report when the hull has no mass properties. The reciprocal is taken on
 // (d.x, d.y, d.z, 1) and made absolute. w is 0.0f - dot3.
-hkVector4* hkgpConvexHull::getMajorPlane(hkVector4* apResult) const {
+hkVector4 hkgpConvexHull::getMajorPlane() const {
+    hkVector4 plane;
     alignas(16) char buf[512];
     hkTransform inertiaSpace;
     hkVector4 inertiaDiagonal;
@@ -1603,12 +1597,12 @@ hkVector4* hkgpConvexHull::getMajorPlane(hkVector4* apResult) const {
         iAxis = inv(2) > inv(0) ? 2 : 0;
     }
     const __m128 translation = inertiaSpace.m_translation.m_quad;
-    *apResult = inertiaSpace.m_rotation.getColumn(iAxis);
-    const __m128 prod = _mm_mul_ps(apResult->m_quad, translation);
+    plane = inertiaSpace.m_rotation.getColumn(iAxis);
+    const __m128 prod = _mm_mul_ps(plane.m_quad, translation);
     const __m128 dot = _mm_add_ss(_mm_shuffle_ps(prod, prod, 0xAA), _mm_add_ss(_mm_shuffle_ps(prod, prod, 0x55), prod));
     const float fW = _mm_cvtss_f32(_mm_sub_ss(_mm_setzero_ps(), dot));
-    (*apResult)(3) = fW;
-    return apResult;
+    plane(3) = fW;
+    return plane;
 }
 
 int32_t hkgpConvexHull::classify(__m128* a1, float a2, float* a3) {
@@ -1786,8 +1780,9 @@ void hkgpConvexHull::getOrientedBoundingBox(hkVector4& halfExtents, hkTransform&
 // (its two larger-magnitude lanes swapped and one negated, then normalized through __CIsqrt unless zero), for 2 the
 // projection plane, for 3 the oriented box's axis of the smallest half extent; w is 0 in every case. The axis
 // choices are x87 compares (unordered counts as not greater), the lane copies x87 float copies.
-hkVector4* hkgpConvexHull::getBestProjectionPlane(hkVector4* apResult) const {
-    apResult->m_quad = _mm_setzero_ps();
+hkVector4 hkgpConvexHull::getBestProjectionPlane() const {
+    hkVector4 plane;
+    plane.m_quad = _mm_setzero_ps();
     const hkgpConvexHullImpl* pData = m_data;
     const __m128 zero = _mm_setzero_ps();
     switch (pData->m_dimensions) {
@@ -1807,21 +1802,21 @@ hkVector4* hkgpConvexHull::getBestProjectionPlane(hkVector4* apResult) const {
             if (fMin > fAbsZ) {
                 iHigh = iLow;
             }
-            apResult->m_quad = zero;
-            (*apResult)(iMid) = pData->m_projectionAxis(iHigh);
-            (*apResult)(iHigh) = -pData->m_projectionAxis(iMid);
-            const __m128 v = apResult->m_quad;
+            plane.m_quad = zero;
+            plane(iMid) = pData->m_projectionAxis(iHigh);
+            plane(iHigh) = -pData->m_projectionAxis(iMid);
+            const __m128 v = plane.m_quad;
             const __m128 sq = _mm_mul_ps(v, v);
             const float fLengthSq =
                 _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq)));
             if (fLengthSq != 0.0f) {
                 const float fLength = std::sqrt(fLengthSq);
                 const float fInvLength = 1.0f / fLength;
-                apResult->m_quad = _mm_mul_ps(_mm_set1_ps(fInvLength), v);
+                plane.m_quad = _mm_mul_ps(_mm_set1_ps(fInvLength), v);
             }
             break;
         }
-        case 2: apResult->m_quad = pData->m_projectionPlane.m_quad; break;
+        case 2: plane.m_quad = pData->m_projectionPlane.m_quad; break;
         case 3: {
             hkVector4 halfExtents;
             hkTransform transform;
@@ -1836,12 +1831,12 @@ hkVector4* hkgpConvexHull::getBestProjectionPlane(hkVector4* apResult) const {
             hkVector4 dir;
             dir.m_quad = zero;
             dir(iAxis) = 1.0f;
-            apResult->setRotatedDir(transform.m_rotation, dir);
+            plane.setRotatedDir(transform.m_rotation, dir);
             break;
         }
     }
-    (*apResult)(3) = 0.0f;
-    return apResult;
+    plane(3) = 0.0f;
+    return plane;
 }
 
 void hkgpConvexHull::ensureContainment(const hkArray<hkVector4, hkContainerHeapAllocator>& points) {
@@ -2610,8 +2605,7 @@ void hkgpConvexHull::createVoronoiCells(
                         break;
                     case NEGATIVE: {
                         if (fFarthest < 0.0f) {
-                            hkVector4 farthest;
-                            fFarthest = pCell->m_data->getFarthestVertexDistanceSquared(&farthest, &site)->m_quad[0];
+                            fFarthest = pCell->m_data->getFarthestVertexDistanceSquared(&site).m_quad[0];
                         }
                         // The remaining points are all too far.
                         if (fFarthest * 4.0 < fDistance) {
@@ -5972,8 +5966,9 @@ int32_t hkgpConvexHullImpl::classify(const __m128* a1, float a2, int32_t* a3, fl
 }
 
 // The vertex farthest from point (the first of equals, point itself when there is none or all are at zero
-// distance): its squared distance to point in a1's lane 0, the z term in lanes 1 to 3.
-hkVector4* hkgpConvexHullImpl::getFarthestVertexDistanceSquared(hkVector4* a1, const hkVector4* point) {
+// distance): its squared distance to point in lane 0, the z term in lanes 1 to 3.
+hkVector4 hkgpConvexHullImpl::getFarthestVertexDistanceSquared(const hkVector4* point) {
+    hkVector4 result;
     const __m128 p = point->m_quad;
     __m128 farthest = p;
     float fBest = 0.0f;
@@ -5991,8 +5986,8 @@ hkVector4* hkgpConvexHullImpl::getFarthestVertexDistanceSquared(hkVector4* a1, c
     }
     const __m128 d = _mm_sub_ps(p, farthest);
     const __m128 sq = _mm_mul_ps(d, d);
-    a1->m_quad = _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq));
-    return a1;
+    result.m_quad = _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq));
+    return result;
 }
 
 // For each point and each triangle: the triangle's vertices transformed by transform (x c0 + y c1 + z c2 + c3), its

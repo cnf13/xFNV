@@ -163,8 +163,7 @@ void hkConvexPenetrationUtil::addPointToSimplex(const hkWingedEdge::Vertex& p) {
     m_simplexSize.m_storage = m_storage + 1;
 }
 
-hkVector4* hkConvexPenetrationUtil::findBestProjection(
-    hkVector4* apBestDistanceOut,
+hkVector4 hkConvexPenetrationUtil::findBestProjection(
     const hkVector4& direction,
     const hkVector4& from,
     hkWingedEdge::Vertex& result
@@ -187,7 +186,6 @@ hkVector4* hkConvexPenetrationUtil::findBestProjection(
     v10[0] = v10[0] + v9;
     v14.m_quad = _mm_max_ps(v10, v13);
     v13[0] = v13[0] - v10[0];
-    (*apBestDistanceOut).m_quad = v14.m_quad;
     if ((_mm_movemask_ps(v13) & 1) != 0) {
         hkVector4 v16;
         hkWingedEdge::Edge* m_storage = resulta.m_referee.m_storage;
@@ -197,7 +195,7 @@ hkVector4* hkConvexPenetrationUtil::findBestProjection(
         result.m_pointBinB.m_quad = v16.m_quad;
         result.m_referee.m_storage = m_storage;
     }
-    return apBestDistanceOut;
+    return v14;
 }
 
 // Grows the simplex from its m_simplexSize points to a tetrahedron around the origin, one support point per step; iStep
@@ -434,12 +432,10 @@ expandEdge:
         cross.setCross(edge, perpendicular);
         perpendicular.m_quad = normalize3(perpendicular.m_quad);
         cross.m_quad = normalize3(cross.m_quad);
-        hkVector4 perpendicularDistance;
-        hkVector4 crossDistance;
         hkWingedEdge::Vertex alongPerpendicular;
         hkWingedEdge::Vertex alongCross;
-        findBestProjection(&perpendicularDistance, perpendicular, *pSimplex, alongPerpendicular);
-        findBestProjection(&crossDistance, cross, *m_simplex.m_storage, alongCross);
+        hkVector4 perpendicularDistance = findBestProjection(perpendicular, *pSimplex, alongPerpendicular);
+        hkVector4 crossDistance = findBestProjection(cross, *m_simplex.m_storage, alongCross);
         if ((_mm_movemask_ps(_mm_sub_ss(crossDistance.m_quad, perpendicularDistance.m_quad)) & 1) != 0) {
             addPointToSimplex(alongPerpendicular);
         }
@@ -454,11 +450,10 @@ expandTriangle:
         // The fourth point, along the triangle's normal or against it; where neither gets further than m_epsTol the
         // origin's projection on the triangle is the answer.
         hkVector4* pSimplex = m_simplex.m_storage;
-        hkVector4 distance;
         hkWingedEdge::Vertex support;
         triangleNormal.m_quad = normalize3(triangleNormal.m_quad);
         iStep = 3;
-        findBestProjection(&distance, triangleNormal, *pSimplex, support);
+        hkVector4 distance = findBestProjection(triangleNormal, *pSimplex, support);
         if ((_mm_movemask_ps(_mm_sub_ss(distance.m_quad, m_epsTol.m_quad)) & 1) == 0) {
             addPointToSimplex(support);
             goto tetrahedron;

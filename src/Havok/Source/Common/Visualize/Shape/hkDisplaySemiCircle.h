@@ -25,13 +25,13 @@ public:
 
     // Reserves and fills the vertex array buildGeometry and getWireframeGeometry pass.
     void generatePoints(hkArray<hkVector4>& points);
-    hkVector4* getNormal(hkVector4* apResult);
-    hkVector4* getPerp(hkVector4* apResult);
+    hkVector4 getNormal();
+    hkVector4 getPerp();
     float getThetaMin();
     float getThetaMax();
     float getRadius();
     int32_t getNumSegments();
-    hkVector4* getCenter(hkVector4* apResult);
+    hkVector4 getCenter();
     // Stores the arc's parameters: radius, the angle range, the segment count, the centre,
     // the normal and startPerp as m_perp.
     void setParameters(

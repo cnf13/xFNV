@@ -60,11 +60,11 @@ static void finishLoadedObjecthkaSplineCompressedAnimation(void* p, int32_t fini
 static void cleanupLoadedObjecthkaSplineCompressedAnimation(void* p);
 static int32_t packMaskAndQuantization(uint8_t a1, uint8_t a2);
 static int32_t packQuantizationTypes(int32_t a1, int32_t a2, int32_t a3);
-static hkVector4* calcMean(hkVector4* apResult, const hkArray<hkVector4>& arPoints);
+static hkVector4 calcMean(const hkArray<hkVector4>& arPoints);
 // The componentwise minimum of the points.
-static hkVector4* calcMin(hkVector4* apResult, const hkArray<hkVector4>& arPoints);
+static hkVector4 calcMin(const hkArray<hkVector4>& arPoints);
 // The componentwise maximum of the points.
-static hkVector4* calcMax(hkVector4* apResult, const hkArray<hkVector4>& arPoints);
+static hkVector4 calcMax(const hkArray<hkVector4>& arPoints);
 
 // The reflected types' hkTypeInfo records: constant .data (no initialiser): the type name, the finish and cleanup
 // functions, no vtable, the RTTI type descriptor and the size.
@@ -292,53 +292,56 @@ static int32_t packQuantizationTypes(int32_t a1, int32_t a2, int32_t a3) {
 
 // The average of the points: their sum times the reciprocal of their count (computed on the x87 stack and rounded to
 // a float).
-static hkVector4* calcMean(hkVector4* apResult, const hkArray<hkVector4>& arPoints) {
+static hkVector4 calcMean(const hkArray<hkVector4>& arPoints) {
+    hkVector4 result;
     const int32_t iSize = arPoints.m_size;
     hkQuadReal kSum = _mm_setzero_ps();
-    apResult->m_quad = kSum;
+    result.m_quad = kSum;
     if (iSize > 0) {
         const hkVector4* pPoint = arPoints.m_data;
         for (int32_t i = iSize; i != 0; --i) {
             kSum = _mm_add_ps(pPoint->m_quad, kSum);
             ++pPoint;
         }
-        apResult->m_quad = kSum;
+        result.m_quad = kSum;
     }
     const float fInv = 1.0 / static_cast<double>(iSize);
-    apResult->m_quad = _mm_mul_ps(_mm_set_ps1(fInv), apResult->m_quad);
-    return apResult;
+    result.m_quad = _mm_mul_ps(_mm_set_ps1(fInv), result.m_quad);
+    return result;
 }
 
 // The componentwise minimum of the points; the first point is copied even when the array is empty.
-static hkVector4* calcMin(hkVector4* apResult, const hkArray<hkVector4>& arPoints) {
+static hkVector4 calcMin(const hkArray<hkVector4>& arPoints) {
+    hkVector4 result;
     const hkVector4* pPoint = arPoints.m_data;
     const int32_t iSize = arPoints.m_size;
-    *apResult = pPoint[0];
+    result = pPoint[0];
     if (iSize > 1) {
-        hkQuadReal kMin = apResult->m_quad;
+        hkQuadReal kMin = result.m_quad;
         for (int32_t i = iSize - 1; i != 0; --i) {
             ++pPoint;
             kMin = _mm_min_ps(kMin, pPoint->m_quad);
         }
-        apResult->m_quad = kMin;
+        result.m_quad = kMin;
     }
-    return apResult;
+    return result;
 }
 
 // The componentwise maximum of the points; the first point is copied even when the array is empty.
-static hkVector4* calcMax(hkVector4* apResult, const hkArray<hkVector4>& arPoints) {
+static hkVector4 calcMax(const hkArray<hkVector4>& arPoints) {
+    hkVector4 result;
     const hkVector4* pPoint = arPoints.m_data;
     const int32_t iSize = arPoints.m_size;
-    *apResult = pPoint[0];
+    result = pPoint[0];
     if (iSize > 1) {
-        hkQuadReal kMax = apResult->m_quad;
+        hkQuadReal kMax = result.m_quad;
         for (int32_t i = iSize - 1; i != 0; --i) {
             ++pPoint;
             kMax = _mm_max_ps(kMax, pPoint->m_quad);
         }
-        apResult->m_quad = kMax;
+        result.m_quad = kMax;
     }
-    return apResult;
+    return result;
 }
 
 const void* getVtablehkaSplineCompressedAnimation() {
@@ -1021,12 +1024,9 @@ void hkaSplineCompressedAnimation::initialize(
                 }
 
                 for (int32_t k = 0; k < numComponents; ++k) {
-                    hkVector4 mean;
-                    hkVector4 minp;
-                    hkVector4 maxp;
-                    calcMean(&mean, samples[k]);
-                    calcMin(&minp, samples[k]);
-                    calcMax(&maxp, samples[k]);
+                    hkVector4 mean = calcMean(samples[k]);
+                    hkVector4 minp = calcMin(samples[k]);
+                    hkVector4 maxp = calcMax(samples[k]);
                     if (k == 1) {
                         // EXE-INLINED none: hkVector4::normalize4 (the rotation's mean; 0 for a zero sum)
                         const __m128 q = mean.m_quad;
@@ -1152,10 +1152,8 @@ void hkaSplineCompressedAnimation::initialize(
                     }
                     else {
                         if (dynamicBits) {
-                            hkVector4 range;
-                            minp = *calcMin(&range, points);
-                            hkVector4 rangeMax;
-                            maxp = *calcMax(&rangeMax, points);
+                            minp = calcMin(points);
+                            maxp = calcMax(points);
                         }
                         uint8_t type;
                         if (trackType) {

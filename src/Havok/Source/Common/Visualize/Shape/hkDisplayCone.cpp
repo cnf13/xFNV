@@ -142,24 +142,12 @@ void hkDisplayCone::setParameters(
     m_numSegments = numSegments;
 }
 
-hkVector4* hkDisplayCone::getPosition(hkVector4* apResult) {
-    apResult->m_quad[0] = m_startPos.m_quad[0];
-    apResult->m_quad[1] = m_startPos.m_quad[1];
-    float z = m_startPos.m_quad[2];
-    float w = m_startPos.m_quad[3];
-    apResult->m_quad[2] = z;
-    apResult->m_quad[3] = w;
-    return apResult;
+hkVector4 hkDisplayCone::getPosition() {
+    return m_startPos;
 }
 
-hkVector4* hkDisplayCone::getAxis(hkVector4* apResult) {
-    apResult->m_quad[0] = m_coneAxis.m_quad[0];
-    apResult->m_quad[1] = m_coneAxis.m_quad[1];
-    float z = m_coneAxis.m_quad[2];
-    float w = m_coneAxis.m_quad[3];
-    apResult->m_quad[2] = z;
-    apResult->m_quad[3] = w;
-    return apResult;
+hkVector4 hkDisplayCone::getAxis() {
+    return m_coneAxis;
 }
 
 float hkDisplayCone::getHeight() {

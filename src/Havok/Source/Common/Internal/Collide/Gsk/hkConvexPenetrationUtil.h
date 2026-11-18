@@ -24,12 +24,7 @@ public:
     void addPointToSimplex(const hkWingedEdge::Vertex& p);
     // Through getPointForSimplex: the larger of the two distances goes in all four lanes of *apBestDistanceOut, which
     // is also returned.
-    hkVector4* findBestProjection(
-        hkVector4* apBestDistanceOut,
-        const hkVector4& direction,
-        const hkVector4& from,
-        hkWingedEdge::Vertex& result
-    );
+    hkVector4 findBestProjection(const hkVector4& direction, const hkVector4& from, hkWingedEdge::Vertex& result);
     // Grows the simplex to a tetrahedron around the origin (HK_SUCCESS), or writes output itself (HK_FAILURE, gjkStatus
     // OK); gjkStatus 5 where it cannot.
     hkResult builtTetrahedron(hkGskOut& output, hkGskStatus& gjkStatus);

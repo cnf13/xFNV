@@ -164,12 +164,12 @@ public:
     // The hull's centroid, computed when it has no mass properties.
     const hkVector4& D752D0() const;
     // Writes the hull's projection plane to apOut and returns it.
-    hkVector4* getProjectionPlane(hkVector4* apOut) const;
+    hkVector4 getProjectionPlane() const;
     // Appends the hull's vertices to arVertices.
     void appendVertices(hkArray<hkVector4>& arVertices);
     // The position of an internal vertex, written to apOut and
     // returned.
-    hkVector4* D74E80(hkVector4* apOut, Vertex* apVertex) const;
+    hkVector4 D74E80(Vertex* apVertex) const;
     // Returns the first vertex of the hull's list.
     Vertex* D75060() const;
     // Builds the hull's face indices.
@@ -204,7 +204,7 @@ public:
     subdivide(int32_t recursions, hkArray<hkgpConvexHull*, hkContainerHeapAllocator>& output, float thickness) const;
     void deleteUserObject();
     uint32_t uid();
-    hkVector4* getProjectionAxis(hkVector4* apResult);
+    hkVector4 getProjectionAxis();
     // Havok SDK signature (hkInternal.lib, tied by bytes).
     bool clipLine(const hkVector4& a, const hkVector4& b, float& t0, float& t1, float epsilon) const;
     // Havok SDK signature (hkInternal.lib, tied by bytes).
@@ -220,7 +220,7 @@ public:
     // Reads only its arguments, never this.
     // Havok SDK signature (hkInternal.lib, tied by bytes).
     hkgpConvexHull::Triangle* getNeighbour(hkgpConvexHull::Triangle* triangle, int32_t index) const;
-    hkVector4* getMajorPlane(hkVector4* apResult) const;
+    hkVector4 getMajorPlane() const;
     int32_t classify(__m128* a1, float a2, float* a3);
     void reset();
     // The plane equation of a triangle: its unit normal and -n.v0.
@@ -251,7 +251,7 @@ public:
     void getOrientedBoundingBox(hkVector4& halfExtents, hkTransform& worldTransform) const;
     // The SDK's getBestProjectionPlane: the normal of the plane that best projects the hull, w 0, into apResult;
     // returns apResult.
-    hkVector4* getBestProjectionPlane(hkVector4* apResult) const;
+    hkVector4 getBestProjectionPlane() const;
     void ensureContainment(const hkArray<hkVector4, hkContainerHeapAllocator>& points);
     int32_t buildPlanar_0(
         const hkVector4* points,
@@ -539,7 +539,7 @@ public:
     int32_t classify(const __m128* a1, float a2, int32_t* a3, float* a4);
     // The squared distance from point to the vertex farthest from it
     // (a1's lane 0; its lanes 1 to 3 hold the last z term); returns a1.
-    hkVector4* getFarthestVertexDistanceSquared(hkVector4* a1, const hkVector4* point);
+    hkVector4 getFarthestVertexDistanceSquared(const hkVector4* point);
     // The largest distance, above FLT_EPSILON, of a point outside the plane of a triangle transformed by transform (the
     // triangle's plane into *planeOut); FLT_EPSILON when none. ensureContainment passes its accumulated hkMatrix4.
     double maxDistanceToTransformedPlanes(

@@ -23,7 +23,7 @@ int32_t isEdgeVolumeBelow(hkgpMeshBase::Edge edge, float a3);
 // Havok SDK signature (hkInternal.lib, tied by reloc).
 float getLoopSurfaceArea(const hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>& a1);
 // The centroid of apTriangle's positions.
-hkVector4* getTriangleCentroid(hkVector4* apResult, const hkgpMeshBase::Triangle* apTriangle);
+hkVector4 getTriangleCentroid(const hkgpMeshBase::Triangle* apTriangle);
 // The extreme intersection points along the line of planes planeA and planeB.
 int32_t findPlanarIntersections(
     const hkVector4* dir,
@@ -494,9 +494,9 @@ public:
     hkgpConvexHull* getConvexHull() const;
     float getConvexHullVolume();
     // The supporting vertex in direction, its index in w.
-    hkVector4* getSupportingVertex(hkVector4* apResult, const hkVector4& direction);
+    hkVector4 getSupportingVertex(const hkVector4& direction);
     // The mean of the vertex positions.
-    hkVector4* getCenter(hkVector4* triangle);
+    hkVector4 getCenter();
     bool setPlane(__m128* a1, __m128* a2, __m128* a3, __m128* a4, char a5);
     int32_t countParts();
     void setPartId(int32_t pid);
